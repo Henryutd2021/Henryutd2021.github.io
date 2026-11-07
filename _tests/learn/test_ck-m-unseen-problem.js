@@ -240,19 +240,27 @@ const usd = v => "$" + (Math.round(v * 100) / 100).toLocaleString("en-US", { min
       // assisted work: a solution opened before answering does not count; the full solutions opened early make it practice
       const last = D.tasks[D.tasks.length - 1].id;
       const all = st(9, 4, 3, true); Object.keys(all.tasks).forEach(id => { all.tasks[id].solFirst = true; });
-      ok(C.level(D, all).level === J.rule.practice, `${k} rule: every solution opened first, then every answer right: practice, not Strong`);
+      ok(C.level(D, all).level === "Not yet" && C.level(D, all).auto === 0 && !C.level(D, all).assisted, `${k} rule: every task's own solution opened first, then every answer right: 0 of 9, Not yet, not Strong (the full solutions stay shut, gateAll)`);
       const one = st(9, 4, 3, true); one.tasks["d-line"].solFirst = true;
       ok(C.level(D, one).level === "Developing" && C.level(D, one).auto === 8, `${k} rule: the defect's solution opened first: that task is not right, so Developing`);
       const two = st(9, 4, 3, true); two.tasks[D.tasks[1].id].solFirst = true;
       ok(C.level(D, two).level === "Strong" && C.level(D, two).early === 1, `${k} rule: one other solution opened first: 8 of 9, still Strong`);
-      const gate = st(9, 4, 3, true); gate.tasks[last].solFirst = true;
-      ok(C.level(D, gate).level === J.rule.practice && C.level(D, gate).assisted === "early", `${k} rule: the full worked solutions opened before task 11: practice`);
+      const gate = st(9, 4, 3, true); gate.solEarly = "2026-11-03T11:00:00.000Z";
+      ok(C.level(D, gate).level === J.rule.practice && C.level(D, gate).assisted === "early", `${k} rule: the full worked solutions opened early by this attempt (the lock's button, recorded as solEarly): practice`);
+      const own = st(9, 4, 3, true); own.tasks[last].solFirst = true;
+      ok(C.level(D, own).level === "Strong" && !C.level(D, own).assisted, `${k} rule: task 11's own early solution opens only its own answer (gateAll), not the full solutions: no practice`);
+      // the W5 final integration's case: task 11 submitted first used to open the full solutions; answers after an
+      // opening are late (the shared rule) and the attempt is practice
+      const skip = st(9, 4, 3, true); D.tasks.forEach(t => { skip.tasks[t.id].at = t.id === last ? "2026-11-03T10:00:00.000Z" : "2026-11-03T10:05:00.000Z"; });
+      const Dskip = Object.assign({}, D, { solOpen: { [D.key]: "2026-11-03T10:00:00.000Z" } }), LS = C.level(Dskip, skip);
+      ok(LS.level === J.rule.practice && LS.assisted === "seen" && LS.late === 10 && LS.auto === 0 && LS.pointsA === 0 && LS.pointsC === 3, `${k} rule: answers after the solutions opened are late (${LS.late}) and the attempt is practice`);
+      ok(/yes \(the full worked solutions\)/.test(C.summary(Dskip, skip, {})) && /before every task was answered/.test(C.describe(Dskip, LS)), `${k}: the summary marks late answers; the results sentence says why`);
       const Dseen = Object.assign({}, D, { solOpen: {} }), late = st(9, 4, 3, true); late.tasks[last].at = "2026-11-03T12:00:00.000Z";
       Dseen.solOpen[D.other] = "2026-11-03T11:00:00.000Z";
       ok(C.level(Dseen, late).level === J.rule.practice && C.level(Dseen, late).assisted === "seen", `${k} rule: the other variant's solutions open before this one was submitted: practice`);
       Dseen.solOpen = {}; Dseen.solOpen[D.other] = "2026-11-03T13:00:00.000Z"; Dseen.solOpen[D.key] = late.tasks[last].at;
       ok(C.level(Dseen, late).level === "Strong", `${k} rule: solutions opened by this attempt's own submission, or by the other variant later, do not count`);
-      ok(/practice/.test(C.describe(D, C.level(D, all))), `${k} describe: says why an assisted attempt has no level`);
+      ok(/practice/.test(C.describe(D, C.level(D, gate))), `${k} describe: says why an assisted attempt has no level`);
       const sm = C.summary(D, Object.assign(st(7, 3, 2, true), { finished: "2026-11-03 10:00" }), { width: 375 });
       ok(sm.split("\n")[0] === "Learn · CK-M results (" + J.version + ")" && sm.indexOf("Variant: " + J.variants[k].label) > 0 && /Level by the published rule: Proficient/.test(sm), `${k} summary: first line, variant, level`);
     });
@@ -298,8 +306,11 @@ const usd = v => "$" + (Math.round(v * 100) / 100).toLocaleString("en-US", { min
     ok(J.intro[0].indexOf("about 240 minutes") > 0 && /120[\s\S]*60[\s\S]*45[\s\S]*15/.test(J.intro[0]), "intro: 120 + 60 + 45 + 15 = 240 minutes");
     // the shared runner's options do what CK-M once did by hand (W2 integration): no observer, no own numeric check or gate
     const SRC = fs.readFileSync(L("ck-m-unseen-problem.js"), "utf8");
-    ok(!/MutationObserver|function checkNumeric|function gate\(|fixResults/.test(SRC) && /describe: describe/.test(SRC) && /submitTask: finalId\(J, k\)/.test(SRC) && /cp\.destroy\(\)/.test(SRC),
-       "page code: the runner's describe, submitTask and destroy options; the numeric check is the shared one");
+    ok(!/MutationObserver|function checkNumeric|function gate\(|fixResults/.test(SRC) && /describe: describe/.test(SRC) && /gateAll: true, late: "practice"/.test(SRC) && !/submitTask/.test(SRC.slice(SRC.indexOf("cp = LX.Checkpoint("))) && /cp\.destroy\(\)/.test(SRC),
+       "page code: the runner's describe, gateAll, late and destroy options; the numeric check is the shared one");
+    ok(/state === "solution"\) \{ if \(!cp\) choose\(cur \|\| "model"\); cp\.solutionNow\(\)/.test(SRC), "page code: the solution demo opens the solutions through the runner, recorded (as CK-A)");
+    ok(!/task 11 makes|submit task 11|when you submit task 11|Submitting opens/i.test(QMD.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?<!-- learn:\1:end -->/g, "") + JSON.stringify(J)), "no text still says task 11 opens the solutions (gateAll)");
+    ok(/Opens once all eleven tasks are answered\./.test(QMD) && /After the worked solutions open:<\/b> an answer given after that counts as practice, not as right/.test(QMD) && /Answered late:<\/b> an answer given after the worked solutions opened counts as practice/.test(QMD), "page: the gate and the late-answer rule, before the tasks and in the rubric");
     ok(C.checkNumeric === require(L("components/checkpoint.js")).checkNumeric, "checkNumeric is the shared runner's (any unit)");
   }
 

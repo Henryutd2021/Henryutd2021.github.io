@@ -46,14 +46,15 @@ body-classes: "page-learn page-lesson lx-form-checkpoint"
 <li><b>A · The brief</b> (about 120 min). Choose a variant. <b>Model:</b> formulate the water brief as a <span class="lx-term" data-term="linear-program">linear program</span>, solve it and read the solution. <b>Empirical:</b> analyse a real year of grid data.</li>
 <li><b>B · The planted defect</b> (about 60 min). Find the one defect in a supplied model, say which check shows it, fix it and solve again.</li>
 <li><b>C · Validation</b> (about 45 min). Check one of your results against an independent reference: hand calculations (model) or a published figure (empirical).</li>
-<li><b>Submit</b> (about 15 min). Enter your results in the eleven tasks below. The worked formulations and code open when you submit task 11.</li>
+<li><b>Submit</b> (about 15 min). Enter your results in the eleven tasks below, in any order. The worked formulations and code open once all eleven are answered.</li>
 </ol>
 <p class="lx-eyebrow">How it is marked, before you start</p>
 <ul class="ckm-rules">
 <li><b>Proficient:</b> at least 6 of the 9 auto-marked tasks right on the first try, including the defect's line (task 6), plus 3 of the 4 points of task 1 and 2 of the 3 of task 11, which you tick yourself.</li>
 <li><b>Strong:</b> 8 of 9 on the first try, the defect's line among them, and every written point.</li>
 <li><b>Tolerances:</b> each number task says how close counts as right.</li>
-<li><b>Opening solutions early:</b> a task whose solution you open before answering counts as not right. Opening the full worked solutions before task 11 makes the attempt practice, with no level.</li>
+<li><b>Opening solutions early:</b> a task whose solution you open before answering counts as not right. Opening the full worked solutions before all eleven tasks are answered makes the attempt practice, with no level.</li>
+<li><b>After the worked solutions open:</b> an answer given after that counts as practice, not as right, and a written task then earns no points.</li>
 </ul>
 <p class="ckm-dl"><a class="lx-btn small" href="notebooks/ck-m-start.ipynb" download>Starter notebook (.ipynb)</a> <a class="lx-btn small ghost" href="../assets/learn/data/town_year.json" download>Dataset: town_year.json</a> <a class="lx-btn small ghost" href="../assets/learn/data/ck-m-unseen-problem-briefs.json" download>Briefs and model data (JSON, no answers)</a></p>
 <p class="lx-hint">The starter notebook holds both briefs' data and the supplied model, and gives no formulation and no answers. It runs in Google Colab or locally with Python 3.9 or later, NumPy and SciPy 1.9 or later. The empirical variant also needs <code>town_year.json</code> in the notebook's folder; its worked solution uses <code>zoneinfo</code> (on Windows, <code>pip install tzdata</code>; it falls back to 2025's clock rule without it).</p>
@@ -108,7 +109,7 @@ body-classes: "page-learn page-lesson lx-form-checkpoint"
 <li><p><b>The fixed model</b> <span class="lx-hint">Part B · Fix and re-solve</span></p><p>Fix the defect and solve again. What is the plan's annual cost? Within 0.5% (about $0.5 million) counts as right.</p><p>Answer with a number and a unit.</p></li>
 <li><p><b>Upper bound by hand</b> <span class="lx-hint">Part C · Validate</span></p><p>Without the solver: what would the day cost if the pumps simply matched each hour's water use (pump as you go)? That plan is feasible, so the optimum cannot cost more. Within 0.5% (about $3.70) counts as right.</p><p>Answer with a number and a unit.</p></li>
 <li><p><b>Lower bound by hand</b> <span class="lx-hint">Part C · Validate</span></p><p>Without the solver: a lower bound, if every m³ could be pumped at the cheapest price and the draw spread evenly over the 24 hours. Within 0.5% (about $1.90) counts as right.</p><p>Answer with a number and a unit.</p></li>
-<li><p><b>Your validation statement</b> <span class="lx-hint">Part C · Validate and submit</span></p><p>State whether your optimum lies between your two bounds, one special case your model reproduces exactly, and what these checks cannot show. Submitting opens the worked solutions below.</p><p>Self-rated against 3 points, shown after you submit.</p></li>
+<li><p><b>Your validation statement</b> <span class="lx-hint">Part C · Validate and submit</span></p><p>State whether your optimum lies between your two bounds, one special case your model reproduces exactly, and what these checks cannot show.</p><p>Self-rated against 3 points, shown after you submit.</p></li>
 </ol>
 <p class="lx-eyebrow">Empirical variant: the tasks</p>
 <ol class="ckm-static">
@@ -122,10 +123,10 @@ body-classes: "page-learn page-lesson lx-form-checkpoint"
 <li><p><b>The fixed model</b> <span class="lx-hint">Part B · Fix and re-solve</span></p><p>Fix the defect and solve again. What is the plan's annual cost? Within 0.5% (about $0.5 million) counts as right.</p><p>Answer with a number and a unit.</p></li>
 <li><p><b>Against a published benchmark</b> <span class="lx-hint">Part C · Validate</span></p><p>EIA reports a 2025 capacity factor of 33.8% for the U.S. utility-scale wind fleet. By how many percentage points does your figure from task 2 exceed it? Within 2% of the value (about 0.4 percentage points) counts as right.</p><p>Answer with a number and a unit.</p></li>
 <li><p><b>What the gap tells you</b> <span class="lx-hint">Part C · Validate</span></p><p>What does that gap tell you?</p><ul><li>a. The dataset is wrong and should not be used.</li><li>b. EIA's value is wrong.</li><li>c. The dataset's percentages are shares of SPP's highest 2025 hour, not of capacity, and SPP's fleet and wind differ from the U.S. average; these data alone cannot split the gap between those causes.</li><li>d. Wind in 2025 was unusually strong everywhere.</li></ul></li>
-<li><p><b>Your validation statement</b> <span class="lx-hint">Part C · Validate and submit</span></p><p>Name the benchmark and its date, read the gap, and say which of your results survive a rescaling of wind to EIA's 33.8% and which do not. Submitting opens the worked solutions below.</p><p>Self-rated against 3 points, shown after you submit.</p></li>
+<li><p><b>Your validation statement</b> <span class="lx-hint">Part C · Validate and submit</span></p><p>Name the benchmark and its date, read the gap, and say which of your results survive a rescaling of wind to EIA's 33.8% and which do not.</p><p>Self-rated against 3 points, shown after you submit.</p></li>
 </ol>
 <!-- ckm-fallback:end -->
-<p class="lx-hint">With JavaScript on, this page gives you the eleven tasks of your variant one at a time, checks each number you enter, keeps your times in this browser, and keeps the worked solutions shut until you submit.</p>
+<p class="lx-hint">With JavaScript on, this page gives you the eleven tasks of your variant one at a time, checks each number you enter, keeps your times in this browser, and keeps the worked solutions shut until all eleven tasks are answered.</p>
 </div>
 </div>
 <p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span>The water brief and the supplied model's costs are illustrative. The dataset and the supplied model's three days are real 2025 Southwest Power Pool shapes (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>) scaled to Prairie Town; the benchmark is EIA's 2025 wind capacity factor (<a href="https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_b">Electric Power Monthly, Table 6.07.B</a>). Draws on M1, M3, B3 and R5. Nothing you type leaves this browser unless you copy it.</span></p>
@@ -174,7 +175,7 @@ body-classes: "page-learn page-lesson lx-form-checkpoint"
 
 ```{=html}
 <div id="ckm-lock" class="lx-ck-lock" hidden>
-<p><b>Opens when you submit task 11.</b> The checkpoint asks for your own formulation, analysis and checks first, so the worked solutions wait for them. Opening them now makes this attempt practice, with no level.</p>
+<p><b>Opens once all eleven tasks are answered.</b> The checkpoint asks for your own formulation, analysis and checks first, so the worked solutions wait for them. Opening them now makes this attempt practice, with no level.</p>
 <p><button type="button" class="lx-btn ghost small">Open them anyway (recorded: practice)</button></p>
 </div>
 <div id="ckm-solution-body" class="lx-ck-gated ckm-solution-body">
@@ -252,7 +253,8 @@ $$0 \le q_t \le \bar Q\,\Delta t, \qquad P_t = k\,q_t / \Delta t \le P, \qquad s
 <li><b>Strong:</b> at least 8 of 9 on the first try, the defect's line on the first try, and every point of both written tasks.</li>
 <li><b>Developing:</b> at least 4 of 9 on the first try.</li>
 <li><b>Not yet:</b> anything else. The checkpoint shows readiness to start the Researcher tier; it certifies nothing.</li>
-<li><b>Solutions opened early:</b> a task whose worked solution you open before answering counts as not right on the first try. If the worked solutions above open before you submit task 11 (early, by an earlier attempt, or in the other variant), the attempt is practice and gets no level.</li>
+<li><b>Solutions opened early:</b> a task whose worked solution you open before answering counts as not right on the first try. If the worked solutions above open before all eleven tasks are answered (early, by an earlier attempt, or in the other variant), the attempt is practice and gets no level.</li>
+<li><b>Answered late:</b> an answer given after the worked solutions opened counts as practice, not as right; a written task submitted after it earns no points.</li>
 </ul>
 <p class="lx-hint">The written tasks are self-rated against their points. A teacher or mentor can rate them again with the table above, from the copied summary, which includes what you typed.</p>
 </div>

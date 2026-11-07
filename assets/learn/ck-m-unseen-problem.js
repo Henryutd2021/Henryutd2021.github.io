@@ -12,8 +12,10 @@
 // aware clock, a results view and a plain-text summary. This file holds CK-M's configuration: the two variants' task
 // lists, CK-M's level rule, its results sentence and summary, and the supplied model run in the browser. The runner's
 // options do the rest (W2 integration): its numeric check takes any unit (answer.value), `describe` writes the results
-// sentence, `submitTask` opens the worked solutions when the final task is submitted (or on purpose, which is recorded),
-// and `destroy()` swaps the runner when the reader changes variant.
+// sentence, `gateAll` opens the worked solutions once all eleven tasks are answered, in any order (or on purpose, which is
+// recorded; W5 final integration: `submitTask` opened them when task 11 alone was submitted, and the other answers could
+// be copied from them), `late: "practice"` is the shared late-answer rule, and `destroy()` swaps the runner when the
+// reader changes variant.
 //
 // Pure part (exported for _tests/learn/test_ck-m-unseen-problem.js, which solves every model with the vendored HiGHS):
 // waterModel (the worked formulation of the model variant), waterBounds, defectModel and defectReport (the supplied
@@ -148,25 +150,30 @@
   function points(st, t) { var r = st.tasks[t.id] || {}; return (r.points || []).filter(Boolean).length; }
   // CK-M's published rule (the page's rubric section says it in words). Levels: 0 Not yet ... 3 Strong.
   // Independent work only: a task whose worked solution was opened before its first answer (solFirst) counts as not
-  // right; and an attempt during which the page's full worked solutions had been open before its final task was
-  // submitted is practice, with no level: opened early by this attempt (solFirst on the final task), or opened earlier
-  // in this browser, by an earlier attempt or by the other variant. D.solOpen = {model, empirical}: the first time the
-  // page's worked solutions opened under each variant (ISO, recorded by each variant's runner, LX.Checkpoint.solOpened);
-  // the final task's `at` (set by the runner) is when this attempt submitted it (the same instant as its own opening, so
-  // that one does not count).
-  function firstRight(st, t) { return CPK.firstRight(st.tasks[t.id], "not-right"); }   // the runner's rule, independent work
+  // right; an answer given after the page's full worked solutions opened counts as practice (the runner's shared
+  // late-answer rule: not right, no points); and an attempt during which they had been open before every task was
+  // answered is practice, with no level: opened early by this attempt (the lock's button, recorded as st.solEarly), or
+  // opened earlier in this browser, by an earlier attempt or by the other variant. D.solOpen = {model, empirical}: the
+  // first time the page's worked solutions opened under each variant (ISO, recorded by each variant's runner,
+  // LX.Checkpoint.solOpened). They open with this attempt's last answer, at that answer's `at`, so that one does not count.
+  function solOpenAt(D) {   // the earliest opening under either variant, or null
+    var seen = [D.key, D.other].map(function (k) { return D.solOpen && k ? D.solOpen[k] : null; }).filter(Boolean).sort();
+    return seen[0] || null;
+  }
+  function late(D, st, t) { return CPK.lateAnswer(st.tasks[t.id], solOpenAt(D)); }
+  function firstRight(st, t, D) { return CPK.firstRight(st.tasks[t.id], "not-right") && !(D && late(D, st, t)); }   // the runner's rules
   function assisted(D, st) {
-    var g = D.tasks[D.tasks.length - 1], r = st.tasks[g.id] || {};
-    if (r.solFirst) return "early";
-    var seen = [D.key, D.other].map(function (k) { return D.solOpen && k ? D.solOpen[k] : null; }).filter(Boolean);
-    if (seen.some(function (t) { return !r.at || t < r.at; })) return "seen";
+    if (st.solEarly) return "early";
+    var so = solOpenAt(D), last = CPK.lastAnswerAt(D, st);
+    if (so && (!CPK.allAnswered(D, st) || !last || so < last)) return "seen";
     return null;
   }
   function level(D, st) {
     var R = D.rule, auto = D.tasks.filter(isAuto), opens = D.tasks.filter(function (t) { return t.kind === "open-short"; });
-    var k = auto.filter(function (t) { return firstRight(st, t); }).length;
-    var defect = firstRight(st, { id: R.defect });
-    var pa = points(st, opens[0]), pc = points(st, opens[1]), na = opens[0].points.length, nc = opens[1].points.length;
+    var k = auto.filter(function (t) { return firstRight(st, t, D); }).length;
+    var defect = firstRight(st, { id: R.defect }, D);
+    var pa = late(D, st, opens[0]) ? 0 : points(st, opens[0]), pc = late(D, st, opens[1]) ? 0 : points(st, opens[1]), na = opens[0].points.length, nc = opens[1].points.length;
+    var nLate = D.tasks.filter(function (t) { return late(D, st, t); }).length;
     var complete = auto.every(function (t) { return st.tasks[t.id] && st.tasks[t.id].first != null; }) && opens.every(function (t) { return st.tasks[t.id] && st.tasks[t.id].answer; });
     var early = auto.filter(function (t) { return st.tasks[t.id] && st.tasks[t.id].solFirst; }).length, help = assisted(D, st);
     var lv = R.levels[0];
@@ -175,10 +182,10 @@
     else if (k >= R.autoProficient && defect && pa >= R.pointsA && pc >= R.pointsC) lv = R.levels[2];
     else if (k >= R.autoDeveloping) lv = R.levels[1];
     return { level: lv, auto: k, autoOf: auto.length, defect: defect, pointsA: pa, pointsAOf: na, pointsC: pc, pointsCOf: nc, complete: complete,
-      early: early, assisted: help, estMin: -1, explainOk: pa === na };   // the shared rule's field names, for code that reads either rule
+      early: early, late: nLate, assisted: help, estMin: -1, explainOk: pa === na };   // the shared rule's field names, for code that reads either rule
   }
   function describe(D, L) {
-    if (L.assisted) return (L.assisted === "early" ? "The full worked solutions were opened before task 11 was submitted" : "The full worked solutions had already been open in this browser (an earlier attempt, or the other variant)") +
+    if (L.assisted) return (L.assisted === "early" ? "The full worked solutions were opened before all " + D.tasks.length + " tasks were answered" : "The full worked solutions had been open in this browser before every task was answered (an earlier attempt, or the other variant)") +
       ", so this attempt is practice and gets no level. Your answers and their feedback stay. An independent attempt needs worked solutions you have not seen.";
     return "Auto-marked tasks right on the first try: " + L.auto + " of " + L.autoOf + (L.early ? " (" + L.early + " with the solution opened first, counted as not right)" : "") + ". The defect's line on the first try: " + (L.defect ? "yes" : "no") +
       ". Points you ticked: " + L.pointsA + " of " + L.pointsAOf + " in part A, " + L.pointsC + " of " + L.pointsCOf + " in part C." + (L.complete ? "" : " Some tasks are not finished; the level counts them as not right.");
@@ -206,7 +213,7 @@
     lines.push("# | Part | Task | First answer | Tries | Time to first answer | Solution opened before answering");
     D.tasks.forEach(function (t, i) {
       var r = st.tasks[t.id] || {};
-      lines.push((i + 1) + " | " + t.part + " | " + t.title + " | " + firstWord(t, r) + " | " + (r.tries || 0) + " | " + fmtMs(r.msFirst) + " | " + (r.solFirst ? "yes" : "no"));
+      lines.push((i + 1) + " | " + t.part + " | " + t.title + " | " + firstWord(t, r) + " | " + (r.tries || 0) + " | " + fmtMs(r.msFirst) + " | " + (late(D, st, t) ? "yes (the full worked solutions)" : r.solFirst ? "yes" : "no"));
     });
     D.tasks.filter(function (t) { return t.kind === "open-short"; }).forEach(function (t) {
       var r = st.tasks[t.id]; if (r && r.answer) lines.push("Your text, " + t.title.toLowerCase() + ": " + String(r.answer).replace(/\s+/g, " ").slice(0, 800));
@@ -368,7 +375,6 @@
   // ---------------------------------------------------------------- view
   var LX = window.LX, H = LX.H;
   var KEYS = { model: "ckm-model-v1", empirical: "ckm-emp-v1" };
-  function finalId(J, key) { var C = J.variants[key].tasksC; return C[C.length - 1].id; }
   function money(v) { return "$" + (Math.round(v * 100) / 100).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
   function mw(v) { return (Math.round(v * 10) / 10).toLocaleString("en-US") + " MW"; }
 
@@ -433,7 +439,7 @@
       D = Ds[k] = Ds[k] || variantData(J, k);
       if (!Object.getOwnPropertyDescriptor(D, "solOpen")) Object.defineProperty(D, "solOpen", { get: solOpenNow });   // read fresh each time
       cp = LX.Checkpoint(host, { data: D, key: KEYS[k], code: CODE, lessonId: "ck-m-unseen-problem", intro: J.intro,
-        lock: lock, solution: body, submitTask: finalId(J, k), level: level, describe: describe, summary: summary, openFirst: "not-right" });
+        lock: lock, solution: body, gateAll: true, late: "practice", level: level, describe: describe, summary: summary, openFirst: "not-right" });
       if (user) host.scrollIntoView({ block: "nearest", behavior: LX.reduced() ? "auto" : "smooth" });
     }
     // the lock box's button before any variant is chosen: start the model variant and record the early opening there
@@ -456,7 +462,8 @@
       if (state === "mid") { choose("model"); cp.show(1); return { view: "task 2" }; }
       if (state === "empirical") { choose("empirical"); cp.show(1); return { view: "empirical task 2" }; }
       if (state === "done") { choose(cur || "model"); cp.results(); return { view: "results" }; }
-      if (state === "solution") { if (lock) lock.hidden = true; if (body) body.classList.add("is-open"); var s = document.getElementById("solution"); if (s) s.scrollIntoView(); return { view: "solution" }; }
+      // the solution state opens them as the lock's button does, recorded (practice), never silently (as CK-A, review #1)
+      if (state === "solution") { if (!cp) choose(cur || "model"); cp.solutionNow(); var s = document.getElementById("solution"); if (s) s.scrollIntoView(); return { view: "solution" }; }
       return null;
     });
   });
