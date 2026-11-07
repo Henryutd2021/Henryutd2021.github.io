@@ -57,7 +57,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-interactive lx-cards" data-learn="air-climate-people" data-src="../assets/learn/data/f11-air-climate-people.json ../assets/learn/data/prairie-city.json ../assets/learn/data/path.json">
 <div class="lx-fallback">
 <!-- f11-fallback:start (written from the model by the test's --write mode; do not edit) -->
-<p class="lx-eyebrow">The idea in two tables: one tonne burned, and who carries the bills</p><div class="lx-scroll-x"><table class="lx-mini-table f11-fbt"><caption class="lx-hint">One tonne burned in a large boiler, before → after the controls AP-42 describes (illustrative coal and oil; EPA factors).</caption><thead><tr><th scope="col">Fuel</th><th scope="col">CO₂</th><th scope="col">CO₂ per MWh of heat</th><th scope="col">SO₂</th><th scope="col">NOx</th><th scope="col">Fine particles</th><th scope="col">Health harm (EPA estimate)</th></tr></thead><tbody><tr><td>Coal</td><td>2.44 t</td><td>341 kg</td><td>38.0 → 3.8 kg</td><td>11.0 → 5.5 kg</td><td>5.21 → 0.38 kg</td><td>$3,130 → $330</td></tr><tr><td>Natural gas</td><td>2.69 t</td><td>202 kg</td><td>0.01 → 0.01 kg</td><td>4.5 → 3.3 kg</td><td>0.18 → 0.18 kg</td><td>$60 → $50</td></tr><tr><td>Oil</td><td>3.19 t</td><td>267 kg</td><td>4.0 → 4.0 kg</td><td>3.4 → 1.4 kg</td><td>0.22 → 0.22 kg</td><td>$310 → $290</td></tr></tbody></table></div><ul><li><b>Methane.</b> If 2.3% of the gas leaks before it is burned, a tonne of gas adds 23.5 kg of methane, about 0.70 t of CO₂e over 100 years (GWP 29.8).</li><li><b>Where it goes.</b> In the lesson's spreading toy (illustrative), each person 300 km away breathes 1.3% of the dose at 10 km, yet 74% of all the breathing happens beyond 100 km.</li><li><b>Health.</b> Dollar values are EPA's 2025 benefit-per-ton estimates for power plants (2019 dollars): $57,000 per short ton of SO₂, $7,710 of NOx, $113,000 of fine particles.</li></ul><div class="lx-scroll-x"><table class="lx-mini-table f11-fbt"><caption class="lx-hint">Prairie City is fictional; its numbers are illustrative. Energy burden = home energy spending ÷ income, by income group (share of area median income).</caption><thead><tr><th scope="col">Group</th><th scope="col">Average income</th><th scope="col">Home energy a year</th><th scope="col">Burden</th></tr></thead><tbody><tr><td>0-30% of area median income</td><td>$13,000</td><td>$1,940</td><td>14.9%</td></tr><tr><td>30-50% of area median income</td><td>$33,000</td><td>$2,131</td><td>6.5%</td></tr><tr><td>50-80% of area median income</td><td>$53,000</td><td>$2,252</td><td>4.2%</td></tr><tr><td>80-100% of area median income</td><td>$74,000</td><td>$2,417</td><td>3.3%</td></tr><tr><td>100% of area median income or more</td><td>$145,000</td><td>$2,702</td><td>1.9%</td></tr></tbody></table></div><p class="lx-hint">The 6% and 10% lines are conventions (ACEEE; DOE's LEAD tool calls 6% or more high), not physical limits. With JavaScript on, you burn each fuel, slide the leak, add controls, walk away from the stack and slide a household's income.</p>
+<p class="lx-eyebrow">The idea in two tables: one tonne burned, and who carries the bills</p><div class="lx-scroll-x"><table class="lx-mini-table f11-fbt"><caption class="lx-hint">One tonne burned in a large boiler, before → after the controls AP-42 describes (illustrative coal and oil; EPA factors).</caption><thead><tr><th scope="col">Fuel</th><th scope="col">CO₂</th><th scope="col">CO₂ per MWh of heat</th><th scope="col">SO₂</th><th scope="col">NOx</th><th scope="col">Fine particles</th><th scope="col">Health harm (EPA estimate)</th></tr></thead><tbody><tr><td>Coal</td><td>2.44 t</td><td>341 kg</td><td>38.0 → 3.8 kg</td><td>11.0 → 5.5 kg</td><td>5.21 → 0.38 kg</td><td>$3,130 → $330</td></tr><tr><td>Natural gas</td><td>2.69 t</td><td>202 kg</td><td>0.01 → 0.01 kg</td><td>4.5 → 3.3 kg</td><td>0.18 → 0.18 kg</td><td>$60 → $50</td></tr><tr><td>Oil</td><td>3.19 t</td><td>267 kg</td><td>4.0 → 4.0 kg</td><td>3.4 → 1.4 kg</td><td>0.22 → 0.22 kg</td><td>$310 → $290</td></tr></tbody></table></div><ul><li><b>Methane.</b> If 2.3% of the gas leaks before it is burned, a tonne of gas adds 23.5 kg of methane, about 0.70 t of CO₂e over 100 years (GWP 29.8).</li><li><b>Where it goes.</b> In the lesson's spreading toy (illustrative), each person 300 km away breathes 1.3% of the dose at 10 km, yet 74% of the toy's exposure beyond 10 km happens more than 100 km away.</li><li><b>Health.</b> Dollar values are EPA's 2025 benefit-per-ton estimates for power plants (2019 dollars): $57,000 per short ton of SO₂, $7,710 of NOx, $113,000 of fine particles.</li></ul><div class="lx-scroll-x"><table class="lx-mini-table f11-fbt"><caption class="lx-hint">Prairie City is fictional; its numbers are illustrative. Burden = home energy spending ÷ income for each group's representative household (its average spending ÷ its average income).</caption><thead><tr><th scope="col">Group</th><th scope="col">Average income</th><th scope="col">Home energy a year</th><th scope="col">Burden (representative household)</th></tr></thead><tbody><tr><td>0-30% of area median income</td><td>$13,000</td><td>$1,940</td><td>14.9%</td></tr><tr><td>30-50% of area median income</td><td>$33,000</td><td>$2,131</td><td>6.5%</td></tr><tr><td>50-80% of area median income</td><td>$53,000</td><td>$2,252</td><td>4.2%</td></tr><tr><td>80-100% of area median income</td><td>$74,000</td><td>$2,417</td><td>3.3%</td></tr><tr><td>100% of area median income or more</td><td>$145,000</td><td>$2,702</td><td>1.9%</td></tr></tbody></table></div><p class="lx-hint">The 6% and 10% lines are conventions (ACEEE; DOE's LEAD tool calls 6% or more high), not physical limits. With JavaScript on, you run each step yourself.</p>
 <!-- f11-fallback:end -->
 </div>
 </div>
@@ -80,10 +80,10 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-fallback">
 <dl class="lx-ideas">
 <dt>Carbon in, CO₂ out</dt><dd>Every tonne of carbon burned makes 3.67 t of CO₂: a tonne of oil makes 3.19 t, gas 2.69 t and coal 2.44 t.</dd>
-<dt>Compare by heat</dt><dd>Per MWh of heat coal sends 341 kg of CO₂ and gas 202 kg, so the fair comparison is by the job done.</dd>
+<dt>Compare by heat</dt><dd>Per MWh of fuel heat coal sends 341 kg of CO₂ and gas 202 kg; per MWh of useful heat or electricity, the equipment's efficiency comes in too.</dd>
 <dt>Leaks count too</dt><dd>A 2.3% leak adds about 0.70 t of CO₂e to a tonne of gas over 100 years.</dd>
 <dt>Pollutants can be caught</dt><dd>Controls cut coal's SO₂ from 38 to 3.8 kg a tonne; no control on this page touches its CO₂.</dd>
-<dt>Burden, not bill</dt><dd><span class="lx-term" data-term="energy-burden">Energy burden</span> is home energy spending divided by income: Prairie City's lowest-income group spends less than the highest, yet carries 14.9% against 1.9%.</dd>
+<dt>Burden, not bill</dt><dd><span class="lx-term" data-term="energy-burden">Energy burden</span> is home energy spending divided by income: Prairie City's lowest-income group spends less than the highest, yet its representative household carries 14.9% against 1.9%.</dd>
 </dl>
 </div>
 </div>
@@ -96,9 +96,10 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-deeper-body">
 ```
 
-- **Net heat.** The IPCC counts the [net calorific value]{.lx-term term="net-calorific-value"}, the heat a fuel gives without the heat in the water vapour it forms; gross heat is about 5% higher for coal and oil and about 10% for most natural gas.
+- **Net heat.** The IPCC counts the [net calorific value]{.lx-term term="net-calorific-value"}: the heat a fuel gives, leaving out the heat in the water vapour it forms.
+- **Gross heat** is about 5% higher than net for coal and oil, and about 10% higher for most natural gas.
 - **Gross-heat sources.** EPA's AP-42 and EIA count gross heat, so their CO₂ per unit of heat is a little lower than the IPCC's for the same fuel.
-- **Coal varies per tonne, not per unit of heat.** Sub-bituminous coal holds only 18.9 GJ a tonne: 1.82 t of CO₂ a tonne, yet 346 kg per MWh of heat, close to bituminous coal's 341 kg.
+- **Coal types vary much more per tonne than per unit of heat.** Sub-bituminous coal holds 18.9 GJ a tonne: 1.82 t of CO₂ a tonne, yet 346 kg per MWh of heat, close to bituminous coal's 341.
 
 ```{=html}
 </div>
@@ -120,15 +121,27 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-deeper-body">
 ```
 
-A year of winds from every direction carries the particles out through ever wider rings, while rain and the ground remove them. Relative to the dose at $r_0$ = 10 km, each person at distance $r$ (km) breathes
+Winds from every direction carry the particles out through ever wider rings while rain and the ground remove them. From $r_0$ = 10 km out, each person at distance $r$ (km) breathes, relative to the dose at $r_0$,
 
 $$c(r) = \frac{r_0}{r}\, e^{-(r - r_0)/L}, \qquad \text{share within } R = 1 - e^{-(R - r_0)/L}$$
 
 - $L$ = 300 km is the toy's illustrative reach; people live evenly around the plant, so the people in a ring grow with $r$ while each one's dose falls.
-- **At 100 km:** $c$ = 7.4% of the dose at 10 km, and 74% of all the breathing happens farther out.
+- **At 100 km:** $c$ = 7.4% of the dose at 10 km, and 74% of the toy's exposure beyond 10 km happens farther out.
+- **Inside 10 km** the toy says nothing: there a tall stack's plume may not yet have reached the ground.
 - **Real estimates** use air-quality models with real winds, chemistry and where people live: EPA's benefit-per-ton values come from such models across the continental United States.
 
 ```{=html}
+</div>
+</details>
+<details class="lx-deeper">
+<summary><span class="k">Go deeper · Analyst</span>Work the numbers yourself</summary>
+<div class="lx-deeper-body">
+<ul>
+<li><b>Carbon to CO₂.</b> Burning 2 t of carbon makes 2 × 44 ÷ 12 = 7.33 t of CO₂: each carbon atom (12 g/mol) joins two oxygen atoms, and CO₂ weighs 44 g/mol.</li>
+<li><b>A 2% leak.</b> The leak is a share of all the gas produced, so 0.02 ÷ 0.98 = 0.0204 t of methane escapes per tonne burned, × 29.8 = 0.608 t of CO₂e.</li>
+<li><b>Short tons.</b> EPA's $57,000 is per short ton of SO₂ (907.18 kg), so 38 kg is 38 ÷ 907.18 × 57,000 = $2,388, in 2019 dollars.</li>
+<li><b>Next.</b> Which CO₂ number answers which question, with emission factors: <a href="a10-emissions-questions.html">A10</a>.</li>
+</ul>
 </div>
 </details>
 <details class="lx-deeper">
@@ -168,7 +181,7 @@ $$c(r) = \frac{r_0}{r}\, e^{-(r - r_0)/L}, \qquad \text{share within } R = 1 - e
 <div class="lx-qq" data-id="near" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “A tall stack's pollution harms only the people who live next to it.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. Neighbours get the highest dose each, but in the spreading toy 74% of all the breathing happens beyond 100 km; EPA's estimates count harm across the continental United States.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. Nearby downwind communities can be heavily exposed, but in the spreading toy 74% of the exposure beyond 10 km happens more than 100 km away; EPA's estimates count harm across the continental United States.</p></details>
 </div>
 <div class="lx-qq" data-id="bill" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “A high energy burden means a high energy bill.”</p>
@@ -183,20 +196,20 @@ $$c(r) = \frac{r_0}{r}\, e^{-(r - r_0)/L}, \qquad \text{share within } R = 1 - e
 <ul class="lx-choices"><li data-value="a">0.7%</li><li data-value="b">7.0%</li><li data-value="c">14%</li></ul>
 <details class="lx-answer"><summary>Answer</summary><p>7.0%: 2,100 ÷ 30,000 = 0.070, above the 6% line ACEEE calls high.</p></details>
 </div>
-<div class="lx-qq" data-id="carbon" data-answer="c">
-<p class="lx-qtext">How much CO₂ does burning 2 t of carbon make?</p>
-<ul class="lx-choices"><li data-value="a">2 t</li><li data-value="b">5.33 t</li><li data-value="c">7.33 t</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>7.33 t: each carbon atom (12 g/mol) joins two oxygen atoms to make CO₂ (44 g/mol), so 2 × 44 ÷ 12 = 7.33.</p></details>
+<div class="lx-qq" data-id="heat" data-answer="a">
+<p class="lx-qtext">Per tonne, oil sends the most CO₂; per MWh of fuel heat, coal does. Why can both be true?</p>
+<ul class="lx-choices"><li data-value="a">A tonne of coal gives much less heat</li><li data-value="b">Coal's controls add CO₂</li><li data-value="c">Oil's CO₂ is counted over 100 years</li></ul>
+<details class="lx-answer"><summary>Answer</summary><p>A tonne of coal gives 7.2 MWh of heat against oil's 11.9 MWh, so each MWh of coal's heat carries more CO₂: 341 kg against 267.</p></details>
 </div>
-<div class="lx-qq" data-id="leak" data-answer="b">
-<p class="lx-qtext">If 2% of the gas leaks before it is burned, how much CO₂e (GWP 29.8) does the leak add to one tonne of gas burned?</p>
-<ul class="lx-choices"><li data-value="a">About 0.06 t</li><li data-value="b">About 0.61 t</li><li data-value="c">About 6.1 t</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>About 0.61 t: 0.02 ÷ 0.98 = 0.0204 t of methane per tonne burned, × 29.8 = 0.608 t.</p></details>
+<div class="lx-qq" data-id="leak" data-answer="a">
+<p class="lx-qtext">A 2.3% leak adds about 0.70 t of CO₂e to a tonne of gas. About how much would a leak half as large add?</p>
+<ul class="lx-choices"><li data-value="a">About 0.35 t</li><li data-value="b">About 0.70 t</li><li data-value="c">About 1.4 t</li></ul>
+<details class="lx-answer"><summary>Answer</summary><p>About 0.35 t: half the leak is about half the methane, so about half the CO₂e. The slider shows 0.33 t at 1.1% and 0.36 t at 1.2%.</p></details>
 </div>
 <div class="lx-qq" data-id="dollars" data-answer="b">
-<p class="lx-qtext">EPA values the harm from a short ton (907 kg) of SO₂ from power plants at $57,000. About how much is 38 kg?</p>
-<ul class="lx-choices"><li data-value="a">About $240</li><li data-value="b">About $2,400</li><li data-value="c">About $24,000</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>About $2,400: 38 ÷ 907.18 × 57,000 = $2,388, an estimate in 2019 dollars.</p></details>
+<p class="lx-qtext">With controls, EPA's estimate for a tonne of coal falls from about $3,130 to about $330. What do these dollars stand for?</p>
+<ul class="lx-choices"><li data-value="a">The price of the coal</li><li data-value="b">Health harm, mostly early deaths</li><li data-value="c">What the controls cost</li></ul>
+<details class="lx-answer"><summary>Answer</summary><p>Health harm: EPA's estimate, in 2019 dollars, of the early deaths and illness from the fine particles the tonne's pollution makes; an estimate, not a price.</p></details>
 </div>
 </div>
 ```

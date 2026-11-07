@@ -70,9 +70,9 @@
       "where": "Table 1.3-1, pp. 1.3-11 and 1.3-12 (SO2 142S lb per 1,000 gal; NOx 24, 10 with low-NOx burners and flue gas recirculation); Table 1.3-6, p. 1.3-17 (filterable PM2.5 0.25 lb per 1,000 gal, industrial boilers); Table 1.3-2, p. 1.3-13 (condensable PM 1.3, all below 1 micrometre); Appendix A, p. A-7 (distillate oil 845 kg/m3)"
     },
     "controls": {
-      "coal": "a wet limestone scrubber (90% of SO2), low-NOx burners and an electrostatic precipitator",
-      "gas": "low-NOx burners",
-      "oil": "low-NOx burners with flue gas recirculation; no scrubber"
+      "coal": "a wet limestone scrubber (it catches 90% of the SO₂), low-NOx burners (a cooler flame forms less NOx) and an electrostatic precipitator (charged plates catch the particles)",
+      "gas": "low-NOx burners (a cooler flame forms less NOx)",
+      "oil": "low-NOx burners with flue gas recirculation (some exhaust is fed back to cool the flame); no scrubber"
     }
   },
   "units": { "kgPerLb": 0.45359237, "litresPerGal": 3.785411784, "kgPerShortTon": 907.18474, "gjPerMWh": 3.6 },
