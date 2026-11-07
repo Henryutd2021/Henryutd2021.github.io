@@ -1527,9 +1527,13 @@
    "tier": "modeler",
    "code": "M11",
    "title": "Techno-economic analysis inside an optimization model",
-   "ready": false,
-   "href": "index.html#modeler",
-   "scales": []
+   "ready": true,
+   "href": "m11-tea-in-models.html",
+   "scales": [],
+   "id": "m11-tea-in-models",
+   "minutes": 40,
+   "form": "cards",
+   "short": "TEA inside a model"
   },
   {
    "tier": "modeler",

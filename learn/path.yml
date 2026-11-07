@@ -1097,7 +1097,24 @@
   lab: "a pandas and scikit-learn notebook that rebuilds the page's split and checks it, then gradient boosting and a small neural network on the linear mix's inputs and on a wider set, about 60 minutes, then 90 minutes of practice."
   does: "Beat persistence and seasonal-naive baselines on a held-out month of real data; fit a learned model; score point and probabilistic forecasts (MAE, pinball loss); find the leak in a model that looks too good."
   after: [4, M7]
-- {kind: lesson, tier: modeler, code: M11, title: "Techno-economic analysis inside an optimization model"}
+- kind: lesson
+  id: m11-tea-in-models
+  code: M11
+  tier: modeler
+  form: cards
+  icon: coin
+  status: active
+  minutes: 40
+  practice_minutes: 90   # the notebook's practice tasks, after its 45-minute lab (learn_map_v2.yml)
+  lab_minutes: 45   # the notebook lab: in the header badge and timeRequired
+  title: "Techno-economic analysis inside an optimization model"
+  subtitle: "Put a wind-hydrogen plant's capital, a tax credit in its own years and the credit's emissions tiers into one LP, then move the boundary and watch the conclusion change"
+  short: "TEA inside a model"
+  teaches: [annualized capital in an LP objective, capital recovery factor, lifetime cash flows and NPV, a tax credit in its own years, a step rule as one LP per step, system boundaries in techno-economic analysis]
+  lab: "a SciPy/HiGHS notebook that rebuilds the plant's LP with its two credit periods and tiers and asserts the browser's numbers, about 45 minutes, then 90 minutes of practice."
+  does: "Link an hourly operating LP of a wind-hydrogen plant to its lifetime cash flows; annualize capital, add the U.S. hydrogen credit in its own ten years and with its emissions tiers, move the boundary (what belongs to the plant, what to the grid) and watch the size, NPV and cost per kilogram change."
+  outcome: "Formulate a techno-economic analysis as an LP with annualized capital and a time-limited credit, handle a stepped rule by enumeration, and state how the boundary changes the conclusion."
+  after: [M3, A1, A12]
 - {kind: lesson, tier: modeler, code: M12, title: "Model a city's energy system: an energy hub with grid limits and screening fairness outputs"}
 - {kind: lesson, tier: modeler, code: M13, title: "Build a nation's pathway: a multi-region, multi-decade model"}
 # M14, builder learn-w5-g (wave W5)
