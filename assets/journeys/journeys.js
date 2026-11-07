@@ -16,9 +16,8 @@
 //      Clicking a dot or a line opens a small card. Every map zooms and pans (d3-zoom 3): see "zoom and pan" below.
 //      Keyboard: one Tab stop on the footprints; the arrow keys move through them in time order, Enter opens the card,
 //      + and − zoom, Escape closes it. If the libraries cannot load, the map box is hidden again.
-//   4. Chapter pages: one zoomable world map per chapter, with chips that zoom to its regions or the whole chapter; it
-//      opens on the whole chapter, or on its main region when the far points would shrink that region (see "the chapter
-//      pages" below).
+//   4. Chapter pages: one zoomable world map per chapter, showing the one view the chapter's data names (the whole
+//      chapter, its home region, or the contiguous United States; see "the chapter pages" below).
 (function () {
   "use strict";
   const root = document.getElementById("journeys");
@@ -1025,25 +1024,22 @@
 
     // ---------- the chapter pages: one zoomable world map per chapter ----------
     // Each chapter page has one map in the world view's projection, with every route of the chapter (the long flights
-    // too) and its places. The chips above it (the chapter's own captions, plus "Whole chapter") zoom to:
-    //   first caption   the main region: where Henry lived and the trips from there. Its centre is the chapter's home (the
-    //                   place lived that the chapter's name names, D.chapters[].hm; of two, the one with more places
-    //                   around it), and it holds the chapter's places within CORE_KM of it, except stops made only in
-    //                   transit and visits to the hometown, with the road routes that stay within a quarter more than
-    //                   that (roads detour)
-    //   second caption  the next cluster of footprints (places and road waypoints, single linkage, 400 km), or the one
-    //                   around the place the caption names ("at")
-    //   Whole chapter   every footprint of the chapter
-    // The view a map opens on (and returns to with the reset button): the whole chapter, so every place shows, when it
-    // is readable there: when at most a third (OPEN_ALL) of its places sit within CROWD_PX of another; otherwise the main
-    // region, and the far points (transit hubs, long flights, the drives between homes), which would shrink it to a
-    // speck, are left to "Whole chapter". The test is made on one reference size (600 by 400 px), so a phone and a
-    // desktop open on the same chip; a chapter can pin the view with map_open (data). Every frame is fitted to the panel
-    // with a margin (fitT), so no dot, label or route end sits on an edge or under the zoom buttons. Places first visited
-    // in the chapter are coloured; labels keep their size and are placed again after each zoom, more of them as the map
-    // zooms in. Each map is drawn when its page first comes near the screen.
+    // too) and its places. It shows one view, the chapter's map_open (data; Henry 2026-11-07: no zoom choices):
+    //   all    every footprint of the chapter
+    //   main   the chapter's home region: where Henry lived and the trips from there. Its centre is the chapter's home
+    //          (the place lived that the chapter's name names, D.chapters[].hm; of two, the one with more places around
+    //          it), and it holds the chapter's places within CORE_KM of it, except stops made only in transit and visits
+    //          to the hometown, with the road routes that stay within a quarter more than that (roads detour)
+    //   us     the contiguous United States (US48)
+    // + and - zoom, the map pans, and the reset button returns to that view. A chapter without map_open opens on the
+    // whole chapter when at most a third (OPEN_ALL) of its places sit within CROWD_PX of another at a 600 by 400 px
+    // reference, otherwise on its main region. Every frame is fitted to the panel with a margin (fitT), so no dot, label
+    // or route end sits on an edge or under the zoom buttons. Places first visited in the chapter are coloured; labels
+    // keep their size and are placed again after each zoom, more of them as the map zooms in. Each map is drawn when its
+    // page first comes near the screen.
     const RAD = Math.PI / 180;
     const CORE_KM = 1200, OPEN_ALL = 1 / 3, CROWD_PX = 14;
+    const US48 = [{ ll: [-124.8, 24.4] }, { ll: [-66.9, 49.4] }];   // the contiguous United States (the 'us' view)
     function km(a, b) {
       const p1 = a[1] * RAD, p2 = b[1] * RAD, dp = p2 - p1, dl = (b[0] - a[0]) * RAD;
       const h = Math.sin(dp / 2) * Math.sin(dp / 2) + Math.cos(p1) * Math.cos(p2) * Math.sin(dl / 2) * Math.sin(dl / 2);
@@ -1066,13 +1062,9 @@
         const home = g.some(function (p) { return p.pid && D.places[p.pid].h; }) ? 1 : 0;
         return { pts: g, places: g.filter(function (p) { return p.pid; }).length, n: g.length, home: home };
       }).sort(function (a, b) { return b.places - a.places || b.home - a.home || b.n - a.n; });
-      // the second chip: the cluster around the place its caption names (chapter data), else the next with enough footprints
-      const at = (chapterOf[id].at || [])[1];
-      const named = at && clusters.slice(1).find(function (c) { return c.pts.some(function (p) { return p.pid === at; }); });
-      return { ents: ents, all: pts, main: mainRegion(id, ents, seenPl) || clusters[0] || null,
-               second: named || clusters.slice(1).find(function (c) { return c.n >= 3 && c.places >= 1; }) || null };
+      return { ents: ents, all: pts, main: mainRegion(id, ents, seenPl) || clusters[0] || null };
     }
-    // the main region (the first chip): the chapter's home and the trips from there (see above)
+    // the main region: the chapter's home and the trips from there (see above)
     function mainRegion(id, ents, seenPl) {
       const pids = Object.keys(seenPl);
       const transitOnly = function (pid) {
@@ -1164,12 +1156,11 @@
       });
       return best.T;
     }
-    // the view a chapter map opens on (a chip's key): the chapter's own choice (map_open), else the whole chapter when
-    // at most OPEN_ALL of its places crowd there (another place within CROWD_PX), else the main region; measured on one
-    // reference size (600 by 400 px), so every screen opens on the same chip
-    const OPEN_KEY = { main: "0", second: "1", all: "all" };
+    // the view a chapter map shows (a key of M.targets): the chapter's map_open; without one, the whole chapter when at
+    // most OPEN_ALL of its places crowd there (another place within CROWD_PX), else the main region, measured on one
+    // reference size (600 by 400 px), so every screen opens on the same view
     function openOn(M) {
-      const pin = OPEN_KEY[chapterOf[M.id].mo];
+      const pin = chapterOf[M.id].mo;
       if (pin && M.targets[pin]) return pin;
       const ref = { proj: projection("world", 600, 400), W: 600, H: 400 };
       const T = fitT(M, M.targets.all, Infinity, ref);
@@ -1177,12 +1168,9 @@
       const crowded = s.filter(function (a) {
         return s.some(function (b) { return b !== a && Math.hypot(a[0] - b[0], a[1] - b[1]) < CROWD_PX; });
       }).length;
-      return crowded <= OPEN_ALL * s.length ? "all" : "0";
+      return crowded <= OPEN_ALL * s.length || !M.targets.main ? "all" : "main";
     }
-    function press(M, key) {
-      M.chips.forEach(function (b) { b.setAttribute("aria-pressed", key != null && b.getAttribute("data-zoom") === key ? "true" : "false"); });
-      if (key != null) M.active = key;
-    }
+    function press(M, key) { if (key != null) M.active = key; }   // the view shown (null once the reader zooms or pans)
     function cmBuild(M) {   // the land at world scale, the routes and the dots, for the map's size
       const W = M.host.clientWidth, H = M.host.clientHeight;
       if (!W || !H) return false;
@@ -1220,7 +1208,7 @@
       });
       M.items.forEach(function (it) { if (it.rank === 0) M.gOv.appendChild(it.g); });   // places lived on top
       if (!M.open) M.open = openOn(M);
-      // the zoom range: from the whole world to a little closer than the closest chip's frame
+      // the zoom range: from the whole world to a little closer than the closest of its frames (all, main, us)
       const ks = Object.keys(M.targets).filter(function (k) { return M.targets[k]; }).map(function (k) { return fitT(M, M.targets[k]).k; });
       M.kMax = Math.min(800, Math.max(24, 2.5 * Math.max.apply(null, ks)));
       if (M.Z) M.Z.bounds(W, H, M.kMax);
@@ -1288,7 +1276,7 @@
       M.items.forEach(function (it) { it.g.setAttribute("transform", "translate(" + (dk * it.s[0] + dx).toFixed(1) + "," + (dk * it.s[1] + dy).toFixed(1) + ")"); });
       if (byUser) press(M, null);
     }
-    function cmFrame(M, key) {   // frame a chip's footprints at once (first drawing, a new size)
+    function cmFrame(M, key) {   // frame a view's footprints at once (first drawing, a new size)
       const T = fitT(M, M.targets[key] || M.targets[M.open], M.kMax);
       if (M.Z) M.Z.set(T); else M.gZ.setAttribute("transform", tStr(T));
       M.t = T;
@@ -1304,23 +1292,13 @@
       const gZ = el("g", {}, svgEl);
       const M = { id: id, A: A, h: h, host: host, svg: svgEl, gZ: gZ, gBg: el("g", {}, gZ), gDet: el("g", {}, gZ), gRt: el("g", {}, svgEl),
                   gOv: el("g", { class: "jr-zover" }, svgEl), items: [], routes: [], t: ID, tR: ID, W: 0, H: 0, active: null, open: null,
-                  targets: { "0": A.main, "1": A.second, all: { pts: A.all } },
-                  chips: Array.prototype.slice.call(h.querySelectorAll(".jr-zchip")) };
+                  targets: { main: A.main, all: { pts: A.all }, us: chapterOf[id].mo === "us" ? { pts: US48 } : null } };
       M.Z = zoomer({ host: host, svg: svgEl, g: gZ, keys: true, homeLabel: "Back to the first view",
         home: function () { press(M, M.open); return fitT(M, M.targets[M.open], M.kMax); },
         onMove: function (t, byUser) { cmMove(M, t, byUser); },
         onEnd: function (t) { M.t = t; if (!tSame(t, M.tR)) cmLayout(M); } });
-      M.chips.forEach(function (b) {
-        const key = b.getAttribute("data-zoom");
-        if (!M.targets[key]) { b.hidden = true; return; }
-        b.addEventListener("click", function () {
-          press(M, key);
-          const T = fitT(M, M.targets[key], M.kMax);
-          if (M.Z) M.Z.go(T, 750); else { M.t = T; gZ.setAttribute("transform", tStr(T)); cmLayout(M); }
-        });
-      });
       if (!cmBuild(M)) return;
-      press(M, M.open);   // the chip of the view it opens on (cmBuild chose it)
+      press(M, M.open);   // the view it shows (cmBuild chose it)
       h.setAttribute("data-open", M.open);   // for layout checks
       cmFrame(M, M.open);
       cmaps.push(M);
