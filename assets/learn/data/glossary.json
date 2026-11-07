@@ -1487,6 +1487,12 @@
   "lesson": "F7",
   "href": "f07-microgrids.html"
  },
+ "gdp": {
+  "term": "Gross domestic product (GDP)",
+  "short": "The value of all the goods and services an economy produces in a year.",
+  "lesson": "A21",
+  "href": "a21-security-minerals.html"
+ },
  "gross-jobs": {
   "term": "Gross jobs",
   "short": "The jobs a project creates, counted on their own, without subtracting jobs lost or work that would have happened anyway.",
@@ -1603,7 +1609,7 @@
  },
  "implied-carbon-price": {
   "term": "Implied carbon price",
-  "short": "The carbon price at which a plan just meets an emissions limit; in an optimization model it is the limit's dual value, what one more tonne allowed would save.",
+  "short": "A carbon price found so that a plan just meets an emissions limit, not set in advance: on a page that tries prices, the lowest that meets it; in a least-cost model, the limit's shadow price.",
   "lesson": "A20",
   "href": "a20-national-scenarios.html"
  },
@@ -2452,6 +2458,12 @@
   "short": "The simplest forecast: the next value will be the same as the last one seen, or as the same hour a day or a week before.",
   "lesson": 4,
   "href": "04-forecasts.html"
+ },
+ "petajoule": {
+  "term": "Petajoule (PJ)",
+  "short": "A unit of energy equal to a million gigajoules (10^15 joules, about 278 GWh), used for a country's yearly fuel use.",
+  "lesson": "A21",
+  "href": "a21-security-minerals.html"
  },
  "photovoltaic": {
   "term": "Photovoltaic (PV)",

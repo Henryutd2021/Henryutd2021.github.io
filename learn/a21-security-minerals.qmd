@@ -47,6 +47,10 @@ body-classes: "page-learn page-lesson lx-form-cards"
 .a21-bar i { display: block; height: 100%; }
 .a21-row > .lx-hint { grid-column: 2; margin: 0; }
 @media (max-width: 560px) { .a21-row { grid-template-columns: 1fr; } .a21-row > .lx-hint { grid-column: 1; } }
+.page-learn .a21-given { margin: 6px 0 4px; } .a21-given th, .a21-given td { text-align: left; vertical-align: top; font-family: var(--lx-f-body); font-size: 13.5px; padding: 3px 12px 3px 0; }
+.page-learn .a21-given th { font-weight: 500; color: var(--lx-ink-2); }
+.page-learn ul.a21-notes { margin: 8px 0 0; padding-left: 1.1em; display: grid; gap: 3px; }
+.page-learn details.a21-tip { margin: 6px 0; } .page-learn details.a21-tip summary { cursor: pointer; color: var(--lx-ink-2); }
 </style>
 ```
 
@@ -74,7 +78,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div id="a21-explain" class="lx-xgrid">
 <div class="lx-fallback">
 <!-- a21-ideas:start (written from the model by the test's --write mode; do not edit) -->
-<dl class="lx-ideas"><dt>Dependence is a ratio</dt><dd>Net imports ÷ primary energy: 40.0% for Prairieland; its value depends on how primary energy is counted.</dd><dt>Concentration is separate</dt><dd>Coal is 0% imported, yet all of it comes from one county; 31.0% of primary energy passes one strait.</dd><dt>The scarcest input sets output</dt><dd>Graphite (anodes) limits the factory to 23% of its output during the restriction.</dd><dt>Whose money</dt><dd>A price spike sends money abroad for imports and moves money at home between users and producers.</dd><dt>Shocks overlap</dt><dd>A restriction and a fire together cost 18.5 GWh of cells, not 24.5 GWh.</dd></dl>
+<dl class="lx-ideas"><dt>Dependence is a ratio</dt><dd>Net imports ÷ primary energy: 40.0% for Prairieland; its value depends on how primary energy is counted.</dd><dt>Concentration is separate</dt><dd>Coal is 0% imported, yet all of it comes from one county; 31.0% of primary energy passes one strait.</dd><dt>The scarcest input sets output</dt><dd>Graphite (anodes) limits the factory to 23% of its output during the restriction.</dd><dt>Whose money</dt><dd>A price spike sends money abroad for imports and moves money at home between users and producers.</dd><dt>Timing matters when shocks combine</dt><dd>A restriction and a fire cost 18.5 GWh of cells with the fire at the start of the restriction, 19.4 GWh with it in the restriction's last 6 months; added, 24.5 GWh.</dd></dl>
 <!-- a21-ideas:end -->
 </div>
 </div>
@@ -90,7 +94,8 @@ body-classes: "page-learn page-lesson lx-form-cards"
 $$\text{import dependence} = \frac{\text{net imports}}{\text{gross available energy}}, \qquad \mathrm{HHI} = \sum_i (100\, s_i)^2$$
 
 - **Symbols.** $s_i$ is supplier $i$'s share of a supply, from 0 to 1; the HHI runs from near 0 (many small suppliers) to 10,000 (one).
-- **Equal shares.** With $n$ equal suppliers the HHI is $10{,}000/n$: four refiners can never bring it below 2,500.
+- **Equal shares.** With $n$ equal suppliers the HHI is $10{,}000/n$; four suppliers can never bring it below 2,500.
+- **Supply groups.** Prairieland lists four supply groups, the last grouping other refiners; counting those firms one by one would lower the index, so the HHI shown is an upper bound.
 - **Stock days.** The IEA counts oil stocks in days of the previous year's net imports, not of all oil used.
 - **The scarcest input.** A factory needing several inputs makes as much as its scarcest input allows: a minimum, not an average.
 
@@ -102,7 +107,7 @@ $$\text{import dependence} = \frac{\text{net imports}}{\text{gross available ene
 <div class="lx-deeper-body">
 ```
 
-- **An import-share cap.** A rule that imports stay below a share of primary energy in each period; its dual value prices that security.
+- **An import-share cap.** Imports stay below a share of primary energy in each period; its [shadow price]{.lx-term term="shadow-price"} is how much modelled cost changes when the cap tightens slightly, not the value of security.
 - **Stocks as decisions.** A two-stage model chooses stock sizes before it knows which disruption comes, then runs each one.
 - **Disruption scenarios.** Shocks become scenarios with stated settings, as on this page, so a plan can be tested against them.
 - **Next.** Modeler lesson [M13](m13-national-pathway.html) adds an import-share cap to Prairieland's pathway model; capstone [C4](c4-prairieland-2050.html) tests a pathway against shocks.
@@ -148,7 +153,7 @@ $$\text{import dependence} = \frac{\text{net imports}}{\text{gross available ene
 <div class="lx-qq" data-id="sellers" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “More LNG sellers protect a country from a world price spike.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. A world price rise reaches every seller: Prairieland would still pay $8.40 billion more abroad, and only using less gas helps.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. A world price rise reaches every seller, so Prairieland would still pay $8.40 billion more abroad; stored gas cushions that only while it lasts.</p></details>
 </div>
 <div class="lx-qq" data-id="hhi" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “A high HHI shows that a supplier is likely to cut a country off.”</p>
@@ -159,7 +164,7 @@ $$\text{import dependence} = \frac{\text{net imports}}{\text{gross available ene
 </div>
 <div class="lx-card a21-practice">
 <!-- a21-practice:start (written from the model by the test's --write mode; do not edit) -->
-<p class="lx-eyebrow">Practice · about 30 minutes on your own</p><ol class="lx-fb-practice"><li><p><b>Through the strait.</b> Prairieland imports 980 PJ of crude (all through the strait) and 420 PJ of LNG (25% through it). Primary energy is 3,500 PJ. What share passes the strait?</p><details class="lx-answer"><summary>Answer</summary><p>980 + 420 × 0.25 = 1,085 PJ; ÷ 3,500 = 31.0%.</p></details></li><li><p><b>An HHI by hand.</b> Graphite's refiners hold 90%, 5%, 3%, 2%. What is the HHI?</p><details class="lx-answer"><summary>Answer</summary><p>90² + 5² + 3² + 2² = 8,100 + 25 + 9 + 4 = 8,138.</p></details></li><li><p><b>Whose money.</b> LNG costs $10.00 per GJ and triples for a year; Prairieland buys 420 PJ. How much more does it pay abroad?</p><details class="lx-answer"><summary>Answer</summary><p>420 PJ × $10.00 × (3 − 1) = $8,400 million, $8.40 billion.</p></details></li><li><p><b>Stocks against a closure.</b> With 60 days of stocks, does a 9-week closure leave Prairieland short? Oil imports are 980 PJ a year.</p><details class="lx-answer"><summary>Answer</summary><p>Lost: 980 × 63 ÷ 365 = 169.2 PJ; stocks: 980 × 60 ÷ 365 = 161.1 PJ; short by 8.1 PJ.</p></details></li><li><p><b>The scarcest mineral.</b> Country R refines 90% of graphite; 5% is recycled; stocks last 60 days. Over a 2-year restriction, what share of output can graphite support?</p><details class="lx-answer"><summary>Answer</summary><p>5% + 95% × 10% = 14.5% a year; (2 × 0.145 + 60/365) ÷ 2 = 0.227, about 23%.</p></details></li><li><p><b>A second site.</b> The factory makes 12 GWh a year with 20 GWh of capacity. A fire stops the main site for 6 months. How much is lost with no second site, and with 30% of the capacity elsewhere?</p><details class="lx-answer"><summary>Answer</summary><p>None elsewhere: 6/12 × 12 = 6.0 GWh. With 30%: 6/12 × (12 − 20 × 0.3) = 3.0 GWh.</p></details></li></ol><p class="lx-hint">Prairieland is fictional; its numbers are illustrative. Every number here comes from the page's model.</p>
+<p class="lx-eyebrow">Practice · about 30 minutes on your own</p><ol class="lx-fb-practice"><li><p><b>Through the strait.</b> What share of primary energy passes the strait?</p><table class="lx-mini-table a21-given"><tbody><tr><th scope="row">Crude oil imports</th><td>980 PJ a year, all through the strait</td></tr><tr><th scope="row">LNG imports</th><td>420 PJ a year, 25% through it</td></tr><tr><th scope="row">Primary energy</th><td>3,500 PJ</td></tr></tbody></table><details class="lx-answer"><summary>Answer</summary><p>980 + 420 × 0.25 = 1,085 PJ; ÷ 3,500 = 31.0%.</p></details></li><li><p><b>An HHI by hand.</b> What is graphite's HHI?</p><table class="lx-mini-table a21-given"><tbody><tr><th scope="row">Graphite's four supply groups</th><td>90%, 5%, 3%, 2%</td></tr></tbody></table><details class="lx-answer"><summary>Answer</summary><p>90² + 5² + 3² + 2² = 8,100 + 25 + 9 + 4 = 8,138.</p></details></li><li><p><b>Whose money.</b> How much more does Prairieland pay abroad?</p><table class="lx-mini-table a21-given"><tbody><tr><th scope="row">LNG price</th><td>$10.00 per GJ, tripled for a year</td></tr><tr><th scope="row">LNG bought</th><td>420 PJ (1 PJ is a million GJ)</td></tr></tbody></table><details class="lx-answer"><summary>Answer</summary><p>420 PJ × $10.00 × (3 − 1) = $8,400 million, $8.40 billion.</p></details></li><li><p><b>Stocks against a closure.</b> Does a 9-week closure leave Prairieland short?</p><table class="lx-mini-table a21-given"><tbody><tr><th scope="row">Oil imports, all through the strait</th><td>980 PJ a year</td></tr><tr><th scope="row">Oil stocks</th><td>60 days of net imports</td></tr><tr><th scope="row">Closure</th><td>9 weeks, 63 days</td></tr></tbody></table><details class="lx-answer"><summary>Answer</summary><p>Lost: 980 × 63 ÷ 365 = 169.2 PJ; stocks: 980 × 60 ÷ 365 = 161.1 PJ; short by 8.1 PJ.</p></details></li><li><p><b>The scarcest mineral.</b> What share of the factory's output can graphite support over the restriction?</p><table class="lx-mini-table a21-given"><tbody><tr><th scope="row">Country R's share of graphite</th><td>90%, stopped for 2 years</td></tr><tr><th scope="row">Recycled at home</th><td>5%</td></tr><tr><th scope="row">Mineral stocks</th><td>60 days of use</td></tr></tbody></table><details class="lx-answer"><summary>Answer</summary><p>5% + 95% × 10% = 14.5% a year; (2 × 0.145 + 60/365) ÷ 2 = 0.227, about 23%.</p></details></li><li><p><b>A second site.</b> How much output does the fire cost with 30% of the capacity at a second site?</p><table class="lx-mini-table a21-given"><tbody><tr><th scope="row">Output in 2025</th><td>12 GWh of cells a year</td></tr><tr><th scope="row">Capacity</th><td>20 GWh a year</td></tr><tr><th scope="row">Fire</th><td>stops the main site for 6 months</td></tr></tbody></table><details class="lx-answer"><summary>Answer</summary><p>6/12 × (12 − 20 × 0.3) = 3.0 GWh, against 6/12 × 12 = 6.0 GWh with one site.</p></details></li></ol><p class="lx-hint">Prairieland is fictional; its numbers are illustrative. Every number here comes from the page's model.</p>
 <!-- a21-practice:end -->
 </div>
 ```
@@ -179,7 +184,7 @@ $$\text{import dependence} = \frac{\text{net imports}}{\text{gross available ene
 <tbody>
 <!-- a21-facts:start (written from the data by the test's --write mode; do not edit) -->
 <tr><td>EU energy import dependency, 2024</td><td>57.3% (net imports / gross available energy); gas 85.0%, oil 96.6%</td><td class="s"><a href="https://ec.europa.eu/eurostat/databrowser/view/nrg_ind_id/default/table">Eurostat</a> · updated 16 Jul 2026</td></tr>
-<tr><td>Leading refiner of strategic minerals, 2025</td><td>one country is the leading refiner for 19 of the IEA's 20 strategic minerals, with an average share of about 70%</td><td class="s"><a href="https://www.iea.org/reports/global-critical-minerals-outlook-2025/executive-summary">International Energy Agency</a> · 2025</td></tr>
+<tr><td>Leading refiner of strategic minerals, IEA report of 2025 (latest year available for each mineral; years vary)</td><td>one country is the leading refiner for 19 of the IEA's 20 strategic minerals, with an average share of about 70%</td><td class="s"><a href="https://www.iea.org/reports/global-critical-minerals-outlook-2025/executive-summary">International Energy Agency</a> · 2025</td></tr>
 <tr><td>Oil through the Strait of Hormuz, fourth quarter of 2025</td><td>21.6 million barrels a day, about 21% of world oil supply</td><td class="s"><a href="https://www.eia.gov/outlooks/steo/report/energysecurity/article.php">U.S. Energy Information Administration</a> · 12 Aug 2026</td></tr>
 <tr><td>Oil stocks benchmark</td><td>IEA members that are net importers hold at least 90 days of net imports</td><td class="s"><a href="https://www.iea.org/data-and-statistics/data-tools/oil-stocks-of-iea-countries">International Energy Agency</a> · read 2 Nov 2026 for the course dossier</td></tr>
 <tr><td>U.S. reliance on imports from China</td><td>a major source for 14 of the 33 critical minerals for which the U.S. most depends on imports (2026 Mineral Commodity Summaries)</td><td class="s"><a href="https://www.usgs.gov/news/national-news-release/value-us-mineral-production-rose-last-year-driven-precious-metals-prices">U.S. Geological Survey</a> · 6 Feb 2026</td></tr>

@@ -10,7 +10,7 @@ glossary:
     def: "A scenario that starts from a goal, such as a carbon budget, and works out what it would take to meet it; the IEA calls this kind normative."
   - id: implied-carbon-price
     term: Implied carbon price
-    def: "The carbon price at which a plan just meets an emissions limit; in an optimization model it is the limit's dual value, what one more tonne allowed would save."
+    def: "A carbon price found so that a plan just meets an emissions limit, not set in advance: on a page that tries prices, the lowest that meets it; in a least-cost model, the limit's shadow price."
 requests:
   - "path.yml: A20's after list is the curriculum's (A1, T13 = lesson 13); both are live."
   - "prairieland.json: nothing for A20. Note for E4 and C4: with the default fast-electrification pace this page's accounting reaches 2,600 Mt at an implied $84 a tonne; its floor at central demand is about 2,486 Mt (every new MWh clean, every coal and combined-cycle plant closed from 2030)."

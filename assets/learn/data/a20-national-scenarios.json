@@ -2,7 +2,7 @@
   "about": {
     "what": "Lesson A20's own settings: four scenarios for Prairieland, the screening accounting that turns their assumptions into results, the gap tracer's groups and outputs, the sort's cards and the real-world scenario families. Every Prairieland number (energy balance, fleet, demand cases, cost and fuel ranges, carbon factors, the budget) is read from prairieland.json at run time, never copied here.",
     "built": "2026-11-07",
-    "builtBy": "builder learn-w6-b (hand-written; tested by _tests/learn/test_a20-national-scenarios.js)",
+    "tests": "_tests/learn/test_a20-national-scenarios.js",
     "dollarYear": 2025
   },
   "rule": {
@@ -80,6 +80,11 @@
       "costs": { "wind": "def", "solar": "def", "battery": "def", "firm": "def" }
     }
   ],
+  "pathwayModel": {
+    "floorMt": 2700,
+    "about": true,
+    "what": "The least cumulative CO₂ 2026–2050 that the pathway model of M13 and SB4 reaches at its most electrification and central demand, rounded, as its data says (e4-pathways.json, levers.budget.why). It raises each sector's electric share in a straight line from 2025 to its 2050 value; this page lets each sector electrify early, up to the most a period allows."
+  },
   "pairs": [
     { "a": "announced", "b": "gasboom" },
     { "a": "current", "b": "gasboom" },
