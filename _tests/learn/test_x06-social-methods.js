@@ -26,6 +26,7 @@ const SIDE = fs.readFileSync(path.join(SITE, "learn/_w1/" + ID + ".yml"), "utf8"
 const QPATH = path.join(SITE, "learn", ID + ".qmd");
 let checks = 0, fails = 0;
 function ok(c, msg) { checks++; if (!c) { fails++; console.log("FAIL:", msg); } }
+const plain = S.plain, nWords = S.nWords, nSent = S.nSent;
 
 // ---------------- the generated blocks
 const BLOCKS = { "x06-fallback": () => M.staticFallback(D), "x06-ideas": () => M.ideasHTML(D), "x06-stop": () => S.stopHTML(D.stop, "x06"), "x06-check": () => M.checkHTML(D),
@@ -46,12 +47,14 @@ Object.keys(BLOCKS).forEach(k => { const r = between(PAGE, k); ok(PAGE.slice(r.f
 const OWN = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?<!-- learn:\1:end -->/g, "");
 
 // ---------------- methods and questions
-const ROW = ["Survey", "Interview", "Choice experiment", "Ethnography", "Policy analysis", "Participatory mapping"];
+// the curriculum row's six methods; its "policy analysis" is named here as what the card does, document-based (X6 review)
+const ROW = ["Survey", "Interview", "Choice experiment", "Ethnography", "Document-based policy analysis", "Participatory mapping"];
 ok(D.methods.map(m => m.label).join() === ROW.join(), "the curriculum row's six methods, in its order");
 D.methods.forEach(m => ok(m.asks && m.data && m.gives && m.cannot && ["yes", "no", "partly"].indexOf(m.people) >= 0, m.id + ": asks, data, gives, cannot, and whether people take part"));
 ok(D.questions.length === 6 && D.questions.map(q => q.bin).sort().join() === D.methods.map(m => m.id).sort().join(), "six questions, one per method");
 D.questions.forEach(q => { const m = M.method(D, q.bin); ok(/\?$/.test(q.text) && q.why.toLowerCase().indexOf(m.label.toLowerCase().split(" ")[0].replace(/y$/, "")) === 0, q.id + ": a question, and a reason that names " + m.label); });
-{ const g = CS.grade(D.questions, Object.fromEntries(D.questions.map(q => [q.id, q.bin]))); ok(g.right === 6 && /^6 of 6 match/.test(M.matchLine(g)), "a perfect match scores 6 of 6"); }
+{ const g = CS.grade(D.questions, Object.fromEntries(D.questions.map(q => [q.id, q.bin]))); ok(g.right === 6 && /^6 of 6 match/.test(M.matchLine(g)), "a perfect match scores 6 of 6");
+  const e = CS.grade(D.questions, {}); ok(e.placed === 0 && /^Place every question first: 6 still/.test(M.matchLine(e)), "an empty check asks for every question first"); }
 // people toggles: the reference agrees with every clear cell; "partly" accepts either
 { const items = M.peopleItems(D), ref = CS.reference(items, ["people"]), sc = CS.score(ref, items, ["people"]);
   ok(sc.differ === 0 && sc.agree + sc.partly === items.length, "the people toggles' reference agrees with every row");
@@ -62,12 +65,27 @@ ok(D.predict.answer === "peak" && D.selection.answer === "notalone" && /M14/.tes
 ok(/data-answer="a"/.test(M.checkHTML(D)) && /A survey of a representative sample/.test(M.checkHTML(D)), "the quick question's answer is the survey");
 
 // ---------------- facts and sources
-const SRC = D.sources;
-ok(/27% of U\.S\. households/.test(SRC["eia-recs"].text) && /34 million/.test(SRC["eia-recs"].text) && /18,496/.test(SRC["eia-recs"].text) && /web or mail/.test(SRC["eia-recs"].text), "the RECS facts as EIA states them");
+const SRC = D.sources, TXT = k => SRC[k].cite + ": " + SRC[k].used.join(" ");
+ok(/27% of U\.S\. households/.test(TXT("eia-recs")) && /34 million/.test(TXT("eia-recs")) && /18,496/.test(TXT("eia-recs")) && /web or mail/.test(TXT("eia-recs")), "the RECS facts as EIA states them");
 ok(D.facts[0].n === "27%" && /34 million/.test(D.facts[0].what) && D.facts[1].n === "18,496" && /web or mail/.test(D.facts[1].what), "the facts equal the source line");
-ok(D.facts[2].n === "7" && /experiments, literature reviews, data collection, data analysis, quantitative energy modeling, qualitative analysis and case studies/.test(D.facts[2].what) && /seven method categories/.test(SRC.sovacool2018.text), "seven method categories, as the review's abstract lists them");
+ok(D.facts[2].n === "7" && /experiments, literature reviews, data collection, data analysis, quantitative energy modeling, qualitative analysis and case studies/.test(D.facts[2].what) && /seven method categories/.test(TXT("sovacool2018")), "seven method categories, as the review's abstract lists them");
 Object.keys(SRC).forEach(k => ok(/\d{4}/.test(SRC[k].asOf) && S.linkOK(SRC[k].url), k + ": dated, link on the allow-list"));
 D.facts.forEach(f => ok(SRC[f.src], f.n + ": a source"));
+Object.keys(SRC).forEach(k => { ok(SRC[k].cite && SRC[k].used.length >= 1 && nWords(SRC[k].cite) <= 32, k + ": a citation of " + nWords(SRC[k].cite) + " words and the claims it supports");
+  SRC[k].used.forEach(u => ok(nWords(u) <= 30, k + ": a 'supports' line of " + nWords(u) + " words")); });
+
+// ---------------- the review's fixes (X6 review, 2026-11-07)
+{ const B = M.bins(D); ok(B.length === 6 && B.every(b => b.label && b.sub && nWords(b.sub) <= 8), "every box of the sort carries a short definition of its method, so nothing is tested before it is explained"); }
+ok(/if \(g\.placed < g\.total\) \{ api\.saw\(matchLine\(g\), true\); return; \} act\.appendChild\(why\)/.test(JS), "the match counts only with every question placed, then shows every pairing's reason");
+{ const r = M.reasonsHTML(D); ok(D.questions.every(q => r.indexOf(q.why) > 0), "every pairing's reason is shown after a full check, right or wrong"); }
+ok(!/needs informed consent and an ethics board's review/.test(RAW + JS + PAGE) && /exemption or a waiver is its decision/.test(D.peopleWhy.yes) && /identifiable personal records/.test(D.peopleWhy.partly) && /ethics board decides/.test(M.PEOPLE_SAW) && /exemptions and waivers follow its process/.test(M.ideasHTML(D)), "ethics: the board decides what review and consent apply, exemptions included; records count too");
+ok(/ethics board\]\] decides what review/.test(M.STEPS[3]) && /decides what review and consent apply/.test(D.stop.includes[1]) && /including any exemption or waiver/.test(PAGE), "the step, the stop box and the Go deeper say the same");
+ok(/^For these questions/.test(M.MATCH_SAW) && !/needs a survey|need interviews/.test(M.MATCH_SAW) && /^Documents alone do not show/.test(M.method(D, "policy").cannot), "method boundaries stated for these questions, not as rules");
+{ const fb = M.staticFallback(D); ok(/<th scope="col">Data<\/th>/.test(fb) && D.methods.every(m => fb.indexOf(m.data.replace(/'/g, "'")) > 0), "the no-JS table has each method's data");
+  ok([D.predict, D.selection].every(Q => Q.options.every(o => fb.indexOf(Q.feedback[o.value]) > 0)) && /homes in the heat-pump programme use less energy/.test(fb), "the no-JS block has both predictions, every option with its feedback"); }
+ok(!/dockets and filings|siting screen/.test(RAW) && /difficulty paying energy bills, or a home kept at an unsafe temperature/.test(D.facts[0].what), "plain words for case records and map layers; energy insecurity defined where the 27% is");
+ok(/does not, by itself, establish the programme's effect/.test(M.ideasHTML(D)), "the static causal line: not by itself");
+D.methods.forEach(m => { const P = M.methodParts(D, m.id); ok(nWords(P.shown.join(" ")) <= 40, m.id + ": the card shows " + nWords(P.shown.join(" ")) + " words at first"); ok(nWords(P.more.join(" ")) <= 40, m.id + ": 'More' holds " + nWords(P.more.join(" ")) + " words"); });
 
 // ---------------- the stop box, neutrality, scope and links
 ok(S.problems(D.stop).length === 0, "the stop box has its parts: " + S.problems(D.stop).join("; "));
@@ -83,13 +101,12 @@ ok(/\(fictional\)/.test(M.STEPS[0]) && /fictional/.test(PAGE), "Prairie City's c
 ["M14", "A13", "A19", "R9", "R3"].forEach(c => ok(new RegExp('\\["' + c + '",').test(JS) || new RegExp('lessonRefHTML\\(P, "' + c + '"\\)').test(JS), c + " is named through LX.lessonRefHTML"));
 
 // ---------------- text budget
-const plain = S.plain, nWords = S.nWords, nSent = S.nSent;
 ok(M.STEPS.length === 5, "five step cards");
 M.STEPS.forEach((t, i) => { const n = nWords(t); ok(n >= 14 && n <= 40, "step " + (i + 1) + ": " + n + " words"); ok(nSent(t) <= 2, "step " + (i + 1) + ": " + nSent(t) + " sentences"); });
-const lines = [M.MATCH_SAW, M.PICK_SAW, M.PEOPLE_SAW, M.matchLine({ right: 4, total: 6 })].concat(Object.values(D.predict.feedback), Object.values(D.selection.feedback), D.questions.map(q => q.why), D.questions.map(q => q.text),
+const lines = [M.MATCH_SAW, M.PICK_SAW, M.PEOPLE_SAW, M.matchLine({ right: 4, placed: 6, total: 6 })].concat(Object.values(D.predict.feedback), Object.values(D.selection.feedback), D.questions.map(q => q.why), D.questions.map(q => q.text),
   [].concat.apply([], D.methods.map(m => [m.asks, m.data, m.gives, m.cannot])), Object.values(D.peopleWhy));
 lines.forEach(t => { ok(nWords(t) <= 40, "a reveal of " + nWords(t) + " words: " + plain(t).slice(0, 60)); ok(nSent(t) <= 2, "a reveal of " + nSent(t) + " sentences: " + plain(t).slice(0, 60)); });
-const PROSE = OWN.replace(/^---[\s\S]*?\n---\n/, " ").replace(/<script[\s\S]*?<\/script>/g, " ").replace(/<style[\s\S]*?<\/style>/g, " ").replace(/<!-- x06-(sources|facts):start[\s\S]*?:end -->/g, " ").replace(/<!--[\s\S]*?-->/g, " ");
+const PROSE = OWN.replace(/^---[\s\S]*?\n---\n/, " ").replace(/<script[\s\S]*?<\/script>/g, " ").replace(/<style[\s\S]*?<\/style>/g, " ").replace(/<!--[\s\S]*?-->/g, " ");
 PROSE.split(/<\/?(?:p|li|dd|dt|td|th|summary|br|caption|h3|h4)\b[^>]*>/).map(plain).filter(x => /[A-Za-z]/.test(x) && !/^[:{]/.test(x)).forEach(x => {
   const n = nWords(x); ok(n <= 42, "text element of " + n + " words: " + x.slice(0, 70)); ok(nSent(x) <= 3, "text element of " + nSent(x) + " sentences: " + x.slice(0, 70)); });
 

@@ -1145,6 +1145,12 @@
   "lesson": "N1",
   "href": "n01-news-lens.html"
  },
+ "evidentiary-hearing": {
+  "term": "Evidentiary hearing",
+  "short": "A formal hearing at which the parties present their evidence and question each other's witnesses before the commissioners.",
+  "lesson": "X4",
+  "href": "x04-rules-law.html"
+ },
  "exajoule": {
   "term": "Exajoule (EJ)",
   "short": "A unit of energy equal to a thousand petajoules (10^18 joules, about 278 TWh), used for the yearly energy of a whole country.",
@@ -1690,6 +1696,12 @@
   "short": "The middle half of a set of values, from the 25th to the 75th percentile.",
   "lesson": "A11",
   "href": "a11-lca-nexus.html"
+ },
+ "intervenor": {
+  "term": "Intervenor",
+  "short": "A person or organization that formally joins a regulatory case as a party, so it can file testimony and question witnesses.",
+  "lesson": "X4",
+  "href": "x04-rules-law.html"
  },
  "inverter": {
   "term": "Inverter",
@@ -2657,6 +2669,12 @@
   "lesson": "A19",
   "href": "a19-gis-siting.html"
  },
+ "rate-base": {
+  "term": "Rate base",
+  "short": "The net value of what a regulated utility has built, its plant less depreciation, on which the regulator allows it to earn a return.",
+  "lesson": "X4",
+  "href": "x04-rules-law.html"
+ },
  "rate-case": {
   "term": "Rate case",
   "short": "A formal proceeding in which a utility asks its regulator to change its rates; staff, consumer advocates and other parties file testimony, and the commission decides.",
@@ -2839,7 +2857,7 @@
  },
  "revenue-requirement": {
   "term": "Revenue requirement",
-  "short": "The total a regulated utility may collect from its customers in a year: its allowed operating costs plus an allowed return on the net value of what it has built.",
+  "short": "The annual revenue a regulated utility may collect: its approved expenses, including depreciation and taxes, plus an allowed financing return on the net value of what it has built.",
   "lesson": "X4",
   "href": "x04-rules-law.html"
  },

@@ -26,6 +26,7 @@ const JS = fs.readFileSync(L_(ID + ".js"), "utf8");
 const SIDE = fs.readFileSync(path.join(SITE, "learn/_w1/" + ID + ".yml"), "utf8");
 const QPATH = path.join(SITE, "learn", ID + ".qmd");
 let checks = 0, fails = 0;
+const plain = S.plain, nWords = S.nWords, nSent = S.nSent;
 function ok(c, msg) { checks++; if (!c) { fails++; console.log("FAIL:", msg); } }
 
 // ---------------- the generated blocks
@@ -80,17 +81,36 @@ ok(step("rfc").comments === 44 && step("nopr").comments === 109 && step("conf").
 ok(D.steps.every(s => !s.date || s.date <= "2020-12-31"), "no live proceeding: every dated stage of the rulemaking ends by 2020");
 
 // ---------------- sources behind every claim
-const SRC = D.sources;
+const SRC = D.sources, TXT = k => SRC[k].cite + ": " + SRC[k].used.join(" ");
 D.cards.forEach(c => ok(D.bins.some(b => b.id === c.bin) && SRC[c.src] && c.why.toLowerCase().indexOf(c.bin) === 0, c.id + ": a bin, a source and a reason that names its level"));
 D.rateCase.forEach(c => ok(SRC[c.src], c.id + ": a source"));
-ok(D.rateCase.length === 6 && /240 days/.test(D.rateCase[5].text) && /waived/.test(D.rateCase[5].text) && /240 days from the filing date/.test(SRC["kcc-rates"].text), "the rate case's order stage states the 240-day rule and its waiver, as the KCC does");
-ok(/not required by law/i.test(D.rateCase[3].text) && /generally held in significant cases/.test(SRC["kcc-rates"].text), "the public hearing is described as the KCC does");
-ok(D.settlement.answer === "no" && /accept, reject or modify a settlement/.test(SRC["kcc-rates"].text), "the settlement answer matches the KCC");
+ok(D.rateCase.length === 6 && /240 days/.test(D.rateCase[5].text) && /waived/.test(D.rateCase[5].text) && /240 days from the filing date/.test(TXT("kcc-rates")), "the rate case's order stage states the 240-day rule and its waiver, as the KCC does");
+ok(/not required by law/i.test(D.rateCase[3].text) && /generally held in significant cases/.test(TXT("kcc-rates")), "the public hearing is described as the KCC does");
+ok(D.settlement.answer === "no" && /accept, reject or modify a settlement/.test(TXT("kcc-rates")), "the settlement answer matches the KCC");
 D.facts.forEach(f => ok(SRC[f.src] && SRC[f.src].asOf, f.n + ": a dated source"));
 { const f = D.facts.filter(x => /years/.test(x.n))[0], s = M.span(D.hook.start, D.hook.end); ok(f.n === s.years + " years " + s.months + " months" && f.what.indexOf(s.years + " years, " + s.months + " months and " + s.days + " days") > 0, "the span fact equals the computed span"); }
 ok(D.facts.some(f => f.n === String(step("nopr").comments)) && D.facts.some(f => f.n === D.quiz.days + " days"), "the 109 and 240-day facts equal the data");
-ok(/230 kV/.test(SRC["ks-siting"].text) && /5 miles/.test(SRC["ks-siting"].text) && /180 days/.test(SRC["ks-siting"].text) && SRC["ks-siting"].url === null, "the Kansas siting law: 230 kV, 5 miles, 180 days, cited by name without a link");
+ok(/230 kV/.test(TXT("ks-siting")) && /5 miles/.test(TXT("ks-siting")) && /hearing within 90 days of the filing/.test(TXT("ks-siting")) && /180 days of the filing/.test(TXT("ks-siting")) && SRC["ks-siting"].url === null, "the Kansas siting law: 230 kV, 5 miles, a hearing within 90 days, a final order within 180, cited by name without a link");
+{ const f = D.facts.filter(x => x.src === "ks-siting")[0], html = M.factsHTML(D);
+  ok(/hearing within 90 days of the filing and a final order within 180 days/.test(f.what) && html.indexOf("K.S.A. 66-1,177 and K.S.A. 66-1,178") > 0, "the siting fact: two deadlines, both statutory sections shown (X4 review)");
+  ok(html.indexOf("Undated, read 7 November 2026") > 0 && !/ · undated</.test(html), "the facts table keeps each source's access date (X4 review)"); }
+Object.keys(SRC).forEach(k => { ok(SRC[k].cite && Array.isArray(SRC[k].used) && SRC[k].used.length >= 1, k + ": a citation and the short claims it supports");
+  SRC[k].used.forEach(u => ok(nWords(u) <= 30, k + ": a 'supports' line of " + nWords(u) + " words")); ok(nWords(SRC[k].cite) <= 30, k + ": a citation of " + nWords(SRC[k].cite) + " words"); });
 Object.keys(SRC).forEach(k => ok(/\d{4}/.test(SRC[k].asOf) && S.linkOK(SRC[k].url), k + ": dated, link on the allow-list or none"));
+
+// ---------------- the review's fixes (X4 review, 2026-11-07)
+ok(D.chain.root && D.chain.tracks.length === 3 && /separate tracks and can overlap/.test(D.chain.note) && /authority/.test(D.chain.root.text), "a law, then three separate tracks that can overlap, not one sequence");
+D.chain.root.src.concat(...D.chain.tracks.map(t => t.src)).forEach(k => ok(SRC[k], "the tracks cite " + k));
+{ const h = M.chainHTML(D); ok(D.chain.tracks.every(t => h.indexOf(t.title) > 0) && h.indexOf(D.chain.note) > 0 && M.staticFallback(D).indexOf(h) >= 0, "the tracks figure, also in the no-JS block"); }
+ok(/six selected milestones/.test(M.orderSaw(D)) && /gathered information repeatedly/.test(M.orderSaw(D)) && !/four times/.test(JS + RAW), "the milestones are a selection; no count of rounds claimed");
+ok(/selected milestones/.test(M.STEPS[1]) && M.STEPS.every(t => !/^Energy rules come in layers/.test(t)) && nSent(M.STEPS[0]) === 1, "step 1 is the date question alone; the tracks come with its reveal");
+ok(/Kansas/.test(M.STEPS[4]) && /\[\[voltage\|kV\]\]/.test(M.STEPS[4]) && ["345", "40 miles"].every(n => M.STEPS[4].indexOf(n) >= 0 && D.project.indexOf(n) >= 0) && /kilovolts/.test(D.project), "the project is introduced before the sort, in Kansas, with kV explained; its numbers equal the data's");
+ok(/KCC issues its decision/.test(JS) && /usually within 240 days of filing/.test(JS) && !/Retail rates change/.test(JS) && /may approve, change or reject it/.test(JS), "the flowchart: a decision deadline, not a rate change");
+{ const dp = M.deeperHTML(); ok(/depreciation/.test(dp) && /income taxes/.test(dp) && /data-term="rate-base"/.test(dp) && /data-term="customer-class"/.test(dp) && /debt and its shareholders/.test(dp), "the revenue requirement: approved expenses incl. depreciation and taxes, a financing return; terms marked"); }
+ok(/depreciation and taxes/.test(SIDE) && ["rate-base", "intervenor", "evidentiary-hearing"].every(t => new RegExp("id: " + t + "\\b").test(SIDE)), "the sidecar defines the revenue requirement fully, and the rate base, an intervenor and an evidentiary hearing");
+ok(/Citizens Utility Ratepayer Board \(CURB\)/.test(D.rateCase.filter(c => c.id === "testimony")[0].text) && /\[\[intervenor\|/.test(RAW) && /\[\[evidentiary-hearing\|/.test(RAW), "CURB expanded and the legal terms marked at first use");
+{ const fb = M.staticFallback(D); ok(/may accept, reject or modify a settlement/.test(fb) && /Both: KCC comments enter the case record/.test(fb) && !/\[\[/.test(fb), "the no-JS block has the settlement answer and where the public can comment, with no raw marks"); }
+ok(/if \(g\.placed < g\.total\) \{ api\.saw\(sortLine\(g\), true\); return; \}/.test(JS) && /^Place every card first/.test(M.sortLine({ right: 0, placed: 0, total: 7 })), "the sort counts only with every card placed");
 
 // ---------------- the stop box, scope and links
 ok(S.problems(D.stop).length === 0, "the stop box has its parts: " + S.problems(D.stop).join("; "));
@@ -106,12 +126,11 @@ ok(hrefs.every(h => S.linkOK(h) || /^[0-9a-z-]+\.html(#[a-z-]+)?$/.test(h) || /^
 ok(/fictional/.test(D.project) && /fictional/.test(PAGE), "Prairie Town's utility is labelled fictional");
 
 // ---------------- text budget
-const plain = S.plain, nWords = S.nWords, nSent = S.nSent;
 ok(M.STEPS.length === 6, "six step cards");
 M.STEPS.forEach((t, i) => { const n = nWords(t); ok(n >= 14 && n <= 40, "step " + (i + 1) + ": " + n + " words"); ok(nSent(t) <= 2, "step " + (i + 1) + ": " + nSent(t) + " sentences"); });
 const lines = [M.CHAIN_SAW, M.orderSaw(D), M.CASE_SAW, M.SORT_SAW, M.orderLine(D, D.shuffle)].concat(Object.values(M.hookFeedback(D)), Object.values(D.settlement.feedback), Object.values(D.voice.feedback), D.cards.map(c => c.why), D.rateCase.map(c => c.text), D.steps.map(s => s.text));
 lines.forEach(t => { ok(nWords(t) <= 40, "a reveal of " + nWords(t) + " words: " + plain(t).slice(0, 60)); ok(nSent(t) <= 2, "a reveal of " + nSent(t) + " sentences: " + plain(t).slice(0, 60)); });
-const PROSE = OWN.replace(/^---[\s\S]*?\n---\n/, " ").replace(/<script[\s\S]*?<\/script>/g, " ").replace(/<style[\s\S]*?<\/style>/g, " ").replace(/<!-- x04-(sources|facts):start[\s\S]*?:end -->/g, " ").replace(/<!--[\s\S]*?-->/g, " ");
+const PROSE = OWN.replace(/^---[\s\S]*?\n---\n/, " ").replace(/<script[\s\S]*?<\/script>/g, " ").replace(/<style[\s\S]*?<\/style>/g, " ").replace(/<!--[\s\S]*?-->/g, " ");
 PROSE.split(/<\/?(?:p|li|dd|dt|td|th|summary|br|caption|h3|h4)\b[^>]*>/).map(plain).filter(x => /[A-Za-z]/.test(x) && !/^[:{]/.test(x)).forEach(x => {
   const n = nWords(x); ok(n <= 42, "text element of " + n + " words: " + x.slice(0, 70)); ok(nSent(x) <= 3, "text element of " + nSent(x) + " sentences: " + x.slice(0, 70)); });
 

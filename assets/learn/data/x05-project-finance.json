@@ -1,10 +1,10 @@
 {
-  "about": "Side topic X5 (How are big energy projects actually financed?): a capital-stack builder for one wind and storage project, closed form. The project is Prairie Town's 150 MW wind farm (town.json, illustrative) with lesson A2's 50 MW, 4-hour battery; their building costs, upkeep and output come from lessons 7 and 13 and A2's data files, and the contract price from A1's. Every dollar is a 2025 dollar. The lender's settings below are illustrative values inside the dated ranges of the sources. One typical year stands for every year of the loan: no inflation, taxes, depreciation, construction loans, reserve accounts or tax-equity flip.",
+  "about": "Side topic X5 (How are big energy projects actually financed?): a capital-stack builder for one wind and storage project, closed form. The project is Prairie Town's wind farm (town.json, illustrative) with lesson A2's battery; their building costs, upkeep and output come from lessons 7 and 13 and A2's data files, and the contract price from A1's, read through x05-inputs.json (the finance-only projection of those files, written by the X5 test). Every dollar is a 2025 dollar. The lender's settings below are illustrative values inside the dated ranges of the sources. One typical year stands for every year of the loan: no inflation, taxes, depreciation, construction loans, reserve accounts or tax-equity flip.",
   "accessed": "2026-11-07",
   "priceYear": 2025,
   "lender": {
     "rate": 6.5,
-    "rateNote": "6.5% a year: the term-debt interest rate the 2025 ATB assumes for land-based wind, utility solar and utility batteries.",
+    "rateNote": "6.5% a year, the toy's chosen rate: the 2025 ATB's nominal term-debt rate for land-based wind, utility solar and batteries. The toy has no inflation, so it uses that rate as it is (simplified).",
     "term": 15,
     "termNote": "15 years, illustrative: the battery's life in lesson 13's data. The 2025 ATB amortizes its loans over 18 years.",
     "dscrContract": 1.3,
@@ -28,7 +28,7 @@
     ],
     "step": 10,
     "start": 100,
-    "note": "Contracted: the wind farm's output sold at A1's fixed price, as generated, and the battery rented out under a tolling agreement. Merchant: the same output at market prices, expected to earn the same on average (illustrative)."
+    "note": "Contracted: the wind output sold at A1's fixed price, as generated, under a [[power-purchase-agreement|power purchase agreement]], and the battery rented out under a [[tolling-agreement|tolling agreement]]. Merchant: market prices, the same on average (illustrative)."
   },
   "bad": {
     "outputFactor": 0.9,
@@ -53,6 +53,7 @@
     "start": 0,
     "note": "A grant is public money that is not paid back, under its program's rules."
   },
+  "structure": "This example assumes project-level debt, paid before either equity investor: operating costs first, then the loan, then tax equity, then the sponsor. Other deal structures order the cash differently.",
   "layers": [
     {
       "key": "sponsor",
@@ -71,8 +72,8 @@
       "short": "Tax equity",
       "color": "var(--lx-tier-2)",
       "who": "Large firms with tax bills to cut, such as banks and insurers.",
-      "gets": "Most of the tax credits and depreciation, plus some cash.",
-      "paid": "Ahead of the sponsor, on terms set in advance; it carries less risk than sponsor equity.",
+      "gets": "Most of the tax credits (cuts to its own tax bill) and the tax deductions for the equipment's wear (depreciation), plus some cash.",
+      "paid": "After the loan and ahead of the sponsor, on terms set in advance; it carries less risk than sponsor equity.",
       "src": "schwabe2017",
       "where": "pp. 13, 20"
     },
@@ -82,8 +83,8 @@
       "short": "Debt",
       "color": "var(--lx-wind)",
       "who": "Banks and other lenders.",
-      "gets": "Fixed loan payments: interest and principal.",
-      "paid": "First, right after operating costs; collateral and covenants protect it, so it asks the lowest return.",
+      "gets": "Fixed loan payments: interest, plus repayment of the amount borrowed (the principal).",
+      "paid": "First, right after operating costs; the project's assets pledged as security (collateral) and rules the borrower must follow (covenants) protect it, so it asks the lowest return.",
       "src": "schwabe2017",
       "where": "pp. 15-16, 20"
     },
@@ -117,7 +118,7 @@
     ],
     "answer": "sponsor",
     "feedback": {
-      "debt": "Not first: the loan is paid right after operating costs, before any owner gets cash.",
+      "debt": "Not first: in this example the loan is paid right after operating costs, before any owner gets cash.",
       "te": "Not first: tax equity is paid ahead of the sponsor on terms set in advance.",
       "sponsor": "Yes: the sponsor is paid last, so its share absorbs a shortfall first."
     }
@@ -142,7 +143,7 @@
     },
     {
       "n": "$13 to $60/MWh",
-      "what": "Wind's average grid-system market value in 2023, from SPP to CAISO, in 2023 dollars: what merchant wind earned, region by region.",
+      "what": "Estimated regional wholesale market value of wind output in 2023, from SPP to CAISO, in 2023 dollars; one project's receipts depend on its contracts and market arrangements.",
       "src": "lbnl2024",
       "where": "p. 6",
       "dollars": {
@@ -205,29 +206,34 @@
   },
   "sources": {
     "atb2025-fin": {
-      "text": "NLR, 2025 Electricity Annual Technology Baseline, Financial Cases and Methods: term debt 6.5% for land-based wind, utility PV and utility batteries; minimum DSCR 1.375 wind, 1.275 PV, 2.0 batteries, 1.45 natural gas; 18-year amortization; leverage set by the minimum DSCR; tax-equity partnership flip",
+      "cite": "NLR, 2025 Electricity Annual Technology Baseline, Financial Cases and Methods",
       "url": "https://atb.nlr.gov/electricity/2025/financial_cases_&_methods",
-      "asOf": "2025 edition (tax law as of 10 July 2025); read 7 November 2026"
+      "asOf": "2025 edition (tax law as of 10 July 2025), read 7 November 2026",
+      "used": ["Nominal term-debt interest rate of 6.5% for land-based wind, utility PV and utility batteries; 18-year amortization.", "Minimum DSCR: 1.375 wind, 1.275 PV, 2.0 batteries, 1.45 natural gas; leverage set by the minimum DSCR.", "The tax-equity partnership flip in its financial cases."]
     },
     "schwabe2017": {
-      "text": "Schwabe, P., Feldman, D., Fields, J. and Settle, E. (2017), Wind Energy Finance in the United States: Current Practice and Opportunities, NREL/TP-6A20-68227: sources of capital pp. v, 11; tax equity typically 30%-50% of the total p. 13; sponsor equity paid last p. 14; debt senior and lower risk pp. 15-16; DSCR box p. 18; risk and return of each source p. 20, Figure 3 p. 21",
+      "cite": "Schwabe, Feldman, Fields and Settle, Wind Energy Finance in the United States: Current Practice and Opportunities, NREL/TP-6A20-68227",
       "url": "https://docs.nlr.gov/docs/fy17osti/68227.pdf",
-      "asOf": "August 2017, read 7 November 2026"
+      "asOf": "August 2017, read 7 November 2026",
+      "used": ["Sources of capital (pp. v, 11); tax equity typically 30%-50% of the total (p. 13).", "Sponsor equity paid last (p. 14); debt senior and lower risk (pp. 15-16); project-level debt and back-leverage (pp. 15-18).", "The DSCR box (p. 18); risk and return of each source (p. 20, Figure 3 p. 21)."]
     },
     "lbnl2024": {
-      "text": "Wiser, R., Millstein, D. et al. (2024), Land-Based Wind Market Report: 2024 Edition, Executive Summary, Lawrence Berkeley National Laboratory: who bought 2023's new wind capacity p. 3; wind's grid-system market value in 2023 by region p. 6 (2023 dollars)",
+      "cite": "Wiser, Millstein et al., Land-Based Wind Market Report: 2024 Edition, Executive Summary, Lawrence Berkeley National Laboratory",
       "url": "https://eta-publications.lbl.gov/sites/default/files/land-based_wind_market_report_2024_edition_executive_summary.pdf",
-      "asOf": "August 2024, read 7 November 2026"
+      "asOf": "August 2024, read 7 November 2026",
+      "used": ["Who bought 2023's new wind capacity (p. 3).", "Wind's estimated grid-system market value in 2023 by region, in 2023 dollars (p. 6)."]
     },
     "doe-era": {
-      "text": "U.S. Department of Energy, Office of Clean Energy Demonstrations, Energy Improvements in Rural or Remote Areas (ERA): for communities with 10,000 or fewer people; a $400 million funding opportunity issued October 2024",
+      "cite": "U.S. Department of Energy, Office of Clean Energy Demonstrations, Energy Improvements in Rural or Remote Areas (ERA)",
       "url": "https://www.energy.gov/oced/era",
-      "asOf": "page undated; read 7 November 2026"
+      "asOf": "page undated, read 7 November 2026",
+      "used": ["For communities with 10,000 or fewer people; a $400 million funding opportunity issued October 2024."]
     },
     "bea-nipa-119": {
-      "text": "U.S. Bureau of Economic Analysis, NIPA Table 1.1.9, Implicit Price Deflators for Gross Domestic Product, line 1 (index, 2017 = 100), annual: 2023 122.451, 2025 128.893 (read through FRED's copy of the BEA series, updated 30 September 2026)",
+      "cite": "U.S. Bureau of Economic Analysis, NIPA Table 1.1.9, Implicit Price Deflators for Gross Domestic Product, line 1",
       "url": "https://apps.bea.gov/iTable/?reqid=19&step=3&isuri=1&1921=survey&1903=13&1904=2022&1905=2026&1906=a&1911=0",
-      "asOf": "read 7 November 2026"
+      "asOf": "read 7 November 2026",
+      "used": ["Index, 2017 = 100, annual: 2023 122.451, 2025 128.893 (read through FRED's copy of the BEA series, updated 30 September 2026)."]
     }
   }
 }
