@@ -945,7 +945,7 @@
   minutes: 25
   practice_minutes: 30   # the myths and the six worked exercises (Check section)
   title: "Why do national energy scenarios disagree?"
-  subtitle: "Line up four scenarios for Prairieland, trace each gap to its assumptions, and sort them as exploratory or target-seeking"
+  subtitle: "Line up four scenarios for a fictional nation, trace each gap to its assumptions, and sort them as exploratory or target-seeking"
   short: "Why scenarios disagree"
   teaches: [exploratory and target-seeking scenarios, scenario assumptions (demand, fuel prices, policy, technology costs), one-at-a-time against ordered swaps, interactions between assumptions, the average over every order, an implied carbon price, reading outlooks as their authors describe them]
   does: "Line up four scenarios for Prairieland built on one data set; read each one's question and assumptions; sort them and four real outlooks as exploratory or target-seeking; trace the gaps in CO₂, electricity and imports to demand, fuel prices, policy and fixed technology costs, one at a time and in order; then move a budget and watch the carbon price it needs."
@@ -962,7 +962,7 @@
   minutes: 25
   practice_minutes: 30   # the myths and the six worked exercises (Check section)
   title: "What makes a nation's energy secure? Imports, minerals, supply chains and factories"
-  subtitle: "Measure Prairieland's import dependence and supplier concentration, then stress it with a price spike, a closed strait, a mineral export restriction and a factory fire"
+  subtitle: "Measure a fictional nation's import dependence and supplier concentration, then stress it with a price spike, a closed strait, a mineral export restriction and a factory fire"
   short: "Energy security"
   teaches: [import dependence, accounting conventions in a ratio, single routes, supplier concentration (HHI), largest-supplier benchmarks, price spikes and who pays, stock days of net imports, the scarcest input, a second site, combined shocks that overlap, which lever helps against which shock]
   does: "Read Prairieland's supply fuel by fuel; compute its import dependence under two conventions and the share on one strait; compute an HHI and cap the leading refiner; stress the nation with an LNG price spike, a closed strait, a mineral export restriction and a factory fire, alone and together; then sort stockpiles, more suppliers, recycling, a second site and using less by the shocks they help against."
