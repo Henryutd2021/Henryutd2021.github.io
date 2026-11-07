@@ -192,6 +192,14 @@ has("Task 1 first: the seven marked tasks open once your review is submitted, an
 has("The level is not the table's: it comes from this rule.", "the level against the criterion table, said before the tasks (Codex review #3)");
 has("Not the table's Strong: this level needs no second person.", "the level against the criterion table, in the rubric section");
 ok(D.intro.some(x => /^Task 1 first: the seven marked tasks open once your review/.test(x)), "the runner's intro says task 1 comes first");
+// task 1 first through the shared runner's per-task options: the seven marked tasks wait for task 1, which is frozen once
+// submitted; no rule of the page's own does it
+{ const CPK = require(L("components/checkpoint.js")), waiting = T.filter(t => t.opensAfter);
+  ok(waiting.length === 7 && waiting.every(t => M.isAuto(t) && t.opensAfter.join() === "review") && auto.every(t => t.opensAfter), "the seven marked tasks, and only they, open after task 1 (opensAfter)");
+  ok(task("review").freeze === true && T.filter(t => t.freeze).length === 1 && /stays as you wrote it/.test(task("review").freezeNote), "task 1 alone is frozen once submitted, with its own line");
+  ok(CPK.openProblems(D).length === 0, "the opensAfter names all work: " + CPK.openProblems(D).join("; "));
+  ok(/opens once task 1, your review of the co-op proposal/.test(D.wait.question) && /^<b>Task 1 first\.<\/b>/.test(D.wait.why) && /waitNote: D\.wait/.test(JS), "the waiting tasks' notice is the data's, passed to the runner");
+  ok(!/LX\.on\("layout"/.test(JS) && !/function (guard|shut|keep)\b/.test(JS), "no guard of the page's own on the runner's markup"); }
 { const st = M.staticTasks(D); ok((st.match(/<details class="ckr-later">/g) || []).length === 7 && /Write task 1, your review, before you open the marked tasks/.test(st), "without JavaScript, the seven marked tasks are folded until after task 1");
   ok(/<p class="lx-hint">Within 2% of the value/.test(st), "the tolerance note is its own line"); }
 ok(/data-term="difference-in-differences"/.test(M.staticStudy(D)) && /data-term="time-of-use-tariff"/.test(M.staticStudy(D)) && ["clean-clone", "lock-file", "checksum", "confidence-interval"].every(k => PAGE.includes('data-term="' + k + '"')), "terms at first use: the study card's, and the tasks' words (Codex review #10)");
@@ -296,6 +304,7 @@ async function earlySequence() {
 // and 12 are open; once task 1 is submitted its text is read-only, and the marked tasks open
 async function firstSequence() {
   const P = mountFresh(), q = () => P.live.querySelector(".lx-ck-q").textContent;
+  let clock = 0; P.E.window.performance.now = () => (clock += 1000);   // every reading one second later: time on a task shows
   P.goTo(1);
   ok(/opens once task 1/.test(q()) && !P.live.querySelector(".lx-choice") && !P.live.querySelector(".lx-ck-sol") && !P.live.querySelector("button.lx-link") && /Task 1 first\./.test(text(P.live.textContent)) && !/Which concern/.test(text(P.live.textContent)),
     "runner: task 2 before task 1: a notice instead of its question, no answers, no solution");
@@ -304,6 +313,7 @@ async function firstSequence() {
   P.goTo(4); P.btn(/^Go to task 1$/).click();
   ok(/^Task 1 of 12/.test(P.live.querySelector(".lx-ck-tag").textContent), "runner: 'Go to task 1' goes there");
   ok(!P.E.LX.store.get(M.KEY, {}).tasks.rank || P.E.LX.store.get(M.KEY, {}).tasks.rank.first == null, "runner: a shut task records no answer");
+  { const s = P.E.LX.store.get(M.KEY, {}); ok(D.tasks.filter(M.isAuto).every(t => !s.tasks[t.id] || !s.tasks[t.id].ms), "runner: no time is counted on a shut task"); }
   P.answer(0);
   const ta = () => P.live.querySelector("textarea");
   ok(ta().hasAttribute("readonly") && !P.btn(/^Submit my explanation$/) && /stays as you wrote it/.test(text(P.live.textContent)), "runner: once submitted, task 1's text is read-only, with no Submit button");

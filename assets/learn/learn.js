@@ -5474,6 +5474,16 @@
              "estimate"    units (as numeric), range: [lo, hi] MWh a year, show: [lo, hi] as printed; low, high (above the low), unit and
                            three short texts (inputs and steps, the main uncertainty, a check); then a self-rating per rubric
                            criterion. The worked-solution section of the page opens on submit.
+     per task (any kind; a task without them behaves as before)
+             opensAfter    [task ids]: the task opens only once each named task is submitted (a first answer recorded, or
+                           a written task submitted). Until then its card shows, in place of its question, answers, early
+                           button and worked solution, a notice and a "Go to task N" button; its clock does not run. For
+                           a task whose question or feedback would shape the answer to another (CK-R: task 1, the
+                           reader's own review, comes before the seven marked tasks that name its concerns)
+             freeze        true: once submitted, the task's answer stays as given (read-only text and number fields, a
+                           fixed unit, choices and order buttons disabled); a line in place of the submit button says so
+                           (freezeNote, else a default). A written task's points and the estimate's self-ratings can still
+                           be ticked. Feedback on a wrong first answer then points to the worked solution, not to a retry
    Options:
      key         LX.store key of the attempt; an attempt stored under another data.version starts afresh. Keep it fixed
                  once testers use a checkpoint (CK-F: "ckf-v1"), so their summaries stay comparable.
@@ -5511,8 +5521,13 @@
                  written task's points and the estimate's self-ratings not at all; the answer that opened it is not late
                  (its `at` is the opening time). The runner adds the rule to the intro (lateRule) so it is said up front;
                  the results name the late tasks, and the copied summary marks them. Default: off (CK-F's rule)
+     waitNote    for tasks with opensAfter: { question, why } (text, and HTML for the notice), or function (task, ids
+                 waited for, D) returning them; default waitText(D, task, ids): "This task opens once task 1 is
+                 submitted." and why
      A page's own level function gets a third argument { solOpen, late, gateAll } (solOpen: when the page's worked
-     solution first opened for this runner, or null).
+     solution first opened for this runner, or null). The runner keeps a task with opensAfter shut, so only an attempt
+     stored elsewhere can answer it first; outOfOrder(D, st) names the tasks submitted after a task that waits for them
+     was answered, for a page's level rule to drop their credit (CK-R does; the shared rule has no such tasks).
    Returns { show(i), results(), intro(), state(), solutionNow(), destroy() }. solutionNow() opens the page's worked
    solution early, recorded on the submit task as above. destroy() stops the clock, saves, removes the runner's document,
    window and lock-button listeners and its markup, so a page can swap runners (CK-M keeps one per variant on screen); the
@@ -5528,7 +5543,9 @@
    Text version: LX.Checkpoint.lineChart adds a table of the hourly values.
    Pure (Node: module.exports): task, checkChoice, checkOrder, checkNumeric (either answer form), checkMWh, checkValue,
    checkEstimate, level(D, st, {openFirst, late, solOpen}), firstRight(record, openFirst), lateAnswer(record, solOpen),
-   allAnswered(D, st), lastAnswerAt(D, st), lateRule({gateAll, n}), tolText(task), describe, summary, fmtMs, firstWord.
+   allAnswered(D, st), lastAnswerAt(D, st), lateRule({gateAll, n}), tolText(task), describe, summary, fmtMs, firstWord;
+   for the per-task options: submitted(record), waitsFor(D, st, task), outOfOrder(D, st), taskList(D, ids),
+   waitText(D, task, ids), openProblems(D) (unknown or circular opensAfter names; a page's test should find none).
    level and summary find the explanation and the estimate as the first "open-short" and the first "estimate" task. */
 (function () {
   "use strict";
@@ -5600,6 +5617,57 @@
   // every task answered: a first answer recorded, or a written task submitted (gateAll opens the worked solution then)
   function allAnswered(D, st) {
     return D.tasks.every(function (t) { var r = st.tasks[t.id]; return !!(r && (r.first != null || r.answer != null)); });
+  }
+  // ---- per-task opening and freezing (task.opensAfter, task.freeze)
+  // a task's record is submitted once a first answer is recorded, or a written task submitted (as allAnswered counts it)
+  function submitted(r) { return !!(r && (r.first != null || r.answer != null)); }
+  // the tasks a task still waits for (its opensAfter ids not yet submitted), in task order; [] when it is open
+  function waitsFor(D, st, t) {
+    var need = (t && t.opensAfter) || [];
+    return D.tasks.filter(function (x) { return need.indexOf(x.id) >= 0 && !submitted(st.tasks[x.id]); }).map(function (x) { return x.id; });
+  }
+  // the tasks named in another task's opensAfter that were submitted after that task's first answer, in task order
+  // (the runner keeps a waiting task shut, so only an attempt stored elsewhere shows one)
+  function outOfOrder(D, st) {
+    var late = {};
+    D.tasks.forEach(function (t) {
+      var r = st.tasks[t.id];
+      (t.opensAfter || []).forEach(function (id) { var n = st.tasks[id]; if (r && r.at && n && n.at && r.at < n.at) late[id] = true; });
+    });
+    return D.tasks.filter(function (x) { return late[x.id]; }).map(function (x) { return x.id; });
+  }
+  // tasks by number: "task 1", "tasks 1 and 4", "tasks 1, 2 and 4"
+  function taskList(D, ids) {
+    var n = ids.map(function (id) { return D.tasks.indexOf(task(D, id)) + 1; });
+    return n.length > 1 ? "tasks " + n.slice(0, -1).join(", ") + " and " + n[n.length - 1] : "task " + n[0];
+  }
+  // what a waiting task shows: the line in place of its question, and the notice under it (HTML)
+  function waitText(D, t, ids) {
+    var w = taskList(D, ids), many = ids.length > 1;
+    return { question: "This task opens once " + w + (many ? " are" : " is") + " submitted.",
+      why: "<b>" + w.charAt(0).toUpperCase() + w.slice(1) + " first.</b> This task's question and worked solution would shape your answer" + (many ? "s" : "") +
+        " there, so they open once " + (many ? "those are" : "it is") + " submitted." };
+  }
+  // opensAfter names that cannot work: an unknown task, the task itself, or a circle of tasks waiting for each other
+  function openProblems(D) {
+    var out = [], ids = D.tasks.map(function (t) { return t.id; });
+    D.tasks.forEach(function (t) {
+      (t.opensAfter || []).forEach(function (id) {
+        if (id === t.id) out.push(t.id + " waits for itself");
+        else if (ids.indexOf(id) < 0) out.push(t.id + " waits for an unknown task " + id);
+      });
+    });
+    var state = {};
+    function visit(id, path) {
+      if (state[id] === 2) return;
+      if (state[id] === 1) { out.push("circle: " + path.concat(id).join(" -> ")); return; }
+      state[id] = 1;
+      var t = task(D, id);
+      ((t && t.opensAfter) || []).forEach(function (n) { if (n !== id && ids.indexOf(n) >= 0) visit(n, path.concat(id)); });
+      state[id] = 2;
+    }
+    ids.forEach(function (id) { visit(id, []); });
+    return out;
   }
   // the attempt's latest first answer (ISO), or null
   function lastAnswerAt(D, st) {
@@ -5690,7 +5758,8 @@
 
   var pure = { task: task, checkChoice: checkChoice, checkOrder: checkOrder, checkNumeric: checkNumeric, checkMWh: checkMWh, checkValue: checkValue,
     checkEstimate: checkEstimate, level: level, firstRight: firstRight, lateAnswer: lateAnswer, allAnswered: allAnswered, lastAnswerAt: lastAnswerAt, lateRule: lateRule, lateText: lateText,
-    tolText: tolText, describe: describe, summary: summary, fmtMs: fmtMs, firstWord: firstWord };
+    tolText: tolText, describe: describe, summary: summary, fmtMs: fmtMs, firstWord: firstWord,
+    submitted: submitted, waitsFor: waitsFor, outOfOrder: outOfOrder, taskList: taskList, waitText: waitText, openProblems: openProblems };
   if (typeof module !== "undefined" && module.exports) module.exports = pure;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -5756,6 +5825,7 @@
     document.addEventListener("visibilitychange", onVis);
     window.addEventListener("pagehide", onHide);
     function answered(id, right, answer, extra) {
+      var ft = task(D, id); if (ft && frozen(ft)) return rec(id);   // a frozen task keeps its first submission
       tick(); var r = rec(id); r.tries += 1;
       if (r.first == null) { r.first = right; r.msFirst = r.ms; }
       if (!r.at) r.at = new Date().toISOString();   // when the task was first answered (the submit task: when it was submitted)
@@ -5798,13 +5868,25 @@
     }
     function show(i) {
       st.cur = i; save(); wrap.innerHTML = "";
-      var t = D.tasks[i], r = rec(t.id), qid = LX.uid("ck-q");
+      var t = D.tasks[i], r = rec(t.id), qid = LX.uid("ck-q"), wait = waitsFor(D, st, t), wt = wait.length ? waitNoteOf(t, wait) : null;
       var c = E("div", { class: "lx-ck-card", role: "group", "aria-labelledby": qid }, wrap);
       var top = E("div", { class: "lx-ck-top" }, c);
       var dots = E("div", { class: "lx-dots", "aria-hidden": "true" }, top);
       for (var d = 0; d < N; d++) E("i", { class: d < i ? "done" : d === i ? "cur" : "" }, dots);
       E("span", { class: "lx-ck-tag", text: "Task " + (i + 1) + " of " + N + " · " + t.skill + " · draws on " + t.lesson }, top);
-      var qp = E("p", { class: "lx-ck-q", id: qid, tabindex: "-1", text: t.prompt }, c);
+      var qp = E("p", { class: "lx-ck-q", id: qid, tabindex: "-1", text: wt ? wt.question : t.prompt }, c);
+      if (wt) shut(c, wait, wt); else open(t, c, r);
+      var foot = E("div", { class: "lx-ck-foot" }, c);
+      E("button", { type: "button", class: "lx-btn ghost small", text: i ? "Back" : "Overview", onclick: function () { if (i) show(i - 1); else intro(); } }, foot);
+      E("button", { type: "button", class: "lx-btn small", html: (i === N - 1 ? "See my results" : "Next task") + LX.icon("arrow"),
+        onclick: function () { var rr = rec(t.id); if (rr.first == null) rr.skipped = true; save(); if (i === N - 1) results(); else show(i + 1); } }, foot);
+      if (wt) stopClock(); else startClock(t.id);   // a waiting task's clock does not run: there is nothing to work on yet
+      qp.focus({ preventScroll: true });
+      c.scrollIntoView({ block: "nearest", behavior: LX.reduced() ? "auto" : "smooth" });
+      LX.emit("layout");
+    }
+    // an open task: its answer controls, the feedback line, its worked solution and the early button
+    function open(t, c, r) {
       var body = E("div", { class: "lx-ck-body" }, c), fb = E("div", { "aria-live": "polite" }, c);
       var sol = E("details", { class: "lx-ck-sol", hidden: r.first == null && !r.solFirst }, c);
       E("summary", { text: "Worked solution" }, sol);
@@ -5814,15 +5896,30 @@
           if (t === gateT && !o.gateAll) openSolution(); if (o.onAnswer) o.onAnswer(t.id, rr, st); } }, c);
       function unlock() { sol.hidden = false; earlyBtn.hidden = true; }
       ({ "choice": choice, "order": order, "numeric": numeric, "open-short": openShort, "estimate": estimate })[t.kind](t, body, fb, unlock);
-      var foot = E("div", { class: "lx-ck-foot" }, c);
-      E("button", { type: "button", class: "lx-btn ghost small", text: i ? "Back" : "Overview", onclick: function () { if (i) show(i - 1); else intro(); } }, foot);
-      E("button", { type: "button", class: "lx-btn small", html: (i === N - 1 ? "See my results" : "Next task") + LX.icon("arrow"),
-        onclick: function () { var rr = rec(t.id); if (rr.first == null) rr.skipped = true; save(); if (i === N - 1) results(); else show(i + 1); } }, foot);
-      startClock(t.id);
-      qp.focus({ preventScroll: true });
-      c.scrollIntoView({ block: "nearest", behavior: LX.reduced() ? "auto" : "smooth" });
-      LX.emit("layout");
     }
+    // a task that waits for others (opensAfter): a notice and a way to the first task it waits for, nothing to answer
+    function waitNoteOf(t, wait) {
+      var w = typeof o.waitNote === "function" ? o.waitNote(t, wait, D) : o.waitNote;
+      return w && w.question ? w : waitText(D, t, wait);
+    }
+    function shut(c, wait, wt) {
+      var to = D.tasks.indexOf(task(D, wait[0]));
+      E("div", { class: "lx-saw no lx-ck-wait", html: LX.icon("question") + "<div>" + wt.why + "</div>" }, c);
+      E("button", { type: "button", class: "lx-btn small", text: "Go to task " + (to + 1), onclick: function () { show(to); } }, E("div", { class: "lx-ck-row" }, c));
+    }
+    // a frozen task (freeze): submitted, so its answer stays as given. kept(t, btn) puts the line that says so in place
+    // of the submit button (or, without one, at the end of `host`)
+    function frozen(t) { return !!t.freeze && submitted(st.tasks[t.id]); }
+    function kept(t, btn, host) {
+      var where = btn ? btn.parentNode : host;
+      if (!where || where.querySelector(".lx-ck-kept")) { if (btn) btn.remove(); return; }
+      E("p", { class: "lx-hint lx-ck-kept", text: t.freezeNote || (t.kind === "open-short" ? "Submitted: your text stays as you wrote it. Tick the points it makes below."
+        : t.kind === "estimate" ? "Submitted: your estimate stays as you gave it. Rate it below." : "Submitted: your answer stays as you gave it.") }, where);
+      if (btn) btn.remove();
+    }
+    function readOnly(els) { els.forEach(function (el) { if (el) { el.setAttribute("readonly", ""); el.readOnly = true; } }); }
+    // the line after a wrong first answer: a retry, or for a frozen task the worked solution
+    function retry(t) { return t.freeze ? " The worked solution is below." : " Try again, or open the worked solution."; }
     function feedback(fb, ok, html) { fb.innerHTML = ""; E("div", { class: "lx-saw" + (ok ? "" : " no"), html: LX.icon(ok ? "check" : "question") + "<div><b>" + (ok ? "Right." : "Not quite.") + "</b> " + html + "</div>" }, fb); }
     function solution(t, sol) {
       if (t.kind === "estimate") { E("p", { html: o.estimateNote || "The worked solution and the marking guide are in the <a href=\"#solution\">Worked solution</a> section below; it opens when you submit." }, sol); return; }
@@ -5837,10 +5934,13 @@
           var res = cChoice(t, op[0]);
           answered(t.id, res.right, op[0]);
           Object.keys(btns).forEach(function (k) { btns[k].setAttribute("aria-pressed", k === op[0] ? "true" : "false"); btns[k].classList.toggle("right", res.right && k === op[0]); btns[k].classList.toggle("wrong", !res.right && k === op[0]); });
-          feedback(fb, res.right, LX.rich(res.why) + (res.right ? "" : " Try again, or open the worked solution."));
+          feedback(fb, res.right, LX.rich(res.why) + (res.right ? "" : retry(t)));
           unlock();
+          if (frozen(t)) fix();
         } }, box);
       });
+      function fix() { Object.keys(btns).forEach(function (k) { btns[k].disabled = true; }); kept(t, null, body); }
+      if (frozen(t)) fix();
     }
     function order(t, body, fb, unlock) {
       var r = rec(t.id), cur = (r.answer && r.answer.length === t.items.length) ? r.answer.slice() : t.start.slice();
@@ -5855,17 +5955,19 @@
           var mv = E("span", { class: "mv" }, li);
           var up = E("button", { type: "button", "aria-label": "Move up: " + text[k], text: "↑", onclick: function () { move(i, -1); } }, mv);
           var dn = E("button", { type: "button", "aria-label": "Move down: " + text[k], text: "↓", onclick: function () { move(i, 1); } }, mv);
-          up.disabled = i === 0; dn.disabled = i === cur.length - 1;
+          var lk = frozen(t); up.disabled = lk || i === 0; dn.disabled = lk || i === cur.length - 1;
           if (k === focusKey) (dir < 0 ? (up.disabled ? dn : up) : (dn.disabled ? up : dn)).focus();
         });
       }
       function move(i, d) { var j = i + d; if (j < 0 || j >= cur.length) return; var k = cur[i]; cur[i] = cur[j]; cur[j] = k; marks = null; paint(k, d); }
       go.addEventListener("click", function () {
         var res = cOrder(t, cur); marks = res.places; answered(t.id, res.right, cur.slice()); paint();
-        feedback(fb, res.right, res.right ? "That is the sequence." : res.n + " of " + cur.length + " in the right place (green). Try again, or open the worked solution.");
+        feedback(fb, res.right, res.right ? "That is the sequence." : res.n + " of " + cur.length + " in the right place (green)." + retry(t));
         unlock();
+        if (frozen(t)) kept(t, go);
       });
       paint();
+      if (frozen(t)) kept(t, go);
     }
     function unitSelect(host, t, chosen) {
       var f = E("div", { class: "lx-ck-field" }, host), id = LX.uid("ck");
@@ -5883,13 +5985,16 @@
       var sel = unitSelect(g, t, r.answer && r.answer.unit), tt = o.tolerance === false ? "" : tolText(t);
       if (tt) { var tid = id1 + "-tol"; E("p", { id: tid, class: "lx-hint lx-ck-tol", text: tt }, body); inp.setAttribute("aria-describedby", tid); }
       var row = E("div", { class: "lx-ck-row" }, body);
-      E("button", { type: "button", class: "lx-btn small", text: "Check", onclick: function () {
+      var chk = E("button", { type: "button", class: "lx-btn small", text: "Check", onclick: function () {
         if (!sel.value) { feedback(fb, false, "Choose a unit first."); return; }
         var res = cNum(t, parseFloat(inp.value), sel.value);
         answered(t.id, res.right, { value: parseFloat(inp.value), unit: sel.value });
-        feedback(fb, res.right, LX.esc(res.msg) + (res.right ? "" : " Try again, or open the worked solution."));
+        feedback(fb, res.right, LX.esc(res.msg) + (res.right ? "" : retry(t)));
         unlock();
+        if (frozen(t)) fix();
       } }, row);
+      function fix() { readOnly([inp]); sel.disabled = true; kept(t, chk); }
+      if (frozen(t)) fix();
     }
     function openShort(t, body, fb, unlock) {
       var r = rec(t.id), id = LX.uid("ck");
@@ -5903,12 +6008,15 @@
         cb.addEventListener("change", function () { var rr = rec(t.id); rr.points = boxes.map(function (b) { return b.checked; }); rr.first = rr.points.every(Boolean); save(); });
         return cb;
       });
-      E("button", { type: "button", class: "lx-btn small", text: "Submit my explanation", onclick: function () {
+      var sub = E("button", { type: "button", class: "lx-btn small", text: "Submit my explanation", onclick: function () {
         if (!ta.value.trim()) { feedback(fb, false, "Write a sentence or two first."); return; }
         var rr = answered(t.id, false, ta.value.trim()); rr.points = rr.points || t.points.map(function () { return false; }); rr.first = rr.points.every(Boolean); save();
         self.hidden = false; unlock(); fb.innerHTML = "";
         E("div", { class: "lx-saw", html: LX.icon("check") + "<div><b>Submitted.</b> Open the worked solution below and tick the points you made.</div>" }, fb);
+        if (frozen(t)) fix();
       } }, row);
+      function fix() { readOnly([ta]); kept(t, sub); }
+      if (frozen(t)) fix();
     }
     function estimate(t, body, fb, unlock) {
       var r = rec(t.id), a = r.answer || {}, g = E("div", { class: "lx-ck-grid2" }, body), F = {};
@@ -5926,7 +6034,7 @@
       var row = E("div", { class: "lx-ck-row" }, body);
       fb = E("div", { class: "lx-ck-fb", "aria-live": "polite" }, body);
       var out = E("div", { class: "lx-ck-rating" }, body);
-      E("button", { type: "button", class: "lx-btn small", text: "Submit my estimate", onclick: function () {
+      var sub = E("button", { type: "button", class: "lx-btn small", text: "Submit my estimate", onclick: function () {
         var lo = parseFloat(F.low.value), hi = parseFloat(F.high.value);
         if (!sel.value || !(lo > 0) || !(hi > 0)) { fb.innerHTML = ""; E("div", { class: "lx-saw no", html: LX.icon("question") + "<div>Give a low and a high value and choose a unit.</div>" }, fb); return; }
         var ans = { low: lo, high: hi, unit: sel.value, reasoning: F.reasoning.value.trim(), uncertainty: F.uncertainty.value.trim(), check: F.check.value.trim() };
@@ -5938,8 +6046,11 @@
         E("div", { class: "lx-saw" + (chk.unitsOk ? "" : " no"), html: LX.icon(chk.unitsOk ? "check" : "question") + "<div><b>Units.</b> " + LX.esc(chk.unitMsg) + "</div>" }, fb);
         if (chk.rangeMsg) E("div", { class: "lx-saw" + (chk.overlaps ? "" : " no"), html: LX.icon(chk.overlaps ? "check" : "question") + "<div><b>Range.</b> " + LX.esc(chk.rangeMsg) + "</div>" }, fb);
         if (!o.gateAll) openSolution(er.at); rate(out);
+        if (frozen(t)) fix();
       } }, row);
       if (r.answer) rate(out);
+      function fix() { readOnly(Object.keys(F).map(function (k) { return F[k]; })); sel.disabled = true; kept(t, sub); }
+      if (frozen(t)) fix();
       function rate(host) {
         host.innerHTML = "";
         E("p", { class: "lx-eyebrow", text: "Rate your estimate on the rubric" }, host);

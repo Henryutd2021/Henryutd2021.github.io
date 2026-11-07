@@ -153,10 +153,8 @@ Who reran it (you, or someone else).</pre></details>
 @media (max-width: 640px) { #ckr-rubric thead { display: none; } #ckr-rubric tbody th { display: block; border: 0; padding: 2px 0; } #ckr-rubric td { display: block; } #ckr-rubric td::before { content: attr(data-l) ": "; color: var(--lx-ink-3); font-size: 12.5px; } }
 .ckr-list { margin: 0; padding-left: 1.2rem; display: grid; gap: 6px; font-size: 15.5px; }
 .ckr-course { margin-top: 18px; }
-.ckr-gate { margin: 8px 0; }
 .ckr-later { margin: 0; }
 .ckr-later > summary { cursor: pointer; color: var(--lx-ink-2); font-size: 14.5px; }
-.ckr-kept { margin: 0; }
 .ckr-defs { margin: 4px 0 0; padding-left: 1.2rem; display: grid; gap: 2px; }
 </style>
 ```

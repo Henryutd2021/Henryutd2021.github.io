@@ -1,0 +1,157 @@
+// test_components_checkpoint_options.js — Node tests for the checkpoint runner's per-task options (components/checkpoint.js,
+// 2026-11-07, generalised from CK-R's task 1 first):
+//   - opensAfter: [task ids]: a task opens only once each named task is submitted; until then its card shows a notice in
+//     place of its question, answers, early button and worked solution, a "Go to task N" button, and its clock does not run
+//   - freeze: true: once submitted, the task's answer stays as given (every kind: text, choice, order, number, estimate);
+//     points and self-ratings can still be ticked; feedback on a wrong first answer points to the worked solution
+//   - the pure helpers: submitted, waitsFor, outOfOrder, taskList, waitText, openProblems
+//   - a task without either option behaves as before (its retry line; no notice, no kept line)
+// CK-R's own test checks the page that uses them; CK-F, CK-A and CK-M use neither and keep their own tests.
+// Usage (from the site folder):  node _tests/learn/test_components_checkpoint_options.js
+"use strict";
+const path = require("path");
+const SITE = path.resolve(__dirname, "..", "..");
+const CP = require(path.join(SITE, "assets/learn/components/checkpoint.js"));
+const { env, load, El } = require("./stubdom.js");
+let checks = 0, fails = 0;
+function ok(c, msg) { checks++; if (!c) { fails++; console.log("FAIL:", msg); } }
+const text = s => String(s).replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+
+const LEVELS = ["Not yet", "Developing", "Proficient", "Strong"];
+function data() {
+  return { version: "options v1", rule: { auto: 4, autoProficient: 3, autoStrong: 4, criteria: ["units"], levels: LEVELS },
+    tasks: [
+      { id: "own", kind: "open-short", title: "Your own text", skill: "Write", lesson: "R1", prompt: "Write two sentences.", points: ["One point.", "Another point."], solution: "Your own.", freeze: true },
+      { id: "pick", kind: "choice", title: "Pick one", skill: "Choose", lesson: "R2", prompt: "Which one?", options: [["a", "Option A"], ["b", "Option B"]], answer: "b",
+        why: { a: "Not this one.", b: "This one." }, solution: "B, because.", opensAfter: ["own"], freeze: true },
+      { id: "seq", kind: "order", title: "Put in order", skill: "Order", lesson: "R3", prompt: "Order these.", items: [["x", "First"], ["y", "Second"], ["z", "Third"]], start: ["z", "x", "y"],
+        solution: "First, second, third.", opensAfter: ["own", "num"], freeze: true },
+      { id: "num", kind: "numeric", title: "A number", skill: "Compute", lesson: "R4", prompt: "How much?", answer: { value: 10, tol: 0.01, show: "10 kW" }, units: [["kW", 1], ["W", 0.001]],
+        solution: "10 kW.", freeze: true, freezeNote: "Kept as you gave it." },
+      { id: "est", kind: "estimate", title: "An estimate", skill: "Estimate", lesson: "R5", prompt: "Estimate it.", units: [["MWh", 1], ["MW", null]], range: [100, 200], show: [100, 200],
+        opensAfter: ["own"], freeze: true },
+      { id: "free", kind: "choice", title: "No options", skill: "Choose", lesson: "R6", prompt: "Which other one?", options: [["a", "Option A"], ["b", "Option B"]], answer: "a",
+        why: { a: "Right.", b: "Wrong." }, solution: "A." }
+    ] };
+}
+
+// ---------------- pure helpers
+{
+  const D = data(), st = { tasks: {} };
+  ok(!CP.submitted(null) && !CP.submitted({ first: null }) && CP.submitted({ first: false }) && CP.submitted({ first: null, answer: "text" }), "submitted: a first answer, or a written task's text");
+  ok(CP.waitsFor(D, st, D.tasks[1]).join() === "own" && CP.waitsFor(D, st, D.tasks[2]).join() === "own,num" && CP.waitsFor(D, st, D.tasks[0]).length === 0 && CP.waitsFor(D, st, D.tasks[5]).length === 0,
+    "waitsFor: the opensAfter names not yet submitted, in task order");
+  st.tasks.own = { first: false, answer: "text", at: "2026-11-07T10:00:00.000Z" };
+  ok(CP.waitsFor(D, st, D.tasks[1]).length === 0 && CP.waitsFor(D, st, D.tasks[2]).join() === "num", "waitsFor: task 1 submitted opens task 2; task 3 still waits for task 4");
+  ok(CP.taskList(D, ["own"]) === "task 1" && CP.taskList(D, ["own", "num"]) === "tasks 1 and 4" && CP.taskList(D, ["own", "pick", "num"]) === "tasks 1, 2 and 4", "taskList: task 1; tasks 1 and 4; tasks 1, 2 and 4");
+  const w1 = CP.waitText(D, D.tasks[1], ["own"]), w2 = CP.waitText(D, D.tasks[2], ["own", "num"]);
+  ok(w1.question === "This task opens once task 1 is submitted." && /^<b>Task 1 first\.<\/b> This task's question and worked solution would shape your answer there, so they open once it is submitted\.$/.test(w1.why),
+    "waitText for one task: " + w1.question + " " + text(w1.why));
+  ok(w2.question === "This task opens once tasks 1 and 4 are submitted." && /^<b>Tasks 1 and 4 first\.<\/b> .*your answers there, so they open once those are submitted\.$/.test(w2.why), "waitText for two: " + w2.question + " " + text(w2.why));
+  const late = { tasks: { own: { first: false, answer: "t", at: "2026-11-07T10:10:00.000Z" }, pick: { first: true, at: "2026-11-07T10:00:00.000Z" } } };
+  ok(CP.outOfOrder(D, late).join() === "own", "outOfOrder: task 1 submitted after task 2 (which waits for it) was answered");
+  ok(CP.outOfOrder(D, st).length === 0 && CP.outOfOrder(D, { tasks: { pick: { first: true, at: "2026-11-07T10:00:00.000Z" } } }).length === 0 &&
+    CP.outOfOrder(D, { tasks: { own: { answer: "t", at: "2026-11-07T10:00:00.000Z" }, pick: { first: true, at: "2026-11-07T10:00:00.000Z" } } }).length === 0, "outOfOrder: none when in order, at the same time, or not submitted");
+  ok(CP.openProblems(D).length === 0, "openProblems: none in a sound checkpoint");
+  const bad = data(); bad.tasks[0].opensAfter = ["seq"]; bad.tasks[5].opensAfter = ["free", "nope"];
+  const pr = CP.openProblems(bad);
+  ok(pr.some(x => x === "free waits for itself") && pr.some(x => x === "free waits for an unknown task nope") && pr.some(x => /^circle: .*own -> seq -> own|^circle: .*seq -> own -> seq/.test(x)), "openProblems: itself, unknown, a circle: " + pr.join("; "));
+}
+
+// ---------------- the runner on a stub document
+function mount(opts) {
+  if (!El.prototype.getBoundingClientRect) El.prototype.getBoundingClientRect = () => ({ top: 0, left: 0, width: 0, height: 0, bottom: 0, right: 0 });
+  const E = env(); let clock = 0;
+  E.window.performance.now = () => (clock += 1000);   // every reading one second later, so time on a task shows
+  load("checkpoint", E);
+  const D = data(), live = E.LX.H("div", null, E.body);
+  const cp = E.LX.Checkpoint(live, Object.assign({ data: D, key: "opts-v1", code: "TEST" }, opts || {}));
+  const btn = re => live.querySelectorAll("button").filter(x => re.test(x.textContent))[0];
+  const tag = () => { const t = live.querySelector(".lx-ck-tag"); return t ? +/Task (\d+)/.exec(t.textContent)[1] - 1 : -1; };
+  const goTo = i => { for (let k = 0; k < 20 && tag() !== i; k++) (tag() < i ? btn(/Next task|Start the checkpoint|Resume/) : btn(/^Back$/)).click(); };
+  const q = () => live.querySelector(".lx-ck-q").textContent, all = () => text(live.textContent), rec = id => (E.LX.store.get("opts-v1", { tasks: {} }).tasks[id] || {});
+  return { E, D, cp, live, btn, goTo, q, all, rec };
+}
+{
+  const P = mount(), { live, btn, goTo, q, all, rec } = P;
+  // waiting tasks: a notice instead of the question; nothing to answer; no early button; no solution; no clock
+  goTo(1);
+  ok(q() === "This task opens once task 1 is submitted." && !live.querySelector(".lx-ck-body") && !live.querySelector(".lx-choice") && !live.querySelector(".lx-ck-sol") && !live.querySelector("button.lx-link"),
+    "task 2 before task 1: the notice in place of its question; no answers, solution or early button");
+  ok(live.querySelector(".lx-ck-wait") && /Task 1 first\./.test(text(live.querySelector(".lx-ck-wait").innerHTML)) && !/Which one/.test(all()), "the notice says why, and the question stays hidden");
+  ok(/^Task 2 of 6/.test(live.querySelector(".lx-ck-tag").textContent) && btn(/^Next task$/) && btn(/^Back$/), "the card keeps its place, its dots and its Back and Next buttons");
+  goTo(2);
+  ok(q() === "This task opens once tasks 1 and 4 are submitted." && btn(/^Go to task 1$/), "task 3 waits for two tasks, and its button goes to the first");
+  goTo(4); ok(/opens once task 1 is submitted/.test(q()), "the estimate waits too");
+  goTo(5); ok(q() === "Which other one?" && live.querySelectorAll(".lx-choice").length === 2, "a task without opensAfter is open");
+  goTo(2); btn(/^Go to task 1$/).click();
+  ok(live.querySelector(".lx-ck-tag").textContent.indexOf("Task 1 of 6") === 0, "'Go to task 1' goes there");
+  ok(!rec("pick").ms && !rec("seq").ms && !rec("est").ms && rec("free").ms > 0, "no time is counted on a waiting task (a task without the option counts as before)");
+  ok(rec("pick").first == null && !rec("pick").answer, "a waiting task records no answer");
+
+  // freeze, a written task: read-only once submitted; its points can still be ticked
+  live.querySelector("textarea").value = "My two sentences."; btn(/^Submit my explanation$/).click();
+  const ta = live.querySelector("textarea");
+  ok(ta.hasAttribute("readonly") && ta.readOnly && !btn(/^Submit my explanation$/) && live.querySelector(".lx-ck-kept").textContent === "Submitted: your text stays as you wrote it. Tick the points it makes below.",
+    "task 1 submitted: its text is read-only, the Submit button gone, the default kept line in its place");
+  const cbs = live.querySelectorAll(".lx-ck-points input"); cbs.forEach(cb => { cb.checked = true; cb.fire("change"); });
+  ok(rec("own").points.join() === "true,true" && rec("own").first === true && rec("own").answer === "My two sentences.", "its points can still be ticked; the text stays as submitted");
+  goTo(1); goTo(0);
+  ok(live.querySelector("textarea").hasAttribute("readonly") && live.querySelector("textarea").value === "My two sentences." && !btn(/^Submit my explanation$/) &&
+    live.querySelectorAll(".lx-ck-kept").length === 1 && live.querySelectorAll(".lx-ck-points input").length === 2, "back on task 1: still read-only, one kept line, the points shown");
+
+  // task 2 opens; a frozen choice: a wrong first answer stays, the options are disabled, the feedback points to the solution
+  goTo(1);
+  ok(q() === "Which one?" && live.querySelectorAll(".lx-choice").length === 2 && !live.querySelector(".lx-ck-wait"), "task 1 submitted: task 2 shows its question and options");
+  live.querySelectorAll(".lx-choice")[0].click();
+  ok(/Not quite\./.test(all()) && /The worked solution is below\./.test(all()) && !/Try again/.test(all()), "frozen choice: the wrong answer's feedback points to the worked solution, not to a retry");
+  ok(live.querySelectorAll(".lx-choice").every(b => b.disabled) && live.querySelector(".lx-ck-kept").textContent === "Submitted: your answer stays as you gave it.", "its options are disabled, with the kept line");
+  live.querySelectorAll(".lx-choice")[1].click();
+  ok(rec("pick").tries === 1 && rec("pick").answer === "a" && rec("pick").first === false, "a second click changes nothing: one try, the first answer kept");
+  ok(!live.querySelector(".lx-ck-sol").hidden, "its worked solution opened with the first answer, as before");
+
+  // task 3 still waits for task 4; a frozen number: read-only field and unit, its own kept line
+  goTo(2); ok(q() === "This task opens once task 4 is submitted.", "task 3 now waits only for task 4");
+  goTo(3); live.querySelector("input").value = "10"; live.querySelector("select").value = "kW"; btn(/^Check$/).click();
+  ok(rec("num").first === true && live.querySelector("input").hasAttribute("readonly") && live.querySelector("select").disabled && !btn(/^Check$/) && live.querySelector(".lx-ck-kept").textContent === "Kept as you gave it.",
+    "frozen number: right, then a read-only field, a fixed unit, no Check, the task's own kept line");
+
+  // a frozen order task: the moves and the check are gone once checked
+  goTo(2);
+  ok(q() === "Order these." && btn(/^Check the order$/), "task 3 opens once tasks 1 and 4 are submitted");
+  btn(/^Check the order$/).click();
+  ok(rec("seq").first === false && /in the right place \(green\)\. The worked solution is below\./.test(all()) && !btn(/^Check the order$/) &&
+    live.querySelectorAll(".lx-ck-order .mv button").every(b => b.disabled) && live.querySelector(".lx-ck-kept"), "frozen order: checked once, then the moves disabled and the check gone");
+
+  // a frozen estimate: fields read-only after a submitted range; the self-ratings stay
+  goTo(4);
+  const ins = live.querySelectorAll("input"); ins[0].value = "120"; ins[1].value = "150"; live.querySelector("select").value = "MWh";
+  live.querySelectorAll("textarea").forEach((t, k) => { t.value = "text " + k; }); btn(/^Submit my estimate$/).click();
+  ok(rec("est").answer && rec("est").answer.low === 120 && live.querySelectorAll(".lx-ck-body input").filter(x => x.getAttribute("type") === "number").every(x => x.hasAttribute("readonly")) &&
+    live.querySelectorAll(".lx-ck-body textarea").every(x => x.hasAttribute("readonly")) && live.querySelector("select").disabled && !btn(/^Submit my estimate$/) &&
+    live.querySelector(".lx-ck-kept").textContent === "Submitted: your estimate stays as you gave it. Rate it below.", "frozen estimate: read-only fields and unit, no Submit, the kept line");
+
+  // a task without the options: the retry line, nothing disabled, a second try counts
+  goTo(5); live.querySelectorAll(".lx-choice")[1].click();
+  ok(/Try again, or open the worked solution\./.test(all()) && live.querySelectorAll(".lx-choice").every(b => !b.disabled) && !live.querySelector(".lx-ck-kept"), "a task without freeze: the retry line, options still open");
+  live.querySelectorAll(".lx-choice")[0].click();
+  ok(rec("free").tries === 2 && rec("free").first === false && rec("free").answer === "a", "a second try is recorded as before");
+  ok(CP.outOfOrder(P.D, P.cp.state()).length === 0, "this attempt kept the order: outOfOrder finds nothing");
+
+  // "Start again": every waiting task shuts again
+  P.cp.results(); btn(/^Start again$/).click(); btn(/Start the checkpoint/).click(); goTo(1);
+  ok(/opens once task 1 is submitted/.test(q()), "after Start again, task 2 waits for task 1 again");
+  goTo(0); ok(!live.querySelector("textarea").hasAttribute("readonly") && btn(/^Submit my explanation$/), "and task 1 is open to write again");
+}
+// waitNote: the page's words, as text or from a function
+{
+  const P = mount({ waitNote: { question: "Opens after your review.", why: "<b>Review first.</b> Its concerns are your own." } });
+  P.btn(/Start the checkpoint/).click(); P.goTo(1);
+  ok(P.q() === "Opens after your review." && /Review first\. Its concerns are your own\./.test(text(P.live.querySelector(".lx-ck-wait").innerHTML)) && P.btn(/^Go to task 1$/), "waitNote as text");
+  const seen = [];
+  const F = mount({ waitNote: (t, ids, D) => { seen.push(t.id + ":" + ids.join("+") + ":" + D.tasks.length); return { question: "Wait for " + ids.join(" and ") + ".", why: "Because." }; } });
+  F.btn(/Start the checkpoint/).click(); F.goTo(2);
+  ok(F.q() === "Wait for own and num." && seen.indexOf("seq:own+num:6") >= 0, "waitNote as a function of the task, the ids waited for and the data");
+}
+console.log((fails ? "FAILED " + fails + " of " : "ok: ") + checks + " checks (checkpoint per-task options)");
+process.exit(fails ? 1 : 0);

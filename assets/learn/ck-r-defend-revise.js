@@ -12,10 +12,11 @@
 // The worked solution (gated with the shared runner's gateAll; the shared late-answer rule) is the annotated example the
 // curriculum names: a review, a response and a revision of the fictional study, with what moved it from Proficient to
 // Strong (LX.Exemplars), the rerun worked through, and the seven marked answers.
-// Task 1 first (Codex review #1): the seven marked tasks are all on the co-op study, and their questions and feedback name
-// concerns task 1's review should find for itself. Until task 1 is submitted, each shows a notice in place of its question
-// (the view's guard, on the runner's "layout" event); once submitted, task 1's text stays as written. The level rule
-// backs this up: a review submitted after a marked task was answered earns no points (reviewAfter).
+// Task 1 first: the seven marked tasks are all on the co-op study, and their questions and feedback name concerns task 1's
+// review should find for itself. The data gives each of them the shared runner's per-task option opensAfter: ["review"]
+// (until task 1 is submitted, a notice in place of its question; the notice's words are the data's `wait`), and task 1
+// freeze: true (once submitted, its text stays as written; its points can still be ticked). The level rule backs this up:
+// a review submitted after a marked task was answered earns no points (reviewAfter, from the runner's outOfOrder).
 //
 // Data: assets/learn/data/ck-r-defend-revise.json. Pure part (exported for _tests/learn/test_ck-r-defend-revise.js):
 // level, describe, summary, runnerData, exOpts, reviewAfter, firstDone and the page's static blocks (staticStudy,
@@ -37,12 +38,9 @@
   function firstRight(st, t, D) { return CPK.firstRight(st.tasks[t.id], "not-right") && !(D && after(D, st, t)); }
   // task 1 (the independent review of the co-op proposal) submitted: the seven marked tasks open then
   function firstDone(st) { var r = st.tasks[FIRST]; return !!(r && r.answer); }
-  // task 1 submitted after one of the marked tasks was answered (the page's guard prevents it; a stored attempt from
-  // elsewhere could still show it): its points do not count
-  function reviewAfter(D, st) {
-    var r = st.tasks[FIRST]; if (!r || !r.at) return false;
-    return D.tasks.some(function (t) { var x = st.tasks[t.id]; return isAuto(t) && !!(x && x.at && x.at < r.at); });
-  }
+  // task 1 submitted after one of the marked tasks (which wait for it) was answered: the runner keeps them shut until
+  // then, so only a stored attempt from elsewhere could show it; its points do not count
+  function reviewAfter(D, st) { return CPK.outOfOrder(D, st).indexOf(FIRST) >= 0; }
   // practice: the worked solution was open before every task was answered (this attempt's lock button or demo, recorded
   // as st.solEarly; or an earlier attempt in this browser)
   function assisted(D, st) {
@@ -141,7 +139,7 @@
       if (t.kind === "order") x += "<ul>" + t.start.map(function (k) { return "<li>" + plain(t.items.filter(function (i) { return i[0] === k; })[0][1]) + "</li>"; }).join("") + "</ul><p>Put these in order.</p>";
       if (t.kind === "numeric") x += "<p>Answer with a number and a unit.</p>";
       if (isOpen(t)) x += "<p>Self-rated against " + t.points.length + " points, shown after you submit.</p>";
-      if (isAuto(t)) x = '<details class="ckr-later"><summary>Open after task 1, your review</summary>' + x + "</details>";
+      if (t.opensAfter && t.opensAfter.length) x = '<details class="ckr-later"><summary>Open after task 1, your review</summary>' + x + "</details>";
       h.push("<li><p><b>" + esc(t.title) + '</b> <span class="lx-hint">Part ' + esc(t.part) + " · " + esc(t.skill) + "</span></p>" + x + "</li>");
     });
     h.push("</ol>");
@@ -202,40 +200,13 @@
   LX.mount(ID, function (live, data, root) {
     var D = data.ck_r_defend_revise, RD = runnerData(D);
     Object.defineProperty(RD, "solOpen", { get: function () { return LX.Checkpoint.solOpened(KEY); } });
-    var cp = null;
-    cp = LX.Checkpoint(live, { data: RD, key: KEY, code: CODE, lessonId: ID, intro: D.intro,
-      // gateAll: the worked solution opens once all twelve tasks are answered, in any order; late: the shared late-answer
-      // rule, which the runner adds to the intro
+    // gateAll: the worked solution opens once all twelve tasks are answered, in any order; late: the shared late-answer
+    // rule, which the runner adds to the intro. Task 1 first comes from the tasks' own opensAfter and freeze options;
+    // waitNote gives the waiting tasks the co-op study's words. Tasks 6, 7, 8 and 12 (the reader's own study) are open
+    // throughout.
+    var cp = LX.Checkpoint(live, { data: RD, key: KEY, code: CODE, lessonId: ID, intro: D.intro,
       lock: "#ckr-lock", solution: "#ckr-solution-body", gateAll: true, late: "practice", level: level, describe: describe, summary: summary, openFirst: "not-right",
-      // task 1 submitted while on screen: its text stays as written from now on
-      onAnswer: function (id) { if (id === FIRST && cp && firstDone(cp.state())) { var c = live.querySelector(".lx-ck-card"); if (c) keep(c); } } });
-    // ---- task 1 first (Codex review #1). The runner draws one task at a time and then emits "layout"; the guard swaps a
-    // marked task's question, answers and solution for a notice until task 1 is submitted, and keeps task 1's text as
-    // written once it is. Tasks 6, 7, 8 and 12 (the reader's own study) are open throughout.
-    function guard() {
-      var st = cp.state(), t = D.tasks[st.cur], card = live.querySelector(".lx-ck-card"), tag = live.querySelector(".lx-ck-tag");
-      if (!t || !card || !tag || tag.textContent.indexOf("Task " + (st.cur + 1) + " of") !== 0 || card.getAttribute("data-ckr") === t.id) return;
-      card.setAttribute("data-ckr", t.id);
-      if (isAuto(t) && !firstDone(st)) shut(card);
-      else if (t.id === FIRST && firstDone(st)) keep(card);
-    }
-    function shut(card) {
-      var q = card.querySelector(".lx-ck-q"), foot = card.querySelector(".lx-ck-foot");
-      if (q) q.textContent = "This task opens once task 1, your review of the co-op proposal, is submitted.";
-      [".lx-ck-body", ".lx-ck-sol", "button.lx-link"].forEach(function (sel) { var x = card.querySelector(sel); if (x) x.remove(); });
-      H("div", { class: "lx-saw no ckr-gate", html: LX.icon("question") + "<div><b>Task 1 first.</b> The marked tasks name concerns about the co-op proposal, so your review finds its own before you see them. Tasks 6, 7, 8 and 12, on your own study, are open now.</div>" }, card);
-      H("button", { type: "button", class: "lx-btn small", text: "Go to task 1", onclick: function () { cp.show(0); } }, H("div", { class: "lx-ck-row" }, card));
-      if (foot) card.appendChild(foot);
-    }
-    function keep(card) {
-      var ta = card.querySelector("textarea"), sub = Array.prototype.filter.call(card.querySelectorAll("button"), function (b) { return /^Submit/.test(b.textContent); })[0];
-      if (ta) { ta.setAttribute("readonly", ""); ta.readOnly = true; }
-      if (sub && sub.parentNode && !card.querySelector(".ckr-kept")) {
-        H("p", { class: "lx-hint ckr-kept", text: "Submitted: your review stays as you wrote it, before the marked tasks. Tick the points it makes below." }, sub.parentNode);
-        sub.remove();
-      }
-    }
-    LX.on("layout", function () { if (cp) guard(); });
+      waitNote: D.wait });
     // the annotated review, response and revision, live (notes to open), inside the gated worked solution
     if (LX.Exemplars) ["review", "response", "revision"].forEach(function (k) {
       var h = document.getElementById("ckr-ex-" + k); if (!h) return;
