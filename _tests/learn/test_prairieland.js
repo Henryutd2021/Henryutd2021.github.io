@@ -280,5 +280,14 @@ ok(/never retype/i.test(sec) && /build_learn_prairieland\.py/.test(sec) && /test
 ["F10", "A20", "A21", "M13", "SB4", "C4", "E4"].forEach(k => ok(new RegExp("\\b" + k + "\\b").test(sec), "README names reader " + k));
 Object.keys(D).forEach(k => ok(sec.includes("`" + k + "`"), "README documents the field `" + k + "`"));
 
+
+// public wording: no private guard codes, no builder or internal notes in the published data (W6 fix review, 2026-11-07)
+{
+  const raw = require("fs").readFileSync(require("path").join(__dirname, "../../assets/learn/data/prairieland.json"), "utf8");
+  ok(!/\bG-(COST|NUC|DC|GIS|POL|SRC|FIN)\b/.test(raw), "no guard codes in the public data");
+  const strings = []; (function walk(v) { if (typeof v === "string") strings.push(v); else if (v && typeof v === "object") Object.values(v).forEach(walk); })(JSON.parse(raw));
+  ok(!strings.some(t => /\bnuclear|reactor/i.test(t) && /per kW|\$|cost/i.test(t)), "no string names nuclear technology together with a cost");
+}
+
 console.log((fails ? "FAILED " + fails + " of " : "ok: ") + checks + " checks (prairieland)");
 process.exit(fails ? 1 : 0);
