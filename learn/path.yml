@@ -1117,7 +1117,7 @@
   short: "Regression and natural experiments"
   outcome: "Estimate a programme's effect with a regression and a difference-in-differences design, check parallel trends with an event study, and name the threats to validity (selection, confounding, spillovers, anticipation) before trusting the answer."
   teaches: [counterfactuals, selection bias, regression with controls, before-after comparisons, difference-in-differences, parallel trends, event studies, clustered standard errors, threats to validity]
-  lab: "a NumPy notebook that rebuilds the page's two simulated panels and checks them, then the two-way fixed-effects regression, standard errors clustered by home, an event-study regression and 200 redrawn panels, about 60 minutes, then 90 minutes of practice."
+  lab: "a NumPy notebook that rebuilds both simulated panels, fits the two-way fixed-effects and event-study regressions, clusters standard errors by home and redraws 200 panels: about 60 minutes, then 90 of practice."
   does: "Ask whether a time-of-use tariff lowered household peaks or whether a policy changed investment, on simulated panels with known effects: describe, regress, try a difference-in-differences design, and list the threats to validity (confounding, selection, spillovers, anticipation) before trusting the answer."
   after: [B2, K5]
 - kind: lesson

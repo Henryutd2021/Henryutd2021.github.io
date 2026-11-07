@@ -32,11 +32,11 @@
    "note": "Each home's true effect: -(0.20 + 0.08 x engagement) kW, never above zero; it applies from month 13 in homes that signed up."
   },
   "level": {
-   "base": 1.3,
+   "base": 2.5,
    "ac": 0.6,
    "size": 0.35,
    "engaged": -0.25,
-   "note": "A home's own level: 1.3 + 0.6 x air conditioning + 0.35 x (size - 2) - 0.25 x engagement, kW."
+   "note": "A home's own level: 2.5 + 0.6 x air conditioning + 0.35 x (size - 2) - 0.25 x engagement, kW. The 2.5 keeps every home-month's evening peak above zero in every panel on the page (lowest about 0.27 kW, with the thermostat offer); a constant moves every home alike, so no estimate changes."
   },
   "season": [
    0.35,
@@ -141,7 +141,7 @@
    {
     "key": "border",
     "label": "Projects moved across the border",
-    "text": "From 2021 each region without the policy lost 4 MW a year of projects that moved to a region with it."
+    "text": "From 2021 each region without the policy lost 4 MW a year of projects to the adopting regions. Those projects are part of the adopters' +10 MW, so some of that gain moved rather than grew."
    }
   ]
  },
@@ -217,10 +217,10 @@
     0.01547350492
    ],
    "cells": [
-    1.684321859,
-    1.32119405,
-    2.236243971,
-    2.17231498
+    2.884321859,
+    2.52119405,
+    3.436243971,
+    3.37231498
    ],
    "eventStudy": [
     -0.00332081569,
@@ -248,8 +248,8 @@
     -0.2872562304,
     -0.2937349879
    ],
-   "firstY": 2.316733667,
-   "lastY": 1.576870184,
+   "firstY": 3.516733667,
+   "lastY": 2.776870184,
    "threats": {
     "trend": [
      -0.4431988173,

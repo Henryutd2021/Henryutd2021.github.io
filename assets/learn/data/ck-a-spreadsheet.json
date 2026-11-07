@@ -24,11 +24,12 @@
  "case": {
   "school": "Prairie Town High School",
   "fictional": "Prairie Town and its high school are fictional; the school's load and several inputs are illustrative.",
-  "text": "Prairie Town High School's district is offered a rooftop solar array and a battery behind the school's meter. Build an auditable spreadsheet that tells the district what it would gain or lose, who else pays or benefits, and how sure that answer is.",
+  "situation": "Prairie Town High School's district is offered a rooftop solar array and a battery behind the school's meter.",
+  "deliverable": "An auditable spreadsheet that tells the district what it would gain or lose, who else pays or benefits, and how sure that answer is.",
   "facts": [
    [
     "System",
-    "250 kW-DC of rooftop solar and a 150 kW / 300 kWh battery, installed together"
+    "250 [[kw-dc|kW-DC]] of rooftop solar and a 150 kW / 300 kWh battery, installed together"
    ],
    [
     "School",
@@ -36,11 +37,15 @@
    ],
    [
     "Tariff",
-    "a demand charge of $10 per kW-month plus an energy charge, set so the school's bill averages Kansas's 2025 commercial price, 11.17 cents/kWh (EIA); exports earn 3 cents/kWh (illustrative)"
+    "a [[demand-charge|demand charge]] of $10 per kW-month plus an energy charge, set so the school's bill averages Kansas's 2025 commercial price, 11.17 cents/kWh (EIA); exports earn 3 cents/kWh (illustrative)"
    ],
    [
-    "Battery",
-    "cuts the monthly billed peak by 60% of its power on average and discharges about 200 times a year (illustrative)"
+    "Battery power",
+    "cuts the monthly billed peak by 60% of its power on average (illustrative)"
+   ],
+   [
+    "Battery energy",
+    "about 200 [[full-cycle|full cycles]] a year, each taking in 300 kWh from the school's supply and returning 90%; the 10% lost is bought at the energy charge (illustrative)"
    ],
    [
     "Costs",
@@ -48,11 +53,19 @@
    ],
    [
     "Money",
-    "25 years, real 2025 dollars, a 4% real discount rate (the course's), battery replaced after 15 years"
+    "25 years, real 2025 dollars, a 4% [[real-rate|real discount rate]] (the course's), battery replaced at the end of year 15"
+   ],
+   [
+    "End value",
+    "at year 25 the replacement battery has 5 of its 15 years left: count 5/15 of its cost as its [[residual-value|residual value]] (straight line)"
    ],
    [
     "The utility",
     "avoids 3 cents for each kWh it no longer supplies and, for half of the battery's peak cut, $180 per kW a year of capacity (illustrative; lesson A4's unit cost)"
+   ],
+   [
+    "Rate reset",
+    "assume the utility recovers its whole remaining revenue shortfall from its other customers at the next rate reset"
    ]
   ]
  },
@@ -108,7 +121,7 @@
    "unit": "kWh",
    "type": "Choice",
    "src": "eia-dg-2024",
-   "note": "Two hours at full power.",
+   "note": "Two hours at full power; the energy it takes in on each full cycle.",
    "low": null,
    "high": null
   },
@@ -125,12 +138,12 @@
   },
   {
    "id": "cycles",
-   "input": "Battery discharges a year",
+   "input": "Battery full cycles a year (each takes in 300 kWh)",
    "value": 200,
    "unit": "per year",
    "type": "Illustrative",
    "src": null,
-   "note": "About one per school day.",
+   "note": "About one per school day. Equivalent full cycles: partial charges add up to whole ones. Each takes in 300 kWh and returns 90% of it; the 10% lost is bought at the energy charge.",
    "low": null,
    "high": null
   },
@@ -141,7 +154,7 @@
    "unit": "fraction",
    "type": "Sourced",
    "src": "eia-dg-2024",
-   "note": "Table 3-3, 2022.",
+   "note": "Table 3-3, 2022: the share of the energy put in that comes back out.",
    "low": null,
    "high": null
   },
@@ -185,7 +198,7 @@
    "unit": "$/kW-month",
    "type": "Illustrative",
    "src": null,
-   "note": "A two-part tariff; the energy charge is derived so the school's bill matches the EIA average.",
+   "note": "A two-part tariff; the energy charge is derived so the school's bill matches the EIA average. Its low and high re-derive the energy charge too, so the school's pre-project bill stays the same (a tariff rebalancing, not a dearer tariff).",
    "low": 5,
    "high": 20
   },
@@ -468,7 +481,7 @@
   },
   {
    "key": "demand",
-   "label": "Demand charge",
+   "label": "Demand charge (pre-project bill held)",
    "ids": [
     "demand"
    ],
@@ -825,7 +838,7 @@
    "title": "The main result",
    "skill": "Present value",
    "kind": "numeric",
-   "prompt": "Over 25 years at 4%, by how much does the present value of the school's costs exceed the present value of its savings? (If your model says the savings are larger, recheck it.)",
+   "prompt": "Over 25 years at 4%, counting the brief's residual value, by how much does the present value of the school's costs exceed the present value of its savings? (If your model says the savings are larger, recheck it.)",
    "units": [
     [
      "$",
@@ -855,7 +868,7 @@
    "title": "Who pays the gap",
    "skill": "Transfers against real costs",
    "kind": "choice",
-   "prompt": "Part of the school's bill saving is not a saving in the utility's costs. Who pays it?",
+   "prompt": "Part of the school's bill saving is not a saving in the utility's costs. Under the brief's rate-reset assumption, who pays it?",
    "options": [
     [
      "a",
@@ -863,7 +876,7 @@
     ],
     [
      "b",
-     "The utility's other customers, once rates are reset"
+     "The utility's other customers, at the next rate reset"
     ],
     [
      "c",
@@ -877,11 +890,11 @@
    "answer": "b",
    "why": {
     "a": "The school receives this part: it is in its bill saving.",
-    "b": "The utility still has to recover its costs; at the next rate review the gap moves onto other customers' rates.",
+    "b": "The utility still has to recover its costs; under the brief's assumption, the next rate reset moves the gap onto other customers' rates.",
     "c": "No tax credit is counted here; a credit would be a separate transfer.",
     "d": "The utility avoids only its energy and capacity costs, less than the bill saving."
    },
-   "solution": "The utility's other customers, once rates are reset: a [[transfer|transfer]], not a real cost saved."
+   "solution": "Under the brief's assumption, the utility's other customers, at the next rate reset: a [[transfer|transfer]], not a real cost saved. Until a reset, or if the utility does not recover it all, part stays with the utility."
   },
   {
    "id": "shift",
@@ -890,7 +903,7 @@
    "title": "The cost shift",
    "skill": "A screening estimate",
    "kind": "numeric",
-   "prompt": "How much a year moves to the utility's other customers?",
+   "prompt": "Under the same assumption, how much a year moves to the utility's other customers?",
    "units": [
     [
      "$ per year",
@@ -928,7 +941,7 @@
     ],
     [
      "c",
-     "The demand charge, $5 to $20 per kW-month"
+     "The demand charge, $5 to $20 per kW-month, with the energy charge re-set so the pre-project bill is unchanged"
     ],
     [
      "d",
@@ -939,7 +952,7 @@
    "why": {
     "a": "The capital is the largest single number in the result.",
     "b": "The rate changes the weight of every future year and the replacement.",
-    "c": "A higher demand charge raises the battery's saving and lowers the energy charge.",
+    "c": "A higher demand charge raises the battery's saving; the energy charge falls to keep the pre-project bill, so the solar saves less. The two partly cancel.",
     "d": "Price moves the energy saving, a modest share of the total."
    },
    "solution": "The worked sensitivity sorts the swings: up-front cost first."
@@ -951,7 +964,7 @@
    "title": "Your log and your sensitivity",
    "skill": "Audit trail",
    "kind": "open-short",
-   "prompt": "Paste three rows of your assumptions log and your sensitivity statement (the main result as a range, and the input that moves it most).",
+   "prompt": "Paste three rows of your assumptions log and your sensitivity statement (the main result as a range, and the input that moves it most). Submit this task last: it opens the worked workbook.",
    "points": [
     "Every input has a value, a unit, a type (sourced, course data, illustrative, choice, derived) and a source or a reason.",
     "Sourced values name the document, the table or page, and an as-of date.",

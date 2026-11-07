@@ -14,7 +14,8 @@
 // never observed by the analyst), selection noise z (normal); then each month's noise.
 //   opt in:      e - 0.6 (s - 2) + 0.6 z > 1
 //   true effect: tau_i = min(0, -(0.20 + 0.08 e)) kW from month 13 in homes that opted in
-//   outcome:     y_it = 1.3 + 0.6 ac + 0.35 (s - 2) - 0.25 e + season_m + ac acSeason_m cooling_year + 0.3 noise + tau_i D_it
+//   outcome:     y_it = 2.5 + 0.6 ac + 0.35 (s - 2) - 0.25 e + season_m + ac acSeason_m cooling_year + 0.3 noise + tau_i D_it
+//                (the 2.5 keeps every home-month above zero in every panel; the test checks it)
 // The truth reported is the average effect on the homes that opted in (ATT); the effect if every home were defaulted
 // onto the tariff is the average of tau_i over all 400 (ATE). Threats (each re-generates the same draws with one change):
 // trend (opted-in homes drift -0.012 kW a month, all 24 months, zero at month 12), anticipate (60% of tau_i in months 10
@@ -28,8 +29,9 @@
 // Panel 2, a policy and solar investment: 30 regions, 2016-2025, the policy from 2021 in regions that adopt. For region r:
 // sunshine (normal), selection noise (normal), then each year's noise. Adopt: sun + 0.7 noise > 0.3. New solar built
 // y_rt = 30 + 8 sun + 3 (t - 2016) + 5 noise + 10 D_rt MW. Threats: boom (adopters +2.5 MW a year faster, all years, zero
-// in 2020) and border (non-adopters -4 MW a year from 2021, projects moved to adopters: a spillover that makes the
-// gross effect look larger and the net national change smaller).
+// in 2020) and border (non-adopters -4 MW a year from 2021, projects moved to adopters: a spillover. The moved projects
+// are inside the adopters' +10 MW, so only the non-adopters' outcomes change: adopters gain 140 MW a year, of which 64
+// moved from the others and 76 is new across all 30 regions; DiD reads 14.0 a region, 196 in all).
 // Every number the page states comes from facts() (_tests/learn/test_m14-did-it-work.js; the notebook asserts reference()).
 (function () {
   "use strict";
@@ -177,10 +179,11 @@
       "Simulated: 400 homes, 24 months; " + E.nOn + " opted into a time-of-use tariff from month 13. The true effect on them is " + kw(E.att) + " on the evening peak (known because the data are simulated).",
       "After the start, TOU homes against flat homes: " + kw(E.naive.est) + ". With home size as a control: " + kw(E.reg.size) + ". Engagement, never measured, still differs.",
       "TOU homes after against before: " + kw(E.ba.est) + ", because flat homes also changed by " + kw(F.flatChange) + " (a cooler second summer).",
-      "Difference-in-differences: " + kw(E.did.est) + " (about 95% interval " + band(E.did, kw) + "), against the truth " + kw(E.att) + ". Before month 13 the monthly gaps stay within " + kw(E.preMax).replace(" kW", "") + " kW of zero.",
+      "Difference-in-differences: " + kw(E.did.est) + " (about 95% interval " + band(E.did, kw) + "), against the truth " + kw(E.att) + ". Before month 13 the change in the TOU–flat gap, against month 12, stays within " + kw(E.preMax).replace(" kW", "") + " kW of zero.",
       "Threats move it: already cutting " + kw(T.trend.did.est) + ", early cuts " + kw(T.anticipate.did.est) + ", neighbours copy " + kw(T.spill.did.est) + ", a thermostat offer " + kw(T.bundle.did.est) + ".",
       "If every home were put on the tariff by default, the average effect would be " + kw(E.ate) + ", not " + kw(E.att) + ": those who opt in respond more.",
-      "Simulated regions: " + R.nOn + " of 30 adopt a policy in 2021. DiD: " + mwy(R.did.est) + " of new solar per adopting region (truth +10.0). If the policy followed a boom: " + mwy(RT.boom.did.est) + "; if projects moved across the border: " + mwy(RT.border.did.est) + "."
+      "Simulated regions: " + R.nOn + " of 30 adopt a policy in 2021. DiD: " + mwy(R.did.est) + " of new solar per adopting region (truth +10.0); if the policy followed a boom, " + mwy(RT.boom.did.est) + ".",
+      "If projects moved across the border, DiD reads " + mwy(RT.border.did.est) + ". Adopters then gain " + Math.round(F.border.gross) + " MW a year: " + Math.round(F.border.lost) + " moved from the other regions and " + Math.round(F.border.net) + " is new."
     ];
     return ['<p class="lx-eyebrow">Simulated panels with known effects: what each estimate says</p>', "<ol>" + li.map(function (x) { return "<li>" + x + "</li>"; }).join("\n") + "</ol>",
       '<div class="lx-scroll-x"><table class="lx-facts m14-fbtab">',
@@ -243,7 +246,8 @@
       marks: rows.map(function (r, i) { return { x: i + 0.5, y: r.est, kind: "dot", label: k2(r.est), color: r.ok === false ? COL.bad : COL.est, pos: "above" }; }),
       aria: aria, text: { head: ["Estimate", "kW", "About 95% interval"], rows: rows.map(function (r) { return [r.label, kw(r.est), r.lo != null ? k2(r.lo) + " to " + k2(r.hi) : "–"]; }), note: "Truth: " + kw(truth) + " (simulated)." } };
   }
-  // an event study: each period's DiD against the last period before the start, with about-95% intervals
+  // an event study: each period's DiD against the last period before the start (that period's treated-minus-comparison
+  // gap minus the reference period's gap: the change in the gap), with about-95% intervals
   function eventSpec(es, o) {
     var vals = [0]; es.forEach(function (x) { vals.push(x.est - 1.96 * x.se, x.est + 1.96 * x.se); }); if (o.truth != null) vals.push(o.truth);
     var st = o.step, lo = Math.floor(Math.min.apply(null, vals) / st) * st, hi = Math.ceil(Math.max.apply(null, vals) / st) * st;
@@ -254,11 +258,12 @@
       refs: o.truth != null ? [{ y: o.truth, label: o.truthLabel, labelN: o.truthLabelN, color: COL.truth, dash: "6 4", labelColor: "color-mix(in srgb, var(--lx-good) 70%, var(--lx-ink))" }] : [],
       bars: es.filter(function (x) { return !x.ref; }).map(function (x) { return { x0: x.k - 0.12, x1: x.k + 0.12, y0: x.est - 1.96 * x.se, y1: x.est + 1.96 * x.se, color: COL.ci, op: 0.3 }; }),
       lines: [{ pts: es.map(function (x) { return [x.k, x.est]; }), color: COL.est, width: 1.6, dots: true }],
-      aria: o.aria, text: { head: [o.kLabel, "Estimate", "About 95% interval"], rows: es.map(function (x) { return [o.kName(x), o.fmtV(x.est), x.ref ? "reference" : o.fmtV(x.est - 1.96 * x.se).replace(/ .*/, "") + " to " + o.fmtV(x.est + 1.96 * x.se)]; }) } };
+      aria: o.aria, text: { head: [o.kLabel, "Change in the gap", "About 95% interval"], rows: es.map(function (x) { return [o.kName(x), o.fmtV(x.est), x.ref ? "reference" : o.fmtV(x.est - 1.96 * x.se).replace(/ .*/, "") + " to " + o.fmtV(x.est + 1.96 * x.se)]; }) } };
   }
   function touEvent(T, E, aria, truth) {
     return eventSpec(E.es, { step: 0.1, unit: "kW", fmt: function (v) { return sgn(v, 1); }, truth: truth, truthLabel: "Truth " + kw(truth), truthLabelN: k2(truth), postLabel: "Tariff in force",
-      ticks: [[-12, "−12", "start"], [-6, "−6"], [-1, "−1"], [0, "0"], [6, "+6"], [11, "+11", "end"]], aria: aria, kLabel: "Months from the start",
+      ticks: [[-12, "−12", "start"], [-6, "−6"], [-1, "−1"], [0, "0"], [6, "+6"], [11, "+11", "end"]], ticksN: [[-12, "−12", "start"], [-6, "−6"], [0, "0"], [6, "+6"], [11, "+11", "end"]],   // phones: −1 and 0 ran together
+      aria: aria, kLabel: "Months from the start",
       kName: function (x) { return "Month " + (x.k + T.start + 1) + " (" + (x.k >= 0 ? "+" : "−") + Math.abs(x.k) + ")"; }, fmtV: kw });
   }
   function regionEvent(R, E, aria, truth) {
@@ -304,10 +309,10 @@
 
     // ---- 3 regress with controls
     steps.push({
-      text: "Add controls: a [[linear-regression|regression]] of each home's after-period peak on a TOU dummy plus what the utility knows. Which controls bring it to the truth?",
+      text: "Add [[control-variable|controls]], measured traits held fixed: a [[linear-regression|regression]] of each home's after-period peak on a [[dummy-variable|0/1 tariff flag]] plus those traits. Which controls bring it to the truth?",
       build: function (act, api) {
         var use = { size: false, ac: false }, tried = {};
-        H("p", { class: "lx-hint", text: "Always in: TOU or not. Add:" }, act);
+        H("p", { class: "lx-hint", text: "Always in: the tariff flag (1 on TOU, 0 on flat). Its coefficient is the fitted gap between the two groups at equal controls, in kW. Add:" }, act);
         var tg = H("div", { class: "lx-toggles", role: "group", "aria-label": "Controls to add" }, act);
         LX.Toggle(tg, { label: "Home size", onChange: function (on) { use.size = on; } });
         LX.Toggle(tg, { label: "Air conditioning", onChange: function (on) { use.ac = on; } });
@@ -316,7 +321,7 @@
         function name(u) { return u.size && u.ac ? "Size and air conditioning" : u.size ? "Home size" : u.ac ? "Air conditioning" : "No controls"; }
         b.addEventListener("click", function () {
           var k = name(use); tried[k] = val(use);
-          table(tb, ["Controls", "TOU coefficient", "Against the truth"], Object.keys(tried).map(function (n) { return [n, kw(tried[n]), (tried[n] / truth).toFixed(1) + " ×"]; }));
+          table(tb, ["Controls", "Tariff flag's coefficient", "Against the truth"], Object.keys(tried).map(function (n) { return [n, kw(tried[n]), (tried[n] / truth).toFixed(1) + " ×"]; }));
           out.innerHTML = k + ": <b>" + kw(val(use)) + "</b>.";
           if (Object.keys(tried).length >= 3 || (use.size && use.ac)) { api.done(); api.saw("Home size moves it to " + kw(E.reg.size) + "; air conditioning moves it little, since it did not drive sign-up. Engagement did, and no meter records it: you cannot control for what you cannot see."); }
           else api.saw("Try another set of controls.", true);
@@ -361,12 +366,13 @@
 
     // ---- 6 parallel trends and the event study
     steps.push({
-      text: "DiD assumes [[parallel-trends|parallel trends]]: without the tariff, both groups would have moved alike. An [[event-study|event study]] checks the months before: do they look parallel?",
+      text: "DiD assumes [[parallel-trends|parallel trends]]: without the tariff, both groups would have moved alike. An [[event-study|event study]] looks at the months before: do they look parallel?",
       build: function (act, api) {
-        LX.Plot(act, { text: "Text version of the chart" }).render(touEvent(T, E, "Event study: each month's difference-in-differences against month 12, with about-95% intervals.", truth));
+        H("p", { class: "lx-hint", text: "Each dot is that month's TOU–flat gap minus the month-12 gap: the change in the gap. Zero means the gap stayed the same." }, act);
+        LX.Plot(act, { text: "Text version of the chart" }).render(touEvent(T, E, "Event study: each month's change in the TOU–flat gap against month 12, with about-95% intervals.", truth));
         var out = readout(act);
         seg(rowEl(act), ["Parallel before the start", "Not parallel"], -1, function (i) {
-          if (i === 0) { api.done(); api.saw("Before month 13 every monthly gap stays within " + kw(E.preMax) + " of zero, inside its interval. Plausible, never proven: the after-period counterfactual is still unseen."); }
+          if (i === 0) { api.done(); api.saw("Before month 13 the change in the gap stays within " + kw(E.preMax) + " of zero, inside every interval. Similar earlier trends support the comparison; they do not prove what would have happened after."); }
           else api.saw("Look again: before month 13, are the dots near zero, with zero inside each interval?", true);
         }, "Are the months before parallel?");
         out.textContent = "";
@@ -385,7 +391,7 @@
           if (k) seen[k] = 1;
           note.textContent = th ? th.label + ": " + th.text : "No threat: the panel of steps 1 to 6.";
           host.innerHTML = "";
-          LX.Plot(host, { text: "Text version of the chart" }).render(touEvent(T, X, "Event study with " + (th ? th.label.toLowerCase() : "no threat") + ".", truth));
+          LX.Plot(host, { text: "Text version of the chart" }).render(touEvent(T, X, "Event study (each month's change in the TOU–flat gap against month 12) with " + (th ? th.label.toLowerCase() : "no threat") + ".", truth));
           table(tb, ["Threat", "DiD", "Interval", "Holds the truth?"], [["None", kw(E.did.est), band(E.did, kw), covers(E.did, truth) ? "yes" : "no"]].concat(D.threats.filter(function (x) { return seen[x.key]; }).map(function (x) { var Y = F.threat[x.key].did; return [x.short, kw(Y.est), band(Y, kw), covers(Y, truth) ? "yes" : "no"]; })));
           out.innerHTML = "DiD <b>" + kw(X.did.est) + "</b> (" + band(X.did, kw) + "); truth " + kw(truth) + ".";
           var n = Object.keys(seen).length;
@@ -413,17 +419,22 @@
       build: function (act, api) {
         var keys = [null].concat(R.threats.map(function (x) { return x.key; })), labels = ["None", "Followed a boom", "Moved across the border"], seen = {};
         seg(rowEl(act), labels, 0, function (i) { draw(i); }, "Threat");
-        var note = H("p", { class: "lx-hint" }, act), host = H("div", null, act), out = readout(act);
+        var note = H("p", { class: "lx-hint" }, act), host = H("div", null, act), out = readout(act), tb = H("div", null, act), B = F.border;
         function draw(i) {
           var k = keys[i], X = k ? F.rthreat[k] : F.R, th = k ? R.threats[i - 1] : null;
           seen[i] = 1;
           note.textContent = th ? th.text : "No threat. Adopting regions are sunnier, so their levels differ; DiD removes fixed differences.";
           host.innerHTML = "";
-          LX.Plot(host, { text: "Text version of the chart" }).render(regionEvent(R, X, "Event study for the regions: each year's difference-in-differences against 2020, with about-95% intervals.", R.effect));
-          var t = "DiD <b>" + mwy(X.did.est) + "</b> per adopting region (" + band(X.did, mwy) + "); truth +10.0.";
-          if (k === "border") t += " Claimed in all " + X.nOn + ": " + Math.round(F.border.claimed) + " MW a year; the simulation's net change across all 30 regions: " + Math.round(F.border.net) + " MW a year.";
-          out.innerHTML = t;
-          if (seen[0] && seen[1] && seen[2]) { api.done(); api.saw("A boom shows in the years before 2021. Projects that moved across the border do not: they shrink the comparison group, so DiD reads " + mwy(F.rthreat.border.did.est) + " where the net change was " + Math.round(F.border.net) + " MW a year in all."); }
+          LX.Plot(host, { text: "Text version of the chart" }).render(regionEvent(R, X, "Event study for the regions: each year's change in the adopter–other gap against 2020, with about-95% intervals.", R.effect));
+          out.innerHTML = "DiD <b>" + mwy(X.did.est) + "</b> per adopting region (" + band(X.did, mwy) + "); truth +10.0.";
+          // the border case's accounting: the moved projects are inside the adopters' gross gain (review #2)
+          if (k === "border") table(tb, ["Border case, all regions", "MW a year"], [
+            ["Claimed by DiD: " + X.nOn + " regions × " + sgn(X.did.est, 1), String(Math.round(B.claimed))],
+            ["Gross gain in the " + X.nOn + " adopting regions (" + X.nOn + " × " + R.effect + ")", String(Math.round(B.gross))],
+            ["of which moved from the " + X.nOff + " others (" + X.nOff + " × " + (-R.border) + ")", String(Math.round(B.lost))],
+            ["New across all 30 regions", String(Math.round(B.net))]]);
+          else tb.innerHTML = "";
+          if (seen[0] && seen[1] && seen[2]) { api.done(); api.saw("A boom shows before 2021; moved projects do not. They shrink the comparison group, so DiD reads " + mwy(F.rthreat.border.did.est) + " a region, while " + Math.round(B.net) + " MW a year is new in all."); }
           else api.saw("Try all three.", true);
         }
         S.draw9 = draw;
@@ -485,9 +496,9 @@
         d: { t: "Who is compared with whom?", tN: ["Who against", "whom?"] },
         rnd: { t: "Assigned at random?", tN: ["Assigned at", "random?"], k: "q" },
         did: { t: "Two groups, before and after", tN: ["Before and", "after"], s: "DiD", sN: "DiD" },
-        pt: { t: "Parallel before?", tN: ["Parallel", "before?"], k: "q" },
+        pt: { t: "Earlier trends support it?", tN: ["Earlier trends", "support it?"], k: "q" },   // a diagnostic, not a certificate (review #3)
         stop: { t: "Find a better comparison", tN: ["Find a better", "comparison"], k: "end" },
-        thr: { t: "List the threats", tN: ["List the", "threats"], s: "selection · confounding · spillover · anticipation", sN: "four kinds" },
+        thr: { t: "List the threats", tN: ["List the", "threats"], s: "four kinds (step 10)", sN: "four kinds" },   // the long list overflowed the box
         rep: { t: "Report effect, interval, for whom", tN: ["Effect, interval,", "for whom"], k: "end" }
       },
       cols: 3, at: { q: [1, 0], d: [1, 1], rnd: [1, 2], did: [0, 3], pt: [0, 4], stop: [0, 5], thr: [1, 5], rep: [1, 6] },

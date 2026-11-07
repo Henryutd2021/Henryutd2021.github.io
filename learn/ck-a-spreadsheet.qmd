@@ -51,6 +51,9 @@ body-classes: "page-learn page-lesson lx-form-checkpoint"
 .cka-log td { text-align: left; white-space: normal; font-family: var(--lx-f-body, inherit); }
 .cka-solution-body .lx-xcard > * { min-width: 0; max-width: 100%; }
 .cka-course { margin-top: 18px; }
+.cka-brief .cka-in { margin: .6rem 0 0; }
+.cka-brief > p { margin: 0 0 4px; }
+.cka-brief > p.lx-hint { margin-top: .5rem; }
 </style>
 ```
 
@@ -61,26 +64,30 @@ body-classes: "page-learn page-lesson lx-form-checkpoint"
 <ol class="cka-parts">
 <li><b>A · Boundary and log</b> (about 40 min). Download the starter workbook. State your boundary; finish the assumptions log: every input's type, source, date and, where you will test it, a low and a high value.</li>
 <li><b>B · The model</b> (about 50 min). Convert the costs to 2025 dollars and build the school's yearly saving and its net present value, every number a formula.</li>
-<li><b>C · Who pays</b> (about 20 min). Split the school's bill saving into a real cost saved and a <span class="lx-term" data-term="transfer">transfer</span>; add the parties up.</li>
+<li><b>C · Who pays</b> (about 20 min). Split the school's bill saving into a real cost saved and a <span class="lx-term" data-term="transfer">transfer</span>; add the parties up (refresher: <a href="a13-fairness-jobs.html">A13</a>).</li>
 <li><b>D · Sensitivity</b> (about 20 min). Swing the inputs that matter one at a time and report the main result as a range.</li>
-<li><b>Submit</b> (about 20 min). Enter your results in the nine tasks below. The worked workbook opens when you submit task 9.</li>
+<li><b>Submit</b> (about 20 min). Enter your results in the nine tasks below, task 9 last: submitting it opens the worked workbook.</li>
 </ol>
 <p class="lx-eyebrow">How it is marked, before you start</p>
 <ul class="cka-rules">
 <li><b>Proficient:</b> at least 5 of the 7 auto-marked tasks right on the first try, plus at least 3 of the 4 points of each written task (1 and 9), which you tick yourself.</li>
 <li><b>Strong:</b> at least 6 of 7 on the first try and every written point.</li>
 <li><b>Opening solutions early:</b> a task whose answer you open before answering counts as not right. Opening the worked workbook before task 9 makes the attempt practice, with no level.</li>
+<li><b>After the worked workbook opens:</b> a task answered after that counts as not right, and a written task gets no points.</li>
 </ul>
 <p class="cka-dl"><a class="lx-btn small" href="../assets/learn/data/ck-a-starter.xlsx" download>Starter workbook (.xlsx)</a></p>
-<p class="lx-hint">It opens in Excel, LibreOffice Calc, Google Sheets or Apple Numbers. It holds the case's facts with their sources and an empty layout; it gives no formulas and no answers. Refreshers: <a href="a01-project-tea.html">A1</a> (cash flows), <a href="a04-retail-tariffs.html">A4</a> (tariffs), <a href="k03-discounting.html">K3</a> (discounting), <a href="k07-spreadsheets.html">K7</a> (spreadsheets).</p>
+<p class="lx-hint">It opens in Excel, LibreOffice Calc, Google Sheets or Apple Numbers. It holds the case's facts with their sources and an empty layout; it gives no formulas and no answers. Refreshers: <a href="a01-project-tea.html">A1</a> (cash flows), <a href="a04-retail-tariffs.html">A4</a> (tariffs), <a href="a13-fairness-jobs.html">A13</a> (who pays), <a href="k03-discounting.html">K3</a> (discounting), <a href="k07-spreadsheets.html">K7</a> (spreadsheets).</p>
 </div>
 
 <div class="lx-card cka-brief" id="cka-brief">
 <p class="lx-eyebrow">The case</p>
 <h3>A school's rooftop solar and battery</h3>
 <!-- cka-brief:start (written from the data file by the test's --write mode; do not edit) -->
-<p>Prairie Town High School's district is offered a rooftop solar array and a battery behind the school's meter. Build an auditable spreadsheet that tells the district what it would gain or lose, who else pays or benefits, and how sure that answer is. <span class="lx-hint">Prairie Town and its high school are fictional; the school's load and several inputs are illustrative.</span></p>
-<ul class="cka-facts"><li><b>System:</b> 250 kW-DC of rooftop solar and a 150 kW / 300 kWh battery, installed together</li><li><b>School:</b> uses 1,000,000 kWh a year, with a billed peak of 400 kW every month (illustrative)</li><li><b>Tariff:</b> a demand charge of $10 per kW-month plus an energy charge, set so the school's bill averages Kansas's 2025 commercial price, 11.17 cents/kWh (EIA); exports earn 3 cents/kWh (illustrative)</li><li><b>Battery:</b> cuts the monthly billed peak by 60% of its power on average and discharges about 200 times a year (illustrative)</li><li><b>Costs:</b> from EIA's 2024 distributed-generation report (2022 dollars) and NLR's 2025 ATB (2023 dollars); convert to 2025 dollars</li><li><b>Money:</b> 25 years, real 2025 dollars, a 4% real discount rate (the course's), battery replaced after 15 years</li><li><b>The utility:</b> avoids 3 cents for each kWh it no longer supplies and, for half of the battery's peak cut, $180 per kW a year of capacity (illustrative; lesson A4's unit cost)</li></ul>
+<p><b>Situation:</b> Prairie Town High School's district is offered a rooftop solar array and a battery behind the school's meter.</p>
+<p><b>Deliverable:</b> An auditable spreadsheet that tells the district what it would gain or lose, who else pays or benefits, and how sure that answer is.</p>
+<p class="lx-eyebrow cka-in">Inputs, illustrative where marked</p>
+<ul class="cka-facts"><li><b>System:</b> 250 <span class="lx-term" data-term="kw-dc">kW-DC</span> of rooftop solar and a 150 kW / 300 kWh battery, installed together</li><li><b>School:</b> uses 1,000,000 kWh a year, with a billed peak of 400 kW every month (illustrative)</li><li><b>Tariff:</b> a <span class="lx-term" data-term="demand-charge">demand charge</span> of $10 per kW-month plus an energy charge, set so the school's bill averages Kansas's 2025 commercial price, 11.17 cents/kWh (EIA); exports earn 3 cents/kWh (illustrative)</li><li><b>Battery power:</b> cuts the monthly billed peak by 60% of its power on average (illustrative)</li><li><b>Battery energy:</b> about 200 <span class="lx-term" data-term="full-cycle">full cycles</span> a year, each taking in 300 kWh from the school's supply and returning 90%; the 10% lost is bought at the energy charge (illustrative)</li><li><b>Costs:</b> from EIA's 2024 distributed-generation report (2022 dollars) and NLR's 2025 ATB (2023 dollars); convert to 2025 dollars</li><li><b>Money:</b> 25 years, real 2025 dollars, a 4% <span class="lx-term" data-term="real-rate">real discount rate</span> (the course's), battery replaced at the end of year 15</li><li><b>End value:</b> at year 25 the replacement battery has 5 of its 15 years left: count 5/15 of its cost as its <span class="lx-term" data-term="residual-value">residual value</span> (straight line)</li><li><b>The utility:</b> avoids 3 cents for each kWh it no longer supplies and, for half of the battery's peak cut, $180 per kW a year of capacity (illustrative; lesson A4's unit cost)</li><li><b>Rate reset:</b> assume the utility recovers its whole remaining revenue shortfall from its other customers at the next rate reset</li></ul>
+<p class="lx-hint">Prairie Town and its high school are fictional; the school's load and several inputs are illustrative.</p>
 <!-- cka-brief:end -->
 </div>
 
@@ -93,11 +100,11 @@ body-classes: "page-learn page-lesson lx-form-checkpoint"
 <li><p><b>Solar output</b> <span class="lx-hint">Part B · A number with units</span></p><p>How much electricity does the array make in a year? Within 2% counts as right.</p><p>Answer with a number and a unit.</p></li>
 <li><p><b>Up-front cost in 2025 dollars</b> <span class="lx-hint">Part B · Convert dollar years</span></p><p>What does the system cost up front, in 2025 dollars? Within 1% counts as right.</p><p>Answer with a number and a unit.</p></li>
 <li><p><b>The school's bill saving</b> <span class="lx-hint">Part B · Read a tariff</span></p><p>How much lower is the school's electricity bill in a year (gross: before upkeep)? Within 3% counts as right.</p><p>Answer with a number and a unit.</p></li>
-<li><p><b>The main result</b> <span class="lx-hint">Part B · Present value</span></p><p>Over 25 years at 4%, by how much does the present value of the school's costs exceed the present value of its savings? (If your model says the savings are larger, recheck it.) Within 3% counts as right.</p><p>Answer with a number and a unit.</p></li>
-<li><p><b>Who pays the gap</b> <span class="lx-hint">Part C · Transfers against real costs</span></p><p>Part of the school's bill saving is not a saving in the utility's costs. Who pays it?</p><ul><li>a. The school district</li><li>b. The utility's other customers, once rates are reset</li><li>c. Federal taxpayers</li><li>d. Nobody: every dollar the school saves is a real cost saved</li></ul></li>
-<li><p><b>The cost shift</b> <span class="lx-hint">Part C · A screening estimate</span></p><p>How much a year moves to the utility's other customers? Within 5% counts as right.</p><p>Answer with a number and a unit.</p></li>
-<li><p><b>What moves the result most</b> <span class="lx-hint">Part D · Sensitivity</span></p><p>Swinging one input at a time over the ranges in the worked log, which moves the school's NPV most?</p><ul><li>a. The up-front cost, ±25%</li><li>b. The discount rate, 2% to 7%</li><li>c. The demand charge, $5 to $20 per kW-month</li><li>d. The average electricity price, ±20%</li></ul></li>
-<li><p><b>Your log and your sensitivity</b> <span class="lx-hint">Part D · Audit trail</span></p><p>Paste three rows of your assumptions log and your sensitivity statement (the main result as a range, and the input that moves it most).</p><p>Self-rated against 4 points, shown after you submit.</p></li>
+<li><p><b>The main result</b> <span class="lx-hint">Part B · Present value</span></p><p>Over 25 years at 4%, counting the brief's residual value, by how much does the present value of the school's costs exceed the present value of its savings? (If your model says the savings are larger, recheck it.) Within 3% counts as right.</p><p>Answer with a number and a unit.</p></li>
+<li><p><b>Who pays the gap</b> <span class="lx-hint">Part C · Transfers against real costs</span></p><p>Part of the school's bill saving is not a saving in the utility's costs. Under the brief's rate-reset assumption, who pays it?</p><ul><li>a. The school district</li><li>b. The utility's other customers, at the next rate reset</li><li>c. Federal taxpayers</li><li>d. Nobody: every dollar the school saves is a real cost saved</li></ul></li>
+<li><p><b>The cost shift</b> <span class="lx-hint">Part C · A screening estimate</span></p><p>Under the same assumption, how much a year moves to the utility's other customers? Within 5% counts as right.</p><p>Answer with a number and a unit.</p></li>
+<li><p><b>What moves the result most</b> <span class="lx-hint">Part D · Sensitivity</span></p><p>Swinging one input at a time over the ranges in the worked log, which moves the school's NPV most?</p><ul><li>a. The up-front cost, ±25%</li><li>b. The discount rate, 2% to 7%</li><li>c. The demand charge, $5 to $20 per kW-month, with the energy charge re-set so the pre-project bill is unchanged</li><li>d. The average electricity price, ±20%</li></ul></li>
+<li><p><b>Your log and your sensitivity</b> <span class="lx-hint">Part D · Audit trail</span></p><p>Paste three rows of your assumptions log and your sensitivity statement (the main result as a range, and the input that moves it most). Submit this task last: it opens the worked workbook.</p><p>Self-rated against 4 points, shown after you submit.</p></li>
 </ol>
 <!-- cka-tasks:end -->
 </div>
@@ -129,38 +136,42 @@ body-classes: "page-learn page-lesson lx-form-checkpoint"
 <tr><th scope="row">Up-front cost</th><td class="n">$866,046 (2025 dollars; $792,500 in 2022 dollars × 1.0928)</td></tr>
 <tr><th scope="row">Bill saving, gross</th><td class="n">$31,965 a year = $18,624 energy + $2,924 exports + $10,800 demand − $382 losses</td></tr>
 <tr><th scope="row">Upkeep</th><td class="n">$14,972 a year ($4,645 solar, $10,327 battery)</td></tr>
-<tr><th scope="row">Annuity factor</th><td class="n">15.62 (25 years at 4%)</td></tr>
-<tr><th scope="row">Battery replacement, year 15</th><td class="n">$408,490; present value $226,820; residual at year 25 $136,163 (present value $51,077)</td></tr>
+<tr><th scope="row"><span class="lx-term" data-term="annuity-factor">Annuity factor</span></th><td class="n">15.62 (25 years at 4%)</td></tr>
+<tr><th scope="row">Battery replacement, year 15</th><td class="n">$408,490; present value $226,820</td></tr>
+<tr><th scope="row"><span class="lx-term" data-term="residual-value">Residual value</span>, year 25</th><td class="n">$136,163 (5 of 15 years left, straight line); present value $51,077</td></tr>
 <tr><th scope="row">Net present value to the school</th><td class="n">−$776,324</td></tr>
 </tbody></table></div>
 <p class="lx-hint">Check in the workbook: the year-by-year cash flow sums to the same −$776,324. The installed cost read as per kW-DC of solar is 7% below the two systems' separate costs, as the report says installing together saves.</p></div>
 <div class="lx-xcard"><header class="lx-x-head"><h3>Who pays and who benefits</h3></header><div class="lx-scroll-x"><table class="lx-facts cf-two cka-led">
 <thead><tr><th scope="col">Party</th><th scope="col">A year</th><th scope="col">Present value</th></tr></thead><tbody>
 <tr><th scope="row">The school district</th><td class="n" data-l="A year">$16,993</td><td class="n" data-l="Present value">−$776,324</td></tr>
-<tr><th scope="row">The utility's other customers (once rates are reset)</th><td class="n" data-l="A year">−$12,351</td><td class="n" data-l="Present value">−$192,941</td></tr>
+<tr><th scope="row">The utility's other customers (at the next rate reset)</th><td class="n" data-l="A year">−$12,351</td><td class="n" data-l="Present value">−$192,941</td></tr>
 <tr><th scope="row">Federal taxpayers (no credit counted)</th><td class="n" data-l="A year">$0</td><td class="n" data-l="Present value">$0</td></tr>
 <tr><th scope="row">Resource view: all parties together</th><td class="n" data-l="A year">$4,642</td><td class="n" data-l="Present value">−$969,265</td></tr>
 </tbody></table></div>
 <ul class="cka-list"><li><b>Gross against net:</b> of the school's $31,965 gross bill saving a year, $19,615 is a real cost the utility avoids; $12,351 is a <span class="lx-term" data-term="transfer">transfer</span> from its other customers.</li>
 <li><b>Adds up:</b> school −$776,324 + other customers −$192,941 = resource view −$969,265.</li>
-<li><b>Screening estimates:</b> the cost shift assumes the utility resets its rates so other customers make up what it does not save, with the avoided costs in the log; a model of the school's bill does not produce this by itself, the accounting of who pays does.</li>
-<li><b>Not in money:</b> about 118 t of CO₂ a year at Kansas's 2024 average factor (an inventory number, not the change caused); no resilience (no islanding equipment costed); installation is job-years, not permanent jobs, and is not estimated.</li></ul></div>
+<li><b>Screening estimate:</b> the cost shift holds only under the brief's rate-reset assumption. It comes from the accounting of who pays, not from the model of the school's bill.</li>
+<li><b>CO₂, not valued:</b> about 118 t a year at Kansas's 2024 average factor: an inventory number, not the change the project causes.</li>
+<li><b>Resilience, not counted:</b> no <span class="lx-term" data-term="islanding">islanding</span> equipment is costed, so the battery gives no backup in an outage.</li>
+<li><b>Jobs, not estimated:</b> installation is job-years of temporary work, not permanent jobs.</li></ul></div>
 <div class="lx-xcard" id="cka-sens"><header class="lx-x-head"><h3>Sensitivity of the main result</h3></header><div class="lx-scroll-x"><table class="lx-facts cf-two cka-sens">
 <thead><tr><th scope="col">Input</th><th scope="col">Low to high</th><th scope="col">NPV at low</th><th scope="col">NPV at high</th></tr></thead><tbody>
 <tr><th scope="row">Up-front cost</th><td class="n" data-l="Low to high">$649,535 to $1,082,558</td><td class="n" data-l="NPV at low">−$559,813</td><td class="n" data-l="NPV at high">−$992,836</td></tr>
-<tr><th scope="row">Average electricity price</th><td class="n" data-l="Low to high">$0.0894 to $0.134</td><td class="n" data-l="NPV at low">−$876,265</td><td class="n" data-l="NPV at high">−$676,384</td></tr>
+<tr><th scope="row">Average electricity price</th><td class="n" data-l="Low to high">$0.0894 to $0.134 per kWh</td><td class="n" data-l="NPV at low">−$876,265</td><td class="n" data-l="NPV at high">−$676,384</td></tr>
 <tr><th scope="row">Battery's cut in the billed peak</th><td class="n" data-l="Low to high">30% to 90%</td><td class="n" data-l="NPV at low">−$860,683</td><td class="n" data-l="NPV at high">−$691,965</td></tr>
-<tr><th scope="row">Upkeep, solar and battery (a year)</th><td class="n" data-l="Low to high">$11,229 to $18,715</td><td class="n" data-l="NPV at low">−$717,850</td><td class="n" data-l="NPV at high">−$834,798</td></tr>
-<tr><th scope="row">Demand charge</th><td class="n" data-l="Low to high">$5 to $20</td><td class="n" data-l="NPV at low">−$753,317</td><td class="n" data-l="NPV at high">−$822,339</td></tr>
+<tr><th scope="row">Upkeep, solar and battery</th><td class="n" data-l="Low to high">$11,229 to $18,715 a year</td><td class="n" data-l="NPV at low">−$717,850</td><td class="n" data-l="NPV at high">−$834,798</td></tr>
+<tr><th scope="row">Demand charge (pre-project bill held)</th><td class="n" data-l="Low to high">$5 to $20 per kW-month</td><td class="n" data-l="NPV at low">−$753,317</td><td class="n" data-l="NPV at high">−$822,339</td></tr>
 <tr><th scope="row">Solar capacity factor</th><td class="n" data-l="Low to high">16.0% to 19.6%</td><td class="n" data-l="NPV at low">−$809,986</td><td class="n" data-l="NPV at high">−$742,663</td></tr>
 <tr><th scope="row">Share used at the school</th><td class="n" data-l="Low to high">60% to 90%</td><td class="n" data-l="NPV at low">−$807,108</td><td class="n" data-l="NPV at high">−$745,540</td></tr>
 <tr><th scope="row">Discount rate</th><td class="n" data-l="Low to high">2% to 7%</td><td class="n" data-l="NPV at low">−$754,804</td><td class="n" data-l="NPV at high">−$790,985</td></tr>
 </tbody></table></div>
-<p class="lx-hint">Sorted by swing. A higher demand charge lowers the energy charge (the tariff still gives the school EIA's average), so the solar saves less than the battery gains: the result falls.</p>
+<p class="lx-hint">Sorted by swing. The demand-charge row varies the demand charge while holding the school's pre-project annual bill constant, so the energy charge falls as it rises.</p>
+<p class="lx-hint">Then the reduction in solar savings exceeds the increase in battery savings: the result falls.</p>
 <div id="cka-tornado"></div></div>
 <div class="lx-xcard"><header class="lx-x-head"><h3>Boundary and assumptions log</h3></header>
-<ul class="cka-list"><li><b>Counted:</b> the school district's money: bill saving, capital, upkeep, the battery's replacement and its residual value; 25 years, real 2025 dollars, 4%.</li>
-<li><b>Left out:</b> tax credits (a transfer if claimed through elective pay), financing, resilience, CO₂'s value, solar wear, tariff changes over time.</li>
+<ul class="cka-list"><li><b>Counted:</b> the school district's money: bill saving, capital, upkeep, the battery's replacement and its residual value; 25 years, real 2025 dollars, a 4% <span class="lx-term" data-term="real-rate">real discount rate</span>.</li>
+<li><b>Left out:</b> tax credits (a transfer if claimed through <span class="lx-term" data-term="elective-pay">elective pay</span>), financing, resilience, CO₂'s value, solar wear, tariff changes over time.</li>
 <li><b>Reported apart:</b> the other customers, federal taxpayers and the resource view.</li></ul>
 <details class="lx-textalt"><summary>The worked assumptions log (36 rows)</summary><div class="lx-scroll-x"><table class="lx-mini-table cka-log"><thead><tr><th scope="col">Input</th><th scope="col">Value</th><th scope="col">Unit</th><th scope="col">Type</th><th scope="col">Source</th></tr></thead><tbody>
 <tr><td>Solar array size</td><td>250</td><td>kW-DC</td><td>Choice</td><td>EIA distributed-generation cost report (2024)</td></tr>
@@ -169,7 +180,7 @@ body-classes: "page-learn page-lesson lx-form-checkpoint"
 <tr><td>Battery power</td><td>150</td><td>kW</td><td>Choice</td><td>EIA distributed-generation cost report (2024)</td></tr>
 <tr><td>Battery energy</td><td>300</td><td>kWh</td><td>Choice</td><td>EIA distributed-generation cost report (2024)</td></tr>
 <tr><td>Average cut in the monthly billed peak, share of battery power</td><td>60%</td><td>fraction</td><td>Illustrative</td><td>this case</td></tr>
-<tr><td>Battery discharges a year</td><td>200</td><td>per year</td><td>Illustrative</td><td>this case</td></tr>
+<tr><td>Battery full cycles a year (each takes in 300 kWh)</td><td>200</td><td>per year</td><td>Illustrative</td><td>this case</td></tr>
 <tr><td>Battery round trip efficiency</td><td>90%</td><td>fraction</td><td>Sourced</td><td>EIA distributed-generation cost report (2024)</td></tr>
 <tr><td>School electricity use</td><td>1,000,000</td><td>kWh a year</td><td>Illustrative</td><td>this case</td></tr>
 <tr><td>School monthly billed peak</td><td>400</td><td>kW</td><td>Illustrative</td><td>this case</td></tr>
@@ -224,6 +235,7 @@ body-classes: "page-learn page-lesson lx-form-checkpoint"
 <li><b>Developing:</b> at least 3 of 7 on the first try.</li>
 <li><b>Not yet:</b> anything else. The checkpoint shows readiness for the Modeler tier; it certifies nothing.</li>
 <li><b>Opened early:</b> a task whose answer you open before answering counts as not right; if the worked workbook opens before you submit task 9, the attempt is practice and gets no level.</li>
+<li><b>Answered late:</b> a task first answered after the worked workbook opened counts as not right; a written task submitted after it gets no points.</li>
 </ul>
 <p class="lx-hint">The written tasks are self-rated against their points. A teacher or mentor can rate your workbook again with the course rubric below, from the copied summary and the file.</p>
 </div>

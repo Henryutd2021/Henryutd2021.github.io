@@ -60,7 +60,29 @@ const t0 = Date.now(), F = M.facts(D), factsMs = Date.now() - t0, E = F.E, T = D
   ok(!/Math\.(log|exp|sin|cos|sqrt)\(/.test(M.touPanel.toString() + M.regionPanel.toString() + M.gauss.toString()), "the panels use only + - x / (exact in the Python port)");
 }
 ok(F.hh.length === 400 && F.hh.every(h => h.y.length === 24) && E.nOn === 92 && E.nOff === 308, "panel 1: 400 homes, 24 months, 92 opt in");
-ok(F.hh.every(h => h.on === (h.e + T.select.size * (h.size - 2) + T.select.noise * 0 > -Infinity ? h.on : h.on)) && F.hh.every(h => h.tau <= 0) && F.hh.every(h => h.size >= 1 && h.size <= 3), "panel 1: every effect at or below zero; sizes 1 to 3 thousand sq ft");
+{
+  // redraw the stream here, in the documented order (ac, size, engagement, selection noise, then 24 months of noise),
+  // and apply the opt-in rule from its inputs: an independent fixture for the page's assignments
+  const r = require(L("components/core.js")).mulberry32(T.seed), g = () => { let x = 0; for (let k = 0; k < 12; k++) x += r(); return x - 6; };
+  let same = 0, flips = 0;
+  for (let i = 0; i < T.n; i++) {
+    const ac = r() < T.acShare ? 1 : 0, size = T.size[0] + (T.size[1] - T.size[0]) * r(), e = g(), z = g();
+    for (let t = 0; t < T.months; t++) g();
+    const on = e - 0.6 * (size - 2) + 0.6 * z > 1 ? 1 : 0, h = F.hh[i];
+    if (h.ac === ac && h.size === size && h.e === e && h.on === on) same++;
+    if (on !== (e > 1 ? 1 : 0)) flips++;
+  }
+  ok(same === T.n && T.select.size === -0.6 && T.select.noise === 0.6 && T.select.cut === 1, "panel 1: every home's draws and opt-in decision match an independent redraw with the stated rule (e - 0.6 (s - 2) + 0.6 z > 1)");
+  ok(flips > 20, "the size and noise terms of the rule matter: " + flips + " homes would decide otherwise on engagement alone");
+}
+ok(F.hh.every(h => h.tau <= 0) && F.hh.every(h => h.size >= 1 && h.size <= 3), "panel 1: every effect at or below zero; sizes 1 to 3 thousand sq ft");
+// physically possible peaks: every home-month above zero in the default panel and in every threat's panel (review #1)
+{
+  const lows = [null].concat(D.threats.map(x => x.key)).map(k => Math.min(...M.touPanel(T, k).flatMap(h => h.y)));
+  ok(lows.every(v => v > 0.25) && Math.min(...lows).toFixed(2) === "0.27" && /lowest about 0\.27 kW/.test(T.level.note), "every home-month's evening peak is above zero in every panel (lowest " + Math.min(...lows).toFixed(3) + " kW, as the settings say)");
+  const rl = [null].concat(R.threats.map(x => x.key)).map(k => Math.min(...M.regionPanel(R, k).flatMap(x => x.y)));
+  ok(rl.every(v => v > 5), "new solar is positive in every region-year of every regions panel (lowest " + Math.min(...rl).toFixed(1) + " MW)");
+}
 ok(E.share.onE > E.share.offE + 0.8 && E.share.onSize < E.share.offSize - 0.2 && Math.abs(E.share.onAC - E.share.offAC) < 0.12, "selection: TOU homes are more engaged and smaller; air conditioning about equal (" + E.share.onAC.toFixed(2) + " against " + E.share.offAC.toFixed(2) + ")");
 ok(near(E.att, F.hh.filter(h => h.on).reduce((s, h) => s + h.tau, 0) / 92, 1e-12) && kw(E.att) === "−0.29 kW" && kw(E.ate) === "−0.20 kW" && E.ate > E.att, "the truth: −0.29 kW on those who opted in; −0.20 kW over all homes (smaller)");
 ok(F.rg.length === 30 && F.R.nOn === 14 && F.R.nOff === 16, "panel 2: 30 regions, 14 adopt");
@@ -108,7 +130,10 @@ const OWN = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?<!-- learn:
 const has = (s, what) => ok(TX.includes(s), "page: " + what + ": '" + s + "'");
 const k2 = v => kw(v).replace(" kW", "");
 has("home size and air conditioning moved the estimate from " + k2(E.naive.est) + " to " + kw(E.reg.both) + "; the truth was " + kw(truth), "myth 1");
-has("the months before stayed flat while DiD read " + k2(F.threat.spill.did.est) + " and " + kw(F.threat.bundle.did.est) + " against a truth of " + k2(truth), "myth 2");
+has("the months before stayed flat while DiD read " + k2(F.threat.spill.did.est) + " and " + kw(F.threat.bundle.did.est) + " against a truth of " + k2(truth) + ". Similar earlier trends support a comparison; they never prove it.", "myth 2");
+ok(!/flat pre-period is necessary/.test(PAGE), "myth 2 no longer calls a flat pre-period necessary");
+has("the numbers of TOU and flat homes: " + E.nOn + " and " + E.nOff, "Go deeper: the symbol table's group sizes");
+has("explain why the untreated trends would have matched", "Go deeper: natural experiments need a case for the untreated trend, not random assignment");
 has("Here volunteers cut " + kw(-truth).replace(" kW", "") + " kW, the average home would cut " + (-E.ate).toFixed(2), "myth 3");
 has("(1.70 − 2.00) − (2.00 − 2.10) = −0.30 + 0.10", "quiz 1"); ok(near((1.70 - 2.00) - (2.00 - 2.10), -0.2, 1e-12), "quiz 1: −0.20 kW");
 ok(/\$-0\.36 - \(-0\.06\) = -0\.30\$ kW \(rounded\)/.test(PAGE) && k2(E.cells.onPost - E.cells.onPre) === "−0.36" && k2(F.flatChange) === "−0.06" && near(-0.36 + 0.06, -0.30, 1e-12), "Go deeper: the DiD of means with the page's rounded changes");
@@ -162,7 +187,7 @@ ok((TX.match(/[Ss]imulated/g) || []).length >= 6, "the page says 'simulated' thr
   const budget = (where, s, w) => ok(words(s) <= w && sents(s) <= 2, where + ": " + words(s) + " words, " + sents(s) + " sentences (at most " + w + " and 2): " + s.slice(0, 70));
   ok(cards.count === 10, "ten step cards");
   for (let i = 0; i < cards.count; i++) { cards.go(i); budget("step " + (i + 1) + " text", stepText(), 36); ok(next() && (i === cards.count - 1 || next().disabled), "step " + (i + 1) + ": Next waits for the action"); }
-  const sawIs = (i, s) => { ok(!next().disabled && saw() === s, "step " + i + " (" + saw() + ")"); budget("step " + i + " result", saw(), 42); };
+  const sawIs = (i, s) => { ok(!next().disabled && saw() === s, "step " + i + " (" + saw() + ")"); budget("step " + i + " result", saw(), 36); };
   cards.go(0); card().querySelectorAll(".lx-choice")[2].click();
   sawIs(1, "Every number here is simulated, so the true effect on the 92 homes is known: −0.29 kW. Real studies never see this line; here it lets you score each method.");
   ok(/Simulated data: seed 78/.test(text(card().innerHTML)), "step 1: the chart is labelled simulated");
@@ -185,10 +210,11 @@ ok((TX.match(/[Ss]imulated/g) || []).length >= 6, "the page says 'simulated' thr
   { const sp = plotSpecs[plotSpecs.length - 1]; ok(sp.text.rows.length === 4 && sp.marks.length === 4 && sp.refs[0].y === truth, "step 5: the estimate ladder has four estimates and the truth"); }
   cards.go(5); card().querySelectorAll(".lx-seg button")[1].click();
   ok(next().disabled && /Look again/.test(saw()), "step 6: 'not parallel' is not accepted");
+  ok(/Each dot is that month's TOU–flat gap minus the month-12 gap: the change in the gap\. Zero means the gap stayed the same\./.test(text(card().innerHTML)), "step 6: what each dot is, said before the chart");
   card().querySelectorAll(".lx-seg button")[0].click();
-  sawIs(6, "Before month 13 every monthly gap stays within 0.04 kW of zero, inside its interval. Plausible, never proven: the after-period counterfactual is still unseen.");
+  sawIs(6, "Before month 13 the change in the gap stays within 0.04 kW of zero, inside every interval. Similar earlier trends support the comparison; they do not prove what would have happened after.");
   { const sp = plotSpecs.filter(x => x.text && x.text.head[0] === "Months from the start").pop();
-    ok(sp && sp.text.rows.length === 24 && sp.text.rows[11][2] === "reference" && sp.text.rows[0][0] === "Month 1 (−12)" && sp.text.rows[23][0] === "Month 24 (+11)", "step 6: the event study's text version, month 12 the reference"); }
+    ok(sp && sp.text.rows.length === 24 && sp.text.rows[11][2] === "reference" && sp.text.rows[0][0] === "Month 1 (−12)" && sp.text.rows[23][0] === "Month 24 (+11)" && sp.text.head[1] === "Change in the gap", "step 6: the event study's text version, month 12 the reference, the column named the change in the gap"); }
   cards.go(6); const sg7 = () => card().querySelectorAll(".lx-seg button");
   sg7()[1].click(); sg7()[2].click(); ok(next().disabled, "step 7: two threats are not enough");
   sg7()[3].click();
@@ -199,8 +225,12 @@ ok((TX.match(/[Ss]imulated/g) || []).length >= 6, "the page says 'simulated' thr
   cards.go(8); const sg9 = () => card().querySelectorAll(".lx-seg button");
   sg9()[1].click(); ok(next().disabled, "step 9: one threat is not enough");
   sg9()[2].click();
-  ok(/Claimed in all 14: 196 MW a year; the simulation's net change across all 30 regions: 76 MW a year\./.test(text(card().innerHTML)), "step 9: the border case's gross and net");
-  sawIs(9, "A boom shows in the years before 2021. Projects that moved across the border do not: they shrink the comparison group, so DiD reads 14.0 MW a year where the net change was 76 MW a year in all.");
+  { const rows = card().querySelectorAll("tbody tr").map(tr => text(tr.innerHTML));
+    ok(rows.length === 4 && rows[0] === "Claimed by DiD: 14 regions × 14.0196" && rows[1] === "Gross gain in the 14 adopting regions (14 × 10)140" && rows[2] === "of which moved from the 16 others (16 × 4)64" && rows[3] === "New across all 30 regions76", "step 9: the border case's accounting: 196 claimed; 140 gross, of which 64 moved; 76 new: " + rows.join(" | "));
+    ok(F.border.gross - F.border.lost === F.border.net && F.border.lost === -R.border * F.R.nOff, "the moved projects are inside the adopters' gross gain: 140 − 64 = 76"); }
+  ok(/Those projects are part of the adopters' \+10 MW/.test(text(card().innerHTML)), "step 9: the border threat says the moved projects are inside the adopters' gain");
+  sawIs(9, "A boom shows before 2021; moved projects do not. They shrink the comparison group, so DiD reads 14.0 MW a year a region, while 76 MW a year is new in all.");
+  sg9()[0].click(); ok(card().querySelectorAll("tbody tr").length === 0, "step 9: the accounting table shows only for the border case"); sg9()[2].click();
   { const sp = plotSpecs.filter(x => x.text && x.text.head[0] === "Year").pop(); ok(sp && sp.text.rows.length === 10 && sp.text.rows[4][2] === "reference" && sp.text.rows[4][0] === "2020", "step 9: the regions' event study, 2020 the reference"); }
   cards.go(9);
   { const segs = card().querySelectorAll(".m14-case .lx-seg"), kinds = Object.keys(D.kinds);

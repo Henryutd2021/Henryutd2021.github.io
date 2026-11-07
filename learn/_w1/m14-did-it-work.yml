@@ -20,5 +20,11 @@ glossary:
   - id: anticipation-effect
     term: Anticipation
     def: "When people change their behaviour before a programme starts because they know it is coming."
+  - id: control-variable
+    term: Control variable
+    def: "A measured trait, such as home size, put into a regression so that groups are compared at equal values of it; it cannot fix a difference nobody measured."
+  - id: dummy-variable
+    term: Dummy variable
+    def: "A 0/1 flag in a regression, such as 1 for a home on the tariff and 0 for one that is not; its coefficient is the fitted difference between the two groups."
 requests:
   - "M14 builds the curriculum row's play on simulated panels with known effects (W5 brief §4 and the task message), not on public data: the row's 'Use public data' (curriculum_v2.md §7.5, learn_map_v2.yml play) could read 'Use simulated panels with a known effect, then read a public study'. Real programme evidence comes from DOE's November 2016 consumer behaviour studies report (energy.gov)."
