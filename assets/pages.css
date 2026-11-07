@@ -517,6 +517,7 @@ body.page-folio main .chip { font-size: .78rem; padding: .16rem .6rem; color: va
 .page-teaching .lc-actions p { display: flex; flex-wrap: wrap; gap: .6rem; margin: 0; }
 .page-teaching .lc-principles { padding: 1.6rem 1.8rem; background: var(--accent-soft); border-left: 1px solid var(--accent-line); }
 .page-teaching .lc-principles > p:first-child { margin: 0 0 .6rem; }
+.page-teaching .lc-principles .label { color: var(--ink-2); }   /* AA on the tinted panel (muted grey was 4.4:1; 2026-11-07) */
 .page-teaching .lc-principles ol { margin: 0; padding-left: 1.2rem; display: grid; gap: .65rem; }
 .page-teaching .lc-principles li { font-size: .92rem; line-height: 1.6; color: var(--ink-2); }
 @media (max-width: 767.98px) {
