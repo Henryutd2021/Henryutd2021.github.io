@@ -36,7 +36,7 @@ toc: false
 </section>
 <section class="proj-sec proj-bounds" aria-labelledby="h-bounds">
 <h2 id="h-bounds"><i class="bi bi-exclamation-circle" aria-hidden="true"></i>Boundary conditions</h2>
-<p>No paper. The public framework is a fresh implementation tested on synthetic data; project data and results are not public.</p>
+<p>No paper. The public framework is a fresh implementation, tested on synthetic data and on a public benchmark of 264 ERCOT wind plants (ARPA-E PERFORM data, simulated plant power, 2018); project data and results are not public.</p>
 </section>
 </div>
 <div class="proj-aside" role="complementary" aria-label="Outputs and reproducibility">
@@ -44,12 +44,13 @@ toc: false
 <h2 id="h-outputs"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>Outputs</h2>
 <div class="out-btns">
 <a class="btn-solid" href="https://github.com/Henryutd2021/wind-uq-surrogate"><i class="bi bi-github" aria-hidden="true"></i>Model framework (GitHub)</a>
+<a class="btn-outline" href="https://github.com/Henryutd2021/wind-uq-surrogate/tree/main/case_studies/perform_ercot"><i class="bi bi-github" aria-hidden="true"></i>Public-data case study (GitHub)</a>
 <a class="btn-outline" href="https://github.com/Henryutd2021/mfgpr-wind-power-curve"><i class="bi bi-github" aria-hidden="true"></i>Related: MF-GPR power curves (GitHub)</a>
 </div>
 </section>
 <section class="aside-card" aria-labelledby="h-repro">
 <h2 id="h-repro"><i class="bi bi-arrow-repeat" aria-hidden="true"></i>Reproducibility</h2>
-<p>Method framework with documentation, examples and tests on GitHub; project materials archived privately.</p>
+<p>Method framework with documentation, examples, tests and a public-data case study on GitHub; project materials archived privately.</p>
 <p class="updated"><i class="bi bi-clock-history" aria-hidden="true"></i>Last updated 2026-11</p>
 </section>
 </div>

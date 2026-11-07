@@ -127,8 +127,8 @@ toc: false
 </section>
 <section class="aside-card" aria-labelledby="h-repro">
 <h2 id="h-repro"><i class="bi bi-arrow-repeat" aria-hidden="true"></i>Reproducibility</h2>
-<p>Model framework with documentation, examples and tests on GitHub; it runs on synthetic data and contains no market data. PJM market inputs require authorization from PJM under its Data Miner terms.</p>
-<p class="updated"><i class="bi bi-clock-history" aria-hidden="true"></i>Last updated 2026-10</p>
+<p>Model framework with documentation, examples and tests on GitHub. Since v1.1.0 it also includes the article&#x27;s 2024 PJM price inputs (hourly energy and ancillary-service prices) with their source, provenance and PJM&#x27;s terms of use; the other examples run on synthetic data.</p>
+<p class="updated"><i class="bi bi-clock-history" aria-hidden="true"></i>Last updated 2026-11</p>
 </section>
 </div>
 </div>
