@@ -218,20 +218,15 @@
           U.keys(act, [["From the library", "precomputed with this engine on " + LIB.date + ": 53 LPs a check, too slow for a click."], ["What moves", "spilled wind and solar is several times the slices' estimate: twelve-hour averages smooth the sunniest and windiest hours."]]);
           api.done(); api.saw(fullWords(e, n));
         } },
-      // 11 near-optimal plans
-      { text: "Many plans cost almost the same. Find the least and the most of one choice over every plan within a millionth of the least cost: two more LPs.",
+      // 11 near-optimal plans (precomputed: three LPs a choice are too slow for a phone click)
+      { text: "Many plans cost almost the same. Over every plan within a millionth of the least cost, how little and how much of each choice could be built? Two more LPs a choice.",
         build: function (act, api) {
-          var k = "solar", nm = {}; Object.keys(NEAR).forEach(function (x) { nm[x] = NEAR[x].label; });
-          U.seg(act, "Which choice", Object.keys(NEAR), nm, k, function (v) { k = v; run.changed({ k: v }); });
-          var run = runBox(act, api, "Find the range", function () { return { k: k }; }, function (st, ctx) {
-            var n = NEAR[st.k];
-            return E4.nearRange(P, DEF, E4.builtTerms(P, n.t, n.q), 1e-6, { signal: ctx.signal, solver: solver() }).then(function (r) { return r.ok ? { status: "optimal", ok: true, results: r } : { status: r.status, ok: false, message: r.message }; });
-          }, function (r, st, kp, res) {
-            kpi(kp, "Least", fix(r.lo / 1000, 2) + " GW"); kpi(kp, "Plan shown", fix(r.at / 1000, 2) + " GW"); kpi(kp, "Most", fix(r.hi / 1000, 2) + " GW");
-            S0.near = { r: r, label: NEAR[st.k].label };
-            api.done(); api.saw(nearWords(r, NEAR[st.k].label) + " Report what every near-optimal plan shares, or say which one you show.");
-          });
-          S0.runners.near = function () { run.run({ k: k }); };
+          var NR = P.cfg.precomputed && P.cfg.precomputed.m13near;
+          if (!NR) { H("p", { class: "lx-hint", text: "The ranges are not in this page's data." }, act); return; }
+          U.table(act, ["Choice", "Least", "The plan shown", "Most"], Object.keys(NEAR).map(function (k) { var r = NR.items[k]; return [NEAR[k].label, fix(r.lo / 1000, 2) + " GW", fix(r.at / 1000, 2) + " GW", fix(r.hi / 1000, 2) + " GW"]; }), "m13-near");
+          U.keys(act, [["Precomputed", "with this engine on " + NR.date + " for the central plan: six more LPs, too slow for a phone click."], ["Report", "what every near-optimal plan shares, or say which one you show; the notebook's practice task 4 runs it."]]);
+          S0.near = NR;
+          api.done(); api.saw(nearWords(NR.items.solar, NEAR.solar.label) + " Report what every near-optimal plan shares, or say which one you show.");
         } }];
     var cards = LX.StepCards(live, { steps: steps });
 
@@ -278,7 +273,7 @@
     LX.demo(root, function (s) {
       if (s === "mid") { cards.go(4); S0.runners.central(); return { view: "mid" }; }
       if (s === "step-8") { cards.go(7); S0.runners.myopic(); return { view: "mid" }; }
-      if (s === "step-11") { cards.go(10); S0.runners.near(); return { view: "mid" }; }
+      if (s === "step-11") { cards.go(10); return { view: "mid" }; }
       if (s === "fail") { cards.go(4); stub = "fail"; S0.runners.central(); return { view: "mid" }; }
       return null;
     }, cards);

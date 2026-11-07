@@ -141,7 +141,7 @@ body-classes: "page-learn page-lesson lx-form-sandbox"
 <li>$0.01 per GJ more for imported crude than domestic crude, so domestic crude is used first.</li>
 </ul>
 <p>Penalties keep every run solvable, and are never part of a cost: an unserved MWh at $10,000, a tonne over the budget at $1,000, a GJ over the import cap at $100, a MW short at a stress hour at $750,000 a year. A plan that cannot meet its budget shows by how much it misses.</p>
-<p>Plans within $1,000 of the best cost differ by under 10 MW in what they build: the plan shown is, in effect, the only best one. Plans within a millionth of the cost can differ by a gigawatt or more in 2045–2050: the model is nearly indifferent there (<a href="m13-national-pathway.html">M13</a>, step 9).</p>
+<p>Plans within $1,000 of the best cost differ by under 10 MW in what they build: the plan shown is, in effect, the only best one. Plans within a millionth of the cost can differ by a gigawatt or more in 2045–2050: the model is nearly indifferent there (<a href="m13-national-pathway.html">M13</a>, step 11).</p>
 ```
 
 ```{=html}

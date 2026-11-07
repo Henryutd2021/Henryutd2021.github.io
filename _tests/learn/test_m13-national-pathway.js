@@ -8,11 +8,11 @@
 //     the cost too; an out-of-reach budget's dual is the penalty); the straight line to zero out of reach at the most
 //     electrification (the prediction's answer) and the fuel left in 2050; decade by decade costs more than perfect
 //     foresight; each of C4's shocks re-planned; the full-year verdicts from the library (with and without the
-//     peak-hour rule; the page's "240 hours"); the near-optimal range of 2050 solar (at least a gigawatt wide, the plan
-//     shown inside it)
+//     peak-hour rule; the page's "240 hours"); the near-optimal ranges (precomputed into e4-pathways.json by --write and
+//     checked against fresh runs; 2050 solar at least a gigawatt wide, the plan shown inside each)
 //   - the page frame: sections, scripts, data-src, the notebook and its downloads, the fictional line; no reactor named,
 //     the firm option never called nuclear; no AI wording
-// --write: writes the marker blocks.
+// --write: writes the marker blocks and precomputed.m13near in e4-pathways.json.
 // Usage (from the site folder):  node _tests/learn/test_m13-national-pathway.js [--write]
 "use strict";
 const fs = require("fs");
@@ -24,7 +24,7 @@ const near = (a, b, t) => Math.abs(a - b) <= (t == null ? 1e-6 : t);
 const QPATH = path.join(X.SITE, "learn/m13-national-pathway.qmd");
 
 (async () => {
-  const { E4, PL, cfg, P, SS, S, L, solver } = await X.load();
+  const { E4, PL, cfg, P, SS, S, L, solver, J } = await X.load();
   const PG = require(L("m13-national-pathway.js"));
   const LIB = JSON.parse(fs.readFileSync(L("data/e4-library.json"), "utf8")), def = SS.defaults(S), rate = def.dr / 100;
   const lib = (pr, fs) => LIB.plans.find(e => e.preset === pr && e.foresight === fs);
@@ -79,9 +79,18 @@ const QPATH = path.join(X.SITE, "learn/m13-national-pathway.qmd");
   const maxH = Math.max(...n.full.map(c => c.unservedHours));
   ok(/all four checks survive/.test(w10) === e.full.every(c => c.unservedMWh < 0.5 && Math.abs(c.gap) <= 0.1) && w10.indexOf("up to " + PG.kilo(maxH) + " hours") >= 0, "step 10: the full-year verdicts as the library has them");
   ok(T.indexOf("unserved for up to " + maxH + " hours in 2024's weather") >= 0 && n.full.find(c => c.unservedHours === maxH).weather === "2024", "the check card's 240 hours is the library's (" + maxH + ", in 2024's weather)");
-  const nr = await E4.nearRange(P, def, E4.builtTerms(P, "solar", 4), 1e-6, { solver });
-  ok(nr.ok && nr.lo <= nr.at + 1e-3 && nr.at <= nr.hi + 1e-3 && nr.hi - nr.lo >= 1000, "step 11: within a millionth of the cost, 2050 solar runs from " + (nr.lo / 1000).toFixed(2) + " to " + (nr.hi / 1000).toFixed(2) + " GW (at least a gigawatt wide; the plan shown " + (nr.at / 1000).toFixed(2) + ")");
-  ok(PG.nearWords(nr, "solar in 2050").indexOf(PG.fix(nr.lo / 1000, 2) + " and " + PG.fix(nr.hi / 1000, 2) + " GW") >= 0, "step 11's words as run");
+  // step 11's near-optimal ranges: precomputed (six LPs, too slow for a phone click), written by --write into
+  // e4-pathways.json precomputed.m13near and checked against fresh runs
+  const NRw = { date: LIB.date, share: 1e-6, plan: "central", items: {} };
+  for (const k of Object.keys(PG.NEAR)) { const n = PG.NEAR[k], r = await E4.nearRange(P, def, E4.builtTerms(P, n.t, n.q), 1e-6, { solver });
+    ok(r.ok, "near-optimal " + k + ": optimal"); NRw.items[k] = { lo: E4.rd(r.lo, 1), hi: E4.rd(r.hi, 1), at: E4.rd(r.at, 1), slack: E4.rd(r.slack, 3), objective: E4.rd(r.objective, 1) }; }
+  if (process.argv.includes("--write")) { const d = J("e4-pathways.json"); d.precomputed = Object.assign({}, d.precomputed, { m13near: NRw }); fs.writeFileSync(L("data/e4-pathways.json"), JSON.stringify(d, null, 1) + "\n"); console.log("wrote precomputed.m13near"); }
+  const NR = J("e4-pathways.json").precomputed.m13near;
+  ok(JSON.stringify(NR) === JSON.stringify(NRw), "the precomputed near-optimal ranges equal fresh runs (--write after a change)");
+  const ns = NR.items.solar;
+  ok(ns.lo <= ns.at + 0.1 && ns.at <= ns.hi + 0.1 && ns.hi - ns.lo >= 1000, "step 11: within a millionth of the cost, 2050 solar runs from " + (ns.lo / 1000).toFixed(2) + " to " + (ns.hi / 1000).toFixed(2) + " GW (at least a gigawatt wide; the plan shown " + (ns.at / 1000).toFixed(2) + ")");
+  ok(PG.nearWords(ns, "solar in 2050").indexOf(PG.fix(ns.lo / 1000, 2) + " and " + PG.fix(ns.hi / 1000, 2) + " GW") >= 0 && /with this engine on " \+ NR\.date/.test(JS), "step 11's words as precomputed, labelled with the date");
+  ok(Object.keys(NR.items).every(k => NR.items[k].lo <= NR.items[k].at + 0.1 && NR.items[k].at <= NR.items[k].hi + 0.1), "every range holds the plan shown");
 
   // ---------------- the page frame
   ["steps", "explain", "check", "sources"].forEach(id => ok(new RegExp("::: \\{#" + id + " \\.lx-sec\\}").test(PAGE), "section #" + id));

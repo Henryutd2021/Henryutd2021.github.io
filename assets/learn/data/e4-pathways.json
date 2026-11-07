@@ -169,7 +169,36 @@
    }
   }
  ],
- "precomputed": {},
+ "precomputed": {
+  "m13near": {
+   "date": "7 November 2026",
+   "share": 0.000001,
+   "plan": "central",
+   "items": {
+    "solar": {
+     "lo": 6501.3,
+     "hi": 7701.2,
+     "at": 7082.3,
+     "slack": 0.402,
+     "objective": 401828.9
+    },
+    "gasCC": {
+     "lo": 6383.3,
+     "hi": 7621.6,
+     "at": 7339.5,
+     "slack": 0.402,
+     "objective": 401828.9
+    },
+    "wind": {
+     "lo": 12490.7,
+     "hi": 12649.2,
+     "at": 12500,
+     "slack": 0.402,
+     "objective": 401828.9
+    }
+   }
+  }
+ },
  "stress": [
   {
    "key": "peak",
