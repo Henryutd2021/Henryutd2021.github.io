@@ -230,7 +230,7 @@ body.page-learn.quarto-dark { --f2-tech: #7CA6EE; --f2-cost: #E2A445; --f2-env: 
 
 Many slow, hard questions are questions about stocks.
 
-- **Equipment.** Power plants, buildings, cars and boilers last for decades, so today's choices stay in the stock long after: new purchases are the inflow, retirements the outflow. National pathways track this (Analyst lesson A20, Modeler lesson M13, upcoming).
+- **Equipment.** Power plants, buildings, cars and boilers last for decades, so today's choices stay in the stock long after: new purchases are the inflow, retirements the outflow. National pathways track this (Modeler lesson [M13](m13-national-pathway.html); Analyst lesson A20, upcoming).
 - **Fuel.** Gas in storage and emergency oil stocks buffer a supply shock (Analyst lesson A21, upcoming).
 - **Stored energy.** Reservoirs and batteries move energy in time ([lesson 9](09-storage.html); Analyst lesson [A8](a08-storage-duration.html)).
 - **Cumulative CO₂ emissions.** Warming tracks them: the IPCC's best estimate is 0.45 °C for each 1,000 Gt of CO₂ (Gt = billion tonnes; likely 0.27 to 0.63 °C).

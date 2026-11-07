@@ -35,7 +35,7 @@ const code = s => s.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:"'])\/\/.*$/
     ok(bundleJS.indexOf(js.trim()) > 0 && bundleCSS.indexOf(css.trim()) > 0, `${n}: in learn.js and learn.css as written`);
   });
   const head = bundleJS.split("\n")[0];
-  ok(/engine-e1, ledger, solvestep, sankey(, engine-e2)?(, adequacy, gp, plainsplan, scenario)?(, lifebox, siting, whopays)?(, engine-e3)?\)/.test(head), "bundle order: ledger, solvestep and sankey after the W3 engines (W4's engine-e2, then the W4 promotions, then the W5 promotions and engine E3, may follow) (" + head.slice(-60) + ")");
+  ok(/engine-e1, ledger, solvestep, sankey(, engine-e2)?(, adequacy, gp, plainsplan, scenario)?(, lifebox, siting, whopays)?(, engine-e3)?(, engine-e4)?\)/.test(head), "bundle order: ledger, solvestep and sankey after the W3 engines (W4's engine-e2, then the W4 promotions, then the W5 promotions and engine E3, then W6's engine E4, may follow) (" + head.slice(-60) + ")");
 
   // ---------------------------------------------------------------- LX.Ledger
   {
