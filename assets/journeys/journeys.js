@@ -69,7 +69,7 @@
       const y = t.getAttribute("data-year");
       tip.innerHTML = "<strong>" + esc(t.getAttribute("data-name")) + "</strong>" +
         (t.classList.contains("is-homeland") ? "Home province" :
-         y ? "First visit " + esc(y) + (t.classList.contains("is-draft") ? " (passed through)" : "") : "Not yet");
+         y ? "First visit " + esc(y) : "Not yet");
       tip.hidden = false;
       const fr = fig.getBoundingClientRect(), tr = t.getBoundingClientRect();
       const tw = tip.offsetWidth, th = tip.offsetHeight;
@@ -658,7 +658,7 @@
     }
     function transitTag(e, pid) {
       if (!(e.tr || []).includes(pid)) return "";
-      return '<span class="jr-tag">' + ((e.ne || []).includes(pid) ? "transit, no entry" : "transit") + "</span>";
+      return '<span class="jr-tag">transit</span>';
     }
     function placeCard(pid, visits) {
       const p = D.places[pid];
@@ -682,7 +682,7 @@
       return '<p class="jr-c-kind">Journey · ' + esc(kinds) + "</p>" +
         '<h3 id="jr-card-h" class="jr-c-date">' + icons(modesOf(e)) + esc(e.w) + "</h3>" +
         '<p class="jr-c-text">' + esc(e.t) + "</p>" + (st ? '<p class="jr-c-badges">' + st + "</p>" : "") +
-        '<p class="jr-c-note">' + esc(chapterOf[e.ch].n) + " years · approximate route, about " + (Math.round(km / 10) * 10).toLocaleString("en-US") + " km</p>";
+        '<p class="jr-c-note">' + esc(chapterOf[e.ch].n) + " years · about " + (Math.round(km / 10) * 10).toLocaleString("en-US") + " km</p>";
     }
     function openCard(m, viaKeyboard) {
       openKey = m.key;
