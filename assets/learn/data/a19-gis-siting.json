@@ -506,7 +506,7 @@
    "asOf": "read 6 November 2026"
   },
   "lbnl-pv": {
-   "text": "Bolinger, M., and Bolinger, G. (2022). Land Requirements for Utility-Scale PV: An Empirical Update on Power and Energy Density. IEEE Journal of Photovoltaics. Webinar slides, Lawrence Berkeley National Laboratory, 1 February 2022 (PDF): 2019 medians, 4.2 acres per MW (DC) for single-axis tracking arrays, slide 13; DC:AC ratio 1.29 for 2019 tracking plants, slide 8; array area, not the whole site, slide 7.",
+   "text": "Bolinger, M., and Bolinger, G. (2022). Land Requirements for Utility-Scale PV: An Empirical Update on Power and Energy Density. IEEE Journal of Photovoltaics. Webinar slides, Lawrence Berkeley National Laboratory, 1 February 2022 (PDF): 2019 medians, 4.2 acres per MW (DC) for single-axis tracking arrays, slide 13; DC:AC ratio 1.29 for 2019 tracking plants, slide 8 (the sample table: 66 single-axis tracking plants that came online in 2019, 4,406 MW DC over 3,419 MW AC, the ratio of the year's summed capacities); array area, not the whole site, slide 7.",
    "url": "https://emp.lbl.gov/sites/default/files/emp-files/land_requirements_for_utility-scale_pv.pdf",
    "doi": "https://doi.org/10.1109/JPHOTOV.2021.3136805",
    "asOf": "slides of 1 February 2022; read 6 November 2026"
@@ -934,13 +934,14 @@
    "draws": 500,
    "seed": 19,
    "wins": {
-    "A": 123,
+    "A": 82,
     "B": 0,
     "C": 4,
-    "D": 69,
+    "D": 0,
     "E": 0
    },
-   "other": 304
+   "other": 414,
+   "near": 110
   },
   "coarse": {
    "eligibleKm2": 888.6875,

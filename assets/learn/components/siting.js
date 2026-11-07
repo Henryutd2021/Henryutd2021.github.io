@@ -19,13 +19,18 @@
      A19.suitability(R, D, type, cfg)   per-cell weighted overlay, 0..1 (NaN where excluded)
      A19.blocks(R, D, type, cfg)        every block of the type's size that has room: { i, j, k, B, m: {key: mean} }
      A19.sites(R, D, type, cfg, n)      the n best blocks that do not overlap: [{ id: "A".., i, j, k, score, ... }]
-                                        (tie rule: higher score first; equal scores: the more northern, then western)
+                                        (tie rule: higher score first; equal scores: the more northern, then western).
+                                        Every weight 0: no ranking, [] with .noWeights = true (W5 fix, 2026-11-06)
      A19.surface(R, D, { protected })   cost surface, $ per km of new line ("forbid" makes protected land impassable)
      A19.paths(R, D, surf, needMW)      multi-source Dijkstra from substations with that much room: { dist, pred, src }
      A19.route(R, P, cell)              the least-cost path from a cell: { cells, km, cost, sub, parts }
      A19.cost(R, D, type, site, cfg, P) a site's costs (2025 dollars): { land, connect, road, water, upfront, cf, mwh, sub }
-     A19.shares(R, D, type, cfg, sites, draws, seed)  how often each site wins under random weights
-     A19.need(D, type), A19.place(R, i, j, k), A19.cellText(R, n)   helpers
+     A19.shares(R, D, type, cfg, sites, draws, seed)  how often each site is the winning block under random weights:
+                                        { wins (the very same block; W5 fix: was "a winner that overlaps it"), other
+                                        (any other block), near (of those, winners that overlap a site) }
+     A19.need(D, type), A19.place(R, i, j, k), A19.cellText(R, n)   helpers (cellText names a substation and the
+                                        lines in a cell, from A19.gridAt(R, n))
+     A19.gridRows(R)                    the grid layer as text: each substation's place, spare MW and lines
      A19.withCity(D, PC)                D with Prairie City's shared numbers filled in (PC = data/prairie-city.json): the
                                         data-center campus's MW is PC.dataCenter.contractMW, read here, never typed in D;
                                         call it first (the lesson, its test, C3)
@@ -356,6 +361,8 @@
   function sites(R, D, type, c, n, X, CR, BL) {
     CR = CR || criteria(R, D, type, c); X = X || exclude(R, D, type, c);
     BL = BL || blocks(R, D, type, c, X, CR);
+    // every weight 0: every score is 0 and only the tie rule would rank, so there is no short list
+    if (!(wsum(c.weights, CR.keys) > 0)) { var none = []; none.qualifying = BL.length; none.ranked = []; none.noWeights = true; return none; }
     var ranked = BL.map(function (bl) { return Object.assign({ score: blockScore(bl, c.weights, CR.keys) }, bl); });
     ranked.sort(function (a, b) { return better(a, b) ? -1 : better(b, a) ? 1 : 0; });
     var pick = [], gap = D.types[type].gap || 0;
@@ -460,7 +467,7 @@
     return { cells: cells, km: km, cost: P.dist[cell], sub: R.D.substations[P.src[cell]].id, parts: parts };
   }
 
-  // ---------------------------------------------------------------- a site's costs (2022 dollars) and energy
+  // ---------------------------------------------------------------- a site's costs (2025 dollars) and energy
   function cost(R, D, type, site, c, P, cft) {
     var T = D.types[type], K = D.costs, out = { type: type };
     var rt = P ? route(R, P, site.cell) : null;
@@ -478,9 +485,11 @@
   }
 
   // ---------------------------------------------------------------- weight sensitivity: random weights, uniform on the simplex
+  // A draw counts for a site only when its best block is that very block; a winner that merely overlaps a site (a block
+  // a cell or two away) counts as another block, and is tallied in `near` too.
   function shares(R, D, type, c, top, draws, seed, BL, CR) {
     CR = CR || criteria(R, D, type, c); BL = BL || blocks(R, D, type, c, null, CR);
-    var keys = CR.keys, K = keys.length, rng = mb(seed >>> 0), tally = {}, other = 0;
+    var keys = CR.keys, K = keys.length, rng = mb(seed >>> 0), tally = {}, other = 0, near = 0;
     top.forEach(function (s) { tally[s.id] = 0; });
     for (var d = 0; d < draws; d++) {
       var u = []; for (var z = 0; z < K - 1; z++) u.push(rng());
@@ -493,10 +502,59 @@
         var cand = { score: blockScore(BL[q], w, keys), i: BL[q].i, j: BL[q].j, k: BL[q].k };
         if (!best || better(cand, best)) best = cand;
       }
-      var hit = best && top.filter(function (s) { return overlap(s, best); })[0];
-      if (hit) tally[hit.id]++; else other++;
+      var hit = best && top.filter(function (s) { return s.i === best.i && s.j === best.j; })[0];
+      if (hit) tally[hit.id]++;
+      else { other++; if (best && top.some(function (s) { return overlap(s, best); })) near++; }
     }
-    return { draws: draws, seed: seed, wins: tally, other: other };
+    return { draws: draws, seed: seed, wins: tally, other: other, near: near };
+  }
+
+  // ---------------------------------------------------------------- the grid layer as text
+  // Each cell's grid features: the substation in it and the lines that cross it (straight segments between substations,
+  // or from a substation to the map's edge, sampled every 0.01 km). Cached on the region.
+  // a line to the map's edge is named by its compass direction from the substation (north-east, east, ...)
+  function edgeDir(D, l) {
+    var a = D.substations.filter(function (s) { return s.id === l.from; })[0], dx = l.to[0] - a.x, dy = l.to[1] - a.y, d = Math.sqrt(dx * dx + dy * dy);
+    var ns = dy < -0.4 * d ? "north" : dy > 0.4 * d ? "south" : "", ew = dx > 0.4 * d ? "east" : dx < -0.4 * d ? "west" : "";
+    return ns && ew ? ns + "-" + ew : ns || ew;
+  }
+  function lineName(D, l) { return typeof l.to === "string" ? l.from + "–" + l.to : l.from + " to the regional grid (" + edgeDir(D, l) + ")"; }
+  function gridCells(R) {
+    var D = R.D, out = [], byId = {}, k = R.cellKm;
+    for (var n = 0; n < R.N; n++) out.push({ sub: null, lines: [] });
+    D.substations.forEach(function (s) { byId[s.id] = s; out[Math.floor(s.y / k) * R.W + Math.floor(s.x / k)].sub = s; });
+    D.lines.forEach(function (l) {
+      var a = byId[l.from], b = typeof l.to === "string" ? byId[l.to] : { x: l.to[0], y: l.to[1] }, name = lineName(D, l);
+      var steps = Math.ceil(Math.sqrt((b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y)) / 0.01);
+      for (var z = 0; z <= steps; z++) {
+        var x = a.x + (b.x - a.x) * z / steps, y = a.y + (b.y - a.y) * z / steps;
+        var i = Math.min(R.W - 1, Math.floor(x / k)), j = Math.min(R.H - 1, Math.floor(y / k)), c = out[j * R.W + i];
+        if (c.lines.indexOf(name) < 0) c.lines.push(name);
+      }
+    });
+    return out;
+  }
+  function gridAt(R, n) { if (!R.gridCache) R.gridCache = gridCells(R); return R.gridCache[n]; }
+  // one row per substation: id, name, where (from the centre), spare MW, and where its lines go
+  function gridRows(R) {
+    var D = R.D;
+    return D.substations.map(function (s) {
+      var to = [], edge = 0;
+      D.lines.forEach(function (l) {
+        if (l.from === s.id) { if (typeof l.to === "string") to.push(l.to); else edge++; }
+        else if (l.to === s.id) to.push(l.from);
+      });
+      var uniq = to.filter(function (t, x) { return to.indexOf(t) === x; });
+      if (edge) uniq.push("regional grid (" + edge + (edge > 1 ? " lines)" : " line)"));
+      var k = R.cellKm;
+      return { id: s.id, name: s.name, where: place(R, Math.floor(s.x / k), Math.floor(s.y / k), 1), spareMW: s.headroomMW, to: uniq };
+    });
+  }
+  function gridWords(R, n) {
+    var g = gridAt(R, n), out = [];
+    if (g.sub) out.push("substation " + g.sub.id + " (" + g.sub.name + "), " + g.sub.headroomMW + " MW spare");
+    if (g.lines.length) out.push("crossed by the line" + (g.lines.length > 1 ? "s " : " ") + g.lines.join(", "));
+    return out;
   }
 
   // ---------------------------------------------------------------- words
@@ -513,11 +571,12 @@
     bits.push("wind " + R.wind[n].toFixed(1) + " m/s");
     bits.push("sun " + R.sun[n].toFixed(2) + " kWh/m² a day");
     bits.push("land $" + Math.round(R.land[n] / 100) * 100 + " an acre");
-    return "Cell " + place(R, i, j, 1) + " of the centre: " + bits.join(", ") + ".";
+    return "Cell " + place(R, i, j, 1) + " of the centre: " + bits.concat(gridWords(R, n)).join(", ") + ".";
   }
 
   var A19 = { build: build, coarsen: coarsen, cfg: cfg, exclude: exclude, criteria: criteria, suitability: suitability, need: need, blocks: blocks,
     blockScore: blockScore, sites: sites, surface: surface, paths: paths, route: route, cost: cost, shares: shares, place: place, cellText: cellText,
+    gridAt: gridAt, gridRows: gridRows, gridWords: gridWords,
     REASONS: REASONS, riverY: riverY, floodHalf: floodHalf, ridgeX: ridgeX, roadDist: roadDist, subDist: subDist, noise: noise, fbm: fbm, lattice: lattice,
     ACRES_PER_KM2: ACRES_PER_KM2, KM_PER_MILE: KM_PER_MILE, overlap: overlap, connCell: connCell, needMW: needMW, usd: usd, withCity: withCity };
   if (typeof module !== "undefined" && module.exports) module.exports = A19;
@@ -533,9 +592,12 @@
               R (another region, e.g. coarsened), suit (Float64Array 0..1, NaN where excluded), X (exclude()'s result: hatch
               the excluded cells, by kind; shade cells cut by setbacks), sites ([{ id, i, j, k, label }]; label replaces the
               letter), sitesKey (the legend's words for them), sel (a site id), ghost ({ i, j, k, label, key }: a dashed
-              block, e.g. where a site was before a change), path ([cells]), homes (true: draw the homes) }
+              block, e.g. where a site was before a change), path ([cells]), homes (true: draw the homes),
+              grid (true: show the substations table, the grid layer's text version, in a closed details box; the "grid"
+              layer shows it open) }
      Site letters go to the first free place (inside a large block, above, beside, below) that covers no substation,
-     the city's name or another letter. */
+     the city's name or another letter. The SVG is hidden from screen readers; its text versions are the line under the
+     map (the cell under the cursor, with any substation and line in it) and the substations table. */
   LX.SiteMap = function (host, o) {
     var R0 = o.R, D = o.D, uid = "a19m" + Math.floor(Math.random() * 1e6);
     var wrap = H("div", { class: "a19-map" }, host);
@@ -553,8 +615,21 @@
     var gSites = S("g", { class: "a19-sites" }, svg), gPath = S("g", { class: "a19-path" }, svg), gLab = S("g", { class: "a19-labs" }, svg);
     var cur = S("rect", { class: "a19-cur", width: VB, height: VB, x: 0, y: 0, visibility: "hidden" }, svg);
     var legend = H("div", { class: "a19-legend" }, wrap);
+    // the grid layer as text: one row per transmission substation, in a details box (open with the grid layer; shown
+    // but closed when a step asks for it with grid: true)
+    var gbox = H("details", { class: "a19-gbox" }, wrap);
+    (function gridTable() {
+      H("summary", { class: "a19-gcap", text: "Substations and lines, the grid layer as text (km from the city centre)" }, gbox);
+      var t = H("table", { class: "a19-gtbl" }, H("div", { class: "lx-scroll-x" }, gbox)), tr = H("tr", null, H("thead", null, t)), tb = H("tbody", null, t);
+      ["Substation", "Where", "Spare capacity", "Lines to"].forEach(function (h) { H("th", { scope: "col", text: h }, tr); });
+      A19.gridRows(R0).forEach(function (g) {
+        var row = H("tr", null, tb); H("th", { scope: "row", text: g.id + " " + g.name }, row);
+        [g.where, g.spareMW + " MW", g.to.join(", ")].forEach(function (c, x) { H("td", { class: x < 2 ? "a19-gnw" : null, text: c }, row); });
+      });
+    })();
+    gbox.hidden = true;
     var live = H("p", { class: "a19-cell", "aria-live": "polite", text: "Tap a cell, or focus the map and use the arrow keys, to read what is there." }, wrap);
-    var st = { layer: "base" }, R = R0, curN = null, cellEls = [], suitRange = null;
+    var st = { layer: "base" }, R = R0, curN = null, cellEls = [], suitRange = null, lastLayer = null;
 
     // features that do not change: river, roads, lines, substations, the city's districts
     (function features() {
@@ -708,6 +783,9 @@
         S("polyline", { points: pts.join(" "), class: "a19-route" }, gPath);
       }
       drawLegend(layer, R);
+      gbox.hidden = !(layer === "grid" || st.grid);
+      if (layer === "grid" && lastLayer !== "grid") gbox.open = true;   // the grid layer opens its text version
+      lastLayer = layer;
       if (curN != null && curN >= R.N) curN = null;
       cursor(curN);
     }
@@ -724,7 +802,7 @@
     }
     function cellTextCoarse(Rc, n) {
       var i = n % Rc.W, j = (n - i) / Rc.W;
-      return "Cell (2 km) " + place(Rc, i, j, 1) + " of the centre: slope " + Rc.slope[n].toFixed(1) + "% on average, sun " + Rc.sun[n].toFixed(2) + " kWh/m² a day, land $" + Math.round(Rc.land[n] / 100) * 100 + " an acre.";
+      return "Cell (2 km) " + place(Rc, i, j, 1) + " of the centre: " + ["slope " + Rc.slope[n].toFixed(1) + "% on average", "sun " + Rc.sun[n].toFixed(2) + " kWh/m² a day", "land $" + Math.round(Rc.land[n] / 100) * 100 + " an acre"].concat(A19.gridWords(Rc, n)).join(", ") + ".";
     }
     fig.addEventListener("keydown", function (e) {
       var d = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[e.key];
