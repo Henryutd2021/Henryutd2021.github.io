@@ -97,7 +97,7 @@ One repository per framework, each with the paper or papers it accompanies.
 
 ::: {.repo-grid}
 
-<!-- NPPH2 (2026-11-02; published by Henry with scripts/henry_release_npph2_2026-11-02.sh; no PJM data) -->
+<!-- NPPH2 (2026-11-02, v1.0.0; v1.1.0 2026-11-07 adds the article's 2024 PJM price inputs, scripts/henry_release_npph2_pjm_2026-11-07.sh) -->
 ::: {.repo .theme-hydrogen}
 ::: {.repo-top}
 [<i class="bi bi-droplet-half" aria-hidden="true"></i>]{.repo-icon} [Hydrogen systems]{.repo-theme} [Hourly MILP and lifecycle TEA]{.repo-type}
@@ -107,7 +107,7 @@ One repository per framework, each with the paper or papers it accompanies.
 
 [Henryutd2021/nuclear-hydrogen-integration]{.repo-slug}
 
-Hourly operation and sizing of a nuclear plant with high-temperature electrolysis, hydrogen storage and batteries, selling energy, hydrogen and ancillary services, linked to a lifecycle cash-flow model with federal tax credits. Runs on synthetic data; PJM market inputs require authorization from PJM.
+Hourly operation and sizing of a nuclear plant with high-temperature electrolysis, hydrogen storage and batteries, selling energy, hydrogen and ancillary services, linked to a lifecycle cash-flow model with federal tax credits. Includes the article's 2024 PJM price inputs (PJM data, under PJM's terms of use); the other examples run on synthetic data.
 
 ::: {.repo-papers}
 [Accompanies]{.label}
@@ -122,6 +122,7 @@ Hourly operation and sizing of a nuclear plant with high-temperature electrolysi
 ::: {.repo-actions}
 [<i class="bi bi-github" aria-hidden="true"></i> GitHub](https://github.com/Henryutd2021/nuclear-hydrogen-integration){.btn-outline .btn-sm-x}
 [<i class="bi bi-journal-text" aria-hidden="true"></i> Formulation](https://github.com/Henryutd2021/nuclear-hydrogen-integration/blob/main/docs/formulation.md){.btn-quiet}
+[<i class="bi bi-table" aria-hidden="true"></i> PJM 2024 data](https://github.com/Henryutd2021/nuclear-hydrogen-integration/tree/main/data/pjm){.btn-quiet}
 :::
 :::
 
@@ -306,7 +307,7 @@ Supply-chain facility location with on-site microgrids; virtual power plant sche
 
 [Henryutd2021/wind-uq-surrogate]{.repo-slug}
 
-Uncertainty metrics of a wind power model's inputs, calibrated uncertainty targets at observed plants, and surrogate models validated on held-out plants, for plant-level power uncertainty where no measurements exist.
+Uncertainty metrics of a wind power model's inputs, calibrated uncertainty targets at observed plants, and surrogate models validated on held-out plants, for plant-level power uncertainty where no measurements exist. Since v1.1.0, a public-data case study of 264 ERCOT wind plants (ARPA-E PERFORM, simulated plant power).
 
 ::: {.repo-papers}
 [Accompanies]{.label}
@@ -321,6 +322,7 @@ Uncertainty metrics of a wind power model's inputs, calibrated uncertainty targe
 ::: {.repo-actions}
 [<i class="bi bi-github" aria-hidden="true"></i> GitHub](https://github.com/Henryutd2021/wind-uq-surrogate){.btn-outline .btn-sm-x}
 [<i class="bi bi-journal-text" aria-hidden="true"></i> Metrics](https://github.com/Henryutd2021/wind-uq-surrogate/blob/main/docs/metrics.md){.btn-quiet}
+[<i class="bi bi-bar-chart" aria-hidden="true"></i> Case study](https://github.com/Henryutd2021/wind-uq-surrogate/tree/main/case_studies/perform_ercot){.btn-quiet}
 :::
 :::
 
