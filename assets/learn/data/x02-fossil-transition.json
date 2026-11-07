@@ -18,10 +18,10 @@
     "nodes": [
       { "id": "lng", "g": "fossil", "label": "LNG", "lines": ["LNG"], "at": [0, 0], "atN": [0, 0], "text": "Gas cooled to −260 °F until liquid, about 600 times smaller, so ships can carry it; the U.S. exported {lngBcfd} [[bcf|Bcf]] a day in 2025, {lngShare} of world LNG exports.", "open": "How long do exporters and buyers commit to each other?" },
       { "id": "gasnet", "g": "fossil", "label": "Gas networks", "lines": ["Gas", "networks"], "at": [1, 0], "atN": [1, 0], "text": "Pipes carry gas to power plants ({gasPower} of U.S. gas use in {gasYear}), industry ({gasIndustry}) and homes: {gasHomes} of U.S. homes use gas.", "open": "Who pays for pipes built to last decades if customers switch?" },
-      { "id": "gaspower", "g": "fossil", "label": "Gas power plants", "lines": ["Gas power", "plants"], "at": [2, 0], "atN": [1, 1], "text": "They made {gasShare} of U.S. utility-scale electricity in 2025, emitting {co2gas} lb of CO₂ per kWh burned against coal's {co2coal} (2023).", "open": "A bridge to a cleaner system, or a lock-in?" },
-      { "id": "oil", "g": "fossil", "label": "Oil and fuels", "lines": ["Oil and", "fuels"], "at": [3, 0], "atN": [0, 1], "text": "About {oilPrimary} of U.S. primary energy in 2025; {oilTransport} of the petroleum used in 2022 went to transport.", "open": "How exposed is an importer whose oil arrives through one sea route?" },
+      { "id": "gaspower", "g": "fossil", "label": "Gas power plants", "lines": ["Gas power", "plants"], "at": [2, 0], "atN": [1, 1], "text": "They made {gasShare} of U.S. utility-scale electricity in 2025, emitting {co2gas} lb of CO₂ per kWh of electricity generated against coal's {co2coal} (2023, burning only).", "open": "A bridge to a cleaner system, or a [[lock-in|lock-in]]?" },
+      { "id": "oil", "g": "fossil", "label": "Oil and fuels", "lines": ["Oil and", "fuels"], "at": [3, 0], "atN": [0, 1], "text": "About {oilPrimary} of U.S. [[primary-energy|primary energy]] in 2025; {oilTransport} of the petroleum used in 2022 went to transport.", "open": "How exposed is an importer whose oil arrives through one sea route?" },
       { "id": "co2", "g": "air", "label": "CO₂ in the air", "lines": ["CO₂ in", "the air"], "at": [1.5, 1], "atN": [0.5, 2], "text": "Energy use emitted {co2Gt} of CO₂ worldwide in 2025.", "open": "Each part of the map adds to it, keeps some out, or takes some back." },
-      { "id": "ccs", "g": "carbon", "label": "Carbon capture (CCS)", "lines": ["Carbon", "capture"], "at": [0, 1], "atN": [0, 3], "text": "Captures CO₂ at a chimney or a gas-processing plant, to store it underground or use it: {ccsMt} a year of capture capacity worldwide, two-thirds at gas processing.", "open": "Can it grow from millions of tonnes toward billions?" },
+      { "id": "ccs", "g": "carbon", "label": "Carbon capture (CCS)", "lines": ["Carbon", "capture"], "at": [0, 1], "atN": [0, 3], "text": "Captures CO₂ at a chimney or a gas-processing plant and stores it deep underground; CO₂ that is used instead may be released again. Capacity worldwide: {ccsMt} a year.", "open": "Can it grow from millions of tonnes toward billions?" },
       { "id": "coal", "g": "fossil", "label": "Coal plants", "lines": ["Coal", "plants"], "at": [3, 1], "atN": [1, 3], "text": "They made {coalShare} of U.S. utility-scale electricity in 2025; owners planned to retire {planned} that year and {retired} retired.", "open": "When does a plant close, who decides, and who carries what is left?" },
       { "id": "cdr", "g": "carbon", "label": "Carbon removal (CDR)", "lines": ["Carbon", "removal"], "at": [0, 2], "atN": [0, 4], "text": "Takes CO₂ out of the air into trees, soils, rock or minerals; IPCC compares a dozen methods.", "open": "How long does it stay stored, and how is it measured?" },
       { "id": "mines", "g": "fossil", "label": "Coal mines and towns", "lines": ["Mines and", "towns"], "at": [3, 2], "atN": [1, 4], "text": "U.S. mines produced {mmst} million short tons in 2024 with an average of {employees} employees.", "open": "What replaces the jobs and the tax base where coal pays for schools and roads?" }
@@ -36,15 +36,15 @@
     "answer": "third"
   },
   "gasNet": {
-    "perCustomer": 500, "unit": "a year", "min": 0, "max": 0.6, "step": 0.05, "start": 0, "need": 0.3,
+    "perCustomer": 500, "unit": "a year", "min": 0, "max": 0.6, "step": 0.05, "start": 0, "need": 0.05,
     "assume": [
-      { "key": "keep", "label": "No pipe retired", "avoid": 0, "line": "The whole network stays, so its cost is shared by fewer customers." },
+      { "key": "keep", "label": "No pipe retired", "avoid": 0, "line": "The whole network stays, so the customers who remain share its whole assumed cost." },
       { "key": "retire", "label": "Pipes to leavers retired", "avoid": 0.5, "line": "Half of the leavers' share of the cost is avoided by retiring the pipes that served them." }
     ],
-    "set": "teaching: one network cost of $500 per customer a year, split equally, and the share of a leaver's cost that retiring pipes avoids (0 or 50%); not a real utility's numbers",
+    "set": "teaching: one network cost of $500 per customer a year, split equally among the customers who stay, and the share of a leaver's cost that retiring pipes avoids (0 or 50%); not a real utility's numbers",
     "src": "lbnl-2018"
   },
-  "book": { "life": 40, "min": 10, "max": 40, "step": 5, "start": 25, "set": "teaching: straight-line recovery over a 40-year book life; real plants follow their regulators' and owners' schedules" },
+  "book": { "life": 40, "min": 10, "max": 40, "step": 5, "start": 25, "set": "teaching: the building cost recovered evenly (straight line) over a 40-year book life; real plants follow their regulators' and owners' schedules" },
   "predictCcs": {
     "q": "A coal plant that captures 90% of its CO₂: carbon removal",
     "options": [{ "value": "yes", "label": "Yes: the CO₂ is stored underground" }, { "value": "no", "label": "No: it cuts its emissions but takes none out of the air" }, { "value": "ten", "label": "Only if stored for 10,000 years" }],
@@ -57,12 +57,15 @@
   },
   "cdr": {
     "title": "Six ways to remove carbon, compared",
-    "note": "Cost: U.S. dollars per tonne of CO₂, IPCC's author-judgement ranges from studies in different dollar years, not adjusted to one year. Potential: billions of tonnes a year that the literature finds possible, not today's scale.",
+    "note": "Cost: U.S. dollars per tonne of CO₂, IPCC's author-judgement ranges from studies in different dollar years, not adjusted to one year. A low end below zero is an estimated net saving.",
+    "note2": "Potential: billions of tonnes of CO₂ a year that the literature finds possible, not today's scale.",
+    "trlScale": "Readiness: 1 = basic principles described, 9 = proven in operation.",
+    "beccsWhy": "Why BECCS can count as removal: plants take CO₂ from the air as they grow; storing that carbon after the biomass is used can give net removal, once other emissions and land-carbon losses are counted.",
     "rows": [
       { "key": "daccs", "name": "Direct air capture with storage (DACCS)", "store": "Rock underground: 10,000 years or longer", "storeRank": 2, "trl": [6, 6], "cost": [100, 300], "potential": "5 to 40", "measure": "Count the CO₂ stored, less emissions from the energy and water it uses." },
       { "key": "beccs", "name": "Bioenergy with carbon capture and storage (BECCS)", "store": "Rock underground: 10,000 years or longer", "storeRank": 2, "trl": [5, 6], "cost": [15, 400], "potential": "0.5 to 11", "measure": "Count the CO₂ stored, less emissions and land carbon lost growing the biomass." },
       { "key": "ew", "name": "Enhanced weathering (crushed rock on fields)", "store": "Minerals: 10,000 years or longer", "storeRank": 2, "trl": [3, 4], "cost": [50, 200], "potential": "2 to 4", "measure": "How fast the rock takes up CO₂ in real soils is still poorly quantified." },
-      { "key": "biochar", "name": "Biochar (charred plant matter in soil)", "store": "Soils: decades to centuries", "storeRank": 1, "trl": [6, 7], "cost": [10, 345], "potential": "0.3 to 6.6", "measure": "Count the carbon in the char, less emissions from making it." },
+      { "key": "biochar", "name": "Biochar (charred plant matter in soil)", "store": "Soils: decades to centuries (IPCC's timescale for carbon stored in soils)", "storeRank": 1, "trl": [6, 7], "cost": [10, 345], "potential": "0.3 to 6.6", "measure": "Count the carbon in the char, less emissions from making it." },
       { "key": "ar", "name": "Afforestation and reforestation", "store": "Trees and soils: decades to centuries", "storeRank": 1, "trl": [8, 9], "cost": [0, 240], "potential": "0.5 to 10", "measure": "Carbon in growing trees; wildfire, disease or pests can reverse it." },
       { "key": "scs", "name": "Soil carbon in croplands and grasslands", "store": "Soils: decades to centuries", "storeRank": 1, "trl": [8, 9], "cost": [-45, 100], "potential": "0.6 to 9.3", "measure": "IPCC: the net addition per hectare is very small and hard to monitor." }
     ],
@@ -77,18 +80,18 @@
   "steelman": {
     "title": "Is gas a bridge or a lock-in? The strongest case on each side",
     "sides": [
-      { "key": "bridge", "title": "A bridge", "points": ["Burning gas for power emitted {co2gas} lb of CO₂ per kWh in 2023 against coal's {co2coal} (EIA, utility-scale, burning only).", "Gas plants already make {gasShare} of U.S. utility-scale electricity, on networks that exist today."] },
-      { "key": "lock", "title": "A lock-in", "points": ["Gas networks last decades: about half of today's mainline gas pipelines went in during the 1950s and 1960s (EIA).", "Leaks before burning narrow the gap: one study put U.S. oil and gas methane at {methane} of gas produced in 2015 (Alvarez et al. 2018, abstract)."] },
+      { "key": "bridge", "title": "A bridge", "points": ["Burning gas for power emitted {co2gas} lb of CO₂ per kWh of electricity generated in 2023 against coal's {co2coal} (EIA, utility-scale, burning only).", "Gas plants already make {gasShare} of U.S. utility-scale electricity, on networks that exist today."] },
+      { "key": "lock", "title": "A lock-in", "points": ["Gas networks last decades: EIA reported in March 2024 that about half of the long-distance gas pipeline network went in during the 1950s and 1960s.", "Leaks before burning narrow the gap: one study put U.S. oil and gas methane at {methane} of gas produced in 2015 (Alvarez et al. 2018, abstract)."] },
       { "key": "tell", "title": "What would tell them apart", "points": ["How many hours new gas plants run in later decades, and measured leak rates ([[lesson:f11-air-climate-people|F11]] counts leaks as CO₂e)."], "wide": true }
     ],
     "note": "Both cases from dated sources; the lesson takes no side."
   },
   "systems": [
     { "key": "gas", "name": "Gas networks and LNG", "today": "Carry gas to power plants, industry and {gasHomes} of U.S. homes; [[lng|LNG]] ships it overseas.", "number": "{lngBcfd} Bcf a day of U.S. LNG exports in 2025, {lngShare} of the world's", "open": "Who pays for the pipes as customers leave?" },
-    { "key": "gaspower", "name": "Gas power plants", "today": "{gasShare} of U.S. utility-scale electricity in 2025.", "number": "{co2gas} lb of CO₂ per kWh burned (2023)", "open": "A bridge or a lock-in?" },
+    { "key": "gaspower", "name": "Gas power plants", "today": "{gasShare} of U.S. utility-scale electricity in 2025.", "number": "{co2gas} lb of CO₂ per kWh of electricity generated, burning only (2023)", "open": "A bridge or a [[lock-in|lock-in]]?" },
     { "key": "coal", "name": "Coal plants and mines", "today": "{coalShare} of U.S. utility-scale electricity in 2025; {mmst} million short tons mined in 2024.", "number": "{planned} planned to retire in 2025, {retired} retired", "open": "When does a plant close, and who carries what is left?" },
-    { "key": "oil", "name": "Oil", "today": "About {oilPrimary} of U.S. primary energy in 2025, used mostly for transport.", "number": "Transport took {oilTransport} of the petroleum used in 2022", "open": "How exposed is an importer to one sea route?" },
-    { "key": "ccs", "name": "Carbon capture and storage", "today": "Captures CO₂ at a chimney or gas-processing plant, to store it underground or use it.", "number": "Capture capacity of {ccsMt} a year worldwide (2025)", "open": "Can it grow against {co2Gt} of energy CO₂ a year?" },
+    { "key": "oil", "name": "Oil", "today": "About {oilPrimary} of U.S. [[primary-energy|primary energy]] in 2025, used mostly for transport.", "number": "Transport took {oilTransport} of the petroleum used in 2022", "open": "How exposed is an importer to one sea route?" },
+    { "key": "ccs", "name": "Carbon capture and storage", "today": "Captures CO₂ at a chimney or gas-processing plant and stores it underground; CO₂ that is used instead may be released again.", "number": "Capture capacity of {ccsMt} a year worldwide (2025)", "open": "Can it grow against {co2Gt} of energy CO₂ a year?" },
     { "key": "cdr", "name": "Carbon removal", "today": "Takes CO₂ already in the air into trees, soils, rock or minerals.", "number": "Stored for decades to 10,000 years or longer, by method", "open": "How long does it stay, and how is it measured?" }
   ],
   "stop": {
@@ -115,7 +118,7 @@
     { "n": "{planned} → {retired}", "what": "Coal capacity U.S. owners planned to retire in 2025, and what retired: {delayed} was delayed and {cancelled} cancelled.", "src": "eia-67427" },
     { "n": "{lngBcfd} Bcf/d", "what": "U.S. LNG exports in 2025, {lngShare} of the world's; LNG is gas cooled to −260 °F, about 600 times smaller.", "src": "eia-67864" },
     { "n": "{employees}", "what": "Average number of employees at U.S. coal mines in 2024.", "src": "eia-acr" },
-    { "n": "{ccsMt}", "what": "CO₂ capture capacity worldwide, a year, two-thirds at natural gas processing; energy CO₂ was {co2Gt} in 2025.", "src": "iea-coal2025" },
+    { "n": "{ccsMt}", "what": "CO₂ capture capacity worldwide, a year, two-thirds at natural gas processing; capacity is not emissions avoided. Energy CO₂ was {co2Gt} in 2025.", "src": "iea-coal2025" },
     { "n": "10,000+ years", "what": "How long geological formations and minerals store removed carbon; trees and soils store it for decades to centuries.", "src": "ipcc-ch12" }
   ],
   "sources": {

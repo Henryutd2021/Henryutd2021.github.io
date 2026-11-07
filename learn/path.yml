@@ -770,7 +770,7 @@
   subtitle: "Overlay a century of U.S. adoption curves, from electric service in homes to solar's share of electricity, and see what sped some up and held others back"
   short: "Past transitions"
   teaches: [diffusion curves, shares over time, network build-out, public programmes, what you measure decides the speed]
-  does: "Guess how long electricity took to reach nine U.S. homes in ten; compare towns and farms; watch gas heating replace coal; read the car and solar curves; sort what sped each change up and what held it back; then a dated timeline and two readings of the record."
+  does: "Guess how long electricity took to reach nine U.S. homes in ten; compare towns and farms; watch piped gas overtake coal as the main heating fuel; read the car and solar curves; sort what sped each change up and what held it back; then a dated timeline and two readings of the record."
   outcome: "Read an adoption curve as a share of a named whole, say how fast past U.S. changes moved and what sped or slowed them, and explain why the answer to how fast depends on what is measured, without forecasting the next one."
   after: [F10]
 # ---------- wave W4 Analyst module A3 (curriculum v2 §18.4; builder learn-w4-b)

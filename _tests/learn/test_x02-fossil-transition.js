@@ -64,7 +64,7 @@ ok(R.share < 1 / 3 && M.pct(R.share) === "31%", "under a third of the plan retir
 ok(D.retire.planned2026 === 6.4 && /6\.4 GW of coal scheduled to retire in 2026/.test(src("eia-67206")) && /may change more than usual/.test(M.retireSaw(D)) && /more subject to change than usual/.test(src("eia-67206")), "2026: 6.4 GW listed; EIA's caveat kept");
 ok(V.mmst === "512.5" && V.employees === "44,060" && /512\.5 million short tons/.test(src("eia-acr")) && /44,060/.test(src("eia-acr")), "coal mines 2024: 512.5 MMst, 44,060 employees (EIA)");
 ok(V.co2coal === "2.31" && V.co2gas === "0.96" && /coal 2\.31, natural gas 0\.96/.test(src("eia-co2kwh")) && V.gasVsCoal === "42%", "CO₂ per kWh 2023: coal 2.31, gas 0.96 lb; gas about 42% of coal's");
-ok(V.ccsMt === "about 50 Mt" && V.co2Gt === "about 38 Gt" && V.ccsShare === "about 0.13%" && near(50 / 38000, 0.0013158, 1e-6) && /around 50 Mt CO₂ a year, two-thirds of it at natural gas processing/.test(src("iea-coal2025")) && /about 38 Gt/.test(src("iea-ger2026")), "capture capacity about 50 Mt against about 38 Gt: about 0.13% (IEA)");
+ok(V.ccsMt === "about 50 million tonnes" && V.co2Gt === "about 38 billion tonnes" && V.co2MtAll === "38,000" && V.ccsShare === "about 0.13%" && near(50 / 38000, 0.0013158, 1e-6) && /around 50 Mt CO₂ a year, two-thirds of it at natural gas processing/.test(src("iea-coal2025")) && /about 38 Gt/.test(src("iea-ger2026")), "capture capacity about 50 Mt against about 38 Gt: about 0.13% (IEA)");
 ok(V.methane === "2.3%" && /2\.3% of gross U\.S\. gas production/.test(src("alvarez2018")), "methane 2.3% (Alvarez et al. 2018, abstract)");
 // templates: every token resolves; no number typed outside tokens except the allowed literals
 const templates = [].concat(D.map.nodes.map(n => n.text), D.map.nodes.map(n => n.open), D.systems.map(s => s.today), D.systems.map(s => s.number), D.systems.map(s => s.open),
@@ -84,22 +84,29 @@ ok(!/\{[a-zA-Z0-9]+\}/.test(M.staticFallback(D) + M.ideasHTML(D) + M.factsHTML(D
   let thrown = false; try { M.netCost(D, 0.7, 0); } catch (e) { thrown = true; } ok(thrown, "the share is bounded (s ≤ 0.6)");
   ok(M.money(M.netCost(D, 0.3, 0)) === "$714" && M.money(M.netCost(D, 0.3, 0.5)) === "$607", "30% gone: $714 with no pipe retired, $607 with half the leavers' share avoided");
   ok(M.netLine(D, 0.3, 0) === "With 30% of customers gone, each remaining customer pays **$714 a year** for the network, against $500 today (illustrative).", "step 3 line");
-  ok(G.assume.map(a => a.avoid).join() === "0,0.5" && G.need === 0.3 && /teaching/.test(G.set), "two assumptions, labelled as teaching values");
-  ok(/fixed costs of direct gas use are spread over fewer therms, potentially raising gas rates/.test(src("lbnl-2018")) && /p\. 40/.test(src("lbnl-2018")) && /spread over fewer therms, potentially raising gas rates/.test(M.netSaw(D)), "the LBNL finding matches its source line (p. 40)");
+  ok(G.assume.map(a => a.avoid).join() === "0,0.5" && G.need === G.step && G.need > G.min && /teaching/.test(G.set) && /customers who stay/.test(G.set), "two assumptions, labelled as teaching values; each counts once some customers have left under it (one slider step)");
+  ok(/Customers who leave the gas network entirely/.test(JS) && !/switch to electric heat/.test(JS) && /leave the network entirely/.test(M.STEPS[2]), "the slider counts customers who leave the network entirely, not those who switch heating (they may keep gas for cooking or water)");
+  ok(M.netCount(1, 2) === "Assumptions tried with customers gone: 1 of 2." && /cnt\.textContent = netCount\(/.test(JS), "the step shows what opens Next: each assumption tried with customers gone");
+  ok(/fixed costs of direct gas use are spread over fewer therms, potentially raising gas rates/.test(src("lbnl-2018")) && /p\. 40/.test(src("lbnl-2018")) && /spread over less gas sold, potentially raising gas rates/.test(M.netSaw(D)) && !/therm/.test(M.netSaw(D)), "the LBNL finding matches its source line (p. 40), in plain words (less gas sold, not therms)");
   const ck = M.checkHTML(D);
   ok(ck.indexOf("$500 ÷ (1 − 0.25) = $500 ÷ 0.75 = $667") > 0 && near(500 / 0.75, 666.67, 0.01), "the network question's worked answer shows its arithmetic");
   ok(ck.indexOf("0.96 ÷ 2.31 = 0.416, or 42%") > 0 && near(0.96 / 2.31, 0.4156, 1e-4), "the CO₂ question's worked answer shows its arithmetic");
   const B = D.book;
   for (let r = B.min; r <= B.max; r += B.step) ok(near(M.unrecovered(D, r), (B.life - r) / B.life) && M.unrecovered(D, r) >= 0, "book value: year " + r + " leaves " + M.pctx(M.unrecovered(D, r)));
-  ok(M.bookLine(D, 25) === "Closing in year 25 of a 40-year book life leaves **37.5%** of the plant's cost [[stranded-cost|unrecovered]] (straight line, illustrative).", "step 4 line, exact (no rounding)");
-  ok(/teaching/.test(B.set), "the book life is labelled as a teaching value");
+  ok(M.bookLine(D, 25) === "Closing 25 years after opening leaves **37.5%** of the building cost [[stranded-cost|unrecovered]]: 15 of its 40 years of even recovery still to come (illustrative).", "step 4 line, exact (no rounding), with its arithmetic: 15 of 40 years left");
+  for (let r = B.min; r <= B.max; r += B.step) { const m = M.bookLine(D, r).match(/: (\d+) of its (\d+) years/); ok(m && near(+m[1] / +m[2], M.unrecovered(D, r)), "the years left over the book life equal the unrecovered share at " + r + " years"); }
+  ok(/teaching/.test(B.set) && /evenly/.test(B.set), "the book life is labelled as a teaching value, recovered evenly");
+  ok(M.STEPS[3].indexOf("recovered evenly over " + B.life + " years") > 0, "step 4 states the even recovery over the data's book life");
+  ok(/label: "Years since " \+ A\.ridgeCounty\.plant\.name \+ " opened"/.test(JS), "the slider reads years since opening");
 }
 
 // ---------------- Ridge County, from A13's file
 {
   const RC = A.ridgeCounty;
-  ok(M.ridgeLine(A) === "Ridge Station (2,400 MW) employs 450 people and its mines 700; coal pays 40% of the county's tax revenue." && RC.plant.mw === 2400 && RC.coalTaxShare === 0.4, "step 4's Ridge County line read from a13-fairness-jobs.json");
-  ok(/A\.ridgeCounty\.fiction/.test(JS) && /fictional/.test(RC.fiction), "the fiction line under the Ridge County step, read from A13's file");
+  ok(M.ridgeLine(A) === "Ridge Station (2,400 MW) employs 450 people and its mines 700; coal pays 40% of the county's tax revenue." && RC.plant.mw === 2400 && RC.coalTaxShare === 0.4, "the explain layer's Ridge County line read from a13-fairness-jobs.json");
+  ok((JS.match(/A\.ridgeCounty\.fiction/g) || []).length === 2 && /fictional/.test(RC.fiction), "the fiction line under the Ridge County step and its explain card, read from A13's file");
+  const step4 = JS.split("{ text: STEPS[3]")[1].split("{ text: STEPS[4]")[0];
+  ok(!/ridgeLine|BOOK_WHO|lessonRefHTML/.test(step4) && /H\("li", \{ text: ridgeLine\(A\) \}/.test(JS) && /H\("li", \{ html: LX\.rich\(BOOK_WHO\) \}/.test(JS), "step 4 keeps to repayment; jobs, taxes and who pays are in the explain layer");
   ok(!/2,?400|450 people|\b700\b/.test(RAW), "Ridge County's numbers are not retyped in X2's data");
   ok(/\["A13", /.test(JS) && /LX\.lessonRefHTML\(P, "A13"\)/.test(JS), "A13 is linked for Ridge County");
 }
@@ -113,7 +120,11 @@ ok(!/\{[a-zA-Z0-9]+\}/.test(M.staticFallback(D) + M.ideasHTML(D) + M.factsHTML(D
   const long = D.cdr.rows.filter(r => r.storeRank === 2), ready = D.cdr.rows.filter(r => r.trl[0] >= 8);
   ok(long.every(r => r.trl[1] <= 6) && ready.length && ready.every(r => r.storeRank === 1) && /readiness of 6 or below/.test(M.cdrSaw(D)) && /\(8 to 9\) store carbon for decades to centuries/.test(M.cdrSaw(D)), "'no method leads every list' holds on the table");
   ok(M.cdrRows(D).filter(r => r.key === "scs")[0].cost === "$−45 to $100" && M.cdrRows(D).filter(r => r.key === "daccs")[0].trl === "6", "a negative low end and a single readiness print plainly");
-  ok(/different dollar years, not adjusted to one year/.test(D.cdr.note) && /not today's scale/.test(D.cdr.note), "cost ranges and potentials labelled for what they are");
+  ok(/different dollar years, not adjusted to one year/.test(D.cdr.note) && /below zero is an estimated net saving/.test(D.cdr.note) && /not today's scale/.test(D.cdr.note2), "cost ranges (a negative low end a net saving) and potentials labelled for what they are");
+  ok(/1 = basic principles described, 9 = proven in operation/.test(D.cdr.trlScale) && /net removal/.test(D.cdr.beccsWhy) && /take CO₂ from the air as they grow/.test(D.cdr.beccsWhy) && /land-carbon losses/.test(D.cdr.beccsWhy), "the readiness scale's ends, and why BECCS can count as removal, said beside the table");
+  const fb = M.staticFallback(D);
+  ok(M.cdrNotes(D).every(t => fb.indexOf(t) > 0) && D.cdr.rows.every(r => fb.indexOf(r.measure) > 0) && /<th scope="col">Measuring it<\/th>/.test(fb), "the no-JS table has the measuring column, the readiness scale and every note the live table has");
+  ok(/billion tonnes/.test(M.POT_LABEL) && !/\bGt\b|\bMt\b/.test(JS.replace(/\/\/[^\n]*/g, "") + RAW.replace(/"(where|title|short)": "[^"]*"/g, "")), "million and billion tonnes spelled out (Mt and Gt only in source lines)");
   ok(/Table 12\.6/.test(src("ipcc-ch12")) && /Cross-Chapter Box 8/.test(src("ipcc-ch12")) && /capture applied to fossil fuel use is not removal/.test(src("ipcc-ch12")), "IPCC source line names the table and the box");
   ok(/hard to monitor/.test(D.cdr.rows.filter(r => r.key === "scs")[0].measure) && /poorly quantified/.test(D.cdr.rows.filter(r => r.key === "ew")[0].measure) && /reverse/.test(D.cdr.rows.filter(r => r.key === "ar")[0].measure), "measurement words follow IPCC's");
 }
@@ -124,10 +135,13 @@ ok(!/\{[a-zA-Z0-9]+\}/.test(M.staticFallback(D) + M.ideasHTML(D) + M.factsHTML(D
   ok(Q.answer === "third" && Q.options.every(o => fb[o.value] && fb[o.value].indexOf("2.6 GW retired, 31% of the plan") > 0) && /^Yes/.test(fb.third) && /^No/.test(fb.all) && /^No/.test(fb.two), "step 2: answer and feedback true for every choice");
   const C = D.predictCcs;
   ok(C.answer === "no" && C.options.every(o => C.feedback[o.value]) && /^Yes/.test(C.feedback.no) && /^No/.test(C.feedback.yes) && /^No/.test(C.feedback.ten), "step 5: answer and feedback for every choice");
-  ok(M.ccsLine(D) === "Capture capacity worldwide: about 50 Mt of CO₂ a year, two-thirds at gas processing (IEA, December 2025). That is about 0.13% of 2025's about 38 Gt of energy CO₂, even running full." || /about 0\.13% of 2025's/.test(M.ccsLine(D)), "step 5 line");
+  ok(M.ccsLine(D) === "Capture capacity worldwide: about 50 million tonnes of CO₂ a year (IEA, December 2025). Compared with 2025's energy CO₂, about 38 billion tonnes, that capacity is about 0.13%, even running full all year.", "step 5 line: capacity compared with a year's emissions, labelled as capacity");
+  ok(/used instead may be released again/.test(M.CCS_SAW) && /used instead may be released again/.test(M.ideasHTML(D)) && D.systems.filter(x => x.key === "ccs")[0].today.indexOf("used instead may be released again") > 0 && !/store it underground or use it/.test(RAW), "capture with durable storage told apart from use, which may release the CO₂ again");
+  ok(/capacity is not emissions avoided/.test(D.facts.filter(f => f.src === "iea-coal2025")[0].what), "capacity is not emissions avoided");
   const SM = M.steelmanSpec(D);
   ok(SM.sides.length === 3 && SM.sides[0].points[0].indexOf("0.96 lb") > 0 && SM.sides[0].points[1].indexOf("41%") >= 0 && SM.sides[1].points[1].indexOf("2.3%") > 0 && /abstract/.test(SM.sides[1].points[1]) && /takes no side/.test(SM.note), "the Steelman card: both cases with dated numbers, no side taken");
-  ok(/1950s and 1960s/.test(SM.sides[1].points[0]) && /1950s and 1960s/.test(src("eia-pipelines")), "the pipelines' age matches its source line");
+  ok(/1950s and 1960s/.test(SM.sides[1].points[0]) && /1950s and 1960s/.test(src("eia-pipelines")) && /EIA reported in March 2024/.test(SM.sides[1].points[0]) && /19 March 2024/.test(D.sources["eia-pipelines"].date) && !/today's mainline/.test(RAW), "the pipelines' age matches its source line, dated at the point of use");
+  ok(!/per kWh burned/.test(RAW + JS) && /per kWh of electricity generated/.test(SM.sides[0].points[0]) && /per kWh of electricity generated/.test(M.checkHTML(D)), "CO₂ per kWh of electricity generated, not per kWh burned");
 }
 
 // ---------------- the map
@@ -172,7 +186,7 @@ ok(M.STEPS.length === 7, "seven step cards");
 M.STEPS.forEach((t, i) => { const n = nWords(t); ok(n >= 18 && n <= 36, "step " + (i + 1) + ": " + n + " words"); ok(nSent(t) <= 2, "step " + (i + 1) + ": " + nSent(t) + " sentences"); });
 ok(/planned to retire 8\.5 GW/.test(M.STEPS[1]) && D.retire.planned2025 === 8.5, "step 2's 8.5 GW is the data's");
 const lines = [M.retireSaw(D), M.MAP_SAW, M.netLine(D, 0.6, 0), M.netSaw(D), M.bookLine(D, 10), M.BOOK_WHO, M.BOOK_SAW, M.ridgeLine(A), M.ccsLine(D), M.CCS_SAW, M.cdrSaw(D), D.cdr.note]
-  .concat(Object.values(M.retireFeedback(D)), Object.values(D.predictCcs.feedback), D.gasNet.assume.map(a => a.line), D.cdr.rows.map(r => r.measure), D.cdr.sorts.map(s => s.note), templates.map(t => M.fill(D, t)), D.stop.includes, D.stop.leaves, D.stop.ladder.map(r => r.text), [D.steelman.note]);
+  .concat(Object.values(M.retireFeedback(D)), Object.values(D.predictCcs.feedback), D.gasNet.assume.map(a => a.line), D.cdr.rows.map(r => r.measure), D.cdr.sorts.map(s => s.note), templates.map(t => M.fill(D, t)), D.stop.includes, D.stop.leaves, D.stop.ladder.map(r => r.text), [D.steelman.note], M.cdrNotes(D), [M.netCount(1, 2)]);
 lines.forEach(t => { ok(nWords(t) <= 36, "a text of " + nWords(t) + " words: " + S.plain(t).slice(0, 60)); ok(nSent(t) <= 2, "a text of " + nSent(t) + " sentences: " + S.plain(t).slice(0, 60)); });
 const PROSE = OWN.replace(/^---[\s\S]*?\n---\n/, " ").replace(/<script[\s\S]*?<\/script>/g, " ").replace(/<style[\s\S]*?<\/style>/g, " ").replace(/<!-- x02-(sources|facts|stop):start[\s\S]*?:end -->/g, " ")
   .replace(/<!--[\s\S]*?-->/g, " ").replace(/^- (.*)$/gm, "<li>$1</li>");
@@ -182,6 +196,8 @@ PROSE.split(/<\/?(?:p|li|dd|dt|td|th|summary|br|caption|h3|h4)\b[^>]*>/).map(S.p
 // ---------------- controls and glossary
 ok(/aria-live/.test(JS) && (JS.match(/LX\.demo\(/g) || []).length === 1 && (JS.match(/demo\[\d\] = function/g) || []).length === 7, "live regions; a demo hook with an action for each of the seven steps");
 ["lng", "bcf", "carbon-capture", "carbon-removal", "technology-readiness"].forEach(t => ok(new RegExp("id: " + t + "\\b").test(SIDE) && new RegExp("\\[\\[" + t + "\\|").test(JS + RAW), "the sidecar defines " + t + " and the page marks it"));
+ok(/\[\[lock-in\|lock-in\]\]/.test(M.STEPS[6]) && /id: lock-in\b/.test(SIDE), "step 7 says what a bridge and a lock-in are, and marks lock-in");
+ok((RAW.match(/\[\[primary-energy\|primary energy\]\]/g) || []).length === 2 && /data-term=\\"primary-energy\\"/.test(JS), "primary energy carries its glossary mark (F3's term)");
 ok(/role: "group", "aria-label": "Assumption about the pipes"/.test(JS), "the assumption buttons are a labelled group");
 
 console.log((fails ? "FAILED " + fails + " of " : "ok: ") + checks + " checks (" + ID + ")");

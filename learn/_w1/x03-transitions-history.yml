@@ -7,5 +7,4 @@ glossary:
     term: Diffusion curve
     def: "How the share of homes, firms or output using a new technology grows over time, often slowly at first, then faster, then levelling off."
 requests:
-  - "X3's explain layer names F10, X2 and A20 through LX.lessonRefHTML, so they link once live; F10 is X3's curriculum prerequisite and is left out of its after list until it is live."
-  - "The 'where we stop' box uses the shelf's shared markup and xs- styles exactly as learn-w7-a's X1, X4, X5 and X6 do (_tests/learn/shelf_stop.js is byte-identical to learn-w7-a's copy); promote the xs- rules to forms.css as one shared rule."
+  - "X3's explain layer names F10, X2 and A20 through LX.lessonRefHTML (all live since the W6+W7 integration, which also added F10 to X3's after list and moved the shelf's xs- stop-box rules into components/explain.css); no change requested."

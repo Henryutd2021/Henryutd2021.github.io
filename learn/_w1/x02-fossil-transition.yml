@@ -18,7 +18,9 @@ glossary:
   - id: technology-readiness
     term: Technology readiness level (TRL)
     def: "A scale from 1 (basic principles described) to 9 (proven in operation) for how mature a technology or method is."
+  - id: lock-in
+    term: Lock-in
+    def: "When long-lived plants, pipes and habits keep a fuel in use for decades after they are built, because leaving them early is costly."
 requests:
   - "X2 reads Ridge County from a13-fairness-jobs.json (ridgeCounty: the plant, its staff, the mine jobs, coal's share of the county's taxes, the fiction line); no change requested. prairieland.json's ridgeCounty.a13 copies the same block."
-  - "X2's explain layer names A13, F11, A21, A20 and X3 through LX.lessonRefHTML, so A21 and A20 link once live; F10 is X2's curriculum prerequisite and is left out of its after list until it is live."
-  - "The 'where we stop' box uses the shelf's shared markup and xs- styles exactly as learn-w7-a's X1, X4, X5 and X6 do (_tests/learn/shelf_stop.js is byte-identical to learn-w7-a's copy); promote the xs- rules to forms.css as one shared rule."
+  - "X2's explain layer names A13, F11, A21, A20 and X3 through LX.lessonRefHTML (all live since the W6+W7 integration, which also added F10 to X2's after list and moved the shelf's xs- stop-box rules into components/explain.css); no change requested."
