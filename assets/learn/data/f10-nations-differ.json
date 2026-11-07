@@ -3,7 +3,11 @@
   "pjPerTWh": 3.6,
   "nuclearHeatEff": 0.33,
   "subEff": 0.4,
-  "subEffNote": "Set for teaching: the substitution method counts each MWh from nuclear, hydro, wind and solar as the fuel a thermal plant would burn to make it, at an assumed efficiency; publishers have used different efficiencies in different years, so the page uses one round value, 40%, for every real country (Prairieland uses its own fleet's, from its file).",
+  "subEffNotes": [
+    "The rule: each MWh from nuclear, hydro, wind and solar counts as the fuel a thermal plant would burn to make it.",
+    "The assumption: publishers have used different plant efficiencies in different years; this page uses one round value, 40%, for every real country.",
+    "The exception: Prairieland uses its own fleet's efficiency, read from its file."
+  ],
   "units": {
     "quad": {
       "label": "quadrillion Btu (quads)",
@@ -34,10 +38,10 @@
       "note": "1 t of oil equivalent = 41.868 GJ"
     },
     "mtep": {
-      "label": "million t of oil equivalent (Mtep, Brazil's tep of 10,000 kcal)",
+      "label": "million t of oil equivalent (Mtep; Brazil's tep is 10⁷ kcal)",
       "pj": 41.868,
       "src": "epe-manual",
-      "note": "1 tep = 10,000 kcal = 41.868 GJ"
+      "note": "1 tep = 10⁷ kcal = 41.868 GJ"
     },
     "twh": {
       "label": "TWh",
@@ -110,10 +114,33 @@
       "note": "Hydro, wind and solar electricity, after net exports"
     },
     "bio": {
-      "label": "Bioenergy and waste",
+      "label": "Bioenergy",
       "short": "Bioenergy",
       "color": "var(--lx-tree)",
+      "renewable": true,
+      "note": "Biofuels, wood and the renewable part of waste, as each publisher counts them"
+    },
+    "geo": {
+      "label": "Geothermal",
+      "short": "Geothermal",
+      "color": "var(--lx-geo)",
       "renewable": true
+    },
+    "geoheat": {
+      "label": "Geothermal, ambient heat and tide",
+      "short": "Geo, ambient",
+      "color": "var(--lx-geo)",
+      "renewable": true,
+      "say": "geothermal, ambient heat and tide",
+      "note": "Geothermal heat, the outdoor heat that heat pumps take in, and tide"
+    },
+    "waste": {
+      "label": "Waste (renewable part not split)",
+      "short": "Waste",
+      "color": "var(--lx-ink-3)",
+      "unsplit": true,
+      "say": "waste",
+      "note": "Waste the publisher does not split into renewable and non-renewable parts"
     },
     "other": {
       "label": "Other",
@@ -154,10 +181,11 @@
         "hydro": 0.842843,
         "wind": 1.584501,
         "solar": 1.437607,
+        "geo": 0.117,
         "bio": 4.853097
       },
       "total": 96.465716,
-      "otherNote": "geothermal (0.12 quads) and the rest of EIA's total",
+      "otherNote": "electricity and coal coke net imports, and rounding",
       "twh": {
         "nuclear": 784.780718,
         "hydro": 247.02321,
@@ -177,6 +205,13 @@
           "commercial"
         ]
       },
+      "finalNote": "U.S. final energy is EIA's end-use energy, which keeps some of the energy industry's own use: natural gas lease and plant fuel in industry, pipeline fuel in transport.",
+      "sectorLabels": {
+        "industry": {
+          "label": "Industry (with farms and mining)",
+          "short": "Industry"
+        }
+      },
       "nonEnergy": [
         "nonfuel"
       ],
@@ -189,13 +224,13 @@
         "production": 107.16283,
         "netImports": -11.099192
       },
-      "published": "96.5 quads of primary energy consumption; EIA counts nuclear at its plants' heat rate and hydro, wind and solar at the heat content of their electricity (3,412 Btu per kWh) since September 2023, close to the physical energy content method; fossil fuels at their gross heat content.",
+      "prov": {
+        "published": "96.5 quads of primary energy consumption (Table 1.3).",
+        "method": "Nuclear at its plants' average heat rate; hydro, wind, solar and geothermal electricity at 3,412 Btu per kWh since September 2023, close to physical energy content.",
+        "coverage": "Final energy is EIA's end-use energy (Tables 2.2 to 2.5); it keeps gas lease and plant fuel in industry and pipeline fuel in transport (Table 4.3). Farms sit inside industry.",
+        "adjust": "Non-fuel use (6.5 quads) shown apart as non-energy use; geothermal (0.117 quads) drawn as its own source; solar includes small-scale solar (Table 10.6)."
+      },
       "convention": "pec",
-      "notes": [
-        "End-use energy without electrical system losses (Tables 2.2 to 2.5); EIA's 6.5 quads of non-fuel use, mostly in industry, are shown apart as non-energy use.",
-        "Agriculture is inside EIA's industrial sector, so no farm row.",
-        "Solar includes small-scale solar (Table 10.6)."
-      ],
       "importDep": {
         "rows": [
           "netImports"
@@ -211,7 +246,7 @@
         "of": "total"
       },
       "resources": "Crude oil, natural gas and coal.",
-      "institutions": "7 ISO/RTO markets plus vertically integrated utilities; 3 weakly coupled interconnections.",
+      "institutions": "Seven [[rto|independent grid operators]] (ISOs and RTOs) run wholesale markets; elsewhere [[vertically-integrated-utility|vertically integrated utilities]] own plants and wires. Three main grids, weakly linked.",
       "src": [
         "eia-mer",
         "eia-method"
@@ -234,10 +269,11 @@
         "hydro": 1330773.45,
         "wind": 1764134.988,
         "solar": 1258250.111,
-        "bio": 5877641.289
+        "bio": 5877641.289,
+        "geoheat": 1080746.567
       },
       "total": 55789527.289,
-      "otherNote": "ambient heat for heat pumps, geothermal, non-renewable waste and electricity and heat trade",
+      "otherNote": "non-renewable waste and electricity and heat trade",
       "twh": {
         "nuclear": 649.545843,
         "hydro": 369.659291,
@@ -279,13 +315,13 @@
         "bunkers": 1703632.272,
         "production": 23002614.941
       },
-      "published": "55,790 PJ of gross available energy, by the physical energy content method: nuclear as reactor heat; hydro, wind and solar photovoltaic as their electricity.",
+      "prov": {
+        "published": "55,790 PJ of gross available energy.",
+        "method": "Physical energy content: nuclear as reactor heat; hydro, wind and solar photovoltaic as their gross electricity (nrg_bal_peh).",
+        "coverage": "Includes 1,704 PJ of fuel for international shipping, shown apart. Bioenergy is renewables less the other renewable sources, so it holds the renewable part of waste; non-renewable waste sits in 'other'.",
+        "adjust": "Coal includes peat and oil shale; solar includes solar heat (164 PJ); geothermal, ambient heat and tide drawn as one source."
+      },
       "convention": "pec",
-      "notes": [
-        "Coal includes peat and oil shale; solar includes solar heat (164 PJ); bioenergy is renewables less hydro, wind, solar, geothermal, tide and ambient heat.",
-        "Gross available energy includes 1,704 PJ of fuel for international shipping, shown apart.",
-        "Electricity by source is gross production (nrg_bal_peh)."
-      ],
       "importDep": {
         "value": 0.573,
         "kind": "published",
@@ -299,7 +335,7 @@
         "split": "renewables 48.1%, nuclear heat 28.2%, oil 3.3% and natural gas 5.1% of that production"
       },
       "resources": "",
-      "institutions": "Unbundled zonal markets, coupled day-ahead and intraday; dense interconnection.",
+      "institutions": "Separate companies make, carry and sell power ([[unbundling|unbundled]]). Each [[bidding-zone|price zone]] has its own price; [[market-coupling|coupled markets]] link the zones a day ahead and within the day.",
       "src": [
         "eurostat-overview",
         "eurostat-balance",
@@ -336,13 +372,15 @@
         "exports": 13625,
         "coalShareOfProduction": 0.661
       },
-      "published": "571,327 × 10,000 t of coal equivalent (5.71 billion t, about 167 EJ): coal 54.8%, oil 18.8%, gas 8.5%, primary electricity and other energy 17.9%; electricity from nuclear, hydro, wind and solar is counted at the coal burned per kWh in the year's thermal plants (the coal-equivalent method).",
+      "prov": {
+        "published": "571,327 × 10,000 t of coal equivalent (5.71 billion t, about 167 EJ): coal 54.8%, oil 18.8%, gas 8.5%, primary electricity and other energy 17.9%.",
+        "method": "Coal equivalent: nuclear, hydro, wind and solar electricity counted at the coal burned per kWh in the year's thermal plants, a kind of substitution.",
+        "coverage": "Partial: the 'other energy' inside NBS's 17.9% is not split by NBS and is left out. Final energy is not drawn.",
+        "adjust": "Physical content is the page's estimate: fossil fuels as published, plus the four sources' TWh (nuclear ÷ 0.33). Solar from the 2023 Communiqué; the rest from the 2025 Yearbook."
+      },
       "convention": "coal",
       "noFinal": "China's statistics count the electricity users buy at the coal burned to make it, so its final energy cannot be drawn on the same basis as the others; this page shows its primary energy only.",
-      "notes": [
-        "Physical energy content here is the page's estimate: fossil fuels as published, plus nuclear, hydro, wind and solar from their TWh; the 'other energy' in NBS's 17.9% is not split by NBS and is left out.",
-        "Solar generation from the 2023 Statistical Communiqué; the rest from the 2025 Statistical Yearbook (2023 data)."
-      ],
+      "coverage": "partial estimate: NBS's 'other energy' left out",
       "importDep": {
         "rows": [
           "imports",
@@ -359,7 +397,7 @@
         "of": "coalTotal"
       },
       "resources": "",
-      "institutions": "State-owned grids; provincial dispatch; spot markets moving toward a unified market.",
+      "institutions": "State-owned grid companies; each province largely dispatches its own plants; spot markets are moving toward one national market.",
       "src": [
         "nbs-yearbook",
         "nbs-communique"
@@ -383,6 +421,13 @@
       "total": 903158,
       "otherNote": "net electricity exports",
       "negOther": "Net electricity exports",
+      "coverage": "traditional biomass is not in the balance",
+      "sectorLabels": {
+        "other": {
+          "label": "Farms and other uses",
+          "short": "Farms, other"
+        }
+      },
       "twh": {
         "nuclear": 47.937,
         "hydro": 134.405,
@@ -418,14 +463,13 @@
         "production": 521633,
         "coalProduction": 413585
       },
-      "published": "903,158 ktoe (37,813 PJ) of total primary energy supply; hydro, wind and solar at their electricity (1 GWh = 0.086 ktoe), nuclear at its electricity ÷ 0.33.",
+      "prov": {
+        "published": "903,158 ktoe (37,813 PJ) of total primary energy supply.",
+        "method": "Hydro, wind and solar at their electricity (1 GWh = 0.086 ktoe); nuclear at its electricity ÷ 0.33.",
+        "coverage": "No row for firewood or other traditional biomass: every share here is of the sources the balance covers.",
+        "adjust": "Coal includes lignite; oil is crude oil less net exports of products. Wind, solar and other renewable power includes bio-power and small hydro. 'Other' final use is farms and non-specified uses."
+      },
       "convention": "pec",
-      "notes": [
-        "Coal includes lignite; oil is crude oil less net exports of oil products.",
-        "The balance has no row for firewood or other traditional biomass.",
-        "Wind, solar and other renewable electricity includes bio-power and small hydro (not split in the tables read).",
-        "'Other' final use is agriculture and the balance's non-specified other uses."
-      ],
       "importDep": {
         "value": 0.4027,
         "kind": "published",
@@ -439,7 +483,7 @@
         "coal": "coalProduction"
       },
       "resources": "",
-      "institutions": "State distribution companies (DISCOMs) buy under long-term contracts; one synchronous grid.",
+      "institutions": "State distribution companies (DISCOMs) buy most power under long-term contracts; one national grid running at one frequency ([[synchronous-grid|synchronous]]).",
       "src": [
         "mospi-esi",
         "mospi-units"
@@ -498,6 +542,12 @@
           "agriculture"
         ]
       },
+      "sectorLabels": {
+        "other": {
+          "label": "Farms",
+          "short": "Farms"
+        }
+      },
       "nonEnergy": [
         "finalAll",
         "-finalEnergyUse"
@@ -514,18 +564,18 @@
         "hydroGWh": 401415,
         "totalGWh": 775896
       },
-      "published": "328.5 Mtep of domestic energy supply (Oferta Interna de Energia); hydro, wind and solar at their electricity (1 kWh = 860 kcal), nuclear at its electricity ÷ 0.33.",
+      "prov": {
+        "published": "328.5 Mtep of domestic energy supply (Oferta Interna de Energia).",
+        "method": "Hydro, wind and solar at their electricity (1 kWh = 860 kcal); nuclear at its electricity ÷ 0.33.",
+        "coverage": "Bioenergy: sugarcane products 52.0, firewood and charcoal 27.1, black liquor and other renewables 29.2 Mtep. Hydro includes imported electricity; solar includes solar heat.",
+        "adjust": "The energy sector's own use, inside BEN's final consumption, moved before the meter, as the others count it. Services, farms and the energy sector split by their published shares."
+      },
       "convention": "pec",
-      "notes": [
-        "Bioenergy is sugarcane products (52.0), firewood and charcoal (27.1), and black liquor and other renewables (29.2), in Mtep.",
-        "Hydro includes imported electricity; solar includes solar heat.",
-        "BEN's final consumption includes the energy sector's own use; the page moves it to 'before the meter', as the other countries count it. Services, farms and the energy sector are split by their published shares."
-      ],
       "importDep": null,
       "importDepNote": "not on the pages read",
       "production": null,
       "resources": "Rivers and sugarcane.",
-      "institutions": "Hydro-dominated national grid; cost-based dispatch; auctions plus a free market.",
+      "institutions": "One national grid, mostly hydro; plants run in order of their modelled costs; power is bought at auctions or traded in a free market.",
       "src": [
         "epe-ben",
         "epe-manual"
@@ -563,7 +613,8 @@
         "coal": 8.8,
         "gas": 47.6,
         "oil": 107.4,
-        "bio": 24.7,
+        "bio": 19.5,
+        "waste": 5.2,
         "hws": 137.7
       },
       "total": null,
@@ -584,6 +635,16 @@
           "other"
         ]
       },
+      "sectorLabels": {
+        "buildings": {
+          "label": "Households",
+          "short": "Households"
+        },
+        "other": {
+          "label": "Services, farms, fishing and other",
+          "short": "Services, other"
+        }
+      },
       "nonEnergy": [
         "nonEnergy"
       ],
@@ -600,13 +661,13 @@
         "hydroGWh": 145476,
         "genGWh": 161793
       },
-      "published": "326 TWh of net domestic energy supply (Table 2; its rows add to 326.2); electricity at its own energy content (1 MWh = 3.6 GJ).",
+      "prov": {
+        "published": "326 TWh of net domestic energy supply (Table 2; its rows add to 326.2).",
+        "method": "Electricity at its own energy content (1 MWh = 3.6 GJ): production less net exports, not split by source (hydro made 89.9% of 2025's generation).",
+        "coverage": "Waste (5.2 TWh) is not split into renewable and non-renewable parts: the page counts it as neither.",
+        "adjust": "Buildings are households only: services sit in 'other' with farms and fishing."
+      },
       "convention": "pec",
-      "notes": [
-        "Electricity in the supply is production less net exports; its hydro, wind and solar are not split in the balance (hydro made 89.9% of 2025's generation).",
-        "Bioenergy and waste: biofuels 19.5 and waste 5.2 TWh.",
-        "Buildings here are households only: services sit in 'other' with farms and fishing."
-      ],
       "importDep": {
         "rows": [
           "imports",
@@ -624,7 +685,7 @@
         "fossil": "oilGasProduction"
       },
       "resources": "Oil and gas, mostly for export; rivers for its own electricity.",
-      "institutions": "Nord Pool bidding zones; flow-based market coupling since October 2024; hydro and dense HVDC links.",
+      "institutions": "Nord Pool's [[bidding-zone|price zones]]; since October 2024 [[flow-based-coupling|flow-based coupling]] limits trades by the flow on each line; hydro, and dense [[hvdc|HVDC]] links.",
       "src": [
         "ssb-balance",
         "ssb-electricity"
@@ -647,6 +708,12 @@
     "key": "pl",
     "name": "Prairieland",
     "card": null,
+    "sectorLabels": {
+      "other": {
+        "label": "Farms",
+        "short": "Farms"
+      }
+    },
     "institutions": "Fictional: the course does not set out its institutions.",
     "map": {
       "primary": {
@@ -690,8 +757,8 @@
       "key": "pec",
       "label": "Physical energy content",
       "short": "Physical content",
-      "who": "the IEA and Eurostat, and five of the six statistics offices on this page (China's is the exception)",
-      "text": "Nuclear counts as its reactors' heat (electricity ÷ 0.33); hydro, wind and solar as the electricity they make."
+      "who": "the IEA, Eurostat and five of this page's six statistics offices (not China's)",
+      "text": "Nuclear counts as its reactors' heat (measured, or electricity ÷ 0.33 if unknown); hydro, wind and solar as the electricity they make."
     },
     {
       "key": "sub",
@@ -762,11 +829,11 @@
   ],
   "sources": {
     "eia-mer": {
-      "title": "Monthly Energy Review, October 2026: Tables 1.1 (production and net imports), 1.3 (primary energy consumption by source), 1.13b (non-combustion use), 2.2 to 2.5 (end-use energy by sector), 7.2a (net generation) and 10.6 (solar, with small-scale)",
+      "title": "Monthly Energy Review, October 2026: Tables 1.1 (production and net imports), 1.3 (primary energy consumption by source), 1.13b (non-combustion use), 2.2 to 2.5 (end-use energy by sector), 4.3 (natural gas consumption by sector), 7.2a (net generation) and 10.6 (solar, with small-scale)",
       "publisher": "U.S. Energy Information Administration",
       "date": "released 29 October 2026; annual 2025 rows read 7 November 2026",
       "url": "https://www.eia.gov/totalenergy/data/monthly/",
-      "where": "2025: primary energy consumption 96.465716 quads; production 107.16283; net imports −11.099192; end use without electrical system losses: residential 11.907, commercial 9.938, industrial 26.652, transportation 28.291 quads"
+      "where": "2025: primary energy consumption 96.465716 quads, geothermal 0.117; production 107.16283; net imports −11.099192; end use without electrical system losses: residential 11.907, commercial 9.938, industrial 26.652, transportation 28.291 quads; Table 4.3 counts natural gas lease and plant fuel in the industrial sector and pipeline fuel in transportation"
     },
     "eia-method": {
       "title": "Change to the primary energy of noncombustible renewables",

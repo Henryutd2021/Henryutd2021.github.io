@@ -14,10 +14,15 @@
 //                  direct equivalent: every such TWh × 3.6. What is not electricity in a row (solar heat, imported power)
 //                  stays as published. China publishes coal equivalent; its physical-content figures are the page's
 //                  estimate (fossil fuels as published plus the four sources' TWh; NBS's unsplit "other energy" left out)
+//   shares         each drawn source is classed on its own: fossil, renewable (hydro, wind, solar, bioenergy, geothermal,
+//                  ambient heat and tide) or neither; a published aggregate the publisher does not split (Norway's waste)
+//                  stays unclassed, and 'other' is never counted renewable. China's and India's shares are of the sources
+//                  their balances cover (coverage, said beside every row)
 //   before meter   primary − final − non-energy use − international shipping fuel (conversion, own use, grid losses and
-//                  statistical differences; boundaries differ by publisher, said on the page)
-//   useful         an illustrative estimate: final energy by sector × Prairieland's sector efficiencies (its useful ÷ its
-//                  final, by sector); official statistics stop at final energy. China: not drawn (its final energy counts
+//                  statistical differences; boundaries differ by publisher, said on the page; the U.S. end-use sectors
+//                  keep some of the energy industry's own use, its finalNote)
+//   useful         a what-if: final energy by sector × Prairieland's sector efficiencies (its useful ÷ its final, by
+//                  sector); official statistics stop at final energy. China: not drawn (its final energy counts
 //                  electricity at the coal burned to make it)
 //   lenses         import dependence (published, or net imports ÷ supply from the published rows), production at home,
 //                  buildings' share of final energy, institutions (from the regional cards' survey)
@@ -69,6 +74,7 @@
     }
     N.key = c.key; N.name = c.name; N.short = c.short; N.year = c.year; N.card = c.card; N.c = c; N.P = P; N.k = k;
     N.twh = c.twh; N.subEff = D.subEff; N.noFinal = c.noFinal || null; N.negOther = c.negOther || null;
+    N.coverage = c.coverage || null; N.finalNote = c.finalNote || null; N.sectorLabels = c.sectorLabels || {};
     // lenses
     var den = function (of) { return of === "total" ? c.total : of === "coalTotal" ? c.coalEquivalent.total : sum(Object.keys(c.primary).map(function (s) { return c.primary[s]; })); };
     N.importDep = c.importDep == null ? null : c.importDep.value != null ? c.importDep.value : rows(P, c.importDep.rows) / den(c.importDep.of);
@@ -88,9 +94,12 @@
     return { key: D.prairieland.key, name: D.prairieland.name, year: String(b.year), card: null, fictional: PL.about.line, src: src, other: other, total: total, published: total,
              final: fin, finalTotal: sum(SECTORS.map(function (s) { return fin[s]; })), nonEnergy: 0, bunkers: 0, useful: use,
              twh: { nuclear: b.conventions.directEquivalent.nuclearPJ / D.pjPerTWh, hydro: src.hydro / D.pjPerTWh, wind: src.wind / D.pjPerTWh, solar: src.solar / D.pjPerTWh },
-             subEff: b.conventions.substitutionEfficiency, noFinal: null, negOther: null,
+             subEff: b.conventions.substitutionEfficiency, noFinal: null, negOther: null, coverage: null, finalNote: null, sectorLabels: D.prairieland.sectorLabels || {},
              importDep: dep.share, importKind: "file", prodShare: (dep.primaryPJ - dep.netImportsPJ) / dep.primaryPJ, PL: PL };
   }
+  // a sector's name for one country (Norway's 'buildings' are households only; U.S. industry holds farms and mining)
+  function sectorLabel(D, N, s, short) { var o = (N.sectorLabels || {})[s] || {}; return (short ? o.short : o.label) || D.sectors[s][short ? "short" : "label"]; }
+  function covTag(N) { return N.coverage ? " (" + N.coverage + ")" : ""; }
   function nations(D, PL) {
     var out = D.countries.map(function (c) { return nation(D, c); });
     if (PL) out.push(prairie(D, PL));
@@ -125,7 +134,7 @@
     var keys = Object.keys(v), total = sum(keys.map(function (s) { return v[s]; })) + N.other;
     var share = function (f) { return sum(keys.filter(function (s) { return f(D.nodes[s]); }).map(function (s) { return v[s]; })) / total; };
     return { v: v, total: total, other: N.other, fossil: share(function (n) { return n.fossil; }), elec: share(function (n) { return n.elec; }),
-             renewable: share(function (n) { return n.renewable; }), eta: eta };
+             renewable: share(function (n) { return n.renewable; }), unsplit: share(function (n) { return n.unsplit; }), eta: eta };
   }
   function largest(D, N) {   // the largest source (physical energy content), and the next
     var s = Object.keys(N.src).sort(function (a, b) { return N.src[b] - N.src[a]; });
@@ -147,7 +156,7 @@
     nodes.forEach(function (n) { links.push({ from: n.id, to: "hub", value: n.id === "other" ? P.other : P.v[n.id] }); });
     nodes.push({ id: "hub", label: "Primary energy", short: "Primary", col: 1, color: HUB });
     if (!N.noFinal) {
-      SECTORS.forEach(function (s) { if (N.final[s] > 0) { nodes.push({ id: "s_" + s, label: D.sectors[s].label, short: D.sectors[s].short, col: 2, color: SECT }); links.push({ from: "hub", to: "s_" + s, value: N.final[s] }); } });
+      SECTORS.forEach(function (s) { if (N.final[s] > 0) { nodes.push({ id: "s_" + s, label: sectorLabel(D, N, s), short: sectorLabel(D, N, s, true), col: 2, color: SECT }); links.push({ from: "hub", to: "s_" + s, value: N.final[s] }); } });
       if (N.nonEnergy > 0) { nodes.push({ id: "nonenergy", label: "Non-energy use (feedstocks)", short: "Feedstocks", col: 2, color: "var(--lx-tier-4)" }); links.push({ from: "hub", to: "nonenergy", value: N.nonEnergy }); }
       if (N.bunkers > 0) { nodes.push({ id: "bunkers", label: "Fuel for international shipping", short: "Shipping fuel", col: 2, color: "var(--lx-ink-3)" }); links.push({ from: "hub", to: "bunkers", value: N.bunkers }); }
       if (P.other < 0) { nodes.push({ id: "exports", label: N.negOther || "Net exports", short: "Exports", col: 2, color: "var(--lx-ink-3)" }); links.push({ from: "hub", to: "exports", value: -P.other }); }
@@ -162,13 +171,13 @@
     var nodes = [{ id: "final", label: "Final energy", short: "Final", col: 0, color: HUB }], links = [], U = withUseful ? useful(N, E) : null;
     SECTORS.forEach(function (s) {
       if (!(N.final[s] > 0)) return;
-      nodes.push({ id: "s_" + s, label: D.sectors[s].label, short: D.sectors[s].short, col: 1, color: SECT });
+      nodes.push({ id: "s_" + s, label: sectorLabel(D, N, s), short: sectorLabel(D, N, s, true), col: 1, color: SECT });
       links.push({ from: "final", to: "s_" + s, value: N.final[s] });
       if (U) { links.push({ from: "s_" + s, to: "useful", value: U.bySector[s] }); links.push({ from: "s_" + s, to: "endloss", value: N.final[s] - U.bySector[s] }); }
     });
-    if (U) {
-      nodes.push({ id: "useful", label: U.estimate ? "Useful energy (estimate)" : "Useful energy", short: "Useful", col: 2, color: "var(--lx-good)" });
-      nodes.push({ id: "endloss", label: U.estimate ? "Lost at the point of use (estimate)" : "Lost at the point of use", short: "Lost in use", col: 2, kind: "loss" });
+    if (U) {   // a real country's useful energy is a what-if at Prairieland's sector efficiencies, named so on the drawing
+      nodes.push({ id: "useful", label: U.estimate ? "Useful energy (what-if)" : "Useful energy", short: "Useful", col: 2, color: "var(--lx-good)" });
+      nodes.push({ id: "endloss", label: U.estimate ? "Lost at the point of use (what-if)" : "Lost at the point of use", short: "Lost in use", col: 2, kind: "loss" });
     }
     return { nodes: nodes, links: links };
   }
@@ -198,7 +207,7 @@
   }
   function viewLine(D, N) {   // step 2's line under the Sankey
     var P = primaryAs(D, N, "pec"), g = largest(D, N);
-    return "**" + N.name + ", " + N.year + "**: " + ejNum(P.total) + " [[exajoule|EJ]] of primary energy; " + srcLabel(D, g.first) + " the largest source (" + pct(g.share) + "); fossil fuels " + pct(P.fossil) + ".";
+    return "**" + N.name + ", " + N.year + "**" + covTag(N) + ": " + ejNum(P.total) + " [[exajoule|EJ]] of primary energy; " + srcLabel(D, g.first) + " the largest source (" + pct(g.share) + "); fossil fuels " + pct(P.fossil) + ".";
   }
   function largestSaw(D, L) {
     var by = {};
@@ -211,17 +220,17 @@
   function accountLine(D, N, E) {
     if (N.noFinal) return N.noFinal;
     var P = primaryAs(D, N, "pec"), U = useful(N, E);
-    return "**" + nameOf(N) + "**: primary " + ej(P.total) + "; final " + ej(N.finalTotal) + " (" + pct(N.finalTotal / P.total) + " of primary); useful " + (U.estimate ? "about " : "") + ej(U.total) +
-      " (" + pct(U.share) + " of final" + (U.estimate ? ", an estimate" : "") + ").";
+    return "**" + nameOf(N) + "**" + covTag(N) + ": primary " + ej(P.total) + "; final " + ej(N.finalTotal) + " (" + pct(N.finalTotal / P.total) + " of primary); useful " +
+      (U.estimate ? "at Prairieland's efficiencies, about " : "") + ej(U.total) + " (" + pct(U.share) + " of final" + (U.estimate ? ", a what-if" : "") + ").";
   }
   function accountSaw(D, L, E) {
     var F = L.filter(function (N) { return !N.noFinal; });
     var bm = F.map(function (N) { return beforeOf(N, primaryAs(D, N, "pec")) / N.total; }), us = F.map(function (N) { return useful(N, E).share; });
-    return "Before the meter " + pct(Math.min.apply(null, bm)) + " to " + pct(Math.max.apply(null, bm)) + " of primary energy is lost or used; then about " +
-      pct(1 - Math.max.apply(null, us)) + " to " + pct(1 - Math.min.apply(null, us)) + " of final energy is lost at the point of use (an estimate).";
+    return "Before the meter " + pct(Math.min.apply(null, bm)) + " to " + pct(Math.max.apply(null, bm)) + " of primary energy is lost or used. At Prairieland's sector efficiencies, about " +
+      pct(1 - Math.max.apply(null, us)) + " to " + pct(1 - Math.min.apply(null, us)) + " of final energy would then be lost at the point of use (a what-if).";
   }
-  var USEFUL_NOTE = "Useful energy is not in official statistics: for the real countries it is an estimate, final energy by sector times Prairieland's sector efficiencies (illustrative).";
-  var FINAL_NOTE = "Final energy here leaves out [[non-energy-use|non-energy use]] (feedstocks) and the energy industry's own use.";
+  var USEFUL_NOTE = "Official statistics stop at final energy. For the real countries, useful energy here is a what-if: their final energy by sector at Prairieland's sector efficiencies (illustrative), not a measurement.";
+  var FINAL_NOTE = "Final energy here leaves out [[non-energy-use|non-energy use]] (feedstocks); the energy industry's own use sits before the meter unless the country's note says otherwise.";
   var BEFORE_NOTE = "\"Before the meter\" holds conversion losses, the energy industry's own use, grid losses and statistical differences; publishers draw these boundaries differently.";
   var Q_CONV = { options: [{ value: "falls", label: "It falls" }, { value: "same", label: "It stays about the same" }, { value: "rises", label: "It rises sharply" }] };
   function convQ(D, L) {
@@ -234,13 +243,18 @@
   }
   function convLine(D, N, conv) {
     var P = primaryAs(D, N, conv), cv = D.conventions.filter(function (x) { return x.key === conv; })[0];
-    return "**" + cv.label + "**: " + poss(N) + " primary energy is " + ej(P.total) + "; nuclear, hydro, wind and solar " + pct(P.elec) + ", fossil fuels " + pct(P.fossil) + "." + (conv === "sub" ? " Assumed thermal efficiency " + pct(P.eta, P.eta === 0.4 ? 0 : 1) + "." : "");
+    return "**" + cv.label + "**: " + poss(N) + " primary energy" + covTag(N) + " is " + ej(P.total) + "; nuclear, hydro, wind and solar " + pct(P.elec) + ", fossil fuels " + pct(P.fossil) + "." + (conv === "sub" ? " Assumed thermal efficiency " + pct(P.eta, P.eta === 0.4 ? 0 : 1) + "." : "");
   }
+  // step 4's reveal starts on the country the prediction was about (Norway), then the reader may switch
+  function convStartKey(D) { return D.mystery.key; }
+  function convSwitchLine(D, L) { return "The line starts with " + nameOf(byKey(L, convStartKey(D))) + ", the country of your prediction; switch country below, or read the table for all seven."; }
   function chinaLine(D, L) {
     var N = byKey(L, "cn"); if (!N) return "";
     var c = N.c, P = primaryAs(D, N, "pec");
     return "China publishes " + pct(c.coalEquivalent.shares.nonFossil, 1) + " for " + c.coalEquivalent.label + ", in coal equivalent, a kind of substitution; by physical energy content its nuclear, hydro, wind and solar come to about " + pct(P.elec, 1) + " (the page's estimate).";
   }
+  var COMPARE_NOTE = "Listed in the course's order, not ranked. Shares are of the sources each balance covers: China's is a partial estimate, and India's balance has no traditional biomass.";
+  var CARD_SAW = "Every card has the same six parts: system, institutions, challenges, research questions, key numbers with their sources and data years, and the day they were checked.";
   var CONV_SAW = "Same plants, same year, different shares: never compare primary-energy shares from two sources without checking their method.";
   // the lenses
   function importText(N) {
@@ -273,7 +287,7 @@
     var s = N.final.buildings / N.finalTotal, extra = N.key === "no" ? " (homes only: services sit in 'other')" : "";
     if (N.PL) {
       var dd = N.PL.regions.map(function (r) { return r.climate.hdd; });
-      extra = "; heating degree days " + fmtN(Math.min.apply(null, dd)) + " to " + fmtN(Math.max.apply(null, dd)) + " by region";
+      extra = "; [[heating-degree-days|heating degree days]] " + fmtN(Math.min.apply(null, dd)) + " to " + fmtN(Math.max.apply(null, dd)) + " by region";
     }
     return pct(s) + " of final energy goes to buildings" + extra;
   }
@@ -284,10 +298,12 @@
   var LENS_MIN = 2;
   var LENS_SAW = "No single lens explains a mix: Norway and the United States both produce more than they use, yet their mixes differ. Each lens lines up with part of the picture; none is the cause on its own.";
   function cardOf(R, id) { return R ? R.cards.filter(function (x) { return x.id === id; })[0] : null; }
-  function cardLine(R, N) {
+  // a source's short name: Ember keeps its label as a compiler of official statistics wherever it is cited
+  function pubName(s) { return /compiler/.test(s.publisher) ? s.publisher : s.publisher.split(",")[0].replace(/ \(.*$/, ""); }
+  function cardPreview(R, N) {   // step 6: the card's system line and its first key number, as two short elements
     var C = cardOf(R, N.card); if (!C) return null;
     var n = C.numbers[0], s = R.sources[n.src];
-    return "**" + C.title + "**: " + C.structure[0] + " One key number: " + n.text.charAt(0).toLowerCase() + n.text.slice(1, -1) + " (" + s.publisher.split(",")[0] + ", " + s.date.split(";")[0] + ").";
+    return { title: C.title, system: C.structure[0], number: n.text, cite: pubName(s) + ", " + s.date.split(";")[0] + (n.year ? "; data: " + n.year : "") };
   }
 
   // ---------------------------------------------------------------- blocks written into the page (by the test's --write)
@@ -296,18 +312,39 @@
   function tableRows(D, L, E) {
     return L.map(function (N) {
       var a = primaryAs(D, N, "pec"), b = primaryAs(D, N, "sub"), U = useful(N, E);
-      return { N: N, primary: a.total, fossil: a.fossil, renPec: a.renewable, renSub: b.renewable, final: N.noFinal ? null : N.finalTotal, fp: N.noFinal ? null : N.finalTotal / a.total, useful: U, imports: importText(N) };
+      return { N: N, primary: a.total, fossil: a.fossil, renPec: a.renewable, renSub: b.renewable, unsplit: a.unsplit, final: N.noFinal ? null : N.finalTotal, fp: N.noFinal ? null : N.finalTotal / a.total,
+               before: N.noFinal ? null : beforeOf(N, a), useful: U, imports: importText(N) };
     });
   }
+  function nameCell(N) { return esc(N.name) + (N.coverage ? "<br><small>" + esc(N.coverage.charAt(0).toUpperCase() + N.coverage.slice(1)) + "</small>" : ""); }
+  // the renewable shares, and any component the publisher does not split (counted as neither renewable nor fossil)
+  function unsplitNote(D, N, share) {
+    var k = Object.keys(N.src).filter(function (s) { return D.nodes[s].unsplit && N.src[s] > 0; });
+    return k.length ? " (" + k.map(function (s) { return srcLabel(D, s); }).join(", ") + ", " + pct(share, 1) + ", not split)" : "";
+  }
+  function renCell(D, r) { return pct(r.renPec) + " / " + pct(r.renSub) + unsplitNote(D, r.N, r.unsplit); }
+  var FLOW_KEY = "us";   // the no-JS worked flow table: the same country as the explain layer's reading guide
   function staticFallback(D, L, E) {
-    var T = tableRows(D, L, E), PLn = L.filter(function (N) { return N.PL; })[0];
+    var T = tableRows(D, L, E), PLn = L.filter(function (N) { return N.PL; })[0], W = byKey(L, FLOW_KEY), ws = primarySpec(D, W, "pec");
+    var lab = {}; ws.nodes.forEach(function (n) { lab[n.id] = n.label; });
+    var th = function (a) { return "<thead><tr>" + a.map(function (x) { return "<th scope=\"col\">" + x + "</th>"; }).join("") + "</tr></thead>"; };
     return "<p class=\"lx-eyebrow\">Seven energy systems, one data year each, in EJ (1 EJ = 1,000 PJ, about 278 TWh)</p>" +
-      "<div class=\"lx-scroll-x\"><table class=\"lx-mini-table f10-fbt\"><thead><tr><th scope=\"col\">Country</th><th scope=\"col\">Year</th><th scope=\"col\">Primary energy</th><th scope=\"col\">Fossil share</th><th scope=\"col\">Renewable share: physical content / substitution</th><th scope=\"col\">Final energy</th><th scope=\"col\">Imports</th></tr></thead><tbody>" +
-      T.map(function (r) { return "<tr><td>" + esc(r.N.name) + "</td><td>" + esc(r.N.year) + "</td><td>" + ej(r.primary) + (r.N.key === "cn" ? " (estimate)" : "") + "</td><td>" + pct(r.fossil) + "</td><td>" + pct(r.renPec) + " / " + pct(r.renSub) + "</td><td>" + (r.final == null ? "not comparable" : ej(r.final)) + "</td><td>" + esc(r.imports) + "</td></tr>"; }).join("") +
+      "<div class=\"lx-scroll-x\"><table class=\"lx-mini-table f10-fbt\">" + th(["Country", "Year", "Primary energy", "Fossil share", "Renewable share: physical content / substitution", "Imports"]) + "<tbody>" +
+      T.map(function (r) { return "<tr><td>" + nameCell(r.N) + "</td><td>" + esc(r.N.year) + "</td><td>" + ej(r.primary) + (r.N.key === "cn" ? " (estimate)" : "") + "</td><td>" + pct(r.fossil) + "</td><td>" + renCell(D, r) + "</td><td>" + esc(r.imports) + "</td></tr>"; }).join("") +
       "</tbody></table></div>" + (PLn ? "<p class=\"lx-hint\">" + esc(PLn.fictional) + "</p>" : "") +
-      "<ul><li><b>Conventions.</b> " + esc(D.conventions.map(function (c) { return c.label + ": " + c.text; }).join(" ")) + "</li>" +
-      "<li><b>China.</b> " + esc(chinaLine(D, L)) + "</li>" +
-      "<li><b>Useful energy.</b> " + esc(USEFUL_NOTE) + "</li></ul>" +
+      "<p class=\"lx-eyebrow\">Primary, final and useful energy, in EJ</p>" +
+      "<div class=\"lx-scroll-x\"><table class=\"lx-mini-table f10-fbt\">" + th(["Country", "Primary", "Lost or used before the meter", "Final (share of primary)", "Useful (share of final)"]) + "<tbody>" +
+      T.map(function (r) {
+        if (r.final == null) return "<tr><td>" + nameCell(r.N) + "</td><td>" + ej(r.primary) + " (estimate)</td><td colspan=\"3\">" + esc(r.N.noFinal) + "</td></tr>";
+        return "<tr><td>" + nameCell(r.N) + "</td><td>" + ej(r.primary) + "</td><td>" + ej(r.before) + "</td><td>" + ej(r.final) + " (" + pct(r.fp) + ")</td><td>" +
+          (r.useful.estimate ? "about " : "") + ej(r.useful.total) + " (" + pct(r.useful.share) + (r.useful.estimate ? ", what-if" : "") + ")</td></tr>";
+      }).join("") + "</tbody></table></div>" +
+      "<ul class=\"f10-notes\"><li><b>Useful energy.</b> " + esc(USEFUL_NOTE) + "</li><li><b>Final energy.</b> " + richStatic(FINAL_NOTE) + "</li>" + (W.finalNote ? "<li><b>" + esc(W.name) + ".</b> " + esc(W.finalNote) + "</li>" : "") + "</ul>" +
+      "<p class=\"lx-eyebrow\">One balance, flow by flow: " + esc(theName(W)) + ", " + esc(W.year) + ", in EJ (physical energy content)</p>" +
+      "<div class=\"lx-scroll-x\"><table class=\"lx-mini-table f10-fbt\">" + th(["From", "To", "EJ"]) + "<tbody>" +
+      ws.links.map(function (l) { return "<tr><td>" + esc(lab[l.from]) + "</td><td>" + esc(lab[l.to]) + "</td><td>" + ejNum(l.value) + "</td></tr>"; }).join("") + "</tbody></table></div>" +
+      "<ul>" + D.conventions.map(function (c) { return "<li><b>" + esc(c.label) + ".</b> " + esc(c.text) + "</li>"; }).join("") +
+      "<li><b>China.</b> " + esc(chinaLine(D, L)) + "</li></ul>" +
       "<p class=\"lx-hint\">With JavaScript on, you guess a country from its mix, switch between countries and conventions, turn on four lenses and open the regional cards.</p>";
   }
   function ideasHTML(D, L, E) {
@@ -315,7 +352,7 @@
     var no = byKey(L, "no"), a = primaryAs(D, no, "pec"), b = primaryAs(D, no, "sub");
     return "<dl class=\"lx-ideas\">" +
       "<dt>One picture per country</dt><dd>A national Sankey shows where energy comes from and where it goes; no two of these seven look alike.</dd>" +
-      "<dt>Primary, final, useful</dt><dd>Final energy is " + pct(Math.min.apply(null, fp)) + " to " + pct(Math.max.apply(null, fp)) + " of primary energy here; useful energy is less again, and only an estimate.</dd>" +
+      "<dt>Primary, final, useful</dt><dd>Final energy is " + pct(Math.min.apply(null, fp)) + " to " + pct(Math.max.apply(null, fp)) + " of primary energy here; useful energy is less again, and for the real countries only a what-if.</dd>" +
       "<dt>Conventions</dt><dd>Norway's renewable share is " + pct(a.renewable) + " by physical energy content and " + pct(b.renewable) + " by substitution: the method moves the number.</dd>" +
       "<dt>Why mixes differ</dt><dd>Resources, imports, climate and institutions each line up with part of a mix; none explains it alone.</dd>" +
       "<dt>Regions</dt><dd>The regional cards set each country in its grid, its institutions and its open research questions.</dd></dl>";
@@ -329,10 +366,10 @@
     return "<div class=\"lx-myths\" data-quiz=\"f10-myth\">" +
       q("share", "myth", "A country's renewable share of primary energy is a single, fixed number.", "Myth. Norway's is " + pct(a.renewable) + " by physical energy content and " + pct(b.renewable) + " by substitution, for the same plants in the same year.") +
       q("exporter", "myth", "A country that produces more energy than it uses imports none.", "Myth. Norway produced " + fmtN(no.P.production) + " TWh in 2025 and still imported " + fmtN(no.P.imports) + " TWh, while exporting " + fmtN(no.P.exports) + " TWh.") +
-      q("useful", "myth", "Most of a country's primary energy ends up as useful heat, motion and light.", "Myth, by this page's estimate: in the five real countries drawn here, about " + pct(Math.min.apply(null, op)) + " to " + pct(Math.max.apply(null, op)) + " of primary energy becomes useful energy.") +
+      q("useful", "myth", "If every country used energy at Prairieland's sector efficiencies, most of its primary energy would end up as useful heat, motion and light.", "Myth, in this what-if: for the five real countries drawn here, " + pct(Math.min.apply(null, op)) + " to " + pct(Math.max.apply(null, op)) + " of primary energy would become useful energy. Their real efficiencies differ and are not in official statistics.") +
       "</div><div class=\"lx-quiz\" data-quiz=\"f10\">" +
       qq("which", "a", "Which of the seven gets " + pct(iP.v.coal / iP.total) + " of its primary energy from coal and lignite and imports " + pct(ind.importDep) + " of its supply?", [["a", "India"], ["b", "The European Union"], ["c", "Brazil"]],
-        "India (fiscal year " + esc(ind.year.replace(/^fiscal year /, "").replace(/ \(provisional\)$/, "")) + "): coal and lignite " + pct(iP.v.coal / iP.total) + "; net import dependency " + pct(ind.importDep, 2) + ", as MoSPI publishes it.") +
+        "India (fiscal year " + esc(ind.year.replace(/^fiscal year /, "").replace(/ \(provisional\)$/, "")) + "): coal and lignite " + pct(iP.v.coal / iP.total) + " of the sources its balance covers (" + esc(ind.coverage) + "); net import dependency " + pct(ind.importDep, 2) + ", as MoSPI publishes it.") +
       qq("mult", "b", "By substitution at " + pct(eta) + " efficiency, 1 TWh of wind electricity (" + fmtN(per, 1) + " PJ) counts as how many PJ of primary energy?", [["a", fmtN(per, 1) + " PJ"], ["b", fmtN(sub1, 0) + " PJ"], ["c", fmtN(per / 0.33, 1) + " PJ"]],
         fmtN(per, 1) + " ÷ " + fmtN(eta, 2) + " = " + fmtN(sub1, 1) + " PJ: the fuel a thermal plant at " + pct(eta) + " would burn to make it, " + fmtN(1 / eta, 1) + " times the electricity.") +
       qq("dep", "a", "The EU's import dependency was " + pct(byKey(L, "eu").importDep, 1) + " in 2024. What does Eurostat divide by what?", [["a", "Net imports ÷ gross available energy"], ["b", "Imports ÷ production"], ["c", "Production ÷ gross available energy"]],
@@ -349,10 +386,24 @@
     return "<table class=\"lx-facts\"><thead><tr><th scope=\"col\">Number</th><th scope=\"col\">What it means</th><th scope=\"col\">Source</th></tr></thead><tbody>" +
       D.facts.map(function (f) { return "<tr><td class=\"n\">" + esc(f.n) + "</td><td>" + esc(f.what) + "</td><td class=\"s\">" + (f.url && f.url !== "no link" ? "<a href=\"" + esc(f.url) + "\">" + esc(f.source) + "</a>" : esc(f.source)) + " · " + esc(f.asof) + "</td></tr>"; }).join("") + "</tbody></table>";
   }
+  // where each country's numbers come from, one field per cell (labelled lines on phones: forms.css table.cf-two)
+  var PROV_COLS = [["published", "Published"], ["method", "Counting method"], ["coverage", "Coverage"], ["adjust", "Changes on this page"]];
   function notesHTML(D) {
-    return "<ul class=\"f10-notes\">" + D.countries.map(function (c) {
-      return "<li><b>" + esc(c.name) + ", " + esc(c.year) + ".</b> " + esc(c.published) + " " + esc(c.notes.join(" ")) + "</li>";
-    }).join("") + "</ul>";
+    return "<table class=\"cf-two f10-prov\"><thead><tr><th scope=\"col\">Country and data year</th>" + PROV_COLS.map(function (p) { return "<th scope=\"col\">" + p[1] + "</th>"; }).join("") + "</tr></thead><tbody>" +
+      D.countries.map(function (c) {
+        return "<tr><th scope=\"row\">" + esc(c.name) + ", " + esc(c.year) + "</th>" + PROV_COLS.map(function (p) { return "<td data-l=\"" + p[1] + "\">" + esc(c.prov[p[0]]) + "</td>"; }).join("") + "</tr>";
+      }).join("") + "</tbody></table>";
+  }
+  // Go deeper: why substitution enlarges electricity; nuclear's share is recomputed under each convention
+  var SUBST_KEY = "us";
+  function substHTML(D, L) {
+    var N = byKey(L, SUBST_KEY), a = primaryAs(D, N, "pec"), b = primaryAs(D, N, "sub"), eta = D.subEff;
+    return "<ul class=\"f10-notes\">" +
+      "<li><b>The rule.</b> A thermal plant at efficiency η burns 3.6 ÷ η PJ of fuel for each TWh it makes. Substitution counts every TWh from nuclear, hydro, wind and solar that way: " + fmtN(1 / eta, 1) + " times its electricity at " + pct(eta) + ", about " + fmtN(1 / D.nuclearHeatEff, 0) + " times at " + pct(D.nuclearHeatEff) + ".</li>" +
+      "<li><b>Nuclear under physical content.</b> Its reactors' heat: measured where it is reported (the EU), from the plants' average heat rate (the U.S.), or electricity ÷ " + fmtN(D.nuclearHeatEff, 2) + " where the heat is not known (India, Brazil, this page's China estimate).</li>" +
+      "<li><b>Recompute the share.</b> Substitution changes nuclear's assigned energy (electricity ÷ " + fmtN(eta, 2) + ") and enlarges hydro, wind and solar, so the total changes too: " + poss(N) + " nuclear is " + pct(a.v.nuclear / a.total, 1) + " by physical content, " + pct(b.v.nuclear / b.total, 1) + " by substitution.</li>" +
+      "<li><b>Direct equivalent</b> counts every TWh at 3.6 PJ, so nuclear's energy falls to about a third of its physical-content value.</li>" +
+      "<li><b>China's coal equivalent</b> is a substitution at the year's coal burned per kWh in thermal plants.</li></ul>";
   }
   var PL_SRC = ["dossier-card", "iea-faq", "owid-primary"];
   function srcItem(s) {
@@ -368,9 +419,10 @@
   var model = { SECTORS: SECTORS, nation: nation, prairie: prairie, nations: nations, byKey: byKey, effs: effs, useful: useful, primaryAs: primaryAs, largest: largest,
     primarySpec: primarySpec, finalSpec: finalSpec, balanceOf: balanceOf, beforeOf: beforeOf, pubOf: pubOf,
     STEPS: STEPS, mysteryQ: mysteryQ, viewLine: viewLine, largestSaw: largestSaw, COMPARE_MIN: COMPARE_MIN, countLine: countLine, accountLine: accountLine, accountSaw: accountSaw,
-    USEFUL_NOTE: USEFUL_NOTE, BEFORE_NOTE: BEFORE_NOTE, FINAL_NOTE: FINAL_NOTE, Q_CONV: Q_CONV, convQ: convQ, convRows: convRows, convLine: convLine, chinaLine: chinaLine, CONV_SAW: CONV_SAW,
+    USEFUL_NOTE: USEFUL_NOTE, BEFORE_NOTE: BEFORE_NOTE, FINAL_NOTE: FINAL_NOTE, Q_CONV: Q_CONV, convQ: convQ, convRows: convRows, convLine: convLine, chinaLine: chinaLine, CONV_SAW: CONV_SAW, CARD_SAW: CARD_SAW, COMPARE_NOTE: COMPARE_NOTE,
     importText: importText, prodText: prodText, resourcesText: resourcesText, climateText: climateText, institutionsText: institutionsText, lensCell: lensCell, LENS_MIN: LENS_MIN, LENS_SAW: LENS_SAW,
-    cardOf: cardOf, cardLine: cardLine, tableRows: tableRows, staticFallback: staticFallback, ideasHTML: ideasHTML, checkHTML: checkHTML, factsHTML: factsHTML, notesHTML: notesHTML, sourcesHTML: sourcesHTML, PL_SRC: PL_SRC,
+    cardOf: cardOf, cardPreview: cardPreview, pubName: pubName, tableRows: tableRows, staticFallback: staticFallback, ideasHTML: ideasHTML, checkHTML: checkHTML, factsHTML: factsHTML, notesHTML: notesHTML, sourcesHTML: sourcesHTML, PL_SRC: PL_SRC,
+    substHTML: substHTML, SUBST_KEY: SUBST_KEY, FLOW_KEY: FLOW_KEY, PROV_COLS: PROV_COLS, sectorLabel: sectorLabel, covTag: covTag, convStartKey: convStartKey, convSwitchLine: convSwitchLine, unsplitNote: unsplitNote,
     cnRatio: cnRatio, fmtN: fmtN, pct: pct, ej: ej, ejNum: ejNum, richStatic: richStatic, nameOf: nameOf, theName: theName, poss: poss };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
@@ -418,7 +470,7 @@
           var tried = {}, cs = seg(act, "Country", countryItems, function (k) { last.key = k; draw(); });
           var vs = seg(act, "Accounting", [{ value: "primary", label: "Primary" }, { value: "final", label: "Final" }, { value: "useful", label: "Useful" }], function (v) { last.view = v; tried[v] = true; draw(); });
           var host = H("div", null, act), sk = null, skView = null, msg = H("p", { class: "lx-hint" }, act);
-          var ln = H("p", { class: "lx-step-line", "aria-live": "polite" }, act), note = H("p", { class: "lx-hint" }, act), fict = H("div", null, act);
+          var ln = H("p", { class: "lx-step-line", "aria-live": "polite" }, act), note = H("p", { class: "lx-hint" }, act), cnote = H("p", { class: "lx-hint" }, act), fict = H("div", null, act);
           function draw() {
             var N = byKey(L, last.key); cs.set(last.key); vs.set(last.view);
             var spec = last.view === "primary" ? primarySpec(D, N, "pec") : finalSpec(D, N, E, last.view === "useful");
@@ -431,6 +483,7 @@
             if (spec) sk.set(spec);
             ln.innerHTML = bold(accountLine(D, N, E));
             note.innerHTML = LX.rich(last.view === "primary" ? BEFORE_NOTE : last.view === "useful" ? (N.PL ? N.PL.balance.useful.note : USEFUL_NOTE) : FINAL_NOTE);
+            cnote.textContent = N.finalNote && last.view !== "useful" ? N.finalNote : ""; cnote.hidden = !cnote.textContent;   // the U.S. end-use boundary
             fict.innerHTML = ""; fictional(fict, N);
             if (tried.primary && tried.final && tried.useful) { api.done(); api.saw(accountSaw(D, L, E)); }
           }
@@ -444,16 +497,21 @@
           var shown = false, pickAll = null;
           function show() {
             pr.reveal(); if (shown) return; shown = true;
+            last.key = convStartKey(D);   // the prediction was about Norway: its line comes first, then any country
             var tried = {}, s = seg(res, "Convention", D.conventions.map(function (c) { return { value: c.key, label: c.short }; }), pick);
-            var who = H("p", { class: "lx-hint", "aria-live": "polite" }, res), ln = H("p", { class: "lx-step-line", "aria-live": "polite" }, res);
+            var who = H("p", { class: "lx-hint", "aria-live": "polite" }, res);
+            H("p", { class: "lx-hint", text: convSwitchLine(D, L) }, res);
+            var cs = seg(res, "Country for the line below", countryItems, function (k) { last.key = k; line(); });
+            var ln = H("p", { class: "lx-step-line", "aria-live": "polite" }, res);
             var tbHost = H("div", { class: "lx-scroll-x" }, res);
             H("p", { class: "lx-hint", text: chinaLine(D, L) }, res);
-            H("p", { class: "lx-hint", text: D.subEffNote }, res);
+            var nl = H("ul", { class: "f10-notes" }, res); D.subEffNotes.forEach(function (t) { H("li", { text: t }, nl); });
+            function line() { cs.set(last.key); ln.innerHTML = bold(convLine(D, byKey(L, last.key), last.conv)); }
             function pick(cv) {
               last.conv = cv; tried[cv] = true; s.set(cv);
               var C = D.conventions.filter(function (x) { return x.key === cv; })[0];
               who.textContent = C.text + (C.who ? " Used by " + C.who + "." : " " + C.note);
-              ln.innerHTML = bold(convLine(D, byKey(L, last.key), cv));
+              line();
               tbHost.innerHTML = convTable(cv) + plLine();
               if (Object.keys(tried).length === D.conventions.length) { api.done(); api.saw(CONV_SAW); }
             }
@@ -469,7 +527,7 @@
           function draw() {
             var on = D.lenses.filter(function (l) { return last.lenses[l.key]; });
             host.innerHTML = lensTable(on);
-            ln.innerHTML = on.map(function (l) { return "<b>" + LX.esc(l.label) + "</b>: " + LX.esc(l.text); }).join("<br>");
+            ln.innerHTML = on.map(function (l) { return "<b>" + LX.esc(l.label) + "</b>: " + LX.rich(l.text); }).join("<br>");
             if (on.length >= LENS_MIN) { api.done(); api.saw(LENS_SAW); }
           }
           draw();
@@ -482,9 +540,11 @@
           function open(k) {
             s.set(k); var N = byKey(L, k), C = cardOf(R, N.card);
             out.innerHTML = "";
-            H("p", { class: "lx-step-line", html: bold(cardLine(R, N)) }, out);
+            var cp = cardPreview(R, N);
+            H("p", { class: "lx-step-line", html: "<b>" + LX.esc(cp.title) + "</b>: " + LX.rich(cp.system) }, out);
+            H("p", { class: "lx-hint", html: "One key number: " + LX.rich(cp.number) + " (" + LX.esc(cp.cite) + ")" }, out);
             H("a", { class: "lx-btn small", style: "justify-self:start", href: "regions.html#" + C.id, html: "Open the " + LX.esc(C.title) + " card" + LX.icon("arrow") }, out);
-            api.done(); api.saw("Every card has the same six parts: system, institutions, challenges, research questions, key numbers with their sources, and the date they were read.");
+            api.done(); api.saw(CARD_SAW);
           }
           H("a", { class: "lx-btn ghost small", style: "justify-self:start;margin-top:10px", href: "regions.html", html: "All twelve regional cards" + LX.icon("arrow") }, act);
           demo[5] = function () { open(withCard[0].key); };
@@ -494,12 +554,12 @@
       var rowsC = convRows(D, L);
       return "<table class=\"lx-mini-table f10-conv\"><caption>Nuclear, hydro, wind and solar's share of primary energy</caption><thead><tr><th scope=\"col\">Country</th>" +
         D.conventions.map(function (c) { return "<th scope=\"col\"" + (c.key === cv ? " class=\"on\"" : "") + ">" + LX.esc(c.short) + "</th>"; }).join("") + "</tr></thead><tbody>" +
-        rowsC.map(function (r) { return "<tr><th scope=\"row\">" + LX.esc(r.name) + (r.key === "cn" ? " (estimate)" : "") + "</th>" + D.conventions.map(function (c) { return "<td" + (c.key === cv ? " class=\"on\"" : "") + ">" + pct(r[c.key]) + "</td>"; }).join("") + "</tr>"; }).join("") + "</tbody></table>";
+        rowsC.map(function (r) { return "<tr><th scope=\"row\">" + LX.esc(r.name) + LX.esc(covTag(byKey(L, r.key))) + "</th>" + D.conventions.map(function (c) { return "<td" + (c.key === cv ? " class=\"on\"" : "") + ">" + pct(r[c.key]) + "</td>"; }).join("") + "</tr>"; }).join("") + "</tbody></table>";
     }
     function lensTable(on) {
       if (!on.length) return "<p class=\"lx-hint\">Turn on a lens to add its column.</p>";
       return "<table class=\"cf-two f10-lens\"><thead><tr><th scope=\"col\">Country</th>" + on.map(function (l) { return "<th scope=\"col\">" + LX.esc(l.label) + "</th>"; }).join("") + "</tr></thead><tbody>" +
-        L.map(function (N) { return "<tr><th scope=\"row\">" + LX.esc(nameOf(N)) + "</th>" + on.map(function (l) { return "<td data-l=\"" + LX.esc(l.label) + "\">" + LX.esc(lensCell(D, N, l.key)) + "</td>"; }).join("") + "</tr>"; }).join("") +
+        L.map(function (N) { return "<tr><th scope=\"row\">" + LX.esc(nameOf(N)) + "</th>" + on.map(function (l) { return "<td data-l=\"" + LX.esc(l.label) + "\">" + LX.rich(lensCell(D, N, l.key)) + "</td>"; }).join("") + "</tr>"; }).join("") +
         "</tbody></table>" + (PL ? "<p class=\"lx-hint\">" + LX.esc(PL.about.line) + "</p>" : "");
     }
     function plLine() { return PL ? "<p class=\"lx-hint\">" + LX.esc(PL.about.line) + "</p>" : ""; }
@@ -520,9 +580,8 @@
       var T = tableRows(D, L, E);
       LX.CompareTable(H("div", { class: "lx-xcard" }, xhost), { title: "Seven energy systems side by side", text: true,
         columns: [{ key: "name", label: "Country and data year", main: true }, { key: "primary", label: "Primary energy" }, { key: "fossil", label: "Fossil share" }, { key: "ren", label: "Renewable share (physical content / substitution)" }, { key: "fp", label: "Final ÷ primary" }, { key: "imp", label: "Imports" }],
-        rows: T.map(function (r) { return { key: r.N.key, color: r.N.PL ? "var(--lx-tier-1)" : "var(--lx-tier-2)", name: r.N.name, note: r.N.year, primary: ej(r.primary) + (r.N.key === "cn" ? " (estimate)" : ""), fossil: pct(r.fossil), ren: pct(r.renPec) + " / " + pct(r.renSub), fp: r.fp == null ? "not comparable" : pct(r.fp), imp: r.imports }; }),
-        sorts: [{ label: "As listed", order: T.map(function (r) { return r.N.key; }) },
-                { label: "By fossil share", order: T.slice().sort(function (a, b) { return b.fossil - a.fossil; }).map(function (r) { return r.N.key; }), ranked: true, note: "Fossil share of primary energy, by physical energy content (China: the page's estimate)." }] });
+        rows: T.map(function (r) { return { key: r.N.key, color: r.N.PL ? "var(--lx-tier-1)" : "var(--lx-tier-2)", name: r.N.name, note: r.N.year + (r.N.coverage ? "; " + r.N.coverage : ""), primary: ej(r.primary) + (r.N.key === "cn" ? " (estimate)" : ""), fossil: pct(r.fossil), ren: renCell(D, r), fp: r.fp == null ? "not comparable" : pct(r.fp), imp: r.imports }; }),
+        sorts: [{ label: "As listed", order: T.map(function (r) { return r.N.key; }), note: COMPARE_NOTE }] });
       var nx = H("div", { class: "lx-xcard" }, xhost);
       H("h3", { text: "Where this goes next" }, nx);
       var ul = H("ul", { class: "f10-next" }, nx);
@@ -537,7 +596,8 @@
     if (full && PL) {
       full.innerHTML = "";
       var sp = PL.balance.sankey;
-      LX.Sankey(full, { label: "Prairieland's 2025 energy in full, in PJ", unit: "PJ", badges: true,   // six columns: numbered badges and a key at every width, so no label crosses a column fmt: function (v) { return fmtN(v); }, height: 380, heightN: 460, textHead: ["From", "To", "PJ"],
+      // six columns: numbered badges and a key at every width, so no label crosses a column
+      LX.Sankey(full, { label: "Prairieland's 2025 energy in full, in PJ", unit: "PJ", badges: true, fmt: function (v) { return fmtN(v); }, height: 380, heightN: 460, textHead: ["From", "To", "PJ"],
         colNames: ["Sources", "Primary", "Conversion", "Carriers", "Sectors", "Becomes"] }).set({ nodes: sp.nodes.map(function (n) { return { id: n.id, label: n.label, short: n.short, col: n.col, kind: n.kind === "loss" ? "loss" : n.kind, color: n.kind === "loss" ? null : "var(--lx-ink-2)" }; }), links: sp.links });
       H("p", { class: "lx-hint", text: PL.about.line + " " + sp.note }, full);
     }

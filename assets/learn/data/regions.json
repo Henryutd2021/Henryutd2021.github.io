@@ -1,5 +1,5 @@
 {
-  "about": "The twelve regional profile cards of Learn (curriculum v2 §15): one structure for every card (system structure, institutions, main challenges, distinctive research questions, verified key numbers, as-of date). Ten cards come from the course's field-landscape survey, whose numbers were each opened on the cited page on 2 November 2026; the Plains (SPP) and Australia cards were verified on their primary sources on 7 November 2026. Ember is cited as a compiler of official statistics. No ranking of regions and no verdict on any policy.",
+  "about": "The twelve regional profile cards of Learn (curriculum v2 §15): one structure for every card (system structure, institutions, main challenges, distinctive research questions, verified key numbers, the date they were checked). Ten cards come from the course's field-landscape survey, whose numbers were each opened on the cited page on 2 November 2026; the Plains (SPP) and Australia cards were verified on their primary sources on 7 November 2026. Every key number carries its source, the source's date and the year its data describe; a surveyed figure whose data year is unknown is held back. Ember is cited as a compiler of official statistics. Each card's focus is an editorial choice, not a property of the region. No ranking of regions and no verdict on any policy.",
   "parts": [
     {
       "key": "structure",
@@ -33,39 +33,42 @@
         "large-load adequacy"
       ],
       "structure": [
-        "Seven ISO/RTO markets, plus vertically integrated utilities in much of the Southeast and West.",
-        "Three weakly coupled interconnections.",
+        "Seven [[rto|independent grid operators]] (ISOs and RTOs) run wholesale markets; elsewhere [[vertically-integrated-utility|vertically integrated utilities]] own plants and wires, as in much of the Southeast and West.",
+        "Three main grids, the [[synchronous-grid|interconnections]], weakly linked to one another.",
         "Gas is the largest source of electricity; demand is rising again with data centers, manufacturing and electrification."
       ],
       "institutions": [
-        "FERC: wholesale markets and interstate transmission.",
-        "NERC: reliability standards.",
-        "DOE and EIA: research, policy and statistics.",
+        "[[ferc|FERC]] (Federal Energy Regulatory Commission): wholesale markets and interstate transmission.",
+        "NERC (North American Electric Reliability Corporation): reliability standards.",
+        "DOE (Department of Energy) and [[eia|EIA]], its statistics agency: research, policy and statistics.",
         "State utility commissions: retail rates.",
         "ISOs and RTOs: grid operation and markets."
       ],
       "challenges": [
-        "A long interconnection backlog, and who pays for new transmission.",
-        "Adequacy as large loads arrive and older plants retire.",
+        "A long [[interconnection-queue|interconnection backlog]], and who pays for new transmission.",
+        "[[resource-adequacy|Adequacy]], enough supply in nearly every hour, as large loads arrive and older plants retire.",
         "Extreme weather."
       ],
       "questions": [
         "How much capacity can flexible large loads save?",
-        "Do the cluster-study reforms after FERC Order 2023 shorten the time to operation?",
+        "Do the [[cluster-study|cluster-study]] reforms after FERC Order 2023 shorten the time to operation?",
         "What does transmission between regions buy in extreme cold?"
       ],
       "numbers": [
         {
           "text": "About 2,061 GW seeking interconnection at the end of 2025: 1,312 GW of generation and about 749 GW of storage.",
-          "src": "lbnl-queued"
+          "src": "lbnl-queued",
+          "year": "end of 2025"
         },
         {
           "text": "Wind and utility-scale solar made 17% of 2025's generation; 19% with small-scale solar.",
-          "src": "eia-67367"
+          "src": "eia-67367",
+          "year": "2025"
         },
         {
           "text": "Data centers used 4.4% of U.S. electricity in 2023 (176 TWh).",
-          "src": "doe-dc"
+          "src": "doe-dc",
+          "year": "2023"
         }
       ],
       "read": "2 November 2026"
@@ -78,48 +81,54 @@
         "wind",
         "winter adequacy"
       ],
-      "note": "Prairie Town's real-data home: the course's hourly shapes come from this grid.",
+      "note": "Prairie Town's real-data home: the course's hourly shapes come from this grid in 2025, before its western expansion.",
       "structure": [
-        "A regional transmission organization (RTO): it runs the bulk grid and the wholesale market for its members.",
+        "A [[rto|regional transmission organization]] (RTO): it runs the bulk grid and the wholesale market for its members.",
         "One market since 1 March 2014, the Integrated Marketplace: day-ahead and real-time energy, reserves and congestion rights.",
-        "At the western edge of the Eastern Interconnection, between MISO to the east and ERCOT to the south."
+        "In the Eastern Interconnection it sits between MISO to the east and ERCOT to the south.",
+        "Since 1 April 2026 its RTO services also reach parts of seven western states, in the Western Interconnection."
       ],
       "institutions": [
         "SPP: reliability coordination, scheduling, transmission planning and the wholesale market.",
-        "FERC: granted SPP its RTO status in 2004.",
+        "FERC, the federal regulator: granted SPP its RTO status in 2004.",
         "SPP's Market Monitoring Unit: an independent monitor that reports on the market each year.",
         "Members: generation-and-transmission cooperatives, municipal systems, investor-owned utilities, independent transmission companies and power producers."
       ],
       "challenges": [
-        "Congestion and wind curtailment: average hourly curtailment rose from 136 MW in 2019 to 1,097 MW in 2023.",
+        "Congestion and wind [[curtailment|curtailment]]: average hourly curtailment rose from 136 MW in 2019 to 1,097 MW in 2023.",
         "Winter adequacy and fuel supply: in February 2021 SPP cut regional demand twice, the first region-wide curtailments in its history.",
         "In 2025, rising gas prices, load growth and resource adequacy concerns."
       ],
       "questions": [
         "How much does new transmission cut wind curtailment and congestion?",
-        "How should capacity be accredited when cold weather takes out many plants and their fuel at once?",
+        "How should capacity be [[capacity-accreditation|accredited]] when cold weather takes out many plants and their fuel at once?",
         "How should wind forecast uncertainty enter the day-ahead commitment?"
       ],
       "numbers": [
         {
           "text": "161 members in all or part of 17 states, about 732,086 square miles; among them 26 generation-and-transmission cooperatives, 18 municipal systems and 16 investor-owned utilities.",
-          "src": "spp-facts"
+          "src": "spp-facts",
+          "year": "October 2026, after the western expansion"
         },
         {
           "text": "Wind made 36.7% of the 300,382 GWh produced in 2025, more than coal (29%) or gas (25.1%).",
-          "src": "spp-facts"
+          "src": "spp-facts",
+          "year": "2025, before the western expansion"
         },
         {
           "text": "Wind capacity 35,934 MW at the end of 2025.",
-          "src": "spp-som"
+          "src": "spp-som",
+          "year": "end of 2025, before the western expansion"
         },
         {
           "text": "Peak 58.0 GW on 27 July 2026, a record; the earlier peak was 56.0 GW on 21 August 2023.",
-          "src": "eia-68305"
+          "src": "eia-68305",
+          "year": "27 July 2026, after the western expansion"
         },
         {
           "text": "February 2021: demand cut by about 1.5% for 50 minutes on 15 February and about 6.5% for about three hours on 16 February.",
-          "src": "spp-uri"
+          "src": "spp-uri",
+          "year": "February 2021"
         }
       ],
       "read": "7 November 2026"
@@ -133,40 +142,44 @@
         "flexibility"
       ],
       "structure": [
-        "Unbundled zonal markets, coupled day-ahead and intraday.",
+        "[[unbundling|Unbundled]]: separate companies make, carry and sell power.",
+        "Each [[bidding-zone|price zone]] has its own price; [[market-coupling|coupled markets]] link the zones a day ahead and within the day.",
         "Dense interconnection between countries.",
-        "Nuclear power, led by France; wind; fast-growing solar.",
+        "Nuclear power, led by France, with wind and fast-growing solar.",
         "Flat demand overall, with clusters of data-center load."
       ],
       "institutions": [
-        "European Commission (DG ENER): energy law and policy.",
-        "ACER: cooperation of national regulators.",
-        "ENTSO-E: the transmission operators' network and grid plans.",
-        "National regulators and TSOs; Eurostat for statistics."
+        "European Commission (DG ENER, its energy department): energy law and policy.",
+        "ACER, the EU Agency for the Cooperation of Energy Regulators: links the national regulators.",
+        "ENTSO-E, the European network of transmission system operators: grid plans.",
+        "National regulators and transmission system operators (TSOs); Eurostat for statistics."
       ],
       "challenges": [
-        "Congestion and redispatch costs.",
-        "Negative prices and falling solar capture prices.",
+        "[[congestion|Congestion]], and the cost of redispatch: paying plants to change their output so flows fit the lines.",
+        "[[negative-price|Negative prices]], and falling solar [[capture-price|capture prices]].",
         "Security of supply after 2022.",
         "Slow permitting of grids."
       ],
       "questions": [
-        "How does bidding-zone design affect redispatch?",
+        "How does the design of price zones affect redispatch?",
         "Which mix of storage, demand response and interconnection cuts negative-price hours most?",
         "Which connection rules fit clusters of data-center load?"
       ],
       "numbers": [
         {
           "text": "Renewables made 47.5% of gross electricity consumption in 2024 (Austria 90.1%, Malta 10.7%).",
-          "src": "eurostat-ren"
+          "src": "eurostat-ren",
+          "year": "2024"
         },
         {
           "text": "Wind and solar made 30% of 2025's electricity, above fossil fuels at 29%.",
-          "src": "ember-eer"
+          "src": "ember-eer",
+          "year": "2025"
         },
         {
           "text": "Data centers used 23% of Ireland's metered electricity in 2025 (5% in 2015).",
-          "src": "cso-dc"
+          "src": "cso-dc",
+          "year": "2025"
         }
       ],
       "read": "2 November 2026"
@@ -185,33 +198,36 @@
         "Ultra-high-voltage (UHV) lines carry power from west to east; coal still leads generation."
       ],
       "institutions": [
-        "NDRC and NEA: planning, prices and energy regulation.",
+        "NDRC (National Development and Reform Commission) and NEA (National Energy Administration): planning, prices and regulation.",
         "State Grid and China Southern Power Grid.",
         "China Electricity Council; the National Bureau of Statistics (NBS).",
         "Beijing and Guangzhou power exchanges."
       ],
       "challenges": [
-        "Rising curtailment of wind and solar.",
+        "Rising [[curtailment|curtailment]] of wind and solar.",
         "Barriers to trade between provinces.",
         "Coal plants retrofitted for flexibility, and capacity payments."
       ],
       "questions": [
         "How do provincial spot designs affect how much wind and solar is used?",
-        "Which mix of UHV lines, storage and flexible coal keeps utilisation at or above 90% at least cost?",
+        "Which mix of ultra-high-voltage lines, storage and flexible coal keeps curtailment low at least cost?",
         "How does market pricing change where wind and solar are built?"
       ],
       "numbers": [
         {
-          "text": "317 GW of solar added in 2025; utilisation 95% for solar and 94% for wind.",
-          "src": "nea-feb"
+          "text": "317 GW of solar added in 2025; about 95% of available solar output and 94% of available wind output was used, not [[curtailment|curtailed]] (this is not a [[capacity-factor|capacity factor]]).",
+          "src": "nea-feb",
+          "year": "2025"
         },
         {
           "text": "Solar capacity 1,286 GW at the end of July 2026, passing coal at 1,285 GW.",
-          "src": "nea-sep"
+          "src": "nea-sep",
+          "year": "end of July 2026"
         },
         {
           "text": "Fossil fuels made 58% of 2025's electricity; wind and solar 22%.",
-          "src": "ember-china"
+          "src": "ember-china",
+          "year": "2025"
         }
       ],
       "read": "2 November 2026"
@@ -226,13 +242,14 @@
       ],
       "structure": [
         "State distribution companies (DISCOMs) buy power under long-term contracts.",
-        "One synchronous national grid.",
-        "Coal makes most of the electricity, while most capacity is now non-fossil; the evening peak binds."
+        "One national grid running at one frequency ([[synchronous-grid|synchronous]]).",
+        "Coal makes most of the electricity, while most capacity is now non-fossil.",
+        "The evening peak, after sunset, is the hardest time to meet demand."
       ],
       "institutions": [
         "Ministry of Power and the Ministry of New and Renewable Energy (MNRE).",
-        "Central Electricity Authority (CEA).",
-        "CERC and state commissions: regulation and tariffs.",
+        "Central Electricity Authority (CEA): national electricity planning.",
+        "CERC (Central Electricity Regulatory Commission) and state commissions: regulation and tariffs.",
         "Grid-India (operator), CTUIL (transmission planning) and SECI (renewable tenders)."
       ],
       "challenges": [
@@ -248,11 +265,13 @@
       "numbers": [
         {
           "text": "Non-fossil capacity 300.50 GW, over 54% of about 552 GW, on 31 July 2026.",
-          "src": "pib-mnre"
+          "src": "pib-mnre",
+          "year": "31 July 2026"
         },
         {
           "text": "Fossil fuels made 73% of 2025's electricity; solar 9.4%.",
-          "src": "ember-india"
+          "src": "ember-india",
+          "year": "2025"
         }
       ],
       "read": "2 November 2026"
@@ -266,17 +285,19 @@
         "links between regions"
       ],
       "structure": [
-        "Japan: ten areas, split between 50 Hz and 60 Hz, joined by limited converters; liberalised retail, a power exchange (JEPX) and a capacity market.",
+        "Japan: ten utility areas, nine of them interconnected; Okinawa's is separate.",
+        "Japan's east runs at 50 Hz and its west at 60 Hz, joined by limited frequency converters.",
+        "Japan: retail open to competition, a power exchange (JEPX) and a [[capacity-market|capacity market]].",
         "South Korea: one network and retail company (KEPCO) and a cost-based pool (KPX).",
-        "Both are isolated systems that import their fuels; nuclear plays a large role in both."
+        "Both are isolated systems, without links to other countries, that import their fuels; nuclear plays a large role in both."
       ],
       "institutions": [
-        "Japan: METI and its energy agency (ANRE), OCCTO (cross-regional coordination), the Nuclear Regulation Authority, JEPX.",
-        "South Korea: the energy ministry (MOTIE), KEPCO, KPX."
+        "Japan: METI and its energy agency (ANRE), OCCTO (coordination between the areas), the Nuclear Regulation Authority, JEPX (Japan Electric Power Exchange).",
+        "South Korea: the government's energy ministry, KEPCO (Korea Electric Power Corporation) and KPX (Korea Power Exchange)."
       ],
       "challenges": [
         "Dependence on imported fuel.",
-        "Curtailment and weak links between regions (Kyushu, Jeju).",
+        "[[curtailment|Curtailment]] and weak links between regions (Kyushu, Jeju).",
         "Finding sites for offshore wind."
       ],
       "questions": [
@@ -287,11 +308,13 @@
       "numbers": [
         {
           "text": "Japan, 2025: fossil fuels 67% of electricity, solar 10%, nuclear 9%.",
-          "src": "ember-japan"
+          "src": "ember-japan",
+          "year": "2025"
         },
         {
           "text": "South Korea, 2025: fossil fuels 60% of electricity; wind and solar 7%.",
-          "src": "ember-korea"
+          "src": "ember-korea",
+          "year": "2025"
         }
       ],
       "read": "2 November 2026"
@@ -305,10 +328,11 @@
         "bidding zones"
       ],
       "structure": [
-        "Nord Pool bidding zones; flow-based market coupling since October 2024; dense HVDC links.",
-        "Hydro in Norway and Sweden, wind in Denmark.",
-        "Sweden and Finland also run nuclear plants.",
-        "New industrial, hydrogen and data-center loads; district heating in many cities."
+        "Nord Pool [[bidding-zone|bidding zones]]: each zone has its own price.",
+        "Since October 2024 [[flow-based-coupling|flow-based coupling]] limits trades by the flow on each line.",
+        "Dense [[hvdc|HVDC]] links.",
+        "Hydro in Norway and Sweden, wind in Denmark; Sweden and Finland also run nuclear plants.",
+        "New industrial, hydrogen and data-center loads; [[district-heating|district heating]] in many cities."
       ],
       "institutions": [
         "Grid operators: Statnett, Svenska kraftnät, Fingrid, Energinet.",
@@ -317,9 +341,9 @@
         "Statistics Norway (SSB) and Eurostat: statistics."
       ],
       "challenges": [
-        "North-south congestion and price gaps.",
+        "North-south [[congestion|congestion]] and price gaps.",
         "Dry-year risk for hydro.",
-        "Inertia, and new large loads."
+        "Little [[inertia|inertia]], and new large loads."
       ],
       "questions": [
         "How has flow-based coupling changed price spreads?",
@@ -329,11 +353,13 @@
       "numbers": [
         {
           "text": "Norway, 2025: 161.8 TWh generated, hydro 89.9%, a record net export of 22.8 TWh.",
-          "src": "ssb-record"
+          "src": "ssb-record",
+          "year": "2025"
         },
         {
           "text": "Renewables' share of gross electricity consumption in 2024: Sweden 88.1%, Denmark 79.7%, Finland 54.3%.",
-          "src": "eurostat-ren"
+          "src": "eurostat-ren",
+          "year": "2024"
         }
       ],
       "read": "2 November 2026"
@@ -347,16 +373,16 @@
         "power and water"
       ],
       "structure": [
-        "Vertically integrated state utilities; single buyers contract independent power producers and power-and-water plants.",
+        "[[vertically-integrated-utility|Vertically integrated]] state utilities; single state buyers sign contracts with independent power producers and power-and-water plants.",
         "Oman runs a spot market; the GCC Interconnection Authority links all six states.",
         "Gas and oil make most electricity, with large solar tenders.",
         "The UAE also runs a nuclear plant."
       ],
       "institutions": [
         "Saudi Arabia: Ministry of Energy, the regulator SERA, Saudi Electricity Company.",
-        "UAE: Ministry of Energy and Infrastructure, DEWA, EWEC.",
-        "Qatar's KAHRAMAA; Oman's regulator APSR.",
-        "The GCC Interconnection Authority (GCCIA)."
+        "UAE: Ministry of Energy and Infrastructure, DEWA (Dubai Electricity and Water Authority), EWEC (Emirates Water and Electricity Company).",
+        "Qatar's KAHRAMAA, its electricity and water utility; Oman's regulator APSR.",
+        "The Gulf Cooperation Council Interconnection Authority (GCCIA)."
       ],
       "challenges": [
         "The value of oil burned for power that could be sold.",
@@ -368,17 +394,25 @@
         "How much peak can district cooling and thermal storage shave?",
         "What is reserve sharing through the GCCIA worth?"
       ],
-      "numbers": [
-        {
-          "text": "Saudi Arabia: 98% of electricity from fossil fuels; demand per person 3.5 times the world average (data year not stated).",
-          "src": "ember-saudi"
-        },
-        {
-          "text": "UAE: 68% from fossil fuels; demand per person 4.2 times the world average (data year not stated).",
-          "src": "ember-uae"
-        }
-      ],
-      "read": "2 November 2026"
+      "numbers": [],
+      "read": "2 November 2026",
+      "held": {
+        "why": "The surveyed figures for Saudi Arabia and the UAE are held back: their source gives no data year.",
+        "src": [
+          "ember-saudi",
+          "ember-uae"
+        ],
+        "items": [
+          {
+            "text": "Saudi Arabia: 98% of electricity from fossil fuels; demand per person 3.5 times the world average (data year not stated).",
+            "src": "ember-saudi"
+          },
+          {
+            "text": "UAE: 68% from fossil fuels; demand per person 4.2 times the world average (data year not stated).",
+            "src": "ember-uae"
+          }
+        ]
+      }
     },
     {
       "id": "ssa",
@@ -389,33 +423,35 @@
         "power pools"
       ],
       "structure": [
-        "Mostly vertically integrated state utilities; Nigeria unbundled in 2013, and South Africa's Eskom is unbundling.",
-        "Thin regional power pools (SAPP, WAPP, EAPP, CAPP).",
+        "Mostly [[vertically-integrated-utility|vertically integrated]] state utilities; Nigeria unbundled in 2013, and South Africa's Eskom is unbundling.",
+        "Thin regional power pools, groups of neighbouring countries that trade power: Southern (SAPP), West (WAPP), Eastern (EAPP) and Central African (CAPP).",
         "Hydro in many countries, coal in South Africa; diesel and off-grid solar where the grid does not reach."
       ],
       "institutions": [
         "National utilities and regulators.",
         "The regional power pools.",
-        "The African Development Bank, the World Bank and AUDA-NEPAD."
+        "The African Development Bank, the World Bank and AUDA-NEPAD, the African Union's development agency."
       ],
       "challenges": [
         "The rural access gap.",
-        "Utility finances and load shedding.",
+        "Utility finances, and load shedding: planned, rotating power cuts.",
         "Climate risk to hydro; a high cost of capital."
       ],
       "questions": [
-        "Where is grid extension, a mini-grid or a solar home system the least-cost way to connect people?",
+        "Where is grid extension, a [[mini-grid|mini-grid]] or a solar home system the least-cost way to connect people?",
         "What is regional trade worth when river flows vary?",
         "Which tariffs make mini-grids viable?"
       ],
       "numbers": [
         {
           "text": "655 million people worldwide without electricity, over 560 million of them in Sub-Saharan Africa.",
-          "src": "wb-sdg7"
+          "src": "wb-sdg7",
+          "year": "2024"
         },
         {
           "text": "South Africa, 2025: 83% of electricity from fossil fuels; wind and solar 13%.",
-          "src": "ember-sa"
+          "src": "ember-sa",
+          "year": "2025"
         }
       ],
       "read": "2 November 2026"
@@ -429,38 +465,41 @@
         "curtailment"
       ],
       "structure": [
-        "Brazil: a hydro-dominated national grid (the SIN), cost-based dispatch, auctions plus a free market.",
-        "Chile: liberalised, with cost-based dispatch on a grid about 3,000 km long.",
-        "Mexico: the state utility CFE dominates after the 2025 reform."
+        "Brazil: a hydro-dominated national grid (the SIN, its National Interconnected System), cost-based dispatch, auctions plus a free market.",
+        "Chile: liberalised, with cost-based dispatch on one long north-south grid.",
+        "Mexico: the state utility CFE (Federal Electricity Commission) dominates after the 2025 reform."
       ],
       "institutions": [
-        "Brazil: MME, the regulator ANEEL, the operator ONS, the planner EPE, the trading chamber CCEE.",
+        "Brazil: MME (the energy ministry), the regulator ANEEL, the operator ONS, the planner EPE, the trading chamber CCEE.",
         "Chile: the energy commission CNE and the operator CEN.",
-        "Mexico: SENER, the operator CENACE, CFE.",
-        "OLADE, the regional energy organisation."
+        "Mexico: SENER (the energy ministry), the operator CENACE, CFE.",
+        "OLADE, the Latin American Energy Organization."
       ],
       "challenges": [
         "Drought risk to hydro.",
-        "Curtailment and transmission bottlenecks in northern Chile.",
+        "[[curtailment|Curtailment]] and transmission bottlenecks in northern Chile.",
         "Investment uncertainty in Mexico."
       ],
       "questions": [
-        "How should reservoirs be run together with wind and solar under drought (stochastic dual dynamic programming)?",
+        "How should reservoirs be run together with wind and solar under drought?",
         "Which storage and transmission cut Chile's curtailment most cheaply?",
         "How do compensation rules for rooftop and other distributed generation shift costs?"
       ],
       "numbers": [
         {
           "text": "Brazil, 2025: hydro 52% of electricity, wind and solar 27%, clean sources 89%.",
-          "src": "ember-brazil"
+          "src": "ember-brazil",
+          "year": "2025"
         },
         {
           "text": "Chile: 20,483.5 MW of non-conventional renewable capacity out of 39,104.4 MW installed, November 2025.",
-          "src": "cen"
+          "src": "cen",
+          "year": "November 2025"
         },
         {
           "text": "Mexico, 2025: 74% of electricity from fossil fuels; wind and solar 13%.",
-          "src": "ember-mexico"
+          "src": "ember-mexico",
+          "year": "2025"
         }
       ],
       "read": "2 November 2026"
@@ -475,33 +514,35 @@
       ],
       "structure": [
         "One integrated utility per island.",
-        "Small, isolated grids with little inertia.",
+        "Small, isolated grids with little [[inertia|inertia]].",
         "Imported diesel and fuel oil; high shares of rooftop solar."
       ],
       "institutions": [
         "Hawaii's Public Utilities Commission and State Energy Office.",
-        "CARICOM's Energy Unit and CCREEE (Caribbean).",
-        "The Pacific Community, PCREEE and the Pacific Power Association.",
-        "IRENA's SIDS Lighthouses initiative."
+        "CARICOM's Energy Unit and CCREEE, the Caribbean's centre for renewable energy and efficiency.",
+        "The Pacific Community, its centre PCREEE and the Pacific Power Association.",
+        "IRENA's SIDS Lighthouses initiative, for small island developing states."
       ],
       "challenges": [
         "Volatile fuel costs.",
-        "Stability at very high shares of inverter-based power.",
+        "Stability at very high shares of [[inverter|inverter]]-based power.",
         "Storm resilience."
       ],
       "questions": [
-        "How much grid-forming capacity does a grid that runs almost entirely on inverters need?",
+        "How much [[grid-forming|grid-forming]] capacity does a grid that runs almost entirely on inverters need?",
         "Which mix of solar, storage and diesel holds up under fuel-price and storm risk?",
         "How should rooftop export tariffs work once midday solar exceeds load?"
       ],
       "numbers": [
         {
-          "text": "Hawaii's average retail price was 38.00 cents per kWh in 2024, the highest of any state; the U.S. average was 12.94.",
-          "src": "eia-hawaii"
+          "text": "Hawaii's average retail price was 38.00 US cents per kWh in 2024, the highest of any state; the U.S. average was 12.94 cents.",
+          "src": "eia-hawaii",
+          "year": "2024"
         },
         {
           "text": "Hawaii had the highest average residential bill in the U.S. in 2024: $213 a month.",
-          "src": "eia-65244"
+          "src": "eia-65244",
+          "year": "2024"
         }
       ],
       "read": "2 November 2026"
@@ -520,36 +561,40 @@
         "Millions of rooftop solar systems; grid-scale batteries growing fast."
       ],
       "institutions": [
-        "AEMO: independent market and system operator and system planner for the NEM and Western Australia's market.",
+        "AEMO (Australian Energy Market Operator): independent market and system operator and system planner for the NEM and Western Australia's market.",
         "The Clean Energy Regulator: runs the Small-scale Renewable Energy Scheme for rooftop systems, which ends in 2030.",
         "State governments and distribution network businesses: emergency backstops that can turn rooftop solar down."
       ],
       "challenges": [
-        "Minimum system load on sunny, mild days, typically in autumn and spring.",
-        "Keeping enough essential system services as large spinning generators run less.",
+        "On sunny, mild days, typically in autumn and spring, rooftop solar supplies much of what customers use, so demand on the grid's large generators falls very low.",
+        "Keeping enough [[ancillary-services|essential system services]] as large spinning generators run less.",
         "Evening peaks (4 pm to 9 pm), now partly met by batteries."
       ],
       "questions": [
-        "How can demand stay above secure minimum levels with millions of rooftop systems connected?",
+        "How can the grid stay secure when operational demand, the demand left for its generators, falls very low?",
         "How do home and grid-scale batteries reshape evening peaks and prices?",
         "Which services replace what large spinning generators gave the grid?"
       ],
       "numbers": [
         {
           "text": "Renewables made 44.3% of NEM generation in July to September 2026, a record for that quarter (41.8% a year earlier).",
-          "src": "aemo-qed"
+          "src": "aemo-qed",
+          "year": "July to September 2026"
         },
         {
-          "text": "NEM-wide minimum operational demand fell to an all-time low of 9,422 MW on Sunday 20 September 2026.",
-          "src": "aemo-qed"
+          "text": "NEM-wide minimum operational demand (the demand left for the grid's generators after rooftop and other distributed solar) fell to an all-time low of 9,422 MW on Sunday 20 September 2026.",
+          "src": "aemo-qed",
+          "year": "20 September 2026"
         },
         {
           "text": "Rooftop and other distributed solar averaged 3,203 MW in July to September 2026, a record for that quarter.",
-          "src": "aemo-qed"
+          "src": "aemo-qed",
+          "year": "July to September 2026"
         },
         {
           "text": "4,562,198 small-scale solar systems installed across Australia, 30,917,812 kW of rated output, as of 30 September 2026 (all of Australia, not only the NEM).",
-          "src": "cer"
+          "src": "cer",
+          "year": "30 September 2026"
         }
       ],
       "read": "7 November 2026"
@@ -603,7 +648,7 @@
       "publisher": "National Energy Administration of China",
       "date": "12 February 2026",
       "url": "https://www.nea.gov.cn/20260212/742b8c6a078347b0b39de676c05c5d58/c.html",
-      "where": "317 GW of solar added in 2025; utilisation 95% solar, 94% wind"
+      "where": "317 GW of solar added in 2025; utilisation rate (利用率: the share of available output used rather than curtailed) 95% solar, 94% wind"
     },
     "nea-sep": {
       "title": "Power industry statistics, January to July 2026",
@@ -647,6 +692,13 @@
       "url": "https://ember-energy.org/countries-and-regions/south-korea/",
       "where": "2025: fossil 60%; wind and solar 7%"
     },
+    "occto": {
+      "title": "Annual Report, Fiscal Year 2022",
+      "publisher": "Organization for Cross-regional Coordination of Transmission Operators, Japan (OCCTO)",
+      "date": "December 2022; read 7 November 2026",
+      "url": "no link",
+      "where": "Japan is divided into 10 regional service areas; those other than Okinawa's are connected by cross-regional interconnection lines; eastern and western Japan use 50 Hz and 60 Hz"
+    },
     "ssb-record": {
       "title": "Highest electricity production ever (Høyeste strømproduksjon noensinne)",
       "publisher": "Statistics Norway (SSB)",
@@ -659,21 +711,21 @@
       "publisher": "Ember, a compiler of official statistics",
       "date": "updated 22 April 2026; data year not stated",
       "url": "https://ember-energy.org/countries-and-regions/saudi-arabia/",
-      "where": "98% fossil; demand per person 3.5 times the world average"
+      "where": "share of electricity from fossil fuels and demand against the world average, shown without a data year"
     },
     "ember-uae": {
       "title": "United Arab Emirates: country profile",
       "publisher": "Ember, a compiler of official statistics",
       "date": "updated 22 April 2026; data year not stated",
       "url": "https://ember-energy.org/countries-and-regions/united-arab-emirates/",
-      "where": "68% fossil; demand per person 4.2 times the world average"
+      "where": "share of electricity from fossil fuels and demand against the world average, shown without a data year"
     },
     "wb-sdg7": {
       "title": "Tracking SDG7: The Energy Progress Report 2026 (joint release)",
       "publisher": "World Bank and the custodian agencies",
       "date": "24 June 2026",
       "url": "https://www.worldbank.org/en/news/press-release/2026/06/16/accelerating-universal-energy-access",
-      "where": "655 million people without electricity; over 560 million in Sub-Saharan Africa"
+      "where": "655 million people without electricity; over 560 million in Sub-Saharan Africa; the access figures are for 2024 ('In 2024, the global access rate stagnated at 92 per cent')"
     },
     "ember-sa": {
       "title": "South Africa: country profile",
@@ -722,7 +774,7 @@
       "publisher": "Southwest Power Pool",
       "date": "updated October 2026; read 7 November 2026",
       "url": "https://www.spp.org/about-us/fast-facts/",
-      "where": "members in all or part of 17 states; ~732,086 square miles; 161 members (26 generation and transmission cooperatives, 18 municipal systems, 16 investor-owned utilities); 2025 energy production 300,382 GWh: wind 36.7%, coal 29%, natural gas 25.1%"
+      "where": "members in all or part of 17 states; ~732,086 square miles; 161 members (26 generation and transmission cooperatives, 18 municipal systems, 16 investor-owned utilities); an East and a West balancing area listed; 2025 energy production 300,382 GWh: wind 36.7%, coal 29%, natural gas 25.1%"
     },
     "spp-som": {
       "title": "State of the Market 2025",
@@ -730,6 +782,13 @@
       "date": "27 May 2026; read 7 November 2026",
       "url": "https://www.spp.org/documents/76798/2025_annual_state_of_the_market_report.pdf",
       "where": "p. 5: rising gas prices, load growth and resource adequacy concerns in 2025; p. 27: RTO status in 2004, the Integrated Marketplace since 1 March 2014, the footprint between MISO and ERCOT; p. 50: wind nameplate 35,934 MW at the end of 2025"
+    },
+    "spp-west": {
+      "title": "RTO Expansion",
+      "publisher": "Southwest Power Pool",
+      "date": "read 7 November 2026",
+      "url": "https://www.spp.org/western-services/rto-expansion/",
+      "where": "on 1 April 2026 SPP expanded its service territory into the Western Interconnection, to resources and customers of utilities in seven states (Arizona, Colorado, Montana, Nebraska, New Mexico, Utah, Wyoming): RTO services spanning two interconnections"
     },
     "spp-uri": {
       "title": "SPP's Response to the February 2021 Winter Weather Event (summary)",
@@ -743,7 +802,7 @@
       "publisher": "U.S. Energy Information Administration, Today in Energy",
       "date": "15 October 2026",
       "url": "https://www.eia.gov/todayinenergy/detail.php?id=68305",
-      "where": "SWPP peaked at 58.0 GW on 27 July 2026; the pre-2026 peak was 56.0 GW on 21 August 2023"
+      "where": "SWPP peaked at 58.0 GW on 27 July 2026; the pre-2026 peak was 56.0 GW on 21 August 2023 (Form EIA-930, as each balancing authority reports)"
     },
     "eia-62406": {
       "title": "Why are Midwest grid operators turning away wind power?",
@@ -757,14 +816,14 @@
       "publisher": "Australian Energy Market Operator (AEMO)",
       "date": "October 2026; read 7 November 2026",
       "url": "https://www.aemo.com.au/-/media/files/major-publications/qed/2026/qed-q3-2026.pdf",
-      "where": "p. 3: renewables 44.3% of NEM generation (41.8% in Q3 2025); NEM-wide minimum operational demand 9,422 MW on Sunday 20 September; distributed PV a record Q3 average of 3,203 MW; p. 4: grid-scale batteries 8.0% of evening-peak generation"
+      "where": "p. 3: renewables 44.3% of NEM generation (41.8% in Q3 2025); NEM-wide minimum operational demand 9,422 MW on Sunday 20 September; distributed PV a record Q3 average of 3,203 MW, operational demand falling as distributed PV grows faster than underlying demand; p. 4: grid-scale batteries 8.0% of generation in the evening peak (1600 hrs to 2100 hrs)"
     },
     "aemo-msl": {
       "title": "Fact Sheet: Minimum system load (MSL)",
       "publisher": "Australian Energy Market Operator (AEMO)",
       "date": "2025; read 7 November 2026",
       "url": "https://www.aemo.com.au/-/media/files/learn/fact-sheets/2025/fact-sheetminimum-system-load.pdf",
-      "where": "low demand on sunny, mild-temperature days, typically in autumn and spring; solar management programs run by state governments and distribution network service providers; AEMO as independent market and system operator and system planner for the NEM and Western Australia's WEM"
+      "where": "low demand on sunny, mild-temperature days, typically in autumn and spring, when rooftop solar reduces the need for electricity from grid-scale generators via the transmission network, limiting access to essential system services; solar management programs run by state governments and distribution network service providers; AEMO as independent market and system operator and system planner for the NEM and Western Australia's WEM"
     },
     "cer": {
       "title": "Small-scale installation postcode data",
@@ -784,7 +843,8 @@
   "partSources": {
     "plains": {
       "structure": [
-        "spp-som"
+        "spp-som",
+        "spp-west"
       ],
       "institutions": [
         "spp-som",
@@ -794,6 +854,11 @@
         "eia-62406",
         "spp-uri",
         "spp-som"
+      ]
+    },
+    "japan-korea": {
+      "structure": [
+        "occto"
       ]
     },
     "australia": {
@@ -810,5 +875,31 @@
         "aemo-qed"
       ]
     }
-  }
+  },
+  "guide": [
+    {
+      "term": "Power and energy",
+      "text": "GW, MW and kW measure power, a rate; TWh, GWh and kWh measure energy, an amount. 1 TWh = 1,000 GWh = 1 billion kWh."
+    },
+    {
+      "term": "Fossil, non-fossil",
+      "text": "Fossil fuels are coal, oil and gas; non-fossil is everything else, nuclear included."
+    },
+    {
+      "term": "Renewable, clean",
+      "text": "Renewables are hydro, wind, solar, bioenergy and geothermal; Ember's 'clean' adds nuclear to them."
+    },
+    {
+      "term": "Non-conventional renewable",
+      "text": "A category in Chilean law that leaves out large hydro."
+    },
+    {
+      "term": "Prices",
+      "text": "Hawaii's are in US cents per kWh."
+    },
+    {
+      "term": "Dates",
+      "text": "Each citation gives the source's date and the year its data describe; each card ends with the day its numbers were checked."
+    }
+  ]
 }

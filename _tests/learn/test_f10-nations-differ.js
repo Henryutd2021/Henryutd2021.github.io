@@ -12,8 +12,13 @@
 //     import dependence, production shares)
 //   - the no-JS block, ideas, notes, check, facts and sources equal what the model writes (--write rewrites them); every
 //     number in the facts table is recomputed
-//   - scope: no nuclear term with a risk term in any string; no "AI"; links on the allow-list (others "no link"); the
-//     fictional line wherever Prairieland is drawn; text budget of the step cards
+//   - shares: every drawn source classed on its own (fossil, renewable, or neither; Norway's unsplit waste stays apart),
+//     recomputed here from the published rows; China's and India's coverage said beside every row and line
+//   - boundaries: the U.S. end-use note; country-specific sector names; useful energy named a what-if wherever it shows
+//   - scope (curriculum §20.4 and §20.3, copied below; scripts/learn_scope_scan.py is the canonical judge): the deny-list
+//     and the nuclear-plus-risk rule over every string the page loads (its data, the regional cards, the Prairieland
+//     strings it shows, the path entries it names) and its own text; links only to §20.3 domains (others "no link"); the
+//     fictional line wherever Prairieland is drawn; the text budget of every note, line, preview, feedback and cell
 // Usage (from the site folder):  node _tests/learn/test_f10-nations-differ.js [--write]
 "use strict";
 const fs = require("fs");
@@ -36,7 +41,7 @@ const L = M.nations(D, PL), E = M.effs(PL), byKey = k => L.filter(n => n.key ===
 
 // ---------------- the generated blocks
 const BLOCKS = { "f10-fallback": () => M.staticFallback(D, L, E), "f10-ideas": () => M.ideasHTML(D, L, E), "f10-notes": () => M.notesHTML(D),
-  "f10-check": () => M.checkHTML(D, L, E), "f10-facts": () => M.factsHTML(D), "f10-sources": () => M.sourcesHTML(D, PL) };
+  "f10-check": () => M.checkHTML(D, L, E), "f10-facts": () => M.factsHTML(D), "f10-sources": () => M.sourcesHTML(D, PL), "f10-subst": () => M.substHTML(D, L) };
 function between(q, name) {
   const a = q.match(new RegExp("<!-- " + name + ":start[^>]*-->\\n")), b = q.indexOf("<!-- " + name + ":end -->");
   if (!a || b < a.index) throw new Error(name + " markers missing in " + QPATH);
@@ -60,14 +65,16 @@ ok(D.nuclearHeatEff === 0.33 && D.subEff === 0.4, "the conventions' efficiencies
 const C = k => D.countries.filter(c => c.key === k)[0];
 {
   const us = C("us"); const listed = sum(Object.values(us.primary)), other = us.total - listed;
-  ok(other > 0 && other < 0.15, "US: the listed sources leave " + other.toFixed(3) + " quads (geothermal 0.117 and the rest of EIA's total)");
+  ok(other > 0 && other < 0.03, "US: the listed sources leave " + other.toFixed(3) + " quads (electricity and coal coke net imports, and rounding)");
+  ok(us.primary.geo === 0.117 && near(us.primary.hydro + us.primary.geo + us.primary.solar + us.primary.wind + us.primary.bio, 8.835, 0.002), "US: geothermal 0.117 quads drawn as its own source; the five renewables add to EIA's 8.835 (Table 1.3, 2025)");
   ok(near(us.twh.hydro * 3412e-6, us.primary.hydro, 0.002) && near(us.twh.wind * 3412e-6, us.primary.wind, 0.002), "US: hydro and wind at 3,412 Btu per kWh (EIA's method since September 2023)");
   ok(us.primary.solar > us.twh.solar * 3412e-6, "US: solar's primary value holds its electricity (with small-scale) and a little solar heat");
   const eff = us.twh.nuclear * 3412e-6 / us.primary.nuclear; ok(eff > 0.32 && eff < 0.34, "US: nuclear at its plants' heat rate, an efficiency of " + (100 * eff).toFixed(1) + "%");
   const P = M.pubOf(us); ok(near(P.residential + P.commercial + P.industrial + P.transportation, 76.788223, 1e-6), "US: end-use sectors add to 76.788 quads");
   ok(near(P.residential + P.commercial + P.industrial + P.transportation + 19.672147, us.total, 0.01), "US: end use plus electrical system losses (19.672 quads, Tables 2.2 to 2.5) is the primary total");
   const eu = C("eu"), el = sum(Object.values(eu.primary)), euOther = eu.total - el;
-  ok(near(euOther, 278962.497 + 800099.994 + 1684.076 + 593729.585 - 44285.868 + 32313.75, 0.05), "EU: 'other' is geothermal, ambient heat, tide, non-renewable waste and electricity and heat trade (TJ)");
+  ok(near(eu.primary.geoheat, 278962.497 + 800099.994 + 1684.076, 1e-6), "EU: geothermal, ambient heat and tide (TJ, nrg_bal_c) drawn as one renewable source");
+  ok(near(euOther, 593729.585 - 44285.868 + 32313.75, 0.05), "EU: 'other' is non-renewable waste and electricity and heat trade (TJ)");
   ok(near(eu.twh.hydro * 3600, eu.primary.hydro, 1) && near(eu.twh.wind * 3600, eu.primary.wind, 1) && near(eu.twh.solar * 3600, 1094316.729, 1), "EU: hydro, wind and solar PV at their gross electricity");
   const Pe = M.pubOf(eu), fec = Pe.industry + Pe.transport + Pe.households + Pe.services + Pe.agriculture + Pe.fishing + Pe.nes;
   ok(near(fec, 36754932.777, 0.01) && Math.round(fec / 1000) === 36755, "EU: sectors add to Eurostat's 36,755 PJ of final energy consumption");
@@ -85,6 +92,7 @@ const C = k => D.countries.filter(c => c.key === k)[0];
   const Pb = M.pubOf(br); ok(near(Pb.energySector + Pb.services + Pb.agriculture + Pb.industry + Pb.transport + Pb.residential, Pb.finalEnergyUse, 1e-9), "Brazil: the split of the remaining final uses closes on 275.417 Mtep");
   ok(near(Pb.energySector / Pb.services, 7.9 / 5.2, 1e-9), "Brazil: the energy sector, services and farms split by their published shares");
   const no = C("no"); ok(near(sum(Object.values(no.primary)), 326.2, 1e-9), "Norway: Table 3's rows add to 326.2 TWh (Table 2 rounds to 326)");
+  ok(no.primary.bio === 19.5 && no.primary.waste === 5.2 && D.nodes.waste.unsplit && !D.nodes.waste.renewable && !D.nodes.waste.fossil, "Norway: biofuels 19.5 TWh renewable; waste 5.2 TWh kept apart, neither renewable nor fossil");
   ok(no.pub.industry + no.pub.transport + no.pub.households + no.pub.other === 211, "Norway: the sector rows (73, 50, 45, 43 TWh) add to 211; SSB's rounded total is 212");
   ok(near(no.pub.production + no.pub.imports - no.pub.exports, 337, 1e-9), "Norway: production + imports − exports = 337 TWh (bunkers and stock changes make 326)");
 }
@@ -163,18 +171,90 @@ M.SECTORS.forEach(s => { const k = { industry: "industry", transport: "transport
   ok(f[3].what.indexOf(M.fmtN(1 / D.subEff, 1) + " at " + M.pct(D.subEff)) > 0, "fact: the substitution factor 2.5 at 40%");
 }
 
+// ---------------- shares from first principles: each source classed on its own (Eurostat keeps non-renewable waste apart)
+{
+  const REN = { us: ["hydro", "wind", "solar", "geo", "bio"], eu: ["hydro", "wind", "solar", "bio", "geoheat"], cn: ["hydro", "wind", "solar"], in: ["hydro", "wso"], br: ["hydro", "wind", "solar", "bio"], no: ["hws", "bio"] };
+  Object.keys(REN).forEach(k => {
+    const N = byKey(k), P = M.primaryAs(D, N, "pec");
+    ok(near(P.renewable, sum(REN[k].map(s => N.src[s])) / N.total, 1e-12), k + ": renewable share " + M.pct(P.renewable, 1) + " = its renewable rows ÷ primary energy; 'other' never counted renewable");
+  });
+  ok(near(M.primaryAs(D, byKey("eu"), "pec").renewable, 0.2027, 0.0005), "EU: renewable share 20.3% with geothermal, ambient heat and tide (18.3% without)");
+  const no = byKey("no"), a = M.primaryAs(D, no, "pec");
+  ok(near(a.unsplit, 5.2 / 326.2, 1e-12) && M.unsplitNote(D, no, a.unsplit).indexOf("waste, 1.6%, not split") > 0, "Norway: waste 1.6% shown as not split");
+  ok(L.filter(N => N.key !== "no").every(N => M.primaryAs(D, N, "pec").unsplit === 0 && M.unsplitNote(D, N, 0) === ""), "no other country has an unsplit component");
+  // coverage beside China and India, in every place a share or total shows
+  const cov = { cn: "partial", in: "traditional biomass" };
+  Object.keys(cov).forEach(k => {
+    const N = byKey(k);
+    ok(N.coverage && N.coverage.indexOf(cov[k]) >= 0, k + ": coverage named");
+    ok(M.viewLine(D, N).indexOf(N.coverage) > 0 && M.convLine(D, N, "pec").indexOf(N.coverage) > 0 && (N.noFinal || M.accountLine(D, N, E).indexOf(N.coverage) > 0), k + ": coverage beside the step lines");
+    ok(M.staticFallback(D, L, E).indexOf(N.coverage.charAt(0).toUpperCase() + N.coverage.slice(1)) > 0, k + ": coverage beside its no-JS rows");
+  });
+  ok(M.checkHTML(D, L, E).indexOf("of the sources its balance covers (" + byKey("in").coverage + ")") > 0, "India's quiz answer: share of the sources covered");
+  ok(!/ranked: true|By fossil share/.test(JS) && /Listed in the course's order, not ranked/.test(M.COMPARE_NOTE), "no ranking of countries in the comparison table");
+  // boundaries and sector names
+  const us = byKey("us"); ok(/lease and plant fuel in industry, pipeline fuel in transport/.test(us.finalNote) && /Table 4\.3/.test(D.sources["eia-mer"].title + D.sources["eia-mer"].where), "US: the end-use boundary named, from MER Table 4.3");
+  ok(/unless the country's note says otherwise/.test(M.FINAL_NOTE) && /cnote\.textContent = N\.finalNote/.test(JS), "final energy's own-use boundary: no blanket claim; the U.S. note shown in step 3");
+  ok(M.finalSpec(D, no, E, false).nodes.filter(n => n.id === "s_buildings")[0].label === "Households" && /Services/.test(M.finalSpec(D, no, E, false).nodes.filter(n => n.id === "s_other")[0].label), "Norway: households and services named as SSB splits them");
+  ok(M.primarySpec(D, us, "pec").nodes.filter(n => n.id === "s_industry")[0].label === "Industry (with farms and mining)", "US: industry holds farms and mining");
+  // useful energy: a what-if for the real countries, never an 'estimate' of their own
+  ok(M.finalSpec(D, us, E, true).nodes.filter(n => n.id === "useful")[0].label === "Useful energy (what-if)" && M.finalSpec(D, byKey("pl"), E, true).nodes.filter(n => n.id === "useful")[0].label === "Useful energy", "useful node: what-if for real countries, Prairieland's own");
+  ok(/what-if/.test(M.USEFUL_NOTE) && /what-if/.test(M.accountLine(D, us, E)) && /what-if/.test(M.accountSaw(D, L, E)) && /in this what-if/.test(M.checkHTML(D, L, E)) && /If every country used energy at Prairieland's sector efficiencies/.test(M.checkHTML(D, L, E)), "useful energy named a what-if in the line, summary, note and myth");
+  ok(!/useful[^.]*\(an estimate\)|Useful energy \(estimate\)/.test(JS + PAGE), "no useful energy called an estimate of a real country");
+  // the substitution box: nuclear's share recomputed, not "barely moves"
+  const sa = M.primaryAs(D, us, "pec"), sb = M.primaryAs(D, us, "sub"), sh = M.substHTML(D, L);
+  ok(sh.indexOf(M.pct(sa.v.nuclear / sa.total, 1) + " by physical content, " + M.pct(sb.v.nuclear / sb.total, 1) + " by substitution") > 0 && near(sa.v.nuclear / sa.total, 0.085, 0.0005) && near(sb.v.nuclear / sb.total, 0.0665, 0.0005), "substitution box: U.S. nuclear 8.5% → 6.7%");
+  ok(!/barely moves/.test(PAGE + JS) && /measured where it is reported/.test(sh), "no 'barely moves'; measured heat told apart from ÷ 0.33");
+  ok(sh.indexOf("2.5 times its electricity at 40%") > 0 && sh.indexOf("about 3 times at 33%") > 0, "substitution box: 2.5 at 40%, about 3 at 33%");
+  // the units: Brazil's tep
+  ok(D.units.mtep.note === "1 tep = 10⁷ kcal = 41.868 GJ" && near(1e7 * 4186.8 / 1e9, 41.868, 1e-9), "1 tep = 10⁷ kcal = 41.868 GJ (1 kcal = 4,186.8 J)");
+  // step 4 starts on the predicted country, with a country switch
+  ok(M.convStartKey(D) === D.mystery.key && /last\.key = convStartKey\(D\)/.test(JS) && /seg\(res, "Country for the line below"/.test(JS), "step 4: the reveal starts on Norway, and the reader can switch country");
+  // step 6: Ember keeps its label as a compiler; system and number are separate short elements
+  L.filter(N => M.cardOf(R, N.card)).forEach(N => {
+    const cp = M.cardPreview(R, N), s = R.sources[M.cardOf(R, N.card).numbers[0].src];
+    ok(!/ember/i.test(s.publisher) || cp.cite.indexOf("Ember, a compiler of official statistics") === 0, N.key + ": Ember named as a compiler in the preview");
+    ok(cp.system.replace(/\[\[[^|]+\|([^\]]+)\]\]/g, "$1").split(/\s+/).length <= 35 && (cp.number + " " + cp.cite).replace(/\[\[[^|]+\|([^\]]+)\]\]/g, "$1").split(/\s+/).length <= 40, N.key + ": preview parts within the budget");
+  });
+  // the no-JS block holds a worked flow table and the primary, final and useful table
+  const fb = M.staticFallback(D, L, E), ws = M.primarySpec(D, byKey(M.FLOW_KEY), "pec");
+  ok(fb.indexOf("One balance, flow by flow") > 0 && ws.links.every(l => fb.indexOf("<td>" + M.ejNum(l.value) + "</td></tr>") > 0), "no-JS: the U.S. flows, every one");
+  ok(fb.indexOf("Primary, final and useful energy") > 0 && L.filter(N => !N.noFinal).every(N => fb.indexOf(M.ej(M.useful(N, E).total)) > 0) && fb.indexOf(M.USEFUL_NOTE) > 0, "no-JS: primary, final and useful for each country, with the what-if note");
+  // provenance: one field per cell; its numbers agree with the data
+  D.countries.forEach(c => ok(M.PROV_COLS.every(p => c.prov[p[0]] && c.prov[p[0]].split(/\s+/).length <= 35), c.key + ": provenance in four short fields"));
+  ok(C("us").prov.published.indexOf(M.fmtN(C("us").total, 1)) === 0 && C("us").prov.adjust.indexOf(M.fmtN(C("us").pub.nonfuel, 1) + " quads") > 0, "US provenance: 96.5 and 6.5 quads");
+  ok(C("eu").prov.published.indexOf(M.fmtN(C("eu").total / 1000)) === 0 && C("eu").prov.coverage.indexOf(M.fmtN(C("eu").pub.bunkers / 1000)) > 0, "EU provenance: 55,790 and 1,704 PJ");
+  ok(C("cn").prov.published.indexOf(M.fmtN(C("cn").coalEquivalent.total)) === 0 && ["coal", "oil", "gas", "nonFossil"].every(s => C("cn").prov.published.indexOf(M.pct(C("cn").coalEquivalent.shares[s], 1)) > 0), "China provenance: the published total and shares");
+  ok(C("in").prov.published.indexOf(M.fmtN(C("in").total)) === 0 && C("in").prov.published.indexOf(M.fmtN(C("in").total * 0.041868)) > 0, "India provenance: 903,158 ktoe = 37,813 PJ");
+  ok(C("br").prov.published.indexOf(M.fmtN(C("br").total, 1)) === 0 && ["sugarcane", "firewood", "liquorOther"].every(k => C("br").prov.coverage.indexOf(M.fmtN(C("br").pub[k], 1)) > 0), "Brazil provenance: 328.5 Mtep and the bioenergy rows");
+  ok(C("no").prov.coverage.indexOf(M.fmtN(C("no").primary.waste, 1) + " TWh") > 0 && C("no").prov.method.indexOf(M.pct(C("no").pub.hydroGWh / C("no").pub.genGWh, 1)) > 0, "Norway provenance: waste 5.2 TWh; hydro 89.9% of generation");
+}
+
 // ---------------- scope
 {
+  // curriculum v2 §20.4 (the canonical copy: scripts/learn_curriculum/data.py; learn_scope_scan.py runs it on the rendered site)
   const NUC = /nuclear|reactor|\bSMR\b|small modular/i, RISK = /cost (trajector|decline|reduction|fall)|learning|commerciali|subsid|credit|threshold|break[- ]even|parity|siting|site selection|suitab|screen|deliver|timing|order|anchor|buyer|data[- ]cent/i;
-  const strs = []; (function walk(x) { if (typeof x === "string") strs.push(x); else if (x && typeof x === "object") Object.keys(x).forEach(k => walk(x[k])); })([D, R]);
+  const DENY = [/\bFOAK\b/, /\bNOAK\b/i, /first[- ]of[- ]a[- ]kind/i, /nth[- ]of[- ]a[- ]kind/i, /learning[- ](curve|rate)/i, /order[- ]book/i, /anchor[- ](customer|buyer)/i, /subsidy[- ]free/i, /parity capital/i, /break[- ]even capital/i, /smr-dc/i, /smr-datacenter/i, /projects\//, /research\.(html|qmd)/, /\bAI\b/, /artificial intelligence/i];
+  // every string the page loads: its own data, the regional cards, the Prairieland strings it shows, the path entries it names
+  const PATHJ = require(L_("data/path.json")), named = new Set(["A20", "A21", "M13", "X3", "X2", "F4", "F3"]);
+  const pathStrs = []; (function walk(x) { if (x && typeof x === "object") { if (named.has(x.code) || named.has(x.id)) pathStrs.push(x); Object.keys(x).forEach(k => walk(x[k])); } })(PATHJ);
+  const plUsed = [PL.about.line, PL.balance.useful.note, PL.balance.sankey, PL.regions.map(r => r.climate), M.PL_SRC.map(k => PL.sources[k])];
+  const strs = []; (function walk(x) { if (typeof x === "string") strs.push(x); else if (x && typeof x === "object") Object.keys(x).forEach(k => walk(x[k])); })([D, R, plUsed, pathStrs]);
+  ok(strs.length > 500 && pathStrs.length >= 5, "the scope scan covers " + strs.length + " strings, " + pathStrs.length + " of them path entries");
+  const denied = strs.concat([JS, OWN]).filter(s => DENY.some(rx => rx.test(s))); ok(!denied.length, "no deny-listed term (§20.4): " + denied.slice(0, 2).map(s => s.slice(0, 60)).join(" | "));
   const bad = strs.filter(s => NUC.test(s) && RISK.test(s)); ok(!bad.length, "no data string pairs a nuclear term with a risk term: " + bad.slice(0, 2).join(" | "));
   const sentences = OWN.replace(/<[^>]+>/g, " ").split(/(?<=[.;:?])\s+/); const badS = sentences.filter(s => NUC.test(s) && RISK.test(s));
   ok(!badS.length, "no page sentence pairs a nuclear term with a risk term: " + badS.slice(0, 2).join(" | "));
   const all = [M.staticFallback(D, L, E), M.ideasHTML(D, L, E), M.checkHTML(D, L, E), M.notesHTML(D), M.STEPS.join(" "), M.LENS_SAW, M.CONV_SAW, M.USEFUL_NOTE, M.BEFORE_NOTE].join(" ").split(/(?<=[.;:?])\s+/);
   ok(!all.filter(s => NUC.test(s) && RISK.test(s)).length, "no generated sentence pairs a nuclear term with a risk term");
-  ok(!/\bAI\b|artificial intelligence|learning[- ](curve|rate)/i.test(RAW + JS + OWN), "no deny-listed term");
-  const ALLOW = /^https:\/\/(www\.)?(eia\.gov|ec\.europa\.eu|ember-energy\.org|eta-publications\.lbl\.gov|energy\.gov|worldbank\.org|spp\.org|iea\.org|ourworldindata\.org|stats\.gov\.cn|mospi\.gov\.in|epe\.gov\.br|ssb\.no|cso\.ie|nea\.gov\.cn|aemo\.com\.au|cer\.gov\.au)\//;   // + the statistics offices and regulators named on F10 and the regional cards (W6 integration)
-  const urls = (RAW + JSON.stringify(R) + OWN).match(/https?:\/\/[^\s"'<>)]+/g) || [];
+  ok(!/\bAI\b|artificial intelligence|learning[- ](curve|rate)/i.test(RAW + JS + OWN), "no deny-listed term in the lesson's own files");
+  ok(!/not on the course's link list|link list|allow-list/i.test(OWN.replace(/<!--[\s\S]*?-->/g, "")), "no editorial link rule shown on the page");
+  // curriculum v2 §20.3, the external domains (learn/ links are internal; the generated navbar and footer are outside the rule)
+  const DOMAINS = ["eia.gov", "energy.gov", "ferc.gov", "nerc.com", "lbl.gov", "nrel.gov", "nlr.gov", "epa.gov", "usgs.gov", "bea.gov", "census.gov", "bls.gov", "noaa.gov", "weather.gov", "fema.gov", "dot.gov", "irs.gov", "energycodes.gov", "kcc.ks.gov",
+    "iea.org", "irena.org", "ipcc.ch", "worldbank.org", "ec.europa.eu", "entsoe.eu", "ember-energy.org", "ourworldindata.org", "openalex.org", "iso.org", "ghgprotocol.org", "doi.org", "pjm.com", "spp.org", "ercot.com", "caiso.com", "misoenergy.org", "iso-ne.com", "nyiso.com",
+    "stats.gov.cn", "nea.gov.cn", "mospi.gov.in", "epe.gov.br", "ssb.no", "cso.ie", "cer.gov.au", "aemo.com.au"];
+  const ALLOW = { test: u => { const m = /^https:\/\/([^/]+)\//.exec(u); return !!m && DOMAINS.some(d => m[1] === d || m[1].endsWith("." + d)); } };
+  const urls = (RAW + JSON.stringify(R) + JSON.stringify(plUsed) + OWN).match(/https?:\/\/[^\s"'<>)]+/g) || [];
   ok(urls.every(u => ALLOW.test(u)), "every link on the allow-list: " + urls.filter(u => !ALLOW.test(u)).slice(0, 3).join(" "));
   Object.keys(D.sources).forEach(k => ok(D.sources[k].url === "no link" || ALLOW.test(D.sources[k].url), "source " + k + " linked only if allow-listed"));
   Object.keys(D.sources).forEach(k => (D.sources[k].also || []).forEach(a => ok(a.label && ALLOW.test(a.url), "source " + k + ": its other file " + a.label + " is linked on the allow-list")));
@@ -184,7 +264,19 @@ M.SECTORS.forEach(s => { const k = { industry: "industry", transport: "transport
 
 // ---------------- text budget
 M.STEPS.forEach((t, i) => { const w = t.replace(/\[\[[^|]+\|([^\]]+)\]\]/g, "$1").split(/\s+/).length; ok(w <= 40, "step " + (i + 1) + " text " + w + " words (≤ 40)"); });
-[M.LENS_SAW, M.CONV_SAW, M.USEFUL_NOTE, M.BEFORE_NOTE].forEach(t => ok(t.split(/\s+/).length <= 40, "a line of ≤ 40 words: " + t.slice(0, 40)));
+{
+  const words = t => t.replace(/\[\[[^|]+\|([^\]]+)\]\]/g, "$1").replace(/\*\*/g, "").replace(/<[^>]+>/g, " ").trim().split(/\s+/).length;
+  const Q = M.mysteryQ(D, L), cq = M.convQ(D, L);
+  const shown = [M.LENS_SAW, M.CONV_SAW, M.CARD_SAW, M.USEFUL_NOTE, M.BEFORE_NOTE, M.FINAL_NOTE, M.COMPARE_NOTE, M.largestSaw(D, L), M.accountSaw(D, L, E), M.chinaLine(D, L), M.convSwitchLine(D, L)]
+    .concat(D.subEffNotes, D.lenses.map(l => l.text), D.conventions.map(c => c.text + (c.who ? " Used by " + c.who + "." : " " + c.note)))
+    .concat(Object.values(Q.feedback), Object.values(cq.feedback))
+    .concat(L.map(N => M.viewLine(D, N)), L.map(N => M.accountLine(D, N, E)), L.map(N => N.finalNote || ""), [].concat(...D.conventions.map(cv => L.map(N => M.convLine(D, N, cv.key)))))
+    .concat([].concat(...L.map(N => ["imports", "resources", "climate", "institutions"].map(k => M.lensCell(D, N, k)))))
+    .filter(Boolean);
+  shown.forEach(t => ok(words(t) <= 40, "≤ 40 words (" + words(t) + "): " + t.slice(0, 50)));
+  ok(D.subEffNotes.length === 3 && D.subEffNotes[1].indexOf(M.pct(D.subEff)) > 0, "the substitution note as rule, assumption and exception; 40% as the data's");
+  const ans = M.checkHTML(D, L, E).match(/<p>[^<]*<\/p>/g) || []; ans.forEach(a => ok(words(a) <= 40, "answer ≤ 40 words: " + a.slice(3, 50)));
+}
 
 console.log((fails ? "FAILED " : "ok ") + (checks - fails) + "/" + checks + " checks (" + ID + ")");
 process.exit(fails ? 1 : 0);
