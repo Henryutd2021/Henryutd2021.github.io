@@ -1,0 +1,15 @@
+# Sidecar for X4 (x04-rules-law), builder learn-w7-a, 2026-11-07. Read by scripts/build_learn.py.
+# No excerpt of Henry's research appears in X4. Neutral: processes only, no verdict on any rule; no live proceeding.
+id: x04-rules-law
+lesson: X4
+glossary:
+  - id: rate-case
+    term: Rate case
+    def: "A formal proceeding in which a utility asks its regulator to change its rates; staff, consumer advocates and other parties file testimony, and the commission decides."
+  - id: revenue-requirement
+    term: Revenue requirement
+    def: "The total a regulated utility may collect from its customers in a year: its allowed operating costs plus an allowed return on the net value of what it has built."
+requests:
+  - "X4 links kcc.ks.gov (allow-listed since 2026-11-07), ferc.gov and energy.gov; the Kansas siting statutes are cited by name without a link (ksrevisor.gov is not on the allow-list)."
+  - "F9's sources kcc-role and kcc-rate-study cite the KCC without a link; kcc.ks.gov is now allow-listed, so they could link https://kcc.ks.gov/about-us/the-commissions-s-role (coordinator's cross-link pass)."
+  - "Review yearly (curriculum row: review 'yearly (policy)'): the KCC's 240-day rule and the Kansas siting law (amended 2025) can change."

@@ -1,0 +1,233 @@
+{
+  "about": "Side topic X5 (How are big energy projects actually financed?): a capital-stack builder for one wind and storage project, closed form. The project is Prairie Town's 150 MW wind farm (town.json, illustrative) with lesson A2's 50 MW, 4-hour battery; their building costs, upkeep and output come from lessons 7 and 13 and A2's data files, and the contract price from A1's. Every dollar is a 2025 dollar. The lender's settings below are illustrative values inside the dated ranges of the sources. One typical year stands for every year of the loan: no inflation, taxes, depreciation, construction loans, reserve accounts or tax-equity flip.",
+  "accessed": "2026-11-07",
+  "priceYear": 2025,
+  "lender": {
+    "rate": 6.5,
+    "rateNote": "6.5% a year: the term-debt interest rate the 2025 ATB assumes for land-based wind, utility solar and utility batteries.",
+    "term": 15,
+    "termNote": "15 years, illustrative: the battery's life in lesson 13's data. The 2025 ATB amortizes its loans over 18 years.",
+    "dscrContract": 1.3,
+    "dscrMerchant": 2.0,
+    "dscrNote": "Illustrative: the lender asks 1.30 times the loan payment from contracted cash and 2.00 times from cash sold at market prices. The 2025 ATB assumes minimum coverage ratios from 1.275 (utility solar) to 2.0 (utility batteries).",
+    "src": [
+      "atb2025-fin"
+    ]
+  },
+  "loan": {
+    "range": [
+      0,
+      160
+    ],
+    "step": 1
+  },
+  "contract": {
+    "range": [
+      0,
+      100
+    ],
+    "step": 10,
+    "start": 100,
+    "note": "Contracted: the wind farm's output sold at A1's fixed price, as generated, and the battery rented out under a tolling agreement. Merchant: the same output at market prices, expected to earn the same on average (illustrative)."
+  },
+  "bad": {
+    "outputFactor": 0.9,
+    "priceFactor": 0.6,
+    "note": "A bad year, illustrative: 10% less wind and market prices 40% lower. A contract fixes the price, not the wind."
+  },
+  "taxEquity": {
+    "range": [
+      0,
+      50
+    ],
+    "step": 5,
+    "start": 0,
+    "note": "Tax equity needs a federal tax credit, which for wind depends on its dates under the 2025 law (lesson A12)."
+  },
+  "grant": {
+    "range": [
+      0,
+      10
+    ],
+    "step": 1,
+    "start": 0,
+    "note": "A grant is public money that is not paid back, under its program's rules."
+  },
+  "layers": [
+    {
+      "key": "sponsor",
+      "label": "Sponsor equity",
+      "short": "Sponsor",
+      "color": "var(--lx-cc)",
+      "who": "The developer or owner: its own money.",
+      "gets": "What is left after everyone else; often the highest return asked.",
+      "paid": "Last: the first to lose when cash falls short.",
+      "src": "schwabe2017",
+      "where": "pp. v, 14"
+    },
+    {
+      "key": "te",
+      "label": "Tax equity",
+      "short": "Tax equity",
+      "color": "var(--lx-tier-2)",
+      "who": "Large firms with tax bills to cut, such as banks and insurers.",
+      "gets": "Most of the tax credits and depreciation, plus some cash.",
+      "paid": "Ahead of the sponsor, on terms set in advance; it carries less risk than sponsor equity.",
+      "src": "schwabe2017",
+      "where": "pp. 13, 20"
+    },
+    {
+      "key": "debt",
+      "label": "Senior debt",
+      "short": "Debt",
+      "color": "var(--lx-wind)",
+      "who": "Banks and other lenders.",
+      "gets": "Fixed loan payments: interest and principal.",
+      "paid": "First, right after operating costs; collateral and covenants protect it, so it asks the lowest return.",
+      "src": "schwabe2017",
+      "where": "pp. 15-16, 20"
+    },
+    {
+      "key": "grant",
+      "label": "Grant",
+      "short": "Grant",
+      "color": "var(--lx-good)",
+      "who": "A public program, for example DOE's program for communities of 10,000 people or fewer.",
+      "gets": "Nothing back in cash; the project meets the program's conditions.",
+      "paid": "Never: it lowers what everyone else must put in.",
+      "src": "doe-era",
+      "where": "program overview"
+    }
+  ],
+  "risks": {
+    "q": "A bad year: cash falls short of what everyone expected. Who loses money first?",
+    "options": [
+      {
+        "value": "debt",
+        "label": "The lenders"
+      },
+      {
+        "value": "te",
+        "label": "The tax-equity investor"
+      },
+      {
+        "value": "sponsor",
+        "label": "The sponsor"
+      }
+    ],
+    "answer": "sponsor",
+    "feedback": {
+      "debt": "Not first: the loan is paid right after operating costs, before any owner gets cash.",
+      "te": "Not first: tax equity is paid ahead of the sponsor on terms set in advance.",
+      "sponsor": "Yes: the sponsor is paid last, so its share absorbs a shortfall first."
+    }
+  },
+  "facts": [
+    {
+      "n": "1.275 to 2.0",
+      "what": "Minimum debt-service coverage ratios the 2025 ATB assumes: 1.275 utility solar, 1.375 land-based wind, 1.45 gas, 2.0 utility batteries.",
+      "src": "atb2025-fin"
+    },
+    {
+      "n": "30–50%",
+      "what": "Share of a wind project's capital that tax equity typically provided where federal tax credits applied (2017).",
+      "src": "schwabe2017",
+      "where": "p. 13"
+    },
+    {
+      "n": "48% · 29% · 9%",
+      "what": "Of the new U.S. wind capacity of 2023: at least 48% sold to direct retail buyers (corporations among them), 29% bought or owned by utilities, at least 9% merchant or quasi-merchant.",
+      "src": "lbnl2024",
+      "where": "p. 3"
+    },
+    {
+      "n": "$13 to $60/MWh",
+      "what": "Wind's average grid-system market value in 2023, from SPP to CAISO, in 2023 dollars: what merchant wind earned, region by region.",
+      "src": "lbnl2024",
+      "where": "p. 6",
+      "dollars": {
+        "year": 2023,
+        "lo": 13,
+        "hi": 60
+      }
+    }
+  ],
+  "deflator": {
+    "index": {
+      "2023": 122.451,
+      "2025": 128.893
+    },
+    "src": "bea-nipa-119",
+    "note": "GDP implicit price deflator (2017 = 100), annual: a 2023 dollar is 128.893 ÷ 122.451 2025 dollars."
+  },
+  "stop": {
+    "title": "This side topic stops at the capital stack",
+    "lede": "Finance enters the course as who puts in money, who is paid first and why lenders value contracts; structuring deals is a profession of its own.",
+    "includes": [
+      "The four layers of a capital stack and the order in which they are paid.",
+      "How a lender sizes a loan from cash flow and a coverage ratio.",
+      "Why contracted revenue supports more debt than revenue sold at market prices."
+    ],
+    "leaves": [
+      "Structuring a deal: partnership flips, back-leverage, reserve accounts, term sheets.",
+      "Tax law, eligibility for credits and accounting standards.",
+      "Investment advice: this lesson rates no project and no investor."
+    ],
+    "ladder": [
+      {
+        "rung": "Start here",
+        "text": "Sections 4 and 6 walk through each source of capital, the debt-service coverage ratio and how financing changes a wind project's cost.",
+        "source": {
+          "label": "Schwabe, Feldman, Fields and Settle, Wind Energy Finance in the United States (NREL/TP-6A20-68227)",
+          "url": "https://docs.nlr.gov/docs/fy17osti/68227.pdf",
+          "asof": "August 2017"
+        }
+      },
+      {
+        "rung": "Go further",
+        "text": "The financing assumptions behind each technology's cost: interest rates, returns, coverage ratios and the tax-equity partnership.",
+        "source": {
+          "label": "NLR, 2025 Electricity ATB, Financial Cases and Methods",
+          "url": "https://atb.nlr.gov/electricity/2025/financial_cases_&_methods",
+          "asof": "2025 edition, read 7 November 2026"
+        }
+      },
+      {
+        "rung": "Go deep",
+        "text": "Build a project's cash flows with debt sizing and tax equity in a free model, with its financial documentation; then an introductory project-finance textbook.",
+        "source": {
+          "label": "NREL System Advisor Model (SAM), financial models documentation",
+          "url": null,
+          "asof": "free software, cited by name"
+        }
+      }
+    ]
+  },
+  "sources": {
+    "atb2025-fin": {
+      "text": "NLR, 2025 Electricity Annual Technology Baseline, Financial Cases and Methods: term debt 6.5% for land-based wind, utility PV and utility batteries; minimum DSCR 1.375 wind, 1.275 PV, 2.0 batteries, 1.45 natural gas; 18-year amortization; leverage set by the minimum DSCR; tax-equity partnership flip",
+      "url": "https://atb.nlr.gov/electricity/2025/financial_cases_&_methods",
+      "asOf": "2025 edition (tax law as of 10 July 2025); read 7 November 2026"
+    },
+    "schwabe2017": {
+      "text": "Schwabe, P., Feldman, D., Fields, J. and Settle, E. (2017), Wind Energy Finance in the United States: Current Practice and Opportunities, NREL/TP-6A20-68227: sources of capital pp. v, 11; tax equity typically 30%-50% of the total p. 13; sponsor equity paid last p. 14; debt senior and lower risk pp. 15-16; DSCR box p. 18; risk and return of each source p. 20, Figure 3 p. 21",
+      "url": "https://docs.nlr.gov/docs/fy17osti/68227.pdf",
+      "asOf": "August 2017, read 7 November 2026"
+    },
+    "lbnl2024": {
+      "text": "Wiser, R., Millstein, D. et al. (2024), Land-Based Wind Market Report: 2024 Edition, Executive Summary, Lawrence Berkeley National Laboratory: who bought 2023's new wind capacity p. 3; wind's grid-system market value in 2023 by region p. 6 (2023 dollars)",
+      "url": "https://eta-publications.lbl.gov/sites/default/files/land-based_wind_market_report_2024_edition_executive_summary.pdf",
+      "asOf": "August 2024, read 7 November 2026"
+    },
+    "doe-era": {
+      "text": "U.S. Department of Energy, Office of Clean Energy Demonstrations, Energy Improvements in Rural or Remote Areas (ERA): for communities with 10,000 or fewer people; a $400 million funding opportunity issued October 2024",
+      "url": "https://www.energy.gov/oced/era",
+      "asOf": "page undated; read 7 November 2026"
+    },
+    "bea-nipa-119": {
+      "text": "U.S. Bureau of Economic Analysis, NIPA Table 1.1.9, Implicit Price Deflators for Gross Domestic Product, line 1 (index, 2017 = 100), annual: 2023 122.451, 2025 128.893 (read through FRED's copy of the BEA series, updated 30 September 2026)",
+      "url": "https://apps.bea.gov/iTable/?reqid=19&step=3&isuri=1&1921=survey&1903=13&1904=2022&1905=2026&1906=a&1911=0",
+      "asOf": "read 7 November 2026"
+    }
+  }
+}

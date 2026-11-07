@@ -1200,9 +1200,13 @@
    "tier": "foundations",
    "code": "X1",
    "title": "What engineering lies beneath the system?",
-   "ready": false,
-   "href": "index.html#foundations",
-   "scales": []
+   "ready": true,
+   "href": "x01-under-the-hood.html",
+   "scales": [],
+   "id": "x01-under-the-hood",
+   "minutes": 12,
+   "form": "cards",
+   "short": "Engineering beneath"
   },
   {
    "tier": "foundations",
@@ -1401,17 +1405,25 @@
    "tier": "analyst",
    "code": "X4",
    "title": "How are energy rules made?",
-   "ready": false,
-   "href": "index.html#analyst",
-   "scales": []
+   "ready": true,
+   "href": "x04-rules-law.html",
+   "scales": [],
+   "id": "x04-rules-law",
+   "minutes": 12,
+   "form": "cards",
+   "short": "Energy rules"
   },
   {
    "tier": "analyst",
    "code": "X5",
    "title": "How are big energy projects actually financed?",
-   "ready": false,
-   "href": "index.html#analyst",
-   "scales": []
+   "ready": true,
+   "href": "x05-project-finance.html",
+   "scales": [],
+   "id": "x05-project-finance",
+   "minutes": 12,
+   "form": "cards",
+   "short": "Project finance"
   },
   {
    "tier": "analyst",
@@ -1781,9 +1793,13 @@
    "tier": "researcher",
    "code": "X6",
    "title": "How do social scientists study energy and people?",
-   "ready": false,
-   "href": "index.html#researcher",
-   "scales": []
+   "ready": true,
+   "href": "x06-social-methods.html",
+   "scales": [],
+   "id": "x06-social-methods",
+   "minutes": 12,
+   "form": "cards",
+   "short": "Social-science methods"
   },
   {
    "tier": "researcher",

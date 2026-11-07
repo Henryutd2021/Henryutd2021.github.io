@@ -1,0 +1,79 @@
+{
+  "about": "Side topic X1 (What engineering lies beneath the system?): eight components, the discipline that designs each, two questions it answers and what system models borrow from it. Numbers are read from the lessons that teach them (F4, F5, A16, lesson 13 and Prairie Town); this file holds words and reading only. Physics, operations and uses only: no cost, timing or deployment of any technology.",
+  "accessed": "2026-11-07",
+  "kinds": [
+    { "id": "rating", "label": "Rating", "text": "How much it can make, carry or store: MW, MWh, a line's limit." },
+    { "id": "efficiency", "label": "Efficiency", "text": "How much of what goes in comes out: a heat rate, a round trip, kWh per kilogram." },
+    { "id": "ramp", "label": "Ramp limit", "text": "How fast its output can change, and how low it can run." },
+    { "id": "outlet", "label": "Outlet temperature", "text": "How hot the heat it gives is, which sets the uses that heat can serve." },
+    { "id": "failure", "label": "Failure rate", "text": "How often it is out of service, and how long it lasts." },
+    { "id": "rules", "label": "Operating rule", "text": "How the people and software running the grid decide: time steps, reserves, limits." }
+  ],
+  "components": [
+    { "id": "inverter", "label": "Inverter", "icon": "sun", "discipline": "Power electronics", "qs": ["How does it turn a solar farm's or a battery's direct current into the grid's alternating current?", "How fast can it respond, and does it hold on through a voltage dip?"], "borrows": ["rating", "efficiency", "ramp"], "text": "Its AC rating in MW, its conversion losses and how fast it can change output; in A17, whether it forms or follows the grid.", "lessons": ["F7", "A17"], "read": "Erickson and Maksimović, Fundamentals of Power Electronics (Springer)" },
+    { "id": "relay", "label": "Protective relay", "icon": "sub", "discipline": "Power system protection", "qs": ["Which breaker should open, and how fast, when a line faults?", "How are its settings chosen so that healthy lines stay in service?"], "borrows": ["rating", "failure"], "text": "The ratings relays defend, such as a line's thermal rating, and how often equipment trips out of service.", "lessons": ["F6", "A17"], "read": "Horowitz and Phadke, Power System Relaying (Wiley)" },
+    { "id": "blade", "label": "Turbine blade", "icon": "turbine", "discipline": "Aerodynamics and structural engineering", "qs": ["How much of the wind's power can the rotor catch?", "Will the blade survive twenty years of gusts?"], "borrows": ["rating", "efficiency", "failure"], "text": "A power curve with its rated power, and how often the turbines are available.", "lessons": ["F4", "M9"], "read": "Burton, Jenkins, Sharpe and Bossanyi, Wind Energy Handbook (Wiley)" },
+    { "id": "combustor", "label": "Gas-turbine combustor", "icon": "flame", "discipline": "Combustion and thermodynamics", "qs": ["How hot can the flame burn before metal or emission limits are reached?", "How low can the turbine run and still burn steadily?"], "borrows": ["efficiency", "ramp", "rating"], "text": "A heat rate, a ramp limit, a minimum output and a start time.", "lessons": ["F4", "M2"], "read": "Turns, An Introduction to Combustion (McGraw-Hill)" },
+    { "id": "core", "label": "Reactor core", "icon": "atom", "discipline": "Reactor physics, thermal hydraulics and nuclear materials", "qs": ["How does the core hold its chain reaction steady?", "How is heat carried away so that fuel and cladding stay within their limits?"], "borrows": ["rating", "outlet", "efficiency"], "text": "A thermal and an electric rating, an outlet temperature and a heat rate.", "lessons": ["F5"], "read": "Lamarsh and Baratta, Introduction to Nuclear Engineering (Pearson)" },
+    { "id": "electrolyzer", "label": "Electrolyzer stack", "icon": "flask", "discipline": "Electrochemistry, catalysis and materials", "qs": ["How much electricity does a kilogram of hydrogen take?", "How fast do the cells wear, and how low can the stack run?"], "borrows": ["efficiency", "ramp", "failure"], "text": "Electricity per kilogram of hydrogen, a minimum load and a stack life.", "lessons": ["A16", "M4"], "read": "U.S. Department of Energy, Hydrogen and Fuel Cell Technologies Office, Hydrogen Production: Electrolysis (energy.gov)" },
+    { "id": "cell", "label": "Battery cell", "icon": "battery", "discipline": "Electrochemistry and materials science", "qs": ["How much energy does a cell hold, and how fast can it charge?", "How do heat and cycling age it?"], "borrows": ["efficiency", "rating", "failure"], "text": "A round-trip efficiency, a duration (energy over power) and a life.", "lessons": ["A8", "M4"], "read": "Linden's Handbook of Batteries (McGraw-Hill)" },
+    { "id": "control", "label": "Control room", "icon": "gauge", "discipline": "Control engineering, operations and cybersecurity", "qs": ["How do operators see the grid every few seconds and send each plant its target output?", "How are those systems kept safe from cyberattack?"], "borrows": ["rules"], "text": "Operating rules: how often dispatch runs, how much reserve is held and which limits are watched.", "lessons": ["0", "3", "M1"], "read": "Wood, Wollenberg and Sheblé, Power Generation, Operation, and Control (Wiley)" }
+  ],
+  "predict": {
+    "q": "What does a planner take from the blade engineers",
+    "options": [{ "value": "a", "label": "The layers of glass and carbon fiber in each blade" }, { "value": "b", "label": "The farm's power curve and how often it is available" }, { "value": "c", "label": "The blade's fatigue test plan" }],
+    "answer": "b",
+    "feedback": {
+      "a": "No: the layup is the structural engineers' design; a model needs the output it leads to.",
+      "b": "Yes: models borrow numbers such as a power curve, its rated power and availability, not the design.",
+      "c": "No: the tests show the blade will last; a model takes the result as availability and a life."
+    }
+  },
+  "sort": {
+    "bins": [{ "id": "borrow", "label": "A system model borrows it", "sub": "a number with units", "color": "var(--lx-tier-2)" }, { "id": "keep", "label": "Stays with the engineers", "sub": "how the device is designed", "color": "var(--lx-ink-3)" }],
+    "cards": [
+      { "id": "hr", "text": "A combined-cycle plant's heat rate", "bin": "borrow", "why": "Borrowed: fuel per MWh is how a dispatch model prices the plant's output." },
+      { "id": "flame", "text": "The shape of the combustor's flame", "bin": "keep", "why": "Kept: combustion engineers shape it; the model sees only the heat rate and emissions it leads to." },
+      { "id": "rte", "text": "A battery's round-trip efficiency", "bin": "borrow", "why": "Borrowed: it sets how much of each stored MWh comes back." },
+      { "id": "coat", "text": "The coating on a battery's electrodes", "bin": "keep", "why": "Kept: a materials choice; the model sees its effect on efficiency and life." },
+      { "id": "curve", "text": "A wind turbine's power curve", "bin": "borrow", "why": "Borrowed: wind speed in, MW out, hour by hour." },
+      { "id": "layup", "text": "The fiber layup inside a blade", "bin": "keep", "why": "Kept: a structural design; the model sees availability and life." },
+      { "id": "kwhkg", "text": "An electrolyzer's kWh per kilogram of hydrogen", "bin": "borrow", "why": "Borrowed: it turns MWh of electricity into kilograms of hydrogen." },
+      { "id": "cat", "text": "The catalyst inside an electrolyzer cell", "bin": "keep", "why": "Kept: electrochemists choose it; the model sees its kWh per kilogram and stack life." }
+    ]
+  },
+  "cyber": {
+    "q": "Do NERC's mandatory cybersecurity standards cover a home's rooftop solar inverter on a local feeder",
+    "options": [{ "value": "a", "label": "Yes, every inverter on the grid" }, { "value": "b", "label": "Generally not: they cover the bulk power system's cyber systems" }, { "value": "c", "label": "Only when the home sells power" }],
+    "answer": "b",
+    "feedback": {
+      "a": "No: NERC's CIP standards apply only to bulk electric system cyber systems, and in general not to systems on the distribution grid.",
+      "b": "Right: NERC's CIP standards apply only to bulk electric system cyber systems, and in general not to systems on the distribution grid.",
+      "c": "No: selling power does not change it; NERC's CIP standards apply to bulk electric system cyber systems, in general not to distribution."
+    },
+    "src": "nerc-sites"
+  },
+  "stop": {
+    "title": "This side topic stops at the nameplate",
+    "lede": "Devices enter the course only as ratings, efficiencies, ramp limits, outlet temperatures and failure rates; designing them belongs to each discipline.",
+    "includes": [
+      "What each discipline designs and which questions it answers.",
+      "Which numbers a system model borrows from it, and where this course uses them.",
+      "Where cybersecurity sits: standards for the bulk power system's control systems."
+    ],
+    "leaves": [
+      "Design methods, physics and calculations for any device.",
+      "Testing, certification and equipment standards.",
+      "Running or securing a control room."
+    ],
+    "ladder": [
+      { "rung": "Start here", "text": "A short tour of turbines, generators and inverters, and how each makes electricity.", "source": { "label": "EIA, Electricity explained: How electricity is generated", "url": "https://www.eia.gov/energyexplained/electricity/how-electricity-is-generated.php", "asof": "read 3 November 2026" } },
+      { "rung": "Go further", "text": "Pick one discipline and read its textbook: each component card above names one, in any recent edition.", "source": { "label": "The reading line on each component card", "url": null, "asof": "list of 7 November 2026" } },
+      { "rung": "Go deep", "text": "For control systems: how the mandatory cybersecurity standards reach the bulk power system, and where distributed resources stand.", "source": { "label": "NERC, Cyber Security for Distributed Energy Resources and DER Aggregators (white paper)", "url": "https://nerc.com/globalassets/our-work/reports/white-papers/white_paper_cybersecurity_for-ders_and_der_aggregators.pdf", "asof": "December 2022" } }
+    ]
+  },
+  "sources": {
+    "nerc-sites": { "text": "NERC Security Integration and Technology Enablement Subcommittee, Cyber Security for Distributed Energy Resources and DER Aggregators (white paper), p. 2: the NERC Critical Infrastructure Protection (CIP) standards apply only to bulk electric system cyber systems and their associated cyber assets; in general they are not applicable to systems or assets connected to the distribution system", "url": "https://nerc.com/globalassets/our-work/reports/white-papers/white_paper_cybersecurity_for-ders_and_der_aggregators.pdf", "asOf": "December 2022 (approved 6 December 2022), read 7 November 2026" },
+    "eia-gen": { "text": "EIA, Electricity explained: How electricity is generated: most electricity comes from turbines driving generators", "url": "https://www.eia.gov/energyexplained/electricity/how-electricity-is-generated.php", "asOf": "page undated; read 3 November 2026 (lesson F4)" }
+  }
+}

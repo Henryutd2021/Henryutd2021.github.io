@@ -1,0 +1,23 @@
+# Sidecar for X5 (x05-project-finance), builder learn-w7-a, 2026-11-07. Read by scripts/build_learn.py.
+# No excerpt of Henry's research appears in X5. Guard G-FIN: contract and offtake examples are wind and storage only.
+id: x05-project-finance
+lesson: X5
+glossary:
+  - id: capital-stack
+    term: Capital stack
+    def: "The layers of money that pay for a project, such as senior debt, tax equity and the sponsor's equity, each with its own place in the order of payment."
+  - id: cash-flow-available-for-debt-service
+    term: Cash flow available for debt service (CFADS)
+    def: "A project's revenue minus its operating costs in a period: the cash that can pay the loan."
+  - id: debt-service-coverage-ratio
+    term: Debt-service coverage ratio (DSCR)
+    def: "The cash available for debt service divided by the loan payment due; a lender asks for a minimum, such as 1.30, as a cushion."
+  - id: tax-equity
+    term: Tax equity
+    def: "Money from an investor with a large tax bill, put into a project in exchange for most of its tax credits and depreciation, plus some cash."
+  - id: sponsor-equity
+    term: Sponsor equity
+    def: "The developer's or owner's own money in a project: paid last, so it carries the most risk and keeps what is left."
+requests:
+  - "X5 reads 07-cost.json (wind), 13-capstone.json (battery), a02-contracts-risk.json (A2's battery and margin), a01-project-tea.json (price) and town.json (wind farm size); no change requested."
+  - "The 'where we stop' box (xs-* styles, written by _tests/learn/shelf_stop.js) is the same on X1, X4, X5 and X6: promote its styles to forms.css and the writer to a component (and offer it to X2 and X3, built on learn-w6-x)."

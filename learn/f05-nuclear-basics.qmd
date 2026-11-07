@@ -256,7 +256,7 @@ $$
 | $k_\text{min}$, $k_\text{max}$ | $k$ with no moderator and with all of it, rods out | 0.5 and 1.25 |
 | $a$ | share of the neutrons the rods absorb when fully in | 0.5 |
 
-Steady means exactly $k = 1$: here only at $m = 1$, $r = 0.4$ (rods 30%, moderator 90% gives $k = 0.999$, a slow decline). Real cores are modelled with neutron transport and kinetics, a field of its own (X1, upcoming).
+Steady means exactly $k = 1$: here only at $m = 1$, $r = 0.4$ (rods 30%, moderator 90% gives $k = 0.999$, a slow decline). Real cores are modelled with neutron transport and kinetics, a field of its own (side topic [X1](x01-under-the-hood.html)).
 
 **A plant in a system model.** Grid models such as [lesson 6](06-three-jobs.qmd), [M2](m02-unit-commitment.qmd) and [lesson 13](13-capstone.qmd) take a plant as a few numbers: its size in MW, its [heat rate]{.lx-term term="heat-rate"} or efficiency, its [capacity factor]{.lx-term term="capacity-factor"} and its [refuelling outages]{.lx-term term="refuelling-outage"}. The U.S. fleet's capacity factor was 91.1% in 2025 (EIA, Table 6.07.B; [lesson 5](05-capacity-factor.qmd)).
 
@@ -267,7 +267,7 @@ Steady means exactly $k = 1$: here only at $m = 1$, $r = 0.4$ (rods 30%, moderat
 <summary><span class="k">Go deeper</span>What this lesson leaves out</summary>
 <div class="lx-deeper-body">
 <ul>
-<li>Neutron physics beyond the toy: the many fission products, cross sections and the kinetics of a real core (X1, upcoming).</li>
+<li>Neutron physics beyond the toy: the many fission products, cross sections and the kinetics of a real core (side topic <a href="x01-under-the-hood.html">X1</a>).</li>
 <li>Radiation, shielding and health effects.</li>
 <li>The fuel cycle before the fuel arrives: mining, conversion and enrichment of uranium.</li>
 <li>The final disposal of spent fuel.</li>

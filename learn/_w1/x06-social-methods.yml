@@ -1,0 +1,16 @@
+# Sidecar for X6 (x06-social-methods), builder learn-w7-a, 2026-11-07. Read by scripts/build_learn.py.
+# No excerpt of Henry's research appears in X6. Method-neutral (curriculum §11.2). Prairie City is fictional.
+id: x06-social-methods
+lesson: X6
+glossary:
+  - id: choice-experiment
+    term: Choice experiment
+    def: "A survey method in which people choose repeatedly between offers whose features vary, so that the weight of each feature can be estimated."
+  - id: ethnography
+    term: Ethnography
+    def: "A research method of long observation and conversation with people where they live or work, to understand their routines in their own terms."
+  - id: participatory-mapping
+    term: Participatory mapping
+    def: "A method in which residents mark on maps the places that matter to them, for planners to weigh."
+requests:
+  - "X6 links M14, A13, A19, R9 and R3 through LX.lessonRefHTML; the static refresher links A13 (live)."

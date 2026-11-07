@@ -1,0 +1,103 @@
+{
+  "about": "Side topic X4 (How are energy rules made?): how a U.S. rule travels from a law to a regulator's rule, a tariff, a rate case and a permit, with one finished federal rulemaking (FERC Order No. 2222, issued 17 September 2020) and Kansas's commission (the KCC) as the state example. Every fact is from a dated primary source below; no live proceeding is described. Prairie Town's utility and its project are fictional and illustrative.",
+  "accessed": "2026-11-07",
+  "project": "Prairie Town's utility (fictional) wants a wind farm and a new 345 kV line about 40 miles long, and to recover their cost in its rates.",
+  "chain": [
+    { "icon": "scale", "title": "Law", "text": "Congress; a state legislature", "src": ["ferc-primer", "kcc-role"] },
+    { "icon": "blueprint", "title": "Rule", "text": "FERC; the state commission", "src": ["ferc-2222"] },
+    { "icon": "coin", "title": "Tariff or rate", "text": "filed by an RTO or a utility", "src": ["ferc-2222", "kcc-rates"] },
+    { "icon": "map", "title": "Permit", "text": "county, state or federal", "src": ["doe-wind-guide", "ks-siting"] }
+  ],
+  "hook": {
+    "q": "How long did one federal rule take",
+    "options": [{ "value": "a", "label": "About six months" }, { "value": "b", "label": "About two years" }, { "value": "c", "label": "Almost five years" }],
+    "answer": "c",
+    "start": "2015-11-19",
+    "end": "2020-09-17"
+  },
+  "steps": [
+    { "id": "panel", "date": "2015-11-19", "label": "A panel at FERC's open meeting", "kind": "event", "text": "FERC opens its inquiry with a panel on electric storage at a public open meeting.", "where": "p. 10" },
+    { "id": "rfc", "date": "2016-04-11", "label": "Data requests and a request for comments", "kind": "policy", "text": "Staff ask the six RTOs and ISOs for their rules and invite comments; 44 arrive.", "where": "pp. 10-11", "comments": 44 },
+    { "id": "nopr", "date": "2016-11-17", "label": "A proposed rule", "kind": "policy", "text": "FERC proposes the rule in a notice of proposed rulemaking; 109 comments follow.", "where": "p. 11", "comments": 109, "key": true },
+    { "id": "conf", "date": "2018-04-10", "label": "A technical conference", "kind": "event", "text": "More than 50 people and organizations speak over two days; 52 comments follow.", "where": "p. 12", "comments": 52 },
+    { "id": "final", "date": "2020-09-17", "label": "The final rule, Order No. 2222", "kind": "policy", "text": "FERC issues the final rule; it takes effect 60 days after it appears in the Federal Register.", "where": "cover page", "key": true },
+    { "id": "tariff", "date": null, "label": "Each RTO files its tariff changes", "kind": "policy", "text": "Each RTO or ISO must file the tariff changes within 270 days of the rule's publication.", "where": "cover page, p. 10" }
+  ],
+  "shuffle": ["final", "conf", "panel", "tariff", "nopr", "rfc"],
+  "rateCase": [
+    { "id": "file", "label": "Application", "day": "Day 0", "who": "The utility", "text": "The utility files an application with supporting data; it needs the commission's approval to change rates.", "src": "kcc-rates" },
+    { "id": "staff", "label": "Staff review", "day": "", "who": "KCC staff", "text": "Staff examine the utility's books and records, ask for more data and recommend; the recommendation is not binding.", "src": "kcc-rates" },
+    { "id": "testimony", "label": "Testimony", "day": "", "who": "The utility, staff, CURB and other intervenors", "text": "Expert witnesses file written testimony; CURB speaks for residential and small business customers, and other intervenors may join.", "src": "kcc-rates" },
+    { "id": "public", "label": "Public hearing", "day": "", "who": "Members of the public", "text": "Not required by law, but generally held in significant cases; public comments become part of the record.", "src": "kcc-rates" },
+    { "id": "hearing", "label": "Evidentiary hearing", "day": "", "who": "The three commissioners and every party", "text": "When held, the facts are presented formally; commissioners review testimony and exhibits and may question witnesses.", "src": "kcc-rates" },
+    { "id": "order", "label": "Order", "day": "Within 240 days", "who": "The three commissioners", "text": "In most cases the commission decides within 240 days of the filing; the limit can be waived in certain circumstances.", "src": "kcc-rates" }
+  ],
+  "settlement": {
+    "q": "The utility, the commission's staff and CURB sign a settlement. Must the commission accept it",
+    "options": [{ "value": "yes", "label": "Yes, once the parties agree" }, { "value": "no", "label": "No, it may accept, reject or change it" }],
+    "answer": "no",
+    "feedback": { "yes": "No: the KCC says it does not have to accept a proposed settlement.", "no": "Right: the KCC may accept, reject or modify a settlement; the commissioners decide." }
+  },
+  "bins": [
+    { "id": "federal", "label": "Federal", "sub": "Congress, FERC, other U.S. agencies", "color": "var(--lx-tier-3)" },
+    { "id": "state", "label": "State", "sub": "the legislature, the KCC", "color": "var(--lx-tier-2)" },
+    { "id": "local", "label": "Local", "sub": "a county or city", "color": "var(--lx-good)" }
+  ],
+  "cards": [
+    { "id": "market", "text": "Rules letting small resources join SPP's wholesale markets as a group", "bin": "federal", "why": "Federal: FERC's Order No. 2222 sets them, and SPP files its tariff with FERC.", "src": "ferc-2222" },
+    { "id": "home", "text": "The price per kWh a Prairie Town home pays its investor-owned utility", "bin": "state", "why": "State: the KCC sets and regulates the rates of the utilities it oversees.", "src": "kcc-role" },
+    { "id": "line", "text": "A siting permit for the new 345 kV line, about 40 miles long", "bin": "state", "why": "State: in Kansas a line of 230 kV or more and at least 5 miles long needs the KCC's siting permit.", "src": "ks-siting" },
+    { "id": "zoning", "text": "Approval of where the wind farm's turbines may stand", "bin": "local", "why": "Local, in most places: the county, sometimes with state regulators; a few states decide alone.", "src": "doe-wind-guide" },
+    { "id": "faa", "text": "A check that the tall turbines are safe for aircraft", "bin": "federal", "why": "Federal: the Federal Aviation Administration reviews tall structures for airspace obstruction.", "src": "doe-wind-guide" },
+    { "id": "nerc", "text": "Mandatory reliability standards for the bulk power grid", "bin": "federal", "why": "Federal: FERC certified NERC in 2006 to write them, and they are mandatory and enforceable.", "src": "ferc-primer" },
+    { "id": "rooftop", "text": "A permit to put solar panels on a Prairie Town roof", "bin": "local", "why": "Local: the city or county permit office issues it.", "src": "doe-solarapp" }
+  ],
+  "voice": {
+    "q": "Which can any member of the public do",
+    "options": [{ "value": "kcc", "label": "Comment on a KCC rate case" }, { "value": "ferc", "label": "Comment on a FERC proposed rule" }, { "value": "both", "label": "Both" }, { "value": "vote", "label": "Vote on the commission's final order" }],
+    "answer": "both",
+    "feedback": {
+      "kcc": "Yes, and more: the public can also comment on a FERC proposed rule.",
+      "ferc": "Yes, and more: KCC rate cases take public comments too.",
+      "both": "Right: KCC comments enter the case record, and FERC took 109 comments on the proposed rule behind Order No. 2222.",
+      "vote": "No: the commissioners decide; the public comments, and parties who intervene file testimony."
+    }
+  },
+  "quiz": { "filed": "2026-03-01", "days": 240 },
+  "facts": [
+    { "n": "240 days", "what": "How long the KCC has, in most cases, to decide a rate case after the filing date; the limit can be waived in certain circumstances.", "src": "kcc-rates" },
+    { "n": "4 years 9 months", "what": "From FERC's first open-meeting panel (19 November 2015) to Order No. 2222 (17 September 2020): 4 years, 9 months and 29 days.", "src": "ferc-2222", "where": "cover page, pp. 10-12" },
+    { "n": "109", "what": "Comments FERC received on its proposed rule of 17 November 2016.", "src": "ferc-2222", "where": "p. 11" },
+    { "n": "3", "what": "KCC commissioners, appointed by the Governor to overlapping four-year terms; no more than two of one party.", "src": "kcc-role" },
+    { "n": "230 kV, 5 miles", "what": "In Kansas, a line this large or larger needs a KCC siting permit; the law sets a public hearing and a final order within 180 days.", "src": "ks-siting" }
+  ],
+  "stop": {
+    "title": "This side topic stops at how rules are made",
+    "lede": "Rules enter the course as who decides what, in what order and when; reading legal texts and following live cases is the work of lawyers and regulatory staff.",
+    "includes": [
+      "Who makes which rule: Congress and FERC, a state legislature and its commission, counties and cities.",
+      "How a rule becomes a tariff, a rate or a permit, and where the public can take part.",
+      "Reading dates: one finished federal rulemaking and a state commission's rate-case clock."
+    ],
+    "leaves": [
+      "Legal texts, their interpretation and legal advice.",
+      "Live proceedings: today's open dockets and pending rules.",
+      "Other states' and other countries' procedures, which differ."
+    ],
+    "ladder": [
+      { "rung": "Start here", "text": "Chapter 2 explains who regulates wholesale electricity, who regulates retail rates and how the markets grew.", "source": { "label": "FERC, Energy Primer: A Handbook of Energy Market Basics", "url": "https://www.ferc.gov/sites/default/files/2024-01/24_Energy-Markets-Primer_0117_DIGITAL_0.pdf", "asof": "January 2024" } },
+      { "rung": "Go further", "text": "A state commission's own guide to a rate case: the revenue requirement, rate design, hearings and settlements.", "source": { "label": "Kansas Corporation Commission, How rates are set", "url": "https://kcc.ks.gov/electric/how-rates-are-set", "asof": "undated, read 7 November 2026" } },
+      { "rung": "Go deep", "text": "Read one finished federal rule in full: its procedural history, the comments and the commission's answers to them.", "source": { "label": "FERC, Order No. 2222 (Docket RM18-9-000)", "url": "https://www.ferc.gov/sites/default/files/2020-09/E-1_0.pdf", "asof": "issued 17 September 2020" } }
+    ]
+  },
+  "sources": {
+    "ferc-primer": { "text": "FERC staff (2024), Energy Primer: A Handbook of Energy Market Basics: FERC's authority under the Natural Gas Act, the Federal Power Act and the Interstate Commerce Act p. vi; state regulators approve retail rates and utilities' investments in generation and distribution, retail rates largely cost-of-service, FERC certified NERC in 2006 and reliability standards became mandatory and enforceable p. 35", "url": "https://www.ferc.gov/sites/default/files/2024-01/24_Energy-Markets-Primer_0117_DIGITAL_0.pdf", "asOf": "January 2024, read 7 November 2026" },
+    "ferc-2222": { "text": "FERC, Order No. 2222, Participation of Distributed Energy Resource Aggregations in Markets Operated by Regional Transmission Organizations and Independent System Operators, Docket RM18-9-000, final rule: cover page (effective 60 days after publication in the Federal Register; tariff changes due within 270 days of publication) and procedural history pp. 10-12", "url": "https://www.ferc.gov/sites/default/files/2020-09/E-1_0.pdf", "asOf": "issued 17 September 2020, read 7 November 2026" },
+    "kcc-role": { "text": "Kansas Corporation Commission, The Commission's Role: authority from K.S.A. 74-601 to 74-631; three members appointed by the Governor to overlapping four-year terms, no more than two of the same party; the present commission established by the Legislature in 1933; the Utilities Division establishes and regulates rates; most electric cooperatives and municipalities are not regulated by the KCC", "url": "https://kcc.ks.gov/about-us/the-commissions-s-role", "asOf": "undated, read 7 November 2026" },
+    "kcc-rates": { "text": "Kansas Corporation Commission, How rates are set: a two-step process (revenue requirement, then rate design); the utility files an application; in most cases 240 days from the filing date to decide, waivable; staff review and non-binding recommendation; intervenors and CURB; expert testimony; a public hearing generally held in significant cases; an evidentiary hearing; the commission may accept, reject or modify a settlement", "url": "https://kcc.ks.gov/electric/how-rates-are-set", "asOf": "undated, read 7 November 2026" },
+    "kcc-faq": { "text": "Kansas Corporation Commission, Electric FAQs: public comments received during the comment period are entered into the official case record; comment online, by mail or by phone, citing the docket number", "url": "https://kcc.ks.gov/electric/electric-faqs", "asOf": "undated, read 7 November 2026" },
+    "ks-siting": { "text": "Kansas Statutes, K.S.A. 66-1,177 (an electric transmission line: at least 5 miles long and used for the bulk transfer of 230 kV or more) and K.S.A. 66-1,178 (a KCC siting permit before site preparation or construction; a public hearing within 90 days in a county the line crosses; a final order within 180 days of the filing, as amended in 2025), Kansas Office of Revisor of Statutes (cited by name, without a link)", "url": null, "asOf": "read 7 November 2026" },
+    "doe-wind-guide": { "text": "U.S. Department of Energy, WINDExchange, Land-Based Wind Energy Economic Development Guide, Regulatory Considerations: the primary siting authority is the local government or a combination of the local government and state regulators; only four states grant siting authority exclusively to the state; Federal Aviation Administration approval may be needed for airspace obstruction", "url": "https://www.energy.gov/cmei/systems/windexchange/land-based-economic-development-guide", "asOf": "undated, read 7 November 2026" },
+    "doe-solarapp": { "text": "U.S. Department of Energy, 160 Communities Now Automating Solar Permitting with SolarAPP+: local jurisdictions issue the permits for residential rooftop solar", "url": "https://www.energy.gov/cmei/systems/articles/160-communities-now-automating-solar-permitting-solarapp", "asOf": "20 December 2023, read 6 November 2026 (lesson F9)" }
+  }
+}

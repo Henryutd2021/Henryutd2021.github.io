@@ -139,7 +139,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 - **The money's mix.** Step 3 held both rates fixed. More loans make the owners' share riskier, so owners ask more: the real WACC may fall less than the slider shows, or not at all.
 - **Loan size.** Lenders cap a loan by the cash that must repay it, so the loan share is not free to choose.
 - **Two views of one project.** These are the project's cash flows before loan payments, discounted at the WACC. Owners also judge their own cash after loan payments, at their own rate: the owners' IRR.
-- **Where it stops.** Loan sizing and capital structure stay at awareness level in this course (side shelf X5, upcoming). No investment advice.
+- **Where it stops.** Loan sizing and capital structure stay at awareness level in this course (side shelf [X5](x05-project-finance.html)). No investment advice.
 
 ```{=html}
 </div>
@@ -258,7 +258,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <li>EIA (2026). <a href="https://www.eia.gov/outlooks/aeo/assumptions/pdf/EMM_Assumptions.pdf">Assumptions to the Annual Energy Outlook 2026: Electricity Market Module</a> (PDF). Table 3: building cost and upkeep.</li>
 <li>EIA. <a href="https://www.eia.gov/electricity/annual/html/epa_04_08_b.html">Electric Power Annual, Table 4.08.B</a>: capacity factors, final 2025 data.</li>
 <li>NLR (2026). 2025 Electricity Annual Technology Baseline: <a href="https://atb.nlr.gov/electricity/2025/financial_cases_&amp;_methods">Financial Cases and Methods</a>.</li>
-<li>Where this goes: <a href="a02-contracts-risk.html">A2</a> asks who carries the risk when the price is not fixed; Modeler lesson <a href="m11-tea-in-models.html">M11</a> goes further into finance, and so will side shelf X5 (upcoming).</li>
+<li>Where this goes: <a href="a02-contracts-risk.html">A2</a> asks who carries the risk when the price is not fixed; Modeler lesson <a href="m11-tea-in-models.html">M11</a> goes further into finance, and so does side shelf <a href="x05-project-finance.html">X5</a>.</li>
 </ul>
 </div>
 ```

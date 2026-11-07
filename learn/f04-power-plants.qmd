@@ -203,7 +203,7 @@ EIA's heat rates are net: they divide the fuel by the electricity the plant send
 | Geothermal water | 300 to 700 °F (EIA) | about 16 (EIA, typical) |
 | Gas in a gas turbine | above 2,000 °F (DOE) | 20 to 35 alone (DOE) |
 
-The physics of that ceiling, and how engineers approach it, is device thermodynamics, beyond this lesson (X1, upcoming).
+The physics of that ceiling, and how engineers approach it, is device thermodynamics, beyond this lesson (side topic [X1](x01-under-the-hood.html)).
 
 - **Combined cycle.** The gas turbine's exhaust is still hot enough to boil water for a [steam turbine]{.lx-term term="steam-turbine"}. With that second turbine, EIA's 2025 full-load tests imply about 45.3% for U.S. combined-cycle plants; DOE reports efficiencies as high as 60 percent for its advanced turbines.
 - **Measured against notional.** The gas and coal shares come from tested heat rates at full load, not a year's fuel use; the hydro, wind and geothermal shares are EIA's typical equipment values. Wind, sunlight, falling water and the earth's heat are not bought by the unit, so the energy a plant does not catch carries no significant cost (EIA, AER 2010, Appendix F).
@@ -241,7 +241,7 @@ At 150 MW for one hour and 7,535 Btu per kWh, that is about 1.13 billion Btu.
 <summary><span class="k">Go deeper</span>What this lesson leaves out</summary>
 <div class="lx-deeper-body">
 <ul>
-<li>How turbines, boilers and cells are designed, and the thermodynamics of their limits (X1, upcoming).</li>
+<li>How turbines, boilers and cells are designed, and the thermodynamics of their limits (side topic <a href="x01-under-the-hood.html">X1</a>).</li>
 <li>Output and efficiency at part load: a plant running below its size usually does worse than its full-load heat rate.</li>
 <li>Emissions and air quality: <a href="f11-air-climate-people.html">F11</a>. Costs: <a href="07-cost.html">lesson 7</a>.</li>
 <li>Concentrated solar power, which uses mirrors to make steam, biomass plants and pumped-storage hydro (lesson 9 treats storage).</li>
