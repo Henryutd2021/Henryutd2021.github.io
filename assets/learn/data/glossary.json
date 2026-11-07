@@ -2617,7 +2617,7 @@
  },
  "scope-2": {
   "term": "Scope 2 emissions",
-  "short": "A company's reported emissions from the electricity, steam, heat or cooling it buys, counted at the plants that make it.",
+  "short": "Emissions from the grid electricity, steam, heat or cooling that a company buys or a city uses, counted at the plants that make it.",
   "lesson": "A10",
   "href": "a10-emissions-questions.html"
  },

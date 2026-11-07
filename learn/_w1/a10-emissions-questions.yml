@@ -19,7 +19,7 @@ glossary:
     def: "A way to report electricity's emissions that counts each MWh at the factor of the electricity the buyer purchased, through contracts or certificates."
   - id: scope-2
     term: Scope 2 emissions
-    def: "A company's reported emissions from the electricity, steam, heat or cooling it buys, counted at the plants that make it."
+    def: "Emissions from the grid electricity, steam, heat or cooling that a company buys or a city uses, counted at the plants that make it."
   - id: residual-mix
     term: Residual mix
     def: "The emission factor of the electricity left after every contract and certificate has been claimed, used for a buyer's unclaimed use."

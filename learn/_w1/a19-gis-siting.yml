@@ -33,5 +33,3 @@ glossary:
     term: Spare capacity (headroom)
     def: "The MW a substation or line can still take for a new load or plant without an upgrade."
 requests:
-  - "Promote assets/learn/a19.js (LX.A19, the pure siting model, and LX.SiteMap, the map view) to components/ once C3 loads it: C3 sites one solar farm with it (A19.build, A19.cfg, A19.sites, A19.cost; LX.SiteMap.draw). Its styles (a19-) are in A19's page style block and would move to a sitemap.css."
-  - "Integration: A19's curriculum prerequisite A11 is not live yet; add `after: [A11]` to A19's path.yml row once A11 is active."

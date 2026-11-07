@@ -9,9 +9,9 @@ css: ../assets/learn/learn.css
 body-classes: "page-learn page-lesson lx-form-cards"
 ---
 
-<!-- A13 (a13-fairness-jobs), step cards, Analyst, D3, W5 (builder learn-w5-b). The accounting layer is a separate pure
-     model, assets/learn/a13-who-pays-and-benefits.js (LX.A13), loaded before the lesson's script so that SB3 and C3 can
-     load the same file; the lesson's words and view are assets/learn/a13-fairness-jobs.js with data/a13-fairness-jobs.json
+<!-- A13 (a13-fairness-jobs), step cards, Analyst, D3, W5 (builder learn-w5-b). The accounting layer is a shared pure
+     model, assets/learn/components/whopays.js (LX.A13, in the learn.js bundle; promoted at the W5 integration), which
+     SB3 and C3 use too; the lesson's words and view are assets/learn/a13-fairness-jobs.js with data/a13-fairness-jobs.json
      (the plan's cost, the coefficients as learner inputs, Ridge County with its W6 note), prairie-city.json (read, never
      retyped) and path.json. Tests: node _tests/learn/test_a13-fairness-jobs.js [--write] (every number on the page is
      checked against LX.A13; --write rewrites the no-JS block and the practice set between their markers). Every output
@@ -124,7 +124,7 @@ $$c_g = \frac{C\,e_g}{\sum_h n_h e_h} \ \text{(per kWh)}, \qquad c_g = \frac{C}{
 
 - **Burden after:** $(s_g + c_g)/y_g$. Every design gives $\sum_g n_g c_g = C$, so the difference between two designs sums to zero: a transfer.
 - **Jobs.** Net permanent jobs $= m\,(J_{\text{new}}(1 - d) - J_{\text{lost}})$, with multiplier $m$ and displacement $d$; building job-years $=$ spending in the county $\times$ job-years per \$M $\times\, m$.
-- **Reuse.** The page's accounting is one small file, `a13-who-pays-and-benefits.js`, that the course's city sandbox and capstone can load with a plan's cost and its changes in use.
+- **Reuse.** The page's accounting is one small shared component, `whopays.js`, that the course's city sandbox and capstone can call with a plan's cost and its changes in use.
 - **An energy model does not produce these outcomes by itself:** it gives costs, energy and MW; an accounting layer like this one turns them into who pays and who gains.
 
 ```{=html}
@@ -248,6 +248,5 @@ $$c_g = \frac{C\,e_g}{\sum_h n_h e_h} \ \text{(per kWh)}, \qquad c_g = \frac{C}{
 
 ```{=html}
 <script src="../assets/learn/learn.js" defer></script>
-<script src="../assets/learn/a13-who-pays-and-benefits.js" defer></script>
 <script src="../assets/learn/a13-fairness-jobs.js" defer></script>
 ```

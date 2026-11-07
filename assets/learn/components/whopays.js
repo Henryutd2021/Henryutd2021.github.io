@@ -1,8 +1,9 @@
-/* a13-who-pays-and-benefits.js — LX.A13: the accounting layer of lesson A13 ("Who pays and who benefits?"), written as a
-   small pure model (no DOM) so that sandbox SB3 (City Planner, engine E3) and capstone C3 (Prairie City 2040) can load
-   it for their household and jobs outputs. Lesson-local (wave W5, builder learn-w5-b); reported for promotion.
-   Browser: <script src="../assets/learn/a13-who-pays-and-benefits.js"> sets window.LX.A13 (load it after learn.js).
-   Node:    const A13 = require("assets/learn/a13-who-pays-and-benefits.js").
+/* whopays.js — LX.A13: the accounting layer of lesson A13 ("Who pays and who benefits?"), written as a small pure model
+   (no DOM) so that sandbox SB3 (City Planner, engine E3) and capstone C3 (Prairie City 2040) can use it for their
+   household and jobs outputs. Written for A13 (wave W5, builder learn-w5-b, as assets/learn/a13-who-pays-and-benefits.js)
+   and promoted at the W5 integration (2026-11-06), its code unchanged.
+   Browser: in the learn.js bundle; it sets window.LX.A13 (no page loads a separate file for it).
+   Node:    const A13 = require("assets/learn/components/whopays.js").
 
    An energy model does not produce these outcomes by itself: it gives a cost, energy use and MW built; this layer turns
    them into who pays and who gains, with stated assumptions. Every output is a SCREENING ESTIMATE: coefficients are the

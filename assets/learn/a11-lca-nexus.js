@@ -184,9 +184,10 @@
   var MET = [["carbon", "Carbon"], ["water", "Water"], ["land", "Land"]];
   var SCOL = { build: "var(--lx-tier-2)", supply: "var(--lx-warn)", run: "var(--lx-accent)", end: "var(--lx-ink-3)" };
 
-  // LifeBox: the life-cycle chain with a boundary the reader drags (i-boundary). Lesson-local.
-  //   var box = LifeBox(host, D, S, onChange);  box.paint();  S = { obj, meter, L, R, cooling, wide }
-  function LifeBox(host, D, S, onChange) {
+  // The life-cycle box: the object and footprint controls, the chain with its draggable boundary (LX.LifeBox, i-boundary;
+  // components/lifebox.js, promoted from this page at the W5 integration), the readouts inside and the text version.
+  //   var box = footprintBox(host, D, S, onChange);  box.paint();  S = { obj, meter, L, R, cooling, wide }
+  function footprintBox(host, D, S, onChange) {
     var wrap = H("div", { class: "a11-box" }, host);
     var top = H("div", { class: "a11-top" }, wrap);
     function segCtl(label, opts, key) {
@@ -197,72 +198,31 @@
     }
     var objB = segCtl("Object", OBJ, "obj"), metB = segCtl("Footprint", MET, "meter");
     var head = H("p", { class: "a11-fu" }, wrap);
-    var chain = H("div", { class: "a11-chain" }, wrap);
-    var bnd = H("div", { class: "a11-bnd" }, chain);   // drawn above the tiles, clicks pass through it; its two handles are sliders
-    var tiles = STAGES.map(function (sid, i) {
-      var b = H("button", { type: "button", class: "a11-tile", style: "--c:" + SCOL[sid] + ";--i:" + (i + 1) }, chain);
-      b.addEventListener("click", function () { tap(i); });
-      return b;
-    });
-    function handle(side) {
-      var h = H("span", { class: "a11-h a11-h-" + side, role: "slider", tabindex: "0", "aria-valuemin": "1", "aria-valuemax": "4", "aria-label": side === "l" ? "Left edge of the boundary" : "Right edge of the boundary" }, bnd);
-      h.addEventListener("keydown", function (e) {
-        var k = e.key, d = k === "ArrowLeft" || k === "ArrowDown" ? -1 : k === "ArrowRight" || k === "ArrowUp" ? 1 : 0;
-        if (k === "Home" || k === "End") { if (side === "l") S.L = k === "Home" ? 0 : S.R; else S.R = k === "End" ? 3 : S.L; e.preventDefault(); change(h); return; }
-        if (!d) return; e.preventDefault();
-        if (side === "l") S.L = Math.max(0, Math.min(S.R, S.L + d)); else S.R = Math.max(S.L, Math.min(3, S.R + d));
-        change(h);
-      });
-      h.addEventListener("pointerdown", function (e) {
-        e.preventDefault(); if (h.setPointerCapture) h.setPointerCapture(e.pointerId); h.focus();
-        function mv(ev) {   // the chain runs across from 561 px, down on phones (the page's CSS)
-          var r = chain.getBoundingClientRect(), down = window.matchMedia && window.matchMedia("(max-width: 560px)").matches;
-          var idx = Math.max(0, Math.min(3, Math.floor(down ? (ev.clientY - r.top) / (r.height / 4) : (ev.clientX - r.left) / (r.width / 4))));
-          var nL = side === "l" ? Math.min(idx, S.R) : S.L, nR = side === "r" ? Math.max(idx, S.L) : S.R;
-          if (nL !== S.L || nR !== S.R) { S.L = nL; S.R = nR; change(h); }
-        }
-        function up() { h.removeEventListener("pointermove", mv); h.removeEventListener("pointerup", up); h.removeEventListener("pointercancel", up); }
-        h.addEventListener("pointermove", mv); h.addEventListener("pointerup", up); h.addEventListener("pointercancel", up);
-      });
-      return h;
-    }
-    var hl = handle("l"), hr = handle("r");
-    // a tap on a stage outside brings it in (and everything between); a tap on an end stage inside moves it out
-    function tap(i) {
-      if (i < S.L) S.L = i; else if (i > S.R) S.R = i;
-      else if (S.L === S.R) return;
-      else if (i === S.L) S.L++; else if (i === S.R) S.R--; else return;
-      change(tiles[i]);
-    }
-    var pre = H("div", { class: "lx-seg a11-pre", role: "group", "aria-label": "Boundary presets" }, wrap), preB = {};
-    [["site", "On site only", 2, 2], ["supply", "Supply and site", 1, 2], ["grave", "Cradle to grave", 0, 3]].forEach(function (p) {
-      var b = H("button", { type: "button", text: p[1] }, pre); preB[p[0]] = [b, p[2], p[3]];
-      b.addEventListener("click", function () { S.L = p[2]; S.R = p[3]; change(b); });
-    });
-    var chips = H("div", { class: "lx-readouts a11-chips", "aria-live": "polite" }, wrap);
-    var alt = H("details", { class: "lx-textalt" }, wrap); H("summary", { text: "Text version: every stage of this object" }, alt);
-    var altBody = H("div", { class: "lx-scroll-x" }, alt);
-    function change(focusEl) { paint(); if (onChange) onChange(S); if (focusEl && focusEl.focus) focusEl.focus(); }
-    function paint() {
-      var ob = D.objects[S.obj], o = { cooling: S.cooling, wide: S.wide };
-      Object.keys(objB).forEach(function (k) { objB[k].setAttribute("aria-pressed", String(k === S.obj)); });
-      Object.keys(metB).forEach(function (k) { metB[k].setAttribute("aria-pressed", String(k === S.meter)); });
-      head.innerHTML = ""; H("b", { text: ob.name }, head); H("span", { text: " · " + ob.kind + " · footprints " + ob.per }, head);
-      chain.style.setProperty("--span", (S.L + 1) + " / " + (S.R + 2));
-      STAGES.forEach(function (sid, i) {
-        var s = stage(D, S.obj, S.meter, sid, o), t = tiles[i], inB = i >= S.L && i <= S.R, st = D.stages[i];
-        t.innerHTML = ""; t.classList.toggle("out", !inB); t.classList.toggle("nc", s.kind === "nc");
-        t.setAttribute("aria-pressed", String(inB));
+    var life = LX.LifeBox(wrap, {
+      stages: D.stages, state: S, cls: "a11", color: function (i) { return SCOL[STAGES[i]]; },
+      presets: [["site", "On site only", 2, 2], ["supply", "Supply and site", 1, 2], ["grave", "Cradle to grave", 0, 3]],
+      tile: function (t, i, inB) {
+        var sid = STAGES[i], ob = D.objects[S.obj], s = stage(D, S.obj, S.meter, sid, { cooling: S.cooling, wide: S.wide }), st = D.stages[i];
+        t.innerHTML = ""; t.classList.toggle("nc", s.kind === "nc");
         H("span", { class: "a11-st", text: st.label }, t);
         H("span", { class: "a11-sn", text: ob.stageNames[sid] }, t);
         H("b", { class: "a11-v", text: val(S.meter, s) }, t);
         t.setAttribute("aria-label", st.label + ", " + ob.stageNames[sid] + ": " + val(S.meter, s) + (s.kind === "num" || s.kind === "bound" ? " " + UNIT[S.meter] : "") + (inB ? ", inside the boundary" : ", outside the boundary"));
-      });
-      [hl, hr].forEach(function (h, j) {
-        var at = j === 0 ? S.L : S.R; h.setAttribute("aria-valuenow", String(at + 1));
-        h.setAttribute("aria-valuetext", (j === 0 ? "starts at " : "ends at ") + D.stages[at].label + ", stage " + (at + 1) + " of 4");
-      });
-      Object.keys(preB).forEach(function (k) { preB[k][0].setAttribute("aria-pressed", String(S.L === preB[k][1] && S.R === preB[k][2])); });
+      },
+      onChange: function () { paintRest(); if (onChange) onChange(S); } });
+    var chips = H("div", { class: "lx-readouts a11-chips", "aria-live": "polite" }, wrap);
+    var alt = H("details", { class: "lx-textalt" }, wrap); H("summary", { text: "Text version: every stage of this object" }, alt);
+    var altBody = H("div", { class: "lx-scroll-x" }, alt);
+    function change() { paint(); if (onChange) onChange(S); }
+    function paint() { paintHead(); life.paint(); paintRest(); }
+    function paintHead() {
+      var ob = D.objects[S.obj];
+      Object.keys(objB).forEach(function (k) { objB[k].setAttribute("aria-pressed", String(k === S.obj)); });
+      Object.keys(metB).forEach(function (k) { metB[k].setAttribute("aria-pressed", String(k === S.meter)); });
+      head.innerHTML = ""; H("b", { text: ob.name }, head); H("span", { text: " · " + ob.kind + " · footprints " + ob.per }, head);
+    }
+    function paintRest() {
+      var ob = D.objects[S.obj], o = { cooling: S.cooling, wide: S.wide };
       chips.innerHTML = "";
       MET.forEach(function (m) {
         var r = inside(D, S.obj, m[0], S.L, S.R, o), c = H("div", { class: "lx-readout" + (m[0] === S.meter ? " a11-on" : "") }, chips);
@@ -280,8 +240,8 @@
         H("td", { text: i >= S.L && i <= S.R ? "yes" : "no" }, tr);
       });
     }
-    paint();
-    return { el: wrap, paint: paint, tiles: tiles, handles: [hl, hr] };
+    paintHead(); paintRest();
+    return { el: wrap, paint: paint, tiles: life.tiles, handles: life.handles };
   }
 
   LX.mount(SLUG, function (live, data, root) {
@@ -293,7 +253,7 @@
     var watch = null;   // the current step's check, run on every change of the box
     var stageEl = H("div", { class: "lx-stage a11-stage" }, live);
     H("p", { class: "a11-how lx-hint", text: "Drag the dashed boundary's edges, tap a stage to bring it in or move it out, or pick a preset." }, stageEl);
-    var box = LifeBox(stageEl, D, S, function () { if (watch) watch(); buildExplain(); });
+    var box = footprintBox(stageEl, D, S, function () { if (watch) watch(); buildExplain(); });
     function set(o) { Object.keys(o).forEach(function (k) { S[k] = o[k]; }); box.paint(); buildExplain(); if (watch) watch(); }
 
     var steps = [

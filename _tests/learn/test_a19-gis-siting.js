@@ -1,4 +1,4 @@
-// test_a19-gis-siting.js — Node tests for A19 (assets/learn/a19.js, the map model; assets/learn/a19-gis-siting.js, the
+// test_a19-gis-siting.js — Node tests for A19 (assets/learn/components/siting.js, the map model; assets/learn/a19-gis-siting.js, the
 // lesson; data/a19-gis-siting.json; the page learn/a19-gis-siting.qmd):
 //   - the region from first principles: noise in [0, 1), classes that exclude each other, homes in open cells, distances
 //     to homes and built-up land against a brute-force search (the 3 km cap changes no result), setback shares that fall
@@ -25,7 +25,7 @@ const vm = require("vm");
 const ID = "a19-gis-siting";
 const SITE = path.resolve(__dirname, "..", "..");
 const L = p => path.join(SITE, "assets/learn", p);
-const A19 = require(L("a19.js"));
+const A19 = require(L("components/siting.js"));
 const LS = require(L(ID + ".js"));
 const DPATH = L("data/" + ID + ".json");
 let RAW = fs.readFileSync(DPATH, "utf8");
@@ -33,7 +33,7 @@ const D0 = JSON.parse(RAW);
 const PC = JSON.parse(fs.readFileSync(L("data/prairie-city.json"), "utf8"));
 const D = A19.withCity(D0, PC);   // the campus's MW from the shared Prairie City data, as the page does
 const CF = JSON.parse(fs.readFileSync(L("data/cf_targets.json"), "utf8"));
-const JS = fs.readFileSync(L(ID + ".js"), "utf8"), MJS = fs.readFileSync(L("a19.js"), "utf8");
+const JS = fs.readFileSync(L(ID + ".js"), "utf8"), MJS = fs.readFileSync(L("components/siting.js"), "utf8");
 const QPATH = path.join(SITE, "learn", ID + ".qmd");
 const SIDE = fs.readFileSync(path.join(SITE, "learn/_w1", ID + ".yml"), "utf8");
 let checks = 0, fails = 0;
@@ -398,7 +398,7 @@ ok(hrefs.length > 8 && hrefs.every(h => ALLOW.test(h) || /^[0-9a-z-]+\.html$/.te
   vm.createContext(ctx);
   let threw = null;
   try { vm.runInContext(MJS, ctx); vm.runInContext(JS, ctx); } catch (e) { threw = e.stack; }
-  ok(!threw && E.LX.A19 && E.LX.SiteMap, "a19.js sets LX.A19 and LX.SiteMap" + (threw ? ": " + threw : ""));
+  ok(!threw && E.LX.A19 && E.LX.SiteMap, "siting.js sets LX.A19 and LX.SiteMap" + (threw ? ": " + threw : ""));
   const root = E.LX.H("div", { class: "lx-interactive", "data-learn": "siting" }, E.body), live = E.LX.H("div", { class: "lx-live" }, root);
   try { init(live, { a19_gis_siting: D0, cf_targets: CF, prairie_city: PC }, root); } catch (e) { threw = e.stack; }
   ok(!threw && demo && demo.cards, "the page mounts on the stub document" + (threw ? ": " + threw : ""));

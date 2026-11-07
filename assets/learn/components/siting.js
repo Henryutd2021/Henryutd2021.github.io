@@ -1,5 +1,7 @@
-/* a19.js — the siting map of lesson A19 (wave W5, builder learn-w5-e, 2026-11-06), lesson-local until the coordinator
-   promotes it. Prairie City is fictional; its numbers are illustrative.
+/* siting.js — LX.A19: the siting map of lesson A19, its pure model (LX.A19) and its view (LX.SiteMap). Written for A19
+   (wave W5, builder learn-w5-e, 2026-11-06, as assets/learn/a19.js) and promoted at the W5 integration (2026-11-06), its
+   code unchanged, for A19 and capstone C3; its styles are siting.css. Prairie City is fictional; its numbers are
+   illustrative.
 
    A seeded region around Prairie City as raster layers on a grid of 1 km cells (data/a19-gis-siting.json holds the
    recipe), and what a screening study does with them: exclusion masks, a weighted overlay (suitability), candidate sites
@@ -7,7 +9,7 @@
    Every layer uses only + − × ÷, square roots, floor and a 32-bit seeded hash, so the lesson's NumPy notebook rebuilds
    the same numbers (scripts/build_learn_a19_notebook.py in the ResearchPortfolio folder).
 
-   Pure model (Node: const A19 = require("assets/learn/a19.js"); the browser: window.LX.A19)
+   Pure model (Node: const A19 = require("assets/learn/components/siting.js"); the browser: window.LX.A19, in learn.js)
      A19.build(D, { newer })            the region: layers, homes, distances (newer: add the homes built since 2019)
      A19.coarsen(R, 2)                  the same region on 2 km cells (layers averaged, classes by majority)
      A19.cfg(D, type, over)             a site type's settings: { exclusions, slopeMax, setbackM, weights } (+ overrides)
@@ -40,7 +42,7 @@
 (function () {
   "use strict";
   var mb = (typeof window !== "undefined" && window.LX && window.LX.mulberry32) ||
-    (typeof require === "function" ? require("./components/core.js").mulberry32 : null);
+    (typeof require === "function" ? require("./core.js").mulberry32 : null);
   var SQRT2 = Math.SQRT2, KM_PER_MILE = 1.609344, ACRES_PER_KM2 = 247.105;
 
   // ---------------------------------------------------------------- seeded value noise (arithmetic only)

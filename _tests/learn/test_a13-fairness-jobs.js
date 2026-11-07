@@ -1,4 +1,4 @@
-// test_a13-fairness-jobs.js — Node tests for lesson A13: the accounting layer (assets/learn/a13-who-pays-and-benefits.js,
+// test_a13-fairness-jobs.js — Node tests for lesson A13: the accounting layer (assets/learn/components/whopays.js,
 // LX.A13, also for SB3 and C3), the lesson's words (assets/learn/a13-fairness-jobs.js), its data file and the page
 // (learn/a13-fairness-jobs.qmd):
 //   - the accounting from first principles: each design recovers exactly the cost; transfers between designs sum to zero;
@@ -19,12 +19,12 @@ const ID = "a13-fairness-jobs";
 const SITE = path.resolve(__dirname, "..", "..");
 const L = p => path.join(SITE, "assets/learn", p);
 const M = require(L(ID + ".js"));
-const A13 = require(L("a13-who-pays-and-benefits.js"));
+const A13 = require(L("components/whopays.js"));
 const RAW = fs.readFileSync(L("data/" + ID + ".json"), "utf8");
 const D = JSON.parse(RAW);
 const PC = require(L("data/prairie-city.json"));
 const JS = fs.readFileSync(L(ID + ".js"), "utf8");
-const ACC = fs.readFileSync(L("a13-who-pays-and-benefits.js"), "utf8");
+const ACC = fs.readFileSync(L("components/whopays.js"), "utf8");
 const SIDE = fs.readFileSync(path.join(SITE, "learn/_w1/" + ID + ".yml"), "utf8");
 const QPATH = path.join(SITE, "learn", ID + ".qmd");
 let checks = 0, fails = 0;
@@ -213,7 +213,7 @@ PROSE.split(/<\/?(?:p|li|dd|dt|td|th|summary|br|caption)\b[^>]*>/).map(plain).fi
 // ---------------- the page's controls
 ok(/aria-live/.test(JS) && /LX\.store\.(get|set)\("a13"/.test(JS), "live regions; settings persist in this browser");
 ok((JS.match(/LX\.demo\(/g) || []).length === 1 && /"mid"/.test(JS) && (JS.match(/demo\[\d\] = function/g) || []).length === 9, "a demo hook for each of the nine steps");
-ok(/a13-who-pays-and-benefits\.js" defer><\/script>\n<script src="\.\.\/assets\/learn\/a13-fairness-jobs\.js"/.test(PAGE), "the accounting layer loads before the lesson's script");
+ok(/<script src="\.\.\/assets\/learn\/learn\.js" defer><\/script>\n<script src="\.\.\/assets\/learn\/a13-fairness-jobs\.js"/.test(PAGE) && !/who-pays-and-benefits|whopays\.js"/.test(PAGE), "the accounting layer comes in the bundle (components/whopays.js); the page loads learn.js and its own script only");
 ["area-median-income", "employment-multiplier", "gross-jobs", "net-jobs", "tax-base", "screening-estimate", "income-based-charge"].forEach(id => ok(new RegExp("id: " + id + "\\b").test(SIDE) && new RegExp("\\[\\[" + id + "\\||term=\"" + id + "\"").test(JS + PAGE), "the sidecar defines and the page marks " + id));
 
 console.log((fails ? "FAILED " + fails + " of " : "ok: ") + checks + " checks (" + ID + ")");

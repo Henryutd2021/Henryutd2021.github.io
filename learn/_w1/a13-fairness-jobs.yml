@@ -24,6 +24,5 @@ glossary:
     term: Income-based charge
     def: "A utility charge that varies with household income, such as a fixed charge set in a few income tiers."
 requests:
-  - "A4 (a04-retail-tariffs.qmd), Go deeper · Modeler: 'who pays and who benefits in A13 (upcoming)' is stale once A13 is live; link a13-fairness-jobs.html instead (coordinator's cross-link pass)."
   - "A22 (a22-tradeoff-explorer) could link A13 from its fairness indicator (energy burden)."
-  - "SB3 and C3 can load assets/learn/a13-who-pays-and-benefits.js (LX.A13) for household burden by group, transfers between rate designs, jobs (job-years, gross and net) and tax base; its header documents inputs and outputs."
+  - "SB3 and C3 can use LX.A13 (assets/learn/components/whopays.js, in the bundle since the W5 integration; no separate script tag) for household burden by group, transfers between rate designs, jobs (job-years, gross and net) and tax base; its header documents inputs and outputs."

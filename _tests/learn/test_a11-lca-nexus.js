@@ -155,7 +155,7 @@ NEW.forEach(id => ok(new RegExp("id: " + id + "\\b").test(SIDE) && JS.includes("
   const E = env();
   E.LX.ready = () => {}; E.LX.progress.guess = () => null; E.LX.visible = E.LX.visible || (() => false);
   const core = require(L("components/core.js")); E.LX.lessonRefHTML = core.lessonRefHTML;
-  ["cards", "predict", "toggle", "ledger", "table", "boundary", "costsplit"].forEach(n => load(n, E));
+  ["cards", "predict", "toggle", "ledger", "table", "boundary", "costsplit", "lifebox"].forEach(n => load(n, E));
   try { load("conceptmap", E); } catch (e) { E.LX.ConceptMap = () => ({}); }
   let init = null, demo = null;
   E.LX.mount = (slug, f) => { if (slug === ID) init = f; };

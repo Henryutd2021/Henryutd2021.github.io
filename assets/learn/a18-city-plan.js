@@ -386,7 +386,7 @@
       return G;
     }
     var steps = [
-      { text: "A plan starts with an [[emissions-inventory|inventory]]. Sort eight activities into the GPC's [[scope-1|scopes]]: burned in the city (scope 1), grid electricity used in it (scope 2), or caused outside it ([[scope-3|scope 3]]).",
+      { text: "A plan starts with an [[emissions-inventory|inventory]]. Sort eight activities into the GPC's [[scope-1|scopes]]: burned in the city (scope 1), grid electricity used in it ([[scope-2|scope 2]]), or caused outside it ([[scope-3|scope 3]]).",
         build: function (act, api) {
           onPlan = null; S.part = "inv"; S.order = false; paint();
           LX.CardSort(act, { bins: A.scopeSort.bins.map(function (b, i) { return { id: b.id, label: b.label, sub: b.sub, color: ["var(--lx-warn)", "var(--lx-accent)", "var(--lx-ink-3)"][i] }; }),

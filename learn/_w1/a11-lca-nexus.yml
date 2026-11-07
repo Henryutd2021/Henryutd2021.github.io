@@ -20,6 +20,3 @@ glossary:
   - id: interquartile-range
     term: Interquartile range
     def: "The middle half of a set of values, from the 25th to the 75th percentile."
-requests:
-  - "A11 keeps its life-cycle boundary box (LifeBox: a chain of stages with a draggable boundary, keyboard handles and tappable stages; i-boundary) lesson-local in a11-lca-nexus.js. Promote it when a second page needs it (R3 or A19 could)."
-  - "A11's prerequisite F11 is not live yet: add F11 to A11's after list when it goes live (curriculum row: prereqs F11)."

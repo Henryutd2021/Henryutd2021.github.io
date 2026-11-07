@@ -5,7 +5,7 @@
 // groupings, Ridge County with its W6 note, the job and tax coefficients as learner inputs, the sources),
 // prairie-city.json (Prairie City's five household groups: households, incomes, electricity use and home energy spending;
 // never retyped) and path.json.
-// Accounting: assets/learn/a13-who-pays-and-benefits.js (LX.A13), a separate pure model that SB3 and C3 can load; this file
+// Accounting: assets/learn/components/whopays.js (LX.A13, in the learn.js bundle), a shared pure model that SB3 and C3 use; this file
 // holds only the lesson's words and view. Every output is a screening estimate with its assumptions beside it.
 //
 // Model (closed form; no optimization), all in LX.A13:
@@ -25,7 +25,7 @@
 (function () {
   "use strict";
   var KEY = "a13_fairness_jobs";
-  var A13 = typeof module !== "undefined" && module.exports ? require("./a13-who-pays-and-benefits.js") : (window.LX && window.LX.A13);
+  var A13 = typeof module !== "undefined" && module.exports ? require("./components/whopays.js") : (window.LX && window.LX.A13);
 
   // ---------------------------------------------------------------- pure helpers and words (no DOM; exported for Node)
   function fmtN(v, d) { return Number(v).toLocaleString("en-US", { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 }); }
@@ -184,7 +184,7 @@
   function bold(t) { return LX.rich(t).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>"); }
 
   LX.mount("fairness-jobs", function (live, data, root) {
-    if (!A13) throw new Error("A13 needs assets/learn/a13-who-pays-and-benefits.js loaded first");
+    if (!A13) throw new Error("A13 needs LX.A13 (components/whopays.js, in learn.js)");
     var D = data[KEY], PC = data.prairie_city, P = data.path, SH = shortOf(PC), S = defaults(D);
     var saved = LX.store.get("a13");
     function inRange(v, r) { return typeof v === "number" && v >= r.min - 1e-9 && v <= r.max + 1e-9; }

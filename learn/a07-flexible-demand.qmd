@@ -112,7 +112,7 @@ A 5% flexible share in Prairie Town on 9 June 2025 (CO₂ in metric tonnes, t):
 - **A cut is a difference.** It is what a home would have used minus what it used; the first number is never metered.
 - **A [baseline]{.lx-term term="baseline"}.** Programs estimate it from similar recent days, often adjusted to the morning of the event.
 - **Errors both ways.** A baseline set too high pays for cuts that never happened; one set too low misses real ones.
-- **Another way.** Compare enrolled homes with a similar group that was not called (M14, upcoming).
+- **Another way.** Compare enrolled homes with a similar group that was not called ([M14](m14-did-it-work.html)).
 
 ```{=html}
 </div>

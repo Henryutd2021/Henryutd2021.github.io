@@ -1,0 +1,23 @@
+/* lifebox.css — LX.LifeBox (lifebox.js): the chain of stage tiles and the dashed boundary with its two handles, moved
+   from A11's page at the W5 integration (2026-11-06), unchanged except for the number of stages (--n, set by the box).
+   The tiles' content (labels, values) is styled by the page. Phones (560 px and narrower): the chain runs down the page
+   and the handles sit on the boundary's top and bottom edges. */
+.lx-life-chain { position: relative; display: grid; grid-template-columns: repeat(var(--n, 4), minmax(0, 1fr)); gap: 20px; padding: 10px 16px; margin: .2rem 0 .6rem; }
+.lx-life-tile { grid-row: 1; grid-column: var(--i); display: grid; align-content: start; gap: 3px; min-width: 0; padding: 8px 12px 10px; border: 1px solid var(--lx-line); border-top: 4px solid var(--c); border-radius: 10px; background: var(--lx-accent-soft); color: var(--lx-ink); text-align: left; font: inherit; cursor: pointer; overflow-wrap: break-word; }
+.lx-life-tile.out { background: var(--lx-surface-2); border-style: dashed; border-top-style: solid; }
+.lx-life-tile:focus-visible { outline: 3px solid var(--lx-ink); outline-offset: 2px; }
+.lx-life-bnd { grid-row: 1; grid-column: var(--span); position: relative; z-index: 2; margin: -6px -6px; border: 2px dashed var(--lx-accent); border-radius: 14px; pointer-events: none; }
+.lx-life-h { position: absolute; top: 50%; width: 24px; height: 44px; margin-top: -22px; border-radius: 9px; background: var(--lx-accent); box-shadow: var(--lx-shadow); pointer-events: auto; cursor: ew-resize; touch-action: none; }
+.lx-life-h::after { content: ""; position: absolute; left: 8px; top: 13px; width: 4px; height: 18px; border-left: 2px solid var(--lx-surface); border-right: 2px solid var(--lx-surface); }
+.lx-life-h-l { left: -13px; } .lx-life-h-r { right: -13px; }
+.lx-life-h:focus-visible { outline: 3px solid var(--lx-ink); outline-offset: 2px; }
+.lx-life-pre { margin: 0 0 .5rem; }
+@media (max-width: 560px) {
+  .lx-life-chain { grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 14px 4px; }
+  .lx-life-tile { grid-row: var(--i); grid-column: 1; padding: 8px 12px; border-top-width: 1px; border-left: 4px solid var(--c); }
+  .lx-life-tile.out { border-left-style: solid; }
+  .lx-life-bnd { grid-column: 1; grid-row: var(--span); margin: -7px -3px; }
+  .lx-life-h { left: 50%; width: 44px; height: 24px; margin: 0 0 0 -22px; cursor: ns-resize; }
+  .lx-life-h::after { left: 13px; top: 8px; width: 18px; height: 4px; border: 0; border-top: 2px solid var(--lx-surface); border-bottom: 2px solid var(--lx-surface); }
+  .lx-life-h-l { top: -13px; } .lx-life-h-r { top: auto; bottom: -13px; right: auto; }
+}

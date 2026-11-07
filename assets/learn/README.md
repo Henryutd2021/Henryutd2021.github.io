@@ -1090,6 +1090,36 @@ Promoted only where a second page already loaded another lesson's script for the
 - A10's Plains fleet is data (`a10-emissions-questions.json`, block `plains`), read by A12 and M6 through `LX.plainsPlan`; nothing to promote.
 - `_tests/learn/excerpt_check.js` (M9, M10, CF8) and `_tests/learn/plains_face.js` (A12, M6) are shared test helpers, not components.
 
+### Promoted at the W5 integration (2026-11-06)
+
+Promoted where a second page uses the code (A19's map in capstone C3; A13's accounting in SB3, M12, C3 and engine E3) and, for the life-cycle box, as the course's shared drag-the-boundary interaction (i-boundary). The siting map and the accounting layer were already separate files; they moved into `components/` with their code unchanged (only the header and the `require` paths are new), and A19's map styles moved from its page into `siting.css`. The life-cycle box is A11's chain and boundary made general (any number of stages; the page paints each tile); A11 draws exactly what it drew before. The three sit in the bundle after the W4 promotions and before engine E3 (`W5_PROMOTED` in `scripts/build_learn.py`), which adds about 66 kB to `learn.js` and 9 kB to `learn.css`. No page loads a separate script for them. Tests: each lesson's own test (every number unchanged) and `_tests/learn/test_components_w5_int.js`.
+
+**Life-cycle box** (`lifebox.js`, `lifebox.css`; i-boundary; from A11): `LX.LifeBox`, a chain of stages with a dashed boundary the reader drags. Its two edges are sliders (arrow keys, Home and End, or a drag); a tap on a stage outside brings it in with every stage between, and a tap on an end stage inside moves it out; optional presets sit under the chain. The chain runs across, and down the page at 560 px and narrower.
+
+```js
+var box = LX.LifeBox(host, { stages: [{ label: "Build" }, { label: "Supply" }, { label: "On site" }, { label: "End of life" }],
+  state: S,                                    // the page's object; the box sets S.L and S.R (first and last stage inside, from 0)
+  tile: function (el, i, inside) { /* fill stage i's button and its aria-label */ },
+  color: function (i) { return "var(--lx-accent)"; },        // optional: the tile's coloured rule
+  presets: [["site", "On site only", 2, 2], ["grave", "Cradle to grave", 0, 3]],   // optional: [key, label, L, R]
+  cls: "a11",                                  // optional: the page's classes too (a11-chain, a11-tile, a11-bnd, a11-h, a11-pre)
+  onChange: function (S) {} });                // after each move by the reader
+// -> { el, paint(), tiles, handles: [left, right], presets }; LX.LifeBox.tap / .key / .drag are the rules (Node: require it)
+```
+
+- The box draws the chain, the boundary and the presets; the page draws the rest (A11: the object and footprint controls, the readouts inside the boundary and the text version, `footprintBox` in `a11-lca-nexus.js`). The tiles' content is styled by the page (A11's `a11-st`, `a11-sn`, `a11-v`).
+- R7 and M11's boundary steps, and CF5's, can use it; each keeps its own text version.
+
+**Siting map** (`siting.js`, `siting.css`; from A19's `a19.js`): `LX.A19`, the pure model of a seeded region around Prairie City on 1 km cells (layers, exclusions by kind, a weighted overlay, candidate blocks, weight sensitivity, a cost surface, least-cost paths to the four transmission substations S1 to S4, site costs in 2025 dollars; `A19.withCity(D, prairieCity)` first), and `LX.SiteMap(host, { R, D, label })`, the SVG map with its legend, keyboard cursor and the line under it. The model's functions are listed in the file's header; the NumPy notebook (`scripts/build_learn_a19_notebook.py`) rebuilds the same numbers. Classes keep A19's `a19-` prefix. A19 and C3 (one solar farm) use it; G-GIS: solar farms, wind farms, transmission corridors and data centers only.
+
+**Who pays and who benefits** (`whopays.js`; from A13's `a13-who-pays-and-benefits.js`): `LX.A13`, the screening accounting layer, pure. Households from `prairie-city.json` (`groupsFrom`), a cost split by kWh, per household or by income (`allocate`), transfers between designs (`transfers`, summing to zero), regrouping and burden lines (`regroup`, `above`), jobs as job-years, gross and net (`jobs`) and a county's tax base (`taxBase`), with `SCREENING` and `ASSUME`, the words each output carries. Every output is a screening estimate; the coefficients are the caller's inputs. A13, SB3, M12, C3 and engine E3 use it.
+
+**Kept lesson-local, and why** (promote when a second page needs the same thing):
+
+- A18's marginal abatement cost curve: only A18 draws one. A15's cost-of-saved-energy curve (batch 2) may be the same chart: compare at its merge.
+- M14's simulated panels, estimators (difference-in-differences, event study) and their charts: only M14 uses them.
+- F11's spreading toy and burden slider, R7's audit, CK-A's school case: each is drawn by one page (CK-A's test recomputes its workbook's formulas with the shared engine of `components/sheet.js`).
+
 **Scope and QA** (ResearchPortfolio folder).
 
 - `python3 scripts/learn_scope_scan.py --site <worktree>` runs the curriculum v2 §20 scan on the rendered `_site/learn/` pages, the data files and the scripts. `build_learn.py --check` runs it whenever a rendered site exists, and fails on any violation.
