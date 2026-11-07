@@ -2,7 +2,8 @@
 // `scales`, as built into assets/learn/data/path.json and every lesson page's data block; 2026-11-07):
 //   - five scales, S0 to S4 in order, with the names, short names and icons lesson F1 teaches; every icon exists
 //   - every lesson names at least one scale that exists, each once; a tier's checkpoint names none; the toolbox has none
-//   - each live lesson page's data block carries the same scales as path.json (the build is up to date)
+//   - each live lesson page's data block carries the same scales as path.json (the build is up to date; the build itself
+//     compares every lesson's scales with its curriculum row)
 //   - the course map draws the same layout with or without the scales (it has no scale view)
 // Usage (from the site folder):  node _tests/learn/test_path_scales.js
 "use strict";
@@ -44,16 +45,16 @@ ok(by("F1").scales.join() === "S0,S1,S2,S3,S4" && by("SB4").scales.join() === "S
 
 // ---------------- the lesson pages carry the same scales
 {
-  let n = 0; const wrong = [];
+  let n = 0; const wrong = [], missing = [];
   lessons.filter(l => l.ready && l.id).forEach(l => {
     const f = path.join(SITE, "learn", l.href.replace(/\.html$/, ".qmd"));
-    if (!fs.existsSync(f)) return;
-    const m = /<script type="application\/json" class="lx-lesson-data">([\s\S]*?)<\/script>/.exec(fs.readFileSync(f, "utf8"));
-    if (!m) return;
+    const m = fs.existsSync(f) && /<script type="application\/json" class="lx-lesson-data">([\s\S]*?)<\/script>/.exec(fs.readFileSync(f, "utf8"));
+    if (!m) { missing.push(l.code || l.id); return; }
     n++;
     const rec = JSON.parse(m[1].replace(/<\\\//g, "</"));
     if (JSON.stringify(rec.scales) !== JSON.stringify(l.scales)) wrong.push(l.code || l.id);
   });
+  ok(missing.length === 0, "every live lesson has a page with a data block: " + missing.join(", "));
   ok(n > 90 && wrong.length === 0, "each of " + n + " lesson pages carries path.json's scales: " + wrong.join(", "));
 }
 

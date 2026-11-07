@@ -201,7 +201,11 @@ ok(D.intro.some(x => /^Task 1 first: the seven marked tasks open once your revie
   ok(/opens once task 1, your review of the co-op proposal/.test(D.wait.question) && /^<b>Task 1 first\.<\/b>/.test(D.wait.why) && /waitNote: D\.wait/.test(JS), "the waiting tasks' notice is the data's, passed to the runner");
   ok(!/LX\.on\("layout"/.test(JS) && !/function (guard|shut|keep)\b/.test(JS), "no guard of the page's own on the runner's markup"); }
 { const st = M.staticTasks(D); ok((st.match(/<details class="ckr-later">/g) || []).length === 7 && /Write task 1, your review, before you open the marked tasks/.test(st), "without JavaScript, the seven marked tasks are folded until after task 1");
-  ok(/<p class="lx-hint">Within 2% of the value/.test(st), "the tolerance note is its own line"); }
+  ok(/<p class="lx-hint">Within 2% of the value/.test(st), "the tolerance note is its own line");
+  // a marked task's title and skill could name a concern: without JavaScript they are folded with its question
+  const items = st.split("<li><p>").slice(1);
+  ok(items.length === 12 && T.every((t, i) => !t.opensAfter || (items[i].indexOf(t.title) > items[i].indexOf('<details class="ckr-later">') && items[i].indexOf(t.skill) > items[i].indexOf('<details class="ckr-later">') && /^<b>Opens after task 1<\/b>/.test(items[i]))),
+    "without JavaScript, each marked task shows 'Opens after task 1'; its title and skill are inside the fold"); }
 ok(/data-term="difference-in-differences"/.test(M.staticStudy(D)) && /data-term="time-of-use-tariff"/.test(M.staticStudy(D)) && ["clean-clone", "lock-file", "checksum", "confidence-interval"].every(k => PAGE.includes('data-term="' + k + '"')), "terms at first use: the study card's, and the tasks' words (Codex review #10)");
 ok(/<b>Reproducibility:<\/b>/.test(PAGE) && /<b>Replicability:<\/b>/.test(PAGE), "the National Academies' two definitions in rows of their own");
 ok(OWN.includes('href="cr-your-own-study.html"'), "the page links the research capstone it defends");
@@ -310,6 +314,13 @@ async function firstSequence() {
     "runner: task 2 before task 1: a notice instead of its question, no answers, no solution");
   const shut = D.tasks.map((t, i) => { P.goTo(i); return /opens once task 1/.test(q()); });
   ok(shut.every((x, i) => x === M.isAuto(D.tasks[i])), "runner: the seven marked tasks are shut, the five written ones open: " + shut.map(x => x ? "shut" : "open").join(" "));
+  P.goTo(1); ok(/^Task 2 of 12 · opens after task 1$/.test(P.live.querySelector(".lx-ck-tag").textContent), "runner: a shut task's tag names no skill or lessons");
+  // the results and the copied summary before task 1: the marked tasks' titles stay unsaid
+  P.goTo(11); P.btn(/See my results/).click();
+  { const rows = P.live.querySelectorAll(".lx-ck-res tbody tr").map(r => r.children[0].textContent), sum = P.live.querySelector("textarea.lx-ck-out").value;
+    ok(D.tasks.every((t, i) => rows[i] === (i + 1) + ". " + (t.opensAfter ? "Opens after task 1" : t.title)) && D.tasks.filter(t => t.opensAfter).every(t => !sum.includes(t.title)),
+      "runner: before task 1, the results and the copied summary list the marked tasks as 'Opens after task 1'"); }
+  P.btn(/^Back to the tasks$/).click();
   P.goTo(4); P.btn(/^Go to task 1$/).click();
   ok(/^Task 1 of 12/.test(P.live.querySelector(".lx-ck-tag").textContent), "runner: 'Go to task 1' goes there");
   ok(!P.E.LX.store.get(M.KEY, {}).tasks.rank || P.E.LX.store.get(M.KEY, {}).tasks.rank.first == null, "runner: a shut task records no answer");

@@ -24,13 +24,17 @@
      per task (any kind; a task without them behaves as before)
              opensAfter    [task ids]: the task opens only once each named task is submitted (a first answer recorded, or
                            a written task submitted). Until then its card shows, in place of its question, answers, early
-                           button and worked solution, a notice and a "Go to task N" button; its clock does not run. For
-                           a task whose question or feedback would shape the answer to another (CK-R: task 1, the
-                           reader's own review, comes before the seven marked tasks that name its concerns)
+                           button and worked solution, a notice and a "Go to task N" button; its clock does not run; its
+                           tag, the results table and the copied summary name it "Opens after task 1" in place of its
+                           title, skill and lessons. For a task whose question, title or feedback would shape the answer
+                           to another (CK-R: task 1, the reader's own review, comes before the seven marked tasks that
+                           name its concerns)
              freeze        true: once submitted, the task's answer stays as given (read-only text and number fields, a
                            fixed unit, choices and order buttons disabled); a line in place of the submit button says so
-                           (freezeNote, else a default). A written task's points and the estimate's self-ratings can still
-                           be ticked. Feedback on a wrong first answer then points to the worked solution, not to a retry
+                           (freezeNote, else a default), describes the kept controls and takes focus after the submission.
+                           A written task's points and the estimate's self-ratings can still be ticked. Feedback on a wrong
+                           first answer then points to the worked solution, not to a retry; an empty or non-positive
+                           number is not kept
    Options:
      key         LX.store key of the attempt; an attempt stored under another data.version starts afresh. Keep it fixed
                  once testers use a checkpoint (CK-F: "ckf-v1"), so their summaries stay comparable.
@@ -92,7 +96,8 @@
    checkEstimate, level(D, st, {openFirst, late, solOpen}), firstRight(record, openFirst), lateAnswer(record, solOpen),
    allAnswered(D, st), lastAnswerAt(D, st), lateRule({gateAll, n}), tolText(task), describe, summary, fmtMs, firstWord;
    for the per-task options: submitted(record), waitsFor(D, st, task), outOfOrder(D, st), taskList(D, ids),
-   waitText(D, task, ids), openProblems(D) (unknown or circular opensAfter names; a page's test should find none).
+   waitText(D, task, ids), shownTitle(D, st, task), openProblems(D) (unknown or circular opensAfter names; a page's test
+   should find none).
    level and summary find the explanation and the estimate as the first "open-short" and the first "estimate" task. */
 (function () {
   "use strict";
@@ -188,6 +193,9 @@
     var n = ids.map(function (id) { return D.tasks.indexOf(task(D, id)) + 1; });
     return n.length > 1 ? "tasks " + n.slice(0, -1).join(", ") + " and " + n[n.length - 1] : "task " + n[0];
   }
+  // a task's title where the attempt lists its tasks (the results table, the copied summary): a waiting task's title
+  // could name what the task it waits for should find, so it reads "Opens after task 1" until then
+  function shownTitle(D, st, t) { var w = waitsFor(D, st, t); return w.length ? "Opens after " + taskList(D, w) : t.title; }
   // what a waiting task shows: the line in place of its question, and the notice under it (HTML)
   function waitText(D, t, ids) {
     var w = taskList(D, ids), many = ids.length > 1;
@@ -286,7 +294,8 @@
     lines.push("# | Task | Draws on | First answer | Tries | Time to first answer | Time on task | Solution opened before answering");
     D.tasks.forEach(function (t, i) {
       var r = st.tasks[t.id] || {};
-      lines.push((i + 1) + " | " + t.title + " | " + t.lesson + " | " + firstWord(D, t, r) + " | " + (r.tries || 0) + " | " + fmtMs(r.msFirst) + " | " + fmtMs(r.ms) + " | " + (r.solFirst ? "yes" : isLate(r) ? "yes (the worked solution section)" : "no"));
+      var hide = waitsFor(D, st, t).length > 0;   // a waiting task's title and lessons stay unsaid, as on its card
+      lines.push((i + 1) + " | " + shownTitle(D, st, t) + " | " + (hide ? "–" : t.lesson) + " | " + firstWord(D, t, r) + " | " + (r.tries || 0) + " | " + fmtMs(r.msFirst) + " | " + fmtMs(r.ms) + " | " + (r.solFirst ? "yes" : isLate(r) ? "yes (the worked solution section)" : "no"));
     });
     var esT = ofKind(D, "estimate"), es = esT && st.tasks[esT.id];
     if (es && es.answer) {
@@ -306,7 +315,7 @@
   var pure = { task: task, checkChoice: checkChoice, checkOrder: checkOrder, checkNumeric: checkNumeric, checkMWh: checkMWh, checkValue: checkValue,
     checkEstimate: checkEstimate, level: level, firstRight: firstRight, lateAnswer: lateAnswer, allAnswered: allAnswered, lastAnswerAt: lastAnswerAt, lateRule: lateRule, lateText: lateText,
     tolText: tolText, describe: describe, summary: summary, fmtMs: fmtMs, firstWord: firstWord,
-    submitted: submitted, waitsFor: waitsFor, outOfOrder: outOfOrder, taskList: taskList, waitText: waitText, openProblems: openProblems };
+    submitted: submitted, waitsFor: waitsFor, outOfOrder: outOfOrder, taskList: taskList, waitText: waitText, openProblems: openProblems, shownTitle: shownTitle };
   if (typeof module !== "undefined" && module.exports) module.exports = pure;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -420,7 +429,7 @@
       var top = E("div", { class: "lx-ck-top" }, c);
       var dots = E("div", { class: "lx-dots", "aria-hidden": "true" }, top);
       for (var d = 0; d < N; d++) E("i", { class: d < i ? "done" : d === i ? "cur" : "" }, dots);
-      E("span", { class: "lx-ck-tag", text: "Task " + (i + 1) + " of " + N + " · " + t.skill + " · draws on " + t.lesson }, top);
+      E("span", { class: "lx-ck-tag", text: "Task " + (i + 1) + " of " + N + (wt ? " · opens after " + taskList(D, wait) : " · " + t.skill + " · draws on " + t.lesson) }, top);
       var qp = E("p", { class: "lx-ck-q", id: qid, tabindex: "-1", text: wt ? wt.question : t.prompt }, c);
       if (wt) shut(c, wait, wt); else open(t, c, r);
       var foot = E("div", { class: "lx-ck-foot" }, c);
@@ -454,15 +463,22 @@
       E("div", { class: "lx-saw no lx-ck-wait", html: LX.icon("question") + "<div>" + wt.why + "</div>" }, c);
       E("button", { type: "button", class: "lx-btn small", text: "Go to task " + (to + 1), onclick: function () { show(to); } }, E("div", { class: "lx-ck-row" }, c));
     }
-    // a frozen task (freeze): submitted, so its answer stays as given. kept(t, btn) puts the line that says so in place
-    // of the submit button (or, without one, at the end of `host`)
+    // a frozen task (freeze): submitted, so its answer stays as given
     function frozen(t) { return !!t.freeze && submitted(st.tasks[t.id]); }
-    function kept(t, btn, host) {
-      var where = btn ? btn.parentNode : host;
-      if (!where || where.querySelector(".lx-ck-kept")) { if (btn) btn.remove(); return; }
-      E("p", { class: "lx-hint lx-ck-kept", text: t.freezeNote || (t.kind === "open-short" ? "Submitted: your text stays as you wrote it. Tick the points it makes below."
+    // kept(t, btn, host, els, move): the line that says so, in place of the submit button (or, without one, at the end of
+    // `host`); the kept answer's controls (els) are described by it; after a submission (move) focus goes to it, since the
+    // button that had focus is gone or disabled
+    function kept(t, btn, host, els, move) {
+      var where = btn ? btn.parentNode : host, p = where ? where.querySelector(".lx-ck-kept") : null;
+      if (!p && where) p = E("p", { class: "lx-hint lx-ck-kept", id: LX.uid("ck-kept"), tabindex: "-1", text: t.freezeNote || (t.kind === "open-short" ? "Submitted: your text stays as you wrote it. Tick the points it makes below."
         : t.kind === "estimate" ? "Submitted: your estimate stays as you gave it. Rate it below." : "Submitted: your answer stays as you gave it.") }, where);
       if (btn) btn.remove();
+      if (!p) return;
+      (els || []).forEach(function (el) {
+        var d = el && el.getAttribute("aria-describedby");
+        if (el && (!d || d.split(" ").indexOf(p.id) < 0)) el.setAttribute("aria-describedby", (d ? d + " " : "") + p.id);
+      });
+      if (move) p.focus({ preventScroll: true });
     }
     function readOnly(els) { els.forEach(function (el) { if (el) { el.setAttribute("readonly", ""); el.readOnly = true; } }); }
     // the line after a wrong first answer: a retry, or for a frozen task the worked solution
@@ -483,10 +499,10 @@
           Object.keys(btns).forEach(function (k) { btns[k].setAttribute("aria-pressed", k === op[0] ? "true" : "false"); btns[k].classList.toggle("right", res.right && k === op[0]); btns[k].classList.toggle("wrong", !res.right && k === op[0]); });
           feedback(fb, res.right, LX.rich(res.why) + (res.right ? "" : retry(t)));
           unlock();
-          if (frozen(t)) fix();
+          if (frozen(t)) fix(true);
         } }, box);
       });
-      function fix() { Object.keys(btns).forEach(function (k) { btns[k].disabled = true; }); kept(t, null, body); }
+      function fix(move) { var bs = Object.keys(btns).map(function (k) { return btns[k]; }); bs.forEach(function (b) { b.disabled = true; }); kept(t, null, body, bs, move); }
       if (frozen(t)) fix();
     }
     function order(t, body, fb, unlock) {
@@ -511,10 +527,10 @@
         var res = cOrder(t, cur); marks = res.places; answered(t.id, res.right, cur.slice()); paint();
         feedback(fb, res.right, res.right ? "That is the sequence." : res.n + " of " + cur.length + " in the right place (green)." + retry(t));
         unlock();
-        if (frozen(t)) kept(t, go);
+        if (frozen(t)) kept(t, go, null, [ol], true);
       });
       paint();
-      if (frozen(t)) kept(t, go);
+      if (frozen(t)) kept(t, go, null, [ol]);
     }
     function unitSelect(host, t, chosen) {
       var f = E("div", { class: "lx-ck-field" }, host), id = LX.uid("ck");
@@ -534,13 +550,14 @@
       var row = E("div", { class: "lx-ck-row" }, body);
       var chk = E("button", { type: "button", class: "lx-btn small", text: "Check", onclick: function () {
         if (!sel.value) { feedback(fb, false, "Choose a unit first."); return; }
+        if (t.freeze && !(parseFloat(inp.value) > 0)) { feedback(fb, false, "Enter a positive number."); return; }   // not kept as an answer
         var res = cNum(t, parseFloat(inp.value), sel.value);
         answered(t.id, res.right, { value: parseFloat(inp.value), unit: sel.value });
         feedback(fb, res.right, LX.esc(res.msg) + (res.right ? "" : retry(t)));
         unlock();
-        if (frozen(t)) fix();
+        if (frozen(t)) fix(true);
       } }, row);
-      function fix() { readOnly([inp]); sel.disabled = true; kept(t, chk); }
+      function fix(move) { readOnly([inp]); sel.disabled = true; kept(t, chk, null, [inp, sel], move); }
       if (frozen(t)) fix();
     }
     function openShort(t, body, fb, unlock) {
@@ -560,9 +577,9 @@
         var rr = answered(t.id, false, ta.value.trim()); rr.points = rr.points || t.points.map(function () { return false; }); rr.first = rr.points.every(Boolean); save();
         self.hidden = false; unlock(); fb.innerHTML = "";
         E("div", { class: "lx-saw", html: LX.icon("check") + "<div><b>Submitted.</b> Open the worked solution below and tick the points you made.</div>" }, fb);
-        if (frozen(t)) fix();
+        if (frozen(t)) fix(true);
       } }, row);
-      function fix() { readOnly([ta]); kept(t, sub); }
+      function fix(move) { readOnly([ta]); kept(t, sub, null, [ta], move); }
       if (frozen(t)) fix();
     }
     function estimate(t, body, fb, unlock) {
@@ -593,10 +610,10 @@
         E("div", { class: "lx-saw" + (chk.unitsOk ? "" : " no"), html: LX.icon(chk.unitsOk ? "check" : "question") + "<div><b>Units.</b> " + LX.esc(chk.unitMsg) + "</div>" }, fb);
         if (chk.rangeMsg) E("div", { class: "lx-saw" + (chk.overlaps ? "" : " no"), html: LX.icon(chk.overlaps ? "check" : "question") + "<div><b>Range.</b> " + LX.esc(chk.rangeMsg) + "</div>" }, fb);
         if (!o.gateAll) openSolution(er.at); rate(out);
-        if (frozen(t)) fix();
+        if (frozen(t)) fix(true);
       } }, row);
       if (r.answer) rate(out);
-      function fix() { readOnly(Object.keys(F).map(function (k) { return F[k]; })); sel.disabled = true; kept(t, sub); }
+      function fix(move) { var els = Object.keys(F).map(function (k) { return F[k]; }); readOnly(els); sel.disabled = true; kept(t, sub, null, els.concat([sel]), move); }
       if (frozen(t)) fix();
       function rate(host) {
         host.innerHTML = "";
@@ -642,7 +659,7 @@
       var bd = E("tbody", null, tb);
       D.tasks.forEach(function (t, i) {
         var r = st.tasks[t.id] || {}, tr = E("tr", null, bd);
-        var td = E("td", { "data-l": "Task" }, tr); E("button", { type: "button", class: "lx-link", text: (i + 1) + ". " + t.title, onclick: function () { show(i); } }, td);
+        var td = E("td", { "data-l": "Task" }, tr); E("button", { type: "button", class: "lx-link", text: (i + 1) + ". " + shownTitle(D, st, t), onclick: function () { show(i); } }, td);
         E("td", { "data-l": "First answer", text: firstWord(D, t, r) }, tr);
         E("td", { class: "n", "data-l": "Tries", text: String(r.tries || 0) }, tr);
         E("td", { class: "n", "data-l": "Time to first answer", text: fmtMs(r.msFirst) }, tr);

@@ -90,7 +90,7 @@
     lines.push("# | Part | Task | First answer | Tries | Time to first answer | Solution opened before answering");
     D.tasks.forEach(function (t, i) {
       var r = st.tasks[t.id] || {}, w = r.first == null ? (r.answer ? "submitted" : "not answered") : isOpen(t) ? points(st, t) + " of " + t.points.length + " points (self)" : r.first ? "right" : "not right";
-      lines.push((i + 1) + " | " + t.part + " | " + t.title + " | " + w + " | " + (r.tries || 0) + " | " + CPK.fmtMs(r.msFirst) + " | " + (after(D, st, t) ? "yes (the worked solution)" : r.solFirst ? "yes" : "no"));
+      lines.push((i + 1) + " | " + t.part + " | " + CPK.shownTitle(D, st, t) + " | " + w + " | " + (r.tries || 0) + " | " + CPK.fmtMs(r.msFirst) + " | " + (after(D, st, t) ? "yes (the worked solution)" : r.solFirst ? "yes" : "no"));
     });
     // the reader's own texts in full, line by line (indented, so a mentor sees where each ends); nothing is cut
     D.tasks.forEach(function (t) {
@@ -139,8 +139,13 @@
       if (t.kind === "order") x += "<ul>" + t.start.map(function (k) { return "<li>" + plain(t.items.filter(function (i) { return i[0] === k; })[0][1]) + "</li>"; }).join("") + "</ul><p>Put these in order.</p>";
       if (t.kind === "numeric") x += "<p>Answer with a number and a unit.</p>";
       if (isOpen(t)) x += "<p>Self-rated against " + t.points.length + " points, shown after you submit.</p>";
-      if (t.opensAfter && t.opensAfter.length) x = '<details class="ckr-later"><summary>Open after task 1, your review</summary>' + x + "</details>";
-      h.push("<li><p><b>" + esc(t.title) + '</b> <span class="lx-hint">Part ' + esc(t.part) + " · " + esc(t.skill) + "</span></p>" + x + "</li>");
+      var head = "<p><b>" + esc(t.title) + '</b> <span class="lx-hint">Part ' + esc(t.part) + " · " + esc(t.skill) + "</span></p>";
+      // a task that waits for task 1: its title and skill, which could name a concern, are folded with its question
+      if (t.opensAfter && t.opensAfter.length) {
+        x = '<details class="ckr-later"><summary>Open after task 1, your review</summary><p><b>' + esc(t.title) + '</b> <span class="lx-hint">' + esc(t.skill) + "</span></p>" + x + "</details>";
+        head = '<p><b>Opens after task 1</b> <span class="lx-hint">Part ' + esc(t.part) + "</span></p>";
+      }
+      h.push("<li>" + head + x + "</li>");
     });
     h.push("</ol>");
     return h.join("\n");
