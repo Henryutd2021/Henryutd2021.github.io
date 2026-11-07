@@ -1091,6 +1091,12 @@
   "lesson": "N1",
   "href": "n01-news-lens.html"
  },
+ "exajoule": {
+  "term": "Exajoule (EJ)",
+  "short": "A unit of energy equal to a thousand petajoules (10^18 joules, about 278 TWh), used for the yearly energy of a whole country.",
+  "lesson": "F10",
+  "href": "f10-nations-differ.html"
+ },
  "exclusion-layer": {
   "term": "Exclusion layer",
   "short": "A map layer that removes land from a siting screen outright, whatever else the land offers, because a rule or a hard limit forbids building there.",
@@ -1528,6 +1534,12 @@
   "short": "A rule that each hour's electricity use is covered by clean generation in that same hour, rather than over a whole year.",
   "lesson": "A16",
   "href": "a16-hydrogen-ptx.html"
+ },
+ "import-dependence": {
+  "term": "Import dependence",
+  "short": "A country's net energy imports as a share of its primary energy supply; it is negative for a net exporter.",
+  "lesson": "F10",
+  "href": "f10-nations-differ.html"
  },
  "income-based-charge": {
   "term": "Income-based charge",
@@ -2183,6 +2195,12 @@
   "lesson": "K3",
   "href": "k03-discounting.html"
  },
+ "non-energy-use": {
+  "term": "Non-energy use",
+  "short": "Fuels used as raw materials rather than burned for energy, such as natural gas for fertilizer or oil for plastics and asphalt.",
+  "lesson": "F10",
+  "href": "f10-nations-differ.html"
+ },
  "normal-distribution": {
   "term": "Normal distribution",
   "short": "A symmetric, bell-shaped spread of values set by its mean and standard deviation, also called Gaussian; about 68% of its values lie within one standard deviation of the mean.",
@@ -2356,6 +2374,12 @@
   "short": "Solar panels that turn sunlight directly into electricity.",
   "lesson": "CF2",
   "href": "cf2-cost-per-kg-vs-system-cost.html"
+ },
+ "physical-energy-content": {
+  "term": "Physical energy content method",
+  "short": "A rule for counting primary energy in which nuclear power counts as the heat its reactors make and hydro, wind and solar as the electricity they make; the IEA and Eurostat use it.",
+  "lesson": "F10",
+  "href": "f10-nations-differ.html"
  },
  "pinball-loss": {
   "term": "Pinball loss",
@@ -2771,6 +2795,12 @@
   "lesson": "F6",
   "href": "f06-grid-and-outages.html"
  },
+ "sankey-diagram": {
+  "term": "Sankey diagram",
+  "short": "A flow diagram in which each band's width is the amount of energy it carries, so what flows in and out of every box can be read and compared at a glance.",
+  "lesson": "F10",
+  "href": "f10-nations-differ.html"
+ },
  "scada": {
   "term": "SCADA records",
   "short": "The operating records a wind farm's control system logs for each turbine, such as ten-minute averages of wind speed and power (supervisory control and data acquisition).",
@@ -3064,6 +3094,12 @@
   "short": "A fenced yard of transformers, breakers and switches where the grid changes voltage and where feeders start.",
   "lesson": "F6",
   "href": "f06-grid-and-outages.html"
+ },
+ "substitution-method": {
+  "term": "Substitution method",
+  "short": "A rule for counting primary energy in which each MWh from nuclear, hydro, wind and solar counts as the fuel a thermal power plant would burn to make it.",
+  "lesson": "F10",
+  "href": "f10-nations-differ.html"
  },
  "suitability-score": {
   "term": "Suitability score",

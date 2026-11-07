@@ -1176,9 +1176,13 @@
    "tier": "foundations",
    "code": "F10",
    "title": "Why does every country's energy system look different?",
-   "ready": false,
-   "href": "index.html#foundations",
-   "scales": []
+   "ready": true,
+   "href": "f10-nations-differ.html",
+   "scales": [],
+   "id": "f10-nations-differ",
+   "minutes": 20,
+   "form": "cards",
+   "short": "Nations compared"
   },
   {
    "tier": "foundations",

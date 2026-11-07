@@ -197,7 +197,7 @@ $$
 | Gas furnace in the basement | 16,900 kWh |
 | Heat pump, its electricity all from that plant | about 12,600 kWh |
 
-That is about 26% less gas, before any wind or solar power enters. Countries count the primary energy of wind, solar and hydro electricity in different ways: F10 (upcoming).
+That is about 26% less gas, before any wind or solar power enters. Countries count the primary energy of wind, solar and hydro electricity in different ways: [F10](f10-nations-differ.html).
 
 ```{=html}
 </div>
