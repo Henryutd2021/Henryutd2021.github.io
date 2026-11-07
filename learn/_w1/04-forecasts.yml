@@ -24,4 +24,4 @@ glossary:
     term: Prediction interval
     def: "A range that should contain the actual value with a stated probability, drawn as a band around a forecast."
 requests:
-  - "Approved source excerpt:uq-mfgpr: Henry approved the E1 wording on 2026-11-03 (DECISIONS.md); it is in the Real-world box as a blockquote.lx-excerpt, word for word, with the DOI. Lesson 5 carries no excerpt (E2)."
+  - "Approved source excerpt:uq-mfgpr: Henry approved the E1 wording on 2026-11-03; it is in the Real-world box as a blockquote.lx-excerpt, word for word, with the DOI. Lesson 5 carries no excerpt (E2)."

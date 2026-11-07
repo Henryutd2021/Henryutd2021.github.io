@@ -248,7 +248,7 @@ body-classes: "page-inner page-publications"
 <div class="pub-authors"><span class="me">H. Li</span></div>
 <div class="pub-venue"><em>Ph.D. dissertation, The University of Texas at Dallas</em>, 2025.</div>
 <div class="pub-links">
-
+<a class="btn-xs" href="files/papers/li2025dissertation.pdf" title="Ph.D. dissertation, The University of Texas at Dallas (final version, September 2025)">PDF</a>
 <button type="button" class="btn-xs bib-toggle" aria-expanded="false" aria-controls="bib-li2025dissertation">Bib</button>
 </div>
 <div class="pub-bib" id="bib-li2025dissertation" hidden>

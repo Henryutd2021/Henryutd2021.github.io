@@ -11,7 +11,7 @@ body-classes: "page-learn page-lesson lx-form-case"
 
 <!-- Case file CF5 (path.yml form: case), wave W5, builder learn-w5-f, 2026-11-06; review fixes on branch learn-w5-cf5,
      2026-11-06 (reports/reviews/learn_cf5-drawing-the-boundary_codex.md). Live since 2026-11-07: Henry approved E14 that
-     day (reports/learn/excerpts_for_approval.md, "W5 sources"; DECISIONS.md, 2026-11-07). Every sentence about the study
+     day (the excerpt register, W5 sources; decision of 2026-11-07). Every sentence about the study
      on this page, in the data file and in the script is an approved E14 sentence, word for word: framing C (the plant's
      steam cycle and operation only, one large load that needs power and cooling everywhere), E14.16b in place of
      E14.16, E14.18 included, E14.24 in its approved wording ("Approved excerpt of: ...", as CF7's footer), no numbers to
