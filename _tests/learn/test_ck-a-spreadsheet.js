@@ -219,7 +219,7 @@ function finish() {
   ok(hrefs.length > 5 && hrefs.every(OKH), "links: eia.gov, atb.nlr.gov, irs.gov, learn pages and downloads only: " + [...new Set(hrefs.filter(h => !OKH(h)))].join(" "));
   ok(!/data-source="excerpt:/.test(PAGE), "no excerpt of the course author's research");
   const PY = fs.readFileSync(path.join(SITE, "learn/path.yml"), "utf8"), entry = PY.split(/\n- kind: /).find(x => new RegExp("\\n  id: " + ID + "\\n").test(x)) || "";
-  ok(/\n  status: active\n/.test(entry) && /\n  minutes: 150\n/.test(entry) && /\n  form: checkpoint\n/.test(entry) && /after: \[A1, A4\]/.test(entry), "path.yml: active checkpoint, 150 minutes, after A1 and A4 (A13 and A15 at the merge)");
+  ok(/\n  status: active\n/.test(entry) && /\n  minutes: 150\n/.test(entry) && /\n  form: checkpoint\n/.test(entry) && /after: \[A1, A4(, A13(, A15)?)?\]/.test(entry), "path.yml: active checkpoint, 150 minutes, after A1 and A4 (A13 since the W5 batch-1 merge, A15 at batch 2)");
   const fm = k => ((PAGE.match(new RegExp("^" + k + ': "(.*)"$', "m")) || [])[1]), py = k => ((entry.match(new RegExp("\\n  " + k + ': "(.*)"')) || [])[1]);
   ok(fm("title") === py("title") && fm("subtitle") === py("subtitle"), "the page's title and subtitle equal path.yml's");
   const GJ = JSON.parse(fs.readFileSync(L("data/glossary.json"), "utf8")), marks = [...(JS + RAW).matchAll(/\[\[([a-z0-9-]+)\|/g)].map(m => m[1]).concat([...PAGE.matchAll(/data-term="([a-z0-9-]+)"/g)].map(m => m[1]));
