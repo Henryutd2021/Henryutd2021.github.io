@@ -55,14 +55,15 @@ const has = (s, what) => ok(TX.includes(s), "page: " + what + ": '" + s + "'");
 const N = D.numbers, ALLTXT = text(RAW.replace(/\\n/g, " "));
 ok(N.joined2024 + N.notJoined2024 === N.pumps && N.joined2025 + N.never === N.notJoined2024 && N.joined2024 + N.joined2025 + N.never === N.pumps, "pumps: 41 + 71 = 112; 71 = 29 + 42");
 ok(N.lo < N.revised && N.revised < N.hi && N.holdLo < N.holdout && N.holdout < N.holdHi, "the revised result (4.6) lies inside 2.9 to 6.3; the 2025 check's (4.1) inside its own 1.8 to 6.4");
-// the validation's rule, set before looking (Codex review #2): the gap between the two estimates, treated as independent, has a
-// 95% interval that includes zero. Standard errors from the printed intervals (half-width ÷ 1.96).
-{ const z = 1.96, se1 = (N.hi - N.lo) / (2 * z), se2 = (N.holdHi - N.holdLo) / (2 * z), gap = N.revised - N.holdout, h = z * Math.sqrt(se1 * se1 + se2 * se2);
-  ok(rel(gap, 0.5, 1e-9) && (gap - h).toFixed(1) === String(N.gapLo) && (gap + h).toFixed(1) === String(N.gapHi) && N.gapLo < 0 && N.gapHi > 0,
-    "the rule: gap 0.5 kW, 95% interval " + (gap - h).toFixed(2) + " to " + (gap + h).toFixed(2) + " (shown −2.4 to 3.4), includes zero");
-  const good = EXS.plain(D.worked.revision.answers[1]);
-  ok(good.includes("2025: 4.1 kW (1.8 to 6.4); gap 0.5 kW (−2.4 to 3.4): they agree") && /treated as independent, has a 95% interval that includes zero/.test(good), "the worked revision shows the rule and its numbers as computed");
-  ok(/the 29 farms that joined in 2025, against the 42 that never joined/.test(good) && /does not prove the method/.test(EXS.marks(D.worked.revision.answers[1]).map(m => m.note).join(" ")), "the 2025 check names its comparison group, and says it supports, not proves");
+// the validation's rule, set before looking: the 2025 estimate's whole 95% interval above the board's 1.5 kW, so the
+// decision would not change. Compatible with the main estimate is not equal to it, and the two share farms (the 29 were
+// comparison farms in the first analysis), so no interval for their gap is shown.
+{ ok(N.holdLo > N.keep && N.gapLo === undefined && N.gapHi === undefined, "the rule: the 2025 interval's low end (1.8) is above 1.5 kW; no gap interval in the data");
+  const good = EXS.plain(D.worked.revision.answers[1]), notes = EXS.marks(D.worked.revision.answers[1]).map(m => m.note).join(" ");
+  ok(good.includes("if its whole 95% interval is above 1.5 kW, so the board's decision would not change. 2025: 4.1 kW (1.8 to 6.4): it is.") && !/includes zero|treated as independent|−2\.4|3\.4\)/.test(good + " " + ALLTXT),
+    "the worked revision shows the rule and its numbers; no independence assumption, no 'includes zero'");
+  ok(/not proof the effects are equal/.test(notes) && /share farms/.test(notes) && /no interval for their gap/.test(notes), "the note: compatible is not equal; the estimates share farms");
+  ok(/the 29 farms that joined in 2025, against the 42 that never joined/.test(good) && !/they agree/.test(good), "the 2025 check names its comparison group, and claims no agreement");
   ok(!/\bvalidated\b/.test(ALLTXT), "nothing claims the analysis was 'validated' by one consistent number"); }
 // the meter check is a measurement check on a matching boundary (Codex review #7)
 { const prof = D.worked.revision.answers[0], t = EXS.plain(prof), notes = EXS.marks(prof).map(m => m.note).join(" ");
@@ -122,6 +123,16 @@ ok(task("rank").answer === "b" && task("competence").answer === "a" && task("res
 { const sol = task("rank").solution + " " + task("respond").solution;
   ok(/Different starting levels alone do no harm/.test(sol) && /matters more than equal starting levels/.test(sol) && /one possible comparison/.test(sol) && !/fairer comparison/.test(ALLTXT) && !/may differ before the tariff/.test(ALLTXT), "selection: different levels are fine; parallel trends needs evidence; later joiners are one possible comparison"); }
 // the rerun's order: the dependency that fixes it is stated (Codex review #4)
+// the cleaning rule decides, set before any result; matching the old number does not
+ok(D.worked.rerun.some(r => r[0] === "Cause" && /set that rule before any result/.test(r[1])) && D.worked.rerun.some(r => r[0] === "Fix" && /not agreement with the old number, decides/.test(r[1])) &&
+  /a rule the data note set before any result/.test(task("report").solution), "the rerun's fix: an exclusion rule set before any result, not the old number, decides");
+// minor concerns are weighed, not dismissed; one or two summary sentences, as the Strong review has
+ok(!/better sources would not move the estimate|the software does not change the answer|other three concerns are minor/.test(ALLTXT) && /threatens the causal claim less directly/.test(task("rank").why.a) && /versions can change results/.test(task("rank").why.c),
+  "the minor concerns: weighed against selection, not dismissed");
+ok(/one or two sentences/.test(task("review").prompt) && /one or two sentences/.test(task("review").points[0]) && /one or two sentences/.test(D.forms.find(f => f.id === "review").lines[0]) && !/in two sentences/.test(ALLTXT),
+  "task 1 asks for one or two summary sentences, as the worked Strong review gives");
+// every written text stays as submitted: a later edit, after the worked solution opened, cannot keep the first one's time
+ok(written.every(t => t.freeze === true), "all five written tasks are frozen once submitted");
 ok(/Each step needs the one before it/.test(task("steps").prompt) && /which runs in that environment/.test(task("steps").items.find(x => x[0] === "data")[1]) && /environment comes first/.test(task("steps").solution), "the order task states why the environment comes before the data");
 // no written point asks for manufactured defects (Codex review #9); the qualitative route and a result near zero (#8)
 ok(!written.some(t => t.points.some(p => /^At least (one|two)\b/.test(p))) && !D.criteria.some(c => c.levels.some(l => /^At least (one|two)\b|at least one change to the analysis/.test(l))), "no point or criterion demands a count of concerns, changes or moved levels");
@@ -188,15 +199,36 @@ has("After the worked solution opens: an answer given after that counts as pract
 has("Opens once all twelve tasks are answered.", "the lock box");
 ok(/gateAll: true, late: "practice"/.test(JS) && !/submitTask/.test(JS.slice(JS.indexOf("LX.Checkpoint(live"))), "the runner: gateAll and the late-answer rule, no submit task");
 has("The co-op, its farms and every number here are fictional: the results are assumed example outputs, not computed from data.", "the fictional label on the study");
-has("Task 1 first: the seven marked tasks open once your review is submitted, and it then stays as written.", "task 1 first, said before the tasks");
+has("Task 1 first: the seven marked tasks open once your review is submitted. Each written task stays as you submit it.", "task 1 first, and written tasks kept as submitted, said before the tasks");
+has("submit it as task 1; the seven marked tasks (2–5, 9–11) open after it.", "part A names every task that waits for task 1");
+ok(T.map((t, i) => t.opensAfter ? i + 1 : 0).filter(Boolean).join() === "2,3,4,5,9,10,11", "the tasks that wait are 2 to 5 and 9 to 11");
 has("The level is not the table's: it comes from this rule.", "the level against the criterion table, said before the tasks (Codex review #3)");
 has("Not the table's Strong: this level needs no second person.", "the level against the criterion table, in the rubric section");
 ok(D.intro.some(x => /^Task 1 first: the seven marked tasks open once your review/.test(x)), "the runner's intro says task 1 comes first");
+// task 1 first through the shared runner's per-task options: the seven marked tasks wait for task 1, which is frozen once
+// submitted; no rule of the page's own does it
+{ const CPK = require(L("components/checkpoint.js")), waiting = T.filter(t => t.opensAfter);
+  ok(waiting.length === 7 && waiting.every(t => M.isAuto(t) && t.opensAfter.join() === "review") && auto.every(t => t.opensAfter), "the seven marked tasks, and only they, open after task 1 (opensAfter)");
+  ok(T.filter(t => t.freeze).map(t => t.id).join() === written.map(t => t.id).join() && /stays as you wrote it, before the marked tasks/.test(task("review").freezeNote), "the five written tasks are frozen once submitted; task 1 with its own line");
+  ok(CPK.openProblems(D).length === 0, "the opensAfter names all work: " + CPK.openProblems(D).join("; "));
+  ok(/opens once task 1, your review of the co-op proposal/.test(D.wait.question) && /^<b>Task 1 first\.<\/b>/.test(D.wait.why) && /waitNote: D\.wait/.test(JS), "the waiting tasks' notice is the data's, passed to the runner");
+  ok(!/LX\.on\("layout"/.test(JS) && !/function (guard|shut|keep)\b/.test(JS), "no guard of the page's own on the runner's markup"); }
 { const st = M.staticTasks(D); ok((st.match(/<details class="ckr-later">/g) || []).length === 7 && /Write task 1, your review, before you open the marked tasks/.test(st), "without JavaScript, the seven marked tasks are folded until after task 1");
-  ok(/<p class="lx-hint">Within 2% of the value/.test(st), "the tolerance note is its own line"); }
+  ok(/<p class="lx-hint">Within 2% of the value/.test(st), "the tolerance note is its own line");
+  // a marked task's title and skill could name a concern: without JavaScript they are folded with its question
+  const items = st.split("<li><p>").slice(1);
+  ok(items.length === 12 && T.every((t, i) => !t.opensAfter || (items[i].indexOf(t.title) > items[i].indexOf('<details class="ckr-later">') && items[i].indexOf(t.skill) > items[i].indexOf('<details class="ckr-later">') && /^<b>Opens after task 1<\/b>/.test(items[i]))),
+    "without JavaScript, each marked task shows 'Opens after task 1'; its title and skill are inside the fold"); }
 ok(/data-term="difference-in-differences"/.test(M.staticStudy(D)) && /data-term="time-of-use-tariff"/.test(M.staticStudy(D)) && ["clean-clone", "lock-file", "checksum", "confidence-interval"].every(k => PAGE.includes('data-term="' + k + '"')), "terms at first use: the study card's, and the tasks' words (Codex review #10)");
 ok(/<b>Reproducibility:<\/b>/.test(PAGE) && /<b>Replicability:<\/b>/.test(PAGE), "the National Academies' two definitions in rows of their own");
 ok(OWN.includes('href="cr-your-own-study.html"'), "the page links the research capstone it defends");
+// the text budget beyond the prompts: every hint, data note and list item of the page's own text (the sources' citations
+// apart) holds at most 35 words
+{ const own = OWN.replace(/<!-- (ckr-[\w-]+):start[\s\S]*?<!-- \1:end -->/g, ""), long = [];
+  for (const m of own.matchAll(/<(p|li)(?: class="[^"]*")?>([\s\S]*?)<\/\1>/g)) {
+    const t = text(m[2].replace(/<svg[\s\S]*?<\/svg>/g, "")), n = t.split(" ").filter(Boolean).length;
+    if (n > 35 && !/\(\d{4}\)\./.test(t)) long.push(n + " words: " + t.slice(0, 60)); }
+  ok(long.length === 0, "the page's own hints, notes and list items are at most 35 words: " + long.join(" | ")); }
 // the rubric: the course's words, never reworded
 {
   const ids = D.rubric.map(x => x.id);
@@ -277,6 +309,8 @@ async function gateSequence() {
   const st = P.E.LX.store.get(M.KEY, {}), so = P.E.LX.store.get(M.KEY + "-sol-open", null);
   ok(P.E.body.querySelector("#ckr-solution-body").classList.contains("is-open") && so === st.tasks[D.tasks[10].id].at, "runner: the twelfth answer opens the worked solution, recorded at its time");
   ok(D.tasks.every(t => st.tasks[t.id] && st.tasks[t.id].first === true), "runner: every task right on its first try, the order and the share included");
+  P.goTo(6);
+  ok(P.live.querySelector("textarea").hasAttribute("readonly") && !P.btn(/^Submit my explanation$/) && st.tasks["mine-response"].tries === 1, "runner: after the worked solution opened, a written text cannot be replaced");
   const lv = P.level();
   ok(lv === "Level: Strong", "runner: every answer given before the solution opened counts, in any order: " + lv);
 }
@@ -296,14 +330,23 @@ async function earlySequence() {
 // and 12 are open; once task 1 is submitted its text is read-only, and the marked tasks open
 async function firstSequence() {
   const P = mountFresh(), q = () => P.live.querySelector(".lx-ck-q").textContent;
+  let clock = 0; P.E.window.performance.now = () => (clock += 1000);   // every reading one second later: time on a task shows
   P.goTo(1);
   ok(/opens once task 1/.test(q()) && !P.live.querySelector(".lx-choice") && !P.live.querySelector(".lx-ck-sol") && !P.live.querySelector("button.lx-link") && /Task 1 first\./.test(text(P.live.textContent)) && !/Which concern/.test(text(P.live.textContent)),
     "runner: task 2 before task 1: a notice instead of its question, no answers, no solution");
   const shut = D.tasks.map((t, i) => { P.goTo(i); return /opens once task 1/.test(q()); });
   ok(shut.every((x, i) => x === M.isAuto(D.tasks[i])), "runner: the seven marked tasks are shut, the five written ones open: " + shut.map(x => x ? "shut" : "open").join(" "));
+  P.goTo(1); ok(/^Task 2 of 12 · opens after task 1$/.test(P.live.querySelector(".lx-ck-tag").textContent), "runner: a shut task's tag names no skill or lessons");
+  // the results and the copied summary before task 1: the marked tasks' titles stay unsaid
+  P.goTo(11); P.btn(/See my results/).click();
+  { const rows = P.live.querySelectorAll(".lx-ck-res tbody tr").map(r => r.children[0].textContent), sum = P.live.querySelector("textarea.lx-ck-out").value;
+    ok(D.tasks.every((t, i) => rows[i] === (i + 1) + ". " + (t.opensAfter ? "Opens after task 1" : t.title)) && D.tasks.filter(t => t.opensAfter).every(t => !sum.includes(t.title)),
+      "runner: before task 1, the results and the copied summary list the marked tasks as 'Opens after task 1'"); }
+  P.btn(/^Back to the tasks$/).click();
   P.goTo(4); P.btn(/^Go to task 1$/).click();
   ok(/^Task 1 of 12/.test(P.live.querySelector(".lx-ck-tag").textContent), "runner: 'Go to task 1' goes there");
   ok(!P.E.LX.store.get(M.KEY, {}).tasks.rank || P.E.LX.store.get(M.KEY, {}).tasks.rank.first == null, "runner: a shut task records no answer");
+  { const s = P.E.LX.store.get(M.KEY, {}); ok(D.tasks.filter(M.isAuto).every(t => !s.tasks[t.id] || !s.tasks[t.id].ms), "runner: no time is counted on a shut task"); }
   P.answer(0);
   const ta = () => P.live.querySelector("textarea");
   ok(ta().hasAttribute("readonly") && !P.btn(/^Submit my explanation$/) && /stays as you wrote it/.test(text(P.live.textContent)), "runner: once submitted, task 1's text is read-only, with no Submit button");

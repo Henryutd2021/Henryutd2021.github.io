@@ -5,8 +5,9 @@
 #   kind: tier    one per tier, in display order; any number of tiers (the map draws one line each, first at the bottom).
 #                 id, title, level, slot (colour 1-5: --lx-tier-<slot> in assets/learn/components/base.css), icon (a name
 #                 in LX.IC), door (the entry-door question), doord, reader, math, assumes, goal
-#   kind: scale   optional system scales (e.g. microgrid, regional grid, city, nation): id, title, short, icon;
-#                 lessons list theirs in `scales: [id, ...]`
+#   kind: scale   the course's system scales, S0 device and plant to S4 nation: id, title, short, icon (a name in LX.IC);
+#                 lessons list theirs in `scales: [id, ...]`, the primary scale first (in path.json and each lesson's
+#                 data; the course map does not draw them)
 #   kind: lesson  starter: N puts the lesson on the starter path as stop N; tier is where it sits; tier2 marks a lesson that
 #                 bridges two tiers; path only for lessons that exist (others show as coming soon); after = starter lessons
 #                 it builds on; form: play (opens with the game: lessons 0 and 13) or cards (step cards; the default);
@@ -82,6 +83,34 @@
   doorcta: "Go to the Researcher tier"
   doorlink: "#researcher"
 
+# ---------- the course's five scales (curriculum S0-S4), with the names lesson F1 teaches; each lesson lists the scales
+# its curriculum row names (`scales:`, its primary scale first); a tier's checkpoint and the toolbox name none
+- kind: scale
+  id: S0
+  title: "Device and plant"
+  short: "Device and plant"
+  icon: house
+- kind: scale
+  id: S1
+  title: "Microgrid and community"
+  short: "Microgrid"
+  icon: plant
+- kind: scale
+  id: S2
+  title: "Regional bulk grid"
+  short: "Regional grid"
+  icon: tower
+- kind: scale
+  id: S3
+  title: "City and region"
+  short: "City"
+  icon: city
+- kind: scale
+  id: S4
+  title: "Nation"
+  short: "Nation"
+  icon: globe
+
 # ---------- the starter path: 14 lessons, the guided tour across the tiers
 - kind: lesson
   id: 00-grid-operator
@@ -100,6 +129,7 @@
   does: "Run Prairie Town's power plants hour by hour for one day and keep supply equal to demand."
   outcome: "Say what balancing means and why cheap plants run first."
   after: []
+  scales: [S2]
 - kind: lesson
   id: 01-power-energy
   starter: 1
@@ -115,6 +145,7 @@
   does: "An appliance board with live power and the energy it adds up, and a ladder of scales from a phone to the whole country."
   outcome: "Convert between units and make quick estimates."
   after: []
+  scales: [S0]
 - kind: lesson
   id: 02-demand
   starter: 2
@@ -130,6 +161,7 @@
   does: "Daily, weekly and seasonal demand curves, and a solar slider that digs the “duck curve”."
   outcome: "Read a demand curve and explain its peaks."
   after: [1]
+  scales: [S2, S0]
 - kind: lesson
   id: 03-balancing
   starter: 3
@@ -145,6 +177,7 @@
   does: "Trip a power plant and watch the frequency fall, then the fast response and the reserves step in."
   outcome: "Explain frequency, reserves and why outages can cascade."
   after: [0]
+  scales: [S2]
 - kind: lesson
   id: 04-forecasts
   starter: 4
@@ -161,6 +194,7 @@
   does: "Forecast against actual demand and wind, a simple baseline to beat, and a band of possibilities instead of one line."
   outcome: "Explain forecast error and why operators hold reserves."
   after: [2, 3]
+  scales: [S2]
 - kind: lesson
   id: 05-capacity-factor
   starter: 5
@@ -178,6 +212,7 @@
   does: "A year of output from nuclear, wind and solar plants of equal size; double a light wind's speed and get eight times the power."
   outcome: "Turn a plant's size in MW into the energy it makes in a year."
   after: [1]
+  scales: [S0]
 - kind: lesson
   id: 06-three-jobs
   starter: 6
@@ -194,6 +229,7 @@
   does: "Sort technologies into the jobs they do, with key numbers for each."
   outcome: "Compare technologies by the job they do."
   after: [4, 5]
+  scales: [S2]
 - kind: lesson
   id: 07-cost
   starter: 7
@@ -209,6 +245,7 @@
   does: "Building, fuel and upkeep; a discounting slider; a levelized-cost calculator, and what it misses."
   outcome: "Compute a levelized cost of electricity and say what it leaves out."
   after: [5]
+  scales: [S0]
 - kind: lesson
   id: 08-merit-order
   starter: 8
@@ -224,6 +261,7 @@
   does: "A supply stack, a demand line and the price where they meet; add wind and watch prices fall."
   outcome: "Explain wholesale prices and price spikes."
   after: [6, 7]
+  scales: [S2]
 - kind: lesson
   id: 09-storage
   status: active
@@ -239,6 +277,7 @@
   does: "A battery with power and energy ratings and losses: charge cheap, sell dear, then compare with the best schedule."
   outcome: "Size and value simple storage."
   after: [2, 8]
+  scales: [S0, S2]
 - kind: lesson
   id: 10-write-it-down
   status: active
@@ -254,6 +293,7 @@
   does: "Sort Prairie Town's choices into decisions, goal and rules, then find the best plan for two plants on a graph."
   outcome: "Formulate a small optimization problem in words and symbols."
   after: [0, 8]
+  scales: [S2]
 - kind: lesson
   id: 11-solver
   status: active
@@ -269,6 +309,7 @@
   does: "A real solver in your browser: try to beat it, check its answer, and read prices from it."
   outcome: "Solve, interpret and check a linear program."
   after: [10]
+  scales: [S2]
 - kind: lesson
   id: 12-trade-offs
   starter: 12
@@ -284,6 +325,7 @@
   does: "Spot the plans nobody should pick, slide a carbon price, and trace the frontier between cost and CO₂."
   outcome: "Reason about trade-offs between goals."
   after: [11]
+  scales: [S2]
 - kind: lesson
   id: 13-capstone
   starter: 13
@@ -300,6 +342,7 @@
   does: "Choose how much wind, solar, gas, nuclear and battery to build, then ask the optimizer for the cheapest plan under a CO₂ cap."
   outcome: "Reason about planning trade-offs and know what real planning models do."
   after: [9, 12]
+  scales: [S2]
 
 # ---------- wave W1 modules off the starter path (curriculum v2: the news lens, the Foundations checkpoint, the bridges
 #            into modelling and the first Modeler lesson); live once a builder sets status: active
@@ -320,6 +363,7 @@
   does: "Dissect a headline: tag phrases with the seven lens questions, run a back-of-envelope check, then write your take in three sentences (claim, what would change your mind, confidence)."
   after: [1]
   next: CK-F
+  scales: [S0, S1, S2, S3, S4]
 - kind: lesson
   id: ck-f-estimate
   code: CK-F
@@ -351,6 +395,7 @@
   does: "Start with a ten-question readiness check that routes you to the toolbox if needed; turn three word problems into equations and inequalities, then into a linear program; drag the constraints of a two-variable LP; write the same model as Ax <= b with a linked view."
   after: [10, K4]
   next: B2
+  scales: [S2]
 - kind: lesson
   id: b02-python-data
   code: B2
@@ -370,6 +415,7 @@
   does: "In a notebook, load a year of hourly grid data, fix time zones and daylight-saving gaps, plot it, compute capacity factors and a duration curve, and write assert checks that catch bad rows."
   after: [5, K7]
   next: B3
+  scales: [S0, S2]
 - kind: lesson
   id: b03-read-check-formulation
   code: B3
@@ -388,6 +434,7 @@
   does: "Read a published-style formulation (sets, indices, parameters, variables, constraints) and translate each line into words and units; find five planted errors (unit, sign, missing index, wrong sum, a free lunch); check a solved model's energy balance and the signs of its duals."
   after: [B1]
   next: M1
+  scales: [S2]
 - kind: lesson
   id: m01-dispatch-to-lmp
   code: M1
@@ -407,6 +454,7 @@
   does: "Build a 24-hour dispatch LP with ramps and read its balance duals as marginal values under stated assumptions; add a three-bus DC power-flow network, congest a line and watch one price split into three."
   after: [11, 8, B1, B2, B3]
   next: M2
+  scales: [S2]
 
 # ---------- wave W2 hubs (curriculum v2 §8): the five scales (F1) and the whole system (F2), builder learn-w2-a
 - kind: lesson
@@ -426,6 +474,7 @@
   outcome: "Place a question at its scale and name who decides it, what a model of it needs and what it takes from other scales."
   after: [0]
   next: F2
+  scales: [S0, S1, S2, S3, S4]
 - kind: lesson
   id: f02-systems-and-map
   code: F2
@@ -444,6 +493,7 @@
   outcome: "Tell a stock from a flow, name a feedback loop as reinforcing or balancing, and trace how one change ripples across technology, cost, emissions, people and security."
   after: [F1, 6]
   next: A22
+  scales: [S0, S1, S2, S3, S4]
 # ---------- wave W3 Foundations (curriculum v2 §7.2): energy services, power plants, nuclear basics, the grid and outages,
 # builder learn-w3-a
 - kind: lesson
@@ -463,6 +513,7 @@
   outcome: "Tell a service from a carrier, estimate the useful energy a home gets from what it buys, and explain why a heat pump's COP changes with the weather."
   after: [1]
   next: F4
+  scales: [S0]
 - kind: lesson
   id: f04-power-plants
   code: F4
@@ -480,6 +531,7 @@
   outcome: "Explain how each kind of plant turns its energy source into electricity, where the losses go, and what limits how fast it can change its output."
   after: [5]
   next: F5
+  scales: [S0]
 - kind: lesson
   id: f05-nuclear-basics
   code: F5
@@ -497,6 +549,7 @@
   outcome: "Explain how a reactor keeps its chain reaction steady, how its heat becomes electricity, and why outlet temperature limits which heat uses a design could serve."
   after: [F4]
   next: F6
+  scales: [S0]
 - kind: lesson
   id: f06-grid-and-outages
   code: F6
@@ -514,6 +567,7 @@
   outcome: "Trace the path from a power plant to a socket, name the equipment at each voltage step, and explain what SAIDI and SAIFI measure."
   after: [3]
   next: F7
+  scales: [S2, S3]
 # ---------- wave W2 modules (curriculum v2 §18.4); live once a builder sets status: active
 - kind: lesson
   id: a22-tradeoff-explorer
@@ -532,6 +586,7 @@
   does: "Change one plan and watch cost, CO₂, reliability, a fairness measure and a security measure move together on a radar; find the plans no other beats on all five; see whose priorities pick which plan, and how a different definition changes the answer."
   after: [F2, 12]
   next: R1
+  scales: [S0, S1, S2, S3, S4]
 # ---------- wave W3 Analyst modules A4 and A7 (curriculum v2 §18.4; builder learn-w3-d)
 - kind: lesson
   id: a04-retail-tariffs
@@ -550,6 +605,7 @@
   does: "Bill a renter, a home with solar and an EV, and a factory under flat, time-of-use, demand-charge and real-time tariffs; see who pays more and what behaviour each tariff rewards; then set a large load's minimum bill."
   after: [8]
   next: A7
+  scales: [S0, S1]
 - kind: lesson
   id: a07-flexible-demand
   code: A7
@@ -566,6 +622,7 @@
   teaches: [load shifting, energy shifted against energy saved, demand response, virtual power plants and aggregators, rebound after an event, local energy trading]
   does: "Shift Prairie Town's load toward cheap or clean hours within limits and see what the shift costs users; pool batteries, thermostats, EV chargers and a dairy's pumps in an aggregator and see what each owner earns, where coordination costs bite and where a feeder's limit stops it; then let neighbours trade."
   after: [9, A4]
+  scales: [S1, S2]
 # ---------- wave W3 Analyst modules (curriculum v2 §18.4), builder learn-w3-e
 - kind: lesson
   id: a08-storage-duration
@@ -584,6 +641,7 @@
   outcome: "Choose a store's duration for a stated job, and say what a one-week run shows (endurance) and what it cannot (adequacy, seasonal value)."
   after: [9, 13]
   next: A16
+  scales: [S2, S4]
 - kind: lesson
   id: a16-hydrogen-ptx
   code: A16
@@ -601,6 +659,7 @@
   outcome: "Compute a hydrogen chain's energy and mass balance and cost per kilogram, tell it from the system's cost, and rank uses of hydrogen against their alternatives."
   after: [9, 7, A8]
   next: M4
+  scales: [S0, S3]
 # ---------- wave W3 microgrid line (curriculum v2 §7.2, §7.3): F7 and A14, builder learn-w3-b. F7's prerequisites in
 # the curriculum are T9 and F6, A14's F7, A1 and A4: F6, A1 and A4 are added to `after` when their rows exist (coordinator).
 - kind: lesson
@@ -620,6 +679,7 @@
   outcome: "Say what makes a microgrid, why ordinary rooftop solar goes dark in an outage, and how power (kW) and stored energy (kWh) limit what an island carries and for how long."
   after: [9, F6]
   next: A14
+  scales: [S1]
 - kind: lesson
   id: a14-microgrid-value
   code: A14
@@ -636,6 +696,7 @@
   does: "Price an outage for a household, a dairy and a hospital; size Prairie Campus's microgrid against a year of outages; add everyday savings; compare a utility, a co-op, the county and a private company as owners; then lower a village mini-grid's cost per kWh with a mill and a cold store."
   outcome: "Estimate a year's expected outage cost, find the size where one more hour of backup stops paying, and say who pays, who gains and who carries the risk under each owner."
   after: [F7, A1, A4]
+  scales: [S1]
 
 - kind: lesson
   id: a01-project-tea
@@ -654,6 +715,7 @@
   outcome: "Lay out a project's yearly cash flows and judge it by NPV at its cost of capital, with its IRR, payback and break-even price, and say what each yardstick misses."
   after: [7, K3]
   next: A2
+  scales: [S0]
 - kind: lesson
   id: a02-contracts-risk
   code: A2
@@ -670,6 +732,7 @@
   does: "Draw price years for a solar-plus-storage plant; sign a fixed price settled at the node, one settled at the hub, a flat block and a battery toll; run 200 seeded price years and see the seller's and the buyer's ranges move."
   outcome: "Say which party carries price, shape, output, basis and battery-margin risk under each contract, and read the risk as a stated statistic of a simulated distribution."
   after: [A1]
+  scales: [S0, S2]
 # ---------- the rest of each tier, in curriculum v2 order (reports/learn/learn_map_v2.yml; coming soon until built).
 #            Replaces the pre-v2 placeholder rows (2026-11-03). CF4 and CF5 went live on 2026-11-07, with the case files
 #            below.
@@ -690,6 +753,7 @@
   does: "Add a steady 300 MW data center to Prairie Town's busiest day, a spring day and its whole year; count the homes it equals; read real requests to connect; time the wait for grid service; set water, jobs and taxes; see who pays if it cancels."
   outcome: "Describe a large load by its size, shape and wait to connect, tell an annual-energy equivalent from a peak one and a request from demand, and name who decides, pays and benefits when it connects."
   after: [2, F6]
+  scales: [S2]
 # ---------- wave W5 Foundations module F9 (curriculum v2 §18.4; builder learn-w5-a)
 - kind: lesson
   id: f09-city-energy
@@ -707,6 +771,7 @@
   does: "Follow Prairie City's 2025 energy from the gas grid, fuels, the SPP grid and rooftop solar to homes, shops, transport, industry and a data-center campus; group it by sector; then sort who usually decides each lever (the city, the utility, the state regulator, owners or federal rules) and light up each one's part of the flows."
   outcome: "Read a city's energy flows by carrier and sector, say where its accounting starts and how little of its electricity it makes, and name who typically decides rates, codes, standards, wires and equipment, knowing that the roles differ by state and utility."
   after: [F3, F6]
+  scales: [S3]
 # ---------- wave W6 Foundations module F10 (curriculum v2 §18.4; builder learn-w6-a)
 - kind: lesson
   id: f10-nations-differ
@@ -724,6 +789,7 @@
   does: "Guess a country from its mix; draw the United States, the European Union, China, India, Japan, Brazil, Norway and the fictional Prairieland from their own statistics; switch between primary, final and useful energy and between three conventions for nuclear, hydro, wind and solar; turn on four lenses (import dependence, resources, climate, institutions); open the regional cards."
   outcome: "Read a national energy balance as a Sankey, say how much is lost before the meter and at the point of use, explain why a country's renewable share changes with the accounting convention, and name what lines up with a mix without claiming any one cause."
   after: [F4]
+  scales: [S4]
 # F11, builder learn-w5-b (wave W5)
 - kind: lesson
   id: f11-air-climate-people
@@ -741,6 +807,7 @@
   does: "Burn one tonne of coal, natural gas or oil and count its CO₂, the methane leaked before gas is burned and its SO₂, NOx and fine particles before and after controls; walk away from the stack; price the harm with EPA's estimates; then slide a Prairie City household's income and read its energy burden."
   outcome: "Explain why fuels compare by heat, not by tonne; count leaked methane as CO₂e with a stated GWP; tell pollutants that controls catch from CO₂ that they do not; and read energy burden as bills over income against conventional lines."
   after: [F4]
+  scales: [S4, S3]
 # X1, builder learn-w7-a (wave W7): side-topic shelf, D1; guard G-NUC
 - kind: lesson
   id: x01-under-the-hood
@@ -757,6 +824,7 @@
   does: "Tap eight components (an inverter, a relay, a turbine blade, a combustor, a reactor core, an electrolyzer stack, a battery cell and a control room) to meet the discipline behind each; sort what a model borrows from what stays with the engineers; light the components by the kind of number they supply."
   outcome: "Name the discipline that designs each major energy device, say which numbers a system model borrows from it (ratings, efficiencies, ramp limits, outlet temperatures, failure rates and operating rules), and where the course stops."
   after: [F4]
+  scales: [S0]
 # X3, builder learn-w6-x (wave W6; side-topic shelf, D1)
 - kind: lesson
   id: x03-transitions-history
@@ -773,6 +841,7 @@
   does: "Guess how long electricity took to reach nine U.S. homes in ten; compare towns and farms; watch piped gas overtake coal as the main heating fuel; read the car and solar curves; sort what sped each change up and what held it back; then a dated timeline and two readings of the record."
   outcome: "Read an adoption curve as a share of a named whole, say how fast past U.S. changes moved and what sped or slowed them, and explain why the answer to how fast depends on what is measured, without forecasting the next one."
   after: [F10]
+  scales: [S4]
 # ---------- wave W4 Analyst module A3 (curriculum v2 §18.4; builder learn-w4-b)
 - kind: lesson
   id: a03-market-design
@@ -790,6 +859,7 @@
   does: "Clear a year of hourly prices on the Plains market; watch negative prices and solar's falling capture price as solar grows; see which new plants cover their costs energy-only and with a capacity market, and what consumers pay; match five arrangements around the world."
   outcome: "Explain how energy-only markets with scarcity pricing and capacity markets each pay for enough capacity, what each costs consumers and who carries which risk, and why more solar lowers solar's own capture price."
   after: [8]
+  scales: [S2]
 # ---------- wave W4 Analyst module A5 (curriculum v2 §18.4; builder learn-w4-b)
 - kind: lesson
   id: a05-adequacy
@@ -807,6 +877,7 @@
   does: "Simulate 500 resampled weather years with random plant outages on the Plains Grid; estimate the loss-of-load expectation; accredit peakers, wind, solar, a battery and demand response by the firm capacity each adds at equal reliability; watch ratings change with the mix; compare with a reserve-margin screen."
   outcome: "Estimate a grid's loss-of-load expectation from a simulation with its Monte Carlo error, rate a resource by the firm capacity it adds at equal reliability, and explain why a rating depends on the grid and its mix."
   after: [3, 6, K5]
+  scales: [S2]
 # A6, builder learn-w4-a (wave W4, 2026-11-05)
 - kind: lesson
   id: a06-interconnection
@@ -824,6 +895,7 @@
   does: "Walk a wind farm and a 300 MW data center through their paths to the grid; run a cluster study and see one withdrawal shift costs and add a restudy; match FERC Order 2023's reforms to the problems they target; check what a substation carries with one line out; price a wait for the developer, other customers and society."
   outcome: "Explain why connecting to the grid takes years, show how cluster studies split upgrade costs and how a withdrawal moves cost and time onto others, size a large load against N−1, and price a wait in separate accounts."
   after: [F8, 8]
+  scales: [S2]
 # ---------- wave W4 Analyst module A9 (curriculum v2 §18.4; builder learn-w4-b)
 - kind: lesson
   id: a09-hazards
@@ -841,6 +913,7 @@
   does: "Sort what heat waves, droughts, cold snaps and wildfire shutoffs hit; read Winter Storm Uri from the FERC–NERC report; stress the Plains Grid with each hazard and with two at once; choose defences under a budget."
   outcome: "Explain how each hazard breaks a power system, why correlated failures defeat independent-outage planning, and compare defences by what they avoid for what they cost."
   after: [F6, A5]
+  scales: [S2, S3]
 - kind: lesson
   id: a10-emissions-questions
   code: A10
@@ -858,6 +931,7 @@
   outcome: "Name which of four emissions questions a number answers, compute each for a load with its stated method and assumptions, and say why a claim is not a measure of emissions caused."
   after: [12, 8]
   next: A12
+  scales: [S2]
 # A11, builder learn-w5-c (wave W5)
 - kind: lesson
   id: a11-lca-nexus
@@ -876,6 +950,7 @@
   outcome: "Name the boundary and functional unit behind a footprint, compare options on one boundary, tell water withdrawn from water consumed, and say whether a number is an attributional share or a consequential change."
   after: [F11]
   next: A12
+  scales: [S0, S3]
 - kind: lesson
   id: a12-policy-instruments
   code: A12
@@ -893,6 +968,7 @@
   outcome: "Explain how four policy instruments change a least-cost plan, compare them on emissions cut, resource cost and who pays, and keep transfers apart from real costs."
   after: [A1, 12]
   next: M6
+  scales: [S4, S2]
 # A13, builder learn-w5-b (wave W5)
 - kind: lesson
   id: a13-fairness-jobs
@@ -910,6 +986,7 @@
   does: "Recover a Prairie City plan's yearly cost per kWh, by a fixed charge and by income and read each group's energy burden; see that the money moved adds up to zero; regroup the households; then count the jobs and tax base Ridge County loses when its coal plant retires and what wind and solar farms bring, with every coefficient set by you."
   outcome: "Allocate a cost across household groups under three designs and read the burden each produces, tell a transfer from a real cost, and report jobs and tax effects as screening estimates that keep job-years apart from permanent jobs and gross apart from net."
   after: [A4, F11]
+  scales: [S3]
 # ---------- wave W5 Analyst module A15 (curriculum v2 §18.4; builder learn-w5-a)
 - kind: lesson
   id: a15-efficiency-electrification
@@ -927,6 +1004,7 @@
   does: "Build a cost-of-saved-energy curve for Prairie City's buildings (water heaters, heat pumps, envelopes, LED tubes, condensing furnaces) with a rebound check; electrify heat and cars district by district on the cold design day against each substation; try three charging rules and a heat network with a store; sort the industrial park's heat by temperature."
   outcome: "Price a saved MWh with the capital recovery factor and judge it against what it saves, show how rebound and the order of measures change the curve, and explain why electrifying heat raises the cold-day peak more than the year's energy, and what envelopes, stores and charging rules do about it."
   after: [F3, F9]
+  scales: [S3]
 # A17, builder learn-w4-a (A17 fork, wave W4)
 - kind: lesson
   id: a17-physical-feasibility
@@ -944,6 +1022,7 @@
   does: "Take M1's plan that balances every hour; add reactive power until a line passes its rating, load a feeder until its far end sags, add rooftop solar until its voltage tops out, find a ramp the plan assumed, and cut inertia to compare two assumed inverter responses after a trip."
   outcome: "Name the physical limits an hourly energy plan can break, say when each binds, and say which check (an AC check, a ramp check at the plan's time step and finer, or a check of the first seconds) would catch it."
   after: [F6, 3]
+  scales: [S2, S1, S3]
 # A18, builder learn-w5-d (wave W5)
 - kind: lesson
   id: a18-city-plan
@@ -961,6 +1040,7 @@
   does: "Sort Prairie City's emissions into the GPC's scopes, set a 2035 target, build a plan from a cost curve of six measures, test it against an up-front budget, each district's substation on the coldest morning and who benefits, then see the curve mislead through overlaps, order, the baseline, prices and hidden costs."
   outcome: "Build a city's inventory by scope, read and use a marginal abatement cost curve, test a plan against money, peaks and fairness, and name five ways the curve misleads and who decides each step of a U.S. city plan."
   after: [F9, A1]
+  scales: [S3]
 - kind: lesson
   id: a19-gis-siting
   path: a19-gis-siting.qmd
@@ -981,6 +1061,7 @@
   lab: "an optional NumPy notebook that rebuilds the map from the same seed, checks the page's sites and line, and passes the sites to a cost model, about 60 minutes."
   does: "Stack map layers for the region around Prairie City; exclude land by rule and weight the criteria for a solar farm, a wind farm and a data-center campus; route a new line along a least-cost path; then change the cell size and the homes layer's date."
   after: [A11]
+  scales: [S3, S4]
 # A20, builder learn-w6-b (wave W6)
 - kind: lesson
   id: a20-national-scenarios
@@ -998,6 +1079,7 @@
   does: "Line up four scenarios for Prairieland built on one data set; read each one's question and assumptions; sort them and four real outlooks as exploratory or target-seeking; trace the gaps in CO₂, electricity and imports to demand, fuel prices, policy and fixed technology costs, one at a time and in order; then move a budget and watch the carbon price it needs."
   outcome: "Tell an exploratory scenario from a target-seeking one, trace a gap between two scenarios to their assumptions in a stated order, explain why the parts depend on that order, and say why a target-seeking scenario's policy is an output, not an input."
   after: [A1, 13]
+  scales: [S4]
 # A21, builder learn-w6-b (wave W6)
 - kind: lesson
   id: a21-security-minerals
@@ -1015,6 +1097,7 @@
   does: "Read Prairieland's supply fuel by fuel; compute its import dependence under two conventions and the share on one strait; compute an HHI and cap the leading refiner; stress the nation with an LNG price spike, a closed strait, a mineral export restriction and a factory fire, alone and together; then sort stockpiles, more suppliers, recycling, a second site and using less by the shocks they help against."
   outcome: "Compute import dependence and a concentration index and say what each does and does not measure, size stocks against a closure, find the scarcest input in a supply chain, and match each security lever to the shocks it helps against."
   after: [F10]
+  scales: [S4]
 # X2, builder learn-w6-x (wave W6; side-topic shelf, D2)
 - kind: lesson
   id: x02-fossil-transition
@@ -1032,6 +1115,7 @@
   does: "Tap a map of gas networks, LNG, gas and coal plants, mines, oil, carbon capture and carbon removal; check a year of coal retirement plans against what retired; spread a gas network's cost over fewer customers under two assumptions; see what an early closure leaves unpaid in Ridge County; tell capture from removal; sort removal methods by permanence, readiness and cost range; weigh gas as a bridge or a lock-in."
   outcome: "Say what gas, coal and oil systems do today and which questions a transition opens, read a retirement or gas-network scenario by its assumptions, and compare carbon-removal methods by permanence, readiness, cost range and how they are measured, without a verdict."
   after: [F10, F11]
+  scales: [S4, S3]
 # X4, builder learn-w7-a (wave W7): side-topic shelf, D1; review yearly (policy)
 - kind: lesson
   id: x04-rules-law
@@ -1048,6 +1132,7 @@
   does: "Put the six stages of FERC's Order No. 2222 in order, step through a Kansas rate case and its 240-day clock, decide whether a settlement binds the commission, sort permits and rules into federal, state and local, and find where the public can speak."
   outcome: "Trace how a U.S. energy rule travels from a law to a rule, a tariff or rate and a permit; say which level of government decides each; and read the dates and the points where the public can take part."
   after: [A3]
+  scales: [S2, S4]
 # X5, builder learn-w7-a (wave W7): side-topic shelf, D1, closed form; guard G-FIN
 - kind: lesson
   id: x05-project-finance
@@ -1064,6 +1149,7 @@
   does: "Build the capital stack of Prairie Town's wind farm and a battery: tap its four layers, size the loan from a coverage ratio, sell less of the output under contract and try a bad year, add tax equity and a grant, and see who loses first."
   outcome: "Name the layers of a project's capital stack and the order in which they are paid, size a loan from cash flow and a coverage ratio, and explain why contracted revenue supports more debt than revenue sold at market prices."
   after: [A1, A2]
+  scales: [S0]
 # CK-A, builder learn-w5-g (wave W5). Curriculum prerequisites A1, A4, A13, A15.
 - kind: lesson
   id: ck-a-spreadsheet
@@ -1095,6 +1181,7 @@
   outcome: "Run a city's energy hub against its substation limits, read what the busiest hour and the LP's duals say about upgrades, and tell the engine's results apart from the screening estimates of who pays."
   teaches: [energy hub, linearized feeder limits, coincident winter peaks, flexibility from managed charging and heat stores, duals as the value of grid room, screening household outputs]
   after: [F3, A7, F9, A15]
+  scales: [S3]
 - kind: lesson
   id: c3-prairie-city-2040
   code: C3
@@ -1114,6 +1201,7 @@
   teaches: [capstone plan summary, a plan within a budget, siting with map layers, screening outputs with stated assumptions, answering stakeholders]
   lab: "M12's notebook: Prairie City's energy hub in SciPy and HiGHS, about 60 minutes."
   after: [SB3, A18, A15, A13, A19]
+  scales: [S3]
 - kind: lesson
   id: m02-unit-commitment
   path: m02-unit-commitment.qmd
@@ -1134,6 +1222,7 @@
   does: "Add start-up costs and minimum run times; watch the LP schedule become impossible to operate; grow a small branch-and-bound tree; see why a mixed-integer program gives no ordinary shadow prices; fix the commitments and re-solve the dispatch LP for conditional prices, then count the uplift payments that start-up costs need."
   after: [M1]
   next: M3
+  scales: [S2]
 - kind: lesson
   id: m03-capacity-expansion
   code: M3
@@ -1153,6 +1242,7 @@
   does: "Co-optimize what to build and how to run it on weighted representative weeks, with the battery linked across them and the extreme weeks kept; then re-run the plan on every hour of 2025 and of 2024 and see which conclusions survive."
   after: [M1, 7, 13]
   next: CK-M
+  scales: [S2, S4]
 - kind: lesson
   id: m04-storage-multienergy
   code: M4
@@ -1172,6 +1262,7 @@
   outcome: "Formulate a multi-carrier plant LP with storage, solve it, and show with stated comparisons where coupling carriers earns value."
   after: [M1, A8]
   next: M5
+  scales: [S0, S3]
 - kind: lesson
   id: m05-microgrid-size-and-run
   code: M5
@@ -1190,6 +1281,7 @@
   lab: "a SciPy/HiGHS notebook that rebuilds engine E1's sizing and outage models, asserts the browser's sizing, check and drawn-outage numbers, and runs the rolling horizon beside the browser's, about 60 minutes."
   does: "A MILP sizes solar, a battery and generator sets for Prairie Campus under outage scenarios; add the host feeder's export limit and the utility's tariff and watch the campus optimum change; then run the storm with rolling-horizon dispatch on forecasts and see what forecast error costs."
   after: [M2, A14]
+  scales: [S1]
 - kind: lesson
   id: m06-carbon-in-models
   code: M6
@@ -1209,6 +1301,7 @@
   outcome: "Put a CO₂ cap, a carbon price and a procurement rule into an LP, read their duals and ties correctly, and show with stated comparisons that meeting a procurement rule is not the same as causing an emissions cut."
   after: [M1, A10, 12]
   next: M7
+  scales: [S2]
 - kind: lesson
   id: m07-monte-carlo
   path: m07-monte-carlo.qmd
@@ -1229,6 +1322,7 @@
   does: "Sample uncertain inputs with a Latin hypercube, run a model a thousand times, rank inputs by influence and read the distribution, not one number."
   after: [A1, B2, K5]
   next: M8
+  scales: [S0, S1, S2, S3, S4]
 # M8, builder learn-w4-d (wave W4, 2026-11-05)
 - kind: lesson
   id: m08-stochastic-robust
@@ -1249,6 +1343,7 @@
   lab: "a SciPy/HiGHS notebook that rebuilds the two-stage program, checks the page's plans and grows the tree to nine branches, about 60 minutes, then 90 minutes of practice."
   does: "Size an electrolyzer now and run it later across three wind build-outs; compute the value of the stochastic solution and of perfect information, and compare with worst-case and least-regret robust plans."
   after: [M3, M7]
+  scales: [S2, S3]
 - kind: lesson
   id: m09-surrogates-uq
   path: m09-surrogates-uq.qmd
@@ -1268,6 +1363,7 @@
   lab: "a NumPy notebook that refits the page's records and checks them, then scikit-learn's Gaussian process, a noise level that changes with wind speed and a surrogate of M7's model, about 45 minutes, then 60 minutes of practice."
   does: "Fit a wind power curve from a handful of records and check the band on held-out records; add the maker's curve as a cheap source and see when the band narrows and stays calibrated, and when the cheap data mislead."
   after: [M7, K6]
+  scales: [S0]
 - kind: lesson
   id: m10-ml-forecasting
   path: m10-ml-forecasting.qmd
@@ -1287,6 +1383,7 @@
   lab: "a pandas and scikit-learn notebook that rebuilds the page's split and checks it, then gradient boosting and a small neural network on the linear mix's inputs and on a wider set, about 60 minutes, then 90 minutes of practice."
   does: "Beat persistence and seasonal-naive baselines on a held-out month of real data; fit a learned model; score point and probabilistic forecasts (MAE, pinball loss); find the leak in a model that looks too good."
   after: [4, M7]
+  scales: [S2]
 - kind: lesson
   id: m11-tea-in-models
   code: M11
@@ -1305,6 +1402,7 @@
   does: "Link an hourly operating LP of a wind-hydrogen plant to its lifetime cash flows; annualize capital, add the U.S. hydrogen credit in its own ten years and with its emissions tiers, move the boundary (what belongs to the plant, what to the grid) and watch the size, NPV and cost per kilogram change."
   outcome: "Formulate a techno-economic analysis as an LP with annualized capital and a time-limited credit, handle a stepped rule by enumeration, and state how the boundary changes the conclusion."
   after: [M3, A1, A12]
+  scales: [S0, S1]
 # M12, builder learn-w5-h (wave W5), on engine E3
 - kind: lesson
   id: m12-city-model
@@ -1324,6 +1422,7 @@
   teaches: [energy hub as a linear program, building stock as shares, linearized feeder limits, duals of grid room and of a CO2 cap, representative days, screening household outputs]
   lab: "a SciPy/HiGHS notebook that rebuilds engine E3's hub and asserts the browser's numbers, about 60 minutes, then 120 minutes of practice."
   after: [M4, A15, A13]
+  scales: [S3]
 # M13, builder learn-w6-h (wave W6), on engine E4; A20 and A21 (curriculum prerequisites, built in parallel on
 # learn-w6-b) join `after` at integration
 - kind: lesson
@@ -1344,6 +1443,7 @@
   teaches: [multi-period capacity expansion, asset vintages and residual value, cumulative carbon budgets, import-share caps, perfect against myopic foresight, the budget's dual as a carbon value, representative slices checked against full years, near-optimal plans]
   lab: "a SciPy/HiGHS notebook that rebuilds engine E4's pathway LP and asserts the browser's numbers, about 60 minutes, then 120 minutes of practice."
   after: [M3, M8, A20, A21]
+  scales: [S4]
 # M14, builder learn-w5-g (wave W5)
 - kind: lesson
   id: m14-did-it-work
@@ -1364,6 +1464,7 @@
   lab: "a NumPy notebook that rebuilds both simulated panels, fits the two-way fixed-effects and event-study regressions, clusters standard errors by home and redraws 200 panels: about 60 minutes, then 90 of practice."
   does: "Ask whether a time-of-use tariff lowered household peaks or whether a policy changed investment, on simulated panels with known effects: describe, regress, try a difference-in-differences design, and list the threats to validity (confounding, selection, spillovers, anticipation) before trusting the answer."
   after: [B2, K5]
+  scales: [S0, S1, S2, S3, S4]
 - kind: lesson
   id: sb2-grid-room
   code: SB2
@@ -1379,6 +1480,7 @@
   outcome: "Run unit commitment and conditional pricing on a three-zone grid, and explain how a large load, a link limit or the reserve requirement changes prices, flows and who is short."
   teaches: [unit commitment, prices conditional on the commitment, transfer limits and congestion, operating reserves, uplift, a large load on the grid]
   after: [M2, M1]
+  scales: [S2]
 - kind: lesson
   id: c2-plains-grid-hard-year
   code: C2
@@ -1397,6 +1499,7 @@
   teaches: [capstone plan and study note, representative days with extreme weeks kept, adequacy by Monte Carlo, who pays for a large load, conditional prices and uplift]
   lab: "M2's notebook: unit commitment and conditional prices in SciPy and HiGHS, about 45 minutes."
   after: [SB2, M2, A5, A6, A9]
+  scales: [S2]
 # SB4 and C4, builder learn-w6-h (wave W6), on engine E4; A20 and A21 join C4's `after` at integration (learn-w6-b)
 - kind: lesson
   id: sb4-pathway-explorer
@@ -1413,6 +1516,7 @@
   outcome: "Run a national pathway model, read what its budget and cap cost and what their duals say, and tell which results survive a shock, myopic decisions and a full year of hours."
   teaches: [national pathway model, cumulative carbon budget, import-share cap, perfect and myopic foresight, shocks and re-planning, representative slices against full years]
   after: [M3]
+  scales: [S4]
 - kind: lesson
   id: c4-prairieland-2050
   code: C4
@@ -1431,6 +1535,7 @@
   teaches: [capstone policy brief, stress tests against shocks, cumulative budgets in practice, screening affordability, a just transition in numbers, uncertainty in a recommendation]
   lab: "M13's notebook, section 8: your pathway in SciPy and HiGHS, part of the hand-in (about 40 of the 240 minutes)."
   after: [SB4, M13, A20, A21, A12]
+  scales: [S4]
 # ---------- the Modeler checkpoint (curriculum v2 §3.3), wave W2
 - kind: lesson
   id: ck-m-unseen-problem
@@ -1464,6 +1569,7 @@
   outcome: "Turn a vague concern into a typed question with an audience, a metric with units, a counterfactual, a scale and boundary, and a falsification statement."
   after: [13, A22]
   next: R10
+  scales: [S0, S1, S2, S3, S4]
 - kind: lesson
   id: r02-literature
   code: R2
@@ -1481,6 +1587,7 @@
   does: "Build a search string block by block against a dated OpenAlex snapshot; snowball backward and forward from one review; code four papers into a twelve-paper concept matrix and spot the empty cell; search it directly; read the closest paper in a first and a second pass."
   after: [R1, N1]
   next: R3
+  scales: [S0, S1, S2, S3, S4]
 - kind: lesson
   id: r03-system-and-method
   code: R3
@@ -1498,6 +1605,7 @@
   outcome: "Choose the scale, boundary, time step, horizon and method family for a question, and defend the method against two alternatives, one from another family."
   after: [R1, F1]
   next: R4
+  scales: [S0, S1, S2, S3, S4]
 - kind: lesson
   id: r04-data
   code: R4
@@ -1515,6 +1623,7 @@
   does: "Clean SPP's raw 2025 hourly file by choosing a time base, a spike rule, a frozen-reading rule and a fill method; watch four reported numbers move with each choice; sort eight data sources by licence; pick coordinate systems for a spatial layer; write the data note."
   after: [R3, B2]
   next: R5
+  scales: [S0, S1, S2, S3, S4]
 - kind: lesson
   id: r05-build-validate
   code: R5
@@ -1533,6 +1642,7 @@
   does: "Find five planted bugs in a one-day battery study (a unit error, a sign flip, a free lunch, a missing rule, a leaked future), each with a named check and a real solver; match a benchmark worked by hand; validate the day-before forecast against measured data and check one input; see why a clean clone fails, rerun it for real in the notebook and write a verification log."
   after: [R4, M1, K8]
   next: R6
+  scales: [S0, S1, S2, S3, S4]
 - kind: lesson
   id: r06-uncertainty-properly
   code: R6
@@ -1550,6 +1660,7 @@
   outcome: "Classify the uncertainties of a study, choose a defensible treatment for each, and report the result as a range that a paper, a decision-maker and the public can each read correctly."
   after: [M7, M8]
   next: R7
+  scales: [S0, S1, S2, S3, S4]
 # R7, builder learn-w5-c (wave W5)
 - kind: lesson
   id: r07-cost-carbon-properly
@@ -1568,6 +1679,7 @@
   outcome: "Find and fix the four most common cost-and-carbon flaws in a study, recompute its conclusion on one boundary against a stated counterfactual, and write an audit note that names whose cost each number is."
   after: [A1, A11, M11]
   next: R8
+  scales: [S0, S1, S2]
 - kind: lesson
   id: r08-communicating
   code: R8
@@ -1585,6 +1697,7 @@
   outcome: "Show a result so that its readers see its limits: an honest key figure, findings with their conditions, a briefing a decision-maker can act on, and a public summary of at most 150 words."
   after: [R6]
   next: R9
+  scales: [S0, S1, S2, S3, S4]
 - kind: lesson
   id: r09-integrity-stakeholders
   code: R9
@@ -1602,6 +1715,7 @@
   does: "Sort ten practices by the norm they serve; work through six dilemmas (a funder's headline, a convenient scenario, a co-author's data, a community meeting, a survey without consent, an error after publication); map who the study affects; write an integrity statement."
   after: [R1]
   next: CR
+  scales: [S0, S1, S2, S3, S4]
 - kind: lesson
   id: r10-question-studio
   code: R10
@@ -1619,6 +1733,7 @@
   outcome: "Generate a research question of your own and test it for rigour and realism before you take it to a mentor."
   after: [R1, F1]
   next: R2
+  scales: [S0, S1, S2, S3, S4]
 
 # X6, builder learn-w7-a (wave W7): side-topic shelf, D1; method-neutral
 - kind: lesson
@@ -1636,6 +1751,7 @@
   does: "Match six of Prairie City's questions about a heat-pump programme to six methods; open each method to see what it gives a model and cannot tell; mark which involve people as participants; then test whether a survey difference shows a programme's effect."
   outcome: "Say which social-science method answers which kind of question, what each can and cannot tell a modeller, why research with people needs consent and review first, and why a difference between joiners and others is not by itself an effect."
   after: [A13]
+  scales: [S3]
 # CK-R and CR, builder learn-w7-b (wave W7). CK-R's curriculum prerequisites are R8 and R9 (§3.3). CR's are R10, R2, R5,
 # R6, R7, R8, R9 and CK-M, plus one scale route (track:S0 to track:S4: a model lab and its capstone), which `after`
 # cannot express: CR's page says it and shows the reader's route. CR is a capstone without a sandbox: the study runs in
@@ -1670,6 +1786,7 @@
   teaches: [research proposals, research tracks, milestones, reproducible repositories, six-page papers, posters, self-assessment against a rubric]
   after: [R10, R2, R5, R6, R7, R8, R9, CK-M]
   next: CK-R
+  scales: [S0, S1, S2, S3, S4]
 # ---------- research case files (curriculum v2 §13; Henry approved every excerpt sentence on 2026-11-03,
 # reports/learn/excerpts_for_approval.md; live from wave W2; tier confirmed by the coordinator)
 - kind: lesson
@@ -1687,6 +1804,7 @@
   outcome: "Say which question a levelized cost answers and which a system's net cost answers, and find where they disagree."
   teaches: [levelized cost against system cost, average and marginal tests, reading a published optimization study]
   after: [7]
+  scales: [S0]
 - kind: lesson
   id: cf6-shifting-load-to-clean-hours
   code: CF6
@@ -1702,6 +1820,7 @@
   outcome: "Tell an average emission factor from a marginal one, and say when moving use to another hour lowers what the plants emit."
   teaches: [average and marginal emission factors, load shifting, attributional and consequential accounting]
   after: [12]
+  scales: [S2]
 - kind: lesson
   id: cf7-cost-of-waiting
   code: CF7
@@ -1717,6 +1836,7 @@
   outcome: "Price a delay in present value for each party, and tell a transfer between accounts from a real saving."
   teaches: [present value of a delay, private ratepayer and social accounts, large-load tariffs]
   after: [8]
+  scales: [S2]
 # CF1, builder learn-w3-b (wave W3): a draft in learn/_drafts/ until its review fixes are done (Henry approved E8 on
 # 2026-11-03); tier to be confirmed by the coordinator
 - kind: lesson
@@ -1734,6 +1854,7 @@
   outcome: "Say how on-site energy and an hourly energy balance enter a location decision, and why a site with stronger wind and sun can win despite higher shipping costs."
   teaches: [facility location with on-site energy, hourly energy balance and grid trade, reading a published optimization model]
   after: [10]
+  scales: [S1]
 
 # ---------- sandboxes and capstones (curriculum v2 §16.3, §16.4, §7.9; wave W3). SB0 runs engine E0
 # (assets/learn/components/engine-e0.js); C0 is built on it. Prerequisites A1 and F4 (curriculum §7.9) join C0's `after`
@@ -1755,6 +1876,7 @@
   teaches: [sizing equipment behind one meter, hourly operation as a linear program, net present value of a plan, what one site cannot do alone]
   after: [9]
   next: C0
+  scales: [S0]
 - kind: lesson
   id: c0-behind-one-meter
   code: C0
@@ -1774,6 +1896,7 @@
   teaches: [a recommendation defended with NPV and CO₂, one-at-a-time sensitivity, stating a model's limits, what one site cannot do alone]
   lab: "the M4 notebook: power, hydrogen and heat in one linear program, about 45 minutes."
   after: [9, A1, F4, SB0]
+  scales: [S0]
 
 # ---------- sandboxes and capstones (curriculum v2 §16.3, §16.4, §7.9; wave W3)
 - kind: lesson
@@ -1792,6 +1915,7 @@
   teaches: [one-line diagram, islanding, load priorities in an outage, outage scenarios, host-feeder limits, ownership and cost of capital]
   does: "One-line diagram, islanding, outage scenarios, load priorities, host-feeder limits and ownership models, on engine E1: a small mixed-integer program."
   after: [9]
+  scales: [S1]
 - kind: lesson
   id: c1-keep-the-campus-running
   code: C1
@@ -1810,6 +1934,7 @@
   teaches: [capstone plan and note, cost and unserved critical load on one boundary, ownership and cost of capital, sensitivity to outage length]
   does: "Size Prairie Campus's microgrid (solar, battery, generator, load priorities) to keep power to the hospital, its water and heating plant and the dormitories through a three-day outage; respect the host feeder's limits; compare utility, co-op and community ownership; report cost, unserved critical load and emissions."
   after: [SB1, F7, A14, A4]
+  scales: [S1]
 
 # CF3, builder learn-w4-d (wave W4); Henry approved E11 on 2026-11-05; live after its review fixes (learn-w4-fix-d,
 # 2026-11-05); Analyst tier, as CF1 and CF2 (coordinator, 2026-11-05)
@@ -1828,6 +1953,7 @@
   outcome: "Say how a two-stage stochastic program sizes equipment before renewable build-out is known, and why its plan differs from a plan for the average future."
   teaches: [sizing before uncertainty resolves, scenarios with chances, reading a published stochastic planning model]
   after: [12]
+  scales: [S2]
 # CF4, builder learn-w6-cf4 (wave W6); review fixes on learn-w6-cf4; went live on 2026-11-07 after Henry approved E15 and
 # its revisions after review (register, "W6 sources"; DECISIONS 2026-11-07): framing C; analyst tier, as the other case files
 - kind: lesson
@@ -1845,6 +1971,7 @@
   outcome: "Say what an hourly dispatch model and a lifetime cash flow each add when judging hydrogen at an existing plant, why the plant's own capital drops out, and which assumptions a result rests on."
   teaches: ["hydrogen at an existing plant", "reserves from an electrolyzer's headroom", "sunk costs", "price-taking", "reading a published dispatch and cash-flow study"]
   after: [7]
+  scales: [S4]
 # CF5, builder learn-w5-f (wave W5); review fixes on learn-w5-cf5; went live on 2026-11-07 after Henry approved E14
 # (register, "W5 sources"; DECISIONS 2026-11-07): framing C, E14.16b; analyst tier (coordinator, 2026-11-06)
 - kind: lesson
@@ -1862,6 +1989,7 @@
   outcome: "Say which plant streams, loads and alternatives a cogeneration study must keep inside its boundary to price the steam it sends to cooling."
   teaches: [system boundaries, pricing a diverted by-product, cogeneration, absorption and electric chillers]
   after: [7]
+  scales: [S1]
 # CF8, builder learn-w4-e (wave W4): a draft in learn/_drafts/ until its review fixes are done (Henry approved E12 and E13
 # on 2026-11-05)
 - kind: lesson
@@ -1879,6 +2007,7 @@
   outcome: "Say why a measured power curve is a band, what a theoretical curve adds when records are few, and why the verdict depends on the score."
   teaches: [probabilistic power curves, multi-fidelity data, from a power-curve band to a capacity-factor band]
   after: [5]
+  scales: [S0]
 # ---------- the math toolbox (curriculum v2 K1-K8; guided minutes; K4 and K7 built in wave W1; K1, K2, K3, K5, K8 in W2)
 - kind: tool
   id: k01-units

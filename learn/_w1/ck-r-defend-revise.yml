@@ -4,8 +4,19 @@ lesson: CK-R
 requests:
   - "CK-R uses the shared runner unchanged: gateAll, the late-answer rule (late: practice), openFirst not-right, and its own level, describe and summary. The worked review, response and revision are LX.Exemplars inside the gated solution; a key other than weak or good ('prof') draws the neutral card, with its own lead word."
   - "The fictional co-op study (Prairie Valley Co-op, 112 irrigation pumps, a night-pumping tariff) is new in W7 and lives only in ck-r-defend-revise.json; its numbers are illustrative, not simulated."
-  - "Fix after the Codex review (2026-11-07): task 1 first. CK-R's view swaps a marked task's question for a notice until task 1 is submitted, and keeps task 1's text read-only afterwards, on the runner's 'layout' event and its markup (.lx-ck-card, .lx-ck-q, .lx-ck-body, .lx-ck-sol). A shared option in checkpoint.js would be cleaner: opensAfter: {taskId: [ids]} (a task shown shut until its prerequisites are answered) and freeze: [ids] (a written task read-only once submitted)."
 glossary:
+  - term: Software environment
+    id: software-environment
+    lesson: K8
+    def: "The language, packages and versions a program runs with, built from a lock file so that a rerun uses the same ones."
+  - term: Audit trail
+    id: audit-trail
+    lesson: R5
+    def: "A record that lets someone follow a qualitative analysis from its raw material, such as interview notes, to each finding."
+  - term: Matched comparison
+    id: matched-comparison
+    lesson: M14
+    def: "A comparison that pairs each unit that got the change with one that did not but was similar before it."
   - term: Clean clone
     id: clean-clone
     lesson: K8

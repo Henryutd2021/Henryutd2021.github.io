@@ -107,6 +107,12 @@
   "lesson": "A11",
   "href": "a11-lca-nexus.html"
  },
+ "audit-trail": {
+  "term": "Audit trail",
+  "short": "A record that lets someone follow a qualitative analysis from its raw material, such as interview notes, to each finding.",
+  "lesson": "R5",
+  "href": "r05-build-validate.html"
+ },
  "agc": {
   "term": "Automatic generation control (AGC)",
   "short": "The grid operator's computer system that raises or lowers plants over minutes to bring frequency back to 60 Hz.",
@@ -2057,6 +2063,12 @@
   "lesson": "A10",
   "href": "a10-emissions-questions.html"
  },
+ "matched-comparison": {
+  "term": "Matched comparison",
+  "short": "A comparison that pairs each unit that got the change with one that did not but was similar before it.",
+  "lesson": "M14",
+  "href": "m14-did-it-work.html"
+ },
  "matrix": {
   "term": "Matrix",
   "short": "A table of numbers in rows and columns; in a model, one row per rule and one column per decision.",
@@ -3166,6 +3178,12 @@
   "short": "Finding papers from one you already have: backward through its references, forward through the works that cite it.",
   "lesson": "R2",
   "href": "r02-literature.html"
+ },
+ "software-environment": {
+  "term": "Software environment",
+  "short": "The language, packages and versions a program runs with, built from a lock file so that a rerun uses the same ones.",
+  "lesson": "K8",
+  "href": "k08-git-notebooks.html"
  },
  "solver": {
   "term": "Solver",
