@@ -52,4 +52,8 @@
 .e3-say.bad { background: var(--lx-bad-soft); border-left: 4px solid var(--lx-bad); }
 .e3-say.good { background: var(--lx-good-soft); border-left: 4px solid var(--lx-good); }
 .e3-says { display: grid; gap: 6px; }
+.e3-keys { margin: .3rem 0 0; display: grid; gap: 4px; font-size: 13.5px; color: var(--lx-ink-2); max-width: 75ch; }
+.e3-keys p { margin: 0; }
+.e3-keys b { font-weight: 600; color: var(--lx-ink); }
+.e3-hh-off { margin: 0 !important; padding: 8px 12px; border-radius: 10px; background: var(--lx-warn-soft, var(--lx-surface-2)); }
 .e3-notes { margin: .3rem 0 0; padding-left: 1.1rem; display: grid; gap: 2px; font-size: 13.5px; color: var(--lx-ink-2); }

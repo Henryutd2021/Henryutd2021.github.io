@@ -40,8 +40,8 @@
   }
   var page = { says: says, pick: pick, kilo: kilo, mil: mil, pct1: pct1,
     GROUPS: [{ title: "Buildings", fields: ["hp", "ret"], color: "var(--lx-cc)", hint: "A [[heat-pump|heat pump]]'s [[coefficient-of-performance|COP]] falls on cold nights; a retrofit cuts the heat a building needs." },
-      { title: "District heat (dense core)", fields: ["dh", "dhp", "sto"], color: "var(--lx-tier-4)", hint: "A hot-water network for part of the core: its plant's heat pump, a gas boiler for the rest, and a heat store to shift the plant's power." },
-      { title: "Cars", fields: ["ev", "evm"], color: "var(--lx-demand)", hint: "Managed charging moves each day's charge to other hours of the same day." },
+      { title: "District heat (dense core)", fields: ["dh", "dhp", "sto"], color: "var(--lx-tier-4)", hint: "A hot-water network for part of the core: its plant's heat pump, a heat store, and a gas boiler for the rest, assumed to exist already (its fuel counts, not its construction)." },
+      { title: "Cars", fields: ["ev", "evm"], color: "var(--lx-demand)", hint: "[[managed-charging|Managed charging]] moves each day's charge to any hours of that day, at most a sixth in one hour. It assumes cars are plugged in at home or work when needed." },
       { title: "Local supply and storage", fields: ["pv", "bat"], color: "var(--lx-solar)", hint: "Rooftop solar a district cannot use is spilled; batteries sit at the substations." },
       { title: "The grid", fields: ["up", "upc"], color: "var(--lx-bad)", hint: "Each district's [[substation|substation]] carries at most its limit each hour, unless the plan buys an upgrade." },
       { title: "Assumptions you can change", fields: ["save", "rc", "dhc", "rule", "rec"], color: "var(--lx-ink-2)", hint: "Set for teaching. \"Who adopts first\" and how shared costs are recovered move only the household table ([[lesson:a13-fairness-jobs|A13]])." }] };
@@ -93,25 +93,27 @@
       var c1 = H("div", { class: "lx-xcard lx-sb-chart" }, res); H("h3", { text: "One district's day against its substation" }, c1);
       day = U.DayView(c1, P);
       day.set(R, page.pick(R));
-      H("p", { class: "lx-hint", html: LX.rich("Each hour's flow through the substation may not pass its limit (a linearized feeder limit). The dashed line is what the district used; the gap is its rooftop solar and batteries. Hourly schedules can tie: the chart shows the one the [[tie-rule|tie rule]] picks.") }, c1);
+      U.keys(c1, [["Read the lines", "the solid line is what the district bought through its substation; the dashed line is what it used. The gap is its rooftop solar and batteries."],
+        ["The limit", "each hour's flow may not pass it (a [[linearized-feeder-limit|linearized feeder limit]]) unless the plan buys an upgrade."],
+        ["Ties", "hourly schedules can cost the same: the chart shows the one the [[tie-rule|tie rule]] picks."]]);
       var c2 = H("div", { class: "lx-xcard lx-sb-chart" }, res); H("h3", { text: "What 1 MW more room is worth, from the LP" }, c2);
-      U.table(c2, ["District", "Busiest hour", "Limit", "Upgrade bought", "1 MW more room saves a year", "Hours it binds"], R.dist.map(function (d) {
+      U.table(c2, ["District", "Busiest hour", "Limit", "Upgrade bought", "1 MW more room saves a year", "Hours a year at the limit"], R.dist.map(function (d) {
         return [d.label, kilo(d.peak) + " MW", kilo(d.limit) + " MW", kilo(d.upg) + " MW", d.value == null ? "–" : "$" + kilo(d.value), kilo(d.bindHours)];
       }), "sb3-val");
-      H("p", { class: "lx-hint", html: LX.rich("The value is the substation row's [[shadow-price|dual]], summed over the hours it binds: a marginal value under stated assumptions (this plan, 2025's prices, the eight days), not a market price. Where the plan buys an upgrade it equals the upgrade's yearly cost per MW.") }, c2);
+      U.keys(c2, [["The value", "the substation row's [[shadow-price|dual]], summed over the year: what one more MW of room would save."],
+        ["Its assumptions", "this plan, 2025's prices and the eight days: a marginal value, not a market price."],
+        ["With an upgrade", "it equals the upgrade's yearly cost per MW."],
+        ["Hours at the limit", "representative hours with the flow at the limit (plus any upgrade), each counted for the days its day stands for."]]);
       var c3 = H("div", { class: "lx-xcard lx-sb-chart" }, res); H("h3", { text: "Yearly cost and CO₂ against 2025" }, c3);
       U.costTable(c3, R);
       var co2 = R.acc.co2, co20 = R.base.acc.co2;
       U.table(c3, ["CO₂, t a year", "2025", "Your plan"], [["Electricity bought (eGRID 2023 SPP North, plus 5% losses)", kilo(co20.elec), kilo(co2.elec)], ["Gas, including the network's boiler", kilo(co20.gas + co20.boiler), kilo(co2.gas + co2.boiler)],
         ["Propane", kilo(co20.propane), kilo(co2.propane)], ["Cars' gasoline", kilo(co20.gasoline), kilo(co2.gasoline)], { cls: "e3-tot", cells: ["Total, the three districts", kilo(R.base.acc.co2Hub), kilo(R.acc.co2Hub)] }], "sb3-co2");
-      H("p", { class: "lx-hint", text: "Money in 2025 dollars: energy at Kansas's 2025 prices, equipment and upgrades as yearly payments at 4% real over their lives. CO₂ is location-based and operating only: an annual average grid rate, not the hour's." }, c3);
+      U.keys(c3, [["Money", "2025 dollars: energy at Kansas's 2025 prices, equipment and upgrades as yearly payments at 4% real over their lives."],
+        ["CO₂", "[[location-based|location-based]] and operating only: an annual average grid rate, not the hour's."],
+        ["The year", "eight representative days, weighted to 365: an estimate, not checked against a full year of hours."]]);
       var c4 = H("div", { class: "lx-xcard lx-sb-chart" }, res); H("h3", { text: "Who pays: a screening estimate by household group" }, c4);
-      U.hhTable(c4, R);
-      var ul = H("ul", { class: "e3-notes" }, c4);
-      [R.hh.screening + " Not from the LP: lesson A13's accounting layer after it; an energy model does not produce these outcomes by itself.",
-        "Adopters: " + S.fields.filter(function (f) { return f.id === "rule"; })[0].names[R.sys.rule].toLowerCase() + "; each adopting home changes by its district's average, scaled by its group's use.",
-        "Households pay " + mil(R.hh.cost) + " a year of the upgrades and batteries (their share of the districts' electricity), " + S.fields.filter(function (f) { return f.id === "rec"; })[0].names[R.hh.design].toLowerCase() + "." + (R.hh.dhPrice > 0 ? " District heat is billed at its average cost, $" + kilo(R.hh.dhPrice) + " per MWh of heat." : ""),
-        "Burden = home energy bills ÷ income (DOE LEAD's definition): equipment bought by households and car prices are not in it; motor fuel is shown apart."].forEach(function (t) { H("li", { text: t }, ul); });
+      U.hhTable(c4, R);   // with its assumptions beside it (E3.hhAssume): the rule, what households pay, what is left out
     }
 
     // ---- how the engine works
@@ -119,8 +121,9 @@
     U.hubDiagram(H("div", { class: "lx-xcard" }, x));
     LX.Boundary(H("div", { class: "lx-xcard" }, x), { title: "Where the engine's answer holds",
       holds: ["eight representative days stand for 2025 (weights add to 365), with a cold design day and the summer peak day kept", "each district's substation is one ceiling on each hour's flow (a linearized feeder limit)",
-        "batteries, the heat store and managed charging only shift energy within a day", "2025's prices, people, homes and weather; costs fixed in 2025 dollars, whatever is built"],
-      leaves: ["power flow inside a district: voltage and each feeder's own limit (A17)", "outages and cold snaps colder than the design day", "how fast the plan could be built, and who decides it", "how bills are really set: the household table is a screening estimate"],
+        "batteries, the heat store and managed charging only shift energy within a day", "2025's prices, people and homes; costs fixed in 2025 dollars, whatever is built",
+        "synthetic weather: NOAA's 1991–2020 normals for Wichita on SPP's 2025 days, with a cold design day and a heat wave set for teaching"],
+      leaves: ["a check against a full year of hours or another weather year: the annual numbers are representative-day estimates", "power flow inside a district: voltage and each feeder's own limit (A17)", "outages and cold snaps colder than the design day", "how fast the plan could be built, and who decides it", "how bills are really set: the household table is a screening estimate"],
       source: "Prairie City is fictional; its numbers are illustrative. Prices: EIA, Kansas 2025; 2025 dollars." });
 
     // ---- the first run, once the bench is in view (the solver loads then: about 3.5 MB, once)
