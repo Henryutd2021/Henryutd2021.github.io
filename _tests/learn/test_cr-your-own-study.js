@@ -12,6 +12,9 @@
 //   - the self-check: one well-formed pair of fragments per rubric competence; the whole rubric in the curriculum's words;
 //     the two statuses as curriculum §3.1 states them; the fragments' arithmetic
 //   - the page on a stub document: the plan, the link, the stage ticks, the card from R10, the proposal, the switcher
+//   - after the Codex review (2026-11-07): the cost and CO₂ fragment's arithmetic; the scale pending until the card has
+//     one, and checked in the proposal; a treatment that fits the family; a same-family alternative named as such;
+//     reproduction against replication; glossary marks; one short action per stage, its checks folded
 //   - scope: no nuclear term, no data-center term, no "AI", no deny-listed term; links to learn pages and doi.org only
 // Usage (from the site folder):  node _tests/learn/test_cr-your-own-study.js [--write]
 "use strict";
@@ -107,6 +110,19 @@ ok(new Set(D.tracks.flatMap(t => t.fits)).size >= 8, "the tracks' families toget
 { const st = Object.values(D.studies).join(" "); ok(/model-based/.test(st) && /empirical/.test(st) && /mixed/.test(st), "the exemplar studies span the three tracks");
   const opt = D.exemplars.filter(e => /linear program|optimization/i.test(EXS.plain(e.answers[1]))).length; ok(opt <= 2, "optimization is one family among several in the fragments (" + opt + " of 9 strong fragments name it)"); }
 has("Every track is judged on the same nine competences.", "the same rubric for every track");
+// reproduction against replication (Codex review #10; National Academies 2019)
+{ const e = M.track(D, "empirical");
+  ok(/a reproduction or replication of a published result/.test(e.short) && /rerun with its own data and code \(a computational reproduction\), or tested on new data \(a replication\)/.test(e.builds) && !/data analysis, or replication of a published result"/.test(RAW), "the empirical track tells reproduction (same data and code) from replication (new data)");
+  ok(/<b>Reproducibility:<\/b>/.test(PAGE) && /<b>Replicability:<\/b>/.test(PAGE), "the sources give both definitions"); }
+// glossary marks at first use, rendered (Codex review #8)
+{ const st = M.staticStages(D, P) + M.staticTracks(D, P) + M.staticExemplars(D);
+  ["snowballing", "concept-matrix", "clean-clone", "feeder", "weatherization", "linear-program"].forEach(k => ok(st.includes('data-term="' + k + '"'), "a glossary mark for " + k + " in the page's static text"));
+  ok(!/\[\[/.test(st), "no raw glossary mark in the static blocks"); }
+// one short action per stage; its evidence as a checklist of short items (Codex review #9)
+{ const nw = t => t.replace(/\[\[[a-z0-9-]+\|([^\]]+)\]\]/g, "$1").split(/\s+/).filter(Boolean).length;
+  ok(D.stages.every(s => nw(s.does) <= 20 && Array.isArray(s.done) && s.done.length >= 2 && s.done.every(x => nw(x) <= 14)), "every stage: an action of at most 20 words, two or more checks of at most 14: " + D.stages.filter(s => nw(s.does) > 20 || !s.done.every(x => nw(x) <= 14)).map(s => s.id).join(", "));
+  ok(M.doneList(D.stages[0]) === '<ul class="cr-done-l"><li>Your card passes its eight checks.</li><li>You can say what answer would change your audience\'s decision.</li></ul>', "the checklist's markup");
+  has("Without it, plan with the table below.", "the fallback's hint, split"); }
 
 // ---------------- the plan link and the plan's checks
 {
@@ -121,30 +137,44 @@ has("Every track is judged on the same nine competences.", "the same rubric for 
   ok(S.fields.every(f => SS.TYPES.includes(f.type) && f.type !== "text"), "the link holds choices only: no free-text field");
   ok(SS.decode(S, "#cr-v1-t9-s1-f0-a34-u0-h6-r1-d0").status === "bad" && SS.decode(S, "#cr-v2-t0").status === "newer", "a damaged or newer link is refused");
   const C = (s, card) => M.planChecks(D, Object.assign({}, d, s), F, card || null);
-  ok(C({}).every(c => c.ok), "the default plan passes its four checks");
+  ok(C({}, "S1").every(c => c.ok), "the default plan, with a card at S1, passes its four checks");
+  ok(!C({})[3].ok && /has no scale yet: set it in the card below/.test(C({})[3].why), "a card without a scale: the scale check is to do, not in place (Codex review #5)");
   ok(!C({ alts: ["opt"] })[0].ok && /you have 1/.test(C({ alts: ["opt"] })[0].why), "one alternative: to do");
   ok(!C({ family: "sim", alts: ["sim"] })[0].ok && !C({ family: "sim", alts: ["sim", "opt"] }).some(c => c.id === "alts" && !c.ok), "one alternative is too few; two with one from another family are enough");
   ok(C({ family: "opt", alts: ["opt", "sim"] })[0].ok && !C({ family: "opt", alts: [] })[0].ok, "two alternatives, one from the same family and one from another: in place");
+  ok(M.altName(F, { family: "opt" }, "opt") === "Optimization (another method of the same family, named in the proposal)" && M.altName(F, { family: "opt" }, "sim") === "Simulation", "a same-family alternative is another method of that family, named in the proposal (Codex review #4)");
+  ok(M.noteOf(D, Object.assign({}, d, { alts: ["opt", "sim"] }), {}, F, "").plan.find(r => r.label === "Method").value === "Optimization; alternatives: Optimization (another method of the same family, named in the proposal), Simulation", "the proposal says so too");
+  ok(/name a same-family one exactly/.test(D.fields.find(f => f.key === "method").hint), "the proposal's method field asks for that method by name");
   ok(!C({ track: "empirical", family: "opt" })[1].ok && /unusual for an empirical study/.test(C({ track: "empirical", family: "opt" })[1].why), "optimization on the empirical track: to do, said why");
   ok(C({ track: "mixed", family: "qual", alts: ["stat", "abm"] })[1].ok, "qualitative methods fit the mixed track");
-  ok(!C({ unc: "oat" })[2].ok && /Proficient level asks for scenarios or a global sensitivity analysis/.test(C({ unc: "oat" })[2].why) && D.uncertainty.filter(u => u.id !== "oat").every(u => C({ unc: u.id })[2].ok), "one input at a time is below Proficient; every other treatment is at it");
+  ok(!C({ unc: "oat" })[2].ok && /Proficient level asks for scenarios or a global sensitivity analysis/.test(C({ unc: "oat" })[2].why), "one input at a time is below Proficient");
+  // a treatment counts only where it fits the method family (Codex review #6): every treatment against every family
+  { const bad = []; D.uncertainty.filter(u => u.id !== "oat").forEach(u => D.families.forEach(f => { if (C({ unc: u.id, family: f })[2].ok !== u.fits.includes(f)) bad.push(u.id + "/" + f); }));
+    ok(!bad.length && D.uncertainty.filter(u => u.ok).every(u => u.fits.length && u.fits.every(f => D.families.includes(f))), "each treatment fits its listed families and no others: " + bad.join(", ")); }
+  ok(!C({ unc: "tri", family: "opt" })[2].ok && /Triangulation suits Qualitative methods and Mixed methods, not Optimization/.test(C({ unc: "tri", family: "opt" })[2].why), "triangulation on an optimization study: to do, said why");
+  ok(C({ unc: "tri", family: "qual" })[2].ok && C({ unc: "ci", family: "stat" })[2].ok && C({ unc: "scen", family: "opt" })[2].ok && !C({ unc: "ci", family: "opt" })[2].ok, "triangulation fits qualitative work, intervals statistics, scenarios optimization");
+  { const mx = M.noteOf(D, Object.assign({}, d, { track: "mixed", family: "mixed", unc: "tri" }), {}, F, "").sensitivity, mq = M.noteOf(D, Object.assign({}, d, { track: "mixed", family: "mixed", unc: "mc" }), {}, F, "").sensitivity;
+    ok(/the numbers need a range too/.test(mx) && /qualitative findings need triangulation too/.test(mq) && !/Mixed study/.test(M.noteOf(D, d, {}, F, "").sensitivity), "a mixed study's proposal names the treatment of its other part"); }
   ok(!C({}, "S3")[3].ok && C({}, "S1")[3].ok, "the card's scale against the plan's");
   // the proposal
   const card = { question: "Did homes weatherized in 2023 use less gas in the next two winters than similar homes still on the waiting list?", type: "evaluative", audience: "the city's housing office", metric: "winter gas use per home, adjusted for the weather", units: "kWh", counterfactual: "similar homes on the waiting list", scale: "S3", boundary: "homes' gas, not electricity", wrong: "the waiting-list homes' use fell as much", uncertainty: "whether the waiting-list homes are similar" };
   ok(QC.check(card).all, "a full card passes the card's eight checks");
   const link = "https://henryutd2021.github.io/learn/cr-your-own-study.html#" + h;
-  const n = M.noteOf(D, d, card, F, link), n0 = M.noteOf(D, d, {}, F, link);
+  const d3 = Object.assign({}, d, { scale: "S3" });   // the plan at the card's scale
+  const n = M.noteOf(D, d3, card, F, link), n0 = M.noteOf(D, d, {}, F, link);
   const words = {}; D.fields.forEach(f => { words[f.key] = Array(f.min + 4).fill("word").join(" ") + "."; });
   const c1 = RN.checks(n, words, D.fields, M.proposalChecks()), c0 = RN.checks(n0, {}, D.fields, M.proposalChecks());
-  ok(c1.all && c1.total === 11, "a full proposal passes all eleven checks (" + c1.pass + " of " + c1.total + ")");
-  ok(c0.pass === 3 && c0.items.filter(i => !i.ok).map(i => i.id).join() === "field-why,field-known,field-method,field-data,field-check,field-leaves,field-integrity,card", "an empty proposal: the link, the alternatives and one page in place; the seven fields and the card to do");
+  ok(c1.all && c1.total === 12, "a full proposal passes all twelve checks (" + c1.pass + " of " + c1.total + ")");
+  ok(c0.pass === 3 && c0.items.filter(i => !i.ok).map(i => i.id).join() === "field-why,field-known,field-method,field-data,field-check,field-leaves,field-integrity,card,scale", "an empty proposal: the link, the alternatives and one page in place; the seven fields, the card and its scale to do");
+  { const cm = RN.checks(M.noteOf(D, d, card, F, link), words, D.fields, M.proposalChecks());
+    ok(cm.pass === 11 && cm.items.filter(i => !i.ok).map(i => i.id).join() === "scale", "a full card at S3 in a plan at S1: the proposal's scale check fails, alone (Codex review #5)"); }
   const t1 = RN.compose(n, words, D.fields, { format: "text", code: "CR", date: "2026-11-07" });
   ok(RN.countWords(t1) <= RN.PAGE_WORDS, "a proposal with every part written at its minimum fits one page (" + RN.countWords(t1) + " words)");
-  ok(t1.includes("Question: " + card.question) && t1.includes("Scale route: S1 microgrid and community: model lab M5, capstone C1") && t1.includes("Milestones: the one-page proposal by week 2; CK-R by week 4; the paper and the poster by week 5; the rubric sheet by week 5"), "the proposal's table: the card, the route and the milestones from the timeline");
+  ok(t1.includes("Question: " + card.question) && t1.includes("Scale route: S3 city and region: model lab M12, capstone C3") && t1.includes("Milestones: the one-page proposal by week 2; CK-R by week 4; the paper and the poster by week 5; the rubric sheet by week 5"), "the proposal's table: the card, the route and the milestones from the timeline");
   ok(t1.includes("Plan link: " + link) && !/word word/.test(link) && !t1.includes("Warning"), "the link carries the choices; no warning line on a proposal");
   ok(t1.includes("Planned: scenarios for the uncertainties classified as scenario or deep") && t1.includes("Method: Optimization; alternatives: Simulation, Agent-based modelling"), "the planned treatment and the method with its alternatives");
   ok(!RN.CLAIMS.test(t1.replace(/stored/g, "")) , "the proposal claims nothing is saved or sent");
-  const nq = M.noteOf(D, Object.assign({}, d, { alts: ["opt"] }), card, F, link); ok(!RN.checks(nq, words, D.fields, M.proposalChecks()).all, "too few alternatives fail the proposal's check too");
+  const nq = M.noteOf(D, Object.assign({}, d3, { alts: ["opt"] }), card, F, link); ok(!RN.checks(nq, words, D.fields, M.proposalChecks()).all, "too few alternatives fail the proposal's check too");
 }
 has("Your plan stays in this browser and in its link.", "the data note on where the plan stays");
 ok(/note: "The link holds your choices only, not your words\."/.test(JS), "the plan link's note says it holds choices only");
@@ -162,6 +192,16 @@ ok(/note: "The link holds your choices only, not your words\."/.test(JS), "the p
 ok(M.msKey(D) === "Underlined: a stage that ends on a milestone (3, the one-page proposal; 7, CK-R; 8, the paper and the poster; 9, the rubric sheet).", "the strip's key names the milestones");
   const trust = EXS.plain(D.exemplars.find(e => e.comp === "trust").answers[1]);
   ok(trust.includes("2.81 MW, against the model's 2.76 MW: 1.8% low") && ((2.81 - 2.76) / 2.81 * 100).toFixed(1) === "1.8" && (2.81 - 2.76) / 2.81 < 0.05, "the log's validation: (2.81 − 2.76) ÷ 2.81 = 1.8%, inside 5%");
+  // the cost and CO₂ fragment (Codex review #1, #2): the saving is the bill's fall less the battery's annualized cost; the
+  // CO₂ from the energy bought and its hourly factors, the battery's losses included
+  { const acc = EXS.plain(D.exemplars.find(e => e.comp === "accounting").answers[1]), accN = EXS.marks(D.exemplars.find(e => e.comp === "accounting").answers[1]).map(m => m.note).join(" ");
+    const bill = 250000, ann = 160000, out = 1800, inn = 2000, fe = 0.50, fn = 0.39;
+    ok(acc.includes("the co-op's power bill falls $250,000 a year; less the battery's annualized cost, $160,000, its yearly cost falls $90,000") && bill - ann === 90000 && !/power bill less the battery/.test(acc), "cost: $250,000 − $160,000 = $90,000, the bill's fall less the battery's yearly cost");
+    ok(acc.includes("1,800 × 0.50 − 2,000 × 0.39 = 900 − 780 = 120 t") && Math.round(out * fe) === 900 && Math.round(inn * fn) === 780 && Math.round(out * fe - inn * fn) === 120 && out / inn === 0.9 && /10% losses/.test(accN) && /200 MWh lost would add CO₂ instead/.test(accN) && inn - out === 200, "CO₂: 1,800 × 0.50 − 2,000 × 0.39 = 120 t, with 10% (200 MWh) lost");
+    ok(/120 t a year less, location-based with the grid's hourly average factors/.test(acc), "the CO₂ says which factors make it a saving"); }
+  // the other numbers are assumed for the example, and said so (Codex review #3)
+  ok(/its numbers are assumed, not computed/.test(M.exOpts(D, 4).note) && TX.includes("Every number in the weak and strong fragments: assumed for the example, not computed."), "the fragments' numbers are labelled assumed, not computed");
+  ok(/we treat a heat wave hotter than any on record as a stress scenario, because we cannot defend a probability for it/.test(EXS.plain(D.exemplars.find(e => e.comp === "uncertainty").answers[1])), "deep uncertainty from the evidence, not the record alone (Codex review #7)");
   const pos = EXS.plain(D.exemplars.find(e => e.comp === "positioning").answers[1]);
   ok(/14 studies/.test(pos) && 14 >= 12 && /9 use billing data and 3 compare/.test(pos), "the gap's matrix holds 14 sources, more than the 12 Proficient asks for");
   const weakPos = EXS.marks(D.exemplars.find(e => e.comp === "positioning").answers[0])[0].note;
@@ -203,11 +243,14 @@ ok(M.msKey(D) === "Underlined: a stage that ends on a milestone (3, the one-page
   ok(T().includes("Model-based track: about 30 hours (20 to 40). At 6 hours a week, about 5 weeks (4 to 7)."), "the scene states the default plan");
   ok($$(".cr-seg").length === 9 && $$(".cr-stage").length === 9, "nine segments and nine stage cards");
   ok(/The nine stages in order, sized by their typical hours: 1 Question, 1.5 h; 2 Literature, 5 h/.test($(".cr-strip").getAttribute("aria-label")), "the strip's text alternative names each stage and its hours");
-  ok(/4 of 4 in place/.test(text(live.textContent)), "the default plan's checks: 4 of 4");
+  ok(/3 of 4 in place/.test(text(live.textContent)) && /Your question card has no scale yet/.test(text(live.textContent)), "the default plan's checks with an empty card: 3 of 4, the scale pending");
+  ok($$(".cr-stage details.cr-done-when").length === 9 && /Done when: 2 checks/.test($$(".cr-stage")[0].textContent) && ($$(".cr-stage")[0].querySelector("details.cr-done-when div").innerHTML.match(/<li>/g) || []).length === 2, "each stage card: one action, its checks folded in a checklist");
+  ok(/Another Optimization method \(name it in the proposal\)/.test(text(live.textContent)), "the chosen family, as an alternative, is another method of it");
   // a track change moves the family to the track's usual one, and the plan's link follows
   live.querySelectorAll(".lx-choice").filter(b => /Empirical/.test(b.textContent))[0].click();
   ok(T().includes("Empirical track"), "the empirical track is drawn");
   ok(/Statistics and econometrics, the track's usual one/.test(text(live.textContent)), "the family follows the track, and the page says so");
+  ok(/Another Statistics and econometrics method/.test(text(live.textContent)) && !/Another Optimization method/.test(text(live.textContent)), "the same-family alternative's label follows the family");
   ok($$(".cr-stage")[2].textContent.includes("M14"), "the empirical track's method stage names M14");
   // a stage ticked done is kept in the plan, and drawn
   $$(".cr-tick input")[0].checked = true; $$(".cr-tick input")[0].fire("change");
@@ -221,7 +264,9 @@ ok(M.msKey(D) === "Underlined: a stage that ends on a milestone (3, the one-page
   ok(/Your question card at the plan's scale/.test(text(live.textContent)) && /Your card says S0; the plan says S1/.test(text(live.textContent)), "the card's scale (S0) against the plan's (S1): said");
   const note = text($("#cr-note").textContent);
   ok(note.includes("Research proposal: an empirical study at S1") && note.includes(r10.question), "the proposal's preview: the heading and the card's question");
-  ok(/of 11 parts in place/.test(note), "the proposal's eleven checks are listed");
+  ok(/of 12 parts in place/.test(note), "the proposal's twelve checks are listed");
+  live.querySelectorAll(".lx-choice").filter(b => /Mixed/.test(b.textContent))[0].click();
+  ok(/Mixed study: the qualitative findings need triangulation too/.test(text(live.textContent)), "a mixed plan says how its other part is treated");
   // the exemplars: nine buttons, one pair at a time
   const exb = $("#exemplars").querySelectorAll(".cr-ex-pick button");
   ok(exb.length === 9 && exb.map(b => b.textContent).join() === RB.COMPETENCES.map(c => c.label).join(), "the switcher: one button per competence, in the rubric's words");
