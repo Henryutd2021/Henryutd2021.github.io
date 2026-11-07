@@ -303,7 +303,7 @@ Domain Knowledge
 - [Aug 20, 2023]{.cv-date} [*A Multi-fidelity Gaussian Process Regression Method for Probabilistic Wind Farm Power Curve Estimation*]{.cv-lt} [ASME 2023 IDETC/CIE, Boston, Massachusetts, USA]{.cv-ld}
 - [Oct 31, 2023]{.cv-date} [*Economic Feasibility and Decarbonization Potential of Hybrid Wind and Hydrogen Systems in Texas*]{.cv-lt} [NAWEA/WindTech 2023 Conference, Denver, Colorado]{.cv-ld}
 - [Nov 1, 2024]{.cv-date} [*Economic Feasibility and Decarbonization Potential of Hybrid Renewables and Hydrogen Systems in Texas*]{.cv-lt} [NAWEA/WindTech 2024 Conference, Rutgers University, New Brunswick, New Jersey]{.cv-ld}
-- [Oct 12, 2026]{.cv-date} [*Quantifying the Cost of Delayed Grid Energization (CoDE) for AI Data Centers*]{.cv-lt} [2026 North American Power Symposium (NAPS), Michigan Technological University, Houghton, Michigan]{.cv-ld}
+- [Oct 12, 2026]{.cv-date} [*Quantifying the Cost of Delayed Energization (CoDE) for AI Data Centers*]{.cv-lt} [2026 North American Power Symposium (NAPS), Michigan Technological University, Houghton, Michigan]{.cv-ld}
 :::
 :::
 

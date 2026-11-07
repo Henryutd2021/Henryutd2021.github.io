@@ -137,10 +137,11 @@ body-classes: "page-inner page-publications"
 <li class="pub" data-type="conference" data-year="2026">
 <div class="pub-badge"><span class="abbr pt-conference">NAPS 2026</span></div>
 <div class="pub-main">
-<div class="pub-title">Quantifying the Cost of Delayed Grid Energization (CoDE) for AI Data Centers</div>
+<div class="pub-title">Quantifying the Cost of Delayed Energization (CoDE) for AI Data Centers</div>
 <div class="pub-authors"><span class="me">H. Li</span>, B. She</div>
 <div class="pub-venue"><em>2026 North American Power Symposium (NAPS)</em>, 2026. <span class="pub-tag tag-ok">Accepted</span></div>
 <div class="pub-links">
+<a class="btn-xs" href="files/papers/li2026code.pdf" title="Accepted manuscript, © IEEE (IEEE author posting policy); accepted for NAPS 2026, the published version will be on IEEE Xplore">Accepted manuscript (PDF)</a>
 <a class="btn-xs" href="https://github.com/Henryutd2021/code-delayed-energization">Code</a>
 <a class="btn-xs" href="projects/data-center-delay-economics.html">Project</a>
 <button type="button" class="btn-xs bib-toggle" aria-expanded="false" aria-controls="bib-li2026code">Bib</button>
@@ -148,7 +149,7 @@ body-classes: "page-inner page-publications"
 <div class="pub-bib" id="bib-li2026code" hidden>
 <button type="button" class="bib-copy"><i class="bi bi-clipboard" aria-hidden="true"></i><span>Copy</span></button>
 <pre><code>@inproceedings{li2026code,
-  title     = {Quantifying the Cost of Delayed Grid Energization ({CoDE}) for {AI} Data Centers},
+  title     = {Quantifying the Cost of Delayed Energization ({CoDE}) for {AI} Data Centers},
   author    = {Li, Honglin and She, Buxin},
   booktitle = {2026 North American Power Symposium (NAPS)},
   year      = {2026}

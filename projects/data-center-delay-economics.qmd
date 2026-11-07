@@ -1,5 +1,5 @@
 ---
-title: "The cost of delayed grid energization for AI data centers"
+title: "The cost of delayed energization for AI data centers"
 subtitle: "IEEE North American Power Symposium (NAPS 2026), first author; accepted"
 description: "What does it cost when a large AI data center must wait for grid energization, and how does the delay affect the developer, electricity ratepayers and society?"
 order: 4
@@ -32,7 +32,7 @@ toc: false
 </section>
 <section class="proj-insight" id="insight" aria-labelledby="h-insight">
 <h2 id="h-insight"><i class="bi bi-stars" aria-hidden="true"></i>Key insight</h2>
-<p class="insight-title">The cost of delayed grid energization depends on who is counting</p>
+<p class="insight-title">The cost of delayed energization depends on who is counting</p>
 <p>A late grid connection costs the developer lost margin and carrying costs; ratepayers face utility carrying and stranding costs; society bears external costs. I keep these present-value accounts separate. In the study, a 36-month delay for a 300 MW-IT facility cost the developer on the order of $0.7 billion, while ratepayer exposure depended strongly on large-load tariff design.</p>
 </section>
 <section class="proj-sec" aria-labelledby="h-contribution">
@@ -75,17 +75,18 @@ toc: false
 <li class="pub" data-type="conference" data-year="2026">
 <div class="pub-badge"><span class="abbr pt-conference">NAPS 2026</span></div>
 <div class="pub-main">
-<div class="pub-title">Quantifying the Cost of Delayed Grid Energization (CoDE) for AI Data Centers</div>
+<div class="pub-title">Quantifying the Cost of Delayed Energization (CoDE) for AI Data Centers</div>
 <div class="pub-authors"><span class="me">H. Li</span>, B. She</div>
 <div class="pub-venue"><em>2026 North American Power Symposium (NAPS)</em>, 2026. <span class="pub-tag tag-ok">Accepted</span></div>
 <div class="pub-links">
+<a class="btn-xs" href="../files/papers/li2026code.pdf" title="Accepted manuscript, © IEEE (IEEE author posting policy); accepted for NAPS 2026, the published version will be on IEEE Xplore">Accepted manuscript (PDF)</a>
 <a class="btn-xs" href="https://github.com/Henryutd2021/code-delayed-energization">Code</a>
 <button type="button" class="btn-xs bib-toggle" aria-expanded="false" aria-controls="bib-li2026code">Bib</button>
 </div>
 <div class="pub-bib" id="bib-li2026code" hidden>
 <button type="button" class="bib-copy"><i class="bi bi-clipboard" aria-hidden="true"></i><span>Copy</span></button>
 <pre><code>@inproceedings{li2026code,
-  title     = {Quantifying the Cost of Delayed Grid Energization ({CoDE}) for {AI} Data Centers},
+  title     = {Quantifying the Cost of Delayed Energization ({CoDE}) for {AI} Data Centers},
   author    = {Li, Honglin and She, Buxin},
   booktitle = {2026 North American Power Symposium (NAPS)},
   year      = {2026}

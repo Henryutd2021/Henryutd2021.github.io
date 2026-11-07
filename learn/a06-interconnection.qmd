@@ -315,7 +315,7 @@ CF7's toy discounts month by month, in three steps:
 <li>ERCOT (29 July 2026). ERCOT Update, Senate Committee on Business and Commerce (PDF). Batch study outputs, slide 3; milestones, slides 4–5; large-load requests, slide 6. <a href="https://www.ercot.com/files/docs/2026/07/29/ERCOT-Senate-July-29-Panel-1-Assessing-The-Grid.pdf">Slides</a>.</li>
 <li>ERCOT. 2026 all-time and monthly demand records (updated 21 August 2026; values preliminary). <a href="https://www.ercot.com/static-assets/data/news/content/a-peak-demand/2026/all-time-records.htm">Records page</a>.</li>
 <li>U.S. Secretary of Energy (2025). Letter to the Federal Energy Regulatory Commission on the interconnection of large loads (PDF). 23 October 2025. <a href="https://www.energy.gov/sites/default/files/2025-10/403%20Large%20Loads%20Letter.pdf">Letter</a>.</li>
-<li>Li et al. (2026). Accepted paper on the cost of delayed grid energization for large loads, 2026 North American Power Symposium (NAPS), presented October 2026; DOI pending.</li>
+<li>Li et al. (2026). Accepted paper on the cost of delayed energization for large loads, 2026 North American Power Symposium (NAPS), presented October 2026; DOI pending.</li>
 <li>code-delayed-energization on GitHub, version 1.0.0 (30 October 2026): open code with illustrative inputs. <a href="https://github.com/Henryutd2021/code-delayed-energization">Repository</a>.</li>
 </ul>
 <!-- a06-sources:end -->

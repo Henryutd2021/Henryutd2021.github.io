@@ -259,7 +259,7 @@ The same plan, note and self-check grow into a research project: pick a question
 <li>Cole, Ramasamy and Turan (2025). <a href="https://docs.nlr.gov/docs/fy25osti/93281.pdf">Cost Projections for Utility-Scale Battery Storage: 2025 Update</a>. NREL/TP-6A40-93281 (its 2024 costs only).</li>
 <li>U.S. Bureau of Economic Analysis. <a href="https://apps.bea.gov/iTable/?reqid=19&amp;step=3&amp;isuri=1&amp;1921=survey&amp;1903=13&amp;1904=2022&amp;1905=2026&amp;1906=a&amp;1911=0">NIPA Table 1.1.9: Implicit Price Deflators for Gross Domestic Product</a>, line 1, annual (2017 = 100): 2024 125.587, 2025 128.893. Last revised 29 October 2026; accessed 5 November 2026. It converts the battery's 2024 costs to 2025 dollars.</li>
 <li>PJM (2026). <a href="https://www.pjm.com/-/media/DotCom/documents/manuals/m20a.pdf">Manual 20A: Resource Adequacy Analysis</a> (PDF), Rev. 3, effective 24 June 2026, section 1.3: the criterion of one day in ten years, 0.1 days a year, that the brief adopts.</li>
-<li>Li et al. (2026). Accepted paper on the cost of delayed grid energization for large loads, 2026 North American Power Symposium (NAPS), presented October 2026; DOI pending.</li>
+<li>Li et al. (2026). Accepted paper on the cost of delayed energization for large loads, 2026 North American Power Symposium (NAPS), presented October 2026; DOI pending.</li>
 <li>EIA. <a href="https://www.eia.gov/electricity/gridmonitor/">Hourly Electric Grid Monitor</a> (Form EIA-930): the Southwest Power Pool's 2025 and 2024 shapes.</li>
 </ul>
 </div>

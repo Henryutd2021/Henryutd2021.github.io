@@ -176,7 +176,7 @@ This guide is for researchers, students and analysts who build models of U.S. po
 - *Modeled, not metered.* The IEA notes that there are no comprehensive global statistics on data-center electricity use. Its figures come from its own model, so treat them as estimates.
 - *Cases and editions.* The cases diverge widely by 2035. Always name the case and the publication you cite, and check whether a later IEA publication has updated the figure.
 - *Granularity.* The figures are national and regional. They cannot stand in for utility, interconnection or nodal load data.
-- *Recording.* In my framework for the cost of delayed grid energization (CoDE), values drawn from capacity outlooks become scenario values, such as case sizes, and never observations. Each one is recorded in a provenance table with its source and access date.
+- *Recording.* In my framework for the cost of delayed energization (CoDE), values drawn from capacity outlooks become scenario values, such as case sizes, and never observations. Each one is recorded in a provenance table with its source and access date.
 
 **Used in.** Not used directly in my published studies. For the provenance rule, see the [code-delayed-energization data pipeline](https://github.com/Henryutd2021/code-delayed-energization/blob/main/docs/data_pipeline.md).
 

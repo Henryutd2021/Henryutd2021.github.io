@@ -189,7 +189,7 @@ body-classes: "page-learn page-lesson lx-form-case"
 <div class="lx-card lx-sources">
 <p class="lx-eyebrow">Sources and further reading</p>
 <ul>
-<li>Li et al. (2026). Accepted paper on the cost of delayed grid energization for large loads, 2026 North American Power Symposium (NAPS), presented October 2026; DOI pending.</li>
+<li>Li et al. (2026). Accepted paper on the cost of delayed energization for large loads, 2026 North American Power Symposium (NAPS), presented October 2026; DOI pending.</li>
 <li>U.S. Department of Energy (2024). <a href="https://www.energy.gov/articles/doe-releases-new-report-evaluating-increase-electricity-demand-data-centers">DOE Releases New Report Evaluating Increase in Electricity Demand from Data Centers</a>. 20 December 2024.</li>
 <li>U.S. Secretary of Energy (2025). <a href="https://www.energy.gov/sites/default/files/2025-10/403%20Large%20Loads%20Letter.pdf">Letter to the Federal Energy Regulatory Commission on the interconnection of large loads</a> (PDF). 23 October 2025.</li>
 <li><a href="https://github.com/Henryutd2021/code-delayed-energization">code-delayed-energization</a> on GitHub, version 1.0.0 (30 October 2026).</li>

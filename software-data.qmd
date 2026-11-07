@@ -164,7 +164,7 @@ A small modular reactor that supplies a data center with power and, through turb
 
 [Henryutd2021/code-delayed-energization]{.repo-slug}
 
-The cost of delayed grid energization for AI data centers, kept in separate developer, ratepayer and social accounts, with the delay cost intensity and the break-even acceleration payment as metrics.
+The cost of delayed energization for AI data centers, kept in separate developer, ratepayer and social accounts, with the delay cost intensity and the break-even acceleration payment as metrics.
 
 ::: {.repo-papers}
 [Accompanies]{.label}
