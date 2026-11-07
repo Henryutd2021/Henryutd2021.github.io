@@ -141,7 +141,7 @@ ok(stepTexts.length === 7 && stepTexts.every(t => words(t) <= 40 && sentences(t)
   ok(long.length === 0, "every page element is 40 words or fewer: " + long.map(x => x.slice(0, 60) + " (" + x.split(" ").length + ")").join(" | ")); }
 ["baseline", "counterfactual", "demand-charge", "transfer-payment", "capital-recovery-factor"].forEach(id => ok(JS.includes("[[" + id + "|") || PAGE.includes('data-term="' + id + '"'), "the page marks the course glossary's " + id));
 { const PY = fs.readFileSync(path.join(SITE, "learn/path.yml"), "utf8"), i = PY.indexOf("id: " + ID), r = PY.slice(i, i + 2000).split("\n- ")[0];
-  ok(i > 0 && /status: active/.test(r) && /form: studio/.test(r) && /minutes: 35/.test(r) && /practice_minutes: 90/.test(r) && /after: \[A1, A11\]/.test(r) && PAGE.includes('subtitle: "' + (r.match(/subtitle: "([^"]+)"/) || [])[1] + '"'), "path.yml: active studio row, 35 + 90 minutes, after A1 and A11, subtitle equal to the page's"); }
+  ok(i > 0 && /status: active/.test(r) && /form: studio/.test(r) && /minutes: 35/.test(r) && /practice_minutes: 90/.test(r) && /after: \[A1, A11(, M11)?\]/.test(r) && PAGE.includes('subtitle: "' + (r.match(/subtitle: "([^"]+)"/) || [])[1] + '"'), "path.yml: active studio row, 35 + 90 minutes, after A1 and A11 (and M11 once live), subtitle equal to the page's"); }
 ok(D.rubric.competences.map(c => c.id).join() === "accounting,realism" && D.checklist.length === 8, "rubric: Consistent accounting and Realism; an eight-item checklist");
 
 // ---------------- the page on a stub document

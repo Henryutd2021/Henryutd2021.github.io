@@ -2166,7 +2166,7 @@ body.page-learn.quarto-dark { --lx-scale-0: #5CC0B1; --lx-scale-1: #5AAED2; --lx
 .lx-sk text { font-family: var(--lx-f-body); font-size: 12.5px; fill: var(--lx-ink); paint-order: stroke; stroke: var(--lx-surface); stroke-width: 3.2px; stroke-linejoin: round; }
 .lx-sk text .v { font-family: var(--lx-f-mono); font-size: 11.5px; fill: var(--lx-ink-2); }
 .lx-sk text.badge { font-family: var(--lx-f-mono); font-size: 11px; font-weight: 600; stroke: none; fill: var(--lx-ink); }
-.lx-sk circle.badge { fill: var(--lx-surface); stroke: var(--lx-ink-3); stroke-width: 1.2; }
+.lx-sk circle.badge { display: inline; fill: var(--lx-surface); stroke: var(--lx-ink-3); stroke-width: 1.2; }   /* display: Bootstrap hides an empty .badge (.badge:empty), and a disc has no content: keep the phone badges shown (W5 integration, from F9) */
 .lx-sk-key { display: grid; grid-template-columns: repeat(auto-fit, minmax(9.5em, 1fr)); gap: 2px 12px; margin: 0; padding: 0; list-style: none; font-size: 13.5px; color: var(--lx-ink-2); }
 .lx-sk-key li { display: flex; gap: 6px; align-items: baseline; min-width: 0; }
 .lx-sk-key li.h { grid-column: 1 / -1; margin-top: 4px; font-family: var(--lx-f-display); font-size: 13px; font-weight: 600; color: var(--lx-ink-3); }

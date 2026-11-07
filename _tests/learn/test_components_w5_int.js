@@ -111,6 +111,14 @@ for (const P of PROMO) {
   box.tiles[1].click(); ok(St.L === 0 && seen.length === 2, "a tap on a middle stage changes nothing");
 }
 
+// ---------------------------------------------------------------- Sankey badges on phones (sankey.css; batch 2, from F9)
+{
+  const css = rd("components/sankey.css"), rule = (css.match(/^\.lx-sk circle\.badge \{([^}]*)\}/m) || [, ""])[1];
+  ok(/display: inline;/.test(rule) && bundleCSS.includes(".lx-sk circle.badge { display: inline;"), "sankey.css shows the badge discs (Bootstrap's .badge:empty would hide them), in learn.css too");
+  const pages = fs.readdirSync(path.join(SITE, "learn")).filter(f => f.endsWith(".qmd")).filter(f => /circle\.badge/.test(page(f.slice(0, -4))));
+  ok(pages.length === 0, "no page keeps its own copy of the badge rule: " + pages.join(" "));
+}
+
 // ---------------------------------------------------------------- the batch-1 wiring
 {
   const PY = fs.readFileSync(path.join(SITE, "learn/path.yml"), "utf8");

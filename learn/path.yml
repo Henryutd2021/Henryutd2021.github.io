@@ -913,7 +913,7 @@
   teaches: [city emissions inventories by scope (GPC), targets, marginal abatement cost curves, cost per tonne avoided, budget, peak and distribution tests, interactions and lock-in, baselines, who decides in a city plan]
   does: "Sort Prairie City's emissions into the GPC's scopes, set a 2035 target, build a plan from a cost curve of six measures, test it against an up-front budget, each district's substation on the coldest morning and who benefits, then see the curve mislead through overlaps, order, the baseline, prices and hidden costs."
   outcome: "Build a city's inventory by scope, read and use a marginal abatement cost curve, test a plan against money, peaks and fairness, and name five ways the curve misleads and who decides each step of a U.S. city plan."
-  after: [A1]   # curriculum prerequisite F9 (learn-w5-a): add it at the W5 batch-2 merge
+  after: [F9, A1]
 - kind: lesson
   id: a19-gis-siting
   path: a19-gis-siting.qmd
@@ -939,8 +939,7 @@
 - {kind: lesson, tier: analyst, code: X2, title: "What happens to gas, coal and oil systems in a transition, and can carbon be removed?"}
 - {kind: lesson, tier: analyst, code: X4, title: "How are energy rules made?"}
 - {kind: lesson, tier: analyst, code: X5, title: "How are big energy projects actually financed?"}
-# CK-A, builder learn-w5-g (wave W5). Curriculum prerequisites A1, A4, A13, A15; A15 is built in parallel
-# (learn-w5-a): add it to `after` at the W5 batch-2 merge.
+# CK-A, builder learn-w5-g (wave W5). Curriculum prerequisites A1, A4, A13, A15.
 - kind: lesson
   id: ck-a-spreadsheet
   code: CK-A
@@ -953,8 +952,8 @@
   subtitle: "About two and a half hours: build a spreadsheet for a school's rooftop solar and battery, say who pays and who benefits, test the result, then check it against a worked workbook"
   short: "Analyst checkpoint"
   does: "Build an auditable spreadsheet for a new case (a school's solar-plus-storage project): state the boundary, the assumptions with sources, who pays and who benefits, and a sensitivity of the main result. A worked workbook with live formulas, an assumptions log and the course rubric open when you submit."
-  after: [A1, A4, A13]
-# SB3 and C3, builder learn-w5-h (wave W5), on engine E3; F9, A15, A18 join their after lists at integration (A19 and A13 are in C3's)
+  after: [A1, A4, A13, A15]
+# SB3 and C3, builder learn-w5-h (wave W5), on engine E3; C3's after list is SB3 and its curriculum prerequisites
 - kind: lesson
   id: sb3-city-planner
   code: SB3
@@ -970,7 +969,7 @@
   does: "Energy hub for Prairie City with linearized feeder limits: heat pumps, retrofits, district heat with a store, managed or unmanaged EV charging, rooftop solar and batteries, run as a linear program on eight representative days; the substations' duals; bills and energy burden by household group from a screening accounting layer."
   outcome: "Run a city's energy hub against its substation limits, read what the busiest hour and the LP's duals say about upgrades, and tell the engine's results apart from the screening estimates of who pays."
   teaches: [energy hub, linearized feeder limits, coincident winter peaks, flexibility from managed charging and heat stores, duals as the value of grid room, screening household outputs]
-  after: [F3, A7]
+  after: [F3, A7, F9, A15]
 - kind: lesson
   id: c3-prairie-city-2040
   code: C3
@@ -989,7 +988,7 @@
   outcome: "Write a city energy plan for 2040 defended with its cost, CO2, substation peaks and a screening of who pays, with its assumptions stated and the stakeholders' objections answered."
   teaches: [capstone plan summary, a plan within a budget, siting with map layers, screening outputs with stated assumptions, answering stakeholders]
   lab: "M12's notebook: Prairie City's energy hub in SciPy and HiGHS, about 60 minutes."
-  after: [SB3, A19, A13]
+  after: [SB3, A18, A15, A13, A19]
 - kind: lesson
   id: m02-unit-commitment
   path: m02-unit-commitment.qmd
@@ -1181,7 +1180,7 @@
   does: "Link an hourly operating LP of a wind-hydrogen plant to its lifetime cash flows; annualize capital, add the U.S. hydrogen credit in its own ten years and with its emissions tiers, move the boundary (what belongs to the plant, what to the grid) and watch the size, NPV and cost per kilogram change."
   outcome: "Formulate a techno-economic analysis as an LP with annualized capital and a time-limited credit, handle a stepped rule by enumeration, and state how the boundary changes the conclusion."
   after: [M3, A1, A12]
-# M12, builder learn-w5-h (wave W5), on engine E3; A15 joins its after list at integration
+# M12, builder learn-w5-h (wave W5), on engine E3
 - kind: lesson
   id: m12-city-model
   code: M12
@@ -1199,7 +1198,7 @@
   outcome: "Formulate a city energy hub as a linear program with linearized feeder limits and building shares as decisions, read its substation and cap duals as marginal values, and report screening household outputs with their assumptions apart from the model."
   teaches: [energy hub as a linear program, building stock as shares, linearized feeder limits, duals of grid room and of a CO2 cap, representative days, screening household outputs]
   lab: "a SciPy/HiGHS notebook that rebuilds engine E3's hub and asserts the browser's numbers, about 60 minutes, then 120 minutes of practice."
-  after: [M4, A13]
+  after: [M4, A15, A13]
 - {kind: lesson, tier: modeler, code: M13, title: "Build a nation's pathway: a multi-region, multi-decade model"}
 # M14, builder learn-w5-g (wave W5)
 - kind: lesson
@@ -1391,7 +1390,7 @@
   teaches: [one boundary for cost and emissions, fair baselines, stated counterfactuals, grid connection costs, credits counted once, cost per tonne avoided, audit notes]
   does: "Audit a fictional study of 40 electric buses: put cost and CO₂ on one boundary, replace a convenient baseline with the stated counterfactual, add the missing grid costs and count a credit once; watch the saving and the CO₂ cut change, then write the audit note."
   outcome: "Find and fix the four most common cost-and-carbon flaws in a study, recompute its conclusion on one boundary against a stated counterfactual, and write an audit note that names whose cost each number is."
-  after: [A1, A11]   # curriculum prerequisite M11 is built in parallel (integration to-do)
+  after: [A1, A11, M11]
   next: R8
 - kind: lesson
   id: r08-communicating

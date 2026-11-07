@@ -185,7 +185,7 @@ ok(stepTexts.length === 10 && stepTexts.every(t => words(t) <= 40 && sentences(t
 ["emissions-inventory", "substation", "baseline", "capital-recovery-factor"].forEach(id => ok(new RegExp("\\[\\[" + id + "\\||term=\"" + id + "\"").test(JS + PAGE), "the page marks the course glossary's " + id));
 ok(!/\b(always|never)\b/i.test(JS.replace(/\/\/[^\n]*/g, "") + OWN), "no 'always' or 'never' on the page");
 { const PY = fs.readFileSync(path.join(SITE, "learn/path.yml"), "utf8"), r = PY.slice(PY.indexOf("id: " + ID), PY.indexOf("id: " + ID) + 2000).split("- kind:")[0];
-  ok(/status: active/.test(r) && /after: \[A1\]/.test(r) && /minutes: 30/.test(r) && PAGE.includes('subtitle: "' + (r.match(/subtitle: "([^"]+)"/) || [])[1] + '"'), "path.yml: active, after A1, 30 minutes, subtitle equal to the page's"); }
+  ok(/status: active/.test(r) && /after: \[(F9, )?A1\]/.test(r) && /minutes: 30/.test(r) && PAGE.includes('subtitle: "' + (r.match(/subtitle: "([^"]+)"/) || [])[1] + '"'), "path.yml: active, after A1 (and F9 once live), 30 minutes, subtitle equal to the page's"); }
 
 // ---------------- the page on a stub document
 {

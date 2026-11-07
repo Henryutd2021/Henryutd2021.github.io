@@ -141,7 +141,7 @@ $$\text{CSE} = \frac{C \times \text{CRF}(r, n)}{\Delta E}, \qquad \text{CRF}(r, 
 
 - **Here,** every measure and every switch is set by hand and priced on its own.
 - **In a model,** a linear program chooses envelopes, heat pumps, networks and stores together, with each substation's limit as a rule and the hour-by-hour balance of heat and power.
-- **Next.** The City Planner sandbox (SB3) and the city energy hub (M12) build that model; see the boundary card above for their links once they are live.
+- **Next.** The City Planner sandbox ([SB3](sb3-city-planner.html)) and the city energy hub ([M12](m12-city-model.html)) build that model.
 
 ```{=html}
 </div>

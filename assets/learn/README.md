@@ -1114,9 +1114,12 @@ var box = LX.LifeBox(host, { stages: [{ label: "Build" }, { label: "Supply" }, {
 
 **Who pays and who benefits** (`whopays.js`; from A13's `a13-who-pays-and-benefits.js`): `LX.A13`, the screening accounting layer, pure. Households from `prairie-city.json` (`groupsFrom`), a cost split by kWh, per household or by income (`allocate`), transfers between designs (`transfers`, summing to zero), regrouping and burden lines (`regroup`, `above`), jobs as job-years, gross and net (`jobs`) and a county's tax base (`taxBase`), with `SCREENING` and `ASSUME`, the words each output carries. Every output is a screening estimate; the coefficients are the caller's inputs. A13, SB3, M12, C3 and engine E3 use it.
 
+**Shared fix** (W5 integration, from F9): `sankey.css` keeps the phone badge discs shown (`.lx-sk circle.badge { display: inline }`; Bootstrap's `.badge:empty` hid them on every Sankey page: F3, F4, F9).
+
 **Kept lesson-local, and why** (promote when a second page needs the same thing):
 
-- A18's marginal abatement cost curve: only A18 draws one. A15's cost-of-saved-energy curve (batch 2) may be the same chart: compare at its merge.
+- A18's marginal abatement cost curve and A15's cost-of-saved-energy curve: two different charts (dollars per tonne avoided against tonnes; dollars per MWh saved against MWh, with the prices the blocks compete with), each drawn by one page.
+- A15's `evSplit` (a day's EV charging by rule, closed form): only A15 uses it; engine E3 schedules managed charging inside its LP.
 - M14's simulated panels, estimators (difference-in-differences, event study) and their charts: only M14 uses them.
 - F11's spreading toy and burden slider, R7's audit, CK-A's school case: each is drawn by one page (CK-A's test recomputes its workbook's formulas with the shared engine of `components/sheet.js`).
 
