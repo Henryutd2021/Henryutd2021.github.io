@@ -1444,8 +1444,40 @@
   next: R2
 
 - {kind: lesson, tier: researcher, code: X6, title: "How do social scientists study energy and people?"}
-- {kind: lesson, tier: researcher, code: CK-R, form: checkpoint, title: "Researcher checkpoint: defend your question and method, then revise"}
-- {kind: lesson, tier: researcher, code: CR, form: capstone, title: "Your own study: from a question to a report"}
+# CK-R and CR, builder learn-w7-b (wave W7). CK-R's curriculum prerequisites are R8 and R9 (§3.3). CR's are R10, R2, R5,
+# R6, R7, R8, R9 and CK-M, plus one scale route (track:S0 to track:S4: a model lab and its capstone), which `after`
+# cannot express: CR's page says it and shows the reader's route. CR is a capstone without a sandbox: the study runs in
+# the reader's own tools; its minutes are the page (the plan and the proposal), practice_minutes the study itself.
+- kind: lesson
+  id: ck-r-defend-revise
+  code: CK-R
+  tier: researcher
+  form: checkpoint
+  icon: check
+  status: active
+  minutes: 240
+  title: "Researcher checkpoint: defend your question and method, then revise"
+  subtitle: "About four hours: review a stranger's study, get a written review of your own, answer it, revise, and rerun your main result from a clean clone"
+  short: "Researcher checkpoint"
+  does: "Calibrate on a fictional study's proposal; get a written mock review of your research capstone's question and method; answer each concern; revise and log the changes; rerun your main result from a clean clone and report any difference. An annotated review, response and revision open when you submit."
+  after: [R8, R9]
+- kind: lesson
+  id: cr-your-own-study
+  code: CR
+  tier: researcher
+  form: capstone
+  icon: flask
+  status: active
+  minutes: 60
+  practice_minutes: 1800   # the study itself: 20 to 40 hours, CK-R's four among them (curriculum v2 §7.9, §7.10)
+  title: "Your own study: from a question to a report"
+  subtitle: "Plan a study at one scale, write a one-page proposal, carry it out, and report it in a paper, a poster and a rubric sheet"
+  short: "Capstone: your own study"
+  does: "Take a question card from the studio; choose a track (model-based, empirical or mixed) and a scale; plan the stages from question to report with their milestones; write a one-page proposal; carry out the study with its uncertainty; write a six-page paper and a poster; self-assess with the rubric."
+  outcome: "Design, carry out and report a study of your own at one scale, and show the evidence a mentor needs to judge whether you are ready for supervised research."
+  teaches: [research proposals, research tracks, milestones, reproducible repositories, six-page papers, posters, self-assessment against a rubric]
+  after: [R10, R2, R5, R6, R7, R8, R9, CK-M]
+  next: CK-R
 # ---------- research case files (curriculum v2 §13; Henry approved every excerpt sentence on 2026-11-03,
 # reports/learn/excerpts_for_approval.md; live from wave W2; tier confirmed by the coordinator)
 - kind: lesson

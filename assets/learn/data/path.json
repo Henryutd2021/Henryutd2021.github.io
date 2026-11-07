@@ -1769,19 +1769,25 @@
    "tier": "researcher",
    "code": "CK-R",
    "title": "Researcher checkpoint: defend your question and method, then revise",
-   "ready": false,
-   "href": "index.html#researcher",
+   "ready": true,
+   "href": "ck-r-defend-revise.html",
    "scales": [],
-   "form": "checkpoint"
+   "id": "ck-r-defend-revise",
+   "minutes": 240,
+   "form": "checkpoint",
+   "short": "Researcher checkpoint"
   },
   {
    "tier": "researcher",
    "code": "CR",
    "title": "Your own study: from a question to a report",
-   "ready": false,
-   "href": "index.html#researcher",
+   "ready": true,
+   "href": "cr-your-own-study.html",
    "scales": [],
-   "form": "capstone"
+   "id": "cr-your-own-study",
+   "minutes": 60,
+   "form": "capstone",
+   "short": "Capstone: your own study"
   },
   {
    "tier": "analyst",
