@@ -1,0 +1,16 @@
+# Sidecar for A20 (a20-national-scenarios), builder learn-w6-b, 2026-11-07. Read by scripts/build_learn.py.
+id: a20-national-scenarios
+lesson: A20
+glossary:
+  - id: exploratory-scenario
+    term: Exploratory scenario
+    def: "A scenario that fixes its assumptions about demand, prices, policies and costs and asks what follows, without forcing any result; the IEA's Current Policies and Stated Policies scenarios are of this kind."
+  - id: target-seeking-scenario
+    term: Target-seeking scenario
+    def: "A scenario that starts from a goal, such as a carbon budget, and works out what it would take to meet it; the IEA calls this kind normative."
+  - id: implied-carbon-price
+    term: Implied carbon price
+    def: "The carbon price at which a plan just meets an emissions limit; in an optimization model it is the limit's dual value, what one more tonne allowed would save."
+requests:
+  - "path.yml: A20's after list is the curriculum's (A1, T13 = lesson 13); both are live."
+  - "prairieland.json: nothing for A20. Note for E4 and C4: with the default fast-electrification pace this page's accounting reaches 2,600 Mt at an implied $84 a tonne; its floor at central demand is about 2,486 Mt (every new MWh clean, every coal and combined-cycle plant closed from 2030)."

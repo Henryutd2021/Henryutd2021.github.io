@@ -1357,17 +1357,25 @@
    "tier": "analyst",
    "code": "A20",
    "title": "Why do national energy scenarios disagree?",
-   "ready": false,
-   "href": "index.html#analyst",
-   "scales": []
+   "ready": true,
+   "href": "a20-national-scenarios.html",
+   "scales": [],
+   "id": "a20-national-scenarios",
+   "minutes": 25,
+   "form": "cards",
+   "short": "Why scenarios disagree"
   },
   {
    "tier": "analyst",
    "code": "A21",
    "title": "What makes a nation's energy secure? Imports, minerals, supply chains and factories",
-   "ready": false,
-   "href": "index.html#analyst",
-   "scales": []
+   "ready": true,
+   "href": "a21-security-minerals.html",
+   "scales": [],
+   "id": "a21-security-minerals",
+   "minutes": 25,
+   "form": "cards",
+   "short": "Energy security"
   },
   {
    "tier": "analyst",

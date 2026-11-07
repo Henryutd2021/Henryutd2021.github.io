@@ -1,0 +1,271 @@
+{
+  "about": {
+    "what": "Lesson A21's own settings: the levers' ranges, the assumptions of each stress test, the thresholds named on the page, the lever sort and the real-world context added to Prairieland's. Every Prairieland number (imports, stocks, minerals, the battery factory, the shocks, fuel prices, GDP, primary energy) is read from prairieland.json at run time, never copied here.",
+    "built": "2026-11-07",
+    "builtBy": "builder learn-w6-b (hand-written; tested by _tests/learn/test_a21-security-minerals.js)",
+    "dollarYear": 2025
+  },
+  "levers": {
+    "gasCut": {
+      "min": 0,
+      "max": 30,
+      "step": 5,
+      "start": 0,
+      "unit": "%",
+      "what": "gas use cut for the year (efficiency, electrification); LNG falls first, domestic output stays"
+    },
+    "weeks": {
+      "min": 1,
+      "max": 26,
+      "step": 1,
+      "start": "shock",
+      "unit": "weeks",
+      "what": "how long the strait stays closed"
+    },
+    "stockDays": {
+      "min": 0,
+      "max": 120,
+      "step": 5,
+      "start": "data",
+      "unit": "days",
+      "what": "oil stocks, in days of net oil imports (the IEA's measure)"
+    },
+    "restraint": {
+      "min": 0,
+      "max": 20,
+      "step": 5,
+      "start": 0,
+      "unit": "%",
+      "what": "oil use cut during the closure (demand restraint)"
+    },
+    "cap": {
+      "min": 30,
+      "max": 90,
+      "step": 5,
+      "start": 90,
+      "unit": "%",
+      "what": "the most any one refiner supplies of each mineral, set before the restriction; the rest moves to the others in proportion"
+    },
+    "recycled": {
+      "min": 0,
+      "max": 40,
+      "step": 5,
+      "start": "data",
+      "unit": "%",
+      "what": "share of each mineral the factory gets from recycling at home"
+    },
+    "mineralDays": {
+      "min": 0,
+      "max": 360,
+      "step": 30,
+      "start": "data",
+      "unit": "days",
+      "what": "the factory's mineral stocks, in days of its use"
+    },
+    "split": {
+      "min": 0,
+      "max": 50,
+      "step": 10,
+      "start": 0,
+      "unit": "%",
+      "what": "share of the cell-making capacity at a second site"
+    }
+  },
+  "assume": {
+    "gasStorageFull": 0.5,
+    "gasStorageWhat": "Gas storage is half full when the strait closes (set for teaching).",
+    "spike": "The price spike lasts the whole year; domestic gas output stays at its 2025 level, so a cut in gas use comes off LNG first.",
+    "closure": "Oil stocks are counted in days of net oil imports, as the IEA counts them; stocks cover the oil the closed strait stops, net of any demand restraint.",
+    "ban": "During the restriction, the other refiners deliver only their usual shares and recycled material is domestic; nothing else is bought.",
+    "fire": "The fire stops the main site; a second site, if any, can run up to its full capacity.",
+    "overlap": "A restriction and a fire in the same two years overlap: the factory loses the larger of the two, not their sum.",
+    "set": "teaching: every assumption in this block"
+  },
+  "thresholds": {
+    "hhiHigh": 1800,
+    "hhiWhat": "U.S. merger guidelines call a market with an HHI above 1,800 highly concentrated: a competition convention, not a security rule.",
+    "hhiSrc": "doj-ftc-2023",
+    "oneCountry": 0.65,
+    "oneCountryWhat": "The EU's Critical Raw Materials Act sets a benchmark: no single third country should supply more than 65% of the EU's yearly use of each strategic raw material at any processing stage, by 2030. A benchmark, not a legal cap.",
+    "oneCountrySrc": "ec-crma"
+  },
+  "sort": {
+    "bins": [
+      {
+        "key": "spike",
+        "label": "Price spike",
+        "short": "Price"
+      },
+      {
+        "key": "closure",
+        "label": "Route closed",
+        "short": "Route"
+      },
+      {
+        "key": "ban",
+        "label": "Export restriction",
+        "short": "Export"
+      },
+      {
+        "key": "fire",
+        "label": "Factory fire",
+        "short": "Fire"
+      }
+    ],
+    "items": [
+      {
+        "key": "stocks",
+        "label": "Stockpiles of oil, gas and minerals",
+        "color": "var(--lx-tier-3)",
+        "ref": {
+          "spike": "partly",
+          "closure": "yes",
+          "ban": "yes",
+          "fire": "no"
+        },
+        "why": {
+          "spike": "A stock release can ease a price spike, but a spike that lasts a year outlasts most stocks.",
+          "closure": "Stocks bridge the weeks a route is closed.",
+          "ban": "Mineral stocks keep the factory running while it finds other supply.",
+          "fire": "Minerals in stock make no cells while the factory is down."
+        }
+      },
+      {
+        "key": "diversify",
+        "label": "More suppliers",
+        "color": "var(--lx-tier-2)",
+        "ref": {
+          "spike": "no",
+          "closure": "partly",
+          "ban": "yes",
+          "fire": "no"
+        },
+        "why": {
+          "spike": "A world price rise reaches every seller.",
+          "closure": "Only suppliers that avoid the strait help.",
+          "ban": "Others keep delivering when one country stops.",
+          "fire": "The factory itself is the single point."
+        }
+      },
+      {
+        "key": "recycle",
+        "label": "Recycling at home",
+        "color": "var(--lx-good)",
+        "ref": {
+          "spike": "no",
+          "closure": "no",
+          "ban": "partly",
+          "fire": "no"
+        },
+        "why": {
+          "spike": "Recycling makes minerals, not gas.",
+          "closure": "The strait carries oil and LNG, not battery minerals.",
+          "ban": "Recycled minerals cover only the recycled share of the need.",
+          "fire": "The factory that uses the minerals is down."
+        }
+      },
+      {
+        "key": "factory",
+        "label": "A second cell-making site",
+        "color": "var(--lx-bat)",
+        "ref": {
+          "spike": "no",
+          "closure": "no",
+          "ban": "no",
+          "fire": "yes"
+        },
+        "why": {
+          "spike": "Cells do not change the price of gas.",
+          "closure": "The strait carries oil and LNG.",
+          "ban": "Both sites need the same minerals.",
+          "fire": "One site keeps making cells while the other is rebuilt."
+        }
+      },
+      {
+        "key": "less",
+        "label": "Using less gas and oil",
+        "color": "var(--lx-wind)",
+        "ref": {
+          "spike": "yes",
+          "closure": "yes",
+          "ban": "no",
+          "fire": "no"
+        },
+        "why": {
+          "spike": "Every unit not bought avoids the higher price.",
+          "closure": "Less oil to replace while the strait is closed.",
+          "ban": "Electrifying more needs more batteries, not fewer minerals.",
+          "fire": "It does not make cells."
+        }
+      }
+    ]
+  },
+  "realWorld": [
+    {
+      "id": "usgs",
+      "what": "U.S. reliance on imports from China",
+      "value": "a major source for 14 of the 33 critical minerals for which the U.S. most depends on imports (2026 Mineral Commodity Summaries)",
+      "src": "usgs-2026"
+    },
+    {
+      "id": "hormuz",
+      "what": "Oil through the Strait of Hormuz, second quarter of 2026",
+      "value": "4.9 million barrels a day during the 2026 disruption",
+      "src": "eia-steo-security"
+    },
+    {
+      "id": "iea400",
+      "what": "IEA collective action, 11 March 2026",
+      "value": "members agreed to make 400 million barrels of oil stocks available, their largest collective action: an agreement, not a record of deliveries",
+      "src": "iea-400"
+    }
+  ],
+  "sources": {
+    "usgs-2026": {
+      "title": "Value of U.S. mineral production rose last year, driven by precious metals prices (news release on the Mineral Commodity Summaries 2026)",
+      "publisher": "U.S. Geological Survey",
+      "date": "6 Feb 2026; read 7 Nov 2026",
+      "url": "https://www.usgs.gov/news/national-news-release/value-us-mineral-production-rose-last-year-driven-precious-metals-prices",
+      "where": "'The U.S. remained reliant on imports from China as a major source for 14 of the 33 critical minerals for which the U.S. most depends on imports.'"
+    },
+    "doj-ftc-2023": {
+      "title": "Merger Guidelines, Guideline 1",
+      "publisher": "U.S. Department of Justice and Federal Trade Commission",
+      "date": "18 Dec 2023; read 7 Nov 2026",
+      "url": "no link",
+      "where": "'Markets with an HHI greater than 1,800 are highly concentrated'; the HHI is the sum of the squares of the market shares"
+    },
+    "ec-crma": {
+      "title": "Critical Raw Materials Act",
+      "publisher": "European Commission",
+      "date": "read 2 Nov 2026 for the course dossier",
+      "url": "https://single-market-economy.ec.europa.eu/sectors/raw-materials/areas-specific-interest/critical-raw-materials/critical-raw-materials-act_en",
+      "where": "benchmarks for 2030: no single third country above 65% of EU annual consumption of each strategic raw material at any relevant processing stage"
+    },
+    "iea-400": {
+      "title": "IEA member countries to carry out largest ever oil stock release amid market disruptions from Middle East conflict",
+      "publisher": "International Energy Agency",
+      "date": "11 Mar 2026; read 2 Nov 2026 for the course dossier",
+      "url": "https://www.iea.org/news/iea-member-countries-to-carry-out-largest-ever-oil-stock-release-amid-market-disruptions-from-middle-east-conflict",
+      "where": "members agreed to make 400 million barrels available"
+    },
+    "eia-steo-security": {
+      "title": "Short-Term Energy Outlook, energy security supplement, tables 1, 2 and 4",
+      "publisher": "U.S. Energy Information Administration",
+      "date": "12 Aug 2026; read 2 Nov 2026 for the course dossier",
+      "url": "https://www.eia.gov/outlooks/steo/report/energysecurity/article.php",
+      "where": "Strait of Hormuz oil flows by quarter, second quarter of 2026: 4.9 million barrels a day"
+    }
+  },
+  "facts": {
+    "prairieland": [
+      "eurostat-id",
+      "iea-gcmo-2025",
+      "eia-steo-security",
+      "iea-stocks"
+    ],
+    "own": [
+      "usgs"
+    ]
+  }
+}
