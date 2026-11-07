@@ -455,6 +455,12 @@
   "lesson": "F4",
   "href": "f04-power-plants.html"
  },
+ "condensing-furnace": {
+  "term": "Condensing furnace",
+  "short": "A gas furnace that also recovers the heat in its exhaust's water vapour, so 90% or more of the gas's energy becomes heat, against about 80% for a non-condensing one.",
+  "lesson": "A18",
+  "href": "a18-city-plan.html"
+ },
  "conditional-price": {
   "term": "Conditional price",
   "short": "A price read from a linear program in which the on/off decisions are held fixed; it holds only for that commitment.",
@@ -1277,6 +1283,12 @@
   "lesson": "M9",
   "href": "m09-surrogates-uq.html"
  },
+ "gdp-deflator": {
+  "term": "GDP deflator",
+  "short": "A price index for everything an economy produces; multiplying by the ratio of two years' values turns one year's dollars into another's, such as 2022 dollars into 2025 dollars.",
+  "lesson": "A18",
+  "href": "a18-city-plan.html"
+ },
  "generator": {
   "term": "Generator",
   "short": "A machine that turns the spin of a shaft into electricity, by turning magnets past coils of wire.",
@@ -1318,6 +1330,12 @@
   "short": "A plant's speed control that opens or closes its steam, gas or water valves as the grid frequency changes.",
   "lesson": 3,
   "href": "03-balancing.html"
+ },
+ "gpc": {
+  "term": "GPC",
+  "short": "The Global Protocol for Community-Scale Greenhouse Gas Emission Inventories (WRI, C40 Cities and ICLEI, 2014), the common standard for counting a city's emissions by sector and scope.",
+  "lesson": "A18",
+  "href": "a18-city-plan.html"
  },
  "frequency": {
   "term": "Grid frequency",
@@ -3304,6 +3322,12 @@
   "short": "A unit of energy: one watt kept up for one hour; 1,000 Wh make one kilowatt-hour.",
   "lesson": 1,
   "href": "01-power-energy.html"
+ },
+ "weatherization": {
+  "term": "Weatherization",
+  "short": "Air sealing, insulation and similar work on a building's shell that cuts the heat it loses, so it needs less heating.",
+  "lesson": "A18",
+  "href": "a18-city-plan.html"
  },
  "web-mercator": {
   "term": "Web Mercator",
