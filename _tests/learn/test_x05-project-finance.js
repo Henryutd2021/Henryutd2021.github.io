@@ -131,7 +131,7 @@ const ST = M.steps(P, L);
 ok(ST.length === 6, "six step cards");
 ST.forEach((t, i) => { const n = nWords(t); ok(n >= 14 && n <= 40, "step " + (i + 1) + ": " + n + " words"); ok(nSent(t) <= 2, "step " + (i + 1) + ": " + nSent(t) + " sentences"); });
 const lines = [M.costSaw(P), M.LAYER_SAW, M.loanSaw(P, L), M.contractSaw(P, L, X), M.stackSaw(P, L, 0.5, 0.3, 0.02), M.badLine(P, L, 1, X), M.badLine(P, L, 0, X), M.loanVerdict(P, L, 126), M.contractLine(P, L, 0.5, X)]
-  .concat(Object.values(M.Q1.feedback), Object.values(X.risks.feedback), [].concat.apply([], X.layers.map(l => [l.who, l.gets, l.paid])));
+  .concat([X.contract.note, X.bad.note, X.taxEquity.note, X.grant.note, L.dscrNote, L.rateNote, L.termNote], Object.values(M.Q1.feedback), Object.values(X.risks.feedback), [].concat.apply([], X.layers.map(l => [l.who, l.gets, l.paid])));
 lines.forEach(t => { ok(nWords(t) <= 40, "a reveal of " + nWords(t) + " words: " + plain(t).slice(0, 60)); ok(nSent(t) <= 3, "a reveal of " + nSent(t) + " sentences: " + plain(t).slice(0, 60)); });
 const PROSE = OWN.replace(/^---[\s\S]*?\n---\n/, " ").replace(/<script[\s\S]*?<\/script>/g, " ").replace(/<style[\s\S]*?<\/style>/g, " ").replace(/<!-- x05-(sources|facts):start[\s\S]*?:end -->/g, " ").replace(/<!--[\s\S]*?-->/g, " ");
 PROSE.split(/<\/?(?:p|li|dd|dt|td|th|summary|br|caption|h3|h4)\b[^>]*>/).map(plain).filter(x => /[A-Za-z]/.test(x) && !/^[:{]/.test(x)).forEach(x => {

@@ -60,7 +60,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 .xs-stop { display: grid; gap: 8px; margin-top: 16px; border-left: 4px solid var(--lx-accent); }
 .page-learn .xs-stop h3 { margin: 0; }
 .page-learn .xs-stop .xs-stop-lede { margin: 0; color: var(--lx-ink-2); }
-.page-learn .xs-stop .xs-h { margin: 4px 0 4px; font-family: var(--lx-f-display); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; color: var(--lx-ink-3); }
+.page-learn .xs-stop .xs-h { margin: 4px 0 4px; font-family: var(--lx-f-display); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; color: var(--lx-ink-2); }
 .xs-stop-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 22px; }
 .page-learn .xs-stop ul, .page-learn .xs-ladder { margin: 0; padding-left: 1.2rem; display: grid; gap: 5px; }
 .page-learn .xs-src { color: var(--lx-ink-3); font-size: 14px; }

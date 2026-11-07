@@ -108,6 +108,13 @@
   function sourcesHTML(D) {
     return "<ul>" + Object.keys(D.sources).map(function (k) { var s = D.sources[k]; return "<li>" + esc(s.text) + (s.url ? ". <a href=\"" + esc(s.url) + "\">Link</a>" : "") + ". " + esc(s.asOf.charAt(0).toUpperCase() + s.asOf.slice(1)) + ".</li>"; }).join("") + "</ul>";
   }
+  // the explain layer's timeline: every dated stage, with the order's own source (as_of: its issue date, ISO)
+  function timelineEvents(D) {
+    var s = D.sources["ferc-2222"];
+    return D.steps.filter(function (x) { return x.date; }).map(function (x) {
+      return { date: x.date, label: x.label, kind: x.kind, key: !!x.key, text: x.text + " (" + x.where + ")", source: { label: "FERC, Order No. 2222", url: s.url, as_of: D.hook.end } };
+    });
+  }
   function deeperHTML() {
     return "<ul><li><b>Step one: how much.</b> The commission sets a <span class=\"lx-term\" data-term=\"revenue-requirement\">revenue requirement</span>: the utility's allowed operating expenses plus an allowed return on its rate base, the net value of what it has built.</li>" +
       "<li><b>Step two: who pays it.</b> Rate design splits that amount into charges for each customer class: fixed charges, prices per kWh and, for large users, demand charges.</li>" +
@@ -116,14 +123,13 @@
 
   var model = { span: span, spanText: spanText, addDays: addDays, longDate: longDate, orderScore: orderScore, STEPS: STEPS, hookFeedback: hookFeedback, CHAIN_SAW: CHAIN_SAW,
     orderLine: orderLine, orderSaw: orderSaw, stepLi: stepLi, caseHTML: caseHTML, CASE_SAW: CASE_SAW, sortLine: sortLine, SORT_SAW: SORT_SAW,
-    staticFallback: staticFallback, ideasHTML: ideasHTML, checkHTML: checkHTML, factsHTML: factsHTML, sourcesHTML: sourcesHTML, deeperHTML: deeperHTML };
+    staticFallback: staticFallback, ideasHTML: ideasHTML, checkHTML: checkHTML, factsHTML: factsHTML, sourcesHTML: sourcesHTML, deeperHTML: deeperHTML, timelineEvents: timelineEvents };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
   // ---------------------------------------------------------------- view
   var LX = window.LX, H = LX.H;
   function bold(t) { return LX.rich(t).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>"); }
-  function src(D, k) { var s = D.sources[k]; return { label: s.text.split(":")[0].split(" (")[0], url: s.url || undefined, as_of: s.asOf.split(",")[0] }; }
 
   LX.mount("x04", function (live, data, root) {
     var D = data[KEY], P = data.path, demo = [], picks = [];
@@ -226,12 +232,12 @@
         },
         cols: 3, at: { cong: [0, 0], leg: [1, 0], loc: [2, 0], ferc: [0, 1], kcc: [1, 1], tar: [0, 2], rate: [1, 2], out: [1, 3] },
         colsN: 3, atN: { cong: [0, 0], leg: [1, 0], loc: [2, 0], ferc: [0, 1], kcc: [1, 1], tar: [0, 2], rate: [1, 2], out: [1, 3] },
-        edges: [["cong", "ferc"], ["leg", "kcc"], ["ferc", "tar", "wholesale"], ["kcc", "rate", "retail"], ["tar", "out"], ["rate", "out"], ["loc", "out", null, { v: true }]],
+        edges: [["cong", "ferc"], ["leg", "kcc"], ["ferc", "tar", "wholesale"], ["kcc", "rate", "retail"], ["tar", "out", null, { v: true }], ["rate", "out"], ["loc", "out", null, { v: true }]],
         traces: [{ label: "Order No. 2222", path: ["cong", "ferc", "tar", "out"], text: "Federal track: FERC's rule changed each regional market's tariff, filed at FERC." },
                  { label: "A Kansas rate change", path: ["leg", "kcc", "rate", "out"], text: "State track: the KCC decides the utility's application, in most cases within 240 days." },
                  { label: "A wind farm's site", path: ["loc", "out"], text: "Local track, in most places: the county, sometimes with the state; a tall-turbine check is federal." }], sel: 1 });
       LX.Timeline(H("div", { class: "lx-card x4-tl" }, xhost), { title: "One federal rule in time: Order No. 2222",
-        events: D.steps.filter(function (s) { return s.date; }).map(function (s) { return { date: s.date, label: s.label, kind: s.kind, key: !!s.key, text: s.text + " (" + s.where + ")", source: src(D, "ferc-2222") }; }) });
+        events: timelineEvents(D) });
       var nx = H("div", { class: "lx-xcard" }, xhost);
       H("h3", { text: "Where this connects" }, nx);
       var ul = H("ul", { class: "x4-next" }, nx);

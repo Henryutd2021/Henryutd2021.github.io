@@ -87,7 +87,7 @@
         } },
       { text: STEPS[1], build: function (act, api) {
           var note = H("p", { class: "lx-step-line", "aria-live": "polite" });
-          var cs = LX.CardSort(act, { bins: D.methods.map(function (m) { return { id: m.id, label: m.label, color: m.color }; }), cards: D.questions, maxWhy: 6,
+          var cs = LX.CardSort(act, { bins: D.methods.map(function (m) { return { id: m.id, label: m.id === "mapping" ? "Mapping" : m.label.replace("Ethnography", "Ethno\u00ADgraphy"), sub: m.id === "mapping" ? "participatory" : null, color: m.color }; }), cards: D.questions, maxWhy: 6,
             onCheck: function (g) { note.textContent = matchLine(g); api.done(); api.saw(MATCH_SAW); } });
           act.appendChild(note);
           demo[1] = function () { var m = {}; D.questions.forEach(function (q) { m[q.id] = q.bin; }); cs.place(m); cs.check(); };

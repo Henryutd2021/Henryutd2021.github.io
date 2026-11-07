@@ -75,7 +75,8 @@ ok(D.steps.filter(s => s.date).every((s, i, a) => i === 0 || s.date > a[i - 1].d
   perm(truth, []); ok(all === 720, "the score is right for all 720 orders"); }
 ok(M.orderScore(D, truth).right === 6 && !/true order is shown/.test(M.orderLine(D, truth)) && /true order is shown/.test(M.orderLine(D, D.shuffle)), "the line after checking is true for a right and a wrong order");
 ok(step("rfc").comments === 44 && step("nopr").comments === 109 && step("conf").comments === 52, "comment counts as in the order's procedural history (44, 109, 52)");
-D.steps.filter(s => s.date).forEach(s => ok(TL.validate ? (() => { try { TL.validate([{ date: s.date, label: s.label, kind: s.kind, source: { label: "FERC" } }]); return true; } catch (e) { return false; } })() : true, s.id + ": a valid timeline event"));
+{ const ev = M.timelineEvents(D), probs = TL.validate(ev); ok(Array.isArray(probs) && probs.length === 0 && ev.length === 5, "the explain layer's timeline events are valid for LX.Timeline (" + probs.join("; ") + ")");
+  const bad = TL.validate([{ date: "2020-09-17", label: "x", source: { label: "y", as_of: "issued 17 September 2020" } }]); ok(bad.length === 1, "the validator refuses a source date in words (the bug the screenshots caught)"); }
 ok(D.steps.every(s => !s.date || s.date <= "2020-12-31"), "no live proceeding: every dated stage of the rulemaking ends by 2020");
 
 // ---------------- sources behind every claim

@@ -270,7 +270,8 @@
           var eq = H("p", { class: "lx-step-line x5-eq", "aria-live": "polite" }, act), verdict = H("p", { class: "lx-hint", "aria-live": "polite" }, act);
           var target = largestLoanM(P, L), moved = false;
           var sl = LX.Slider(act, { label: "Loan", color: "var(--lx-wind)", min: X.loan.range[0], max: X.loan.range[1], step: X.loan.step, value: 60, fmt: function (v) { return "$" + v + "M"; }, onChange: function () { moved = true; draw(); } });
-          H("p", { class: "lx-hint", html: LX.rich("Fully contracted here. A level payment at " + fmtN(L.rate, 1) + "% over " + L.term + " years; one typical year in 2025 dollars stands for every year (simplified). " + L.dscrNote) }, act);
+          H("p", { class: "lx-hint", text: "Fully contracted here; a level payment at " + fmtN(L.rate, 1) + "% over " + L.term + " years, with one typical year in 2025 dollars standing for every year (simplified)." }, act);
+          H("p", { class: "lx-hint", text: L.dscrNote }, act);
           var show = H("button", { type: "button", class: "lx-btn small", text: "Show me the largest loan" }, act);
           show.addEventListener("click", function () { sl.set(target, true); });
           ro.rev.textContent = M(P.rev); ro.opex.textContent = M(P.opex); ro.cf.textContent = M(P.cf);
@@ -286,7 +287,7 @@
           var line = H("p", { class: "lx-step-line", "aria-live": "polite" }, act), low = false, tried = false;
           var sl = LX.Slider(act, { label: "Sold under contract", color: "var(--lx-tier-2)", min: X.contract.range[0], max: X.contract.range[1], step: X.contract.step, value: Math.round(st.s * 100), fmt: function (v) { return v + "%"; }, onChange: function () { draw(); } });
           var tg = LX.Toggle(H("div", { class: "lx-toggles", role: "group", "aria-label": "The year" }, act), { label: "A bad year", on: false, onChange: function () { tried = tried || tg.val(); draw(); } });
-          H("p", { class: "lx-hint", text: X.contract.note + " " + X.bad.note }, act);
+          H("p", { class: "lx-hint", text: X.contract.note }, act); H("p", { class: "lx-hint", text: X.bad.note }, act);
           function draw() {
             var s = sl.val() / 100, D = debtMax(P, L, s), cf = yearCF(P, s, tg.val() ? X.bad : null);
             st.s = s; low = low || s <= 0.5;
@@ -304,7 +305,8 @@
           var c = H("div", { class: "x5-ctls" }, act);
           var a = LX.Slider(c, { label: "Tax equity, share of the cost", color: "var(--lx-tier-2)", min: X.taxEquity.range[0], max: X.taxEquity.range[1], step: X.taxEquity.step, value: Math.round(st.te * 100), fmt: function (v) { return v + "%"; }, onChange: function () { moved = true; draw(); } });
           var g = LX.Slider(c, { label: "Grant, share of the cost", color: "var(--lx-good)", min: X.grant.range[0], max: X.grant.range[1], step: X.grant.step, value: Math.round(st.g * 100), fmt: function (v) { return v + "%"; }, onChange: function () { moved = true; draw(); } });
-          H("p", { class: "lx-hint", html: LX.rich(X.taxEquity.note.replace("lesson A12", LX.lessonRef(Pth, "A12").ready ? "[[lesson:a12-policy-instruments|lesson A12]]" : "lesson A12") + " " + X.grant.note + " The loan stays sized on the whole project's cash; in a real partnership tax equity takes a share of the cash first, so the loan would be smaller.") }, act);
+          H("p", { class: "lx-hint", html: LX.rich(X.taxEquity.note.replace("lesson A12", LX.lessonRef(Pth, "A12").ready ? "[[lesson:a12-policy-instruments|lesson A12]]" : "lesson A12") + " Both shares are yours to set, illustrative.") }, act);
+          H("p", { class: "lx-hint", text: "The loan stays sized on the whole project's cash; in a real partnership tax equity takes a share of the cash first, so the loan would be smaller." }, act);
           function draw() {
             st.te = a.val() / 100; st.g = g.val() / 100;
             var S = stack(P, L, st.s, st.te, st.g); sb.set(stackSpec(S)); line.innerHTML = bold(stackSaw(P, L, st.s, st.te, st.g));

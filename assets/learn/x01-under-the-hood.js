@@ -197,14 +197,14 @@
       xhost.innerHTML = ""; xhost.classList.add("is-live");
       LX.ConceptMap(H("div", { class: "lx-xcard" }, xhost), {
         title: "From a discipline to a number in the model", lede: "Tap an idea: each discipline hands the model a few kinds of number.",
-        groups: { disc: ["Disciplines", "var(--lx-tier-1)"], num: ["What models borrow", "var(--lx-tier-2)"], model: ["The system model", "var(--lx-accent)"] },
+        groups: { disc: ["Disciplines", "var(--lx-tier-1)"], num: ["What models borrow", "var(--lx-tier-2)"], model: ["The system model", "var(--lx-tier-4)"] },
         cols: 3, rows: 5, colsN: 3, rowsN: 5, sel: "eff", gameLabel: "In this lesson",
         nodes: [
-          { id: "pe", g: "disc", label: "Power electronics, protection", lines: ["Power", "electronics"], at: [0, 0], text: "Design inverters and relays: how power is converted, and how faults are cleared." },
-          { id: "mech", g: "disc", label: "Aerodynamics, combustion", lines: ["Aero,", "combustion"], at: [0, 1], text: "Design blades and combustors: how much power a rotor catches, how hot a flame burns." },
+          { id: "pe", g: "disc", label: "Power electronics", lines: ["Power", "electronics"], at: [0, 0], text: "Power electronics and protection design inverters and relays: how power is converted, and how faults are cleared." },
+          { id: "mech", g: "disc", label: "Aero, combustion", lines: ["Aero,", "combustion"], at: [0, 1], text: "Aerodynamics and combustion design blades and combustors: how much power a rotor catches, how hot a flame burns." },
           { id: "nucl", g: "disc", label: "Reactor physics", lines: ["Reactor", "physics"], at: [0, 2], text: "With thermal hydraulics and materials: a steady chain reaction and the heat carried out of the core." },
           { id: "chem", g: "disc", label: "Electrochemistry", lines: ["Electro-", "chemistry"], at: [0, 3], text: "Design battery cells and electrolyzer stacks: energy held, kWh per kilogram, wear." },
-          { id: "ctl", g: "disc", label: "Control, cybersecurity", lines: ["Control,", "cyber"], at: [0, 4], text: "Design the control room's software and protect it; NERC's CIP standards cover the bulk power system." },
+          { id: "ctl", g: "disc", label: "Control, cyber", lines: ["Control,", "cyber"], at: [2, 0], text: "Control engineering and cybersecurity design the control room's software and protect it; NERC's CIP standards cover the bulk power system." },
           { id: "rating", g: "num", label: "Ratings", at: [1, 0], text: "MW, MWh and line limits." },
           { id: "eff", g: "num", label: "Efficiencies", at: [1, 1], text: "Heat rates, round trips, kWh per kilogram." },
           { id: "ramp", g: "num", label: "Ramp limits", lines: ["Ramp", "limits"], at: [1, 2], text: "How fast output changes, and the lowest steady load." },
