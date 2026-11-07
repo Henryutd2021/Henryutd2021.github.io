@@ -212,7 +212,7 @@ body-classes: "page-learn page-lesson lx-form-studio"
 <details class="lx-deeper">
 <summary><span class="k">Go deeper · Researcher</span>From a card to a study</summary>
 <div class="lx-deeper-body">
-<p>The research capstone (CR, upcoming) starts from a card made here.</p>
+<p>The research capstone (<a href="cr-your-own-study.html">CR</a>) starts from a card made here.</p>
 <ul>
 <li><a href="r02-literature.html">R2</a> maps the literature around it.</li>
 <li><a href="r03-system-and-method.html">R3</a> chooses the system, boundary and method.</li>

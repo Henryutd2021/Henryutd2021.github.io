@@ -149,7 +149,7 @@ body-classes: "page-learn page-lesson lx-form-studio"
 <ul>
 <li>How to run interviews, focus groups or participatory workshops well: a qualitative-methods course, and a mentor, are the next step.</li>
 <li>Misconduct investigations: the European code's §3.2 sets out how institutions handle them fairly.</li>
-<li>Peer review: writing a review, and answering one point by point, is practised in the Researcher checkpoint (CK-R, upcoming).</li>
+<li>Peer review: writing a review, and answering one point by point, is practised in the Researcher checkpoint (<a href="ck-r-defend-revise.html">CK-R</a>).</li>
 </ul>
 </div>
 </details>
@@ -177,7 +177,7 @@ body-classes: "page-learn page-lesson lx-form-studio"
 <details class="lx-deeper">
 <summary><span class="k">Go deeper · Researcher</span>From this statement to your capstone</summary>
 <div class="lx-deeper-body">
-<p>The capstone research project asks for this statement with its proposal, and its mixed track (a model with a stakeholder or survey part) needs the ethics step before any data are collected. The data licences here are the ones you checked in <a href="r04-data.html">R4</a>; the Researcher checkpoint (CK-R, upcoming) asks you to defend them under review.</p>
+<p>The capstone research project asks for this statement with its proposal, and its mixed track (a model with a stakeholder or survey part) needs the ethics step before any data are collected. The data licences here are the ones you checked in <a href="r04-data.html">R4</a>; the Researcher checkpoint (<a href="ck-r-defend-revise.html">CK-R</a>) asks you to defend them under review.</p>
 </div>
 </details>
 </div>

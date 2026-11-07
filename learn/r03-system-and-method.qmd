@@ -172,7 +172,7 @@ body-classes: "page-learn page-lesson lx-form-studio"
 <details class="lx-deeper">
 <summary><span class="k">Go deeper · Researcher</span>Where the defence goes next</summary>
 <div class="lx-deeper-body">
-<p>In the research capstone (CR, upcoming), this design card becomes the method section of your proposal; the mock review in CK-R asks you to defend it again.</p>
+<p>In the research capstone (<a href="cr-your-own-study.html">CR</a>), this design card becomes the method section of your proposal; the mock review in <a href="ck-r-defend-revise.html">CK-R</a> asks you to defend it again.</p>
 <p>The Modeler lessons build the families in depth:</p>
 <ul>
 <li><a href="m01-dispatch-to-lmp.html">M1</a>: a dispatch linear program.</li>

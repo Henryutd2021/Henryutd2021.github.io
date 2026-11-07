@@ -187,7 +187,7 @@ body-classes: "page-learn page-lesson lx-form-studio"
 <details class="lx-deeper">
 <summary><span class="k">Go deeper · Researcher</span>From a card to a proposal</summary>
 <div class="lx-deeper-body">
-<p>In the research capstone (CR, upcoming), your proposal opens with this card.</p>
+<p>In the research capstone (<a href="cr-your-own-study.html">CR</a>), your proposal opens with this card.</p>
 <ul>
 <li><a href="r10-question-studio.html">R10</a>, the question studio, helps you generate candidate questions.</li>
 <li><a href="r02-literature.html">R2</a> tests what is already known.</li>
