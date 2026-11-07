@@ -757,7 +757,7 @@
   does: "Tap eight components (an inverter, a relay, a turbine blade, a combustor, a reactor core, an electrolyzer stack, a battery cell and a control room) to meet the discipline behind each; sort what a model borrows from what stays with the engineers; light the components by the kind of number they supply."
   outcome: "Name the discipline that designs each major energy device, say which numbers a system model borrows from it (ratings, efficiencies, ramp limits, outlet temperatures, failure rates and operating rules), and where the course stops."
   after: [F4]
-# X3, builder learn-w6-x (wave W6; side-topic shelf, D1). Curriculum prerequisite F10 is not live yet (integration to-do).
+# X3, builder learn-w6-x (wave W6; side-topic shelf, D1)
 - kind: lesson
   id: x03-transitions-history
   code: X3
@@ -772,7 +772,7 @@
   teaches: [diffusion curves, shares over time, network build-out, public programmes, what you measure decides the speed]
   does: "Guess how long electricity took to reach nine U.S. homes in ten; compare towns and farms; watch gas heating replace coal; read the car and solar curves; sort what sped each change up and what held it back; then a dated timeline and two readings of the record."
   outcome: "Read an adoption curve as a share of a named whole, say how fast past U.S. changes moved and what sped or slowed them, and explain why the answer to how fast depends on what is measured, without forecasting the next one."
-  after: []
+  after: [F10]
 # ---------- wave W4 Analyst module A3 (curriculum v2 §18.4; builder learn-w4-b)
 - kind: lesson
   id: a03-market-design
@@ -998,7 +998,7 @@
   does: "Line up four scenarios for Prairieland built on one data set; read each one's question and assumptions; sort them and four real outlooks as exploratory or target-seeking; trace the gaps in CO₂, electricity and imports to demand, fuel prices, policy and fixed technology costs, one at a time and in order; then move a budget and watch the carbon price it needs."
   outcome: "Tell an exploratory scenario from a target-seeking one, trace a gap between two scenarios to their assumptions in a stated order, explain why the parts depend on that order, and say why a target-seeking scenario's policy is an output, not an input."
   after: [A1, 13]
-# A21, builder learn-w6-b (wave W6). Curriculum prerequisite F10 is left out until F10 is live (integration to-do).
+# A21, builder learn-w6-b (wave W6)
 - kind: lesson
   id: a21-security-minerals
   code: A21
@@ -1014,7 +1014,8 @@
   teaches: [import dependence, accounting conventions in a ratio, single routes, supplier concentration (HHI), largest-supplier benchmarks, price spikes and who pays, stock days of net imports, the scarcest input, a second site, combined shocks that overlap, which lever helps against which shock]
   does: "Read Prairieland's supply fuel by fuel; compute its import dependence under two conventions and the share on one strait; compute an HHI and cap the leading refiner; stress the nation with an LNG price spike, a closed strait, a mineral export restriction and a factory fire, alone and together; then sort stockpiles, more suppliers, recycling, a second site and using less by the shocks they help against."
   outcome: "Compute import dependence and a concentration index and say what each does and does not measure, size stocks against a closure, find the scarcest input in a supply chain, and match each security lever to the shocks it helps against."
-# X2, builder learn-w6-x (wave W6; side-topic shelf, D2). Curriculum prerequisite F10 is not live yet (integration to-do).
+  after: [F10]
+# X2, builder learn-w6-x (wave W6; side-topic shelf, D2)
 - kind: lesson
   id: x02-fossil-transition
   code: X2
@@ -1030,7 +1031,7 @@
   teaches: [roles of gas coal and oil today, retirement plans against retirements, network costs and remaining customers, stranded assets, capture against removal, permanence of carbon storage]
   does: "Tap a map of gas networks, LNG, gas and coal plants, mines, oil, carbon capture and carbon removal; check a year of coal retirement plans against what retired; spread a gas network's cost over fewer customers under two assumptions; see what an early closure leaves unpaid in Ridge County; tell capture from removal; sort removal methods by permanence, readiness and cost range; weigh gas as a bridge or a lock-in."
   outcome: "Say what gas, coal and oil systems do today and which questions a transition opens, read a retirement or gas-network scenario by its assumptions, and compare carbon-removal methods by permanence, readiness, cost range and how they are measured, without a verdict."
-  after: [F11]
+  after: [F10, F11]
 # X4, builder learn-w7-a (wave W7): side-topic shelf, D1; review yearly (policy)
 - kind: lesson
   id: x04-rules-law
@@ -1342,7 +1343,7 @@
   outcome: "Formulate a multi-region, multi-decade capacity-expansion LP with vintages, residual value, a cumulative budget and an import cap, read its budget dual as a carbon value that rises at the discount rate, and say which conclusions survive myopic decisions, shocks and full years of hours."
   teaches: [multi-period capacity expansion, asset vintages and residual value, cumulative carbon budgets, import-share caps, perfect against myopic foresight, the budget's dual as a carbon value, representative slices checked against full years, near-optimal plans]
   lab: "a SciPy/HiGHS notebook that rebuilds engine E4's pathway LP and asserts the browser's numbers, about 60 minutes, then 120 minutes of practice."
-  after: [M3, M8]
+  after: [M3, M8, A20, A21]
 # M14, builder learn-w5-g (wave W5)
 - kind: lesson
   id: m14-did-it-work
@@ -1430,7 +1431,7 @@
   outcome: "Defend a national pathway in a two-page policy brief: its cost, emissions against the budget, security under four shocks, a screening of affordability and of Ridge County's jobs (gross and net), and the uncertainty that would change the recommendation."
   teaches: [capstone policy brief, stress tests against shocks, cumulative budgets in practice, screening affordability, a just transition in numbers, uncertainty in a recommendation]
   lab: "M13's notebook: Prairieland's pathway in SciPy and HiGHS, about 60 minutes."
-  after: [SB4, M13, A12]
+  after: [SB4, M13, A20, A21, A12]
 # ---------- the Modeler checkpoint (curriculum v2 §3.3), wave W2
 - kind: lesson
   id: ck-m-unseen-problem
@@ -1601,6 +1602,7 @@
   teaches: [informed consent, ethics review, authorship and credit, conflicts of interest, data licences, corrections, stakeholders]
   does: "Sort ten practices by the norm they serve; work through six dilemmas (a funder's headline, a convenient scenario, a co-author's data, a community meeting, a survey without consent, an error after publication); map who the study affects; write an integrity statement."
   after: [R1]
+  next: CR
 - kind: lesson
   id: r10-question-studio
   code: R10
