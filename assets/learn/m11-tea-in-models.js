@@ -2,13 +2,14 @@
 // cards with solver runs), wave W5, builder learn-w5-f, 2026-11-06.
 //
 // Data: assets/learn/data/m11-tea-in-models.json (the plant, the electrolyzer's costs, the credit as the IRS states it, the
-// counting rules, the boundaries, the tie rule and a reference block written by the test), 13-capstone.json (the wind farm's
-// costs, the rate and the life, as lesson 13 shows them), a16-hydrogen-ptx.json (57 kWh per kg, as A16 shows it), town.json
+// counting rules, the boundaries, the tie rule, a reference block written by the test, and a "lesson13" block the test
+// copies from 13-capstone.json and checks on every run: the wind farm's costs, the rate and the life, as lesson 13 shows
+// them, so this page and its notebook need only that subset), a16-hydrogen-ptx.json (57 kWh per kg, as A16 shows it), town.json
 // (Prairie Town's fleet, for its price and CO2), town_year.json (SPP 2025 hourly shapes, EIA-930), cf_targets.json (EIA's
 // wind capacity factor).
 //
-// The model: one linear program for a plant's whole life, on twelve representative days (one per month, each weighted by
-// its month's days). Money is in real 2025 dollars; the objective is the plant's ANNUAL EQUIVALENT net cost, $ a year
+// The model: one linear program for a plant's whole life, on 36 representative days (three per month, each weighted by
+// the days it stands for). Every variable is >= 0 and 0 <= S <= 100 MW. Money is in real 2025 dollars; the objective is the plant's ANNUAL EQUIVALENT net cost, $ a year
 // (its present value divided by the annuity factor of its life). Decisions:
 //   S                   the electrolyzer's size (MW), or fixed
 //   per period p, day d, hour t:
@@ -32,8 +33,8 @@
 //   where counted = imp (no certificates; hourly matching behind one meter), u (hourly matching across the grid), or, with
 //   annual matching, the year's imp minus the certificates (wind sold), which may go negative in the row because the
 //   right side is never negative (e x max(0, X) <= L x kg is e x X <= L x kg); e = the grid's t CO2 per MWh.
-//   A tier's rule is a step, which no single LP can hold: plan() solves one LP per tier (and one with no credit) and keeps
-//   the best (ties to the cleaner tier). Credit amounts are the law's; no page searches over them (guard G-POL).
+//   A tier's rule is a step, which no single LP can hold: the page solves one LP per tier (and one with no credit) and keeps
+//   the best (pick(): the largest value; within $1 a year of it, the case listed first). Credit amounts are the law's; no page searches over them (guard G-POL).
 // Reported numbers leave out the tie rule's hair costs (data "tie"); the test proves the reported numbers the same on every
 // best plan and re-runs the plans on all 8,760 hours of 2025 (data reference.fullYear).
 (function () {
@@ -219,20 +220,23 @@
     if (creditOn) D.credit.tiers.forEach(function (t) { L.push({ id: t.id, tier: t, credit: t.amount * (o.wage === false ? 1 : D.credit.multiplier) }); });
     return L;
   }
-  // the best case: the largest annual equivalent; ties within $1 a year go to the case listed first ("none", then the
-  // cleaner tier); a plan that makes no hydrogen claims nothing ("none")
+  // the best case: the largest annual equivalent, and of the cases within TIE_USD ($1 a year) of it the one listed first
+  // ("none", then the cleaner tier); a plan that makes no hydrogen claims nothing ("none")
+  var TIE_USD = 1;
   function pick(list) {
-    var best = null;
-    list.forEach(function (c) { if (c.R && c.R.ok && (!best || c.R.annual > best.R.annual + 1)) best = c; });
-    if (best && best.R.kg < 1) best = list.filter(function (c) { return c.id === "none"; })[0] || best;
+    var ok = list.filter(function (c) { return c.R && c.R.ok; });
+    if (!ok.length) return null;
+    var top = Math.max.apply(null, ok.map(function (c) { return c.R.annual; }));
+    var best = ok.filter(function (c) { return c.R.annual >= top - TIE_USD; })[0];
+    if (best.R.kg < 1) best = list.filter(function (c) { return c.id === "none"; })[0] || best;
     return best;
   }
   // A bound for each case without an LP: the same LP with no cap. With no cap the hours are independent once the size S
   // is set, so each hour's best use of S is a short ladder (wind the connection cannot carry, then wind it could sell,
   // then power bought, each worth less than the one before), and the year's cost is a convex, piecewise-linear function
-  // of S: its least value is found by sweeping its corners. It equals the uncapped LP's optimum (the test checks), so a
-  // case whose uncapped optimum is no better than a plan already solved cannot win and needs no LP. For "none" it is
-  // exact. Returns the LP objective ($ a year, the tie rule's hair costs included) and the best S.
+  // of S: its least value is found by sweeping its corners. It equals the uncapped LP's optimum (the test checks), which
+  // annualBound() turns into a bound on what the capped case can report. For "none" it is exact. Returns the LP
+  // objective ($ a year, the tie rule's hair costs included unless o.hair is false) and the best S.
   function freeObj(Y, K, D, o) {
     var days = o.days || Y.days, grid = o.boundary === "grid", hair = o.hair === false ? { import: 0, curtail: 0 } : D.tie, maxMW = D.plant.maxMW;
     var base = 0, ev = [], capCost = o.size == null ? (K.crf + D.electrolyzer.fomShare) * K.capexKW * 1000 : 0;
@@ -260,13 +264,40 @@
     F += slope * (maxMW - pos); if (F < best.obj - 1e-9) best = { obj: F, S: maxMW };
     return best;
   }
-  // the cases' bounds and the order to solve them in: tiers by bound, best first, then "none". A case is solved only if its
-  // bound beats the best objective found so far by more than BOUND_MARGIN ($ a year; the bound is exact, the margin only
-  // guards rounding); "none" is solved only if it would win, since its bound is its optimum.
-  var BOUND_MARGIN = 1000;
+  // An upper bound on a case's reported annual equivalent ($ a year) without an LP: the uncapped LP's optimum with no hair
+  // costs (freeObj, hair: false), turned into the annual equivalent as read() reports it (minus the wind farm's own costs
+  // for one plant, minus the wind farm alone for the increment). The capped LP's plan is feasible for the uncapped one, so
+  // it reports no more (the test checks it on a grid of settings).
+  function annualBound(Y, K, D, o) {
+    var oc = {}; for (var k in o) oc[k] = o[k]; oc.hair = false; oc.tier = null;
+    var b = o.boundary || "plant", f = freeObj(Y, K, D, oc), fixedCap = o.size != null ? (K.crf + D.electrolyzer.fomShare) * K.capexKW * 1000 * o.size : 0;
+    var windC = K.windFomKW * 1000 * K.windMW + K.crf * K.windCapexKW * 1000 * K.windMW;
+    return -(f.obj + fixedCap) - (b === "plant" ? windC : 0) - (b === "increment" ? windAlone(Y, K, o.days) : 0);
+  }
+  // The cases' bounds and the order to solve them in: tiers by bound, best first, then "none". A case c needs no LP when
+  // it cannot be pick()'s answer, which holds in either of two cases:
+  //   (a) its bound is more than TIE_USD + BOUND_GUARD below the best annual equivalent already solved (top): c cannot
+  //       come within $1 a year of the best (BOUND_GUARD, $1 a year, covers the solver's rounding of objectives of a few
+  //       $M), and skipping it leaves the best unchanged;
+  //   (b) a case listed before c in pick()'s order is solved and reports at least c's bound (less BOUND_EPS, a cent): if c
+  //       were within $1 of the best, so would that earlier case be, and the earlier one wins the tie.
+  // The test checks on a grid of settings that the skips never change the answer. "none" is solved only when it could win.
+  var BOUND_GUARD = 1, BOUND_EPS = 0.01;
   function bounded(Y, K, D, o, list, window) {
-    list.forEach(function (c) { var oc = {}; for (var k in o) oc[k] = o[k]; oc.credit = c.credit; oc.tier = null; oc.window = window || "right"; c.ub = freeObj(Y, K, D, oc).obj; });
-    return list.filter(function (c) { return c.id !== "none"; }).sort(function (a, b) { return a.ub - b.ub; }).concat(list.filter(function (c) { return c.id === "none"; }));
+    list.forEach(function (c) { var oc = {}; for (var k in o) oc[k] = o[k]; oc.credit = c.credit; oc.tier = null; oc.window = window || "right"; c.ub = annualBound(Y, K, D, oc); });
+    return list.filter(function (c) { return c.id !== "none"; }).sort(function (a, b) { return b.ub - a.ub; }).concat(list.filter(function (c) { return c.id === "none"; }));
+  }
+  // c: a case with its bound (bounded); list: the cases in pick()'s order, with R once solved; top: the best annual
+  // equivalent solved so far (-Infinity before the first LP)
+  function canSkip(c, list, top) {
+    if (c.ub < top - TIE_USD - BOUND_GUARD) return true;
+    var at = list.indexOf(c);
+    return list.some(function (i, j) { return j < at && i.R && i.R.ok && i.R.annual >= c.ub - BOUND_EPS; });
+  }
+  // the representative days' weights in words ("9, 10 or 11")
+  function weightWords(days) {
+    var u = []; days.forEach(function (d) { if (u.indexOf(d.weight) < 0) u.push(d.weight); }); u.sort(function (a, b) { return a - b; });
+    return u.length > 1 ? u.slice(0, -1).join(", ") + " or " + u[u.length - 1] : String(u[0]);
   }
   function eligible(D, start) { var s = D.credit.starts.filter(function (x) { return x.year === start; })[0]; return !!(s && s.ok); }
 
@@ -278,10 +309,11 @@
     t: function (kg) { return Math.round(kg / 1000).toLocaleString("en-US") + " t"; },
     mwh: function (v) { return Math.round(v).toLocaleString("en-US") + " MWh"; },
     pct: function (v) { return Math.round(v * 100) + "%"; },
-    rate: function (v) { return v.toFixed(3) + " kg CO₂e/kg"; }
+    rate: function (v) { return v.toFixed(3) + " kg CO₂/kg"; }   // operating CO2 of the counted grid power (illustrative)
   };
   var model = { HOURS: HOURS, MON: MON, crf: crf, af: af, to2025: to2025, costs: costs, capexRange: capexRange, prepare: prepare, medoids: medoids, allDays: allDays, dateOf: dateOf,
-    periods: periods, build: build, read: read, money: money, windAlone: windAlone, tierCases: tierCases, pick: pick, eligible: eligible, freeObj: freeObj, bounded: bounded, BOUND_MARGIN: BOUND_MARGIN, sum: sum, fm: fm };
+    periods: periods, build: build, read: read, money: money, windAlone: windAlone, tierCases: tierCases, pick: pick, eligible: eligible, freeObj: freeObj, annualBound: annualBound,
+    bounded: bounded, canSkip: canSkip, TIE_USD: TIE_USD, BOUND_GUARD: BOUND_GUARD, BOUND_EPS: BOUND_EPS, weightWords: weightWords, sum: sum, fm: fm };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX || !window.LX.H) return;
 
@@ -337,10 +369,13 @@
     return g;
   }
   function choice(host, label) { var d = H("div", { class: "m11-choice" }, host); H("span", { text: label }, d); return d; }
+  // rich text with glossary marks and **bold** (LX.rich escapes any HTML tag)
+  function rb(t) { return LX.rich(t).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>"); }
 
   LX.mount(SLUG, function (live, data, root) {
     css(); root.classList.add("m11-lab");
-    var D = data.m11_tea_in_models, C13 = data["13_capstone"], A16 = data.a16_hydrogen_ptx, REF = D.reference;
+    // C13: lesson 13's wind farm, rate and life, as the test copies them from 13-capstone.json into this lesson's data
+    var D = data.m11_tea_in_models, C13 = D.lesson13, A16 = data.a16_hydrogen_ptx, REF = D.reference;
     var Y = prepare(D, data.town, data.town_year, data.cf_targets, LX.townProfile), CX = capexRange(D), own = LX.store.get(KEY, {}) || {};
     function remember(k, v) { own[k] = v; LX.store.set(KEY, own); }
     // the reader's settings, shared by every step
@@ -361,17 +396,18 @@
       });
     }
     // the tier enumeration: one LP per case at most, each solve its own step with progress (onStep). Each case's bound
-    // (its LP with no cap, solved in closed form: freeObj) orders the tiers and skips any that cannot beat the best LP
-    // found so far; "none" is solved only if it would win. Resolves to { cases, best, solved } or { failed }
+    // (annualBound: its LP with no cap, in closed form) orders the tiers and skips any that cannot win even at its bound
+    // (canSkip); "none" is solved only if it could win. Resolves to { cases, best, solved }
+    // or { failed }
     function evaluate(o, window, onStep) {
-      var k0 = K(), L = tierCases(D, { wage: st.wage }, creditOK()).map(function (c) { return { id: c.id, tier: c.tier, credit: c.credit }; }), inc = Infinity, n = 0;
+      var k0 = K(), L = tierCases(D, { wage: st.wage }, creditOK()).map(function (c) { return { id: c.id, tier: c.tier, credit: c.credit }; }), top = -Infinity, n = 0;
       var order = bounded(Y, k0, D, o, L, window);
       return order.reduce(function (pr, c) {
         return pr.then(function (bad) { if (bad) return bad;
-          if (c.ub >= inc - BOUND_MARGIN) { c.skip = true; return null; }
+          if (canSkip(c, L, top)) { c.skip = true; return null; }
           var oc = {}; for (var k in o) oc[k] = o[k]; oc.credit = c.credit; oc.tier = c.tier; oc.window = window || "right";
           return solve1(oc).then(function (x) { c.R = x.R; c.r = x.r;
-            if (x.R) { n++; inc = Math.min(inc, x.r.objective); if (onStep) onStep(n, c); }
+            if (x.R) { n++; top = Math.max(top, x.R.annual); if (onStep) onStep(n, c); }
             return x.R ? null : x.r; });
         });
       }, Promise.resolve(null)).then(function (bad) {
@@ -450,14 +486,14 @@
           go.addEventListener("click", LX.SolveStep.action({ api: api, st: stt, host: act, go: go, cls: "m11-fail", job: function () { var o = base({ boundary: "plant", size: st.size }); return solve1(o).then(function (x) { last = x; return x.R ? null : x.r; }); },
             show: function () {
               var R = last.R, a = R.per[0]; stt.set(last.r); out.innerHTML = ""; var k = H("div", { class: "m11-kpis" }, out);
-              kpi(k, "Hydrogen a year", fm.t(a.kg)); kpi(k, "Electrolyzer running", fm.pct(R.util)); kpi(k, "Power bought", fm.mwh(a.imp)); kpi(k, "Wind curtailed", fm.mwh(a.cur));
+              kpi(k, "Hydrogen a year", fm.t(a.kg)); kpi(k, "Capacity utilization", fm.pct(R.util)); kpi(k, "Power bought", fm.mwh(a.imp)); kpi(k, "Wind curtailed", fm.mwh(a.cur));
               drawScene(R, last.o);
               ph.innerHTML = ""; var sel = H("select", { class: "m11-sel", "aria-label": "Day to show" }, H("label", { class: "m11-choice" }, ph));
               Y.days.forEach(function (dy, i) { H("option", { value: String(i), text: dayLabel(dy) }, sel); }); sel.value = "8";
               var pl = H("div", null, ph); dayPlot(pl, last, 8);
               sel.addEventListener("change", function () { pl.innerHTML = ""; dayPlot(pl, last, +sel.value); });
               remember("s1", { S: R.S, kg: a.kg });
-              api.done(); api.saw("The electrolyzer runs " + fm.pct(R.util) + " of the year's capacity: on wind first, then on power bought when a kilogram earns more than the power and the charge cost. **An operating model: hours given a size.**");
+              api.done(); api.saw("[[capacity-utilization|Capacity utilization]] " + fm.pct(R.util) + ": the MWh it used ÷ (size × 8,760 h); half power all year would be 50%. Wind comes first, then power bought when a kilogram earns more than power and charge. **An operating model: hours given a size.**");
             } }));
         } },
       // 2 annualize capital
@@ -496,13 +532,13 @@
             job: function () { return solve1(base({ boundary: "plant", size: st.size })).then(function (x) { fixedX = x; if (!x.R) return x.r; return solve1(base({ boundary: "plant" })).then(function (y) { freeX = y; return y.R ? null : y.r; }); }); },
             show: function () {
               var A = fixedX.R, B = freeX.R; stt.set(freeX.r); out.innerHTML = "";
-              table(out, ["Plan", "Size", "Running", "Value a year (annual equivalent)", "~Cost per kg"], [["Your size", fm.mw(A.S), fm.pct(A.util), fm.musd(A.annual), A.lcoh == null ? "–" : fm.kg(A.lcoh)], ["The model's size", fm.mw(B.S), fm.pct(B.util), fm.musd(B.annual), B.lcoh == null ? "–" : fm.kg(B.lcoh)]], "Your size against the model's", 1);
+              table(out, ["Plan", "Size", "Utilization", "Value a year (annual equivalent)", "~Cost per kg"], [["Your size", fm.mw(A.S), fm.pct(A.util), fm.musd(A.annual), A.lcoh == null ? "–" : fm.kg(A.lcoh)], ["The model's size", fm.mw(B.S), fm.pct(B.util), fm.musd(B.annual), B.lcoh == null ? "–" : fm.kg(B.lcoh)]], "Your size against the model's", 1);
               H("p", { class: "m11-note", html: LX.rich("Value a year: the plan's [[net-present-value|NPV]] spread evenly over its life, wind farm included (step 4). Cost per kg: the [[lcoh|levelized cost]] before any credit.") }, out);
               var d = B.S - A.S, word = Math.abs(d) < 0.5 ? "about the same as" : d < 0 ? "less than" : "more than";
               po.answer = Math.abs(d) < 0.5 ? "same" : d < 0 ? "less" : "more"; pr.reveal("The model built " + fm.mw(B.S) + ": " + word + " your " + fm.mw(A.S) + ".");
               drawScene(B, freeX.o); remember("s3", { S: B.S, annual: B.annual, lcoh: B.lcoh });
               var lc = (A.lcoh != null && B.lcoh != null) ? (B.lcoh > A.lcoh + 0.005 ? " Its cost per kg is higher, " + fm.kg(B.lcoh) + " against " + fm.kg(A.lcoh) + ", yet the plan is worth more: **the LP maximizes value, not the cost per kg** (CF2)." : " **The LP maximizes the plan's value; the cost per kg is a result, not the goal.**") : B.S < 0.05 ? " At this price no electrolyzer pays for itself." : "";
-              api.done(); api.saw("It builds " + fm.mw(B.S) + (B.S > 0.05 ? ", running " + fm.pct(B.util) + " of the year" : "") + "; value " + fm.musd(B.annual) + " a year against " + fm.musd(A.annual) + " at your size." + lc);
+              api.done(); api.saw("It builds " + fm.mw(B.S) + (B.S > 0.05 ? ", at " + fm.pct(B.util) + " capacity utilization" : "") + "; value " + fm.musd(B.annual) + " a year against " + fm.musd(A.annual) + " at your size." + lc);
             } }));
         } },
       // 4 lifetime cash flows
@@ -512,6 +548,7 @@
           go.addEventListener("click", LX.SolveStep.action({ api: api, st: stt, host: act, go: go, cls: "m11-fail", job: function () { return solve1(base({ boundary: "plant" })).then(function (y) { x = y; return y.R ? null : y.r; }); },
             show: function () { stt.set(x.r); out.innerHTML = ""; cashChart(out, x.R, x.K, "The model's plan, wind farm and electrolyzer"); var k = H("div", { class: "m11-kpis" }, out);
               kpi(k, "NPV", fm.musd(x.R.npv), x.R.npv < 0 ? "bad" : "good"); kpi(k, "Annual equivalent × annuity factor", fm.musd(x.R.annual) + " × " + x.K.af.toFixed(2));
+              H("p", { class: "m11-note", html: rb("The [[annuity-factor|annuity factor]], " + x.K.af.toFixed(2) + " here, is what $1 a year for " + st.N + " years is worth today: 1 ÷ CRF.") }, out);
               remember("s4", { npv: x.R.npv }); drawScene(x.R, x.o);
               api.done(); api.saw("NPV " + fm.musd(x.R.npv) + ": " + (x.R.npv < 0 ? "at these settings the plant, wind farm included, does not earn back its cost at " + st.r.toFixed(1) + "% real." : "the plant earns back its cost at " + st.r.toFixed(1) + "% real, with " + fm.musd(x.R.npv) + " to spare.") + " **When every year is alike, the LP's annual goal and the NPV rank plans the same way.**");
             } }));
@@ -520,23 +557,25 @@
       { text: "A [[production-credit|production credit]] pays per kilogram. Read the U.S. hydrogen credit as the IRS states it today, then say when your plant begins construction and whether it meets the wage rules.",
         build: function (act, api) {
           var C = D.credit, law = H("div", { class: "m11-law" }, act), picked = {};
-          H("p", { html: LX.rich("<b>Who can still claim it.</b> A facility whose construction begins before 1 January 2028: Public Law 119-21 (2025) ended the credit for facilities that begin later. It is paid for 10 years from the day the facility is placed in service.") }, law);
-          H("p", { html: LX.rich("<b>What qualifies.</b> Hydrogen with at most 4 kg [[co2e|CO₂e]] per kg, [[well-to-gate|well to gate]], from DOE's 45VH2-GREET model. The cleaner, the larger the share:") }, law);
+          H("p", { html: rb("**Who can still claim it.** A facility whose construction begins before 1 January 2028; Public Law 119-21 (2025) ended the credit for later starts.") }, law);
+          H("p", { html: rb("**For how long.** 10 years from the day the facility is [[placed-in-service|placed in service]].") }, law);
+          H("p", { html: rb("**What qualifies.** Hydrogen with at most 4 kg [[co2e|CO₂e]] per kg, [[well-to-gate|well to gate]], from DOE's 45VH2-GREET model. The cleaner, the larger the share:") }, law);
           table(law, ["kg CO₂e per kg", "Share", "2025 amount", "With the wage rules"], C.tiers.map(function (t) { return [t.label, (t.pct * 100).toFixed(1).replace(".0", "") + "%", "$" + t.amount.toFixed(3), "$" + (t.amount * C.multiplier).toFixed(3)]; }), "The credit's tiers in 2025");
           H("p", { class: "src", html: "Source: IRS, <a href=\"" + D.sources["irs-i7210"].url + "\">Instructions for Form 7210 (2025)</a>, page updated 30 April 2026, read 6 November 2026. The amount is adjusted for inflation each year; this lesson holds the 2025 amount in 2025 dollars." }, law);
           var c1 = choice(act, "Construction begins in"), c2 = choice(act, "Prevailing wage and apprenticeship rules"), out = H("div", { "aria-live": "polite" }, act);
           seg(c1, "Year construction begins", C.starts.map(function (s) { return { id: s.year, label: String(s.year) }; }), null, function (y) { st.start = y; picked.a = 1; upd(); });
           seg(c2, "Wage and apprenticeship rules", [{ id: true, label: "met (× 5)" }, { id: false, label: "not met" }], null, function (v) { st.wage = v; picked.b = 1; upd(); });
+          H("p", { class: "m11-note", html: rb("[[prevailing-wage-apprenticeship|Wage rules]]: those who build or repair the facility earn at least the local prevailing wage, and registered apprentices work a set number of hours. Meeting both multiplies the credit by 5.") }, c2);
           function upd() {
             out.innerHTML = ""; var k = H("div", { class: "m11-kpis" }, out), ok = creditOK(), top = perKg(C.tiers[0]);
-            kpi(k, "Top tier", ok ? "$" + top.toFixed(3) + "/kg" : "none", ok ? "good" : "bad"); kpi(k, "Years", ok ? "1 to " + C.years : "–");
+            kpi(k, "Top tier, if its emissions qualify", ok ? "$" + top.toFixed(3) + "/kg" : "none", ok ? "good" : "bad"); kpi(k, "Years", ok ? "1 to " + C.years : "–");
             if (picked.a && picked.b) { api.done(); remember("s5", { ok: ok, top: top });
-              api.saw(ok ? "Your plant qualifies: up to $" + top.toFixed(2) + " per kg in the top tier, for years 1 to " + C.years + " of its " + st.N + "." : "Construction in " + st.start + " is too late: no credit. The next steps then run without one."); }
+              api.saw(ok ? "The construction-date condition is met. The credit then depends on the plant's emissions tier (steps 6 and 7): up to $" + top.toFixed(2) + " per kg in the top tier, for years 1 to " + C.years + " of its " + st.N + "." : "Construction in " + st.start + " is too late: no credit. The next steps then run without one."); }
           }
           H("p", { class: "m11-note", text: "Pick both to go on." }, act);
         } },
       // 6 the credit's ten years inside the model
-      { text: "Put the credit in the LP for its own ten years: two copies of the year share one size, the first with the credit. To claim the top tier, counted grid power stays under 0.45 kg CO₂e per kg (next step).",
+      { text: "Put the credit in the LP for its own ten years: two copies of the year share one size, and only the first earns the credit. Then compare it with a credit counted in every year.",
         build: function (act, api) {
           var row = H("div", { class: "m11-row" }, act), go = H("button", { type: "button", class: "lx-btn small", html: LX.icon("play") + "Solve: ten years, and all years" }, row), stt = LX.SolverStatus(row), out = H("div", { "aria-live": "polite" }, act), A = null, B = null;
           go.addEventListener("click", LX.SolveStep.action({ api: api, st: stt, host: act, go: go, cls: "m11-fail",
@@ -548,8 +587,10 @@
             show: function () {
               stt.set(A.r); out.innerHTML = "";
               if (!creditOK()) { H("p", { class: "m11-note", text: "No credit applies (construction in " + st.start + "), so both runs are the plan of step 4: " + fm.mw(A.R.S) + ", NPV " + fm.musd(A.R.npv) + "." }, out); api.done(); api.saw("Without a credit there is nothing to place in time. Pick 2026 or 2027 in step 5 to see the difference."); return; }
-              var k = A.K, phi = af(k.r, D.credit.years) / k.af;
+              var k = A.K, phi = af(k.r, D.credit.years) / k.af, kp = perKg(D.credit.tiers[0]), share = A.R.creditLev / kp, mkg = function (v) { return (v / 1e6).toFixed(2) + " million kg"; };
+              H("p", { class: "m11-note", text: "Both runs claim the top tier: in the credit years, the counted grid CO₂ (operating only, illustrative) stays under 0.45 kg per kg." }, out);
               H("p", { class: "m11-note", text: "The first copy carries " + fm.pct(phi) + " of the life's discounted years: AF(" + st.r.toFixed(1) + "%, 10) ÷ AF(" + st.r.toFixed(1) + "%, " + st.N + ") = " + af(k.r, D.credit.years).toFixed(2) + " ÷ " + k.af.toFixed(2) + "." }, out);
+              if (A.R.per.length > 1) H("p", { class: "m11-note", text: "It makes " + mkg(A.R.per[0].kg) + " a year under the cap, " + mkg(A.R.per[1].kg) + " after the credit ends. So the credit years hold " + (share * 100).toFixed(1) + "% of the discounted kilograms: $" + kp.toFixed(3) + " × " + share.toFixed(3) + " ≈ " + fm.kg(A.R.creditLev) + " over the life." }, out);
               table(out, ["Credit counted", "Size", "Hydrogen a year", "NPV", "Credit per kg over the life"], [["Its 10 years (right)", fm.mw(A.R.S), fm.t(A.R.kg), fm.musd(A.R.npv), fm.kg(A.R.creditLev)], ["All " + st.N + " years (wrong)", fm.mw(B.R.S), fm.t(B.R.kg), fm.musd(B.R.npv), fm.kg(B.R.creditLev)]], "The credit in its own years against in every year", 0);
               cashChart(out, A.R, A.K, "Its 10 years: the credit stops after year 10");
               drawScene(A.R, A.o); remember("s6", { npv: A.R.npv, wrong: B.R.npv, lev: A.R.creditLev });
@@ -561,18 +602,18 @@
         build: function (act, api) {
           var c1 = choice(act, "The grid's CO₂ rate counted for power bought");
           seg(c1, "Grid CO₂ rate", D.grid.presets.map(function (g) { return { id: g.id, label: g.label + ": " + eOf(g.id).toFixed(3) + " t/MWh" }; }), st.eKey, function (id) { st.eKey = id; });
-          H("p", { class: "m11-note", text: "Counting rule: hourly matching, the rule from 2030. Operating CO₂ only: the rules' life-cycle grid rate is higher (simplified)." }, act);
+          H("p", { class: "m11-note", html: rb("Counting rule: [[hourly-matching|hourly matching]], the rule from 2030. Operating CO₂ only: the rules' life-cycle grid rate is higher (simplified).") }, act);
           var row = H("div", { class: "m11-row" }, act), go = H("button", { type: "button", class: "lx-btn small", html: LX.icon("play") + "Solve the tiers" }, row), stt = LX.SolverStatus(row), prog = H("p", { class: "m11-note", "aria-live": "polite" }, act), out = H("div", { "aria-live": "polite" }, act), ev = null;
           go.addEventListener("click", LX.SolveStep.action({ api: api, st: stt, host: act, go: go, cls: "m11-fail",
             job: function () { prog.textContent = ""; return evaluate(base({ boundary: "plant", rule: "hourly" }), "right", progress(prog)).then(function (e) { ev = e; return e.failed || null; }); },
             show: function () {
               stt.set(ev.best.r); prog.textContent = done(ev); out.innerHTML = ""; var L = ev.cases, bi = L.indexOf(ev.best);
-              table(out, ["Case", "Credit per kg", "Size", "~Grid power counted", "Value a year"], L.map(function (c) {
+              table(out, ["Case", "Credit per kg", "Size", "~Counted grid CO₂ per kg", "Value a year"], L.map(function (c) {
                 var name = c.id === "none" ? "No credit" : c.tier.label + " kg";
                 if (!c.R || c.same) return [name, c.credit ? "$" + c.credit.toFixed(3) : "–", c.same ? fm.mw(c.R.S) : "–", "–", c.same ? fm.musd(c.R.annual) : "skipped: bound"];
                 return [name, c.credit ? "$" + c.credit.toFixed(3) : "–", fm.mw(c.R.S), c.R.kg > 0 ? fm.rate(c.R.rate) : "–", fm.musd(c.R.annual)]; }), "One LP per tier", bi);
-              H("p", { class: "m11-note", text: "Each tier's cap is 'at most' a hair (0.001) under its 'less than' limit. Best plan highlighted; ties within $1 a year go to the row listed first." }, out);
-              if (ev.solved < L.length) H("p", { class: "m11-note", html: "<b>Bounding.</b> With no cap, a case's hours can be solved in a few lines, which bounds what it could earn; a case whose bound cannot beat the best LP so far needs no LP: " + (L.length - ev.solved) + " of " + L.length + " skipped." }, out);
+              H("p", { class: "m11-note", text: "Best plan highlighted: the largest value, or the first row listed within $1 a year of it. Each cap sits 0.001 under its 'less than' limit." }, out);
+              if (ev.solved < L.length) H("p", { class: "m11-note", html: "<b>Bounding.</b> With no cap, a case's hours solve in a few lines: that bounds its value. A case that cannot win even at its bound needs no LP: " + (L.length - ev.solved) + " of " + L.length + " skipped." }, out);
               drawScene(ev.best.R, null); remember("s7", { best: ev.best.id });
               var b = ev.best, why = b.id === "none" ? (L.length === 1 ? "No credit applies, so one LP is all there is." : "Claiming any tier costs more than it pays: the grid power it rules out is worth more.") : b.id === "t1" ? "The top tier wins: the grid power it rules out is worth less than the larger credit." : "A lower tier wins: buying more grid power is worth more than the larger credit.";
               api.done(); api.saw("Best: " + caseName(b) + ": " + fm.mw(b.R.S) + ", " + fm.musd(b.R.annual) + " a year. " + why + " **A step rule is a set of LPs, one per step.**");
@@ -583,6 +624,7 @@
         build: function (act, api) {
           var c1 = choice(act, "The plant's boundary"), c2 = choice(act, "Bought power counts as clean with"), c = H("div", { class: "lx-ctls" }, act);
           seg(c1, "Boundary", D.boundaries.map(function (b) { return { id: b.id, label: b.label }; }), st.boundary, function (id) { st.boundary = id; note(); });
+          H("p", { class: "m11-note", html: rb("**Increment**: the electrolyzer's value against keeping the wind farm alone, an [[incremental-analysis|incremental analysis]].") }, c1);
           seg(c2, "Counting rule", D.rules.map(function (r) { return { id: r.id, label: r.label }; }), st.rule, function (id) { st.rule = id; note(); });
           LX.Slider(c, { label: "Delivery charge on power bought", min: D.charge.min, max: D.charge.max, step: D.charge.step, value: st.c, color: "var(--lx-cc)", fmt: function (q) { return "$" + q + " per MWh"; }, onChange: function (q) { st.c = q; } });
           var nt = H("p", { class: "m11-note" }, act);
@@ -659,15 +701,16 @@
       rows: [
         { html: "min (" + sym("crf", "<var>CRF</var>") + " + " + sym("fom", "<var>f</var>") + ") " + sym("capex", "<var>c</var>") + " " + sym("S", "<var>S</var>") + " + Σ<sub><var>p</var></sub> " + sym("phi", "<var>φ</var><sub><var>p</var></sub>") + " Σ<sub><var>d</var>,<var>t</var></sub> " + sym("wd", "<var>n</var><sub><var>d</var></sub>") + " [(" + sym("p", "<var>p</var><sub><var>t</var></sub>") + " + " + sym("ch", "<var>q</var>") + ") " + sym("imp", "<var>imp</var>") + " − <var>p</var><sub><var>t</var></sub> " + sym("exp", "<var>exp</var>") + " + (" + sym("wear", "<var>v</var>") + " − (" + sym("h", "<var>h</var>") + " + " + sym("cr", "<var>κ</var><sub><var>p</var></sub>") + ") " + sym("k", "<var>k</var>") + ") " + sym("ez", "<var>ez</var>") + "]", tag: "goal", say: "Minimise the annual equivalent net cost: capital recovery and upkeep of the size, plus each period's weighted hours of power bought and sold, stack wear, hydrogen sales and the credit." },
         { html: sym("dw", "<var>dw</var>") + " + <var>exp</var> ≤ " + sym("w", "<var>w</var><sub><var>t</var></sub>") + ", &nbsp; <var>ez</var> = <var>dw</var> + <var>imp</var> ≤ <var>S</var>, &nbsp; <var>exp</var>, <var>imp</var> ≤ 50", tag: "hours", say: "Wind goes to the electrolyzer or is sold, the rest curtailed; the electrolyzer takes wind and bought power up to its size; the connection carries at most 50 megawatts each way." },
-        { html: "Σ<sub><var>d</var>,<var>t</var></sub> <var>n</var><sub><var>d</var></sub> (" + sym("e", "<var>e</var>") + " " + sym("u", "<var>u</var>") + " − " + sym("L", "<var>L</var>") + " <var>k</var> <var>ez</var> ÷ 1000) ≤ 0, &nbsp; <var>u</var> ≥ <var>imp</var> − <var>exp</var>", tag: "tier (period 1)", say: "In the credit years, the counted grid power's CO2 stays under the tier's limit per kilogram; with hourly matching, only power bought beyond the same hour's sales counts." }
+        { html: "<var>dw</var>, <var>exp</var>, <var>imp</var>, <var>u</var> ≥ 0, &nbsp; 0 ≤ <var>S</var> ≤ 100", tag: "bounds", say: "Every power variable is zero or more, and the size runs from 0 to 100 megawatts. Without u ≥ 0, an hour that sells could cancel power bought in another hour: that would be annual matching, not hourly." },
+        { html: "Σ<sub><var>d</var>,<var>t</var></sub> <var>n</var><sub><var>d</var></sub> (" + sym("e", "<var>e</var>") + " " + sym("u", "<var>u</var>") + " − " + sym("L", "<var>L</var>") + " <var>k</var> <var>ez</var> ÷ 1000) ≤ 0, &nbsp; <var>u</var> ≥ <var>imp</var> − <var>exp</var>, &nbsp; <var>u</var> ≥ 0", tag: "tier (period 1)", say: "In the credit years, the counted grid power's CO2 stays under the tier's limit per kilogram; with hourly matching, only power bought beyond the same hour's sales counts, and never less than zero." }
       ],
       symbols: {
         crf: { name: "CRF", label: "CRF, the capital recovery factor", unit: "per year", words: "r ÷ (1 − (1 + r)^−N): the equal yearly share of an up-front cost over N years at rate r.", you: d.crf.toFixed(4) + " (4% real, 30 years).", code: "crf(K.r, K.N)" },
         fom: { name: "f", label: "f, fixed upkeep", unit: "share of capital a year", words: "DOE: 5% of the installed cost a year.", you: "0.05", code: "D.electrolyzer.fomShare" },
-        capex: { name: "c", label: "c, installed cost", unit: "$ per MW", words: "DOE's $2,000 per kW in 2022 dollars, × 128.893 ÷ 118.026 (BEA's GDP deflator) to 2025 dollars.", you: "$" + Math.round(d.capexKW).toLocaleString("en-US") + " per kW.", code: "K.capexKW * 1000" },
+        capex: { name: "c", label: "c, installed cost", unit: "$ per MW", words: "DOE's $2,000 per kW in 2022 dollars, × 128.893 ÷ 118.026 (BEA's GDP deflator) to 2025 dollars, × 1,000 kW per MW.", you: "$" + Math.round(d.capexKW).toLocaleString("en-US") + " per kW = about $" + (Math.round(d.capexKW) * 1000).toLocaleString("en-US") + " per MW.", code: "K.capexKW * 1000" },
         S: { name: "S", label: "S, the electrolyzer's size", unit: "MW", words: "A decision: chosen with the hours, up to 100 MW.", you: "Top tier, one plant: " + d.t1.S.toFixed(1) + " MW.", code: '"S"' },
         phi: { name: "φ_p", label: "phi p, a period's weight", unit: "share", words: "The share of the life's discounted years: AF(r, 10) ÷ AF(r, N) for the credit years, the rest after.", you: d.phi.toFixed(3) + " and " + (1 - d.phi).toFixed(3) + ".", code: "periods(K, o)" },
-        wd: { name: "n_d", label: "n d, a day's weight", unit: "days", words: "The days of its month's third that a representative day stands for; 365 in all.", you: "10 or 11 days each, 36 days.", code: "dy.weight" },
+        wd: { name: "n_d", label: "n d, a day's weight", unit: "days", words: "The days of its month's third that a representative day stands for; 365 in all.", you: weightWords(Y.days) + " days each, " + Y.days.length + " days.", code: "dy.weight" },
         p: { name: "p_t", label: "p t, the grid price", unit: "$/MWh", words: "Prairie Town's cost of one more MWh in hour t: $0, $40 or $100.", you: R.priceShare.zero + " of 2025's hours at $0.", code: "dy.p[t]" },
         ch: { name: "q", label: "q, the delivery charge", unit: "$/MWh", words: "A transmission and delivery charge on power bought (illustrative).", you: "$" + D.charge.def + ".", code: "o.c" },
         imp: { name: "imp", label: "imp, power bought", unit: "MW", words: "Bought from the grid in an hour, at most 50 MW (all of the electrolyzer's power across the grid).", you: "Top tier: " + Math.round(d.t1.imp).toLocaleString("en-US") + " MWh a year.", code: '"imp" + s' },
@@ -676,12 +719,12 @@
         h: { name: "h", label: "h, the hydrogen price", unit: "$/kg", words: "What the buyer pays per kilogram, set by you.", you: "$" + D.hydrogen.price.def.toFixed(2) + ".", code: "o.h" },
         cr: { name: "κ_p", label: "kappa p, the credit", unit: "$/kg", words: "The tier's amount in the credit years, 0 after them.", you: "$" + (D.credit.tiers[0].amount * D.credit.multiplier).toFixed(3) + " at the top tier with the wage rules.", code: "pp.credit" },
         k: { name: "k", label: "k, kilograms per MWh", unit: "kg/MWh", words: "1,000 ÷ 57 kWh per kg, about 17.54 (DOE).", you: "17.54", code: "K.k" },
-        ez: { name: "ez", label: "ez, power into the electrolyzer", unit: "MW", words: "Shorthand for dw + imp, never above S.", you: "Top tier: running " + Math.round(d.t1.util * 100) + "% of the year.", code: "dw + imp" },
+        ez: { name: "ez", label: "ez, power into the electrolyzer", unit: "MW", words: "Shorthand for dw + imp, never above S.", you: "Top tier: capacity utilization " + Math.round(d.t1.util * 100) + "%, its MWh ÷ (S × 8,760 h).", code: "dw + imp" },
         dw: { name: "dw", label: "dw, wind taken directly", unit: "MW", words: "Wind the electrolyzer takes behind the plant's meter (none across the grid).", you: "Counts as zero CO2 here.", code: '"dw" + s' },
         w: { name: "w_t", label: "w t, the plant's wind", unit: "MW", words: "100 MW following SPP's 2025 shape at EIA's 33.8% capacity factor.", you: "Representative days: " + (R.repCF * 100).toFixed(1) + "% against the year's 33.8%.", code: "dy.w[t]" },
         e: { name: "e", label: "e, the grid's CO2 rate", unit: "t/MWh", words: "The rate counted for power bought (operating CO2 only; simplified).", you: "Prairie Town's 2025 average, " + R.townRate.toFixed(3) + ".", code: "o.e" },
-        u: { name: "u", label: "u, unmatched power", unit: "MW", words: "Bought power not covered by certificates from the same hour (hourly matching).", you: "No certificates: u = imp; annual matching: the year's bought minus sold, in one row.", code: '"u" + s' },
-        L: { name: "L", label: "L, the tier's limit", unit: "kg CO2e per kg", words: "0.45, 1.5, 2.5 or 4.0 kg per kg; the LP uses 0.001 below each 'less than'.", you: "Top tier: 0.449.", code: "o.tier.max" }
+        u: { name: "u", label: "u, unmatched power", unit: "MW", words: "Bought power not covered by certificates from the same hour (hourly matching); never below 0.", you: "No certificates: u = imp; annual matching: the year's bought minus sold, in one row.", code: '"u" + s' },
+        L: { name: "L", label: "L, the tier's limit", unit: "kg CO2e per kg", words: "0.45, 1.5, 2.5 or 4.0 kg per kg; the LP uses 0.001 below each 'less than' and counts operating CO2 against it (simplified).", you: "Top tier: 0.449.", code: "o.tier.max" }
       }
     });
     LX.CompareTable(H("div", { class: "lx-xcard" }, x), {

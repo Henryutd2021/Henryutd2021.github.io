@@ -287,6 +287,12 @@
   "lesson": "A3",
   "href": "a03-market-design.html"
  },
+ "capacity-utilization": {
+  "term": "Capacity utilization",
+  "short": "The energy a machine used or made over a year divided by its size times 8,760 hours, its average loading, so half power all year gives 50%, as full power for half the year does.",
+  "lesson": "M11",
+  "href": "m11-tea-in-models.html"
+ },
  "capital-cost": {
   "term": "Capital cost",
   "short": "The money spent to build a power plant, usually given per kilowatt of capacity, before it makes any electricity.",
@@ -2326,6 +2332,12 @@
   "short": "What an amount of money paid or received in the future is worth today, once it is discounted.",
   "lesson": 7,
   "href": "07-cost.html"
+ },
+ "prevailing-wage-apprenticeship": {
+  "term": "Prevailing wage and apprenticeship requirements",
+  "short": "Two federal conditions of many clean-energy tax credits, the hydrogen credit among them, that raise the credit fivefold when both are met: those who build or repair the facility are paid at least the local prevailing wage, and apprentices from registered programs work a set number of hours.",
+  "lesson": "M11",
+  "href": "m11-tea-in-models.html"
  },
  "pricing-node": {
   "term": "Pricing node",
