@@ -1164,9 +1164,13 @@
    "tier": "foundations",
    "code": "F9",
    "title": "What does a city run on, and who controls what?",
-   "ready": false,
-   "href": "index.html#foundations",
-   "scales": []
+   "ready": true,
+   "href": "f09-city-energy.html",
+   "scales": [],
+   "id": "f09-city-energy",
+   "minutes": 15,
+   "form": "cards",
+   "short": "A city's energy"
   },
   {
    "tier": "foundations",
@@ -1180,9 +1184,13 @@
    "tier": "foundations",
    "code": "F11",
    "title": "What does energy do to the air, the climate and people's lives?",
-   "ready": false,
-   "href": "index.html#foundations",
-   "scales": []
+   "ready": true,
+   "href": "f11-air-climate-people.html",
+   "scales": [],
+   "id": "f11-air-climate-people",
+   "minutes": 20,
+   "form": "cards",
+   "short": "Air, climate and bills"
   },
   {
    "tier": "foundations",
@@ -1264,9 +1272,13 @@
    "tier": "analyst",
    "code": "A11",
    "title": "What does 'clean' mean from cradle to grave? Life cycles, water and land",
-   "ready": false,
-   "href": "index.html#analyst",
-   "scales": []
+   "ready": true,
+   "href": "a11-lca-nexus.html",
+   "scales": [],
+   "id": "a11-lca-nexus",
+   "minutes": 25,
+   "form": "cards",
+   "short": "Life cycles, water, land"
   },
   {
    "tier": "analyst",
@@ -1284,17 +1296,25 @@
    "tier": "analyst",
    "code": "A13",
    "title": "Who pays and who benefits? Energy burden, fairness and jobs",
-   "ready": false,
-   "href": "index.html#analyst",
-   "scales": []
+   "ready": true,
+   "href": "a13-fairness-jobs.html",
+   "scales": [],
+   "id": "a13-fairness-jobs",
+   "minutes": 30,
+   "form": "cards",
+   "short": "Who pays, who benefits"
   },
   {
    "tier": "analyst",
    "code": "A15",
    "title": "How much can efficiency and electrification change demand? Buildings, heat, transport and industry",
-   "ready": false,
-   "href": "index.html#analyst",
-   "scales": []
+   "ready": true,
+   "href": "a15-efficiency-electrification.html",
+   "scales": [],
+   "id": "a15-efficiency-electrification",
+   "minutes": 35,
+   "form": "cards",
+   "short": "Efficiency and electrification"
   },
   {
    "tier": "analyst",
@@ -1312,17 +1332,26 @@
    "tier": "analyst",
    "code": "A18",
    "title": "How is a city or regional energy plan made?",
-   "ready": false,
-   "href": "index.html#analyst",
-   "scales": []
+   "ready": true,
+   "href": "a18-city-plan.html",
+   "scales": [],
+   "id": "a18-city-plan",
+   "minutes": 30,
+   "form": "cards",
+   "short": "A city's energy plan"
   },
   {
    "tier": "analyst",
    "code": "A19",
    "title": "Where should it go? Siting with maps, from layers to a suitability score",
-   "ready": false,
-   "href": "index.html#analyst",
-   "scales": []
+   "ready": true,
+   "href": "a19-gis-siting.html",
+   "scales": [],
+   "id": "a19-gis-siting",
+   "tier2": "modeler",
+   "minutes": 25,
+   "form": "cards",
+   "short": "Siting with maps"
   },
   {
    "tier": "analyst",
@@ -1368,28 +1397,39 @@
    "tier": "analyst",
    "code": "CK-A",
    "title": "Analyst checkpoint: an auditable spreadsheet for a new case",
-   "ready": false,
-   "href": "index.html#analyst",
+   "ready": true,
+   "href": "ck-a-spreadsheet.html",
    "scales": [],
-   "form": "checkpoint"
+   "id": "ck-a-spreadsheet",
+   "minutes": 150,
+   "form": "checkpoint",
+   "short": "Analyst checkpoint"
   },
   {
    "tier": "analyst",
    "code": "SB3",
    "title": "City Planner",
-   "ready": false,
-   "href": "index.html#analyst",
+   "ready": true,
+   "href": "sb3-city-planner.html",
    "scales": [],
-   "form": "sandbox"
+   "id": "sb3-city-planner",
+   "tier2": "modeler",
+   "minutes": 30,
+   "form": "sandbox",
+   "short": "City Planner"
   },
   {
    "tier": "analyst",
    "code": "C3",
    "title": "Prairie City 2040: write the city's energy plan",
-   "ready": false,
-   "href": "index.html#analyst",
+   "ready": true,
+   "href": "c3-prairie-city-2040.html",
    "scales": [],
-   "form": "capstone"
+   "id": "c3-prairie-city-2040",
+   "tier2": "modeler",
+   "minutes": 150,
+   "form": "capstone",
+   "short": "Prairie City 2040"
   },
   {
    "tier": "modeler",
@@ -1503,17 +1543,25 @@
    "tier": "modeler",
    "code": "M11",
    "title": "Techno-economic analysis inside an optimization model",
-   "ready": false,
-   "href": "index.html#modeler",
-   "scales": []
+   "ready": true,
+   "href": "m11-tea-in-models.html",
+   "scales": [],
+   "id": "m11-tea-in-models",
+   "minutes": 40,
+   "form": "cards",
+   "short": "TEA inside a model"
   },
   {
    "tier": "modeler",
    "code": "M12",
    "title": "Model a city's energy system: an energy hub with grid limits and screening fairness outputs",
-   "ready": false,
-   "href": "index.html#modeler",
-   "scales": []
+   "ready": true,
+   "href": "m12-city-model.html",
+   "scales": [],
+   "id": "m12-city-model",
+   "minutes": 45,
+   "form": "cards",
+   "short": "A city's energy hub"
   },
   {
    "tier": "modeler",
@@ -1527,9 +1575,13 @@
    "tier": "modeler",
    "code": "M14",
    "title": "Did it work? Learning from data with regression and natural experiments",
-   "ready": false,
-   "href": "index.html#modeler",
-   "scales": []
+   "ready": true,
+   "href": "m14-did-it-work.html",
+   "scales": [],
+   "id": "m14-did-it-work",
+   "minutes": 40,
+   "form": "cards",
+   "short": "Regression and natural experiments"
   },
   {
    "tier": "modeler",
@@ -1661,9 +1713,13 @@
    "tier": "researcher",
    "code": "R7",
    "title": "Cost and carbon done properly: one boundary, a fair baseline, a stated counterfactual",
-   "ready": false,
-   "href": "index.html#researcher",
-   "scales": []
+   "ready": true,
+   "href": "r07-cost-carbon-properly.html",
+   "scales": [],
+   "id": "r07-cost-carbon-properly",
+   "minutes": 35,
+   "form": "studio",
+   "short": "Cost and carbon, properly"
   },
   {
    "tier": "researcher",

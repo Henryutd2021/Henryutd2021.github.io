@@ -1,0 +1,556 @@
+{
+ "about": {
+  "what": "Engine E3's settings and costs: Prairie City's energy hub (the three districts behind their substation limits) as a linear program over prairie-city.json's eight representative days. Prairie City's own numbers are in prairie-city.json; this file holds only what the engine adds.",
+  "line": "Prairie City is fictional; its numbers are illustrative.",
+  "built": "2026-11-06",
+  "builtBy": "scripts/build_learn_e3_data.py (ResearchPortfolio repository): python3 scripts/build_learn_e3_data.py --site <site>; the `precomputed` block is written by the tests' --write mode",
+  "set": "Costs read from other course files say so in `via`; everything marked \"teaching\" is illustrative, set for this course, with a range the reader can change."
+ },
+ "dollarYear": 2025,
+ "finance": {
+  "rate": 0.04,
+  "plantLife": 30,
+  "note": "Every up-front cost is paid as a yearly amount: the up-front cost x the capital recovery factor at a 4% real rate over the item's life, plus its upkeep. 4% real is lesson 13's rate (a round value inside the 2025 ATB's financing range).",
+  "via": "13-capstone.json finance",
+  "src": [
+   "atb2025-fin"
+  ]
+ },
+ "heatPump": {
+  "capex": 7355,
+  "capexSource": 6730,
+  "capexYear": 2022,
+  "life": 15,
+  "note": "EIA's minimum-efficiency air-source heat pump, installed, per home ($6,730 in 2022 dollars, x 1.0928 to 2025 dollars with EIA's GDP deflator, as engine E0 does); 15-year life. Its efficiency through the year is Prairie City's COP curve (prairie-city.json, cop), not this unit's rating. Commercial buildings are counted as home-equivalents by their heat need.",
+  "via": "e0.json home.hp.standard",
+  "src": [
+   "eia-aeo2026-rdm",
+   "eia-steo-9a"
+  ]
+ },
+ "retrofit": {
+  "cost": {
+   "def": 9000,
+   "lo": 3000,
+   "hi": 25000,
+   "step": 500
+  },
+  "save": {
+   "def": 18,
+   "lo": 10,
+   "hi": 50,
+   "step": 1
+  },
+  "life": 30,
+  "anchor": {
+   "gasCut": 17.8,
+   "costPerHome": 4695,
+   "costYear": 2008,
+   "programYear": 2008
+  },
+  "note": "Set for teaching: an envelope package (air sealing, attic and wall insulation, duct sealing) that cuts a home's space-heat need by the share you set, at a cost per home you set (2025 dollars), lasting 30 years. For scale: ORNL's national evaluation of DOE's Weatherization Assistance Program found that gas-heated single-family homes weatherized in program year 2008 cut their gas use by 17.8%, at an average cost of $4,695 a home in 2008 dollars (not converted here).",
+  "set": "teaching",
+  "src": [
+   "ornl-wap-2014"
+  ]
+ },
+ "dh": {
+  "network": {
+   "cost": {
+    "def": 12000,
+    "lo": 5000,
+    "hi": 25000,
+    "step": 500
+   },
+   "life": 40
+  },
+  "plant": {
+   "cop": 3,
+   "capex": {
+    "def": 1200,
+    "lo": 600,
+    "hi": 2000,
+    "step": 50
+   },
+   "life": 25,
+   "boilerEff": 0.9
+  },
+  "store": {
+   "capex": {
+    "def": 3000,
+    "lo": 1000,
+    "hi": 8000,
+    "step": 250
+   },
+   "life": 30,
+   "lossPerHour": 0.005,
+   "minHours": 4
+  },
+  "loss": 0.1,
+  "note": "Set for teaching: a hot-water network in the dense core; each connected home-equivalent costs the network sum you set (pipes and connections, 40 years); 10% of the heat sent out is lost in the pipes. The plant is a large electric heat pump on a steady heat source (COP 3.0 every hour, fed through the core's substation; cost per kW of heat, 25 years) with a gas boiler (90%) for the rest, which is assumed to exist already and is counted at its fuel only. The store is a water tank: cost per MWh of heat it holds (30 years), 0.5% of its heat lost each hour, filled or emptied in 4 hours or more.",
+  "set": "teaching"
+ },
+ "ev": {
+  "minHours": 6,
+  "note": "Managed charging moves each day's charging energy to any hour of the same day, at most one sixth of it in one hour (a day's charge takes 6 hours or more): it assumes cars can plug in at home or at work. Unmanaged charging follows prairie-city.json's evening profile. Vehicles' prices are outside the boundary: only their fuel and electricity are counted.",
+  "set": "teaching"
+ },
+ "rooftop": {
+  "capex": 4738,
+  "capexSource": 4336,
+  "capexYear": 2022,
+  "fom": 20,
+  "life": 25,
+  "note": "EIA's residential solar system, installed, per kW ($4,336 in 2022 dollars, x 1.0928 to 2025 dollars, as engine E0 does); upkeep $20 per kW a year (illustrative, E0's); 25-year life. Output per MW follows prairie-city.json's solar shape on each day, scaled to EIA's 17.6% rooftop capacity factor.",
+  "via": "e0.json home.pv",
+  "src": [
+   "eia-aeo2026-rdm",
+   "eia-steo-9a",
+   "eia-dg-2024"
+  ]
+ },
+ "battery": {
+  "capex": 1371,
+  "fomShare": 0.04,
+  "life": 15,
+  "hours": 4,
+  "rte": 0.85,
+  "note": "Neighbourhood batteries at the substations, 4 hours: NREL's 2024 cost ($372 per kW plus $241 per kWh, 2024 dollars, x 1.0263 to 2025 dollars with BEA's deflator, as capstone C2 does), 4% of it a year of upkeep, 15 years; 85% of a charge comes back (the loss is taken on charging).",
+  "via": "e2-plains-grid.json c2.costs.bat; e0.json farm.battery.rte",
+  "src": [
+   "nrel-battery-2025",
+   "bea-nipa-119",
+   "eia-aeo2026-emm"
+  ]
+ },
+ "upgrade": {
+  "capex": {
+   "def": 800,
+   "lo": 200,
+   "hi": 2000,
+   "step": 50
+  },
+  "life": 40,
+  "note": "Set for teaching: more room at a district's substation (a transformer and feeders), an up-front cost per kW you set, paid over 40 years. The model buys only what the busiest hour needs after every flexible load has moved.",
+  "set": "teaching"
+ },
+ "tie": {
+  "peak": 20,
+  "cityPeak": 10,
+  "wear": 1,
+  "storeWear": 0.5,
+  "ev": 0.1,
+  "note": "Stated small costs, far below any real one, that pick one plan when several cost the same: $20 a year per MW of each district's busiest hour, $10 per MW of the three districts' busiest hour together, $1 per MWh out of a battery, $0.50 per MWh out of the heat store, and $0.10 per MWh of managed charging times the hour's share of SPP's peak demand (charging prefers quieter hours). They are left out of every reported cost."
+ },
+ "c3": {
+  "budget": {
+   "def": 1500,
+   "unit": "$ million up front, 2026 to 2040",
+   "set": "teaching"
+  },
+  "wind": {
+   "capex": 1712,
+   "fom": 34.57,
+   "life": 30,
+   "via": "13-capstone.json techs.wind",
+   "src": [
+    "eia-aeo2026-emm"
+   ]
+  },
+  "solarFarm": {
+   "capex": 1484,
+   "fom": 23.6,
+   "life": 30,
+   "via": "13-capstone.json techs.solar",
+   "src": [
+    "eia-aeo2026-emm"
+   ]
+  },
+  "electrolyzer": {
+   "capex": 2186,
+   "capexSource": 2000,
+   "capexYear": 2022,
+   "fomShare": 0.05,
+   "stackShare": 0.11,
+   "stackHours": 40000,
+   "life": 30,
+   "via": "e0.json farm.electrolyzer",
+   "src": [
+    "doe-h2-24005",
+    "eia-steo-9a"
+   ]
+  },
+  "indHP": {
+   "cop": 3,
+   "capex": 900,
+   "life": 20,
+   "set": "teaching",
+   "note": "Set for teaching: industrial heat pumps for the food plants' heat below 100 C (washing, pasteurizing, hot water), COP 3.0, $900 per kW of heat, 20 years, running flat all year."
+  },
+  "avoided": {
+   "def": 35,
+   "lo": 20,
+   "hi": 80,
+   "step": 5,
+   "set": "teaching",
+   "note": "Set for teaching: what one MWh from the wind contract or the solar farm saves the city's supplier when it replaces a bought MWh; the wires part of the bill is still paid."
+  },
+  "gasInd": {
+   "lo": 3,
+   "hi": 7,
+   "step": 0.25,
+   "unit": "$ per thousand cubic feet",
+   "set": "teaching",
+   "note": "Set for teaching: the range C3's sensitivity test moves the industrial park's gas price over (prairie-city.json prices.gasPerMcf.industrial, itself set for teaching from EIA's Kansas citygate price); not a forecast."
+  },
+  "note": "C3 plans Prairie City for 2040 with 2025's people, homes and prices and the course's synthetic weather: only the plan changes. The industrial park and the data-center campus take power at their own substations (no limit modelled); the park's new loads are flat all year."
+ },
+ "sources": {
+  "atb2025-fin": {
+   "text": "NLR, 2025 Electricity Annual Technology Baseline, Financial Cases and Methods",
+   "url": "https://atb.nlr.gov/electricity/2025/financial_cases_&_methods",
+   "asOf": "checked 2 Nov 2026 (via 13-capstone.json)"
+  },
+  "eia-aeo2026-rdm": {
+   "text": "EIA, Assumptions to the Annual Energy Outlook 2026: Residential Demand Module, Table 2, p. 4 (heat pumps, furnaces; 2022 dollars) and Table 3, p. 5 (rooftop solar; 2022 dollars, 25-year life)",
+   "url": "https://www.eia.gov/outlooks/aeo/assumptions/pdf/RDM_Assumptions.pdf",
+   "asOf": "April 2026; checked 3 Nov 2026",
+   "short": "EIA AEO2026, residential assumptions, Tables 2-3"
+  },
+  "eia-aeo2026-emm": {
+   "text": "EIA, Assumptions to the Annual Energy Outlook 2026: Electricity Market Module, Table 3, p. 5 (2025 dollars), and its note on storage losses",
+   "url": "https://www.eia.gov/outlooks/aeo/assumptions/pdf/EMM_Assumptions.pdf",
+   "asOf": "April 2026; checked 3 Nov 2026",
+   "short": "EIA AEO2026, electricity assumptions, Table 3"
+  },
+  "eia-steo-9a": {
+   "text": "EIA, Short-Term Energy Outlook, Table 9a: GDP implicit price deflator (2017 = 100), yearly means 2022 118.035, 2023 122.389, 2024 125.430, 2025 128.989",
+   "url": "https://www.eia.gov/outlooks/steo/",
+   "asOf": "October 2026 issue (1 Oct 2026)",
+   "short": "EIA STEO, Table 9a"
+  },
+  "eia-dg-2024": {
+   "text": "EIA, Distributed Generation, Battery Storage, and Combined Heat and Power System Characteristics and Costs in the Buildings and Industrial Sectors, Table 2-2, p. 12 (residential solar: 17.6% capacity factor in 2022)",
+   "url": "https://www.eia.gov/analysis/studies/buildings/dg_storage_chp/pdf/dg_storage_chp.pdf",
+   "asOf": "March 2024; checked 3 Nov 2026",
+   "short": "EIA, distributed generation costs (2024), Table 2-2"
+  },
+  "doe-h2-24005": {
+   "text": "DOE Hydrogen Program Record 24005, Clean Hydrogen Production Cost Scenarios with PEM Electrolyzer Technology, Table 1, p. 2, and p. 9 (fixed and replacement costs)",
+   "url": "https://www.hydrogen.energy.gov/docs/hydrogenprogramlibraries/pdfs/24005-clean-hydrogen-production-cost-pem-electrolyzer.pdf",
+   "asOf": "20 May 2024; checked 3 Nov 2026",
+   "short": "DOE Hydrogen Program Record 24005"
+  },
+  "nrel-battery-2025": {
+   "text": "Cole, Ramasamy and Turan, Cost Projections for Utility-Scale Battery Storage: 2025 Update, NREL/TP-6A40-93281 (2024 costs, section 2 and Figure 2; O&M and life, section 3)",
+   "url": "https://docs.nlr.gov/docs/fy25osti/93281.pdf",
+   "asOf": "June 2025"
+  },
+  "bea-nipa-119": {
+   "text": "U.S. Bureau of Economic Analysis, NIPA Table 1.1.9: Implicit Price Deflators for Gross Domestic Product, line 1, annual (2017 = 100): 2024 125.587, 2025 128.893",
+   "url": "https://apps.bea.gov/iTable/?reqid=19&step=3&isuri=1&1921=survey&1903=13&1904=2022&1905=2026&1906=a&1911=0",
+   "asOf": "last revised 29 October 2026; accessed 5 November 2026"
+  },
+  "ornl-wap-2014": {
+   "text": "Tonn and others, Weatherization Works: Summary of Findings from the Retrospective Evaluation of the U.S. Department of Energy's Weatherization Assistance Program, ORNL/TM-2014/338, Oak Ridge National Laboratory: executive summary p. xiv ($4,695 average cost a unit, program year 2008) and section 3.1, p. 12 (gas use of single-family gas-heated homes down 17.8%)",
+   "url": "no link",
+   "asOf": "September 2014; read 6 Nov 2026"
+  }
+ },
+ "precomputed": {
+  "sb3": {
+   "head": "Result: 2025 as it is, then \"Electrify heat and cars\" (80% of furnaces and resistance heat to heat pumps, half the cars electric)",
+   "rows": [
+    [
+     "2025 as it is: yearly cost against 2025 (2025 dollars; equipment and upgrades as yearly payments)",
+     "$0.0M"
+    ],
+    [
+     "2025 as it is: CO₂ of the three districts' buildings and cars",
+     "1,921,977 t a year"
+    ],
+    [
+     "2025 as it is: busiest hour against the limit, core · suburbs · fringe",
+     "213/250 · 192/230 · 48/60 MW"
+    ],
+    [
+     "2025 as it is: substation upgrades bought",
+     "0 MW"
+    ],
+    [
+     "2025 as it is: energy burden, homes below 80% of area median income (screening estimate)",
+     "6.1%"
+    ],
+    [
+     "Electrify heat and cars: yearly cost against 2025 (2025 dollars; equipment and upgrades as yearly payments)",
+     "−$65.8M"
+    ],
+    [
+     "Electrify heat and cars: CO₂ of the three districts' buildings and cars",
+     "1,527,234 t a year"
+    ],
+    [
+     "Electrify heat and cars: busiest hour against the limit, core · suburbs · fringe",
+     "276/250 · 288/230 · 67/60 MW"
+    ],
+    [
+     "Electrify heat and cars: substation upgrades bought",
+     "91 MW"
+    ],
+    [
+     "Electrify heat and cars: energy burden, homes below 80% of area median income (screening estimate)",
+     "5.4%"
+    ]
+   ],
+   "note": "Precomputed with HiGHS on 6 November 2026: the hub as a linear program over eight representative days. Prairie City is fictional; its numbers are illustrative. With JavaScript on, the bench runs your own plan."
+  },
+  "m12": {
+   "table": "<div class=\"lx-scroll-x\"><table class=\"lx-facts m12-table\"><thead><tr><th scope=\"col\">Plan</th><th scope=\"col\">Yearly cost against 2025</th><th scope=\"col\">CO₂ of the districts (a year)</th><th scope=\"col\">Substation upgrades</th><th scope=\"col\">Burden, homes below 80% of area median income (AMI; screening)</th></tr></thead><tbody><tr><td>2025 as it is</td><td class=\"n\">$0.0M</td><td class=\"n\">1,921,977 t</td><td class=\"n\">0 MW</td><td class=\"n\">6.1%</td></tr><tr><td>Electrify heat and cars</td><td class=\"n\">−$65.8M</td><td class=\"n\">1,527,234 t</td><td class=\"n\">91 MW</td><td class=\"n\">5.4%</td></tr><tr><td>Electrify, managed charging, 40 MW of batteries</td><td class=\"n\">−$60.5M</td><td class=\"n\">1,527,266 t</td><td class=\"n\">48 MW</td><td class=\"n\">5.5%</td></tr><tr><td>The LP's choice, CO₂ ≤ 80% of 2025</td><td class=\"n\">−$86.2M</td><td class=\"n\">1,537,582 t</td><td class=\"n\">5 MW</td><td class=\"n\">5.1%</td></tr></tbody></table></div><p class=\"lx-hint\">Precomputed with HiGHS on 6 November 2026. Cost includes the cars' fuel and charging, not their prices; equipment and upgrades as yearly payments.</p>",
+   "ref": {
+    "runs": {
+     "today": {
+      "peaks": [
+       212.807,
+       192.368,
+       48.012
+      ],
+      "upg": [
+       0,
+       0,
+       0
+      ],
+      "cost": 614595991,
+      "co2": 1921977,
+      "imp": 2010138,
+      "burdenLow": 0.06116,
+      "burdenOther": 0.02036
+     },
+     "electrify": {
+      "peaks": [
+       275.525,
+       288.425,
+       67.496
+      ],
+      "upg": [
+       25.525,
+       58.425,
+       7.496
+      ],
+      "cost": 548750600,
+      "co2": 1527234,
+      "imp": 2446087,
+      "burdenLow": 0.05427,
+      "burdenOther": 0.01818,
+      "value": [
+       40418.79,
+       40418.79,
+       40418.79
+      ]
+     },
+     "flex": {
+      "peaks": [
+       256.855,
+       268.372,
+       62.922
+      ],
+      "upg": [
+       6.855,
+       38.372,
+       2.922
+      ],
+      "cost": 554136706,
+      "co2": 1527266,
+      "imp": 2446165,
+      "burdenLow": 0.05497,
+      "burdenOther": 0.01841
+     },
+     "choose": {
+      "peaks": [
+       172.481,
+       168.698,
+       64.735
+      ],
+      "upg": [
+       0,
+       0,
+       4.735
+      ],
+      "cost": 528394145,
+      "co2": 1537582,
+      "imp": 2050690,
+      "burdenLow": 0.05093,
+      "burdenOther": 0.01692,
+      "capDual": 191.05,
+      "hp": [
+       0.307,
+       0.2677,
+       0.888
+      ],
+      "pvAdd": 92.314
+     }
+    },
+    "cap": 80,
+    "base": 1921977,
+    "my": {
+     "plan": {
+      "hp": 70,
+      "ret": 40,
+      "dh": 30,
+      "dhp": 100,
+      "sto": 800,
+      "ev": 60,
+      "evm": "managed",
+      "pv": 100,
+      "bat": 20
+     },
+     "burdenLow": 0.05216,
+     "dhPrice": 130.8
+    }
+   }
+  },
+  "c3": {
+   "head": "Result: 2025 as it is, then the reference plan of the exemplars (70% heat pumps, 40% electric cars, 200 MW of wind, a 100 MW solar farm at A19's site A)",
+   "rows": [
+    [
+     "2025: up front, 2026 to 2040 (2025 dollars)",
+     "$0.0M of a $1,500.0M budget"
+    ],
+    [
+     "2025: the city's yearly cost against 2025",
+     "$0.0M"
+    ],
+    [
+     "2025: the city's CO₂ (location-based, operating)",
+     "2,765,433 t a year"
+    ],
+    [
+     "2025: busiest hour against the limit, core · suburbs · fringe",
+     "213/250 · 192/230 · 48/60 MW"
+    ],
+    [
+     "2025: energy burden, homes below 80% of area median income (screening)",
+     "6.1%"
+    ],
+    [
+     "Reference plan: up front, 2026 to 2040 (2025 dollars)",
+     "$1,227.9M of a $1,500.0M budget"
+    ],
+    [
+     "Reference plan: the city's yearly cost against 2025",
+     "−$29.2M"
+    ],
+    [
+     "Reference plan: the city's CO₂ (location-based, operating)",
+     "2,423,488 t a year"
+    ],
+    [
+     "Reference plan: busiest hour against the limit, core · suburbs · fringe",
+     "250/250 · 256/230 · 60/60 MW"
+    ],
+    [
+     "Reference plan: energy burden, homes below 80% of area median income (screening)",
+     "5.5%"
+    ]
+   ],
+   "note": "Precomputed with HiGHS on 6 November 2026. Prairie City is fictional; its numbers are illustrative. With JavaScript on, you run your own plan."
+  },
+  "c3ex": {
+   "title": "Two summaries of the same brief",
+   "task": "Recommend Prairie City's 2040 energy plan within the budget, and say who gains and who pays.",
+   "id": "c3-ex",
+   "lines": true,
+   "answers": [
+    {
+     "key": "weak",
+     "label": "Weak summary",
+     "level": "Developing",
+     "parts": [
+      "Prairie City should ",
+      {
+       "text": "go green with heat pumps and wind",
+       "note": "No sizes, no shares, no budget: the council cannot check or cost it."
+      },
+      ". ",
+      {
+       "text": "Emissions will fall a lot",
+       "note": "By how much, on what boundary, against which year?"
+      },
+      " and ",
+      {
+       "text": "everyone will save money",
+       "note": "Who? The household table is a screening estimate with an adoption rule; name the groups and the numbers."
+      },
+      ". ",
+      {
+       "text": "Some people objected but the plan is the best",
+       "note": "Each objection needs an answer: what you would change, or why you would not."
+      },
+      "."
+     ]
+    },
+    {
+     "key": "good",
+     "label": "Strong summary",
+     "level": "Proficient",
+     "parts": [
+      "Recommendation: ",
+      {
+       "text": "switch 70% of furnaces and resistance heat to heat pumps, retrofit 10% of buildings, make 40% of cars electric with managed charging, add 30 MW of substation batteries, move the food plants' low-temperature heat to heat pumps, and contract 200 MW of wind and a 100 MW solar farm at site A",
+       "note": "Every lever with its size: a plan the council can cost and check."
+      },
+      ".\n",
+      "Budget and cost: ",
+      {
+       "text": "$1,227.9M up front against $1,500.0M; the city's yearly cost −$29.2M against 2025 (energy bills plus equipment as yearly payments, 2025 dollars)",
+       "note": "Up front and yearly kept apart, on one boundary."
+      },
+      ".\n",
+      "CO₂ and the grid: ",
+      {
+       "text": "the city's location-based CO₂ 2,423,488 t a year, 12% below 2025 (operating only; the contracts not deducted); 26 MW of substation upgrades, the suburbs the tightest",
+       "note": "The cut with its boundary, and where the plan needs grid room."
+      },
+      ".\n",
+      "Who pays (screening): ",
+      {
+       "text": "energy burden of homes below 80% of area median income 6.1% → 5.5%, every group adopting alike; the cars' fuel and charging count as transport, outside the burden",
+       "note": "The rule stated, and the estimate labelled as a screening estimate."
+      },
+      ".\n",
+      "Jobs (screening): ",
+      {
+       "text": "about 2,947 construction job-years to 2040 (gross), 2,358 net of displacement; at the farms 18 direct ongoing jobs, 29 gross supported, 23 net of displacement",
+       "note": "Job-years kept apart from ongoing jobs, gross apart from net."
+      },
+      ".\n",
+      "Site: ",
+      {
+       "text": "site A, the best of A19's five blocks and the cheapest to connect ($5.3M), at a 23.8% capacity factor",
+       "note": "The site's choice with its evidence from the map."
+      },
+      ".\n",
+      "Sensitivity: ",
+      {
+       "text": "the yearly cost runs from −$72.6M to −$2.9M with every input at its lower- or higher-cost end; value of a contract MWh moves it most, $20/MWh to $80/MWh; every tested input is set for teaching",
+       "note": "A range, the input that matters most, and what kind of number each input is."
+      },
+      ".\n",
+      "Panel: ",
+      {
+       "text": "to the electric utility (26 MW of upgrades): I keep them, since with the plan's levers fixed they are the cheapest way to meet the suburbs' busiest hour (its dual equals the upgrade's yearly cost); to the climate group (12% cut): the wind and solar contracts do not lower the location-based CO₂ (a market-based report could claim about 301,316 t); deeper cuts need more heat pumps and retrofits, with $272.1M of the budget left; to the industrial park (+$2.2M a year, 7%): I keep the food plants' heat pumps for the gas they save, and show the park's gas price in the sensitivity table; to farmers and rural residents (site A): it is the screen's best block and the cheapest of the five to connect, $5.3M for its line, road and land, 1.0 km to S4, on about 542 acres",
+       "note": "Each objection answered with a reason or a change, from the run's own numbers."
+      },
+      ".\n",
+      "Limits: ",
+      {
+       "text": "2025's people and prices held to 2040, one substation per district, eight representative days of synthetic weather, the household rule an assumption, the map's layers simulated",
+       "note": "What the plan leaves out, so the council does not over-read it."
+      },
+      "."
+     ]
+    }
+   ],
+   "note": "Both summaries are illustrative. The strong one quotes this engine's numbers for one reference plan within the budget, precomputed; another plan is just as strong when its evidence supports it."
+  }
+ }
+}

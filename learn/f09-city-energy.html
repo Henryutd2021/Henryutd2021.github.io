@@ -1,0 +1,1634 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.19">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="F9 of Energy Systems, Step by Step: follow a fictional U.S. city’s year of energy from gas, fuels, the regional grid and rooftop solar to its homes, shops, transport, industry and a data-center campus; then sort who typically decides each lever, from utility rates to building codes and equipment standards.">
+
+<title>What does a city run on, and who controls what? – Honglin Li</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../images/favicon.svg" rel="icon" type="image/svg+xml">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-b626d73c4c936ccc3cb08be7d45d1df6.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-c0b1642a1007bf633769ed7b0f05c6cc.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-24969ac2e858442fb45ced1a2b17dbde.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-c0b1642a1007bf633769ed7b0f05c6cc.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.9.4/css/academicons.min.css" crossorigin="anonymous">
+<meta name="theme-color" content="#ffffff">
+
+
+<link rel="stylesheet" href="../assets/base.css">
+<link rel="stylesheet" href="../assets/home.css">
+<link rel="stylesheet" href="../assets/pubs.css">
+<link rel="stylesheet" href="../assets/pages.css">
+<link rel="stylesheet" href="../assets/map.css">
+<link rel="stylesheet" href="../assets/explainers.css">
+<link rel="stylesheet" href="../assets/learn/learn.css">
+<meta property="og:title" content="What does a city run on, and who controls what? – Honglin Li">
+<meta property="og:description" content="F9 of Energy Systems, Step by Step: follow a fictional U.S. city’s year of energy from gas, fuels, the regional grid and rooftop solar to its homes, shops, transport, industry and a data-center campus; then sort who typically decides each lever, from utility rates to building codes and equipment standards.">
+<meta property="og:image" content="https://henryutd2021.github.io/learn/images/profile-square.jpg">
+<meta property="og:site_name" content="Honglin Li">
+</head>
+
+<body class="nav-fixed page-learn page-lesson lx-form-cards quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-xl " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">Honglin Li</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../research.html"> 
+<span class="menu-text">Research</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../projects.html"> 
+<span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../publications.html"> 
+<span class="menu-text">Publications</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../software-data.html"> 
+<span class="menu-text">Software</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../teaching.html"> 
+<span class="menu-text">Teaching</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../learn/index.html"> 
+<span class="menu-text">Learn</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../field-notes.html"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../cv.html"> 
+<span class="menu-text">CV</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../journeys.html"> 
+<span class="menu-text">Journeys</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en"> <i class="bi bi-mortarboard-fill" role="img" aria-label="Google Scholar">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/Henryutd2021"> <i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/honglin-li-998b18221/"> <i class="bi bi-linkedin" role="img" aria-label="LinkedIn">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content column-page" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">What does a city run on, and who controls what?</h1>
+<p class="subtitle lead">Follow Prairie City’s year of energy from its sources to its sectors, then see who decides each part</p>
+</div>
+
+<div>
+  <div class="description">
+    F9 of Energy Systems, Step by Step: follow a fictional U.S. city’s year of energy from gas, fuels, the regional grid and rooftop solar to its homes, shops, transport, industry and a data-center campus; then sort who typically decides each lever, from utility rates to building codes and equipment standards.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta column-page">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<!-- F9 (f09-city-energy), step cards, Foundations, D1, no model, W5 (builder learn-w5-a). A data-center campus appears
+     only as a load (guard G-DC). Script: assets/learn/f09-city-energy.js with data/prairie-city.json (Prairie City's
+     2025 flows, read at run time, never retyped), data/f09-city-energy.json (sector groups, who decides what, each
+     with a dated primary source, the numbers to remember) and data/path.json.
+     Tests: node _tests/learn/test_f09-city-energy.js [--write] (every number on this page is checked against the data;
+     --write rewrites the blocks between the f09-* markers). The learn:meta, learn:next and learn:footer blocks are
+     written by scripts/build_learn.py. Lesson-local styles (prefix f9-) are below. -->
+<!-- learn:meta:start (generated by scripts/build_learn.py from learn/path.yml; edit the YAML, not this block) -->
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "name": "What does a city run on, and who controls what? Follow Prairie City's year of energy from its sources to its sectors, then see who decides each part", "description": "F9 of Energy Systems, Step by Step: follow a fictional U.S. city's year of energy from gas, fuels, the regional grid and rooftop solar to its homes, shops, transport, industry and a data-center campus; then sort who typically decides each lever, from utility rates to building codes and equipment standards.", "learningResourceType": "Interactive lesson", "educationalLevel": "Beginner", "timeRequired": "PT25M", "inLanguage": "en", "isAccessibleForFree": true, "teaches": ["a city's energy flows by carrier and sector, final and useful energy at city scale, the city's accounting boundary", "who decides what in U.S. energy", "typical against universal roles"], "license": "https://creativecommons.org/licenses/by/4.0/", "author": {"@type": "Person", "name": "Honglin Li", "url": "https://henryutd2021.github.io/"}, "url": "https://henryutd2021.github.io/learn/f09-city-energy.html", "isPartOf": {"@type": "Course", "name": "Energy Systems, Step by Step", "url": "https://henryutd2021.github.io/learn/"}}</script>
+<script type="application/json" class="lx-lesson-data">{"id":"f09-city-energy","starter":null,"total":14,"code":"F9","title":"What does a city run on, and who controls what?","subtitle":"Follow Prairie City's year of energy from its sources to its sectors, then see who decides each part","short":"A city's energy","tier":"foundations","tier2":null,"tierLabel":"Foundations · L1","level":"L1","slot":1,"slot2":null,"minutes":15,"does":"Follow Prairie City's 2025 energy from the gas grid, fuels, the SPP grid and rooftop solar to homes, shops, transport, industry and a data-center campus; group it by sector; then sort who usually decides each lever (the city, the utility, the state regulator, owners or federal rules) and light up each one's part of the flows.","outcome":"Read a city's energy flows by carrier and sector, say where its accounting starts and how little of its electricity it makes, and name who typically decides rates, codes, standards, wires and equipment, knowing that the roles differ by state and utility.","icon":"city","form":"cards","scales":[],"teaches":["a city's energy flows by carrier and sector, final and useful energy at city scale, the city's accounting boundary","who decides what in U.S. energy","typical against universal roles"],"lab":null,"href":"f09-city-energy.html","ready":true,"after":[{"id":"f03-energy-services","code":"F3","title":"What do people actually want from energy?","short":"Energy services","does":"A Prairie Town home's year of energy by service and by carrier, the gap between energy bought and useful energy delivered, and a heat pump whose COP falls on a cold day.","href":"f03-energy-services.html","ready":true},{"id":"f06-grid-and-outages","code":"F6","title":"How does power reach your plug, and why does it sometimes fail?","short":"Grid and outages","does":"Power followed from plant to lamp through each voltage step; then a storm: tap the failed parts, see which homes go dark, and why many outages start on local wires.","href":"f06-grid-and-outages.html","ready":true}],"prev":null,"next":null,"practice":10}</script>
+<div class="lx-head" data-lesson-id="f09-city-energy" data-total="14" data-tier="foundations" data-level="L1" data-minutes="15" data-form="cards">
+<div>
+<nav class="lx-crumbs" aria-label="Breadcrumb"><ol><li><a href="index.html">Learn</a></li><li aria-current="page">F9</li></ol></nav>
+<ul class="lx-badges" aria-label="About this lesson">
+<li style="--c:var(--lx-tier-1)"><span class="lx-dot" aria-hidden="true"></span>Foundations · L1</li>
+<li><span class="lx-nw">15 min guided</span> · <span class="lx-nw">about 10 min practice</span></li>
+<li>After <a href="f03-energy-services.html">F3</a> and <a href="f06-grid-and-outages.html">F6</a></li>
+<li class="lx-done-tag" data-lesson-id="f09-city-energy" hidden="">Completed</li>
+</ul>
+</div>
+<nav class="lx-steps" aria-label="In this lesson"><ol><li><a href="#steps"><span class="lx-n">1</span>Step by step</a></li><li><a href="#explain"><span class="lx-n">2</span>Explain</a></li><li><a href="#check"><span class="lx-n">3</span>Check</a></li><li><a href="#sources"><span class="lx-n">4</span>Sources</a></li></ol></nav>
+</div>
+<!-- learn:meta:end -->
+<style>
+.f9-fbt th, .f9-fbt td { text-align: left; vertical-align: top; font-family: var(--lx-f-body); font-size: 13.5px; padding: 4px 10px 4px 0; }
+.f9-res { display: grid; gap: 10px; margin-top: 8px; min-width: 0; }
+.page-learn .f9-fict { margin: 6px 0 0; }
+.f9-actors { flex-wrap: wrap; }
+.page-learn .f9-why ul { margin: 6px 0 0; padding-left: 1.1rem; display: grid; gap: 4px; font-size: 14px; } .page-learn .f9-src { color: var(--lx-ink-3); }
+.page-learn .f9-next { margin: 6px 0 0; padding-left: 1.2rem; display: grid; gap: 3px; }
+.page-learn .f9-note ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 2px; } .page-learn .f9-note li { margin: 0; }
+</style>
+<div id="steps" class="lx-sec">
+<div class="lx-interactive lx-cards" data-learn="f09" data-src="../assets/learn/data/prairie-city.json ../assets/learn/data/f09-city-energy.json ../assets/learn/data/path.json">
+<div class="lx-fallback">
+<!-- f09-fallback:start (written from the data by the test's --write mode; do not edit) -->
+<p class="lx-eyebrow">Prairie City's year of energy, 2025, in GWh (1 GWh = 1 million kWh)</p><p class="lx-hint">Prairie City is fictional; its numbers are illustrative.</p><div class="lx-scroll-x">
+<table class="lx-mini-table f9-fbt caption-top table">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">Sector</th>
+<th data-quarto-table-cell-role="th" scope="col">Takes in</th>
+<th data-quarto-table-cell-role="th" scope="col">Useful energy</th>
+<th data-quarto-table-cell-role="th" scope="col">Counted as lost</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Buildings: homes, shops, offices and public buildings</td>
+<td>3,994 GWh</td>
+<td>3,586 GWh</td>
+<td>408 GWh (10%)</td>
+</tr>
+<tr class="even">
+<td>Transport: cars, buses and trucks</td>
+<td>3,517 GWh</td>
+<td>1,059 GWh</td>
+<td>2,458 GWh (70%)</td>
+</tr>
+<tr class="odd">
+<td>Industry and farms (the industrial park, the farms)</td>
+<td>1,481 GWh</td>
+<td>552 GWh (and 591 GWh of hydrogen)</td>
+<td>338 GWh (23%)</td>
+</tr>
+<tr class="even">
+<td>Data-center campus, one large load kept apart</td>
+<td>1,076 GWh</td>
+<td>1,076 GWh</td>
+<td>not estimated (its electricity counts as useful)</td>
+</tr>
+</tbody>
+</table>
+</div><p class="lx-hint">Convention: for computers, appliances and lights, the electricity delivered counts as useful; their own losses are not estimated, so a sector's loss share is not its efficiency.</p><ul><li><b>Carriers.</b> Electricity 3,477 GWh; Gasoline 3,167 GWh; Natural gas 2,859 GWh; Diesel 444 GWh; Propane 125 GWh.</li><li><b>Electricity.</b> Rooftop solar makes 0.9% of it; the rest comes from the SPP grid, and 166 GWh is lost in the city's wires.</li></ul><p class="lx-eyebrow">Who decides, for a Kansas city served by an investor-owned utility (typical roles)</p><div class="lx-scroll-x">
+<table class="lx-mini-table f9-fbt caption-top table">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">Lever</th>
+<th data-quarto-table-cell-role="th" scope="col">Usually decided by</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>The price per kWh a home pays its investor-owned electric utility</td>
+<td>The state regulator</td>
+</tr>
+<tr class="even">
+<td>Which power plants and contracts supply the city's electricity</td>
+<td>The utility</td>
+</tr>
+<tr class="odd">
+<td>The substations and feeders that serve each street</td>
+<td>The utility</td>
+</tr>
+<tr class="even">
+<td>Rules for interstate transmission and wholesale power sales</td>
+<td>Federal rules</td>
+</tr>
+<tr class="odd">
+<td>The least efficiency a new furnace, water heater or light bulb may have</td>
+<td>Federal rules</td>
+</tr>
+<tr class="even">
+<td>Safety rules for the gas mains under the streets</td>
+<td>Federal rules</td>
+</tr>
+<tr class="odd">
+<td>The energy code new buildings in Prairie City must meet</td>
+<td>The city</td>
+</tr>
+<tr class="even">
+<td>A permit to put solar panels on a roof</td>
+<td>The city</td>
+</tr>
+<tr class="odd">
+<td>Whether a home swaps its furnace for a heat pump</td>
+<td>Owners</td>
+</tr>
+</tbody>
+</table>
+</div><p class="lx-hint">With JavaScript on, you follow the flows step by step, sort who decides each lever, and light up each actor's part of the flows.</p>
+<!-- f09-fallback:end -->
+</div>
+</div>
+<div class="lx-datanote f9-note"><svg class="lx-ic" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5M12 8v.2"></path></svg><ul>
+<li><b>Illustrative.</b> Prairie City is fictional; its numbers are illustrative, and its flows are built bottom-up from its homes, vehicles, industrial park and data-center campus in the course's shared city data.</li>
+<li><b>Anchored.</b> Fuels at their energy content (<a href="https://www.eia.gov/energyexplained/units-and-calculators/british-thermal-units.php">EIA</a>); engine and EV efficiencies from DOE; the grid's hourly shapes from SPP's 2025 data.</li>
+<li><b>Who decides.</b> Roles for a Kansas city served by an investor-owned utility: typical, not universal, each from a dated primary source listed under Sources.</li>
+</ul></div>
+<p class="lx-hint" style="margin-top:10px">Need a refresher? <a href="f03-energy-services.html">F3</a> on carriers, services and useful energy; <a href="f06-grid-and-outages.html">F6</a> on how power reaches a plug.</p>
+</div>
+<div id="explain" class="lx-sec">
+<section id="what-you-just-did-as-diagrams" class="level2 lx-sec-h">
+<h2 class="anchored" data-anchor-id="what-you-just-did-as-diagrams">What you just did, as diagrams</h2>
+</section>
+<div id="f09-explain" class="lx-xgrid">
+<div class="lx-fallback">
+<!-- f09-ideas:start (written from the data by the test's --write mode; do not edit) -->
+<dl class="lx-ideas"><dt>Carriers to sectors</dt><dd>A city buys gas, fuels and electricity, and uses them in buildings, transport and industry; buildings take the most, 3,994 GWh.</dd><dt>Useful and lost</dt><dd>Engines lose most of their fuel as heat: transport turns 30% of what it takes in into motion.</dd><dt>A convention</dt><dd>For computers, appliances and lights, the electricity delivered counts as useful; their own losses are not estimated, so a sector's loss share is not its efficiency.</dd><dt>The power sector</dt><dd>Prairie City makes 0.9% of its electricity; its accounting starts where the regional grid's power enters its wires.</dd><dt>Who decides</dt><dd>For a Kansas city served by an investor-owned utility, the state regulator approves rates, federal rules set equipment standards and interstate markets, the city adopts its energy code and issues permits, and owners choose equipment.</dd><dt>Typical, not universal</dt><dd>A city that owns its utility sets its own rates; many states adopt one energy code for the whole state, and states organise their utilities differently.</dd></dl>
+<!-- f09-ideas:end -->
+</div>
+</div>
+<div class="lx-deepers">
+<details class="lx-deeper">
+<summary><span class="k">Go deeper · Analyst</span>Where a city's count starts</summary>
+<div class="lx-deeper-body">
+<ul>
+<li><strong><span class="lx-term" data-term="final-energy">Final energy</span></strong> is what the city buys at the meter or the pump; <span class="lx-term" data-term="useful-energy">useful energy</span> is the warmth, motion and light it gets.</li>
+<li><strong>A convention.</strong> For appliances, lights and computers the electricity delivered counts as useful, so their own losses are not estimated; for heat and vehicles, the heat or motion delivered counts.</li>
+<li><strong>The boundary.</strong> Power plants on the regional grid are outside the city: their losses appear in a regional or national count, not here.</li>
+</ul>
+</div>
+</details>
+<details class="lx-deeper">
+<summary><span class="k">Go deeper · Analyst</span>Who decides, in a little more detail</summary>
+<div class="lx-deeper-body">
+<ul>
+<li><strong>Rates.</strong> An investor-owned utility asks its state commission to change rates; the commission reviews its costs and approves the rates and terms.</li>
+<li><strong>Supply.</strong> In states without retail competition, as in Kansas, utilities may build, own and run power plants; states with retail competition leave generation to competing suppliers.</li>
+<li><strong>The grid.</strong> A regional operator such as SPP runs the bulk grid and the wholesale market under FERC’s rules.</li>
+<li><strong>Codes.</strong> The U.S. has no national energy code: states or local governments adopt one, and local permit offices enforce it.</li>
+</ul>
+</div>
+</details>
+<details class="lx-deeper">
+<summary><span class="k">Go deeper</span>What this lesson leaves out</summary>
+<div class="lx-deeper-body">
+<ul>
+<li>Emissions from each flow, and how a city counts them.</li>
+<li>Hours and seasons: a year's flows hide the coldest evening.</li>
+<li>Costs and who pays them.</li>
+<li>Rules outside the U.S., and the details of any one state's law.</li>
+</ul>
+</div>
+</details>
+</div>
+</div>
+<div id="check" class="lx-sec">
+<section id="check-yourself" class="level2 lx-sec-h">
+<h2 class="anchored" data-anchor-id="check-yourself">Check yourself</h2>
+</section>
+<p class="lx-lede">Practice, about 10 minutes: three myths, then four questions.</p>
+<!-- f09-check:start (written from the data by the test's --write mode; do not edit) -->
+<div class="lx-myths" data-quiz="f09-myth"><div class="lx-qq" data-id="gridmix" data-answer="myth"><p class="lx-qtext">Myth or fact? “Prairie City's council alone decides which power plants make its electricity.”</p><ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul><details class="lx-answer"><summary>Answer</summary><p>Myth. In Kansas the utility picks its plants and contracts, the state regulator reviews their costs and SPP runs the regional grid; the city shapes its own use, buildings and permits.</p></details></div><div class="lx-qq" data-id="council" data-answer="myth"><p class="lx-qtext">Myth or fact? “The city council sets the electricity rate every home pays.”</p><ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul><details class="lx-answer"><summary>Answer</summary><p>Myth for an investor-owned utility: in Kansas, the state's commission approves the rates. Fact where the city owns its utility.</p></details></div><div class="lx-qq" data-id="cars" data-answer="myth"><p class="lx-qtext">Myth or fact? “Most of the energy a car burns moves the car.”</p><ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul><details class="lx-answer"><summary>Answer</summary><p>Myth. Prairie City's transport takes in 3,517 GWh and turns 1,059 GWh into motion; the rest leaves as heat.</p></details></div></div><div class="lx-quiz" data-quiz="f09"><div class="lx-qq" data-id="gasshare" data-answer="b"><p class="lx-qtext">Prairie City's homes buy 1,155 GWh of electricity, 1,376 GWh of gas and 99 GWh of propane; their heat pumps also draw 138 GWh of free outdoor-air heat. About what share of what they buy is gas?</p><ul class="lx-choices"><li data-value="a">A quarter</li><li data-value="b">Half</li><li data-value="c">Three quarters</li></ul><details class="lx-answer"><summary>Answer</summary><p>About half of what they buy: 1,376.2 ÷ 2,630.0 = 52%; counting the free outdoor-air heat too, 1,376.2 ÷ 2,767.7 = 50%.</p></details></div><div class="lx-qq" data-id="kcc" data-answer="c"><p class="lx-qtext">Who approves the rates of Kansas's investor-owned electric utilities?</p><ul class="lx-choices"><li data-value="a">The city council</li><li data-value="b">FERC</li><li data-value="c">The Kansas Corporation Commission</li></ul><details class="lx-answer"><summary>Answer</summary><p>The Kansas Corporation Commission, the state regulator; FERC regulates interstate transmission and wholesale sales.</p></details></div><div class="lx-qq" data-id="ferc" data-answer="a"><p class="lx-qtext">Which body regulates interstate transmission and wholesale power sales?</p><ul class="lx-choices"><li data-value="a">FERC</li><li data-value="b">The state regulator</li><li data-value="c">The utility</li></ul><details class="lx-answer"><summary>Answer</summary><p>FERC, the Federal Energy Regulatory Commission.</p></details></div><div class="lx-qq" data-id="losses" data-answer="b"><p class="lx-qtext">Prairie City's meters take 3,311.5 GWh of electricity a year, and the wires lose 5% as much again (set for teaching). How much is lost?</p><ul class="lx-choices"><li data-value="a">About 17 GWh</li><li data-value="b">About 166 GWh</li><li data-value="c">About 1,656 GWh</li></ul><details class="lx-answer"><summary>Answer</summary><p>3,311.5 × 0.05 = 165.6 GWh, about the flow to distribution losses in the Sankey.</p></details></div></div>
+<!-- f09-check:end -->
+</div>
+<div id="sources" class="lx-sec">
+<section id="numbers-sources-and-whats-next" class="level2 lx-sec-h">
+<h2 class="anchored" data-anchor-id="numbers-sources-and-whats-next">Numbers, sources and what’s next</h2>
+</section>
+<div class="lx-end">
+<div class="lx-card">
+<p class="lx-eyebrow">Numbers to remember</p>
+<!-- f09-facts:start (written from the data file by the test's --write mode; do not edit) -->
+
+<table class="lx-facts caption-top table">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">Number</th>
+<th data-quarto-table-cell-role="th" scope="col">What it means</th>
+<th data-quarto-table-cell-role="th" scope="col">Source</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td class="n">3 of every 4</td>
+<td>U.S. electricity customers served by investor-owned utilities (72% in 2017); 1,958 publicly owned utilities served about 12,100 customers each on average.</td>
+<td class="s"><a href="https://www.eia.gov/todayinenergy/detail.php?id=40913">EIA, Today in Energy</a> · 15 August 2019; data for 2017</td>
+</tr>
+<tr class="even">
+<td class="n">75% · 40%</td>
+<td>Shares of U.S. electricity and of total energy that buildings use.</td>
+<td class="s"><a href="https://www.energy.gov/cmei/buildings/data-and-analysis-buildings-sector-innovation">DOE Building Technologies Office, Data and Analysis for Buildings Sector Innovation</a> · page read 6 November 2026</td>
+</tr>
+<tr class="odd">
+<td class="n">more than 70</td>
+<td>Kinds of appliances and equipment with DOE efficiency standards, about 90% of home energy use.</td>
+<td class="s"><a href="https://www.energy.gov/cmei/buildings/appliance-and-equipment-standards-program">DOE, Appliance and Equipment Standards Program</a> · page read 6 November 2026</td>
+</tr>
+<tr class="even">
+<td class="n">17 states</td>
+<td>The Southwest Power Pool, the regional grid operator for Kansas, serves members in all or part of 17 states.</td>
+<td class="s"><a href="https://www.spp.org/about-us/fast-facts/">SPP, Fast Facts</a> · updated October 2026</td>
+</tr>
+</tbody>
+</table>
+
+<!-- f09-facts:end -->
+</div>
+<div class="lx-stack">
+<!-- learn:next:start (generated by scripts/build_learn.py from learn/path.yml; edit the YAML, not this block) -->
+<div class="lx-next lx-card" data-next-id="">
+<p class="lx-eyebrow">Keep going</p>
+<p class="lx-next-t"><a href="index.html">Back to the course map</a></p>
+<button type="button" class="lx-btn ghost small lx-complete" data-complete="f09-city-energy" aria-pressed="false" hidden="">Mark this lesson as complete</button>
+</div>
+<!-- learn:next:end -->
+<div class="lx-card lx-sources">
+<p class="lx-eyebrow">Sources and further reading</p>
+<!-- f09-sources:start (written from the data files by the test's --write mode; do not edit) -->
+<p class="lx-hint">Who decides what (typical U.S. practice):</p><ul><li>U.S. Department of Energy, Office of Electricity Delivery and Energy Reliability. <a href="https://www.energy.gov/sites/prod/files/2015/12/f28/united-states-electricity-industry-primer.pdf">United States Electricity Industry Primer (DOE/OE-0017)</a>. July 2015. §4.5, p. 27: state commissions regulate what are fair and reasonable rates; §4.6, p. 27: public power is generally regulated by its own local government; §4.8, p. 30: where utilities are vertically integrated, they may construct, own and operate power plants.</li><li>Kansas Corporation Commission. The Commission's Role (no link). Undated; read 6 November 2026. The Utilities Division establishes and regulates rates for public utilities; the KCC does not regulate most electric cooperatives or municipalities.</li><li>Kansas Corporation Commission staff. Rate Study (no link). Undated (about January 2019); read 6 November 2026. P. 2: each electric utility builds an integrated system to generate, transmit and distribute electricity in its service territory.</li><li>U.S. Energy Information Administration, Today in Energy. <a href="https://www.eia.gov/todayinenergy/detail.php?id=40913">Investor-owned utilities served 72% of U.S. electricity customers in 2017</a>. 15 August 2019; data for 2017. Three out of every four utility customers; 1,958 publicly owned utilities averaging 12,100 customers; 812 co-ops averaging 24,500.</li><li>U.S. Energy Information Administration, Electricity explained. <a href="https://www.eia.gov/energyexplained/electricity/delivery-to-consumers.php">How electricity is delivered to consumers</a>. Undated; read 6 November 2026. Local electric utilities operate the distribution system that connects homes and businesses to the grid; utilities plan for future power needs.</li><li>Federal Energy Regulatory Commission. <a href="https://www.ferc.gov/what-ferc-does">What FERC Does</a>. Updated 18 June 2025. Regulates the transmission and wholesale sale of electricity in interstate commerce, and interstate natural gas pipelines; does not regulate retail sales to consumers.</li><li>U.S. Department of Energy. <a href="https://www.energy.gov/cmei/buildings/appliance-and-equipment-standards-program">Appliance and Equipment Standards Program</a>. Undated; read 6 November 2026. More than 70 products, about 90% of home energy use.</li><li>U.S. Department of Transportation, Pipeline and Hazardous Materials Safety Administration. <a href="https://www.phmsa.dot.gov/pipeline/effort-allocation/state-effort">State Effort</a>. Updated 15 May 2026. PHMSA develops pipeline safety regulations; certified state agencies inspect intrastate pipelines, including most gas distribution systems.</li><li>U.S. Department of Energy. <a href="https://www.energy.gov/cmei/buildings/articles/energy-codes-101-what-are-they-and-what-does-role">Energy Codes 101: What Are They and What is DOE's Role?</a>. 31 May 2016. No national energy code; states or local governments adopt codes; enforcement is almost always by local permit offices.</li><li>U.S. Department of Energy, Building Energy Codes Program. Kansas: current energy code status (no link). Undated; read 6 November 2026. Residential and commercial: home rule, enforced by local jurisdictions.</li><li>U.S. Department of Energy. <a href="https://www.energy.gov/cmei/systems/articles/160-communities-now-automating-solar-permitting-solarapp">160 Communities Now Automating Solar Permitting with SolarAPP+</a>. 20 December 2023. Jurisdictions issue permits for residential rooftop solar.</li><li>U.S. Department of Energy. <a href="https://www.energy.gov/sites/default/files/2022-08/energy-saver-guide-2022.pdf">Energy Saver: Tips on Saving Money and Energy in Your Home</a>. 2022. Heating and cooling choices for homeowners, heat pumps on p. 16.</li><li>U.S. Department of Transportation. Corporate Average Fuel Economy (CAFE) Standards (no link). Updated 11 August 2014. NHTSA sets and enforces the CAFE standards.</li><li>Southwest Power Pool. <a href="https://www.spp.org/about-us/">About Us</a>. Undated; read 6 November 2026. A regional transmission organization mandated by FERC to ensure reliable supplies of power, adequate transmission and competitive wholesale prices.</li><li>U.S. Energy Information Administration. <a href="https://www.eia.gov/energyexplained/use-of-energy/industry.php">Use of energy explained: Energy use in industry</a>. Undated; read 6 November 2026. Industry's activities include manufacturing, agriculture (farming, fishing and forestry), mining and construction.</li></ul><p class="lx-hint">Prairie City's flows (the course's shared city data), the parts used here:</p><ul><li>U.S. Energy Information Administration. <a href="https://www.eia.gov/energyexplained/units-and-calculators/british-thermal-units.php">Energy explained: British thermal units (Btu), sample conversion factors</a>. Read 6 Nov 2026. Gallon of motor gasoline 120,214 Btu; diesel 137,381; propane 91,452; cubic foot of natural gas 1,036; kWh 3,412.</li><li>U.S. Energy Information Administration. <a href="https://www.eia.gov/analysis/studies/buildings/dg_storage_chp/pdf/dg_storage_chp.pdf">Distributed Generation, Battery Storage, and Combined Heat and Power System Characteristics and Costs in the Buildings and Industrial Sectors, Table 2-2</a>. March 2024. Residential solar capacity factor 17.6%.</li><li>U.S. Energy Information Administration. <a href="https://www.eia.gov/consumption/residential/data/2020/index.php?view=consumption">2020 RECS, Table CE4.6: Annual household site end-use consumption by fuel, averages</a>. 2020 data; released June 2023, revised March 2024. West North Central, MMBtu per household using the fuel and end use: gas water heating 17.4, other gas 3.8; electricity air conditioning 5.9, refrigerators 3.0, other 18.5.</li><li>U.S. Department of Energy, Vehicle Technologies (Fact of the Week #1360). <a href="https://www.energy.gov/cmei/vehicles/articles/fotw-1360-sept-16-2024-typical-ev-87-91-efficient-compared-30-conventional">A Typical EV is 87%–91% Efficient Compared to 30% for a Conventional Gasoline Vehicle</a>. 16 Sep 2024. EVs 87-91% efficient; gasoline vehicles about 30%.</li><li>U.S. Energy Information Administration. <a href="https://www.eia.gov/electricity/gridmonitor/">Hourly Electric Grid Monitor (Form EIA-930), Southwest Power Pool, 2025</a>. Accessed 2 Nov 2026. Hourly demand, wind and solar shapes, each normalised to its own 2025 maximum.</li></ul>
+<!-- f09-sources:end -->
+</div>
+</div>
+</div>
+<!-- learn:footer:start (generated by scripts/build_learn.py from learn/path.yml; edit the YAML, not this block) -->
+<div class="lx-foot">
+<p class="lx-corrections">Spotted an error, or stuck? Write to <a href="mailto:hlli@ksu.edu?subject=Learn%2C%20What%20does%20a%20city%20run%20on%2C%20and%20who%20controls%20what?">hlli@ksu.edu</a>. Corrections are made in place and dated here.</p>
+<p class="lx-license">Text licensed <a href="https://creativecommons.org/licenses/by/4.0/" rel="license">CC BY 4.0</a>, code <a href="https://opensource.org/license/mit">MIT</a>: teachers and students may reuse and adapt it, with credit to Honglin Li.</p>
+</div>
+<!-- learn:footer:end -->
+</div>
+<script src="../assets/learn/learn.js" defer=""></script>
+<script src="../assets/learn/f09-city-energy.js" defer=""></script>
+
+
+
+</main> <!-- /main -->
+<script>
+// site.js — site-wide behaviour (third redesign, 2026-10-30): skip link, navbar shadow once scrolled,
+// back-to-top button, and a gentle one-time fade-in of content blocks. Without JS every page is complete.
+(function () {
+  const root = document.documentElement;
+  const body = document.body;
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // skip link to the page's main landmark
+  const main = document.querySelector("main");
+  if (main) {
+    if (!main.id) main.id = "main-content";
+    const skip = document.createElement("a");
+    skip.className = "skip-link"; skip.href = "#" + main.id; skip.textContent = "Skip to main content";
+    body.insertBefore(skip, body.firstChild);
+  }
+
+  // the brand (the name at the left of the navbar) is the link to the home page, the About page, which has no navbar
+  // item of its own since Journeys joined the navbar (2026-11-05)
+  const brand = document.querySelector("#quarto-header .navbar-brand");
+  if (brand) {
+    brand.setAttribute("aria-label", "Honglin Li, home");
+    const here = location.pathname.replace(/\/index\.html$/, "/");
+    if (brand.pathname && brand.pathname.replace(/\/index\.html$/, "/") === here) brand.setAttribute("aria-current", "page");
+  }
+  // the navbar says "Notes" for Field Notes (to fit at 1,200 px); its accessible name keeps the full name
+  document.querySelectorAll('#quarto-header .nav-link[href$="field-notes.html"]').forEach(function (a) { a.setAttribute("aria-label", "Field Notes"); });
+
+  // back-to-top button
+  const top = document.createElement("button");
+  top.type = "button"; top.className = "to-top"; top.setAttribute("aria-label", "Back to top");
+  top.innerHTML = '<i class="bi bi-arrow-up" aria-hidden="true"></i>';
+  top.hidden = true;  // out of the tab order until the page is scrolled down
+  top.addEventListener("click", function () {
+    window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+    if (main) { main.setAttribute("tabindex", "-1"); main.focus({ preventScroll: true }); }
+  });
+  body.appendChild(top);
+
+  function onScroll() {
+    const y = window.scrollY;
+    body.classList.toggle("scrolled", y > 8);
+    const show = y > window.innerHeight * 0.8;
+    top.hidden = !show;
+    top.classList.toggle("show", show);
+  }
+  onScroll();
+  window.addEventListener("scroll", onScroll, { passive: true });
+
+  // gentle fade-in, once per block
+  const auto = document.querySelectorAll("main .card, main .glow-card, main .reveal-auto > *");
+  auto.forEach(function (el) { el.classList.add("reveal"); });
+  const items = document.querySelectorAll(".reveal");
+  if (!reduce && "IntersectionObserver" in window) {
+    root.classList.add("js-reveal");
+    const io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
+    }, { rootMargin: "0px 0px -5% 0px", threshold: 0.05 });
+    items.forEach(function (el) { io.observe(el); });
+  } else {
+    items.forEach(function (el) { el.classList.add("in"); });
+  }
+})();
+</script>
+<script>
+// pages.js — publications, projects listing and project pages (third redesign, 2026-10-30).
+// Inlined on every page (scripts/build_site.py writes pages-js.html), so each part is guarded by element presence.
+//   1. BIB buttons: show / hide an entry's BibTeX; copy button (Publications, home page, project pages)
+//   2. Publications: search box and type tabs; hides empty year groups; live result count; the pressed type is
+//      highlighted in the publications-per-year chart; #journal, #conference, #preprint or #thesis in the URL
+//      presses that tab (the About page's stat row, site/_stats.qmd, links there)
+//   3. Projects: theme tabs built from the cards; #<theme> in the URL preselects a theme (project breadcrumbs link there)
+// Without JS every page is complete: the filter bars stay hidden and the BibTeX panels closed.
+(function () {
+  "use strict";
+
+  // a polite live region for short confirmations ("BibTeX copied")
+  let live = null;
+  function announce(msg) {
+    if (!live) {
+      live = document.createElement("div");
+      live.className = "visually-hidden"; live.setAttribute("role", "status"); live.setAttribute("aria-live", "polite");
+      document.body.appendChild(live);
+    }
+    live.textContent = ""; window.setTimeout(function () { live.textContent = msg; }, 30);
+  }
+  const norm = function (s) { return (s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/\s+/g, " "); };
+
+  // ---------- 1. BibTeX ----------
+  document.querySelectorAll(".bib-toggle").forEach(function (btn) {
+    const panel = document.getElementById(btn.getAttribute("aria-controls"));
+    if (!panel) return;
+    btn.addEventListener("click", function () {
+      const open = btn.getAttribute("aria-expanded") === "true";
+      btn.setAttribute("aria-expanded", String(!open));
+      panel.hidden = open;
+    });
+  });
+  function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+    return new Promise(function (resolve, reject) {   // fallback (e.g. file:// previews)
+      const ta = document.createElement("textarea");
+      ta.value = text; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      let ok = false;
+      try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+      ta.remove();
+      if (ok) resolve(); else reject(new Error("copy failed"));
+    });
+  }
+  document.querySelectorAll(".bib-copy").forEach(function (btn) {
+    const label = btn.querySelector("span");
+    const code = btn.parentElement.querySelector("code");
+    if (!code) return;
+    btn.addEventListener("click", function () {
+      copyText(code.textContent).then(function () {
+        btn.classList.add("done"); if (label) label.textContent = "Copied"; announce("BibTeX copied to the clipboard");
+      }, function () {
+        if (label) label.textContent = "Select and copy"; announce("Copy failed; select the text and copy it");
+        const sel = window.getSelection(), range = document.createRange();
+        range.selectNodeContents(code); sel.removeAllRanges(); sel.addRange(range);
+      }).then(function () {
+        window.setTimeout(function () { btn.classList.remove("done"); if (label) label.textContent = "Copy"; }, 1800);
+      });
+    });
+  });
+
+  // pressed-state helper for a group of filter tabs
+  function pressTab(tabs, active) {
+    tabs.forEach(function (t) { t.setAttribute("aria-pressed", String(t === active)); });
+  }
+
+  // ---------- 2. Publications: search and type tabs ----------
+  const pubBar = document.querySelector(".pub-filter");
+  if (pubBar) {
+    const input = pubBar.querySelector("#pub-q");
+    const tabs = Array.prototype.slice.call(pubBar.querySelectorAll(".ftab"));
+    const groups = Array.prototype.slice.call(document.querySelectorAll(".pub-year"));
+    const items = Array.prototype.slice.call(document.querySelectorAll(".pub-years .pub"));
+    const status = document.querySelector(".filter-status");
+    const empty = document.querySelector(".filter-empty");
+    const chart = document.querySelector(".pub-chart");
+    const total = items.length;
+    let type = "all";
+    items.forEach(function (li) {   // search text: badge, title, authors, venue and year (not the BibTeX)
+      li._q = norm([".abbr", ".pub-title", ".pub-authors", ".pub-venue"].map(function (s) {
+        const el = li.querySelector(s); return el ? el.textContent : "";
+      }).join(" ") + " " + li.getAttribute("data-year"));
+    });
+    function apply() {
+      const terms = norm(input.value).trim().split(" ").filter(Boolean);
+      let shown = 0;
+      items.forEach(function (li) {
+        const ok = (type === "all" || li.getAttribute("data-type") === type) && terms.every(function (t) { return li._q.indexOf(t) !== -1; });
+        li.hidden = !ok; if (ok) shown++;
+      });
+      groups.forEach(function (g) { g.hidden = !g.querySelector(".pub:not([hidden])"); });
+      if (empty) empty.hidden = shown > 0;
+      if (chart) chart.setAttribute("data-type", type);
+      if (status) status.textContent = (shown === total && !terms.length) ? "" :
+        "Showing " + shown + " of " + total + " publications" + (terms.length ? " matching “" + input.value.trim() + "”" : "") + ".";
+    }
+    tabs.forEach(function (t) {
+      t.addEventListener("click", function () { type = t.getAttribute("data-filter"); pressTab(tabs, t); apply(); });
+    });
+    input.addEventListener("input", apply);
+    input.addEventListener("keydown", function (e) { if (e.key === "Escape" && input.value) { input.value = ""; apply(); } });
+    const reset = document.querySelector(".filter-reset");
+    if (reset) reset.addEventListener("click", function () { input.value = ""; type = "all"; pressTab(tabs, tabs[0]); apply(); input.focus(); });
+    pubBar.hidden = false;
+    function typeFromHash() {   // year anchors (#y2026) match no tab and are left alone
+      const h = decodeURIComponent((location.hash || "").slice(1));
+      const tab = tabs.find(function (t) { return t.getAttribute("data-filter") === h; });
+      if (tab) { type = h; pressTab(tabs, tab); apply(); }
+    }
+    typeFromHash();
+    window.addEventListener("hashchange", typeFromHash);
+  }
+
+  // ---------- 3. Projects: theme tabs ----------
+  const projBar = document.querySelector(".proj-filter");
+  const cells = Array.prototype.slice.call(document.querySelectorAll(".project-grid [data-theme]"));
+  if (projBar && cells.length) {
+    const box = projBar.querySelector(".ftabs");
+    const status = document.querySelector(".filter-status");
+    const themes = [];   // [key, label, count] in card order
+    cells.forEach(function (c) {
+      const k = c.getAttribute("data-theme");
+      const hit = themes.find(function (t) { return t[0] === k; });
+      if (hit) hit[2]++; else themes.push([k, c.getAttribute("data-label"), 1]);
+    });
+    function makeTab(key, label, n) {
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "ftab" + (key === "all" ? "" : " theme-" + key);
+      b.setAttribute("data-filter", key); b.setAttribute("aria-pressed", "false");
+      b.innerHTML = (key === "all" ? "" : '<span class="tdot" aria-hidden="true"></span>') + "<span></span> " + '<span class="n">' + n + "</span>";
+      b.children[key === "all" ? 0 : 1].textContent = label;
+      box.appendChild(b);
+      return b;
+    }
+    const tabs = [makeTab("all", "All", cells.length)].concat(themes.map(function (t) { return makeTab(t[0], t[1], t[2]); }));
+    function select(key, push) {
+      const tab = tabs.find(function (t) { return t.getAttribute("data-filter") === key; }) || tabs[0];
+      key = tab.getAttribute("data-filter");
+      pressTab(tabs, tab);
+      let shown = 0;
+      cells.forEach(function (c) { const ok = key === "all" || c.getAttribute("data-theme") === key; c.hidden = !ok; if (ok) shown++; });
+      if (status) status.textContent = key === "all" ? "" : "Showing " + shown + " of " + cells.length + " projects: " + tab.children[1].textContent + ".";
+      if (push && window.history && history.replaceState) history.replaceState(null, "", key === "all" ? location.pathname + location.search : "#" + key);
+    }
+    tabs.forEach(function (t) { t.addEventListener("click", function () { select(t.getAttribute("data-filter"), true); }); });
+    projBar.hidden = false;
+    const initial = decodeURIComponent((location.hash || "").slice(1));
+    select(initial || "all", false);
+    window.addEventListener("hashchange", function () { select(decodeURIComponent(location.hash.slice(1)) || "all", false); });
+  }
+})();
+</script>
+<script>
+// home.js — about/home page (third redesign, 2026-10-30). Guard by element presence.
+</script>
+<script>
+// map.js — "Collaborations around the world" map on the About page (2026-10-30).
+// The section, its legend, the institution list and the data (<script id="cmap-data">) come from scripts/build_map.py
+// (_map.qmd); styles in assets/map.css. Inlined on every page (scripts/build_site.py writes map-js.html), so it does
+// nothing unless #cmap is on the page.
+//   - Lazy: Leaflet 1.9.4 (cdnjs, with SRI) and the tiles load only when the section nears the viewport.
+//   - The basemap follows Quarto's day/night toggle (body.quarto-light / body.quarto-dark): CARTO light_all / dark_all
+//     when #cmap carries data-tiles-key (CARTO basemaps need a free key; set in scripts/build_map.py); otherwise the
+//     OpenStreetMap standard tiles, toned grey by day and inverted by night in map.css (.cmap.tiles-osm).
+//   - Scroll-wheel zoom (and one-finger dragging on touch screens) stays off until the map is clicked.
+//   - Keyboard: the map takes focus (arrows pan, +/- zoom); Tab reaches each marker, Enter opens its popup, Esc closes.
+//   - Markers that overlap at the current zoom are spread apart a little, so each stays visible and clickable.
+//   - Without JS, or if Leaflet cannot load, the map box stays hidden and the list below the map is the content.
+// Visitor map (part 2 below): the provider's snippet waits in <template id="visitor-map-tpl">; it is inserted after the
+// page has loaded, so it never blocks rendering, and the "Visitors" section is hidden again if it fails or draws nothing.
+
+// ---------- 1. collaboration map ----------
+(function () {
+  "use strict";
+  const root = document.getElementById("cmap");
+  const dataEl = document.getElementById("cmap-data");
+  if (!root || !dataEl) return;
+  let data;
+  try { data = JSON.parse(dataEl.textContent); } catch (e) { return; }
+  const wrap = root.closest(".cmap-wrap");
+  const section = root.closest("section") || root;
+
+  const CDN = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/";
+  const LEAFLET_CSS = { href: CDN + "leaflet.min.css",
+    integrity: "sha512-h9FcoyWjHcOcmEVkxOfTLnmZFWIH0iZhZT1H2TbOq55xssQGEJHEaIm+PgoUaZbRvQTNTluNOEfb1ZRy6D3BOw==" };
+  const LEAFLET_JS = { src: CDN + "leaflet.min.js",
+    integrity: "sha512-puJW3E/qXDqYp9IfhAI54BJEaWIfloJ7JWs7OeD5i6ruC9JZL1gERT1wjtwXFlh7CjE7ZJ+/vcRZRkIYIb6p4g==" };
+  const OSM_ATTR = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+  // The CARTO key is restricted to the live site's host, so local previews (file://, localhost) use OpenStreetMap tiles.
+  const LIVE_HOST = "henryutd2021.github.io";
+  const tilesKey = location.hostname === LIVE_HOST ? root.getAttribute("data-tiles-key") : null;
+  const BASEMAP = tilesKey ? {
+    kind: "carto",
+    light: "https://basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png?key=" + encodeURIComponent(tilesKey),
+    dark: "https://basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}.png?key=" + encodeURIComponent(tilesKey),
+    attribution: OSM_ATTR + ' &copy; <a href="https://carto.com/attributions">CARTO</a>', maxZoom: 20,
+  } : {
+    kind: "osm",   // one tile set for both themes; map.css tones it (grey by day, inverted by night)
+    light: "https://tile.openstreetmap.org/{z}/{x}/{y}.png", dark: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+    attribution: OSM_ATTR, maxZoom: 19,
+  };
+  const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const isDark = function () { return document.body.classList.contains("quarto-dark"); };
+  const esc = function (s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  };
+
+  // JS is running: reserve the map's space now (a quiet placeholder until Leaflet arrives); hide it again on failure
+  wrap.hidden = false;
+  root.classList.add("is-loading");
+  function fail() { wrap.hidden = true; }
+
+  // ---------- load Leaflet (CSS and JS, both with SRI), once ----------
+  function loadLeaflet(done) {
+    if (window.L && window.L.map) { done(true); return; }
+    let pending = 2, ok = true, finished = false;
+    const timer = window.setTimeout(function () { finish(false); }, 20000);
+    function finish(success) {
+      if (finished) return;
+      if (!success) ok = false;
+      if (--pending > 0 && ok) return;
+      finished = true; window.clearTimeout(timer);
+      done(ok && !!(window.L && window.L.map));
+    }
+    const link = document.createElement("link");
+    link.rel = "stylesheet"; link.href = LEAFLET_CSS.href; link.integrity = LEAFLET_CSS.integrity;
+    link.crossOrigin = "anonymous"; link.referrerPolicy = "no-referrer";
+    link.onload = function () { finish(true); }; link.onerror = function () { finish(false); };
+    document.head.appendChild(link);
+    const script = document.createElement("script");
+    script.src = LEAFLET_JS.src; script.integrity = LEAFLET_JS.integrity;
+    script.crossOrigin = "anonymous"; script.referrerPolicy = "no-referrer";
+    script.onload = function () { finish(true); }; script.onerror = function () { finish(false); };
+    document.head.appendChild(script);
+  }
+
+  // ---------- popups ----------
+  function paperList(papers, max) {
+    const items = papers.slice(0, max).map(function (p) {
+      const t = p[2] ? '<a href="https://doi.org/' + esc(p[2]) + '">' + esc(p[0]) + "</a>" : esc(p[0]);
+      const st = p[3] && p[3] !== "published" ? ' <span class="cmap-pop-st">' + esc(p[3]) + "</span>" : "";
+      return "<li>" + t + ' <span class="cmap-pop-yr">' + esc(p[1]) + "</span>" + st + "</li>";
+    });
+    if (papers.length > max) items.push('<li class="cmap-pop-more">and ' + (papers.length - max) + " more</li>");
+    return '<ul class="cmap-pop-papers">' + items.join("") + "</ul>";
+  }
+  function yearSpan(papers) {
+    const ys = papers.map(function (p) { return p[1]; }).filter(Boolean).sort();
+    if (!ys.length) return "";
+    return ys[0] === ys[ys.length - 1] ? String(ys[0]) : ys[0] + "–" + ys[ys.length - 1];
+  }
+  function instPopup(i) {
+    const n = i.count, word = n === 1 ? "paper" : "papers";
+    return '<div class="cmap-pop">' +
+      '<p class="cmap-pop-kind">' + (i.home ? "Home institution" : "Collaborating institution") + "</p>" +
+      "<h3>" + esc(i.name) + "</h3>" +
+      '<p class="cmap-pop-place">' + esc([i.place, i.country].filter(Boolean).join(", ")) + "</p>" +
+      '<p class="cmap-pop-n"><strong>' + n + "</strong> " + (i.home ? word : "joint " + word) +
+      (yearSpan(i.papers) ? " · " + yearSpan(i.papers) : "") + "</p>" +
+      paperList(i.papers, i.home ? 3 : 4) + "</div>";
+  }
+  function talkPopup(t) {
+    return '<div class="cmap-pop">' +
+      '<p class="cmap-pop-kind cmap-pop-kind--talk">Conference presentation</p>' +
+      "<h3>" + esc(t.event) + "</h3>" +
+      '<p class="cmap-pop-place">' + esc([t.place, t.country].filter(Boolean).join(", ")) + " · " + esc(t.date) + "</p>" +
+      '<p class="cmap-pop-talk">' + esc(t.title) + "</p></div>";
+  }
+
+  // ---------- the map ----------
+  function init() {
+    const L = window.L;
+    const touch = !!(L.Browser && L.Browser.mobile);
+    const map = L.map(root, {
+      scrollWheelZoom: false, dragging: !touch, worldCopyJump: true, zoomSnap: 1, minZoom: 1, maxZoom: 12,   // whole zoom levels: no seams between scaled tiles
+      keyboard: true, zoomAnimation: !reduceMotion, fadeAnimation: !reduceMotion, markerZoomAnimation: !reduceMotion,
+    });
+    root.classList.remove("is-loading");
+    const hint = wrap.querySelector(".cmap-hint");
+    if (touch && hint) hint.textContent = "Tap the map to move it with one finger; pinch to zoom. Tap a marker for details.";
+    root.setAttribute("role", "region");
+    root.setAttribute("aria-roledescription", "map");
+    root.setAttribute("aria-label", root.getAttribute("data-label") || "Map");
+    map.attributionControl.setPrefix('<a href="https://leafletjs.com">Leaflet</a>');
+    root.classList.add("tiles-" + BASEMAP.kind);
+    const tiles = L.tileLayer(isDark() ? BASEMAP.dark : BASEMAP.light,
+      { attribution: BASEMAP.attribution, maxZoom: BASEMAP.maxZoom }).addTo(map);
+
+    // popups fit inside the map: narrower on phones, and scrolling inside when taller than the map (2026-11-05)
+    function popupOptions() {
+      const w = root.clientWidth, h = root.clientHeight, narrow = w < 480;
+      return { maxWidth: narrow ? Math.max(170, w - 130) : 300, maxHeight: Math.max(140, h - (narrow ? 110 : 80)), closeButton: true,
+               autoPanPaddingTopLeft: narrow ? L.point(46, 12) : L.point(64, 24), autoPanPaddingBottomRight: narrow ? L.point(10, 12) : L.point(24, 24) };
+    }
+
+    // markers: home = ring, collaborators = filled circle (size grows with joint papers), presentations = diamond
+    const markers = [];
+    function add(kind, lat, lon, size, label, popup, z) {
+      // the marker's box is at least 24 px (a touch target), the dot inside it keeps its own size (2026-11-05)
+      const box = Math.max(24, size);
+      const icon = L.divIcon({ className: "cmap-mk cmap-mk--" + kind, html: '<span style="width:' + size + "px;height:" + size + 'px"></span>',
+                               iconSize: [box, box], iconAnchor: [box / 2, box / 2], popupAnchor: [0, -size / 2] });
+      const m = L.marker([lat, lon], { icon: icon, title: label, keyboard: true, riseOnHover: true, zIndexOffset: z })
+        .bindPopup(popup, popupOptions()).addTo(map);
+      m.on("add", function () { const el = m.getElement(); if (el) el.setAttribute("aria-label", label); });
+      const el = m.getElement(); if (el) el.setAttribute("aria-label", label);
+      m.cmapSize = size;
+      markers.push(m);
+    }
+    (data.institutions || []).forEach(function (i) {
+      const n = i.count, place = [i.place, i.country].filter(Boolean).join(", ");
+      const label = i.name + ", " + place + " — " + (i.home ? "home institution, " + n + (n === 1 ? " paper" : " papers")
+                                                            : n + (n === 1 ? " joint paper" : " joint papers"));
+      const size = i.home ? Math.round(16 + 2 * Math.sqrt(n)) : Math.round(10 + 3 * Math.sqrt(n));
+      add(i.home ? "home" : "collab", i.lat, i.lon, size, label, instPopup(i), i.home ? 0 : 100);
+    });
+    (data.presentations || []).forEach(function (t) {
+      const label = t.event + ", " + [t.place, t.country].filter(Boolean).join(", ") + " — presentation, " + t.date;
+      add("talk", t.lat, t.lon, 13, label, talkPopup(t), 200);
+    });
+    if (!markers.length) { fail(); return; }
+
+    // spread markers that overlap at the current zoom (visual offset of the inner dot only). Overlapping markers form
+    // a group (chained: A near B, B near C -> one group), laid out on a small circle around the group's centre in the
+    // markers' own compass order, the circle just large enough that neighbours no longer touch. If a spread group
+    // then touches another marker, the two merge and are laid out again.
+    const GAP = 4;
+    function declutter() {
+      const k = map.getZoom() <= 2 ? 0.72 : 1;   // smaller markers at world-wide zoom levels (phones), so fewer collide
+      root.style.setProperty("--k", String(k));
+      const pts = markers.map(function (m) { return { m: m, p: map.latLngToLayerPoint(m.getLatLng()), r: k * m.cmapSize / 2 }; });
+      const parent = pts.map(function (_, i) { return i; });
+      const find = function (i) { while (parent[i] !== i) { parent[i] = parent[parent[i]]; i = parent[i]; } return i; };
+      const touch = function (i, j, pi, pj) { return pi.distanceTo(pj) < pts[i].r + pts[j].r + GAP; };
+      function layout() {
+        const pos = pts.map(function (q) { return q.p; });
+        const groups = {};
+        pts.forEach(function (_, i) { (groups[find(i)] = groups[find(i)] || []).push(i); });
+        Object.keys(groups).forEach(function (g) {
+          const group = groups[g];
+          if (group.length === 1) return;
+          let cx = 0, cy = 0, rmax = 0;
+          group.forEach(function (k) { cx += pts[k].p.x; cy += pts[k].p.y; rmax = Math.max(rmax, pts[k].r); });
+          cx /= group.length; cy /= group.length;
+          const R = Math.max(rmax + GAP, (2 * rmax + GAP) / (2 * Math.sin(Math.PI / group.length)));
+          const angOf = function (k) { return Math.atan2(pts[k].p.y - cy, pts[k].p.x - cx); };
+          group.sort(function (x, y) { return angOf(x) - angOf(y); });
+          const start = angOf(group[0]);
+          group.forEach(function (k, n) {
+            const ang = start + (2 * Math.PI * n) / group.length;
+            pos[k] = L.point(cx + R * Math.cos(ang), cy + R * Math.sin(ang));
+          });
+        });
+        return pos;
+      }
+      for (let i = 0; i < pts.length; i++) {
+        for (let j = i + 1; j < pts.length; j++) { if (touch(i, j, pts[i].p, pts[j].p)) parent[find(i)] = find(j); }
+      }
+      let pos = layout();
+      for (let round = 0; round < 6; round++) {
+        let merged = false;
+        for (let i = 0; i < pts.length; i++) {
+          for (let j = i + 1; j < pts.length; j++) {
+            if (find(i) !== find(j) && touch(i, j, pos[i], pos[j])) { parent[find(i)] = find(j); merged = true; }
+          }
+        }
+        if (!merged) break;
+        pos = layout();
+      }
+      pts.forEach(function (q, i) { shift(q.m, pos[i].x - q.p.x, pos[i].y - q.p.y); });
+    }
+    function shift(m, dx, dy) {
+      const el = m.getElement(); if (!el) return;
+      el.style.setProperty("--dx", dx.toFixed(1) + "px"); el.style.setProperty("--dy", dy.toFixed(1) + "px");
+    }
+
+    const bounds = L.latLngBounds(markers.map(function (m) { return m.getLatLng(); }));
+    function fitAll() {
+      const pad = Math.round(Math.min(36, Math.max(12, root.clientWidth * 0.03)));
+      map.fitBounds(bounds, { padding: [pad, pad], maxZoom: 5, animate: !reduceMotion });
+    }
+    map.on("zoomend viewreset", declutter);
+    fitAll();
+    declutter();
+
+    // "show all" control under the zoom buttons
+    const Reset = L.Control.extend({
+      options: { position: "topleft" },
+      onAdd: function () {
+        const box = L.DomUtil.create("div", "leaflet-bar cmap-reset");
+        const b = L.DomUtil.create("a", "", box);
+        b.href = "#"; b.setAttribute("role", "button"); b.title = "Show all markers"; b.setAttribute("aria-label", "Show all markers");
+        b.innerHTML = '<i class="bi bi-globe2" aria-hidden="true"></i>';
+        L.DomEvent.disableClickPropagation(box);
+        L.DomEvent.on(b, "click", function (e) { L.DomEvent.preventDefault(e); map.closePopup(); fitAll(); });
+        return box;
+      },
+    });
+    map.addControl(new Reset());
+
+    // scroll-wheel zoom (and touch dragging) only after a click on the map; off again when the pointer leaves
+    function arm() { map.scrollWheelZoom.enable(); if (touch) map.dragging.enable(); root.classList.add("is-armed"); }
+    function disarm() { map.scrollWheelZoom.disable(); if (touch) map.dragging.disable(); root.classList.remove("is-armed"); }
+    map.on("click", arm);
+    root.addEventListener("mouseleave", disarm);
+    document.addEventListener("touchstart", function (e) { if (!root.contains(e.target)) disarm(); }, { passive: true });
+
+    // day / night basemap: follow Quarto's toggle (it swaps body.quarto-light / body.quarto-dark)
+    new MutationObserver(function () {
+      const url = isDark() ? BASEMAP.dark : BASEMAP.light;
+      if (tiles._url !== url) tiles.setUrl(url);
+    }).observe(document.body, { attributes: true, attributeFilter: ["class"] });
+
+    // the map may have been laid out while hidden or resized with the page
+    window.addEventListener("resize", function () { map.invalidateSize(); });
+  }
+
+  function start() {
+    loadLeaflet(function (ok) {
+      if (!ok) { fail(); return; }
+      try { init(); } catch (e) { fail(); }
+    });
+  }
+  if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver(function (entries) {
+      if (entries.some(function (e) { return e.isIntersecting; })) { io.disconnect(); start(); }
+    }, { rootMargin: "400px 0px" });
+    io.observe(section);
+  } else {
+    start();
+  }
+})();
+
+// ---------- 2. visitor map (third-party widget, About page only; own section since 2026-11-05) ----------
+// MapMyVisitors' loader reads from its own URL: w (width; "a" = its parent's width), co (the panel colour, i.e. the ocean),
+// cl (the land colour of the generated background image) and ct (the text colour). Here co, cl and ct are set to the
+// site's day or night colours before the snippet runs; on high-DPI screens the widget is drawn at twice the column width
+// in a box scaled to one half, so its land image stays crisp (map.css enlarges the widget's text and dots to match).
+// A day/night switch after loading recolours the panel and text through map.css and swaps the land image for the other
+// theme's. The frame follows the column's width on resize.
+(function () {
+  "use strict";
+  const box = document.getElementById("visitor-map");
+  const tpl = document.getElementById("visitor-map-tpl");
+  const body = document.getElementById("visitor-map-body");
+  if (!box || !tpl || !body || !("content" in tpl)) return;
+  const THEME = { light: { co: "eef2f7", cl: "cbd5e1", ct: "374151" }, dark: { co: "1c212a", cl: "3b4351", ct: "d1d5db" } };
+  const isDark = function () { return document.body.classList.contains("quarto-dark"); };
+  const k = (window.devicePixelRatio || 1) >= 1.5 ? 2 : 1;
+  let done = false, inner = null;
+  function hide() { if (!done) { done = true; box.hidden = true; } }
+  function drawn() {
+    return !!inner && Array.prototype.some.call(inner.children, function (el) { return el.tagName !== "SCRIPT" && el.tagName !== "STYLE"; });
+  }
+  function themedSrc(src) {
+    try {
+      const u = new URL(src, location.href);
+      if (!/(^|\.)mapmyvisitors\.com$/.test(u.hostname)) return src;
+      const t = THEME[isDark() ? "dark" : "light"];
+      Object.keys(t).forEach(function (key) { u.searchParams.set(key, t[key]); });
+      return u.toString();
+    } catch (e) { return src; }
+  }
+  function fit() {   // scale the widget to the frame's width and the frame's height to the widget
+    if (!inner || !inner.offsetWidth) return;
+    const s = body.clientWidth / inner.offsetWidth;
+    inner.style.transform = s === 1 ? "" : "scale(" + s + ")";
+    body.style.height = Math.ceil(inner.offsetHeight * s) + "px";
+  }
+  function insert() {
+    box.hidden = false;
+    inner = document.createElement("div");
+    inner.className = "visitor-scale" + (k > 1 ? " is-2x" : "");
+    inner.style.width = Math.floor(body.clientWidth * k) + "px";
+    body.appendChild(inner);
+    const frag = tpl.content.cloneNode(true);
+    // scripts cloned from a template never run: recreate them (same attributes, themed colours), asynchronous by nature
+    frag.querySelectorAll("script").forEach(function (old) {
+      const s = document.createElement("script");
+      Array.prototype.forEach.call(old.attributes, function (a) { s.setAttribute(a.name, a.name === "src" ? themedSrc(a.value) : a.value); });
+      if (old.textContent.trim()) s.text = old.textContent;
+      s.async = true;
+      s.addEventListener("error", hide);
+      old.parentNode.replaceChild(s, old);
+    });
+    inner.appendChild(frag);
+    fit();
+    if ("ResizeObserver" in window) new ResizeObserver(fit).observe(inner);
+    window.addEventListener("resize", fit);
+    window.setTimeout(function () { if (!drawn()) hide(); else { done = true; fit(); } }, 15000);
+  }
+  // day / night after loading: the panel and text colours follow map.css; the land image is swapped here
+  new MutationObserver(function () {
+    if (!inner) return;
+    const t = THEME[isDark() ? "dark" : "light"];
+    inner.querySelectorAll(".mapmyvisitors-map").forEach(function (m) {
+      const bg = m.style.backgroundImage;
+      if (bg) m.style.backgroundImage = bg.replace(/co_[0-9a-f]{6}/i, "co_" + t.co).replace(/cl_[0-9a-f]{6}/i, "cl_" + t.cl);
+    });
+  }).observe(document.body, { attributes: true, attributeFilter: ["class"] });
+  if (document.readyState === "complete") insert();
+  else window.addEventListener("load", insert, { once: true });
+})();
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/henryutd2021\.github\.io");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© 2026 Honglin Li · Kansas State University · <a href="mailto:hlli@ksu.edu">hlli@ksu.edu</a></p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Last updated: November 2026 · Built with <a href="https://quarto.org">Quarto</a></p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

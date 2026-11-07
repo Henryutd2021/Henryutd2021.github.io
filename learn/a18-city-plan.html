@@ -1,0 +1,1688 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.19">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Analyst lesson A18 of Energy Systems, Step by Step: build a city’s emissions inventory by scope, set a target, pick measures from a marginal abatement cost curve, test the plan against an up-front budget, substation limits on the coldest morning and who benefits, and see where the curve misleads: interactions, order and lock-in, the baseline, static costs and measures that save money but do not happen by themselves.">
+
+<title>How is a city or regional energy plan made? – Honglin Li</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../images/favicon.svg" rel="icon" type="image/svg+xml">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-b626d73c4c936ccc3cb08be7d45d1df6.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-c0b1642a1007bf633769ed7b0f05c6cc.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-24969ac2e858442fb45ced1a2b17dbde.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-c0b1642a1007bf633769ed7b0f05c6cc.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.9.4/css/academicons.min.css" crossorigin="anonymous">
+<meta name="theme-color" content="#ffffff">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../assets/base.css">
+<link rel="stylesheet" href="../assets/home.css">
+<link rel="stylesheet" href="../assets/pubs.css">
+<link rel="stylesheet" href="../assets/pages.css">
+<link rel="stylesheet" href="../assets/map.css">
+<link rel="stylesheet" href="../assets/explainers.css">
+<link rel="stylesheet" href="../assets/learn/learn.css">
+<meta property="og:title" content="How is a city or regional energy plan made? – Honglin Li">
+<meta property="og:description" content="Analyst lesson A18 of Energy Systems, Step by Step: build a city’s emissions inventory by scope, set a target, pick measures from a marginal abatement cost curve, test the plan against an up-front budget, substation limits on the coldest morning and who benefits, and see where the curve misleads: interactions, order and lock-in, the baseline, static costs and measures that save money but do not happen by themselves.">
+<meta property="og:image" content="https://henryutd2021.github.io/learn/images/profile-square.jpg">
+<meta property="og:site_name" content="Honglin Li">
+</head>
+
+<body class="nav-fixed page-learn page-lesson lx-form-cards quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-xl " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">Honglin Li</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../research.html"> 
+<span class="menu-text">Research</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../projects.html"> 
+<span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../publications.html"> 
+<span class="menu-text">Publications</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../software-data.html"> 
+<span class="menu-text">Software</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../teaching.html"> 
+<span class="menu-text">Teaching</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../learn/index.html"> 
+<span class="menu-text">Learn</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../field-notes.html"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../cv.html"> 
+<span class="menu-text">CV</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../journeys.html"> 
+<span class="menu-text">Journeys</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en"> <i class="bi bi-mortarboard-fill" role="img" aria-label="Google Scholar">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/Henryutd2021"> <i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/honglin-li-998b18221/"> <i class="bi bi-linkedin" role="img" aria-label="LinkedIn">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content column-page" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">How is a city or regional energy plan made?</h1>
+<p class="subtitle lead">Count Prairie City’s emissions, pick measures from a cost curve, test the plan against budget, winter peaks and who benefits, and see where the curve misleads</p>
+</div>
+
+<div>
+  <div class="description">
+    Analyst lesson A18 of Energy Systems, Step by Step: build a city’s emissions inventory by scope, set a target, pick measures from a marginal abatement cost curve, test the plan against an up-front budget, substation limits on the coldest morning and who benefits, and see where the curve misleads: interactions, order and lock-in, the baseline, static costs and measures that save money but do not happen by themselves.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta column-page">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<!-- A18 in the step-card form, closed form (Learn W5, builder learn-w5-d, 2026-11-06). Model, step cards and explain
+     layer: assets/learn/a18-city-plan.js with assets/learn/data/a18-city-plan.json, prairie-city.json (never retyped),
+     e0.json (lesson SB0's costs and rate) and path.json. Tests: node _tests/learn/test_a18-city-plan.js checks every
+     number below against the model. Prairie City is fictional. Generated, do not edit by hand: the learn:meta,
+     learn:next and learn:footer blocks. -->
+<!-- learn:meta:start (generated by scripts/build_learn.py from learn/path.yml; edit the YAML, not this block) -->
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "name": "How is a city or regional energy plan made? Count Prairie City's emissions, pick measures from a cost curve, test the plan against budget, winter peaks and who benefits, and see where the curve misleads", "description": "Analyst lesson A18 of Energy Systems, Step by Step: build a city's emissions inventory by scope, set a target, pick measures from a marginal abatement cost curve, test the plan against an up-front budget, substation limits on the coldest morning and who benefits, and see where the curve misleads: interactions, order and lock-in, the baseline, static costs and measures that save money but do not happen by themselves.", "learningResourceType": "Interactive lesson", "educationalLevel": "Intermediate", "timeRequired": "PT60M", "inLanguage": "en", "isAccessibleForFree": true, "teaches": ["city emissions inventories by scope (GPC)", "targets", "marginal abatement cost curves", "cost per tonne avoided", "budget", "peak and distribution tests", "interactions and lock-in", "baselines", "who decides in a city plan"], "license": "https://creativecommons.org/licenses/by/4.0/", "author": {"@type": "Person", "name": "Honglin Li", "url": "https://henryutd2021.github.io/"}, "url": "https://henryutd2021.github.io/learn/a18-city-plan.html", "isPartOf": {"@type": "Course", "name": "Energy Systems, Step by Step", "url": "https://henryutd2021.github.io/learn/"}}</script>
+<script type="application/json" class="lx-lesson-data">{"id":"a18-city-plan","starter":null,"total":14,"code":"A18","title":"How is a city or regional energy plan made?","subtitle":"Count Prairie City's emissions, pick measures from a cost curve, test the plan against budget, winter peaks and who benefits, and see where the curve misleads","short":"A city's energy plan","tier":"analyst","tier2":null,"tierLabel":"Analyst · L2","level":"L2","slot":2,"slot2":null,"minutes":30,"does":"Sort Prairie City's emissions into the GPC's scopes, set a 2035 target, build a plan from a cost curve of six measures, test it against an up-front budget, each district's substation on the coldest morning and who benefits, then see the curve mislead through overlaps, order, the baseline, prices and hidden costs.","outcome":"Build a city's inventory by scope, read and use a marginal abatement cost curve, test a plan against money, peaks and fairness, and name five ways the curve misleads and who decides each step of a U.S. city plan.","icon":"blueprint","form":"cards","scales":[],"teaches":["city emissions inventories by scope (GPC)","targets","marginal abatement cost curves","cost per tonne avoided","budget","peak and distribution tests","interactions and lock-in","baselines","who decides in a city plan"],"lab":null,"href":"a18-city-plan.html","ready":true,"after":[{"id":"f09-city-energy","code":"F9","title":"What does a city run on, and who controls what?","short":"A city's energy","does":"Follow Prairie City's 2025 energy from the gas grid, fuels, the SPP grid and rooftop solar to homes, shops, transport, industry and a data-center campus; group it by sector; then sort who usually decides each lever (the city, the utility, the state regulator, owners or federal rules) and light up each one's part of the flows.","href":"f09-city-energy.html","ready":true},{"id":"a01-project-tea","code":"A1","title":"Is this project worth building? Cash flows, discounting and the cost of capital","short":"Is it worth building?","does":"Build a wind farm's cash flows year by year; discount them at the cost of capital; move the loan share, the rate, the life and the price; read NPV, IRR and payback; a tornado chart ranks what matters.","href":"a01-project-tea.html","ready":true}],"prev":null,"next":null,"practice":30}</script>
+<div class="lx-head" data-lesson-id="a18-city-plan" data-total="14" data-tier="analyst" data-level="L2" data-minutes="30" data-form="cards">
+<div>
+<nav class="lx-crumbs" aria-label="Breadcrumb"><ol><li><a href="index.html">Learn</a></li><li aria-current="page">A18</li></ol></nav>
+<ul class="lx-badges" aria-label="About this lesson">
+<li style="--c:var(--lx-tier-2)"><span class="lx-dot" aria-hidden="true"></span>Analyst · L2</li>
+<li><span class="lx-nw">30 min guided</span> · <span class="lx-nw">about 30 min practice</span></li>
+<li>After <a href="f09-city-energy.html">F9</a> and <a href="a01-project-tea.html">A1</a></li>
+<li class="lx-done-tag" data-lesson-id="a18-city-plan" hidden="">Completed</li>
+</ul>
+</div>
+<nav class="lx-steps" aria-label="In this lesson"><ol><li><a href="#steps"><span class="lx-n">1</span>Step by step</a></li><li><a href="#explain"><span class="lx-n">2</span>Explain</a></li><li><a href="#check"><span class="lx-n">3</span>Check</a></li><li><a href="#sources"><span class="lx-n">4</span>Sources</a></li></ol></nav>
+</div>
+<!-- learn:meta:end -->
+<div id="steps" class="lx-sec">
+<div class="lx-interactive lx-cards" data-learn="a18-city-plan" data-src="../assets/learn/data/a18-city-plan.json ../assets/learn/data/prairie-city.json ../assets/learn/data/e0.json ../assets/learn/data/path.json">
+<div class="lx-fallback">
+<p class="lx-eyebrow">Prairie City's cost curve, 2026 to 2035: six measures, each alone, cheapest first</p>
+
+<table class="lx-facts a18-fb caption-top table">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">Measure</th>
+<th data-quarto-table-cell-role="th" scope="col">Tonnes CO₂ a year by 2035</th>
+<th data-quarto-table-cell-role="th" scope="col">Cost per tonne</th>
+<th data-quarto-table-cell-role="th" scope="col">Up front</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1 · Heat-pump water heaters</td>
+<td data-label="Tonnes">19,206 t</td>
+<td data-label="Cost">−$266 per t</td>
+<td data-label="Up front">$18.4M</td>
+</tr>
+<tr class="even">
+<td>2 · Efficiency programmes in shops and offices</td>
+<td data-label="Tonnes">33,562 t</td>
+<td data-label="Cost">−$137 per t</td>
+<td data-label="Up front">$42.7M</td>
+</tr>
+<tr class="odd">
+<td>3 · Condensing gas furnaces</td>
+<td data-label="Tonnes">11,337 t</td>
+<td data-label="Cost">−$92 per t</td>
+<td data-label="Up front">$20.1M</td>
+</tr>
+<tr class="even">
+<td>4 · Weatherize homes built before 1980</td>
+<td data-label="Tonnes">20,280 t</td>
+<td data-label="Cost">$153 per t</td>
+<td data-label="Up front">$125.4M</td>
+</tr>
+<tr class="odd">
+<td>5 · Rooftop solar on homes</td>
+<td data-label="Tonnes">37,978 t</td>
+<td data-label="Cost">$159 per t</td>
+<td data-label="Up front">$284.1M</td>
+</tr>
+<tr class="even">
+<td>6 · Heat pumps instead of gas furnaces</td>
+<td data-label="Tonnes">42,329 t</td>
+<td data-label="Cost">$212 per t</td>
+<td data-label="Up front">$157.5M</td>
+</tr>
+</tbody>
+</table>
+
+<p class="lx-hint">The inventory: 2,766,098 t of CO₂ in 2025; scope 1 (burned in the city) 1,418,605 t, scope 2 (grid electricity, not rooftop solar used on site) 1,282,744 t, scope 3 (losses on the wires) 64,749 t.</p>
+<p class="lx-hint">Alone, the six bars add to 164,692 t; together they cut 150,854 t (5.5% of 2025), because measures overlap.</p>
+<p class="lx-hint">Heat pumps alone put the suburbs 10.8 MW over their 230 MW substation limit on the cold design day; with all six measures every district stays within its limit.</p>
+<p class="lx-hint">With JavaScript on, you sort the inventory, set a target, build the plan from the curve and test it.</p>
+</div>
+</div>
+<p class="lx-datanote"><svg class="lx-ic" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5M12 8v.2"></path></svg><span><b>Prairie City is fictional; its numbers are illustrative.</b> Its inventory, districts, days, prices and household groups are the course's shared Prairie City data, anchored to Wichita and Kansas.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5M12 8v.2"></path></svg><span><b>Real costs, one price year.</b> Equipment from <a href="https://www.eia.gov/outlooks/aeo/assumptions/pdf/RDM_Assumptions.pdf">EIA</a> (2022 dollars), shops and offices from LBNL (2012), weatherization from ORNL (2008). All are in 2025 dollars, converted with BEA's <span class="lx-term" data-term="gdp-deflator">GDP deflator</span> (<a href="https://apps.bea.gov/iTable/?reqid=19&amp;step=3&amp;isuri=1&amp;1921=survey&amp;1903=13&amp;1904=2022&amp;1905=2026&amp;1906=a&amp;1911=0">NIPA Table 1.1.9</a>).</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5M12 8v.2"></path></svg><span><b>Money and CO₂.</b> A 4% real rate, as in lessons 7 and 13; energy at Kansas's 2025 retail prices. Grid electricity at eGRID2023's SPP North rate plus 5% wire losses; rooftop solar used on site has none.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5M12 8v.2"></path></svg><span><b>Set for teaching.</b> Each measure's potential by 2035, two lives (weatherization 20 years, shops 12), the two cleaner grids, the programme's 40% share and who takes part.</span></p>
+<p class="lx-hint" style="margin-top:.6rem">About 30 guided minutes in ten steps. Helpful first: <span class="a18-ref" data-code="F9"><a href="f09-city-energy.html">F9</a></span>, what a city runs on and who controls what.</p>
+<style>/* lesson-local */
+.a18-measures { margin-top: .5rem; }
+.a18-measures .lx-toggle { border-left: 4px solid var(--a18-c, var(--lx-line)); text-align: left; }
+.a18-what { margin-top: .4rem; }
+.a18-fict { margin: 0 0 .4rem; }
+.a18-led td.a18-over { color: var(--lx-bad); font-weight: 600; }
+@media (max-width: 640px) { .a18-measures .lx-toggle { width: 100%; } .a18-fb td:first-child { font-weight: 600; } .a18-fb td[data-label]::before { content: attr(data-label) ": "; color: var(--lx-ink-3); font-size: 12.5px; } }
+</style>
+</div>
+<div id="explain" class="lx-sec">
+<section id="what-you-just-did-as-diagrams" class="level2 lx-sec-h">
+<h2 class="anchored" data-anchor-id="what-you-just-did-as-diagrams">What you just did, as diagrams</h2>
+</section>
+<div id="a18-explain" class="lx-xgrid">
+<div class="lx-fallback">
+<dl class="lx-ideas">
+<dt>Inventory</dt><dd>Count first, by scope: what the city burns (scope 1), the grid electricity it uses (scope 2) and the losses on the wires (scope 3).</dd>
+<dt>Curve</dt><dd>Each bar is one measure alone: its width the tonnes it avoids, its height the cost per tonne. Below zero it saves more than it costs.</dd>
+<dt>Tests</dt><dd>A plan also needs money up front, room at each substation on the coldest morning, and a fair answer to who gains and who pays.</dd>
+<dt>Where it misleads</dt><dd>Measures overlap and compete, order and lock-in matter, the baseline and prices move the bars, and a saving on paper does not install itself.</dd>
+<dt>Who decides</dt><dd>The city counts and adopts; the utility runs programmes and supply; the state regulator approves the utility's parts; owners make most choices.</dd>
+</dl>
+</div>
+</div>
+<div class="lx-deepers">
+<details class="lx-deeper">
+<summary><span class="k">Go deeper · Analyst</span>A city's inventory under the GPC</summary>
+<div class="lx-deeper-body">
+<ul>
+<li><strong>The standard.</strong> The Global Protocol for Community-Scale Greenhouse Gas Emission Inventories (GPC), by WRI, C40 Cities and ICLEI, final version December 2014.</li>
+<li><strong>Scopes</strong> (Table 3.2, p.&nbsp;31). Scope 1: sources inside the city boundary. Scope 2: grid-supplied electricity, heat, steam or cooling used inside it. Scope 3: other emissions outside the boundary caused by activities inside it.</li>
+<li><strong>Rooftop solar.</strong> Power from panels used where they stand is not grid-supplied, so Prairie City’s scope 2 leaves it out: the homes’ and businesses’ electricity less their rooftop share.</li>
+<li><strong>Two reporting levels</strong> (Box 4.1, p.&nbsp;36). BASIC: scopes 1 and 2 of stationary energy and transport, and waste. BASIC+ adds industrial processes (IPPU), agriculture and land, trips across the boundary, and losses on the wires.</li>
+<li><strong>Prairie City’s subtotals.</strong> Scopes 1 and 2: 2,701,349 t. With the losses (scope 3): 2,766,098 t, the inventory the targets use.</li>
+<li><strong>Not BASIC or BASIC+.</strong> They count CO₂ only (the GPC asks for seven gases, p.&nbsp;30), leave out waste and do not split out the fertilizer plant’s feedstock: teaching subtotals, not GPC reporting totals.</li>
+<li><strong>Farm machinery.</strong> Tractors and other farm machinery go under stationary energy, agriculture (Table 6.5, p.&nbsp;62), not transport.</li>
+<li><strong>Feedstock.</strong> Fossil fuel used as a feedstock, like the gas the fertilizer plant turns into hydrogen, goes under IPPU (p.&nbsp;56). This data does not split it from the gas the plant burns.</li>
+<li><strong>Each year.</strong> The GPC recommends updating the inventory every year to track progress (p.&nbsp;12).</li>
+</ul>
+</div>
+</details>
+<details class="lx-deeper">
+<summary><span class="k">Go deeper · Analyst</span>How one bar is priced</summary>
+<div class="lx-deeper-body">
+<p><span class="math display">\[\text{cost per tonne} = \frac{\text{extra capital} \times \mathrm{CRF} + \text{extra upkeep} + \text{change in energy bills}}{\text{tonnes of CO}_2\text{ avoided a year}}, \qquad \mathrm{CRF} = \frac{r}{1-(1+r)^{-n}}\]</span></p>
+<ul>
+<li><strong>Symbols.</strong> <span class="math inline">\(r\)</span> is the real discount rate (4% a year); <span class="math inline">\(n\)</span> the item’s life in years; CRF the <span class="lx-term" data-term="capital-recovery-factor">capital recovery factor</span>, which spreads an up-front cost into equal yearly payments. Money in 2025 dollars, a year.</li>
+<li><strong>Heat-pump water heaters.</strong> The heat pump costs $810 more than a new electric heater in 2022 dollars, $884.58 in 2025 dollars. By 2035, 20,777 homes heated with electricity replace theirs: $18.4M up front.</li>
+<li><strong>A year.</strong> That capital × CRF (4%, 15.1 years) = $1,645,017. The homes save 46,781 MWh, $6,755,228 at 14.44¢ per kWh, and avoid 46,781 × 0.391 × 1.05 = 19,206 t.</li>
+<li><strong>The bar.</strong> (1,645,017 − 6,755,228) ÷ 19,206 = −$266 per t: it saves more than it costs.</li>
+</ul>
+</div>
+</details>
+<details class="lx-deeper">
+<summary><span class="k">Go deeper · Modeler</span>From a curve to a planning model</summary>
+<div class="lx-deeper-body">
+<ul>
+<li><strong>A curve ranks measures one at a time.</strong> A planning model chooses them together: each measure’s level is a decision between zero and its potential.</li>
+<li><strong>Rules a curve cannot hold.</strong> The heat balance links weatherization and heat pumps; each district’s highest hour must stay under its substation limit; the up-front money must fit a budget; the cut must reach the target.</li>
+<li><strong>The goal.</strong> The least net annual cost that meets every rule.</li>
+<li><strong>Overlaps.</strong> A heat pump in a weatherized home saves less. A planning model must represent such overlaps explicitly; <span class="a18-ref" data-code="M12"><a href="m12-city-model.html">M12</a></span> introduces suitable formulations.</li>
+<li><strong>Next.</strong> <span class="a18-ref" data-code="M12"><a href="m12-city-model.html">M12</a></span> builds such a city energy hub, <span class="a18-ref" data-code="SB3"><a href="sb3-city-planner.html">SB3</a></span> lets you run one, and <span class="a18-ref" data-code="C3"><a href="c3-prairie-city-2040.html">C3</a></span> asks for Prairie City’s 2040 plan.</li>
+</ul>
+</div>
+</details>
+<details class="lx-deeper">
+<summary><span class="k">Go deeper</span>What this lesson leaves out</summary>
+<div class="lx-deeper-body">
+<ul>
+<li>Transport, 31% of the inventory, the industrial park and the grid's own plan: none has a bar here. The grid's change still counts toward the target (step 8).</li>
+<li>Rebound, comfort, health and the soft costs of taking part.</li>
+<li>How lower sales move rates for every customer, and energy burden: <span class="a18-ref" data-code="A13"><a href="a13-fairness-jobs.html">A13</a></span>.</li>
+<li>The cost of a bigger substation, and furnace fans at the peak hour.</li>
+<li>Cooling when a heat pump replaces an air conditioner: counted as unchanged.</li>
+</ul>
+</div>
+</details>
+</div>
+</div>
+<div id="check" class="lx-sec">
+<section id="check-yourself" class="level2 lx-sec-h">
+<h2 class="anchored" data-anchor-id="check-yourself">Check yourself</h2>
+</section>
+<div class="lx-myths" data-quiz="a18-myth">
+<div class="lx-qq" data-id="grid" data-answer="myth">
+<p class="lx-qtext">Myth or fact? “A city decides its own electricity emissions.”</p>
+<ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. Prairie City's 1,282,744 t of scope 2 follow the regional grid's rate. In step 8 the much cleaner grid alone cuts 830,547 t a year of scope 2 and the losses' scope 3.</p><p>Cities influence demand, and some run their own utility, as Los Angeles does; the regional supply's emissions involve utilities, markets and public policy.</p></details>
+</div>
+<div class="lx-qq" data-id="negative" data-answer="myth">
+<p class="lx-qtext">Myth or fact? “A measure below zero on the curve will happen by itself, because it saves money.”</p>
+<ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. Its cost leaves out the time and hassle of taking part, and a landlord who pays gets none of a tenant's savings. Programmes, rules and financing exist for that gap.</p></details>
+</div>
+<div class="lx-qq" data-id="add" data-answer="myth">
+<p class="lx-qtext">Myth or fact? “Adding up the bars you pick gives your plan's cut.”</p>
+<ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. Alone, the six bars add to 164,692 t; together they cut 150,854 t. Heat pumps and condensing furnaces compete for the same furnaces, and weatherized homes need less heat.</p></details>
+</div>
+<div class="lx-qq" data-id="solar" data-answer="myth">
+<p class="lx-qtext">Myth or fact? “New rooftop solar lowers Prairie City's highest hour of the year.”</p>
+<ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
+<details class="lx-answer"><summary>Answer</summary><p>Myth, here. Each district's highest hour is 07:00 on the cold design day, before the sun is up enough: 60 MW of new panels lower it by under 0.1 MW.</p></details>
+</div>
+</div>
+
+<div class="lx-quiz" data-quiz="a18">
+<div class="lx-qq" data-id="price" data-answer="a">
+<p class="lx-qtext">A measure costs $300 a year more to own and saves $100 a year of energy. It avoids 2 t of CO₂ a year. What is its cost per tonne?</p>
+<ul class="lx-choices"><li data-value="a">$100 per t</li><li data-value="b">$150 per t</li><li data-value="c">−$100 per t</li><li data-value="d">$200 per t</li></ul>
+<details class="lx-answer"><summary>Answer</summary><p>$100 per t: (300 − 100) ÷ 2. The energy saved is subtracted before dividing.</p><p>$150 per t forgets the saving; −$100 per t gets the sign of the saving wrong.</p></details>
+</div>
+</div>
+</div>
+<div id="sources" class="lx-sec">
+<section id="numbers-sources-and-whats-next" class="level2 lx-sec-h">
+<h2 class="anchored" data-anchor-id="numbers-sources-and-whats-next">Numbers, sources and what’s next</h2>
+</section>
+<div class="lx-end">
+<div class="lx-card">
+<p class="lx-eyebrow">Numbers to remember</p>
+
+<table class="lx-facts caption-top table">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">Number</th>
+<th data-quarto-table-cell-role="th" scope="col">What it means</th>
+<th data-quarto-table-cell-role="th" scope="col">Source</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td class="n">$0.046 per kWh</td>
+<td>Average total cost of saving electricity through U.S. utility customer-funded efficiency programmes, 2009 to 2013: programme and participants together, in 2012 dollars.</td>
+<td class="s"><a href="https://www.energy.gov/sites/prod/files/2017/01/f34/The%20Total%20Cost%20of%20Saving%20Electricity%20through%20Utility%20Customer-Funded%20Energy%20Efficiency%20Programs%20Estimates%20at%20the%20National%2C%20State%2C%20Sector%20and%20Program%20Level.pdf">LBNL, Table 1</a> · April 2015</td>
+</tr>
+<tr class="even">
+<td class="n">$8,620 and $3,690</td>
+<td>Installed cost of the most efficient air-source heat pump and of a minimum-efficiency gas furnace, in 2022 dollars.</td>
+<td class="s"><a href="https://www.eia.gov/outlooks/aeo/assumptions/pdf/RDM_Assumptions.pdf">EIA, AEO2026 Residential Demand Module, Table 2</a> · April 2026</td>
+</tr>
+<tr class="odd">
+<td class="n">22.5 years</td>
+<td>Average life of a gas furnace in the northern U.S.: one bought in 2026 is expected to run past 2045.</td>
+<td class="s"><a href="https://www.eia.gov/analysis/studies/buildings/equipcosts/pdf/appendix-a.pdf">EIA, equipment costs, Appendix A, p. 10</a> · March 2023</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+<div class="lx-stack">
+<!-- learn:next:start (generated by scripts/build_learn.py from learn/path.yml; edit the YAML, not this block) -->
+<div class="lx-next lx-card" data-next-id="">
+<p class="lx-eyebrow">Keep going</p>
+<p class="lx-next-t"><a href="index.html">Back to the course map</a></p>
+<button type="button" class="lx-btn ghost small lx-complete" data-complete="a18-city-plan" aria-pressed="false" hidden="">Mark this lesson as complete</button>
+</div>
+<!-- learn:next:end -->
+<div class="lx-card lx-real">
+<p class="lx-eyebrow">In the real world</p>
+<p><b>New York City.</b> Over two thirds of the city's greenhouse-gas emissions are attributed to buildings. Local Law 97 of 2019 sets emissions limits for most buildings over 25,000 square feet from 2024, with stricter limits from 2030.</p>
+<p>For 2024, the first compliance year, about 95% of the 19,963 properties required to report filed (NYC Department of Buildings, 2026).</p>
+<p><b>Los Angeles.</b> In 2016 and 2017 the City Council passed motions directing its city-owned utility, LADWP, to study a 100% renewable power system; NREL ran the LA100 study (March 2021).</p>
+<p>Peak demand grows in all its projections, but more slowly than annual electricity use (LA100 executive summary, p. 20).</p>
+<p class="lx-hint">Los Angeles peaks on hot afternoons. In a cold city, heat pumps can put the peak on the coldest morning, as step 5 showed.</p>
+</div>
+<div class="lx-card lx-sources">
+<p class="lx-eyebrow">Sources and further reading</p>
+<ul>
+<li>Fong, W. K., Sotos, M., Doust, M., Schultz, S., Marques, A. and Deng-Beck, C. (2014). <a href="https://ghgprotocol.org/sites/default/files/ghgp/standards/GHGP_GPC_0.pdf">Global Protocol for Community-Scale Greenhouse Gas Emission Inventories: An Accounting and Reporting Standard for Cities</a>. WRI, C40 Cities and ICLEI, December 2014: Table 3.2 (p. 31), Box 4.1 (p. 36), Table 6.5 (p. 62), p. 12, p. 30 (seven gases) and p. 56.</li>
+<li>EIA. <a href="https://www.eia.gov/outlooks/aeo/assumptions/pdf/RDM_Assumptions.pdf">Assumptions to the Annual Energy Outlook 2026: Residential Demand Module</a>, Table 2 (equipment, 2022 dollars) and Table 3 (rooftop solar, 2022 dollars), April 2026.</li>
+<li>EIA. <a href="https://www.eia.gov/analysis/studies/buildings/equipcosts/pdf/appendix-a.pdf">Updated Buildings Sector Appliance and Equipment Costs and Efficiencies, Appendix A</a>: gas furnaces (North, p. 10), central air conditioners (North, p. 27), air-source heat pumps (p. 39), electric and heat-pump water heaters (pp. 62 and 65), March 2023.</li>
+<li>Hoffman, I. M., Rybka, G., Leventis, G., Goldman, C. A., Schwartz, L., Billingsley, M. and Schiller, S. (2015). <a href="https://www.energy.gov/sites/prod/files/2017/01/f34/The%20Total%20Cost%20of%20Saving%20Electricity%20through%20Utility%20Customer-Funded%20Energy%20Efficiency%20Programs%20Estimates%20at%20the%20National%2C%20State%2C%20Sector%20and%20Program%20Level.pdf">The Total Cost of Saving Electricity through Utility Customer-Funded Energy Efficiency Programs</a>. LBNL technical brief, April 2015: Table 1, pp. 2, 13-14 and 16.</li>
+<li>Tonn, B., Carroll, D., Pigg, S., Blasnik, M. and others (2014). <a href="https://www.energy.gov/sites/prod/files/2015/09/f26/weatherization-works-retrospective-evaluation.pdf">Weatherization Works: Summary of Findings from the Retrospective Evaluation of the U.S. Department of Energy's Weatherization Assistance Program</a>. ORNL/TM-2014/338, September 2014, executive summary.</li>
+<li>Kahrl, F., Mills, A., Lavin, L., Ryan, N. and Olsen, A. (2016). <a href="https://eta-publications.lbl.gov/sites/default/files/lbnl-1006269.pdf">The Future of Electricity Resource Planning</a>. LBNL-1006269, September 2016, executive summary.</li>
+<li>Cochran, J., Denholm, P. and others (2021). <a href="https://docs.nlr.gov/docs/fy21osti/79444-ES.pdf">LA100: The Los Angeles 100% Renewable Energy Study, Executive Summary</a>. NREL/TP-6A20-79444-ES, March 2021, pp. 1 and 20.</li>
+<li>NYC Department of Buildings (2026). Local Law 97: 2024 Compliance and Reporting Rates, pp. 1-4 (nyc.gov; no link).</li>
+<li>BEA. <a href="https://apps.bea.gov/iTable/?reqid=19&amp;step=3&amp;isuri=1&amp;1921=survey&amp;1903=13&amp;1904=2022&amp;1905=2026&amp;1906=a&amp;1911=0">NIPA Table 1.1.9, Implicit Price Deflators for GDP</a>: 2008 88.013, 2012 93.185, 2022 118.026, 2025 128.893 (read through FRED series A191RD3A086NBEA, last updated 30 September 2026).</li>
+<li>Prairie City's data: Census QuickFacts, NOAA normals, EIA prices and CO₂ coefficients, EPA eGRID2023, RECS 2020 and DOE's LEAD tool, as listed in the course's Prairie City file.</li>
+<li>Earlier lessons: <a href="a01-project-tea.html">A1</a> (a project's cash flows and the capital recovery factor), <a href="a10-emissions-questions.html">A10</a> (inventories against consequences), <a href="12-trade-offs.html">lesson 12</a> (cost against CO₂).</li>
+</ul>
+</div>
+</div>
+</div>
+<!-- learn:footer:start (generated by scripts/build_learn.py from learn/path.yml; edit the YAML, not this block) -->
+<div class="lx-foot">
+<p class="lx-corrections">Spotted an error, or stuck? Write to <a href="mailto:hlli@ksu.edu?subject=Learn%2C%20How%20is%20a%20city%20or%20regional%20energy%20plan%20made?">hlli@ksu.edu</a>. Corrections are made in place and dated here.</p>
+<p class="lx-license">Text licensed <a href="https://creativecommons.org/licenses/by/4.0/" rel="license">CC BY 4.0</a>, code <a href="https://opensource.org/license/mit">MIT</a>: teachers and students may reuse and adapt it, with credit to Honglin Li.</p>
+</div>
+<!-- learn:footer:end -->
+</div>
+<script src="../assets/learn/learn.js" defer=""></script>
+<script src="../assets/learn/a18-city-plan.js" defer=""></script>
+
+
+
+</main> <!-- /main -->
+<script>
+// site.js — site-wide behaviour (third redesign, 2026-10-30): skip link, navbar shadow once scrolled,
+// back-to-top button, and a gentle one-time fade-in of content blocks. Without JS every page is complete.
+(function () {
+  const root = document.documentElement;
+  const body = document.body;
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // skip link to the page's main landmark
+  const main = document.querySelector("main");
+  if (main) {
+    if (!main.id) main.id = "main-content";
+    const skip = document.createElement("a");
+    skip.className = "skip-link"; skip.href = "#" + main.id; skip.textContent = "Skip to main content";
+    body.insertBefore(skip, body.firstChild);
+  }
+
+  // the brand (the name at the left of the navbar) is the link to the home page, the About page, which has no navbar
+  // item of its own since Journeys joined the navbar (2026-11-05)
+  const brand = document.querySelector("#quarto-header .navbar-brand");
+  if (brand) {
+    brand.setAttribute("aria-label", "Honglin Li, home");
+    const here = location.pathname.replace(/\/index\.html$/, "/");
+    if (brand.pathname && brand.pathname.replace(/\/index\.html$/, "/") === here) brand.setAttribute("aria-current", "page");
+  }
+  // the navbar says "Notes" for Field Notes (to fit at 1,200 px); its accessible name keeps the full name
+  document.querySelectorAll('#quarto-header .nav-link[href$="field-notes.html"]').forEach(function (a) { a.setAttribute("aria-label", "Field Notes"); });
+
+  // back-to-top button
+  const top = document.createElement("button");
+  top.type = "button"; top.className = "to-top"; top.setAttribute("aria-label", "Back to top");
+  top.innerHTML = '<i class="bi bi-arrow-up" aria-hidden="true"></i>';
+  top.hidden = true;  // out of the tab order until the page is scrolled down
+  top.addEventListener("click", function () {
+    window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+    if (main) { main.setAttribute("tabindex", "-1"); main.focus({ preventScroll: true }); }
+  });
+  body.appendChild(top);
+
+  function onScroll() {
+    const y = window.scrollY;
+    body.classList.toggle("scrolled", y > 8);
+    const show = y > window.innerHeight * 0.8;
+    top.hidden = !show;
+    top.classList.toggle("show", show);
+  }
+  onScroll();
+  window.addEventListener("scroll", onScroll, { passive: true });
+
+  // gentle fade-in, once per block
+  const auto = document.querySelectorAll("main .card, main .glow-card, main .reveal-auto > *");
+  auto.forEach(function (el) { el.classList.add("reveal"); });
+  const items = document.querySelectorAll(".reveal");
+  if (!reduce && "IntersectionObserver" in window) {
+    root.classList.add("js-reveal");
+    const io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
+    }, { rootMargin: "0px 0px -5% 0px", threshold: 0.05 });
+    items.forEach(function (el) { io.observe(el); });
+  } else {
+    items.forEach(function (el) { el.classList.add("in"); });
+  }
+})();
+</script>
+<script>
+// pages.js — publications, projects listing and project pages (third redesign, 2026-10-30).
+// Inlined on every page (scripts/build_site.py writes pages-js.html), so each part is guarded by element presence.
+//   1. BIB buttons: show / hide an entry's BibTeX; copy button (Publications, home page, project pages)
+//   2. Publications: search box and type tabs; hides empty year groups; live result count; the pressed type is
+//      highlighted in the publications-per-year chart; #journal, #conference, #preprint or #thesis in the URL
+//      presses that tab (the About page's stat row, site/_stats.qmd, links there)
+//   3. Projects: theme tabs built from the cards; #<theme> in the URL preselects a theme (project breadcrumbs link there)
+// Without JS every page is complete: the filter bars stay hidden and the BibTeX panels closed.
+(function () {
+  "use strict";
+
+  // a polite live region for short confirmations ("BibTeX copied")
+  let live = null;
+  function announce(msg) {
+    if (!live) {
+      live = document.createElement("div");
+      live.className = "visually-hidden"; live.setAttribute("role", "status"); live.setAttribute("aria-live", "polite");
+      document.body.appendChild(live);
+    }
+    live.textContent = ""; window.setTimeout(function () { live.textContent = msg; }, 30);
+  }
+  const norm = function (s) { return (s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/\s+/g, " "); };
+
+  // ---------- 1. BibTeX ----------
+  document.querySelectorAll(".bib-toggle").forEach(function (btn) {
+    const panel = document.getElementById(btn.getAttribute("aria-controls"));
+    if (!panel) return;
+    btn.addEventListener("click", function () {
+      const open = btn.getAttribute("aria-expanded") === "true";
+      btn.setAttribute("aria-expanded", String(!open));
+      panel.hidden = open;
+    });
+  });
+  function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+    return new Promise(function (resolve, reject) {   // fallback (e.g. file:// previews)
+      const ta = document.createElement("textarea");
+      ta.value = text; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      let ok = false;
+      try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+      ta.remove();
+      if (ok) resolve(); else reject(new Error("copy failed"));
+    });
+  }
+  document.querySelectorAll(".bib-copy").forEach(function (btn) {
+    const label = btn.querySelector("span");
+    const code = btn.parentElement.querySelector("code");
+    if (!code) return;
+    btn.addEventListener("click", function () {
+      copyText(code.textContent).then(function () {
+        btn.classList.add("done"); if (label) label.textContent = "Copied"; announce("BibTeX copied to the clipboard");
+      }, function () {
+        if (label) label.textContent = "Select and copy"; announce("Copy failed; select the text and copy it");
+        const sel = window.getSelection(), range = document.createRange();
+        range.selectNodeContents(code); sel.removeAllRanges(); sel.addRange(range);
+      }).then(function () {
+        window.setTimeout(function () { btn.classList.remove("done"); if (label) label.textContent = "Copy"; }, 1800);
+      });
+    });
+  });
+
+  // pressed-state helper for a group of filter tabs
+  function pressTab(tabs, active) {
+    tabs.forEach(function (t) { t.setAttribute("aria-pressed", String(t === active)); });
+  }
+
+  // ---------- 2. Publications: search and type tabs ----------
+  const pubBar = document.querySelector(".pub-filter");
+  if (pubBar) {
+    const input = pubBar.querySelector("#pub-q");
+    const tabs = Array.prototype.slice.call(pubBar.querySelectorAll(".ftab"));
+    const groups = Array.prototype.slice.call(document.querySelectorAll(".pub-year"));
+    const items = Array.prototype.slice.call(document.querySelectorAll(".pub-years .pub"));
+    const status = document.querySelector(".filter-status");
+    const empty = document.querySelector(".filter-empty");
+    const chart = document.querySelector(".pub-chart");
+    const total = items.length;
+    let type = "all";
+    items.forEach(function (li) {   // search text: badge, title, authors, venue and year (not the BibTeX)
+      li._q = norm([".abbr", ".pub-title", ".pub-authors", ".pub-venue"].map(function (s) {
+        const el = li.querySelector(s); return el ? el.textContent : "";
+      }).join(" ") + " " + li.getAttribute("data-year"));
+    });
+    function apply() {
+      const terms = norm(input.value).trim().split(" ").filter(Boolean);
+      let shown = 0;
+      items.forEach(function (li) {
+        const ok = (type === "all" || li.getAttribute("data-type") === type) && terms.every(function (t) { return li._q.indexOf(t) !== -1; });
+        li.hidden = !ok; if (ok) shown++;
+      });
+      groups.forEach(function (g) { g.hidden = !g.querySelector(".pub:not([hidden])"); });
+      if (empty) empty.hidden = shown > 0;
+      if (chart) chart.setAttribute("data-type", type);
+      if (status) status.textContent = (shown === total && !terms.length) ? "" :
+        "Showing " + shown + " of " + total + " publications" + (terms.length ? " matching “" + input.value.trim() + "”" : "") + ".";
+    }
+    tabs.forEach(function (t) {
+      t.addEventListener("click", function () { type = t.getAttribute("data-filter"); pressTab(tabs, t); apply(); });
+    });
+    input.addEventListener("input", apply);
+    input.addEventListener("keydown", function (e) { if (e.key === "Escape" && input.value) { input.value = ""; apply(); } });
+    const reset = document.querySelector(".filter-reset");
+    if (reset) reset.addEventListener("click", function () { input.value = ""; type = "all"; pressTab(tabs, tabs[0]); apply(); input.focus(); });
+    pubBar.hidden = false;
+    function typeFromHash() {   // year anchors (#y2026) match no tab and are left alone
+      const h = decodeURIComponent((location.hash || "").slice(1));
+      const tab = tabs.find(function (t) { return t.getAttribute("data-filter") === h; });
+      if (tab) { type = h; pressTab(tabs, tab); apply(); }
+    }
+    typeFromHash();
+    window.addEventListener("hashchange", typeFromHash);
+  }
+
+  // ---------- 3. Projects: theme tabs ----------
+  const projBar = document.querySelector(".proj-filter");
+  const cells = Array.prototype.slice.call(document.querySelectorAll(".project-grid [data-theme]"));
+  if (projBar && cells.length) {
+    const box = projBar.querySelector(".ftabs");
+    const status = document.querySelector(".filter-status");
+    const themes = [];   // [key, label, count] in card order
+    cells.forEach(function (c) {
+      const k = c.getAttribute("data-theme");
+      const hit = themes.find(function (t) { return t[0] === k; });
+      if (hit) hit[2]++; else themes.push([k, c.getAttribute("data-label"), 1]);
+    });
+    function makeTab(key, label, n) {
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "ftab" + (key === "all" ? "" : " theme-" + key);
+      b.setAttribute("data-filter", key); b.setAttribute("aria-pressed", "false");
+      b.innerHTML = (key === "all" ? "" : '<span class="tdot" aria-hidden="true"></span>') + "<span></span> " + '<span class="n">' + n + "</span>";
+      b.children[key === "all" ? 0 : 1].textContent = label;
+      box.appendChild(b);
+      return b;
+    }
+    const tabs = [makeTab("all", "All", cells.length)].concat(themes.map(function (t) { return makeTab(t[0], t[1], t[2]); }));
+    function select(key, push) {
+      const tab = tabs.find(function (t) { return t.getAttribute("data-filter") === key; }) || tabs[0];
+      key = tab.getAttribute("data-filter");
+      pressTab(tabs, tab);
+      let shown = 0;
+      cells.forEach(function (c) { const ok = key === "all" || c.getAttribute("data-theme") === key; c.hidden = !ok; if (ok) shown++; });
+      if (status) status.textContent = key === "all" ? "" : "Showing " + shown + " of " + cells.length + " projects: " + tab.children[1].textContent + ".";
+      if (push && window.history && history.replaceState) history.replaceState(null, "", key === "all" ? location.pathname + location.search : "#" + key);
+    }
+    tabs.forEach(function (t) { t.addEventListener("click", function () { select(t.getAttribute("data-filter"), true); }); });
+    projBar.hidden = false;
+    const initial = decodeURIComponent((location.hash || "").slice(1));
+    select(initial || "all", false);
+    window.addEventListener("hashchange", function () { select(decodeURIComponent(location.hash.slice(1)) || "all", false); });
+  }
+})();
+</script>
+<script>
+// home.js — about/home page (third redesign, 2026-10-30). Guard by element presence.
+</script>
+<script>
+// map.js — "Collaborations around the world" map on the About page (2026-10-30).
+// The section, its legend, the institution list and the data (<script id="cmap-data">) come from scripts/build_map.py
+// (_map.qmd); styles in assets/map.css. Inlined on every page (scripts/build_site.py writes map-js.html), so it does
+// nothing unless #cmap is on the page.
+//   - Lazy: Leaflet 1.9.4 (cdnjs, with SRI) and the tiles load only when the section nears the viewport.
+//   - The basemap follows Quarto's day/night toggle (body.quarto-light / body.quarto-dark): CARTO light_all / dark_all
+//     when #cmap carries data-tiles-key (CARTO basemaps need a free key; set in scripts/build_map.py); otherwise the
+//     OpenStreetMap standard tiles, toned grey by day and inverted by night in map.css (.cmap.tiles-osm).
+//   - Scroll-wheel zoom (and one-finger dragging on touch screens) stays off until the map is clicked.
+//   - Keyboard: the map takes focus (arrows pan, +/- zoom); Tab reaches each marker, Enter opens its popup, Esc closes.
+//   - Markers that overlap at the current zoom are spread apart a little, so each stays visible and clickable.
+//   - Without JS, or if Leaflet cannot load, the map box stays hidden and the list below the map is the content.
+// Visitor map (part 2 below): the provider's snippet waits in <template id="visitor-map-tpl">; it is inserted after the
+// page has loaded, so it never blocks rendering, and the "Visitors" section is hidden again if it fails or draws nothing.
+
+// ---------- 1. collaboration map ----------
+(function () {
+  "use strict";
+  const root = document.getElementById("cmap");
+  const dataEl = document.getElementById("cmap-data");
+  if (!root || !dataEl) return;
+  let data;
+  try { data = JSON.parse(dataEl.textContent); } catch (e) { return; }
+  const wrap = root.closest(".cmap-wrap");
+  const section = root.closest("section") || root;
+
+  const CDN = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/";
+  const LEAFLET_CSS = { href: CDN + "leaflet.min.css",
+    integrity: "sha512-h9FcoyWjHcOcmEVkxOfTLnmZFWIH0iZhZT1H2TbOq55xssQGEJHEaIm+PgoUaZbRvQTNTluNOEfb1ZRy6D3BOw==" };
+  const LEAFLET_JS = { src: CDN + "leaflet.min.js",
+    integrity: "sha512-puJW3E/qXDqYp9IfhAI54BJEaWIfloJ7JWs7OeD5i6ruC9JZL1gERT1wjtwXFlh7CjE7ZJ+/vcRZRkIYIb6p4g==" };
+  const OSM_ATTR = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+  // The CARTO key is restricted to the live site's host, so local previews (file://, localhost) use OpenStreetMap tiles.
+  const LIVE_HOST = "henryutd2021.github.io";
+  const tilesKey = location.hostname === LIVE_HOST ? root.getAttribute("data-tiles-key") : null;
+  const BASEMAP = tilesKey ? {
+    kind: "carto",
+    light: "https://basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png?key=" + encodeURIComponent(tilesKey),
+    dark: "https://basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}.png?key=" + encodeURIComponent(tilesKey),
+    attribution: OSM_ATTR + ' &copy; <a href="https://carto.com/attributions">CARTO</a>', maxZoom: 20,
+  } : {
+    kind: "osm",   // one tile set for both themes; map.css tones it (grey by day, inverted by night)
+    light: "https://tile.openstreetmap.org/{z}/{x}/{y}.png", dark: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+    attribution: OSM_ATTR, maxZoom: 19,
+  };
+  const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const isDark = function () { return document.body.classList.contains("quarto-dark"); };
+  const esc = function (s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  };
+
+  // JS is running: reserve the map's space now (a quiet placeholder until Leaflet arrives); hide it again on failure
+  wrap.hidden = false;
+  root.classList.add("is-loading");
+  function fail() { wrap.hidden = true; }
+
+  // ---------- load Leaflet (CSS and JS, both with SRI), once ----------
+  function loadLeaflet(done) {
+    if (window.L && window.L.map) { done(true); return; }
+    let pending = 2, ok = true, finished = false;
+    const timer = window.setTimeout(function () { finish(false); }, 20000);
+    function finish(success) {
+      if (finished) return;
+      if (!success) ok = false;
+      if (--pending > 0 && ok) return;
+      finished = true; window.clearTimeout(timer);
+      done(ok && !!(window.L && window.L.map));
+    }
+    const link = document.createElement("link");
+    link.rel = "stylesheet"; link.href = LEAFLET_CSS.href; link.integrity = LEAFLET_CSS.integrity;
+    link.crossOrigin = "anonymous"; link.referrerPolicy = "no-referrer";
+    link.onload = function () { finish(true); }; link.onerror = function () { finish(false); };
+    document.head.appendChild(link);
+    const script = document.createElement("script");
+    script.src = LEAFLET_JS.src; script.integrity = LEAFLET_JS.integrity;
+    script.crossOrigin = "anonymous"; script.referrerPolicy = "no-referrer";
+    script.onload = function () { finish(true); }; script.onerror = function () { finish(false); };
+    document.head.appendChild(script);
+  }
+
+  // ---------- popups ----------
+  function paperList(papers, max) {
+    const items = papers.slice(0, max).map(function (p) {
+      const t = p[2] ? '<a href="https://doi.org/' + esc(p[2]) + '">' + esc(p[0]) + "</a>" : esc(p[0]);
+      const st = p[3] && p[3] !== "published" ? ' <span class="cmap-pop-st">' + esc(p[3]) + "</span>" : "";
+      return "<li>" + t + ' <span class="cmap-pop-yr">' + esc(p[1]) + "</span>" + st + "</li>";
+    });
+    if (papers.length > max) items.push('<li class="cmap-pop-more">and ' + (papers.length - max) + " more</li>");
+    return '<ul class="cmap-pop-papers">' + items.join("") + "</ul>";
+  }
+  function yearSpan(papers) {
+    const ys = papers.map(function (p) { return p[1]; }).filter(Boolean).sort();
+    if (!ys.length) return "";
+    return ys[0] === ys[ys.length - 1] ? String(ys[0]) : ys[0] + "–" + ys[ys.length - 1];
+  }
+  function instPopup(i) {
+    const n = i.count, word = n === 1 ? "paper" : "papers";
+    return '<div class="cmap-pop">' +
+      '<p class="cmap-pop-kind">' + (i.home ? "Home institution" : "Collaborating institution") + "</p>" +
+      "<h3>" + esc(i.name) + "</h3>" +
+      '<p class="cmap-pop-place">' + esc([i.place, i.country].filter(Boolean).join(", ")) + "</p>" +
+      '<p class="cmap-pop-n"><strong>' + n + "</strong> " + (i.home ? word : "joint " + word) +
+      (yearSpan(i.papers) ? " · " + yearSpan(i.papers) : "") + "</p>" +
+      paperList(i.papers, i.home ? 3 : 4) + "</div>";
+  }
+  function talkPopup(t) {
+    return '<div class="cmap-pop">' +
+      '<p class="cmap-pop-kind cmap-pop-kind--talk">Conference presentation</p>' +
+      "<h3>" + esc(t.event) + "</h3>" +
+      '<p class="cmap-pop-place">' + esc([t.place, t.country].filter(Boolean).join(", ")) + " · " + esc(t.date) + "</p>" +
+      '<p class="cmap-pop-talk">' + esc(t.title) + "</p></div>";
+  }
+
+  // ---------- the map ----------
+  function init() {
+    const L = window.L;
+    const touch = !!(L.Browser && L.Browser.mobile);
+    const map = L.map(root, {
+      scrollWheelZoom: false, dragging: !touch, worldCopyJump: true, zoomSnap: 1, minZoom: 1, maxZoom: 12,   // whole zoom levels: no seams between scaled tiles
+      keyboard: true, zoomAnimation: !reduceMotion, fadeAnimation: !reduceMotion, markerZoomAnimation: !reduceMotion,
+    });
+    root.classList.remove("is-loading");
+    const hint = wrap.querySelector(".cmap-hint");
+    if (touch && hint) hint.textContent = "Tap the map to move it with one finger; pinch to zoom. Tap a marker for details.";
+    root.setAttribute("role", "region");
+    root.setAttribute("aria-roledescription", "map");
+    root.setAttribute("aria-label", root.getAttribute("data-label") || "Map");
+    map.attributionControl.setPrefix('<a href="https://leafletjs.com">Leaflet</a>');
+    root.classList.add("tiles-" + BASEMAP.kind);
+    const tiles = L.tileLayer(isDark() ? BASEMAP.dark : BASEMAP.light,
+      { attribution: BASEMAP.attribution, maxZoom: BASEMAP.maxZoom }).addTo(map);
+
+    // popups fit inside the map: narrower on phones, and scrolling inside when taller than the map (2026-11-05)
+    function popupOptions() {
+      const w = root.clientWidth, h = root.clientHeight, narrow = w < 480;
+      return { maxWidth: narrow ? Math.max(170, w - 130) : 300, maxHeight: Math.max(140, h - (narrow ? 110 : 80)), closeButton: true,
+               autoPanPaddingTopLeft: narrow ? L.point(46, 12) : L.point(64, 24), autoPanPaddingBottomRight: narrow ? L.point(10, 12) : L.point(24, 24) };
+    }
+
+    // markers: home = ring, collaborators = filled circle (size grows with joint papers), presentations = diamond
+    const markers = [];
+    function add(kind, lat, lon, size, label, popup, z) {
+      // the marker's box is at least 24 px (a touch target), the dot inside it keeps its own size (2026-11-05)
+      const box = Math.max(24, size);
+      const icon = L.divIcon({ className: "cmap-mk cmap-mk--" + kind, html: '<span style="width:' + size + "px;height:" + size + 'px"></span>',
+                               iconSize: [box, box], iconAnchor: [box / 2, box / 2], popupAnchor: [0, -size / 2] });
+      const m = L.marker([lat, lon], { icon: icon, title: label, keyboard: true, riseOnHover: true, zIndexOffset: z })
+        .bindPopup(popup, popupOptions()).addTo(map);
+      m.on("add", function () { const el = m.getElement(); if (el) el.setAttribute("aria-label", label); });
+      const el = m.getElement(); if (el) el.setAttribute("aria-label", label);
+      m.cmapSize = size;
+      markers.push(m);
+    }
+    (data.institutions || []).forEach(function (i) {
+      const n = i.count, place = [i.place, i.country].filter(Boolean).join(", ");
+      const label = i.name + ", " + place + " — " + (i.home ? "home institution, " + n + (n === 1 ? " paper" : " papers")
+                                                            : n + (n === 1 ? " joint paper" : " joint papers"));
+      const size = i.home ? Math.round(16 + 2 * Math.sqrt(n)) : Math.round(10 + 3 * Math.sqrt(n));
+      add(i.home ? "home" : "collab", i.lat, i.lon, size, label, instPopup(i), i.home ? 0 : 100);
+    });
+    (data.presentations || []).forEach(function (t) {
+      const label = t.event + ", " + [t.place, t.country].filter(Boolean).join(", ") + " — presentation, " + t.date;
+      add("talk", t.lat, t.lon, 13, label, talkPopup(t), 200);
+    });
+    if (!markers.length) { fail(); return; }
+
+    // spread markers that overlap at the current zoom (visual offset of the inner dot only). Overlapping markers form
+    // a group (chained: A near B, B near C -> one group), laid out on a small circle around the group's centre in the
+    // markers' own compass order, the circle just large enough that neighbours no longer touch. If a spread group
+    // then touches another marker, the two merge and are laid out again.
+    const GAP = 4;
+    function declutter() {
+      const k = map.getZoom() <= 2 ? 0.72 : 1;   // smaller markers at world-wide zoom levels (phones), so fewer collide
+      root.style.setProperty("--k", String(k));
+      const pts = markers.map(function (m) { return { m: m, p: map.latLngToLayerPoint(m.getLatLng()), r: k * m.cmapSize / 2 }; });
+      const parent = pts.map(function (_, i) { return i; });
+      const find = function (i) { while (parent[i] !== i) { parent[i] = parent[parent[i]]; i = parent[i]; } return i; };
+      const touch = function (i, j, pi, pj) { return pi.distanceTo(pj) < pts[i].r + pts[j].r + GAP; };
+      function layout() {
+        const pos = pts.map(function (q) { return q.p; });
+        const groups = {};
+        pts.forEach(function (_, i) { (groups[find(i)] = groups[find(i)] || []).push(i); });
+        Object.keys(groups).forEach(function (g) {
+          const group = groups[g];
+          if (group.length === 1) return;
+          let cx = 0, cy = 0, rmax = 0;
+          group.forEach(function (k) { cx += pts[k].p.x; cy += pts[k].p.y; rmax = Math.max(rmax, pts[k].r); });
+          cx /= group.length; cy /= group.length;
+          const R = Math.max(rmax + GAP, (2 * rmax + GAP) / (2 * Math.sin(Math.PI / group.length)));
+          const angOf = function (k) { return Math.atan2(pts[k].p.y - cy, pts[k].p.x - cx); };
+          group.sort(function (x, y) { return angOf(x) - angOf(y); });
+          const start = angOf(group[0]);
+          group.forEach(function (k, n) {
+            const ang = start + (2 * Math.PI * n) / group.length;
+            pos[k] = L.point(cx + R * Math.cos(ang), cy + R * Math.sin(ang));
+          });
+        });
+        return pos;
+      }
+      for (let i = 0; i < pts.length; i++) {
+        for (let j = i + 1; j < pts.length; j++) { if (touch(i, j, pts[i].p, pts[j].p)) parent[find(i)] = find(j); }
+      }
+      let pos = layout();
+      for (let round = 0; round < 6; round++) {
+        let merged = false;
+        for (let i = 0; i < pts.length; i++) {
+          for (let j = i + 1; j < pts.length; j++) {
+            if (find(i) !== find(j) && touch(i, j, pos[i], pos[j])) { parent[find(i)] = find(j); merged = true; }
+          }
+        }
+        if (!merged) break;
+        pos = layout();
+      }
+      pts.forEach(function (q, i) { shift(q.m, pos[i].x - q.p.x, pos[i].y - q.p.y); });
+    }
+    function shift(m, dx, dy) {
+      const el = m.getElement(); if (!el) return;
+      el.style.setProperty("--dx", dx.toFixed(1) + "px"); el.style.setProperty("--dy", dy.toFixed(1) + "px");
+    }
+
+    const bounds = L.latLngBounds(markers.map(function (m) { return m.getLatLng(); }));
+    function fitAll() {
+      const pad = Math.round(Math.min(36, Math.max(12, root.clientWidth * 0.03)));
+      map.fitBounds(bounds, { padding: [pad, pad], maxZoom: 5, animate: !reduceMotion });
+    }
+    map.on("zoomend viewreset", declutter);
+    fitAll();
+    declutter();
+
+    // "show all" control under the zoom buttons
+    const Reset = L.Control.extend({
+      options: { position: "topleft" },
+      onAdd: function () {
+        const box = L.DomUtil.create("div", "leaflet-bar cmap-reset");
+        const b = L.DomUtil.create("a", "", box);
+        b.href = "#"; b.setAttribute("role", "button"); b.title = "Show all markers"; b.setAttribute("aria-label", "Show all markers");
+        b.innerHTML = '<i class="bi bi-globe2" aria-hidden="true"></i>';
+        L.DomEvent.disableClickPropagation(box);
+        L.DomEvent.on(b, "click", function (e) { L.DomEvent.preventDefault(e); map.closePopup(); fitAll(); });
+        return box;
+      },
+    });
+    map.addControl(new Reset());
+
+    // scroll-wheel zoom (and touch dragging) only after a click on the map; off again when the pointer leaves
+    function arm() { map.scrollWheelZoom.enable(); if (touch) map.dragging.enable(); root.classList.add("is-armed"); }
+    function disarm() { map.scrollWheelZoom.disable(); if (touch) map.dragging.disable(); root.classList.remove("is-armed"); }
+    map.on("click", arm);
+    root.addEventListener("mouseleave", disarm);
+    document.addEventListener("touchstart", function (e) { if (!root.contains(e.target)) disarm(); }, { passive: true });
+
+    // day / night basemap: follow Quarto's toggle (it swaps body.quarto-light / body.quarto-dark)
+    new MutationObserver(function () {
+      const url = isDark() ? BASEMAP.dark : BASEMAP.light;
+      if (tiles._url !== url) tiles.setUrl(url);
+    }).observe(document.body, { attributes: true, attributeFilter: ["class"] });
+
+    // the map may have been laid out while hidden or resized with the page
+    window.addEventListener("resize", function () { map.invalidateSize(); });
+  }
+
+  function start() {
+    loadLeaflet(function (ok) {
+      if (!ok) { fail(); return; }
+      try { init(); } catch (e) { fail(); }
+    });
+  }
+  if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver(function (entries) {
+      if (entries.some(function (e) { return e.isIntersecting; })) { io.disconnect(); start(); }
+    }, { rootMargin: "400px 0px" });
+    io.observe(section);
+  } else {
+    start();
+  }
+})();
+
+// ---------- 2. visitor map (third-party widget, About page only; own section since 2026-11-05) ----------
+// MapMyVisitors' loader reads from its own URL: w (width; "a" = its parent's width), co (the panel colour, i.e. the ocean),
+// cl (the land colour of the generated background image) and ct (the text colour). Here co, cl and ct are set to the
+// site's day or night colours before the snippet runs; on high-DPI screens the widget is drawn at twice the column width
+// in a box scaled to one half, so its land image stays crisp (map.css enlarges the widget's text and dots to match).
+// A day/night switch after loading recolours the panel and text through map.css and swaps the land image for the other
+// theme's. The frame follows the column's width on resize.
+(function () {
+  "use strict";
+  const box = document.getElementById("visitor-map");
+  const tpl = document.getElementById("visitor-map-tpl");
+  const body = document.getElementById("visitor-map-body");
+  if (!box || !tpl || !body || !("content" in tpl)) return;
+  const THEME = { light: { co: "eef2f7", cl: "cbd5e1", ct: "374151" }, dark: { co: "1c212a", cl: "3b4351", ct: "d1d5db" } };
+  const isDark = function () { return document.body.classList.contains("quarto-dark"); };
+  const k = (window.devicePixelRatio || 1) >= 1.5 ? 2 : 1;
+  let done = false, inner = null;
+  function hide() { if (!done) { done = true; box.hidden = true; } }
+  function drawn() {
+    return !!inner && Array.prototype.some.call(inner.children, function (el) { return el.tagName !== "SCRIPT" && el.tagName !== "STYLE"; });
+  }
+  function themedSrc(src) {
+    try {
+      const u = new URL(src, location.href);
+      if (!/(^|\.)mapmyvisitors\.com$/.test(u.hostname)) return src;
+      const t = THEME[isDark() ? "dark" : "light"];
+      Object.keys(t).forEach(function (key) { u.searchParams.set(key, t[key]); });
+      return u.toString();
+    } catch (e) { return src; }
+  }
+  function fit() {   // scale the widget to the frame's width and the frame's height to the widget
+    if (!inner || !inner.offsetWidth) return;
+    const s = body.clientWidth / inner.offsetWidth;
+    inner.style.transform = s === 1 ? "" : "scale(" + s + ")";
+    body.style.height = Math.ceil(inner.offsetHeight * s) + "px";
+  }
+  function insert() {
+    box.hidden = false;
+    inner = document.createElement("div");
+    inner.className = "visitor-scale" + (k > 1 ? " is-2x" : "");
+    inner.style.width = Math.floor(body.clientWidth * k) + "px";
+    body.appendChild(inner);
+    const frag = tpl.content.cloneNode(true);
+    // scripts cloned from a template never run: recreate them (same attributes, themed colours), asynchronous by nature
+    frag.querySelectorAll("script").forEach(function (old) {
+      const s = document.createElement("script");
+      Array.prototype.forEach.call(old.attributes, function (a) { s.setAttribute(a.name, a.name === "src" ? themedSrc(a.value) : a.value); });
+      if (old.textContent.trim()) s.text = old.textContent;
+      s.async = true;
+      s.addEventListener("error", hide);
+      old.parentNode.replaceChild(s, old);
+    });
+    inner.appendChild(frag);
+    fit();
+    if ("ResizeObserver" in window) new ResizeObserver(fit).observe(inner);
+    window.addEventListener("resize", fit);
+    window.setTimeout(function () { if (!drawn()) hide(); else { done = true; fit(); } }, 15000);
+  }
+  // day / night after loading: the panel and text colours follow map.css; the land image is swapped here
+  new MutationObserver(function () {
+    if (!inner) return;
+    const t = THEME[isDark() ? "dark" : "light"];
+    inner.querySelectorAll(".mapmyvisitors-map").forEach(function (m) {
+      const bg = m.style.backgroundImage;
+      if (bg) m.style.backgroundImage = bg.replace(/co_[0-9a-f]{6}/i, "co_" + t.co).replace(/cl_[0-9a-f]{6}/i, "cl_" + t.cl);
+    });
+  }).observe(document.body, { attributes: true, attributeFilter: ["class"] });
+  if (document.readyState === "complete") insert();
+  else window.addEventListener("load", insert, { once: true });
+})();
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/henryutd2021\.github\.io");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© 2026 Honglin Li · Kansas State University · <a href="mailto:hlli@ksu.edu">hlli@ksu.edu</a></p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Last updated: November 2026 · Built with <a href="https://quarto.org">Quarto</a></p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

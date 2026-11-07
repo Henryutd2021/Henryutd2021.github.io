@@ -564,7 +564,7 @@
     [["S0", "Device and plant", "W to MW", "A phone charge: " + fmtE(W.wh.phone) + ". A home's year: " + fmtE(W.wh.homeyear) + ".", true],
      ["S1", "Microgrid and community", "kW to MW", "A campus or village keeping its lights on", false, ["f07-microgrids.html", "F7"]],
      ["S2", "Regional grid", "MW to GW", "Prairie Town peaks at " + num(W.town.scalePeakMW, 0) + " MW; the Southwest Power Pool peaked at " + num(W.spp.peakGW, 1) + " GW in 2025.", false],
-     ["S3", "City and region", "hundreds of MW", "Prairie City's buildings, transport and industry (upcoming).", false],
+     ["S3", "City and region", "hundreds of MW", "Prairie City's buildings, transport and industry", false, ["f09-city-energy.html", "F9"]],
      ["S4", "Nation", "hundreds of GW", "The U.S. used " + num(Math.round(W.wh.us / 1e12), 0) + " TWh in 2025; the Lower 48's record hour needed " + num(W.fermi.peakGW, 0) + " GW.", false]]
       .forEach(function (s) {
         var li = H("li", { class: s[4] ? "here" : "" }, strip);

@@ -1,0 +1,614 @@
+{
+ "about": "Data of Learn lesson M11, Techno-economic analysis inside an optimization model (wave W5, builder learn-w5-f, 2026-11-06). The plant, the hydrogen buyer, Prairie Town's grid and the charges are fictional and illustrative; wind and Prairie Town's demand follow the real hourly shapes of the Southwest Power Pool grid in 2025 (town_year.json, EIA-930). Every dollar is a real 2025 dollar: the electrolyzer's 2022-dollar costs are converted here with BEA's GDP deflator. The wind farm's costs, the rate and the life are read from lesson 13's data (13-capstone.json) and the electrolyzer's energy use from A16's (a16-hydrogen-ptx.json), so the pages agree. The credit is U.S. federal section 45V as the IRS states it for 2025; its use here is a teaching simplification (see creditNote). The reference block is written by node _tests/learn/test_m11-tea-in-models.js --write and re-solved by the same test on every run.",
+ "accessed": "2026-11-06",
+ "priceYear": 2025,
+ "deflator": {
+  "index": {
+   "2022": 118.026,
+   "2024": 125.587,
+   "2025": 128.893
+  },
+  "note": "GDP implicit price deflator (index, 2017 = 100, annual), the series lesson 13 uses (its 2024 and 2025 values are the same). A 2022 dollar is 128.893 / 118.026 = 1.0921 2025 dollars.",
+  "src": ["bea-nipa-119"]
+ },
+ "plant": {
+  "windMW": 100,
+  "connectionMW": 50,
+  "maxMW": 100,
+  "profileMethod": "power",
+  "note": "Illustrative: a new 100 MW wind farm whose grid connection takes or gives at most 50 MW, and an electrolyzer of up to 100 MW beside it. The wind follows SPP's 2025 hourly shape, raised to a power so that its year averages EIA's 33.8% capacity factor (the best hour stays at 100 MW)."
+ },
+ "town": {
+  "demandPeakMW": 450,
+  "note": "Prairie Town's grid price each hour, as in lesson 9 and M4: $0 while wind and sun are spilled, $40 when the combined-cycle plant is the last one needed, $100 for the peaker (lesson 8's running costs). The plant takes these prices and does not move them."
+ },
+ "days": {
+  "note": "Thirty-six representative days, three per month: the month's days are split into thirds by the plant's daily wind energy (calm, middle, windy; ties to the earlier day), and each third's medoid day stands for it (the day closest to the others of its third in the plant's hourly wind and Prairie Town's hourly price; ties to the earlier day), weighted by the third's days (365 in all). Days run midnight to midnight, Central Standard Time. The test re-runs the default plans on all 8,760 hours of 2025 (reference.fullYear)."
+ },
+ "electrolyzer": {
+  "capex2022": {
+   "low": 1500,
+   "mid": 2000,
+   "high": 2500
+  },
+  "fomShare": 0.05,
+  "replaceShare": 0.11,
+  "replaceHours": 40000,
+  "life": 30,
+  "note": "DOE's installed costs for PEM electrolyzers, in 2022 dollars per kW ($1,500, $2,000 and $2,500), converted to 2025 dollars. Fixed upkeep 5% of the installed cost a year. Stack replacement, 11% of the installed cost every 40,000 operating hours, is charged here per MWh the electrolyzer uses (an illustrative throughput allowance; DOE counts hours at any load). Compression, storage and delivery are left out, as in DOE's record.",
+  "src": ["doe-24005"]
+ },
+ "hydrogen": {
+  "price": {
+   "min": 1.5,
+   "max": 6,
+   "step": 0.25,
+   "def": 4
+  },
+  "note": "Illustrative: a buyer on a pipeline takes every kilogram made, at a set real price per kg for the plant's whole life."
+ },
+ "fixedSize": {
+  "min": 5,
+  "max": 60,
+  "step": 5,
+  "def": 30
+ },
+ "rate": {
+  "min": 2,
+  "max": 10,
+  "step": 0.5
+ },
+ "life": {
+  "min": 15,
+  "max": 30,
+  "step": 1
+ },
+ "charge": {
+  "min": 0,
+  "max": 30,
+  "step": 2,
+  "def": 10,
+  "note": "Illustrative: a transmission and delivery charge, $ per MWh, on every MWh the plant buys from the grid (on every MWh it uses when the electrolyzer sits across the grid). Real charges depend on the utility's tariff."
+ },
+ "grid": {
+  "presets": [
+   {
+    "id": "town",
+    "label": "Prairie Town's 2025 average",
+    "note": "Computed by the lesson from Prairie Town's fleet (lesson 8) on every hour of 2025: the gas plants' CO₂ divided by all the power used. Operating CO₂ only."
+   },
+   {
+    "id": "cc",
+    "label": "A gas combined-cycle plant",
+    "note": "Prairie Town's combined-cycle plant's rate (town.json): operating CO₂ only."
+   }
+  ],
+  "note": "Simplified: the rules count the region's life-cycle grid rate from DOE's 45VH2-GREET model, which also includes fuel supply and upstream methane, so it is higher than these operating rates. The plant's own wind counts as zero here (a simplification)."
+ },
+ "credit": {
+  "section": "45V",
+  "name": "Clean hydrogen production credit, tax code section 45V",
+  "base": 0.637,
+  "multiplier": 5,
+  "years": 10,
+  "limit": 4,
+  "constructBefore": "2028-01-01",
+  "tiers": [
+   {
+    "id": "t1",
+    "label": "Less than 0.45",
+    "max": 0.45,
+    "strict": true,
+    "pct": 1,
+    "amount": 0.637
+   },
+   {
+    "id": "t2",
+    "label": "0.45 to less than 1.5",
+    "max": 1.5,
+    "strict": true,
+    "pct": 0.334,
+    "amount": 0.213
+   },
+   {
+    "id": "t3",
+    "label": "1.5 to less than 2.5",
+    "max": 2.5,
+    "strict": true,
+    "pct": 0.25,
+    "amount": 0.159
+   },
+   {
+    "id": "t4",
+    "label": "2.5 to not greater than 4.0",
+    "max": 4,
+    "strict": false,
+    "pct": 0.2,
+    "amount": 0.127
+   }
+  ],
+  "starts": [
+   {
+    "year": 2026,
+    "ok": true
+   },
+   {
+    "year": 2027,
+    "ok": true
+   },
+   {
+    "year": 2028,
+    "ok": false
+   }
+  ],
+  "strictMargin": 0.001,
+  "creditNote": "As the IRS states it for 2025: a credit per kg of qualified clean hydrogen (at most 4 kg CO₂e per kg, well-to-gate, from 45VH2-GREET) for the 10 years from the day a facility is placed in service; Public Law 119-21 (2025) limits it to facilities whose construction begins before 1 January 2028. The amount is adjusted for inflation each year, so the lesson holds it constant in 2025 dollars (an approximation: each year's amount is rounded). Multiplied by 5 when the prevailing wage and apprenticeship requirements are met. The lesson leaves out taxes, tax equity, elective pay and transfers of the credit, and treats the tier limits as 'at most' a hair under each 'less than' (0.001 kg).",
+  "src": ["irs-i7210", "irs-td10023"]
+ },
+ "rules": [
+  {
+   "id": "none",
+   "label": "No certificates",
+   "short": "none",
+   "note": "Every MWh bought counts at the grid's rate."
+  },
+  {
+   "id": "annual",
+   "label": "Annual matching",
+   "short": "annual",
+   "note": "The wind farm's certificates for power sold to the grid may cover power bought in the same year: the rule for electricity generated until the end of 2029."
+  },
+  {
+   "id": "hourly",
+   "label": "Hourly matching",
+   "short": "hourly",
+   "note": "Certificates must come from the same hour: the rule for electricity generated from 1 January 2030."
+  }
+ ],
+ "rulesNote": "Simplified: one rule for all ten credit years. The final rules (T.D. 10023, effective 10 January 2025) also require certificates from new plants (in commercial operation no more than 36 months before the hydrogen plant was placed in service; this wind farm is built with it) in the same region. The wind farm's certificates go to the hydrogen plant at no extra cost here (an assumption).",
+ "boundaries": [
+  {
+   "id": "plant",
+   "label": "Wind farm and electrolyzer, one plant",
+   "short": "one plant"
+  },
+  {
+   "id": "increment",
+   "label": "The electrolyzer's increment",
+   "short": "increment",
+   "note": "The same plant minus the wind farm on its own (selling what its connection takes): a with-and-without comparison."
+  },
+  {
+   "id": "grid",
+   "label": "Electrolyzer across the grid",
+   "short": "across the grid",
+   "note": "The electrolyzer sits at the buyer and takes all its power from the grid; the wind farm sells to the grid on its own and its certificates go to the electrolyzer. Wind above the farm's 50 MW connection cannot reach it."
+  }
+ ],
+ "tie": {
+  "import": 0.001,
+  "curtail": 0.001,
+  "note": "Tie rule, stated in advance: a hair cost of $0.001 per MWh on power bought and on wind curtailed, so the plan neither buys and sells in the same hour nor curtails wind it could sell at $0. Left out of every reported number."
+ },
+ "sources": {
+  "doe-24005": {
+   "text": "DOE Hydrogen Program Record 24005, Clean Hydrogen Production Cost Scenarios with PEM Electrolyzer Technology (20 May 2024): Table 1 (about 57 kWh per kg; 30-year system life; installed capital $1,500, $2,000 and $2,500 per kW in 2022 dollars; replacement every 40,000 operating hours at 11% of the installed cost) and p. 9 (fixed operating costs 5% of the installed cost a year; about 10% nominal cost of capital)",
+   "url": "https://www.hydrogen.energy.gov/docs/hydrogenprogramlibraries/pdfs/24005-clean-hydrogen-production-cost-pem-electrolyzer.pdf",
+   "asOf": "20 May 2024; read 6 November 2026"
+  },
+  "irs-i7210": {
+   "text": "IRS, Instructions for Form 7210 (2025), Clean Hydrogen Production Credit: What's New (Public Law 119-21), definitions, the 10-year credit period and the table of emissions rates, applicable percentages and 2025 amounts",
+   "url": "https://www.irs.gov/instructions/i7210",
+   "asOf": "page updated 30 April 2026; read 6 November 2026"
+  },
+  "irs-td10023": {
+   "text": "IRS, Internal Revenue Bulletin 2025-13 (24 March 2025), T.D. 10023, Credit for Production of Clean Hydrogen: effective 10 January 2025; well-to-gate emissions; hourly matching for electricity generated from 1 January 2030, annual matching before; incrementality (36 months)",
+   "url": "https://www.irs.gov/irb/2025-13_IRB",
+   "asOf": "read 6 November 2026"
+  },
+  "irs-pwa": {
+   "text": "IRS, Prevailing wage and apprenticeship requirements (page last reviewed or updated 2 July 2026): pay laborers and mechanics employed in construction, alteration or repair no less than the prevailing wage rates; employ apprentices from registered apprenticeship programs for a certain number of hours; meeting both increases the base amounts by 5 times",
+   "url": "https://www.irs.gov/credits-deductions/prevailing-wage-and-apprenticeship-requirements",
+   "asOf": "read 6 November 2026"
+  },
+  "irs-45v": {
+   "text": "IRS, Clean hydrogen production credit (page updated 31 December 2025)",
+   "url": "https://www.irs.gov/credits-deductions/clean-hydrogen-production-credit",
+   "asOf": "read 6 November 2026"
+  },
+  "bea-nipa-119": {
+   "text": "U.S. Bureau of Economic Analysis, NIPA Table 1.1.9, Implicit Price Deflators for Gross Domestic Product, line 1 (index, 2017 = 100), annual: 2022 118.026, 2024 125.587, 2025 128.893 (read through FRED's copy of the BEA series, updated 30 September 2026)",
+   "url": "https://apps.bea.gov/iTable/?reqid=19&step=3&isuri=1&1921=survey&1903=13&1904=2022&1905=2026&1906=a&1911=0",
+   "asOf": "read 6 November 2026",
+   "short": "BEA, NIPA Table 1.1.9"
+  },
+  "eia-930": {
+   "text": "EIA, Hourly Electric Grid Monitor (Form EIA-930), Southwest Power Pool, 2025",
+   "url": "https://www.eia.gov/electricity/gridmonitor/",
+   "asOf": "accessed 2 November 2026"
+  },
+  "eia-epm-cf": {
+   "text": "EIA, Electric Power Monthly, Table 6.07.B: wind capacity factor 33.8% in 2025",
+   "url": "https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_b",
+   "asOf": "issue of 23 October 2026"
+  }
+ },
+ "reference": {
+  "about": "Written by node _tests/learn/test_m11-tea-in-models.js --write; re-solved by the same test on every run. Defaults: $4 per kg, $10 per MWh charge, DOE's middle installed cost, lesson 13's rate and life, Prairie Town's grid rate, hourly matching, construction in 2027 with the wage rules met. Money in real 2025 dollars; NPV over the life, annual = NPV / annuity factor; kg a year in the credit years.",
+  "days": [
+   {
+    "date": "2025-01-03",
+    "weight": 10
+   },
+   {
+    "date": "2025-01-04",
+    "weight": 11
+   },
+   {
+    "date": "2025-01-11",
+    "weight": 10
+   },
+   {
+    "date": "2025-02-10",
+    "weight": 9
+   },
+   {
+    "date": "2025-02-22",
+    "weight": 10
+   },
+   {
+    "date": "2025-02-28",
+    "weight": 9
+   },
+   {
+    "date": "2025-03-16",
+    "weight": 10
+   },
+   {
+    "date": "2025-03-21",
+    "weight": 11
+   },
+   {
+    "date": "2025-03-17",
+    "weight": 10
+   },
+   {
+    "date": "2025-04-24",
+    "weight": 10
+   },
+   {
+    "date": "2025-04-11",
+    "weight": 10
+   },
+   {
+    "date": "2025-04-12",
+    "weight": 10
+   },
+   {
+    "date": "2025-05-09",
+    "weight": 10
+   },
+   {
+    "date": "2025-05-27",
+    "weight": 11
+   },
+   {
+    "date": "2025-05-20",
+    "weight": 10
+   },
+   {
+    "date": "2025-06-04",
+    "weight": 10
+   },
+   {
+    "date": "2025-06-11",
+    "weight": 10
+   },
+   {
+    "date": "2025-06-02",
+    "weight": 10
+   },
+   {
+    "date": "2025-07-06",
+    "weight": 10
+   },
+   {
+    "date": "2025-07-09",
+    "weight": 11
+   },
+   {
+    "date": "2025-07-21",
+    "weight": 10
+   },
+   {
+    "date": "2025-08-26",
+    "weight": 10
+   },
+   {
+    "date": "2025-08-01",
+    "weight": 11
+   },
+   {
+    "date": "2025-08-16",
+    "weight": 10
+   },
+   {
+    "date": "2025-09-19",
+    "weight": 10
+   },
+   {
+    "date": "2025-09-29",
+    "weight": 10
+   },
+   {
+    "date": "2025-09-14",
+    "weight": 10
+   },
+   {
+    "date": "2025-10-26",
+    "weight": 10
+   },
+   {
+    "date": "2025-10-12",
+    "weight": 11
+   },
+   {
+    "date": "2025-10-16",
+    "weight": 10
+   },
+   {
+    "date": "2025-11-24",
+    "weight": 10
+   },
+   {
+    "date": "2025-11-13",
+    "weight": 10
+   },
+   {
+    "date": "2025-11-02",
+    "weight": 10
+   },
+   {
+    "date": "2025-12-30",
+    "weight": 10
+   },
+   {
+    "date": "2025-12-18",
+    "weight": 11
+   },
+   {
+    "date": "2025-12-22",
+    "weight": 10
+   }
+  ],
+  "repCF": 0.332,
+  "townRate": 0.082,
+  "ccRate": 0.37,
+  "priceShare": {
+   "zero": "16%",
+   "cc": "78%",
+   "pk": "6%"
+  },
+  "defaults": {
+   "crf": 0.057830099133661314,
+   "af": 17.29203330066449,
+   "capexKW": 2184.145866165082,
+   "wear": 6.006401131953976,
+   "phi": 0.4690539069828968,
+   "top": 3.185,
+   "fixed": {
+    "S": 30,
+    "kg": 4491707,
+    "imp": 63024,
+    "cur": 326,
+    "util": 0.974,
+    "npv": -59650550,
+    "annual": -3449597,
+    "lcoh": 4.768,
+    "creditLev": 0,
+    "rate": 1.156
+   },
+   "sized": {
+    "S": 22.7,
+    "kg": 3394312,
+    "imp": 37635,
+    "cur": 1509,
+    "util": 0.975,
+    "npv": -58658633,
+    "annual": -3392235,
+    "lcoh": 4.999,
+    "creditLev": 0,
+    "rate": 0.913
+   },
+   "t1": {
+    "S": 46.2,
+    "kg": 4959751,
+    "imp": 27037,
+    "cur": 0,
+    "util": 0.699,
+    "npv": 46368220,
+    "annual": 2681479,
+    "lcoh": 4.789,
+    "creditLev": 1.236,
+    "rate": 0.449,
+    "kgAfter": 6909264,
+    "kgShare": 0.3881
+   },
+   "t1all": {
+    "S": 49.7,
+    "kg": 5122113,
+    "imp": 27922,
+    "cur": 0,
+    "util": 0.671,
+    "npv": 176248225,
+    "annual": 10192452,
+    "lcoh": 5.195,
+    "creditLev": 3.185,
+    "rate": 0.449
+   },
+   "annual": {
+    "S": 37.6,
+    "kg": 5634357,
+    "imp": 96094,
+    "cur": 29,
+    "util": 0.974,
+    "npv": 83139484,
+    "annual": 4807965,
+    "lcoh": 4.641,
+    "creditLev": 1.494,
+    "rate": 0.449
+   },
+   "tiers": [
+    {
+     "id": "none",
+     "S": 22.7,
+     "annual": -3392235,
+     "rate": 0.913
+    },
+    {
+     "id": "t1",
+     "S": 46.2,
+     "annual": 2681479,
+     "rate": 0.449
+    },
+    {
+     "id": "t2",
+     "S": 40.4,
+     "annual": -671006,
+     "rate": 1.499
+    },
+    {
+     "id": "t3",
+     "S": 53.8,
+     "annual": -1235353,
+     "rate": 1.955
+    },
+    {
+     "id": "t4",
+     "S": 50.7,
+     "annual": -1821866,
+     "rate": 1.853
+    }
+   ],
+   "best": "t1",
+   "solved": 1
+  },
+  "boundaries": [
+   {
+    "id": "plant",
+    "label": "Wind farm and electrolyzer, one plant",
+    "tier": "t1",
+    "S": 46.2,
+    "npv": 46368220,
+    "lcoh": 4.789,
+    "npvNone": -58658633,
+    "sNone": 22.7
+   },
+   {
+    "id": "increment",
+    "label": "The electrolyzer's increment",
+    "tier": "t1",
+    "S": 46.2,
+    "npv": 121179310,
+    "lcoh": 4.067,
+    "npvNone": 16152458,
+    "sNone": 22.7
+   },
+   {
+    "id": "grid",
+    "label": "Electrolyzer across the grid",
+    "tier": "t1",
+    "S": 40.1,
+    "npv": 63194006,
+    "lcoh": 4.604,
+    "npvNone": 0,
+    "sNone": 0
+   }
+  ],
+  "gridNone": {
+   "tier": "none",
+   "S": 0
+  },
+  "fullYear": {
+   "about": "Each default plan's size fixed, its hours re-optimized on all 8,760 hours of 2025 (the same rules); npvGap = 36 days - full year ($); kgGapPct = (36 days - full year) / full year.",
+   "plans": [
+    {
+     "id": "fixed30",
+     "npvRep": -59650550,
+     "npvFull": -58096967,
+     "kgGapPct": 3.4
+    },
+    {
+     "id": "sized",
+     "npvRep": -58658633,
+     "npvFull": -57471905,
+     "kgGapPct": 3.4
+    },
+    {
+     "id": "t1",
+     "npvRep": 46368220,
+     "npvFull": 45046348,
+     "kgGapPct": 2.5
+    },
+    {
+     "id": "t1all",
+     "npvRep": 176248225,
+     "npvFull": 172834852,
+     "kgGapPct": 2
+    },
+    {
+     "id": "increment",
+     "npvRep": 121179310,
+     "npvFull": 121768710,
+     "kgGapPct": 2.5
+    },
+    {
+     "id": "grid",
+     "npvRep": 63194006,
+     "npvFull": 59460642,
+     "kgGapPct": 3.1
+    },
+    {
+     "id": "annual",
+     "npvRep": 83139484,
+     "npvFull": 82112905,
+     "kgGapPct": -1.8
+    }
+   ],
+   "maxNpvGapM": 4,
+   "maxKgGapPct": 4
+  },
+  "size": {
+   "cols": 5185,
+   "rows": 3457
+  }
+ },
+ "lesson13": {
+  "about": "Copied from lesson 13's data (13-capstone.json) by node _tests/learn/test_m11-tea-in-models.js --write and checked against it on every run: the wind farm's installed cost and fixed upkeep (2025 dollars), the real rate and the life. Edit lesson 13's data, never this block.",
+  "techs": {
+   "wind": {
+    "label": "Wind farm",
+    "capex": 1712,
+    "fom": 34.57,
+    "src": ["eia-aeo2026-emm"]
+   }
+  },
+  "finance": {
+   "wacc": 4,
+   "life": 30,
+   "src": ["atb2025-fin"]
+  },
+  "sources": {
+   "eia-aeo2026-emm": {
+    "text": "EIA, Assumptions to the Annual Energy Outlook 2026: Electricity Market Module, Table 3 (2025 dollars)",
+    "url": "https://www.eia.gov/outlooks/aeo/assumptions/pdf/EMM_Assumptions.pdf",
+    "asOf": "April 2026"
+   },
+   "atb2025-fin": {
+    "text": "NLR, 2025 Electricity Annual Technology Baseline, Financial Cases and Methods",
+    "url": "https://atb.nlr.gov/electricity/2025/financial_cases_&_methods",
+    "asOf": "checked 2 Nov 2026"
+   }
+  }
+ }
+}

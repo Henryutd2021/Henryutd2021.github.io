@@ -1,0 +1,1015 @@
+{
+ "about": "CK-A, the Analyst checkpoint (ck-a-spreadsheet), wave W5, built by scripts/build_learn_cka_sheet.py on 2026-11-06 (do not edit by hand). Prairie Town High School is fictional; its load and several inputs are illustrative and labelled so in the log; the costs, prices, capacity factor and price index are dated public numbers (sources). The page's model (assets/learn/ck-a-spreadsheet.js) recomputes every worked number; _tests/learn/test_ck-a-spreadsheet.js checks it against this file and against the worked workbook's formulas.",
+ "version": "ck-a v1 (6 Nov 2026)",
+ "built": "2026-11-06",
+ "files": {
+  "starter": "ck-a-starter.xlsx",
+  "worked": "ck-a-worked.xlsx"
+ },
+ "rule": {
+  "auto": 7,
+  "autoProficient": 5,
+  "autoStrong": 6,
+  "autoDeveloping": 3,
+  "pointsProficient": 3,
+  "levels": [
+   "Not yet",
+   "Developing",
+   "Proficient",
+   "Strong"
+  ],
+  "practice": "Practice (no level)",
+  "openFirst": "not-right"
+ },
+ "case": {
+  "school": "Prairie Town High School",
+  "fictional": "Prairie Town and its high school are fictional; the school's load and several inputs are illustrative.",
+  "situation": "Prairie Town High School's district is offered a rooftop solar array and a battery behind the school's meter.",
+  "deliverable": "An auditable spreadsheet that tells the district what it would gain or lose, who else pays or benefits, and how sure that answer is.",
+  "facts": [
+   [
+    "System",
+    "250 [[kw-dc|kW-DC]] of rooftop solar and a 150 kW / 300 kWh battery, installed together"
+   ],
+   [
+    "School",
+    "uses 1,000,000 kWh a year, with a billed peak of 400 kW every month (illustrative)"
+   ],
+   [
+    "Tariff",
+    "a [[demand-charge|demand charge]] of $10 per kW-month plus an energy charge, set so the school's bill averages Kansas's 2025 commercial price, 11.17 cents/kWh (EIA); exports earn 3 cents/kWh (illustrative)"
+   ],
+   [
+    "Battery power",
+    "cuts the monthly billed peak by 60% of its power on average (illustrative)"
+   ],
+   [
+    "Battery energy",
+    "about 200 [[full-cycle|full cycles]] a year, each taking in 300 kWh from the school's supply and returning 90%; the 10% lost is bought at the energy charge (illustrative)"
+   ],
+   [
+    "Costs",
+    "from EIA's 2024 distributed-generation report (2022 dollars) and NLR's 2025 ATB (2023 dollars); convert to 2025 dollars"
+   ],
+   [
+    "Money",
+    "25 years, real 2025 dollars, a 4% [[real-rate|real discount rate]] (the course's), battery replaced at the end of year 15"
+   ],
+   [
+    "End value",
+    "at year 25 the replacement battery has 5 of its 15 years left: count 5/15 of its cost as its [[residual-value|residual value]] (straight line)"
+   ],
+   [
+    "The utility",
+    "avoids 3 cents for each kWh it no longer supplies and, for half of the battery's peak cut, $180 per kW a year of capacity (illustrative; lesson A4's unit cost)"
+   ],
+   [
+    "Rate reset",
+    "assume the utility recovers its whole remaining revenue shortfall from its other customers at the next rate reset"
+   ]
+  ]
+ },
+ "log": [
+  {
+   "id": "pvKW",
+   "input": "Solar array size",
+   "value": 250,
+   "unit": "kW-DC",
+   "type": "Choice",
+   "src": "eia-dg-2024",
+   "note": "The report's medium commercial rooftop system; the school roof is assumed to fit it.",
+   "low": null,
+   "high": null
+  },
+  {
+   "id": "pvCF",
+   "input": "Solar capacity factor",
+   "value": 0.178,
+   "unit": "fraction",
+   "type": "Sourced",
+   "src": "eia-dg-2024",
+   "note": "Table 2-5, 250 kW-DC, 2022, U.S. average; Kansas sun may differ.",
+   "low": "x0.9",
+   "high": "x1.1"
+  },
+  {
+   "id": "self",
+   "input": "Share of solar output used at the school",
+   "value": 0.75,
+   "unit": "fraction",
+   "type": "Illustrative",
+   "src": null,
+   "note": "Summer break and weekends send the rest to the grid.",
+   "low": 0.6,
+   "high": 0.9
+  },
+  {
+   "id": "batKW",
+   "input": "Battery power",
+   "value": 150,
+   "unit": "kW",
+   "type": "Choice",
+   "src": "eia-dg-2024",
+   "note": "The report's medium commercial battery.",
+   "low": null,
+   "high": null
+  },
+  {
+   "id": "batKWh",
+   "input": "Battery energy",
+   "value": 300,
+   "unit": "kWh",
+   "type": "Choice",
+   "src": "eia-dg-2024",
+   "note": "Two hours at full power; the energy it takes in on each full cycle.",
+   "low": null,
+   "high": null
+  },
+  {
+   "id": "cut",
+   "input": "Average cut in the monthly billed peak, share of battery power",
+   "value": 0.6,
+   "unit": "fraction",
+   "type": "Illustrative",
+   "src": null,
+   "note": "A battery misses some peaks (forecast errors, long peaks, an empty battery).",
+   "low": 0.3,
+   "high": 0.9
+  },
+  {
+   "id": "cycles",
+   "input": "Battery full cycles a year (each takes in 300 kWh)",
+   "value": 200,
+   "unit": "per year",
+   "type": "Illustrative",
+   "src": null,
+   "note": "About one per school day. Equivalent full cycles: partial charges add up to whole ones. Each takes in 300 kWh and returns 90% of it; the 10% lost is bought at the energy charge.",
+   "low": null,
+   "high": null
+  },
+  {
+   "id": "rte",
+   "input": "Battery round trip efficiency",
+   "value": 0.9,
+   "unit": "fraction",
+   "type": "Sourced",
+   "src": "eia-dg-2024",
+   "note": "Table 3-3, 2022: the share of the energy put in that comes back out.",
+   "low": null,
+   "high": null
+  },
+  {
+   "id": "use",
+   "input": "School electricity use",
+   "value": 1000000,
+   "unit": "kWh a year",
+   "type": "Illustrative",
+   "src": null,
+   "note": "A large high school; not a measured building.",
+   "low": null,
+   "high": null
+  },
+  {
+   "id": "peak",
+   "input": "School monthly billed peak",
+   "value": 400,
+   "unit": "kW",
+   "type": "Illustrative",
+   "src": null,
+   "note": "Taken as the same every month.",
+   "low": null,
+   "high": null
+  },
+  {
+   "id": "price",
+   "input": "Average commercial electricity price, Kansas",
+   "value": 0.1117,
+   "unit": "$/kWh",
+   "type": "Sourced",
+   "src": "eia-epm-5-6-b",
+   "note": "January to August 2025; includes demand charges. The tariff below is set to give the school this average before the project.",
+   "low": "x0.8",
+   "high": "x1.2"
+  },
+  {
+   "id": "demand",
+   "input": "Demand charge",
+   "value": 10,
+   "unit": "$/kW-month",
+   "type": "Illustrative",
+   "src": null,
+   "note": "A two-part tariff; the energy charge is derived so the school's bill matches the EIA average. Its low and high re-derive the energy charge too, so the school's pre-project bill stays the same (a tariff rebalancing, not a dearer tariff).",
+   "low": 5,
+   "high": 20
+  },
+  {
+   "id": "export",
+   "input": "Credit for each kWh sent to the grid",
+   "value": 0.03,
+   "unit": "$/kWh",
+   "type": "Illustrative",
+   "src": null,
+   "note": "Net billing near the utility's avoided energy cost (lesson A4).",
+   "low": null,
+   "high": null
+  },
+  {
+   "id": "capKW",
+   "input": "Installed cost, solar + battery, per kW-DC of solar",
+   "value": 3170,
+   "unit": "$/kW-DC (2022 $)",
+   "type": "Sourced",
+   "src": "eia-dg-2024",
+   "note": "Figure 3-5, 2022; read as per kW-DC of the solar array: 7% below the two systems' separate costs, as the report says co-location saves.",
+   "low": null,
+   "high": null
+  },
+  {
+   "id": "pvAloneKW",
+   "input": "Installed cost, solar alone (check only)",
+   "value": 1903,
+   "unit": "$/kW-DC (2022 $)",
+   "type": "Sourced",
+   "src": "eia-dg-2024",
+   "note": "Figure 2-4, 250 kW-DC, 2022; used only to check how Figure 3-5 is read.",
+   "low": null,
+   "high": null
+  },
+  {
+   "id": "batRepKW",
+   "input": "Standalone battery cost, for the replacement",
+   "value": 2492,
+   "unit": "$/kW (2022 $)",
+   "type": "Sourced",
+   "src": "eia-dg-2024",
+   "note": "Figure 3-4, 2022; held constant in real terms (no assumed cost change).",
+   "low": null,
+   "high": null
+  },
+  {
+   "id": "pvOM",
+   "input": "Solar upkeep",
+   "value": 17.63,
+   "unit": "$/kW-DC a year (2023 $)",
+   "type": "Sourced",
+   "src": "atb2025-cpv",
+   "note": "ATB value for 2024, in 2023 dollars.",
+   "low": null,
+   "high": null
+  },
+  {
+   "id": "batOM",
+   "input": "Battery upkeep",
+   "value": 63,
+   "unit": "$/kW a year (2022 $)",
+   "type": "Sourced",
+   "src": "eia-dg-2024",
+   "note": "Figure 3-6, commercial, 2022.",
+   "low": null,
+   "high": null
+  },
+  {
+   "id": "i2022",
+   "input": "Price index, 2022",
+   "value": 118.035,
+   "unit": "index (2017 = 100)",
+   "type": "Course data",
+   "src": "eia-steo-9a",
+   "note": "The course's GDP price index (e0.json).",
+   "low": null,
+   "high": null
+  },
+  {
+   "id": "i2023",
+   "input": "Price index, 2023",
+   "value": 122.389,
+   "unit": "index (2017 = 100)",
+   "type": "Course data",
+   "src": "eia-steo-9a",
+   "note": "The course's GDP price index (e0.json).",
+   "low": null,
+   "high": null
+  },
+  {
+   "id": "i2025",
+   "input": "Price index, 2025",
+   "value": 128.989,
+   "unit": "index (2017 = 100)",
+   "type": "Course data",
+   "src": "eia-steo-9a",
+   "note": "The course's GDP price index (e0.json).",
+   "low": null,
+   "high": null
+  },
+  {
+   "id": "rate",
+   "input": "Discount rate (real)",
+   "value": 0.04,
+   "unit": "per year",
+   "type": "Course data",
+   "src": null,
+   "note": "The course's real rate (lessons 7 and 13, e0.json); a school district's own rate may differ.",
+   "low": 0.02,
+   "high": 0.07
+  },
+  {
+   "id": "years",
+   "input": "Analysis period",
+   "value": 25,
+   "unit": "years",
+   "type": "Choice",
+   "src": null,
+   "note": "A rooftop array's usual design life.",
+   "low": null,
+   "high": null
+  },
+  {
+   "id": "batLife",
+   "input": "Battery useful life",
+   "value": 15,
+   "unit": "years",
+   "type": "Sourced",
+   "src": "eia-dg-2024",
+   "note": "Table 3-3; replaced once, at the end of year 15.",
+   "low": null,
+   "high": null
+  },
+  {
+   "id": "avoidE",
+   "input": "Utility's avoided energy cost",
+   "value": 0.03,
+   "unit": "$/kWh",
+   "type": "Illustrative",
+   "src": null,
+   "note": "Taken equal to the export credit.",
+   "low": null,
+   "high": null
+  },
+  {
+   "id": "capCost",
+   "input": "Utility's avoided capacity cost",
+   "value": 180,
+   "unit": "$/kW a year",
+   "type": "Course data",
+   "src": null,
+   "note": "Lesson A4's illustrative $15 per kW-month for the town's tightest hour, times 12.",
+   "low": null,
+   "high": null
+  },
+  {
+   "id": "coinc",
+   "input": "Share of the battery's peak cut that falls in the system's tightest hours",
+   "value": 0.5,
+   "unit": "fraction",
+   "type": "Illustrative",
+   "src": null,
+   "note": "A school's peak need not be the grid's.",
+   "low": null,
+   "high": null
+  },
+  {
+   "id": "co2lb",
+   "input": "Grid CO2 factor",
+   "value": 680,
+   "unit": "lb per MWh",
+   "type": "Sourced",
+   "src": "eia-ks-profile",
+   "note": "Kansas 2024 average of its power plants (location-based); a marginal factor would differ (lesson A10).",
+   "low": null,
+   "high": null
+  },
+  {
+   "id": "defl22",
+   "input": "2022 dollars to 2025 dollars",
+   "value": null,
+   "unit": "factor",
+   "type": "Derived",
+   "src": null,
+   "note": "Index 2025 / index 2022.",
+   "low": null,
+   "high": null
+  },
+  {
+   "id": "defl23",
+   "input": "2023 dollars to 2025 dollars",
+   "value": null,
+   "unit": "factor",
+   "type": "Derived",
+   "src": null,
+   "note": "Index 2025 / index 2023.",
+   "low": null,
+   "high": null
+  },
+  {
+   "id": "capital",
+   "input": "Up-front cost, solar + battery",
+   "value": null,
+   "unit": "$ (2025)",
+   "type": "Derived",
+   "src": null,
+   "note": "Installed cost per kW-DC x solar size x the 2022 factor.",
+   "low": "x0.75",
+   "high": "x1.25"
+  },
+  {
+   "id": "repl",
+   "input": "Battery replacement at the end of year 15",
+   "value": null,
+   "unit": "$ (2025)",
+   "type": "Derived",
+   "src": null,
+   "note": "Standalone cost x battery power x the 2022 factor.",
+   "low": null,
+   "high": null
+  },
+  {
+   "id": "omPV",
+   "input": "Solar upkeep a year",
+   "value": null,
+   "unit": "$ (2025)",
+   "type": "Derived",
+   "src": null,
+   "note": "Per kW-DC x solar size x the 2023 factor.",
+   "low": "x0.75",
+   "high": "x1.25"
+  },
+  {
+   "id": "omBat",
+   "input": "Battery upkeep a year",
+   "value": null,
+   "unit": "$ (2025)",
+   "type": "Derived",
+   "src": null,
+   "note": "Per kW x battery power x the 2022 factor.",
+   "low": "x0.75",
+   "high": "x1.25"
+  },
+  {
+   "id": "co2",
+   "input": "Grid CO2 factor in metric tonnes",
+   "value": null,
+   "unit": "t per MWh",
+   "type": "Derived",
+   "src": null,
+   "note": "lb per MWh x 0.45359237 kg per lb / 1,000.",
+   "low": null,
+   "high": null
+  },
+  {
+   "id": "coloc",
+   "input": "Check: saving from installing together",
+   "value": null,
+   "unit": "fraction",
+   "type": "Derived",
+   "src": null,
+   "note": "1 - combined cost / (solar alone + standalone battery), 2022 dollars: positive, as the report says co-location saves.",
+   "low": null,
+   "high": null
+  }
+ ],
+ "sens": [
+  {
+   "key": "capital",
+   "label": "Up-front cost",
+   "ids": [
+    "capital"
+   ],
+   "lo": 649534.772525,
+   "hi": 1082557.954208,
+   "atLo": -559812.572905,
+   "atHi": -992835.754589
+  },
+  {
+   "key": "demand",
+   "label": "Demand charge (pre-project bill held)",
+   "ids": [
+    "demand"
+   ],
+   "lo": 5,
+   "hi": 20,
+   "atLo": -753316.589289,
+   "atHi": -822339.312663
+  },
+  {
+   "key": "price",
+   "label": "Average electricity price",
+   "ids": [
+    "price"
+   ],
+   "lo": 0.08936,
+   "hi": 0.13404,
+   "atLo": -876264.765808,
+   "atHi": -676383.561686
+  },
+  {
+   "key": "rate",
+   "label": "Discount rate",
+   "ids": [
+    "rate"
+   ],
+   "lo": 0.02,
+   "hi": 0.07,
+   "atLo": -754803.801593,
+   "atHi": -790985.33956
+  },
+  {
+   "key": "pvCF",
+   "label": "Solar capacity factor",
+   "ids": [
+    "pvCF"
+   ],
+   "lo": 0.1602,
+   "hi": 0.1958,
+   "atLo": -809985.528845,
+   "atHi": -742662.798649
+  },
+  {
+   "key": "self",
+   "label": "Share used at the school",
+   "ids": [
+    "self"
+   ],
+   "lo": 0.6,
+   "hi": 0.9,
+   "atLo": -807108.098721,
+   "atHi": -745540.228773
+  },
+  {
+   "key": "cut",
+   "label": "Battery's cut in the billed peak",
+   "ids": [
+    "cut"
+   ],
+   "lo": 0.3,
+   "hi": 0.9,
+   "atLo": -860683.395443,
+   "atHi": -691964.932051
+  },
+  {
+   "key": "upkeep",
+   "label": "Upkeep, solar and battery",
+   "ids": [
+    "omPV",
+    "omBat"
+   ],
+   "lo": 11229.126642,
+   "hi": 18715.211069,
+   "atLo": -717850.05905,
+   "atHi": -834798.268444
+  }
+ ],
+ "top": "capital",
+ "worked": {
+  "energyCharge": 0.0637,
+  "solar": 389820.0,
+  "used": 292365.0,
+  "exported": 97455.0,
+  "sEnergy": 18623.6505,
+  "sExport": 2923.65,
+  "sDemand": 10800.0,
+  "lossKWh": 6000.0,
+  "sLoss": -382.2,
+  "billSave": 31965.1005,
+  "upkeep": 14972.168855,
+  "net": 16992.931645,
+  "af": 15.62208,
+  "pvNet": 265464.936629,
+  "pvRepl": 226819.860526,
+  "residual": 136163.251578,
+  "pvResidual": 51077.123516,
+  "npvSchool": -776324.163747,
+  "avoided": 19614.6,
+  "shift": 12350.5005,
+  "npvOthers": -192940.506155,
+  "npvSociety": -969264.669902,
+  "check": 0.0,
+  "co2t": 118.38652
+ },
+ "base": {
+  "pvKW": 250,
+  "pvCF": 0.178,
+  "self": 0.75,
+  "batKW": 150,
+  "batKWh": 300,
+  "cut": 0.6,
+  "cycles": 200,
+  "rte": 0.9,
+  "use": 1000000,
+  "peak": 400,
+  "price": 0.1117,
+  "demand": 10,
+  "export": 0.03,
+  "capKW": 3170,
+  "pvAloneKW": 1903,
+  "batRepKW": 2492,
+  "pvOM": 17.63,
+  "batOM": 63,
+  "i2022": 118.035,
+  "i2023": 122.389,
+  "i2025": 128.989,
+  "rate": 0.04,
+  "years": 25,
+  "batLife": 15,
+  "avoidE": 0.03,
+  "capCost": 180,
+  "coinc": 0.5,
+  "co2lb": 680,
+  "defl22": 1.092803,
+  "defl23": 1.053926,
+  "capital": 866046.363367,
+  "repl": 408489.754734,
+  "omPV": 4645.180674,
+  "omBat": 10326.988181,
+  "co2": 0.308443,
+  "coloc": 0.067153
+ },
+ "cash": {
+  "pvSum": -776324.163747,
+  "minCum": -1019642.143431,
+  "years": 25
+ },
+ "sheets": {
+  "logRow": {
+   "pvKW": 5,
+   "pvCF": 6,
+   "self": 7,
+   "batKW": 8,
+   "batKWh": 9,
+   "cut": 10,
+   "cycles": 11,
+   "rte": 12,
+   "use": 13,
+   "peak": 14,
+   "price": 15,
+   "demand": 16,
+   "export": 17,
+   "capKW": 18,
+   "pvAloneKW": 19,
+   "batRepKW": 20,
+   "pvOM": 21,
+   "batOM": 22,
+   "i2022": 23,
+   "i2023": 24,
+   "i2025": 25,
+   "rate": 26,
+   "years": 27,
+   "batLife": 28,
+   "avoidE": 29,
+   "capCost": 30,
+   "coinc": 31,
+   "co2lb": 32,
+   "defl22": 33,
+   "defl23": 34,
+   "capital": 35,
+   "repl": 36,
+   "omPV": 37,
+   "omBat": 38,
+   "co2": 39,
+   "coloc": 40
+  },
+  "modelRow": {
+   "pvKW": 5,
+   "pvCF": 6,
+   "self": 7,
+   "batKW": 8,
+   "batKWh": 9,
+   "cut": 10,
+   "cycles": 11,
+   "rte": 12,
+   "use": 13,
+   "peak": 14,
+   "price": 15,
+   "demand": 16,
+   "export": 17,
+   "capital": 18,
+   "repl": 19,
+   "omPV": 20,
+   "omBat": 21,
+   "rate": 22,
+   "years": 23,
+   "batLife": 24,
+   "avoidE": 25,
+   "capCost": 26,
+   "coinc": 27,
+   "energyCharge": 29,
+   "solar": 30,
+   "used": 31,
+   "exported": 32,
+   "sEnergy": 33,
+   "sExport": 34,
+   "sDemand": 35,
+   "lossKWh": 36,
+   "sLoss": 37,
+   "billSave": 38,
+   "upkeep": 39,
+   "net": 40,
+   "af": 41,
+   "pvNet": 42,
+   "pvRepl": 43,
+   "residual": 44,
+   "pvResidual": 45,
+   "npvSchool": 46,
+   "avoided": 47,
+   "shift": 48,
+   "npvOthers": 49,
+   "npvSociety": 50,
+   "check": 51
+  }
+ },
+ "tasks": [
+  {
+   "id": "boundary",
+   "part": "A",
+   "lesson": "A1, A13",
+   "title": "Your boundary",
+   "skill": "State the boundary",
+   "kind": "open-short",
+   "prompt": "In two or three sentences: whose money does your main result count, over what period and in which dollars, and what does it leave out?",
+   "points": [
+    "Whose money: the school district's, from its electricity bill, the system's capital, upkeep and the battery's replacement.",
+    "Time and money: 25 years, real 2025 dollars, one real discount rate (4%), with costs from other dollar years converted.",
+    "Left out, and said so: tax credits, financing, resilience, CO2's value and solar wear (or a stated subset of these).",
+    "The other parties (the utility's other customers, federal taxpayers, the resource view) reported apart from the main result."
+   ],
+   "solution": "The school district's own money over 25 years in real 2025 dollars at 4%: its bill saving against the capital, upkeep and battery replacement. Left out: tax credits, financing, resilience, CO2's value and solar wear. Other customers and the resource view are reported apart."
+  },
+  {
+   "id": "solar",
+   "part": "B",
+   "lesson": "T5, A1",
+   "title": "Solar output",
+   "skill": "A number with units",
+   "kind": "numeric",
+   "prompt": "How much electricity does the array make in a year?",
+   "units": [
+    [
+     "kWh per year",
+     0.001
+    ],
+    [
+     "MWh per year",
+     1
+    ],
+    [
+     "GWh per year",
+     1000
+    ],
+    [
+     "kW",
+     null
+    ],
+    [
+     "MW",
+     null
+    ]
+   ],
+   "unitNote": {
+    "kW": "kW measures power; a year's output is energy: kWh or MWh per year.",
+    "MW": "MW measures power; a year's output is energy: kWh or MWh per year."
+   },
+   "answer": {
+    "value": 389.82,
+    "tol": 0.02,
+    "show": "about 390 MWh a year"
+   },
+   "tolNote": "Within 2% counts as right.",
+   "solution": "250 kW × 0.178 × 8,760 h = 389,820 kWh, about 390 MWh a year."
+  },
+  {
+   "id": "upfront",
+   "part": "B",
+   "lesson": "A1, K3",
+   "title": "Up-front cost in 2025 dollars",
+   "skill": "Convert dollar years",
+   "kind": "numeric",
+   "prompt": "What does the system cost up front, in 2025 dollars?",
+   "units": [
+    [
+     "$",
+     1
+    ],
+    [
+     "thousand $",
+     1000
+    ],
+    [
+     "million $",
+     1000000
+    ]
+   ],
+   "answer": {
+    "value": 866046.363367,
+    "tol": 0.01,
+    "show": "about $866,000 in 2025 dollars"
+   },
+   "tolNote": "Within 1% counts as right.",
+   "solution": "$3,170 per kW-DC × 250 kW-DC = $792,500 in 2022 dollars; × 1.0928 (128.989 ÷ 118.035) = $866,046 in 2025 dollars."
+  },
+  {
+   "id": "billsave",
+   "part": "B",
+   "lesson": "A4",
+   "title": "The school's bill saving",
+   "skill": "Read a tariff",
+   "kind": "numeric",
+   "prompt": "How much lower is the school's electricity bill in a year (gross: before upkeep)?",
+   "units": [
+    [
+     "$ per year",
+     1
+    ],
+    [
+     "thousand $ per year",
+     1000
+    ]
+   ],
+   "answer": {
+    "value": 31965.1005,
+    "tol": 0.03,
+    "show": "about $32,000 a year"
+   },
+   "tolNote": "Within 3% counts as right.",
+   "solution": "Energy charges $18,624, export credits $2,924, demand charges $10,800, battery losses −$382: $31,965 a year."
+  },
+  {
+   "id": "npc",
+   "part": "B",
+   "lesson": "A1, K3",
+   "title": "The main result",
+   "skill": "Present value",
+   "kind": "numeric",
+   "prompt": "Over 25 years at 4%, counting the brief's residual value, by how much does the present value of the school's costs exceed the present value of its savings? (If your model says the savings are larger, recheck it.)",
+   "units": [
+    [
+     "$",
+     1
+    ],
+    [
+     "thousand $",
+     1000
+    ],
+    [
+     "million $",
+     1000000
+    ]
+   ],
+   "answer": {
+    "value": 776324.163747,
+    "tol": 0.03,
+    "show": "about $776,000: a net present value of −$776,000"
+   },
+   "tolNote": "Within 3% counts as right.",
+   "solution": "−$866,046 up front, + $265,465 of net savings ($16,993 a year × 15.62), − $226,820 for the replacement, + $51,077 of residual value: NPV −$776,324."
+  },
+  {
+   "id": "transfer",
+   "part": "C",
+   "lesson": "A13, A4",
+   "title": "Who pays the gap",
+   "skill": "Transfers against real costs",
+   "kind": "choice",
+   "prompt": "Part of the school's bill saving is not a saving in the utility's costs. Under the brief's rate-reset assumption, who pays it?",
+   "options": [
+    [
+     "a",
+     "The school district"
+    ],
+    [
+     "b",
+     "The utility's other customers, at the next rate reset"
+    ],
+    [
+     "c",
+     "Federal taxpayers"
+    ],
+    [
+     "d",
+     "Nobody: every dollar the school saves is a real cost saved"
+    ]
+   ],
+   "answer": "b",
+   "why": {
+    "a": "The school receives this part: it is in its bill saving.",
+    "b": "The utility still has to recover its costs; under the brief's assumption, the next rate reset moves the gap onto other customers' rates.",
+    "c": "No tax credit is counted here; a credit would be a separate transfer.",
+    "d": "The utility avoids only its energy and capacity costs, less than the bill saving."
+   },
+   "solution": "Under the brief's assumption, the utility's other customers, at the next rate reset: a [[transfer|transfer]], not a real cost saved. Until a reset, or if the utility does not recover it all, part stays with the utility."
+  },
+  {
+   "id": "shift",
+   "part": "C",
+   "lesson": "A13",
+   "title": "The cost shift",
+   "skill": "A screening estimate",
+   "kind": "numeric",
+   "prompt": "Under the same assumption, how much a year moves to the utility's other customers?",
+   "units": [
+    [
+     "$ per year",
+     1
+    ],
+    [
+     "thousand $ per year",
+     1000
+    ]
+   ],
+   "answer": {
+    "value": 12350.5005,
+    "tol": 0.05,
+    "show": "about $12,400 a year"
+   },
+   "tolNote": "Within 5% counts as right.",
+   "solution": "Bill saving $31,965 − the utility's avoided cost $19,615 ($11,515 of energy, $8,100 of capacity) = $12,351 a year."
+  },
+  {
+   "id": "tornado",
+   "part": "D",
+   "lesson": "A1, M7",
+   "title": "What moves the result most",
+   "skill": "Sensitivity",
+   "kind": "choice",
+   "prompt": "Swinging one input at a time over the ranges in the worked log, which moves the school's NPV most?",
+   "options": [
+    [
+     "a",
+     "The up-front cost, ±25%"
+    ],
+    [
+     "b",
+     "The discount rate, 2% to 7%"
+    ],
+    [
+     "c",
+     "The demand charge, $5 to $20 per kW-month, with the energy charge re-set so the pre-project bill is unchanged"
+    ],
+    [
+     "d",
+     "The average electricity price, ±20%"
+    ]
+   ],
+   "answer": "a",
+   "why": {
+    "a": "The capital is the largest single number in the result.",
+    "b": "The rate changes the weight of every future year and the replacement.",
+    "c": "A higher demand charge raises the battery's saving; the energy charge falls to keep the pre-project bill, so the solar saves less. The two partly cancel.",
+    "d": "Price moves the energy saving, a modest share of the total."
+   },
+   "solution": "The worked sensitivity sorts the swings: up-front cost first."
+  },
+  {
+   "id": "log",
+   "part": "D",
+   "lesson": "A1, R4",
+   "title": "Your log and your sensitivity",
+   "skill": "Audit trail",
+   "kind": "open-short",
+   "prompt": "Paste three rows of your assumptions log and your sensitivity statement (the main result as a range, and the input that moves it most).",
+   "points": [
+    "Every input has a value, a unit, a type (sourced, course data, illustrative, choice, derived) and a source or a reason.",
+    "Sourced values name the document, the table or page, and an as-of date.",
+    "Costs from different dollar years are converted to 2025 dollars with a stated index.",
+    "The main result is given as a range from the sensitivity, with the input that moves it most named."
+   ],
+   "solution": "Each input carries its value, unit, type, source and date; costs are in 2025 dollars by a stated index; the sensitivity reports the range and the largest swing."
+  }
+ ],
+ "sources": {
+  "eia-epm-5-6-b": {
+   "text": "EIA, Electric Power Monthly, Table 5.6.B (average price of electricity to ultimate customers, year to date): Kansas, commercial, 11.17 cents/kWh, January to August 2025",
+   "url": "https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_5_6_b",
+   "asOf": "issue of 23 Oct 2026",
+   "short": "EIA Electric Power Monthly, Table 5.6.B"
+  },
+  "eia-dg-2024": {
+   "text": "EIA (report by Z Federal and DNV), Distributed Generation, Battery Storage, and Combined Heat and Power System Characteristics and Costs in the Buildings and Industrial Sectors, March 2024: Appendix A, Figure 3-5, p. 36 (commercial solar 250 kW-DC + storage 150 kW-DC, 300 kWh: $3,170/kW-DC, 2022 $); Figure 3-4, p. 36 (commercial standalone storage, 150 kW-DC, 300 kWh: $2,492/kW-DC, 2022 $); Table 2-5, p. 14 (250 kW-DC solar: 17.8% capacity factor, 2022); Table 3-3, p. 32 (battery: 90% round trip, 15-year useful life, 2022); Figure 3-6, p. 37 (commercial battery upkeep $63/kW-year, 2022 $). Pages are the report's own (Appendix A).",
+   "url": "https://www.eia.gov/analysis/studies/buildings/dg_storage_chp/pdf/dg_storage_chp.pdf",
+   "asOf": "March 2024; read 6 Nov 2026",
+   "short": "EIA distributed-generation cost report (2024)"
+  },
+  "atb2025-cpv": {
+   "text": "NLR, 2025 Electricity Annual Technology Baseline, Commercial PV: fixed upkeep of approximately $17.63/kW-DC a year for 2024; all ATB values in 2023 dollars",
+   "url": "https://atb.nlr.gov/electricity/2025/commercial_pv",
+   "asOf": "read 6 Nov 2026",
+   "short": "NLR ATB 2025, Commercial PV"
+  },
+  "eia-steo-9a": {
+   "text": "EIA, Short-Term Energy Outlook, Table 9a: GDP implicit price deflator (2017 = 100), yearly means 2022 118.035, 2023 122.389, 2025 128.989 (the course's index, assets/learn/data/e0.json)",
+   "url": "https://www.eia.gov/outlooks/steo/",
+   "asOf": "October 2026 issue",
+   "short": "EIA STEO Table 9a"
+  },
+  "eia-ks-profile": {
+   "text": "EIA, Kansas Electricity Profile 2024, Table 1: carbon dioxide 680 lb/MWh (average of the state's power plants; location-based)",
+   "url": "https://www.eia.gov/electricity/state/kansas/",
+   "asOf": "data year 2024",
+   "short": "EIA Kansas Electricity Profile 2024"
+  },
+  "irs-elective-pay": {
+   "text": "IRS, Elective pay and transferability: tax-exempt and governmental entities can benefit from certain clean energy investment and production credits (page last reviewed 27 Jun 2026)",
+   "url": "https://www.irs.gov/credits-deductions/elective-pay-and-transferability",
+   "asOf": "reviewed 27 Jun 2026",
+   "short": "IRS, elective pay"
+  }
+ }
+}

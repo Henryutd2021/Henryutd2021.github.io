@@ -1,0 +1,524 @@
+{
+  "about": "Lesson F9's own inputs: how the Sankey's sectors group, the colours of its nodes, who typically decides what in U.S. energy (each claim with a dated primary source), and the numbers to remember. Prairie City's flows are read from prairie-city.json (flows, balance, supply), never copied here.",
+  "groups": [
+    {
+      "key": "buildings",
+      "label": "Buildings: homes, shops, offices and public buildings",
+      "short": "Buildings",
+      "members": [
+        "homes",
+        "commercial"
+      ]
+    },
+    {
+      "key": "transport",
+      "label": "Transport: cars, buses and trucks",
+      "short": "Transport",
+      "members": [
+        "transport"
+      ]
+    },
+    {
+      "key": "industry",
+      "label": "Industry and farms (the industrial park, the farms)",
+      "short": "Industry",
+      "members": [
+        "food",
+        "fertilizer",
+        "farms"
+      ],
+      "note": "EIA counts agriculture, with manufacturing, mining and construction, as industry.",
+      "src": "eia-industry"
+    },
+    {
+      "key": "datacenter",
+      "label": "Data-center campus, one large load kept apart",
+      "short": "Data-center campus",
+      "members": [
+        "datacenter"
+      ]
+    }
+  ],
+  "power": {
+    "nodes": [
+      "src_grid",
+      "src_solar",
+      "el",
+      "grid_losses"
+    ],
+    "label": "The power sector: electricity made, bought and delivered"
+  },
+  "colors": {
+    "src_gas": "var(--lx-cc)",
+    "gas": "var(--lx-cc)",
+    "src_oil": "var(--lx-pk)",
+    "gasoline": "var(--lx-pk)",
+    "diesel": "var(--lx-geo)",
+    "propane": "var(--lx-tier-4)",
+    "src_grid": "var(--lx-bat)",
+    "el": "var(--lx-bat)",
+    "src_solar": "var(--lx-solar)",
+    "air": "var(--lx-wind)",
+    "sector": "var(--lx-ink-2)",
+    "useful": "var(--lx-good)",
+    "h2": "var(--lx-hyd)",
+    "losses": "var(--lx-ink-3)",
+    "grid_losses": "var(--lx-ink-3)"
+  },
+  "actors": [
+    {
+      "key": "city",
+      "label": "The city",
+      "sub": "council, permits, its own buildings and buses",
+      "color": "var(--lx-tier-1)",
+      "nodes": [
+        "buildings",
+        "transport",
+        "src_solar"
+      ],
+      "levers": "Energy codes for new buildings and the permits that enforce them, rooftop-solar permits, its own buses and buildings."
+    },
+    {
+      "key": "utility",
+      "label": "The utility",
+      "sub": "wires, gas mains, power supply",
+      "color": "var(--lx-tier-2)",
+      "nodes": [
+        "src_grid",
+        "el",
+        "gas",
+        "grid_losses"
+      ],
+      "levers": "Distribution wires and substations, gas mains, and, in Kansas, its own power plants and contracts."
+    },
+    {
+      "key": "regulator",
+      "label": "The state regulator",
+      "sub": "Kansas: the Kansas Corporation Commission",
+      "color": "var(--lx-tier-3)",
+      "nodes": [
+        "el",
+        "gas"
+      ],
+      "levers": "The rates and terms of investor-owned electricity and gas utilities, and a review of their costs."
+    },
+    {
+      "key": "owners",
+      "label": "Owners",
+      "sub": "households, businesses, the plants and the campus",
+      "color": "var(--lx-tier-4)",
+      "nodes": [
+        "buildings",
+        "transport",
+        "industry",
+        "datacenter"
+      ],
+      "levers": "What to install, which car to buy and how to use them: furnaces, heat pumps, vehicles, processes."
+    },
+    {
+      "key": "federal",
+      "label": "Federal rules",
+      "sub": "grid markets, equipment, pipelines, fuel economy",
+      "color": "var(--lx-tier-5)",
+      "nodes": [
+        "src_grid",
+        "src_gas",
+        "gas",
+        "buildings",
+        "gasoline"
+      ],
+      "levers": "Interstate transmission, wholesale power and gas pipelines ([[ferc|FERC]]); efficiency standards for equipment sold (the Department of Energy); pipeline safety and fuel economy (Transportation Department agencies)."
+    }
+  ],
+  "levers": [
+    {
+      "id": "rates",
+      "text": "The price per kWh a home pays its investor-owned electric utility",
+      "bin": "regulator",
+      "why": "Typically the [[public-utility-commission|state commission]] sets or approves [[investor-owned-utility|investor-owned utilities']] rates; in Kansas, the Kansas Corporation Commission.",
+      "src": [
+        "doe-primer",
+        "kcc-role"
+      ]
+    },
+    {
+      "id": "supply",
+      "text": "Which power plants and contracts supply the city's electricity",
+      "bin": "utility",
+      "why": "Where utilities are [[vertically-integrated-utility|vertically integrated]], as in Kansas, the utility builds, owns or buys its supply; the regulator reviews the costs.",
+      "src": [
+        "doe-primer",
+        "kcc-rate-study"
+      ]
+    },
+    {
+      "id": "wires",
+      "text": "The substations and feeders that serve each street",
+      "bin": "utility",
+      "why": "Local electric utilities operate the distribution system and plan for future needs.",
+      "src": [
+        "eia-delivery"
+      ]
+    },
+    {
+      "id": "wholesale",
+      "text": "Rules for interstate transmission and wholesale power sales",
+      "bin": "federal",
+      "why": "[[ferc|FERC]] regulates the transmission and [[wholesale-price|wholesale sale]] of electricity in interstate commerce.",
+      "src": [
+        "ferc-what"
+      ]
+    },
+    {
+      "id": "standards",
+      "text": "The least efficiency a new furnace, water heater or light bulb may have",
+      "bin": "federal",
+      "why": "DOE sets efficiency standards for more than 70 kinds of appliances and equipment.",
+      "src": [
+        "doe-standards"
+      ]
+    },
+    {
+      "id": "pipes",
+      "text": "Safety rules for the gas mains under the streets",
+      "bin": "federal",
+      "why": "PHMSA writes pipeline safety rules; certified state programs inspect most gas distribution pipelines.",
+      "src": [
+        "phmsa-state"
+      ]
+    },
+    {
+      "id": "code",
+      "text": "The energy code new buildings in Prairie City must meet",
+      "bin": "city",
+      "why": "Kansas leaves the [[building-code|energy code]] to each city or county (home rule), and local permit offices enforce it; in many states the state adopts one code.",
+      "src": [
+        "doe-codes101",
+        "energycodes-ks"
+      ]
+    },
+    {
+      "id": "solar",
+      "text": "A permit to put solar panels on a roof",
+      "bin": "city",
+      "why": "Local governments issue the permits for rooftop solar.",
+      "src": [
+        "doe-solarapp"
+      ]
+    },
+    {
+      "id": "heating",
+      "text": "Whether a home swaps its furnace for a heat pump",
+      "bin": "owners",
+      "why": "The owner chooses, within federal efficiency standards and local codes; DOE's guide is written for that choice.",
+      "src": [
+        "doe-energysaver",
+        "doe-standards"
+      ]
+    }
+  ],
+  "roles": {
+    "cols": [
+      {
+        "key": "buildings",
+        "label": "Buildings"
+      },
+      {
+        "key": "transport",
+        "label": "Transport"
+      },
+      {
+        "key": "industry",
+        "label": "Industry"
+      },
+      {
+        "key": "power",
+        "label": "Power supply"
+      }
+    ],
+    "rows": [
+      {
+        "key": "city",
+        "name": "The city",
+        "note": "council and permit office",
+        "cells": {
+          "buildings": {
+            "v": "yes",
+            "t": "energy codes for new buildings, permits"
+          },
+          "transport": {
+            "v": "part",
+            "t": "its buses and streets"
+          },
+          "industry": {
+            "v": "part",
+            "t": "zoning and permits"
+          },
+          "power": {
+            "v": "part",
+            "t": "rooftop-solar permits; little say over the grid's plants"
+          }
+        }
+      },
+      {
+        "key": "utility",
+        "name": "The utility",
+        "note": "investor-owned, in Kansas",
+        "cells": {
+          "buildings": {
+            "v": "part",
+            "t": "connects and bills them"
+          },
+          "transport": {
+            "v": "part",
+            "t": "connects chargers"
+          },
+          "industry": {
+            "v": "part",
+            "t": "connects and serves them"
+          },
+          "power": {
+            "v": "yes",
+            "t": "wires, and its own plants and contracts"
+          }
+        }
+      },
+      {
+        "key": "regulator",
+        "name": "The state regulator",
+        "note": "the Kansas Corporation Commission",
+        "cells": {
+          "buildings": {
+            "v": "part",
+            "t": "approves the rates they pay"
+          },
+          "transport": {
+            "v": "part",
+            "t": "approves the utility rates that chargers pay"
+          },
+          "industry": {
+            "v": "part",
+            "t": "approves the rates they pay"
+          },
+          "power": {
+            "v": "yes",
+            "t": "approves rates, reviews the utility's costs"
+          }
+        }
+      },
+      {
+        "key": "owners",
+        "name": "Owners",
+        "note": "households and firms",
+        "cells": {
+          "buildings": {
+            "v": "yes",
+            "t": "what to install and how to use it"
+          },
+          "transport": {
+            "v": "yes",
+            "t": "which vehicle, how far"
+          },
+          "industry": {
+            "v": "yes",
+            "t": "its process and equipment"
+          },
+          "power": {
+            "v": "part",
+            "t": "solar on their own roofs"
+          }
+        }
+      },
+      {
+        "key": "federal",
+        "name": "Federal rules",
+        "note": "grid markets, equipment, pipelines, fuel economy",
+        "cells": {
+          "buildings": {
+            "v": "part",
+            "t": "efficiency standards for equipment sold"
+          },
+          "transport": {
+            "v": "part",
+            "t": "fuel-economy standards"
+          },
+          "industry": {
+            "v": "part",
+            "t": "equipment standards, pipeline safety"
+          },
+          "power": {
+            "v": "part",
+            "t": "interstate transmission and wholesale markets"
+          }
+        }
+      }
+    ],
+    "note": "Roles for a Kansas city served by an investor-owned utility. Typical U.S. roles, not universal: they differ by state, and a city that owns its utility answers to its own local government."
+  },
+  "muni": {
+    "q": "Some U.S. cities own their electric utility. If Prairie City did, which lever would move to its own local government?",
+    "options": [
+      {
+        "value": "rates",
+        "label": "The electricity rates"
+      },
+      {
+        "value": "standards",
+        "label": "The furnace efficiency standard"
+      },
+      {
+        "value": "wholesale",
+        "label": "Interstate transmission rules"
+      }
+    ],
+    "answer": "rates",
+    "feedback": {
+      "rates": "Public power utilities are generally regulated by their own local government, not the state; Kansas's commission does not regulate most of them.",
+      "standards": "Equipment standards stay federal (DOE) whoever owns the utility; the rates are what move: public power answers to its own local government.",
+      "wholesale": "Interstate transmission stays with FERC whoever owns the utility; the rates are what move: public power answers to its own local government."
+    },
+    "src": [
+      "doe-primer",
+      "kcc-role",
+      "eia-iou-2019"
+    ],
+    "extra": "In 2017, 1,958 publicly owned utilities served about 12,100 customers each on average (EIA)."
+  },
+  "facts": [
+    {
+      "n": "3 of every 4",
+      "what": "U.S. electricity customers served by investor-owned utilities (72% in 2017); 1,958 publicly owned utilities served about 12,100 customers each on average.",
+      "source": "EIA, Today in Energy",
+      "url": "https://www.eia.gov/todayinenergy/detail.php?id=40913",
+      "asof": "15 August 2019; data for 2017"
+    },
+    {
+      "n": "75% · 40%",
+      "what": "Shares of U.S. electricity and of total energy that buildings use.",
+      "source": "DOE Building Technologies Office, Data and Analysis for Buildings Sector Innovation",
+      "url": "https://www.energy.gov/cmei/buildings/data-and-analysis-buildings-sector-innovation",
+      "asof": "page read 6 November 2026"
+    },
+    {
+      "n": "more than 70",
+      "what": "Kinds of appliances and equipment with DOE efficiency standards, about 90% of home energy use.",
+      "source": "DOE, Appliance and Equipment Standards Program",
+      "url": "https://www.energy.gov/cmei/buildings/appliance-and-equipment-standards-program",
+      "asof": "page read 6 November 2026"
+    },
+    {
+      "n": "17 states",
+      "what": "The Southwest Power Pool, the regional grid operator for Kansas, serves members in all or part of 17 states.",
+      "source": "SPP, Fast Facts",
+      "url": "https://www.spp.org/about-us/fast-facts/",
+      "asof": "updated October 2026"
+    }
+  ],
+  "sources": {
+    "doe-primer": {
+      "title": "United States Electricity Industry Primer (DOE/OE-0017)",
+      "publisher": "U.S. Department of Energy, Office of Electricity Delivery and Energy Reliability",
+      "date": "July 2015",
+      "url": "https://www.energy.gov/sites/prod/files/2015/12/f28/united-states-electricity-industry-primer.pdf",
+      "where": "§4.5, p. 27: state commissions regulate what are fair and reasonable rates; §4.6, p. 27: public power is generally regulated by its own local government; §4.8, p. 30: where utilities are vertically integrated, they may construct, own and operate power plants"
+    },
+    "kcc-role": {
+      "title": "The Commission's Role",
+      "publisher": "Kansas Corporation Commission",
+      "date": "undated; read 6 November 2026",
+      "url": "no link",
+      "where": "the Utilities Division establishes and regulates rates for public utilities; the KCC does not regulate most electric cooperatives or municipalities"
+    },
+    "kcc-rate-study": {
+      "title": "Rate Study",
+      "publisher": "Kansas Corporation Commission staff",
+      "date": "undated (about January 2019); read 6 November 2026",
+      "url": "no link",
+      "where": "p. 2: each electric utility builds an integrated system to generate, transmit and distribute electricity in its service territory"
+    },
+    "eia-iou-2019": {
+      "title": "Investor-owned utilities served 72% of U.S. electricity customers in 2017",
+      "publisher": "U.S. Energy Information Administration, Today in Energy",
+      "date": "15 August 2019; data for 2017",
+      "url": "https://www.eia.gov/todayinenergy/detail.php?id=40913",
+      "where": "three out of every four utility customers; 1,958 publicly owned utilities averaging 12,100 customers; 812 co-ops averaging 24,500"
+    },
+    "eia-delivery": {
+      "title": "How electricity is delivered to consumers",
+      "publisher": "U.S. Energy Information Administration, Electricity explained",
+      "date": "undated; read 6 November 2026",
+      "url": "https://www.eia.gov/energyexplained/electricity/delivery-to-consumers.php",
+      "where": "local electric utilities operate the distribution system that connects homes and businesses to the grid; utilities plan for future power needs"
+    },
+    "ferc-what": {
+      "title": "What FERC Does",
+      "publisher": "Federal Energy Regulatory Commission",
+      "date": "updated 18 June 2025",
+      "url": "https://www.ferc.gov/what-ferc-does",
+      "where": "regulates the transmission and wholesale sale of electricity in interstate commerce, and interstate natural gas pipelines; does not regulate retail sales to consumers"
+    },
+    "doe-standards": {
+      "title": "Appliance and Equipment Standards Program",
+      "publisher": "U.S. Department of Energy",
+      "date": "undated; read 6 November 2026",
+      "url": "https://www.energy.gov/cmei/buildings/appliance-and-equipment-standards-program",
+      "where": "more than 70 products, about 90% of home energy use"
+    },
+    "phmsa-state": {
+      "title": "State Effort",
+      "publisher": "U.S. Department of Transportation, Pipeline and Hazardous Materials Safety Administration",
+      "date": "updated 15 May 2026",
+      "url": "https://www.phmsa.dot.gov/pipeline/effort-allocation/state-effort",
+      "where": "PHMSA develops pipeline safety regulations; certified state agencies inspect intrastate pipelines, including most gas distribution systems"
+    },
+    "doe-codes101": {
+      "title": "Energy Codes 101: What Are They and What is DOE's Role?",
+      "publisher": "U.S. Department of Energy",
+      "date": "31 May 2016",
+      "url": "https://www.energy.gov/cmei/buildings/articles/energy-codes-101-what-are-they-and-what-does-role",
+      "where": "no national energy code; states or local governments adopt codes; enforcement is almost always by local permit offices"
+    },
+    "energycodes-ks": {
+      "title": "Kansas: current energy code status",
+      "publisher": "U.S. Department of Energy, Building Energy Codes Program",
+      "date": "undated; read 6 November 2026",
+      "url": "no link",
+      "where": "residential and commercial: home rule, enforced by local jurisdictions"
+    },
+    "doe-solarapp": {
+      "title": "160 Communities Now Automating Solar Permitting with SolarAPP+",
+      "publisher": "U.S. Department of Energy",
+      "date": "20 December 2023",
+      "url": "https://www.energy.gov/cmei/systems/articles/160-communities-now-automating-solar-permitting-solarapp",
+      "where": "jurisdictions issue permits for residential rooftop solar"
+    },
+    "doe-energysaver": {
+      "title": "Energy Saver: Tips on Saving Money and Energy in Your Home",
+      "publisher": "U.S. Department of Energy",
+      "date": "2022",
+      "url": "https://www.energy.gov/sites/default/files/2022-08/energy-saver-guide-2022.pdf",
+      "where": "heating and cooling choices for homeowners, heat pumps on p. 16"
+    },
+    "dot-cafe": {
+      "title": "Corporate Average Fuel Economy (CAFE) Standards",
+      "publisher": "U.S. Department of Transportation",
+      "date": "updated 11 August 2014",
+      "url": "no link",
+      "where": "NHTSA sets and enforces the CAFE standards"
+    },
+    "spp-about": {
+      "title": "About Us",
+      "publisher": "Southwest Power Pool",
+      "date": "undated; read 6 November 2026",
+      "url": "https://www.spp.org/about-us/",
+      "where": "a regional transmission organization mandated by FERC to ensure reliable supplies of power, adequate transmission and competitive wholesale prices"
+    },
+    "eia-industry": {
+      "title": "Use of energy explained: Energy use in industry",
+      "publisher": "U.S. Energy Information Administration",
+      "date": "undated; read 6 November 2026",
+      "url": "https://www.eia.gov/energyexplained/use-of-energy/industry.php",
+      "where": "industry's activities include manufacturing, agriculture (farming, fishing and forestry), mining and construction"
+    }
+  }
+}

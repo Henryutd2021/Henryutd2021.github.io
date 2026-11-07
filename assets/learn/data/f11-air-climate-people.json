@@ -1,0 +1,129 @@
+{
+  "about": "Lesson F11 (f11-air-climate-people), 2026-11-06, builder learn-w5-b. One tonne of coal, natural gas or oil burned: its heat and CO2 from the 2006 IPCC Guidelines' defaults; methane leaked before gas is burned, at a leak share the reader sets, as CO2e with the AR6 100-year GWP of fossil methane; air pollutants from EPA's AP-42 emission factors for large boilers, before and after the controls AP-42 describes; a spreading toy (illustrative) for where the particles go; EPA's 2025 benefit-per-ton values (estimates, 2019 dollars) for the health harm; then energy burden for Prairie City's household groups, read from prairie-city.json. The coal's sulfur and ash, the oil's sulfur, the controls chosen, the toy's spreading rule and the income slider are set for teaching and labelled so on the page.",
+  "built": "2026-11-06",
+  "fuels": [
+    { "key": "coal", "name": "Coal", "long": "Bituminous coal", "ipcc": "Other Bituminous Coal", "ncvGJperT": 25.8, "co2KgPerTJ": 94600, "color": "var(--lx-steel)" },
+    { "key": "gas", "name": "Natural gas", "long": "Natural gas", "ipcc": "Natural Gas", "ncvGJperT": 48.0, "co2KgPerTJ": 56100, "color": "var(--lx-cc)" },
+    { "key": "oil", "name": "Oil", "long": "Diesel or heating oil", "ipcc": "Gas/Diesel Oil", "ncvGJperT": 43.0, "co2KgPerTJ": 74100, "color": "var(--lx-pk)" }
+  ],
+  "fuelsAlso": [
+    { "key": "subbit", "name": "Sub-bituminous coal", "ipcc": "Sub-Bituminous Coal", "ncvGJperT": 18.9, "co2KgPerTJ": 96100, "note": "the coal most Plains plants burn; used in the Go deeper box only" }
+  ],
+  "ipcc2006": {
+    "title": "2006 IPCC Guidelines for National Greenhouse Gas Inventories, Volume 2 (Energy), Chapter 1 (Introduction)",
+    "publisher": "Intergovernmental Panel on Climate Change (IPCC)",
+    "date": "2006; read 6 Nov 2026",
+    "url": "https://www.ipcc.ch/report/2006-ipcc-guidelines-for-national-greenhouse-gas-inventories/",
+    "where": "Table 1.2, p. 1.18 (default net calorific values, TJ/Gg = GJ per tonne): other bituminous coal 25.8, natural gas 48.0, gas/diesel oil 43.0, sub-bituminous coal 18.9; Table 1.4, pp. 1.23-1.24 (default CO2 emission factors, kg/TJ): 94,600, 56,100, 74,100 and 96,100; section 1.4.1.2, p. 1.16: net calorific values are about 5% below gross for coal and oil and about 10% below for most natural gas",
+    "netNote": "Net calorific values leave out the heat in the water vapour the fuel forms; the IPCC uses them."
+  },
+  "carbon": { "co2PerC": 3.6667, "note": "Each tonne of carbon burned makes 44/12 = 3.67 t of CO2 (molar masses 44 and 12 g/mol)." },
+  "methane": {
+    "gwp100": 29.8,
+    "gwpSource": {
+      "title": "IPCC Global Warming Potential Values, version 2.0 (adapted from the IPCC Sixth Assessment Report)",
+      "publisher": "Greenhouse Gas Protocol",
+      "date": "7 Aug 2024; read 6 Nov 2026",
+      "url": "https://ghgprotocol.org/sites/default/files/2024-08/Global-Warming-Potential-Values%20%28August%202024%29.pdf",
+      "where": "p. 2: 100-year GWP of fossil methane 29.8 (AR6), non-fossil 27.0; p. 1: the fossil value is for fugitive emissions from oil and gas systems and coal mining"
+    },
+    "leak": { "min": 0, "max": 4, "step": 0.1, "start": 2.3, "unit": "% of the gas produced" },
+    "studies": [
+      { "key": "alvarez", "pct": 2.3, "label": "Alvarez et al. (2018), Science", "doi": "https://doi.org/10.1126/science.aar7204",
+        "what": "U.S. oil and gas supply chain, 2015: 13 ± 2 teragrams of methane a year, equivalent to 2.3% of gross U.S. gas production, about 60% above the EPA inventory's estimate (abstract)" },
+      { "key": "sherwin", "lo": 0.75, "hi": 9.63, "label": "Sherwin et al. (2024), Nature", "doi": "https://doi.org/10.1038/s41586-024-07117-5",
+        "what": "six U.S. oil and gas regions measured from aircraft: total emissions from 0.75% to 9.63% of natural gas production, by region (abstract)" }
+    ],
+    "pureNote": "The leaked gas is counted as pure methane; pipeline gas is mostly methane (AP-42 section 1.4: generally above 85 percent)."
+  },
+  "pollutants": {
+    "source": {
+      "title": "AP-42, Compilation of Air Pollutant Emission Factors, Volume I: Section 1.1 Bituminous and Subbituminous Coal Combustion (9/98); Section 1.3 Fuel Oil Combustion (5/10); Section 1.4 Natural Gas Combustion (revised 10/26); Appendix A (9/85, reformatted 1/95)",
+      "publisher": "U.S. Environmental Protection Agency",
+      "date": "read 6 Nov 2026",
+      "urls": {
+        "coal": "https://www.epa.gov/sites/default/files/2020-09/documents/1.1_bituminous_and_subbituminous_coal_combustion.pdf",
+        "oil": "https://www.epa.gov/sites/default/files/2020-09/documents/1.3_fuel_oil_combustion.pdf",
+        "gas": "https://www.epa.gov/sites/default/files/2020-09/documents/1.4_natural_gas_combustion.pdf",
+        "appA": "https://www.epa.gov/sites/production/files/2020-11/documents/appa.pdf"
+      },
+      "caveat": "AP-42 factors are averages of tests: about half of real sources emit more and half less (Section 1.4's disclaimer)."
+    },
+    "coal": {
+      "sulfurPct": 2, "ashPct": 10, "set": "illustrative coal, within AP-42 Appendix A's ranges for bituminous coal (sulfur 0.6-5.4%, ash 4-20%)",
+      "boiler": "pulverized coal, dry bottom, wall-fired, bituminous (AP-42 Table 1.1-3)",
+      "so2LbPerTonPerS": 38, "noxLbPerTon": 22, "noxLbPerTonLNB": 11,
+      "pm25LbPerTonPerA": 0.6, "pm25LbPerTonPerAESP": 0.024,
+      "cpmNoFGD": { "perS": 0.1, "minus": 0.03 }, "cpmFGD": 0.02, "mmbtuPerTon": 26.0,
+      "scrubberPct": 90, "scrubberRange": "80-95+%",
+      "where": "Table 1.1-3, p. 1.1-16 (SOx 38S lb/ton, NOx 22 lb/ton, 11 with low-NOx burners); Table 1.1-6, p. 1.1-26 (PM2.5 0.6A lb/ton uncontrolled, 0.024A with an ESP); Table 1.1-5, p. 1.1-24 (condensable PM 0.1S - 0.03 lb/MMBtu without FGD, 0.02 with FGD; 26 MMBtu/ton); Table 1.1-1, p. 1.1-13 (wet lime or limestone scrubbers, 80-95+%); lb/ton x 0.5 = kg per metric tonne (footnote a)"
+    },
+    "gas": {
+      "boiler": "large wall-fired boiler, over 100 MMBtu/hr (AP-42 Table 1.4-1)",
+      "densityLbPerMMscf": 42000, "noxLb": 190, "noxLbLNB": 140, "so2Lb": 0.6, "pmLb": 7.6,
+      "where": "Table 1.4-1, p. 1.4-6 (NOx 190 lb per million scf uncontrolled post-NSPS, 140 with low-NOx burners); Table 1.4-2, p. 1.4-7 (PM total 7.6, all below 1 micrometre; SO2 0.6 at 2,000 grains of sulfur per million scf; fuel density 4.2 x 10^4 lb per million scf, footnote b)"
+    },
+    "oil": {
+      "sulfurPct": 0.2, "set": "illustrative distillate oil, within AP-42 Appendix A's range (0.2-1.0%)",
+      "boiler": "No. 2 oil in a boiler over 100 MMBtu/hr (AP-42 Table 1.3-1)",
+      "so2LbPerKgalPerS": 142, "noxLbPerKgal": 24, "noxLbPerKgalLNB": 10, "pm25FiltLbPerKgal": 0.25, "cpmLbPerKgal": 1.3, "densityKgPerM3": 845,
+      "where": "Table 1.3-1, pp. 1.3-11 and 1.3-12 (SO2 142S lb per 1,000 gal; NOx 24, 10 with low-NOx burners and flue gas recirculation); Table 1.3-6, p. 1.3-17 (filterable PM2.5 0.25 lb per 1,000 gal, industrial boilers); Table 1.3-2, p. 1.3-13 (condensable PM 1.3, all below 1 micrometre); Appendix A, p. A-7 (distillate oil 845 kg/m3)"
+    },
+    "controls": {
+      "coal": "a wet limestone scrubber (it catches 90% of the SO₂), low-NOx burners (a cooler flame forms less NOx) and an electrostatic precipitator (charged plates catch the particles)",
+      "gas": "low-NOx burners (a cooler flame forms less NOx)",
+      "oil": "low-NOx burners with flue gas recirculation (some exhaust is fed back to cool the flame); no scrubber"
+    }
+  },
+  "units": { "kgPerLb": 0.45359237, "litresPerGal": 3.785411784, "kgPerShortTon": 907.18474, "gjPerMWh": 3.6 },
+  "spread": {
+    "set": "illustrative toy, not a dispersion model: a year of winds from every direction spreads the particles in a widening ring; their concentration falls as 1/r while rain and the ground remove them over an illustrative reach L; people live evenly around the plant",
+    "r0km": 10, "reachKm": 300,
+    "stops": [10, 30, 100, 300, 1000],
+    "note": "The toy starts 10 km out: closer to a tall stack the plume may not yet have reached the ground."
+  },
+  "bpt": {
+    "title": "Technical Support Document: Estimating the Benefit per Ton of Reducing Directly-Emitted PM2.5, PM2.5 Precursors and Ozone Precursors from 21 Sectors",
+    "publisher": "U.S. Environmental Protection Agency, Office of Air Quality Planning and Standards",
+    "date": "June 2024; read 6 Nov 2026",
+    "url": "https://www.epa.gov/system/files/documents/2024-06/source-apportionment-tsd-2024.pdf",
+    "where": "Table 8, p. 22: 2025 values in 2019 dollars at a 2% discount rate, per short ton, PM2.5-related benefits (mortality and morbidity); electricity generating units: directly emitted PM2.5 $113,000, SO2 $57,000, NOx $7,710; residential wood stoves: directly emitted PM2.5 $479,000; p. 6: source-apportionment air quality modelling across the continental U.S., then health effects with BenMAP-CE",
+    "dollarYear": 2019, "year": 2025, "discount": 2,
+    "egu": { "pm25": 113000, "so2": 57000, "nox": 7710 },
+    "woodstovePm25": 479000,
+    "ozoneNote": "PM2.5-related harm only; EPA lists ozone-related harm from summer NOx separately."
+  },
+  "who": {
+    "title": "Ambient (outdoor) air pollution, fact sheet",
+    "publisher": "World Health Organization",
+    "date": "24 Oct 2024; read 6 Nov 2026",
+    "deathsM": 4.2, "deathsYear": 2019, "lmicPct": 89, "popPct": 99,
+    "where": "4.2 million premature deaths worldwide in 2019 from ambient air pollution, 89% of them in low- and middle-income countries; 99% of the world's people lived where WHO's air quality guideline levels were not met (2019)"
+  },
+  "burden": {
+    "income": { "min": 5000, "max": 200000, "step": 1000, "start": 33000 },
+    "high": 0.06, "severe": 0.10,
+    "aceee": {
+      "title": "How High Are Household Energy Burdens?",
+      "publisher": "American Council for an Energy-Efficient Economy (ACEEE)",
+      "date": "Sep 2020 (copy on energy.gov); read 6 Nov 2026",
+      "url": "https://www.energy.gov/sites/default/files/2023-05/Attachment%20J%20-%20ACEEE%2C%20How%20High%20are%20Household%20Energy%20Burdens.pdf",
+      "where": "a burden above 6% is called high and above 10% severe; with 2017 American Housing Survey data, 25% of U.S. households had a high burden and 13% a severe one"
+    },
+    "lead": {
+      "title": "Low-Income Energy Affordability Data (LEAD) Tool",
+      "publisher": "U.S. Department of Energy",
+      "date": "ACS 2018-2022 data; read 6 Nov 2026",
+      "url": "https://www.energy.gov/cmei/scep/low-income-energy-affordability-data-lead-tool",
+      "where": "energy burden = home energy spending / income; 6% or more is called high; about 6% on average for low-income households (0-80% of area median income) and about 2% for others"
+    }
+  },
+  "facts": [
+    { "n": "2.44 · 2.69 · 3.19 t", "what": "CO₂ from burning one tonne of bituminous coal, natural gas and diesel or heating oil (IPCC default values).", "src": "ipcc2006" },
+    { "n": "29.8", "what": "Tonnes of CO₂ that warm the climate as much over 100 years as one tonne of fossil methane (IPCC AR6, as compiled by the GHG Protocol).", "src": "gwp" },
+    { "n": "2.3%", "what": "Methane from the U.S. oil and gas supply chain in 2015, as a share of gross gas production: about 60% above the EPA inventory's estimate (study abstract).", "src": "alvarez" },
+    { "n": "$57,000", "what": "EPA's 2025 estimate of the health harm avoided per short ton of SO₂ not emitted by U.S. power plants (2019 dollars): an estimate, not a price.", "src": "bpt" },
+    { "n": "4.2 million", "what": "Premature deaths worldwide in 2019 from outdoor air pollution, 89% of them in low- and middle-income countries.", "src": "who" },
+    { "n": "6% · 10%", "what": "Energy burdens that ACEEE calls high and severe; DOE's LEAD tool calls 6% or more high. Conventions, not physical limits.", "src": "aceee" }
+  ]
+}

@@ -41,6 +41,12 @@
   "lesson": "K3",
   "href": "k03-discounting.html"
  },
+ "anticipation-effect": {
+  "term": "Anticipation",
+  "short": "When people change their behaviour before a programme starts because they know it is coming.",
+  "lesson": "M14",
+  "href": "m14-did-it-work.html"
+ },
  "api-key": {
   "term": "API key",
   "short": "A private code that identifies you to an online data service; treat it like a password and keep it out of shared files.",
@@ -52,6 +58,12 @@
   "short": "The combined size of real and reactive power, the square root of MW² plus Mvar², in megavolt-amperes (MVA); a wire's heating follows it, not MW alone.",
   "lesson": "A17",
   "href": "a17-physical-feasibility.html"
+ },
+ "area-median-income": {
+  "term": "Area median income (AMI)",
+  "short": "The middle family income of an area, used to sort households into income bands such as 0-30% or 50-80% of it.",
+  "lesson": "A13",
+  "href": "a13-fairness-jobs.html"
  },
  "array": {
   "term": "Array",
@@ -70,6 +82,12 @@
   "short": "The share of a grid's CO₂ assigned to one user, for example each MWh it uses times that hour's average emission factor.",
   "lesson": "CF6",
   "href": "cf6-shifting-load-to-clean-hours.html"
+ },
+ "attributional-analysis": {
+  "term": "Attributional analysis",
+  "short": "An analysis that gives a product its share of today's burdens from average data, so the shares of all products add up.",
+  "lesson": "A11",
+  "href": "a11-lca-nexus.html"
  },
  "agc": {
   "term": "Automatic generation control (AGC)",
@@ -143,6 +161,12 @@
   "lesson": "R5",
   "href": "r05-build-validate.html"
  },
+ "benefit-per-ton": {
+  "term": "Benefit per ton",
+  "short": "An estimate of the health harm, in dollars, avoided by not emitting one more ton of a pollutant from a given kind of source, averaged over where those sources are.",
+  "lesson": "F11",
+  "href": "f11-air-climate-people.html"
+ },
  "forecast-bias": {
   "term": "Bias",
   "short": "The average signed miss of a forecast, showing whether it tends to run too high or too low.",
@@ -209,6 +233,12 @@
   "lesson": "F1",
   "href": "f01-five-scales.html"
  },
+ "building-envelope": {
+  "term": "Building envelope",
+  "short": "A building's outer shell, its walls, roof, windows and floor, whose insulation and air sealing set how fast heat leaks out.",
+  "lesson": "A15",
+  "href": "a15-efficiency-electrification.html"
+ },
  "bus": {
   "term": "Bus",
   "short": "A point of the network where plants, loads and lines meet, such as a substation; a network model has one balance rule per bus.",
@@ -262,6 +292,12 @@
   "short": "An auction, run ahead of time, that pays plants and other resources for being available, in an amount a planner sets, on top of energy prices.",
   "lesson": "A3",
   "href": "a03-market-design.html"
+ },
+ "capacity-utilization": {
+  "term": "Capacity utilization",
+  "short": "The energy a machine used or made over a year divided by its size times 8,760 hours, its average loading, so half power all year gives 50%, as full power for half the year does.",
+  "lesson": "M11",
+  "href": "m11-tea-in-models.html"
  },
  "capital-cost": {
   "term": "Capital cost",
@@ -389,6 +425,12 @@
   "lesson": "F3",
   "href": "f03-energy-services.html"
  },
+ "coincident-peak": {
+  "term": "Coincident peak",
+  "short": "The most a group of customers draws in the same hour; it is lower than the sum of their own peaks when they peak at different times.",
+  "lesson": "A15",
+  "href": "a15-efficiency-electrification.html"
+ },
  "combined-cycle": {
   "term": "Combined-cycle plant",
   "short": "A gas power plant that burns gas in a turbine and uses the hot exhaust to make steam for a second turbine, so it gets more electricity from the same fuel.",
@@ -425,6 +467,12 @@
   "lesson": "F4",
   "href": "f04-power-plants.html"
  },
+ "condensing-furnace": {
+  "term": "Condensing furnace",
+  "short": "A gas furnace that also recovers the heat in its exhaust's water vapour, so 90% or more of the gas's energy becomes heat, against about 80% for a non-condensing one.",
+  "lesson": "A18",
+  "href": "a18-city-plan.html"
+ },
  "conditional-price": {
   "term": "Conditional price",
   "short": "A price read from a linear program in which the on/off decisions are held fixed; it holds only for that commitment.",
@@ -436,6 +484,12 @@
   "short": "A financial or other tie that could bias, or seem to bias, a researcher's work, and so must be declared.",
   "lesson": "R9",
   "href": "r09-integrity-stakeholders.html"
+ },
+ "confounding": {
+  "term": "Confounding",
+  "short": "When something other than the programme, such as a second change at the same time, also differs between the groups and moves the outcome.",
+  "lesson": "M14",
+  "href": "m14-did-it-work.html"
  },
  "congestion": {
   "term": "Congestion",
@@ -466,6 +520,12 @@
   "short": "A rod of neutron-absorbing material that is pushed into a reactor core to slow the chain reaction, or pulled out to speed it up.",
   "lesson": "F5",
   "href": "f05-nuclear-basics.html"
+ },
+ "control-variable": {
+  "term": "Control variable",
+  "short": "A measured trait, such as home size, put into a regression so that groups are compared at equal values of it; it cannot fix a difference nobody measured.",
+  "lesson": "M14",
+  "href": "m14-did-it-work.html"
  },
  "coolant": {
   "term": "Coolant",
@@ -503,11 +563,29 @@
   "lesson": "M5",
   "href": "m05-microgrid-size-and-run.html"
  },
+ "cost-of-saved-energy": {
+  "term": "Cost of saved energy",
+  "short": "What a measure costs per unit of energy it saves: its extra cost spread over its life at a discount rate, plus any extra yearly cost, divided by the energy it saves each year.",
+  "lesson": "A15",
+  "href": "a15-efficiency-electrification.html"
+ },
  "cost-of-service": {
   "term": "Cost of service",
   "short": "What it costs a utility to serve a customer or a class of customers: energy, plants, wires, meters and billing.",
   "lesson": "A4",
   "href": "a04-retail-tariffs.html"
+ },
+ "abatement-cost": {
+  "term": "Cost per tonne avoided",
+  "short": "A measure's net yearly cost, its capital spread over its life plus upkeep minus the energy it saves, divided by the tonnes of CO2 it avoids a year.",
+  "lesson": "A18",
+  "href": "a18-city-plan.html"
+ },
+ "cost-surface": {
+  "term": "Cost surface",
+  "short": "A map that gives the cost of building a line or a road through each cell, for example in dollars per km.",
+  "lesson": "A19",
+  "href": "a19-gis-siting.html"
  },
  "counterfactual": {
   "term": "Counterfactual",
@@ -713,6 +791,12 @@
   "lesson": "F5",
   "href": "f05-nuclear-basics.html"
  },
+ "design-day": {
+  "term": "Design day",
+  "short": "A cold (or hot) day chosen for planning, so that equipment and networks are sized for its highest hour rather than for an average day.",
+  "lesson": "A15",
+  "href": "a15-efficiency-electrification.html"
+ },
  "deterministic-equivalent": {
   "term": "Deterministic equivalent",
   "short": "A chance constraint rewritten as an ordinary rule with a safety margin, for example planning for the demand level that is exceeded with only the allowed probability.",
@@ -791,6 +875,12 @@
   "lesson": 2,
   "href": "02-demand.html"
  },
+ "dummy-variable": {
+  "term": "Dummy variable",
+  "short": "A 0/1 flag in a regression, such as 1 for a home on the tariff and 0 for one that is not; its coefficient is the fitted difference between the two groups.",
+  "lesson": "M14",
+  "href": "m14-did-it-work.html"
+ },
  "duration-curve": {
   "term": "Duration curve",
   "short": "A year of hourly values sorted from highest to lowest, showing for how many hours each level is reached.",
@@ -815,11 +905,23 @@
   "lesson": "CF3",
   "href": "cf3-hydrogen-under-uncertainty.html"
  },
+ "elective-pay": {
+  "term": "Elective pay",
+  "short": "A rule of United States tax law that lets tax-exempt and governmental bodies, such as school districts, receive the value of certain clean-energy tax credits as a payment from the IRS.",
+  "lesson": "CK-A",
+  "href": "ck-a-spreadsheet.html"
+ },
  "electric-current": {
   "term": "Electric current",
   "short": "The flow of electric charge through a wire, measured in amperes (A); for the same power, a higher voltage needs less current.",
   "lesson": "F6",
   "href": "f06-grid-and-outages.html"
+ },
+ "electric-vehicle": {
+  "term": "Electric vehicle (EV)",
+  "short": "A car, bus or truck driven by an electric motor from a battery charged from the grid, instead of by burning gasoline or diesel.",
+  "lesson": "SB3",
+  "href": "sb3-city-planner.html"
  },
  "electrification": {
   "term": "Electrification",
@@ -833,6 +935,12 @@
   "lesson": "CF2",
   "href": "cf2-cost-per-kg-vs-system-cost.html"
  },
+ "emission-factor": {
+  "term": "Emission factor",
+  "short": "The average mass of a pollutant released per unit of fuel burned or of output, such as kilograms of SO₂ per tonne of coal, taken from measurements.",
+  "lesson": "F11",
+  "href": "f11-air-climate-people.html"
+ },
  "emissions-cap": {
   "term": "Emissions cap",
   "short": "A limit on the total CO2 that may be emitted in a period, such as a year.",
@@ -844,6 +952,12 @@
   "short": "An account that divides emissions that already happened among their sources or users, so that the shares add up to the total.",
   "lesson": "A10",
   "href": "a10-emissions-questions.html"
+ },
+ "employment-multiplier": {
+  "term": "Employment multiplier",
+  "short": "The total jobs, on site plus at suppliers and from workers' spending, that go with each on-site job, taken from a regional input-output table.",
+  "lesson": "A13",
+  "href": "a13-fairness-jobs.html"
  },
  "energization": {
   "term": "Energization",
@@ -857,6 +971,12 @@
   "lesson": 0,
   "href": "00-grid-operator.html"
  },
+ "energy-attribute-certificate": {
+  "term": "Energy attribute certificate (EAC)",
+  "short": "A tradable record that one megawatt-hour was generated by a given plant at a given place and time, which a buyer retires to claim that power; a rule decides which certificates may count.",
+  "lesson": "M11",
+  "href": "m11-tea-in-models.html"
+ },
  "energy-burden": {
   "term": "Energy burden",
   "short": "The share of a household's income spent on energy bills.",
@@ -868,6 +988,12 @@
   "short": "A form in which energy is moved to where it is used, such as electricity, natural gas, gasoline or hydrogen.",
   "lesson": "F3",
   "href": "f03-energy-services.html"
+ },
+ "energy-hub": {
+  "term": "Energy hub",
+  "short": "A model of a place where energy carriers come in, are converted and stored, and meet the uses: a district, a campus or a city, not a building.",
+  "lesson": "SB3",
+  "href": "sb3-city-planner.html"
  },
  "energy-security": {
   "term": "Energy security",
@@ -929,11 +1055,23 @@
   "lesson": "R9",
   "href": "r09-integrity-stakeholders.html"
  },
+ "event-study": {
+  "term": "Event study",
+  "short": "A difference-in-differences estimated period by period around the start date, so the periods before the start can be checked for parallel trends.",
+  "lesson": "M14",
+  "href": "m14-did-it-work.html"
+ },
  "evidence-ladder": {
   "term": "Evidence ladder",
   "short": "The stages a project climbs: announced, funded, permitted, under construction, operating and at design output.",
   "lesson": "N1",
   "href": "n01-news-lens.html"
+ },
+ "exclusion-layer": {
+  "term": "Exclusion layer",
+  "short": "A map layer that removes land from a siting screen outright, whatever else the land offers, because a rule or a hard limit forbids building there.",
+  "lesson": "A19",
+  "href": "a19-gis-siting.html"
  },
  "exogenous": {
   "term": "Exogenous",
@@ -1019,6 +1157,12 @@
   "lesson": "A16",
   "href": "a16-hydrogen-ptx.html"
  },
+ "ferc": {
+  "term": "FERC (Federal Energy Regulatory Commission)",
+  "short": "The federal regulator of interstate electricity transmission, wholesale power sales and interstate gas pipelines in the United States.",
+  "lesson": "F9",
+  "href": "f09-city-energy.html"
+ },
  "fermi-estimate": {
   "term": "Fermi estimate",
   "short": "A quick estimate built from round numbers and a few simple steps, aiming to get the order of magnitude right.",
@@ -1030,6 +1174,12 @@
   "short": "The energy a home, business or vehicle buys and uses, as on its meters and receipts, such as kWh of electricity or gallons of gasoline.",
   "lesson": "F3",
   "href": "f03-energy-services.html"
+ },
+ "fine-particles": {
+  "term": "Fine particles (PM2.5)",
+  "short": "Airborne particles no wider than 2.5 micrometres, small enough to reach deep into the lungs; burning releases them and also forms them in the air from SO₂ and NOx.",
+  "lesson": "F11",
+  "href": "f11-air-climate-people.html"
  },
  "firm-capacity": {
   "term": "Firm capacity",
@@ -1078,6 +1228,12 @@
   "short": "The ability of a plant, a store or a group of users to raise or lower power quickly when the grid asks.",
   "lesson": 6,
   "href": "06-three-jobs.html"
+ },
+ "flood-zone": {
+  "term": "Flood zone",
+  "short": "Land mapped as likely to flood; in the U.S., FEMA's Special Flood Hazard Area is land with at least a 1% chance of flooding in any year.",
+  "lesson": "A19",
+  "href": "a19-gis-siting.html"
  },
  "flow": {
   "term": "Flow",
@@ -1133,6 +1289,12 @@
   "lesson": "A16",
   "href": "a16-hydrogen-ptx.html"
  },
+ "functional-unit": {
+  "term": "Functional unit",
+  "short": "The amount of service a footprint is counted per, such as one kWh made or one MWh used, so that options are compared on the same service.",
+  "lesson": "A11",
+  "href": "a11-lca-nexus.html"
+ },
  "fuse": {
   "term": "Fuse",
   "short": "A wire that melts on a fault and cuts the power beyond it; a crew must replace it.",
@@ -1157,6 +1319,12 @@
   "lesson": "M9",
   "href": "m09-surrogates-uq.html"
  },
+ "gdp-deflator": {
+  "term": "GDP deflator",
+  "short": "A price index for everything an economy produces; multiplying by the ratio of two years' values turns one year's dollars into another's, such as 2022 dollars into 2025 dollars.",
+  "lesson": "A18",
+  "href": "a18-city-plan.html"
+ },
  "generator": {
   "term": "Generator",
   "short": "A machine that turns the spin of a shaft into electricity, by turning magnets past coils of wire.",
@@ -1175,6 +1343,12 @@
   "lesson": "N1",
   "href": "n01-news-lens.html"
  },
+ "gigawatt-hour": {
+  "term": "Gigawatt-hour (GWh)",
+  "short": "A unit of energy equal to a million kilowatt-hours, used for the yearly energy of a city, a large plant or a large customer.",
+  "lesson": "F9",
+  "href": "f09-city-energy.html"
+ },
  "gis": {
   "term": "GIS (geographic information system)",
   "short": "Software and methods for mapping and analysing data tied to places, such as land use, lines and population.",
@@ -1187,11 +1361,23 @@
   "lesson": "M7",
   "href": "m07-monte-carlo.html"
  },
+ "global-warming-potential": {
+  "term": "Global warming potential (GWP)",
+  "short": "How much a tonne of a gas warms the climate over a chosen horizon, such as 100 years, compared with a tonne of CO₂.",
+  "lesson": "F11",
+  "href": "f11-air-climate-people.html"
+ },
  "governor": {
   "term": "Governor",
   "short": "A plant's speed control that opens or closes its steam, gas or water valves as the grid frequency changes.",
   "lesson": 3,
   "href": "03-balancing.html"
+ },
+ "gpc": {
+  "term": "GPC",
+  "short": "The Global Protocol for Community-Scale Greenhouse Gas Emission Inventories (WRI, C40 Cities and ICLEI, 2014), the common standard for counting a city's emissions by sector and scope.",
+  "lesson": "A18",
+  "href": "a18-city-plan.html"
  },
  "frequency": {
   "term": "Grid frequency",
@@ -1210,6 +1396,12 @@
   "short": "Said of an inverter or a generator that sets voltage and frequency itself, so it can start and hold an island with no grid behind it.",
   "lesson": "F7",
   "href": "f07-microgrids.html"
+ },
+ "gross-jobs": {
+  "term": "Gross jobs",
+  "short": "The jobs a project creates, counted on their own, without subtracting jobs lost or work that would have happened anyway.",
+  "lesson": "A13",
+  "href": "a13-fairness-jobs.html"
  },
  "git-head": {
   "term": "HEAD (Git)",
@@ -1252,6 +1444,12 @@
   "short": "The boiler of a combined-cycle plant, heated by the gas turbine's hot exhaust instead of a flame.",
   "lesson": "F4",
   "href": "f04-power-plants.html"
+ },
+ "heat-pump-water-heater": {
+  "term": "Heat-pump water heater",
+  "short": "A water heater that moves heat from the surrounding air into the tank, using a fraction of the electricity an electric-resistance heater needs.",
+  "lesson": "A15",
+  "href": "a15-efficiency-electrification.html"
  },
  "held-out-data": {
   "term": "Held-out data",
@@ -1306,6 +1504,18 @@
   "short": "A rule that each hour's electricity use is covered by clean generation in that same hour, rather than over a whole year.",
   "lesson": "A16",
   "href": "a16-hydrogen-ptx.html"
+ },
+ "income-based-charge": {
+  "term": "Income-based charge",
+  "short": "A utility charge that varies with household income, such as a fixed charge set in a few income tiers.",
+  "lesson": "A13",
+  "href": "a13-fairness-jobs.html"
+ },
+ "incremental-analysis": {
+  "term": "Incremental analysis",
+  "short": "Judging an addition by the difference between the system with it and the system without it, so that costs and earnings that exist either way drop out.",
+  "lesson": "M11",
+  "href": "m11-tea-in-models.html"
  },
  "independent-events": {
   "term": "Independent events",
@@ -1367,6 +1577,12 @@
   "lesson": "A1",
   "href": "a01-project-tea.html"
  },
+ "interquartile-range": {
+  "term": "Interquartile range",
+  "short": "The middle half of a set of values, from the 25th to the 75th percentile.",
+  "lesson": "A11",
+  "href": "a11-lca-nexus.html"
+ },
  "inverter": {
   "term": "Inverter",
   "short": "Power electronics that convert the direct current of solar panels and batteries, or a wind turbine's varying output, into the grid's alternating current.",
@@ -1378,6 +1594,12 @@
   "short": "A payment, often through the tax code, of a share of what a new plant costs to build, whatever it later produces.",
   "lesson": "A12",
   "href": "a12-policy-instruments.html"
+ },
+ "investor-owned-utility": {
+  "term": "Investor-owned utility",
+  "short": "An electric or gas utility owned by shareholders; its retail rates are typically set or approved by the state's utility commission.",
+  "lesson": "F9",
+  "href": "f09-city-energy.html"
  },
  "islanding": {
   "term": "Islanding",
@@ -1409,6 +1631,18 @@
   "lesson": 1,
   "href": "01-power-energy.html"
  },
+ "kw-dc": {
+  "term": "kW-DC",
+  "short": "A solar array's size as the direct-current rating of its panels at standard test conditions; its AC output, after the inverter, is a little lower.",
+  "lesson": "CK-A",
+  "href": "ck-a-spreadsheet.html"
+ },
+ "land-use-intensity": {
+  "term": "Land-use intensity",
+  "short": "The land a plant holds for each unit of energy it makes in a year, here square metres per MWh a year.",
+  "lesson": "A11",
+  "href": "a11-lca-nexus.html"
+ },
  "large-load": {
   "term": "Large load",
   "short": "One customer, such as a data center or a large factory, that draws tens of megawatts or more; utilities and grid operators set their own thresholds.",
@@ -1438,6 +1672,12 @@
   "short": "Lawrence Berkeley National Laboratory, a laboratory of the United States Department of Energy that publishes, among other datasets, a yearly one of the projects waiting in interconnection queues across the country.",
   "lesson": "CF3",
   "href": "cf3-hydrogen-under-uncertainty.html"
+ },
+ "least-cost-path": {
+  "term": "Least-cost path",
+  "short": "The route between two places across a cost surface whose summed costs are the lowest.",
+  "lesson": "A19",
+  "href": "a19-gis-siting.html"
  },
  "length-scale": {
   "term": "Length-scale",
@@ -1474,6 +1714,12 @@
   "short": "A model that predicts a quantity as a weighted sum of inputs, with the weights chosen to make the squared misses on past data as small as possible.",
   "lesson": "M10",
   "href": "m10-ml-forecasting.html"
+ },
+ "linearized-feeder-limit": {
+  "term": "Linearized feeder limit",
+  "short": "A ceiling on the power through a substation or feeder in each hour, written as a straight-line rule a linear program can use, with no voltage or power-flow physics.",
+  "lesson": "SB3",
+  "href": "sb3-city-planner.html"
  },
  "load-factor": {
   "term": "Load factor",
@@ -1565,11 +1811,23 @@
   "lesson": "F6",
   "href": "f06-grid-and-outages.html"
  },
+ "managed-charging": {
+  "term": "Managed charging",
+  "short": "Charging electric cars in the hours a utility or an aggregator chooses, within limits the drivers set, instead of as soon as they plug in.",
+  "lesson": "SB3",
+  "href": "sb3-city-planner.html"
+ },
  "margin": {
   "term": "Margin",
   "short": "What a business earns from its output after paying its operating costs: revenue minus operating costs.",
   "lesson": "CF7",
   "href": "cf7-cost-of-waiting.html"
+ },
+ "marginal-abatement-cost-curve": {
+  "term": "Marginal abatement cost curve",
+  "short": "A chart of measures that cut emissions, each a bar as wide as the tonnes it avoids and as high as its cost per tonne, sorted cheapest first.",
+  "lesson": "A18",
+  "href": "a18-city-plan.html"
  },
  "marginal-cost": {
   "term": "Marginal cost",
@@ -1678,6 +1936,12 @@
   "short": "A network with loops, so power can reach a place by more than one path, as transmission networks do.",
   "lesson": "F6",
   "href": "f06-grid-and-outages.html"
+ },
+ "methane-leak": {
+  "term": "Methane leak",
+  "short": "Natural gas that escapes from wells, pipes, compressors and tanks before it is burned; it is mostly methane, a strong warming gas.",
+  "lesson": "F11",
+  "href": "f11-air-climate-people.html"
  },
  "method-family": {
   "term": "Method family",
@@ -1823,11 +2087,23 @@
   "lesson": "A4",
   "href": "a04-retail-tariffs.html"
  },
+ "net-calorific-value": {
+  "term": "Net calorific value",
+  "short": "The heat a fuel gives when burned, not counting the heat in the water vapour it forms; it is a little lower than the gross value.",
+  "lesson": "F11",
+  "href": "f11-air-climate-people.html"
+ },
  "net-demand": {
   "term": "Net demand (net load)",
   "short": "Demand minus the output of wind and solar, which is what the other power plants must still supply.",
   "lesson": 2,
   "href": "02-demand.html"
+ },
+ "net-jobs": {
+  "term": "Net jobs",
+  "short": "Jobs created minus jobs lost and minus work that would have existed anyway, so the change a project really makes.",
+  "lesson": "A13",
+  "href": "a13-fairness-jobs.html"
  },
  "net-metering": {
   "term": "Net metering",
@@ -1955,6 +2231,12 @@
   "lesson": 7,
   "href": "07-cost.html"
  },
+ "parallel-trends": {
+  "term": "Parallel trends",
+  "short": "The assumption behind difference-in-differences: without the programme, the treated and comparison groups would have changed by the same amount.",
+  "lesson": "M14",
+  "href": "m14-did-it-work.html"
+ },
  "parameter": {
   "term": "Parameter",
   "short": "A number a model is given and takes as it is, such as demand or a plant's running cost, as opposed to a decision it makes.",
@@ -2051,6 +2333,12 @@
   "lesson": "M9",
   "href": "m09-surrogates-uq.html"
  },
+ "placed-in-service": {
+  "term": "Placed in service",
+  "short": "The date a facility is ready and available to do its job; many tax credits start their clock on it.",
+  "lesson": "M11",
+  "href": "m11-tea-in-models.html"
+ },
  "point-of-common-coupling": {
   "term": "Point of common coupling",
   "short": "The one place where a microgrid meets the main grid, with the switch that opens to let it run on its own.",
@@ -2105,6 +2393,12 @@
   "lesson": 7,
   "href": "07-cost.html"
  },
+ "prevailing-wage-apprenticeship": {
+  "term": "Prevailing wage and apprenticeship requirements",
+  "short": "Two federal conditions of many clean-energy tax credits, the hydrogen credit among them, that raise the credit fivefold when both are met: those who build or repair the facility are paid at least the local prevailing wage, and apprentices from registered programs work a set number of hours.",
+  "lesson": "M11",
+  "href": "m11-tea-in-models.html"
+ },
  "pricing-node": {
   "term": "Pricing node",
   "short": "A point on the grid, such as a power plant's connection, where the market sets its own price.",
@@ -2128,6 +2422,12 @@
   "short": "A rule that says how likely each value of an uncertain input is; a uniform distribution makes every value in its range equally likely.",
   "lesson": "M7",
   "href": "m07-monte-carlo.html"
+ },
+ "process-heat": {
+  "term": "Process heat",
+  "short": "Heat that factories use to make things, such as hot water for washing, steam for cooking and drying, or ovens and furnaces above a few hundred degrees.",
+  "lesson": "A15",
+  "href": "a15-efficiency-electrification.html"
  },
  "procurement-rule": {
   "term": "Procurement rule",
@@ -2165,6 +2465,18 @@
   "lesson": "R4",
   "href": "r04-data.html"
  },
+ "public-power-utility": {
+  "term": "Public power utility",
+  "short": "An electric utility owned by a city or another public body, generally regulated by its own local government rather than the state commission.",
+  "lesson": "F9",
+  "href": "f09-city-energy.html"
+ },
+ "public-utility-commission": {
+  "term": "Public utility commission",
+  "short": "A state's utility regulator (in Kansas, the Kansas Corporation Commission), which sets or approves the rates and service rules of the utilities it oversees.",
+  "lesson": "F9",
+  "href": "f09-city-energy.html"
+ },
  "quartile": {
   "term": "Quartile",
   "short": "The values that cut a sorted set into four equal parts: 25% of values lie below the first, 50% below the second (the median), 75% below the third.",
@@ -2200,6 +2512,12 @@
   "short": "The correlation of the ranks of two quantities, from −1 to 1: how consistently one rises or falls with the other, whatever the shape of the link.",
   "lesson": "M7",
   "href": "m07-monte-carlo.html"
+ },
+ "raster": {
+  "term": "Raster",
+  "short": "A map stored as a grid of equal cells, each holding one number or one class, such as slope or land cover.",
+  "lesson": "A19",
+  "href": "a19-gis-siting.html"
  },
  "rocof": {
   "term": "Rate of change of frequency",
@@ -2351,6 +2669,12 @@
   "lesson": "A10",
   "href": "a10-emissions-questions.html"
  },
+ "residual-value": {
+  "term": "Residual value",
+  "short": "The value an asset is assumed to keep at the end of an analysis, such as the unused years of a battery bought late, counted as a credit in the last year.",
+  "lesson": "CK-A",
+  "href": "ck-a-spreadsheet.html"
+ },
  "resource-adequacy": {
   "term": "Resource adequacy",
   "short": "Whether a power system has enough supply to meet demand in nearly every hour, judged with many weather years and plant outages against a criterion such as a loss-of-load expectation.",
@@ -2362,6 +2686,12 @@
   "short": "What a plan uses up, such as plants built, their upkeep and the fuel burned, leaving out payments that only move money between groups.",
   "lesson": "A12",
   "href": "a12-policy-instruments.html"
+ },
+ "retrofit": {
+  "term": "Retrofit",
+  "short": "Work on an existing building, such as air sealing and insulation, that cuts the heat it needs.",
+  "lesson": "SB3",
+  "href": "sb3-city-planner.html"
  },
  "robust-optimization": {
   "term": "Robust optimization",
@@ -2447,11 +2777,35 @@
   "lesson": "K1",
   "href": "k01-units.html"
  },
+ "scope-1": {
+  "term": "Scope 1 emissions",
+  "short": "Emissions from sources inside the boundary being counted: a company's own boilers and vehicles, or, for a city, fuels burned inside its border.",
+  "lesson": "A18",
+  "href": "a18-city-plan.html"
+ },
  "scope-2": {
   "term": "Scope 2 emissions",
-  "short": "A company's reported emissions from the electricity, steam, heat or cooling it buys, counted at the plants that make it.",
+  "short": "Emissions from the grid electricity, steam, heat or cooling that a company buys or a city uses, counted at the plants that make it.",
   "lesson": "A10",
   "href": "a10-emissions-questions.html"
+ },
+ "scope-3": {
+  "term": "Scope 3 emissions",
+  "short": "Other emissions that happen outside the boundary because of activities inside it, such as electricity lost on the wires that bring a city its power.",
+  "lesson": "A18",
+  "href": "a18-city-plan.html"
+ },
+ "screening-estimate": {
+  "term": "Screening estimate",
+  "short": "A quick estimate from stated assumptions and coefficients a reader can change, used to compare options, not to predict outcomes.",
+  "lesson": "A13",
+  "href": "a13-fairness-jobs.html"
+ },
+ "scrubber": {
+  "term": "Scrubber",
+  "short": "Equipment that sprays a wet or dry chemical such as limestone through a plant's exhaust to capture most of its sulfur dioxide.",
+  "lesson": "F11",
+  "href": "f11-air-climate-people.html"
  },
  "sdwpf": {
   "term": "SDWPF dataset",
@@ -2471,6 +2825,12 @@
   "lesson": "M4",
   "href": "m04-storage-multienergy.html"
  },
+ "selection-bias": {
+  "term": "Selection bias",
+  "short": "A false effect that appears when the people or places that take up a programme differ, before it starts, from those that do not.",
+  "lesson": "M14",
+  "href": "m14-did-it-work.html"
+ },
  "sensitivity-analysis": {
   "term": "Sensitivity analysis",
   "short": "Changing a model's inputs one at a time and re-solving, to see which inputs the answer depends on.",
@@ -2488,6 +2848,12 @@
   "short": "The voltage a utility keeps at a customer's meter in normal operation; in the U.S., ANSI C84.1 Range A, 114 to 126 V on a 120 V service (0.95 to 1.05 per unit).",
   "lesson": "A17",
   "href": "a17-physical-feasibility.html"
+ },
+ "setback": {
+  "term": "Setback",
+  "short": "The least distance a project must keep from a home, road, line or other feature, usually set by local rules.",
+  "lesson": "A19",
+  "href": "a19-gis-siting.html"
  },
  "shadow-price": {
   "term": "Shadow price",
@@ -2531,11 +2897,29 @@
   "lesson": 11,
   "href": "11-solver.html"
  },
+ "spare-capacity": {
+  "term": "Spare capacity (headroom)",
+  "short": "The MW a substation or line can still take for a new load or plant without an upgrade.",
+  "lesson": "A19",
+  "href": "a19-gis-siting.html"
+ },
+ "spatial-resolution": {
+  "term": "Spatial resolution",
+  "short": "The size of a raster's cells: finer cells show smaller features, such as a setback, but need more data and more computing.",
+  "lesson": "A19",
+  "href": "a19-gis-siting.html"
+ },
  "spent-fuel": {
   "term": "Spent fuel",
   "short": "Fuel that has been used in a reactor and taken out; it is solid, highly radioactive and still warm, and is kept first in water pools, later in dry casks.",
   "lesson": "F5",
   "href": "f05-nuclear-basics.html"
+ },
+ "spillover-effect": {
+  "term": "Spillover",
+  "short": "When a programme also changes the comparison group, for example neighbours copying a habit or projects moving across a border.",
+  "lesson": "M14",
+  "href": "m14-did-it-work.html"
  },
  "spp": {
   "term": "SPP (Southwest Power Pool)",
@@ -2645,6 +3029,12 @@
   "lesson": "F6",
   "href": "f06-grid-and-outages.html"
  },
+ "suitability-score": {
+  "term": "Suitability score",
+  "short": "A cell's or a site's weighted score in a siting screen, here from 0 to 100: a ranking under stated weights, not a cost and not a verdict.",
+  "lesson": "A19",
+  "href": "a19-gis-siting.html"
+ },
  "supply-diversity": {
   "term": "Supply diversity",
   "short": "How evenly the energy supply is spread over different sources, so that losing one does not lose most of it.",
@@ -2687,6 +3077,12 @@
   "lesson": "A22",
   "href": "a22-tradeoff-explorer.html"
  },
+ "tax-base": {
+  "term": "Tax base",
+  "short": "The total value a local government can tax, such as the assessed value of homes, businesses and power plants in a county.",
+  "lesson": "A13",
+  "href": "a13-fairness-jobs.html"
+ },
  "techno-economic-analysis": {
   "term": "Techno-economic analysis (TEA)",
   "short": "Estimating what a technology costs and earns from its engineering design, its prices and its operating pattern.",
@@ -2705,6 +3101,12 @@
   "lesson": "B2",
   "href": "b02-python-data.html"
  },
+ "temperature-lift": {
+  "term": "Temperature lift",
+  "short": "How far a heat pump raises heat: its delivery temperature minus its source temperature, in kelvin (a difference of 1 K equals 1 °C).",
+  "lesson": "A15",
+  "href": "a15-efficiency-electrification.html"
+ },
  "terawatt-hour": {
   "term": "Terawatt-hour (TWh)",
   "short": "A unit of energy equal to a billion kilowatt-hours, used for the yearly electricity use of regions and countries.",
@@ -2722,6 +3124,12 @@
   "short": "Storing energy as heat, for example in tanks of hot molten salt, to use it hours later.",
   "lesson": "CF2",
   "href": "cf2-cost-per-kg-vs-system-cost.html"
+ },
+ "tie-rule": {
+  "term": "Tie rule",
+  "short": "A stated way to pick one answer when several plans cost exactly the same, usually tiny costs that are left out of the reported results.",
+  "lesson": "SB3",
+  "href": "sb3-city-planner.html"
  },
  "time-step": {
   "term": "Time step",
@@ -2939,6 +3347,12 @@
   "lesson": "K8",
   "href": "k08-git-notebooks.html"
  },
+ "vertically-integrated-utility": {
+  "term": "Vertically integrated utility",
+  "short": "A utility that owns and runs the power plants, transmission and distribution in its service territory, as Kansas's investor-owned utilities do; its rates are approved by the state regulator.",
+  "lesson": "F9",
+  "href": "f09-city-energy.html"
+ },
  "virtual-power-plant": {
   "term": "Virtual power plant",
   "short": "Many small devices, such as batteries, thermostats and chargers, controlled together and offered to the grid as one resource.",
@@ -2963,11 +3377,29 @@
   "lesson": "F4",
   "href": "f04-power-plants.html"
  },
+ "water-consumption": {
+  "term": "Water consumption",
+  "short": "Water taken and not returned, mostly lost to evaporation, so it is no longer available downstream.",
+  "lesson": "A11",
+  "href": "a11-lca-nexus.html"
+ },
+ "water-withdrawal": {
+  "term": "Water withdrawal",
+  "short": "Water taken from a river, lake or aquifer, of which the part not returned is consumption; how much returns depends on the cooling system.",
+  "lesson": "A11",
+  "href": "a11-lca-nexus.html"
+ },
  "watt-hour": {
   "term": "Watt-hour (Wh)",
   "short": "A unit of energy: one watt kept up for one hour; 1,000 Wh make one kilowatt-hour.",
   "lesson": 1,
   "href": "01-power-energy.html"
+ },
+ "weatherization": {
+  "term": "Weatherization",
+  "short": "Air sealing, insulation and similar work on a building's shell that cuts the heat it loses, so it needs less heating.",
+  "lesson": "A18",
+  "href": "a18-city-plan.html"
  },
  "web-mercator": {
   "term": "Web Mercator",
@@ -2980,6 +3412,12 @@
   "short": "The blended return a project must pay its lenders and its owners, used as the project's discount rate.",
   "lesson": 7,
   "href": "07-cost.html"
+ },
+ "weighted-overlay": {
+  "term": "Weighted overlay",
+  "short": "Combining several criterion maps cell by cell: each criterion is scored from 0 to 1, multiplied by its weight, and the results are added into one suitability map.",
+  "lesson": "A19",
+  "href": "a19-gis-siting.html"
  },
  "weighted-sum": {
   "term": "Weighted sum",

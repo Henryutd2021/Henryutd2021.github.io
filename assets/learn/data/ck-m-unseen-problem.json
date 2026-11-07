@@ -20,7 +20,7 @@
  "intro": [
   "Eleven tasks in three parts, about 240 minutes: A, the brief (about 120); B, the planted defect (about 60); C, a validation (about 45); then submit (about 15).",
   "The level: at least 6 of the 9 auto-marked tasks right on the first try, with the defect's line (task 6), for Proficient; 8 of 9 and every written point for Strong. Each number task states its tolerance.",
-  "No hints. Each task's worked solution opens after your first answer. A task whose solution you open before answering counts as not right; opening the full worked solutions before task 11 makes the attempt practice, with no level.",
+  "No hints. Each task's worked solution opens after your first answer. A task whose solution you open before answering counts as not right; opening the full worked solutions before all eleven tasks are answered makes the attempt practice, with no level.",
   "Work in the starter notebook and enter your results here. Your answers stay in this browser; “Copy my results” gives a summary to share, including what you typed."
  ],
  "brief": {
@@ -629,7 +629,7 @@
       "tol": 0.001,
       "show": "$526.90 for the day"
      },
-     "solution": "$526.90 for the day, energy and demand charge together. How it splits between them is in the worked solutions, which open when you submit task 11.",
+     "solution": "$526.90 for the day, energy and demand charge together. How it splits between them is in the worked solutions, which open once all eleven tasks are answered.",
      "unitNote": {
       "kWh": "kWh measures energy. The answer is a cost, in dollars."
      }
@@ -794,7 +794,7 @@
      "title": "Your validation statement",
      "skill": "Validate and submit",
      "kind": "open-short",
-     "prompt": "State whether your optimum lies between your two bounds, one special case your model reproduces exactly, and what these checks cannot show. Submitting opens the worked solutions below.",
+     "prompt": "State whether your optimum lies between your two bounds, one special case your model reproduces exactly, and what these checks cannot show.",
      "points": [
       "The optimum, $526.90, lies between the hand bounds, $375.67 and $731.80.",
       "One clearly specified special case, matched exactly by an independent hand calculation; for example, with no demand charge and no limits on the tower or the pumps, the night price times the day's energy, $294.00 (another: one flat price and no demand charge).",
@@ -996,7 +996,7 @@
      "title": "Your validation statement",
      "skill": "Validate and submit",
      "kind": "open-short",
-     "prompt": "Name the benchmark and its date, read the gap, and say which of your results survive a rescaling of wind to EIA's 33.8% and which do not. Submitting opens the worked solutions below.",
+     "prompt": "Name the benchmark and its date, read the gap, and say which of your results survive a rescaling of wind to EIA's 33.8% and which do not.",
      "points": [
       "The benchmark named with its date: EIA, Electric Power Monthly, Table 6.07.B, 2025 annual: 33.8% for U.S. utility-scale wind.",
       "The gap read as a definition difference (shares of the year's highest hour, not of capacity), plus a different fleet and region, without splitting it between them; a like-for-like check needs SPP's installed wind capacity.",

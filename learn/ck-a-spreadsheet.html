@@ -1,0 +1,2074 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.19">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="The Analyst checkpoint (CK-A) of Energy Systems, Step by Step: build an auditable spreadsheet for a fictional school’s rooftop solar and battery from dated EIA and NLR numbers: a boundary, an assumptions log with sources, the school’s net present value, who pays and who benefits (transfers against real costs), and a sensitivity of the main result. A worked workbook with live formulas opens when you submit. Answers and times stay in your browser.">
+
+<title>Analyst checkpoint: an auditable spreadsheet for a new case – Honglin Li</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../images/favicon.svg" rel="icon" type="image/svg+xml">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-b626d73c4c936ccc3cb08be7d45d1df6.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-c0b1642a1007bf633769ed7b0f05c6cc.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-24969ac2e858442fb45ced1a2b17dbde.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-c0b1642a1007bf633769ed7b0f05c6cc.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.9.4/css/academicons.min.css" crossorigin="anonymous">
+<meta name="theme-color" content="#ffffff">
+
+
+<link rel="stylesheet" href="../assets/base.css">
+<link rel="stylesheet" href="../assets/home.css">
+<link rel="stylesheet" href="../assets/pubs.css">
+<link rel="stylesheet" href="../assets/pages.css">
+<link rel="stylesheet" href="../assets/map.css">
+<link rel="stylesheet" href="../assets/explainers.css">
+<link rel="stylesheet" href="../assets/learn/learn.css">
+<meta property="og:title" content="Analyst checkpoint: an auditable spreadsheet for a new case – Honglin Li">
+<meta property="og:description" content="The Analyst checkpoint (CK-A) of Energy Systems, Step by Step: build an auditable spreadsheet for a fictional school’s rooftop solar and battery from dated EIA and NLR numbers: a boundary, an assumptions log with sources, the school’s net present value, who pays and who benefits (transfers against real costs), and a sensitivity of the main result. A worked workbook with live formulas opens when you submit. Answers and times stay in your browser.">
+<meta property="og:image" content="https://henryutd2021.github.io/learn/images/profile-square.jpg">
+<meta property="og:site_name" content="Honglin Li">
+</head>
+
+<body class="nav-fixed page-learn page-lesson lx-form-checkpoint quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-xl " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">Honglin Li</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../research.html"> 
+<span class="menu-text">Research</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../projects.html"> 
+<span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../publications.html"> 
+<span class="menu-text">Publications</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../software-data.html"> 
+<span class="menu-text">Software</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../teaching.html"> 
+<span class="menu-text">Teaching</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../learn/index.html"> 
+<span class="menu-text">Learn</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../field-notes.html"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../cv.html"> 
+<span class="menu-text">CV</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../journeys.html"> 
+<span class="menu-text">Journeys</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en"> <i class="bi bi-mortarboard-fill" role="img" aria-label="Google Scholar">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/Henryutd2021"> <i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/honglin-li-998b18221/"> <i class="bi bi-linkedin" role="img" aria-label="LinkedIn">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content column-page" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Analyst checkpoint: an auditable spreadsheet for a new case</h1>
+<p class="subtitle lead">About two and a half hours: build a spreadsheet for a school’s rooftop solar and battery, say who pays and who benefits, test the result, then check it against a worked workbook</p>
+</div>
+
+<div>
+  <div class="description">
+    The Analyst checkpoint (CK-A) of Energy Systems, Step by Step: build an auditable spreadsheet for a fictional school’s rooftop solar and battery from dated EIA and NLR numbers: a boundary, an assumptions log with sources, the school’s net present value, who pays and who benefits (transfers against real costs), and a sensitivity of the main result. A worked workbook with live formulas opens when you submit. Answers and times stay in your browser.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta column-page">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<!-- CK-A in the checkpoint form (curriculum v2 §3.3: task page, worked solution revealed after submission, rubric with
+     anchored levels), wave W5, 2026-11-06. Case, log, tasks and worked numbers: assets/learn/data/ck-a-spreadsheet.json,
+     written with the starter and worked workbooks (ck-a-starter.xlsx, ck-a-worked.xlsx, XLSX with live formulas) by
+     scripts/build_learn_cka_sheet.py in the ResearchPortfolio folder. Runner: the shared LX.Checkpoint; CK-A's level rule,
+     results sentence, summary and static blocks: assets/learn/ck-a-spreadsheet.js. The blocks between markers are written
+     by node _tests/learn/test_ck-a-spreadsheet.js --write, which also evaluates the worked workbook's formulas with the
+     course's formula engine and checks every number on this page. -->
+<!-- learn:meta:start (generated by scripts/build_learn.py from learn/path.yml; edit the YAML, not this block) -->
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "name": "Analyst checkpoint: an auditable spreadsheet for a new case About two and a half hours: build a spreadsheet for a school's rooftop solar and battery, say who pays and who benefits, test the result, then check it against a worked workbook", "description": "The Analyst checkpoint (CK-A) of Energy Systems, Step by Step: build an auditable spreadsheet for a fictional school's rooftop solar and battery from dated EIA and NLR numbers: a boundary, an assumptions log with sources, the school's net present value, who pays and who benefits (transfers against real costs), and a sensitivity of the main result. A worked workbook with live formulas opens when you submit. Answers and times stay in your browser.", "learningResourceType": "Interactive lesson", "educationalLevel": "Intermediate", "timeRequired": "PT150M", "inLanguage": "en", "isAccessibleForFree": true, "teaches": [], "license": "https://creativecommons.org/licenses/by/4.0/", "author": {"@type": "Person", "name": "Honglin Li", "url": "https://henryutd2021.github.io/"}, "url": "https://henryutd2021.github.io/learn/ck-a-spreadsheet.html", "isPartOf": {"@type": "Course", "name": "Energy Systems, Step by Step", "url": "https://henryutd2021.github.io/learn/"}}</script>
+<script type="application/json" class="lx-lesson-data">{"id":"ck-a-spreadsheet","starter":null,"total":14,"code":"CK-A","title":"Analyst checkpoint: an auditable spreadsheet for a new case","subtitle":"About two and a half hours: build a spreadsheet for a school's rooftop solar and battery, say who pays and who benefits, test the result, then check it against a worked workbook","short":"Analyst checkpoint","tier":"analyst","tier2":null,"tierLabel":"Analyst · L2","level":"L2","slot":2,"slot2":null,"minutes":150,"does":"Build an auditable spreadsheet for a new case (a school's solar-plus-storage project): state the boundary, the assumptions with sources, who pays and who benefits, and a sensitivity of the main result. A worked workbook with live formulas, an assumptions log and the course rubric open when you submit.","outcome":null,"icon":"check","form":"checkpoint","scales":[],"teaches":[],"lab":null,"href":"ck-a-spreadsheet.html","ready":true,"after":[{"id":"a01-project-tea","code":"A1","title":"Is this project worth building? Cash flows, discounting and the cost of capital","short":"Is it worth building?","does":"Build a wind farm's cash flows year by year; discount them at the cost of capital; move the loan share, the rate, the life and the price; read NPV, IRR and payback; a tornado chart ranks what matters.","href":"a01-project-tea.html","ready":true},{"id":"a04-retail-tariffs","code":"A4","title":"How should an electricity bill be designed? Retail, dynamic and large-load tariffs","short":"Designing a bill","does":"Bill a renter, a home with solar and an EV, and a factory under flat, time-of-use, demand-charge and real-time tariffs; see who pays more and what behaviour each tariff rewards; then set a large load's minimum bill.","href":"a04-retail-tariffs.html","ready":true},{"id":"a13-fairness-jobs","code":"A13","title":"Who pays and who benefits? Energy burden, fairness and jobs","short":"Who pays, who benefits","does":"Recover a Prairie City plan's yearly cost per kWh, by a fixed charge and by income and read each group's energy burden; see that the money moved adds up to zero; regroup the households; then count the jobs and tax base Ridge County loses when its coal plant retires and what wind and solar farms bring, with every coefficient set by you.","href":"a13-fairness-jobs.html","ready":true},{"id":"a15-efficiency-electrification","code":"A15","title":"How much can efficiency and electrification change demand? Buildings, heat, transport and industry","short":"Efficiency and electrification","does":"Build a cost-of-saved-energy curve for Prairie City's buildings (water heaters, heat pumps, envelopes, LED tubes, condensing furnaces) with a rebound check; electrify heat and cars district by district on the cold design day against each substation; try three charging rules and a heat network with a store; sort the industrial park's heat by temperature.","href":"a15-efficiency-electrification.html","ready":true}],"prev":null,"next":null}</script>
+<div class="lx-head" data-lesson-id="ck-a-spreadsheet" data-total="14" data-tier="analyst" data-level="L2" data-minutes="150" data-form="checkpoint">
+<div>
+<nav class="lx-crumbs" aria-label="Breadcrumb"><ol><li><a href="index.html">Learn</a></li><li aria-current="page">CK-A</li></ol></nav>
+<ul class="lx-badges" aria-label="About this lesson">
+<li style="--c:var(--lx-tier-2)"><span class="lx-dot" aria-hidden="true"></span>Analyst · L2</li>
+<li>Checkpoint</li>
+<li>150 min</li>
+<li>After <a href="a01-project-tea.html">A1</a> and <a href="a04-retail-tariffs.html">A4</a> and <a href="a13-fairness-jobs.html">A13</a> and <a href="a15-efficiency-electrification.html">A15</a></li>
+<li class="lx-done-tag" data-lesson-id="ck-a-spreadsheet" hidden="">Completed</li>
+</ul>
+</div>
+<nav class="lx-steps" aria-label="In this lesson"><ol><li><a href="#task"><span class="lx-n">1</span>Task</a></li><li><a href="#solution"><span class="lx-n">2</span>Worked solution</a></li><li><a href="#rubric"><span class="lx-n">3</span>Rubric</a></li><li><a href="#sources"><span class="lx-n">4</span>Sources</a></li></ol></nav>
+</div>
+<!-- learn:meta:end -->
+<style>
+.cka-parts, .cka-rules { margin: 0 0 .6rem; padding-left: 1.3rem; display: grid; gap: 4px; font-size: 15.5px; }
+.cka-facts { margin: .4rem 0 0; padding-left: 1.2rem; display: grid; gap: 4px; font-size: 15px; }
+.cka-dl { display: flex; flex-wrap: wrap; gap: 8px; margin: .6rem 0 0 !important; }
+.cka-static { margin: 0 0 1rem; padding-left: 1.3rem; display: grid; gap: 12px; font-size: 15px; }
+.cka-static p { margin: 0 0 4px; } .cka-static ul { margin: 0 0 4px; padding-left: 1.2rem; }
+.cka-list { margin: 0; padding-left: 1.2rem; display: grid; gap: 6px; font-size: 15.5px; }
+.cka-big { font-size: 16.5px; margin: 0 0 .4rem; } .cka-big b { font-family: var(--lx-f-mono); }
+.cka-sol td, .cka-sol th, .cka-sens td, .cka-sens th { font-size: 14.5px; } .cka-sol td.n, .cka-sens td.n { font-family: var(--lx-f-mono); white-space: normal; }
+.cka-sol tbody th, .cka-sens tbody th, .cka-led tbody th { text-align: left; font-weight: 500; text-transform: none; letter-spacing: 0; color: var(--lx-ink); font-size: 14.5px; }
+.cka-log td { text-align: left; white-space: normal; font-family: var(--lx-f-body, inherit); }
+.cka-solution-body .lx-xcard > * { min-width: 0; max-width: 100%; }
+.cka-course { margin-top: 18px; }
+.cka-brief .cka-in { margin: .6rem 0 0; }
+.cka-brief > p { margin: 0 0 4px; }
+.cka-brief > p.lx-hint { margin-top: .5rem; }
+</style>
+<div id="task" class="lx-sec">
+<div class="lx-card cka-intro">
+<p class="lx-eyebrow">How this checkpoint works · about 150 minutes, no hints</p>
+<ol class="cka-parts">
+<li><b>A · Boundary and log</b> (about 40 min). Download the starter workbook. State your boundary; finish the assumptions log: every input's type, source, date and, where you will test it, a low and a high value.</li>
+<li><b>B · The model</b> (about 50 min). Convert the costs to 2025 dollars and build the school's yearly saving and its net present value, every number a formula.</li>
+<li><b>C · Who pays</b> (about 20 min). Split the school's bill saving into a real cost saved and a <span class="lx-term" data-term="transfer">transfer</span>; add the parties up (refresher: <a href="a13-fairness-jobs.html">A13</a>).</li>
+<li><b>D · Sensitivity</b> (about 20 min). Swing the inputs that matter one at a time and report the main result as a range.</li>
+<li><b>Submit</b> (about 20 min). Enter your results in the nine tasks below, in any order: the worked workbook opens once all nine are answered.</li>
+</ol>
+<p class="lx-eyebrow">How it is marked, before you start</p>
+<ul class="cka-rules">
+<li><b>Proficient:</b> at least 5 of the 7 auto-marked tasks right on the first try, plus at least 3 of the 4 points of each written task (1 and 9), which you tick yourself.</li>
+<li><b>Strong:</b> at least 6 of 7 on the first try and every written point.</li>
+<li><b>Opening solutions early:</b> a task whose answer you open before answering counts as not right. Opening the worked workbook before all nine are answered makes the attempt practice, with no level.</li>
+<li><b>After the worked workbook opens:</b> an answer given after that counts as practice, not as right, and a written task then earns no points.</li>
+</ul>
+<p class="cka-dl"><a class="lx-btn small" href="../assets/learn/data/ck-a-starter.xlsx" download="">Starter workbook (.xlsx)</a></p>
+<p class="lx-hint">It opens in Excel, LibreOffice Calc, Google Sheets or Apple Numbers. It holds the case's facts with their sources and an empty layout; it gives no formulas and no answers. Refreshers: <a href="a01-project-tea.html">A1</a> (cash flows), <a href="a04-retail-tariffs.html">A4</a> (tariffs), <a href="a13-fairness-jobs.html">A13</a> (who pays), <a href="k03-discounting.html">K3</a> (discounting), <a href="k07-spreadsheets.html">K7</a> (spreadsheets).</p>
+</div>
+
+<div class="lx-card cka-brief" id="cka-brief">
+<p class="lx-eyebrow">The case</p>
+<h3 class="anchored">A school's rooftop solar and battery</h3>
+<!-- cka-brief:start (written from the data file by the test's --write mode; do not edit) -->
+<p><b>Situation:</b> Prairie Town High School's district is offered a rooftop solar array and a battery behind the school's meter.</p>
+<p><b>Deliverable:</b> An auditable spreadsheet that tells the district what it would gain or lose, who else pays or benefits, and how sure that answer is.</p>
+<p class="lx-eyebrow cka-in">Inputs, illustrative where marked</p>
+<ul class="cka-facts"><li><b>System:</b> 250 <span class="lx-term" data-term="kw-dc">kW-DC</span> of rooftop solar and a 150 kW / 300 kWh battery, installed together</li><li><b>School:</b> uses 1,000,000 kWh a year, with a billed peak of 400 kW every month (illustrative)</li><li><b>Tariff:</b> a <span class="lx-term" data-term="demand-charge">demand charge</span> of $10 per kW-month plus an energy charge, set so the school's bill averages Kansas's 2025 commercial price, 11.17 cents/kWh (EIA); exports earn 3 cents/kWh (illustrative)</li><li><b>Battery power:</b> cuts the monthly billed peak by 60% of its power on average (illustrative)</li><li><b>Battery energy:</b> about 200 <span class="lx-term" data-term="full-cycle">full cycles</span> a year, each taking in 300 kWh from the school's supply and returning 90%; the 10% lost is bought at the energy charge (illustrative)</li><li><b>Costs:</b> from EIA's 2024 distributed-generation report (2022 dollars) and NLR's 2025 ATB (2023 dollars); convert to 2025 dollars</li><li><b>Money:</b> 25 years, real 2025 dollars, a 4% <span class="lx-term" data-term="real-rate">real discount rate</span> (the course's), battery replaced at the end of year 15</li><li><b>End value:</b> at year 25 the replacement battery has 5 of its 15 years left: count 5/15 of its cost as its <span class="lx-term" data-term="residual-value">residual value</span> (straight line)</li><li><b>The utility:</b> avoids 3 cents for each kWh it no longer supplies and, for half of the battery's peak cut, $180 per kW a year of capacity (illustrative; lesson A4's unit cost)</li><li><b>Rate reset:</b> assume the utility recovers its whole remaining revenue shortfall from its other customers at the next rate reset</li></ul>
+<p class="lx-hint">Prairie Town and its high school are fictional; the school's load and several inputs are illustrative.</p>
+<!-- cka-brief:end -->
+</div>
+
+<div class="lx-interactive" data-learn="ck-a-spreadsheet" data-src="../assets/learn/data/ck-a-spreadsheet.json">
+<div class="lx-fallback">
+<!-- cka-tasks:start (written from the data file by the test's --write mode; do not edit) -->
+<p class="lx-hint">Without JavaScript nothing here is locked: the worked solution is further down the page. Build your spreadsheet first, write your answers down, then compare.</p>
+<ol class="cka-static">
+<li><p><b>Your boundary</b> <span class="lx-hint">Part A · State the boundary</span></p><p>In two or three sentences: whose money does your main result count, over what period and in which dollars, and what does it leave out?</p><p>Self-rated against 4 points, shown after you submit.</p></li>
+<li><p><b>Solar output</b> <span class="lx-hint">Part B · A number with units</span></p><p>How much electricity does the array make in a year? Within 2% counts as right.</p><p>Answer with a number and a unit.</p></li>
+<li><p><b>Up-front cost in 2025 dollars</b> <span class="lx-hint">Part B · Convert dollar years</span></p><p>What does the system cost up front, in 2025 dollars? Within 1% counts as right.</p><p>Answer with a number and a unit.</p></li>
+<li><p><b>The school's bill saving</b> <span class="lx-hint">Part B · Read a tariff</span></p><p>How much lower is the school's electricity bill in a year (gross: before upkeep)? Within 3% counts as right.</p><p>Answer with a number and a unit.</p></li>
+<li><p><b>The main result</b> <span class="lx-hint">Part B · Present value</span></p><p>Over 25 years at 4%, counting the brief's residual value, by how much does the present value of the school's costs exceed the present value of its savings? (If your model says the savings are larger, recheck it.) Within 3% counts as right.</p><p>Answer with a number and a unit.</p></li>
+<li><p><b>Who pays the gap</b> <span class="lx-hint">Part C · Transfers against real costs</span></p><p>Part of the school's bill saving is not a saving in the utility's costs. Under the brief's rate-reset assumption, who pays it?</p><ul><li>a. The school district</li><li>b. The utility's other customers, at the next rate reset</li><li>c. Federal taxpayers</li><li>d. Nobody: every dollar the school saves is a real cost saved</li></ul></li>
+<li><p><b>The cost shift</b> <span class="lx-hint">Part C · A screening estimate</span></p><p>Under the same assumption, how much a year moves to the utility's other customers? Within 5% counts as right.</p><p>Answer with a number and a unit.</p></li>
+<li><p><b>What moves the result most</b> <span class="lx-hint">Part D · Sensitivity</span></p><p>Swinging one input at a time over the ranges in the worked log, which moves the school's NPV most?</p><ul><li>a. The up-front cost, ±25%</li><li>b. The discount rate, 2% to 7%</li><li>c. The demand charge, $5 to $20 per kW-month, with the energy charge re-set so the pre-project bill is unchanged</li><li>d. The average electricity price, ±20%</li></ul></li>
+<li><p><b>Your log and your sensitivity</b> <span class="lx-hint">Part D · Audit trail</span></p><p>Paste three rows of your assumptions log and your sensitivity statement (the main result as a range, and the input that moves it most).</p><p>Self-rated against 4 points, shown after you submit.</p></li>
+</ol>
+<!-- cka-tasks:end -->
+</div>
+</div>
+<p class="lx-datanote"><svg class="lx-ic" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5M12 8v.2"></path></svg><span>Prairie Town is fictional; its numbers are illustrative where the log says so. Prices, costs, the capacity factor and the price index are dated public figures (Sources). Nothing you type leaves this browser unless you copy it; the copied summary includes what you typed in tasks 1 and 9.</span></p>
+</div>
+<div id="solution" class="lx-sec">
+<section id="worked-solution" class="level2 lx-sec-h">
+<h2 class="anchored" data-anchor-id="worked-solution">Worked solution</h2>
+</section>
+<div id="cka-lock" class="lx-ck-lock" hidden="">
+<p><b>Opens once all nine tasks are answered.</b> The checkpoint asks for your own spreadsheet first, so the worked workbook waits for it. Opening it now makes this attempt practice, with no level.</p>
+<p><button type="button" class="lx-btn ghost small">Open it anyway (recorded: practice)</button></p>
+</div>
+<div id="cka-solution-body" class="lx-xgrid lx-ck-gated cka-solution-body">
+<!-- cka-solution:start (written from the data file by the test's --write mode; do not edit) -->
+<div class="lx-xcard"><header class="lx-x-head"><h3 class="anchored">The answer in one line</h3></header>
+<p class="cka-big">Net present value to the school: <b>−$776,324</b> (2025 dollars, 25 years, 4% real). In present value the district pays $776,000 more than it saves.</p>
+<p class="lx-hint">One-at-a-time swings put it between −$993,000 and −$560,000: no single swing changes its sign. Cumulative cash stays below zero in every year (lowest −$1,020,000), so there is no payback within 25 years.</p>
+<p class="cka-dl"><a class="lx-btn small" href="../assets/learn/data/ck-a-worked.xlsx" download="">Worked spreadsheet (.xlsx, live formulas)</a></p></div>
+<div class="lx-xcard"><header class="lx-x-head"><h3 class="anchored">The numbers, step by step</h3></header><div class="lx-scroll-x">
+<table class="lx-facts cka-sol caption-top table">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">Quantity</th>
+<th data-quarto-table-cell-role="th" scope="col">Worked value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">Energy charge (derived from EIA's average)</th>
+<td class="n">$0.0637/kWh</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">Solar output</th>
+<td class="n">389,820 kWh a year (292,365 used, 97,455 sent out)</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">Up-front cost</th>
+<td class="n">$866,046 (2025 dollars; $792,500 in 2022 dollars × 1.0928)</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">Bill saving, gross</th>
+<td class="n">$31,965 a year = $18,624 energy + $2,924 exports + $10,800 demand − $382 losses</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">Upkeep</th>
+<td class="n">$14,972 a year ($4,645 solar, $10,327 battery)</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row"><span class="lx-term" data-term="annuity-factor">Annuity factor</span></th>
+<td class="n">15.62 (25 years at 4%)</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">Battery replacement, year 15</th>
+<td class="n">$408,490; present value $226,820</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row"><span class="lx-term" data-term="residual-value">Residual value</span>, year 25</th>
+<td class="n">$136,163 (5 of 15 years left, straight line); present value $51,077</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">Net present value to the school</th>
+<td class="n">−$776,324</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="lx-hint">Check in the workbook: the year-by-year cash flow sums to the same −$776,324. The installed cost read as per kW-DC of solar is 7% below the two systems' separate costs, as the report says installing together saves.</p></div>
+<div class="lx-xcard"><header class="lx-x-head"><h3 class="anchored">Who pays and who benefits</h3></header><div class="lx-scroll-x">
+<table class="lx-facts cf-two cka-led caption-top table">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">Party</th>
+<th data-quarto-table-cell-role="th" scope="col">A year</th>
+<th data-quarto-table-cell-role="th" scope="col">Present value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">The school district</th>
+<td class="n" data-l="A year">$16,993</td>
+<td class="n" data-l="Present value">−$776,324</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">The utility's other customers (at the next rate reset)</th>
+<td class="n" data-l="A year">−$12,351</td>
+<td class="n" data-l="Present value">−$192,941</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">Federal taxpayers (no credit counted)</th>
+<td class="n" data-l="A year">$0</td>
+<td class="n" data-l="Present value">$0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">Resource view: all parties together</th>
+<td class="n" data-l="A year">$4,642</td>
+<td class="n" data-l="Present value">−$969,265</td>
+</tr>
+</tbody>
+</table>
+</div>
+<ul class="cka-list"><li><b>Gross against net:</b> of the school's $31,965 gross bill saving a year, $19,615 is a real cost the utility avoids; $12,351 is a <span class="lx-term" data-term="transfer">transfer</span> from its other customers.</li>
+<li><b>Adds up:</b> school −$776,324 + other customers −$192,941 = resource view −$969,265.</li>
+<li><b>Screening estimate:</b> the cost shift holds only under the brief's rate-reset assumption. It comes from the accounting of who pays, not from the model of the school's bill.</li>
+<li><b>CO₂, not valued:</b> about 118 t a year at Kansas's 2024 average factor: an inventory number, not the change the project causes.</li>
+<li><b>Resilience, not counted:</b> no <span class="lx-term" data-term="islanding">islanding</span> equipment is costed, so the battery gives no backup in an outage.</li>
+<li><b>Jobs, not estimated:</b> installation is job-years of temporary work, not permanent jobs.</li></ul></div>
+<div class="lx-xcard" id="cka-sens"><header class="lx-x-head"><h3 class="anchored">Sensitivity of the main result</h3></header><div class="lx-scroll-x">
+<table class="lx-facts cf-two cka-sens caption-top table">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">Input</th>
+<th data-quarto-table-cell-role="th" scope="col">Low to high</th>
+<th data-quarto-table-cell-role="th" scope="col">NPV at low</th>
+<th data-quarto-table-cell-role="th" scope="col">NPV at high</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">Up-front cost</th>
+<td class="n" data-l="Low to high">$649,535 to $1,082,558</td>
+<td class="n" data-l="NPV at low">−$559,813</td>
+<td class="n" data-l="NPV at high">−$992,836</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">Average electricity price</th>
+<td class="n" data-l="Low to high">$0.0894 to $0.134 per kWh</td>
+<td class="n" data-l="NPV at low">−$876,265</td>
+<td class="n" data-l="NPV at high">−$676,384</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">Battery's cut in the billed peak</th>
+<td class="n" data-l="Low to high">30% to 90%</td>
+<td class="n" data-l="NPV at low">−$860,683</td>
+<td class="n" data-l="NPV at high">−$691,965</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">Upkeep, solar and battery</th>
+<td class="n" data-l="Low to high">$11,229 to $18,715 a year</td>
+<td class="n" data-l="NPV at low">−$717,850</td>
+<td class="n" data-l="NPV at high">−$834,798</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">Demand charge (pre-project bill held)</th>
+<td class="n" data-l="Low to high">$5 to $20 per kW-month</td>
+<td class="n" data-l="NPV at low">−$753,317</td>
+<td class="n" data-l="NPV at high">−$822,339</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">Solar capacity factor</th>
+<td class="n" data-l="Low to high">16.0% to 19.6%</td>
+<td class="n" data-l="NPV at low">−$809,986</td>
+<td class="n" data-l="NPV at high">−$742,663</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">Share used at the school</th>
+<td class="n" data-l="Low to high">60% to 90%</td>
+<td class="n" data-l="NPV at low">−$807,108</td>
+<td class="n" data-l="NPV at high">−$745,540</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">Discount rate</th>
+<td class="n" data-l="Low to high">2% to 7%</td>
+<td class="n" data-l="NPV at low">−$754,804</td>
+<td class="n" data-l="NPV at high">−$790,985</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="lx-hint">Sorted by swing. The demand-charge row varies the demand charge while holding the school's pre-project annual bill constant, so the energy charge falls as it rises.</p>
+<p class="lx-hint">Then the reduction in solar savings exceeds the increase in battery savings: the result falls.</p>
+<div id="cka-tornado"></div></div>
+<div class="lx-xcard"><header class="lx-x-head"><h3 class="anchored">Boundary and assumptions log</h3></header>
+<ul class="cka-list"><li><b>Counted:</b> the school district's money: bill saving, capital, upkeep, the battery's replacement and its residual value; 25 years, real 2025 dollars, a 4% <span class="lx-term" data-term="real-rate">real discount rate</span>.</li>
+<li><b>Left out:</b> tax credits (a transfer if claimed through <span class="lx-term" data-term="elective-pay">elective pay</span>), financing, resilience, CO₂'s value, solar wear, tariff changes over time.</li>
+<li><b>Reported apart:</b> the other customers, federal taxpayers and the resource view.</li></ul>
+<details class="lx-textalt"><summary>The worked assumptions log (36 rows)</summary><div class="lx-scroll-x">
+<table class="lx-mini-table cka-log caption-top table">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">Input</th>
+<th data-quarto-table-cell-role="th" scope="col">Value</th>
+<th data-quarto-table-cell-role="th" scope="col">Unit</th>
+<th data-quarto-table-cell-role="th" scope="col">Type</th>
+<th data-quarto-table-cell-role="th" scope="col">Source</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Solar array size</td>
+<td>250</td>
+<td>kW-DC</td>
+<td>Choice</td>
+<td>EIA distributed-generation cost report (2024)</td>
+</tr>
+<tr class="even">
+<td>Solar capacity factor</td>
+<td>17.8%</td>
+<td>fraction</td>
+<td>Sourced</td>
+<td>EIA distributed-generation cost report (2024)</td>
+</tr>
+<tr class="odd">
+<td>Share of solar output used at the school</td>
+<td>75%</td>
+<td>fraction</td>
+<td>Illustrative</td>
+<td>this case</td>
+</tr>
+<tr class="even">
+<td>Battery power</td>
+<td>150</td>
+<td>kW</td>
+<td>Choice</td>
+<td>EIA distributed-generation cost report (2024)</td>
+</tr>
+<tr class="odd">
+<td>Battery energy</td>
+<td>300</td>
+<td>kWh</td>
+<td>Choice</td>
+<td>EIA distributed-generation cost report (2024)</td>
+</tr>
+<tr class="even">
+<td>Average cut in the monthly billed peak, share of battery power</td>
+<td>60%</td>
+<td>fraction</td>
+<td>Illustrative</td>
+<td>this case</td>
+</tr>
+<tr class="odd">
+<td>Battery full cycles a year (each takes in 300 kWh)</td>
+<td>200</td>
+<td>per year</td>
+<td>Illustrative</td>
+<td>this case</td>
+</tr>
+<tr class="even">
+<td>Battery round trip efficiency</td>
+<td>90%</td>
+<td>fraction</td>
+<td>Sourced</td>
+<td>EIA distributed-generation cost report (2024)</td>
+</tr>
+<tr class="odd">
+<td>School electricity use</td>
+<td>1,000,000</td>
+<td>kWh a year</td>
+<td>Illustrative</td>
+<td>this case</td>
+</tr>
+<tr class="even">
+<td>School monthly billed peak</td>
+<td>400</td>
+<td>kW</td>
+<td>Illustrative</td>
+<td>this case</td>
+</tr>
+<tr class="odd">
+<td>Average commercial electricity price, Kansas</td>
+<td>$0.1117</td>
+<td>$/kWh</td>
+<td>Sourced</td>
+<td>EIA Electric Power Monthly, Table 5.6.B</td>
+</tr>
+<tr class="even">
+<td>Demand charge</td>
+<td>$10</td>
+<td>$/kW-month</td>
+<td>Illustrative</td>
+<td>this case</td>
+</tr>
+<tr class="odd">
+<td>Credit for each kWh sent to the grid</td>
+<td>$0.03</td>
+<td>$/kWh</td>
+<td>Illustrative</td>
+<td>this case</td>
+</tr>
+<tr class="even">
+<td>Installed cost, solar + battery, per kW-DC of solar</td>
+<td>$3,170</td>
+<td>$/kW-DC (2022 $)</td>
+<td>Sourced</td>
+<td>EIA distributed-generation cost report (2024)</td>
+</tr>
+<tr class="odd">
+<td>Installed cost, solar alone (check only)</td>
+<td>$1,903</td>
+<td>$/kW-DC (2022 $)</td>
+<td>Sourced</td>
+<td>EIA distributed-generation cost report (2024)</td>
+</tr>
+<tr class="even">
+<td>Standalone battery cost, for the replacement</td>
+<td>$2,492</td>
+<td>$/kW (2022 $)</td>
+<td>Sourced</td>
+<td>EIA distributed-generation cost report (2024)</td>
+</tr>
+<tr class="odd">
+<td>Solar upkeep</td>
+<td>$17.63</td>
+<td>$/kW-DC a year (2023 $)</td>
+<td>Sourced</td>
+<td>NLR ATB 2025, Commercial PV</td>
+</tr>
+<tr class="even">
+<td>Battery upkeep</td>
+<td>$63</td>
+<td>$/kW a year (2022 $)</td>
+<td>Sourced</td>
+<td>EIA distributed-generation cost report (2024)</td>
+</tr>
+<tr class="odd">
+<td>Price index, 2022</td>
+<td>118.035</td>
+<td>index (2017 = 100)</td>
+<td>Course data</td>
+<td>EIA STEO Table 9a</td>
+</tr>
+<tr class="even">
+<td>Price index, 2023</td>
+<td>122.389</td>
+<td>index (2017 = 100)</td>
+<td>Course data</td>
+<td>EIA STEO Table 9a</td>
+</tr>
+<tr class="odd">
+<td>Price index, 2025</td>
+<td>128.989</td>
+<td>index (2017 = 100)</td>
+<td>Course data</td>
+<td>EIA STEO Table 9a</td>
+</tr>
+<tr class="even">
+<td>Discount rate (real)</td>
+<td>4%</td>
+<td>per year</td>
+<td>Course data</td>
+<td>this case</td>
+</tr>
+<tr class="odd">
+<td>Analysis period</td>
+<td>25</td>
+<td>years</td>
+<td>Choice</td>
+<td>this case</td>
+</tr>
+<tr class="even">
+<td>Battery useful life</td>
+<td>15</td>
+<td>years</td>
+<td>Sourced</td>
+<td>EIA distributed-generation cost report (2024)</td>
+</tr>
+<tr class="odd">
+<td>Utility's avoided energy cost</td>
+<td>$0.03</td>
+<td>$/kWh</td>
+<td>Illustrative</td>
+<td>this case</td>
+</tr>
+<tr class="even">
+<td>Utility's avoided capacity cost</td>
+<td>$180</td>
+<td>$/kW a year</td>
+<td>Course data</td>
+<td>this case</td>
+</tr>
+<tr class="odd">
+<td>Share of the battery's peak cut that falls in the system's tightest hours</td>
+<td>50%</td>
+<td>fraction</td>
+<td>Illustrative</td>
+<td>this case</td>
+</tr>
+<tr class="even">
+<td>Grid CO2 factor</td>
+<td>680</td>
+<td>lb per MWh</td>
+<td>Sourced</td>
+<td>EIA Kansas Electricity Profile 2024</td>
+</tr>
+<tr class="odd">
+<td>2022 dollars to 2025 dollars</td>
+<td>1.0928</td>
+<td>factor</td>
+<td>Derived</td>
+<td>formula in the log</td>
+</tr>
+<tr class="even">
+<td>2023 dollars to 2025 dollars</td>
+<td>1.0539</td>
+<td>factor</td>
+<td>Derived</td>
+<td>formula in the log</td>
+</tr>
+<tr class="odd">
+<td>Up-front cost, solar + battery</td>
+<td>$866,046</td>
+<td>$ (2025)</td>
+<td>Derived</td>
+<td>formula in the log</td>
+</tr>
+<tr class="even">
+<td>Battery replacement at the end of year 15</td>
+<td>$408,490</td>
+<td>$ (2025)</td>
+<td>Derived</td>
+<td>formula in the log</td>
+</tr>
+<tr class="odd">
+<td>Solar upkeep a year</td>
+<td>$4,645</td>
+<td>$ (2025)</td>
+<td>Derived</td>
+<td>formula in the log</td>
+</tr>
+<tr class="even">
+<td>Battery upkeep a year</td>
+<td>$10,327</td>
+<td>$ (2025)</td>
+<td>Derived</td>
+<td>formula in the log</td>
+</tr>
+<tr class="odd">
+<td>Grid CO2 factor in metric tonnes</td>
+<td>0.3084</td>
+<td>t per MWh</td>
+<td>Derived</td>
+<td>formula in the log</td>
+</tr>
+<tr class="even">
+<td>Check: saving from installing together</td>
+<td>6.7%</td>
+<td>fraction</td>
+<td>Derived</td>
+<td>formula in the log</td>
+</tr>
+</tbody>
+</table>
+</div></details></div>
+<div class="lx-xcard"><header class="lx-x-head"><h3 class="anchored">The points of the two written tasks</h3></header>
+<p><b>Your boundary</b></p><ul class="cka-list"><li>Whose money: the school district's, from its electricity bill, the system's capital, upkeep and the battery's replacement.</li><li>Time and money: 25 years, real 2025 dollars, one real discount rate (4%), with costs from other dollar years converted.</li><li>Left out, and said so: tax credits, financing, resilience, CO2's value and solar wear (or a stated subset of these).</li><li>The other parties (the utility's other customers, federal taxpayers, the resource view) reported apart from the main result.</li></ul>
+<p><b>Your log and your sensitivity</b></p><ul class="cka-list"><li>Every input has a value, a unit, a type (sourced, course data, illustrative, choice, derived) and a source or a reason.</li><li>Sourced values name the document, the table or page, and an as-of date.</li><li>Costs from different dollar years are converted to 2025 dollars with a stated index.</li><li>The main result is given as a range from the sensitivity, with the input that moves it most named.</li></ul>
+</div>
+<!-- cka-solution:end -->
+</div>
+</div>
+<div id="rubric" class="lx-sec">
+<section id="rubric" class="level2 lx-sec-h">
+<h2 class="anchored" data-anchor-id="rubric">Rubric</h2>
+</section>
+<div class="lx-xgrid">
+<div class="lx-xcard">
+<header class="lx-x-head"><h3 class="anchored">The checkpoint's level</h3></header>
+<ul class="cka-list">
+<li><b>Proficient:</b> at least 5 of the 7 auto-marked tasks right on the first try; at least 3 of the 4 points of your boundary (task 1) and 3 of the 4 points of your log and sensitivity (task 9).</li>
+<li><b>Strong:</b> at least 6 of 7 on the first try, and every point of both written tasks.</li>
+<li><b>Developing:</b> at least 3 of 7 on the first try.</li>
+<li><b>Not yet:</b> anything else. The checkpoint shows readiness for the Modeler tier; it certifies nothing.</li>
+<li><b>Opened early:</b> a task whose answer you open before answering counts as not right; if the worked workbook opens before all nine tasks are answered (on purpose, or in an earlier attempt), the attempt is practice and gets no level.</li>
+<li><b>Answered late:</b> an answer given after the worked workbook opened counts as practice, not as right; a written task submitted after it earns no points.</li>
+</ul>
+<p class="lx-hint">The written tasks are self-rated against their points. A teacher or mentor can rate your workbook again with the course rubric below, from the copied summary and the file.</p>
+</div>
+</div>
+
+<div id="cka-course-rubric" class="lx-xgrid cka-course">
+<div class="lx-fallback">
+<!-- cka-course-rubric:start (written by LX.Rubric's staticHTML in the test's --write mode; do not edit) -->
+<div class="lx-scroll-x">
+<table class="lx-facts lx-rb-static caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">Competence</th>
+<th data-quarto-table-cell-role="th" scope="col">Developing</th>
+<th data-quarto-table-cell-role="th" scope="col">Proficient (the bar)</th>
+<th data-quarto-table-cell-role="th" scope="col">Strong</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">Consistent accounting<br>
+<span class="lx-hint">Look for: One boundary for every cost and saving, in 2025 dollars; the school's result kept apart from the other customers' and the resource view; transfers kept apart from real costs.</span></th>
+<td data-l="Developing">Costs and emissions on different boundaries.</td>
+<td data-l="Proficient">Cost and emissions on one boundary; emissions question named; who pays and who benefits named.</td>
+<td data-l="Strong">Distributional and environmental side effects estimated with stated assumptions.</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">Uncertainty<br>
+<span class="lx-hint">Look for: Low and high values for the inputs that matter, the main result as a range, the input that moves it most named.</span></th>
+<td data-l="Developing">Single numbers.</td>
+<td data-l="Proficient">Uncertainties classified; scenario or global sensitivity analysis; results as ranges.</td>
+<td data-l="Strong">Decision-relevant uncertainty identified and its value discussed.</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">Trustworthy analysis<br>
+<span class="lx-hint">Look for: Every number traces to a formula or to a log row with a source and a date; a second calculation (a year-by-year cash flow) checks the first.</span></th>
+<td data-l="Developing">Results cannot be rerun.</td>
+<td data-l="Proficient">Reruns from a clean clone (or a complete audit trail); verification log; one validation against real data or an independent reference.</td>
+<td data-l="Strong">Independent reproduction by someone else; validation on data not used to build the analysis.</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">Realism<br>
+<span class="lx-hint">Look for: Illustrative inputs labelled as such; what the spreadsheet leaves out listed (credits, resilience, solar wear, tariff changes).</span></th>
+<td data-l="Developing">Assumes announced projects exist.</td>
+<td data-l="Proficient">Evidence status of key inputs; a 'what the analysis leaves out' list.</td>
+<td data-l="Strong">Realism checked with a practitioner or primary documents.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- cka-course-rubric:end -->
+</div>
+</div>
+</div>
+<div id="sources" class="lx-sec">
+<section id="numbers-sources-and-whats-next" class="level2 lx-sec-h">
+<h2 class="anchored" data-anchor-id="numbers-sources-and-whats-next">Numbers, sources and what’s next</h2>
+</section>
+<div class="lx-end">
+<div class="lx-card">
+<p class="lx-eyebrow">Numbers used in the case</p>
+
+<table class="lx-facts caption-top table">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">Number</th>
+<th data-quarto-table-cell-role="th" scope="col">What it means</th>
+<th data-quarto-table-cell-role="th" scope="col">Source</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td class="n">11.17¢/kWh</td>
+<td>Average price of electricity to Kansas's commercial customers, January to August 2025.</td>
+<td class="s"><a href="https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_5_6_b">EIA, Electric Power Monthly, Table 5.6.B</a> · issue of 23 Oct 2026</td>
+</tr>
+<tr class="even">
+<td class="n">$3,170/kW-DC</td>
+<td>Installed cost of a commercial 250 kW-DC solar array with a 150 kW, 300 kWh battery, per kW-DC of solar, 2022 dollars.</td>
+<td class="s"><a href="https://www.eia.gov/analysis/studies/buildings/dg_storage_chp/pdf/dg_storage_chp.pdf">EIA distributed-generation report</a> (PDF), Appendix A, Figure 3-5, p. 36 · March 2024</td>
+</tr>
+<tr class="odd">
+<td class="n">17.8%</td>
+<td>Capacity factor of a 250 kW-DC commercial solar system, U.S. average, 2022.</td>
+<td class="s">Same report, Table 2-5, p. 14</td>
+</tr>
+<tr class="even">
+<td class="n">$63/kW a year</td>
+<td>Upkeep of a commercial battery, 2022 dollars; 90% round trip and a 15-year life (Table 3-3, p. 32).</td>
+<td class="s">Same report, Figure 3-6, p. 37</td>
+</tr>
+<tr class="odd">
+<td class="n">$17.63/kW-DC a year</td>
+<td>Upkeep of commercial solar for 2024, in 2023 dollars.</td>
+<td class="s"><a href="https://atb.nlr.gov/electricity/2025/commercial_pv">NLR, 2025 ATB, Commercial PV</a> · read 6 Nov 2026</td>
+</tr>
+<tr class="even">
+<td class="n">680 lb/MWh</td>
+<td>CO₂ per MWh generated by Kansas's power plants, 2024 (an average factor).</td>
+<td class="s"><a href="https://www.eia.gov/electricity/state/kansas/">EIA, Kansas Electricity Profile 2024</a>, Table 1</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+<div class="lx-stack">
+<!-- learn:next:start (generated by scripts/build_learn.py from learn/path.yml; edit the YAML, not this block) -->
+<div class="lx-next lx-card" data-next-id="">
+<p class="lx-eyebrow">Keep going</p>
+<p class="lx-next-t"><a href="index.html">Back to the course map</a></p>
+<button type="button" class="lx-btn ghost small lx-complete" data-complete="ck-a-spreadsheet" aria-pressed="false" hidden="">Mark this lesson as complete</button>
+</div>
+<!-- learn:next:end -->
+<div class="lx-card lx-sources">
+<p class="lx-eyebrow">Sources and further reading</p>
+<ul>
+<li>EIA (report by Z Federal and DNV), March 2024. <a href="https://www.eia.gov/analysis/studies/buildings/dg_storage_chp/pdf/dg_storage_chp.pdf">Distributed Generation, Battery Storage, and Combined Heat and Power System Characteristics and Costs in the Buildings and Industrial Sectors</a> (PDF): Appendix A, Table 2-5 (p. 14), Figure 2-4 (p. 19), Table 3-3 (p. 32), Figures 3-4 and 3-5 (p. 36), Figure 3-6 (p. 37); costs in 2022 dollars.</li>
+<li>EIA. <a href="https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_5_6_b">Electric Power Monthly, Table 5.6.B</a>: average price of electricity to ultimate customers by end-use sector, year to date (issue of 23 Oct 2026).</li>
+<li>NLR. <a href="https://atb.nlr.gov/electricity/2025/commercial_pv">2025 Electricity Annual Technology Baseline: Commercial PV</a>; all values in 2023 dollars.</li>
+<li>EIA. <a href="https://www.eia.gov/outlooks/steo/">Short-Term Energy Outlook</a>, Table 9a: GDP implicit price deflator (October 2026 issue), the course's price index.</li>
+<li>EIA. <a href="https://www.eia.gov/electricity/state/kansas/">Kansas Electricity Profile 2024</a>, Table 1.</li>
+<li>IRS. <a href="https://www.irs.gov/credits-deductions/elective-pay-and-transferability">Elective pay and transferability</a> (page last reviewed 27 Jun 2026): how tax-exempt and governmental entities can benefit from certain clean-energy credits; not counted in this case.</li>
+</ul>
+</div>
+</div>
+</div>
+<!-- learn:footer:start (generated by scripts/build_learn.py from learn/path.yml; edit the YAML, not this block) -->
+<div class="lx-foot">
+<p class="lx-corrections">Spotted an error, or stuck? Write to <a href="mailto:hlli@ksu.edu?subject=Learn%2C%20Analyst%20checkpoint:%20an%20auditable%20spreadsheet%20for%20a%20new%20case">hlli@ksu.edu</a>. Corrections are made in place and dated here.</p>
+<p class="lx-license">Text licensed <a href="https://creativecommons.org/licenses/by/4.0/" rel="license">CC BY 4.0</a>, code <a href="https://opensource.org/license/mit">MIT</a>: teachers and students may reuse and adapt it, with credit to Honglin Li.</p>
+</div>
+<!-- learn:footer:end -->
+</div>
+<script src="../assets/learn/learn.js" defer=""></script>
+<script src="../assets/learn/ck-a-spreadsheet.js" defer=""></script>
+
+
+
+</main> <!-- /main -->
+<script>
+// site.js — site-wide behaviour (third redesign, 2026-10-30): skip link, navbar shadow once scrolled,
+// back-to-top button, and a gentle one-time fade-in of content blocks. Without JS every page is complete.
+(function () {
+  const root = document.documentElement;
+  const body = document.body;
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // skip link to the page's main landmark
+  const main = document.querySelector("main");
+  if (main) {
+    if (!main.id) main.id = "main-content";
+    const skip = document.createElement("a");
+    skip.className = "skip-link"; skip.href = "#" + main.id; skip.textContent = "Skip to main content";
+    body.insertBefore(skip, body.firstChild);
+  }
+
+  // the brand (the name at the left of the navbar) is the link to the home page, the About page, which has no navbar
+  // item of its own since Journeys joined the navbar (2026-11-05)
+  const brand = document.querySelector("#quarto-header .navbar-brand");
+  if (brand) {
+    brand.setAttribute("aria-label", "Honglin Li, home");
+    const here = location.pathname.replace(/\/index\.html$/, "/");
+    if (brand.pathname && brand.pathname.replace(/\/index\.html$/, "/") === here) brand.setAttribute("aria-current", "page");
+  }
+  // the navbar says "Notes" for Field Notes (to fit at 1,200 px); its accessible name keeps the full name
+  document.querySelectorAll('#quarto-header .nav-link[href$="field-notes.html"]').forEach(function (a) { a.setAttribute("aria-label", "Field Notes"); });
+
+  // back-to-top button
+  const top = document.createElement("button");
+  top.type = "button"; top.className = "to-top"; top.setAttribute("aria-label", "Back to top");
+  top.innerHTML = '<i class="bi bi-arrow-up" aria-hidden="true"></i>';
+  top.hidden = true;  // out of the tab order until the page is scrolled down
+  top.addEventListener("click", function () {
+    window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+    if (main) { main.setAttribute("tabindex", "-1"); main.focus({ preventScroll: true }); }
+  });
+  body.appendChild(top);
+
+  function onScroll() {
+    const y = window.scrollY;
+    body.classList.toggle("scrolled", y > 8);
+    const show = y > window.innerHeight * 0.8;
+    top.hidden = !show;
+    top.classList.toggle("show", show);
+  }
+  onScroll();
+  window.addEventListener("scroll", onScroll, { passive: true });
+
+  // gentle fade-in, once per block
+  const auto = document.querySelectorAll("main .card, main .glow-card, main .reveal-auto > *");
+  auto.forEach(function (el) { el.classList.add("reveal"); });
+  const items = document.querySelectorAll(".reveal");
+  if (!reduce && "IntersectionObserver" in window) {
+    root.classList.add("js-reveal");
+    const io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
+    }, { rootMargin: "0px 0px -5% 0px", threshold: 0.05 });
+    items.forEach(function (el) { io.observe(el); });
+  } else {
+    items.forEach(function (el) { el.classList.add("in"); });
+  }
+})();
+</script>
+<script>
+// pages.js — publications, projects listing and project pages (third redesign, 2026-10-30).
+// Inlined on every page (scripts/build_site.py writes pages-js.html), so each part is guarded by element presence.
+//   1. BIB buttons: show / hide an entry's BibTeX; copy button (Publications, home page, project pages)
+//   2. Publications: search box and type tabs; hides empty year groups; live result count; the pressed type is
+//      highlighted in the publications-per-year chart; #journal, #conference, #preprint or #thesis in the URL
+//      presses that tab (the About page's stat row, site/_stats.qmd, links there)
+//   3. Projects: theme tabs built from the cards; #<theme> in the URL preselects a theme (project breadcrumbs link there)
+// Without JS every page is complete: the filter bars stay hidden and the BibTeX panels closed.
+(function () {
+  "use strict";
+
+  // a polite live region for short confirmations ("BibTeX copied")
+  let live = null;
+  function announce(msg) {
+    if (!live) {
+      live = document.createElement("div");
+      live.className = "visually-hidden"; live.setAttribute("role", "status"); live.setAttribute("aria-live", "polite");
+      document.body.appendChild(live);
+    }
+    live.textContent = ""; window.setTimeout(function () { live.textContent = msg; }, 30);
+  }
+  const norm = function (s) { return (s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/\s+/g, " "); };
+
+  // ---------- 1. BibTeX ----------
+  document.querySelectorAll(".bib-toggle").forEach(function (btn) {
+    const panel = document.getElementById(btn.getAttribute("aria-controls"));
+    if (!panel) return;
+    btn.addEventListener("click", function () {
+      const open = btn.getAttribute("aria-expanded") === "true";
+      btn.setAttribute("aria-expanded", String(!open));
+      panel.hidden = open;
+    });
+  });
+  function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+    return new Promise(function (resolve, reject) {   // fallback (e.g. file:// previews)
+      const ta = document.createElement("textarea");
+      ta.value = text; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      let ok = false;
+      try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+      ta.remove();
+      if (ok) resolve(); else reject(new Error("copy failed"));
+    });
+  }
+  document.querySelectorAll(".bib-copy").forEach(function (btn) {
+    const label = btn.querySelector("span");
+    const code = btn.parentElement.querySelector("code");
+    if (!code) return;
+    btn.addEventListener("click", function () {
+      copyText(code.textContent).then(function () {
+        btn.classList.add("done"); if (label) label.textContent = "Copied"; announce("BibTeX copied to the clipboard");
+      }, function () {
+        if (label) label.textContent = "Select and copy"; announce("Copy failed; select the text and copy it");
+        const sel = window.getSelection(), range = document.createRange();
+        range.selectNodeContents(code); sel.removeAllRanges(); sel.addRange(range);
+      }).then(function () {
+        window.setTimeout(function () { btn.classList.remove("done"); if (label) label.textContent = "Copy"; }, 1800);
+      });
+    });
+  });
+
+  // pressed-state helper for a group of filter tabs
+  function pressTab(tabs, active) {
+    tabs.forEach(function (t) { t.setAttribute("aria-pressed", String(t === active)); });
+  }
+
+  // ---------- 2. Publications: search and type tabs ----------
+  const pubBar = document.querySelector(".pub-filter");
+  if (pubBar) {
+    const input = pubBar.querySelector("#pub-q");
+    const tabs = Array.prototype.slice.call(pubBar.querySelectorAll(".ftab"));
+    const groups = Array.prototype.slice.call(document.querySelectorAll(".pub-year"));
+    const items = Array.prototype.slice.call(document.querySelectorAll(".pub-years .pub"));
+    const status = document.querySelector(".filter-status");
+    const empty = document.querySelector(".filter-empty");
+    const chart = document.querySelector(".pub-chart");
+    const total = items.length;
+    let type = "all";
+    items.forEach(function (li) {   // search text: badge, title, authors, venue and year (not the BibTeX)
+      li._q = norm([".abbr", ".pub-title", ".pub-authors", ".pub-venue"].map(function (s) {
+        const el = li.querySelector(s); return el ? el.textContent : "";
+      }).join(" ") + " " + li.getAttribute("data-year"));
+    });
+    function apply() {
+      const terms = norm(input.value).trim().split(" ").filter(Boolean);
+      let shown = 0;
+      items.forEach(function (li) {
+        const ok = (type === "all" || li.getAttribute("data-type") === type) && terms.every(function (t) { return li._q.indexOf(t) !== -1; });
+        li.hidden = !ok; if (ok) shown++;
+      });
+      groups.forEach(function (g) { g.hidden = !g.querySelector(".pub:not([hidden])"); });
+      if (empty) empty.hidden = shown > 0;
+      if (chart) chart.setAttribute("data-type", type);
+      if (status) status.textContent = (shown === total && !terms.length) ? "" :
+        "Showing " + shown + " of " + total + " publications" + (terms.length ? " matching “" + input.value.trim() + "”" : "") + ".";
+    }
+    tabs.forEach(function (t) {
+      t.addEventListener("click", function () { type = t.getAttribute("data-filter"); pressTab(tabs, t); apply(); });
+    });
+    input.addEventListener("input", apply);
+    input.addEventListener("keydown", function (e) { if (e.key === "Escape" && input.value) { input.value = ""; apply(); } });
+    const reset = document.querySelector(".filter-reset");
+    if (reset) reset.addEventListener("click", function () { input.value = ""; type = "all"; pressTab(tabs, tabs[0]); apply(); input.focus(); });
+    pubBar.hidden = false;
+    function typeFromHash() {   // year anchors (#y2026) match no tab and are left alone
+      const h = decodeURIComponent((location.hash || "").slice(1));
+      const tab = tabs.find(function (t) { return t.getAttribute("data-filter") === h; });
+      if (tab) { type = h; pressTab(tabs, tab); apply(); }
+    }
+    typeFromHash();
+    window.addEventListener("hashchange", typeFromHash);
+  }
+
+  // ---------- 3. Projects: theme tabs ----------
+  const projBar = document.querySelector(".proj-filter");
+  const cells = Array.prototype.slice.call(document.querySelectorAll(".project-grid [data-theme]"));
+  if (projBar && cells.length) {
+    const box = projBar.querySelector(".ftabs");
+    const status = document.querySelector(".filter-status");
+    const themes = [];   // [key, label, count] in card order
+    cells.forEach(function (c) {
+      const k = c.getAttribute("data-theme");
+      const hit = themes.find(function (t) { return t[0] === k; });
+      if (hit) hit[2]++; else themes.push([k, c.getAttribute("data-label"), 1]);
+    });
+    function makeTab(key, label, n) {
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "ftab" + (key === "all" ? "" : " theme-" + key);
+      b.setAttribute("data-filter", key); b.setAttribute("aria-pressed", "false");
+      b.innerHTML = (key === "all" ? "" : '<span class="tdot" aria-hidden="true"></span>') + "<span></span> " + '<span class="n">' + n + "</span>";
+      b.children[key === "all" ? 0 : 1].textContent = label;
+      box.appendChild(b);
+      return b;
+    }
+    const tabs = [makeTab("all", "All", cells.length)].concat(themes.map(function (t) { return makeTab(t[0], t[1], t[2]); }));
+    function select(key, push) {
+      const tab = tabs.find(function (t) { return t.getAttribute("data-filter") === key; }) || tabs[0];
+      key = tab.getAttribute("data-filter");
+      pressTab(tabs, tab);
+      let shown = 0;
+      cells.forEach(function (c) { const ok = key === "all" || c.getAttribute("data-theme") === key; c.hidden = !ok; if (ok) shown++; });
+      if (status) status.textContent = key === "all" ? "" : "Showing " + shown + " of " + cells.length + " projects: " + tab.children[1].textContent + ".";
+      if (push && window.history && history.replaceState) history.replaceState(null, "", key === "all" ? location.pathname + location.search : "#" + key);
+    }
+    tabs.forEach(function (t) { t.addEventListener("click", function () { select(t.getAttribute("data-filter"), true); }); });
+    projBar.hidden = false;
+    const initial = decodeURIComponent((location.hash || "").slice(1));
+    select(initial || "all", false);
+    window.addEventListener("hashchange", function () { select(decodeURIComponent(location.hash.slice(1)) || "all", false); });
+  }
+})();
+</script>
+<script>
+// home.js — about/home page (third redesign, 2026-10-30). Guard by element presence.
+</script>
+<script>
+// map.js — "Collaborations around the world" map on the About page (2026-10-30).
+// The section, its legend, the institution list and the data (<script id="cmap-data">) come from scripts/build_map.py
+// (_map.qmd); styles in assets/map.css. Inlined on every page (scripts/build_site.py writes map-js.html), so it does
+// nothing unless #cmap is on the page.
+//   - Lazy: Leaflet 1.9.4 (cdnjs, with SRI) and the tiles load only when the section nears the viewport.
+//   - The basemap follows Quarto's day/night toggle (body.quarto-light / body.quarto-dark): CARTO light_all / dark_all
+//     when #cmap carries data-tiles-key (CARTO basemaps need a free key; set in scripts/build_map.py); otherwise the
+//     OpenStreetMap standard tiles, toned grey by day and inverted by night in map.css (.cmap.tiles-osm).
+//   - Scroll-wheel zoom (and one-finger dragging on touch screens) stays off until the map is clicked.
+//   - Keyboard: the map takes focus (arrows pan, +/- zoom); Tab reaches each marker, Enter opens its popup, Esc closes.
+//   - Markers that overlap at the current zoom are spread apart a little, so each stays visible and clickable.
+//   - Without JS, or if Leaflet cannot load, the map box stays hidden and the list below the map is the content.
+// Visitor map (part 2 below): the provider's snippet waits in <template id="visitor-map-tpl">; it is inserted after the
+// page has loaded, so it never blocks rendering, and the "Visitors" section is hidden again if it fails or draws nothing.
+
+// ---------- 1. collaboration map ----------
+(function () {
+  "use strict";
+  const root = document.getElementById("cmap");
+  const dataEl = document.getElementById("cmap-data");
+  if (!root || !dataEl) return;
+  let data;
+  try { data = JSON.parse(dataEl.textContent); } catch (e) { return; }
+  const wrap = root.closest(".cmap-wrap");
+  const section = root.closest("section") || root;
+
+  const CDN = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/";
+  const LEAFLET_CSS = { href: CDN + "leaflet.min.css",
+    integrity: "sha512-h9FcoyWjHcOcmEVkxOfTLnmZFWIH0iZhZT1H2TbOq55xssQGEJHEaIm+PgoUaZbRvQTNTluNOEfb1ZRy6D3BOw==" };
+  const LEAFLET_JS = { src: CDN + "leaflet.min.js",
+    integrity: "sha512-puJW3E/qXDqYp9IfhAI54BJEaWIfloJ7JWs7OeD5i6ruC9JZL1gERT1wjtwXFlh7CjE7ZJ+/vcRZRkIYIb6p4g==" };
+  const OSM_ATTR = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+  // The CARTO key is restricted to the live site's host, so local previews (file://, localhost) use OpenStreetMap tiles.
+  const LIVE_HOST = "henryutd2021.github.io";
+  const tilesKey = location.hostname === LIVE_HOST ? root.getAttribute("data-tiles-key") : null;
+  const BASEMAP = tilesKey ? {
+    kind: "carto",
+    light: "https://basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png?key=" + encodeURIComponent(tilesKey),
+    dark: "https://basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}.png?key=" + encodeURIComponent(tilesKey),
+    attribution: OSM_ATTR + ' &copy; <a href="https://carto.com/attributions">CARTO</a>', maxZoom: 20,
+  } : {
+    kind: "osm",   // one tile set for both themes; map.css tones it (grey by day, inverted by night)
+    light: "https://tile.openstreetmap.org/{z}/{x}/{y}.png", dark: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+    attribution: OSM_ATTR, maxZoom: 19,
+  };
+  const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const isDark = function () { return document.body.classList.contains("quarto-dark"); };
+  const esc = function (s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  };
+
+  // JS is running: reserve the map's space now (a quiet placeholder until Leaflet arrives); hide it again on failure
+  wrap.hidden = false;
+  root.classList.add("is-loading");
+  function fail() { wrap.hidden = true; }
+
+  // ---------- load Leaflet (CSS and JS, both with SRI), once ----------
+  function loadLeaflet(done) {
+    if (window.L && window.L.map) { done(true); return; }
+    let pending = 2, ok = true, finished = false;
+    const timer = window.setTimeout(function () { finish(false); }, 20000);
+    function finish(success) {
+      if (finished) return;
+      if (!success) ok = false;
+      if (--pending > 0 && ok) return;
+      finished = true; window.clearTimeout(timer);
+      done(ok && !!(window.L && window.L.map));
+    }
+    const link = document.createElement("link");
+    link.rel = "stylesheet"; link.href = LEAFLET_CSS.href; link.integrity = LEAFLET_CSS.integrity;
+    link.crossOrigin = "anonymous"; link.referrerPolicy = "no-referrer";
+    link.onload = function () { finish(true); }; link.onerror = function () { finish(false); };
+    document.head.appendChild(link);
+    const script = document.createElement("script");
+    script.src = LEAFLET_JS.src; script.integrity = LEAFLET_JS.integrity;
+    script.crossOrigin = "anonymous"; script.referrerPolicy = "no-referrer";
+    script.onload = function () { finish(true); }; script.onerror = function () { finish(false); };
+    document.head.appendChild(script);
+  }
+
+  // ---------- popups ----------
+  function paperList(papers, max) {
+    const items = papers.slice(0, max).map(function (p) {
+      const t = p[2] ? '<a href="https://doi.org/' + esc(p[2]) + '">' + esc(p[0]) + "</a>" : esc(p[0]);
+      const st = p[3] && p[3] !== "published" ? ' <span class="cmap-pop-st">' + esc(p[3]) + "</span>" : "";
+      return "<li>" + t + ' <span class="cmap-pop-yr">' + esc(p[1]) + "</span>" + st + "</li>";
+    });
+    if (papers.length > max) items.push('<li class="cmap-pop-more">and ' + (papers.length - max) + " more</li>");
+    return '<ul class="cmap-pop-papers">' + items.join("") + "</ul>";
+  }
+  function yearSpan(papers) {
+    const ys = papers.map(function (p) { return p[1]; }).filter(Boolean).sort();
+    if (!ys.length) return "";
+    return ys[0] === ys[ys.length - 1] ? String(ys[0]) : ys[0] + "–" + ys[ys.length - 1];
+  }
+  function instPopup(i) {
+    const n = i.count, word = n === 1 ? "paper" : "papers";
+    return '<div class="cmap-pop">' +
+      '<p class="cmap-pop-kind">' + (i.home ? "Home institution" : "Collaborating institution") + "</p>" +
+      "<h3>" + esc(i.name) + "</h3>" +
+      '<p class="cmap-pop-place">' + esc([i.place, i.country].filter(Boolean).join(", ")) + "</p>" +
+      '<p class="cmap-pop-n"><strong>' + n + "</strong> " + (i.home ? word : "joint " + word) +
+      (yearSpan(i.papers) ? " · " + yearSpan(i.papers) : "") + "</p>" +
+      paperList(i.papers, i.home ? 3 : 4) + "</div>";
+  }
+  function talkPopup(t) {
+    return '<div class="cmap-pop">' +
+      '<p class="cmap-pop-kind cmap-pop-kind--talk">Conference presentation</p>' +
+      "<h3>" + esc(t.event) + "</h3>" +
+      '<p class="cmap-pop-place">' + esc([t.place, t.country].filter(Boolean).join(", ")) + " · " + esc(t.date) + "</p>" +
+      '<p class="cmap-pop-talk">' + esc(t.title) + "</p></div>";
+  }
+
+  // ---------- the map ----------
+  function init() {
+    const L = window.L;
+    const touch = !!(L.Browser && L.Browser.mobile);
+    const map = L.map(root, {
+      scrollWheelZoom: false, dragging: !touch, worldCopyJump: true, zoomSnap: 1, minZoom: 1, maxZoom: 12,   // whole zoom levels: no seams between scaled tiles
+      keyboard: true, zoomAnimation: !reduceMotion, fadeAnimation: !reduceMotion, markerZoomAnimation: !reduceMotion,
+    });
+    root.classList.remove("is-loading");
+    const hint = wrap.querySelector(".cmap-hint");
+    if (touch && hint) hint.textContent = "Tap the map to move it with one finger; pinch to zoom. Tap a marker for details.";
+    root.setAttribute("role", "region");
+    root.setAttribute("aria-roledescription", "map");
+    root.setAttribute("aria-label", root.getAttribute("data-label") || "Map");
+    map.attributionControl.setPrefix('<a href="https://leafletjs.com">Leaflet</a>');
+    root.classList.add("tiles-" + BASEMAP.kind);
+    const tiles = L.tileLayer(isDark() ? BASEMAP.dark : BASEMAP.light,
+      { attribution: BASEMAP.attribution, maxZoom: BASEMAP.maxZoom }).addTo(map);
+
+    // popups fit inside the map: narrower on phones, and scrolling inside when taller than the map (2026-11-05)
+    function popupOptions() {
+      const w = root.clientWidth, h = root.clientHeight, narrow = w < 480;
+      return { maxWidth: narrow ? Math.max(170, w - 130) : 300, maxHeight: Math.max(140, h - (narrow ? 110 : 80)), closeButton: true,
+               autoPanPaddingTopLeft: narrow ? L.point(46, 12) : L.point(64, 24), autoPanPaddingBottomRight: narrow ? L.point(10, 12) : L.point(24, 24) };
+    }
+
+    // markers: home = ring, collaborators = filled circle (size grows with joint papers), presentations = diamond
+    const markers = [];
+    function add(kind, lat, lon, size, label, popup, z) {
+      // the marker's box is at least 24 px (a touch target), the dot inside it keeps its own size (2026-11-05)
+      const box = Math.max(24, size);
+      const icon = L.divIcon({ className: "cmap-mk cmap-mk--" + kind, html: '<span style="width:' + size + "px;height:" + size + 'px"></span>',
+                               iconSize: [box, box], iconAnchor: [box / 2, box / 2], popupAnchor: [0, -size / 2] });
+      const m = L.marker([lat, lon], { icon: icon, title: label, keyboard: true, riseOnHover: true, zIndexOffset: z })
+        .bindPopup(popup, popupOptions()).addTo(map);
+      m.on("add", function () { const el = m.getElement(); if (el) el.setAttribute("aria-label", label); });
+      const el = m.getElement(); if (el) el.setAttribute("aria-label", label);
+      m.cmapSize = size;
+      markers.push(m);
+    }
+    (data.institutions || []).forEach(function (i) {
+      const n = i.count, place = [i.place, i.country].filter(Boolean).join(", ");
+      const label = i.name + ", " + place + " — " + (i.home ? "home institution, " + n + (n === 1 ? " paper" : " papers")
+                                                            : n + (n === 1 ? " joint paper" : " joint papers"));
+      const size = i.home ? Math.round(16 + 2 * Math.sqrt(n)) : Math.round(10 + 3 * Math.sqrt(n));
+      add(i.home ? "home" : "collab", i.lat, i.lon, size, label, instPopup(i), i.home ? 0 : 100);
+    });
+    (data.presentations || []).forEach(function (t) {
+      const label = t.event + ", " + [t.place, t.country].filter(Boolean).join(", ") + " — presentation, " + t.date;
+      add("talk", t.lat, t.lon, 13, label, talkPopup(t), 200);
+    });
+    if (!markers.length) { fail(); return; }
+
+    // spread markers that overlap at the current zoom (visual offset of the inner dot only). Overlapping markers form
+    // a group (chained: A near B, B near C -> one group), laid out on a small circle around the group's centre in the
+    // markers' own compass order, the circle just large enough that neighbours no longer touch. If a spread group
+    // then touches another marker, the two merge and are laid out again.
+    const GAP = 4;
+    function declutter() {
+      const k = map.getZoom() <= 2 ? 0.72 : 1;   // smaller markers at world-wide zoom levels (phones), so fewer collide
+      root.style.setProperty("--k", String(k));
+      const pts = markers.map(function (m) { return { m: m, p: map.latLngToLayerPoint(m.getLatLng()), r: k * m.cmapSize / 2 }; });
+      const parent = pts.map(function (_, i) { return i; });
+      const find = function (i) { while (parent[i] !== i) { parent[i] = parent[parent[i]]; i = parent[i]; } return i; };
+      const touch = function (i, j, pi, pj) { return pi.distanceTo(pj) < pts[i].r + pts[j].r + GAP; };
+      function layout() {
+        const pos = pts.map(function (q) { return q.p; });
+        const groups = {};
+        pts.forEach(function (_, i) { (groups[find(i)] = groups[find(i)] || []).push(i); });
+        Object.keys(groups).forEach(function (g) {
+          const group = groups[g];
+          if (group.length === 1) return;
+          let cx = 0, cy = 0, rmax = 0;
+          group.forEach(function (k) { cx += pts[k].p.x; cy += pts[k].p.y; rmax = Math.max(rmax, pts[k].r); });
+          cx /= group.length; cy /= group.length;
+          const R = Math.max(rmax + GAP, (2 * rmax + GAP) / (2 * Math.sin(Math.PI / group.length)));
+          const angOf = function (k) { return Math.atan2(pts[k].p.y - cy, pts[k].p.x - cx); };
+          group.sort(function (x, y) { return angOf(x) - angOf(y); });
+          const start = angOf(group[0]);
+          group.forEach(function (k, n) {
+            const ang = start + (2 * Math.PI * n) / group.length;
+            pos[k] = L.point(cx + R * Math.cos(ang), cy + R * Math.sin(ang));
+          });
+        });
+        return pos;
+      }
+      for (let i = 0; i < pts.length; i++) {
+        for (let j = i + 1; j < pts.length; j++) { if (touch(i, j, pts[i].p, pts[j].p)) parent[find(i)] = find(j); }
+      }
+      let pos = layout();
+      for (let round = 0; round < 6; round++) {
+        let merged = false;
+        for (let i = 0; i < pts.length; i++) {
+          for (let j = i + 1; j < pts.length; j++) {
+            if (find(i) !== find(j) && touch(i, j, pos[i], pos[j])) { parent[find(i)] = find(j); merged = true; }
+          }
+        }
+        if (!merged) break;
+        pos = layout();
+      }
+      pts.forEach(function (q, i) { shift(q.m, pos[i].x - q.p.x, pos[i].y - q.p.y); });
+    }
+    function shift(m, dx, dy) {
+      const el = m.getElement(); if (!el) return;
+      el.style.setProperty("--dx", dx.toFixed(1) + "px"); el.style.setProperty("--dy", dy.toFixed(1) + "px");
+    }
+
+    const bounds = L.latLngBounds(markers.map(function (m) { return m.getLatLng(); }));
+    function fitAll() {
+      const pad = Math.round(Math.min(36, Math.max(12, root.clientWidth * 0.03)));
+      map.fitBounds(bounds, { padding: [pad, pad], maxZoom: 5, animate: !reduceMotion });
+    }
+    map.on("zoomend viewreset", declutter);
+    fitAll();
+    declutter();
+
+    // "show all" control under the zoom buttons
+    const Reset = L.Control.extend({
+      options: { position: "topleft" },
+      onAdd: function () {
+        const box = L.DomUtil.create("div", "leaflet-bar cmap-reset");
+        const b = L.DomUtil.create("a", "", box);
+        b.href = "#"; b.setAttribute("role", "button"); b.title = "Show all markers"; b.setAttribute("aria-label", "Show all markers");
+        b.innerHTML = '<i class="bi bi-globe2" aria-hidden="true"></i>';
+        L.DomEvent.disableClickPropagation(box);
+        L.DomEvent.on(b, "click", function (e) { L.DomEvent.preventDefault(e); map.closePopup(); fitAll(); });
+        return box;
+      },
+    });
+    map.addControl(new Reset());
+
+    // scroll-wheel zoom (and touch dragging) only after a click on the map; off again when the pointer leaves
+    function arm() { map.scrollWheelZoom.enable(); if (touch) map.dragging.enable(); root.classList.add("is-armed"); }
+    function disarm() { map.scrollWheelZoom.disable(); if (touch) map.dragging.disable(); root.classList.remove("is-armed"); }
+    map.on("click", arm);
+    root.addEventListener("mouseleave", disarm);
+    document.addEventListener("touchstart", function (e) { if (!root.contains(e.target)) disarm(); }, { passive: true });
+
+    // day / night basemap: follow Quarto's toggle (it swaps body.quarto-light / body.quarto-dark)
+    new MutationObserver(function () {
+      const url = isDark() ? BASEMAP.dark : BASEMAP.light;
+      if (tiles._url !== url) tiles.setUrl(url);
+    }).observe(document.body, { attributes: true, attributeFilter: ["class"] });
+
+    // the map may have been laid out while hidden or resized with the page
+    window.addEventListener("resize", function () { map.invalidateSize(); });
+  }
+
+  function start() {
+    loadLeaflet(function (ok) {
+      if (!ok) { fail(); return; }
+      try { init(); } catch (e) { fail(); }
+    });
+  }
+  if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver(function (entries) {
+      if (entries.some(function (e) { return e.isIntersecting; })) { io.disconnect(); start(); }
+    }, { rootMargin: "400px 0px" });
+    io.observe(section);
+  } else {
+    start();
+  }
+})();
+
+// ---------- 2. visitor map (third-party widget, About page only; own section since 2026-11-05) ----------
+// MapMyVisitors' loader reads from its own URL: w (width; "a" = its parent's width), co (the panel colour, i.e. the ocean),
+// cl (the land colour of the generated background image) and ct (the text colour). Here co, cl and ct are set to the
+// site's day or night colours before the snippet runs; on high-DPI screens the widget is drawn at twice the column width
+// in a box scaled to one half, so its land image stays crisp (map.css enlarges the widget's text and dots to match).
+// A day/night switch after loading recolours the panel and text through map.css and swaps the land image for the other
+// theme's. The frame follows the column's width on resize.
+(function () {
+  "use strict";
+  const box = document.getElementById("visitor-map");
+  const tpl = document.getElementById("visitor-map-tpl");
+  const body = document.getElementById("visitor-map-body");
+  if (!box || !tpl || !body || !("content" in tpl)) return;
+  const THEME = { light: { co: "eef2f7", cl: "cbd5e1", ct: "374151" }, dark: { co: "1c212a", cl: "3b4351", ct: "d1d5db" } };
+  const isDark = function () { return document.body.classList.contains("quarto-dark"); };
+  const k = (window.devicePixelRatio || 1) >= 1.5 ? 2 : 1;
+  let done = false, inner = null;
+  function hide() { if (!done) { done = true; box.hidden = true; } }
+  function drawn() {
+    return !!inner && Array.prototype.some.call(inner.children, function (el) { return el.tagName !== "SCRIPT" && el.tagName !== "STYLE"; });
+  }
+  function themedSrc(src) {
+    try {
+      const u = new URL(src, location.href);
+      if (!/(^|\.)mapmyvisitors\.com$/.test(u.hostname)) return src;
+      const t = THEME[isDark() ? "dark" : "light"];
+      Object.keys(t).forEach(function (key) { u.searchParams.set(key, t[key]); });
+      return u.toString();
+    } catch (e) { return src; }
+  }
+  function fit() {   // scale the widget to the frame's width and the frame's height to the widget
+    if (!inner || !inner.offsetWidth) return;
+    const s = body.clientWidth / inner.offsetWidth;
+    inner.style.transform = s === 1 ? "" : "scale(" + s + ")";
+    body.style.height = Math.ceil(inner.offsetHeight * s) + "px";
+  }
+  function insert() {
+    box.hidden = false;
+    inner = document.createElement("div");
+    inner.className = "visitor-scale" + (k > 1 ? " is-2x" : "");
+    inner.style.width = Math.floor(body.clientWidth * k) + "px";
+    body.appendChild(inner);
+    const frag = tpl.content.cloneNode(true);
+    // scripts cloned from a template never run: recreate them (same attributes, themed colours), asynchronous by nature
+    frag.querySelectorAll("script").forEach(function (old) {
+      const s = document.createElement("script");
+      Array.prototype.forEach.call(old.attributes, function (a) { s.setAttribute(a.name, a.name === "src" ? themedSrc(a.value) : a.value); });
+      if (old.textContent.trim()) s.text = old.textContent;
+      s.async = true;
+      s.addEventListener("error", hide);
+      old.parentNode.replaceChild(s, old);
+    });
+    inner.appendChild(frag);
+    fit();
+    if ("ResizeObserver" in window) new ResizeObserver(fit).observe(inner);
+    window.addEventListener("resize", fit);
+    window.setTimeout(function () { if (!drawn()) hide(); else { done = true; fit(); } }, 15000);
+  }
+  // day / night after loading: the panel and text colours follow map.css; the land image is swapped here
+  new MutationObserver(function () {
+    if (!inner) return;
+    const t = THEME[isDark() ? "dark" : "light"];
+    inner.querySelectorAll(".mapmyvisitors-map").forEach(function (m) {
+      const bg = m.style.backgroundImage;
+      if (bg) m.style.backgroundImage = bg.replace(/co_[0-9a-f]{6}/i, "co_" + t.co).replace(/cl_[0-9a-f]{6}/i, "cl_" + t.cl);
+    });
+  }).observe(document.body, { attributes: true, attributeFilter: ["class"] });
+  if (document.readyState === "complete") insert();
+  else window.addEventListener("load", insert, { once: true });
+})();
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/henryutd2021\.github\.io");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© 2026 Honglin Li · Kansas State University · <a href="mailto:hlli@ksu.edu">hlli@ksu.edu</a></p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Last updated: November 2026 · Built with <a href="https://quarto.org">Quarto</a></p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>
