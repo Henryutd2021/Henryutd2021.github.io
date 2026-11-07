@@ -17,7 +17,6 @@ body.quarto-dark.page-journeys .quarto-title-banner .quarto-title::before { back
   <li><strong>25<small>/34</small></strong><span>Chinese provinces and regions</span></li>
   <li><strong>212,000</strong><span>km of mapped routes, roughly</span></li>
 </ul>
-<p class="jr-stats-note">A landing counts as a footprint: Brunei was a transit without entry.</p>
 
 <section class="jr-sec jr-map-sec" aria-labelledby="h-jr-map">
   <h2 id="h-jr-map" class="visually-hidden">Map of the journeys</h2>
