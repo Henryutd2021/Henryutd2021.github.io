@@ -205,6 +205,12 @@
   },
   "note": "C3 plans Prairie City for 2040 with 2025's people, homes and prices and the course's synthetic weather: only the plan changes. The industrial park and the data-center campus take power at their own substations (no limit modelled); the park's new loads are flat all year."
  },
+ "fullYear": {
+  "unservedPerMWh": 10000,
+  "via": "13-capstone.json unservedPenalty",
+  "note": "The full-year check re-runs a plan on every hour of 2025 with the same LP and constraints, keeping what the eight days decided: the building shares, the sizes and each district's substation upgrade. Load a substation cannot carry is left unserved at $10,000 per MWh (lesson 13's illustrative penalty), never part of a reported cost. 2025 as it is is re-run the same way, so each change against 2025 is like for like.",
+  "set": "teaching"
+ },
  "sources": {
   "atb2025-fin": {
    "text": "NLR, 2025 Electricity Annual Technology Baseline, Financial Cases and Methods",

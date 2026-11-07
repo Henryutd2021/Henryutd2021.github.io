@@ -2401,6 +2401,9 @@ body.page-learn.quarto-dark { --lx-scale-0: #5CC0B1; --lx-scale-1: #5AAED2; --lx
   .lx-facts.e3-lab td[data-l]::before { content: attr(data-l) ": "; font-family: var(--lx-f-display); font-weight: 400; font-size: 12.5px; color: var(--lx-ink-3); white-space: normal; }
 }
 .e3-inputs td.n { white-space: normal; min-width: 6.5em; }
+/* the full-year check's table: its cells are short phrases, so they wrap */
+.lx-facts.e3-fullt td.n { white-space: normal; min-width: 7em; }
+.lx-facts.e3-fullt td.n:last-child { min-width: 5em; }
 
 /* ---------- the hub diagram: in, convert and store, out */
 .e3-hub { margin: 0; display: grid; gap: 8px; min-width: 0; }

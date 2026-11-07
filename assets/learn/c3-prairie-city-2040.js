@@ -3,7 +3,8 @@
 //
 // The page: the brief (static), the plan (E3's C3 schema: buildings, district heat, cars, the industrial park, local
 // supply, the grid, assumptions; the solar farm's site; Run the 2040 plan; the plan link), the results (against the
-// $1,500M budget, cost and CO2 against 2025 for the whole city, the substations, the screening household table, jobs,
+// $1,500M budget, cost and CO2 against 2025 for the whole city, the substations, the full-year check (precomputed for
+// the presets and the reference plan: data/e3-full-year.json; never solved on the page), the screening household table, jobs,
 // the stakeholder panel, the sensitivity chart and table: one input at a time, then all together), the answer boxes (one
 // per stakeholder) and the two-page plan summary (LX.ReportNote), the self-check (LX.Exemplars,
 // LX.Rubric) and the sources. Every number comes from E3 and is checked by _tests/learn/test_c3-prairie-city-2040.js.
@@ -240,7 +241,7 @@
   // ---------------------------------------------------------------- view
   var LX = window.LX, H = LX.H, E3 = LX.E3, U = E3.ui;
   LX.mount("c3", function (live, data, root) {
-    var P = E3.prepare(data.prairie_city, data.e3_city_hub), cfg = P.cfg, S = E3.c3Schema(cfg), stub = null, last = null, sens = null;
+    var P = E3.prepare(data.prairie_city, data.e3_city_hub), cfg = P.cfg, S = E3.c3Schema(cfg), stub = null, last = null, sens = null, FY = data.e3_full_year || null, FYc = data.prairie_city.fullYear;
     var rh = document.getElementById("c3-results"), fb = rh.querySelector(".lx-fallback"); if (fb) fb.hidden = true;
     H("p", { class: "lx-hint e3-line", text: P.line }, live);
     var wrap = H("div", { class: "lx-sb e3-sb" }, live);
@@ -314,6 +315,10 @@
       dv.set(R, { d: best, k: R.dist[best].at.k });
       U.table(c2, ["District", "Busiest hour", "Limit", "Upgrade", "1 MW more room saves a year (LP dual)"], R.dist.map(function (d) { return [d.label, kilo(d.peak) + " MW", kilo(d.limit) + " MW", kilo(d.upg) + " MW", d.value == null ? "–" : "$" + kilo(d.value)]; }), "c3-sub");
       U.keys(c2, [["LP dual", "the substation row's [[shadow-price|dual]], summed over the year: what one more MW of room would save, under this plan's assumptions."]]);
+      // the full-year check of the plan that ran (precomputed for the presets and the reference plan; none for others)
+      U.fullCard(res, E3.fullFind(FY, "c3", S, R.state, LX.ShareState), FYc, P, { date: FY ? FY.date : "",
+        none: "It is precomputed for the presets and the exemplars' reference plan, with every other setting at its default: a year of hours is too large to solve on a click.",
+        load: { label: "Load the reference plan (checked)", go: function () { change(Object.assign(LX.ShareState.defaults(S), page.REF_PLAN)); run.run(plan); } } });
       var c3 = H("div", { class: "lx-xcard" }, res); H("h3", { text: "Who pays: a screening estimate by household group" }, c3);
       // HOOK(A13), wired: the table is E3.households, whose money and burden are LX.A13.allocate
       U.hhTable(c3, R);

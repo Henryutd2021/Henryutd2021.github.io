@@ -7,9 +7,12 @@
 //     cost), the upgrades flexibility saves, the LP's chosen shares and the cap's dual, for every cap the slider offers
 //     (65% to 100%), and each "who adopts first" rule leaving the LP's cost and CO2 unchanged
 //   - the prediction's answer: the suburbs' busiest electrified hour is on the cold winter design day, at night
+//   - the full-year check (data/e3-full-year.json, rebuilt by test_e3-full-year.js): the four plans' rows and words in the
+//     explain layer and its no-JS table; every claim of the words true of the data (what holds, the short days, the plan
+//     that misses most, step 6's cap); no full-year solve on the page
 //   - the page: the cards form, the notebook links, the formulation's symbols, the tie rule's numbers, the myth answers
 //     true of the model; no nuclear term; no AI wording
-// --write: recomputes `precomputed.m12` and writes the m12-static and m12-inputs blocks.
+// --write: recomputes `precomputed.m12` and writes the m12-static, m12-full and m12-inputs blocks.
 // Usage (from the site folder):  node _tests/learn/test_m12-city-model.js [--write]
 "use strict";
 const fs = require("fs");
@@ -48,12 +51,15 @@ const RUN_DATE = "6 November 2026";
   ok(rMy.ok && rMy.results.hh.dhPrice > 0, "the notebook's plan runs, with district heat billed at its average cost");
   ref.my = { plan: MY, burdenLow: +rMy.results.hh.low.burden.toFixed(5), dhPrice: +rMy.results.hh.dhPrice.toFixed(2) };
   const pre = { table: table, ref: ref };
-  const BLOCKS = { "m12-static": () => table, "m12-inputs": () => E3.inputsHTML(P, { fixed: true }) };
+  const FY = JSON.parse(fs.readFileSync(L("data/e3-full-year.json"), "utf8")), FYc = city.fullYear, FE = PG.fullEntries(FY);
+  const fullHTML = () => E3.tableHTML(["Full-year check: plan", "Yearly cost against 2025: eight days → full year", "CO₂ gap", "Upgrades: eight days → sized on the year", "Unserved with the eight days' upgrades"],
+    FE.map((e, i) => E3.fullPlanRow(e, PG.fullLabel(e, i))), "e3-fullt", [null, "n", "n", "n", "n"]) + '<p class="lx-hint">Precomputed with HiGHS on ' + FY.date + ": each plan run again on all 8,760 hours of 2025, with what its eight days decided kept.</p>";
+  const BLOCKS = { "m12-static": () => table, "m12-full": fullHTML, "m12-inputs": () => E3.inputsHTML(P, { fixed: true }) };
   if (process.argv.includes("--write")) {
     const d = JSON.parse(fs.readFileSync(DPATH, "utf8")); d.precomputed = Object.assign({}, d.precomputed, { m12: pre });
     fs.writeFileSync(DPATH, JSON.stringify(d, null, 1) + "\n");
-    X.writeBlocks(QPATH, { "m12-static": BLOCKS["m12-static"](), "m12-inputs": BLOCKS["m12-inputs"]() });
-    console.log("wrote precomputed.m12 and the m12-static and m12-inputs blocks");
+    X.writeBlocks(QPATH, { "m12-static": BLOCKS["m12-static"](), "m12-full": BLOCKS["m12-full"](), "m12-inputs": BLOCKS["m12-inputs"]() });
+    console.log("wrote precomputed.m12 and the m12-static, m12-full and m12-inputs blocks");
   }
   const PAGE = fs.readFileSync(QPATH, "utf8"), D = JSON.parse(fs.readFileSync(DPATH, "utf8"));
   ok(JSON.stringify(D.precomputed && D.precomputed.m12) === JSON.stringify(pre), "precomputed.m12 equals fresh runs (run with --write after a change)");
@@ -89,6 +95,21 @@ const RUN_DATE = "6 November 2026";
     const src = c80.results, R2 = E3.summarize(Object.assign({}, src.state, { rule }), P, src.raw, src.base);
     ok(near(R2.acc.total, src.acc.total) && near(R2.acc.co2Hub, src.acc.co2Hub) && Math.abs(R2.hh.low.burden - src.hh.low.burden) > 1e-5, "step 7 (" + rule + "): the rule moves burden, not cost or CO2");
   });
+
+  // ---------------- the full-year check
+  ok(FE.every(Boolean) && FE.map(e => e.page + "/" + e.id).join() === "sb3/today,sb3/electrify,m12/flex,m12/choose", "the four plans' checks: 2025 and electrify (the City Planner's presets), flexibility and the LP's choice");
+  ok(["today", "electrify", "flex"].every((k, i) => FE[i].key === SS.encode(S, Object.assign({}, DEF, PG.PLANS[k].state))) && FE[3].cap === Math.round(R.today.acc.co2Hub * PG.CHOOSE.capDef / 100), "each check is of the lesson's own plan (step 6's at its 80% cap of " + E3.kilo(FE[3].cap) + " t)");
+  ok(FE.every((e, i) => e.days.dCost === Math.round((i < 3 ? R[["today", "electrify", "flex"][i]] : c80.results).delta.cost / 1e3) / 1e3), "the check's eight-day costs are the lesson's own runs");
+  const keys = PG.fullKeys(FY, FYc, E3), kt = keys.map(k => k[0] + ": " + k[1]).join(" ");
+  const up = V => V.dist.reduce((t, d) => t + d.upg, 0), worst = FE.reduce((a, e) => e.year.unserved > a.year.unserved ? e : a, FE[0]);
+  ok(FE.every(e => up(e.days) < 0.5 || (e.year.unserved >= 0.5 && e.year.shortDays.every(d => d.day === "2025-02-19" || d.day === "2025-02-20"))) && /every plan that buys upgrades leaves load unserved on 19 and 20 February/.test(kt), "every plan that buys upgrades leaves load unserved on 19 and 20 February, as said");
+  ok(worst === FE[2] && kt.indexOf("so the plan with managed charging and batteries misses most: " + E3.kilo(worst.year.unserved) + " MWh") >= 0 && FE[2].days.batteryMW === 40, "the plan with managed charging and batteries misses most (" + E3.kilo(worst.year.unserved) + " MWh), as said");
+  ok(FE[3].year.co2 > FE[3].cap && kt.indexOf(E3.kilo(FE[3].year.co2 - FE[3].cap) + " t over the cap") >= 0, "step 6's plan: over its cap on the year by " + E3.kilo(FE[3].year.co2 - FE[3].cap) + " t, as said");
+  ok(keys.length === 6 && ["The check", "What holds", "Three cold days", "The grid", "Step 6's cap", "Not tested"].every((k, i) => keys[i] && keys[i][0] === k), "the card's keys, one idea each");
+  ok(FE.every(e => Math.abs(e.year.cost / e.days.cost - 1) < 0.001 && Math.abs(e.year.co2 / e.days.co2 - 1) < 0.001) && /cost and CO₂ hold; the upgrades the eight days buy fall a little short on 19 and 20 February/.test(T), "the explain layer: cost and CO2 hold (within 0.1%); the upgrades fall a little short on 19 and 20 February");
+  ok(/e3_full_year/.test(JS) && /e3-full-year\.json/.test(PAGE) && !/fullYear\s*\(/.test(JS), "the page reads the data file and never solves the year");
+  has("Storage resets every day, on the eight days and in the full-year check: no carrying heat or charge between days.");
+  ok(!/no full-year check here/.test(PAGE), "the old 'no full-year check here' is gone");
 
   // ---------------- the page
   has("about 60 minutes, then 120 minutes of practice");

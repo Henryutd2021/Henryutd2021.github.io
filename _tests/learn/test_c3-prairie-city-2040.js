@@ -13,6 +13,9 @@
 //     sites and the contracts, from fresh runs (the c3-evidence block)
 //   - the summary: one answer field per stakeholder, the "answered" check, a sources field, the rubric's own levels, and
 //     room for the reader's words inside the two pages (C3 review findings 5 and 6)
+//   - the full-year check (data/e3-full-year.json, rebuilt by test_e3-full-year.js): a check for each preset and the
+//     reference plan, found by the plan link (the site's details ignored); the check's eight days are the reference
+//     plan's own run; the contract MWh higher on the year, as the words say; no full-year solve on the page
 //   - the hooks: A19's siting (no site changes a number until the map is wired) and A13's jobs (no number shown)
 //   - guard G-GIS: the only siting on the page is a solar farm; no nuclear term on the page, its script or the data; no
 //     AI wording
@@ -91,6 +94,17 @@ const RUN_DATE = "6 November 2026";
   ok(!EX.validate(c3ex).length, "the exemplars are valid");
   const T = X.norm(PAGE), JS = fs.readFileSync(L("c3-prairie-city-2040.js"), "utf8");
   const has = s => ok(T.indexOf(s) >= 0, "page states " + JSON.stringify(s));
+
+  // ---------------- the full-year check
+  const FY = JSON.parse(fs.readFileSync(L("data/e3-full-year.json"), "utf8")), FYc = city.fullYear, c3F = FY.plans.filter(e => e.page === "c3"), er = c3F.find(e => e.id === "ref");
+  ok(c3F.map(e => e.id).join() === E3.c3presets.map(p => p.id).concat(["ref"]).join(), "a full-year check for each preset and the reference plan");
+  ok(E3.fullFind(FY, "c3", S, withSite(ref), SS) === er && E3.fullFind(FY, "c3", S, def, SS) === c3F[0] && E3.fullFind(FY, "c3", S, Object.assign({}, ref, { site: "D" }), SS) === null, "the page finds the reference plan's and the default's checks (the site's details ignored), none for another site");
+  ok(er.days.dCost === Math.round(R1.delta.cityCost / 1e3) / 1e3 && er.days.co2 === Math.round(R1.acc.city.co2), "the check's eight days are the reference plan's own run");
+  const wr = E3.fullWhy(er, FYc, FY.date).map(k => k[0] + ": " + k[1]).join(" "), upF = V => V.dist.reduce((t, d) => t + d.upg, 0);
+  ok(wr.indexOf((upF(er.year) - upF(er.days)).toFixed(1) + " MW more") >= 0 && wr.indexOf(E3.kilo(er.year.unserved) + " MWh unserved on 19 Feb and 20 Feb") >= 0 && /Wind and sun/.test(wr), "the reference plan's words: the MW more the year would buy, the unserved MWh and days, wind and sun");
+  ok(c3F.filter(e => e.days.contractGWh > 0).every(e => e.year.contractGWh > e.days.contractGWh) && FYc.windCF.days < FYc.windCF.year && FYc.solarCF.days > FYc.solarCF.year, "the contract MWh are higher on the year for every plan with contracts; the eight days carry less wind and more sun than 2025");
+  ok(/U\.fullCard\(res, E3\.fullFind\(FY, "c3", S, R\.state, LX\.ShareState\)/.test(JS) && !/fullYear\s*\(/.test(JS) && /e3-full-year\.json/.test(PAGE), "the card for the plan that ran; the page reads the data file and never solves the year");
+  has("eight representative days, with a full-year check of the presets and the reference plan on every hour of 2025 beside the results");
 
   // ---------------- the brief
   has("$" + E3.kilo(cfg.c3.budget.def) + " million of up-front spending");
