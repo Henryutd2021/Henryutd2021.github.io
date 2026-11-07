@@ -73,22 +73,22 @@ body-classes: "page-learn page-lesson lx-form-checkpoint"
 <p class="lx-eyebrow">The forms</p>
 <p class="ckr-lede">Four plain templates: one for a review, one for a response, a change log and a rerun report. Use them for the co-op proposal and for your own study.</p>
 <!-- ckr-forms:start (written from the data file by the test's --write mode; do not edit) -->
-<details class="lx-textalt ckr-form" data-form="review"><summary>The review form <span class="lx-hint">· Parts A and B</span></summary><pre>1. The study in two sentences: question, method, data.
+<details class="lx-textalt ckr-form" data-form="review"><summary>The review form (parts A and B)</summary><pre>1. The study in two sentences: question, method, data.
 2. The main claim it will make, and the evidence it plans.
 3. Major concerns (at most three): ones that could change the conclusion. For each: the rubric competence, and what evidence or change would answer it.
 4. Minor concerns.
 5. One alternative method from another family, and what it would show that this one cannot.
 6. Can the main result be rerun from the repository? What is missing?
 7. Recommendation: proceed; proceed once the major concerns are answered; or rethink the question.</pre></details>
-<details class="lx-textalt ckr-form" data-form="response"><summary>The response <span class="lx-hint">· Part C</span></summary><pre>For each concern, in the reviewer's order:
+<details class="lx-textalt ckr-form" data-form="response"><summary>The response (part C)</summary><pre>For each concern, in the reviewer's order:
 Concern 1 (competence): accepted / partly accepted / declined.
 Reason: one or two sentences.
 Change: what changed, and where (a section of the proposal, a file in the repository).
 Evidence: a test, a figure or a number, where you have one.</pre></details>
-<details class="lx-textalt ckr-form" data-form="log"><summary>The change log <span class="lx-hint">· Part C</span></summary><pre>One line per change:
+<details class="lx-textalt ckr-form" data-form="log"><summary>The change log (part C)</summary><pre>One line per change:
 Before → after · the concern it answers · where.
 Then: your rubric self-rating after the revision, competence by competence, and any level that moved, with its evidence.</pre></details>
-<details class="lx-textalt ckr-form" data-form="rerun"><summary>The rerun report <span class="lx-hint">· Part D</span></summary><pre>Repository and commit; date; machine and environment.
+<details class="lx-textalt ckr-form" data-form="rerun"><summary>The rerun report (part D)</summary><pre>Repository and commit; date; machine and environment.
 Tolerance for the main result, written down before the rerun.
 Reported value; rerun value; difference as a share of the reported value.
 Cause of any difference, and the fix in the repository.
@@ -124,8 +124,9 @@ Who reran it (you, or someone else).</pre></details>
 .ckr-intro, .ckr-a { max-width: 1100px; }
 .ckr-parts, .ckr-rules { margin: .2rem 0 .6rem; padding-left: 1.3rem; display: grid; gap: 5px; font-size: 15.5px; }
 .ckr-a { margin: 1rem 0; align-items: start; }
+.ckr-intro > .lx-hint { margin: .3rem 0 .9rem; }
 .ckr-study h3 { margin: 2px 0 6px; font-size: 1.15rem; }
-.ckr-study > p, .ckr-forms > p { margin: 0 0 6px; }
+.ckr-study > p, .ckr-forms > p { margin: 0 0 6px; font-size: 15px; color: var(--lx-ink-2); }
 .ckr-fields { margin: 6px 0; display: grid; gap: 6px; font-size: 15px; }
 .ckr-fields > div { display: grid; grid-template-columns: 8.5em minmax(0, 1fr); gap: 10px; min-width: 0; }
 .ckr-fields dt { font-family: var(--lx-f-display); font-weight: 500; color: var(--lx-ink); }

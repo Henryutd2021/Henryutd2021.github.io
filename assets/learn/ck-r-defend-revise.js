@@ -111,7 +111,7 @@
   function formText(f) { return f.lines.join("\n"); }
   function staticForms(D) {
     return D.forms.map(function (f) {
-      return '<details class="lx-textalt ckr-form" data-form="' + esc(f.id) + '"><summary>' + esc(f.title) + ' <span class="lx-hint">· ' + esc(f.use) + "</span></summary>" +
+      return '<details class="lx-textalt ckr-form" data-form="' + esc(f.id) + '"><summary>' + esc(f.title) + " (" + esc(f.use.charAt(0).toLowerCase() + f.use.slice(1)) + ")</summary>" +
         "<pre>" + esc(formText(f)) + "</pre></details>";
     }).join("\n");
   }

@@ -158,7 +158,8 @@ ok(/note: "The link holds your choices only, not your words\."/.test(JS), "the p
     ok(D.stages.some(s => s.id === e.stage) && D.studies[e.study] && e.answers[0].key === "weak" && e.answers[1].key === "good", "fragments " + e.comp + ": a stage, a fictional study, weak first");
     ok(e.answers[0].level === "Developing" && ["Proficient", "Strong"].includes(e.answers[1].level), "fragments " + e.comp + ": Developing against Proficient or Strong");
   });
-  ok(/Illustrative; the study is fictional/.test(M.exOpts(D, 0).note), "each pair says it is illustrative and fictional");
+  ok(/Both fragments are illustrative; the study is fictional/.test(M.exOpts(D, 0).note) && M.exWhere(D, 0) === "Stage 1, question · " + D.studies.weather, "each pair says it is illustrative and fictional, and names its stage and study once");
+ok(M.msKey(D) === "Underlined: a stage that ends on a milestone (3, the one-page proposal; 7, CK-R; 8, the paper and the poster; 9, the rubric sheet).", "the strip's key names the milestones");
   const trust = EXS.plain(D.exemplars.find(e => e.comp === "trust").answers[1]);
   ok(trust.includes("2.81 MW, against the model's 2.76 MW: 1.8% low") && ((2.81 - 2.76) / 2.81 * 100).toFixed(1) === "1.8" && (2.81 - 2.76) / 2.81 < 0.05, "the log's validation: (2.81 − 2.76) ÷ 2.81 = 1.8%, inside 5%");
   const pos = EXS.plain(D.exemplars.find(e => e.comp === "positioning").answers[1]);

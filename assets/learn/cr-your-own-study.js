@@ -165,7 +165,12 @@
     return '<p class="cr-strip-lede">The model-based track: about ' + fmtH(tl.total.typ) + " hours (" + tl.total.lo + " to " + tl.total.hi + "). At 6 hours a week, about " + tl.weeks.typ + " weeks (" + tl.weeks.lo + " to " + tl.weeks.hi + ").</p>" +
       '<div class="cr-strip" aria-hidden="true" style="grid-template-columns: ' + tl.rows.map(function (r) { return "minmax(26px, " + r.typ + "fr)"; }).join(" ") + '">' +
       tl.rows.map(function (r, i) { return '<span class="cr-seg' + (D.stages[i].milestone ? " ms" : "") + '">' + (i + 1) + "</span>"; }).join("") + "</div>" +
-      '<ol class="cr-legend">' + tl.rows.map(function (r) { return "<li>" + esc(r.label) + " · " + fmtH(r.typ) + " h</li>"; }).join("") + "</ol>";
+      '<ol class="cr-legend">' + tl.rows.map(function (r) { return "<li>" + esc(r.label) + " · " + fmtH(r.typ) + " h</li>"; }).join("") + "</ol>" +
+      '<p class="lx-hint cr-ms-key">' + esc(msKey(D)) + "</p>";
+  }
+  // the strip's key: which stages end on a milestone (their segments are underlined)
+  function msKey(D) {
+    return "Underlined: a stage that ends on a milestone (" + D.stages.map(function (s, i) { return s.milestone ? (i + 1) + ", " + s.milestone : null; }).filter(Boolean).join("; ") + ").";
   }
   function staticPlan(D, F) { var S = schema(D, F); return SS.staticHTML(S, SS.defaults(S), { head: "Your choice", planHead: "Starting plan" }); }
   function staticOutline(D) {
@@ -178,12 +183,17 @@
   }
   function exOpts(D, k) {
     var E = D.exemplars[k];
-    return { title: E.title, task: E.task, answers: E.answers, lines: !!E.lines, id: "cr-ex-" + E.comp, note: "Illustrative; the study is fictional: " + D.studies[E.study] + "." };
+    return { title: E.title, task: E.task, answers: E.answers, lines: !!E.lines, id: "cr-ex-" + E.comp, note: "Both fragments are illustrative; the study is fictional." };
+  }
+  // the line above a pair: its stage and its (fictional) study
+  function exWhere(D, k) {
+    var E = D.exemplars[k], s = by(D.stages, E.stage);
+    return "Stage " + (D.stages.indexOf(s) + 1) + ", " + s.label.toLowerCase() + " · " + D.studies[E.study];
   }
   function staticExemplars(D) {
     return D.exemplars.map(function (E, k) {
       var o = exOpts(D, k);
-      return '<div class="cr-ex-static"><p class="lx-eyebrow">' + esc(o.title) + '</p><p class="lx-hint">' + esc(o.task) + " " + esc(o.note) + "</p>\n" + EXS.staticHTML(o) + "</div>";
+      return '<div class="cr-ex-static"><p class="lx-eyebrow">' + esc(o.title) + '</p><p class="lx-hint">' + esc(exWhere(D, k)) + ". " + esc(o.task) + " " + esc(o.note) + "</p>\n" + EXS.staticHTML(o) + "</div>";
     }).join("\n");
   }
   function staticRubric(D) { return RB.staticHTML(D.rubric); }
@@ -192,7 +202,7 @@
       D.statuses.map(function (x) { return '<tr><th scope="row">' + esc(x.status) + '</th><td data-l="Requires">' + esc(x.requires) + '</td><td data-l="Evidence">' + esc(x.evidence) + "</td></tr>"; }).join("") + "</tbody></table></div>";
   }
   var api = { CODE: CODE, ID: ID, SCALES: SCALES, track: track, stageHours: stageHours, totals: totals, timeline: timeline, milestones: milestones, famNames: famNames,
-    schema: schema, planChecks: planChecks, route: route, noteOf: noteOf, proposalChecks: proposalChecks, exOpts: exOpts, fmtH: fmtH,
+    schema: schema, planChecks: planChecks, route: route, noteOf: noteOf, proposalChecks: proposalChecks, exOpts: exOpts, exWhere: exWhere, fmtH: fmtH, msKey: msKey,
     staticTracks: staticTracks, staticStrip: staticStrip, staticStages: staticStages, staticRoutes: staticRoutes, staticPlan: staticPlan, staticOutline: staticOutline,
     staticExemplars: staticExemplars, staticRubric: staticRubric, staticStatuses: staticStatuses };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
@@ -279,6 +289,7 @@
     var stripLede = H("p", { class: "cr-strip-lede", "aria-live": "polite" }, stripCard);
     var strip = H("div", { class: "cr-strip", role: "img" }, stripCard);
     var legend = H("ol", { class: "cr-legend", "aria-hidden": "true" }, stripCard);
+    H("p", { class: "lx-hint cr-ms-key", text: msKey(D) }, stripCard);
     var cardsBox = H("div", { class: "lx-xcard" }, res || live);
     H("header", { class: "lx-x-head", html: "<h3>Your study, stage by stage</h3>" }, cardsBox);
     var cards = H("ol", { class: "cr-stages" }, cardsBox);
@@ -379,8 +390,7 @@
         exAt = k; LX.store.set("cr-ex-pick", k);
         exBtns.forEach(function (b, i) { b.setAttribute("aria-pressed", i === k ? "true" : "false"); });
         exOut.innerHTML = "";
-        var st0 = by(D.stages, D.exemplars[k].stage);
-        H("p", { class: "cr-ex-stage", html: "Stage " + (D.stages.indexOf(st0) + 1) + ", " + LX.esc(st0.label.toLowerCase()) + " · " + LX.esc(D.studies[D.exemplars[k].study]) }, exOut);
+        H("p", { class: "cr-ex-stage", text: exWhere(D, k) }, exOut);
         ex = LX.Exemplars(exOut, exOpts(D, k));
         if (user && exBtns[k].focus) exBtns[k].focus();
         LX.emit("layout");
