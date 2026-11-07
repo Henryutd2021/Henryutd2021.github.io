@@ -13960,7 +13960,8 @@
 /* whopays.js — LX.A13: the accounting layer of lesson A13 ("Who pays and who benefits?"), written as a small pure model
    (no DOM) so that sandbox SB3 (City Planner, engine E3) and capstone C3 (Prairie City 2040) can use it for their
    household and jobs outputs. Written for A13 (wave W5, builder learn-w5-b, as assets/learn/a13-who-pays-and-benefits.js)
-   and promoted at the W5 integration (2026-11-06), its code unchanged.
+   and promoted at the W5 integration (2026-11-06), its code unchanged; jobs() and taxBase() were extended at the A13
+   review fixes the same day (new inputs and outputs below; the outputs SB3, M12 and C3 read are unchanged).
    Browser: in the learn.js bundle; it sets window.LX.A13 (no page loads a separate file for it).
    Node:    const A13 = require("assets/learn/components/whopays.js").
 
@@ -13991,31 +13992,48 @@
                              line (group averages; households inside a group are not resolved)
    Jobs (Ridge County when its coal plant retires; any plant and any build)
      j = A13.jobs({ staff, mineJobs, multiplier, newMW, capexPerKW, localShare, jobYearsPerM, buildYears, omPer100MW,
-                    displacement (0-1), horizonYears })
+                    displacement (0-1), horizonYears, buildDisplacement (0-1, optional), operatingYears (optional) })
+       staff, mineJobs, jobYearsPerM and omPer100MW are DIRECT (on-site) jobs; the multiplier turns them into totals.
+       buildDisplacement: the share of the building work that would have existed anyway (default: displacement, so all
+                  new work is treated alike); it changes only buildJobYearsNet and the horizon's net, never buildJobYears.
+       operatingYears: the years the new plant runs inside the horizon (default horizonYears - buildYears, not below 0:
+                  the old plant retires as the horizon starts, building comes first, then operation).
        -> { lostDirect, lostTotal (x multiplier), capexM ($M), localM ($M spent in the county), buildJobYearsDirect,
-            buildJobYears (x multiplier), buildJobsAvg (per building year), newPermDirect, newPermGross (x multiplier),
-            newPermNet (gross x (1 - displacement)), netPerm (newPermNet - lostTotal), horizon: { years, build, newPerm,
-            lostPerm, net } (job-years over the horizon) }
+            buildJobYears (x multiplier; GROSS, no displacement), buildJobYearsGross (the same), buildDisplacement,
+            buildJobYearsNet (gross x (1 - buildDisplacement)), buildJobsAvg (gross, per building year), newPermDirect,
+            newPermGross (x multiplier), newPermNet (gross x (1 - displacement)), netPerm (newPermNet - lostTotal),
+            horizon: { years, buildYears, operatingYears, build (gross), buildNet, newPermGross (x operatingYears),
+                       newPerm (net, x operatingYears), lostPerm (x years), gross (build + newPermGross - lostPerm),
+                       net (buildNet + newPerm - lostPerm) } (job-years over the horizon) }
        Assumptions (A13.ASSUME.jobs): lost jobs are counted in full (no re-employment assumed); the multiplier turns direct
-       jobs into direct + supplier + spending jobs on both sides; displacement applies to the new work only.
+       jobs into direct + supplier + spending jobs on both sides; displacement comes off every count marked net.
+       Changed at the A13 review fixes (2026-11-06): buildJobYearsNet, buildDisplacement, operatingYears and the horizon's
+       gross and net are new; horizon.newPerm counts operatingYears (was horizonYears) and horizon.net subtracts
+       displacement from building too (it used to add gross building job-years to net operating ones). Every other output
+       is unchanged.
    Tax base
      t = A13.taxBase({ plantValueM, rate (0-1), newCapexM, taxableShare (0-1), otherRevenueM, mineCoalTaxM })
-       -> { plantTaxM, newTaxM, changeM, revenueBeforeM, revenueAfterM, changeShare, coalShareBefore, coalShareAfter }
-       Property tax is a transfer (owner to county): the county's change is real for its budget, not a resource cost.
+       otherRevenueM is the county's revenue other than the plant's tax and includes the mines' coal taxes (mineCoalTaxM),
+       which stay as they are: a plant-property-tax comparison.
+       -> { plantTaxM, newTaxM, changeM, revenueBeforeM, revenueAfterM, changeShare, coalShareBefore, coalShareAfter,
+            ifMinesCloseM (the change if the mines' coal taxes ended too), ifMinesCloseShare }
+       Property tax is a transfer (owner to county): the payment uses up nothing; the county's budget change is real, and
+       what it does to public services or to the region's wealth is not estimated here.
    A13.ASSUME (the assumptions to print beside each result), A13.SCREENING (the label), A13.VERSION. */
 (function () {
   "use strict";
-  var VERSION = "a13-accounting-1";
+  var VERSION = "a13-accounting-2";
   var SCREENING = "Screening estimate: your inputs and the stated assumptions, not a prediction.";
   var ASSUME = {
     split: ["The plan's yearly cost is recovered in full from households; businesses are left out.",
             "Each group is its average household; households within a group differ.",
             "Use does not change when the price changes (no response to the charge)."],
     jobs: ["Lost jobs count in full: no re-employment of the plant's or mines' workers is assumed.",
-           "The multiplier turns on-site jobs into on-site, supplier and spending jobs, the same on both sides.",
-           "Displacement applies to the new work only: local jobs that would have existed anyway."],
-    tax: ["One property tax rate for the plant and the new farms; the county's other revenue does not change.",
-          "Property tax is a transfer from owners to the county: its budget changes, the region's resources do not."]
+           "The multiplier turns direct (on-site) jobs into direct, supplier and spending jobs, the same on both sides.",
+           "Displacement, new work that would have existed anyway, comes off every count marked net; gross counts keep it."],
+    tax: ["One property tax rate for the plant and the new farms.",
+          "The county's other revenue stays as it is, the coal mines' taxes included: a plant-property-tax comparison.",
+          "A tax moves money from owners to the county and uses up nothing; what a smaller budget does to services is not estimated."]
   };
   function sum(a, f) { return a.reduce(function (s, x) { return s + f(x); }, 0); }
 
@@ -14065,18 +14083,22 @@
 
   function jobs(J) {
     var m = J.multiplier, lostDirect = J.staff + J.mineJobs, capexM = J.newMW * J.capexPerKW / 1000, localM = capexM * J.localShare;
-    var bd = localM * J.jobYearsPerM, bt = bd * m, npd = J.newMW / 100 * J.omPer100MW, npg = npd * m, npn = npg * (1 - J.displacement);
-    var lost = lostDirect * m, Hy = J.horizonYears;
-    return { lostDirect: lostDirect, lostTotal: lost, capexM: capexM, localM: localM, buildJobYearsDirect: bd, buildJobYears: bt,
-             buildJobsAvg: J.buildYears > 0 ? bt / J.buildYears : 0, newPermDirect: npd, newPermGross: npg, newPermNet: npn, netPerm: npn - lost,
-             horizon: { years: Hy, build: bt, newPerm: npn * Hy, lostPerm: lost * Hy, net: bt + npn * Hy - lost * Hy } };
+    var dB = J.buildDisplacement != null ? J.buildDisplacement : J.displacement;
+    var bd = localM * J.jobYearsPerM, bt = bd * m, btn = bt * (1 - dB), npd = J.newMW / 100 * J.omPer100MW, npg = npd * m, npn = npg * (1 - J.displacement);
+    var lost = lostDirect * m, Hy = J.horizonYears, Oy = J.operatingYears != null ? J.operatingYears : Math.max(0, Hy - J.buildYears);
+    return { lostDirect: lostDirect, lostTotal: lost, capexM: capexM, localM: localM, buildJobYearsDirect: bd, buildJobYears: bt, buildJobYearsGross: bt,
+             buildDisplacement: dB, buildJobYearsNet: btn, buildJobsAvg: J.buildYears > 0 ? bt / J.buildYears : 0,
+             newPermDirect: npd, newPermGross: npg, newPermNet: npn, netPerm: npn - lost,
+             horizon: { years: Hy, buildYears: J.buildYears, operatingYears: Oy, build: bt, buildNet: btn, newPermGross: npg * Oy, newPerm: npn * Oy,
+                        lostPerm: lost * Hy, gross: bt + npg * Oy - lost * Hy, net: btn + npn * Oy - lost * Hy } };
   }
 
   function taxBase(T) {
     var plant = T.plantValueM * T.rate, nw = T.newCapexM * T.taxableShare * T.rate;
     var before = T.otherRevenueM + plant, after = T.otherRevenueM + nw;
     return { plantTaxM: plant, newTaxM: nw, changeM: nw - plant, revenueBeforeM: before, revenueAfterM: after, changeShare: (after - before) / before,
-             coalShareBefore: (T.mineCoalTaxM + plant) / before, coalShareAfter: T.mineCoalTaxM / after };
+             coalShareBefore: (T.mineCoalTaxM + plant) / before, coalShareAfter: T.mineCoalTaxM / after,
+             ifMinesCloseM: nw - plant - T.mineCoalTaxM, ifMinesCloseShare: (nw - plant - T.mineCoalTaxM) / before };
   }
 
   var A13 = { VERSION: VERSION, SCREENING: SCREENING, ASSUME: ASSUME, groupsFrom: groupsFrom, allocate: allocate, transfers: transfers,

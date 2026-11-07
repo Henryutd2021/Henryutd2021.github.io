@@ -13,11 +13,13 @@
 //              sum(households x income); burden after = (home energy + charge) / income
 //   transfer   design B minus design A, per group: sums to 0 (the same cost moved), so not a real cost
 //   grouping   merged groups' burden = their total spending / their total income (five groups against two)
-//   jobs       lost = (plant staff + mine jobs) x multiplier; building job-years = MW x $/kW x local share x job-years
-//              per $M x multiplier, over two building years; permanent = MW / 100 x jobs per 100 MW x multiplier;
-//              net = permanent x (1 - displacement) - lost; job-years over 20 years
+//   jobs       lost = (plant staff + mine jobs) x multiplier; building job-years = MW x $/kW x local share x direct
+//              job-years per $M x multiplier (gross), over two building years; permanent = MW / 100 x direct jobs per
+//              100 MW x multiplier (gross); net = gross x (1 - displacement), the same share for building and running;
+//              the 20 years from retirement: building in years 1-2, running in years 3-20, the lost jobs in all 20
 //   tax        plant tax = taxable value x rate; new tax = cost of the farms x taxable share x rate; county revenue =
-//              other revenue + tax
+//              other revenue + tax, the mines' coal taxes held fixed (a plant-property-tax comparison); the change if
+//              they ended too is shown beside it
 // Every number on the page comes from LX.A13 or the data files; _tests/learn/test_a13-fairness-jobs.js checks them.
 //
 // Shared components: LX.StepCards, LX.Predict, LX.Slider, LX.Plot, LX.Ledger, LX.Stakeholders, LX.Boundary,
@@ -36,6 +38,7 @@
   function signed0(v, d) { return signed(v, d) || "$" + fmtN(0, d == null ? 2 : d) + "M"; }
   function pts(v) { return (v >= 0 ? "+" : "−") + fmtN(Math.abs(100 * v), 1) + " points"; }
   function cents(v) { return fmtN(100 * v, 2) + "¢"; }
+  function sgn(v) { var r = Math.round(v); return (r < 0 ? "−" : r > 0 ? "+" : "") + fmtN(Math.abs(r)); }
   function shortOf(PC) { return PC.groups.map(function (g) { return g.amiPct[1] == null ? g.amiPct[0] + "%+" : g.amiPct[0] + "–" + g.amiPct[1] + "%"; }); }
   function design(D, key) { return D.designs.filter(function (x) { return x.key === key; })[0]; }
   function rows(PC) { return A13.groupsFrom(PC); }
@@ -43,7 +46,7 @@
   function jobInputs(D, PC, S) {
     var R = D.ridgeCounty, J = D.jobs;
     return { staff: R.plant.staff, mineJobs: R.plant.mineJobs, multiplier: S.m, newMW: S.mw, capexPerKW: S.capex, localShare: J.localShare, jobYearsPerM: S.jy,
-             buildYears: J.buildYears, omPer100MW: S.om, displacement: S.disp / 100, horizonYears: J.horizonYears };
+             buildYears: J.buildYears, omPer100MW: S.om, displacement: S.disp / 100, buildDisplacement: S.disp / 100, horizonYears: J.horizonYears };
   }
   function taxInputs(D, S) {
     var R = D.ridgeCounty;
@@ -111,19 +114,31 @@
   function buildLine(D, PC, S) {
     var j = A13.jobs(jobInputs(D, PC, S));
     if (S.mw === 0) return "No new farms: no building work, against about " + fmtN(Math.round(j.lostTotal)) + " permanent jobs lost.";
-    return moneyM(j.localM, 0) + " spent in the county makes about **" + fmtN(Math.round(j.buildJobYears)) + " job-years**: about " + fmtN(Math.round(j.buildJobsAvg)) + " jobs for " + D.jobs.buildYears + " years, then none.";
+    return moneyM(j.localM, 0) + " spent in the county × " + fmtN(S.jy, 1) + " = " + fmtN(Math.round(j.buildJobYearsDirect)) + " direct job-years; × " + fmtN(S.m, 1) + " = about **" + fmtN(Math.round(j.buildJobYears)) + " job-years** in all: about " + fmtN(Math.round(j.buildJobsAvg)) + " jobs for " + D.jobs.buildYears + " years, then none.";
   }
   function buildSaw(D, PC, S) {
     var j = A13.jobs(jobInputs(D, PC, S));
-    return "Building gives about " + fmtN(Math.round(j.horizon.build)) + " [[job-year|job-years]]; the jobs lost add up to about " + fmtN(Math.round(j.horizon.lostPerm)) + " job-years over " + j.horizon.years + " years. Compare job-years with job-years, never with jobs.";
+    return "Building gives about " + fmtN(Math.round(j.horizon.build)) + " [[job-year|job-years]] before any displacement; the jobs lost add up to about " + fmtN(Math.round(j.horizon.lostPerm)) + " job-years over " + j.horizon.years + " years. Compare job-years with job-years, never with jobs.";
   }
   function permLine(D, PC, S) {
     var j = A13.jobs(jobInputs(D, PC, S));
-    return "Running the farms: about **" + fmtN(Math.round(j.newPermGross)) + "** permanent jobs gross, " + fmtN(Math.round(j.newPermNet)) + " net of " + fmtN(S.disp) + "% displacement; against " + fmtN(Math.round(j.lostTotal)) + " lost, a net change of " + (j.netPerm < 0 ? "−" : "+") + fmtN(Math.abs(Math.round(j.netPerm))) + ".";
+    return "Running the farms: " + fmtN(Math.round(j.newPermDirect)) + " direct jobs × " + fmtN(S.m, 1) + " = about **" + fmtN(Math.round(j.newPermGross)) + "** permanent jobs gross, " + fmtN(Math.round(j.newPermNet)) + " net of " + fmtN(S.disp) + "% displacement; against " + fmtN(Math.round(j.lostTotal)) + " lost, a net change of " + (j.netPerm < 0 ? "−" : "+") + fmtN(Math.abs(Math.round(j.netPerm))) + ".";
   }
   function permSaw(D, PC, S) {
     var j = A13.jobs(jobInputs(D, PC, S));
-    return "Gross counts only the new jobs; net subtracts what is lost and what would have existed anyway. Here, over " + j.horizon.years + " years: " + (j.horizon.net < 0 ? "−" : "+") + fmtN(Math.abs(Math.round(j.horizon.net))) + " job-years net.";
+    return "Gross counts only the new jobs; net subtracts the jobs lost and the new work that would have existed anyway, building and running alike. Over the " + j.horizon.years + " years from retirement: **" + sgn(j.horizon.net) + "** job-years net.";
+  }
+  // the 20 years from retirement on one timeline (the ledger in step 7, the fallback, the explain layer)
+  function timelineLine(D) {
+    var b = D.jobs.buildYears, h = D.jobs.horizonYears;
+    return "Timeline, set for teaching: the plant retires as year 1 begins; the farms are built in years 1–" + b + " and run in years " + (b + 1) + "–" + h + ".";
+  }
+  function timelineRows(D, PC, S) {
+    var j = A13.jobs(jobInputs(D, PC, S)), x = j.horizon, b = D.jobs.buildYears, h = D.jobs.horizonYears;
+    return [{ head: "Building the farms", years: "1–" + b, gross: x.build, net: x.buildNet },
+            { head: "Running the farms", years: (b + 1) + "–" + h, gross: x.newPermGross, net: x.newPerm },
+            { head: "Jobs lost", sub: "plant, mines, suppliers, spending", years: "1–" + h, gross: -x.lostPerm, net: -x.lostPerm },
+            { head: "= Change", years: "", gross: x.gross, net: x.net, total: true }];
   }
   function taxLine(D, S) {
     var t = A13.taxBase(taxInputs(D, S));
@@ -131,9 +146,28 @@
   }
   function taxSaw(D, S) {
     var t = A13.taxBase(taxInputs(D, S));
-    return "Coal's share of the county's tax revenue goes from " + pct(t.coalShareBefore, 0) + " to " + pct(t.coalShareAfter, 0) + ". The tax is a transfer from owners to the county: real for its budget, not a cost to the region.";
+    return "Holding the mines' taxes fixed, coal's share of county revenue goes from " + pct(t.coalShareBefore, 0) + " to " + pct(t.coalShareAfter, 0) + ". The tax itself uses up nothing; what the county's budget change does to its services, this model does not estimate.";
+  }
+  function mineLine(D, S) {
+    var t = A13.taxBase(taxInputs(D, S)), sh = (t.ifMinesCloseShare < 0 ? "−" : "+") + fmtN(Math.abs(100 * t.ifMinesCloseShare), 1) + "%";
+    return "The mines' " + moneyM(D.ridgeCounty.mineCoalTaxM, 0) + " a year of coal taxes is held fixed, as if they sold their coal elsewhere; if it ended too, revenue would change by " + signed0(t.ifMinesCloseM, 1) + " (" + sh + ").";
   }
   var FICTION_PC = "Prairie City is fictional; its numbers are illustrative.";
+  var POINTS = "Burden changes are in percentage points: from 15% to 17% of income is +2 points.";
+  // who pays what, in words, for the explain layer's stakeholder map: the lower-income groups (below 80% of AMI) against
+  // the higher-income ones, under the reader's design and cost (the test checks the words for every design and cost)
+  function payWords(a) {
+    if (!(a.cost > 0)) return { low: "nothing: no cost to recover", high: "nothing: no cost to recover", none: true };
+    var lo = a.rows[0], hi = a.rows[a.rows.length - 1];
+    var dollars = function (r, o) { return Math.abs(r.charge - o.charge) < 0.005 ? "the same dollars" : r.charge < o.charge ? "fewer dollars" : "more dollars"; };
+    var share = function (r, o) { return Math.abs(r.delta - o.delta) < 1e-12 ? "the same share of income" : r.delta > o.delta ? "a larger share of income" : "a smaller share of income"; };
+    return { low: dollars(lo, hi) + ", " + share(lo, hi), high: dollars(hi, lo) + ", " + share(hi, lo) };
+  }
+  // the county's cells: it pays only when its revenue falls
+  function countyCells(t) {
+    return { pay: t.changeM < -1e-9 ? { v: "part", t: "a smaller tax base: " + signed0(t.changeM, 1) + " a year" } : { v: "no", t: t.changeM > 1e-9 ? "none: its revenue grows " + signed0(t.changeM, 1) + " a year" : "none: its revenue does not change" },
+             ben: t.newTaxM > 1e-9 ? { v: "part", t: "tax from the new farms" } : { v: "no" } };
+  }
   function staticFallback(D, PC) {
     var c = D.plan.costM.start, sh = shortOf(PC), A = ["kwh", "fixed", "income"].map(function (k) { return split(D, PC, c, k); });
     var head = "<thead><tr><th scope=\"col\">Group (share of area median income)</th><th scope=\"col\">Households</th>" + D.designs.map(function (d) { return "<th scope=\"col\">" + d.name + ": charge, burden after</th>"; }).join("") + "</tr></thead>";
@@ -145,8 +179,9 @@
       "<div class=\"lx-scroll-x\"><table class=\"lx-mini-table a13-fbt\"><caption class=\"lx-hint\">" + FICTION_PC + " A year, per household; burden = home energy spending ÷ income.</caption>" + head + "<tbody>" + body + "</tbody></table></div>" +
       "<ul><li><b>A transfer.</b> Every design recovers the same " + moneyM(c, 0) + "; moving from per kWh to a fixed charge shifts " + moneyM(moved(D, PC, c, "fixed").up / 1e6) + " a year onto lower-income groups, and the money moved adds up to zero.</li>" +
       "<li><b>Ridge County (fictional).</b> Its coal plant retires: " + fmtN(j.lostDirect) + " jobs on site, about " + fmtN(Math.round(j.lostTotal)) + " with suppliers and spending (multiplier " + fmtN(S.m, 1) + ").</li>" +
-      "<li><b>Job-years against jobs.</b> " + fmtN(S.mw) + " MW of wind and solar at " + money(S.capex) + " per kW give about " + fmtN(Math.round(j.buildJobYears)) + " job-years of building, and about " + fmtN(Math.round(j.newPermGross)) + " permanent jobs gross, " + fmtN(Math.round(j.newPermNet)) + " net of " + S.disp + "% displacement.</li>" +
-      "<li><b>Tax base.</b> The plant paid " + moneyM(t.plantTaxM, 1) + " a year at " + fmtN(S.rate, 1) + "%; the new farms pay " + moneyM(t.newTaxM, 1) + ": " + signed0(t.changeM, 1) + " for the county, a transfer.</li></ul>" +
+      "<li><b>Job-years against jobs.</b> " + fmtN(S.mw) + " MW of wind and solar at " + money(S.capex) + " per kW give about " + fmtN(Math.round(j.buildJobYears)) + " job-years of building gross (" + fmtN(Math.round(j.buildJobYearsNet)) + " net of " + S.disp + "% displacement), and about " + fmtN(Math.round(j.newPermGross)) + " permanent jobs gross, " + fmtN(Math.round(j.newPermNet)) + " net.</li>" +
+      "<li><b>One timeline.</b> Building in years 1–" + D.jobs.buildYears + " and running in years " + (D.jobs.buildYears + 1) + "–" + D.jobs.horizonYears + ", net of displacement, against " + D.jobs.horizonYears + " years of lost jobs: " + sgn(j.horizon.net) + " job-years.</li>" +
+      "<li><b>Tax base.</b> The plant paid " + moneyM(t.plantTaxM, 1) + " a year at " + fmtN(S.rate, 1) + "%; the new farms pay " + moneyM(t.newTaxM, 1) + ": " + signed0(t.changeM, 1) + " for the county's budget, the mines' coal taxes held fixed. The payment is a transfer: it uses up nothing.</li></ul>" +
       "<p class=\"lx-hint\">Every coefficient is an illustrative input, not a prediction. With JavaScript on, you set them yourself, step by step.</p>";
   }
   function practice(D, PC) {
@@ -162,10 +197,10 @@
        moneyM(c, 0) + " ÷ total household income " + moneyM(inc.rows.reduce(function (s, r) { return s + r.households * r.income; }, 0) / 1e6, 0) + " = " + pct(inc.rate.shareOfIncome, 3) + "; " + pts(inc.rows[0].delta) + " for every group."],
       ["Group, then read.", "Households below 80% of area median income: how does their merged burden compare with the poorest group's, before the plan?",
        "Merged: total spending ÷ total income = " + pct(two[0].burden) + "; the 0–30% group alone: " + pct(a.rows[0].burden) + ". The merged average hides the tail."],
-      ["Job-years against jobs.", money(S.capex) + " per kW for " + fmtN(S.mw) + " MW, " + pct(D.jobs.localShare, 0) + " spent locally, " + fmtN(S.jy, 1) + " job-years per $M, multiplier " + fmtN(S.m, 1) + ". Compare with " + fmtN(Math.round(j.lostTotal)) + " permanent jobs lost over " + D.jobs.horizonYears + " years.",
-       moneyM(j.capexM, 0) + " × " + pct(D.jobs.localShare, 0) + " = " + moneyM(j.localM, 0) + "; × " + fmtN(S.jy, 1) + " × " + fmtN(S.m, 1) + " = " + fmtN(Math.round(j.buildJobYears)) + " job-years, against " + fmtN(Math.round(j.lostTotal)) + " × " + D.jobs.horizonYears + " = " + fmtN(Math.round(j.horizon.lostPerm)) + " job-years lost."],
-      ["The county's budget.", "Plant value " + moneyM(D.ridgeCounty.plant.valueM, 0) + ", new farms " + moneyM(j.capexM, 0) + " with " + S.taxable + "% taxable, rate " + fmtN(S.rate, 1) + "%. What changes for the county, and for the region?",
-       moneyM(t.plantTaxM, 0) + " lost, " + moneyM(t.newTaxM, 0) + " gained: " + signed0(t.changeM, 0) + " a year for the county; for the region a transfer, owners pay less and the county receives less."]
+      ["Job-years against jobs.", money(S.capex) + " per kW for " + fmtN(S.mw) + " MW, " + pct(D.jobs.localShare, 0) + " spent locally, " + fmtN(S.jy, 1) + " direct job-years per $M, multiplier " + fmtN(S.m, 1) + ". Compare with " + fmtN(Math.round(j.lostTotal)) + " permanent jobs lost over " + D.jobs.horizonYears + " years.",
+       moneyM(j.capexM, 0) + " × " + pct(D.jobs.localShare, 0) + " = " + moneyM(j.localM, 0) + "; × " + fmtN(S.jy, 1) + " = " + fmtN(Math.round(j.buildJobYearsDirect)) + " direct job-years; × " + fmtN(S.m, 1) + " = " + fmtN(Math.round(j.buildJobYears)) + " job-years in all (gross), against " + fmtN(Math.round(j.lostTotal)) + " × " + D.jobs.horizonYears + " = " + fmtN(Math.round(j.horizon.lostPerm)) + " job-years lost."],
+      ["The county's budget.", "Plant value " + moneyM(D.ridgeCounty.plant.valueM, 0) + ", new farms " + moneyM(j.capexM, 0) + " with " + S.taxable + "% taxable, rate " + fmtN(S.rate, 1) + "%. What changes for the county's budget, and what does this model leave open?",
+       moneyM(t.plantTaxM, 0) + " lost, " + moneyM(t.newTaxM, 0) + " gained: " + signed0(t.changeM, 0) + " a year for the county's budget, the mines' taxes held fixed. The payments use up nothing; what a smaller budget does to services, and to the region, is not estimated."]
     ];
     return "<p class=\"lx-eyebrow\">Practice · about 30 minutes on your own</p><ol class=\"lx-fb-practice\">" + items.map(function (x) {
       return "<li><p><b>" + x[0] + "</b> " + x[1] + "</p><details class=\"lx-answer\"><summary>Answer</summary><p>" + x[2] + "</p></details></li>";
@@ -175,7 +210,8 @@
   var model = { A13: A13, fmtN: fmtN, pct: pct, money: money, moneyM: moneyM, signed: signed, signed0: signed0, pts: pts, cents: cents, shortOf: shortOf, design: design, rows: rows, split: split,
     jobInputs: jobInputs, taxInputs: taxInputs, defaults: defaults, RISE: RISE, riseSaw: riseSaw, designLine: designLine, designSaw: designSaw, moved: moved,
     transferLine: transferLine, TRANSFER_SAW: TRANSFER_SAW, groupLine: groupLine, groupSaw: groupSaw, lostLine: lostLine, lostSaw: lostSaw, buildLine: buildLine,
-    buildSaw: buildSaw, permLine: permLine, permSaw: permSaw, taxLine: taxLine, taxSaw: taxSaw, FICTION_PC: FICTION_PC, staticFallback: staticFallback, practice: practice };
+    buildSaw: buildSaw, permLine: permLine, permSaw: permSaw, timelineLine: timelineLine, timelineRows: timelineRows, taxLine: taxLine, taxSaw: taxSaw, mineLine: mineLine,
+    sgn: sgn, POINTS: POINTS, payWords: payWords, countyCells: countyCells, FICTION_PC: FICTION_PC, staticFallback: staticFallback, practice: practice };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -195,7 +231,9 @@
       if (inRange(saved.taxable, D.tax.taxableShare)) S.taxable = saved.taxable;
       if (design(D, saved.design)) S.design = saved.design;
     }
-    function keep() { LX.store.set("a13", S); }
+    // every change is kept in this browser and, a moment later, redrawn in the explain layer (it follows the reader's settings)
+    var xTimer = null;
+    function keep() { LX.store.set("a13", S); if (xTimer) clearTimeout(xTimer); xTimer = setTimeout(paintExplain, 200); }
     var demo = [];
     function chips(host, list) {
       host.innerHTML = "";
@@ -238,12 +276,12 @@
     }
 
     var steps = [
-      { text: "Prairie City's plan must recover a yearly cost from its households' electricity bills. Charge it per kWh first. Which income group's energy burden rises the most?",
+      { text: "Prairie City's plan recovers a yearly cost through its households' electricity bills, charged per kWh. Its households fall in five income groups, by their share of [[area-median-income|area median income]] (AMI).",
         build: function (act, api) {
-          var pr = LX.Predict(act, { id: "a13-rise", q: RISE.q, title: false, answer: RISE.answer, options: PC.groups.map(function (g, i) { return { value: g.key, label: SH[i] }; }), feedback: RISE.feedback, onPick: function () { show(); } });
+          var pr = LX.Predict(act, { id: "a13-rise", q: RISE.q, answer: RISE.answer, options: PC.groups.map(function (g, i) { return { value: g.key, label: SH[i] }; }), feedback: RISE.feedback, onPick: function () { show(); } });
           var res = H("div", { class: "a13-res" }, act); res.hidden = true;
           var Pl = LX.Plot(H("div", null, res), { text: "Text version of the chart", legend: true });
-          H("p", { class: "lx-hint", text: FICTION_PC + " Groups are shares of area median income; the plan's cost is set for teaching." }, res);
+          H("p", { class: "lx-hint", text: FICTION_PC + " The plan's cost is set for teaching. " + POINTS }, res);
           function show() { pr.reveal(); res.hidden = false; burdenChart(Pl, split(D, PC, D.plan.costM.start, "kwh")); api.done(); api.saw(riseSaw(D, PC, D.plan.costM.start)); }
           if (pr.picked()) show();
           demo[0] = function () { if (!pr.picked()) { var b = act.querySelector(".lx-choice"); if (b) b.click(); } };
@@ -296,10 +334,10 @@
           pick("five");
           demo[3] = function () { pick("two"); };
         } },
-      { text: "Now Prairieland's coal county. Ridge County's coal plant is retiring. Count the jobs that end: the plant's staff, the mine jobs that supply it, and the jobs their spending supports ([[employment-multiplier|multiplier]]).",
+      { text: "Ridge County, Prairieland's coal county, is losing its coal plant. Count the jobs that end: the plant's staff, the mine jobs that supply it, and the jobs their spending supports ([[employment-multiplier|multiplier]]).",
         build: function (act, api) {
           var ro = H("div", { class: "lx-readouts", "aria-live": "polite" }, act), line = H("p", { class: "lx-step-line", "aria-live": "polite" }, act);
-          slider(act, "Multiplier: all jobs per on-site job (illustrative)", D.jobs.multiplier, "m", function (v) { return fmtN(v, 1) + "×"; }, "var(--lx-tier-4)", function () { paint(); api.done(); api.saw(lostSaw(D, PC, S)); });
+          slider(act, "Multiplier: all jobs per direct (on-site) job (illustrative)", D.jobs.multiplier, "m", function (v) { return fmtN(v, 1) + "×"; }, "var(--lx-tier-4)", function () { paint(); api.done(); api.saw(lostSaw(D, PC, S)); });
           H("p", { class: "lx-hint", html: "Real multipliers come from regional input-output tables, such as BEA's RIMS II. " + LX.rich(D.ridgeCounty.fiction) }, act);
           assume(act, [A13.ASSUME.jobs[0], A13.ASSUME.jobs[1]]);
           function paint() {
@@ -310,41 +348,45 @@
           paint(); api.done(); api.saw(lostSaw(D, PC, S));
           demo[4] = function () { paint(); };
         } },
-      { text: "Wind and solar farms built in the county bring construction work. Set their size, their cost and the [[job-year|job-years]] each million dollars spent locally creates, then compare.",
+      { text: "Wind and solar farms built in the county bring construction work. Set their size, their cost and the direct [[job-year|job-years]] each million dollars spent locally creates, then compare.",
         build: function (act, api) {
           var ro = H("div", { class: "lx-readouts", "aria-live": "polite" }, act), line = H("p", { class: "lx-step-line", "aria-live": "polite" }, act);
           var J = D.jobs, go = function () { paint(); api.done(); api.saw(buildSaw(D, PC, S)); };
           var sl = slider(act, "New wind and solar in the county", J.newMW, "mw", function (v) { return fmtN(v) + " MW"; }, "var(--lx-wind)", go);
           slider(act, "Building cost (illustrative)", J.capexPerKW, "capex", function (v) { return money(v) + " per kW"; }, "var(--lx-tier-3)", go);
-          slider(act, "Job-years per $M spent locally (illustrative)", J.jobYearsPerM, "jy", function (v) { return fmtN(v, 1); }, "var(--lx-tier-4)", go);
-          H("p", { class: "lx-hint", text: "Local share of the spending " + pct(J.localShare, 0) + "; building takes " + J.buildYears + " years. NREL's JEDI models count a construction job as one full-time year." }, act);
+          slider(act, "Direct job-years per $M spent locally (illustrative)", J.jobYearsPerM, "jy", function (v) { return fmtN(v, 1); }, "var(--lx-tier-4)", go);
+          H("p", { class: "lx-hint", text: "Local share of the spending " + pct(J.localShare, 0) + "; building takes " + J.buildYears + " years. NREL's JEDI models count a construction job as one full-time year. Displacement comes in the next step." }, act);
           function paint() {
             var j = A13.jobs(jobInputs(D, PC, S));
-            chips(ro, [["Spent in the county", moneyM(j.localM, 0)], ["Building job-years", fmtN(Math.round(j.buildJobYears))], ["Jobs lost, over " + j.horizon.years + " years", fmtN(Math.round(j.horizon.lostPerm)) + " job-years", "bad"]]);
+            chips(ro, [["Spent in the county", moneyM(j.localM, 0)], ["Direct building job-years", fmtN(Math.round(j.buildJobYearsDirect))], ["With the multiplier (gross)", fmtN(Math.round(j.buildJobYears))], ["Jobs lost, over " + j.horizon.years + " years", fmtN(Math.round(j.horizon.lostPerm)) + " job-years", "bad"]]);
             line.innerHTML = bold(buildLine(D, PC, S));
           }
           paint(); api.done(); api.saw(buildSaw(D, PC, S));
           demo[5] = function () { sl.set(3000, true); };
         } },
-      { text: "Building ends; running the farms needs a permanent crew. Set the jobs per 100 MW and the share of new work that would have existed anyway: [[gross-jobs|gross]] against [[net-jobs|net]].",
+      { text: "Building ends; running the farms needs a permanent crew. Set the direct jobs per 100 MW and the share of new work that would have existed anyway: [[gross-jobs|gross]] against [[net-jobs|net]].",
         build: function (act, api) {
           var ro = H("div", { class: "lx-readouts", "aria-live": "polite" }, act), line = H("p", { class: "lx-step-line", "aria-live": "polite" }, act);
           var J = D.jobs, go = function () { paint(); api.done(); api.saw(permSaw(D, PC, S)); };
-          var sl = slider(act, "Permanent jobs per 100 MW (illustrative)", J.omPer100MW, "om", function (v) { return fmtN(v); }, "var(--lx-wind)", go);
-          slider(act, "Displacement: new work that would have existed anyway", J.displacement, "disp", function (v) { return fmtN(v) + "%"; }, "var(--lx-tier-5)", go);
-          H("p", { class: "lx-hint", text: "NREL's JEDI models report gross jobs only; net effects subtract displaced activity (JEDI limitations page)." }, act);
+          var sl = slider(act, "Direct permanent jobs per 100 MW (illustrative)", J.omPer100MW, "om", function (v) { return fmtN(v); }, "var(--lx-wind)", go);
+          slider(act, "Displacement: new work, building and running, that would have existed anyway", J.displacement, "disp", function (v) { return fmtN(v) + "%"; }, "var(--lx-tier-5)", go);
+          var tl = H("div", null, act);
+          H("p", { class: "lx-hint", text: timelineLine(D) + " NREL's JEDI models report gross jobs only; net effects subtract displaced activity (JEDI limitations page)." }, act);
           assume(act, A13.ASSUME.jobs);
           function paint() {
             var j = A13.jobs(jobInputs(D, PC, S));
-            chips(ro, [["New permanent, gross", fmtN(Math.round(j.newPermGross))], ["New permanent, net", fmtN(Math.round(j.newPermNet))], ["Net change", (j.netPerm < 0 ? "−" : "+") + fmtN(Math.abs(Math.round(j.netPerm))), j.netPerm < 0 ? "bad" : "good"]]);
+            chips(ro, [["New permanent, gross", fmtN(Math.round(j.newPermGross))], ["New permanent, net", fmtN(Math.round(j.newPermNet))], ["Net change in permanent jobs", sgn(j.netPerm), j.netPerm < 0 ? "bad" : "good"]]);
             line.innerHTML = bold(permLine(D, PC, S));
+            tl.innerHTML = "";
+            LX.Ledger(tl, { caption: "Job-years over the " + D.jobs.horizonYears + " years from the plant's retirement (screening estimate).", columns: ["Part", "Years", "Gross", "Net of " + fmtN(S.disp) + "% displacement"],
+              rows: timelineRows(D, PC, S).map(function (r) { return { head: r.head, sub: r.sub, cells: [r.years, sgn(r.gross), sgn(r.net)], total: !!r.total }; }), cls: "a13-led" });
           }
           paint(); api.done(); api.saw(permSaw(D, PC, S));
           demo[6] = function () { sl.set(12, true); };
         } },
       { text: "The plant paid property tax to Ridge County: part of its [[tax-base|tax base]]. Set the tax rate and how much of the new farms' cost is taxable, then read the county's budget.",
         build: function (act, api) {
-          var ro = H("div", { class: "lx-readouts", "aria-live": "polite" }, act), line = H("p", { class: "lx-step-line", "aria-live": "polite" }, act);
+          var ro = H("div", { class: "lx-readouts", "aria-live": "polite" }, act), line = H("p", { class: "lx-step-line", "aria-live": "polite" }, act), mines = H("p", { class: "lx-hint" }, act);
           var T = D.tax, go = function () { paint(); api.done(); api.saw(taxSaw(D, S)); };
           var sl = slider(act, "Property tax rate (illustrative)", T.rate, "rate", function (v) { return fmtN(v, 1) + "% a year"; }, "var(--lx-tier-5)", go);
           slider(act, "Taxable share of the new farms' cost", T.taxableShare, "taxable", function (v) { return fmtN(v) + "%"; }, "var(--lx-tier-5)", go);
@@ -352,8 +394,8 @@
           assume(act, A13.ASSUME.tax);
           function paint() {
             var t = A13.taxBase(taxInputs(D, S));
-            chips(ro, [["Plant's tax", moneyM(t.plantTaxM, 1)], ["New farms' tax", moneyM(t.newTaxM, 1)], ["County revenue", signed0(t.changeM, 1), t.changeM < 0 ? "bad" : t.changeM > 0 ? "good" : ""]]);
-            line.innerHTML = bold(taxLine(D, S));
+            chips(ro, [["Plant's tax", moneyM(t.plantTaxM, 1)], ["New farms' tax", moneyM(t.newTaxM, 1)], ["County revenue, plant tax only", signed0(t.changeM, 1), t.changeM < 0 ? "bad" : t.changeM > 0 ? "good" : ""], ["If the mines' taxes ended too", signed0(t.ifMinesCloseM, 1), "bad"]]);
+            line.innerHTML = bold(taxLine(D, S)); mines.textContent = mineLine(D, S);
           }
           paint(); api.done(); api.saw(taxSaw(D, S));
           demo[7] = function () { sl.set(1.5, true); };
@@ -367,9 +409,9 @@
             LX.Ledger(box, { caption: "Who pays and who gains, a year, with your inputs. Screening estimate.", columns: ["Who", "Pays or gains", "Kind"],
               rows: [{ head: "Prairie City, poorest group", sub: SH[0] + " of area median income", cells: ["pays " + money(a.rows[0].charge) + " a household (" + pts(a.rows[0].delta) + ")", "a share of a real cost"] },
                      { head: "Prairie City, top group", sub: SH[SH.length - 1] + " of area median income", cells: ["pays " + money(a.rows[a.rows.length - 1].charge) + " a household (" + pts(a.rows[a.rows.length - 1].delta) + ")", "a share of a real cost"] },
-                     { head: "Ridge County's workers", sub: "plant, mines and their suppliers", cells: [(j.netPerm < 0 ? "−" : "+") + fmtN(Math.abs(Math.round(j.netPerm))) + " permanent jobs, net", "earnings, not a cost"] },
-                     { head: "Construction workers", sub: "for " + D.jobs.buildYears + " years", cells: [fmtN(Math.round(j.buildJobYears)) + " job-years", "temporary"] },
-                     { head: "Ridge County's budget", cells: [signed0(t.changeM, 1) + " a year", "a transfer"] }], cls: "a13-led" });
+                     { head: "Ridge County's workers", sub: "plant, mines and their suppliers", cells: [sgn(j.netPerm) + " permanent jobs, net", "earnings, not a cost"] },
+                     { head: "Construction workers", sub: "for " + D.jobs.buildYears + " years", cells: [fmtN(Math.round(j.buildJobYears)) + " job-years gross, " + fmtN(Math.round(j.buildJobYearsNet)) + " net", "temporary"] },
+                     { head: "Ridge County's budget", sub: "plant tax only; the mines' held fixed", cells: [signed0(t.changeM, 1) + " a year", "a transfer"] }], cls: "a13-led" });
           }
           paint(); api.done();
           H("a", { class: "lx-btn small", style: "justify-self:start;margin-top:10px", href: "#explain", html: "Who decides, pays and benefits, as diagrams" + LX.icon("arrow") }, act);
@@ -380,30 +422,37 @@
 
     // ---------------------------------------------------------------- the explain layer
     var xhost = document.getElementById("a13-explain");
-    if (xhost) {
+    function paintExplain() {
+      if (!xhost) return;
       xhost.innerHTML = ""; xhost.classList.add("is-live");
+      var a = split(D, PC, S.costM, S.design), w = payWords(a), t = A13.taxBase(taxInputs(D, S)), cc = countyCells(t), farms = S.mw > 0;
+      var pv = w.none ? "no" : "yes";
       LX.Stakeholders(H("div", { class: "lx-xcard" }, xhost), {
         title: "Who decides, who pays, who benefits",
-        lede: "Typical roles when a city recovers a plan's cost and a coal county loses its plant.",
+        lede: "Typical roles, with your settings: " + moneyM(S.costM, 0) + " a year recovered " + design(D, S.design).lower + ", and Ridge County's plant retiring.",
         cols: [{ key: "dec", label: "Decides" }, { key: "pay", label: "Pays" }, { key: "ben", label: "Benefits" }],
         rows: [
           { key: "reg", name: "State regulators", cells: { dec: { v: "yes", t: "how the cost is split: the [[tariff|tariff]]" }, pay: { v: "no" }, ben: { v: "no" } } },
-          { key: "low", name: "Low-income households", note: "below 80% of area median income", cells: { dec: { v: "part", t: "comment at rate hearings" }, pay: { v: "yes", t: "the largest share of income" }, ben: { v: "part", t: "if the plan lowers bills or a design protects them" } } },
-          { key: "high", name: "Higher-income households", cells: { dec: { v: "part", t: "comment at rate hearings" }, pay: { v: "yes", t: "more dollars, a small share of income" }, ben: { v: "part", t: "from what the plan delivers" } } },
-          { key: "work", name: "Ridge County's workers", cells: { dec: { v: "no" }, pay: { v: "yes", t: "jobs lost unless re-employed" }, ben: { v: "part", t: "some farm and building jobs" } } },
-          { key: "county", name: "Ridge County's government", cells: { dec: { v: "part", t: "rates, abatements, permits" }, pay: { v: "part", t: "a smaller tax base" }, ben: { v: "part", t: "tax from the new farms" } } },
-          { key: "owners", name: "Plant and farm owners", cells: { dec: { v: "yes", t: "when to retire, where to build" }, pay: { v: "yes", t: "building costs and taxes" }, ben: { v: "yes", t: "their returns" } } }],
-        note: "Illustrative roles for fictional places; real arrangements vary by state." });
-      var la = split(D, PC, D.plan.costM.start, "kwh"), lf = split(D, PC, D.plan.costM.start, "fixed"), li = split(D, PC, D.plan.costM.start, "income");
+          { key: "low", name: "Low-income households", note: "below 80% of area median income", cells: { dec: { v: "part", t: "comment at rate hearings" }, pay: { v: pv, t: w.low }, ben: { v: "part", t: "if the plan lowers bills or a design protects them" } } },
+          { key: "high", name: "Higher-income households", cells: { dec: { v: "part", t: "comment at rate hearings" }, pay: { v: pv, t: w.high }, ben: { v: "part", t: "from what the plan delivers" } } },
+          { key: "work", name: "Ridge County's workers", cells: { dec: { v: "no" }, pay: { v: "yes", t: "jobs lost unless re-employed" }, ben: farms ? { v: "part", t: "some farm and building jobs" } : { v: "no" } } },
+          { key: "county", name: "Ridge County's government", cells: { dec: { v: "part", t: "rates, abatements, permits" }, pay: cc.pay, ben: cc.ben } },
+          { key: "owners", name: "Plant and farm owners", cells: { dec: { v: "yes", t: "when to retire, where to build" }, pay: { v: "yes", t: farms ? "building costs and taxes" : "the plant's closing costs" }, ben: { v: "yes", t: "their returns" } } }],
+        note: "Illustrative roles for fictional places; real arrangements vary by state. Redrawn from your settings." });
+      var la = split(D, PC, S.costM, "kwh"), lf = split(D, PC, S.costM, "fixed"), li = split(D, PC, S.costM, "income");
       var lw = H("div", { class: "lx-xcard" }, xhost); H("header", { class: "lx-x-head" }, lw).appendChild(H("h3", { text: "Ledger: the same cost, three designs" }));
-      LX.Ledger(lw, { caption: "Yearly charge per household at " + moneyM(D.plan.costM.start, 0) + " (screening estimate); every column recovers the same total.", columns: ["Group", "Per kWh", "Fixed charge", "By income"],
+      LX.Ledger(lw, { caption: "Yearly charge per household at your " + moneyM(S.costM, 0) + " (screening estimate); every column recovers the same total.", columns: ["Group", "Per kWh", "Fixed charge", "By income"],
         rows: la.rows.map(function (r, i) { return { head: SH[i], cells: [money(r.charge), money(lf.rows[i].charge), money(li.rows[i].charge)] }; })
           .concat([{ head: "= All", cells: [moneyM(la.total / 1e6), moneyM(lf.total / 1e6), moneyM(li.total / 1e6)], total: true }]), cls: "a13-led" });
+      var lt = H("div", { class: "lx-xcard" }, xhost); H("header", { class: "lx-x-head" }, lt).appendChild(H("h3", { text: "Ledger: jobs on one timeline" }));
+      LX.Ledger(lt, { caption: timelineLine(D) + " With your inputs; net of " + fmtN(S.disp) + "% displacement.", columns: ["Part", "Years", "Gross job-years", "Net job-years"],
+        rows: timelineRows(D, PC, S).map(function (r) { return { head: r.head, sub: r.sub, cells: [r.years, sgn(r.gross), sgn(r.net)], total: !!r.total }; }), cls: "a13-led" });
       LX.Boundary(H("div", { class: "lx-xcard" }, xhost), { title: "Where these estimates hold",
-        holds: ["The coefficients you set are right for the place and the year.", "Each group's average stands for its households.", "Lost jobs are not refilled elsewhere in the county."],
-        leaves: ["Responses to prices, moves, retraining and new firms.", "Health, emissions and what the plan delivers to each group.", "Who gets a say: procedure, not only money."],
+        holds: ["The coefficients you set are right for the place and the year.", "Each group's average stands for its households.", "Lost jobs are not refilled elsewhere in the county.", "The mines' coal taxes stay as they are."],
+        leaves: ["Responses to prices, moves, retraining and new firms.", "Health, emissions and what the plan delivers to each group.", "What a smaller county budget does to its services.", "Who gets a say: procedure, not only money."],
         source: "Accounting: this page's screening model. Prairie City from the course's shared city data; Ridge County fictional." });
     }
+    paintExplain();
 
     LX.demo(root, function (state) {
       var n = state === "mid" ? 2 : +((/^step-(\d+)$/.exec(state) || [])[1] || 0); if (!n) return null;
