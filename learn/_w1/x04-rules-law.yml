@@ -8,7 +8,16 @@ glossary:
     def: "A formal proceeding in which a utility asks its regulator to change its rates; staff, consumer advocates and other parties file testimony, and the commission decides."
   - id: revenue-requirement
     term: Revenue requirement
-    def: "The total a regulated utility may collect from its customers in a year: its allowed operating costs plus an allowed return on the net value of what it has built."
+    def: "The annual revenue a regulated utility may collect: its approved expenses, including depreciation and taxes, plus an allowed financing return on the net value of what it has built."
+  - id: rate-base
+    term: Rate base
+    def: "The net value of what a regulated utility has built, its plant less depreciation, on which the regulator allows it to earn a return."
+  - id: intervenor
+    term: Intervenor
+    def: "A person or organization that formally joins a regulatory case as a party, so it can file testimony and question witnesses."
+  - id: evidentiary-hearing
+    term: Evidentiary hearing
+    def: "A formal hearing at which the parties present their evidence and question each other's witnesses before the commissioners."
 requests:
   - "X4 links kcc.ks.gov (allow-listed since 2026-11-07), ferc.gov and energy.gov; the Kansas siting statutes are cited by name without a link (ksrevisor.gov is not on the allow-list)."
   - "F9's sources kcc-role and kcc-rate-study cite the KCC without a link; kcc.ks.gov is now allow-listed, so they could link https://kcc.ks.gov/about-us/the-commissions-s-role (coordinator's cross-link pass)."

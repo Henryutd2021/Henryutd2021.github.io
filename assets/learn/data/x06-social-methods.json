@@ -12,24 +12,24 @@
     }
   },
   "methods": [
-    { "id": "survey", "label": "Survey", "color": "var(--lx-tier-1)", "asks": "How many, how much, how often, across a population.", "data": "A questionnaire answered by a sample chosen to represent a population.", "gives": "Shares and rates by household group, such as who has a heat pump or who struggles with bills.", "cannot": "Why people act as they do, in depth; or whether a programme caused a change, without a comparison design.", "people": "yes" },
-    { "id": "interview", "label": "Interview", "color": "var(--lx-tier-2)", "asks": "Why and how, in people's own words.", "data": "Open conversations with a few chosen people, recorded and transcribed.", "gives": "Reasons, barriers and assumptions worth testing, including ones a model leaves out.", "cannot": "How common each view is across a city.", "people": "yes" },
-    { "id": "choice", "label": "Choice experiment", "term": "choice-experiment", "color": "var(--lx-tier-3)", "asks": "Which trade-offs people accept.", "data": "Repeated choices between offers whose features vary, made by a sample of people.", "gives": "How much each feature weighs, such as bill saving against control, for adoption scenarios.", "cannot": "What people do once the offer is real: the choices are stated, not observed.", "people": "yes" },
-    { "id": "ethno", "label": "Ethnography", "term": "ethnography", "color": "var(--lx-tier-4)", "asks": "How people live with energy, day to day.", "data": "Long observation and conversation in homes or communities.", "gives": "Routines a model's behaviour rules should reflect, such as how heating is really used.", "cannot": "Numbers that hold for a whole city.", "people": "yes" },
-    { "id": "policy", "label": "Policy analysis", "color": "var(--lx-cc)", "asks": "How rules came about, and who shaped them.", "data": "Laws, rulings, dockets and filings, read and compared over time.", "gives": "The rules and limits a model must respect, and which of them are open to change.", "cannot": "How people experience the rules.", "people": "partly" },
-    { "id": "mapping", "label": "Participatory mapping", "term": "participatory-mapping", "color": "var(--lx-good)", "asks": "Which places matter to people, and why.", "data": "Residents mark places on maps, in workshops or online.", "gives": "Layers to exclude or weigh in a siting screen, as in lesson A19.", "cannot": "How the whole population feels, when few take part.", "people": "yes" }
+    { "id": "survey", "label": "Survey", "short": "Survey", "def": "set questions to a sample standing for many", "color": "var(--lx-tier-1)", "asks": "How many, how much, how often, across a population.", "data": "A questionnaire answered by a sample chosen to represent a population.", "gives": "Shares and rates by household group, such as who has a heat pump or who struggles with bills.", "cannot": "Why people act as they do, in depth; or whether a programme caused a change, without a comparison design.", "people": "yes" },
+    { "id": "interview", "label": "Interview", "short": "Interview", "def": "open conversations with a few people", "color": "var(--lx-tier-2)", "asks": "Why and how, in people's own words.", "data": "Open conversations with a few chosen people, recorded and transcribed.", "gives": "Reasons, barriers and assumptions worth testing, including ones a model leaves out.", "cannot": "How common each view is across a city.", "people": "yes" },
+    { "id": "choice", "label": "Choice experiment", "short": "Choice experiment", "def": "repeated choices between varied offers", "term": "choice-experiment", "color": "var(--lx-tier-3)", "asks": "Which trade-offs people accept.", "data": "Repeated choices between offers whose features vary, made by a sample of people.", "gives": "How much each feature weighs, such as bill saving against control, for adoption scenarios.", "cannot": "What people do once the offer is real: the choices are stated, not observed.", "people": "yes" },
+    { "id": "ethno", "label": "Ethnography", "short": "Ethno\u00adgraphy", "def": "long observation where people live", "term": "ethnography", "color": "var(--lx-tier-4)", "asks": "How people live with energy, day to day.", "data": "Long observation and conversation in homes or communities.", "gives": "Routines a model's behaviour rules should reflect, such as how heating is really used.", "cannot": "Numbers that hold for a whole city.", "people": "yes" },
+    { "id": "policy", "label": "Document-based policy analysis", "short": "Policy analysis", "def": "reading laws, rulings and case records", "color": "var(--lx-cc)", "asks": "How rules came about, and who shaped them.", "data": "Laws, rulings, official case records and the documents parties submitted, read and compared over time.", "gives": "The rules and limits a model must respect, and which of them are open to change.", "cannot": "Documents alone do not show how people experience the rules.", "people": "partly" },
+    { "id": "mapping", "label": "Participatory mapping", "short": "Mapping", "def": "participatory: residents mark places on maps", "term": "participatory-mapping", "color": "var(--lx-good)", "asks": "Which places matter to people, and why.", "data": "Residents mark places on maps, in workshops or online.", "gives": "Map layers used to compare possible locations, to exclude or weigh, as in lesson A19.", "cannot": "How the whole population feels, when few take part.", "people": "yes" }
   ],
   "questions": [
     { "id": "q1", "text": "What share of Prairie City's households had trouble paying an energy bill last year, by income group?", "bin": "survey", "why": "Survey: one questionnaire to a sample chosen to represent all households gives shares by group." },
     { "id": "q2", "text": "Why do landlords turn down a free efficiency upgrade for their rental homes?", "bin": "interview", "why": "Interviews: open questions to a few landlords bring out reasons no one listed in advance." },
     { "id": "q3", "text": "How much bill saving would a household trade for letting the utility adjust its thermostat at the peak?", "bin": "choice", "why": "Choice experiment: people pick between offers that vary saving and control, revealing the trade-off they accept." },
     { "id": "q4", "text": "How do families actually use their heating through a winter, and what does comfort mean to them?", "bin": "ethno", "why": "Ethnography: time spent with households shows routines people may not report in a survey." },
-    { "id": "q5", "text": "How did the state's rules for rooftop solar bill credits change over ten years, and who argued for what?", "bin": "policy", "why": "Policy analysis: statutes, rulings and filings read and compared over the decade." },
+    { "id": "q5", "text": "How did the state's rules for rooftop solar bill credits change over ten years, and who argued for what?", "bin": "policy", "why": "Document-based policy analysis: statutes, rulings and submitted documents read and compared over the decade." },
     { "id": "q6", "text": "Which places do residents want kept clear of a new solar farm, and why?", "bin": "mapping", "why": "Participatory mapping: residents mark the places that matter, which planners can turn into map layers." }
   ],
   "peopleWhy": {
-    "yes": "People take part: informed consent and an ethics board's review come first.",
-    "partly": "Mostly documents; once officials are interviewed, people take part too."
+    "yes": "People take part: ask the ethics board first what review and consent apply; an exemption or a waiver is its decision, under its process.",
+    "partly": "Mostly documents; once officials are interviewed, or identifiable personal records are used, ask the ethics board too."
   },
   "selection": {
     "q": "Does the survey difference show the programme's effect",
@@ -42,7 +42,7 @@
     }
   },
   "facts": [
-    { "n": "27%", "what": "U.S. households reporting energy insecurity in 2020, about 34 million, in EIA's Residential Energy Consumption Survey.", "src": "eia-recs" },
+    { "n": "27%", "what": "U.S. households reporting energy insecurity in 2020, about 34 million: difficulty paying energy bills, or a home kept at an unsafe temperature because of energy costs (EIA's Residential Energy Consumption Survey).", "src": "eia-recs" },
     { "n": "18,496", "what": "Households that answered the 2020 survey, by web or mail questionnaire, late 2020 to early 2021.", "src": "eia-recs" },
     { "n": "7", "what": "Method categories given codes of practice in a review of energy social science: experiments, literature reviews, data collection, data analysis, quantitative energy modeling, qualitative analysis and case studies.", "src": "sovacool2018" }
   ],
@@ -51,7 +51,7 @@
     "lede": "Social-science methods enter the course as what each can tell a modeller and how to work with the people who use them; training in a method is beyond it.",
     "includes": [
       "What six methods answer, the data each needs and what each cannot tell.",
-      "Why research with people needs informed consent and an ethics board's review first.",
+      "Why research with people starts with the ethics board, which decides what review and consent apply.",
       "How findings become a model's inputs, groups, layers or scenarios."
     ],
     "leaves": [
@@ -62,12 +62,15 @@
     "ladder": [
       { "rung": "Start here", "text": "How energy social scientists choose and combine methods, with codes of practice for each family (open access).", "source": { "label": "Sovacool, Axsen and Sorrell (2018), Promoting novelty, rigor, and style in energy social science", "url": "https://doi.org/10.1016/j.erss.2018.07.007", "asof": "published 3 October 2018" } },
       { "rung": "Go further", "text": "An introductory social-science research-methods textbook, for how each method is designed and judged.", "source": { "label": "Bryman, Social Research Methods (Oxford University Press), cited by name", "url": null, "asof": "any recent edition" } },
-      { "rung": "Go deep", "text": "The rules for research with people on DOE-supported projects: prior review and informed consent; your university's ethics board publishes its own guide.", "source": { "label": "U.S. Department of Energy, Order 443.1D, Protection of Human Research Subjects", "url": "https://www.energy.gov/documents/doe-o-443-1-dprotection-human-research-subjects2026-07-23pdf", "asof": "approved 5 August 2026" } }
+      { "rung": "Go deep", "text": "The rules for research with people on DOE-supported projects, including who decides on review and on exemptions; your university's ethics board publishes its own guide.", "source": { "label": "U.S. Department of Energy, Order 443.1D, Protection of Human Research Subjects", "url": "https://www.energy.gov/documents/doe-o-443-1-dprotection-human-research-subjects2026-07-23pdf", "asof": "approved 5 August 2026" } }
     ]
   },
   "sources": {
-    "eia-recs": { "text": "EIA, Today in Energy: In 2020, 27% of U.S. households had difficulty meeting their energy needs (Residential Energy Consumption Survey): 34 million households; 18,496 households answered by web or mail questionnaires in late 2020 and early 2021; lower-income households, households with children and renters reported more energy insecurity", "url": "https://www.eia.gov/todayinenergy/detail.php?id=51979", "asOf": "11 April 2022, read 7 November 2026" },
-    "sovacool2018": { "text": "Sovacool, B. K., Axsen, J. and Sorrell, S. (2018), Promoting novelty, rigor, and style in energy social science: Towards codes of practice for appropriate methods and research design, Energy Research & Social Science 45, 12-42 (abstract; open access, CC BY): codes of practice for seven method categories, and balancing methodological appropriateness rather than relying on evidence hierarchies", "url": "https://doi.org/10.1016/j.erss.2018.07.007", "asOf": "published 3 October 2018, read 7 November 2026" },
-    "doe-4431d": { "text": "U.S. Department of Energy, Order 443.1D, Protection of Human Research Subjects (approved 5 August 2026), as used in lesson R9", "url": "https://www.energy.gov/documents/doe-o-443-1-dprotection-human-research-subjects2026-07-23pdf", "asOf": "read 3 November 2026 (lesson R9)" }
+    "eia-recs": { "cite": "EIA, Today in Energy: In 2020, 27% of U.S. households had difficulty meeting their energy needs", "url": "https://www.eia.gov/todayinenergy/detail.php?id=51979", "asOf": "11 April 2022, read 7 November 2026",
+      "used": ["Energy insecurity: difficulty paying energy bills, or a home kept at an unsafe temperature because of energy cost concerns.", "34 million households, 27% of all U.S. households, in 2020 (Residential Energy Consumption Survey).", "18,496 households answered by web or mail questionnaire in late 2020 and early 2021.", "Lower-income households, households with children and renters reported more energy insecurity."] },
+    "sovacool2018": { "cite": "Sovacool, Axsen and Sorrell (2018), Promoting novelty, rigor, and style in energy social science: Towards codes of practice for appropriate methods and research design, Energy Research & Social Science 45, 12-42", "url": "https://doi.org/10.1016/j.erss.2018.07.007", "asOf": "published 3 October 2018, read 7 November 2026",
+      "used": ["The abstract (open access, CC BY): codes of practice for seven method categories.", "Balancing methodological appropriateness rather than relying on evidence hierarchies."] },
+    "doe-4431d": { "cite": "U.S. Department of Energy, Order 443.1D, Protection of Human Research Subjects (approved 5 August 2026)", "url": "https://www.energy.gov/documents/doe-o-443-1-dprotection-human-research-subjects2026-07-23pdf", "asOf": "read 3 November 2026 (lesson R9)",
+      "used": ["The rules for research with people on DOE-supported projects, as used in lesson R9: review, exemption determinations and informed consent."] }
   }
 }
