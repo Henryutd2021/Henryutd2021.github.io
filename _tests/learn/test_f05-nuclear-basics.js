@@ -231,7 +231,7 @@ const fmt = v => v.toLocaleString("en-US");
   for (const h of own.matchAll(/href="([^"]+)"|\]\(([^)]+)\)|src="([^"]+)"/g)) { const u = (h[1] || h[2] || h[3]).replace(/&amp;/g, "&"); nl++; ok(ALLOW.test(u), `link on the allow-list: ${u}`);
     const pg = /^([0-9a-z-]+)\.(qmd|html)$/.exec(u); if (pg) ok(fs.existsSync(path.join(SITE, "learn", pg[1] + ".qmd")), `linked lesson ${u} exists`); }
   ok(nl >= 20, `${nl} links checked`);
-  ok(/X1, upcoming/.test(QMD) && !/href="x01/.test(QMD), "X1 is named as upcoming, not linked");
+  ok(!/X1, upcoming/.test(QMD) && /\(side topic \[X1\]\(x01-under-the-hood\.html\)\)/.test(QMD) && /\(side topic <a href="x01-under-the-hood\.html">X1<\/a>\)/.test(QMD), "X1 is linked now that it is live (W7)");
 }
 
 // ---------------- the page on a stub document: step 3 → step 4 → Back (review #5), step 3's state at 30/90 (review #4),

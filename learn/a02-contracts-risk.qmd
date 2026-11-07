@@ -139,7 +139,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-deeper-body">
 ```
 
-- **Lenders size loans on the bad years.** A loan is repaid from the low years' revenue, so a narrower range can carry a larger loan. This stays at awareness level here (side shelf X5, upcoming).
+- **Lenders size loans on the bad years.** A loan is repaid from the low years' revenue, so a narrower range can carry a larger loan. This stays at awareness level here (side shelf [X5](x05-project-finance.html)).
 - **Fair is not the market price.** Each contract here is signed at its fair price, so on average it moves no money. Real prices also pay one side for the risk it takes on.
 - **A naming trap.** Resource studies often name levels by exceedance: their "P90" output is the level exceeded in 90% of years, this page's P10. Check which convention a study uses.
 
@@ -249,7 +249,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <li>FERC staff (2024). <a href="https://www.ferc.gov/sites/default/files/2024-01/24_Energy-Markets-Primer_0117_DIGITAL_0.pdf">Energy Primer: A Handbook of Energy Market Basics</a> (PDF). Locational prices p. 70; contract quantity, location (nodes, zones, hubs), fixed and floating prices, forwards and swaps pp. 121–122.</li>
 <li>Kahrl, F. (2021). <a href="https://eta-publications.lbl.gov/sites/default/files/all_source_competitive_solutions_20210217_gmlc_format.pdf">All-Source Competitive Solicitations: State and Electric Utility Practices</a> (PDF). Lawrence Berkeley National Laboratory. Tolling agreements: p. 5 (Table 1 note) and p. 34.</li>
 <li>Millstein, D., Wiser, R., Mills, A. D., Bolinger, M., Seel, J. and Jeong, S. (2021). <a href="https://doi.org/10.1016/j.joule.2021.05.009">Solar and wind grid system value in the United States: The effect of transmission congestion, generation profiles, and curtailment</a>. Joule 5(7), 1749–1775. From the abstract: solar's loss of value is most sensitive to its output profile, its shape.</li>
-<li>Where this goes: Modeler lesson <a href="m07-monte-carlo.html">M7</a> samples linked inputs; side shelf X5 (upcoming) covers how lenders size loans.</li>
+<li>Where this goes: Modeler lesson <a href="m07-monte-carlo.html">M7</a> samples linked inputs; side shelf <a href="x05-project-finance.html">X5</a> covers how lenders size loans.</li>
 </ul>
 </div>
 ```
