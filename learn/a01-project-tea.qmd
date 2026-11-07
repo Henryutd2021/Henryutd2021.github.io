@@ -53,7 +53,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 
 ::: {#steps .lx-sec}
 ```{=html}
-<div class="lx-interactive lx-cards" data-learn="a01" data-src="../assets/learn/data/07-cost.json ../assets/learn/data/a01-project-tea.json">
+<div class="lx-interactive lx-cards" data-learn="a01" data-src="../assets/learn/data/07-cost.json ../assets/learn/data/a01-project-tea.json ../assets/learn/data/path.json">
 <div class="lx-fallback">
 <p class="lx-eyebrow">A 150 MW wind farm in seven moves (real 2025 dollars)</p>
 <ol>

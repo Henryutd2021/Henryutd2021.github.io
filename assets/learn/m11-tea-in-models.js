@@ -6,7 +6,7 @@
 // copies from 13-capstone.json and checks on every run: the wind farm's costs, the rate and the life, as lesson 13 shows
 // them, so this page and its notebook need only that subset), a16-hydrogen-ptx.json (57 kWh per kg, as A16 shows it), town.json
 // (Prairie Town's fleet, for its price and CO2), town_year.json (SPP 2025 hourly shapes, EIA-930), cf_targets.json (EIA's
-// wind capacity factor), path.json (step 8 names case file CF5 through LX.lessonRefHTML).
+// wind capacity factor), path.json (step 8 names case file CF5 and step 9 case file CF4 through LX.lessonRefHTML).
 //
 // The model: one linear program for a plant's whole life, on 36 representative days (three per month, each weighted by
 // the days it stands for). Every variable is >= 0 and 0 <= S <= 100 MW. Money is in real 2025 dollars; the objective is the plant's ANNUAL EQUIVALENT net cost, $ a year
@@ -650,7 +650,11 @@
       // 9 formulate it
       { text: "You built a techno-economic analysis inside an LP: annual capital in the goal, hours that earn, a credit in its own years, a tier as a set of LPs, and a boundary you stated.",
         free: true,
-        build: function (act) { H("a", { class: "lx-btn small", style: "justify-self:start", href: "#explain", html: "The model, symbol by symbol" + LX.icon("arrow") }, act); LX.progress.done(SLUG); } }
+        build: function (act) {
+          H("a", { class: "lx-btn small", style: "justify-self:start", href: "#explain", html: "The model, symbol by symbol" + LX.icon("arrow") }, act);
+          if (PJ && LX.lessonRefHTML) H("p", { class: "m11-note", html: "Case file " + LX.lessonRefHTML(PJ, "CF4") + " (hydrogen at existing plants): what an hourly dispatch model and a lifetime cash flow each add, when the plant's own capital is already spent." }, act);
+          LX.progress.done(SLUG);
+        } }
     ];
     // the year-by-year cash flows (real 2025 dollars) with the running discounted total
     function cashChart(host, R, k, label) {

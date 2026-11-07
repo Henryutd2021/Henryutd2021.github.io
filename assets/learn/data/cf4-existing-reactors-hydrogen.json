@@ -1,0 +1,118 @@
+{
+ "about": "Data of Learn case file CF4 (wave W6, 2026-11-07). The timeline and the boundary card are approved E15 wording (Henry, 2026-11-07; reports/learn/excerpts_for_approval.md, W6 sources), word for word (E15.26, E15.27, E15.25); the boundary card's source line is E15.30. The idea is the course's own toy: a generic existing plant with round numbers, some of them the reader's, for one illustrative day; nothing in it is the study's input, equation or result.",
+ "built": "2026-11-07",
+ "timeline": {
+  "title": "The study in time",
+  "lede": "Two dated steps: the journal article and its open code.",
+  "events": [
+   {
+    "date": "2026-06",
+    "label": "Journal article (this case)",
+    "kind": "study",
+    "key": true,
+    "text": "Hourly operation of 42 existing reactors with high-temperature electrolysis, hydrogen storage and batteries, in seven U.S. ISO/RTO markets at 2024 prices, is linked to a lifetime cash-flow model; published online on 2 June 2026.",
+    "source": {
+     "label": "Li et al. (2026), Nature Communications 17, 7090",
+     "url": "https://doi.org/10.1038/s41467-026-73630-y"
+    }
+   },
+   {
+    "date": "2026-11-02",
+    "label": "Code released",
+    "kind": "study",
+    "text": "A documented, runnable implementation of the modelling framework, with synthetic examples (version 1.0.0).",
+    "source": {
+     "label": "nuclear-hydrogen-integration on GitHub",
+     "url": "https://github.com/Henryutd2021/nuclear-hydrogen-integration",
+     "as_of": "2026-11-07"
+    }
+   }
+  ]
+ },
+ "boundary": {
+  "title": "Where the result holds",
+  "holds": [
+   "42 existing plants in seven U.S. ISO/RTO markets, each at its own 2024 hourly prices, taken as given;",
+   "one year of hourly operation (8,760 hours) turned into a lifetime cash flow;",
+   "the existing plant's capital treated as already spent, so the capital counted is that of the new hydrogen and battery equipment;",
+   "the assumed hydrogen production credit ($3/kg for ten years) in the retrofit results shown here, with the dispatch held fixed after it expires;",
+   "no credits in the baseload case;",
+   "modeled ancillary-service participation parameters."
+  ],
+  "leaves": [
+   "price feedback from large-scale adoption;",
+   "re-optimized operation after the credit expires."
+  ],
+  "source": "Approved excerpt of: Li et al. (2026), Nature Communications."
+ },
+ "scale": {
+  "mark": "S4",
+  "markText": "Its reach: plants across a nation's markets. Its model works one plant at a time, as at S0."
+ },
+ "idea": {
+  "title": "One day at an existing plant that can also make hydrogen",
+  "note": "Illustrative round numbers, some of them yours: a generic existing plant, not the study's inputs or results. Power in MW, as an average over each hour; money in dollars for the one day shown.",
+  "plantMW": 1000,
+  "kgPerMWh": 25,
+  "h2Price": 2,
+  "elzCostPerMWDay": 400,
+  "prices": [30, 28, 26, 25, 26, 30, 38, 46, 44, 36, 26, 18, 14, 12, 14, 20, 30, 54, 72, 90, 76, 62, 42, 34],
+  "start": {
+   "level": 1,
+   "reserve": 8,
+   "elz": 200,
+   "reserves": true,
+   "hour": 13
+  },
+  "sliders": [
+   {
+    "key": "level",
+    "label": "Grid price level: the day's prices times",
+    "min": 0.5,
+    "max": 1.5,
+    "step": 0.1,
+    "dec": 1,
+    "pre": "×",
+    "unit": "",
+    "color": "var(--lx-ink-2)"
+   },
+   {
+    "key": "reserve",
+    "label": "Reserve price, per MW held for an hour",
+    "min": 0,
+    "max": 20,
+    "step": 1,
+    "dec": 0,
+    "pre": "$",
+    "unit": "",
+    "color": "var(--lx-good)"
+   },
+   {
+    "key": "elz",
+    "label": "Electrolyzer size",
+    "min": 0,
+    "max": 400,
+    "step": 50,
+    "dec": 0,
+    "pre": "",
+    "unit": "MW",
+    "color": "var(--lx-tier-5)"
+   }
+  ],
+  "reserveModes": [
+   {
+    "id": "on",
+    "label": "Offer reserves"
+   },
+   {
+    "id": "off",
+    "label": "No reserves"
+   }
+  ],
+  "practice": {
+   "levels": [0.6, 1.4],
+   "elz": [0, 400],
+   "hours": [13, 19]
+  }
+ }
+}

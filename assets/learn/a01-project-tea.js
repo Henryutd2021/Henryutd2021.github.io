@@ -10,6 +10,7 @@
 //   assets/learn/data/a01-project-tea.json the farm's size (150 MW, Prairie Town's wind farm), the illustrative sale price
 //                                         ($50/MWh), slider ranges, the timeline's illustrative calendar and the myth's
 //                                         smaller farm
+//   assets/learn/data/path.json           the course's lessons: step 1 names case file CF4 through LX.lessonRefHTML
 // One price year: every dollar is a real 2025 dollar, so every rate is a real rate (as in lesson 7 and K3). The sale price
 // is fixed in real terms, as a contract indexed to inflation would be (a flat nominal price would fall in real terms).
 // Each card from step 4 on starts again from the default farm ($50/MWh, 4% real, 30 years) and says so.
@@ -269,6 +270,7 @@
   }
 
   function view(live, data, root) {
+    var PJ = data.path || null;   // path.json, for LX.lessonRefHTML (step 1 names case file CF4)
     var D7 = data["07_cost"], DA = data["a01_project_tea"], s = story(D7, DA), T = texts(s), Q = prompts(s, D7), p = s.p, autos = {}, steps = [];
     var R = pct(p.rate, 0), N = p.life;
     // cards 4 to 7 start again from the default farm, whatever an earlier card changed: each says so first
@@ -304,6 +306,7 @@
         }
         autos[0] = function () { ["build", "sales", "upkeep"].forEach(function (k) { on[k] = true; }); draw(); };
         draw();
+        if (PJ && LX.lessonRefHTML) H("p", { class: "lx-hint", html: "Year 0 counts here because the farm is not built yet. Case file " + LX.lessonRefHTML(PJ, "CF4") + " (hydrogen at existing plants) shows the other case: a plant's own capital, already spent, drops out." }, act);
       }
     });
 
