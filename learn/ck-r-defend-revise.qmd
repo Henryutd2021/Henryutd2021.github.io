@@ -42,7 +42,7 @@ body-classes: "page-learn page-lesson lx-form-checkpoint"
 <div class="lx-card ckr-intro">
 <p class="lx-eyebrow">How this checkpoint works · about 240 minutes, no hints</p>
 <ol class="ckr-parts">
-<li><b>A · A stranger's study</b> (about 45 min). Review the co-op proposal below with the review form and submit it as task 1; tasks 2 to 5 open after it.</li>
+<li><b>A · A stranger's study</b> (about 45 min). Review the co-op proposal below with the review form and submit it as task 1; the seven marked tasks (2–5, 9–11) open after it.</li>
 <li><b>B · Your mock review</b> (about 60 min). Get a written review of your <a href="cr-your-own-study.html">research capstone</a>'s question and method: from a mentor, a peer, or yourself after a day away.</li>
 <li><b>C · Respond and revise</b> (about 70 min). Answer each concern point by point; revise your proposal and log each change.</li>
 <li><b>D · Rerun</b> (about 50 min). Order and check the co-op study's rerun (tasks 9 to 11), then rerun your own main result from a clean clone.</li>

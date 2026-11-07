@@ -200,6 +200,8 @@ has("Opens once all twelve tasks are answered.", "the lock box");
 ok(/gateAll: true, late: "practice"/.test(JS) && !/submitTask/.test(JS.slice(JS.indexOf("LX.Checkpoint(live"))), "the runner: gateAll and the late-answer rule, no submit task");
 has("The co-op, its farms and every number here are fictional: the results are assumed example outputs, not computed from data.", "the fictional label on the study");
 has("Task 1 first: the seven marked tasks open once your review is submitted. Each written task stays as you submit it.", "task 1 first, and written tasks kept as submitted, said before the tasks");
+has("submit it as task 1; the seven marked tasks (2–5, 9–11) open after it.", "part A names every task that waits for task 1");
+ok(T.map((t, i) => t.opensAfter ? i + 1 : 0).filter(Boolean).join() === "2,3,4,5,9,10,11", "the tasks that wait are 2 to 5 and 9 to 11");
 has("The level is not the table's: it comes from this rule.", "the level against the criterion table, said before the tasks (Codex review #3)");
 has("Not the table's Strong: this level needs no second person.", "the level against the criterion table, in the rubric section");
 ok(D.intro.some(x => /^Task 1 first: the seven marked tasks open once your review/.test(x)), "the runner's intro says task 1 comes first");
