@@ -11,6 +11,12 @@
   "lesson": "K7",
   "href": "k07-spreadsheets.html"
  },
+ "absorption-chiller": {
+  "term": "Absorption chiller",
+  "short": "A chiller driven by heat, such as steam or hot water, instead of an electric compressor; it uses a salt solution that absorbs and releases a refrigerant.",
+  "lesson": "CF5",
+  "href": "cf5-drawing-the-boundary.html"
+ },
  "additionality": {
   "term": "Additionality",
   "short": "Whether a purchase brings new clean generation that would not have been built otherwise, rather than claiming output that existed anyway.",
@@ -34,6 +40,12 @@
   "short": "The older, widely used electrolyzer type, whose cells sit in an alkaline liquid; the units in IRENA's 2020 table must stay above about 15% of their size.",
   "lesson": "A16",
   "href": "a16-hydrogen-ptx.html"
+ },
+ "ancillary-services": {
+  "term": "Ancillary services",
+  "short": "Services besides energy that keep the grid steady, such as reserves and frequency regulation; grid operators buy them separately from energy.",
+  "lesson": "CF5",
+  "href": "cf5-drawing-the-boundary.html"
  },
  "annuity-factor": {
   "term": "Annuity factor",
@@ -425,6 +437,12 @@
   "lesson": "F3",
   "href": "f03-energy-services.html"
  },
+ "cogeneration": {
+  "term": "Cogeneration",
+  "short": "Making two useful products from one fuel or heat source, such as electricity and heat, steam or cooling, instead of making each separately.",
+  "lesson": "CF5",
+  "href": "cf5-drawing-the-boundary.html"
+ },
  "coincident-peak": {
   "term": "Coincident peak",
   "short": "The most a group of customers draws in the same hour; it is lower than the sum of their own peaks when they peak at different times.",
@@ -634,6 +652,12 @@
   "short": "The continuous ranked probability score of a whole forecast distribution: twice its pinball loss averaged over every quantile level; lower is better.",
   "lesson": "M9",
   "href": "m09-surrogates-uq.html"
+ },
+ "crystallization": {
+  "term": "Crystallization (in an absorption chiller)",
+  "short": "The salt solution in an absorption chiller turning to solid crystals when it gets too concentrated or too cold, which blocks the machine; the chiller must stay clear of that limit.",
+  "lesson": "CF5",
+  "href": "cf5-drawing-the-boundary.html"
  },
  "cube-law": {
   "term": "Cube law",
@@ -1919,6 +1943,12 @@
   "lesson": 0,
   "href": "00-grid-operator.html"
  },
+ "merchant-generator": {
+  "term": "Merchant generator",
+  "short": "A power plant that sells its output into the wholesale market at whatever prices it fetches, rather than to one customer under a fixed arrangement.",
+  "lesson": "CF5",
+  "href": "cf5-drawing-the-boundary.html"
+ },
  "merge": {
   "term": "Merge",
   "short": "Joining two lines of commits into one, keeping the changes made on both.",
@@ -2909,6 +2939,12 @@
   "lesson": "A19",
   "href": "a19-gis-siting.html"
  },
+ "special-ordered-set": {
+  "term": "Special ordered set (SOS2)",
+  "short": "A rule in a mixed-integer program that lets at most two neighbouring points of a curve be used, so the model can follow a curved line by joining straight pieces.",
+  "lesson": "CF5",
+  "href": "cf5-drawing-the-boundary.html"
+ },
  "spent-fuel": {
   "term": "Spent fuel",
   "short": "Fuel that has been used in a reactor and taken out; it is solid, highly radioactive and still warm, and is kept first in water pools, later in dry casks.",
@@ -3227,6 +3263,12 @@
   "lesson": "F4",
   "href": "f04-power-plants.html"
  },
+ "turbine-crossover": {
+  "term": "Turbine crossover",
+  "short": "The pipe that carries steam from a high-pressure turbine to a low-pressure turbine; steam taken there has already done part of its work.",
+  "lesson": "CF5",
+  "href": "cf5-drawing-the-boundary.html"
+ },
  "two-stage-stochastic-program": {
   "term": "Two-stage stochastic program",
   "short": "An optimization model that chooses the here-and-now decisions and each branch's recourse together, to minimise the expected cost over all branches.",
@@ -3431,6 +3473,12 @@
   "lesson": "A16",
   "href": "a16-hydrogen-ptx.html"
  },
+ "wet-bulb-temperature": {
+  "term": "Wet-bulb temperature",
+  "short": "The lowest temperature evaporating water can reach in the air at hand, which combines heat and humidity; when it is high, chillers and cooling towers reject heat less well and deliver less, which is called derating.",
+  "lesson": "CF5",
+  "href": "cf5-drawing-the-boundary.html"
+ },
  "wholesale-price": {
   "term": "Wholesale price",
   "short": "The price at which electricity is traded between power plants and the companies that sell it to customers, often set hour by hour.",
@@ -3442,6 +3490,12 @@
   "short": "A utility switching off power lines in dry, windy weather so that they cannot start a fire; the customers on those lines lose power.",
   "lesson": "A9",
   "href": "a09-hazards.html"
+ },
+ "willans-line": {
+  "term": "Willans line",
+  "short": "A straight-line rule for a turbine's steam use against its output; here it gives the electricity lost for each unit of steam taken out of the turbine.",
+  "lesson": "CF5",
+  "href": "cf5-drawing-the-boundary.html"
  },
  "winterization": {
   "term": "Winterization",

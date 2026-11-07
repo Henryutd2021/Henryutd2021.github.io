@@ -1897,6 +1897,18 @@
   },
   {
    "tier": "analyst",
+   "code": "CF5",
+   "title": "Where should a cogeneration study's boundary be drawn?",
+   "ready": true,
+   "href": "cf5-drawing-the-boundary.html",
+   "scales": [],
+   "id": "cf5-drawing-the-boundary",
+   "minutes": 10,
+   "form": "case",
+   "short": "Drawing the boundary"
+  },
+  {
+   "tier": "analyst",
    "code": "CF8",
    "title": "Learning a wind turbine's power curve from scarce data",
    "ready": true,
