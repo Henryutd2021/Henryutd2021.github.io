@@ -439,7 +439,7 @@
                 { id: "days", g: "meas", label: "Days of stocks", text: "Days of net imports.", at: [1, 1], atN: [1, 1] },
                 { id: "less", g: "lev", label: "Use less", text: "Efficiency and electrification.", at: [2, 0], atN: [2, 0] },
                 { id: "stock", g: "lev", label: "Stockpiles", text: "Oil, gas and minerals.", at: [2, 1], atN: [2, 1] },
-                { id: "div", g: "lev", label: "More suppliers, recycling", text: "Spread the supply.", at: [2, 2], atN: [2, 2] },
+                { id: "div", g: "lev", label: "Diversify, recycle", text: "More suppliers, and recycling at home.", at: [2, 2], atN: [2, 2] },
                 { id: "two", g: "lev", label: "A second site", text: "Spare capacity elsewhere.", at: [2, 3], atN: [2, 3] }],
         edges: [["price", "dep"], ["route", "days"], ["sup", "hhi"], ["dep", "less"], ["days", "stock"], ["hhi", "div"], ["site", "two"]], cols: 3, rows: 4, colsN: 3, rowsN: 4 });
       LX.CompareTable(H("div", { class: "lx-xcard" }, xhost), { title: "Which lever helps against which shock", text: true, caption: "From the stress tests on this page; “partly” where it helps only in part.",

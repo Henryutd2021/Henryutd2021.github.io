@@ -111,6 +111,19 @@ $$s = \min\left(1,\ \max\left(0,\ \tfrac{1}{2} + \frac{C_{\text{gas}} - C_{\text
 </div>
 </details>
 <details class="lx-deeper">
+<summary><span class="k">Go deeper · Analyst</span>Where a national budget comes from</summary>
+<div class="lx-deeper-body">
+```
+
+- **A target is chosen.** A target-seeking scenario needs a target first; a national carbon budget is one, and choosing it is a value judgement, not a model output.
+- **Sharing a global budget.** Common rules give each country a share by population, by today's emissions, by capability to pay or by historical responsibility; each rule gives a very different national budget.
+- **Prairieland's presets.** The budget slider's presets are arithmetic on 2025's emissions (a straight line to zero by 2050 or 2040, or no change), not a fair share under any rule.
+- **Report the rule.** A study that cites a national budget should say which sharing rule, which global budget and which start year it used.
+
+```{=html}
+</div>
+</details>
+<details class="lx-deeper">
 <summary><span class="k">Go deeper · Modeler</span>How an optimization model seeks a target</summary>
 <div class="lx-deeper-body">
 ```

@@ -573,8 +573,9 @@
                 { title: "More CO₂ and more LNG", text: "With fast demand growth and dearer clean plants too.", value: outFmt(P, "co2", cb.out.co2) + " → " + outFmt(P, "co2", gbR.out.co2) + " in 2050" }],
         note: "The last link mixes all four groups: the gap tracer splits it." });
       LX.Flowchart(H("div", { class: "lx-xcard" }, xhost), { title: "How to compare two scenarios",
-        nodes: { q: { t: "Same question?", k: "q" }, lev: { t: "Compare the policies they need", s: "not the results" }, bd: { t: "Same boundary and units?", k: "q" }, fix: { t: "Align them first", s: "sectors, gases, conventions" },
-                 one: { t: "Swap assumptions", s: "one at a time" }, ord: { t: "Then in order", s: "state the order, or average" }, rep: { t: "Report the spread", s: "not one number", k: "end" } },
+        nodes: { q: { t: "Same question?", k: "q" }, lev: { t: "Compare the policies they need", tN: ["Compare the", "policies needed"], s: "not the results", sN: "not results" },
+                 bd: { t: "Same boundary and units?", tN: ["Same boundary", "and units?"], k: "q" }, fix: { t: "Align them first", s: "sectors, gases, conventions", sN: "sectors, gases" },
+                 one: { t: "Swap assumptions", s: "one at a time" }, ord: { t: "Then in order", s: "state the order, or average", sN: "say the order" }, rep: { t: "Report the spread", s: "not one number", k: "end" } },
         cols: 2, colsN: 2, at: { q: [0, 0], lev: [1, 0], bd: [0, 1], fix: [1, 1], one: [0, 2], ord: [0, 3], rep: [0, 4] }, atN: { q: [0, 0], lev: [1, 0], bd: [0, 1], fix: [1, 1], one: [0, 2], ord: [0, 3], rep: [0, 4] },
         edges: [["q", "lev", "no"], ["q", "bd", "yes"], ["lev", "bd", null, { v: true }], ["bd", "fix", "no"], ["bd", "one", "yes"], ["fix", "one", null, { v: true }], ["one", "ord"], ["ord", "rep"]],
         traces: [{ label: "Announced → Gas boom", path: ["q", "bd", "one", "ord", "rep"], text: orderLine(P, "announced", "gasboom", "co2", "avg") },
