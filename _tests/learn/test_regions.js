@@ -83,7 +83,8 @@ Object.keys(VERIFIED).forEach(id => {
 
 // ---------------- sources and links
 Object.keys(R.sources).forEach(k => { const s = R.sources[k]; if (/ember/i.test(s.publisher)) ok(s.publisher === "Ember, a compiler of official statistics", k + ": Ember labelled as a compiler of official statistics"); });
-const ALLOW = /^https:\/\/(www\.)?(eia\.gov|ec\.europa\.eu|ember-energy\.org|eta-publications\.lbl\.gov|energy\.gov|worldbank\.org|spp\.org)\//;
+// the course allow-list (curriculum v2 §20.3), with the statistics offices and regulators named on a card (W6 integration)
+const ALLOW = /^https:\/\/(www\.)?(eia\.gov|ec\.europa\.eu|ember-energy\.org|eta-publications\.lbl\.gov|energy\.gov|worldbank\.org|spp\.org|cso\.ie|nea\.gov\.cn|ssb\.no|aemo\.com\.au|cer\.gov\.au)\//;
 Object.keys(R.sources).forEach(k => ok(R.sources[k].url === "no link" || ALLOW.test(R.sources[k].url), k + ": linked only if allow-listed"));
 const used = new Set(); R.cards.forEach(c => c.numbers.forEach(n => used.add(n.src))); Object.values(R.partSources).forEach(p => Object.values(p).forEach(a => a.forEach(s => used.add(s))));
 ok(Object.keys(R.sources).every(k => used.has(k)), "every source is used: " + Object.keys(R.sources).filter(k => !used.has(k)).join(" "));

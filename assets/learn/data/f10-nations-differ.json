@@ -749,7 +749,7 @@
       "n": "54.8%",
       "what": "Coal's share of China's total energy consumption in 2023, in coal equivalent.",
       "source": "National Bureau of Statistics of China, Statistical Yearbook 2025, Table 9-2",
-      "url": "no link",
+      "url": "https://www.stats.gov.cn/sj/ndsj/2025/indexeh.htm",
       "asof": "2025 edition; data for 2023"
     },
     {
@@ -800,56 +800,60 @@
       "title": "China Statistical Yearbook 2025, chapter 9: Tables 9-1, 9-2 (total energy consumption and its composition), 9-3 (overall energy balance), 9-6 (electricity balance)",
       "publisher": "National Bureau of Statistics of China",
       "date": "2025 edition; 2023 data; read 7 November 2026",
-      "url": "no link",
+      "url": "https://www.stats.gov.cn/sj/ndsj/2025/indexeh.htm",
       "where": "2023: consumption 571,327 × 10,000 tce, coal 54.8%, petroleum 18.8%, natural gas 8.5%, primary electricity and other energy 17.9%; production 475,979; imports 145,253; exports 13,625; hydro 12,858, nuclear 4,347, wind 8,859 (100 million kWh); raw coal 66.1% of production; electricity converted at the year's average coal consumption for generation"
     },
     "nbs-communique": {
       "title": "Statistical Communiqué of the People's Republic of China on the 2023 National Economic and Social Development, Table 4",
       "publisher": "National Bureau of Statistics of China",
       "date": "29 February 2024",
-      "url": "no link",
+      "url": "https://www.stats.gov.cn/sj/zxfb/202402/t20240228_1947915.html",
       "where": "2023 solar generation 5,841.5 (100 million kWh)"
     },
     "mospi-esi": {
       "title": "Energy Statistics India 2025: Table 7.6 (energy balance of India for 2023-24, provisional), Table 3.6 (electricity generation) and Table 8.3 (net energy import dependency)",
       "publisher": "Ministry of Statistics and Programme Implementation, Government of India",
       "date": "March 2025; read 7 November 2026",
-      "url": "no link",
+      "url": "https://mospi.gov.in/sites/default/files/publication_reports/Energy_Statistics_2025/Chapter7_27032025.pdf",
+      "also": [
+        {"label": "Table 3.6 in chapter 3", "url": "https://mospi.gov.in/sites/default/files/publication_reports/Energy_Statistics_2025/Chapter3_27032025.pdf"},
+        {"label": "Table 8.3 in chapter 8", "url": "https://mospi.gov.in/sites/default/files/publication_reports/Energy_Statistics_2025/Chapter8_27032025.pdf"}
+      ],
       "where": "2023-24 (P), ktoe: total primary energy supply 903,158; production 521,633; final consumption 613,605 (industry 311,822, transport 71,945, residential 62,169, commercial 10,815, agriculture 22,564, non-specified 111,266, non-energy 23,023); net import dependency 40.27%"
     },
     "mospi-units": {
       "title": "Energy Statistics India 2024, Annexure II: energy units and conversion factors",
       "publisher": "Ministry of Statistics and Programme Implementation, Government of India",
       "date": "2024; read 7 November 2026",
-      "url": "no link",
+      "url": "https://mospi.gov.in/sites/default/files/publication_reports/Energy_Statistics_2024/AnnexureII-Energy_Units_and_Conversion_Factors.pdf",
       "where": "electricity from hydro and renewables 1 GWh = 0.086 ktoe; from nuclear 1 GWh = 0.086 ÷ 0.33 ktoe"
     },
     "epe-ben": {
       "title": "Balanço Energético Nacional 2026, Relatório Síntese (base year 2025)",
       "publisher": "Empresa de Pesquisa Energética (EPE), Brazil",
       "date": "published 3 June 2026, updated 31 July 2026; read 7 November 2026",
-      "url": "no link",
+      "url": "https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/PublicacoesArquivos/publicacao-975/topico-847/BEN_S%C3%ADntese_2026_PT.pdf",
       "where": "2025: Oferta Interna de Energia 328.5 Mtep by source (p. 19); final consumption 291.7 Mtep and its shares (p. 25), 275,417 thousand tep without non-energy use (p. 69); generation by source in GWh (p. 41)"
     },
     "epe-manual": {
       "title": "Manual Metodológico do Balanço Energético Nacional (NT-EPE-DEA-SEE 005/2021)",
       "publisher": "Empresa de Pesquisa Energética (EPE), Brazil",
       "date": "2022 edition; read 7 November 2026",
-      "url": "no link",
+      "url": "https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/PublicacoesArquivos/publicacao-578/BEN%20_%20Manual%202022.pdf",
       "where": "1 kWh = 860 kcal for hydro and electricity (0.086 tep per MWh); nuclear at its generation ÷ 33%"
     },
     "ssb-balance": {
       "title": "Production and consumption of energy, energy balance and energy account: Tables 1 to 3",
       "publisher": "Statistics Norway (SSB)",
       "date": "updated 12 June 2026; read 7 November 2026",
-      "url": "no link",
+      "url": "https://www.ssb.no/en/energibalanse",
       "where": "2025, TWh: production 2,593; imports 124; exports 2,380; total energy supply 326 (by product: coal 8.8, gas 47.6, oil 107.4, biofuels 19.5, waste 5.2, electricity 137.7); final energy consumption 212 (industry and mining 73, transport 50, households 45, other 43); non-energy use 26"
     },
     "ssb-electricity": {
       "title": "Electricity, Table 7: production, imports, exports and consumption of electric power",
       "publisher": "Statistics Norway (SSB)",
       "date": "updated 19 October 2026; read 7 November 2026",
-      "url": "no link",
+      "url": "https://www.ssb.no/elektrisitet",
       "where": "2025, GWh: production 161,793 (hydro 145,476, wind 13,899, solar 348, thermal 2,070)"
     },
     "un-ires": {

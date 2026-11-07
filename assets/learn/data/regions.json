@@ -595,21 +595,21 @@
       "title": "Data Centres Metered Electricity Consumption 2025, key findings",
       "publisher": "Central Statistics Office, Ireland",
       "date": "July 2026",
-      "url": "no link",
+      "url": "https://www.cso.ie/en/releasesandpublications/ep/p-dcmec/datacentresmeteredelectricityconsumption2025/keyfindings/",
       "where": "23% of metered electricity in 2025, 5% in 2015"
     },
     "nea-feb": {
       "title": "Press release on 2025 renewable energy development",
       "publisher": "National Energy Administration of China",
       "date": "12 February 2026",
-      "url": "no link",
+      "url": "https://www.nea.gov.cn/20260212/742b8c6a078347b0b39de676c05c5d58/c.html",
       "where": "317 GW of solar added in 2025; utilisation 95% solar, 94% wind"
     },
     "nea-sep": {
       "title": "Power industry statistics, January to July 2026",
       "publisher": "National Energy Administration of China",
       "date": "11 September 2026",
-      "url": "no link",
+      "url": "https://www.nea.gov.cn/20260911/b87ec7acd72a4a85979be5a0573bac81/c.html",
       "where": "solar capacity 1,286 GW at the end of July 2026; coal 1,285 GW"
     },
     "ember-china": {
@@ -651,7 +651,7 @@
       "title": "Highest electricity production ever (Høyeste strømproduksjon noensinne)",
       "publisher": "Statistics Norway (SSB)",
       "date": "May 2026",
-      "url": "no link",
+      "url": "https://www.ssb.no/energi-og-industri/energi/statistikk/elektrisitet/artikler/hoyeste-stromproduksjon-noensinne-05052026",
       "where": "2025: 161.8 TWh, hydro 89.9%, record net export 22.8 TWh"
     },
     "ember-saudi": {
@@ -756,28 +756,28 @@
       "title": "Quarterly Energy Dynamics, Q3 2026",
       "publisher": "Australian Energy Market Operator (AEMO)",
       "date": "October 2026; read 7 November 2026",
-      "url": "no link",
+      "url": "https://www.aemo.com.au/-/media/files/major-publications/qed/2026/qed-q3-2026.pdf",
       "where": "p. 3: renewables 44.3% of NEM generation (41.8% in Q3 2025); NEM-wide minimum operational demand 9,422 MW on Sunday 20 September; distributed PV a record Q3 average of 3,203 MW; p. 4: grid-scale batteries 8.0% of evening-peak generation"
     },
     "aemo-msl": {
       "title": "Fact Sheet: Minimum system load (MSL)",
       "publisher": "Australian Energy Market Operator (AEMO)",
       "date": "2025; read 7 November 2026",
-      "url": "no link",
+      "url": "https://www.aemo.com.au/-/media/files/learn/fact-sheets/2025/fact-sheetminimum-system-load.pdf",
       "where": "low demand on sunny, mild-temperature days, typically in autumn and spring; solar management programs run by state governments and distribution network service providers; AEMO as independent market and system operator and system planner for the NEM and Western Australia's WEM"
     },
     "cer": {
       "title": "Small-scale installation postcode data",
       "publisher": "Clean Energy Regulator, Australia",
       "date": "last updated 20 October 2026; data current as at 30 September 2026",
-      "url": "no link",
+      "url": "https://cer.gov.au/RET/Forms-and-resources/Postcode-data-for-small-scale-installations",
       "where": "Table 2: solar photovoltaic (PV) 4,562,198 installations, 30,917,812 kW rated output"
     },
     "cer-scheme": {
       "title": "Small-scale Renewable Energy Scheme",
       "publisher": "Clean Energy Regulator, Australia",
       "date": "last updated 29 October 2026; read 7 November 2026",
-      "url": "no link",
+      "url": "https://cer.gov.au/schemes/renewable-energy-target/small-scale-renewable-energy-scheme",
       "where": "the scheme issues certificates for small-scale systems until it ends in 2030"
     }
   },

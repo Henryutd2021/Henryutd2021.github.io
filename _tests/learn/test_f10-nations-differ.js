@@ -173,10 +173,12 @@ M.SECTORS.forEach(s => { const k = { industry: "industry", transport: "transport
   const all = [M.staticFallback(D, L, E), M.ideasHTML(D, L, E), M.checkHTML(D, L, E), M.notesHTML(D), M.STEPS.join(" "), M.LENS_SAW, M.CONV_SAW, M.USEFUL_NOTE, M.BEFORE_NOTE].join(" ").split(/(?<=[.;:?])\s+/);
   ok(!all.filter(s => NUC.test(s) && RISK.test(s)).length, "no generated sentence pairs a nuclear term with a risk term");
   ok(!/\bAI\b|artificial intelligence|learning[- ](curve|rate)/i.test(RAW + JS + OWN), "no deny-listed term");
-  const ALLOW = /^https:\/\/(www\.)?(eia\.gov|ec\.europa\.eu|ember-energy\.org|eta-publications\.lbl\.gov|energy\.gov|worldbank\.org|spp\.org|iea\.org|ourworldindata\.org)\//;
+  const ALLOW = /^https:\/\/(www\.)?(eia\.gov|ec\.europa\.eu|ember-energy\.org|eta-publications\.lbl\.gov|energy\.gov|worldbank\.org|spp\.org|iea\.org|ourworldindata\.org|stats\.gov\.cn|mospi\.gov\.in|epe\.gov\.br|ssb\.no|cso\.ie|nea\.gov\.cn|aemo\.com\.au|cer\.gov\.au)\//;   // + the statistics offices and regulators named on F10 and the regional cards (W6 integration)
   const urls = (RAW + JSON.stringify(R) + OWN).match(/https?:\/\/[^\s"'<>)]+/g) || [];
   ok(urls.every(u => ALLOW.test(u)), "every link on the allow-list: " + urls.filter(u => !ALLOW.test(u)).slice(0, 3).join(" "));
   Object.keys(D.sources).forEach(k => ok(D.sources[k].url === "no link" || ALLOW.test(D.sources[k].url), "source " + k + " linked only if allow-listed"));
+  Object.keys(D.sources).forEach(k => (D.sources[k].also || []).forEach(a => ok(a.label && ALLOW.test(a.url), "source " + k + ": its other file " + a.label + " is linked on the allow-list")));
+  ok(["nbs-yearbook", "mospi-esi", "epe-ben", "ssb-balance"].every(k => D.sources[k].url !== "no link"), "the national statistics offices are linked (allow-listed since W6)");
   ok(M.staticFallback(D, L, E).indexOf(PL.about.line) >= 0 && /fictional\(host, N\)|PL\.about\.line/.test(JS), "the fictional line with every Prairieland drawing (fallback, steps, lens table, explain)");
 }
 

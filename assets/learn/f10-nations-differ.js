@@ -357,6 +357,7 @@
   var PL_SRC = ["dossier-card", "iea-faq", "owid-primary"];
   function srcItem(s) {
     var t = s.url && s.url !== "no link" ? "<a href=\"" + esc(s.url) + "\">" + esc(s.title) + "</a>" : esc(s.title) + " (no link)";
+    if (s.also && s.also.length) t += " (also " + s.also.map(function (a) { return "<a href=\"" + esc(a.url) + "\">" + esc(a.label) + "</a>"; }).join(", ") + ")";   // one source in several files
     return "<li>" + esc(s.publisher) + ". " + t + ". " + esc(s.date.charAt(0).toUpperCase() + s.date.slice(1)) + ". " + esc(s.where.charAt(0).toUpperCase() + s.where.slice(1)) + ".</li>";
   }
   function sourcesHTML(D, PL) {

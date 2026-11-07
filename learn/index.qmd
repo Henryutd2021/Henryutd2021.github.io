@@ -32,6 +32,7 @@ One small fictional town and a power grid you run yourself. Start with a game, t
 :::
 
 ::: {.lx-landing-note}
+Reference: the [regional profile cards](regions.html), twelve energy systems in one structure with dated key numbers.
 Prairie Town is fictional; every real-world number in the lessons carries a source and a date. Your guesses and progress stay in this browser. Written by Honglin Li.
 :::
 

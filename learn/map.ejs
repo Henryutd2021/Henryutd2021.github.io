@@ -5,8 +5,9 @@
    The starter path (ids lesson-N), then one block per tier (any number of tiers) listing every lesson of the tier in
    the map's order: its starter-path lessons, then the rest in curriculum order (modules by number, unnumbered ones,
    bridges, the news lens, side topics, case files, sandboxes, the checkpoint, capstones; as metro.js draws its line),
-   each with its status (open or coming soon); then the math toolbox. Progress ticks: elements with data-lesson-id get
-   .is-done from learn.js.
+   each with its status (open or coming soon); then the math toolbox; then the reference pages outside path.yml (the
+   regional profile cards, learn/regions.qmd: no tier, code or time row, so not a station on the map). Progress ticks:
+   elements with data-lesson-id get .is-done from learn.js.
    A lesson or tool links to its page only when it is live: `path`, or `status: active` (page <id>.qmd), and not
    status: upcoming (path.yml; the same rule as scripts/build_learn.py). A held row (status: hold, a draft whose title
    may not be listed before Henry approves it) is left out of every list, as build_learn.py leaves it out of path.json. */
@@ -65,6 +66,10 @@ const status = l => live(l) ? "open" : "coming soon";
 <ul><% for (const t of tools) { %><li<% if (has(t.id)) { %> data-lesson-id="<%= t.id %>"<% } %>><% if (has(t.code)) { %><span class="lx-code"><%= t.code %></span><% } %><% if (live(t)) { %><a href="<%- link(page(t)) %>"><%= t.title %></a><% } else { %><%= t.title %><% } %> <span class="lx-code">· <%= has(t.minutes) ? t.minutes + " min · " : "" %><%= status(t) %></span></li><% } %></ul>
 </section>
 <% } %>
+<section id="reference" aria-labelledby="h-reference">
+<h3 id="h-reference"><i style="--c:var(--lx-ink-3)"></i>Reference</h3>
+<ul><li><a href="regions.html">Regional profile cards</a> <span class="lx-code">· twelve energy systems in one structure, with dated key numbers · opened from F10</span></li></ul>
+</section>
 </div>
 </details>
 ```
