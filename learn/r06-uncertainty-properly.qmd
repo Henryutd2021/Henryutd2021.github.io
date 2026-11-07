@@ -226,7 +226,7 @@ body-classes: "page-learn page-lesson lx-form-studio"
 <li>With a perfect forecast you pick the better plan in each future: 12 or 6, an expected 9.</li>
 <li>So a perfect forecast is worth at most 9 − 7 = 2 payoff units to someone who maximizes the expected payoff.</li>
 </ul>
-<p>In the capstone research project (CR, upcoming), your uncertainty plan goes into the proposal. <a href="m08-stochastic-robust.html">M8</a> builds decisions that hedge before the uncertainty resolves; <a href="m07-monte-carlo.html">M7</a> builds the sampling.</p>
+<p>In the capstone research project (<a href="cr-your-own-study.html">CR</a>), your uncertainty plan goes into the proposal. <a href="m08-stochastic-robust.html">M8</a> builds decisions that hedge before the uncertainty resolves; <a href="m07-monte-carlo.html">M7</a> builds the sampling.</p>
 </div>
 </details>
 </div>

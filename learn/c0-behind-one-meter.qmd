@@ -162,7 +162,7 @@ body-classes: "page-learn page-lesson lx-form-capstone"
 <div class="lx-deeper-body">
 ```
 
-- The same plan, note and self-check grow into the research project (CR, upcoming): a question, a model at your chosen scale, uncertainty done properly and a short paper.
+- The same plan, note and self-check grow into the research project ([CR](cr-your-own-study.html)): a question, a model at your chosen scale, uncertainty done properly and a short paper.
 - Start with the [question studio (R10)](r10-question-studio.html), which turns "what should this site install?" into a question you can test.
 
 ```{=html}

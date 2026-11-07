@@ -173,7 +173,7 @@ const QPATH = path.join(SITE, "learn/c0-behind-one-meter.qmd");
     /^Li et al\. \(20\d\d\)\. .+\.$/,                                                                // citation (title checked below)
     /^Say which yardstick your note uses\. Case file CF2 takes the first case apart\.$/,                 // pointer to CF2
     /^Go deeper · ResearcherFrom this capstone to your own study$/,                                       // course label
-    /^The same plan, note and self-check grow into the research project \(CR, upcoming\): .+\.$/];        // the course's CR, not a study
+    /^The same plan, note and self-check grow into the research project \(CR(?:, upcoming)?\): .+\.$/];        // the course's CR, not a study
   const GEN = /<!-- (c0-[a-z]+):start[\s\S]*?<!-- \1:end -->/g;   // generated blocks: component and engine text, checked above
   const rest = OWN.replace(/<blockquote class="lx-excerpt"[\s\S]*?<\/blockquote>/g, " ").replace(/^---[\s\S]*?\n---\n/, " ").replace(GEN, " ");
   const elems = rest.split(/<\/?(?:p|li|ul|ol|dt|dd|div|summary|h[1-6]|footer|table|tr|td|th)\b[^>]*>|\n- |```[^\n]*\n?/).map(t => norm(t.replace(/\[([^\]]+)\]\{[^}]*\}/g, "$1").replace(/\[([^\]]+)\]\([^)]*\)/g, "$1"))).filter(t => t && /[A-Za-z]/.test(t) && !/^(:::|\{=html\})/.test(t));

@@ -192,7 +192,7 @@ Run [M12](m12-city-model.html)'s notebook (SciPy and HiGHS, about 60 minutes). I
 <div class="lx-deeper-body">
 ```
 
-The same plan, panel and summary grow into a research project: frame a question about a city's heat or its substations, test it with uncertainty, and report it with its limits. The research capstone (CR, upcoming) and the question studio [R10](r10-question-studio.html) take it from there.
+The same plan, panel and summary grow into a research project: frame a question about a city's heat or its substations, test it with uncertainty, and report it with its limits. The research capstone ([CR](cr-your-own-study.html)) and the question studio [R10](r10-question-studio.html) take it from there.
 
 ```{=html}
 </div>
