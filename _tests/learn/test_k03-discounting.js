@@ -117,7 +117,7 @@ const usd = K.usd, f4 = K.f4;
   ["07-cost.html", "12-trade-offs.html", "13-capstone.html"].forEach(h => ok(QMD.indexOf('href="' + h + '"') >= 0 || QMD.indexOf("](" + h + ")") >= 0, "links back to " + h));
   ok(/EMM_Assumptions\.pdf">EIA, AEO2026 assumptions, Table 3<\/a> \(2025 dollars, April 2026\)/.test(QMD) && /financial_cases_&amp;_methods">NLR, 2025 ATB<\/a> · September 2026/.test(QMD), "sources: EIA and NLR with their dates");
   ok(/\$100 and 7% are illustrative/.test(QMD), "the illustrative values are labelled");
-  ok(!/href="[^"]*m13/i.test(QMD) && /<a href="a01-project-tea\.html">A1<\/a> builds on it, and so does Modeler lesson <a href="m11-tea-in-models\.html">M11<\/a>/.test(QMD) && /\[M11\]\(m11-tea-in-models\.html\) puts/.test(QMD) && /M13, upcoming/.test(QMD), "upcoming lessons (M13) are named, not linked; A1 (W3) and M11 (W5) linked now that they are live");
+  ok(/\[M13\]\(m13-national-pathway\.html\)/.test(QMD) && !/M13, upcoming/.test(QMD) && /<a href="a01-project-tea\.html">A1<\/a> builds on it, and so does Modeler lesson <a href="m11-tea-in-models\.html">M11<\/a>/.test(QMD) && /\[M11\]\(m11-tea-in-models\.html\) puts/.test(QMD), "A1 (W3), M11 (W5) and M13 (W6) linked now that they are live");
   ok(!/nuclear|reactor|\bSMR\b|learning|data cent/i.test(QMD.replace(/<!-- learn:meta:start[\s\S]*?learn:meta:end -->/, "")) && !/nuclear|reactor|learning|data cent/i.test(JS.replace(/\/\/.*$/gm, "")), "scope: no nuclear, no learning wording, no data centers");
 }
 

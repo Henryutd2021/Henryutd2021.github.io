@@ -167,7 +167,9 @@ ok(layout(five, "h", { W: 1098 }).H > layout(real, "h", { W: 1098 }).H, "five ti
  [{ form: "play" }, "lesson"], [{ code: "R6" }, "studio"], [{ code: "CK-A" }, "checkpoint"], [{ code: "CF4" }, "case"], [{ code: "SB2" }, "sandbox"], [{ code: "C3" }, "capstone"],
  [{ code: "CR" }, "capstone"], [{ code: "M6" }, "lesson"], [{}, "lesson"]].forEach(([m, k]) => ok(kindOf(m) === k, `kind of ${JSON.stringify(m)} is ${k}`));
 // the narrow layout's rows: names wrap to two lines at most, shortened with an ellipsis; a short name when there is one
-const V = layout(w3(real), "v", { W: 310, open: allOpen(real) });
+// since W7 every lesson path.json lists is live: one made-up lesson still to come (Z8, a long title) keeps the upcoming case
+const w3s = w3(real); w3s.more.push({ tier: "analyst", code: "Z8", title: "A made-up lesson still to come, with a question title as long as the real ones are", ready: false, href: "index.html#analyst", scales: [] });
+const V = layout(w3s, "v", { W: 310, open: allOpen(real) });
 ok(V.stops.every(s => s.lines.length <= 2) && V.own.every(o => o.lines.length <= 2) && V.own.some(o => !o.m.ready && o.lines.length === 2), "narrow: names wrap to two lines (upcoming ones too), shortened with an ellipsis");
 const withShort = clone(real); withShort.more[0].short = "Read a headline";
 ok(layout(withShort, "v", { W: 310, open: allOpen(real) }).own.find(o => o.j === 0).lines.join(" ") === "Read a headline", "narrow: a lesson's short name is shown when path.json has one");

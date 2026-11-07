@@ -122,7 +122,10 @@ ok(bundleJS.indexOf("LX.Stakeholders = ") > 0 && bundleJS.indexOf("LX.Stakeholde
   ok(["m02-unit-commitment", "m03-capacity-expansion", "m04-storage-multienergy", "m05-microgrid-size-and-run", "m07-monte-carlo"].every(id => labs.includes(id)) && labs.join() === withLab.join(),
      `the lab time shows on every page with lab_minutes (${labs.join(", ")})`);
   ok(n >= 20, `practice badges checked on ${n} pages; 120 minutes and more read in hours`);
-  ok(rd("teaching.qmd").indexOf(all.length + " lessons live; more coming") > 0, `Teaching card: ${all.length} lessons live, as in path.json`);
+  // "; more coming" only while path.json lists a lesson that is not live yet (build_learn.py's teaching block; since W7 every
+  // listed lesson is live)
+  const listed = [].concat(P.starter, P.more, P.toolbox).length, more = all.length < listed ? "; more coming" : "";
+  ok(rd("teaching.qmd").indexOf(all.length + " lessons live" + more + "]") > 0, `Teaching card: ${all.length} lessons live${more}, as in path.json`);
 }
 
 console.log(fails ? `FAILED ${fails} of ${checks} checks (test_components_w2_int)` : `ok ${checks}/${checks} checks (test_components_w2_int)`);

@@ -171,8 +171,10 @@ const PALL = [].concat(P.starter || [], P.more || [], P.toolbox || []);
 const pentry = c => PALL.filter(l => (typeof c === "number" ? l.starter === c : l.code === c))[0];
 const fixCodes = [...new Set([].concat(...D.realism.map(r => r.fix)))];
 ok(fixCodes.every(c => CORE.lessonRef(P, c).ready === !!(pentry(c) || {}).ready), "fix links: lessonRef() reads the live status of every code a realism fix names, from path.json (" + fixCodes.join(", ") + "; live: " + fixCodes.filter(c => CORE.lessonRef(P, c).ready).join(", ") + ")");
-const upc = PALL.filter(l => l.code && !l.ready)[0], liveR = PALL.filter(l => l.code && l.ready && l.href)[0];
-ok(upc && CORE.lessonRefHTML(P, upc.code) === upc.code + " (upcoming)", "fix links: an upcoming module (" + (upc && upc.code) + ") is named, not linked");
+// since W7 every lesson path.json lists is live: a copy with one made-up module still to come (Z8) keeps that case checked
+const PZ = Object.assign({}, P, { more: (P.more || []).concat([{ code: "Z8", title: "A module still to come", ready: false }]) });
+const upc = [].concat(PZ.starter || [], PZ.more, PZ.toolbox || []).filter(l => l.code && !l.ready)[0], liveR = PALL.filter(l => l.code && l.ready && l.href)[0];
+ok(upc && CORE.lessonRefHTML(PZ, upc.code) === upc.code + " (upcoming)", "fix links: an upcoming module (" + (upc && upc.code) + ") is named, not linked");
 ok(liveR && CORE.lessonRefHTML(P, liveR.code) === '<a href="' + liveR.href + '">' + liveR.code + "</a>", "fix links: a live module (" + (liveR && liveR.code) + ") links to its page");
 ok(CORE.lessonRef(P, "R9").ready === !!(pentry("R9") || {}).ready && CORE.lessonRef(P, "R3").ready === !!(pentry("R3") || {}).ready, "fix links: R3 and R9 follow path.yml (live on this branch: " + ["R3", "R9"].filter(c => CORE.lessonRef(P, c).ready).join(", ") + ")");
 ok(!/function ref(HTML)?\s*\(/.test(JS) && !("ref" in M) && /LX\.lessonRefHTML\(P, c\)/.test(JS) && /LX\.lessonRef\(P, map\[k\]\)/.test(JS), "fix links: the studio uses LX.lessonRef and LX.lessonRefHTML and keeps no copy");
