@@ -624,7 +624,7 @@
       if (i >= wins.length) return Promise.resolve({ ok: true });
       var win = wins[i], rest = []; for (var j = i; j < wins.length; j++) rest = rest.concat(wins[j]);
       var S0 = sysOf(state, P, { shock: o.shock }), wsum = function (ps) { return sum(ps.map(function (p) { return S0.w[p]; })); };
-      var left = (B - spent) * wsum(win) / wsum(rest);
+      var left = i === 0 && o.firstLeft != null ? o.firstLeft : (B - spent) * wsum(win) / wsum(rest);
       var S = sysOf(state, P, { shock: o.shock, only: win, fixed: fixed, budgetLeft: left, horizonEnd: state.fs === "myopic" ? win[win.length - 1] : S0.np - 1, fixedThrough: o.fixedThrough });
       var m = build(P, S, o.build);
       return new Promise(function (res) { res(sol(m, { timeLimit: o.timeLimit, signal: o.signal })); }).then(function (r) {
@@ -649,7 +649,18 @@
   function shockRun(state, P, sol, raw, shock, o) {
     var S = sysOf(state, P), Ss = sysOf(state, P, { shock: shock }), sp = Ss.shockP, spent = 0;
     for (var p = 0; p < sp; p++) spent += S.w[p] * raw.per[p].co2;
-    return runWindows(state, P, sol, { timeLimit: o.timeLimit, signal: o.signal, shock: shock, from: sp, fixed: fixedOf(P, raw, sp), fixedThrough: sp, spent: spent, build: o.build }).then(function (b) {
+    // decade by decade: the window the shock falls in keeps the share of the budget the plan gave it, less what its
+    // earlier years emitted (so a shock that changes nothing the plan uses changes nothing)
+    var firstLeft = null;
+    if (state.fs === "myopic") {
+      var wins = windowsOf(state, 0), win = wins.filter(function (w) { return w.indexOf(sp) >= 0; })[0], wsum = function (ps) { return sum(ps.map(function (q) { return S.w[q]; })); };
+      var before = S.w0 * P.carbon.base2025Mt, restAll = [];
+      for (var q = 0; q < win[0]; q++) before += S.w[q] * raw.per[q].co2;
+      for (var q2 = win[0]; q2 < S.np; q2++) restAll.push(q2);
+      firstLeft = (state.bud - before) * wsum(win) / wsum(restAll);
+      win.forEach(function (q3) { if (q3 < sp) firstLeft -= S.w[q3] * raw.per[q3].co2; });
+    }
+    return runWindows(state, P, sol, { timeLimit: o.timeLimit, signal: o.signal, shock: shock, from: sp, fixed: fixedOf(P, raw, sp), fixedThrough: sp, spent: spent, firstLeft: firstLeft, build: o.build }).then(function (b) {
       if (!b.ok) return b;
       var rawS = merge(b.raws); for (var p2 = 0; p2 < sp; p2++) rawS.per[p2] = raw.per[p2];
       var R = summarize(state, P, Ss, rawS); R.key = shock; R.year = Ss.shockYear; R.label = P.shocks[shock].label;
@@ -695,198 +706,6 @@
     }).then(null, function (e) { return { status: "error", ok: false, kind: "lp", message: "The run failed: " + (e && e.message || e), ms: Date.now() - t0 }; });
   }
   function presetsOf(P) { return P.cfg.presets; }
-
-  // ---------------------------------------------------------------- the hourly year (prairieland.json timeSlices.hourRule)
-  // Yr: { demand, wind, solar } (8,760 values each: town_year.json for 2025, m03-capacity-expansion-2024.json for 2024)
-  function hourly(P, Yr) {
-    var TS = P.PL.timeSlices, N = Yr.demand.length, mean = sum(Yr.demand) / N;
-    return { N: N, demand: Yr.demand.map(function (d) { return d / mean; }),
-      wind: REG.map(function (k) { var a = TS.windScale[k], lag = TS.windLagHours[k]; return Yr.demand.map(function (d, i) { return a * Yr.wind[((i - lag) % N + N) % N] / 1000; }); }),
-      solar: REG.map(function (k) { var a = TS.solarScale[k]; return Yr.solar.map(function (v) { return a * v / 1000; }); }) };
-  }
-  // the two stress hours of the reserve rule, from 2025's hours: the peak net-load hour prairieland.json names, and the hour
-  // of the highest national net load inside the scarce-wind week (net load: load less the 2025 fleet's wind and solar)
-  function stressHours(P, y25) {
-    var H = hourly(P, y25), ex = P.PL.timeSlices.extremes, y0 = Date.UTC(2025, 0, 1);
-    var dayOf = function (iso) { return Math.round((Date.UTC(+iso.slice(0, 4), +iso.slice(5, 7) - 1, +iso.slice(8, 10)) - y0) / 864e5); };
-    var bus = P.R.map(function (R) { var e = R.el2025; return e * MWH_PER_PJ / (1 - P.gridLoss) / P.hours; });
-    var w25 = P.R.map(function (R, r) { return P.PL.fleet.units.filter(function (u) { return u.tech === "wind" && P.ri[u.region] === r && u.built <= 2025 && u.retire > 2025; }).reduce(function (a, u) { return a + u.mw; }, 0); });
-    var s25 = P.R.map(function (R, r) { return P.PL.fleet.units.filter(function (u) { return u.tech === "solar" && P.ri[u.region] === r && u.built <= 2025 && u.retire > 2025; }).reduce(function (a, u) { return a + u.mw; }, 0); });
-    var net = function (i) { var t = 0; P.R.forEach(function (R, r) { t += bus[r] * H.demand[i] - w25[r] * H.wind[r][i] - s25[r] * H.solar[r][i]; }); return t; };
-    var pk = dayOf(ex.peakNetLoadDay.date) * 24 + ex.peakNetLoadDay.hour;
-    var w0 = dayOf(ex.scarceWindWeek.start), wi = w0 * 24;
-    for (var i = w0 * 24; i < (w0 + 7) * 24; i++) if (net(i) > net(wi) + 1e-9) wi = i;
-    var hh = function (i) { var d = new Date(y0 + Math.floor(i / 24) * 864e5); return d.getUTCDate() + " " + ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][d.getUTCMonth()] + " 2025, " + ((i % 24) < 10 ? "0" : "") + (i % 24) + ":00"; };
-    var r4 = function (v) { return Math.round(v * 1e4) / 1e4; };
-    return [{ key: "peak", i: pk, when: hh(pk), label: "the peak net-load hour (" + hh(pk) + ")" }, { key: "winter", i: wi, when: hh(wi), label: "the busiest hour of the scarce-wind week (" + hh(wi) + ")" }].map(function (x) {
-      return { key: x.key, i: x.i, when: x.when, label: x.label, demand: r4(H.demand[x.i]), wind: P.R.map(function (R, r) { return r4(H.wind[r][x.i]); }), solar: P.R.map(function (R, r) { return r4(H.solar[r][x.i]); }), netLoad2025GW: Math.round(net(x.i) / 10) / 100 };
-    });
-  }
-
-  // ---------------------------------------------------------------- reading a solved model
-  // raw: the decisions of every period (from this model, or fixed from earlier windows) and, for each modelled period p,
-  // what ran (raw.per[p]); merge() joins the windows of a decade-by-decade run
-  function read(P, S, m, r) {
-    var x = r.values, val = function (n) { return x[n] || 0; }, fx = S.fixed || { n: {}, k: {}, a: {} };
-    var dec = function (nm, dflt) { return x[nm] != null ? x[nm] : fx[nm.charAt(0)][nm] != null ? fx[nm.charAt(0)][nm] : dflt; };
-    var raw = { Y: S.Y, np: S.np, only: m.meta.only.slice(), per: S.Y.map(function () { return null; }), over: val("over") };
-    raw.n = P.R.map(function (R, rr) { var o = {}; NEW.forEach(function (t) { o[t] = S.Y.map(function (y, q) { return dec("n_" + rr + t + q, 0); }); }); return o; });
-    raw.firm = S.Y.map(function (y, q) { return dec("n_firm" + q, 0); });
-    raw.a = P.links.map(function (l) { return S.Y.map(function (y, q) { return dec("a_" + l.i + "_" + q, 0); }); });
-    raw.k = P.units.map(function (u) { return S.Y.map(function (y, p) { return P.on(u, y) ? dec("k_" + u.j + "_" + p, u.mw) : 0; }); });
-    var duals = r.duals || {};
-    raw.budgetDual = duals.budget || 0;
-    raw.only.forEach(function (p) {
-      var y = S.Y[p], tg = "_" + p, D = S.D[p], q = { p: p, y: y };
-      var G = {}, GR = P.R.map(function () { return {}; }), add = function (r_, t, v) { G[t] = (G[t] || 0) + v; GR[r_][t] = (GR[r_][t] || 0) + v; };
-      var mwh = function (nm, s) { return val(nm) * P.S[s].h; };
-      P.units.forEach(function (u) { if (!raw.k[u.j][p]) return; P.S.forEach(function (s) { add(u.r, u.tech, mwh("g_" + u.j + "_" + s.i + tg, s.i)); }); });
-      var avail = { wind: 0, solar: 0 }, unserved = P.R.map(function () { return 0; }), unservedH = 0, bIn = 0;
-      P.R.forEach(function (R, rr) {
-        P.S.forEach(function (s) {
-          add(rr, "nuclear", mwh("nu_" + rr + "_" + s.i + tg, s.i));
-          add(rr, "hydro", mwh("hy_" + rr + "_" + s.i + tg, s.i));
-          ["wind", "solar"].forEach(function (t) { add(rr, t, mwh("vr_" + rr + t + "_" + s.i + tg, s.i)); });
-          ["gasCC", "gasCT"].forEach(function (t) { add(rr, t, mwh("ng_" + rr + t + "_" + s.i + tg, s.i)); });
-          add(rr, "battery", mwh("bd_" + rr + "_" + s.i + tg, s.i)); bIn += mwh("bc_" + rr + "_" + s.i + tg, s.i);
-          var us = val("us_" + rr + "_" + s.i + tg); unserved[rr] += us * s.h; if (us > 0.5) unservedH += s.h;
-          add(rr, "firm", mwh("fg_" + s.i + tg, s.i) * S.share[p][rr]);
-        });
-        ["wind", "solar"].forEach(function (t) { var c = capNow(P, raw, t, rr, p); P.S.forEach(function (s) { avail[t] += c * (t === "wind" ? s.wind[rr] : s.solar[rr]) * s.h; }); });
-      });
-      q.genMWh = G; q.genR = GR; q.batteryIn = bIn; q.unservedMWh = sum(unserved); q.unservedR = unserved; q.unservedHours = unservedH;
-      q.curtailMWh = { wind: Math.max(0, avail.wind - (G.wind || 0)), solar: Math.max(0, avail.solar - (G.solar || 0)) }; q.availMWh = avail;
-      q.fuel = { crudeDom: val("cdom" + tg), crudeImp: val("cimp" + tg), gasDom: val("gdom" + tg), lng: val("lng" + tg), coal: val("coal" + tg) };
-      var lin = function (T) { return T.reduce(function (a, t) { return a + val(t[0]) * t[1]; }, 0); };
-      q.co2 = lin(m.meta.CO2[p]); q.primary = lin(m.meta.PRIM[p]); q.imports = lin(m.meta.IMP[p]); q.importShare = q.imports / q.primary;
-      q.fuelValue = { oil: (duals["oil" + tg] || 0) / D, gas: (duals["gas" + tg] || 0) / D, coal: (duals["cl" + tg] || 0) / D };   // $/GJ that year, carbon value included
-      q.importOver = val("oimp" + tg); q.importDual = duals["imp" + tg] ? -duals["imp" + tg] / D : 0;   // $ per GJ a year, in that year
-      q.price = P.R.map(function (R, rr) {                       // load-weighted marginal cost of electricity ($/MWh, that year's dollars)
-        var a = 0, b = 0; P.S.forEach(function (s) { var L = S.loadMW[p][rr] * s.demand * s.h, d = duals["bal_" + rr + "_" + s.i + tg]; if (d == null) return; a += L * d * 1e6 / (s.h * D); b += L; });
-        return b ? a / b : null;
-      });
-      q.slicePrice = P.R.map(function (R, rr) { return P.S.map(function (s) { var d = duals["bal_" + rr + "_" + s.i + tg]; return d == null ? null : d * 1e6 / (s.h * D); }); });
-      q.linkAt = P.links.map(function (l) {                      // hours a year the link runs at its limit (slice hours)
-        var cap = l.mw; for (var qq = 0; qq <= p; qq++) cap += raw.a[l.i][qq];
-        var h = 0; P.S.forEach(function (s) { if (val("fw_" + l.i + "_" + s.i + tg) + val("fb_" + l.i + "_" + s.i + tg) >= cap - 0.5 && cap > 0) h += s.h; }); return h;
-      });
-      q.stressShort = {}; (cfg0(P).stress || []).forEach(function (Hh, hi) { P.R.forEach(function (R, rr) { var sv = val("ss_" + hi + "_" + rr + tg); if (sv > 1e-6) q.stressShort[hi + "_" + rr] = sv; }); });
-      q.flows = P.links.map(function (l) { return P.S.map(function (s) { return val("fw_" + l.i + "_" + s.i + tg) - val("fb_" + l.i + "_" + s.i + tg); }); });
-      raw.per[p] = q;
-    });
-    return raw;
-  }
-  function cfg0(P) { return P.cfg; }
-  // online capacity (MW) of a technology in region r, period p: existing units still open + new builds whose life covers p
-  function capNow(P, raw, t, r, p) {
-    var Y = raw.Y, y = Y[p], c = 0;
-    if (t === "firm") { for (var q = 0; q <= p; q++) if (Y[p] - Y[q] < P.tech.firm.life) c += raw.firm[q]; return c; }
-    if (FOSSIL.indexOf(t) >= 0) P.units.forEach(function (u) { if (u.r === r && u.tech === t) c += raw.k[u.j][p]; });
-    else c += P.exist(t, r, y);
-    if (NEW.indexOf(t) >= 0) for (var q2 = 0; q2 <= p; q2++) if (Y[p] - Y[q2] < P.tech[t].life) c += raw.n[r][t][q2];
-    return c;
-  }
-  // join the windows of a run: decisions from the last window (it holds every earlier one as fixed), periods from each
-  function merge(raws) {
-    var out = copy(raws[raws.length - 1]);
-    out.per = out.per.map(function (q, p) { for (var i = 0; i < raws.length; i++) if (raws[i].per[p] && raws[i].only.indexOf(p) >= 0) return raws[i].per[p]; return q; });
-    out.only = out.Y.map(function (y, p) { return p; });
-    out.over = sum(raws.map(function (r) { return r.over; }));
-    out.windows = raws.map(function (r) { return { only: r.only, budgetDual: r.budgetDual, over: r.over }; });
-    return out;
-  }
-  // the decisions of periods up to f (index), as S.fixed
-  function fixedOf(P, raw, f) {
-    var o = { n: {}, k: {}, a: {} };
-    raw.Y.forEach(function (y, q) {
-      if (q > f) return;
-      P.R.forEach(function (R, r) { NEW.forEach(function (t) { o.n["n_" + r + t + q] = raw.n[r][t][q]; }); });
-      o.n["n_firm" + q] = raw.firm[q];
-      P.links.forEach(function (l) { o.a["a_" + l.i + "_" + q] = raw.a[l.i][q]; });
-      P.units.forEach(function (u) { if (P.on(u, y)) o.k["k_" + u.j + "_" + q] = raw.k[u.j][q]; });
-    });
-    return o;
-  }
-
-  // ---------------------------------------------------------------- money: each model year's cost and the present value
-  // yearly ($M a year, that year's 2025 dollars): new plants' and links' payments (annuity + fixed O&M) for what is open,
-  // fixed O&M of fossil plants kept open, variable O&M of what ran, fuels bought; pv = sum_p D_p x yearly_p
-  function money(P, S, raw) {
-    var T = P.tech, cfg = P.cfg, Y = S.Y;
-    var yearly = Y.map(function (y, p) {
-      var q = raw.per[p]; if (!q) return null;
-      var o = { capital: 0, transmission: 0, fom: 0, vom: 0, fuel: 0 };
-      P.R.forEach(function (R, r) { NEW.forEach(function (t) { for (var b = 0; b <= p; b++) if (Y[p] - Y[b] < T[t].life) o.capital += raw.n[r][t][b] * (S.capex[b][t] * crf(S.rate, T[t].life) + T[t].fom) / 1000; }); });
-      for (var b = 0; b <= p; b++) if (Y[p] - Y[b] < T.firm.life) o.capital += raw.firm[b] * (S.capex[b].firm * crf(S.rate, T.firm.life) + T.firm.fom) / 1000;
-      P.links.forEach(function (l) { for (var b2 = 0; b2 <= p; b2++) o.transmission += raw.a[l.i][b2] * l.km * S.txCost * crf(S.rate, P.tx.life) / 1e6; });
-      P.units.forEach(function (u) { var om = u.tech === "coal" || u.tech === "oil" ? cfg.existing.om[u.tech].fom : T[u.tech].fom; o.fom += raw.k[u.j][p] * om / 1000; });
-      var G = q.genR, vomOf = function (t) { return t === "coal" || t === "oil" ? cfg.existing.om[t].vom : t === "nuclear" ? cfg.existing.om.nuclear.vom : t === "firm" ? T.firm.vom : T[t] ? T[t].vom : 0; };
-      G.forEach(function (g) { for (var t in g) if (t !== "battery" && t !== "firm") o.vom += g[t] * vomOf(t) / 1e6; });
-      o.vom += (q.genMWh.firm || 0) * T.firm.vom / 1e6;
-      var f = q.fuel, pr = S.price[p];
-      o.fuel = (f.crudeDom + f.crudeImp) * pr.oil + f.gasDom * pr.gas + f.lng * pr.lng + f.coal * pr.coal;
-      o.total = o.capital + o.transmission + o.fom + o.vom + o.fuel;
-      return o;
-    });
-    var pv = { capital: 0, transmission: 0, fom: 0, vom: 0, fuel: 0, total: 0 };
-    yearly.forEach(function (o, p) { if (!o) return; for (var k in pv) pv[k] += o[k] * S.D[p]; });
-    return { yearly: yearly, pv: pv };
-  }
-
-  // ---------------------------------------------------------------- runs: windows, foresight and shocks
-  var WORDS = { infeasible: "No pathway meets every rule of this plan.", "time-limit": "The run reached its time limit before the solver proved the best pathway.",
-    cancelled: "The run was stopped.", superseded: "A newer run replaced this one.", error: "The solver failed on this plan." };
-  function windowsOf(state, from) {
-    var all = state.fs === "myopic" ? [[0, 1], [2, 3], [4]] : [[0, 1, 2, 3, 4]];
-    return all.map(function (w) { return w.filter(function (p) { return p >= from; }); }).filter(function (w) { return w.length; });
-  }
-  // solve windows in turn; each sees only its periods, earlier decisions fixed, and a share of the budget left
-  function runWindows(state, P, sol, o) {
-    var B = state.bud, w0 = sysOf(state, P).w0, base = P.carbon.base2025Mt;
-    var wins = windowsOf(state, o.from || 0), raws = [], fixed = o.fixed || { n: {}, k: {}, a: {} }, spent = w0 * base + (o.spent || 0), models = [];
-    var step = function (i) {
-      if (i >= wins.length) return Promise.resolve({ ok: true });
-      var win = wins[i], rest = []; for (var j = i; j < wins.length; j++) rest = rest.concat(wins[j]);
-      var S0 = sysOf(state, P, { shock: o.shock }), wsum = function (ps) { return sum(ps.map(function (p) { return S0.w[p]; })); };
-      var left = (B - spent) * wsum(win) / wsum(rest);
-      var S = sysOf(state, P, { shock: o.shock, only: win, fixed: fixed, budgetLeft: left, horizonEnd: state.fs === "myopic" ? win[win.length - 1] : S0.np - 1, fixedThrough: o.fixedThrough });
-      var m = build(P, S, o.build);
-      return new Promise(function (res) { res(sol(m, { timeLimit: o.timeLimit, signal: o.signal })); }).then(function (r) {
-        if (r.status !== "optimal") return { ok: false, r: r, window: win };
-        var raw = read(P, S, m, r); raws.push(raw); models.push({ cols: m.variables.length, rows: m.constraints.length, ms: r.ms && r.ms.total });
-        win.forEach(function (p) { spent += S.w[p] * raw.per[p].co2; });
-        fixed = fixedOf(P, raw, win[win.length - 1]);
-        return step(i + 1);
-      });
-    };
-    return step(0).then(function (x) { if (!x.ok) return x; return { ok: true, raws: raws, models: models }; });
-  }
-  // a plan's run: its pathway (perfect or decade by decade); with a shock, the re-plan from the shock's year as well
-  function solve(state, P, o) {
-    o = o || {};
-    var t0 = Date.now();
-    var sol = o.solver || (typeof window !== "undefined" && window.LX && window.LX.solver ? function (m, op) { return window.LX.solver.solve(m, op); } : null);
-    if (!sol) return Promise.resolve({ status: "error", ok: false, kind: "lp", message: "No solver is available." });
-    var tl = o.timeLimit || (o.attempt > 1 ? P.cfg.solver.retryTimeLimit : P.cfg.solver.timeLimit);
-    var fail = function (r) { return { status: r.status, ok: false, kind: "lp", message: WORDS[r.status] || r.message || ("The solver reported " + r.status + "."), hint: null, ms: Date.now() - t0 }; };
-    var shock = o.shock !== undefined ? o.shock : (state.sh && state.sh !== "none" ? state.sh : null);
-    return runWindows(state, P, sol, { timeLimit: tl, signal: o.signal, build: o.build }).then(function (a) {
-      if (!a.ok) return fail(a.r);
-      var S = sysOf(state, P), raw = merge(a.raws), res = { plan: summarize(state, P, S, raw), models: a.models };
-      if (!shock) return { status: "optimal", ok: true, kind: "lp", message: "", results: res, ms: Date.now() - t0 };
-      var Ss = sysOf(state, P, { shock: shock }), sp = Ss.shockP, spent = 0;
-      for (var p = 0; p < sp; p++) spent += S.w[p] * raw.per[p].co2;
-      return runWindows(state, P, sol, { timeLimit: tl, signal: o.signal, shock: shock, from: sp, fixed: fixedOf(P, raw, sp), fixedThrough: sp, spent: spent, build: o.build }).then(function (b) {
-        if (!b.ok) return fail(b.r);
-        // the shocked pathway: the plan's periods before the shock, then the re-planned ones
-        var rawS = merge(b.raws); for (var p2 = 0; p2 < sp; p2++) rawS.per[p2] = raw.per[p2];
-        rawS.n = b.raws[b.raws.length - 1].n; rawS.firm = b.raws[b.raws.length - 1].firm; rawS.a = b.raws[b.raws.length - 1].a; rawS.k = b.raws[b.raws.length - 1].k;
-        res.shock = summarize(state, P, Ss, rawS); res.shock.key = shock; res.shock.year = Ss.shockYear;
-        res.models = res.models.concat(b.models);
-        return { status: "optimal", ok: true, kind: "lp", message: "", results: res, ms: Date.now() - t0 };
-      });
-    }).then(null, function (e) { return { status: "error", ok: false, kind: "lp", message: "The run failed: " + (e && e.message || e), ms: Date.now() - t0 }; });
-  }
 
   // ---------------------------------------------------------------- the full-year check (§9.3)
   // The plan's capacities in model year p, re-dispatched hour by hour over a whole weather year (H = hourly(P, year)):
@@ -1077,6 +896,36 @@
     });
   }
 
+  // ---------------------------------------------------------------- near-optimal plans (M13): the optimal face widened
+  // faceModel: every row of a solved model, plus "objective <= best + slack" ($M, the whole objective with its penalties and
+  // tie costs), minimising or maximising a linear expression (terms: { variable: coefficient }) over it
+  function faceModel(m, r, terms, sense, slack) {
+    var cost = m.variables.filter(function (v) { return v.cost; }).map(function (v) { return [v.name, v.cost]; });
+    var out = { sense: sense, variables: m.variables.map(function (v) { return { name: v.name, lb: v.lb, ub: v.ub, cost: 0 }; }), constraints: m.constraints.concat([{ name: "face", terms: cost, ub: r.objective + slack }]) };
+    out.objective = { terms: terms };
+    return out;
+  }
+  // the new capacity of one technology built in one model year, nationally, as terms
+  function builtTerms(P, t, q) { var o = {}; if (t === "firm") o["n_firm" + q] = 1; else P.R.forEach(function (R, r) { o["n_" + r + t + q] = 1; }); return o; }
+  // plans within a share of the best cost: the lowest and highest of an expression (two more LPs); Promise of { lo, hi }
+  function nearRange(P, state, terms, share, o) {
+    o = o || {};
+    var sol = solverOf(o), S = sysOf(state, P), m = build(P, S), tl = o.timeLimit || P.cfg.solver.timeLimit;
+    var one = function (mm) { return new Promise(function (res) { res(sol(mm, { timeLimit: tl, signal: o.signal })); }); };
+    return one(m).then(function (r) {
+      if (r.status !== "optimal") return { status: r.status, ok: false };
+      var slack = Math.abs(r.objective) * share;
+      return one(faceModel(m, r, terms, "min", slack)).then(function (a) {
+        if (a.status !== "optimal") return { status: a.status, ok: false };
+        return one(faceModel(m, r, terms, "max", slack)).then(function (b) {
+          if (b.status !== "optimal") return { status: b.status, ok: false };
+          var at = 0; for (var k in terms) at += (r.values[k] || 0) * terms[k];
+          return { status: "optimal", ok: true, lo: a.objective, hi: b.objective, at: at, slack: slack, objective: r.objective };
+        });
+      });
+    }).then(null, function (e) { return { status: "error", ok: false, message: String(e && e.message || e) }; });
+  }
+
   // ---------------------------------------------------------------- plain tables for the no-JS blocks and the note
   function esc(x) { return String(x).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
   function tableHTML(head, rows, cls) {
@@ -1123,7 +972,7 @@
   }
 
   var E4 = { REG: REG, NEW: NEW, FOSSIL: FOSSIL, prepare: prepare, schema: schema, defaults: defaults, withPreset: withPreset, sysOf: sysOf, build: build, crf: crf, dsum: dsum,
-    hourly: hourly, stressHours: stressHours, fullYear: fullYear, seasonOfDay: seasonOfDay, newCap: newCap, read: read, capNow: capNow, merge: merge, fixedOf: fixedOf, money: money, windowsOf: windowsOf, runWindows: runWindows, planRun: planRun, shockRun: shockRun, solve: solve, shockTest: shockTest, c4Shocks: c4Shocks, presetsOf: presetsOf, summarize: summarize, resultRows: resultRows, fallbackHTML: fallbackHTML, inputsHTML: inputsHTML, tableHTML: tableHTML, planRows: planRows, esc: esc, view: view, shockView: shockView, stressMargins: stressMargins, TECHS: TECHS, rd: rd, WORDS: WORDS,
+    hourly: hourly, stressHours: stressHours, fullYear: fullYear, seasonOfDay: seasonOfDay, newCap: newCap, read: read, capNow: capNow, merge: merge, fixedOf: fixedOf, money: money, windowsOf: windowsOf, runWindows: runWindows, planRun: planRun, shockRun: shockRun, solve: solve, shockTest: shockTest, c4Shocks: c4Shocks, presetsOf: presetsOf, summarize: summarize, faceModel: faceModel, builtTerms: builtTerms, nearRange: nearRange, resultRows: resultRows, fallbackHTML: fallbackHTML, inputsHTML: inputsHTML, tableHTML: tableHTML, planRows: planRows, esc: esc, view: view, shockView: shockView, stressMargins: stressMargins, TECHS: TECHS, rd: rd, WORDS: WORDS,
     kilo: kilo, fix: fix, pct: pct, bn: bn, copy: copy, sum: sum, PJ_PER_MWH: PJ_PER_MWH, MWH_PER_PJ: MWH_PER_PJ };
   if (typeof module !== "undefined" && module.exports) module.exports = E4;
   if (typeof window === "undefined" || !window.LX) return;

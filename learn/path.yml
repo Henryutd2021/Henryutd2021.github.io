@@ -1207,7 +1207,7 @@
   tier: modeler
   form: cards
   icon: frontier
-  status: upcoming
+  status: active
   minutes: 45
   practice_minutes: 120   # the notebook's practice tasks, after its 60-minute lab
   lab_minutes: 60   # the notebook lab (learn_map_v2.yml)
@@ -1296,7 +1296,7 @@
   form: capstone
   sandbox: SB4
   icon: target
-  status: upcoming
+  status: active
   minutes: 240
   lab_minutes: 60   # the Modeler version adds M13's notebook
   title: "Prairieland 2050: design and defend a nation's pathway"

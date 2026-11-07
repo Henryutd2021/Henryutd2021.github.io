@@ -43,6 +43,8 @@ function face(model, r, terms, sense, solveSync, slack) {
 function grid(E4, P, S) {
   const d = E4.defaults(S), out = [];
   E4.presetsOf(P).forEach(pr => ["perfect", "myopic"].forEach(fs => out.push({ preset: pr.id, state: Object.assign(E4.withPreset(d, pr), { fs: fs, sh: "none" }) })));
+  // the central plan without the peak-hour rule (M13's full-year step: what the slices alone miss)
+  out.push({ preset: "central-norule", state: Object.assign(E4.withPreset(d, E4.presetsOf(P).find(p => p.id === "central")), { fs: "perfect", sh: "none", rm: "off" }) });
   return out;
 }
 function fullOf(E4, c, R, p, weather) {
@@ -68,7 +70,7 @@ async function libEntry(X, g, H25, H24, o) {
   return { key: SS.encode(S, Object.assign({}, g.state, { sh: "none" })), preset: g.preset, foresight: g.state.fs, status: "optimal", view: V, shocks: shocks, full: full };
 }
 function libText(plans) {
-  return JSON.stringify({ about: "Engine E4's precomputed library for SB4, M13 and C4 (learn/sb4-pathway-explorer.qmd, m13-national-pathway.qmd, c4-prairieland-2050.qmd): every preset with perfect foresight and decade by decade, solved with E4 itself on " + LIB_DATE +
+  return JSON.stringify({ about: "Engine E4's precomputed library for SB4, M13 and C4 (learn/sb4-pathway-explorer.qmd, m13-national-pathway.qmd, c4-prairieland-2050.qmd): every preset with perfect foresight and decade by decade, and the central plan without the peak-hour rule, solved with E4 itself on " + LIB_DATE +
     " (each LP optimal, at most 120 s a solve), its view (every number a page shows), C4's four shocks re-planned, and the full-year checks of 2030 and 2050 in 2025's and 2024's weather (52 weeks and 31 December, an LP each). Phones read it instead of loading the solver; the full-year checks are too slow for a click. Written by node _tests/learn/test_e4-engine.js --write; checked byte for byte (--library: every entry).",
     date: LIB_DATE, timeLimit: 120, plans: plans });
 }

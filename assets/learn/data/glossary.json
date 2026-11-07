@@ -3131,6 +3131,12 @@
   "lesson": "SB3",
   "href": "sb3-city-planner.html"
  },
+ "time-slice": {
+  "term": "Time slice",
+  "short": "A group of hours, such as winter nights, that a planning model treats as one, weighted by how many hours it stands for.",
+  "lesson": "SB4",
+  "href": "sb4-pathway-explorer.html"
+ },
  "time-step": {
   "term": "Time step",
   "short": "The length of one step in a model or dataset, such as five minutes, an hour or a year.",
@@ -3352,6 +3358,12 @@
   "short": "A utility that owns and runs the power plants, transmission and distribution in its service territory, as Kansas's investor-owned utilities do; its rates are approved by the state regulator.",
   "lesson": "F9",
   "href": "f09-city-energy.html"
+ },
+ "vintage": {
+  "term": "Vintage",
+  "short": "The year a plant was built: in a multi-decade model each vintage keeps its own cost and runs until its life ends.",
+  "lesson": "SB4",
+  "href": "sb4-pathway-explorer.html"
  },
  "virtual-power-plant": {
   "term": "Virtual power plant",

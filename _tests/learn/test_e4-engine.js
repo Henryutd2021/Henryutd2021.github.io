@@ -213,7 +213,10 @@ const WRITE = process.argv.includes("--write"), FULLLIB = process.argv.includes(
       fs.writeFileSync(LPATH, X.libText(plans) + "\n");
     }
     const LIB = fs.existsSync(LPATH) ? JSON.parse(fs.readFileSync(LPATH, "utf8")) : null;
-    ok(LIB && LIB.plans.length === GRID.length && LIB.plans.every((e, i) => e.key === SS.encode(S, GRID[i].state)), "the library holds every preset, perfect and decade by decade (" + GRID.length + "), in order");
+    ok(LIB && LIB.plans.length === GRID.length && LIB.plans.every((e, i) => e.key === SS.encode(S, GRID[i].state)), "the library holds every preset, perfect and decade by decade, and the central plan without the peak-hour rule (" + GRID.length + "), in order");
+    const nr = LIB && LIB.plans.find(e => e.preset === "central-norule");
+    ok(LIB && LIB.plans.every(e => { const sp = P.Y.indexOf(cfg.levers.shockYear.mineralBan); return e.view.built.battery[sp] > 0.005 || Math.abs(e.shocks.mineralBan.dPV) <= 1; }), "a shock that touches nothing the plan uses changes nothing: the mineral restriction with no new batteries in its year leaves the cost as it was (perfect and decade by decade)");
+    ok(nr && nr.full.some(c => c.unservedMWh > 1e4), "the central plan without the peak-hour rule fails the full-year check (" + (nr ? nr.full.map(c => c.unservedHours + " h").join(", ") : "?") + ")");
     ok(LIB && fs.readFileSync(LPATH, "utf8") === X.libText(LIB.plans) + "\n", "the library file is written exactly as the test writes it");
     ok(LIB && LIB.date === X.LIB_DATE && LIB.plans.every(e => e.status === "optimal" && e.full.length === 4 && e.full.every(c => c.status === "optimal" && c.solves === 53)), "every library run optimal; four full-year checks each, 53 LPs each");
     const idx = FULLLIB ? GRID.map((g, i) => i) : [2, 5];
