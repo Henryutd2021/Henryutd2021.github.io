@@ -9,8 +9,13 @@
 //     sum of its steps; every least-cost path (ties included) shares the shown length and km through protected land;
 //     the line's cost per km from NREL
 //   - costs and energy recomputed (land, road, water, the capacity factors from cf_targets.json); random weights sum to 1
-//   - words true for every input: each step's reveal over every exclusion set, setbacks from 100 to 1,500 m, weights,
-//     within the text budget (about 35 words, three sentences)
+//   - words true for every input: each step's reveal over every exclusion set, setbacks from 100 to 1,500 m, weights
+//     (all of them 0 included: no ranking), within the text budget (about 35 words; the page's own prose: one or two
+//     sentences after a bold label or "Myth.")
+//   - W5 fixes (2026-11-06): weight shares count the very same block only (recounted independently); the grid layer as
+//     text (substations table, cell lines against an independent segment test); step 2's switch labels follow
+//     "Stricter rules"; step 4 says it keeps the default rules; a campus row that needs an upgrade is marked; practice
+//     arithmetic is evaluated as displayed; the mitigation cost in 2025 dollars
 //   - every number on the page (fallback, Go deeper, myths, quiz, practice, numbers to remember) from the model or the data
 //   - scope: siting examples are solar, wind, a line and a data center only; no nuclear technology; data centers as loads
 //     and buildings; no "AI"; links to learn pages and allowed domains only; the approved excerpt word for word
@@ -63,7 +68,7 @@ function reference() {
     solar: run("solar"), wind: run("wind"), dc: run("dc"), dcAny: run("dc", { anySub: true }),
     windSetback: [220, 400, 800, 1500].map(sb => ({ setbackM: sb, eligibleKm2: r6(M.run("wind", { setbackM: sb }).X.areaKm2), blocks: M.run("wind", { setbackM: sb }).BL.length })),
     corridor: { forbid: cor("forbid"), allow: cor("allow") },
-    shares: { draws: sh.draws, seed: sh.seed, wins: sh.wins, other: sh.other },
+    shares: { draws: sh.draws, seed: sh.seed, wins: sh.wins, other: sh.other, near: sh.near },
     coarse: run("solar", undefined, { coarse: true }), newer: run("solar", undefined, { newer: true })
   };
 }
@@ -86,6 +91,8 @@ ok(JSON.stringify(JSON.parse(RAW).reference) === JSON.stringify(reference()), "t
 const text = s => s.replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/\s+/g, " ").trim();
 const TXT = text(PAGE);
 const has = (s, msg) => ok(TXT.indexOf(s) >= 0, "page states " + JSON.stringify(s) + (msg ? " (" + msg + ")" : ""));
+// evaluate displayed arithmetic: "$1,615,100 × 128.893 ÷ 118.026" etc. (×, ÷, +, −, ², π, parentheses)
+const evalShown = e => Function("return (" + e.replace(/\$|,(?=\d{3})/g, "").replace(/×/g, "*").replace(/÷/g, "/").replace(/−/g, "-").replace(/π/g, "Math.PI").replace(/([0-9.]+)²/g, "($1*$1)") + ")")();
 
 // ---------------- 1 the region
 const N = R.N;
@@ -229,7 +236,17 @@ ok(F.musd(cF.route.cost - cA.route.cost) === "$3.6 million", "forbidding protect
   for (let d = 0; d < 200; d++) { const u = [rng(), rng(), rng(), rng()].sort((a, b) => a - b), w = [u[0], u[1] - u[0], u[2] - u[1], u[3] - u[2], 1 - u[3]]; if (!near(w.reduce((a, b) => a + b, 0), 1, 1e-12) || w.some(x => x < 0)) bad++; }
   ok(bad === 0, "random weights: five gaps of sorted uniforms, each ≥ 0, summing to 1");
   const sh = M.shares("solar"); ok(Object.values(sh.wins).reduce((a, b) => a + b, 0) + sh.other === 500, "the 500 draws are all counted");
-  ok(F.pct(sh.wins.A / 500) === "25%" && F.pct(sh.other / 500) === "61%", "default site A wins 25%; outside the top five 61%");
+  ok(F.pct(sh.wins.A / 500) === "16%" && F.pct(sh.other / 500) === "83%" && sh.near === 110, "default site A is the winning block in 16%; other blocks 83%, 110 of them overlapping a default site");
+  // an independent recount: every block's score by a plain loop, the winner by the tie rule, a win only for the same block
+  { const r = M.run("solar"), keys = r.CR.keys, g = require(L("components/core.js")).mulberry32(D.sensitivity.seed >>> 0), ex = {}; let oth = 0, nr = 0;
+    r.top.forEach(t => { ex[t.id] = 0; });
+    for (let d = 0; d < D.sensitivity.draws; d++) {
+      const u = []; for (let z = 0; z < keys.length - 1; z++) u.push(g()); u.sort((a, b) => a - b);
+      const w = keys.map((k, z) => (z < keys.length - 1 ? u[z] : 1) - (z ? u[z - 1] : 0));
+      let best = null; r.BL.forEach(b => { const v = keys.reduce((t, k, z) => t + w[z] * b.m[k], 0); if (!best || v > best.v || (v === best.v && (b.j < best.b.j || (b.j === best.b.j && b.i < best.b.i)))) best = { v, b }; });
+      const same = r.top.filter(t => t.i === best.b.i && t.j === best.b.j)[0];
+      if (same) ex[same.id]++; else { oth++; if (r.top.some(t => Math.abs(t.i - best.b.i) < t.k && Math.abs(t.j - best.b.j) < t.k)) nr++; } }
+    ok(JSON.stringify(ex) === JSON.stringify(sh.wins) && oth === sh.other && nr === sh.near, "weight shares recounted independently: " + JSON.stringify(ex) + ", other " + oth + ", near " + nr); }
 }
 // newer homes next to solar site A; 2 km cells
 {
@@ -276,19 +293,57 @@ for (let sb = 100; sb <= T.wind.setbackMaxM; sb += 20) {
     if (!(f && a) || t6.indexOf(F.musd(f.route.cost)) < 0 || f.route.cost < a.route.cost - 1e-6) ok(false, "step 6 reveal true at " + sb + " m (forbidding never makes the line cheaper)");
     if (a && (a.route.parts.protected > 0) !== /through protected land/.test(t6)) ok(false, "step 6 reveal says 'through protected land' only when the allowed line crosses it, at " + sb + " m"); }
 }
-ok(/\$38,000 a mile barely deters it/.test(LS.s6Saw(M, 220)), "step 6 reveal at 220 m: the mitigation cost barely deters the line");
+ok(LS.s6Saw(M, 220).indexOf("about $41,500 a mile (NREL's $38,000 in 2022 dollars) barely deters it") > 0 && LS.mitWords(D) === "about " + F.usd100(38000 * 128.893 / 118.026) + " a mile (NREL's $38,000 in 2022 dollars)" && near(A19.usd(D, 38000, 2022), 41498.77, 0.01),
+  "step 6 reveal at 220 m: the mitigation cost in 2025 dollars ($41,499, said 'about $41,500'), NREL's 2022 figure beside it");
 budget(LS.s7Saw(M), "step 7 reveal", 40, 2);
 ok(/site B would use North \(S2\), which has only 120 MW spare/.test(LS.s7Saw(M)) && LS.s7Saw(M).indexOf(F.musd(M.run("dc").costs[0].upfront)) > 0, "step 7 reveal: with any substation, B uses North (S2) with 180 MW spare");
 const HX = LS.hints(M); Object.keys(HX).forEach(k => budget(HX[k], "hint " + k, 35, 2));
+ok(HX.slope === "Slope is rise over run: a 10% slope climbs 10 m over 100 m across the ground." && /150 MW is the farm's size/.test(HX.energy) && near(150 * 8760 * CF.targets.solar.cf / 1000, 315.36, 1e-9), "hints: slope as rise over run; MW against GWh a year (150 MW × 8,760 h × 24.0% ÷ 1,000 = 315 GWh at the mean)");
+[LS.sharesNote(M), LS.ruleWords(D, false), LS.ruleWords(D, true), LS.NOWEIGHTS].forEach((t, x) => budget(t, "new words " + x, 30, 2));
+{ const sh = M.shares("solar"); ok(LS.sharesNote(M).indexOf(sh.near + " of the " + sh.other + " other wins went to blocks that overlap one of the five") > 0, "the shares note states the overlapping winners (" + sh.near + " of " + sh.other + ")"); }
+ok(LS.ruleWords(D, false) === "Thresholds now: slopes over 10% and 61 m from homes, NREL's reference case." && LS.ruleWords(D, true) === "Thresholds now: slopes over 5% and 152 m from homes, NREL's limited case.", "step 2 states the thresholds in force");
+{ const a = LS.exLabels(D, false), b = LS.exLabels(D, true);
+  ok(a.slope === "Slope over 10%" && a.setback === "61 m from homes" && b.slope === "Slope over 5%" && b.setback === "152 m from homes" && b.protected === a.protected && b.flood === a.flood, "step 2's switch labels follow Stricter rules (10% and 61 m, or 5% and 152 m)");
+  ok(T.solar.slopeOptions[1] === 5 && T.solar.setbackOptions[1] === 152 && LS.strictOver(D, "solar", true).slopeMax === 5 && LS.strictOver(D, "solar", true).setbackM === 152, "the labels name the thresholds the model applies"); }
+// every weight 0: no ranking anywhere
+{ const z = { res: 0, sub: 0, road: 0, land: 0, homes: 0 }, st0 = { ex: T.solar.exclusions, strict: false, w: z, sb: 220 }, r = M.run("solar", LS.solarOver(D, st0));
+  ok(r.top.length === 0 && r.top.noWeights === true && r.costs.length === 0 && r.top.qualifying === M.run("solar").BL.length, "every weight 0: no short list (sites returns [] with noWeights), the blocks with room unchanged");
+  ok(LS.s3Saw(M, st0) === LS.NOWEIGHTS && /^Choose a criterion before ranking sites/.test(LS.NOWEIGHTS), "every weight 0: step 3 says to choose a criterion");
+  ok(/your weights are all 0, so they rank no site/.test(LS.limitRows(M, st0)[0].here), "every weight 0: the limits table says so");
+  ok(A19.sites(R, D, "solar", A19.cfg(D, "solar", { weights: Object.assign({}, z, { land: 5 }) })).length === 5, "one weight above 0 ranks again"); }
+// a campus row that needs an upgrade is marked in its up-front cell
+{ const rows = LS.rowsFor(M, "dc", { anySub: true }), r = M.run("dc", { anySub: true });
+  ok(rows.every((x, i) => x.upgrade === (D.substations.filter(sb => sb.id === r.costs[i].sub)[0].headroomMW < T.dc.mw)) && rows.some(x => x.upgrade) && rows.filter(x => x.upgrade).every(x => / \+ upgrade$/.test(x.upfront)) && rows.filter(x => !x.upgrade).every(x => !/upgrade/.test(x.upfront)),
+    "any substation: rows that need an upgrade say '+ upgrade' beside their up-front cost (" + rows.filter(x => x.upgrade).map(x => x.id + " " + x.upfront).join(", ") + ")");
+  ok(LS.rowsFor(M, "dc").every(x => !x.upgrade) && LS.rowsFor(M, "solar").every(x => !x.upgrade) && LS.rowsFor(M, "wind").every(x => !x.upgrade), "with spare capacity required, no row needs an upgrade"); }
+// the grid layer as text
+{ const G = A19.gridRows(R);
+  ok(G.map(g => g.id + ":" + g.spareMW).join(",") === D.substations.map(sb => sb.id + ":" + sb.headroomMW).join(",") && G.every(g => g.where === A19.place(R, Math.floor(D.substations.filter(x => x.id === g.id)[0].x), Math.floor(D.substations.filter(x => x.id === g.id)[0].y), 1)), "substations table: every substation, its spare MW and its place");
+  ok(G.every(g => g.to.length === new Set(g.to).size) && G.filter(g => g.id === "S4")[0].to.join() === "S1,S2,regional grid (2 lines)" && G.filter(g => g.id === "S1")[0].to.join() === "S4,S2,S3", "substations table: where each substation's lines go");
+  let bad = 0; D.substations.forEach(sb => { const n = Math.floor(sb.y) * 44 + Math.floor(sb.x), t = A19.cellText(R, n); if (t.indexOf("substation " + sb.id + " (" + sb.name + "), " + sb.headroomMW + " MW spare") < 0) bad++; });
+  ok(bad === 0, "a substation's cell says which substation and its spare MW");
+  // the lines through each cell against an exact segment-and-square clip (Liang–Barsky): a cell the line runs through for
+  // more than 0.02 km must be listed; a listed cell must be touched by the line
+  const byId = {}; D.substations.forEach(sb => { byId[sb.id] = sb; });
+  const clip = (a, b, i, j) => { let t0 = 0, t1 = 1; const dx = b.x - a.x, dy = b.y - a.y;
+    for (const [pp, q] of [[-dx, a.x - i], [dx, i + 1 - a.x], [-dy, a.y - j], [dy, j + 1 - a.y]]) { if (pp === 0) { if (q < 0) return 0; continue; } const r = q / pp; if (pp < 0) t0 = Math.max(t0, r); else t1 = Math.min(t1, r); }
+    return t1 >= t0 ? (t1 - t0) * Math.hypot(dx, dy) : -1; };
+  let miss = 0, extra = 0, crossed = 0;
+  D.lines.forEach(l => { const a = byId[l.from], b = typeof l.to === "string" ? byId[l.to] : { x: l.to[0], y: l.to[1] }, name = typeof l.to === "string" ? l.from + "–" + l.to : l.from + " to the regional grid (" + (l.to[1] < a.y ? "north-east" : "south-east") + ")";
+    for (let n = 0; n < N; n++) { const i = n % 44, j = (n - i) / 44, len = clip(a, b, i, j), listed = A19.gridAt(R, n).lines.indexOf(name) >= 0;
+      if (len > 0.02 && !listed) miss++; if (listed && len < 0) extra++; if (listed) crossed++; } });
+  ok(miss === 0 && extra === 0 && crossed > 40, "the lines named in each cell match an exact clip of each line (" + crossed + " cell crossings)");
+  const cs = A19.cellText(M.region({ coarse: true }), Math.floor(14.5 / 2) * 22 + Math.floor(22.5 / 2));
+  ok(/substation S3 \(West\), 250 MW spare/.test(cs) && /^Cell \(2 km\)/.test(A19.cellText(M.region({ coarse: true }), 0)) === false, "2 km cells name their substation too"); }
 ok(/function keep\(k, v\) \{[^\n]*setTimeout\(buildExplain/.test(JS), "every saved setting refreshes the explain layer");
 
 // ---------------- 6 every number on the page
 has("Prairie City is fictional; its numbers are illustrative.");
-has("solar arrays take 4.2 acres per MW of panels, single-axis tracking, with 1.29 MW of panels per MW of inverters");
+has("tracking solar arrays take 4.2 acres per MW of panels (DC); 2019's tracking plants had 1.29 MW of panels per MW of inverters (AC, the grid side)");
 ok(T.solar.acresPerMWdc === 4.2 && T.solar.dcac === 1.29, "data: 4.2 acres per MW (DC), DC:AC 1.29");
-has("wind farms spread over 34.5 ha per MW");
-has("150 × 1.29 × 4.2 = 812.7 acres = 3.29 km² of a 4 km² block");
-has("$1,095,979 per km on farmland (2025 dollars), × 1.8 in flood zones");
+has("wind farms spread over 34.5 ha per MW, where 1 ha = 10,000 m², about 2.5 acres"); ok((10000 / 4046.8564224).toFixed(1) === "2.5", "1 ha = 2.47 acres, about 2.5");
+has("150 × 1.29 × 4.2 = 812.7 acres ≈ 3.29 km² of a 4 km² block");
+has("$c$ ≈ $1,095,979 per km on farmland (2025 dollars), × 1.8 in [flood zones]{.lx-term term=\"flood-zone\"}");
 has("1 at 0 km, 0 from 15 km (solar)"); ok(T.solar.ramps.sub[0] === 0 && T.solar.ramps.sub[1] === 15, "solar ramp near a substation: 0 to 15 km");
 has("default solar weights 20, 35, 15, 20, 10"); ok(["res", "sub", "road", "land", "homes"].map(k => T.solar.weights[k]).join(",") === "20,35,15,20,10", "data: default solar weights");
 has("land price falls from 1 at $2,500 an acre to 0 at $15,000"); ok(T.solar.ramps.land.join(",") === "2500,15000", "data: the land ramp");
@@ -296,8 +351,14 @@ has("NREL's $1,615,100 a mile (2022 dollars) × 128.893 / 118.026 (BEA's GDP def
 has("checked at 16 points"); ok(D.grid.sub * D.grid.sub === 16, "16 setback points per cell");
 has("about 67,000 cells of 11.5 km × 11.5 km");
 has("Wind site A costs $16.6 million up front, site E $12.4 million.");
-has("Priced at $38,000 a mile, the new line crossed 3.4 km of protected land");
-has("sunshine differs by only 4.5% across the 44 km region");
+has("Priced at " + LS.mitWords(D) + ", the new line crossed 3.4 km of protected land");
+// the sunshine myth: min–max scaling stretches a 4.5% physical spread into the full 0–1 score; the spread of each
+// criterion's weighted contribution across the blocks with room (default solar weights)
+{ const r = M.run("solar"), tw = r.CR.keys.reduce((t, k) => t + r.c.weights[k], 0);
+  const spread = k => { let lo = Infinity, hi = -Infinity; r.BL.forEach(b => { lo = Math.min(lo, b.m[k]); hi = Math.max(hi, b.m[k]); }); return 100 * r.c.weights[k] * (hi - lo) / tw; };
+  ok(Math.round(spread("res")) === 19 && Math.round(spread("land")) === 17 && spread("res") > spread("land") && r.c.weights.res === 20, "sunshine (weight 20) spreads blocks' scores by about 19 points, cheap land by about 17 (" + spread("res").toFixed(2) + ", " + spread("land").toFixed(2) + ")");
+  has("“Sunshine differs by only 4.5% across this region, so it barely moves a solar site's score.”");
+  has("Min–max scaling stretches the 4.5% to a full 0 to 1: at weight 20, sunshine spreads blocks' scores by about 19 points, more than cheap land's 17."); }
 has("this map checks 16 points in each cell, and NREL's supply curves check setbacks on 90 m cells");
 has("In step 8, 36 homes built since 2019 push solar site A out of the top five.");
 // practice, recomputed
@@ -305,13 +366,20 @@ has("In step 8, 36 homes built since 2019 push solar site A out of the top five.
   const s = [0.6, 0.9, 1.0, 0.4, 0.5], w1 = [20, 35, 15, 20, 10], w2 = [10, 10, 5, 5, 70];
   const dot = (a, b) => a.reduce((t, v, k) => t + v * b[k], 0) / b.reduce((t, v) => t + v, 0);
   ok(near(100 * dot(s, w1), 71.5, 1e-9) && near(100 * dot(s, w2), 57, 1e-9), "practice 1–2: 71.5 and 57");
-  has("= 71.5 of 100"); has("(6 + 9 + 5 + 2 + 35) ÷ 100 = 57 of 100");
+  // the table the reader works from, and each answer's arithmetic evaluated as written
+  const pt = (PAGE.match(/<table class="lx-facts a19-pr" data-practice="score">([\s\S]*?)<\/table>/) || [, ""])[1];
+  const prow = [...pt.matchAll(/<tr><th scope="row">[^<]+<\/th><td class="n">([0-9.]+)<\/td><td class="n">([0-9.]+)<\/td><td class="n">([0-9.]+)<\/td><\/tr>/g)].map(m => [+m[1], +m[2], +m[3]]);
+  ok(prow.length === 5 && prow.map(x => x[0]).join() === s.join() && prow.map(x => x[1]).join() === w1.join() && prow.map(x => x[2]).join() === w2.join(), "practice 1–2: the table gives the scores, the default and the neighbours' weights");
+  ok(w1.join(",") === ["res", "sub", "road", "land", "homes"].map(k => T.solar.weights[k]).join(","), "practice 1 uses the default solar weights");
+  const ans = [...PAGE.matchAll(/<p>(\([^<]*?\) ÷ 100) = ([0-9.]+), or ([0-9.]+) out of 100/g)];
+  ok(ans.length === 2 && ans.every(m => near(evalShown(m[1]), +m[2], 1e-12) && near(100 * +m[2], +m[3], 1e-9)) && ans.map(m => m[3]).join() === "71.5,57", "practice 1–2: each displayed sum evaluates to the shown 0.715 and 0.57, then × 100 (" + ans.map(m => evalShown(m[1])).join(", ") + ")");
   ok(w2.join(",") === ["res", "sub", "road", "land", "homes"].map(k => D.presets.neighbours[k]).join(","), "practice 2 uses the neighbours' preset");
   ok(near(200 * 1.3 * 4.2, 1092, 1e-9) && (1092 / 247.105).toFixed(2) === "4.42", "practice 3: 1,092 acres = 4.42 km²"); has("200 × 1.3 × 4.2 = 1,092 acres, about 4.42 km²");
   ok(100 * 34.5 === 3450 && 100 * 0.3 === 30 && 30 / 3450 < 0.01, "practice 4: 3,450 ha, 30 ha, under 1%"); has("3,450 ha (34.5 km²) in all; 30 ha for good, under 1%");
-  ok((40 * Math.PI * 0.16).toFixed(1) === "20.1" && (40 * Math.PI * 0.22 * 0.22).toFixed(1) === "6.1", "practice 5: 20.1 and 6.1 km²"); has("40 × π × 0.4² = 20.1 km² against 40 × π × 0.22² = 6.1 km²");
-  ok((base * (8 + 4 * 1.8) / 1e6).toFixed(1) === "16.7" && (128.893 / 118.026).toFixed(4) === "1.0921" && Math.round(1615100 * (128.893 / 118.026) / 1.609344) === 1095979, "practice 6: $16.7 million in 2025 dollars");
-  has("$1,615,100 × 1.0921 ÷ 1.609344 = $1,095,979 a km; × (8 + 4 × 1.8) = $16.7 million in 2025 dollars.");
+  ok(evalShown("40 × π × 0.4²").toFixed(1) === "20.1" && evalShown("40 × π × 0.22²").toFixed(1) === "6.1", "practice 5: 20.1 and 6.1 km², evaluated as displayed"); has("40 × π × 0.4² ≈ 20.1 km² against 40 × π × 0.22² ≈ 6.1 km²");
+  const p6 = "$1,615,100 × 128.893 ÷ 118.026 ÷ 1.609344";
+  ok(Math.round(evalShown(p6)) === 1095979 && near(evalShown(p6), base, 1e-6) && (evalShown(p6 + " × (8 + 4 × 1.8)") / 1e6).toFixed(1) === "16.7", "practice 6: the displayed chain evaluates to $1,095,979 a km and $16.7 million (2025 dollars)");
+  has(p6 + " ≈ $1,095,979 a km; × (8 + 4 × 1.8) ≈ $16.7 million in 2025 dollars.");
   // practice 7: Dijkstra on the 3 × 3 grid, side-by-side moves only
   const G = [[1, 1, 4], [1, 5, 1], [2, 1, 1]], dist = [[Infinity, Infinity, Infinity], [Infinity, Infinity, Infinity], [Infinity, Infinity, Infinity]], done = {};
   dist[0][0] = 0;
@@ -319,12 +387,16 @@ has("In step 8, 36 homes built since 2019 push solar site A out of the top five.
     [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([dr, dc]) => { const r = u[0] + dr, c = u[1] + dc; if (r < 0 || c < 0 || r > 2 || c > 2) return; const nd = dist[u[0]][u[1]] + (G[u[0]][u[1]] + G[r][c]) / 2; if (nd < dist[r][c]) dist[r][c] = nd; }); }
   const top = (1 + 1) / 2 + (1 + 4) / 2 + (4 + 1) / 2 + (1 + 1) / 2;
   ok(dist[2][2] === 5 && top === 7, "practice 7: the cheapest path costs 5, the top-and-right one 7"); has("1 + 1.5 + 1.5 + 1 = 5"); has("costs 7");
+  const gt = (PAGE.match(/<table class="lx-facts a19-pr" data-practice="grid">([\s\S]*?)<\/table>/) || [, ""])[1];
+  const grow = [...gt.matchAll(/<tr><th scope="row">[^<]+<\/th>((?:<td class="n">\d+<\/td>){3})<\/tr>/g)].map(m => [...m[1].matchAll(/>(\d+)</g)].map(x => +x[1]));
+  ok(JSON.stringify(grow) === JSON.stringify(G), "practice 7: the page's grid table is the grid solved here");
 }
 // numbers to remember and the sources' figures
 has("4.2 acres per MW"); has("34.5 ha per MW"); has("220 m · 61 m"); has("$1.6 million a mile");
 ok(T.wind.setbackM === 220 && T.solar.setbackM === 61 && T.wind.setbackOptions[1] === 400 && T.solar.setbackOptions[1] === 152 && T.wind.slopeOptions.join(",") === "25,13" && T.solar.slopeOptions.join(",") === "10,5", "data: NREL Tables 7 and 9 (220/400 m, 61/152 m; 25/13%, 10/5%)");
 ok(/34\.5 ± 22\.4 ha per MW/.test(RAW) && /0\.3 ± 0\.3 ha per MW/.test(RAW) && /Table 1, p\. 10/.test(RAW), "data: NREL 2009 Table 1");
-ok(/4\.2 acres per MW \(DC\) for single-axis tracking arrays, slide 13/.test(RAW) && /DC:AC ratio 1\.29 for 2019 tracking plants, slide 8/.test(RAW), "data: LBNL slides 8 and 13");
+ok(/4\.2 acres per MW \(DC\) for single-axis tracking arrays, slide 13/.test(RAW) && /DC:AC ratio 1\.29 for 2019 tracking plants, slide 8 \(the sample table: 66 single-axis tracking plants that came online in 2019, 4,406 MW DC over 3,419 MW AC/.test(RAW) && (4406 / 3419).toFixed(2) === "1.29", "data: LBNL slides 8 and 13 (slide 8's table: 4,406 / 3,419 = 1.29)");
+has("the sample table on slide 8 (2019 tracking plants: 4,406 MW DC over 3,419 MW AC, 1.29)");
 
 // the shared Prairie City data: the campus's MW is read, never typed; S1–S4 are transmission substations
 ok(D0.types.dc.mw === undefined && /prairie-city\.json/.test(D0.types.dc.mwFrom) && T.dc.mw === PC.dataCenter.contractMW && T.dc.mw === 150, "the campus's MW is prairie-city.json's dataCenter.contractMW (150), read through A19.withCity");
@@ -365,7 +437,7 @@ ok(hrefs.length > 8 && hrefs.every(h => ALLOW.test(h) || /^[0-9a-z-]+\.html$/.te
 {
   const prose = OWN.replace(/<!-- a19-fallback:start[\s\S]*?<!-- a19-fallback:end -->/, " ").replace(/<style>[\s\S]*?<\/style>/, " ").replace(/<table class="lx-facts">[\s\S]*?<\/table>/g, " ").replace(/^---[\s\S]*?\n---\n/, " ")
     .replace(/<div class="lx-card lx-sources">[\s\S]*?<\/div>/, " ").replace(/<blockquote[\s\S]*?<\/blockquote>/g, " ").replace(/<!--[\s\S]*?-->/g, " ").split(/<\/?(?:p|li|dd|dt|summary|td|th)\b[^>]*>|<br>|\n\n|\n- /).filter(s => /[A-Za-z]{3}/.test(text(s)) && !/^\|/.test(text(s)) && !/^(:::|```)/.test(text(s)));
-  prose.forEach(raw => { const s = text(raw), w = s.split(" ").length, n = nSent(text(raw.replace(/^\s*<b>[^<]*<\/b>/, ""))); ok(w <= 45 && n <= 3, "text element of " + w + " words, " + n + " sentences (≤ 45, ≤ 3): " + s.slice(0, 70)); });
+  prose.forEach(raw => { const s = text(raw), w = s.split(" ").length, n = nSent(text(raw.replace(/^\s*<b>[^<]*<\/b>/, "").replace(/^\s*\*\*[^*]+\*\*/, "")).replace(/^(Myth|Fact)\. /, "")); ok(w <= 36 && n <= 2, "text element of " + w + " words, " + n + " sentences (≤ 36, ≤ 2 after a label or 'Myth.'): " + s.slice(0, 70)); });
 }
 
 // ---------------- 9 path.yml entry, front matter, sidecar, glossary
@@ -413,6 +485,27 @@ ok(hrefs.length > 8 && hrefs.every(h => ALLOW.test(h) || /^[0-9a-z-]+\.html$/.te
     const strictLeft = F.km2(M.run("solar", Object.assign({ exclusions: T.solar.exclusions }, LS.strictOver(D, "solar", true))).X.areaKm2);
     ok(xp.textContent.indexOf("1 km cells leave " + strictLeft) >= 0, "stricter rules reach the explain layer (" + strictLeft + ")");
     ok(live.querySelectorAll(".a19-svg").length >= 1 && live.querySelectorAll("rect").length > 1320, "the map draws its 1,320 cells");
+    const tog = () => act().querySelectorAll("button.lx-toggle").map(b => b.textContent);
+    ok(tog().indexOf("Slope over 5%") >= 0 && tog().indexOf("152 m from homes") >= 0 && act().textContent.indexOf(LS.ruleWords(D, true)) >= 0, "stricter rules: the switches read 5% and 152 m, and the thresholds line says so: " + tog().join(" | "));
+    act().lxSet("strict", false);
+    ok(tog().indexOf("Slope over 10%") >= 0 && tog().indexOf("61 m from homes") >= 0 && act().textContent.indexOf(LS.ruleWords(D, false)) >= 0, "back to the reference case: 10% and 61 m");
+    // step 1: the grid layer shows the substations table; other layers hide it
+    demo.cards.go(0); act().lxSet("grid");
+    const gb = () => act().querySelector(".a19-gbox");
+    ok(gb() && !gb().hidden && gb().open && gb().querySelectorAll("tbody tr").length === 4 && /S3 West/.test(gb().textContent) && /250 MW/.test(gb().textContent), "step 1, grid layer: the substations table is shown and open (4 rows, spare MW)");
+    act().lxSet("wind"); ok(gb().hidden, "step 1, another layer: the substations table is hidden");
+    // step 3: every weight 0
+    demo.cards.go(2); ["res", "sub", "road", "land", "homes"].forEach(k => act().lxSet(k, 0));
+    ok(act().textContent.indexOf(LS.NOWEIGHTS) >= 0 && act().querySelectorAll("button.a19-pick").length === 0, "step 3, every weight 0: no sites, and the table asks for a criterion");
+    act().lxSet("sub", 35); ok(act().querySelectorAll("button.a19-pick").length === 5, "step 3, one weight back: five sites");
+    // step 4: the default rules, said where the reader acts; exact-block shares
+    demo.cards.go(3);
+    ok(/Rules\s*the defaults/.test(act().textContent) && act().textContent.indexOf(HX.rules4) >= 0 && /Another block/.test(act().textContent) && act().textContent.indexOf(LS.sharesNote(M)) >= 0, "step 4: says it keeps the default rules; bars count the very same block, other blocks apart");
+    // steps 6 and 7: the substations table under the map; an upgrade is marked and the note says why
+    demo.cards.go(5); ok(gb() && !gb().hidden && !gb().open, "step 6: the substations table is there, closed under the map");
+    demo.cards.go(6); act().lxSet("any");
+    ok(gb() && !gb().hidden && /\$6\.3M \+ upgrade/.test(act().textContent) && /not comparable/.test(act().textContent), "step 7, any substation: site B's cost says + upgrade, and the note says it is not comparable");
+    act().lxSet("spare"); ok(!/\+ upgrade/.test(act().querySelector(".a19-sites-box").textContent), "step 7, spare capacity only: no upgrade");
   } catch (e) { ok(false, "the stub page test threw: " + (e && e.stack || e)); }
 }
 

@@ -19,6 +19,7 @@
   function sc(v) { return String(Math.round(100 * v)); }
   function km(v) { return v.toFixed(1) + " km"; }
   function gwh(v) { return comma(Math.round(v / 1000)) + " GWh"; }
+  function usd100(v) { return "$" + comma(Math.round(v / 100) * 100); }
   function subName(D, id) { var s = D.substations.filter(function (x) { return x.id === id; })[0]; return s ? s.name + " (" + s.id + ")" : "none"; }
   function subOf(D, id) { return D.substations.filter(function (x) { return x.id === id; })[0]; }
 
@@ -75,17 +76,29 @@
   function critLabel(D, type, k) { var c = D.criteria[k]; return typeof c === "string" ? c : c[type]; }
 
   // ---------------------------------------------------------------- words (pure; the test checks them for every input)
+  var NOWEIGHTS = "Choose a criterion before ranking sites: with every weight at 0, no block scores above another.";
   function hints(M) {
     var D = M.D, T = D.types;
     return {
       always: "Always out: the river, built-up land, the industrial park and substations. Stricter rules: NREL's limited case, slopes over " + T.solar.slopeOptions[1] + "% and " + T.solar.setbackOptions[1] + " m from buildings.",
-      weights: "A weight of 0 drops a criterion; only the ratios between weights matter. Scores run from 0 to 100 for land that is left.",
+      slope: "Slope is rise over run: a " + T.solar.slopeMax + "% slope climbs " + T.solar.slopeMax + " m over 100 m across the ground.",
+      weights: "A weight of 0 drops a criterion, but one at least must be above 0; only the ratios between weights matter. Scores run from 0 to 100 for land that is left.",
+      energy: T.solar.mw + " MW is the farm's size, a rate of [[power|power]]; GWh a year is the energy it makes: MW × 8,760 hours × its [[capacity-factor|capacity factor]] ÷ 1,000.",
       random: "Each draw picks five weights at random that sum to 1, all mixes equally likely; seed " + D.sensitivity.seed + ".",
+      rules4: "This step keeps the default rules, all four exclusions at NREL's reference case, whatever you set in step 2.",
       wind: "Turbines go on the buildable cells; the farm's total area includes the farmland between them, as NREL's 34.5 ha per MW average does.",
       corridor: "Costs: NREL's 138 kV baseline, $" + comma(D.costs.lineUSDperMile) + " a mile in 2022 dollars ($" + comma(Math.round(A19.usd(D, D.costs.lineUSDperMile, D.costs.lineYear))) + " in 2025 dollars), times " + D.costs.mult.wet + " in flood zones, " + D.costs.mult.built + " through built-up land.",
       dc: "A data center here is a load and a building: Prairie City's " + T.dc.mw + " MW campus (shared city data), with its water, land and road. Its cooling sets its water need, left out here.",
       limits: "The 2 km check runs on the solar farm with your step 2 rules and default weights. The newer homes are acreages along the north county road."
     };
+  }
+  function exLabels(D, strict) {
+    var T = D.types.solar, sl = strict ? T.slopeOptions[1] : T.slopeMax, sb = strict ? T.setbackOptions[1] : T.setbackM;
+    return { protected: "Protected land", flood: "Flood zones", slope: "Slope over " + sl + "%", setback: sb + " m from homes" };
+  }
+  function ruleWords(D, strict) {
+    var L = exLabels(D, strict);
+    return "Thresholds now: " + L.slope.toLowerCase().replace("slope over", "slopes over") + " and " + L.setback + ", NREL's " + (strict ? "limited" : "reference") + " case.";
   }
   function s1Saw(M) {
     var R = M.R, lo = Infinity, hi = -Infinity, wmax = -Infinity;
@@ -96,17 +109,22 @@
     var strict = !!st.strict, r = M.run("solar", Object.assign({ exclusions: st.ex }, strictOver(M.D, "solar", strict))), none = M.solo("solar", null, strict);
     var drops = EXKEYS.map(function (k) { return none - M.solo("solar", k, strict); });
     var names = ["protected land", "flood zones", "steep slopes", "setbacks"];
-    return "Your rules leave **" + km2(r.X.areaKm2) + "**, " + pct(r.X.share) + " of the region. On its own, " + names.map(function (nm, i) { return nm + " remove" + (i === 0 ? "s " : " ") + km2(drops[i]); }).join(", ") + ".";
+    return "Your rules leave **" + km2(r.X.areaKm2) + "**, " + pct(r.X.share) + " of the region. On its own, " + names.map(function (nm, i) { return (i === 3 ? "[[setback|setbacks]]" : nm) + " remove" + (i === 0 ? "s " : " ") + km2(drops[i]); }).join(", ") + ".";
   }
   function s3Saw(M, st) {
     var r = M.run("solar", solarOver(M.D, st)), s = r.top[0], k = r.costs[0];
+    if (r.top.noWeights) return NOWEIGHTS;
     if (!s) return "No block has room with these rules.";
     return "Site **A** scores **" + sc(s.score) + "** of 100, " + A19.place(r.R, s.i, s.j, s.k) + " of the centre: " + musd(k.upfront) + " up front and " + gwh(k.mwh) + " a year. A score ranks sites; it is not a cost.";
   }
   function s4Saw(M) {
     var D = M.D, dev = M.run("solar", { weights: presetW(D, "solar", "developer") }).top[0], nb = M.run("solar", { weights: presetW(D, "solar", "neighbours") }).top[0];
     var sh = M.shares("solar"), r0 = M.run("solar");
-    return "A developer's best site is " + A19.place(M.R, dev.i, dev.j, dev.k) + "; neighbours' is " + A19.place(M.R, nb.i, nb.j, nb.k) + ". Of " + sh.draws + " random weightings, default site A wins **" + pct(sh.wins.A / sh.draws) + "**; sites outside the top five win " + pct(sh.other / sh.draws) + ".";
+    return "A developer's best site is " + A19.place(M.R, dev.i, dev.j, dev.k) + "; neighbours' is " + A19.place(M.R, nb.i, nb.j, nb.k) + ". Of " + sh.draws + " random weightings, default site A is the winning block in **" + pct(sh.wins.A / sh.draws) + "**; other blocks win " + pct(sh.other / sh.draws) + ".";
+  }
+  function sharesNote(M) {
+    var sh = M.shares("solar");
+    return "A win counts for a site only when the winner is that very block; " + sh.near + " of the " + sh.other + " other wins went to blocks that overlap one of the five.";
   }
   function windAt(M, sb) { return M.run("wind", { setbackM: sb }); }
   function s5Saw(M, sb) {
@@ -123,8 +141,10 @@
     var f = corridor(M, sb, "forbid"), a = corridor(M, sb, "allow");
     if (!f || !a) return "No path reaches a substation with room.";
     var through = a.route.parts.protected || 0;
-    return "Forbidden, the line runs **" + km(f.route.km) + "** for **" + musd(f.route.cost) + "**. Allowed, it runs " + km(a.route.km) + " for " + musd(a.route.cost) + (through > 0 ? ", " + km(through) + " of it through protected land: $" + comma(M.D.costs.mitigationUSDperMile) + " a mile barely deters it." : ", avoiding protected land anyway.");
+    return "Forbidden, the line runs **" + km(f.route.km) + "** for **" + musd(f.route.cost) + "**. Allowed, it runs " + km(a.route.km) + " for " + musd(a.route.cost) + (through > 0 ? ", " + km(through) + " of it through protected land: " + mitWords(M.D) + " barely deters it." : ", avoiding protected land anyway.");
   }
+  // NREL's mitigation cost in the page's dollars (2025), with the source's 2022 figure
+  function mitWords(D) { return "about " + usd100(A19.usd(D, D.costs.mitigationUSDperMile, D.costs.mitigationYear)) + " a mile (NREL's $" + comma(D.costs.mitigationUSDperMile) + " in " + D.costs.mitigationYear + " dollars)"; }
   function dcRun(M, any) { return M.run("dc", { anySub: !!any }); }
   function s7Saw(M) {
     var D = M.D, mw = D.types.dc.mw, a = dcRun(M, false), b = dcRun(M, true), s = a.top[0], k = a.costs[0];
@@ -151,7 +171,8 @@
     return r.top.map(function (s, i) {
       var k = r.costs[i];
       var priced = !!r.P;
-      return { id: s.id, where: A19.place(r.R, s.i, s.j, s.k), score: sc(s.score), upfront: !priced ? "–" : isFinite(k.upfront) ? musdS(k.upfront) : "no path", sub: priced && k.sub ? subName(M.D, k.sub) : "–", subId: priced && k.sub ? k.sub : "–", energy: k.mwh ? gwh(k.mwh) : null, water: type === "dc" ? km(k.waterKm) : null };
+      var sb = priced && k.sub ? subOf(M.D, k.sub) : null, up = !!(sb && sb.headroomMW < A19.needMW(M.D, type, {}));
+      return { id: s.id, where: A19.place(r.R, s.i, s.j, s.k), score: sc(s.score), upfront: !priced ? "–" : isFinite(k.upfront) ? musdS(k.upfront) + (up ? " + upgrade" : "") : "no path", upgrade: up, sub: priced && k.sub ? subName(M.D, k.sub) : "–", subId: priced && k.sub ? k.sub : "–", energy: k.mwh ? gwh(k.mwh) : null, water: type === "dc" ? km(k.waterKm) : null };
     });
   }
   function staticFallback(M) {
@@ -173,8 +194,8 @@
     var D = M.D, L = limits(M, st.ex, st.strict), sh = M.shares("solar"), f = corridor(M, st.sb, "forbid"), a = corridor(M, st.sb, "allow");
     var r = M.run("solar", solarOver(D, st));
     return [
-      { key: "weights", name: "Weights are value choices", here: "Default site A wins " + pct(sh.wins.A / sh.draws) + " of " + sh.draws + " random weightings; your weights put A " + (r.top[0] ? A19.place(M.R, r.top[0].i, r.top[0].j, r.top[0].k) : "nowhere") + ".", study: "Publish the weights, test other sets, and report which sites survive most of them." },
-      { key: "exclude", name: "Exclude or weight?", here: f && a ? "Forbidding protected land adds " + musd(f.route.cost - a.route.cost) + " to the line; priced at $" + comma(D.costs.mitigationUSDperMile) + " a mile, it would cut through." : "No path in one of the two cases.", study: "Exclude only what a rule forbids; weight what people trade off, and say which is which." },
+      { key: "weights", name: "Weights are value choices", here: "Default site A is the winning block in " + pct(sh.wins.A / sh.draws) + " of " + sh.draws + " random weightings; " + (r.top.noWeights ? "your weights are all 0, so they rank no site." : "your weights put A " + (r.top[0] ? A19.place(M.R, r.top[0].i, r.top[0].j, r.top[0].k) : "nowhere") + "."), study: "Publish the weights, test other sets, and report which sites survive most of them." },
+      { key: "exclude", name: "Exclude or weight?", here: f && a ? "Forbidding protected land adds " + musd(f.route.cost - a.route.cost) + " to the line; priced at " + mitWords(D) + ", it would cut through." : "No path in one of the two cases.", study: "Exclude only what a rule forbids; weight what people trade off, and say which is which." },
       { key: "res", name: "Resolution", here: "1 km cells leave " + km2(L.fine.X.areaKm2) + " for solar; 2 km cells, " + km2(L.coarse.X.areaKm2) + ". Setbacks are smaller than a cell.", study: "Use cells finer than the rules: NREL's supply curves work at 90 m." },
       { key: "vintage", name: "Data vintage", here: L.nNewer + " homes built since " + D.homes.vintage + " are missing from the dated layer" + (L.A && !L.stillHas ? "; one costs site A its room" : "") + ".", study: "Date every layer; check the leading sites on newer imagery and on the ground." },
       { key: "who", name: "Who was asked", here: "A developer's and the neighbours' weights pick different sites; nobody in this map was asked.", study: "Set criteria and weights with the people affected, and record whose they are." }
@@ -183,12 +204,14 @@
 
   var lesson = { model: model, hints: hints, s1Saw: s1Saw, s2Saw: s2Saw, s3Saw: s3Saw, s4Saw: s4Saw, s5Saw: s5Saw, s6Saw: s6Saw, s7Saw: s7Saw, s8Saw: s8Saw,
     corridor: corridor, limits: limits, rowsFor: rowsFor, staticFallback: staticFallback, limitRows: limitRows, weightsOf: weightsOf, presetW: presetW,
-    strictOver: strictOver, solarOver: solarOver, LAYERS: LAYERS, EXKEYS: EXKEYS, fmt: { comma: comma, km2: km2, musd: musd, musdS: musdS, pct: pct, sc: sc, km: km, gwh: gwh } };
+    strictOver: strictOver, solarOver: solarOver, exLabels: exLabels, ruleWords: ruleWords, sharesNote: sharesNote, mitWords: mitWords, NOWEIGHTS: NOWEIGHTS,
+    LAYERS: LAYERS, EXKEYS: EXKEYS, fmt: { comma: comma, km2: km2, musd: musd, musdS: musdS, pct: pct, sc: sc, km: km, gwh: gwh, usd100: usd100 } };
   if (typeof module !== "undefined" && module.exports) module.exports = lesson;
   if (typeof window === "undefined" || !window.LX) return;
 
   // ---------------------------------------------------------------- view
   var LX = window.LX, H = LX.H;
+  var UPNOTE = "Up front: the site's own costs in 2025 dollars (the new line, an access road, land and a water main). “+ upgrade”: the substation's upgrade and the wait are not priced, so that total is not comparable.";
 
   function seg(host, label, items, sel, onPick) {
     var g = H("div", { class: "lx-seg a19-seg", role: "group", "aria-label": label }, host), bs = {};
@@ -217,7 +240,7 @@
       var th = H("thead", null, tbl), tr = H("tr", null, th);
       head.forEach(function (h) { H("th", { scope: "col", text: h }, tr); });
       var tb = H("tbody", null, tbl);
-      if (!rows.length) { var e = H("tr", null, tb); H("td", { colspan: "6", text: "No block has room with these rules." }, e); return; }
+      if (!rows.length) { var e = H("tr", null, tb); H("td", { colspan: "6", text: opts.empty || "No block has room with these rules." }, e); return; }
       rows.forEach(function (r) {
         var row = H("tr", { class: r.id === sel ? "on" : "" }, tb), h = H("th", { scope: "row" }, row);
         var b = H("button", { type: "button", class: "a19-pick", "aria-pressed": r.id === sel ? "true" : "false", "aria-label": "Show site " + r.id + " on the map", text: r.id }, h);
@@ -263,17 +286,23 @@
           act.lxSet = function (k) { show(k); };
         } },
       // 2 exclusions
-      { text: "A solar farm cannot go everywhere. [[exclusion-layer|Exclusion layers]] remove land outright: protected land, flood zones, steep slopes and a [[setback|setback]] from homes. Switch them and watch the land left.",
+      { text: "A solar farm cannot go everywhere. [[exclusion-layer|Exclusion layers]] remove land outright: protected land, [[flood-zone|flood zones]], steep slopes and a setback from homes. Switch them and watch the land left.",
         build: function (act, api) {
           var map = mapIn(act, "Map of the solar farm's exclusions: hatched cells are excluded, shaded ones lose land to setbacks"), s = st(), moved = !!log.exMoved;
           var tg = H("div", { class: "lx-toggles a19-ctl", role: "group", "aria-label": "Exclusions for the solar farm" }, act), ts = {};
-          var names = { protected: "Protected land", flood: "Flood zones", slope: "Slope over " + T.solar.slopeMax + "%", setback: T.solar.setbackM + " m from homes" };
+          var names = exLabels(D, s.strict);
           EXKEYS.forEach(function (k) { ts[k] = LX.Toggle(tg, { label: names[k], on: s.ex[k], onChange: function (on) { s.ex[k] = on; keep("ex", s.ex); touched(); } }); });
           var strictT = LX.Toggle(tg, { label: "Stricter rules", on: s.strict, onChange: function (on) { s.strict = on; keep("strict", on); touched(); } });
           var ro = H("div", { class: "lx-readouts", "aria-live": "polite" }, act);
+          var rules = H("p", { class: "lx-hint", "aria-live": "polite" }, act);
           H("p", { class: "lx-hint", text: TX.always }, act);
+          H("p", { class: "lx-hint", text: TX.slope }, act);
           function paint() {
             var r = M.run("solar", Object.assign({ exclusions: s.ex }, strictOver(D, "solar", s.strict)));
+            // the switches name the thresholds in force: "Stricter rules" changes the slope limit and the setback
+            var lb = exLabels(D, s.strict);
+            ["slope", "setback"].forEach(function (k) { var sp = ts[k].el.querySelector("span"); if (sp) sp.textContent = lb[k]; });
+            rules.textContent = ruleWords(D, s.strict);
             map.draw({ layer: "base", X: r.X, homes: true });
             readouts(ro, [["Land left", km2(r.X.areaKm2)], ["Share of the region", pct(r.X.share)], ["2 km blocks with room", comma(r.BL.length)]]);
           }
@@ -289,6 +318,7 @@
           var grid = H("div", { class: "a19-sliders" }, act), sl = {};
           var tbl = SitesTable(act, function (id) { sel = id; paint(true); });
           H("p", { class: "lx-hint", text: TX.weights }, act);
+          H("p", { class: "lx-hint", html: LX.rich(TX.energy) }, act);
           T.solar.criteria.forEach(function (k) {
             sl[k] = LX.Slider(grid, { label: critLabel(D, "solar", k), min: 0, max: 100, step: 5, value: s.w[k], color: "var(--lx-accent)",
               fmt: function (v) { return String(v); }, onChange: function (v) { s.w[k] = v; keep("w", s.w); moves++; paint(); if (moves >= 1) { api.done(); api.saw(s3Saw(M, s)); } } });
@@ -296,36 +326,39 @@
           function paint(keepSel) {
             var r = M.run("solar", solarOver(D, s));
             if (!keepSel) { sel = null; tbl.sel(null); }
-            drawRun(map, r, { sel: sel });
-            tbl.set(tableRows(r));
+            if (r.top.noWeights) map.draw({ layer: "base", X: r.X });   // no weights, no scores: the land left only
+            else drawRun(map, r, { sel: sel });
+            tbl.set(tableRows(r), { empty: NOWEIGHTS });
           }
           paint();
           if (log.w) { api.done(); api.saw(s3Saw(M, s)); }
           act.lxSet = function (k, v) { sl[k].set(v); s.w[k] = v; keep("w", s.w); paint(); api.done(); api.saw(s3Saw(M, s)); };
         } },
       // 4 who sets the weights
-      { text: "Weights are value choices, not physics. Pick whose weights to use; then see how often each site wins when " + D.sensitivity.draws + " sets of weights are drawn at random.",
+      { text: "Weights are value choices, not physics. With the default rules, pick whose weights to use; then see how often each site wins when " + D.sensitivity.draws + " sets of weights are drawn at random.",
         build: function (act, api) {
-          var map = mapIn(act, "Suitability map for the solar farm under the chosen weights"), seen = log.presets || {}, cur = "developer";
+          var map = mapIn(act, "Suitability map for the solar farm under the chosen weights, with the default rules"), seen = log.presets || {}, cur = "developer";
           var sg = seg(H("div", { class: "a19-ctl" }, act), "Whose weights", [["developer", D.presets.developer.label], ["neighbours", D.presets.neighbours.label], ["equal", D.presets.equal.label]], cur, function (k) { pick(k); });
           var ro = H("div", { class: "lx-readouts", "aria-live": "polite" }, act);
           var bars = H("div", { class: "a19-bars" }, act);
+          H("p", { class: "lx-hint", text: TX.rules4 }, act);
           H("p", { class: "lx-hint", text: TX.random }, act);
           (function drawShares() {
             var sh = M.shares("solar"), r0 = M.run("solar");
-            H("p", { class: "a19-tcap", text: "With the default rules: how often each default site wins under " + sh.draws + " random weightings" }, bars);
+            H("p", { class: "a19-tcap", text: "With the default rules: how often each default site is the winning block under " + sh.draws + " random weightings" }, bars);
             var list = H("ul", { class: "a19-barlist" }, bars);
-            r0.top.map(function (s) { return [s.id + " (" + A19.place(M.R, s.i, s.j, s.k) + ")", sh.wins[s.id]]; }).concat([["Outside the top five", sh.other]]).forEach(function (row) {
+            r0.top.map(function (s) { return [s.id + " (" + A19.place(M.R, s.i, s.j, s.k) + ")", sh.wins[s.id]]; }).concat([["Another block", sh.other]]).forEach(function (row) {
               var li = H("li", null, list); H("span", { class: "a19-bl", text: row[0] }, li);
               var tr = H("span", { class: "a19-bt", "aria-hidden": "true" }, li); H("i", { style: "width:" + (100 * row[1] / sh.draws).toFixed(1) + "%" }, tr);
               H("b", { text: pct(row[1] / sh.draws) }, li);
             });
+            H("p", { class: "a19-tnote", text: sharesNote(M) }, bars);
           })();
           function pick(k) {
             cur = k; sg.set(k); seen[k] = true; keep("presets", seen);
             var r = M.run("solar", { weights: presetW(D, "solar", k) }), s = r.top[0];
             drawRun(map, r, { sites: s ? [Object.assign({}, s, { id: "best", label: "Best" })] : [], sel: "best", sitesKey: "The best site under these weights" });
-            readouts(ro, [["Best site", s ? A19.place(M.R, s.i, s.j, s.k) : "none"], ["Its score", s ? sc(s.score) : "–"], ["Up front", s ? musd(r.costs[0].upfront) : "–"]]);
+            readouts(ro, [["Rules", "the defaults"], ["Best site", s ? A19.place(M.R, s.i, s.j, s.k) : "none"], ["Its score", s ? sc(s.score) : "–"], ["Up front", s ? musd(r.costs[0].upfront) : "–"]]);
             if (Object.keys(seen).length >= 2) { api.done(); api.saw(s4Saw(M)); }
           }
           pick(cur);
@@ -365,7 +398,7 @@
             cur = k; sg.set(k); seen[k] = true; keep("corr", seen);
             var c = corridor(M, sb, k), r = windAt(M, sb);
             if (!c) { readouts(ro, [["Line", "no path"]]); return; }
-            map.draw({ layer: "protected", sites: [c.site], sel: "A", path: c.route.cells, sitesKey: "Wind site A" });
+            map.draw({ layer: "protected", sites: [c.site], sel: "A", path: c.route.cells, sitesKey: "Wind site A", grid: true });
             readouts(ro, [["Length", km(c.route.km)], ["Cost", musd(c.route.cost)], ["To", subName(D, c.route.sub)]]);
             var pn = { farmland: "farmland", fringe: "the rural fringe", built: "built-up land", wet: "flood zones", hilly: "slopes over 5%", protected: "protected land" };
             parts.textContent = "Along the way: " + Object.keys(c.route.parts).map(function (p) { return km(c.route.parts[p]) + " of " + pn[p]; }).join(", ") + ".";
@@ -375,20 +408,20 @@
           act.lxSet = function (k) { pick(k); };
         } },
       // 7 the data center
-      { text: "A [[data-center|data-center]] campus is a load and a building: " + T.dc.mw + " MW from the grid, water, a road, dry land. Compare substations with " + T.dc.mw + " MW to spare against any substation.",
+      { text: "A [[data-center|data-center]] campus is a load and a building: " + T.dc.mw + " MW from the grid, water, a road, dry land. Compare substations with " + T.dc.mw + " MW of [[spare-capacity|spare capacity]] against any substation.",
         build: function (act, api) {
           var map = mapIn(act, "Suitability map for the data-center campus, with the five best 1 km cells"), seen = log.dc || {}, cur = "spare";
           var sg = seg(H("div", { class: "a19-ctl" }, act), "Which substations count", [["spare", "Only with " + T.dc.mw + " MW spare"], ["any", "Any substation"]], cur, function (k) { pick(k); });
           var ro = H("div", { class: "lx-readouts", "aria-live": "polite" }, act);
           H("p", { class: "lx-hint", text: TX.dc }, act);
-          var tbl = SitesTable(act, function (id) { var r = dcRun(M, cur === "any"); drawRun(map, r, { sel: id }); });
+          var tbl = SitesTable(act, function (id) { var r = dcRun(M, cur === "any"); drawRun(map, r, { sel: id, grid: true }); });
           function pick(k) {
             cur = k; sg.set(k); seen[k] = true; keep("dc", seen);
-            var r = dcRun(M, k === "any"); drawRun(map, r); tbl.sel(null);
-            var rows = tableRows(r).map(function (x, i) { var sub = r.costs[i].sub && subOf(D, r.costs[i].sub); if (sub && sub.headroomMW < T.dc.mw) x.upgrade = true; return x; });
-            tbl.set(rows, { last: "Water main", lastKey: "water" });
-            var k0 = r.costs[0];
-            readouts(ro, [["Site A, up front", k0 ? musd(k0.upfront) : "–"], ["Line", k0 ? musd(k0.connect) : "–"], ["Water main", k0 ? musd(k0.water) : "–"], ["Land", k0 ? musd(k0.land) : "–"]]);
+            var r = dcRun(M, k === "any"); drawRun(map, r, { grid: true }); tbl.sel(null);
+            var rows = tableRows(r), anyUp = rows.some(function (x) { return x.upgrade; });
+            tbl.set(rows, { last: "Water main", lastKey: "water", note: anyUp ? UPNOTE : null });
+            var k0 = r.costs[0], up0 = rows[0] && rows[0].upgrade;
+            readouts(ro, [["Site A, up front" + (up0 ? " + upgrade" : ""), k0 ? musd(k0.upfront) : "–"], ["Line", k0 ? musd(k0.connect) : "–"], ["Water main", k0 ? musd(k0.water) : "–"], ["Land", k0 ? musd(k0.land) : "–"]]);
             if (seen.spare && seen.any) { api.done(); api.saw(s7Saw(M)); }
           }
           pick(cur);
@@ -433,7 +466,7 @@
       setTimeout(function () {
         var host = live.querySelector(".lx-step-act");
         if (!host || !host.lxSet) return;
-        if (i === 0) { host.lxSet("protected"); host.lxSet("slope"); host.lxSet("wind"); }
+        if (i === 0) { host.lxSet("protected"); host.lxSet("wind"); host.lxSet("grid"); }   // ends on the grid layer: its table shows
         if (i === 1) host.lxSet("setback", true);
         if (i === 2) host.lxSet("homes", 40);
         if (i === 3) { host.lxSet("neighbours"); host.lxSet("developer"); }
@@ -466,7 +499,7 @@
         at: { layers: [0, 0], excl: [1, 0], score: [2, 0], sites: [2, 1], cost: [1, 1], ask: [1, 2], field: [0, 2], back: [2, 2] },
         atN: { layers: [0, 0], excl: [1, 0], score: [1, 1], sites: [0, 1], cost: [0, 2], ask: [0, 3], back: [1, 3], field: [0, 4] },
         edges: [["layers", "excl"], ["excl", "score"], ["score", "sites"], ["sites", "cost"], ["cost", "ask"], ["ask", "field", "yes"], ["ask", "back", "no"]],
-        traces: [{ label: "Your solar run", path: ["layers", "excl", "score", "sites", "cost"], text: top ? "Your rules leave " + km2(r.X.areaKm2) + "; your weights rank site A " + A19.place(M.R, top.i, top.j, top.k) + " first, at " + sc(top.score) + ": " + musd(k0.upfront) + " up front, " + gwh(k0.mwh) + " a year." : "No block has room with your rules." },
+        traces: [{ label: "Your solar run", path: ["layers", "excl", "score", "sites", "cost"], text: top ? "Your rules leave " + km2(r.X.areaKm2) + "; your weights rank site A " + A19.place(M.R, top.i, top.j, top.k) + " first, at " + sc(top.score) + ": " + musd(k0.upfront) + " up front, " + gwh(k0.mwh) + " a year." : r.top.noWeights ? "Your rules leave " + km2(r.X.areaKm2) + "; your weights are all 0, so no site is ranked." : "No block has room with your rules." },
                  { label: "When people disagree", path: ["sites", "cost", "ask", "back"], text: "Neighbours' weights pick another site: the screen goes back to its weights, not to a new map." }]
       });
       var c2 = H("div", { class: "lx-xcard" }, host);

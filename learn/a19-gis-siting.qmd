@@ -71,6 +71,8 @@ body-classes: "page-learn page-lesson lx-form-cards"
 .a19-fb-h { margin: .8rem 0 .2rem; }
 .a19-nb { margin-top: 1.2rem; max-width: 980px; } .a19-dl { margin-top: .6rem !important; display: flex; flex-wrap: wrap; gap: 8px; }
 .a19-nb-steps { margin: .4rem 0 0; padding-left: 1.3rem; display: grid; gap: 2px; }
+.a19-pr { width: auto; margin: 4px 0 6px; } .a19-pr th, .a19-pr td { padding: 2px 14px 2px 0; text-align: left; font-family: var(--lx-f-body); font-size: 13.5px; }
+.a19-pr td.n { font-variant-numeric: tabular-nums; }
 @media (max-width: 560px) { .a19-tbl { font-size: 13px; } .a19-tbl td, .a19-tbl th { padding-right: 6px; } .a19-barlist li { grid-template-columns: minmax(0, 1fr) 3em; } .a19-bt { grid-column: 1 / -1; grid-row: 2; } }
 </style>
 ```
@@ -90,12 +92,13 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <p><b>Corridor</b> from wind site A to West (S3): 13.7 km for $15.3 million with protected land forbidden; 10.2 km for $11.7 million when it is allowed at NREL's mitigation cost (3.4 km through it).</p>
 <p>Up-front costs are 2025 dollars (NREL's 2022 line costs converted with BEA's GDP deflator): the new line, an access road, land and, for the data center, a water main. Energy is a year's output; the two are never added.</p>
 <!-- a19-fallback:end -->
-<p class="lx-hint">With JavaScript on, you work through the screen yourself: a map of the region with its layers, switches for the exclusions, sliders for the weights, a line routed to a substation and a table of the best sites under the map.</p>
+<p class="lx-hint">With JavaScript on, you run the screen yourself: a map with its layers, switches for the exclusions, sliders for the weights, a routed line and a table of the best sites.</p>
 </div>
 </div>
 <div class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><ul>
 <li><b>Fictional:</b> Prairie City is fictional; its numbers are illustrative. Every layer is generated from a seed and a stated recipe; nothing was downloaded.</li>
-<li><b>Sourced:</b> solar arrays take 4.2 acres per MW of panels, single-axis tracking, with 1.29 MW of panels per MW of inverters (<a href="https://emp.lbl.gov/sites/default/files/emp-files/land_requirements_for_utility-scale_pv.pdf">LBNL</a>, 2019 plants); wind farms spread over 34.5 ha per MW (<a href="https://docs.nlr.gov/docs/fy09osti/45834.pdf">NREL, 2009</a>, Table 1).</li>
+<li><b>Sourced:</b> tracking solar arrays take 4.2 acres per MW of panels (DC); 2019's tracking plants had 1.29 MW of panels per MW of <span class="lx-term" data-term="inverter">inverters</span> (AC, the grid side) (<a href="https://emp.lbl.gov/sites/default/files/emp-files/land_requirements_for_utility-scale_pv.pdf">LBNL</a>, slides 13 and 8).</li>
+<li><b>Sourced:</b> wind farms spread over 34.5 ha per MW, where 1 ha = 10,000 m², about 2.5 acres (<a href="https://docs.nlr.gov/docs/fy09osti/45834.pdf">NREL, 2009</a>, Table 1).</li>
 <li><b>Sourced:</b> setbacks, slope rules and the line's cost per mile come from <a href="https://docs.nlr.gov/docs/fy25osti/91900.pdf">NREL's 2024 supply curves</a> (Tables 7, 9, 11 and 12), in 2022 dollars, shown in 2025 dollars with <a href="https://apps.bea.gov/iTable/?reqid=19&amp;step=3&amp;isuri=1&amp;1921=survey&amp;1903=13&amp;1904=2022&amp;1905=2026&amp;1906=a&amp;1911=0">BEA's GDP deflator</a>.</li>
 <li><b>Shared city data:</b> the data-center campus's 150 MW contract comes from Prairie City's data, as on the course's other city pages.</li>
 <li><b>Set for teaching:</b> the four transmission substations S1–S4 and their spare capacity, land prices, access roads, water mains, block sizes and the capacity-factor rules.</li>
@@ -103,7 +106,8 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <p class="lx-hint" style="margin-top:.6rem">About 25 guided minutes in eight steps. Practice, about 30 more: the set under Check.</p>
 <div class="lx-card lx-notebook a19-nb">
 <p class="lx-eyebrow">Optional · build it in Python · notebook lab, about 60 minutes</p>
-<p>The same region in NumPy from the same seed, with <code>assert</code> cells against this page: masks, scores, the best blocks, a least-cost path, and the sites passed to the cost model. A last section lists the public layers a real screen would use instead.</p>
+<p>The same region in NumPy, from the same seed, checked against this page with <code>assert</code> cells.</p>
+<p>Inside: masks, scores and the best blocks; a least-cost path; a cost model; cleaning and aligning simulated raw layers; the public layers a real screen would use.</p>
 <ol class="a19-nb-steps">
 <li>Download the notebook and the lesson data into one folder (in Colab, upload the data with the folder icon).</li>
 <li>Open it in Google Colab (<em>File → Upload notebook</em>) or locally with Python 3 and NumPy.</li>
@@ -145,15 +149,15 @@ body-classes: "page-learn page-lesson lx-form-cards"
 |---|---|---|
 | A criterion's score | $s = 1 - \min\!\big(1, \max(0, \tfrac{d - d_0}{d_1 - d_0})\big)$ | near a substation: 1 at 0 km, 0 from 15 km (solar) |
 | Suitability | $S = \sum_k w_k s_k \,/\, \sum_k w_k$ | default solar weights 20, 35, 15, 20, 10 |
-| Room in a block | $B = \sum_c a_c f_c \ge$ the land needed | 150 × 1.29 × 4.2 = 812.7 acres = 3.29 km² of a 4 km² block |
-| A line's cost | $\sum_\text{steps} \tfrac{c_u + c_v}{2}\,\ell$ | $c$ = $1,095,979 per km on farmland (2025 dollars), × 1.8 in flood zones |
+| Room in a block | $B = \sum_c a_c f_c \ge$ the land needed | 150 × 1.29 × 4.2 = 812.7 acres ≈ 3.29 km² of a 4 km² block |
+| A line's cost | $\sum_\text{steps} \tfrac{c_u + c_v}{2}\,\ell$ | $c$ ≈ $1,095,979 per km on farmland (2025 dollars), × 1.8 in [flood zones]{.lx-term term="flood-zone"} |
 
 - **Scores.** $d$ is a distance in km and $d_0$, $d_1$ the ramp's ends; $w_k$ is a weight and $s_k$ a score from 0 to 1.
 - **Blocks.** $a_c$ is a cell's area in km² and $f_c$ its share outside setbacks, checked at 16 points.
 - **Lines.** $c_u$ and $c_v$ are two neighbouring cells' costs per km; the step $\ell$ is 1 km, or $\sqrt{2}$ km on a diagonal.
 - **Resources** are rescaled from the region's lowest (0) to its highest (1); land price falls from 1 at $2,500 an acre to 0 at $15,000.
 - **The line's cost per km** is NREL's $1,615,100 a mile (2022 dollars) × 128.893 / 118.026 (BEA's GDP deflator, to 2025 dollars) ÷ 1.609344 km a mile.
-- **Ties.** Equal scores go to the more northern, then the more western block. Equal-cost paths can differ in their steps; the page draws the first its search finds, and its length and cost are the same on all of them.
+- **Ties.** Equal scores go to the more northern, then the more western block. Equal-cost paths may differ in their steps but share their length and cost; the page draws the first found.
 
 ```{=html}
 </div>
@@ -164,7 +168,8 @@ body-classes: "page-learn page-lesson lx-form-cards"
 ```
 
 - **The notebook** (above) rebuilds every layer as a NumPy array from the same seed, then masks, scores, ranks blocks and runs Dijkstra's algorithm for the line.
-- **Real layers** come as rasters and vectors in different coordinate systems: project them to one equal-area grid before measuring distance or area.
+- **Real layers** come as rasters and vectors in different coordinate systems, with gaps and errors; the notebook cleans and aligns simulated ones onto one grid.
+- **Areas and distances.** An equal-area projection keeps areas true, not distances: check its distance error where you measure setbacks and routes, or measure on the curved Earth (geodesic distances).
 - **A supply curve** sorts many sites by their cost, as NREL's supply curves do for about 67,000 cells of 11.5 km × 11.5 km, and hands it to a planning model such as [M3](m03-capacity-expansion.html).
 - **Out of this course's scope:** remote sensing, geostatistics, cartography and field surveys.
 
@@ -174,7 +179,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <details class="lx-deeper">
 <summary><span class="k">Go deeper</span>The data-center card: spare capacity and the cost of waiting</summary>
 <div class="lx-deeper-body">
-<p>A campus near a substation without spare capacity waits for an upgrade. In step 7, that wait has no price; one study prices it.</p>
+<p>A campus near a substation without <span class="lx-term" data-term="spare-capacity">spare capacity</span> waits for an upgrade. In step 7, that wait has no price; one study prices it.</p>
 <blockquote class="lx-excerpt" data-source="excerpt:code"><p>A late grid connection costs the developer lost <span class="lx-term" data-term="margin">margin</span> and <span class="lx-term" data-term="carrying-cost">carrying costs</span>; ratepayers face utility carrying and <span class="lx-term" data-term="stranded-cost">stranding</span> costs; society bears <span class="lx-term" data-term="external-cost">external costs</span>.</p><p>The study keeps these present-value accounts separate.</p><footer>Approved excerpt of: Li et al. (2026), accepted paper, 2026 North American Power Symposium (NAPS); DOI pending.</footer></blockquote>
 <p class="lx-hint">Holds when: the delay is given and the inputs are illustrative. Leaves out: why service is late.</p>
 <p class="lx-hint">The full case: case file <a href="cf7-cost-of-waiting.html">CF7</a>; how a large load asks for service: <a href="a06-interconnection.html">A6</a>.</p>
@@ -211,12 +216,12 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-qq" data-id="weight" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “Excluding land and giving it a low weight do the same job.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. Priced at $38,000 a mile, the new line crossed 3.4 km of protected land; only the exclusion kept it out.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. Priced at about $41,500 a mile (NREL's $38,000 in 2022 dollars), the new line crossed 3.4 km of protected land; only the exclusion kept it out.</p></details>
 </div>
 <div class="lx-qq" data-id="sun" data-answer="myth">
-<p class="lx-qtext">Myth or fact? “Within one county, sunshine decides where a solar farm goes.”</p>
+<p class="lx-qtext">Myth or fact? “Sunshine differs by only 4.5% across this region, so it barely moves a solar site's score.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth, here: sunshine differs by only 4.5% across the 44 km region, so land, roads and a substation with room decide more.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. Min–max scaling stretches the 4.5% to a full 0 to 1: at weight 20, sunshine spreads blocks' scores by about 19 points, more than cheap land's 17. Scaling and weights, not physics, set that.</p></details>
 </div>
 <div class="lx-qq" data-id="res" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “A map of 1 km cells can check a 220 m setback.”</p>
@@ -240,13 +245,15 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-card a19-practice">
 <p class="lx-eyebrow">Practice · about 30 minutes on your own</p>
 <ol class="lx-fb-practice">
-<li><p><b>A score by hand.</b> A cell scores 0.6 for sunshine, 0.9 near a substation, 1.0 near a road, 0.4 for cheap land and 0.5 away from homes. With weights 20, 35, 15, 20 and 10, what is its suitability?</p><details class="lx-answer"><summary>Answer</summary><p>(0.6 × 20 + 0.9 × 35 + 1.0 × 15 + 0.4 × 20 + 0.5 × 10) ÷ 100 = 71.5 of 100.</p></details></li>
-<li><p><b>Other weights.</b> Score the same cell with the neighbours' weights, 10, 10, 5, 5 and 70.</p><details class="lx-answer"><summary>Answer</summary><p>(6 + 9 + 5 + 2 + 35) ÷ 100 = 57 of 100: lower, because this cell is close to homes.</p></details></li>
+<li><p><b>A score by hand.</b> One cell's scores and the default weights are below. What is its suitability, out of 100?</p>
+<div class="lx-scroll-x"><table class="lx-facts a19-pr" data-practice="score"><thead><tr><th scope="col">Criterion</th><th scope="col">Score, 0 to 1</th><th scope="col">Weight</th><th scope="col">Neighbours' weight</th></tr></thead><tbody><tr><th scope="row">Sunshine</th><td class="n">0.6</td><td class="n">20</td><td class="n">10</td></tr><tr><th scope="row">Near a substation</th><td class="n">0.9</td><td class="n">35</td><td class="n">10</td></tr><tr><th scope="row">Near a road</th><td class="n">1.0</td><td class="n">15</td><td class="n">5</td></tr><tr><th scope="row">Cheap land</th><td class="n">0.4</td><td class="n">20</td><td class="n">5</td></tr><tr><th scope="row">Away from homes</th><td class="n">0.5</td><td class="n">10</td><td class="n">70</td></tr></tbody></table></div><details class="lx-answer"><summary>Answer</summary><p>(0.6 × 20 + 0.9 × 35 + 1.0 × 15 + 0.4 × 20 + 0.5 × 10) ÷ 100 = 0.715, or 71.5 out of 100.</p></details></li>
+<li><p><b>Other weights.</b> Score the same cell with the neighbours' weights, the table's last column.</p><details class="lx-answer"><summary>Answer</summary><p>(0.6 × 10 + 0.9 × 10 + 1.0 × 5 + 0.4 × 5 + 0.5 × 70) ÷ 100 = 0.57, or 57 out of 100: lower, because this cell is close to homes.</p></details></li>
 <li><p><b>Land for solar.</b> A 200 MW (AC) farm has 1.3 MW of panels per MW of inverters. At LBNL's 4.2 acres per MW of panels, how much land do the arrays need?</p><details class="lx-answer"><summary>Answer</summary><p>200 × 1.3 × 4.2 = 1,092 acres, about 4.42 km²; the whole site is larger (roads, fences, setbacks).</p></details></li>
-<li><p><b>Land for wind.</b> A 100 MW wind farm at NREL's average of 34.5 ha per MW: how large is it, and how much of it do turbines, roads and substations occupy for good, at 0.3 ha per MW?</p><details class="lx-answer"><summary>Answer</summary><p>3,450 ha (34.5 km²) in all; 30 ha for good, under 1%: farming goes on between the turbines.</p></details></li>
-<li><p><b>Setbacks.</b> 40 farmsteads, none within 800 m of another. How much land does a 400 m setback remove, and how much a 220 m one?</p><details class="lx-answer"><summary>Answer</summary><p>40 × π × 0.4² = 20.1 km² against 40 × π × 0.22² = 6.1 km²: the area grows with the square of the setback.</p></details></li>
-<li><p><b>A line's cost.</b> A 12 km route runs 8 km over farmland and 4 km through a flood zone (× 1.8). At NREL's $1,615,100 a mile in 2022 dollars, what does it cost in 2025 dollars (deflator 128.893 / 118.026)?</p><details class="lx-answer"><summary>Answer</summary><p>$1,615,100 × 1.0921 ÷ 1.609344 = $1,095,979 a km; × (8 + 4 × 1.8) = $16.7 million in 2025 dollars.</p></details></li>
-<li><p><b>A least-cost path by hand.</b> A 3 × 3 grid's costs per km, by row: 1 1 4 / 1 5 1 / 2 1 1. A step to a side-by-side cell costs the two cells' average. Cheapest path, top-left to bottom-right?</p><details class="lx-answer"><summary>Answer</summary><p>Down the left column, then along the bottom row: 1 + 1.5 + 1.5 + 1 = 5. Along the top row and down the right column costs 7.</p></details></li>
+<li><p><b>Land for wind.</b> A 100 MW wind farm takes NREL's average 34.5 ha per MW. How large is it, and how much do turbines, roads and substations occupy for good, at 0.3 ha per MW?</p><details class="lx-answer"><summary>Answer</summary><p>3,450 ha (34.5 km²) in all; 30 ha for good, under 1%: farming goes on between the turbines.</p></details></li>
+<li><p><b>Setbacks.</b> 40 farmsteads, none within 800 m of another. How much land does a 400 m setback remove, and how much a 220 m one?</p><details class="lx-answer"><summary>Answer</summary><p>40 × π × 0.4² ≈ 20.1 km² against 40 × π × 0.22² ≈ 6.1 km²: the area grows with the square of the setback.</p></details></li>
+<li><p><b>A line's cost.</b> A 12 km route crosses 8 km of farmland and 4 km of flood zone (× 1.8). Price it in 2025 dollars: NREL's $1,615,100 a mile (2022), deflator 128.893 ÷ 118.026.</p><details class="lx-answer"><summary>Answer</summary><p>$1,615,100 × 128.893 ÷ 118.026 ÷ 1.609344 ≈ $1,095,979 a km; × (8 + 4 × 1.8) ≈ $16.7 million in 2025 dollars.</p></details></li>
+<li><p><b>A least-cost path by hand.</b> Each step goes to a side-by-side cell and costs the two cells' average (costs per km below). What is the cheapest path from top left to bottom right?</p>
+<div class="lx-scroll-x"><table class="lx-facts a19-pr" data-practice="grid"><thead><tr><th scope="col">Row</th><th scope="col">Left</th><th scope="col">Middle</th><th scope="col">Right</th></tr></thead><tbody><tr><th scope="row">Top</th><td class="n">1</td><td class="n">1</td><td class="n">4</td></tr><tr><th scope="row">Middle</th><td class="n">1</td><td class="n">5</td><td class="n">1</td></tr><tr><th scope="row">Bottom</th><td class="n">2</td><td class="n">1</td><td class="n">1</td></tr></tbody></table></div><details class="lx-answer"><summary>Answer</summary><p>Down the left column, then along the bottom row: 1 + 1.5 + 1.5 + 1 = 5. Along the top row and down the right column costs 7.</p></details></li>
 <li><p><b>Read a claim critically.</b> A report says: “Our map shows the best solar site in the county.” What four questions would you ask?</p><details class="lx-answer"><summary>Answer</summary><p>Whose weights, and would other weights pick another site; which land was excluded, by what rule; how fine and how recent the layers are; who was asked, and what a visit found.</p></details></li>
 </ol>
 </div>
@@ -266,7 +273,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <thead><tr><th scope="col">Number</th><th scope="col">What it means</th><th scope="col">Source</th></tr></thead>
 <tbody>
 <tr><td class="n">4.2 acres per MW</td><td>Land under single-axis tracking solar arrays per MW of panels (DC), the median of U.S. plants built in 2019; the whole site is larger.</td><td class="s"><a href="https://emp.lbl.gov/sites/default/files/emp-files/land_requirements_for_utility-scale_pv.pdf">LBNL slides</a>, slide 13 (PDF) · 1 February 2022</td></tr>
-<tr><td class="n">34.5 ha per MW</td><td>Average total area of U.S. wind plants; turbines, roads and substations occupy about 0.3 ha per MW of it for good.</td><td class="s"><a href="https://docs.nlr.gov/docs/fy09osti/45834.pdf">NREL (2009)</a>, Table 1, p. 10 (PDF) · August 2009</td></tr>
+<tr><td class="n">34.5 ha per MW</td><td>Average total area of U.S. wind plants (1 ha = 10,000 m²); turbines, roads and substations occupy about 0.3 ha per MW of it for good.</td><td class="s"><a href="https://docs.nlr.gov/docs/fy09osti/45834.pdf">NREL (2009)</a>, Table 1, p. 10 (PDF) · August 2009</td></tr>
 <tr><td class="n">220 m · 61 m</td><td>Setbacks from buildings for wind and for solar in NREL's reference case: the median of existing local rules.</td><td class="s"><a href="https://docs.nlr.gov/docs/fy25osti/91900.pdf">NREL (2025)</a>, Tables 7 and 9 (PDF) · revised June 2025</td></tr>
 <tr><td class="n">$1.6 million a mile</td><td>A new 138 kV line over pasture with MISO's costs (also used for SPP), in 2022 dollars, before land-cover multipliers.</td><td class="s"><a href="https://docs.nlr.gov/docs/fy25osti/91900.pdf">NREL (2025)</a>, Table 11, p. 34 (PDF) · revised June 2025</td></tr>
 </tbody>
@@ -289,14 +296,14 @@ body-classes: "page-learn page-lesson lx-form-cards"
 ```{=html}
 <div class="lx-card lx-real">
 <p class="lx-eyebrow">In the real world</p>
-<p>NREL's 2024 supply curves screen the contiguous U.S. the same way: exclusions with local setbacks on 90 m cells, about 67,000 candidate sites of 11.5 km × 11.5 km for wind and solar, and least-cost paths to the grid.</p>
+<p>NREL's 2024 supply curves screen the contiguous U.S. the same way: exclusions and local setbacks on 90 m cells, about 67,000 candidate sites of 11.5 km × 11.5 km, and least-cost paths to the grid.</p>
 <p class="lx-hint">Where its median setbacks become the 90th percentile of local rules, much less land is left: the rules are local choices.</p>
 </div>
 <div class="lx-card lx-sources">
 <p class="lx-eyebrow">Sources and further reading</p>
 <ul>
 <li>Lopez, A., Zuckerman, G. R., Pinchuk, P., Gleason, M., Rivers, M., Roberts, O., Williams, T., Heimiller, D., Thomson, S.-M., Mai, T., and Cole, W. (2025). <a href="https://docs.nlr.gov/docs/fy25osti/91900.pdf">Renewable Energy Technical Potential and Supply Curves for the Contiguous United States: 2024 Edition</a> (PDF). NREL/TP-6A20-91900, revised June 2025. Candidate sites, p. 2; reference and limited cases, pp. 18–19; wind siting, Table 7; solar siting, Table 9; least-cost paths, §2.5; Tables 11 and 12 and the mitigation costs, p. 34.</li>
-<li>Bolinger, M., and Bolinger, G. (2022). <a href="https://doi.org/10.1109/JPHOTOV.2021.3136805">Land Requirements for Utility-Scale PV: An Empirical Update on Power and Energy Density</a>. <em>IEEE Journal of Photovoltaics</em>. Summary slides, <a href="https://emp.lbl.gov/sites/default/files/emp-files/land_requirements_for_utility-scale_pv.pdf">LBNL</a> (PDF), 1 February 2022: 2019 medians, slide 13; DC:AC ratios, slide 8; array area only, slide 7.</li>
+<li>Bolinger, M., and Bolinger, G. (2022). <a href="https://doi.org/10.1109/JPHOTOV.2021.3136805">Land Requirements for Utility-Scale PV: An Empirical Update on Power and Energy Density</a>. <em>IEEE Journal of Photovoltaics</em>. Summary slides, <a href="https://emp.lbl.gov/sites/default/files/emp-files/land_requirements_for_utility-scale_pv.pdf">LBNL</a> (PDF), 1 February 2022: 2019 medians, slide 13; DC:AC ratio by year, the sample table on slide 8 (2019 tracking plants: 4,406 MW DC over 3,419 MW AC, 1.29); array area only, slide 7.</li>
 <li>Denholm, P., Hand, M., Jackson, M., and Ong, S. (2009). <a href="https://docs.nlr.gov/docs/fy09osti/45834.pdf">Land-Use Requirements of Modern Wind Power Plants in the United States</a> (PDF). NREL/TP-6A2-45834. Table 1, p. 10.</li>
 <li>Ong, S., Campbell, C., Denholm, P., Margolis, R., and Heath, G. (2013). <a href="https://docs.nlr.gov/docs/fy13osti/56290.pdf">Land-Use Requirements for Solar Power Plants in the United States</a> (PDF). NREL/TP-6A20-56290. Whole sites, Table ES-1, p. v.</li>
 <li>Dollar years: U.S. Bureau of Economic Analysis. <a href="https://apps.bea.gov/iTable/?reqid=19&amp;step=3&amp;isuri=1&amp;1921=survey&amp;1903=13&amp;1904=2022&amp;1905=2026&amp;1906=a&amp;1911=0">NIPA Table 1.1.9, Implicit Price Deflators for Gross Domestic Product</a>, line 1, annual: 2022 118.026, 2025 128.893 (as of 30 September 2026, read through FRED's annual series on 6 November 2026).</li>
