@@ -287,7 +287,12 @@ const invEl = s => (B.sectors[s].el || 0) * 1000 * tPerMWh, invGas = s => (B.sec
 ok(rel(D.inventory2025.sectors.datacenter, invEl("datacenter"), 1e-3), "inventory: data center = MWh x SPP North rate");
 ok(rel(D.inventory2025.sectors.fertilizer, invEl("fertilizer") + invGas("fertilizer"), 1e-3), "inventory: fertilizer = electricity + gas (all carbon counted)");
 ok(rel(D.inventory2025.sectors.transport, invEl("transport") + TR.gasolineGal * E.kgCO2.gasolinePerGal / 1000 + (TR.buses.dieselGal + TR.trucksDieselGal) * E.kgCO2.dieselPerGal / 1000, 1e-3), "inventory: transport = EVs + gasoline + diesel");
-ok(rel(D.inventory2025.sectors.homes, invEl("homes") + invGas("homes") + T.propaneGal * E.kgCO2.propanePerGal / 1000, 1e-3), "inventory: homes = electricity + gas + propane");
+// rooftop solar used on site is not grid-supplied (GPC scope 2): its MWh come off homes' and businesses' electricity, in
+// proportion to their use (coordinator, 2026-11-06; engine E3 counts electricity bought, so the two agree)
+const roofT = s => D.supply.rooftopMWh * B.sectors[s].el / (B.sectors.homes.el + B.sectors.commercial.el) * tPerMWh;
+ok(rel(D.inventory2025.sectors.homes, invEl("homes") - roofT("homes") + invGas("homes") + T.propaneGal * E.kgCO2.propanePerGal / 1000, 1e-3), "inventory: homes = grid electricity (less its rooftop share) + gas + propane");
+ok(rel(D.inventory2025.sectors.commercial, invEl("commercial") - roofT("commercial") + invGas("commercial"), 1e-3), "inventory: commercial = grid electricity (less its rooftop share) + gas");
+ok(near(roofT("homes") + roofT("commercial"), D.supply.rooftopMWh * tPerMWh, 0.5), "the rooftop deductions add up to the rooftop MWh at the grid rate");
 ok(D.inventory2025.total === sum(Object.values(D.inventory2025.sectors)), "inventory total is the sum of its rows");
 
 // ---------------- the README section
