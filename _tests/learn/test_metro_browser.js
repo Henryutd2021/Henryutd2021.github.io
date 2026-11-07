@@ -146,6 +146,16 @@ async function pageChecks(P) {
     ok(!card(), `${label}: Escape closes the card`);
     const want2 = opener();
     ok(!!want2 && document.activeElement === want2, `${label}: focus returns to the opener (now on ${document.activeElement ? document.activeElement.tagName + "." + (document.activeElement.getAttribute("class") || "") : "nothing"})`);
+    // a click outside the card closes it too (Henry, 2026-11-07); a click inside does not
+    if (want2) {
+      key(want2, "Enter"); await settle();
+      if (card()) {
+        card().querySelector(".ph").click(); await settle();
+        ok(!!card(), `${label}: a click inside the card keeps it open`);
+        document.body.click(); await settle();
+        ok(!card(), `${label}: a click outside the card closes it`);
+      }
+    }
   }
   await document.fonts.ready;
   for (let k = 0; k < 40 && !(svg() && svg().querySelector(".stn")); k++) await wait(100);

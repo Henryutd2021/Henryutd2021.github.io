@@ -446,6 +446,12 @@
         if (on) { opener = { el: d }; var first = st.filter(function (l) { return l.tier === t.id; })[0]; if (first) open("s" + first.starter, true); else openTier(k); }
       });
     });
+    // a click anywhere outside the open card closes it (Henry, 2026-11-07); a click on a station, door or label then opens
+    // its own card as before. Captured on the document, so it runs before the station's own handler. No timed close: a
+    // card stays until the reader closes it (WCAG 2.2.1).
+    document.addEventListener("click", function (e) {
+      if (card && !card.contains(e.target)) close(false);
+    }, true);
     // Escape closes the open card from anywhere in the map (a door keeps focus when it opens one); arrow keys step along a line
     host.addEventListener("keydown", function (e) {
       if (e.key === "Escape" && card) { e.preventDefault(); close(true); return; }
