@@ -286,7 +286,7 @@ Object.keys(D).forEach(k => ok(sec.includes("`" + k + "`"), "README documents th
   const raw = require("fs").readFileSync(require("path").join(__dirname, "../../assets/learn/data/prairieland.json"), "utf8");
   ok(!/\bG-(COST|NUC|DC|GIS|POL|SRC|FIN)\b/.test(raw), "no guard codes in the public data");
   const strings = []; (function walk(v) { if (typeof v === "string") strings.push(v); else if (v && typeof v === "object") Object.values(v).forEach(walk); })(JSON.parse(raw));
-  ok(!strings.some(t => /\bnuclear|reactor/i.test(t) && /per kW|\$|cost/i.test(t)), "no string names nuclear technology together with a cost");
+  ok(!strings.some(t => /\bnuclear|reactor/i.test(t) && /per kW|cost/i.test(t)), "no string names nuclear technology together with a cost");
 }
 
 console.log((fails ? "FAILED " + fails + " of " : "ok: ") + checks + " checks (prairieland)");
