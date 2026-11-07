@@ -1599,9 +1599,13 @@
    "tier": "modeler",
    "code": "M13",
    "title": "Build a nation's pathway: a multi-region, multi-decade model",
-   "ready": false,
-   "href": "index.html#modeler",
-   "scales": []
+   "ready": true,
+   "href": "m13-national-pathway.html",
+   "scales": [],
+   "id": "m13-national-pathway",
+   "minutes": 45,
+   "form": "cards",
+   "short": "A nation's pathway"
   },
   {
    "tier": "modeler",
@@ -1643,19 +1647,26 @@
    "tier": "modeler",
    "code": "SB4",
    "title": "Pathway Explorer",
-   "ready": false,
-   "href": "index.html#modeler",
+   "ready": true,
+   "href": "sb4-pathway-explorer.html",
    "scales": [],
-   "form": "sandbox"
+   "id": "sb4-pathway-explorer",
+   "minutes": 30,
+   "form": "sandbox",
+   "short": "Pathway Explorer"
   },
   {
    "tier": "modeler",
    "code": "C4",
    "title": "Prairieland 2050: design and defend a nation's pathway",
-   "ready": false,
-   "href": "index.html#modeler",
+   "ready": true,
+   "href": "c4-prairieland-2050.html",
    "scales": [],
-   "form": "capstone"
+   "id": "c4-prairieland-2050",
+   "tier2": "researcher",
+   "minutes": 240,
+   "form": "capstone",
+   "short": "Prairieland 2050"
   },
   {
    "tier": "modeler",

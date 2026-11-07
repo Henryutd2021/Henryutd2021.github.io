@@ -1,0 +1,60 @@
+/* engine-e4.css — the view pieces of engine E4 (LX.E4.ui: the bench's controls, the nation's map, the mix, CO2 and import
+   charts, tables), shared by SB4, M13 and C4. Colours from --lx-* tokens only; no overflow clipping (chart tips stay
+   visible; a wide table scrolls in its own .lx-scroll-x). W6, 2026-11-07. */
+
+/* ---------- bench extras */
+.e4-ghint { margin: -4px 0 0 !important; }
+.e4-segrow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.e4-segl { font-family: var(--lx-f-display); font-size: 13.5px; color: var(--lx-ink-2); }
+.e4-seg button { min-height: 34px; }
+.e4-ro .lx-readout { flex: 1 1 140px; }
+.e4-line { margin: 0 0 6px !important; font-size: 13.5px; color: var(--lx-ink-2); }
+.e4-src { margin: 4px 0 0 !important; font-size: 13.5px; color: var(--lx-ink-2); }
+.e4-src.lib { color: var(--lx-warn); }
+
+.e4-fold { border: 1px solid var(--lx-line); border-radius: var(--lx-r); background: var(--lx-surface); padding: 4px 12px; }
+.e4-fold > summary { cursor: pointer; padding: 8px 0; font-family: var(--lx-f-display); font-weight: 600; font-size: 15px; line-height: 1.35; color: var(--lx-ink); }
+.e4-fold[open] > summary { margin-bottom: 4px; }
+.e4-fold > .lx-sb-group { margin-bottom: 10px; }
+.e4-inputs td.n { white-space: normal; min-width: 7em; }
+
+/* ---------- the nation's map */
+.e4-map, .e4-mix, .e4-co2, .e4-imp { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; min-width: 0; }
+.e4-map-top { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.e4-map-svg { min-width: 0; }
+.e4-svg { width: 100%; height: auto; display: block; max-height: 480px; }
+.e4-sea { fill: var(--lx-accent-soft); }
+.e4-route { fill: none; stroke: var(--lx-accent); stroke-width: 2.5; stroke-dasharray: 6 5; }
+.e4-link { stroke: var(--lx-line-2); stroke-linecap: round; }
+.e4-link.hot { stroke: var(--lx-warn); }
+.e4-node { fill: var(--lx-surface); stroke: var(--lx-line-2); stroke-width: 1.5; }
+.e4-mlab { font-family: var(--lx-f-display); font-size: 15px; fill: var(--lx-ink); }
+.e4-mlab.small { font-size: 12.5px; fill: var(--lx-ink-2); }
+.e4-halo { paint-order: stroke; stroke: var(--lx-surface); stroke-width: 4px; stroke-linejoin: round; }
+.e4-rc-box { fill: var(--lx-surface-2); stroke: var(--lx-line-2); }
+.e4-map-say { margin: 0 !important; font-size: 14px; color: var(--lx-ink-2); }
+
+/* ---------- legends and keys */
+.e4-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13.5px; color: var(--lx-ink-2); }
+.e4-key { display: inline-flex; align-items: center; gap: 6px; }
+.e4-key i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+.e4-keys { display: grid; gap: 4px; }
+.e4-keys p { margin: 0 !important; font-size: 14px; color: var(--lx-ink-2); }
+.e4-keys b { color: var(--lx-ink); font-weight: 600; }
+
+/* ---------- what a run says */
+.e4-says { display: grid; gap: 6px; }
+.e4-say { margin: 0 !important; padding: 8px 12px; border-left: 4px solid var(--lx-line-2); background: var(--lx-surface-2); border-radius: 0 8px 8px 0; font-size: 15px; }
+.e4-say.good { border-left-color: var(--lx-good); }
+.e4-say.bad { border-left-color: var(--lx-bad); }
+.e4-say.warn { border-left-color: var(--lx-warn); }
+
+/* ---------- tables */
+.lx-facts.e4-tab tbody th { text-transform: none; letter-spacing: 0; font-size: 14.5px; font-weight: 500; color: var(--lx-ink); }
+.lx-facts.e4-tab tr.e4-tot th, .lx-facts.e4-tab tr.e4-tot td { font-weight: 700; border-top: 2px solid var(--lx-line-2); }
+.lx-facts.e4-tab td.bad { color: var(--lx-bad); }
+.lx-facts.e4-tab td.good { color: var(--lx-good); }
+@media (max-width: 640px) {
+  .lx-facts.e4-tab th[scope="row"] { display: block; padding: 2px 0; border: 0; }
+  .lx-facts.e4-tab td[data-l]::before { content: attr(data-l) ": "; font-family: var(--lx-f-display); font-weight: 400; font-size: 12.5px; color: var(--lx-ink-3); white-space: normal; }
+}

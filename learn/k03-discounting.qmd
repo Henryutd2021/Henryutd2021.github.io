@@ -154,7 +154,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 - **One year stands for the life.** [Lessons 12](12-trade-offs.html) and [13](13-capstone.html) minimise one year's cost, $1000 \sum_k (\mathrm{CRF}_k\, C_k + \mathrm{FOM}_k)\,K_k$ plus running costs, with $K_k$ the MW built of plant $k$.
 - **Units.** $C_k$ (building cost) and $\mathrm{FOM}_k$ (fixed upkeep) are \$ per kW and $K_k$ is in MW, so the 1,000 (kW per MW) makes the units match: one MW of wind adds \$133,575 a year.
 - **The assumption.** Every year of the life looks like the modelled year, and each plant's cost is recovered over $n$ years at the same rate: 30 years for plants, 15 for lesson 13's battery.
-- **Where next.** A model that spans decades discounts each year's cash instead, and credits plants that outlive its horizon (Modeler lesson M13, upcoming); [M11](m11-tea-in-models.html) puts a project's full cash flow inside the optimization.
+- **Where next.** A model that spans decades discounts each year's cash instead, and credits plants that outlive its horizon (Modeler lesson [M13](m13-national-pathway.html)); [M11](m11-tea-in-models.html) puts a project's full cash flow inside the optimization.
 
 ```{=html}
 </div>

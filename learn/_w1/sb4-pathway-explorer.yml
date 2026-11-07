@@ -1,0 +1,18 @@
+# Sidecar for SB4 (sb4-pathway-explorer), M13 (m13-national-pathway) and C4 (c4-prairieland-2050), builder learn-w6-h,
+# 2026-11-07. Read by scripts/build_learn.py.
+id: sb4-pathway-explorer
+lesson: SB4
+glossary:
+  - id: vintage
+    term: Vintage
+    def: "The year a plant was built: in a multi-decade model each vintage keeps its own cost and runs until its life ends."
+  - id: time-slice
+    term: Time slice
+    def: "A group of hours, such as winter nights, that a planning model treats as one, weighted by how many hours it stands for."
+requests:
+  - "build_learn.py: add W6_ENGINES = [\"engine-e4\"] after W5_ENGINES (COMPONENTS_JS and COMPONENTS_CSS, and OPTIONAL_COMPONENTS), as in the scratch copy w6-h-scratch/rp/scripts/build_learn.py; learn.js and learn.css on this branch were built with it."
+  - "learn_solver_bench.mjs: add the E4 sets (e4default, e4secure, e4high single models; e4run-default, e4run-myopic, e4run-shock, e4run-high, e4run-c4, e4run-c4ref clicks; e4run-near is there too but M13 shows those ranges precomputed, since three LPs a choice take 3.4 s at 6x), as in w6-h-scratch/rp/scripts/learn_solver_bench.mjs."
+  - "Engine E4's data: assets/learn/data/e4-pathways.json is hand-written (its stress block from test_e4-engine.js --write); the library e4-library.json from test_e4-engine.js --write (about 5 minutes)."
+  - "prairieland.json (via its builder): carbon.budget.def 2,600 Mt is out of reach in E4 (the least any pathway reaches is about 2,700 Mt at the most electrification and central demand); E4's plan uses its own default (3,600 Mt). Some capex and fuel defaults sit off their slider steps (wind $1,712/kW with step 10 from $1,500; gas $4.05/GJ with step 0.1 from $2.00): E4 uses steps of $1/kW and $0.01/GJ."
+  - "Integration: A20 and A21 (learn-w6-b) join M13's after (curriculum: M3, M8, A20, A21) and C4's after (SB4, M13, A20, A21, A12); F10 can join SB4's after."
+  - "learn_surface_check.py: add \"Prairieland\", \"Ridge\" and \"County\" to PROPER (course proper nouns, as Prairie, City and Plains are); tested in the scratch copy: the SB4, M13 and C4 subtitles then pass with 0 open findings."

@@ -187,7 +187,7 @@ Cyclic storage replaces the link with $s_{p,168} = 0$ for every $p$; no link dro
 <li>Plant outages and reserve margins: adequacy studies treat them over many weather years (<a href="a05-adequacy.html">A5</a>).</li>
 <li>Start-up costs and minimum run times: on/off decisions make a mixed-integer program (<a href="m02-unit-commitment.html">M2</a>).</li>
 <li>Transmission and regions: the town is one bus with no imports.</li>
-<li>Several years of investment, retirements and residual value: a pathway model (M13, upcoming).</li>
+<li>Several years of investment, retirements and residual value: a pathway model (<a href="m13-national-pathway.html">M13</a>).</li>
 <li>Uncertainty when building: here the weather is known when the sizes are chosen (<a href="m08-stochastic-robust.html">M8</a> chooses them before it is known).</li>
 <li>Costs that change with time: every cost is constant within the year modelled.</li>
 </ul>

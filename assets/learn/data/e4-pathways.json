@@ -1,0 +1,248 @@
+{
+ "about": {
+  "what": "Engine E4's own settings (wave W6, builder learn-w6-h, 2026-11-07): what the national pathway model adds to prairieland.json, which it reads and never retypes. The plan's levers and their ranges, the operating settings of the existing fleet, the penalty costs that keep every run solvable, the tie rule, the presets, capstone C4's accounting inputs and the precomputed default runs (written by the SB4, M13 and C4 tests' --write). Read by SB4 (learn/sb4-pathway-explorer.qmd), M13 (learn/m13-national-pathway.qmd) and C4 (learn/c4-prairieland-2050.qmd).",
+  "line": "Prairieland is fictional; its numbers are illustrative.",
+  "built": "2026-11-07",
+  "dollarYear": 2025
+ },
+ "existing": {
+  "availability": {
+   "coal": 0.85,
+   "gasCC": 0.9,
+   "gasCT": 0.92,
+   "oil": 0.9,
+   "nuclear": 0.9156,
+   "hydro": 1
+  },
+  "om": {
+   "coal": {
+    "fom": 45,
+    "vom": 4.5
+   },
+   "oil": {
+    "fom": 30,
+    "vom": 5
+   },
+   "nuclear": {
+    "vom": 9,
+    "note": "existing nuclear plants' running cost, $ per MWh, set for teaching"
+   }
+  },
+  "gasFromNew": "Existing gas plants have the new plants' fixed and variable O&M (prairieland.json costs.technologies gasCC and gasCT) at their own efficiencies.",
+  "fixedLeftOut": "The fixed O&M of existing hydro, wind, solar, nuclear and battery plants is the same in every pathway (they run to their retirement years) and is left out of the pathway cost; existing plants' capital is sunk.",
+  "set": "teaching: availability factors stand in for outages (the planning model has none); coal and oil plants' fixed and variable O&M ($ per kW-year, $ per MWh) are illustrative"
+ },
+ "conventions": {
+  "periodYears": "Each model year stands for the five years that end in it (2030 for 2026-2030, ..., 2050 for 2046-2050): its yearly costs count five times, each year discounted to 2025.",
+  "online": "A plant counts in a model year only if it retires after that year (prairieland.json capacityByYearMW): Ridge Station, retiring at the end of 2037, counts in 2035, not in 2040.",
+  "newPlants": "A plant built in a model year runs in that model year and in each later one its life covers; it pays yearly capital (an annuity over its life at the discount rate) and fixed O&M for the years it runs up to 2050. The payments after 2050 are its residual value, not charged.",
+  "fuels": "Fuels are bought at the national level: domestic gas (up to the 2025 output, 5% of it used in the gas fields) before LNG, domestic crude (up to the 2025 output) before imported crude; crude goes to the refinery (5.5% lost) except what oil-fired plants burn; coal comes from Ridge County's mines (1.4% used at the mines), no imports.",
+  "firm": "The generic firm clean option has no location: its output is shared among the regions in proportion to their demand, so the model never chooses where it goes. Its build limit is the generic 2 GW a region a period, for the five regions together (10 GW a period).",
+  "primary": "Primary energy on the physical energy content method (prairieland.json balance.conventions): fuels as burned, existing nuclear as its heat (electricity / 0.33), hydro, wind, solar and the generic firm option at their electricity output.",
+  "electrification": "A sector's fuel use switched to electricity rises in a straight line from 0 in 2025 to the plan's 2050 share; each GJ of fuel switched delivers its useful energy (prairieland.json balance.useful.efficiency) from electricity at the sector's ratio (demand.electrification). End-use equipment costs are left out, so the engine does not choose electrification: the plan does.",
+  "newLoads": "New large loads (factories and data centers, loads only) are spread over the regions in proportion to their 2025 electricity use; straight-line between the years prairieland.json gives."
+ },
+ "penalties": {
+  "unservedPerMWh": 10000,
+  "budgetPerT": 1000,
+  "importPerGJ": 100,
+  "what": "Penalty costs, never part of a reported cost: electricity not served ($10,000 per MWh: above what a gas turbine costs for the 12 hours of the peak net-load day, so the plan serves every slice), CO2 above the cumulative budget ($1,000 per tonne, above the cost of every cut the model can make) imports above the cap ($100 per GJ) and a shortfall at a stress hour ($750,000 per MW a year, ten times a new gas turbine's yearly cost). They keep every run solvable: a plan that cannot meet its budget or cap shows by how much it misses, instead of failing. Serving demand comes first: a coal plant's tonne per MWh costs less than an unserved MWh.",
+  "reservePerMWYear": 750000
+ },
+ "tie": {
+  "flowPerMWh": 0.05,
+  "batteryPerMWh": 0.5,
+  "importPremiumPerGJ": 0.01,
+  "what": "The tie rule (W2 review finding 2): $0.05 per MWh carried on any link, $0.50 per MWh out of a battery, $0.01 per GJ more for imported crude than domestic crude; left out of every reported cost."
+ },
+ "levers": {
+  "electrification": {
+   "buildings": {
+    "def": 80
+   },
+   "transport": {
+    "def": 50
+   },
+   "industry": {
+    "def": 55
+   },
+   "unit": "electricity's share of the sector's useful energy in 2050 (%); it rises in a straight line from 2025's",
+   "set": "teaching defaults; the ranges come from prairieland.json: from 2025's share to at most 15 points a period (75 by 2050), at most 100%, industry at most 60%"
+  },
+  "importCap": {
+   "def": 40,
+   "lo": 10,
+   "hi": 60,
+   "step": 5,
+   "unit": "% of primary energy, in every model year",
+   "set": "teaching: 2025's import dependence is 40%"
+  },
+  "shockYear": {
+   "gasSpike": 2030,
+   "drought": 2035,
+   "mineralBan": 2035,
+   "demandSurprise": 2035
+  },
+  "budget": {
+   "def": 3600,
+   "why": "E4's default plan: prairieland.json's default (2,600 Mt) is out of reach with the levers E4 has (the least any pathway reaches at the most electrification and central demand is about 2,700 Mt); the page shows the data's presets as marks on the slider."
+  },
+  "reserve": {
+   "def": "r10",
+   "what": "The peak-hour reserve rule (teaching): at two stress hours of 2025's weather, the peak net-load hour and the busiest hour of the scarce-wind week, every region's load plus a margin must be met by plants at their availability, wind and solar at that hour's output, batteries at full power, the firm option's share and the links. The slices alone would let a plan lean on twelve-hour averages; adequacy itself is never judged here (lesson A5)."
+  }
+ },
+ "solver": {
+  "timeLimit": 10,
+  "retryTimeLimit": 30,
+  "libraryTimeLimit": 120
+ },
+ "presets": [
+  {
+   "id": "today",
+   "label": "Policies as in 2025",
+   "note": "2025's electricity shares held, no carbon budget to speak of (the slider's top), imports up to 60%",
+   "state": {
+    "eb": 54,
+    "et": 3,
+    "ei": 40,
+    "bud": 5400,
+    "cap": 60,
+    "fm": 1,
+    "fs": "perfect"
+   }
+  },
+  {
+   "id": "central",
+   "label": "Central: electrify, budget 3,600 Mt",
+   "note": "the default plan",
+   "state": {
+    "eb": 80,
+    "et": 50,
+    "ei": 55,
+    "bud": 3600,
+    "cap": 40,
+    "fm": 1,
+    "fs": "perfect"
+   }
+  },
+  {
+   "id": "secure",
+   "label": "Security first: imports at most 25%",
+   "note": "more electrification and a tighter import cap",
+   "state": {
+    "eb": 90,
+    "et": 70,
+    "ei": 60,
+    "bud": 3600,
+    "cap": 25,
+    "fm": 1,
+    "fs": "perfect"
+   }
+  },
+  {
+   "id": "deep",
+   "label": "Deep cuts: as far as the levers go, 3,000 Mt",
+   "note": "the most electrification the data allows and a 3,000 Mt budget",
+   "state": {
+    "eb": 100,
+    "et": 78,
+    "ei": 60,
+    "bud": 3000,
+    "cap": 40,
+    "fm": 1,
+    "fs": "perfect"
+   }
+  },
+  {
+   "id": "nofirm",
+   "label": "Central without the firm clean option",
+   "note": "the central plan with the generic firm option ruled out",
+   "state": {
+    "eb": 80,
+    "et": 50,
+    "ei": 55,
+    "bud": 3600,
+    "cap": 40,
+    "fm": 0,
+    "fs": "perfect"
+   }
+  }
+ ],
+ "precomputed": {
+  "m13near": {
+   "date": "7 November 2026",
+   "share": 0.000001,
+   "plan": "central",
+   "items": {
+    "solar": {
+     "lo": 6501.3,
+     "hi": 7701.2,
+     "at": 7082.3,
+     "slack": 0.402,
+     "objective": 401828.9
+    },
+    "gasCC": {
+     "lo": 6383.3,
+     "hi": 7621.6,
+     "at": 7339.5,
+     "slack": 0.402,
+     "objective": 401828.9
+    },
+    "wind": {
+     "lo": 12490.7,
+     "hi": 12649.2,
+     "at": 12500,
+     "slack": 0.402,
+     "objective": 401828.9
+    }
+   }
+  }
+ },
+ "stress": [
+  {
+   "key": "peak",
+   "i": 5563,
+   "when": "20 Aug 2025, 19:00",
+   "label": "the peak net-load hour (20 Aug 2025, 19:00)",
+   "demand": 1.3826,
+   "wind": [
+    0.2211,
+    0.062,
+    0.2078,
+    0.0791,
+    0.0223
+   ],
+   "solar": [
+    0.006,
+    0.0073,
+    0.009,
+    0.0081,
+    0.0094
+   ],
+   "netLoad2025GW": 31.34
+  },
+  {
+   "key": "winter",
+   "i": 151,
+   "when": "7 Jan 2025, 07:00",
+   "label": "the busiest hour of the scarce-wind week (7 Jan 2025, 07:00)",
+   "demand": 1.2596,
+   "wind": [
+    0.0844,
+    0.1319,
+    0.1691,
+    0.0967,
+    0.3078
+   ],
+   "solar": [
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "netLoad2025GW": 28.58
+  }
+ ]
+}
