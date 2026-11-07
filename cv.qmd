@@ -298,9 +298,9 @@ Domain Knowledge
 ::: {.cv-list .cv-talks}
 - [Mar 10, 2021]{.cv-date} [*Power Demand Prediction using LSTM Neural Network with Multiple Features*]{.cv-lt} [2021 International Research Conference]{.cv-ld}
 - [May 24, 2021]{.cv-date} [*Allocating microgrid for transactive energy operations in a multi-echelon manufacturing supply chain*]{.cv-lt} [Annual IISE Conference and Expo 2021]{.cv-ld}
-- [Jun 2, 2022]{.cv-date} [*Optimal Planning of Co-Located Wind Energy and Hydrogen Plants: A Techno-Economic Analysis*]{.cv-lt} [TORQUE 2022, Netherlands]{.cv-ld}
+- [Jun 2, 2022]{.cv-date} [*Optimal Planning of Co-Located Wind Energy and Hydrogen Plants: A Techno-Economic Analysis*]{.cv-lt} [TORQUE 2022, Delft, Netherlands]{.cv-ld}
 - [Oct 17, 2022]{.cv-date} [*Redesign Supply Chain for Transactive Energy Operations in Manufacturing-Microgrid-Climate Nexus*]{.cv-lt} [Annual INFORMS Conference 2022]{.cv-ld}
-- [Aug 20, 2023]{.cv-date} [*A Multi-fidelity Gaussian Process Regression Method for Probabilistic Wind Farm Power Curve Estimation*]{.cv-lt} [ASME 2023 IDETC/CIE]{.cv-ld}
+- [Aug 20, 2023]{.cv-date} [*A Multi-fidelity Gaussian Process Regression Method for Probabilistic Wind Farm Power Curve Estimation*]{.cv-lt} [ASME 2023 IDETC/CIE, Boston, Massachusetts, USA]{.cv-ld}
 - [Oct 31, 2023]{.cv-date} [*Economic Feasibility and Decarbonization Potential of Hybrid Wind and Hydrogen Systems in Texas*]{.cv-lt} [NAWEA/WindTech 2023 Conference, Denver, Colorado]{.cv-ld}
 - [Nov 1, 2024]{.cv-date} [*Economic Feasibility and Decarbonization Potential of Hybrid Renewables and Hydrogen Systems in Texas*]{.cv-lt} [NAWEA/WindTech 2024 Conference, Rutgers University, New Brunswick, New Jersey]{.cv-ld}
 - [Oct 12, 2026]{.cv-date} [*Quantifying the Cost of Delayed Grid Energization (CoDE) for AI Data Centers*]{.cv-lt} [2026 North American Power Symposium (NAPS), Michigan Technological University, Houghton, Michigan]{.cv-ld}
