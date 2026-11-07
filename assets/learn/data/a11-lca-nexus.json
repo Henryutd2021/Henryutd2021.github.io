@@ -15,7 +15,7 @@
     "solar": {
       "name": "Solar farm",
       "kind": "Utility-scale solar panels",
-      "per": "per MWh it makes",
+      "per": "per unit of electricity it makes",
       "stageNames": { "build": "Panels made, farm built", "supply": "Upkeep", "run": "Panels at work", "end": "Taken down" },
       "carbon": {
         "build": { "v": 28, "about": true, "src": "nrel" },
@@ -39,7 +39,7 @@
     "gas": {
       "name": "Gas plant",
       "kind": "Natural gas combined-cycle plant",
-      "per": "per MWh it makes",
+      "per": "per unit of electricity it makes",
       "stageNames": { "build": "Plant built", "supply": "Gas produced and piped", "run": "Gas burned, plant cooled", "end": "Taken down" },
       "carbon": {
         "build": { "v": 0.8, "src": "nrel" },
@@ -63,7 +63,7 @@
     "dc": {
       "name": "Data center",
       "kind": "A facility and a load",
-      "per": "per MWh it uses",
+      "per": "per unit of electricity it uses",
       "stageNames": { "build": "Servers and building made", "supply": "Its electricity, made elsewhere", "run": "Its own cooling", "end": "Taken down" },
       "carbon": {
         "build": { "nc": "servers and buildings: not in LBNL's report" },
@@ -85,7 +85,7 @@
       }
     }
   },
-  "nrelTotals": { "solar": 43, "gas": 486, "wind": 13, "windOngoing": 0.74 },
+  "nrelTotals": { "solar": 43, "gas": 486, "wind": 13 },
   "harmonized": {
     "solar": { "median": 45, "lo": 39, "hi": 49, "what": "crystalline silicon panels, harmonized (Hsu et al., 2012, abstract)", "src": "hsu" },
     "gas": { "median": 450, "lo": 420, "hi": 480, "what": "combined-cycle plants, harmonized (O'Donoughue et al., 2014, abstract)", "src": "odonoughue" }
@@ -126,9 +126,9 @@
     "summer": { "median": { "hydro": 15, "gas": 45 }, "drought": { "hydro": 8, "gas": 50 } }
   },
   "consequential": [
-    { "id": "gas", "label": "Gas plants run less", "note": "Each MWh of solar replaces a MWh from gas plants that already exist: their gas supply and burning stop for it; their construction is already done." },
+    { "id": "gas", "label": "Gas plants run less", "note": "Each MWh of solar replaces a MWh from gas plants that already exist: the gas burned (389 g) and its supply (71 g, treated here as all fuel supply) are avoided; their construction is done." },
     { "id": "spill", "label": "Nothing: its output is spilled", "note": "The grid had more clean power than it could use at those hours, so the new farm's MWh replace nothing." },
-    { "id": "wind", "label": "Wind farms run less", "note": "Each MWh of solar replaces a MWh from wind farms that already exist: only their upkeep changes." }
+    { "id": "wind", "label": "Wind farms run less", "note": "Each MWh of solar replaces a MWh from wind farms that already exist: they are built and their upkeep goes on, so nothing they emit changes." }
   ],
   "sources": {
     "nrel": { "label": "NREL, Life Cycle Greenhouse Gas Emissions from Electricity Generation: Update (NREL/FS-6A50-80580), Table 1", "url": "https://docs.nlr.gov/docs/fy21osti/80580.pdf", "asOf": "September 2021; read 6 November 2026" },

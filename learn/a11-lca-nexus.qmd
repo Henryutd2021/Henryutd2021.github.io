@@ -53,15 +53,17 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <tr><td>Data center, water consumed</td><td data-label="On site only">99 gal per MWh</td><td data-label="Cradle to grave">1,293 gal per MWh (2 stages not counted)</td></tr>
 <tr><td>Data center, land</td><td data-label="On site only">not counted</td><td data-label="Cradle to grave">not counted</td></tr>
 </tbody></table></div>
-<p class="lx-hint">The gas plant has a cooling tower; the data center is the 2023 U.S. average, per MWh it uses.</p>
-<p class="lx-hint">A new solar farm's attributional share is about 43 g per kWh; if gas plants run less, the consequential change is −417 g per kWh.</p>
+<p class="lx-hint">The gas plant has a cooling tower; the data center is the 2023 U.S. average, per unit of electricity it uses.</p>
+<p class="lx-hint">A new solar farm's attributional share is about 43 g per kWh.</p>
+<p class="lx-hint">If gas plants run less, the consequential change against not building it is 43 − (71 + 389) = −417 g per kWh: avoided, not removed.</p>
 <p class="lx-hint">With JavaScript on, you drag the boundary stage by stage, pick the cooling, count the land between and switch on a drought.</p>
 <!-- a11-fallback:end -->
 </div>
 </div>
-<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Medians and averages, not one plant.</b> Each footprint is a published median for its technology and stage, or for data centers a 2023 U.S. average. Ranges come from the same reviews; a real plant can sit anywhere in them.</span></p>
-<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Carbon:</b> NREL's 2021 medians by life-cycle phase, g <span class="lx-term" data-term="co2e">CO₂e</span> per kWh. <b>Water:</b> gallons consumed per MWh (1 gallon = 3.785 litres), from two NREL-led reviews. <b>Land:</b> square metres held per MWh made in a year.</span></p>
-<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>The data center</b> is a load: Berkeley Lab's 2023 averages for U.S. data centers, per MWh used. Lesson F8's campus draws 240 MW in every hour.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Medians and averages, not one plant.</b> Each footprint is a published <span class="lx-term" data-term="median">median</span> by stage, or a 2023 U.S. average for data centers; a real plant can sit anywhere in the ranges.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Carbon</b> in g <span class="lx-term" data-term="co2e">CO₂e</span> per kWh, the same number as kg per MWh: NREL's 2021 medians by life-cycle phase.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Water</b> in U.S. gallons consumed per MWh (1 gallon = 3.785 litres), from two NREL-led reviews. <b>Land</b> in m² held per MWh made in a year.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>The data center</b> is a load: Berkeley Lab's 2023 averages for U.S. data centers, per unit of electricity used. Lesson F8's campus draws 240 MW in every hour.</span></p>
 <p class="lx-hint" style="margin-top:.6rem">About 25 guided minutes in eight steps.</p>
 <style>/* lesson-local: the life-cycle box's tile content (the chain and boundary: LX.LifeBox, lifebox.css) */
 .a11-top { display: flex; flex-wrap: wrap; gap: 6px 18px; }
@@ -96,7 +98,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <dt>Boundary</dt><dd>On site, a solar farm emits 0 g per kWh; from cradle to grave, about 43 g, mostly from making the panels.</dd>
 <dt>One boundary</dt><dd>Gas at its stack (389 g) against solar from cradle to grave (43 g) is unfair; on one boundary it is 486 against 43.</dd>
 <dt>Water</dt><dd>Withdrawn is not consumed: once-through cooling takes 11,380 gal per MWh and consumes 100.</dd>
-<dt>Land</dt><dd>Counting the land between moves gas from 4.1 to 19.0 m² per MWh a year, past solar.</dd>
+<dt>Land</dt><dd>Counting the land between moves gas from 4.1 to 19.0 m² per MWh a year, past solar's illustrative 14.9.</dd>
 <dt>A load</dt><dd>A data center's indirect water, 1,194 gal per MWh it uses, is about 12 times its own cooling water (U.S., 2023).</dd>
 <dt>Two questions</dt><dd>A new solar farm's share is about 43 g per kWh; what changes depends on what it replaces.</dd>
 <dt>Drought</dt><dd>In EIA's drought case, hydropower falls from 15% to 8% of California's summer generation and gas rises from 45% to 50%.</dd>
@@ -114,8 +116,9 @@ body-classes: "page-learn page-lesson lx-form-cards"
 ```
 
 - **Medians of published studies.** NREL screened about 3,000 life-cycle studies and kept fewer than 15% (2021).
-- **Medians need not add.** Gas's phases add to 461 g per kWh, its total median is 486 g.
-- **Harmonized.** Re-running studies on common assumptions narrows the spread: crystalline-silicon panels 45 g per kWh (middle half 39 to 49), combined-cycle plants 450 g (420 to 480). Both from the papers' abstracts.
+- **Medians need not add.** A median is the middle estimate after sorting. Gas's phases add to 461 g per kWh, its total median is 486 g.
+- **Harmonized.** Re-running studies on common assumptions narrows their spread (both from the papers' abstracts).
+- **Harmonized medians.** Crystalline-silicon panels 45 g per kWh (middle half 39 to 49); combined-cycle plants 450 g (420 to 480).
 - **What moves a solar number most.** Sunshine, panel life and efficiency, and the grid that powered the factory.
 - **What moves a gas number most.** The plant's efficiency, and methane leaked on the way from the well. The harmonized gas studies count methane at its 100-year warming effect (Heath et al., 2014).
 
@@ -127,8 +130,10 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-deeper-body">
 ```
 
-- **Two products, one plant.** When a plant sells both power and heat, its burden must be split (by energy, by value) or the study is widened to include what the second product replaces: system expansion (ISO 14044).
-- **Attributional and consequential, by name.** IPCC AR6 Working Group III, Annex III (2022): attributional studies use average data for a product's own impacts; consequential studies widen the boundary to the effects of a change, and depend more on their assumptions.
+- **Two products, one plant.** When a plant sells both power and heat, its burden is split between them, by energy or by value (ISO 14044).
+- **System expansion.** Instead, the study can be widened to include what the second product replaces (ISO 14044).
+- **Attributional, by name.** IPCC AR6 Working Group III, Annex III (2022): attributional studies use average data for a product's own impacts.
+- **Consequential, by name.** Consequential studies widen the boundary to the effects of a change, and depend more on their assumptions (the same annex).
 - **In a model.** What responds to a change is an output of a dispatch or planning model: [A10](a10-emissions-questions.html) asks it for a day, [M6](m06-carbon-in-models.html) over years.
 
 ```{=html}
@@ -140,7 +145,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <ul>
 <li>Any one real plant: its sunshine, gas field, river and grid.</li>
 <li>Harms other than climate, water and land: air pollution, toxicity, wildlife.</li>
-<li>Mines and factories' land and water, and a data center's servers and buildings.</li>
+<li>The land of mines and factories (their water is in Build where the reviews count it), and a data center's servers and buildings.</li>
 <li>Where water is scarce: a gallon consumed in a desert counts the same here as one by a full river.</li>
 </ul>
 </div>

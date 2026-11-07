@@ -7,7 +7,11 @@
     "title": "Electric buses for Port Alder: cheaper and carbon-free",
     "authors": "R. Okonjo and L. Varga, Harbourline Consulting (fictional), report to Port Alder Transit (fictional), 2026",
     "headline": "Replacing Port Alder Transit's 40 oldest diesel buses with battery-electric buses saves {saving} a year and cuts the fleet's CO₂ by {cutPct}.",
-    "method": "Annual costs over a 12-year bus life at a 3% real discount rate; CO₂ from the buses' tailpipes."
+    "method": "Annual costs over a 12-year bus life at a 3% real discount rate; CO₂ from the buses' tailpipes.",
+    "plan": {
+      "source": "Port Alder Transit's fleet plan (fictional)",
+      "text": "The {buses} buses bought in {oldYear} retire in 2026; {buses} new diesel buses replace them ({newMpg} mpg, {newMaint} a mile in repairs) unless the board funds another option."
+    }
   },
   "inputs": {
     "buses": 40,
@@ -19,7 +23,8 @@
       "charger": 60000,
       "kWhPerMile": 2.2,
       "energyPrice": 0.09,
-      "maintPerMile": 0.6
+      "maintPerMile": 0.6,
+      "meter": "at the depot meter, charging losses included"
     },
     "diesel": {
       "price": 560000,
@@ -59,7 +64,8 @@
         "v": 0.7,
         "label": "0.70, a coal-heavy grid"
       }
-    ]
+    ],
+    "tdLoss": 0.05
   },
   "fixes": [
     {
@@ -228,7 +234,7 @@
         "parts": [
           "Boundary: ",
           {
-            "text": "charging is in the cost but its CO₂ is not; counted at EIA's 2023 U.S. average, the electric fleet emits {eCO2} a year.",
+            "text": "charging is in the cost but its CO₂ is not; at EIA's 2023 U.S. average factor, the electric fleet is attributed {eCO2} a year.",
             "note": "Names the mismatch, the fix and the factor's source."
           },
           "\n",
@@ -250,10 +256,22 @@
             "note": "Says which count stays and why."
           },
           "\n",
+          "Evidence: ",
+          {
+            "text": "the prices, miles and {kWhPerMile} kWh per mile are the study's illustrative assumptions; the replacement plan is the agency's own document (fictional); the CO₂ factors are EIA's published figures.",
+            "note": "Each key input's evidence status, as the Realism bar asks."
+          },
+          "\n",
+          "Leaves out: ",
+          {
+            "text": "making the buses and batteries, street air and noise, grid losses, a grid that gets cleaner, battery replacement.",
+            "note": "What the audit does not count, said."
+          },
+          "\n",
           "Conclusion: ",
           {
-            "text": "for the agency, electric costs {extra} a year more and cuts {cut} of CO₂ ({cutPctA}), about {perTonne} per tonne, if the grid is at the 2023 U.S. average.",
-            "note": "Cost and CO₂ on one boundary, whose cost, and the condition that moves it most."
+            "text": "for the agency, electric costs {extra} a year more and lowers attributed CO₂ by {cut} ({cutPctA}), about {perTonne} per tonne, if the grid is at the 2023 U.S. average.",
+            "note": "Cost and attributed CO₂ on one boundary, whose cost, and the condition that moves it most."
           }
         ]
       }
@@ -278,6 +296,11 @@
         "label": "Conditions",
         "weak": "None",
         "good": "The grid's CO₂ factor"
+      },
+      {
+        "label": "Evidence and limits",
+        "weak": "None",
+        "good": "Each input's status; what is left out"
       }
     ]
   },
@@ -355,7 +378,7 @@
       },
       {
         "id": "e5",
-        "text": "The study's corrected cost per tonne of CO₂ avoided.",
+        "text": "The audit's cost per attributed tonne of CO₂.",
         "answer": [
           "projection"
         ],
@@ -371,7 +394,7 @@
     "competences": [
       {
         "id": "accounting",
-        "look": "cost and CO₂ on one boundary, the emissions question named (what changes against a stated counterfactual), and whose cost each number is."
+        "look": "cost and CO₂ for the same service, alternatives and years, the emissions question named (an attributed share or a change in the system), and whose cost each number is."
       },
       {
         "id": "realism",
@@ -388,7 +411,7 @@
     {
       "id": "boundary",
       "label": "One boundary",
-      "text": "Everything inside the cost boundary is inside the CO₂ boundary, and the reverse; what is left out is said."
+      "text": "Cost and CO₂ cover the same service, alternatives and years; whose costs count and which emissions stages are in are stated, with what is left out."
     },
     {
       "id": "counter",
@@ -431,6 +454,12 @@
       "label": "EIA, Frequently Asked Questions: How much carbon dioxide is produced per kilowatthour of U.S. electricity generation?",
       "url": "https://www.eia.gov/tools/faqs/faq.php?id=74&t=11",
       "asOf": "data for 2023; page updated 11 December 2024"
+    },
+    "losses": {
+      "label": "EIA, Frequently Asked Questions: How much electricity is lost in electricity transmission and distribution in the United States?",
+      "url": "https://www.eia.gov/tools/faqs/faq.php?id=105&t=3",
+      "asOf": "about 5% in 2018 to 2022; updated 7 November 2023"
     }
-  }
+  },
+  "units": "Units: t is a metric tonne (1,000 kg); mpg is miles per U.S. gallon; a demand charge is dollars per kW of the month's highest draw (a kW-month), billed each month."
 }

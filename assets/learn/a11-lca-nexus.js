@@ -17,12 +17,15 @@
 //           litres to gallons at 3.785411784.
 //   land    m² held per MWh made in a year; solar: 1 acre (4,046.86 m²) / 394 MWh a year, the median energy density of
 //           single-axis tracking plants built in 2019 (LBNL), arrays only; "the land between" scales to the whole lease
-//           at one Nevada plant's ratio (1,375 / 945 acres, LBNL's example). Gas: Lovering et al. (2022), 410 ha per TWh a
+//           at one Nevada plant's ratio (1,375 / 945 acres, LBNL's example): an illustrative scaling, not a published
+//           result. Gas: Lovering et al. (2022), 410 ha per TWh a
 //           year (footprint: well pads, roads, pipelines, plant) or 1,900 (spacing: the whole gas field); over 90% is
 //           indirect (fuel supply), so Supply alone is "over" 90% of the total and On site "under" 10%.
 // The boundary is a run of stages [L, R] (indices 0..3). The total inside sums its stages; a stage "not counted" is
-// listed, never added. Consequential answer for a new solar farm (illustrative arithmetic on NREL's medians): its whole
-// life (43) minus the ongoing phases of what its MWh replace: gas 71 + 389, wind 0.74 (upkeep), spilled power 0.
+// listed, never added. Consequential answer for a new solar farm against not building it (illustrative arithmetic on
+// NREL's medians): its whole life (43) minus what its MWh avoid: existing gas plants' burning and gas supply, 389 + 71
+// (the 71 treated as all fuel supply); existing wind farms 0 (built already, their upkeep goes on: review 2026-11-06);
+// spilled power 0.
 // Every number on the page is checked by _tests/learn/test_a11-lca-nexus.js. A data center appears only as a load.
 (function () {
   "use strict";
@@ -45,7 +48,7 @@
     out.kind = "num";
     if (e.cooling) { var c = coolingOf(D, o.cooling); out.v = c.use; out.lo = c.useLo; out.hi = c.useHi; out.wd = c.wd; out.wdLo = c.wdLo; out.wdHi = c.wdHi; out.note = c.label + ": " + c.how; return out; }
     if (e.dc) { var V = dcVals(D); out.v = e.dc === "ghg" ? V.ghg : e.dc === "direct" ? V.direct : V.indirect; return out; }
-    if (e.fromDensity) { out.v = landPv(D, o.wide); out.note = o.wide ? "the whole lease, at one Nevada plant's ratio of site to arrays (LBNL's example)" : e.note; return out; }
+    if (e.fromDensity) { out.v = landPv(D, o.wide); out.note = o.wide ? "illustrative: the arrays scaled to one Nevada plant's whole lease (LBNL's example)" : e.note; return out; }
     if (e.share) {
       var tot = landGas(D, o.wide), m = D.land.gasIndirectMin;
       out.kind = "bound"; out.dir = e.share === "indirect" ? "over" : "under"; out.v = tot * (e.share === "indirect" ? m : 1 - m); out.joint = tot;
@@ -66,11 +69,16 @@
   }
   function full(D, obj, meter, o) { return inside(D, obj, meter, 0, 3, o); }
   // the consequential change per kWh of a new solar farm: its whole life minus the ongoing phases of what it replaces
-  function avoided(D, k) { var g = D.objects.gas.carbon; return k === "gas" ? g.supply.v + g.run.v : k === "wind" ? D.nrelTotals.windOngoing : 0; }
+  // existing plants that run less: gas avoids its burning and its gas supply; wind's upkeep goes on whether it runs or not
+  function avoided(D, k) { var g = D.objects.gas.carbon; return k === "gas" ? g.supply.v + g.run.v : 0; }
   function consequential(D, k) { return D.nrelTotals.solar - avoided(D, k); }
   function stack(A10) { var P = A10.plains; return P.plants.cc.heatRate * P.gas.co2PerMMBtu; }   // MMBtu/MWh x kg/MMBtu = kg/MWh = g/kWh
   function campus(D, F8) { var mwh = F8.campus.drawMW * 8760, V = dcVals(D); return { mw: F8.campus.drawMW, mwh: mwh, co2: mwh * D.dcData.ghgKgPerKWh, indirect: mwh * V.indirect, direct: mwh * V.direct }; }
   function ratio(a, b) { return a / b; }
+  function consArith(D, k) {   // "43 − (71 + 389) = −417": the change against not building the farm, with its arithmetic
+    var g = D.objects.gas.carbon, sub = k === "gas" ? "(" + num("carbon", g.supply.v) + " + " + num("carbon", g.run.v) + ")" : "0";
+    return D.nrelTotals.solar + " − " + sub + " = " + signed(consequential(D, k));
+  }
 
   // formats
   function grp(n) { return Math.round(n).toLocaleString("en-US"); }
@@ -80,6 +88,11 @@
     return grp(v);
   }
   var UNIT = { carbon: "g CO₂e per kWh", water: "gal per MWh", land: "m² per MWh a year" };
+  // the header's unit line: the footprint's own denominator, made (a plant) or used (a load)
+  function unitLine(obj, meter) {
+    var v = obj === "dc" ? "used" : "made";
+    return meter === "carbon" ? "carbon in g CO₂e per kWh " + v + " (= kg per MWh)" : meter === "water" ? "water in gallons consumed per MWh " + v : "land in m² held per MWh " + v + " in a year";
+  }
   function val(meter, s) {
     if (s.kind === "nc") return "not counted";
     if (s.kind === "none") return "none";
@@ -107,9 +120,9 @@
   }
   function lineGas(D, A10) {
     var g = D.objects.gas.carbon, w = inside(D, "gas", "carbon", 1, 2);
-    return "**With the gas supply:** " + num("carbon", g.run.v) + " + " + num("carbon", g.supply.v) + " = " + num("carbon", w.v) + " g per kWh. The median of whole-life totals is " + D.nrelTotals.gas + " g: medians of stages need not add up.";
+    return "**With the gas supply:** " + num("carbon", g.run.v) + " + " + num("carbon", g.supply.v) + " = " + num("carbon", w.v) + " g per kWh. The [[median|median]] of whole-life totals is " + D.nrelTotals.gas + " g: medians of stages need not add up.";
   }
-  function stackHint(A10) { return "A check: lesson A10's EIA heat rate gives " + grp(stack(A10)) + " g per kWh at the stack of today's combined-cycle fleet, close to NREL's median."; }
+  function stackHint(A10) { return "A check: EIA's 2025 average tested [[heat-rate|heat rate]] of combined-cycle plants at full load (lesson A10) gives about " + grp(stack(A10)) + " g CO₂ per kWh at the stack, close to NREL's median."; }
   function brochureRatio(D) { return D.objects.gas.carbon.run.v / D.nrelTotals.solar; }
   function fairRatio(D) { return D.nrelTotals.gas / D.nrelTotals.solar; }
   function lineCompare(D) {
@@ -120,7 +133,7 @@
     return "**" + c.label + ":** withdraws " + grp(c.wd) + " gal per MWh and consumes " + grp(c.use) + " (medians). " + (c.wd > 1000 ? "Most of it goes back, warmer." : c.id === "dry" ? "Almost no water, at some cost in efficiency." : "Most of what it takes in evaporates.");
   }
   function lineLand(D, wide) {
-    return wide ? "**With the land between:** solar about " + num("land", landPv(D, true)) + " m² (one plant's whole lease), gas " + num("land", landGas(D, true)) + " m² (the whole gas field). Counting more land reverses the order."
+    return wide ? "**With the land between:** solar about " + num("land", landPv(D, true)) + " m² (illustrative: arrays scaled to one plant's lease), gas " + num("land", landGas(D, true)) + " m² (the whole gas field). In this example the order reverses."
       : "**Footprints only:** solar " + num("land", landPv(D, false)) + " m² per MWh a year under its arrays; gas " + num("land", landGas(D, false)) + " m², over 90% of it at wells, roads and pipelines.";
   }
   function lineDC(D, F8) {
@@ -129,11 +142,12 @@
   }
   function lineCons(D, k) {
     var o = D.consequential.filter(function (x) { return x.id === k; })[0];
-    return "**" + o.label + ":** the change is " + signed(consequential(D, k)) + " g per kWh of solar; its attributional share stays about " + D.nrelTotals.solar + " g.";
+    var v = consequential(D, k);
+    return "**" + o.label + ":** against not building the farm, " + consArith(D, k) + " g per kWh of solar" + (v < 0 ? ": " + grp(-v) + " g avoided, not removed from the air." : ": more than without it.");
   }
   function lineDrought(D, on) {
     var s = D.drought.summer[on ? "drought" : "median"];
-    return on ? "**Drought case:** hydropower falls to " + s.hydro + "% of California's summer generation and gas rises to " + s.gas + "%; more is imported. More gas means more CO₂ and more cooling water."
+    return on ? "**Drought case:** hydropower falls to " + s.hydro + "% of California's summer generation, gas rises to " + s.gas + "%, imports grow. More gas burned means more CO₂ and can mean more cooling water; this page does not total it."
       : "**Median water year:** hydropower " + s.hydro + "% and gas " + s.gas + "% of California's summer generation (EIA's model).";
   }
 
@@ -151,8 +165,9 @@
       });
     });
     h.push("</tbody></table></div>");
-    h.push('<p class="lx-hint">The gas plant has a cooling tower; the data center is the 2023 U.S. average, per MWh it uses.</p>');
-    h.push('<p class="lx-hint">A new solar farm\'s attributional share is about ' + D.nrelTotals.solar + " g per kWh; if gas plants run less, the consequential change is " + signed(consequential(D, "gas")) + " g per kWh.</p>");
+    h.push('<p class="lx-hint">The gas plant has a cooling tower; the data center is the 2023 U.S. average, per unit of electricity it uses.</p>');
+    h.push('<p class="lx-hint">A new solar farm\'s attributional share is about ' + D.nrelTotals.solar + " g per kWh.</p>");
+    h.push('<p class="lx-hint">If gas plants run less, the consequential change against not building it is ' + consArith(D, "gas") + " g per kWh: avoided, not removed.</p>");
     h.push('<p class="lx-hint">With JavaScript on, you drag the boundary stage by stage, pick the cooling, count the land between and switch on a drought.</p>');
     return h.join("\n");
   }
@@ -162,7 +177,7 @@
       ["Boundary", "On site, a solar farm emits 0 g per kWh; from cradle to grave, about " + D.nrelTotals.solar + " g, mostly from making the panels."],
       ["One boundary", "Gas at its stack (" + D.objects.gas.carbon.run.v + " g) against solar from cradle to grave (" + D.nrelTotals.solar + " g) is unfair; on one boundary it is " + D.nrelTotals.gas + " against " + D.nrelTotals.solar + "."],
       ["Water", "Withdrawn is not consumed: once-through cooling takes " + grp(coolingOf(D, "once").wd) + " gal per MWh and consumes " + grp(coolingOf(D, "once").use) + "."],
-      ["Land", "Counting the land between moves gas from " + num("land", landGas(D, false)) + " to " + num("land", landGas(D, true)) + " m² per MWh a year, past solar."],
+      ["Land", "Counting the land between moves gas from " + num("land", landGas(D, false)) + " to " + num("land", landGas(D, true)) + " m² per MWh a year, past solar's illustrative " + num("land", landPv(D, true)) + "."],
       ["A load", "A data center's indirect water, " + grp(V.indirect) + " gal per MWh it uses, is about " + Math.round(V.indirect / V.direct) + " times its own cooling water (U.S., 2023)."],
       ["Two questions", "A new solar farm's share is about " + D.nrelTotals.solar + " g per kWh; what changes depends on what it replaces."],
       ["Drought", "In EIA's drought case, hydropower falls from " + d.median.hydro + "% to " + d.drought.hydro + "% of California's summer generation and gas rises from " + d.median.gas + "% to " + d.drought.gas + "%."]
@@ -171,7 +186,7 @@
   }
 
   var model = { STAGES: STAGES, fallbackHTML: fallbackHTML, explainHTML: explainHTML, galPerMWh: galPerMWh, haToM2: haToM2, landPv: landPv, landPvFixed: landPvFixed, landGas: landGas, dcVals: dcVals, coolingOf: coolingOf,
-    stage: stage, inside: inside, full: full, avoided: avoided, consequential: consequential, stack: stack, campus: campus, ratio: ratio,
+    stage: stage, inside: inside, full: full, avoided: avoided, consequential: consequential, consArith: consArith, unitLine: unitLine, stack: stack, campus: campus, ratio: ratio,
     num: num, val: val, totalText: totalText, wholeNote: wholeNote, range: range, signed: signed, grp: grp, billions: billions, millions: millions, UNIT: UNIT,
     brochureRatio: brochureRatio, fairRatio: fairRatio,
     lineSolar: lineSolar, lineGas: lineGas, stackHint: stackHint, lineCompare: lineCompare, lineWater: lineWater, lineLand: lineLand, lineDC: lineDC, lineCons: lineCons, lineDrought: lineDrought };
@@ -219,7 +234,7 @@
       var ob = D.objects[S.obj];
       Object.keys(objB).forEach(function (k) { objB[k].setAttribute("aria-pressed", String(k === S.obj)); });
       Object.keys(metB).forEach(function (k) { metB[k].setAttribute("aria-pressed", String(k === S.meter)); });
-      head.innerHTML = ""; H("b", { text: ob.name }, head); H("span", { text: " · " + ob.kind + " · footprints " + ob.per }, head);
+      head.innerHTML = ""; H("b", { text: ob.name }, head); H("span", { text: " · " + ob.kind + " · " + unitLine(S.obj, S.meter) }, head);
     }
     function paintRest() {
       var ob = D.objects[S.obj], o = { cooling: S.cooling, wide: S.wide };
@@ -261,6 +276,7 @@
         build: function (act, api) {
           set({ obj: "solar", meter: "carbon", L: 2, R: 2 });
           H("p", { class: "lx-hint", html: LX.rich("The [[functional-unit|functional unit]] is one kWh the farm makes. Its [[life-cycle-assessment|life cycle]] runs from Build to End of life.") }, act);
+          H("p", { class: "lx-hint", text: "Build happens once: its emissions are divided by all the electricity the farm is expected to make over its life, so they show as g per kWh." }, act);
           watch = function () { if (S.obj === "solar" && S.meter === "carbon" && S.L === 0 && S.R === 3) { api.saw(lineSolar(D)); api.done(); } };
         } },
       { text: "Now a gas plant: inside a boundary at its stack it emits " + D.objects.gas.carbon.run.v + " g CO₂e per kWh, NREL's median. Drag the left edge back to the gas field, where gas is produced, processed and piped.",
@@ -282,7 +298,7 @@
           LX.Ledger(tab, { cls: "a11-led", caption: "g CO₂e per kWh made, on each boundary.", columns: ["Boundary", "Solar farm", "Gas plant"], rows: rows.map(function (r) { return { head: r[0], cells: [r[1], r[2]] }; }) });
           H("p", { class: "lx-hint", html: LX.rich("Harmonized: studies re-run on common assumptions; the [[interquartile-range|middle half]] of their results in brackets (crystalline panels; combined-cycle plants).") }, tab);
         } },
-      { text: "Switch to water: a plant [[water-withdrawal|withdraws]] water and returns most of it, and [[water-consumption|consumes]] what evaporates. Pick two ways to cool the gas plant and compare both numbers.",
+      { text: "Switch to water: a plant [[water-withdrawal|withdraws]] water, returns part of it and [[water-consumption|consumes]] the rest, mostly by evaporation; the split depends on the cooling. Pick two ways to cool the gas plant and compare.",
         build: function (act, api) {
           set({ obj: "gas", meter: "water", L: 0, R: 3 }); S.tried = {};
           var w = H("div", { class: "cf-ctl" }, act), id = LX.uid("a11c"); H("p", { class: "cf-ctl-l", id: id, text: "Cooling" }, w);
@@ -310,7 +326,7 @@
             out.innerHTML = "";
             LX.Ledger(out, { cls: "a11-led", caption: "m² held per MWh made in a year.", columns: ["Counted", "Solar farm", "Gas plant"],
               rows: [{ head: "Footprint", sub: "arrays; well pads, roads, pipelines, plant", cells: [num("land", landPv(D, false)), num("land", landGas(D, false))] },
-                     { head: "With the land between", sub: "one plant's whole lease; the whole gas field", cells: [num("land", landPv(D, true)), num("land", landGas(D, true))] }] });
+                     { head: "With the land between", sub: "arrays scaled to one plant's lease (illustrative); the whole gas field", cells: [num("land", landPv(D, true)), num("land", landGas(D, true))] }] });
           }
           LX.Toggle(H("div", { class: "lx-toggles", role: "group", "aria-label": "Land counted" }, act), { label: "Count the land between", on: S.wide,
             onChange: function (on) { S.wide = on; keep(); box.paint(); buildExplain(); api.saw(lineLand(D, on)); api.done(); } });
@@ -333,7 +349,7 @@
             Object.keys(bs).forEach(function (k) { bs[k].setAttribute("aria-pressed", String(k === S.cons)); });
             chipsC.innerHTML = "";
             var a = H("div", { class: "lx-readout" }, chipsC); H("span", { text: "Attributional: its share" }, a); H("b", { text: "about " + D.nrelTotals.solar + " g per kWh" }, a);
-            if (S.cons) { var v = consequential(D, S.cons), c = H("div", { class: "lx-readout " + (v < 0 ? "good" : "bad") }, chipsC); H("span", { text: "Consequential: the change" }, c); H("b", { text: signed(v) + " g per kWh" }, c);
+            if (S.cons) { var v = consequential(D, S.cons), c = H("div", { class: "lx-readout " + (v < 0 ? "good" : "bad") }, chipsC); H("span", { text: "Consequential: against not building it" }, c); H("b", { text: consArith(D, S.cons) + " g per kWh" }, c);
               note.textContent = D.consequential.filter(function (x) { return x.id === S.cons; })[0].note; }
           }
           D.consequential.forEach(function (c) {
@@ -351,8 +367,11 @@
           var holder = H("div", null, act), cs = null;
           function draw() {
             holder.innerHTML = "";
+            var cases = [["median", "Median water year"], ["drought", "Drought case"]].filter(function (r) { return r[0] === "median" || S.drought; });
             cs = LX.CostSplit(holder, { parts: parts, scale: 100, fmt: function (v) { return Math.round(v) + "%"; },
-              rows: [["median", "Median water year"], ["drought", "Drought case"]].filter(function (r) { return r[0] === "median" || S.drought; }).map(function (r) { var v = vals(r[0]); return { key: r[0], label: r[1], values: v, total: 100, aria: r[1] + ": hydropower " + v.hydro + "%, natural gas " + v.gas + "%, other in-state sources " + v.other + "% of California's summer generation." }; }) });
+              rows: cases.map(function (r) { var v = vals(r[0]); return { key: r[0], label: r[1], values: v, total: 100, aria: r[1] + ": hydropower " + v.hydro + "%, natural gas " + v.gas + "%, other in-state sources " + v.other + "% of California's summer generation." }; }) });
+            LX.Ledger(holder, { cls: "a11-led a11-dr", caption: "Shares of California's summer generation, % (EIA's model).", columns: ["Water year", "Hydropower", "Natural gas", "Other in-state"],
+              rows: cases.map(function (r) { var v = vals(r[0]); return { head: r[1], cells: [v.hydro + "%", v.gas + "%", v.other + "%"] }; }) });
           }
           LX.Toggle(H("div", { class: "lx-toggles", role: "group", "aria-label": "Water year" }, act), { label: "Drought case (EIA, May 2022)", on: S.drought,
             onChange: function (on) { S.drought = on; keep(); draw(); api.saw(lineDrought(D, on)); if (on) api.done(); } });
@@ -387,13 +406,13 @@
           { id: "land", g: "foot", label: "Land", text: "Footprint or the land between: the order can reverse.", at: [3, 1], atN: [2, 1] },
           { id: "attr", g: "q", label: "Attributional", text: "Its share of today's burdens, from average data.", at: [0, 2], atN: [0, 2.4] },
           { id: "cons", g: "q", label: "Consequential", lines: ["Conse-", "quential"], text: "What changes because of a decision; it depends on what responds.", at: [1.3, 2], atN: [2, 2.4] },
-          { id: "drought", g: "q", label: "Drought", text: "Less hydropower, more gas burned and more cooling water consumed.", at: [3, 2], atN: [1, 3.2] }
+          { id: "drought", g: "q", label: "Drought", text: "Less hydropower and more gas burned; more cooling-water demand is possible, not calculated here.", at: [3, 2], atN: [1, 3.2] }
         ],
         edges: [["fu", "bound", "sets the frame for"], ["bound", "carbon", "decides"], ["bound", "water", "decides"], ["bound", "land", "decides"], ["carbon", "attr", "answers"], ["carbon", "cons", "answers"], ["drought", "water", "tightens"]],
         cols: 4, rows: 3, colsN: 3, rowsN: 4, gameLabel: "In this lesson" });
       LX.Boundary(H("div", { class: "lx-xcard" }, xhost), { title: "Where these footprints hold",
-        holds: ["each number is a published median for its technology and stage, or a 2023 U.S. average, not one real plant;", "carbon in CO₂ equivalents: methane and other gases converted to CO₂'s warming effect;", "water is consumption in U.S. conditions; land is held area, not damage to it;", "the data center is the 2023 U.S. average of LBNL's report."],
-        leaves: ["one site's sun, gas field, river or grid: ranges show how far a real plant can sit from the median;", "the land and water of mines and factories;", "a data center's servers, buildings and site;", "air pollution and health."],
+        holds: ["each number is a published median for its technology and stage, or a 2023 U.S. average, not one real plant; solar's land between is an illustrative scaling;", "carbon in CO₂ equivalents: methane and other gases converted to CO₂'s warming effect;", "water is consumption in U.S. conditions, with making and building where the reviews count them; land is held area, not damage to it;", "the data center is the 2023 U.S. average of LBNL's report."],
+        leaves: ["one site's sun, gas field, river or grid: ranges show how far a real plant can sit from the median;", "the land of mines and factories;", "a data center's servers, buildings and site;", "air pollution and health."],
         source: "Sources: NREL (2021), Meldrum et al. (2013), Macknick et al. (2012), Bolinger and Bolinger (2022), Lovering et al. (2022), LBNL (2024), EIA and USGS; dates in Sources below." });
       H("p", { class: "lx-hint", html: "Air pollution and health, from a tonne of fuel to the people who breathe it: " + ref("F11") + "." }, xhost);
     }
@@ -403,6 +422,9 @@
       if (state === "mid") { cards.go(1); set({ obj: "gas", meter: "carbon", L: 1, R: 2 }); return { view: "gas plant with its fuel supply" }; }
       if (state === "water") { cards.go(3); set({ obj: "gas", meter: "water", L: 0, R: 3, cooling: "once" }); return { view: "once-through cooling" }; }
       if (state === "dc") { cards.go(5); set({ obj: "dc", meter: "water", L: 1, R: 2 }); return { view: "data center with its power" }; }
+      function press(re) { var b = cards.el.querySelectorAll("button"); for (var i = 0; i < b.length; i++) if (re.test(b[i].textContent)) { b[i].click(); return; } }
+      if (state === "cons") { cards.go(6); press(/^Gas plants run less/); return { view: "the consequential change against not building the farm" }; }
+      if (state === "drought") { S.drought = false; cards.go(7); var tg = cards.el.querySelector(".lx-toggle"); if (tg) tg.click(); return { view: "the drought case with its table" }; }
       return null;
     }, cards);
     root.lxLesson = { model: model, D: D, S: S, cards: cards, box: box };

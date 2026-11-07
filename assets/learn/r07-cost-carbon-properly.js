@@ -7,16 +7,20 @@
    Page: learn/r07-cost-carbon-properly.qmd (studio form: Task, Exemplars, Self-check, Sources).
 
    The model (closed form, one year of a 12-year bus life; annual equivalents at a 3% real rate, CRF = r / (1 − (1 + r)^−n)):
-     electric  capital (buses + chargers − the credit, up front) × CRF + energy (miles × kWh per mile × price) + repairs
-               + [grid fix] demand charges (peak kW × $ per kW-month × 12) + depot connection × CRF
+     electric  capital (buses + chargers − the credit, up front) × CRF + energy (miles × kWh per mile × price; kWh at the
+               depot meter, charging losses in) + repairs
+               + [grid fix] demand charges (peak kW × $ per kW-month × 12) + depot connection × CRF; each of the two grid
+               costs also enters alone (F.depot, F.demand: step 4's switches); F.grid is both
                − [no credit fix] the credit counted again as income (credit / life, a year)
      diesel    capital (buses, up front) × CRF + fuel (miles / mpg × price) + repairs; mpg and repairs per mile of the
                2009 buses (the study's baseline) or of new buses ([baseline fix])
      CO2       diesel: gallons × 10.19 kg; electric: 0 at the tailpipe, or [boundary fix] MWh × the grid's average factor
                (EIA 2023 U.S. average, or a reader's choice of 0.10 or 0.70 t per MWh)
-     saving = diesel − electric (a year); cut = diesel CO2 − electric CO2; cost per tonne avoided = −saving / cut (only
-     when electric costs more). Society's view: the credit moves money from the state to the agency, so it leaves out the
-     credit altogether. Every fix is independent of the others' order: the test runs all 16 combinations.
+     saving = diesel − electric (a year); cut = diesel CO2 − electric CO2, attributed operating CO2 (average-factor
+     accounting: the system's real change needs a consequential analysis, A10); cost per attributed tonne = −saving / cut
+     (only when electric costs more). Society's view: the credit moves money from the state to the agency, so it leaves
+     out the credit altogether. Every fix is independent of the others' order: the test runs all 16 combinations. The
+     waterfall is built from the fixes that are on (review 2026-11-06).
    Task (step cards): read the study; find the boundary mismatch; state the counterfactual; add the grid costs; count the
    credit once; watch the conclusion change (waterfall on LX.Plot, each fix on or off, the grid factor); write the audit
    note (form-only checks, then the strong exemplar). Exemplars: LX.Exemplars, the who-pays ledger (LX.Ledger, i-ledger),
@@ -36,7 +40,7 @@
     var I = D.inputs, N = I.buses, miles = N * I.milesPerBus, k = crf(I.rate, I.life), E = I.electric, G = I.diesel, R = I.grid, C = I.credit;
     var e = { upfront: N * (E.price + E.charger) - N * C.perBus, mwh: miles * E.kWhPerMile / 1000 };
     e.capital = e.upfront * k; e.energy = miles * E.kWhPerMile * E.energyPrice; e.maint = miles * E.maintPerMile;
-    e.depotUpfront = F.grid ? R.depotUpgrade : 0; e.depot = e.depotUpfront * k; e.demand = F.grid ? R.peakKW * R.demandCharge * 12 : 0;
+    e.depotUpfront = F.grid || F.depot ? R.depotUpgrade : 0; e.depot = e.depotUpfront * k; e.demand = F.grid || F.demand ? R.peakKW * R.demandCharge * 12 : 0;
     e.creditTwice = F.credit ? 0 : N * C.perBus / I.life;
     e.total = e.capital + e.energy + e.maint + e.depot + e.demand - e.creditTwice;
     var d = { upfront: N * G.price, mpg: F.baseline ? G.newMpg : G.oldMpg, mm: F.baseline ? G.newMaintPerMile : G.oldMaintPerMile };
@@ -48,11 +52,18 @@
     return { e: e, d: d, co2: co2, saving: saving, extra: -saving, crf: k, miles: miles, creditYear: credit, creditTwiceYear: N * C.perBus / I.life,
       perTonne: saving < 0 && co2.cut > 0 ? -saving / co2.cut : null, society: society, societyPerTonne: society > 0 && co2.cut > 0 ? society / co2.cut : null };
   }
-  // the conclusion as fixes are added in the page's order (the boundary moves CO2 only)
-  function waterfall(D, gid) {
-    var order = [["study", null], ["baseline", "A fair baseline"], ["grid", "Grid costs"], ["credit", "The credit once"]], F = all(false), out = [];
-    order.forEach(function (o) { if (o[1]) F[o[0]] = true; out.push({ id: o[0], label: o[1] || "The study", saving: run(D, F, gid).saving }); });
-    F.boundary = true; out.push({ id: "audit", label: "Audited", saving: run(D, F, gid).saving });
+  // the conclusion as the fixes that are on (Fx; all four if left out) are added in the page's order: one bar per cost fix
+  // that is on, then the result now (the boundary moves CO2 only); a grid fix with one of its two costs is labelled by it
+  function gridOn(Fx) { return !!(Fx.grid || Fx.depot || Fx.demand); }
+  function waterfall(D, gid, Fx) {
+    Fx = Fx || all(true);
+    var F = all(false), out = [{ id: "study", label: "The study", saving: run(D, F, gid).saving }];
+    if (Fx.baseline) { F.baseline = true; out.push({ id: "baseline", label: "A fair baseline", saving: run(D, F, gid).saving }); }
+    if (gridOn(Fx)) { F.grid = !!Fx.grid; F.depot = !!(Fx.grid || Fx.depot); F.demand = !!(Fx.grid || Fx.demand);
+      out.push({ id: "grid", label: Fx.grid || (F.depot && F.demand) ? "Grid costs" : F.depot ? "Depot connection" : "Demand charges", saving: run(D, F, gid).saving }); }
+    if (Fx.credit) { F.credit = true; out.push({ id: "credit", label: "The credit once", saving: run(D, F, gid).saving }); }
+    var done = FIX.every(function (k) { return k === "grid" ? F.depot && F.demand : Fx[k]; });
+    F.boundary = !!Fx.boundary; out.push({ id: done ? "audit" : "now", label: done ? "Audited" : "Now", saving: run(D, F, gid).saving });
     return out;
   }
   // formats
@@ -74,18 +85,38 @@
     var S0 = run(D, all(false)), A = run(D, all(true)), I = D.inputs;
     return { saving: money(S0.saving), cutPct: pct(S0.co2.pct), eCO2: t(A.co2.e), dCO2: t(A.co2.d), oldCO2: t(S0.co2.d), newMpg: I.diesel.newMpg, oldMpg: I.diesel.oldMpg,
       depot: money(I.grid.depotUpgrade), demand: usd(A.e.demand), creditYear: usd(S0.creditTwiceYear), extra: money(A.extra), cut: t(A.co2.cut),
-      cutPctA: pct(A.co2.pct), credit: money(I.buses * I.credit.perBus), perTonne: "$" + grp(A.perTonne), societyPerTonne: "$" + grp(A.societyPerTonne), society: money(A.society), factor: gridUS(D).toFixed(3) };
+      cutPctA: pct(A.co2.pct), credit: money(I.buses * I.credit.perBus), perTonne: "$" + grp(A.perTonne), societyPerTonne: "$" + grp(A.societyPerTonne), society: money(A.society), factor: gridUS(D).toFixed(3),
+      buses: I.buses, oldYear: I.diesel.oldYear, newMaint: "$" + I.diesel.newMaintPerMile.toFixed(2), kWhPerMile: I.electric.kWhPerMile, lossPct: Math.round(D.co2.tdLoss * 100) + "%" };
   }
   function verdict(r) {
-    return r.saving >= 0 ? "Electric saves " + money(r.saving) + " a year and cuts CO₂ by " + t(r.co2.cut) + " (" + pct(r.co2.pct) + ")."
-      : "Electric costs " + money(r.extra) + " a year more and cuts " + t(r.co2.cut) + " of CO₂ (" + pct(r.co2.pct) + "): about $" + grp(r.perTonne) + " per tonne.";
+    return r.saving >= 0 ? "Electric saves " + money(r.saving) + " a year and lowers attributed CO₂ by " + t(r.co2.cut) + " (" + pct(r.co2.pct) + ")."
+      : "Electric costs " + money(r.extra) + " a year more and lowers attributed CO₂ by " + t(r.co2.cut) + " (" + pct(r.co2.pct) + "): about $" + grp(r.perTonne) + " per attributed tonne.";
   }
   // the lines the page assembles (checked for every input in the test)
-  function lineBoundary(D, gid) { var r = run(D, { boundary: true }, gid); return "**One boundary:** charging " + grp(r.e.mwh) + " MWh a year at " + r.co2.factor.toFixed(3) + " t per MWh emits " + t(r.co2.e) + ". The CO₂ cut falls from 100% to " + pct(r.co2.pct) + "."; }
+  function lineBoundary(D, gid) { var r = run(D, { boundary: true }, gid); return "**One boundary:** charging " + grp(r.e.mwh) + " MWh a year at " + r.co2.factor.toFixed(3) + " t per MWh is attributed " + t(r.co2.e) + ". The CO₂ cut falls from 100% to " + pct(r.co2.pct) + "."; }
   function lineBaseline(D) { var a = run(D, {}), b = run(D, { baseline: true }); return "**Fair baseline:** new diesel buses burn " + grp(b.d.gallons) + " gallons a year, not " + grp(a.d.gallons) + ". Diesel's yearly cost falls by " + money(a.d.total - b.d.total) + "."; }
   function lineGrid(D) { var r = run(D, { grid: true }); return "**Grid costs:** " + usd(r.e.demand) + " a year in demand charges, and " + money(r.e.depotUpfront) + " up front for the depot (" + usd(r.e.depot) + " a year as an annual equivalent)."; }
   function lineCredit(D) { var r = run(D, {}); return "**The credit once:** the " + money(D.inputs.buses * D.inputs.credit.perBus) + " stays off the price up front; the second count, " + usd(r.creditTwiceYear) + " a year, goes."; }
+  function lineGridPart(D, which) { var r = run(D, which === "depot" ? { depot: true } : { demand: true });
+    return which === "depot" ? "**Depot connection:** " + money(r.e.depotUpfront) + " up front, " + usd(r.e.depot) + " a year as an annual equivalent. The demand charges are still missing."
+      : "**Demand charges:** " + usd(r.e.demand) + " a year. The depot connection is still missing."; }
   function lineVerdict(D, F, gid) { return "**Now:** " + verdict(run(D, F, gid)); }
+  // the study's inputs, its fleet plan and two numbers worked from them (review finding 3); the units key (finding 8)
+  function inputRows(D) {
+    var E = D.inputs.electric, G = D.inputs.diesel, C = D.inputs.credit;
+    return [["Price per bus", usd(E.price) + " + " + usd(E.charger) + " charger", usd(G.price)],
+      ["Energy per mile", E.kWhPerMile + " kWh, " + E.meter, G.oldMpg + " mpg (the " + G.oldYear + " buses)"],
+      ["Energy price", "$" + E.energyPrice.toFixed(2) + " per kWh, energy rate only", "$" + G.fuelPrice.toFixed(2) + " per gallon"],
+      ["Repairs per mile", "$" + E.maintPerMile.toFixed(2), "$" + G.oldMaintPerMile.toFixed(2) + " (the " + G.oldYear + " buses)"],
+      ["Purchase credit", usd(C.perBus) + " per bus, " + C.name, "none"]];
+  }
+  function fleetLine(D) { var I = D.inputs; return "Both fleets: " + I.buses + " buses, " + grp(I.milesPerBus) + " miles each a year, a " + I.life + "-year life, a " + Math.round(I.rate * 100) + "% real discount rate."; }
+  function planText(D) { return fillT(D.study.plan.text, facts(D)); }
+  function worked(D) {
+    var I = D.inputs, S0 = run(D, all(false)), miles = S0.miles;
+    return ["Charging energy: " + I.buses + " buses × " + grp(I.milesPerBus) + " miles × " + I.electric.kWhPerMile + " kWh per mile = " + grp(S0.e.mwh) + " MWh a year; at $" + I.electric.energyPrice.toFixed(2) + " per kWh, " + usd(S0.e.energy) + " a year.",
+      "Diesel fuel, as the study runs it: " + grp(miles) + " miles ÷ " + I.diesel.oldMpg + " mpg = " + grp(S0.d.gallons) + " gallons a year; at $" + I.diesel.fuelPrice.toFixed(2) + " per gallon, " + usd(S0.d.fuel) + " a year."];
+  }
 
   // ---- the no-JS blocks (written by the test's --write mode)
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
@@ -111,7 +142,8 @@
     h.push('<p class="lx-eyebrow">The study (fictional)</p>');
     h.push("<p><b>" + esc(D.study.title) + "</b>. " + esc(D.study.authors) + ".</p>");
     h.push("<p>" + esc(fillT(D.study.headline, F)) + "</p>");
-    h.push('<details class="lx-textalt"><summary>Four flaws, each fixed, and the conclusion after each</summary><div class="lx-scroll-x"><table class="lx-facts"><thead><tr><th scope="col">Fix</th><th scope="col">What it changes</th><th scope="col">Saving a year, electric against diesel</th><th scope="col">CO₂ cut</th></tr></thead><tbody>');
+    h.push(inputsHTML(D));
+    h.push('<details class="lx-textalt"><summary>Four flaws, each fixed, and the conclusion after each</summary><div class="lx-scroll-x"><table class="lx-facts"><thead><tr><th scope="col">Fix</th><th scope="col">What it changes</th><th scope="col">Saving a year, electric against diesel</th><th scope="col">Attributed CO₂ cut</th></tr></thead><tbody>');
     var Fx = all(false);
     h.push("<tr><td>The study as published</td><td>none</td><td>" + money(S0.saving) + "</td><td>" + t(S0.co2.cut) + " (" + pct(S0.co2.pct) + ")</td></tr>");
     [["boundary", lineBoundary(D)], ["baseline", lineBaseline(D)], ["grid", lineGrid(D)], ["credit", lineCredit(D)]].forEach(function (x) {
@@ -119,8 +151,17 @@
       h.push("<tr><td>" + esc(f.label) + "</td><td>" + esc(x[1].replace(/\*\*/g, "")) + "</td><td>" + (r.saving >= 0 ? money(r.saving) : "−" + money(r.saving).slice(1)) + "</td><td>" + t(r.co2.cut) + " (" + pct(r.co2.pct) + ")</td></tr>");
     });
     h.push("</tbody></table></div></details>");
-    h.push("<p><b>Audited:</b> " + esc(verdict(A)) + " That is for the transit agency, with the grid at EIA's 2023 U.S. average.</p>");
+    h.push("<p><b>Audited:</b> " + esc(verdict(A)) + " That is for the transit agency, with charging at EIA's 2023 U.S. average factor.</p>");
     return h.join("\n");
+  }
+  function inputsHTML(D) {
+    var w = worked(D);
+    return '<p class="lx-eyebrow">Its inputs (illustrative)</p><div class="lx-scroll-x"><table class="lx-facts r07-in"><thead><tr><th scope="col">Input</th><th scope="col">Electric</th><th scope="col">Diesel</th></tr></thead><tbody>'
+      + inputRows(D).map(function (r) { return '<tr><th scope="row">' + esc(r[0]) + '</th><td data-l="Electric">' + esc(r[1]) + '</td><td data-l="Diesel">' + esc(r[2]) + "</td></tr>"; }).join("") + "</tbody></table></div>"
+      + '<p class="lx-hint">' + esc(fleetLine(D)) + "</p>"
+      + '<p class="r07-plan"><b>From ' + esc(D.study.plan.source) + ":</b> " + esc(planText(D)) + "</p>"
+      + '<p class="lx-hint">' + esc(D.units) + "</p>"
+      + '<details class="lx-textalt"><summary>Two numbers worked from these inputs</summary><ul><li>' + esc(w[0]) + "</li><li>" + esc(w[1]) + "</li></ul></details>";
   }
   function ledgerHTML(D) {
     var h = ['<p class="lx-eyebrow">The study against the audit, thousands of 2025 dollars a year (rounded)</p><div class="lx-scroll-x"><table class="lx-facts"><thead><tr><th scope="col">Line</th><th scope="col">Study</th><th scope="col">Audited</th></tr></thead><tbody>'];
@@ -131,17 +172,20 @@
   function whoRows(D) {
     var A = run(D, all(true)), N = D.inputs.buses * D.inputs.credit.perBus;
     return [
-      { head: "Port Alder Transit", sub: "the agency's budget", cells: ["+" + money(A.extra) + " a year", "$" + grp(A.perTonne) + " per tonne (about)"] },
+      { head: "Port Alder Transit", sub: "the agency's budget", cells: ["+" + money(A.extra) + " a year", "$" + grp(A.perTonne) + " per attributed tonne (about)"] },
       { head: "The state", sub: "pays the credit", cells: [money(N) + " up front (" + money(A.creditYear) + " a year as an annual equivalent)", "a transfer to the agency"] },
-      { head: "Agency and state together", sub: "the credit nets out", cells: ["+" + money(A.society) + " a year", "$" + grp(A.societyPerTonne) + " per tonne (about)"] },
-      { head: "The climate", sub: "CO₂, at EIA's 2023 U.S. grid average", cells: ["−" + t(A.co2.cut) + " a year", pct(A.co2.pct) + " of the diesel fleet's"] }
+      { head: "Agency and state together", sub: "the credit nets out", cells: ["+" + money(A.society) + " a year", "$" + grp(A.societyPerTonne) + " per attributed tonne (about)"] },
+      { head: "Attributed CO₂", sub: "operating energy, charging at EIA's 2023 U.S. grid average", cells: ["−" + t(A.co2.cut) + " a year", pct(A.co2.pct) + " of the diesel fleet's"] }
     ];
   }
   function boundarySpec(D) {
     return { title: "Where the audited conclusion holds",
-      holds: ["the inputs are this fictional study's, in 2025 dollars, over a 12-year life at 3%;", "charging's CO₂ is at the grid's average factor (EIA, 2023); a marginal factor for the hours buses charge could differ (A10);", "the agency pays the depot connection; the state pays the credit once;", "both fleets run the same routes and miles."],
-      leaves: ["making the buses and batteries (a life-cycle boundary, A11);", "tailpipe air pollution and noise in the streets, which electric buses cut;", "a grid that gets cleaner over the 12 years, and battery replacement;", "federal grants, fuel and power price changes."],
-      source: "Illustrative inputs; real fleets differ. EIA: 10.19 kg CO₂ per gallon of diesel (2024); 1.53 billion tonnes over 4.18 trillion kWh, U.S. 2023." };
+      holds: ["the inputs are this fictional study's, in 2025 dollars, over a 12-year life at 3%;", "costs are the agency's, with the state's credit once; CO₂ is each fleet's operating energy, at the tailpipe or the power plant;",
+        "charging's CO₂ is attributed at the grid's average factor (EIA, 2023): what the grid really emits less needs a consequential analysis (A10);",
+        D.inputs.electric.kWhPerMile + " kWh per mile is " + D.inputs.electric.meter + ";", "the agency pays the depot connection; both fleets run the same routes and miles."],
+      leaves: ["making the buses and batteries: embodied CO₂ is outside both fleets' counts (a life-cycle boundary, A11);", "grid losses between plant and depot (EIA: about " + Math.round(D.co2.tdLoss * 100) + "%), which would raise charging's CO₂ a little;",
+        "tailpipe air pollution and noise in the streets, which electric buses cut;", "a grid that gets cleaner over the 12 years, and battery replacement;", "federal grants, fuel and power price changes."],
+      source: "Illustrative inputs; real fleets differ. EIA: 10.19 kg CO₂ per U.S. gallon of diesel (2024); 1.53 billion tonnes over 4.18 trillion kWh generated, U.S. 2023." };
   }
   function boundaryHTML(D) {
     var b = boundarySpec(D);
@@ -150,7 +194,7 @@
   }
   function exemplarsSpec(D) { return fillDeep(D.exemplars, facts(D)); }
   function whoHTML(D) {
-    return '<p class="lx-eyebrow">Who pays, who gains: the audited plan, a year, against new diesel buses</p><div class="lx-scroll-x"><table class="lx-facts"><thead><tr><th scope="col">Who</th><th scope="col">Cost or change</th><th scope="col">Per tonne of CO₂ avoided</th></tr></thead><tbody>'
+    return '<p class="lx-eyebrow">Who pays, who gains: the audited plan, a year, against new diesel buses</p><div class="lx-scroll-x"><table class="lx-facts"><thead><tr><th scope="col">Who</th><th scope="col">Cost or change</th><th scope="col">Per attributed tonne of CO₂</th></tr></thead><tbody>'
       + whoRows(D).map(function (r) { return '<tr><th scope="row">' + esc(r.head) + '<br><span class="lx-hint">' + esc(r.sub) + "</span></th><td>" + esc(r.cells[0]) + "</td><td>" + esc(r.cells[1]) + "</td></tr>"; }).join("") + "</tbody></table></div>";
   }
   function ladderHTML(D) {
@@ -159,8 +203,9 @@
   }
   function checksOf(D, text) { var s = String(text || ""); return D.writeChecks.map(function (c) { return { id: c.id, label: c.label, ok: new RegExp(c.re, "i").test(s) }; }); }
 
-  var model = { FIX: FIX, crf: crf, gridUS: gridUS, gridFactor: gridFactor, all: all, run: run, waterfall: waterfall, grp: grp, money: money, usd: usd, thou: thou, t: t, pct: pct,
-    fillT: fillT, fillDeep: fillDeep, facts: facts, verdict: verdict, lineBoundary: lineBoundary, lineBaseline: lineBaseline, lineGrid: lineGrid, lineCredit: lineCredit, lineVerdict: lineVerdict,
+  var model = { FIX: FIX, crf: crf, gridUS: gridUS, gridFactor: gridFactor, all: all, run: run, waterfall: waterfall, gridOn: gridOn, grp: grp, money: money, usd: usd, thou: thou, t: t, pct: pct,
+    fillT: fillT, fillDeep: fillDeep, facts: facts, verdict: verdict, lineBoundary: lineBoundary, lineBaseline: lineBaseline, lineGrid: lineGrid, lineGridPart: lineGridPart, lineCredit: lineCredit, lineVerdict: lineVerdict,
+    inputRows: inputRows, fleetLine: fleetLine, planText: planText, worked: worked, inputsHTML: inputsHTML,
     ledgerRows: ledgerRows, staticTask: staticTask, whoHTML: whoHTML, ladderHTML: ladderHTML, ledgerHTML: ledgerHTML, whoRows: whoRows, boundarySpec: boundarySpec, boundaryHTML: boundaryHTML, exemplarsSpec: exemplarsSpec, checksOf: checksOf, esc: esc, rich: rich };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX || !window.LX.H) return;
@@ -187,23 +232,27 @@
     var tb = H("table", { class: "lx-facts r07-tab" }, paper); H("caption", { text: "Its tables: a year, 2025 dollars." }, tb);
     var hr0 = H("tr", null, H("thead", null, tb)); ["", "Electric", "Diesel"].forEach(function (x) { H("th", { scope: "col", text: x }, hr0); });
     var tbd = H("tbody", null, tb);
-    [["Cost", money(S0.e.total), money(S0.d.total)], ["CO₂", t(S0.co2.e), t(S0.co2.d)]].forEach(function (r) { var tr = H("tr", null, tbd); H("th", { scope: "row", text: r[0] }, tr); H("td", { text: r[1] }, tr); H("td", { text: r[2] }, tr); });
+    [["Cost", money(S0.e.total), money(S0.d.total)], ["CO₂", t(S0.co2.e), t(S0.co2.d)]].forEach(function (r) { var tr = H("tr", null, tbd); H("th", { scope: "row", text: r[0] }, tr); H("td", { text: r[1], "data-l": "Electric" }, tr); H("td", { text: r[2], "data-l": "Diesel" }, tr); });
+    H("div", { class: "r07-inputs", html: inputsHTML(D) }, paper);   // the study's inputs, its fleet plan, the units and two worked numbers
     var audit = H("section", { class: "r07-audit", "aria-label": "Your audit" }, cols);
     H("p", { class: "lx-eyebrow", text: "Your audit" }, audit);
     var chips = H("div", { class: "lx-readouts", "aria-live": "polite" }, audit), fixList = H("ul", { class: "r07-fixes" }, audit), verdictEl = H("p", { class: "r07-verdict" }, audit);
+    H("p", { class: "lx-hint", html: LX.rich("[[attributed-emissions|Attributed]] CO₂: diesel at the tailpipe and, once the boundary is fixed, charging at the grid's average factor. What the grid really emits less needs a consequential analysis: ") + ref("A10") + "." }, audit);
     function chip(label, value, tone) { var c = H("div", { class: "lx-readout" + (tone ? " " + tone : "") }, chips); H("span", { text: label }, c); H("b", { text: value }, c); }
     function paint() {
       var r = run(D, S.fx, S.grid);
       chips.innerHTML = "";
       chip(r.saving >= 0 ? "Electric saves, a year" : "Electric costs more, a year", money(r.saving), r.saving >= 0 ? "good" : "bad");
-      chip("CO₂ cut, a year", t(r.co2.cut) + " (" + pct(r.co2.pct) + ")");
-      chip("Cost per tonne avoided", r.perTonne ? "about $" + grp(r.perTonne) : "none: electric saves money");
+      chip("Attributed CO₂ cut, a year", t(r.co2.cut) + " (" + pct(r.co2.pct) + ")");
+      chip("Cost per attributed tonne", r.perTonne ? "about $" + grp(r.perTonne) : "none: electric saves money");
       fixList.innerHTML = "";
-      D.fixes.forEach(function (f) { var li = H("li", { class: S.fx[f.id] ? "on" : "" }, fixList); H("span", { class: "r07-tick", "aria-hidden": "true", html: LX.icon(S.fx[f.id] ? "check" : "cross") }, li); H("span", { text: f.label + ": " + (S.fx[f.id] ? f.short : "not fixed yet") }, li); });
+      D.fixes.forEach(function (f) {
+        var part = f.id === "grid" && !S.fx.grid && (S.fx.depot || S.fx.demand) ? (S.fx.depot ? "depot connection added; demand charges still missing" : "demand charges added; depot connection still missing") : null;
+        var li = H("li", { class: S.fx[f.id] ? "on" : "" }, fixList); H("span", { class: "r07-tick", "aria-hidden": "true", html: LX.icon(S.fx[f.id] ? "check" : "cross") }, li); H("span", { text: f.label + ": " + (S.fx[f.id] ? f.short : part || "not fixed yet") }, li); });
       verdictEl.textContent = verdict(r) + (S.fx.boundary ? " CO₂ at " + r.co2.factor.toFixed(3) + " t per MWh of charging." : "");
       buildExplain();
     }
-    function fix(id, on) { S.fx[id] = on; keep(); paint(); }
+    function fix(id, on) { S.fx[id] = on; if (id === "grid") { S.fx.depot = on; S.fx.demand = on; } keep(); paint(); }
 
     function choice(act, items, onRight) {   // a row of options with feedback; the right one applies its fix
       var g = H("div", { class: "r07-opts", role: "group" }, act), out = H("div", { class: "lx-predict-out", "aria-live": "polite" }, act);
@@ -241,8 +290,11 @@
         } },
       { text: "Flaw 3, missing grid costs: the study prices charging at an energy rate alone. Add the depot's new connection and the [[demand-charge|demand charges]] for charging 40 buses at once.",
         build: function (act, api) {
-          var I = D.inputs.grid, tg = H("div", { class: "lx-toggles", role: "group", "aria-label": "Grid costs" }, act), on = { a: S.fx.grid, b: S.fx.grid };
-          function upd() { if (on.a && on.b) { fix("grid", true); api.saw(lineGrid(D)); api.done(); } else if (S.fx.grid) fix("grid", false); }
+          var I = D.inputs.grid, tg = H("div", { class: "lx-toggles", role: "group", "aria-label": "Grid costs" }, act), on = { a: !!(S.fx.grid || S.fx.depot), b: !!(S.fx.grid || S.fx.demand) };
+          function upd() {   // each cost enters on its own; the fix is done when both are in
+            S.fx.depot = on.a; S.fx.demand = on.b; S.fx.grid = on.a && on.b; keep(); paint();
+            if (S.fx.grid) { api.saw(lineGrid(D)); api.done(); } else if (on.a || on.b) api.saw(lineGridPart(D, on.a ? "depot" : "demand"));
+          }
           LX.Toggle(tg, { label: "Depot connection: " + money(I.depotUpgrade) + " up front", on: on.a, onChange: function (v) { on.a = v; upd(); } });
           LX.Toggle(tg, { label: "Demand charges: " + grp(I.peakKW) + " kW at $" + I.demandCharge + " per kW-month", on: on.b, onChange: function (v) { on.b = v; upd(); } });
           H("p", { class: "lx-hint", html: "Up front and annual stay apart: the connection is paid once and shown a year as an annual equivalent at 3% over 12 years. Demand charges: " + ref("A4") + "." }, act);
@@ -261,21 +313,21 @@
           H("p", { class: "lx-hint", html: LX.rich("For the agency and the state together the credit is a [[transfer-payment|transfer]], not a saving: see the ledger under Exemplars.") + " " + ref("A12") + " shows why." }, act);
           if (S.fx.credit) api.done();
         } },
-      { text: "The conclusion has changed: each bar is one fix, in the order you made them. Turn any fix off to see the conclusion without it, and try the grid's CO₂ factor.",
+      { text: "The conclusion has changed: each bar is one cost fix that is on, then the result now. Turn any fix off and the chart follows; try the grid's CO₂ factor too.",
         build: function (act, api) {
           var plotHost = H("div", null, act), P1 = LX.Plot(plotHost, { text: "Text version of the chart", box: true });
           function draw() {
-            var w = waterfall(D, S.grid), bars = [], prev = 0, ticks = [], ticksN = [], SH = ["Study", "Base", "Grid", "Credit", "Audit"];
+            var w = waterfall(D, S.grid, S.fx), bars = [], prev = 0, ticks = [], ticksN = [], SH = { study: "Study", baseline: "Base", grid: "Grid", credit: "Credit", audit: "Audit", now: "Now" }, last = w[w.length - 1];
             w.forEach(function (s, i) {
               var y0 = i === 0 || i === w.length - 1 ? 0 : prev, y1 = s.saving / 1e6;
               bars.push({ x0: i + 0.15, x1: i + 0.85, y0: Math.min(y0, y1), y1: Math.max(y0, y1), color: i === 0 || i === w.length - 1 ? "var(--lx-accent)" : y1 < y0 ? "var(--lx-bad)" : "var(--lx-good)", op: 0.85, rx: 3 });
-              ticks.push([i + 0.5, s.label]); ticksN.push([i + 0.5, SH[i]]); prev = y1;
+              ticks.push([i + 0.5, s.label]); ticksN.push([i + 0.5, SH[s.id]]); prev = y1;
             });
             P1.render({ x: { min: 0, max: w.length, ticks: ticks, ticksN: ticksN }, y: { min: -1, max: 1.5, step: 0.5, fmt: function (v) { return (v < 0 ? "−" : "") + "$" + Math.abs(v).toFixed(1) + "M"; }, unit: "saving a year", zero: true },
-              height: 250, heightN: 220, bars: bars, legend: [{ label: "A fix that lowers the saving", color: "var(--lx-bad)" }, { label: "The study and the audit", color: "var(--lx-accent)" }],
+              height: 250, heightN: 220, bars: bars, legend: [{ label: "A fix that lowers the saving", color: "var(--lx-bad)" }, { label: "The study and the result now", color: "var(--lx-accent)" }],
               marks: w.map(function (s, i) { return { x: i + 0.5, y: s.saving / 1e6, label: (s.saving < 0 ? "−" : "+") + (Math.abs(s.saving) / 1e6).toFixed(2), kind: "dot", pos: s.saving < 0 ? "below" : "above" }; }),
-              aria: "The electric fleet's yearly saving against diesel, from the study's " + money(w[0].saving) + " to the audited " + (w[4].saving < 0 ? "extra cost of " : "") + money(w[4].saving) + ", fix by fix.",
-              text: { head: ["After", "Saving a year, electric against diesel"], rows: w.map(function (s) { return [s.label, (s.saving < 0 ? "−" : "") + money(s.saving)]; }), note: "The boundary fix changes CO₂ only." } });
+              aria: "The electric fleet's yearly saving against diesel, from the study's " + money(w[0].saving) + " to " + (last.id === "audit" ? "the audited " : "the result now, ") + (last.saving < 0 ? "an extra cost of " : "") + money(last.saving) + ", one bar per fix that is on.",
+              text: { head: ["After", "Saving a year, electric against diesel"], rows: w.map(function (s) { return [s.label, (s.saving < 0 ? "−" : "") + money(s.saving)]; }), note: "Only the fixes that are on; the boundary fix changes CO₂ only." } });
           }
           var tg = H("div", { class: "lx-toggles", role: "group", "aria-label": "Fixes" }, act), tgs = {};
           D.fixes.forEach(function (f) { tgs[f.id] = LX.Toggle(tg, { label: f.label, on: S.fx[f.id], onChange: function (v) { fix(f.id, v); draw(); api.saw(lineVerdict(D, S.fx, S.grid)); api.done(); } }); });
@@ -322,7 +374,7 @@
       }
       var h = xhost._who; h.innerHTML = "";
       var hd = H("header", { class: "lx-x-head" }, h); H("h3", { text: "Who pays, who gains: the audited plan" }, hd);
-      LX.Ledger(h, { cls: "r07-who", caption: "A year, against new diesel buses; 2025 dollars, rounded.", columns: ["Who", "Cost or change", "Per tonne of CO₂ avoided"],
+      LX.Ledger(h, { cls: "r07-who", caption: "A year, against new diesel buses; 2025 dollars, rounded.", columns: ["Who", "Cost or change", "Per attributed tonne of CO₂"],
         rows: whoRows(D).map(function (r) { return { head: r.head, sub: r.sub, cells: r.cells.map(function (c) { return { text: c, cls: "who" }; }) }; }) });
     }
     var rhost = document.getElementById("r07-rubric");
@@ -335,6 +387,8 @@
     LX.demo(root, function (state) {
       if (state === "mid") { S.fx = { boundary: true, baseline: true, grid: false, credit: false }; keep(); cards.go(3); paint(); return { view: "two flaws fixed" }; }
       if (state === "done") { S.fx = all(true); keep(); cards.go(5); paint(); return { view: "all four fixed" }; }
+      if (state === "depot") { S.fx = { boundary: true, baseline: true, grid: false, credit: false, depot: true, demand: false }; keep(); cards.go(3); paint(); return { view: "one grid cost in" }; }
+      if (state === "nogrid") { S.fx = { boundary: true, baseline: true, grid: false, credit: true }; keep(); cards.go(5); paint(); return { view: "every fix but the grid costs" }; }
       return null;
     }, cards);
     root.lxLesson = { model: model, D: D, S: S, cards: cards };
