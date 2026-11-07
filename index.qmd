@@ -12,11 +12,15 @@ listing:
     sort: "date desc"
     max-items: 1
     fields: [date, title, description]
-# This page's own include-in-header replaces the one in _quarto.yml, so the two project-level lines (the Academicons
-# stylesheet for the Google Scholar and ORCID icons, and the theme colour) are repeated here (2026-11-05).
+# This page's own include-in-header replaces the one in _quarto.yml, so the project-level lines (the security policy and
+# referrer policy, the Academicons stylesheet for the Google Scholar and ORCID icons, and the theme colour) are repeated
+# here (2026-11-05; security lines 2026-11-07). The policy is the site's plus what the visitor widget needs: its loader
+# (mapmyvisitors.com) loads jQuery from code.jquery.com and runs its server's reply with eval ('unsafe-eval').
 include-in-header:
   text: |
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.9.4/css/academicons.min.css" crossorigin="anonymous">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://mapmyvisitors.com https://code.jquery.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; img-src 'self' data: blob: https:; connect-src 'self' https://cdn.jsdelivr.net; worker-src 'self' blob:; object-src 'self'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.9.4/css/academicons.min.css" integrity="sha384-cxs0Bj979VdNByRZzAJ2KJWG8vH/kG7fwWZAIZW3Tmsw0rAuP/pu3I3LitFWEs18" crossorigin="anonymous">
     <meta name="theme-color" content="#ffffff">
     <meta name="google-site-verification" content="HYz_8CxZxTFlFVPVBRmrgRHyec1XTOszSbx0ergwHH4" />
     <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Person", "name": "Honglin Li", "alternateName": "李洪林", "honorificSuffix": "Ph.D.", "url": "https://henryutd2021.github.io/", "image": "https://henryutd2021.github.io/images/profile-square.jpg", "email": "mailto:hlli@ksu.edu", "jobTitle": "Postdoctoral Fellow", "worksFor": {"@type": "CollegeOrUniversity", "name": "Kansas State University", "department": "Department of Electrical and Computer Engineering"}, "alumniOf": [{"@type": "CollegeOrUniversity", "name": "The University of Texas at Dallas"}, {"@type": "CollegeOrUniversity", "name": "Texas State University"}, {"@type": "CollegeOrUniversity", "name": "Dalian Maritime University"}], "knowsAbout": ["Energy systems optimization", "Techno-economic analysis", "Small modular reactors", "AI data center power supply", "Hydrogen energy systems", "Electricity markets", "Stochastic optimization"], "sameAs": ["https://scholar.google.com/citations?user=O1BZdHQAAAAJ", "https://orcid.org/0000-0002-8405-3032", "https://www.linkedin.com/in/honglin-li-998b18221/", "https://github.com/Henryutd2021"]}</script>
