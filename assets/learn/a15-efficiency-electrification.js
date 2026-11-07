@@ -7,12 +7,13 @@
 // the rebound range, the district-heat and industry settings) and data/path.json (lesson links that appear once live).
 //
 // Model (closed form; no optimization):
-//   cost of saved energy  CSE = C x CRF(r, n) / dE, $ per MWh saved, 2025 dollars. C = the extra cost per unit (at
+//   cost of saved energy  CSE = (C x CRF(r, n) + A) / dE, $ per MWh saved, 2025 dollars; A = the extra yearly cost. C = the extra cost per unit (at
 //                         replacement: the efficient choice minus the standard one; a retrofit: the whole cost), moved to
 //                         2025 dollars with BEA's GDP deflator; CRF(r, n) = r (1 + r)^n / ((1 + r)^n - 1), r the real
 //                         discount rate (LBNL's 6% by default), n the life in years; dE the MWh of the carrier saved a year,
-//                         times (1 - rebound) for the homes' measures. A measure pays when its CSE is below the retail price
-//                         of what it saves (2025 Kansas: homes' and shops' electricity, homes' gas).
+//                         times (1 - rebound) for the homes' measures. A block is cost-effective when its CSE is below the
+//                         price it competes with: Kansas's 2025 average retail price of what it saves (homes' and shops'
+//                         electricity, homes' gas), a flat price per MWh (no fixed, demand or time-of-use charges).
 //   savings per unit      heat pump from resistance: q (1 - 1/SCOP), q = the district's average home's heat a year, SCOP
 //                         the heat-weighted COP over the representative days (F3's curve at each hour's temperature);
 //                         heat-pump water heater: w (1/0.92 - 1/3.73), w = hot water delivered per home; weatherization:
@@ -22,7 +23,11 @@
 //                         weatherization, the heat pump's cost) use A18's sources and values; the heat pump's cost is read
 //                         from e0.json (SB0's and A18's figure). Yearly extras (upkeep, a furnace fan's electricity at the
 //                         homes' price) are added to C x CRF.
-//   the curve             blocks sorted by CSE (ties by key), each as wide as the city's MWh saved a year (units x dE).
+//   the curve             a sequence, cheapest first: each block counts only what it saves after the blocks to its left
+//                         (a heat pump and weatherization share the same heating electricity; a condensing furnace and
+//                         weatherization the same gas), so the next block is the cheapest at its incremental saving (ties
+//                         by key); widths add to the package's saving. Each block is as wide as the city's MWh saved a year
+//                         (units x dE after the earlier blocks); its cost alone is kept as b.alone.
 //   electrification       per district and representative day, MW: base + heat' x (res' + hp'/COP(T_h)) + EV_h, with
 //                         heat' = heat x (1 - env x weatherization's cut x pre-1980 home heat / all heat), res' = res (1 - x),
 //                         hp' = hp + res x + (gas + propane) g; EVs: the 2025 MWh per EV a day x vehicles x EV share, by
@@ -30,7 +35,9 @@
 //                         (the lowest hours raised to one level). With every setting at 2025's, the peaks are the file's.
 //   district heat         a share d of the core's gas and propane heat goes to a network: sent = heat / (1 - losses);
 //                         plant electricity = sent / COP(source); with a store the plant runs flat all day; store size =
-//                         max - min of the running sum of (sent - its daily mean); water volume = MWh / (c_p dT rho).
+//                         max - min of the running sum of (sent - its daily mean); water volume = MWh / (c_p dT rho), dT the
+//                         network's supply (the heat pump's 45 C delivery, prairie-city.json's cop.supplyC) minus its
+//                         return (25 C, set for teaching): a stratified tank charged at supply and emptied to return.
 //   industry              electricity = low band / COP + medium band / 0.98 + high band / 0.98 (the ceiling of full
 //                         electrification), and the fertilizer plant's electrolysis equivalent from prairie-city.json.
 // Every number on the page comes from this model or the data files; _tests/learn/test_a15-efficiency-electrification.js
@@ -89,30 +96,43 @@
   }
   function weatherCut(C) { var v = C.vintages; return (v.pre1980.heatKWhPerM2 - v.y1980_2009.heatKWhPerM2) / v.pre1980.heatKWhPerM2; }
   function lifeOf(m) { return m.key === "led" ? m.lifeHours / m.hoursPerYear : m.life; }
-  function unitsAndSave(C, D, m) {   // units across the city, and MWh saved a year before rebound
-    var units = 0, save = 0, sc = scop(C), eff = C.homes.furnaceEfficiency, cut = weatherCut(C);
+  // measures that save the same energy: a heat pump and weatherization (a resistance home's heating electricity), a
+  // condensing furnace and weatherization (a gas home's gas); each saves less after the other
+  var OVERLAP = { hp: "weatherEl", weatherEl: "hp", condensing: "weatherGas", weatherGas: "condensing" };
+  function unitsAndSave(C, D, m, after) {   // units across the city, and MWh saved a year before rebound, after the blocks in `after`
+    after = after || {};
+    var units = 0, save = 0, sc = scop(C), eff = C.homes.furnaceEfficiency, cut = weatherCut(C), first = after[OVERLAP[m.key]];
+    var afue = (D.measures.filter(function (x) { return x.key === "condensing"; })[0] || {}).afue;
     C.districts.forEach(function (d) {
-      var h = homeOf(C, d), n = 0, s = 0;
+      var h = homeOf(C, d), n = 0, s = 0, wx = h.pre * h.preHeat * cut;   // wx: an average home's heat that weatherization saves
       if (m.key === "led") { n = d.commercialM2 * D.lighting.shareFluorescent / D.lighting.m2PerFixture; s = (m.t8Watts - m.ledWatts * m.t8Lumens / m.ledLumens) * m.hoursPerYear / 1e6; }
       else if (m.key === "hpwh") { n = d.heating.resistance + d.heating.heatPump; s = h.wh * (1 / m.baseUEF - 1 / m.uef); }
-      else if (m.key === "hp") { n = d.heating.resistance; s = h.heat * (1 - 1 / sc); }
-      else if (m.key === "weatherEl") { n = d.heating.resistance * h.pre; s = h.preHeat * cut; }
-      else if (m.key === "condensing") { n = d.heating.gas; s = h.heat * (1 / eff - 1 / m.afue); }
-      else if (m.key === "weatherGas") { n = d.heating.gas * h.pre; s = h.preHeat * cut / eff; }
+      else if (m.key === "hp") { n = d.heating.resistance; s = (h.heat - (first ? wx : 0)) * (1 - 1 / sc); }
+      else if (m.key === "weatherEl") { n = d.heating.resistance * h.pre; s = h.preHeat * cut / (first ? sc : 1); }
+      else if (m.key === "condensing") { n = d.heating.gas; s = (h.heat - (first ? wx : 0)) * (1 / eff - 1 / m.afue); }
+      else if (m.key === "weatherGas") { n = d.heating.gas * h.pre; s = h.preHeat * cut / (first ? afue : eff); }
       units += n; save += n * s;
     });
     return { units: units, save: save };
   }
-  function measure(C, D, m, S) {
-    var u = unitsAndSave(C, D, m), cost = unitCost(D, m), life = lifeOf(m), rb = m.household ? S.rebound : 0;
+  function measure(C, D, m, S, after) {
+    var u = unitsAndSave(C, D, m, after), cost = unitCost(D, m), life = lifeOf(m), rb = m.household ? S.rebound : 0;
     var perUnit = u.save / u.units, net = perUnit * (1 - rb), extra = extraYear(C, D, m), ann = cost * crf(S.rate, life) + extra, P = priceOf(C, m);
+    var by = after && after[OVERLAP[m.key]] ? OVERLAP[m.key] : null;
     return { key: m.key, m: m, label: m.label, short: m.short, carrier: m.carrier, units: u.units, perUnit: perUnit, net: net, cost: cost, life: life,
-             crf: crf(S.rate, life), extra: extra, annual: ann, cse: ann / net, mwh: u.units * net, price: P, pays: ann / net < P, household: m.household };
+             crf: crf(S.rate, life), extra: extra, annual: ann, cse: ann / net, mwh: u.units * net, price: P, pays: ann / net < P, household: m.household, by: by };
   }
+  // the curve as a sequence: the cheapest block at its saving after the blocks already placed, then the next
   function curve(C, D, S, carrier) {
-    var list = D.measures.filter(function (m) { return m.carrier === carrier; }).map(function (m) { return measure(C, D, m, S); });
-    list.sort(function (a, b) { return a.cse - b.cse || (a.key < b.key ? -1 : 1); });
-    var x = 0; list.forEach(function (b, i) { b.n = i + 1; b.x0 = x; x += b.mwh; b.x1 = x; });
+    var left = D.measures.filter(function (m) { return m.carrier === carrier; }), done = {}, list = [], x = 0;
+    while (left.length) {
+      var opts = left.map(function (m) { return measure(C, D, m, S, done); });
+      opts.sort(function (a, b) { return a.cse - b.cse || (a.key < b.key ? -1 : 1); });
+      var b = opts[0];
+      if (b.by) { b.alone = measure(C, D, b.m, S).cse; b.byN = list.filter(function (q) { return q.key === b.by; })[0].n; }
+      b.n = list.length + 1; b.x0 = x; x += b.mwh; b.x1 = x; list.push(b); done[b.key] = true;
+      left = left.filter(function (m) { return m.key !== b.key; });
+    }
     return list;
   }
   function paying(list) { return list.filter(function (b) { return b.pays; }); }
@@ -171,7 +191,16 @@
     var pk = 0; tot.forEach(function (v, h) { if (v > tot[pk] + 1e-9) pk = h; });
     return { parts: parts, tot: tot, peak: tot[pk], hour: pk, sumPeaks: sum(parts.map(function (p) { return p.peak; })), over: parts.filter(function (p) { return p.peak > p.limit; }) };
   }
-  function storeM3(D, mwh) { var w = D.water; return mwh * 3.6e9 / (w.cp * 1000 * D.districtHeat.deltaK * w.rho); }
+  // the loads the districts' bars leave out, each on its own substation: the industrial park (flat over the year, a teaching
+  // simplification in prairie-city.json) and the data-center campus (a load: the design day's hourly MW); with them, the whole city
+  function ownSubs(C, R) {
+    var day = design(C), park = (C.industry.food.electricityMWh + C.industry.fertilizer.electricityMWh) / 8760, dc = day.dataCenterMW;
+    var all = R.tot.map(function (v, h) { return v + park + dc[h]; }), pk = 0; all.forEach(function (v, h) { if (v > all[pk] + 1e-9) pk = h; });
+    return { park: park, dc: dc[R.hour], peak: all[pk], hour: pk };
+  }
+  // the store's usable temperature range: the network's supply (the heat pump's delivery temperature, F3's curve) minus its return
+  function dhDeltaK(C, D) { return C.cop.supplyC - D.districtHeat.returnC; }
+  function storeM3(C, D, mwh) { var w = D.water; return mwh * 3.6e9 / (w.cp * 1000 * dhDeltaK(C, D) * w.rho); }
   // ---- industry: the electricity full electrification would need (a ceiling)
   function industry(C, D, copV) {
     var b = {}; C.industry.processHeat.forEach(function (x) { b[x.band] = x.deliveredMWh; });
@@ -187,17 +216,34 @@
   function stepTexts(C, D) {
     var core = C.districts[0], dd = design(C);
     return [
-      "Treat a saving like a power plant: what does a saved MWh cost? A [[heat-pump-water-heater|heat-pump water heater]] costs more, then uses less electricity for " + fmtN(M_(D, "hpwh").life, 1) + " years. Is its saved MWh cheaper than a bought one?",
-      "Now every electricity measure for Prairie City's buildings, cheapest first: a [[cost-of-saved-energy|cost-of-saved-energy]] curve. Each block is as wide as the MWh it saves a year and as tall as the cost of each. Open three blocks.",
-      "Most homes here heat with gas, and gas is cheap: " + usd(prices(C).gas, 1) + " per MWh in 2025, against " + usd(prices(C).residential, 1) + " for electricity. Switch to the gas curve: which measures still beat their price?",
-      "Engineering savings assume nothing else changes. Add a [[rebound-effect|rebound]], homes kept a little warmer once heat is cheaper, and change the discount rate. Which blocks cross their price?",
-      "Now electrify: the dense core's [[substation|substation]] can carry " + core.substationMW + " MW. On the cold [[design-day|design day]], " + num(dd.tmin) + " °C before dawn, its gas furnaces become heat pumps. Will the peak fit?",
-      "Efficiency first: insulate and seal the core's older homes, and swap its resistance heaters for heat pumps. How far does the design day's peak come down?",
+      "Treat a saving like a power plant: a [[heat-pump-water-heater|heat-pump water heater]] costs more up front, then uses less electricity for " + fmtN(M_(D, "hpwh").life, 1) + " years. Is its saved MWh cheaper than a bought one?",
+      "Every electricity measure for Prairie City's buildings, cheapest first, makes a [[cost-of-saved-energy|cost-of-saved-energy]] curve: each block's width is what it saves after the blocks to its left, its height the cost per MWh. Open three.",
+      "Most homes here heat with gas, and gas is cheap: " + usd(prices(C).gas, 1) + " per MWh on average in 2025, against " + usd(prices(C).residential, 1) + " for electricity. Switch to the gas curve: which measures still beat their price?",
+      "Engineering savings assume nothing else changes: add a [[rebound-effect|rebound]], homes kept a little warmer once heat is cheaper, and change the discount rate. Which blocks cross their price?",
+      "Now electrify: on the cold [[design-day|design day]], " + num(dd.tmin) + " °C before dawn, the dense core's gas furnaces become heat pumps. Will its peak fit its " + core.substationMW + " MW [[substation|substation]]?",
+      "Efficiency first: seal and insulate the [[building-envelope|envelope]] of the core's older homes, and swap its resistance heaters for heat pumps. How far does the design day's peak come down?",
       "Cars next, in the suburbs: set the share of electric cars (" + pct(C.transport.evShare2025, 1) + " in 2025) and choose when they charge. Which charging rule keeps the cold day's peak lowest?",
-      "District by district: each has its own substation, and the city's peak is their sum, hour by hour. Electrify all three and compare each [[coincident-peak|peak]] with its limit.",
+      "District by district: each has its own substation, and the three districts' combined peak is their sum, hour by hour. Electrify all three and compare each [[coincident-peak|peak]] with its limit.",
       "A heat network for the core instead: one large heat pump on a steady " + fmtN(D.districtHeat.sourceC) + " °C source, with a hot-water [[thermal-storage|store]]. Compare it with heat pumps in every building.",
       "Industry last: the park's [[process-heat|process heat]] by temperature. Sort each band to the electric option that can reach it, then see the electricity full electrification would need."
     ];
+  }
+  // hints under the controls (pure, so the text budget is tested)
+  var HINTS = {
+    crf: "The [[capital-recovery-factor|capital recovery factor]] (CRF) turns a cost paid now into equal yearly payments over the life.",
+    rate: "A [[real-rate|real discount rate]] leaves inflation out; LBNL uses 6% real.",
+    assumed: "Assumed: each block counts what it saves after the blocks to its left; equipment at replacement costs only its extra; LED tubes at equal light; older homes spread evenly over heating fuels.",
+    rebound: "A review of studies finds the direct rebound for household energy services in rich countries generally below 30% (Sorrell and others, 2009, abstract).",
+    ev: "Illustrative rules: a timer spreads each day's charging over 00:00 to 06:00; filling the valleys raises the lowest hours to one level, at any hour.",
+    keep: "Step 8 keeps your share and rule for the suburbs."
+  };
+  function netHint(C, D) {
+    var H = D.districtHeat;
+    return "Every gas and propane furnace in the core is replaced here; your step 6 settings stay. Set for teaching: a " + fmtN(H.sourceC) + " °C source, " + pct(H.lossShare) + " pipe losses, a store between " + fmtN(C.cop.supplyC) + " °C out and " + fmtN(H.returnC) + " °C back.";
+  }
+  function copHint(D) {
+    var I = D.industry;
+    return "LBNL (2022): COP " + fmtN(I.cop.min, 1) + " to " + fmtN(I.cop.max, 1) + " at [[temperature-lift|temperature lifts]] of 130 to 40 K (a difference of 1 K is 1 °C). Boilers and ovens at " + pct(I.boilerEff) + ": a ceiling, not a forecast.";
   }
   var Q1 = { options: [{ value: "cheaper", label: "Cheaper than buying" }, { value: "same", label: "About the same" }, { value: "dearer", label: "Dearer than buying" }] };
   function q1(C, D, S) {   // the prediction of step 1: its answer and feedback follow the model at the reader's rate
@@ -208,26 +254,26 @@
   }
   function chain1(C, D, S) {
     var b = measure(C, D, M_(D, "hpwh"), { rate: S.rate, rebound: 0 });
-    return [{ v: usd(b.cost), u: "extra, 2025 $" }, { op: "× " + fmtN(b.crf, 3) + " (" + pct(S.rate) + ", " + fmtN(b.life, 1) + " years) =" }, { v: usd(b.annual, 1), u: "a year" },
+    return [{ v: usd(b.cost), u: "extra, 2025 $" }, { op: "× " + fmtN(b.crf, 3) + " (" + pct(S.rate) + ", " + fmtN(b.life, 1) + " years)" + (b.extra > 0.005 ? " + " + usd(b.extra) + " a year" : "") + " =" }, { v: usd(b.annual, 1), u: "a year" },
             { op: "÷ " + fmtN(b.perUnit, 2) + " MWh saved a year =" }, { v: usd(b.cse, 1), u: "per MWh saved", out: true }];
   }
   function line1(C, D, S) {
     var b = measure(C, D, M_(D, "hpwh"), { rate: S.rate, rebound: 0 });
-    return "At " + pct(S.rate) + " a saved MWh costs **" + usd(b.cse, 1) + "**, " + (b.pays ? "below" : "above") + " the " + usd(b.price, 1) + " a home pays per MWh bought (2025).";
+    return "At " + pct(S.rate) + " a saved MWh costs **" + usd(b.cse, 1) + "**, " + (b.pays ? "below" : "above") + " Kansas's 2025 average home price, " + usd(b.price, 1) + " per MWh bought.";
   }
   function blockLine(b) {
-    return "**" + b.n + ". " + b.label + "**: " + fmtN(b.units) + " units, " + fmtN(b.net, 2) + " MWh saved a year each, " + usd(b.cost) + (b.m.basis === "replacement" ? " extra" : "") + " up front" + (b.extra > 0.005 ? " and " + usd(b.extra) + " a year" : "") + ", " + fmtN(b.life, 1) + " years: " +
-      fmtCSE(b.cse) + ", " + (b.pays ? "below" : "above") + " its " + usd(b.price, 1) + " price.";
+    return "**" + b.n + ". " + b.label + "**: " + fmtN(b.units) + " units, " + fmtN(b.net, 2) + " MWh saved a year each" + (b.by ? " after block " + b.byN : "") + ", " + usd(b.cost) + (b.m.basis === "replacement" ? " extra" : "") + " up front" + (b.extra > 0.005 ? " and " + usd(b.extra) + " a year" : "") + ", " + fmtN(b.life, 1) + " years: " +
+      fmtCSE(b.cse) + (b.by ? " (alone " + usd(b.alone, 1) + ")" : "") + ", " + (b.pays ? "below" : "above") + " its " + usd(b.price, 1) + " price.";
   }
   function curveSaw(list, carrier) {
     var pay = paying(list), all = sum(list.map(function (b) { return b.mwh; }));
-    return fmtN(pay.length) + " of " + fmtN(list.length) + " " + (carrier === "gas" ? "gas" : "electricity") + " blocks cost less than the energy they save: **" + fmtN(payMWh(list)) + " of " + fmtN(all) + " MWh** a year.";
+    return fmtN(pay.length) + " of " + fmtN(list.length) + " " + (carrier === "gas" ? "gas" : "electricity") + " blocks cost less than the average price of what they save: **" + fmtN(payMWh(list)) + " of " + fmtN(all) + " MWh** a year.";
   }
   function reboundLine(C, D, S) {
     var a = curve(C, D, S, "el"), g = curve(C, D, S, "gas"), above = a.concat(g).filter(function (b) { return !b.pays; });
     var head = "At " + pct(S.rate) + " and " + pct(S.rebound) + " rebound, ";
     return head + (above.length ? "above their price: " + above.map(function (b) { return b.short; }).join(", ") + "." : "every block stays below its price.") +
-      " Paying savings: " + fmtN(payMWh(a)) + " MWh of electricity, " + fmtN(payMWh(g)) + " MWh of gas a year.";
+      " Below their price: " + fmtN(payMWh(a)) + " MWh of electricity, " + fmtN(payMWh(g)) + " MWh of gas a year.";
   }
   function peakLine(r, label) {
     var over = r.peak - r.limit;
@@ -252,55 +298,105 @@
   }
   function together(R) { return R.sumPeaks - R.peak <= 0.005 * R.sumPeaks; }
   function cityLine(R) {
-    return "City peak **" + fmtN(R.peak, 1) + " MW** at " + hm(R.hour) + (together(R) ? ", almost the sum of the districts' own peaks (" + fmtN(R.sumPeaks, 1) + " MW): one cold night hits every district at once. "
-      : ", " + fmtN(R.sumPeaks - R.peak, 1) + " MW below the sum of the districts' own peaks, which fall at different hours. ") +
+    return "The three districts together peak at **" + fmtN(R.peak, 1) + " MW** at " + hm(R.hour) + (together(R) ? ", almost the sum of their own peaks (" + fmtN(R.sumPeaks, 1) + " MW): one cold night hits every district at once. "
+      : ", " + fmtN(R.sumPeaks - R.peak, 1) + " MW below the sum of their own peaks, which fall at different hours. ") +
       (R.over.length ? "Over their limits: " + R.over.map(function (p) { return p.label.toLowerCase(); }).join(", ") + "." : "Every district fits its limit.");
+  }
+  function subsLine(C, R) {   // what the bars leave out (A15 review: the districts are not the whole city)
+    var o = ownSubs(C, R);
+    return "Not in the bars: the industrial park (" + fmtN(o.park, 1) + " MW, flat) and the data-center campus (" + fmtN(o.dc, 1) + " MW), each a load on its own substation; with them, Prairie City peaks at " + fmtN(o.peak, 1) + " MW at " + hm(o.hour) + ".";
   }
   function gasSaw(list) {
     var no = list.filter(function (b) { return !b.pays; });
-    return "Cheap gas sets a low bar: a gas saving must cost under " + usd(list[0].price, 1) + " per MWh. " + (no.length ? "Above it: " + no.map(function (b) { return b.short.toLowerCase(); }).join(", ") + "." : "Every gas block clears it at your settings.");
+    return "Cheap gas sets a low bar: a gas saving must cost under " + usd(list[0].price, 1) + " per MWh, Kansas's 2025 average. " + (no.length ? "Above it: " + no.map(function (b) { return b.short.toLowerCase(); }).join(", ") + "." : "Every gas block clears it at your settings.");
   }
-  function dhLine(D, r, mode) {
+  function dhLine(C, D, r, mode) {
     var t = { hp: "Heat pumps in every building", plant: "A network without a store", store: "A network with a store" }[mode];
-    return t + ": the core's peak is **" + fmtN(r.peak, 1) + " MW** at " + hm(r.hour) + (mode === "store" ? "; the store holds " + fmtN(r.store, 0) + " MWh of heat, about " + fmtN(Math.round(storeM3(D, r.store) / 100) * 100) + " m³ of hot water." : ".");
+    return t + ": the core's peak is **" + fmtN(r.peak, 1) + " MW** at " + hm(r.hour) + (mode === "store" ? "; the store holds " + fmtN(r.store, 0) + " MWh of heat, about " + fmtN(Math.round(storeM3(C, D, r.store) / 100) * 100) + " m³ of water between " + fmtN(C.cop.supplyC) + " and " + fmtN(D.districtHeat.returnC) + " °C." : ".");
   }
   function dhSaw(a, b, c) {   // a: heat pumps everywhere, b: network without a store, c: with its store
     var head = "Design-day peak: " + fmtN(a.peak, 1) + " MW with heat pumps everywhere, " + fmtN(b.peak, 1) + " MW with the network, **" + fmtN(c.peak, 1) + " MW** with its store. ";
     if (a.peak - c.peak < 0.05) return head + "With so little heat on the network, the three are about the same.";
     return head + (b.peak < a.peak - 0.05 ? "The steady source cuts the peak" + (c.peak < b.peak - 0.05 ? ", and the store cuts it further." : "; the store adds little here.") : "Here the store does the cutting.");
   }
+  // step 9 at the reader's settings (the core's step 6 settings, every furnace replaced), for the explain layer
+  function netRuns(C, D, s0, share) {
+    var o = {}; ["hp", "plant", "store"].forEach(function (md) { var s = { env: s0.env || 0, res: s0.res || 0, gas: 1, dh: { share: share, mode: md } }; o[md] = districtDay(C, D, 0, design(C), s); });
+    return o;
+  }
+  function netLine(C, D, s0, share) {
+    var o = netRuns(C, D, s0, share);
+    return "Step 9, every furnace replaced: " + fmtN(o.hp.peak, 1) + " MW with heat pumps in every building; with " + pct(share) + " of the gas heat on the network, " + fmtN(o.plant.peak, 1) + " MW without a store and " + fmtN(o.store.peak, 1) + " MW with one.";
+  }
+  function annNet(C, D, s0, share, seen) { return "No heat network in this chart. " + (seen ? netLine(C, D, s0, share) : "Step 9 compares one with heat pumps in every building."); }
   function indLine(C, D, copV) {
     var I = industry(C, D, copV);
     return "At a heat-pump COP of " + fmtN(copV, 1) + ", the process heat would need " + fmtN(I.heatEl / 1000, 1) + " GWh a year and the plant's hydrogen " + fmtN(I.h2 / 1000, 1) + " GWh: **" + pct(I.share) + "** of the city's 2025 electricity, a steady " + fmtN(I.mwFlat, 1) + " MW.";
   }
+  // step 10's bins and cards (pure: the fallback's table and the test read them too)
+  function industryBins(D) {
+    var I = D.industry;
+    return [{ id: "hp", label: "Industrial heat pump", sub: "up to about " + I.hpMaxC + " °C here (LBNL, 2022)", color: "var(--lx-good)" }, { id: "boiler", label: "Electric boiler", sub: "steam", color: "var(--lx-bat)" },
+            { id: "oven", label: "Electric ovens and furnaces", sub: "resistance or induction", color: "var(--lx-tier-4)" }, { id: "elys", label: "Hydrogen by electrolysis", sub: "a feedstock, not only heat", color: "var(--lx-hyd)" }];
+  }
+  function industryCards(C, D) {
+    var I = D.industry, b = C.industry.processHeat.map(function (x) { return { band: x.band, deliveredMWh: x.deliveredMWh, label: x.label.replace(/(\d) C\b/g, "$1 °C") }; });
+    return [
+      { id: "low", text: "Food plants: " + b[0].label + ", " + fmtN(b[0].deliveredMWh) + " MWh a year", bin: "hp", why: "Below 100 °C is easy for an industrial heat pump, and it delivers several units of heat per unit of electricity." },
+      { id: "medium", text: "Food plants: " + b[1].label + ", " + fmtN(b[1].deliveredMWh) + " MWh a year", bin: "boiler", why: "Most of this steam is above the " + I.hpMaxC + " °C this exercise uses (LBNL, 2022; DOE's 2024 tip sheet says about " + I.hpMaxC2024 + " °C): an electric boiler makes it, and heat pumps can take the lower-pressure part." },
+      { id: "high", text: "Food plants: " + b[2].label + ", " + fmtN(b[2].deliveredMWh) + " MWh a year", bin: "oven", why: "Above 400 °C, electric resistance or induction heats directly, at about one unit of heat per unit of electricity." },
+      { id: "h2", text: "The fertilizer plant: " + fmtN(C.industry.fertilizer.hydrogenT) + " t of hydrogen a year from gas reformers", bin: "elys", why: "The plant needs hydrogen itself, not only heat: electrolysis would make it from electricity and water." }];
+  }
 
-  // the no-JS block: the curves at the defaults, the core's design day, the districts, the industry ceiling
+  // the no-JS block: the curves at the defaults with per-unit and city columns, the core's design day, charging rules, the
+  // heat network, the three districts and the industry table (A15 review: every activity has a text version)
+  function tableHTML(head, rows, cls) {
+    return "<div class=\"lx-scroll-x\"><table class=\"lx-mini-table " + (cls || "a15-fbt") + "\"><thead><tr>" + head.map(function (h) { return "<th scope=\"col\">" + h + "</th>"; }).join("") + "</tr></thead><tbody>" +
+      rows.map(function (r) { return typeof r === "string" ? r : "<tr>" + r.map(function (c) { return "<td>" + c + "</td>"; }).join("") + "</tr>"; }).join("") + "</tbody></table></div>";
+  }
   function staticFallback(C, D) {
     var S = { rate: D.rate.start, rebound: 0 }, e = curve(C, D, S, "el"), g = curve(C, D, S, "gas"), dd = design(C);
-    var row = function (b) { return "<tr><td>" + b.label + "</td><td>" + usd(b.cost) + "</td><td>" + fmtN(b.life, 1) + "</td><td>" + fmtN(b.mwh) + "</td><td>" + usd(b.cse, 1) + "</td><td>" + usd(b.price, 1) + "</td></tr>"; };
+    var row = function (b) { return [b.n + ". " + b.label + (b.by ? " (after block " + b.byN + ")" : ""), usd(b.cost), b.extra > 0.005 ? usd(b.extra) : "none", fmtN(b.life, 1), fmtN(b.net, 2), fmtN(b.mwh), usd(b.cse, 1), usd(b.price, 1)]; };
+    var grp = function (t) { return "<tr><th scope=\"colgroup\" colspan=\"8\">" + t + "</th></tr>"; };
     var core = [0, 0.5, 1].map(function (gv) { return districtDay(C, D, 0, dd, { gas: gv }); });
     var all = districtDay(C, D, 0, dd, { gas: 1, res: 1, env: 1 }), I = industry(C, D, D.industry.cop.start);
+    var ev = D.electrify.rules.map(function (r) { return [r.label, districtDay(C, D, 1, dd, { ev: 0.3, rule: r.key })]; });
+    var net = netRuns(C, D, {}, D.districtHeat.share.start), R = city(C, D, { core: { gas: 1 }, suburbs: { gas: 1 }, fringe: { gas: 1 } });
+    var bins = industryBins(D), cards = industryCards(C, D), binOf = {}; bins.forEach(function (b) { binOf[b.id] = b.label; });
+    var elOf = { low: I.el.low, medium: I.el.medium, high: I.el.high, h2: I.h2 };
     return "<p class=\"lx-eyebrow\">Prairie City's buildings: the cost of saved energy at a " + pct(S.rate) + " discount rate (2025 dollars)</p>" +
       "<p class=\"lx-hint\">" + LINE + "</p>" +
-      "<div class=\"lx-scroll-x\"><table class=\"lx-mini-table a15-fbt\"><thead><tr><th scope=\"col\">Measure</th><th scope=\"col\">Cost per unit</th><th scope=\"col\">Life (years)</th><th scope=\"col\">MWh saved a year</th><th scope=\"col\">Per MWh saved</th><th scope=\"col\">Price it competes with</th></tr></thead><tbody>" +
-      e.map(row).join("") + g.map(row).join("") + "</tbody></table></div>" +
+      tableHTML(["Measure, cheapest first", "Extra cost per unit, up front", "Extra per unit a year", "Life (years)", "MWh saved per unit a year", "City MWh saved a year", "Per MWh saved", "Average price it competes with"],
+        [grp("Electricity saved")].concat(e.map(row), [grp("Gas saved")], g.map(row))) +
+      "<p class=\"lx-hint\">Each block counts only what it saves after the blocks above it. Prices are Kansas's 2025 averages, flat per MWh.</p>" +
       "<ul>" +
       "<li><b>Electricity.</b> " + curveSaw(e, "el").replace(/\*\*/g, "") + "</li>" +
       "<li><b>Gas.</b> " + curveSaw(g, "gas").replace(/\*\*/g, "") + "</li>" +
       "<li><b>The core on the design day.</b> " + core.map(function (r, i) { return ["As in 2025", "Half the gas heat to heat pumps", "All of it"][i] + ": " + fmtN(r.peak, 1) + " MW"; }).join("; ") + ", against a " + C.districts[0].substationMW + " MW substation.</li>" +
       "<li><b>Efficiency first.</b> With every older home sealed and insulated and every resistance heater swapped too, the all-electric core peaks at " + fmtN(all.peak, 1) + " MW.</li>" +
-      "<li><b>Industry.</b> Full electrification of the park's process heat and hydrogen would need " + pct(I.share) + " of the city's 2025 electricity (a ceiling, at a heat-pump COP of " + fmtN(D.industry.cop.start, 1) + ").</li>" +
-      "</ul><p class=\"lx-hint\">With JavaScript on, you build the curve, add a rebound, electrify each district on the cold design day, try charging rules and a heat network, and sort the park's heat.</p>";
+      "</ul>" +
+      "<p class=\"lx-eyebrow\">The suburbs on the design day, with 30% electric cars</p>" +
+      tableHTML(["Charging rule", "Charging a day", "Peak", "At"], ev.map(function (x) { return [x[0], fmtN(x[1].evDay, 1) + " MWh", fmtN(x[1].peak, 1) + " MW", hm(x[1].hour)]; })) +
+      "<p class=\"lx-eyebrow\">The core's heat on the design day: every furnace replaced, " + pct(D.districtHeat.share.start) + " of its gas heat on a network</p>" +
+      tableHTML(["How the heat is made", "Peak", "Store"], [["Heat pumps in every building", fmtN(net.hp.peak, 1) + " MW", "none"], ["A network without a store", fmtN(net.plant.peak, 1) + " MW", "none"],
+        ["A network with a store", fmtN(net.store.peak, 1) + " MW", fmtN(net.store.store, 0) + " MWh, about " + fmtN(Math.round(storeM3(C, D, net.store.store) / 100) * 100) + " m³ of water"]]) +
+      "<p class=\"lx-eyebrow\">Each district on the design day, every furnace replaced</p>" +
+      tableHTML(["District", "Peak", "Substation limit"], R.parts.map(function (p) { return [p.label, fmtN(p.peak, 1) + " MW", p.limit + " MW"]; })) +
+      "<p class=\"lx-hint\">" + cityLine(R).replace(/\*\*/g, "") + "</p><p class=\"lx-hint\">" + subsLine(C, R) + "</p>" +
+      "<p class=\"lx-eyebrow\">The industrial park's heat, sorted by temperature</p>" +
+      tableHTML(["What is needed", "Electric option", "Electricity, MWh a year"], cards.map(function (c) { return [c.text, binOf[c.bin], fmtN(elOf[c.id])]; })) +
+      "<p class=\"lx-hint\">" + indLine(C, D, D.industry.cop.start).replace(/\*\*/g, "") + " A ceiling, not a forecast.</p>" +
+      "<p class=\"lx-hint\">With JavaScript on, you build the curve, add a rebound, electrify each district on the cold design day, try charging rules and a heat network, and sort the park's heat.</p>";
   }
   // the explain layer's no-JS ideas, and the Check section's myths and question (written into the page by the test)
   function ideasHTML(C, D) {
     var S = { rate: D.rate.start, rebound: 0 }, e = curve(C, D, S, "el"), a = annualVsPeak(C, D, 0, { gas: 1 }), dd = design(C);
     return "<dl class=\"lx-ideas\">" +
-      "<dt>Efficiency as a resource</dt><dd>A saved MWh has a cost: the extra cost spread over the life with the capital recovery factor, divided by the MWh saved a year.</dd>" +
-      "<dt>The curve</dt><dd>Sorted cheapest first, " + fmtN(paying(e).length) + " of " + fmtN(e.length) + " electricity measures for Prairie City's buildings cost less than the electricity they save (6%, no rebound).</dd>" +
+      "<dt>Efficiency as a resource</dt><dd>A saved MWh has a cost: the extra cost spread over the life with the capital recovery factor, plus any extra yearly cost, divided by the MWh saved a year.</dd>" +
+      "<dt>The curve</dt><dd>Cheapest first, each block counting what it saves after those to its left, " + fmtN(paying(e).length) + " of " + fmtN(e.length) + " electricity measures for Prairie City's buildings cost less than Kansas's average price (" + pct(S.rate) + ", no rebound).</dd>" +
       "<dt>Rebound</dt><dd>Part of a saving comes back as more comfort; it raises the cost per MWh actually saved.</dd>" +
-      "<dt>Peaks, not MWh</dt><dd>All the core's gas heat on heat pumps adds " + pct(a.dy) + " to its year's electricity but " + pct(a.dp) + " to its design-day peak, at " + num(dd.tmin) + " °C.</dd>" +
-      "<dt>Industry by temperature</dt><dd>Low-temperature heat suits heat pumps; steam, ovens and hydrogen need other electric routes.</dd></dl>";
+      "<dt>Peaks, not MWh</dt><dd>All the core's gas heat on heat pumps adds " + pct(a.dy) + " to its year's electricity but " + pct(a.dp) + " to its peak on a design day whose minimum is " + num(dd.tmin) + " °C.</dd>" +
+      "<dt>Industry by temperature</dt><dd>Heat below about " + D.industry.hpMaxC + " °C suits heat pumps, some low-pressure steam included; hotter steam, ovens and hydrogen need boilers, resistance heating or electrolysis.</dd></dl>";
   }
   function checkHTML(C, D) {
     var S = { rate: D.rate.start, rebound: 0 }, dd = design(C), full = districtDay(C, D, 0, dd, { gas: 1 }), base = districtDay(C, D, 0, dd, {}), a = annualVsPeak(C, D, 0, { gas: 1 });
@@ -310,9 +406,9 @@
     var x = 40, rb = 0.25, y = r2(x / (1 - rb), 2);
     return "<div class=\"lx-myths\" data-quiz=\"a15-myth\">" +
       q("kwh", "myth", "Electrifying heat only adds kilowatt-hours over the year.", "Myth. The core's gas heat on heat pumps adds " + pct(a.dy) + " to its year's electricity but " + pct(a.dp) + " to its design-day peak: " + fmtN(base.peak, 1) + " to " + fmtN(full.peak, 1) + " MW.") +
-      q("cold", "myth", "Heat pumps stop working in a cold snap.", "Myth. ENERGY STAR's cold-climate criteria ask for a COP of at least " + fmtN(cc, 2) + " at " + num(D.coldClimate.atC) + " °C (" + D.coldClimate.atF + " °F); this lesson's curve gives " + fmtN(cop(C, dd.tmin), 2) + " at " + num(dd.tmin) + " °C. Efficiency falls, so peaks grow.") +
+      q("cold", "myth", "Heat pumps stop working in a cold snap.", "Myth. ENERGY STAR's cold-climate criteria ask for a COP of at least " + fmtN(cc, 2) + " at " + num(D.coldClimate.atC) + " °C (" + D.coldClimate.atF + " °F), and this lesson's curve gives " + fmtN(cop(C, dd.tmin), 2) + " at " + num(dd.tmin) + " °C: efficiency falls, so peaks grow.") +
       q("timer", "myth", "Charging cars after midnight always eases the grid.", "Myth. On the design day a midnight timer puts the suburbs' charging on the coldest hours: " + fmtN(ev.timer.peak, 1) + " MW against " + fmtN(ev.evening.peak, 1) + " MW as today, with 30% electric cars.") +
-      q("pays", "myth", "Every efficiency measure pays for itself.", "Myth. Weatherizing an older gas-heated home saves gas at " + usd(wg.cse, 1) + " per MWh at 6%, " + (wg.pays ? "below" : "above") + " the " + usd(wg.price, 1) + " a home pays for gas; its other gains, comfort and a lower peak, are not in that number.") +
+      q("pays", "myth", "Every efficiency measure pays for itself.", "Myth. Weatherizing an older home with a standard gas furnace saves gas at " + usd(wg.cse, 1) + " per MWh at " + pct(S.rate) + ", " + (wg.pays ? "below" : "above") + " Kansas's 2025 average gas price, " + usd(wg.price, 1) + "; comfort and a lower peak are not in that number.") +
       "</div><div class=\"lx-quiz\" data-quiz=\"a15\"><div class=\"lx-qq\" data-id=\"rebound\" data-answer=\"b\"><p class=\"lx-qtext\">A measure saves energy at $" + x + " per MWh with no rebound. With a 25% rebound, what does a saved MWh cost?</p>" +
       "<ul class=\"lx-choices\"><li data-value=\"a\">$30.00</li><li data-value=\"b\">$" + fmtN(y, 2) + "</li><li data-value=\"c\">$50.00</li></ul><details class=\"lx-answer\"><summary>Answer</summary><p>$" + x + " ÷ (1 − 0.25) = $" + fmtN(y, 2) + ": the cost is the same, the MWh saved are a quarter fewer.</p></details></div></div>";
   }
@@ -333,50 +429,62 @@
     return "<p class=\"lx-hint\">This lesson's measures and settings:</p><ul>" + Object.keys(D.sources).map(function (k) { return srcItem(D.sources[k]); }).join("") + "</ul>" +
       "<p class=\"lx-hint\">Prairie City's data (shared by the city lessons), the parts used here:</p><ul>" + CITY_SRC.map(function (k) { return srcItem(C.sources[k]); }).join("") + "</ul>";
   }
-  // the practice set (Check section; the test writes it into the page and recomputes every answer)
+  // the practice set (Check section; the test writes it into the page and recomputes every answer). Each item: its givens as
+  // a table, one task sentence, a worked answer (A15 review: no number the answer needs is left out of the givens)
   function r2(v, d) { var m = Math.pow(10, d); return Math.round(v * m) / m; }
-  function cseByHand(b) {   // the worked sum with the numbers as shown: cost (cents), CRF (4 places), yearly extras, saving (2 places)
+  function cseByHand(b) {   // the worked sum with the numbers as shown: cost (cents), CRF (4 places), yearly extras, saving (3 places)
     var cost = r2(b.cost, 2), f = r2(b.crf, 4), cap = r2(cost * f, 2), x = r2(b.extra, 2), ann = r2(cap + x, 2), save = r2(b.perUnit, 3);
     return { cost: cost, crf: f, cap: cap, extra: x, annual: ann, save: save, cse: r2(ann / save, 2) };
   }
   function practice(C, D) {
     var S = { rate: D.rate.start, rebound: 0 }, cf = measure(C, D, M_(D, "condensing"), S), eg = M_(D, "weatherEl");
-    var x1 = cseByHand(cf), e3 = cseByHand(measure(C, D, eg, { rate: 0.03, rebound: 0 })), e10 = cseByHand(measure(C, D, eg, { rate: 0.1, rebound: 0 })), Pg = r2(cf.price, 2), Pe0 = r2(prices(C).residential, 2);
-    var hp = cseByHand(measure(C, D, M_(D, "hp"), S)), hp20 = r2(hp.cse / 0.8, 2), Pe = r2(prices(C).residential, 2);
-    var sc = r2(scop(C), 2), ae = cseByHand(measure(C, D, M_(D, "weatherEl"), S)), aeHP = r2(ae.cse * sc, 2);
-    var dd = design(C), core = C.districts[0], k7 = 7, T = dd.temp[k7], sh = core.heat.share, fuel = sh.gas + sh.propane;
-    var Q = dd.districts.core.heat[k7], B = dd.districts.core.base[k7], cp = r2(cop(C, T), 2), rs = r2(sh.resistance, 3), hs = r2(sh.heatPump + fuel * 0.5, 3);
-    var hel = r2(Q * (rs + hs / cp), 1), evh = districtDay(C, D, 0, dd, {}).ev[k7], tot = r2(B + hel + evh, 1);
+    var x1 = cseByHand(cf), e3 = cseByHand(measure(C, D, eg, { rate: 0.03, rebound: 0 })), e10 = cseByHand(measure(C, D, eg, { rate: 0.1, rebound: 0 })), Pg = r2(cf.price, 2), Pe = r2(prices(C).residential, 2);
+    var hp = cseByHand(measure(C, D, M_(D, "hp"), S)), hp20 = r2(hp.cse / 0.8, 2);
+    var sc = r2(scop(C), 2), ae = cseByHand(measure(C, D, eg, S)), aeHP = r2(ae.cse * sc, 2), onCurve = curve(C, D, S, "el").filter(function (b) { return b.key === "weatherEl" && b.by === "hp"; })[0];
+    var dd = design(C), core = C.districts[0], k7 = 7, T = dd.temp[k7], sh = core.heat.share;
+    var g3 = r2(sh.gas, 3), p3 = r2(sh.propane, 3), rs = r2(sh.resistance, 3), h3 = r2(sh.heatPump, 3), hs = r2(h3 + (g3 + p3) / 2 + 1e-9, 3);   // half up, as a reader rounds 0.4665
+    var Q = r2(dd.districts.core.heat[k7], 1), B = r2(dd.districts.core.base[k7], 1), cp = r2(cop(C, T), 2), evh = r2(districtDay(C, D, 0, dd, {}).ev[k7], 1);
+    var hel = r2(Q * (rs + hs / cp), 1), tot = r2(hel + B + evh, 1);
     var sub = districtDay(C, D, 1, dd, { ev: 0.3 }), sub0 = districtDay(C, D, 1, dd, {}), h19 = 19, Ed = r2(sub.evDay, 1), p19 = C.transport.evProfile[h19];
-    var I = industry(C, D, 2.5);
+    var I = industry(C, D, 2.5), rate = pct(S.rate);
     return [
-      { t: "One measure by hand", q: "A condensing furnace costs " + usd(x1.cost, 2) + " more than a standard one, plus " + usd(x1.extra, 2) + " a year of upkeep and fan electricity; it lasts " + fmtN(cf.life, 1) + " years and saves " + fmtN(x1.save, 3) + " MWh of gas a year. At " + pct(S.rate) + ", what does a saved MWh cost?",
+      { t: "One measure by hand", givens: [["Extra purchase cost (a condensing furnace against a standard one)", usd(x1.cost, 2)], ["Extra a year: upkeep and fan electricity", usd(x1.extra, 2)], ["Life", fmtN(cf.life, 1) + " years"], ["Gas saved a year", fmtN(x1.save, 3) + " MWh"], ["Real discount rate", rate], ["Gas price (Kansas average, 2025)", usd(Pg, 2) + " per MWh"]],
+        q: "What does a saved MWh of gas cost, and does it beat the price?",
         a: "CRF = " + fmtN(x1.crf, 4) + "; " + usd(x1.cost, 2) + " × " + fmtN(x1.crf, 4) + " = " + usd(x1.cap, 2) + ", plus " + usd(x1.extra, 2) + " = " + usd(x1.annual, 2) + " a year; ÷ " + fmtN(x1.save, 3) + " MWh = " + usd(x1.cse, 2) + " per MWh, " + (x1.cse < Pg ? "under" : "over") + " gas at " + usd(Pg, 2) + ".",
         check: { cse: x1.cse, exact: cf.cse } },
-      { t: "The discount rate decides", q: "Weatherizing an older home heated by resistance costs " + usd(e3.cost, 2) + ", lasts " + fmtN(eg.life) + " years and saves " + fmtN(e3.save, 3) + " MWh of electricity a year. Does it beat electricity at " + usd(Pe0, 2) + " per MWh at 3% and at 10%?",
-        a: "At 3%: CRF " + fmtN(e3.crf, 4) + ", " + usd(e3.annual, 2) + " a year, " + usd(e3.cse, 2) + " per MWh: " + (e3.cse < Pe0 ? "yes" : "no") + ". At 10%: CRF " + fmtN(e10.crf, 4) + ", " + usd(e10.annual, 2) + ", " + usd(e10.cse, 2) + ": " + (e10.cse < Pe0 ? "yes" : "no") + ". Near the price, the rate decides.",
+      { t: "The discount rate decides", givens: [["Weatherizing an older home heated by resistance (a retrofit)", usd(e3.cost, 2)], ["Life", fmtN(eg.life) + " years"], ["Electricity saved a year", fmtN(e3.save, 3) + " MWh"], ["Electricity price (Kansas homes' average, 2025)", usd(Pe, 2) + " per MWh"]],
+        q: "Does it beat the price at a 3% and at a 10% real discount rate?",
+        a: "At 3%: CRF " + fmtN(e3.crf, 4) + ", " + usd(e3.annual, 2) + " a year, " + usd(e3.cse, 2) + " per MWh, so " + (e3.cse < Pe ? "yes" : "no") + "; at 10%: CRF " + fmtN(e10.crf, 4) + ", " + usd(e10.annual, 2) + ", " + usd(e10.cse, 2) + ", so " + (e10.cse < Pe ? "yes" : "no") + ". Near the price, the rate decides.",
         check: { r3: e3.cse, r10: e10.cse } },
-      { t: "Rebound", q: "A heat pump replacing resistance heat saves electricity at " + usd(hp.cse, 2) + " per MWh. With a 20% rebound, what does a saved MWh cost?",
+      { t: "Rebound", givens: [["A heat pump replacing resistance heat, no rebound", usd(hp.cse, 2) + " per MWh saved"], ["Rebound", "20%"], ["Electricity price", usd(Pe, 2) + " per MWh"]],
+        q: "What does a saved MWh cost with the rebound?",
         a: usd(hp.cse, 2) + " ÷ (1 − 0.20) = " + usd(hp20, 2) + " per MWh, " + (hp20 < Pe ? "still under" : "over") + " " + usd(Pe, 2) + ". Rebound shrinks the saving, not the cost.",
         check: { cse: hp20 } },
-      { t: "Interactions", q: "Weatherization saves electricity in a resistance-heated home at " + usd(ae.cse, 2) + " per MWh. If a heat pump with a seasonal COP of " + fmtN(sc, 2) + " goes in first, what does its saved MWh cost?",
-        a: "The heat pump already divides the heat's electricity by " + fmtN(sc, 2) + ", so weatherization saves that much less: " + usd(ae.cse, 2) + " × " + fmtN(sc, 2) + " = " + usd(aeHP, 2) + " per MWh, " + (aeHP < Pe ? "still under" : "now over") + " " + usd(Pe, 2) + ". Order matters.",
-        check: { cse: aeHP } },
-      { t: "A cold hour", q: "At " + hm(k7) + " on the design day (" + num(T, 1) + " °C, COP " + fmtN(cp, 2) + "), the core needs " + fmtN(Q, 1) + " MW of heat and " + fmtN(B, 1) + " MW of base load. Half its gas and propane heat goes to heat pumps. The hour's total?",
-        a: "Heat-pump share " + fmtN(hs, 3) + ", resistance " + fmtN(rs, 3) + ": " + fmtN(Q, 1) + " × (" + fmtN(rs, 3) + " + " + fmtN(hs, 3) + " ÷ " + fmtN(cp, 2) + ") = " + fmtN(hel, 1) + " MW; plus " + fmtN(B, 1) + " MW base and " + fmtN(evh, 1) + " MW of cars: " + fmtN(tot, 1) + " MW, against " + core.substationMW + ".",
-        check: { hel: hel, tot: tot, model: districtDay(C, D, 0, dd, { gas: 0.5 }).tot[k7] } },
-      { t: "Evening chargers", q: "In the suburbs, 30% of cars become electric and charge as today: " + fmtN(Ed, 1) + " MWh a day. How much do they add at " + hm(h19) + ", when " + pct(p19) + " of a day's charging happens?",
+      { t: "Interactions", givens: [["Weatherizing a resistance-heated home, on its own", usd(ae.cse, 2) + " per MWh saved"], ["Seasonal COP of a heat pump installed first", fmtN(sc, 2)], ["Electricity price", usd(Pe, 2) + " per MWh"]],
+        q: "With the heat pump in first, what does weatherization's saved MWh cost?",
+        a: "The heat pump already divides the heat's electricity by " + fmtN(sc, 2) + ", so weatherization saves that much less: " + usd(ae.cse, 2) + " × " + fmtN(sc, 2) + " = " + usd(aeHP, 2) + " per MWh, " + (aeHP < Pe ? "still under" : "now over") + " " + usd(Pe, 2) + "." +
+          (onCurve ? " The curve's block " + onCurve.n + " gives " + usd(onCurve.cse, 2) + " with the COP unrounded." : ""),
+        check: { cse: aeHP, curve: onCurve ? onCurve.cse : null } },
+      { t: "A cold hour", givens: [["Hour on the design day", hm(k7) + ", " + num(T, 1) + " °C"], ["Heat-pump COP at that hour", fmtN(cp, 2)], ["The core's heat need", fmtN(Q, 1) + " MW"], ["Base load", fmtN(B, 1) + " MW"], ["Cars charging", fmtN(evh, 1) + " MW"],
+          ["Shares of the heat: gas, propane, resistance, heat pumps", [g3, p3, rs, h3].map(function (v) { return fmtN(v, 3); }).join(", ")]],
+        q: "Half the gas and propane heat moves to heat pumps: what is the hour's total load?",
+        a: "Heat-pump share " + fmtN(h3, 3) + " + (" + fmtN(g3, 3) + " + " + fmtN(p3, 3) + ") ÷ 2 = " + fmtN(hs, 3) + "; " + fmtN(Q, 1) + " × (" + fmtN(rs, 3) + " + " + fmtN(hs, 3) + " ÷ " + fmtN(cp, 2) + ") = " + fmtN(hel, 1) + " MW of heating; plus " + fmtN(B, 1) + " MW base and " + fmtN(evh, 1) + " MW of cars: " + fmtN(tot, 1) + " MW, against " + core.substationMW + ".",
+        check: { hel: hel, tot: tot, model: districtDay(C, D, 0, dd, { gas: 0.5 }).tot[k7], hs: hs, shares: [g3, p3, rs, h3] } },
+      { t: "Evening chargers", givens: [["The suburbs' charging a day, 30% electric cars, as today", fmtN(Ed, 1) + " MWh"], ["Share of a day's charging at " + hm(h19), pct(p19)], ["Charging at " + hm(h19) + " in 2025", fmtN(sub0.ev[h19], 2) + " MW"]],
+        q: "How much do the suburbs' cars add at " + hm(h19) + "?",
         a: fmtN(Ed, 1) + " × " + fmtN(p19, 2) + " = " + fmtN(r2(Ed * p19, 1), 1) + " MW, against " + fmtN(sub0.ev[h19], 2) + " MW in 2025.",
         check: { mw: r2(Ed * p19, 1), model: sub.ev[h19] } },
-      { t: "Industrial heat pump", q: "The park's heat below 100 °C is " + fmtN(I.bands.low) + " MWh a year. How much electricity would heat pumps at a COP of 2.5 need, as a steady MW?",
+      { t: "Industrial heat pump", givens: [["The park's heat below 100 °C", fmtN(I.bands.low) + " MWh a year"], ["Heat-pump COP", "2.5"], ["Hours in a year", "8,760"]],
+        q: "How much electricity would heat pumps need, as a steady MW?",
         a: fmtN(I.bands.low) + " ÷ 2.5 = " + fmtN(I.el.low) + " MWh a year; ÷ 8,760 h = " + fmtN(I.el.low / 8760, 1) + " MW.",
         check: { mwh: I.el.low } }
     ];
   }
+  function givensHTML(g) { return "<table class=\"lx-mini-table a15-given\"><tbody>" + g.map(function (r) { return "<tr><th scope=\"row\">" + r[0] + "</th><td>" + r[1] + "</td></tr>"; }).join("") + "</tbody></table>"; }
   function practiceHTML(C, D) {
     var P = practice(C, D), mins = 30;
     return "<p class=\"lx-eyebrow\">Practice · about " + mins + " minutes on your own</p><ol class=\"lx-fb-practice\">" + P.map(function (p) {
-      return "<li><p><b>" + p.t + ".</b> " + p.q + "</p><details class=\"lx-answer\"><summary>Answer</summary><p>" + p.a + "</p></details></li>";
+      return "<li><p><b>" + p.t + ".</b> " + p.q + "</p>" + givensHTML(p.givens) + "<details class=\"lx-answer\"><summary>Answer</summary><p>" + p.a + "</p></details></li>";
     }).join("") + "</ol>";
   }
 
@@ -384,6 +492,7 @@
     paying: paying, payMWh: payMWh, evSplit: evSplit, districtDay: districtDay, design: design, dayByKey: dayByKey, yearMWh: yearMWh, yearPeak: yearPeak, city: city, storeM3: storeM3, industry: industry,
     stepTexts: stepTexts, Q1: Q1, q1: q1, chain1: chain1, line1: line1, blockLine: blockLine, curveSaw: curveSaw, reboundLine: reboundLine, peakLine: peakLine, annualVsPeak: annualVsPeak, avpLine: avpLine,
     evLine: evLine, evSaw: evSaw, cityLine: cityLine, together: together, dhSaw: dhSaw, gasSaw: gasSaw, num: num, dhLine: dhLine, indLine: indLine, staticFallback: staticFallback, ideasHTML: ideasHTML, checkHTML: checkHTML, factsHTML: factsHTML, sourcesHTML: sourcesHTML, CITY_SRC: CITY_SRC, practice: practice, practiceHTML: practiceHTML,
+    OVERLAP: OVERLAP, annNet: annNet, ownSubs: ownSubs, subsLine: subsLine, dhDeltaK: dhDeltaK, netRuns: netRuns, netLine: netLine, HINTS: HINTS, netHint: netHint, copHint: copHint, industryBins: industryBins, industryCards: industryCards, givensHTML: givensHTML,
     setLine: function (l) { LINE = l; }, fmtN: fmtN, pct: pct, usd: usd, hm: hm, toY: toY };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
@@ -409,8 +518,10 @@
       if (["evening", "timer", "fill"].indexOf(saved.rule) >= 0) S.rule = saved.rule;
       if (inR(saved.dh, D.districtHeat.share)) S.dh = saved.dh;
       if (inR(saved.cop, D.industry.cop)) S.cop = saved.cop;
+      if (["hp", "plant", "store"].indexOf(saved.dhMode) >= 0) S.dhMode = saved.dhMode;
+      if (saved.dhSeen === true) S.dhSeen = true;
     }
-    function keep() { LX.store.set("a15", { rate: S.rate, rebound: S.rebound, dist: S.dist, evShare: S.evShare, rule: S.rule, dh: S.dh, cop: S.cop }); }
+    function keep() { LX.store.set("a15", { rate: S.rate, rebound: S.rebound, dist: S.dist, evShare: S.evShare, rule: S.rule, dh: S.dh, dhMode: S.dhMode, dhSeen: !!S.dhSeen, cop: S.cop }); }
     function sOf(key) { var s = S.dist[key]; return { gas: s.gas, res: s.res, env: s.env, ev: key === "suburbs" ? S.evShare : null, rule: key === "suburbs" ? S.rule : "evening" }; }
     function allS() { var o = {}; Object.keys(S.dist).forEach(function (k) { o[k] = sOf(k); }); return o; }
     var demo = [];
@@ -420,9 +531,12 @@
     }
     function lineP(host, t) { host.innerHTML = bold(t); }
     function fictional(host) { H("p", { class: "lx-hint a15-fict", text: C.about.line }, host); }
-    function slider(host, label, r, val, fmt, color, on) {
-      return LX.Slider(host, { label: label, color: color || "var(--lx-accent)", min: r.min, max: r.max, step: r.step, value: val, fmt: fmt, onChange: on });
+    function slider(host, label, r, val, fmt, color, on, hint) {
+      return LX.Slider(host, { label: label, color: color || "var(--lx-accent)", min: r.min, max: r.max, step: r.step, value: val, fmt: fmt, onChange: on, hint: hint ? function () { return hint; } : null });
     }
+    // a lesson named inside text that goes through LX.rich (which escapes HTML): LX.rich's lesson-link mark once live
+    function refMark(P, code) { var r = LX.lessonRef(P, code); return r.ready ? "[[lesson:" + r.href.replace(/\.html$/, "") + "|" + r.label + "]]" : r.label + " (upcoming)"; }
+    function hintP(host, t, live) { var o = { class: "lx-hint", html: LX.rich(t) }; if (live) o["aria-live"] = "polite"; return H("p", o, host); }
     var pctF = function (v) { return pct(v); };
 
     // the cost-of-saved-energy curve, on LX.Plot: blocks, the prices they compete with, numbered marks
@@ -445,10 +559,10 @@
         x: { min: 0, max: xMax, ticks: xt, ticksN: xt.filter(function (t, i) { return i % 2 === 0; }) },
         y: { min: 0, max: yMax, step: yMax > 300 ? 100 : 50, fmt: function (v) { return "$" + fmtN(v); }, unit: "$ per MWh saved" }, height: 260, heightN: 230,
         bars: bars, marks: marks, refs: refs,
-        legend: [{ label: "Pays: below the price it competes with (block width: MWh saved a year)", color: COL[carrier] }, { label: "Each block's price (the tick across it)", color: "var(--lx-ink)" }].concat(priceLeg),
+        legend: [{ label: "Below the average price it competes with (width: MWh saved a year after the blocks to its left)", color: COL[carrier] }, { label: "Each block's price (the tick across it)", color: "var(--lx-ink)" }].concat(priceLeg),
         tip: function (x) { var b = list.filter(function (q) { return x >= q.x0 && x <= q.x1; })[0]; return b ? "<div><b>" + b.n + ". " + LX.esc(b.short) + "</b></div><div>" + usd(b.cse, 1) + " per MWh · " + fmtN(b.mwh) + " MWh a year</div>" : null; },
         aria: "Cost-of-saved-energy curve for " + (carrier === "gas" ? "gas" : "electricity") + ": " + list.map(function (b) { return b.n + " " + b.short + " " + usd(b.cse, 0) + " per MWh"; }).join("; ") + ".",
-        text: { head: ["#", "Measure", "MWh saved a year", "$ per MWh saved", "Price"], rows: list.map(function (b) { return [String(b.n), b.label, fmtN(b.mwh), usd(b.cse, 1), usd(b.price, 1)]; }) }
+        text: { head: ["#", "Measure", "MWh saved a year, after the blocks before it", "$ per MWh saved", "Average price"], rows: list.map(function (b) { return [String(b.n), b.label + (b.by ? " (alone " + usd(b.alone, 1) + ")" : ""), fmtN(b.mwh), usd(b.cse, 1), usd(b.price, 1)]; }) }
       });
     }
     // one district's design day as stacked hourly bars, with its substation's limit
@@ -492,8 +606,8 @@
             res.innerHTML = ""; pr.reveal();
             var uc = LX.UnitChain(res, { label: "From the extra cost to a cost per saved MWh", steps: chain1(C, D, S) });
             var ln = H("p", { class: "lx-step-line", "aria-live": "polite" }, res);
-            slider(res, "Real discount rate", D.rate, S.rate, pctF, "var(--lx-tier-2)", function (v) { S.rate = v; keep(); uc.set(chain1(C, D, S)); lineP(ln, line1(C, D, S)); buildExplain(); });
-            H("p", { class: "lx-hint", text: "CRF, the capital recovery factor, turns a cost paid now into equal yearly payments over the life. LBNL uses 6% real." }, res);
+            slider(res, "Real discount rate", D.rate, S.rate, pctF, "var(--lx-tier-2)", function (v) { S.rate = v; keep(); uc.set(chain1(C, D, S)); lineP(ln, line1(C, D, S)); buildExplain(); }, HINTS.rate);
+            hintP(res, HINTS.crf);
             fictional(res); lineP(ln, line1(C, D, S)); api.done();
           }
           if (pr.picked()) show();
@@ -507,7 +621,7 @@
           drawCurve(Pl, list, "el");
           var seg = pickBlocks(bh, list, function (b, sg, bt) { press(sg, bt); seen[b.key] = true; lineP(ln, blockLine(b)); if (Object.keys(seen).length >= 3) { api.done(); api.saw(curveSaw(list, "el")); } });
           lineP(ln, "Tap a numbered block to read it.");
-          H("p", { class: "lx-hint", text: "Assumed: each measure on its own; equipment at replacement costs only its extra over a standard choice; LED tubes counted at equal light; older homes spread evenly over heating fuels." }, act);
+          hintP(act, HINTS.assumed);
           demo[1] = function () { Array.prototype.slice.call(seg.querySelectorAll("button"), 0, 3).forEach(function (b) { b.click(); }); };
         } },
       { text: texts[2], build: function (act, api) {
@@ -531,8 +645,8 @@
           var Pl = LX.Plot(H("div", null, act), { text: "Text version of the chart", legend: true });
           var ln = H("p", { class: "lx-step-line", "aria-live": "polite" }, act);
           slider(act, "Rebound (homes' measures)", D.rebound, S.rebound, pctF, "var(--lx-warn)", function (v) { S.rebound = v; keep(); paint(); api.done(); });
-          slider(act, "Real discount rate", D.rate, S.rate, pctF, "var(--lx-tier-2)", function (v) { S.rate = v; keep(); paint(); api.done(); });
-          H("p", { class: "lx-hint", text: "A review of studies finds the direct rebound for household energy services in rich countries generally below 30% (Sorrell and others, 2009, abstract)." }, act);
+          slider(act, "Real discount rate", D.rate, S.rate, pctF, "var(--lx-tier-2)", function (v) { S.rate = v; keep(); paint(); api.done(); }, HINTS.rate);
+          hintP(act, HINTS.rebound);
           fictional(act);
           [["el", "Electricity"], ["gas", "Gas"]].forEach(function (t) { btn[t[0]] = H("button", { type: "button", text: t[1] }, tabs); btn[t[0]].addEventListener("click", function () { S.carrier = t[0]; paint(); }); });
           function paint() {
@@ -591,8 +705,8 @@
           var Pl = LX.Plot(H("div", null, act), { text: "Text version of the chart", legend: true });
           var ln = H("p", { class: "lx-step-line", "aria-live": "polite" }, act);
           slider(act, "Electric share of the suburbs' cars", D.electrify.ev, S.evShare, pctF, COL.ev, function (v) { S.evShare = v; keep(); paint(); });
-          H("p", { class: "lx-hint", text: "Step 8 keeps your share and rule for the suburbs." }, act);
-          H("p", { class: "lx-hint", text: "Illustrative rules: a timer spreads each day's charging over 00:00 to 06:00; filling the valleys raises the lowest hours to one level, at any hour." }, act);
+          hintP(act, HINTS.keep);
+          hintP(act, HINTS.ev);
           fictional(act);
           D.electrify.rules.forEach(function (t) { btn[t.key] = H("button", { type: "button", text: t.label }, tabs); btn[t.key].addEventListener("click", function () { S.rule = t.key; seen[t.key] = true; keep(); paint(); }); });
           function all3() { var o = {}; ["evening", "timer", "fill"].forEach(function (k) { var s = sOf("suburbs"); s.rule = k; o[k] = districtDay(C, D, 1, dd, s); }); return o; }
@@ -609,7 +723,7 @@
       { text: texts[7], build: function (act, api) {
           var sel = "fringe", tabs = H("div", { class: "lx-seg", role: "group", "aria-label": "District" }, act), btn = {};
           var bars = H("div", { class: "a15-dbars", role: "img" }, act);
-          var ctl = H("div", { class: "a15-ctl" }, act), ln = H("p", { class: "lx-step-line", "aria-live": "polite" }, act);
+          var ctl = H("div", { class: "a15-ctl" }, act), ln = H("p", { class: "lx-step-line", "aria-live": "polite" }, act), subs = hintP(act, "", true);
           fictional(act);
           C.districts.forEach(function (d) { btn[d.key] = H("button", { type: "button", text: d.label }, tabs); btn[d.key].addEventListener("click", function () { sel = d.key; build(); }); });
           function build() {
@@ -632,7 +746,7 @@
               H("span", { class: "a15-dbar-n", text: fmtN(p.peak, 1) + " / " + p.limit + " MW" }, row);
             });
             bars.setAttribute("aria-label", "Design-day peaks against limits: " + R.parts.map(function (p) { return p.label + " " + fmtN(p.peak, 1) + " of " + p.limit + " MW"; }).join("; ") + ".");
-            lineP(ln, cityLine(R)); buildExplain();
+            lineP(ln, cityLine(R)); subs.textContent = subsLine(C, R); buildExplain();
           }
           build();
           demo[7] = function () { ["core", "suburbs", "fringe"].forEach(function (k) { S.dist[k].gas = 1; }); keep(); build(); api.done(); };
@@ -642,27 +756,21 @@
           var Pl = LX.Plot(H("div", null, act), { text: "Text version of the chart", legend: true });
           var ln = H("p", { class: "lx-step-line", "aria-live": "polite" }, act);
           slider(act, "Share of the core's gas heat on the network", D.districtHeat.share, S.dh, pctF, COL.dh, function (v) { S.dh = v; keep(); paint(); });
-          H("p", { class: "lx-hint", text: "Every gas and propane furnace in the core is replaced here; your step 6 settings stay. Source, losses and store are set for teaching." }, act);
+          hintP(act, netHint(C, D));
           fictional(act);
-          [["hp", "Heat pumps everywhere"], ["plant", "Network, no store"], ["store", "Network with a store"]].forEach(function (t) { btn[t[0]] = H("button", { type: "button", text: t[1] }, tabs); btn[t[0]].addEventListener("click", function () { S.dhMode = t[0]; seen[t[0]] = true; paint(); }); });
+          [["hp", "Heat pumps everywhere"], ["plant", "Network, no store"], ["store", "Network with a store"]].forEach(function (t) { btn[t[0]] = H("button", { type: "button", text: t[1] }, tabs); btn[t[0]].addEventListener("click", function () { S.dhMode = t[0]; seen[t[0]] = true; keep(); paint(); }); });
           function rOf(mode) { var s = sOf("core"); s.gas = 1; s.dh = { share: S.dh, mode: mode }; var r = districtDay(C, D, 0, dd, s); r.label = C.districts[0].label; return r; }
           function paint() {
             Object.keys(btn).forEach(function (j) { btn[j].setAttribute("aria-pressed", String(j === S.dhMode)); });
-            var r = rOf(S.dhMode); drawDay(Pl, r); lineP(ln, dhLine(D, r, S.dhMode));
+            var r = rOf(S.dhMode); drawDay(Pl, r); lineP(ln, dhLine(C, D, r, S.dhMode));
             if (seen.hp && seen.plant && seen.store) { var a = rOf("hp"), b = rOf("plant"), c = rOf("store"); api.done(); api.saw(dhSaw(a, b, c)); }
+            buildExplain();
           }
-          seen[S.dhMode] = true; paint();
+          seen[S.dhMode] = true; S.dhSeen = true; keep(); paint();
           demo[8] = function () { ["plant", "store", "hp"].forEach(function (k) { btn[k].click(); }); btn.store.click(); };
         } },
       { text: texts[9], build: function (act, api) {
-          var I = D.industry, bands = C.industry.processHeat.map(function (b) { return { band: b.band, deliveredMWh: b.deliveredMWh, label: b.label.replace(/(\d) C\b/g, "$1 °C") }; });
-          var bins = [{ id: "hp", label: "Industrial heat pump", sub: "up to about " + I.hpMaxC + " °C", color: "var(--lx-good)" }, { id: "boiler", label: "Electric boiler", sub: "steam", color: "var(--lx-bat)" },
-                      { id: "oven", label: "Electric ovens and furnaces", sub: "resistance or induction", color: "var(--lx-tier-4)" }, { id: "elys", label: "Hydrogen by electrolysis", sub: "a feedstock, not only heat", color: "var(--lx-hyd)" }];
-          var cards = [
-            { id: "low", text: "Food plants: " + bands[0].label + ", " + fmtN(bands[0].deliveredMWh) + " MWh a year", bin: "hp", why: "Below 100 °C is easy for an industrial heat pump, and it delivers several units of heat per unit of electricity." },
-            { id: "medium", text: "Food plants: " + bands[1].label + ", " + fmtN(bands[1].deliveredMWh) + " MWh a year", bin: "boiler", why: "Steam up to 400 °C is past today's commercial heat pumps (about " + I.hpMaxC + " °C); an electric boiler makes it, and heat pumps can take the lower part." },
-            { id: "high", text: "Food plants: " + bands[2].label + ", " + fmtN(bands[2].deliveredMWh) + " MWh a year", bin: "oven", why: "Above 400 °C, electric resistance or induction heats directly, at about one unit of heat per unit of electricity." },
-            { id: "h2", text: "The fertilizer plant: " + fmtN(C.industry.fertilizer.hydrogenT) + " t of hydrogen a year from gas reformers", bin: "elys", why: "The plant needs hydrogen itself, not only heat: electrolysis would make it from electricity and water." }];
+          var I = D.industry, bins = industryBins(D), cards = industryCards(C, D);
           var res = H("div", { class: "a15-res" }, act);
           fictional(act);
           var cs = LX.CardSort(act, { bins: bins, cards: cards, onCheck: function () { show(); } });
@@ -671,7 +779,7 @@
             res.innerHTML = "";
             var ln = H("p", { class: "lx-step-line", "aria-live": "polite" }, res);
             slider(res, "Industrial heat pump COP", I.cop, S.cop, function (v) { return fmtN(v, 1); }, "var(--lx-good)", function (v) { S.cop = v; keep(); lineP(ln, indLine(C, D, S.cop)); });
-            H("p", { class: "lx-hint", text: "LBNL (2022): COP from 1.6 to 5.8 at temperature lifts of 130 to 40 K. Electric boilers and ovens at 98%. A ceiling, not a forecast." }, res);
+            hintP(res, copHint(D));
             lineP(ln, indLine(C, D, S.cop)); api.done();
           }
           demo[9] = function () { var m = {}; cards.forEach(function (c) { m[c.id] = c.bin; }); cs.place(m); cs.check(); };
@@ -686,10 +794,10 @@
       xhost.innerHTML = ""; xhost.classList.add("is-live");
       var e = curve(C, D, S, "el"), g = curve(C, D, S, "gas");
       LX.CompareTable(H("div", { class: "lx-xcard" }, xhost), {
-        title: "The measures, side by side (your rate " + pct(S.rate) + ", rebound " + pct(S.rebound) + ")", text: true,
-        columns: [{ key: "name", label: "Measure", main: true }, { key: "cost", label: "Extra cost, 2025 $ (up front, and a year)" }, { key: "life", label: "Life" }, { key: "save", label: "Saves a year" }, { key: "cse", label: "Per MWh saved" }, { key: "pays", label: "Against its price" }],
-        rows: e.concat(g).map(function (b) { return { key: b.key, color: COL[b.carrier], name: b.label, cost: usd(b.cost) + (b.extra > 0.005 ? " + " + usd(b.extra) + " a year" : ""), life: fmtN(b.life, 1) + " years", save: fmtN(b.net, 2) + " MWh of " + (b.carrier === "gas" ? "gas" : "electricity"), cse: usd(b.cse, 1), pays: (b.pays ? "pays, under " : "does not pay, over ") + usd(b.price, 1) }; }),
-        caption: C.about.line + " Costs from EIA, LBNL and ResStock (sources below); 2025 Kansas retail prices." });
+        title: "The measures, in the curve's order (your rate " + pct(S.rate) + ", rebound " + pct(S.rebound) + ")", text: true,
+        columns: [{ key: "name", label: "Measure", main: true }, { key: "cost", label: "Extra cost per unit, 2025 $ (up front, and a year)" }, { key: "life", label: "Life" }, { key: "save", label: "Saves per unit a year, after the blocks before it" }, { key: "cse", label: "Per MWh saved" }, { key: "pays", label: "Against the average price" }],
+        rows: e.concat(g).map(function (b) { return { key: b.key, color: COL[b.carrier], name: b.label, cost: usd(b.cost) + (b.extra > 0.005 ? " + " + usd(b.extra) + " a year" : ""), life: fmtN(b.life, 1) + " years", save: fmtN(b.net, 2) + " MWh of " + (b.carrier === "gas" ? "gas" : "electricity"), cse: usd(b.cse, 1) + (b.by ? " (alone " + usd(b.alone, 1) + ")" : ""), pays: (b.pays ? "below " : "above ") + usd(b.price, 1) }; }),
+        caption: C.about.line + " Costs from EIA and ORNL (sources below); Kansas's 2025 average retail prices, flat per MWh." });
       var core = districtDay(C, D, 0, dd, sOf("core"));
       LX.CausalChain(H("div", { class: "lx-xcard" }, xhost), {
         title: "Cause and effect: a cold night on electrified heat",
@@ -697,7 +805,7 @@
                 { title: "COP falls", text: "An air-source heat pump moves less heat per kWh when the air is colder.", value: "COP " + fmtN(cop(C, dd.tmin), 2) + " against " + fmtN(scop(C), 2) + " over the year" },
                 { title: "The peak grows", text: "Heating electricity rises faster than the year's MWh.", value: fmtN(core.peak, 1) + " MW in the core (your settings)" },
                 { title: "The substation binds", text: "The wires and transformers are sized for the peak hour, not the year.", value: core.limit + " MW limit" },
-                { title: "What helps", text: "Envelopes, steadier heat sources with stores, and charging away from the coldest hours.", value: "steps 6, 7 and 9" }],
+                { title: "What helps", text: "Tighter [[building-envelope|envelopes]], steadier heat sources with stores, and charging away from the coldest hours.", value: "steps 6, 7 and 9" }],
         note: C.about.line });
       var ann = H("div", { class: "lx-xcard" }, xhost);
       H("h3", { text: "The design day in the core, annotated" }, ann);
@@ -705,15 +813,16 @@
       core.label = C.districts[0].label;
       var mk = [{ x: 3.5, y: core.base[3] / 2, n: "1", kind: "dot" }, { x: 5.5, y: core.base[5] + core.hel[5] / 2, n: "2", kind: "dot" }, { x: 19.5, y: core.tot[19], n: "3", kind: "dot", pos: "above" },
                 { x: 13.5, y: core.limit, n: "4", kind: "dot", pos: "above" }, { x: core.hour + 0.5, y: core.peak, n: "5", kind: "dot", pos: "above" }];
-      drawDay(Pl, core, { marks: mk, title: "The dense core with your settings" });
+      drawDay(Pl, core, { marks: mk, title: "The dense core with your settings (steps 5, 6 and 8), heat pumps in each building" });
       var ol = H("ol", { class: "a15-ann" }, ann);
       ["Base load: SPP's 2025 winter-peak shape, which already carries some of the region's own electric heating.", "Heating electricity: heat × (resistance share + heat-pump share ÷ COP), largest before dawn.",
        "Electric cars, mostly in the evening as today.", "The substation's peak-hour limit, " + core.limit + " MW (one substation per district is a teaching simplification).",
        "The peak, " + fmtN(core.peak, 1) + " MW at " + hm(core.hour) + "."].forEach(function (t) { H("li", { html: LX.rich(t) }, ol); });
+      hintP(ann, annNet(C, D, S.dist.core, S.dh, S.dhSeen));
       LX.Boundary(H("div", { class: "lx-xcard" }, xhost), { title: "Where these answers hold",
-        lede: "Closed-form estimates for a fictional city. The City Planner sandbox, " + LX.lessonRefHTML(P, "SB3") + ", chooses measures, heat and wires together with an optimization model.",
-        holds: ["Costs and savings as stated, in 2025 dollars, each measure on its own.", "Eight representative days of 2025 weather, with one cold design day.", "Retail prices as the yardstick: what the customer pays."],
-        leaves: ["Interactions between measures (practice item 4 shows one).", "What the grid avoids: generation, wires and capacity the savings defer.", "Comfort, health and the value of the rebound itself.", "Upgrade costs of substations and feeders."],
+        lede: "Closed-form estimates for a fictional city. The City Planner sandbox, " + refMark(P, "SB3") + ", chooses measures, heat and wires together with an optimization model.",
+        holds: ["Costs and savings as stated, in 2025 dollars, each block counting what it saves after the cheaper ones.", "Eight representative days: SPP's 2025 electricity shapes, temperatures from NOAA's 1991–2020 normals, and a cold design day set for teaching.", "Kansas's 2025 average retail prices as a flat yardstick; real bills add fixed, demand or time-of-use charges."],
+        leaves: ["Smaller overlaps: lights and water heaters also change a home's heating.", "What the grid avoids: generation, wires and capacity the savings defer.", "Comfort, health and the value of the rebound itself.", "Upgrade costs of substations and feeders.", "The industrial park and the data-center campus, on their own substations (step 8 names them)."],
         source: "Data: prairie-city.json and this lesson's sources (below)." });
     }
     buildExplain();

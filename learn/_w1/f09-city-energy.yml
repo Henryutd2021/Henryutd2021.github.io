@@ -15,6 +15,12 @@ glossary:
   - id: ferc
     term: FERC (Federal Energy Regulatory Commission)
     def: "The federal regulator of interstate electricity transmission, wholesale power sales and interstate gas pipelines in the United States."
+  - id: vertically-integrated-utility
+    term: Vertically integrated utility
+    def: "A utility that owns and runs the power plants, transmission and distribution in its service territory, as Kansas's investor-owned utilities do; its rates are approved by the state regulator."
+  - id: gigawatt-hour
+    term: Gigawatt-hour (GWh)
+    def: "A unit of energy equal to a million kilowatt-hours, used for the yearly energy of a city, a large plant or a large customer."
 requests:
   - "F9 reads prairie-city.json's flows, balance, supply, transport.engineEfficiency and sources; no change requested."
   - "F9's explain layer names A15, A18, F11, SB3 and A4 through LX.lessonRefHTML, so they link once live; no static links to upcoming lessons."

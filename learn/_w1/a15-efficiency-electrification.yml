@@ -5,20 +5,27 @@ lesson: A15
 glossary:
   - id: cost-of-saved-energy
     term: Cost of saved energy
-    def: "What a measure costs per unit of energy it saves: its extra cost spread over its life at a discount rate, divided by the energy it saves each year."
+    def: "What a measure costs per unit of energy it saves: its extra cost spread over its life at a discount rate, plus any extra yearly cost, divided by the energy it saves each year."
   - id: heat-pump-water-heater
     term: Heat-pump water heater
     def: "A water heater that moves heat from the surrounding air into the tank, using a fraction of the electricity an electric-resistance heater needs."
   - id: design-day
     term: Design day
-    def: "A cold (or hot) day of planning weather, harsher than most, whose highest hour sets the size of heating equipment and of the wires that feed it."
+    def: "A cold (or hot) day chosen for planning, so that equipment and networks are sized for its highest hour rather than for an average day."
   - id: coincident-peak
     term: Coincident peak
     def: "The most a group of customers draws in the same hour; it is lower than the sum of their own peaks when they peak at different times."
+  - id: building-envelope
+    term: Building envelope
+    def: "A building's outer shell, its walls, roof, windows and floor, whose insulation and air sealing set how fast heat leaks out."
+  - id: temperature-lift
+    term: Temperature lift
+    def: "How far a heat pump raises heat: its delivery temperature minus its source temperature, in kelvin (a difference of 1 K equals 1 °C)."
   - id: process-heat
     term: Process heat
     def: "Heat that factories use to make things, such as hot water for washing, steam for cooking and drying, or ovens and furnaces above a few hundred degrees."
 requests:
   - "A15 runs closed form. At integration, the coordinator may let its electrification steps call engine E3 (SB3's LP); the boundary card already names SB3 through LX.lessonRefHTML."
-  - "prairie-city.json: no change needed. A15 reads districts, homes, dwellingTypes, vintages, heatModel, cop, days (design day), transport.evProfile, industry, annual, prices, units and sources."
+  - "prairie-city.json: no change needed. A15 reads districts, homes, dwellingTypes, vintages, heatModel, cop (supplyC is also the heat network's supply temperature), days (design day, with dataCenterMW for step 8's note on the loads with their own substations), transport.evProfile, industry (processHeat; food and fertilizer electricityMWh), annual, prices, units and sources. It shows no inventory2025 number."
+  - "Review fixes (2026-11-06): the cost-of-saved-energy curve is now a sequence (each block counts what it saves after the blocks to its left: heat pumps and weatherization, condensing furnaces and weatherization overlap), as A18's 'in order' bars do; no shared measure cost or source changed. The design-day definition follows A18's fix-branch wording (learn-w5-fix-d), so the two sidecars match once both merge."
   - "Cross-page (brief §2 item 8): the measures A18 also prices use A18's sources and values: heat-pump water heaters (EIA AEO2026 RDM Table 2: $905 against $1,715, UEF 0.92 against 3.73), condensing furnaces (99% $4,320 against 80% $3,690, upkeep and fan electricity), weatherization (ORNL $4,695 in 2008 dollars, 20 years, 115 to 80 kWh per m2) and the heat pump's cost (read from e0.json, $8,620 in 2022 dollars, $150 a year, 15.3 years). A15's own: LED tubes (EIA Appendix C), the resistance furnace it replaces ($1,480, $50 a year), the rebound range and the LBNL 2018 programme figure ($0.049 per kWh, 2016 dollars; A18 cites the 2015 brief's $0.045 for commercial rebates)."

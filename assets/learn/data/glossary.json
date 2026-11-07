@@ -233,6 +233,12 @@
   "lesson": "F1",
   "href": "f01-five-scales.html"
  },
+ "building-envelope": {
+  "term": "Building envelope",
+  "short": "A building's outer shell, its walls, roof, windows and floor, whose insulation and air sealing set how fast heat leaks out.",
+  "lesson": "A15",
+  "href": "a15-efficiency-electrification.html"
+ },
  "bus": {
   "term": "Bus",
   "short": "A point of the network where plants, loads and lines meet, such as a substation; a network model has one balance rule per bus.",
@@ -553,7 +559,7 @@
  },
  "cost-of-saved-energy": {
   "term": "Cost of saved energy",
-  "short": "What a measure costs per unit of energy it saves: its extra cost spread over its life at a discount rate, divided by the energy it saves each year.",
+  "short": "What a measure costs per unit of energy it saves: its extra cost spread over its life at a discount rate, plus any extra yearly cost, divided by the energy it saves each year.",
   "lesson": "A15",
   "href": "a15-efficiency-electrification.html"
  },
@@ -781,7 +787,7 @@
  },
  "design-day": {
   "term": "Design day",
-  "short": "A cold (or hot) day of planning weather, harsher than most, whose highest hour sets the size of heating equipment and of the wires that feed it.",
+  "short": "A cold (or hot) day chosen for planning, so that equipment and networks are sized for its highest hour rather than for an average day.",
   "lesson": "A15",
   "href": "a15-efficiency-electrification.html"
  },
@@ -1324,6 +1330,12 @@
   "short": "A thousand megawatts, a rate of energy flow used for large plants, whole fleets and national demand.",
   "lesson": "N1",
   "href": "n01-news-lens.html"
+ },
+ "gigawatt-hour": {
+  "term": "Gigawatt-hour (GWh)",
+  "short": "A unit of energy equal to a million kilowatt-hours, used for the yearly energy of a city, a large plant or a large customer.",
+  "lesson": "F9",
+  "href": "f09-city-energy.html"
  },
  "gis": {
   "term": "GIS (geographic information system)",
@@ -3071,6 +3083,12 @@
   "lesson": "B2",
   "href": "b02-python-data.html"
  },
+ "temperature-lift": {
+  "term": "Temperature lift",
+  "short": "How far a heat pump raises heat: its delivery temperature minus its source temperature, in kelvin (a difference of 1 K equals 1 °C).",
+  "lesson": "A15",
+  "href": "a15-efficiency-electrification.html"
+ },
  "terawatt-hour": {
   "term": "Terawatt-hour (TWh)",
   "short": "A unit of energy equal to a billion kilowatt-hours, used for the yearly electricity use of regions and countries.",
@@ -3310,6 +3328,12 @@
   "short": "Keeping every saved state of a project's files, with who changed what and why, so any earlier state can be compared or brought back.",
   "lesson": "K8",
   "href": "k08-git-notebooks.html"
+ },
+ "vertically-integrated-utility": {
+  "term": "Vertically integrated utility",
+  "short": "A utility that owns and runs the power plants, transmission and distribution in its service territory, as Kansas's investor-owned utilities do; its rates are approved by the state regulator.",
+  "lesson": "F9",
+  "href": "f09-city-energy.html"
  },
  "virtual-power-plant": {
   "term": "Virtual power plant",
