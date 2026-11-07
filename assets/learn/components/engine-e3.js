@@ -212,7 +212,9 @@
       S.a.ely = yearly(ez.capex * 1000, ez.life, rate, ez.fomShare + ez.stackShare * 8760 / ez.stackHours);
       S.a.ihp = yearly(c.indHP.capex * 1000, c.indHP.life, rate);
       S.capex.wind = c.wind.capex * 1000; S.capex.farm = c.solarFarm.capex * 1000; S.capex.ely = ez.capex * 1000; S.capex.ihp = c.indHP.capex * 1000;
-      S.siteAdj = s.siteInfo || null;   // set by the page's siting hook: { connectUSD, cfK } (A19's map), else none
+      // set by the page's siting hook: { connectUSD, cfK } (A19's map), else none; only with a solar farm, so a plan without
+      // one (and 2025's baseline, which keeps the plan's other fields) carries no site's line, road or land
+      S.siteAdj = s.farm > 0 ? s.siteInfo || null : null;
       // the park's flat new loads (MW) and the gas they replace (MWh of gas a year)
       S.ihpHeatMW = S.ihp * P.out.lowHeat / 8760;
       S.ihpElMW = S.ihpHeatMW / c.indHP.cop;
@@ -842,13 +844,13 @@
   function fullRows(e, P) {
     var D = e.days, Y = e.year, c3 = e.page === "c3";
     var lab = function (key) { var d = P.days.filter(function (x) { return x.key === key; })[0]; return d ? d.label.toLowerCase() : key; };
-    var grid = function (d, yr) { return kilo(d.peak) + " of " + kilo(d.limit) + (d.upg >= 0.5 ? " + " + kilo(d.upg) + " MW of upgrade" : " MW") + (d.at ? " (" + (yr ? fdate(d.at.day) : lab(d.at.day)) + ", " + hh(d.at.h) + ")" : ""); };
+    var grid = function (d, yr) { return kilo(d.peak) + " MW, " + (d.upg >= 0.5 ? kilo(d.upg) + " MW over its " + kilo(d.limit) + " MW limit" : "within its " + kilo(d.limit) + " MW limit") + (d.at ? " (" + (yr ? fdate(d.at.day) : lab(d.at.day)) + ", " + hh(d.at.h) + ")" : ""); };
     var dmw = function (v) { return Math.abs(v) < 0.5 ? "same" : sgn(Math.round(v), function (x) { return kilo(x) + " MW"; }); };
-    var rows = [[c3 ? "The city's yearly cost against 2025" : "Yearly cost against 2025", millions(D.dCost * 1e6), millions(Y.dCost * 1e6), Math.abs(Y.dCost - D.dCost) < 0.05 ? "under $0.1M" : sgn(Y.dCost - D.dCost, function (x) { return millions(x * 1e6); })],
+    var rows = [[(c3 ? "The city's yearly cost against 2025" : "Yearly cost against 2025") + " (no penalty on unserved energy)", millions(D.dCost * 1e6), millions(Y.dCost * 1e6), Math.abs(Y.dCost - D.dCost) < 0.05 ? "under $0.1M" : sgn(Y.dCost - D.dCost, function (x) { return millions(x * 1e6); })],
       [c3 ? "The city's CO₂ a year" : "The districts' CO₂ a year", kilo(D.co2) + " t", kilo(Y.co2) + " t", sgn(Y.co2 / D.co2 - 1, function (x) { return pct(x, 2); })]];
     if (e.cap != null) rows.push(["Against the CO₂ cap, " + kilo(e.cap) + " t", D.co2 <= e.cap + 0.5 ? "within" : kilo(D.co2 - e.cap) + " t over", Y.co2 <= e.cap + 0.5 ? "within" : kilo(Y.co2 - e.cap) + " t over", ""]);
-    D.dist.forEach(function (d, i) { rows.push([P.D[i].label + ": busiest hour against the limit", grid(d, false), grid(Y.dist[i], true), dmw(Y.dist[i].peak - d.peak)]); });
-    rows.push(["Unserved, with the eight days' upgrades", "none (sized on these days)", Y.unserved < 0.5 ? "none" : kilo(Y.unserved) + " MWh on " + dateList(Y.shortDays.map(function (x) { return x.day; })), ""]);
+    D.dist.forEach(function (d, i) { rows.push([P.D[i].label + ": busiest hour, and the upgrade it needs", grid(d, false), grid(Y.dist[i], true), dmw(Y.dist[i].peak - d.peak)]); });
+    rows.push(["Unserved, with only the eight days' upgrades", "none (sized on these days)", Y.unserved < 0.5 ? "none" : kilo(Y.unserved) + " MWh on " + dateList(Y.shortDays.map(function (x) { return x.day; })), ""]);
     if (D.batteryMW > 0) rows.push(["Batteries: MWh out a year", kilo(D.batteryOut), kilo(Y.batteryOut), sgn(Math.round(Y.batteryOut - D.batteryOut), kilo)]);
     if (D.storeMWh > 0) rows.push(["Heat store: MWh of heat out a year", D.storeOut < 0.5 ? "not used" : kilo(D.storeOut), Y.storeOut < 0.5 ? "not used" : kilo(Y.storeOut), Math.max(D.storeOut, Y.storeOut) < 0.5 ? "" : sgn(Math.round(Y.storeOut - D.storeOut), kilo)]);
     if (c3 && Math.max(D.contractGWh, Y.contractGWh) > 0) rows.push(["Contract wind and solar the city used", kilo(D.contractGWh) + " GWh", kilo(Y.contractGWh) + " GWh", sgn(Y.contractGWh / D.contractGWh - 1, function (x) { return pct(x, 1); })]);
@@ -860,11 +862,13 @@
     var gap = Math.max(Math.abs(Y.cost / D.cost - 1), Math.abs(Y.co2 / D.co2 - 1));
     var extra = sum(Y.dist.map(function (y, i) { return y.upg - D.dist[i].upg; })), up = sum(D.dist.map(function (d) { return d.upg; }));
     var most = Math.max.apply(null, Y.dist.map(function (y, i) { return y.peak - D.dist[i].peak; }));
+    var ua = 1 - FYc.degreeHoursDays / FYc.degreeHours;   // the year's heat-loss rate against the eight days' (same heat need)
     out.push(["The check", "the plan as the eight days decided it (shares, sizes, substation upgrades), run on every hour of 2025 with the same model. Precomputed on " + date + ": too large for a click."]);
-    out.push(["What holds", "yearly cost and CO₂, within " + (gap < 0.001 ? "0.1%" : "about " + pct(gap, 1)) + ": the days are weighted and scaled to the year's base and heat energy."]);
+    out.push(["Two runs", "cost, CO₂ and unserved energy keep the eight days' upgrades; the busiest hours and upgrades come from a second run with the upgrades sized on the year."]);
+    out.push(["What holds", "yearly cost and CO₂, within " + (gap < 0.001 ? "0.1%" : "about " + pct(gap, 1)) + ": like the days, the year is scaled to the city's annual base and heat energy (its heat-loss rate " + pct(ua, 1) + " lower)."]);
     var cost = extra * e.upYearly;
-    out.push(["Three cold days", "the design day stands for 3 days; in the year they are " + dateList(FYc.designDays) + ", equally cold. Only their base load differs (it follows SPP's demand): February's is higher in the hours that matter."]);
-    out.push(["The grid", Y.unserved >= 0.5 ? "the eight days' upgrades leave " + kilo(Y.unserved) + " MWh unserved on " + dateList(Y.shortDays.map(function (x) { return x.day; })) + ". Sized on the year, the plan would buy " + (extra).toFixed(1) + " MW more, about " + (cost < 1e5 ? money(Math.round(cost / 1000) * 1000) : millions(cost)) + " a year."
+    out.push(["Three cold days", "the design day stands for 3 days: in the year, " + dateList(FYc.designDays) + ", equally cold. Only their base load (SPP's demand) differs, and February's is higher in the hours that matter."]);
+    out.push(["The grid", Y.unserved >= 0.5 ? "the eight days' upgrades leave " + kilo(Y.unserved) + " MWh unserved on " + dateList(Y.shortDays.map(function (x) { return x.day; })) + " (load the model's substations cannot carry). Sized on the year, the plan buys " + (extra).toFixed(1) + " MW more, about " + (cost < 1e5 ? money(Math.round(cost / 1000) * 1000) : millions(cost)) + " a year."
       : "every hour of the year stays within the limits" + (up >= 0.5 ? " and the eight days' upgrades" : "") + (most >= 0.5 ? "; the busiest hour is up to " + kilo(most) + " MW higher than on the eight days." : ".")]);
     if (c3 && Math.max(D.contractGWh, Y.contractGWh) > 0) out.push(["Wind and sun", "the eight days are picked by their shapes, not scaled: " + pct(FYc.windCF.days, 1) + " wind and " + pct(FYc.solarCF.days, 1) + " solar capacity factors, against 2025's " + pct(FYc.windCF.year, 1) + " and " + pct(FYc.solarCF.year, 1) + ". Hence the contract row and the cost gap."]);
     out.push(["Not tested", "another weather year, cold beyond the design day, or storage from one day to the next: the year uses the eight days' synthetic weather rule."]);

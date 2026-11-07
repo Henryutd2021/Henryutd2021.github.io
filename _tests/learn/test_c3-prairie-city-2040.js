@@ -16,6 +16,7 @@
 //   - the full-year check (data/e3-full-year.json, rebuilt by test_e3-full-year.js): a check for each preset and the
 //     reference plan, found by the plan link (the site's details ignored); the check's eight days are the reference
 //     plan's own run; the contract MWh higher on the year, as the words say; no full-year solve on the page
+//   - 2025's baseline carries no site's costs (only a plan with a solar farm pays for its site)
 //   - the hooks: A19's siting (no site changes a number until the map is wired) and A13's jobs (no number shown)
 //   - guard G-GIS: the only siting on the page is a solar farm; no nuclear term on the page, its script or the data; no
 //     AI wording
@@ -45,6 +46,8 @@ const RUN_DATE = "6 November 2026";
   ok(r0.ok && r1.ok, "2025 and the reference plan run optimal");
   const R1 = r1.results, b1 = PG.budget(R1, P);
   ok(b1.within, "the reference plan is within the budget (" + PG.mil(b1.upfront) + ")");
+  ok(Math.abs(R1.base.acc.city.money - r0.results.acc.city.money) < 1 && Math.abs(R1.base.acc.upfrontTotal) < 1 && E3.sysOf(E3.baseState(withSite(ref)), P).siteAdj === null,
+    "2025's baseline carries no site's line, road or land: the reference plan is compared with the same 2025 as every plan (C3 review, full-year follow-up)");
   const rows = (R, tag) => [[tag + ": up front, 2026 to 2040 (2025 dollars)", PG.mil(R.acc.upfrontTotal) + " of a " + PG.mil(cfg.c3.budget.def * 1e6) + " budget"],
     [tag + ": the city's yearly cost against 2025", PG.smil(R.delta.cityCost)], [tag + ": the city's CO₂ (location-based, operating)", E3.kilo(R.acc.city.co2) + " t a year"],
     [tag + ": busiest hour against the limit, core · suburbs · fringe", R.dist.map(d => E3.kilo(d.peak) + "/" + E3.kilo(d.limit)).join(" · ") + " MW"],
@@ -65,6 +68,10 @@ const RUN_DATE = "6 November 2026";
     site: { id: site1.id, connectUSD: site1.connectUSD, km: site1.km, sub: site1.sub, acres: site1.acres, cf: site1.cf },
     jobs: { jobYears: jb.jobYears, jobYearsNet: jb.jobYearsNet, permDirect: jb.permDirect, permGross: jb.permGross, permNet: jb.permNet, mw: jb.mw },
     sens: { cheap: sens1.joint.cheap, dear: sens1.joint.dear, top: { label: top1.label, loText: top1.loText, hiText: top1.hiText } } };
+  // the reference plan's full-year check (data/e3-full-year.json, rebuilt by test_e3-full-year.js)
+  const FY = JSON.parse(fs.readFileSync(L("data/e3-full-year.json"), "utf8")), FYc = city.fullYear, c3F = FY.plans.filter(e => e.page === "c3"), er = c3F.find(e => e.id === "ref");
+  const upF = V => V.dist.reduce((t, d) => t + d.upg, 0), erExtra = upF(er.year) - upF(er.days);
+  x.full = { extra: erExtra, days: E3.dateList(er.year.shortDays.map(s => s.day)) };
   const c3ex = PG.exemplars(x);
   // the evidence pack: small tables from the same runs, for the summary without JavaScript
   const tb = (head, rows) => E3.tableHTML(head, rows, "c3-ev");
@@ -77,7 +84,8 @@ const RUN_DATE = "6 November 2026";
     "<p class=\"lx-hint\"><b>Sensitivity</b> (the plan held fixed):</p>",
     tb(["Input", "Range tested", "Yearly cost against 2025", "What kind of number"], sens1.rows.map(r => [r.label, r.loText + " to " + r.hiText, PG.mil(r.atLo) + " to " + PG.mil(r.atHi), r.kind]).concat([["All together", "every cheaper end, then every dearer end", PG.mil(sens1.joint.cheap) + " to " + PG.mil(sens1.joint.dear), "a joint test"]])),
     "<p class=\"lx-hint\"><b>The five solar sites</b> (A19's screen, a " + E3.kilo(ref.farm) + " MW farm; up front: line, road and land, 2025 dollars):</p>",
-    tb(["Site", "Where", "Line to", "Up front", "Capacity factor"], SM.top.map(t => { const q = PG.siteInfo(SM, t.id, ref.farm); return [t.id + (t.id === ref.site ? " (the plan's)" : ""), q.where + " of the centre", q.sub + ", " + q.km.toFixed(1) + " km", PG.mil(q.connectUSD), (q.cf * 100).toFixed(1) + "%"]; })),
+    tb(["Site", "Where", "Line to", "Up front", "Capacity factor (a full year)"], SM.top.map(t => { const q = PG.siteInfo(SM, t.id, ref.farm); return [t.id + (t.id === ref.site ? " (the plan's)" : ""), q.where + " of the centre", q.sub + ", " + q.km.toFixed(1) + " km", PG.mil(q.connectUSD), (q.cf * 100).toFixed(1) + "%"]; })),
+    "<p class=\"lx-hint\"><b>Full-year check</b> (all 8,760 hours of 2025, precomputed): substation upgrades " + E3.kilo(upF(er.days)) + " MW on the eight days, " + E3.kilo(upF(er.year)) + " MW sized on the year; with the eight days' upgrades, " + E3.kilo(er.year.unserved) + " MWh unserved on " + E3.dateList(er.year.shortDays.map(s => s.day)) + "; cost and CO₂ within " + (Math.max(Math.abs(er.year.cost / er.days.cost - 1), Math.abs(er.year.co2 / er.days.co2 - 1)) < 0.001 ? "0.1%" : "about " + PG.pct1(Math.max(Math.abs(er.year.cost / er.days.cost - 1), Math.abs(er.year.co2 / er.days.co2 - 1)))) + ".</p>",
     "<p class=\"lx-hint\"><b>Contracts:</b> the city used " + E3.kilo(R1.acc.contract.mwh / 1000) + " GWh a year of the farms' " + E3.kilo(R1.acc.contract.gen / 1000) + " GWh; not deducted from the location-based CO₂. A market-based report could claim about " + E3.kilo(R1.acc.contract.t) + " t for them (simplified: the grid's average rate, no residual mix).</p>"].join("\n");
   const withPre = Object.assign({}, P, { cfg: Object.assign({}, cfg, { precomputed: Object.assign({}, cfg.precomputed, { c3: pre }) }) });
   const BLOCKS = { "c3-plan": () => SS.staticHTML(S, def), "c3-results": () => E3.fallback(withPre, "c3"), "c3-note": () => RN.outlineHTML(PG.FIELDS, PG.OUTLINE),
@@ -96,11 +104,14 @@ const RUN_DATE = "6 November 2026";
   const has = s => ok(T.indexOf(s) >= 0, "page states " + JSON.stringify(s));
 
   // ---------------- the full-year check
-  const FY = JSON.parse(fs.readFileSync(L("data/e3-full-year.json"), "utf8")), FYc = city.fullYear, c3F = FY.plans.filter(e => e.page === "c3"), er = c3F.find(e => e.id === "ref");
   ok(c3F.map(e => e.id).join() === E3.c3presets.map(p => p.id).concat(["ref"]).join(), "a full-year check for each preset and the reference plan");
   ok(E3.fullFind(FY, "c3", S, withSite(ref), SS) === er && E3.fullFind(FY, "c3", S, def, SS) === c3F[0] && E3.fullFind(FY, "c3", S, Object.assign({}, ref, { site: "D" }), SS) === null, "the page finds the reference plan's and the default's checks (the site's details ignored), none for another site");
   ok(er.days.dCost === Math.round(R1.delta.cityCost / 1e3) / 1e3 && er.days.co2 === Math.round(R1.acc.city.co2), "the check's eight days are the reference plan's own run");
-  const wr = E3.fullWhy(er, FYc, FY.date).map(k => k[0] + ": " + k[1]).join(" "), upF = V => V.dist.reduce((t, d) => t + d.upg, 0);
+  const wr = E3.fullWhy(er, FYc, FY.date).map(k => k[0] + ": " + k[1]).join(" ");
+  const strongF = EX.plain(c3ex.answers[1]);
+  ok(er.year.unserved >= 0.5 && strongF.indexOf("(on all 8,760 hours the upgrades fall " + erExtra.toFixed(1) + " MW short, on " + E3.dateList(er.year.shortDays.map(s => s.day)) + ")") >= 0, "the strong summary states what the full-year check found (" + erExtra.toFixed(1) + " MW short)");
+  ok(PG.fullAssume(er) === "Eight days stand for the year; on all 8,760 hours its upgrades fall " + erExtra.toFixed(1) + " MW short." && PG.fullAssume(c3F[0]) === "Eight days stand for the year; on all 8,760 hours its upgrades hold." &&
+    /n\.assumptions = n\.assumptions\.map/.test(JS), "the summary's assumption names the full-year check's finding for a checked plan");
   ok(wr.indexOf((upF(er.year) - upF(er.days)).toFixed(1) + " MW more") >= 0 && wr.indexOf(E3.kilo(er.year.unserved) + " MWh unserved on 19 Feb and 20 Feb") >= 0 && /Wind and sun/.test(wr), "the reference plan's words: the MW more the year would buy, the unserved MWh and days, wind and sun");
   ok(c3F.filter(e => e.days.contractGWh > 0).every(e => e.year.contractGWh > e.days.contractGWh) && FYc.windCF.days < FYc.windCF.year && FYc.solarCF.days > FYc.solarCF.year, "the contract MWh are higher on the year for every plan with contracts; the eight days carry less wind and more sun than 2025");
   ok(/U\.fullCard\(res, E3\.fullFind\(FY, "c3", S, R\.state, LX\.ShareState\)/.test(JS) && !/fullYear\s*\(/.test(JS) && /e3-full-year\.json/.test(PAGE), "the card for the plan that ran; the page reads the data file and never solves the year");
@@ -184,6 +195,7 @@ const RUN_DATE = "6 November 2026";
   {
     const n = E3.note(ref, R1, P); n.link = "https://example.org/x#c3"; n.run = { ok: true, stale: false, text: "the 2040 plan" };
     n.results = n.results.concat(PG.panelRows(pn1, {}, WORD));
+    n.assumptions = n.assumptions.map(t => /^Eight representative days/.test(t) ? PG.fullAssume(er) : t);   // as the page does for a checked plan
     n.results.push({ label: "Jobs (screening)", value: E3.kilo(jb.jobYears) + " construction job-years gross, " + E3.kilo(jb.jobYearsNet) + " net; ongoing 18 direct, 29 gross supported, 23 net", note: "lesson A13's coefficients" }); n.assumptions.push(jb.assumeLine); n.results = n.results.concat(PG.sensRows(sens1)); n.sensitivity = sw;
     // the reader's own parts left empty ("(not written yet)", 3 words each) do not count as the run's lines
     const composed = RN.compose(n, {}, F, { format: "text" }), auto = RN.countWords(composed) - 3 * (composed.match(/\(not written yet\)/g) || []).length;

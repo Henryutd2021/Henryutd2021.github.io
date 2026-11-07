@@ -62,7 +62,7 @@
     var why = E3.fullWhy(E[1], FYc, FY.date), pick = function (k) { return why.filter(function (x) { return x[0] === k; })[0]; };
     return [["The check", "each plan as its eight days decided it (step 6's at the 80% cap), run on every hour of 2025 with the same model. Precomputed on " + FY.date + ": too large for a click."],
       pick("What holds"), pick("Three cold days"),
-      ["The grid", "every plan that buys upgrades leaves load unserved on 19 and 20 February. Flexibility fills the design day up to its limits, so " + (worst === E[2] ? "the plan with managed charging and batteries" : lc(fullLabel(worst, E.indexOf(worst)))) + " misses most: " + kilo(worst.year.unserved) + " MWh."],
+      ["The grid", "every plan that buys upgrades leaves load unserved on 19 or 20 February. Flexibility fills the design day up to its limits, so " + (worst === E[2] ? "the plan with managed charging and batteries" : lc(fullLabel(worst, E.indexOf(worst)))) + " misses most: " + kilo(worst.year.unserved) + " MWh."],
       ["Step 6's cap", ch.year.co2 > ch.cap + 0.5 ? "on the year, the LP's choice is " + kilo(ch.year.co2 - ch.cap) + " t over the cap it was chosen under (" + pct2(ch.year.co2 / ch.cap - 1) + ")." : "on the year, the LP's choice stays within its cap."],
       pick("Not tested")];
   }
@@ -252,7 +252,7 @@
       // the full-year check of the lesson's four plans (precomputed; the same for every reader)
       var fc = H("div", { class: "lx-xcard lx-sb-chart e3-full" }, x); H("h3", { text: "Full-year check: the lesson's four plans on 8,760 hours" }, fc);
       if (!FY) { H("p", { class: "lx-hint", text: "The full-year check did not load." }, fc); return; }
-      U.table(fc, ["Plan", "Yearly cost against 2025: eight days → full year", "CO₂ gap", "Upgrades: eight days → sized on the year", "Unserved with the eight days' upgrades"],
+      U.table(fc, ["Plan", "Yearly cost against 2025, no penalty on unserved energy: eight days → full year", "CO₂ gap", "Upgrades: eight days → sized on the year", "Unserved with the eight days' upgrades"],
         fullEntries(FY).map(function (e, i) { return E3.fullPlanRow(e, fullLabel(e, i)); }), "e3-fullt");
       U.keys(fc, fullKeys(FY, FYc, E3));
     }

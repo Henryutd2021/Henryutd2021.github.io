@@ -52,8 +52,9 @@ const RUN_DATE = "6 November 2026";
   ref.my = { plan: MY, burdenLow: +rMy.results.hh.low.burden.toFixed(5), dhPrice: +rMy.results.hh.dhPrice.toFixed(2) };
   const pre = { table: table, ref: ref };
   const FY = JSON.parse(fs.readFileSync(L("data/e3-full-year.json"), "utf8")), FYc = city.fullYear, FE = PG.fullEntries(FY);
-  const fullHTML = () => E3.tableHTML(["Full-year check: plan", "Yearly cost against 2025: eight days → full year", "CO₂ gap", "Upgrades: eight days → sized on the year", "Unserved with the eight days' upgrades"],
-    FE.map((e, i) => E3.fullPlanRow(e, PG.fullLabel(e, i))), "e3-fullt", [null, "n", "n", "n", "n"]) + '<p class="lx-hint">Precomputed with HiGHS on ' + FY.date + ": each plan run again on all 8,760 hours of 2025, with what its eight days decided kept.</p>";
+  const fullHTML = () => E3.tableHTML(["Full-year check: plan", "Yearly cost against 2025, no penalty on unserved energy: eight days → full year", "CO₂ gap", "Upgrades: eight days → sized on the year", "Unserved with the eight days' upgrades"],
+    FE.map((e, i) => E3.fullPlanRow(e, PG.fullLabel(e, i))), "e3-fullt", [null, "n", "n", "n", "n"]) + '<p class="lx-hint">Precomputed with HiGHS on ' + FY.date + ": each plan run again on all 8,760 hours of 2025, with what its eight days decided kept. On the year, step 6's plan is " +
+    E3.kilo(FE[3].year.co2 - FE[3].cap) + " t over the CO₂ cap it was chosen under.</p>";
   const BLOCKS = { "m12-static": () => table, "m12-full": fullHTML, "m12-inputs": () => E3.inputsHTML(P, { fixed: true }) };
   if (process.argv.includes("--write")) {
     const d = JSON.parse(fs.readFileSync(DPATH, "utf8")); d.precomputed = Object.assign({}, d.precomputed, { m12: pre });
@@ -102,11 +103,11 @@ const RUN_DATE = "6 November 2026";
   ok(FE.every((e, i) => e.days.dCost === Math.round((i < 3 ? R[["today", "electrify", "flex"][i]] : c80.results).delta.cost / 1e3) / 1e3), "the check's eight-day costs are the lesson's own runs");
   const keys = PG.fullKeys(FY, FYc, E3), kt = keys.map(k => k[0] + ": " + k[1]).join(" ");
   const up = V => V.dist.reduce((t, d) => t + d.upg, 0), worst = FE.reduce((a, e) => e.year.unserved > a.year.unserved ? e : a, FE[0]);
-  ok(FE.every(e => up(e.days) < 0.5 || (e.year.unserved >= 0.5 && e.year.shortDays.every(d => d.day === "2025-02-19" || d.day === "2025-02-20"))) && /every plan that buys upgrades leaves load unserved on 19 and 20 February/.test(kt), "every plan that buys upgrades leaves load unserved on 19 and 20 February, as said");
+  ok(FE.every(e => up(e.days) < 0.5 || (e.year.unserved >= 0.5 && e.year.shortDays.length > 0 && e.year.shortDays.every(d => d.day === "2025-02-19" || d.day === "2025-02-20"))) && /every plan that buys upgrades leaves load unserved on 19 or 20 February/.test(kt), "every plan that buys upgrades leaves load unserved on 19 or 20 February (" + FE.map(e => e.year.shortDays.map(d => d.day.slice(8)).join("+") || "none").join(", ") + "), as said");
   ok(worst === FE[2] && kt.indexOf("so the plan with managed charging and batteries misses most: " + E3.kilo(worst.year.unserved) + " MWh") >= 0 && FE[2].days.batteryMW === 40, "the plan with managed charging and batteries misses most (" + E3.kilo(worst.year.unserved) + " MWh), as said");
   ok(FE[3].year.co2 > FE[3].cap && kt.indexOf(E3.kilo(FE[3].year.co2 - FE[3].cap) + " t over the cap") >= 0, "step 6's plan: over its cap on the year by " + E3.kilo(FE[3].year.co2 - FE[3].cap) + " t, as said");
   ok(keys.length === 6 && ["The check", "What holds", "Three cold days", "The grid", "Step 6's cap", "Not tested"].every((k, i) => keys[i] && keys[i][0] === k), "the card's keys, one idea each");
-  ok(FE.every(e => Math.abs(e.year.cost / e.days.cost - 1) < 0.001 && Math.abs(e.year.co2 / e.days.co2 - 1) < 0.001) && /cost and CO₂ hold; the upgrades the eight days buy fall a little short on 19 and 20 February/.test(T), "the explain layer: cost and CO2 hold (within 0.1%); the upgrades fall a little short on 19 and 20 February");
+  ok(FE.every(e => Math.abs(e.year.cost / e.days.cost - 1) < 0.001 && Math.abs(e.year.co2 / e.days.co2 - 1) < 0.001) && /cost and CO₂ hold; the upgrades the eight days buy fall a little short on 19 or 20 February/.test(T) && FE[3].year.co2 > FE[3].cap, "the explain layer: cost and CO2 hold (within 0.1%); the upgrades fall a little short on 19 or 20 February; the no-JS table says step 6's plan ends over its cap");
   ok(/e3_full_year/.test(JS) && /e3-full-year\.json/.test(PAGE) && !/fullYear\s*\(/.test(JS), "the page reads the data file and never solves the year");
   has("Storage resets every day, on the eight days and in the full-year check: no carrying heat or charge between days.");
   ok(!/no full-year check here/.test(PAGE), "the old 'no full-year check here' is gone");
