@@ -5,7 +5,8 @@
 // log with sources and dates, the model, who pays and who benefits (A13's distinctions: transfers against real costs,
 // gross against net), and a sensitivity of the main result. Then nine tasks in the shared checkpoint runner
 // (LX.Checkpoint): two written (self-ticked against stated points) and seven auto-marked. The worked solution (a
-// workbook with live formulas, ck-a-worked.xlsx, and the page's tables) opens when the last task is submitted.
+// workbook with live formulas, ck-a-worked.xlsx, and the page's tables) opens once all nine tasks are answered, in any
+// order (the runner's gateAll option).
 //
 // Data: assets/learn/data/ck-a-spreadsheet.json, written with both workbooks by scripts/build_learn_cka_sheet.py
 // (ResearchPortfolio folder). This file's pure model recomputes every worked number from the log's values (derive, model);
@@ -21,11 +22,12 @@
 // the other customers. School + other customers = the resource view (the test proves it).
 //
 // Level rule (the page's rubric section says it in words): first-try answers of the seven auto-marked tasks and the points
-// ticked in the two written tasks; a task whose worked solution was opened first counts as not right; a task first
-// answered after the full worked solution opened (submitting task 9 opens it) counts as not right too, and a written task
-// submitted after it gets no points (review, 2026-11-06: skipping to task 9 and copying the solution no longer earns a
-// level); an attempt during which the full worked solution had been open before the last task was submitted is practice,
-// with no level (CK-M's rule).
+// ticked in the two written tasks; a task whose worked solution was opened first counts as not right. The full worked
+// solution opens only once every task is answered (gateAll; review, 2026-11-06: submitting task 9 first used to open it,
+// and the other answers could be copied from it); an answer given after it opened counts as practice (the runner's shared
+// late-answer rule, late "practice": not right, no points for a written task); and an attempt during which it had been
+// open before every task was answered (opened early on purpose, or by an earlier attempt) is practice, with no level
+// (CK-M's rule).
 (function () {
   "use strict";
   var CODE = "CK-A", KEY = "cka-v1";
@@ -103,18 +105,16 @@
   var CPK = (typeof window !== "undefined" && window.LX && window.LX.Checkpoint) || require("./components/checkpoint.js");
   function isAuto(t) { return t.kind === "choice" || t.kind === "order" || t.kind === "numeric"; }
   function points(st, t) { var r = st.tasks[t.id] || {}; return (r.points || []).filter(Boolean).length; }
-  // a task first answered after the page's full worked solution opened (D.solOpen: ISO time, the runner's record; the
-  // submit task itself opens it, so it is never "after")
-  function after(D, st, t) {
-    var r = st.tasks[t.id], g = D.tasks[D.tasks.length - 1];
-    return !!(D.solOpen && t.id !== g.id && r && r.at && r.at > D.solOpen);
-  }
+  // a task first answered after the page's full worked solution opened (D.solOpen: ISO time, the runner's record): the
+  // runner's shared late-answer rule (the answer that opened it, the last of all, is not late)
+  function after(D, st, t) { return CPK.lateAnswer(st.tasks[t.id], D.solOpen); }
   function firstRight(st, t, D) { return CPK.firstRight(st.tasks[t.id], "not-right") && !(D && after(D, st, t)); }
-  // practice: the full worked solution was open before the last task was submitted (by this attempt or an earlier one)
+  // practice: the full worked solution was open before every task was answered: opened early by this attempt (the lock's
+  // button or the solution demo, recorded as st.solEarly), or by an earlier attempt in this browser
   function assisted(D, st) {
-    var g = D.tasks[D.tasks.length - 1], r = st.tasks[g.id] || {};
-    if (r.solFirst) return "early";
-    if (D.solOpen && (!r.at || D.solOpen < r.at)) return "seen";
+    if (st.solEarly) return "early";
+    var last = CPK.lastAnswerAt(D, st);
+    if (D.solOpen && (!CPK.allAnswered(D, st) || !last || D.solOpen < last)) return "seen";
     return null;
   }
   function level(D, st) {
@@ -133,10 +133,10 @@
     return { level: lv, auto: k, autoOf: auto.length, pointsA: pa, pointsAOf: na, pointsB: pb, pointsBOf: nb, complete: complete, early: early, late: late, assisted: help, estMin: -1, explainOk: pa === na };
   }
   function describe(D, L) {
-    if (L.assisted) return (L.assisted === "early" ? "The worked solution was opened before task " + D.tasks.length + " was submitted" : "The worked solution had already been open in this browser (an earlier attempt)") +
+    if (L.assisted) return (L.assisted === "early" ? "The worked solution was opened before all " + D.tasks.length + " tasks were answered" : "The worked solution had already been open in this browser (an earlier attempt)") +
       ", so this attempt is practice and gets no level. Your answers and their feedback stay.";
     return "Auto-marked tasks right on the first try: " + L.auto + " of " + L.autoOf + (L.early ? " (" + L.early + " with the solution opened first, counted as not right)" : "") +
-      (L.late ? ". Answered after the worked solution opened, so counted as not right or without points: " + L.late + " task" + (L.late > 1 ? "s" : "") : "") +
+      (L.late ? ". Answered after the worked solution opened, so counted as practice (not right, no points): " + L.late + " task" + (L.late > 1 ? "s" : "") : "") +
       ". Points counted: " + L.pointsA + " of " + L.pointsAOf + " for the boundary, " + L.pointsB + " of " + L.pointsBOf + " for the log and sensitivity." + (L.complete ? "" : " Some tasks are not finished; the level counts them as not right.");
   }
   function summary(D, st, env) {
@@ -278,8 +278,10 @@
     var D = data.ck_a_spreadsheet, F = facts(D), RD = runnerData(D);
     Object.defineProperty(RD, "solOpen", { get: function () { return LX.Checkpoint.solOpened(KEY); } });
     var cp = LX.Checkpoint(live, { data: RD, key: KEY, code: CODE, lessonId: "ck-a-spreadsheet",
-      intro: ["Nine tasks on your own spreadsheet: two short texts you rate yourself, and seven answers marked at once.", "No hints. Build the spreadsheet first (about two hours); each task's worked answer opens after your first answer, and opening one early is recorded.", "Submit task 9 last: it opens the full worked solution, and a task answered after that counts as not right.", "Your answers and times stay in this browser. At the end, “Copy my results” gives a plain-text summary for you to share, with what you typed."],
-      lock: "#cka-lock", solution: "#cka-solution-body", submitTask: D.tasks[D.tasks.length - 1].id, level: level, describe: describe, summary: summary, openFirst: "not-right" });
+      intro: ["Nine tasks on your own spreadsheet: two short texts you rate yourself, and seven answers marked at once.", "No hints. Build the spreadsheet first (about two hours); each task's worked answer opens after your first answer, and opening one early is recorded.", "Your answers and times stay in this browser. At the end, “Copy my results” gives a plain-text summary for you to share, with what you typed."],
+      // gateAll: the full worked solution opens once all nine are answered; late: the shared late-answer rule, which the
+      // runner adds to the intro
+      lock: "#cka-lock", solution: "#cka-solution-body", gateAll: true, late: "practice", level: level, describe: describe, summary: summary, openFirst: "not-right" });
     var tw = document.getElementById("cka-tornado");
     if (tw && LX.Tornado) {
       tw.innerHTML = "";

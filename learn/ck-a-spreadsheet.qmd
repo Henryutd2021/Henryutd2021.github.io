@@ -66,14 +66,14 @@ body-classes: "page-learn page-lesson lx-form-checkpoint"
 <li><b>B · The model</b> (about 50 min). Convert the costs to 2025 dollars and build the school's yearly saving and its net present value, every number a formula.</li>
 <li><b>C · Who pays</b> (about 20 min). Split the school's bill saving into a real cost saved and a <span class="lx-term" data-term="transfer">transfer</span>; add the parties up (refresher: <a href="a13-fairness-jobs.html">A13</a>).</li>
 <li><b>D · Sensitivity</b> (about 20 min). Swing the inputs that matter one at a time and report the main result as a range.</li>
-<li><b>Submit</b> (about 20 min). Enter your results in the nine tasks below, task 9 last: submitting it opens the worked workbook.</li>
+<li><b>Submit</b> (about 20 min). Enter your results in the nine tasks below, in any order: the worked workbook opens once all nine are answered.</li>
 </ol>
 <p class="lx-eyebrow">How it is marked, before you start</p>
 <ul class="cka-rules">
 <li><b>Proficient:</b> at least 5 of the 7 auto-marked tasks right on the first try, plus at least 3 of the 4 points of each written task (1 and 9), which you tick yourself.</li>
 <li><b>Strong:</b> at least 6 of 7 on the first try and every written point.</li>
-<li><b>Opening solutions early:</b> a task whose answer you open before answering counts as not right. Opening the worked workbook before task 9 makes the attempt practice, with no level.</li>
-<li><b>After the worked workbook opens:</b> a task answered after that counts as not right, and a written task gets no points.</li>
+<li><b>Opening solutions early:</b> a task whose answer you open before answering counts as not right. Opening the worked workbook before all nine are answered makes the attempt practice, with no level.</li>
+<li><b>After the worked workbook opens:</b> an answer given after that counts as practice, not as right, and a written task then earns no points.</li>
 </ul>
 <p class="cka-dl"><a class="lx-btn small" href="../assets/learn/data/ck-a-starter.xlsx" download>Starter workbook (.xlsx)</a></p>
 <p class="lx-hint">It opens in Excel, LibreOffice Calc, Google Sheets or Apple Numbers. It holds the case's facts with their sources and an empty layout; it gives no formulas and no answers. Refreshers: <a href="a01-project-tea.html">A1</a> (cash flows), <a href="a04-retail-tariffs.html">A4</a> (tariffs), <a href="a13-fairness-jobs.html">A13</a> (who pays), <a href="k03-discounting.html">K3</a> (discounting), <a href="k07-spreadsheets.html">K7</a> (spreadsheets).</p>
@@ -104,7 +104,7 @@ body-classes: "page-learn page-lesson lx-form-checkpoint"
 <li><p><b>Who pays the gap</b> <span class="lx-hint">Part C · Transfers against real costs</span></p><p>Part of the school's bill saving is not a saving in the utility's costs. Under the brief's rate-reset assumption, who pays it?</p><ul><li>a. The school district</li><li>b. The utility's other customers, at the next rate reset</li><li>c. Federal taxpayers</li><li>d. Nobody: every dollar the school saves is a real cost saved</li></ul></li>
 <li><p><b>The cost shift</b> <span class="lx-hint">Part C · A screening estimate</span></p><p>Under the same assumption, how much a year moves to the utility's other customers? Within 5% counts as right.</p><p>Answer with a number and a unit.</p></li>
 <li><p><b>What moves the result most</b> <span class="lx-hint">Part D · Sensitivity</span></p><p>Swinging one input at a time over the ranges in the worked log, which moves the school's NPV most?</p><ul><li>a. The up-front cost, ±25%</li><li>b. The discount rate, 2% to 7%</li><li>c. The demand charge, $5 to $20 per kW-month, with the energy charge re-set so the pre-project bill is unchanged</li><li>d. The average electricity price, ±20%</li></ul></li>
-<li><p><b>Your log and your sensitivity</b> <span class="lx-hint">Part D · Audit trail</span></p><p>Paste three rows of your assumptions log and your sensitivity statement (the main result as a range, and the input that moves it most). Submit this task last: it opens the worked workbook.</p><p>Self-rated against 4 points, shown after you submit.</p></li>
+<li><p><b>Your log and your sensitivity</b> <span class="lx-hint">Part D · Audit trail</span></p><p>Paste three rows of your assumptions log and your sensitivity statement (the main result as a range, and the input that moves it most).</p><p>Self-rated against 4 points, shown after you submit.</p></li>
 </ol>
 <!-- cka-tasks:end -->
 </div>
@@ -120,7 +120,7 @@ body-classes: "page-learn page-lesson lx-form-checkpoint"
 
 ```{=html}
 <div id="cka-lock" class="lx-ck-lock" hidden>
-<p><b>Opens when you submit task 9.</b> The checkpoint asks for your own spreadsheet first, so the worked workbook waits for it. Opening it now makes this attempt practice, with no level.</p>
+<p><b>Opens once all nine tasks are answered.</b> The checkpoint asks for your own spreadsheet first, so the worked workbook waits for it. Opening it now makes this attempt practice, with no level.</p>
 <p><button type="button" class="lx-btn ghost small">Open it anyway (recorded: practice)</button></p>
 </div>
 <div id="cka-solution-body" class="lx-xgrid lx-ck-gated cka-solution-body">
@@ -234,8 +234,8 @@ body-classes: "page-learn page-lesson lx-form-checkpoint"
 <li><b>Strong:</b> at least 6 of 7 on the first try, and every point of both written tasks.</li>
 <li><b>Developing:</b> at least 3 of 7 on the first try.</li>
 <li><b>Not yet:</b> anything else. The checkpoint shows readiness for the Modeler tier; it certifies nothing.</li>
-<li><b>Opened early:</b> a task whose answer you open before answering counts as not right; if the worked workbook opens before you submit task 9, the attempt is practice and gets no level.</li>
-<li><b>Answered late:</b> a task first answered after the worked workbook opened counts as not right; a written task submitted after it gets no points.</li>
+<li><b>Opened early:</b> a task whose answer you open before answering counts as not right; if the worked workbook opens before all nine tasks are answered (on purpose, or in an earlier attempt), the attempt is practice and gets no level.</li>
+<li><b>Answered late:</b> an answer given after the worked workbook opened counts as practice, not as right; a written task submitted after it earns no points.</li>
 </ul>
 <p class="lx-hint">The written tasks are self-rated against their points. A teacher or mentor can rate your workbook again with the course rubric below, from the copied summary and the file.</p>
 </div>

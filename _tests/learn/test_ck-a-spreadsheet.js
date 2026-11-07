@@ -7,8 +7,9 @@
 //   - the worked workbook: unzipped here; every formula evaluated with the course's own engine (components/sheet.js, the
 //     sheets laid end to end) equals its cached value and the model; the starter has no formulas and no worked values
 //   - the tasks: answers equal the model; the level rule on sample attempts, including answers given after the full
-//     worked solution opened (pure, and on the real runner: task 9 first, then the shown answers, earns no level; the same
-//     answers in order earn Strong); the demo opens the solution only through the recorded path; the sensitivity's
+//     worked solution opened (pure: practice; on the real runner, gateAll: task 9 first opens nothing, the solution opens
+//     with the ninth answer, in any order; opened early with the lock's button, the later answers are practice); the
+//     shared late-answer rule said before the tasks; the demo opens the solution only through the recorded path; the sensitivity's
 //     claims (no sign change, the largest swing, a higher demand charge lowering the result); the conventions the answers
 //     rest on (residual value, the battery's energy basis, the rate reset, the demand-charge scenario) stated before
 //     the tasks; units in the sensitivity
@@ -143,7 +144,7 @@ const val = (sheet, ref) => { const m = /^([A-Z]+)(\d+)$/.exec(ref); return ENG.
 
 // ---------------- the tasks and the level rule
 const T = D.tasks, task = id => T.find(t => t.id === id);
-ok(T.length === 9 && T.filter(t => ["choice", "numeric"].includes(t.kind)).length === 7 && T.filter(t => t.kind === "open-short").length === 2 && T[T.length - 1].id === "log", "nine tasks: seven auto-marked, two written, the last opens the solution");
+ok(T.length === 9 && T.filter(t => ["choice", "numeric"].includes(t.kind)).length === 7 && T.filter(t => t.kind === "open-short").length === 2 && T[T.length - 1].id === "log", "nine tasks: seven auto-marked, two written, the log last");
 ok(rel(task("solar").answer.value, r.solar / 1000, 1e-6) && rel(task("upfront").answer.value, b.capital, 1e-6) && rel(task("billsave").answer.value, r.billSave, 1e-6) && rel(task("npc").answer.value, -r.npvSchool, 1e-6) && rel(task("shift").answer.value, r.shift, 1e-6), "numeric answers equal the model");
 ok(task("tornado").answer === "a" && task("transfer").answer === "b", "choice answers: the up-front cost; the other customers");
 ok(M.checkNumeric(task("npc"), 0.78, "million $").right && !M.checkNumeric(task("npc"), 0.70, "million $").right && M.checkNumeric(task("solar"), 389.8, "MWh per year").right && !M.checkNumeric(task("solar"), 250, "kW").right, "numeric checks: units and tolerances");
@@ -153,18 +154,23 @@ ok(task("solar").units.filter(u => u[1] === null).length === 2, "the solar task 
   const st = (k, pa, pb, o) => { const s = { tasks: {} }; T.forEach(t => { if (t.kind === "open-short") s.tasks[t.id] = rec(false, { answer: "text", points: t.points.map((_, i) => i < (t.id === "boundary" ? pa : pb)) }); }); T.filter(t => t.kind !== "open-short").forEach((t, i) => { s.tasks[t.id] = rec(i < k); }); return Object.assign(s, o || {}); };
   const R = d => M.level(Object.assign({}, D), d).level;
   ok(R(st(7, 4, 4)) === "Strong" && R(st(6, 4, 4)) === "Strong" && R(st(6, 3, 4)) === "Proficient" && R(st(5, 3, 3)) === "Proficient" && R(st(5, 2, 4)) === "Developing" && R(st(3, 0, 0)) === "Developing" && R(st(2, 4, 4)) === "Not yet", "the level rule on sample attempts");
-  const early = st(7, 4, 4); early.tasks.log.solFirst = true;
-  ok(M.level(D, early).level === "Practice (no level)", "the worked solution opened before task 9: practice");
+  const early = st(7, 4, 4, { solEarly: "2026-11-06T09:00:00Z" });
+  ok(M.level(D, early).level === "Practice (no level)", "the worked solution opened early by this attempt (the lock's button, before every task was answered): practice");
+  const own9 = st(7, 4, 4); own9.tasks.log.solFirst = true;
+  ok(M.level(D, own9).level === "Strong", "task 9's own early solution opens only its own answer (gateAll), not the full worked solution: no practice");
   const seen = st(7, 4, 4); ok(M.level(Object.assign({ solOpen: "2026-11-05T00:00:00Z" }, D), seen).level === "Practice (no level)" && M.level(Object.assign({ solOpen: "2026-11-06T10:00:00Z" }, D), seen).level === "Strong", "opened by an earlier attempt: practice; opened by submitting task 9: counts");
   const opened = st(7, 4, 4); opened.tasks.solar.solFirst = true; ok(M.level(D, opened).auto === 6, "a task opened before answering counts as not right");
-  // review #1: task 9 submitted first (it opens the full worked solution), then every other task answered from it
+  // review #1: answers given after the full worked solution opened (with gateAll it opens only once all nine are
+  // answered, so this needs an earlier opening): each is late under the shared rule, and the attempt is practice
   const late = st(7, 4, 4); T.forEach(t => { late.tasks[t.id].at = t.id === "log" ? "2026-11-06T10:00:00.000Z" : "2026-11-06T10:05:00.000Z"; });
   const LL = M.level(Object.assign({ solOpen: "2026-11-06T10:00:00.000Z" }, D), late);
-  ok(LL.level === "Not yet" && LL.auto === 0 && LL.pointsA === 0 && LL.pointsB === 4 && LL.late === 8, "answers given after task 9 opened the solution earn no level: " + LL.level + ", " + LL.auto + " of 7, boundary points " + LL.pointsA);
-  ok(/Answered after the worked solution opened, so counted as not right or without points: 8 tasks/.test(M.describe(D, LL)), "the results sentence says why");
+  ok(LL.level === "Practice (no level)" && LL.auto === 0 && LL.pointsA === 0 && LL.pointsB === 4 && LL.late === 8, "answers given after the solution opened earn no level: " + LL.level + ", " + LL.auto + " of 7, boundary points " + LL.pointsA + ", " + LL.late + " late");
+  ok(/so this attempt is practice and gets no level/.test(M.describe(D, LL)) && /counted as practice \(not right, no points\): 8 tasks/.test(M.describe(D, Object.assign({}, LL, { assisted: null }))), "the results sentence says why");
   ok(/yes \(the full worked solution\)/.test(M.summary(Object.assign({ solOpen: "2026-11-06T10:00:00.000Z" }, D), late, {})), "the copied summary marks the late answers");
   const inOrder = st(7, 4, 4); T.forEach(t => { inOrder.tasks[t.id].at = t.id === "log" ? "2026-11-06T10:05:00.000Z" : "2026-11-06T10:00:00.000Z"; });
-  ok(M.level(Object.assign({ solOpen: "2026-11-06T10:05:00.000Z" }, D), inOrder).level === "Strong", "the same answers before task 9: Strong");
+  ok(M.level(Object.assign({ solOpen: "2026-11-06T10:05:00.000Z" }, D), inOrder).level === "Strong", "the same answers, the solution opened by the ninth: Strong");
+  const any = st(7, 4, 4); T.forEach((t, i) => { any.tasks[t.id].at = t.id === "solar" ? "2026-11-06T10:05:00.000Z" : "2026-11-06T10:0" + (i % 5) + ":00.000Z"; });
+  ok(M.level(Object.assign({ solOpen: "2026-11-06T10:05:00.000Z" }, D), any).level === "Strong", "in any order: the ninth answer (here task 2) opens it, and none is late");
   ok(/^Learn · CK-A results \(ck-a v1 \(6 Nov 2026\)\)\n/.test(M.summary(D, st(7, 4, 4), { width: 375 })), "the copied summary's first line");
 }
 
@@ -180,9 +186,12 @@ ok(rel(-776324 - 192941, -969265, 1e-6), "and they do (rounded)");
   ok(v.price === 0.1117 && v.capKW === 3170 && v.pvCF === 0.178 && v.batOM === 63 && v.pvOM === 17.63 && v.co2lb === 680 && v.rte === 0.9 && v.batLife === 15, "the numbers-used table matches the log");
   ["11.17¢/kWh", "$3,170/kW-DC", "17.8%", "$63/kW a year", "$17.63/kW-DC a year", "680 lb/MWh"].forEach(s => ok(OWN.includes('<td class="n">' + s + "</td>"), "numbers used: " + s)); }
 { const mins = [...OWN.matchAll(/\(about (\d+) min\)/g)].map(m => +m[1]); ok(mins.length === 5 && mins.reduce((a, x) => a + x, 0) === 150, "the parts add up to about 150 minutes: " + mins.join(" + ")); }
-has("Enter your results in the nine tasks below, task 9 last: submitting it opens the worked workbook.", "nine tasks, task 9 last");
-has("After the worked workbook opens: a task answered after that counts as not right, and a written task gets no points.", "the late-answer rule, before the tasks");
-has("Answered late: a task first answered after the worked workbook opened counts as not right; a written task submitted after it gets no points.", "the late-answer rule, in the rubric");
+has("Enter your results in the nine tasks below, in any order: the worked workbook opens once all nine are answered.", "nine tasks, any order (gateAll)");
+has("After the worked workbook opens: an answer given after that counts as practice, not as right, and a written task then earns no points.", "the late-answer rule, before the tasks");
+has("Answered late: an answer given after the worked workbook opened counts as practice, not as right; a written task submitted after it earns no points.", "the late-answer rule, in the rubric");
+has("Opens once all nine tasks are answered.", "the lock box: gateAll");
+ok(!/task 9 last|submit task 9|Submit this task last/i.test(TX + JSON.stringify(D.tasks)), "no text still says task 9 opens the solution");
+ok(/gateAll: true, late: "practice"/.test(JS) && !/submitTask/.test(JS.slice(JS.indexOf("LX.Checkpoint(live"))), "the runner: gateAll and the shared late-answer rule, no submit task");
 // the conventions the answers depend on, stated before the tasks (reviews #2, #3, #4, #5)
 { const BR = text(PAGE.slice(between(PAGE, "cka-brief").from, between(PAGE, "cka-brief").to));
   ok(BR.includes("End value: at year 25 the replacement battery has 5 of its 15 years left: count 5/15 of its cost as its residual value (straight line)") && rel(r.residual, b.repl * 5 / 15, 1e-12), "the brief states the straight-line residual value the answer uses (5/15 of the replacement)");
@@ -194,7 +203,7 @@ has("Answered late: a task first answered after the worked workbook opened count
     .every(x => words(x) <= 35), "every part of the brief is at most 35 words"); }
 ok(task("tornado").options.find(o => o[0] === "c")[1].includes("with the energy charge re-set so the pre-project bill is unchanged") && /pre-project bill held/.test(F.sens.find(x => x.key === "demand").label), "the demand-charge swing is named as a rebalancing (pre-project bill held), before and after");
 ok(/Under the brief's rate-reset assumption, who pays it\?$/.test(task("transfer").prompt) && /^Under the same assumption/.test(task("shift").prompt) && /counting the brief's residual value/.test(task("npc").prompt), "tasks 5 to 7 say which given convention they rest on");
-ok(/Submit this task last: it opens the worked workbook\.$/.test(task("log").prompt), "task 9 says to submit it last");
+ok(/the input that moves it most\)\.$/.test(task("log").prompt), "task 9 no longer asks to be submitted last (gateAll)");
 // units in the sensitivity (review #9)
 { const SO = text(M.staticSolution(D));
   ok(SO.includes("$0.0894 to $0.134 per kWh") && SO.includes("$5 to $20 per kW-month") && SO.includes("$11,229 to $18,715 a year"), "the sensitivity table keeps its units");
@@ -237,9 +246,11 @@ ok(!between(PAGE, "cka-tasks") || !PAGE.slice(between(PAGE, "cka-tasks").from, b
   ok(cr.querySelectorAll("fieldset").length === 4 || /Consistent accounting/.test(cr.innerHTML), "the course rubric draws its four competences");
   ["mid", "done", "solution"].forEach(s => { let q = null; try { q = demo(s); } catch (err) { q = null; } ok(q && q.view, "demo state " + s + " runs"); });
   ok(E.LX.store.get(M.KEY + "-sol-open", null) && E.body.querySelector("#cka-solution-body").classList.contains("is-open") && E.body.querySelector("#cka-lock").hidden, "the solution demo opens the worked solution through the runner, recorded");
-  { const st9 = E.LX.store.get(M.KEY, {}); ok(st9.tasks && st9.tasks.log && st9.tasks.log.solFirst === true && M.level(Object.assign({ solOpen: E.LX.store.get(M.KEY + "-sol-open") }, D), st9).level === "Practice (no level)", "opening it by the demo makes the attempt practice"); }
+  { const st9 = E.LX.store.get(M.KEY, {}); ok(st9.solEarly && M.level(Object.assign({ solOpen: E.LX.store.get(M.KEY + "-sol-open") }, D), st9).level === "Practice (no level)", "opening it by the demo is recorded on the attempt and makes it practice"); }
   await reviewersSequence();
+  await earlySequence();
   await inOrderSequence();
+  introSays();
   finish();
 })().catch(err => { ok(false, "the stub page test threw: " + (err && err.stack || err)); finish(); });
 
@@ -269,16 +280,37 @@ function mountFresh() {
   return { E, live, answer, level };
 }
 function sleep(ms) { return new Promise(res => setTimeout(res, ms)); }
-// review #1, reproduced: skip to task 9, submit it (the full solution opens), then answer the others from it
+// review #1, reproduced on the runner with gateAll: task 9 submitted first opens nothing; the other answers, given
+// before the solution opens, count; the ninth answer opens it
 async function reviewersSequence() {
   const P = mountFresh();
   P.answer(8);
-  ok(P.E.body.querySelector("#cka-solution-body").classList.contains("is-open") && P.E.LX.store.get(M.KEY + "-sol-open", null), "runner: submitting task 9 opens the worked solution and records when");
+  ok(!P.E.body.querySelector("#cka-solution-body").classList.contains("is-open") && !P.E.LX.store.get(M.KEY + "-sol-open", null), "runner: submitting task 9 first opens nothing (gateAll)");
   await sleep(5);
-  for (let i = 0; i < 8; i++) P.answer(i);
-  const lv = P.level(), st = P.E.LX.store.get(M.KEY, {});
-  ok(lv === "Level: Not yet" && D.tasks.slice(0, 8).every(t => st.tasks[t.id].at > P.E.LX.store.get(M.KEY + "-sol-open")), "runner: the reviewer's sequence (task 9 first, then the shown answers) earns no level: " + lv);
-  ok(/counted as not right or without points: 8 tasks/.test(text(P.live.innerHTML)), "runner: the results say why");
+  for (let i = 0; i < 7; i++) P.answer(i);
+  ok(!P.E.body.querySelector("#cka-solution-body").classList.contains("is-open"), "runner: eight of nine answered, still shut");
+  P.answer(7);
+  const st = P.E.LX.store.get(M.KEY, {}), so = P.E.LX.store.get(M.KEY + "-sol-open", null);
+  ok(P.E.body.querySelector("#cka-solution-body").classList.contains("is-open") && so === st.tasks[D.tasks[7].id].at, "runner: the ninth answer opens the worked solution, recorded at its time");
+  const lv = P.level();
+  ok(lv === "Level: Strong", "runner: every answer given before the solution opened counts, in any order: " + lv);
+}
+// opened early with the lock's button: the answers after it are late (practice), and the attempt gets no level
+async function earlySequence() {
+  const P = mountFresh();
+  P.answer(0);
+  await sleep(5);
+  P.E.body.querySelector("#cka-lock button").click();
+  ok(P.E.body.querySelector("#cka-solution-body").classList.contains("is-open") && P.E.LX.store.get(M.KEY, {}).solEarly, "runner: the lock's button opens it early, recorded on the attempt");
+  await sleep(5);
+  for (let i = 1; i < 9; i++) P.answer(i);
+  const lv = P.level(), d = text(P.live.querySelector(".lx-ck-describe").textContent);
+  ok(lv === "Level: Practice (no level)" && /opened before all 9 tasks were answered/.test(d), "runner: opened early: practice, said why: " + lv);
+}
+// the intro says the shared late-answer rule up front
+function introSays() {
+  const P = mountFresh();
+  ok(text(P.live.textContent).includes("The worked solution section opens once all nine tasks are answered, in any order; opening it earlier is recorded. An answer given after it opens counts as practice, not as right, and a written task then earns no points."), "runner: the intro states the gate and the late-answer rule");
 }
 // the same answers in the published order earn Strong
 async function inOrderSequence() {

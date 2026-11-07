@@ -5487,6 +5487,18 @@
                  names its final open-short task
      onAnswer    function (taskId, record, state): called after each recorded answer, and when a solution is opened before
                  answering (record.solFirst), for pages that keep their own state beside the runner's
+     gateAll     true: the page's worked solution (lock and solution above) opens only once every task is answered (a
+                 first answer, or a written task submitted), in any order, never by one task; the lock's button and
+                 solutionNow() still open it early, recorded on the attempt (state.solEarly, the ISO time); each task's
+                 own "Show the worked solution now" opens only that task's solution (W5 final integration, from CK-A's
+                 review: answering the submit task first used to open every answer)
+     late        "practice": the shared late-answer rule. A task first answered after the page's worked solution opened
+                 (its `at` later than LX.Checkpoint.solOpened(key)) counts as practice: an auto-marked task as not right, a
+                 written task's points and the estimate's self-ratings not at all; the answer that opened it is not late
+                 (its `at` is the opening time). The runner adds the rule to the intro (lateRule) so it is said up front;
+                 the results name the late tasks, and the copied summary marks them. Default: off (CK-F's rule)
+     A page's own level function gets a third argument { solOpen, late, gateAll } (solOpen: when the page's worked
+     solution first opened for this runner, or null).
    Returns { show(i), results(), intro(), state(), solutionNow(), destroy() }. solutionNow() opens the page's worked
    solution early, recorded on the submit task as above. destroy() stops the clock, saves, removes the runner's document,
    window and lock-button listeners and its markup, so a page can swap runners (CK-M keeps one per variant on screen); the
@@ -5501,8 +5513,8 @@
    order task's ↑ ↓ buttons keep focus on the moved item. The results table becomes labelled lines on phones.
    Text version: LX.Checkpoint.lineChart adds a table of the hourly values.
    Pure (Node: module.exports): task, checkChoice, checkOrder, checkNumeric (either answer form), checkMWh, checkValue,
-   checkEstimate, level(D, st, {openFirst}), firstRight(record, openFirst), tolText(task), describe, summary, fmtMs,
-   firstWord.
+   checkEstimate, level(D, st, {openFirst, late, solOpen}), firstRight(record, openFirst), lateAnswer(record, solOpen),
+   allAnswered(D, st), lastAnswerAt(D, st), lateRule({gateAll, n}), tolText(task), describe, summary, fmtMs, firstWord.
    level and summary find the explanation and the estimate as the first "open-short" and the first "estimate" task. */
 (function () {
   "use strict";
@@ -5567,30 +5579,58 @@
   // a task's first answer counts as right; with openFirst "not-right" (independent work), not when its worked solution
   // was opened before that answer (solFirst). Default "counts": CK-F's published rule.
   function firstRight(r, openFirst) { return !!(r && r.first === true && !(openFirst === "not-right" && r.solFirst)); }
+  // the shared late-answer rule (option late "practice"): a task first answered after the page's worked solution opened
+  // (solOpen, ISO time) is practice. The answer that opened it is not late: the runner records the opening at that
+  // answer's own `at`. ISO strings from toISOString compare in time order.
+  function lateAnswer(r, solOpen) { return !!(solOpen && r && r.at && r.at > solOpen); }
+  // every task answered: a first answer recorded, or a written task submitted (gateAll opens the worked solution then)
+  function allAnswered(D, st) {
+    return D.tasks.every(function (t) { var r = st.tasks[t.id]; return !!(r && (r.first != null || r.answer != null)); });
+  }
+  // the attempt's latest first answer (ISO), or null
+  function lastAnswerAt(D, st) {
+    var m = null; D.tasks.forEach(function (t) { var r = st.tasks[t.id]; if (r && r.at && (!m || r.at > m)) m = r.at; }); return m;
+  }
+  // the rule in words, said before the tasks (the runner adds it to the intro when late is "practice")
+  function lateRule(o) {
+    o = o || {};
+    var W = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve"], n = o.n ? (W[o.n] || String(o.n)) + " " : "";
+    return (o.gateAll ? "The worked solution section opens once all " + n + "tasks are answered, in any order; opening it earlier is recorded."
+      : "The worked solution section opens when you submit " + (o.submit ? "task " + o.submit : "the last task") + "; opening it earlier is recorded.") +
+      " An answer given after it opens counts as practice, not as right, and a written task then earns no points.";
+  }
   // the published rule: auto-marked items right on the first try, the estimate's self-ratings, the explanation's points.
   // Levels by index in rule.levels: 0 Not yet, 1 Developing, 2 Proficient, 3 Strong. openFirst: opt.openFirst, else
-  // D.rule.openFirst, else "counts"; the result's `early` counts the auto-marked tasks opened first.
+  // D.rule.openFirst, else "counts"; the result's `early` counts the auto-marked tasks opened first. late: opt.late, else
+  // D.rule.late ("practice": the late-answer rule, with opt.solOpen); the result's `late` counts the late tasks.
   function level(D, st, opt) {
     var R = D.rule, autoIds = D.tasks.filter(isAuto).map(function (t) { return t.id; });
     var of = (opt && opt.openFirst) || R.openFirst || "counts";
-    var k = autoIds.filter(function (id) { return firstRight(st.tasks[id], of); }).length;
+    var lateOn = ((opt && opt.late) || R.late) === "practice", so = (opt && opt.solOpen) || null;
+    var isLate = function (id) { return lateOn && lateAnswer(st.tasks[id], so); };
+    var k = autoIds.filter(function (id) { return firstRight(st.tasks[id], of) && !isLate(id); }).length;
     var early = autoIds.filter(function (id) { return st.tasks[id] && st.tasks[id].solFirst; }).length;
     var exT = ofKind(D, "open-short"), esT = ofKind(D, "estimate");
-    var ex = (exT && st.tasks[exT.id]) || {}, es = (esT && st.tasks[esT.id]) || {}, rt = es.rating || {};
+    var ex = (exT && st.tasks[exT.id]) || {}, es = (esT && st.tasks[esT.id]) || {}, rt = (esT && isLate(esT.id)) ? {} : es.rating || {};
     var crit = R.criteria.map(function (c) { return rt[c] != null ? R.levels.indexOf(rt[c]) : -1; });
     var estMin = Math.min.apply(null, crit), estStrong = crit.filter(function (x) { return x === 3; }).length;
-    var pts = ex.points || [], explainOk = pts.length > 0 && pts.length === (exT && exT.points ? exT.points.length : 2) && pts.every(Boolean);
+    var pts = ex.points || [], explainOk = pts.length > 0 && pts.length === (exT && exT.points ? exT.points.length : 2) && pts.every(Boolean) && !(exT && isLate(exT.id));
+    var lateIds = lateOn ? D.tasks.filter(function (t) { return isLate(t.id); }).map(function (t) { return t.id; }) : [];
     var complete = autoIds.every(function (id) { return st.tasks[id] && st.tasks[id].first != null; }) && estMin >= 0 && ex.points != null;
     var lv = R.levels[0];
     if (k >= R.autoStrong && estMin >= 2 && estStrong >= 2 && explainOk) lv = R.levels[3];
     else if (k >= R.autoProficient && estMin >= 2 && explainOk) lv = R.levels[2];
     else if (k >= (R.autoDeveloping != null ? R.autoDeveloping : 3) && estMin >= 1) lv = R.levels[1];
-    return { level: lv, auto: k, autoOf: autoIds.length, estMin: estMin, explainOk: explainOk, complete: complete, early: early, openFirst: of };
+    return { level: lv, auto: k, autoOf: autoIds.length, estMin: estMin, explainOk: explainOk, complete: complete, early: early, openFirst: of, late: lateIds.length, lateIds: lateIds };
+  }
+  // the late tasks in words, for a results sentence ("" when none)
+  function lateText(L) {
+    return L && L.late ? " Answered after the worked solution opened, so counted as practice (not right, no points): " + L.late + " task" + (L.late > 1 ? "s" : "") + "." : "";
   }
   // the results view's sentence under the level (CK-F's parts; a checkpoint with another rule passes its own describe)
   function describe(D, L) {
     return "Auto-marked tasks right on the first try: " + L.auto + " of " + L.autoOf + (L.openFirst === "not-right" && L.early ? " (" + L.early + " with the solution opened first, counted as not right)" : "") + ". Estimate: lowest self-rating " + (L.estMin >= 0 ? D.rule.levels[L.estMin] : "not rated yet") +
-      ". Explanation: " + (L.explainOk ? "both points." : "not both points ticked.") + (L.complete ? "" : " Some tasks are not finished; the level counts them as not right.");
+      ". Explanation: " + (L.explainOk ? "both points." : "not both points ticked.") + lateText(L) + (L.complete ? "" : " Some tasks are not finished; the level counts them as not right.");
   }
   function fmtMs(ms) {
     if (ms == null) return "–";
@@ -5606,7 +5646,8 @@
   // the copied summary: keep its format fixed once testers use it (their summaries are compared across versions)
   function summary(D, st, env, o) {
     env = env || {}; o = o || {};
-    var L = o.level ? o.level(D, st) : level(D, st, { openFirst: o.openFirst }), total = 0, lines = [];
+    var L = o.level ? o.level(D, st, { solOpen: o.solOpen || null, late: o.late }) : level(D, st, { openFirst: o.openFirst, late: o.late, solOpen: o.solOpen }), total = 0, lines = [];
+    var isLate = function (r) { return o.late === "practice" && lateAnswer(r, o.solOpen); };
     D.tasks.forEach(function (t) { var r = st.tasks[t.id]; if (r && r.ms) total += r.ms; });
     lines.push("Learn · " + (o.code || "Checkpoint") + " results (" + D.version + ")");
     lines.push("Finished: " + (st.finished || "not yet") + " (this device's clock) · active time " + fmtMs(total));
@@ -5616,7 +5657,7 @@
     lines.push("# | Task | Draws on | First answer | Tries | Time to first answer | Time on task | Solution opened before answering");
     D.tasks.forEach(function (t, i) {
       var r = st.tasks[t.id] || {};
-      lines.push((i + 1) + " | " + t.title + " | " + t.lesson + " | " + firstWord(D, t, r) + " | " + (r.tries || 0) + " | " + fmtMs(r.msFirst) + " | " + fmtMs(r.ms) + " | " + (r.solFirst ? "yes" : "no"));
+      lines.push((i + 1) + " | " + t.title + " | " + t.lesson + " | " + firstWord(D, t, r) + " | " + (r.tries || 0) + " | " + fmtMs(r.msFirst) + " | " + fmtMs(r.ms) + " | " + (r.solFirst ? "yes" : isLate(r) ? "yes (the worked solution section)" : "no"));
     });
     var esT = ofKind(D, "estimate"), es = esT && st.tasks[esT.id];
     if (es && es.answer) {
@@ -5634,7 +5675,8 @@
   }
 
   var pure = { task: task, checkChoice: checkChoice, checkOrder: checkOrder, checkNumeric: checkNumeric, checkMWh: checkMWh, checkValue: checkValue,
-    checkEstimate: checkEstimate, level: level, firstRight: firstRight, tolText: tolText, describe: describe, summary: summary, fmtMs: fmtMs, firstWord: firstWord };
+    checkEstimate: checkEstimate, level: level, firstRight: firstRight, lateAnswer: lateAnswer, allAnswered: allAnswered, lastAnswerAt: lastAnswerAt, lateRule: lateRule, lateText: lateText,
+    tolText: tolText, describe: describe, summary: summary, fmtMs: fmtMs, firstWord: firstWord };
   if (typeof module !== "undefined" && module.exports) module.exports = pure;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -5680,9 +5722,10 @@
   LX.Checkpoint = function (host, o) {
     var D = o.data, KEY = o.key, N = D.tasks.length, code = o.code || "Checkpoint";
     var CK = o.checks || {}, cChoice = CK.choice || checkChoice, cOrder = CK.order || checkOrder, cNum = CK.numeric || checkNumeric, cEst = CK.estimate || checkEstimate;
-    var levelOf = o.level || function (D, st) { return level(D, st, { openFirst: o.openFirst }); };
-    var summaryOf = o.summary || function (D, st, env) { return summary(D, st, env, { code: code, level: o.level, openFirst: o.openFirst }); };
     var SOL = KEY + "-sol-open";   // when the page's worked solution first opened for this runner (kept across "Start again")
+    function solAt() { return LX.store.get(SOL, null); }
+    var levelOf = function (D, st) { return o.level ? o.level(D, st, { solOpen: solAt(), late: o.late, gateAll: !!o.gateAll }) : level(D, st, { openFirst: o.openFirst, late: o.late, solOpen: solAt() }); };
+    var summaryOf = o.summary || function (D, st, env) { return summary(D, st, env, { code: code, level: o.level, openFirst: o.openFirst, late: o.late, solOpen: solAt() }); };
     var esT = ofKind(D, "estimate"), gateT = o.submitTask ? task(D, o.submitTask) : esT, describeOf = o.describe || describe;
     function fresh() { return { version: D.version, started: null, finished: null, cur: 0, tasks: {} }; }
     var st = LX.store.get(KEY, null);
@@ -5705,12 +5748,17 @@
       if (answer !== undefined) r.answer = answer;
       if (extra) for (var k in extra) r[k] = extra[k];
       save();
-      if (gateT && id === gateT.id && gateT !== esT) openSolution(r.at);   // the estimate opens it itself, after its range check
+      if (o.gateAll) { if (allAnswered(D, st)) openSolution(r.at); }   // every task answered, in any order (this answer's `at`)
+      else if (gateT && id === gateT.id && gateT !== esT) openSolution(r.at);   // the estimate opens it itself, after its range check
       if (o.onAnswer) o.onAnswer(id, r, st);
       return r;
     }
     // the page's worked solution opened before the submit task is answered: recorded on that task
     function early() {
+      if (o.gateAll) {   // recorded on the attempt (practice), unless every task was already answered
+        if (!allAnswered(D, st) && !st.solEarly) st.solEarly = new Date().toISOString();
+        save(); openSolution(); return;
+      }
       var r = gateT ? rec(gateT.id) : null;
       if (r && r.first == null && !r.answer) r.solFirst = true;
       save(); openSolution();   // recorded before onAnswer runs, so the page reads the opening there
@@ -5724,7 +5772,8 @@
       E("p", { class: "lx-eyebrow", text: "How this checkpoint works" }, c);
       var ul = E("ul", { class: "lx-ck-intro" }, c);
       (o.intro || [N + " tasks, one at a time.", "No hints. Each worked solution opens after your first answer; you may open it earlier, and that is recorded.",
-        "Your answers and times stay in this browser. At the end, “Copy my results” gives you a summary to paste into a form."]).forEach(function (s) { E("li", { text: s }, ul); });
+        "Your answers and times stay in this browser. At the end, “Copy my results” gives you a summary to paste into a form."]).concat(o.late === "practice" ? [lateRule({ gateAll: o.gateAll, n: N, submit: gateT ? D.tasks.indexOf(gateT) + 1 : null })] : [])
+        .forEach(function (s) { E("li", { text: s }, ul); });
       var row = E("div", { class: "lx-ck-row" }, c), started = !!st.started;
       E("button", { type: "button", class: "lx-btn", html: (started ? "Resume at task " + (st.cur + 1) : "Start the checkpoint") + LX.icon("arrow"), onclick: function () { if (!st.started) { st.started = new Date().toISOString(); save(); } show(st.cur); } }, row);
       if (started) E("button", { type: "button", class: "lx-btn ghost", text: "Start again (clears this browser's answers)", onclick: reset }, row);
@@ -5748,7 +5797,7 @@
       solution(t, sol);
       var earlyBtn = E("button", { type: "button", class: "lx-link", text: "Show the worked solution now (recorded as opened before answering)", hidden: r.first != null || r.solFirst,
         onclick: function () { var rr = rec(t.id); rr.solFirst = true; save(); sol.hidden = false; sol.open = true; earlyBtn.hidden = true;
-          if (t === gateT) openSolution(); if (o.onAnswer) o.onAnswer(t.id, rr, st); } }, c);
+          if (t === gateT && !o.gateAll) openSolution(); if (o.onAnswer) o.onAnswer(t.id, rr, st); } }, c);
       function unlock() { sol.hidden = false; earlyBtn.hidden = true; }
       ({ "choice": choice, "order": order, "numeric": numeric, "open-short": openShort, "estimate": estimate })[t.kind](t, body, fb, unlock);
       var foot = E("div", { class: "lx-ck-foot" }, c);
@@ -5874,7 +5923,7 @@
         fb.innerHTML = "";
         E("div", { class: "lx-saw" + (chk.unitsOk ? "" : " no"), html: LX.icon(chk.unitsOk ? "check" : "question") + "<div><b>Units.</b> " + LX.esc(chk.unitMsg) + "</div>" }, fb);
         if (chk.rangeMsg) E("div", { class: "lx-saw" + (chk.overlaps ? "" : " no"), html: LX.icon(chk.overlaps ? "check" : "question") + "<div><b>Range.</b> " + LX.esc(chk.rangeMsg) + "</div>" }, fb);
-        openSolution(er.at); rate(out);
+        if (!o.gateAll) openSolution(er.at); rate(out);
       } }, row);
       if (r.answer) rate(out);
       function rate(host) {
@@ -5925,7 +5974,7 @@
         E("td", { "data-l": "First answer", text: firstWord(D, t, r) }, tr);
         E("td", { class: "n", "data-l": "Tries", text: String(r.tries || 0) }, tr);
         E("td", { class: "n", "data-l": "Time to first answer", text: fmtMs(r.msFirst) }, tr);
-        E("td", { "data-l": "Solution first", text: r.solFirst ? "yes" : "no" }, tr);
+        E("td", { "data-l": "Solution first", text: r.solFirst ? "yes" : o.late === "practice" && lateAnswer(r, solAt()) ? "yes (worked solution open)" : "no" }, tr);
       });
       var text = summaryOf(D, st, { width: window.innerWidth });
       var row = E("div", { class: "lx-ck-row" }, c), msg = E("p", { class: "lx-hint", "aria-live": "polite" }, c);
@@ -5948,10 +5997,11 @@
       var cells = tr.querySelectorAll("th, td");
       RUBRIC.push({ id: tr.getAttribute("data-c"), name: cells[0].textContent.trim(), levels: [1, 2, 3, 4].map(function (k) { return cells[k] ? cells[k].textContent.trim() : ""; }) });
     });
-    // the worked-solution section: shut until the estimate is submitted (or opened on purpose, which is recorded)
+    // the worked-solution section: shut until the submit task (the estimate) is answered, or with gateAll until every task
+    // is answered (or opened on purpose, which is recorded)
     var lock = q(o.lock), solBody = q(o.solution), ob = null;
     if (lock && solBody) {
-      var er = gateT && st.tasks[gateT.id], done = !!(er && (er.first != null || er.answer || er.solFirst));
+      var er = gateT && st.tasks[gateT.id], done = o.gateAll ? allAnswered(D, st) || !!st.solEarly : !!(er && (er.first != null || er.answer || er.solFirst));
       lock.hidden = done; solBody.classList.toggle("is-open", done);
       ob = lock.querySelector("button");
       if (ob) ob.addEventListener("click", early);

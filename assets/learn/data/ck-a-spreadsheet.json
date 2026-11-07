@@ -964,7 +964,7 @@
    "title": "Your log and your sensitivity",
    "skill": "Audit trail",
    "kind": "open-short",
-   "prompt": "Paste three rows of your assumptions log and your sensitivity statement (the main result as a range, and the input that moves it most). Submit this task last: it opens the worked workbook.",
+   "prompt": "Paste three rows of your assumptions log and your sensitivity statement (the main result as a range, and the input that moves it most).",
    "points": [
     "Every input has a value, a unit, a type (sourced, course data, illustrative, choice, derived) and a source or a reason.",
     "Sourced values name the document, the table or page, and an as-of date.",

@@ -7,11 +7,15 @@
 //     them; the lesson scripts read the components and keep no copy; the map's styles left A19's page for siting.css
 //   - LX.LifeBox's rules (tap, keys, drag) and the box on a stub document (stages, classes, slider attributes, presets)
 //   - the batch-1 path.yml wiring (A11 after F11, A19 after A11, CK-A after A13, R6 next R7) and scope-2 for a city
+//   - checkpoint.js (final integration, from CK-A's review): the gateAll option (the page's worked solution opens only once
+//     every task is answered, in any order; early openings recorded on the attempt) and the shared late-answer rule (late
+//     "practice": an answer given after the solution opened counts as practice, not as right; said in the intro), pure
+//     and on a stub runner; CK-F keeps its rule (neither option)
 // Usage (from the site folder):  node _tests/learn/test_components_w5_int.js
 "use strict";
 const fs = require("fs");
 const path = require("path");
-const { env, load } = require("./stubdom.js");
+const { env, load, buttons } = require("./stubdom.js");
 const SITE = path.resolve(__dirname, "..", "..");
 const L = p => path.join(SITE, "assets/learn", p);
 const rd = p => fs.readFileSync(L(p), "utf8");
@@ -131,6 +135,65 @@ for (const P of PROMO) {
   const def = g && (g.short || g.def || "");
   ok(/company/.test(def) && /city/.test(def) && (def.match(/[.!?](\s|$)/g) || []).length === 1, "scope-2: one plain sentence for a company and a city");
   ok(/\[\[scope-2\|scope 2\]\]/.test(rd("a18-city-plan.js")), "A18 marks scope 2 with the glossary term");
+}
+
+// ---------------------------------------------------------------- checkpoint.js: gateAll and the late-answer rule
+{
+  const CP = require(L("components/checkpoint.js"));
+  const rule = { autoProficient: 1, autoStrong: 2, autoDeveloping: 1, criteria: [], levels: ["Not yet", "Developing", "Proficient", "Strong"] };
+  const D = { version: "ck-g v1", rule, tasks: [
+    { id: "c1", kind: "choice", title: "Pick", lesson: "M1", skill: "read", prompt: "Which?", options: [["a", "A"], ["b", "B"]], answer: "a", why: {}, solution: "A." },
+    { id: "c2", kind: "choice", title: "Pick again", lesson: "M1", skill: "read", prompt: "And?", options: [["a", "A"], ["b", "B"]], answer: "b", why: {}, solution: "B." },
+    { id: "f1", kind: "open-short", title: "Explain", lesson: "R5", skill: "explain", prompt: "Why?", solution: "Two points.", points: ["One.", "Two."] }] };
+  const T0 = "2026-11-06T10:00:00.000Z", T1 = "2026-11-06T10:05:00.000Z";
+  ok(!CP.lateAnswer({ at: T0 }, T0) && CP.lateAnswer({ at: T1 }, T0) && !CP.lateAnswer({ at: T1 }, null) && !CP.lateAnswer(null, T0), "checkpoint: an answer is late only after the opening; the one that opened it is not");
+  const st = at => ({ tasks: { c1: { first: true, at: at[0] }, c2: { first: true, at: at[1] }, f1: { first: true, answer: "x", points: [true, true], at: at[2] } } });
+  const s1 = st([T1, T1, T0]), L0 = CP.level(D, s1, { solOpen: T0 }), L1 = CP.level(D, s1, { late: "practice", solOpen: T0 });
+  ok(L0.auto === 2 && L0.late === 0 && L1.auto === 0 && L1.late === 2 && L1.lateIds.join() === "c1,c2" && L1.explainOk && L1.level === "Not yet",
+     "checkpoint: late practice counts answers after the opening as not right (0 of 2, Not yet); off by default, CK-F's rule (2 of 2)");
+  ok(!CP.level(D, st([T0, T0, T1]), { late: "practice", solOpen: T0 }).explainOk && CP.level(D, st([T0, T0, T1]), { solOpen: T0 }).explainOk, "checkpoint: a written task submitted after the opening earns no points");
+  ok(/counted as practice \(not right, no points\): 2 tasks\./.test(CP.describe(D, L1)) && !/practice/.test(CP.describe(D, L0)), "checkpoint: the results sentence names the late tasks");
+  ok(/\| yes \(the worked solution section\)$/m.test(CP.summary(D, s1, {}, { late: "practice", solOpen: T0 })) && !/worked solution section/.test(CP.summary(D, s1, {}, { solOpen: T0 })), "checkpoint: the copied summary marks late answers");
+  ok(CP.allAnswered(D, s1) && !CP.allAnswered(D, { tasks: { c1: { first: true }, c2: { first: true } } }) && CP.lastAnswerAt(D, s1) === T1, "checkpoint: allAnswered and lastAnswerAt");
+  ok(CP.lateRule({ gateAll: true, n: 3 }) === "The worked solution section opens once all three tasks are answered, in any order; opening it earlier is recorded. An answer given after it opens counts as practice, not as right, and a written task then earns no points.",
+     "checkpoint: the rule in words (gateAll)");
+  // the runner with gateAll and the rule (a page: the lock box, the worked-solution body, the runner)
+  const mount = store => {
+    const E = env({ store }); load("checkpoint", E); E.window.confirm = () => true;
+    const LX = E.LX, H = LX.H, pg = E.body;
+    const lock = H("div", { id: "g-lock", class: "lx-ck-lock" }, pg), lb = H("button", { type: "button", text: "Open it anyway" }, lock), body = H("div", { id: "g-sol", class: "lx-ck-gated" }, pg);
+    const host = H("div", null, pg), cp = LX.Checkpoint(host, { data: D, key: "ckg", code: "CK-G", lock: "#g-lock", solution: "#g-sol", gateAll: true, late: "practice", openFirst: "not-right" });
+    const pick = (i, v) => { cp.show(i); host.querySelectorAll(".lx-choice").filter(b => b.textContent === v)[0].click(); };
+    const explain = () => { cp.show(2); host.querySelector("textarea").value = "Because."; buttons(host, /^Submit my explanation/)[0].click(); };
+    return { E, LX, lb, host, cp, pick, explain, shut: () => !lock.hidden && !body.classList.contains("is-open"), opened: () => lock.hidden && body.classList.contains("is-open") };
+  };
+  let P = mount({});
+  ok(P.host.textContent.includes(CP.lateRule({ gateAll: true, n: 3 })) && P.shut(), "checkpoint runner: the intro says the rule up front; the worked solution starts shut");
+  P.explain();
+  ok(P.shut() && !P.LX.Checkpoint.solOpened("ckg"), "gateAll: the last task answered first opens nothing");
+  P.pick(0, "A");
+  ok(P.shut(), "gateAll: two of three answered, still shut");
+  P.cp.show(1); buttons(P.host, /^Show the worked solution now/)[0].click();
+  ok(P.shut() && P.cp.state().tasks.c2.solFirst && !P.cp.state().solEarly, "gateAll: a task's own early button opens only its own solution");
+  P.pick(1, "B");
+  ok(P.opened() && P.LX.Checkpoint.solOpened("ckg") === P.cp.state().tasks.c2.at, "gateAll: the last answer opens the worked solution, recorded at that answer's time");
+  P.cp.results();
+  const d1 = P.host.querySelector(".lx-ck-describe").textContent;
+  ok(!/practice/.test(d1) && /1 of 2/.test(d1), "gateAll: nothing late; the task opened first counts as not right (" + d1.slice(0, 60) + ")");
+  P = mount(P.E.store);   // a reload
+  ok(P.opened(), "gateAll: a finished attempt reloads with the solution open");
+  P.cp.results(); buttons(P.host, /^Start again/)[0].click();
+  ok(P.shut() && !P.cp.state().solEarly, "Start again shuts it");
+  P.lb.click();
+  ok(P.opened() && P.cp.state().solEarly, "gateAll: the lock button opens it early, recorded on the attempt (solEarly)");
+  P.LX.store.set("ckg-sol-open", "2026-01-01T00:00:00.000Z");   // the first opening, well before the answers below
+  P.pick(0, "A"); P.pick(1, "B"); P.explain();
+  P.cp.results();
+  const d2 = P.host.querySelector(".lx-ck-describe").textContent, cells = P.host.querySelectorAll(".lx-ck-res td").map(td => td.textContent);
+  ok(/counted as practice \(not right, no points\): 3 tasks\./.test(d2) && /0 of 2/.test(d2) && cells.filter(x => x === "yes (worked solution open)").length === 3, "the late-answer rule on the runner: results sentence and table");
+  // CK-F keeps its published rule: neither option on its page
+  const ckf = fs.readFileSync(L("ck-f-estimate.js"), "utf8");
+  ok(!/gateAll|late:/.test(ckf), "CK-F keeps its rule: its worked solution covers only the estimate, so the options are not used");
 }
 
 console.log(fails ? `FAILED ${fails} of ${checks} checks (test_components_w5_int)` : `ok ${checks}/${checks} checks (test_components_w5_int)`);
