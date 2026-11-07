@@ -1120,8 +1120,8 @@
     // side (18 px; 14 in a map under 576 px wide), centred in what is left. On the page (F omitted) the dots and the ends
     // of the road routes are also kept clear of the zoom buttons (top right) and, on touch screens, of "Tap to explore"
     // (bottom left): each of these may push the margin on its thin side (the buttons: the right; "Tap to explore": the
-    // bottom) past itself; of the ways, the one that hides the fewest dots and route ends, then the one with the largest
-    // zoom (the plain margins first). F: another size to fit for ({proj, W, H}: the reference size that chooses the
+    // bottom) past itself; of the ways, the one that hides the fewest dots and route ends, then the fewest points along the
+    // road routes (so a leg does not run under the buttons), then the one with the largest zoom (the plain margins first). F: another size to fit for ({proj, W, H}: the reference size that chooses the
     // opening view)
     function fitT(M, cl, kMax, F) {
       const P = F || M;
@@ -1144,8 +1144,9 @@
         if (r.width) obs.push({ l: r.left - ox, t: r.top - oy, r: r.right - ox, b: r.bottom - oy });
       });
       const marks = cl.pts.filter(function (p) { return p.pid || p.end; }).map(function (p) { return P.proj(p.ll); }).filter(Boolean);
-      const hidden = function (T) {
-        return marks.filter(function (q) {
+      const along = cl.pts.filter(function (p) { return !p.pid && !p.end; }).map(function (p) { return P.proj(p.ll); }).filter(Boolean);
+      const hidden = function (T, set) {
+        return (set || marks).filter(function (q) {
           const s = tApply(T, q);
           return obs.some(function (o) { return s[0] > o.l - 8 && s[0] < o.r + 8 && s[1] > o.t - 8 && s[1] < o.b + 8; });   // 8 px: a dot and its ring
         }).length;
@@ -1158,8 +1159,8 @@
       });
       let best = null;
       ways.forEach(function (I) {
-        const T = fit(I), n = hidden(T);
-        if (!best || n < best.n || (n === best.n && T.k > best.T.k + 1e-9)) best = { T: T, n: n };
+        const T = fit(I), n = hidden(T), a = hidden(T, along);
+        if (!best || n < best.n || (n === best.n && (a < best.a || (a === best.a && T.k > best.T.k + 1e-9)))) best = { T: T, n: n, a: a };
       });
       return best.T;
     }
