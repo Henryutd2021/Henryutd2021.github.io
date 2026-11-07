@@ -27,6 +27,7 @@
    "who": "owners",
    "sector": "homes",
    "what": "Homes heated with electricity put in a heat-pump water heater instead of a new electric one when the old one wears out.",
+   "unit": "homes",
    "baseUEF": 0.92,
    "newUEF": 3.73,
    "baseCost": 905,
@@ -51,6 +52,7 @@
    "who": "utility",
    "sector": "commercial",
    "what": "Rebate programmes save 10% of the electricity that shops, offices and public buildings use.",
+   "unit": "MWh saved a year",
    "share": 0.1,
    "cse": 0.045,
    "cseYear": 2012,
@@ -71,7 +73,8 @@
    "short": "Furnaces",
    "who": "owners",
    "sector": "homes",
-   "what": "Homes heated with gas put in a 99% furnace instead of an 80% one when the old furnace wears out.",
+   "what": "Homes heated with gas put in a 99% [[condensing-furnace|condensing furnace]] instead of an 80% one when the old furnace wears out.",
+   "unit": "homes",
    "baseAFUE": 0.8,
    "newAFUE": 0.99,
    "baseCost": 3690,
@@ -98,7 +101,8 @@
    "short": "Weatherize",
    "who": "programme",
    "sector": "homes",
-   "what": "Air sealing and insulation bring 40% of the homes built before 1980 to the heat need of homes built 1980 to 2009.",
+   "what": "Air sealing and insulation ([[weatherization|weatherization]]) bring 40% of the homes built before 1980 to the heat need of homes built 1980 to 2009.",
+   "unit": "homes",
    "share": 0.4,
    "costPerHome": 4695,
    "costYear": 2008,
@@ -121,6 +125,7 @@
    "who": "owners",
    "sector": "homes",
    "what": "Homes add 60 MW of rooftop panels, valued at the retail price of the electricity they replace.",
+   "unit": "systems of 6.7 kW",
    "addMW": 60,
    "systemKW": 6.7,
    "cost2030": 3199,
@@ -142,6 +147,7 @@
    "who": "owners",
    "sector": "homes",
    "what": "Homes heated with gas put in an electric heat pump instead of a new 80% furnace when the old furnace wears out.",
+   "unit": "homes",
    "life": 15.3,
    "upkeep": 150,
    "acCost": 5250,
@@ -220,7 +226,7 @@
   "min": 1,
   "max": 8,
   "step": 0.5,
-  "note": "Set by the reader: the cut by 2035 as a share of the 2025 inventory (BASIC+)."
+  "note": "Set by the reader: the cut by 2035 as a share of the 2025 inventory (all its rows: scopes 1, 2 and 3). The cut counts the measures and the grid's own change; 2035 without a plan is 2025's energy use at the 2035 grid's rate."
  },
  "budget": {
   "def": 250,
@@ -231,7 +237,7 @@
  },
  "programme": {
   "share": 0.4,
-  "note": "Set for teaching: a utility programme pays 40% of the home measures' cost and recovers it on all homes' bills, in proportion to what each home spends on energy. In LBNL's 2009-2013 data, participants paid 59% of residential prescriptive programmes' total cost and 36% of whole-home retrofit programmes' (April 2015, pp. 13-14)."
+  "note": "Set for teaching: a utility programme pays 40% of each home measure's extra up-front cost, where that is positive (a measure that costs less than the usual replacement gets no rebate), and recovers it on all homes' bills over the item's life, in proportion to what each home spends on energy. In LBNL's 2009-2013 data, participants paid 59% of residential prescriptive programmes' total cost and 36% of whole-home retrofit programmes' (April 2015, pp. 13-14)."
  },
  "participation": {
   "first": {
@@ -428,8 +434,9 @@
    },
    {
     "id": "ok",
-    "t": "Passes the tests?",
-    "s": ""
+    "t": "Passes the checks?",
+    "s": "target, budget, peaks",
+    "sN": "3 checks"
    },
    {
     "id": "plan",

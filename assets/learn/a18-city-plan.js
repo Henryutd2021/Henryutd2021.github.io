@@ -8,19 +8,25 @@
 //
 // The model (pure, no DOM; exported for Node). Everything is relative to Prairie City's 2025, with a 2035 horizon.
 //   inventory   inventory2025 (t CO2 by sector, location-based, operating only) split into GPC scopes: scope 2 = the
-//               sector's electricity at the meter x eGRID's SPP North rate; scope 1 = the rest (fuels burned in the city);
-//               scope 3 = distribution losses (the GPC counts them in BASIC+ only)
+//               sector's grid-supplied electricity x eGRID's SPP North rate (rooftop solar used on site comes off the
+//               homes' and businesses' electricity in proportion to their use, as prairie-city.json does); scope 1 = the
+//               rest (fuels burned in the city); scope 3 = distribution losses. CO2-only teaching subtotals, not the
+//               GPC's BASIC or BASIC+ totals (no waste, no other gases, the fertilizer plant's feedstock not split out)
 //   measures    each at its 2035 potential: replaced equipment = 10 / average life of the stock (ages spread evenly)
 //   evaluate    one plan (a set of measures) against no plan: the change in electricity (homes, shops), gas, propane and
 //               rooftop output; CO2 = gas x 52.91 kg/MMBtu + propane x 5.75 kg/gal + electricity x factor x (1 + 5% lost
 //               on the wires); net annual cost = annualized extra capital (capital recovery at the rate, each item over
-//               its own life) + extra upkeep + the change in energy bills at 2025 Kansas retail prices; up-front money
+//               its own life) + extra upkeep + the change in energy bills at 2025 Kansas retail prices; up-front money.
+//               2035 without a plan = 2025's energy use at the 2035 grid's rate, so the cut from 2025 = the grid's own
+//               change (the inventory's scope 2 and losses rows at the new rate) + the measures' cut; targets use it
 //   bars        each measure alone (its bar); the curve sorts them by cost per tonne (tie rule: data order) and
 //               "in order" gives each bar what it adds after the bars before it (interactions)
 //   peak        each district's load in every hour of the eight representative days: base x (1 - savings share) +
 //               space heat x (resistance share + heat-pump share / COP(T)) + EV charging - new rooftop output; against
 //               its substation limit (one substation per district: a teaching simplification)
-//   groups      who gets the home measures' savings and who pays the programme's share, by household group
+//   groups      who gets the home measures' savings and who pays the programme's rebates, by household group: the
+//               programme pays 40% of each home measure's extra up-front cost where that is positive (a measure that
+//               costs less than the usual replacement gets none), recovered on all homes' bills over the item's life
 // Every number on the page is checked by _tests/learn/test_a18-city-plan.js.
 (function () {
   "use strict";
@@ -59,8 +65,11 @@
         pre: d.envelope.pre1980, floor: d.heatedFloorM2, base: d.annualMWh.base, comBase: d.annualMWh.commercialBase,
         ev: d.evMWhPerDay, limit: d.substationMW, peak25: d.peak2025MW, share: hh / H, src: d };
     });
+    // Heat per home is the same for every heating fuel within a district: prairie-city.json's builder derives the homes'
+    // gas, propane and electricity that way (district heat.share mixes homes with businesses, so it is not used here)
     W.vint = { from: PC.vintages.pre1980.heatKWhPerM2, to: PC.vintages.y1980_2009.heatKWhPerM2 };
-    W.elTotal = PC.balance.totals.el * 1000;                                  // MWh at the meter, 2025
+    W.I = inventory(W);
+    W.gridT = W.I.tot.s2 + W.I.tot.s3;                                        // t CO2 of 2025 that follow the grid's rate
     return W;
   }
   function rep(W, life) { return Math.min(1, W.years / life); }
@@ -111,7 +120,9 @@
     var P = W.price;
     R.elGrid = R.elRes + R.elCom - R.roof;                                    // change of electricity from the grid, MWh at the meter
     R.co2 = R.gas * W.gasT + R.prop * W.propT + R.elGrid * o.grid * (1 + W.loss);
-    R.t = -R.co2;                                                            // tonnes avoided a year (by 2035)
+    R.t = -R.co2;                                                            // tonnes the measures avoid a year (by 2035)
+    R.gridCut = W.gridT * (1 - o.grid / W.grid23);                           // the grid's own change from 2025, no measure
+    R.total = R.gridCut + R.t;                                               // the cut from 2025's inventory by 2035
     R.billHome = R.elRes * P.elRes - R.roof * P.elRes + R.gas * P.gasRes * o.gasX + R.prop * P.prop;    // change in homes' bills
     R.billCom = R.elCom * P.elCom;
     R.capital = sum(IDS.map(function (k) { return R.ann[k] + R.keep[k]; }));
@@ -120,6 +131,11 @@
     R.per = R.t > 0 ? R.net / R.t : null;
     R.homeCost = sum(IDS.filter(function (k) { return HOME[k]; }).map(function (k) { return R.ann[k] + R.keep[k]; }));
     R.homeUnits = sum(IDS.filter(function (k) { return HOME[k]; }).map(function (k) { return R.units[k]; }));
+    // the programme's rebates: 40% of each home measure's extra up-front cost where it is positive, as an annual
+    // equivalent over the item's life (what all homes' bills recover)
+    var life = { hpwh: wh.life, furnace: fu.life, weather: we.life, solar: W.E0.home.pv.life, hp: hp.life };
+    R.reb = {}; IDS.filter(function (k) { return HOME[k]; }).forEach(function (k) { R.reb[k] = W.A.programme.share * Math.max(0, R.up[k]) * crf(r, life[k]); });
+    R.rebate = sum(Object.keys(R.reb).map(function (k) { return R.reb[k]; }));
     return R;
   }
   function round2(v) { return Math.round(v * 100) / 100; }
@@ -137,8 +153,8 @@
     return ids.map(function (id) { have.push(id); var R = evaluate(W, have.slice(), o), t = R.t - prev.t, net = R.net - prev.net, x = { id: id, t: t, net: net, per: t > 0 ? net / t : null }; prev = R; return x; });
   }
   // the inventory, split into GPC scopes by sector (t CO2, 2025): scope 1 from each sector's fuels in their own units
-  // (gas MMBtu, gallons) x EIA's coefficients, rounded; scope 2 = the sector's inventory - scope 1 (its electricity x
-  // eGRID's rate; the test checks it within 1 t); scope 3 = distribution losses
+  // (gas MMBtu, gallons) x EIA's coefficients, rounded; scope 2 = the sector's inventory - scope 1 (its grid-supplied
+  // electricity x eGRID's rate; the test checks it within 2 t of roundings); scope 3 = distribution losses
   function fuelsOf(PC) {
     var c = PC.emissions.kgCO2, t = PC.city.totals, tr = PC.transport, g = function (mmbtu) { return mmbtu * c.gasPerMMBtu / 1000; };
     return { homes: g(t.gasMMBtu.residential) + t.propaneGal * c.propanePerGal / 1000, commercial: g(t.gasMMBtu.commercial),
@@ -151,14 +167,21 @@
     return { homes: T.residentialBase + T.residentialHeat, commercial: T.commercialBase + T.commercialHeat, food: PC.industry.food.electricityMWh,
       fertilizer: PC.industry.fertilizer.electricityMWh, datacenter: PC.dataCenter.annualMWh, transport: PC.transport.evMWh, farms: PC.farms.electricityMWh };
   }
+  // grid-supplied electricity by sector (MWh, 2025): rooftop solar used on site is not grid-supplied (GPC scope 2), so its
+  // MWh come off the homes' and businesses' electricity in proportion to their use, as prairie-city.json's inventory does
+  function gridElOf(PC) {
+    var el = elOf(PC), B = PC.balance.sectors, hc = B.homes.el + B.commercial.el, out = {};
+    Object.keys(el).forEach(function (k) { out[k] = el[k] - (k === "homes" || k === "commercial" ? PC.supply.rooftopMWh * B[k].el / hc : 0); });
+    return out;
+  }
   function inventory(W) {
-    var PC = W.PC, inv = PC.inventory2025.sectors, F = fuelsOf(PC), el = elOf(PC);
+    var PC = W.PC, inv = PC.inventory2025.sectors, F = fuelsOf(PC), el = elOf(PC), ge = gridElOf(PC);
     var rows = Object.keys(inv).map(function (k) {
       if (k === "grid_losses") return { key: k, s1: 0, s2: 0, s3: inv[k], total: inv[k] };
-      var s1 = Math.round(F[k]); return { key: k, s1: s1, s2: inv[k] - s1, s3: 0, total: inv[k], el: el[k], fuel: F[k] };
+      var s1 = Math.round(F[k]); return { key: k, s1: s1, s2: inv[k] - s1, s3: 0, total: inv[k], el: el[k], gridEl: ge[k], fuel: F[k] };
     });
     var tot = { s1: sum(rows.map(function (x) { return x.s1; })), s2: sum(rows.map(function (x) { return x.s2; })), s3: sum(rows.map(function (x) { return x.s3; })), total: PC.inventory2025.total };
-    return { rows: rows, tot: tot, basic: tot.s1 + tot.s2 };
+    return { rows: rows, tot: tot, s12: tot.s1 + tot.s2 };
   }
   // the district loads in every hour of the eight days, with a plan (the evaluate result R)
   function peaks(W, R) {
@@ -182,8 +205,8 @@
   }
   // who gets the home measures' savings and who pays the programme's share, by household group (annual, $)
   function groups(W, R, key) {
-    var PC = W.PC, G = PC.groups, w = W.A.participation[key].w, p = W.A.programme.share;
-    var save = -R.billHome, cost = R.homeCost, prog = p * cost, partNet = save - (1 - p) * cost;
+    var PC = W.PC, G = PC.groups, w = W.A.participation[key].w;
+    var save = -R.billHome, cost = R.homeCost, prog = R.rebate, partNet = save - cost + prog;   // prog: rebates, never below zero
     var wsum = sum(G.map(function (g, i) { return w[i] * g.households; })), spend = sum(G.map(function (g) { return g.homeEnergy * g.households; }));
     return G.map(function (g, i) {
       var sh = w[i] * g.households / wsum, charge = prog * g.homeEnergy / spend;   // per household, a year
@@ -210,19 +233,24 @@
   function words(s) { return String(s).replace(/\[\[[^|\]]*\|([^\]]*)\]\]/g, "$1").replace(/\*\*/g, "").trim().split(/\s+/).length; }
   function name(W, id) { return W.M[id].short; }
   function lineInventory(I) {
-    return "Scope 1, burned in the city: " + fm.kt(I.tot.s1) + "; scope 2, grid electricity: " + fm.kt(I.tot.s2) + "; scope 3, losses on the wires: " + fm.kt(I.tot.s3) +
-      ". Leaving out waste (not in this data), BASIC is " + fm.kt(I.basic) + " and BASIC+ " + fm.kt(I.tot.total) + ".";
+    return "Scope 1, burned in the city: " + fm.kt(I.tot.s1) + "; scope 2, electricity from the grid (not rooftop solar used on site): " + fm.kt(I.tot.s2) +
+      "; scope 3, losses on the wires: " + fm.kt(I.tot.s3) + ". 1 kt is 1,000 t.";
   }
   function targetT(W, pct) { return W.PC.inventory2025.total * pct / 100; }
   function lineTarget(W, pct, all) {
-    return "A " + pct + "% cut is " + fm.t(targetT(W, pct)) + " a year by 2035, from 2025's " + fm.t(W.PC.inventory2025.total) + ". The curve's six bars together reach " + fm.pct(all.t / W.PC.inventory2025.total) + ".";
+    var tot = W.PC.inventory2025.total;
+    return "A " + pct + "% cut is " + fm.t(targetT(W, pct)) + " a year by 2035, from 2025's " + fm.t(tot) + ". The curve's six bars together cut " + fm.pct(all.t / tot) +
+      (all.gridCut > 0.5 ? "; the grid's own change adds " + fm.pct(all.gridCut / tot) + "." : ".");
   }
+  // the target counts the whole cut from 2025: the measures' and the grid's own (R.total)
   function linePlan(W, R, pct) {
-    var ids = Object.keys(R.on), n = ids.length, tot = W.PC.inventory2025.total, need = targetT(W, pct);
-    if (!n) return "No bars in the plan yet. Add the cheapest ones, or press **Cheapest first**.";
-    var s = "**Your plan:** " + n + (n === 1 ? " bar, " : " bars, ") + fm.t(R.t) + " a year by 2035, " + fm.pct(R.t / tot) + " of 2025. ";
-    if (R.t >= need) return s + "It reaches the " + pct + "% target.";
-    return s + "It is " + fm.t(need - R.t) + " short of the target" + (n === IDS.length ? ": the rest lies outside this curve (transport, industry, the grid's rate)." : ".");
+    var n = Object.keys(R.on).length, tot = W.PC.inventory2025.total, need = targetT(W, pct), g = R.gridCut > 0.5;
+    if (!n) return (g ? "No bars yet; the grid's own change cuts " + fm.t(R.gridCut) + (R.total >= need ? ", enough for the " + pct + "% target. " : ". ") : "No bars in the plan yet. ") +
+      "Add the cheapest ones, or press **Cheapest first**.";
+    var s = "**Your plan:** " + n + (n === 1 ? " bar cuts " : " bars cut ") + fm.t(R.t) + " a year by 2035" + (g ? "; with the grid's own " + fm.t(R.gridCut) + " the cut is " + fm.t(R.total) : "") +
+      ", " + fm.pct(R.total / tot) + " of 2025. ";
+    if (R.total >= need) return s + "It reaches the " + pct + "% target.";
+    return s + "It is " + fm.t(need - R.total) + " short of the target" + (n === IDS.length ? ": the rest lies outside this curve (transport, industry, the grid's rate)." : ".");
   }
   function lineBudget(R, budgetM) {
     if (!Object.keys(R.on).length) return "No bars yet, so the plan needs no money up front.";
@@ -240,8 +268,9 @@
   function lineGroups(W, G, R) {
     if (!(R.homeUnits > 0)) return "The plan has no home measures yet, so no household gains or pays through it.";
     var lo = Math.min.apply(null, G.map(function (g) { return g.charge; })), hi = Math.max.apply(null, G.map(function (g) { return g.charge; }));
-    return "Households at 100% of the area median income or more take " + fm.pct(G[4].share, 0) + " of the home measures; the 0-30% group takes " + fm.pct(G[0].share, 0) +
-      ". A home that takes none pays " + fm.usd(lo) + " to " + fm.usd(hi) + " a year for the programme.";
+    var s = "Households at 100% of the area median income or more take " + fm.pct(G[4].share, 0) + " of the home measures; the 0-30% group takes " + fm.pct(G[0].share, 0) + ". ";
+    if (!(R.rebate > 0)) return s + "They cost less up front than the usual replacements, so the programme pays no rebate and nobody pays for one.";
+    return s + "A home that takes none pays " + fm.usd(lo) + " to " + fm.usd(hi) + " a year for the programme's rebates.";
   }
   function lineOrder(W, o) {
     var B = bars(W, o), ids = B.map(function (b) { return b.id; }), io = inOrder(W, ids, o), all = evaluate(W, IDS, o);
@@ -254,13 +283,28 @@
   }
   function orderText(W, B) { return B.map(function (b, i) { return (i + 1) + " " + b.m.short.toLowerCase(); }).join(", "); }
   function lineBaseline(W, o) {
-    var B = bars(W, o), drop = W.elTotal * (1 + W.loss) * (W.grid23 - o.grid);
+    var B = bars(W, o), g = evaluate(W, [], o).gridCut;
     var s = "At " + o.grid.toFixed(3) + " t per MWh" + (o.ac ? ", air conditioner due," : "") + " the order is " + orderText(W, B) + ". ";
-    return s + (drop > 0.5 ? "The cleaner grid alone cuts " + fm.t(drop) + " a year, with no measure." : "At 2023's rate the grid cuts nothing by itself.");
+    return s + (g > 0.5 ? "The grid alone cuts " + fm.t(g) + " a year (scopes 2 and 3), which counts toward the target." : "At 2023's rate the grid cuts nothing by itself.");
   }
   function lineStatic(W, o) {
     var B = bars(W, o), lo = B[0], hi = B[B.length - 1];
     return "Cheapest now: " + lo.m.short.toLowerCase() + " at " + fm.per(lo.per) + "; dearest: " + hi.m.short.toLowerCase() + " at " + fm.per(hi.per) + ". The order is " + orderText(W, B) + ".";
+  }
+  // what each measure is: its replacement and main assumption, and how many by 2035 at its potential
+  function measureLines(W) {
+    return W.A.measures.map(function (m) { var u = evaluate(W, [m.id]).units[m.id];
+      return { id: m.id, head: m.n + " · " + m.label + ".", text: m.what + " By 2035: " + Math.round(u).toLocaleString("en-US") + " " + m.unit + "." }; });
+  }
+  // the explain layer's "Your plan" trace: adopting needs the target, the budget and the peaks; who gains and who pays
+  // is weighed, not passed or failed (pure; P = peaks with the plan)
+  function tracePlan(W, R, P, S) {
+    var n = Object.keys(R.on).length, over = P.filter(function (x) { return x.over > 1e-9; }).length;
+    if (!n) return { pass: false, n: 0, text: "No measures yet: the plan stops at the options." };
+    var miss = [R.total < targetT(W, S.target) ? "misses the target" : null, R.upfront > S.budget * 1e6 ? "needs more than the budget" : null, over ? "puts a substation over its limit" : null].filter(Boolean);
+    if (!miss.length) return { pass: true, n: n, text: "It meets the target, the budget and every substation limit. Who gains and who pays (test 3) is not pass or fail: the council weighs it before adopting." };
+    var last = miss.pop();
+    return { pass: false, n: n, text: "It " + (miss.length ? miss.join(", ") + " and " : "") + last + ": revise the measures or their order, and screen again." };
   }
   // every reported total of a plan, for the comparison table (each measure alone)
   function table(W, o) {
@@ -268,7 +312,8 @@
     return bars(W, o).map(function (b) { var P = peaks(W, b.R); return { id: b.id, m: b.m, per: b.per, t: b.t, up: b.up, dPeak: P[sub].mw - base[sub].mw }; });
   }
   var model = { IDS: IDS, HOME: HOME, crf: crf, prepare: prepare, rep: rep, opt: opt, evaluate: evaluate, bars: bars, sortBars: sortBars, curve: curve,
-    inOrder: inOrder, inventory: inventory, fuelsOf: fuelsOf, elOf: elOf, peaks: peaks, groups: groups, hm: hm, fm: fm, round2: round2,
+    inOrder: inOrder, inventory: inventory, fuelsOf: fuelsOf, elOf: elOf, gridElOf: gridElOf, peaks: peaks, groups: groups, hm: hm, fm: fm, round2: round2,
+    measureLines: measureLines, tracePlan: tracePlan,
     gridOf: gridOf, gasOf: gasOf, settings: settings, planIds: planIds, words: words, targetT: targetT, table: table,
     lineInventory: lineInventory, lineTarget: lineTarget, linePlan: linePlan, lineBudget: lineBudget, linePeak: linePeak, lineGroups: lineGroups,
     lineOrder: lineOrder, lineBaseline: lineBaseline, lineStatic: lineStatic };
@@ -301,9 +346,12 @@
     var plot = LX.Plot(maccHost, { text: "Text version of the curve" });
     var tg = H("div", { class: "lx-toggles a18-measures", role: "group", "aria-label": "Measures in your plan" }, maccHost), toggles = {};
     A.measures.forEach(function (m) {
-      toggles[m.id] = LX.Toggle(tg, { label: m.n + " · " + m.short, on: S.plan[m.id], onChange: function (on) { S.plan[m.id] = on; keep(); paint(); if (onPlan) onPlan(); } });
+      toggles[m.id] = LX.Toggle(tg, { label: m.n + " · " + m.label, on: S.plan[m.id], onChange: function (on) { S.plan[m.id] = on; keep(); paint(); if (onPlan) onPlan(); } });
       toggles[m.id].el.style.setProperty("--a18-c", m.color);
     });
+    var what = H("details", { class: "lx-textalt a18-what" }, maccHost); H("summary", { text: "What each measure is, and how many by 2035" }, what);
+    var whatList = H("ul", null, what);
+    measureLines(W).forEach(function (x) { var li = H("li", null, whatList); li.innerHTML = "<b>" + LX.rich(x.head) + "</b> " + LX.rich(x.text); });
     var status = H("p", { class: "lx-stage-status", "aria-live": "polite" }, stage);
     var invSplit = null;
     function chip(label, value, tone) { var c = H("div", { class: "lx-readout" + (tone ? " " + tone : "") }, chips); H("span", { text: label }, c); H("b", { text: value }, c); }
@@ -315,7 +363,7 @@
       invSplit = LX.CostSplit(invHost, { parts: parts, fmt: function (v) { return fm.kt(v); },
         rows: I.rows.slice().sort(function (a, b) { return b.total - a.total; }).map(function (r) { return { key: r.key, label: SHORT[r.key], color: "var(--lx-ink-3)", total: r.total,
           values: S.sorted ? { s1: r.s1, s2: r.s2, s3: r.s3 } : { all: r.total } }; }) });
-      H("p", { class: "lx-hint", text: "Prairie City's 2025 inventory, t CO₂ by sector (location-based, operating only): " + fm.t(I.tot.total) + "." }, invHost);
+      H("p", { class: "lx-hint", text: "Prairie City's 2025 CO₂ by sector in kt (1 kt = 1,000 t), location-based, operating only: " + fm.t(I.tot.total) + " in all. A teaching inventory: CO₂ only, no waste." }, invHost);
     }
     function yAxis(list) {
       var lo = Math.min.apply(null, list.map(function (b) { return b.per == null ? 0 : b.per; }).concat([-100])), hi = Math.max.apply(null, list.map(function (b) { return b.per == null ? 0 : b.per; }).concat([100]));
@@ -324,18 +372,20 @@
     function drawCurve() {
       var o = O(), B = bars(W, o), io = S.order ? inOrder(W, B.map(function (b) { return b.id; }), o) : null;
       var list = B.map(function (b, i) { return io ? { id: b.id, m: b.m, t: Math.max(0, io[i].t), per: io[i].per, alone: b } : { id: b.id, m: b.m, t: b.t, per: b.per, alone: b }; });
-      var C = curve(list), xmax = Math.max(180, Math.ceil(C[C.length - 1].x1 / 1000 / 30) * 30), ya = yAxis(list), need = targetT(W, S.target) / 1000;
+      var g = evaluate(W, [], o).gridCut, C = curve(list), xmax = Math.max(180, Math.ceil(C[C.length - 1].x1 / 1000 / 30) * 30), ya = yAxis(list);
+      var need = Math.max(0, targetT(W, S.target) - g) / 1000;             // what the measures must add to the grid's own change
       var xt = []; for (var v = 0; v <= xmax; v += 30) xt.push([v, v + (v === xmax ? " kt" : "")]);
       plot.render({
         x: { min: 0, max: xmax, ticks: xt, ticksN: xt.filter(function (t, i) { return i % 2 === 0; }) },
         y: { min: ya.min, max: ya.max, step: ya.step, zero: true, fmt: function (v) { return (v < 0 ? "−$" : "$") + Math.abs(v); }, unit: "$ per t CO₂" }, height: 280, heightN: 240,
         bars: C.filter(function (c) { return c.per != null; }).map(function (c) { return { x0: c.x0 / 1000, x1: c.x1 / 1000, y0: 0, y1: c.per, color: c.b.m.color, op: S.plan[c.id] ? 0.9 : 0.25 }; }),
         marks: C.filter(function (c) { return c.per != null && c.x1 > c.x0; }).map(function (c) { return { x: (c.x0 + c.x1) / 2000, y: c.per, n: String(c.b.m.n) }; })
-          .concat(S.part === "inv" ? [] : [{ x: Math.min(need, xmax), y: ya.max, vline: true }]),
+          .concat(S.part === "inv" || !(need > 0) ? [] : [{ x: Math.min(need, xmax), y: ya.max, vline: true }]),
         legend: A.measures.map(function (m) { return { label: m.n + " " + m.short, color: m.color }; }),
-        aria: "Prairie City's marginal abatement cost curve" + (S.order ? ", each bar in order after the bars before it" : ", each measure alone") + ": width, tonnes of CO₂ avoided a year by 2035; height, cost per tonne. The dashed line is the target.",
+        aria: "Prairie City's marginal abatement cost curve" + (S.order ? ", each bar in order after the bars before it" : ", each measure alone") + ": width, tonnes of CO₂ avoided a year by 2035; height, cost per tonne. The dashed line is what the measures must cut to reach the target.",
         text: { head: ["Order", "Measure", "Tonnes a year", "Cost per tonne", "In your plan"], rows: C.map(function (c, i) { return [String(i + 1), c.b.m.label, fm.t(c.t), fm.per(c.per), S.plan[c.id] ? "yes" : "no"]; }),
-          note: "Dashed line: the target, " + fm.t(need * 1000) + " a year." }
+          note: g > 0.5 ? (need > 0 ? "Dashed line: the target less the grid's own " + fm.t(g) + ", " + fm.t(need * 1000) + " a year for the measures." : "The grid's own " + fm.t(g) + " already meets the target: no dashed line.") :
+            "Dashed line: the target, " + fm.t(need * 1000) + " a year." }
       });
     }
     function paint() {
@@ -344,13 +394,14 @@
       chips.innerHTML = "";
       if (inv) { chip("Inventory, 2025", fm.kt(I.tot.total)); if (S.sorted) { chip("Scope 1", fm.kt(I.tot.s1)); chip("Scope 2", fm.kt(I.tot.s2)); chip("Scope 3", fm.kt(I.tot.s3)); } }
       else {
-        chip("Target", fm.t(need) + " a year"); chip("Your plan cuts", fm.t(r.t), r.t >= need && planIds(S).length ? "good" : null);
+        chip("Target", fm.t(need) + " a year"); chip("Your measures cut", fm.t(r.t), r.total >= need && planIds(S).length ? "good" : null);
+        if (r.gridCut > 0.5) { chip("The grid's own change", fm.t(r.gridCut)); chip("Cut from 2025", fm.t(r.total), r.total >= need ? "good" : null); }
         chip("Net cost a year", fm.musd(r.net), Math.abs(r.net) < 5e4 ? null : r.net > 0 ? "bad" : "good"); chip("Up front, one-time", fm.musd(r.upfront));
       }
       invHost.hidden = !inv; maccHost.hidden = inv;
       if (inv) drawInventory(); else drawCurve();
       IDS.forEach(function (k) { toggles[k].set(!!S.plan[k]); });
-      status.textContent = inv ? "Scope 1 is burned in the city; scope 2 is grid electricity used in it; scope 3 happens outside it because of the city." :
+      status.textContent = inv ? "Scope 1 is burned in the city; scope 2 is grid electricity used in it (rooftop solar used on site is not); scope 3 happens outside it because of the city." :
         (S.order ? "Bars in order, cheapest first: width = tonnes each adds after the bars before it, height = its cost per tonne." : "Each bar alone, cheapest first: width = tonnes avoided a year by 2035, height = cost per tonne.");
       buildExplain();
     }
@@ -367,7 +418,7 @@
     }
     function cheapest() {   // continue from the reader's plan: add the cheapest bars not yet in it until the target is met
       var need = targetT(W, S.target), B = bars(W, O());
-      for (var i = 0; i < B.length && R().t < need; i++) if (!S.plan[B[i].id]) S.plan[B[i].id] = true;
+      for (var i = 0; i < B.length && R().total < need; i++) if (!S.plan[B[i].id]) S.plan[B[i].id] = true;
       keep(); paint(); if (onPlan) onPlan();
     }
     function ledgerPeak(host) {
@@ -382,13 +433,14 @@
       host.innerHTML = ""; var r = R(), G = groups(W, r, S.who);
       LX.Ledger(host, { cls: "a18-led", caption: "A screening estimate for one year by 2035 (" + A.participation[S.who].label.toLowerCase() + "): bills at 2025 prices, equipment as an annual equivalent; rate changes and transfers are left to " + refText("A13") + ".",
         columns: ["Household group", "Home measures per 100 homes", "A home that takes none, a year", "Average per home, a year"],
-        rows: G.map(function (g) { return { head: g.label, sub: g.hh.toLocaleString("en-US") + " households", cells: [g.per100.toFixed(0), "−" + fm.usd(g.charge), fm.usd(g.avg)] }; }) });
+        rows: G.map(function (g) { return { head: g.label, sub: g.hh.toLocaleString("en-US") + " households", cells: [g.per100.toFixed(0), fm.usd(-g.charge), fm.usd(g.avg)] }; }) });
       return G;
     }
     var steps = [
-      { text: "A plan starts with an [[emissions-inventory|inventory]]. Sort eight activities into the GPC's [[scope-1|scopes]]: burned in the city (scope 1), grid electricity used in it ([[scope-2|scope 2]]), or caused outside it ([[scope-3|scope 3]]).",
+      { text: "A plan starts with an [[emissions-inventory|inventory]]. Sort eight activities into the scopes of the [[gpc|GPC]], the standard for city inventories: burned in the city ([[scope-1|scope 1]]), grid electricity used in it ([[scope-2|scope 2]]), or caused outside it ([[scope-3|scope 3]]).",
         build: function (act, api) {
           onPlan = null; S.part = "inv"; S.order = false; paint();
+          H("p", { class: "lx-hint", text: "GPC: the Global Protocol for Community-Scale Greenhouse Gas Emission Inventories (WRI, C40 Cities and ICLEI, 2014)." }, act);
           LX.CardSort(act, { bins: A.scopeSort.bins.map(function (b, i) { return { id: b.id, label: b.label, sub: b.sub, color: ["var(--lx-warn)", "var(--lx-accent)", "var(--lx-ink-3)"][i] }; }),
             cards: A.scopeSort.cards, onCheck: function (g) { if (g.placed === g.total) { S.sorted = true; keep(); paint(); api.done(); api.saw("You placed " + g.right + " of " + g.total + " as the GPC does. " + lineInventory(I)); } } });
           if (S.sorted) { api.done(); api.saw(lineInventory(I)); }
@@ -407,7 +459,7 @@
           S.part = "plan"; S.order = false; paint();
           var b = H("button", { type: "button", class: "lx-btn small", text: "Cheapest first" }, act);
           H("p", { class: "lx-hint", text: "Cheapest first adds the cheapest bars missing from your plan until it reaches the target." }, act);
-          function check() { var r = R(); api.saw(linePlan(W, r, S.target)); if (r.t >= targetT(W, S.target) || planIds(S).length === IDS.length) api.done(); }
+          function check() { var r = R(); api.saw(linePlan(W, r, S.target)); if (r.total >= targetT(W, S.target) || planIds(S).length === IDS.length) api.done(); }
           onPlan = check; b.addEventListener("click", cheapest);
           if (planIds(S).length) check();
         } },
@@ -427,7 +479,7 @@
           function run() { var P = ledgerPeak(host); api.saw(linePeak(P)); api.done(); }
           b.addEventListener("click", run); onPlan = function () { if (host.firstChild) { var P = ledgerPeak(host); api.saw(linePeak(P)); } };
         } },
-      { text: "Test 3, who benefits. Homes that take a measure keep its savings; a programme paying 40% of the cost recovers it on every home's bill. Compare two ways homes take part.",
+      { text: "Test 3, who benefits. Homes that take a measure keep its savings; a programme paying 40% of the extra cost up front recovers it on every home's bill. Compare two ways homes take part.",
         build: function (act, api) {
           S.part = "who"; S.order = false; paint();
           var host = H("div", null, act), ref = H("p", { class: "lx-hint" }, act);
@@ -446,14 +498,14 @@
           H("p", { class: "lx-hint", text: "Lock-in: a furnace bought in 2026 lasts " + W.M.furnace.life + " years on average, past 2045; a home that buys one is out of the heat-pump bar until then." }, act);
           if (S.order) { api.done(); api.saw(lineOrder(W, O())); }
         } },
-      { text: "Where it misleads, 2: the [[baseline|baseline]]. A bar's tonnes depend on what would happen anyway: the grid's CO₂ per MWh in 2035, and whether the old air conditioner is due too.",
+      { text: "Where it misleads, 2: the [[counterfactual|baseline]], what would happen anyway. The grid's CO₂ per MWh in 2035 changes the tonnes; whether the old air conditioner is due too changes the heat pump's cost.",
         build: function (act, api) {
           onPlan = null; S.part = "base"; S.order = false; paint();
           function say() { api.saw(lineBaseline(W, O())); api.done(); }
           seg(act, "a18-grid-l", "The grid in 2035", A.options.grid.map(function (g) { return [g.key, g.label + " (" + (g.t == null ? W.grid23 : g.t).toFixed(2) + " t/MWh)"]; }), S.grid, function (k) { S.grid = k; keep(); paint(); say(); });
           LX.Toggle(H("div", { class: "lx-toggles", role: "group", "aria-label": "What a heat pump replaces" }, act), { label: "The air conditioner is due too", on: S.ac,
             onChange: function (on) { S.ac = on; keep(); paint(); say(); } });
-          H("p", { class: "lx-hint", text: "The two cleaner grids are set for teaching; the utility's plan, approved by the state regulator, decides the real one." }, act);
+          H("p", { class: "lx-hint", text: "The two cleaner grids are set for teaching. The real one depends on utilities, regional markets and state and federal policy; a city can cut its use." }, act);
         } },
       { text: "Where it misleads, 3: a curve is a snapshot of prices and costs. Move the gas price and use EIA's 2030 cost for rooftop solar; watch bars change height and order.",
         build: function (act, api) {
@@ -476,12 +528,12 @@
     var xhost = document.getElementById("a18-explain");
     function buildExplain() {
       if (!xhost) return;
-      var o = O(), r = R(), P = peaks(W, r), over = P.filter(function (x) { return x.over > 1e-9; }), need = targetT(W, S.target), n = planIds(S).length;
+      var o = O(), r = R(), P = peaks(W, r), tp = tracePlan(W, r, P, S), n = tp.n;
       xhost.innerHTML = ""; xhost.classList.add("is-live");
       var F = {}; A.flow.steps.forEach(function (s) { F[s.id] = s; });
       function nd(id) { var s = F[id], o2 = { t: s.t, tN: s.t.length > 14 ? splitWords(s.t) : [s.t] }; if (s.s) { o2.s = s.s; o2.sN = s.sN || s.s; } if (id === "ok") o2.k = "q"; if (id === "mon" || id === "rev") o2.k = "end"; return o2; }
       function splitWords(t) { var w = t.split(" "), h = Math.ceil(w.length / 2); return [w.slice(0, h).join(" "), w.slice(h).join(" ")]; }
-      var pass = n > 0 && r.t >= need && r.upfront <= S.budget * 1e6 && !over.length;
+      var pass = tp.pass;
       LX.Flowchart(H("div", { class: "lx-xcard" }, xhost), {
         title: "How a U.S. city plan is made, and who decides", lede: A.flow.note,
         nodes: { inv: nd("inv"), tgt: nd("tgt"), opt: nd("opt"), irp: nd("irp"), scr: nd("scr"), ok: nd("ok"), plan: nd("plan"), rev: nd("rev"), mon: nd("mon") },
@@ -490,12 +542,14 @@
         atN: { inv: [0, 0], tgt: [0, 1], opt: [0, 2], irp: [1, 2], scr: [0, 3], ok: [0, 4], rev: [1, 4], plan: [0, 5], mon: [0, 6] },
         edges: [["inv", "tgt"], ["tgt", "opt"], ["opt", "irp"], ["opt", "scr"], ["irp", "scr", null, { v: true }], ["scr", "ok"], ["ok", "plan", "yes"], ["ok", "rev", "no"], ["plan", "mon"]],
         traces: [
-          { label: "Your plan", path: n ? ["inv", "tgt", "opt", "scr", "ok", pass ? "plan" : "rev"].concat(pass ? ["mon"] : []) : ["inv", "tgt", "opt"],
-            text: !n ? "No measures yet: the plan stops at the options." : pass ? "It reaches the target, fits the budget and keeps every substation within its limit: the council could adopt it, and the inventory tracks it each year." :
-              "It fails " + [r.t < need ? "the target" : null, r.upfront > S.budget * 1e6 ? "the budget" : null, over.length ? "a substation limit" : null].filter(Boolean).join(" and ") + ": revise the measures or their order, and screen again." },
-          { label: "The utility's part", path: ["opt", "irp", "scr", "ok", "plan"], text: F.irp.who + " " + F.plan.who },
-          { label: "Who decides each step", path: ["inv", "tgt", "opt", "scr", "plan", "mon"], text: [F.inv.who, F.tgt.who, F.opt.who, F.scr.who, F.mon.who].join(" ") }],
+          { label: "Your plan", path: n ? ["inv", "tgt", "opt", "scr", "ok", pass ? "plan" : "rev"].concat(pass ? ["mon"] : []) : ["inv", "tgt", "opt"], text: tp.text },
+          { label: "The utility's part", path: ["opt", "irp", "scr", "ok", "plan"], text: F.irp.who + " " + F.plan.who }],
         sel: 0 });
+      // who decides each step: one row per step, one sentence each
+      LX.CompareTable(H("div", { class: "lx-xcard" }, xhost), {
+        title: "Who decides each step", text: true, caption: "Typical U.S. practice; who does what differs by state and city.",
+        columns: [{ key: "step", label: "Step", main: true }, { key: "who", label: "Who does what" }],
+        rows: A.flow.steps.filter(function (s) { return s.who; }).map(function (s) { return { key: s.id, step: s.t, who: s.who }; }) });
       var T = table(W, o);
       LX.CompareTable(H("div", { class: "lx-xcard" }, xhost), {
         title: "The curve and the tests, measure by measure", text: true,
@@ -504,7 +558,7 @@
         rows: T.map(function (x) { return { key: x.id, color: x.m.color, name: x.m.n + " " + x.m.label, per: fm.per(x.per), t: fm.t(x.t), up: fm.musd(x.up),
           pk: (x.dPeak > 0.05 ? "+" : x.dPeak < -0.05 ? "−" : "") + fm.mw(Math.abs(x.dPeak)), who: x.m.whoText }; }) });
       LX.Boundary(H("div", { class: "lx-xcard" }, xhost), { title: "Where this curve holds",
-        holds: ["Prairie City, a fictional city, with 2025 prices and costs in 2025 dollars;", "ten years, each measure at its stated potential, equipment replaced only when it wears out;",
+        holds: ["Prairie City, a fictional city, with 2025 prices and costs in 2025 dollars;", "2035 without a plan: 2025's energy use, at the 2035 grid's rate;", "ten years, each measure at its stated potential, equipment replaced only when it wears out;",
           "CO₂ at each fuel's coefficient and the grid's average rate (location-based), with 5% lost on the wires;", "costs spread over each item's life at a 4% real rate, energy at retail prices."],
         leaves: ["transport, the industrial park and the grid's own plan: no bar here;", "rebound, comfort, health and soft costs;", "how lower sales move rates for everyone: " + refRich("A13") + ";", "the cost of a bigger substation."],
         source: "Costs: EIA (2022 dollars), LBNL (2012), ORNL (2008), in 2025 dollars with BEA's deflator. Prairie City is fictional; its numbers are illustrative." });
