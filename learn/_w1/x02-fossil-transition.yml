@@ -1,0 +1,24 @@
+# Sidecar for X2 (x02-fossil-transition), builder learn-w6-x, 2026-11-07. Read by scripts/build_learn.py.
+# No excerpt of Henry's research appears in X2.
+id: x02-fossil-transition
+lesson: X2
+glossary:
+  - id: lng
+    term: Liquefied natural gas (LNG)
+    def: "Natural gas cooled until it turns liquid, so that ships can carry it across oceans; it is warmed back into gas where it lands."
+  - id: bcf
+    term: Billion cubic feet (Bcf)
+    def: "A unit of natural-gas volume, a billion cubic feet; EIA often gives gas flows in Bcf a day."
+  - id: carbon-capture
+    term: Carbon capture and storage (CCS)
+    def: "Capturing CO₂ from a source such as a chimney before it reaches the air, and storing it, usually deep underground."
+  - id: carbon-removal
+    term: Carbon dioxide removal (CDR)
+    def: "Taking CO₂ that is already in the air and storing it in trees, soils, rock, minerals or products."
+  - id: technology-readiness
+    term: Technology readiness level (TRL)
+    def: "A scale from 1 (basic principles described) to 9 (proven in operation) for how mature a technology or method is."
+requests:
+  - "X2 reads Ridge County from a13-fairness-jobs.json (ridgeCounty: the plant, its staff, the mine jobs, coal's share of the county's taxes, the fiction line); no change requested. prairieland.json's ridgeCounty.a13 copies the same block."
+  - "X2's explain layer names A13, F11, A21, A20 and X3 through LX.lessonRefHTML, so A21 and A20 link once live; F10 is X2's curriculum prerequisite and is left out of its after list until it is live."
+  - "The 'where we stop' box uses the shelf's shared markup and xs- styles exactly as learn-w7-a's X1, X4, X5 and X6 do (_tests/learn/shelf_stop.js is byte-identical to learn-w7-a's copy); promote the xs- rules to forms.css as one shared rule."

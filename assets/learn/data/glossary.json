@@ -185,6 +185,12 @@
   "lesson": 4,
   "href": "04-forecasts.html"
  },
+ "bcf": {
+  "term": "Billion cubic feet (Bcf)",
+  "short": "A unit of natural-gas volume, a billion cubic feet; EIA often gives gas flows in Bcf a day.",
+  "lesson": "X2",
+  "href": "x02-fossil-transition.html"
+ },
  "binding-constraint": {
   "term": "Binding constraint",
   "short": "A rule that holds exactly at the selected plan, with no room to spare; loosening it may or may not improve the best cost.",
@@ -340,6 +346,18 @@
   "short": "A cap on the total CO₂ emitted over many years, a limit on a stock rather than on one year's flow.",
   "lesson": "F2",
   "href": "f02-systems-and-map.html"
+ },
+ "carbon-capture": {
+  "term": "Carbon capture and storage (CCS)",
+  "short": "Capturing CO₂ from a source such as a chimney before it reaches the air, and storing it, usually deep underground.",
+  "lesson": "X2",
+  "href": "x02-fossil-transition.html"
+ },
+ "carbon-removal": {
+  "term": "Carbon dioxide removal (CDR)",
+  "short": "Taking CO₂ that is already in the air and storing it in trees, soils, rock, minerals or products.",
+  "lesson": "X2",
+  "href": "x02-fossil-transition.html"
  },
  "carbon-intensity": {
   "term": "Carbon intensity",
@@ -844,6 +862,12 @@
   "short": "A comparison of how much an outcome changed in a group that got a programme against how much it changed in a similar group that did not.",
   "lesson": "R3",
   "href": "r03-system-and-method.html"
+ },
+ "diffusion-curve": {
+  "term": "Diffusion curve",
+  "short": "How the share of homes, firms or output using a new technology grows over time, often slowly at first, then faster, then levelling off.",
+  "lesson": "X3",
+  "href": "x03-transitions-history.html"
  },
  "discount-rate": {
   "term": "Discount rate",
@@ -1756,6 +1780,12 @@
   "short": "A ceiling on the power through a substation or feeder in each hour, written as a straight-line rule a linear program can use, with no voltage or power-flow physics.",
   "lesson": "SB3",
   "href": "sb3-city-planner.html"
+ },
+ "lng": {
+  "term": "Liquefied natural gas (LNG)",
+  "short": "Natural gas cooled until it turns liquid, so that ships can carry it across oceans; it is warmed back into gas where it lands.",
+  "lesson": "X2",
+  "href": "x02-fossil-transition.html"
  },
  "load-factor": {
   "term": "Load factor",
@@ -3166,6 +3196,12 @@
   "short": "A model that compares equipment sizes and ways of running them by both their performance and their cost, and picks the best for a stated goal.",
   "lesson": "F7",
   "href": "f07-microgrids.html"
+ },
+ "technology-readiness": {
+  "term": "Technology readiness level (TRL)",
+  "short": "A scale from 1 (basic principles described) to 9 (proven in operation) for how mature a technology or method is.",
+  "lesson": "X2",
+  "href": "x02-fossil-transition.html"
  },
  "telemetry": {
   "term": "Telemetry",

@@ -742,7 +742,22 @@
   outcome: "Explain why fuels compare by heat, not by tonne; count leaked methane as CO₂e with a stated GWP; tell pollutants that controls catch from CO₂ that they do not; and read energy burden as bills over income against conventional lines."
   after: [F4]
 - {kind: lesson, tier: foundations, code: X1, title: "What engineering lies beneath the system?"}
-- {kind: lesson, tier: foundations, code: X3, title: "How fast have energy transitions happened before?"}
+# X3, builder learn-w6-x (wave W6; side-topic shelf, D1). Curriculum prerequisite F10 is not live yet (integration to-do).
+- kind: lesson
+  id: x03-transitions-history
+  code: X3
+  tier: foundations
+  form: cards
+  icon: clock
+  status: active
+  minutes: 12
+  title: "How fast have energy transitions happened before?"
+  subtitle: "Overlay a century of U.S. adoption curves, from electric service in homes to solar's share of electricity, and see what sped some up and held others back"
+  short: "Past transitions"
+  teaches: [diffusion curves, shares over time, network build-out, public programmes, what you measure decides the speed]
+  does: "Guess how long electricity took to reach nine U.S. homes in ten; compare towns and farms; watch gas heating replace coal; read the car and solar curves; sort what sped each change up and what held it back; then a dated timeline and two readings of the record."
+  outcome: "Read an adoption curve as a share of a named whole, say how fast past U.S. changes moved and what sped or slowed them, and explain why the answer to how fast depends on what is measured, without forecasting the next one."
+  after: []
 # ---------- wave W4 Analyst module A3 (curriculum v2 §18.4; builder learn-w4-b)
 - kind: lesson
   id: a03-market-design
@@ -953,7 +968,23 @@
   after: [A11]
 - {kind: lesson, tier: analyst, code: A20, title: "Why do national energy scenarios disagree?"}
 - {kind: lesson, tier: analyst, code: A21, title: "What makes a nation's energy secure? Imports, minerals, supply chains and factories"}
-- {kind: lesson, tier: analyst, code: X2, title: "What happens to gas, coal and oil systems in a transition, and can carbon be removed?"}
+# X2, builder learn-w6-x (wave W6; side-topic shelf, D2). Curriculum prerequisite F10 is not live yet (integration to-do).
+- kind: lesson
+  id: x02-fossil-transition
+  code: X2
+  tier: analyst
+  form: cards
+  icon: flame
+  status: active
+  minutes: 15
+  practice_minutes: 10   # the myths and questions (Check section)
+  title: "What happens to gas, coal and oil systems in a transition, and can carbon be removed?"
+  subtitle: "Map gas networks, LNG, coal, oil, carbon capture and carbon removal; read a retirement plan and a gas-network scenario by their assumptions; compare removal methods"
+  short: "Fossil systems, carbon removal"
+  teaches: [roles of gas coal and oil today, retirement plans against retirements, network costs and remaining customers, stranded assets, capture against removal, permanence of carbon storage]
+  does: "Tap a map of gas networks, LNG, gas and coal plants, mines, oil, carbon capture and carbon removal; check a year of coal retirement plans against what retired; spread a gas network's cost over fewer customers under two assumptions; see what an early closure leaves unpaid in Ridge County; tell capture from removal; sort removal methods by permanence, readiness and cost range; weigh gas as a bridge or a lock-in."
+  outcome: "Say what gas, coal and oil systems do today and which questions a transition opens, read a retirement or gas-network scenario by its assumptions, and compare carbon-removal methods by permanence, readiness, cost range and how they are measured, without a verdict."
+  after: [F11]
 - {kind: lesson, tier: analyst, code: X4, title: "How are energy rules made?"}
 - {kind: lesson, tier: analyst, code: X5, title: "How are big energy projects actually financed?"}
 # CK-A, builder learn-w5-g (wave W5). Curriculum prerequisites A1, A4, A13, A15.

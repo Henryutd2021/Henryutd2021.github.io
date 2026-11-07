@@ -1208,9 +1208,13 @@
    "tier": "foundations",
    "code": "X3",
    "title": "How fast have energy transitions happened before?",
-   "ready": false,
-   "href": "index.html#foundations",
-   "scales": []
+   "ready": true,
+   "href": "x03-transitions-history.html",
+   "scales": [],
+   "id": "x03-transitions-history",
+   "minutes": 12,
+   "form": "cards",
+   "short": "Past transitions"
   },
   {
    "tier": "analyst",
@@ -1377,9 +1381,13 @@
    "tier": "analyst",
    "code": "X2",
    "title": "What happens to gas, coal and oil systems in a transition, and can carbon be removed?",
-   "ready": false,
-   "href": "index.html#analyst",
-   "scales": []
+   "ready": true,
+   "href": "x02-fossil-transition.html",
+   "scales": [],
+   "id": "x02-fossil-transition",
+   "minutes": 15,
+   "form": "cards",
+   "short": "Fossil systems, carbon removal"
   },
   {
    "tier": "analyst",
