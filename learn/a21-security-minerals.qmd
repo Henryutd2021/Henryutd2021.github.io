@@ -244,6 +244,7 @@ $$\text{import dependence} = \frac{\text{net imports}}{\text{gross available ene
 </div>
 ```
 <!-- learn:footer:end -->
+:::
 
 ```{=html}
 <script src="../assets/learn/learn.js" defer></script>

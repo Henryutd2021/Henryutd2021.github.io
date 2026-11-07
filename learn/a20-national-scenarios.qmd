@@ -272,6 +272,7 @@ $$s = \min\left(1,\ \max\left(0,\ \tfrac{1}{2} + \frac{C_{\text{gas}} - C_{\text
 </div>
 ```
 <!-- learn:footer:end -->
+:::
 
 ```{=html}
 <script src="../assets/learn/learn.js" defer></script>

@@ -283,6 +283,7 @@ $$c(r) = \frac{r_0}{r}\, e^{-(r - r_0)/L}, \qquad \text{share within } R = 1 - e
 </div>
 ```
 <!-- learn:footer:end -->
+:::
 
 ```{=html}
 <script src="../assets/learn/learn.js" defer></script>

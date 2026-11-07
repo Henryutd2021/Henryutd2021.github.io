@@ -247,6 +247,7 @@ $$c_g = \frac{C\,e_g}{\sum_h n_h e_h} \ \text{(per kWh)}, \qquad c_g = \frac{C}{
 </div>
 ```
 <!-- learn:footer:end -->
+:::
 
 ```{=html}
 <script src="../assets/learn/learn.js" defer></script>
