@@ -1953,7 +1953,7 @@
   "yearsEach": 5,
   "horizonEnd": 2050,
   "note": "Model years 2030, 2035, 2040, 2045 and 2050, each standing for five years; 2025 is the observed base year. The same 12 time slices (weather of 2025) are used in every period; demand scales them.",
-  "residualValue": "Assets whose lives run past 2050 keep a residual value: E4 charges each plant's yearly capital payments (annuities at the discount rate over its life) only for the years up to 2050, so a plant built in 2045 pays for 2045-2050 only.",
+  "residualValue": "Assets whose lives run past 2050 keep a residual value: E4 charges each plant's yearly capital payments (annuities at the discount rate over its life) only for the years up to 2050, so a plant built in the 2045 model year (2041-2045) pays for 2041-2050 only.",
   "retirement": "Each existing unit retires at the end of its `retire` year (fleet.units); E4 may retire coal and gas earlier, saving their fixed O&M; existing plants' capital is sunk.",
   "discount": {
    "def": 5,
