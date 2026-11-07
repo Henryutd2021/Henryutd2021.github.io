@@ -1054,8 +1054,8 @@
  "inventory2025": {
   "unit": "t CO2",
   "sectors": {
-   "homes": 721284,
-   "commercial": 395844,
+   "homes": 714334,
+   "commercial": 390738,
    "food": 119578,
    "fertilizer": 160452,
    "datacenter": 420524,
@@ -1063,8 +1063,8 @@
    "farms": 42955,
    "grid_losses": 64749
   },
-  "total": 2778154,
-  "method": "Location-based, operating CO2 only: electricity at the meter x eGRID2023 SPP North (861.999 lb per MWh), distribution losses as their own row; fuels x EIA's coefficients. The fertilizer plant's gas reformers are counted as if all the carbon in their gas reaches the air (plants that make urea or sell CO2 keep some: an accounting choice). Not counted: methane leaks, upstream emissions, refrigerants."
+  "total": 2766098,
+  "method": "Location-based, operating CO2 only: grid-supplied electricity x eGRID2023 SPP North (861.999 lb per MWh), with rooftop solar used on site taken off the homes' and businesses' electricity in proportion to their use, distribution losses as their own row; fuels x EIA's coefficients. The fertilizer plant's gas reformers are counted as if all the carbon in their gas reaches the air (plants that make urea or sell CO2 keep some: an accounting choice). Not counted: methane leaks, upstream emissions, refrigerants."
  },
  "prices": {
   "electricityCentsPerKWh": {
