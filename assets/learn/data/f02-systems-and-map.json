@@ -32,17 +32,17 @@
   "carbon": {
    "label": "Carbon budget", "icon": "cloud", "color": "var(--lx-ink-3)",
    "about": [
-    {"k": "Setup", "t": "Illustrative: Prairieland emits 100 Mt of CO₂ in 2025 (Mt = million tonnes) and allows itself 1,500 Mt in all from 2025 on."},
+    {"k": "Setup", "t": "Illustrative: a nation emits 100 Mt of CO₂ in 2025 (Mt = million tonnes) and allows itself 1,500 Mt in all from 2025 on."},
     {"k": "Rule", "t": "Emissions change in straight lines: to the 2035 level, then to zero in the net-zero year, or they stay at the 2035 level."},
     {"k": "Stock", "t": "The counter adds up CO₂ emitted since the start of 2025. It does not model how much of it stays in the air."}],
    "e0": 100, "start_year": 2025, "end_year": 2070, "budget": 1500, "pivot_year": 2035,
    "l35": {"min": 0, "max": 100, "step": 10, "start": 100},
    "nz": {"min": 2040, "max": 2075, "step": 5, "start": 2075, "never": 2075},
    "predict": {"id": "f2-halve", "l35": 50, "nz": 2075,
-    "q": "Prairieland halves its emissions by 2035, then holds them there. After 2035, the CO₂ it has emitted since 2025 (the stock)…",
+    "q": "The nation halves its emissions by 2035, then holds them there. After 2035, the CO₂ it has emitted since 2025 (the stock)…",
     "answer": "rises",
     "options": [{"value": "falls", "label": "falls"}, {"value": "flat", "label": "levels off"}, {"value": "rises", "label": "keeps rising, more slowly"}]},
-   "task": "Choose the 2035 level and the net-zero year. Keep Prairieland's cumulative CO₂ within its budget to 2070."
+   "task": "Choose the 2035 level and the net-zero year. Keep the nation's cumulative CO₂ within its budget to 2070."
   }
  },
  "loops": {

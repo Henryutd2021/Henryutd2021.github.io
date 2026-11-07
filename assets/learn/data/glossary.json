@@ -1609,9 +1609,9 @@
  },
  "import-dependence": {
   "term": "Import dependence",
-  "short": "Net energy imports divided by the energy a country uses (Eurostat divides by gross available energy); its value depends on how primary energy is counted.",
-  "lesson": "A21",
-  "href": "a21-security-minerals.html"
+  "short": "A country's net energy imports as a share of the energy it uses (its primary energy supply; Eurostat divides by gross available energy), negative for a net exporter; its value depends on how primary energy is counted.",
+  "lesson": "F10",
+  "href": "f10-nations-differ.html"
  },
  "income-based-charge": {
   "term": "Income-based charge",

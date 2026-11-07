@@ -182,7 +182,7 @@ body.page-learn.quarto-dark { --f2-tech: #7CA6EE; --f2-cost: #E2A445; --f2-env: 
 <dl class="lx-ideas">
 <dt>A reservoir</dt><dd>Holding up to 350 GWh and fed by a river averaging 101 MW, it gets through the year without spilling or running dry only with a steady release from 100 to 115 MW (the slider moves in 5 MW steps).</dd>
 <dt>A battery</dt><dd>A 25 MW, 100 MWh battery that loses 20% on charging must buy 125 MWh to deliver 100.</dd>
-<dt>A carbon budget</dt><dd>If Prairieland halves its 100 Mt a year by 2035 and holds there, its cumulative emissions still rise, from 825 Mt to 2,575 Mt by 2070, past a 1,500 Mt budget.</dd>
+<dt>A carbon budget</dt><dd>If an illustrative nation halves its 100 Mt a year by 2035 and holds there, its cumulative emissions still rise, from 825 Mt to 2,575 Mt by 2070, past a 1,500 Mt budget.</dd>
 <dt>Feedback loops</dt><dd>More EVs bring more chargers, which bring more EVs: a reinforcing loop. Longer queues at chargers slow the growth, and the rebound effect takes back part of an efficiency saving: balancing loops.</dd>
 <dt>The system map</dt><dd>Each of four levers reaches technology, cost, emissions, people and security within three waves.</dd>
 </dl>
@@ -198,7 +198,7 @@ body.page-learn.quarto-dark { --f2-tech: #7CA6EE; --f2-cost: #E2A445; --f2-env: 
 <p class="lx-hint">With JavaScript on, you run these yourself: three tanks, two loops and four levers.</p>
 </div>
 </div>
-<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Tanks:</b> the reservoir, lesson 9's battery and Prairieland's budget are illustrative.<br><b>Units:</b> Mt = million tonnes; GWh = a thousand MWh.<br><b>Map:</b> first-round directions of change, other things equal, for a grid like the Plains Grid; it states no sizes.<br><b>Waves:</b> steps in tracing causes; each label says roughly when a step plays out.<br><b>Data center:</b> an illustrative 300 MW load.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Tanks:</b> the reservoir, lesson 9's battery and the nation's budget are illustrative.<br><b>Units:</b> Mt = million tonnes; GWh = a thousand MWh.<br><b>Map:</b> first-round directions of change, other things equal, for a grid like the Plains Grid; it states no sizes.<br><b>Waves:</b> steps in tracing causes; each label says roughly when a step plays out.<br><b>Data center:</b> an illustrative 300 MW load.</span></p>
 ```
 :::
 

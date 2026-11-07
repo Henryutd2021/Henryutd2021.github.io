@@ -148,7 +148,10 @@ ok(/no forecasts/.test(D.stop.lede) && D.stop.leaves.some(t => /Forecasts/.test(
 ok(/ipcc\.ch\/report\/ar6\/wg3\/chapter\/chapter-12/.test(RAW) && /Global Energy Monitor/.test(RAW) && /eia\.gov\/energyexplained\/natural-gas/.test(RAW), "the reading ladder is the curriculum's (§4.3: IPCC chapters 6 and 12, EIA gas data, Global Energy Monitor)");
 
 // ---------------- neutrality and scope
-const ALL = PAGE + "\n" + RAW + "\n" + JS + "\n" + SIDE;
+// the page's own words: the generated learn:* blocks repeat other lessons' descriptions (a prerequisite's "does" line,
+// e.g. F10's, which names nuclear among its accounting conventions), so the scope checks read the page without them
+const OWNPAGE = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?<!-- learn:\1:end -->/g, "");
+const ALL = OWNPAGE + "\n" + RAW + "\n" + JS + "\n" + SIDE;
 const PROSEALL = ALL.replace(/\/\/[^\n]*/g, "");
 ok(!/nuclear|reactor|\bSMR\b|small modular|fission|uranium/i.test(ALL), "no nuclear term");
 ok(!/data[- ]?cent/i.test(ALL), "no data centers on this page");
@@ -161,7 +164,7 @@ const hrefs = [...OWN.matchAll(/href="([^"]+)"/g)].map(m => m[1].replace(/&amp;/
 ok(hrefs.every(h => S.linkOK(h) || /^[0-9a-z-]+\.html(#[a-z-]+)?$/.test(h) || /^#/.test(h)), "links on the allow-list (" + hrefs.filter(h => !(S.linkOK(h) || /^[0-9a-z-]+\.html(#[a-z-]+)?$/.test(h) || /^#/.test(h))).join(", ") + ")");
 ["A13", "F11", "A21", "A20", "X3"].forEach(c => ok(new RegExp('\\["' + c + '",').test(JS), c + " is named through LX.lessonRefHTML"));
 const ROW = PATHY.split("id: x02-fossil-transition")[1].split("\n- ")[0];
-ok(/code: X2/.test(ROW) && /\n  minutes: 15\n/.test(ROW) && /\n  practice_minutes: 10/.test(ROW) && /status: active/.test(ROW) && /after: \[F11\]/.test(ROW), "path.yml: X2 is 15 + 10 minutes, after F11 (F10 to add when live)");
+ok(/code: X2/.test(ROW) && /\n  minutes: 15\n/.test(ROW) && /\n  practice_minutes: 10/.test(ROW) && /status: active/.test(ROW) && /after: \[F10, F11\]/.test(ROW), "path.yml: X2 is 15 + 10 minutes, after F10 and F11");
 
 // ---------------- text budget
 const nWords = S.nWords, nSent = S.nSent;

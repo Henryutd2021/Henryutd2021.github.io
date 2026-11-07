@@ -136,7 +136,7 @@ const hrefs = [...OWN.matchAll(/href="([^"]+)"/g)].map(m => m[1].replace(/&amp;/
 const okHref = h => /^https:\/\/(www\.iea\.org|www\.eia\.gov|ec\.europa\.eu|single-market-economy\.ec\.europa\.eu|www\.usgs\.gov|doi\.org)\//.test(h) || /^[0-9a-z-]+\.html(#[a-z-]+)?$/.test(h) || /^#/.test(h);
 ok(hrefs.every(okHref), "links: IEA, EIA, the European Commission, USGS, doi.org and learn pages (" + hrefs.filter(h => !okHref(h)).join(", ") + ")");
 ok(Object.values(D.sources).every(s => s.url === "no link" || okHref(s.url)), "the data file's sources are allow-listed or cited without a link");
-ok(/F10 \(upcoming\)/.test(OWN) && /M13 \(upcoming\)/.test(OWN) && /cf1-supply-chain-microgrids\.html/.test(OWN), "F10 and M13 named as upcoming; CF1 linked");
+ok(/f10-nations-differ\.html/.test(OWN) && /m13-national-pathway\.html/.test(OWN) && /c4-prairieland-2050\.html/.test(OWN) && !/\(upcoming\)/.test(OWN) && /cf1-supply-chain-microgrids\.html/.test(OWN), "F10, M13 and C4 linked now they are live (W6 integration); CF1 linked");
 
 // ---------------- the practice set balances as displayed
 { const P = M.practice(PL, D), num = s => Number(s.replace(/,/g, "")); ok((P.match(/<li>/g) || []).length === 6, "six worked exercises");
@@ -167,7 +167,10 @@ PROSE.split(/<\/?(?:p|li|dd|dt|td|th|summary|br|caption)\b[^>]*>/).map(plain).fi
 // ---------------- controls, glossary, demo hooks
 ok(/aria-live/.test(JS) && /LX\.store\.(get|set)\("a21"/.test(JS), "live regions; levers persist in this browser");
 ok((JS.match(/LX\.demo\(/g) || []).length === 1 && (JS.match(/demo\[\d\] = function/g) || []).length === 10, "a demo hook for each of the ten steps");
-["import-dependence", "hhi"].forEach(id => ok(new RegExp("id: " + id + "\\b").test(SIDE) && new RegExp("\\[\\[" + id + "\\||term=\"" + id + "\"").test(JS + PAGE), "the sidecar defines and the page marks " + id));
+ok(/id: hhi\b/.test(SIDE) && /\[\[hhi\||term="hhi"/.test(JS + PAGE), "the sidecar defines and the page marks hhi");
+// import-dependence: one definition for the course, in F10's sidecar since the W6 integration (F10 teaches it first)
+const F10SIDE = fs.readFileSync(path.join(SITE, "learn/_w1/f10-nations-differ.yml"), "utf8");
+ok(/id: import-dependence\b/.test(F10SIDE) && !/id: import-dependence\b/.test(SIDE) && /\[\[import-dependence\||term="import-dependence"/.test(JS + PAGE), "F10's sidecar defines import-dependence (one definition); the page marks it");
 
 console.log((fails ? "FAILED " + fails + " of " : "ok: ") + checks + " checks (" + ID + ")");
 process.exit(fails ? 1 : 0);

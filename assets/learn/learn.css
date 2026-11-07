@@ -555,6 +555,20 @@ details.lx-deeper .k { font-size: 11.5px; letter-spacing: .07em; text-transform:
 .lx-cgroups i { width: 10px; height: 4px; border-radius: 2px; background: var(--c); }
 @media (max-width: 860px) { .lx-cmap { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 560px) { .lx-xcard { padding: 14px; } }
+/* the side-topic shelf's "where we stop" box (curriculum v2 §16.2 e-stop; X1 to X6; promoted at the W6 integration,
+   2026-11-07): a card with what the topic covers and leaves to specialists, side by side, then a three-rung reading ladder
+   with dated sources. Static HTML written by _tests/learn/shelf_stop.js (stopHTML) from each page's data; same with and
+   without JavaScript. */
+.xs-stop { display: grid; gap: 8px; margin-top: 16px; border-left: 4px solid var(--lx-accent); }
+.page-learn .xs-stop h3 { margin: 0; }
+.page-learn .xs-stop .xs-stop-lede { margin: 0; color: var(--lx-ink-2); }
+.page-learn .xs-stop .xs-h { margin: 4px 0 4px; font-family: var(--lx-f-display); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; color: var(--lx-ink-2); }
+.xs-stop-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 22px; }
+.page-learn .xs-stop ul, .page-learn .xs-ladder { margin: 0; padding-left: 1.2rem; display: grid; gap: 5px; }
+.page-learn .xs-src { color: var(--lx-ink-3); font-size: 14px; }
+@media (max-width: 640px) {
+  .xs-stop-cols { grid-template-columns: minmax(0, 1fr); }
+}
 
 /* flowchart.css — decision flowchart with traced cases (flowchart.js). */
 .lx-flow svg { display: block; width: 100%; height: auto; }

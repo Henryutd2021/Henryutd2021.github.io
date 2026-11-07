@@ -21,7 +21,7 @@
 //
 // Shared components: LX.StepCards, LX.ConceptMap, LX.Predict, LX.Slider, LX.CompareTable, LX.Steelman,
 // LX.lessonRefHTML, LX.demo. Lesson-local: two bar readouts. The "where we stop" box is static HTML written by the test
-// (the shelf's shared xs- markup, as on X1, X3, X4, X5 and X6).
+// (the shelf's shared e-stop box: xs- markup, styles in components/explain.css).
 (function () {
   "use strict";
   var KEY = "x02_fossil_transition";

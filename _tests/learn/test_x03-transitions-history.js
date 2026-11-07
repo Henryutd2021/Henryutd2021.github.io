@@ -128,7 +128,10 @@ ok(/Energy and Civilization/.test(RAW) && /Energy Transitions: Global and Nation
 ok(/<!-- x03-stop:start/.test(PAGE) && PAGE.indexOf("x03-stop:start") > PAGE.indexOf('id="x03-explain"'), "the stop box closes the explain section");
 
 // ---------------- scope and links
-const ALL = PAGE + "\n" + RAW + "\n" + JS + "\n" + SIDE;
+// the page's own words: the generated learn:* blocks repeat other lessons' descriptions (a prerequisite's "does" line,
+// e.g. F10's, which names nuclear among its accounting conventions), so the scope checks read the page without them
+const OWNPAGE = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?<!-- learn:\1:end -->/g, "");
+const ALL = OWNPAGE + "\n" + RAW + "\n" + JS + "\n" + SIDE;
 ok(!/nuclear|reactor|\bSMR\b|small modular|fission|uranium/i.test(ALL), "no nuclear term");
 ok(!/\bAI\b|artificial intelligence/.test(ALL), "no 'AI'");
 ok(!/projects\/|research\.html|smr-dc/.test(ALL), "no project page and no Research page");

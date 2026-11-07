@@ -151,7 +151,7 @@ const hrefs = [...OWN.matchAll(/href="([^"]+)"/g)].map(m => m[1].replace(/&amp;/
 const okHref = h => /^https:\/\/(www\.iea\.org|www\.eia\.gov|www\.ipcc\.ch|doi\.org)\//.test(h) || /^[0-9a-z-]+\.html(#[a-z-]+)?$/.test(h) || /^#/.test(h);
 ok(hrefs.every(okHref), "links: IEA, EIA, IPCC, doi.org and learn pages (" + hrefs.filter(h => !okHref(h)).join(", ") + ")");
 ok(Object.values(D.sources).every(s => /^https:\/\/(www\.iea\.org|www\.eia\.gov|doi\.org)\//.test(s.url)), "the data file's sources are allow-listed");
-ok(/a01-project-tea\.html/.test(OWN) && /13-capstone\.html/.test(OWN) && /M13 \(upcoming\)/.test(OWN) && /SB4 \(upcoming\)/.test(OWN), "links back to A1 and lesson 13; M13 and SB4 named as upcoming");
+ok(/a01-project-tea\.html/.test(OWN) && /13-capstone\.html/.test(OWN) && /m13-national-pathway\.html/.test(OWN) && /sb4-pathway-explorer\.html/.test(OWN) && !/\(upcoming\)/.test(OWN), "links back to A1 and lesson 13; M13 and SB4 linked now they are live (W6 integration)");
 ok(/not a forecast/.test(JS) && /no scenario here is more likely/i.test(JS + PAGE), "no scenario is called a forecast or more likely");
 
 // ---------------- the practice set balances (W4 finding 6, W5 finding 6)

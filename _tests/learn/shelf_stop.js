@@ -1,14 +1,16 @@
 // shelf_stop.js — the side-topic shelf's "where we stop" box (curriculum v2 §16.2 e-stop: where the course stops, plus
-// a three-rung reading ladder; §4.4 says what each side topic includes and excludes), shared by the W7 tests of X1, X4,
-// X5 and X6 (builder learn-w7-a, 2026-11-07). Not a test itself (the QA runs test_*.js only).
+// a three-rung reading ladder; §4.4 says what each side topic includes and excludes), the writer shared by the tests of
+// X1 to X6 (builders learn-w7-a and learn-w6-x, 2026-11-07; one file since the W6 integration). Not a test itself (the
+// QA runs test_*.js only).
 //   const S = require("./shelf_stop.js");
 //   S.stopHTML(D.stop, "x05")  -> the box's static HTML (each test writes it between <!-- x05-stop:start --> markers)
 //   S.problems(D.stop)         -> [] when the box has its parts: a title, what the topic covers, what it leaves to
 //                                 specialists, and exactly three rungs, each with a source label and an "as of" date
 //   S.ALLOW, S.linkOK(url)     -> the allow-list used by the four tests (curriculum §20.3)
 //   S.plain, S.nWords, S.nSent -> the text-budget counters the four tests share
-// The box is static HTML (it reads the same with and without JavaScript); its styles are the page's xs-* rules, the
-// same block on each of the four pages (to promote to forms.css as one shared rule).
+// The box is static HTML (it reads the same with and without JavaScript); its styles are the xs- rules in
+// assets/learn/components/explain.css (promoted from the six pages at the W6 integration; README "Promoted at the W6
+// integration").
 "use strict";
 const ALLOW = /^https:\/\/([a-z0-9.-]+\.)?(eia\.gov|energy\.gov|ferc\.gov|nerc\.com|lbl\.gov|nrel\.gov|nlr\.gov|epa\.gov|usgs\.gov|bea\.gov|census\.gov|bls\.gov|noaa\.gov|irs\.gov|kcc\.ks\.gov|iea\.org|irena\.org|ipcc\.ch|ourworldindata\.org|openalex\.org|doi\.org|spp\.org)\//;
 function linkOK(u) { return u == null || ALLOW.test(u); }

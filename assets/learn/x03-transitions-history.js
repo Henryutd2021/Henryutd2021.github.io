@@ -16,7 +16,7 @@
 //
 // Shared components: LX.StepCards, LX.Guess, LX.Plot, LX.Toggle, LX.CardSort, LX.Timeline, LX.Steelman,
 // LX.lessonRefHTML, LX.demo. Lesson-local: the curve viewer (toggles and a zoom over LX.Plot). The "where we stop" box is
-// static HTML written by the test (the shelf's shared xs- markup, as on X1, X4, X5 and X6).
+// static HTML written by the test (the shelf's shared e-stop box: xs- markup, styles in components/explain.css).
 (function () {
   "use strict";
   var KEY = "x03_transitions_history";

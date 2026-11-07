@@ -61,7 +61,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 </div>
 <p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Prairieland is fictional; its numbers are illustrative.</b> Its imports, stocks, refiners, battery factory and shocks come from the course's shared national data.</span></p>
 <p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Stress tests, not forecasts.</b> Each shock and each lever is set for teaching; the steps state their assumptions.</span></p>
-<p class="lx-hint" style="margin-top:.6rem">About 25 guided minutes in ten steps. Helpful first: F10 (upcoming), why every country's energy system looks different.</p>
+<p class="lx-hint" style="margin-top:.6rem">About 25 guided minutes in ten steps. Helpful first: <a href="f10-nations-differ.html">F10</a>, why every country's energy system looks different.</p>
 ```
 :::
 
@@ -105,7 +105,7 @@ $$\text{import dependence} = \frac{\text{net imports}}{\text{gross available ene
 - **An import-share cap.** A rule that imports stay below a share of primary energy in each period; its dual value prices that security.
 - **Stocks as decisions.** A two-stage model chooses stock sizes before it knows which disruption comes, then runs each one.
 - **Disruption scenarios.** Shocks become scenarios with stated settings, as on this page, so a plan can be tested against them.
-- **Next.** M13 (upcoming) adds an import-share cap to Prairieland's pathway model; C4 (upcoming) tests a pathway against shocks.
+- **Next.** Modeler lesson [M13](m13-national-pathway.html) adds an import-share cap to Prairieland's pathway model; capstone [C4](c4-prairieland-2050.html) tests a pathway against shocks.
 
 ```{=html}
 </div>

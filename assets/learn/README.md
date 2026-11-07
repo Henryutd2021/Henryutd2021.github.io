@@ -1138,6 +1138,30 @@ var box = LX.LifeBox(host, { stages: [{ label: "Build" }, { label: "Supply" }, {
 
 Every diagram ships a "Text version" and keyboard focus. Use colours from tokens only (`--lx-*` in `base.css`); day and night both work. Animations stop under `prefers-reduced-motion`. Inline `code` takes the tokens by itself (`base.css`, at zero specificity, so a page's own code rule still wins): a page needs no night-theme override for it.
 
+
+### Promoted at the W6 integration (2026-11-07)
+
+**Where we stop** (e-stop, curriculum v2 §16.2; the side-topic shelf X1 to X6): a card that says what a side topic covers and what it leaves to specialists, side by side, then a three-rung reading ladder whose rungs carry a dated source (a link only when it is on the allow-list). The six shelves had the same markup and the same seven style rules; the rules now sit once in `components/explain.css` (the explain layer's shared frame; they keep the `xs-` prefix, so no page changed its HTML) and the pages' own style blocks keep only their lesson prefixes. The box is static HTML, the same with and without JavaScript, written into each page between its `<id>-stop` markers by the lesson test's `--write` from the page's data (`stop: { title, lede, inLabel?, outLabel?, includes[], leaves[], ladder: [{ rung, text, source: { label, url?, asof } }] }`) with the one shared writer, `_tests/learn/shelf_stop.js`:
+
+```js
+const S = require("./shelf_stop.js");      // in a test under _tests/learn/
+S.stopHTML(D.stop, "x05")                  // -> <div class="lx-card xs-stop" id="x05-stop">…</div>
+S.problems(D.stop)                         // -> [] when it has a title, a lede, two or more items each side and exactly three dated rungs
+S.plain(t), S.nWords(t), S.nSent(t)        // the text-budget counters the shelf tests share
+```
+
+No `build_learn.py` change: `explain.css` is already in the bundle. A new side topic copies the call, its data block and the markers.
+
+**Reference pages outside `path.yml`** (W6: `learn/regions.qmd`, the twelve regional profile cards, curriculum v2 §15): no tier, code or time row, so not a station on the course map. The course map links them (a line in `learn/index.qmd`'s landing note and a "Reference" block at the end of `map.ejs`'s list), and lessons link them where they help (F1, F10). The cards, the comparison table and the sources are written from `data/regions.json` by `node _tests/learn/test_regions.js --write`; `regions.js` adds the filter by dominant scale. The footer is the Learn footer, between `learn:footer` markers, written by `scripts/build_learn.py` from its `REFERENCE_PAGES` list (subject line "Learn, <page title>"), which also checks the page's glossary marks.
+
+**Sources with more than one file** (F10, lesson-local): a source in `f10-nations-differ.json` may carry `also: [{ label, url }]`, printed after its title as "(also <a>Table 3.6 in chapter 3</a>, …)"; India's statistics are three chapter files of one publication.
+
+**Kept lesson-local, and why** (promote when a second page needs the same thing):
+
+- CR's pick-one exemplar switcher (`cr-ex-pick`: one competence's pair of fragments at a time, through `LX.Exemplars`): only CR picks; CK-R shows its three worked exemplars (review, response, revision) together inside the gated solution.
+- X3's curve viewer (overlaid adoption curves as shares of a named whole, zoom and toggles) and X2's comparison bars: each drawn by one page.
+- A20's closed-form scenario accounting and A21's shock arithmetic: each page's own model over `prairieland.json`; engine E4 (SB4, M13, C4) is the shared pathway model.
+
 ## Prairie City data (wave W5)
 
 `data/prairie-city.json` (about 60 KB) is the one source of Prairie City's numbers, the fictional city of the S3 scale (curriculum v2 §6): about 250,000 people in three districts (dense core, suburbs, rural fringe), one substation per district (a teaching simplification, said in the file), farms, an industrial park (food processing; a fertilizer plant that uses hydrogen made in gas reformers), a data-center campus (a load only, guard G-DC), wind to the west and a gas grid. It is anchored to the U.S. Plains as Prairie Town and the Plains Grid are: Wichita's income and household size (Census), Wichita's 1991-2020 weather normals (NOAA), Kansas's 2025 prices (EIA), SPP's 2025 hourly shapes (`town_year.json`), eGRID's SPP North CO2 rate. Everything else is set for teaching, and the builder says which is which, constant by constant.

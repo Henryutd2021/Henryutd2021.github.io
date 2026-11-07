@@ -17,7 +17,7 @@ glossary:
     def: "A rule for counting primary energy in which each MWh from nuclear, hydro, wind and solar counts as the fuel a thermal power plant would burn to make it."
   - id: import-dependence
     term: Import dependence
-    def: "A country's net energy imports as a share of its primary energy supply; it is negative for a net exporter."
+    def: "A country's net energy imports as a share of the energy it uses (its primary energy supply; Eurostat divides by gross available energy), negative for a net exporter; its value depends on how primary energy is counted."
   - id: non-energy-use
     term: Non-energy use
     def: "Fuels used as raw materials rather than burned for energy, such as natural gas for fertilizer or oil for plastics and asphalt."

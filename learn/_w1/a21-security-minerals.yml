@@ -2,9 +2,7 @@
 id: a21-security-minerals
 lesson: A21
 glossary:
-  - id: import-dependence
-    term: Import dependence
-    def: "Net energy imports divided by the energy a country uses (Eurostat divides by gross available energy); its value depends on how primary energy is counted."
+  # import-dependence: one definition, in F10's sidecar (it is taught there first; W6 integration merged the two)
   - id: hhi
     term: Herfindahl-Hirschman index (HHI)
     def: "A measure of how concentrated a supply is: the sum of each supplier's squared percentage share, from near 0 for many small suppliers to 10,000 for one."

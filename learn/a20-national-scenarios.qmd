@@ -131,7 +131,7 @@ $$s = \min\left(1,\ \max\left(0,\ \tfrac{1}{2} + \frac{C_{\text{gas}} - C_{\text
 - **A budget is a rule.** A planning model adds one constraint: the sum over the model years of weight × emissions stays at or below the budget.
 - **Its price.** The constraint's dual value is the [implied carbon price]{.lx-term term="implied-carbon-price"}, what one more tonne of budget would save; this page tries prices instead, while a model finds plan and price together.
 - **Foresight.** A model that sees every period at once plans differently from one that plans decade by decade; that choice is one more assumption to report.
-- **Next.** M13 (upcoming) builds Prairieland's multi-region, multi-decade model; SB4 (upcoming) lets you run it.
+- **Next.** Modeler lesson [M13](m13-national-pathway.html) builds Prairieland's multi-region, multi-decade model; the [Pathway Explorer (SB4)](sb4-pathway-explorer.html) lets you run it.
 
 ```{=html}
 </div>

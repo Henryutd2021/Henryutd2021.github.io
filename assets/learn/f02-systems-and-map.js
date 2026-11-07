@@ -321,9 +321,9 @@
           aria: "Energy in the battery, hour by hour", text: { head: ["End of hour", "Stored (MWh)"], rows: res.stock.slice(1).map(function (v, i) { return [HH(i + 1), fx(v)]; }) } });
       } else {
         var top = Math.max(2000, Math.ceil(Math.max.apply(null, res.stock) / 1000) * 1000);
-        pFlow.render({ caption: "The flow: Prairieland's CO₂ emissions (Mt a year)", x: x, y: { min: 0, max: 120, step: 20, fmt: fx, unit: "Mt/yr" }, height: 170, heightN: 150,
+        pFlow.render({ caption: "The flow: the nation's CO₂ emissions (Mt a year)", x: x, y: { min: 0, max: 120, step: 20, fmt: fx, unit: "Mt/yr" }, height: 170, heightN: 150,
           lines: [{ values: res.e, x0: P.start_year, step: 1, color: "var(--lx-ink-3)", area: 0.15 }], marks: mark,
-          aria: "Prairieland's emissions, year by year", text: { head: ["Year", "Emissions (Mt)"], rows: res.e.map(function (v, i) { return [P.start_year + i, fx(v, 1)]; }) } });
+          aria: "The nation's emissions, year by year", text: { head: ["Year", "Emissions (Mt)"], rows: res.e.map(function (v, i) { return [P.start_year + i, fx(v, 1)]; }) } });
         pStock.render({ caption: "The stock: CO₂ emitted since the start of " + P.start_year + " (Mt)", x: x, y: { min: 0, max: top, step: top / 4, fmt: fx, unit: "Mt" }, height: 170, heightN: 150,
           lines: [{ values: res.stock, x0: P.start_year, color: "var(--lx-ink-2)", area: 0.15, width: 2.6 }], refs: [{ y: P.budget, label: "budget", dash: "5 4", color: "var(--lx-bad)" }], marks: mark,
           aria: "Cumulative CO₂ since 2025", text: { head: ["End of year", "Cumulative (Mt)"], rows: res.stock.slice(1).map(function (v, i) { return [P.start_year + i, fx(v)]; }) } });
@@ -694,7 +694,7 @@
       return [
         { icon: "drop", title: "Stock", got: !!won.reservoir, lock: "Meet the reservoir's goal.", text: "An amount that builds up or drains: water in a reservoir, energy in a battery, CO₂ emitted.", moment: cS && won.reservoir ? "Your reservoir: a steady " + cS.release + " MW release." : null },
         { icon: "battery", title: "Flow", got: !!won.battery, lock: "Meet the battery's goal.", text: "A rate that fills or drains a stock: MW into a battery, Mt of CO₂ a year. MW is a flow, MWh a stock." },
-        { icon: "cloud", title: "Only zero stops the rise", got: !!won.carbon, lock: "Keep Prairieland within its budget.", text: "A smaller inflow still fills the tub. Cumulative CO₂ stops rising only when net emissions reach zero." },
+        { icon: "cloud", title: "Only zero stops the rise", got: !!won.carbon, lock: "Keep the nation within its budget.", text: "A smaller inflow still fills the tub. Cumulative CO₂ stops rising only when net emissions reach zero." },
         { icon: "wave", title: "Reinforcing loop", got: !!(lp.ev || {}).done, lock: "Close the chargers and EVs diagram.", text: "An even number of − links: change feeds itself, up or down." },
         { icon: "scale", title: "Balancing loop", got: !!(lp.rebound || {}).done, lock: "Close the rebound diagram.", text: "An odd number of − links: the loop opposes the change, as the rebound takes back part of a saving." },
         { icon: "map", title: "Ripple and hubs", got: c.map === 4, lock: "Follow all four levers.", text: "One change spreads step by step across technology, cost, emissions, people and security; some parts move every time." }
