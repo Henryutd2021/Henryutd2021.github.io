@@ -311,6 +311,12 @@
   "lesson": 7,
   "href": "07-cost.html"
  },
+ "capital-stack": {
+  "term": "Capital stack",
+  "short": "The layers of money that pay for a project, such as senior debt, tax equity and the sponsor's equity, each with its own place in the order of payment.",
+  "lesson": "X5",
+  "href": "x05-project-finance.html"
+ },
  "capture-price": {
   "term": "Capture price",
   "short": "The average market price a plant's output earns, each hour weighted by what the plant produced in it.",
@@ -353,6 +359,12 @@
   "lesson": "CF7",
   "href": "cf7-cost-of-waiting.html"
  },
+ "cash-flow-available-for-debt-service": {
+  "term": "Cash flow available for debt service (CFADS)",
+  "short": "A project's revenue minus its operating costs in a period: the cash that can pay the loan.",
+  "lesson": "X5",
+  "href": "x05-project-finance.html"
+ },
  "causal-loop-diagram": {
   "term": "Causal-loop diagram",
   "short": "A map of causes and effects in which every arrow carries a sign: plus if more of the cause brings more of the effect, minus if it brings less.",
@@ -376,6 +388,12 @@
   "short": "A short fingerprint computed from a file's bytes, such as SHA-256, that changes if even one byte of the file changes.",
   "lesson": "K8",
   "href": "k08-git-notebooks.html"
+ },
+ "choice-experiment": {
+  "term": "Choice experiment",
+  "short": "A survey method in which people choose repeatedly between offers whose features vary, so that the weight of each feature can be estimated.",
+  "lesson": "X6",
+  "href": "x06-social-methods.html"
  },
  "circuit-breaker": {
   "term": "Circuit breaker",
@@ -731,6 +749,12 @@
   "lesson": "M1",
   "href": "m01-dispatch-to-lmp.html"
  },
+ "debt-service-coverage-ratio": {
+  "term": "Debt-service coverage ratio (DSCR)",
+  "short": "The cash available for debt service divided by the loan payment due; a lender asks for a minimum, such as 1.30, as a cushion.",
+  "lesson": "X5",
+  "href": "x05-project-finance.html"
+ },
  "decay-heat": {
   "term": "Decay heat",
   "short": "Heat that the radioactive fission products in used fuel keep giving off after the chain reaction has stopped.",
@@ -1054,6 +1078,12 @@
   "short": "The committee that reviews research with people before it starts; in the United States, an institutional review board.",
   "lesson": "R9",
   "href": "r09-integrity-stakeholders.html"
+ },
+ "ethnography": {
+  "term": "Ethnography",
+  "short": "A research method of long observation and conversation with people where they live or work, to understand their routines in their own terms.",
+  "lesson": "X6",
+  "href": "x06-social-methods.html"
  },
  "event-study": {
   "term": "Event study",
@@ -2249,6 +2279,12 @@
   "lesson": 12,
   "href": "12-trade-offs.html"
  },
+ "participatory-mapping": {
+  "term": "Participatory mapping",
+  "short": "A method in which residents mark on maps the places that matter to them, for planners to weigh.",
+  "lesson": "X6",
+  "href": "x06-social-methods.html"
+ },
  "passive-safety": {
   "term": "Passive safety",
   "short": "Safety features that rely on natural effects, such as hot fluid rising and cool fluid sinking, instead of pumps, outside power or operators.",
@@ -2519,6 +2555,12 @@
   "lesson": "A19",
   "href": "a19-gis-siting.html"
  },
+ "rate-case": {
+  "term": "Rate case",
+  "short": "A formal proceeding in which a utility asks its regulator to change its rates; staff, consumer advocates and other parties file testimony, and the commission decides.",
+  "lesson": "X4",
+  "href": "x04-rules-law.html"
+ },
  "rocof": {
   "term": "Rate of change of frequency",
   "short": "How fast the grid's frequency moves in the first instant after a disturbance, in hertz per second.",
@@ -2692,6 +2734,12 @@
   "short": "Work on an existing building, such as air sealing and insulation, that cuts the heat it needs.",
   "lesson": "SB3",
   "href": "sb3-city-planner.html"
+ },
+ "revenue-requirement": {
+  "term": "Revenue requirement",
+  "short": "The total a regulated utility may collect from its customers in a year: its allowed operating costs plus an allowed return on the net value of what it has built.",
+  "lesson": "X4",
+  "href": "x04-rules-law.html"
  },
  "robust-optimization": {
   "term": "Robust optimization",
@@ -2921,6 +2969,12 @@
   "lesson": "M14",
   "href": "m14-did-it-work.html"
  },
+ "sponsor-equity": {
+  "term": "Sponsor equity",
+  "short": "The developer's or owner's own money in a project: paid last, so it carries the most risk and keeps what is left.",
+  "lesson": "X5",
+  "href": "x05-project-finance.html"
+ },
  "spp": {
   "term": "SPP (Southwest Power Pool)",
   "short": "The regional grid operator that runs the transmission grid and wholesale electricity market across much of the central U.S.; the course's hourly data come from its area (EIA-930).",
@@ -3082,6 +3136,12 @@
   "short": "The total value a local government can tax, such as the assessed value of homes, businesses and power plants in a county.",
   "lesson": "A13",
   "href": "a13-fairness-jobs.html"
+ },
+ "tax-equity": {
+  "term": "Tax equity",
+  "short": "Money from an investor with a large tax bill, put into a project in exchange for most of its tax credits and depreciation, plus some cash.",
+  "lesson": "X5",
+  "href": "x05-project-finance.html"
  },
  "techno-economic-analysis": {
   "term": "Techno-economic analysis (TEA)",
