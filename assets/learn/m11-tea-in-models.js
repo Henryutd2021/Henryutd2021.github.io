@@ -6,7 +6,7 @@
 // copies from 13-capstone.json and checks on every run: the wind farm's costs, the rate and the life, as lesson 13 shows
 // them, so this page and its notebook need only that subset), a16-hydrogen-ptx.json (57 kWh per kg, as A16 shows it), town.json
 // (Prairie Town's fleet, for its price and CO2), town_year.json (SPP 2025 hourly shapes, EIA-930), cf_targets.json (EIA's
-// wind capacity factor).
+// wind capacity factor), path.json (step 8 names case file CF5 through LX.lessonRefHTML).
 //
 // The model: one linear program for a plant's whole life, on 36 representative days (three per month, each weighted by
 // the days it stands for). Every variable is >= 0 and 0 <= S <= 100 MW. Money is in real 2025 dollars; the objective is the plant's ANNUAL EQUIVALENT net cost, $ a year
@@ -375,7 +375,7 @@
   LX.mount(SLUG, function (live, data, root) {
     css(); root.classList.add("m11-lab");
     // C13: lesson 13's wind farm, rate and life, as the test copies them from 13-capstone.json into this lesson's data
-    var D = data.m11_tea_in_models, C13 = D.lesson13, A16 = data.a16_hydrogen_ptx, REF = D.reference;
+    var D = data.m11_tea_in_models, C13 = D.lesson13, A16 = data.a16_hydrogen_ptx, REF = D.reference, PJ = data.path || null;   // PJ: path.json, for LX.lessonRefHTML
     var Y = prepare(D, data.town, data.town_year, data.cf_targets, LX.townProfile), CX = capexRange(D), own = LX.store.get(KEY, {}) || {};
     function remember(k, v) { own[k] = v; LX.store.set(KEY, own); }
     // the reader's settings, shared by every step
@@ -631,6 +631,7 @@
           function note() { var b = D.boundaries.filter(function (x) { return x.id === st.boundary; })[0], r = D.rules.filter(function (x) { return x.id === st.rule; })[0]; nt.textContent = (b.note ? b.note + " " : "") + r.note; drawScene(null, { boundary: st.boundary }); }
           note();
           var row = H("div", { class: "m11-row" }, act), go = H("button", { type: "button", class: "lx-btn small", html: LX.icon("play") + "Solve this boundary" }, row), stt = LX.SolverStatus(row), prog = H("p", { class: "m11-note", "aria-live": "polite" }, act), out = H("div", { "aria-live": "polite" }, act), ev = null, o = null;
+          if (PJ && LX.lessonRefHTML) H("p", { class: "m11-note", html: "Case file " + LX.lessonRefHTML(PJ, "CF5") + ": where should a cogeneration study's boundary be drawn?" }, act);
           go.addEventListener("click", LX.SolveStep.action({ api: api, st: stt, host: act, go: go, cls: "m11-fail",
             job: function () { o = base({}); prog.textContent = ""; return evaluate(o, "right", progress(prog)).then(function (e) { ev = e; return e.failed || null; }); },
             show: function () {

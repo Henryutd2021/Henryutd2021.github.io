@@ -1,0 +1,34 @@
+# Sidecar for CF5 (cf5-drawing-the-boundary), builder learn-w5-f, 2026-11-06; review fixes on learn-w5-cf5, 2026-11-06.
+# Read by scripts/build_learn.py. Live since 2026-11-07 (Henry approved E14; path.yml status: active). Depth D2
+# (working knowledge), closed-form toy, as CF6-CF8.
+# Glossary: these terms are taught in CF5 (glossary.json names it); each is marked at its first use on the page.
+id: cf5-drawing-the-boundary
+lesson: CF5
+glossary:
+  - id: absorption-chiller
+    term: Absorption chiller
+    def: "A chiller driven by heat, such as steam or hot water, instead of an electric compressor; it uses a salt solution that absorbs and releases a refrigerant."
+  - id: cogeneration
+    term: Cogeneration
+    def: "Making two useful products from one fuel or heat source, such as electricity and heat, steam or cooling, instead of making each separately."
+  - id: merchant-generator
+    term: Merchant generator
+    def: "A power plant that sells its output into the wholesale market at whatever prices it fetches, rather than to one customer under a fixed arrangement."
+  - id: turbine-crossover
+    term: Turbine crossover
+    def: "The pipe that carries steam from a high-pressure turbine to a low-pressure turbine; steam taken there has already done part of its work."
+  - id: wet-bulb-temperature
+    term: Wet-bulb temperature
+    def: "The lowest temperature evaporating water can reach in the air at hand, which combines heat and humidity; when it is high, chillers and cooling towers reject heat less well and deliver less, which is called derating."
+  - id: special-ordered-set
+    term: Special ordered set (SOS2)
+    def: "A rule in a mixed-integer program that lets at most two neighbouring points of a curve be used, so the model can follow a curved line by joining straight pieces."
+  - id: willans-line
+    term: Willans line
+    def: "A straight-line rule for a turbine's steam use against its output; here it gives the electricity lost for each unit of steam taken out of the turbine."
+  - id: crystallization
+    term: Crystallization (in an absorption chiller)
+    def: "The salt solution in an absorption chiller turning to solid crystals when it gets too concentrated or too cold, which blocks the machine; the chiller must stay clear of that limit."
+  - id: ancillary-services
+    term: Ancillary services
+    def: "Services besides energy that keep the grid steady, such as reserves and frequency regulation; grid operators buy them separately from energy."

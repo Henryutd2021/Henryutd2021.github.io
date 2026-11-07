@@ -671,7 +671,8 @@
   outcome: "Say which party carries price, shape, output, basis and battery-margin risk under each contract, and read the risk as a stated statistic of a simulated distribution."
   after: [A1]
 # ---------- the rest of each tier, in curriculum v2 order (reports/learn/learn_map_v2.yml; coming soon until built).
-#            Replaces the pre-v2 placeholder rows (2026-11-03). CF4 and CF5 are left out until their excerpts are approved.
+#            Replaces the pre-v2 placeholder rows (2026-11-03). CF4 is left out until its excerpts are approved (CF5 went
+#            live on 2026-11-07, with the case files below).
 # ---------- wave W4 Foundations module F8 (curriculum v2 §18.4; builder learn-w4-a)
 - kind: lesson
   id: f08-large-loads
@@ -1604,6 +1605,23 @@
   outcome: "Say how a two-stage stochastic program sizes equipment before renewable build-out is known, and why its plan differs from a plan for the average future."
   teaches: [sizing before uncertainty resolves, scenarios with chances, reading a published stochastic planning model]
   after: [12]
+# CF5, builder learn-w5-f (wave W5); review fixes on learn-w5-cf5; went live on 2026-11-07 after Henry approved E14
+# (register, "W5 sources"; DECISIONS 2026-11-07): framing C, E14.16b; analyst tier (coordinator, 2026-11-06)
+- kind: lesson
+  id: cf5-drawing-the-boundary
+  code: CF5
+  tier: analyst
+  form: case
+  icon: scale
+  status: active
+  minutes: 10
+  title: "Where should a cogeneration study's boundary be drawn?"
+  subtitle: "Follow one study's boundary through six parts, then move the line yourself around a toy steam plant and its load"
+  short: "Drawing the boundary"
+  does: "A case file in six parts and a timeline; then move the boundary around a toy steam plant and its load, and see steam cooling look free, costly or worth it."
+  outcome: "Say which plant streams, loads and alternatives a cogeneration study must keep inside its boundary to price the steam it sends to cooling."
+  teaches: [system boundaries, pricing a diverted by-product, cogeneration, absorption and electric chillers]
+  after: [7]
 # CF8, builder learn-w4-e (wave W4): a draft in learn/_drafts/ until its review fixes are done (Henry approved E12 and E13
 # on 2026-11-05)
 - kind: lesson

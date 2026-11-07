@@ -12,7 +12,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <!-- M11 in the model-lab form (step cards with solver runs), Learn W5, builder learn-w5-f, 2026-11-06. Model and page:
      assets/learn/m11-tea-in-models.js with assets/learn/data/m11-tea-in-models.json (its lesson13 block: lesson 13's wind
      farm costs, rate and life, copied and checked by the test), a16-hydrogen-ptx.json (57 kWh per kg), town.json,
-     town_year.json and cf_targets.json. Lab:
+     town_year.json, cf_targets.json and path.json (step 8 names case file CF5 through LX.lessonRefHTML). Lab:
      learn/notebooks/m11-tea-in-models.ipynb (written by scripts/build_learn_m11_notebook.py in the ResearchPortfolio
      folder; SciPy linprog with HiGHS; asserts the reference block). Tests: node _tests/learn/test_m11-tea-in-models.js
      re-solves every number below and proves each is the same for every best plan (--write rewrites the reference block).
@@ -40,7 +40,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 
 ::: {#steps .lx-sec}
 ```{=html}
-<div class="lx-interactive lx-cards" data-learn="m11-tea-in-models" data-src="../assets/learn/data/m11-tea-in-models.json ../assets/learn/data/a16-hydrogen-ptx.json ../assets/learn/data/town.json ../assets/learn/data/town_year.json ../assets/learn/data/cf_targets.json">
+<div class="lx-interactive lx-cards" data-learn="m11-tea-in-models" data-src="../assets/learn/data/m11-tea-in-models.json ../assets/learn/data/a16-hydrogen-ptx.json ../assets/learn/data/town.json ../assets/learn/data/town_year.json ../assets/learn/data/cf_targets.json ../assets/learn/data/path.json">
 <div class="lx-fallback">
 <p class="lx-eyebrow">One wind-hydrogen plant, three boundaries: what the same LP concludes</p>
 <table class="lx-facts m11-fb">

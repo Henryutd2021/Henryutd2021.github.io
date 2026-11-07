@@ -8,12 +8,13 @@
    each with its status (open or coming soon); then the math toolbox. Progress ticks: elements with data-lesson-id get
    .is-done from learn.js.
    A lesson or tool links to its page only when it is live: `path`, or `status: active` (page <id>.qmd), and not
-   status: upcoming (path.yml; the same rule as scripts/build_learn.py). */
+   status: upcoming (path.yml; the same rule as scripts/build_learn.py). A held row (status: hold, a draft whose title
+   may not be listed before Henry approves it) is left out of every list, as build_learn.py leaves it out of path.json. */
 const has = v => v !== undefined && v !== null && v !== "";
 const tiers = items.filter(i => i.kind === "tier");
-const lessons = items.filter(i => i.kind === "lesson");
+const lessons = items.filter(i => i.kind === "lesson" && i.status !== "hold");
 const starter = lessons.filter(i => has(i.starter)).sort((a, b) => Number(a.starter) - Number(b.starter));
-const tools = items.filter(i => i.kind === "tool");
+const tools = items.filter(i => i.kind === "tool" && i.status !== "hold");
 const link = p => String(p).replace(/\.qmd($|#)/, ".html$1");
 const page = l => has(l.path) ? l.path : (l.status === "active" && has(l.id) ? l.id + ".qmd" : "");
 const live = l => has(page(l)) && l.status !== "upcoming";
