@@ -10,7 +10,11 @@
 //   - the course rubric in the curriculum's words (framing, method, trust), never reworded; the page's rules agree with
 //     the data's rule; the parts add up to 240 minutes
 //   - the page on a stub document with the real runner: gateAll (eleven answers leave it shut, the twelfth opens it), the
-//     lock's early opening makes the attempt practice, every task right in order gives Strong
+//     lock's early opening makes the attempt practice, every task right in order gives Strong; task 1 first (the seven
+//     marked tasks shut until it is submitted, then open; task 1 read-only once submitted; Codex review #1)
+//   - after the Codex review (2026-11-07): the validation's rule worked from the intervals; the measurement check named as
+//     such; the rerun's dependency stated; no written point demands a count of defects; prompts within the text budget;
+//     the copied summary keeps every text whole
 //   - scope: no nuclear term, no data-center term, no "AI", no deny-listed term; links to learn pages and doi.org only
 // Usage (from the site folder):  node _tests/learn/test_ck-r-defend-revise.js [--write]
 "use strict";
@@ -50,7 +54,21 @@ const has = (s, what) => ok(TX.includes(s), "page: " + what + ": '" + s + "'");
 // ---------------- the fictional study's numbers, everywhere they appear
 const N = D.numbers, ALLTXT = text(RAW.replace(/\\n/g, " "));
 ok(N.joined2024 + N.notJoined2024 === N.pumps && N.joined2025 + N.never === N.notJoined2024 && N.joined2024 + N.joined2025 + N.never === N.pumps, "pumps: 41 + 71 = 112; 71 = 29 + 42");
-ok(N.lo < N.revised && N.revised < N.hi && N.lo < N.holdout && N.holdout < N.hi, "the revised result (4.6) and the hold-out summer (4.1) both lie inside the interval 2.9 to 6.3");
+ok(N.lo < N.revised && N.revised < N.hi && N.holdLo < N.holdout && N.holdout < N.holdHi, "the revised result (4.6) lies inside 2.9 to 6.3; the 2025 check's (4.1) inside its own 1.8 to 6.4");
+// the validation's rule, set before looking (Codex review #2): the gap between the two estimates, treated as independent, has a
+// 95% interval that includes zero. Standard errors from the printed intervals (half-width ÷ 1.96).
+{ const z = 1.96, se1 = (N.hi - N.lo) / (2 * z), se2 = (N.holdHi - N.holdLo) / (2 * z), gap = N.revised - N.holdout, h = z * Math.sqrt(se1 * se1 + se2 * se2);
+  ok(rel(gap, 0.5, 1e-9) && (gap - h).toFixed(1) === String(N.gapLo) && (gap + h).toFixed(1) === String(N.gapHi) && N.gapLo < 0 && N.gapHi > 0,
+    "the rule: gap 0.5 kW, 95% interval " + (gap - h).toFixed(2) + " to " + (gap + h).toFixed(2) + " (shown −2.4 to 3.4), includes zero");
+  const good = EXS.plain(D.worked.revision.answers[1]);
+  ok(good.includes("2025: 4.1 kW (1.8 to 6.4); gap 0.5 kW (−2.4 to 3.4): they agree") && /treated as independent, has a 95% interval that includes zero/.test(good), "the worked revision shows the rule and its numbers as computed");
+  ok(/the 29 farms that joined in 2025, against the 42 that never joined/.test(good) && /does not prove the method/.test(EXS.marks(D.worked.revision.answers[1]).map(m => m.note).join(" ")), "the 2025 check names its comparison group, and says it supports, not proves");
+  ok(!/\bvalidated\b/.test(ALLTXT), "nothing claims the analysis was 'validated' by one consistent number"); }
+// the meter check is a measurement check on a matching boundary (Codex review #7)
+{ const prof = D.worked.revision.answers[0], t = EXS.plain(prof), notes = EXS.marks(prof).map(m => m.note).join(" ");
+  ok(/feeders that serve only pumps, same hours, after line losses/.test(t) && /of the measurements, not of the tariff's effect/.test(notes) && !/substation meter/.test(ALLTXT), "the meter check: pump-only feeders, line losses, and labelled a measurement check"); }
+// the results are assumed outputs, said where they are shown (Codex review #6)
+ok(/assumed example outputs, not computed from data/.test(D.study.label) && /assumed example outputs/.test(D.worked.revision.note) && /assumed example outputs/.test(D.meta.note), "the study's results are labelled assumed example outputs");
 ok(N.lo > N.keep, "the whole interval is above the board's 1.5 kW: 'above 1.5 kW across the interval' holds");
 ok(N.first > N.revised, "the fairer comparison lowered the estimate (6.2 to 4.6), as the response says");
 {
@@ -99,7 +117,21 @@ ok(task("rank").answer === "b" && task("competence").answer === "a" && task("res
   ok(diff.map(d => d.label).join() === [comp("framing").label, comp("method").label, comp("trust").label].join(), "the revision's difference table: Framing, Method fit, Trustworthy analysis");
   ok(/what answer would change a decision/.test(comp("framing").strong) && /limits of the chosen method stated and partly mitigated/.test(comp("method").strong) && /independent reproduction by someone else; validation on data not used to build the analysis/.test(comp("trust").strong), "the three Strong anchors the worked revision shows");
   const good = EXS.plain(D.worked.revision.answers[1]);
-  ok(/would keep the tariff/.test(good) && /Limit: later joiners may still differ\. Mitigated/.test(good) && /co-op engineer reran the clean clone/.test(good) && /not used to build the analysis/.test(good), "the Strong revision shows each of the three moves"); }
+  ok(/would keep the tariff/.test(good) && /Limit: the later joiners' demand might still have moved differently\. Mitigated/.test(good) && /co-op engineer reran the clean clone/.test(good) && /not used to build the analysis/.test(good), "the Strong revision shows each of the three moves"); }
+// difference-in-differences without overstating selection (Codex review #5): levels may differ; the trend is what needs evidence
+{ const sol = task("rank").solution + " " + task("respond").solution;
+  ok(/Different starting levels alone do no harm/.test(sol) && /matters more than equal starting levels/.test(sol) && /one possible comparison/.test(sol) && !/fairer comparison/.test(ALLTXT) && !/may differ before the tariff/.test(ALLTXT), "selection: different levels are fine; parallel trends needs evidence; later joiners are one possible comparison"); }
+// the rerun's order: the dependency that fixes it is stated (Codex review #4)
+ok(/Each step needs the one before it/.test(task("steps").prompt) && /which runs in that environment/.test(task("steps").items.find(x => x[0] === "data")[1]) && /environment comes first/.test(task("steps").solution), "the order task states why the environment comes before the data");
+// no written point asks for manufactured defects (Codex review #9); the qualitative route and a result near zero (#8)
+ok(!written.some(t => t.points.some(p => /^At least (one|two)\b/.test(p))) && !D.criteria.some(c => c.levels.some(l => /^At least (one|two)\b|at least one change to the analysis/.test(l))), "no point or criterion demands a count of concerns, changes or moved levels");
+{ const r = task("mine-rerun").points.join(" "); ok(/audit trail/.test(r) && /what would count as the same finding/.test(r) && /in the result's units when that value is zero or near it/.test(r) && /coding decisions documented/.test(r), "the rerun's points: a qualitative route, and an absolute difference near zero"); }
+ok(/tick it if you declined none/.test(task("mine-response").points[3]) && /if none could/.test(task("mine-revision").points[3]) && /if the reviewer found none/.test(task("mine-review").points[1]), "points that may not apply say how to tick them");
+// the text budget (Codex review #11): prompts at most 35 words; the number task's prompt and tolerance note at most 40
+{ const nw = t => t.replace(/\[\[[a-z0-9-]+\|([^\]]+)\]\]/g, "$1").split(/\s+/).filter(Boolean).length;
+  ok(T.every(t => nw(t.prompt) <= 35), "every prompt is at most 35 words: " + T.filter(t => nw(t.prompt) > 35).map(t => t.id + " " + nw(t.prompt)).join(", "));
+  ok(nw(task("gap").prompt + " " + task("gap").tolNote) <= 40, "the number task's prompt and tolerance note: " + nw(task("gap").prompt + " " + task("gap").tolNote) + " words");
+  ok(written.every(t => t.points.every(p => nw(p) <= 35)), "every written point is at most 35 words"); }
 // the worked exemplars are well formed
 ["review", "response", "revision"].forEach(k => {
   const o = M.exOpts(D, k);
@@ -132,7 +164,16 @@ ok(D.worked.revision.answers.map(a => a.level).join() === "Proficient,Strong" &&
   ok(/so this attempt is practice and gets no level/.test(M.describe(D, LL)) && /counted as practice \(not right, no points\): 11 tasks/.test(M.describe(D, Object.assign({}, LL, { assisted: null }))), "the results sentence says why");
   ok(/your review of the co-op proposal 4 of 4; your mock review 4 of 4; your response 4 of 4; your revision 4 of 4; your rerun 4 of 4\./.test(M.describe(D, M.level(D, st(7, 4)))), "the results sentence names each written task's points");
   ok(/yes \(the worked solution\)/.test(M.summary(Object.assign({ solOpen: "2026-11-07T10:00:00.000Z" }, D), late, {})), "the copied summary marks late answers");
-  ok(/^Learn · CK-R results \(ck-r v1 \(7 Nov 2026\)\)\n/.test(M.summary(D, st(7, 4), { width: 375 })) && /Your text, your mock review: text/.test(M.summary(D, st(7, 4), {})), "the copied summary's first line, and the reader's texts in it");
+  ok(/^Learn · CK-R results \(ck-r v1 \(7 Nov 2026\)\)\n/.test(M.summary(D, st(7, 4), { width: 375 })) && /\nYour text, your mock review:\n  text\n/.test(M.summary(D, st(7, 4), {})), "the copied summary's first line, and the reader's texts in it");
+  // every written text whole, its lines kept (Codex review #12)
+  const long = st(7, 4), body = ["Major 1 · Method fit: " + "word ".repeat(400).trim(), "", "Major 2 · Framing: whose peak?"].join("\n"); long.tasks["mine-review"].answer = body;
+  const sm = M.summary(D, long, {});
+  ok(sm.includes("  Major 1 · Method fit: " + "word ".repeat(400).trim() + "\n  \n  Major 2 · Framing: whose peak?") && body.length > 1500, "the copied summary keeps a " + body.length + "-character review whole, line by line");
+  // task 1 first, backed by the level rule: a review submitted after a marked task was answered earns no points
+  const rv = st(7, 4); T.forEach(t => { rv.tasks[t.id].at = t.id === "review" ? "2026-11-07T10:10:00.000Z" : "2026-11-07T10:00:00.000Z"; });
+  const LR = M.level(D, rv);
+  ok(M.reviewAfter(D, rv) && LR.points[0] === 0 && LR.level === "Developing" && /Task 1 was submitted after a marked task was answered, so its points do not count/.test(M.describe(D, LR)), "a review written after the marked tasks: no points, said why (" + LR.level + ")");
+  ok(!M.reviewAfter(D, st(7, 4)) && M.firstDone(st(7, 4)) && !M.firstDone({ tasks: {} }), "the review first (or at the same time): it counts");
 }
 
 // ---------------- the page's own text
@@ -146,7 +187,15 @@ has("Enter your results in the twelve tasks below, in any order. The worked revi
 has("After the worked solution opens: an answer given after that counts as practice, not as right, and a written task then earns no points.", "the late-answer rule, before the tasks");
 has("Opens once all twelve tasks are answered.", "the lock box");
 ok(/gateAll: true, late: "practice"/.test(JS) && !/submitTask/.test(JS.slice(JS.indexOf("LX.Checkpoint(live"))), "the runner: gateAll and the late-answer rule, no submit task");
-has("The co-op, its farms and every number here are fictional (illustrative).", "the fictional label on the study");
+has("The co-op, its farms and every number here are fictional: the results are assumed example outputs, not computed from data.", "the fictional label on the study");
+has("Task 1 first: the seven marked tasks open once your review is submitted, and it then stays as written.", "task 1 first, said before the tasks");
+has("The level is not the table's: it comes from this rule.", "the level against the criterion table, said before the tasks (Codex review #3)");
+has("Not the table's Strong: this level needs no second person.", "the level against the criterion table, in the rubric section");
+ok(D.intro.some(x => /^Task 1 first: the seven marked tasks open once your review/.test(x)), "the runner's intro says task 1 comes first");
+{ const st = M.staticTasks(D); ok((st.match(/<details class="ckr-later">/g) || []).length === 7 && /Write task 1, your review, before you open the marked tasks/.test(st), "without JavaScript, the seven marked tasks are folded until after task 1");
+  ok(/<p class="lx-hint">Within 2% of the value/.test(st), "the tolerance note is its own line"); }
+ok(/data-term="difference-in-differences"/.test(M.staticStudy(D)) && /data-term="time-of-use-tariff"/.test(M.staticStudy(D)) && ["clean-clone", "lock-file", "checksum", "confidence-interval"].every(k => PAGE.includes('data-term="' + k + '"')), "terms at first use: the study card's, and the tasks' words (Codex review #10)");
+ok(/<b>Reproducibility:<\/b>/.test(PAGE) && /<b>Replicability:<\/b>/.test(PAGE), "the National Academies' two definitions in rows of their own");
 ok(OWN.includes('href="cr-your-own-study.html"'), "the page links the research capstone it defends");
 // the rubric: the course's words, never reworded
 {
@@ -173,6 +222,7 @@ ok(OWN.includes('href="cr-your-own-study.html"'), "the page links the research c
   ok(P.E.LX.store.get(M.KEY + "-sol-open", null) && P.E.body.querySelector("#ckr-solution-body").classList.contains("is-open"), "the solution demo opens the worked solution through the runner, recorded");
   await gateSequence();
   await earlySequence();
+  await firstSequence();
   finish();
 })().catch(err => { ok(false, "the stub page test threw: " + (err && err.stack || err)); finish(); });
 
@@ -180,6 +230,7 @@ function mountFresh() {
   const { env, load, El } = require("./stubdom.js");
   if (!El.prototype.getBoundingClientRect) El.prototype.getBoundingClientRect = () => ({ top: 0, left: 0, width: 0, height: 0, bottom: 0, right: 0 });
   const E = env(); E.LX.ready = () => {}; E.LX.reduced = () => true; E.window.innerWidth = 1280;
+  const subs = {}; E.LX.on = (ev, f) => { (subs[ev] = subs[ev] || []).push(f); }; E.LX.emit = (ev, x) => (subs[ev] || []).forEach(f => f(x));   // as core.js
   ["checkpoint", "rubric", "exemplars"].forEach(n => load(n, E));
   let init = null, demo = null; E.LX.mount = (slug, f) => { if (slug === ID) init = f; }; E.LX.demo = (root, fn) => { demo = fn; return () => null; };
   const lock = E.LX.H("div", { id: "ckr-lock", hidden: "" }, E.body); E.LX.H("button", { type: "button" }, lock);
@@ -211,7 +262,7 @@ function mountFresh() {
       live.querySelectorAll(".lx-ck-points input").forEach(cb => { cb.checked = true; cb.fire("change"); }); }
   };
   const level = () => { goTo(D.tasks.length - 1); btn(/See my results/).click(); return text(live.querySelector(".lx-ck-level").textContent); };
-  return { E, live, answer, level, threw, demo, cr };
+  return { E, live, answer, level, threw, demo, cr, goTo, btn };
 }
 function sleep(ms) { return new Promise(res => setTimeout(res, ms)); }
 // gateAll on the real runner: task 12 first opens nothing; eleven answers leave it shut; the twelfth opens it
@@ -239,6 +290,29 @@ async function earlySequence() {
   for (let i = 1; i < 12; i++) P.answer(i);
   const lv = P.level();
   ok(lv === "Level: Practice (no level)", "runner: opened early: practice: " + lv);
+}
+
+// task 1 first (Codex review #1): before task 1 is submitted, every marked task shows a notice and no answers; tasks 6, 7, 8
+// and 12 are open; once task 1 is submitted its text is read-only, and the marked tasks open
+async function firstSequence() {
+  const P = mountFresh(), q = () => P.live.querySelector(".lx-ck-q").textContent;
+  P.goTo(1);
+  ok(/opens once task 1/.test(q()) && !P.live.querySelector(".lx-choice") && !P.live.querySelector(".lx-ck-sol") && !P.live.querySelector("button.lx-link") && /Task 1 first\./.test(text(P.live.textContent)) && !/Which concern/.test(text(P.live.textContent)),
+    "runner: task 2 before task 1: a notice instead of its question, no answers, no solution");
+  const shut = D.tasks.map((t, i) => { P.goTo(i); return /opens once task 1/.test(q()); });
+  ok(shut.every((x, i) => x === M.isAuto(D.tasks[i])), "runner: the seven marked tasks are shut, the five written ones open: " + shut.map(x => x ? "shut" : "open").join(" "));
+  P.goTo(4); P.btn(/^Go to task 1$/).click();
+  ok(/^Task 1 of 12/.test(P.live.querySelector(".lx-ck-tag").textContent), "runner: 'Go to task 1' goes there");
+  ok(!P.E.LX.store.get(M.KEY, {}).tasks.rank || P.E.LX.store.get(M.KEY, {}).tasks.rank.first == null, "runner: a shut task records no answer");
+  P.answer(0);
+  const ta = () => P.live.querySelector("textarea");
+  ok(ta().hasAttribute("readonly") && !P.btn(/^Submit my explanation$/) && /stays as you wrote it/.test(text(P.live.textContent)), "runner: once submitted, task 1's text is read-only, with no Submit button");
+  P.goTo(1);
+  ok(!/opens once task 1/.test(q()) && P.live.querySelectorAll(".lx-choice").length === 4, "runner: after task 1, task 2 shows its question and answers");
+  P.goTo(0);
+  ok(ta().hasAttribute("readonly") && !P.btn(/^Submit my explanation$/) && P.live.querySelectorAll(".lx-ck-points input").length === 4, "runner: back on task 1, the text stays read-only and the points can still be ticked");
+  for (let i = 1; i < 12; i++) P.answer(i);
+  ok(P.level() === "Level: Strong", "runner: task 1 first, then the rest: Strong");
 }
 
 function finish() {

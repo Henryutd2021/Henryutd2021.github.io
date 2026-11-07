@@ -5,6 +5,12 @@
   "lesson": "K8",
   "href": "k08-git-notebooks.html"
  },
+ "confidence-interval": {
+  "term": "95% confidence interval",
+  "short": "A range worked out from the data by a method that, over many repeated samples, would contain the true value 95 times in 100.",
+  "lesson": "M14",
+  "href": "m14-did-it-work.html"
+ },
  "absolute-reference": {
   "term": "Absolute reference",
   "short": "A spreadsheet address with $ signs, such as $E$1, that stays the same when a formula is copied to other cells.",
@@ -436,6 +442,12 @@
   "short": "A switch that opens by itself when it senses a fault, cutting the power to everything beyond it, and can be closed again.",
   "lesson": "F6",
   "href": "f06-grid-and-outages.html"
+ },
+ "clean-clone": {
+  "term": "Clean clone",
+  "short": "A fresh clone of a repository into a new, empty folder, run with only what the repository holds, so that no file left on your own machine can change the result.",
+  "lesson": "K8",
+  "href": "k08-git-notebooks.html"
  },
  "clean-energy-standard": {
   "term": "Clean-energy standard",
@@ -1912,6 +1924,12 @@
   "short": "The extra cost per megawatt-hour of serving a small increase in demand at one place on the grid in one interval, given the plants running and the limits of the lines.",
   "lesson": "M1",
   "href": "m01-dispatch-to-lmp.html"
+ },
+ "lock-file": {
+  "term": "Lock file",
+  "short": "A file in a repository that pins the exact version of every package the code uses, so the same environment can be built again.",
+  "lesson": "K8",
+  "href": "k08-git-notebooks.html"
  },
  "lock-in": {
   "term": "Lock-in",

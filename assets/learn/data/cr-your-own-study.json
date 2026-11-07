@@ -1,19 +1,19 @@
 {
   "meta": {
     "lesson": "CR, the research capstone (curriculum v2 §7.9, §11.2, §3.1, §3.4), wave W7, builder learn-w7-b, 7 November 2026",
-    "note": "The hours are the curriculum's planning ranges (20 to 40 hours for the study, CK-R's four among them), not measurements. The exemplar studies (a co-op feeder, Prairie City's weatherization programme, a co-op's community solar, the Plains Grid in a heat wave) and their numbers are fictional and illustrative. Method families: the ids of R3's data file (r03-system-and-method.json), whose labels the page reads. Read by assets/learn/cr-your-own-study.js; the page's static blocks are written from this file by node _tests/learn/test_cr-your-own-study.js --write."
+    "note": "The hours are the curriculum's planning ranges (20 to 40 hours for the study, CK-R's four among them), not measurements. The exemplar studies (a co-op feeder, Prairie City's weatherization programme, a co-op's community solar, the Plains Grid in a heat wave) and their numbers are fictional and illustrative: assumed, not computed, except the cost and CO₂ fragment, whose arithmetic the page shows and the test redoes. Method families: the ids of R3's data file (r03-system-and-method.json), whose labels the page reads. Read by assets/learn/cr-your-own-study.js; the page's static blocks are written from this file by node _tests/learn/test_cr-your-own-study.js --write."
   },
   "version": "cr v1 (7 Nov 2026)",
   "families": ["opt", "sim", "stat", "ml", "sd", "abm", "eq", "qual", "mixed"],
   "tracks": [
     { "id": "model", "label": "Model-based", "short": "optimization or simulation",
       "builds": "A model of the system that answers what to do, or what would happen.", "types": "Prescriptive, predictive or explanatory",
-      "lessons": ["M1", "M3", "B3"], "trust": "Reruns from a clean clone; checked against a hand calculation or a published benchmark, and validated against real data.",
+      "lessons": ["M1", "M3", "B3"], "trust": "Reruns from a [[clean-clone|clean clone]]; checked against a hand calculation or a published benchmark, and validated against real data.",
       "family": "opt", "fits": ["opt", "sim", "sd", "abm", "eq"],
       "hours": { "question": [1, 2], "literature": [4, 6], "method": [1, 2], "data": [1, 3], "build": [3, 10], "uncertainty": [1, 3], "review": [4, 4], "communicate": [4, 8], "integrity": [1, 2] } },
-    { "id": "empirical", "label": "Empirical", "short": "data analysis, or replication of a published result",
-      "builds": "An analysis of observed data, or a rerun of a published study with its data.", "types": "Descriptive, explanatory, evaluative or predictive",
-      "lessons": ["B2", "M14", "R4"], "trust": "Reruns from a clean clone, raw data to result; a replication reports how close it came to the published number.",
+    { "id": "empirical", "label": "Empirical", "short": "data analysis, or a reproduction or replication of a published result",
+      "builds": "An analysis of observed data; or a published result rerun with its own data and code (a computational reproduction), or tested on new data (a replication).", "types": "Descriptive, explanatory, evaluative or predictive",
+      "lessons": ["B2", "M14", "R4"], "trust": "Reruns from a clean clone, raw data to result; a reproduction or a replication reports how close it came to the published number.",
       "family": "stat", "fits": ["stat", "ml"],
       "hours": { "question": [1, 2], "literature": [4, 6], "method": [1, 2], "data": [3, 8], "build": [2, 7], "uncertainty": [1, 3], "review": [4, 4], "communicate": [3, 6], "integrity": [1, 2] } },
     { "id": "mixed", "label": "Mixed", "short": "a model or data analysis with a stakeholder or qualitative part",
@@ -23,24 +23,24 @@
       "hours": { "question": [1, 2], "literature": [4, 6], "method": [1, 2], "data": [2, 6], "build": [2, 7], "uncertainty": [1, 3], "review": [4, 4], "communicate": [3, 6], "integrity": [2, 4] } }
   ],
   "stages": [
-    { "id": "question", "label": "Question", "does": "Turn your question card into a question you can answer at your scale, with its boundary.",
-      "done": "Your card passes its eight checks, and you can say what answer would change your audience's decision.", "lessons": ["R1", "R10", "R3"], "comps": ["framing"] },
-    { "id": "literature", "label": "Literature", "does": "Search open databases, snowball from a review, and map what is known.",
-      "done": "A concept matrix of at least 12 sources, and a gap stated with evidence: a search a reviewer can repeat.", "lessons": ["R2"], "comps": ["positioning"] },
-    { "id": "method", "label": "Method", "does": "Choose a method family and defend it against two alternatives; then write the one-page proposal.",
-      "done": "The method defended against two alternatives, one from another family. Milestone: the proposal.", "lessons": ["R3"], "route": "lab", "comps": ["method"], "milestone": "the one-page proposal" },
+    { "id": "question", "label": "Question", "does": "Turn your question card into one you can answer at your scale, with its boundary.",
+      "done": ["Your card passes its eight checks.", "You can say what answer would change your audience's decision."], "lessons": ["R1", "R10", "R3"], "comps": ["framing"] },
+    { "id": "literature", "label": "Literature", "does": "Search open databases, [[snowballing|snowball]] from a review, and map what is known.",
+      "done": ["A [[concept-matrix|concept matrix]] of at least 12 sources.", "A gap stated with evidence, from a search a reviewer can repeat."], "lessons": ["R2"], "comps": ["positioning"] },
+    { "id": "method", "label": "Method", "does": "Choose a method family, defend it, and write the one-page proposal.",
+      "done": ["The method defended against two alternatives, one from another family.", "Milestone: the proposal."], "lessons": ["R3"], "route": "lab", "comps": ["method"], "milestone": "the one-page proposal" },
     { "id": "data", "label": "Data", "does": "Get, clean and document your data, or plan and hold your interviews.",
-      "done": "A data note: each source with its date and licence, and a cleaning log; for interviews, consent forms and a guide.", "lessons": ["R4", "B2"], "comps": ["trust", "realism"] },
+      "done": ["A data note: each source with its date and licence.", "A cleaning log; for interviews, consent forms and a guide."], "lessons": ["R4", "B2"], "comps": ["trust", "realism"] },
     { "id": "build", "label": "Build and validate", "does": "Build the model or analysis under version control, verify it, and validate one result.",
-      "done": "It reruns from a clean clone (or a complete audit trail); a verification log; one validation against real data or an independent reference.", "lessons": ["R5", "CK-M", "K8"], "route": "lab", "comps": ["trust"] },
+      "done": ["It reruns from a [[clean-clone|clean clone]] (or a complete audit trail).", "A verification log.", "One validation against real data or an independent reference."], "lessons": ["R5", "CK-M", "K8"], "route": "lab", "comps": ["trust"] },
     { "id": "uncertainty", "label": "Uncertainty and accounting", "does": "Classify the uncertainties, treat each one, and put cost and carbon on one boundary.",
-      "done": "Uncertainties classified; scenarios or a global sensitivity analysis; results as ranges; cost and emissions on one boundary where you report both.", "lessons": ["R6", "R7", "M7", "M8"], "comps": ["uncertainty", "accounting"] },
-    { "id": "review", "label": "Mock review and rerun", "does": "Defend your question and method in a written mock review, answer it, revise, and rerun your main result.",
-      "done": "Every major concern answered, a change log, and a clean-clone rerun within your tolerance or the difference explained.", "lessons": ["CK-R"], "comps": ["framing", "method", "trust"], "milestone": "CK-R" },
+      "done": ["Uncertainties classified.", "Scenarios or a global sensitivity analysis; results as ranges.", "Cost and emissions on one boundary where you report both."], "lessons": ["R6", "R7", "M7", "M8"], "comps": ["uncertainty", "accounting"] },
+    { "id": "review", "label": "Mock review and rerun", "does": "Get a written mock review of your question and method, answer it, revise, and rerun your main result.",
+      "done": ["Every major concern answered.", "A change log.", "A clean-clone rerun within your tolerance, or the difference explained."], "lessons": ["CK-R"], "comps": ["framing", "method", "trust"], "milestone": "CK-R" },
     { "id": "communicate", "label": "Paper and poster", "does": "Write the paper and the poster, with each result's limits beside it.",
-      "done": "A six-page paper with one key figure, a limits paragraph and a 150-word public summary; a poster.", "lessons": ["R8"], "route": "cap", "comps": ["communication", "realism"], "milestone": "the paper and the poster" },
-    { "id": "integrity", "label": "Integrity and release", "does": "Check licences, credit and conflicts, treat the people your study is about fairly, and release what you may.",
-      "done": "Licences checked, credit and conflicts stated, the people the study is about treated fairly; data and code released with documentation where allowed; your rubric sheet.", "lessons": ["R9"], "comps": ["integrity"], "milestone": "the rubric sheet" }
+      "done": ["A six-page paper with one key figure.", "A limits paragraph and a 150-word public summary.", "A poster."], "lessons": ["R8"], "route": "cap", "comps": ["communication", "realism"], "milestone": "the paper and the poster" },
+    { "id": "integrity", "label": "Integrity and release", "does": "Check licences, credit and conflicts; treat the people your study is about fairly; release what you may.",
+      "done": ["Licences checked; credit and conflicts stated.", "The people the study is about treated fairly.", "Data and code released with documentation where allowed.", "Your rubric sheet."], "lessons": ["R9"], "comps": ["integrity"], "milestone": "the rubric sheet" }
   ],
   "routes": {
     "S0": { "name": "device and plant", "lab": "M4", "cap": "C0" },
@@ -51,12 +51,18 @@
   },
   "prereqs": ["R10", "R2", "R5", "R6", "R7", "R8", "R9", "CK-M"],
   "uncertainty": [
-    { "id": "scen", "label": "Scenarios", "line": "Scenarios for the uncertainties classified as scenario or deep, each result reported per scenario.", "ok": true },
-    { "id": "gsa", "label": "Global sensitivity analysis", "line": "A global sensitivity analysis, every uncertain input varied together, results as ranges.", "ok": true },
-    { "id": "mc", "label": "Monte Carlo", "line": "Monte Carlo over the inputs classified as parameter uncertainty, varied together, results as ranges.", "ok": true },
-    { "id": "stoch", "label": "Stochastic or robust optimization", "line": "Stochastic or robust optimization over stated scenarios, with the plan's cost in each.", "ok": true },
-    { "id": "ci", "label": "Intervals and robustness checks", "line": "Confidence intervals, and the main estimate rerun under other reasonable specifications.", "ok": true },
-    { "id": "tri", "label": "Triangulation", "line": "Triangulation: each qualitative finding checked against a second source or method.", "ok": true },
+    { "id": "scen", "label": "Scenarios", "line": "Scenarios for the uncertainties classified as scenario or deep, each result reported per scenario.", "ok": true,
+      "fits": ["opt", "sim", "stat", "ml", "sd", "abm", "eq", "qual", "mixed"] },
+    { "id": "gsa", "label": "Global sensitivity analysis", "line": "A global sensitivity analysis, every uncertain input varied together, results as ranges.", "ok": true,
+      "fits": ["opt", "sim", "ml", "sd", "abm", "eq", "mixed"] },
+    { "id": "mc", "label": "Monte Carlo", "line": "Monte Carlo over the inputs classified as parameter uncertainty, varied together, results as ranges.", "ok": true,
+      "fits": ["opt", "sim", "stat", "ml", "sd", "abm", "eq", "mixed"] },
+    { "id": "stoch", "label": "Stochastic or robust optimization", "line": "Stochastic or robust optimization over stated scenarios, with the plan's cost in each.", "ok": true,
+      "fits": ["opt", "mixed"] },
+    { "id": "ci", "label": "Intervals and robustness checks", "line": "Confidence intervals, and the main estimate rerun under other reasonable specifications.", "ok": true,
+      "fits": ["stat", "ml", "mixed"] },
+    { "id": "tri", "label": "Triangulation", "line": "Triangulation: each qualitative finding checked against a second source or method.", "ok": true,
+      "fits": ["qual", "mixed"] },
     { "id": "oat", "label": "One input at a time", "line": "One input swung at a time, the others at their base values.", "ok": false,
       "why": "Swings one at a time miss interactions; the rubric's Proficient level asks for scenarios or a global sensitivity analysis." }
   ],
@@ -68,15 +74,15 @@
   "fields": [
     { "key": "why", "label": "Why it matters", "hint": "Who would act on the answer, and what answer would change their decision.", "rows": 2, "need": true, "at": "top", "min": 10 },
     { "key": "known", "label": "What is known, and the gap", "hint": "The three closest studies and what none of them answers; the size of your concept matrix and the date of your search (R2).", "rows": 3, "need": true, "min": 15 },
-    { "key": "method", "label": "Why this method, not the alternatives", "hint": "What your method answers that the two alternatives cannot, and one limit you will mitigate (R3).", "rows": 3, "need": true, "min": 15 },
+    { "key": "method", "label": "Why this method, not the alternatives", "hint": "What your method answers that the two alternatives cannot (name a same-family one exactly), and one limit you will mitigate (R3).", "rows": 3, "need": true, "min": 15 },
     { "key": "data", "label": "Data and licences", "hint": "Each source, its date and its licence; for interviews, who you will ask and how you will ask for consent (R4, R9).", "rows": 2, "need": true, "min": 8 },
     { "key": "check", "label": "How you will check it", "hint": "One verification check, one validation against real data or an independent reference, and the tolerance you set now (R5).", "rows": 2, "need": true, "min": 10 },
     { "key": "leaves", "label": "What the study leaves out", "hint": "The parts, people and years outside your boundary, and why that does not change the answer to your question.", "rows": 2, "need": true, "min": 8 },
     { "key": "integrity", "label": "Integrity", "hint": "Credit, conflicts, consent, and who the study affects (R9).", "rows": 2, "need": true, "min": 8 }
   ],
   "studies": {
-    "feeder": "A co-op's farm feeder: how much battery, and which tariff, keep the summer evening peak under the feeder's limit at least cost (model-based, prescriptive, S1)",
-    "weather": "Prairie City's 2023 weatherization programme: did weatherized homes use less gas than homes on its waiting list (empirical, evaluative, S3)",
+    "feeder": "A co-op's farm [[feeder|feeder]]: how much battery, and which tariff, keep the summer evening peak under the feeder's limit at least cost (model-based, prescriptive, S1)",
+    "weather": "Prairie City's 2023 [[weatherization|weatherization]] programme: did weatherized homes use less gas than homes on its waiting list (empirical, evaluative, S3)",
     "solar": "A co-op's community solar: why some farms joined and others did not, from sign-up records and 12 interviews (mixed, explanatory, S1)",
     "heat": "The Plains Grid in a five-day heat wave: how often the reserve falls short with more air conditioning (model-based, predictive, S2)"
   },
@@ -106,7 +112,7 @@
       "answers": [
         { "key": "weak", "label": "Weak", "level": "Developing", "parts": ["Method: ", { "text": "optimization, because I used it in M2.", "note": "Chosen by habit." }] },
         { "key": "good", "label": "Strong", "level": "Strong", "parts": [
-          "Method: ", { "text": "a linear program of the feeder's summer evenings: the question asks what to do, under stated rules.", "note": "The family fits the question's type (prescriptive)." },
+          "Method: ", { "text": "a linear program of the feeder's summer evenings: the question asks what to do, under stated rules.", "note": "The family fits the question's type (prescriptive); a [[linear-program|linear program]] is one kind of optimization." },
           "\nAgainst simulation: ", { "text": "it tests the designs it is given, but does not search for the cheapest.", "note": "One alternative, and why not." },
           "\nAgainst agent-based modelling: ", { "text": "it would capture how members respond, but needs behaviour data the co-op does not have.", "note": "A second alternative, from another family." },
           "\nLimit: ", { "text": "perfect foresight flatters the battery; I rerun with a day-ahead forecast.", "note": "A limit of the chosen method, stated and partly mitigated ([[perfect-foresight|perfect foresight]])." }
@@ -119,7 +125,7 @@
           "Balance: ", { "text": "holds in every hour (largest error 0.000 kW).", "note": "A verification check, named, with its result." },
           "\nBenchmark: ", { "text": "with no battery, the bill equals the hand calculation to the cent.", "note": "An independent reference, worked by hand." },
           "\nValidation: ", { "text": "the feeder's metered 2025 evening peak, 2.81 MW, against the model's 2.76 MW: 1.8% low, inside the 5% set beforehand.", "note": "Real data, with a tolerance set before looking." },
-          "\nRerun: ", { "text": "from a clean clone, the same result.", "note": "Reproducible from the repository alone. Strong would add a rerun by someone else." }
+          "\nRerun: ", { "text": "from a clean clone, the same result.", "note": "Reproducible from the repository alone ([[clean-clone|clean clone]]). Strong would add a rerun by someone else." }
         ] }
       ] },
     { "comp": "uncertainty", "stage": "uncertainty", "study": "heat", "title": "Uncertainty: the result", "task": "Report the main result.", "lines": true,
@@ -128,15 +134,16 @@
         { "key": "good", "label": "Proficient", "level": "Proficient", "parts": [
           "Result: ", { "text": "in 90% of 1,000 Monte Carlo runs the reserve falls short in 1 to 9 hours of the heat wave, against 0 to 2 hours with today's air conditioning.", "note": "A range, how it was made, and what it is compared with." },
           "\nDrivers: ", { "text": "air-conditioning growth moves it most, then the gas fleet's outage rate.", "note": "The uncertainties that matter, ranked. Strong would add what knowing them better is worth to the decision." },
-          "\nKept apart: ", { "text": "a heat wave hotter than any on record is a scenario, not a draw.", "note": "[[deep-uncertainty|Deep uncertainty]] kept out of the probabilities." }
+          "\nKept apart: ", { "text": "we treat a heat wave hotter than any on record as a stress scenario, because we cannot defend a probability for it.", "note": "[[deep-uncertainty|Deep uncertainty]] kept out of the probabilities: the evidence, not the record alone, decides it." }
         ] }
       ] },
     { "comp": "accounting", "stage": "uncertainty", "study": "feeder", "title": "Consistent accounting: cost and carbon", "task": "Report cost and CO₂.", "lines": true,
       "answers": [
         { "key": "weak", "label": "Weak", "level": "Developing", "parts": ["Result: ", { "text": "the battery saves money and cuts emissions a lot.", "note": "Whose money, on what boundary, against what?" }] },
         { "key": "good", "label": "Proficient", "level": "Proficient", "parts": [
-          "Cost: ", { "text": "the co-op's yearly cost falls $90,000 against no battery: its power bill less the battery's annualized cost, in 2025 dollars.", "note": "Whose money, against what, in which dollars." },
-          "\nCO₂: ", { "text": "120 t a year less, location-based, on the same boundary: the co-op's purchases.", "note": "One boundary for cost and carbon; the emissions question named ([[location-based|location-based]])." },
+          "Cost: ", { "text": "against no battery, the co-op's power bill falls $250,000 a year; less the battery's annualized cost, $160,000, its yearly cost falls $90,000 (2025 dollars).", "note": "Whose money, against what, in which dollars: the bill's fall less the battery's yearly cost." },
+          "\nCO₂: ", { "text": "120 t a year less, location-based with the grid's hourly average factors, on the same boundary: the co-op's purchases.", "note": "One boundary for cost and carbon; the emissions question named ([[location-based|location-based]])." },
+          "\nHow: ", { "text": "it buys 2,000 MWh at night (0.39 t CO₂ per MWh) to deliver 1,800 MWh in the evening (0.50 t per MWh): 1,800 × 0.50 − 2,000 × 0.39 = 900 − 780 = 120 t.", "note": "The arithmetic, its 10% losses included. With one yearly factor for every hour, the 200 MWh lost would add CO₂ instead." },
           "\nWho: ", { "text": "members pay for the battery through rates; farms on the feeder gain most.", "note": "Who pays and who benefits, named." }
         ] }
       ] },

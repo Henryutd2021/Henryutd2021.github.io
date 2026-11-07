@@ -12,13 +12,17 @@
 // The worked solution (gated with the shared runner's gateAll; the shared late-answer rule) is the annotated example the
 // curriculum names: a review, a response and a revision of the fictional study, with what moved it from Proficient to
 // Strong (LX.Exemplars), the rerun worked through, and the seven marked answers.
+// Task 1 first (Codex review #1): the seven marked tasks are all on the co-op study, and their questions and feedback name
+// concerns task 1's review should find for itself. Until task 1 is submitted, each shows a notice in place of its question
+// (the view's guard, on the runner's "layout" event); once submitted, task 1's text stays as written. The level rule
+// backs this up: a review submitted after a marked task was answered earns no points (reviewAfter).
 //
 // Data: assets/learn/data/ck-r-defend-revise.json. Pure part (exported for _tests/learn/test_ck-r-defend-revise.js):
-// level, describe, summary, runnerData, exOpts and the page's static blocks (staticStudy, staticForms, staticTasks,
-// staticSolution, staticCriteria), RUBRIC, KEY, CODE, after, checkNumeric.
+// level, describe, summary, runnerData, exOpts, reviewAfter, firstDone and the page's static blocks (staticStudy,
+// staticForms, staticTasks, staticSolution, staticCriteria), KEY, CODE, FIRST, after, checkNumeric.
 (function () {
   "use strict";
-  var CODE = "CK-R", KEY = "ckr-v1", ID = "ck-r-defend-revise";
+  var CODE = "CK-R", KEY = "ckr-v1", ID = "ck-r-defend-revise", FIRST = "review";
 
   // ---------------------------------------------------------------- pure part
   var CPK = (typeof window !== "undefined" && window.LX && window.LX.Checkpoint) || require("./components/checkpoint.js");
@@ -31,6 +35,14 @@
   // late-answer rule (the answer that opened it, the last of all, is not late)
   function after(D, st, t) { return CPK.lateAnswer(st.tasks[t.id], D.solOpen); }
   function firstRight(st, t, D) { return CPK.firstRight(st.tasks[t.id], "not-right") && !(D && after(D, st, t)); }
+  // task 1 (the independent review of the co-op proposal) submitted: the seven marked tasks open then
+  function firstDone(st) { var r = st.tasks[FIRST]; return !!(r && r.answer); }
+  // task 1 submitted after one of the marked tasks was answered (the page's guard prevents it; a stored attempt from
+  // elsewhere could still show it): its points do not count
+  function reviewAfter(D, st) {
+    var r = st.tasks[FIRST]; if (!r || !r.at) return false;
+    return D.tasks.some(function (t) { var x = st.tasks[t.id]; return isAuto(t) && !!(x && x.at && x.at < r.at); });
+  }
   // practice: the worked solution was open before every task was answered (this attempt's lock button or demo, recorded
   // as st.solEarly; or an earlier attempt in this browser)
   function assisted(D, st) {
@@ -45,7 +57,8 @@
   function level(D, st) {
     var R = D.rule, auto = D.tasks.filter(isAuto), opens = D.tasks.filter(isOpen);
     var k = auto.filter(function (t) { return firstRight(st, t, D); }).length;
-    var pts = opens.map(function (t) { return after(D, st, t) ? 0 : points(st, t); }), of = opens.map(function (t) { return t.points.length; });
+    var rAfter = reviewAfter(D, st);
+    var pts = opens.map(function (t) { return after(D, st, t) || (t.id === FIRST && rAfter) ? 0 : points(st, t); }), of = opens.map(function (t) { return t.points.length; });
     var late = D.tasks.filter(function (t) { return after(D, st, t); }).length, help = assisted(D, st);
     var complete = auto.every(function (t) { return st.tasks[t.id] && st.tasks[t.id].first != null; }) && opens.every(function (t) { return st.tasks[t.id] && st.tasks[t.id].answer; });
     var early = auto.filter(function (t) { return st.tasks[t.id] && st.tasks[t.id].solFirst && !after(D, st, t); }).length;
@@ -56,7 +69,7 @@
     else if (k >= R.autoProficient && enough) lv = R.levels[2];
     else if (k >= R.autoDeveloping) lv = R.levels[1];
     return { level: lv, auto: k, autoOf: auto.length, points: pts, pointsOf: of, written: opens.map(function (t) { return t.title; }),
-      complete: complete, early: early, late: late, assisted: help, estMin: -1, explainOk: every };
+      complete: complete, early: early, late: late, assisted: help, estMin: -1, explainOk: every, reviewAfter: rAfter };
   }
   function describe(D, L) {
     if (L.assisted) return (L.assisted === "early" ? "The worked solution was opened before all " + D.tasks.length + " tasks were answered" : "The worked solution had already been open in this browser (an earlier attempt)") +
@@ -64,6 +77,7 @@
     return "Auto-marked tasks right on the first try: " + L.auto + " of " + L.autoOf + (L.early ? " (" + L.early + " with the solution opened first, counted as not right)" : "") +
       (L.late ? ". Answered after the worked solution opened, so counted as practice (not right, no points): " + L.late + " task" + (L.late > 1 ? "s" : "") : "") +
       ". Points counted: " + L.written.map(function (w, i) { return w.charAt(0).toLowerCase() + w.slice(1) + " " + L.points[i] + " of " + L.pointsOf[i]; }).join("; ") + "." +
+      (L.reviewAfter ? " Task 1 was submitted after a marked task was answered, so its points do not count." : "") +
       (L.complete ? "" : " Some tasks are not finished; the level counts them as not right.");
   }
   // the copied summary: keep its format fixed once testers use it
@@ -80,9 +94,13 @@
       var r = st.tasks[t.id] || {}, w = r.first == null ? (r.answer ? "submitted" : "not answered") : isOpen(t) ? points(st, t) + " of " + t.points.length + " points (self)" : r.first ? "right" : "not right";
       lines.push((i + 1) + " | " + t.part + " | " + t.title + " | " + w + " | " + (r.tries || 0) + " | " + CPK.fmtMs(r.msFirst) + " | " + (after(D, st, t) ? "yes (the worked solution)" : r.solFirst ? "yes" : "no"));
     });
+    // the reader's own texts in full, line by line (indented, so a mentor sees where each ends); nothing is cut
     D.tasks.forEach(function (t) {
       var r = st.tasks[t.id]; if (!r || !r.answer) return;
-      if (isOpen(t)) lines.push("Your text, " + t.title.charAt(0).toLowerCase() + t.title.slice(1) + ": " + String(r.answer).replace(/\s+/g, " ").slice(0, 1500));
+      if (isOpen(t)) {
+        lines.push(""); lines.push("Your text, " + t.title.charAt(0).toLowerCase() + t.title.slice(1) + ":");
+        String(r.answer).replace(/\r\n?/g, "\n").split("\n").forEach(function (x) { lines.push("  " + x.replace(/\s+$/, "")); });
+      }
       if (t.kind === "numeric") lines.push("Your number, " + t.title.toLowerCase() + ": " + r.answer.value + " " + r.answer.unit);
     });
     lines.push("");
@@ -105,7 +123,7 @@
   function staticStudy(D) {
     var S = D.study;
     return "<h3>" + esc(S.title) + "</h3>\n<p>" + esc(S.who) + "</p>\n" +
-      '<dl class="ckr-fields">' + S.fields.map(function (f) { return "<div><dt>" + esc(f[0]) + "</dt><dd>" + esc(f[1]) + "</dd></div>"; }).join("") + "</dl>\n" +
+      '<dl class="ckr-fields">' + S.fields.map(function (f) { return "<div><dt>" + esc(f[0]) + "</dt><dd>" + RICH(f[1]) + "</dd></div>"; }).join("") + "</dl>\n" +
       '<p class="lx-hint">' + esc(S.label) + "</p>";
   }
   function formText(f) { return f.lines.join("\n"); }
@@ -116,14 +134,15 @@
     }).join("\n");
   }
   function staticTasks(D) {
-    var h = ['<p class="lx-hint">Without JavaScript nothing here is locked: the worked solution is further down the page. Do the tasks first and keep your answers; the level rule is in the rubric section.</p>', '<ol class="ckr-static">'];
+    var h = ['<p class="lx-hint">Without JavaScript nothing here is locked, and the worked solution is further down the page. Write task 1, your review, before you open the marked tasks: their questions name concerns your review should find. The level rule is in the rubric section.</p>', '<ol class="ckr-static">'];
     D.tasks.forEach(function (t) {
-      var x = "<li><p><b>" + esc(t.title) + '</b> <span class="lx-hint">Part ' + esc(t.part) + " · " + esc(t.skill) + "</span></p><p>" + plain(t.prompt + (t.tolNote ? " " + t.tolNote : "")) + "</p>";
+      var x = "<p>" + plain(t.prompt) + "</p>" + (t.tolNote ? '<p class="lx-hint">' + plain(t.tolNote) + "</p>" : "");
       if (t.kind === "choice") x += "<ul>" + t.options.map(function (o) { return "<li>" + o[0] + ". " + plain(o[1]) + "</li>"; }).join("") + "</ul>";
       if (t.kind === "order") x += "<ul>" + t.start.map(function (k) { return "<li>" + plain(t.items.filter(function (i) { return i[0] === k; })[0][1]) + "</li>"; }).join("") + "</ul><p>Put these in order.</p>";
       if (t.kind === "numeric") x += "<p>Answer with a number and a unit.</p>";
       if (isOpen(t)) x += "<p>Self-rated against " + t.points.length + " points, shown after you submit.</p>";
-      h.push(x + "</li>");
+      if (isAuto(t)) x = '<details class="ckr-later"><summary>Open after task 1, your review</summary>' + x + "</details>";
+      h.push("<li><p><b>" + esc(t.title) + '</b> <span class="lx-hint">Part ' + esc(t.part) + " · " + esc(t.skill) + "</span></p>" + x + "</li>");
     });
     h.push("</ol>");
     return h.join("\n");
@@ -155,7 +174,8 @@
         return '<tr data-c="' + esc(c.id) + '"><th scope="row">' + esc(c.label) + "</th>" + c.levels.map(function (x, i) { return '<td data-l="' + L[i] + '">' + esc(x) + "</td>"; }).join("") + "</tr>";
       }).join("\n") + "\n</tbody>\n</table>";
   }
-  var api = { CODE: CODE, KEY: KEY, ID: ID, level: level, describe: describe, summary: summary, runnerData: runnerData, exOpts: exOpts, after: after,
+  var api = { CODE: CODE, KEY: KEY, ID: ID, FIRST: FIRST, level: level, describe: describe, summary: summary, runnerData: runnerData, exOpts: exOpts, after: after,
+    reviewAfter: reviewAfter, firstDone: firstDone, isAuto: isAuto,
     staticStudy: staticStudy, staticForms: staticForms, staticTasks: staticTasks, staticSolution: staticSolution, staticCriteria: staticCriteria, formText: formText,
     checkNumeric: CPK.checkNumeric, checkOrder: CPK.checkOrder, checkChoice: CPK.checkChoice };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
@@ -182,10 +202,40 @@
   LX.mount(ID, function (live, data, root) {
     var D = data.ck_r_defend_revise, RD = runnerData(D);
     Object.defineProperty(RD, "solOpen", { get: function () { return LX.Checkpoint.solOpened(KEY); } });
-    var cp = LX.Checkpoint(live, { data: RD, key: KEY, code: CODE, lessonId: ID, intro: D.intro,
+    var cp = null;
+    cp = LX.Checkpoint(live, { data: RD, key: KEY, code: CODE, lessonId: ID, intro: D.intro,
       // gateAll: the worked solution opens once all twelve tasks are answered, in any order; late: the shared late-answer
       // rule, which the runner adds to the intro
-      lock: "#ckr-lock", solution: "#ckr-solution-body", gateAll: true, late: "practice", level: level, describe: describe, summary: summary, openFirst: "not-right" });
+      lock: "#ckr-lock", solution: "#ckr-solution-body", gateAll: true, late: "practice", level: level, describe: describe, summary: summary, openFirst: "not-right",
+      // task 1 submitted while on screen: its text stays as written from now on
+      onAnswer: function (id) { if (id === FIRST && cp && firstDone(cp.state())) { var c = live.querySelector(".lx-ck-card"); if (c) keep(c); } } });
+    // ---- task 1 first (Codex review #1). The runner draws one task at a time and then emits "layout"; the guard swaps a
+    // marked task's question, answers and solution for a notice until task 1 is submitted, and keeps task 1's text as
+    // written once it is. Tasks 6, 7, 8 and 12 (the reader's own study) are open throughout.
+    function guard() {
+      var st = cp.state(), t = D.tasks[st.cur], card = live.querySelector(".lx-ck-card"), tag = live.querySelector(".lx-ck-tag");
+      if (!t || !card || !tag || tag.textContent.indexOf("Task " + (st.cur + 1) + " of") !== 0 || card.getAttribute("data-ckr") === t.id) return;
+      card.setAttribute("data-ckr", t.id);
+      if (isAuto(t) && !firstDone(st)) shut(card);
+      else if (t.id === FIRST && firstDone(st)) keep(card);
+    }
+    function shut(card) {
+      var q = card.querySelector(".lx-ck-q"), foot = card.querySelector(".lx-ck-foot");
+      if (q) q.textContent = "This task opens once task 1, your review of the co-op proposal, is submitted.";
+      [".lx-ck-body", ".lx-ck-sol", "button.lx-link"].forEach(function (sel) { var x = card.querySelector(sel); if (x) x.remove(); });
+      H("div", { class: "lx-saw no ckr-gate", html: LX.icon("question") + "<div><b>Task 1 first.</b> The marked tasks name concerns about the co-op proposal, so your review finds its own before you see them. Tasks 6, 7, 8 and 12, on your own study, are open now.</div>" }, card);
+      H("button", { type: "button", class: "lx-btn small", text: "Go to task 1", onclick: function () { cp.show(0); } }, H("div", { class: "lx-ck-row" }, card));
+      if (foot) card.appendChild(foot);
+    }
+    function keep(card) {
+      var ta = card.querySelector("textarea"), sub = Array.prototype.filter.call(card.querySelectorAll("button"), function (b) { return /^Submit/.test(b.textContent); })[0];
+      if (ta) { ta.setAttribute("readonly", ""); ta.readOnly = true; }
+      if (sub && sub.parentNode && !card.querySelector(".ckr-kept")) {
+        H("p", { class: "lx-hint ckr-kept", text: "Submitted: your review stays as you wrote it, before the marked tasks. Tick the points it makes below." }, sub.parentNode);
+        sub.remove();
+      }
+    }
+    LX.on("layout", function () { if (cp) guard(); });
     // the annotated review, response and revision, live (notes to open), inside the gated worked solution
     if (LX.Exemplars) ["review", "response", "revision"].forEach(function (k) {
       var h = document.getElementById("ckr-ex-" + k); if (!h) return;
@@ -199,7 +249,7 @@
         lede: "The three competences this checkpoint shows, in the course's words.", competences: D.rubric });
     }
     LX.demo(root, function (state) {
-      if (state === "mid") { cp.show(1); return { view: "task 2" }; }
+      if (state === "mid") { cp.show(1); return { view: "task 2 (shut until task 1 is submitted)" }; }
       if (state === "done") { cp.results(); return { view: "results" }; }
       // the solution state opens it as the lock's button does, recorded (practice), never silently (CK-A review #1)
       if (state === "solution") { cp.solutionNow(); var s = document.getElementById("solution"); if (s) s.scrollIntoView(); return { view: "solution" }; }
