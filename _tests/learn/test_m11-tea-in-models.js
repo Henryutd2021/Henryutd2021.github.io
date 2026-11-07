@@ -52,20 +52,26 @@ const fm = M.fm, r1 = v => Math.round(v * 10) / 10, r3 = v => Math.round(v * 100
   const base = { boundary: "plant", h: D.hydrogen.price.def, c: D.charge.def, rule: "hourly", e: Y.rate };
   const run = (o, K) => { K = K || K0; const m = M.build(Y, K, D, o), r = solve(m); return { m, r, R: M.read(Y, K, D, o, r), o, K }; };
   const evaluate = (o, K) => { const L2 = M.tierCases(D, { wage: true }, true).map(c => ({ ...c, ...run({ ...o, credit: c.credit, tier: c.tier, window: "right" }, K) })); return { cases: L2, best: M.pick(L2) }; };
-  // the page's evaluation: each case's bound (its uncapped LP in closed form, M.freeObj) orders the tiers and skips any
-  // case that cannot beat the best LP found so far (M.bounded, M.BOUND_MARGIN); "none" is solved only if it would win
+  // the page's evaluation: each case's bound (its uncapped LP in closed form, M.annualBound) orders the tiers and skips any
+  // case that cannot win even at its bound (M.bounded, M.canSkip); "none" is solved only if it could win
   const pruned = (o, K) => {
     K = K || K0;
-    const L2 = M.tierCases(D, { wage: true }, true).map(c => ({ ...c })); let inc = Infinity, n = 0;
+    const L2 = M.tierCases(D, { wage: true }, true).map(c => ({ ...c })); let top = -Infinity, n = 0;
     M.bounded(Y, K, D, o, L2, "right").forEach(c => {
-      if (c.ub >= inc - M.BOUND_MARGIN) { c.skip = true; return; }
-      Object.assign(c, run({ ...o, credit: c.credit, tier: c.tier, window: "right" }, K)); n++; inc = Math.min(inc, c.r.objective);
+      if (M.canSkip(c, L2, top)) { c.skip = true; return; }
+      Object.assign(c, run({ ...o, credit: c.credit, tier: c.tier, window: "right" }, K)); n++; top = Math.max(top, c.R.annual);
     });
     let best = M.pick(L2);
     if (best && best.id === "none" && !best.R) { const any = L2.find(c => c.R), none = L2.find(c => c.id === "none"); none.R = any.R; none.same = true; best = none; }
     return { cases: L2, best, solved: n };
   };
   const ALL = M.allDays(Y);
+  // lesson 13's numbers M11 uses, as the "lesson13" block of M11's data (the page and the notebook read only this subset,
+  // so neither loads lesson 13's whole file): the wind farm's installed cost and upkeep, the rate and the life, with sources
+  const sub13 = () => ({ about: "Copied from lesson 13's data (13-capstone.json) by node _tests/learn/test_m11-tea-in-models.js --write and checked against it on every run: the wind farm's installed cost and fixed upkeep (2025 dollars), the real rate and the life. Edit lesson 13's data, never this block.",
+    techs: { wind: { label: C13.techs.wind.label, capex: C13.techs.wind.capex, fom: C13.techs.wind.fom, src: C13.techs.wind.src } },
+    finance: { wacc: C13.finance.wacc, life: C13.finance.life, src: C13.finance.src },
+    sources: Object.fromEntries([].concat(C13.techs.wind.src, C13.finance.src).map(k => [k, C13.sources[k]])) });
   const PLANS = {
     fixed30: { ...base, size: D.fixedSize.def },
     sized: { ...base },
@@ -101,9 +107,10 @@ const fm = M.fm, r1 = v => Math.round(v * 10) / 10, r3 = v => Math.round(v * 100
     });
     ref.fullYear = { about: "Each default plan's size fixed, its hours re-optimized on all 8,760 hours of 2025 (the same rules); npvGap = 36 days - full year ($); kgGapPct = (36 days - full year) / full year.", plans: fy,
       maxNpvGapM: Math.ceil(Math.max.apply(null, fy.map(f => Math.abs(f.npvRep - f.npvFull))) / 1e6), maxKgGapPct: Math.ceil(Math.max.apply(null, fy.map(f => Math.abs(f.kgGapPct)))) };
+    ref.defaults.t1.kgAfter = Math.round(R.t1.per[1].kg); ref.defaults.t1.kgShare = Math.round(R.t1.creditLev / top * 1e4) / 1e4;
     const m0 = M.build(Y, K0, D, PLANS.t1); ref.size = { cols: m0.variables.length, rows: m0.constraints.length };
     ref.defaults.solved = pruned(base).solved;
-    D.reference = ref;
+    D.reference = ref; D.lesson13 = sub13();
     // arrays of numbers or strings on one line
     fs.writeFileSync(DPATH, JSON.stringify(D, null, 1).replace(/\[([^\[\]{}]*)\]/g, (m, x) => "[" + x.trim().split(/,\s*\n\s*/).join(", ") + "]") + "\n");
     console.log("wrote the reference block of", DPATH);
@@ -119,11 +126,15 @@ const fm = M.fm, r1 = v => Math.round(v * 10) / 10, r3 = v => Math.round(v * 100
   ok(A16.electrolyzer.kWhPerKg === 57 && A16.electrolyzer.capexPerKW === D.electrolyzer.capex2022.mid, "57 kWh per kg and DOE's $2,000 per kW are A16's numbers");
   ok(near(K0.k, 1000 / 57) && near(K0.wear, 0.11 * CX.mid * 1000 / 40000) && near(K0.fomKW, 0.05 * CX.mid), "kg per MWh, stack wear per MWh and fixed upkeep from DOE's record");
   ok(C13.techs.wind.capex === 1712 && C13.techs.wind.fom === 34.57 && C13.finance.wacc === 4 && C13.finance.life === 30, "the wind farm's costs, the rate and the life are lesson 13's");
+  ok(JSON.stringify(D.lesson13) === JSON.stringify(sub13()), "the lesson13 block is lesson 13's data, unchanged (run with --write after lesson 13 changes)");
+  ok(JSON.stringify(M.costs(D, D.lesson13, A16, { capexKW: CX.mid, r: D.lesson13.finance.wacc / 100, N: D.lesson13.finance.life })) === JSON.stringify(K0), "the page's costs from the lesson13 block equal those from lesson 13's file");
+  ok(!/nuclear|reactor/i.test(JSON.stringify(D.lesson13)), "the lesson13 block holds no nuclear entry or wording");
+  ok(!/data\/13-capstone\.json/.test(PAGE) && !/13-capstone\.json/.test(NB) && !/13_capstone/.test(JS), "the page and the notebook load no lesson 13 file (only the subset)");
   ok(D.credit.tiers.map(t => t.pct).join() === "1,0.334,0.25,0.2" && D.credit.tiers.map(t => t.amount).join() === "0.637,0.213,0.159,0.127" && D.credit.multiplier === 5 && D.credit.years === 10 && D.credit.limit === 4, "the credit's tiers, 2025 amounts, x5 and 10 years as the IRS states them");
   D.credit.tiers.forEach(t => ok(Math.abs(t.amount - 0.637 * t.pct) <= 0.0006, "each tier's amount is its share of $0.637 (IRS rounding): " + t.id));
   ok(D.credit.constructBefore === "2028-01-01" && D.credit.starts.map(s => s.year + ":" + s.ok).join() === "2026:true,2027:true,2028:false", "construction must begin before 1 January 2028");
   ok(D.credit.tiers.slice(0, 3).every(t => t.strict) && !D.credit.tiers[3].strict && D.credit.strictMargin === 0.001, "'less than' limits are strict; 4.0 is 'not greater than'");
-  ["irs-i7210", "irs-td10023", "irs-45v", "doe-24005", "bea-nipa-119"].forEach(k => ok(D.sources[k] && D.sources[k].url && /\d{4}/.test(D.sources[k].asOf), "source with url and date: " + k));
+  ["irs-i7210", "irs-td10023", "irs-45v", "irs-pwa", "doe-24005", "bea-nipa-119"].forEach(k => ok(D.sources[k] && D.sources[k].url && /\d{4}/.test(D.sources[k].asOf), "source with url and date: " + k));
   ok(D.sources["irs-i7210"].url.startsWith("https://www.irs.gov/") && D.sources["irs-td10023"].url.startsWith("https://www.irs.gov/"), "the credit's sources are on irs.gov (allow-listed)");
   ok(/Illustrative/.test(D.plant.note) && /Illustrative/.test(D.hydrogen.note) && /Illustrative/.test(D.charge.note) && /Simplified/.test(D.grid.note) && /Simplified/.test(D.rulesNote), "illustrative and simplified parts say so");
 
@@ -214,13 +225,17 @@ const fm = M.fm, r1 = v => Math.round(v * 10) / 10, r3 = v => Math.round(v * 100
   const EV = evaluate(base);
   // the bound: on a grid of settings the pruned evaluation picks the same case, with the same value, as all five LPs
   {
-    let bad = 0, cnt = 0, saved = 0;
+    let bad = 0, cnt = 0, saved = 0, bnd = 0;
     [3, 4, 5].forEach(h => [Y.rate, Y.ccRate].forEach(e => ["none", "annual", "hourly"].forEach(rule => ["plant", "grid"].forEach(boundary => {
       const o = { ...base, h, e, rule, boundary }, full = evaluate(o), pr = pruned(o); cnt++; saved += 5 - pr.solved;
       if (full.best.id !== pr.best.id || Math.abs(full.best.R.annual - pr.best.R.annual) > 1e-6) bad++;
-      pr.cases.forEach((c, i) => { if (!c.R) { const f = full.cases[i]; if (f.R.annual > pr.best.R.annual + 1e-6) bad++; } });
+      pr.cases.forEach((c, i) => { const f = full.cases[i];
+        // a skipped case is more than $1 below the best, or no better than a solved case listed before it (which wins the tie)
+        if (!c.R && !(f.R.annual < pr.best.R.annual - M.TIE_USD || pr.cases.some((q, j) => j < i && q.R && q.R.annual >= f.R.annual - M.BOUND_EPS))) bad++;
+        if (f.R.annual > c.ub + 0.5) bnd++; });                                    // the bound is a bound (0.5: solver rounding)
     }))));
-    ok(bad === 0, `the bound never skips a better case: ${cnt} settings, ${saved} of ${cnt * 5} LPs skipped`);
+    ok(bad === 0, `the bound never changes the answer; each skipped case is more than $1 a year below the best or tied with an earlier solved case: ${cnt} settings, ${saved} of ${cnt * 5} LPs skipped`);
+    ok(bnd === 0, "every case's annual equivalent is at most its bound (M.annualBound), on every setting");
     ok(pruned(base).solved === REF.defaults.solved, "the defaults solve " + REF.defaults.solved + " of 5 LPs");
   }
   // the bound is the uncapped LP's optimum, in closed form
@@ -228,7 +243,12 @@ const fm = M.fm, r1 = v => Math.round(v * 10) / 10, r3 = v => Math.round(v * 100
     [3, 4, 5].forEach(h => ["plant", "grid"].forEach(boundary => [null, 0.635, 3.185].forEach(credit => [0, 10].forEach(c => {
       const o = { ...base, h, boundary, c, credit, tier: null, window: "right" }, f = M.freeObj(Y, K0, D, o), x = run(o);
       worst = Math.max(worst, Math.abs(f.obj - x.r.objective));
-    })))); ok(worst < 0.01, "the closed-form bound equals the uncapped LP's optimum (largest gap $" + worst.toExponential(1) + " a year)"); }
+      const x0 = run({ ...o, hair: false }); worst = Math.max(worst, Math.abs(M.freeObj(Y, K0, D, { ...o, hair: false }).obj - x0.r.objective));
+    })))); ok(worst < 0.01, "the closed-form bound equals the uncapped LP's optimum, with and without hair costs (largest gap $" + worst.toExponential(1) + " a year)"); }
+  // the tie rule: the largest value, and within $1 a year of it the case listed first, whatever else is in the list
+  { const c = (id, a) => ({ id, R: { ok: true, annual: a, kg: 5 } });
+    ok(M.pick([c("none", 100), c("t1", 100.5)]).id === "none" && M.pick([c("none", 0), c("t1", 0.5), c("t2", 1.2)]).id === "t1" && M.pick([c("t1", 0.5), c("t2", 1.2)]).id === "t1" && M.pick([c("none", 0), c("t2", 1.2)]).id === "t2",
+      "pick: the first case listed within $1 a year of the largest value, the same with or without a case more than $1 below"); }
   // the plant's hourly matching is the same LP optimum as no certificates (no u needed behind one meter)
   [D.credit.tiers[0], D.credit.tiers[2]].forEach(t => { const a = run({ ...base, credit: 3, tier: t, window: "right" }), b = run({ ...base, rule: "none", credit: 3, tier: t, window: "right" }); ok(near(a.r.objective, b.r.objective, 1e-6) && a.m.variables.length === b.m.variables.length, "plant: hourly matching = no certificates (" + t.id + ")"); });
   ok(EV.best.id === REF.defaults.best && EV.cases.every((c, i) => near(r1(c.R.S), REF.defaults.tiers[i].S) && Math.abs(Math.round(c.R.annual) - REF.defaults.tiers[i].annual) <= 1), "the five LPs re-solved; best " + EV.best.id);
@@ -251,6 +271,14 @@ const fm = M.fm, r1 = v => Math.round(v * 10) / 10, r3 = v => Math.round(v * 100
   onPage("0.0578", "CRF at 4% over 30 years"); onPage("$" + top.toFixed(3), "the top tier with the wage rules ($3.185)");
   onPage("about " + fm.kg(d.t1.creditLev), "the credit levelized over the life"); onPage(fm.pct(d.phi), "the credit years' share of the discounted life");
   onPage(fm.musd(d.t1all.npv - d.t1.npv), "the wrong window's overstatement");
+  ok(near(d.t1.kgShare, d.t1.creditLev / top, 6e-4) && near(d.t1.kgShare, d.t1.kg * M.af(0.04, 10) / (d.t1.kg * M.af(0.04, 10) + d.t1.kgAfter * (M.af(0.04, 30) - M.af(0.04, 10))), 1e-4), "the credit years' share of discounted kilograms, from the two production rates");
+  onPage((d.t1.kgShare * 100).toFixed(1) + "%", "the credit years' share of the discounted kilograms"); onPage(top.toFixed(3) + " × " + d.t1.kgShare.toFixed(3), "the credit per kg over the life as a product");
+  onPage((d.t1.kg / 1e6).toFixed(2) + " million kg", "hydrogen a year in the credit years"); onPage((d.t1.kgAfter / 1e6).toFixed(2) + " million", "hydrogen a year after the credit");
+  ok(near(top * d.t1.kgShare, d.t1.creditLev, 0.002), "3.185 x the share is the credit per kg over the life");
+  ok(M.weightWords(Y.days) === "9, 10 or 11" && /weightWords\(Y\.days\)/.test(JS) && !/10 or 11 days/.test(JS + PAGE), "the days' weights in words come from the days (9, 10 or 11)");
+  onPage("u \\ge 0", "u is never below zero in the algebra"); onPage("0 \\le S \\le 100", "the size's bounds in the algebra"); ok(/u<\/var> ≥ 0/.test(JS) && /0 ≤ <var>S<\/var> ≤ 100/.test(JS), "the equation card states u >= 0 and 0 <= S <= 100");
+  ok(!/Electrolyzer running|"Running"|running " \+ fm\.pct|Your plant qualifies/.test(JS), "utilization is never called running time; the construction date is not called qualifying");
+  onPage("$" + Math.round(d.capexKW).toLocaleString("en-US") + " per kW = about $" + (Math.round(d.capexKW) * 1000).toLocaleString("en-US") + " per MW", "the installed cost per kW and per MW");
   onPage("within $" + REF.fullYear.maxNpvGapM + "M", "the full-year check's NPV gap"); onPage("within " + REF.fullYear.maxKgGapPct + "%", "the full-year check's hydrogen gap");
   onPage(fm.mw(d.sized.S), "the model's size without a credit"); onPage(fm.mw(d.t1.S), "the top tier's size");
   onPage("$" + Math.round(d.capexKW).toLocaleString("en-US") + " per kW", "the installed cost in 2025 dollars");
@@ -275,7 +303,9 @@ const fm = M.fm, r1 = v => Math.round(v * 10) / 10, r3 = v => Math.round(v * 100
     ok(!/\| E3\.(2|3|8|13) \|/.test(RG.md.split("## Revisions after review")[1] || ""), "no revision after review replaces E3.2, E3.3, E3.8 or E3.13");
   } else console.log("note: excerpts_for_approval.md not found (set LEARN_PORTFOLIO); excerpts not checked against the register");
   ok(NB.includes(ID + ".json") && NB.includes("reference") && NB.includes("assert") && NB.includes("linprog"), "notebook: reads the reference block and asserts it with linprog");
-  ["energy-attribute-certificate", "incremental-analysis", "placed-in-service"].forEach(id => ok(new RegExp("id: " + id + "\\b").test(SIDE), "sidecar defines " + id));
+  ["lcoh", "kg", "creditLev", "npv", "S"].forEach(f => ok(new RegExp('assert[^\\n]*\\[\\\\"' + f + '\\\\"\\][^\\n]*ref\\[\\\\"' + f + '\\\\"\\]').test(NB), "notebook asserts " + f + " against the reference block"));
+  ok(/def periods\(K, o, service=/.test(NB) || /PERIODS_2028/.test(NB), "notebook task 4 gives the period structure (start, end, rule)");
+  ["energy-attribute-certificate", "incremental-analysis", "placed-in-service", "capacity-utilization", "prevailing-wage-apprenticeship"].forEach(id => ok(new RegExp("id: " + id + "\\b").test(SIDE), "sidecar defines " + id));
 
   // ---------------- the page on a stub document: a solve that fails, then works
   {
@@ -295,7 +325,7 @@ const fm = M.fm, r1 = v => Math.round(v * 10) / 10, r3 = v => Math.round(v * 100
     const root = E.LX.H("div", { class: "lx-interactive", "data-learn": ID }, E.body), live = E.LX.H("div", { class: "lx-live" }, root);
     const unhandled = []; const onUn = e => unhandled.push(String(e && e.message || e)); process.on("unhandledRejection", onUn);
     let threw = null;
-    try { init(live, { m11_tea_in_models: D, "13_capstone": C13, a16_hydrogen_ptx: A16, town, town_year: year, cf_targets: T }, root); } catch (e) { threw = e.stack; }
+    try { init(live, { m11_tea_in_models: D, a16_hydrogen_ptx: A16, town, town_year: year, cf_targets: T }, root); } catch (e) { threw = e.stack; }
     ok(!threw && demo && demo.cards, "the page mounts on the stub document" + (threw ? ": " + threw : ""));
     const flush = async () => { for (let i = 0; i < 30; i++) await new Promise(r => setImmediate(r)); };
     const card = () => demo.cards.el, btns = re => card().querySelectorAll("button").filter(b => re.test(b.textContent)), next = () => btns(/Next/)[0], failBox = () => card().querySelector(".m11-fail");

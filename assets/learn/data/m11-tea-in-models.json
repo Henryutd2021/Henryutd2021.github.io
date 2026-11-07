@@ -206,6 +206,11 @@
    "url": "https://www.irs.gov/irb/2025-13_IRB",
    "asOf": "read 6 November 2026"
   },
+  "irs-pwa": {
+   "text": "IRS, Prevailing wage and apprenticeship requirements (page last reviewed or updated 2 July 2026): pay laborers and mechanics employed in construction, alteration or repair no less than the prevailing wage rates; employ apprentices from registered apprenticeship programs for a certain number of hours; meeting both increases the base amounts by 5 times",
+   "url": "https://www.irs.gov/credits-deductions/prevailing-wage-and-apprenticeship-requirements",
+   "asOf": "read 6 November 2026"
+  },
   "irs-45v": {
    "text": "IRS, Clean hydrogen production credit (page updated 31 December 2025)",
    "url": "https://www.irs.gov/credits-deductions/clean-hydrogen-production-credit",
@@ -425,7 +430,9 @@
     "annual": 2681479,
     "lcoh": 4.789,
     "creditLev": 1.236,
-    "rate": 0.449
+    "rate": 0.449,
+    "kgAfter": 6909264,
+    "kgShare": 0.3881
    },
    "t1all": {
     "S": 49.7,
@@ -574,6 +581,34 @@
   "size": {
    "cols": 5185,
    "rows": 3457
+  }
+ },
+ "lesson13": {
+  "about": "Copied from lesson 13's data (13-capstone.json) by node _tests/learn/test_m11-tea-in-models.js --write and checked against it on every run: the wind farm's installed cost and fixed upkeep (2025 dollars), the real rate and the life. Edit lesson 13's data, never this block.",
+  "techs": {
+   "wind": {
+    "label": "Wind farm",
+    "capex": 1712,
+    "fom": 34.57,
+    "src": ["eia-aeo2026-emm"]
+   }
+  },
+  "finance": {
+   "wacc": 4,
+   "life": 30,
+   "src": ["atb2025-fin"]
+  },
+  "sources": {
+   "eia-aeo2026-emm": {
+    "text": "EIA, Assumptions to the Annual Energy Outlook 2026: Electricity Market Module, Table 3 (2025 dollars)",
+    "url": "https://www.eia.gov/outlooks/aeo/assumptions/pdf/EMM_Assumptions.pdf",
+    "asOf": "April 2026"
+   },
+   "atb2025-fin": {
+    "text": "NLR, 2025 Electricity Annual Technology Baseline, Financial Cases and Methods",
+    "url": "https://atb.nlr.gov/electricity/2025/financial_cases_&_methods",
+    "asOf": "checked 2 Nov 2026"
+   }
   }
  }
 }
