@@ -79,21 +79,23 @@
   // HOOK(A13), wired (learn-w5-b merged, 2026-11-06): jobs by lesson A13's model (LX.A13.jobs) with A13's coefficients
   // (data/a13-fairness-jobs.json, `jobs`: the reader can change them on A13's page; here at their defaults). Building:
   // gross job-years from all the plan's up-front spending, the share spent locally times A13's job-years per $M, times
-  // the multiplier (no displacement applied), over the 15 years 2026 to 2040. Ongoing: the wind and solar farms' upkeep
-  // jobs per 100 MW, direct; gross supported (times the multiplier: supplier and spending jobs, not all at the farms);
-  // and net of displacement. Other equipment's upkeep jobs are not counted. Nothing retires in this plan (no jobs lost).
-  // (C3 review finding 12; learn-w5-fix-b may add A13 options, wired at the final integration.)
+  // the multiplier, over the 15 years 2026 to 2040; net: less A13's displacement share (building work that would have
+  // happened anyway), passed as buildDisplacement as A13 does (A13's options from its review fixes: buildJobYearsNet).
+  // Ongoing: the wind and solar farms' upkeep jobs per 100 MW, direct; gross supported (times the multiplier: supplier
+  // and spending jobs, not all at the farms); and net of the same displacement. Other equipment's upkeep jobs are not
+  // counted. Nothing retires in this plan (no jobs lost). (C3 review finding 12; net building job-years at the W5 final
+  // integration.)
   function jobs(R, A13, Jd) {
     if (!A13 || !Jd || !R) return null;
     var c = { staff: 0, mineJobs: 0, multiplier: Jd.multiplier.start, localShare: Jd.localShare, jobYearsPerM: Jd.jobYearsPerM.start,
-      displacement: Jd.displacement.start / 100, horizonYears: Jd.horizonYears, buildYears: 15 };
+      displacement: Jd.displacement.start / 100, buildDisplacement: Jd.displacement.start / 100, horizonYears: Jd.horizonYears, buildYears: 15 };
     var b = A13.jobs(Object.assign({}, c, { newMW: R.acc.upfrontTotal / 1e6, capexPerKW: 1000, omPer100MW: 0 }));   // capexM = up front, $M
     var mw = (R.sys.wind || 0) + (R.sys.farm || 0), o = A13.jobs(Object.assign({}, c, { newMW: mw, capexPerKW: 0, omPer100MW: Jd.omPer100MW.start }));
-    return { jobYears: b.buildJobYears, perYear: b.buildJobsAvg, permDirect: o.newPermDirect, permGross: o.newPermGross, permNet: o.newPermNet, mw: mw, c: c, omPer100MW: Jd.omPer100MW.start,
-      note: "Construction: " + Math.round(c.localShare * 100) + "% of the up-front spending spent locally, at " + c.jobYearsPerM + " job-years per $M, times " + c.multiplier + " (gross; no displacement applied). " +
+    return { jobYears: b.buildJobYears, jobYearsNet: b.buildJobYearsNet, perYear: b.buildJobsAvg, permDirect: o.newPermDirect, permGross: o.newPermGross, permNet: o.newPermNet, mw: mw, c: c, omPer100MW: Jd.omPer100MW.start,
+      note: "Construction: " + Math.round(c.localShare * 100) + "% of the up-front spending spent locally, at " + c.jobYearsPerM + " job-years per $M, times " + c.multiplier + " (gross); less " + Math.round(c.buildDisplacement * 100) + "% displacement (net). " +
         "Ongoing: " + Jd.omPer100MW.start + " direct jobs per 100 MW of wind and solar; times " + c.multiplier + " for supplier and spending jobs (gross supported); less " + Math.round(c.displacement * 100) + "% displacement (net). Other equipment's upkeep not counted; nothing retires.",
-      assumeLine: "Jobs: A13's default coefficients; the multiplier adds supplier and spending jobs; displacement applies to new work only.",
-      lines: [["Construction", "job-years: one job for one year. Gross: the multiplier adds supplier and spending jobs; no displacement applied."],
+      assumeLine: "Jobs: A13's defaults; gross adds supplier and spending jobs; net takes off displacement, work that would happen anyway.",
+      lines: [["Construction", "job-years: one job for one year. Gross: the multiplier adds supplier and spending jobs; net: less displacement, building work that would have happened anyway."],
         ["Ongoing", "jobs for as long as the farms run: direct at the farms, then gross supported (with supplier and spending jobs, not all at the farms), then net of displacement."],
         ["Not counted", "other equipment's upkeep jobs; nothing retires in this plan."]],
       screening: A13.SCREENING, assume: A13.ASSUME.jobs };
@@ -175,7 +177,7 @@
     rural: function (x) { return "farmers and rural residents (site " + x.site.id + "): it is the screen's best block and the cheapest of the five to connect, " + mil(x.site.connectUSD) + " for its line, road and land, " + x.site.km.toFixed(1) + " km to " + x.site.sub + ", on about " + kilo(x.site.acres) + " acres"; } };
   function exemplars(x) {
     // x: { upfront, budget, dCost, co2, cut, up, worst, burden0, burden, altBurden, objectors: [keys], contractT, dPark,
-    //      dParkShare, site: { id, connectUSD, km, sub, acres, cf }, jobs: { jobYears, permDirect, permGross, permNet, mw },
+    //      dParkShare, site: { id, connectUSD, km, sub, acres, cf }, jobs: { jobYears, jobYearsNet, permDirect, permGross, permNet, mw },
     //      sens: { cheap, dear, top: { label, loText, hiText } } } from a run of REF_PLAN
     var obj = x.objectors.map(function (k) { return ANSWER[k](x); });
     return { title: "Two summaries of the same brief", task: "Recommend Prairie City's 2040 energy plan within the budget, and say who gains and who pays.", id: "c3-ex", lines: true,
@@ -188,7 +190,7 @@
           "Budget and cost: ", { text: mil(x.upfront) + " up front against " + mil(x.budget) + "; the city's yearly cost " + smil(x.dCost) + " against 2025 (energy bills plus equipment as yearly payments, 2025 dollars)", note: "Up front and yearly kept apart, on one boundary." }, ".\n",
           "CO₂ and the grid: ", { text: "the city's location-based CO₂ " + kilo(x.co2) + " t a year, " + pct0(x.cut) + " below 2025 (operating only; the contracts not deducted); " + kilo(x.up) + " MW of substation upgrades, the " + x.worst + " the tightest", note: "The cut with its boundary, and where the plan needs grid room." }, ".\n",
           "Who pays (screening): ", { text: "energy burden of homes below 80% of area median income " + pct1(x.burden0) + " → " + pct1(x.burden) + ", every group adopting alike; the cars' fuel and charging count as transport, outside the burden", note: "The rule stated, and the estimate labelled as a screening estimate." }, ".\n",
-          "Jobs (screening): ", { text: "about " + kilo(x.jobs.jobYears) + " construction job-years to 2040 (gross); at the farms " + kilo(x.jobs.permDirect) + " direct ongoing jobs, " + kilo(x.jobs.permGross) + " gross supported, " + kilo(x.jobs.permNet) + " net of displacement", note: "Job-years kept apart from ongoing jobs, gross apart from net." }, ".\n",
+          "Jobs (screening): ", { text: "about " + kilo(x.jobs.jobYears) + " construction job-years to 2040 (gross), " + kilo(x.jobs.jobYearsNet) + " net of displacement; at the farms " + kilo(x.jobs.permDirect) + " direct ongoing jobs, " + kilo(x.jobs.permGross) + " gross supported, " + kilo(x.jobs.permNet) + " net of displacement", note: "Job-years kept apart from ongoing jobs, gross apart from net." }, ".\n",
           "Site: ", { text: "site " + x.site.id + ", the best of A19's five blocks and the cheapest to connect (" + mil(x.site.connectUSD) + "), at a " + (x.site.cf * 100).toFixed(1) + "% capacity factor", note: "The site's choice with its evidence from the map." }, ".\n",
           "Sensitivity: ", { text: "the yearly cost runs from " + mil(x.sens.cheap) + " to " + mil(x.sens.dear) + " with every input at its lower- or higher-cost end; " + lc1(x.sens.top.label) + " moves it most, " + x.sens.top.loText + " to " + x.sens.top.hiText + "; every tested input is set for teaching", note: "A range, the input that matters most, and what kind of number each input is." }, ".\n",
           "Panel: ", { text: obj.length ? "to " + obj.join("; to ") : "no stakeholder objects", note: "Each objection answered with a reason or a change, from the run's own numbers." }, ".\n",
@@ -317,7 +319,7 @@
       U.hhTable(c3, R);
       var jb = page.jobs(R, window.LX.A13, data.a13_fairness_jobs && data.a13_fairness_jobs.jobs);
       if (jb) {
-        U.table(c3, ["Jobs (screening, lesson A13's model)", "Estimate"], [["Construction, 2026 to 2040 (gross)", kilo(jb.jobYears) + " job-years (about " + kilo(jb.perYear) + " a year)"],
+        U.table(c3, ["Jobs (screening, lesson A13's model)", "Estimate"], [["Construction, 2026 to 2040 (gross) and net", kilo(jb.jobYears) + " job-years gross (about " + kilo(jb.perYear) + " a year) · " + kilo(jb.jobYearsNet) + " net"],
           ["Ongoing, supported by the wind and solar farms (" + kilo(jb.mw) + " MW)", kilo(jb.permDirect) + " direct · " + kilo(jb.permGross) + " gross supported · " + kilo(jb.permNet) + " net"]], "c3-jobs");
         U.keys(c3, jb.lines.concat([["Coefficients", jb.note]]));
         H("p", { class: "lx-hint", text: jb.screening }, c3);
@@ -387,7 +389,7 @@
         // summary) in the results
         n.results = n.results.concat(page.panelRows(panel(R, P), answers, LX.Stakeholders.WORD));
         var jb = page.jobs(R, window.LX.A13, data.a13_fairness_jobs && data.a13_fairness_jobs.jobs);
-        if (jb) { n.results.push({ label: "Jobs (screening)", value: kilo(jb.jobYears) + " construction job-years (gross); ongoing " + kilo(jb.permDirect) + " direct, " + kilo(jb.permGross) + " gross supported, " + kilo(jb.permNet) + " net", note: "lesson A13's coefficients" });
+        if (jb) { n.results.push({ label: "Jobs (screening)", value: kilo(jb.jobYears) + " construction job-years gross, " + kilo(jb.jobYearsNet) + " net; ongoing " + kilo(jb.permDirect) + " direct, " + kilo(jb.permGross) + " gross supported, " + kilo(jb.permNet) + " net", note: "lesson A13's coefficients" });
           n.assumptions.push(jb.assumeLine); }
         var fresh = sens && LX.ShareState.same(S, sens.state, plan);
         if (fresh) n.results = n.results.concat(page.sensRows(sens));

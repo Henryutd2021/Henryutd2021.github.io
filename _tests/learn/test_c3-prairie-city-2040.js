@@ -60,7 +60,7 @@ const RUN_DATE = "6 November 2026";
   const x = { upfront: b1.upfront, budget: b1.budget, dCost: R1.delta.cityCost, co2: R1.acc.city.co2, cut: PG.co2Cut(R1), up: PG.upTotal(R1), worst, burden0: R1.hh.low.burden0, burden: R1.hh.low.burden,
     altBurden: alt1.hh.low.burden, objectors: pn1.filter(p => p.cell.v !== "yes").map(p => p.key), contractT: R1.acc.contract.t, dPark: pk1 - pk0, dParkShare: (pk1 - pk0) / pk0,
     site: { id: site1.id, connectUSD: site1.connectUSD, km: site1.km, sub: site1.sub, acres: site1.acres, cf: site1.cf },
-    jobs: { jobYears: jb.jobYears, permDirect: jb.permDirect, permGross: jb.permGross, permNet: jb.permNet, mw: jb.mw },
+    jobs: { jobYears: jb.jobYears, jobYearsNet: jb.jobYearsNet, permDirect: jb.permDirect, permGross: jb.permGross, permNet: jb.permNet, mw: jb.mw },
     sens: { cheap: sens1.joint.cheap, dear: sens1.joint.dear, top: { label: top1.label, loText: top1.loText, hiText: top1.hiText } } };
   const c3ex = PG.exemplars(x);
   // the evidence pack: small tables from the same runs, for the summary without JavaScript
@@ -68,7 +68,7 @@ const RUN_DATE = "6 November 2026";
   const evidence = () => [
     "<p class=\"lx-hint\"><b>Who pays (screening, accounting layer, not the LP; every group adopting alike):</b></p>",
     tb(["Household group", "Home energy bills", "Energy burden", "Transport: fuel and charging"], R1.hh.rows.map(r => [r.label, E3.money(r.home0) + " → " + E3.money(r.home), PG.pct1(r.burden0) + " → " + PG.pct1(r.burden), E3.money(r.tr0) + " → " + E3.money(r.tr)])),
-    "<p class=\"lx-hint\"><b>Jobs (screening, lesson A13's coefficients):</b> " + E3.kilo(jb.jobYears) + " construction job-years, 2026 to 2040 (gross); ongoing at the farms " + E3.kilo(jb.permDirect) + " direct, " + E3.kilo(jb.permGross) + " gross supported, " + E3.kilo(jb.permNet) + " net of displacement.</p>",
+    "<p class=\"lx-hint\"><b>Jobs (screening, lesson A13's coefficients):</b> " + E3.kilo(jb.jobYears) + " construction job-years, 2026 to 2040 (gross), " + E3.kilo(jb.jobYearsNet) + " net of displacement; ongoing at the farms " + E3.kilo(jb.permDirect) + " direct, " + E3.kilo(jb.permGross) + " gross supported, " + E3.kilo(jb.permNet) + " net of displacement.</p>",
     "<p class=\"lx-hint\"><b>The panel:</b></p>",
     tb(["Stakeholder", "Reaction", "Why", "Their rule"], pn1.map((q, i) => [q.name, { yes: "Yes", part: "Partly", no: "No" }[q.cell.v], q.cell.t, PG.PANEL[i].rule])),
     "<p class=\"lx-hint\"><b>Sensitivity</b> (the plan held fixed):</p>",
@@ -112,7 +112,7 @@ const RUN_DATE = "6 November 2026";
   const sc = SM.costs.map(c => c.connect + c.road + c.land), ia = SM.top.map(t => t.id).indexOf(ref.site);
   ok(ia === 0 && sc[ia] === Math.min(...sc) && strong.indexOf("the best of A19's five blocks and the cheapest to connect (" + PG.mil(site1.connectUSD) + ")") >= 0, "site " + ref.site + ": the screen's best block and the cheapest to connect, as the summary says");
   ok(strong.indexOf(PG.mil(sens1.joint.cheap) + " to " + PG.mil(sens1.joint.dear)) >= 0 && strong.indexOf(PG.lc1(top1.label) + " moves it most") >= 0 && sens1.rows.every(r => /set for teaching/.test(r.kind)), "the strong summary's sensitivity: the joint range and the input that moves it most");
-  ok(strong.indexOf(E3.kilo(jb.jobYears) + " construction job-years") >= 0 && strong.indexOf(E3.kilo(jb.permDirect) + " direct ongoing jobs, " + E3.kilo(jb.permGross) + " gross supported, " + E3.kilo(jb.permNet) + " net") >= 0, "the strong summary's jobs: construction job-years apart from ongoing jobs, direct, gross and net");
+  ok(strong.indexOf(E3.kilo(jb.jobYears) + " construction job-years to 2040 (gross), " + E3.kilo(jb.jobYearsNet) + " net of displacement") >= 0 && strong.indexOf(E3.kilo(jb.permDirect) + " direct ongoing jobs, " + E3.kilo(jb.permGross) + " gross supported, " + E3.kilo(jb.permNet) + " net") >= 0, "the strong summary's jobs: construction job-years gross and net, apart from ongoing jobs, direct, gross and net");
   ok(x.objectors.indexOf("climate") >= 0 && /contracts do not lower the location-based CO₂/.test(strong) && near(x.cut, (r0.results.acc.city.co2 - R1.acc.city.co2) / r0.results.acc.city.co2, 1e-12), "the climate group is answered on the location-based boundary");
 
   // ---------------- the panel, for every preset and the reference plan
@@ -170,7 +170,7 @@ const RUN_DATE = "6 November 2026";
   {
     const n = E3.note(ref, R1, P); n.link = "https://example.org/x#c3"; n.run = { ok: true, stale: false, text: "the 2040 plan" };
     n.results = n.results.concat(PG.panelRows(pn1, {}, WORD));
-    n.results.push({ label: "Jobs (screening)", value: E3.kilo(jb.jobYears) + " construction job-years (gross); ongoing 18 direct, 29 gross supported, 23 net", note: "lesson A13's coefficients" }); n.assumptions.push(jb.assumeLine); n.results = n.results.concat(PG.sensRows(sens1)); n.sensitivity = sw;
+    n.results.push({ label: "Jobs (screening)", value: E3.kilo(jb.jobYears) + " construction job-years gross, " + E3.kilo(jb.jobYearsNet) + " net; ongoing 18 direct, 29 gross supported, 23 net", note: "lesson A13's coefficients" }); n.assumptions.push(jb.assumeLine); n.results = n.results.concat(PG.sensRows(sens1)); n.sensitivity = sw;
     // the reader's own parts left empty ("(not written yet)", 3 words each) do not count as the run's lines
     const composed = RN.compose(n, {}, F, { format: "text" }), auto = RN.countWords(composed) - 3 * (composed.match(/\(not written yet\)/g) || []).length;
     if (process.env.C3_SHOW_NOTE) console.log(composed);
@@ -195,10 +195,13 @@ const RUN_DATE = "6 November 2026";
   ok(Math.abs(rD.acc.city.money - R1.acc.city.money) > 1, "another site changes the plan's cost");
   // HOOK(A13), wired: jobs by A13's model at A13's default coefficients
   const exp = A13.jobs({ staff: 0, mineJobs: 0, multiplier: JD.multiplier.start, localShare: JD.localShare, jobYearsPerM: JD.jobYearsPerM.start, displacement: JD.displacement.start / 100,
-    horizonYears: JD.horizonYears, buildYears: 15, newMW: R1.acc.upfrontTotal / 1e6, capexPerKW: 1000, omPer100MW: 0 });
+    horizonYears: JD.horizonYears, buildYears: 15, newMW: R1.acc.upfrontTotal / 1e6, capexPerKW: 1000, omPer100MW: 0, buildDisplacement: JD.displacement.start / 100 });
   ok(jb && near(jb.jobYears, R1.acc.upfrontTotal / 1e6 * JD.localShare * JD.jobYearsPerM.start * JD.multiplier.start, 1e-6) && near(jb.jobYears, exp.buildJobYears, 1e-9), "jobs: building job-years from all up-front spending by A13's model (" + Math.round(jb.jobYears) + ")");
+  ok(near(jb.jobYearsNet, exp.buildJobYearsNet, 1e-9) && near(jb.jobYearsNet, jb.jobYears * (1 - JD.displacement.start / 100), 1e-6) && jb.jobYearsNet < jb.jobYears &&
+    /less " \+ Math\.round\(c\.buildDisplacement \* 100\) \+ "% displacement \(net\)/.test(JS) && /work that would have happened anyway/.test(JS),
+    "jobs: net building job-years by A13's buildJobYearsNet, less A13's displacement share as A13 applies it to building and running alike, with the assumption stated (" + Math.round(jb.jobYearsNet) + ")");
   ok(near(jb.permDirect, (ref.wind + ref.farm) / 100 * JD.omPer100MW.start, 1e-9) && near(jb.permGross, jb.permDirect * JD.multiplier.start, 1e-9) && near(jb.permNet, jb.permGross * (1 - JD.displacement.start / 100), 1e-9), "jobs: ongoing direct, gross supported and net from the wind and solar farms' MW (C3 review finding 12)");
-  ok(!/Permanent, at the wind and solar farms/.test(JS) && /Ongoing, supported by the wind and solar farms/.test(JS) && /Construction, 2026 to 2040 \(gross\)/.test(JS), "jobs labelled: construction job-years (gross), ongoing jobs supported by the farms");
+  ok(!/Permanent, at the wind and solar farms/.test(JS) && /Ongoing, supported by the wind and solar farms/.test(JS) && /Construction, 2026 to 2040 \(gross\) and net/.test(JS) && /" job-years gross \(about " \+ kilo\(jb\.perYear\) \+ " a year\) · " \+ kilo\(jb\.jobYearsNet\) \+ " net"/.test(JS), "jobs labelled: construction job-years gross and net, ongoing jobs supported by the farms");
   ok(/HOOK\(A19\)/.test(JS) && /HOOK\(A13\)/.test(JS) && PG.jobs(R1, null, JD) === null, "both hooks are marked; without A13's model no jobs number is shown");
   ok(!/a13-who-pays-and-benefits\.js|whopays\.js"/.test(PAGE) && /a13-fairness-jobs\.json/.test(PAGE), "A13's accounting layer comes in the bundle (components/whopays.js); the page loads its coefficients");
   ok(/<script src="\.\.\/assets\/learn\/learn\.js" defer><\/script>\s*<script src="\.\.\/assets\/learn\/c3-prairie-city-2040\.js"/.test(PAGE) && !/a19\.js"/.test(PAGE) && !/\.a19-map \{/.test(PAGE) && /a19-gis-siting\.json/.test(PAGE) && /cf_targets\.json/.test(PAGE), "A19's map comes in the bundle (components/siting.js and siting.css; no copied styles); the page loads A19's data");
