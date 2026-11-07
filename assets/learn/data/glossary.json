@@ -1187,6 +1187,12 @@
   "lesson": "M8",
   "href": "m08-stochastic-robust.html"
  },
+ "exploratory-scenario": {
+  "term": "Exploratory scenario",
+  "short": "A scenario that fixes its assumptions about demand, prices, policies and costs and asks what follows, without forcing any result; the IEA's Current Policies and Stated Policies scenarios are of this kind.",
+  "lesson": "A20",
+  "href": "a20-national-scenarios.html"
+ },
  "external-cost": {
   "term": "External cost",
   "short": "A cost that falls on people outside a deal, such as the damage from CO₂, which neither the buyer nor the seller pays.",
@@ -1547,6 +1553,12 @@
   "lesson": "M8",
   "href": "m08-stochastic-robust.html"
  },
+ "hhi": {
+  "term": "Herfindahl-Hirschman index (HHI)",
+  "short": "A measure of how concentrated a supply is: the sum of each supplier's squared percentage share, from near 0 for many small suppliers to 10,000 for one.",
+  "lesson": "A21",
+  "href": "a21-security-minerals.html"
+ },
  "hidden-state": {
   "term": "Hidden state",
   "short": "Values in a notebook's memory that no longer match the code on the page, for example after a cell was edited but not rerun.",
@@ -1589,11 +1601,17 @@
   "lesson": "A16",
   "href": "a16-hydrogen-ptx.html"
  },
+ "implied-carbon-price": {
+  "term": "Implied carbon price",
+  "short": "The carbon price at which a plan just meets an emissions limit; in an optimization model it is the limit's dual value, what one more tonne allowed would save.",
+  "lesson": "A20",
+  "href": "a20-national-scenarios.html"
+ },
  "import-dependence": {
   "term": "Import dependence",
-  "short": "A country's net energy imports as a share of its primary energy supply; it is negative for a net exporter.",
-  "lesson": "F10",
-  "href": "f10-nations-differ.html"
+  "short": "Net energy imports divided by the energy a country uses (Eurostat divides by gross available energy); its value depends on how primary energy is counted.",
+  "lesson": "A21",
+  "href": "a21-security-minerals.html"
  },
  "income-based-charge": {
   "term": "Income-based charge",
@@ -3226,6 +3244,12 @@
   "short": "The line that decides which parts, costs and emissions a study counts and which it leaves out.",
   "lesson": "N1",
   "href": "n01-news-lens.html"
+ },
+ "target-seeking-scenario": {
+  "term": "Target-seeking scenario",
+  "short": "A scenario that starts from a goal, such as a carbon budget, and works out what it would take to meet it; the IEA calls this kind normative.",
+  "lesson": "A20",
+  "href": "a20-national-scenarios.html"
  },
  "tariff": {
   "term": "Tariff",
