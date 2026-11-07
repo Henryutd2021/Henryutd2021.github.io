@@ -966,8 +966,39 @@
   lab: "an optional NumPy notebook that rebuilds the map from the same seed, checks the page's sites and line, and passes the sites to a cost model, about 60 minutes."
   does: "Stack map layers for the region around Prairie City; exclude land by rule and weight the criteria for a solar farm, a wind farm and a data-center campus; route a new line along a least-cost path; then change the cell size and the homes layer's date."
   after: [A11]
-- {kind: lesson, tier: analyst, code: A20, title: "Why do national energy scenarios disagree?"}
-- {kind: lesson, tier: analyst, code: A21, title: "What makes a nation's energy secure? Imports, minerals, supply chains and factories"}
+# A20, builder learn-w6-b (wave W6)
+- kind: lesson
+  id: a20-national-scenarios
+  code: A20
+  tier: analyst
+  form: cards
+  icon: curve
+  status: active
+  minutes: 25
+  practice_minutes: 30   # the myths and the six worked exercises (Check section)
+  title: "Why do national energy scenarios disagree?"
+  subtitle: "Line up four scenarios for a fictional nation, trace each gap to its assumptions, and sort them as exploratory or target-seeking"
+  short: "Why scenarios disagree"
+  teaches: [exploratory and target-seeking scenarios, scenario assumptions (demand, fuel prices, policy, technology costs), one-at-a-time against ordered swaps, interactions between assumptions, the average over every order, an implied carbon price, reading outlooks as their authors describe them]
+  does: "Line up four scenarios for Prairieland built on one data set; read each one's question and assumptions; sort them and four real outlooks as exploratory or target-seeking; trace the gaps in CO₂, electricity and imports to demand, fuel prices, policy and fixed technology costs, one at a time and in order; then move a budget and watch the carbon price it needs."
+  outcome: "Tell an exploratory scenario from a target-seeking one, trace a gap between two scenarios to their assumptions in a stated order, explain why the parts depend on that order, and say why a target-seeking scenario's policy is an output, not an input."
+  after: [A1, 13]
+# A21, builder learn-w6-b (wave W6). Curriculum prerequisite F10 is left out until F10 is live (integration to-do).
+- kind: lesson
+  id: a21-security-minerals
+  code: A21
+  tier: analyst
+  form: cards
+  icon: lock
+  status: active
+  minutes: 25
+  practice_minutes: 30   # the myths and the six worked exercises (Check section)
+  title: "What makes a nation's energy secure? Imports, minerals, supply chains and factories"
+  subtitle: "Measure a fictional nation's import dependence and supplier concentration, then stress it with a price spike, a closed strait, a mineral export restriction and a factory fire"
+  short: "Energy security"
+  teaches: [import dependence, accounting conventions in a ratio, single routes, supplier concentration (HHI), largest-supplier benchmarks, price spikes and who pays, stock days of net imports, the scarcest input, a second site, combined shocks that overlap, which lever helps against which shock]
+  does: "Read Prairieland's supply fuel by fuel; compute its import dependence under two conventions and the share on one strait; compute an HHI and cap the leading refiner; stress the nation with an LNG price spike, a closed strait, a mineral export restriction and a factory fire, alone and together; then sort stockpiles, more suppliers, recycling, a second site and using less by the shocks they help against."
+  outcome: "Compute import dependence and a concentration index and say what each does and does not measure, size stocks against a closure, find the scarcest input in a supply chain, and match each security lever to the shocks it helps against."
 # X2, builder learn-w6-x (wave W6; side-topic shelf, D2). Curriculum prerequisite F10 is not live yet (integration to-do).
 - kind: lesson
   id: x02-fossil-transition

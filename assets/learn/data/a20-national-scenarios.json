@@ -1,0 +1,115 @@
+{
+  "about": {
+    "what": "Lesson A20's own settings: four scenarios for Prairieland, the screening accounting that turns their assumptions into results, the gap tracer's groups and outputs, the sort's cards and the real-world scenario families. Every Prairieland number (energy balance, fleet, demand cases, cost and fuel ranges, carbon factors, the budget) is read from prairieland.json at run time, never copied here.",
+    "built": "2026-11-07",
+    "builtBy": "builder learn-w6-b (hand-written; tested by _tests/learn/test_a20-national-scenarios.js)",
+    "dollarYear": 2025
+  },
+  "rule": {
+    "what": "The screening accounting (closed form, no optimization). Useful energy grows at the demand case's rates; a share of it switches to electricity at the policy's pace; existing plants run as in 2025 until they retire; new power is split between new gas plants and a clean mix by a sharing rule on their full costs per MWh; a carbon price can close existing coal and combined-cycle plants early.",
+    "mix": { "wind": 0.55, "solar": 0.35, "firm": 0.10 },
+    "mixWhat": "The clean mix, by share of its energy: wind, solar and the generic firm clean plant, plus 4-hour batteries beside the solar.",
+    "batteryPerSolar": 0.25,
+    "batteryWhat": "MW of 4-hour battery per MW of new solar in the clean mix.",
+    "gasCF": 0.5,
+    "gasWhat": "Capacity factor of a new gas combined-cycle plant, for its full cost per MWh.",
+    "halfWidth": 20,
+    "halfWidthWhat": "Dollars per MWh: at equal full costs, half of the new power is clean; when the clean mix is this much cheaper, all of it is; this much dearer, none.",
+    "earlyClose": ["coal", "gasCC"],
+    "earlyCloseWhat": "An existing coal or combined-cycle plant closes early when its fuel and carbon cost per MWh is above the clean mix's full cost; peakers and oil plants are kept for the peak hours.",
+    "domestic": "Domestic crude and gas output stay at their 2025 levels; any extra oil or gas is imported (no exports).",
+    "gasBlend": "New gas plants and early closures are judged at a blend of the domestic gas and LNG prices, weighted by 2025's supply.",
+    "carbonFrom": 2030,
+    "priceMax": 300,
+    "priceStep": 1,
+    "priceWhat": "A target-seeking scenario finds the lowest whole-dollar carbon price, $0 to $300 per tonne, the same in every model year from 2030, that meets its target.",
+    "set": "teaching: every setting in this block, the sharing rule and its half-width; the clean mix stands for any combination of wind, solar, storage and firm clean plants"
+  },
+  "elec": {
+    "slow": { "label": "Slow", "phrase": "slow electrification", "perPeriod": 0.03, "what": "3 percentage points of each sector's useful energy a period" },
+    "stated": { "label": "As announced", "phrase": "electrification as announced", "perPeriod": 0.07, "what": "7 points a period" },
+    "fast": { "label": "Fastest allowed", "phrase": "the fastest electrification allowed", "perPeriod": "max", "what": "the most Prairieland's data allows a period" },
+    "set": "teaching: the paces; buildings, transport and industry switch, agriculture keeps its 2025 share; industry stops at Prairieland's limit for 2050"
+  },
+  "groups": [
+    { "key": "demand", "label": "Demand", "short": "Demand", "what": "the demand case: growth of each sector's useful energy and new large loads" },
+    { "key": "fuel", "label": "Fuel prices", "short": "Fuel", "what": "the prices of domestic gas and LNG" },
+    { "key": "policy", "label": "Policy", "short": "Policy", "what": "the carbon price and the pace of electrification" },
+    { "key": "costs", "label": "Technology costs", "short": "Costs", "what": "the fixed capital costs of wind, solar, batteries and the firm clean plant" }
+  ],
+  "outputs": [
+    { "key": "co2", "label": "CO₂ in 2050", "unit": "Mt", "dec": 1 },
+    { "key": "el", "label": "Electricity made in 2050", "unit": "TWh", "dec": 1 },
+    { "key": "imp", "label": "Oil and LNG imports in 2050", "unit": "PJ", "dec": 0 }
+  ],
+  "scenarios": [
+    {
+      "key": "current", "name": "Current policies", "short": "Current", "kind": "exploratory", "color": "var(--lx-ink-2)",
+      "question": "What happens if Prairieland keeps only the policies in force today?",
+      "story": "Central demand, today's fuel prices, no carbon price, electrification at a slow pace, technology costs at their defaults.",
+      "demand": "central",
+      "fuel": { "gas": "def", "lng": "def" },
+      "policy": { "price": 0, "elec": "slow" },
+      "costs": { "wind": "def", "solar": "def", "battery": "def", "firm": "def" }
+    },
+    {
+      "key": "announced", "name": "Announced plans", "short": "Announced", "kind": "exploratory", "color": "var(--lx-tier-3)",
+      "question": "What happens if Prairieland also carries out the plans it has announced?",
+      "story": "As Current policies, plus an announced carbon price of $40 a tonne from 2030 and electrification as announced. The plans are added; meeting a goal is not required.",
+      "demand": "central",
+      "fuel": { "gas": "def", "lng": "def" },
+      "policy": { "price": 40, "elec": "stated" },
+      "costs": { "wind": "def", "solar": "def", "battery": "def", "firm": "def" }
+    },
+    {
+      "key": "gasboom", "name": "Gas boom", "short": "Gas boom", "kind": "exploratory", "color": "var(--lx-cc)",
+      "question": "What happens if demand grows fast, gas stays cheap and clean plants cost more?",
+      "story": "High demand, domestic gas and LNG at the low ends of their ranges, no carbon price, slow electrification, wind, solar, batteries and the firm clean plant at the high ends of their ranges.",
+      "demand": "high",
+      "fuel": { "gas": "lo", "lng": "lo" },
+      "policy": { "price": 0, "elec": "slow" },
+      "costs": { "wind": "hi", "solar": "hi", "battery": "hi", "firm": "hi" }
+    },
+    {
+      "key": "budget", "name": "Budget pathway", "short": "Budget", "kind": "target", "color": "var(--lx-good)",
+      "question": "What would it take to keep Prairieland's CO₂ from 2026 to 2050 within its budget?",
+      "story": "Central demand, today's fuel prices, the fastest electrification allowed, technology costs at their defaults; the carbon price is found, not assumed: the lowest that meets the budget.",
+      "demand": "central",
+      "fuel": { "gas": "def", "lng": "def" },
+      "policy": { "price": null, "elec": "fast", "target": { "metric": "cum", "budget": "def" } },
+      "costs": { "wind": "def", "solar": "def", "battery": "def", "firm": "def" }
+    }
+  ],
+  "pairs": [
+    { "a": "announced", "b": "gasboom" },
+    { "a": "current", "b": "gasboom" },
+    { "a": "current", "b": "announced" },
+    { "a": "current", "b": "budget" }
+  ],
+  "sort": {
+    "bins": [
+      { "id": "exploratory", "label": "Exploratory", "sub": "from assumptions" },
+      { "id": "target", "label": "Target-seeking", "sub": "from a goal" }
+    ],
+    "cards": [
+      { "id": "current", "text": "Prairieland: Current policies", "bin": "exploratory", "why": "It sets today's policies and asks what follows; nothing forces a result." },
+      { "id": "announced", "text": "Prairieland: Announced plans", "bin": "exploratory", "why": "It adds announced plans but does not require their goal to be met." },
+      { "id": "gasboom", "text": "Prairieland: Gas boom", "bin": "exploratory", "why": "A what-if on demand, gas prices and costs, with no goal to reach." },
+      { "id": "budget", "text": "Prairieland: Budget pathway", "bin": "target", "why": "Its budget is fixed first; the carbon price is found to meet it." },
+      { "id": "iea-cps", "text": "IEA, World Energy Outlook 2025: Current Policies Scenario", "bin": "exploratory", "why": "The IEA calls it exploratory: policies and regulations already in place." },
+      { "id": "iea-steps", "text": "IEA, World Energy Outlook 2025: Stated Policies Scenario", "bin": "exploratory", "why": "Exploratory too: it adds policies that are announced but not yet adopted." },
+      { "id": "iea-nze", "text": "IEA, World Energy Outlook 2025: Net Zero Emissions by 2050 Scenario", "bin": "target", "why": "Normative in the IEA's words: it is built to reach a stated goal." },
+      { "id": "eia-base", "text": "EIA, Annual Energy Outlook 2026: the Counterfactual Baseline case and its side cases", "bin": "exploratory", "why": "Laws and regulations in force as of December 2025, with side cases on growth, supply and costs; EIA says the results are not predictions." }
+    ]
+  },
+  "realWorld": [
+    { "id": "iea", "who": "IEA, World Energy Outlook 2025 (November 2025)", "what": "Two exploratory scenarios (Current Policies, Stated Policies) and two normative ones (Net Zero Emissions by 2050, and ACCESS, on universal access to electricity and clean cooking).", "src": "iea-weo2025" },
+    { "id": "eia", "who": "EIA, Annual Energy Outlook 2026 (8 April 2026)", "what": "A Counterfactual Baseline case (formerly the Reference case) under laws and regulations in force as of December 2025, and side cases; in EIA's words, the results are not predictions of what will happen.", "src": "eia-aeo2026-narr" }
+  ],
+  "sources": {
+    "iea-weo2025": { "title": "Scenarios in the World Energy Outlook 2025 (commentary)", "publisher": "International Energy Agency", "date": "read 2 Nov 2026 for the course dossier", "url": "https://www.iea.org/commentaries/scenarios-in-the-world-energy-outlook-2025", "where": "the four scenarios and which are exploratory or normative" },
+    "eia-aeo2026-narr": { "title": "Annual Energy Outlook 2026, narrative: foreword and introduction", "publisher": "U.S. Energy Information Administration", "date": "released 8 Apr 2026; read 7 Nov 2026", "url": "https://www.eia.gov/outlooks/aeo/narrative/index.php", "where": "'These outcomes are not predictions of what will happen'; the Counterfactual Baseline case (formerly the Reference case) under laws and regulations in force as of December 2025; the side cases" },
+    "trutnevyte-2016": { "title": "Trutnevyte (2016), Does cost optimization approximate the real-world energy transition? Energy 106, 182-193", "publisher": "Energy (Elsevier)", "date": "2016", "url": "https://doi.org/10.1016/j.energy.2016.03.038", "where": "abstract: cost-optimal scenarios compared with the UK's electricity transition, 1990-2014" },
+    "decarolis-2017": { "title": "DeCarolis et al. (2017), Formalizing best practice for energy system optimization modelling. Applied Energy 194, 184-198", "publisher": "Applied Energy (Elsevier)", "date": "2017", "url": "https://doi.org/10.1016/j.apenergy.2017.03.001", "where": "good practice for building and reporting energy-system models" }
+  }
+}
