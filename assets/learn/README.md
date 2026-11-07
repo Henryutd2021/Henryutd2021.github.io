@@ -1156,6 +1156,8 @@ No `build_learn.py` change: `explain.css` is already in the bundle. A new side t
 
 **Sources with more than one file** (F10, lesson-local): a source in `f10-nations-differ.json` may carry `also: [{ label, url }]`, printed after its title as "(also <a>Table 3.6 in chapter 3</a>, …)"; India's statistics are three chapter files of one publication.
 
+**A balance published under another convention** (F10, lesson-local): a country in `f10-nations-differ.json` may carry `pubElec: { mjPerKWh, gwh: { source: GWh } }` when its publisher counts each kWh of those sources at its own MJ per kWh (Japan's METI, a substitution). `nation()` takes `gwh × mjPerKWh` out of each published row and puts back the electricity at 3.6 MJ per kWh (nuclear's ÷ 0.33), so the drawn rows are physical energy content; the published total stays as `published`, and the official renewable share as `pubRenewable`. Nuclear and geothermal enter physical content as heat (electricity ÷ 0.33 and ÷ 0.10, Eurostat's defaults when the heat is not known: `heatEff`); every source in `twh` switches with the convention. `primaryTag` ("estimate", "converted") labels a total the page has worked out.
+
 **Kept lesson-local, and why** (promote when a second page needs the same thing):
 
 - CR's pick-one exemplar switcher (`cr-ex-pick`: one competence's pair of fragments at a time, through `LX.Exemplars`): only CR picks; CK-R shows its three worked exemplars (review, response, revision) together inside the gated solution.

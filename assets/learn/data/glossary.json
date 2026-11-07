@@ -1523,6 +1523,12 @@
   "lesson": "F7",
   "href": "f07-microgrids.html"
  },
+ "gross-calorific-value": {
+  "term": "Gross calorific value",
+  "short": "The heat a fuel gives when burned, counting the heat won back by condensing the water vapour it forms; it is a little higher than the net value, which the IEA and Eurostat use.",
+  "lesson": "F10",
+  "href": "f10-nations-differ.html"
+ },
  "gdp": {
   "term": "Gross domestic product (GDP)",
   "short": "The value of all the goods and services an economy produces in a year.",

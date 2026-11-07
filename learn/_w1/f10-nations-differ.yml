@@ -36,6 +36,9 @@ glossary:
   - id: hvdc
     term: HVDC (high-voltage direct current)
     def: "A transmission link that carries power as direct current, used for long undersea cables and to join grids that do not run in step."
+  - id: gross-calorific-value
+    term: Gross calorific value
+    def: "The heat a fuel gives when burned, counting the heat won back by condensing the water vapour it forms; it is a little higher than the net value, which the IEA and Eurostat use."
   - id: heating-degree-days
     term: Heating degree days
     def: "A measure of how cold a year was: for each day, the degrees by which its average temperature fell below a base such as 18 °C, added over the year."

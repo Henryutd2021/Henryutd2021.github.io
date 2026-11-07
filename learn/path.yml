@@ -718,10 +718,10 @@
   minutes: 20
   practice_minutes: 10   # the myths and questions (Check section)
   title: "Why does every country's energy system look different?"
-  subtitle: "Draw seven national energy balances as flow diagrams, switch from primary to final to useful energy, count reactors and wind farms three ways, and see how imports, resources, climate and institutions line up with each mix"
+  subtitle: "Draw eight national energy balances as flow diagrams, switch from primary to final to useful energy, count reactors and wind farms three ways, and see how imports, resources, climate and institutions line up with each mix"
   short: "Nations compared"
   teaches: [national energy balances as Sankeys, primary against final against useful energy at national scale, accounting conventions for primary energy, import dependence, why national energy mixes differ]
-  does: "Guess a country from its mix; draw the United States, the European Union, China, India, Brazil, Norway and the fictional Prairieland from their own statistics; switch between primary, final and useful energy and between three conventions for nuclear, hydro, wind and solar; turn on four lenses (import dependence, resources, climate, institutions); open the regional cards."
+  does: "Guess a country from its mix; draw the United States, the European Union, China, India, Japan, Brazil, Norway and the fictional Prairieland from their own statistics; switch between primary, final and useful energy and between three conventions for nuclear, hydro, wind and solar; turn on four lenses (import dependence, resources, climate, institutions); open the regional cards."
   outcome: "Read a national energy balance as a Sankey, say how much is lost before the meter and at the point of use, explain why a country's renewable share changes with the accounting convention, and name what lines up with a mix without claiming any one cause."
   after: [F4]
 # F11, builder learn-w5-b (wave W5)
