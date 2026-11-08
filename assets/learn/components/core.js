@@ -173,9 +173,11 @@
   // Everything the course keeps lives under one localStorage key, "learn.v1". When the browser refuses it (site data
   // blocked, some private windows, a full quota), the state is kept in memory for the rest of this page's life, as JSON
   // text so it behaves like storage, and one short notice says that it will not survive a reload
-  // (LX.store.persistent() is then false). LX.store.clearAll() is the course-wide reset: it replaces everything with
-  // {reset: <time>}, and the mark keeps a page opened before the reset (another tab, a page restored from the back-forward
-  // cache) from writing its old state back: such a page's writes are dropped, and it says so once.
+  // (LX.store.persistent() is then false). Every page's first head script puts an in-memory stand-in in place of storage
+  // the browser refuses (marked inMemory: true); it counts as refused here, so the notice still shows.
+  // LX.store.clearAll() is the course-wide reset: it replaces everything with {reset: <time>}, and the mark keeps a page
+  // opened before the reset (another tab, a page restored from the back-forward cache) from writing its old state back:
+  // such a page's writes are dropped, and it says so once.
   var KEY = "learn.v1", MEM = null, warned = {}, EPOCH;   // EPOCH: the reset mark this page started with
   var NOTES = { blocked: "This browser is not keeping site data, so your answers and progress last only until you reload or leave this page.",
     stale: "This course's data was cleared in this browser, from another tab. Reload this page to start afresh; until then, nothing on it is saved." };
@@ -184,7 +186,7 @@
     if (MEM != null) s = JSON.parse(MEM);
     else {
       var txt;
-      try { txt = window.localStorage.getItem(KEY); } catch (e) { MEM = "{}"; notice("blocked"); txt = null; }
+      try { if (window.localStorage.inMemory === true) throw 0; txt = window.localStorage.getItem(KEY); } catch (e) { MEM = "{}"; notice("blocked"); txt = null; }
       try { s = JSON.parse(txt) || {}; } catch (e) { s = {}; }   // unreadable text: start afresh (the next write replaces it)
     }
     if (EPOCH === undefined) EPOCH = s.reset || null;

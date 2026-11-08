@@ -95,6 +95,11 @@ format:
       light: [cosmo, theme-light.scss]
       dark: [darkly, theme-dark.scss]
     css: [assets/base.css, assets/home.css, assets/pubs.css, assets/pages.css, assets/map.css, assets/explainers.css]
+    # the first lines of every <head>: Quarto's metadata partial plus a small script that runs before all others and, when
+    # the browser refuses site storage, gives the page an in-memory store for the visit (so the theme switch and the page
+    # scripts do not stop with an error); with working storage it changes nothing. A page's own include-in-header does
+    # not replace it
+    template-partials: [assets/head/metadata.html]
     # MathJax pinned to an exact version (Quarto's default is the moving mathjax@4); its SRI hash is in _post_render.py
     html-math-method:
       method: mathjax

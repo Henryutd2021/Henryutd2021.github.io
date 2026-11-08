@@ -1,0 +1,49 @@
+$-- The first lines of every page's <head> (a template partial, set in _quarto.yml): Quarto's own metadata partial
+$-- (Quarto 1.10, share/formats/html/pandoc/metadata.html) with one script added right after the charset line, so that it
+$-- runs before Quarto's head scripts, its color-scheme script and every page script. After a Quarto upgrade, compare
+$-- this file with that one.
+$--
+$-- The script: when this browser refuses site storage (site data blocked, some private windows), reading
+$-- localStorage or sessionStorage throws, and Quarto's theme switch and page scripts stop with an error. The script
+$-- then gives the page an in-memory store for this visit, with the same methods, so nothing throws; it is marked
+$-- inMemory: true, which the Learn pages read to say that progress will not survive a reload. When storage works it
+$-- changes nothing.
+<meta charset="utf-8" />
+<script>(function () {
+  ["localStorage", "sessionStorage"].forEach(function (name) {
+    try { window[name].getItem("_"); return; } catch (e) { }   // storage works: leave it as it is
+    var data = Object.create(null);
+    var mem = {
+      getItem: function (k) { k = String(k); return k in data ? data[k] : null; },
+      setItem: function (k, v) { data[String(k)] = String(v); },
+      removeItem: function (k) { delete data[String(k)]; },
+      clear: function () { data = Object.create(null); },
+      key: function (i) { var keys = Object.keys(data); return i >= 0 && i < keys.length ? keys[i] : null; }
+    };
+    Object.defineProperty(mem, "length", { get: function () { return Object.keys(data).length; } });
+    Object.defineProperty(mem, "inMemory", { value: true });
+    try { Object.defineProperty(window, name, { configurable: true, enumerable: true, get: function () { return mem; } }); } catch (e) { }
+  });
+})();</script>
+$if(quarto-version)$
+<meta name="generator" content="quarto-$quarto-version$" />
+$else$
+<meta name="generator" content="quarto" />
+$endif$
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+
+$for(author-meta)$
+<meta name="author" content="$author-meta$" />
+$endfor$
+$if(date-meta)$
+<meta name="dcterms.date" content="$date-meta$" />
+$endif$
+$if(keywords)$
+<meta name="keywords" content="$for(keywords)$$keywords$$sep$, $endfor$" />
+$endif$
+$if(description-meta)$
+<meta name="description" content="$description-meta$" />
+$endif$
+
+<title>$pagetitle$$if(title-prefix)$ – $title-prefix$$endif$</title>
