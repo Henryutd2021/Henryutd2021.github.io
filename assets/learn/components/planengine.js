@@ -240,9 +240,11 @@
           } else if (!plan) {
             var e = {}; e["s" + id] = 1; e.K_be = -1; cons.push({ name: "E" + id, terms: e, le: 0 });
           }
-          if (!plan) {   // charge + discharge <= battery MW (one row: charging and discharging at once never pays)
-            var c1 = {}; c1["c" + id] = 1; c1["d" + id] = 1; c1.K_bp = -1; cons.push({ name: "P" + id, terms: c1, le: 0 });
-          }
+          // charge + discharge <= battery MW, for the optimizer and for a fixed plan alike (one row: charging and
+          // discharging at once never pays, so the row changes no cost; it keeps every solution physical)
+          var c1 = {}; c1["c" + id] = 1; c1["d" + id] = 1;
+          if (plan) cons.push({ name: "P" + id, terms: c1, le: plan.bp });
+          else { c1.K_bp = -1; cons.push({ name: "P" + id, terms: c1, le: 0 }); }
         }
         if (!plan) {
           var g = {}; g["g" + id] = 1; g.K_cc = -1; cons.push({ name: "Gc" + id, terms: g, le: 0 });
@@ -401,20 +403,19 @@
   // the full-year check and its error measures (first written for lesson M3)
   // link(m, RW, mode): a model from weekModel() (the linked chain) with another rule for the battery between weeks:
   //   "linked" (or none)  the model as it is: one calendar chain of 52 start levels (Kotzur et al. 2018)
-  //   "cyclic"            each representative week ends where it starts (s<p>_167 = 0), so no energy moves between weeks
+  //   "cyclic"            the 52 chain rows are dropped and each representative week ends where it starts
+  //                       (s<p>_167 = 0): every week starts at a level of its own, so no energy moves between weeks
   //   "free"              no rule between weeks: the 52 chain rows are dropped, so each week may start at any level and
   //                       stored energy can appear from nothing
   // Variable names are build()'s: s<p>_<h> is the level in representative week p after hour h, relative to the week's
   // start; W<i> the level at the start of calendar week i; constraint W<i> is the chain W<i+1> = W<i> + s<rep(i)>_167.
+  // Without the chain, the rows Wl<i> and Wh<i> (0 <= W<i> + lowest swing, W<i> + highest swing <= MWh) still hold, each
+  // with a start level W<i> of its own.
   function link(m, RW, mode) {
     if (!mode || mode === "linked") return m;
     if (mode !== "cyclic" && mode !== "free") throw new Error("link: mode must be linked, cyclic or free");
-    var cons = m.constraints;
-    if (mode === "free") cons = cons.filter(function (c) { return !/^W\d+$/.test(c.name); });
-    else {
-      cons = cons.slice();
-      RW.reps.forEach(function (r, p) { var t = {}; t["s" + p + "_" + (HPW - 1)] = 1; cons.push({ name: "cyc" + p, terms: t, eq: 0 }); });
-    }
+    var cons = m.constraints.filter(function (c) { return !/^W\d+$/.test(c.name); });
+    if (mode === "cyclic") RW.reps.forEach(function (r, p) { var t = {}; t["s" + p + "_" + (HPW - 1)] = 1; cons.push({ name: "cyc" + p, terms: t, eq: 0 }); });
     return { sense: m.sense, variables: m.variables, constraints: cons };
   }
   // the whole year as one period, as fullYearModel() builds it (for summarize() of a full-year run)
