@@ -112,20 +112,20 @@ ok(blocks > 0 && !/Math\.floor\(\(i\) \/ 24\)/.test(JS) && /perDay\(R, m\)/.test
 // ---------------- the row check sees a short column (malformed input)
 const bad = JSON.parse(JSON.stringify(RAWF)); bad.wind = bad.wind.slice(1);
 const kBad = M.checks(M.frame(bad));
-ok(!kBad[0].ok && !kBad[1].ok && /8760, 8759, 8760/.test(kBad[0].detail), "asserts: a column one value short fails the row check and the missing-value check");
+ok(!kBad[0].ok && !kBad[2].ok && /8760, 8759, 8760/.test(kBad[0].detail), "asserts: a column one value short fails the row check and the missing-value check");
 
 // ---------------- asserts on both files
 const kR = M.checks(R), kC = M.checks(C);
-ok(kR.map(c => c.ok).join() === "true,true,false,false,false", "asserts: raw fails spike, repeats and night (3 of 5)");
-ok(kC.every(c => c.ok), "asserts: the cleaned file passes all five");
-ok(M.ASSERTS.length === 5 && M.ASSERTS.every(a => NBSRC.indexOf(a.id === "rows" ? "len(d) == 8760" : a.id === "gaps" ? "notna().all().all()" : a.id === "spike" ? "0.5 * d[\"demand\"].median()" : a.id === "repeat" ? "longest_repeat(d).max() < 6" : "bad_night(d).sum() == 0") >= 0),
-  "asserts: the five page asserts are the notebook's five rules");
+ok(kR.map(c => c.ok).join() === "true,true,true,false,false,false", "asserts: raw fails spike, repeats and night (3 of 6)");
+ok(kC.every(c => c.ok), "asserts: the cleaned file passes all six");
+ok(M.ASSERTS.length === 6 && M.ASSERTS.every(a => NBSRC.indexOf(a.id === "rows" ? "len(d) == 8760" : a.id === "stamps" ? "d.index.is_unique and (d.index.to_series().diff().dropna() == pd.Timedelta(hours=1)).all()" : a.id === "gaps" ? "notna().all().all()" : a.id === "spike" ? "0.5 * d[\"demand\"].median()" : a.id === "repeat" ? "longest_repeat(d).max() < 6" : "bad_night(d).sum() == 0") >= 0),
+  "asserts: the six page asserts are the notebook's six rules");
 
 // ---------------- the page states the model's numbers
 [["1,505 MW", dD.min === 1505], ["8,760 rows", R.n === 8760], ["363 days of 24 hours", ls.hist[24] === 363], ["671 wind hours and 1,377 solar hours", true],
  ["155 hours", lr.len === 155], ["617 MW", lr.value === 617], ["214 hours in the raw file, none in the cleaned file", nbR.length === 214 && nbC.length === 0],
  ["March (70.7 GWh)", true], ["September (45.1 GWh)", true], ["90% of its peak for 180 hours", true], ["52.8% (wind) and 23.4% (solar)", true], ["52.8% and 23.4%", true],
- ["fails 3 of 5 asserts; the cleaned file passes all 5", kR.filter(c => !c.ok).length === 3 && kC.every(c => c.ok)], ["54.4 GW", true], ["29 July", pk.date === "2025-07-29"], ["1,377 h", true], ["180 h", true],
+ ["fails 3 of 6 asserts; the cleaned file passes all 6", kR.filter(c => !c.ok).length === 3 && kC.every(c => c.ok) && kR.length === 6], ["54.4 GW", true], ["29 July", pk.date === "2025-07-29"], ["1,377 h", true], ["180 h", true],
  ["150 MW wind, 200 MW solar, 450 MW demand", true]].forEach(x =>
   ok(has(x[0]) && x[1], `page: states "${x[0]}" and the model agrees`));
 
@@ -139,6 +139,19 @@ ok(!/is also that hour's MWh|is also the MWh/.test(QMD + JS + NBSRC) && /energy 
 ok(has("documented heuristic") && has("by construction") && /sun is below the horizon/.test(QMD), "night rule: a heuristic, with the sun-position part, and its check passes by construction");
 ok(/the rescaled day-ahead forecast/.test(JS) && /zeroes solar in the hours its night rule marks/.test(JS), "flowchart traces: demand and wind/solar fills told apart; the night rule zeroes hours");
 ok((JS.match(/alt: /g) || []).length >= 6, "charts: every chart has a text version (repeats, December x 3, hourly, daily, monthly, duration)");
+
+// ---------------- sweep review: wording and behaviour fixed on the page, in the data file and in the notebook
+{ const mx = Math.max(...RAWF.demand), raw90 = RAWF.demand.filter(v => v > 0.9 * mx).length;
+  ok(raw90 === 176 && has("cleaned, rounded SPP 2025 profile (the raw file: 176)") && has("In the cleaned file, demand is above 90% of its peak for 180 hours"), `duration: 180 h is the cleaned, rounded profile; the raw file gives ${raw90}`); }
+ok(/EIA-adjusted extract/.test(RAWF.dataset.status) && /summed/.test(RAWF.dataset.status) && !/as EIA publishes it|before any cleaning/.test(RAWF.dataset.status), "data: the download's status line says what the extraction did");
+ok(/if len\(nonzero\) else 0/.test(NBSRC) && /longest_repeat\(pd\.DataFrame\(\{"solar": \[0\.0\] \* 24\}\)\)/.test(NBSRC) && M.longestRun(new Array(24).fill(0)) === 0, "repeats: a column of zeros gives 0 in the notebook helper, as in the page's (no crash)");
+ok(/"hourly time stamps"/.test(NBSRC) && /passes by construction here/.test(NBSRC) && /pass by construction/.test(JS), "asserts: the gate checks hourly stamps, and says this file's stamps pass by construction");
+ok(/\| Rule: the hour is night when \| Action \| Limitation \|/.test(NBSRC) && !/a same-hour fill could copy it/.test(NBSRC), "notebook: the night rule as a rule / action / limitation table");
+ok(/looks implausible/.test(NBSRC) && !/cannot be right/.test(NBSRC), "notebook: the spike is suspected, not proven");
+ok(/jupyter lab/.test(QMD) && /pip install jupyterlab pandas matplotlib/.test(QMD + NBSRC) && /run `jupyter lab` there/.test(NBSRC), "setup: a local route that opens the notebook (JupyterLab), with its folder");
+ok(has("then about 60 minutes of practice tasks") && /plus about 60 minutes of practice tasks/.test(NBSRC), "time: the practice tasks' 60 minutes are shown beside the lab's");
+ok(!/practis|centre|colour|modelling/.test(QMD + NBSRC + JS), "spelling: American");
+ok(/function feedback\(\)/.test(JS) && /Now choose a farm\./.test(JS) && !/if \(sorted\) \{ api\.done\(\); api\.saw\("Demand is above 90%/.test(JS), "duration step: sorting demand asks for a farm; the step ends on a farm's shaded curve");
 
 // ---------------- notebook: clean, runnable outside any repository, same checks
 ok(NB.nbformat === 4 && NB.metadata.kernelspec.name === "python3", "notebook: nbformat 4, Python 3 kernel");

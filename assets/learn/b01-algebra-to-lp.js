@@ -42,13 +42,16 @@
   // is a learner's model {sense, c, rows} the story's model? Feasible regions are compared inside a large box. Each rule is
   // checked at each corner with a small relative allowance, 0.2% of the size of its terms there: enough for a rounded
   // coefficient (0.333h <= 10 counts as h/3 <= 10), too small for a changed requirement (39.5 for 40 MWh of heat, or
-  // 0.95 for the shuttle's 1 MWh, fail). The goal must point the same way.
+  // 0.95 for the shuttle's 1 MWh, fail). The goal must point the same way. A rule with no decision in it (0x + 0y op b)
+  // is either always true (harmless, listed in `idle`) or never true (`never`: the model has no plan at all).
   var REL = 2e-3;
   function tolAt(r, p) { return REL * (Math.abs(r.b) + Math.abs(r.a[0] * p[0]) + Math.abs(r.a[1] * p[1])) + 1e-9; }
   function compare(ref, mine, view) {
-    var big = bigBox(view);
-    var bad = (mine.rows || []).filter(function (r) { return !r || !r.a || !isFinite(r.a[0]) || !isFinite(r.a[1]) || !isFinite(r.b) || (!r.a[0] && !r.a[1]); });
-    var rows = (mine.rows || []).filter(function (r) { return bad.indexOf(r) < 0; });
+    var big = bigBox(view), all = mine.rows || [];
+    var bad = all.filter(function (r) { return !r || !r.a || !isFinite(r.a[0]) || !isFinite(r.a[1]) || !isFinite(r.b); });
+    var flat = all.filter(function (r) { return bad.indexOf(r) < 0 && !r.a[0] && !r.a[1]; });
+    var never = flat.filter(function (r) { return !holds(r, [0, 0], 1e-9); }), idle = flat.filter(function (r) { return never.indexOf(r) < 0; });
+    var rows = all.filter(function (r) { return bad.indexOf(r) < 0 && flat.indexOf(r) < 0; });
     var pr = region(ref.rows, big), pm = region(rows, big);
     var missing = ref.rows.filter(function (r) { return pm.some(function (p) { return !holds(r, p, tolAt(r, p)); }); });
     var cuts = rows.filter(function (r) { return pr.some(function (p) { return !holds(r, p, tolAt(r, p)); }); });
@@ -56,7 +59,8 @@
     var nv = Math.hypot(v[0], v[1]), nw = Math.hypot(w[0], w[1]), cross = v[0] * w[1] - v[1] * w[0], dot = v[0] * w[0] + v[1] * w[1];
     var objOK = isFinite(nw) && nw > 0 && Math.abs(cross) <= 0.01 * nv * nw && dot > 0;
     var obj = { ok: objOK, factor: objOK ? nw / nv : null, reversed: isFinite(nw) && nw > 0 && Math.abs(cross) <= 0.01 * nv * nw && dot < 0 };
-    return { ok: objOK && !missing.length && !cuts.length && !bad.length, missing: missing, cuts: cuts, empty: bad, obj: obj, infeasible: !pm.length };
+    return { ok: objOK && !missing.length && !cuts.length && !bad.length && !never.length, missing: missing, cuts: cuts, empty: bad, never: never, idle: idle,
+             obj: obj, infeasible: !pm.length || never.length > 0 };
   }
 
   // the rows as A x <= b (>= rows flipped, = rows split), keeping the sign rows x >= 0 as bounds
@@ -173,6 +177,7 @@
       if (st.rows.some(function (s) { return s.op === ">=" && !isBound(s) && sameRow(r, { a: s.a, b: s.b }); })) return { ok: false, why: fill(C.copied, { k: i + 1 }) };
     }
     if (res.empty.length) return { ok: false, why: C.blank };
+    if (res.never.length) return { ok: false, why: fill(C.never, { k: rows.indexOf(res.never[0]) + 1, b: num(res.never[0].b) }) };
     if (res.cuts.length) return { ok: false, why: fill(C.cuts, { k: rows.indexOf(res.cuts[0]) + 1 }) };
     if (res.missing.length) return { ok: false, why: fill(C.missing, { says: res.missing[0].says }) };
     return { ok: false, why: C.weights };
@@ -284,27 +289,51 @@
     var sg = LP.segment(r.a, r.b, view);
     return "The line " + fmtLin(r.a, sy || ["x", "y"]) + " = " + num(r.b) + (sg ? " runs from " + pt(sg[0]) + " to " + pt(sg[1]) : " lies outside the drawing") + "; " + sideWords(r) + ".";
   }
-  // a learner's rules (and goal, once chosen) in words: the region's corners, whether it is open, and the best plan
-  function describeModel(m, sy, view) {
-    var rows = (m.rows || []).filter(function (r) { return r.a[0] || r.a[1]; });
-    if (!rows.length) return ["No rules yet: every plan passes."];
-    var out = ["Your rules: " + rows.map(function (r) { return fmtRule(r, sy); }).join(", ") + "."];
+  // the best plan of any rules a learner writes (rules with a decision in them): unbounded only when a direction the
+  // region runs along forever improves the goal (LX.lp2.rays), so an open region with a finite best (minimize x with
+  // x, y >= 0) is not called unbounded; exact corners (LX.lp2.solve) when the region has one, which x >= 0 and y >= 0
+  // guarantee. -> {status: "optimal" | "tied" | "unbounded" | "infeasible", x: [x, y] or null}
+  function bestPlan(m, view) {
+    var rows = m.rows, sg = m.sense === "max" ? -1 : 1, c = [sg * m.c[0], sg * m.c[1]];
+    if (!region(rows, bigBox(view)).length) return { status: "infeasible", x: null };
+    if (LP.rays(rows).some(function (r) { return c[0] * r[0] + c[1] * r[1] < -1e-9; })) return { status: "unbounded", x: null };
+    if (LP.corners(rows).length) { var e = LP.solve(m); return { status: e.status, x: [r6(e.x), r6(e.y)] }; }
+    return { status: "tied", x: null };   // no corner: the best plans fill a whole line
+  }
+  // a learner's rules (and goal, once chosen) in words: the region's corners, whether it is open, and the best plan;
+  // lead names the rules (default "Your rules: ")
+  function describeModel(m, sy, view, lead) {
+    var all = m.rows || [], rows = all.filter(function (r) { return r.a[0] || r.a[1]; });
+    if (!all.length) return ["No rules yet: every plan passes."];
+    var out = [(lead || "Your rules: ") + all.map(function (r) { return fmtRule(r, sy); }).join(", ") + "."];
+    var never = all.filter(function (r) { return !r.a[0] && !r.a[1] && !holds(r, [0, 0], 1e-9); });
+    if (never.length) { out.push(fmtRule(never[0], sy) + " has no decision in it and is never true: no plan passes."); return out; }
+    if (!rows.length) { out.push("None of them has a decision in it: every plan passes."); return out; }
     if (!region(rows, bigBox(view)).length) { out.push("No plan passes all of them."); return out; }
     var C = LP.corners(rows), open = LP.rays(rows).length > 0;
-    out.push(C.length ? "The plans that pass them all form a region with corners " + C.map(function (p) { return pt([r6(p.x), r6(p.y)]); }).join(", ") + (open ? "; it goes on for ever in some direction." : ".")
-                      : "The plans that pass them all form a region without corners" + (open ? " that goes on for ever." : "."));
+    out.push(C.length ? "The plans that pass them all form a region with corners " + C.map(function (p) { return pt([r6(p.x), r6(p.y)]); }).join(", ") + (open ? "; it goes on forever in some direction." : ".")
+                      : "The plans that pass them all form a region without corners" + (open ? " that goes on forever." : "."));
     if (m.sense && (m.c[0] || m.c[1])) {
-      var o = optimum({ sense: m.sense, c: m.c, rows: rows }, view);
+      var o = bestPlan({ sense: m.sense, c: m.c, rows: rows }, view);
       if (o.status === "optimal") out.push("Best plan for your goal: " + pt(o.x) + ".");
-      else if (o.status === "unbounded") out.push("Your goal improves for ever: the model is unbounded.");
+      else if (o.status === "tied" && o.x) out.push("Best plan for your goal: " + pt(o.x) + "; other plans tie with it.");
+      else if (o.status === "tied") out.push("Many plans tie for best: a whole line of them.");
+      else if (o.status === "unbounded") out.push("Your goal improves forever: the model is unbounded.");
     }
     return out;
+  }
+  // the solver's answer in words, valued with the story's own goal; when the learner's goal is a scaled or sign-flipped
+  // copy (min 30c − 120d for max 120d − 30c), its own value is named as well, so −6,240 is not read as a loss
+  function solverLine(story, names, x, y, objective) {
+    var v = r6(story.c[0] * x + story.c[1] * y), own = Math.abs(objective - v) > 1e-6 * (1 + Math.abs(v));
+    return names[0] + " = " + num(x) + ", " + names[1] + " = " + num(y) + ", " + (story.sense === "max" ? "earns " : "costs ") + money(v) +
+      (own ? "; your goal's own value is " + num(objective) + ", the same plan on your goal's scale" : "");
   }
 
   var model = { townDay: townDay, le: le, lhs: LP.lhs, holds: holds, clip: LP.clip, region: region, optimum: optimum, compare: compare,
                 toArrays: toArrays, dispatchStory: dispatchStory, planningStory: planningStory, withKey: withKey, readiness: readiness, adviceFor: adviceFor,
                 cornerTable: cornerTable, checkArrays: checkArrays, practiceSpecs: practiceSpecs, fill: fill, num: num, money: money, pt: pt,
-                fmtRule: fmtRule, ruleWords: ruleWords, describeModel: describeModel, tolAt: tolAt, HOUR: HOUR, PREV_CC: PREV_CC };
+                fmtRule: fmtRule, ruleWords: ruleWords, describeModel: describeModel, bestPlan: bestPlan, solverLine: solverLine, tolAt: tolAt, HOUR: HOUR, PREV_CC: PREV_CC };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -326,6 +355,8 @@
     });
     return { el: g, set: function (i) { bs.forEach(function (x, j) { x.setAttribute("aria-pressed", j === i ? "true" : "false"); }); } };
   }
+  function liveAlt(host, title) { var d = H("details", { class: "lx-textalt" }, host); H("summary", { text: title }, d); return H("ul", null, d); }
+  function setItems(ul, items) { ul.innerHTML = ""; items.forEach(function (t) { H("li", { text: t }, ul); }); }
   function textAlt(host, title, items) {
     var d = H("details", { class: "lx-textalt" }, host); H("summary", { text: title }, d);
     var ul = H("ul", null, d); items.forEach(function (t) { H("li", { html: LX.rich(t) }, ul); });
@@ -403,14 +434,15 @@
       rows: mine.rows.filter(function (r) { return isFinite(r.b) && (isFinite(r.a[0]) || isFinite(r.a[1])); }).map(function (r) { return { a: [isFinite(r.a[0]) ? r.a[0] : 0, isFinite(r.a[1]) ? r.a[1] : 0], op: r.op, b: r.b }; }) }; }
     function draw() {
       var m = clean(); pl.clear();
-      var usable = m.rows.filter(function (r) { return r.a[0] || r.a[1]; });
-      if (usable.length) pl.region(usable);
+      var usable = m.rows.filter(function (r) { return r.a[0] || r.a[1]; });   // rules with no decision draw no line but still count
+      if (m.rows.length) pl.region(m.rows);
       usable.forEach(function (r) { pl.rule(r, { label: r.b === 0 && (!r.a[0] || !r.a[1]) ? null : fmtRule(r, sy), cls: "on" }); });
-      if (m.sense && (m.c[0] || m.c[1]) && usable.length) {
-        var opt = optimum({ sense: m.sense, c: m.c, rows: usable }, st.view);
-        if (opt.status === "optimal") pl.point(opt.x, { label: "best: (" + num(opt.x[0]) + ", " + num(opt.x[1]) + ")" });
+      var never = m.rows.some(function (r) { return !r.a[0] && !r.a[1] && !holds(r, [0, 0], 1e-9); });
+      if (m.sense && (m.c[0] || m.c[1]) && usable.length && !never) {
+        var opt = bestPlan({ sense: m.sense, c: m.c, rows: usable }, st.view);
+        if (opt.x && (opt.status === "optimal" || opt.status === "tied")) pl.point(opt.x, { label: "best: (" + num(opt.x[0]) + ", " + num(opt.x[1]) + ")" });
       }
-      altList.innerHTML = ""; describeModel({ sense: m.sense, c: m.c, rows: usable }, sy, st.view).forEach(function (t) { H("li", { text: t }, altList); });
+      setItems(altList, describeModel(m, sy, st.view));
     }
     function report(res, m) {
       out.innerHTML = "";
@@ -419,7 +451,8 @@
         solved = true; box.classList.add("is-solved");
         var gtxt = st.goalUnit === "$k a year" ? "$" + (v / 1000).toFixed(1) + " million a year" : st.goalUnit.charAt(0) === "$" ? money(v) + st.goalUnit.slice(1) : num(v) + " " + st.goalUnit;
         H("div", { class: "lx-saw", html: LX.icon("check") + "<div><b>Your model matches the story.</b> " + LX.esc("Best plan: " + sy[0] + " = " + num(opt.x[0]) + " " + st.vars[0].unit + ", " + sy[1] + " = " + num(opt.x[1]) + " " + st.vars[1].unit + "; goal " + gtxt + ".") +
-          (res.obj.factor && Math.abs(res.obj.factor - 1) > 0.01 ? " " + LX.esc("(Your goal is the story's times " + num(res.obj.factor) + ": the same best plan, a scaled value.)") : "") + "</div>" }, out);
+          (res.obj.factor && Math.abs(res.obj.factor - 1) > 0.01 ? " " + LX.esc("(Your goal is the story's times " + num(res.obj.factor) + ": the same best plan, a scaled value.)") : "") +
+          (res.idle.length ? " " + LX.esc("(" + fmtRule(res.idle[0], sy) + " has no decision in it: always true, so it changes nothing.)") : "") + "</div>" }, out);
         if (o.onSolved) o.onSolved(clean(), opt);
         return;
       }
@@ -427,13 +460,14 @@
       if (o.mode === "all" && !mine.sense) msgs.push("Choose min or max for the goal.");
       else if (!res.obj.ok) msgs.push(res.obj.reversed ? "Your goal points the wrong way: it would chase the worst plan. Check min or max, or the signs." : "Your goal weighs " + sy[0] + " and " + sy[1] + " differently from the story. Check its two numbers.");
       res.missing.forEach(function (r) { msgs.push("Your model lets through plans that break this sentence: “" + r.says + "”."); });
+      res.never.forEach(function (r) { msgs.push("Your rule " + fmtRule(r, sy) + " has no decision in it and is never true, so no plan passes. Remove it or fill in its numbers."); });
       res.cuts.forEach(function (r) { msgs.push("Your rule " + fmtRule(r, sy) + " rules out plans the story allows. Check its sign, numbers or right-hand side."); });
       if (res.empty.length) msgs.push("A rule is empty or unreadable: fill in its numbers or remove it.");
       var box2 = H("div", { class: "lx-saw no", html: LX.icon("question") + "<div><b>Not yet.</b></div>" }, out), ul = H("ul", { class: "b1-msgs" }, box2.lastChild);
       msgs.slice(0, 4).forEach(function (t) { H("li", { text: t }, ul); });
     }
     check.addEventListener("click", function () {
-      var m = clean(); m.rows = m.rows.filter(function (r) { return r.a[0] || r.a[1]; });
+      var m = clean();   // a rule with no decision in it stays: 0 ≤ −1 makes the model infeasible, 0 ≤ 1 changes nothing
       if (!m.sense) { out.innerHTML = ""; H("div", { class: "lx-saw no", html: LX.icon("question") + "<div><b>Not yet.</b> Choose min or max for the goal first.</div>" }, out); return; }
       report(compare(st, m, st.view), m);
     });
@@ -574,7 +608,7 @@
       build: function (act, api) {
         var on = {}, chips = H("div", { class: "k4-chips", role: "group", "aria-label": "Rules" }, act);
         var pl = planeFor(act, d1, "The dispatch rules switched on, and the plans that pass them all.");
-        var out = H("p", { class: "k4-test", "aria-live": "polite" }, act);
+        var out = H("p", { class: "k4-test", "aria-live": "polite" }, act), alt4 = null;
         d1.rows.forEach(function (r) {
           var b = H("button", { type: "button", class: "lx-chip", "aria-pressed": "false" }, chips); H("i", { style: "--c:var(--lx-accent)" }, b); H("span", { text: fmtRule(r) }, b);
           b.addEventListener("click", function () { on[r.key] = !on[r.key]; b.setAttribute("aria-pressed", on[r.key] ? "true" : "false"); draw(r.key); });
@@ -587,11 +621,12 @@
           if (last === "ccMax" && on.ccMax && on.ramp) out.textContent = "x ≤ " + d1.ccMax + " changes nothing while x ≤ " + d1.reach + " is on: it is redundant this hour.";
           else out.textContent = all ? "All six rules: a triangle of allowed plans." : rules.length + " of " + d1.rows.length + " rules on.";
           if (all) { api.done(); api.saw("Six rules leave a triangle of allowed plans, the [[feasible-region|feasible region]]. x ≤ " + d1.ccMax + " changes nothing, because x ≤ " + d1.reach + " is tighter: a redundant rule."); }
+          if (alt4) setItems(alt4, describeModel({ rows: rules }, ["x", "y"], d1.view, "Rules on: ").map(function (t) { return t.replace("No rules yet: every plan passes.", "No rules on: every plan passes."); })
+            .concat(all ? ["Plans above the cover line make more than " + d1.need + " MW of gas; the extra, at most " + d1.maxSurplus + " MW, is matched by spilling some of the " + d1.spillable + " MW of wind and sun."] : []));
           return P;
         }
+        alt4 = liveAlt(act, "Text version");
         draw();
-        textAlt(act, "Text version", ["Rules: " + d1.rows.map(function (r) { return fmtRule(r); }).join(", ") + ".", "Together they leave a triangle with corners " + region(d1.rows, d1.view).map(function (p) { return "(" + num(p[0]) + ", " + num(p[1]) + ")"; }).join(", ") + ".",
-          "Plans above the cover line make more than " + d1.need + " MW of gas; the extra, at most " + d1.maxSurplus + " MW, is matched by spilling some of the " + d1.spillable + " MW of wind and sun."]);
       }
     });
 
@@ -692,7 +727,7 @@
 
     // 9 the same model as A x <= b
     steps.push({
-      text: "Many solvers read a model as [[array|arrays]], ordered lists and tables of numbers: costs c, a table A and limits b, every rule written as ≤. Flip the cover rule into that form, then tap any row.",
+      text: "Solvers read a model as [[array|arrays]]: costs c, a table A and limits b, with every rule written as ≤. Flip the cover rule into that form, then tap a row.",
       build: function (act, api) {
         var flipped = false, sel = null, rows = d1.rows.filter(function (r) { return r.b !== 0; });
         var grid = H("div", { class: "b1-mx", role: "group", "aria-label": "The rows of A x ≤ b" }, act);
@@ -744,19 +779,19 @@
                    constraints: m.rows.filter(function (r) { return !(r.op === ">=" && r.b === 0 && (r.a[0] === 0 || r.a[1] === 0)); })
                      .map(function (r, i) { var c = { name: "r" + (i + 1), terms: {} }; c.terms[names[0]] = r.a[0]; c.terms[names[1]] = r.a[1]; c[{ "<=": "le", ">=": "ge", "=": "eq" }[r.op]] = r.b; return c; }) };
         }
-        function run(m, names, ref, label) {
+        function run(m, names, ref, label, story) {
           if (!LX.solver) { out.innerHTML = ""; H("p", { class: "lx-hint", text: "The solver could not load here; its answer would be the corner (" + ref.x.join(", ") + ")." }, out); api.done(); return; }
           if (status) status.set("solving");
           LX.solver.solve(toSolver(m, names), { timeLimit: 2, key: "b1" }).then(function (r) {
             if (status) status.set(r); out.innerHTML = "";
             if (!r.ok) { H("div", { class: "lx-saw no", html: LX.icon("question") + "<div>" + LX.esc("HiGHS says: " + r.status + ".") + "</div>" }, out); return; }
             var x = r.values[names[0]], y = r.values[names[1]], same = Math.abs(x - ref.x[0]) < 1e-6 && Math.abs(y - ref.x[1]) < 1e-6;
-            H("div", { class: "lx-saw", html: LX.icon("check") + "<div><b>" + LX.esc(label) + ":</b> " + LX.esc(names[0] + " = " + num(x) + ", " + names[1] + " = " + num(y) + ", goal " + money(r.objective) + (same ? ": the corner you found by hand." : ".")) + "</div>" }, out);
+            H("div", { class: "lx-saw", html: LX.icon("check") + "<div><b>" + LX.esc(label) + ":</b> " + LX.esc(solverLine(story, names, x, y, r.objective) + (same ? ": the corner you found by hand." : ".")) + "</div>" }, out);
             if (label === "Dispatch") { api.done(); api.saw("HiGHS returns " + num(x) + " and " + num(y) + " MW, " + money(r.objective) + ": the same corner. Solvers do this for millions of decisions, where no graph can help."); }
           });
         }
-        b1.addEventListener("click", function () { run(d1, ["x", "y"], best1, "Dispatch"); });
-        b2.addEventListener("click", function () { run(diyModel || battery, ["c", "d"], bestB, diyModel ? "Your battery model" : "The battery model (yours is not finished yet)"); });
+        b1.addEventListener("click", function () { run(d1, ["x", "y"], best1, "Dispatch", d1); });
+        b2.addEventListener("click", function () { run(diyModel || battery, ["c", "d"], bestB, diyModel ? "Your battery model" : "The battery model (yours is not finished yet)", battery); });
       }
     });
 
@@ -899,7 +934,7 @@
     ci.push(numIn(w, null, "Cost of " + sy[1] + ", min form", function (v) { c[1] = v; draw(); })); H("span", { class: "b1-sym", text: sy[1] }, w);
     var list = H("div", { class: "b1-rows" }, box), tools = H("div", { class: "b1-tools" }, box);
     H("p", { class: "b1-mxnote", text: "Bounds " + sy[0] + " ≥ 0 and " + sy[1] + " ≥ 0 go in separately, as in step 9." }, box);
-    var pl = planeFor(box, st, "The plans that pass your rows of A x ≤ b and the bounds.");
+    var pl = planeFor(box, st, "The plans that pass your rows of A x ≤ b and the bounds."), altUl = liveAlt(box, "Text version");
     function blank() { return { a: [NaN, NaN], b: NaN }; }
     for (var k = 0; k < (o.blanks || 1); k++) mine.push(blank());
     function rows() { return (o.given || []).concat(mine); }
@@ -926,9 +961,10 @@
     }
     function draw() {
       pl.clear();
-      var use = rows().filter(function (r) { return isFinite(r.a[0]) && isFinite(r.a[1]) && isFinite(r.b) && (r.a[0] || r.a[1]); }).map(function (r) { return { a: r.a, op: "<=", b: r.b }; });
-      var rs = use.concat(bounds()), P = pl.region(rs);
+      var all = rows().filter(function (r) { return isFinite(r.a[0]) && isFinite(r.a[1]) && isFinite(r.b); }).map(function (r) { return { a: r.a, op: "<=", b: r.b }; });
+      var use = all.filter(function (r) { return r.a[0] || r.a[1]; }), rs = all.concat(bounds()), P = pl.region(rs);
       ruleLines(pl, use, st.view, function (r) { return fmtRule(r, sy); }, "on", P);
+      setItems(altUl, describeModel({ rows: rs }, sy, st.view, "Your rows and the bounds: "));
     }
     render(); draw();
     return {

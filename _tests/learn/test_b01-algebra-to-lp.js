@@ -196,6 +196,11 @@ if (process.argv.includes("--fallback")) { console.log(fallbackSVG()); process.e
     ok(d1.rows.length === 6 && JS.indexOf('d1.rows.length + " rules.') > 0 && JS.indexOf("Six rules leave a triangle") > 0, "js: step 3 counts the rules from the model (6), as step 4 says");
     has("Linear programs use ≤, ≥ and =", "the strict-inequality answer allows equalities");
     has("can climb by at most 40 MW an hour", "the fallback: the ramp limits the climb");
+    ok(!/odelling/.test(QMD + JS) && !/for ever/.test(JS), "spelling: American (modeling, forever)");
+    has("some corner is a best plan", "the corner quiz states its condition"); has("at least one best plan is a corner", "the corner idea states its condition");
+    has("annual yields of about 2.1 and 3.0 GWh per MW follow from the U.S. 2025 capacity factors", "yields are not called capacity factors");
+    ok(!/supply line|north line|substation/.test(JSON.stringify(J.stories)) && /supply contract allows at most 10 MWh/.test(J.stories.heat.text.join(" ")) && /north contract allows at most 80 MWh/.test(J.stories.imports.text.join(" ")), "stories: energy limits are contract limits, not a line's power rating");
+    ok(/\[\[capacity-factor\|capacity factors\]\]/.test(J.stories.planning.text.join(" ")), "planning story: capacity factor carries its glossary mark");
     ok(d1.rows[1].says.indexOf("can climb by at most 40 MW") > 0 && JS.indexOf("(the drop is left out)") > 0 && QMD.indexOf("limits only the climb") > 0, "ramp: upward only, said in the story, the worked line and the limits box");
     // gas above the need is matched by spilling wind or sun: every plan in each dispatch region has enough to spill
     [["dispatch", d1], ["d14", stories.d14], ["d18", stories.d18]].forEach(([k, st]) => {
@@ -238,7 +243,7 @@ if (process.argv.includes("--fallback")) { console.log(fallbackSVG()); process.e
        SP.c18.check({ x: 105, y: 10, cost: 5000 }).why === B.fill(PI.c18.badCost, SP.c18.vars) && SP.c18.check({ x: 105, y: NaN, cost: 5200 }) === null, "c18: right passes; off the lines and a wrong cost get their reasons; a blank waits");
     // imports: from scratch
     ok(JSON.stringify(SP.imports.table.map(r => r.x)) === "[[0,100],[0,160],[48,52]]" && SP.imports.vars.nAxis === 2 && SP.imports.vars.k === "0.5" && SP.imports.vars.rhs === "24", "imports: corners (0, 100), (0, 160), (48, 52); 0.5x = 24");
-    ok(SP.imports.table.every(r => r.keys.indexOf("north") < 0), "imports: the north line touches no corner (the right reason calls it redundant)");
+    ok(SP.imports.table.every(r => r.keys.indexOf("north") < 0), "imports: the north contract touches no corner (the right reason calls it redundant)");
     ok(SP.imports.check({ x: 48, y: 52, cost: 4040 }).ok && /breaks a rule: “at most 64 t/.test(SP.imports.check({ x: 60, y: 40, cost: 3800 }).why) && /costs \$5,000/.test(SP.imports.check({ x: 0, y: 100, cost: 5000 }).why) && /recompute/.test(SP.imports.check({ x: 48, y: 52, cost: 4000 }).why), "imports: right passes; a plan over the cap, a dearer corner and a wrong cost get their reasons");
     // aplan: worked arrays and the what-if goal
     ok(JSON.stringify(SP.aplan.arrays.A) === "[[-2.1,-3],[1,1]]" && JSON.stringify(SP.aplan.arrays.b) === "[-300,115]" && JSON.stringify(SP.aplan.changed.b) === "[-330,115]" && JSON.stringify(SP.aplan.changed.A) === JSON.stringify(SP.aplan.arrays.A), "aplan: a 330 GWh goal changes only b₁, to −330");
@@ -282,6 +287,30 @@ if (process.argv.includes("--fallback")) { console.log(fallbackSVG()); process.e
       ok(/corners/.test(d[1]) && d[1].indexOf("(80, 72)") > 0 && d[2] === "Best plan for your goal: (80, 72).", "builder text: the battery's corners and best plan in words: " + d.join(" | "));
       ok(B.describeModel({ sense: null, c: [NaN, NaN], rows: [] }, ["c", "d"], bt.view)[0] === "No rules yet: every plan passes." && /No plan passes/.test(B.describeModel({ rows: [{ a: [1, 0], op: "<=", b: 5 }, { a: [1, 0], op: ">=", b: 6 }] }, ["x", "y"], bt.view).join(" ")), "builder text: no rules, and contradictory rules"); }
     ok(/Choose min or max for the goal first/.test(JS) && !/m\.sense = "min"/.test(JS), "builder: min or max must be chosen; nothing is filled in silently");
+    // an open region with a finite best is not unbounded; unbounded needs a direction that improves the goal for ever
+    { const xy = [{ a: [1, 0], op: ">=", b: 0 }, { a: [0, 1], op: ">=", b: 0 }], v = [0, 160, 0, 140];
+      const b1 = B.bestPlan({ sense: "min", c: [1, 0], rows: xy }, v), d = B.describeModel({ sense: "min", c: [1, 0], rows: xy }, ["x", "y"], v);
+      ok(b1.status === "tied" && b1.x.join() === "0,0" && d[2] === "Best plan for your goal: (0, 0); other plans tie with it." && !/unbounded/.test(d.join(" ")), "best plan: minimize x with x, y ≥ 0 is 0 on the y-axis, not unbounded: " + d.join(" | "));
+      ok(B.bestPlan({ sense: "max", c: [1, 1], rows: xy }, v).status === "unbounded" && /unbounded/.test(B.describeModel({ sense: "max", c: [1, 1], rows: xy }, ["x", "y"], v).join(" ")), "best plan: maximize x + y with x, y ≥ 0 is unbounded");
+      ok(B.bestPlan({ sense: "min", c: [1, 0], rows: [xy[0]] }, v).status === "tied" && B.bestPlan({ sense: "min", c: [0, 1], rows: [xy[0]] }, v).status === "unbounded", "best plan: a region without corners: a whole line ties for min x; min y is unbounded");
+      ok(B.bestPlan({ sense: "max", c: stories.battery.c, rows: stories.battery.rows }, stories.battery.view).x.join() === "80,72", "best plan: the battery's exact corner (80, 72)");
+      ok(!/optimum\(\{ sense: m\.sense/.test(JS) && /bestPlan\(\{ sense: m\.sense, c: m\.c, rows: usable \}/.test(JS), "builder: the plane's best point uses the exact best plan, not the boxed search"); }
+    // a rule with no decision in it: never true makes the model infeasible; always true changes nothing
+    { const bt = stories.battery, bm = bt.rows.map(r => ({ a: r.a.slice(), op: r.op, b: r.b }));
+      const bad = B.compare(bt, { sense: "max", c: bt.c, rows: bm.concat([{ a: [0, 0], op: "<=", b: -1 }]) }, bt.view);
+      const fine = B.compare(bt, { sense: "max", c: bt.c, rows: bm.concat([{ a: [0, 0], op: "<=", b: 1 }]) }, bt.view);
+      ok(!bad.ok && bad.never.length === 1 && bad.infeasible && fine.ok && fine.idle.length === 1 && !fine.never.length, "compare: 0c + 0d ≤ −1 makes the battery model infeasible; 0c + 0d ≤ 1 changes nothing");
+      ok(!/m\.rows = m\.rows\.filter\(function \(r\) \{ return r\.a\[0\] \|\| r\.a\[1\]; \}\)/.test(JS) && /has no decision in it and is never true/.test(JS), "builder: the check keeps rules with no decision in it and says why 0 ≤ −1 fails");
+      const dn = B.describeModel({ rows: bm.concat([{ a: [0, 0], op: "<=", b: -1 }]) }, ["c", "d"], bt.view);
+      ok(dn[1] === "0 ≤ −1 has no decision in it and is never true: no plan passes.", "builder text: 0 ≤ −1 is named as never true: " + dn.join(" | "));
+      const nv = SP.abus.check({ c: SP.abus.answer.c, rows: SP.abus.answer.rows.concat([{ a: [0, 0], b: -1 }]) }), ia = SP.abus.check({ c: SP.abus.answer.c, rows: SP.abus.answer.rows.concat([{ a: [0, 0], b: 1 }]) });
+      ok(!nv.ok && nv.why === B.fill(PJ.checks.never, { k: 5, b: "−1" }) && ia.ok, "arrays: a row 0 ≤ −1 is caught (" + nv.why + "); a row 0 ≤ 1 is harmless"); }
+    // the solver's answer is valued with the story's goal; a min-form goal's own value is named, not shown as a loss
+    { const bt = stories.battery, t1 = B.solverLine(bt, ["c", "d"], 80, 72, -6240), t2 = B.solverLine(bt, ["c", "d"], 80, 72, 6240);
+      ok(/earns \$6,240; your goal's own value is −6,240/.test(t1) && t2 === "c = 80, d = 72, earns $6,240" && B.solverLine(d1, ["x", "y"], 130, 15, 6700) === "x = 130, y = 15, costs $6,700", "solver line: " + t1);
+      ok(/solverLine\(story, names, x, y, r\.objective\)/.test(JS) && /"Your battery model" : "The battery model \(yours is not finished yet\)", battery\)/.test(JS), "solver run: the battery is valued with the story's goal"); }
+    // text versions follow the interaction: step 4's switched-on rules, the arrays exercises' rows
+    ok(/describeModel\(\{ rows: rules \}, \["x", "y"\], d1\.view, "Rules on: "\)/.test(JS) && /describeModel\(\{ rows: rs \}, sy, st\.view, "Your rows and the bounds: "\)/.test(JS), "text versions: step 4 and the arrays exercises describe what is drawn");
     // the page hosts the set; the view builds every exercise
     ok(QMD.indexOf('<div id="b1-practice"></div>') > 0, "page: the practice host in the Check section");
     ["c14", "c18", "imports", "aplan", "abat", "abus"].forEach(k => ok(JS.indexOf(k + ": function") > 0, `js: the view builds exercise ${k}`));
