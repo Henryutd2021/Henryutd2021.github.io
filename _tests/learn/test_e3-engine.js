@@ -5,9 +5,8 @@
 //   - the plan links: SB3's and C3's schemas valid; defaults and presets valid and round-trip
 //   - 2025 as it is: each district buys its 2025 electricity less the rooftop solar it uses; its busiest hour is
 //     prairie-city.json's peak2025MW; the city's CO2 agrees with the 2025 inventory (both count grid-supplied
-//     electricity): row by row except distribution losses, within the rounding of the hourly data; the losses row
-//     differs by 5% of the rooftop MWh at the grid rate (the inventory takes losses on all electricity used, E3 on
-//     electricity bought), about 600 t
+//     electricity, and both take distribution losses on it): row by row and in total, within the rounding of the
+//     hourly data
 //   - the model as built, for every preset of SB3 and C3: every district-hour balances; imports within the limit plus the
 //     upgrade; batteries and the heat store follow their state equations, cyclic in each day; managed charging moves
 //     each day's energy within the day; the network's heat balances; the farms never exceed their output or the city's load
@@ -98,16 +97,15 @@ const near = (a, b, t) => Math.abs(a - b) <= (t == null ? 1e-6 : t);
     ok(R0.dist[i].upg < 1e-6, x.key + ": no upgrade in 2025");
   });
   const rc0 = await E3.solve(c3d, P, { solver }), A0c = rc0.results.acc;
-  // E3 and the 2025 inventory: both count grid-supplied electricity (rooftop solar used on site is not bought). Without
-  // the losses row they agree within the rounding of the hourly data (0.1 MW) and of the file's yearly figures; the
-  // losses row differs by 5% of the rooftop MWh at the grid rate, because the inventory takes distribution losses on all
-  // the electricity used (rooftop solar too) and E3 on what is bought through the substations
+  // E3 and the 2025 inventory: both count grid-supplied electricity (rooftop solar used on site is not bought), and both
+  // take the 5% distribution losses on it, so they agree row by row and in total within the rounding of the hourly data
+  // (0.1 MW) and of the file's yearly figures
   const inv = city.inventory2025, pvUsed0 = R0.acc.d.reduce((s, o) => s + o.pvUsed, 0);
   const lossE3 = (A0c.d.reduce((s, o) => s + o.imp, 0) + A0c.outside.el) * P.ef.grid * P.ef.loss, roofLoss = pvUsed0 * P.ef.grid * P.ef.loss;
   ok(near(pvUsed0, city.supply.rooftopMWh, 1), "2025: the rooftop solar used is prairie-city.json's rooftop MWh (" + Math.round(pvUsed0) + ")");
   ok(near(A0c.city.co2 - lossE3, inv.total - inv.sectors.grid_losses, 100), "the city's CO2 without the losses row = the inventory's (" + Math.round(A0c.city.co2 - lossE3) + " vs " + (inv.total - inv.sectors.grid_losses) + ")");
-  ok(near(inv.sectors.grid_losses - lossE3, roofLoss, 30), "the losses rows differ by 5% of the rooftop MWh at the grid rate (" + Math.round(inv.sectors.grid_losses - lossE3) + " vs " + Math.round(roofLoss) + " t)");
-  ok(near(inv.total - A0c.city.co2, 665, 100) && Math.abs(inv.total - A0c.city.co2) / inv.total < 5e-4, "E3's 2025 city CO2 is within 0.05% of the inventory, about 600 t lower, as the README says (" + Math.round(inv.total - A0c.city.co2) + " t)");
+  ok(near(inv.sectors.grid_losses, lossE3, 30) && roofLoss > 500, "the losses rows agree: both 5% of grid-supplied electricity, none on the rooftop solar used on site (" + Math.round(inv.sectors.grid_losses - lossE3) + " t apart; the rooftop MWh would add " + Math.round(roofLoss) + " t)");
+  ok(Math.abs(inv.total - A0c.city.co2) <= 100, "E3's 2025 city CO2 is the inventory's within 100 t, as the README says (" + Math.round(inv.total - A0c.city.co2) + " t)");
   const g0 = R0.hh;
   g0.rows.forEach((x, j) => ok(near(x.home0, city.groups[j].homeEnergy, 0.01) && near(x.home, x.home0, 1e-6) && near(x.fuel, x.fuel0, 1e-6) && near(x.burden, city.groups[j].burden, 1e-4), "households " + x.key + ": 2025 bills and burden as prairie-city.json (" + Math.round(x.home) + ")"));
   ok(near(g0.low.burden0, city.groupsNote.lowIncomeBurden, 1e-4) && near(g0.other.burden0, city.groupsNote.otherBurden, 1e-4), "0-80% and other groups' burden as prairie-city.json");

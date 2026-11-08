@@ -71,7 +71,7 @@
   }
   function power(C) {
     var el = into(C, "el"), solar = outOf(C, "src_solar"), grid = outOf(C, "src_grid"), lost = sum(C.flows.links.filter(function (l) { return l.from === "el" && l.to === "grid_losses"; }).map(function (l) { return l.value; }));
-    return { el: el, solar: solar, grid: grid, own: solar / el, lost: lost, meters: C.balance.totals.el, lossShare: C.supply.gridLossShare };
+    return { el: el, solar: solar, grid: grid, own: solar / el, lost: lost, meters: C.balance.totals.el, gridMeters: C.balance.totals.el - solar, lossShare: C.supply.gridLossShare };
   }
   // the lens: an actor's nodes lit, the rest pale
   function lens(C, F, key) {
@@ -94,6 +94,8 @@
   function countLine(n) { return n >= LENS_MIN ? "Actors compared: " + n + " of 5." : "Actors compared: " + n + " of at least " + LENS_MIN + "."; }
   // how useful energy is counted (shown beside the first Sankey, the losses step, the no-JS table and the explain layer)
   var CONV = "Convention: for computers, appliances and lights, the electricity delivered counts as useful; their own losses are not estimated, so a sector's loss share is not its efficiency.";
+  // the fertilizer plant's branch ends at the hydrogen it makes: the count stops before ammonia synthesis
+  var H2_LINE = "Boundary: the fertilizer plant's flow stops at the hydrogen its gas reformers make, at its higher heating value; turning that hydrogen into ammonia is outside this count.";
 
   // ---------------------------------------------------------------- the words the page shows (pure, tested)
   var STEPS = [
@@ -140,11 +142,11 @@
   function ownTick(v) { var k = 0; OWN_VAL.forEach(function (t, i) { if (Math.abs(t - v) < Math.abs(OWN_VAL[k] - v)) k = i; }); return k; }
   function powerLine(C) {
     var p = power(C);
-    return "Rooftop solar makes **" + pct(p.own, 1) + "** of the electricity; the other " + gwh(p.grid) + " comes from the [[spp|SPP]] grid. " + gwh(p.lost) + " is lost in the city's own wires (" + pct(p.lossShare) + ", set for teaching).";
+    return "Rooftop solar makes **" + pct(p.own, 1) + "** of the electricity; the other " + gwh(p.grid) + " comes from the [[spp|SPP]] grid. " + gwh(p.lost) + " is lost in the city's own wires (" + pct(p.lossShare) + " of the grid electricity users take, set for teaching).";
   }
   var POWER_SAW = "The power sector sits mostly outside the city: its plants are on the regional grid. The city's own accounting starts where electricity enters its wires.";
   // step 5: who the bins are, before the sort (their glossary terms open here, not only in the feedback)
-  var WHO_LINE = "Here the utility is [[vertically-integrated-utility|vertically integrated]]: it owns plants, wires and gas mains; the state regulator is a [[public-utility-commission|public utility commission]].";
+  var WHO_LINE = "Here the electric utility is [[vertically-integrated-utility|vertically integrated]], owning plants and wires; Prairie City's also runs the gas mains (set for teaching). The state regulator is a [[public-utility-commission|public utility commission]].";
   var SORT_NOTE = "Roles for a Kansas city served by an investor-owned utility, each from a dated primary source (listed under Sources); a city-owned utility or another state can differ.";
   function lensLine(F, key) { var a = F.actors.filter(function (x) { return x.key === key; })[0]; return "**" + a.label + "**: " + a.levers; }
   var LENS_SAW = "No one owns the whole picture: the city's levers sit on buildings and transport, while its electricity supply belongs to the utility, under the regulator and federal rules.";
@@ -166,7 +168,7 @@
     return "<p class=\"lx-eyebrow\">Prairie City's year of energy, 2025, in GWh (1 GWh = 1 million kWh)</p><p class=\"lx-hint\">" + esc(C.about.line) + "</p>" +
       "<div class=\"lx-scroll-x\"><table class=\"lx-mini-table f9-fbt\"><thead><tr><th scope=\"col\">Sector</th><th scope=\"col\">Takes in</th><th scope=\"col\">Useful energy</th><th scope=\"col\">Counted as lost</th></tr></thead><tbody>" +
       s.map(function (x) { return "<tr><td>" + esc(x.label) + "</td><td>" + gwh(x.gwh) + "</td><td>" + gwh(x.useful) + (x.h2 ? " (and " + gwh(x.h2) + " of hydrogen)" : "") + "</td><td>" + lostCell(x) + "</td></tr>"; }).join("") + "</tbody></table></div>" +
-      "<p class=\"lx-hint\">" + esc(CONV) + "</p>" +
+      "<p class=\"lx-hint\">" + esc(CONV) + "</p><p class=\"lx-hint\">" + esc(H2_LINE) + "</p>" +
       "<ul><li><b>Carriers.</b> " + cs.map(function (c) { return esc(c.label) + " " + gwh(c.gwh); }).join("; ") + ".</li>" +
       "<li><b>Electricity.</b> Rooftop solar makes " + pct(p.own, 1) + " of it; the rest comes from the SPP grid, and " + gwh(p.lost) + " is lost in the city's wires.</li></ul>" +
       "<p class=\"lx-eyebrow\">Who decides, for a Kansas city served by an investor-owned utility (typical roles)</p>" +
@@ -181,8 +183,9 @@
       "<dt>Useful and lost</dt><dd>Engines lose most of their fuel as heat: transport turns " + pct(1 - t.lossShare) + " of what it takes in into motion.</dd>" +
       "<dt>A convention</dt><dd>" + esc(CONV.replace(/^Convention: f/, "F")) + "</dd>" +
       "<dt>The power sector</dt><dd>Prairie City makes " + pct(p.own, 1) + " of its electricity; its accounting starts where the regional grid's power enters its wires.</dd>" +
-      "<dt>Who decides</dt><dd>For a Kansas city served by an investor-owned utility, the state regulator approves rates, federal rules set equipment standards and interstate markets, the city adopts its energy code and issues permits, and owners choose equipment.</dd>" +
-      "<dt>Typical, not universal</dt><dd>A city that owns its utility sets its own rates; many states adopt one energy code for the whole state, and states organise their utilities differently.</dd></dl>";
+      "<dt>Who decides</dt><dd>For a Kansas city served by an investor-owned utility, the state regulator approves rates; federal rules set equipment standards and govern interstate markets.</dd>" +
+      "<dt>The city and owners</dt><dd>The city adopts its energy code and issues permits; owners choose their equipment.</dd>" +
+      "<dt>Typical, not universal</dt><dd>A city that owns its utility sets its own rates; many states adopt one energy code for the whole state, and states organize their utilities differently.</dd></dl>";
   }
   // the homes' energy (the gas-share question): what they buy, and what they take in with the outdoor air's heat
   function homesMix(C) {
@@ -193,36 +196,37 @@
     var p = power(C), t = sectors(C, F).filter(function (x) { return x.key === "transport"; })[0], X = homesMix(C), h = X.h;
     var q = function (id, ans, text, a) { return "<div class=\"lx-qq\" data-id=\"" + id + "\" data-answer=\"" + ans + "\"><p class=\"lx-qtext\">Myth or fact? “" + text + "”</p><ul class=\"lx-choices\"><li data-value=\"myth\">Myth</li><li data-value=\"fact\">Fact</li></ul><details class=\"lx-answer\"><summary>Answer</summary><p>" + a + "</p></details></div>"; };
     var qq = function (id, ans, text, opts, a) { return "<div class=\"lx-qq\" data-id=\"" + id + "\" data-answer=\"" + ans + "\"><p class=\"lx-qtext\">" + text + "</p><ul class=\"lx-choices\">" + opts.map(function (o) { return "<li data-value=\"" + o[0] + "\">" + o[1] + "</li>"; }).join("") + "</ul><details class=\"lx-answer\"><summary>Answer</summary><p>" + a + "</p></details></div>"; };
-    var lost = Math.round(p.meters * p.lossShare * 10) / 10;
+    var lost = Math.round(p.gridMeters * p.lossShare * 10) / 10;
     return "<div class=\"lx-myths\" data-quiz=\"f09-myth\">" +
-      q("gridmix", "myth", "Prairie City's council alone decides which power plants make its electricity.", "Myth. In Kansas the utility picks its plants and contracts, the state regulator reviews their costs and SPP runs the regional grid; the city shapes its own use, buildings and permits.") +
+      q("gridmix", "myth", "Prairie City's council alone decides which power plants make its electricity.", "Myth. In Kansas the utility owns plants and signs supply contracts, the state regulator reviews their costs, and SPP's market decides which plants run across the region; the city shapes its own use and permits.") +
       q("council", "myth", "The city council sets the electricity rate every home pays.", "Myth for an investor-owned utility: in Kansas, the state's commission approves the rates. Fact where the city owns its utility.") +
       q("cars", "myth", "Most of the energy a car burns moves the car.", "Myth. Prairie City's transport takes in " + gwh(t.gwh) + " and turns " + gwh(t.useful) + " into motion; the rest leaves as heat.") +
       "</div><div class=\"lx-quiz\" data-quiz=\"f09\">" +
-      qq("gasshare", "b", "Prairie City's homes buy " + gwh(h.el) + " of electricity, " + gwh(h.gas) + " of gas and " + gwh(h.propane) + " of propane; their heat pumps also draw " + gwh(h.air) + " of free outdoor-air heat. About what share of what they buy is gas?",
-        [["a", "A quarter"], ["b", "Half"], ["c", "Three quarters"]], "About half of what they buy: " + fmtN(h.gas, 1) + " ÷ " + fmtN(X.bought, 1) + " = " + pct(X.gasBought) + "; counting the free outdoor-air heat too, " + fmtN(h.gas, 1) + " ÷ " + fmtN(X.all, 1) + " = " + pct(X.gasAll) + ".") +
+      qq("gasshare", "b", "Prairie City's homes buy " + gwh(h.el) + " of electricity, " + gwh(h.gas) + " of gas and " + gwh(h.propane) + " of propane. About what share of what they buy is gas?",
+        [["a", "A quarter"], ["b", "Half"], ["c", "Three quarters"]], "About half: " + fmtN(h.gas, 1) + " ÷ " + fmtN(X.bought, 1) + " = " + pct(X.gasBought) + ". Their heat pumps also draw " + gwh(h.air) + " of free outdoor-air heat; counting it, " + fmtN(h.gas, 1) + " ÷ " + fmtN(X.all, 1) + " = " + pct(X.gasAll) + ".") +
       qq("kcc", "c", "Who approves the rates of Kansas's investor-owned electric utilities?", [["a", "The city council"], ["b", "FERC"], ["c", "The Kansas Corporation Commission"]], "The Kansas Corporation Commission, the state regulator; FERC regulates interstate transmission and wholesale sales.") +
       qq("ferc", "a", "Which body regulates interstate transmission and wholesale power sales?", [["a", "FERC"], ["b", "The state regulator"], ["c", "The utility"]], "FERC, the Federal Energy Regulatory Commission.") +
-      qq("losses", "b", "Prairie City's meters take " + fmtN(p.meters, 1) + " GWh of electricity a year, and the wires lose " + pct(p.lossShare) + " as much again (set for teaching). How much is lost?",
-        [["a", "About " + fmtN(Math.round(lost / 10)) + " GWh"], ["b", "About " + fmtN(Math.round(lost)) + " GWh"], ["c", "About " + fmtN(Math.round(lost * 10)) + " GWh"]], fmtN(p.meters, 1) + " × " + fmtN(p.lossShare, 2) + " = " + fmtN(lost, 1) + " GWh, about the flow to distribution losses in the Sankey.") +
+      qq("losses", "b", "Prairie City's meters take " + fmtN(p.gridMeters, 1) + " GWh of grid electricity a year (rooftop solar aside), and the wires lose " + pct(p.lossShare) + " as much again (set for teaching). How much is lost?",
+        [["a", "About " + fmtN(Math.round(lost / 10)) + " GWh"], ["b", "About " + fmtN(Math.round(lost)) + " GWh"], ["c", "About " + fmtN(Math.round(lost * 10)) + " GWh"]], fmtN(p.gridMeters, 1) + " × " + fmtN(p.lossShare, 2) + " = " + fmtN(lost, 1) + " GWh, about the flow to distribution losses in the Sankey.") +
       "</div>";
   }
   function factsHTML(F) {
     return "<table class=\"lx-facts\"><thead><tr><th scope=\"col\">Number</th><th scope=\"col\">What it means</th><th scope=\"col\">Source</th></tr></thead><tbody>" +
       F.facts.map(function (f) { return "<tr><td class=\"n\">" + esc(f.n) + "</td><td>" + esc(f.what) + "</td><td class=\"s\"><a href=\"" + esc(f.url) + "\">" + esc(f.source) + "</a> · " + esc(f.asof) + "</td></tr>"; }).join("") + "</tbody></table>";
   }
-  var CITY_SRC = ["eia-btu", "eia-dg-2024", "eia-recs-wnc", "doe-fotw1360", "eia-930"];
+  // the city data's sources for the parts this page shows, the hydrogen branch included (gas per kg, the heating value)
+  var CITY_SRC = ["eia-btu", "eia-dg-2024", "eia-recs-wnc", "doe-fotw1360", "eia-930", "eia-aeo2026-hmm", "hydrogen-properties"];
   function srcItem(s) {
     var via = function (x) { return x.replace(/ \(via [^)]*\)/g, ""); }, cap = function (x) { return x.charAt(0).toUpperCase() + x.slice(1); };
     var t = s.url && s.url !== "no link" ? "<a href=\"" + esc(s.url) + "\">" + esc(s.title) + "</a>" : esc(s.title) + " (no link)";
-    return "<li>" + esc(s.publisher) + ". " + t + ". " + esc(cap(via(s.date))) + ". " + esc(cap(via(s.where))) + ".</li>";
+    return "<li>" + esc(cap(s.publisher)) + ". " + t + ". " + esc(cap(via(s.date))) + ". " + esc(cap(via(s.where))) + ".</li>";
   }
   function sourcesHTML(C, F) {
     return "<p class=\"lx-hint\">Who decides what (typical U.S. practice):</p><ul>" + Object.keys(F.sources).map(function (k) { return srcItem(F.sources[k]); }).join("") + "</ul>" +
       "<p class=\"lx-hint\">Prairie City's flows (the course's shared city data), the parts used here:</p><ul>" + CITY_SRC.map(function (k) { return srcItem(C.sources[k]); }).join("") + "</ul>";
   }
 
-  var model = { detailed: detailed, grouped: grouped, balance: balance, carriers: carriers, sectors: sectors, power: power, lens: lens, litParts: litParts, litLine: litLine, LENS_MIN: LENS_MIN, countLine: countLine, CONV: CONV, into: into, outOf: outOf,
+  var model = { detailed: detailed, grouped: grouped, balance: balance, carriers: carriers, sectors: sectors, power: power, lens: lens, litParts: litParts, litLine: litLine, LENS_MIN: LENS_MIN, countLine: countLine, CONV: CONV, H2_LINE: H2_LINE, into: into, outOf: outOf,
     STEPS: STEPS, Q_CARRIER: Q_CARRIER, carrierQ: carrierQ, sectorLine: sectorLine, sectorSaw: sectorSaw, Q_LOSS: Q_LOSS, lossQ: lossQ, lossLine: lossLine,
     OWN_TICKS: OWN_TICKS, OWN_VAL: OWN_VAL, ownTick: ownTick, powerLine: powerLine, POWER_SAW: POWER_SAW, WHO_LINE: WHO_LINE, SORT_NOTE: SORT_NOTE, lensLine: lensLine, LENS_SAW: LENS_SAW, muniSaw: muniSaw, whyItems: whyItems,
     homesMix: homesMix, lostCell: lostCell, staticFallback: staticFallback, ideasHTML: ideasHTML, checkHTML: checkHTML, factsHTML: factsHTML, sourcesHTML: sourcesHTML, CITY_SRC: CITY_SRC, fmtN: fmtN, pct: pct, gwh: gwh };
@@ -238,7 +242,7 @@
     var C = data.prairie_city, F = data[KEY], P = data.path, demo = [];
     var last = { view: "grouped", actor: "city" };
     function fictional(host) { H("p", { class: "lx-hint f9-fict", text: C.about.line }, host); }
-    function conv(host) { H("p", { class: "lx-hint f9-conv", text: CONV }, host); }
+    function conv(host) { H("p", { class: "lx-hint f9-conv", text: CONV }, host); H("p", { class: "lx-hint f9-conv", text: H2_LINE }, host); }
     function sankey(host, label, h) { return LX.Sankey(host, { label: label, unit: "GWh", fmt: fmtG, height: h || 340, heightN: 420, textHead: ["From", "To", "GWh in 2025"], colNames: ["Sources", "Carriers", "Sectors", "Becomes"] }); }
 
     var steps = [

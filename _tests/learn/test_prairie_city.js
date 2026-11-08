@@ -272,7 +272,7 @@ ok(near(B.sectors.transport.gasoline, gwh(TR.gasolineGal, D.units.btuPerGal.gaso
 ok(near(B.sectors.datacenter.el, DC.annualMWh / 1000, 0.06) && near(B.sectors.fertilizer.gas, FE.gasMMBtu * D.units.mwhPerMMBtu / 1000, 0.06), "data center and fertilizer flows are their blocks'");
 ok(near(B.sectors.homes.el, (T.annualMWh.residentialBase + T.annualMWh.residentialHeat) / 1000, 0.06) && near(B.sectors.commercial.el, (T.annualMWh.commercialBase + T.annualMWh.commercialHeat) / 1000, 0.06), "homes' and commercial electricity are the districts'");
 ok(near(B.sectors.homes.gas, T.gasMMBtu.residential * D.units.mwhPerMMBtu / 1000, 0.06) && near(B.sectors.commercial.gas, T.gasMMBtu.commercial * D.units.mwhPerMMBtu / 1000, 0.06), "homes' and commercial gas are the districts'");
-ok(near(vin("grid_losses"), r(B.totals.el * D.supply.gridLossShare, 1), 0.051) && near(F.links.find(l => l.from === "src_solar").value, r(D.supply.rooftopMWh / 1000, 1), 0.051), "grid losses 5% of delivered electricity; rooftop solar = MW x 8,760 h x 17.6%");
+ok(near(vin("grid_losses"), r((B.totals.el - D.supply.rooftopMWh / 1000) * D.supply.gridLossShare, 1), 0.051) && near(F.links.find(l => l.from === "src_solar").value, r(D.supply.rooftopMWh / 1000, 1), 0.051), "grid losses 5% of grid-supplied electricity (delivered less rooftop solar used on site); rooftop solar = MW x 8,760 h x 17.6%");
 ok(near(D.supply.rooftopMWh, D.supply.rooftopSolarMW * 8760 * e0.home.solar.cf, 0.6) && D.supply.rooftopCF === e0.home.solar.cf, "rooftop solar's capacity factor is e0.json's (EIA)");
 ok(near(vin("h2"), r(FE.hydrogenMWh / 1000, 1), 1e-9), "the hydrogen node carries the hydrogen's energy");
 ok(near(D.annual.electricityMWh, B.totals.el * 1000, 1e-6), "the city's electricity is the balance's");

@@ -8,14 +8,14 @@
 //     losses; every row and the totals add up; the page calls them CO2-only teaching subtotals, never BASIC or BASIC+
 //   - the baseline: A18's no-plan homes reproduce prairie-city.json's residential gas and heating electricity by district
 //     (same heat per home within a district, as its data build step derives them); the target counts the grid's own change
-//   - the programme: rebates are 40% of positive extra up-front costs only, charges never below zero (heat pumps with the
+//   - the program: rebates are 40% of positive extra up-front costs only, charges never below zero (heat pumps with the
 //     air conditioner due: no rebate, no charge, no double minus sign)
 //   - interactions: furnaces and heat pumps compete (both = heat pumps alone), the joint plan is below the sum of the bars,
 //     the bars in order add exactly to the joint plan (telescoping)
 //   - ties: the order of the bars is unique for every setting (36 combinations), the tie rule tested on a constructed tie;
 //     every bar avoids CO2 for every setting
 //   - feedback lines true for every input: all 64 plans x 36 settings (and targets, budgets, participation), each line
-//     45 words and three sentences at most, and its verdict equal to the model's (reaches, fits, over); explain-layer
+//     40 words and two sentences at most, and its verdict equal to the model's (reaches, fits, over); explain-layer
 //     texts (the plan trace, the who-decides rows, the boundary, the fallback) and data notes one or two sentences
 //   - every number on the page (fallback, Go deeper, myths, quiz, facts) against the model; scope, links, text, glossary
 //   - the page on a stub document: every step, the shortcut continues from the reader's plan
@@ -124,7 +124,7 @@ ok(B.filter(b => b.per < 0).length === 3 && B.filter(b => b.per < 0).every(b => 
 { const rows = [...PAGE0.matchAll(/<tr><td>(\d) · ([^<]+)<\/td><td>([^<]+)<\/td><td>([^<]+)<\/td><td>([^<]+)<\/td><\/tr>/g)];
   ok(rows.length === 6 && rows.every((m, i) => +m[1] === i + 1 && m[2] === B[i].m.label && m[3] === fm.t(B[i].t) && m[4] === fm.per(B[i].per) && m[5] === fm.musd(B[i].up)), "fallback table: the six bars in order with tonnes, cost per tonne and up front"); }
 onPage(`Alone, the six bars add to ${fm.t(alone)}; together they cut ${fm.t(all.t)} (${fm.pct(all.t / PC.inventory2025.total)} of 2025)`, "fallback: alone against together");
-onPage(`Alone, the six bars add to ${fm.t(alone)}; together they cut ${fm.t(all.t)}. Heat pumps and condensing furnaces compete`, "myth 3");
+onPage(`With the starting settings, the six bars add to ${fm.t(alone)} alone; together they cut ${fm.t(all.t)}. Heat pumps and condensing furnaces compete`, "myth 3: the numbers named as the starting settings'");
 { const fh = M.evaluate(W, ["furnace", "hp"], o0), h = M.evaluate(W, ["hp"], o0);
   ok(near(fh.t, h.t, 1e-6) && near(fh.net, h.net, 1e-6) && near(fh.upfront, h.upfront, 1e-6), "furnaces and heat pumps compete: both = heat pumps alone"); }
 ok(all.t < alone - 1000, "together less than the sum of the bars alone");
@@ -158,8 +158,8 @@ ok(ties === 0, "no two bars tie to the cent at any setting (the tie rule never d
 // ---------------- feedback lines, true for every input
 const subsets = []; for (let m = 0; m < 64; m++) subsets.push(IDS.filter((k, i) => m & (1 << i)));
 let lines = 0, expl = 0; const over = [], explOver = [];
-const LONG = (t, w, s) => { lines++; if (words(t) > (w || 45) || sentences(t) > (s || 3)) over.push(t.slice(0, 80) + " (" + words(t) + "/" + sentences(t) + ")"); };
-const EXPL = t => { expl++; if (words(t) > 45 || sentences(t) > 2) explOver.push(t.slice(0, 80) + " (" + words(t) + "/" + sentences(t) + ")"); };
+const LONG = (t, w, s) => { lines++; if (words(t) > (w || 40) || sentences(t) > (s || 2)) over.push(t.slice(0, 80) + " (" + words(t) + "/" + sentences(t) + ")"); };
+const EXPL = t => { expl++; if (words(t) > 40 || sentences(t) > 2) explOver.push(t.slice(0, 80) + " (" + words(t) + "/" + sentences(t) + ")"); };
 COMBOS.forEach(c => {
   const o = M.settings(W, Object.assign({}, DEF, c));
   LONG(M.lineOrder(W, o)); LONG(M.lineBaseline(W, o)); LONG(M.lineStatic(W, o));
@@ -174,13 +174,13 @@ COMBOS.forEach(c => {
     [0, 250, 700].forEach(bm => { const l = M.lineBudget(R, bm); LONG(l); ok(!ids.length || (R.upfront <= bm * 1e6) === /fits/.test(l), "budget line's verdict: " + ids.join("+") + " $" + bm + "M"); });
     ["first", "low"].forEach(k => { const G = M.groups(W, R, k), l = M.lineGroups(W, G, R); LONG(l);
       ok(near(G.reduce((s, g) => s + g.share, 0), 1, 1e-12), "group shares add to one");
-      ok(near(G.reduce((s, g) => s + g.charge * g.hh, 0), R.rebate, 1e-3) && G.every(g => g.charge >= 0), "the programme's charges recover its rebates and are never below zero");
+      ok(near(G.reduce((s, g) => s + g.charge * g.hh, 0), R.rebate, 1e-3) && G.every(g => g.charge >= 0), "the program's charges recover its rebates and are never below zero");
       ok(!/−\$|−−/.test(l) && (R.rebate > 0) === /pays \$/.test(l), "the groups line signs once and names a charge only when there are rebates");
       ok(near(G.reduce((s, g) => s + g.avg * g.hh, 0), -R.billHome - R.homeCost, 1e-3), "groups' net = home bills saved - home measures' full cost (a transfer nets out)"); });
   });
 });
-ok(over.length === 0 && lines > 10000, "every assembled line (" + lines + ") is 45 words and three sentences at most: " + over.slice(0, 4).join(" | "));
-ok(explOver.length === 0 && expl > 10000, "every explain-layer trace (" + expl + ") is 45 words and two sentences at most: " + explOver.slice(0, 3).join(" | "));
+ok(over.length === 0 && lines > 10000, "every assembled line (" + lines + ") is 40 words and two sentences at most: " + over.slice(0, 4).join(" | "));
+ok(explOver.length === 0 && expl > 10000, "every explain-layer trace (" + expl + ") is 40 words and two sentences at most: " + explOver.slice(0, 3).join(" | "));
 LONG("You placed 8 of 8 as the GPC does. " + M.lineInventory(I)); COMBOS.forEach(c => LONG(M.lineTarget(W, 4, M.evaluate(W, IDS, M.settings(W, Object.assign({}, DEF, c))))));
 ok(over.length === 0, "inventory and target lines are short: " + over.join(" | "));
 // what the page's static text says about peaks
@@ -189,15 +189,16 @@ ok(over.length === 0, "inventory and target lines are short: " + over.join(" | "
   ok(sub.day === "winter_design" && hp.filter(x => x.over > 0).length === 1, "heat pumps alone: only the suburbs go over, on the design day");
   ok(M.peaks(W, all).every(x => x.over < 0), "all six measures: every district within its limit");
   const sol = M.peaks(W, M.evaluate(W, ["solar"], o0)); ok(sol.every((x, i) => P0[i].mw - x.mw < 0.1 && P0[i].mw - x.mw >= 0 && x.h === 7 && x.day === "winter_design"), "myth 4: 60 MW of panels lower each highest hour (07:00, design day) by under 0.1 MW");
-  onPage("Each district's highest hour is 07:00 on the cold design day, before the sun is up enough: 60 MW of new panels lower it by under 0.1 MW.", "myth 4"); }
-ok(W.M.solar.addMW === 60 && W.M.weather.share === 0.4 && A.programme.share === 0.4 && JS.includes("a programme paying 40% of the extra cost up front") && /60 MW of rooftop panels/.test(W.M.solar.what) && /40% of the homes built before 1980/.test(W.M.weather.what), "teaching settings named on the page: 60 MW, 40%, 40%");
-// the programme's rebates by hand: 40% of each home measure's positive extra up-front cost, over the item's life
+  onPage("On the eight representative days, each district's highest hour is 07:00 on the cold design day, before the sun is up enough: 60 MW of new panels lower it by under 0.1 MW.", "myth 4: on the eight days, not the year");
+  onPage("Myth or fact? “New rooftop solar substantially lowers Prairie City's highest hour.”", "myth 4 asks about a substantial cut, which the model does not find"); }
+ok(W.M.solar.addMW === 60 && W.M.weather.share === 0.4 && A.programme.share === 0.4 && JS.includes("a program paying 40% of the extra cost up front") && /60 MW of rooftop panels/.test(W.M.solar.what) && /40% of the homes built before 1980/.test(W.M.weather.what), "teaching settings named on the page: 60 MW, 40%, 40%");
+// the program's rebates by hand: 40% of each home measure's positive extra up-front cost, over the item's life
 { const lifeOf = { hpwh: 15.1, furnace: 22.5, weather: 20, solar: E0.home.pv.life, hp: 15.3 };
   for (const ac of [false, true]) {
     const o = Object.assign({}, o0, { ac }), R = M.evaluate(W, Object.keys(lifeOf), o), rb = Object.keys(lifeOf).reduce((s, k) => s + 0.4 * Math.max(0, R.up[k]) * M.crf(0.04, lifeOf[k]), 0);
     ok(near(R.rebate, rb, 1e-6), "rebates by hand" + (ac ? ", air conditioner due" : "") + ": $" + Math.round(rb)); }
   // regression (review): heat pumps alone with the air conditioner due cost less up front and over their life than the usual
-  // replacements; the programme then pays no rebate and charges nobody, and nothing shows a double minus
+  // replacements; the program then pays no rebate and charges nobody, and nothing shows a double minus
   const o = Object.assign({}, o0, { ac: true }), R = M.evaluate(W, ["hp"], o);
   ok(R.up.hp < 0 && R.homeCost < 0 && R.rebate === 0, "heat pumps with the air conditioner due: cheaper up front (" + fm.musd(R.up.hp) + ") and a year; no rebate");
   ["first", "low"].forEach(k => { const G = M.groups(W, R, k), l = M.lineGroups(W, G, R);
@@ -207,7 +208,11 @@ onPage("A measure costs $300 a year more to own and saves $100 a year of energy.
 // facts
 onPage("<td class=\"n\">$8,620 and $3,690</td>", "fact: heat pump and furnace"); ok(E0.home.hp.high.capex === 8620 && W.M.furnace.baseCost === 3690, "fact numbers are the data's");
 onPage("<td class=\"n\">22.5 years</td>", "fact: furnace life"); ok(2026 + W.M.furnace.life > 2045, "a furnace of 2026 runs past 2045");
-ok(JS.includes('"Lock-in: a furnace bought in 2026 lasts " + W.M.furnace.life + " years on average, past 2045'), "lock-in hint reads the life from the data");
+ok(JS.includes('"Lock-in, not modeled here: a furnace bought in 2026 lasts " + W.M.furnace.life + " years on average, past 2045'), "lock-in hint reads the life from the data and says it is not modeled");
+ok(JS.includes("The order changes each bar's credit, not the plan's total") && !/revise the measures or their order/.test(JS), "step 7: counting order credits the bars; it is not an installation sequence");
+ok(/height divides net yearly cost by tonnes/.test(JS) && /extra investment above usual replacements, 2026 to 2035/.test(JS) && /above the usual replacements/.test(M.lineBudget(M.evaluate(W, ["hpwh"], o0), 250)), "step 4 and its line: a bar's height is cost per tonne; the budget checks extra investment above the usual replacements");
+ok(["hel", "shop"].every(id => /^Grid-supplied electricity/.test(A.scopeSort.cards.find(c => c.id === id).text)), "scope sort: the scope 2 cards say grid-supplied (rooftop solar used on site is not scope 2)");
+ok(A.scopeSort.cards.filter(c => /BASIC\+/.test(c.why)).every(c => /fuller level, BASIC\+/.test(c.why)) && /stationary energy sector \(fuel burned/.test(A.scopeSort.cards.find(c => c.id === "hgas").why), "scope sort: BASIC+ and stationary energy explained where they first appear");
 
 // ---------------- scope, links, text, glossary
 const OWN = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1:end -->/g, "").replace(/<!--[\s\S]*?-->/g, "").replace(/^---[\s\S]*?\n---\n/, "");
@@ -224,7 +229,7 @@ ok(!/nyc\.gov|fred\.stlouisfed/.test(OWN.replace(/\(nyc\.gov; no link\)/, "")), 
   ["A13", "M12", "SB3", "C3", "F9"].forEach(c => ok(new RegExp('class="a18-ref" data-code="' + c + '">' + c + ' \\(upcoming\\)</span>').test(OWN) || core.lessonRef(PATH, c).ready, c + ": named through LX.lessonRef, '(upcoming)' until live"));
   ok(!/\bA13\b/.test(JS.replace(/refText\("A13"\)|refRich\("A13"\)|lessonRefHTML\(PATH, "A13"\)/g, "")), "A13 is named only through LX.lessonRef in the script"); }
 const stepTexts = [...JS.matchAll(/\{ text: "([^\n]+)",\n\s+build:/g)].map(m => m[1].replace(/\[\[[^|]+\|([^\]]+)\]\]/g, "$1"));
-ok(stepTexts.length === 10 && stepTexts.every(t => words(t) <= 40 && sentences(t) <= 3), "ten step texts of 40 words and three sentences at most: " + stepTexts.map(t => words(t) + "/" + sentences(t)).join(","));
+ok(stepTexts.length === 10 && stepTexts.every(t => words(t) <= 36 && sentences(t) <= 2), "ten step texts of 36 words and two sentences at most: " + stepTexts.map(t => words(t) + "/" + sentences(t)).join(","));
 ok(/scopes of the \[\[gpc\|GPC\]\]/.test(JS) && JS.indexOf("Global Protocol for Community-Scale") < JS.indexOf("LX.CardSort(act, { bins: A.scopeSort") && /\[\[scope-1\|scope 1\]\]/.test(JS), "step 1: GPC spelled out before the sort; each scope label carries its own definition");
 ok(/1 kt = 1,000 t/.test(JS) && /1 kt is 1,000 t/.test(M.lineInventory(I)), "kt is converted to tonnes where it first appears");
 ok(/The grid's CO₂ per MWh in 2035 changes the tonnes; whether the old air conditioner is due too changes the heat pump's cost/.test(JS), "step 8: the grid moves tonnes, the air conditioner moves cost");
@@ -232,8 +237,8 @@ ok(/must represent such overlaps explicitly/.test(PAGE) && !/linear program hand
 ok(!/a choice of the utility and the state regulator, not the city/.test(PAGE) && /Cities influence demand, and some run their own utility/.test(PAGE), "myth 1: who shapes electricity emissions, without overstating");
 { const O2 = OWN.replace(/<div class="lx-card lx-sources">[\s\S]*?<\/div>/, "").replace(/<style>[\s\S]*?<\/style>/g, "").replace(/\$\$[\s\S]*?\$\$/g, "");
   const els = O2.replace(/^- (.*)$/gm, "<li>$1</li>").split(/<\/?(?:p|li|dd|dt|td|th|summary|footer)\b[^>]*>/i).map(x => x.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim()).filter(x => /[A-Za-z]/.test(x));
-  const long = els.filter(x => x.split(" ").length > 45);
-  ok(long.length === 0, "every page element is 45 words or fewer: " + long.map(x => x.slice(0, 60) + " (" + x.split(" ").length + ")").join(" | ")); }
+  const long = els.filter(x => x.split(" ").length > 40);
+  ok(long.length === 0, "every page element is 40 words or fewer: " + long.map(x => x.slice(0, 60) + " (" + x.split(" ").length + ")").join(" | ")); }
 // explain elements and data notes: one or two sentences each (the course's text budget), one idea per row
 { const plain = h => h.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
   const notes = [...PAGE.matchAll(/<p class="lx-datanote">[\s\S]*?<b>[^<]*<\/b>([\s\S]*?)<\/span><\/p>/g)].map(m => plain(m[1]));

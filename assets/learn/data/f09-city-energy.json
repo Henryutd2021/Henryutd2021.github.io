@@ -81,7 +81,7 @@
     {
       "key": "utility",
       "label": "The utility",
-      "sub": "wires, gas mains, power supply",
+      "sub": "electricity and, here, gas: wires, mains, power supply",
       "color": "var(--lx-tier-2)",
       "nodes": [
         "src_grid",
@@ -143,9 +143,9 @@
     },
     {
       "id": "supply",
-      "text": "Which power plants and contracts supply the city's electricity",
+      "text": "Which plants the utility owns and which electricity contracts it signs",
       "bin": "utility",
-      "why": "Where utilities are [[vertically-integrated-utility|vertically integrated]], as in Kansas, the utility builds, owns or buys its supply; the regulator reviews the costs.",
+      "why": "Where utilities are [[vertically-integrated-utility|vertically integrated]], as in Kansas, the utility builds, owns or buys its supply; the regulator reviews the costs. [[spp|SPP]]'s market decides which plants run.",
       "src": [
         "doe-primer",
         "kcc-rate-study"
@@ -162,7 +162,7 @@
     },
     {
       "id": "wholesale",
-      "text": "Rules for interstate transmission and wholesale power sales",
+      "text": "Rules for interstate transmission and for electricity sold to utilities for resale",
       "bin": "federal",
       "why": "[[ferc|FERC]] regulates the transmission and [[wholesale-price|wholesale sale]] of electricity in interstate commerce.",
       "src": [
@@ -182,14 +182,14 @@
       "id": "pipes",
       "text": "Safety rules for the gas mains under the streets",
       "bin": "federal",
-      "why": "PHMSA writes pipeline safety rules; certified state programs inspect most gas distribution pipelines.",
+      "why": "PHMSA, the federal pipeline-safety agency, writes the safety rules; certified state programs inspect most gas distribution pipelines.",
       "src": [
         "phmsa-state"
       ]
     },
     {
       "id": "code",
-      "text": "The energy code new buildings in Prairie City must meet",
+      "text": "The minimum energy rules new buildings in Prairie City must meet (the energy code)",
       "bin": "city",
       "why": "Kansas leaves the [[building-code|energy code]] to each city or county (home rule), and local permit offices enforce it; in many states the state adopts one code.",
       "src": [

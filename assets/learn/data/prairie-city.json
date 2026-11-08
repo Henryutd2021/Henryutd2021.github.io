@@ -644,7 +644,7 @@
   "rooftopMWh": 30835.0,
   "windToTheWest": "Wind farms can be built or contracted on the ridge to the west; per-MW hourly output on each representative day is in days[].wind. None serves the city directly in 2025.",
   "gridLossShare": 0.05,
-  "gridLossNote": "Set for teaching: distribution losses 5% of the electricity delivered in the city.",
+  "gridLossNote": "Set for teaching: distribution losses 5% of the grid-supplied electricity delivered in the city; rooftop solar used on site crosses no distribution wires.",
   "gas": "The gas grid serves every district except where propane is shown (the fringe's farmhouses).",
   "src": [
    "eia-dg-2024"
@@ -826,7 +826,7 @@
    {
     "from": "src_grid",
     "to": "el",
-    "value": 3446.3
+    "value": 3444.7
    },
    {
     "from": "src_solar",
@@ -996,7 +996,7 @@
    {
     "from": "el",
     "to": "grid_losses",
-    "value": 165.6
+    "value": 164.0
    }
   ],
   "note": "Annual energy flows of 2025, GWh, rounded to 0.1 GWh; every node balances exactly (each sector's loss link is the rounded remainder). Fuels at their energy content (EIA's Btu factors), electricity at 3,412 Btu per kWh. Useful energy: heat delivered for space, water and process heat (furnaces and boilers 80%, water heaters 60% gas and 90% electric, heat pumps by F3's COP curve with the outdoor air's heat shown as its own carrier); motion for vehicles (engines 30%, EVs 89%); the energy of the hydrogen made (higher heating value); for appliances, lighting, cooling, motors, cooking, drying and the data center, the energy delivered counts as useful (a convention). Electricity's upstream generation is outside the city's boundary: the grid node is where the city's own accounting starts."
@@ -1067,9 +1067,9 @@
    "datacenter": 420524,
    "transport": 852768,
    "farms": 42955,
-   "grid_losses": 64749
+   "grid_losses": 64123
   },
-  "total": 2766098,
+  "total": 2765472,
   "method": "Location-based, operating CO2 only: grid-supplied electricity x eGRID2023 SPP North (861.999 lb per MWh), with rooftop solar used on site taken off the homes' and businesses' electricity in proportion to their use, distribution losses as their own row; fuels x EIA's coefficients. The fertilizer plant's gas reformers are counted as if all the carbon in their gas reaches the air (plants that make urea or sell CO2 keep some: an accounting choice). Not counted: methane leaks, upstream emissions, refrigerants."
  },
  "prices": {
@@ -1739,11 +1739,11 @@
    "where": "evaporative cooling towers use water mainly by evaporation; air-cooled heat rejection is an alternative"
   },
   "hydrogen-properties": {
-   "title": "Physical constants: hydrogen's higher heating value (141.9 MJ per kg, 39.4 kWh per kg); ammonia's hydrogen content (3 x 1.008 / 17.031)",
-   "publisher": "standard properties",
-   "date": "no date",
+   "title": "Chemistry WebBook: Water, standard enthalpy of formation of the liquid",
+   "publisher": "National Institute of Standards and Technology (NIST)",
+   "date": "page read 8 Nov 2026",
    "url": "no link",
-   "where": "hydrogen energy in the Sankey; ammonia made from the hydrogen"
+   "where": "-285.830 kJ per mol (CODATA key value) over hydrogen's 2.016 g per mol: 141.8 MJ per kg, 39.4 kWh per kg (higher heating value), for the hydrogen energy in the Sankey; ammonia's hydrogen content, 3 x 1.008 / 17.031 (standard atomic weights)"
   }
  }
 }
