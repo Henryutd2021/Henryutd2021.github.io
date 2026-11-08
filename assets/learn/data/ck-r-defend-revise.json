@@ -1,7 +1,7 @@
 {
   "meta": {
     "lesson": "CK-R, the Researcher checkpoint, 7 November 2026",
-    "note": "The co-op study (Prairie Valley Co-op, its 112 irrigation pumps, its tariff and every number about them) is fictional and illustrative: no dataset was simulated or measured, so its results (6.2, 4.6, 4.3 and 4.1 kW, the intervals) are assumed example outputs, not computed. The reader's own study is their research capstone (CR). Read by assets/learn/ck-r-defend-revise.js; the page's static blocks are written from this file by node _tests/learn/test_ck-r-defend-revise.js --write."
+    "note": "The co-op study (Prairie Valley Co-op, its 112 irrigation pumps, its tariff and every number about them) is fictional and illustrative: no dataset was simulated or measured, so its results (6.2, 4.6, 4.3 and 4.1 kW, the intervals) are assumed example outputs, not computed. The reader's own study is their research capstone (CR). The page reads this file; its no-JS text is made from the same file."
   },
   "version": "ck-r v1 (7 Nov 2026)",
   "rule": { "auto": 7, "autoProficient": 5, "autoStrong": 6, "autoDeveloping": 3, "pointsProficient": 3,

@@ -124,8 +124,8 @@ async function fullEntries(H, PY, o) {
 }
 function fullText(city, cfg, plans) {
   return JSON.stringify({ about: "Engine E3's full-year check (SB3, M12 and C3): each page's default and presets, M12's own plans and C3's reference plan, run on prairie-city.json's eight representative days and again on all 8,760 hours of 2025 built by its fullYear rule, with the same LP and constraints and what the eight days decided kept (shares, sizes, substation upgrades); load a substation cannot carry left unserved. year.dist[].upg and peak: the upgrades each district would buy on the year instead, and its busiest hour then; year.unserved and shortDays: what the eight days' upgrades leave unserved, day by day. Solved with HiGHS on " + FULL_DATE + ", each entry checked against a fresh run. Too slow for a click, so the pages read it.",
-    dataset: { creator: "Honglin Li", date: "2026-11-07", status: "Illustrative: Prairie City is fictional; the year's hours are built by a stated rule from SPP's 2025 shapes and NOAA's normals (synthetic weather).",
-      source: "Engine E3's linear program, solved with HiGHS for the plans named in `plans`.", license: "CC BY 4.0, Honglin Li." },
+    dataset: { creator: "Honglin Li", date: "2026-11-08", status: "Illustrative: Prairie City is fictional; the year's hours are built by a stated rule from SPP's 2025 shapes and NOAA's normals (synthetic weather).",
+      source: "Engine E3's linear program, solved with HiGHS for the plans named in `plans`.", license: "CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/), Honglin Li. Built from Prairie City's hours: SPP shapes from EIA-930 (U.S. government works in the public domain) and NOAA's 1991-2020 climate normals (listed as CC0)." },
     line: city.about.line, date: FULL_DATE, unservedPerMWh: cfg.fullYear.unservedPerMWh,
     plans: plans.map(e => { const x = Object.assign({}, e); delete x._R8; delete x._FY; return x; }) }) + "\n";
 }

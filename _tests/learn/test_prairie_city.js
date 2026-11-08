@@ -42,6 +42,7 @@ ok(/one substation per district is a teaching simplification/i.test(D.about.simp
 // ---------------- sources: complete, allow-listed, every reference resolves
 const ALLOW = ["eia.gov", "energy.gov", "nrel.gov", "nlr.gov", "epa.gov", "bea.gov", "census.gov", "bls.gov", "noaa.gov", "weather.gov",
   "fema.gov", "dot.gov", "irs.gov", "ferc.gov", "lbl.gov", "spp.org"];
+const LICENCE_HOST = ["creativecommons.org"];   // the licence's own URL in dataset.license, not a source
 Object.entries(D.sources).forEach(([k, s]) => {
   ok(s.title && s.publisher && s.date && s.url && s.where, "source " + k + " has title, publisher, date, url and where");
   if (s.url !== "no link") {
@@ -60,7 +61,7 @@ ok(srcRefs.length > 15 && srcRefs.every(s => D.sources[s]), "every src names a s
   if (Array.isArray(x)) x.forEach(urls);
   else if (x && typeof x === "object") Object.values(x).forEach(urls);
   else if (typeof x === "string") (x.match(/https?:\/\/[^\s"),;]+/g) || []).forEach(u => {
-    const h = new URL(u).hostname; ok(ALLOW.some(a => h === a || h.endsWith("." + a)), "link on the allow-list: " + u); });
+    const h = new URL(u).hostname; ok(ALLOW.concat(LICENCE_HOST).some(a => h === a || h.endsWith("." + a)), "link on the allow-list: " + u); });
 })(D);
 
 // ---------------- scope (the scope scan's deny-list; data centers appear as loads only)

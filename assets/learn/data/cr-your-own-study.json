@@ -1,7 +1,7 @@
 {
   "meta": {
     "lesson": "CR, the research capstone, 7 November 2026",
-    "note": "The hours are the course's planning ranges (20 to 40 hours for the study, CK-R's four among them), not measurements. The exemplar studies (a co-op feeder, Prairie City's weatherization programme, a co-op's community solar, the Plains Grid in a heat wave) and their numbers are fictional and illustrative: assumed, not computed, except the cost and CO₂ fragment, whose arithmetic the page shows and the test redoes. Method families: the ids of R3's data file (r03-system-and-method.json), whose labels the page reads. Read by assets/learn/cr-your-own-study.js; the page's static blocks are written from this file by node _tests/learn/test_cr-your-own-study.js --write."
+    "note": "The hours are the course's planning ranges (20 to 40 hours for the study, CK-R's four among them), not measurements. The exemplar studies (a co-op feeder, Prairie City's weatherization programme, a co-op's community solar, the Plains Grid in a heat wave) and their numbers are fictional and illustrative: assumed, not computed, except the cost and CO₂ fragment, whose arithmetic the page shows and the test redoes. Method families: the ids of R3's data file (r03-system-and-method.json), whose labels the page reads. The page reads this file; its no-JS text is made from the same file."
   },
   "version": "cr v1 (7 Nov 2026)",
   "families": ["opt", "sim", "stat", "ml", "sd", "abm", "eq", "qual", "mixed"],
