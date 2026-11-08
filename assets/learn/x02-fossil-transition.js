@@ -45,7 +45,8 @@
       co2coal: fmtN(c.coal, 2), co2gas: fmtN(c.gas, 2), gasVsCoal: pct(c.gas / c.coal),
       ccsMt: "about " + fmtN(D.ccs.captureMt) + " million tonnes", co2Gt: "about " + fmtN(D.energyCo2.gt) + " billion tonnes", ccsShare: "about " + pct(D.ccs.captureMt / (D.energyCo2.gt * 1000), 2),
       co2MtAll: fmtN(D.energyCo2.gt * 1000),
-      methane: fmtN(D.methane.pct, 1) + "%"
+      methane: fmtN(D.methane.pct, 1) + "%",
+      utilMW: fmtN(D.units.utilityMinMW) + " MW", shortTon: fmtN(D.units.shortTonLb) + " pounds"
     };
   }
   function fill(D, t) { var V = vals(D); return String(t).replace(/\{([a-zA-Z0-9]+)\}/g, function (m, k) { if (!(k in V)) throw new Error("unknown token " + k); return V[k]; }); }
@@ -117,6 +118,7 @@
   // ---------------------------------------------------------------- the no-JS block, ideas, check, facts, sources
   function esc(t) { return String(t).replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
   function systemRows(D) { return D.systems.map(function (s) { return { key: s.key, name: s.name, today: fill(D, s.today), number: fill(D, s.number), open: fill(D, s.open) }; }); }
+  var FB_SHARE = 0.3;   // the no-JS block's worked example: 30% of customers gone
   function staticFallback(D) {
     var R = retireParts(D), V = vals(D);
     return "<p class=\"lx-eyebrow\">Fossil systems and carbon: what each does today, and the open question</p>" +
@@ -127,6 +129,11 @@
       cdrRows(D).map(function (r) { return "<tr><td>" + esc(r.name) + "</td><td>" + esc(r.store) + "</td><td>" + esc(r.trl) + "</td><td>" + esc(r.cost) + "</td><td>" + esc(r.potential) + "</td><td>" + esc(r.measure) + "</td></tr>"; }).join("") + "</tbody></table></div>" +
       "<ul class=\"x2-notes\">" + cdrNotes(D).map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("") + "</ul>" +
       "<ul><li>Coal retirements in 2025: " + V.planned + " planned, " + V.retired + " retired (" + pct(R.share) + " of the plan).</li><li>" + esc(ccsLine(D)) + "</li></ul>" +
+      "<p class=\"lx-eyebrow\">Two worked examples (illustrative teaching numbers)</p>" +
+      "<ul>" + D.gasNet.assume.map(function (a) { return "<li><b>" + esc(a.label) + ":</b> " + esc(a.line) + "</li><li>" + esc(netLine(D, FB_SHARE, a.avoid).replace(/\*\*/g, "")) + "</li>"; }).join("") +
+      "<li><b>An early closure:</b> " + esc(bookLine(D, D.book.start).replace(/\*\*/g, "")) + "</li></ul>" +
+      "<p class=\"lx-eyebrow\">" + esc(D.steelman.title) + "</p><ul>" +
+      steelmanSpec(D).sides.map(function (sd) { return sd.points.map(function (t) { return "<li><b>" + esc(sd.title) + ":</b> " + esc(t) + "</li>"; }).join(""); }).join("") + "</ul>" +
       "<p class=\"lx-hint\">With JavaScript on, you tap the map, check a retirement plan, try a gas-network scenario and a plant's early closure, tell capture from removal and sort the removal table.</p>";
   }
   function ideasHTML(D) {
@@ -148,12 +155,12 @@
       q("lng", "fact", "LNG is natural gas cooled until it is a liquid about 600 times smaller.", "Fact. EIA: it is cooled to −260 °F, and the liquid is 600 times smaller than the gas.") +
       q("plans", "myth", "When owners plan to retire a coal plant, it closes that year.", "Myth. In 2025 owners planned " + V.planned + " and " + V.retired + " retired; " + V.delayed + " was delayed and " + V.cancelled + " cancelled (EIA).") +
       "</div><div class=\"lx-quiz\" data-quiz=\"x02\">" +
-      qq("co2", "b", "EIA: in 2023 burning coal for power emitted " + V.co2coal + " lb of CO₂ per kWh of electricity generated and burning gas " + V.co2gas + ". About what share of coal's is gas's?", [["a", "About 20%"], ["b", "About 40%"], ["c", "About 60%"]],
+      qq("co2", "b", "EIA: in 2023 burning coal for power emitted " + V.co2coal + " pounds of CO₂ per kWh of electricity generated and burning gas " + V.co2gas + ". About what share of coal's is gas's?", [["a", "About 20%"], ["b", "About 40%"], ["c", "About 60%"]],
         "About 40%: " + V.co2gas + " ÷ " + V.co2coal + " = " + fmtN(D.co2kwh.gas / D.co2kwh.coal, 3) + ", or " + V.gasVsCoal + ". Burning only: leaks before burning are not counted.") +
       qq("net", "b", "A network costs " + money(F) + " a year per customer and no pipe can be retired; a quarter of the customers leave. What does each remaining one pay for it (illustrative)?", [["a", money(F)], ["b", money(c25)], ["c", money(F * 1.25)]],
         money(F) + " ÷ (1 − 0.25) = " + money(F) + " ÷ 0.75 = " + money(c25) + ". The network's total cost has not changed; it is shared by fewer customers.") +
       qq("ew", "c", "In IPCC's table, which method stores carbon for 10,000 years or longer but has the lowest readiness, 3 to 4?", [["a", "Direct air capture with storage"], ["b", "Biochar"], ["c", "Enhanced weathering"]],
-        "Enhanced weathering: crushed rock on fields stores carbon in minerals, but its readiness is 3 to 4 and its uptake in real soils is still poorly quantified (IPCC).") +
+        "Enhanced weathering: crushed rock reacts with CO₂, which ends up as bicarbonate in water or in carbonate minerals. Its readiness is 3 to 4, and its uptake in real soils is still poorly quantified (IPCC).") +
       "</div>";
   }
   function factsHTML(D) {
@@ -163,7 +170,7 @@
   function sourcesHTML(D) {
     var cap = function (x) { return x.charAt(0).toUpperCase() + x.slice(1); };
     return "<ul>" + Object.keys(D.sources).map(function (k) { var s = D.sources[k];
-      return "<li>" + esc(s.publisher) + ". <a href=\"" + esc(s.url) + "\">" + esc(s.title) + "</a>. " + esc(cap(s.date)) + ". " + esc(cap(s.where)) + ".</li>"; }).join("") +
+      return "<li>" + esc(s.publisher) + ". <a href=\"" + esc(s.url) + "\">" + esc(s.title) + "</a>. " + esc(cap(s.date)) + ".<br><span class=\"x2-where\">" + esc(cap(s.where)) + ".</span></li>"; }).join("") +
       "<li>Ridge County and Prairieland are fictional; their numbers are illustrative, read from lesson A13's data.</li></ul>";
   }
   function mapSpec(D) {

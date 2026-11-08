@@ -85,7 +85,10 @@ for (let k = Math.round(D.methane.leak.min * 10); k <= Math.round(D.methane.leak
   if (p > 0 && Math.abs(kgShown * 29.8 / 1000 - m.co2eT) > 0.006) ok(false, "leak chain's rounded kg x 29.8 within rounding of the t shown at " + p + "%");
 }
 ok(D.methane.studies[0].pct === 2.3 && /abstract/.test(D.methane.studies[0].what) && D.methane.studies[1].lo === 0.75 && D.methane.studies[1].hi === 9.63, "leak studies: 2.3% (Alvarez, abstract); 0.75-9.63% (Sherwin, abstract)");
-ok(/2\.3% of gas production in 2015 \(Alvarez et al\., 2018\), and from 0\.75% to 9\.63% across six regions \(Sherwin et al\., 2024\)/.test(M.LEAK_NOTE), "the leak range is labelled with its sources");
+ok(/2\.3% of gas production in 2015 \(Alvarez et al\., 2018\); 0\.75% to 9\.63% in six regions' aerial surveys, 2016 to 2021 \(Sherwin et al\., 2024\)/.test(M.LEAK_NOTE), "the leak range is labelled with its sources and its survey years");
+ok(D.methane.studies[1].campaigns === "2016-2021" && /Pennsylvania \(2021\)/.test(D.methane.studies[1].what) && /New Mexico Permian \(2018-2020\)/.test(D.methane.studies[1].what) && /historical survey estimates/.test(D.methane.studies[1].what), "the regional range carries its campaign years (2016 to 2021; the endpoints' campaigns)");
+// the model counts the leaked gas as pure methane, and the page says so beside the slider and in the no-JS block
+ok(/pure methane/.test(M.PURE_NOTE) && /text: PURE_NOTE \}, act\);\n\s*H\("p", \{ class: "lx-hint", text: LEAK_NOTE/.test(JS) && /counted as pure methane/.test(M.staticFallback(D, PC)) && /pure methane/.test(D.methane.pureNote), "the pure-methane assumption is stated beside the leak slider and in the no-JS block");
 has("0.02 ÷ 0.98 = 0.0204 t of methane escapes per tonne burned, × 29.8 = 0.608 t of CO₂e", "Go deeper: 2% leak"); ok((0.02 / 0.98).toFixed(4) === "0.0204" && (0.02 / 0.98 * 29.8).toFixed(3) === "0.608" && M.methane(D, 2).co2eT.toFixed(3) === "0.608", "2% leak arithmetic");
 
 // ---------------- pollutants (AP-42)
@@ -124,8 +127,9 @@ ok(near(hu.total, 38 / 907.18474 * 57000 + 11 / 907.18474 * 7710 + 5.21 / 907.18
 ok(Math.round(38 / 907.18474 * 57000) === 2388, "question: 38 kg of SO2 = $2,388"); has("38 ÷ 907.18 × 57,000 = $2,388", "question: dollars");
 ok(/\$479,000 from home wood stoves, against \$113,000 from power plants/.test(M.woodLine(D)), "the wood stove comparison reads the data");
 ok(/estimates?/.test(M.healthSaw(D) + M.healthLine(D, "coal", false)) && /Estimates, not prices/.test(JS), "health dollars are labelled estimates");
-ok(M.healthSaw(D) === "For a tonne of coal, controls cut EPA's estimate of the harm from about $3,130 to about $330. WHO counts 4.2 million early deaths from outdoor air pollution in 2019." && M.healthSaw(D, "coal") === M.healthSaw(D), "step 6 reveal for coal");
-ok(/^For a tonne of natural gas, controls cut EPA's estimate of the harm from about \$60 to about \$50\./.test(M.healthSaw(D, "gas")) && /^For a tonne of oil, controls cut EPA's estimate of the harm from about \$310 to about \$290\./.test(M.healthSaw(D, "oil")), "step 6 reveal follows the fuel picked");
+ok(M.healthSaw(D) === "For a tonne of coal, controls cut EPA's estimate of the harm from about $3,130 to about $330, in 2019 dollars." && M.healthSaw(D, "coal") === M.healthSaw(D), "step 6 reveal for coal");
+ok(/^For a tonne of natural gas, controls cut EPA's estimate of the harm from about \$60 to about \$50, in 2019 dollars\.$/.test(M.healthSaw(D, "gas")) && /^For a tonne of oil, controls cut EPA's estimate of the harm from about \$310 to about \$290, in 2019 dollars\.$/.test(M.healthSaw(D, "oil")), "step 6 reveal follows the fuel picked");
+ok(["coal", "gas", "oil"].every(k => !/WHO|deaths/.test(M.healthSaw(D, k))) && /WHO counts 4\.2 million premature deaths worldwide in 2019/.test(PAGE), "step 6's reveal stays on the reader's tonne; WHO's global figure stays in the real-world box");
 ok(D.who.deathsM === 4.2 && D.who.deathsYear === 2019 && D.who.lmicPct === 89 && D.who.popPct === 99, "WHO 2024 fact sheet numbers");
 
 // ---------------- the spreading toy
@@ -170,7 +174,10 @@ for (let inc = IN.min; inc <= IN.max; inc += IN.step) {
   if ((v === "severe") !== (r.burden > 0.10) || (v === "high") !== (r.burden > 0.06 && r.burden <= 0.10) || (v === "below") !== (r.burden < 0.06)) ok(false, "verdict at $" + inc);
   if ((v === "severe" && !(sv > 0.10)) || (v === "high" && !(sv > 0.06)) || (v === "below" && !(sv < 0.06))) ok(false, "the rounded burden shown agrees with the verdict at $" + inc + " (" + shown + ")");
 }
-ok(M.burdenLine(D, G, 33000) === "Income $33,000 a year, home energy $2,131: a burden of **6.5%**, above the 6% line ACEEE calls high.", "step 7 at the default income");
+ok(M.burdenLine(D, G, 33000) === "Income $33,000 a year, home energy $2,131 (its group's average): a burden of **6.5%**, above the 6% line ACEEE calls high.", "step 7 at the default income");
+// the slider's household is a what-if household with its group's average bill, not the group's representative household
+ok(/Slide a what-if household's income: it pays its income group's average home energy bill/.test(JS) && /label: "What-if household's income a year"/.test(JS) && !/visit Prairie City's representative households/.test(JS), "step 7 calls the slider's household a what-if household paying its group's average bill");
+ok(M.burdenLine(D, G, 20000).indexOf("$1,940 (its group's average)") >= 0 && M.pct(M.burdenAt(G, 20000).burden, 1) === "9.7%" && M.pct(G[0].burden, 1) === "14.9%", "at $20,000 the what-if household's 9.7% is not the lowest group's representative 14.9%");
 ok(/conventions/.test(M.LINES_NOTE) && /LEAD tool calls 6% or more high/.test(M.LINES_NOTE) && /ACEEE/.test(M.LINES_NOTE), "the 6% and 10% lines are called conventions, with ACEEE and LEAD");
 ok(D.burden.high === 0.06 && D.burden.severe === 0.10, "lines at 6% and 10%");
 ok(M.groupsSaw(D, G) === "**29,409** of Prairie City's 101,410 households (29%) are in groups whose representative burden is above 6%. Group figures can hide households above the line in the other groups.", "step 8 reveal");
@@ -205,7 +212,8 @@ has("2 × 44 ÷ 12 = 7.33", "Go deeper: carbon"); ok((2 * 44 / 12).toFixed(2) ==
   ok(quiz.indexOf("A tonne of coal gives " + M.fmtN(byK.coal.mwh, 1) + " MWh of heat against oil's " + M.fmtN(byK.oil.mwh, 1) + " MWh, so each MWh of coal's heat carries more CO₂: " + M.fmtN(byK.coal.perMWh) + " kg against " + M.fmtN(byK.oil.perMWh)) >= 0, "question: heat, from the model (7.2 and 11.9 MWh; 341 and 267 kg)");
   ok(quiz.indexOf("A " + M.fmtN(2.3, 1) + "% leak adds about " + M.methane(D, 2.3).co2eT.toFixed(2) + " t") >= 0 && quiz.indexOf("The slider shows " + M.methane(D, 1.1).co2eT.toFixed(2) + " t at 1.1% and " + M.methane(D, 1.2).co2eT.toFixed(2) + " t at 1.2%") >= 0 && Math.abs(M.methane(D, 1.15).co2eT - 0.35) < 0.005, "question: half the leak, about 0.35 t (0.33 and 0.36 on the slider)");
   ok(quiz.indexOf("from about $" + M.fmtN(Math.round(hu.total / 10) * 10) + " to about $" + M.fmtN(Math.round(hc.total / 10) * 10)) >= 0 && /an estimate, not a price/.test(quiz), "question: what EPA's dollars stand for, from the model"); }
-{ const box = OWN.match(/Work the numbers yourself<\/summary>[\s\S]*?<\/details>/)[0]; ok(/a10-emissions-questions\.html/.test(box) && /907\.18/.test(box) && /0\.02 ÷ 0\.98/.test(box) && /g\/mol/.test(box), "the arithmetic sits in an Analyst box with a reading link to A10"); }
+{ const box = OWN.match(/Work the numbers yourself<\/summary>[\s\S]*?<\/details>/)[0]; ok(/a10-emissions-questions\.html/.test(box) && /907\.18/.test(box) && /0\.02 ÷ 0\.98/.test(box) && /12 mass units of carbon become 44 of CO₂/.test(box), "the arithmetic sits in an Analyst box with a reading link to A10"); }
+ok(!/g\/mol/.test(OWN + JS), "no molar-mass unit on the page: the carbon arithmetic uses mass units");
 // numbers to remember: each row matches the data file and carries its source
 D.facts.forEach(fc => {
   const row = PAGE.indexOf('<td class="n">' + fc.n + "</td><td>" + fc.what + "</td>");
@@ -220,12 +228,12 @@ const okHref = h => /^https:\/\/(www\.ipcc\.ch|ghgprotocol\.org|doi\.org|www\.ep
 ok(hrefs.every(okHref), "links: IPCC, GHG Protocol, doi.org, EPA, DOE and learn pages only (" + hrefs.filter(h => !okHref(h)).join(", ") + ")");
 ["coal", "oil", "gas", "appA"].forEach(k => ok(OWN.indexOf(D.pollutants.source.urls[k]) >= 0, "AP-42 " + k + " linked in the sources"));
 ok(OWN.indexOf(D.bpt.url) >= 0 && OWN.indexOf(D.ipcc2006.url) >= 0 && OWN.indexOf(D.methane.gwpSource.url) >= 0 && OWN.indexOf(D.burden.aceee.url) >= 0 && OWN.indexOf(D.burden.lead.url) >= 0, "every data-file source is in the sources list");
-ok(/\(abstract\)/.test(OWN.match(/Alvarez, R\. A\.[^<]*<a[^>]*>[^<]*<\/a>[^<]*/)[0]) && /\(abstract\)/.test(OWN.match(/Sherwin, E\. D\.[^<]*<a[^>]*>[^<]*<\/a>[^<]*/)[0]), "the two leak studies say 'abstract' in their source lines");
+ok(/\(abstract\)/.test(OWN.match(/Alvarez, R\. A\.[^<]*<a[^>]*>[^<]*<\/a>[^<]*/)[0]) && /\(abstract; campaign years from p\. 329 and Fig\. 2: 15 aerial campaigns, 2016 to 2021\)/.test(OWN.match(/Sherwin, E\. D\.[^<]*<a[^>]*>[^<]*<\/a>[^<]*/)[0]), "the two leak studies say where their numbers come from (abstract; Sherwin's campaign years)");
 
 // ---------------- predictions and reveals true for every choice
 ok(M.MOST.answer === "oil" && byK.oil.co2T === Math.max(...T.map(t => t.co2T)) && ["coal", "gas", "oil"].every(k => M.MOST.feedback[k]), "step 1: oil is the answer; feedback for every fuel");
 ok(/a quarter of whose mass is hydrogen/.test(M.MOST.feedback.gas) && near(4 * 1.008 / (12.011 + 4 * 1.008), 0.25, 0.01), "step 1: methane is about a quarter hydrogen by mass");
-ok(M.mostSaw(D) === "Per tonne: oil **3.19 t**, gas **2.69 t**, coal **2.44 t** of CO₂. Each tonne of carbon burned makes 3.67 t of CO₂.", "step 1 reveal");
+ok(M.mostSaw(D) === "Per tonne: oil **3.19 t**, gas **2.69 t**, coal **2.44 t** of CO₂. Each tonne of carbon burned makes 3.67 t of CO₂: oxygen from the air adds the mass.", "step 1 reveal: the extra mass comes from oxygen");
 ok(M.heatSaw(D) === "Per MWh of heat, coal sends **341 kg** of CO₂, oil 267 kg and gas 202 kg: coal about 1.7 times gas.", "step 2 reveal");
 
 // ---------------- scope
@@ -265,7 +273,16 @@ ok(/\[\[co2e\|/.test(stepTexts[2]) && /\[\[global-warming-potential\|GWP\]\]/.te
 ok(/\[\[area-median-income\|/.test(stepTexts[7]) && /average spending divided by its average income/.test(stepTexts[7]), "step 8 defines AMI and the representative household before its question");
 ok(/charged plates catch the particles/.test(D.pollutants.controls.coal) && /a cooler flame forms less NOx/.test(D.pollutants.controls.gas) && /fed back to cool the flame/.test(D.pollutants.controls.oil), "the control equipment is explained in plain words");
 // the explain layer follows the reader's settings: the experiment table, redrawn after each change
-ok(/function keep\(\) \{[^\n]*paintMine/.test(JS) && /A fixed reference example: one tonne of coal, no controls/.test(JS) && /The same example whatever you set above/.test(JS), "explain layer: the reader's experiment, redrawn on change; the causal chain labelled a fixed reference");
+ok(/function keep\(\) \{[^\n]*paintMine/.test(JS) && /Path 1, climate: a fixed reference example, one tonne of coal/.test(JS) && /The same example whatever you set above/.test(JS), "explain layer: the reader's experiment, redrawn on change; the causal chains labelled a fixed reference");
+// three separate paths, not one chain: carbon to climate, pollutants to health, spending and income to burden
+{ const chains = JS.split("LX.CausalChain(").slice(1).map(c => c.slice(0, c.indexOf("note:")));
+  ok(chains.length === 3 && /Carbon burns/.test(chains[0]) && !/Sulfur|Health|bills/i.test(chains[0]) && /Sulfur and ash/.test(chains[1]) && /Health/.test(chains[1]) && !/CO₂ stays|Bills/.test(chains[1]) && /Energy burden/.test(chains[2]) && !/Sulfur|CO₂ stays/.test(chains[2]), "explain layer: three separate causal paths (climate; air and health; bills and income)");
+  ok(/some ash stays in the boiler/.test(chains[1]) && !/They leave as SO₂ and fine particles unless controls catch them/.test(JS), "the ash link says some ash stays in the boiler and only some particles are fine");
+  ok(/The tonne of coal above does not set these bills/.test(JS), "the bills path says the coal example does not set the bills"); }
+// the no-JS version explains the names and units it uses before its tables
+{ const fb = M.staticFallback(D, PC);
+  ok(fb.indexOf("A tonne is 1,000 kg") >= 0 && /per short ton, the U\.S\. ton of 907 kg/.test(fb) && /SO₂ is sulfur dioxide, NOx nitrogen oxides/.test(fb) && /CO₂-equivalent counts another gas/.test(fb) && /GWP \(global warming potential\)/.test(fb) && fb.indexOf("A tonne is 1,000 kg") < fb.indexOf("<table"), "the no-JS block defines tonnes, short tons, the pollutants, CO2e and GWP before its tables");
+  fb.replace(/<table[\s\S]*?<\/table>/g, " ").split(/<\/?(?:li|p|caption)\b[^>]*>/).map(plain).filter(x => /[A-Za-z]/.test(x)).forEach(x => ok(nWords(x) <= 38 && nSent(x) <= 2, "no-JS element of " + nWords(x) + " words: " + x.slice(0, 60))); }
 [{ fuel: "gas", leak: 0, controls: true, r: 300, income: 25000 }, { fuel: "oil", leak: 4, controls: false, r: 10, income: 150000 }, { fuel: "coal", leak: 2.3, controls: false, r: 100, income: 33000 }].forEach(S => {
   const R = M.experimentRows(D, G, S), t = M.tonne(M.fuel(D, S.fuel), D), p = M.pollutants(D, S.fuel, S.controls), h = M.health(D, p), b = M.burdenAt(G, S.income), mm = M.methane(D, S.leak);
   ok(R.length === 6 && R[0].set === M.fuel(D, S.fuel).name && R[0].out.indexOf(M.fmtN(t.co2T, 2) + " t of CO₂") === 0 && (S.leak === 0 ? R[1].out === "none" : R[1].out.indexOf(M.fmtN(mm.co2eT, 2) + " t CO₂e") >= 0) &&
