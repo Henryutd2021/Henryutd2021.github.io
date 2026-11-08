@@ -339,7 +339,7 @@
   }
   function solve(state, P, opts) {
     opts = opts || {};
-    var task = opts.task || "run", attempt = opts.attempt || 1, limit = opts.timeLimit != null ? opts.timeLimit : (attempt > 1 ? 10 : 3);
+    var task = opts.task || "run", attempt = opts.attempt || 1, limit = opts.timeLimit != null ? opts.timeLimit : (attempt > 1 ? 30 : 10);
     var call = opts.solver || (typeof window !== "undefined" && window.LX && window.LX.solver ? function (m, so) { return window.LX.solver.solve(m, so); } : null);
     var t0 = Date.now(), raw = { task: task, state: state, solves: [] };
     function fail(e) { return { status: "error", ok: false, kind: "milp", message: "The run failed before it gave an answer" + (e && e.message ? " (" + e.message + ")." : "."), results: null, mipGap: null }; }

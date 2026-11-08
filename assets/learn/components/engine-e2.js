@@ -380,7 +380,7 @@
   function solve(state, P, opts) {
     opts = opts || {};
     var task = opts.task || (state.conn != null ? "year" : "period"), attempt = opts.attempt || 1;
-    var limit = opts.timeLimit != null ? opts.timeLimit : (attempt > 1 ? 10 : 3);
+    var limit = opts.timeLimit != null ? opts.timeLimit : (attempt > 1 ? 30 : 10);
     var call = opts.solver || (typeof window !== "undefined" && window.LX && window.LX.solver ? function (m, so) { return window.LX.solver.solve(m, so); } : null);
     var t0 = Date.now(), sys = sysOf(state, P), days = opts.only ? [{ y: String(opts.only.y), day: opts.only.day, carry: false, label: dayLong(opts.only.day) }] : daysOf(state, P, task), raw = { task: task, state: state, sys: sys, days: [], solves: [] };
     function fail(e) { return { status: "error", ok: false, kind: "milp", message: "The run failed before it gave an answer" + (e && e.message ? " (" + e.message + ")." : "."), results: null, mipGap: null }; }

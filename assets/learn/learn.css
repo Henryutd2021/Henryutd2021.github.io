@@ -862,6 +862,16 @@ details.lx-listview > summary { cursor: pointer; min-height: 48px; display: flex
 .lx-solver-status[data-status="loading"]::before, .lx-solver-status[data-status="solving"]::before { animation: lx-solver-pulse 1s ease-in-out infinite alternate; }
 @keyframes lx-solver-pulse { from { opacity: .25; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .lx-solver-status::before { animation: none !important; } }
+/* the progress line of a long solve (LX.SolveProgress): appears after two seconds, next to the control that started
+   the solve; a moving bar (none with reduced motion), the seconds elapsed, step k of n and the usual time. No
+   percentage: the solver cannot know one. */
+.lx-solve-prog { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin: 6px 0 0; font-size: 13.5px; line-height: 1.4; color: var(--lx-ink-2); }
+.lx-solve-prog[hidden] { display: none; }
+.lx-solve-prog-bar { position: relative; flex: none; width: 88px; height: 6px; overflow: hidden; border-radius: 3px; background: var(--lx-surface-3); }
+.lx-solve-prog-bar::after { content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: 36%; border-radius: 3px; background: var(--lx-accent); animation: lx-solve-slide 1.6s ease-in-out infinite; }
+.lx-solve-prog-text { min-width: 0; font-variant-numeric: tabular-nums; }
+@keyframes lx-solve-slide { 0% { transform: translateX(-100%); } 100% { transform: translateX(280%); } }
+@media (prefers-reduced-motion: reduce) { .lx-solve-prog-bar { display: none; } }
 
 /* plot.css — LX.Plot and LX.PlotCard (plot.js): the XY chart's text and focus ring, the caption, and the chart card with
    value chips (readouts) above the chart; also the model-lab stage (.lx-stage: a card with a head, readouts, sliders,
