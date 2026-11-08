@@ -115,7 +115,7 @@
   }
  ],
  "reference": {
-  "about": "Results of the Plains Grid's planning LP, solved with HiGHS 1.15.4: CO2 and resource cost with no policy, and each instrument at its default setting.",
+  "about": "Results of the Plains Grid's planning LP, solved with HiGHS 1.15.1: CO2 and resource cost with no policy, and each instrument at its default setting.",
   "base": {
    "co2": 4777392.205142699,
    "resource": 388910266.25449985
