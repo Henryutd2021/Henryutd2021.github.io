@@ -4,7 +4,7 @@
   "lesson": "learn/f01-five-scales.qmd (model and view: assets/learn/f01-five-scales.js; tests: _tests/learn/test_f01-five-scales.js)",
   "built": "2026-11-03",
   "lessons": "Per scale, the lessons that go further, by starter number or code: LX.ScaleStrip links a lesson when data/path.json marks it live, and names it as upcoming (with its note) otherwise.",
-  "note": "The scale definitions follow the course's definition of a scale (decisions, authority, physics, inputs, outputs). The scales are overlapping views, not levels of authority: a city and a grid region can share land, and one organisation can act at two scales. Prairie Town, Prairie Campus, the Plains Grid, Prairie City and Prairieland are fictional; their sizes are illustrative. The real anchors (electricity bought per U.S. residential customer, as average power; the Southwest Power Pool's 2025 peak; the Lower 48 record hour) are read from 01-power-energy.json and town_days.json, where each carries its source and date. Prairie Town's 450 MW is the highest hour of its illustrative year (SPP's 2025 demand shape scaled so that SPP's highest hour is 450 MW: town.json and town_year.json), not the peak of lesson 0's day.",
+  "note": "The scale definitions follow the course's definition of a scale (decisions, authority, physics, inputs, outputs). The scales are overlapping views, not levels of authority: a city and a grid region can share land, and one organization can act at two scales. Prairie Town, Prairie Campus, the Plains Grid, Prairie City and Prairieland are fictional; their sizes are illustrative. The real anchors (electricity bought per U.S. residential customer, as average power; the Southwest Power Pool's 2025 peak; the Lower 48 record hour) are read from 01-power-energy.json and town_days.json, where each carries its source and date. Prairie Town's 450 MW is the highest hour of its illustrative year (SPP's 2025 demand shape scaled so that SPP's highest hour is 450 MW: town.json and town_year.json), not the peak of lesson 0's day.",
   "gloss": "Each scale's `gloss` is one line under the zoom's caption that defines the scene's terms at first use (glossary marks)."
  },
  "scales": [
@@ -22,7 +22,7 @@
   },
   {
    "id": "S1", "key": "s1", "place": "Prairie Campus", "name": "Microgrid and community", "short": "Microgrid", "icon": "plant",
-   "setting": "Prairie Campus: a college, the county hospital and a rural co-op",
+   "setting": "Prairie Campus: a college, the county hospital and a rural co-op (a utility owned by its members)",
    "power": "kW to MW",
    "gloss": "A [[microgrid|microgrid]] can [[islanding|island]]: disconnect from the grid and keep its own loads running. It links to the grid through a [[feeder|feeder]], a local power line.",
    "question": "How do we keep critical services running in an outage, and who owns the system?",
@@ -39,9 +39,9 @@
    "gloss": "A [[synchronous-grid|synchronous grid]] shares one AC [[frequency|frequency]]. Synchronous generators rotate in step electrically; [[inverter|inverters]] connect other resources to that frequency; several operators can share the grid, each balancing its own region.",
    "question": "Will there be enough power, what sets prices, and how should a large new load connect?",
    "who": "A grid operator (a regional market operator or a utility, acting as balancing authority), overseen by regulators",
-   "what": "Which plants run in its region, reserves, new transmission, capacity and connections",
+   "what": "Which plants run and the reserves; a say in new transmission, capacity and connections, shared with planners, utilities and regulators",
    "physics": "Power flow on lines; frequency and inertia when a study looks at fast disturbances",
-   "inputs": "Aggregated loads and small resources, fuel prices, policy, power traded with neighbouring regions",
+   "inputs": "Aggregated loads and small resources, fuel prices, policy, power traded with neighboring regions",
    "outputs": "Prices, reliability, emission factors, connection timelines"
   },
   {
@@ -64,7 +64,7 @@
    "question": "Which pathway keeps a nation secure, affordable, clean and fair?",
    "who": "A national government and its regulators",
    "what": "Targets, instruments, infrastructure, emergency stocks, trade",
-   "physics": "Energy balances for each region (primary and final), the main power lines between regions",
+   "physics": "Energy balances for each region, from fuels as produced to energy as used; the main power lines between regions",
    "inputs": "World prices, technology availability, climate commitments",
    "outputs": "Policy and price signals, targets and budgets passed down to regions"
   }

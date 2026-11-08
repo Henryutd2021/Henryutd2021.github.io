@@ -4,7 +4,7 @@
   "creator": "Honglin Li",
   "date": "2026-11-05",
   "status": "Illustrative: Prairie Town is fictional; demand, wind and solar follow real SPP 2025 hourly shapes (EIA-930); the technology costs are from cited EIA and NREL sources.",
-  "source": "Written by hand for lessons 12 and 13 from the cited sources; the frontier is precomputed with HiGHS.",
+  "source": "Inputs for lessons 12 and 13 from the cited EIA and NREL sources, on Prairie Town's illustrative assumptions; the frontier is precomputed with HiGHS.",
   "license": "CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/), Honglin Li. Values taken from the sources listed in this file keep their publishers' terms; EIA data are U.S. government works in the public domain."
  },
  "accessed": "2026-11-02",
