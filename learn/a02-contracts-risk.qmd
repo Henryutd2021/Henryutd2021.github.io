@@ -11,7 +11,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 
 <!-- Analyst lesson A2 in the step-card form, simulation mode. Seven cards of one idea and one action
      each: one price year, 200 price years, three contracts for the solar output, a battery toll, and a price away from fair.
-     A seeded simulation (seed 2025, shown on the page; "New seed" draws another 200 years). Every risk number is a stated
+     A seeded simulation (seed 2025, shown on the page; "Draw another 200 years" picks a new seed). Every risk number is a stated
      statistic of the simulated years (P10, median, P90, mean), never "the" outcome. Model, view and drill:
      assets/learn/a02-contracts-risk.js, reading lesson 7's data file (the solar capacity factor) and
      assets/learn/data/a02-contracts-risk.json. Every number below is checked against the model at seed 2025 by
@@ -73,7 +73,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <li>Settled at the hub, the basis moves to the seller ($5.3M to $6.7M); the buyer's range narrows ($7.0M to $8.3M).</li>
 <li>A shaped contract, a flat block at a fixed price, fixes the buyer's bill at $7.59M; the seller settles the hours its panels miss too ($5.0M to $6.9M).</li>
 <li>Tolled at $5.17 per kW a month, the battery pays its owner a fixed $3.10M a year, and its margin ($1.9M to $4.5M) moves to the buyer.</li>
-<li>A price $5.00 above fair moves $1.05M a year from the buyer to the seller; who carries which risk stays the same.</li>
+<li>A price $5.00 above fair moves $1.05M a year from the buyer to the seller on average (every year under the flat block); who carries which risk stays the same.</li>
 </ol>
 <div class="a2-tables">
 <table class="a2-static a2-words" aria-label="The five drivers of each simulated price year: illustrative, drawn independently">
@@ -82,7 +82,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <tr><td>Hub price</td><td>The yearly average price at the <span class="lx-term" data-term="trading-hub">trading hub</span>, a regional reference price</td></tr>
 <tr><td>Shape</td><td>The hub price per MWh of solar output, as a share of the hub's all-hours average (the <span class="lx-term" data-term="capture-ratio">capture ratio</span>)</td></tr>
 <tr><td>Output</td><td>This year's solar output, as a share of a typical year's</td></tr>
-<tr><td>Basis</td><td>The plant's <span class="lx-term" data-term="pricing-node">node</span> price minus the hub price, per MWh of solar output</td></tr>
+<tr><td>Basis</td><td>The plant's <span class="lx-term" data-term="pricing-node">node</span> price minus the hub price, per MWh of solar output: the plant sells at the hub's solar-hours price plus the basis</td></tr>
 <tr><td>Battery margin</td><td>What the battery earns per MWh after paying for its charging and losses</td></tr>
 </tbody></table>
 <!-- a2-table:start (written by _tests/learn/test_a02-contracts-risk.js --write; do not edit) -->

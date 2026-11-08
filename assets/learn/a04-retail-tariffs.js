@@ -208,11 +208,18 @@
     return "Plants: " + usd(e.cost.capacity) + " a month, for its " + kw(e.atTight) + " at " + hm(W.tight) + " while the car charges. Its energy costs " + usd(e.cost.energy) +
       "; the kWh it sends back at midday are worth $0, because the town is already spilling sun.";
   }
+  // step 3's rates: how each part of the cost of serving is priced (illustrative), and one worked example from them
+  function costRates(D, W, E) {
+    var C = D.costs, e = E.solarev, k = Math.round(e.atTight * 1000) / 1000;
+    return { lines: ["**Energy:** each hour's kWh × the town's price that hour, over " + D.days + " days.", "**Plants:** $" + C.capacityPerKW + " a month per kW drawn at " + hm(W.tight) + ", the town's tightest hour.",
+                     "**Local wires:** $" + C.wiresPerKW + " a month per kW of the customer's own busiest hour.", "**Meter:** $" + D.classes.home.meter + " a month for a home, $" + D.classes.business.meter + " for a business."],
+             worked: "Plants for the solar and EV home: " + k + " kW × $" + C.capacityPerKW + " = $" + (k * C.capacityPerKW).toFixed(2) + " a month." };
+  }
   // step 4: the flat price with net metering
   function flatReveal(D, T, E) {
     var r = E.renter, s = E.solarev, mix = D.classes.home.mix;
-    return "At " + cents(T.home.flat.p) + " per kWh the renter pays " + usd(r.bill.flat.total) + " for a cost of " + usd(r.cost.total) + "; the solar and EV home pays " +
-      usd(s.bill.flat.total) + " for a cost of " + usd(s.cost.total) + ". " + (mix.renter === 9 ? "Nine" : String(mix.renter)) + " renters, about " + usd(r.gap.flat) + " each above their cost, cover that home's " + usd(-s.gap.flat) + ".";
+    return "At " + cents(T.home.flat.p) + " per kWh the renter pays " + usd(r.bill.flat.total) + " for a cost of " + usd(r.cost.total) + ", and the solar and EV home " +
+      usd(s.bill.flat.total) + " for " + usd(s.cost.total) + ". " + (mix.renter === 9 ? "Nine" : String(mix.renter)) + " renters, about " + usd(r.gap.flat) + " each above cost, cover that home's " + usd(-s.gap.flat) + ".";
   }
   // steps 2-4 show the start; when the reader's choices differ, this note says so ("" at the start)
   function startNote(s) {
@@ -251,8 +258,8 @@
   function scarcityReveal(D, W, T, scarce) {
     var a = evaluate(D, W, T, {}).renter, b = evaluate(D, W, T, { scarce: true }).renter;
     if (!scarce) return "Without scarcity, the renter's real-time bill is " + usd(a.bill.rtp.total) + " and its flat bill " + usd(a.bill.flat.total) + ".";
-    return "Real-time: the renter's bill jumps from " + usd(a.bill.rtp.total) + " to " + usd(b.bill.rtp.total) + " this month. Flat: it stays " + usd(b.bill.flat.total) +
-      " while serving the renter costs " + usd(b.cost.total) + ". Here we assume the utility pays the gap now and recovers it from all customers later.";
+    return "Real-time: the renter's bill jumps from " + usd(a.bill.rtp.total) + " to " + usd(b.bill.rtp.total) + " this month; flat, it stays " + usd(b.bill.flat.total) +
+      " while serving the renter costs " + usd(b.cost.total) + ". We assume the utility pays that gap now and recovers it from all customers later.";
   }
   // step 8: one sentence per tariff, for the homes, in the reader's state s (the same state as the ledger beside it);
   // the scarcity week's effect on the renter is a comparison with and without it, labelled as such
@@ -266,8 +273,8 @@
     if (tk === "demand") return "**Demand charge:** the renter pays " + gapWords(r.demand) + " and the home " + gapShort(h.demand) + ". It bills the home's own busiest hour, " + hm(b) +
       (b === W.tight ? ", which is also the town's tightest hour." : ", not the town's tightest hour, " + hm(W.tight) + ".");
     var a0 = evaluate(D, W, T, { ev: s.ev, batch: s.batch }).renter, a1 = evaluate(D, W, T, { ev: s.ev, batch: s.batch, scarce: true }).renter;
-    return "**Real-time:** it passes on each hour's price (a scarcity week adds " + usd(a1.bill.rtp.total - a0.bill.rtp.total) + " to the renter's bill) but charges no kW; moving the car to 01:00 saves its owner " +
-      usd(-ch.bill.rtp) + falls + ".";
+    return "**Real-time:** each hour's price passes through (a scarcity week adds " + usd(a1.bill.rtp.total - a0.bill.rtp.total) + " to the renter's bill), with no kW charge; moving the car to 01:00 saves its owner " +
+      usd(-ch.bill.rtp) + ", while the model's cost falls " + usd(-ch.cost) + ".";
   }
   // step 8's closing claim, checked by the test: no tariff is nearest to cost for every customer in every habit
   var PICK_NOTE = "No tariff is nearest to cost for every customer and every habit.";
@@ -322,24 +329,25 @@
        "$" + x.F + " + " + kwh(off) + " × " + cents(x.off) + " + " + kwh(pk) + " × " + cents(x.peak) + " ≈ " + usd(hand) + " (the page's " + usd(r.bill.tou.total) + " uses unrounded prices)."],
       ["Who pays for the solar and EV home under the flat price?", "Its bill is " + usd(E.solarev.bill.flat.total) + " and serving it costs " + usd(E.solarev.cost.total) + ".",
        "The other homes: " + (mix.renter === 9 ? "nine" : String(mix.renter)) + " renters contribute about " + usd(mix.renter * r.gap.flat) + " in total, about " + usd(r.gap.flat) + " each: the home's " + usd(-E.solarev.gap.flat) + " gap. Prices were set so the class pays its cost."],
-      ["A lower busiest hour for the factory.", "Its demand charge is $" + T.business.demand.d + " per kW, and moving the batch cuts its busiest hour by 200 kW. What does its bill save, and how far does the model's cost of serving it fall?",
+      ["A lower busiest hour for the factory.", "Its demand charge is $" + T.business.demand.d + " per kW; moving the batch cuts its busiest hour by 200 kW. How much do its bill and the model's cost of serving it fall?",
        usd(-ch.bill.demand) + " on the bill (200 kW × $" + T.business.demand.d + "), but the cost falls only " + usd(-ch.cost) + ": the wires' share falls " + usd(f0.wires - f1.wires) + " and the batch's energy costs " + usd(f1.energy - f0.energy) + " more."],
       ["A large load whose highest demand is 60% of its contract.", "Contract 100 MW, minimum billing demand 80%, upgrades $15M a year. Who pays what, if other customers cover the rest?",
        "It is billed for " + lg.billedMW + " MW at $" + lg.k.toFixed(2) + " per kW a month: " + musd(lg.load) + " a year; other customers pay " + musd(lg.others) + "."],
       ["Move the time-of-use window.", "The town's dearest hours on " + W.dateLabel + " are " + hm(20) + " to " + hm(23) + ", when the peaker runs. Is 16:00 to 21:00 a good window?",
        "Only partly: at 16:00 sun is still spare (the town's price is $0), and 21:00 to 23:00 is left out. A window set months ahead cannot follow every day."],
       ["Read a claim critically.", "A story says: “Real-time pricing cut one customer's bill by 40%.” Name three things you would ask.",
-       "Against which tariff? Did the customer change when it used power, or was it a month without scarcity? And who paid for the risk in other months?"]
+       "Against which tariff; did the customer change when it used power, or was the month free of scarcity; and who paid for the risk in other months?"]
     ];
     return "<p class=\"lx-eyebrow\">Practice · about 30 minutes on your own</p><ol class=\"lx-fb-practice\">" + items.map(function (it) {
-      return "<li><p><b>" + it[0] + "</b> " + it[1] + "</p><details class=\"lx-answer\"><summary>Answer</summary><p>" + it[2] + "</p></details></li>";
+      // the exercise's name on its own line, then what is given and the question (two sentences at most)
+      return "<li><p><b>" + it[0] + "</b></p><p>" + it[1] + "</p><details class=\"lx-answer\"><summary>Answer</summary><p>" + it[2] + "</p></details></li>";
     }).join("") + "</ol>";
   }
 
   var model = { HOURS: HOURS, DEFAULT: DEFAULT, START: START, ALLOC: ALLOC, atStart: atStart, startNote: startNote, costStep: costStep, flatStep: flatStep, gapShort: gapShort, PICK_NOTE: PICK_NOTE, prepare: prepare, profile: profile, prices: prices, cost: cost, calibrate: calibrate, bill: bill,
                 evaluate: evaluate, change: change, netBilling: netBilling, large: large, onPeak: onPeak, sum: sum, maxOf: maxOf, busiest: busiest,
                 usd: usd, dusd: dusd, cents: cents, musd: musd, kw: kw, kwh: kwh, hm: hm, span: span, gapWords: gapWords, rateLines: rateLines,
-                summary: summary, costReveal: costReveal, flatReveal: flatReveal, touReveal: touReveal, demandReveal: demandReveal,
+                summary: summary, costReveal: costReveal, costRates: costRates, flatReveal: flatReveal, touReveal: touReveal, demandReveal: demandReveal,
                 scarcityReveal: scarcityReveal, pickLine: pickLine, largeLine: largeLine, rich: rich, staticFallback: staticFallback, staticPractice: staticPractice };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX || !window.LX.H) return;
@@ -453,7 +461,7 @@
 
     // ---------- step cards
     var steps = [
-      { text: "A [[tariff|tariff]], the rule that turns costs into a bill, has up to three parts: a [[fixed-charge|fixed charge]] a month, a price per [[kilowatt-hour|kWh]], and a [[demand-charge|demand charge]] per kW of the busiest hour. Which pays for which cost?",
+      { text: "A [[tariff|tariff]] turns costs into a bill with up to three parts: a [[fixed-charge|fixed charge]] a month, a price per [[kilowatt-hour|kWh]], and a [[demand-charge|demand charge]] per kW of the busiest hour. Which pays for which cost?",
         build: function (act, api) {
           mode = "look"; hook = null; pin = false; stage.hidden = true;
           LX.CardSort(act, {
@@ -466,14 +474,14 @@
               sawB(api, g.right === g.total ? "**All three match.** Real tariffs often blur them: many home tariffs recover wires costs per kWh, not per kW." : "**" + g.right + " of " + g.total + " match.** Move the others, or read the reasons and go on.", g.right < g.total);
             } });
         } },
-      { text: "Meet three Prairie Town customers on " + W.dateLabel + ", a sunny day on real Southwest Power Pool hourly patterns. Tap each: its use, its busiest hour, and its draw at " + hm(W.tight) + ", the town's tightest hour (most gas needed).",
+      { text: "Meet three Prairie Town customers on " + W.dateLabel + ", a sunny day with real Southwest Power Pool hourly patterns. Tap each: its use, busiest hour and draw at " + hm(W.tight) + ", the town's tightest hour (most gas needed).",
         build: function (act, api) {
           mode = "look"; pin = true; stage.hidden = false; var seen = {};
           hook = function (e) { if (!e.cust) return; seen[e.cust] = true; sawB(api, summary(D, W, evaluate(D, W, T, START), e.cust)); if (Object.keys(seen).length >= D.customers.length) api.done(); };
           paint(); seen[S.cust] = true;
           H("p", { class: "lx-hint", text: "Tap all three customers above the chart." }, act);
         } },
-      { text: "In this model, serving a customer costs four things: energy each hour, plants for the town's tightest hour, local wires for its own busiest hour, and a meter. Which costs most for the solar and EV home?",
+      { text: "Serving a customer costs four things here: energy each hour, plants for the town's tightest hour, local wires for its own busiest hour, and a meter. Which costs most for the solar and [[electric-vehicle|EV]] home?",
         build: function (act, api) {
           mode = "look"; hook = null; pin = true; stage.hidden = false; S.cust = "solarev"; paint();
           var box = H("div", null, act), cs = costStep(D, W, T, S);   // at the start, whatever the reader chose later
@@ -488,6 +496,9 @@
               });
               box.innerHTML = "";
               LX.CostSplit(box, { parts: D.parts, rows: rows, fmt: usd, key: true });
+              var cr = costRates(D, W, E), ul = H("ul", { class: "a4-rates", "aria-label": "How each part is priced (illustrative)" }, box);
+              cr.lines.forEach(function (t) { H("li", { html: LX.rich(t).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>") }, ul); });
+              H("p", { class: "lx-hint", text: cr.worked }, box);
               H("p", { class: "lx-hint", text: "The factory costs " + usd(E.factory.cost.total) + " a month to serve: " + LX.CostSplit.text(D.parts, E.factory.cost, usd) + "." }, box);
               act.appendChild(box); api.done();
             } });
@@ -516,7 +527,7 @@
           mark(); if (S.ev === "night") { api.done(); sawB(api, touReveal(D, W, T, S)); }
           H("p", { class: "lx-hint", text: ALLOC }, act);
         } },
-      { text: "[[demand-charge|Demand charge]]: the factory pays per kW of its busiest hour. Move its 200 kW batch from 13:00 to midnight. What does its bill save, and how far does the model's cost of serving it fall?",
+      { text: "[[demand-charge|Demand charge]]: the factory pays per kW of its busiest hour. Move its 200 kW batch from 13:00 to midnight: what does its bill save, and how far does the model's cost of serving it fall?",
         build: function (act, api) {
           mode = "bill"; hook = null; pin = false; stage.hidden = false; S.tariff = "demand"; S.cust = "factory"; paint();
           var c = cust(D, "factory"), w = H("div", { class: "cf-ctl" }, act);
@@ -530,7 +541,7 @@
           function mark() { bs.forEach(function (b, i) { b.setAttribute("aria-pressed", String(["day", "night"][i] === S.batch)); }); }
           mark(); if (S.batch === "night") { api.done(); sawB(api, demandReveal(D, W, T, S)); }
         } },
-      { text: "[[real-time-pricing|Real-time pricing]]: each kWh costs the town's price that hour, plus a plant-and-wire charge. Add a scarcity week: " + D.scarcity.label + ". Whose bill carries the risk, and when?",
+      { text: "[[real-time-pricing|Real-time pricing]]: each kWh costs the town's price that hour, plus a plant-and-wire charge. Add a scarcity week, " + D.scarcity.label + ": whose bill carries the risk, and when?",
         build: function (act, api) {
           mode = "bill"; hook = null; pin = false; stage.hidden = false; S.tariff = "rtp"; S.cust = "renter"; paint();
           var tg = LX.Toggle(H("div", { class: "cf-ctl" }, act), { label: "Scarcity week", on: S.scarce, onChange: function (on) {
@@ -556,7 +567,7 @@
           });
           H("p", { class: "lx-hint", text: PICK_NOTE }, act);
         } },
-      { text: "A " + D.large.contractMW + " MW data center takes a [[large-load-tariff|large-load tariff]]; upgrades built for it cost $" + D.large.upgradeCostPerYear / 1e6 + "M a year. If its demand stays below the contract, who pays? Set a [[minimum-billing-demand|minimum billing demand]].",
+      { text: "A " + D.large.contractMW + " MW data center takes a [[large-load-tariff|large-load tariff]]; upgrades built for it cost $" + D.large.upgradeCostPerYear / 1e6 + "M a year. Set a [[minimum-billing-demand|minimum billing demand]]: who pays if its demand stays below the contract?",
         build: function (act, api) {
           mode = "bill"; hook = null; pin = false; stage.hidden = true;
           var sU = LX.Slider(H("div", null, act), { label: "Its highest hourly demand each month, share of the " + L.contractMW + " MW contract", color: "var(--lx-tier-2)", min: L.useSteps[0], max: L.useSteps[1], step: L.useSteps[2], value: S.u,
@@ -573,7 +584,7 @@
             [["Billing demand", Math.round(r.billedMW) + " MW"], ["Paid by the data center", musd(r.load)], ["Paid by other customers", musd(r.others)]].forEach(function (x) {
               var c = H("div", { class: "lx-readout" }, ch); H("span", { text: x[0] }, c); H("b", { text: x[1] }, c); });
             cs.set([{ key: "up", label: "Upgrades, " + musd(L.upgradeCostPerYear) + " a year", color: "var(--lx-ink-3)", values: { load: r.load, others: r.others }, total: L.upgradeCostPerYear,
-                      aria: "Upgrades, " + musd(L.upgradeCostPerYear) + " a year: the data center pays " + musd(r.load) + ", other customers " + musd(r.others) + "." }], L.upgradeCostPerYear * 1.04);
+                      aria: "Billing demand " + Math.round(r.billedMW) + " MW. Upgrades, " + musd(L.upgradeCostPerYear) + " a year: the data center pays " + musd(r.load) + ", other customers " + musd(r.others) + "." }], L.upgradeCostPerYear * 1.04);
             if (acted) sawB(api, largeLine(L, S.u, S.m));
           }
           draw(false); if (S.m > 0) { api.done(); sawB(api, largeLine(L, S.u, S.m)); }
@@ -623,7 +634,7 @@
       var lc = H("div", { class: "lx-xcard" }, xhost);
       H("h3", { text: "Ledger: who pays above or below its cost" }, H("header", { class: "lx-x-head" }, lc));
       ledger(lc);
-      H("p", { class: "lx-hint", text: "Within each class the gaps add to zero at the start (" + D.classes.home.mix.renter + " renters to 1 solar and EV home). After a move, bills and costs part until the next rate case re-sets the prices." }, lc);
+      H("p", { class: "lx-hint", html: LX.rich("Within each class the gaps add to zero at the start (" + D.classes.home.mix.renter + " renters to 1 solar and EV home). After a move, bills and costs part until the next [[rate-case|rate case]] re-sets the prices.") }, lc);
       // 3 causal chain with the reader's numbers (net metering under the flat price, at the defaults)
       var nb = netBilling(D, W);
       LX.CausalChain(H("div", { class: "lx-xcard" }, xhost), {

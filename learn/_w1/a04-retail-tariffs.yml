@@ -24,7 +24,7 @@ glossary:
     def: "When some customers pay more than the cost of serving them so that others can pay less."
   - id: large-load-tariff
     term: Large-load tariff
-    def: "A tariff for very large new customers, such as data centers or factories, with terms that protect other customers if the load uses less than it promised."
+    def: "A tariff for very large new customers, such as data centers or factories, with terms such as minimum bills, long contracts and exit fees that can reduce other customers' exposure if the load uses less than it promised."
   - id: minimum-billing-demand
     term: Minimum billing demand
     def: "The least demand, often a share of the contracted kW or MW, that a customer is billed for each month however low its demand."

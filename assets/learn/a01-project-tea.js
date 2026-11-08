@@ -11,7 +11,8 @@
 //                                         ($50/MWh), slider ranges, the timeline's illustrative calendar and the myth's
 //                                         smaller farm
 //   assets/learn/data/path.json           the course's lessons: step 1 names case file CF4 through LX.lessonRefHTML
-// One price year: every dollar is a real 2025 dollar, so every rate is a real rate (as in lesson 7 and K3). The sale price
+// One price year: every dollar is a real 2025 dollar, so the discount rate is real (as in lesson 7 and K3); step 3 converts
+// its nominal loan and owner rates to real with 2.5% inflation (lesson 7's blend). The sale price
 // is fixed in real terms, as a contract indexed to inflation would be (a flat nominal price would fall in real terms).
 // Each card from step 4 on starts again from the default farm ($50/MWh, 4% real, 30 years) and says so.
 //
@@ -152,19 +153,22 @@
   function texts(s) {
     var p = s.p, R = pct(p.rate, 0);
     return {
-      build: "Year 0 spends " + musd(s.C) + ". Years 1 to " + p.life + " each sell " + musd(s.S) + " and spend " + musd(s.F) + " on upkeep: " + musd(s.net) + " net. Added up without discounting, that is " + musd(s.sum) + ".",
+      build: "Year 0 spends " + musd(s.C) + ". Years 1 to " + p.life + " each sell " + musd(s.S) + " and spend " + musd(s.F) + " on upkeep, " + musd(s.net) + " net: " + musd(s.sum) + " together, before the outlay is taken off.",
+      buildPart: "Add all three cash flows, the building cost, the sales and the upkeep, to read the farm's net cash.",
       disc: "At " + R + ", the " + p.life + " net years are worth " + musd(s.pvNet) + " today. Minus the " + musd(s.C) + " outlay, the [[net-present-value|NPV]] is " + signed(s.npv) + ": the farm is worth building at this rate and price.",
       wacc: function (d) { var W = wacc(s.fin, d), v = npv(p, W.real); return d + "% loans: " + pct(W.nominal, 1) + " nominal, " + pct(W.real, 2) + " real; NPV " + signed(v) + "."; },
-      waccSaw: "Rates held fixed, more loans lower the WACC and raise the NPV. Real financing shifts risk and required returns, so this slider cannot pick the best loan share.",
-      irr: "Between " + pct(s.irrB.lo, 1) + " (NPV " + signed(s.irrB.npvLo) + ") and " + pct(s.irrB.hi, 1) + " (" + signed(s.irrB.npvHi) + ") the NPV changes sign. The [[internal-rate-of-return|internal rate of return]] lies between: " + pct(s.irr, 2) + ". It is above " + R + ", so the NPV at " + R + " is positive.",
+      waccSaw: "Rates held fixed, more loans lower the WACC and raise the NPV; real financing shifts risk and required returns, so this slider cannot pick the best loan share.",
+      irr: "Between " + pct(s.irrB.lo, 1) + " (NPV " + signed(s.irrB.npvLo) + ") and " + pct(s.irrB.hi, 1) + " (" + signed(s.irrB.npvHi) + ") the NPV changes sign: the [[internal-rate-of-return|internal rate of return]] lies between, at " + pct(s.irr, 2) + ". It is above " + R + ", so the NPV at " + R + " is positive.",
       irrDown: "Past zero: the NPV is negative here. Step back with − one notch at a time until it turns positive.",
       irrUp: "The NPV is still positive. Step up with + one notch at a time until it turns negative.",
       restart: "Starting again from the default farm: " + usd(p.price, 0) + "/MWh, " + R + " real, " + p.life + " years.",
       pay: "Payback stays in year " + s.pb.simple + ", but the NPV falls from " + signed(s.npv) + " to " + signed(s.npv20) + ". Payback is blind to every year after it.",
+      payBack: "Back to " + p.life + " years: the NPV is " + signed(s.npv) + " again and payback is still year " + s.pb.simple + ", the same for both lives; only the NPV counts years " + (s.life20.life + 1) + " to " + p.life + ".",
       be: "The NPV crosses zero at " + usd(s.be) + "/MWh, lesson 7's LCOE for the same farm. Below it, the NPV is negative: the farm would not earn its " + R + ".",
       tor: function (guess) {
         var top = s.tor.rows[0], second = s.tor.rows[1];
-        return (guess === top.key ? "Right. " : "") + top.label + " moves the NPV most (" + musd(top.swing) + " across its range), then " + second.label.toLowerCase() + " (" + musd(second.swing) + "). Other ranges could change the order.";
+        var lead = top.label + " moves the NPV most (" + musd(top.swing) + " across its range), then " + second.label.toLowerCase() + " (" + musd(second.swing) + "); other ranges could change the order.";
+        return guess === top.key ? "Right: " + lead.charAt(0).toLowerCase() + lead.slice(1) : lead;
       }
     };
   }
@@ -280,7 +284,7 @@
     steps.push({
       text: Q[0],
       build: function (act, api) {
-        var on = { build: false, sales: false, upkeep: false };
+        var on = { build: false, sales: false, upkeep: false }, built = false;
         var row = H("div", { class: "lx-choices-row", role: "group", "aria-label": "Add a cash flow" }, act), btn = {};
         [["build", "Add the building cost"], ["sales", "Add the sales"], ["upkeep", "Add the upkeep"]].forEach(function (b) {
           btn[b[0]] = H("button", { type: "button", class: "lx-choice", "aria-pressed": "false", text: b[1] }, row);
@@ -302,7 +306,9 @@
             legend: [{ label: "Building cost", color: COL.build }, { label: "Sales", color: COL.sales }, { label: "Upkeep", color: COL.upkeep }],
             aria: "Cash flows of the wind farm in millions of 2025 dollars: " + (on.build ? "year 0 " + musd(-outlay(p)) + "; " : "") + (on.sales ? "sales " + musd(sales(p)) + " a year; " : "") + (on.upkeep ? "upkeep " + musd(-upkeep(p)) + " a year." : ""),
             text: { head: ["Cash flow", "When", "$M"], rows: [["Building cost", "year 0", on.build ? musd(-outlay(p)) : "not added"], ["Sales", "years 1 to " + N + ", each", on.sales ? musd(sales(p)) : "not added"], ["Upkeep", "years 1 to " + N + ", each", on.upkeep ? musd(-upkeep(p)) : "not added"]] } });
-          if (on.build && on.sales && on.upkeep) { api.done(); api.saw(T.build); LX.emit("layout"); }
+          // once done, removing a cash flow replaces the summary, so it never describes a chart that is no longer shown
+          if (on.build && on.sales && on.upkeep) { built = true; api.done(); api.saw(T.build); LX.emit("layout"); }
+          else if (built) api.saw(T.buildPart, true);
         }
         autos[0] = function () { ["build", "sales", "upkeep"].forEach(function (k) { on[k] = true; }); draw(); };
         draw();
@@ -398,7 +404,8 @@
       text: Q[4],
       build: function (act, api) {
         restart(act);
-        var tg = LX.Toggle(H("div", { class: "lx-toggles", role: "group", "aria-label": "Life of the farm" }, act), { label: "A " + D7.finance.lifeRange[0] + "-year life instead of " + N, on: false, onChange: draw });
+        var moved = false;
+        var tg = LX.Toggle(H("div", { class: "lx-toggles", role: "group", "aria-label": "Life of the farm" }, act), { label: "A " + D7.finance.lifeRange[0] + "-year life instead of " + N, on: false, onChange: function () { moved = true; draw(); } });
         var P = LX.Plot(act, { text: "Text version of the chart", box: true });
         var ro = readouts(act, [["s", "1 · Simple payback"], ["d", "2 · Discounted payback, " + R], ["npv", "NPV at " + R]]);
         function yearsText(t) { return t == null ? "never" : "year " + t; }
@@ -416,7 +423,8 @@
             marks: marks, legend: [{ label: "Running sum of cash", color: COL.net }, { label: "Running sum, discounted at " + R, color: COL.today, dash: "6 4" }],
             aria: "Running sums of the wind farm's cash over a " + q.life + "-year life: simple payback " + yearsText(pb.simple) + ", discounted payback " + yearsText(pb.discounted) + ", NPV " + signed(v) + ".",
             text: { head: ["Year", "Running sum, $M", "Discounted, $M"], rows: F.filter(function (y) { return y.t % 4 === 0 || y.t === pb.simple || y.t === pb.discounted || y.t === q.life; }).map(function (y) { return [String(y.t), musd(y.cum), musd(y.cumPV)]; }) } });
-          if (tg.val()) { api.done(); api.saw(T.pay); }
+          // switched back to 30 years, the message follows the readouts again
+          if (tg.val()) { api.done(); api.saw(T.pay); } else if (moved) api.saw(T.payBack);
         }
         autos[4] = function () { tg.set(true); draw(); };
         draw();
@@ -514,7 +522,7 @@
       symbols: {
         npv: { sym: "NPV", name: "Net present value", unit: "$", color: "var(--lx-ink)", words: "Every year's cash, discounted to today and added up, the outlay included. Above zero, the project earns more than the rate r.", you: you("npv"), code: "npv = -C + sum((p*E - F) / (1 + r)**t for t in range(1, n + 1))" },
         C: { sym: "C", name: "Building cost", unit: "$, in year 0", color: COL.build, words: "The whole outlay, paid at once in year 0 (no interest during construction here).", you: you("C"), code: "C = 1000 * 150 * 1712" },
-        p: { sym: "p", name: "Sale price", unit: "$ per MWh", color: COL.sales, words: "What each MWh sells for, fixed in 2025 dollars for the whole life, as a contract indexed to inflation would be (illustrative).", you: you("p"), code: "p = 50" },
+        p: { sym: "p", name: "Sale price", unit: "$ per MWh", color: COL.sales, words: "What each MWh sells for, fixed in 2025 dollars for the whole life, as a contract indexed to inflation would be (illustrative).", you: you("p"), code: function () { var q = own() || p; return "p = " + q.price; } },
         E: { sym: "E", name: "Yearly output", unit: "MWh a year", color: "var(--lx-wind)", words: "Size × 8,760 hours × the capacity factor (lesson 5).", you: you("E"), code: "E = 150 * 8760 * 0.338" },
         F: { sym: "F", name: "Fixed upkeep", unit: "$ a year", color: COL.upkeep, words: "[[fixed-om|Fixed operation and maintenance]], paid every year whatever the output.", you: you("F"), code: "F = 1000 * 150 * 34.57" },
         r: { sym: "r", name: "Discount rate", unit: "a fraction per year", color: COL.today, words: "What the money costs, the [[wacc|WACC]]; real, because every dollar here is a 2025 dollar.", you: you("r"), code: "r = 0.04" },

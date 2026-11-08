@@ -121,10 +121,10 @@ ok(D.large.lbnlMedian === 80 && D.facts[2].what.indexOf("median minimum billing 
 // ---------------- the page's sentences (from the model) and numbers in the prose
 const S = {
   costReveal: "Plants: $139 a month, for its 9.25 kW at 20:00 while the car charges. Its energy costs $58; the kWh it sends back at midday are worth $0, because the town is already spilling sun.",
-  flatReveal: "At 14.7¢ per kWh the renter pays $92 for a cost of $71; the solar and EV home pays $66 for a cost of $262. Nine renters, about $22 each above their cost, cover that home's $196.",
+  flatReveal: "At 14.7¢ per kWh the renter pays $92 for a cost of $71, and the solar and EV home $66 for $262. Nine renters, about $22 each above cost, cover that home's $196.",
   tou: "Charging at 01:00 cuts the time-of-use bill by $68 a month, while the model's cost of serving the home falls $126. Under the flat price the bill would not move at all.",
   demand: "At midnight the demand-charge bill falls $3,000 a month, but the model's cost of serving the factory falls only $720: the batch's energy now costs $480 more. Under real-time pricing the bill rises $480.",
-  scarce: "Real-time: the renter's bill jumps from $88 to $132 this month. Flat: it stays $92 while serving the renter costs $114. Here we assume the utility pays the gap now and recovers it from all customers later."
+  scarce: "Real-time: the renter's bill jumps from $88 to $132 this month; flat, it stays $92 while serving the renter costs $114. We assume the utility pays that gap now and recovers it from all customers later."
 };
 ok(Math.round(9 * r.gap.flat) === 196 && Math.round(r.gap.flat) === 22 && 9 * Math.round(r.gap.flat) !== 196, "nine renters' gaps add to $196, about $22 each (9 × $22 would be $198, so the page never writes it)");
 ok(M.costReveal(D, W, E0) === S.costReveal, "step 3 reveal");
@@ -165,7 +165,7 @@ STATES.forEach(st => {
   ok(tu.indexOf("saves its owner " + M.usd(-ch.bill.tou) + ", while the model's cost of serving the home falls " + M.usd(-ch.cost) + "; the renter pays " + M.gapWords(E.renter.gap.tou) + ".") >= 0, "step 8 time-of-use " + tag);
   ok(dm.indexOf("the renter pays " + M.gapWords(E.renter.gap.demand) + " and the home " + M.gapShort(E.solarev.gap.demand) + ". It bills the home's own busiest hour, " + M.hm(b)) >= 0 &&
      (b === W.tight) === /also the town's tightest hour/.test(dm), "step 8 demand charge " + tag);
-  ok(rt.indexOf("saves its owner " + M.usd(-ch.bill.rtp) + ", while the model's cost of serving the home falls " + M.usd(-ch.cost) + ".") >= 0 && /a scarcity week adds \$44 to the renter's bill/.test(rt), "step 8 real-time " + tag);
+  ok(rt.indexOf("saves its owner " + M.usd(-ch.bill.rtp) + ", while the model's cost falls " + M.usd(-ch.cost) + ".") >= 0 && /a scarcity week adds \$44 to the renter's bill/.test(rt), "step 8 real-time " + tag);
 });
 ok(/the renter pays \$22 below its cost and the solar and EV home \$322 below/.test(M.pickLine(D, W, T, "flat", { scarce: true })) &&
    /the home \$2 below/.test(M.pickLine(D, W, T, "demand", { ev: "night", scarce: true })) && /the home \$58 above/.test(M.pickLine(D, W, T, "demand", { ev: "night" })),
@@ -190,13 +190,37 @@ has("it falls to 13.5¢", "Go deeper: net billing price");
 has("The renter's bill falls from $92 to $86; the solar and EV home's rises from $66 to $127, still below its $262 cost.", "Go deeper: net billing bills");
 has("In the toy the renter pays $22 above its cost and the solar and EV home $196 below", "myth 1");
 has("Moving the factory's batch saves $3,000 on its bill, but the model's cost of serving it falls only $720", "myth 2");
-has("A scarcity week raises the renter's real-time bill from $88 to $132. Under the other tariffs the utility pays first; here we assume it recovers that from all customers later.", "myth 3");
+has("Fact: a scarcity week raises the renter's real-time bill from $88 to $132. Under the other tariffs the utility pays first; here we assume it recovers that from all customers later.", "myth 3");
 has("With its highest demand at half its contract, other customers pay $7.5M a year of the upgrades with no minimum, and $3.0M with a minimum of 80% (if they cover what it does not pay).", "myth 4");
-has("Time-of-use: $68 a month, against $30 under the demand charge, $13 under real-time pricing and nothing under the flat price. The model's cost of serving the home falls $126.", "quick question");
+has("Time-of-use: $68 a month, against $30 under the demand charge, $13 under real-time and nothing flat; the model's cost of serving the home falls $126. With the scarcity week on, real-time saves $79, time-of-use still $68.", "quick question");
+// the quick question names its state: without the scarcity week time-of-use saves most; with it, real-time does
+{
+  const q0 = M.change(D, W, T, "solarev", { ev: "evening" }, { ev: "night" }), q1 = M.change(D, W, T, "solarev", { ev: "evening", scarce: true }, { ev: "night", scarce: true });
+  const best = q => D.tariffs.map(x => x.key).sort((a, b) => q.bill[a] - q.bill[b])[0];
+  ok(best(q0) === "tou" && M.usd(-q0.bill.tou) === "$68" && M.usd(-q0.bill.demand) === "$30" && M.usd(-q0.bill.rtp) === "$13" && q0.bill.flat === 0 && M.usd(-q0.cost) === "$126", "quick question without the scarcity week: time-of-use $68, demand $30, real-time $13, flat $0; cost $126");
+  ok(best(q1) === "rtp" && M.usd(-q1.bill.rtp) === "$79" && M.usd(-q1.bill.tou) === "$68", "quick question with the scarcity week: real-time saves $79, more than time-of-use's $68");
+  has("Without the scarcity week, under which tariff does moving the car's charging from 19:00 to 01:00 save its owner the most?", "quick question: the state is named");
+}
+// step 3: how each part is priced, and a worked example that reproduces $139 from the shown operands
+{
+  const cr = M.costRates(D, W, E0);
+  ok(cr.worked === "Plants for the solar and EV home: 9.252 kW × $15 = $138.78 a month." && (9.252 * 15).toFixed(2) === "138.78" && M.usd(E0.solarev.cost.capacity) === "$139" && near(E0.solarev.atTight, 9.252, 1e-9), "step 3: the worked example, 9.252 kW × $15 = $138.78 ($139)");
+  ok(cr.lines.length === 4 && /\$15 a month per kW drawn at 20:00, the town's tightest hour/.test(cr.lines[1]) && /\$6 a month per kW of the customer's own busiest hour/.test(cr.lines[2]) && /\$10 a month for a home, \$200 for a business/.test(cr.lines[3]) && /cr\.lines\.forEach/.test(JS), "step 3: the four rates are shown");
+}
+// the Modeler box's bill has the hour factor, so a kW becomes a kWh
+has("$$\\text{bill}(x) = F + n \\sum_{t} p_t\\, x_t\\, \\Delta t + d \\max_t x_t$$", "Modeler box: the bill with Δt");
+has("one kW held for one hour uses one kWh", "Modeler box: power and energy");
+// the large load's text alternative names its billing demand
+ok(/aria: "Billing demand " \+ Math\.round\(r\.billedMW\) \+ " MW\. Upgrades, "/.test(JS), "large load: the cost split's text alternative names the billing demand");
+// protections are stated as reducing exposure, not as a guarantee
+has("Minimum bills, long contracts and exit fees can reduce other customers' exposure to a large load's upgrades; how much depends on their amounts and terms.", "explain: large-load protections");
+ok(!/keep a large load's upgrades from falling/.test(PAGE) && /can reduce other customers' exposure/.test(fs.readFileSync(path.join(SITE, "learn/_w1/" + ID + ".yml"), "utf8")), "large-load tariff: no guarantee in the explain layer or the glossary");
+// first-use terms: EV, rate case, collateral, slopes
+ok(/\[\[electric-vehicle\|EV\]\] home\?/.test(JS) && /an electric vehicle \(EV\)/.test(RAW) && /\[\[rate-case\|rate case\]\]/.test(JS) && /\[rate cases\]\{\.lx-term term="rate-case"\}\*\*, the regulator's reviews that set a utility's prices/.test(OWN) && /collateral \(security against nonpayment\)/.test(OWN) && /slopes \(how the bill changes when one hour's kW changes\)/.test(OWN), "terms: EV, rate case, collateral and slopes are explained where they first appear");
 // the Modeler box: the demand charge falls only when every tied peak falls (the factory's 13:00 and 14:00)
 ok(f.net[13] === f.peak && f.net[14] === f.peak && f.net.filter(v => v === f.peak).length === 2, "the factory's busiest hours, 13:00 and 14:00, are tied at 500 kW");
 { const one = f.net.slice(); one[13] -= 100; ok(near(M.bill(T.business.demand, "demand", W, one, W.price).demand, M.bill(T.business.demand, "demand", W, f.net, W.price).demand), "lowering only one tied peak leaves the demand charge unchanged"); }
-has("The demand charge falls only when the highest remaining hourly demand falls: all tied peaks must come down", "Modeler box: tied peaks");
+has("The demand charge falls only when the highest hourly demand falls: all tied peaks must come down", "Modeler box: tied peaks");
 has("sends the right signals for the costs this model represents", "Modeler box: limited to the model's costs");
 // numbers to remember: each row = the data file, with its source and date
 D.facts.forEach(fc => {
@@ -254,25 +278,29 @@ ok(hrefs.every(h => /^https:\/\/(www\.eia\.gov|www\.ferc\.gov|eta-publications\.
 ok(!/projects\/|research\.html/.test(PAGE), "no project page and no Research page");
 
 // ---------------- text budget
-const plain = t => t.replace(/<[^>]+>/g, " ").replace(/\$\$[\s\S]*?\$\$/g, " ").replace(/\$[^$\n]+\$/g, "x").replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1").replace(/&amp;/g, "&").trim();
+// inline math is $...$ holding TeX (a backslash, _, ^ or braces); "$15 per kW ... $6" is prose with two dollar amounts
+const plain = t => t.replace(/<[^>]+>/g, " ").replace(/\$\$[\s\S]*?\$\$/g, " ").replace(/\$[^$\n]*[\\_^{}][^$\n]*\$/g, "x").replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1").replace(/&amp;/g, "&").trim();
 const nWords = t => plain(t).split(/\s+/).filter(w => /[A-Za-z0-9$]/.test(w)).length;
 const stepTexts = [...JS.matchAll(/\{ text: ("(?:[^"\\]|\\.)*"(?: \+ [^\n]*?)?),\n\s*(?:free: true,\n\s*)?build/g)].map(m => m[1]);
 ok(stepTexts.length === 10, "ten step cards (" + stepTexts.length + ")");
 // evaluate each step's text expression with the page's values in scope
 const stepVals = stepTexts.map(src => Function("W", "D", "hm", "return " + src)(W, D, M.hm));
-stepVals.forEach((t, i) => { const n = nWords(t); ok(n >= 18 && n <= 42, "step " + (i + 1) + ": " + n + " words (about 35)"); });
+stepVals.forEach((t, i) => { const n = nWords(t); ok(n >= 18 && n <= 36, "step " + (i + 1) + ": " + n + " words (about 35)"); });
 const nSent = t => plain(t).split(/(?<=[.?!])\s+(?=[A-Z“])/).filter(x => /[A-Za-z]/.test(x)).length;
-stepVals.forEach((t, i) => ok(nSent(t) <= 3, "step " + (i + 1) + ": " + nSent(t) + " sentences (at most three)"));
+stepVals.forEach((t, i) => ok(nSent(t) <= 2, "step " + (i + 1) + ": " + nSent(t) + " sentences (one or two)"));
 const lines = [M.costReveal(D, W, E0), M.flatReveal(D, T, E0), M.scarcityReveal(D, W, T, true), M.PICK_NOTE, M.ALLOC]
   .concat(STATES.map(st => M.touReveal(D, W, T, st))).concat(STATES.map(st => M.demandReveal(D, W, T, st)))
   .concat([].concat(...STATES.map(st => D.tariffs.map(x => M.pickLine(D, W, T, x.key, st))))).concat(D.customers.map(c => M.summary(D, W, E0, c.key)))
   .concat([M.startNote({ scarce: true })]).concat([25, 50, 75, 100].map(u => [0, 50, 80, 100].map(m => M.largeLine(D.large, u, m))).flat());
-lines.forEach(t => { ok(nWords(t) <= 42, "a reveal of " + nWords(t) + " words: " + t.slice(0, 60)); ok(nSent(t) <= 3, "a reveal of " + nSent(t) + " sentences: " + t.slice(0, 60)); });
+lines.forEach(t => { ok(nWords(t) <= 36, "a reveal of " + nWords(t) + " words: " + t.slice(0, 60)); ok(nSent(t) <= 2, "a reveal of " + nSent(t) + " sentences: " + t.slice(0, 60)); });
 // the page's own prose, the no-JS blocks included: paragraphs, list items, definitions, table cells, captions
-const PROSE = OWN.replace(/^---[\s\S]*?\n---\n/, " ").replace(/<script[\s\S]*?<\/script>/g, " ").replace(/<style[\s\S]*?<\/style>/g, " ")
+// the sources list is citations, not prose: it is left out
+const PROSE = OWN.replace(/^---[\s\S]*?\n---\n/, " ").replace(/<script[\s\S]*?<\/script>/g, " ").replace(/<style[\s\S]*?<\/style>/g, " ").replace(/<div class="lx-card lx-sources">[\s\S]*?<\/div>/, " ")
   .replace(/<!--[\s\S]*?-->/g, " ").replace(/^- (.*)$/gm, "<li>$1</li>").replace(/^\|(.*)\|$/gm, "<td>$1</td>");
 PROSE.split(/<\/?(?:p|li|dd|dt|td|th|summary|blockquote|br|caption)\b[^>]*>/).map(plain).filter(x => /[A-Za-z]/.test(x) && !/^[:{]/.test(x)).forEach(x => {
-  const n = nWords(x); ok(n <= 42, "text element of " + n + " words: " + x.slice(0, 70)); ok(nSent(x) <= 3, "text element of " + nSent(x) + " sentences: " + x.slice(0, 70)); });
+  const n = nWords(x); ok(n <= 36, "text element of " + n + " words: " + x.slice(0, 70)); ok(nSent(x) <= 2, "text element of " + nSent(x) + " sentences: " + x.slice(0, 70)); });
+// the budget counts prose between two dollar amounts (the old math pattern dropped it)
+ok(nWords("Plants: $15 a month per kW drawn at 20:00, and wires $6 a month") === 14, "budget: prose between dollar amounts is counted");
 
 // ---------------- the step-card controls the page relies on
 ok(/aria-live/.test(JS) && /LX\.store\.(get|set)\("a04"/.test(JS), "live status region; the reader's choices persist in this browser");
