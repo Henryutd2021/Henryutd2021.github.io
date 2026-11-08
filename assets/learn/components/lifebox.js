@@ -1,6 +1,5 @@
-/* lifebox.js — LX.LifeBox: a chain of stages with a boundary the reader drags (the curriculum's i-boundary), promoted at
-   the W5 integration (2026-11-06) from Analyst lesson A11's life-cycle box (assets/learn/a11-lca-nexus.js, builder
-   learn-w5-c), whose interaction it is, unchanged. A dashed boundary lies over a row of stage tiles (a column on phones,
+/* lifebox.js — LX.LifeBox: a chain of stages with a boundary the reader drags (the course's i-boundary interaction),
+   first used for Analyst lesson A11's life-cycle box (assets/learn/a11-lca-nexus.js). A dashed boundary lies over a row of stage tiles (a column on phones,
    560 px and narrower); its two edges are sliders (arrow keys, Home and End, or drag); a tap on a stage outside brings it
    in, with every stage between, and a tap on an end stage inside moves it out; optional preset buttons sit under the
    chain. The page fills each tile and reads the boundary, which lives in the page's own state object (S.L and S.R: the

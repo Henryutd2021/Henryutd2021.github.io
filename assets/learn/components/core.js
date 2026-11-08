@@ -1,9 +1,9 @@
-/* core.js — the LX namespace every Learn component builds on (component library, 2026-11-02).
+/* core.js — the LX namespace every Learn component builds on (component library).
    Helpers:  LX.H(tag, attrs, parent)   HTML element; attrs: text, html, class, on<event>, any attribute
              LX.S(tag, attrs, parent)   SVG element
              LX.icon(name, cls)         24-unit stroke pictogram as an SVG string (names in LX.IC)
              LX.rich(text)              text with [[glossary-id|shown words]] marks -> HTML with tap-to-define terms, and
-                                        [[lesson:<id>|shown words]] -> a link to learn/<id>.html (W3: text a component
+                                        [[lesson:<id>|shown words]] -> a link to learn/<id>.html (text a component
                                         draws can link a live lesson; _tests/learn/test_components_w3_shared.js checks
                                         that every such mark names a live page)
              LX.fmt.money/tonnes/mw/mwh/hh/int, LX.clamp, LX.lerp, LX.reduced() (prefers-reduced-motion)
@@ -19,7 +19,7 @@
                                    page's links appear by themselves when a lesson goes live
    Random:   LX.mulberry32(seed)    a small seeded generator (mulberry32, 32-bit): a function returning numbers in [0, 1);
                                    the same seed gives the same numbers on every page, in Node and in the notebooks' Python
-                                   ports (promoted at the W3 integration from M7 and engine E1, which each had a copy)
+                                   ports (shared by M7 and engine E1)
    Also: the back-to-top guard (hides the site's button while it would cover lesson controls or any text) and course ticks.
    Node: module.exports = { lessonRef, lessonRefHTML, mulberry32, rich } (pure; the rest needs a browser). */
 (function () {
@@ -267,7 +267,7 @@
   //             null for it and `cards` (an LX.StepCards) is given, the card is simply opened
   // and may add its own names ("band", "milp", ...). window.lxDemo(state) and root.lxDemo(state) run it, and so does
   // the address: ?demo=<state>, #lx-demo-<state>, #lx-demo-<N> or #lx-step-<N> (= "step-N"), #lx-demo (= "mid").
-  // scripts/learn_screenshots.mjs uses it for any state it does not know. Readers never see it unless they ask for it.
+  // The screenshot check uses it for any state it does not know. Readers never see it unless they ask for it.
   LX.demoState = function () {
     var q = /[?&]demo=([\w-]+)/.exec(location.search), h = /^#lx-(demo|step)(?:-([\w-]+))?$/.exec(location.hash);
     if (q) return q[1];

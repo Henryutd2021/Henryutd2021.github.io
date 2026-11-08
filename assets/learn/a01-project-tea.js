@@ -1,5 +1,5 @@
 // a01-project-tea.js — Analyst lesson A1, "Is this project worth building? Cash flows, discounting and the cost of capital"
-// (step cards, Learn W3, 2026-11-03).
+// (step cards).
 //
 // Data (read through data-src):
 //   assets/learn/data/07-cost.json        lesson 7's wind farm and finance, so every input agrees with lessons 7, 12, 13

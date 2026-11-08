@@ -1,4 +1,4 @@
-// k04-linear-equations.js — Toolbox K4, "Linear equations and inequalities" (step cards, Learn W1, 2026-11-02).
+// k04-linear-equations.js — Toolbox K4, "Linear equations and inequalities" (step cards).
 //
 // Just-in-time math for B1 (From algebra to a linear program). One interactive, the rule plane: a two-variable plane
 // where each rule a1·x + a2·y (≤ | = | ≥) b is a line plus a side, the plans that pass every rule are shaded, and a
@@ -341,9 +341,8 @@
     });
   }
 
-  // ---- practice drill: a seeded stream of short items with instant feedback (LX.Drill; this visit only). As before the
-  // promotion, focus stays on "Next item"; since the W2 integration an empty box asks for a number (as in K1 to K3)
-  // instead of counting as a wrong answer.
+  // ---- practice drill: a seeded stream of short items with instant feedback (LX.Drill; this visit only). Focus
+  // stays on "Next item"; an empty box asks for a number (as in K1 to K3) instead of counting as a wrong answer.
   function drillView(D) {
     var host = document.getElementById("k4-drill"); if (!host) return; host.innerHTML = "";
     LX.Drill(host, { hint: "Five kinds of item in rotation, new numbers each time. Aim for ten in a row.", focus: false, empty: "Type a number first.",

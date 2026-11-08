@@ -1,10 +1,10 @@
-// c1-keep-the-campus-running.js — C1, "Keep the campus running: a microgrid for a three-day winter outage" (capstone,
-// wave W3, 2026-11-03), built on the Microgrid Workbench's engine E1 (assets/learn/components/engine-e1.js, LX.E1).
+// c1-keep-the-campus-running.js — C1, "Keep the campus running: a microgrid for a three-day winter outage" (capstone),
+// built on the Microgrid Workbench's engine E1 (assets/learn/components/engine-e1.js, LX.E1).
 //
 // The capstone narrows the bench: the outage is the three-day winter storm (72 hours from 00:00 on 20 January 2025),
 // the dorms start as must stay on (the brief: power to the hospital, its water and heating plant and the dorms), and
 // every run also checks the same plan, held fixed, on the storm cut to one or two days or stretched to four (the
-// sensitivity). Whatever priorities the reader sets, the page reports the brief's three critical loads (W3 review C1 2).
+// sensitivity). Whatever priorities the reader sets, the page reports the brief's three critical loads.
 // A second run box sizes the cheapest plan for each of the three owners and runs each rounded plan, so the sizes and
 // the cost shown belong together (C1 4). The note is LX.ReportNote; the self-check LX.Exemplars and LX.Rubric. The
 // exemplars quote the engine's numbers for the plan that "Size it for me" gives from the defaults, checked by
@@ -15,7 +15,7 @@
   // ---------------------------------------------------------------- pure (Node: the test reads these)
   function money(v) { var r = Math.round(v); return (r < 0 ? "−$" : "$") + Math.abs(r).toLocaleString("en-US"); }
   function kilo(v) { return Math.round(v).toLocaleString("en-US"); }
-  // the brief's critical loads, fixed whatever priorities the reader sets (W3 review C1 2): the hospital, the water and
+  // the brief's critical loads, fixed whatever priorities the reader sets: the hospital, the water and
   // heating plant and the dorms, the first three of the engine's loads (the test checks the order)
   var CRIT = "the hospital, the water and heating plant and the dorms";
   function crit(o) { return o.perLoad[0] + o.perLoad[1] + o.perLoad[2]; }
@@ -39,7 +39,7 @@
     return (same ? "Each owner's cheapest plan has the same sizes here: between 4% and 6%, the cost of capital moves the cost, not the plan. " : "The cheapest plan differs by owner: cheaper capital buys more equipment that saves on the bill. ") +
       lo.owner.label + " costs least, " + money(lo.total) + " a year; " + hi.owner.label.toLowerCase() + " most, " + money(hi.total) + ".";
   }
-  // the two exemplar notes (illustrative); the strong one is a complete short note, one field a line (W3 review C1 7, 9),
+  // the two exemplar notes (illustrative); the strong one is a complete short note, one field a line,
   // quoting the run of the plan "Size it for me" gives from the defaults (R) and that plan's cost for the other owners.
   // paidBy(key): the annual cost of this same plan (R.plan, R's bill) with owner key's cost of capital. The test checks
   // every number against the engine.
@@ -91,7 +91,7 @@
         lastR = R;
         var main = {}; for (var k in R) main[k] = R[k];
         main.outages = [R.outages[0]];
-        // the brief's three loads, whatever priorities the plan gives them (W3 review C1 2), above the engine's results
+        // the brief's three loads, whatever priorities the plan gives them, above the engine's results
         // (E1.Results empties its own host, so it draws into a box of its own)
         host.innerHTML = "";
         var c0 = crit(R.outages[0]), lab = H("p", { class: "c1-crit " + (c0 > 0.5 ? "bad" : "good"), role: "note" }, host);
@@ -125,7 +125,7 @@
     H("p", { class: "lx-hint", html: LX.rich("Each owner pays for the equipment at its own illustrative real [[cost-of-capital|cost of capital]]: utility 6%, co-op 4%, community 5%. The bill and the storm are the same.") }, oc);
     var oRow = H("div", null, oc), oStale = H("p", null, oc), oRes = H("div", null, oc), oStop = E1.ui.stopper();
     // each owner: size for the storm, then run that plan rounded up to the bench's steps (whole sets, their 30% minimum),
-    // so the sizes and the annual cost in a row belong to the same plan (W3 review C1 4)
+    // so the sizes and the annual cost in a row belong to the same plan
     var OW = LX.BenchRun(oRow, { label: "Size it for each owner", state: function () { return B.plan(); }, results: [oRes], stale: oStale, busy: oStop.busy,
       solve: function (st, ctx) {
         var out = [], k = 0;

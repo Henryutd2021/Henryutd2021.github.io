@@ -1,11 +1,10 @@
 /* gp.js — LX.M9: Gaussian processes on small data (one source, or two with a cheap level: multi-fidelity), their
    covariance, maximum likelihood on a grid, the normal distribution and held-out scores (coverage, RMSE, pinball loss),
-   with the toy wind turbine they are taught on. Promoted at the W4 integration (2026-11-05) from Modeler lesson M9
-   (assets/learn/m09-surrogates-uq.js), whose code it is, unchanged; case file CF8 turns its fits into a capacity-factor
-   band. Pure: no DOM; the page passes in its data (assets/learn/data/m09-surrogates-uq.json: the turbine, the stored
+   with the toy wind turbine they are taught on. Shared by Modeler lesson M9 (whose page script is
+   assets/learn/m09-surrogates-uq.js) and case file CF8, which turns its fits into a capacity-factor band. Pure: no DOM; the page passes in its data (assets/learn/data/m09-surrogates-uq.json: the turbine, the stored
    records and the stored maximum-likelihood settings). Each page keeps its own text and view (M9: facts, reference,
    staticFallback). Node: require("assets/learn/components/gp.js"); tests: _tests/learn/test_m09-surrogates-uq.js,
-   test_cf8-power-curves-from-scarce-data.js (every number), test_components_w4_int.js (the promotion).
+   test_cf8-power-curves-from-scarce-data.js (every number), test_components_w4_int.js (the shared component in the bundle).
 
    The toy (illustrative; invented, seeded, not any real turbine or the course author's data): one 2,000 kW wind turbine.
      maker's curve   f(v) = 0 below 3 m/s; 2,000 (v^3 - 3^3) / (11.5^3 - 3^3) kW from 3 to 11.5 m/s; 2,000 kW above
@@ -249,7 +248,7 @@
     return bins;
   }
   // the records in the 1 m/s bin starting at lo (the bins of gaps(): the last one, 19-20 m/s, includes 20): count, mean
-  // power and mean gap below the maker's curve (M9's chart text versions; review M9 #3, 2026-11-05)
+  // power and mean gap below the maker's curve (M9's chart text versions)
   function recBin(T, recs, lo) {
     var last = T.range[1] - T.range[0] - 1, n = 0, sp = 0, sg = 0;
     recs.forEach(function (r) { if (Math.min(last, Math.floor(r[0] - T.range[0])) === lo - T.range[0]) { n++; sp += r[1]; sg += maker(T, r[0]) - r[1]; } });

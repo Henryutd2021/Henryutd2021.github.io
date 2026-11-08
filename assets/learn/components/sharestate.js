@@ -1,5 +1,5 @@
 /* sharestate.js — LX.ShareState (i-share): a sandbox's or capstone's plan kept in the address (#hash): compact,
-   versioned and checked when a page opens it, with a "Copy plan link" button (W3, curriculum v2 §16.1, §16.3). There is
+   versioned and checked when a page opens it, with a "Copy plan link" button. There is
    no server and no personal data: the link holds only the numbers and choices that the page's schema declares (there is
    no free-text type), and nothing leaves the page unless the reader copies the link.
 

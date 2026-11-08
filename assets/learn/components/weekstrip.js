@@ -1,6 +1,6 @@
 /* weekstrip.js — LX.WeekStrip: a year's 52 calendar weeks in four rows of 13, each coloured by the representative week
    that stands for it, with a red dot on each week that has unserved demand in a full-year check, a key and a text
-   version (a table). Promoted from lesson M3 at the W2 integration (2026-11-03); M13 and C2 can reuse it. It reads the
+   version (a table). First used by lesson M3; M13 and C2 can reuse it. It reads the
    planning engine's objects (LX.townPlan, components/planengine.js, bundled before it):
 
      var ws = LX.WeekStrip(host, Y);        // Y: LX.townPlan.prepareYear(...); opts (optional): { year: 2025 }

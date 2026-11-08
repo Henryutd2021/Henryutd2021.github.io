@@ -10,7 +10,7 @@
      priceLabel: function (p) { return "Equal score at $" + Math.round(p) + "/t"; },
      fmtX: function (t) { return "530 kt"; }, fmtY: function (usd) { return "$131.4M"; },   text version and spoken labels
      altTitle: "Text version of the chart",
-     xStep: 200, yStep: 25 });                      tick steps (W4): CO₂ gridlines every xStep kt (default 200); cost
+     xStep: 200, yStep: 25 });                      tick steps: CO₂ gridlines every xStep kt (default 200); cost
                                                     gridlines every yStep $M (default 20, 25 or 50 by the axis span)
    Points carry co2 in tonnes and cost in dollars a year (the axes show kt and $M).
    fc.frontier([{ co2, cost, cap (kt, or null for no cap), solved }], label)   the line; solved points get a dot

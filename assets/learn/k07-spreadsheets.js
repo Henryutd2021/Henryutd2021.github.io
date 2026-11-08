@@ -1,4 +1,4 @@
-// k07-spreadsheets.js — Toolbox K7, "Spreadsheets in practice" (step cards, Learn W1, 2026-11-02).
+// k07-spreadsheets.js — Toolbox K7, "Spreadsheets in practice" (step cards).
 //
 // Just-in-time skills for B2 (Python and data) and the Analyst tier. One interactive: a small working spreadsheet of
 // Prairie Town's real day (3 September 2025, the same hours as lesson 0) with a formula bar, cell addresses, fill-down,

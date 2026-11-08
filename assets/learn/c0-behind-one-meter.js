@@ -1,5 +1,5 @@
-// c0-behind-one-meter.js — Capstone C0, "Behind one meter: what should one home or one plant install?" (wave W3,
-// 2026-11-03). Page: learn/c0-behind-one-meter.qmd (capstone form: Brief, Plan, Note, Self-check, Sources).
+// c0-behind-one-meter.js — Capstone C0, "Behind one meter: what should one home or one plant install?".
+// Page: learn/c0-behind-one-meter.qmd (capstone form: Brief, Plan, Note, Self-check, Sources).
 // Built on the Site Bench (SB0): the plan runs on engine E0 (assets/learn/components/engine-e0.js, LX.E0, in the bundle)
 // through the same bench kit (LX.E0.ui.bench), under its own plan-link key (#c0-v1-...). This file adds the sensitivity
 // chart (LX.Tornado over LX.E0.sensitivity, the equipment held fixed), the one-page note (LX.ReportNote: the reader's

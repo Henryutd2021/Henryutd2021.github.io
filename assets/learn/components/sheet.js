@@ -1,5 +1,5 @@
 /* sheet.js — LX.Sheet: a small working spreadsheet: a formula engine and a view with a formula bar, a grid that moves with
-   the arrow keys, and fill-down (promoted from toolbox K7, W1 2026-11-02; for any lesson that wants an in-page sheet).
+   the arrow keys, and fill-down (first used by toolbox K7; for any lesson that wants an in-page sheet).
    var sh = LX.Sheet(host, sheet, { start: "B5", fillRows: [5, 28], fillCols: "EF", prefix: { F: "$" }, wide: "F",
      headRow: 4, label: "Spreadsheet of ...; use the arrow keys to move, Enter to edit", todo: ["E33"],
      onSelect: function (name) {}, onChange: function (sheet, name, how) {} });      how: "fill" after a fill-down

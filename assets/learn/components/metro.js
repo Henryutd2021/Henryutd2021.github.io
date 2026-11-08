@@ -5,7 +5,7 @@
                                         drawn 1:1, so text keeps its CSS size), opts.measure(text, font) a text measurer
                                         (fonts "label", "code", "tier", "text", "sub"; default: an estimate), opts.open
                                         {tier id: true} the narrow layout's folds that are open
-   What is drawn (map v2, 2026-11-03): every lesson in path.json is one station.
+   What is drawn: every lesson in path.json is one station.
      - The starter path (path.starter) is the named route across the tier lines, as before: large stations with icons
        and names, the route drawn thick; a lesson with tier2 bridges two lines (a capsule "to A").
      - Each tier is one line (thinner, in the tier's colour) carrying all its lessons: its starter stops first, then
@@ -446,7 +446,7 @@
         if (on) { opener = { el: d }; var first = st.filter(function (l) { return l.tier === t.id; })[0]; if (first) open("s" + first.starter, true); else openTier(k); }
       });
     });
-    // a click anywhere outside the open card closes it (Henry, 2026-11-07); a click on a station, door or label then opens
+    // a click anywhere outside the open card closes it; a click on a station, door or label then opens
     // its own card as before. Captured on the document, so it runs before the station's own handler. No timed close: a
     // card stays until the reader closes it (WCAG 2.2.1).
     document.addEventListener("click", function (e) {

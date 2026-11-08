@@ -1,5 +1,4 @@
-// 06-three-jobs.js — Lesson 6, "Cheap energy, firm capacity, flexibility: which plant does which job?" (step cards, W1,
-// 2026-11-02).
+// 06-three-jobs.js — Lesson 6, "Cheap energy, firm capacity, flexibility: which plant does which job?" (step cards).
 //
 // Data: assets/learn/data/06-three-jobs.json (nine technologies with sourced key numbers and the reference sort) and
 // assets/learn/data/town_year.json (SPP's 2025 wind shape, for the longest calm spell in the Steelman card).
@@ -76,7 +75,7 @@
 
   // ---------------------------------------------------------------- view
   var LX = window.LX, H = LX.H, S = LX.S, LESSON = "06-three-jobs";
-  // the pictograms atom, flame, drop, geo and dial are in the shared LX.IC (core.js) since the W1 merge
+  // the pictograms atom, flame, drop, geo and dial are in the shared LX.IC (core.js)
   var MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   function pct(x, d) { return (x * 100).toFixed(d === undefined ? 1 : d) + "%"; }
   function firmText(t) { return t.firm == null ? t.firmLabel : t.firmLabel + (t.firmNote ? " (" + t.firmNote + ")" : ""); }

@@ -1,8 +1,8 @@
 // m08-stochastic-robust.js — Modeler lesson M8, "Deciding before the uncertainty resolves: stochastic and robust
-// optimization" (model-lab: step cards with solver runs), wave W4, builder learn-w4-d, 2026-11-05.
+// optimization" (model-lab: step cards with solver runs).
 //
 // The model is the shared scenario component, LX.m08 (assets/learn/components/scenario.js, in the learn.js bundle;
-// promoted from this file at the W4 integration, unchanged): the toy, the closed form, the extensive-form LP and its
+// CF3 uses it too): the toy, the closed form, the extensive-form LP and its
 // robust variants, the formats; its data, model and tie rule are described there. This file keeps the page's own pure
 // parts (step 2's verdict, the no-JS block) and the page; in Node it exports the component's functions with them, as
 // before. _tests/learn/test_m08-stochastic-robust.js proves each size unique and recomputes every number.
@@ -74,7 +74,7 @@
     var St = { ws: {}, ev: null, sp: null, rob: null, reg: null, pre: {}, guess: typeof own.guess === "number" ? own.guess : null };
     function remember() { LX.store.set(KEY, { guess: St.guess }); }
     function lp(m, key) { return LX.solver.solve(m, { timeLimit: 5, key: "m8-" + key, label: "m8" }); }
-    // each job resolves to null (solved) or the failed result; results already solved are kept (W2 finding 1)
+    // each job resolves to null (solved) or the failed result; results already solved are kept
     function priced(S2, x) { return lp(build(D, S2, { fix: x }), "fix" + x).then(function (r) { var o = read(D, S2, r); return o ? { r: r, o: o } : { r: r }; }); }
     function jobWS() {
       return S.reduce(function (pr, s) {

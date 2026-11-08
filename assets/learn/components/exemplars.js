@@ -1,5 +1,5 @@
 /* exemplars.js — LX.Exemplars: a good and a weak answer to the same task, side by side, with tap-to-reveal notes that
-   say what makes the difference (research studios, curriculum v2 §11.1; W2).
+   say what makes the difference (the research studios).
    var ex = LX.Exemplars(host, {
      title: "Two answers to the same brief",     the card's heading (an h3 in .lx-x-head; optional)
      lede: "One sentence.",                       optional

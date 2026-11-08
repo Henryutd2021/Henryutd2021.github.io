@@ -1,5 +1,5 @@
 // a06-interconnection.js — Lesson A6, "Why does it take years to connect a power plant or a data center?" (step cards,
-// Analyst tier; wave W4, builder learn-w4-a, 2026-11-05). Data centers appear only as loads.
+// Analyst tier). Data centers appear only as loads.
 //
 // Data: assets/learn/data/a06-interconnection.json (the two paths through the queue, Prairie Town's cluster, the east
 // substation, ERCOT's large-load numbers, the ladder, the numbers to remember and the sources), cf7-cost-of-waiting.json

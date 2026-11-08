@@ -1,7 +1,6 @@
 /* weekstrip.css — LX.WeekStrip (weekstrip.js): 52 week cells in four rows of 13 behind a date column, extreme weeks
-   outlined, a red dot on short weeks, the key, and the text version's table. Moved from the style block M3 injected
-   (m3-strip, m3-grid, m3-cell, m3-keys, and the m3-tbl rules its table used) at the W2 integration, 2026-11-03; the
-   look is unchanged. Colours from --lx-* tokens only; cell colours come in as --c. */
+   outlined, a red dot on short weeks, the key, and the text version's table (M3's look: m3-strip, m3-grid, m3-cell,
+   m3-keys and the m3-tbl rules its table uses). Colours from --lx-* tokens only; cell colours come in as --c. */
 .lx-wks{display:grid;gap:6px;min-width:0}
 .lx-wks-grid{display:grid;grid-template-columns:4.6em repeat(13,minmax(0,1fr));gap:3px;align-items:center}
 .lx-wks-grid span.rl{font-size:12px;color:var(--lx-ink-3);font-family:var(--lx-f-mono)}

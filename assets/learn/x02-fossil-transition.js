@@ -1,5 +1,5 @@
 // x02-fossil-transition.js — Lesson X2, "What happens to gas, coal and oil systems in a transition, and can carbon be
-// removed?" (side-topic shelf, step cards, Analyst, D2, no model; wave W6, builder learn-w6-x, 2026-11-07).
+// removed?" (side-topic shelf, step cards, Analyst, D2, no model).
 //
 // Data: data/x02-fossil-transition.json (the map, every dated number with its source, the two teaching toys, IPCC's
 // removal methods, the Steelman card, the stop box, facts and sources), data/a13-fairness-jobs.json (Ridge County, read
@@ -17,7 +17,7 @@
 //                 building cost recovered evenly over an L-year book life (straight line), 0 ≤ r ≤ L
 //   removal       IPCC's table sorted three ways (storage time, readiness by the middle of its range, cost range's low
 //                 end); ties keep the table's order
-// Neutral (curriculum §4.4): roles and open questions, no forecasts, no verdicts.
+// Neutral: roles and open questions, no forecasts, no verdicts.
 // Every number on the page comes from the data files; _tests/learn/test_x02-fossil-transition.js checks them.
 //
 // Shared components: LX.StepCards, LX.ConceptMap, LX.Predict, LX.Slider, LX.CompareTable, LX.Steelman,

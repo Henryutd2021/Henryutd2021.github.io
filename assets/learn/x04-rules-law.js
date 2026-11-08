@@ -1,5 +1,5 @@
-// x04-rules-law.js — Side topic X4, "How are energy rules made?" (step cards, Analyst, side line, D1, no model; wave W7,
-// builder learn-w7-a, 2026-11-07). Neutral: the page describes who decides, in what order and when; it judges no rule.
+// x04-rules-law.js — Side topic X4, "How are energy rules made?" (step cards, Analyst, side line, D1, no model).
+// Neutral: the page describes who decides, in what order and when; it judges no rule.
 //
 // Data: data/x04-rules-law.json (a law and the three separate tracks that follow it; six selected milestones of one
 // finished federal rulemaking, FERC Order No. 2222, with dates and comment counts; the six stages of a Kansas rate case;
@@ -10,7 +10,7 @@
 // and a 240-day clock from a filing date.
 //
 // Shared components: LX.StepCards, LX.Predict, LX.CardSort, LX.Flowchart, LX.Timeline, LX.lessonRefHTML, LX.demo.
-// Lesson-local: the law-and-tracks figure (chainHTML; X4 review: the tracks are separate, not one sequence), the
+// Lesson-local: the law-and-tracks figure (chainHTML: the tracks are separate, not one sequence), the
 // milestone picker and the rate-case track.
 (function () {
   "use strict";
@@ -53,7 +53,7 @@
              c: "Yes: " + s.years + " years, " + s.months + " months and " + s.days + " days, from " + longDate(D.hook.start) + " to " + longDate(D.hook.end) + "." };
   }
   var CHAIN_SAW = "Three tracks, three kinds of decider: FERC for markets and tariffs, the state commission for retail rates, and a county, the state or a federal agency for permits.";
-  // a law, then three separate tracks (X4 review: permits do not follow tariffs in one compulsory sequence); icon(name)
+  // a law, then three separate tracks (permits do not follow tariffs in one compulsory sequence); icon(name)
   // draws an icon in the browser, none in Node
   function chainHTML(D, icon) {
     var C = D.chain, ic = function (n) { return icon ? "<span class=\"x4-ic\">" + icon(n) + "</span>" : ""; };
@@ -65,7 +65,7 @@
     var sc = orderScore(D, picks);
     return sc.right + " of " + sc.total + " milestones in their right place." + (sc.right < sc.total ? " The true order is shown below." : "");
   }
-  // X4 review: the six are a selection from the order's procedural history, not every round of comments
+  // the six are a selection from the order's procedural history, not every round of comments
   function orderSaw(D) {
     var n = byId(D.steps, "nopr"), f = byId(D.steps, "final"), s = span(n.date, f.date);
     return "From the proposed rule to the final rule: " + spanText(s) + (s.days ? " and " + s.days + " days" : "") + ". These are six selected milestones: FERC gathered information repeatedly before the rule, through panels, data requests, comments and a conference.";
@@ -116,7 +116,7 @@
       "<div class=\"lx-qq\" data-id=\"clock\" data-answer=\"b\"><p class=\"lx-qtext\">A Kansas utility files a rate case on " + longDate(D.quiz.filed) + ". In most cases, by when must the KCC decide?</p><ul class=\"lx-choices\"><li data-value=\"a\">" + longDate(addDays(D.quiz.filed, 60)) + "</li><li data-value=\"b\">" + longDate(due) + "</li><li data-value=\"c\">" + longDate(addDays(D.quiz.filed, 365)) + "</li></ul><details class=\"lx-answer\"><summary>Answer</summary><p>" + longDate(due) + ": " + D.quiz.days + " days after the filing date, the KCC's usual limit for its decision (it can be waived in certain circumstances); any rate change follows the order.</p></details></div>" +
       "</div>";
   }
-  // a source's label (the citation alone) and its full date line (X4 review: keep the access date in the facts table)
+  // a source's label (the citation alone) and its full date line (keep the access date in the facts table)
   function srcLabel(s) { return esc(s.cite); }
   function factsHTML(D) {
     return "<table class=\"lx-facts\"><thead><tr><th scope=\"col\">Number</th><th scope=\"col\">What it means</th><th scope=\"col\">Source</th></tr></thead><tbody>" +
@@ -125,7 +125,7 @@
         return "<tr><td class=\"n\">" + esc(f.n) + "</td><td>" + esc(f.what) + "</td><td class=\"s\">" + (s.url ? "<a href=\"" + esc(s.url) + "\">" + srcLabel(s) + "</a>" : srcLabel(s)) + (f.where ? ", " + esc(f.where) : "") + " · " + esc(cap(s.asOf)) + "</td></tr>";
       }).join("") + "</tbody></table>";
   }
-  // each source: the citation, its link and date, then the short claims it supports, one per line (X4 review)
+  // each source: the citation, its link and date, then the short claims it supports, one per line
   function sourcesHTML(D) {
     return "<ul>" + Object.keys(D.sources).map(function (k) { var s = D.sources[k]; return "<li>" + esc(s.cite) + (s.url ? ". <a href=\"" + esc(s.url) + "\">Link</a>" : "") + ". " + esc(cap(s.asOf)) + ".<ul class=\"x4-used\">" + s.used.map(function (u) { return "<li>" + esc(u) + "</li>"; }).join("") + "</ul></li>"; }).join("") + "</ul>";
   }
@@ -136,7 +136,7 @@
       return { date: x.date, label: x.label, kind: x.kind, key: !!x.key, text: x.text + " (" + x.where + ")", source: { label: "FERC, Order No. 2222", url: s.url, as_of: D.hook.end } };
     });
   }
-  // X4 review: what the revenue requirement covers (approved expenses incl. depreciation and taxes, and a financing
+  // what the revenue requirement covers (approved expenses incl. depreciation and taxes, and a financing
   // return on the rate base), and every term defined at first use
   function deeperHTML() {
     return "<ul><li><b>Step one: how much.</b> The commission sets a <span class=\"lx-term\" data-term=\"revenue-requirement\">revenue requirement</span>: the year's approved expenses, including depreciation (recovering past investment) and income taxes, plus an allowed return.</li>" +

@@ -1,5 +1,5 @@
 // a21-security-minerals.js — Lesson A21, "What makes a nation's energy secure? Imports, minerals, supply chains and
-// factories" (step cards, Analyst, D3; wave W6, 2026-11-07, builder learn-w6-b).
+// factories" (step cards, Analyst, D3).
 //
 // Data: assets/learn/data/prairieland.json (imports, stocks, minerals, the battery factory, the shocks, fuel prices, GDP,
 // primary energy and its conventions, the real-world numbers; read, never retyped), assets/learn/data/a21-security-minerals.json
@@ -392,7 +392,7 @@
         } },
       { text: "A single route matters too: all imported crude and a quarter of the LNG pass one strait. What share of all primary energy passes it?",
         build: function (act, api) {
-          // the inputs beside the question (W6 finding: the earlier cards are gone by now), then an optional hint
+          // the inputs beside the question (the earlier cards are gone by now), then an optional hint
           LX.Ledger(H("div", null, act), { caption: "What you need, 2025. " + LINE, columns: ["", "PJ a year", "Through the strait"],
             rows: straitInputs(PL).map(function (r) { return { head: r[0], cells: [r[1], r[2]] }; }), cls: "a21-led" });
           var ans = straitAnswer(PL), out;
@@ -502,7 +502,7 @@
     var cards = LX.StepCards(live, { id: "a21-steps", steps: steps });
 
     // ---------------------------------------------------------------- the explain layer
-    // drawn from the reader's levers (W6 finding: it showed 2025's settings as if they were the reader's); says which
+    // drawn from the reader's levers (never 2025's settings shown as if they were the reader's); says which
     function paintExplain() {
       var xhost = document.getElementById("a21-explain");
       if (!xhost) return;

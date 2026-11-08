@@ -1,6 +1,6 @@
 /* pricechart.js — LX.PriceChart and LX.HourPicker: hourly prices as step lines (one per bus, or one single price), an
-   earlier run dashed behind them, the selected hour shaded, and a picker for the hour. Promoted in the W1 integration
-   (2026-11-02) from M1 (m01-dispatch-to-lmp.js); the chart is drawn by LX.Plot (plot.js).
+   earlier run dashed behind them, the selected hour shaded, and a picker for the hour. First
+   used by M1 (m01-dispatch-to-lmp.js); the chart is drawn by LX.Plot (plot.js).
 
    var ch = LX.PriceChart(host, { label: "what the chart shows", ghostLabel: "With the ramp rule", onPick: function (t) {},
                                   unit: "$/MWh" });

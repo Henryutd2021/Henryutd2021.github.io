@@ -1,15 +1,14 @@
 /* whopays.js — LX.A13: the accounting layer of lesson A13 ("Who pays and who benefits?"), written as a small pure model
    (no DOM) so that sandbox SB3 (City Planner, engine E3) and capstone C3 (Prairie City 2040) can use it for their
-   household and jobs outputs. Written for A13 (wave W5, builder learn-w5-b, as assets/learn/a13-who-pays-and-benefits.js)
-   and promoted at the W5 integration (2026-11-06), its code unchanged; jobs() and taxBase() were extended at the A13
-   review fixes the same day (new inputs and outputs below; the outputs SB3, M12 and C3 read are unchanged).
+   household and jobs outputs. jobs() and taxBase() take the inputs and give the outputs listed below; the outputs SB3,
+   M12 and C3 read are the same as A13's.
    Browser: in the learn.js bundle; it sets window.LX.A13 (no page loads a separate file for it).
    Node:    const A13 = require("assets/learn/components/whopays.js").
 
    An energy model does not produce these outcomes by itself: it gives a cost, energy use and MW built; this layer turns
    them into who pays and who gains, with stated assumptions. Every output is a SCREENING ESTIMATE: coefficients are the
-   caller's inputs, not predictions (curriculum v2 §9.6: transfers against real costs, job-years against permanent jobs,
-   gross against net, and how households are grouped, each kept apart).
+   caller's inputs, not predictions (transfers against real costs, job-years against permanent jobs, gross against net,
+   and how households are grouped, each kept apart).
 
    Households (Prairie City's groups, from assets/learn/data/prairie-city.json; never retyped)
      rows = A13.groupsFrom(pc)            -> [{ key, label, households, income ($ a year), kWh (a year), spend ($ a year of
@@ -48,10 +47,9 @@
                        net (buildNet + newPerm - lostPerm) } (job-years over the horizon) }
        Assumptions (A13.ASSUME.jobs): lost jobs are counted in full (no re-employment assumed); the multiplier turns direct
        jobs into direct + supplier + spending jobs on both sides; displacement comes off every count marked net.
-       Changed at the A13 review fixes (2026-11-06): buildJobYearsNet, buildDisplacement, operatingYears and the horizon's
-       gross and net are new; horizon.newPerm counts operatingYears (was horizonYears) and horizon.net subtracts
-       displacement from building too (it used to add gross building job-years to net operating ones). Every other output
-       is unchanged.
+       buildJobYearsNet, buildDisplacement, operatingYears and the horizon's gross and net: horizon.newPerm counts
+       operatingYears (not horizonYears) and horizon.net subtracts displacement from building too (it never adds gross
+       building job-years to net operating ones).
    Tax base
      t = A13.taxBase({ plantValueM, rate (0-1), newCapexM, taxableShare (0-1), otherRevenueM, mineCoalTaxM })
        otherRevenueM is the county's revenue other than the plant's tax and includes the mines' coal taxes (mineCoalTaxM),

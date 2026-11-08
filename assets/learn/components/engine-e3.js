@@ -1,10 +1,10 @@
-/* engine-e3.js — LX.E3: engine E3 of Learn, Prairie City's energy hub (wave W5, 2026-11-06; curriculum v2 §16.4, §9.2,
-   §9.5, §9.6). Used by the City Planner (SB3, learn/sb3-city-planner.qmd), Modeler lesson M12 (learn/m12-city-model.qmd)
+/* engine-e3.js — LX.E3: engine E3 of Learn, Prairie City's energy hub (one of the course's sandbox engines). Used by
+   the City Planner (SB3, learn/sb3-city-planner.qmd), Modeler lesson M12 (learn/m12-city-model.qmd)
    and capstone C3 (learn/c3-prairie-city-2040.qmd): one model, three pages.
 
    Data: assets/learn/data/prairie-city.json (the city: districts, heat, loads, days, COP, prices, emission factors,
    household groups; shared, read only) and assets/learn/data/e3-city-hub.json (what the engine adds: costs, plant and
-   store settings, the tie rule, the ranges; from scripts/build_learn_e3_data.py; its `precomputed` block from the tests'
+   store settings, the tie rule, the ranges; written by its data build step; its `precomputed` block from the tests'
    --write). Prairie City is fictional; its numbers are illustrative. Every dollar is a 2025 dollar.
 
    The hub (a linear program, LP), over the eight representative days of 2025 (weights w_k, summing to 365), hour by hour:
@@ -32,24 +32,24 @@
      its own substation, fixed), a wind contract and a solar farm whose output is netted against the city's purchases
      hour by hour (farmUse <= output, farmUse <= the city's meter load; the rest spilled, no CO2 credit for it), valued
      at the reader's "avoided cost" per MWh. CO2 stays location-based: the contract MWh do not change the grid's
-     average rate, so they are never deducted (C3 review finding 1, GHG Protocol Scope 2 Guidance); what a
+     average rate, so they are never deducted (GHG Protocol Scope 2 Guidance); what a
      market-based report could claim for them is reported apart (acc.contract).
 
-   Prices and duals (§9.2): only from this LP, labelled "marginal values under stated assumptions": the substation duals
+   Prices and duals (from LPs only, never from MILPs): only from this LP, labelled "marginal values under stated assumptions": the substation duals
    (value of 1 MW more room, $ per MW per year), the balance duals ($/MWh in a district-hour), the CO2 cap's dual.
-   Screening household outputs (§9.6): bills and energy burden by household group come from an accounting layer after
+   Screening household outputs (kept apart from the model's costs): bills and energy burden by household group come from an accounting layer after
    the LP (E3.households), never from the LP: who adopts first (a stated rule), each adopting home's change (the
    district's average, scaled by the group's use index), shared costs (upgrades, batteries) on every kWh, district heat
    billed at its average cost. Equipment bought by adopting households is not in bills (LEAD's definition of burden).
    Car charging the plan adds is transport, counted with motor fuel, not home energy (LEAD's burden leaves transport
-   out; SB3 review finding 1); new EVs replace only gasoline a group has (a fitted district-by-group table; finding 2).
+   out); new EVs replace only gasoline a group has (a fitted district-by-group table).
 
-   Tie rule (W2 review finding 2): stated costs far below any real one (e3-city-hub.json `tie`): $20 a year per MW of each
+   Tie rule: stated costs far below any real one (e3-city-hub.json `tie`): $20 a year per MW of each
    district's busiest hour, $10 per MW of the three districts' busiest hour together, $1 per MWh out of a battery, $0.50
    per MWh out of the heat store, $0.10 x the hour's share of SPP's peak per MWh of managed charging. Left out of every
    reported cost. The LP minimises the economic cost plus these small costs, so on a few plans it spends a few dollars a
-   year more to keep a busiest hour that is under its limit lower (SB3 review finding 4): _tests/learn/test_e3-engine.js
-   finds the economic optimum (ties x0) for every preset and the review's plans and checks the gap is under $30 a year
+   year more to keep a busiest hour that is under its limit lower: _tests/learn/test_e3-engine.js
+   finds the economic optimum (ties x0) for every preset and the test's own plans and checks the gap is under $30 a year
    ($24.80 at most). It also re-solves with the tie costs x2 and x0.1 and checks every reported number on the optimal
    face (min and max of each over the plans within $1 of the best cost).
 
@@ -176,7 +176,7 @@
     { id: "electrify", label: "Electrify heat and cars", state: { hp: 80, ret: 0, dh: 0, dhp: 0, sto: 0, ev: 50, evm: "home", pv: 0, bat: 0, up: "yes" }, note: "80% of furnaces and resistance heat to heat pumps, half the cars electric, charging unmanaged" },
     { id: "flex", label: "Electrify with flexibility", state: { hp: 80, ret: 40, dh: 0, dhp: 0, sto: 0, ev: 50, evm: "managed", pv: 100, bat: 40, up: "yes" }, note: "The same, with retrofits, managed charging, rooftop solar and batteries" },
     { id: "network", label: "Heat network in the core", state: { hp: 80, ret: 40, dh: 40, dhp: 120, sto: 1200, ev: 50, evm: "managed", pv: 100, bat: 0, up: "yes" }, note: "Four in ten of the core's buildings on a network with a heat pump and a store" }];
-  // C3's "2025 as it is" resets every lever of the 2040 plan, the park's and the farms' too (C3 review finding 4)
+  // C3's "2025 as it is" resets every lever of the 2040 plan, the park's and the farms' too
   var c3presets = [
     { id: "today", label: "2025 as it is", state: { hp: 0, ret: 0, dh: 0, dhp: 0, sto: 0, ev: 1, evm: "home", pv: 0, bat: 0, up: "yes", ihp: 0, ely: 0, wind: 0, farm: 0 } },
     { id: "buildings", label: "Buildings first", state: { hp: 70, ret: 50, dh: 30, dhp: 100, sto: 800, ev: 40, evm: "managed", pv: 60, bat: 20, ihp: 50, ely: 0, wind: 100, farm: 50 } },
@@ -513,7 +513,7 @@
   }
 
   // ---------------------------------------------------------------- screening household outputs (an accounting layer)
-  // Screening household outputs (§9.6) in two parts, never from the LP. (1) E3 spreads each measure's change in the homes'
+  // Screening household outputs in two parts, never from the LP. (1) E3 spreads each measure's change in the homes'
   // energy over the five income groups, district by district: a group's potential for a measure is its eligible homes
   // times its use index (gas for heating measures, electricity for rooftop solar), filled by the plan's rule (even: every
   // group at the same rate; low or high: one group after another, lowest or highest income first), so each district's
@@ -656,7 +656,7 @@
     return moved;
   }
   // the household table's assumptions, one sentence each (beside the table, and in C3's note): the rule, what the
-  // households pay of the plan and how, what is left out, how cars count (M12 review finding 4, C3 finding 7)
+  // households pay of the plan and how, what is left out, how cars count
   var RULE_WORDS = { even: "every group alike", low: "lower incomes first", high: "higher incomes first" };
   var REC_WORDS = { kwh: "per kWh", fixed: "as the same fixed charge on every household", income: "in proportion to income" };
   function hhAssume(R) {
@@ -685,7 +685,7 @@
     R.dist = A.d.map(function (o, i) {
       // the busiest hour, its day, and the summed substation value (LP duals). Hours at the limit come from the slack
       // (the flow within 0.001 MW of the limit plus any upgrade), each representative hour counted for the days its day
-      // stands for: hours a year (SB3 review finding 3). bindSlots: representative hours whose dual is positive.
+      // stands for: hours a year. bindSlots: representative hours whose dual is positive.
       // need: the busiest hour of what the district asked of its substation (bought plus any load left unserved, which
       // only the full-year check allows); unservedHours: hours with more than 0.05 MW unserved (M3's threshold)
       var best = -1, at = null, val = 0, slots = 0, hrs = 0, top = o.limit + o.upg, need = -1, nat = null, uh = 0, um = 0;
@@ -1120,7 +1120,7 @@
     }), "e3-cost");
   }
   // the screening household table (accounting layer, not the LP) and its assumptions beside it (hhAssume); a plan the
-  // layer cannot spread (a group's use below zero) shows why instead of numbers (SB3 review finding 2)
+  // layer cannot spread (a group's use below zero) shows why instead of numbers
   function hhTable(host, R) {
     var h = R.hh;
     if (!h || h.clamped) { H("p", { class: "lx-hint e3-hh-off", role: "status", text: "No household table for this plan: " + (h ? CLAMPED : "lesson A13's accounting layer did not load") + "." }, host); return null; }

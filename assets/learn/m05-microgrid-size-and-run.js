@@ -1,5 +1,5 @@
-// m05-microgrid-size-and-run.js — M5, "Size and run a microgrid that survives an outage" (model lab, wave W3,
-// 2026-11-03), on engine E1 (assets/learn/components/engine-e1.js, LX.E1; data assets/learn/data/e1-prairie-campus.json).
+// m05-microgrid-size-and-run.js — M5, "Size and run a microgrid that survives an outage" (model lab), on
+// engine E1 (assets/learn/components/engine-e1.js, LX.E1; data assets/learn/data/e1-prairie-campus.json).
 //
 // Steps: (1) the campus islanded for the storm; (2) the model written down and counted; (3) the sizing MILP solved
 // (status, gap, no duals); (4) branch and bound on the whole generator sets (E1.bb; M2's rules; a node whose LP fails
@@ -8,9 +8,9 @@
 // plan checked hour by hour with whole sets and their 30% minimum, then on the ten seeded winter outages; (7) the storm
 // run with a rolling horizon on four forecasts (what forecast error costs). Every solving step runs through LX.BenchRun
 // (a message and "Try again" after a failure or a time limit; Next held while it runs).
-// Lab: learn/notebooks/m05-microgrid-size-and-run.ipynb (scripts/build_learn_m05_notebook.py). Every number the page
+// Lab: learn/notebooks/m05-microgrid-size-and-run.ipynb (written by its notebook build step). Every number the page
 // states is the engine's, checked by _tests/learn/test_m05-microgrid-size-and-run.js.
-// Lesson-local component (candidate to promote): TreeView, a small branch-and-bound tree drawn from E1.bb's nodes.
+// Lesson-local component (used by this page only): TreeView, a small branch-and-bound tree drawn from E1.bb's nodes.
 (function () {
   "use strict";
   // ---------------------------------------------------------------- pure (Node: the test reads these)
@@ -21,7 +21,7 @@
   function caseLabel(c) { return (c.exp >= 2000 ? "no export limit" : "exports up to " + kilo(c.exp) + " kW") + " · " + (c.tar === "tou" ? "time-of-use" : "flat tariff") + " · " + (c.storm ? "the storm" : "no outage"); }
   function planOf(c) { var p = JSON.parse(JSON.stringify(BASE)); p.exp = c.exp; p.tar = c.tar; p.out = c.storm ? ["jan3"] : []; return p; }
   // what step 5 says after a new case, against the cases solved before it (all: {key: {c, sized}}): the comparisons it
-  // supports, one short sentence each, shown as separate results (W3 review M5 9); an empty list when none applies
+  // supports, one short sentence each, shown as separate results; an empty list when none applies
   function caseWords(c, sz, all) {
     var z = sz.exact, out = [];
     var prev = function (k) { return all[k] ? all[k].sized : null; };
@@ -32,7 +32,7 @@
     return out;
   }
   function sizedWords(sz) { var z = sz.exact; return "Sized: " + kilo(z.pv) + " kW of solar, " + kilo(z.bat) + " kWh of battery, " + z.gen + " set" + (z.gen === 1 ? "" : "s") + ", " + money(sz.total) + " a year (2025 dollars, illustrative)."; }
-  // the plan a check or a forecast run belongs to (M5 review 2: results of different plans are never compared)
+  // the plan a check or a forecast run belongs to (results of different plans are never compared)
   function planKey(p) { return [p.pv, p.bat, p.gen, p.fuel, p.exp, p.imp, p.tar, p.own, p.ph, p.pw, p.pd, p.pl, (p.out || []).join("+")].join("|"); }
   // step 7: the forecasts compared (rows: [{key, label, totals}])
   function rollWords(rows) {
@@ -45,7 +45,7 @@
       ? "With this controller, forecast error costs this plan " + kilo(worst.totals.must - p.totals.must) + " kWh of must-stay-on load with “" + worst.label.toLowerCase() + "”: sized with perfect foresight, it has no margin."
       : "With this controller, these forecasts leave the must-stay-on loads as well served as the perfect one; the cost shows in the other loads.";
   }
-  // the controller's rule for each real hour (engine E1's realTime), as the page states it (M5 review 1)
+  // the controller's rule for each real hour (engine E1's realTime), as the page states it
   var CONTROLLER = ["All the sun goes in first, then the planned sets' output.",
     "Short: the battery, then the sets up to full, then loads are shed: shed-first loads first, must-stay-on loads last.",
     "Spare: shed must-stay-on loads come back first, then the sets go down to their minimum, the battery charges, the other loads come back, and only then is solar curtailed."];
@@ -90,7 +90,7 @@
       });
       pick(sel, true);
     }
-    // a pick redraws the tree (the selection ring); the reader's focus goes back to the node they picked (M5 review 12)
+    // a pick redraws the tree (the selection ring); the reader's focus goes back to the node they picked
     function pick(id, quiet) {
       sel = id; if (!T || !T.nodes[id]) return; panel.innerHTML = "<p>" + words(T.nodes[id]) + "</p>";
       if (quiet) return;
@@ -248,7 +248,7 @@
       { text: "The sizing left out the sets' 30% minimum. Check the last plan you sized for the storm, rounded up to the bench's steps (25 kW, 50 kWh), hour by hour, with whole sets that run at 30% or more.",
         build: function (act, api) {
           var plan = currentPlan, ex = exactOf();
-          // the rounding, said before the check (M5 review 4): the exact sizes, and the plan the check runs
+          // the rounding, said before the check: the exact sizes, and the plan the check runs
           H("p", { class: "m5-sub", text: "The check runs " + kilo(plan().pv) + " kW · " + kilo(plan().bat) + " kWh · " + plan().gen + " set" + (plan().gen === 1 ? "" : "s") + ", rounded up from the sizing's " + kilo(ex.pv) + " kW · " + kilo(ex.bat) + " kWh: more equipment, so a slightly higher annual cost." }, act);
           var res = H("div", null), kp = H("div", { class: "lx-readouts" });
           var run = LX.BenchRun(act, { label: "Run the storm hour by hour", busy: api.busy, results: [res, kp], partial: true, state: plan,
@@ -285,7 +285,7 @@
           var ctl = H("ol", { class: "m5-ctl" }, act); CONTROLLER.forEach(function (t) { H("li", { text: t }, ctl); });
           var tb = H("div", { class: "lx-scroll-x" }), prog = H("p", { class: "m5-prog", "aria-live": "polite" });
           // the plan steps 6 and 7 share: the last one sized for the storm (rounded), or the stored one; results of an
-          // earlier plan are dropped, never compared with this one's (M5 review 2)
+          // earlier plan are dropped, never compared with this one's
           var plan = function () { var c = currentPlan(); c.fc = key; return c; };
           LX.BenchRun(act, { label: "Run the storm on this forecast", busy: api.busy, results: [tb], state: plan,
             solve: function (st, ctx) {

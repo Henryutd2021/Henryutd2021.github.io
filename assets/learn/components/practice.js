@@ -1,5 +1,5 @@
-/* practice.js — LX.Practice: faded practice sets with staged hints and an automatic check (promoted from bridges B1 and B3
-   at the W1 merge, 2026-11-02; styles and the small exercise pieces in practice.css).
+/* practice.js — LX.Practice: faded practice sets with staged hints and an automatic check (bridges B1 and B3; styles and
+   the small exercise pieces in practice.css).
    LX.Practice(host, { id, title, lede, foot, blank, tracks: [{ label, intro, items: [{ key, kind, minutes, title, build }] }] })
      id      LX.store key: which exercises are done, in this browser only
      blank   the reason shown when Check is pressed with an empty answer

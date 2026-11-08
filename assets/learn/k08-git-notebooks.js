@@ -1,4 +1,4 @@
-// k08-git-notebooks.js — Toolbox K8, "Git and reproducible notebooks" (step cards, Learn W2, 2026-11-03).
+// k08-git-notebooks.js — Toolbox K8, "Git and reproducible notebooks" (step cards).
 //
 // Just-in-time skills for B2 (the first notebook), M1 (a notebook that asserts the browser's prices) and R5 (verification).
 // Everything is simulated in the browser: no repository is created and nothing is fetched. Commands are shown

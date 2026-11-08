@@ -39,9 +39,8 @@
 .lx-cgroups i { width: 10px; height: 4px; border-radius: 2px; background: var(--c); }
 @media (max-width: 860px) { .lx-cmap { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 560px) { .lx-xcard { padding: 14px; } }
-/* the side-topic shelf's "where we stop" box (curriculum v2 §16.2 e-stop; X1 to X6; promoted at the W6 integration,
-   2026-11-07): a card with what the topic covers and leaves to specialists, side by side, then a three-rung reading ladder
-   with dated sources. Static HTML written by _tests/learn/shelf_stop.js (stopHTML) from each page's data; same with and
+/* the side-topic shelf's "where we stop" box (e-stop; X1 to X6): a card with what the topic covers and leaves to
+   specialists, side by side, then a three-rung reading ladder with dated sources. Static HTML written by _tests/learn/shelf_stop.js (stopHTML) from each page's data; same with and
    without JavaScript. */
 .xs-stop { display: grid; gap: 8px; margin-top: 16px; border-left: 4px solid var(--lx-accent); }
 .page-learn .xs-stop h3 { margin: 0; }

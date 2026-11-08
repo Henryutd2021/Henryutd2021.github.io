@@ -1,7 +1,7 @@
 /* plot.css — LX.Plot and LX.PlotCard (plot.js): the XY chart's text and focus ring, the caption, and the chart card with
    value chips (readouts) above the chart; also the model-lab stage (.lx-stage: a card with a head, readouts, sliders,
    a status line and goals; markup only, used by lessons 10 and 11). The readout tooltip (.lx-chart-tip), the legend (.lx-legend) and the text-version
-   table (.lx-mini-table) are shared with daychart.css. Promoted from lessons 2, 3 and 4 and B2 (W1 integration). */
+   table (.lx-mini-table) are shared with daychart.css. Used by lessons 2, 3 and 4, B2 and later pages. */
 .lx-plotbox { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; min-width: 0; }   /* the column never grows past the box: a wide text-version table scrolls in its own box (SB1, C1 at 375 px) */
 .lx-plot-cap { font-family: var(--lx-f-display); font-weight: 500; font-size: 14.5px; color: var(--lx-ink-2); margin: 0; }
 .lx-plot-cap:empty { display: none; }

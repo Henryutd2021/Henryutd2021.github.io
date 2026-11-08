@@ -1,4 +1,4 @@
-/* glossary.js — tap-to-define terms from learn/glossary.yml (built into assets/learn/data/glossary.json by build_learn.py).
+/* glossary.js — tap-to-define terms from learn/glossary.yml (built into assets/learn/data/glossary.json by the course build step).
    Markdown:  [frequency]{.lx-term term="frequency"}            (Pandoc writes data-term="frequency")
    HTML:      <span class="lx-term" data-term="frequency">frequency</span>
    JS text:   LX.rich("Keep the [[frequency|frequency]] at 60 Hz")   (any component that takes text accepts these marks)

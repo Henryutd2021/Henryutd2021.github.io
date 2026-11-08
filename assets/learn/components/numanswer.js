@@ -1,6 +1,6 @@
 /* numanswer.js — LX.NumAnswer: a number box with its label, its unit and a Check button, plus the lenient number parser and
-   the tolerance check behind it (promoted from the toolbox, K1 to K4, at the W2 merge, 2026-11-03; K5 and K8 use it too,
-   and LX.Drill builds its numeric items with it). Styles in numanswer.css.
+   the tolerance check behind it (used by the toolbox lessons K1 to K5 and K8, and LX.Drill builds its numeric items
+   with it). Styles in numanswer.css.
    LX.NumAnswer(host, { label, unit, accept, button, width, widthPhone, onCheck })
      label       the visible label, tied to the box (for/id)
      unit        a short unit after the box ("MW", "dollars", "% of hours"); none when empty. The box's description

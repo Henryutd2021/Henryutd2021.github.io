@@ -1,4 +1,4 @@
-/* engine-e0.js — LX.E0: engine E0 of the course (curriculum v2 §16.4): one site behind one meter, sized and run hour by
+/* engine-e0.js — LX.E0: engine E0 of the course (one of its sandbox engines): one site behind one meter, sized and run hour by
    hour as a linear program. Written for the Site Bench (SB0) and its capstone (C0). Lesson A8 keeps its own week LP (least unserved
    energy on a regional grid, stores with their own losses that start full), which this engine does not model.
    Data a page passes in: assets/learn/data/e0.json (the two sites, every cost with its source and dollar year, the price

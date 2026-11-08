@@ -1,5 +1,5 @@
 // f07-microgrids.js — Lesson F7, "What is a microgrid? From a hospital that keeps its lights on to a village with no grid"
-// (Foundations, step cards, wave W3, 2026-11-03).
+// (Foundations, step cards).
 //
 // Data: assets/learn/data/f07-microgrids.json (Prairie Campus and the village, both fictional and illustrative; real 2025
 // solar shapes from SPP, scaled per kW of panels as the data file's "about" says) and data/path.json (lesson links).

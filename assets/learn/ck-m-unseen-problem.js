@@ -1,4 +1,4 @@
-// ck-m-unseen-problem.js — CK-M, the Modeler checkpoint (curriculum v2 §3.3; wave W2, 2026-11-03).
+// ck-m-unseen-problem.js — CK-M, the Modeler checkpoint (the Modeler tier's end-of-tier task).
 //
 // About 240 minutes, in three parts, on problems the course has not shown:
 //   A  formulate and implement an unseen problem from a one-paragraph brief (model variant: a water utility's pumping
@@ -11,10 +11,10 @@
 // checkpoint runner (LX.Checkpoint, components/checkpoint.js): one task at a time, first-try recording, the visibility-
 // aware clock, a results view and a plain-text summary. This file holds CK-M's configuration: the two variants' task
 // lists, CK-M's level rule, its results sentence and summary, and the supplied model run in the browser. The runner's
-// options do the rest (W2 integration): its numeric check takes any unit (answer.value), `describe` writes the results
+// options do the rest: its numeric check takes any unit (answer.value), `describe` writes the results
 // sentence, `gateAll` opens the worked solutions once all eleven tasks are answered, in any order (or on purpose, which is
-// recorded; W5 final integration: `submitTask` opened them when task 11 alone was submitted, and the other answers could
-// be copied from them), `late: "practice"` is the shared late-answer rule, and `destroy()` swaps the runner when the
+// recorded; `submitTask` alone must not open them when task 11 is submitted first, or the other answers could be copied
+// from them), `late: "practice"` is the shared late-answer rule, and `destroy()` swaps the runner when the
 // reader changes variant.
 //
 // Pure part (exported for _tests/learn/test_ck-m-unseen-problem.js, which solves every model with the vendored HiGHS):
@@ -141,8 +141,8 @@
       rescale: k, ratioTopNSame: mean(w2, tN) / mean(w2), ratioTopNPicked: mean(w2, tN2) / mean(w2), keptTopN: tN2.filter(function (i) { return inN[i]; }).length, topN2: tN2 };
   }
 
-  // a number with any unit: the shared runner's check (components/checkpoint.js, promoted from this file at the W2
-  // integration): units [[name, factor to the answer's unit]] (null: the wrong kind, unitNote[name] says why); answer
+  // a number with any unit: the shared runner's check (components/checkpoint.js, shared by the
+  // checkpoints): units [[name, factor to the answer's unit]] (null: the wrong kind, unitNote[name] says why); answer
   // {value, tol (relative), show}
   var CPK = (typeof window !== "undefined" && window.LX && window.LX.Checkpoint) || require("./components/checkpoint.js");
   var checkNumeric = CPK.checkNumeric;
@@ -321,7 +321,7 @@
     return h.join("\n");
   }
   function pct(v) { return n1(v) + "%"; }
-  // the like-for-like benchmark (W4 carry-over): SPP's 2025 wind output (EIA-930) over its wind capacity as EIA counts it
+  // the like-for-like benchmark: SPP's 2025 wind output (EIA-930) over its wind capacity as EIA counts it
   // (EIA-860M, time-adjusted net summer MW), from E.sppWind; the rest of the gap is the dataset's definition
   function likeForLike(E, S) {
     var W = E.sppWind, cf = W.capacityFactor * 100;
@@ -462,7 +462,7 @@
       if (state === "mid") { choose("model"); cp.show(1); return { view: "task 2" }; }
       if (state === "empirical") { choose("empirical"); cp.show(1); return { view: "empirical task 2" }; }
       if (state === "done") { choose(cur || "model"); cp.results(); return { view: "results" }; }
-      // the solution state opens them as the lock's button does, recorded (practice), never silently (as CK-A, review #1)
+      // the solution state opens them as the lock's button does, recorded (practice), never silently (as CK-A)
       if (state === "solution") { if (!cp) choose(cur || "model"); cp.solutionNow(); var s = document.getElementById("solution"); if (s) s.scrollIntoView(); return { view: "solution" }; }
       return null;
     });

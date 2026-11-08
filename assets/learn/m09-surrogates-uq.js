@@ -1,8 +1,8 @@
 // m09-surrogates-uq.js — Modeler lesson M9, "Learning from few runs: surrogates, Gaussian processes and multi-fidelity
-// data" (model-lab in the step-card form, statistical mode, no solver; Learn W4, 2026-11-05).
+// data" (model-lab in the step-card form, statistical mode, no solver).
 //
 // The model is the shared Gaussian-process component, LX.M9 (assets/learn/components/gp.js, in the learn.js bundle;
-// promoted from this file at the W4 integration, unchanged): the toy turbine and its records, the GP fits (one and
+// CF8 uses it too): the toy turbine and its records, the GP fits (one and
 // two sources), maximum likelihood, the normal distribution and the held-out scores. This file keeps the page's own
 // pure parts (facts, the reference block, the no-JS fallback) and the page; in Node it exports the component's
 // functions with them, as before. Every number the page states comes from these functions;

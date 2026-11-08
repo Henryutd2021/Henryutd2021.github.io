@@ -1,6 +1,6 @@
 /* planengine.js — LX.townPlan: the planning engine of lessons 12 and 13, Prairie Town's capacity plan as a linear program
-   (promoted from assets/learn/13-capstone.js by the W2 infra branch, 2026-11-03; the code is unchanged). It is the
-   one-region capacity-expansion LP that M3 and A22 can build on (curriculum v2 §16.4 lists the scale engines).
+   (first written for lesson 13, assets/learn/13-capstone.js). It is the one-region capacity-expansion LP that M3 and
+   A22 can build on (one of the course's scale engines).
    Data a lesson passes in: assets/learn/data/13-capstone.json (technology costs with primary sources and dates, the
    default scenario, the representative-week rule), town_year.json (every hour of 2025 on the Southwest Power Pool grid,
    EIA-930, as shapes) and cf_targets.json (EIA 2025 capacity factors, used by LX.townProfile to size wind and solar).
@@ -31,7 +31,7 @@
      summarize(C, periods, result, opts) -> {cost, co2, plan, unserved, spilledShare, capDual, ...};  periodsOf(RW);
      encodePlan and decodePlan (#plan-... links), weekSeries, frontierAt, ceilPlan, stars, capReading, fullVerdict, crf,
      fixedCost, build, KEYS, HPW, WEEKS, HOURS, weekMonth, weekStart;
-     from lesson M3 (W2 integration): link(model, RW, mode) (the battery between representative weeks: "linked",
+     from lesson M3: link(model, RW, mode) (the battery between representative weeks: "linked",
      "cyclic" or "free"), yearPeriods(Y), readCheck(C, Y, result, plan) (a fixed plan's full-year run: totals and MWh
      unserved in each calendar week) and errors(est, full, cap, ref) (cost gap, CO2 over the cap, estimate error).
      LX.WeekStrip (components/weekstrip.js) draws a set of weeks and readCheck's byWeek as a 52-week calendar.
@@ -47,7 +47,7 @@
   // ---------------------------------------------------------------- inputs: the town's year
   // Y = { demand[8760] MW, wind[8760], solar[8760] (MW per MW built), nucAvail, peak, energy }
   // Index i of town_year.json is the hour that starts i hours after 00:00 on 1 January, Central standard time (UTC-6).
-  // Night-time solar telemetry errors are set to zero by the data build (scripts/build_learn_town_data.py), so the shapes
+  // Night-time solar telemetry errors are set to zero by the town data build step, so the shapes
   // are used as they are.
   function prepareYear(year, targets, cfg, profile) {
     var tp = profile || (typeof window !== "undefined" && window.LX && window.LX.townProfile);
@@ -398,7 +398,7 @@
   }
 
   // ---------------------------------------------------------------- representative periods: the battery between them,
-  // the full-year check and its error measures (promoted from lesson M3 at the W2 integration, 2026-11-03; unchanged)
+  // the full-year check and its error measures (first written for lesson M3)
   // link(m, RW, mode): a model from weekModel() (the linked chain) with another rule for the battery between weeks:
   //   "linked" (or none)  the model as it is: one calendar chain of 52 start levels (Kotzur et al. 2018)
   //   "cyclic"            each representative week ends where it starts (s<p>_167 = 0), so no energy moves between weeks

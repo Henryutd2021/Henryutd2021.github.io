@@ -1,5 +1,5 @@
 // a07-flexible-demand.js — Lesson A7, "Can demand and small resources act like a power plant? Demand response, EV
-// charging, virtual power plants and local trading" (step cards, Analyst tier; wave W3, 2026-11-03).
+// charging, virtual power plants and local trading" (step cards, Analyst tier).
 //
 // Data: assets/learn/data/a07-flexible-demand.json (the shift, the devices, Feeder 7, the trade, the numbers to remember),
 // a04-retail-tariffs.json (A4's customers and tariff rules, for the neighbours' trade), town.json (Prairie Town's fleet;

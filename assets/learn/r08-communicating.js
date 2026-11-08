@@ -1,5 +1,4 @@
-/* r08-communicating.js — research studio R8, "How do you show results so people understand their limits?" (curriculum v2
-   §11; W4, 2026-11-05).
+/* r08-communicating.js — research studio R8, "How do you show results so people understand their limits?".
    Data: assets/learn/data/r08-communicating.json (nine findings to sort, three charts with their diagnoses and fixes, the
    findings, briefing and public-paragraph steps, exemplars, the comparison table, the boundary box, the rubric line, the
    checklist, and fromR6: the numbers of R6's fictional study, which the test recomputes with R6's model), cf_targets.json

@@ -1,4 +1,4 @@
-// c3-prairie-city-2040.js — C3, "Prairie City 2040: write the city's energy plan" (capstone, wave W5, 2026-11-06), on
+// c3-prairie-city-2040.js — C3, "Prairie City 2040: write the city's energy plan" (capstone), on
 // the City Planner's engine E3 (assets/learn/components/engine-e3.js, LX.E3; data prairie-city.json and e3-city-hub.json).
 //
 // The page: the brief (static), the plan (E3's C3 schema: buildings, district heat, cars, the industrial park, local
@@ -10,13 +10,13 @@
 // LX.Rubric) and the sources. Every number comes from E3 and is checked by _tests/learn/test_c3-prairie-city-2040.js.
 //
 // Two pieces come from parallel lessons; each sits behind a clearly marked hook (search "HOOK"):
-//   HOOK(A19)  wired (learn-w5-e merged, 2026-11-06): the siting step runs A19's map model (assets/learn/components/siting.js,
-//              LX.A19 and LX.SiteMap, in the bundle since the W5 integration; data a19-gis-siting.json, read through A19.withCity with prairie-city.json): the five best
+//   HOOK(A19)  wired: the siting step runs A19's map model (assets/learn/components/siting.js,
+//              LX.A19 and LX.SiteMap, in the bundle; data a19-gis-siting.json, read through A19.withCity with prairie-city.json): the five best
 //              solar blocks by A19's default weights, each with a least-cost line to a transmission substation (S1 to S4,
 //              not the districts' substations), its access road, its land and its capacity factor, in 2025 dollars. The
 //              chosen site enters the plan as state.siteInfo = { connectUSD, cfK } (siteInfo below); a farm is at most
-//              A19's 150 MW block. G-GIS: the only siting here is a solar farm.
-//   HOOK(A13)  wired (learn-w5-b merged, 2026-11-06): the household table's money and burden come from lesson A13's
+//              A19's 150 MW block. Siting scope: the only siting here is a solar farm.
+//   HOOK(A13)  wired: the household table's money and burden come from lesson A13's
 //              accounting layer (LX.A13.allocate, through E3.households) and the jobs from LX.A13.jobs with A13's
 //              coefficients (data/a13-fairness-jobs.json); both are screening estimates and say so.
 // Prairie City is fictional; its numbers are illustrative.
@@ -77,15 +77,14 @@
     return { id: id, connectUSD: co.connect + co.road + co.land * f, cfK: co.cf / M.cft.solar, cf: co.cf, line: co.connect, road: co.road, land: co.land * f,
       acres: co.acres * f, km: co.route ? co.route.km : null, sub: co.sub, where: M.A19.place(M.R, t.i, t.j, t.k), score: t.score };
   }
-  // HOOK(A13), wired (learn-w5-b merged, 2026-11-06): jobs by lesson A13's model (LX.A13.jobs) with A13's coefficients
+  // HOOK(A13), wired: jobs by lesson A13's model (LX.A13.jobs) with A13's coefficients
   // (data/a13-fairness-jobs.json, `jobs`: the reader can change them on A13's page; here at their defaults). Building:
   // gross job-years from all the plan's up-front spending, the share spent locally times A13's job-years per $M, times
   // the multiplier, over the 15 years 2026 to 2040; net: less A13's displacement share (building work that would have
-  // happened anyway), passed as buildDisplacement as A13 does (A13's options from its review fixes: buildJobYearsNet).
+  // happened anyway), passed as buildDisplacement as A13 does (A13's option buildJobYearsNet).
   // Ongoing: the wind and solar farms' upkeep jobs per 100 MW, direct; gross supported (times the multiplier: supplier
   // and spending jobs, not all at the farms); and net of the same displacement. Other equipment's upkeep jobs are not
-  // counted. Nothing retires in this plan (no jobs lost). (C3 review finding 12; net building job-years at the W5 final
-  // integration.)
+  // counted. Nothing retires in this plan (no jobs lost).
   function jobs(R, A13, Jd) {
     if (!A13 || !Jd || !R) return null;
     var c = { staff: 0, mineJobs: 0, multiplier: Jd.multiplier.start, localShare: Jd.localShare, jobYearsPerM: Jd.jobYearsPerM.start,
@@ -102,7 +101,7 @@
       screening: A13.SCREENING, assume: A13.ASSUME.jobs };
   }
   // the sensitivity: the plan held fixed, one input at a time (re-solved where the LP depends on it), then every input at
-  // the end that lowers this plan's cost and at the end that raises it, together (a joint test; C3 review finding 6). Each
+  // the end that lowers this plan's cost and at the end that raises it, together (a joint test). Each
   // input is classed: set for teaching, or from public data. The park's gas price is no plan field: its runs read a copy
   // of P with that price (gasP), and the 2025 baseline is re-costed at it, so the change against 2025 stays like for like.
   // Which end raises the cost is read from the one-at-a-time runs (a plan that burns less gas than 2025 gains from a
@@ -166,7 +165,7 @@
       .concat([{ label: "Sensitivity: all inputs at their lower-, then higher-cost ends", value: mil(sens.joint.cheap) + " to " + mil(sens.joint.dear) }]);
   }
   // the reference plan of the exemplars (within the budget) and the two notes on it, written from a precomputed run.
-  // Site A: the screen's best block and the cheapest of the five to connect (C3 review finding 3)
+  // Site A: the screen's best block and the cheapest of the five to connect
   var REF_PLAN = { hp: 70, ret: 10, dh: 0, dhp: 0, sto: 0, ev: 40, evm: "managed", pv: 0, bat: 30, ihp: 100, ely: 0, wind: 200, farm: 100, site: "A" };
   // one answer per stakeholder who objects, from the run's own numbers (x: below); true of the run by construction
   var ANSWER = {
@@ -214,7 +213,7 @@
       { title: "Local supply and storage", fields: ["pv", "bat", "wind", "farm"], color: "var(--lx-solar)", hint: "A wind contract and a solar farm count against what the city buys, hour by hour; output the city cannot use earns nothing. They do not lower the [[location-based|location-based]] CO₂." },
       { title: "The grid", fields: ["up", "upc"], color: "var(--lx-bad)", hint: "Each district's [[substation|substation]] carries at most its limit each hour, unless the plan buys an upgrade." },
       { title: "Assumptions you can change", fields: ["av", "save", "rc", "dhc", "rule", "rec"], color: "var(--lx-ink-2)", hint: "Set for teaching. \"Who adopts first\" and how shared costs are recovered move only the household table ([[lesson:a13-fairness-jobs|A13]])." }],
-    // C3's own words for the levels the page's workflow supports (C3 review finding 6): the test gives one-at-a-time and
+    // C3's own words for the levels the page's workflow supports: the test gives one-at-a-time and
     // joint cases with each input classed; the summary has a sources field and one answer per stakeholder
     RUBRIC: [{ id: "accounting", look: "Cost and CO₂ on one boundary (the whole city, a year, 2025 dollars, location-based); who pays named by household group, as a screening estimate; jobs as construction job-years and ongoing jobs, gross and net." },
       { id: "uncertainty", look: "The sensitivity table: each input one at a time and all together at their cheaper and dearer ends, each input classed as public data or set for teaching.",

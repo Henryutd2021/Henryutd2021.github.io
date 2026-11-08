@@ -19,5 +19,5 @@ details.lx-deeper .k { font-size: 11.5px; letter-spacing: .07em; text-transform:
 .lx-deeper-body .math.display { display: block; overflow-x: auto; overflow-y: hidden; max-width: 100%; }
 .lx-deeper-body pre, .lx-deeper-body div.sourceCode { overflow-x: auto; max-width: 100%; }
 .lx-deeper-body table { display: block; overflow-x: auto; max-width: 100%; }
-/* a long inline command breaks on a phone instead of widening the page (K8's nbconvert line; W2 integration) */
+/* a long inline command breaks on a phone instead of widening the page (K8's nbconvert line) */
 .lx-deeper-body :not(pre) > code { white-space: normal; overflow-wrap: anywhere; }

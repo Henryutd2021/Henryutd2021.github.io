@@ -1,10 +1,9 @@
 /* engine-e1.js — LX.E1: engine E1 of Learn, a campus microgrid sized and run through outage scenarios with a small
-   mixed-integer program (MILP), with the host feeder's import and export limits and three owners (wave W3, 2026-11-03;
-   curriculum v2 §16.4). Used by the Microgrid Workbench (SB1, learn/sb1-microgrid-workbench.qmd), capstone C1
+   mixed-integer program (MILP), with the host feeder's import and export limits and three owners. Used by the Microgrid Workbench (SB1, learn/sb1-microgrid-workbench.qmd), capstone C1
    (learn/c1-keep-the-campus-running.qmd) and Modeler lesson M5 (learn/m05-microgrid-size-and-run.qmd). No prices: a MILP
-   gives none (§9.2), so nothing here reads a dual; any "value" is the difference between two solved plans, said so.
+   gives none (prices come from LPs, never from MILPs), so nothing here reads a dual; any "value" is the difference between two solved plans, said so.
 
-   Data: assets/learn/data/e1-prairie-campus.json (scripts/build_learn_e1_data.mjs): lesson F7's Prairie Campus (fictional;
+   Data: assets/learn/data/e1-prairie-campus.json (written by its data build step): lesson F7's Prairie Campus (fictional;
    flat loads: hospital 300 kW, water and heating plant 100 kW, dorms 250 kW, labs 550 kW), illustrative costs in 2025
    dollars, a teaching solar profile per kW of panels (SPP's observed 2025 hourly shape scaled to EIA's monthly capacity
    factors; not measured campus output), EIA's tariff level, diesel price and CO2 factors, the outage scenarios (the grid
@@ -22,7 +21,7 @@
       carries nothing from one day to the next), import i <= imp, export e <= exp, s + d + i + x = 1,200 + c + e;
       cost = sum of weight x (tariff_h x i - credit x e), plus $10 per kWh x left unserved (the year may fall short only
       when the import limit is below 1,200 kW and the plan cannot make up the rest; the page then says so, shows the
-      kWh and does not compare the cost with the grid-only bill: W3 review SB1 1, C1 3). The generator runs only in
+      kWh and does not compare the cost with the grid-only bill). The generator runs only in
       outages (illustrative rule). The 12 average days smooth the weather: the test checks four plans against a
       chronological 8,760-hour year (F7's campus: the same bill; larger solar-and-battery plans: a bill 4% to 7% higher).
       Then one MILP per outage scenario (islanded; the battery and the tank start full): s + d + g - c = loads served;
@@ -34,12 +33,12 @@
       must-stay-on load served in every hour of every chosen outage. To keep it small it leaves out the 30% minimum
       (g <= 200 x gen only); the check above then runs the plan with it. The chosen sizes are rounded up to the bench's
       steps (25 kW, 50 kWh) and checked: a safe candidate (more equipment never makes the check worse), not proven the
-      cheapest plan on the steps (W3 review SB1 6: a nearby plan on the steps can cost a few dollars less).
+      cheapest plan on the steps (a nearby plan on the steps can cost a few dollars less).
    Annual cost (summarize, note): equipment paid over its life plus upkeep and the tank, plus the normal-year grid bill.
    It leaves out the diesel burned in an outage and refilling the tank: each outage reports its gallons and their cost
-   at EIA's diesel price on its own, with no outage frequency assumed (W3 review SB1 8, C1 6, M5 5).
+   at EIA's diesel price on its own, with no outage frequency assumed.
 
-   Tie rule (W2 review finding 2; weights restated, W3 review SB1 7): the check's objective is weighted, not a strict
+   Tie rule: the check's objective is weighted, not a strict
    order. Unserved kWh of must stay on weigh 1,000, keep if possible 10, shed first 1; within a priority each step up the
    list (hospital, water and heat, dorms, labs) adds 0.5% and each hour earlier in the outage up to 2% in all, so an
    earlier hour can outweigh the list order; then 0.01 per gallon of fuel and 0.0001 per kWh through the battery. The
@@ -49,7 +48,7 @@
    other tie weights and checks that the totals stay the same.
    Every MILP here stops only within 0.0001% of its best bound (mip_rel_gap 1e-6, not HiGHS's default 0.01%), so the
    reported totals are the optimum's, not a near-optimum's.
-   No false certificates (finding 3): "optimal" only when every solve of a run is optimal; a time limit returns the best
+   No false certificates: "optimal" only when every solve of a run is optimal; a time limit returns the best
    plan found with status "time-limit" and its gap, never "optimal" or "best".
 
    API (the sandbox contract, learn/_template-sandbox.qmd):
@@ -68,8 +67,8 @@
    Node: module.exports = E1 (no DOM). In a page: LX.E1, with the shared view pieces LX.E1.Line (the one-line diagram),
    LX.E1.Bench (the controls, presets, run box with a Stop button and plan link), LX.E1.Results (readouts, tables,
    charts), LX.E1.ui.stopper() (a Stop button for any LX.BenchRun: { busy, attach(run) }; shown while it runs, cancels it).
-   Changes after the W3 reviews (2026-11-03; assets/learn/README.md lists them): normal-year unserved load reported and
-   the saving withheld when service differs; outage diesel shown with its cost and kept out of the annual cost; the
+   Review changes (assets/learn/README.md lists them): normal-year unserved load reported and the saving withheld when
+   service differs; outage diesel shown with its cost and kept out of the annual cost; the
    sizing's plan adopted from the plan it was given (a change while it runs stops it) and the other results told; a
    Stop button; the tie weights stated; end-of-hour labels in the battery table; realTime brings must-stay-on loads
    back before it charges the battery. */
@@ -121,7 +120,7 @@
     return d.getUTCDate() + " " + MON[d.getUTCMonth()] + " " + hh(h % 24);
   }
   function hh(h) { return (h < 10 ? "0" : "") + h + ":00"; }
-  // the end of hour t (the battery's charge and the diesel left are states at the end of the hour: W3 review SB1 13, M5 11)
+  // the end of hour t (the battery's charge and the diesel left are states at the end of the hour)
   function hourEnd(sc, t) { return when(sc, t + 1); }
 
   // ---------------------------------------------------------------- the plan
@@ -493,8 +492,8 @@
   // one real hour, following the plan: the planned sets stay on (or off) and the plan's loads are the targets. The real
   // sun all goes in first, then the plan's generator output. Short: the battery, then the sets up to full, then loads
   // shed in reverse priority (shed first, keep if possible, must stay on; the list's last load first). Spare: first the
-  // must-stay-on loads the plan shed come back (the forecast was gloomier than the sun; W3 review M5 1: before, the
-  // battery charged first and left them short), then the sets go down to their minimum, then the battery charges, then
+  // must-stay-on loads the plan shed come back (the forecast was gloomier than the sun; the battery never charges first
+  // and leaves them short), then the sets go down to their minimum, then the battery charges, then
   // the other shed loads come back in priority order, then the panels are curtailed. Returns the hour and the new
   // state { soc, fuel }.
   function realTime(state, P, h, st) {
@@ -707,7 +706,7 @@
     if (hint) H("p", { class: "lx-hint e1-ghint", html: LX.rich(hint).replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>") }, f);
     return f;
   }
-  // a Stop button for an LX.BenchRun (W3 review SB1 9): pass s.busy as the run box's busy callback, then s.attach(run).
+  // a Stop button for an LX.BenchRun: pass s.busy as the run box's busy callback, then s.attach(run).
   // It sits after Run, shows only while a run is on, and cancels it (run.cancel()); focus then goes to Run, since Stop
   // hides itself (a keyboard reader would otherwise lose their place)
   function stopper() {
@@ -734,7 +733,7 @@
     H("span", { class: "e1-wire", "aria-hidden": "true" }, top);
     var sw = H("div", { class: "e1-node e1-switch" }, top);
     sw.innerHTML = '<span class="e1-sym" aria-hidden="true"><i></i></span><span class="e1-nt"><b>Switch to the grid</b><small class="e1-ss"></small></span>';
-    // the bus, named and defined (W3 review C1 8); on phones the label keeps only its name, which fits on one line (the
+    // the bus, named and defined; on phones the label keeps only its name, which fits on one line (the
     // text version below says what it is)
     H("div", { class: "e1-bus", "aria-hidden": "true" }, el).appendChild(H("span", { html: 'Campus bus<span class="e1-busdef">: the shared connection</span>' }));
     var cols = H("div", { class: "e1-cols" }, el);
@@ -845,8 +844,8 @@
       render: function (R, st, r) {
         if (r.task === "size") {
           // adopt the sizes (rounded up to the bench's steps) onto the plan the sizing was given (st), never onto
-          // choices made while it ran (a change stops a sizing: change() below; W3 review SB1 3); then tell every
-          // results panel that the plan changed (SB1 2) and check the sizes hour by hour (onDone)
+          // choices made while it ran (a change stops a sizing: change() below); then tell every
+          // results panel that the plan changed and check the sizes hour by hour (onDone)
           adopted = LX.ShareState.same(S, st, plan);
           if (!adopted) { sizeNote = null; return; }
           var p = copy(st); p.pv = R.plan.pv; p.bat = R.plan.bat; p.gen = R.plan.gen;

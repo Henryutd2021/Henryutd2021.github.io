@@ -1,9 +1,9 @@
 // cf8-power-curves-from-scarce-data.js — Case file CF8, "Learning a wind turbine's power curve from scarce data" (case
-// form, wave W4, 2026-11-05; live after its review fixes, learn-w4-fix-e).
+// form).
 //
 // Data: assets/learn/data/cf8-power-curves-from-scarce-data.json: the studies' dated steps (LX.Timeline), where the
 // conference result holds (LX.Boundary) and the toy's settings and words. The research text in the data file is approved
-// excerpt wording (reports/learn/excerpts_for_approval.md, E12 and E13); this script adds none of its own. Each timeline
+// excerpt wording (E12 and E13); this script adds none of its own. Each timeline
 // event of the related project (E13) carries the approved acknowledgement as its `footer`, drawn visibly under the event
 // in the live timeline and in the no-JS list (LX.Timeline itself has no footer field, so this script adds it).
 //
@@ -16,15 +16,15 @@
 //                                                                      20 m/s, 0.2% of the year, count as nothing too)
 //   its uncertainty   var(CF) = w^T Sigma w / 2,000^2, Sigma the posterior covariance of the curve (not of single records:
 //                     the capacity factor averages the curve); 90% band CF +/- 1.645 sd. So the band is the fitted curve's
-//                     uncertainty only, with the wind mix and the fit's settings held fixed (review CF8 #1): it is not a
+//                     uncertainty only, with the wind mix and the fit's settings held fixed: it is not a
 //                     band for next year's energy, which weather and operation also move.
 //   for reference     the maker's curve and the field curve (hidden from the fits) averaged the same way
 //   the averaging     bins(): the same weights grouped into wind-speed bins, with the maker's mean power in each, so the
-//                     contributions add up to the maker's capacity factor (review CF8 #3)
-// The explainer's text version (review CF8 #7): explainerRows() reads explainer:uq-mfgpr's own model (its synthetic data)
+//                     contributions add up to the maker's capacity factor
+// The explainer's text version: explainerRows() reads explainer:uq-mfgpr's own model (its synthetic data)
 // at one slider setting, by wind-speed region. The test writes the slider's start (5 points) into the page (no-JS); in the
 // browser the explainer sends its "explainer-update" event on every move (detail: n and its pure model as `api`), and
-// liveTable() rewrites the table and the summary, so the text version follows the slider (final W4 integration).
+// liveTable() rewrites the table and the summary, so the text version follows the slider.
 // Every number on the page is checked by _tests/learn/test_cf8-power-curves-from-scarce-data.js.
 (function () {
   "use strict";
@@ -143,7 +143,7 @@
   LX.mount("cf8", function (live, data) {
     var D = data[KEY];
     var tl = LX.Timeline(H("div", { class: "lx-card" }, live), D.timeline), lis = tl.el.querySelectorAll(".lx-tl-ev");
-    // each event's footer (the E13 acknowledgement), visible under the event, after its source line (review CF8 #6)
+    // each event's footer (the E13 acknowledgement), visible under the event, after its source line
     tl.events.forEach(function (e, k) { if (e.footer && lis[k]) H("p", { class: "lx-hint lx-tl-foot", text: e.footer }, lis[k].querySelector(".lx-tl-body") || lis[k]); });
     var x = document.getElementById("cf8-explain");
     if (x) { x.innerHTML = ""; x.classList.add("is-live"); LX.Boundary(H("div", { class: "lx-xcard" }, x), D.boundary); }

@@ -1,11 +1,11 @@
 /* drill.js — LX.Drill: a seeded practice drill, a stream of short items in rotation with instant feedback and a running
-   score (promoted from the toolbox, K1 to K4, at the W2 merge, 2026-11-03; K5 and K8 use it too). Numeric items use
+   score (used by the toolbox lessons K1 to K5 and K8). Numeric items use
    LX.NumAnswer (numanswer.js). Styles in drill.css.
    LX.Drill(host, { item, hint, title, seed, unit, check, empty, focus, width, widthPhone, cls, choicesClass })
      item(k, r)    the page's item maker: item k (0, 1, 2, ...) drawn with the seeded random source r (r() in [0, 1));
                    returns { q, why, choices?, answer, unit?, tol? }: with choices, answer is the index of the right one;
                    without, answer is a number and the reader types it; q is text and may carry [[id|words]] glossary
-                   marks (LX.rich; W3 shared fix 1)
+                   marks (LX.rich)
      hint          one line under the title (the kinds of item and an honest time); may carry [[id|words]] glossary marks
      title         the card's heading (default "Practice drill")
      seed          the seed (default: a new one per visit, (Date.now() % 100000) + 1); the same seed gives the same items

@@ -1,4 +1,4 @@
-/* engine-e2.js — LX.E2: engine E2 of Learn, the Plains Grid (wave W4, 2026-11-05; curriculum v2 §16.4, §9.2, §9.3).
+/* engine-e2.js — LX.E2: engine E2 of Learn, the Plains Grid (one of the course's sandbox engines).
    Three zones on a transport model, unit commitment as a mixed-integer program (MILP), then the dispatch linear program
    (LP) with the commitment fixed, whose balance duals are the prices, conditional on the commitment. Used by the Grid
    Room (SB2, learn/sb2-grid-room.qmd) and capstone C2 (learn/c2-plains-grid-hard-year.qmd).
@@ -31,17 +31,17 @@
    First day of a period: each unit starts in whatever state suits 00:00, at no start-up cost, and has been in it long
    enough for its minimum times. Later days carry the state of 23:00 and the last day's starts and stops. Each day is
    committed without seeing the next (as a day-ahead market commits one day at a time).
-   Pricing (§9.2): the MILP shows no prices (its duals are null and never read). The dispatch LP keeps every commitment
+   Pricing (prices come from LPs, never from MILPs): the MILP shows no prices (its duals are null and never read). The dispatch LP keeps every commitment
    fixed (the units on are bounded by pmin x n and pmax x n; units off are left out); its balance duals are the zones'
    prices and its reserve dual the reserve price, "conditional on the commitment". Uplift: a committed group whose
    day's revenue at those prices (energy and reserve) falls short of its running, no-load and start-up costs is paid
    the difference (make-whole), charged to load in proportion to energy (C2). Prices are shown only when the pricing LP
-   itself reports optimal (SB2 review finding 6): a pricing LP that stops early gives no result, whatever the MILP did.
-   Who is short (SB2 finding 2, C2 finding 2): a zone's unserved load is shared by its customers in proportion to their
+   itself reports optimal: a pricing LP that stops early gives no result, whatever the MILP did.
+   Who is short: a zone's unserved load is shared by its customers in proportion to their
    load that hour (the large load's after its own curtailment); the large load's served energy and payment follow that
    rule (readDay: h.llShed, tot.llShed).
 
-   Tie rule (W2 review finding 2), all in $/MWh (data file, `tie`), far below a cent: spilling wind and sun costs
+   Tie rule, all in $/MWh (data file, `tie`), far below a cent: spilling wind and sun costs
    0.00001 at Wind Ridge, 0.00002 at Prairie Town, 0.00003 in Metro (the farthest from the city spills first); unserved
    load 0.003, 0.002, 0.001 above $5,000 in W, T, M (Metro's load is shed first when several zones could be); reserve
    0.000001 x (the group's place in the list + 1), so the groups listed first carry reserve first; the battery 0.001 per
@@ -63,7 +63,7 @@
      E2.adequacy(P, sys, { years, seed, signal, sync, onProgress }) -> Promise (or, with sync, the result) of
        { lole, lolh, eue, curtailHours, years, ci: { lole: [lo, hi] }, byYear }   (a seeded Monte Carlo; below)
      Pure models: dayModel, readDay, carry, weighting, priceSlopes (the test's corner check)
-   Adequacy (C2's probabilistic check; adequacy is never judged from the reduced runs, §9.3): a seeded Monte Carlo
+   Adequacy (C2's probabilistic check; adequacy is never judged from the reduced runs of representative days): a seeded Monte Carlo
    (LX.mulberry32) over every hour of the 2025 and 2024 weather (alternate draw years), with each unit available or out
    for a whole day, drawn afresh each day with its forced outage rate (illustrative), and the battery charged and
    discharged greedily hour by hour; each hour's unserved load is the max-flow deficit of the three zones and two links
@@ -363,7 +363,7 @@
   function worst(list) { var w = "optimal"; list.forEach(function (s) { if ((RANK[s] == null ? 5 : RANK[s]) > (RANK[w] == null ? 5 : RANK[w])) w = s; }); return w; }
   // the days a task runs: [{ y, day, carry (use yesterday's state), label }]
   function daysOf(state, P, task) {
-    // C2's year (§9.3): the 12 representative days, each weighted by its month's days, less the days of a kept hard week
+    // C2's year (representative days): the 12 representative days, each weighted by its month's days, less the days of a kept hard week
     // in that month; then the two hard weeks, day by day in order (weight 1 each): 365 days in all
     var wk = [];
     if (task === "year" || task === "weeks") P.cfg.c2.weeks.forEach(function (id) { var pr = P.periods[id]; for (var d = 0; d < pr.days; d++) wk.push({ y: String(pr.year), day: pr.day0 + d, carry: d > 0, period: id, weight: 1, label: dayLong(pr.day0 + d) }); });

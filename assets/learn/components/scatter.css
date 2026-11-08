@@ -1,5 +1,5 @@
 /* scatter.css — LX.Scatter (scatter.js): axis text, dot labels, and the dots' pressed state and keyboard focus ring.
-   Promoted from lesson 6 (W1 integration). */
+   First used by lesson 6. */
 .lx-scatter { display: block; width: 100%; height: auto; max-width: 620px; }
 .lx-scatter .ax { font-family: var(--lx-f-mono); font-size: 11px; fill: var(--lx-ink-3); }
 .lx-scatter .axt { font-family: var(--lx-f-display); font-size: 12.5px; fill: var(--lx-ink-2); }

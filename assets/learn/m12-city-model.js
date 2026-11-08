@@ -1,5 +1,5 @@
 // m12-city-model.js — M12, "Model a city's energy system: an energy hub with grid limits and screening fairness outputs"
-// (Modeler, model-lab in the cards form, wave W5, 2026-11-06), on engine E3 (assets/learn/components/engine-e3.js, LX.E3,
+// (Modeler, model-lab in the cards form), on engine E3 (assets/learn/components/engine-e3.js, LX.E3,
 // in the bundle; the City Planner SB3 and capstone C3 run the same model). Data: prairie-city.json and e3-city-hub.json.
 //
 // Steps: predict where the limit bites; the formulation (the hub, building shares as decisions, the balance, the
@@ -42,7 +42,7 @@
     return "With CO₂ at most " + capPct + "% of 2025, the LP puts heat pumps in " + hp + " of the core's, suburbs' and fringe's heat, retrofits " + ret + ", district heat " + pct0(A.d[0].share.dh) +
       ", " + kilo(sz.pvAdd) + " MW of rooftop solar and " + kilo(sz.batAdd) + " MW of batteries. " + (cap != null && cap > 0.5 ? "The cap binds: the last tonne cut costs about $" + kilo(cap) + " (the cap's dual)." : "The cap does not bind: its dual is $0.");
   }
-  // the comparison's rows; rule: "who adopts first" for every row's burden (step 7's choice; M12 review finding 3). The
+  // the comparison's rows; rule: "who adopts first" for every row's burden (step 7's choice). The
   // rule moves the household table only, so cost, CO2 and upgrades are the runs' own; resum(R, rule) re-reads the run
   // with that rule (E3.summarize on the same LP solution)
   function compareRows(runs, rule, resum) {

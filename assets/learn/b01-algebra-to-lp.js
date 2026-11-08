@@ -1,5 +1,4 @@
-// b01-algebra-to-lp.js — Bridge B1, "From algebra to a linear program: how do equations become a model?" (step cards,
-// Learn W1, 2026-11-02).
+// b01-algebra-to-lp.js — Bridge B1, "From algebra to a linear program: how do equations become a model?" (step cards).
 //
 // Ten cards: a ten-question readiness check that routes to the toolbox; a word problem tagged into decisions, goal,
 // rules and givens; a fully worked translation; the rules on a plane; the cheapest corner; what a wrong sign does; a

@@ -1,5 +1,5 @@
 // m03-capacity-expansion.js — Modeler lesson M3, "What should be built? Capacity expansion with representative periods,
-// validated" (model-lab: step cards with a solver run), wave W2, 2026-11-03.
+// validated" (model-lab: step cards with a solver run).
 //
 // Engine: lesson 13's planning LP, the shared component LX.townPlan (assets/learn/components/planengine.js, bundled into
 // learn.js; in Node it is required). This file extends it through its public API and duplicates none of it:
@@ -14,8 +14,8 @@
 //     same yearly demand energy and the same wind and solar capacity factors as 2025, so only the hourly pattern differs);
 //   - stated error measures (TP.errors(), on TP.readCheck() of the full-year run): the cost estimate against the full-year optimum (precomputed: about a minute in
 //     Node), and, for the re-dispatched plan, unserved energy (MWh, hours, largest shortfall) and CO2 against the cap.
-// link(), readCheck() and errors() began here and were promoted to the engine at the W2 integration (2026-11-03), as was
-// the 52-week calendar strip (LX.WeekStrip, components/weekstrip.js); this file keeps no copy.
+// link(), readCheck() and errors() are the planning engine's, as is the 52-week calendar strip (LX.WeekStrip,
+// components/weekstrip.js); this file keeps no copy.
 // Data: assets/learn/data/m03-capacity-expansion.json (the lesson's choices and its reference results; the Node test
 // re-solves every reference number and --write rewrites them). Every number on the page is checked by
 // _tests/learn/test_m03-capacity-expansion.js with the vendored HiGHS; the notebook rebuilds the model in SciPy.
@@ -59,7 +59,7 @@
   function setOf(D, id) { return D.sets.filter(function (s) { return s.id === id; })[0]; }
 
   // ---------------------------------------------------------------- the battery between weeks
-  // TP.link(m, RW, mode) (planengine.js, promoted from this lesson): "linked" (the engine's own calendar chain),
+  // TP.link(m, RW, mode) (planengine.js): "linked" (the engine's own calendar chain),
   // "cyclic" (each representative week ends where it starts) or "free" (no rule between weeks)
   // the planning LP on representative weeks: o = {cap (t CO2 a year), mode}
   function planModel(C, RW, o) { return TP.link(TP.weekModel(C, RW, { cap: o.cap }), RW, o.mode); }
@@ -79,7 +79,7 @@
              spilled: s.spilledShare, hours: RW.reps.length * HPW, weeks: RW.reps.length };
   }
   // a fixed plan's full-year run (TP.readCheck: totals and MWh unserved in each calendar week) and the stated error
-  // measures (TP.errors: cost gap, CO2 over the cap, estimate error) are in the planning engine, promoted from here
+  // measures (TP.errors: cost gap, CO2 over the cap, estimate error) are in the planning engine
   // the weeks as the page lists them: kind, season, how many calendar weeks each stands for, its weight and start date
   function weekList(RW) {
     return RW.reps.map(function (r, p) {
@@ -219,7 +219,7 @@
         });
       });
     }
-    // what a full-year run's cost counts (W2 review, finding 2): plants and fuel only
+    // what a full-year run's cost counts: plants and fuel only
     var SPEND = "Spending: building and running the plants. The re-run enforces no CO₂ cap and does not price unserved demand.";
     function verdict(host, x, k, year) {
       var c = x[k], e = TP.errors(x.est, c, cap, null), ul = H("ul", { class: "m3-verdict" }, host);
@@ -242,7 +242,7 @@
       return t;
     }
 
-    // ---------------------------------------------------------------- solves that fail (W2 review, finding 3)
+    // ---------------------------------------------------------------- solves that fail
     // A solve can stop at its time limit on a slow phone, or the solver can fail to load. The step then says so in plain
     // words, clears its busy state (Next and the step's button work again) and offers "Try again"; results already
     // solved are kept, so a retry solves only what is missing.
@@ -256,8 +256,8 @@
     }
     // one solver action of a step. o: { api, st (an LX.SolverStatus), host, go (the step's own button, or null), job () ->
     // Promise, failed () -> the first failed solve or null, show () -> the results }. Returns the action, for the step's
-    // button or prediction and for "Try again". LX.SolveStep (components/solvestep.js, promoted from M3, A8 and M4 at the
-    // W3 integration); the note keeps the class m3-fail and M3's last sentence.
+    // button or prediction and for "Try again". LX.SolveStep (components/solvestep.js, shared by M3, A8 and
+    // M4); the note keeps the class m3-fail and M3's last sentence.
     function action(o) {
       o.cls = "m3-fail"; o.kept = " What you did before is kept; on a slow device, close other tabs first.";
       return LX.SolveStep.action(o);
@@ -276,7 +276,7 @@
             } });
           f = H("div", { class: "m3-formula", hidden: true, role: "math", "aria-label": "minimise, over the sizes K, the sum of yearly cost f times size K, plus the sum over modelled weeks p of the weight w p times the running cost of every hour of that week" }, act);
           f.innerHTML = "min &nbsp;Σ<sub><var>i</var></sub> <var>f</var><sub><var>i</var></sub> <var>K</var><sub><var>i</var></sub> &nbsp;+&nbsp; Σ<sub><var>p</var></sub> <span class='w'><var>w</var><sub><var>p</var></sub></span> Σ<sub><var>h</var></sub> (running cost in hour <var>h</var> of week <var>p</var>)";
-          // the symbol key beside the first formula (W2 review, finding 10)
+          // the symbol key beside the first formula
           key = H("ul", { class: "m3-key", hidden: true, "aria-label": "The symbols in the formula" }, act);
           [["<var>K</var><sub><var>i</var></sub>", "size built of plant <var>i</var>: MW (battery energy: MWh)"],
            ["<var>f</var><sub><var>i</var></sub>", "its yearly cost: $ per MW-year (battery energy: per MWh-year)"],
@@ -364,7 +364,7 @@
             onPick: function () { run(); } });
           st = LX.SolverStatus(H("div", { class: "m3-row" }, act));
           tb = H("div", null, act); note = H("p", { class: "m3-note", hidden: true, text: "Precomputed rows: their LPs are too large to solve quickly on a phone. The Node test and the notebook solve them again." }, act);
-          // every set's plan run on all of 2025; a failed solve leaves a message and "Try again" (finding 3)
+          // every set's plan run on all of 2025; a failed solve leaves a message and "Try again"
           run = action({ api: api, st: st, host: act, go: null,
             job: function () { return Promise.all(SETROWS.map(function (id) { return check(id, 2025); })); },
             failed: function () { return firstFail(SETROWS.map(function (id) { return [id, "y25"]; })); },
@@ -398,7 +398,7 @@
           var rules = H("dl", { class: "m3-rules", "aria-label": "Three rules for the battery between weeks" }, act);
           [["Linked", "one calendar chain of 52 start levels: energy carried into a week was stored before."], ["Cyclic", "each representative week ends where it starts."],
            ["No link", "each week may start at any level."]].forEach(function (r) { H("dt", { text: r[0] }, rules); H("dd", { text: r[1] }, rules); });
-          // the what-if, as short labelled lines (W2 review, finding 11)
+          // the what-if, as short labelled lines
           var info = H("ul", { class: "m3-info" }, act);
           [["What-if", "battery energy at $" + D.storage.energyCapex + " per kWh, not the sourced $" + Math.round(cfg.techs.battery.energyCapex) + " in " + cfg.priceYear + " dollars (lesson 13). An illustrative what-if, not a forecast or a sourced cost."],
            ["Why", "so the solver builds a battery large enough for the rules to differ."],
@@ -411,8 +411,8 @@
             table(tb, ["Rule between weeks", "~Battery MW / MWh", "Estimate", "Full year: CO₂", "Full year: unserved"], D.storage.modes.map(function (m) {
               var o = out[m]; return { cells: [NAMES[m], batText(o.est.plan), fm.musd(o.est.cost), { text: fm.kt(o.full.co2), cls: o.full.co2 > cap + 0.5 ? "bad" : "ok" }, { text: o.full.unserved < 0.5 ? "0" : fm.mwh(o.full.unserved), cls: o.full.unserved < 0.5 ? "ok" : "bad" }] };
             }), "Three rules for the battery between weeks, at the illustrative what-if storage cost");
-            // the battery column is hidden on phones (the result line names the no-link battery); the mechanism (W2 review,
-            // finding 1): what each rule lets the battery carry from one week to the next
+            // the battery column is hidden on phones (the result line names the no-link battery); the mechanism:
+            // what each rule lets the battery carry from one week to the next
             H("p", { class: "m3-note", text: "Largest net change of the battery over one representative week: " + D.storage.modes.map(function (m) { return NAMES[m].toLowerCase() + " " + fm.mwh(largest(out[m].net)); }).join(", ") + "." }, tb);
           }
           // the three planning LPs, solved here; each plan's full-year run is the stored one when the plan is the reference
@@ -458,7 +458,7 @@
           function show() {
             var x = res.wk7, F = R.full;
             tb.innerHTML = "";
-            // the last row is the plan optimized on all 8,760 hours of 2025, run on 2024: no optimum of 2024 is computed (finding 14)
+            // the last row is the plan optimized on all 8,760 hours of 2025, run on 2024: no optimum of 2024 is computed
             table(tb, ["Plan, year run", "~Spending", "CO₂", "Unserved"], [
               { cells: ["4 + 3 plan, 2025", fm.musd(x.y25.cost), { text: fm.kt(x.y25.co2), cls: "bad" }, { text: fm.mwh(x.y25.unserved) + " · " + x.y25.hours + " h", cls: x.y25.unserved < 0.5 ? "ok" : "bad" }] },
               { cells: ["4 + 3 plan, 2024", fm.musd(x.y24.cost), { text: fm.kt(x.y24.co2), cls: x.y24.co2 > cap + 0.5 ? "bad" : "ok" }, { text: fm.mwh(x.y24.unserved) + " · " + x.y24.hours + " h", cls: x.y24.unserved < 0.5 ? "ok" : "bad" }] },
@@ -479,7 +479,7 @@
       { text: "Sort six conclusions drawn from the seven weeks. Which survive the checks you ran?",
         build: function (act, api) {
           var x = R.sets.wk7, F = R.full;
-          // the spending cards state their boundary (finding 2): plants and fuel, no shortage penalty, no cap in the re-runs
+          // the spending cards state their boundary: plants and fuel, no shortage penalty, no cap in the re-runs
           var cards = [
             { id: "cost", text: "The plan's yearly spending on plants and fuel is within 2% of the weeks' estimate.", bin: "holds",
               why: "On 2025 " + fm.spct(x.y2025.cost / x.cost - 1) + ", on 2024 " + fm.spct(x.y2024.cost / x.cost - 1) + ": spending only. The $" + S.C.voll.toLocaleString("en-US") + " per MWh shortage penalty would add " + fm.musd(penalty(S.C, x.y2025)) + " and " + fm.musd(penalty(S.C, x.y2024)) + ", and the re-runs enforce no cap." },

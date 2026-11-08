@@ -1,5 +1,4 @@
-// a18-city-plan.js — Analyst lesson A18, "How is a city or regional energy plan made?" (step cards, closed form),
-// wave W5, builder learn-w5-d, 2026-11-06.
+// a18-city-plan.js — Analyst lesson A18, "How is a city or regional energy plan made?" (step cards, closed form).
 //
 // Data: assets/learn/data/a18-city-plan.json (the six measures and their sources, the plan's rules and settings),
 // prairie-city.json (Prairie City: inventory, flows, districts, days, prices, factors, household groups; never retyped),

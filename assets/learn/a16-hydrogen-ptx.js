@@ -1,5 +1,5 @@
 // a16-hydrogen-ptx.js — Analyst lesson A16, "Where does hydrogen make sense? From renewables to electrolysis, storage and
-// use" (step cards, closed form), wave W3, 2026-11-03.
+// use" (step cards, closed form).
 //
 // Data: assets/learn/data/a16-hydrogen-ptx.json (the wind farm, the electrolyzer and its costs in 2022 dollars from DOE
 // Hydrogen Program Record 24005, part-load ranges from IRENA, the use sorter, numbers to remember, each with its source),
@@ -18,17 +18,17 @@
 //   electricity cost: spare wind $0 (it would be curtailed); wind diverted from sale and grid power $30/MWh (the record's
 //   renewable electricity price, 2022 dollars).
 //   average utilization: the year's MWh / (X x 8,760), so util x 8,760 is the equivalent full-load hours; the hours it runs
-//   at all (hoursOn) and at full size (hoursFull) are counted separately (A16 review, finding 1).
+//   at all (hoursOn) and at full size (hoursFull) are counted separately.
 //   cost per kg (a partial levelized cost): (capital recovery at 4% real over 30 years x $2,000/kW + electricity) / kg.
 //   It leaves out fixed upkeep and stack replacement, which DOE's production cost ($5-7/kg) counts, and compression,
 //   storage and delivery, which DOE's production cost leaves out too (Record 24005, p. 2).
 //   the system's net change (the farm's owner, against no electrolyzer): hydrogen sold at a price minus the electrolyzer's
 //   yearly capital minus lost wind sales and grid purchases. The owner's choices are the slider's sizes or none (0 MW, net
-//   0): at a low price every size loses money and the owner builds nothing (A16 review, finding 2).
+//   0): at a low price every size loses money and the owner builds nothing.
 //   steady delivery: the user takes the year's average output every hour; the tank must hold the range of the cumulative
 //   difference between production and delivery. It starts at the level that never runs dry (the start fill), loses
 //   nothing and ends the year where it started: the minimum working storage for 2025's known hours, not a guarantee
-//   for other weather years (A16 review, finding 7).
+//   for other weather years.
 //   CO2 of grid hours (annual rule): grid MWh x 0.37 t/MWh (illustrative: Prairie Town's gas plant), per kg.
 // Every number on the page is checked by _tests/learn/test_a16-hydrogen-ptx.js.
 (function () {
@@ -128,7 +128,7 @@
     ].join("\n") }, document.head);
   }
   var TECH = { pem: "PEM", alk: "alkaline" };
-  // the electrolyzer a step uses, named on the step (A16 review, finding 9: the type chosen in step 3 carries on, visibly)
+  // the electrolyzer a step uses, named on the step (the type chosen in step 3 carries on, visibly)
   function ctx(host, X, tech, rest) { return H("p", { class: "a16-ctx", html: LX.rich("**" + (X != null ? X + " MW " : "") + TECH[tech] + " electrolyzer** (" + Math.round(MINLOAD[tech] * 100) + "% minimum load)" + (rest || "") + ".").replace(/\*\*(.+?)\*\*/g, "<b>$1</b>") }, host); }
   var MINLOAD = {};
   function kpi(host, label, value, tone) { var k = H("div", { class: "a16-kpi" + (tone ? " " + tone : "") }, host); H("small", { text: label }, k); H("b", { text: value }, k); return k; }
@@ -164,7 +164,7 @@
       // 2 size an electrolyzer on spare wind
       { text: "A 100 MW wind farm's grid connection takes 50 MW; the rest is [[curtailment|curtailed]]. Add a [[pem-electrolyzer|PEM electrolyzer]] that uses only that spare wind. Try three sizes.",
         build: function (act, api) {
-          // always PEM, as the step says; step 3 brings in the alkaline type (A16 review, finding 9)
+          // always PEM, as the step says; step 3 brings in the alkaline type
           var out = H("div", { class: "a16-kpis", "aria-live": "polite" }, act), tried = {};
           function draw() {
             var o = run(Y, st.X, "spare", "pem"); out.innerHTML = "";
@@ -259,7 +259,7 @@
             if (g.placed < g.total) return; api.done(); LX.progress.done(SLUG); remember("uses", g.right);
             api.saw(g.right + " of " + g.total + " as the evidence sorts them. Hydrogen makes most sense where it is the [[feedstock|feedstock]], or where nothing electric does the job yet.");
           } });
-          // every source with its link and date (A16 review, finding 13)
+          // every source with its link and date
           H("p", { class: "a16-note", html: "Sources: " + D.uses.sources.map(function (s) { return "<a href=\"" + LX.esc(s.url) + "\">" + LX.esc(s.label) + "</a> (" + LX.esc(s.date) + ")"; }).join("; ") + "." }, act);
         } }
     ];
@@ -282,7 +282,7 @@
     var x = document.getElementById("a16-explain"); if (!x) return;
     x.innerHTML = ""; x.classList.add("is-live");
     var X = 30, rs = ["spare", "hourly", "annual"].map(function (r) { return run(Y, X, r, "pem"); });
-    // a second question after "feedstock?" (A16 review, finding 4): a use that is not a feedstock goes to electricity only
+    // a second question after "feedstock?": a use that is not a feedstock goes to electricity only
     // when electricity can meet its range, temperature or storage time; otherwise the routes are compared, as the sorter does
     var AT = { wind: [0, 0], ez: [0, 1], store: [0, 2], use: [0, 3], yes: [1, 3], direct: [0, 4], elec: [1, 4], both: [0, 5] };
     LX.Flowchart(H("div", { class: "lx-xcard" }, x), {

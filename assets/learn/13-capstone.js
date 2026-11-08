@@ -1,4 +1,4 @@
-// 13-capstone.js — Lesson 13, "What should Prairie Town build? Plan its power system" (play-first capstone, W1).
+// 13-capstone.js — Lesson 13, "What should Prairie Town build? Plan its power system" (play-first capstone).
 // Its planning engine (LX.townPlan: the model, the representative weeks, the LP builders and the page kit that lessons
 // 12 and 13 share) is the component assets/learn/components/planengine.js, bundled into learn.js; this file is the game.
 //

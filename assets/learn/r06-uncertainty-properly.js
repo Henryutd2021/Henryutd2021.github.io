@@ -1,5 +1,4 @@
-/* r06-uncertainty-properly.js — research studio R6, "Uncertainty done properly: what to vary, how, and how to say it"
-   (curriculum v2 §11; W4, 2026-11-05).
+/* r06-uncertainty-properly.js — research studio R6, "Uncertainty done properly: what to vary, how, and how to say it".
    Data: assets/learn/data/r06-uncertainty-properly.json (the fictional study, its twelve uncertainty cards, five treatment
    picks, the rewrite checks and examples, the exemplars, the comparison table, the rubric line, the checklist), town_year.json
    (SPP's 2025 hourly demand, from EIA-930: the real hourly pattern the model adds car charging to) and path.json (lesson

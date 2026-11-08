@@ -1,5 +1,5 @@
 // f10-nations-differ.js — Lesson F10, "Why does every country's energy system look different?" (step cards, Foundations,
-// D2, closed-form; wave W6, builder learn-w6-a, 2026-11-07).
+// D2, closed-form).
 //
 // Data: data/f10-nations-differ.json (seven real balances as their statistics publishers published them, one data year each,
 // with the rows, units and conversions; the conventions; the four lenses; the numbers to remember), data/prairieland.json

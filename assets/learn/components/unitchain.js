@@ -1,6 +1,6 @@
 /* unitchain.js — LX.UnitChain: a back-of-envelope chain of numbers with units (649 TWh × 1,000 = 649,000 GWh ÷ 8,760 h =
-   74.1 GW ...), and LX.EvidenceClock: a timeline of how long evidence took after an event (promoted from N1's envelope
-   checks, W1 2026-11-02).
+   74.1 GW ...), and LX.EvidenceClock: a timeline of how long evidence took after an event (first used by N1's envelope
+   checks).
    var uc = LX.UnitChain(host, { label: "Unit chain", steps: [
        { v: "649 TWh", u: "a year (energy)" }, { op: "× 1,000 =" }, { v: "649,000 GWh", u: "a year" },
        { op: "÷ 8,760 h =" }, { v: "74.1 GW", u: "average power", out: true }] });

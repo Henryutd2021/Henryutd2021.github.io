@@ -1,6 +1,5 @@
-/* sankey.js — LX.Sankey: energy flows drawn as bands whose width keeps the value (i-sankey, e-sankey; curriculum v2 §16:
-   F3, F4, later F9 and F10). Promoted at the W3 integration (2026-11-03) from F3's script, which F4 loaded for it; the
-   code is F3's, unchanged, with its styles moved to sankey.css.
+/* sankey.js — LX.Sankey: energy flows drawn as bands whose width keeps the value (i-sankey, e-sankey: F3, F4, F9 and
+   F10). First written for F3; its styles are in sankey.css.
    Pure (Node: require("assets/learn/components/sankey.js") = { layout, band, flows }; page: LX.Sankey.layout, .band,
    .flows): the layout of a spec in a W x H box, a band's ribbon path, and each node's flows in and out.
    View: LX.Sankey(host, opts) -> { el, set(spec), pick(id), layout(), readout } (options below). */

@@ -1,5 +1,4 @@
-// a20-national-scenarios.js — Lesson A20, "Why do national energy scenarios disagree?" (step cards, Analyst, D3; wave W6,
-// 2026-11-07, builder learn-w6-b).
+// a20-national-scenarios.js — Lesson A20, "Why do national energy scenarios disagree?" (step cards, Analyst, D3).
 //
 // Data: assets/learn/data/prairieland.json (Prairieland's balance, fleet, demand cases, cost and fuel ranges, carbon factors,
 // the budget and its accounting; read, never retyped), assets/learn/data/a20-national-scenarios.json (the four scenarios,
@@ -20,7 +19,7 @@
 //     C_gas = capital and fixed O&M at the rule's capacity factor + variable O&M + fuel (domestic gas and LNG blended by
 //             2025's supply) + the carbon price x CO2 per MWh
 //     full cost of a plant = (capital x CRF(r, life) + fixed O&M) / (capacity factor x 8.76) + variable O&M, at the default
-//     discount rate; capital costs are fixed values inside Prairieland's ranges, the same in every year (G-COST)
+//     discount rate; capital costs are fixed values inside Prairieland's ranges, the same in every year (no cost changes with how much is built)
 //   fuels: crude = oil products / (1 - refinery losses) + oil burned in plants; gas = (final + plants) / (1 - own use);
 //     coal = (final + plants) x 2025's ratio of coal mined to coal used; imports = use above 2025's domestic output
 //   CO2 = fuels x IPCC 2006 factors (net calorific values); cumulative 2026-2050 = Prairieland's linear weights x model years

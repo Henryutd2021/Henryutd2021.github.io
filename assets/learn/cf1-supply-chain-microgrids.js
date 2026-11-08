@@ -1,9 +1,9 @@
 // cf1-supply-chain-microgrids.js — Case file CF1, "Where should a factory go when sun and wind are part of the decision?"
-// (case form, wave W3, 2026-11-03).
+// (case form).
 //
 // Data: assets/learn/data/cf1-supply-chain-microgrids.json: the studies' dated steps (LX.Timeline), where the result holds
 // (LX.Boundary) and the illustrative toy ("idea"); assets/learn/data/town_year.json for the toy's wind and sun shapes.
-// The research text in the data file is approved excerpt wording (reports/learn/excerpts_for_approval.md, E8); this
+// The research text in the data file is approved excerpt wording (E8); this
 // script adds none of its own.
 //
 // The idea (illustrative; invented round numbers in 2025 dollars, not the studies' inputs or results): one factory, two

@@ -1,4 +1,4 @@
-// f06-grid-and-outages.js — F6, "How does power reach your plug, and why does it sometimes fail?" (step cards, W3, 2026-11-03).
+// f06-grid-and-outages.js — F6, "How does power reach your plug, and why does it sometimes fail?" (step cards).
 //
 // Data: assets/learn/data/f06-grid-and-outages.json (the eight stops from plant to socket with sourced U.S. voltage
 // classes, the illustrative 5-ohm line, Prairie Town's east-side network and storm, EIA's reliability table 2015-2025,
@@ -28,7 +28,7 @@
 //                          system (EIA Table 11.1)
 // Prairie Town's network, homes and repair hours are illustrative; the voltage classes and reliability numbers are real.
 //
-// Lesson-local components (candidates for promotion): VoltPath (a plant-to-socket path with eight stops, two layouts,
+// Lesson-local components (used by this page only): VoltPath (a plant-to-socket path with eight stops, two layouts,
 // and a voltage staircase of buttons), GridNet (i-network for distribution: a one-line diagram whose parts are buttons
 // that fail and repair, with protection logic, dark homes and a text version; i-hazard: a preset storm to inspect).
 // Shared components: LX.StepCards, LX.Slider, LX.Predict, LX.Plot, LX.EnergyChain, LX.CausalChain,

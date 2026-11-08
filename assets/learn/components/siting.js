@@ -1,13 +1,12 @@
-/* siting.js — LX.A19: the siting map of lesson A19, its pure model (LX.A19) and its view (LX.SiteMap). Written for A19
-   (wave W5, builder learn-w5-e, 2026-11-06, as assets/learn/a19.js) and promoted at the W5 integration (2026-11-06), its
-   code unchanged, for A19 and capstone C3; its styles are siting.css. Prairie City is fictional; its numbers are
+/* siting.js — LX.A19: the siting map of lesson A19, its pure model (LX.A19) and its view (LX.SiteMap), shared by A19
+   and capstone C3; its styles are siting.css. Prairie City is fictional; its numbers are
    illustrative.
 
    A seeded region around Prairie City as raster layers on a grid of 1 km cells (data/a19-gis-siting.json holds the
    recipe), and what a screening study does with them: exclusion masks, a weighted overlay (suitability), candidate sites
    in blocks, weight sensitivity, a cost surface with least-cost paths to substations, and a simple site-cost model.
    Every layer uses only + − × ÷, square roots, floor and a 32-bit seeded hash, so the lesson's NumPy notebook rebuilds
-   the same numbers (scripts/build_learn_a19_notebook.py in the ResearchPortfolio folder).
+   the same numbers (the notebook's build step checks them).
 
    Pure model (Node: const A19 = require("assets/learn/components/siting.js"); the browser: window.LX.A19, in learn.js)
      A19.build(D, { newer })            the region: layers, homes, distances (newer: add the homes built since 2019)
@@ -20,13 +19,13 @@
      A19.blocks(R, D, type, cfg)        every block of the type's size that has room: { i, j, k, B, m: {key: mean} }
      A19.sites(R, D, type, cfg, n)      the n best blocks that do not overlap: [{ id: "A".., i, j, k, score, ... }]
                                         (tie rule: higher score first; equal scores: the more northern, then western).
-                                        Every weight 0: no ranking, [] with .noWeights = true (W5 fix, 2026-11-06)
+                                        Every weight 0: no ranking, [] with .noWeights = true
      A19.surface(R, D, { protected })   cost surface, $ per km of new line ("forbid" makes protected land impassable)
      A19.paths(R, D, surf, needMW)      multi-source Dijkstra from substations with that much room: { dist, pred, src }
      A19.route(R, P, cell)              the least-cost path from a cell: { cells, km, cost, sub, parts }
      A19.cost(R, D, type, site, cfg, P) a site's costs (2025 dollars): { land, connect, road, water, upfront, cf, mwh, sub }
      A19.shares(R, D, type, cfg, sites, draws, seed)  how often each site is the winning block under random weights:
-                                        { wins (the very same block; W5 fix: was "a winner that overlaps it"), other
+                                        { wins (the very same block, not a winner that overlaps it), other
                                         (any other block), near (of those, winners that overlap a site) }
      A19.need(D, type), A19.place(R, i, j, k), A19.cellText(R, n)   helpers (cellText names a substation and the
                                         lines in a cell, from A19.gridAt(R, n))

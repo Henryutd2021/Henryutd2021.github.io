@@ -1,6 +1,6 @@
 /* engine-e2.css — the view pieces of engine E2 (LX.E2.ui: the zone map, the commitment table, the bench's small
    controls). Colours from --lx-* tokens only; no overflow clipping (chart tips stay visible; a wide table scrolls in its
-   own .lx-scroll-x). W4, 2026-11-05. */
+   own .lx-scroll-x). */
 
 /* ---------- bench extras */
 .e2-ghint { margin: -4px 0 0 !important; }

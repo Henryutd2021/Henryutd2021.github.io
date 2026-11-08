@@ -1,6 +1,6 @@
 /* linkedviews.js — LX.LinkedViews: the same model shown several ways (in words, in symbols, as a table), linked: tap a line
-   in any view and the same part lights up in every view, and the lesson can light it on its chart too (W1 integration,
-   2026-11-02; lesson 10, step 8).
+   in any view and the same part lights up in every view, and the lesson can light it on its chart too
+   (lesson 10, step 8).
    var lv = LX.LinkedViews(host, {
      panels: [{title: "In words", items: [{key: "demand", html: "<b>Demand:</b> at least 145 MW."}, {html: "Not linked."}]},
               {title: "In symbols", items: [...]}],                   // an item without a key is a plain line

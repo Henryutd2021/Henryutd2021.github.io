@@ -1,5 +1,5 @@
-/* lifebox.css — LX.LifeBox (lifebox.js): the chain of stage tiles and the dashed boundary with its two handles, moved
-   from A11's page at the W5 integration (2026-11-06), unchanged except for the number of stages (--n, set by the box).
+/* lifebox.css — LX.LifeBox (lifebox.js): the chain of stage tiles and the dashed boundary with its two handles, first
+   drawn on A11's page, for any number of stages (--n, set by the box).
    The tiles' content (labels, values) is styled by the page. Phones (560 px and narrower): the chain runs down the page
    and the handles sit on the boundary's top and bottom edges. */
 .lx-life-chain { position: relative; display: grid; grid-template-columns: repeat(var(--n, 4), minmax(0, 1fr)); gap: 20px; padding: 10px 16px; margin: .2rem 0 .6rem; }

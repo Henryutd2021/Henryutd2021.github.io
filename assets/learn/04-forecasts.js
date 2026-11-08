@@ -1,4 +1,4 @@
-// 04-forecasts.js — Lesson 4, "Forecasts and surprises" (step cards, Learn W1, 2026-11-02).
+// 04-forecasts.js — Lesson 4, "Forecasts and surprises" (step cards).
 //
 // Data (all real, Southwest Power Pool, 2025, from EIA-930; see each file's meta):
 //   assets/learn/data/town_days.json   the days typical_forecast (10 Feb 2025) and big_forecast_miss (4 Feb 2025): hourly
@@ -24,7 +24,7 @@
 //   forecast (the page labels both).
 // Every number the page states comes from these functions or the data files and is checked in
 // _tests/learn/test_04_forecasts.js. The pure model is exported for Node; the view uses the component library.
-// The chart card is the shared LX.PlotCard and its chart LX.Plot (components/plot.js, W1 integration).
+// The chart card is the shared LX.PlotCard and its chart LX.Plot (components/plot.js).
 (function () {
   "use strict";
   var COSTS = { over: 10, under: 300 };                     // $/MWh, illustrative (the page says so)

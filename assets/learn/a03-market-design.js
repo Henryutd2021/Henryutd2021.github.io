@@ -1,5 +1,5 @@
 // a03-market-design.js — Analyst lesson A3, "Energy-only or capacity market? How wholesale markets are designed for high
-// renewable shares" (step cards, closed-form, Learn W4, 2026-11-05).
+// renewable shares" (step cards, closed-form).
 //
 // Data (read through data-src): town_year.json (SPP's 2025 hourly shapes, EIA-930), cf_targets.json (EIA's 2025 capacity
 // factors), 07-cost.json (lesson 7: gas heat rates, upkeep and building costs, the gas price, 4% real over 30 years) and

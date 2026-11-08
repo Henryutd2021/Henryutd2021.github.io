@@ -1,5 +1,5 @@
 // x05-project-finance.js — Side topic X5, "How are big energy projects actually financed?" (step cards, Analyst,
-// side line, D1, closed form; wave W7, builder learn-w7-a, 2026-11-07). Guard G-FIN: every contract and offtake
+// side line, D1, closed form). Every contract and offtake
 // example is wind, solar, storage or gas (here a wind PPA and a battery tolling agreement).
 //
 // Data (read through data-src, never retyped):
@@ -7,7 +7,7 @@
 //                                   ranges, the bad year, the payment structure, the four layers, the facts, the stop
 //                                   box and the sources (each a citation, a date and the short claims it supports)
 //   data/x05-inputs.json            the finance-only projection of the other lessons' data, written by the X5 test
-//                                   (--write) and checked against its sources on every run (X5 review: the page loads
+//                                   (--write) and checked against its sources on every run (the page loads
 //                                   only the fields it uses):
 //     from 07-cost.json             the wind farm's building cost ($/kW), fixed upkeep ($/kW-yr) and capacity factor
 //     from 13-capstone.json         the battery's cost per kW and per kWh (2025 dollars) and its fixed upkeep share
@@ -22,7 +22,7 @@
 //               margin, where wind MWh = MW × 8,760 × CF and the expected margin (after paying for charging and losses) of
 //               A2's lognormal is median × exp(σ²/2) (the battery's fair toll in A2)
 //   cash        CFADS = R − remaining operating costs (fixed upkeep: wind $/kW-yr × kW + battery share × battery cost)
-//   structure   project-level debt, paid before either equity investor (X5 review: one stated structure throughout)
+//   structure   project-level debt, paid before either equity investor (one stated structure throughout)
 //   payment     a level loan at rate r over n years: payment = loan × r ÷ (1 − (1 + r)^−n); no inflation, so the ATB's
 //               nominal 6.5% is used as the toy's rate on 2025-dollar cash (stated on the page)
 //   loan        the lender's largest loan: [s × CFADS ÷ DSCRc + (1 − s) × CFADS ÷ DSCRm] ÷ (payment per $ of loan), where
@@ -124,7 +124,7 @@
     return "<b>" + esc(l.label) + "</b><dl class=\"x5-dl\"><dt>Who</dt><dd>" + esc(l.who) + "</dd><dt>Gets</dt><dd>" + esc(l.gets) + "</dd><dt>Paid</dt><dd>" + esc(l.paid) + "</dd></dl>";
   }
   var LAYER_SAW = "Order of payment in this example: operating costs, then the loan, then tax equity, then the sponsor. A grant is never paid back.";
-  // where a typical year's cash comes from (X5 review: the battery's earnings are already net of its charging costs)
+  // where a typical year's cash comes from (the battery's earnings are already net of its charging costs)
   function ledgerRows(P) {
     return [["Wind sales", fmtN(P.windMWh) + " MWh × $" + fmtN(P.price) + "/MWh", P.windRev], ["Battery earnings after charging", fmtN(P.discharged) + " MWh discharged × $" + fmtN(P.margin, 2) + "/MWh margin", P.batRev],
             ["Remaining operating costs", "fixed upkeep of the wind farm and the battery", -P.opex], ["Cash available for debt service", "what is left to pay the loan", P.cf]];
@@ -167,9 +167,9 @@
   function esc(t) { return String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
   var SHARES = [1, 0.5, 0];
   var ORDER = ["sponsor", "te", "debt", "grant"];   // the stack's layers, top to bottom on screen
-  // X5 review: every layer keeps a minimum height so its label fits, so a scaled stack is not exactly to scale
+  // every layer keeps a minimum height so its label fits, so a scaled stack is not exactly to scale
   var SCALED_CAP = "Heights approximate (each layer keeps a minimum height); read the percentages for exact shares.";
-  // the explain layer's opening line: the reader's own settings (X5 review: refreshed whenever they change)
+  // the explain layer's opening line: the reader's own settings (refreshed whenever they change)
   function explainLede(st) { return pct(st.s) + " sold under contract, " + pct(st.te) + " tax equity, a " + pct(st.g) + " grant; 2025 dollars, illustrative."; }
   function staticFallback(P, L, X) {
     return "<p class=\"lx-eyebrow\">One wind and storage project, one typical year, 2025 dollars (illustrative)</p>" +
@@ -200,7 +200,7 @@
       "<div class=\"lx-qq\" data-id=\"dscr\" data-answer=\"b\"><p class=\"lx-qtext\">A project's cash available for debt service is " + M(P.cf) + " a year and its loan payment is " + M(pay) + ". What is its debt-service coverage ratio?</p><ul class=\"lx-choices\"><li data-value=\"a\">About " + x2(pay / P.cf) + "</li><li data-value=\"b\">About " + x2(d) + "</li><li data-value=\"c\">About " + x2(d + 1) + "</li></ul><details class=\"lx-answer\"><summary>Answer</summary><p>" + M(P.cf) + " ÷ " + M(pay) + " = " + x2(d) + ": the cash covers the payment " + x2(d) + " times. The ratio is cash over payment, not payment over cash (" + x2(pay / P.cf) + ").</p></details></div>" +
       "</div>";
   }
-  // the Go deeper box (X5 review: D1, so the coverage rule in words with one symbolic line, the payment, and a link to A1
+  // the Go deeper box (D1, so the coverage rule in words with one symbolic line, the payment, and a link to A1
   // for how a rate and a term turn a payment into a loan); every shown number follows from the ones shown before it
   function sizing(P, L) {
     var cfM = Math.round(P.cf / 1e3) / 1e3, payC = Math.round(cfM / L.dscrContract * 1e3) / 1e3, payM = Math.round(cfM / L.dscrMerchant * 1e3) / 1e3;
@@ -224,7 +224,7 @@
   // the project's own inputs, each from the data file that holds it
   var BORROWED = [["07_cost", "eia-aeo2026-emm", "wind farm: building cost and fixed upkeep (lesson 7)"], ["07_cost", "eia-epa-cf", "wind farm: capacity factor (lesson 7)"], ["13_capstone", "nrel-battery-2025", "battery: building cost and upkeep (lesson 13)"], ["13_capstone", "bea-nipa-119", "battery: 2024 to 2025 dollars (lesson 13)"]];
   function cap(t) { return t.charAt(0).toUpperCase() + t.slice(1); }
-  // a source: its citation, link and date, then the short claims it supports, one per line (X5 review: citation
+  // a source: its citation, link and date, then the short claims it supports, one per line (citation
   // metadata apart from the teaching claims)
   function srcLi(s) { return "<li>" + esc(s.cite) + (s.url ? ". <a href=\"" + esc(s.url) + "\">Link</a>" : "") + (s.asOf ? ". " + esc(cap(s.asOf)) : "") + ".<ul class=\"x5-used\">" + s.used.map(function (u) { return "<li>" + esc(u) + "</li>"; }).join("") + "</ul></li>"; }
   function sourcesHTML(I) {
@@ -369,7 +369,7 @@
     // ---------------------------------------------------------------- the explain layer (the reader's last stack)
     var xhost = document.getElementById("x05-explain"), xTimer = null;
     // the explain layer follows the reader's settings: rebuilt (debounced) whenever step 4 or 5 changes them, so a reader
-    // who jumps to Explain never sees an older stack (X5 review)
+    // who jumps to Explain never sees an older stack
     function refreshExplain() { if (!xhost) return; clearTimeout(xTimer); xTimer = setTimeout(buildExplain, 120); }
     function buildExplain() {
       if (!xhost) return;

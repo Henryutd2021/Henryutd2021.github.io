@@ -1,14 +1,13 @@
 /* planengine.css — the page kit of the planning engine (planengine.js, LX.townPlan.ui) shared by lessons 12 and 13:
    the stage and cards, the plan and comparison tables (TextTable: cards on phones), the scenario box, the week tabs, the
-   hourly table and the verdict list. Moved verbatim from the style block 13-capstone.js used to inject (W2 infra,
-   2026-11-03); the lx13- prefix stays because both lessons use these classes. Colours from --lx-* tokens only. */
+   hourly table and the verdict list. The lx13- prefix stays because both lessons use these classes. Colours from --lx-* tokens only. */
 .lx13-stage{display:grid;gap:14px;min-width:0}
 .lx13-card{background:var(--lx-surface);border:1px solid var(--lx-line);border-radius:var(--lx-r-lg);padding:14px 16px;display:grid;gap:10px;min-width:0}
 .page-learn .lx13-card h3{font-size:17px}
 .lx13-head{display:flex;justify-content:space-between;align-items:center;gap:6px 12px;flex-wrap:wrap}
 .lx13-sub{font-size:13.5px;color:var(--lx-ink-3)}
-/* nothing in a card may widen it: wide tables scroll in their own box (.lx13-hours, lesson 12's .lx12-scroll; W2 integration: at 375 px
-   an open text version pushed lesson 13's page 344 px wide, lesson 12's 117 px) */
+/* nothing in a card may widen it: wide tables scroll in their own box (.lx13-hours, lesson 12's .lx12-scroll; without
+   it, at 375 px an open text version pushed lesson 13's page 344 px wide, lesson 12's 117 px) */
 .lx13-card>*,.lx13-chart>.lx-textalt{min-width:0;max-width:100%}
 .lx13-chart svg{display:block;width:100%;height:auto}
 .lx13-chart text{font-family:var(--lx-f-mono);font-size:12px;fill:var(--lx-ink-3)}

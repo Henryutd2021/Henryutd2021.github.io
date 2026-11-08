@@ -1,4 +1,4 @@
-// ck-f-estimate.js — CK-F, the Foundations checkpoint (curriculum v2 §3.3; wave W1, 2026-11-02).
+// ck-f-estimate.js — CK-F, the Foundations checkpoint (the Foundations tier's end-of-tier task).
 //
 // Nine tasks on unfamiliar situations across T0-T6 and N1 (assets/learn/data/ck-f-estimate.json): one open explanation,
 // seven auto-marked items (choices, an ordering, a number with units) and the main estimate (a town's school buses go
@@ -9,7 +9,7 @@
 // clock, first-try recording, the rubric self-rating, the results view and the copyable summary. This file holds CK-F's
 // configuration, its two chart tasks, the worked solution's numbers and the mount.
 //
-// Measured for the W1 validation (curriculum §18.3), in this browser only (LX.store, key "ckf-v1", unchanged since the
+// Measured in this browser only (LX.store, key "ckf-v1", unchanged since the
 // first testers): active time per task (the clock runs only while the task is on screen and the tab is visible), time to
 // the first answer, whether the first answer was right, the number of tries, and whether the solution was opened before
 // answering. "Copy my results" puts a plain-text summary on the clipboard for the tester to paste into a form; nothing is

@@ -1,5 +1,5 @@
 /* scatter.js — LX.Scatter: a dot chart of two measures, one labelled dot per item, every dot a button, with an optional
-   dashed y = x line and a text version. Promoted in the W1 integration (2026-11-02) from lesson 6 (06-three-jobs.js:
+   dashed y = x line and a text version. First used by lesson 6 (06-three-jobs.js:
    capacity factor across, firm share up).
 
    var sc = LX.Scatter(host, {

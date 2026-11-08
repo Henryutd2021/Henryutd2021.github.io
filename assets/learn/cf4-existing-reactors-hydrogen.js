@@ -1,6 +1,6 @@
-// cf4-existing-reactors-hydrogen.js — Case file CF4 (case form, wave W6, 2026-11-07; live since Henry approved E15 on
-// 2026-11-07, reports/learn/excerpts_for_approval.md, "W6 sources"). Existing plants only. Depth D2 (working knowledge),
-// closed-form toy; the Go deeper box gives its arithmetic, nothing more.
+// cf4-existing-reactors-hydrogen.js — Case file CF4 (case form; its research wording is the approved excerpt E15).
+// Existing plants only. Depth D2 (working knowledge), closed-form toy; the Go deeper box gives its arithmetic, nothing
+// more.
 //
 // Data: assets/learn/data/cf4-existing-reactors-hydrogen.json: the study in time (LX.Timeline: E15.26 and E15.27), where
 // the study's result holds (LX.Boundary: E15.25 split at its clauses, word for word, with E15.30 as its source line), the
@@ -14,7 +14,7 @@
 //   g_t  MW sold to the grid at the hour's price p_t (the reader's price level times the day's shape), dollars per MWh
 //   h_t  MW of electricity sent to an electrolyzer of size E, which makes k kg of hydrogen per MWh, sold at one fixed
 //        assumed price pi_H per kg, so a MWh as hydrogen earns v = k pi_H (electricity only: the steam a
-//        high-temperature electrolyzer also takes is left out, so every MW in the toy is electrical; review #2)
+//        high-temperature electrolyzer also takes is left out, so every MW in the toy is electrical)
 //   r_t  MW held as up-reserve, paid q per MW-hour (simplified: one product, never called); turning the
 //        electrolyzer down sends its power to the grid, so r_t <= h_t; a plant at full power has no other headroom
 //   bounds: g_t + h_t = P, 0 <= h_t <= E, 0 <= r_t <= h_t (so g_t >= P - E >= 0; E is at most P)
@@ -77,7 +77,7 @@
     if (Math.round(x.p * 100) === Math.round(x.value * 100)) return head + ": the same, so the toy sells all " + mw(I.plantMW) + ".";
     return head + ", less than the grid pays, so all " + mw(I.plantMW) + " are sold.";
   }
-  // the picked hour's three sums, with the hour that turns MW into MWh (review #6)
+  // the picked hour's three sums, with the hour that turns MW into MWh
   function sceneLines(I, d, t) {
     var x = d.hours[t];
     return {
@@ -86,7 +86,7 @@
       res: !d.s.reserves ? "not offered" : x.r ? mw(x.r) + " × 1 h × " + per(d.q) + " per MW-hour = " + money(x.reserve) : "none: the electrolyzer is off"
     };
   }
-  // where to start every practice question (review #5): the defaults, as the Reset button restores them
+  // where to start every practice question: the defaults, as the Reset button restores them
   function startLine(I) {
     var s = I.start;
     return "Start each one from the defaults: press Reset (price level ×" + s.level.toFixed(1) + ", reserve price " + per(s.reserve) + " per MW-hour, electrolyzer " + mw(s.elz) + ", reserves " + (s.reserves ? "offered" : "off") + ").";
@@ -145,7 +145,7 @@
       "<details class=\"lx-textalt\"><summary>The toy's assumptions</summary><ul>" + assumptions(I).map(function (t) { return "<li>" + rich(t) + "</li>"; }).join("") + "</ul></details>";
   }
   // worked answers to "Try it yourself", from the model (shown with and without JavaScript): one row per setting, each
-  // from the defaults (review #5), as setting / result / why (review #4); the arithmetic as displayed
+  // from the defaults, as setting / result / why; the arithmetic as displayed
   function runs(d) { return d.s.elz ? "runs in " + (d.runHours === 24 ? "all 24 hours" : d.runHours + " of 24 hours") : "none built"; }
   function hourRow(I, d, t) {
     var x = d.hours[t], earn = "the " + per(x.value) + " a MWh earns " + valueWords(d);

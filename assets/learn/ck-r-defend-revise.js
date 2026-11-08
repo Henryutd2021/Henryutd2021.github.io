@@ -1,4 +1,4 @@
-// ck-r-defend-revise.js — CK-R, the Researcher checkpoint (curriculum v2 §3.3; wave W7, builder learn-w7-b, 2026-11-07).
+// ck-r-defend-revise.js — CK-R, the Researcher checkpoint (the Researcher tier's end-of-tier task).
 //
 // About 240 minutes. The reader defends their research capstone's (CR) question and method in a written mock review,
 // answers the critique, revises, and reruns the main result from a clean clone. Because the reader's own study cannot be
@@ -228,7 +228,7 @@
     LX.demo(root, function (state) {
       if (state === "mid") { cp.show(1); return { view: "task 2 (shut until task 1 is submitted)" }; }
       if (state === "done") { cp.results(); return { view: "results" }; }
-      // the solution state opens it as the lock's button does, recorded (practice), never silently (CK-A review #1)
+      // the solution state opens it as the lock's button does, recorded (practice), never silently (as CK-A)
       if (state === "solution") { cp.solutionNow(); var s = document.getElementById("solution"); if (s) s.scrollIntoView(); return { view: "solution" }; }
       return null;
     });

@@ -1,5 +1,5 @@
 // x01-under-the-hood.js — Side topic X1, "What engineering lies beneath the system?" (step cards, Foundations, side
-// line, D1, no model; wave W7, builder learn-w7-a, 2026-11-07). Guard G-NUC: the reactor core card is physics,
+// line, D1, no model). Nuclear scope: the reactor core card is physics,
 // thermal hydraulics and materials only.
 //
 // Data (read through data-src, never retyped):
@@ -27,7 +27,7 @@
   function plant(F4, key) { return F4.plants.filter(function (p) { return p.key === key; })[0]; }
   // the numbers this course already borrows, by component, each read from the lesson that teaches it; each carries the kind
   // of number it is (kind: null for the inverter's "DC to AC", which says what the device does) and a short label, so the
-  // kinds step shows only the values of the kind picked and the no-JS block names every value (X1 review, 2026-11-07)
+  // kinds step shows only the values of the kind picked and the no-JS block names every value
   function numbers(I) {
     var btu = I.F5.facts.btu_per_kwh.value, cc = plant(I.F4, "cc"), hrN = I.F5.facts.heat_rate_btu_kwh, b = I.C13.techs.battery, E = I.A16.electrolyzer;
     var effCC = btu / cc.heatRate, effN = btu / hrN.value, bat = { label: I.C13.sources["nrel-battery-2025"].text.split(" (")[0], url: I.C13.sources["nrel-battery-2025"].url, asof: I.C13.sources["nrel-battery-2025"].asOf };
@@ -75,7 +75,7 @@
     var k = kind(X, kid), names = withKind(X, kid).map(function (id) { return comp(X, id).label.toLowerCase(); });
     return "**" + k.label + "**: " + k.text + " Supplied here by: " + names.join(", ") + ".";
   }
-  // the sort is checked only with every card placed (X1 review: an empty check no longer unlocks Next)
+  // the sort is checked only with every card placed (an empty check no longer unlocks Next)
   function sortNote(g) { return g.placed < g.total ? "Place every card first: " + (g.total - g.placed) + " still in the pool." : g.right + " of " + g.total + " match."; }
   var BOARD_SAW = "Each discipline answers its own questions; a system model keeps only the numbers it needs from each answer.";
   var SORT_SAW = "Borrowed: heat rate, round trip, power curve, kWh per kilogram. Kept: flame shape, electrode coating, fiber layup, catalyst. Each kept design shows up in the model only through a borrowed number.";

@@ -1,5 +1,5 @@
 // x03-transitions-history.js — Lesson X3, "How fast have energy transitions happened before?" (side-topic shelf, step
-// cards, Foundations, D1, no model; wave W6, builder learn-w6-x, 2026-11-07).
+// cards, Foundations, D1, no model).
 //
 // Data: data/x03-transitions-history.json (U.S. adoption curves as shares over time, each point transcribed from a dated
 // primary source: the Census Bureau's Historical Statistics and housing tables, EIA's Electric Power Annual; the
@@ -13,7 +13,7 @@
 //   passes       the first published year in which one curve is at or above another, and the year before it
 //   mostCommon   the main heating fuel with the largest share in a census year, gas and coal from the curves, the
 //                other fuels from the same national rows (heatOthers)
-// Diffusion only (curriculum §4.4): no cost curve of any technology, no forecast of future speed.
+// Diffusion only: no cost curve of any technology, no forecast of future speed.
 // Every number on the page comes from the data file; _tests/learn/test_x03-transitions-history.js checks them.
 //
 // Shared components: LX.StepCards, LX.Guess, LX.Plot, LX.Toggle, LX.CardSort, LX.Timeline, LX.Steelman,

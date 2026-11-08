@@ -1,12 +1,12 @@
 /* scenario.js — LX.m08: a two-stage decision under scenarios, on M8's toy (one electrolyzer sized before anyone knows
    how much planned wind gets built): the branches and their chances, the closed form of each branch's cost, the
    extensive-form LP and its readout, the wait-and-see, expected-value, worst-case and least-regret variants, and the
-   formats. Promoted at the W4 integration (2026-11-05) from Modeler lesson M8 (assets/learn/m08-stochastic-robust.js),
-   whose code it is, unchanged; case file CF3 prices a reader's size in each build-out with the closed form. Pure: no
+   formats. Shared by Modeler lesson M8 (whose page script is assets/learn/m08-stochastic-robust.js) and case file CF3,
+   which prices a reader's size in each build-out with the closed form. Pure: no
    DOM; the page passes in its data (assets/learn/data/m08-stochastic-robust.json) and solves the LPs with LX.solver.
    Each page keeps its own text (M8: lockWords, staticHTML). Node: require("assets/learn/components/scenario.js");
    tests: _tests/learn/test_m08-stochastic-robust.js, test_cf3-hydrogen-under-uncertainty.js (every number),
-   test_components_w4_int.js (the promotion).
+   test_components_w4_int.js (the shared component in the bundle).
 
    Data: assets/learn/data/m08-stochastic-robust.json (the windy zone, the three build-outs, the five wind blocks, the
    electrolyzer and the hydrogen, and a reference block written by the test).
@@ -28,7 +28,7 @@
      cost_s(x) = c x + 1.50 (54,000 x 8,760 - 18 sum_b h_b min(x, sigma_{s,b}))
    piecewise linear in x; an extra MW pays while it runs more than c / (1.50 x 18) = 2,963 hours a year (the critical
    hours; on average over the branches for the stochastic plan).
-   Ties (W2 review finding 2): every size the page reports is the only best size. Given a size, each branch's operation is
+   Ties: every size the page reports is the only best size. Given a size, each branch's operation is
    unique (every MWh of surplus used saves $27), so every cost shown is unique. The robust LPs fix only the size; each
    plan's branch costs come from re-solving with the size fixed. _tests/learn/test_m08-stochastic-robust.js proves each
    size unique (every cost here is convex and piecewise linear in the size, and its slope is negative just below each

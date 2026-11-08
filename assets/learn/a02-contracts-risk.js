@@ -1,5 +1,5 @@
 // a02-contracts-risk.js — Analyst lesson A2, "Who carries the risk? Power purchase agreements and risk allocation"
-// (step cards, simulation mode, Learn W3, 2026-11-03).
+// (step cards, simulation mode).
 //
 // Data (read through data-src):
 //   assets/learn/data/07-cost.json            the solar farm's capacity factor (24.0%, EIA, U.S. utility-scale solar PV, 2025), as in

@@ -1,4 +1,4 @@
-// 07-cost.js — Lesson 7, "What does electricity cost to make?" (step cards, Analyst tier; W1, 2026-11-02).
+// 07-cost.js — Lesson 7, "What does electricity cost to make?" (step cards, Analyst tier).
 //
 // Data: assets/learn/data/07-cost.json (the calculator's inputs with sources and dates: EIA AEO2026 cost assumptions in 2025
 // dollars, EIA's 2025 capacity factors and gas cost, the 2025 ATB's financial assumptions), assets/learn/data/town.json

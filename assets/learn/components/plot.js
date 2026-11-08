@@ -1,6 +1,6 @@
 /* plot.js — LX.Plot: one XY chart (SVG) for every Learn lesson, and LX.PlotCard: a chart card with value chips above it.
-   Promoted in the W1 integration (2026-11-02) from the lesson-local plot() of 03-balancing.js and 04-forecasts.js, the
-   LineChart of 02-demand.js and the light chart of b02-python-data.js. LX.PriceChart (pricechart.js) is built on it.
+   It replaced the lesson-local plot() of 03-balancing.js and 04-forecasts.js, the LineChart of 02-demand.js and the
+   light chart of b02-python-data.js. LX.PriceChart (pricechart.js) is built on it.
 
    var P = LX.Plot(host, { caption: true, text: "Text version of the chart", legend: true, box: true, cls: "" });
      caption  true: a caption line above the chart (set by spec.caption; [[glossary|marks]] allowed); implies box

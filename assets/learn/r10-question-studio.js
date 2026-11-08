@@ -1,5 +1,5 @@
-/* r10-question-studio.js — research studio R10, "What could you study? The question studio" (curriculum v2 §11.3; W2,
-   2026-11-03). Data: assets/learn/data/r10-question-studio.json (the pickers exactly as §11.3 lists them, draft templates
+/* r10-question-studio.js — research studio R10, "What could you study? The question studio".
+   Data: assets/learn/data/r10-question-studio.json (the pickers exactly as the course plan lists them, draft templates
    for the five question types, the realism checks, search terms, the OpenAlex crowding counts, seven example cards, the
    exemplars and the checklist) and data/path.json (to link live lessons and name the rest as upcoming).
    Page: learn/r10-question-studio.qmd (studio form: Task, Exemplars, Self-check, Sources).
@@ -12,7 +12,7 @@
    Example cards: loading one starts a fresh card with that example's own picks and card fields (an element, stakeholder
    or dimension outside the pickers comes as an example "extra" with its own search terms); realism answers and papers
    start empty, and the previous work is kept, to restore with one button.
-   Rules (§11.3, §20): the studio makes no originality judgement (no combination is called new, hot or a gap; counts are
+   Rules: the studio makes no originality judgement (no combination is called new, hot or a gap; counts are
    context only); the pickers' lists contain no excluded topic, so no spin or draft can produce one, and data centers
    appear only as a load ("data-center loads" in every draft); a learner may still type any question. The audience is
    filled in only for a prescriptive draft, which names the stakeholder as the one who acts; for the other types the
@@ -47,7 +47,7 @@
     var c = clean(D, p);
     return KEYS.filter(function (k) { return slot(D, c, k); }).map(function (k) { var x = slot(D, c, k); return k === "scale" && c[k] ? x.id : x.label; }).join(" · ");
   }
-  // the draft question for a type: the §11.2 template filled with the picks; "[…]" marks what only the learner can supply
+  // the draft question for a type: the question type's template filled with the picks; "[…]" marks what only the learner can supply
   function draft(D, p, type) {
     var t = D.drafts[type]; if (!t) return "";
     var c = clean(D, p), S = slot(D, c, "scale"), M = slot(D, c, "dimension"), E = slot(D, c, "element"),

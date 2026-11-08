@@ -1,4 +1,4 @@
-// sb4-pathway-explorer.js — SB4, "Pathway Explorer" (sandbox, wave W6, 2026-11-07), on engine E4 (assets/learn/components/
+// sb4-pathway-explorer.js — SB4, "Pathway Explorer" (sandbox), on engine E4 (assets/learn/components/
 // engine-e4.js, LX.E4, in the bundle; data assets/learn/data/prairieland.json, e4-pathways.json and the precomputed library
 // e4-library.json).
 //
@@ -96,7 +96,7 @@
       bud: function () { return B.presets.map(function (x) { return x.label + ": " + kilo(x.mt) + " Mt"; }).join(" · ") + " (arithmetic on 2025, not a fair share)."; },
       cap: function () { return "2025: " + pct(P.imports.dependence.share) + " of primary energy was imported."; }
     };
-    // the limits group carries the budget gap with A20; the shock group its table of numbers (SB4 review)
+    // the limits group carries the budget gap with A20; the shock group its table of numbers
     var groups = page.GROUPS.map(function (g) {
       var o = {}; for (var k in g) o[k] = g[k];
       if (g.gap) o.extra = function (fs) { E4.GAP.slice(0, 2).forEach(function (t) { H("p", { class: "lx-hint e4-ghint", html: LX.rich(t) }, fs); }); };

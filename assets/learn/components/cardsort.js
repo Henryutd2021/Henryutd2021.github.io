@@ -1,5 +1,5 @@
-/* cardsort.js — LX.CardSort: sort cards into bins and check the sort, with a one-line reason for each card (W1 integration,
-   2026-11-02). Two modes of one component:
+/* cardsort.js — LX.CardSort: sort cards into bins and check the sort, with a one-line reason for each card. Two modes
+   of one component:
 
    "cards" (default; lesson 10's i-formulation): tap a card, then tap a bin; tap a placed card to move it. Check marks each
    placed card right or not and gives the reasons of up to three wrong ones.

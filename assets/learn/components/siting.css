@@ -1,8 +1,7 @@
-/* siting.css — the siting map's styles (LX.SiteMap, siting.js), moved from A19's page at the W5 integration (2026-11-06),
-   unchanged: cells by land class and layer, hatched exclusions by kind, features (river, roads, lines, substations,
+/* siting.css — the siting map's styles (LX.SiteMap, siting.js; A19 and C3): cells by land class and layer, hatched exclusions by kind, features (river, roads, lines, substations,
    homes), site blocks and their letters, the least-cost route, the keyboard cursor, the legend's keys and ramps, and the
-   line under the map. Classes keep A19's a19- prefix (the map draws them; tests and the layout audit find them).
-   W5 fix (2026-11-06): the substations table (a19-gbox), the grid layer's text version. */
+   line under the map, the substations table (a19-gbox) and the grid layer's text version. Classes keep A19's a19-
+   prefix (the map draws them; tests and the layout audit find them). */
 .a19-map { display: grid; gap: 6px; min-width: 0; max-width: 640px; }
 .a19-fig { position: relative; border: 1px solid var(--lx-line); border-radius: 10px; overflow: hidden; background: var(--lx-surface); line-height: 0; }
 .a19-fig:focus-visible { outline: 3px solid var(--lx-accent); outline-offset: 2px; }

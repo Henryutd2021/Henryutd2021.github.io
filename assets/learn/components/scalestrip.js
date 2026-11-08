@@ -1,5 +1,5 @@
-/* scalestrip.js — LX.ScaleStrip: the five scales of curriculum v2 §5.3 (S0 device and plant ... S4 nation) side by side
-   (e-scale-strip; W2, promoted from F1's explain layer and R3's self-check). One card per scale, its top edge in the
+/* scalestrip.js — LX.ScaleStrip: the course's five scales (S0 device and plant ... S4 nation) side by side
+   (e-scale-strip; used by F1's explain layer and R3's self-check). One card per scale, its top edge in the
    scale's colour (--lx-scale-0 ... 4, day and night, in scalestrip.css), with the parts a lesson asks for.
    var ss = LX.ScaleStrip(host, {
      title: "Five scales at a glance", lede: "One sentence.",   an h3 in .lx-x-head and a lede (both optional)

@@ -1,5 +1,5 @@
 // a10-emissions-questions.js — Analyst lesson A10, "Which emissions question are you asking? Inventories, consequences
-// and procurement claims" (step cards, closed form), wave W4, builder learn-w4-c, 2026-11-05.
+// and procurement claims" (step cards, closed form).
 //
 // Data: assets/learn/data/a10-emissions-questions.json (the Plains Grid's fleet, also read by A12 and M6; the day, the two
 // loads, the long-run and procurement options, the card sort, numbers to remember), town_year.json (SPP 2025 hourly

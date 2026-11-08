@@ -1,5 +1,5 @@
-/* profiles.js — wind and solar output for a plant of a given size, with a realistic annual capacity factor (data
-   convention for wave W1, 2026-11-02).
+/* profiles.js — wind and solar output for a plant of a given size, with a realistic annual capacity factor (the
+   course's data convention).
    The wind and solar shapes in assets/learn/data/town_days.json and town_year.json are each normalised to their own 2025
    maximum hour (integers in thousandths). Their mean/max (wind 0.53, solar 0.24 for SPP in 2025) is therefore NOT a
    capacity factor. To turn a shape into a plant's output, scale it so that its annual capacity factor equals a sourced

@@ -1,6 +1,6 @@
 /* engine-e1.css — the view pieces of engine E1 (LX.E1.Line, LX.E1.Bench, LX.E1.Results, LX.E1.HourChart): the campus
    one-line diagram, the bench's small controls, the cost and outage tables. Colours from --lx-* tokens only; no
-   overflow clipping (chart tips stay visible; a wide table scrolls in its own .lx-scroll-x). W3, 2026-11-03. */
+   overflow clipping (chart tips stay visible; a wide table scrolls in its own .lx-scroll-x). */
 
 /* ---------- the one-line diagram */
 .e1-line { display: grid; gap: 0; min-width: 0; font-size: 14.5px; }
@@ -55,7 +55,7 @@
 
 /* ---------- results */
 .e1-sized { margin: 0; padding: 8px 12px; border-radius: 10px; background: var(--lx-surface-2); font-size: 14.5px; }
-/* a plan that leaves load unserved in a normal year (W3 review SB1 1): said above the results, in the bad tone */
+/* a plan that leaves load unserved in a normal year: said above the results, in the bad tone */
 .e1-short { margin: 0; padding: 8px 12px; border-radius: 10px; background: var(--lx-bad-soft); border-left: 4px solid var(--lx-bad); font-size: 14.5px; color: var(--lx-ink); }
 .e1-short b { color: var(--lx-bad); }
 /* the cost's boundary and the outage weights: one short idea a line */

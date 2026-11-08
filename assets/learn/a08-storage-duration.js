@@ -1,12 +1,12 @@
 // a08-storage-duration.js — Analyst lesson A8, "How long should storage last? From batteries to seasonal stores"
-// (step cards with a linear program), wave W3, 2026-11-03.
+// (step cards with a linear program).
 //
 // Data: assets/learn/data/a08-storage-duration.json (the Plains Grid fleet, the week, four stores with their sources, the
 // duration ladder, 2021 installed costs from DOE's 2022 storage assessment, numbers to remember, and a reference block
 // written by the test), town_year.json (SPP 2025 hourly shapes, EIA-930) and cf_targets.json (EIA capacity factors).
 //
-// The engine (pure, no DOM; exported for Node): inputs -> LP -> results. It stays lesson-local (W3 integration,
-// 2026-11-03): engine E0 (components/engine-e0.js, SB0 and C0) models one site's bill or revenue, with storage cyclic in
+// The engine (pure, no DOM; exported for Node): inputs -> LP -> results. It stays lesson-local:
+// engine E0 (components/engine-e0.js, SB0 and C0) models one site's bill or revenue, with storage cyclic in
 // each period, one 85% round trip and no unserved energy, so it cannot state this week LP (least unserved energy on the
 // Plains Grid with firm output, four stores each with its own round trip and standing loss, the store full at the start,
 // this tie rule) without a second model inside E0; moving A8 would change the engine, not reuse it.
@@ -88,7 +88,7 @@
   // $ per MWh delivered: yearly capital (capital recovery x installed cost in $/kW x 1,000 kW per MW) over the MWh delivered
   // a year (cycles x duration in hours, per MW), plus the energy bought to charge (price / round trip). Cycles above the
   // store's limit are capped (capped: true). The costed store is DOE's cost case (it.hours), which for hydrogen is 24 hours,
-  // not the week-long store of the LP: the explain layer shows the two in separate tables (A8 review, finding 1).
+  // not the week-long store of the LP: the explain layer shows the two in separate tables.
   function perMWh(it, cycles, price, rate, perDay) {
     var n = Math.min(cycles, maxCycles(it, perDay)), yearly = crf(rate, it.life) * it.perKW * 1000, mwh = n * it.hours;
     return { cycles: n, capped: n < cycles, capital: yearly / mwh, charging: price / it.eta, total: yearly / mwh + price / it.eta, yearly: yearly };
@@ -100,7 +100,7 @@
     usd: function (v) { return "$" + Math.round(v).toLocaleString("en-US"); },
     hm: function (t) { return (t % DAY < 10 ? "0" : "") + (t % DAY) + ":00"; }
   };
-  // the cost table of the explain layer: DOE's cost cases, each named with its own size (A8 review, finding 1)
+  // the cost table of the explain layer: DOE's cost cases, each named with its own size
   function costRows(D) {
     var R = D.reference, C = D.costs;
     return C.items.map(function (it) {
@@ -165,7 +165,7 @@
         var o = r.ok ? read(W, s, r) : { ok: false, status: r.status, message: r.message, r: r }; o.r = r; o.store = s; res[key] = o; return o;
       });
     }
-    // solves that fail (W2 review): a message, "Try again", the busy state cleared, results kept (LX.SolveStep,
+    // solves that fail: a message, "Try again", the busy state cleared, results kept (LX.SolveStep,
     // components/solvestep.js; the note keeps the class a8-fail)
     function action(o) { o.cls = "a8-fail"; return LX.SolveStep.action(o); }
     function weekPlot(host, sol, label) {
@@ -179,7 +179,7 @@
       return P;
     }
     // the week's text version: every hour (CST, the hour that starts then), the plotted series and, with a store, its
-    // output (+) or charging (−) and the demand left unserved, all in MW (= MWh over the hour) (A8 review, finding 8)
+    // output (+) or charging (−) and the demand left unserved, all in MW (= MWh over the hour)
     function weekText(sol) {
       var n = function (v) { return Math.round(v).toLocaleString("en-US"); }, head = ["Hour starting", "Demand", "Wind + sun + firm", "Short without storage"];
       if (sol) head = head.concat([sol.store.short + " out (+) or in (−)", "Unserved with it"]);
@@ -254,7 +254,7 @@
       { text: function () { return "The hydrogen store holds " + fm.mwh(store(D, "hydrogen").E) + ", far more than the week's shortfall. Why does some remain? Change its power and solve again."; },
         build: function (act, api) {
           // the power solved travels with its result (sent); the slider is off while a solve runs, and a result for another
-          // power is marked stale (A8 review, finding 2)
+          // power is marked stale
           var st = LX.SolverStatus(act), out = H("div", { class: "a8-kpis", "aria-live": "polite" }, act), P = 1000, sent = null, shownP = null, run, sl;
           var go = H("button", { type: "button", class: "lx-btn small", html: LX.icon("play") + "Solve" }, H("div", { class: "a8-row" }, act));
           sl = LX.Slider(act, { label: "Hydrogen store's power (fuel cell)", min: 500, max: 2000, step: 100, value: P, fmt: function (v) { return v.toLocaleString("en-US") + " MW"; }, onChange: function (v) { P = v; stale(); } });
@@ -337,7 +337,7 @@
 
   // ---------------------------------------------------------------- explain layer: two comparison tables, causal chain
   // The week (the LP's stores) and the costs (DOE's cost cases) are separate tables, each naming its own store sizes: the
-  // hydrogen store of the week holds 168 hours, DOE's hydrogen cost case 24 hours (A8 review, finding 1).
+  // hydrogen store of the week holds 168 hours, DOE's hydrogen cost case 24 hours.
   function explain(W, D) {
     var x = document.getElementById("a8-explain"); if (!x) return;
     x.innerHTML = ""; x.classList.add("is-live");

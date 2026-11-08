@@ -1,4 +1,4 @@
-// 11-solver.js — Lesson 11, "Ask the solver, then check its answer" (model lab, Modeler tier; W1, 2026-11-02).
+// 11-solver.js — Lesson 11, "Ask the solver, then check its answer" (model lab, Modeler tier).
 //
 // Data: assets/learn/data/11-solver.json (slider ranges, the unserved penalty, lesson 0's cheapest-first totals and a
 // precomputed answer used only if the solver cannot load), town.json (Prairie Town's fleet; illustrative), town_year.json

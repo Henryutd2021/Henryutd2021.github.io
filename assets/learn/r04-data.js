@@ -1,4 +1,4 @@
-// r04-data.js — Research studio R4, "Data you can defend: sources, cleaning, licences and provenance" (W2, 2026-11-03).
+// r04-data.js — Research studio R4, "Data you can defend: sources, cleaning, licences and provenance".
 //
 // Data (real, Southwest Power Pool 2025, from EIA Form EIA-930; the same raw extract as lesson B2):
 //   assets/learn/data/b02-python-data.json  demand, wind and solar in MW from EIA's adjusted columns, before any cleaning;
@@ -10,8 +10,8 @@
 // about them: for each problem the reader picks an option, the page cleans the real year with that option, and four
 // reported numbers move (annual demand energy, the lowest hour of demand, the clock time of the peak hour, annual wind
 // energy). A sensitivity table then varies one choice at a time, the log writes itself from the choices, and the reader
-// finishes a data note. The rules are the course's own documented example (scripts/build_learn_town_data.py, which
-// builds Prairie Town's shapes): spikes under half the median, runs of 3 or more identical non-zero readings, gaps filled
+// finishes a data note. The rules are the course's own documented example (the data build step that
+// makes Prairie Town's shapes): spikes under half the median, runs of 3 or more identical non-zero readings, gaps filled
 // from the same hour on nearby valid days (7, then 21, then 45 days each side). The course's build fills demand from the
 // rescaled day-ahead forecast, which this raw file does not carry, so here every column uses the same-hour rule.
 //
@@ -23,7 +23,7 @@
 // LX.CompareTable, LX.Checklist, LX.Exemplars, LX.Rubric. Lesson-local: the decision buttons, the four-number readout,
 // the sensitivity table and the data-note form; CSS injected once with --lx-* tokens only.
 //
-// After the Codex review (W2 fix, 2026-11-03): flags are provisional (implausible, suspected), not proof; the same-hour
+// Flags are provisional (implausible, suspected), not proof; the same-hour
 // fill is the same UTC hour (rows 24 apart); a night check on solar runs after cleaning and its failures are logged as a
 // known limit; every log line carries its effect against the alternative; the spatial log records the coordinate systems
 // the reader chose as proposed, not as processing done; the starter notebook learn/notebooks/r04-data.ipynb repeats the

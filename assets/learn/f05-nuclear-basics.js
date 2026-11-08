@@ -1,10 +1,10 @@
-// f05-nuclear-basics.js — F5, "How does a nuclear reactor make electricity, and heat?" (step cards, W3, 2026-11-03).
+// f05-nuclear-basics.js — F5, "How does a nuclear reactor make electricity, and heat?" (step cards).
 //
 // Data: assets/learn/data/f05-nuclear-basics.json (the chain-reaction toy, Prairie Town's plant, the designs and heat
 // uses, every real number with its source and date), town.json (Prairie Town's 100 MW plant, illustrative),
 // cf_targets.json (the U.S. fleet's 2025 capacity factor, EIA, for the Modeler's note; read by the test, stated on the page).
 //
-// Physics and technology only (guards G-NUC, G-SRC): no costs, no deployment, no siting, no data centers.
+// Physics and technology only (the course's nuclear scope; no research excerpt): no costs, no deployment, no siting, no data centers.
 //
 // Closed-form model (pure, exported for Node):
 //   kOf(T, rods, mod)   the toy's multiplication factor: kFull(mod) x (1 - rodAbsorb x rods/100), where kFull rises in a
@@ -22,7 +22,7 @@
 //                       hottest designs run above part of the band) or "whole" (the hottest run above all of it).
 //                       Overlap is not capability: the chosen design and its heat exchangers decide.
 //   reached(D, key)     the heat uses whose band a design's outlet overlaps (or electricity), in data order
-// Lesson-local components (candidates for promotion if later lessons want them): FissionScene (tap to fire one
+// Lesson-local components (used by this page only): FissionScene (tap to fire one
 // neutron), ChainToy (rods and moderator sliders, a core picture and neutrons per generation, with a text version),
 // PlantDiagram (PWR or BWR, tappable parts with numbered markers and chips, an aria-live note), HeatLadder (designs on
 // a temperature axis against the heat-use bands, rows as buttons). Shared: LX.StepCards, LX.Slider, LX.Predict,

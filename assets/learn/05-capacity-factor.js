@@ -1,4 +1,4 @@
-// 05-capacity-factor.js — Lesson 5, "Capacity factor: why is 1 MW not always 1 MW?" (step cards, W1, 2026-11-02).
+// 05-capacity-factor.js — Lesson 5, "Capacity factor: why is 1 MW not always 1 MW?" (step cards).
 //
 // Data: assets/learn/data/town_year.json (every hour of 2025 on the Southwest Power Pool grid, EIA-930, as shapes),
 // assets/learn/data/cf_targets.json (shared: EIA Electric Power Monthly, Table 6.07.B, 2025 annual capacity factors) and
@@ -14,7 +14,7 @@
 // (it can; it rarely does). Each month is first brought to the U.S. monthly capacity factor (the helper's monthlyCF
 // option, EIA's 2025 monthly values in cf_targets.json), because the SPP shapes contain the fleets' growth during 2025
 // (solar's January maximum is 0.56 of its November maximum); then the annual capacity factor is set exactly. Night-time
-// solar telemetry is zero in town_year.json itself (scripts/build_learn_town_data.py). Nuclear has no shape: it runs at
+// solar telemetry is zero in town_year.json itself (as its data build step writes it). Nuclear has no shape: it runs at
 // full size except for one illustrative refuelling outage sized to the same target.
 //
 // Model (closed form):

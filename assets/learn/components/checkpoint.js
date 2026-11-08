@@ -1,7 +1,7 @@
-/* checkpoint.js — LX.Checkpoint: the checkpoint runner (curriculum v2 §3.3 and §18.3; promoted from CK-F, W1 2026-11-02;
-   CK-A, CK-M and CK-R reuse it). One task at a time; a clock that runs only while a task is on screen and the tab is
-   visible; first-try recording; five task kinds; a rubric self-rating read from the page's rubric table; a results view;
-   and a plain-text summary the tester copies into a form (nothing is sent anywhere).
+/* checkpoint.js — LX.Checkpoint: the runner of the tier checkpoints (CK-F, CK-A, CK-M and CK-R use it). One task at
+   a time; a clock that runs only while a task is on screen and the tab is visible; first-try recording; five task
+   kinds; a rubric self-rating read from the page's rubric table; a results view; and a plain-text summary the tester
+   copies into a form (nothing is sent anywhere).
    var cp = LX.Checkpoint(host, { data: D, key: "ckf-v1", code: "CK-F", lessonId: "ck-f-estimate",
      intro: ["Nine tasks, about 40 minutes: ...", "No hints. ...", "Your answers and times stay in this browser. ..."],
      rubric: "#ckf-rubric", lock: "#ckf-lock", solution: "#ckf-solution-body",
@@ -65,8 +65,8 @@
      gateAll     true: the page's worked solution (lock and solution above) opens only once every task is answered (a
                  first answer, or a written task submitted), in any order, never by one task; the lock's button and
                  solutionNow() still open it early, recorded on the attempt (state.solEarly, the ISO time); each task's
-                 own "Show the worked solution now" opens only that task's solution (W5 final integration, from CK-A's
-                 review: answering the submit task first used to open every answer)
+                 own "Show the worked solution now" opens only that task's solution (answering the submit task first
+                 never opens every answer)
      late        "practice": the shared late-answer rule. A task first answered after the page's worked solution opened
                  (its `at` later than LX.Checkpoint.solOpened(key)) counts as practice: an auto-marked task as not right, a
                  written task's points and the estimate's self-ratings not at all; the answer that opened it is not late
@@ -121,7 +121,7 @@
     return { right: rel <= a.tol, mwh: mwh, rel: rel,
       msg: rel <= a.tol ? "Right: about " + Math.round(a.mwh / 1000) + " GWh." : mwh > a.mwh * 2.5 ? "Too high. Did every hour count at full output?" : mwh < a.mwh / 2.5 ? "Too low. Check the hours in a year and the units." : "Close, but more than 10% off. Recheck the multiplication." };
   }
-  // a number with any unit (promoted from CK-M, W2): units [[name, factor to the answer's unit]] (null: a unit of the wrong
+  // a number with any unit (first used by CK-M): units [[name, factor to the answer's unit]] (null: a unit of the wrong
   // kind, unitNote[name] saying why; result kind: true); answer {value, tol (relative), show}
   function checkValue(t, value, unit) {
     var f = unitFactor(t, unit);

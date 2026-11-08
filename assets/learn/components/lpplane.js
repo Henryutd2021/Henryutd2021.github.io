@@ -1,6 +1,6 @@
 /* lpplane.js — LX.LPPlane: the plane of a two-variable linear program (each rule a line plus a side, the region of plans
    that pass every rule, the cost line, the best corners or tied edge, an unbounded arrow, a simplex walk and a plan dot),
-   and LX.lp2, the pure rule algebra behind it (W1 integration, 2026-11-02). Used by B1, K4, lesson 10 and lesson 11.
+   and LX.lp2, the pure rule algebra behind it. Used by B1, K4, lesson 10 and lesson 11.
 
    A rule is {a: [a1, a2], op: "<=" | ">=" | "=", b, id (or key)}: a1·x + a2·y (op) b. A view (the data box) is
    [x0, x1, y0, y1] or {x: [x0, x1], y: [y0, y1]}.

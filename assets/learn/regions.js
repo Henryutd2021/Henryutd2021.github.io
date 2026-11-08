@@ -1,5 +1,4 @@
-// regions.js — the twelve regional profile cards (learn/regions.qmd; curriculum v2 §15; wave W6, builder learn-w6-a,
-// 2026-11-07; review fixes learn-w6-fix-a, 2026-11-07). A reference page, not a lesson: the cards themselves are static
+// regions.js — the twelve regional profile cards (learn/regions.qmd). A reference page, not a lesson: the cards themselves are static
 // HTML written from data/regions.json by the test's --write mode (so every reader, with or without JavaScript, sees all of
 // them); this script adds a filter by each card's focus (an editorial choice, not a property of the region) and makes a
 // link to a card the filter hides show that card first. Every card has the same six parts: system structure,

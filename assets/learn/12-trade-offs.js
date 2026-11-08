@@ -1,4 +1,4 @@
-// 12-trade-offs.js — Lesson 12, "Cheap or clean? How do you weigh cost against emissions?" (step cards, W1).
+// 12-trade-offs.js — Lesson 12, "Cheap or clean? How do you weigh cost against emissions?" (step cards).
 //
 // Data: assets/learn/data/12-trade-offs.json (six hand-made plans for Prairie Town, each with its precomputed year) and
 // the shared planning engine of lessons 12 and 13: assets/learn/components/planengine.js (LX.townPlan, in learn.js) with

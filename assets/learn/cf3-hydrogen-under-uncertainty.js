@@ -1,20 +1,20 @@
 // cf3-hydrogen-under-uncertainty.js — Case file CF3, "Where should hydrogen go when nobody knows how much wind will be
-// built?" (case form, wave W4, builder learn-w4-d, 2026-11-05).
+// built?" (case form).
 //
 // Data: assets/learn/data/cf3-hydrogen-under-uncertainty.json (the study's dated steps for LX.Timeline, where the result
 // holds for LX.Boundary, the scale mark, the toy's labels), assets/learn/data/m08-stochastic-robust.json (the toy itself:
 // lesson M8's windy zone and its reference plans), data/f01-five-scales.json (the five scales, for LX.ScaleStrip) and
 // data/path.json. The research text in the data file and on the page is approved excerpt wording
-// (reports/learn/excerpts_for_approval.md, E10 and E11); this script adds none of its own.
+// (E10 and E11); this script adds none of its own.
 //
 // The idea (illustrative, M8's toy; not the study's inputs or results): one electrolyzer in a windy zone is sized before
 // anyone knows whether none, half or all of the planned wind gets built (chances 25%, 50%, 25%). The reader picks a size;
 // the page prices it in each build-out with M8's closed form (LX.m08: components/scenario.js in the learn.js bundle,
-// promoted from M8 at the W4 integration) and compares it with the three plans M8 solves: the plan for the average
+// shared with M8) and compares it with the three plans M8 solves: the plan for the average
 // build-out, the hedged plan (the two-stage stochastic program) and the worst-case plan, each defined in one line. One
 // worked line shows how the hedged plan's expected cost is made from its three branch costs (fixed to that plan: its
 // rounded terms add up to its rounded total, which is not so at every size), and the toy's assumptions and wind blocks
-// are listed with and without JavaScript (review CF3 #2 and #3). Every number is checked by
+// are listed with and without JavaScript. Every number is checked by
 // _tests/learn/test_cf3-hydrogen-under-uncertainty.js, for every size the slider allows.
 (function () {
   "use strict";

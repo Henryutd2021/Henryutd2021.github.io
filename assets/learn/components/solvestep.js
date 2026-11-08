@@ -1,5 +1,5 @@
-/* solvestep.js — LX.SolveStep: a step card's solver action and its failure note (promoted at the W3 integration,
-   2026-11-03, from M3, A8 and M4, which each had the same code; W2 review finding 3). A step that solves disables its
+/* solvestep.js — LX.SolveStep: a step card's solver action and its failure note (shared by M3, A8 and M4). A step
+   that solves disables its
    own button, shows LX.SolverStatus, holds the page's busy state (so "Next" waits), and on a failed solve, a time limit or
    a solver that would not load says so in plain words, clears the busy state and offers "Try again"; results already
    solved are kept, so a retry solves only what is missing.

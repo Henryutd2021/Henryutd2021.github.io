@@ -1,5 +1,5 @@
 /* stakeholders.css — LX.Stakeholders (the role table: cards of labelled lines on phones) and LX.StakeholderMap (rings of
-   groups as buttons), promoted from A22 and R9 at the W2 integration. Colours from --lx-* tokens only, day and night. */
+   groups as buttons), used by A22 and R9. Colours from --lx-* tokens only, day and night. */
 .lx-stake { width: 100%; border-collapse: collapse; font-size: 14px; }
 .lx-stake th, .lx-stake td { padding: 7px 8px; border-bottom: 1px solid var(--lx-line); text-align: left; vertical-align: top; font-weight: 400; }
 .lx-stake thead th { font-family: var(--lx-f-display); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--lx-ink-3); }

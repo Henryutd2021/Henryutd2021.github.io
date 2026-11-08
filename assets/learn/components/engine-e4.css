@@ -1,6 +1,6 @@
 /* engine-e4.css — the view pieces of engine E4 (LX.E4.ui: the bench's controls, the nation's map, the mix, CO2 and import
    charts, tables), shared by SB4, M13 and C4. Colours from --lx-* tokens only; no overflow clipping (chart tips stay
-   visible; a wide table scrolls in its own .lx-scroll-x). W6, 2026-11-07. */
+   visible; a wide table scrolls in its own .lx-scroll-x). */
 
 /* ---------- bench extras */
 .e4-ghint { margin: -4px 0 0 !important; }
@@ -17,9 +17,9 @@
 .e4-fold[open] > summary { margin-bottom: 4px; }
 .e4-fold > .lx-sb-group { margin-bottom: 10px; }
 .e4-inputs td.n { white-space: normal; min-width: 7em; }
-/* a fieldset sizes to its widest content: let the shock table scroll inside it instead of widening the page (fix-h) */
+/* a fieldset sizes to its widest content: let the shock table scroll inside it instead of widening the page */
 .e4-sb .lx-sb-group { min-width: 0; }
-/* tables whose cells are words, not numbers (the shock table, the map's mix by source): wrap them (fix-h) */
+/* tables whose cells are words, not numbers (the shock table, the map's mix by source): wrap them */
 .lx-facts.e4-wrap td.n { white-space: normal; font-family: inherit; font-weight: 400; min-width: 9em; }
 
 /* ---------- the nation's map */

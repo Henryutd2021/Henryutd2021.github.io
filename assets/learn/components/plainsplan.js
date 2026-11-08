@@ -1,10 +1,10 @@
 /* plainsplan.js — LX.plainsPlan: the Plains Grid's planning linear program (a year on four representative days: new wind,
    solar and a 4-hour battery against the existing gas fleet), with the carbon and policy options that edit it.
-   Promoted at the W4 integration (2026-11-05) from Modeler lesson M6 (assets/learn/m06-carbon-in-models.js), whose code
-   it is, unchanged; Analyst lesson A12 (policy instruments) runs the same LP. Pure: no DOM; the page passes in its data
+   Shared by Modeler lesson M6 (whose page script is assets/learn/m06-carbon-in-models.js) and Analyst lesson A12
+   (policy instruments), which runs the same LP. Pure: no DOM; the page passes in its data
    and solves the models with LX.solver. Node: require("assets/learn/components/plainsplan.js"); tests:
    _tests/learn/test_m06-carbon-in-models.js, test_a12-policy-instruments.js (each number proved the same on every best
-   plan by _tests/learn/plains_face.js), test_components_w4_int.js (the promotion).
+   plan by _tests/learn/plains_face.js), test_components_w4_int.js (the shared component in the bundle).
 
    Data: assets/learn/data/a10-emissions-questions.json (the Plains Grid's existing fleet: a 4,000 MW peak, 3,000 MW of
    wind, 600 MW of solar, 2,000 MW of gas combined-cycle plants and 2,300 MW of gas peakers, with EIA's 2025 heat rates,
@@ -90,7 +90,7 @@
   }
   // the season's medoid: the day whose hourly demand (share of the peak), wind and solar (per MW) are closest, in summed
   // squares, to all the season's other days
-  // plus two extreme days kept with a weight of one day each (curriculum §9.3), taken out of their seasons' weights: the
+  // plus two extreme days kept with a weight of one day each (the course's representative days), taken out of their seasons' weights: the
   // calmest day (the lowest daily mean wind) and the day of the highest net load (demand less existing wind and solar,
   // its highest hour)
   function medoids(P, M, year, PF) {

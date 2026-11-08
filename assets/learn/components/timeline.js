@@ -1,5 +1,5 @@
 /* timeline.js — LX.Timeline: dated events, each with its source, in order (e-timeline; case files CF1-CF8, also A1 and
-   X3; W2).
+   X3).
    var tl = LX.Timeline(host, {
      title: "The study in time",  lede: "One sentence.",   both optional (the title is an h3 in .lx-x-head)
      events: [{ date: "2023" | "2023-05" | "2023-05-14",   ISO, to the year, month or day

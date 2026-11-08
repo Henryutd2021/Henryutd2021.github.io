@@ -1,5 +1,5 @@
 // a11-lca-nexus.js — Analyst lesson A11, "What does 'clean' mean from cradle to grave? Life cycles, water and land"
-// (step cards, closed form), wave W5, builder learn-w5-c, 2026-11-06.
+// (step cards, closed form).
 //
 // Data: assets/learn/data/a11-lca-nexus.json (footprints by life-cycle stage, each a published median or range with its
 // source and date), a10-emissions-questions.json (lesson A10's EIA heat rate and CO2 coefficient for the stack check),
@@ -24,7 +24,7 @@
 // The boundary is a run of stages [L, R] (indices 0..3). The total inside sums its stages; a stage "not counted" is
 // listed, never added. Consequential answer for a new solar farm against not building it (illustrative arithmetic on
 // NREL's medians): its whole life (43) minus what its MWh avoid: existing gas plants' burning and gas supply, 389 + 71
-// (the 71 treated as all fuel supply); existing wind farms 0 (built already, their upkeep goes on: review 2026-11-06);
+// (the 71 treated as all fuel supply); existing wind farms 0 (built already, their upkeep goes on);
 // spilled power 0.
 // Every number on the page is checked by _tests/learn/test_a11-lca-nexus.js. A data center appears only as a load.
 (function () {
@@ -200,7 +200,7 @@
   var SCOL = { build: "var(--lx-tier-2)", supply: "var(--lx-warn)", run: "var(--lx-accent)", end: "var(--lx-ink-3)" };
 
   // The life-cycle box: the object and footprint controls, the chain with its draggable boundary (LX.LifeBox, i-boundary;
-  // components/lifebox.js, promoted from this page at the W5 integration), the readouts inside and the text version.
+  // components/lifebox.js, shared with other pages), the readouts inside and the text version.
   //   var box = footprintBox(host, D, S, onChange);  box.paint();  S = { obj, meter, L, R, cooling, wide }
   function footprintBox(host, D, S, onChange) {
     var wrap = H("div", { class: "a11-box" }, host);

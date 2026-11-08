@@ -1,6 +1,6 @@
 /* checklist.js — LX.Checklist: a list of tick boxes the reader keeps for their own work (native checkboxes; the ticks
-   stay in this browser). Promoted in W1 (2026-11-02) from N1 and B2 (bordered rows, count and "Clear" under the list) and
-   from B3 and K7 (soft rows, label and text on one line, count in the header).
+   stay in this browser). Two looks: N1's and B2's (bordered rows, count and "Clear" under the list) and B3's and K7's
+   (soft rows, label and text on one line, count in the header).
    LX.Checklist(host, { id: "b2-checklist", title: "A data check you can reuse", lede: "One sentence.",
      items: [{ id: "rows", label: "Rows and span", text: "One sentence.", note: "len(df)" }, ...],
      doneText: "Write what you found in a data note." });

@@ -1,10 +1,10 @@
-/* r03-system-and-method.js — research studio R3, "Which system, which boundary, which method?" (curriculum v2 §11; W2,
-   2026-11-03). Data: assets/learn/data/r03-system-and-method.json (three illustrative briefs at three scales and of three
+/* r03-system-and-method.js — research studio R3, "Which system, which boundary, which method?".
+   Data: assets/learn/data/r03-system-and-method.json (three illustrative briefs at three scales and of three
    question types, nine method families, the five scales, the exemplars) and data/path.json (lesson links).
    Page: learn/r03-system-and-method.qmd (studio form: Task, Exemplars, Self-check, Sources).
    Task (step cards): choose a brief; place it on the scale ladder; draw its boundary (LX.CardSort into inside, given and
    left out, then LX.Boundary of the reader's own sort: i-boundary); pick a time step and a horizon; choose one of nine
-   method families (§11.2: optimization is one family among several, and several can fit one question); defend it against
+   method families (method-neutral: optimization is one family among several, and several can fit one question); defend it against
    two alternatives, one from another family, in labelled parts (the step is done when the five required parts are there;
    opening the example defence completes nothing); then a design card to copy, built from the same parts.
    Exemplars: a weak and a strong method defence (LX.Exemplars), the steps as a flowchart (LX.Flowchart, e-flowchart) and

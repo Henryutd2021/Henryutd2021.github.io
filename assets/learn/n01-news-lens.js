@@ -1,4 +1,4 @@
-// n01-news-lens.js — Lesson N1, "How do you read an energy headline like a researcher?" (lens type, step cards; 2026-11-02).
+// n01-news-lens.js — Lesson N1, "How do you read an energy headline like a researcher?" (lens type, step cards).
 //
 // Data: assets/learn/data/n01-news-lens.json — the seven lens questions, three worked stories (paraphrased headlines,
 // tagged phrases, a researcher's annotation, a back-of-envelope check, a model take, primary sources with dates), the
@@ -10,14 +10,14 @@
 // judge six sentences for units or scale errors; write a three-sentence take. The explain layer is a reusable checklist
 // and the evidence ladder (announced ... at design output), with the stories' claims placed on it.
 //
-// Shared components (promoted from this lesson in W1): LX.PhraseTagger (components/tagger.js, the dissector),
+// Shared components: LX.PhraseTagger (components/tagger.js, the dissector),
 // LX.UnitChain and LX.EvidenceClock (unitchain.js, the envelope checks), LX.Checklist (checklist.js) and
 // LX.EvidenceLadder (evidence.js). The lesson-local CSS left (the lens cards, the spotter, the take) is injected once by
 // injectCSS() below, using only the --lx-* tokens, so day and night both work.
 //
 // The pure model is exported for Node (_tests/learn/test_n01-news-lens.js checks every number the page states); its
 // phrase scoring and ladder check are the shared components' own (window.LX in the page, the component files in Node).
-// No-JS fallback: the stories and notes are written into the page by scripts/learn_n01_fallback.js; the worked checks,
+// No-JS fallback: the stories and notes are written into the page by the course's no-JS fallback step; the worked checks,
 // the spotter's answers and the ladder placements by staticChecks() below, through
 // `node _tests/learn/test_n01-news-lens.js --write` (the test checks that the page and this function agree).
 (function () {

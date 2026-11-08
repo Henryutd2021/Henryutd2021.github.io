@@ -12,7 +12,7 @@
                                  false: right under the chart
    ch.draw(blocks [{ key, mw, offer }] (cheapest first), demand MW, { xMax: 450, hideDemand: false }) -> the clearing result
      (hideDemand: just the blocks, full colour, no price; for building a stack). Money reads "$40.00" and "−$5.00".
-     Tick steps (W4): { xStep: 1000, yStep: 50 } in draw's options, or xStep / yStep in the constructor's options for every
+     Tick steps: { xStep: 1000, yStep: 50 } in draw's options, or xStep / yStep in the constructor's options for every
      draw: MW labels every xStep, $/MWh gridlines every yStep from the axis start (defaults: 100 or 150 MW; $20 or $40).
    ch.el (the chart box). It redraws itself on resize and on the day/night switch.
    Text version (details.lx-textalt): one line per block ("Wind farm: offers 150 MW at $0.00/MWh; runs 120 MW.") and the

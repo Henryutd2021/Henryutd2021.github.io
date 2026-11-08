@@ -1,5 +1,5 @@
 // a15-efficiency-electrification.js — Lesson A15, "How much can efficiency and electrification change demand? Buildings,
-// heat, transport and industry" (step cards, Analyst, D3, closed form; wave W5, builder learn-w5-a, 2026-11-06).
+// heat, transport and industry" (step cards, Analyst, D3, closed form).
 //
 // Data: data/prairie-city.json (Prairie City: districts, homes, floor area, the heat model, F3's COP curve, the eight
 // representative days with the cold design day, EV charging, the industrial park, 2025 Kansas prices; read, never retyped),
@@ -302,7 +302,7 @@
       : ", " + fmtN(R.sumPeaks - R.peak, 1) + " MW below the sum of their own peaks, which fall at different hours. ") +
       (R.over.length ? "Over their limits: " + R.over.map(function (p) { return p.label.toLowerCase(); }).join(", ") + "." : "Every district fits its limit.");
   }
-  function subsLine(C, R) {   // what the bars leave out (A15 review: the districts are not the whole city)
+  function subsLine(C, R) {   // what the bars leave out (the districts are not the whole city)
     var o = ownSubs(C, R);
     return "Not in the bars: the industrial park (" + fmtN(o.park, 1) + " MW, flat) and the data-center campus (" + fmtN(o.dc, 1) + " MW), each a load on its own substation; with them, Prairie City peaks at " + fmtN(o.peak, 1) + " MW at " + hm(o.hour) + ".";
   }
@@ -349,7 +349,7 @@
   }
 
   // the no-JS block: the curves at the defaults with per-unit and city columns, the core's design day, charging rules, the
-  // heat network, the three districts and the industry table (A15 review: every activity has a text version)
+  // heat network, the three districts and the industry table (every activity has a text version)
   function tableHTML(head, rows, cls) {
     return "<div class=\"lx-scroll-x\"><table class=\"lx-mini-table " + (cls || "a15-fbt") + "\"><thead><tr>" + head.map(function (h) { return "<th scope=\"col\">" + h + "</th>"; }).join("") + "</tr></thead><tbody>" +
       rows.map(function (r) { return typeof r === "string" ? r : "<tr>" + r.map(function (c) { return "<td>" + c + "</td>"; }).join("") + "</tr>"; }).join("") + "</tbody></table></div>";
@@ -430,7 +430,7 @@
       "<p class=\"lx-hint\">Prairie City's data (shared by the city lessons), the parts used here:</p><ul>" + CITY_SRC.map(function (k) { return srcItem(C.sources[k]); }).join("") + "</ul>";
   }
   // the practice set (Check section; the test writes it into the page and recomputes every answer). Each item: its givens as
-  // a table, one task sentence, a worked answer (A15 review: no number the answer needs is left out of the givens)
+  // a table, one task sentence, a worked answer (no number the answer needs is left out of the givens)
   function r2(v, d) { var m = Math.pow(10, d); return Math.round(v * m) / m; }
   function cseByHand(b) {   // the worked sum with the numbers as shown: cost (cents), CRF (4 places), yearly extras, saving (3 places)
     var cost = r2(b.cost, 2), f = r2(b.crf, 4), cap = r2(cost * f, 2), x = r2(b.extra, 2), ann = r2(cap + x, 2), save = r2(b.perUnit, 3);

@@ -1,10 +1,10 @@
-/* forms.css — page pieces of the W2 and W3 forms (learn/_template-studio.qmd, _template-case.qmd, _template-sandbox.qmd,
-   _template-capstone.qmd). W2: the studio's task
+/* forms.css — page pieces of the studio, case-file, sandbox and capstone forms (learn/_template-studio.qmd,
+   _template-case.qmd, _template-sandbox.qmd, _template-capstone.qmd). Studio and case file: the studio's task
    card above the interactive (div.lx-card.lx-studio-brief, seen with and without JavaScript) and its task list; the
    case file's numbered parts, its question line and the approved-excerpt quote (blockquote.lx-excerpt with
    data-source="excerpt:<key>", checked by the scope scan); the static lists of the no-JS fallbacks (timeline, exemplar
    notes, rubric table); the case file's Try-it box, its toys' controls and comparison table (.cf-*), and the theme colour
-   of an allow-listed explainer on a Learn page. W3: the sandbox's brief (its facts as labelled cells) and bench frame
+   of an allow-listed explainer on a Learn page. Sandbox and capstone: the sandbox's brief (its facts as labelled cells) and bench frame
    (controls beside the run box from 960 px), the results' readouts and chart cards, the capstone's brief, and the
    static tables of their no-JS fallbacks. Colours from --lx-* tokens only. */
 .lx-studio-brief { margin-bottom: 14px; display: grid; gap: 8px; }
@@ -69,7 +69,7 @@ body.page-learn { --t: var(--lx-accent); }
   .lx-rb-static th[scope="row"] { display: block; border: 0; padding: 6px 0 2px; }
 }
 
-/* ---------- sandbox and capstone pages (W3) */
+/* ---------- sandbox and capstone pages */
 /* the brief: a card above the bench (seen with and without JavaScript); its facts as labelled cells, two columns
    from 641 px; a capstone's brief reuses the studio's task list (.lx-studio-task) */
 .lx-sb-brief, .lx-cap-brief { margin-bottom: 14px; display: grid; gap: 10px; }
@@ -90,7 +90,7 @@ body.page-learn { --t: var(--lx-accent); }
 @media (min-width: 960px) { .lx-sb-side { position: sticky; top: 72px; } }
 .lx-sb-presets { display: flex; flex-wrap: wrap; gap: 6px; }
 /* results: the readouts (.lx-readouts from plot.css), then chart cards (no overflow clipping: chart tips and popovers
-   must stay visible, W2 review finding 7; a wide table goes in its own .lx-scroll-x) */
+   must stay visible; a wide table goes in its own .lx-scroll-x) */
 .lx-sb-results { display: grid; gap: 14px; min-width: 0; }
 .lx-sb-charts { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
 @media (min-width: 960px) { .lx-sb-charts.two { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

@@ -1,7 +1,7 @@
 /* benchrun.css — LX.BenchRun (benchrun.js): the Run and Try again buttons, the status line (its left rule coloured by
    the run's kind: done, a refused or failed run, a stop) and the "results are for an earlier plan" line above the
    results, whose charts dim while they are stale or a run is on. Only graphics dim (an SVG's shapes, canvas); text,
-   chart labels included, keeps its 4.5:1 contrast (W3 layout audit), and the stale line says in words why the charts
+   chart labels included, keeps its 4.5:1 contrast, and the stale line says in words why the charts
    are faded. Colours from --lx-* tokens
    only; the words carry the meaning too. */
 .lx-br { display: grid; gap: 8px; min-width: 0; }

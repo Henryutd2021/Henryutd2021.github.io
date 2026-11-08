@@ -1,5 +1,5 @@
 // a17-physical-feasibility.js — A17, "Will it work on the wires? Voltage, reactive power, inertia, ramps and hosting
-// capacity" (step cards, Analyst, wave W4, 2026-11-05). Recognition at depth D2 (curriculum v2 §9.4): what each physical
+// capacity" (step cards, Analyst). Recognition at depth D2 (physical feasibility): what each physical
 // limit is, when it binds, and how a plan that balances every hour can miss it.
 //
 // Data (data-src): a17-physical-feasibility.json (this lesson's illustrative line, feeder, ramp and inertia settings, the
@@ -28,7 +28,7 @@
 //                    (grid-forming) or after a 0.5 s measurement (grid-following)
 // The network values are illustrative (data file); the band is ANSI C84.1 Range A (NREL 2021, Table 1, p. 4).
 //
-// Lesson-local components (candidates for promotion): LimitGauge (i-gauge: a value on a track with its allowed band,
+// Lesson-local components (used by this page only): LimitGauge (i-gauge: a value on a track with its allowed band,
 // role="meter", the value and its state in words) and LimitMap (e-annotated: a one-line diagram with five numbered
 // limits and a list of buttons that open what each is, when it binds and what the plan assumed; two layouts).
 // Shared components: LX.StepCards, LX.Predict, LX.Slider, LX.Toggle, LX.Plot, LX.Network, LX.CardSort,

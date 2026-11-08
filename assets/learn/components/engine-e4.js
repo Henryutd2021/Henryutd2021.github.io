@@ -1,6 +1,6 @@
-/* engine-e4.js — LX.E4: engine E4 of Learn, Prairieland's pathway to 2050 (wave W6, builder learn-w6-h, 2026-11-07;
-   curriculum v2 §16.4, §9.2, §9.3). Used by the Pathway Explorer (SB4, learn/sb4-pathway-explorer.qmd), Modeler lesson
-   M13 (learn/m13-national-pathway.qmd) and capstone C4 (learn/c4-prairieland-2050.qmd): one model, three pages.
+/* engine-e4.js — LX.E4: engine E4 of Learn, Prairieland's pathway to 2050 (one of the course's sandbox engines). Used
+   by the Pathway Explorer (SB4, learn/sb4-pathway-explorer.qmd), Modeler lesson M13 (learn/m13-national-pathway.qmd)
+   and capstone C4 (learn/c4-prairieland-2050.qmd): one model, three pages.
 
    Data: assets/learn/data/prairieland.json (the nation: regions, fleet with vintages, links, fuels, cost ranges, the
    carbon budget, time slices, shocks, demand; shared, read only) and assets/learn/data/e4-pathways.json (what the
@@ -32,11 +32,11 @@
      goal: min the present value in 2025 of new plants' and links' yearly payments for the years they serve up to 2050
                                      (the rest is residual value), fixed O&M of fossil plants kept open and of new plants,
                                      variable O&M, fuels, unserved energy and stress-hour shortfall at penalties, the tie rule
-   Limits first (SB4 and M13 reviews, 2026-11-07): the budget and the import cap are limits, not prices. Each window's LP
+   Limits first: the budget and the import cap are limits, not prices. Each window's LP
    runs with the overshoots at their penalties; when it meets both limits it is the least-cost plan within them (one LP).
    When it misses one, two more LPs: the least overshoot (no more unserved energy or stress-hour shortfall than run 1:
-   serving demand comes first), then the least cost at that overshoot. Overshoot 0: the limits hold (the reviewer's 2,800 Mt
-   case); above 0: they are out of reach, the run is the closest plan, and their duals are not marginal values (null).
+   serving demand comes first), then the least cost at that overshoot. Overshoot 0: the limits hold (e.g. a 2,800 Mt
+   budget); above 0: they are out of reach, the run is the closest plan, and their duals are not marginal values (null).
    Foresight: perfect (one LP over 2030-2050) or decade by decade (myopic: 2030-2035 seeing only them, their builds fixed;
    then 2040-2045; then 2050; each window gets the remaining budget in proportion to its weights).
    Shocks (C4, SB4): the plan's builds and retirements up to and including the shock's model year stay as planned; that
@@ -44,14 +44,14 @@
    restriction, e4-pathways.json levers.shockRule "before") arrives before the shock year's plants are bought: decisions
    through the model year before it stay, and the shock year's builds are re-planned at the shock's price.
 
-   Prices and duals (§9.2): only from this LP, labelled "marginal values under stated assumptions": the budget's dual
+   Prices and duals (from LPs only, never from MILPs): only from this LP, labelled "marginal values under stated assumptions": the budget's dual
    (present value in 2025 of one more tonne; as a price in model year p's own 2025 dollars it is mu x w_p / D_p, from the
-   LP's own coefficients), the import cap's duals, each region's marginal cost of electricity. Screening outputs (§9.6;
-   affordability and Ridge County jobs) come from LX.A13 (components/whopays.js) after the LP, never from it.
+   LP's own coefficients), the import cap's duals, each region's marginal cost of electricity. Screening outputs (kept
+   apart from the model's costs: affordability and Ridge County jobs) come from LX.A13 (components/whopays.js) after the LP, never from it.
 
-   G-COST: costs are the learner-set fixed ranges from prairieland.json, the same in every period; no cost changes with how
-   much is built; the firm clean option is one generic option with constant cost and the generic build limits, with no
-   timeline of its own and no location (G-GIS).
+   Costs: the learner-set fixed ranges from prairieland.json, the same in every period; no cost changes with how much is
+   built; the firm clean option is one generic option with constant cost and the generic build limits, with no timeline
+   of its own and no location.
 
    API (the sandbox contract, learn/_template-sandbox.qmd):
      E4.prepare(PL, cfg) -> P;  E4.schema(P), E4.presets, E4.sysOf(state, P, o) -> S
@@ -467,7 +467,7 @@
       row("imp" + tg, Object.keys(t).map(function (k) { return [k, t[k]]; }), null, 0);
     });
     // retirements never reverse: kept open in p <= kept open in p-1. A unit online in p was online in p-1 (retirement years
-    // only end), so a fixed 0 in p-1 is a unit retired in an earlier window: it stays at 0 (M13 review: no reopening)
+    // only end), so a fixed 0 in p-1 is a unit retired in an earlier window: it stays at 0 (no reopening)
     if (S.retOn) P.units.forEach(function (u) {
       for (var p = 1; p < S.np; p++) { var a = kv[u.j][p - 1], b = kv[u.j][p];
         if (typeof b !== "string" || !P.on(u, S.Y[p - 1])) continue;
@@ -696,8 +696,8 @@
   // the re-plan after a shock: decisions up to and including the shock's model year fixed at the plan's; that year runs
   // what was built under the shock; later years re-plan knowing it (with the plan's foresight). A shock on new plants'
   // price (levers.shockRule "before": the mineral restriction) meets plants not yet bought: decisions through the model
-  // year before it are kept, and the shock year's builds are re-planned at its price (SB4 review: never reprice plants
-  // already decided)
+  // year before it are kept, and the shock year's builds are re-planned at its price (plants
+  // already decided are never repriced)
   function keptThrough(P, shock, sp) { return ((P.cfg.levers.shockRule || {})[shock] || {}).keep === "before" ? sp - 1 : sp; }
   function shockRun(state, P, sol, raw, shock, o) {
     var S = sysOf(state, P), Ss = sysOf(state, P, { shock: shock }), sp = Ss.shockP, spent = 0, kt = keptThrough(P, shock, sp);
@@ -759,7 +759,7 @@
     }).then(null, function (e) { return { status: "error", ok: false, kind: "lp", message: "The run failed: " + (e && e.message || e), ms: Date.now() - t0 }; });
   }
   function presetsOf(P) { return P.cfg.presets; }
-  // the budget gap with lesson A20 (fix-h, 2026-11-07; the A20/A21 group states the other side): A20's closed-form
+  // the budget gap with lesson A20 (A20 states the other side): A20's closed-form
   // accounting meets 2,600 Mt, this LP's floor is about 2,700 Mt (most electrification, central demand, straight-line
   // counting: 2,673 Mt). Tested: lifting the build-rate and transmission limits a hundredfold moves the floor by about 5 Mt;
   // A20's electrification path inside a copy of this engine lowers it to about 2,414 Mt (test_m13-national-pathway.js).
@@ -767,7 +767,7 @@
   var GAP = ["Counted with straight lines between model years, no pathway here gets below about 2,700 Mt at central demand, even at the most electrification.",
     "[[lesson:a20-national-scenarios|A20]]'s simpler accounting meets 2,600 Mt: its fastest path electrifies buildings and industry years sooner (15 points a period from 2025), while here each share rises in a straight line to 2050.",
     "Not the build limits: lifting this engine's build-rate and transmission limits a hundredfold lowers its floor by about 5 Mt; A20's electrification path inside it lowers the floor to about 2,400 Mt."];
-  // the run's status line, by foresight (SB4 and C4 reviews: decade by decade solves each window to optimality, which does
+  // the run's status line, by foresight (decade by decade solves each window to optimality, which does
   // not make the combined pathway the cheapest over 2026-2050); V: a view, or { reach } from a run
   var WIN_NAMES = ["2030–2035", "2040–2045", "2050"];
   function doneWords(state, V, o) {
@@ -792,7 +792,7 @@
     return { ok: served && near, served: served, near: near, text: served && near ? "survives" : "does not survive (" + why.join("; ") + ")" };
   }
   // the four shocks (and the two A21 keeps for itself) as the engine runs them: one row each, with the model year it hits,
-  // what changes, and what the re-plan keeps (SB4 review: magnitudes and durations, modelled effects apart from the story)
+  // what changes, and what the re-plan keeps (magnitudes and durations, modelled effects apart from the story)
   function shockTable(P, keys) {
     var yr = P.cfg.levers.shockYear, each = P.each;
     return (keys || c4Shocks(P)).map(function (k) {
@@ -807,7 +807,7 @@
     });
   }
 
-  // ---------------------------------------------------------------- the full-year check (§9.3)
+  // ---------------------------------------------------------------- the full-year check (of the representative slices)
   // The plan's capacities in model year p, re-dispatched hour by hour over a whole weather year (H = hourly(P, year)):
   // 52 weeks of 168 hours and 31 December, one LP each, batteries cyclic within each week, hydro's energy fixed day by day
   // (its season's factor), the links' limits, unserved energy at the penalty; fuels at the slice run's marginal values for
@@ -967,7 +967,7 @@
     o.price = R.price.map(function (pr) { return pr.map(function (v) { return v == null ? null : rd(v, 1); }); });
     o.reach = R.reach; o.windowReach = R.windowReach.slice();
     o.carbonValue = R.budgetDual.map(function (v) { return v == null ? null : rd(v, 1); });
-    // the budget's value as a price in each model year's own 2025 dollars, from the LP's coefficients (M13 review): the
+    // the budget's value as a price in each model year's own 2025 dollars, from the LP's coefficients: the
     // budget row weighs that year's CO2 by w_p, the goal its yearly costs by D_p, so mu x w_p / D_p
     o.carbonPrice = Y.map(function (y, p) { var i = R.windowOf[p], mu = i == null ? null : R.budgetDual[i]; return mu == null ? null : rd(mu * R.S.w[p] / R.S.D[p], 1); });
     o.D = R.S.D.map(function (v) { return rd(v, 4); });
@@ -991,7 +991,7 @@
   }
   // the reserve rule's spare at the tighter stress hour, nation-wide, each model year (from the plan's capacities, with the
   // same availability as the rule's rows: a drought derates the summer hour), and the shortfall: the nation's at the worse
-  // of the two stress hours (regions summed within an hour, never across hours: M13 review)
+  // of the two stress hours (regions summed within an hour, never across hours)
   function stressMargins(P, R) {
     var cfg = P.cfg, T = P.tech, S = R.S;
     return R.Y.map(function (y, p) {
@@ -1070,8 +1070,8 @@
     return tableHTML(["Result: " + (o.label || "the default plan"), "Value"], resultRows(V, P)) +
       '<p class="lx-hint">Precomputed with this engine on ' + esc(o.date) + ": one linear program over 2030–2050 on twelve time slices. " + esc(P.line) + " With JavaScript on, the bench runs your own plan.</p>";
   }
-  // the inputs, with what is a published value, what is a published range and what is set for teaching kept apart (SB4
-  // review): the default (its source), the range a learner may set (always set for teaching), and the source's own range
+  // the inputs, with what is a published value, what is a published range and what is set for teaching kept apart:
+  // the default (its source), the range a learner may set (always set for teaching), and the source's own range
   function inputsHTML(P) {
     var T = P.tech, F = P.fuels, kw = function (v) { return "$" + kilo(v) + "/kW"; }, gj = function (v) { return "$" + fix(v, 2) + "/GJ"; }, rg = function (r, f) { return f(r.lo) + " to " + f(r.hi); };
     var cap = function (t, name, def, src) { var c = T[t]; return [name, kw(c.capex.def) + " (" + def + ")", rg(c.capex, kw), src + ": " + kw(c.source.lo) + " to " + kw(c.source.hi)]; };
@@ -1087,7 +1087,7 @@
       ["Hourly shapes", "SPP's 2025 grid (slices); 2024 for the independent year", "fixed", "EIA Hourly Electric Grid Monitor (Form EIA-930)"]];
     return tableHTML(["Input (2025 dollars)", "Default", "Range you can set (set for teaching)", "Source, and the source's own range"], rows, "e4-inputs");
   }
-  // the plan as rows [label, value] (C4's note); each number at its field's precision (C4 review: 5.5% stays 5.5%)
+  // the plan as rows [label, value] (C4's note); each number at its field's precision (5.5% stays 5.5%)
   function planRows(state, P) {
     var S = schema(P), o = [];
     var num = function (f, v) { var s = String(f.step), d = s.indexOf(".") >= 0 ? s.length - s.indexOf(".") - 1 : 0, t = fix(v, d); return d ? t.replace(/\.?0+$/, "") : t; };
@@ -1218,7 +1218,7 @@
       svgWrap.innerHTML = ""; svgWrap.appendChild(svg);
       say.textContent = y + ": " + P.R.map(function (R, r) { var g = mixOf(V, P, r, p), t = sum(g.map(function (x) { return x[1]; })), b = g.slice().sort(function (u, w) { return w[1] - u[1]; })[0]; return R.short + " mostly " + NAME[b[0]].toLowerCase() + " (" + pct(b[1] / t) + ")"; }).join("; ") + ".";
       altBody.innerHTML = "";
-      // every wedge of every disc (reviews: the text version gave only the largest source)
+      // every wedge of every disc (not only the largest source)
       table(altBody, ["Region, " + y, "Electricity made", "By source (TWh, share)", "Marginal cost (LP)"], P.R.map(function (R, r) { var g = mixOf(V, P, r, p), t = sum(g.map(function (x) { return x[1]; }));
         var mix = g.filter(function (x) { return x[1] > 0; }).sort(function (u, w) { return w[1] - u[1]; }).map(function (x) { return NAME[x[0]] + " " + fix(x[1], 1) + " (" + pct(x[1] / t) + ")"; }).join("; ");
         return [R.name, fix(t, 1) + " TWh", mix || "none", V.price[p][r] == null ? "–" : "about $" + Math.round(V.price[p][r]) + "/MWh"]; }), "e4-wrap");
@@ -1275,7 +1275,7 @@
     } };
   }
   // the readouts beside the bench: [label, value, tone]
-  // the readouts; an absent rule is "not tested", never "served" (SB4 and C4 reviews), and a shortfall is the worst model
+  // the readouts; an absent rule is "not tested", never "served", and a shortfall is the worst model
   // year's at its worse stress hour
   function ruleOn(V) { return !("rule" in V) || V.rule !== null; }
   function readouts(V) {

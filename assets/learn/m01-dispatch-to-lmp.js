@@ -1,5 +1,5 @@
 // m01-dispatch-to-lmp.js — M1, "From dispatch to locational prices: the linear program behind the market" (model lab,
-// the first Modeler lesson; wave W1, 2026-11-02).
+// the first Modeler lesson).
 //
 // Data: assets/learn/data/m01-dispatch-to-lmp.json: lesson 0's real day (3 September 2025, Southwest Power Pool shapes
 // from EIA-930, scaled to Prairie Town exactly as grid-operator.js does), Prairie Town's five plants, three buses and

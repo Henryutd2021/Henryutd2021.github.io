@@ -1,7 +1,7 @@
-/* benchrun.js — LX.BenchRun: the Run button, status line and failure states of a sandbox or capstone (W3). The page
+/* benchrun.js — LX.BenchRun: the Run button, status line and failure states of a sandbox or capstone. The page
    hands it the engine's solve; it runs one plan at a time, says what happened in plain words, offers "Try again" after a
    failure, a time limit or an infeasible plan, keeps the last results that were drawn (marked as belonging to an earlier
-   plan), and holds the page's busy state while a run is on (W2 review findings 1, 3 and 8).
+   plan), and holds the page's busy state while a run is on.
    var run = LX.BenchRun(host, {
      state: function () { return plan; },   the plan on the controls (the Run button runs it)
      solve: function (state, ctx) { return engine.solve(state, data, { signal: ctx.signal, timeLimit: ctx.attempt > 1 ? 30 : 10 }); },

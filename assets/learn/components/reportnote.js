@@ -1,4 +1,4 @@
-/* reportnote.js — LX.ReportNote: the report template of a sandbox or capstone (W3, curriculum v2 §16.3, §7.9). It turns
+/* reportnote.js — LX.ReportNote: the report template of a sandbox or capstone. It turns
    the reader's plan and results into a one-page note to copy as plain text or Markdown, with the stated assumptions, a
    sensitivity line and the limits, plus the deliverable's checks (a capstone's "done when"). It never saves or sends
    anything: the note is built in the page, the reader's own words stay in this browser (when it allows storage) and are

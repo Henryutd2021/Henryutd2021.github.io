@@ -1,5 +1,5 @@
-/* stakeholders.js — e-stakeholders (curriculum v2 §16.2: who decides, who pays, who benefits), promoted at the W2
-   integration (2026-11-03) from A22 (the role table) and R9 (the stakeholder map); F8, F9, F11 and A13 can reuse them.
+/* stakeholders.js — e-stakeholders (who decides, who pays, who benefits): A22's role table and R9's stakeholder map;
+   F8, F9, F11 and A13 can reuse them.
 
    LX.Stakeholders(host, o): a table of roles against questions; on phones each role becomes a card of labelled lines.
      o = { title, lede ([[glossary|marks]]), cols: [{ key, label }],

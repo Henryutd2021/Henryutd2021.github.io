@@ -1,6 +1,6 @@
 /* tagger.js — LX.PhraseTagger: the "dissector". The reader tags the highlighted phrases of a short text with the question
    each one raises, names the question the text leaves unanswered, and compares with a researcher's tags and notes
-   (promoted from N1's news lens, W1 2026-11-02).
+   (first used by N1, the news lens).
    LX.PhraseTagger(host, { key: "n1-tags-a",
      tags: [{ id: "scale", n: 1, label: "Scale", sub: "units, size", color: "var(--lx-tier-1)" }, ...],   the question set
      kicker: "Story 1 of 3 · Data centers", title: "A paraphrased headline", framing: "One line on where it comes from.",

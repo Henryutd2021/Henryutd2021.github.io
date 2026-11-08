@@ -1,5 +1,5 @@
 // b03-read-check-formulation.js — Bridge B3, "How do you read a formulation, and check that a model is right?" (step
-// cards, Learn W1, 2026-11-02).
+// cards).
 //
 // Eight cards: the reading order of a published-style formulation; two indices as a table; sums as columns and rows of
 // that table; the units of the objective; how many rows one "for all" line stands for; a bug hunt (five suspect models,

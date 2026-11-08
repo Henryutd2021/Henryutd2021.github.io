@@ -1,5 +1,5 @@
 /* a19-gis-siting.js — lesson A19 "Where should it go? Siting with maps, from layers to a suitability score" (Analyst,
-   step cards, spatial; wave W5, builder learn-w5-e, 2026-11-06). Prairie City is fictional; its numbers are illustrative.
+   step cards, spatial). Prairie City is fictional; its numbers are illustrative.
    The map and its model are assets/learn/components/siting.js (LX.A19, LX.SiteMap, in learn.js). This file holds the
    lesson's own numbers and words (pure, exported for Node: _tests/learn/test_a19-gis-siting.js checks every one), the
    eight step cards, the demo states and the explain layer.

@@ -1,5 +1,5 @@
-/* toggle.js — LX.Toggle: an on/off switch button (W1 integration, 2026-11-02; lesson 10 switches the rules of its linear
-   program on and off with it).
+/* toggle.js — LX.Toggle: an on/off switch button (lesson 10 switches the rules of its linear program on and off with
+   it).
    var t = LX.Toggle(host, { label: "CO₂ cap", on: true, onChange: function (on) {} });
      label      the words beside the switch
      on         the starting state (default false)

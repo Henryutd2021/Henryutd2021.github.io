@@ -1,5 +1,5 @@
-/* questioncard.js — LX.QuestionCard: a structured research-question card (curriculum v2 §11.2-11.3; R1, R10, the
-   capstone research project; W2): the question in one sentence, its type, its audience or decision-maker, a metric with
+/* questioncard.js — LX.QuestionCard: a structured research-question card (the course's question types and question
+   studio; R1, R10, the capstone research project): the question in one sentence, its type, its audience or decision-maker, a metric with
    units, the counterfactual, scale and boundary, an "I would be wrong if" statement and the main uncertainty. Each part
    is checked for rigour; the card copies as plain text and can travel in a link.
    var qc = LX.QuestionCard(host, {
@@ -16,10 +16,10 @@
      share: true,                a "Share this card" button: the card travels in the link's #q-... hash (LX.Share)
      onChange: function (values, checks) {} });
    Returns { el, get(), set(values), text(), checks() }.
-   Fields: native, labelled controls with a one-line hint; the type is a set of five radio buttons (§11.2) that shows the
+   Fields: native, labelled controls with a one-line hint; the type is a set of five radio buttons (the course's question types) that shows the
    chosen type's template and typical methods (one method family among several). Checks: eight lines (the question
-   written, with no bracketed placeholder such as "[…]" left from a draft, then the seven parts that §11.3's rigour
-   checks need), each "filled in" or "to do" in words and with an icon, never colour alone. The head counts "N of 8
+   written, with no bracketed placeholder such as "[…]" left from a draft, then the seven parts that the question
+   studio's rigour checks need), each "filled in" or "to do" in words and with an icon, never colour alone. The head counts "N of 8
    parts filled in": the checks see only whether a part is there, not how rigorous it is (the rubric does that); they
    never block (a learner may type any question) and never judge originality, importance or novelty.
    Node: module.exports = { TYPES, SCALES, FIELDS, CHECKS, check, text, encode, decode, clean } (pure). */

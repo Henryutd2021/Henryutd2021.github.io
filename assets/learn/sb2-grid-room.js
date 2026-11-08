@@ -1,4 +1,4 @@
-// sb2-grid-room.js — SB2, "Grid Room" (sandbox, wave W4, 2026-11-05), on engine E2 (assets/learn/components/engine-e2.js,
+// sb2-grid-room.js — SB2, "Grid Room" (sandbox), on engine E2 (assets/learn/components/engine-e2.js,
 // LX.E2, in the bundle; data assets/learn/data/e2-plains-grid.json with SPP's 2025 shapes from town_year.json).
 //
 // The page: the brief (static), the bench (the period, a large load, the two links' limits, the reserve and the gas price;
@@ -20,7 +20,7 @@
   }
   // what a run says, one idea a line; R: E2.summarize's results, P: the prepared data. Never more than the run shows.
   // A link set to 0 MW is open: nothing flows, so it never "reaches its limit", and the zones on its two sides are priced
-  // on their own (SB2 review finding 1); the equal-price line is said only when the prices are within a cent every hour.
+  // on their own; the equal-price line is said only when the prices are within a cent every hour.
   function says(R, P) {
     var T = R.tot, out = [], zn = function (i) { return P.zones[i].name; };
     var shortZ = T.shedZ.map(function (v, i) { return { i: i, v: v }; }).filter(function (x) { return x.v > 0.5; });

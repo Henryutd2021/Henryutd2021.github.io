@@ -1,4 +1,4 @@
-// sb3-city-planner.js — SB3, "City Planner" (sandbox, wave W5, 2026-11-06), on engine E3 (assets/learn/components/
+// sb3-city-planner.js — SB3, "City Planner" (sandbox), on engine E3 (assets/learn/components/
 // engine-e3.js, LX.E3, in the bundle; data assets/learn/data/prairie-city.json and e3-city-hub.json).
 //
 // The page: the brief (static), the bench (buildings, district heat, cars, local supply, the grid, assumptions; Run the

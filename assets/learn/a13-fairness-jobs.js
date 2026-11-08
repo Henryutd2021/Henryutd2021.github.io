@@ -1,8 +1,8 @@
 // a13-fairness-jobs.js — Lesson A13, "Who pays and who benefits? Energy burden, fairness and jobs" (step cards, Analyst,
-// D3; wave W5, 2026-11-06, builder learn-w5-b).
+// D3).
 //
 // Data: assets/learn/data/a13-fairness-jobs.json (the plan's yearly cost as a learner input, the three designs, the
-// groupings, Ridge County with its W6 note, the job and tax coefficients as learner inputs, the sources),
+// groupings, Ridge County with its note, the job and tax coefficients as learner inputs, the sources),
 // prairie-city.json (Prairie City's five household groups: households, incomes, electricity use and home energy spending;
 // never retyped) and path.json.
 // Accounting: assets/learn/components/whopays.js (LX.A13, in the learn.js bundle), a shared pure model that SB3 and C3 use; this file

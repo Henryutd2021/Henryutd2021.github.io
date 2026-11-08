@@ -1,11 +1,11 @@
-/* adequacy.js — LX.A5: the resource-adequacy simulator (loss of load by Monte Carlo, seeded), promoted at the W4
-   integration (2026-11-05) from Analyst lesson A5 (assets/learn/a05-adequacy.js), whose code it is, unchanged; lesson A9
-   (hazards) runs the same simulator with its hazards as multipliers (o.mod). Pure: no DOM; the page passes the data in.
+/* adequacy.js — LX.A5: the resource-adequacy simulator (loss of load by Monte Carlo, seeded), shared by Analyst lesson A5
+   (whose page script is assets/learn/a05-adequacy.js) and lesson A9 (hazards), which runs the same simulator with its
+   hazards as multipliers (o.mod). Pure: no DOM; the page passes the data in.
    Data the pages load and pass in: town_year.json (SPP's 2025 hourly shapes, EIA-930), m03-capacity-expansion-2024.json
    (SPP's 2024 shapes), cf_targets.json (EIA's 2025 capacity factors) and a05-adequacy.json (the Plains Grid, its units,
    the resources added, the seeded simulation). Each page keeps its own text, drill and view (A5: drillItem, blocksText,
    mixText). Node: require("assets/learn/components/adequacy.js"); tests: _tests/learn/test_a05-adequacy.js,
-   test_a09-hazards.js (every number), test_components_w4_int.js (the promotion).
+   test_a09-hazards.js (every number), test_components_w4_int.js (the shared component in the bundle).
 
    The model (simulation, no solver; pure, exported for Node and as LX.A5):
      sources(D, y25, y24, targets, profile)  both weather years as unit shapes: demand / its own peak; wind and solar per MW

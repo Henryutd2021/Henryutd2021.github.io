@@ -1,5 +1,5 @@
 // m07-monte-carlo.js — Modeler lesson M7, "What could happen? Scenarios, Monte Carlo and global sensitivity" (model-lab
-// in the step-card form, simulation mode, Learn W3, 2026-11-03).
+// in the step-card form, simulation mode).
 //
 // The toy (illustrative; CF7's waiting load, assets/learn/data/cf7-cost-of-waiting.json `idea`): a 100 MW load, such as a
 // factory or a data center, waits tau months for its grid connection. Other customers pay the utility's costs (no

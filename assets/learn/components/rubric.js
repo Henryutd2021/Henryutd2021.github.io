@@ -1,4 +1,4 @@
-/* rubric.js — LX.Rubric: a self-check against the course rubric (curriculum v2 §3.4; W2). Four levels (Not yet,
+/* rubric.js — LX.Rubric: a self-check against the course rubric. Four levels (Not yet,
    Developing, Proficient, Strong) and nine competences, method-neutral; Proficient on every competence is the bar for
    the readiness claim. The reader picks a level for each competence a studio builds, sees its anchored description,
    and copies a plain-text summary.
@@ -11,15 +11,15 @@
                                  accounting, realism, communication, integrity; `look` adds the studio's own line
      onChange: function (picks) {},    picks = { framing: "proficient", method: null }
      note: "One sentence.",
-     bar: "the bar for this note" });   optional (W3, capstones): the bar's label, under Proficient, in the static table's
+     bar: "the bar for this note" });   optional (capstones): the bar's label, under Proficient, in the static table's
                                  header ("Proficient (the bar for this note)") and in the result line; default "the bar"
    A capstone may also give a competence its own level words, for a deliverable the course's words do not describe (C0
    and C1: a one-page note, not the final project's six-page paper):
      { id: "communication", look: "...", levels: { proficient: "one-page note with ..." } }   developing, proficient
                                  and/or strong; the others stay the course's. The copied summary's first line names the
-                                 competences in the capstone's own words. W2's studios use neither option.
+                                 competences in the capstone's own words. The research studios use neither option.
    Returns { el, picks(), set(id, level), clear(), summary() }.
-   The words of the levels are the course's own (§3.4) and are not reworded per studio (a capstone may override one
+   The words of the levels are the course rubric's own and are not reworded per studio (a capstone may override one
    competence's, above); "Not yet" has no anchored
    description there, so it reads "Developing is not reached yet". Each competence is a fieldset of native radio buttons
    (Tab to the group, arrow keys move, Space picks); each radio's label carries its level and the anchored description,
@@ -29,7 +29,7 @@
    Node: module.exports = { VERSION, LEVELS, COMPETENCES, competence, count, summary, staticHTML, resultText } (pure). */
 (function () {
   "use strict";
-  // ---------------------------------------------------------------- the rubric (curriculum v2 §3.4, word for word)
+  // ---------------------------------------------------------------- the rubric (the course rubric, word for word)
   var VERSION = "rubric v1 (curriculum v2 §3.4)";
   var LEVELS = [
     { id: "not-yet", label: "Not yet" },

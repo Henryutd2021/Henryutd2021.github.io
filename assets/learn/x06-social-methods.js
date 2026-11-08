@@ -1,6 +1,6 @@
 // x06-social-methods.js — Side topic X6, "How do social scientists study energy and people?" (step cards, Researcher,
-// side line, D1, no model; wave W7, builder learn-w7-a, 2026-11-07). Method-neutral: six methods, each answering a
-// different kind of question; none ranked above another (curriculum §11.2).
+// side line, D1, no model). Method-neutral: six methods, each answering a
+// different kind of question; none ranked above another.
 //
 // Data: data/x06-social-methods.json (the six methods with what each asks, its data, what it gives a modeller, what it
 // cannot tell and whether people take part; six questions to match; the predicts; facts, stop box and sources, dated)
@@ -23,7 +23,7 @@
   ];
   var PICK_MIN = 3;
   function pickCount(n) { return n >= PICK_MIN ? "Methods opened: " + n + " of 6." : "Methods opened: " + n + " of at least " + PICK_MIN + "."; }
-  // a method's card (X6 review: what it gives and cannot tell show at once; what it asks and the data it needs open
+  // a method's card (what it gives and cannot tell show at once; what it asks and the data it needs open
   // under "More", so the first view keeps to the text budget)
   function methodParts(D, id) { var m = method(D, id); return { shown: [m.label, m.gives, m.cannot], more: [m.asks, m.data] }; }
   function methodHTML(D, id) {
@@ -31,10 +31,10 @@
     return "<b>" + (m.term ? "<span class=\"lx-term\" data-term=\"" + m.term + "\">" + esc(m.label) + "</span>" : esc(m.label)) + "</b><dl class=\"x6-dl\"><dt>Gives a model</dt><dd>" + esc(m.gives) + "</dd><dt>Cannot tell</dt><dd>" + esc(m.cannot) + "</dd></dl>" +
       "<details class=\"x6-more\"><summary>More: what it asks and the data it needs</summary><dl class=\"x6-dl\"><dt>Asks</dt><dd>" + esc(m.asks) + "</dd><dt>Data</dt><dd>" + esc(m.data) + "</dd></dl></details>";
   }
-  // the sort's bins carry a short definition each, so the methods are explained where they are tested (X6 review)
+  // the sort's bins carry a short definition each, so the methods are explained where they are tested
   function bins(D) { return D.methods.map(function (m) { return { id: m.id, label: m.short, sub: m.def, color: m.color }; }); }
   function matchLine(g) { return g.placed < g.total ? "Place every question first: " + (g.total - g.placed) + " still in the pool." : g.right + " of " + g.total + " match the best fit. Open the reasons below; other methods can add to each answer."; }
-  // every pairing with its reason, shown after a full check, right or wrong (X6 review: a perfect match showed none)
+  // every pairing with its reason, shown after a full check, right or wrong (a perfect match included)
   function reasonsHTML(D) { return "<ul>" + D.questions.map(function (q) { return "<li><b>" + esc(q.text) + "</b> " + esc(q.why) + "</li>"; }).join("") + "</ul>"; }
   var MATCH_SAW = "For these questions, surveys estimate shares, interviews explore reasons, choice experiments weigh trade-offs, ethnography follows daily life, documents trace rules and participatory mapping finds places.";
   var PICK_SAW = "Every method hands a modeller something different: shares, reasons, weights, routines, rules or map layers; none of them alone tells the whole story.";
@@ -46,7 +46,7 @@
   // ---------------------------------------------------------------- the no-JS block, ideas, check, facts, sources
   function esc(t) { return String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
   function staticFallback(D) {
-    // a prediction without JavaScript: the question, then every option with its feedback (X6 review)
+    // a prediction without JavaScript: the question, then every option with its feedback
     var qa = function (q, Q) { return "<details class=\"x6-qa\"><summary>" + esc(q) + "</summary><ul>" + Q.options.map(function (o) { return "<li><b>" + esc(o.label) + ".</b> " + esc(Q.feedback[o.value]) + "</li>"; }).join("") + "</ul></details>"; };
     return qa("Prairie City's council (fictional) weighs a heat-pump programme. Which of its questions can the energy model answer by itself?", D.predict) +
       "<p class=\"lx-eyebrow\">Six methods, what each asks, the data it needs and what it can tell a modeller</p>" +
@@ -76,7 +76,7 @@
       D.facts.map(function (f) { var s = D.sources[f.src]; return "<tr><td class=\"n\">" + esc(f.n) + "</td><td>" + esc(f.what) + "</td><td class=\"s\"><a href=\"" + esc(s.url) + "\">" + esc(s.cite.split(": ")[0]) + "</a> · " + esc(cap(s.asOf)) + "</td></tr>"; }).join("") + "</tbody></table>";
   }
   function cap(t) { return t.charAt(0).toUpperCase() + t.slice(1); }
-  // each source: the citation, its link and date, then the short claims it supports, one per line (X6 review)
+  // each source: the citation, its link and date, then the short claims it supports, one per line
   function sourcesHTML(D) {
     return "<ul>" + Object.keys(D.sources).map(function (k) { var s = D.sources[k]; return "<li>" + esc(s.cite) + ". <a href=\"" + esc(s.url) + "\">Link</a>. " + esc(cap(s.asOf)) + ".<ul class=\"x6-used\">" + s.used.map(function (u) { return "<li>" + esc(u) + "</li>"; }).join("") + "</ul></li>"; }).join("") + "</ul>" +
       "<p class=\"lx-hint\">The six method summaries are this course's own, at awareness level; the codes of practice above give each method's standards.</p>";

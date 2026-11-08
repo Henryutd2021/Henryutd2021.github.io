@@ -24,7 +24,7 @@
     var qid = LX.uid("q");
     if (o.q && o.title !== false) H("p", { class: "lx-q", id: qid, html: LX.rich(o.q) }, w);
     // the choices are named by the question: through its heading, or, with title: false (the page shows the question
-    // itself), by q as plain text (W5 final integration, from the A13 review); no q: "Your prediction"
+    // itself), by q as plain text; no q: "Your prediction"
     var ch = H("div", { class: "lx-choices-row", role: "group", "aria-label": !o.q ? "Your prediction" : o.title === false ? plain(o.q) : null, "aria-labelledby": o.q && o.title !== false ? qid : null }, w);
     var out = H("div", { class: "lx-predict-out", "aria-live": "polite" }, w);
     var btns = {}, picked = LX.progress.guess(o.id) || null, labels = (LX._guessLabels = LX._guessLabels || {})[o.id] = {};

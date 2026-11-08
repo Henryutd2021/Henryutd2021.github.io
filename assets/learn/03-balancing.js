@@ -1,4 +1,4 @@
-// 03-balancing.js — Lesson 3, "How does the grid stay balanced every second?" (step cards, Learn W1, 2026-11-02).
+// 03-balancing.js — Lesson 3, "How does the grid stay balanced every second?" (step cards).
 //
 // Data: assets/learn/data/03-balancing.json (the Plains Grid model's parameters, illustrative; the NERC control
 // continuum; real under-frequency settings and the Winter Storm Uri chronology from the FERC-NERC report, with pages).
@@ -18,7 +18,7 @@
 // and is checked in _tests/learn/test_03_balancing.js.
 //
 // The pure model is exported for Node; the view uses the component library (window.LX; assets/learn/README.md).
-// The chart card is the shared LX.PlotCard and its chart LX.Plot (components/plot.js, W1 integration).
+// The chart card is the shared LX.PlotCard and its chart LX.Plot (components/plot.js).
 (function () {
   "use strict";
 

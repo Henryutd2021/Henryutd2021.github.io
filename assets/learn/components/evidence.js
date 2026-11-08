@@ -1,6 +1,5 @@
 /* evidence.js — LX.EvidenceLadder: the stages a project or claim climbs (announced ... at design output), drawn as a
-   ladder with the highest rung on top, and claims the reader places on it (curriculum v2 §16; promoted from N1, W1
-   2026-11-02).
+   ladder with the highest rung on top, and claims the reader places on it (first used by the news lens, N1).
    LX.EvidenceLadder(host, { title: "The evidence ladder", lede: "One or two sentences.",
      rungs: [{ id: "announced", label: "Announced", text: "One line." }, ...],      lowest rung first; numbered 1..n from the bottom
      off: { id: "projection", label: "A projection is not on the ladder" },         optional: a box under the ladder for claims
