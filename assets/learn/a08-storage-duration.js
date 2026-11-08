@@ -171,9 +171,11 @@
     function weekPlot(host, sol, label) {
       var P = LX.Plot(host, { box: true, text: "Text version of the week" }), narrow = (host.clientWidth || 600) < 480;
       var supply = W.wind.map(function (w, t) { return w + W.solar[t] + W.firm; });
+      // available supply: wind and sun before any is spilled, firm output at its full 1,000 MW; with a store, plus its
+      // output and minus its charging. Below demand, the gap is unserved; above it, the surplus is spilled or firm idles
       var lines = [{ values: W.demand, x0: 0.5, color: "var(--lx-ink)", width: 2.2 }, { values: supply, x0: 0.5, color: "var(--lx-wind)", area: 0.12 }];
-      var legend = [{ label: "Demand", color: "var(--lx-ink)" }, { label: "Wind + sun + firm", color: "var(--lx-wind)" }];
-      if (sol) { lines.push({ values: supply.map(function (x, t) { return x + sol.dis[t] - sol.ch[t]; }), x0: 0.5, color: sol.store.color, dash: "5 3", width: 2 }); legend.push({ label: "With " + sol.store.short.toLowerCase() + " (one best schedule)", color: sol.store.color, dash: "5 3" }); }
+      var legend = [{ label: "Demand", color: "var(--lx-ink)" }, { label: "Available: wind + sun + firm", color: "var(--lx-wind)" }];
+      if (sol) { lines.push({ values: supply.map(function (x, t) { return x + sol.dis[t] - sol.ch[t]; }), x0: 0.5, color: sol.store.color, dash: "5 3", width: 2 }); legend.push({ label: "Available with " + sol.store.short.toLowerCase() + " out or in (one best schedule)", color: sol.store.color, dash: "5 3" }); }
       P.render({ x: { min: 0, max: W.T, ticks: dayTicks(W, false), ticksN: dayTicks(W, true) }, y: { min: 0, max: 5000, step: 1000, fmt: function (v) { return v.toLocaleString("en-US"); }, unit: "MW" },
         lines: lines, legend: legend, aria: label, text: weekText(sol) });
       return P;
@@ -181,9 +183,9 @@
     // the week's text version: every hour (CST, the hour that starts then), the plotted series and, with a store, its
     // output (+) or charging (−) and the demand left unserved, all in MW (= MWh over the hour)
     function weekText(sol) {
-      var n = function (v) { return Math.round(v).toLocaleString("en-US"); }, head = ["Hour starting", "Demand", "Wind + sun + firm", "Short without storage"];
+      var n = function (v) { return Math.round(v).toLocaleString("en-US"); }, head = ["Hour starting", "Demand", "Available: wind + sun + firm", "Short without storage"];
       if (sol) head = head.concat([sol.store.short + " out (+) or in (−)", "Unserved with it"]);
-      return { head: head, note: "All in MW, the same as MWh over the hour. " + (sol ? "The store's schedule is one of the best schedules; the unserved total is the same for all of them." : "Run a store in step 5 to add its schedule."),
+      return { head: head, note: "All in MW, the same as MWh over the hour. Available: wind and sun before any is spilled, firm output at its full " + fm.mw(W.firm) + ". " + (sol ? "The store's schedule is one of the best schedules; the unserved total is the same for all of them." : "Run a store in step 5 to add its schedule."),
         rows: W.demand.map(function (d, t) { var r = [dayTicks(W, false)[Math.floor(t / DAY)][1] + " " + fm.hm(t), n(d), n(W.wind[t] + W.solar[t] + W.firm), n(W.short0[t])]; return sol ? r.concat([n(sol.dis[t] - sol.ch[t]), n(sol.uns[t])]) : r; }) };
     }
     var TECHS = D.techs.map(function (t) { return store(D, t.id); });
@@ -207,7 +209,7 @@
           H("p", { class: "a8-note", html: "Ladder: " + LX.esc(D.ladder.source.label) + "." }, act);
         } },
       // 3 operating limits: what comes back after an idle spell
-      { text: "Each store has its own limits. Put 1 MWh into each, leave it idle, and see what comes back after a few days.",
+      { text: "Each store has its own limits. Put 1 MWh into each, leave it idle for at least seven days, and see what comes back.",
         build: function (act, api) {
           var out = H("ul", { class: "a8-bars", "aria-live": "polite" }, act), moved = 0;
           var lim = H("ul", { class: "a8-note", style: "padding-left:1.1rem;display:grid;gap:2px" }, act);
@@ -224,7 +226,7 @@
       { text: "Now a hard week on the Plains Grid: " + W.label + ", real shapes scaled to an illustrative fleet with little firm power. Which days are short?",
         build: function (act, api) {
           var k = H("div", { class: "a8-kpis" }, act);
-          kpi(k, "Shortfall, no storage", fm.mwh(W.shortSum), "bad"); kpi(k, "Hours short", String(W.shortHours)); kpi(k, "Largest gap", fm.mw(W.peakGap));
+          kpi(k, "Shortfall, no storage", fm.mwh(W.shortSum), "bad"); kpi(k, "Hours short", String(W.shortHours)); kpi(k, "Largest shortfall after firm", fm.mw(W.peakGap));
           weekPlot(act, null, "The week: demand against wind, sun and firm output");
           var pr = LX.Predict(act, { id: "a8-week", fresh: true, q: "Where does most of the shortfall fall?", answer: "late",
             options: [{ value: "early", label: "The first two days" }, { value: "late", label: "The last three days" }, { value: "even", label: "Spread evenly" }],
@@ -268,7 +270,7 @@
             kpi(out, "Power", fm.mw(Pj)); kpi(out, "Unserved left", fm.mwh(o.unserved), o.unserved > 0.5 ? "bad" : "good"); kpi(out, "Hours when the gap tops firm + power", String(W.short0.filter(function (x) { return x > Pj; }).length));
             stale(); api.done(); remember("h2P", Pj);
             api.saw(o.unserved > 0.5 ? "At " + fm.mw(Pj) + " the store still leaves " + fm.mwh(o.unserved) + ": exactly the MWh by which the gap tops firm output plus " + fm.mw(Pj) + " in its worst hours. **Power, not energy, limits it.**"
-              : "At " + fm.mw(Pj) + " every hour is served: the largest gap above firm output is " + fm.mw(W.peakGap) + ". Energy and power both have to be enough.");
+              : "At " + fm.mw(Pj) + " every hour is served: the largest shortfall after firm output is " + fm.mw(W.peakGap) + ". Energy and power both have to be enough.");
           }
           run = action({ api: api, st: st, host: act, go: go,
             job: function () {
@@ -288,13 +290,13 @@
             C.items.forEach(function (it) {
               var c = perMWh(it, cyc, price, C.rate), li = H("li", null, out), s = store(D, it.id);   // it.hours: DOE's cost case
               H("span", { text: s.short + " · " + it.hours + " h" }, li);
-              var b = H("span", { class: "bar", role: "img", "aria-label": s.short + ": " + fm.usd(c.total) + " per MWh delivered, " + fm.usd(c.capital) + " capital and " + fm.usd(c.charging) + " charging" + (c.capped ? ", at its limit of " + c.cycles + " cycles a year" : "") }, li);
+              var b = H("span", { class: "bar", role: "img", "aria-label": s.short + ": " + fm.usd(c.total) + " per MWh delivered, " + fm.usd(c.capital) + " capital and " + fm.usd(c.charging) + " charging" + (c.capped ? ", at its limit of " + c.cycles + " cycles a year" : "") + (c.total > mx() ? "; the bar stops at $600" : "") }, li);
               H("i", { style: "width:" + Math.min(100, c.capital / mx() * 100).toFixed(1) + "%;background:" + s.color }, b); H("i", { style: "width:" + Math.min(100, c.charging / mx() * 100).toFixed(1) + "%;background:var(--lx-ink-3)" }, b);
-              H("b", { text: (c.total > mx() ? "> " : "") + fm.usd(c.total) }, li);
+              H("b", { text: fm.usd(c.total) }, li);   // the calculated cost; only the bar stops at $600
             });
             var h = C.items.filter(function (i) { return i.id === "hydrogen"; })[0];
             note.innerHTML = LX.rich("Coloured: building it, the yearly [[capital-recovery-factor|capital recovery]] at " + Math.round(C.rate * 100) + "% [[real-rate|real]] (inflation taken out). Grey: charging, price ÷ round trip.");
-            note2.textContent = "DOE's cost cases: the hydrogen store here holds 24 hours, so it can cycle at most " + maxCycles(h) + " times a year. Bars stop at $600.";
+            note2.textContent = "DOE's cost cases: the hydrogen store here holds 24 hours. Charging at its discharge power, it can cycle at most " + maxCycles(h) + " times a year. Bars stop at $600.";
           }
           LX.Slider(ctl, { label: "Full cycles a year", min: 2, max: 365, step: 1, value: cyc, fmt: function (v) { return v + " a year"; }, onChange: function (v) { cyc = v; moved.c = 1; draw(); check(); } });
           LX.Slider(ctl, { label: "Price of charging power", min: 0, max: 60, step: 5, value: price, fmt: function (v) { return "$" + v + "/MWh"; }, onChange: function (v) { price = v; moved.p = 1; draw(); check(); } });
@@ -364,7 +366,7 @@
                 { key: "cost", label: "$ per MWh delivered", phone: "$/MWh", num: true }],
       rows: cr,
       sorts: [{ label: "By installed $ per kWh", order: cr.slice().sort(function (a, b) { return a.kwh.value - b.kwh.value; }).map(function (r) { return r.key; }), ranked: true, note: "Hydrogen's energy capacity is the cheapest per kWh." },
-              { label: "By $ per MWh delivered", order: cr.slice().sort(function (a, b) { return a.cost.value - b.cost.value; }).map(function (r) { return r.key; }), ranked: true, note: "Capped at 86 cycles and losing 69% on the way, hydrogen's MWh is not the cheapest." }]
+              { label: "By $ per MWh delivered", order: cr.slice().sort(function (a, b) { return a.cost.value - b.cost.value; }).map(function (r) { return r.key; }), ranked: true, note: "At most 86 cycles (charging at its discharge power) and losing 69% on the way, hydrogen's MWh is not the cheapest." }]
     });
     LX.CausalChain(H("div", { class: "lx-xcard" }, x), {
       title: "Cause and effect: a calm week drains short stores",
