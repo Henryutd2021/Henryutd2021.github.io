@@ -7680,7 +7680,7 @@
   //   peak    the week with the year's highest hourly demand
   //   netpeak the week with the highest hourly net load (demand minus the output of reference wind and solar farms)
   //   calm    the week with the least wind energy
-  //   winter  the winter week with the highest hourly net load (a cold, still spell)
+  //   winter  the winter week with the highest hourly net load (chosen after the other extremes)
   // then one medoid week per season among the other weeks of that season (the week closest, hour by hour, to all the
   // others), scaled so that the season's demand, wind and solar energy are kept.
   function selectWeeks(Y, opts) {
@@ -8514,8 +8514,8 @@
      // -> { el, draw }
 
    - Colours. A typical week takes its season's colour (winter, spring, summer, fall); a season's second and third
-     typical weeks are mixed toward the ink colour. Extreme weeks (peak demand, peak net load, least wind, cold still
-     winter) have their own colours and an outline. All colours are --lx-* tokens, so day and night both work.
+     typical weeks are mixed toward the ink colour. Extreme weeks (peak demand, peak net load, least wind, winter
+     net-load peak) have their own colours and an outline. All colours are --lx-* tokens, so day and night both work.
    - Letters. W, Sp, Su, F (numbered when a season has several typical weeks), P, N, C, X: the colour is never the only cue.
    - Text. The grid is role="img" with a sentence that lists every representative week and how many weeks it stands for
      (and how many weeks are short); the key repeats the letters; "Text version" holds a table of all 52 weeks (the week's
@@ -8534,7 +8534,7 @@
   var XCOL = { peak: "var(--lx-bad)", netpeak: "var(--lx-tier-4)", calm: "var(--lx-ink-3)", winter: "var(--lx-tier-2)" };
   var XLET = { peak: "P", netpeak: "N", calm: "C", winter: "X" };
   var SLET = { winter: "W", spring: "Sp", summer: "Su", fall: "F" };
-  var NAMES = { season: "Typical", peak: "Peak demand", netpeak: "Peak net load", calm: "Least wind", winter: "Cold, still winter" };
+  var NAMES = { season: "Typical", peak: "Peak demand", netpeak: "Peak net load", calm: "Least wind", winter: "Winter net-load peak" };
   var SHORT = 0.05;   // MWh: a calendar week counts as short above this
 
   // ---------------------------------------------------------------- pure helpers

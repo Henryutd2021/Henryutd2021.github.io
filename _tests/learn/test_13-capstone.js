@@ -268,8 +268,11 @@ function batteryNote(cfg) {
   ok(JS.indexOf("model.fullVerdict(s, f, target)") > 0 && JS.indexOf('ms.set("co2", { frac: f.co2 / target, text: "Full year: "') > 0, "the debrief re-judges the missions with the full year");
 
   // ---------------- the concept map quotes a stored full-year check only for the plan it checked
-  ok(JS.includes('LX.store.set("t13-full", { key: key,') && JS.includes("key = planKey(plan, S_.sc)") && JS.includes("key: planKey(S_.plan, S_.sc)") &&
-     JS.includes("F && F.key && F.key === L.key ?"), "the stored full-year check names its plan and scenario; the concept map quotes it only for that plan");
+  ok(JS.includes('LX.store.set("t13-full", { key: key,') && JS.includes("key = snap.key") && JS.includes("key: S_.sumKey") && JS.includes("S_.sumPlan = plan; S_.sumKey = key;") &&
+     JS.includes("F && F.key && F.key === L.key ?"), "the stored full-year check names the plan it ran (the scored seven-week result's plan and scenario); the concept map quotes it only for that plan");
+  ok(JS.includes("if (S_.sumKey !== planKey(S_.plan, S_.sc)) { clearTimeout(timer); return run().then(") && JS.includes("snap.key !== planKey(S_.plan, S_.sc)"),
+     "scoring waits for a due re-run, so it never scores one plan's seven weeks under another plan's key");
+  ok(JS.includes('LX.on("t13-run", function () {') && JS.includes("if ((moment(id) || \"\") !== (you ? you.textContent : \"\")) cm.select(id);"), "the concept map's open idea follows each new run and full-year check");
   // ---------------- the data note: short labelled items; profiles, not weather
   const dn = (page.match(/<div class="lx-datanote">[\s\S]*?<\/ul><\/div>/) || [""])[0], dli = dn.match(/<li>[\s\S]*?<\/li>/g) || [];
   ok(dli.length === 5 && dli.every(li => /^<li><b>[^<]+:<\/b>/.test(li) && li.replace(/<[^>]+>/g, " ").trim().split(/\s+/).length <= 30), "data note: five labelled items, each 30 words at most");

@@ -61,7 +61,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <li><b>Price year:</b> 2025 dollars throughout; NREL's 2024 battery costs are converted with BEA's GDP implicit price deflator (×1.0263). The battery is under 1% of the seven-week plan's yearly cost.</li>
 <li><b>Demand, wind and sun:</b> 2025 and 2024 hourly profiles of the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>).</li>
 <li><b>2024:</b> scaled to 2025's yearly demand energy and <span class="lx-term" data-term="capacity-factor">capacity factors</span>; 29 February left out.</li>
-<li><b>Precomputed:</b> the full-year optimum, labelled where shown.</li>
+<li><b>Precomputed:</b> the full-year optimum, labeled where shown.</li>
 <li><b>Prairie Town:</b> fictional.</li>
 <li><b>Storage what-if (step 8):</b> battery energy at $20 per kWh instead of the sourced $247 in 2025 dollars (lesson 13): an illustrative what-if, not a forecast or a sourced cost.</li>
 </ul></div>

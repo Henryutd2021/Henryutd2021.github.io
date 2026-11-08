@@ -88,7 +88,7 @@
   //   peak    the week with the year's highest hourly demand
   //   netpeak the week with the highest hourly net load (demand minus the output of reference wind and solar farms)
   //   calm    the week with the least wind energy
-  //   winter  the winter week with the highest hourly net load (a cold, still spell)
+  //   winter  the winter week with the highest hourly net load (chosen after the other extremes)
   // then one medoid week per season among the other weeks of that season (the week closest, hour by hour, to all the
   // others), scaled so that the season's demand, wind and solar energy are kept.
   function selectWeeks(Y, opts) {
