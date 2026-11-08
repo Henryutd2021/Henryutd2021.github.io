@@ -106,7 +106,7 @@
   // for teaching, or from public data. The park's gas price is no plan field: its runs use a copy of P with that price
   // (gasP), whose own 2025 run is solved too, so the change against 2025 stays like for like. Which end raises the cost is
   // read from the one-at-a-time runs (a plan that burns less gas than 2025 gains from a dearer gas price). Every case is
-  // a live solve: about 18 small LPs, under 2 s on a slow phone.
+  // a live solve: 14 small LPs, plus a 2025 run at each gas price tried, about 2 s at a 6x CPU slowdown.
   var SENS = [{ key: "upc", label: "Upgrade cost", unit: "$/kW", kind: "set for teaching" },
     { key: "av", label: "Value of a wind or solar MWh", unit: "$/MWh", kind: "set for teaching" },
     { key: "rc", label: "Retrofit cost", unit: "$/home", kind: "set for teaching" },
