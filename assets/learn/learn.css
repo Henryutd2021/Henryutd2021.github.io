@@ -2134,6 +2134,7 @@ body.page-learn.quarto-dark { --lx-scale-0: #5CC0B1; --lx-scale-1: #5AAED2; --lx
 .lx-sb-group > .lx-seg { justify-self: start; }
 .e1-allowl, .e1-segl { font-family: var(--lx-f-display); font-size: 13.5px; color: var(--lx-ink-2); }
 .e1-sizehint { margin: 0 !important; font-size: 13.5px; }
+.e1-allowh { flex-basis: 100%; margin: 0 !important; }   /* under the toggles: the sizes replace the reader's (SB1) */
 .e1-ro .lx-readout { flex: 1 1 140px; }
 
 /* ---------- results */
@@ -2276,6 +2277,7 @@ body.page-learn.quarto-dark { --lx-scale-0: #5CC0B1; --lx-scale-1: #5AAED2; --lx
 .e2-say.bad b { color: var(--lx-bad); }
 .e2-say.good { background: var(--lx-good-soft); border-left: 4px solid var(--lx-good); }
 .e2-notes { margin: .3rem 0 0; padding-left: 1.1rem; display: grid; gap: 2px; font-size: 13.5px; color: var(--lx-ink-2); }
+.e2-unit-notes { margin: .4rem 0 0; padding-left: 1.1rem; display: grid; gap: 2px; }   /* the plants table's formulas, one a line */
 
 /* row labels of the data tables: plain words, not the column headings' small capitals; on phones (base.css shows one
    block per row with the header hidden) each cell is labelled with its column */

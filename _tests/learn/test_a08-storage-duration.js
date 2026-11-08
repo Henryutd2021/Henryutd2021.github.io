@@ -127,6 +127,7 @@ const fm = M.fm, r1 = v => Math.round(v * 10) / 10;
   ok(M.maxCycles({ hours: 2, eta: 0.8 }, 10) === Math.floor(8760 / 4.5) && M.maxCycles({ hours: 2, eta: 0.8 }) === 365, "cycle rule: the report's example, 2 hours at 80% runs 4.5 hours a cycle");
   ok(M.maxCycles(it("battery")) === 365 && M.maxCycles(it("psh")) === 365 && M.maxCycles(it("hydrogen")) === 86, "cycle limits: 365, 365 and 86 a year");
   const c = id => M.perMWh(it(id), 250, 20, C.rate);
+  const perMWhOf = (id, n, pr) => M.perMWh(it(id), n, pr, C.rate).total;
   ok(Math.round(c("battery").total) === 156 && Math.round(c("battery").capital) === 132 && Math.round(c("battery").charging) === 24, "battery at 250 cycles and $20: $156 ($132 capital, $24 charging)");
   ok(Math.round(c("psh").total) === 71 && Math.round(c("hydrogen").total) === 149 && Math.round(c("hydrogen").charging) === 65 && c("hydrogen").capped, "pumped hydro $71; hydrogen $149 at its 86-cycle cap, $65 of it charging");
   ok(c("psh").total < c("hydrogen").total && c("psh").total < c("battery").total && it("hydrogen").perKWh < it("psh").perKWh, "myth 3: hydrogen has the lowest cost per kWh, pumped hydro the cheapest MWh at 250 cycles");
@@ -143,9 +144,12 @@ const fm = M.fm, r1 = v => Math.round(v * 10) / 10;
   onPage(`the battery covers ${fm.pct(out.battery.covered)} of the shortfall, the hydrogen store ${fm.pct(out.hydrogen.covered)}`, "explain: endurance");
   onPage(`In ${R.hoursAbove} hours the gap tops firm output plus 1,000 MW`, "explain: power still matters");
   onPage(`holds 168,000 MWh against a ${fm.mwh(W.shortSum)} shortfall, yet leaves ${fm.mwh(out.hydrogen.unserved)} unserved: in ${R.hoursAbove} hours`, "myth 1");
-  onPage("\\$132 of capital, plus \\$24 of charging: \\$156 per MWh", "Go deeper: the battery's cost");
-  onPage("so at most 86 cycles a year: \\$149 per MWh at best, \\$65 of it charging", "Go deeper: hydrogen's cost");
-  onPage("($126, against $263 for pumped hydro and $385 for the battery).</p><p>At 250 cycles a year pumped hydro delivers the cheapest MWh, $71; hydrogen, capped at 86 cycles, $149 (DOE's 24-hour cost case).", "myth 3");
+  onPage("\\$132 of capital, plus 20 ÷ 0.83 = \\$24 of charging: \\$156 per MWh", "Go deeper: the battery's cost");
+  ok(Math.round(20 / 0.83) === Math.round(c("battery").charging) && near(it("battery").eta, 0.83, 0.005), "the battery's charging: $20 ÷ its 83% round trip = $24");
+  onPage("If it charges at the same power as it discharges, a 24-hour store at 31% needs 24 + 24 ÷ 0.31 = 101 hours a cycle: at most 86 full cycles a year.", "Go deeper: hydrogen's cycles, with their assumption");
+  onPage("At those 86 cycles and \\$20/MWh charging: \\$149 per MWh, \\$65 of it charging, with fixed upkeep left out.", "Go deeper: hydrogen's cost, with its charging price and what it leaves out");
+  onPage("($126, against $263 for pumped hydro and $385 for the battery).</p><p>At 250 cycles a year pumped hydro delivers the cheapest MWh, $71; hydrogen, at most 86 cycles when it charges at its discharge power, $149 (DOE's 24-hour cost case, $20/MWh charging).", "myth 3");
+  ok(/Charging at its discharge power, it can cycle at most " \+ maxCycles\(h\)/.test(JS) && /At most 86 cycles \(charging at its discharge power\)/.test(JS) && !/capped at 86|at best/.test(PAGE + JS), "the 86-cycle limit is stated with its assumption (equal charging and discharging power), never as the store's own cap");
   // the cost table names the store it costs: each row's duration is the costed duration, and the week's table
   // (1,000 MW stores, the hydrogen one 168 hours) carries no cost column
   { const cr = M.costRows(D);
@@ -154,7 +158,9 @@ const fm = M.fm, r1 = v => Math.round(v * 10) / 10;
     const weekTable = JS.slice(JS.indexOf('title: "Four stores, one calm week"'), JS.indexOf("var cr = costRows(D);"));
     ok(weekTable.length > 0 && !/cost|\$ per MWh/.test(weekTable.replace(/costRows/g, "")), "explain: the week's table has no cost column"); }
   // the formula with its units: 1,000 x CRF x $/kW / (cycles x hours) reproduces the battery's $132
-  ok(near(1000 * M.crf(0.04, 16) * 1540 / (250 * 4), c("battery").capital, 1e-9) && PAGE.includes("1,000 × 0.0858 × 1,540 ÷ (250 × 4) = \\$132") && PAGE.includes("= 1,000 × capital recovery × installed cost (\\$ per kW) ÷ (cycles a year × duration in hours)"), "Go deeper: the formula carries the 1,000 (kW to MW) and its units");
+  ok(near(1000 * M.crf(0.04, 16) * 1540 / (250 * 4), c("battery").capital, 1e-9) && PAGE.includes("1,000 × 0.0858 × 1,540 ÷ (250 × 4) = \\$132") && PAGE.includes("\\frac{1{,}000 \\times \\text{capital recovery} \\times \\text{installed \\$ per kW}}{\\text{cycles a year} \\times \\text{duration in hours}} + \\frac{\\text{charging price}}{\\text{round trip}}") && PAGE.includes("The 1,000 turns kW into MW."),
+    "Go deeper: the formula, displayed, carries the 1,000 (kW to MW) and its units; the battery's inputs and its result are separate lines");
+  ok(near(M.crf(0.04, 16), 0.0858, 5e-5) && PAGE.includes("- **The battery's inputs.** 4 hours; \\$1,540 per kW; 16 years, so capital recovery 0.0858; 83% round trip; 250 cycles a year; \\$20/MWh charging."), "Go deeper: the battery's inputs, one line");
   onPage("(\\$28.19 and \\$23.90 per kW-year)", "fixed upkeep from the report"); onPage("at \\$5.82 per kWh", "the cavern cost");
   ok(it("psh").fom === 28.19 && it("hydrogen").fom === 23.90 && it("hydrogen").cavernPerKWh === 5.82, "the data file holds the report's upkeep and cavern costs");
   onPage("10 × 0.50 × 0.98<sup>5</sup> = 4.52", "quiz 2"); ok(near(10 * M.idle(th, 5), 4.52, 0.005), "quiz 2 = the model");
@@ -200,12 +206,12 @@ const fm = M.fm, r1 = v => Math.round(v * 10) / 10;
 
   // ---------------- text, scope, sidecar
   const stepTexts = (JS.match(/\{ text: "([^"]+)"/g) || []).map(s => s.slice(9, -1));
-  ok(stepTexts.length >= 7 && stepTexts.every(t => t.split(/\s+/).length <= 40), "step texts: 40 words at most");
+  ok(stepTexts.length >= 7 && stepTexts.every(t => t.split(/\s+/).length <= 35), "step texts: 35 words at most");
   // review 10: every element of the page's own text (data notes, explain, Go deeper, answers, numbers) stays within budget
   { const OWN = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1:end -->/g, "").replace(/<!--[\s\S]*?-->/g, "").replace(/^---[\s\S]*?\n---\n/, "").replace(/<div class="lx-card lx-sources">[\s\S]*?<\/div>/, "").replace(/<style>[\s\S]*?<\/style>/g, "").replace(/\$\$[\s\S]*?\$\$/g, "");
     const els = OWN.replace(/^- (.*)$/gm, "<li>$1</li>").replace(/^\|(.*)\|$/gm, "<td>$1</td>").split(/<\/?(?:p|li|dd|dt|td|th|summary|blockquote|footer)\b[^>]*>/i).map(x => x.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim()).filter(x => /[A-Za-z]/.test(x));
-    const long = els.filter(x => x.split(" ").length > 40);
-    ok(long.length === 0, "every page element is 40 words or fewer: " + long.map(x => x.slice(0, 60) + " (" + x.split(" ").length + ")").join(" | ")); }
+    const long = els.filter(x => x.split(" ").length > 35);
+    ok(long.length === 0, "every page element is 35 words or fewer: " + long.map(x => x.slice(0, 60) + " (" + x.split(" ").length + ")").join(" | ")); }
   const NUC = /nuclear|reactor|\bSMR\b|small modular/i;
   ok(!NUC.test(PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1:end -->/g, "") + JS + JSON.stringify(D)), "no nuclear term anywhere in the lesson (outside the generated header, which names other lessons)");
   ok(!/\bAI\b|data cent/i.test(PAGE + JS), "no AI wording, no data centers");
@@ -270,9 +276,21 @@ const fm = M.fm, r1 = v => Math.round(v * 10) / 10;
       // review 8: the week's text version lists every hour, with the store's schedule once a store is shown
       demo.cards.go(4); await flush();
       const tx = specs[specs.length - 1].text, bat = M.read(W, M.store(D, "battery"), solve(M.build(W, M.store(D, "battery"), { plains: G })));
-      ok(tx.rows.length === 168 && tx.head.join("|") === "Hour starting|Demand|Wind + sun + firm|Short without storage|Battery out (+) or in (−)|Unserved with it" && tx.rows[0][0] === "2 Jan 00:00" && tx.rows[167][0] === "8 Jan 23:00",
+      ok(tx.rows.length === 168 && tx.head.join("|") === "Hour starting|Demand|Available: wind + sun + firm|Short without storage|Battery out (+) or in (−)|Unserved with it" && /Available: wind and sun before spilling, firm at its full 1,000 MW\./.test(tx.note) && tx.note.split(/\s+/).length <= 35 && tx.rows[0][0] === "2 Jan 00:00" && tx.rows[167][0] === "8 Jan 23:00",
          "step 5: the week's text version has a row for each of the 168 hours, with the store's output and the unserved demand (" + tx.rows.length + " rows: " + tx.head.join(", ") + ")");
       ok(near(tx.rows.reduce((a, r) => a + +r[5].replace(/,/g, ""), 0), R.stores.battery.unserved, 168) && near(tx.rows.reduce((a, r) => a + +r[3].replace(/,/g, ""), 0), W.shortSum, 168), "step 5: the hourly text sums to the week's shortfall and the battery's unserved energy (rounding aside)");
+      // review 1: step 4's tile is the largest shortfall after firm output (1,429 MW), not the largest gap (2,429 MW)
+      demo.cards.go(3); await flush();
+      ok(card().textContent.includes("Largest shortfall after firm" + fm.mw(W.peakGap)) && !/Largest gap/.test(card().textContent) && W.peakGap === Math.max(...W.gap) - W.firm, "step 4: the tile names the shortfall after firm output (" + fm.mw(W.peakGap) + "; the largest gap is " + fm.mw(Math.max(...W.gap)) + ")");
+      // review 4: step 3 says what unlocks Next (seven days or more)
+      demo.cards.go(2); await flush();
+      ok(/at least seven days/.test(card().textContent) && /if \(v >= 7\)/.test(JS), "step 3: the text says at least seven days, the rule that unlocks Next");
+      // review 3: at 2 cycles a year the battery's bar is clipped, its cost shown as calculated ($16,545), no ">"
+      demo.cards.go(6); await flush();
+      const cyc = card().querySelectorAll("input")[0]; cyc.value = 2; cyc.fire("input"); await flush();
+      const bar = card().querySelectorAll(".a8-bars li")[0], bb = perMWhOf("battery", 2, 20);
+      ok(bar && bar.textContent.includes(fm.usd(bb)) && fm.usd(bb) === "$16,545" && !/>/.test(card().querySelector(".a8-bars").textContent) && /the bar stops at \$600/.test(bar.querySelector(".bar").getAttribute("aria-label")),
+        "step 7 at 2 cycles and $20: the battery shows its calculated $16,545, no '>', and its bar is said to stop at $600");
     } catch (e) { ok(false, "the stub page test threw: " + (e && e.stack || e)); }
     process.removeListener("unhandledRejection", onUn);
     ok(!unhandled.length, "no unhandled promise rejection: " + unhandled.join(" | "));

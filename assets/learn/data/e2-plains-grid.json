@@ -410,7 +410,7 @@
      "$1,676,000"
     ],
     [
-     "Today's grid: average price, Wind Ridge · Prairie Town · Metro (conditional on the commitment)",
+     "Today's grid: average price per MWh served, Wind Ridge · Prairie Town · Metro (energy payments over the MWh used, so busy hours weigh more; conditional on the commitment)",
      "$27 · $27 · $29 /MWh"
     ],
     [
@@ -422,8 +422,8 @@
      "0 · 2 of 24"
     ],
     [
-     "Today's grid: unserved · reserve short",
-     "0 MWh · 0 MWh"
+     "Today's grid: unserved · reserve short (missing reserve MW added up hour by hour)",
+     "0 MWh · 0 MW·h"
     ],
     [
      "Today's grid: uplift (make-whole payments)",
@@ -434,7 +434,7 @@
      "$1,895,000"
     ],
     [
-     "With the 300 MW load: average price, Wind Ridge · Prairie Town · Metro (conditional on the commitment)",
+     "With the 300 MW load: average price per MWh served, Wind Ridge · Prairie Town · Metro (energy payments over the MWh used, so busy hours weigh more; conditional on the commitment)",
      "$32 · $32 · $32 /MWh"
     ],
     [
@@ -446,15 +446,15 @@
      "0 · 4 of 24"
     ],
     [
-     "With the 300 MW load: unserved · reserve short",
-     "0 MWh · 0 MWh"
+     "With the 300 MW load: unserved · reserve short (missing reserve MW added up hour by hour)",
+     "0 MWh · 0 MW·h"
     ],
     [
      "With the 300 MW load: uplift (make-whole payments)",
      "$0"
     ]
    ],
-   "note": "Precomputed with HiGHS on 5 November 2026: each day a mixed-integer program commits the plants, then the dispatch linear program with that commitment fixed gives the prices. With JavaScript on, the bench runs your own plan."
+   "note": "Precomputed with HiGHS on 5 November 2026: a mixed-integer program commits the plants each day; the dispatch linear program, with that commitment fixed, gives the prices. With JavaScript on, the bench runs your own plan."
   },
   "c2": {
    "head": "Results: the default plan (all 300 MW, nothing built), then the reference plan",

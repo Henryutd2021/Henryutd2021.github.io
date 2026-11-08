@@ -55,6 +55,7 @@
 .e2-say.bad b { color: var(--lx-bad); }
 .e2-say.good { background: var(--lx-good-soft); border-left: 4px solid var(--lx-good); }
 .e2-notes { margin: .3rem 0 0; padding-left: 1.1rem; display: grid; gap: 2px; font-size: 13.5px; color: var(--lx-ink-2); }
+.e2-unit-notes { margin: .4rem 0 0; padding-left: 1.1rem; display: grid; gap: 2px; }   /* the plants table's formulas, one a line */
 
 /* row labels of the data tables: plain words, not the column headings' small capitals; on phones (base.css shows one
    block per row with the header hidden) each cell is labelled with its column */

@@ -601,10 +601,10 @@
       ["Peak load: Ridge · Town · Metro", zl("peak") + " MW", "Illustrative; each hour follows SPP's 2025 demand shape (" + linkA(S.eia930, "EIA-930") + ", accessed " + S.eia930.asOf + ")"],
       ["Wind built: Ridge · Town · Metro", zl("wind") + " MW", "Illustrative"],
       ["Solar built: Ridge · Town · Metro", zl("solar") + " MW", "Illustrative"],
-      ["Output per MW: wind · solar", (P.cfg.cf.wind * 100).toFixed(1) + "% · " + (P.cfg.cf.solar * 100).toFixed(1) + "% a year", "SPP's 2025 shapes scaled to EIA's 2025 monthly capacity factors: " + linkA(S.epm607, "EPM Table 6.07.B") + ", " + S.epm607.asOf],
+      ["Output per MW: wind · solar", (P.cfg.cf.wind * 100).toFixed(1) + "% · " + (P.cfg.cf.solar * 100).toFixed(1) + "% a year", "SPP's 2025 hourly timing, rescaled to EIA's 2025 U.S. utility-scale monthly capacity factors (national, not SPP's own): " + linkA(S.epm607, "EPM Table 6.07.B") + ", " + S.epm607.asOf],
       ["Link limits: Ridge–Town · Town–Metro", P.links.map(function (l) { return kilo(l.cap); }).join(" · ") + " MW", "Illustrative"],
       ["Fuel: gas · coal", "$" + c.fuels.gas.price.toFixed(2) + " · $" + c.fuels.coal.price.toFixed(2) + "/MMBtu", "Average cost to the electric power industry, 2025: " + linkA(S.epa74, "EIA, Electric Power Annual, Table 7.4") + " · " + S.epa74.asOf + ". One <span class=\"lx-term\" data-term=\"mmbtu\">MMBtu</span> is a million British thermal units of fuel heat"],
-      ["Heat rates", "6.4 to 11.2 MMBtu/MWh", "Illustrative, around EIA's 2025 averages (coal 10.65, gas 7.78 MMBtu/MWh): " + linkA(S.epa81, "Electric Power Annual, Table 8.1") + " · " + S.epa81.asOf],
+      ["Heat rates", "6.4 to 11.2 MMBtu/MWh", "Fuel heat burned per MWh made (the <span class=\"lx-term\" data-term=\"heat-rate\">heat rate</span>). Illustrative, around EIA's 2025 averages (coal 10.65, gas 7.78 MMBtu/MWh): " + linkA(S.epa81, "Electric Power Annual, Table 8.1") + " · " + S.epa81.asOf],
       ["CO₂: gas · subbituminous coal", c.fuels.gas.co2.toFixed(2) + " · " + c.fuels.coal.co2.toFixed(2) + " kg/MMBtu", linkA(S.co2, "EIA, Carbon Dioxide Emissions Coefficients") + " · " + S.co2.asOf],
       ["Unserved load · reserve short", "$" + kilo(c.voll) + " · $" + kilo(c.reserveShort) + "/MWh", "Illustrative penalties in the objective, not costs anyone pays"]];
     var h = "<div class=\"lx-scroll-x\"><table class=\"lx-facts e2-inputs\"><thead><tr><th scope=\"col\">Input</th><th scope=\"col\">Value</th><th scope=\"col\">Source</th></tr></thead><tbody>" +
@@ -616,7 +616,9 @@
     h += "<details class=\"lx-deeper e2-units\"><summary><span class=\"k\">The plants</span>Each unit group's data (illustrative)</summary><div class=\"lx-deeper-body\"><div class=\"lx-scroll-x\"><table class=\"lx-facts\"><thead><tr>" +
       head.map(function (x) { return "<th scope=\"col\">" + escH(x) + "</th>"; }).join("") + "</tr></thead><tbody>" +
       urows.map(function (r) { return "<tr>" + r.map(function (x, i) { return i ? "<td class=\"n\" data-l=\"" + escH(head[i]) + "\">" + escH(x) + "</td>" : "<th scope=\"row\">" + escH(x) + "</th>"; }).join("") + "</tr>"; }).join("") +
-      "</tbody></table></div><p class=\"lx-hint\">Running cost = heat rate × fuel price + variable upkeep; no-load cost = the heat burned each hour a unit is on × fuel price. Peakers start within minutes and have no minimum output, so the model gives them no on/off decision.</p></div></details>";
+      "</tbody></table></div><ul class=\"lx-hint e2-unit-notes\"><li>Running cost = heat rate × fuel price + variable upkeep.</li><li>No-load cost = the heat burned each hour a unit is on × fuel price.</li>" +
+      "<li>Peakers start within minutes and have no minimum output, so the model gives them no on/off decision.</li>" +
+      "<li>A <span class=\"lx-term\" data-term=\"combined-cycle\">combined cycle</span> uses a gas turbine's hot exhaust to make more electricity in a steam turbine.</li></ul></div></details>";
     return h;
   }
 

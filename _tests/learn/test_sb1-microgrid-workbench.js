@@ -59,6 +59,14 @@ function resultRows(E1, R) {
   }
   ok(yr.every(r => r.ok), "full-year check: every plan's 8,760-hour LP is optimal and serves the campus");
   ok(Math.abs(pct(yr[0])) < 0.05 && yr.slice(1).every(r => pct(r) >= 4 && pct(r) <= 7), "full-year check: F7's campus the same, the large plans 4% to 7% higher (" + yr.map(r => pct(r).toFixed(2) + "%").join(", ") + "), as the page and the engine's notes say");
+  // the 4% to 7% holds for the three plans checked, not for every plan: the largest plan with no exports comes out far
+  // higher (a review's case), so the page and the engine's words add that other plans can differ more
+  {
+    const big = Object.assign({}, def, { pv: 4000, bat: 8000, exp: 0 }), avg = E1.readYear(big, P, solveSync(E1.yearModel(big, P))), full = X.fullYear(E1, P, big, solveSync), d = (full.bill - avg.bill) / avg.bill * 100;
+    const ENG = fs.readFileSync(X.L("components/engine-e1.js"), "utf8"), JS0 = fs.readFileSync(X.L("sb1-microgrid-workbench.js"), "utf8"), PG0 = fs.readFileSync(QPATH, "utf8");
+    ok(full.status === "optimal" && d > 10 && !/up to 7%/.test(ENG + JS0 + PG0) && (ENG.match(/4% to 7% higher; other plans can differ more/g) || []).length === 2 && /for the three larger plans checked below, a full year's bill came out 4% to 7% higher; other plans can differ more/.test(JS0) && /Other plans can differ more than these\./.test(PG0),
+      "the full-year bound only for the plans checked: 4,000 kW, 8,000 kWh, no exports comes out " + d.toFixed(1) + "% higher, so every statement says other plans can differ more");
+  }
   const PAGE = fs.readFileSync(QPATH, "utf8"), D = JSON.parse(fs.readFileSync(DPATH, "utf8"));
   ok(JSON.stringify(D.precomputed && D.precomputed.sb1) === JSON.stringify(pre), "the data file's precomputed default run equals a fresh run (run with --write after a change)");
   Object.keys(BLOCKS).forEach(k => { const r = X.between(PAGE, k); ok(r && r.text === BLOCKS[k]() + "\n", k + " block is up to date (run with --write)"); });
@@ -90,6 +98,14 @@ function resultRows(E1, R) {
   ok(sd.ok && sd.results.outages.length === 10, "the default plan on the ten seeded outages: optimal runs");
   const w = PG.seededWords(sd.results);
   ok(w.ok === sd.results.outages.filter(o => o.must < 0.5).length && /drawn outages/.test(w.text) && /not how often it would fail/.test(w.caution) && !/reliab|probab|percent|%/.test(w.text), "seeded words: a count of these outages, no reliability or probability claim: " + w.text);
+  // the pass count, the worst outage and the caution are three short elements (49 words in one paragraph before)
+  {
+    const wc = s => String(s || "").split(/\s+/).filter(Boolean).length, JS1 = fs.readFileSync(X.L("sb1-microgrid-workbench.js"), "utf8");
+    const bad = Object.assign({}, def, { gen: 0, bat: 0, pv: 0 }), sb = await E1.solve(bad, P, { solver, scenarios: P.seeded }), wb = PG.seededWords(sb.results);
+    ok(sb.ok && wb.ok < wb.n && wb.worstText && [w.text, w.worstText, w.caution, wb.text, wb.worstText, wb.caution].every(s => wc(s) <= 35) && /if \(w\.worstText\)/.test(JS1), "seeded words: three short elements, each within 35 words (" + [wb.text, wb.worstText, wb.caution].map(wc).join(", ") + ")");
+    const strs = (JS1.match(/LX\.rich\("[^"]+"\)|text: "[^"]{60,}"/g) || []).map(s => s.replace(/\[\[[^|]+\|([^\]]+)\]\]/g, "$1"));
+    ok(strs.length >= 2 && strs.every(s => wc(s) <= 37), "the explain layer's paragraphs within about 35 words: " + strs.map(wc).join(", "));
+  }
 
   // ---------------- the page frame
   ["brief", "bench", "results", "explain", "sources"].forEach(id => ok(new RegExp('::: \\{#' + id + ' \\.lx-sec\\}').test(PAGE), "section #" + id));
@@ -100,6 +116,10 @@ function resultRows(E1, R) {
   ok(!/\bprices?\b/i.test(T.replace(/Marginal electricity prices \(the engine does not calculate them\)|Marginal prices|diesel price|retail price|average price|Prices each outage's diesel/gi, "")), "the page names no price from the model (only that it calculates none)");
   ok(/does not calculate marginal electricity prices/.test(js) && /marginal prices of any kind from the model/.test(js), "the explain layer: the engine does not calculate marginal electricity prices");
   // ---------------- the wording details
+  ok(/Size it for me may build/.test(PAGE) && /It replaces your sizes; your other choices stay\./.test(fs.readFileSync(X.L("sb1-microgrid-workbench.js"), "utf8")) && /Its sizes replace yours; a technology switched off here is sized to zero\./.test(fs.readFileSync(X.L("components/engine-e1.js"), "utf8")),
+    "Size it for me: the bench says its sizes replace the reader's and a technology switched off is sized to zero");
+  ["Starts with a full battery and a full diesel tank; no fuel arrives during it.", "loads are flat and can be partly served", "It leaves out the sets' 30% minimum.", "not proven the cheapest on the steps"].forEach(s => has(s, "the no-JS explanation keeps the assumptions the results rest on"));
+  ok(/data-term="islanding">island<\/span>, cut off from the main grid/.test(PAGE) && !/part-load/.test(PAGE) && /1 kW of panels averages about 0\.24 kW over the year/.test(T), "island, fuel use below full output and the solar capacity factor said in plain words");
   ok(/test hypothetical outages on 2025 solar profiles/.test(PAGE) && !/real outages/.test(PAGE + js), "the subtitle: hypothetical outages, not real ones");
   ok(T.indexOf("not measured campus output") >= 0 && T.indexOf("The sun is real") < 0, "solar: a teaching profile, not measured campus output");
   ["feeder", "tariff", "linear-program", "cost-of-capital", "mixed-integer-program"].forEach(id => ok(new RegExp('data-term="' + id + '"').test(PAGE), "glossary mark on the page: " + id + ""));

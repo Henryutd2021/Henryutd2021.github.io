@@ -25,10 +25,10 @@ function rowsOf(E2, P, R, tag) {
   const T = R.tot;
   return [
     [tag + ": production cost (running, no-load and start-up; 2025 dollars)", moneyK(T.prod)],
-    [tag + ": average price, " + P.zones.map(z => z.name).join(" · ") + " (conditional on the commitment)", R.avgPrice.map(v => E2.priceTxt(v)).join(" · ") + " /MWh"],
+    [tag + ": average price per MWh served, " + P.zones.map(z => z.name).join(" · ") + " (energy payments over the MWh used, so busy hours weigh more; conditional on the commitment)", R.avgPrice.map(v => E2.priceTxt(v)).join(" · ") + " /MWh"],
     [tag + ": highest price in any zone", E2.priceTxt(Math.max.apply(null, R.maxPrice)) + "/MWh"],
     [tag + ": hours at the limit, Ridge–Town · Town–Metro", E2.kilo(T.cong.WT) + " · " + E2.kilo(T.cong.TM) + " of " + R.hours],
-    [tag + ": unserved · reserve short", E2.kilo(T.shed) + " MWh · " + E2.kilo(T.rshort) + " MWh"],
+    [tag + ": unserved · reserve short (missing reserve MW added up hour by hour)", E2.kilo(T.shed) + " MWh · " + E2.kilo(T.rshort) + " MW·h"],
     [tag + ": uplift (make-whole payments)", moneyK(T.upliftAll)]];
 }
 
@@ -40,7 +40,7 @@ function rowsOf(E2, P, R, tag) {
   ok(r0.ok && r1.ok, "the default plan and the 300 MW preset run optimal on the summer peak day");
   const pre = { head: "Result: summer peak day, 29 July 2025 (the default plan, then a 300 MW data center at Prairie Town)",
     rows: rowsOf(E2, P, r0.results, "Today's grid").concat(rowsOf(E2, P, r1.results, "With the 300 MW load")),
-    note: "Precomputed with HiGHS on " + RUN_DATE + ": each day a mixed-integer program commits the plants, then the dispatch linear program with that commitment fixed gives the prices. With JavaScript on, the bench runs your own plan." };
+    note: "Precomputed with HiGHS on " + RUN_DATE + ": a mixed-integer program commits the plants each day; the dispatch linear program, with that commitment fixed, gives the prices. With JavaScript on, the bench runs your own plan." };
   const withPre = { cfg: Object.assign({}, cfg, { precomputed: Object.assign({}, cfg.precomputed, { sb2: pre }) }) };
   const BLOCKS = { "sb2-bench": () => SS.staticHTML(E2.schema, def), "sb2-results": () => E2.fallback(withPre, "sb2"), "sb2-inputs": () => E2.inputsHTML(P) };
   if (process.argv.includes("--write")) {
@@ -87,7 +87,7 @@ function rowsOf(E2, P, R, tag) {
     let open = 0;
     P.links.forEach(l => {
       const n = R.tot.cong[l.id], cap = R.sys.caps[l.id], a = P.zix[l.from], b = P.zix[l.to];
-      let split = 0; R.days.forEach(d => d.hours.forEach(h => { if ((cap === 0 || Math.abs(h.f[l.id]) >= cap - 1e-6) && Math.abs(h.z[a].price - h.z[b].price) >= 0.5) split++; }));
+      let split = 0; R.days.forEach(d => d.hours.forEach(h => { if ((cap === 0 || Math.abs(h.f[l.id]) >= cap - 1e-6) && Math.abs(h.z[a].price - h.z[b].price) >= 1 - 1e-6) split++; }));
       if (cap === 0) {
         open++; seen.open++;
         if (!txt.includes(l.name + " is open (set to 0 MW):** nothing flows on it") || !txt.includes("differ by $1/MWh or more in " + E2.kilo(split) + " of " + R.hours + " hours") || /at its limit for/.test(txt.split(l.name)[1] || "")) bad("open " + l.id);
@@ -98,7 +98,7 @@ function rowsOf(E2, P, R, tag) {
     if (cent) seen.cent++;
     if (cent !== (!open && P.links.every(l => R.tot.cong[l.id] === 0) && sp < 0.01)) bad("cent " + sp);
     if (/within a cent/.test(txt) && !(sp < 0.01)) bad("spread " + sp);
-    if (R.tot.rshort > 0.5 !== /Reserve short by/.test(txt)) bad("reserve");
+    if (R.tot.rshort > 0.5 !== /Reserve short: [\d,]+ MW·h\*\* over [\d,]+ hours, the missing reserve MW added up hour by hour, not demand unserved\./.test(txt)) bad("reserve");
     // the money card's notes: the large load's served energy never above its zone's, its share of a shortfall stated
     const N = PG.notes(R, P).join(" "), zi = P.zix[R.sys.llz];
     if (R.sys.ll > 0) {
@@ -114,6 +114,21 @@ function rowsOf(E2, P, R, tag) {
   }
   ok(wordsOk, "the run's words, notes and readouts are true for all " + nRuns + " runs: every preset on every period and eight with a link open (" + notes.slice(0, 4).join("; ") + ")");
   ok(seen.open >= 8 && seen.cent > 0 && seen.llShed > 0 && seen.curtail > 0, "the runs cover open links, equal prices, the large load's share of a shortfall and curtailment at its bid (" + JSON.stringify(seen) + ")");
+  // review 1: "differ by $1/MWh or more" counts unrounded gaps of $1 or more (the review's case: summer peak day,
+  // 300 MW at Prairie Town, Town–Metro at 100 MW, gas $3.60; at 20:00 the gap is about $0.75, which counted before)
+  { const st = Object.assign({}, def, { ll: 300, llz: "T", tm: 100, gas: 3.6 }), r = await E2.solve(st, P, { solver }), R = r.results, l = P.links.find(x => x.id === "TM"), a = P.zix[l.from], b = P.zix[l.to];
+    const atCap = R.days[0].hours.filter(h => Math.abs(h.f.TM) >= R.sys.caps.TM - 1e-6), gaps = atCap.map(h => Math.abs(h.z[a].price - h.z[b].price));
+    const n1 = gaps.filter(g => g >= 1 - 1e-6).length, nHalf = gaps.filter(g => g >= 0.5).length, txt = PG.says(R, P).map(s => s.text).join(" ");
+    ok(r.ok && nHalf > n1 && gaps.some(g => g > 0.5 && g < 1) && new RegExp("Town–Metro at its limit for " + atCap.length + " of " + R.hours + " hours;\\*\\* in " + (n1 === atCap.length ? "all of them" : n1 + " of them") + " the prices on its two sides differ by \\$1/MWh or more").test(txt),
+      "the price-gap count: " + n1 + " of " + atCap.length + " hours at the limit differ by $1/MWh or more (the old $0.50 threshold counted " + nHalf + ")"); }
+  // review 2 and 3: the average price is per MWh served, weighted by use; the reserve shortfall is in MW·h
+  { const R = r1.results, N = PG.notes(R, P).join(" "), ro = PG.readouts(R, P);
+    ok(ro[1][0] === "Average price per MWh served, Prairie Town" && /so hours with more use weigh more; uplift and reserve payments are not in it/.test(N) && /\[\[congestion-rent\|Congestion rent\]\] [^:]+: loads' energy payments minus plants' energy earnings/.test(N) && /html: LX\.rich\(t\)/.test(JS),
+      "the average price is per MWh served, weighted by use, energy only; congestion rent is the energy settlement, marked for the glossary");
+    // offline peakers count toward the region-wide reserve, so no bench plan runs short of it: the words are checked on
+    // a run's results with 10 MW short for two hours put in by hand
+    const RS = Object.assign({}, R, { tot: Object.assign({}, R.tot, { rshort: 20 }), rshortHours: 2 }), say = PG.says(RS, P).map(s => s.text).join(" ");
+    ok(/\*\*Reserve short: 20 MW·h\*\* over 2 hours, the missing reserve MW added up hour by hour, not demand unserved\. Each MW·h short costs the model \$1,000\./.test(say) && !/Reserve short by/.test(say + JS), "reserve short is said in MW·h, the missing reserve added up hour by hour, not unserved demand: " + (say.match(/\*\*Reserve short[^.]*\./) || [""])[0]); }
   // curtailment at the bid: a hard case (peak-demand week, 400 MW, 20% flexible, $300/MWh): hours that curtail at
   // exactly the bid exist, so the page never says "above"
   { const r = await E2.solve(Object.assign({}, def, { per: "hot", ll: 400, flex: 20, bid: 300 }), P, { solver }), R = r.results, zi = P.zix.T;
@@ -133,7 +148,13 @@ function rowsOf(E2, P, R, tag) {
   ok(/data-term=\\"mmbtu\\"/.test(ENG) && /One <span[^>]*>MMBtu<\/span> is a million British thermal units/.test(PAGE), "the inputs table defines MMBtu");
   ok(/Starting conditions:\*\* the first day assumes any units on at 00:00 were already running, so their earlier start-up costs are left out/.test(JS) && /whether the reserve could reach a zone after a failure/.test(JS) && /whether the reserve can reach each zone/.test(PAGE),
     "the first day's free start and the reserve's deliverability are stated");
-  [PG.TABLE_HINT, PG.START_HINT, PG.GROUPS[1].hint, PG.GROUPS[3].hint].forEach(t => { const n = t.replace(/\[\[[a-z-]+\|([^\]]+)\]\]/g, "$1").replace(/\*\*/g, "").split(/\s+/).length; ok(n <= 35, "within the 35-word budget (" + n + "): " + t.slice(0, 40)); });
+  [PG.TABLE_HINT, PG.UNIT_HINT, PG.START_HINT, PG.GROUPS[1].hint, PG.GROUPS[3].hint].concat(PG.notes(r1.results, P)).forEach(t => { const n = t.replace(/\[\[[a-z-]+\|([^\]]+)\]\]/g, "$1").replace(/\*\*/g, "").split(/\s+/).length; ok(n <= 35, "within the 35-word budget (" + n + "): " + t.slice(0, 40)); });
+  // review 4: the page's own elements, the inputs table's cells and the plants' notes, each within 35 words
+  { const OWN = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1:end -->/g, "").replace(/<!--[\s\S]*?-->/g, " ").replace(/^---[\s\S]*?\n---\n/, "").replace(/<style>[\s\S]*?<\/style>/g, "").replace(/<div class="lx-card lx-sources">[\s\S]*?<\/div>/, "");
+    const els = OWN.replace(/^- (.*)$/gm, "<li>$1</li>").split(/<\/?(?:p|li|dd|dt|td|th|summary)\b[^>]*>/i).map(x => x.replace(/<[^>]+>/g, "").replace(/\[([^\]]+)\]\([^)]*\)/g, "$1").replace(/\s+/g, " ").trim()).filter(x => /[A-Za-z]/.test(x) && !/^```/.test(x));
+    const long = els.filter(x => x.split(" ").length > 35);
+    ok(els.length > 80 && !long.length, "every element of the page within 35 words (" + els.length + "): " + long.map(x => x.slice(0, 50) + " (" + x.split(" ").length + ")").join(" | ")); }
+  ok(/data-term="heat-rate"/.test(PAGE) && /data-term="combined-cycle"/.test(PAGE) && /\[\[combined-cycle\|/.test(JS) && /national figures, not SPP's own/.test(PAGE) && /national, not SPP's own/.test(PAGE), "heat rate and combined cycle defined and marked; the capacity factors named as U.S. national figures rescaling SPP's timing (review 5 and 6)");
   const desc = (PAGE.match(/^description: "([^"]+)"/m) || [])[1] || "";
   ok(desc.split(/\s+/).length <= 35, "the description is within the 35-word budget (" + desc.split(/\s+/).length + " words)");
   const hrefs = [...PAGE.matchAll(/href="([^"]+)"/g)].map(m => m[1]).filter(h => !/^(https?:|mailto:|#|\.\.\/)/.test(h) && !/^index\.html(#|$)/.test(h));
