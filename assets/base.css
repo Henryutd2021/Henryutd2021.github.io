@@ -95,6 +95,11 @@ a.card:hover, a.glow-card:hover, .card.is-link:hover { box-shadow: var(--shadow-
 .js-reveal .reveal { opacity: 0; transform: translateY(10px); transition: opacity .5s var(--ease), transform .5s var(--ease); }
 .js-reveal .reveal.in, .js-reveal .reveal:focus-within { opacity: 1; transform: none; }
 
+/* listing pages whose post titles follow the page title (Briefings, Perspectives): the titles and the margin's
+   "Categories" heading are <h2>, so no heading level is skipped; they keep the look of the <h3> and <h5> they were */
+div.quarto-post .body h2.listing-title, #quarto-margin-sidebar h2.quarto-listing-category-title {
+  color: var(--ink); padding-bottom: 0; border-bottom: 0; }
+
 /* ---------- footer ---------- */
 .nav-footer { border-top: 1px solid var(--line); background: var(--bg-2) !important; font-size: .86rem; color: var(--muted); }
 .nav-footer a { color: var(--ink-2); }
