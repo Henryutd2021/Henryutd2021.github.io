@@ -188,7 +188,8 @@ const has = (s, msg) => ok(T.indexOf(s) >= 0, "page states " + JSON.stringify(s)
   has("$\\sqrt{110^2 + 50^2}$ = 120.8 MVA"); has("1000 × 120 ÷ (√3 × 138) = 502 A"); has("16 GW·s = 16,000 MW·s");
   const v4 = M.evening(F, 4);
   ok(v4.Q.toFixed(2) === "1.31" && M.pu(v4.v) === "0.951" && (12.47 * 12.47).toFixed(1) === "155.5", "Go deeper: 4.0 MW, Q 1.31 Mvar, 155.5 kV², 0.951 per unit");
-  has("1.03 − (2.0 × 4.0 + 3.2 × 1.31) ÷ 155.5 = 0.951 per unit");
+  has("1.03 − (2.0 × 4.0 + 3.2 × 1.315) ÷ 155.5 = 0.951 per unit");
+  ok((1.03 - (2.0 * 4.0 + 3.2 * 1.315) / 155.5).toFixed(3) === "0.951" && v4.Q.toFixed(3) === "1.315", "Go deeper: the printed operands themselves give the printed 0.951");
   ok((F.noonLoadMW * M.tanphi(F.loadPF)).toFixed(2) === "0.33", "Go deeper: Q_L = 0.33 Mvar");
   has("(2.0 × 1.0 + 3.2 × 0.33 + 0.02 × 155.5) ÷ 2.0 = 3.1 MW"); has("60 × 100 ÷ (2 × 16,000) = 0.19 Hz per second");
   ok(M.tanphi(0.95).toFixed(2) === "0.33", "q = 0.33 at power factor 0.95");
@@ -199,14 +200,16 @@ const has = (s, msg) => ok(T.indexOf(s) >= 0, "page states " + JSON.stringify(s)
   ok((110 / c50.S).toFixed(2) === "0.91", "practice 2: 0.91"); has("110 ÷ 120.8 = 0.91");
   const F3 = { kV: 12.47, km: 1, rOhmPerKm: 1.5, xOhmPerKm: 2.4, vSub: 1.02, loadPF: 0.95 }, e3 = M.evening(F3, 3);
   ok(e3.Q.toFixed(2) === "0.99" && e3.v.toFixed(3) === "0.976" && e3.v >= Bd.lo, "practice 3: Q 0.99 Mvar, 0.976 per unit, in the band");
-  has("1.02 − (1.5 × 3 + 2.4 × 0.99) ÷ 155.5 = 0.976 per unit");
+  has("1.02 − (1.5 × 3 + 2.4 × 0.99) ÷ 155.5 = 0.976 per unit"); has("Q = P × √(1 ÷ PF² − 1) = 3 × 0.329 = 0.99 Mvar");
+  ok(Math.sqrt(1 / (0.95 * 0.95) - 1).toFixed(3) === "0.329" && (3 * Math.sqrt(1 / (0.95 * 0.95) - 1)).toFixed(2) === "0.99", "practice 3: the Mvar worked from the power factor");
   const F4 = Object.assign({}, F, { km: 16 }), h4 = M.hosting(F4, Bd.hi, false);
   ok(h4.toFixed(1) === "2.3" && near(M.ohms(F4).R, 4, 1e-12) && near(M.ohms(F4).X, 6.4, 1e-12), "practice 4: 16 km feeder hosts 2.3 MW");
   has("About 2.3 MW: (4.0 × 1.0 + 6.4 × 0.33 + 0.02 × 155.5) ÷ 4.0, less than the 3.1 MW of the 8 km feeder");
   ok(near(60 * 200 / (2 * 10000), 0.6, 1e-12) && near(M.rocof(Object.assign({}, G, { tripMW: 200 }), 10), 0.6, 1e-12), "practice 5: 0.6 Hz/s");
   { const d0 = 100, d1 = 210, cc0 = 100, pk0 = 0, cc1 = cc0 + 40, pk1 = d1 - cc1;
     ok(cc0 + pk0 === d0 && cc1 + pk1 === d1 && cc1 <= 150 && pk1 <= 100 && cc1 - cc0 <= 40 && pk1 === 70 && cc1 === 140, "practice 6: 100 = 100 + 0 before, 210 = 140 + 70 after, within both plants' sizes and the 40 MW ramp"); }
-  has("Within an hour, the gas plants must go from 100 to 210 MW"); has("the combined-cycle plant climbs 40 MW, to 140 MW, and the peaker gives the other 70 MW");
+  has("Demand climbs steadily for an hour, taking the gas plants from 100 to 210 MW"); has("by the hour's end the combined-cycle plant is at 140 MW and the peaker gives 70 MW");
+  { let okAll = true; for (let k = 0; k <= 60; k++) { const tau = k / 60, need = 110 * tau, cc = Math.min(40 * tau, 50), pk = need - cc; if (pk < -1e-9 || pk > 100 + 1e-9) okAll = false; } ok(okAll, "practice 6: with demand climbing steadily, the peaker's share stays within 0 to 100 MW at every minute"); }
   // numbers to remember and the band
   ok(Bd.volts[0] === Bd.nominalV * Bd.lo && Bd.volts[1] === Math.round(Bd.nominalV * Bd.hi), "band: 114 and 126 V = 0.95 and 1.05 of 120 V");
   has("The normal range of service voltage, ANSI C84.1 Range A: 114 to 126 V on a 120 V service.");
@@ -249,6 +252,13 @@ const has = (s, msg) => ok(T.indexOf(s) >= 0, "page states " + JSON.stringify(s)
     if (says !== st || t.indexOf("near " + evL.toFixed(1) + " MW") < 0) ok(false, "sag reveal true at " + p + " MW: " + t);
   }
   ok(/too close to 0\.95 to call: an AC check decides/.test(M.sagSaw(A, 4)), "the sag reveal at 4.0 MW leaves the verdict to an AC check");
+  { // the AC check's line, for every evening and noon setting: within the budget, and its words follow the AC result
+    const pts = []; for (let p = F.evening.min; p <= F.evening.max + 1e-9; p += F.evening.step) pts.push(M.evening(F, p));
+    for (let pv = F.pv.min; pv <= F.pv.max + 1e-9; pv += F.pv.step) [false, true].forEach(ab => pts.push(M.noon(F, pv, ab)));
+    let bad = [];
+    pts.forEach(pt => { const ac = M.acEnd(F, pt.P, pt.Q), t = M.acSaw(A, pt.v, ac), w = M.acWords(Bd, ac);
+      if (!(nWords(t) <= 40 && nSent(t) <= 2) || (!isNaN(ac) && t.indexOf(M.pu(ac) + " per unit**, " + w) < 0)) bad.push(plain(t).slice(0, 60)); });
+    ok(pts.length > 60 && bad.length === 0, "the AC check's line at every setting (" + pts.length + "): short, and true to the AC result: " + bad.slice(0, 3).join(" | ")); }
   for (let pv = F.pv.min; pv <= F.pv.max + 1e-9; pv += F.pv.step) {
     const t = M.noonSaw(A, pv), v = M.noon(F, pv, false).v;
     budget(t, "hosting reveal at " + pv + " MW", 36, 2);
@@ -304,7 +314,7 @@ const has = (s, msg) => ok(T.indexOf(s) >= 0, "page states " + JSON.stringify(s)
   // the generated no-JS block counts too; a leading bold label ("A ramp.") is a label, not a sentence
   const prose = OWN.replace(/<!-- a17-fallback:(start|end)[^>]*-->/g, " ").replace(/<style>[\s\S]*?<\/style>/, " ").replace(/<table class="lx-facts">[\s\S]*?<\/table>/g, " ").replace(/^---[\s\S]*?\n---\n/, " ")
     .replace(/<div class="lx-card lx-sources">[\s\S]*?<\/div>/, " ").replace(/<!--[\s\S]*?-->/g, " ").split(/<\/?(?:p|li|dd|dt|summary|td|th)\b[^>]*>|<br>|\n\n|\n- /).filter(s => /[A-Za-z]{3}/.test(text(s)) && !/^\|/.test(text(s)) && !/^(:::|```)/.test(text(s)));
-  prose.forEach(raw => { const s = text(raw), w = s.split(" ").length, n = nSent(text(raw.replace(/^\s*<b>[^<]*<\/b>/, ""))); ok(w <= 40 && n <= 3, "text element of " + w + " words, " + n + " sentences (≤ 40, ≤ 3): " + s.slice(0, 70)); });
+  prose.forEach(raw => { const s = text(raw), w = s.split(" ").length, n = nSent(text(raw.replace(/^\s*<b>[^<]*<\/b>/, ""))); ok(w <= 40 && n <= 2, "text element of " + w + " words, " + n + " sentences (≤ 40, ≤ 2): " + s.slice(0, 70)); });
 
   // ---------------- path.yml entry, front matter, sidecar
   const PY = fs.readFileSync(path.join(SITE, "learn/path.yml"), "utf8"), entry = PY.split(/\n- kind: /).find(e => /\n  id: a17-physical-feasibility\n/.test(e)) || "";
@@ -312,7 +322,7 @@ const has = (s, msg) => ok(T.indexOf(s) >= 0, "page states " + JSON.stringify(s)
   const sub = (entry.match(/\n  subtitle: "(.*)"\n/) || [])[1];
   ok(sub && PAGE.indexOf('subtitle: "' + sub + '"') >= 0, "front matter subtitle = path.yml");
   const terms = [...SIDE.matchAll(/- id: ([a-z-]+)/g)].map(m => m[1]);
-  ok(terms.join(",") === "apparent-power,power-factor,thermal-rating,hosting-capacity,per-unit,service-voltage-range", "sidecar: six new glossary terms");
+  ok(terms.join(",") === "apparent-power,power-factor,thermal-rating,hosting-capacity,per-unit,ac-power-flow,service-voltage-range", "sidecar: seven new glossary terms");
   const used = new Set([...(PAGE + JS).matchAll(/data-term="([a-z0-9-]+)"|\[\[([a-z0-9-]+)\|/g)].map(m => m[1] || m[2]).filter(Boolean));
   const GL = JSON.parse(fs.readFileSync(L("data/glossary.json"), "utf8"));
   ok([...used].every(t => GL[t]), "every glossary mark is defined: " + [...used].filter(t => !GL[t]).join(", "));
@@ -341,6 +351,17 @@ const has = (s, msg) => ok(T.indexOf(s) >= 0, "page states " + JSON.stringify(s)
       ok(xp.textContent.includes("at your 0 Mvar it runs at 92%"), "explain at first: the default 0 Mvar");
       demo.cards.go(1); act().lxSet(55);
       ok(xp.textContent.includes("at your 55 Mvar it runs at 102%") && !xp.textContent.includes("at your 0 Mvar"), "an ordinary slider move (55 Mvar) refreshes the explain layer");
+      ok(live.querySelectorAll(".lx-saw").length > 0, "one deliberate change from the starting value compares two settings: the step answers");
+      // the AC check, live: at 4.0 MW the first estimate cannot decide; the AC check reads 0.945, below the band
+      demo.cards.go(2); act().lxSet(4);
+      const tgl = act().querySelectorAll("button").filter(b => /Run an AC check/.test(b.textContent) || /Run an AC check/.test(b.getAttribute("aria-label") || ""))[0];
+      ok(!!tgl, "step 3 offers an AC check"); if (tgl) tgl.click();
+      ok(/AC check: 0\.945 per unit, below the band; the first estimate read 0\.951\. Near a limit, the AC check decides\./.test(act().textContent.replace(/\s+/g, " ")) && act().textContent.includes("Far end, AC check"), "step 3: the AC check's reading beside the first estimate, and its verdict");
+      // the ramp readout is red only outside the limit
+      demo.cards.go(5); act().lxSet(12);
+      const chg = () => act().querySelectorAll(".lx-readout").filter(r => /Asked to change/.test(r.textContent))[0];
+      ok(chg() && !/\bbad\b/.test(chg().className), "step 6: a change within ±40 MW is not marked as an error");
+      act().lxSet(14); ok(chg() && /\bbad\b/.test(chg().className), "step 6: the +50 MW into 14:00 is marked");
       demo.cards.go(2); act().lxSet(5);
       ok(xp.textContent.includes("at your 5.0 MW it reads 0.932 per unit, below the band"), "the evening slider refreshes the map's sag line");
       demo.cards.go(3); act().lxSet(0);

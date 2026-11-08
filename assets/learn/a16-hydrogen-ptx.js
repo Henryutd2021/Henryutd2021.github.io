@@ -103,7 +103,13 @@
     musd: function (v) { return (v < 0 ? "−$" : "+$") + (Math.abs(v) / 1e6).toFixed(2) + "M"; },
     co2: function (v) { return v.toFixed(1) + " kg"; }
   };
-  var model = { HOURS: HOURS, prepare: prepare, crf: crf, run: run, net: net, sweep: sweep, best: best, lossPrice: lossPrice, tank: tank, chain: chain, sum: sum, fm: fm };
+  // the cost per kg, worked: capital a year (size x $/kW x the capital recovery factor) plus power, over the year's kg
+  function costWorked(o, E) {
+    var f = crf(E.rate, E.life);
+    return "Worked: " + o.X + " MW × $" + E.capexPerKW.toLocaleString("en-US") + " per kW × " + f.toFixed(4) + " (" + Math.round(E.rate * 100) + "%, " + E.life + " years) = $" + Math.round(o.capital).toLocaleString("en-US") + " a year" +
+      (o.elecCost > 0.5 ? " + $" + Math.round(o.elecCost).toLocaleString("en-US") + " of power" : ", power free") + "; ÷ " + Math.round(o.kg).toLocaleString("en-US") + " kg = " + fm.kg2(o.lcoh) + " per kg.";
+  }
+  var model = { costWorked: costWorked, HOURS: HOURS, prepare: prepare, crf: crf, run: run, net: net, sweep: sweep, best: best, lossPrice: lossPrice, tank: tank, chain: chain, sum: sum, fm: fm };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX || !window.LX.H) return;
 
@@ -122,7 +128,7 @@
       ".a16-tbl th,.a16-tbl td{padding:5px 6px;border-bottom:1px solid var(--lx-line);text-align:right;font-weight:400}",
       ".a16-tbl th:first-child,.a16-tbl td:first-child{text-align:left}.a16-tbl thead th{font-family:var(--lx-f-display);font-size:12px;color:var(--lx-ink-3);vertical-align:bottom}",
       ".a16-tbl td{font-family:var(--lx-f-mono);font-variant-numeric:tabular-nums}.a16-tbl td:first-child{font-family:var(--lx-f-body)}",
-      ".a16-note{font-size:13.5px;color:var(--lx-ink-3);margin:0}",
+      ".a16-note{font-size:13.5px;color:var(--lx-ink-3);margin:0}.a16-src{margin:0;padding-left:1.1rem;display:grid;gap:2px}",
       ".a16-ctx{font-size:13.5px;margin:0;padding:5px 10px;border-left:3px solid var(--lx-accent);background:var(--lx-surface-2);border-radius:0 8px 8px 0}",
       "@media (max-width:560px){.a16-tbl table{font-size:12.5px}.a16-tbl th,.a16-tbl td{padding:4px 3px}.a16-tbl .ph{display:none}}"
     ].join("\n") }, document.head);
@@ -165,16 +171,18 @@
       { text: "A 100 MW wind farm's grid connection takes 50 MW; the rest is [[curtailment|curtailed]]. Add a [[pem-electrolyzer|PEM electrolyzer]] that uses only that spare wind. Try three sizes.",
         build: function (act, api) {
           // always PEM, as the step says; step 3 brings in the alkaline type
-          var out = H("div", { class: "a16-kpis", "aria-live": "polite" }, act), tried = {};
+          var out = H("div", { class: "a16-kpis", "aria-live": "polite" }, act), tried = {}, wk = H("p", { class: "a16-note", "aria-live": "polite" }, act);
           function draw() {
             var o = run(Y, st.X, "spare", "pem"); out.innerHTML = "";
             kpi(out, "Hydrogen a year", fm.t(o.kg)); kpi(out, "Average utilization", fm.pct(o.util)); kpi(out, "Hours running", fm.h(o.hoursOn)); kpi(out, "Curtailed left", fm.gwh(o.curtailed)); kpi(out, "Cost per kg (partial)", fm.kg2(o.lcoh));
+            wk.textContent = costWorked(o, E);
             return o;
           }
           LX.Slider(act, { label: "Electrolyzer size", min: D.sizes.min, max: D.sizes.max, step: D.sizes.step, value: st.X, fmt: function (v) { return v + " MW"; },
             onChange: function (v) { st.X = v; var o = draw(); tried[v] = 1; if (Object.keys(tried).length >= 3) { api.done(); api.saw("At " + v + " MW its year's output equals " + fm.h(o.eflh) + " [[full-load-hours|at full size]] (" + fm.pct(o.util) + " average utilization), though it runs in " + fm.h(o.hoursOn) + ". **Bigger electrolyzers sit idle more**, so each kg carries more capital: " + fm.kg2(o.lcoh) + "."); } } });
           H("p", { class: "a16-note", text: "Without it, " + fm.gwh(spare0) + " of wind a year is curtailed. Average utilization = the year's output ÷ (size × 8,760 hours)." }, act);
-          H("p", { class: "a16-note", text: "Cost per kg counts capital ($" + E.capexPerKW.toLocaleString("en-US") + "/kW, 2022 dollars) and power only. DOE's production cost, $5–7/kg, also counts upkeep and stack replacement." }, act);
+          H("p", { class: "a16-note", text: "Cost per kg counts capital ($" + E.capexPerKW.toLocaleString("en-US") + "/kW, 2022 dollars) and power only. DOE's production cost, $5–7/kg, also counts upkeep and stack replacement (new electrolysis cells)." }, act);
+          H("p", { class: "a16-note", text: "Units: t = tonne, 1,000 kg; Mt = million tonnes; GWh = 1,000 MWh. The farm's hours are built from regional data, not measured at one farm, so spare wind depends on that construction." }, act);
           draw();
         } },
       // 3 part-load limits
@@ -225,7 +233,7 @@
             options: [{ value: "hours", label: "a few hours of delivery" }, { value: "days", label: "a few days" }, { value: "weeks", label: "weeks or more" }],
             feedback: { weeks: "Windy and calm seasons differ, so the tank fills for weeks and drains for weeks.", hours: "Daily swings are small next to the seasons'.", days: "Calm spells last days, and seasons longer." },
             onPick: function () {
-              pr.reveal(); out.innerHTML = ""; kpi(out, "Steady delivery", Math.round(tk.q).toLocaleString("en-US") + " kg/h"); kpi(out, "Working storage needed", fm.t(tk.size)); kpi(out, "In the tank on 1 January", fm.t(tk.start)); kpi(out, "Days of delivery", Math.round(tk.days).toLocaleString("en-US"));
+              pr.reveal(); out.innerHTML = ""; kpi(out, "Steady delivery", Math.round(tk.q).toLocaleString("en-US") + " kg/h"); kpi(out, "Working storage needed (usable capacity)", fm.t(tk.size)); kpi(out, "In the tank on 1 January", fm.t(tk.start)); kpi(out, "Days of delivery", Math.round(tk.days).toLocaleString("en-US"));
               note.hidden = false;
               P.render({ x: { min: 0, max: 365, ticks: [[0, "Jan"], [90, "Apr"], [181, "Jul"], [273, "Oct"], [365, "Dec 31"]], ticksN: [[0, "Jan"], [181, "Jul"], [365, "Dec"]] }, y: { min: 0, max: Math.ceil(tk.size / 1000 / 100) * 100, step: Math.ceil(tk.size / 1000 / 400) * 100, fmt: function (v) { return v.toLocaleString("en-US"); }, unit: "t in the tank" },
                 lines: [{ values: tk.daily.map(function (v) { return v / 1000; }), x0: 1, color: "var(--lx-good)", area: 0.15 }], aria: "Hydrogen in the tank at the end of each day of 2025",
@@ -235,6 +243,7 @@
             } });
           out = H("div", { class: "a16-kpis" }, act); P = LX.Plot(act, { box: true, text: "Text version of the tank" });
           note = H("p", { class: "a16-note", hidden: true, text: "The least working storage for 2025's known hours: the tank starts the year " + fm.t(tk.start) + " full, loses nothing and ends where it started. Another weather year needs its own check." }, act);
+          H("p", { class: "a16-note", text: "How the size is found: add up production minus the steady delivery hour by hour. The tank must hold the running total's highest point minus its lowest." }, act);
         } },
       // 6 procurement rules
       { text: "[[procurement-rule|Rules]] for calling hydrogen clean set which power may count. Compare three at 30 MW: spare wind, wind [[hourly-matching|matched hour by hour]], or grid power matched over the year.",
@@ -255,12 +264,14 @@
       // 7 the use sorter
       { text: "Where is hydrogen worth its losses? Sort eight uses by their alternative today: is hydrogen the [[feedstock|feedstock]], or can electricity do the job? Then check.",
         build: function (act, api) {
-          LX.CardSort(act, { bins: D.uses.bins, cards: D.uses.cards, onCheck: function (g) {
+          LX.CardSort(act, { bins: D.uses.bins, cards: D.uses.cards, hint: "Decide in order: is hydrogen a chemical input, and if not, can electricity meet the job's range, heat or storage time today, with far less power? Tap a card, then the box it belongs in.", onCheck: function (g) {
             if (g.placed < g.total) return; api.done(); LX.progress.done(SLUG); remember("uses", g.right);
             api.saw(g.right + " of " + g.total + " as the evidence sorts them. Hydrogen makes most sense where it is the [[feedstock|feedstock]], or where nothing electric does the job yet.");
           } });
           // every source with its link and date
-          H("p", { class: "a16-note", html: "Sources: " + D.uses.sources.map(function (s) { return "<a href=\"" + LX.esc(s.url) + "\">" + LX.esc(s.label) + "</a> (" + LX.esc(s.date) + ")"; }).join("; ") + "." }, act);
+          H("p", { class: "a16-note", text: "Sources:" }, act);
+          var sl = H("ul", { class: "a16-src" }, act);
+          D.uses.sources.forEach(function (s) { H("li", { class: "a16-note", html: "<a href=\"" + LX.esc(s.url) + "\">" + LX.esc(s.label) + "</a> (" + LX.esc(s.date) + ")." }, sl); });
         } }
     ];
     var cardsHost = H("div", null, live);
@@ -300,14 +311,14 @@
                { label: "Ocean shipping", path: ["wind", "ez", "store", "use", "direct", "both"], text: "Batteries do not yet carry long voyages; fuels made from hydrogen compete with other fuels." }], sel: 0
     });
     LX.CompareTable(H("div", { class: "lx-xcard" }, x), {
-      title: "Three procurement rules, one 30 MW electrolyzer", lede: "Same farm, same year (PEM, 5% minimum). Average utilization: the year's output ÷ (30 MW × 8,760 hours). Cost per kg counts capital and power only.",
+      title: "Three procurement rules, one 30 MW electrolyzer", lede: "Reference comparison: PEM, 5% minimum, whatever type you picked above. Same farm, same year. Average utilization: the year's output ÷ (30 MW × 8,760 hours). Cost per kg counts capital and power only.",
       columns: [{ key: "name", label: "Rule", main: true }, { key: "util", label: "Average utilization", phone: "Avg. use", num: true }, { key: "lcoh", label: "Cost per kg", num: true }, { key: "co2", label: "CO₂ of grid hours, per kg", phone: "Grid CO₂", num: true }],
       rows: rs.map(function (o) { return { key: o.rule, color: o.rule === "annual" ? "var(--lx-bad)" : "var(--lx-good)", name: RULES[o.rule], note: fm.t(o.kg) + " a year; runs " + o.hoursOn.toLocaleString("en-US") + " h", util: { text: fm.pct(o.util), value: o.util }, lcoh: { text: fm.kg2(o.lcoh), value: o.lcoh }, co2: { text: fm.co2(o.gridCO2), value: o.gridCO2 } }; }),
       sorts: [{ label: "By rule", order: ["spare", "hourly", "annual"], note: "The rule changes how many hours run, so it changes the cost per kg." },
               { label: "By cost per kg", order: rs.slice().sort(function (a, b) { return a.lcoh - b.lcoh; }).map(function (o) { return o.rule; }), ranked: true, note: "The cheapest kg comes with the grid's emissions unless the grid power is itself clean." }]
     });
     LX.Boundary(H("div", { class: "lx-xcard" }, x), { title: "Where this lesson's numbers hold",
-      holds: ["one illustrative 100 MW wind farm with a 50 MW connection, on SPP's real 2025 wind hours;", "DOE's 2022-dollar capital cost and power price, at 4% real over 30 years;", "hydrogen used or stored on site, sold at a price you set."],
+      holds: ["one illustrative 100 MW wind farm with a 50 MW connection, its hours built from SPP's real 2025 regional shape: spare wind and the tank depend on that construction;", "DOE's 2022-dollar capital cost and power price, at 4% real over 30 years;", "hydrogen used or stored on site, sold at a price you set."],
       leaves: ["upkeep and stack replacement, which DOE's $5–7/kg production cost counts;", "compression, storage beyond the tank, pipelines and trucks, which DOE's figure leaves out too;", "credit rules, which change from year to year;", "whether the wind farm would have been built anyway ([[additionality|additionality]])."],
       source: "Costs: DOE Hydrogen Program Record 24005 (2022 dollars). Part-load ranges: IRENA (2020)." });
   }

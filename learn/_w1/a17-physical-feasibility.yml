@@ -17,6 +17,9 @@ glossary:
   - id: per-unit
     term: Per unit
     def: "A voltage written as a fraction of its nominal value: 1.00 per unit is 120 V on a 120 V service, 0.95 is 114 V."
+  - id: ac-power-flow
+    term: AC power flow (AC check)
+    def: "A calculation of a network's voltages, currents and reactive power as well as its MW, from the alternating-current equations; it shows what a DC power flow or a first estimate leaves out."
   - id: service-voltage-range
     term: Service voltage range
     def: "The voltage a utility keeps at a customer's meter in normal operation; in the U.S., ANSI C84.1 Range A, 114 to 126 V on a 120 V service (0.95 to 1.05 per unit)."

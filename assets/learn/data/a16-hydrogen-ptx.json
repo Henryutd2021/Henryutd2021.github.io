@@ -1,7 +1,7 @@
 {
  "about": "Data of Learn lesson A16, Where does hydrogen make sense? The wind farm, its grid limit and the hydrogen user are fictional and illustrative; the wind follows the real hourly shape of the Southwest Power Pool grid in 2025 (town_year.json, EIA-930). Every cost is in 2022 dollars, from one DOE record. Sources and dates are given with each item.",
- "dataset": { "creator": "Honglin Li", "date": "2026-11-07", "status": "Illustrative: the wind farm, its grid limit and the hydrogen user are fictional; the wind follows SPP's real 2025 hourly shape (EIA-930); the costs are from one DOE record, in 2022 dollars.", "source": "Written by hand for lesson A16 from the sources named with each item.", "license": "CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/), Honglin Li. Values taken from the sources named in this file keep their publishers' terms; EIA and DOE data are U.S. government works in the public domain." },
- "farm": { "windMW": 100, "exportMW": 50, "profileMethod": "power", "note": "Illustrative: a 100 MW wind farm whose grid connection takes at most 50 MW." },
+ "dataset": { "creator": "Honglin Li", "date": "2026-11-07", "status": "Illustrative: the wind farm, its grid limit and the hydrogen user are fictional; the wind follows SPP's real 2025 hourly shape (EIA-930); the costs are from one DOE record, in 2022 dollars.", "source": "Values for lesson A16 from the sources named with each item; the farm, its grid limit and the hydrogen user are set for teaching.", "license": "CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/), Honglin Li. Values taken from the sources named in this file keep their publishers' terms; EIA and DOE data are U.S. government works in the public domain." },
+ "farm": { "windMW": 100, "exportMW": 50, "profileMethod": "power", "note": "Illustrative: a 100 MW wind farm whose grid connection takes at most 50 MW. Its hours are constructed, not measured: SPP's regional 2025 shape raised to a power so the peak hour reaches 100 MW and the year averages 33.8%; spare wind and the tank depend on that construction." },
  "electrolyzer": {
   "kWhPerKg": 57, "capexPerKW": 2000, "life": 30, "rate": 0.04, "rateNote": "4% real, as in lesson 13.",
   "doeBoundary": "DOE's $5-7/kg (Record 24005, pp. 1-2 and the appendix) counts fixed upkeep (5% of the installed cost a year) and stack replacement (11% of it every 40,000 operating hours); it leaves out compression, storage, distribution and dispensing, and assumes 50-75% capacity factors and about 10% nominal cost of capital. The lesson counts capital and power only, at 4% real.",
@@ -25,17 +25,17 @@
  "prices": { "min": 2, "max": 8, "step": 0.5, "start": 4 },
  "uses": {
   "bins": [
-   { "id": "feed", "label": "Hydrogen is the feedstock", "sub": "no direct-electric route today" },
+   { "id": "feed", "label": "Hydrogen is a chemical input", "sub": "the product is made from it in today's main route" },
    { "id": "both", "label": "Both routes are tried", "sub": "hydrogen against batteries or electric heat" },
    { "id": "elec", "label": "Electricity does it with far less", "sub": "a direct-electric route uses much less power" }
   ],
   "cards": [
    { "id": "ammonia", "text": "Ammonia for fertilizer", "bin": "feed", "why": "Ammonia is made from hydrogen: about 60% of industry's 55 Mt of hydrogen in 2024 (IEA)." },
    { "id": "refining", "text": "Oil refining", "bin": "feed", "why": "Refineries already use over 43 Mt a year (IEA, 2024): the choice is how it is made." },
-   { "id": "steel", "text": "Steel from iron ore (direct reduction)", "bin": "feed", "why": "Hydrogen can replace the gas that strips oxygen from the ore; about 10% of industry's hydrogen today (IEA)." },
+   { "id": "steel", "text": "Steel from iron ore (hydrogen-based direct reduction)", "bin": "feed", "why": "Hydrogen can replace the gas that strips oxygen from the ore; about 10% of industry's hydrogen today (IEA). Electricity-only routes are still in development." },
    { "id": "ships", "text": "Fuel for ocean shipping", "bin": "both", "why": "Long voyages need dense fuels; ammonia and methanol made from hydrogen compete with others." },
-   { "id": "storage", "text": "Power storage for weeks", "bin": "both", "why": "Salt caverns hold weeks of energy cheaply, but only about 31% comes back (A8)." },
-   { "id": "trucks", "text": "Long-haul trucks", "bin": "both", "why": "Fuel cells and batteries are both tried; a battery truck uses far less electricity per mile." },
+   { "id": "storage", "text": "Power storage for weeks", "bin": "both", "why": "Salt caverns hold weeks of energy cheaply, but little comes back: about 35% here (step 1), 31% in DOE's 2022 storage assessment (A8)." },
+   { "id": "trucks", "text": "Long-haul trucks, heavy and on long daily routes", "bin": "both", "why": "Batteries do not yet meet every heavy long-haul duty, so fuel cells are tried too, though a battery truck uses far less electricity per mile." },
    { "id": "cars", "text": "Passenger cars", "bin": "elec", "why": "Electric car: 100 miles on 25–40 kWh. Fuel cell car: about 60 miles per kg, made with 57 kWh: about 1 mile per kWh." },
    { "id": "homes", "text": "Heating homes", "bin": "elec", "why": "A heat pump gives up to three times the heat of the power it uses; hydrogen loses about 40% before any heat is made." }
   ],

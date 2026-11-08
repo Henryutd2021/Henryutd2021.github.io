@@ -125,6 +125,16 @@ ok(PAGE.includes("Matching sets which power may count. Separately, from 2030 DOE
 ok(PAGE.includes("could reach about 4.0, if it uses the average U.S. grid mix and upstream methane leaks stay at or below 1%"), "Go deeper: the 95% capture example keeps DOE's conditions");
 ok(/12 September 2025/.test(PAGE) && D.facts[0].asof.startsWith("published 12 September 2025"), "IEA: the publication date, 12 September 2025 (revised October 2025)");
 
+// the farm's construction disclosed; round trips labelled; matching's timeline; the LP's limit; worked costs
+ok(/raised to a power so the peak reaches 100 MW/.test(PAGE) && /depend on that construction/.test(D.farm.note) && /depends on that construction/.test(JS) && /spare wind and the tank depend on that construction/.test(JS), "the farm's hours are a construction from regional data, said on the page, in step 2 and in the boundary");
+{ const c = M.chain(D), st = D.uses.cards.find(u => u.id === "storage").why; ok(Math.round(c.back * 100) === 35 && /about 35% here \(step 1\), 31% in DOE's 2022 storage assessment \(A8\)/.test(st), "two round trips, each labelled: this lesson's 35% and A8's DOE 31%"); }
+ok(/Annual matching is allowed before 2030; hourly matching applies from 2030 \(U\.S\. Treasury, 3 January 2025\)/.test(PAGE) && !/the same year or the same hour/.test(PAGE), "matching's timeline: annual before 2030, hourly from 2030");
+ok(/with the on\/off schedule fixed beforehand, dispatch can stay linear/.test(PAGE) && !/can only force the unit on/.test(PAGE), "the minimum-load limit: mixed-integer in general, linear with a fixed schedule");
+{ const o = M.run(Y, 20, "spare", "pem"), w = M.costWorked(o, E); ok(w.includes("20 MW × $2,000 per kW × " + M.crf(0.04, 30).toFixed(4)) && w.includes(fm.kg2(o.lcoh) + " per kg") && near(o.capital / o.kg, o.lcoh, 1e-9), "step 2: the cost per kg worked, capital a year ÷ kg (spare wind is free)"); }
+ok(/running total's highest point minus its lowest/.test(JS) && /Working storage needed \(usable capacity\)/.test(JS), "step 5: how the tank's size is found, and what working storage means");
+ok(/hint: "Decide in order: is hydrogen a chemical input/.test(JS) && D.uses.bins[0].label === "Hydrogen is a chemical input" && /Electricity-only routes are still in development/.test(D.uses.cards.find(u => u.id === "steel").why), "the sorter states its order of questions; steel's electric routes acknowledged");
+ok(/D\.uses\.sources\.forEach\(function \(s\) \{ H\("li"/.test(JS), "step 7's sources as list items");
+ok(/Reference comparison: PEM/.test(JS), "the explain table says it is a PEM reference");
 // ---------------- research wording (the sourcing rule): approved sentences only
 const SNAP = {
   "E3.14": "A higher hydrogen price makes each kilogram worth more, so the optimizer builds a larger electrolyzer to capture more surplus wind. The extra capacity runs fewer full-load hours, so the cost per kilogram, the levelized cost of hydrogen, goes up. Yet the added hydrogen revenue lowers the net cost of the whole system. The cost per kilogram and the system's cost move in opposite directions.",
@@ -226,6 +236,11 @@ ok(!/txh2/.test(SIDE.split("requests:")[1] || "") || !/pending/i.test(SIDE), "si
     ok(/PEM electrolyzer/.test(card().textContent) && /best for the owner at/.test(card().textContent), "step 4 names the type; at $4.00 the owner builds");
     for (let i = 0; i < 4; i++) btns(/^Lower Hydrogen price/)[0].click();
     ok(/\$2\.00\/kg/.test(card().textContent) && /the owner's best choice is to build none/.test(card().textContent), "step 4 at $2.00: every size loses money and the owner builds none");
+    // every note and line the cards assemble at run time stays within the text budget (40 words)
+    const runtime = [];
+    for (let k = 0; k < 7; k++) { demo.cards.go(k); card().querySelectorAll(".a16-note, .a16-ctx, .lx-saw, .lx-hint, li").forEach(e => runtime.push(e.textContent.replace(/\s+/g, " ").trim())); }
+    const longRT = runtime.filter(t => /[A-Za-z]/.test(t) && t.split(" ").length > 40);
+    ok(runtime.length > 15 && longRT.length === 0, "every runtime note and line is 40 words at most: " + longRT.map(t => t.slice(0, 50) + " (" + t.split(" ").length + ")").join(" | "));
   } catch (e) { ok(false, "the stub page test threw: " + (e && e.stack || e)); }
 }
 
