@@ -61,7 +61,7 @@
  },
  "anticipation-effect": {
   "term": "Anticipation",
-  "short": "When people change their behaviour before a programme starts because they know it is coming.",
+  "short": "When people change their behavior before a program starts because they know it is coming.",
   "lesson": "M14",
   "href": "m14-did-it-work.html"
  },
@@ -565,7 +565,7 @@
  },
  "confounding": {
   "term": "Confounding",
-  "short": "When something other than the programme, such as a second change at the same time, also differs between the groups and moves the outcome.",
+  "short": "When something other than the program, such as a second change at the same time, also differs between the groups and moves the outcome.",
   "lesson": "M14",
   "href": "m14-did-it-work.html"
  },
@@ -1999,7 +1999,7 @@
  },
  "lower-bound": {
   "term": "Lower bound",
-  "short": "A value the best answer cannot fall below; in a cost-minimising model, the cost of a relaxation is one.",
+  "short": "A value the best answer cannot fall below; in a cost-minimizing model, the cost of a relaxation is one.",
   "lesson": "M2",
   "href": "m02-unit-commitment.html"
  },
@@ -2473,7 +2473,7 @@
  },
  "parallel-trends": {
   "term": "Parallel trends",
-  "short": "The assumption behind difference-in-differences: without the programme, the treated and comparison groups would have changed by the same amount.",
+  "short": "The assumption behind difference-in-differences: without the program, the treated and comparison groups would have changed by the same amount.",
   "lesson": "M14",
   "href": "m14-did-it-work.html"
  },
@@ -3121,7 +3121,7 @@
  },
  "selection-bias": {
   "term": "Selection bias",
-  "short": "A false effect that appears when the people or places that take up a programme differ, before it starts, from those that do not.",
+  "short": "A false effect from who joins: those who take up a program differ from the rest in a way the comparison does not remove (difference-in-differences removes a fixed gap, not a different trend).",
   "lesson": "M14",
   "href": "m14-did-it-work.html"
  },
@@ -3223,7 +3223,7 @@
  },
  "spillover-effect": {
   "term": "Spillover",
-  "short": "When a programme also changes the comparison group, for example neighbours copying a habit or projects moving across a border.",
+  "short": "When a program also changes the comparison group, for example neighbors copying a habit or projects moving across a border.",
   "lesson": "M14",
   "href": "m14-did-it-work.html"
  },
@@ -3585,7 +3585,7 @@
  },
  "two-stage-stochastic-program": {
   "term": "Two-stage stochastic program",
-  "short": "An optimization model that chooses the here-and-now decisions and each branch's recourse together, to minimise the expected cost over all branches.",
+  "short": "An optimization model that chooses the here-and-now decisions and each branch's recourse together, to minimize the expected cost over all branches.",
   "lesson": "M8",
   "href": "m08-stochastic-robust.html"
  },

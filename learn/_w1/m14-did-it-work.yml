@@ -4,22 +4,22 @@ lesson: M14
 glossary:
   - id: selection-bias
     term: Selection bias
-    def: "A false effect that appears when the people or places that take up a programme differ, before it starts, from those that do not."
+    def: "A false effect from who joins: those who take up a program differ from the rest in a way the comparison does not remove (difference-in-differences removes a fixed gap, not a different trend)."
   - id: parallel-trends
     term: Parallel trends
-    def: "The assumption behind difference-in-differences: without the programme, the treated and comparison groups would have changed by the same amount."
+    def: "The assumption behind difference-in-differences: without the program, the treated and comparison groups would have changed by the same amount."
   - id: event-study
     term: Event study
     def: "A difference-in-differences estimated period by period around the start date, so the periods before the start can be checked for parallel trends."
   - id: confounding
     term: Confounding
-    def: "When something other than the programme, such as a second change at the same time, also differs between the groups and moves the outcome."
+    def: "When something other than the program, such as a second change at the same time, also differs between the groups and moves the outcome."
   - id: spillover-effect
     term: Spillover
-    def: "When a programme also changes the comparison group, for example neighbours copying a habit or projects moving across a border."
+    def: "When a program also changes the comparison group, for example neighbors copying a habit or projects moving across a border."
   - id: anticipation-effect
     term: Anticipation
-    def: "When people change their behaviour before a programme starts because they know it is coming."
+    def: "When people change their behavior before a program starts because they know it is coming."
   - id: control-variable
     term: Control variable
     def: "A measured trait, such as home size, put into a regression so that groups are compared at equal values of it; it cannot fix a difference nobody measured."
@@ -27,4 +27,4 @@ glossary:
     term: Dummy variable
     def: "A 0/1 flag in a regression, such as 1 for a home on the tariff and 0 for one that is not; its coefficient is the fitted difference between the two groups."
 requests:
-  - "M14 builds the course plan's play on simulated panels with known effects, not on public data: the plan's 'Use public data' could read 'Use simulated panels with a known effect, then read a public study'. Real programme evidence comes from DOE's November 2016 consumer behaviour studies report (energy.gov)."
+  - "M14 builds the course plan's play on simulated panels with known effects, not on public data: the plan's 'Use public data' could read 'Use simulated panels with a known effect, then read a public study'. Real program evidence comes from DOE's November 2016 consumer behavior studies report (energy.gov)."

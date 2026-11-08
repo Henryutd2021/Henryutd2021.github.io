@@ -11,7 +11,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 
 <!-- M14 in the model-lab form (step cards, statistical mode, no solver). Model, step cards and
      explain layer: assets/learn/m14-did-it-work.js with assets/learn/data/m14-did-it-work.json. Every dataset is
-     SIMULATED with a known true effect, generated in the browser from a stated seed (no download). Real programme
+     SIMULATED with a known true effect, generated in the browser from a stated seed (no download). Real program
      evidence comes only from the cited DOE report (November 2016), worded no stronger than its executive summary. Lab:
      learn/notebooks/m14-did-it-work.ipynb (written by its notebook build step; NumPy only; asserts the reference
      block). Tests: node _tests/learn/test_m14-did-it-work.js [--write]. -->
@@ -62,7 +62,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <li>After the start, TOU homes against flat homes: −0.85 kW. With home size as a control: −0.73 kW. Engagement, never measured, still differs.</li>
 <li>TOU homes after against before: −0.36 kW, because flat homes also changed by −0.06 kW (a cooler second summer).</li>
 <li>Difference-in-differences: −0.30 kW (about 95% interval −0.33 to −0.27 kW), against the truth −0.29 kW. Before month 13 the change in the TOU–flat gap, against month 12, stays within 0.04 kW of zero.</li>
-<li>Threats move it: already cutting −0.44 kW, early cuts −0.26 kW, neighbours copy −0.22 kW, a thermostat offer −0.42 kW.</li>
+<li>Threats move it: already cutting −0.44 kW, early cuts −0.26 kW, neighbors copy −0.22 kW, a thermostat offer −0.42 kW.</li>
 <li>If every home were put on the tariff by default, the average effect would be −0.20 kW, not −0.29 kW: those who opt in respond more.</li>
 <li>Simulated regions: 14 of 30 adopt a policy in 2021. DiD: 10.0 MW a year of new solar per adopting region (truth +10.0); if the policy followed a boom, 22.5 MW a year.</li>
 <li>If projects moved across the border, DiD reads 14.0 MW a year. Adopters then gain 140 MW a year: 64 moved from the other regions and 76 is new.</li></ol>
@@ -116,7 +116,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-fallback">
 <dl class="lx-ideas">
 <dt>Counterfactual</dt><dd>An effect is a comparison with what would have happened without the change; it is never observed.</dd>
-<dt>Selection</dt><dd>People who choose a programme differ from those who do not, before it starts.</dd>
+<dt>Selection</dt><dd>Who joins differs from who does not in a way the comparison does not remove. DiD removes a fixed gap, not a different trend.</dd>
 <dt>Difference-in-differences</dt><dd>Compare the change in the treated group with the change in a comparison group.</dd>
 <dt>Parallel trends</dt><dd>The assumption that both groups would have moved alike; the months before can make it plausible, never prove it.</dd>
 <dt>Threats</dt><dd>Selection on trends, confounding, spillovers and anticipation each move the estimate away from the truth.</dd>
@@ -164,9 +164,9 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-deeper-body">
 ```
 
-- **Randomized trial.** Chance decides who gets the tariff, so the groups differ only by chance before the start. DOE's consumer behaviour studies used randomized designs for this reason (Sources).
+- **Randomized trial.** Chance decides who gets the tariff, so the groups differ only by chance before the start. DOE's consumer behavior studies used randomized designs for this reason (Sources).
 - **Randomized encouragement.** When people cannot be forced onto a tariff, chance decides who is invited or defaulted; the comparison is between the invited and the not invited.
-- **Natural experiment.** An outside rule or event creates a comparison: a start date by postcode, a threshold, a border. For DiD, explain why the untreated trends would have matched, and check for anticipation, spillovers and other changes at the same time.
+- **Natural experiment.** An outside rule or event creates a comparison: a start date by ZIP code, a threshold, a border. For DiD, explain why the untreated trends would have matched, and check for anticipation, spillovers and other changes at the same time.
 - **Pre-register.** Write the comparison, the outcome and the threats down before looking at the after-period data.
 
 ```{=html}
@@ -191,7 +191,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-qq" data-id="pretrend" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “Flat months before the start prove the DiD estimate is right.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. With neighbours copying or a thermostat offer, the months before stayed flat while DiD read −0.22 and −0.42 kW against a truth of −0.29. Similar earlier trends support a comparison; they never prove it.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. With neighbors copying or a thermostat offer, the months before stayed flat while DiD read −0.22 and −0.42 kW against a truth of −0.29. Similar earlier trends support a comparison; they never prove it.</p></details>
 </div>
 <div class="lx-qq" data-id="volunteers" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “An effect measured on volunteers tells you the effect of making the tariff everyone's default.”</p>
@@ -228,7 +228,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <thead><tr><th scope="col">Number</th><th scope="col">What it means</th><th scope="col">Source</th></tr></thead>
 <tbody>
 <tr><td class="n">−0.30 kW</td><td>The DiD estimate on the simulated homes; the truth was −0.29 kW, the naive gap −0.85 kW.</td><td class="s">This lesson's simulation · seed 78</td></tr>
-<tr><td class="n">12% and 6%</td><td>Average TOU peak-period cuts reported for opt-in and for opt-out (default) customers in DOE's consumer behaviour studies.</td><td class="s"><a href="https://www.energy.gov/sites/prod/files/2017/01/f34/CBS_Final_Program_Impact_Report_20161107.pdf">DOE (PDF)</a>, p. vi · Nov 2016</td></tr>
+<tr><td class="n">12% and 6%</td><td>Average TOU peak-period cuts reported for opt-in and for opt-out (default) customers in DOE's consumer behavior studies.</td><td class="s"><a href="https://www.energy.gov/sites/prod/files/2017/01/f34/CBS_Final_Program_Impact_Report_20161107.pdf">DOE (PDF)</a>, p. vi · Nov 2016</td></tr>
 <tr><td class="n">6% and 18%</td><td>Average TOU peak-period cuts for peak to off-peak price ratios below 2:1 and above 4:1.</td><td class="s"><a href="https://www.energy.gov/sites/prod/files/2017/01/f34/CBS_Final_Program_Impact_Report_20161107.pdf">DOE (PDF)</a>, Table ES-2, p. viii · Nov 2016</td></tr>
 </tbody>
 </table>
@@ -250,8 +250,8 @@ body-classes: "page-learn page-lesson lx-form-cards"
 ```{=html}
 <div class="lx-card lx-real">
 <p class="lx-eyebrow">Where this came up in practice</p>
-<p>Under the Smart Grid Investment Grant, ten utilities ran eleven consumer behaviour studies of time-based rates, applying randomized and controlled designs to estimate customers' responses more precisely and credibly (DOE, November 2016, pp. iv–v).</p>
-<p>Opt-out enrolment was far higher than opt-in (92% against 15%), peak-period cuts were generally lower (6% against 12% for TOU), and retention was about the same (90% against 87%) (p. vi).</p>
+<p>Under the Smart Grid Investment Grant, ten utilities ran eleven consumer behavior studies of time-based rates, applying randomized and controlled designs to estimate customers' responses more precisely and credibly (DOE, November 2016, pp. iv–v).</p>
+<p>Opt-out enrollment was far higher than opt-in (92% against 15%), peak-period cuts were generally lower (6% against 12% for TOU), and retention was about the same (90% against 87%) (p. vi).</p>
 <p><b>A selection example</b> (same report, Table ES-2, p. viii): in one utility's opt-in TOU study, homes with in-home displays cut their peak somewhat more than homes without.</p>
 <p>The report says pre-treatment differences between the two groups can explain that gap.</p>
 </div>
