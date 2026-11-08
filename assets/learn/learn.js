@@ -9398,8 +9398,10 @@
                 Every plan is feasible (the grid balances the home; spilled wind balances the farm).
      time       representative weeks (weeks(): one medoid week per season, scaled to keep the season's energy, plus
                 extreme weeks kept as they are; each stands for its weeks, and the 24 hours of 31 December are spread
-                over the weights). Storage ends each week where it started (no storage between weeks). opts.full builds
-                the same LP on all 8,760 hours with storage cyclic over the year: the check used by the tests.
+                over the weights). Batteries and the tank are half full (e0.json weeks.boundary) at the start and the
+                end of every period, so the 52 calendar weeks and 31 December join into one schedule for the year and
+                nothing is stored from one week to the next. opts.full builds the same LP on all 8,760 hours with storage
+                cyclic over the year at a level of its own: the check used by the tests (it can only do as well or better).
      tie rule   a wear charge (e0.json tie: $0.0002/kWh home, $0.02/MWh farm) on battery charge and discharge, and on the
                 farm a hair's preference (TIME, one part in a million at most) for selling power and hydrogen earlier in the
                 week; both are left out of every reported number (read() prices the flows itself). Hour-by-hour schedules
@@ -9664,11 +9666,21 @@
     for (var h = 0; h < p.n; h++) out.push({ wind: p.series.wind[h], price: sell[p.h0 + h] });
     return out;
   }
+  // a store's level at the end of a period's last hour, pinned at the boundary share of its size (the first hour starts
+  // from that level too, through the cyclic row): fixed sizes pin the variable, sized ones add a row with the size
+  function pin(V, R, name, sizeVar, cap, share, rn) {
+    if (sizeVar) { var t = {}; t[name] = 1; t[sizeVar] = -share; R.push({ name: rn, terms: t, eq: 0 }); return; }
+    for (var i = V.length - 1; i >= 0; i--) if (V[i].name === name) { V[i].lb = share * cap; V[i].ub = share * cap; return; }
+    throw new Error("E0.build: no variable " + name);
+  }
   // the LP of a plan over a list of periods (opts.periods, or opts.mode: "week" all 52, "reps", "year"); opts.size: the
-  // sizes are decisions too. Variable names carry the period's index k and the hour h ("i3_17").
+  // sizes are decisions too. Variable names carry the period's index k and the hour h ("i3_17"). Every period but the
+  // whole year starts and ends with its stores at the boundary share of their size (D.weeks.boundary).
   function build(P, s, opts) {
     opts = opts || {};
     var D = P.D, Z = sizes(s), C = costs(D, s), size = !!opts.size, ps = opts.periods || periods(P, s, opts.mode || (size ? "reps" : "week")), V = [], R = [];
+    var share = D.weeks.boundary;
+    if (!(share >= 0 && share <= 1)) throw new Error("E0.build: e0.json weeks.boundary must be a share between 0 and 1");
     if (s.site === "home") {
       var tie = D.tie.home, xc = s.xc / 100, rte = D.home.battery.rte, bat = size || Z.hb > 0, u = SC.home;
       if (size) V.push({ name: "PV", ub: field("pv").max, cost: C.pv.eac * u }, { name: "HB", ub: field("hb").max, cost: C.hb.eac * u });
@@ -9694,6 +9706,7 @@
           if (size) { bal.PV = x.pv; R.push({ name: "b" + id, terms: bal, eq: x.need }); var xr = {}; xr["x" + id] = 1; xr.PV = -x.pv; R.push({ name: "xp" + id, terms: xr, le: 0 }); }
           else R.push({ name: "b" + id, terms: bal, eq: x.need - x.pv * Z.pv });
         });
+        if (bat && p.kind !== "year") pin(V, R, "s" + k + "_" + (p.n - 1), size ? "HB" : null, Z.hb, share, "sb" + k);
       });
     } else {
       var ft = D.tie.farm, frte = D.farm.battery.rte, tpm = 1 / D.farm.electrolyzer.kWhPerKg, h2p = s.h2, f = SC.farm;   // tpm: t of hydrogen per MWh
@@ -9729,6 +9742,10 @@
           }
           R.push({ name: "b" + id, terms: bal, le: x.wind * Z.wind });
         });
+        if (p.kind !== "year") {
+          if (fbat) pin(V, R, "s" + k + "_" + (p.n - 1), size ? "FB" : null, Z.fb, share, "sb" + k);
+          if (tank) pin(V, R, "k" + k + "_" + (p.n - 1), size ? "TK" : null, Z.tank / 1000, share, "kb" + k);
+        }
       });
     }
     return { sense: "min", variables: V, constraints: R };
@@ -9909,8 +9926,8 @@
         { key: "npv", label: "Net present value, " + N + " years", value: money(cfP.npv), note: "the whole plant, at " + num(s.rate, 1) + "% real; grid line not costed" },
         { key: "added", label: "What the extra equipment adds", value: money(cfP.npv - cfA.npv), note: "against the same wind farm alone (" + money(cfA.npv) + ")" },
         { key: "revenue", label: "Net revenue a year", value: money(T.revenue), note: "power " + money(T.sales) + (T.h2 > 0 ? ", hydrogen " + money(T.h2Rev) + ", less stack wear" : "") },
-        { key: "spill", label: "Wind spilled", value: pct(T.spillShare, 1), note: "alone: " + pct(T.aloneSpillShare, 1) + "; the line is full " + num(T.lineHours || 0) + " h a year" + sched },
-        { key: "h2", label: "Hydrogen sold a year", value: num(T.h2 / 1000) + " t", note: T.h2 > 0 ? "the buyer's full take in " + num(T.fullTake || 0) + " h" + sched : "no electrolyzer" },
+        { key: "spill", label: "Wind spilled", value: pct(T.spillShare, 1), note: "unused; alone: " + pct(T.aloneSpillShare, 1) + "; the line is full " + num(T.lineHours || 0) + " h a year" + sched },
+        { key: "h2", label: "Hydrogen sold a year", value: num(T.h2 / 1000) + " t", note: T.h2 > 0 ? "the buyer's full take in " + num(T.fullTake || 0) + " h" + sched : Z.el > 0 ? "no hydrogen sold under this plan" : "no electrolyzer" },
         { key: "co2", label: "Potential CO₂ avoided, a year", value: T.h2 > 0 ? num(T.co2Avoided) + " t" : "–",
           note: T.h2 > 0 ? "if this hydrogen replaces hydrogen made from gas; leaves out the grid power these MWh no longer replace" : "no hydrogen; running the farm emits no CO₂" },
         { key: "lcoh", label: "Cost per kg of hydrogen", value: lcoh === null ? "–" : "$" + num(lcoh, 2), note: lcoh === null ? "no hydrogen" : "electrolyzer, tank and wear only; the wind is counted as free" }];
@@ -9931,9 +9948,16 @@
     for (k in z) { var f = field(k); o[k] = Math.min(f.max, Math.max(f.min, Math.round(z[k] / STEP[k]) * STEP[k])); o[k] = +o[k].toFixed(2); }
     return o;
   }
+  // "Size it for me" in words: a suggestion from the representative weeks, rounded, then run on the year (the bench's
+  // check table shows a case where a step either side does better on the year)
+  function sizeWords(site, n) {
+    return "Or let the engine suggest " + (site === "home" ? "solar and battery" : "battery, electrolyzer and tank") + " sizes: least yearly cost on " + n +
+      " [[representative-period|representative weeks]], rounded to the controls' steps. The year then runs them; a step either side can do better.";
+  }
+  var SIZED = "Suggested: the sizes with the least yearly cost on the representative weeks, rounded to the controls' steps, are on the controls, and the year is running with them.";
   var HINT = "Every plan on this bench should be feasible (the grid or spilled wind balances each hour), so this is a fault in the bench: reload the page or change one control and run again.";
-  // a run. Default: the 52 calendar weeks of 2025, one small LP each, solved one after another (storage starts and ends
-  // each week at the same level); o.full: one LP on all 8,760 hours with storage cyclic over the year (the check);
+  // a run. Default: the 52 calendar weeks of 2025, one small LP each, solved one after another (storage half full at the
+  // start and end of each week, so the weeks join); o.full: one LP on all 8,760 hours with storage cyclic over the year (the check);
   // o.mode "reps": the representative weeks; o.size: sizing on the representative weeks (results.sizes, .snapped).
   // Never rejects: { status, ok, message, hint, results, raw, kind, ms }; ok only when every model is optimal.
   function fail(status, message) { return { status: status, ok: false, message: message, hint: status === "infeasible" ? HINT : null, results: null }; }
@@ -10183,6 +10207,21 @@
       (check.date ? '<p class="lx-hint">Solved on ' + esc(check.date) + ' with HiGHS by the bench\'s test.</p>' : "");
   }
 
+  // "Size it for me" checked on the year (D.reference.sizing, written by the test): for each case, the suggested sizes, the
+  // NPV of a run of the year with them, and the best plan one control step either side of them, run the same way
+  function sizingRows(check) {
+    return (check && check.rows || []).map(function (r) {
+      var z = Object.keys(r.sizes).filter(function (k) { return r.sizes[k] > 0; }).map(function (k) { return field(k).label + " " + fmtField(field(k), r.sizes[k]); });
+      return [r.label, z.length ? z.join(", ") : "nothing", money(r.npv), r.best ? field(r.best.key).label + " " + fmtField(field(r.best.key), r.best.value) + ": NPV " + (r.best.npv - r.npv >= 0 ? "+" : "−") + money(Math.abs(r.best.npv - r.npv)) : "none better"];
+    });
+  }
+  function sizingHTML(check) {
+    if (!check) return "";
+    return '<table class="lx-facts"><thead><tr><th scope="col">Case</th><th scope="col">Suggested on the representative weeks</th><th scope="col">NPV, the year run with them</th><th scope="col">Best of one step either side, on the year</th></tr></thead><tbody>' +
+      sizingRows(check).map(function (r) { return "<tr><td>" + esc(r[0]) + "</td><td>" + esc(r[1]) + '</td><td class="n">' + esc(r[2]) + "</td><td>" + esc(r[3]) + "</td></tr>"; }).join("") + "</tbody></table>" +
+      (check.date ? '<p class="lx-hint">Solved on ' + esc(check.date) + " with HiGHS by the bench's test.</p>" : "");
+  }
+
   // every sentence the results draw for a run (the page's text budget is checked on these by the test): the week strip's
   // key, the week chart's note and schedule line, the cash flow's keys
   function captions(s, res) {
@@ -10202,8 +10241,9 @@
   var api = { HOURS: HOURS, HPW: HPW, WEEKS: WEEKS, SITES: SITES, schema: schema, schemaFor: schemaFor, presets: presets, defaults: defaults, withPreset: withPreset,
     field: field, crf: crf, usd: usd, costs: costs, temperature: temperature, prepare: prepare, weeks: weeks, periods: periods, build: build,
     read: read, start: start, add: add, finish: finish, summarize: summarize, cashflow: cashflow, items: items, solve: solve, snap: snap, sensitivity: sensitivity, sensRows: sensRows,
-    recost: recost, sensWords: sensWords, sensNote: sensNote, split: split, stores: stores, captions: captions, SCHED: SCHED, HINT: HINT, fmt: { money: money, num: num, pct: pct, field: fmtField }, note: note, heading: heading, planRows: planRows,
-    resultsHTML: resultsHTML, fallback: fallback, inputRows: inputRows, inputsHTML: inputsHTML, sourcesHTML: sourcesHTML, checkRows: checkRows, checkHTML: checkHTML };
+    recost: recost, sensWords: sensWords, sensNote: sensNote, split: split, stores: stores, captions: captions, SCHED: SCHED, HINT: HINT, sizeWords: sizeWords, SIZED: SIZED, fmt: { money: money, num: num, pct: pct, field: fmtField }, note: note, heading: heading, planRows: planRows,
+    resultsHTML: resultsHTML, fallback: fallback, inputRows: inputRows, inputsHTML: inputsHTML, sourcesHTML: sourcesHTML, checkRows: checkRows, checkHTML: checkHTML,
+    sizingRows: sizingRows, sizingHTML: sizingHTML };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   if (typeof window === "undefined" || !window.LX) return;
   window.LX.E0 = api;
@@ -10224,7 +10264,7 @@
     if (f.id === "hb") return function (lo, hi, mx, v) { return v > 0 ? "Charges and discharges at up to " + num(v / 2.5, 1) + " kW (2.5 hours)." : "No battery."; };
     if (f.id === "wind") return function (lo, hi, mx, v) { return "Makes about " + num(v * P.farm.windCF * HOURS) + " MWh a year."; };
     if (f.id === "fb") return function (lo, hi, mx, v) { return v > 0 ? "Up to " + num(v / 4) + " MW in or out (4 hours)." : "No battery."; };
-    if (f.id === "el") return function (lo, hi, mx, v) { return v > 0 ? "Makes up to " + num(v * 1000 / D.farm.electrolyzer.kWhPerKg) + " kg of hydrogen an hour." : "No electrolyzer."; };
+    if (f.id === "el") return function (lo, hi, mx, v) { return (v > 0 ? "Makes up to " + num(v * 1000 / D.farm.electrolyzer.kWhPerKg) + " kg of hydrogen an hour." : "No electrolyzer.") + " Stack wear: an allowance per MWh for replacing its cells."; };
     if (f.id === "tank") return function (lo, hi, mx, v) { return v > 0 ? "Holds " + num(v * 1000) + " kg of hydrogen." : "No tank: hydrogen is sold as it is made."; };
     if (f.id === "line") return function () { return "Sell only: the farm cannot buy power."; };
     if (f.id === "xc") return function () { return "What the utility pays for each kWh the panels send to the grid ([[net-billing|net billing]])."; };
@@ -10435,8 +10475,7 @@
     var shownSite = null;
     function showSite() {
       groupEls.forEach(function (g) { g.el.hidden = !!g.site && g.site !== plan.site; });
-      if (sizeHint) sizeHint.textContent = "Or let the engine choose the " + (plan.site === "home" ? "solar and battery" : "battery, electrolyzer and tank") + " sizes with the least yearly cost, on " +
-        P[plan.site].weeks.reps.length + " representative weeks; your other choices stay.";
+      if (sizeHint) sizeHint.innerHTML = LX.rich(sizeWords(plan.site, P[plan.site].weeks.reps.length));
       if (shownSite === plan.site) return;
       shownSite = plan.site;
       presetBox.innerHTML = "";
@@ -10457,7 +10496,7 @@
       solve: function (st, ctx) { return solve(st, P, { signal: ctx.signal, timeLimit: ctx.attempt > 1 ? 30 : 10 }); },
       render: function (r, st, full) { res.draw(r, st); chips(r); if (o.onRun) o.onRun(r, st, full); },
       results: [res.el, roBox], stale: staleP, busy: o.api && o.api.busy, onDone: function (r, st) { if (o.onDone) o.onDone(r, st); },
-      words: { ok: "Done: the cheapest way to run this plan through every hour of 2025, as 52 weeks and 31 December (the solver reports each one optimal)." } });
+      words: { ok: "Done: the cheapest way to run this plan through every hour of 2025, as 52 weeks and 31 December, storage half full where they meet (the solver reports each one optimal)." } });
     var sizer = null;
     if (sizeBox) {
       var sizeHint = H("p", { class: "lx-hint" }, sizeBox);
@@ -10474,7 +10513,7 @@
           var sn = r.snapped; SIZE_KEYS[st.site].forEach(function (k) { plan[k] = sn[k]; }); refill(); changed(); setTimeout(function () { run.run(plan); }, 0);
         },
         busy: o.api && o.api.busy,
-        words: { ok: "Sized: the engine's least-cost sizes, rounded to the controls' steps, are on the controls, and the year is running with them.",
+        words: { ok: SIZED,
           cancelled: "Sizing stopped: the plan on the controls changed. Press Size it for me to size the plan you see." } });
     }
     function changed() { if (sizer && sizer.running()) sizer.cancel(); ss.set(plan); run.changed(plan); if (o.onChange) o.onChange(plan); }
@@ -10512,7 +10551,9 @@
       when the import limit is below 1,200 kW and the plan cannot make up the rest; the page then says so, shows the
       kWh and does not compare the cost with the grid-only bill). The generator runs only in
       outages (illustrative rule). The 12 average days smooth the weather: the test checks four plans against a
-      chronological 8,760-hour year (F7's campus: the same bill; larger solar-and-battery plans: a bill 4% to 7% higher).
+      chronological 8,760-hour year (F7's campus: the same bill; the three larger solar-and-battery plans: a bill 4% to 7%
+      higher) and one extreme plan (4,000 kW, 8,000 kWh, no exports: about 12% higher), so the pages say other plans can
+      differ more.
       Then one MILP per outage scenario (islanded; the battery and the tank start full): s + d + g - c = loads served;
       g <= 200 u, g >= 60 u (a set that is on runs at 30% or more), u = sets on, a whole number from 0 to gen;
       fuel: sum 0.07 g <= the gallons on site; each load may be partly served. The objective is a priority order, not
@@ -10632,7 +10673,7 @@
         { id: "imp", short: "im", type: "int", min: C.imp[0], max: C.imp[1], step: C.imp[2], def: D.imp, label: "Feeder import limit", unit: "kW" },
         { id: "tar", short: "t", type: "enum", values: ["tou", "flat"], names: { tou: "Time-of-use", flat: "Flat" }, def: D.tar, label: "Tariff" },
         { id: "own", short: "w", type: "enum", values: ["utility", "coop", "community"], names: { utility: "Utility-owned", coop: "Co-op-owned", community: "Community-owned" }, def: D.own, label: "Owner" },
-        { id: "allow", short: "al", type: "set", values: ["pv", "bat", "gen"], names: { pv: "solar", bat: "battery", gen: "generator sets" }, def: D.allow, label: "Size it may build" }]
+        { id: "allow", short: "al", type: "set", values: ["pv", "bat", "gen"], names: { pv: "solar", bat: "battery", gen: "generator sets" }, def: D.allow, label: "Size it for me may build" }]
     };
   }
   var schema = makeSchema();
@@ -10951,8 +10992,8 @@
         "The model knows the coming sun (perfect foresight); the sun is a teaching profile from SPP's 2025 hourly solar, not measured campus output"],
       sensitivity: null,
       limits: ["It checks only the outages chosen: a different start, a longer storm or a broken set can turn out worse",
-        "Its year is 12 average days: for the larger solar-and-battery plans checked over a full 8,760-hour year, the grid bill came out about 4% to 7% higher",
-        "It leaves out the network inside the campus, the generator's part-load fuel use and battery wear"]
+        "Its year is 12 average days: for the larger solar-and-battery plans checked over a full 8,760-hour year, the grid bill came out about 4% to 7% higher; other plans can differ more",
+        "It leaves out the network inside the campus, how a generator's fuel use changes below full output, and battery wear"]
     };
   }
   // the no-JS tables of the default plan's precomputed run (written into the data by the test's --write mode)
@@ -11292,14 +11333,15 @@
     sl("fuel", "Diesel on site", COL.gen, 25, function (v) { return kilo(v) + " gal"; });
     if (!(o.hide && o.hide.allow)) {
       var al = H("div", { class: "e1-allow" }, g1);
-      H("span", { class: "e1-allowl", text: "Size it may build:" }, al);
-      var tg = H("div", { class: "lx-toggles", role: "group", "aria-label": "What Size it may build" }, al);
+      H("span", { class: "e1-allowl", text: "Size it for me may build:" }, al);
+      var tg = H("div", { class: "lx-toggles", role: "group", "aria-label": "What Size it for me may build" }, al);
       ctl.allow = {};
       [["pv", "Solar"], ["bat", "Battery"], ["gen", "Generator sets"]].forEach(function (x) {
         ctl.allow[x[0]] = LX.Toggle(tg, { label: x[1], on: plan.allow.indexOf(x[0]) >= 0, onChange: function (on) {
           var p = copy(plan), a = p.allow.filter(function (y) { return y !== x[0]; }); if (on) a.push(x[0]);
           p.allow = ["pv", "bat", "gen"].filter(function (y) { return a.indexOf(y) >= 0; }); change(p); } });
       });
+      H("p", { class: "lx-ctl-hint e1-allowh", text: "Its sizes replace yours; a technology switched off here is sized to zero." }, al);
     }
     if (!(o.hide && o.hide.out)) {
       var g2 = fieldset(ctr, "Outages to plan for", "Hypothetical: the grid assumed down during a stretch of 2025 sun; the battery and the tank start full.");
@@ -11352,7 +11394,8 @@
     var sizeB = H("button", { class: "lx-btn ghost small", type: "button", text: "Size it for me" }, run.button.parentNode);
     sizeB.addEventListener("click", function () { if (run.running()) return; task = "size"; run.run(plan); });
     run.button.parentNode.addEventListener("click", function (e) { if (e.target === run.button || run.button.contains(e.target)) task = "run"; }, true);
-    H("p", { class: "lx-hint e1-sizehint", html: "<b>Size it for me</b> " + LX.rich("asks the [[mixed-integer-program|mixed-integer program]] for the cheapest sizes that keep every must-stay-on load on through the chosen outages, rounds them up to the bench's steps and runs them: a safe plan, not proven the cheapest on the steps.") }, side);
+    H("p", { class: "lx-hint e1-sizehint", html: "<b>Size it for me</b> " + LX.rich("asks the [[mixed-integer-program|mixed-integer program]] for the cheapest sizes that keep every must-stay-on load on through the chosen outages. They replace your sizes.") }, side);
+    H("p", { class: "lx-hint e1-sizehint", text: "Rounded up to the bench's steps and then run: a safe plan, not proven the cheapest on the steps." }, side);
     side.appendChild(ro);
     side.insertBefore(ss.status, pre);
     side.appendChild(ss.el);
@@ -11429,7 +11472,7 @@
     // the cost's boundary, one idea a line (SB1 5, 8 and 10)
     var cn = H("ul", { class: "lx-hint e1-cost-notes" }, c1);
     ["**Equipment**: paid over its life at the " + R.owner.label.toLowerCase().replace("-owned", "") + " owner's " + Math.round(R.rate * 100) + "% real [[cost-of-capital|cost of capital]] (through the [[capital-recovery-factor|capital recovery factor]]), plus upkeep.",
-      "**Grid bill**: estimated on 12 average days; for the larger solar-and-battery plans checked over a full 8,760-hour year, it came out about 4% to 7% higher.",
+      "**Grid bill**: estimated on 12 average days; for the larger solar-and-battery plans checked over a full 8,760-hour year, it came out about 4% to 7% higher; other plans can differ more.",
       "**Not included**: the diesel burned in outages (its cost is under each outage). 2025 dollars, illustrative.",
       "**Grid electricity**: " + kilo(R.year.imports / 1000) + " MWh bought, " + kilo(R.year.exports / 1000) + " MWh exported, " + kilo(R.year.co2) + " t CO₂ (U.S. [[average-emission-factor|average factor]], [[operating-emissions|operating only]])."]
       .forEach(function (t) { H("li", { html: LX.rich(t).replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>") }, cn); });
@@ -11456,7 +11499,8 @@
       var on = H("ul", { class: "lx-hint e1-cost-notes" }, c2);
       ["Per outage only: the stretches the plan was run on, not a reliability figure. Diesel at $" + P.cfg.fuel.price.toFixed(2) + " a gallon, not in the annual cost.",
         "Who goes short: a kWh of must stay on weighs 100 times one of keep if possible, which weighs 10 times one of shed first.",
-        "Within a priority, each step up the list (hospital, water and heat, dorms, labs) counts 0.5% more and an earlier hour up to 2% more: a preference, not a strict order."]
+        "Within a priority, each step up the list (hospital, water and heat, dorms, labs) counts 0.5% more and an earlier hour up to 2% more: a preference, not a strict order.",
+        "Smaller weights still prefer less diesel and less battery cycling; other hourly schedules with the same totals can remain."]
         .forEach(function (t) { H("li", { text: t }, on); });
       chartHost = H("div", { class: "lx-xcard lx-sb-chart e1-hourcard" }, host);
       draw();
@@ -12452,10 +12496,10 @@
       ["Peak load: Ridge · Town · Metro", zl("peak") + " MW", "Illustrative; each hour follows SPP's 2025 demand shape (" + linkA(S.eia930, "EIA-930") + ", accessed " + S.eia930.asOf + ")"],
       ["Wind built: Ridge · Town · Metro", zl("wind") + " MW", "Illustrative"],
       ["Solar built: Ridge · Town · Metro", zl("solar") + " MW", "Illustrative"],
-      ["Output per MW: wind · solar", (P.cfg.cf.wind * 100).toFixed(1) + "% · " + (P.cfg.cf.solar * 100).toFixed(1) + "% a year", "SPP's 2025 shapes scaled to EIA's 2025 monthly capacity factors: " + linkA(S.epm607, "EPM Table 6.07.B") + ", " + S.epm607.asOf],
+      ["Output per MW: wind · solar", (P.cfg.cf.wind * 100).toFixed(1) + "% · " + (P.cfg.cf.solar * 100).toFixed(1) + "% a year", "SPP's 2025 hourly timing, rescaled to EIA's 2025 U.S. utility-scale monthly capacity factors (national, not SPP's own): " + linkA(S.epm607, "EPM Table 6.07.B") + ", " + S.epm607.asOf],
       ["Link limits: Ridge–Town · Town–Metro", P.links.map(function (l) { return kilo(l.cap); }).join(" · ") + " MW", "Illustrative"],
       ["Fuel: gas · coal", "$" + c.fuels.gas.price.toFixed(2) + " · $" + c.fuels.coal.price.toFixed(2) + "/MMBtu", "Average cost to the electric power industry, 2025: " + linkA(S.epa74, "EIA, Electric Power Annual, Table 7.4") + " · " + S.epa74.asOf + ". One <span class=\"lx-term\" data-term=\"mmbtu\">MMBtu</span> is a million British thermal units of fuel heat"],
-      ["Heat rates", "6.4 to 11.2 MMBtu/MWh", "Illustrative, around EIA's 2025 averages (coal 10.65, gas 7.78 MMBtu/MWh): " + linkA(S.epa81, "Electric Power Annual, Table 8.1") + " · " + S.epa81.asOf],
+      ["Heat rates", "6.4 to 11.2 MMBtu/MWh", "Fuel heat burned per MWh made (the <span class=\"lx-term\" data-term=\"heat-rate\">heat rate</span>). Illustrative, around EIA's 2025 averages (coal 10.65, gas 7.78 MMBtu/MWh): " + linkA(S.epa81, "Electric Power Annual, Table 8.1") + " · " + S.epa81.asOf],
       ["CO₂: gas · subbituminous coal", c.fuels.gas.co2.toFixed(2) + " · " + c.fuels.coal.co2.toFixed(2) + " kg/MMBtu", linkA(S.co2, "EIA, Carbon Dioxide Emissions Coefficients") + " · " + S.co2.asOf],
       ["Unserved load · reserve short", "$" + kilo(c.voll) + " · $" + kilo(c.reserveShort) + "/MWh", "Illustrative penalties in the objective, not costs anyone pays"]];
     var h = "<div class=\"lx-scroll-x\"><table class=\"lx-facts e2-inputs\"><thead><tr><th scope=\"col\">Input</th><th scope=\"col\">Value</th><th scope=\"col\">Source</th></tr></thead><tbody>" +
@@ -12467,7 +12511,9 @@
     h += "<details class=\"lx-deeper e2-units\"><summary><span class=\"k\">The plants</span>Each unit group's data (illustrative)</summary><div class=\"lx-deeper-body\"><div class=\"lx-scroll-x\"><table class=\"lx-facts\"><thead><tr>" +
       head.map(function (x) { return "<th scope=\"col\">" + escH(x) + "</th>"; }).join("") + "</tr></thead><tbody>" +
       urows.map(function (r) { return "<tr>" + r.map(function (x, i) { return i ? "<td class=\"n\" data-l=\"" + escH(head[i]) + "\">" + escH(x) + "</td>" : "<th scope=\"row\">" + escH(x) + "</th>"; }).join("") + "</tr>"; }).join("") +
-      "</tbody></table></div><p class=\"lx-hint\">Running cost = heat rate × fuel price + variable upkeep; no-load cost = the heat burned each hour a unit is on × fuel price. Peakers start within minutes and have no minimum output, so the model gives them no on/off decision.</p></div></details>";
+      "</tbody></table></div><ul class=\"lx-hint e2-unit-notes\"><li>Running cost = heat rate × fuel price + variable upkeep.</li><li>No-load cost = the heat burned each hour a unit is on × fuel price.</li>" +
+      "<li>Peakers start within minutes and have no minimum output, so the model gives them no on/off decision.</li>" +
+      "<li>A <span class=\"lx-term\" data-term=\"combined-cycle\">combined cycle</span> uses a gas turbine's hot exhaust to make more electricity in a steam turbine.</li></ul></div></details>";
     return h;
   }
 

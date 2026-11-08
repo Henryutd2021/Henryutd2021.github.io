@@ -18,6 +18,8 @@
     R.days.forEach(function (d) { d.hours.forEach(function (h) { var p = h.z.map(function (x) { return x.price; }); m = Math.max(m, Math.max.apply(null, p) - Math.min.apply(null, p)); }); });
     return m;
   }
+  // two zones' prices "differ by $1/MWh or more" when the unrounded gap is at least $1 (a hair under counts, for rounding)
+  var GAP = 1 - 1e-6;
   // what a run says, one idea a line; R: E2.summarize's results, P: the prepared data. Never more than the run shows.
   // A link set to 0 MW is open: nothing flows, so it never "reaches its limit", and the zones on its two sides are priced
   // on their own; the equal-price line is said only when the prices are within a cent every hour.
@@ -26,11 +28,11 @@
     var shortZ = T.shedZ.map(function (v, i) { return { i: i, v: v }; }).filter(function (x) { return x.v > 0.5; });
     if (shortZ.length) out.push({ kind: "bad", text: "**" + kilo(T.shed) + " MWh unserved** in " + shortZ.map(function (x) { return zn(x.i) + " (" + kilo(x.v) + " MWh)"; }).join(" and ") + ": in those hours the zone's price is the $" + kilo(P.cfg.voll) + "/MWh penalty for unserved load." });
     else out.push({ kind: "good", text: "**Every MWh served** in all " + R.hours + " hours." });
-    if (T.rshort > 0.5) out.push({ kind: "bad", text: "**Reserve short by " + kilo(T.rshort) + " MWh** over " + kilo(R.rshortHours) + " hours: each MWh short costs the model $" + kilo(P.cfg.reserveShort) + ", and the reserve price shows it." });
+    if (T.rshort > 0.5) out.push({ kind: "bad", text: "**Reserve short: " + kilo(T.rshort) + " MW·h** over " + kilo(R.rshortHours) + " hours, the missing reserve MW added up hour by hour, not demand unserved. Each MW·h short costs the model $" + kilo(P.cfg.reserveShort) + "." });
     var open = 0;
     P.links.forEach(function (l) {
       var n = T.cong[l.id], a = P.zix[l.from], b = P.zix[l.to], cap = R.sys.caps[l.id], split = 0;
-      R.days.forEach(function (d) { d.hours.forEach(function (h) { if ((cap === 0 || Math.abs(h.f[l.id]) >= cap - 1e-6) && Math.abs(h.z[a].price - h.z[b].price) >= 0.5) split++; }); });
+      R.days.forEach(function (d) { d.hours.forEach(function (h) { if ((cap === 0 || Math.abs(h.f[l.id]) >= cap - 1e-6) && Math.abs(h.z[a].price - h.z[b].price) >= GAP) split++; }); });
       if (cap === 0) { open++; out.push({ kind: "", text: "**" + l.name + " is open (set to 0 MW):** nothing flows on it, so " + zn(a) + " and " + zn(b) + " are each priced on their own; their prices differ by $1/MWh or more in " + kilo(split) + " of " + R.hours + " hours." }); }
       else if (n > 0) out.push({ kind: "", text: "**" + l.name + " at its limit for " + kilo(n) + " of " + R.hours + " hours;** in " + (split === n ? (n === 1 ? "that hour" : "all of them") : kilo(split) + " of them") + " the prices on its two sides differ by $1/MWh or more ([[congestion|congestion]])." });
     });
@@ -46,7 +48,8 @@
   function notes(R, P) {
     var T = R.tot, out = ["Production cost " + moneyK(T.prod) + ": running " + moneyK(T.running) + ", no-load " + moneyK(T.noload) + ", start-up " + moneyK(T.startup) + " (2025 dollars; penalties not included).",
       "CO₂ " + kilo(T.co2) + " t, from the fuel burned (EIA's coefficients; operating only). Wind and sun spilled: " + kilo(T.spill) + " MWh.",
-      "Congestion rent " + moneyK(T.rent) + ": what loads pay minus what plants earn when a link is at its limit."];
+      "[[congestion-rent|Congestion rent]] " + moneyK(T.rent) + ": loads' energy payments minus plants' energy earnings, which differ when a link is at its limit; uplift and reserve payments are not in it.",
+      "Average price per MWh served: a zone's energy payments over the MWh it uses, so hours with more use weigh more; uplift and reserve payments are not in it."];
     if (R.sys.ll > 0) out.push("The large load: " + kilo(T.llMWh) + " MWh served at " + price(R.llAvg) + "/MWh on average (" + moneyK(T.llPay) + ")" +
       (T.curtail > 0.5 ? "; it curtailed " + kilo(T.curtail) + " MWh at its $" + kilo(R.sys.bid) + "/MWh bid" : "") +
       (T.llShed > 0.5 ? "; " + kilo(T.llShed) + " MWh of it unserved, its share of " + P.zones[P.zix[R.sys.llz]].name + "'s shortfall in proportion to load" : "") + ".");
@@ -55,11 +58,12 @@
   // the readouts beside the controls: [label, value, tone]
   function readouts(R, P) {
     var T = R.tot, ti = P.zix.T;
-    return [["Production cost", moneyK(T.prod), ""], ["Average price, Prairie Town", price(R.avgPrice[ti]) + "/MWh", ""],
+    return [["Production cost", moneyK(T.prod), ""], ["Average price per MWh served, Prairie Town", price(R.avgPrice[ti]) + "/MWh", ""],
       ["Unserved", kilo(T.shed) + " MWh", T.shed > 0.5 ? "bad" : "good"], ["Town–Metro at its limit", R.sys.caps.TM === 0 ? "open (0 MW)" : kilo(T.cong.TM) + " h", ""]];
   }
   var page = { says: says, notes: notes, spread: spread, readouts: readouts, kilo: kilo, price: price, moneyK: moneyK,
     TABLE_HINT: "**Table coverage:** only units with an on/off decision. [[peaker|Peakers]] start within minutes and have no minimum output, so the model gives them none.",
+    UNIT_HINT: "**Combined cycle:** a [[combined-cycle|combined cycle]] uses a gas turbine's hot exhaust to make more electricity in a steam turbine.",
     START_HINT: "**Starting conditions:** the first day assumes any units on at 00:00 were already running, so their earlier start-up costs are left out. Later days carry the state of 23:00 forward.",
     GROUPS: [{ title: "The period", fields: ["per"], hint: "Real 2025 days of the Southwest Power Pool grid, scaled to the three zones." },
       { title: "A large load (a data center)", fields: ["ll", "llz", "flex", "bid"], color: "var(--lx-demand)", hint: "A load only, flat every hour. Its flexible share can [[demand-response|curtail]] (cut its own use) when serving it would cost more than its bid; a partial cut can set the price equal to the bid." },
@@ -134,10 +138,10 @@
         U.seg(row, "Day shown", vals, names, 0, showDay);
       }
       showDay(0);
-      [page.TABLE_HINT, page.START_HINT].forEach(function (t) { H("p", { class: "lx-hint", html: LX.rich(t).replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>") }, c3); });
+      [page.TABLE_HINT, page.UNIT_HINT, page.START_HINT].forEach(function (t) { H("p", { class: "lx-hint", html: LX.rich(t).replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>") }, c3); });
       var c4 = H("div", { class: "lx-xcard lx-sb-chart" }, res); H("h3", { text: "Energy, starts and uplift" }, c4);
       U.moneyTable(c4, P, R);
-      var ul = H("ul", { class: "e2-notes" }, c4); page.notes(R, P).forEach(function (t) { H("li", { text: t }, ul); });
+      var ul = H("ul", { class: "e2-notes" }, c4); page.notes(R, P).forEach(function (t) { H("li", { html: LX.rich(t) }, ul); });
     }
 
     // ---- how the engine works
