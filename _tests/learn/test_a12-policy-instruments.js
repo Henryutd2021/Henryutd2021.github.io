@@ -148,7 +148,7 @@ ${D.rules.map(r => { const src = x => `<p class="lx-hint">Source: ${x.url ? `<a 
 <p class="lx-hint">The model's instruments are simpler than these rules: no phase-outs, eligibility tests or trading.</p>
 </div>`;
   const blocks = { "a12-fallback": FALLBACK, "a12-explain": EXPLAIN, "a12-check": CHECK, "a12-rules": RULES };
-  const reference = { about: "Written by node _tests/learn/test_a12-policy-instruments.js --write; re-solved on every run.", base: { co2: base.co2, resource: base.resource },
+  const reference = { about: "Results of the Plains Grid's planning LP, solved with HiGHS 1.15.4: CO2 and resource cost with no policy, and each instrument at its default setting.", base: { co2: base.co2, resource: base.resource },
     defaults: {} };
   defs.forEach(z => { reference.defaults[z.x.id] = { cut: f.pct(z.c.cutPct), per: f.pt(z.c.perT), co2: z.r.co2, resource: z.r.resource }; });
   const blockRx = k => new RegExp("(<!-- " + k + ":start[^>]*-->\\n)[\\s\\S]*?(<!-- " + k + ":end -->)");

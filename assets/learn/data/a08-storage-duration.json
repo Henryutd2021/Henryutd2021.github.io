@@ -1,5 +1,5 @@
 {
- "about": "Data of Learn lesson A8, How long should storage last? The Plains Grid and its fleet are fictional and illustrative; demand, wind and solar follow the real hourly shapes of the Southwest Power Pool grid in 2025 (town_year.json, EIA-930), scaled as stated below. Storage parameters and costs come from the primary sources listed with each item. The reference block is written by node _tests/learn/test_a08-storage-duration.js --write and re-solved by the same test on every run.",
+ "about": "Data of Learn lesson A8, How long should storage last? The Plains Grid and its fleet are fictional and illustrative; demand, wind and solar follow the real hourly shapes of the Southwest Power Pool grid in 2025 (town_year.json, EIA-930), scaled as stated below. Storage parameters and costs come from the primary sources listed with each item. The reference block holds the week's results for each store, solved with HiGHS 1.15.4.",
  "plains": {
   "name": "Plains Grid",
   "note": "Illustrative: a future Plains Grid with much wind and little firm power, so that a calm week leaves a gap. Not a forecast of any real grid.",
@@ -247,7 +247,7 @@
   }
  ],
  "reference": {
-  "about": "Written by node _tests/learn/test_a08-storage-duration.js --write; re-solved by the same test on every run. Energy in MWh.",
+  "about": "Results of the lesson's week, solved with HiGHS 1.15.4 once for each store (unserved energy and the share of the shortfall covered), and the week's shortfall figures the page states. Energy in MWh.",
   "stores": {
    "battery": {
     "unserved": 37709.8,

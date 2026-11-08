@@ -37,7 +37,7 @@ for (let m = 1; m < (1 << DEF.length); m++) {
 PORT.sort((a, b) => a.total - b.total || a.c - b.c);
 const BEST = PORT[0], WINT = PORT.filter(p => p.ds.join() === "winterize")[0], BAT = PORT.filter(p => p.ds.join() === "battery")[0];
 const reference = {
-  about: "Written by node _tests/learn/test_a09-hazards.js --write at seed 2025 and checked on every run.",
+  about: "Results of the stress tests at seed 2025: the year with each hazard, the pairs of hazards together, and the best set of defences within the budget.",
   years: Object.fromEntries(Object.keys(SW).map(k => [k, { lole: SW[k].lole, eue: +SW[k].eue.toFixed(2), shut: +SW[k].shut.toFixed(1) }])),
   pairs: PAIRS.map(x => ({ ids: x.p, lole: x.ab.lole, eue: +x.ab.eue.toFixed(2), ratio: +x.c.ratio.toFixed(4) })),
   best: { defences: BEST.ds, cost: BEST.c, total: +BEST.total.toFixed(2), portfolios: PORT.length }
