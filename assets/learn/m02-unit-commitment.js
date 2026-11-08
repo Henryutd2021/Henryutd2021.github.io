@@ -668,7 +668,7 @@
               st.set(x.r); api.busy(false); if (!x.day.ok) return;
               S0.lp = x.day; show(); api.done();
               var pkHours = S0.lp.hours.filter(function (h) { return h.p.pk > TOL; }).map(function (h) { return h.t; });
-              api.saw("Optimal: " + money(S0.lp.cost) + ". Above the combined-cycle plant's " + D.fleet.cc.mw + " MW the [[peaker|peaker]] runs, " + span(pkHours) + ", but only " + Math.round(S0.lp.hours[L.focus].p.pk) + " MW at " + hh(L.focus) + ". A real peaker cannot run steadily below " + D.fleet.pk.min + " MW, its [[minimum-stable-output|minimum output]].");
+              api.saw("Optimal: " + money(S0.lp.cost) + ". Above the " + D.fleet.cc.mw + " MW of Gas CC, the [[combined-cycle|combined-cycle plant]], the [[peaker|peaker]] runs, " + span(pkHours) + ", but only " + Math.round(S0.lp.hours[L.focus].p.pk) + " MW at " + hh(L.focus) + ". A real peaker cannot run steadily below " + D.fleet.pk.min + " MW, its [[minimum-stable-output|minimum output]].");
             });
           });
         } },
@@ -1015,7 +1015,7 @@
                   { key: "paid", label: "Peaker: paid", color: "var(--lx-good)", values: { paid: k.revenue }, total: k.revenue }],
                 fmt: function (v) { return money(v); } });
               var kp = E("div", { class: "m2-kpis" }, right);
-              kpi(kp, "Peaker short", money(k.uplift), "bad"); kpi(kp, "Gas CC above its costs", money(c.profit), "good");
+              kpi(kp, "Peaker short", money(k.uplift), "bad"); kpi(kp, "Combined-cycle above its costs", money(c.profit), "good");
               E("p", { class: "m2-tag", style: "margin-top:10px", text: "The " + money(k.uplift) + " short, in three parts:" }, right);
               var ul = E("ul", { class: "m2-ul" }, right);
               var minMWh = k.shortHours.reduce(function (a, t) { return a + S0.milp.hours[t].p.pk; }, 0);
@@ -1120,9 +1120,14 @@
           say: "A start-up minus a shut-down equals the change of the switch from the hour before." },
         { html: sym("u", "<var>u</var><sub>cc,−1</sub>") + " = " + sym("u", "<var>u</var><sub>cc,23</sub>") + " = 1,  " + sym("u", "<var>u</var><sub>pk,−1</sub>") + " = 0", tag: "the day's ends",
           say: "The end condition: the combined-cycle plant is on before the day and must be on in the last hour, 23:00, so the day ends as it began. The peaker starts the day off and may end it either way." },
+        { html: "0 ≤ " + sym("r", "<var>r</var><sub><var>t</var></sub>") + " ≤ wind<sub><var>t</var></sub> + solar<sub><var>t</var></sub>,  " + sym("s", "<var>s</var><sub><var>t</var></sub>") + " ≥ 0,  0 ≤ " + sym("v", "<var>v</var><sub><var>g,t</var></sub>") + ", " + sym("w", "<var>w</var><sub><var>g,t</var></sub>") + " ≤ 1", tag: "bounds",
+          say: "Wind and solar used are at most what the weather gives. Unserved demand is never negative. Each start-up and shut-down lies between 0 and 1." },
         { html: "Σ<sub>" + sym("tau", "τ") + "=max(0, <var>t</var>−" + sym("UT", "<var>UT</var><sub><var>g</var></sub>") + "+1)</sub><sup><var>t</var></sup> " + sym("v", "<var>v</var><sub><var>g</var>,τ</sub>") + " ≤ " + sym("u", "<var>u</var><sub><var>g,t</var></sub>"), tag: "minimum run",
           note: "within this day only",
-          say: "A plant started in the last UT hours must still be on; the sum starts at the day's first hour at the earliest. The minimum down time is the same rule for shut-downs: the shut-downs of the last DT hours are at most one minus the switch. Both count within this day only: the hours before the day are assumed to meet them, and a start at 23:00 owes nothing after midnight." },
+          say: "A plant started in the last UT hours must still be on. The sum starts no earlier than the day's first hour: the hours before the day are assumed to meet the rule." },
+        { html: "Σ<sub>" + sym("tau", "τ") + "=max(0, <var>t</var>−" + sym("DT", "<var>DT</var><sub><var>g</var></sub>") + "+1)</sub><sup><var>t</var></sup> " + sym("w", "<var>w</var><sub><var>g</var>,τ</sub>") + " ≤ 1 − " + sym("u", "<var>u</var><sub><var>g,t</var></sub>"), tag: "minimum down",
+          note: "within this day only",
+          say: "A plant stopped in the last DT hours must still be off. Like the run time, it counts within this day: a stop at 23:00 owes nothing after midnight." },
         { html: sym("u", "<var>u</var><sub><var>g,t</var></sub>") + " ∈ {0, 1}", tag: "the switch", note: "the relaxation: 0 ≤ u ≤ 1",
           say: "Each switch is 0 or 1. The relaxation allows any value from 0 to 1." }
       ],
@@ -1135,13 +1140,14 @@
         SU: { name: "SU_g", label: "start-up cost", unit: "$ per start", words: "Fuel and wear spent bringing a plant from off to on.", you: "Peaker " + money(F.pk.startup) + ", CC " + money(F.cc.startup) + " (illustrative)", code: "v: { cost: " + F.pk.startup + " }" },
         v: { name: "v_g,t", label: "start-up", unit: "1 = starts in hour t", words: "1 in the hour a plant starts. With whole switches it comes out 0 or 1 by itself.", you: "The relaxation pays " + R.relaxStarts + " of a peaker start; the commitment one", code: '{ name: "v_pk_17", ub: 1 }' },
         w: { name: "w_g,t", label: "shut-down", unit: "1 = stops in hour t", words: "1 in the hour a plant stops; it feeds the minimum down time.", code: '{ name: "w_pk_23", ub: 1 }' },
-        V: { name: "V", label: "unserved-energy penalty", unit: "$/MWh", words: "A large illustrative cost of demand left unserved, so every node of the tree has an answer.", you: money(D.penalty) + " per MWh, as in lesson 11", code: "shed: { cost: " + D.penalty + " }" },
+        V: { name: "V", label: "unserved-energy penalty", unit: "$/MWh", words: "A large illustrative cost of demand left unserved, so a shortage of supply never leaves a node of the tree without a plan. Switches that break a run or down time still can.", you: money(D.penalty) + " per MWh, as in lesson 11", code: "shed: { cost: " + D.penalty + " }" },
         s: { name: "s_t", label: "unserved demand", unit: "MW", words: "Demand left unserved in hour t.", you: "0 in the best plan; " + R.tree.firstOff.shed + " MWh in the node 'peaker off at " + hh(R.tree.first.t) + "'", code: '{ name: "shed_19" }' },
         r: { name: "r_t", label: "wind and solar used", unit: "MW", words: "Wind and solar used, at most what the weather gives; the rest is spilled.", code: "ub: wind[t] + solar[t]" },
         d: { name: "d_t", label: "demand", unit: "MW", words: "Prairie Town's demand in hour t, from the real shape of " + D.day.label + ".", you: "Peak " + Math.max.apply(null, D.day.demand) + " MW", code: "eq: demand[t]" },
         Pmin: { name: "P̲_g", label: "minimum output", unit: "MW", words: "The lowest steady output when on.", you: "Peaker " + F.pk.min + " MW, CC " + F.cc.min + " MW (illustrative)", code: "min_pk: p - " + F.pk.min + " u >= 0" },
         Pmax: { name: "P̄_g", label: "size", unit: "MW", words: "The most a plant can make.", you: "Peaker " + F.pk.mw + " MW, CC " + F.cc.mw + " MW", code: "max_pk: p - " + F.pk.mw + " u <= 0" },
         tau: { name: "τ", label: "an hour in the sum", unit: "hour", words: "Each hour summed over: the last UT hours up to hour t, but never before the day's first hour (0).", you: "Peaker at " + hh(R.focus) + ": τ = " + (R.focus - F.pk.up + 1) + " to " + R.focus, code: "for s in range(max(0, t - UT + 1), t + 1)" },
+        DT: { name: "DT_g", label: "minimum down time", unit: "hours", words: "Hours a plant must stay off once stopped.", you: "Peaker " + F.pk.down + " hours, CC " + F.cc.down + " (illustrative)", code: "down_pk_t: u_t + (w_t-1 + w_t) <= 1" },
         UT: { name: "UT_g", label: "minimum run time", unit: "hours", words: "Hours a plant must stay on once started. The minimum down time DT is the same for staying off.", you: "Peaker " + F.pk.up + " and " + F.pk.down + " hours, CC " + F.cc.up + " and " + F.cc.down + " (illustrative)", code: "up_pk_t: u_t - (v_t-1 + v_t) >= 0" }
       },
       sel: "u",

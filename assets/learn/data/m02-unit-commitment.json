@@ -70,7 +70,7 @@
  },
  "fleet_note": "min = minimum output when on (MW); noload = $ per hour on; startup = $ per start; up and down = minimum run and down times (hours); init = on (1) or off (0) before the day; end = state required in the last hour. All illustrative; the peaker's 30 MW minimum is lesson 11's.",
  "penalty": 3000,
- "penalty_note": "Cost per MWh of unserved demand: a large illustrative number, as in lesson 11, so that every node of the branch-and-bound tree has an answer.",
+ "penalty_note": "Cost per MWh of unserved demand: a large illustrative number, as in lesson 11, so that a shortage of supply never makes a node of the branch-and-bound tree infeasible (switches that break a minimum run or down time still can).",
  "lesson": {
   "focus": 17,
   "edit": [15, 16, 17, 18, 19, 20, 21, 22, 23],
