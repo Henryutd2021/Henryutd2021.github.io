@@ -118,9 +118,19 @@ ok(W.fixed.some(r => /inverter/.test(r[0]) && r[1] === "$150,000") && PAGE.index
 ok(/the same average day repeats all year; cloudy spells, seasons and battery power limits are left out/.test(D.texts.villageToy) && PAGE.indexOf(D.texts.villageToy) >= 0 && JS.indexOf("D.texts.villageToy") >= 0 && !/Cheapest panels|Cheapest battery/.test(JS) && /cheapest sizes for the repeated average day/.test(M.villageTable(D)),
   "the village's toy boundary and 'cheapest for the repeated day' are stated");
 // feedback texts stay short
-[M.stackFeedback(D), M.villageFeedback(D)].concat(D.owners.map(o => M.ownerFeedback(D, o) + " Try another owner.")).forEach(t => { const w = text(t.replace(/\[\[[a-z0-9-]+\|([^\]]+)\]\]/g, "$1")).split(" ").length; ok(w <= 40, "feedback stays short (" + w + " words): " + t.slice(0, 50)); });
+[M.stackFeedback(D), M.villageFeedback(D)].concat(D.owners.map(o => M.ownerFeedback(D, o))).forEach(t => { const w = text(t.replace(/\[\[[a-z0-9-]+\|([^\]]+)\]\]/g, "$1")).split(" ").length; ok(w <= 40, "feedback stays short (" + w + " words): " + t.slice(0, 50)); });
 D.texts.ledgerNotes.concat([D.texts.billNote, D.texts.stackAssume, D.texts.villageToy]).forEach(t => ok(t.split(" ").length <= 35, "a note stays short: " + t.slice(0, 40)));
 ok(/\$0\.31 per kWh for the households, \$0\.23 with the mill at midday, \$0\.20 with a cold store too\. In the evening the mill needs more battery: \$0\.28\./.test(M.villageFeedback(D)), "step 8's feedback: the four costs per kWh");
+// the survey's two methods named: households' willingness to pay, businesses' direct costs (report section 1.3)
+ok(/would pay/.test(M.staticSteps(D)) && /direct costs/.test(JS) && !/the household loses|household's loss|outage costs \$\d/.test(JS + PAGE + JSON.stringify(D)), "households: what they would pay to avoid an outage; businesses: their costs");
+// the ledger separates the campus's view from all parties: the supplier's lost bill revenue, owner profit not calculated
+{ const L0 = M.ledgerRows(D, D.owners[0]), net = L0.find(r => /campus's view/.test(r.head)).v, all = L0[L0.length - 1].v;
+  ok(M.usd(net) === "$19,724" && M.usd(all) === "−$34,276" && near(net - all, M.everydaySavings(D), 1e-6) && /power supplier/.test(L0.find(r => /no longer collected/.test(r.head)).who) && /not calculated/.test(M.PROFIT) && PAGE.indexOf(M.PROFIT) >= 0,
+    "ledger (utility owner): +$19,724 in the campus's view, −$34,276 for all parties if the supplier's costs do not fall; owner profit not calculated"); }
+ok(/300 kW × \$15 per kW a month × 12 = \$54,000 a year/.test(M.billWorked(D)) && PAGE.indexOf(M.billWorked(D)) >= 0 && /billWorked\(D\) \}, act\)/.test(JS), "the $54,000 bill saving is worked in step 6 and the no-JS version");
+ok(/<th scope="col">Who gains<\/th>/.test(M.staticExplain(D)), "the no-JS owner table has the Who gains column");
+ok(/fixed equipment apart/.test(JS) && /saves after fuel/.test(JS) && /First hour with its fixed equipment/.test(JS), "the next-hour readout says what it leaves out");
+D.owners.forEach(o => { const t = M.ownerFeedback(D, o); ok(t.split(/(?<=[.?!])\s+(?=[A-Z])/).length <= 2, "owner feedback: two sentences at most: " + t.slice(0, 50)); });
 // the household's price is the U.S. average, not its own tariff
 ok(!/it pays/.test(JS.replace(/\/\/[^\n]*/g, "") + PAGE) && /the 2025 U\.S\. residential average of 17\.23¢ per kWh/.test(PAGE) && JS.indexOf("the 2025 U.S. residential average of ") >= 0, "17.23¢ is named the 2025 U.S. residential average");
 

@@ -4,7 +4,7 @@
   "creator": "Honglin Li",
   "date": "2026-11-07",
   "status": "Illustrative: the Plains Grid and its plant sizes are fictional; the heat rates, fuel prices and CO2 coefficients are EIA's, with their tables and dates in sources.",
-  "source": "Written by hand for lesson A10 from the cited EIA sources.",
+  "source": "Values for lesson A10 from the cited EIA sources; the Plains Grid's plant sizes are chosen for teaching.",
   "license": "CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/), Honglin Li. Values taken from the sources listed in this file keep their publishers' terms; EIA data are U.S. government works in the public domain."
  },
  "accessed": "2026-11-05",
@@ -137,9 +137,10 @@
   }
  ],
  "claimRules": {
-  "label": "Illustrative reporting rules, after the GHG Protocol's Scope 2 Guidance (2015), market-based method",
+  "label": "Illustrative reporting rules, after the GHG Protocol's Scope 2 Guidance (2015), [[market-based|market-based method]]",
+  "certificate": "A [[energy-attribute-certificate|certificate]] records one MWh from a named plant. Retiring it cancels it for the buyer, so nobody else can claim that MWh.",
   "assume": "Each certificate is assumed to be this buyer's alone, retired for it, and from the same market as its use (Table 7.1, criteria 2, 3 and 5).",
-  "proxy": "Shortfall hours use the grid average as a teaching proxy; the guidance asks for a residual mix (the factor of unclaimed power) where one exists.",
+  "proxy": "Shortfall hours use the grid average as a teaching proxy; the guidance asks for a [[residual-mix|residual mix]] (the factor of unclaimed power) where one exists.",
   "status": "The GHG Protocol consulted on a revision from 20 October 2025 to 31 January 2026; hourly matching and deliverability are proposals, not adopted rules (feedback summary, 29 July 2026).",
   "sources": [
    {

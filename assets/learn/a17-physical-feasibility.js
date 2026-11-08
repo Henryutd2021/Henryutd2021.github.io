@@ -181,6 +181,14 @@
   function invSaw(G, I, E) {
     return "With these assumed responses at " + E + " GW·s, the grid-forming battery halves the starting fall, to **" + rocof(G, E, G.ffrMW).toFixed(2) + " Hz per second**; the grid-following one helps only after " + I.delayS + " s.";
   }
+  // the AC check's line beside the first estimate (steps 3 to 5): where they differ, the AC check decides
+  function acWords(B, v) { return v < B.lo ? "below the band" : v > B.hi ? "above the band" : "within the band"; }
+  function acSaw(A, est, ac) {
+    var B = A.band;
+    if (isNaN(ac)) return "The AC check finds no operating point: this feeder cannot carry that load at all.";
+    return "**AC check: " + pu(ac) + " per unit**, " + acWords(B, ac) + "; the first estimate read " + pu(est) + "." +
+      (verdict(est, B) === "near" ? " Near a limit, the AC check decides." : acWords(B, est) !== acWords(B, ac) ? " They disagree: the AC check decides." : " Both agree here.");
+  }
   function sortSaw(right, total) {
     return "**" + right + " of " + total + "** in the right box. Three need an AC check of voltage and reactive power, one a ramp check, one a check of the first seconds.";
   }
@@ -192,7 +200,8 @@
       reactive: "[[reactive-power|Reactive power]], counted in Mvar (megavolt-amperes reactive), flows back and forth with the MW: it moves no net energy, but it adds current.",
       line: "Illustrative: a " + L.kV + " kV line rated " + L.ratingMVA + " MVA, about " + fmtN(amps(L.ratingMVA, L.kV)) + " A in each wire. [[power-factor|Power factor]] = MW ÷ MVA.",
       band: "The band is ANSI's normal range, [[service-voltage-range|" + B.volts[0] + " to " + B.volts[1] + " V]] on a " + B.nominalV + " V service: " + B.lo.toFixed(2) + " to " + B.hi.toFixed(2) + " [[per-unit|per unit]].",
-      estimate: "The gauge shows a first estimate: within " + B.margin.toFixed(2) + " per unit of a limit, only an AC check can decide.",
+      estimate: "The gauge shows a first estimate. Within " + B.margin.toFixed(2) + " per unit of a limit only an [[ac-power-flow|AC check]], a calculation of voltages and reactive power as well as MW, can decide.",
+      ac: "The AC check solves this feeder's alternating-current equations exactly for one load at its far end, the substation held at " + F.vSub.toFixed(2) + " per unit: still a model, with its own assumptions.",
       noon: "Same feeder: the substation holds " + F.vSub.toFixed(2) + " per unit, set for the evening peak. Load at noon: " + fmtN(F.noonLoadMW, 1) + " MW at a power factor of " + F.loadPF.toFixed(2) + " (illustrative).",
       ramp: "The gas plant can change its output by at most " + A.ramp.limitMWh + " MW from one hour to the next (lesson 0's town, illustrative). Day: " + M1.day.label + ", Southwest Power Pool shapes scaled to Prairie Town.",
       sketch: "A sketch of the first second: the starting slope held, before load relief and governors bend the line (lesson 3).",
@@ -228,7 +237,7 @@
       st === "out" ? { title: "Past the band's top", text: "Above " + B.hi.toFixed(2) + " per unit (" + B.volts[1] + " V on a " + B.nominalV + " V service), the voltage leaves ANSI's normal range.", value: "outside" } :
       st === "near" ? { title: "Close to the band's top", text: "Within " + B.margin.toFixed(2) + " per unit of " + B.hi.toFixed(2) + ", a first estimate cannot decide; an AC check would.", value: "near" } :
                       { title: "Inside the band", text: "Below " + B.hi.toFixed(2) + " per unit (" + B.volts[1] + " V on a " + B.nominalV + " V service), the voltage stays in ANSI's normal range.", value: "within" },
-      { title: "The hosting capacity", text: "By the first estimate this feeder takes about this much solar; more needs absorbing inverters, a new regulator plan or new wires.", value: fmtN(s.absorb ? s.hostAbsorb : s.host, 1) + " MW" }
+      { title: "The hosting capacity", text: "A voltage-only first estimate. Above it, run an AC check before deciding whether voltage control or upgrades are needed.", value: fmtN(s.absorb ? s.hostAbsorb : s.host, 1) + " MW" }
     ];
     var note = (s.pvSet ? "Your solar: " + fmtN(s.pv, 2) + " MW" : "No solar set yet: the chain shows the hosting capacity") + (s.absorb ? ", with inverters absorbing reactive power." : ", inverters at a power factor of 1.");
     return { links: links, note: note };
@@ -253,7 +262,7 @@
     noon: noon, hosting: hosting, dcFlows: dcFlows, flatMW: flatMW, refBus: refBus, m1Injections: m1Injections, noRamp: noRamp, changes: changes, overs: overs,
     rocof: rocof, startRocof: startRocof, sketch: sketch, summary: summary, staticFallback: staticFallback, fmtN: fmtN, pu: pu, hh: hh, signed: signed,
     acEnd: acEnd, acEveningLimit: acEveningLimit, acHosting: acHosting, verdict: verdict, STATE: STATE, heatSaw: heatSaw, heatRev: heatRev, sagSaw: sagSaw,
-    noonSaw: noonSaw, absorbSaw: absorbSaw, rampSaw: rampSaw, rocofSaw: rocofSaw, invSaw: invSaw, sortSaw: sortSaw, hints: hints, mapItems: mapItems, solarChain: solarChain };
+    noonSaw: noonSaw, absorbSaw: absorbSaw, acSaw: acSaw, acWords: acWords, rampSaw: rampSaw, rocofSaw: rocofSaw, invSaw: invSaw, sortSaw: sortSaw, hints: hints, mapItems: mapItems, solarChain: solarChain };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -381,6 +390,20 @@
       return net;
     }
 
+    // the AC check beside a feeder's first estimate (steps 3 to 5): a toggle, its assumptions, and a line comparing the two
+    function acToggle(box, repaint) {
+      var on = !!log.ac, line = null, x = { on: function () { return on; } };
+      LX.Toggle(H("div", { class: "lx-toggles", role: "group", "aria-label": "AC check" }, box), { label: "Run an AC check of the feeder", on: on, onChange: function (v) { on = v; keep("ac", v); repaint(); } });
+      H("p", { class: "lx-hint", text: TX.ac }, box);
+      line = H("p", { class: "a17-rev", "aria-live": "polite" }, box);
+      x.rows = function (pt) {
+        if (!on) { line.innerHTML = ""; return []; }
+        var v = acEnd(F, pt.P, pt.Q), bad = isNaN(v) || v < B.lo || v > B.hi;
+        line.innerHTML = LX.rich(acSaw(A, pt.v, v)).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
+        return [["Far end, AC check", isNaN(v) ? "no solution" : pu(v) + " per unit", bad ? "bad" : ""]];
+      };
+      return x;
+    }
     var steps = [
       { text: "A plan for noon balances on three [[bus|buses]], the network's connection points. Its [[dc-power-flow|DC power flow]], a model that counts MW only, puts the Ridge–Town line exactly at its " + Math.round(flows[L.id]) + " MW limit. Will it hold?",
         build: function (act, api) {
@@ -412,6 +435,7 @@
               rev.innerHTML = LX.rich(heatRev(A, M1, log.pred)).replace(/^(Your prediction: [a-z ]+\.)/, "<b>$1</b>");
             }
           }
+          tried[sl.val()] = true;   // the starting value counts: one deliberate change compares two settings
           paint(sl.val(), false);
           act.lxSet = function (v) { sl.set(v); paint(v, true); };
         } },
@@ -426,12 +450,14 @@
             fmt: function (v) { return fmtN(v, 1) + " MW"; }, onChange: function (v) { paint(v, true); } });
           H("p", { class: "lx-hint", html: LX.rich(TX.band) }, box);
           H("p", { class: "lx-hint", html: LX.rich(TX.estimate) }, box);
+          var ac = acToggle(box, function () { paint(sl.val(), false); });
           function paint(p, user) {
             var e = evening(F, p), state = gauge.set(e.v), cls = state === "out" ? "bad" : state === "near" ? "warn" : "";
-            readouts(ro, [["Load", fmtN(e.P, 1) + " MW + " + fmtN(e.Q, 2) + " Mvar"], ["Far end, first estimate", pu(e.v) + " per unit", cls], ["On a " + B.nominalV + " V service", volts(e.v), cls]]);
+            readouts(ro, [["Load", fmtN(e.P, 1) + " MW + " + fmtN(e.Q, 2) + " Mvar"], ["Far end, first estimate", pu(e.v) + " per unit", cls], ["On a " + B.nominalV + " V service", volts(e.v), cls]].concat(ac.rows(e)));
             if (user) { keep("ev", p); tried[p] = true; }
             if (Object.keys(tried).length >= 2) { api.done(); api.saw(sagSaw(A, p)); }
           }
+          tried[sl.val()] = true;
           paint(sl.val(), false);
           act.lxSet = function (v) { sl.set(v); paint(v, true); };
         } },
@@ -475,9 +501,10 @@
       var toggled = false;
       H("p", { class: "lx-hint", html: LX.rich(TX.noon) }, box);
       H("p", { class: "lx-hint", html: LX.rich(TX.estimate) }, box);
+      var ac = acToggle(box, function () { paint(sl.val(), false); });
       function paint(pv, user) {
         var n = noon(F, pv, absorb), state = gauge.set(n.v), hc = absorb ? h1 : h0, cls = state === "out" ? "bad" : state === "near" ? "warn" : "";
-        readouts(ro, [["Flowing back up the feeder", n.P < 0 ? fmtN(-n.P, 2) + " MW" : "none"], ["Far end, first estimate", pu(n.v) + " per unit", cls], ["Hosting capacity, first estimate", fmtN(hc, 1) + " MW of solar"]]);
+        readouts(ro, [["Flowing back up the feeder", n.P < 0 ? fmtN(-n.P, 2) + " MW" : "none"], ["Far end, first estimate", pu(n.v) + " per unit", cls], ["Hosting capacity, first estimate (voltage only)", fmtN(hc, 1) + " MW of solar"]].concat(ac.rows(n)));
         if (user) keep("pv", pv);
         if (n.v > B.hi) crossed = true;
         if (!withToggle && crossed) { api.done(); api.saw(noonSaw(A, pv)); }
@@ -498,7 +525,7 @@
       H("p", { class: "lx-hint", html: LX.rich(TX.ramp) }, box);
       function paint(t, user) {
         sel = LX.clamp(t, 0, plan.length - 1);
-        var d = sel > 0 ? plan[sel].cc - plan[sel - 1].cc : 0, bad = gauge.set(d);
+        var d = sel > 0 ? plan[sel].cc - plan[sel - 1].cc : 0, bad = gauge.set(d) === "out";
         readouts(ro, [["Hour", hh(sel)], ["Gas plant", plan[sel].cc + " MW"], ["Asked to change", sel > 0 ? signed(d) + " MW" : "first hour", bad ? "bad" : ""]]);
         var bars = plan.map(function (h, k) { return { x0: k + 0.15, x1: k + 0.85, y0: 0, y1: h.cc, color: "var(--lx-cc)", op: k === sel ? 1 : 0.55, rx: 2 }; });
         Pl.render({ x: { min: 0, max: 24, ticks: [[0, "00:00"], [6, "06:00"], [12, "12:00"], [18, "18:00"], [24, "24:00"]], ticksN: [[0, "0"], [12, "12"], [24, "24"]] },
@@ -543,7 +570,7 @@
         if (inverters && seen.gfl && seen.gfm) { api.done(); api.saw(invSaw(G, I, E)); }
         if (inverters && sg) sg.set(mode);
       }
-      if (inverters) { seen[mode] = true; keep("modes", seen); }
+      if (inverters) { seen[mode] = true; keep("modes", seen); } else tried[E] = true;   // the starting value counts: one change compares two
       paint(false);
       act.lxSet = function (v) { if (inverters) { mode = v; seen[v] = true; keep("mode", v); keep("modes", seen); } else { E = v; sl.set(v); keep("E", v); tried[v] = true; } paint(true); };
     }

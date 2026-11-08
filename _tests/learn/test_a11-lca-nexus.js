@@ -108,17 +108,28 @@ let nb = 0, bad = [];
   for (let l = 0; l < 4; l++) for (let r = l; r < 4; r++) {
     nb++; const opt = { cooling: c.id, wide: w }, res = M.inside(D, o, m, l, r, opt), st = [];
     for (let i = l; i <= r; i++) st.push(M.stage(D, o, m, M.STAGES[i], opt));
-    const counted = st.filter(s => s.kind === "num" || s.kind === "none" || s.kind === "with"), bnd = st.filter(s => s.kind === "bound"), nc = st.filter(s => s.kind === "nc");
+    // a stage published inside another ("with": water's End of life inside Build) counts only when its partner is inside too;
+    // alone it has no separate number ("sep", never 0), and a partner inside without it says it includes it ("incl")
+    const E = D.objects[o][m], pin = sid => { const j = M.STAGES.indexOf(E[sid].with); return j >= l && j <= r; };
+    const counted = st.filter(s => s.kind === "num" || s.kind === "none" || (s.kind === "with" && pin(s.sid))), bnd = st.filter(s => s.kind === "bound"), nc = st.filter(s => s.kind === "nc");
+    const sep = st.filter(s => s.kind === "with" && !pin(s.sid)), incl = M.STAGES.filter((sid, j) => (j < l || j > r) && E[sid].with && pin(sid));
     let want = counted.reduce((a, s) => a + s.v, 0);
     if (bnd.length === 2) want += bnd[0].joint; else if (bnd.length === 1) want += bnd[0].v;
-    const good = near(res.v, want, 1e-9) && res.nc.length === nc.length && (bnd.length === 1 ? res.kind === "bound" : res.kind === (counted.length + bnd.length ? "num" : "nc"));
+    const good = near(res.v, want, 1e-9) && res.nc.length === nc.length && res.sep.length === sep.length && res.incl.length === incl.length &&
+      (bnd.length === 1 ? res.kind === "bound" : res.kind === (counted.length + bnd.length ? "num" : sep.length ? "sep" : "nc"));
     if (!good) bad.push([o, m, c.id, w, l, r].join("/"));
   }
 }))));
 ok(nb === 3 * 3 * 4 * 2 * 10 && bad.length === 0, "every boundary (" + nb + "): the total is the sum of its counted stages, uncounted stages listed, gas land a bound unless both stages are in: " + bad.slice(0, 4).join(" "));
+ok(M.totalText("water", M.inside(D, "solar", "water", 3, 3)) === "not separate (in Build)" && M.totalText("water", M.inside(D, "gas", "water", 3, 3, { cooling: "tower" })) === "not separate (in Build)", "water, End of life alone: not separate (it is published inside Build), never a false 0");
+ok(["solar", "gas"].every(o => { const r = M.inside(D, o, "water", 2, 3, { cooling: "tower" }); return r.kind === "num" && r.sep.length === 1 && /End of life not separate: it is in Build, outside/.test(M.totalText("water", r)); }) && /r\.sep\.length\) H\("small", \{ text: "End of life missing/.test(JS), "water, On site to End of life: the total says End of life's water is missing (it is in Build), in the text and the readout");
+for (let l = 0; l < 4; l++) for (let r = l; r < 4; r++) ["solar", "gas"].forEach(o => { const x = M.inside(D, o, "water", l, r, { cooling: "tower" }); if (x.sep.length && x.kind === "num" && !/not separate/.test(M.totalText("water", x))) ok(false, "a water total that leaves out End of life says so: " + o + " " + l + "-" + r); });
+ok(/Build includes End of life/.test(M.totalText("water", M.inside(D, "solar", "water", 0, 0))) && /Build includes End of life/.test(M.totalText("water", M.inside(D, "gas", "water", 0, 2, { cooling: "tower" }))) && !/includes/.test(M.totalText("water", M.full(D, "gas", "water", { cooling: "tower" }))), "water, Build without End of life: the total says Build includes End of life");
+ok(M.val("land", M.stage(D, "gas", "land", "supply")) === "over 3.69" && M.val("land", M.stage(D, "gas", "land", "run")) === "under 0.41" && M.totalText("land", M.inside(D, "gas", "land", 2, 2)).startsWith("under 0.41 ") && M.val("land", M.stage(D, "gas", "land", "run", { wide: true })) === "under 1.9", "gas land bounds keep two decimals: over 3.69, under 0.41 (rounding never tightens a bound)");
 ok(M.inside(D, "gas", "land", 1, 1).dir === "over" && M.inside(D, "gas", "land", 2, 2).dir === "under" && near(M.inside(D, "gas", "land", 1, 2).v, 4.1, 1e-12), "gas land: Supply alone is 'over' 90%, the site alone 'under' 10%, both together the whole 4.1");
 ok(M.val("water", M.stage(D, "solar", "water", "end")) === "in Build" && M.val("carbon", M.stage(D, "dc", "carbon", "build")) === "not counted" && M.val("carbon", M.stage(D, "solar", "carbon", "build")) === "about 28", "stage labels: 'in Build', 'not counted', NREL's approximate values 'about'");
 
+{ const g = D.consequential.find(c => c.id === "gas").note; ok(/per MWh|a MWh/.test(g) && g.includes(D.objects.gas.carbon.run.v + " kg CO₂e") && g.includes(D.objects.gas.carbon.supply.v + " kg") && !/\d g\b/.test(g), "the consequential note counts one MWh in kg (389 g per kWh = 389 kg per MWh)"); }
 // ---------------- numbers on the page against the model
 onPage("about 43 g CO₂e per kWh (NREL's median)", "myth 1");
 onPage("withdraws " + M.grp(cool("once").wd) + " gallons per MWh and consumes " + cool("once").use + "; a cooling tower withdraws " + cool("tower").wd + " and consumes " + cool("tower").use, "myth 2");
@@ -126,7 +137,7 @@ onPage(Math.round(V.direct) + " gallons per MWh on site against " + M.grp(V.indi
 onPage((cool("tower").use * 1000).toLocaleString("en-US") + " gallons: " + cool("tower").use + " gallons per MWh × 1,000 MWh", "the quiz's answer");
 onPage((cool("tower").wd * 1000).toLocaleString("en-US") + " gallons", "the quiz's withdrawal option"); onPage((cool("once").wd * 1000).toLocaleString("en-US") + " gallons", "the quiz's once-through option");
 onPage("Gas's phases add to " + M.grp(M.full(D, "gas", "carbon").v) + " g per kWh, its total median is " + D.nrelTotals.gas + " g", "Go deeper: medians need not add");
-onPage(D.harmonized.solar.median + " g per kWh (middle half " + D.harmonized.solar.lo + " to " + D.harmonized.solar.hi + ")", "Go deeper: harmonized solar");
+onPage(D.harmonized.solar.median + " g per kWh ([middle half]{.lx-term term=\"interquartile-range\"} " + D.harmonized.solar.lo + " to " + D.harmonized.solar.hi + ")", "Go deeper: harmonized solar");
 onPage(D.harmonized.gas.median + " g (" + D.harmonized.gas.lo + " to " + D.harmonized.gas.hi + ")", "Go deeper: harmonized gas");
 onPage(D.nrelTotals.solar + " and " + D.nrelTotals.gas + " g per kWh", "numbers to remember: NREL");
 onPage(cool("tower").wd + " and " + cool("tower").use + " gal per MWh", "numbers to remember: tower");
@@ -159,7 +170,7 @@ ok(stepTexts.length === 8 && stepTexts.every(t => words(t) <= 35 && sentences(t)
   const long = els.filter(x => x.split(" ").length > 35);
   ok(long.length === 0, "every page element is 35 words or fewer: " + long.map(x => x.slice(0, 60) + " (" + x.split(" ").length + ")").join(" | ")); }
 const NEW = ["functional-unit", "water-withdrawal", "water-consumption", "land-use-intensity", "attributional-analysis", "interquartile-range"];
-NEW.forEach(id => ok(new RegExp("id: " + id + "\\b").test(SIDE) && JS.includes("[[" + id + "|"), "sidecar defines and the page marks " + id));
+NEW.forEach(id => ok(new RegExp("id: " + id + "\\b").test(SIDE) && (JS.includes("[[" + id + "|") || PAGE.includes('term="' + id + '"')), "sidecar defines and the page marks " + id));
 ["system-boundary", "life-cycle-assessment", "consequential-analysis", "median", "heat-rate"].forEach(id => ok(JS.includes("[[" + id + "|") || PAGE.includes('data-term="' + id + '"'), "the page marks the course glossary's " + id));
 { const PY = fs.readFileSync(path.join(SITE, "learn/path.yml"), "utf8"), i = PY.indexOf("id: " + ID), r = PY.slice(i, i + 2000).split("\n- ")[0];
   ok(i > 0 && /status: active/.test(r) && /form: cards/.test(r) && /minutes: 25/.test(r) && /practice_minutes: 30/.test(r) && /after: \[F11\]/.test(r) && PAGE.includes('subtitle: "' + (r.match(/subtitle: "([^"]+)"/) || [])[1] + '"'), "path.yml: active cards row, 25 + 30 minutes, after F11 (the curriculum's prerequisite), subtitle equal to the page's"); }
@@ -199,6 +210,7 @@ NEW.forEach(id => ok(new RegExp("id: " + id + "\\b").test(SIDE) && JS.includes("
     // step 3
     demo.cards.go(2); btn(card(), /^Two boundaries/).click();
     ok(card().textContent.includes("about 11 times") && card().textContent.includes("You called it."), "step 3: the fair comparison, 11 times"); grab();
+    ok(!/Harmonized/.test(card().textContent) && card().textContent.includes("natural gas generation as a whole") && card().textContent.includes("thin-film and crystalline panels"), "step 3: one idea, the boundary; NREL's populations named, harmonized medians left to Go deeper");
     // step 4
     demo.cards.go(3); for (const c of D.cooling) { btn(card(), new RegExp("^" + c.label.replace(/[()]/g, "\\$&") + "$")).click(); grab(); }
     ok(S.cooling === "dry" && card().textContent.includes("withdraws 2 gal per MWh and consumes 2"), "step 4: every cooling, each with its line");

@@ -23,6 +23,12 @@
   "lesson": "CF5",
   "href": "cf5-drawing-the-boundary.html"
  },
+ "ac-power-flow": {
+  "term": "AC power flow (AC check)",
+  "short": "A calculation of a network's voltages, currents and reactive power as well as its MW, from the alternating-current equations; it shows what a DC power flow or a first estimate leaves out.",
+  "lesson": "A17",
+  "href": "a17-physical-feasibility.html"
+ },
  "additionality": {
   "term": "Additionality",
   "short": "Whether a purchase brings new clean generation that would not have been built otherwise, rather than claiming output that existed anyway.",
@@ -463,7 +469,7 @@
  },
  "clean-energy-standard": {
   "term": "Clean-energy standard",
-  "short": "A rule that a set share of the electricity sold in a year comes from sources the rule counts as clean; sellers prove it with certificates.",
+  "short": "A rule that a set share of the electricity sold in a year comes from sources the rule counts as clean; sellers prove it with certificates, each a record of one MWh from a counted source.",
   "lesson": "A12",
   "href": "a12-policy-instruments.html"
  },

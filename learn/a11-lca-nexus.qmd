@@ -49,7 +49,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <tr><td>Solar farm, land</td><td data-label="On site only">10.3 m² per MWh a year</td><td data-label="Cradle to grave">10.3 m² per MWh a year (2 stages not counted)</td></tr>
 <tr><td>Gas plant, carbon</td><td data-label="On site only">389 g CO₂e per kWh</td><td data-label="Cradle to grave">461 g CO₂e per kWh (stages added; whole-life median 486)</td></tr>
 <tr><td>Gas plant, water consumed</td><td data-label="On site only">205 gal per MWh</td><td data-label="Cradle to grave">222 gal per MWh</td></tr>
-<tr><td>Gas plant, land</td><td data-label="On site only">under 0.4 m² per MWh a year</td><td data-label="Cradle to grave">4.1 m² per MWh a year (2 stages not counted)</td></tr>
+<tr><td>Gas plant, land</td><td data-label="On site only">under 0.41 m² per MWh a year</td><td data-label="Cradle to grave">4.1 m² per MWh a year (2 stages not counted)</td></tr>
 <tr><td>Data center, carbon</td><td data-label="On site only">not counted</td><td data-label="Cradle to grave">340 g CO₂e per kWh (3 stages not counted)</td></tr>
 <tr><td>Data center, water consumed</td><td data-label="On site only">99 gal per MWh</td><td data-label="Cradle to grave">1,293 gal per MWh (2 stages not counted)</td></tr>
 <tr><td>Data center, land</td><td data-label="On site only">not counted</td><td data-label="Cradle to grave">not counted</td></tr>
@@ -61,8 +61,8 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <!-- a11-fallback:end -->
 </div>
 </div>
-<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Medians and averages, not one plant.</b> Each footprint is a published <span class="lx-term" data-term="median">median</span> by stage, or a 2023 U.S. average for data centers; a real plant can sit anywhere in the ranges.</span></p>
-<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Carbon</b> in g <span class="lx-term" data-term="co2e">CO₂e</span> per kWh, the same number as kg per MWh: NREL's 2021 medians by life-cycle phase.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Medians and averages, not one plant.</b> Each stage is a published <span class="lx-term" data-term="median">median</span>, or a 2023 U.S. average for data centers. Totals add stage medians from different reviews: illustrative sums, not published totals.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Carbon</b> in g <span class="lx-term" data-term="co2e">CO₂e</span> per kWh, the same number as kg per MWh: NREL's 2021 medians by life-cycle phase, for natural gas generation as a whole and for all solar panels.</span></p>
 <p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Water</b> in U.S. gallons consumed per MWh (1 gallon = 3.785 litres), from two NREL-led reviews. <b>Land</b> in m² held per MWh made in a year.</span></p>
 <p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>The data center</b> is a load: Berkeley Lab's 2023 averages for U.S. data centers, per unit of electricity used. Lesson F8's campus draws 240 MW in every hour.</span></p>
 <p class="lx-hint" style="margin-top:.6rem">About 25 guided minutes in eight steps.</p>
@@ -117,9 +117,10 @@ body-classes: "page-learn page-lesson lx-form-cards"
 ```
 
 - **Medians of published studies.** NREL screened about 3,000 life-cycle studies and kept fewer than 15% (2021).
+- **Which plants.** NREL's 43 g covers thin-film and crystalline panels; its 486 g covers natural gas generation as a whole, not combined-cycle plants alone.
 - **Medians need not add.** A median is the middle estimate after sorting. Gas's phases add to 461 g per kWh, its total median is 486 g.
 - **Harmonized.** Re-running studies on common assumptions narrows their spread (both from the papers' abstracts).
-- **Harmonized medians.** Crystalline-silicon panels 45 g per kWh (middle half 39 to 49); combined-cycle plants 450 g (420 to 480).
+- **Harmonized medians.** Crystalline-silicon panels 45 g per kWh ([middle half]{.lx-term term="interquartile-range"} 39 to 49); combined-cycle plants 450 g (420 to 480). Different study groups from NREL's medians, so compare them as assumptions, not as boundaries.
 - **What moves a solar number most.** Sunshine, panel life and efficiency, and the grid that powered the factory.
 - **What moves a gas number most.** The plant's efficiency, and methane leaked on the way from the well. The harmonized gas studies count methane at its 100-year warming effect (Heath et al., 2014).
 
@@ -136,6 +137,18 @@ body-classes: "page-learn page-lesson lx-form-cards"
 - **Attributional, by name.** IPCC AR6 Working Group III, Annex III (2022): attributional studies use average data for a product's own impacts.
 - **Consequential, by name.** Consequential studies widen the boundary to the effects of a change, and depend more on their assumptions (the same annex).
 - **In a model.** What responds to a change is an output of a dispatch or planning model: [A10](a10-emissions-questions.html) asks it for a day, [M6](m06-carbon-in-models.html) over years.
+
+```{=html}
+</div>
+</details>
+<details class="lx-deeper">
+<summary><span class="k">Go deeper · Analyst</span>Drought beyond the generation mix</summary>
+<div class="lx-deeper-body">
+```
+
+- **A real dry year.** In 2021 California's hydropower made 48% less than its 2011–2020 average (EIA).
+- **Warm or low rivers.** Plants cooled by rivers can be forced to cut output: [A9](a09-hazards.html) stress-tests it. EIA did not expect a significant effect in California in 2022.
+- **A load's water.** A data center's indirect water sits in these plants and reservoirs: Berkeley Lab names thermal plants' cooling and hydropower reservoirs' evaporation.
 
 ```{=html}
 </div>

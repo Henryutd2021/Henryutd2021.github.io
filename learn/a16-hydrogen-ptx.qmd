@@ -53,22 +53,23 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <table class="lx-facts a16-fb a16-uses">
 <thead><tr><th scope="col">Use</th><th scope="col">Where it sits</th><th scope="col">Why</th></tr></thead>
 <tbody>
-<tr><td>Ammonia for fertilizer</td><td data-label="Sits">Hydrogen is the feedstock</td><td data-label="Why">Ammonia is made from hydrogen: about 60% of industry's 55 Mt of hydrogen in 2024 (IEA).</td></tr>
-<tr><td>Oil refining</td><td data-label="Sits">Hydrogen is the feedstock</td><td data-label="Why">Refineries already use over 43 Mt a year (IEA, 2024): the choice is how it is made.</td></tr>
-<tr><td>Steel from iron ore (direct reduction)</td><td data-label="Sits">Hydrogen is the feedstock</td><td data-label="Why">Hydrogen can replace the gas that strips oxygen from the ore; about 10% of industry's hydrogen today (IEA).</td></tr>
+<tr><td>Ammonia for fertilizer</td><td data-label="Sits">Hydrogen is a chemical input</td><td data-label="Why">Ammonia is made from hydrogen: about 60% of industry's 55 Mt of hydrogen in 2024 (IEA).</td></tr>
+<tr><td>Oil refining</td><td data-label="Sits">Hydrogen is a chemical input</td><td data-label="Why">Refineries already use over 43 Mt a year (IEA, 2024): the choice is how it is made.</td></tr>
+<tr><td>Steel from iron ore (hydrogen-based direct reduction)</td><td data-label="Sits">Hydrogen is a chemical input</td><td data-label="Why">Hydrogen can replace the gas that strips oxygen from the ore; about 10% of industry's hydrogen today (IEA). Electricity-only routes are still in development.</td></tr>
 <tr><td>Fuel for ocean shipping</td><td data-label="Sits">Both routes are tried</td><td data-label="Why">Long voyages need dense fuels; ammonia and methanol made from hydrogen compete with others.</td></tr>
-<tr><td>Power storage for weeks</td><td data-label="Sits">Both routes are tried</td><td data-label="Why">Salt caverns hold weeks of energy cheaply, but only about 31% comes back (A8).</td></tr>
-<tr><td>Long-haul trucks</td><td data-label="Sits">Both routes are tried</td><td data-label="Why">Fuel cells and batteries are both tried; a battery truck uses far less electricity per mile.</td></tr>
+<tr><td>Power storage for weeks</td><td data-label="Sits">Both routes are tried</td><td data-label="Why">Salt caverns hold weeks of energy cheaply, but little comes back: about 35% here (step 1), 31% in DOE's 2022 storage assessment (A8).</td></tr>
+<tr><td>Long-haul trucks, on routes longer than today's batteries cover</td><td data-label="Sits">Both routes are tried</td><td data-label="Why">Where batteries do not yet cover the route, fuel cells and batteries are both tried; a battery truck still uses far less electricity per mile.</td></tr>
 <tr><td>Passenger cars</td><td data-label="Sits">Electricity does it with far less</td><td data-label="Why">Electric car: 100 miles on 25–40 kWh. Fuel cell car: about 60 miles per kg, made with 57 kWh: about 1 mile per kWh.</td></tr>
 <tr><td>Heating homes</td><td data-label="Sits">Electricity does it with far less</td><td data-label="Why">A heat pump gives up to three times the heat of the power it uses; hydrogen loses about 40% before any heat is made.</td></tr>
 </tbody>
 </table>
+<p class="lx-hint">Mt = million tonnes. A use is a chemical input if its product is made from hydrogen; otherwise electricity goes first where it meets the job today, and both routes are tried where it does not yet.</p>
 <p class="lx-hint">With JavaScript on, you size the electrolyzer, set its part-load limit, move the hydrogen price, size a tank and sort the uses yourself.</p>
 </div>
 </div>
-<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Illustrative farm.</b> 100 MW of wind on the Southwest Power Pool's real 2025 hours (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), scaled to a 33.8% <span class="lx-term" data-term="capacity-factor">capacity factor</span> (<a href="https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_b">EIA</a>, U.S. wind fleet, 2025); its grid connection takes 50 MW.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Illustrative farm.</b> 100 MW, with a 50 MW grid connection. Its wind: the Southwest Power Pool's real 2025 regional hours (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), raised to a power so the peak reaches 100 MW and the year a 33.8% <span class="lx-term" data-term="capacity-factor">capacity factor</span> (<a href="https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_b">EIA</a>, 2025).</span></p>
 <p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Costs, one price year.</b> Electrolyzer $2,000 per kW, 57 kWh per kg and power at $30 per MWh, in 2022 dollars from DOE's <a href="https://www.hydrogen.energy.gov/docs/hydrogenprogramlibraries/pdfs/24005-clean-hydrogen-production-cost-pem-electrolyzer.pdf">Record 24005</a> (May 2024); 4% real over 30 years.</span></p>
-<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Partial cost.</b> Upkeep and stack replacement are left out; DOE's $5–7 per kg counts them, at 50–75% utilization and its own financing. Compression, storage and delivery are outside both.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Partial cost.</b> Upkeep and stack replacement (new electrolysis cells) are left out; DOE's $5–7 per kg counts them, at 50–75% utilization and its own financing. Compression, storage and delivery are outside both.</span></p>
 <p class="lx-hint" style="margin-top:.6rem">About 30 guided minutes in seven steps.</p>
 <style>/* lesson-local */
 @media (max-width: 640px) { .a16-fb td:first-child { font-weight: 600; } .a16-fb td[data-label]::before { content: attr(data-label) ": "; color: var(--lx-ink-3); font-size: 12.5px; } }
@@ -116,9 +117,11 @@ body-classes: "page-learn page-lesson lx-form-cards"
 
 - **Colours are names, not measurements.** Grey (natural gas), blue (gas with capture) and green (renewable electrolysis) are common labels; the IEA says it “does not use colours” and counts low-emissions hydrogen instead.
 - **What rules measure.** DOE's clean-hydrogen target is at most 4.0 kg [CO₂e]{.lx-term term="co2e"} per kg, [well-to-gate]{.lx-term term="well-to-gate"}.
-- **DOE's example.** A gas reformer with about 95% carbon capture could reach about 4.0, if it uses the average U.S. grid mix and upstream methane leaks stay at or below 1%.
-- **Three tests of the power.** The U.S. clean-hydrogen credit's final rules (January 2025) ask for [deliverability]{.lx-term term="deliverability"} (the same region), temporal matching (the same year or the same hour) and incrementality (new clean power).
-- **Matching is not accounting.** Matching sets which power may count. Separately, from 2030 DOE's 45VH2-GREET manual (December 2025) lets a producer opt to count its electricity's emissions hour by hour, if its annual result is at most 4.0 kg.
+- **DOE's example.** A [gas reformer]{.lx-term term="gas-reformer"} with about 95% carbon capture could reach about 4.0, if it uses the average U.S. grid mix and upstream methane leaks stay at or below 1%.
+- **Three tests of the power.** The U.S. clean-hydrogen credit's final rules (January 2025) ask for [deliverability]{.lx-term term="deliverability"} (the same region), incrementality (new clean power) and temporal matching.
+- **Matching in time.** Annual matching is allowed before 2030; hourly matching applies from 2030 (U.S. Treasury, 3 January 2025).
+- **Matching is not accounting.** Matching sets which power may count. Separately, from 2030 DOE's 45VH2-GREET manual (December 2025) lets a producer opt to count its electricity's emissions hour by hour.
+- **Its condition.** The option applies only if the producer's annual result is at most 4.0 kg.
 - **A claim is not a cause.** Matching sets what a buyer may claim. Whether emissions fall depends on whether the clean power is new ([additionality]{.lx-term term="additionality"}) and deliverable: the accounting questions of [A10](a10-emissions-questions.qmd).
 
 ```{=html}
@@ -133,7 +136,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 - **In a model** the solver chooses the size, the tank and every hour's operation at once.
 - **The tank's balance:** $L_t = L_{t-1} + h_t - q_t$.
 - **Its symbols:** $L_t$ is the hydrogen in the tank at the end of hour $t$, $h_t$ the hour's production and $q_t$ its delivery, all in kg.
-- **A minimum load** is a yes-or-no choice per hour (on or off), so an exact model is a [mixed-integer program]{.lx-term term="mixed-integer-program"}; a linear program can only force the unit on or ignore the limit.
+- **A minimum load** is a yes-or-no choice per hour (on or off). Choosing both the on/off states and the operating levels generally needs a [mixed-integer program]{.lx-term term="mixed-integer-program"}; with the on/off schedule fixed beforehand, dispatch can stay linear.
 - **Next.** [M4](m04-storage-multienergy.html) builds such a plant model with a battery, a hydrogen tank and a heat store.
 
 ```{=html}

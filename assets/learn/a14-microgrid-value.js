@@ -152,8 +152,23 @@
   // step 7's feedback for an owner
   function ownerFeedback(D, o) {
     var x = design(D, D.designs[2], D.hospital.perHour, { everyday: true, rate: o.rate });
-    return "With " + o.label.toLowerCase() + " as owner the design costs " + usd(x.annual) + " a year at " + (o.rate * 100).toFixed(0) + "%. The avoided outage cost and the bill savings stay the same; the net, who pays and who carries the risk change.";
+    return "With " + o.label.toLowerCase() + " as owner the design costs " + usd(x.annual) + " a year at " + (o.rate * 100).toFixed(0) + "%: a net of " + signed(x.net) + " in the campus's view. Only the borrowing cost moved.";
   }
+  // step 6's bill saving, worked: the peak trimmed × the demand charge × 12 months
+  function billWorked(D) {
+    var e = D.costs.everyday;
+    return "The bill saving, worked: the battery trims each monthly peak by " + e.kw + " kW; " + e.kw + " kW × $" + e.perKWMonth + " per kW a month × 12 = " + usd(everydaySavings(D)) + " a year. It needs at least " + e.minHours + " hours of battery.";
+  }
+  // the year's ledger for one owner: project benefits and costs, then the supplier's lost bill revenue (explain layer and no-JS)
+  function ledgerRows(D, o) {
+    var d = design(D, D.designs[2], D.hospital.perHour, { everyday: true, rate: o.rate });
+    return [{ head: "+ Outage cost avoided", who: "the hospital", v: d.avoided }, { head: "+ Bill savings (peak trimmed)", who: o.everydayTo, v: d.everyday },
+            { head: "− Capital, spread over " + D.finance.years + " years", who: "the owner", v: -d.capitalYear }, { head: "− Upkeep, tank and fuel", who: "the owner", v: -(d.upkeep + d.fuel) },
+            { head: "= Net, the campus's view", who: "", v: d.net, total: true },
+            { head: "− Bill revenue no longer collected", who: "the campus's power supplier", v: -d.everyday },
+            { head: "= Net, all parties, if the supplier's own costs do not fall", who: "", v: d.net - d.everyday, total: true }];
+  }
+  var PROFIT = "The owner's profit is not calculated: it depends on the fee or rates it collects.";
 
   function usd(v) { return (v < -0.5 ? "−$" : "$") + Math.round(Math.abs(v)).toLocaleString("en-US"); }
   function usd2(v) { return "$" + v.toFixed(2); }
@@ -175,7 +190,7 @@
   }
   function staticSteps(D) {
     var I = D.ice, F = facts(D), O = D.outages;
-    var ice = "<div class=\"lx-scroll-x\"><table class=\"lx-mini-table a14-tab\"><caption class=\"lx-hint\">What one outage costs, on average, rural co-op members (2025 survey, 2025 dollars)</caption><thead><tr><th scope=\"col\">Length</th><th scope=\"col\">A household</th><th scope=\"col\">A business</th><th scope=\"col\">Household, per kWh not delivered</th></tr></thead><tbody>" +
+    var ice = "<div class=\"lx-scroll-x\"><table class=\"lx-mini-table a14-tab\"><caption class=\"lx-hint\">What one outage is worth to rural co-op members, on average: what a household would pay to avoid it, what it costs a business (2025 survey, 2025 dollars)</caption><thead><tr><th scope=\"col\">Length</th><th scope=\"col\">A household would pay to avoid it</th><th scope=\"col\">A business's costs</th><th scope=\"col\">Household, per kWh not delivered</th></tr></thead><tbody>" +
       I.hours.map(function (h, i) { return "<tr><td>" + I.names[i] + "</td><td class=\"n\">" + usd2(I.household.event[i]) + "</td><td class=\"n\">" + usd(I.business.event[i]) + "</td><td class=\"n\">" + usd2(I.household.kwh[i]) + "</td></tr>"; }).join("") + "</tbody></table></div>";
     var out = "<div class=\"lx-scroll-x\"><table class=\"lx-mini-table a14-tab\"><caption class=\"lx-hint\">A year of outages at Prairie Campus (illustrative), at " + usd(F.c) + " an hour for the hospital</caption><thead><tr><th scope=\"col\">Length</th><th scope=\"col\">Outages a year</th><th scope=\"col\">Hours a year</th><th scope=\"col\">Cost a year</th></tr></thead><tbody>" +
       contributions(O, F.c).map(function (x) { return "<tr><td>" + x.hours + " h</td><td class=\"n\">" + x.perYear + "</td><td class=\"n\">" + f2(x.expHours) + "</td><td class=\"n\">" + usd(x.cost) + "</td></tr>"; }).join("") + "</tbody></table></div>";
@@ -186,7 +201,7 @@
       "<li>A battery: its first hour saves " + usd(F.first.saves) + " a year and costs " + usd(F.first.costs) + ", so no battery pays from outages alone.</li>" +
       "<li>At " + usd(F.hi) + " an hour, hours up to " + F.m + " pass, but " + F.m + " hours cost " + usd(F.dm.annual) + " against " + usd(F.dm.avoided) + " avoided.</li>" +
       "<li>A generator: the best tank holds " + F.g.gen + " hours, " + signed(F.g.net) + " a year.</li></ul>" +
-      "<div class=\"lx-scroll-x\">" + workedTable(D) + "</div>" + dz +
+      "<div class=\"lx-scroll-x\">" + workedTable(D) + "</div>" + dz + "<p class=\"lx-hint\">" + billWorked(D) + "</p>" +
       "<p class=\"lx-hint\">" + D.texts.billNote + "</p><div class=\"lx-scroll-x\">" + villageTable(D) + "</div><p class=\"lx-hint\">" + D.texts.villageToy + "</p>";
   }
   function staticExplain(D) {
@@ -196,14 +211,17 @@
       "<dt>The next hour</dt><dd>Buy another hour of backup while it saves more a year than it costs; then check that the whole design covers its fixed costs.</dd>" +
       "<dt>Value stacking</dt><dd>Everyday savings can carry a design that outage savings alone cannot, if one battery can do both: here it is assumed full when each outage starts.</dd>" +
       "<dt>Who owns it</dt><dd>At a fixed borrowing rate, changing who pays moves the gains between parties, not the combined total. Here each owner also borrows at its own rate, so the net changes too.</dd></dl>" +
-      "<div class=\"lx-scroll-x\"><table class=\"lx-mini-table a14-tab\"><caption class=\"lx-hint\">Four owners of the battery-and-generator design (illustrative deals and rates)</caption><thead><tr><th scope=\"col\">Owner</th><th scope=\"col\">Who pays</th><th scope=\"col\">Carries the risk</th><th scope=\"col\">Annual cost</th></tr></thead><tbody>" +
-      F.owners.map(function (r) { return "<tr><td>" + r.o.label + " (" + (r.o.rate * 100).toFixed(0) + "%)</td><td>" + r.o.pays + "</td><td>" + r.o.risk + "</td><td class=\"n\">" + usd(r.x.annual) + "</td></tr>"; }).join("") + "</tbody></table></div>";
+      "<div class=\"lx-scroll-x\"><table class=\"lx-mini-table a14-tab\"><caption class=\"lx-hint\">Four owners of the battery-and-generator design (illustrative deals and rates)</caption><thead><tr><th scope=\"col\">Owner</th><th scope=\"col\">Who pays</th><th scope=\"col\">Who gains</th><th scope=\"col\">Carries the risk</th><th scope=\"col\">Annual cost</th></tr></thead><tbody>" +
+      F.owners.map(function (r) { return "<tr><td>" + r.o.label + " (" + (r.o.rate * 100).toFixed(0) + "%)</td><td>" + r.o.pays + "</td><td>" + r.o.gains + "</td><td>" + r.o.risk + "</td><td class=\"n\">" + usd(r.x.annual) + "</td></tr>"; }).join("") + "</tbody></table></div>" +
+      "<div class=\"lx-scroll-x\"><table class=\"lx-mini-table a14-tab\"><caption class=\"lx-hint\">The ledger, a year: owned by " + D.owners[0].label.toLowerCase() + " (" + (D.owners[0].rate * 100).toFixed(0) + "%); 2025 dollars, illustrative</caption><thead><tr><th scope=\"col\">A year</th><th scope=\"col\">Who</th><th scope=\"col\">Amount</th></tr></thead><tbody>" +
+      ledgerRows(D, D.owners[0]).map(function (r) { return "<tr" + (r.total ? " class=\"tot\"" : "") + "><th scope=\"row\">" + r.head + "</th><td>" + r.who + "</td><td class=\"n\">" + signed(r.v) + "</td></tr>"; }).join("") + "</tbody></table></div>" +
+      "<p class=\"lx-hint\">" + PROFIT + "</p>";
   }
   function staticMyth(D) {
     var F = facts(D), b = F.designs[0], I = D.ice;
     function qq(id, q, a) { return "<div class=\"lx-qq\" data-id=\"" + id + "\" data-answer=\"myth\">\n<p class=\"lx-qtext\">Myth or fact? “" + q + "”</p>\n<ul class=\"lx-choices\"><li data-value=\"myth\">Myth</li><li data-value=\"fact\">Fact</li></ul>\n<details class=\"lx-answer\"><summary>Answer</summary><p>" + a + "</p></details>\n</div>"; }
     return [qq("pays", "A microgrid that keeps a hospital open always pays for itself.", "Myth. Here a 2-hour battery comes out at " + signed(b.no.net) + " a year on outages alone, and at " + signed(b.yes.net) + " with the campus's bill savings, if it is full at every outage."),
-            qq("voll", "The value of lost load is one number.", "Myth. In the 2025 co-op survey, an 8-hour outage cost a household " + usd2(F.kwh8[0]) + " and a business " + usd(F.kwh8[1]) + " per kWh not delivered."),
+            qq("voll", "The value of lost load is one number.", "Myth. In the 2025 co-op survey, per kWh not delivered in an 8-hour outage, a household would pay " + usd2(F.kwh8[0]) + " to avoid it and a business lost " + usd(F.kwh8[1]) + "."),
             qq("owner", "If a microgrid saves money overall, its owner comes out ahead.", "Myth. The owner pays the capital and gains only through rates, a fee or the savings it keeps. Its borrowing rate moves the net too: " + signed(F.owners[3].x.net) + " a year at 10%, " + signed(F.owners[2].x.net) + " at 4%.")].join("\n");
   }
   function staticPractice(D) {
@@ -215,7 +233,7 @@
        "Outages longer than 4 hours happen " + f2(F.s4) + " times a year, so it saves " + usd(F.c * F.s4) + " a year: far below " + usd(F.first.costs) + "."],
       ["When the first hour passes.", "At what cost of an hour without power would the battery's first hour save as much as it costs?",
        usd(F.first.costs) + " ÷ " + f2(F.count) + " outages a year = " + usd(F.pass) + " an hour. The fixed costs would still need covering."],
-      ["Value against price.", "A household's 24-hour outage costs " + usd2(F.kwh24) + " per kWh not delivered. How many times the 2025 U.S. residential average of " + I.retailCents.residential + "¢ per kWh?",
+      ["Value against price.", "To avoid a 24-hour outage, a household would pay " + usd2(F.kwh24) + " per kWh not delivered. How many times the 2025 U.S. residential average of " + I.retailCents.residential + "¢ per kWh?",
        "About " + times(F.kwh24, I.retailCents.residential / 100) + " times."],
       ["The cost of borrowing.", "The battery-and-generator design costs " + usd(design(D, D.designs[2], F.c).capital) + " to build, spread over " + D.finance.years + " years. Its capital cost a year at 4% and at 10%?",
        usd(ow[2].x.capitalYear) + " and " + usd(ow[3].x.capitalYear) + ": the same equipment, " + usd(ow[3].x.capitalYear - ow[2].x.capitalYear) + " a year apart."],
@@ -229,7 +247,7 @@
     return D.facts.map(function (f) { return "<tr><td class=\"n\">" + f.n + "</td><td>" + f.what + "</td><td class=\"s\"><a href=\"" + f.url + "\">" + f.source + "</a> · " + f.asof + "</td></tr>"; }).join("\n");
   }
 
-  var model = { batteryWorked: batteryWorked, workedTable: workedTable, villageTable: villageTable, villageFeedback: villageFeedback, stackFeedback: stackFeedback, ownerFeedback: ownerFeedback,
+  var model = { billWorked: billWorked, ledgerRows: ledgerRows, PROFIT: PROFIT, batteryWorked: batteryWorked, workedTable: workedTable, villageTable: villageTable, villageFeedback: villageFeedback, stackFeedback: stackFeedback, ownerFeedback: ownerFeedback,
                 facts: facts, staticSteps: staticSteps, staticExplain: staticExplain, staticMyth: staticMyth, staticPractice: staticPractice, staticFacts: staticFacts, crf: crf, S: S, A: A, totalHours: totalHours, outageCount: outageCount, contributions: contributions, everydaySavings: everydaySavings,
                 design: design, batteryHourCost: batteryHourCost, nextHour: nextHour, best: best, marginalSize: marginalSize,
                 villageLoad: villageLoad, villageShort: villageShort, villageCase: villageCase, CASES: CASES, usd: usd, usd2: usd2, signed: signed, times: times };
@@ -281,7 +299,7 @@
     function keep() { LX.store.set("a14", { owner: St.owner }); }
 
     var cards = LX.StepCards(live, { id: "a14-steps", steps: [
-      { text: "An outage costs different people different amounts. Pick its length and compare a household, a dairy and the county hospital.",
+      { text: "An outage costs different people different amounts. Pick its length and compare a household and a dairy, members of a rural [[co-op|co-op]], with the county hospital.",
         build: function (act, api) {
           var picks = 0, row = H("div", { class: "cf-ctl" }, act); H("p", { class: "cf-ctl-l", text: "Outage length" }, row);
           var grid = H("div", { class: "a14-who" }, act), note = H("p", { class: "lx-hint", "aria-live": "polite" }, act);
@@ -290,15 +308,15 @@
           function paint() {
             grid.innerHTML = "";
             var i = St.dur, h = I.hours[i];
-            card("house", "A household", "survey average, rural co-op members", usd2(I.household.event[i]));
-            card("drop", "A dairy", "priced as the survey's average business member", usd(I.business.event[i]));
+            card("house", "A household", "survey average: what members would pay to avoid it", usd2(I.household.event[i]));
+            card("drop", "A dairy", "the survey's average business member: its direct costs", usd(I.business.event[i]));
             card("cross", "The county hospital", "illustrative: " + usd(Ho.perHour) + " an hour", usd(Ho.perHour * h));
-            note.textContent = "Per kWh not delivered, the household loses " + usd2(I.household.kwh[i]) + ": about " + times(I.household.kwh[i], I.retailCents.residential / 100) + " times the 2025 U.S. residential average of " + I.retailCents.residential + "¢ per kWh (2025 dollars).";
-            if (picks >= 1) { api.saw("The same " + I.names[i] + " cost the household " + usd2(I.household.event[i]) + ", the dairy " + usd(I.business.event[i]) + " and the hospital " + usd(Ho.perHour * h) + ". The [[value-of-lost-load|value of lost load]] is not one number."); api.done(); }
+            note.textContent = "Per kWh not delivered, the household would pay " + usd2(I.household.kwh[i]) + " to avoid it: about " + times(I.household.kwh[i], I.retailCents.residential / 100) + " times the 2025 U.S. residential average of " + I.retailCents.residential + "¢ per kWh (2025 dollars).";
+            if (picks >= 1) { api.saw("The same " + I.names[i] + ": the household would pay " + usd2(I.household.event[i]) + " to avoid them, the dairy loses " + usd(I.business.event[i]) + " and the hospital " + usd(Ho.perHour * h) + ". The [[value-of-lost-load|value of lost load]] is not one number."); api.done(); }
           }
           paint();
         } },
-      { text: "Prairie Campus's feeder fails " + fmt1(outageCount(O)) + " times a year on average, from " + O.hours[0] + " to " + O.hours[O.hours.length - 1] + " hours (illustrative). Which outages cost the hospital most over a year?",
+      { text: "Prairie Campus's [[feeder|feeder]] fails " + fmt1(outageCount(O)) + " times a year on average, from " + O.hours[0] + " to " + O.hours[O.hours.length - 1] + " hours (illustrative). Which outages cost the hospital most over a year?",
         build: function (act, api) {
           var box = H("div", {}, act);
           var pr = LX.Predict(act, { id: "a14-which", q: "", title: false, fresh: true, answer: "long",
@@ -315,7 +333,7 @@
             api.saw("Outages of 12 hours or more are " + pct(ln / outageCount(O)) + " of the outages but " + pct(lh / totalHours(O)) + " of the hours: " + usd(Ho.perHour * lh) + " of the hospital's expected " + usd(Ho.perHour * totalHours(O)) + " a year.");
           }
         } },
-      { text: "A battery covers the first hours of every outage. Each extra hour costs " + usd(batteryHourCost(D)) + " a year, on top of the switch, the controls and the battery's inverter. Slide its size.",
+      { text: "A battery covers the first hours of every outage. Each extra hour costs " + usd(batteryHourCost(D)) + " a year, on top of the switch, the controls and the battery's [[inverter|inverter]]. Slide its size.",
         build: function (act, api) {
           sizeStep(act, api, "battery", false);
           var wk = H("details", { class: "lx-textalt" }, act); H("summary", { text: "How an hour of battery costs " + usd(batteryHourCost(D)) + " a year" }, wk);
@@ -330,7 +348,7 @@
           St.c = Ho.perHour;
           var tg = LX.Toggle(H("div", { class: "lx-toggles" }, act), { label: "Count the campus's bill savings", on: St.everyday, onChange: function (on) { St.everyday = on; flips++; paint(); } });
           var flips = 0, box = H("div", { class: "lx-scroll-x" }, act);
-          H("p", { class: "lx-hint", text: D.texts.stackAssume }, act); H("p", { class: "lx-hint", text: D.texts.billNote }, act);
+          H("p", { class: "lx-hint", text: billWorked(D) }, act); H("p", { class: "lx-hint", text: D.texts.stackAssume }, act); H("p", { class: "lx-hint", text: D.texts.billNote }, act);
           function paint() {
             var rows = D.designs.map(function (d) { return { d: d, x: design(D, d, Ho.perHour, { everyday: St.everyday }) }; });
             var top = rows.reduce(function (a, b) { return b.x.net > a.x.net ? b : a; });
@@ -346,6 +364,7 @@
           var tried = {}, card = H("div", { class: "a14-owner", "aria-live": "polite" }, act), hint = H("p", { class: "lx-hint", text: D.texts.ownersNote }, act);
           seg(H("div", { class: "cf-ctl" }, act), "Owner", D.owners.map(function (o) { return [o.key, o.label]; }), St.owner, function (k) { St.owner = k; tried[k] = true; keep(); paint(); });
           act.insertBefore(act.lastChild, card);
+          act.insertBefore(H("p", { class: "lx-hint", text: "Compare two owners or more." }, act), card);
           function paint() {
             card.innerHTML = "";
             if (!St.owner) { H("p", { class: "lx-hint", text: "Pick an owner." }, card); return; }
@@ -355,7 +374,7 @@
             [["Pays", o.pays], ["Gains", o.gains], ["Carries the risk", o.risk]].forEach(function (r) { H("p", { html: "<b>" + r[0] + ":</b> " + LX.rich(r[1]) }, card); });
             var n = Object.keys(tried).length;
             if (onOwner) onOwner(St.owner);
-            api.saw(ownerFeedback(D, o) + (n < 2 ? " Try another owner." : ""), n < 2);
+            api.saw(ownerFeedback(D, o), n < 2);
             if (n >= 2) api.done();
           }
           paint();
@@ -400,8 +419,10 @@
       function paint() {
         var h = kind === "battery" ? St.bat : St.gen, x = design(D, kind === "battery" ? { bat: h } : { gen: h }, St.c), nx = nextHour(D, kind, h, St.c);
         var b = best(D, kind, St.c, max), m = marginalSize(D, kind, St.c, max);
-        chips(out, [["Annual cost", usd(x.annual)], ["Outage cost avoided", usd(x.avoided)], ["Net", signed(x.net), x.net < 0 ? "bad" : null],
-                    ["Next hour saves / costs", h < max ? usd(nx.saves) + " / " + usd(nx.costs) : "–"]]);
+        var cl = [["Annual cost", usd(x.annual)], ["Outage cost avoided", usd(x.avoided)], ["Net", signed(x.net), x.net < 0 ? "bad" : null],
+                  [kind === "battery" ? "Next hour saves / costs, fixed equipment apart" : "Next hour saves after fuel / costs", h < max ? usd(nx.saves) + " / " + usd(nx.costs) : "–"]];
+        if (h === 0) cl.push(["First hour with its fixed equipment", usd(design(D, kind === "battery" ? { bat: 1 } : { gen: 1 }, St.c).annual) + " a year"]);
+        chips(out, cl);
         P.render(sizeSpec(D, kind, St.c, h, max));
         if (kind === "battery" && !values) {
           var n0 = nextHour(D, "battery", 0, St.c);
@@ -460,10 +481,8 @@
       lhost.innerHTML = "";
       H("p", { class: "lx-hint", text: "Battery 2 hours and generator 72 hours, owned by " + o.label.toLowerCase() + " (" + (o.rate * 100).toFixed(0) + "%); 2025 dollars, illustrative." }, lhost);
       LX.Ledger(lhost, { cls: "a14-ledger", columns: ["A year", "Who", "Amount"],   // LX.Ledger (components/ledger.js)
-        rows: [["+ Outage cost avoided", "the hospital", d.avoided], ["+ Bill savings (peak trimmed)", o.everydayTo, d.everyday], ["− Capital, spread over " + D.finance.years + " years", "the owner", -d.capitalYear], ["− Upkeep, tank and fuel", "the owner", -(d.upkeep + d.fuel)]]
-          .map(function (r) { return { head: r[0], cells: [{ text: r[1], cls: "who" }, signed(r[2])] }; })
-          .concat([{ head: "= Net, campus savings counted", cells: [{ text: "", cls: "who" }, signed(d.net)], total: true }]) });
-      D.texts.ledgerNotes.forEach(function (t) { H("p", { class: "lx-hint", text: t }, lhost); });
+        rows: ledgerRows(D, o).map(function (r) { return { head: r.head, cells: [{ text: r.who, cls: "who" }, signed(r.v)], total: !!r.total }; }) });
+      D.texts.ledgerNotes.concat([PROFIT]).forEach(function (t) { H("p", { class: "lx-hint", text: t }, lhost); });
     }
     setOwner(St.owner);
     // 3 the causal chain (e-chain)
