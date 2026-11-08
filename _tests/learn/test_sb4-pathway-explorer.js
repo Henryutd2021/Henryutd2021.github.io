@@ -94,7 +94,7 @@ const QPATH = path.join(X.SITE, "learn/sb4-pathway-explorer.qmd");
       "a plan 0.45 Mt over its budget is out of reach, its cap met: " + sn[0].text.slice(0, 110));
     // only the cap missed (security first): the excess, never "imports less"
     const sec = LIB.plans.find(x => x.preset === "secure" && x.foresight === "perfect"), ss1 = PG.says(sec.view, null, P, E4)[1].text;
-    ok(!sec.view.missBudget && sec.view.missCap[0] && /PJ over the cap in all/.test(ss1) && /this is the cheapest at that excess, not the least imports/.test(ss1), "security first, only the cap missed: " + ss1);
+    ok(!sec.view.missBudget && sec.view.missCap[0] && /^\*\*Imports above the cap:\*\* 27\.4% of the cap's base in 2030 against 25%, 77\.6 PJ over in all\./.test(ss1) && Math.abs(sec.view.impCap[0] - 0.2735) < 0.0005 && /this is the cheapest at that excess, not the least imports/.test(ss1), "security first, only the cap missed: " + ss1);
   }
 
   // ---------------- the sweep's fixes: terms at first use, the slices' wording, the strait, batteries, the dated correction
@@ -102,7 +102,7 @@ const QPATH = path.join(X.SITE, "learn/sb4-pathway-explorer.qmd");
   ok(!/kept whole/.test(JS + PAGE) && /get their own average day and night, not their hourly sequence/.test(JS), "the extreme periods are averaged slices, never 'kept whole'");
   ok(E4.straitText(P) === "all imported crude and 25% of LNG through the strait" && /E4\.straitText\(P\)/.test(JS), "the strait carries all imported crude and a quarter of LNG (prairieland.json), on the map and in the imports key");
   ok(/storage, not a source/.test(JS) && /batteries store, so they are not a source/.test(JS), "batteries are storage, not a source, in the map's and the mix chart's keys");
-  { const sec = LIB.plans.find(x => x.preset === "secure" && x.foresight === "perfect"); has("Corrected 8 Nov 2026: the import cap's base now leaves out what batteries and links lose, so wasting electricity cannot help meet it. Security first: " + E4.bn(sec.view.pv.total) + ", was $520.4 billion.");
+  { const sec = LIB.plans.find(x => x.preset === "secure" && x.foresight === "perfect"); has("Corrected 8 Nov 2026: the import cap's base now leaves out what batteries and links lose, so electricity lost there no longer helps meet it. Security first: " + E4.bn(sec.view.pv.total) + ", was $520.4 billion.");
     ok(E4.bn(sec.view.pv.total) === "$438.2 billion", "the 8 Nov correction's number is the library's (" + E4.bn(sec.view.pv.total) + ")"); }
   has("A run that misses a limit shows no electricity prices; the scarce-wind week's battery energy is paid back on winter days.");
   has("NIPA Table 1.1.9: Implicit Price Deflators for Gross Domestic Product, line 1, annual (2017 = 100): 2024 125.587, 2025 128.893");

@@ -15859,8 +15859,9 @@
                                      wind and solar within each region's most; a plant runs in its model year and the later
                                      ones its life covers (vintages)
      batteries: cyclic within each representative day (state at 08:00 and 20:00 within 0 and 4 h x power); in the
-                                     scarce-wind week the store may enter full and run down over the seven days, and the
-                                     winter day pays it back (over winter's days and the week, energy in x 85% = energy out)
+                                     scarce-wind week the store may enter full and run down over the seven days; winter
+                                     runs in order (its 83 days, then the week, cyclic over the season), so winter's days
+                                     pay the week back (energy in x 85% = energy out) and the level stays within the store
      links: flows each way within the link's limit (existing + additions), 1% lost per 100 km
      fuels (national, each year): crude = refinery input + oil plants (domestic crude, up to 2025's output, then imports);
                                      gas = final + plants, delivered by domestic fields (up to 2025's output; 5% of it
@@ -15870,7 +15871,9 @@
      CO2 (Mt a year) = fuels burned x IPCC factors; cumulative 2026-2050 = sum_p w_p CO2_p + w_2025 x 214.9 <= budget
                                      (+ an overshoot, see "limits first"); w linear (2, 5, 5, 5, 5, 3) or step (0, 5, 5, 5, 5, 5)
      imports (crude imports + LNG) <= cap x (primary energy - what batteries and links lose), each year (+ an overshoot,
-                                     see "limits first"): losing electricity on purpose cannot help meet the cap
+                                     see "limits first"): electricity lost in batteries and links does not count toward the
+                                     cap's base (the cheapest waste loops); burning more fuel still raises primary energy, as
+                                     in the statistic itself
      the stress hours (peak-hour rule): plants at their availability (the summer hour with a drought's derating), wind and
                                      solar at that hour, batteries at full power, the firm option's share, the links
      goal: min the present value in 2025 of new plants' and links' yearly payments for the years they serve up to 2050
@@ -16257,12 +16260,17 @@
               row("bw0_" + r + tg, endW, 0, null); row("bw1_" + r + tg, E(endW), null, hrs * b0);
               row("bw2_" + r + tg, lastDay, 0, null); row("bw3_" + r + tg, E(lastDay), null, hrs * b0);
             } else if (d === P.refill) {
-              // its season's representative day pays the week back: over the season's days and the week, what the store
-              // takes in x 85% equals what it gives (no energy from nowhere); the day ends within the store too
-              var wk = P.days.filter(function (x) { return x.week; })[0];
-              row("bz_" + r + "_" + d.key + tg, times(delta(d), d.days).concat(times(delta(wk), wk.days)), 0, 0);
-              var nightEnd = [[s0, 1]].concat(delta(d));
-              row("b3_" + r + "_" + d.key + tg, nightEnd, 0, null); row("b4_" + r + "_" + d.key + tg, E(nightEnd), null, hrs * b0);
+              // winter in order: its K representative days, then the scarce-wind week, and back (cyclic over the season).
+              // The store starts winter at s0 and changes by delta each day; the week starts where the last winter day
+              // ends and must end where winter began, so the winter days pay back what the week draws (energy in x 85% =
+              // energy out). The level is linear in the day, so the first and the last winter day bound every one
+              var wk = P.days.filter(function (x) { return x.week; })[0], K = d.days, sw = "bs_" + r + "_" + wk.key + tg;
+              var at = function (k) { return [[s0, 1]].concat(times(delta(d), k)); };            // the level at the start of day k
+              var lastStart = at(K - 1), lastNoon = lastStart.concat([[ch[d.d], hd * eta], [dis[d.d], -hd]]);
+              row("b3_" + r + "_" + d.key + tg, lastStart, 0, null); row("b4_" + r + "_" + d.key + tg, E(lastStart), null, hrs * b0);
+              row("b5_" + r + "_" + d.key + tg, lastNoon, 0, null); row("b6_" + r + "_" + d.key + tg, E(lastNoon), null, hrs * b0);
+              row("bk_" + r + "_" + d.key + tg, [[sw, 1]].concat(times(at(K), -1)), 0, 0);                   // the week starts where winter's days end
+              row("bz_" + r + "_" + d.key + tg, [[sw, 1]].concat(times(delta(wk), wk.days), [[s0, -1]]), 0, 0);   // and ends where winter began
             } else row("bz_" + r + "_" + d.key + tg, delta(d), 0, 0);
           });
           // what the batteries lose (MWh in - MWh out, as PJ): left out of the import cap's primary energy (below)
@@ -16331,7 +16339,9 @@
       IMP[p] = [[ci, 1], [gl, 1]]; LOSS[p] = lossE;
       // the import cap: imports - cap x (primary - what batteries and links lose) - over <= 0. Losses count in primary
       // energy (the generation that covers them does), but not in the cap's base: else losing electricity on purpose
-      // (a battery charging and discharging at once, a link carrying power both ways) would help meet the cap
+      // (a battery charging and discharging at once, a link carrying power both ways) would help meet the cap. Extra fuel
+      // or nuclear output into such a loss still adds its conversion loss to the base: it costs fuel or runs a plant
+      // harder, and the tests find no such loop in the presets' or a binding cap's solutions
       var oi = v("oimp" + tg, 0, o.noPenalty ? 0 : Infinity, pen.importPerGJ, "penalty");
       var t = {}; IMP[p].forEach(function (x) { t[x[0]] = (t[x[0]] || 0) + x[1]; }); PRIM[p].forEach(function (x) { t[x[0]] = (t[x[0]] || 0) - S.cap * x[1]; });
       LOSS[p].forEach(function (x) { t[x[0]] = (t[x[0]] || 0) + S.cap * x[1]; });
@@ -16862,6 +16872,9 @@
     o.missBudget = R.over > 5e-5; o.missCap = R.capOver.map(function (v) { return v > 1e-3; });
     o.co2 = R.co2.map(function (v) { return rd(v, 1); });
     o.imp = R.importShare.map(function (v) { return rd(v, 3); }); o.cap = R.S.cap; o.capOver = R.capOver.map(function (v) { return rd(v, 1); });
+    // the cap's own measure: imports / (primary energy - what batteries and links lose); imp is the statistic (imports /
+    // primary energy), at most the cap whenever the cap is met, and a tenth of a point or so below this measure
+    o.impCap = Y.map(function (y, p) { var q = R.raw.per[p]; return rd(q.imports / (q.primary - (q.lossPJ || 0)), 4); });
     o.clean = R.clean.map(function (v) { return rd(v, 3); });
     o.unserved = R.unservedTWh.map(function (v) { return rd(v, 2); }); o.curtail = R.curtailTWh.map(function (v) { return rd(v, 1); });
     o.capGW = R.cap.map(function (c) { var x = {}; TECHS.forEach(function (t) { x[t] = rd(c[t] / 1000, 2); }); return x; });
@@ -17159,7 +17172,7 @@
           a0 = a1;
         });
         var t1 = mk("text", { x: c[0], y: c[1] + rad + 22, "text-anchor": "middle", class: "e4-mlab e4-halo" }); t1.textContent = R.name;
-        var pr = V.price[p][r], t2 = mk("text", { x: c[0], y: c[1] + rad + 38, "text-anchor": "middle", class: "e4-mlab small e4-halo" }); t2.textContent = pr == null ? "no marginal cost" : "about $" + Math.round(pr) + "/MWh";
+        var pr = V.price[p][r], t2 = mk("text", { x: c[0], y: c[1] + rad + 38, "text-anchor": "middle", class: "e4-mlab small e4-halo" }); t2.textContent = pr == null ? "marginal cost unavailable" : "about $" + Math.round(pr) + "/MWh";
       });
       var rc = POS.ridge, rcm = mk("g", { class: "e4-rc" }); mk("rect", { x: rc[0] - 62, y: rc[1] - 70, width: 124, height: 20, rx: 10, class: "e4-rc-box" }, rcm);
       var t3 = mk("text", { x: rc[0], y: rc[1] - 56, "text-anchor": "middle", class: "e4-mlab small" }, rcm); t3.textContent = "Ridge County: coal";
@@ -17169,7 +17182,7 @@
       // every wedge of every disc (not only the largest source)
       table(altBody, ["Region, " + y, "Electricity made", "By source (TWh, share)", "Marginal cost (LP)"], P.R.map(function (R, r) { var g = mixOf(V, P, r, p), t = sum(g.map(function (x) { return x[1]; }));
         var mix = g.filter(function (x) { return x[1] > 0; }).sort(function (u, w) { return w[1] - u[1]; }).map(function (x) { return NAME[x[0]] + " " + fix(x[1], 1) + " (" + pct(x[1] / t) + ")"; }).join("; ");
-        return [R.name, fix(t, 1) + " TWh", mix || "none", V.price[p][r] == null ? "none: a limit out of reach, so no marginal values" : "about $" + Math.round(V.price[p][r]) + "/MWh"]; }), "e4-wrap");
+        return [R.name, fix(t, 1) + " TWh", mix || "none", V.price[p][r] == null ? "unavailable: a limit out of reach, so no marginal values" : "about $" + Math.round(V.price[p][r]) + "/MWh"]; }), "e4-wrap");
       H("p", { class: "lx-hint", text: "Batteries store electricity and make none, so they are not a source here. The strait: " + straitText(P) + "." }, altBody);
       table(altBody, ["Link, " + y, "Transfer limit", "Hours a year at the limit (slices)"], P.links.map(function (l, i) { return [P.R[l.a].short + " – " + P.R[l.b].short, fix(V.linkGW[p][i], 1) + " GW", kilo(V.linkAt[p][i])]; }));
     }

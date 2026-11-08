@@ -127,10 +127,24 @@ const WRITE = process.argv.includes("--write"), FULLLIB = process.argv.includes(
     ok(near(R.cum, 2 * 214.9 + E4.sum(P.Y.map((y, p) => [5, 5, 5, 5, 3][p] * R.co2[p])), 1e-6) && R.cum <= st.bud + raw.over + 1e-4, pr.id + ": cumulative CO2 = 2 x 214.9 + 5, 5, 5, 5, 3 x each model year's, within the budget plus any overshoot");
     P.Y.forEach((y, p) => ok(R.importShare[p] <= Sx.cap + raw.per[p].importOver / raw.per[p].primary + 1e-6, pr.id + " " + y + ": imports within the cap (" + (100 * R.importShare[p]).toFixed(1) + "%)"));
     P.Y.forEach((y, p) => { const q = raw.per[p]; ok(q.imports <= Sx.cap * (q.primary - q.lossPJ) + q.importOver + 1e-6 && q.lossPJ >= -1e-9, pr.id + " " + y + ": imports within the cap x (primary energy less the " + q.lossPJ.toFixed(1) + " PJ that batteries and links lose)"); });
+    { const V = E4.view(R, P); ok(P.Y.every((y, p) => Math.abs(V.impCap[p] - raw.per[p].imports / (raw.per[p].primary - raw.per[p].lossPJ)) < 1e-4 && V.imp[p] <= V.impCap[p] + 1e-3 && (V.missCap[p] || V.impCap[p] <= Sx.cap + 1e-4)), pr.id + ": the cap's own measure (impCap) is at or above the statistic, and within the cap unless the cap is missed"); }
     // batteries: over a year (each representative day x its days, the week x 7) a store gives out 85% of what it takes in
     const eta = T.battery.roundTrip;
     let bal0 = 0; P.Y.forEach((y, p) => P.R.forEach((Rr, r) => { const t = E4.sum(P.S.map(s => s.h * (eta * val(x, "bc_" + r + "_" + s.i + "_" + p) - val(x, "bd_" + r + "_" + s.i + "_" + p)))); bal0 = Math.max(bal0, Math.abs(t)); }));
     ok(bal0 < 1e-2, pr.id + ": every region's batteries give out 85% of what they take in over each model year, the scarce-wind week included (worst " + bal0.toExponential(1) + " MWh)");
+    // winter in order, rebuilt hour block by hour block: 83 winter days, then the 7 days of the week, from the winter start
+    // level; every start of day and noon within 0 and 4 h x power, and the week ends where winter began
+    let wv = 0;
+    { const wd = P.refill, wk = P.days.find(d => d.week), hd = d => P.S[d.d].h / P.S[d.d].days, hn = d => P.S[d.n].h / P.S[d.n].days;
+      P.Y.forEach((y, p) => P.R.forEach((Rr, r) => { const cap = T.battery.hours * E4.capNow(P, raw, "battery", r, p); if (cap <= 0) return;
+        const c = (sl) => val(x, "bc_" + r + "_" + sl + "_" + p), d = (sl) => val(x, "bd_" + r + "_" + sl + "_" + p);
+        let lv = val(x, "bs_" + r + "_" + wd.key + "_" + p); const lv0 = lv;
+        const step = (dd) => { const noon = lv + hd(dd) * (eta * c(dd.d) - d(dd.d)); wv = Math.max(wv, -lv, lv - cap, -noon, noon - cap); lv = noon + hn(dd) * (eta * c(dd.n) - d(dd.n)); };
+        for (let k = 0; k < wd.days; k++) step(wd);
+        wv = Math.max(wv, Math.abs(lv - val(x, "bs_" + r + "_" + wk.key + "_" + p)));
+        for (let k = 0; k < wk.days; k++) step(wk);
+        wv = Math.max(wv, -lv, lv - cap, Math.abs(lv - lv0)); })); }
+    ok(wv < 1e-3, pr.id + ": winter's 83 days then the scarce-wind week, rebuilt in order: every level within the store, the week ending where winter began (worst " + wv.toExponential(1) + " MWh)");
     // every MWh made is used or lost: generation (batteries left out) = busbar load + what batteries and links lose - unserved
     let gl = 0; P.Y.forEach((y, p) => { const q = raw.per[p], gen = E4.sum(Object.keys(q.genMWh).filter(t => t !== "battery").map(t => q.genMWh[t])), load = E4.sum(Sx.loadMW[p]) * E4.sum(P.S.map(s => s.demand * s.h));
       gl = Math.max(gl, Math.abs(gen - load - q.lossPJ / E4.PJ_PER_MWH + q.unservedMWh) / load); });

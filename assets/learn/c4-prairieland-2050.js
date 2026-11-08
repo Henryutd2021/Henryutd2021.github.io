@@ -62,8 +62,8 @@
   }
   // the budget's flag and words, as the engine gives them (a run 0.4 Mt over is over): as E4.missB, cumText, overText
   function missB(V) { return V.missBudget != null ? V.missBudget : V.over > 0.5; }
-  function cumOf(V) { return missB(V) && V.over < 10 ? fix(V.cum, 1) : kilo(V.cum); }
-  function overOf(V) { return V.over >= 0.05 ? fix(V.over, V.over < 10 ? 1 : 0) + " Mt" : "under 0.1 Mt"; }
+  function cumOf(V) { return missB(V) && V.over1 != null && V.over1 < 10 ? fix(V.cum1, 1) : kilo(V.cum); }
+  function overOf(V) { var o = V.over1 != null ? V.over1 : V.over; return o >= 0.05 ? (o < 10 ? fix(o, 1) : kilo(V.over)) + " Mt" : "under 0.1 Mt"; }
   // the four shocks as rows, and the brief's sensitivity line
   // the four shocks as rows; a plan without the peak-hour rule has its stress hours "not tested", never "met"
   function shockRows(V, X) {
@@ -98,9 +98,13 @@
   var ACC = { linear: "the budget counts 2025 twice and the model years with straight lines between (weights 2, 5, 5, 5, 5, 3)", step: "the budget counts each model year for the five years ending in it (weights 0, 5, 5, 5, 5, 5): 2025 not at all" };
   function fullStatus(full, E4) {
     if (!full) return "Full-year check: not known for this plan (it is precomputed for the presets only).";
-    var ok = full.filter(function (c) { return E4.fullVerdict(c).ok; }).length, priced = full.filter(function (c) { return c.fuelAt === "price"; }).length;
-    return "Full-year check (2030 and 2050, 2025's and 2024's weather): " + ok + " of " + full.length + " pass, all demand served and CO₂ within 10% of the slices (a teaching tolerance)" +
-      (priced ? "; " + priced + " of them test demand served only, since that year's run missed a limit and has no marginal values" : "") + "; it does not test the cumulative budget.";
+    // the two kinds of check counted apart: both tests where the slice run had marginal values; demand served only where
+    // its window missed a limit (CO2 not compared)
+    var cmp = full.filter(function (c) { return c.fuelAt !== "price"; }), pr = full.filter(function (c) { return c.fuelAt === "price"; }), okN = function (a) { return a.filter(function (c) { return E4.fullVerdict(c).ok; }).length; };
+    var parts = [];
+    if (cmp.length) parts.push(okN(cmp) + " of " + cmp.length + " pass, all demand served and CO₂ within 10% of the slices (a teaching tolerance)");
+    if (pr.length) parts.push(okN(pr) + " of " + pr.length + " serve all demand, CO₂ not compared (the run missed a limit)");
+    return "Full-year check (2030 and 2050, two weathers): " + parts.join("; ") + "; it does not test the budget.";
   }
   function assumptions(st, af, jb, V, full, E4) {
     var hh = A13split(af);
@@ -158,8 +162,8 @@
           "Why this one: ", { text: "a security-first plan (imports at most " + pct(Vs.cap) + ") costs " + bn(Vs.pv.total - V.pv.total) + " more" + (sMiss.length ? " and still cannot meet its cap in " + sMiss.join(" and ") : ""), note: "A reason against another pathway, from a second run." }, ".\n",
           "Cost and carbon: ", { text: bn(V.pv.total) + " to 2050 (present value, 2025 dollars, supply side and every fuel); CO₂ " + kilo(V.cum) + " of " + kilo(V.budget) + " Mt", note: "One boundary, the budget's arithmetic stated." }, ".\n",
           "Security: ", { text: "imports at most " + pct(Math.max.apply(null, V.imp)) + " of primary energy against a " + pct(V.cap) + " cap", note: "A measure and its limit." }, ".\n",
-          "Shocks: ", { text: sensLines(V, X).slice(0, 2).join(" ") + " Each was re-planned from its year", note: "All four, as a range, with what the re-plan kept." }, ".\n",
-          "Imports and peak hours: ", { text: sensLines(V, X).slice(2).join(" ").replace(/\.$/, ""), note: "The other two measures, under the same four shocks." }, ".\n",
+          "Shocks: ", { text: sensLines(V, X)[0].replace(/\.$/, ""), note: "All four, re-planned from their years, as a range." }, ".\n",
+          "Under the shocks: ", { text: sensLines(V, X).slice(1).join(" ").replace(/\.$/, ""), note: "The budget, the cap and the peak-hour rule under the same four." }, ".\n",
           "What would change it: ", { text: "the " + X2.label.toLowerCase() + " costs most (" + sbn(X2.dPV) + ")" + (X2.rule !== null && X2.reserveShort[V.Y.indexOf(X2.year)] > 0.5 ? " and leaves the stress hours " + kilo(X2.reserveShort[V.Y.indexOf(X2.year)]) + " MW short in " + X2.year : "") + "; if it looked likely, I would build more firm capacity before " + X2.year, note: "The result that would change the recommendation, named." }, ".\n",
           "Who pays (screening): ", { text: "about $" + kilo(af.perHH) + " a household a year in " + af.year + " if households pay " + pct(af.share) + "; equipment not counted", note: "A screening estimate with its share and what it leaves out." }, ".\n",
           "Ridge County (screening): ", { text: kilo(jb.j.lostTotal) + " jobs lost against " + kilo(jb.j.newPermGross) + " new ongoing jobs (" + kilo(jb.j.newPermNet) + " net), with a multiplier of " + fix(st.jm, 1) + ", " + st.jd + "% displacement and all the Ridge region's new wind and solar in the county", note: "Gross and net kept apart; the multiplier, displacement and the county assumption stated." }, ".\n",
