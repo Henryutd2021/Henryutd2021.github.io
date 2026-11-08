@@ -182,7 +182,7 @@
         aria: "Bars: the cost per kilogram of each 10 megawatt block, rising from " + usd2(B[0].perKg) + " to " + usd2(B[N - 1].perKg) + ". Line: the average cost per kilogram at each size. Dashed line: the price, " + usd2(S.price) + " per kilogram.",
         text: { head: ["Block", "Its cost per kg", "Average if built up to here", "Built?"],
                 rows: B.map(function (b, k) { return [b.from + "–" + b.to + " MW", usd2(b.perKg), usd2(design(I, S.price, k + 1).lcoh), k < S.n ? "yes" : "no"]; }),
-                note: "Net cost of the system at " + usd2(S.price) + "/kg: lowest at " + bt.net.mw + " MW (" + musd(bt.net.net) + " a year)." }
+                note: "Net cost change versus no electrolyzer at " + usd2(S.price) + "/kg: lowest at " + bt.net.mw + " MW (" + musd(bt.net.net) + " a year)." }
       });
       status.innerHTML = statusLines(I, S.price, S.n).map(function (t) { return "<p>" + t + "</p>"; }).join("");
       if (acted) LX.store.set("cf2-idea", { price: S.price, n: S.n });

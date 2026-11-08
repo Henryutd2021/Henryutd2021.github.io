@@ -48,13 +48,28 @@
       text: "Expected cost of the hedged plan: " + S.map(function (s, i) { return fm.pct(s.p) + " × " + fm.m(per[i]); }).join(" + ") + " = " + fm.m(M.expected(D8, S, x)) + " a year." };
   }
   function workedHTML(M, D8, I) { return "<p class=\"cf3-worked\">" + worked(M, D8).text + "</p><p class=\"lx-hint\">" + rich(I.workedNote) + "</p>"; }
+  // how one branch cost is made, from the toy's own inputs: reformers alone, then the hedged plan with none of the planned wind
+  function chain(M, D8) {
+    var fm = M.fm, H2 = D8.hydrogen, E = D8.electrolyzer, x = D8.reference.sp.x, W = M.scen(D8)[0].W;
+    var kg = E.kgPerMWh * M.used(D8, W, x), plant = E.costPerMWYear * x, buy = H2.reformerPerKg * (H2.demandKgPerHour * M.HOURS - kg);
+    return { plant: plant, kg: kg, buy: buy, total: plant + buy, base: M.base(D8),
+      lines: ["Gas reformers alone: " + fm.int(H2.demandKgPerHour) + " kg an hour × " + fm.int(M.HOURS) + " hours × $" + H2.reformerPerKg.toFixed(2) + "/kg = " + fm.m(M.base(D8)) + " a year, in every build-out.",
+        "Hedged plan, none built: " + fm.int(x) + " MW × $" + fm.int(E.costPerMWYear) + " = " + fm.m(plant) + " for the electrolyzer; it makes " + (kg / 1e6).toFixed(1) + " million kg, so reformers supply the rest for " + fm.m(buy) + ". Total " + fm.m(plant + buy) + "."] };
+  }
+  function chainHTML(M, D8) { return chain(M, D8).lines.map(function (t) { return "<p class=\"lx-hint\">" + t + "</p>"; }).join(""); }
   // the toy's assumptions (M8's notes, then the boundary that sets its sizes) and its five wind blocks
   function assumptionsHTML(M, D8, I) {
     var fm = M.fm, notes = [D8.zone.note, D8.wind.note, D8.electrolyzer.note, D8.hydrogen.note].map(function (t) { return "<li>" + rich(t) + "</li>"; }).join("");
     return "<ul>" + notes + I.assumptions.map(function (t) { return "<li>" + rich(t) + "</li>"; }).join("") + "</ul>" +
       "<div class=\"lx-scroll-x\"><table class=\"lx-mini-table\"><caption class=\"lx-hint\">" + rich(I.blocksCaption) + "</caption><thead><tr><th scope=\"col\">Wind block</th><th scope=\"col\">Hours a year</th><th scope=\"col\">Capacity factor</th></tr></thead><tbody>" +
       D8.blocks.labels.map(function (l, b) { return "<tr><th scope=\"row\">" + l + "</th><td class=\"n\">" + fm.int(D8.blocks.hours[b]) + "</td><td class=\"n\">" + Math.round(D8.blocks.cf[b] * 1000) / 10 + "%</td></tr>"; }).join("") +
-      "</tbody></table></div>";
+      "</tbody></table></div>" + sourceHTML(D8, I);
+  }
+  // the wind blocks' primary sources and the date they were read (M8's data), one line under the table
+  function sourceHTML(D8, I) {
+    var s = D8.blocks.source, d = new Date(s.as_of + "T00:00:00Z");
+    var day = d.getUTCDate() + " " + ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][d.getUTCMonth()] + " " + d.getUTCFullYear();
+    return "<p class=\"lx-hint\">Sources: <a href=\"" + s.url + "\">EIA-930</a>, SPP's hourly wind in 2025; <a href=\"" + I.cfSource.url + "\">" + I.cfSource.label + "</a>, the 2025 U.S. wind capacity factor. Read on " + day + ".</p>";
   }
   function rich(t) {
     return String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/\[\[([a-z0-9-]+)\|([^\]]+)\]\]/g, function (m, id, w) {
@@ -66,10 +81,9 @@
     var fm = M.fm, S = M.scen(D8);
     var rows = plans(I, D8).map(function (p) { var r = price(M, D8, p.x); return "<tr><th scope=\"row\">" + p.label + "</th><td class=\"n\">" + fm.mw(p.x) + "</td>" + r.per.map(function (v) { return "<td class=\"n\">" + fm.m(v) + "</td>"; }).join("") + "<td class=\"n\">" + fm.m(r.exp) + "</td></tr>"; }).join("");
     return "<p class=\"lx-eyebrow\">" + I.title + " (illustrative)</p><p class=\"lx-hint\">" + I.note + "</p>" + defsHTML(I) +
-      "<div class=\"lx-scroll-x\"><table class=\"lx-mini-table cf3-res\"><caption class=\"lx-hint\">Annual cost of the hydrogen supply for three sizes, in each build-out and in expectation</caption><thead><tr><th scope=\"col\">Plan</th><th scope=\"col\">Size</th>" +
+      "<div class=\"lx-scroll-x\"><table class=\"lx-mini-table cf3-res\"><caption class=\"lx-hint\">Annual cost of the hydrogen supply for three sizes, in each build-out and in expectation (2025 dollars; M = million)</caption><thead><tr><th scope=\"col\">Plan</th><th scope=\"col\">Size</th>" +
       S.map(function (s) { return "<th scope=\"col\">" + s.short + " (" + fm.pct(s.p) + ")</th>"; }).join("") + "<th scope=\"col\">Expected</th></tr></thead><tbody>" + rows + "</tbody></table></div>" +
-      workedHTML(M, D8, I) +
-      "<p class=\"lx-hint\">With gas reformers alone, every build-out costs " + fm.m(M.base(D8)) + " a year.</p>" +
+      workedHTML(M, D8, I) + chainHTML(M, D8) +
       "<details class=\"lx-textalt\"><summary>" + I.assumptionsTitle + "</summary>" + assumptionsHTML(M, D8, I) + "</details>";
   }
   function staticBoundary(b) {
@@ -77,7 +91,7 @@
     return "<p class=\"lx-eyebrow\">" + rich(b.title) + "</p><dl class=\"lx-ideas\"><dt>It holds when</dt><dd>" + ul(b.holds) + "</dd><dt>It leaves out</dt><dd>" + ul(b.leaves) + "</dd></dl>" +
       "<p class=\"lx-hint\">" + rich(b.source) + "</p>";
   }
-  var model = { price: price, plans: plans, status: status, worked: worked, staticIdea: staticIdea, staticBoundary: staticBoundary };
+  var model = { price: price, plans: plans, status: status, worked: worked, chain: chain, staticIdea: staticIdea, staticBoundary: staticBoundary };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX || !window.LX.H) return;
 
@@ -117,14 +131,14 @@
     H("div", { html: defsHTML(I) }, sc);
     var tbl = H("div", { class: "cf3-led" }, stage);
     var st = H("div", { class: "lx-stage-status", "aria-live": "polite", style: "display:grid;gap:4px" }, stage);
-    H("div", { class: "cf3-work", html: workedHTML(M, D8, I) }, stage);
+    H("div", { class: "cf3-work", html: workedHTML(M, D8, I) + chainHTML(M, D8) }, stage);
     var why = H("details", { class: "lx-textalt" }, stage); H("summary", { text: I.assumptionsTitle }, why);
     H("div", { html: assumptionsHTML(M, D8, I) }, why);
     function paint(v, save) {
       var r = price(M, D8, v);
       bs.forEach(function (b, i) { b.setAttribute("aria-pressed", String(Math.abs(P[i].x - v) < 1e-9)); });
       tbl.innerHTML = "";
-      LX.Ledger(tbl, { caption: "What " + fm.mw(v) + " costs a year in each build-out (2025 dollars)", columns: ["Build-out", "Chance", "Wind built", "Cost a year"],
+      LX.Ledger(tbl, { caption: "What " + fm.mw(v) + " costs a year in each build-out (2025 dollars; M = million)", columns: ["Build-out", "Chance", "Wind built", "Cost a year"],
         rows: S.map(function (s, i) { return { head: s.short, cells: [fm.pct(s.p), fm.int(s.W) + " MW", fm.m(r.per[i])] }; })
           .concat([{ head: "Expected", cells: ["", "", fm.m(r.exp)], total: true }]), cls: "cf3-tab" });
       st.innerHTML = status(M, D8, v).map(function (t) { return "<p>" + t + "</p>"; }).join("");

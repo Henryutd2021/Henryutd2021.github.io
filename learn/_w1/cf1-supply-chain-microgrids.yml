@@ -16,6 +16,12 @@ glossary:
   - id: stylized-network
     term: Stylized network
     def: "A simplified, made-up network built to show how a model behaves, with invented distances and costs rather than a real company's map."
+  - id: synthetic-data
+    term: Synthetic data
+    def: "Invented values made to look realistic, used in place of real records so that a model can be shown and shared."
+  - id: supply-chain-tier
+    term: Supply-chain tier
+    def: "One level of a supply chain, such as factories, then warehouses, then stores: a three-tier chain has all three, a two-tier chain two of them."
   - id: logistics-cost
     term: Logistics cost
     def: "The cost of moving and storing goods between factories, warehouses and stores: shipping, warehousing and handling."

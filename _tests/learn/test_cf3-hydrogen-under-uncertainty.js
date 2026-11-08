@@ -132,7 +132,7 @@ const keys = [...PAGE.matchAll(/data-source="([^"]+)"/g)].map(m => m[1]);
 ok(keys.length === 1 && keys[0] === "excerpt:txh2", "one excerpt, from excerpt:txh2");
 const OWN = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?<!-- learn:\1:end -->/g, "");
 const hrefs = [...OWN.matchAll(/href="([^"]+)"/g)].map(m => m[1]);
-ok(hrefs.every(h => /^https:\/\/doi\.org\/10\./.test(h) || h === "https://github.com/Henryutd2021/txh2-ercot-hydrogen" || /^[0-9a-z-]+\.html$/.test(h) || /^\.\.\/assets\//.test(h) || /^#/.test(h)), "links: doi.org, the allow-listed repository and learn pages only");
+ok(hrefs.every(h => /^https:\/\/doi\.org\/10\./.test(h) || h === "https://github.com/Henryutd2021/txh2-ercot-hydrogen" || h === D8.blocks.source.url || h === I.cfSource.url || /^[0-9a-z-]+\.html$/.test(h) || /^\.\.\/assets\//.test(h) || /^#/.test(h)), "links: doi.org, the allow-listed repository and learn pages only");
 ok(!/projects\/|research\.html/.test(PAGE + JS) && /assets\/explainers\/txh2\.js/.test(PAGE) && !/explainers\/(?!common|txh2)/.test(PAGE), "no project page and no Research page; only the allow-listed txh2 explainer");
 ok(TL.validate(D.timeline.events).length === 0 && D.timeline.events.every(e => e.source && e.source.label), "every timeline event has a valid date and a source");
 ok(!/\bSMR\b|nuclear|reactor|small modular|131 tons|1,300 tons|92\.4%|310 kilotons|Zhang/i.test(PAGE + JS + JSON.stringify(D)), "no reformer abbreviation, no nuclear term, none of the abstract's withdrawn numbers, no co-author");
@@ -178,7 +178,7 @@ const NOT_RESEARCH = [
   [/^Question type: prescriptive \(what should be built, where, and how should it run\?\)\.$/, "course label (the course's question types)"],
   [/^From: Li et al\. \(2025\), International Journal of Hydrogen Energy\.$/, "provenance label"],
   [/^From Li et al\. \(2025\), International Journal of Hydrogen Energy\.$/, "provenance label"],
-  [/^Every result about the study is quoted from the published paper named in the sources\.$/, "provenance label"],
+  [/^Detail ?Where the inputs come from$/, "the label of a collapsed detail box"],
   [/^The toy below uses illustrative round numbers\.$/, "provenance label (the toy)"],
   [/^Li et al\. \(2025\), International Journal of Hydrogen Energy 113, 77–89$/, "citation label (timeline, data file)"],
   [/^txh2-ercot-hydrogen on GitHub$/, "citation label (repository)"],
@@ -247,7 +247,8 @@ const GENERATED = new RegExp("<!-- (" + CF.prefix + "-[a-z]+):start[\\s\\S]*?<!-
 let REST = OWN.replace(GENERATED, " ");
 const cut = (re, optional) => { const m = REST.match(re); ok(!!m || optional, "page zone found: " + re); if (m) REST = REST.replace(m[0], " "); return m ? m[0] : ""; };
 strict("page, the case", elements(cut(/<div class="lx-case">[\s\S]*?\n<\/div>\n(?=<div class="lx-interactive")/)));
-strict("page, the case's data note", elements(cut(/<p class="lx-datanote"><span>Every result[\s\S]*?<\/p>/)));
+strict("page, the case's data note", elements(cut(/<p class="lx-datanote"><span>The toy below uses illustrative round numbers\.<\/span><\/p>/)));
+ok(!/quoted from the published/.test(PAGE), "the data note claims no quotation: the excerpts carry their own sources");
 strict("page, explainer no-JS steps", elements(cut(/<ol class="ex-fallback[\s\S]*?<\/ol>/)));
 strict("page, explainer note", elements(cut(/<p class="lx-hint">Illustrative model with stylized numbers[\s\S]*?<\/p>/)));
 strict("page, try it yourself", elements(cut(/<p>Try it yourself:[\s\S]*?<\/p>/)));
@@ -300,6 +301,19 @@ const longEls = prose.filter(s => s.split(" ").length > 40);
 ok(prose.length > 60 && longEls.length === 0, "every text element is 40 words at most (" + prose.length + " elements): " + longEls.map(s => s.slice(0, 60) + " (" + s.split(" ").length + ")").join(" | "));
 D.timeline.events.forEach(e => ok(norm(e.text).split(" ").length <= 40, "timeline " + e.date + ": its text is 40 words at most (" + norm(e.text).split(" ").length + ")"));
 [I.note, I.workedNote].concat(I.plans.map(p => p.label + ": " + p.def), I.assumptions).forEach(t => ok(norm(t).split(" ").length <= 40, "data, the toy's text is 40 words at most: " + norm(t).slice(0, 50)));
+
+// ---------------- how one cost is made, and the explainer's sign
+{ const c = M.chain(M8, D8), sp = M.price(M8, D8, R8.sp.x);
+  ok(near(c.base, D8.hydrogen.demandKgPerHour * 8760 * D8.hydrogen.reformerPerKg, 1e-6) && near(c.total, sp.per[0], 1e-6) && near(c.plant, R8.sp.x * D8.electrolyzer.costPerMWYear, 1e-6),
+    "the worked chain: reformers alone = 54,000 kg × 8,760 h × $1.50; the hedged plan with none built = its electrolyzer + the reformer hydrogen it does not replace = the table's branch cost");
+  ok(c.lines.every(t => PAGE.indexOf(t) >= 0) && c.lines.every(t => t.split(" ").length <= 40) && /cf3-work", html: workedHTML\(M, D8, I\) \+ chainHTML\(M, D8\)/.test(JS), "the chain is on the page and in the live view, each line 40 words at most");
+  ok(/\(2025 dollars; M = million\)<\/caption>/.test(PAGE) && /\(2025 dollars; M = million\)"/.test(JS), "the cost tables say what M means");
+  ok(/Sources: <a href="https:\/\/www\.eia\.gov\/electricity\/gridmonitor\/">EIA-930<\/a>, SPP's hourly wind in 2025; <a href="https:\/\/www\.eia\.gov\/electricity\/monthly\/epm_table_grapher\.php\?t=table_6_07_b">EIA Electric Power Monthly, Table 6\.07\.B<\/a>, the 2025 U\.S\. wind capacity factor\. Read on 2 November 2026\./.test(PAGE) && D8.blocks.source.as_of === "2026-11-02",
+    "the wind blocks name both primary sources and the date they were read");
+  const C = EX.C, avoided = C.mwhPerT * C.efGas;
+  ok(PAGE.indexOf("each tonne of hydrogen sent to fuel cells makes " + C.mwhPerT + " MWh and so avoids " + avoided.toFixed(1) + " t of CO₂ from gas plants; the reformer hydrogen that replaces it emits " + C.efRef + " t, so total CO₂ rises") >= 0 && C.efRef > avoided && EX.model({ price: 250 }).dNet > 0,
+    "the explainer's sign: replacement hydrogen emits more than the gas power it displaces (" + C.efRef + " t against " + avoided.toFixed(2) + " t per tonne)");
+  ok(/Planning only for the most likely future always gives the lowest expected cost\./.test(PAGE), "myth 1 names its yardstick: expected cost"); }
 
 // ---------------- glossary marks: technical terms at first use
 { const G = JSON.parse(fs.readFileSync(L("data/glossary.json"), "utf8")), SIDE = fs.readFileSync(path.join(SITE, "learn/_w1", ID + ".yml"), "utf8");
