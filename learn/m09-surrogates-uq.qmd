@@ -102,8 +102,10 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><ul>
 <li><b>Toy:</b> one invented 2,000 kW turbine, not a real one. Its field curve is the maker's curve averaged over gusts (12% turbulence) and 3% lower.</li>
 <li><b>Scatter:</b> power scatter combines 15 kW of background noise with an approximate wind-error term, 0.3 m/s times the curve's slope, so it grows where the curve is steep.</li>
-<li><b>Records:</b> ten-minute averages, wind speeds Weibull-distributed (k = 2, c = 8 m/s) between 3 and 20 m/s; 64 to fit (seed 9, used in order) and 400 others to score (seed 2023), generator mulberry32.</li>
-<li><b>Fits:</b> a squared-exponential kernel and one noise level; settings by maximum likelihood on a fixed grid. Settings for 24 to 64 records are stored with the page and checked by its test.</li>
+<li><b>Records:</b> ten-minute averages; 64 to fit (seed 9, used in order) and 400 others to score (seed 2023), generator mulberry32.</li>
+<li><b>Wind speeds</b> (recipe detail): a Weibull distribution, a skewed shape often used for wind (k = 2, c = 8 m/s) between 3 and 20 m/s.</li>
+<li><b>Fits:</b> one noise level; settings by maximum likelihood on a fixed grid. Settings for 24 to 64 records are stored with the page and checked by its test.</li>
+<li><b>Kernel</b> (recipe detail): squared-exponential, so two speeds' powers are alike when the speeds are close, less so with distance.</li>
 </ul></div>
 <p class="lx-hint" style="margin-top:.6rem">About 40 guided minutes in nine steps. Every fit runs in your browser; nothing is sent anywhere.</p>
 <div class="lx-card lx-notebook m9-nb">
@@ -202,8 +204,8 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-quiz" data-quiz="m9">
 <div class="lx-qq" data-id="chance" data-answer="b">
 <p class="lx-qtext">A 90% band holds 86% of 400 new records. Two standard errors of a share near 90% are √(0.9 × 0.1 ÷ 400) × 2 = 3 points. What do you conclude?</p>
-<ul class="lx-choices"><li data-value="a">Nothing: 86% is close to 90%</li><li data-value="b">The band is likely too narrow: 4 points below is outside the sampling range</li><li data-value="c">The band is too wide</li><li data-value="d">The records are wrong</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Likely too narrow: 86% is 4 points below 90%, outside the approximate 95% sampling range of ± 3 points for independent records, so sampling alone is unlikely to explain it. Consecutive real records are not independent, so their range is wider.</p></details>
+<ul class="lx-choices"><li data-value="a">Nothing: 86% is close to 90%</li><li data-value="b">The band undercovers: 4 points below is outside the sampling range</li><li data-value="c">The band is too wide</li><li data-value="d">The records are wrong</li></ul>
+<details class="lx-answer"><summary>Answer</summary><p>It undercovers: 86% is 4 points below 90%, outside the approximate 95% sampling range of ± 3 points for independent records, so sampling alone is unlikely to explain it. Check whether the band is too narrow, wrongly centered, or both. Consecutive real records are not independent, so their range is wider.</p></details>
 </div>
 <div class="lx-qq" data-id="gap" data-answer="c">
 <p class="lx-qtext">You fit a one-source GP to 16 records, all below 12 m/s. Where will its band be widest?</p>
