@@ -283,7 +283,7 @@
 
     // ---- step 5: capacity factor is a ratio
     steps.push({
-      text: "A [[capacity-factor|capacity factor]] is energy made ÷ the most possible over the same period. In a year, Prairie Town's " + num(s.windMW) + " MW wind farm could make " + num(s.windMax) + " MWh. At U.S. wind's " + pct(s.windCF) + " in 2025, how many MWh?",
+      text: "A [[capacity-factor|capacity factor]] is energy made ÷ the most possible over the same period. In a year, Prairie Town's " + num(s.windMW) + " MW wind farm could make " + num(s.windMax) + " MWh: at U.S. wind's " + pct(s.windCF) + " in 2025, how many MWh?",
       build: function (act, api) {
         var rows = H("div", { class: "k2-cf" }, act);
         var r1 = H("div", { class: "k2-effrow" }, rows); H("span", { class: "k2-effnm", text: "Most possible" }, r1);

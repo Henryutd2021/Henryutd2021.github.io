@@ -41,8 +41,13 @@ const num = K.num;
   { const sc = town.scenarios.lesson0; let worst = 0;
     const t0 = Date.parse(year.start_utc + "Z"), d0 = Date.parse(sc.date + "T00:00:00Z"), i = Math.round((d0 - t0) / 3600000) + 1 - (sc.utcOffsetHours || 0);
     D.demand.forEach((v, t) => { worst = Math.max(worst, Math.abs(v - year.demand[i + t] / 1000 * sc.demandPeakMW)); });
-    ok(worst <= sc.step / 2 + 1e-9, `data: the day's rounding moves an hour by at most ${sc.step / 2} MW (${worst.toFixed(2)})`); }
-  ok(/Prairie Town's demand is scaled so its busiest hour of 2025 is " \+ s\.peak/.test(JS) && !/Write Prairie Town's busiest hour of 2025/.test(JS), "step 1: 450 MW is named as the scale, not as a rounded hour");
+    ok(worst <= sc.step / 2 + 1e-9, `data: the day's rounding moves an hour by at most ${sc.step / 2} MW (${worst.toFixed(2)})`);
+    // rounding every day of 2025 the same way gives a year whose highest hour is 452 MW: so the page calls 450 MW the
+    // peak before the rounding, never the peak of a rounded series
+    const f = town.fleet, yr = year.demand.map((v, t) => { const w = Math.round(year.wind[t] / 1000 * f.wind.mw), so = Math.round(year.solar[t] / 1000 * f.solar.mw);
+      return Math.round((v / 1000 * sc.demandPeakMW - f.nuclear.mw - w - so) / sc.step) * sc.step + f.nuclear.mw + w + so; });
+    ok(Math.max(...yr) === 452 && /before lesson 0's rounding/.test(QMD), `data: the rounded year peaks at ${Math.max(...yr)} MW, so 450 MW is named as the peak before rounding`); }
+  ok(/the busiest hour Prairie Town's demand is scaled to in 2025, in \[\[kilowatt/.test(JS) && !/Write Prairie Town's busiest hour of 2025/.test(JS), "step 1: 450 MW is named as the scale, not as a rounded hour");
   ok(s.dayMWh === 6957 && s.gasMWh === 1965 && s.gasCost === 40 && s.gasDollars === 78600, "data: the day 6,957 MWh, gas need 1,965 MWh at a flat $40 = $78,600 (as K7)");
   // $78,600 is a flat-price product, not a schedule: lesson 0's cheapest-first day (ramp limits, curtailment, the peaker) differs
   const EX = G0.expert(W).totals, schedGas = EX.cc * town.fleet.cc.cost + EX.pk * town.fleet.peaker.cost;
@@ -123,7 +128,7 @@ const num = K.num;
   ok(a && b > a.index && QMD.slice(a.index + a[0].length, b).trim() === T.trim(), "page: the k1-table equals staticTable() (run with --write)");
   // links back to the lessons that need this, and dated primary sources
   ["01-power-energy.html", "05-capacity-factor.html", "07-cost.html", "00-grid-operator.html"].forEach(h => ok(QMD.indexOf('href="' + h + '"') >= 0, "links to " + h));
-  ok(/<b>Source\.<\/b> Prairie Town's day is the real hourly demand shape of 3 September 2025 on the Southwest Power Pool grid \(<a href="https:\/\/www\.eia\.gov\/electricity\/gridmonitor\/">EIA-930<\/a>\)/.test(QMD) && /<b>Illustrative\.<\/b> The shape is scaled as in <a href="00-grid-operator\.html">lesson 0<\/a>/.test(QMD) && /checked 2 November 2026/.test(QMD) && /\(2022 data\)/.test(QMD) && /\(2025 data\)/.test(QMD), "sources: the day, the anchors and their dates, source and assumptions in separate entries");
+  ok(/<b>Source\.<\/b> Prairie Town's day is the real hourly demand shape of 3 September 2025 on the Southwest Power Pool grid \(<a href="https:\/\/www\.eia\.gov\/electricity\/gridmonitor\/">EIA-930<\/a>\)/.test(QMD) && /<b>Illustrative\.<\/b> Scaled as in <a href="00-grid-operator\.html">lesson 0<\/a>: 450 MW in 2025's busiest hour, before lesson 0's rounding \(at most 2\.5 MW an hour\)\./.test(QMD) && /checked 2 November 2026/.test(QMD) && /\(2022 data\)/.test(QMD) && /\(2025 data\)/.test(QMD), "sources: the day, the anchors and their dates, source and assumptions in separate entries");
   ok(/The town, its scale and the flat \$40\/MWh gas running cost are illustrative/.test(QMD), "the illustrative values are labelled");
   // each data-note entry is one labelled idea, within the text budget
   const notes = ((QMD.match(/<div class="lx-datanote">[\s\S]*?<\/ul><\/div>/) || [""])[0].match(/<li>[\s\S]*?<\/li>/g) || []).map(t => t.replace(/<[^>]+>/g, " ").trim().split(/\s+/).length);
@@ -143,7 +148,7 @@ const num = K.num;
   [s.peak, num(s.peakKW), s.peakGW, s.dayMWh, num(s.dayMWh), s.dayGWh, K.sig(s.dayGWh, 3), num(s.gasMWh), s.gasCost, num(s.gasDollars), num(s.avgMW, 1),
    s.loMW, s.hiMW, num(s.loBound), num(s.hiBound), s.span, s.ramp, num(s.sppGWh), num(s.sppGWh * 1000), s.homeToSpp, num(s.dayMWh * 1000),
    Math.round(s.dayGWh), Math.round(s.dayGWh) * 10, "298.6", "0.2986", "2,986", "10,791", "4,200", "1,000", "0.019",
-   num(G0.expert(G0.prepare(town, year, "lesson0")).totals.pk), num(G0.expert(G0.prepare(town, year, "lesson0")).totals.cc), s.pkCost, num(80400), K.HALF.toFixed(2), days.stats.missing_hours_filled.demand].forEach(add);
+   num(G0.expert(G0.prepare(town, year, "lesson0")).totals.pk), num(G0.expert(G0.prepare(town, year, "lesson0")).totals.cc), s.pkCost, num(80400), K.HALF.toFixed(2), days.stats.missing_hours_filled.demand, town.scenarios.lesson0.step / 2].forEach(add);
   s.items.forEach(it => { add(K.sig(it.mant, 3)); add(it.exp); add(K.plain(it.wh)); });
   ["2.2", "2.8", "9.84", "3,600", "3.6", "8,760", "24", "1", "2", "3", "4", "5", "6", "7", "9", "10", "12", "13", "14", "15", "16", "21", "100", "0", "2019", "2022", "2025", "2026", "0.45", "930"].forEach(add);
   const found = (body.match(/\d[\d,]*(?:\.\d+)?/g) || []).map(t => t.replace(/[.,]$/, ""));

@@ -28,7 +28,7 @@ function fallback() {
   const L = S.levels;
   const facts = [
     `A histogram counts hours per bin: with 1-point bins, ${share(S.mid, 0)} of the ${int(S.n)} hours lie from −2% up to +3%; the errors run from ${pct(S.min)} to ${pct(S.max)}.`,
-    `Centre: mean ${pct(S.mean)}, median ${pct(S.median)}. Demand came in above the forecast in ${share(S.pos, 0)} of hours.`,
+    `Center: mean ${pct(S.mean)}, median ${pct(S.median)}. Demand came in above the forecast in ${share(S.pos, 0)} of hours.`,
     `Spread: standard deviation ${S.sd.toFixed(2)} points; mean ± 1 SD, from ${pct(S.lo1sd, 2)} to ${pct(S.hi1sd, 2)}, holds ${share(S.in1sd, 0)} of hours; the quartiles are ${pct(S.q25)} and ${pct(S.q75)}.`,
     `Chance by counting: ${int(S.above)} of ${int(S.n)} hours, ${share(S.aboveShare)}, had demand more than 5% above the forecast.`,
     `Nominal intervals from percentiles: 50% from ${pct(L["50"].lo)} to ${pct(L["50"].hi)}; 80% from ${pct(L["80"].lo)} to ${pct(L["80"].hi)} (lesson 4's band); 95% from ${pct(L["95"].lo)} to ${pct(L["95"].hi)}. Hours tied at the ends make them hold ${share(L["50"].n / S.n)}, ${share(L["80"].n / S.n)} and ${share(L["95"].n / S.n)}.`,
@@ -240,7 +240,8 @@ function sgn2(v) { return K.sgn(v, 2); }
       ok(v[1] + v[3] + v[5] === 100 && v[1] > 0 && v[3] > 0 && v[5] > 0 && near(it.answer, (v[0] * v[1] + v[2] * v[3] + v[4] * v[5]) / 100, 1e-9) && it.why.indexOf(String(it.answer) + " MW") >= 0, `drill ${seed}/${i}: ev ${it.q} -> ${it.answer}`);
     }
     if (it.kind === "sample") {
-      const m = /Sample 1: ([\d,]+) hours, ([\d,]+) of them above \(([\d.]+)%\)\. Sample 2: ([\d,]+) hours, ([\d,]+) of them above \(([\d.]+)%\)/.exec(it.q);
+      const m = /sample 1, ([\d,]+) hours, ([\d,]+) of them above \(([\d.]+)%\); sample 2, ([\d,]+) hours, ([\d,]+) of them above \(([\d.]+)%\)\. Which share is more trustworthy\?$/.exec(it.q);
+      ok(m && it.q.split(/(?<=[.?!])\s+(?=[A-Z])/).length <= 2 && it.q.split(/\s+/).length <= 36, `drill ${seed}/${i}: the sample question is two sentences, at most 36 words`);
       const v = m ? m.slice(1).map(t => +t.replace(/,/g, "")) : [];
       ok(m && it.answer === (v[0] > v[3] ? 0 : 1), `drill ${seed}/${i}: the bigger sample`);
       ok(m && [0, 3].every(j => Number.isInteger(v[j + 1]) && v[j + 1] >= 0 && v[j + 1] <= v[j] && near(100 * v[j + 1] / v[j], v[j + 2], 1e-9)), `drill ${seed}/${i}: each share is a whole number of hours out of its sample: ${it.q}`);

@@ -64,9 +64,9 @@
     return [
       { cell: "E33", label: "Demand over the day, MWh", ask: "Total demand energy over the day, in MWh (each row is one hour).", answer: sum(D.demand), hint: "=SUM(B5:B28)" },
       { cell: "E34", label: "Wind and solar share, %", ask: "Share of the day's demand met by wind and solar, in %.", answer: 100 * sum(D.wind.concat(D.solar)) / sum(D.demand), hint: "=SUM(C5:D28)/SUM(B5:B28)*100" },
-      { cell: "E35", label: "Gas, rows 17:00–21:00, avg MW", ask: "Average gas need over the five hourly rows labelled 17:00 to 21:00, in MW.", answer: sum(ev) / ev.length, hint: "=AVERAGE(E22:E26)" },
+      { cell: "E35", label: "Gas, rows 17:00–21:00, avg MW", ask: "Average gas need over the five hourly rows labeled 17:00 to 21:00, in MW.", answer: sum(ev) / ev.length, hint: "=AVERAGE(E22:E26)" },
       { cell: "E36", label: "Highest solar, MW", ask: "The day's highest solar output, in MW.", answer: Math.max.apply(null, D.solar), hint: "=MAX(D5:D28)" },
-      { cell: "E37", label: "Gas cost at the E32 cost", ask: "The day's gas cost at the alternative gas cost in E32, $55 per MWh, without changing E2.", answer: ALT * sum(D.need), hint: "=E30*E32" }];
+      { cell: "E37", label: "Gas cost at the E32 cost", ask: "The day's gas cost at the alternative gas cost in E32, $55 per MWh, without changing E2.", answer: (D.alt || ALT) * sum(D.need), hint: "=E30*E32" }];
   }
   // the practice sheet: the finished sheet, the alternative gas cost as a labelled input (E32), the five task rows
   var ALT = 55;
@@ -77,11 +77,12 @@
     return S;
   }
 
-  // the inputs nudged: demand, wind and solar rows and the gas cost change; nuclear (E1) stays, so gas need follows
+  // the inputs nudged: demand, wind and solar rows, the gas cost and the practice's alternative cost (E32) change;
+  // nuclear (E1) stays, so gas need follows
   function nudge(D) {
     var nuc = D.fleet.nuclear.mw;
     var demand = D.demand.map(function (v, t) { return v + 7 + (t % 3); }), wind = D.wind.map(function (v) { return v + 2; }), solar = D.solar.map(function (v) { return v + 3; });
-    return { fleet: D.fleet, demand: demand, wind: wind, solar: solar, need: demand.map(function (v, t) { return v - nuc - wind[t] - solar[t]; }), price: 41 };
+    return { fleet: D.fleet, demand: demand, wind: wind, solar: solar, need: demand.map(function (v, t) { return v - nuc - wind[t] - solar[t]; }), price: 41, alt: ALT + 3 };
   }
   function close(v, want) { return typeof v === "number" && Math.abs(v - want) <= 1e-6 * Math.max(1, Math.abs(want)) + 0.005; }
   // does the sheet's cell still give `want(N)` once the inputs are nudged? (a copy; the reader's sheet is untouched)
@@ -89,7 +90,7 @@
     var N = nudge(D), c = {};
     Object.keys(sheet.cells).forEach(function (k) { c[k] = sheet.cells[k]; });
     for (var t = 0; t < 24; t++) { c["B" + (R0 + t)] = String(N.demand[t]); c["C" + (R0 + t)] = String(N.wind[t]); c["D" + (R0 + t)] = String(N.solar[t]); }
-    c.E2 = String(N.price);
+    c.E2 = String(N.price); if (c.E32 != null) c.E32 = String(N.alt);
     return close(value({ cells: c, rows: sheet.rows, cols: sheet.cols }, cell), want(N));
   }
   // does the gas need in `cells` (E5 or the whole column) follow a change of the nuclear input E1? (a copy)
@@ -254,7 +255,7 @@
       columns: [{ key: "name", label: "Address", main: true }, { key: "down", label: "Filled down one row" }, { key: "right", label: "Filled right one column", phoneHide: true }, { key: "use", label: "Use it for" }],
       rows: ADDR.map(function (a, i) { return Object.assign({ color: ["var(--lx-accent)", "var(--lx-cc)", "var(--lx-wind)", "var(--lx-solar)"][i] }, a); })
     });
-    var items = [["Inputs apart", "Every input in its own labelled cell, with its unit."], ["Assumptions in input cells", "Formulas point at input cells, not at typed numbers, so one change updates everything."],
+    var items = [["Inputs apart", "Every input in its own labeled cell, with its unit."], ["Assumptions in input cells", "Formulas point at input cells, not at typed numbers, so one change updates everything."],
                  ["$ for inputs", "Absolute addresses for inputs, relative ones for data."], ["One formula per column", "Write it once, fill it down, spot-check one row by hand."],
                  ["A check cell", "Compute a total two ways and compare, as F30 against E30 × E2. Agreement shows consistency, not correctness."], ["Source and date", "Name where the data came from and when, beside the data."]];
     LX.Checklist(H("div", { class: "lx-xcard" }, x), { id: "k7-check", title: "A sheet you can trust", count: "head", soft: true, inline: true, sep: ". ", ordered: true,

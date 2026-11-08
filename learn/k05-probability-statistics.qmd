@@ -78,7 +78,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 </div>
 <ol>
 <li>A histogram counts hours per bin: with 1-point bins, 74% of the 2,716 hours lie from −2% up to +3%; the errors run from −8.3% to +9.8%.</li>
-<li>Centre: mean +0.8%, median +0.7%. Demand came in above the forecast in 61% of hours.</li>
+<li>Center: mean +0.8%, median +0.7%. Demand came in above the forecast in 61% of hours.</li>
 <li>Spread: standard deviation 2.45 points; mean ± 1 SD, from −1.65% to +3.25%, holds 72% of hours; the quartiles are −0.8% and +2.2%.</li>
 <li>Chance by counting: 134 of 2,716 hours, 4.9%, had demand more than 5% above the forecast.</li>
 <li>Nominal intervals from percentiles: 50% from −0.8% to +2.2%; 80% from −2.1% to +3.8% (lesson 4's band); 95% from −3.5% to +6.2%. Hours tied at the ends make them hold 51.3%, 81.1% and 95.0%.</li>
@@ -144,7 +144,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-fallback">
 <dl class="lx-ideas">
 <dt>Histogram</dt><dd>Hours counted per bin of error; the bin width changes how jagged it looks, not the data.</dd>
-<dt>Mean and median</dt><dd>Two centres: the average, pulled by every value, and the middle value, which a few wild values barely move.</dd>
+<dt>Mean and median</dt><dd>Two centers: the average, pulled by every value, and the middle value, which a few wild values barely move.</dd>
 <dt>Standard deviation, quartiles</dt><dd>Two spreads: a typical distance from the mean, and the range of the middle half.</dd>
 <dt>Percentile and interval</dt><dd>The value a given share of hours stays at or below; two of them bound an interval.</dd>
 <dt>Probability as a share</dt><dd>Count the hours where the event happened and divide by all hours; with few hours, the share is rough.</dd>
@@ -180,7 +180,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 ```
 
 - **Where these ideas go next.** Running a model on many random draws of its inputs: Modeler lesson [M7](m07-monte-carlo.html). Planning against scenarios weighted by their chances: [M8](m08-stochastic-robust.html). Fast stand-ins for slow models, each prediction with its own spread: [M9](m09-surrogates-uq.html).
-- **Draw together what moves together.** Sample whole hours or days, so demand, wind and outages keep their joint behaviour; drawing each input separately assumes independence.
+- **Draw together what moves together.** Sample whole hours or days, so demand, wind and outages keep their joint behavior; drawing each input separately assumes independence.
 
 ```{=html}
 </div>

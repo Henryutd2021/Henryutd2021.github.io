@@ -93,16 +93,18 @@ const D = K.townDay(town, year), sum = a => a.reduce((x, y) => x + y, 0), fmt = 
   T.forEach(t => ok(near(K.value(F, t.cell), t.answer, 1e-9), `practice ${t.cell}: the hint formula ${t.hint} gives ${t.answer}`));
   ok(T[0].answer === sum(D.demand) && T[3].answer === Math.max(...D.solar) && T[4].answer === 55 * 1965, "practice: answers from the day");
   ok(near(T[2].answer, (D.need[17] + D.need[18] + D.need[19] + D.need[20] + D.need[21]) / 5) && K.value(F, "A22") === "17:00" && K.value(F, "A26") === "21:00", "practice: E22:E26 is 17:00 to 21:00");
-  ok(/five hourly rows labelled 17:00 to 21:00/.test(T[2].ask), "practice: the evening average names its five hourly rows");
+  ok(/five hourly rows labeled 17:00 to 21:00/.test(T[2].ask), "practice: the evening average names its five hourly rows");
   ok(K.graded(F, D).every(Boolean), "practice: the hint formulas pass, values and dependencies");
   // typed constants, even after =, do not pass; alternative formulas that point at the cells do
   const G = K.practiceSheet(D);
   T.forEach(t => { G.cells[t.cell] = "=" + t.answer; }); K.changed(G);
   ok(K.graded(G, D).every(g => !g), "practice: =<the number> fails every task (it does not follow the inputs)");
-  G.cells.E33 = "=SUM(B5:B28)"; G.cells.E34 = "=(SUM(C5:C28)+SUM(D5:D28))/E33*100"; G.cells.E35 = "=(E22+E23+E24+E25+E26)/5"; G.cells.E36 = "=MAX(D5:D28)+0*B5"; G.cells.E37 = "=F30/E2*55"; K.changed(G);
+  G.cells.E33 = "=SUM(B5:B28)"; G.cells.E34 = "=(SUM(C5:C28)+SUM(D5:D28))/E33*100"; G.cells.E35 = "=(E22+E23+E24+E25+E26)/5"; G.cells.E36 = "=MAX(D5:D28)+0*B5"; G.cells.E37 = "=F30/E2*E32"; K.changed(G);
   ok(K.graded(G, D).every(Boolean), "practice: equivalent formulas pass");
   G.cells.E36 = "=161+0*D5"; G.cells.E33 = "=SUM(B5:B27)+B28*1"; K.changed(G);
   const g2 = K.graded(G, D); ok(!g2[3] && g2[0], "practice: a constant hidden in a formula fails; a split range passes");
+  G.cells.E37 = "=E30*55"; K.changed(G); ok(K.value(G, "E37") === T[4].answer && !K.graded(G, D)[4], "practice: =E30*55 has the right value but types the assumption E32 holds, so it does not pass");
+  G.cells.E37 = "=SUM(F5:F28)/E2*E32"; K.changed(G); ok(K.graded(G, D)[4], "practice: another route through E32 passes");
 }
 // ---------------- step 6: F30 must follow the inputs too; step 7: the nudge keeps the E column honest
 {

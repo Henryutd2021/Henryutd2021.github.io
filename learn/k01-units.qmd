@@ -114,7 +114,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 </div>
 <div class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><ul>
 <li><b>Source.</b> Prairie Town's day is the real hourly demand shape of 3 September 2025 on the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>).</li>
-<li><b>Illustrative.</b> The shape is scaled as in <a href="00-grid-operator.html">lesson 0</a> so that the town's busiest hour of 2025 is 450 MW. The town, its scale and the flat $40/MWh gas running cost are illustrative.</li>
+<li><b>Illustrative.</b> Scaled as in <a href="00-grid-operator.html">lesson 0</a>: 450 MW in 2025's busiest hour, before lesson 0's rounding (at most 2.5 MW an hour). The town, its scale and the flat $40/MWh gas running cost are illustrative.</li>
 <li><b>Not a schedule.</b> $78,600 prices all 1,965 MWh of gas at one flat $40/MWh. Lesson 0's schedule, held to ramp limits, runs 1,960 MWh at $40/MWh and 20 MWh on a $100/MWh peak plant: $80,400.</li>
 <li><b>Anchors.</b> A phone charge: <a href="https://www.epa.gov/energy/greenhouse-gas-equivalencies-calculator-calculations-and-references">EPA</a> (checked 2 November 2026). A home's yearly purchases: <a href="https://www.eia.gov/tools/faqs/faq.php?id=97&amp;t=3">EIA</a> (2022 data). The Southwest Power Pool's year: EIA-930 (2025 data). The U.S. year: <a href="https://www.eia.gov/energyexplained/electricity/use-of-electricity.php">EIA</a> (2025 data).</li>
 </ul></div>

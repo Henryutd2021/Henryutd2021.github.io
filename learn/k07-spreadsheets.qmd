@@ -228,7 +228,7 @@ No addresses and no fill-down, so no sliding E1. Bridge B2 does this with a whol
 <p class="lx-hint">Use the table of the day above, about 30 minutes. With JavaScript on, you type each answer as a formula in a working sheet.</p><ol class="k7-tasks">
 <li>Total demand energy over the day, in MWh (each row is one hour). <details class="k7-hint"><summary>Answer</summary><code>=SUM(B5:B28)</code> = 6,957 MWh</details></li>
 <li>Share of the day's demand met by wind and solar, in %. <details class="k7-hint"><summary>Answer</summary><code>=SUM(C5:D28)/SUM(B5:B28)*100</code> = 37.3%</details></li>
-<li>Average gas need over the five hourly rows labelled 17:00 to 21:00, in MW. <details class="k7-hint"><summary>Answer</summary><code>=AVERAGE(E22:E26)</code> = 112 MW</details></li>
+<li>Average gas need over the five hourly rows labeled 17:00 to 21:00, in MW. <details class="k7-hint"><summary>Answer</summary><code>=AVERAGE(E22:E26)</code> = 112 MW</details></li>
 <li>The day's highest solar output, in MW. <details class="k7-hint"><summary>Answer</summary><code>=MAX(D5:D28)</code> = 161 MW</details></li>
 <li>The day's gas cost at the alternative gas cost in E32, $55 per MWh, without changing E2. <details class="k7-hint"><summary>Answer</summary><code>=E30*E32</code> = $108,075</details></li>
 </ol></div>

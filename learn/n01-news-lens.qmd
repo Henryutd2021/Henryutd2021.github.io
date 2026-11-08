@@ -62,7 +62,10 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <li><strong>about 148 GW of grid connections</strong> (Physics): Capacity, not energy: the report turns 649 TWh into GW by assuming connections are used at 50% on average.</li>
 <li><strong>Cryptocurrency mining is not counted</strong> (Boundary): What counts as a data center is a choice; a study that includes mining reports a larger number.</li>
 <li><strong>Left unanswered</strong> (Who pays): Who pays for the new lines and plants that serve large loads depends on each utility's <span class="lx-term" data-term="tariff">tariff</span>, its rules for what customers pay, and the story does not say. Analyst lesson <a href="a04-retail-tariffs.html">A4</a> covers large-load tariffs.</li>
-<li><strong>A researcher's take</strong>: I accept the direction, strong growth in U.S. data-center use by 2030, but not the exact 11.8%. A new estimate built on lower chip shipments or lower server power would change my mind. Confidence: medium, since credible projections still differ by about 50%.</li></ul></details>
+<li><strong>A researcher's take, claim</strong>: I accept the direction, strong growth in U.S. data-center use by 2030, but not the exact 11.8%.</li>
+<li><strong>A researcher's take, what would change my mind</strong>: A new estimate built on lower chip shipments or lower server power would change my mind.</li>
+<li><strong>A researcher's take, confidence</strong>: Medium, since credible projections still differ by about 50%.</li>
+</ul></details>
 <p class="lx-hint">Source: <a href="https://www.energy.gov/documents/united-states-data-center-energy-usage-report-2025-update">LBNL, United States Data Center Energy Usage Report: 2025 Update, pp. 5, 8–11 (PDF)</a> (published 18 June 2026)</p>
 <p class="lx-eyebrow">Story 2 · Storage · United States</p>
 <p><strong>“A record 15 GW of batteries joined the U.S. grid in 2025”</strong> <span class="lx-hint">Our paraphrase of how the data release was headlined.</span></p>
@@ -78,7 +81,10 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <li><strong>53 GW in total</strong> (Scale): Big for one year. For scale, U.S. use averaged about 480 GW across 2025 (4.20 trillion kWh ÷ 8,760 h).</li>
 <li><strong>The count covers utility-scale plants of 1 MW and up</strong> (Boundary): Home batteries and rooftop solar sit outside this count.</li>
 <li><strong>Left unanswered</strong> (Who pays): Who pays for the batteries, and who earns from them, depends on market rules and contracts; the story does not say. Analyst lesson <a href="a02-contracts-risk.html">A2</a> covers contracts and risk.</li>
-<li><strong>A researcher's take</strong>: I accept that a record amount of battery power, about 15 GW, came online in 2025, as a preliminary count. Final annual data showing a much lower figure would change my mind. Confidence: high for the power; the energy stored cannot be known from this story.</li></ul></details>
+<li><strong>A researcher's take, claim</strong>: I accept that a record amount of battery power, about 15 GW, came online in 2025, as a preliminary count.</li>
+<li><strong>A researcher's take, what would change my mind</strong>: Final annual data showing a much lower figure would change my mind.</li>
+<li><strong>A researcher's take, confidence</strong>: High for the power; the energy stored cannot be known from this story.</li>
+</ul></details>
 <p class="lx-hint">Source: <a href="https://www.eia.gov/todayinenergy/detail.php?id=67205">EIA, Today in Energy: 2025 additions, preliminary</a> (20 February 2026); <a href="https://www.eia.gov/todayinenergy/detail.php?id=64586">EIA, Today in Energy: additions planned for 2025</a> (24 February 2025); <a href="https://www.eia.gov/energyexplained/electricity/electricity-in-the-us-generation-capacity-and-sales.php">EIA, Energy Explained: utility-scale means 1 MW or more</a> (checked 2 November 2026); <a href="https://www.eia.gov/energyexplained/electricity/use-of-electricity.php">EIA, Energy Explained: U.S. use 4.20 trillion kWh in 2025</a> (data for 2025); <a href="https://www.eia.gov/todayinenergy/detail.php?id=51798">EIA, Today in Energy: battery duration = MWh ÷ MW</a> (25 March 2022)</p>
 <p class="lx-eyebrow">Story 3 · Reliability · Spain and Portugal</p>
 <p class="lx-hint">Two terms first: <span class="lx-term" data-term="voltage">voltage</span> is the electrical push on the lines. Supplying or absorbing <span class="lx-term" data-term="reactive-power">reactive power</span> helps keep local voltage within safe limits, neither too low nor too high.</p>
@@ -94,7 +100,10 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <li><strong>many interacting factors</strong> (Boundary): Control rules, regulation practices and protection settings are part of the system, not only the power plants.</li>
 <li><strong>gaps in voltage and reactive-power control</strong> (Physics): Frequency responds to any gap between supply and demand (lesson 0). Voltage also depends on local network conditions and reactive-power control, so a yearly energy total cannot diagnose this blackout.</li>
 <li><strong>Left unanswered</strong> (Counterfactual): Compared with what? The headline skips the test: would the same plants with different control settings, or different plants with the same settings, have held? The panel's event-by-event analysis is how such questions get answered.</li>
-<li><strong>A researcher's take</strong>: I reject the claim that renewables alone caused the blackout. An investigation tracing the collapse to one cause would change my mind. Confidence: high that there was no single cause, because the expert panel found many interacting factors.</li></ul></details>
+<li><strong>A researcher's take, claim</strong>: I reject the claim that renewables alone caused the blackout.</li>
+<li><strong>A researcher's take, what would change my mind</strong>: An investigation tracing the collapse to one cause would change my mind.</li>
+<li><strong>A researcher's take, confidence</strong>: High that there was no single cause, because the expert panel found many interacting factors.</li>
+</ul></details>
 <p class="lx-hint">Source: <a href="https://www.entsoe.eu/publications/blackout/28-april-2025-iberian-blackout/">ENTSO-E, 28 April 2025 Iberian blackout: expert panel reports</a> (factual report 3 October 2025; final report 20 March 2026)</p>
 <!-- fallback:end -->
 <!-- fallback-checks:start (written by _tests/learn/test_n01-news-lens.js in its write mode, from the data file; do not edit) -->
@@ -167,10 +176,10 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <details class="lx-deeper">
 <summary><span class="k">Steelman</span>Why the 2030 data-center projection could come out lower, or higher</summary>
 <div class="lx-deeper-body">
-<p>The report's own sensitivity scenarios give the strongest case each way (LBNL 2025 Update, p. 5):</p>
+<p>The report's own sensitivity scenarios give the strongest case each way (LBNL 2025 Update, pp. 5 and 7):</p>
 <ul>
-<li><strong>Lower:</strong> fewer IT installations than forecast (578 TWh in 2030), or shorter working lives for specialised chips (590 TWh).</li>
-<li><strong>Higher:</strong> more specialised graphics chips installed (664 TWh), or servers that draw more power when idle and run busier (782 TWh).</li>
+<li><strong>Lower:</strong> fewer graphics and application-specific chips installed than forecast (578 TWh in 2030), or shorter working lives for specialized chips (590 TWh).</li>
+<li><strong>Higher:</strong> more application-specific chips (ASICs) installed (664 TWh), or servers that draw more power when idle and run busier (782 TWh).</li>
 </ul>
 <p>Combined, the authors' bounds are 521–843 TWh. A careful reader reports the range and the drivers, not one number.</p>
 </div>
@@ -280,7 +289,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 
 ```{=html}
 <div class="lx-card lx-real">
-<p class="lx-eyebrow">Practise on real news · about 15 minutes</p>
+<p class="lx-eyebrow">Practice on real news · about 15 minutes</p>
 <p>Pick one item from this site's Field Notes briefings, or from today's news. Run the seven questions on it, then write your three-sentence take.</p>
 <ul>
 <li>Concepts from <a href="00-grid-operator.html">lesson 0</a> (power and energy, frequency) and lessons <a href="01-power-energy.html">1</a> and <a href="05-capacity-factor.html">5</a> (units, capacity factor).</li>

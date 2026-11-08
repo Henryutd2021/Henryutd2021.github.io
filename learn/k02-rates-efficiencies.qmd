@@ -143,7 +143,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-deeper-body">
 ```
 
-- **Rates become fixed numbers.** A planning model multiplies each MWh a gas plant makes by rates like these: 6.226 × \$3.85 = \$23.97 of fuel and 0.329 t of CO₂. A real plant's heat rate changes with its output; a fixed one is a modelling choice.
+- **Rates become fixed numbers.** A planning model multiplies each MWh a gas plant makes by rates like these: 6.226 × \$3.85 = \$23.97 of fuel and 0.329 t of CO₂. A real plant's heat rate changes with its output; a fixed one is a modeling choice.
 - **Where next.** [Lesson 13](13-capstone.html) writes such a model in full, and [M3](m03-capacity-expansion.html) builds one in a notebook.
 
 ```{=html}

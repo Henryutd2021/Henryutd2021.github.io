@@ -2,7 +2,7 @@
   "meta": {
     "title": "N1 news lens: three worked stories, a units spotter and the evidence ladder",
     "built": "2026-11-02",
-    "note": "Headlines are paraphrased in our own words; no outlet is quoted. Facts come from the primary sources linked, as of the dates given (all checked 2026-11-02). Story 3's early single-cause claims are described, not dated. Spotter sentences are illustrative composites; where they use a real number, its source is named. Toy durations and utilisation rates are labelled illustrative.",
+    "note": "Headlines are paraphrased in our own words; no outlet is quoted. Facts come from the primary sources linked, as of the dates given (all checked 2026-11-02). Story 3's early single-cause claims are described, not dated. Spotter sentences are illustrative composites; where they use a real number, its source is named. Toy durations and utilization rates are labeled illustrative.",
     "used_by": "learn/n01-news-lens.qmd via assets/learn/n01-news-lens.js; checked by _tests/learn/test_n01-news-lens.js"
   },
   "lens": [
@@ -144,10 +144,10 @@
     ],
     "projection_label": "Not on the ladder: a projection"
   },
-  "sensitivity": { "src": "LBNL 2025 Update, p. 5", "url": "https://www.energy.gov/documents/united-states-data-center-energy-usage-report-2025-update", "as_of": "published 18 June 2026", "used_by": "the Steelman box in learn/n01-news-lens.qmd",
+  "sensitivity": { "src": "LBNL 2025 Update, pp. 5 and 7", "url": "https://www.energy.gov/documents/united-states-data-center-energy-usage-report-2025-update", "as_of": "published 18 June 2026", "used_by": "the Steelman box in learn/n01-news-lens.qmd",
     "reference_twh": 649, "bounds": [521, 843],
-    "lower": [{ "what": "fewer IT installations than forecast", "twh": 578 }, { "what": "shorter working lives for specialised chips", "twh": 590 }],
-    "higher": [{ "what": "more specialised graphics chips installed", "twh": 664 }, { "what": "servers that draw more power when idle and run busier", "twh": 782 }] },
+    "lower": [{ "what": "fewer graphics and application-specific chips installed than forecast", "twh": 578 }, { "what": "shorter working lives for specialized chips", "twh": 590 }],
+    "higher": [{ "what": "more application-specific chips (ASICs) installed", "twh": 664 }, { "what": "servers that draw more power when idle and run busier", "twh": 782 }] },
   "numbers": [
     { "n": "8,760 h", "what": "Hours in a year (not a leap year): 1 GW running all year is 8.76 TWh.", "src": "", "url": "", "as_of": "arithmetic" },
     { "n": "192 TWh", "what": "U.S. data-center electricity use in 2024, about 4.7% of the total.", "src": "LBNL 2025 Update, p. 8", "url": "https://www.energy.gov/documents/united-states-data-center-energy-usage-report-2025-update", "as_of": "published June 2026" },

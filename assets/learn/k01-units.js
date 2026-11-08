@@ -217,7 +217,7 @@
 
     // ---- step 1: the prefix ladder
     steps.push({
-      text: "Each prefix is 1,000 times the one below: kilo (k), mega (M), giga (G), tera (T). Prairie Town's demand is scaled so its busiest hour of 2025 is " + s.peak + " [[megawatt|MW]]. Write that in [[kilowatt|kW]] and in [[gigawatt|GW]].",
+      text: "Each prefix is 1,000 times the one below: kilo (k), mega (M), giga (G), tera (T). Write " + s.peak + " [[megawatt|MW]], the busiest hour Prairie Town's demand is scaled to in 2025, in [[kilowatt|kW]] and in [[gigawatt|GW]].",
       build: function (act, api) {
         var lad = H("ol", { class: "k1-ladder", "aria-label": "The prefix ladder for " + s.peak + " MW" }, act), cells = {};
         var vals = [s.peakW, s.peakKW, s.peak, s.peakGW, s.peakTW];

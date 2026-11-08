@@ -46,7 +46,7 @@ D.stories.forEach((s, k) => {
     ok(has(esc(p.text)) && has(esc(p.note)), `story ${s.id} ${p.p}: phrase and note are in the no-JS fallback`);
   });
   ok(ids.indexOf(s.missing.answer) >= 0 && words(s.missing.note) <= 50, `story ${s.id}: the unanswered question is a lens id; note under 50 words`);
-  ok(has(esc(s.headline)) && has(esc(s.take)), `story ${s.id}: headline and model take are in the fallback`);
+  ok(has(esc(s.headline)) && M.takeParts(s.take).every(x => has(`<li><strong>A researcher's take, ${x.k.toLowerCase()}</strong>: ${esc(x.v)}</li>`)), `story ${s.id}: headline and model take (in its three parts) are in the fallback`);
   ok(sentences(s.take) === 3, `story ${s.id}: the model take has three sentences`);
   const tp = M.takeParts(s.take);
   ok(tp.length === 3 && tp.every(x => x.v && words(x.v) <= 20) && !/^Confidence/.test(tp[2].v), `story ${s.id}: the take shows as three labelled lines of at most 20 words`);
@@ -164,10 +164,12 @@ hrefs.forEach(h => ok(/^https:\/\/([a-z0-9-]+\.)*(eia\.gov|energy\.gov|entsoe\.e
   const SIDE = fs.readFileSync(path.join(SITE, "learn/_w1/n01-news-lens.yml"), "utf8");
   ok(!/holds voltage up|held up locally/.test(SIDE + JS + JSON.stringify(D)) && /supplying or absorbing it locally helps keep voltage within safe limits/.test(SIDE) && /Supplying or absorbing \[\[reactive-power\|reactive power\]\] helps keep local voltage within safe limits, neither too low nor too high/.test(D.stories[2].intro), "reactive power: keeps voltage within limits both ways");
   ok(/Its main scenario, the Reference Case, puts/.test(JSON.stringify(D)) && /\[\[tariff\|tariff\]\], its rules for what customers pay/.test(D.stories[0].missing.note), "terms: the Reference Case and tariff are explained where they first appear");
-  ok(/Practise on real news · about 15 minutes/.test(QMD), "practice: the independent exercise shows its time");
+  ok(/Practice on real news · about 15 minutes/.test(QMD), "practice: the independent exercise shows its time");
   // every element of the worked checks and of the step prompts within about 35 words
   const st = M.staticChecks(D), lis = (st.match(/<li>[\s\S]*?<\/li>/g) || []).map(t => words(t.replace(/<[^>]+>/g, " ")));
   ok(lis.length >= 10 && lis.every(n => n <= 36), "fallback: each worked check and ladder element is at most 36 words: " + lis.join(", "));
+  const fbl = QMD.slice(QMD.indexOf("<!-- fallback:start -->"), QMD.indexOf("<!-- fallback:end -->")), fli = (fbl.match(/<li>[\s\S]*?<\/li>/g) || []).map(t => words(t.replace(/<[^>]+>/g, " ")));
+  ok(fli.length >= 18 && fli.every(n => n <= 40), "fallback: each note and take part in the stories' no-JS version is short: max " + Math.max(...fli));
   ok(/<th scope="col">Sentence<\/th><th scope="col">Verdict<\/th><th scope="col">Why<\/th>/.test(st), "fallback: the spotter answers are a table (sentence, verdict, why), not one long line each");
   stepTexts.forEach((t, i) => ok(words(t.replace(/\[\[[^|]+\|([^\]]+)\]\]/g, "$1")) <= 35, `step ${i + 1}: at most 35 words (${words(t)})`));
 }
