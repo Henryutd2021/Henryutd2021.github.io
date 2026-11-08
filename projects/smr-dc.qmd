@@ -33,7 +33,7 @@ toc: false
 <section class="proj-insight" id="insight" aria-labelledby="h-insight">
 <h2 id="h-insight"><i class="bi bi-stars" aria-hidden="true"></i>Key insight</h2>
 <p class="insight-title">Reliability requirements add a capital premium that levelized cost leaves out</p>
-<p>A hyperscale campus needs Tier IV-level availability, so one reactor is not enough: with N+1 redundancy, a 300 MW campus may need 400 MW of SMR capacity. Standard levelized-cost estimates omit this reliability premium, so they understate the cost of firm on-site supply.</p>
+<p>For a campus that targets Tier IV-level availability, one reactor alone cannot ride through refueling and unplanned outages. In the Perspective&#x27;s N+1 example, a 300 MW campus needs 400 MW of SMR capacity: one 100 MW module more than the load. Standard levelized-cost estimates omit this reliability premium, so they understate the cost of firm on-site supply.</p>
 </section>
 <section class="proj-sec" aria-labelledby="h-contribution">
 <h2 id="h-contribution"><i class="bi bi-person-check" aria-hidden="true"></i>My contribution</h2>

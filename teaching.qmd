@@ -182,7 +182,7 @@ Co-advised, focusing on techno-economic analysis modeling.
 ::: {.tl-body}
 [Undergraduate student **Jonathon Matutes** (University of Indianapolis)]{.tl-who} [REU]{.tl-tag}
 
-Techno-economic analysis of potential offshore wind energy development along the northeastern US coast.
+Techno-economic analysis of potential offshore wind energy development along the northeastern U.S. coast.
 :::
 :::
 
@@ -192,7 +192,7 @@ Techno-economic analysis of potential offshore wind energy development along the
 ::: {.tl-body}
 [Undergraduate student **Zaina Anarwala** (UIUC)]{.tl-who} [REU]{.tl-tag}
 
-Techno-economic analysis of potential offshore wind energy development in the US Gulf of Mexico.
+Techno-economic analysis of potential offshore wind energy development in the U.S. Gulf of Mexico.
 :::
 :::
 

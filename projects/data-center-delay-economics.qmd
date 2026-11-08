@@ -24,7 +24,7 @@ toc: false
 <div class="proj-main">
 <div class="proj-glance">
 <p class="glance-role"><i class="bi bi-person-check" aria-hidden="true"></i>First author</p>
-<ul class="glance-tags" aria-label="Scale and methods"><li>Present-value framework</li><li>Developer, ratepayer, social ledgers</li><li>300 MW-IT case</li><li>Latin hypercube screening</li><li>Staged service, bridge power</li></ul>
+<ul class="glance-tags" aria-label="Scale and methods"><li>Present-value framework</li><li>Developer, ratepayer, social ledgers</li><li>Illustrative 300 MW-IT case</li><li>Latin hypercube screening</li><li>Staged service, bridge power</li></ul>
 </div>
 <section class="proj-q" aria-labelledby="h-question">
 <h2 id="h-question"><i class="bi bi-question-circle" aria-hidden="true"></i>Research question</h2>
@@ -33,7 +33,7 @@ toc: false
 <section class="proj-insight" id="insight" aria-labelledby="h-insight">
 <h2 id="h-insight"><i class="bi bi-stars" aria-hidden="true"></i>Key insight</h2>
 <p class="insight-title">The cost of delayed energization depends on who is counting</p>
-<p>A late grid connection costs the developer lost margin and carrying costs; ratepayers face utility carrying and stranding costs; society bears external costs. I keep these present-value accounts separate. In the study, a 36-month delay for a 300 MW-IT facility cost the developer on the order of $0.7 billion, while ratepayer exposure depended strongly on large-load tariff design.</p>
+<p>A late grid connection costs the developer lost margin and carrying costs; ratepayers face utility carrying and stranding costs; society bears external costs. I keep these present-value accounts separate. In the study&#x27;s illustrative base case, a 36-month delay for a 300 MW-IT facility cost the developer on the order of $0.7 billion, while ratepayer exposure depended strongly on large-load tariff design.</p>
 </section>
 <section class="proj-sec" aria-labelledby="h-contribution">
 <h2 id="h-contribution"><i class="bi bi-person-check" aria-hidden="true"></i>My contribution</h2>
@@ -60,7 +60,7 @@ toc: false
 <section class="proj-sec" aria-labelledby="h-findings">
 <h2 id="h-findings"><i class="bi bi-lightbulb" aria-hidden="true"></i>Key findings</h2>
 <ol class="findings">
-<li>For a 300 MW-IT facility, a 36-month delay costs the developer on the order of $0.7 billion in present value.</li>
+<li>In the study&#x27;s illustrative base case, a 36-month delay for a 300 MW-IT facility cost the developer on the order of $0.7 billion in present value.</li>
 <li>Staged energization can recover a large share of that cost.</li>
 <li>Ratepayer exposure depends strongly on large-load tariff design.</li>
 </ol>

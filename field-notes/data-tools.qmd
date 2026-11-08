@@ -55,7 +55,7 @@ This guide is for researchers, students and analysts who build models of U.S. po
 **Known pitfalls.**
 
 - *Clock.* ERCOT data follow Central Prevailing Time, so every spring has a missing hour and every fall a repeated one. On the long day, ERCOT labels the repeated hour separately from the normal one. My Texas hydrogen framework converts every series to one fixed-offset clock before aggregating, then reindexes it to a complete hourly axis.
-- *From intervals to hours.* Average each resource's SCED intervals within each hour to get its energy for that hour. An hour without a record is missing, not zero. Fill only short gaps, resource by resource, *before* summing to zones; after summing, a silent resource is hidden by its neighbours.
+- *From intervals to hours.* Average each resource's SCED intervals within each hour to get its energy for that hour. An hour without a record is missing, not zero. Fill only short gaps, resource by resource, *before* summing to zones; after summing, a silent resource is hidden by its neighbors.
 - *Locations.* Disclosure files identify resources by ERCOT name, not by county. The framework matches each one to its plant in EIA-860, which gives the county and from that the weather zone. The mapping table is kept under version control, and unmatched capacity is reviewed.
 - *Capacity factors.* The denominator should be the capacity actually operating in that hour, taken from commissioning dates; year-end capacity understates early-year capacity factors. Look at the maximum before any clipping: a value above 1 means a matching or capacity error.
 - *Corrections.* ERCOT sometimes reposts disclosure data. A March 2026 [market notice](https://www.ercot.com/services/comm/mkt_notices/M-B030626-02), for example, announced supplemental files for a load-resource file affected from December 2025 to January 2026. Watch the market notices and re-download the affected days.
@@ -116,9 +116,9 @@ This guide is for researchers, students and analysts who build models of U.S. po
 
 **What it is.** The U.S. Energy Information Administration (EIA) collects hourly operating data from the balancing authorities (BAs) of the Lower 48 states on Form EIA-930. It publishes them through the [Hourly Electric Grid Monitor](https://www.eia.gov/electricity/gridmonitor/).
 
-**Coverage.** Hourly data for each BA: demand, demand forecast, net generation, total interchange and interchange with each neighbouring BA. EIA aggregates them into 13 regions and a Lower 48 total. Data start on 1 July 2015. Net generation by energy source, subregion demand and EIA's estimated CO₂ emissions start on 1 July 2018, and battery storage became a separate energy source on 1 January 2025.
+**Coverage.** Hourly data for each BA: demand, demand forecast, net generation, total interchange and interchange with each neighboring BA. EIA aggregates them into 13 regions and a Lower 48 total. Data start on 1 July 2015. Net generation by energy source, subregion demand and EIA's estimated CO₂ emissions start on 1 July 2018, and battery storage became a separate energy source on 1 January 2025.
 
-**Access.** Use the dashboards, the six-month CSV files (balance, interchange and subregion), or the full-history workbooks for each BA and region. The [EIA API](https://www.eia.gov/opendata/) needs a free registered key and serves EIA-930 data from 1 January 2019 onward; older data are in the downloadable files. EIA's [About the EIA-930 data](https://www.eia.gov/electricity/930-content/about.html) page is the best single reference.
+**Access.** Use the dashboards, the six-month CSV files (balance, interchange and subregion), or the full-history workbooks for each BA and region. The files are under *Download Data* in the upper right of the Grid Monitor's [dashboard](https://www.eia.gov/electricity/gridmonitor/dashboard/electric_overview/US48/US48). The [EIA API](https://www.eia.gov/opendata/) needs a free registered key and serves EIA-930 data from 1 January 2019 onward; older data are in the downloadable files. EIA's [About the EIA-930 data](https://www.eia.gov/electricity/930-content/about.html) page is the best single reference.
 
 **License and terms.** EIA's [copyright and reuse policy](https://www.eia.gov/about/copyrights_reuse.php) places its publications, as federal government works, in the public domain, and lets you use and distribute its data. EIA asks for an acknowledgment that names it and gives the publication date. **Redistribution: allowed.**
 
@@ -169,7 +169,7 @@ This guide is for researchers, students and analysts who build models of U.S. po
 
 **Access.** Read the reports online or download the PDFs; the Observatory is interactive.
 
-**License and terms.** The report pages carry a CC BY 4.0 licence. The IEA's [terms](https://www.iea.org/terms) exclude standalone datasets, data explorers and data annexes from that licence and place them under its terms for non-CC material. **Redistribution: report text and figures allowed with attribution under CC BY 4.0. Data from the Observatory are not CC BY; check the IEA's terms or ask the IEA before republishing them.**
+**License and terms.** The report pages carry a CC BY 4.0 license. The IEA's [terms](https://www.iea.org/terms) exclude standalone datasets, data explorers and data annexes from that license and place them under its terms for non-CC material. **Redistribution: report text and figures allowed with attribution under CC BY 4.0. Data from the Observatory are not CC BY; check the IEA's terms or ask the IEA before republishing them.**
 
 **Known pitfalls.**
 
@@ -193,7 +193,7 @@ This guide is for researchers, students and analysts who build models of U.S. po
 **Known pitfalls.**
 
 - *Quality flags are defined but not applied.* The dataset paper defines zero, missing, unknown and abnormal values. Power is *unknown* when it is at or below zero while wind speed exceeds 2.5 m/s, or when any pitch angle exceeds 89°; these cases often reflect curtailment or stops. The authors leave it to users to decide how to treat them.
-- *Filter for your purpose.* Forecast evaluation excludes those records. My multi-fidelity power-curve method keeps stops and curtailment on purpose, because its density-based sampling is meant to represent the turbines' full operating behaviour. It removes only rows with missing or non-finite values and negative power, and reports how many rows each rule removed.
+- *Filter for your purpose.* Forecast evaluation excludes those records. My multi-fidelity power-curve method keeps stops and curtailment on purpose, because its density-based sampling is meant to represent the turbines' full operating behavior. It removes only rows with missing or non-finite values and negative power, and reports how many rows each rule removed.
 - *Time.* In the 245-day file, a timestamp is built as (day − 1) days plus the time of day.
 - *Units and sensors.* Check power units against the 1.5 MW turbine rating. Nacelle anemometers sit behind the rotor, which affects the wind-speed readings. Look for duplicate intervals after merges and for long runs of stuck values.
 
@@ -225,7 +225,7 @@ This guide is for researchers, students and analysts who build models of U.S. po
 
 **What it is.** The Regional Energy Deployment System ([ReEDS](https://www.nlr.gov/analysis/reeds/)) is NLR's open-source capacity planning and dispatch model of the U.S. power system. Its `inputs` folder is a documented collection of planning data, covering load, supply curves, transmission, plant characteristics, fuel prices, financing and state policies.
 
-**Coverage.** The contiguous United States, represented as 133 model balancing areas, over multi-decade planning horizons. The latest release, 2026.09.21, was published on 30 September 2026.
+**Coverage.** The contiguous United States over multi-decade planning horizons. The latest release, 2026.09.21, was published on 30 September 2026. It represents the country as 90 model zones by default, each a group of counties that need not match a balancing authority area; release 2026.08.03 changed the default from 132 zones to these 90 ([spatial resolution](https://reeds-model.github.io/ReEDS/model_documentation.html#spatial-resolution)).
 
 **Access.**
 
@@ -239,7 +239,7 @@ This guide is for researchers, students and analysts who build models of U.S. po
 
 - *Version pinning.* Inputs change from release to release. Record the release tag and the identifiers of the remote files a run used.
 - *Dollar years.* The model documentation reports different inputs in different dollar years. Convert everything to one constant-dollar year before reusing it, as all my frameworks do.
-- *Scope.* Each balancing area is treated as a copper plate, and capacity decisions have limited foresight unless intertemporal mode is used. The results are least-cost planning outcomes under stated assumptions, not forecasts.
+- *Scope.* Each model zone is treated as a copper plate, and capacity decisions have limited foresight unless intertemporal mode is used. The results are least-cost planning outcomes under stated assumptions, not forecasts.
 
 **Used in.** Not used directly in my published studies.
 
@@ -366,6 +366,4 @@ This guide is for researchers, students and analysts who build models of U.S. po
 
 ---
 
-*Every item is checked against its primary source; the views are my own.*
-
-*Views are my own and do not represent my employer. This guide is reviewed each quarter; corrections are made in place and noted here with the date.*
+*Every item is checked against its primary source. Views are my own and do not represent my employer. This guide is reviewed each quarter; corrections are made in place and noted here with the date.*

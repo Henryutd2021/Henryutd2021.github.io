@@ -1,7 +1,7 @@
 ---
 title: "Journeys"
 subtitle: '[行万里路]{lang="zh-Hans"} · The long road since 2010'
-description: "Honglin Li's travel log since 2010: the places he has lived and travelled in China, the United States and beyond, on a map with a time line."
+description: "Honglin Li's travel log since 2010: the places he has lived and traveled in China, the United States and beyond, on a map with a time line."
 title-block-banner: true
 page-layout: full
 toc: false

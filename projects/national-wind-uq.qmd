@@ -32,7 +32,7 @@ toc: false
 </section>
 <section class="proj-sec" aria-labelledby="h-method">
 <h2 id="h-method"><i class="bi bi-diagram-3" aria-hidden="true"></i>Method</h2>
-<p>Moving-window, data-source, ensemble-spread and spatial (variogram) uncertainty metrics as inputs; pinball-loss-optimal scales of a predictive distribution around the point forecast as targets at observed plants; Gaussian process regression and other regressors as surrogates; validation by holding out whole plants, scored with pinball loss, CRPS and reliability, with recalibration of the predictive distributions.</p>
+<p>The workflow learns, at wind plants with power measurements, how the uncertainty of a plant&#x27;s power forecast relates to measures of uncertainty in its inputs, and uses that relation to estimate forecast uncertainty at plants without measurements. In technical terms: moving-window, data-source, ensemble-spread and spatial (variogram) uncertainty metrics as inputs; pinball-loss-optimal scales of a predictive distribution around the point forecast as targets at observed plants; Gaussian process regression and other regressors as surrogates; validation by holding out whole plants, scored with pinball loss, CRPS and reliability, with recalibration of the predictive distributions.</p>
 </section>
 <section class="proj-sec proj-bounds" aria-labelledby="h-bounds">
 <h2 id="h-bounds"><i class="bi bi-exclamation-circle" aria-hidden="true"></i>Boundary conditions</h2>
