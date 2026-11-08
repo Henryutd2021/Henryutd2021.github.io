@@ -92,7 +92,13 @@ for (let v = X.loan.range[0]; v <= X.loan.range[1]; v += X.loan.step) {
   if (v === 0) ok(/No loan yet/.test(t), "loan 0: no loan");
   else ok(dd >= L.dscrContract ? /would lend/.test(t) : /would not lend/.test(t), "loan $" + v + "M: the verdict matches its coverage " + dd.toFixed(3));
 }
-ok(/= \*\*1\.308\*\*/.test(M.cashLine(P, L, 125)) && /= \*\*1\.297\*\*/.test(M.cashLine(P, L, 126)), "step 3 shows coverage to three decimals, so 1.297 never reads as 1.30");
+ok(/≈ \*\*1\.308\*\*/.test(M.cashLine(P, L, 125)) && /≈ \*\*1\.297\*\*/.test(M.cashLine(P, L, 126)), "step 3 shows coverage to three decimals, so 1.297 never reads as 1.30");
+// the coverage line: rounded amounts to $1,000, the ratio from unrounded values, marked "≈"; within rounding of the shown amounts
+for (let v = 1; v <= X.loan.range[1]; v++) { const t = M.cashLine(P, L, v), m = t.match(/= \$([\d,.]+)M ÷ \$([\d,.]+)M ≈ \*\*([\d.]+)\*\*/);
+  if (!m) { ok(false, "loan $" + v + "M: the coverage line has its form"); continue; }
+  const a = +m[1].replace(/,/g, ""), b = +m[2].replace(/,/g, ""), r = +m[3];
+  if (!(near(a, P.cf / 1e6, 0.0005) && near(b, M.payment(L, v * 1e6) / 1e6, 0.0005) && near(r, M.dscr(P.cf, v * 1e6, L), 0.0005) && near(r, a / b, r * 0.0006 / b + 0.0006))) ok(false, "loan $" + v + "M: the coverage line agrees with its rounded amounts: " + t); }
+ok(/rounded to \$1,000/.test(JS), "the code says why the line uses ≈");
 // the bad year, recomputed
 const B = X.bad;
 for (let s = 0; s <= 1.0001; s += 0.1) {
@@ -135,6 +141,24 @@ ok(/^After the loan and ahead of the sponsor/.test(X.layers.filter(l => l.key ==
 { const deep = PAGE.slice(PAGE.indexOf('<div class="lx-deepers">'), PAGE.indexOf("::: {#check")); ok(!/partnership flip|back-leverage|refinanc|P50|P99/i.test(deep), "the Go deeper boxes teach no deal structuring (D1): limitations and reading only");
   ok(!/\(1 \+ r\)|A = /.test(deep) && (deep.match(/class="x5-eq"/g) || []).length === 1 && /a01-project-tea\.html/.test(deep), "the sizing box: words, one symbolic line, a link to A1 for the annuity"); }
 ok(/nominal/.test(L.rateNote) && /no inflation/.test(L.rateNote) && /nominal rate is used as it is/.test(JS) && /no inflation/.test(M.staticFallback(P, L, X)), "the 6.5% is the ATB's nominal rate, used as the toy's chosen rate with no inflation, said on the page");
+// step 4: the stated completion condition is the one the code checks
+ok(/Slide the share to 50% or less, then switch on a bad year\./.test(M.steps(P, L)[3]) && M.LOW === 0.5 && /low = low \|\| s <= LOW \+ 1e-9/.test(JS) && /if \(low && tried\)/.test(JS), "step 4 says 'half or less, then a bad year', and Next unlocks on exactly that");
+// the part-contracted rule, said in words, with the ATB's ratios read as per technology
+{ const rl = M.ruleLine(L); ok(/one loan on the contracted share of the cash, at 1\.30, and one on the market share, at 2\.00, then adds them; both ratios are illustrative/.test(rl) && /text: ruleLine\(L\)/.test(JS) && M.staticFallback(P, L, X).indexOf(rl) > 0, "the toy lender's rule (a loan on each share, added) is said at step 4 and without JavaScript");
+  ok(near(M.debtMax(P, L, 0.5), (D1 + D0) / 2, 1e-3) && near(M.debtMax(P, L, 0.5) / 1e6, 103.7, 0.05), "at 50% contracted the two loans add to $103.7M, half of each endpoint");
+  const z = M.sizing(P, L); ok(near(z.half, Math.round((z.c + z.m) / 2 * 100) / 100, 1e-9) && near(z.half, M.debtMax(P, L, 0.5) / 1e6, 0.006) && M.deeperHTML(P, L).indexOf("($" + M.fmtN(z.c, 2) + "M + $" + M.fmtN(z.m, 2) + "M) ÷ 2 = $" + M.fmtN(z.half, 2) + "M") > 0, "the Go deeper box shows the in-between rule with its own numbers");
+  ok(/differ by technology/.test(L.dscrNote) && /differ by technology, not by contract/.test(JS) && /differ by technology, not by contract/.test(PAGE) && !/sit inside the dated ranges/.test(PAGE) && !/settings inside the dated ranges/.test(JS), "the ATB's coverage ratios are described as per technology, not as support for the contracted/merchant split"); }
+// the grant apart from the repaid layers
+ok(M.REPAID.join() === "sponsor,te,debt" && M.ORDER.join() === "sponsor,te,debt,grant" && /REPAID\.forEach\(function \(k\) \{ layer\(k, col\); \}\)/.test(JS) && /layer\("grant", grow\)/.test(JS), "the stack's column holds only the repaid layers; the grant is drawn in a row of its own");
+ok(/"Repaid last, most risk"/.test(JS) && /"Repaid first, least risk"/.test(JS) && !/"Paid first, least risk"/.test(JS) && /Paid in at the start, never repaid/.test(JS), "the order-of-repayment labels span the repaid layers; the grant is labelled as never repaid");
+ok(/a grant is not repaid/.test(M.steps(P, L)[1]) && !/each paid back in a set order/.test(JS) && /three layers in the order they are repaid, then a grant, which is not/.test(M.staticFallback(P, L, X)), "step 2 and the no-JS block keep the grant out of the repayment order");
+ok(/a lower return than equity/.test(M.checkHTML(P, L)) && /a lower return than equity/.test(X.layers.filter(l => l.key === "debt")[0].paid) && !/lowest return/.test(JS + RAW), "debt asks a lower return than equity (not 'the lowest', which a grant would undercut)");
+// units and plain words
+{ const u = M.costChain(P)[4].u; ok(/kW × \$[\d.,]+\/kW \+ [\d,]+ kWh × \$[\d.,]+\/kWh$/.test(u), "the battery's cost shows its rates per kW and per kWh, so the units cancel to dollars (" + u + ")"); }
+ok(/data-term="cash-flow-available-for-debt-service">CFADS</.test(M.deeperHTML(P, L)) && /data-term="debt-service-coverage-ratio">DSCR</.test(M.deeperHTML(P, L)), "the equation's CFADS and DSCR are marked for the glossary");
+ok(!/P50|P99|\bflips?\b|quasi-merchant,|merchant or quasi-merchant\.|partnership flips|back-leverage/.test(JS + M.ideasHTML(P, L, X) + M.factsHTML(X) + S.stopHTML(X.stop, "x05")), "no unexplained shorthand (P50, P99, flips, back-leverage) in the limits, ideas, facts or stop box");
+ok(/revenue tied mainly to market prices \(merchant or quasi-merchant\)/.test(RAW), "LBNL's 'merchant or quasi-merchant' is glossed in plain words");
+ok(/"Fully contracted here\. The loan is repaid in equal yearly payments at "/.test(JS) && !/standing for every year and no inflation, so the ATB's nominal rate is used as it is \(simplified\)/.test(JS), "step 3's loan hint holds one idea; the nominal-rate caveat stays in the limits");
 // the explain layer follows the reader's settings
 ok((JS.match(/refreshExplain\(\);\n\s*\}/g) || []).length === 2 && /function refreshExplain\(\)/.test(JS) && /text: explainLede\(st\)/.test(JS), "steps 4 and 5 refresh the explain layer on every change, read from the reader's state");
 ok(M.explainLede({ s: 0, te: 0.3, g: 0.02 }) === "0% sold under contract, 30% tax equity, a 2% grant; 2025 dollars, illustrative.", "the explain line names the reader's own settings");
@@ -172,13 +196,13 @@ ok(/2025 dollars/.test(M.steps(P, L)[0]) && /2025 dollars/.test(PAGE) && /Illust
 // ---------------- text budget
 const ST = M.steps(P, L);
 ok(ST.length === 6, "six step cards");
-ST.forEach((t, i) => { const n = nWords(t); ok(n >= 14 && n <= 40, "step " + (i + 1) + ": " + n + " words"); ok(nSent(t) <= 2, "step " + (i + 1) + ": " + nSent(t) + " sentences"); });
-const lines = [M.costSaw(P), M.LAYER_SAW, M.loanSaw(P, L), M.contractSaw(P, L, X), M.stackSaw(P, L, 0.5, 0.3, 0.02), M.badLine(P, L, 1, X), M.badLine(P, L, 0, X), M.loanVerdict(P, L, 126), M.contractLine(P, L, 0.5, X)]
+ST.forEach((t, i) => { const n = nWords(t); ok(n >= 14 && n <= 36, "step " + (i + 1) + ": " + n + " words"); ok(nSent(t) <= 2, "step " + (i + 1) + ": " + nSent(t) + " sentences"); });
+const lines = [M.costSaw(P), M.LAYER_SAW, M.loanSaw(P, L), M.contractSaw(P, L, X), M.stackSaw(P, L, 0.5, 0.3, 0.02), M.badLine(P, L, 1, X), M.badLine(P, L, 0, X), M.loanVerdict(P, L, 126), M.contractLine(P, L, 0.5, X), M.ruleLine(L)]
   .concat([X.contract.note, X.bad.note, X.taxEquity.note, X.grant.note, L.dscrNote, L.rateNote, L.termNote], Object.values(M.Q1.feedback), Object.values(X.risks.feedback), [].concat.apply([], X.layers.map(l => [l.who, l.gets, l.paid])));
-lines.forEach(t => { ok(nWords(t) <= 40, "a reveal of " + nWords(t) + " words: " + plain(t).slice(0, 60)); ok(nSent(t) <= 3, "a reveal of " + nSent(t) + " sentences: " + plain(t).slice(0, 60)); });
+lines.forEach(t => { ok(nWords(t) <= 36, "a reveal of " + nWords(t) + " words: " + plain(t).slice(0, 60)); ok(nSent(t) <= 2, "a reveal of " + nSent(t) + " sentences: " + plain(t).slice(0, 60)); });
 const PROSE = OWN.replace(/^---[\s\S]*?\n---\n/, " ").replace(/<script[\s\S]*?<\/script>/g, " ").replace(/<style[\s\S]*?<\/style>/g, " ").replace(/<!--[\s\S]*?-->/g, " ");
 PROSE.split(/<\/?(?:p|li|dd|dt|td|th|summary|br|caption|h3|h4)\b[^>]*>/).map(plain).filter(x => /[A-Za-z]/.test(x) && !/^[:{]/.test(x)).forEach(x => {
-  const n = nWords(x); ok(n <= 42, "text element of " + n + " words: " + x.slice(0, 70)); ok(nSent(x) <= 3, "text element of " + nSent(x) + " sentences: " + x.slice(0, 70)); });
+  const n = nWords(x); ok(n <= 40, "text element of " + n + " words: " + x.slice(0, 70)); ok(nSent(x) <= 3, "text element of " + nSent(x) + " sentences: " + x.slice(0, 70)); });
 
 // ---------------- controls
 ok(/aria-live/.test(JS) && (JS.match(/LX\.demo\(/g) || []).length === 1 && (JS.match(/demo\[\d\] = function/g) || []).length === 6, "live regions; a demo hook with an action for each of the six steps");

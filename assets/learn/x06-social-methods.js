@@ -2,7 +2,7 @@
 // side line, D1, no model). Method-neutral: six methods, each answering a
 // different kind of question; none ranked above another.
 //
-// Data: data/x06-social-methods.json (the six methods with what each asks, its data, what it gives a modeller, what it
+// Data: data/x06-social-methods.json (the six methods with what each asks, its data, what it gives a modeler, what it
 // cannot tell and whether people take part; six questions to match; the predicts; facts, stop box and sources, dated)
 // and data/path.json (lesson links that appear once a lesson is live). Prairie City and its council are fictional.
 //
@@ -15,11 +15,11 @@
   // ---------------------------------------------------------------- pure (no DOM; exported for Node)
   function method(D, id) { return D.methods.filter(function (m) { return m.id === id; })[0]; }
   var STEPS = [
-    "Prairie City's council (fictional) is weighing a heat-pump programme: its energy model gives costs, peaks and emissions, but the council also asks about people. Which question can the model answer by itself?",
+    "Prairie City's council (fictional) is weighing a heat-pump program: its energy model gives costs, peaks and emissions, but the council also asks about people. Which question can the model answer by itself?",
     "Six of the council's questions, six methods, each with a short definition on its box. Match each question to the method that fits it best; several could help.",
-    "Each method gives a modeller something and leaves something out. Tap at least three methods to see what each can and cannot tell a model.",
+    "Each method gives a modeler something and leaves something out. Tap at least three methods to see what each can and cannot tell a model.",
     "Some methods study people directly. Mark the ones in which people take part; before such a study, the institution's [[ethics-board|ethics board]] decides what review and [[informed-consent|informed consent]] it needs.",
-    "One more trap, where social science meets statistics: a survey finds that homes in the heat-pump programme use less energy than homes outside it. Does that show the programme cut their use?"
+    "One more trap, where social science meets statistics: a survey finds that homes in the heat-pump program use less energy than homes outside it. Does that show the program cut their use?"
   ];
   var PICK_MIN = 3;
   function pickCount(n) { return n >= PICK_MIN ? "Methods opened: " + n + " of 6." : "Methods opened: " + n + " of at least " + PICK_MIN + "."; }
@@ -29,7 +29,7 @@
   function methodHTML(D, id) {
     var m = method(D, id);
     return "<b>" + (m.term ? "<span class=\"lx-term\" data-term=\"" + m.term + "\">" + esc(m.label) + "</span>" : esc(m.label)) + "</b><dl class=\"x6-dl\"><dt>Gives a model</dt><dd>" + esc(m.gives) + "</dd><dt>Cannot tell</dt><dd>" + esc(m.cannot) + "</dd></dl>" +
-      "<details class=\"x6-more\"><summary>More: what it asks and the data it needs</summary><dl class=\"x6-dl\"><dt>Asks</dt><dd>" + esc(m.asks) + "</dd><dt>Data</dt><dd>" + esc(m.data) + "</dd></dl></details>";
+      "<details class=\"x6-more\"><summary>More: what it asks, the data it needs</summary><dl class=\"x6-dl\"><dt>Asks</dt><dd>" + esc(m.asks) + "</dd><dt>Data</dt><dd>" + esc(m.data) + "</dd></dl></details>";
   }
   // the sort's bins carry a short definition each, so the methods are explained where they are tested
   function bins(D) { return D.methods.map(function (m) { return { id: m.id, label: m.short, sub: m.def, color: m.color }; }); }
@@ -37,7 +37,7 @@
   // every pairing with its reason, shown after a full check, right or wrong (a perfect match included)
   function reasonsHTML(D) { return "<ul>" + D.questions.map(function (q) { return "<li><b>" + esc(q.text) + "</b> " + esc(q.why) + "</li>"; }).join("") + "</ul>"; }
   var MATCH_SAW = "For these questions, surveys estimate shares, interviews explore reasons, choice experiments weigh trade-offs, ethnography follows daily life, documents trace rules and participatory mapping finds places.";
-  var PICK_SAW = "Every method hands a modeller something different: shares, reasons, weights, routines, rules or map layers; none of them alone tells the whole story.";
+  var PICK_SAW = "Every method hands a modeler something different: shares, reasons, weights, routines, rules or map layers; none of them alone tells the whole story.";
   var PEOPLE_SAW = "Surveys, interviews, choice experiments, ethnography and participatory mapping involve people, so the ethics board decides first what review and consent apply; policy analysis can too, through interviews or personal records.";
   function peopleItems(D) {
     return D.methods.map(function (m) { return { key: m.id, label: m.label, color: m.color, ref: { people: m.people }, why: { people: D.peopleWhy[m.people] } }; });
@@ -48,27 +48,28 @@
   function staticFallback(D) {
     // a prediction without JavaScript: the question, then every option with its feedback
     var qa = function (q, Q) { return "<details class=\"x6-qa\"><summary>" + esc(q) + "</summary><ul>" + Q.options.map(function (o) { return "<li><b>" + esc(o.label) + ".</b> " + esc(Q.feedback[o.value]) + "</li>"; }).join("") + "</ul></details>"; };
-    return qa("Prairie City's council (fictional) weighs a heat-pump programme. Which of its questions can the energy model answer by itself?", D.predict) +
-      "<p class=\"lx-eyebrow\">Six methods, what each asks, the data it needs and what it can tell a modeller</p>" +
+    return qa("Prairie City's council (fictional) weighs a heat-pump program. Which of its questions can the energy model answer by itself?", D.predict) +
+      "<p class=\"lx-eyebrow\">Six methods, what each asks, the data it needs and what it can tell a modeler</p>" +
       "<div class=\"lx-scroll-x\"><table class=\"lx-mini-table x6-fbt\"><thead><tr><th scope=\"col\">Method</th><th scope=\"col\">Asks</th><th scope=\"col\">Data</th><th scope=\"col\">Gives a model</th><th scope=\"col\">Cannot tell</th></tr></thead><tbody>" +
       D.methods.map(function (m) { return "<tr><td>" + esc(m.label) + "</td><td>" + esc(m.asks) + "</td><td>" + esc(m.data) + "</td><td>" + esc(m.gives) + "</td><td>" + esc(m.cannot) + "</td></tr>"; }).join("") + "</tbody></table></div>" +
-      "<p class=\"lx-eyebrow\">Six questions and the method that fits each best</p><ul>" + D.questions.map(function (q) { return "<li>" + esc(q.text) + " " + esc(method(D, q.bin).label) + ".</li>"; }).join("") + "</ul>" +
+      "<p class=\"lx-eyebrow\">Six questions and the method that fits each best, with the reason</p><ul>" + D.questions.map(function (q) { return "<li>" + esc(q.text) + "<br>" + esc(q.why) + "</li>"; }).join("") + "</ul>" +
+      "<p class=\"lx-eyebrow\">Which methods involve people as participants</p><ul>" + D.methods.map(function (m) { return "<li><b>" + esc(m.label) + ".</b> " + esc(D.peopleWhy[m.people]) + "</li>"; }).join("") + "</ul>" +
       qa(STEPS[4].replace(/^One more trap, where social science meets statistics: a/, "A"), D.selection) +
       "<p class=\"lx-hint\">With JavaScript on, you match the questions to methods, open each method, mark which involve people and test one survey result.</p>";
   }
   function ideasHTML() {
     return "<dl class=\"lx-ideas\">" +
       "<dt>Different questions</dt><dd>Each method answers its own kind of question: how many, why, which trade-off, how people live, how rules came about, which places matter.</dd>" +
-      "<dt>For a modeller</dt><dd>Findings become inputs, household groups, behaviour rules, constraints, map layers or scenarios.</dd>" +
-      "<dt>Ethics board first</dt><dd>Before research with people, or with identifiable records about them, ask the institution's ethics board what review and consent apply; exemptions and waivers follow its process.</dd>" +
-      "<dt>Not causal by itself</dt><dd>A difference between joiners and others does not, by itself, establish the programme's effect; a fair comparison is a design choice of its own.</dd>" +
+      "<dt>For a modeler</dt><dd>Findings become inputs, household groups, behavior rules, constraints, map layers or scenarios.</dd>" +
+      "<dt>Ethics board first</dt><dd>Before research with people, or with identifiable records about them, ask the institution's ethics board what review and consent apply; it also decides whether any requirement can be relaxed.</dd>" +
+      "<dt>Not causal by itself</dt><dd>A difference between joiners and others does not, by itself, establish the program's effect; a fair comparison is a design choice of its own.</dd>" +
       "<dt>Neutral</dt><dd>No method is ranked above another here: each is the right tool for some questions and the wrong one for others.</dd></dl>";
   }
   function checkHTML() {
     return "<div class=\"lx-myths\" data-quiz=\"x06-myth\">" +
       "<div class=\"lx-qq\" data-id=\"volunteers\" data-answer=\"myth\"><p class=\"lx-qtext\">Myth or fact? “An online poll of 50 volunteers shows what share of a city's households struggle with their energy bills.”</p><ul class=\"lx-choices\"><li data-value=\"myth\">Myth</li><li data-value=\"fact\">Fact</li></ul><details class=\"lx-answer\"><summary>Answer</summary><p>Myth. Volunteers choose themselves; a share for the whole city needs a sample drawn to represent it, as large surveys such as EIA's do.</p></details></div>" +
       "</div><div class=\"lx-quiz\" data-quiz=\"x06\">" +
-      "<div class=\"lx-qq\" data-id=\"count\" data-answer=\"a\"><p class=\"lx-qtext\">A modeller needs to know how many of a city's homes have a heat pump today, by income group. Which method fits best?</p><ul class=\"lx-choices\"><li data-value=\"a\">A survey of a representative sample</li><li data-value=\"b\">Ethnography in a few homes</li><li data-value=\"c\">Interviews with installers</li></ul><details class=\"lx-answer\"><summary>Answer</summary><p>A survey: a count by group across a population is what surveys do; ethnography and interviews explain how and why, in depth.</p></details></div>" +
+      "<div class=\"lx-qq\" data-id=\"count\" data-answer=\"a\"><p class=\"lx-qtext\">A modeler needs to know how many of a city's homes have a heat pump today, by income group. Which method fits best?</p><ul class=\"lx-choices\"><li data-value=\"a\">A survey of a representative sample</li><li data-value=\"b\">Ethnography in a few homes</li><li data-value=\"c\">Interviews with installers</li></ul><details class=\"lx-answer\"><summary>Answer</summary><p>A survey: a representative sample estimates shares or numbers by group, and who responds affects how reliable they are; ethnography and interviews explain how and why.</p></details></div>" +
       "</div>";
   }
   function factsHTML(D) {
@@ -151,7 +152,7 @@
       var nx = H("div", { class: "lx-xcard" }, xhost);
       H("h3", { text: "Where this connects" }, nx);
       var ul = H("ul", { class: "x6-next" }, nx);
-      [["M14", "fair comparisons with data: did a programme work?"], ["A13", "who pays and who benefits, by household group"], ["A19", "map layers, where participatory maps can feed in"], ["R9", "consent, ethics boards and the people a study owes"], ["R3", "method families, of which these are some"]]
+      [["M14", "fair comparisons with data: did a program work?"], ["A13", "who pays and who benefits, by household group"], ["A19", "map layers, where participatory maps can feed in"], ["R9", "consent, ethics boards and the people a study owes"], ["R3", "method families, of which these are some"]]
         .forEach(function (x) { H("li", { html: LX.lessonRefHTML(P, x[0]) + ": " + LX.esc(x[1]) + "." }, ul); });
     }
     buildExplain();

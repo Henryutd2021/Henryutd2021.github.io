@@ -1,12 +1,12 @@
 {
   "about": "Side topic X4 (How are energy rules made?): how U.S. energy rules start from a law and follow separate tracks (a regulator's rules and tariffs, a rate case, a permit), with one finished federal rulemaking (FERC Order No. 2222, issued 17 September 2020) and Kansas's commission (the KCC) as the state example. Every fact is from a dated primary source below; no live proceeding is described. Prairie Town's utility and its project are fictional and illustrative.",
   "accessed": "2026-11-07",
-  "project": "Prairie Town's utility (fictional), in Kansas, wants a wind farm and a new 345 kV line (kV, kilovolts: the line's voltage) about 40 miles long, and to recover their cost in its rates.",
+  "project": "Prairie Town's investor-owned utility (fictional), in Kansas, wants a wind farm and a new 345 kV line (kV, kilovolts: the line's voltage) about 40 miles long, and to recover their cost in its rates.",
   "chain": {
     "root": { "icon": "scale", "title": "Law", "text": "Congress or a state legislature gives a regulator its authority.", "src": ["ferc-primer", "kcc-role"] },
     "tracks": [
-      { "icon": "blueprint", "title": "Market rules and tariffs", "text": "FERC writes rules for wholesale markets and transmission; an RTO or a utility files its tariff at FERC.", "src": ["ferc-2222", "ferc-primer"] },
-      { "icon": "coin", "title": "Retail rates", "text": "The state commission, in Kansas the KCC, decides each utility's rate case.", "src": ["kcc-rates"] },
+      { "icon": "blueprint", "title": "Market rules and tariffs", "text": "[[ferc|FERC]] writes rules for wholesale markets and transmission; a regional grid operator ([[rto|RTO]]) or a utility files its tariff, its service rules and prices, at FERC.", "src": ["ferc-2222", "ferc-primer"] },
+      { "icon": "coin", "title": "Retail rates", "text": "The state commission decides rate cases: in Kansas the KCC, for investor-owned utilities but not most electric cooperatives or city-run utilities.", "src": ["kcc-rates", "kcc-role"] },
       { "icon": "map", "title": "Project permits", "text": "A county, the state or a federal agency, depending on what is built and where.", "src": ["doe-wind-guide", "ks-siting"] }
     ],
     "note": "These approvals follow separate tracks and can overlap: one project may need a tariff change, a rate decision and permits at the same time."
@@ -47,18 +47,19 @@
     { "id": "local", "label": "Local", "sub": "a county or city", "color": "var(--lx-good)" }
   ],
   "cards": [
-    { "id": "market", "text": "Rules letting small resources join SPP's wholesale markets as a group", "bin": "federal", "why": "Federal: FERC's Order No. 2222 sets them, and SPP files its tariff with FERC.", "src": "ferc-2222" },
+    { "id": "market", "text": "Rules letting small resources join the wholesale markets of the Southwest Power Pool (SPP) as a group", "bin": "federal", "why": "Federal: FERC's Order No. 2222 sets them, and SPP files its market tariff with FERC.", "src": "ferc-2222" },
     { "id": "home", "text": "The price per kWh a Prairie Town home pays its investor-owned utility", "bin": "state", "why": "State: the KCC sets and regulates the rates of the utilities it oversees.", "src": "kcc-role" },
     { "id": "line", "text": "A siting permit for the new 345 kV line, about 40 miles long", "bin": "state", "why": "State: in Kansas a line of 230 kV or more and at least 5 miles long needs the KCC's siting permit.", "src": "ks-siting" },
     { "id": "zoning", "text": "Approval of where the wind farm's turbines may stand", "bin": "local", "why": "Local, in most places: the county, sometimes with state regulators; a few states decide alone.", "src": "doe-wind-guide" },
     { "id": "faa", "text": "A check that the tall turbines are safe for aircraft", "bin": "federal", "why": "Federal: the Federal Aviation Administration reviews tall structures for airspace obstruction.", "src": "doe-wind-guide" },
-    { "id": "nerc", "text": "Mandatory reliability standards for the bulk power grid", "bin": "federal", "why": "Federal: FERC certified NERC in 2006 to write them, and they are mandatory and enforceable.", "src": "ferc-primer" },
+    { "id": "nerc", "text": "Mandatory reliability standards for the bulk power grid", "bin": "federal", "why": "Federal: FERC certified the North American Electric Reliability Corporation (NERC) in 2006 to write them; they are mandatory and enforceable.", "src": "ferc-primer" },
     { "id": "rooftop", "text": "A permit to put solar panels on a Prairie Town roof", "bin": "local", "why": "Local: the city or county permit office issues it.", "src": "doe-solarapp" }
   ],
   "voice": {
     "q": "Which can any member of the public do",
     "options": [{ "value": "kcc", "label": "Comment on a KCC rate case" }, { "value": "ferc", "label": "Comment on a FERC proposed rule" }, { "value": "both", "label": "Both" }, { "value": "vote", "label": "Vote on the commission's final order" }],
     "answer": "both",
+    "static": "The first two: anyone may comment on a KCC rate case, and on a FERC proposed rule during its comment period; only commissioners vote on a final order.",
     "feedback": {
       "kcc": "Yes, and more: the public can also comment on a FERC proposed rule.",
       "ferc": "Yes, and more: KCC rate cases take public comments too.",
@@ -99,9 +100,9 @@
     "ferc-2222": { "cite": "FERC, Order No. 2222, Participation of Distributed Energy Resource Aggregations in Markets Operated by Regional Transmission Organizations and Independent System Operators, Docket RM18-9-000, final rule", "url": "https://www.ferc.gov/sites/default/files/2020-09/E-1_0.pdf", "asOf": "issued 17 September 2020, read 7 November 2026",
       "used": ["Effective 60 days after publication in the Federal Register; tariff changes due within 270 days of publication (cover page).", "The procedural history from which the six milestones are selected, with the comment counts (pp. 10-12)."] },
     "kcc-role": { "cite": "Kansas Corporation Commission, The Commission's Role", "url": "https://www.kcc.ks.gov/about-us/the-commissions-s-role", "asOf": "undated, read 7 November 2026",
-      "used": ["Authority from K.S.A. 74-601 to 74-631; the present commission established by the Legislature in 1933.", "Three members appointed by the Governor to overlapping four-year terms, no more than two of the same party.", "The Utilities Division establishes and regulates rates; most electric cooperatives and municipalities are not regulated by the KCC."] },
+      "used": ["Authority from K.S.A. 74-601 to 74-631; the present commission established by the Legislature in 1933.", "Three members appointed by the Governor to overlapping four-year terms, no more than two of the same party.", "The Utilities Division establishes and regulates rates for public utilities; the KCC does not regulate most electric cooperatives or municipalities."] },
     "kcc-rates": { "cite": "Kansas Corporation Commission, How rates are set", "url": "https://www.kcc.ks.gov/electric/how-rates-are-set", "asOf": "undated, read 7 November 2026",
-      "used": ["Two steps: the revenue requirement (approved expenses, including depreciation and income taxes, plus a return on the rate base), then rate design.", "The utility files an application; in most cases 240 days from the filing date for the KCC's decision, a written order; the limit is waivable.", "Staff review and a non-binding recommendation; the Citizens Utility Ratepayer Board (CURB) and other intervenors; expert testimony.", "A public hearing, generally held in significant cases; an evidentiary hearing; the commission may accept, reject or modify a settlement."] },
+      "used": ["Two steps: the revenue requirement (approved expenses, including depreciation and income taxes, plus a return on the rate base), then rate design.", "Plant enters the rate base once in service and shown to benefit consumers; the utility has an opportunity, not a guarantee, to earn the return.", "The utility files an application; in most cases 240 days from the filing date for the KCC's decision, a written order; the limit is waivable.", "Staff review and a non-binding recommendation; the Citizens Utility Ratepayer Board (CURB) and other intervenors; expert testimony.", "A public hearing, generally held in significant cases; an evidentiary hearing; the commission may accept, reject or modify a settlement."] },
     "kcc-faq": { "cite": "Kansas Corporation Commission, Electric FAQs", "url": "https://www.kcc.ks.gov/electric/electric-faqs", "asOf": "undated, read 7 November 2026",
       "used": ["Public comments received during the comment period are entered into the official case record; comment online, by mail or by phone, citing the docket number."] },
     "ks-siting": { "cite": "Kansas Statutes, K.S.A. 66-1,177 and K.S.A. 66-1,178, as amended by House Bill 2040 (Kansas Register, 17 April 2025); cited by name, without a link", "url": null, "asOf": "read 7 November 2026",

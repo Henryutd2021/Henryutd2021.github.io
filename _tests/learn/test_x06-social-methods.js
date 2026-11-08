@@ -78,13 +78,26 @@ Object.keys(SRC).forEach(k => { ok(SRC[k].cite && SRC[k].used.length >= 1 && nWo
 { const B = M.bins(D); ok(B.length === 6 && B.every(b => b.label && b.sub && nWords(b.sub) <= 8), "every box of the sort carries a short definition of its method, so nothing is tested before it is explained"); }
 ok(/if \(g\.placed < g\.total\) \{ api\.saw\(matchLine\(g\), true\); return; \} act\.appendChild\(why\)/.test(JS), "the match counts only with every question placed, then shows every pairing's reason");
 { const r = M.reasonsHTML(D); ok(D.questions.every(q => r.indexOf(q.why) > 0), "every pairing's reason is shown after a full check, right or wrong"); }
-ok(!/needs informed consent and an ethics board's review/.test(RAW + JS + PAGE) && /exemption or a waiver is its decision/.test(D.peopleWhy.yes) && /identifiable personal records/.test(D.peopleWhy.partly) && /ethics board decides/.test(M.PEOPLE_SAW) && /exemptions and waivers follow its process/.test(M.ideasHTML(D)), "ethics: the board decides what review and consent apply, exemptions included; records count too");
-ok(/ethics board\]\] decides what review/.test(M.STEPS[3]) && /decides what review and consent apply/.test(D.stop.includes[1]) && /including any exemption or waiver/.test(PAGE), "the step, the stop box and the Go deeper say the same");
-ok(/^For these questions/.test(M.MATCH_SAW) && !/needs a survey|need interviews/.test(M.MATCH_SAW) && /^Documents alone do not show/.test(M.method(D, "policy").cannot), "method boundaries stated for these questions, not as rules");
+ok(!/needs informed consent and an ethics board's review/.test(RAW + JS + PAGE) && /decides whether any requirement can be relaxed/.test(D.peopleWhy.yes) && /identifiable personal records/.test(D.peopleWhy.partly) && /ethics board decides/.test(M.PEOPLE_SAW) && /decides whether any requirement can be relaxed/.test(M.ideasHTML(D)), "ethics: the board decides what review and consent apply, and whether any requirement can be relaxed; records count too");
+{ const cut = x => x.replace(/exemption determinations/g, "").replace(/including who decides on review and on exemptions/g, "");   // the DOE order's own subjects, in the reading ladder and its source
+  ok(!/\bexemptions?\b|\bwaivers?\b/i.test(cut(PAGE) + cut(RAW) + JS), "no unexplained 'exemption' or 'waiver' in the lesson's own text: plain words for what the board may relax"); }
+ok(/ethics board\]\] decides what review/.test(M.STEPS[3]) && /decides what review and consent apply/.test(D.stop.includes[1]) && /and whether any requirement can be relaxed, before data are collected/.test(PAGE), "the step, the stop box and the Go deeper say the same");
+ok(/^For these questions/.test(M.MATCH_SAW) && !/needs a survey|need interviews/.test(M.MATCH_SAW) && /^Everyday experience the records miss, especially of people who left no record/.test(M.method(D, "policy").cannot) && !/Documents alone do not show/.test(RAW), "method boundaries stated for these questions, not as rules; documents can record experiences, so the limit is records that miss people");
+// one story: every question is about the council's heat-pump program, as the subtitle promises
+D.questions.forEach(q => ok(/heat[- ]pump|program/.test(q.text), q.id + ": the question is about the heat-pump program (" + q.text.slice(0, 50) + ")"));
+ok(!/rooftop solar|solar farm|thermostat|efficiency upgrade/.test(D.questions.map(q => q.text).join(" ")), "no question drifts to another program");
+// surveys estimate; who responds matters
+ok(/estimates shares or numbers by group, and who responds affects how reliable they are/.test(M.checkHTML(D)) && !/a count by group across a population is what surveys do/.test(JS) && /estimates shares by group; who responds affects/.test(D.questions[0].why) && /^Estimated shares/.test(M.method(D, "survey").gives), "a survey estimates shares from those who respond; it does not count them");
+ok(!/adoption scenarios/.test(RAW) && /how many take up an offer/.test(M.method(D, "choice").gives), "plain words for adoption scenarios");
+ok(!/behaviour|programme|modeller/.test(RAW + JS), "American spelling in the page's own text: behavior, program, modeler");
 { const fb = M.staticFallback(D); ok(/<th scope="col">Data<\/th>/.test(fb) && D.methods.every(m => fb.indexOf(m.data.replace(/'/g, "'")) > 0), "the no-JS table has each method's data");
-  ok([D.predict, D.selection].every(Q => Q.options.every(o => fb.indexOf(Q.feedback[o.value]) > 0)) && /homes in the heat-pump programme use less energy/.test(fb), "the no-JS block has both predictions, every option with its feedback"); }
+  ok([D.predict, D.selection].every(Q => Q.options.every(o => fb.indexOf(Q.feedback[o.value]) > 0)) && /homes in the heat-pump program use less energy/.test(fb), "the no-JS block has both predictions, every option with its feedback");
+  ok(D.questions.every(q => fb.indexOf(q.text + "<br>" + q.why.replace(/'/g, "'")) > 0), "the no-JS block gives every pairing with its reason");
+  ok(/Which methods involve people as participants/.test(fb) && D.methods.every(m => fb.indexOf("<b>" + m.label + ".</b> " + D.peopleWhy[m.people]) > 0) && /once officials are interviewed, or identifiable personal records are used/.test(fb), "the no-JS block says which methods involve people, and when document analysis needs the ethics board too"); }
 ok(!/dockets and filings|siting screen/.test(RAW) && /difficulty paying energy bills, or a home kept at an unsafe temperature/.test(D.facts[0].what), "plain words for case records and map layers; energy insecurity defined where the 27% is");
-ok(/does not, by itself, establish the programme's effect/.test(M.ideasHTML(D)), "the static causal line: not by itself");
+ok(/does not, by itself, establish the program's effect/.test(M.ideasHTML(D)), "the static causal line: not by itself");
+// the whole first view of a method's card, labels and the "More" summary included
+D.methods.forEach(m => { const h = M.methodHTML(D, m.id), vis = h.replace(/<details[\s\S]*?<summary>([\s\S]*?)<\/summary>[\s\S]*<\/details>/, "$1"); ok(nWords(vis) <= 40, m.id + ": the card's first view is " + nWords(vis) + " words, labels included"); });
 D.methods.forEach(m => { const P = M.methodParts(D, m.id); ok(nWords(P.shown.join(" ")) <= 40, m.id + ": the card shows " + nWords(P.shown.join(" ")) + " words at first"); ok(nWords(P.more.join(" ")) <= 40, m.id + ": 'More' holds " + nWords(P.more.join(" ")) + " words"); });
 
 // ---------------- the stop box, neutrality, scope and links
@@ -102,10 +115,10 @@ ok(/\(fictional\)/.test(M.STEPS[0]) && /fictional/.test(PAGE), "Prairie City's c
 
 // ---------------- text budget
 ok(M.STEPS.length === 5, "five step cards");
-M.STEPS.forEach((t, i) => { const n = nWords(t); ok(n >= 14 && n <= 40, "step " + (i + 1) + ": " + n + " words"); ok(nSent(t) <= 2, "step " + (i + 1) + ": " + nSent(t) + " sentences"); });
+M.STEPS.forEach((t, i) => { const n = nWords(t); ok(n >= 14 && n <= 36, "step " + (i + 1) + ": " + n + " words"); ok(nSent(t) <= 2, "step " + (i + 1) + ": " + nSent(t) + " sentences"); });
 const lines = [M.MATCH_SAW, M.PICK_SAW, M.PEOPLE_SAW, M.matchLine({ right: 4, placed: 6, total: 6 })].concat(Object.values(D.predict.feedback), Object.values(D.selection.feedback), D.questions.map(q => q.why), D.questions.map(q => q.text),
   [].concat.apply([], D.methods.map(m => [m.asks, m.data, m.gives, m.cannot])), Object.values(D.peopleWhy));
-lines.forEach(t => { ok(nWords(t) <= 40, "a reveal of " + nWords(t) + " words: " + plain(t).slice(0, 60)); ok(nSent(t) <= 2, "a reveal of " + nSent(t) + " sentences: " + plain(t).slice(0, 60)); });
+lines.forEach(t => { ok(nWords(t) <= 36, "a reveal of " + nWords(t) + " words: " + plain(t).slice(0, 60)); ok(nSent(t) <= 2, "a reveal of " + nSent(t) + " sentences: " + plain(t).slice(0, 60)); });
 const PROSE = OWN.replace(/^---[\s\S]*?\n---\n/, " ").replace(/<script[\s\S]*?<\/script>/g, " ").replace(/<style[\s\S]*?<\/style>/g, " ").replace(/<!--[\s\S]*?-->/g, " ");
 PROSE.split(/<\/?(?:p|li|dd|dt|td|th|summary|br|caption|h3|h4)\b[^>]*>/).map(plain).filter(x => /[A-Za-z]/.test(x) && !/^[:{]/.test(x)).forEach(x => {
   const n = nWords(x); ok(n <= 42, "text element of " + n + " words: " + x.slice(0, 70)); ok(nSent(x) <= 3, "text element of " + nSent(x) + " sentences: " + x.slice(0, 70)); });
