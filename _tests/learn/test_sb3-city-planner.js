@@ -39,7 +39,7 @@ function rowsOf(E3, R, tag) {
   ok(r0.ok && r1.ok, "2025 as it is and the electrify preset run optimal");
   const pre = { head: "Result: 2025 as it is, then \"Electrify heat and cars\" (80% of furnaces and resistance heat to heat pumps, half the cars electric)",
     rows: rowsOf(E3, r0.results, "2025 as it is").concat(rowsOf(E3, r1.results, "Electrify heat and cars")),
-    note: "Precomputed with HiGHS on " + RUN_DATE + ": the hub as a linear program over eight representative days. Prairie City is fictional; its numbers are illustrative. With JavaScript on, the bench runs your own plan." };
+    note: "Precomputed with HiGHS on " + RUN_DATE + ": the hub as a linear program over eight representative days. " + PG.UNITS + " Prairie City is fictional; its numbers are illustrative. With JavaScript on, the bench runs your own plan." };
   const withPre = Object.assign({}, P, { cfg: Object.assign({}, cfg, { precomputed: Object.assign({}, cfg.precomputed, { sb3: pre }) }) });
   const FY = JSON.parse(fs.readFileSync(L("data/e3-full-year.json"), "utf8")), FYc = city.fullYear, fel = E3.fullById(FY, "sb3", "electrify");
   const fullHTML = () => E3.tableHTML(["Full-year check of \"Electrify heat and cars\"", "Eight days", "Full year", "Gap"], E3.fullRows(fel, P), "e3-fullt", [null, "n", "n", "n"]) +
@@ -84,7 +84,15 @@ function rowsOf(E3, R, tag) {
   ok(/data-term="substation"/.test(PAGE) && /data-term="electric-vehicle">electric cars \(EVs\)/.test(PAGE) && /linear program \(LP\)/.test(PAGE) && /data-term="energy-burden"/.test(PAGE) && /area median income \(AMI\)/.test(PAGE) && /\[\[linearized-feeder-limit\|/.test(JS), "terms glossed or expanded at first use");
   ok(/U\.keys\(c1, \[\["Read the lines"/.test(JS) && /\["The value"/.test(JS) && /\["Its assumptions"/.test(JS), "the chart and dual explanations split into labelled lines");
   ok(/energycodes|bto-cchp-tech-challenge-spec-102521\.pdf/.test(PAGE), "the DOE specification is in the sources, dated");
-  has("paid yearly at 4% real over each item's life"); ok(cfg.finance.rate === 0.04, "4% real");
+  has("paid yearly at 4% a year after inflation (a real rate) over each item's life"); ok(cfg.finance.rate === 0.04, "4% real");
+  has("the heat pump's 15-year life set for teaching"); ok(cfg.heatPump.life === 15 && cfg.heatPump.lifeSet === "teaching", "the heat pump's life: set for teaching");
+  has("the Southwest Power Pool's (SPP's) 2025 days"); { const sp = "Southwest Power Pool's (", B = X.norm(PAGE.split("<!-- learn:meta:end -->")[1]); ok(B.indexOf("SPP") === B.indexOf(sp + "SPP's)") + sp.length, "SPP spelled out at its first use in the page's text"); }
+  // the presets said beside their buttons, and what they leave alone; units of the results
+  ok(!/title: pr\.note/.test(JS) && /e3-pre-say/.test(JS) && /What each preset sets/.test(JS) && E3.presets.every(p => PG.presetSay(p).indexOf(p.label) >= 0 && PG.presetSay(p).indexOf(p.note.slice(1)) >= 0) &&
+    /cost settings and household rules stay as you set them/.test(PG.KEEP) && PG.presetSay(null) === PG.KEEP, "each preset's description is shown on the page, not only in a tooltip, with what a preset leaves alone");
+  { const st = Object.assign({}, def, { upc: 1500, rc: 5000, save: 30, rule: "low" }), p2 = E3.withPreset(st, E3.presets[3]); ok(["upc", "rc", "save", "rule"].every(k => p2[k] === st[k]), "a preset keeps the cost settings and household rules, as the page says"); }
+  ok(/\$M: millions of 2025 dollars; t: metric tonnes of CO₂\./.test(PG.UNITS) && /P\.line \+ " " \+ UNITS/.test(JS) && T.indexOf(PG.UNITS) >= 0, "$M and t explained above the results and in the no-JS table");
+  ok(/each MW of power stores 4 MWh, four hours at full power/.test(JS) && /MWh of heat/.test(BLOCKS["sb3-bench"]()), "the battery's four hours and the heat store's MWh of heat, beside the controls");
   has("eGRID's 2023 SPP North CO₂ rate"); ok(city.emissions.gridLbPerMWh.year === 2023, "eGRID 2023");
 
   // ---------------- the run's words, for every preset and rule

@@ -49,7 +49,12 @@ const RUN_DATE = "6 November 2026";
   // its district-heat billing against the browser's
   const MY = { hp: 70, ret: 40, dh: 30, dhp: 100, sto: 800, ev: 60, evm: "managed", pv: 100, bat: 20 }, rMy = await E3.solve(Object.assign({}, DEF, MY), P, { solver });
   ok(rMy.ok && rMy.results.hh.dhPrice > 0, "the notebook's plan runs, with district heat billed at its average cost");
-  ref.my = { plan: MY, burdenLow: +rMy.results.hh.low.burden.toFixed(5), dhPrice: +rMy.results.hh.dhPrice.toFixed(2) };
+  ref.my = { plan: MY, burdenLow: +rMy.results.hh.low.burden.toFixed(5), dhPrice: +rMy.results.hh.dhPrice.toFixed(2), cost: Math.round(rMy.results.acc.total) };
+  // the LP's choice with retrofits at $3,000 a home: it retrofits only furnace-heated buildings, so the notebook can
+  // check that its household layer saves each carrier on the retrofitted buildings' own systems
+  const c3000 = await E3.solve(Object.assign({}, DEF, PG.CHOOSE.base, { rc: 3000 }), P, { solver, size: true, cap: R.today.acc.co2Hub * PG.CHOOSE.capDef / 100, retMax: PG.CHOOSE.retMax, dhMax: PG.CHOOSE.dhMax, pvMax: PG.CHOOSE.pvMax, batMax: PG.CHOOSE.batMax });
+  ok(c3000.ok && c3000.results.raw.y.every(y => y[1].hp + y[1].res < 1e-6) && c3000.results.raw.y.some(y => y[1].fuel > 0.01), "at $3,000 a home the LP retrofits only furnace-heated buildings");
+  ref.runs.choose3000 = { burdenLow: +c3000.results.hh.low.burden.toFixed(5), burdenOther: +c3000.results.hh.other.burden.toFixed(5) };
   const pre = { table: table, ref: ref };
   const FY = JSON.parse(fs.readFileSync(L("data/e3-full-year.json"), "utf8")), FYc = city.fullYear, FE = PG.fullEntries(FY);
   const fullHTML = () => E3.tableHTML(["Full-year check: plan", "Yearly cost against 2025, no penalty on unserved energy: eight days → full year", "CO₂ gap", "Upgrades: eight days → sized on the year", "Unserved with the eight days' upgrades"],
@@ -89,7 +94,9 @@ const RUN_DATE = "6 November 2026";
     ok(Rc.acc.co2Hub <= R.today.acc.co2Hub * cap / 100 + 1, cap + "%: CO2 within the cap");
     ok(cd > 0.5 ? wc.indexOf("$" + E3.kilo(cd)) >= 0 && /binds/.test(wc) : /does not bind/.test(wc), cap + "%: the cap's words match its dual ($" + cd.toFixed(1) + ")");
     ok(cd >= lastDual - 0.5, cap + "%: the dual does not fall as the cap tightens"); lastDual = cd;
-    ok(Rc.acc.d.every(o => wc.indexOf(PG.pct0(o.share.hp)) >= 0), cap + "%: the chosen heat-pump shares as said");
+    const ro = PG.chooseReadouts(Rc), rv = k => (ro.find(r => r[0] === k) || [])[1];
+    ok(rv("Rooftop solar added") === E3.kilo(Rc.raw.sizes.pvAdd) + " MW" && rv("Batteries added") === E3.kilo(Rc.raw.sizes.batAdd) + " MW" && rv("CO₂") === E3.kilo(Rc.acc.co2Hub) + " t" && wc.split(/\s+/).length <= 35,
+      cap + "%: a short result (" + wc.split(/\s+/).length + " words); what the LP chose in the readouts and the table");
   }
   // step 7: the rule moves the household table only
   ["low", "high"].forEach(rule => {
@@ -130,7 +137,26 @@ const RUN_DATE = "6 November 2026";
   // the details, one by one
   ok(/\[d = \\text\{core\}\]\\, pl_\{kh\}/.test(PAGE) && /hp_\{kh\} \+ boil_\{kh\} \+ so_\{kh\} - si_\{kh\}/.test(PAGE) && /sym\("pl"/.test(JS) && /tag: "heat network \(core\)"/.test(JS) && cfg.dh.plant.cop === 3 && cfg.dh.loss === 0.1,
     "the balance carries the heat network's plant power, and the network has its own heat balance");
-  ["out", "in", "sig", "pl", "net"].forEach(k => ok(new RegExp("sym\\(\"" + k + "\"").test(JS) && new RegExp("(^|[\\s{,])\"?" + k + "\"?: \\{ name").test(JS), "equation card: " + k + " is a symbol with its words"));
+  ["out", "in", "sig", "pl", "net", "kap", "pind", "cop"].forEach(k => ok(new RegExp("sym\\(\"" + k + "\"").test(JS) && new RegExp("(^|[\\s{,])\"?" + k + "\"?: \\{ name").test(JS), "equation card: " + k + " is a symbol with its words"));
+  // the equation card as built: heating power by carrier (resistance 1, heat pump 1/COP, furnace and district heat 0), the
+  // plant's industrial price in the goal, the balance dual's day weight, Q as a power
+  ok(/sym\("kap", "κ<sub><var>s<\/var><\/sub>"\)/.test(JS) && !/\/ " \+ sym\("cop"/.test(JS) && /κ<sub>res<\/sub> = 1,  κ<sub>hp<\/sub> = 1 ÷ " \+ sym\("cop"/.test(JS) && /κ<sub>fuel<\/sub> = κ<sub>dh<\/sub> = 0/.test(JS),
+    "the card's balance uses carrier coefficients: resistance 1, heat pump 1 ÷ COP, furnace and district heat 0");
+  ok(/sym\("pind", "<var>p<\/var><sub>ind<\/sub>"\) \+ " − <var>p<\/var><sub>core<\/sub>\) " \+ sym\("pl"/.test(JS) && /\(p_\{ind\} - p_\{core\}\)\\, pl_\{kh\}/.test(PAGE) && P.price.ind < P.D[0].pEl,
+    "the goal prices the plant's power at the industrial price, on the card and the page (the engine's dp column cost)");
+  ok(/Its dual ÷ w_k is \$ per MWh in one such hour/.test(JS) && T.indexOf("divided by $w_k$, it is the marginal cost of one more MWh in one such hour") >= 0 && /\/ P\.w\[k\]/.test(fs.readFileSync(L("components/engine-e3.js"), "utf8")),
+    "the balance dual: divided by the day's weight, as the engine reports it");
+  ok(/A power: how far the hour's temperature is below 18\.3 °C \(°C\) times the district's heat-loss rate \(MW of heat per °C/.test(JS) && !/Degree-hours below/.test(JS), "Q is a power: temperature deficit × MW per °C");
+  ok(/\[\[coefficient-of-performance\|coefficient of performance\]\]/.test(JS) && /the Southwest Power Pool's \(SPP's\) 2025 hourly shapes/.test(T) && T.indexOf("the heat pump's coefficient of performance") >= 0, "COP and SPP spelled out at first use");
+  { const w = PG.words("electrify", R.electrify, P).split(/\s+/).length; ok(w <= 40, "step 4's feedback is short (" + w + " words)"); }
+  ok(/\{ key: "hp", name: "Heat pumps bought"/.test(JS) && /keeps 2025's heat pumps/.test(JS), "the mode table says how each mode counts the heat pumps bought");
+  // the notebook twin: gross heat pumps in a run, the LP's in sizing; retrofit savings from the retrofitted buildings' own
+  // systems, checked on the furnace-only plan; the household paragraph as a short numbered flow
+  ok(/hp_new = \(1 - x\) \* cc \* \(s0\[\\"fuel\\"\] \+ s0\[\\"res\\"\]\)/.test(NB) && /hp_new = max\(0\.0, share\[\\"hp\\"\] - D\[\\"s0\\"\]\[\\"hp\\"\]\) if size else S\[\\"d\\"\]\[i\]\[\\"hpNew\\"\]/.test(NB) && /REF\[\\"my\\"\]\[\\"cost\\"\]/.test(NB),
+    "the notebook charges the heat pumps as the engine does, and checks the own plan's cost against it");
+  ok(/mix\(o\[\\"y\\"\]\[i\]\[1\]\)/.test(NB) && /REF\[\\"runs\\"\]\[\\"choose3000\\"\]/.test(NB) && /rc=3000/.test(NB), "the notebook's retrofit savings come from the retrofitted shares, checked on the furnace-only plan");
+  ok(/1\. \*\*Measures\.\*\*/.test(NB) && /5\. \*\*Burden\.\*\*/.test(NB) && !/Nothing below changes the LP's plan\. For each measure/.test(NB) && /\| `hp` \| furnaces and resistance heaters switched to heat pumps \| % \|/.test(NB), "the notebook's household layer as five short steps; its controls as a table");
+  ok(/the heat pump's 15-year life is set for teaching/.test(NB) && /the Southwest Power Pool's \(SPP's\)/.test(NB) && /divided by `W\[k\]`/.test(NB), "the notebook: the life set for teaching, SPP spelled out, the dual's day weight");
   // step 8 reads every row with the rule chosen in step 7
   const cr = PG.compareRows(runs, "low", (Rr, rule) => E3.summarize(Object.assign({}, Rr.state, { rule }), P, Rr.raw, Rr.base));
   ok(cr.every((r, i) => r.rule === "low" && near(r.cost, runs[i].R.delta.cost) && near(r.co2, runs[i].R.acc.co2Hub)) && cr.some((r, i) => Math.abs(r.burden - runs[i].R.hh.low.burden) > 1e-5), "the comparison uses step 7's rule for every row; cost and CO2 unchanged");

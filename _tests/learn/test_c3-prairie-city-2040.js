@@ -6,16 +6,16 @@
 //   - the brief's numbers: the budget, the time split adding to 150 minutes, the Modeler version's 60 minutes
 //   - the reference plan: within the budget, its exemplar numbers equal a fresh run, its levers as the strong summary says
 //   - the stakeholder panel: every reaction true of its run and its stated rule, for every preset and the reference plan
-//   - the sensitivity: inputs moved to the ends of their ranges, the plan held fixed (re-solved where the LP depends on
-//     them); accounting-only inputs equal a re-solve; the park's gas price re-costs the run and its 2025 baseline; the
-//     joint cheaper and dearer cases equal fresh runs and bracket every one-at-a-time case
+//   - the sensitivity: inputs moved to the ends of their ranges, every case solved again (building and equipment choices
+//     fixed; dispatch and substation upgrades re-optimized, their MW and up-front cost reported); the park's gas price
+//     with its own 2025 baseline; the joint cheaper and dearer cases equal fresh runs and bracket every one-at-a-time case
 //   - the evidence pack for the summary without JavaScript: households, jobs, panel, sensitivity,
-//     sites and the contracts, from fresh runs (the c3-evidence block)
+//     sites and the city's wind and solar, from fresh runs (the c3-evidence block)
 //   - the summary: one answer field per stakeholder, the "answered" check, a sources field, the rubric's own levels, and
 //     room for the reader's words inside the two pages
 //   - the full-year check (data/e3-full-year.json, rebuilt by test_e3-full-year.js): a check for each preset and the
 //     reference plan, found by the plan link (the site's details ignored); the check's eight days are the reference
-//     plan's own run; the contract MWh higher on the year, as the words say; no full-year solve on the page
+//     plan's own run; the farms' MWh used higher on the year, as the words say; no full-year solve on the page
 //   - 2025's baseline carries no site's costs (only a plan with a solar farm pays for its site)
 //   - the hooks: A19's siting (no site changes a number until the map is wired) and A13's jobs (no number shown)
 //   - siting scope (solar, wind, transmission corridors and data centers only): the only siting on the page is a solar
@@ -52,7 +52,7 @@ const RUN_DATE = "6 November 2026";
     [tag + ": the city's yearly cost against 2025", PG.smil(R.delta.cityCost)], [tag + ": the city's CO₂ (location-based, operating)", E3.kilo(R.acc.city.co2) + " t a year"],
     [tag + ": busiest hour against the limit, core · suburbs · fringe", R.dist.map(d => E3.kilo(d.peak) + "/" + E3.kilo(d.limit)).join(" · ") + " MW"],
     [tag + ": energy burden, homes below 80% of area median income (screening)", PG.pct1(R.hh.low.burden)]];
-  const pre = { head: "Result: 2025 as it is, then the reference plan of the exemplars (70% heat pumps, 40% electric cars, 200 MW of wind, a 100 MW solar farm at A19's site " + ref.site + ")",
+  const pre = { head: "Result: 2025 as it is, then the reference plan of the exemplars (70% heat pumps, 40% electric cars, 200 MW of city-owned wind, a 100 MW solar farm at A19's site " + ref.site + ")",
     rows: rows(r0.results, "2025").concat(rows(R1, "Reference plan")),
     note: "Precomputed with HiGHS on " + RUN_DATE + ". Prairie City is fictional; its numbers are illustrative. With JavaScript on, you run your own plan." };
   const worst = R1.dist.slice().sort((a, b) => b.peak / b.limit - a.peak / a.limit)[0].label.toLowerCase();
@@ -81,12 +81,12 @@ const RUN_DATE = "6 November 2026";
     "<p class=\"lx-hint\"><b>Jobs (screening, lesson A13's coefficients):</b> " + E3.kilo(jb.jobYears) + " construction job-years, 2026 to 2040 (gross), " + E3.kilo(jb.jobYearsNet) + " net of displacement; ongoing at the farms " + E3.kilo(jb.permDirect) + " direct, " + E3.kilo(jb.permGross) + " gross supported, " + E3.kilo(jb.permNet) + " net of displacement.</p>",
     "<p class=\"lx-hint\"><b>The panel:</b></p>",
     tb(["Stakeholder", "Reaction", "Why", "Their rule"], pn1.map((q, i) => [q.name, { yes: "Yes", part: "Partly", no: "No" }[q.cell.v], q.cell.t, PG.PANEL[i].rule])),
-    "<p class=\"lx-hint\"><b>Sensitivity</b> (the plan held fixed):</p>",
-    tb(["Input", "Range tested", "Yearly cost against 2025", "What kind of number"], sens1.rows.map(r => [r.label, r.loText + " to " + r.hiText, PG.mil(r.atLo) + " to " + PG.mil(r.atHi), r.kind]).concat([["All together", "every cheaper end, then every dearer end", PG.mil(sens1.joint.cheap) + " to " + PG.mil(sens1.joint.dear), "a joint test"]])),
+    "<p class=\"lx-hint\"><b>Sensitivity</b> (each case solved again: " + PG.SENS_HOW + "):</p>",
+    tb(["Input", "Range tested", "Yearly cost against 2025", "Substation upgrades: MW, up front", "What kind of number"], sens1.rows.map(r => [r.label, r.loText + " to " + r.hiText, PG.mil(r.atLo) + " to " + PG.mil(r.atHi), PG.upText(r.upLo, r.upHi), r.kind]).concat([["All together", "every cheaper end, then every dearer end", PG.mil(sens1.joint.cheap) + " to " + PG.mil(sens1.joint.dear), PG.upText(sens1.joint.cheapUp, sens1.joint.dearUp), "a joint test"]])),
     "<p class=\"lx-hint\"><b>The five solar sites</b> (A19's screen, a " + E3.kilo(ref.farm) + " MW farm; up front: line, road and land, 2025 dollars):</p>",
     tb(["Site", "Where", "Line to", "Up front", "Capacity factor (a full year)"], SM.top.map(t => { const q = PG.siteInfo(SM, t.id, ref.farm); return [t.id + (t.id === ref.site ? " (the plan's)" : ""), q.where + " of the centre", q.sub + ", " + q.km.toFixed(1) + " km", PG.mil(q.connectUSD), (q.cf * 100).toFixed(1) + "%"]; })),
     "<p class=\"lx-hint\"><b>Full-year check</b> (all 8,760 hours of 2025, precomputed): substation upgrades " + E3.kilo(upF(er.days)) + " MW on the eight days, " + E3.kilo(upF(er.year)) + " MW sized on the year; with the eight days' upgrades, " + E3.kilo(er.year.unserved) + " MWh unserved on " + E3.dateList(er.year.shortDays.map(s => s.day)) + "; cost and CO₂ within " + (Math.max(Math.abs(er.year.cost / er.days.cost - 1), Math.abs(er.year.co2 / er.days.co2 - 1)) < 0.001 ? "0.1%" : "about " + PG.pct1(Math.max(Math.abs(er.year.cost / er.days.cost - 1), Math.abs(er.year.co2 / er.days.co2 - 1)))) + ".</p>",
-    "<p class=\"lx-hint\"><b>Contracts:</b> the city used " + E3.kilo(R1.acc.contract.mwh / 1000) + " GWh a year of the farms' " + E3.kilo(R1.acc.contract.gen / 1000) + " GWh; not deducted from the location-based CO₂. A market-based report could claim about " + E3.kilo(R1.acc.contract.t) + " t for them (simplified: the grid's average rate, no residual mix).</p>"].join("\n");
+    "<p class=\"lx-hint\"><b>The city's wind and solar:</b> the city used " + E3.kilo(R1.acc.contract.mwh / 1000) + " GWh a year of its farms' " + E3.kilo(R1.acc.contract.gen / 1000) + " GWh; not deducted from the location-based CO₂. At the grid's average rate those MWh come to about " + E3.kilo(R1.acc.contract.t) + " t: an illustrative grid-average comparison, not a market-based inventory result (that needs qualifying certificates and a residual mix) and not a physical cut.</p>"].join("\n");
   const withPre = Object.assign({}, P, { cfg: Object.assign({}, cfg, { precomputed: Object.assign({}, cfg.precomputed, { c3: pre }) }) });
   const BLOCKS = { "c3-plan": () => SS.staticHTML(S, def), "c3-results": () => E3.fallback(withPre, "c3"), "c3-note": () => RN.outlineHTML(PG.FIELDS, PG.OUTLINE),
     "c3-exemplars": () => EX.staticHTML(c3ex), "c3-rubric": () => RB.staticHTML(PG.RUBRIC, { bar: PG.RUBRIC_BAR }), "c3-inputs": () => E3.inputsHTML(P, { c3: true }), "c3-evidence": evidence };
@@ -129,8 +129,9 @@ const RUN_DATE = "6 November 2026";
   // ---------------- the reference plan's words
   const strong = EX.plain(c3ex.answers[1]);
   const R = PG.REF_PLAN;
-  ok(strong.indexOf(R.hp + "% of furnaces") >= 0 && strong.indexOf("retrofit " + R.ret + "%") >= 0 && strong.indexOf(R.ev + "% of cars") >= 0 && strong.indexOf(R.bat + " MW of substation batteries") >= 0 &&
-    strong.indexOf(R.wind + " MW of wind") >= 0 && strong.indexOf(R.farm + " MW solar farm at site " + R.site) >= 0 && R.ihp === 100 && R.dh === 0 && R.ely === 0 && R.pv === 0, "the strong summary's levers are the reference plan's");
+  ok(strong.indexOf("Sizes: heat pumps " + R.hp + "% · retrofits " + R.ret + "% · electric cars " + R.ev + "%, managed · batteries " + R.bat + " MW · food plants' low-temperature heat " + R.ihp + "% · wind " + R.wind + " MW · solar " + R.farm + " MW, site " + R.site) >= 0 &&
+    R.evm === "managed" && R.dh === 0 && R.ely === 0 && R.pv === 0 && /build city-owned wind and solar/.test(strong), "the strong summary's levers are the reference plan's, as a short recommendation and a list of sizes");
+  { const lines = strong.split("\n"), rec = lines.find(l => /^Recommendation:/.test(l)); ok(rec && rec.split(/\s+/).length <= 35 && lines.filter(l => /^Panel:/.test(l)).length === x.objectors.length, "the recommendation is one short line (" + (rec || "").split(/\s+/).length + " words); one panel line per stakeholder who objects"); }
   // the strong summary answers every objection with the run's numbers, gives the site's reason, a sensitivity result and
   // the jobs; no instruction left in place of an answer
   ok(x.objectors.length >= 2 && x.objectors.every(k => strong.indexOf(PG.ANSWER[k](x)) >= 0) && !/a line each on what I would change/.test(strong) && !/jobs not yet estimated/.test(strong), "the strong summary answers each objector (" + x.objectors.join(", ") + ")");
@@ -138,7 +139,7 @@ const RUN_DATE = "6 November 2026";
   ok(ia === 0 && sc[ia] === Math.min(...sc) && strong.indexOf("the best of A19's five blocks and the cheapest to connect (" + PG.mil(site1.connectUSD) + ")") >= 0, "site " + ref.site + ": the screen's best block and the cheapest to connect, as the summary says");
   ok(strong.indexOf(PG.mil(sens1.joint.cheap) + " to " + PG.mil(sens1.joint.dear)) >= 0 && strong.indexOf(PG.lc1(top1.label) + " moves it most") >= 0 && sens1.rows.every(r => /set for teaching/.test(r.kind)), "the strong summary's sensitivity: the joint range and the input that moves it most");
   ok(strong.indexOf(E3.kilo(jb.jobYears) + " construction job-years to 2040 (gross), " + E3.kilo(jb.jobYearsNet) + " net of displacement") >= 0 && strong.indexOf(E3.kilo(jb.permDirect) + " direct ongoing jobs, " + E3.kilo(jb.permGross) + " gross supported, " + E3.kilo(jb.permNet) + " net") >= 0, "the strong summary's jobs: construction job-years gross and net, apart from ongoing jobs, direct, gross and net");
-  ok(x.objectors.indexOf("climate") >= 0 && /contracts do not lower the location-based CO₂/.test(strong) && near(x.cut, (r0.results.acc.city.co2 - R1.acc.city.co2) / r0.results.acc.city.co2, 1e-12), "the climate group is answered on the location-based boundary");
+  ok(x.objectors.indexOf("climate") >= 0 && /city's wind and solar do not lower the location-based CO₂/.test(strong) && !/market-based report could claim/.test(strong) && near(x.cut, (r0.results.acc.city.co2 - R1.acc.city.co2) / r0.results.acc.city.co2, 1e-12), "the climate group is answered on the location-based boundary");
 
   // ---------------- the panel, for every preset and the reference plan
   const plans = E3.c3presets.map(p => E3.withPreset(def, p)).concat([ref, Object.assign({}, ref, { wind: 400, farm: 150, site: "E" })]);
@@ -160,20 +161,30 @@ const RUN_DATE = "6 November 2026";
     ok(near(pc, el * P.price.ind + (P.out.foodGas + P.out.fertGas - S1.ihp * P.out.lowHeat / P.out.burner - S1.ely * P.out.fertGas) * P.price.gasInd + (Rr.acc.money.ihp || 0) + (Rr.acc.money.ely || 0), 1), "the park's yearly cost as stated");
   }
 
-  // ---------------- the sensitivity: the accounting-only inputs equal a re-solve
-  for (const sx of PG.SENS.filter(s => !s.solve && !s.price)) {
-    const f = S.fields.filter(q => q.id === sx.key)[0];
-    for (const v of [f.min, f.max]) {
-      const s = withSite(Object.assign({}, ref, { [sx.key]: v })), acc = E3.summarize(s, P, R1.raw, R1.base), re = (await E3.solve(s, P, { solver })).results;
-      ok(near(acc.delta.cityCost, re.delta.cityCost, 50), sx.key + " at " + v + ": the accounting equals a re-solve (" + PG.mil(acc.delta.cityCost) + ")");
+  // ---------------- the sensitivity: every case solved again, its upgrades re-optimized and reported
+  {
+    let calls = 0;
+    const counted = (st, PP) => { calls++; return E3.solve(st, PP, { solver }); };
+    const again = await PG.runSens(R1, withSite(ref), S, P, E3, counted);
+    ok(again && calls === PG.SENS.length * 2 + 2 && JSON.stringify(again.rows) === JSON.stringify(sens1.rows), "every case is a solve: " + calls + " (each input at both ends, then the two joint cases); the same rows again");
+    for (const r of sens1.rows) {
+      const f = S.fields.filter(q => q.id === r.key)[0];
+      if (!f) continue;
+      const re = (await E3.solve(withSite(Object.assign({}, ref, { [r.key]: f.max })), P, { solver })).results;
+      ok(near(r.atHi, re.delta.cityCost, 1) && near(r.upHi.mw, PG.upTotal(re), 1e-6) && near(r.upHi.usd, re.acc.upfront.up, 1), r.key + " at " + f.max + ": a fresh solve, with its upgrades (" + PG.upText(r.upLo, r.upHi) + ")");
     }
+    const upc = sens1.rows.find(r => r.key === "upc"), sv = sens1.rows.find(r => r.key === "save"), fu = S.fields.find(q => q.id === "upc");
+    ok(near(upc.upLo.usd, upc.upLo.mw * fu.min * 1000, 1) && near(upc.upHi.usd, upc.upHi.mw * fu.max * 1000, 1) && Math.abs(sv.upLo.mw - sv.upHi.mw) > 1, "the upgrades are re-optimized: their spending at each upgrade cost, and the MW move with the retrofit saving (" + PG.upText(sv.upLo, sv.upHi) + ")");
+    const ur = PG.upRange(sens1);
+    ok(ur.mwLo < PG.upTotal(R1) && ur.mwHi > PG.upTotal(R1), "the upgrades over the test bracket the plan's own " + E3.kilo(PG.upTotal(R1)) + " MW (" + E3.kilo(ur.mwLo) + " to " + E3.kilo(ur.mwHi) + ")");
   }
-  const sw = PG.sensWords(R1.delta.cityCost, sens1.rows, sens1.joint);
-  ok(/the plan held fixed/.test(sw) && sw.indexOf(PG.mil(sens1.joint.cheap)) >= 0, "the sensitivity line says the plan is held fixed, with the joint range");
+  const sw = PG.sensWords(R1.delta.cityCost, sens1.rows, sens1.joint, PG.upRange(sens1));
+  ok(/Equipment fixed; dispatch and upgrades re-optimized \(/.test(sw) && sw.indexOf(PG.mil(PG.upRange(sens1).usdHi) + " up front") >= 0 && !/the plan held fixed/.test(sw) && sw.indexOf(PG.mil(sens1.joint.cheap)) >= 0, "the sensitivity line says what is held fixed and what is re-optimized, with the joint range and the upgrades");
+  ok(!/held fixed\)|plan held fixed|re-run through the LP/.test(fs.readFileSync(L("c3-prairie-city-2040.js"), "utf8")), "no old 'plan held fixed' wording");
   // the park's gas price: the run and its 2025 baseline re-costed at the price; the joint cases equal fresh runs
   {
     const g = cfg.c3.gasInd, gr = sens1.rows.filter(r => r.key === "gasInd")[0], Q = PG.gasP(P, g.hi), base2 = (await E3.solve(withSite(ref), Q, { solver })).results;
-    ok(near(gr.atHi, base2.delta.cityCost, 50) && near(Q.price.gasInd / P.price.gasInd, g.hi / city.prices.gasPerMcf.industrial, 1e-12), "the park's gas price at $" + g.hi + "/Mcf: the accounting equals a re-solve at that price (" + PG.mil(gr.atHi) + ")");
+    ok(near(gr.atHi, base2.delta.cityCost, 50) && near(Q.price.gasInd / P.price.gasInd, g.hi / city.prices.gasPerMcf.industrial, 1e-12), "the park's gas price at $" + g.hi + "/Mcf: its case is a solve at that price, with its own 2025 run (" + PG.mil(gr.atHi) + ")");
     ok(gr.atHi < gr.atLo && sens1.joint.gas[1] === g.lo, "this plan burns less gas than 2025, so a dearer gas price lowers its cost: the joint dearer case takes the low gas price");
     const J = sens1.joint;
     sens1.rows.forEach(r => { if (r.key === "gasInd") return; const f = S.fields.filter(z => z.id === r.key)[0], up = r.atHi >= r.atLo; ok(J.dearState[r.key] === (up ? f.max : f.min) && J.cheapState[r.key] === (up ? f.min : f.max), r.key + ": the joint cases take the end the one-at-a-time run says raises or lowers the cost"); });
