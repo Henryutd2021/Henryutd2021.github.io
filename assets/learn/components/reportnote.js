@@ -24,6 +24,9 @@
      assumptions  ["All money in 2025 dollars.", ...]                          one sentence each
      sensitivity  { metric: "Net present value", input: "the battery price", held: "the plan held fixed",
                     base: { at: "$400/kWh", value: "$4,210" }, cases: [{ at: "$300/kWh", value: "$5,000" }, ...] }
+                  or several inputs, each at a low and a high case (a one-at-a-time sensitivity: one table row per input,
+                  its two cases in it, in every format): { metric: "NPV", base: { value: "−$17,813" }, held: "the equipment held fixed",
+                    rows: [{ label: "Equipment cost", lo: { at: "75% of sourced", value: "−$10,237" }, hi: { at: ..., value: ... } }] }
                   or one sentence (a string)
      limits       ["It leaves out ...", ...]
      footer       optional; default: a teaching model with illustrative assumptions, not advice for a real site
@@ -47,9 +50,11 @@
   function joinAnd(a) { return a.length < 2 ? a.join("") : a.slice(0, -1).join(", ") + " and " + a[a.length - 1]; }
   // "Net present value is $4,210 with the battery price at $400/kWh (this plan), $5,000 at $300/kWh and $3,100 at
   // $500/kWh, with the plan held fixed."
+  function multi(s) { return !!(s && typeof s === "object" && s.metric && s.base && list(s.rows).length); }
   function sensitivityLine(s) {
     if (!s) return "";
     if (typeof s === "string") return sentence(s);
+    if (multi(s)) return sentence(s.metric + " " + s.base.value + " at this plan; each row moves one input" + (s.held ? ", " + s.held : ""));
     if (!s.metric || !s.base || !list(s.cases).length) return "";
     var parts = [s.base.value + " with " + s.input + " at " + s.base.at + " (this plan)"].concat(s.cases.map(function (c) { return c.value + " at " + c.at; }));
     return sentence(s.metric + " is " + joinAnd(parts) + (s.held ? ", with " + s.held : ""));
@@ -78,9 +83,10 @@
     if (list(n.results).length) out.push({ h: "Results", table: { head: ["Result", "Value"], rows: n.results.map(function (r) { return [r.label, r.value + (r.note ? " (" + r.note + ")" : "")]; }) } });
     out.push({ h: "Assumptions", list: list(n.assumptions).map(sentence), none: "(none stated)" });
     var sl = sensitivityLine(n.sensitivity), s = n.sensitivity;
-    var st = s && typeof s === "object" && s.base && list(s.cases).length ? { head: [s.inputLabel || oneLine(s.input).replace(/^the /, ""), s.metric],
+    var st = multi(s) ? { head: ["Input", s.metric + ", low case; high case"], rows: s.rows.map(function (r) { return [r.label, r.lo.value + " at " + r.lo.at + "; " + r.hi.value + " at " + r.hi.at]; }) }
+      : s && typeof s === "object" && s.base && list(s.cases).length ? { head: [s.inputLabel || oneLine(s.input).replace(/^the /, ""), s.metric],
       rows: [[s.base.at + " (this plan)", s.base.value]].concat(s.cases.map(function (c) { return [c.at, c.value]; })) } : null;
-    out.push({ h: "Sensitivity", para: sl || "(no sensitivity line yet)", empty: !sl, table: st, tableMdOnly: true });
+    out.push({ h: "Sensitivity", para: sl || "(no sensitivity line yet)", empty: !sl, table: st, tableMdOnly: !multi(s) });
     fields.filter(function (f) { return f.at !== "top"; }).forEach(field);
     if (list(n.limits).length) out.push({ h: "Limits of this analysis", list: list(n.limits).map(sentence) });
     out.push({ foot: n.footer || FOOTER });

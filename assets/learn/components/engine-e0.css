@@ -33,6 +33,9 @@
 /* a capstone's card of excerpts before its note (C0): space between the quotes */
 .c0-yard .lx-excerpt + .lx-excerpt { margin-top: 12px; }
 .c0-tornado { min-width: 0; }
+.c0-whole { margin-top: 12px; }
+.c0-whole pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 13.5px; line-height: 1.45; margin: 8px 0 0; }
+.e0-hours table { font-size: 13px; } .e0-hours th[scope="row"] { white-space: nowrap; }
 .e0-extra { display: grid; gap: 14px; }
 @media (max-width: 560px) {
   /* 13 squares a row stay at least 24 px wide on a 375 px phone: the strip uses the card's padding */

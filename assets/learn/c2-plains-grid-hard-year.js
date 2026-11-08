@@ -92,13 +92,27 @@
     return { rows: rows, err25: span("f25"), err24: span("f24") };
   }
   function sgn(v) { return (v >= 0 ? "+" : "") + mil(v); }
+  // other customers' change over every day of 2025 for a plan that is one of the four checked (the same operation: its
+  // money fields may differ), else null; keyOf: E2.c2Key
+  function checkedFull(st, cfg, keyOf) {
+    var pc = cfg.precomputed, r = (pc.c2check || []).filter(function (x) { return keyOf(x.plan) === keyOf(st); })[0];
+    return r ? ledger(st, r.f25, pc.c2checkBase.f25, cfg).delta : null;
+  }
+  // the 26-day estimate's error in words: this plan's own full year when it is one of the four checked, else the four
+  // plans' observed range, with this plan's own error unknown
+  function errWords(L, K, full) {
+    return full != null ? "this plan is one of the four checked: every day of 2025 gives " + sgn(full) + " (estimate " + sgn(L.delta) + ")"
+      : "for the four plans checked, every day of 2025 moved other customers' change by " + sgn(K.err25.lo) + " to " + sgn(K.err25.hi) + " from the 26-day estimate; this plan's own error is unknown";
+  }
   // the who-pays card's notes, one idea a line (L: the ledger; cr: its cost range; K: ledgerCheck)
-  function ledgerNotes(st, L, cr, K, cfg) {
-    var e = K.err25;
-    return ["**Other customers pay " + mil(Math.abs(L.delta)) + " a year " + (L.delta >= 0 ? "more" : "less") + " than today** on the 26-day estimate (" + (L.perMWh >= 0 ? "+" : "−") + "$" + Math.abs(L.perMWh).toFixed(2) + " per MWh)" + (Math.abs(cr.hi - cr.lo) >= 5e4 ? "; across the cost ranges you can set, from " + mil(cr.lo) + " to " + mil(cr.hi) : "; nothing is built, so the cost ranges do not move it") + ".",
-      "**The estimate's error:** for the four plans checked, every day of 2025 put other customers' change " + sgn(e.lo) + " to " + sgn(e.hi) + " from the 26-day estimate. For this plan, read it as " + sgn(L.delta + e.lo) + " to " + sgn(L.delta + e.hi) + ".",
+  function ledgerNotes(st, L, cr, K, cfg, full) {
+    var still = Math.abs(cr.hi - cr.lo) >= 5e4 ? "; across the cost ranges you can set, from " + mil(cr.lo) + " to " + mil(cr.hi)
+      : L.N < 1 ? "; nothing is built, so the cost ranges do not move it" : st.share >= 100 ? "; the large load pays all new fixed costs directly, so the cost ranges do not move it" : "; the cost ranges move it by less than $0.1M";
+    return ["**Other customers pay " + mil(Math.abs(L.delta)) + " a year " + (L.delta >= 0 ? "more" : "less") + " than today** on the 26-day estimate (" + (L.perMWh >= 0 ? "+" : "−") + "$" + Math.abs(L.perMWh).toFixed(2) + " per MWh)" + still + ".",
+      "**The estimate's error:** " + errWords(L, K, full) + ".",
       "**Where the change comes from:** " + partsWords(L) + ".",
-      "**The large load pays " + mil(L.ll.total) + "** for " + kilo(L.Ell / 1000) + " GWh" + (L.llPerMWh != null ? " ($" + L.llPerMWh.toFixed(2) + " per MWh)" : "") + "; new capacity and the uprate cost " + mil(L.N) + " a year, " + st.share + "% of it paid by the large load directly.",
+      "**The large load pays " + mil(L.ll.total) + "** for " + kilo(L.Ell / 1000) + " GWh" + (L.llPerMWh != null ? " ($" + L.llPerMWh.toFixed(2) + " per MWh)" : "") + ".",
+      "**Fixed-cost rule:** new capacity and the uprate cost " + mil(L.N) + " a year; the large load pays " + st.share + "% directly, and all customers, the large load included, share the rest by served energy.",
       "**Billing rule:** each MWh served pays its zone's price ([[conditional-price|conditional on the commitment]]); [[congestion-rent|congestion rent]] goes back to customers by energy; [[uplift|uplift]], the make-whole payment to committed plants, is charged by energy.",
       "**Shortfall rule:** a zone's unserved load is shared by its customers in proportion to their load, the large load's after its own curtailment. Unserved energy is not billed; adequacy is checked below."];
   }
@@ -132,14 +146,15 @@
   function exemplars(ref) {
     var st = ref.plan, A = ref.A, L = ref.L, W = ref.W, sw = A.sweep.slice().sort(function (a, b) { return a.mw - b.mw; }), lt = function (v) { return loleTxt(v, 0.1); };
     return { title: "Two notes on the same brief", task: "Recommend how much of the 300 MW connects this year, what to build so the grid stays adequate, and who pays.", id: "c2-ex", lines: true,
+      lede: "The strong note in excerpts: a full note also carries the plan link, the downloaded chart and the paragraph from M2's notebook.",
       answers: [
         { key: "weak", label: "Weak note", level: "Developing", parts: ["Connect the data center and ", { text: "build some peakers", note: "No sizes, no place, no units: the planners cannot check it." }, ". ",
           { text: "The grid will be reliable", note: "Reliable by what measure, against what criterion, with what uncertainty?" }, " and ", { text: "prices will stay low", note: "Which prices, where, in which hours? Prices here are conditional on the commitment." }, ", so ",
           { text: "nobody is hurt", note: "Who pays for the new plants and the link is the brief's question: name the parties and the amounts." }, "."] },
-        { key: "good", label: "Strong note", level: "Proficient", parts: [
+        { key: "good", label: "Strong note (excerpts)", level: "Proficient", parts: [
           "Recommendation: connect ", { text: "the full " + kilo(st.conn) + " MW this year with " + st.pk + " new 50 MW peakers at Prairie Town and " + kilo(st.up) + " MW more on Town–Metro", note: "Sizes with units and places: a plan the planners can check and cost." }, ".\n",
           "Adequacy: ", { text: lt(A.plan.lole) + " loss-of-load days a year (90% interval " + lt(A.plan.ci[0]) + " to " + lt(A.plan.ci[1]) + (A.plan.lole <= 0.1 && A.plan.ci[1] > 0.1 ? ": the point estimate meets the 0.1 criterion, the interval crosses it" : "") + "), against " + lt(A.today.lole) + " for today's grid and " + A.bare.lole.toFixed(1) + " if the load connects with nothing built", note: "The criterion's measure, its Monte Carlo interval with the warning it carries, and two baselines." }, ".\n",
-          "Sensitivity (chart attached): ", { text: "with these builds held fixed, " + sw.map(function (x) { return lt(x.lole) + " days at " + kilo(x.mw) + " MW"; }).join(", ") + " connected", note: "One input moved, the plan held fixed: where the margin runs out." }, ".\n",
+          "Sensitivity (its chart goes with the note): ", { text: "with these builds held fixed, " + sw.map(function (x) { return lt(x.lole) + " days at " + kilo(x.mw) + " MW"; }).join(", ") + " connected", note: "One input moved, the plan held fixed: where the margin runs out." }, ".\n",
           "Hard weeks: ", { text: kilo(W.shed) + " MWh unserved in the 14 days; Town's price peaks at " + price(W.maxT) + "/MWh, conditional on the commitment", note: "The extreme periods kept, and the prices labelled for what they are." }, ".\n",
           "Who pays: ", { text: "on the 26-day estimate, the large load " + mil(L.ll.total) + " a year, half the new costs directly, and other customers " + mil(L.delta) + " a year more than today (" + mil(L.lo) + " to " + mil(L.hi) + " across the cost ranges); every day of 2025 gives " + mil(ref.full.ll) + " and " + mil(ref.full.delta), note: "Both parties on one boundary, a year, 2025 dollars, with the range the costs allow and the estimate checked against a full year." }, ".\n",
           "Emissions: ", { text: kilo(ref.co2 / 1000) + " kt of CO₂ a year from the fuel burned", note: "Operating CO₂ on its own line, not mixed into the money." }, ".\n",
@@ -157,10 +172,10 @@
       }).join("") + "</tbody></table></div>";
   }
   var page = { SWEEP: SWEEP, LIB_LIMIT: LIB_LIMIT, libEntry: libEntry, libStatus: libStatus, MONEY: MONEY, moneyOnly: moneyOnly, priceErr: priceErr, partsWords: partsWords, exemplars: exemplars, costsHTML: costsHTML, newCost: newCost, ledger: ledger, costRange: costRange, adequacyWords: adequacyWords, sensitivity: sensitivity, kilo: kilo, mil: mil, price: price,
-    loleTxt: loleTxt, ledgerCheck: ledgerCheck, ledgerNotes: ledgerNotes, sgn: sgn, CHART_NAME: "c2-sensitivity",
+    loleTxt: loleTxt, ledgerCheck: ledgerCheck, ledgerNotes: ledgerNotes, checkedFull: checkedFull, errWords: errWords, sgn: sgn, CHART_NAME: "c2-sensitivity",
     GROUPS: [{ title: "The large load (a data center at Prairie Town)", fields: ["conn", "flex"], color: "var(--lx-demand)", hint: "It asks for 300 MW, flat, every hour: connect half or all of it this year, and let a fifth of it [[demand-response|curtail]] (cut its own use) when serving it would cost more than its bid." },
       { title: "What to build", fields: ["pk", "bat", "up"], color: "var(--lx-cc)", hint: "New [[peaker|peakers]] (gas plants that start within minutes) and a 4-hour battery at Prairie Town, and an [[uprate|uprate]] of Town–Metro: a higher transfer limit." },
-      { title: "Operations and who pays", fields: ["res", "share"], color: "var(--lx-tier-4)", hint: "The [[reserves|operating reserve]] held every hour, and the share of the new costs the large load pays itself." },
+      { title: "Operations and who pays", fields: ["res", "share"], color: "var(--lx-tier-4)", hint: "The [[reserves|operating reserve]] held every hour, and the large load's direct share of the new fixed costs; all customers, it included, share the rest by served energy." },
       { title: "Costs you set (fixed ranges, a year per kW)", fields: ["cpk", "cbat", "cup"], color: "var(--lx-ink-2)", hint: "Each cost stays the same however much is built. Defaults: EIA's and NREL's values, as yearly payments (sources below)." }],
     RUBRIC: [{ id: "accounting", look: "Who pays and who benefits: the large load and other customers on one boundary, a year, 2025 dollars; CO₂ on its own line." },
       { id: "uncertainty", look: "The sensitivity chart attached: adequacy as the connected load grows, the plan held fixed; the Monte Carlo interval and the ledger's estimate error stated." },
@@ -223,7 +238,7 @@
         rows: [{ head: "The large load", sub: kilo(L.Ell / 1000) + " GWh served", cells: row(L.ll) }, { head: "Other customers", sub: kilo(L.Eoth / 1000) + " GWh served", cells: row(L.oth) },
           { head: "Other customers, today's grid", sub: "no large load, nothing built", cells: row(L.b), total: true }], cls: "c2-led" });
       var cr = page.costRange(st, e.year, base(st), cfg);
-      var ul = H("ul", { class: "e2-notes" }, c1); page.ledgerNotes(st, L, cr, K, cfg).forEach(function (t) { H("li", { html: LX.rich(t).replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>") }, ul); });
+      var ul = H("ul", { class: "e2-notes" }, c1); page.ledgerNotes(st, L, cr, K, cfg, page.checkedFull(st, cfg, E2.c2Key)).forEach(function (t) { H("li", { html: LX.rich(t).replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>") }, ul); });
       // the hard weeks
       var c2 = H("div", { class: "lx-xcard lx-sb-chart" }, res); H("h3", { text: "The two hard weeks, day by day" }, c2);
       [(W.shed > 0.5 ? "**" + kilo(W.shed) + " MWh unserved**" : "**No load unserved**") + " in the 14 days" + (W.rshort > 0.5 ? "; reserve short by " + kilo(W.rshort) + " MWh" : "") + "; highest price " + price(Math.max.apply(null, W.max)) + "/MWh (conditional on the commitment).",
@@ -291,7 +306,10 @@
     // ---- adequacy, with the sensitivity: the plan held fixed as the connected load grows (today's grid precomputed)
     var ac = H("div", { class: "lx-xcard c2-adeq" }, rh);
     H("h3", { text: "Check adequacy: enough supply in nearly every hour?" }, ac);
-    H("p", { class: "lx-hint", html: LX.rich("A seeded [[monte-carlo|Monte Carlo]]: " + cfg.c2.adequacy.years + " draw years of 2025's and 2024's weather, each plant up or out for a whole day at its [[forced-outage-rate|forced outage rate]]. Counts [[lole|loss-of-load]] days, [[lolh|hours]] and [[expected-unserved-energy|energy]]. The brief's criterion, 0.1 days a year, is PJM's one day in ten years (sources below). It runs live, at any connected size.") }, ac);
+    var aSteps = H("ol", { class: "lx-hint c2-steps" }, ac);
+    ["**Draw:** " + cfg.c2.adequacy.years + " draw years from 2025's and 2024's weather, a seeded [[monte-carlo|Monte Carlo]].", "**Simulate:** each plant up or out for a whole day, at its [[forced-outage-rate|forced outage rate]].",
+      "**Count:** [[lole|loss-of-load]] days, [[lolh|hours]] and [[expected-unserved-energy|energy]].", "**Compare:** with the brief's criterion, 0.1 days a year: PJM's one day in ten years (sources below). It runs live, at any connected size."]
+      .forEach(function (t) { H("li", { html: LX.rich(t).replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>") }, aSteps); });
     var aRow = H("div", null, ac), aStale = H("p", null, ac), aRes = H("div", { class: "c2-adeq-res" }, ac), aStop = U.stopper(), aProg = H("p", { class: "lx-hint c2-prog", "aria-live": "polite" });
     var AD = LX.BenchRun(aRow, { label: "Check adequacy", state: function () { return plan; }, results: [aRes], stale: aStale, busy: function (on) { aStop.busy(on); if (!on) aProg.textContent = ""; },
       words: { ok: "Done: every draw year simulated (a Monte Carlo estimate, with its 90% interval)." },
@@ -374,7 +392,7 @@
           link: ss.url(), run: { ok: ls.ok, stale: false, text: "precomputed with this engine on " + LIB.date + ": 12 representative days and the two hard weeks (365 days of weight), " + ls.text },
           plan: S.fields.map(function (f) { return { label: f.label, value: U.fmtOf(f)(st[f.id]) }; }),
           results: [{ label: "Production cost", value: page.mil(e.year.prod) + " a year", note: "running, no-load and start-up; 2025 dollars; illustrative plants" },
-            { label: "Other customers against today's grid", value: (L.delta >= 0 ? "+" : "") + page.mil(L.delta) + " a year", note: "26-day estimate; with the full-year check's error, " + page.sgn(L.delta + K.err25.lo) + " to " + page.sgn(L.delta + K.err25.hi) + "; " + page.partsWords(L) },
+            { label: "Other customers against today's grid", value: (L.delta >= 0 ? "+" : "") + page.mil(L.delta) + " a year", note: "26-day estimate; " + page.errWords(L, K, page.checkedFull(st, cfg, E2.c2Key)) + "; " + page.partsWords(L) },
             { label: "The large load pays", value: page.mil(L.ll.total) + " a year", note: kilo(L.Ell / 1000) + " GWh served; " + st.share + "% of new costs paid directly" },
             { label: "Hard weeks: unserved load", value: kilo(W.shed) + " MWh", note: "peak-demand week and low-wind winter week; highest price " + price(Math.max.apply(null, W.max)) + "/MWh, conditional on the commitment" },
             { label: "Town–Metro at its limit", value: kilo(e.year.cong) + " hours a year", note: "the 26-day estimate finds only part of these hours (see its check)" },
@@ -382,6 +400,7 @@
           assumptions: ["The Plains Grid, its plants, links and costs are fictional and illustrative; 2025 dollars", "Demand, wind and sun follow the Southwest Power Pool's 2025 shapes; the three zones share that weather",
             "The year is 12 representative days and two hard weeks; each day is committed alone, knowing its load, wind and sun exactly",
             "Prices are conditional on the commitment; uplift and congestion rent are shared by energy", "A zone's unserved load is shared by its customers in proportion to their load",
+            "The large load pays its chosen share of the new fixed costs directly; all customers, the large load included, share the rest by served energy",
             "Costs stay the same however much is built (the ranges are the reader's)"],
           sensitivity: adeq && LX.ShareState.same(S, adeq.plan, st) ? page.sensitivity(adeq.A, st) : "Run Check adequacy on this plan for the sensitivity line.",
           limits: ["A transport model: no power-flow physics, losses or voltage", "No forecast errors or ramp limits in the commitment; outages only in the adequacy check",

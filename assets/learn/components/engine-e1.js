@@ -462,7 +462,7 @@
         "The model knows the coming sun (perfect foresight); the sun is a teaching profile from SPP's 2025 hourly solar, not measured campus output"],
       sensitivity: null,
       limits: ["It checks only the outages chosen: a different start, a longer storm or a broken set can turn out worse",
-        "Its year is 12 average days: over a full 8,760-hour year, a large solar-and-battery plan's grid bill comes out up to 7% higher",
+        "Its year is 12 average days: for the larger solar-and-battery plans checked over a full 8,760-hour year, the grid bill came out about 4% to 7% higher",
         "It leaves out the network inside the campus, the generator's part-load fuel use and battery wear"]
     };
   }
@@ -940,7 +940,7 @@
     // the cost's boundary, one idea a line (SB1 5, 8 and 10)
     var cn = H("ul", { class: "lx-hint e1-cost-notes" }, c1);
     ["**Equipment**: paid over its life at the " + R.owner.label.toLowerCase().replace("-owned", "") + " owner's " + Math.round(R.rate * 100) + "% real [[cost-of-capital|cost of capital]] (through the [[capital-recovery-factor|capital recovery factor]]), plus upkeep.",
-      "**Grid bill**: estimated on 12 average days; a full 8,760-hour year comes out up to 7% higher for large solar-and-battery plans.",
+      "**Grid bill**: estimated on 12 average days; for the larger solar-and-battery plans checked over a full 8,760-hour year, it came out about 4% to 7% higher.",
       "**Not included**: the diesel burned in outages (its cost is under each outage). 2025 dollars, illustrative.",
       "**Grid electricity**: " + kilo(R.year.imports / 1000) + " MWh bought, " + kilo(R.year.exports / 1000) + " MWh exported, " + kilo(R.year.co2) + " t CO₂ (U.S. [[average-emission-factor|average factor]], [[operating-emissions|operating only]])."]
       .forEach(function (t) { H("li", { html: LX.rich(t).replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>") }, cn); });

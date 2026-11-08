@@ -6,7 +6,7 @@
   "dollarYear": 2025,
   "built": "2026-11-07",
   "builtBy": "Built for the course from the Prairieland card and the public sources listed in `sources`.",
-  "method": "Top-down from the card: primary energy 3.5 EJ split by its shares, then refinery, power plants and grid to final energy by sector and carrier, then useful energy; the fleet's generation unit by unit; regions by teaching weights that add up to the nation exactly. Time slices from SPP's 2025 hourly shapes, 12 slices with the peak net-load day and the scarce-wind winter week kept whole.",
+  "method": "Top-down from the card: primary energy 3.5 EJ split by its shares, then refinery, power plants and grid to final energy by sector and carrier, then useful energy; the fleet's generation unit by unit; regions by teaching weights that add up to the nation exactly. Time slices from SPP's 2025 hourly shapes, 12 slices, the peak net-load day and the scarce-wind winter week with slices of their own.",
   "simplifications": [
    "All fossil energy is counted as burned (no non-energy use such as plastics or asphalt).",
    "One demand shape (SPP's 2025) serves every region; regions differ in size, not in daily shape.",
@@ -2330,8 +2330,8 @@
    "weights": "Each slice's hours; they sum to 8,760.",
    "days": "A season's day and night slices form one representative day (12 + 12 hours) that stands for `days` days; batteries cycle within it (end of night = start of day).",
    "week": "The scarce-wind week is 7 consecutive days: a store may enter it full but must cover the week's shortfall from what it holds (no refill from other seasons).",
-   "extremes": "Kept whole: the peak net-load day and the scarce-wind winter week.",
-   "sameYear": "Load, wind, solar and the hydro factor all come from one weather year (2025), so their correlation survives.",
+   "extremes": "The peak net-load day and the scarce-wind winter week get slices of their own: each its average day and night, repeated over its days. Their hourly sequence is not kept; the full-year check runs every hour in order.",
+   "sameYear": "Load, wind, solar and the hydro factor all come from one weather year (2025), so each slice averages hours in which they occurred together; averaging removes the variation within a slice.",
    "outages": "Forced outages are left out of the planning LP (availability factors stand in); adequacy is never judged from slices (lesson A5)."
   },
   "fullYearCheck": {
@@ -2363,7 +2363,7 @@
     "hours each link is at its limit",
     "the scarce-wind week's lowest store level"
    ],
-   "survives": "Set for teaching: a conclusion survives if it holds in both years: all demand served, CO2 within 10% of the slice estimate, the same ranking of plans. A plan that fails the 2024 year is reported, not hidden."
+   "survives": "Set for teaching: a conclusion survives if it holds in both years: all demand served, CO2 within 10% of the slice estimate, in every check. A plan that fails the 2024 year is reported, not hidden."
   }
  },
  "shocks": [
@@ -2596,7 +2596,7 @@
    "publisher": "National Laboratory of the Rockies (formerly NREL)",
    "date": "June 2025 (via 13-capstone.json)",
    "url": "https://docs.nlr.gov/docs/fy25osti/93281.pdf",
-   "where": "2024 cost: $372 per kW plus $241 per kWh (2024 dollars), converted with BEA's GDP deflator (x 128.893 / 125.587)"
+   "where": "2024 cost: $372 per kW plus $241 per kWh (2024 dollars), converted to 2025 dollars with BEA's GDP deflator (x 128.893 / 125.587: U.S. Bureau of Economic Analysis, NIPA Table 1.1.9: Implicit Price Deflators for Gross Domestic Product, line 1, annual (2017 = 100): 2024 125.587, 2025 128.893; last revised 29 October 2026; accessed 5 November 2026)"
   },
   "eia-epa-gas": {
    "title": "Electric Power Annual, Table 7.4: average cost of fossil fuels for the electric power industry",

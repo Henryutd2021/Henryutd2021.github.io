@@ -32,6 +32,15 @@ function staticKey(inst) {
     '<thead><tr><th scope="col">Symbol</th><th scope="col">Meaning</th><th scope="col">Unit</th><th scope="col">Value</th></tr></thead>\n<tbody>\n' +
     M.inputs(inst).map(r => `<tr><th scope="row">${r.sym}</th><td>${esc(r.name)}</td><td>${esc(r.unit)}</td><td>${esc(r.value)}</td></tr>`).join("\n") + "\n</tbody></table></div></details>";
 }
+// the formulation's lines as the page shows them without JavaScript: the same tags as the interactive lines (data, goal,
+// (1) to (5)), and the same lines in words
+const LN = ["par", "obj", "bal", "size", "wx", "ramp", "must"];
+const tagged = (html, k) => `<li><span class="b3-tag">${esc(J.lineTags[k])}</span> ${html} <span class="b3-static-n">(${esc(J.lineNames[k])})</span></li>`;
+function staticLines() {
+  return '<ul class="b3-static b3-tagged">\n' + LN.map(k => tagged(J.lines[k], k)).join("\n") + "\n</ul>\n" +
+    '<details class="lx-textalt"><summary>The lines in words</summary><ul class="b3-static-words">' + LN.map(k => `<li><b>${esc(J.lineTags[k])} ${esc(J.lineNames[k])}.</b> ${esc(J.lineWords[k])}</li>`).join("") + "</ul>" +
+    '<dl class="b3-static-legend">' + J.legend.map(x => `<dt>${esc(x[0])}</dt><dd>${esc(x[1])}</dd>`).join("") + "</dl></details>";
+}
 function staticPractice() {
   const PJ = J.practice, sol = {};
   Object.keys(M.PRACTICE_RUN).forEach(k => { sol[k] = M.fromRef(M.practiceInst(town, year, J, k), k === "ok" ? J.ref : PJ.ref[k]); });
@@ -39,7 +48,7 @@ function staticPractice() {
   const r6 = v => String(Math.round(v * 1e6) / 1e6);
   const strip = t => { const u = String(t).replace(/^Right[:.]\s*/, ""); return u.charAt(0).toUpperCase() + u.slice(1); };
   const p = t => `<p>${esc(t)}</p>`, line = h => `<p class="b3-static-line">${h}</p>`;
-  const lines = bug => '<ol class="b3-static">' + ["par", "obj", "bal", "size", "wx", "ramp", "must"].map(k => `<li>${(bug && PJ.bugs[bug].line === k ? PJ.bugs[bug].html : J.lines[k])} <span class="b3-static-n">(${esc(J.lineNames[k])})</span></li>`).join("") + "</ol>";
+  const lines = bug => '<ul class="b3-static b3-tagged">' + LN.map(k => tagged(bug && PJ.bugs[bug].line === k ? PJ.bugs[bug].html : J.lines[k], k)).join("") + "</ul>";
   const worked = w => '<ul class="b3-static-worked">' + w.map(x => `<li><b>${esc(x[0])}.</b> ${esc(x[1])}</li>`).join("") + "</ul>";
   const table = (key, sum) => {
     const i = M.practiceInst(town, year, J, key), S = sol[key];
@@ -75,11 +84,11 @@ function staticPractice() {
     PJ.tracks.map(t => `<h3>${esc(t.label)}</h3>\n<p>${esc(t.intro)}</p>\n<ol class="b3-ps">\n` + t.items.map(k => {
       const it = PJ.items[k], s = SP[k];
       return `<li><p><b>${esc(s.title || it.title)}</b> (${KIND[it.kind]}, about ${it.minutes} min)</p>\n${body[k](it, s).join("\n")}\n<details class="lx-answer"><summary>Answer</summary><p>${esc(answer[k](it, s))}</p></details></li>`;
-    }).join("\n") + "\n</ol>").join("\n") + `\n<p class="lx-fp-foot">${esc(PJ.foot)}</p>\n</div>`;
+    }).join("\n") + "\n</ol>").join("\n") + '\n<ul class="lx-fp-foot lx-fp-notes">' + PJ.foot.map(n => `<li><b>${esc(n[0])}:</b> ${esc(n[1])}</li>`).join("") + "</ul>\n</div>";
 }
 const between = (a, b) => { const i = QMD.indexOf(a), j = QMD.indexOf(b); return i > 0 && j > i ? QMD.slice(i + a.length, j).trim() : null; };
 if (process.argv.includes("--static")) {
-  console.log("<!-- b3-static-key -->\n" + staticKey(M.instance(town, year)) + "\n<!-- b3-static-practice -->\n" + staticPractice()); process.exit(0);
+  console.log("<!-- b3-static-lines -->\n" + staticLines() + "\n<!-- b3-static-key -->\n" + staticKey(M.instance(town, year)) + "\n<!-- b3-static-practice -->\n" + staticPractice()); process.exit(0);
 }
 
 let checks = 0, fails = 0;
@@ -146,6 +155,8 @@ const has = (s, msg) => ok(QMD.indexOf(s) >= 0, "page states " + (msg || JSON.st
       ok(near(r.duals.ramp_17, 40) && near(M.summarize(c, r).rows[0].cc, 110), `counterexample: a 150 MW start forces the plant down only to 110 MW at 17:00; that ramp row's dual is +$40 (${r.duals.ramp_17})`); }
     ok(near(D.ramp_18, -40) && T.every(t => D["wx_wind_" + t] <= 1e-9) && /Upper limits, such as the weather limits and the ramp's climb, have duals ≤ 0/.test(JS) && /all ≥ 0 for these inputs/.test(JS), "step 7: upper limits ≤ 0, balance duals ≥ 0 for these inputs (said so)");
     ok(!/more demand can never make the cheapest plan cheaper/.test(JS + QMD), "no universal claim about dual signs");
+    ok(!/forced above demand/.test(JS + QMD) && /extra demand can lower the cost across linked hours/i.test(QMD) && /Extra demand can lower the cost across linked hours/.test(JS) && /the least nuclear and the ramp allow/.test(QMD + JS), "the negative dual is explained by linked hours at the least output nuclear and the ramp allow (105 MW; 104 MW would be infeasible), not by output above demand");
+    { const a = M.instance(town, year); a.d[17] = 104; ok(core.solveWith(highs, M.buildModel(a, null)).status === "infeasible", "below 105 MW at 17:00 the model is infeasible: output cannot exceed demand"); }
     has("“A balance dual can never be negative.”", "the myth on dual signs"); has("its dual becomes −$140", "the counterexample in the myth answer"); ok(/data-id="neg2" data-answer="myth"/.test(QMD), "the dual-sign myth is a myth");
   }
 
@@ -194,8 +205,18 @@ const has = (s, msg) => ok(QMD.indexOf(s) >= 0, "page states " + (msg || JSON.st
     has("the cost-optimal paths of a model, under the study's alternative assumptions", "the Trutnevyte wording");
     has("9 to 23%");
     ok(J.vv.filter(v => v.answer === 0).length === 3 && J.vv.length === 6, "vv: three verification, three validation");
+    { const SC = fs.readFileSync(path.join(SITE, "learn/_w1/b03-read-check-formulation.yml"), "utf8");
+      ok(/equations and code implement the intended model correctly/.test(JS) && /equations and code implement the intended model correctly/.test(QMD) && /equations and code implement the intended model correctly/.test(SC) && !/does what its equations say/.test(JS + QMD + SC), "verification compares the equations and code with the intended model (step 8, the fallback, the glossary)"); }
+    ok(/text: "Σ over g adds down a column: every plant, one hour\. Tap the column for Σg p\(g,19\)\.",/.test(JS) && /Next, Σ over t adds along a row/.test(JS), "step 3 asks one thing at a time: the row task appears after the column");
     ok(J.blocks.map(b => b.key).join() === "sets,par,vars,obj,cons", "blocks: the reading sequence");
-    ok(/−<i>R<\/i> Δ<i>t<\/i> ≤ .* ≤ <i>R<\/i> Δ<i>t<\/i>/.test(J.lines.ramp) && QMD.indexOf("−R Δt ≤ p<sub>cc,t</sub> − p<sub>cc,t−1</sub> ≤ R Δt") > 0, "ramp line: R Δt, so every side is in MW (data and fallback)");
+    ok(/−<i>R<\/i> Δ<i>t<\/i> ≤ .* ≤ <i>R<\/i> Δ<i>t<\/i>/.test(J.lines.ramp) && between("<!-- b3-static-lines:start -->", "<!-- b3-static-lines:end -->") === staticLines(), "ramp line: R Δt, so every side is in MW (data, and the fallback's generated lines)");
+    ok(LN.every(k => J.lineWords[k] && J.lineTags[k]) && JSON.stringify(LN.map(k => J.lineTags[k])) === JSON.stringify(["data", "goal", "(1)", "(2)", "(3)", "(4)", "(5)"]) && /views: o\.onPick \? \["symbols"\] : \["symbols", "words"\]/.test(JS) && /tag: J\.lineTags\[k\]/.test(JS),
+      "every line has words and one tag, the same with and without JavaScript; the read-only lines offer a words view");
+    { const dom = /<i>p<\/i>, <i>u<\/i> ≥ 0$/, m = M.buildModel(inst, null);
+      ok(m.variables.every(v => v.lb === undefined || v.lb === 0) && dom.test(J.lines.must) && dom.test(J.practice.bugs.flat.html) && /zero or more/.test(J.lineWords.must) && /at least 0/.test(M.inputs(inst).find(r => r.sym === "<i>p<sub>g,t</sub></i>").name),
+        "the variables' domain, p, u ≥ 0, as the model's bounds have it: on the formulation's last line (both versions of it), in its words and in the key"); }
+    ok(J.legend.some(x => x[0] === "g ∈ G" && /belongs to the set of plants/.test(x[1])) && M.inputs(inst).some(r => r.sym === "<i>p<sub>g,t</sub></i>" && r.value === "chosen") && M.inputs(inst).some(r => r.sym === "<i>u<sub>t</sub></i>" && r.value === "chosen"), "the key defines p(g,t) and u(t) and reads g ∈ G aloud");
+    ok(/line \(5\), “nuclear runs flat”/.test(J.practice.items.g2.right) && /<span class="b3-tag">\(5\)<\/span> <i>p<\/i><sub>nuc,<i>t<\/i><\/sub> ≤/.test(staticPractice()) && !/<ol class="b3-static">/.test(QMD), "the static practice names line (5) by its tag and name, as its list shows it (no 1-to-7 numbering)");
     { const K = M.inputs(inst), s16 = K.find(r => /cc,16/.test(r.sym));
       ok(s16 && s16.value === "45" && s16.unit === "MW" && /given, not chosen/.test(s16.name), "key: p(cc,16) = 45 MW, a given start");
       ok(K.find(r => r.sym === "<i>d<sub>t</sub></i>").value === "17:00 349, 18:00 344, 19:00 331, 20:00 319" && K.find(r => r.sym === "<i>V</i>").value === "10,000", "key: demand by hour and V from the model"); }
@@ -227,7 +248,7 @@ const has = (s, msg) => ok(QMD.indexOf(s) >= 0, "page states " + (msg || JSON.st
     {
       const plan = G0.expertPlan(G0.prepare(town, year, "lesson0"));
       Object.keys(PJ.windows).forEach(w => { const W = PJ.windows[w]; ok(plan[W.hours[0] - 1].cc === W.start, `practice window ${w}: starts at lesson 0's ${W.start} MW at ${W.hours[0] - 1}:00`); });
-      ok(PJ.foot.indexOf(`The ${PJ.windows.eve.start} MW and ${PJ.windows.dip.start} MW starts are lesson 0's cheapest-first plan at ${PJ.windows.eve.hours[0] - 1}:00 and ${PJ.windows.dip.hours[0] - 1}:00`) > 0, "practice foot: the starts and their hours");
+      ok(PJ.foot.length === 3 && PJ.foot[1][0] === "Starting outputs" && PJ.foot[1][1].indexOf(`the ${PJ.windows.eve.start} MW and ${PJ.windows.dip.start} MW starts are lesson 0's cheapest-first plan at ${PJ.windows.eve.hours[0] - 1}:00 and ${PJ.windows.dip.hours[0] - 1}:00`) === 0 && PJ.foot.every(n => n[1].split(/\s+/).length <= 20), "practice foot: three short labelled notes (solver, the starts and their hours, what is illustrative)");
     }
     // the three new bugs: what each does, from HiGHS
     {

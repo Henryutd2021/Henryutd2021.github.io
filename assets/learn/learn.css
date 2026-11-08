@@ -1488,6 +1488,8 @@ button.lx-fline:hover { border-color: var(--lx-ink-3); }
 .lx-fp-lede { font-size: 15px; color: var(--lx-ink-2); max-width: 72ch; }
 .lx-fp-intro { font-size: 14.5px; color: var(--lx-ink-2); }
 .lx-fp-foot { font-size: 13px; color: var(--lx-ink-3); }
+ul.lx-fp-notes { margin: 0; padding-left: 1.1rem; display: grid; gap: 2px; }
+ul.lx-fp-notes li { margin: 0; } ul.lx-fp-notes b { font-weight: 600; color: var(--lx-ink-2); }
 .lx-fp-fade { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(122px, 1fr)); gap: 6px; }
 @media (max-width: 560px) {
   .lx-fp-bar .lx-seg { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); width: 100%; }
@@ -2068,6 +2070,9 @@ body.page-learn.quarto-dark { --lx-scale-0: #5CC0B1; --lx-scale-1: #5AAED2; --lx
 /* a capstone's card of excerpts before its note (C0): space between the quotes */
 .c0-yard .lx-excerpt + .lx-excerpt { margin-top: 12px; }
 .c0-tornado { min-width: 0; }
+.c0-whole { margin-top: 12px; }
+.c0-whole pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 13.5px; line-height: 1.45; margin: 8px 0 0; }
+.e0-hours table { font-size: 13px; } .e0-hours th[scope="row"] { white-space: nowrap; }
 .e0-extra { display: grid; gap: 14px; }
 @media (max-width: 560px) {
   /* 13 squares a row stay at least 24 px wide on a 375 px phone: the strip uses the card's padding */

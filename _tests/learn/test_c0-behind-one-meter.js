@@ -58,7 +58,8 @@ const QPATH = path.join(SITE, "learn/c0-behind-one-meter.qmd");
 
   // ---------------- blocks
   const BLOCKS = C0.staticBlocks(D, CR, P, E0, SS, RN, EX, RB);
-  const MARK = { plan: "c0-plan", nojs: "c0-nojs", results: "c0-results", note: "c0-note", exemplars: "c0-exemplars", rubric: "c0-rubric", inputs: "c0-inputs" };
+  BLOCKS.whole = C0.wholeHTML(CR, E0, SS, RN, r.results, CR.reference.sens, CR.reference.date, "https://henryutd2021.github.io/learn/c0-behind-one-meter.html");
+  const MARK = { plan: "c0-plan", nojs: "c0-nojs", results: "c0-results", note: "c0-note", exemplars: "c0-exemplars", rubric: "c0-rubric", inputs: "c0-inputs", whole: "c0-whole" };
   function between(q, name) { const a = q.indexOf("<!-- " + name + ":start"), b = q.indexOf("<!-- " + name + ":end -->"); if (a < 0 || b < 0) return null; return { a: q.indexOf("\n", a) + 1, b: b }; }
   let Q = fs.readFileSync(QPATH, "utf8");
   if (WRITE) { Object.keys(MARK).forEach(k => { const r = between(Q, MARK[k]); if (!r) throw new Error(MARK[k] + " markers missing"); Q = Q.slice(0, r.a) + BLOCKS[k] + "\n" + Q.slice(r.b); }); fs.writeFileSync(QPATH, Q); }
@@ -81,8 +82,13 @@ const QPATH = path.join(SITE, "learn/c0-behind-one-meter.qmd");
   // ---------------- the sensitivity the note carries and the note's checks
   const sl = C0.sensLine(D0, sens, E0);
   const widest = sens.rows.slice().sort((a, b) => Math.abs(b.atHi - b.atLo) - Math.abs(a.atHi - a.atLo))[0];
-  ok(typeof sl === "string" && sl.indexOf("The NPV is " + m(sens.base)) === 0 && sl.indexOf(widest.label) < Math.min(...sens.rows.filter(x => x !== widest).map(x => sl.indexOf(x.label))) &&
-    sens.rows.every(x => sl.indexOf(m(x.atLo)) > 0 && sl.indexOf(m(x.atHi)) > 0) && /held fixed/.test(sl), "the note's sensitivity is every bar of the chart, widest first: " + sl);
+  ok(sl && sl.metric === "NPV" && sl.base.value === m(sens.base) && sl.rows[0].label === widest.label && sl.rows.length === sens.rows.length &&
+    sens.rows.every(x => sl.rows.some(y => y.label === x.label && y.lo.value === m(x.atLo) && y.hi.value === m(x.atHi))) && /held fixed/.test(sl.held), "the note's sensitivity is every bar of the chart, widest first, as rows");
+  { const txt = RN.compose(Object.assign(E0.note(D0, R), { sensitivity: sl }), {}, C.note.fields, { format: "text" }), md = RN.compose(Object.assign(E0.note(D0, R), { sensitivity: sl }), {}, C.note.fields, { format: "md" });
+    const sec = txt.slice(txt.indexOf("SENSITIVITY"), txt.indexOf("RECOMMENDATION") > txt.indexOf("SENSITIVITY") ? txt.indexOf("RECOMMENDATION") : txt.indexOf("WHAT THE SITE"));
+    ok(sens.rows.every(x => sec.indexOf("- " + x.label + ": " + m(x.atLo) + " at " + x.loText + "; " + m(x.atHi) + " at " + x.hiText) >= 0) && /\| Input \| NPV, low case; high case \|/.test(md),
+      "the copied note (text and Markdown) carries one row per bar, its two cases in it: the chart's numbers, in every format");
+    ok(RN.sensitivityLine(sl).split(/\s+/).length <= 35 && sec.split("\n").every(l => l.split(/\s+/).length <= 35), "the note's sensitivity: a short line and one row per case, each within 35 words (it was one paragraph of about 70)"); }
   ok(widest.key === "cost", "for the default plan, the equipment cost moves the NPV most");
   const note = E0.note(D0, R); note.link = "https://henryutd2021.github.io/learn/c0-behind-one-meter.html" + C0.hashOf(SS, E0, D0); note.sensitivity = sl;
   const words = C0.exemplarWords(C);
@@ -102,6 +108,17 @@ const QPATH = path.join(SITE, "learn/c0-behind-one-meter.qmd");
   ok(fres("co2") && /^\d/.test(fres("co2").value) && /replaces hydrogen made from gas/.test(fres("co2").note) && /alone/.test(fres("added").note) && /counted as free/.test(fres("lcoh").note),
     "a farm's note keeps the CO₂ row and each result's boundary: " + RN.compose(fn, {}, C.note.fields, { format: "text" }).split("\n").filter(l => /CO₂|alone|free/.test(l)).join(" | "));
   ok(fn.results.every(x => x.note) && /potential saving/.test(fn.assumptions.join(" ")), "every result in the note carries its note; the CO₂ assumption says potential");
+  ok(/grid line not costed/.test(farm.results.readouts.find(x => x.key === "npv").note) && fn.assumptions.some(a => /The grid line is an assumed limit; building or upgrading it is not costed/.test(a)) && !E0.note(D0, R).assumptions.some(a => /connection limit/.test(a)) &&
+    E0.inputRows(D, P).some(x => x[0] === "Farm: line to the grid" && /not costed/.test(x[1])), "the farm's NPV, its note's assumptions and the inputs say the line to the grid is an assumed limit, its cost not counted");
+  // the longest notes: farm plans with every piece of equipment, their sensitivity and the shortest fields the checks
+  // allow, still fit on one page (the reader cannot shorten the bench's parts)
+  { const short = { recommend: "w ".repeat(12).trim(), alone: "w ".repeat(8).trim(), change: "w ".repeat(8).trim() };
+    for (const extra of [{ el: 50, fb: 200, tank: 20 }, { el: 100, fb: 300, tank: 20, sale: "tou" }]) {
+      const s4 = Object.assign({}, D0, { site: "farm" }, extra), b4 = await E0.solve(s4, P, { solver }), n4 = E0.note(s4, b4.results), sn4 = await E0.sensitivity(s4, P, b4, { solver });
+      n4.link = "https://henryutd2021.github.io/learn/c0-behind-one-meter.html" + C0.hashOf(SS, E0, s4); n4.sensitivity = C0.sensLine(s4, sn4, E0);
+      const wc4 = Math.max(RN.countWords(RN.compose(n4, short, C.note.fields, { format: "md" })), RN.countWords(RN.compose(n4, short, C.note.fields, { format: "text" })));
+      ok(b4.ok && wc4 <= RN.PAGE_WORDS && RN.checks(n4, short, C.note.fields).items.find(i => i.id === "page").ok && RN.sensitivityLine(n4.sensitivity).split(/\s+/).length <= 35, "a farm note with " + JSON.stringify(extra) + " and the shortest fields fits on one page (" + wc4 + " words of " + RN.PAGE_WORDS + ")");
+    } }
   // the farm's equipment-cost case (the review's: 50 MW at $3.25/kg, 125%) equals a fresh solve
   {
     const s3 = Object.assign({}, D0, { site: "farm", el: 50, h2: 3.25 }), b3 = await E0.solve(s3, P, { solver }), sn3 = await E0.sensitivity(s3, P, b3, { solver });
@@ -199,6 +216,14 @@ const QPATH = path.join(SITE, "learn/c0-behind-one-meter.qmd");
   C.exemplars.answers.forEach(a => { a.parts.map(q => typeof q === "string" ? q : q.text).join("").split("\n").forEach(l => ok(wc(l) <= 35, "exemplar line within 35 words (" + wc(l) + "): " + l.slice(0, 50))); EX.marks(a).forEach(x => ok(wc(x.note) <= 35, "exemplar note within 35 words: " + x.note.slice(0, 50))); });
   [C.exemplars.lede, C.exemplars.task, C.exemplars.note, C.rubric.lede, C.rubric.note, C.note.lede, C.sensitivity.lede, E0.sensWords(D0, sens).note].forEach(t => ok(wc(t) <= 35, "generated text within 35 words (" + wc(t) + "): " + t.slice(0, 50)));
   C.note.fields.forEach(f => ok(f.hint.split(" ").length <= 25, "note field hint within 25 words: " + f.label));
+  // the generated tables: every cell of the inputs table within 35 words (one idea a row)
+  E0.inputRows(D, P).forEach(x => ok(wc(x[1]) <= 35, "inputs cell within 35 words (" + wc(x[1]) + "): " + x[0]));
+  // the rubric: C0's own level words for all four competences, Proficient each "Look for" line (the bar)
+  C.rubric.competences.forEach(c => { const k = RB.competence(c); ok(c.levels && ["developing", "proficient", "strong"].every(l => c.levels[l] && wc(c.levels[l]) <= 35) && wc(c.look) <= 35, "rubric " + c.id + ": its own developing, proficient and strong words for this note, each within 35 words"); });
+  ok(/the farm whole and against its wind alone/.test(C.rubric.competences[0].look) && /potential saving/.test(C.rubric.competences[0].look) && !/against the same site with nothing new/.test(JSON.stringify(C.rubric)), "accounting: the home and the farm each have their boundary (the farm's NPV is the whole plant's, its CO₂ a potential saving)");
+  ok(/the three parts you write; with the bench's parts/.test(C.exemplars.answers.find(a => a.key === "good").level) && /the chart stays on the page the link opens/.test(Q), "the strong note is labelled as the parts the reader writes; the brief says where the chart stays");
+  { const W = BLOCKS.whole; ok(sens.rows.every(x => W.indexOf(m(x.atLo)) > 0 && W.indexOf(m(x.atHi)) > 0) && /LIMITS OF THIS ANALYSIS/.test(W) && /ASSUMPTIONS/.test(W) && W.indexOf(words.recommend.slice(0, 40)) > 0, "the assembled strong note shows every sensitivity case, the assumptions and the limits with the reader's three parts"); }
+  ok(/Text version: this week, hour by hour/.test(fs.readFileSync(L("components/engine-e0.js"), "utf8")) && /"Needs the grid"/.test(fs.readFileSync(L("components/engine-e0.js"), "utf8")) && /"At a limit"/.test(fs.readFileSync(L("components/engine-e0.js"), "utf8")), "the week chart's text versions: day by day, and hour by hour with when the site needs the grid or meets a limit");
 
   console.log(`${checks - fails}/${checks} checks passed`);
   process.exit(fails ? 1 : 0);

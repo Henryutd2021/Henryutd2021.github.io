@@ -1335,7 +1335,7 @@
   }
   // the readouts beside the bench: [label, value, tone]
   // the readouts; an absent rule is "not tested", never "served", and a shortfall is the worst model
-  // year's at its worse stress hour
+  // year's at its worse stress hour, against the rule (load + its margin), not unserved demand
   function ruleOn(V) { return !("rule" in V) || V.rule !== null; }
   function readouts(V) {
     var maxImp = Math.max.apply(null, V.imp), un = sum(V.unserved), short = Math.max.apply(null, V.reserve.map(function (x) { return x.shortMW; }).concat([0]));
@@ -1344,7 +1344,7 @@
       ["Imports, highest year", pct(maxImp) + " (cap " + pct(V.cap) + ")", maxImp > V.cap + 0.0005 ? "bad" : "good"],
       ["Clean electricity, 2050", pct(V.clean[V.clean.length - 1]), ""],
       un > 0.005 ? ["Electricity not served in the slices", fix(un, 2) + " TWh", "bad"] : !ruleOn(V) ? ["Slices served; stress hours", "not tested (rule off)", "warn"]
-        : short > 0.5 ? ["Short at a stress hour (worst year)", kilo(short) + " MW", "warn"] : ["Every slice and stress hour served", "yes", "good"]];
+        : short > 0.5 ? ["Short of the peak-hour rule (worst year)", kilo(short) + " MW", "warn"] : ["Every slice and stress hour served", "yes", "good"]];
   }
   E4.ui = { COL: COL, NAME: NAME, POS: POS, fmtOf: fmtOf, seg: seg, controls: controls, stopper: stopper, table: table, keys: keys, yearPick: yearPick, Map: Map, MixChart: MixChart,
     Co2Chart: Co2Chart, ImportChart: ImportChart, readouts: readouts, mixOf: mixOf, ruleOn: ruleOn };
