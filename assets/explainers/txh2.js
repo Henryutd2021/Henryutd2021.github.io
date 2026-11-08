@@ -50,7 +50,7 @@
 
   // ---------------------------------------------------------------------------------------------------------------
   // View: one slider (price of gas-fired power); an allocation bar and a chart of CO2 changes across the price range,
-  // with the current price marked; three readouts; one sentence.
+  // with the current price marked; the values at that price as a table ("Show the numbers"); three readouts; one sentence.
   window.Explainer.register("txh2", function (root, h) {
     var state = { price: C.pStart };
     var kt = function (t, signed) { var v = t / 1000; return (signed && v > 0.05 ? "+" : "") + h.fmt(v, Math.abs(v) < 10 ? 1 : 0); };
@@ -66,6 +66,21 @@
       "Bottom: change in yearly CO₂ from gas-fired power, from reformers and in total, across prices of gas-fired power, compared with sending all green hydrogen to industry." });
     var g = h.el("g", {}, svg);
     var legend = h.el("div", { style: "display:flex;flex-wrap:wrap;gap:.25rem 1rem;margin-top:.45rem;font-size:.78rem;color:var(--ink-2)" }, ui.figure);
+    // the values at the chosen price as a table, for keyboard and screen-reader users (the SVG is one image)
+    var data = h.el("details", { class: "ex-data" }, ui.figure);
+    h.el("summary", { text: "Show the numbers" }, data);
+    var table = h.el("table", {}, data);
+    function fillTable(m) {
+      var rows = [["Price of power from gas-fired plants", "$" + m.price + "/MWh"],
+        ["Green hydrogen to industry", kt(m.toIndustry) + " kt a year (" + h.fmt((1 - m.share) * 100, 0) + "%)"],
+        ["Green hydrogen to fuel cells", kt(m.toPower) + " kt a year (" + h.fmt(m.share * 100, 0) + "%)"],
+        ["Fuel cells installed", h.fmt(m.fuelCellMW, 0) + " MW"], ["Power from fuel cells", h.fmt(m.fuelCellMWh / 1000, 1) + " GWh a year"],
+        ["Extra reformer hydrogen", kt(m.extraReformer) + " kt a year"],
+        ["Change in CO₂ from gas-fired power", kt(m.dGas, true) + " kt a year"], ["Change in CO₂ from reformers", kt(m.dRef, true) + " kt a year"],
+        ["Net change in CO₂", kt(m.dNet, true) + " kt a year"]];
+      table.innerHTML = "<caption>Illustrative values from the toy model, compared with sending all green hydrogen to industry</caption><tbody>" +
+        rows.map(function (r) { return "<tr><th scope=\"row\">" + r[0] + "</th><td>" + r[1] + "</td></tr>"; }).join("") + "</tbody>";
+    }
     var set = h.readouts(ui.side, [
       { key: "share", label: "Green hydrogen to fuel cells" },
       { key: "ref", label: "Extra reformer hydrogen" },
@@ -77,6 +92,7 @@
     function update() {
       var m = model(state);
       set({ share: h.fmt(m.share * 100, 0) + "%", ref: kt(m.extraReformer) + " kt/yr", net: kt(m.dNet, true) + " kt CO₂/yr" });
+      fillTable(m);
       var price = "<strong>$" + m.price + "/MWh</strong>";
       if (m.share <= 0) {
         say("At " + price + ", gas-fired power is cheaper than making electricity from green hydrogen once the fuel cells and the reformer " +
