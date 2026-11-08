@@ -136,7 +136,7 @@ const APPROVED_SNAPSHOT = {   // the approved wording, E7 with the revisions aft
   "E7.1": "What does it cost when a large data center must wait for grid energization, and how does the delay affect the developer, electricity ratepayers and society?",
   "E7.2": "A late grid connection costs the developer lost margin and carrying costs; ratepayers face utility carrying and stranding costs; society bears external costs.",
   "E7.3": "The study keeps these present-value accounts separate.",
-  "E7.4": "For a 300 MW-IT facility, a 36-month delay costs the developer on the order of $0.7 billion in present value.",
+  "E7.4": "In the study's illustrative base case, a 36-month delay for a 300 MW-IT facility cost the developer on the order of $0.7 billion in present value.",
   "E7.5": "Staged energization can recover a large share of that cost.",
   "E7.6": "Ratepayer exposure depends strongly on large-load tariff design.",
   "E7.7": "The delay is treated as exogenous and parameters are illustrative; network feasibility is not modeled, and the social perspective is illustrated with a single bridge-power example.",

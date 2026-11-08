@@ -60,8 +60,8 @@ const APPROVED_SNAPSHOT = {
   const LPATH = X.L("data/e2-c2-library.json"), GRID = E2.c2Grid(S, def), ref = Object.assign({}, def, E2.c2presets[1].state, { share: 50 });
   const libOf = async st => C.libEntry(E2, P, st, await E2.solve(st, P, { solver, task: "year", timeLimit: C.LIB_LIMIT }));
   const grid = {}; E2.C2_DISPATCH.forEach(k => { const f = S.fields.filter(x => x.id === k)[0], v = []; for (let x = f.min; x <= f.max; x += f.step) v.push(x); grid[k] = v; });
-  const libText = plans => '{"about":"Engine E2\'s precomputed library for capstone C2 (learn/c2-plains-grid-hard-year.qmd): every plan of the grid (the dispatch fields of C2\'s plan), its year of 26 days (12 representative days and the two hard weeks) solved with E2 itself on ' + RUN_DATE +
-    ', each day a MILP (gap 1e-6, at most ' + C.LIB_LIMIT + ' s) then the dispatch LP with the commitment fixed. Written by node _tests/learn/test_c2-plains-grid-hard-year.js --write; checked byte for byte.","date":"' + RUN_DATE + '","timeLimit":' + C.LIB_LIMIT +
+  const libText = plans => '{"about":"The year of every plan on capstone C2\'s grid of choices (the choices that change the dispatch): 12 representative days and the two hard weeks, each day committed by a mixed-integer program (gap 1e-6, at most ' + C.LIB_LIMIT +
+    ' s a solve) and priced by the dispatch linear program with the commitment fixed, solved with engine E2 and HiGHS on ' + RUN_DATE + '. The page shows each plan\'s year from here, at once.","date":"' + RUN_DATE + '","timeLimit":' + C.LIB_LIMIT +
     ',"grid":' + JSON.stringify(grid) + ',"plans":[\n' + plans.map(e => JSON.stringify(e)).join(",\n") + "\n]}\n";
   let LIB = fs.existsSync(LPATH) ? JSON.parse(fs.readFileSync(LPATH, "utf8")) : null;
   if (WRITE && !process.argv.includes("--keep-library")) {

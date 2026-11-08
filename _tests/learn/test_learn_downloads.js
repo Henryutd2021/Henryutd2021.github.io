@@ -5,14 +5,14 @@
 //              keep their publishers' terms, named in the same line) }, among the file's first three keys
 //   no string in the file reads as an instruction to the course's maintainers: no test or script paths, no "--write",
 //   no "node <file>.js", no "never this block", no "do not edit by hand", no "written by the test"
-// Not covered here: the shared data of Prairie City and Prairieland and of engines E3 and E4, whose `about` blocks
-// are written by their own data builders.
+// Not covered here: the shared data of Prairie City and of engine E3, whose `about` blocks are written by their own data
+// builders. Prairieland's data and engine E4's files are covered.
 // Run from the site folder: node _tests/learn/test_learn_downloads.js
 "use strict";
 const fs = require("fs"), path = require("path");
 const SITE = path.resolve(__dirname, "..", "..");
 const LEARN = path.join(SITE, "learn"), DATA = path.join(SITE, "assets/learn/data");
-const NOT_COVERED = /^(e3-|e4-|prairie-city|prairieland)/;
+const NOT_COVERED = /^(e3-|prairie-city)/;
 let checks = 0, fails = 0;
 function ok(c, msg) { checks++; if (!c) { fails++; console.log("FAIL:", msg); } }
 
@@ -23,7 +23,7 @@ fs.readdirSync(LEARN).filter(f => f.endsWith(".qmd")).forEach(f => {
   for (const m of q.matchAll(/href="\.\.\/assets\/learn\/data\/([a-z0-9_-]+)\.json"/g)) (offered[m[1]] = offered[m[1]] || []).push(f);
 });
 const names = Object.keys(offered).sort(), covered = names.filter(n => !NOT_COVERED.test(n));
-ok(covered.length >= 24, "the offered files are found (" + covered.length + " covered, " + (names.length - covered.length) + " not covered)");
+ok(covered.length >= 27, "the offered files are found (" + covered.length + " covered, " + (names.length - covered.length) + " not covered)");
 
 const MAINT = [
   [/_tests\//, "a test path"], [/--write\b/, "a write flag"], [/\bnode\s+\S+\.js\b/, "a node command"],

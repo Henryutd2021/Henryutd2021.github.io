@@ -46,8 +46,8 @@
     },
     "spp": {
       "what": "SPP's 2025 totals and shares (annual demand, peak hour, solar share of net generation) as computed from the EIA-930 files listed in town_days.json meta, in its `stats` block",
-      "source": "EIA, Hourly Electric Grid Monitor (Form EIA-930), six-month BALANCE files 2025, balancing authority SWPP",
-      "url": "https://www.eia.gov/electricity/gridmonitor/sixMonthFiles/",
+      "source": "EIA, Hourly Electric Grid Monitor (Form EIA-930), six-month BALANCE files 2025 (on the Grid Monitor's dashboard: Download Data → Six-Month Files), balancing authority SWPP",
+      "url": "https://www.eia.gov/electricity/gridmonitor/dashboard/electric_overview/US48/US48",
       "as_of": "accessed 2 November 2026"
     }
   }

@@ -662,6 +662,10 @@
           { label: "Version 4 (missing rule)", path: ["paper", "code", "ver", "q1", "fix"], text: fill("Only paper against code catches it: {rampRows} ramp rows on paper, {rampRowsMissing} in the code. It would pass the benchmark (**{benchMissing}**).", v) },
           { label: "The fixed study", path: ["paper", "code", "ver", "q1", "bench", "q2", "val", "q3", "rev", "rep", "end"], text: fill("Checks pass and the benchmark matches (**{benchOk}**). The forecast misses its {fcTol} MW tolerance at {fcMaxHour}, so the claim is narrowed: **{honest}** planned the day before, **{ok}** only as an upper bound. Then a clean clone reruns it.", v) }
         ], sel: 2 });
+      // the flowchart sits in the task section, which has no h2 of its own: its title is that section's heading, so it is
+      // an h2 (an h3 there would skip a level after the page's h1); the page's style block keeps the h3's look
+      var t3 = x1.querySelector(".lx-x-head h3");
+      if (t3) t3.parentNode.replaceChild(H("h2", { class: t3.className || null, text: t3.textContent }), t3);
     }
     var x2 = document.getElementById("r5-exemplars");
     if (x2) { x2.innerHTML = ""; var E = exemplars(J, v); E.id = "r5-ex"; LX.Exemplars(H("div", { class: "lx-xcard" }, x2), E); }

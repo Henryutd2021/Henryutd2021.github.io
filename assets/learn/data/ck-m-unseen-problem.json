@@ -180,7 +180,7 @@
      "sha256": "1146158b972439db7c7f4cc7d0491e07644ddbf244d03b8ecb44cb2c833d10f1"
     }
    ],
-   "outputUrl": "https://www.eia.gov/electricity/gridmonitor/sixMonthFiles/",
+   "outputUrl": "https://www.eia.gov/electricity/gridmonitor/dashboard/electric_overview/US48/US48",
    "outputAccessed": "2026-11-05",
    "outputDerivedBy": "the same extraction step on the EIA-930 files, with the cleaning rules of the course's year file (town_year.json)",
    "src": [

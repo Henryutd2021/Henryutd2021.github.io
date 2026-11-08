@@ -100,7 +100,7 @@
   {"id": "integrity", "look": "The licence of every source is checked and stated, with the attribution lines it asks for."}
  ],
  "sources": [
-  {"label": "EIA, Hourly Electric Grid Monitor six-month files (Form EIA-930)", "url": "https://www.eia.gov/electricity/gridmonitor/sixMonthFiles/", "as_of": "2 November 2026"},
+  {"label": "EIA, Hourly Electric Grid Monitor six-month files (Form EIA-930), on its dashboard: Download Data → Six-Month Files", "url": "https://www.eia.gov/electricity/gridmonitor/dashboard/electric_overview/US48/US48", "as_of": "2 November 2026"},
   {"label": "EIA, Copyrights and reuse", "url": "https://www.eia.gov/about/copyrights_reuse.php", "as_of": "3 November 2026"},
   {"label": "USGS, U.S. Wind Turbine Database (v9.1, 28 September 2026): licence and attribution", "url": "https://energy.usgs.gov/uswtdb/", "as_of": "3 November 2026"},
   {"label": "Ember, Electricity Data Explorer (CC BY 4.0)", "url": "https://ember-energy.org/data/electricity-data-explorer/", "as_of": "2 November 2026"},

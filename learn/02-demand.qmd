@@ -179,11 +179,11 @@ The energy above a line $L$ counts only the part of each hour's demand over the 
 <table class="lx-facts">
 <thead><tr><th scope="col">Number</th><th scope="col">What it means</th><th scope="col">Source</th></tr></thead>
 <tbody>
-<tr><td class="n">54.4 GW</td><td>The Southwest Power Pool's busiest hour of 2025: 16:00 to 17:00 on 29 July.</td><td class="s"><a href="https://www.eia.gov/electricity/gridmonitor/sixMonthFiles/">EIA-930 six-month files</a>, computed · data for 2025</td></tr>
-<tr><td class="n">299 TWh</td><td>SPP's demand over 2025: an average of 34 GW, so a load factor of 0.63.</td><td class="s"><a href="https://www.eia.gov/electricity/gridmonitor/sixMonthFiles/">EIA-930 six-month files</a>, computed · data for 2025</td></tr>
+<tr><td class="n">54.4 GW</td><td>The Southwest Power Pool's busiest hour of 2025: 16:00 to 17:00 on 29 July.</td><td class="s"><a href="https://www.eia.gov/electricity/gridmonitor/dashboard/electric_overview/US48/US48">EIA-930 six-month files</a> (Download Data → Six-Month Files), computed · data for 2025</td></tr>
+<tr><td class="n">299 TWh</td><td>SPP's demand over 2025: an average of 34 GW, so a load factor of 0.63.</td><td class="s"><a href="https://www.eia.gov/electricity/gridmonitor/dashboard/electric_overview/US48/US48">EIA-930 six-month files</a> (Download Data → Six-Month Files), computed · data for 2025</td></tr>
 <tr><td class="n">759 GW</td><td>Record peak demand of the Lower 48 states, on the same day, 29 July 2025.</td><td class="s"><a href="https://www.eia.gov/todayinenergy/detail.php?id=65864">EIA, Today in Energy</a> · as of August 2025</td></tr>
-<tr><td class="n">180 hours</td><td>Hours of 2025 with demand above 90% of the year's peak (SPP's shape): 2.1% of the year.</td><td class="s"><a href="https://www.eia.gov/electricity/gridmonitor/sixMonthFiles/">EIA-930 six-month files</a>, computed · data for 2025</td></tr>
-<tr><td class="n">0.8%</td><td>Solar's share of SPP's net generation in 2025.</td><td class="s"><a href="https://www.eia.gov/electricity/gridmonitor/sixMonthFiles/">EIA-930 six-month files</a>, computed · data for 2025</td></tr>
+<tr><td class="n">180 hours</td><td>Hours of 2025 with demand above 90% of the year's peak (SPP's shape): 2.1% of the year.</td><td class="s"><a href="https://www.eia.gov/electricity/gridmonitor/dashboard/electric_overview/US48/US48">EIA-930 six-month files</a> (Download Data → Six-Month Files), computed · data for 2025</td></tr>
+<tr><td class="n">0.8%</td><td>Solar's share of SPP's net generation in 2025.</td><td class="s"><a href="https://www.eia.gov/electricity/gridmonitor/dashboard/electric_overview/US48/US48">EIA-930 six-month files</a> (Download Data → Six-Month Files), computed · data for 2025</td></tr>
 </tbody>
 </table>
 </div>
@@ -209,7 +209,7 @@ The energy above a line $L$ counts only the part of each hour's demand over the 
 <div class="lx-card lx-sources">
 <p class="lx-eyebrow">Sources and further reading</p>
 <ul>
-<li>EIA. <a href="https://www.eia.gov/electricity/gridmonitor/">Hourly Electric Grid Monitor</a> (Form EIA-930), and its <a href="https://www.eia.gov/electricity/gridmonitor/sixMonthFiles/">six-month files</a>: the Southwest Power Pool's 2025 data behind every curve here.</li>
+<li>EIA. <a href="https://www.eia.gov/electricity/gridmonitor/">Hourly Electric Grid Monitor</a> (Form EIA-930), and its <a href="https://www.eia.gov/electricity/gridmonitor/dashboard/electric_overview/US48/US48">six-month files</a> (on the dashboard: Download Data → Six-Month Files): the Southwest Power Pool's 2025 data behind every curve here.</li>
 <li>EIA (2025). <a href="https://www.eia.gov/todayinenergy/detail.php?id=65864">U.S. electricity peak demand set new records twice in July</a>. Today in Energy.</li>
 <li>EIA (2023). <a href="https://www.eia.gov/todayinenergy/detail.php?id=56880">As solar capacity grows, duck curves are getting deeper in California</a>. Today in Energy.</li>
 <li>EIA. <a href="https://www.eia.gov/energyexplained/electricity/use-of-electricity.php">Electricity explained: Use of electricity</a> (2025 data).</li>

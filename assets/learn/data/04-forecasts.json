@@ -1,8 +1,8 @@
 {
  "meta": {
   "title": "Lesson 4 forecast statistics (Southwest Power Pool, 2025)",
-  "source": "U.S. Energy Information Administration, Form EIA-930 Hourly Electric Grid Monitor, six-month BALANCE files, balancing authority SWPP (Southwest Power Pool), calendar year 2025",
-  "source_url": "https://www.eia.gov/electricity/gridmonitor/sixMonthFiles/",
+  "source": "U.S. Energy Information Administration, Form EIA-930 Hourly Electric Grid Monitor, six-month BALANCE files (on the Grid Monitor's dashboard: Download Data \u2192 Six-Month Files), balancing authority SWPP (Southwest Power Pool), calendar year 2025",
+  "source_url": "https://www.eia.gov/electricity/gridmonitor/dashboard/electric_overview/US48/US48",
   "files": [
    {
     "name": "EIA930_BALANCE_2025_Jan_Jun.csv",

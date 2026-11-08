@@ -47,7 +47,7 @@ const QPATH = path.join(SITE, "learn/c0-behind-one-meter.qmd");
   ok(r.ok, "the default plan runs");
   const sens = await E0.sensitivity(D0, P, r, { solver });
   if (WRITE) {
-    C.reference = { about: "Written by node _tests/learn/test_c0-behind-one-meter.js --write: the default plan's sensitivity, for the page's no-JS route.", date: new Date().toLocaleDateString("en-CA"), sens: sens };
+    C.reference = { about: "The default plan's sensitivity, shown when JavaScript is off, solved with engine E0 and HiGHS.", date: new Date().toLocaleDateString("en-CA"), sens: sens };
     let txt = fs.readFileSync(L("data/c0-behind-one-meter.json"), "utf8"), at = txt.lastIndexOf(',\n "reference"');
     if (at < 0) at = txt.lastIndexOf("\n}");
     fs.writeFileSync(L("data/c0-behind-one-meter.json"), txt.slice(0, at) + ',\n "reference": ' + JSON.stringify(C.reference) + "\n}\n");

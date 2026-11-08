@@ -1239,6 +1239,7 @@ LX.E3.ui.hhTable(host, R); LX.E3.ui.hubDiagram(host); LX.E3.ui.readouts(R); LX.E
 | Field | What it holds (units) | Read by |
 |---|---|---|
 | `about` | `line` (the fictional line, word for word), what the file is, `method`, the `simplifications` to state on a page (all fossil energy burned, one demand shape, lagged wind, a transport model, no exports or biomass) | every page |
+| `dataset` | for a reader who downloads the file: creator, date, status (fictional, illustrative), source and license | the download (M13) |
 | `dollarYear`, `units` | 2025 dollars; PJ on net calorific values, MW, Mt CO2; 3.6 PJ per TWh; GJ per MMBtu and the net-to-gross heating-value ratios used to convert EIA's prices | every page |
 | `nation` | people, workforce (A13's), GDP, primary energy and its shares (the card), the renewables split, final and useful energy, electricity, CO2, import dependence, per-person figures | F10, A20, A21 |
 | `regions` | per region: people, `story`, `climate` (degree days, base 18 C; Capital Valley's are Prairie City's NOAA normals), `resources` (wind and solar capacity factors, the most wind and solar it can hold, hydro, coal, crude and gas, the wind lag), `final` (PJ by sector and carrier), `capacityMW`, `electricity` (final, grid losses, generation, net export) and `co2Mt` | F10, A21, M13, SB4/E4, C4 |

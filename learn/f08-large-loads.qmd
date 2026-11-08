@@ -249,7 +249,7 @@ $$\text{LF} = \frac{\bar d + c}{d_{\max} + c} = \frac{281.9 + 240}{450 + 240} = 
 <div class="lx-card lx-real">
 <p class="lx-eyebrow">In the real world</p>
 <p>Waiting for grid service costs money, and the cost grows with every month.</p>
-<blockquote class="lx-excerpt" data-source="excerpt:code"><p>For a 300 <span class="lx-term" data-term="mw-it">MW-IT</span> facility, a 36-month delay costs the developer on the order of $0.7 billion in <span class="lx-term" data-term="present-value">present value</span>.</p><p><span class="lx-term" data-term="staged-energization">Staged energization</span> can recover a large share of that cost.</p><footer>From: Li et al. (2026), accepted paper, 2026 North American Power Symposium (NAPS); DOI pending.</footer></blockquote>
+<blockquote class="lx-excerpt" data-source="excerpt:code"><p>In the study's illustrative base case, a 36-month delay for a 300 <span class="lx-term" data-term="mw-it">MW-IT</span> facility cost the developer on the order of $0.7 billion in <span class="lx-term" data-term="present-value">present value</span>.</p><p><span class="lx-term" data-term="staged-energization">Staged energization</span> can recover a large share of that cost.</p><footer>From: Li et al. (2026), accepted paper, 2026 North American Power Symposium (NAPS); DOI pending.</footer></blockquote>
 <p class="lx-hint">MW-IT counts computing equipment only; this lesson's 300 MW is the whole campus's grid contract. Present value states future costs in today's dollars.</p>
 <p class="lx-hint">The full case: case file <a href="cf7-cost-of-waiting.html">CF7</a> (what waiting for a grid connection costs, and who pays).</p>
 </div>

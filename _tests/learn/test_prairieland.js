@@ -35,7 +35,9 @@ const SECT = ["industry", "buildings", "transport", "agriculture"];
 // ---------------- the frame
 ok(D.about.line === "Prairieland is fictional; its numbers are illustrative.", "the fictional line, word for word");
 ok(D.dollarYear === 2025 && D.about.dollarYear === 2025 && D.costs.dollarYear === 2025, "2025 dollars");
-ok(/Prairieland data build step/.test(D.about.builtBy) && /test_prairieland\.js/.test(D.about.builtBy), "about names its build step and its test");
+ok(/Prairieland data build step/.test(D.about.builtBy) && !/_tests\/|\.js\b|by hand/.test(D.about.builtBy), "about names its build step, with no maintenance wording");
+ok(Object.keys(D)[1] === "dataset" && Object.keys(D.dataset).join() === "creator,date,status,source,license" && D.dataset.date === D.about.built && /^Illustrative: Prairieland is fictional\./.test(D.dataset.status),
+  "the download's dataset block: creator, date (the build date), status, source, license");
 ok(RAW.length < 100 * 1024, "the file is under 100 KB (" + (RAW.length / 1024).toFixed(1) + " KB)");
 ok(JSON.stringify(D.regions.map(r => r.key)) === JSON.stringify(RK), "five regions");
 
@@ -270,7 +272,7 @@ const refs = [];
   else if (typeof x === "string" && k === "src") refs.push(x);
 })(D, "");
 ok(refs.length >= 10 && refs.every(s => D.sources[s]), "every src names a source in the file (" + refs.filter(s => !D.sources[s]).join(", ") + ")");
-ok(!/https?:\/\//.test(JSON.stringify(Object.assign({}, D, { sources: null }))), "links appear only in sources");
+ok(!/https?:\/\//.test(JSON.stringify(Object.assign({}, D, { sources: null, dataset: Object.assign({}, D.dataset, { license: null }) }))), "links appear only in sources (and the license's address)");
 
 // ---------------- the README section
 const README = fs.readFileSync(L("README.md"), "utf8");
