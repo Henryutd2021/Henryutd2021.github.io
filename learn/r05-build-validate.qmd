@@ -99,7 +99,7 @@ body-classes: "page-learn page-lesson lx-form-studio"
 <style>/* lesson-local */
 .r5-nb { margin-top: 1.2rem; max-width: 980px; } .r5-dl { margin-top: .6rem !important; display: flex; flex-wrap: wrap; gap: 8px; }
 .r5-nb-steps { margin: .4rem 0 0; padding-left: 1.3rem; display: grid; gap: 2px; }
-.r5-flow { margin-top: 1.2rem; } .page-learn .r5-flow .lx-x-head h2 { font-size: 20px; margin-bottom: 0; }
+.r5-flow { margin-top: 1.2rem; }
 .r5-task { margin-bottom: 1rem; max-width: 980px; }
 .r5-static, .r5-static-rules { margin: 0; padding-left: 1.3rem; display: grid; gap: 10px; font-size: 15px; }
 .r5-static p { margin: 0 0 4px; } .r5-static-code code { white-space: pre-wrap; word-break: break-word; }

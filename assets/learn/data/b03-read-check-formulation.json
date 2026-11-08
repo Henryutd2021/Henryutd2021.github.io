@@ -1,7 +1,7 @@
 {
  "meta": {
   "title": "Bridge B3 (How do you read a formulation, and check that a model is right?): formulation, suspects and checks",
-  "built_by": "by hand, 2026-11-02; the precomputed solution ('ref') was solved with HiGHS 1.15.4 and is re-checked by _tests/learn/test_b03-read-check-formulation.js",
+  "built_by": "by hand, 2026-11-02; the precomputed solution ('ref') was solved with HiGHS 1.15.1 and is checked against a fresh solve",
   "license": "CC BY 4.0",
   "notes": "Prairie Town's dispatch, 17:00-20:00 on 3 September 2025 (lesson 0's day, from EIA-930 shapes for the Southwest Power Pool, scaled). Fleet and prices from town.json; the 45 MW start of the combined-cycle plant is lesson 0's cheapest-first plan at 16:00; V = $10,000/MWh for unserved demand is illustrative. The ramp line is written with R Δt so that every side is in MW. The signs of the balance duals are those of these inputs: the Node test also solves two counterexamples (17:00 demand of 105 MW gives a negative 17:00 dual; a 150 MW start gives a positive ramp dual)."
  },
@@ -39,7 +39,7 @@
  ],
  "units": {"options": ["$/MWh", "MW", "h", "MWh", "$", "$/MW"], "factors": [{"sym": "c<sub>g</sub>", "answer": "$/MWh"}, {"sym": "p<sub>g,t</sub>", "answer": "MW"}, {"sym": "Δt", "answer": "h"}], "result": "$"},
  "ref": {
-  "solver": "HiGHS 1.15.4",
+  "solver": "HiGHS 1.15.1",
   "objective": 22600,
   "hours": [17, 18, 19, 20],
   "p": {"nuc": [100, 100, 100, 100], "wind": [44, 59, 72, 89], "solar": [130, 70, 14, 0], "cc": [75, 115, 145, 130], "pk": [0, 0, 0, 0]},
@@ -201,7 +201,7 @@
     "duals": "The solver's balance duals: {duals} per MWh."
    }
   },
-  "ref_note": "HiGHS 1.15.4 solutions of the practice models (node _tests/learn/test_b03-read-check-formulation.js --ref), the page's answer when the solver cannot load; re-checked by the same test.",
+  "ref_note": "HiGHS 1.15.1 solutions of the practice models, the page's answer when the solver cannot load; each is checked against a fresh solve.",
   "ref": {
    "vkwh": {"objective": 8700, "p": {"nuc": [100, 100, 100, 100], "wind": [54, 59, 72, 89], "solar": [130, 70, 14, 0], "cc": [5, 0, 0, 0], "pk": [0, 0, 0, 0]}, "u": [60, 115, 145, 130], "balanceDuals": [10, 10, 10, 10]},
    "flat": {"objective": 22500, "p": {"nuc": [90, 100, 100, 100], "wind": [54, 59, 72, 89], "solar": [130, 70, 14, 0], "cc": [75, 115, 145, 130], "pk": [0, 0, 0, 0]}, "u": [0, 0, 0, 0], "balanceDuals": [10, 70, 40, 40]},

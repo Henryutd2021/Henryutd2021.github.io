@@ -322,7 +322,7 @@
       ".a22-radarcard{grid-area:radar}.a22-libcard{grid-area:lib}.a22-panel{grid-area:panel;display:grid;gap:14px;min-width:0}",
       "@media (max-width:860px){.a22-play{grid-template-columns:minmax(0,1fr);grid-template-areas:'radar' 'panel' 'lib'}}",
       ".a22-card{background:var(--lx-surface);border:1px solid var(--lx-line);border-radius:var(--lx-r-lg);padding:14px 16px;display:grid;gap:10px;min-width:0}",
-      ".page-learn .a22-card h3{font-size:17px;margin:0}.a22-card>*,.a22-panel>*{min-width:0;max-width:100%}",
+      ".page-learn .a22-card :is(h2,h3){font-size:17px;margin:0}.page-learn .a22-card .a22-head h2{opacity:.9}.a22-card>*,.a22-panel>*{min-width:0;max-width:100%}",
       ".a22-head{display:flex;justify-content:space-between;align-items:center;gap:6px 12px;flex-wrap:wrap}",
       ".a22-sub{font-size:13.5px;color:var(--lx-ink-3);margin:0}",
       ".a22-radar svg{display:block;width:100%;max-width:440px;height:auto;margin:0 auto}",
@@ -343,7 +343,7 @@
       ".a22-tile small{font-family:var(--lx-f-mono);font-size:11.5px;min-height:1.2em;color:var(--lx-ink-3)}",
       ".a22-tile small.good{color:var(--lx-good)}.a22-tile small.bad{color:var(--lx-bad)}",
       ".a22-def{border-left:3px solid var(--lx-accent);background:var(--lx-surface-2);border-radius:0 10px 10px 0;padding:9px 12px;display:grid;gap:5px;font-size:14px}",
-      ".a22-def[hidden]{display:none}.page-learn .a22-def h4{font-size:14.5px;margin:0}.a22-def p{margin:0}",
+      ".a22-def[hidden]{display:none}.page-learn .a22-def :is(h3,h4){font-size:14.5px;margin:0}.a22-def p{margin:0}",
       ".a22-def .kind{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--lx-ink-3)}.a22-def .kind.choice{color:var(--lx-warn)}",
       ".a22-cmp{font-size:13.5px;color:var(--lx-ink-2);margin:0}.a22-cmp b{font-family:var(--lx-f-mono);font-weight:600}",
       ".a22-fields{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:3px 10px;margin:0}.a22-fields dt{font-family:var(--lx-f-display);font-size:12.5px;color:var(--lx-ink-3);padding-top:1px}",
@@ -513,7 +513,8 @@
     var panel = H("div", { class: "a22-panel" }, lay);
     var lc = H("section", { class: "a22-card a22-libcard", "aria-label": "Nine plans for Prairie Town" }, lay);
 
-    var rh = H("div", { class: "a22-head" }, rc); var rTitle = H("h3", { text: "Your plan: five goals at once" }, rh);
+    // the two cards' titles share a level: h3, or an h2 when the layout sits right under the page title
+    var rh = H("div", { class: "a22-head" }, rc), cardTag = LX.hTag(3, rh), subTag = "h" + (+cardTag.charAt(1) + 1); var rTitle = H(cardTag, { text: "Your plan: five goals at once" }, rh);
     var status = LX.SolverStatus(rh);
     H("p", { class: "a22-sub", text: "Each spoke is one goal, from the worst end of its scale (centre) to the best (rim); the dashed ring is halfway. Every plan runs through all 8,760 hours of 2025." }, rc);
     var radar = Radar(rc, { axes: AXES_UI, label: "Radar of five goals" });
@@ -538,7 +539,7 @@
       defBox.hidden = !defSel; defBox.innerHTML = ""; if (!defSel) return;
       var k = M.axisKey(defSel, S_.defs), d = DEFN[k];
       H("p", { class: "kind" + (d.choice ? " choice" : ""), text: LAB[defSel] + " · " + d.kind }, defBox);
-      H("h4", { text: d.name + " (" + d.unit + ")" }, defBox);
+      H(subTag, { text: d.name + " (" + d.unit + ")" }, defBox);
       var dl = H("dl", { class: "a22-fields" }, defBox);
       [["Measure", d.measure], ["Assumption", d.assume], k === "fair" ? ["Tariff now", TARIFF[S_.defs.fair].label + ": " + TARIFF[S_.defs.fair].text + "."] : null,
        ["Leaves out", d.leaves], d.read ? ["Reading it", d.read] : null].forEach(function (f) {
@@ -546,7 +547,7 @@
       });
     }
 
-    var lh = H("div", { class: "a22-head" }, lc); H("h3", { text: "Nine plans for Prairie Town" }, lh);
+    var lh = H("div", { class: "a22-head" }, lc); H(cardTag, { text: "Nine plans for Prairie Town" }, lh);
     var libSub = H("p", { class: "a22-sub", text: "Hand-made, illustrative plans, each run through 2025. Select a plan to compare it with yours on the radar." }, lc);
     var grid = H("div", { class: "a22-plans" }, lc), cards = {};
     LIB.forEach(function (p) {

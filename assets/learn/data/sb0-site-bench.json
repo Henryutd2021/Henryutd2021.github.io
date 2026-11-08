@@ -1,5 +1,5 @@
 {
- "about": "Sandbox SB0, the Site Bench: the words of the page's explain layer. The engine, its data and every number are in assets/learn/components/engine-e0.js and assets/learn/data/e0.json; the check of the run in 52 weeks and 31 December against one full-year LP is written into e0.json (reference) by _tests/learn/test_sb0-site-bench.js --write.",
+ "about": "Sandbox SB0, the Site Bench: the words of the page's explain layer. The engine's data and every number are in e0.json, with the check of the run in 52 weeks and 31 December against one LP over the whole year (its `reference` block).",
  "rules": {
   "title": "Decisions, goal and rules, in words",
   "items": [

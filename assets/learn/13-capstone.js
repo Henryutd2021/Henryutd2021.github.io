@@ -161,7 +161,8 @@
     var deb = H("div", { class: "lx-debrief lx-stepcard", hidden: true, tabindex: "-1" }, lay);
 
     var c1 = H("section", { class: "lx13-card lx13-week", "aria-label": "Your plan's year, run on seven weeks" }, stage);
-    var h1 = H("div", { class: "lx13-head" }, c1); H("h3", { text: "Your plan's year, run on seven weeks" }, h1);
+    // the three cards' titles share a level: h3, or an h2 when the stage sits right under the page title
+    var h1 = H("div", { class: "lx13-head" }, c1), cardTag = LX.hTag(3, h1); H(cardTag, { text: "Your plan's year, run on seven weeks" }, h1);
     var status = LX.SolverStatus(h1);
     var mix = H("div", { class: "lx13-mix", role: "img" }, c1), mixLeg = H("p", { class: "lx13-sub" }, c1);
     var seg = H("div", { class: "lx-seg", role: "group", "aria-label": "Week to show" }, c1);
@@ -174,7 +175,7 @@
     var wc = WeekChart(c1);
 
     var c2 = H("section", { class: "lx13-card", "aria-label": "Your plan on the cost and CO₂ frontier" }, stage);
-    var h2 = H("div", { class: "lx13-head" }, c2); H("h3", { text: "Your plan on the frontier" }, h2);
+    var h2 = H("div", { class: "lx13-head" }, c2); H(cardTag, { text: "Your plan on the frontier" }, h2);
     H("p", { class: "lx13-sub", html: LX.rich("The line joins the cheapest plans the solver found at a set of CO₂ caps ([[pareto-frontier|lesson 12]]). Well below it is out of reach; between solved points the true frontier sags slightly below the line.") }, c2);
     var fc = LX.Frontier(c2, { label: "Your plan and the optimizer's plan against the cost and CO₂ frontier", shadeLabel: "out of reach (approximately)",
       frontierLabel: "Frontier: cheapest plans at solved caps, joined by straight lines" });
@@ -183,7 +184,7 @@
     // one LP per cap, in turn; the progress line counts the caps
     var frProg = LX.SolveProgress(c2, { unit: "cap", usual: FRONT_USUAL });
 
-    var ph = H("div", { class: "lx13-head" }, panel); H("h3", { text: "What to build" }, ph);
+    var ph = H("div", { class: "lx13-head" }, panel); H(cardTag, { text: "What to build" }, ph);
     var resetBtn = H("button", { class: "lx-link", type: "button", text: "Back to lesson 0's plants" }, ph);
     var evBox = H("div", { class: "lx-events", "aria-live": "polite" }, panel);
     var sl = {};

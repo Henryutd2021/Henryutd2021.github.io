@@ -1801,6 +1801,8 @@ body.page-learn { --t: var(--lx-accent); }
 /* the card's title as an h2 (right under the page title: LX.hTag in core.js) keeps the h3's look; the id and three classes
    outweigh the theme's first-h2-in-a-section margin on narrow screens */
 .page-learn #quarto-content .lx13-card .lx13-head h2{margin:0;opacity:.9}
+/* the same for the play panel's title (lesson 13's "What to build"), at the size of the theme's h3 */
+.page-learn #quarto-content .lx-play-panel .lx13-head h2{font-size:18px;margin:0;opacity:.9}
 .lx13-head{display:flex;justify-content:space-between;align-items:center;gap:6px 12px;flex-wrap:wrap}
 .lx13-sub{font-size:13.5px;color:var(--lx-ink-3)}
 /* nothing in a card may widen it: wide tables scroll in their own box (.lx13-hours, lesson 12's .lx12-scroll; without
