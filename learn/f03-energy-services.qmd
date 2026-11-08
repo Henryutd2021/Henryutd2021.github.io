@@ -187,8 +187,10 @@ Suppose the heat pump's 5,400 kWh came from one gas plant, through the grid:
 
 | Assumption | Value | Source |
 |---|---|---|
-| The plant | Gas combined cycle, 7,535 Btu of gas per kWh (full-load test heat rate, 2025) | EIA, via [F4](f04-power-plants.html) |
-| The grid | About 5% lost on the way (U.S. average, 2018–2022) | [EIA](https://www.eia.gov/tools/faqs/faq.php?id=105&t=3), via [F6](f06-grid-and-outages.html) |
+| The plant | Gas combined cycle, 7,535 Btu of gas per kWh (full-load test heat rate, 2025) | [EIA](https://www.eia.gov/electricity/annual/html/epa_08_02.html) |
+| The grid | About 5% lost on the way (U.S. average, 2018–2022) | [EIA](https://www.eia.gov/tools/faqs/faq.php?id=105&t=3) |
+
+[F4](f04-power-plants.html) and [F6](f06-grid-and-outages.html) explain where each number comes from.
 
 $$
 \text{sent out} = \frac{5{,}400 \text{ kWh}}{1 - 0.05} \approx 5{,}700 \text{ kWh}
