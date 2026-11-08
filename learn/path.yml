@@ -1453,7 +1453,7 @@
   subtitle: "Write Prairieland's five regions to 2050 as one linear program with vintages, residual value, links, a cumulative carbon budget and an import cap, then test it against foresight, shocks and full years of hours"
   short: "A nation's pathway"
   does: "A five-region Prairieland model to 2050 with asset vintages, retirements and residual value, transmission, a cumulative carbon budget built from period emissions, and a cap on import share; representative slices checked against full-year runs of selected years; compare perfect foresight with decade-by-decade decisions; inject shocks."
-  outcome: "Formulate a multi-region, multi-decade capacity-expansion LP with vintages, residual value, a cumulative budget and an import cap, read its budget dual as a carbon value that rises at the discount rate, and say which conclusions survive myopic decisions, shocks and full years of hours."
+  outcome: "Formulate a multi-region, multi-decade capacity-expansion LP with vintages, residual value, a cumulative budget and an import cap, turn its budget dual into each model year's carbon price through the discount factors and year weights, and say which conclusions survive myopic decisions, shocks and full years of hours."
   teaches: [multi-period capacity expansion, asset vintages and residual value, cumulative carbon budgets, import-share caps, perfect against myopic foresight, the budget's dual as a carbon value, representative slices checked against full years, near-optimal plans]
   lab: "a SciPy/HiGHS notebook that rebuilds engine E4's pathway LP and asserts the browser's numbers, about 60 minutes, then 120 minutes of practice."
   after: [M3, M8, A20, A21]
