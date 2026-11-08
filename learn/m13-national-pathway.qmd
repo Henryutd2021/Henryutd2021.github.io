@@ -155,7 +155,7 @@ $$\sum_p w_p\, \text{CO}_2(f_p) + w_{2025}\cdot 214.9 \le B \qquad \text{imports
 
 <ul class="m13-rules">
 <li><b>The dual as a price.</b> The budget's dual $\mu$ is in present-value dollars a tonne. As a price in model year $p$'s own dollars it is $\mu\, w_p / D_p$; only in a model of every year, each counted once, is it $\mu (1+i)^{t-2025}$.</li>
-<li><b>Batteries.</b> They cycle within each representative day; the scarce-wind week's store may enter full and run down over seven days, and winter's days pay it back.</li>
+<li><b>Batteries.</b> Outside winter they cycle within each representative day. Winter runs in order, its days then the scarce-wind week, cyclic over the season: the week's store may enter full and run down, and winter's days pay it back.</li>
 <li><b>The cap's base.</b> Primary energy less what batteries and links lose: electricity lost there does not count toward the cap.</li>
 <li><b>Stress hours.</b> At two stress hours of 2025, each region's load plus 10% must be covered by available capacity and the links.</li>
 <li><b>Gas.</b> The LP buys domestic gas and LNG in the least-cost mix within the import cap, so under a tight budget LNG can win: the national inventory counts the gas burned in domestic fields, not LNG's upstream emissions abroad.</li>

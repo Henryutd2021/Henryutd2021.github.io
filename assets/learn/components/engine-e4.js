@@ -18,7 +18,7 @@
                                      clean option (national, no location): within the generic limits per region and period,
                                      wind and solar within each region's most; a plant runs in its model year and the later
                                      ones its life covers (vintages)
-     batteries: cyclic within each representative day (state at 08:00 and 20:00 within 0 and 4 h x power); in the
+     batteries: outside winter, cyclic within each representative day (state at 08:00 and 20:00 within 0 and 4 h x power); in the
                                      scarce-wind week the store may enter full and run down over the seven days; winter
                                      runs in order (its 83 days, then the week, cyclic over the season), so winter's days
                                      pay the week back (energy in x 85% = energy out) and the level stays within the store

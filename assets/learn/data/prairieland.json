@@ -2328,7 +2328,7 @@
   },
   "chronology": {
    "weights": "Each slice's hours; they sum to 8,760.",
-   "days": "A season's day and night slices form one representative day (12 + 12 hours) that stands for `days` days; batteries cycle within it (end of night = start of day).",
+   "days": "A season's day and night slices form one representative day (12 + 12 hours) that stands for `days` days; batteries cycle within it (end of night = start of day), except winter's, which carry over into the scarce-wind week (see week).",
    "week": "The scarce-wind week is 7 consecutive days: a store may enter it full but must cover the week's shortfall from what it holds (no refill from other seasons). Winter runs in order, its days and then the week, and a store ends winter where it began: the winter days pay back what the week draws.",
    "extremes": "The peak net-load day and the scarce-wind winter week get slices of their own: each its average day and night, repeated over its days. Their hourly sequence is not kept; the full-year check runs every hour in order.",
    "sameYear": "Load, wind, solar and the hydro factor all come from one weather year (2025), so each slice averages hours in which they occurred together; averaging removes the variation within a slice.",
