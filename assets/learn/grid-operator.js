@@ -26,7 +26,7 @@
 // combined-cycle level, so "let the rule finish the day" continues from the reader's own last hour (finishPlan()).
 // CO2 is operating CO2 only (fuel burned at the plant), with illustrative rates; construction, fuel supply and
 // upstream methane are outside the boundary (town.json, units.co2). Planning the whole day at once can do a
-// little better by warming up the slow plant before the solar dip and the sunset; the Node test computes that optimum
+// little better by raising the slow plant's output earlier, before the solar dip and the sunset; the Node test computes that optimum
 // (_tests/learn/test_grid_operator.js), and every number the page states is checked against this model.
 //
 // The pure model is exported for Node. The view (play-first game, debrief, explain layer) uses the component library
@@ -216,18 +216,18 @@
     var evBox = H("div", { class: "lx-events", "aria-live": "polite" }, panel);
     var ctl = H("div", { class: "lx-gctl" }, panel);
     var cc = LX.Slider(ctl, { label: "Gas combined-cycle", cls: "lx-ctl-cc", color: "var(--lx-cc)", max: f.cc.mw, step: g.step, onChange: refresh,
-      hint: function (lo, hi, max) { return "$" + f.cc.cost + "/MWh, the cheaper gas plant. " + (lo === 0 && hi === max ? "It changes by at most " + f.cc.ramp + " MW per hour." : "This hour it can reach " + lo + " to " + hi + " MW ([[ramp-rate|ramp limit]]: " + f.cc.ramp + " MW per hour)."); } });
+      hint: function (lo, hi, max) { return "[[combined-cycle|Combined-cycle]]: $" + f.cc.cost + "/MWh, the cheaper gas plant. " + (lo === 0 && hi === max ? "It changes by at most " + f.cc.ramp + " MW per hour." : "This hour it can reach " + lo + " to " + hi + " MW ([[ramp-rate|ramp limit]]: " + f.cc.ramp + " MW per hour)."); } });
     var pk = LX.Slider(ctl, { label: "Gas peaker", cls: "lx-ctl-pk", color: "var(--lx-pk)", max: f.peaker.mw, step: g.step, onChange: refresh,
-      hint: function () { return "$" + f.peaker.cost + "/MWh, the costly gas plant. It can jump to any level at once."; } });
+      hint: function () { return "[[peaker|Peaker]]: $" + f.peaker.cost + "/MWh, the costly gas plant. In this game it can jump to any level at once."; } });
     var next = H("button", { class: "lx-btn lx-gnext", type: "button" }, panel);
     var tal = H("div", { class: "lx-tallies" }, panel);
     function tally(label) { var d = H("div", { class: "lx-tally" }, tal); H("span", { text: label }, d); return H("b", null, d); }
     var tCost = tally("Running cost"), tCo2 = tally("CO₂"), tLit = tally("Lights on");
     var ops = H("details", { class: "lx-ops" }, panel);
     H("summary", { html: LX.icon("chart") + "Operator's view: the day as a chart" }, ops);
-    var SERIES = [["nuclear", "Nuclear", "var(--lx-nuc)"], ["solar", "Solar", "var(--lx-solar)"], ["wind", "Wind", "var(--lx-wind)"], ["cc", "Gas CC", "var(--lx-cc)"], ["pk", "Peaker", "var(--lx-pk)"]]
+    var SERIES = [["nuclear", "Nuclear", "var(--lx-nuc)"], ["solar", "Solar", "var(--lx-solar)"], ["wind", "Wind", "var(--lx-wind)"], ["cc", "Gas combined-cycle", "var(--lx-cc)"], ["pk", "Gas peaker", "var(--lx-pk)"]]
       .map(function (s) { return { key: s[0], label: s[1], color: s[2] }; });
-    var chart = LX.DayChart(ops, { series: SERIES, demand: W.demand, rows: function () { return S_.rows; }, yMax: 400, label: "Hourly output by plant for the hours played, with demand for the whole day." });
+    var chart = LX.DayChart(ops, { series: SERIES, demand: W.demand, rows: function () { return S_.rows; }, yMax: 400, label: "Hourly output by plant in MW for the hours played, with demand in MW for the whole day." });
     ops.addEventListener("toggle", function () { if (ops.open) chart.render(); });
 
     var S_ = null;
@@ -323,11 +323,13 @@
       H("a", { class: "lx-btn small", href: "#explain", html: "See what you did, as diagrams" + LX.icon("arrow") }, h);
       LX.Stars(deb, [{ label: "Lights on", n: st.reliability, value: (24 - S_.short) + "/24 h" },
                      { label: "Cost", n: st.cost, value: F.money(S_.cost) }, { label: "CO₂", n: st.co2, value: F.tonnes(S_.co2) }]);
-      H("p", { class: "lx-hint", text: "The cheapest-first rule: " + F.money(EX.totals.cost) + " and " + F.tonnes(EX.totals.co2) + ", every light on. Planning ahead can beat it: warm the combined-cycle plant up before the solar dip and the sunset." }, deb);
+      H("p", { class: "lx-hint", text: "The cheapest-first rule: " + F.money(EX.totals.cost) + " and " + F.tonnes(EX.totals.co2) + ", every light on." }, deb);
+      H("p", { class: "lx-hint", text: "Planning ahead can beat it: raise the combined-cycle plant's output earlier, before the solar dip and the sunset." }, deb);
       var NOTES = [
         { icon: "scale", title: "Balance", text: "Supply must equal demand at every moment.", moment: "You kept the beam level for " + (24 - you.hoursOff) + " of 24 hours.", got: true },
         { icon: "lamp", title: "Made as it is used", text: "With no storage, plants must make each extra MW in the hour it is needed.", moment: "06:00: demand went from " + W.demand[HOOK - 1] + " to " + W.demand[HOOK] + " MW.", got: S_.hookDone && !S_.hookSkipped, lock: "Answer the 06:00 question to collect this." },
-        { icon: "wave", title: "Frequency", text: "60 Hz is the grid's pulse; short of power, it falls.", moment: "Your lowest reading: " + S_.minF.toFixed(2) + " Hz.", got: S_.minF < 59.995 || S_.maxF > 60.005, lock: "Let supply fall short once to collect this." },
+        { icon: "wave", title: "Frequency", text: "60 Hz is the grid's pulse; short of power, it falls.", got: true,
+          moment: S_.minF < 59.995 ? "Your lowest reading: " + S_.minF.toFixed(2) + " Hz." : S_.maxF > 60.005 ? "Your highest reading: " + S_.maxF.toFixed(2) + " Hz." : "You held 60.00 Hz all day." },
         { icon: "cloud", title: "Variable vs dispatchable", text: "Wind and sun follow the weather; gas follows your orders.", moment: cloudH >= 0 ? "The " + F.hh(cloudH) + " solar dip: " + W.solar[cloudH - 1] + " → " + W.solar[cloudH] + " MW." : "", got: true },
         { icon: "ramp", title: "Ramp limit", text: "The combined-cycle plant changes by " + f.cc.ramp + " MW per hour at most.", moment: S_.rampHit.length ? "You hit it at " + F.hh(S_.rampHit[0]) + "." : "", got: S_.rampHit.length > 0, lock: "Push the combined-cycle plant to its limit to collect this." },
         { icon: "stairs", title: "Merit order", text: "[[merit-order|Cheapest first]]: $" + f.cc.cost + "/MWh gas before the $" + f.peaker.cost + "/MWh peaker.", moment: "You ran the peaker for " + S_.pkHours + (S_.pkHours === 1 ? " hour." : " hours."), got: true }
@@ -337,7 +339,7 @@
       LX.Notes(deb, NOTES.map(function (x) { x.link = { href: "#explain", text: "On the concept map" }; return x; }));
       var ops2 = H("details", { class: "lx-ops" }, deb);
       H("summary", { html: LX.icon("chart") + "Operator's view: your day as a chart" }, ops2);
-      var ch2 = LX.DayChart(ops2, { series: SERIES, demand: W.demand, rows: function () { return S_.rows; }, yMax: 400, label: "Your hourly output by plant, with demand." });
+      var ch2 = LX.DayChart(ops2, { series: SERIES, demand: W.demand, rows: function () { return S_.rows; }, yMax: 400, label: "Your hourly output by plant in MW, with demand in MW." });
       ops2.addEventListener("toggle", function () { if (ops2.open) ch2.render(); });
       H("button", { class: "lx-btn ghost small", type: "button", text: "Play the day again", onclick: function () { reset(); panel.scrollIntoView({ block: "nearest" }); } }, deb);
       var last = S_.rows[23]; scene.set(sceneState(last, 23)); meters.set(last);
@@ -407,7 +409,7 @@
         { id: "goal", g: "choice", label: "Goal", at: [0, 2], atN: [0, 2], text: "What the operator keeps as low as possible: running cost, and here also CO₂.", game: "The cost and CO₂ stars.", later: later },
         { id: "decisions", g: "choice", label: "Decisions", at: [0.78, 2], atN: [1, 4], text: "What the operator chooses: each gas plant's output, every hour.", game: "48 numbers: two sliders times 24 hours.", later: later },
         { id: "supply", g: "bal", label: "Supply", at: [1.6, 2], atN: [1, 2], text: "The power all plants make this hour.", game: "The coloured stack on the left of the beam." },
-        { id: "variable", g: "plants", label: "Variable plants", lines: ["Variable", "plants"], at: [2.95, 2], atN: [2, 2], text: "Wind and solar make what the weather allows; nobody can order more.", game: cloudH >= 0 ? "At " + F2.hh(cloudH) + " recorded solar output dipped from " + W.solar[cloudH - 1] + " to " + W.solar[cloudH] + " MW." : "The wind and the sun." },
+        { id: "variable", g: "plants", label: "Variable plants", lines: ["Variable", "plants"], at: [2.95, 2], atN: [2, 2], text: "Wind and solar make what the weather allows; nobody can order more than that.", game: cloudH >= 0 ? "At " + F2.hh(cloudH) + " recorded solar output dipped from " + W.solar[cloudH - 1] + " to " + W.solar[cloudH] + " MW." : "The wind and the sun." },
         { id: "merit", g: "choice", label: "Merit order", lines: ["Merit", "order"], at: [0.4, 3], atN: [0, 3], text: "Run the cheapest plant first and the most expensive last.", game: "Combined-cycle at $" + f.cc.cost + "/MWh before the peaker at $" + f.peaker.cost + "/MWh." },
         { id: "dispatch", g: "plants", label: "Dispatchable plants", lines: ["Dispatchable", "plants"], at: [1.6, 3], atN: [1, 3], text: "Plants that change output on command, like the two gas plants.", game: "Your two sliders." },
         { id: "ramp", g: "plants", label: "Ramp limit", lines: ["Ramp", "limit"], at: [2.95, 3], atN: [2, 3], text: "How fast a plant can change. The combined-cycle plant moves at most " + f.cc.ramp + " MW per hour.", game: "The shaded band on the combined-cycle slider." }
@@ -486,7 +488,7 @@
     }
     LX.EnergyChain(H("div", { class: "lx-xcard" }, host), {
       title: "From plant to lamp", aside: "Typical U.S. values: DOE, July 2015, p. 12; homes: DOE, January 2017, p. A-6",
-      lede: "Voltage goes up to travel far with small losses, then down to be safe at home. The trip takes a fraction of a second.",
+      lede: "[[voltage|Voltage]], in volts (1 kV = 1,000 V), goes up to travel far with small losses, then down to be safe at home.",
       stops: [{ icon: "plant", title: "Power plant", text: "makes it", value: "5–34.5 kV" }, { icon: "tower", title: "Transmission", text: "carries it far", value: "69–765 kV" },
               { icon: "sub", title: "Substation", text: "steps it down for local lines", value: "15–34.5 kV" }, { icon: "house", title: "Home", text: "uses it", value: "120/240 V" }]
     });

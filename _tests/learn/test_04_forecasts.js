@@ -163,10 +163,38 @@ function fallbackSvg() {
   s += `<div class="lx-legend" aria-hidden="true"><span><i style="--c:var(--lx-ink)"></i>Actual demand</span><span><i style="--c:var(--lx-accent)"></i>SPP day-ahead forecast</span><span><i style="--c:var(--lx-warn)"></i>Demand above forecast</span><span><i style="--c:var(--lx-tier-3)"></i>Below forecast</span></div>`;
   return s;
 }
+// the other results, for readers without JavaScript: the baseline, the band, the toy cushion game and wind (the same model)
+function fallbackMore() {
+  const b80 = d => M.outside(d.A, M.band(fc, d.F, "80")), money = v => "$" + Math.round(v).toLocaleString("en-US");
+  let s = `<details class="lx-textalt"><summary>The lesson's other results, as text</summary>\n<ul>\n`;
+  s += `<li><b>Against a baseline.</b> Over the ${PM.hours_yesterday.toLocaleString("en-US")} January–April hours both could be scored, SPP's average miss was ${PM.spp_same_hours_yesterday} MW against ${PM.yesterday.toLocaleString("en-US")} MW for “same hour yesterday”: ${pct(skill, 0)} smaller, looking back.</li>\n`;
+  s += `<li><b>A band.</b> The 80% band runs from ${sp(q["0.1"])} to ${sp(q["0.9"])} around the forecast: ${b80(T)} of 24 hours fell outside it on ${T.label.long}, ${b80(X)} of 24 on ${X.label.long}.</li>\n`;
+  s += `<li><b>Lopsided costs, a toy calculation.</b> The January–April misses applied to one fixed ${(fc.jan_apr.mean_forecast_mw / 1000).toFixed(1)} GW forecast, at illustrative prices of $${C.under} for a missing MWh and $${C.over} for an unused one: the cheapest cushion is ${sp(BEST.r)}.</li>\n</ul>\n`;
+  s += `<div class="lx-scroll-x"><table class="lx-mini-table"><caption>The toy cushion game: average cost per hour</caption>\n<thead><tr><th scope="col">Cushion</th><th scope="col">Cost per hour</th><th scope="col">Hours short</th></tr></thead>\n<tbody>\n`;
+  [0, 0.02, 0.04, 0.06, 0.08, 0.10].forEach(r => { const m = M.marginCost(fc, r, errs); s += `<tr><td>${r ? sp(r) : "none"}</td><td>${money(m.total)}</td><td>${pct(m.shortShare, 0)}</td></tr>\n`; });
+  s += `</tbody>\n</table></div>\n<div class="lx-scroll-x"><table class="lx-mini-table"><caption>Wind, “it stays as it is now”: average miss as a share of the largest wind hour of 2025 (${(W.max_wind_mw / 1000).toFixed(1)} GW)</caption>\n<thead><tr><th scope="col">Looking ahead</th>`;
+  W.lead_hours.forEach(L => { s += `<th scope="col">${L} h</th>`; });
+  s += `</tr></thead>\n<tbody><tr><td>Average miss</td>`;
+  W.mae_pct_of_max.forEach(v => { s += `<td>${v}%</td>`; });
+  return s + `</tr></tbody>\n</table></div>\n</details>`;
+}
 const FB = fallbackSvg(), re = /(<!-- fallback-svg:start -->\n)([\s\S]*?)(<!-- fallback-svg:end -->)/;
-if (process.argv.includes("--fallback")) { QMD = QMD.replace(re, (m0, a, b, c) => a + FB + "\n" + c); fs.writeFileSync(QMD_PATH, QMD); console.log("wrote the static figure into learn/04-forecasts.qmd"); }
-const cur = re.exec(QMD);
+const FM = fallbackMore(), reM = /(<!-- fallback-more:start -->\n)([\s\S]*?)(<!-- fallback-more:end -->)/;
+if (process.argv.includes("--fallback")) { QMD = QMD.replace(re, (m0, a, b, c) => a + FB + "\n" + c).replace(reM, (m0, a, b, c) => a + FM + "\n" + c); fs.writeFileSync(QMD_PATH, QMD); console.log("wrote the static figure and the text results into learn/04-forecasts.qmd"); }
+const cur = re.exec(QMD), curM = reM.exec(QMD);
 ok(cur && cur[2].trim() === FB.trim(), "page: the static figure matches the data (run with --fallback to rewrite it)");
+ok(curM && curM[2].trim() === FM.trim() && /19 of 24 on 4 February 2025/.test(FM) && /cheapest cushion is \+6\.0%/.test(FM), "page: the no-JavaScript results (baseline, band, toy cushion, wind) match the model (run with --fallback to rewrite them)");
+
+// ---------------- wording the per-page review asked for
+ok(QMD.indexOf("\\text{MAPE} = \\frac{100\\%}{m}\\sum_{t:\\,A_t > 0}") >= 0 && /adds only the \$m\$ hours with output above zero/.test(QMD), "MAPE formula: only hours with A > 0, their count as the denominator, in percent (as mape() computes)");
+ok(near(M.mape([0, 10, 20], [5, 12, 18]).value, (0.2 + 0.1) / 2, 1e-12) && M.mape([0, 10, 20], [5, 12, 18]).hours === 2, "mape(): the zero hour is skipped and the denominator is the 2 positive hours");
+ok(/"MAPE, sunlit hours only"/.test(code), "solar chip: MAPE over sunlit hours");
+ok(/Toy calculation: January–April 2025 misses, in percent, applied to one fixed/.test(code) && /Toy calculation: the January–April misses, in percent, applied to one fixed/.test(code) && (fc.jan_apr.mean_forecast_mw / 1000).toFixed(1) === "32.6", "cost chart and slider: a toy calculation on one fixed 32.6 GW forecast");
+has("In this toy game, a missing MWh costs $300");
+ok(!/real skill/.test(code) && /looking back: this baseline uses all of the day before/.test(code) && /This is a look back: the baseline uses the whole previous day/.test(QMD), "baseline: a retrospective comparison, not an operational one");
+ok(!/worst day|"Worst · /i.test(code) && /biggest daily miss among January–April days with no repaired hours/.test(code) && /"A large miss · "/.test(code), "the 4 February day is 'a large miss' among days with no repaired hours, not 'the worst day'");
+ok(/\[\[skill-score\|skill score\]\] \(how much a forecast beats a simple baseline\)/.test(code) && /data-term="skill-score">skill score</.test(QMD), "skill score marked and explained at first use");
+has("<p>The bias is different: the signed misses (−1, +1, +3) average +1 GW.</p>"); has("often harder to forecast, in percent, than a whole region");
 
 console.log(`typical ${T.date}: MAPE ${pct(M.mape(T.A, T.F).value, 2)}, MAE ${(M.mae(T.A, T.F) / 1000).toFixed(2)} GW; miss ${X.date}: MAPE ${pct(M.mape(X.A, X.F).value, 2)}; cheapest margin ${BEST.r} (short ${pct(BEST.shortShare)})`);
 console.log(`${checks} checks, ${fails} failures`);

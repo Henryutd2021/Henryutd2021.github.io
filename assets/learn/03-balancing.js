@@ -75,7 +75,21 @@
   // a Uri event's frequency for display: a reading ("59.304 Hz") or a threshold crossing the report states without a
   // reading ("below 59.4 Hz", "above 60 Hz"; data: cross)
   function hzEvent(e) { return e.cross ? e.cross + " " + e.hz + " Hz" : e.hz.toFixed(3) + " Hz"; }
-  var model = { simulate: simulate, rocof: rocof, settleGap: settleGap, story: story, clock: clock, hzEvent: hzEvent };
+  // the causal chain's AGC link for the reader's case: AGC raises reserve plants to 60 Hz; it turns plants down when the
+  // relays cut more load than was lost; it runs out when the reserve is smaller than the lost plant
+  function agcLink(G, st) {
+    var mins = function (v) { return (v / 60).toFixed(1) + " min"; };
+    if (st.ufls != null && st.shedMW > G.tripMW) return { title: "AGC turns plants down", text: "Relays cut more than was lost, so AGC lowers output to bring 60 Hz back.", value: st.back != null ? mins(st.back) : "still off 60 Hz" };
+    if (st.back != null) return { title: "AGC restores 60 Hz", text: "Reserve plants are raised over minutes.", value: mins(st.back) };
+    return { title: "AGC runs out of reserve", text: "The frequency stays low until operators start more plants.", value: "still " + st.end.toFixed(2) + " Hz" };
+  }
+  // the Texas chart's readout: the reading nearest the pointer among those shown so far; nothing past the latest one
+  function uriTip(shown, x) {
+    if (!shown.length || x > clock(shown[shown.length - 1][0]) + 1) return null;
+    var best = shown.reduce(function (a, p) { return Math.abs(clock(p[0]) - x) < Math.abs(clock(a[0]) - x) ? p : a; });
+    return "<div><b>" + best[0] + " a.m.</b><span><b>" + best[1].toFixed(3) + " Hz</b></span></div>";
+  }
+  var model = { simulate: simulate, rocof: rocof, settleGap: settleGap, story: story, clock: clock, hzEvent: hzEvent, agcLink: agcLink, uriTip: uriTip };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -91,7 +105,7 @@
     q: "Before you trip it: what slows the fall in frequency first?",
     options: [{ value: "ops", label: "Operators in the control room" }, { value: "spin", label: "Energy stored in spinning machines" },
               { value: "gov", label: "Governors on power plants" }, { value: "ufls", label: "Relays that cut customers" }],
-    feedback: { ops: "People take minutes; the first second belongs to physics.", spin: "Every turbine on the grid slows together and gives up stored energy at once.",
+    feedback: { ops: "People take minutes; the first second belongs to physics.", spin: "Every machine turning in step with the grid slows together and gives up stored energy at once.",
                 gov: "Governors act within seconds, but they are not first.", ufls: "Relays are the last line of defence, used only if the fall reaches 59.3 Hz." }
   };
 
@@ -212,15 +226,18 @@
       var pts = U.points.map(function (p) { return [clock(p[0]), p[1]]; });
       ttl.textContent = "ERCOT (Texas) frequency, 15 February 2021, 1:15–2:30 a.m.";
       chip("Time", e.at + " a.m."); chip("Frequency", hzEvent(e), e.hz < 59.45 ? "bad" : e.hz < 59.9 ? "warn" : ""); chip("Customer demand ordered off", mw(e.shedMW));
-      var marks = U.events.slice(0, S_.uri + 1).map(function (ev, i) { return { x: clock(ev.at), y: ev.hz, color: i === S_.uri ? COL.uri : "var(--lx-ink-3)", above: ev.hz > 59.8 }; });
-      var cut = clock(e.at), shown = pts.filter(function (p) { return p[0] <= cut; });
+      // a reading gets a ring on its dot; a threshold crossing (no reading in the report) only a dashed line at its time
+      var marks = U.events.slice(0, S_.uri + 1).map(function (ev, i) { return ev.cross ? { x: clock(ev.at), y: ev.hz, vline: true } : { x: clock(ev.at), y: ev.hz, color: i === S_.uri ? COL.uri : "var(--lx-ink-3)", above: ev.hz > 59.8 }; });
+      var cut = clock(e.at), shown = pts.filter(function (p) { return p[0] <= cut; }), shownRaw = U.points.filter(function (p) { return clock(p[0]) <= cut; });
+      var legend = [{ label: "Readings in the official chronology (dots); the line only joins them", color: COL.uri, dash: true }];
+      if (U.events.slice(0, S_.uri + 1).some(function (ev) { return ev.cross; })) legend.push({ label: "Threshold crossing: time only, no reading", color: "var(--lx-ink-3)", dash: true });
       P.render({ x: { min: clock("1:15"), max: clock("2:30"), ticks: [[clock("1:15"), "1:15"], [clock("1:30"), "1:30"], [clock("1:45"), "1:45"], [clock("2:00"), "2:00"], [clock("2:15"), "2:15"], [clock("2:30"), "2:30 a.m."]], ticksN: [[clock("1:15"), "1:15"], [clock("1:45"), "1:45"], [clock("2:15"), "2:15 a.m."]] },
         y: { min: lo, max: hi, ticks: ticksHz(lo, hi), unit: "Hz" },
-        lines: [{ pts: shown, color: COL.uri, dots: true, anim: false }],
+        lines: [{ pts: shown, color: COL.uri, dots: true, dash: "3 3", width: 1.6, anim: false }],
         refs: [{ y: 60, label: "60 Hz", below: true }, { y: 59.4, color: "var(--lx-warn)", dash: "5 4", label: "Generator timer · 59.4 Hz", labelN: "59.4 Hz", below: false }, { y: 59.3, color: COL.ufls, dash: "5 4", label: "Relays cut customers · 59.3 Hz", labelN: "59.3 Hz", below: true }],
-        marks: marks, legend: [{ label: "Frequency readings in the official chronology", color: COL.uri }],
-        tip: function (x) { var best = U.points.reduce(function (a, p) { return Math.abs(clock(p[0]) - x) < Math.abs(clock(a[0]) - x) ? p : a; }); return "<div><b>" + best[0] + " a.m.</b><span><b>" + best[1].toFixed(3) + " Hz</b></span></div>"; },
-        aria: "Frequency readings on 15 February 2021 in Texas, from the FERC-NERC report's chronology. The text version below lists them." }, animate);
+        marks: marks, legend: legend,
+        tip: function (x) { return uriTip(shownRaw, x); },
+        aria: "Frequency readings on 15 February 2021 in Texas, from the FERC-NERC report's chronology, at selected times. The text version below lists them." }, animate);
       // the text version: every reading, and the two moments the report gives only as a threshold crossing
       var list = H("ul", null, altBody), rows = U.points.map(function (p) { return [clock(p[0]), p[0] + " a.m.: " + p[1].toFixed(3) + " Hz"]; });
       U.events.forEach(function (ev) { if (ev.cross) rows.push([clock(ev.at) + 0.5, ev.at + " a.m.: " + hzEvent(ev) + " (a threshold crossing; the report gives no reading)"]); });
@@ -253,7 +270,7 @@
           b.addEventListener("click", function () { S_.tripped = true; S_.view = "seconds"; draw(true); store(); b.disabled = true; b.textContent = "Tripped"; said(); api.done(); });
           if (S_.tripped) { b.disabled = true; b.textContent = "Tripped"; said(); api.done(); }
         } },
-      { text: "Fewer spinning machines store less energy. Grids running mostly on wind and solar, which connect through [[inverter|inverters]], have less [[inertia|inertia]]. Slide it and watch the fall.",
+      { text: "Only machines turning in step with the grid hand it their stored spin. Wind and solar connect through [[inverter|inverters]] that usually hide theirs, so they add little [[inertia|inertia]]. Slide it and watch the fall.",
         build: function (act, api) {
           S_.tripped = true; enter("seconds", 2);
           var s = LX.Slider(act, { label: "Inertia (stored spin)", color: COL.inertia, min: G.inertia.min, max: G.inertia.max, step: G.inertia.step, unit: "GW·s",
@@ -379,7 +396,7 @@
           { title: "Machines slow together", text: "Stored spin covers the gap for seconds.", value: st.rocof.toFixed(2) + " Hz/s at first" },
           { title: "Governors add power", text: "Plants holding reserve open their valves.", value: st.ufls != null ? "too little reserve" : st.sinking ? "reserve used up" : "lowest " + hz(st.nadir.f) },
           { title: st.ufls != null ? "Relays cut customers" : "Frequency levels off low", text: st.ufls != null ? "Automatic, at 59.3 Hz." : "The fall is stopped, not undone.", value: st.ufls != null ? mw(st.shedMW) : "near " + hz(60 - st.gap) },
-          { title: "AGC restores 60 Hz", text: "Reserve plants are raised over minutes.", value: st.back != null ? min1(st.back) : "reserve used up" },
+          agcLink(G, st),
           { title: "Reserve rebuilt", text: "Operators start plants for the next trip.", value: "10 min to hours" }
         ],
         note: "Your settings: inertia " + c.inertia + " GW·s, reserve " + c.reserve + " MW. Change them in the steps above and the numbers here follow."
@@ -416,7 +433,7 @@
         q1: { t: "Stopped above 59.3 Hz?", tN: ["Held above", "59.3 Hz?"], k: "q" },
         ufls: { t: "Relays cut customers", tN: ["Relays cut", "customers"], s: "automatic · last line", sN: "last line" },
         q2: { t: "Reserve enough for 60 Hz?", tN: ["Reserve", "enough?"], k: "q" },
-        agc: { t: "AGC restores 60 Hz", tN: ["AGC restores", "60 Hz"], s: "1–10 min · from reserve", sN: "1–10 min" },
+        agc: { t: "AGC restores 60 Hz", tN: ["AGC restores", "60 Hz"], s: "1–10 min · raises or lowers plants", sN: "1–10 min" },
         ops: { t: "Operators act by hand", tN: ["Operators act", "by hand"], s: "start plants or cut customers", sN: "plants or cuts" },
         end: { t: "Rebuild the reserve", tN: ["Rebuild the", "reserve"], s: "10 min to hours", sN: "minutes to hours", k: "end" }
       },

@@ -1,5 +1,7 @@
 // test_01-power-energy.js — Node tests for Lesson 1 (assets/learn/01-power-energy.js), its data
-// (assets/learn/data/01-power-energy.json + town.json, town_year.json, town_days.json) and every number the page states.
+// (assets/learn/data/01-power-energy.json + town.json, town_year.json, town_days.json), the numbers the page states (each
+// checked below: computed from the model or the data, or read from a sourced anchor) and, on a stub document, the board's
+// clock and meter.
 // Usage (from the site folder):  node _tests/learn/test_01-power-energy.js
 "use strict";
 const fs = require("fs");
@@ -125,13 +127,14 @@ ok(Math.round(W.fermi.avgGW) === 479 && has("$4{,}200\\ \\text{TWh} \\div 8{,}76
 ok(Math.round(W.fermi.peakGW) === 759 && W.fermi.ratio === undefined, "fermi: 759 GW record kept as a number; no ratio against the U.S. year (review point 4)");
 ok(W.fermi.sppRatio.toFixed(1) === "1.6" && W.fermi.sppAvgGW.toFixed(1) === "34.1" && W.fermi.sppPeakGW.toFixed(1) === "54.4", "fermi: SPP's peak/average from one data set: 54.4 / 34.1 GW = 1.6");
 ok(has("its peak hour needed 54.4 GW, about 1.6 times the average") && has("an average of 34.1 GW") && has("used 298.6 TWh in 2025"), "page: Go deeper states SPP's 298.6 TWh, 34.1 GW and 54.4 GW");
+ok(days.stats.missing_hours_filled.demand === 699 && has("In the course's cleaned copy of EIA's 2025 data (699 implausible demand hours repaired)"), "page: SPP's totals are named as the course's cleaned data, with its 699 repaired hours");
 ok(has("the 2025 peak hour needed about 1.6 times its average") && !has("The grid is built for that peak") && !/The grid is built for that peak/.test(JS), "page and view: peak/average from SPP; no 'built for that peak'");
 ok(int(W.wh.us / 1e9) === "4,200,000", "fermi: unit chain 4,200 TWh = 4,200,000 GWh");
 
 // ---------------- the wind-farm claim
 ok(W.wind.claim === 100000 && D.wind.cf.start === 100 && D.wind.home_w.start === 1000, "wind: slider start reproduces the claim, 100 MW / 1 kW = 100,000 homes");
 ok(Math.round(W.wind.homeW) === 1232 && int(Math.round(W.wind.real / 100) * 100) === "27,400", `wind: EIA averages give ${W.wind.real.toFixed(0)} homes (page: about 27,400)`);
-ok(has("An average home bought 10,791 kWh a year (about 1,232 W on average), so the farm's yearly energy matches what about 27,400 homes buy") && has("an average of about 1,232 W bought from the grid"), "page: wind myth numbers, as purchases");
+ok(has("An average home bought 10,791 kWh a year (about 1,232 W on average).") && has("So the farm's yearly energy matches what about 27,400 homes buy: 100 MW × 33.8% ÷ 1,232 W.") && has("an average of about 1,232 W bought from the grid"), "page: wind myth numbers, as purchases");
 ok(!/average draw/i.test(QMD.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1:end -->/g, "")) && !/Average draw/.test(JS), "page and script: EIA counts electricity bought, so no \"average draw\" (shared fix 10, after K2 #4)");
 ok(near(M.homes(100, 0.338, 10791 * 1000 / 8760), 100 * 8760 * 0.338 / 10.791, 1e-6), "wind: homes = MW x 8,760 h x CF / MWh per home");
 // step 8 (review point 3): EIA's averages are reachable on the sliders, and the on-screen result there is the stated one
@@ -159,6 +162,53 @@ ok(/Stretch, optional: a \[\[fermi-estimate/.test(JS) && /Stretch, optional: cla
 ok(/if \(moveFocus\) qp\.focus\(\)/.test(JS) && /tabindex: "-1"/.test(JS), "ladder: focus moves to the next question");
 ok(/homes whose yearly purchases it matches/.test(JS) && /illustrative equivalent/.test(JS) && has("illustrative equivalent"), "wind: purchases benchmark, an illustrative equivalent");
 Object.keys(A).forEach(k => ok(/^https:\/\/www\.(eia|epa)\.gov\//.test(A[k].url) && A[k].as_of && QMD.indexOf(A[k].url.replace(/&/g, "&amp;")) >= 0, `anchor ${k}: allow-listed URL, an as-of date, and cited on the page`));
+
+// ---------------- worked numbers in the check and the Go deeper boxes, computed
+ok(near(1000 * 3600 / 1e6, 3.6) && has("= 3.6\\ \\text{MJ}$ (megajoules, millions of joules)"), "Go deeper: 1 kWh = 1,000 W x 3,600 s = 3.6 MJ, with MJ spelled out");
+ok(2 * 3 === 6 && has("6 kWh: energy = power × time = 2 kW × 3 h") && has('<li data-value="b">6 kWh</li>') && near(2 / 3, 0.67, 0.005) && has('<li data-value="c">0.67 kWh</li>'), "quiz: a 2 kW heater for 3 h uses 6 kWh (the 0.67 kWh distractor is 2 / 3)");
+ok(near(1 / 0.25, 4) && has("With 15-minute data $\\Delta t = 0.25$ h. Leaving it out makes these energy-based terms four times too large"), "Modeler preview: leaving out 0.25 h overstates energy by 1 / 0.25 = 4");
+ok(has("$\\sum_i$ means \"add over every step $i$\"") && has("multiply each step's power by its duration, then add the results"), "Go deeper: the sum has a reading key");
+ok(has("At the same price per kWh, cost follows energy") && has('data-term="tariff">tariffs</span> (electricity pricing plans)') && !has("nameplate") && !/EV charger/.test(JS + JSON.stringify(D)), "wording: price assumption, tariffs explained, no 'nameplate' or 'EV'");
+ok(has("A label may state its rated or maximum power; the actual draw depends on how it runs"), "limits: a label's rating is not the actual draw");
+ok(/the largest unit that keeps its amount at 1 or more/.test(JS), "ladder: the step states the rung rule it grades");
+ok(M.fmtKWh(10 * 10 / 60) === "1.7 Wh" && M.fmtKWh(0) === "0.00 kWh" && M.fmtKWh(250) === "0.25 kWh", "meter: under 10 Wh it shows Wh, so a 10 W LED for 10 minutes reads 1.7 Wh, not 0.00 kWh");
+ok(M.fmtKWh(0.5) === "0.50 Wh" && M.fmtKWh(10) === "0.01 kWh", "meter: the Wh/kWh switch at 10 Wh");
+
+// ---------------- the board on a stub document: Reset cancels a running count-up; switches are locked while it runs
+{
+  const vm = require("vm");
+  const { env, load } = require("./stubdom.js");
+  const E = env();
+  E.LX.ready = () => {}; E.LX.visible = () => false; E.LX.progress.guess = () => null; E.LX.reduced = () => false;
+  E.LX.IC = {}; E.LX.iconInto = () => {};
+  ["cards", "controls", "predict", "unitchain", "table"].forEach(n => load(n, E));
+  let init = null; const timers = [];
+  E.LX.mount = (slug, f) => { if (slug === "power-energy") init = f; };
+  E.LX.demo = () => () => null;
+  const mctx = { window: E.window, document: E.document, location: E.location, navigator: {}, console, module: { exports: {} }, performance: E.window.performance,
+    setTimeout: f => { timers.push(f); return timers.length; }, clearTimeout: () => {} };
+  let threw = null, B = null;
+  try {
+    vm.runInNewContext(JS, mctx);
+    const root = E.LX.H("div", { class: "lx-interactive" }, E.body), live = E.LX.H("div", null, root);
+    init(live, { "01_power_energy": D, town: town, town_year: year, town_days: days }, root);
+    B = root.lxLesson.board;
+  } catch (e) { threw = e.message; }
+  ok(!threw && B, "stub: the page mounts" + (threw ? ": " + threw : ""));
+  if (B) {
+    const btn = re => B.el.querySelectorAll("button").filter(b => re.test(b.textContent))[0];
+    const meter = () => B.el.querySelector(".t1-m.en .v").textContent, clock = () => B.el.querySelector(".t1-clock").textContent;
+    B.only(["hairdryer"]); btn(/Run 10 min/).click();
+    ok(timers.length === 1 && btn(/Hair dryer/).disabled && btn(/LED bulb/).disabled && btn(/Run 1 hour/).disabled, "stub: during a count-up the clock and every switch are locked");
+    timers.shift()(); timers.shift()();
+    btn(/Reset the meter/).click();
+    while (timers.length) timers.shift()();
+    ok(meter() === "0.00 kWh" && clock() === "Clock run: 0 min" && B.state().meter.t === 0, `stub: Reset during a count-up leaves a clean meter (${meter()}, ${clock()})`);
+    ok(!btn(/Hair dryer/).disabled && !btn(/Run 10 min/).disabled, "stub: Reset unlocks the switches and the clock");
+    B.only(["led"]); btn(/Run 10 min/).click(); while (timers.length) timers.shift()();
+    ok(meter() === "1.7 Wh" && clock() === "Clock run: 10 min", `stub: a 10 W LED for 10 minutes reads 1.7 Wh (${meter()})`);
+  }
+}
 
 // ---------------- scope: links and words (curriculum section 20)
 // the generated header, next box and footer (the course build step) are checked by the course-wide scans; here: the lesson's own text

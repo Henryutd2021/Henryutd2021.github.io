@@ -90,9 +90,15 @@ The [load factor]{.lx-term term="load-factor"} is average demand $\bar d$ over p
 
 $$LF = \frac{\bar d}{d_{\max}} = \frac{282\ \text{MW}}{450\ \text{MW}} = 0.63 .$$
 
-Each hour adds its demand times one hour of energy. Sorting changes the order, not the total: $E = \sum_h d_h \times 1\ \text{h} \approx 2{,}469{,}131$ MWh, about 2,469 GWh, either way. Here $d_h$ is demand in hour $h$, in MW, and $\sum_h$ adds all 8,760 hours.
+The year's energy adds each hour's demand times one hour. Sorting changes the order, not the total:
 
-The energy above a line $L$ counts only the part of each hour's demand over the line, $\max(0,\ d_h - L) \times 1\ \text{h}$, in MWh. For $L = 405$ MW it is 3,068 MWh, only 0.12% of $E$: the top tenth of the peak holds very little of the year's energy.
+$$E = \sum_h d_h \times 1\ \text{h} \approx 2{,}469{,}131\ \text{MWh}.$$
+
+Here $d_h$ is demand in hour $h$, in MW, and $\sum_h$ adds all 8,760 hours: about 2,469 GWh, sorted or not.
+
+The energy above a line $L$ counts only the part of each hour's demand over it, $\max(0,\ d_h - L) \times 1\ \text{h}$, in MWh.
+
+For $L = 405$ MW it is 3,068 MWh, only 0.12% of $E$: the top tenth of the peak holds very little of the year's energy.
 
 ```{=html}
 </div>
@@ -115,10 +121,10 @@ The energy above a line $L$ counts only the part of each hour's demand over the 
 <div class="lx-deeper-body">
 <ul>
 <li>One region only: the Southwest Power Pool in the central U.S., scaled down. Other regions peak at other hours and in other seasons.</li>
-<li>For 699 hours of 2025 (about 8%) SPP's reported demand was implausible; those hours were rebuilt from SPP's own day-ahead forecast. The named days contain no rebuilt hours.</li>
-<li>SPP's solar telemetry froze for 1,377 hours (about 16%); those hours were filled from the same hour on nearby days, and solar is set to zero after dark. The named days contain no filled hours.</li>
+<li>For 699 hours of 2025 (about 8%) SPP's reported demand was implausible; those hours were rebuilt from SPP's own <span class="lx-term" data-term="day-ahead-forecast">day-ahead forecast</span>, made the day before. The named days contain no rebuilt hours.</li>
+<li>Our cleaning rule flagged 1,377 hours (about 16%) where SPP's solar readings repeated, unchanged and above zero, three or more hours in a row; those hours were filled from the same hour on nearby days, and solar is set to zero after dark. The named days contain no filled hours.</li>
 <li>SPP has little solar (0.8% of its 2025 generation), so the duck curve adds a hypothetical farm that follows SPP's solar shape.</li>
-<li>The solar slider sets an illustrative maximum output, the farm's output in SPP's top solar hour of 2025; it is not a nameplate rating.</li>
+<li>The solar slider sets an illustrative maximum output, the farm's output in SPP's top solar hour of 2025; it is not the farm's rated maximum.</li>
 <li>Real net demand subtracts wind as well as solar; here only solar is subtracted, to isolate its effect.</li>
 <li>One year of data cannot show long-term growth.</li>
 </ul>
@@ -146,9 +152,9 @@ The energy above a line $L$ counts only the part of each hour's demand over the 
 <details class="lx-answer"><summary>Answer</summary><p>Myth. The grid as a whole must be able to meet the peak hour, with a margin: Prairie Town averages 282 MW but peaks at 450 MW.</p></details>
 </div>
 <div class="lx-qq" data-id="evening" data-answer="myth">
-<p class="lx-qtext">Myth or fact? “Adding solar makes the evening easier for the other plants.”</p>
+<p class="lx-qtext">Myth or fact? “In this example, adding 200 MW of solar makes net demand's steepest three-hour climb after noon smaller.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. Solar fades while demand stays high, so the others must climb faster: on 30 May 2025, with 200 MW of solar, net demand's steepest three-hour climb after noon is 114 MW, against 20 MW without it.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. Solar fades while demand stays high, so the others must climb faster: on 30 May 2025, with 200 MW of solar, net demand's steepest three-hour climb after noon is 114 MW, against 20 MW without it.</p><p>Solar does lower the highest net demand after noon, from 294 to 265 MW.</p></details>
 </div>
 </div>
 
@@ -182,8 +188,8 @@ The energy above a line $L$ counts only the part of each hour's demand over the 
 <tr><td class="n">54.4 GW</td><td>The Southwest Power Pool's busiest hour of 2025: 16:00 to 17:00 on 29 July.</td><td class="s"><a href="https://www.eia.gov/electricity/gridmonitor/dashboard/electric_overview/US48/US48">EIA-930 six-month files</a> (Download Data → Six-Month Files), computed · data for 2025</td></tr>
 <tr><td class="n">299 TWh</td><td>SPP's demand over 2025: an average of 34 GW, so a load factor of 0.63.</td><td class="s"><a href="https://www.eia.gov/electricity/gridmonitor/dashboard/electric_overview/US48/US48">EIA-930 six-month files</a> (Download Data → Six-Month Files), computed · data for 2025</td></tr>
 <tr><td class="n">759 GW</td><td>Record peak demand of the Lower 48 states, on the same day, 29 July 2025.</td><td class="s"><a href="https://www.eia.gov/todayinenergy/detail.php?id=65864">EIA, Today in Energy</a> · as of August 2025</td></tr>
-<tr><td class="n">180 hours</td><td>Hours of 2025 with demand above 90% of the year's peak (SPP's shape): 2.1% of the year.</td><td class="s"><a href="https://www.eia.gov/electricity/gridmonitor/dashboard/electric_overview/US48/US48">EIA-930 six-month files</a> (Download Data → Six-Month Files), computed · data for 2025</td></tr>
-<tr><td class="n">0.8%</td><td>Solar's share of SPP's net generation in 2025.</td><td class="s"><a href="https://www.eia.gov/electricity/gridmonitor/dashboard/electric_overview/US48/US48">EIA-930 six-month files</a> (Download Data → Six-Month Files), computed · data for 2025</td></tr>
+<tr><td class="n">180 hours</td><td>Hours of 2025 with demand above 90% of the year's peak, in the course's cleaned, rounded SPP profile: 2.1% of the year.</td><td class="s"><a href="https://www.eia.gov/electricity/gridmonitor/dashboard/electric_overview/US48/US48">EIA-930 six-month files</a> (Download Data → Six-Month Files), computed · data for 2025</td></tr>
+<tr><td class="n">0.8%</td><td>Solar's share of SPP's 2025 net generation: plant output after subtracting the electricity the plants use themselves.</td><td class="s"><a href="https://www.eia.gov/electricity/gridmonitor/dashboard/electric_overview/US48/US48">EIA-930 six-month files</a> (Download Data → Six-Month Files), computed · data for 2025</td></tr>
 </tbody>
 </table>
 </div>

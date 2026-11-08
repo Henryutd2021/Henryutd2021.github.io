@@ -6,14 +6,14 @@
     "note": "Appliance powers are illustrative. Every other real-world number below carries its source URL and an 'as of' date. Prairie Town's day and the Southwest Power Pool's year are computed by the lesson from town.json, town_year.json and town_days.json (EIA-930, 2025)."
   },
   "devices": {
-    "basis": "Typical nameplate power of each appliance, rounded; illustrative. The label on your own appliance gives its real power, and many appliances (heaters, refrigerators) cycle on and off.",
+    "basis": "Typical electrical power of each appliance, rounded; illustrative. The board holds each one constant; a label may state rated or maximum power, the actual draw depends on how the appliance runs, and many appliances (heaters, refrigerators) cycle on and off.",
     "list": [
       { "id": "led", "label": "LED bulb", "watts": 10, "icon": "bulb" },
       { "id": "laptop", "label": "Laptop", "watts": 50, "icon": "laptop" },
       { "id": "tv", "label": "Television", "watts": 100, "icon": "tv" },
       { "id": "microwave", "label": "Microwave", "watts": 1000, "icon": "microwave" },
       { "id": "hairdryer", "label": "Hair dryer", "watts": 1500, "icon": "dryer" },
-      { "id": "ev", "label": "EV charger", "watts": 7200, "icon": "car" }
+      { "id": "ev", "label": "Electric-car charger", "watts": 7200, "icon": "car" }
     ]
   },
   "predict": {

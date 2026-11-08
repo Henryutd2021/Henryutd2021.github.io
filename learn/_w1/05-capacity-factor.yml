@@ -9,7 +9,7 @@ glossary:
     def: "A chart of how much power a wind turbine makes at each wind speed."
   - id: cube-law
     term: Cube law
-    def: "The power carried by the wind grows with the cube of its speed (twice the speed, eight times the power); a turbine's output follows it only between its cut-in and rated speeds."
+    def: "The power carried by the wind grows with the cube of its speed (twice the speed, eight times the power); a real turbine's output follows it only roughly, and only between its cut-in and rated speeds."
   - id: cut-in-speed
     term: Cut-in speed
     def: "The lowest wind speed at which a turbine starts to make electricity."

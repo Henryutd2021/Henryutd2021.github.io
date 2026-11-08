@@ -180,16 +180,18 @@ Nuclear dips in spring and fall, the seasons when many reactors stop to refuel.
 <div class="lx-deeper-body">
 ```
 
-**Power in the wind.** Through a rotor, the wind carries $P_\text{wind} = \tfrac{1}{2}\rho A v^3$.
+**Power in the wind.** Through a rotor, the wind carries $P_\text{wind} = \tfrac{1}{2}\rho A v^3$. With the units below this gives watts; divide by 1,000 for kilowatts.
 
 | Symbol | Meaning | The lesson's turbine |
 |---|---|---|
 | $\rho$ | air density, kg/m³ | 1.225 kg/m³, sea level |
 | $A$ | area the blades sweep, m² | 7,854 m², a 100 m rotor |
 | $v$ | wind speed, m/s | 12 m/s, its rated speed |
-| $P_\text{wind}$ | power in the wind, kW | 8,313 kW |
+| $P_\text{wind}$ | power in the wind, W | about 8,313,000 W, or 8,313 kW |
 
-**What the turbine captures.** It makes 3,000 kW at 12 m/s, so its [power coefficient]{.lx-term term="power-coefficient"} is $C_p = 3{,}000 / 8{,}313 = 0.36$. No rotor can capture more than $16/27 \approx 0.593$ of the wind's power: the Betz limit.
+**What the turbine captures.** It makes 3,000 kW at 12 m/s, so its [power coefficient]{.lx-term term="power-coefficient"} is $C_p = 3{,}000 / 8{,}313 = 0.36$.
+
+**The Betz limit.** No rotor can capture more than $16/27 \approx 0.593$ of the wind's power.
 
 **The lesson's clean [power curve]{.lx-term term="power-curve"}**, output $P$ in kW at wind speed $v$ in m/s:
 
@@ -203,13 +205,15 @@ $$
 
 **A measured curve.** Real 10-minute averages scatter around a curve: gusts, air density and the turbine's own controls move each one.
 
+Each point below averages the records with similar wind speeds (a 0.5 m/s bin). The spread is one [standard deviation]{.lx-term term="standard-deviation"} of those records: how much they vary, not an error bar on the average.
+
 The chart shows a 1.5 MW research turbine that NREL tested in 2011, beside a clean curve built the same way for it: the cube law at its best $C_p$, 0.52, capped at 1,500 kW.
 
 ```{=html}
 <div id="t5-measured" class="lx5-measured">
 <table class="lx-mini-table">
 <caption>Measured against clean, selected wind speeds (the full table appears with JavaScript on)</caption>
-<thead><tr><th scope="col">Wind speed, m/s</th><th scope="col">Measured average, kW</th><th scope="col">Spread (±1 SD), kW</th><th scope="col">Clean curve, kW</th></tr></thead>
+<thead><tr><th scope="col">Wind speed, m/s</th><th scope="col">Measured average, kW</th><th scope="col">Spread (±1 standard deviation), kW</th><th scope="col">Clean curve, kW</th></tr></thead>
 <tbody>
 <tr><td>3.97</td><td>59</td><td>28</td><td>93</td></tr>
 <tr><td>5.99</td><td>304</td><td>52</td><td>319</td></tr>
@@ -260,7 +264,7 @@ Source: NREL, [Power Performance Test Report for the U.S. Department of Energy 1
 <div class="lx-qq" data-id="full" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “A 100 MW wind farm makes 100 MW most of the time.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. In 2025, U.S. wind farms made 33.8% of what they would have made at full size, and the cube law makes their output swing with every change in the wind.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. In 2025, U.S. wind farms made 33.8% of what they would have made at full size; below rated speed, their output rises and falls roughly with the cube of the wind speed.</p></details>
 </div>
 <div class="lx-qq" data-id="broken" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “A solar farm with a 24.0% capacity factor is broken three-quarters of the time.”</p>
@@ -270,7 +274,8 @@ Source: NREL, [Power Performance Test Report for the U.S. Department of Energy 1
 <div class="lx-qq" data-id="double" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “Doubling the wind speed doubles a turbine's output.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. On this lesson's turbine it gives eight times the output (2 × 2 × 2), but only while both speeds lie between cut-in (3 m/s) and rated (12 m/s); then output holds at rated power until cut-out (25 m/s).</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. On this lesson's turbine it depends on the speeds:</p>
+<ul><li>Both from 3 to 12 m/s: eight times the output (2 × 2 × 2).</li><li>From 12 to 25 m/s: output holds at rated power.</li><li>Above 25 m/s: the turbine shuts down.</li></ul></details>
 </div>
 </div>
 
