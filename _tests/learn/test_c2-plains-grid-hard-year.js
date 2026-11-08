@@ -124,7 +124,7 @@ const APPROVED_SNAPSHOT = {
   // ---------------- the results without JavaScript
   const A0 = ade(def), L0 = C.ledger(def, e0.year, c2base[String(def.res)], cfg);
   const rowsOf = (tag, st, e, L, A, F) => [
-    [tag + ": the plan", C.kilo(st.conn) + " MW connected · " + st.pk + " new peakers · " + C.kilo(st.up) + " MW uprate · " + st.share + "% of new costs paid by the large load"],
+    [tag + ": the plan", C.kilo(st.conn) + " MW connected · " + st.pk + " new peakers · " + C.kilo(st.up) + " MW uprate · " + st.share + "% of new fixed costs paid directly by the large load"],
     [tag + ": production cost, a year (2025 dollars)", C.mil(e.year.prod)],
     [tag + ": other customers against today's grid, a year", C.sgn(L.delta) + " (26-day estimate) · " + C.sgn(F.delta) + " (every day of 2025)"],
     [tag + ": the large load pays, a year", C.mil(L.ll.total) + " (26-day estimate) · " + C.mil(F.ll.total) + " (every day of 2025)"],
@@ -204,10 +204,23 @@ const APPROVED_SNAPSHOT = {
   ok(K.rows.every(r => r.f25 >= r.est + K.err25.lo - 1e-6 && r.f25 <= r.est + K.err25.hi + 1e-6) && FR.delta >= refL.delta + K.err25.lo && FR.delta <= refL.delta + K.err25.hi,
     "every checked plan's and the reference plan's full-2025 change (" + C.mil(FR.delta) + ") lies within the estimate plus the stated error (" + C.sgn(K.err25.lo) + " to " + C.sgn(K.err25.hi) + ")");
   ok(K.err25.hi > 0 && K.rows.some(r => near(r.f25 - r.est, K.err25.hi, 1)) && JSON.stringify(C.ledgerCheck(D)) === JSON.stringify(K), "the page's ledger check (data file) is the test's: 2025's error " + C.sgn(K.err25.lo) + " to " + C.sgn(K.err25.hi) + ", 2024's " + C.sgn(K.err24.lo) + " to " + C.sgn(K.err24.hi));
-  { const N = C.ledgerNotes(ref, refL, refCR, K, cfg).join(" ");
-    ok(N.indexOf("every day of 2025 put other customers' change " + C.sgn(K.err25.lo) + " to " + C.sgn(K.err25.hi) + " from the 26-day estimate. For this plan, read it as " + C.sgn(refL.delta + K.err25.lo) + " to " + C.sgn(refL.delta + K.err25.hi)) >= 0 &&
-      /\*\*Billing rule:\*\*/.test(N) && /\*\*Shortfall rule:\*\* a zone's unserved load is shared by its customers in proportion to their load/.test(N), "the who-pays notes carry the estimate's error and state the billing and shortfall rules apart");
-    C.ledgerNotes(ref, refL, refCR, K, cfg).forEach(t => { const n = t.replace(/\[\[[a-z-]+\|([^\]]+)\]\]/g, "$1").replace(/\*\*/g, "").split(/\s+/).length; ok(n <= 36, "a who-pays note within the budget (" + n + " words): " + t.slice(0, 40)); }); }
+  { const JS0 = fs.readFileSync(X.L("c2-plains-grid-hard-year.js"), "utf8"), fullR = C.checkedFull(ref, cfg, E2.c2Key), N = C.ledgerNotes(ref, refL, refCR, K, cfg, fullR).join(" ");
+    ok(near(fullR, FR.delta, 1e-6) && N.indexOf("this plan is one of the four checked: every day of 2025 gives " + C.sgn(FR.delta) + " (estimate " + C.sgn(refL.delta) + ")") >= 0 &&
+      /\*\*Billing rule:\*\*/.test(N) && /\*\*Shortfall rule:\*\* a zone's unserved load is shared by its customers in proportion to their load/.test(N), "the who-pays notes: a checked plan (the reference plan) gets its own full year; the billing and shortfall rules apart");
+    // a plan off the four checked: the four plans' observed range, never claimed as this plan's
+    const off = byKey[E2.c2Key(Object.assign({}, ref, { pk: 4 }))] ? Object.assign({}, ref, { pk: 4 }) : null, eO = off && byKey[E2.c2Key(off)];
+    ok(off && C.checkedFull(off, cfg, E2.c2Key) === null && (() => { const Lo = C.ledger(off, eO.year, c2base[String(off.res)], cfg), t = C.ledgerNotes(off, Lo, C.costRange(off, eO.year, c2base[String(off.res)], cfg), K, cfg, null).join(" ");
+      return t.indexOf("for the four plans checked, every day of 2025 moved other customers' change by " + C.sgn(K.err25.lo) + " to " + C.sgn(K.err25.hi) + " from the 26-day estimate; this plan's own error is unknown") >= 0 && !/read it as/.test(t + JS0); })(),
+      "a plan that was not checked: the four checked plans' error range, labelled as theirs; this plan's own error unknown (no range carried to it)");
+    // the fixed-cost rule: the direct share plus the large load's energy share of the rest, said in words
+    const fx = refL.ll.fixed, Nn = refL.N, f = refL.Ell / (refL.Ell + refL.Eoth);
+    ok(near(fx, Nn * 0.5 + Nn * 0.5 * f, 1) && N.indexOf("**Fixed-cost rule:** new capacity and the uprate cost " + C.mil(Nn) + " a year; the large load pays 50% directly, and all customers, the large load included, share the rest by served energy.") >= 0 && fx > Nn * 0.5 + 1e5,
+      "the fixed-cost rule in words: at 50% the large load pays " + C.mil(fx) + " of " + C.mil(Nn) + " (half directly, plus its energy share of the rest)");
+    ok(/share the rest by served energy/.test(JSON.stringify(C.GROUPS)) && /Direct share of new fixed costs \(large load\)/.test(fs.readFileSync(X.L("components/engine-e2.js"), "utf8")) && /all customers, the large load included, share the rest by served energy/.test(JS0), "the control, its hint and the note's assumptions say how the rest is shared");
+    // a built plan whose new costs the large load pays in full: never "nothing is built"
+    { const all = Object.assign({}, ref, { share: 100 }), La = C.ledger(all, eR.year, c2base[String(all.res)], cfg), t = C.ledgerNotes(all, La, C.costRange(all, eR.year, c2base[String(all.res)], cfg), K, cfg, null)[0];
+      ok(La.N > 1e6 && /the large load pays all new fixed costs directly, so the cost ranges do not move it/.test(t) && !/nothing is built/.test(t), "six peakers, the uprate, 100% paid directly: " + t.replace(/\*\*/g, "").slice(0, 120)); }
+    C.ledgerNotes(ref, refL, refCR, K, cfg, fullR).forEach(t => { const n = t.replace(/\[\[[a-z-]+\|([^\]]+)\]\]/g, "$1").replace(/\*\*/g, "").split(/\s+/).length; ok(n <= 36, "a who-pays note within the budget (" + n + " words): " + t.slice(0, 40)); }); }
   // the shortfall rule in the ledger: the default plan sheds at Town, and the large load carries its share
   ok(e0.year.ll < 300 * 8760 - 0.5 && near(L0.Ell, e0.year.ll, 1e-9) && R0.tot.llShed > 0.5 && near(R0.tot.llMWh + R0.tot.llShed, 300 * 8760, 1e-3), "the default plan: the large load's share of Town's shortfall (" + C.kilo(R0.tot.llShed) + " MWh a year) is not billed, and served + unserved = 300 MW × 8,760 h");
 
@@ -253,7 +266,7 @@ const APPROVED_SNAPSHOT = {
     ok(c.deflator["2024"] === 125.587 && c.deflator["2025"] === 128.893 && b.basis.indexOf("×" + k.toFixed(4) + " to 2025 by BEA's GDP deflator") >= 0 &&
       PAGE.indexOf("NIPA Table 1.1.9: Implicit Price Deflators for Gross Domestic Product</a>, line 1, annual (2017 = 100): 2024 125.587, 2025 128.893. Last revised 29 October 2026; accessed 5 November 2026.") >= 0 && !/Short-Term Energy Outlook/.test(PAGE + DATA),
       "the price year: BEA's deflator, its values and dates on the page (as lesson 13), not the rolling STEO page"); }
-  ok(/PJM \(2026\)\. <a href="https:\/\/www\.pjm\.com\/-\/media\/DotCom\/documents\/manuals\/m20a\.pdf">Manual 20A: Resource Adequacy Analysis<\/a> \(PDF\), Rev\. 3, effective 24 June 2026, section 1\.3/.test(PAGE) && /The brief's criterion, 0\.1 days a year, is PJM's one day in ten years/.test(JS) && !/common criterion/.test(JS + PAGE),
+  ok(/PJM \(2026\)\. <a href="https:\/\/www\.pjm\.com\/-\/media\/DotCom\/documents\/manuals\/m20a\.pdf">Manual 20A: Resource Adequacy Analysis<\/a> \(PDF\), Rev\. 3, effective 24 June 2026, section 1\.3/.test(PAGE) && /the brief's criterion, 0\.1 days a year: PJM's one day in ten years/.test(JS) && !/common criterion/.test(JS + PAGE),
     "the 0.1 criterion is the brief's choice, sourced to PJM Manual 20A section 1.3 (dated), not 'common'");
   ok(T.indexOf("Here 2024 is only a second-weather-year robustness check: the adequacy check already draws on it.") >= 0 && !/weather it was not built for/.test(T), "2024 is called a robustness check, not held-out validation");
   ok(/Reserve:<\/b> one region-wide total; the model does not check whether it can reach a zone after a disturbance/.test(PAGE) && /Reserves are pooled across the region: the model does not check whether they can reach a zone after a disturbance/.test(JS),
@@ -262,6 +275,11 @@ const APPROVED_SNAPSHOT = {
   // the hand-in: the notebook required, timed, and in the note; the chart downloaded and checked
   ok(T.indexOf("Plus M2's notebook, about 45 minutes: run every cell. Its practice section is optional, about 90 minutes more.") >= 0 && /Part of the hand-in: M2's notebook, about 45 minutes/.test(PAGE) && !/Modeler version/.test(PAGE) &&
     C.FIELDS.some(f => f.key === "zones" && f.need) && /its sensitivity chart and a paragraph from M2's notebook/.test(T), "M2's notebook is part of the hand-in, timed (45 minutes; practice optional) and asked for in the note");
+  ok(/^The strong note in excerpts: a full note also carries the plan link, the downloaded chart and the paragraph from M2's notebook\.$/.test(c2ex.exemplars.lede) && c2ex.exemplars.answers[1].label === "Strong note (excerpts)" && !/chart attached/.test(JSON.stringify(c2ex.exemplars)), "the strong exemplar is labelled as excerpts and names the pieces a full note adds");
+  ok(/var aSteps = H\("ol", \{ class: "lx-hint c2-steps" \}/.test(JS) && ["**Draw:**", "**Simulate:**", "**Count:**", "**Compare:**"].every(k => JS.indexOf(k) > 0), "the adequacy check in four short steps: draw, simulate, count, compare");
+  ok(/0\.1 <span class="lx-term" data-term="lole">loss-of-load days<\/span> a year/.test(PAGE) && /one <span class="lx-term" data-term="bus">bus<\/span>: every plant and load meet at a single point, so no link can fill up/.test(PAGE), "first uses: loss-of-load days (in the brief) and a bus (the notebook card), with their glossary marks");
+  { const nb = JSON.parse(fs.readFileSync(path.join(X.SITE, "learn/notebooks/m02-unit-commitment.ipynb"), "utf8")).cells[4].source.join("");
+    ok(/\| Symbol \| Meaning \| Unit \|/.test(nb) && !/Symbols: \$t\$ hour;/.test(nb), "M2's notebook (the note's paragraph comes from it): its symbols as a table, one per row"); }
   ok(/id: "chart", label: "Sensitivity chart downloaded for this plan, to attach to the note"/.test(JS) && /Download the chart \(SVG\) for your note/.test(JS) && /The sensitivity chart attached/.test(JSON.stringify(C.RUBRIC)) && /the sensitivity chart: the recommendation first/.test(JSON.stringify(C.RUBRIC)),
     "the chart can be downloaded, the note checks it, and the rubric asks for it");
   // terms at first use: the controls' hints and the who-pays rules mark them

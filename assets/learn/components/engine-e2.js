@@ -155,7 +155,7 @@
       { id: "bat", short: "s", type: "int", min: 0, max: 100, step: 100, def: 0, label: "Battery at Prairie Town (4 hours)", unit: "MW" },
       { id: "up", short: "u", type: "int", min: 0, max: 300, step: 300, def: 0, label: "Town–Metro uprate", unit: "MW" },
       { id: "res", short: "r", type: "int", min: 150, max: 250, step: 100, def: 250, label: "Operating reserve required", unit: "MW" },
-      { id: "share", short: "h", type: "int", min: 0, max: 100, step: 10, def: 0, label: "Share of new costs the large load pays", unit: "%" }];
+      { id: "share", short: "h", type: "int", min: 0, max: 100, step: 10, def: 0, label: "Direct share of new fixed costs (large load)", unit: "%" }];
     ["pk", "bat", "up"].forEach(function (k) {
       var r = R[k];
       f.push({ id: "c" + k, short: "c" + k, type: "int", min: r.lo, max: r.hi, step: r.step, def: r.def, label: r.label, unit: r.unit });
