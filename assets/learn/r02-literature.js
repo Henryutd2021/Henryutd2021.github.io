@@ -81,14 +81,15 @@
     return c;
   }
   function emptyCells(c) { return Object.keys(c).filter(function (k) { return !c[k].length; }); }
-  // each cell of the two by two in words, so feedback names the cell the reader picked, whatever the coding
-  var CELL = { yy: "both a storage link between periods and extreme periods", yn: "a storage link without extreme periods",
-               ny: "extreme periods without a storage link", nn: "neither a storage link nor extreme periods" };
+  // each cell of the two by two in words, so feedback names the cell the reader picked, whatever the coding; said as the
+  // coding allows ("reported" or "not stated"), never as a confirmed absence
+  var CELL = { yy: "storage link and extremes both reported", yn: "storage link reported, extremes not stated",
+               ny: "extremes reported, storage link not stated", nn: "neither reported" };
   function cellPhrase(k) { return CELL[k]; }
   // feedback for a tapped cell, from the counted marks: {empty, text, names}
   function cellFeedback(D, c, k) {
     var names = c[k].map(function (key) { return D.matrix.filter(function (p) { return p.key === key; })[0].name; });
-    if (!names.length) return { empty: true, names: names, text: "That cell is empty. In this coding, no abstract in your twelve reports " + CELL[k] + "." };
+    if (!names.length) return { empty: true, names: names, text: "That cell is empty. In this coding, no abstract in your twelve falls in “" + CELL[k] + "”." };
     return { empty: false, names: names, text: "Not empty: " + names.length + " paper" + (names.length === 1 ? "" : "s") + " here (" + names.join("; ") + ")." };
   }
   // the follow-up question for the empty cell the reader picked
@@ -107,6 +108,38 @@
     var a = p.authors, who = a.length === 1 ? a[0].split(" ").pop() : a.length === 2 ? a[0].split(" ").pop() + " and " + a[1].split(" ").pop() : a[0].split(" ").pop() + " et al.";
     return who + " (" + p.year + ")";
   }
+  // the exemplars' spec: one for the live card and the no-JS block (lines: one field per line in both)
+  function exemplarsSpec(D) {
+    var E = D.exemplars;
+    return { title: "Two gap statements for the same question", task: E.task, id: "r2-ex",
+      answers: [{ key: "weak", label: "Weak answer", level: "Developing", parts: E.weak }, { key: "good", label: "Strong answer", level: "Proficient", parts: E.good }],
+      diff: E.diff, note: E.note, lines: true };
+  }
+  // the coding step's text, as separate elements: the task, the two ideas defined before coding, the rule
+  function matrixIntro(D) {
+    return ["Eight rows are coded for you; “Why” opens their reasons after a check. Code the four rows marked “to code”.",
+      "The two ideas: a [[storage-link|storage link]] carries the energy stored at one period's end into the next; [[extreme-period|extreme periods]] are unusually demanding ones, such as high demand with little wind.",
+      "The rule: " + D.coding_rule];
+  }
+  // "which two papers does the closest one build on?": a tap toggles a pick, at most two at a time (a third waits
+  // until one is unpicked); a check counts the right picks: the step is done when both are right, or on the second check
+  // (then the answer is shown); a first wrong check asks for a retry
+  var PICK = ["p04", "p11"];
+  function pickToggle(picks, key) {
+    var p = picks.slice(), i = p.indexOf(key);
+    if (i >= 0) { p.splice(i, 1); return { picks: p, full: false }; }
+    if (p.length >= 2) return { picks: p, full: true };
+    p.push(key); return { picks: p, full: false };
+  }
+  function pickCheck(picks, tries) {
+    var hit = picks.filter(function (k) { return PICK.indexOf(k) >= 0; }).length, t = tries + 1;
+    return { hit: hit, tries: t, ready: picks.length === 2, done: picks.length === 2 && (hit === 2 || t >= 2), retry: picks.length === 2 && hit < 2 && t < 2 };
+  }
+  // how a string moves to a second database, as an HTML table (no-JS block and the live log step)
+  function databasesHTML(D) {
+    return '<p class="lx-hint">' + esc(D.databases_note) + '</p><div class="lx-scroll-x"><table class="lx-facts"><thead><tr><th scope="col">Database</th><th scope="col">What its search takes</th><th scope="col">Log</th></tr></thead><tbody>' +
+      D.databases.map(function (d) { return "<tr><td>" + esc(d.name) + "</td><td>" + esc(d.syntax) + (d.src ? ' <span class="lx-hint">(' + esc(d.src) + ")</span>" : "") + "</td><td>" + esc(d.log) + "</td></tr>"; }).join("") + "</tbody></table></div>";
+  }
   // the no-JS version of the task (what to produce is the page's task card, above the interactive): the ladder, the
   // routes, the matrix and the follow-up search, as HTML
   function staticTask(D, S) {
@@ -119,10 +152,12 @@
     });
     h.push("</tbody></table></div>");
     h.push('<p class="lx-hint">Each count links the same search on OpenAlex\'s search page; counts there may differ as OpenAlex updates its records.</p>');
+    h.push('<p class="lx-eyebrow">Moving the strings to a second database</p>' + databasesHTML(D));
     h.push("<p>Snowballing from " + esc(cite(S.review)) + ": " + f0(S.snowball.references) + " references (backward) and " + f0(S.snowball.cited_by) + " citing works (forward) on " + date +
       ". Of the 12 matrix papers, the AND-the-model string finds " + R.search.length + ", backward snowballing " + R.backward.length + " and forward snowballing " + R.forward.length +
       "; together, all " + R.union.length + ".</p>");
     h.push('<p class="lx-eyebrow">The concept matrix, coded from the abstracts (first pass)</p>');
+    h.push("<p>" + rich(matrixIntro(D)[1]) + "</p>");
     h.push('<p class="lx-hint">' + esc(D.coding_rule) + " " + Object.keys(D.values).map(function (v) { return "<b>" + esc(v) + "</b>: " + esc(D.values[v]); }).join("; ") + ".</p>");
     h.push('<div class="lx-scroll-x"><table class="lx-facts"><thead><tr><th scope="col">Paper</th>' + D.bins.map(function (b) { return '<th scope="col">' + esc(b.label) + "</th>"; }).join("") + "</tr></thead><tbody>");
     D.matrix.forEach(function (p) {
@@ -138,7 +173,7 @@
     var hf = D.fillers[0];
     h.push('<p class="lx-eyebrow">Reading the closest paper: ' + esc(hf.name) + "</p><ol>");
     D.passes.forEach(function (p) { h.push("<li><b>" + esc(p.label) + "</b> (" + esc(p.time) + "): " + esc(p.read) + " Out: " + esc(p.out) + "</li>"); });
-    h.push("</ol><p>Its headings (open preprint, October 2022), for the first pass: " + esc(D.headings.join(" · ")) + ".</p>");
+    h.push('</ol><p>Its headings (open preprint, October 2022), for the first pass:</p><ul>' + D.headings.map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ul>");
     h.push('<details class="lx-textalt"><summary>The first pass, worked: the five Cs</summary><dl class="lx-ideas">' +
       D.five_cs.map(function (c) { return "<dt>" + esc(c.c) + "</dt><dd>" + esc(c.q) + " " + rich(c.worked) + "</dd>"; }).join("") + "</dl></details>");
     h.push('<details class="lx-textalt"><summary>The second pass, worked: the extraction sheet</summary><dl class="lx-ideas">' +
@@ -150,7 +185,8 @@
   }
   var model = { KEYS: KEYS, queryString: queryString, apiURL: apiURL, searchURL: searchURL, web: web, knownCount: knownCount, routes: routes, refMarks: refMarks, startMarks: startMarks,
                 cross: cross, emptyCells: emptyCells, cellPhrase: cellPhrase, cellFeedback: cellFeedback, gapQuestion: gapQuestion, differs: differs,
-                paper: paper, cite: cite, dateText: dateText, staticTask: staticTask, f0: f0, rich: rich, plain: plain };
+                paper: paper, cite: cite, dateText: dateText, staticTask: staticTask, f0: f0, rich: rich, plain: plain,
+                exemplarsSpec: exemplarsSpec, matrixIntro: matrixIntro, databasesHTML: databasesHTML, PICK: PICK, pickToggle: pickToggle, pickCheck: pickCheck };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -303,6 +339,8 @@
         var tb = H("tbody", null, t);
         S.ladder.forEach(function (r) { var tr = H("tr", null, tb); H("td", { text: "OpenAlex, title and abstract" }, tr); H("td", null, tr).appendChild(H("code", { text: r.query })); H("td", { text: S.meta.as_of }, tr); H("td", { class: "n", text: f0(r.count) }, tr); });
         LX.store.set("r2-log", S.ladder.map(function (r) { return [r.query, S.meta.as_of, r.count]; }));
+        var db = H("details", { class: "lx-textalt" }, log); H("summary", { text: "Your second database: what its search takes" }, db);
+        H("div", { html: databasesHTML(D) }, db);
         api.done(); api.saw("A search log is four things per line: where, what, when and how many. With it, a reviewer can repeat your search and see what changed since.");
       });
     };
@@ -351,7 +389,7 @@
       var marks = LX.store.get("r2-marks", null) || startMarks(D);
       state.marks = marks;
       var toCode = D.matrix.filter(function (p) { return p.code; }).map(function (p) { return p.name; });
-      H("p", { class: "lx-hint", text: "Eight rows are coded for you; “Why” opens their reasons after a check. Code the four marked “to code”. The rule: " + D.coding_rule }, act);
+      matrixIntro(D).forEach(function (t) { H("p", { class: "lx-hint", html: LX.rich(t) }, act); });
       var cs = LX.CardSort(act, { mode: "toggles", bins: D.bins, checkLabel: "Check my coding", cls: "r2-matrix",
         items: D.matrix.map(function (p) { return { key: p.key, label: p.name + (p.code ? " · to code" : ""), color: p.code ? "var(--lx-accent)" : "var(--lx-ink-3)", ref: p.ref, why: p.why }; }),
         marks: marks, onChange: function (m) { LX.store.set("r2-marks", m); state.marks = m; },
@@ -431,20 +469,27 @@
       D.fillers.forEach(function (f) { var li = H("li", null, ul); doiLink(f.doi, f.name, H("b", null, li)); H("span", { text: " · " + f.summary }, li); });
       var h = D.fillers[0], hs = S.snowball.fillers_citing_review.indexOf(h.doi) >= 0;
       H("p", { class: "r2-q", text: "Which two of your twelve papers does " + h.name + " build on?" }, act);
-      var g = H("div", { class: "r2-chips", role: "group", "aria-label": "Pick two papers" }, act), fb = H("div", { "aria-live": "polite" }, act), want = ["p04", "p11"], picks = [];
+      H("p", { class: "lx-hint", text: "Match its two ideas, a storage link and extremes picked from model results, to the matrix rows; its reference list, at the DOI, confirms them. Tap two, then check." }, act);
+      var g = H("div", { class: "r2-chips", role: "group", "aria-label": "Pick two papers" }, act), picks = [], tries = 0, btns = {};
+      var row = H("div", { class: "r2-row" }, act), chk = H("button", { type: "button", class: "lx-btn small", text: "Check my two", disabled: true }, row);
+      var cnt = H("span", { class: "lx-hint", "aria-live": "polite", text: "0 of 2 picked." }, row), fb = H("div", { "aria-live": "polite" }, act);
+      function sync() { D.matrix.forEach(function (p) { btns[p.key].setAttribute("aria-pressed", picks.indexOf(p.key) >= 0 ? "true" : "false"); }); chk.disabled = picks.length !== 2; cnt.textContent = picks.length + " of 2 picked."; }
       D.matrix.forEach(function (p) {
-        var b = H("button", { type: "button", class: "r2-chip", "aria-pressed": "false", text: p.name }, g);
-        b.addEventListener("click", function () {
-          if (picks.indexOf(p.key) >= 0) return;
-          picks.push(p.key); b.setAttribute("aria-pressed", "true");
-          var hit = picks.filter(function (k) { return want.indexOf(k) >= 0; }).length;
-          if (hit === 2 || picks.length >= 4) {
-            api.done();
-            saw(fb, hit === 2, "<b>" + (hit === 2 ? "Both." : "The two are:") + "</b> Kotzur et al. (2018) for linked storage and Teichgraeber, Küpper and Brandt (2021) for extreme periods: the storage-only and extremes-only cells of the course's coding. " +
-              (hs ? "It also cites the review, so forward snowballing would have found it." : ""));
-            api.saw("The empty cell did not survive the search. That is a good result: you now know the closest prior work, and your question must say what it adds to these three, after reading them.");
-          }
+        var b = btns[p.key] = H("button", { type: "button", class: "r2-chip", "aria-pressed": "false", text: p.name }, g);
+        b.addEventListener("click", function () {   // a second tap unpicks; a third pick waits until one is unpicked
+          var r = pickToggle(picks, p.key);
+          if (r.full) { cnt.textContent = "Two at most: tap one to unpick it."; return; }
+          picks = r.picks; fb.innerHTML = ""; sync();
         });
+      });
+      chk.addEventListener("click", function () {
+        var c = pickCheck(picks, tries), hit = c.hit; tries = c.tries;
+        if (c.retry) { saw(fb, false, "<b>" + hit + " of 2.</b> Look again at the closest paper's two ideas, change your picks and check again."); return; }
+        if (!c.done) return;
+        api.done();
+        saw(fb, hit === 2, "<b>" + (hit === 2 ? "Both." : "The two are:") + "</b> Kotzur et al. (2018) for linked storage and Teichgraeber, Küpper and Brandt (2021) for extreme periods: the storage-only and extremes-only cells of the course's coding. " +
+          (hs ? "It also cites the review, so forward snowballing would have found it." : ""));
+        api.saw("The empty cell did not survive the search. That is a good result: you now know the closest prior work, and your question must say what it adds to these three, after reading them.");
       });
     };
   }
@@ -455,7 +500,8 @@
       var h = D.fillers[0];
       var grid = H("div", { class: "r2-passes" }, act);
       D.passes.forEach(function (p) { var d = H("div", null, grid); H("b", { text: p.label }, d); H("span", { class: "lx-hint", text: p.time }, d); H("span", { text: p.read }, d); H("span", { class: "lx-hint", text: "Out: " + p.out }, d); });
-      H("p", { class: "lx-hint", text: "Its headings (open preprint, October 2022), for your first pass: " + D.headings.join(" · ") + "." }, act);
+      H("p", { class: "lx-hint", text: "Its headings (open preprint, October 2022), for your first pass:" }, act);
+      var hl = H("ul", { class: "r2-plan" }, act); D.headings.forEach(function (x) { H("li", { text: x }, hl); });
       var c0 = D.five_cs[0];
       H("p", { class: "r2-q", text: "First pass on " + h.name + ": " + c0.q }, act);
       var g = H("div", { class: "lx-qbtns", role: "group", "aria-label": c0.q }, act), fb = H("div", { "aria-live": "polite" }, act);
@@ -497,12 +543,6 @@
   }
 
   // ---- exemplars and explain layer (#exemplars), rubric and checklist (#selfcheck)
-  function exemplarsSpec(D) {
-    var E = D.exemplars;
-    return { title: "Two gap statements for the same question", task: E.task, id: "r2-ex",
-      answers: [{ key: "weak", label: "Weak answer", level: "Developing", parts: E.weak }, { key: "good", label: "Strong answer", level: "Proficient", parts: E.good }],
-      diff: E.diff, note: E.note, lines: true };
-  }
   function explain(D, S) {
     var x = document.getElementById("r02-exemplars"); if (!x) return;
     x.innerHTML = "";
@@ -533,7 +573,8 @@
       lede: "Each route finds papers the others miss. Log what you did with each.",
       columns: [{ key: "name", label: "Route", main: true }, { key: "finds", label: "Good at" }, { key: "misses", label: "Misses" }, { key: "log", label: "Log" }],
       rows: [
-        { key: "oa", name: "Open database search", note: "OpenAlex, Semantic Scholar, Crossref", finds: "Broad, repeatable searches with exact strings and counts", misses: "Papers that use other words; the worked string 4 missed 3 of the 12", log: "String, field, date, count" },
+        { key: "oa", name: "OpenAlex search", note: "an open index; takes AND, OR and quoted phrases", finds: "Broad, repeatable searches with exact strings and counts", misses: "Papers that use other words; the worked string 4 missed 3 of the 12", log: "String, field, date, count" },
+        { key: "ss", name: "Semantic Scholar, Crossref", note: "open, ranked by relevance", finds: "A second look at the same topic, by its key words", misses: "Boolean strings: Semantic Scholar takes quoted phrases but not AND or OR; Crossref takes neither", log: "Words as typed, date, how many results you screened" },
         { key: "gs", name: "Google Scholar", note: "free to search, not an open database", finds: "Wide coverage and a “cited by” list", misses: "No API and uneven metadata; hard to repeat exactly", log: "String, date, how many results you screened" },
         { key: "bw", name: "Backward snowballing", note: "a paper's references", finds: "The classics a field builds on", misses: "Anything newer than the paper", log: "Seed paper, how many references you screened" },
         { key: "fw", name: "Forward snowballing", note: "works that cite a paper", finds: "Newer work that engages the seed", misses: "Work that never cites the seed", log: "Seed, date (the list grows)" },
@@ -549,7 +590,7 @@
       lede: "Tick each line for your own topic before you write the gap statement.", doneText: "Now write the gap statement.",
       items: [
         { id: "blocks", label: "Concept blocks", text: "Two or three blocks of synonyms, joined with AND." },
-        { id: "log", label: "Search log", text: "Database, field, string, date and count for every search, in two open databases." },
+        { id: "log", label: "Search log", text: "Database, field, string as run, date and count for every search, in two open databases." },
         { id: "snow", label: "Snowballing", text: "Backward and forward from at least one review." },
         { id: "screen", label: "Screening", text: "Why each dropped paper was dropped, in a word or two." },
         { id: "matrix", label: "Concept matrix", text: "At least 12 papers, coded by a written rule; “not stated” kept apart from “no”." },

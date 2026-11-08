@@ -24,10 +24,8 @@ const JS = fs.readFileSync(L("r02-literature.js"), "utf8");
 let checks = 0, fails = 0;
 function ok(c, msg) { checks++; if (!c) { fails++; console.log("FAIL:", msg); } }
 
-function exSpec() {
-  const E = D.exemplars;
-  return { answers: [{ key: "weak", label: "Weak answer", level: "Developing", parts: E.weak }, { key: "good", label: "Strong answer", level: "Proficient", parts: E.good }], diff: E.diff };
-}
+// the page's own exemplars spec (lines: true), so the no-JS block keeps the live card's field breaks
+function exSpec() { return M.exemplarsSpec(D); }
 const BLOCKS = {
   "r02-task": () => M.staticTask(D, S),
   "r02-exemplars": () => EX.staticHTML(exSpec()),
@@ -90,11 +88,13 @@ const ref = M.refMarks(D), c = M.cross(D, ref);
 ok(c.yy.length === 0 && c.yn.join() === "p04,p06" && c.ny.join() === "p10,p11" && c.nn.length === 8, "storage × extremes: 0 both, 2 storage only, 2 extremes only, 8 neither");
 ok(M.emptyCells(c).join() === "yy", "the only empty cell is storage linked and extremes kept");
 // feedback from the selected cell and the counted coding
-ok(M.cellFeedback(D, c, "yy").empty && /reports both a storage link between periods and extreme periods/.test(M.cellFeedback(D, c, "yy").text), "course's coding: the empty cell's feedback names both");
+ok(M.cellFeedback(D, c, "yy").empty && /falls in “storage link and extremes both reported”/.test(M.cellFeedback(D, c, "yy").text), "course's coding: the empty cell's feedback names both");
+ok(["yy", "yn", "ny", "nn"].every(k => !/without|\bno storage|\bnor\b/.test(M.cellPhrase(k))) && /reported, extremes not stated/.test(M.cellPhrase("yn")) && M.cellPhrase("nn") === "neither reported",
+  "cell names say what the abstracts report or do not state, never a confirmed absence");
 ok(!M.cellFeedback(D, c, "yn").empty && /Kotzur et al\. \(2018\); Tejada-Arango/.test(M.cellFeedback(D, c, "yn").text), "course's coding: a full cell lists its papers");
 { const m = JSON.parse(JSON.stringify(ref)); m.p04.extreme = true; m.p06.extreme = true;
   const x = M.cross(D, m), f = M.cellFeedback(D, x, "yn");
-  ok(M.emptyCells(x).join() === "yn" && f.empty && /a storage link without extreme periods/.test(f.text) && !/both/.test(f.text), "a wrong coding (p04, p06 with extremes): the empty cell is storage-only, and its feedback says so, not 'both'");
+  ok(M.emptyCells(x).join() === "yn" && f.empty && /storage link reported, extremes not stated/.test(f.text) && !/both/.test(f.text), "a wrong coding (p04, p06 with extremes): the empty cell is storage-only, and its feedback says so, not 'both'");
   ok(!M.cellFeedback(D, x, "yy").empty && /2 papers here/.test(M.cellFeedback(D, x, "yy").text), "a wrong coding: the both cell now holds two papers, and says so");
   ok(!/both/.test(M.gapQuestion(D, "yn")) && /both/.test(M.gapQuestion(D, "yy")), "the follow-up question names the tapped cell");
   ok(M.differs(D, m).join() === "p04,p06" && M.differs(D, ref).length === 0, "rows that differ from the course's coding are found"); }
@@ -105,9 +105,39 @@ ok(!M.cellFeedback(D, c, "yn").empty && /Kotzur et al\. \(2018\); Tejada-Arango/
   ok(M.emptyCells(x).join() === "yy,yn,ny" && ["yy", "yn", "ny"].every(k => M.cellFeedback(D, x, k).empty && M.cellFeedback(D, x, k).text.indexOf(M.cellPhrase(k)) >= 0), "a coding with three empty cells: each one's feedback names its own cell"); }
 const start = M.startMarks(D);
 ok(D.matrix.every(p => M.KEYS.every(k => start[p.key][k] === (p.code ? false : p.ref[k] === "yes"))), "start: eight rows coded, the reader's four blank");
-ok(/want = \["p04", "p11"\]/.test(JS) && D.matrix.find(p => p.key === "p04").name === "Kotzur et al. (2018)" && D.matrix.find(p => p.key === "p11").name.indexOf("Teichgraeber, Küpper") === 0,
+ok(M.PICK.join() === "p04,p11" && D.matrix.find(p => p.key === "p04").name === "Kotzur et al. (2018)" && D.matrix.find(p => p.key === "p11").name.indexOf("Teichgraeber, Küpper") === 0,
   "the closest paper builds on p04 (Kotzur et al. 2018b in its references) and p11 (Teichgraeber et al. 2021)");
 ok(D.five_cs[0].options.some(o => o[0] === D.five_cs[0].answer) && D.gap_q.options.some(o => o[0] === D.gap_q.answer) && D.gap_q.answer === "test", "the quiz answers exist; the gap answer is 'search it first'");
+
+// pick two: a tap toggles, at most two at a time; a check is explicit, with one retry
+{ let p = M.pickToggle([], "p01").picks; p = M.pickToggle(p, "p02").picks;
+  ok(M.pickToggle(p, "p04").full && M.pickToggle(p, "p04").picks.join() === "p01,p02", "a third pick waits: two at most");
+  ok(M.pickToggle(p, "p01").picks.join() === "p02", "a second tap unpicks a paper (a mistaken choice can be corrected)");
+  const w1 = M.pickCheck(p, 0);
+  ok(w1.hit === 0 && w1.retry && !w1.done, "two wrong picks: no answer yet, a retry");
+  p = M.pickToggle(M.pickToggle(p, "p01").picks, "p02").picks; p = M.pickToggle(M.pickToggle(p, "p04").picks, "p11").picks;
+  const r = M.pickCheck(p, w1.tries);
+  ok(p.join() === "p04,p11" && r.hit === 2 && r.done && !r.retry, "after unpicking the wrong two, the right two pass: never four selected at once");
+  ok(M.pickCheck(["p01", "p04"], 1).done && !M.pickCheck(["p01", "p04"], 1).retry && M.pickCheck(["p04"], 0).ready === false, "a second wrong check shows the answer; one pick cannot be checked"); }
+
+// ---------------- second database: syntax named per database, never assumed portable
+ok(D.databases.map(d => d.name).join() === "OpenAlex,Semantic Scholar,Crossref", "the second-database table: OpenAlex, Semantic Scholar, Crossref");
+ok(/AND, OR, NOT and quoted phrases/.test(D.databases[0].syntax) && /no AND, OR or NOT/.test(D.databases[1].syntax) && /Quoted phrases/.test(D.databases[1].syntax) && /No AND, OR or exact phrases/.test(D.databases[2].syntax),
+  "OpenAlex takes the strings unchanged; Semantic Scholar takes quotes but no Boolean operators; Crossref takes neither");
+ok(D.databases.slice(1).every(d => /checked 8 November 2026/.test(d.src)), "each syntax claim for another database is sourced and dated");
+ok(/adapt them to a second database's syntax/.test(D.practice[0].task) && !/OpenAlex and one other open database/.test(JSON.stringify(D)), "the practice adapts the strings to the second database, rather than running them unchanged");
+ok(/OpenAlex search", note: "an open index; takes AND, OR and quoted phrases"/.test(JS) && /Semantic Scholar takes quoted phrases but not AND or OR; Crossref takes neither/.test(JS) && !/note: "OpenAlex, Semantic Scholar, Crossref"/.test(JS),
+  "the comparison table keeps OpenAlex's exact strings apart from the relevance-ranked searches");
+ok(/Semantic Scholar<\/td><td>[^<]*takes quoted phrases but not AND, OR or NOT/.test(PAGE) && /Crossref<\/td><td>[^<]*takes no AND, OR or exact phrases/.test(PAGE), "the tools table says what each database's search takes");
+ok(/your own statement also logs your second database/.test(D.exemplars.note), "the strong exemplar says what remains: the second database");
+
+// ---------------- the coding step: the two ideas defined before the coding
+{ const mi = M.matrixIntro(D);
+  ok(mi.length === 3 && /\[\[storage-link\|/.test(mi[1]) && /\[\[extreme-period\|/.test(mi[1]) && /The rule: /.test(mi[2]), "the coding step: task, the two ideas defined, then the rule, as three elements");
+  mi.forEach((t, i) => ok(M.plain(t).trim().split(/\s+/).length <= 35, "coding step element " + (i + 1) + ": at most 35 words (" + M.plain(t).trim().split(/\s+/).length + ")")); }
+ok(/\[\[extreme-period\|extreme periods\]\]/.test(D.question) && /\[\[reanalysis\|/.test(JSON.stringify(D.sheet)) && /\[\[self-organizing-map\|/.test(JSON.stringify(D.matrix)), "first-use terms are marked: extreme periods, reanalysis, self-organizing maps");
+ok(/Plan on representative days chosen from the input data; run operations over the full series; use those results to choose new periods/.test(D.sheet.find(x => x.k === "Method").v), "the extraction sheet's method has the second planning stage (section 3.1 of the preprint)");
+ok(/where wind and solar supply 90% of generation/.test(D.matrix.find(p => p.key === "p12").summary), "the 90% share is a share of generation");
 
 // ---------------- string builder
 ok(M.queryString(D.blocks, { A: ["representative days"], B: ["capacity expansion"] }) === '"representative days" AND "capacity expansion"', "one term per block: quoted phrases joined by AND");
@@ -161,6 +191,9 @@ const text = JSON.stringify(D) + JSON.stringify(S) + JS;
 ok(!/\bAI\b|artificial intelligence|learning[- ](curve|rate)|\bFOAK\b|nuclear|reactor|\bSMR\b/i.test(text), "no deny-listed or out-of-scope words in the data or the script");
 
 // ---------------- text budget
+{ const r = between(PAGE, "r02-exemplars"), blk = r ? PAGE.slice(r.from, r.to) : "";
+  ok(/<p class="lx-ex-lines">/.test(blk) && /<b>Matrix:<\/b>/.test(blk), "no-JS exemplars keep the live card's field lines and bold labels"); }
+ok(/Its headings \(open preprint, October 2022\), for the first pass:<\/p><ul><li>1\. Introduction/.test(task) && /for your first pass:" \}, act\);\n      var hl = H\("ul"/.test(JS), "the headings are a short list, on the page and in the no-JS block");
 const words = s => M.plain(s).trim().split(/\s+/).length;
 const strip = h => h.replace(/<[^>]+>/g, " ").replace(/&[a-z]+;/g, "x");
 EX.plain(spec.answers[1]).replace(/ \[\d+\]/g, "").split("\n").forEach((l, i) => ok(words(l) <= 35, "strong answer line " + (i + 1) + ": at most 35 words (" + words(l) + ")"));

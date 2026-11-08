@@ -28,11 +28,12 @@ const JS = fs.readFileSync(L("r04-data.js"), "utf8");
 const F = M.frame(RAWF);
 let checks = 0, fails = 0;
 function ok(c, msg) { checks++; if (!c) { fails++; console.log("FAIL:", msg); } }
+const words0 = s => M.plain(s).trim().split(/\s+/).length, strip0 = h => h.replace(/<[^>]+>/g, " ").replace(/&[a-z]+;/g, "x");
 const near = (a, b, t) => Math.abs(a - b) <= (t == null ? 1e-9 : t);
 
 const BLOCKS = {
   "r04-task": () => M.staticTask(F, D, T),
-  "r04-exemplars": () => EX.staticHTML(M.exemplarsSpec(F, RAWF.meta)),
+  "r04-exemplars": () => EX.staticHTML(M.exemplarsSpec(F, RAWF.meta, D)),
   "r04-rubric": () => RB.staticHTML(D.rubric)
 };
 function between(text, key) {
@@ -131,7 +132,10 @@ ok(/Extraction \(before this note's cleaning\): .*negative values set to 0/.test
 ok(!/impossible|not possible|Physically possible/.test(JSON.stringify(D) + JS) && /implausible/.test(JSON.stringify(D.decisions.spike)) && /suspected frozen telemetry/.test(JSON.stringify(D.decisions.frozen)), "flags are 'implausible' and 'suspected', not proof");
 ok(d[spikeRow - 1] > 10 * d[spikeRow] && d[spikeRow + 1] > 10 * d[spikeRow], "the spike is under a tenth of the hours around it, as its note says");
 { const a = [5, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 5]; ok(M.runFlags(a, 12).filter(Boolean).length === 12 && M.runFlags(a, 13).filter(Boolean).length === 0, "a run of exactly 12 is flagged by the 12-hour rule");
-  ok(/shorter than 12 hours slip through/.test(D.decisions.frozen.options.find(o => o.id === 12).note), "the 12-hour note says freezes shorter than 12 hours slip through"); }
+  const o12 = D.decisions.frozen.options.find(o => o.id === 12), o24 = D.decisions.frozen.options.find(o => o.id === 24);
+  ok(/runs shorter than 12 hours stay unflagged/.test(o12.note) && /trade-off, not a verdict/.test(o12.note) && o12.verdict === "ok" && o24.verdict === "ok",
+    "the 12- and 24-hour rules are trade-offs (fewer false alarms, more missed freezes), not errors: no independent check says otherwise");
+  ok(!/slip through|bad hour/.test(JSON.stringify(D.decisions)) && /suspect hour/.test(D.decisions.spike.options.find(o => o.id === "keep").note), "flags stay suspicions in the feedback: a suspect hour, unflagged runs"); }
 // licences: database against produced work
 ok(!/travel with/.test(JSON.stringify(D) + JS + PAGE) && /produced work/.test(JS) && /map made from it/.test(D.licences.cards.find(k => k.id === "osm").why), "share-alike: a derived database and a map are told apart");
 // the chart's text version
@@ -158,8 +162,29 @@ const lines = M.logLines(F, base, D);
 ok(lines.find(l => l.key === "spike").what.indexOf("16,541 MW") >= 0 && lines.find(l => l.key === "spike").count === "1 demand hour flagged", "log: spike rule with its limit and count");
 ok(lines.find(l => l.key === "frozen").count === "demand 698 h, wind 671 h, solar 1,377 h", "log: frozen counts per column");
 
+// the input file by its own checksum, and the cleaning code's version (the upstream CSVs' checksums cannot verify it)
+{ const sha = require("crypto").createHash("sha256").update(fs.readFileSync(L("data/b02-python-data.json"))).digest("hex");
+  ok(D.input && D.input.name === "b02-python-data.json" && D.input.sha256 === sha, "the note's input checksum is the extract's own SHA-256 (" + sha.slice(0, 12) + "…)");
+  ok(note.indexOf("Input file: b02-python-data.json, SHA-256 " + sha) >= 0 && note.indexOf("Cleaning code: " + D.input.code) >= 0 && /Upstream files and SHA-256/.test(note), "data note: upstream checksums, the input file's own, and the cleaning code");
+  const NB = fs.readFileSync(path.join(SITE, "learn/notebooks/r04-data.ipynb"), "utf8"), src = JSON.parse(NB).cells.map(c => c.source.join("")).join("\n");
+  ok(src.indexOf('NOTEBOOK = "' + D.input.code + '"') >= 0 && /hashlib\.sha256\(raw_bytes\)/.test(src) && /"Input file: b02-python-data\.json, SHA-256 " \+ INPUT_SHA256/.test(src), "notebook: the same edition, and the input file's checksum computed from its bytes");
+  ok(/def rule_text\(ch\)/.test(src) && /def step_effects\(ch\)/.test(src) && /"Units: " \+ meta\["units"\]/.test(src) && /lines \+= \["Spatial log:"\]/.test(src) && /data_note\(MINE, REASONS, LIMITS, RERUN, SPATIAL_LOG\)/.test(src),
+    "notebook: the exported note states rules in words with thresholds, units, each step's effect and the spatial log");
+  ok(/area\(\$geometry\) \/ 1e6/.test(src) && !/`\$area \/ 1e6`/.test(src) && /reprojecting recalculates every coordinate/.test(src) && /dissolved \(overlapping buffers merged/.test(src), "notebook: planar area() in each layer's metres, not $area; reproject and dissolve explained");
+  ok(!/buildable/.test(JSON.stringify(D) + src) && /the area the 1 km buffers cover/.test(D.spatial.questions[1].q), "the spatial exercise measures the buffers' area, not buildable land"); }
+// the licence of the underlying data and of the course's extract, told apart
+ok(/as EIA publishes it/.test(D.licences.cards.find(k => k.id === "eia").text) && /extract of it is shared under CC BY 4\.0/.test(D.licences.cards.find(k => k.id === "eia").why) && /the course's extract CC BY 4\.0/.test(JS) && /the course's extract is CC BY 4\.0/.test(PAGE) && !/this studio's file\)/.test(JSON.stringify(D)),
+  "licences: EIA's data public domain, the course's extract CC BY 4.0, in the sort, the exemplar and the task");
+ok(/\[\[utm\|UTM\]\]/.test(D.spatial.systems) && /\[\[web-mercator\|/.test(D.spatial.systems) && /\[\[equal-area-projection\|/.test(D.spatial.systems) && /H\("p", \{ class: "lx-hint", html: LX\.rich\(Sp\.systems\) \}, act\);/.test(JS), "spatial: the three systems explained, with glossary help, before the picks");
+ok(/var Sp = D\.spatial, st0 = LX\.store\.get\("r4-spatial", null\)/.test(JS) && /answered\[q\.id\] = o\[0\]; LX\.store\.set\("r4-spatial", answered\)/.test(JS), "spatial: saved picks restored on a revisit, and each pick saved at once");
+ok(/rob: \{ t: "Insensitive to this choice"/.test(JS) && !/Say it is robust/.test(JS), "flowchart: an unchanged result is insensitive to the tested choice, not 'robust'");
+ok(/The straight-line fill removes the within-gap fluctuations/.test(JS) && !/runs flat through/.test(JS), "the linear fill's caption matches the interpolation");
+{ const r = between(PAGE, "r04-task"), blk = r ? PAGE.slice(r.from, r.to) : "";
+  ok(/<li><b>Rule:<\/b>/.test(blk) && /<li><b>Result:<\/b>/.test(blk) && /<li><b>Next action:<\/b>/.test(blk), "no-JS night check in rule, result and next action");
+  (blk.slice(blk.indexOf("Licences: what each source")).match(/<(li|td|p)>[\s\S]*?<\/\1>/g) || []).map(strip0).forEach(b => ok(words0(b) <= 35, "no-JS task element at most 35 words (" + words0(b) + "): " + b.slice(0, 40))); }
+
 // ---------------- exemplars
-const spec = M.exemplarsSpec(F, RAWF.meta);
+const spec = M.exemplarsSpec(F, RAWF.meta, D);
 ok(EX.validate(spec).length === 0, "exemplars well formed: " + EX.validate(spec).join("; "));
 const good = EX.plain(spec.answers[1]).replace(/ \[\d+\]/g, ""), weak = EX.plain(spec.answers[0]).replace(/ \[\d+\]/g, "");
 ok(good.indexOf("298.56 TWh (raw 299.48)") >= 0 && good.indexOf("24.4 GW (raw 1.5)") >= 0 && good.indexOf("275.09 TWh") >= 0 && good.indexOf("16,541 MW") >= 0, "strong note: the model's numbers");

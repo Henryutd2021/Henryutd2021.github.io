@@ -9,6 +9,7 @@ glossary:
   - {id: utm, term: "UTM (Universal Transverse Mercator)", def: "A set of 60 north-to-south zones, each a flat map in metres that keeps distances close to true inside the zone."}
   - {id: web-mercator, term: "Web Mercator", def: "The projection most web maps use: good for viewing, but it stretches distances and areas more the farther a place is from the equator."}
   - {id: buffer, term: "Buffer (GIS)", def: "The zone within a set distance of a map feature, such as everything within 1 km of a wind turbine."}
+  - {id: equal-area-projection, term: "Equal-area projection", def: "A map projection that keeps areas true, at the cost of shapes and distances; Albers equal-area (EPSG:5070) is the usual one for the contiguous U.S."}
 requests:
   - "R4 reuses B2's raw file (assets/learn/data/b02-python-data.json) and town_days.json (the data build's counts); it adds no data file but its own text (r04-data.json). The Node test checks that its counts at a 3-hour run equal the build's (699, 671, 1,377) and that its local clock equals B2's model and the ICU database for all 8,760 hours."
   - "Notebook: learn/notebooks/r04-data.ipynb is R4's starter notebook (the four decisions as parameters, the four numbers, the sensitivity table, the night check, the data-note writer, a QGIS practice for Ford County, Kansas). It is written by the studio's notebook build step and runs clean end to end; its asserts carry the page's numbers."

@@ -204,6 +204,30 @@ function put(text, name, body) {
     ok(JS.indexOf("Fix it and run again") > 0, "fix button");
   }
 
+  // ---------------- what the study claims, and what its checks show
+  {
+    const words = t => M.fill(t, v).replace(/\[\[[a-z0-9-]+\|([^\]]+)\]\]/g, "$1").replace(/\*\*/g, "").trim().split(/\s+/).length;
+    ok(/cut in the day's modeled running cost/.test(J.study.savingNote) && /not the owner's earnings/.test(J.study.savingNote) && !/what storage can earn|what flexibility can earn/.test(QMD + JSON.stringify(J)),
+      "a saving is the cut in modeled running cost, not the battery's earnings");
+    ok(/This validates one component, the plan's forecast/.test(J.validationText) && /illustrative screening choice/.test(J.validationTol) && /Not validated here: the battery's dispatch and both savings/.test(J.validationLimit),
+      "validation: of the forecast component, with an illustrative tolerance; the dispatch and savings stay model results");
+    const blk = between(QMD, "r5-study");
+    ok(/Validation of the forecast component/.test(blk) && /<b>Not validated:<\/b>/.test(blk) && /<b>Tolerance:<\/b> set first: the battery's 50 MW/.test(blk), "no-JS block: validation as prediction, tolerance, outcome and what it leaves unvalidated");
+    ok(/Only the battery's schedule is set the day before\. The plants are still dispatched knowing all of 20 August/.test(J.bugs.find(b => b.id === "leak").scope) && blk.indexOf("Only the battery's schedule is set the day before") > 0 && /Battery planned the day before/.test(JS),
+      "the day-before run says that only the battery's schedule is planned in advance");
+    ok(/\[\[unserved-energy\|unserved\]\]/.test(J.rules[0].words) && J.study.V === 10000 && /illustrative \$10,000\/MWh/.test(J.rules[0].words) && /A row is one equation or limit/.test(J.study.rowsNote), "first-use terms: unserved demand and a row explained");
+    ok(/The nuclear plant at its 100 MW/.test(J.rules.find(r => r.id === "size").words), "the sizes rule states the nuclear plant's fixed output, as the code sets it");
+    ok(J.study.symbols.some(s => /pseudocode/.test(s[1]) && /m\.add/.test(s[0]) && /supply\[t\]/.test(s[0])), "the fixes' code is labelled pseudocode, with T, m.add and supply[t] explained");
+    ok(/a pinned environment\)/.test(blk) && /\(a tag\)/.test(blk), "the rerun's fixes say what a pinned environment and a tag are");
+    ok(!/Written by hand/i.test(JSON.stringify(J)) && /^Illustrative teaching dataset/.test(J.dataset.source), "data file: content provenance, no production note");
+    ok(/Assumed: 85%/.test(J.inputCheck.assumed) && /Measured: .*82% in 2019/.test(J.inputCheck.measured) && /Run the study with 82%/.test(JS), "input check: assumption, reference and result as separate elements");
+    [J.study.savingNote, J.study.rowsNote, J.validationText, J.validationTol, J.validationSaw, J.validationLimit, J.inputCheck.text, J.inputCheck.saw, J.bugs.find(b => b.id === "leak").scope]
+      .forEach(t => ok(words(t) <= 35, "text budget: at most 35 words (" + words(t) + "): " + t.slice(0, 40)));
+    const steps = (JS.match(/text: "([^"]+)",\s*\n?\s*build/g) || []).map(t => t.slice(7, t.indexOf('",')));
+    ok(/\{ free: true, text: "Before the first version runs/.test(JS) && /state === "mid" \? 3/.test(JS), "the opening is two cards (the claim and rules; the plants, names and three words); the demo's mid state is version 1, card 3");
+    steps.forEach(t => ok(words(t) <= 35, "step text at most 35 words (" + words(t) + "): " + t.slice(0, 40)));
+  }
+
   // ---------------- the notebook: same data, same asserted numbers
   if (fs.existsSync(NB)) {
     const nb = JSON.parse(fs.readFileSync(NB, "utf8")), src = nb.cells.map(c => (Array.isArray(c.source) ? c.source.join("") : c.source)).join("\n");
@@ -217,6 +241,9 @@ function put(text, name, body) {
     ok(/def town_day\(year, date\)/.test(src) && /2025-03-09/.test(src) && /town_day\(year, "2025-09-03"\) == DAYS\["2025-09-03"\]/.test(src), "notebook: a loader for other days, checked against lesson 0's day, clock-change days left out");
     ok(/at least the check the page names/.test(src) && !/fail exactly the check/.test(src), "notebook: each bug fails at least its named check");
     ok(nb.cells.every(c => c.cell_type !== "code" || !c.outputs || c.outputs.every(o => o.output_type !== "error")), "notebook: no error outputs saved");
+    ok(/\| Nuclear plant \| \$p_\{\\text\{nuc\},t\} = 100\$/.test(src) && /bounds\[col\[f"\{g\}_\{t\}"\]\] = \(hi, hi\) if g == "nuc"/.test(src), "notebook: the formulation states the nuclear plant's fixed 100 MW, as the code sets it");
+    ok(/python --version > python-version\.txt/.test(src) && /SciPy ships the HiGHS/.test(src) && /macOS or Linux/.test(src) && /git add run\.py checks\.py requirements\.txt python-version\.txt/.test(src), "notebook: the clean clone pins Python too, says SciPy supplies HiGHS, and names the platforms");
+    ok(/Validation of one component/.test(src) && /Only the battery's schedule is set the day before/.test(src) && /not what the battery's owner would earn/.test(src), "notebook: the same limits as the page (one component validated, only the battery planned ahead, a saving is not earnings)");
   } else ok(false, "notebook exists");
 
   console.log(`${checks - fails}/${checks} checks passed`);
