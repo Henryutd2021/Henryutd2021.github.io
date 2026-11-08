@@ -151,7 +151,7 @@ body-classes: "page-learn page-lesson lx-form-sandbox"
 <li>$1 per MWh out of a battery and $0.50 per MWh out of the heat store: no cycling for nothing.</li>
 <li>$0.10 per MWh of managed charging, times the hour's share of SPP's peak demand: quieter hours first.</li>
 </ul>
-<p>So the LP minimises the cost plus these small costs. On a few plans it pays a little to keep a busiest hour that is under its limit lower:</p>
+<p>So the LP minimizes the cost plus these small costs. On a few plans it pays a little to keep a busiest hour that is under its limit lower:</p>
 <ul class="sb3-rules">
 <li><b>The price of the ties:</b> under $30 a year in the engine's test, against the cheapest schedule found without them.</li>
 <li><b>The same answer:</b> every preset run again with the costs ×2 and ×0.1 gives the same numbers.</li>

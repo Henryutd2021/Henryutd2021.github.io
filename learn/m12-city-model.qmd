@@ -162,7 +162,7 @@ When the LP chooses (step 6): $\sum_{e,s} y_{d,e,s} = 1$, furnaces and resistanc
 <details class="lx-deeper">
 <summary><span class="k">Go deeper · Modeler</span>When two answers cost the same: the tie rule</summary>
 <div class="lx-deeper-body">
-<p>With one price all day, many schedules tie. Small stated costs, left out of every reported number, pick one:</p>
+<p>With one price all day, many schedules tie. Small stated costs pick one; they are left out of every reported cost total, though the duals include them:</p>
 <div class="lx-scroll-x"><table class="lx-facts m12-ties"><thead><tr><th scope="col">Tie cost</th><th scope="col">Size</th></tr></thead><tbody>
 <tr><td>Each district's busiest hour</td><td class="n">$20 a year per MW</td></tr>
 <tr><td>The three districts' busiest hour together</td><td class="n">$10 per MW</td></tr>
@@ -171,8 +171,8 @@ When the LP chooses (step 6): $\sum_{e,s} y_{d,e,s} = 1$, furnaces and resistanc
 <tr><td>Managed charging</td><td class="n">$0.10 per MWh × the hour's share of SPP's peak demand</td></tr>
 </tbody></table></div>
 <ul class="m12-rules">
-<li>The LP minimises the cost plus these small costs: on a few plans it pays under $30 a year, in the engine's test, to keep a busiest hour that is under its limit lower.</li>
-<li>The engine's test finds the lowest and highest value of each busiest hour, each upgrade and the energy bought over every plan within $1 of the best cost: they agree.</li>
+<li>The LP minimizes the cost plus these small costs: on a few plans it pays under $30 a year, in the engine's test, to keep a busiest hour that is under its limit lower.</li>
+<li>The engine's test finds the lowest and highest value of each busiest hour, each upgrade and the energy bought over every plan within $1 of the best cost: they agree within its tolerances (0.5 MW, 0.05 MW and 5 MWh).</li>
 <li>The tie costs also enter the balance duals, by a few dollars at most on the busiest hours: read them as "about".</li>
 <li>The substation duals summed over the year are checked as slopes of the LP's objective, cost plus the tie costs: it moves by the same amount when the limit moves 0.1 MW up or down.</li>
 <li>The reported cost leaves the tie costs out: where a limit binds without an upgrade, it saves about $9 per MW a year more than the dual.</li>

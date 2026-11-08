@@ -32,7 +32,7 @@
    "suburbs": "Suburbs",
    "fringe": "Rural fringe"
   },
-  "note": "Built-up land is where a stretched distance from the centre, plus a seeded wobble, is at most 6 km: the core within 2.6 km, the suburbs beyond; the rural fringe district runs out to 9.5 km. Illustrative."
+  "note": "Built-up land is where a stretched distance from the center, plus a seeded wobble, is at most 6 km: the core within 2.6 km, the suburbs beyond; the rural fringe district runs out to 9.5 km. Illustrative."
  },
  "river": {
   "name": "Prairie River",
@@ -48,7 +48,7 @@
    "scale": 6,
    "salt": 21
   },
-  "note": "The river's centre line runs west to east south of the city; the flood zone (standing in for a 1% annual chance flood zone) is 1 to 3 km either side. Illustrative."
+  "note": "The river's center line runs west to east south of the city; the flood zone (standing in for a 1% annual chance flood zone) is 1 to 3 km either side. Illustrative."
  },
  "protected": [
   {
@@ -445,7 +445,7 @@
    "homes": 0
   },
   "neighbours": {
-   "label": "Neighbours",
+   "label": "Neighbors",
    "res": 10,
    "water": 10,
    "sub": 10,
@@ -466,7 +466,7 @@
  "corridor": {
   "need": "wind",
   "protected": "forbid",
-  "note": "From the wind farm to the nearest substation with 150 MW spare, along the cheapest path over the cost surface; steps between neighbouring cells, diagonals included."
+  "note": "From the wind farm to the nearest substation with 150 MW spare, along the cheapest path over the cost surface; steps between neighboring cells, diagonals included."
  },
  "costs": {
   "year": 2025,

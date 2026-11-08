@@ -188,6 +188,7 @@ const RUN_DATE = "6 November 2026";
     ok(/def weather\(city\)/.test(NB) && /COP, DIST = weather\(CITY\)/.test(NB) && /COP, DIST = weather\(colder\(5\)\)/.test(NB) && /def colder\(dT/.test(NB) && /would leave `Qann` and `eps` on the old weather/.test(NB), "notebook: practice 2 rebuilds COP, Q, Qann and eps together (weather(colder(5)))");
     ok(/\["Q and y", "Q is the heat a district needs that hour, in MW of heat/.test(JSm) && /"Electrical input \(MW\) for a share y of the heat Q"/.test(JSm), "step 2: Q and y defined before the table; its column is the electrical input in MW");
     ok(/which keeps some of its winter electric heating: winter peaks and upgrades are illustrative/.test(T) && /which still carries the region's own electric heating/.test(JSm), "the base load's winter heating bias is stated");
+    ok(/they are left out of every reported cost total, though the duals include them/.test(T) && !/left out of every reported number/.test(T) && /they agree within its tolerances \(0\.5 MW, 0\.05 MW and 5 MWh\)/.test(T), "the tie rule: out of cost totals, inside the duals; the agreement within the test's tolerances");
     ok(/saves about \$9 per MW a year more than the dual/.test(T) && /slopes of the LP's objective, cost plus the tie costs/.test(T), "the duals are slopes of the objective; the reported cost's gap is stated"); }
   console.log((fails ? "FAILED " : "ok ") + (checks - fails) + "/" + checks + " checks (M12)");
   process.exit(fails ? 1 : 0);

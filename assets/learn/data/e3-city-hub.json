@@ -122,7 +122,7 @@
   "life": 15,
   "hours": 4,
   "rte": 0.85,
-  "note": "Neighbourhood batteries at the substations, 4 hours: NREL's 2024 cost ($372 per kW plus $241 per kWh, 2024 dollars, x 1.0263 to 2025 dollars with BEA's deflator, as capstone C2 does), 4% of it a year of upkeep, 15 years; 85% of a charge comes back (the loss is taken on charging).",
+  "note": "Neighborhood batteries at the substations, 4 hours: NREL's 2024 cost ($372 per kW plus $241 per kWh, 2024 dollars, x 1.0263 to 2025 dollars with BEA's deflator, as capstone C2 does), 4% of it a year of upkeep, 15 years; 85% of a charge comes back (the loss is taken on charging).",
   "via": "e2-plains-grid.json c2.costs.bat; e0.json farm.battery.rte",
   "src": [
    "nrel-battery-2025",
@@ -210,7 +210,7 @@
    "set": "teaching",
    "note": "Set for teaching: the range C3's sensitivity test moves the industrial park's gas price over (prairie-city.json prices.gasPerMcf.industrial, itself set for teaching from EIA's Kansas citygate price); not a forecast."
   },
-  "note": "C3 plans Prairie City for 2040 with 2025's people, homes and prices and the course's synthetic weather: only the plan changes. The industrial park and the data-center campus take power at their own substations (no limit modelled); the park's new loads are flat all year."
+  "note": "C3 plans Prairie City for 2040 with 2025's people, homes and prices and the course's synthetic weather: only the plan changes. The industrial park and the data-center campus take power at their own substations (no limit modeled); the park's new loads are flat all year."
  },
  "fullYear": {
   "unservedPerMWh": 10000,
@@ -573,7 +573,7 @@
       ".\n",
       "Panel: ",
       {
-       "text": "to the climate group (12% cut): the city's wind and solar do not lower the location-based CO₂; deeper cuts need more heat pumps and retrofits, with $272.1M of the budget left",
+       "text": "to the climate group (12% cut): the city's wind and solar do not lower the location-based CO₂; deeper cuts need more heat pumps and retrofits, with $272.1M of the budget left ($267.6M after the full-year remedy)",
        "note": "The boundary held, and what would cut deeper, with the budget left."
       },
       ".\n",

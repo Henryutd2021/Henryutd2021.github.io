@@ -560,7 +560,7 @@
   function place(R, i, j, k) {
     var C = R.D.city, x = (i + k / 2) * R.cellKm, y = (j + k / 2) * R.cellKm, dx = Math.round(x - C.cx), dy = Math.round(y - C.cy);
     var ew = dx === 0 ? "" : Math.abs(dx) + " km " + (dx < 0 ? "W" : "E"), ns = dy === 0 ? "" : Math.abs(dy) + " km " + (dy < 0 ? "N" : "S");
-    return (ew && ns ? ew + ", " + ns : ew || ns || "at the centre");
+    return (ew && ns ? ew + ", " + ns : ew || ns || "at the center");
   }
   // the homes in a cell (the newer ones apart) and the distance from its centre to the nearest home or built-up land:
   // the homes layer's text version, cell by cell (a home's dot is drawn on the map only)
@@ -572,7 +572,7 @@
   function homeWords(R, n) {
     var c = homesIn(R, n), d = R.dHome[n], out = [];
     out.push(c.all === 0 ? "no homes" : c.all + (c.all === 1 ? " home" : " homes") + (c.newer ? " (" + c.newer + " built since " + R.D.homes.vintage + ")" : ""));
-    if (!R.built[n] && !R.water[n]) out.push("nearest home or built-up land " + (d >= 3 ? "3 km or more" : d < 1 ? Math.round(d * 100) * 10 + " m" : d.toFixed(1) + " km") + " from its centre");
+    if (!R.built[n] && !R.water[n]) out.push("nearest home or built-up land " + (d >= 3 ? "3 km or more" : d < 1 ? Math.round(d * 100) * 10 + " m" : d.toFixed(1) + " km") + " from its center");
     return out;
   }
   function cellText(R, n) {
@@ -583,7 +583,7 @@
     bits.push("wind " + R.wind[n].toFixed(1) + " m/s");
     bits.push("sun " + R.sun[n].toFixed(2) + " kWh/m² a day");
     bits.push("land $" + Math.round(R.land[n] / 100) * 100 + " an acre");
-    return "Cell " + place(R, i, j, 1) + " of the centre: " + bits.concat(homeWords(R, n), gridWords(R, n)).join(", ") + ".";
+    return "Cell " + place(R, i, j, 1) + " of the center: " + bits.concat(homeWords(R, n), gridWords(R, n)).join(", ") + ".";
   }
 
   var A19 = { build: build, coarsen: coarsen, cfg: cfg, exclude: exclude, criteria: criteria, suitability: suitability, need: need, blocks: blocks,
@@ -631,7 +631,7 @@
     // but closed when a step asks for it with grid: true)
     var gbox = H("details", { class: "a19-gbox" }, wrap);
     (function gridTable() {
-      H("summary", { class: "a19-gcap", text: "Substations and lines, the grid layer as text (km from the city centre)" }, gbox);
+      H("summary", { class: "a19-gcap", text: "Substations and lines, the grid layer as text (km from the city center)" }, gbox);
       var t = H("table", { class: "a19-gtbl" }, H("div", { class: "lx-scroll-x" }, gbox)), tr = H("tr", null, H("thead", null, t)), tb = H("tbody", null, t);
       ["Substation", "Where", "Spare capacity", "Lines to"].forEach(function (h) { H("th", { scope: "col", text: h }, tr); });
       A19.gridRows(R0).forEach(function (g) {
@@ -821,7 +821,7 @@
     }
     function cellTextCoarse(Rc, n) {
       var i = n % Rc.W, j = (n - i) / Rc.W;
-      return "Cell (2 km) " + place(Rc, i, j, 1) + " of the centre: " + ["slope " + Rc.slope[n].toFixed(1) + "% on average", "sun " + Rc.sun[n].toFixed(2) + " kWh/m² a day", "land $" + Math.round(Rc.land[n] / 100) * 100 + " an acre"].concat(A19.homeWords(Rc, n), A19.gridWords(Rc, n)).join(", ") + ".";
+      return "Cell (2 km) " + place(Rc, i, j, 1) + " of the center: " + ["slope " + Rc.slope[n].toFixed(1) + "% on average", "sun " + Rc.sun[n].toFixed(2) + " kWh/m² a day", "land $" + Math.round(Rc.land[n] / 100) * 100 + " an acre"].concat(A19.homeWords(Rc, n), A19.gridWords(Rc, n)).join(", ") + ".";
     }
     fig.addEventListener("keydown", function (e) {
       var d = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[e.key];

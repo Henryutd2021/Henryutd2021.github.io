@@ -50,7 +50,7 @@
       : { v: "no", t: cut >= 0.005 ? "Down only " + pct0(cut) + "." : cut <= -0.005 ? "The city's CO₂ goes up " + pct0(-cut) + "." : "No cut in the city's CO₂." };
     out.park = dPark <= 0 ? { v: "yes", t: "Its yearly cost " + smil(park - park0) + "." } : dPark <= 0.1 ? { v: "part", t: "Its yearly cost " + smil(park - park0) + " (" + pct0(dPark) + ")." } : { v: "no", t: "Its yearly cost " + smil(park - park0) + " (" + pct0(dPark) + ")." };
     var si = S.siteAdj;
-    out.rural = S.farm > 0 ? { v: "part", t: kilo(S.farm) + " MW at site " + S.site + (si && si.acres ? ", " + si.where + " of the centre, on about " + kilo(si.acres) + " acres of farmland." : ".") } : { v: "yes", t: "No solar farm, no land used." };
+    out.rural = S.farm > 0 ? { v: "part", t: kilo(S.farm) + " MW at site " + S.site + (si && si.acres ? ", " + si.where + " of the center, on about " + kilo(si.acres) + " acres of farmland." : ".") } : { v: "yes", t: "No solar farm, no land used." };
     return PANEL.map(function (p) { return { key: p.key, name: p.name, note: p.note, cell: out[p.key] }; });
   }
   // the park's yearly energy and equipment cost (2025 dollars): electricity at the industrial price, gas, its new equipment
@@ -192,7 +192,7 @@
     council: function (x) { return "the city council (over budget): I would drop the solar farm or some retrofits first; the plan is " + mil(x.upfront - x.budget) + " over"; },
     utility: function (x) { return "the electric utility (" + kilo(x.up) + " MW of upgrades): I keep them, the cheapest way to meet the " + x.worst + (/s$/.test(x.worst) ? "'" : "'s") + " busiest hour on the eight days (its dual equals the upgrade's yearly cost)"; },
     advocates: function (x) { return "the low-income advocates (burden " + pct1(x.burden0) + " → " + pct1(x.burden) + "): recovering the shared costs by income instead gives " + pct1(x.altBurden) + " (screening)"; },
-    climate: function (x) { return "the climate group (" + pct0(x.cut) + " cut): the city's wind and solar do not lower the location-based CO₂; deeper cuts need more heat pumps and retrofits, with " + mil(x.budget - x.upfront) + " of the budget left"; },
+    climate: function (x) { return "the climate group (" + pct0(x.cut) + " cut): the city's wind and solar do not lower the location-based CO₂; deeper cuts need more heat pumps and retrofits, with " + mil(x.budget - x.upfront) + " of the budget left" + (x.full && x.full.upfront ? " (" + mil(x.budget - x.upfront - x.full.upfront) + " after the full-year remedy)" : ""); },
     park: function (x) { return "the industrial park (" + smil(x.dPark) + " a year, " + pct0(x.dParkShare) + "): I keep the food plants' heat pumps for the gas they save, and show the park's gas price in the sensitivity table"; },
     rural: function (x) { return "farmers and rural residents (site " + x.site.id + "): it is the screen's highest-scoring block and the cheapest of the five to connect, " + mil(x.site.connectUSD) + " for its line, road and land, " + x.site.km.toFixed(1) + " km to " + x.site.sub + ", on about " + kilo(x.site.acres) + " acres"; } };
   // the note on each stakeholder's answer in the strong summary: what makes it an answer
@@ -249,7 +249,7 @@
         levels: { proficient: "each tested input classed as public data or set for teaching; the one-at-a-time and the joint cheaper and dearer cases reported, the result as a range, and the inputs that could flip the recommendation named" } },
       { id: "realism", look: "What the plan leaves out: power flow inside districts, 2025's people and prices held to 2040, the household rule an assumption; the site's evidence from A19's simulated layers; what the full-year check found and what you would do about it, or, for a plan without one, what that leaves open and how you would check it." },
       { id: "integrity", look: "The sources field filled; every stakeholder who objects answered fairly, with what you would change or why you would not.",
-        levels: { proficient: "the data's sources and licences named (public data from EIA, NOAA, EPA and DOE; A19's simulated map layers), the numbers called illustrative, any conflict of interest stated, and every stakeholder who objects answered fairly" } },
+        levels: { proficient: "the data's sources and licenses named (public data from EIA, NOAA, EPA and DOE; A19's simulated map layers), the numbers called illustrative, any conflict of interest stated, and every stakeholder who objects answered fairly" } },
       { id: "communication", look: "Two pages the council can act on: the recommendation first, then the evidence, the panel and the limits.",
         levels: { proficient: "a two-page plan summary with the plan link, the sensitivity table (and the chart as an image, where you can attach one) and an answer to each stakeholder who objects: the recommendation first, then the evidence (budget, cost, CO₂, the substations, who pays, jobs, the site), the panel's objections answered, the sensitivity and the limits" } }],
     RUBRIC_BAR: "the bar for this plan summary",
@@ -313,13 +313,14 @@
         tb.innerHTML = "";
         U.table(tb, ["Site", "Score (A19's default weights)", "Where", "Line to", "Up front: line, road, land", "Capacity factor (a full year)"], SM.top.map(function (t) {
           var x = page.siteInfo(SM, t.id, Math.max(p.farm, 10));
-          return [t.id + (t.id === p.site ? " (yours)" : ""), Math.round(100 * t.score) + " of 100", x.where + " of the centre", x.sub + ", " + x.km.toFixed(1) + " km", mil(x.connectUSD), (x.cf * 100).toFixed(1) + "%"];
+          return [t.id + (t.id === p.site ? " (yours)" : ""), Math.round(100 * t.score) + " of 100", x.where + " of the center", x.sub + ", " + x.km.toFixed(1) + " km", mil(x.connectUSD), (x.cf * 100).toFixed(1) + "%"];
         }), "c3-sitetbl");
         U.keys(tb, [["Up front", "for a " + kilo(Math.max(p.farm, 10)) + " MW farm, 2025 dollars: the land in proportion to the MW, the line and road as A19 costs them for its block. The panels are in the solar-farm cost."],
           ["Capacity factor", "the site's yearly output over what it would make at full power all year ([[capacity-factor|capacity factor]]). The eight representative days carry more sun than the year: see the full-year check."]]);
         var ev = page.siteEvidence(SM);
         U.table(tb, ev.head, ev.rows, "c3-sitetbl c3-why");
-        U.keys(tb, [["Why they rank", "each criterion's score from 0 to 100 (the block's average), times its weight; the weighted sum is the score. Change the weights in [[lesson:a19-gis-siting|A19]]."]]);
+        U.keys(tb, [["Why they rank", "each criterion's score, 0 to 100 (the block's average, rounded here); the site's score is their weighted average: each times its weight, summed, divided by the weights' total."],
+          ["The weights", "A19's defaults; change them in [[lesson:a19-gis-siting|A19]]."]]);
       }
       paint(plan);
       return { set: function (p) { sg.set(p.site); paint(p); }, info: function (id, mw) { return page.siteInfo(SM, id, mw); } };

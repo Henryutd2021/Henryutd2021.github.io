@@ -321,7 +321,7 @@
     "id": "farm",
     "text": "Diesel burned by tractors on the farms",
     "bin": "s1",
-    "why": "Burned in the city boundary; the GPC files farm machinery under stationary energy (fuel burned in place, not on roads), agriculture (Table 6.5)."
+    "why": "Burned in the city boundary; the GPC files off-road machinery working on farms under stationary energy, agriculture (Table 6.5), not under transportation."
    },
    {
     "id": "shop",
