@@ -85,7 +85,7 @@
   "names": {"deg": "EPSG:4326 (degrees)", "web": "Web Mercator (EPSG:3857)", "alb": "equal-area Albers (EPSG:5070)", "utm": "the local UTM zone (metres)"},
   "log": "Spatial layer (proposed, not yet processed): U.S. Wind Turbine Database v9.1 (public domain; acknowledgment kept). Coordinate systems chosen: {buffer} for the 1 km buffers; {area} for areas. Input file, outputs and counts to log when you run it."
  },
- "input": {"name": "b02-python-data.json", "sha256": "c4e368f4e48936ba858690e51e05a593cc7d6f6e836c8d5aea1abaad6bde0824", "code": "r04-data.ipynb, the R4 starter notebook, edition of 8 November 2026"},
+ "input": {"name": "b02-python-data.json", "sha256": "54fb03b9ad5bc2100c841aff72209e61456328fd847315877f4e0c720eb66b95", "code": "r04-data.ipynb, the R4 starter notebook, edition of 8 November 2026"},
  "note_fields": [
   {"id": "limits", "label": "Known limits", "hint": "For example: filled hours borrow other days' weather; solar still fails the night check; the spike rule cannot catch a plausible wrong value."},
   {"id": "rerun", "label": "How to rerun", "hint": "The notebook or script, its settings and the expected four numbers."}
