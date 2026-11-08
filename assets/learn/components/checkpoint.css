@@ -67,3 +67,8 @@
 .lx-ck-lock { border: 1px dashed var(--lx-line-2); border-radius: var(--lx-r-lg); padding: 16px 18px; display: grid; gap: 10px; background: var(--lx-surface); }
 .lx-js .lx-ck-gated:not(.is-open) { display: none; }
 @media (max-width: 560px) { .lx-ck-card { padding: 14px; } .lx-ck-q { font-size: 17.5px; } }
+/* a neutral comparison (the estimate's range against the worked one: not a mark) and a worked solution that waits for
+   other tasks (task option solAfter) */
+.lx-ck .lx-saw.info { background: var(--lx-surface-2); border: 1px solid var(--lx-line); }
+.lx-ck .lx-saw.info .lx-ic { color: var(--lx-ink-2); }
+.lx-ck .lx-ck-solwait { margin: 0; }

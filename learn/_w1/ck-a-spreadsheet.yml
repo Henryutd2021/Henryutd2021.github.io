@@ -4,7 +4,7 @@ lesson: CK-A
 glossary:
   - id: kw-dc
     term: kW-DC
-    def: "A solar array's size as the direct-current rating of its panels at standard test conditions; its AC output, after the inverter, is a little lower."
+    def: "A solar array's size as the combined direct-current rated power of its panels at standard test conditions, while its actual output varies with sunlight, temperature and the inverter's limits."
   - id: residual-value
     term: Residual value
     def: "The value an asset is assumed to keep at the end of an analysis, such as the unused years of a battery bought late, counted as a credit in the last year."

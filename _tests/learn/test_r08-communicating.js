@@ -69,7 +69,7 @@ function pct7(v, p) { const s = v.slice().sort((a, b) => a - b), r = (s.length -
   const bad = R.spec(D, C, F, "axis", {}), good = R.spec(D, C, F, "axis", { zero: true, scope: true, title: true });
   ok(bad.y.min === 20 && bad.bars.every(b => b.y0 === 20) && good.y.min === 0 && good.bars.every(b => b.y0 === 0), "misleading bars start at 20%, fixed bars at zero");
   ok(Math.abs(bad.heights[2] / bad.heights[8] - (hi - 20) / (lo - 20)) < 1e-9 && good.bars.every(b => b.y1 <= good.y.max) && bad.bars.every(b => b.y1 <= bad.y.max), "drawn heights are the stated ratio; no bar leaves the axis");
-  ok(/U\.S\. utility-scale wind fleet, 2025; EIA/.test(good.caption) && good.caption.indexOf(D.charts[0].goodTitle) === 0, "fixed chart names the fleet, the year and the source");
+  ok(/U\.S\. utility-scale wind fleet, 2025; EIA/.test(good.caption) && good.caption.indexOf(R.fill(D.charts[0].goodTitle, F)) === 0 && /was highest in March and lowest in September/.test(good.caption), "fixed chart names the fleet, the year and the source; its title says what the year showed, not a recurring pattern");
 }
 // chart 2
 {
@@ -84,7 +84,7 @@ function pct7(v, p) { const s = v.slice().sort((a, b) => a - b), r = (s.length -
   const bad = R.spec(D, C, F, "window", {}), good = R.spec(D, C, F, "window", { year: true, mark: true, title: true });
   ok(bad.lines[0].pts.length === 14 && good.lines[0].pts.length === 365 && good.spans.length === 1 && good.spans[0].x0 === best.i + 0.5, "misleading: 14 days; fixed: 365 days with the two weeks marked");
   // the fixed chart describes the year's spread and claims no trend either way (a fortnight cannot show one)
-  ok(!/no fall|no trend across|no decline/i.test(JSON.stringify(D)) && /cannot show a trend/.test(R.fill(D.findingsStep.fields[1].example, F)) && /swung widely through 2025/.test(D.charts[1].goodTitle), "chart 2: descriptive title and finding, no claim about a year-long trend");
+  ok(!/no fall|no trend across|no decline/i.test(JSON.stringify(D)) && /this selected fortnight does not establish a year-long decline/.test(R.fill(D.findingsStep.fields[1].example, F)) && !/cannot show a trend/.test(JSON.stringify(D)) && /swung widely through 2025/.test(D.charts[1].goodTitle), "chart 2: descriptive title and finding, no claim about a year-long trend");
 }
 // chart 3
 {
@@ -94,14 +94,16 @@ function pct7(v, p) { const s = v.slice().sort((a, b) => a - b), r = (s.length -
   ok(F.avgPeak === String(Math.round(mean[am])) && F.avgHour === (am < 10 ? "0" : "") + am + ":00" && F.avgPeak === "311" && F.avgHour === "17:00", "the average day peaks at 311 MW at 17:00");
   ok(F.p90Max === String(Math.round(p90[pm])) && F.p90Hour === "16:00" && F.p90Max === "399", "1 day in 10 the 16:00 hour is above 399 MW (P90 by hour, linear interpolation)");
   ok(byH[16].filter(v => v > 398.8).length >= 36 && byH[16].filter(v => v > 398.8).length <= 37, "P90 means about 1 day in 10: " + byH[16].filter(v => v > p90[16]).length + " of 365 days above it");
-  ok(F.yearPeak === "450" && F.peakHour === "16:00" && F.peakDay === "29 July", "the year's highest hour: 450 MW at 16:00 on 29 July");
+  ok(F.yearPeak === "450" && F.peakHour === "16:00" && F.peakDay === "29 July" && F.peakTZ === "Central Daylight Time", "the year's highest hour: 450 MW at 16:00 Central Daylight Time on 29 July");
+  ok(R.tzOf({ date: "2025-01-15" }) === "Central Standard Time" && R.tzOf({ date: "2025-03-09" }) === "Central Daylight Time" && R.tzOf({ date: "2025-11-02" }) === "Central Standard Time", "time zone by daylight saving (second Sunday of March to first Sunday of November)");
+  ok(/\{peakHour\} \{peakTZ\}/.test(D.findings.find(f => f.id === "pk").text), "the self-contained finding names its clock");
   const sum = DAYS.filter(d => d.m >= 5 && d.m <= 7), win = DAYS.filter(d => d.m === 11 || d.m <= 1), pk = d => d.h[d.d.indexOf(Math.max(...d.d))];
   ok(F.sumDays === String(sum.length) && sum.every(d => pk(d) >= 12 && pk(d) < 18), "all " + sum.length + " June–August days peaked between 12:00 and 18:00");
   ok(F.winMorn === String(win.filter(d => pk(d) < 12).length) && F.winDays === String(win.length) && F.winMorn === "64" && F.winDays === "90", "winter: " + F.winMorn + " of " + F.winDays + " days peaked before noon");
   const good = R.spec(D, C, F, "average", { spread: true, max: true, title: true });
   ok(good.bars.length === 24 && good.bars.every((b, h) => Math.abs(b.y1 - p90[h]) < 1e-9) && good.refs[0].y === 450 && good.bars.every(b => b.y1 <= good.y.max && b.y0 >= good.y.min), "fixed: the P10–P90 band by hour and the 450 MW line, inside the axis");
-  ok(good.text.head.join() === "Hour,Average (MW),P10 (MW),P90 (MW)", "chart 3's text version: every column with its unit");
-  const top = "Highest hourly demand in 2025: 450 MW, at 16:00 on 29 July.";
+  ok(good.text.head.join() === "Hour (Central local time),Average (MW),P10 (MW),P90 (MW)" && /Central local time/.test(good.caption), "chart 3's text version: every column with its unit");
+  const top = "Highest hourly demand in 2025: 450 MW, at 16:00 Central Daylight Time on 29 July.";
   [true, false].forEach(mx => { const sp = R.spec(D, C, F, "average", { spread: true, max: mx }); ok((sp.text.note === top) === mx && (sp.aria.indexOf(top) >= 0) === mx && !/\[\[/.test(sp.aria), "the year's highest hour in the text version and the label exactly when its line is drawn (" + mx + ")"); });
   ok(R.staticTask(D, C).indexOf(top) >= 0, "no-JS chart 3: the highest hour stated beside its table");
 }
@@ -118,12 +120,29 @@ D.charts.forEach(c => {
     if (c.id === "average" && /spread across days/.test(t) && !fx.spread) honest = false;
     if (fx.title && t === R.fill(c.badTitle, F)) honest = false;
     if (c.id === "axis" && !!fx.scope !== /EIA, Electric Power Monthly/.test(sp.caption)) honest = false;
-    c.options.forEach(o => { const cs = R.chartState(D, F, c, { pick: o.id, fx }); if (cs.done !== !!(fx[kf] && fx.title) || !cs.text || /undefined|\{/.test(cs.text)) rule = false; });
+    c.options.forEach(o => { const cs = R.chartState(D, F, c, { pick: o.id, fx }); if (cs.done !== (o.verdict === "good" && R.needed(c).every(f => fx[f.id])) || !cs.text || /undefined|\{/.test(cs.text)) rule = false; });
     if (R.chartState(D, F, c, { pick: null, fx }).done) rule = false;
   }
   ok(honest, c.id + ": in all eight fix combinations the title and caption say only what is drawn");
-  ok(rule, c.id + ": repaired only with a diagnosis, the key fix and the title fix; feedback written for every state");
+  ok(rule, c.id + ": repaired only with the right diagnosis and every needed fix (the key fix, the title, and for chart 1 the scope); feedback written for every state");
 });
+// a wrong diagnosis never completes a chart; chart 1 needs its scope (fleet, year, source)
+{ const ax = D.charts[0], all3 = { zero: true, scope: true, title: true };
+  ok(!R.chartState(D, F, ax, { pick: "a", fx: all3 }).done && R.chartState(D, F, ax, { pick: "b", fx: all3 }).done && !R.chartState(D, F, ax, { pick: "b", fx: { zero: true, title: true } }).done, "chart 1: a wrong diagnosis, or no scope, leaves it unrepaired");
+  ok(R.needed(ax).map(f => f.id).join() === "zero,scope,title", "chart 1's needed fixes: zero, scope, title"); }
+// the writing checks: a demand range needs its unit; two dates are not one
+{ const ok1 = ["480–535 MW", "480 to 535 megawatts", "between 480 and 535 MW", "480 MW to 535 MW", "480-535 MW"], no1 = ["2025 and 2035", "from 2025 to 2035", "in 2035, 515"];
+  ok(ok1.every(t => R.MWRANGE.test(t)) && no1.every(t => !R.MWRANGE.test(t)), "a range in MW: five forms accepted, date pairs refused");
+  const dates = "Between 2025 and 2035 the town's busiest hour could grow if more people drive electric cars, and our model runs depend on how fast they spread, which nobody knows today, so we will keep watching it.";
+  ok(!R.publicChecks(D, dates).find(c => c.id === "range").ok && !R.publicState(D, dates).done, "a public summary with only two dates does not pass the range check");
+  ok(!R.briefChecks("finding", "From 2025 to 2035 with central uptake.").find(c => c.id === "range").ok, "briefing: two dates are not a range of demand"); }
+// no hidden length gates: a step's completion rests on its visible checks only
+ok(!/words\(v\[f\.id\]\) >= [48]/.test(JS) && !/words\(ta\.value\) < 30/.test(JS), "no hidden minimum lengths before a writing step can finish");
+ok(R.findingsState(D, { axis: "US fleet 23% to 43% in 2025.", window: "SPP 14% to 93% in 2025.", average: "Prairie Town 311 MW in 2025." }).done, "three short findings that pass every visible check finish the step");
+// chart 2 without JavaScript: the selected fortnight and the whole year, day by day
+{ const st = R.staticTask(D, C);
+  ok(/The two weeks, day by day/.test(st) && /The whole year, day by day/.test(st) && (st.match(/<td>2025-\d\d-\d\d<\/td>/g) || []).length === 14 + 365, "no-JS chart 2: the 14 selected days and all 365, as tables");
+  ok(st.indexOf(R.rich(R.SORT_TERMS)) >= 0 && /utility-scale/.test(R.SORT_TERMS) && /capacity-factor/.test(R.SORT_TERMS) && /H\("p", \{ class: "lx-hint", html: LX\.rich\(SORT_TERMS\) \}, act\)/.test(JS), "the sort's two terms are explained before it, live and without JavaScript"); }
 // every chart: one right diagnosis, one key fix, and the fixes change the drawing
 D.charts.forEach(c => {
   ok(c.options.length === 3 && c.options.filter(o => o.verdict === "good").length === 1 && c.options.some(o => o.verdict === "bad"), c.id + ": three diagnoses, one right, one wrong");
@@ -194,7 +213,7 @@ ok(good.indexOf(F.c10 + "–" + F.c90 + " MW") >= 0 && good.indexOf("about " + F
 Object.keys(BLOCKS).forEach(k => { const r = between(PAGE, k); ok(r && PAGE.slice(r.from, r.to) === BLOCKS[k]() + "\n", k + ": the page's no-JS block equals the model's (run with --write after a data edit)"); });
 { const brief = PAGE.indexOf('<div class="lx-card lx-studio-brief">'), inter = PAGE.indexOf('<div class="lx-interactive');
   ok(brief >= 0 && brief < inter && /<b>Produce:<\/b>[\s\S]*<b>From:<\/b>[\s\S]*<b>Done when:<\/b>[\s\S]*Communication[\s\S]*About 30 minutes guided here, then about 90 minutes on your own/.test(PAGE.slice(brief, inter)), "the task card sits above the interactive, with the time"); }
-ok(/311 MW/.test(PAGE) && /16:00 hour tops 399 MW/.test(PAGE) && /1\.9 times looked like 7\.5 times/.test(PAGE) && /23\.1% to 43\.1%/.test(PAGE) && /33\.8% for the year/.test(PAGE) && /16:00 on 29 July/.test(PAGE), "the page's static numbers equal the model's");
+ok(/311 MW/.test(PAGE) && /16:00 hour tops 399 MW/.test(PAGE) && /1\.9 times looked like 7\.5 times/.test(PAGE) && /23\.1% to 43\.1%/.test(PAGE) && /33\.8% for the year/.test(PAGE) && /16:00 Central Daylight Time on 29 July/.test(PAGE), "the page's static numbers equal the model's");
 ok(/released 23 October 2026; accessed 2 November 2026/.test(PAGE) && CF.monthly.source.indexOf("released 23 October 2026") >= 0, "EIA table dated as in cf_targets.json");
 ok(!/\[\[/.test(R.staticTask(D, C) + R.chartsHTML(D, F) + R.boundaryHTML(D)), "no-JS blocks: glossary marks become term spans");
 const OWN = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?<!-- learn:\1:end -->/g, "");
@@ -230,6 +249,34 @@ D.charts.forEach(c => { for (let m = 0; m < 8; m++) { const fx = {}; c.fixes.for
 { const P = fs.readFileSync(path.join(SITE, "learn/path.yml"), "utf8"), row = P.slice(P.indexOf("id: r08-communicating"), P.indexOf("id: r09-integrity-stakeholders"));
   ok(/Sort nine findings/.test(row) && D.findings.length === 9 && /three misleading charts/.test(row) && D.charts.length === 3, "path.yml says what the data hold");
   ok(/after: \[R6\]/.test(row) && /practice_minutes: 90/.test(row) && /minutes: 30/.test(row), "path.yml: prerequisites and minutes as the curriculum row"); }
+
+// ---------------- the page on a stub document: a wrong diagnosis never completes chart 1, nor do the fixes without its scope
+{
+  const vm = require("vm"), { env, load } = require("./stubdom.js"), E = env();
+  E.LX.ready = () => {}; E.LX.progress.guess = () => null; E.LX.visible = E.LX.visible || (() => false);
+  E.LX.lessonRef = () => ({ ready: true, href: "r06-uncertainty-properly.html", label: "R6" });
+  ["cards", "cardsort", "plot", "exemplars", "comparetable", "boundary", "rubric", "checklist"].forEach(n => { try { load(n, E); } catch (e) { /* not needed below */ } });
+  const SC = E.LX.StepCards, doneAt = {};
+  E.LX.StepCards = (host, o) => SC(host, Object.assign({}, o, { steps: o.steps.map((st, k) => Object.assign({}, st, { build: (act, api) => { const d = api.done; api.done = () => { doneAt[k] = (doneAt[k] || 0) + 1; d(); }; return st.build(act, api); } })) }));
+  let init = null, demo = null;
+  E.LX.mount = (slug, f) => { if (slug === "r08-communicating") init = f; };
+  E.LX.demo = (root, fn, cards) => { demo = { fn, cards }; return () => null; };
+  vm.runInNewContext(JS, { window: E.window, document: E.document, location: E.location, navigator: {}, console, module: { exports: {} }, performance: E.window.performance, setTimeout: () => 0, clearTimeout: () => {}, requestAnimationFrame: () => 0 });
+  const root = E.LX.H("div", { class: "lx-interactive", "data-learn": "r08-communicating" }, E.body), live = E.LX.H("div", { class: "lx-live" }, root);
+  let threw = null, V = null;
+  try { init(live, { r08_communicating: D, cf_targets: CF, town_year: Y, path: { starter: [], more: [] } }, root); V = root.lxLesson && root.lxLesson.view; } catch (e) { threw = e.stack; }
+  ok(!threw && V && V.cards, "the page mounts on the stub document" + (threw ? ": " + threw : ""));
+  if (!threw && V) {
+    V.cards.go(1);
+    const card = V.cards.el, btn = re => card.querySelectorAll("button").filter(b => re.test(b.textContent))[0];
+    btn(/^The months run in calendar order/).click(); btn(/Start the axis at zero/).click(); btn(/Make the title say/).click();
+    ok(!doneAt[1], "chart 1: a wrong diagnosis with the key and title fixes does not complete it");
+    btn(/^The axis starts at 20%/).click();
+    ok(!doneAt[1] && /Name the fleet, the year and the source/.test(card.textContent), "chart 1: the right diagnosis without the scope does not complete it, and says what is missing");
+    btn(/Name the fleet, the year and the source/).click();
+    ok(doneAt[1] >= 1, "chart 1: the right diagnosis and all three needed fixes complete it");
+  }
+}
 
 console.log(`${checks - fails} of ${checks} checks passed`);
 process.exit(fails ? 1 : 0);

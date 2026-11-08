@@ -29,3 +29,6 @@ glossary:
     id: confidence-interval
     lesson: M14
     def: "A range worked out from the data by a method that, over many repeated samples, would contain the true value 95 times in 100."
+  - term: Agent-based model
+    id: agent-based-model
+    def: "A simulation in which many decision-makers, such as farmers or households, each follow their own rules, so that the system's behavior comes out of their choices."

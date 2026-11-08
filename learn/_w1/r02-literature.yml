@@ -7,6 +7,9 @@ glossary:
   - {id: boolean-operators, term: "Boolean operators", def: "AND, OR and NOT, the words that join search terms: AND narrows a search, OR widens it, NOT leaves terms out."}
   - {id: clustering, term: "Clustering", def: "Grouping similar items, such as days with similar demand and weather, so that one representative can stand for each group."}
   - {id: time-series-aggregation, term: "Time-series aggregation", def: "Shrinking a long series, such as a year of hours, to a few representative periods that a model can solve quickly."}
+  - {id: storage-link, term: "Storage link (between periods)", def: "In a model of representative periods, the energy stored at the end of one period carried into the next, so storage can move energy across days or seasons."}
+  - {id: extreme-period, term: "Extreme period", def: "An unusually demanding stretch of time, such as a cold, still week with high demand and little wind, kept in a model so its plan copes with it."}
+  - {id: reanalysis, term: "Reanalysis", def: "A gridded record of past weather made by running a weather model over historical observations, hour by hour for decades."}
+  - {id: self-organizing-map, term: "Self-organizing map", def: "A clustering method that places similar items, such as days, in neighboring cells of a small grid."}
 requests:
   - "Data: assets/learn/data/r02-literature-openalex.json is written by the studio's snapshot build step. It queries OpenAlex once (about ten requests) and stores a dated snapshot; the page makes no live API call."
-  - "Snapshot note: r02-literature-openalex.json's meta.note says 'a rerun gives larger numbers'; counts can move either way (a reference list of 3 November 2026 shows 193 against the snapshot's 196). The note can change at the next dated refresh of the snapshot; the page does not repeat it."

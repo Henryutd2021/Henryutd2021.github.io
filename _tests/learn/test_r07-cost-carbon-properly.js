@@ -109,7 +109,15 @@ ok(!/per tonne (of CO₂ )?avoided|CO₂ avoided|tonne avoided/i.test(JS.replace
 { const inp = M.inputsHTML(D), w = M.worked(D);
   ok(inp.includes("2.2 kWh, at the depot meter, charging losses included") && inp.includes("$1,000,000 + $60,000 charger") && inp.includes("$560,000") && inp.includes("3.5 mpg (the 2009 buses)") && inp.includes("$0.09 per kWh") && inp.includes("$3.60 per gallon") && inp.includes("$150,000 per bus"), "the inputs table shows the study's inputs, from the data");
   ok(M.fleetLine(D) === "Both fleets: 40 buses, 36,000 miles each a year, a 12-year life, a 3% real discount rate." && !/\{/.test(M.planText(D)) && M.planText(D).includes("40 new diesel buses replace them (4.5 mpg, $0.85 a mile"), "the fleet line and the plan extract, filled from the inputs");
-  ok(w[0] === "Charging energy: 40 buses × 36,000 miles × 2.2 kWh per mile = 3,168 MWh a year; at $0.09 per kWh, $285,120 a year." && w[1].includes("1,440,000 miles ÷ 3.5 mpg = 411,429 gallons a year") && w[1].includes("$1,481,143 a year"), "two worked numbers with units");
+  ok(w[0] === "Charging energy: 40 buses × 36,000 miles × 2.2 kWh per mile = 3,168,000 kWh = 3,168 MWh a year." && w[1] === "Its bill: 3,168,000 kWh × $0.09 per kWh = $285,120 a year." && w[2].includes("1,440,000 miles ÷ 3.5 mpg = 411,429 gallons a year") && w[2].includes("$1,481,143 a year"), "two worked numbers with units, the kWh-to-MWh step shown");
+  // the audited line follows the grid factor chosen, as the readout does (it once stayed at the U.S. average)
+  ["clean", "us", "dirty"].forEach(g => { const A = M.run(D, M.all(true), g), L = M.auditLine(D, g, "more"), v = M.verdict(A);
+    ok(L.indexOf(v.charAt(0).toLowerCase() + v.slice(1)) > 0 && L.indexOf(A.co2.factor.toFixed(3) + " t per MWh") > 0 && /^You predicted it: audited \(all four fixes/.test(L), "audited line at the " + g + " grid: " + L); });
+  ok(/1,043 t \(32%\)/.test(M.auditLine(D, "dirty", null)) && /\$622 per attributed tonne/.test(M.auditLine(D, "dirty", null)) && /^Audited \(all four fixes/.test(M.auditLine(D, "dirty", null)), "audited line at 0.70 t per MWh: 1,043 t, 32%, $622 per tonne, as the readout");
+  { const it = id => D.ladder.items.find(x => x.id === id);
+    ok(/permit/.test(it("e2").text) && it("e2").answer[0] === "permitted" && /planned routes/.test(it("e4").text) && it("e4").answer[0] === "design", "evidence ladder: the premises match their rungs (permits issued; the planned service delivered, not only energy per mile)"); }
+  ok(/\[\[consequential-analysis\|consequential analysis\]\]/.test(JS) && /\[\[average-emission-factor\|average factor\]\]/.test(JS) && /\[\[marginal-emission-factor\|marginal\]\]/.test(D.checklist.find(c => c.id === "question").text), "emissions terms marked where they first appear (audit hint, checklist)");
+  ok(!/var A = run\(D, all\(true\)\), msg/.test(JS) && /if \(ah\) aud\(\)/.test(JS), "the step's audited line is redrawn when the grid factor changes");
   ok(/U\.S\. gallon/.test(D.units) && /kW-month/.test(D.units) && /metric tonne/.test(D.units) && inp.includes(M.esc(D.units)), "the units key: t, mpg (U.S. gallon), kW-month");
   ok(M.staticTask(D).includes(inp), "the no-JS task shows the same inputs");
   ok(M.boundarySpec(D).holds.some(x => /depot meter, charging losses included/.test(x)) && M.boundarySpec(D).leaves.some(x => /grid losses .*about 5%/.test(x)) && D.co2.tdLoss === 0.05 && /5%/.test(D.sources.losses.asOf), "the meter boundary and grid losses (EIA: about 5%) are stated"); }
@@ -211,6 +219,7 @@ ok(D.rubric.competences.map(c => c.id).join() === "accounting,realism" && D.chec
     demo.cards.go(5); grab();
     for (const g of D.co2.gridChoices) { btn(new RegExp(g.v != null ? "^" + g.v.toFixed(2) : "^0\\.366")).click(); grab(); }
     ok(live.textContent.includes("$622"), "step 6: the grid factor moves the cost per tonne");
+    ok(card().textContent.includes(M.auditLine(D, "dirty", "more")) && !card().textContent.includes(M.auditLine(D, "us", "more")), "step 6: the audited line follows the grid factor (0.70: 1,043 t, 32%, $622 per tonne), not the U.S. average");
     const tgs = card().querySelectorAll(".lx-toggle"); tgs.forEach(b => { b.click(); grab(); b.click(); grab(); });
     { const gt = [...tgs].find(b => /Grid costs/.test(b.textContent)); gt.click();
       ok(!S.fx.grid && !S.fx.depot && !S.fx.demand && card().textContent.includes("Now") && card().textContent.includes("−$0.18 million") && !card().textContent.includes("Audited"), "step 6: with the grid costs off, the chart and its text version end at −$0.18 million, Now");

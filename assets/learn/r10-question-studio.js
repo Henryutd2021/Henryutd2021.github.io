@@ -7,8 +7,13 @@
    less travelled" toggle weights the element spin towards smaller keyword clusters, to diversify suggestions only);
    choose a question type and see a draft; write the question on a card (LX.QuestionCard: its checks show which parts are
    filled in; rigour is judged with the rubric); answer five realism checks (pass, warn or block, each with the lesson that
-   helps, and a line for the evidence); get search strings for OpenAlex (each link opens OpenAlex's live results in a new
-   tab; the page itself sends no request) and note the three closest papers; copy everything.
+   helps, and a line for the evidence); get three search strings and run them on a dated OpenAlex snapshot
+   (assets/learn/data/r10-question-studio-openalex.json, from its data build step: for each system element, the most-cited
+   works whose titles or abstracts match the element's block, metadata only), searched in this page: each string's other
+   blocks are matched in the titles and OpenAlex keywords (a review also by its type), and the reader can filter the same
+   collection with words of their own; a link repeats a string on OpenAlex today, as an optional rerun whose results differ from the snapshot's
+   date. Note the three closest papers; copy everything. When the picks or the card's question change after the realism
+   answers or the paper notes were written, those steps say so, to review them.
    Example cards: loading one starts a fresh card with that example's own picks and card fields (an element, stakeholder
    or dimension outside the pickers comes as an example "extra" with its own search terms); realism answers and papers
    start empty, and the previous work is kept, to restore with one button.
@@ -94,16 +99,63 @@
   // glossary marks (double brackets) as spans, built from parts so the build's glossary scan finds no placeholder id
   function rich(t) { return esc(t).replace(/\[\[([a-z0-9-]+)\|([^\]]+)\]\]/g, function (m, id, w) { return '<span class="lx-term" data-term=' + '"' + id + '">' + w + "</span>"; }); }
   function group(terms) { return terms.length > 1 ? "(" + terms.join(" OR ") + ")" : terms[0]; }
+  function bare(t) { return String(t).replace(/"/g, "").toLowerCase(); }
   function operators(s) { return (String(s).match(/\b(AND|OR|NOT)\b/g) || []).length; }
   // search strings for open databases: a core string, a narrow one and one for reviews (at most 5 operators each)
   function searchStrings(D, p) {
     var c = clean(D, p), E = slot(D, c, "element"), M = slot(D, c, "dimension");
     if (!E || !M) return [];
     var K = slot(D, c, "stakeholder"), tw = slot(D, c, "twist"), X = tw || slot(D, c, "lever"), out = [];
-    out.push({ id: "core", label: "Core: the element and the dimension", text: group(E.terms) + " AND " + group(M.terms) });
-    if (K && X) out.push({ id: "narrow", label: "Narrow: who is involved, and " + (tw ? "the twist" : "the lever"), text: group(E.terms) + " AND " + group(K.terms) + " AND " + group(X.terms) });
-    out.push({ id: "reviews", label: "Reviews first: read one before the papers", text: group(E.terms) + " AND " + group(M.terms) + " AND review" });
+    // need: the blocks after the element's, as plain lowercase terms (the snapshot holds the element's works already)
+    out.push({ id: "core", label: "Core: the element and the dimension", text: group(E.terms) + " AND " + group(M.terms), need: [M.terms.map(bare)] });
+    if (K && X) out.push({ id: "narrow", label: "Narrow: who is involved, and " + (tw ? "the twist" : "the lever"), text: group(E.terms) + " AND " + group(K.terms) + " AND " + group(X.terms),
+      need: [K.terms.map(bare), X.terms.map(bare)] });
+    out.push({ id: "reviews", label: "Reviews first: read one before the papers", text: "review AND " + group(E.terms) + " AND " + group(M.terms), need: [M.terms.map(bare)], review: true });
     return out;
+  }
+  // ---- the dated snapshot (S: r10-question-studio-openalex.json): the picked element's collection, searched here
+  // works: [openalex id, doi, title, year, citations, venue index, review (1) or not (0), keyword indices], most-cited first
+  function snapElement(S, D, p) {
+    var c = clean(D, p), x = item(D, "element", c.element), e = slot(D, c, "element");
+    if (!S || !e) return null;
+    return S.elements.filter(function (r) { return x ? r.id === x.id : !!(c.extra && c.extra.element) && r.label === e.label; })[0] || null;
+  }
+  // a work's searchable text: its title and its OpenAlex keywords (S.keywords, by index), in lower case
+  function hay(S, w) { return (String(w[2]) + " | " + (w[7] || []).map(function (k) { return S && S.keywords ? S.keywords[k] : ""; }).join(" | ")).toLowerCase(); }
+  // a block matches when one of its terms appears in the title or a keyword (anywhere, so "price" also finds "prices");
+  // "review" matches a work OpenAlex types as a review, or a title with the word
+  function inWork(S, w, terms) { var t = hay(S, w); return terms.some(function (x) { return t.indexOf(x) >= 0; }); }
+  function localMatches(el, s, S) {
+    if (!el || !s) return [];
+    return el.works.filter(function (w) {
+      return (s.need || []).every(function (b) { return inWork(S, w, b); }) && (!s.review || w[6] === 1 || /review/i.test(w[2]));
+    });
+  }
+  // the reader's own words: every word of three letters or more in the title or a keyword
+  function ownMatches(el, text, S) {
+    var ws = String(text || "").toLowerCase().replace(/["()]/g, " ").split(/\s+/).filter(function (w) { return w.length >= 3 && !/^(and|not|the|for|with|from|into)$/.test(w); });
+    if (!el || !ws.length) return [];
+    return el.works.filter(function (w) { var t = hay(S, w); return ws.every(function (x) { return t.indexOf(x) >= 0; }); });
+  }
+  function workRef(S, w) {
+    var v = S.venues[w[5]];
+    return w[2] + " (" + w[3] + (v ? ", " + v : "") + ")" + (w[1] ? ", doi:" + w[1] : ", OpenAlex " + w[0]);
+  }
+  function workURL(w) { return w[1] ? "https://doi.org/" + w[1] : "https://openalex.org/" + w[0]; }
+  function snapDate(S) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(S.meta.as_of), M = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    return m ? +m[3] + " " + M[+m[2] - 1] + " " + m[1] : S.meta.as_of;
+  }
+  function snapLine(S, el, s, n) {
+    var one = n === 1;
+    return n + " of the " + el.works.length + " works " + (one ? "has" : "have") + " these words in " + (one ? "its title or keywords" : "their titles or keywords") +
+      (s.review ? (one ? " and is a review" : " and are reviews") : "") + ".";
+  }
+  // what the element's collection is: its date, size and source, and what was left out
+  function snapAbout(S, el) {
+    var out = el.top - el.works.length;
+    return "Snapshot: OpenAlex, retrieved " + snapDate(S) + ": the " + el.top + " most-cited works since 2016 on " + el.label + ", of " + fmtInt(el.count) + " matched" +
+      (out ? " (" + out + " outside the course's scope left out)" : "") + ". The other blocks are matched in titles and OpenAlex keywords.";
   }
   function searchURL(D, s) { return D.search.url + encodeURIComponent(s); }
   function cluster(D, id) { return D.clusters.filter(function (c) { return c.id === id; })[0] || null; }
@@ -149,13 +201,20 @@
     list.forEach(function (x) { if (x.state) n[x.state]++; else n.open++; });
     return n;
   }
-  // the whole studio result as text: the card (LX.QuestionCard's text), realism, search strings and the three papers
-  function summary(D, st, cardText) {
+  // what the realism answers and paper notes were written for: the combination and the card's question. When it changes
+  // afterwards, those steps ask the reader to review them (searches and notes follow the question, not only the picks)
+  function basis(D, picks, question) { return JSON.stringify([combo(D, picks), trim(question)]); }
+  // the whole studio result as text: the card (LX.QuestionCard's text), realism, search strings (with their counts in the
+  // snapshot S, when given) and the three papers
+  function summary(D, st, cardText, S) {
     var lines = [cardText || "", "Combination: " + (combo(D, st.picks) || "(not yet)")];
     realism(D, st.realism, st.evidence).forEach(function (r) {
       lines.push("Realism, " + r.label.toLowerCase() + ": " + (r.state || "not answered") + (r.evidence ? "; evidence: " + r.evidence : ""));
     });
-    searchStrings(D, st.picks).forEach(function (s) { lines.push("Search (" + s.id + "): " + s.text); });
+    var el = S ? snapElement(S, D, st.picks) : null;
+    searchStrings(D, st.picks).forEach(function (s) {
+      lines.push("Search (" + s.id + "): " + s.text + (el ? " · in the OpenAlex snapshot of " + snapDate(S) + ": " + localMatches(el, s, S).length + " of " + el.works.length + " works" : ""));
+    });
     (st.papers || []).forEach(function (p, i) { if (p && (String(p.t || "").trim() || String(p.d || "").trim())) lines.push("Close paper " + (i + 1) + ": " + String(p.t || "").trim() + (String(p.d || "").trim() ? " (differs: " + String(p.d).trim() + ")" : "")); });
     return lines.join("\n");
   }
@@ -187,7 +246,7 @@
   function staticTask(D, types) {
     var h = ['<div class="lx-scroll-x"><table class="lx-facts"><thead><tr><th scope="col">Picker</th><th scope="col">Options</th></tr></thead><tbody>'];
     KEYS.forEach(function (k) {
-      h.push('<tr><th scope="row">' + esc(D.pickerLabels[k]) + "</th><td>" + D.pickers[k].map(function (x) { return esc(x.label) + (x.note ? " (" + esc(x.note) + ")" : ""); }).join(" · ") + "</td></tr>");
+      h.push('<tr><th scope="row">' + esc(D.pickerLabels[k]) + "</th><td>" + D.pickers[k].map(function (x) { return esc(x.label) + (x.note ? " (" + esc(x.note) + ")" : "") + (x.def ? " (" + esc(x.def) + ")" : ""); }).join(" · ") + "</td></tr>");
     });
     h.push("</tbody></table></div>");
     h.push('<p class="lx-eyebrow">Five types of question, and a draft for each</p>');
@@ -213,6 +272,23 @@
     h.push("<ul>" + D.crowding.caveats.map(function (c) { return "<li>" + esc(c) + "</li>"; }).join("") + "</ul>");
     return h.join("\n");
   }
+  // the literature step for readers without JavaScript: one spin (D.litPicks) worked on the snapshot, with the recipe for
+  // the three strings and a paper record to copy
+  function staticLit(D, S) {
+    var p = clean(D, D.litPicks), el = snapElement(S, D, p), h = [];
+    h.push('<p class="lx-eyebrow">Three searches, worked for one spin</p>');
+    h.push('<p class="lx-hint">' + esc(combo(D, p)) + "</p>");
+    h.push('<ul><li><b>Core:</b> the element\'s block AND the dimension\'s.</li><li><b>Narrow:</b> the element AND the stakeholder AND the twist, or the lever.</li><li><b>Reviews:</b> the word review AND the core string.</li></ul>');
+    h.push('<p class="lx-hint">' + esc(snapAbout(S, el)) + "</p>");
+    searchStrings(D, p).forEach(function (s) {
+      var m = localMatches(el, s, S);
+      h.push('<div class="r10-str"><p><b>' + esc(s.label.split(":")[0]) + ":</b> <code>" + esc(s.text) + '</code></p><p class="lx-hint">' + esc(snapLine(S, el, s, m.length)) + "</p>" +
+        (m.length ? '<ul class="r10-hits">' + m.slice(0, 3).map(function (w) { return '<li><a href="' + esc(workURL(w)) + '">' + esc(w[2]) + "</a> (" + w[3] + ")</li>"; }).join("") + "</ul>"
+          : '<p class="lx-hint">None: drop a block, or search a database yourself and record the date.</p>') + "</div>");
+    });
+    h.push("<p><b>A paper record, three times:</b> title or DOI; how your card differs from it.</p>");
+    return h.join("\n");
+  }
   // a type's typical methods with glossary marks on the method names the glossary explains (D.methodTerms)
   function methodsMarked(D, methods) {
     var T = D.methodTerms || {}, keys = Object.keys(T).sort(function (a, b) { return b.length - a.length; });
@@ -221,8 +297,9 @@
     return String(methods).replace(re, function (w) { return "[[" + T[w] + "|" + w + "]]"; });
   }
   // the page's no-JS blocks (the test writes and checks them): C = { types, exemplars, rubric }
-  function staticBlocks(D, C) {
+  function staticBlocks(D, C, S) {
     return {
+      lit: S ? staticLit(D, S) : "",
       task: staticTask(D, C.types),
       exemplars: C.exemplars(D.exemplars) + '\n<p class="lx-eyebrow">Seven example cards</p>\n' + staticExamples(D),
       rubric: C.rubric(D.rubric.competences) + '\n<p class="lx-eyebrow">Before you take a card to a mentor</p>\n<ul>'
@@ -232,7 +309,8 @@
   }
   var model = { KEYS: KEYS, REQUIRED: REQUIRED, item: item, slot: slot, clean: clean, complete: complete, combo: combo, draft: draft, autoCard: autoCard, sync: sync,
                 example: example, typeLabel: typeLabel, examplePicks: examplePicks, exampleCard: exampleCard, methodsMarked: methodsMarked,
-                searchStrings: searchStrings, searchURL: searchURL, operators: operators, crowd: crowd, crowdText: crowdText, cluster: cluster,
+                searchStrings: searchStrings, searchURL: searchURL, snapElement: snapElement, localMatches: localMatches, ownMatches: ownMatches,
+                workRef: workRef, workURL: workURL, snapDate: snapDate, snapLine: snapLine, snapAbout: snapAbout, staticLit: staticLit, basis: basis, operators: operators, crowd: crowd, crowdText: crowdText, cluster: cluster,
                 weights: weights, spin: spin, realism: realism, realismCount: realismCount, summary: summary,
                 check: check, staticTask: staticTask, staticExamples: staticExamples, staticCrowding: staticCrowding, staticBlocks: staticBlocks, rich: rich, fmtInt: fmtInt };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
@@ -247,6 +325,10 @@
       ".r10-picks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 14px}",
       ".r10-pick{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 8px;align-items:end}",
       ".r10-pick label{grid-column:1/-1;font-family:var(--lx-f-display);font-weight:500;font-size:14px;color:var(--lx-ink)}",
+      ".r10-pick .r10-def{grid-column:1/-1;margin:0}",
+      ".r10-hits{margin:0;padding-left:1.1rem;display:grid;gap:6px;font-size:14px;color:var(--lx-ink-2)}",
+      ".r10-hits li{overflow-wrap:anywhere}.r10-hits button{margin-left:6px}",
+      ".r10-own{display:grid;gap:4px;font-size:13.5px;color:var(--lx-ink-2)}",
       ".r10-pick select,.r10-lit input,.r10-lit textarea{font:inherit;font-size:15px;padding:7px 10px;border-radius:10px;border:1px solid var(--lx-line-2);background:var(--lx-surface);color:var(--lx-ink);width:100%;box-sizing:border-box;min-width:0}",
       ".r10-ctx{margin:0;padding:10px 12px;border-radius:10px;background:var(--lx-surface-2);font-size:14px;color:var(--lx-ink-2);display:grid;gap:4px}",
       ".r10-combo{font-family:var(--lx-f-display);font-weight:500;font-size:16px;color:var(--lx-ink)}",
@@ -280,12 +362,23 @@
   LX.mount("r10-question-studio", function (live, data, root) {
     injectCSS();
     var D = data.r10_question_studio, P = data.path, QC = LX.QuestionCard;
-    var st = LX.store.get("r10-state", null) || {};
+    var st = LX.store.get("r10-state", null) || {}, SNAP_URL = LX.base + "data/r10-question-studio-openalex.json", snap = null;
     st.picks = clean(D, st.picks || {}); st.realism = st.realism || {}; st.evidence = st.evidence || {}; st.papers = st.papers || [{}, {}, {}]; st.auto = st.auto || null;
     function save() { LX.store.set("r10-state", st); }
     function key() { return JSON.stringify([st.picks, st.type || null]); }
     // a card already written (or opened from a shared link) lets the reader go straight on to it
     function hasCard() { var c = LX.store.get("r10-card", null); return !!(c && String(c.question || "").trim()); }
+    function cardQ() { return String((LX.store.get("r10-card", null) || {}).question || "").trim(); }
+    function nowBasis() { return basis(D, st.picks, cardQ()); }
+    // a notice when the picks or the card's question changed after this step's answers were written (st[k]: the basis
+    // they were written for); "Reviewed" takes the new basis
+    function stale(host, k, text) {
+      if (!st[k] || st[k] === nowBasis()) return;
+      var n = H("div", { class: "lx-saw no", role: "status" }, host);
+      n.innerHTML = LX.icon("question") + "<div>" + LX.esc(text) + "</div>";
+      var b = H("button", { class: "lx-btn ghost small", type: "button", text: "Reviewed: keep them" }, n.lastChild);
+      b.addEventListener("click", function () { st[k] = nowBasis(); save(); n.remove(); LX.emit("layout"); });
+    }
     function iconLine(cls, word, html) { return '<p class="r10-res ' + cls + '">' + LX.icon(cls === "pass" ? "check" : cls === "warn" ? "question" : "cross") + "<span><b>" + word + "</b> " + html + "</span></p>"; }
     function fixLinks(list) { return list && list.length ? " See " + list.map(function (c) { return LX.lessonRefHTML(P, c); }).join(" and ") + "." : ""; }
     // the card's automatic fields follow the picks (only when the picks or the type changed); the learner's edits stay
@@ -312,10 +405,15 @@
             H("option", { value: "", text: k === "twist" ? "No twist" : "Pick…" }, sel);
             D.pickers[k].forEach(function (x) { H("option", { value: x.id, text: x.label + (x.note ? " (" + x.note + ")" : "") }, sel); });
             sel.value = st.picks[k] || "";
-            sel.addEventListener("change", function () { st.picks[k] = sel.value || null; dropExtra(k); changed(); });
+            sel.addEventListener("change", function () { st.picks[k] = sel.value || null; dropExtra(k); changed(); paintDef(); });
             var sp = H("button", { class: "lx-btn ghost small", type: "button", text: "Spin", "aria-label": "Spin " + D.pickerLabels[k].toLowerCase() }, w);
-            sp.addEventListener("click", function () { st.picks[k] = spinOne(k); sel.value = st.picks[k]; dropExtra(k); changed(); });
-            sels[k] = sel;
+            sp.addEventListener("click", function () { st.picks[k] = spinOne(k); sel.value = st.picks[k]; dropExtra(k); changed(); paintDef(); });
+            // a native option holds plain text: the chosen option's meaning shows under the picker
+            var def = H("p", { class: "lx-hint r10-def", "aria-live": "polite", id: id + "-d" }, w);
+            sel.setAttribute("aria-describedby", def.id);
+            function paintDef() { var x = item(D, k, sel.value); def.textContent = x && x.def ? x.label.charAt(0).toUpperCase() + x.label.slice(1) + ": " + x.def + "." : ""; def.hidden = !def.textContent; }
+            paintDef();
+            sels[k] = { sel: sel, paint: paintDef };
           });
           if (D.terms) H("p", { class: "lx-hint", html: "Words used here: " + LX.rich(D.terms) }, act);
           var ctx = H("div", { class: "r10-ctx", "aria-live": "polite" }, act);
@@ -323,7 +421,7 @@
           function dropExtra(k) { if (st.picks.extra) { delete st.picks.extra[k]; if (!Object.keys(st.picks.extra).length) delete st.picks.extra; } }
           function spinOne(k) { return spin(D.pickers[k], Math.random, k === "element" ? weights(D, !!st.road) : null); }
           all.addEventListener("click", function () {
-            KEYS.forEach(function (k) { if (k === "twist" && Math.random() < 0.5) { st.picks[k] = null; } else st.picks[k] = spinOne(k); sels[k].value = st.picks[k] || ""; });
+            KEYS.forEach(function (k) { if (k === "twist" && Math.random() < 0.5) { st.picks[k] = null; } else st.picks[k] = spinOne(k); sels[k].sel.value = st.picks[k] || ""; sels[k].paint(); });
             delete st.picks.extra; changed();
           });
           function paintCtx() {
@@ -355,6 +453,8 @@
           H("p", { class: "r10-combo", text: combo(D, st.picks) }, act);
           var wrap = H("div", { class: "r10-types", role: "group", "aria-label": "Five types of question" }, act), btns = {};
           var out = H("p", { class: "r10-draft", "aria-live": "polite", hidden: true }, act);
+          // the scale is a field of the card, beside the draft rather than inside it (so the question stays short)
+          var where = H("p", { class: "lx-hint", hidden: true }, act);
           var meth = H("p", { class: "lx-hint", hidden: true }, act);
           var row = H("div", { class: "r10-bar" }, act), use = H("button", { class: "lx-btn ghost small", type: "button", hidden: true, text: "Put this draft on my card" }, row);
           var um = H("span", { class: "lx-hint", "aria-live": "polite" }, row);
@@ -373,6 +473,8 @@
             st.type = id; if (byReader) syncCard(); else save();
             Object.keys(btns).forEach(function (k) { btns[k].setAttribute("aria-pressed", k === id ? "true" : "false"); });
             out.hidden = false; out.textContent = "Draft: " + draft(D, st.picks, id);
+            var sc = slot(D, clean(D, st.picks), "scale");
+            where.hidden = !sc; where.textContent = sc ? "Scale: " + sc.label + ", on the card's scale field; say the place in your own words." : "";
             var T = QC.TYPES.filter(function (x) { return x.id === id; })[0];
             meth.hidden = false; meth.innerHTML = "Typical methods for this type: " + LX.rich(methodsMarked(D, T.methods)) + "; other methods can answer it too.";
             // the card keeps a question the reader wrote; offer the draft instead of overwriting it
@@ -400,6 +502,7 @@
         } },
       { text: "Run five realism checks. Answer honestly: a warning or a block does not stop you, it shows what to fix first.",
         build: function (act, api) {
+          stale(act, "realBasis", "Your picks or your card's question changed since you answered these checks: review each answer.");
           var wrap = H("div", { class: "r10-real" }, act), res = {};
           var sum = H("p", { class: "lx-hint", "aria-live": "polite" }, act);
           D.realism.forEach(function (r) {
@@ -410,12 +513,12 @@
               var lab = H("label", null, opts), inp = H("input", { type: "radio", name: name, value: String(i) }, lab);
               lab.appendChild(document.createTextNode(a));
               inp.checked = st.realism[r.id] === i;
-              inp.addEventListener("change", function () { if (inp.checked) { st.realism[r.id] = i; save(); paint(); } });
+              inp.addEventListener("change", function () { if (inp.checked) { st.realism[r.id] = i; st.realBasis = nowBasis(); save(); paint(); } });
             });
             res[r.id] = H("div", { "aria-live": "polite" }, fs);
             var el = H("label", { class: "ev" }, fs); el.appendChild(document.createTextNode(r.evidence));
             var ei = H("input", { type: "text", maxlength: "300" }, el); ei.value = st.evidence[r.id] || "";
-            ei.addEventListener("input", function () { st.evidence[r.id] = ei.value; save(); });
+            ei.addEventListener("input", function () { st.evidence[r.id] = ei.value; st.realBasis = nowBasis(); save(); });
           });
           function paint() {
             var R = realism(D, st.realism);
@@ -430,32 +533,79 @@
           }
           paint();
         } },
-      { text: "Find out what is already known. Run these [[search-string|search strings]], then note the three closest papers and how your card differs from each.",
+      { text: "Find out what is already known. Run these [[search-string|search strings]] on a dated snapshot, then note the three closest papers and how your card differs from each.",
         free: true,
         build: function (act, api) {
-          var lit = H("div", { class: "r10-lit" }, act), S = searchStrings(D, st.picks);
+          var lit = H("div", { class: "r10-lit" }, act), S = searchStrings(D, st.picks), c = combo(D, st.picks), q = cardQ(), inputs = [];
+          stale(lit, "paperBasis", "Your picks or your card's question changed since you noted these papers: check that the searches and notes still fit.");
           if (!S.length) H("p", { class: "lx-hint", text: "Pick an element and a dimension in step 1 to get search strings." }, lit);
-          S.forEach(function (s) {
-            var box = H("div", { class: "r10-str" }, lit);
-            H("p", { class: "lx-eyebrow", text: s.label }, box);
-            H("code", { text: s.text }, box);
-            var row = H("div", { class: "r10-bar" }, box);
-            var cp = H("button", { class: "lx-btn ghost small", type: "button", text: "Copy" }, row);
-            H("a", { href: searchURL(D, s.text), target: "_blank", rel: "noopener", text: "Search OpenAlex (live results, new tab)" }, row);
-            var m = H("span", { class: "lx-hint", "aria-live": "polite" }, row);
-            cp.addEventListener("click", function () { LX.copyText(s.text).then(function (ok) { m.textContent = ok ? "Copied." : "Select the string and copy it."; }); });
-          });
-          H("p", { class: "lx-hint", text: D.search.live }, lit);
-          H("p", { class: "lx-hint", text: D.search.note + " Link format checked on " + D.search.checked + "; " + D.search.noreq.charAt(0).toLowerCase() + D.search.noreq.slice(1) }, lit);
+          else {
+            H("p", { class: "lx-hint", text: "These strings follow your picks in step 1: " + c + "." }, lit);
+            if (q) {
+              H("p", { class: "lx-hint", text: "Your card asks: “" + q + "”" }, lit);
+              H("p", { class: "lx-hint", text: "If it has moved away from the picks, change them, or search the snapshot with your own words below." }, lit);
+            }
+          }
+          var box = H("div", { class: "r10-lit", "aria-live": "polite" }, lit);
+          if (S.length) box.textContent = "Loading the dated snapshot…";
+          // note a work as the next empty close paper (title, year, venue and DOI), never over a note the reader wrote
+          function note(w, msg) {
+            var i = [0, 1, 2].filter(function (k) { return !String((st.papers[k] || {}).t || "").trim(); })[0];
+            if (i == null) { msg.textContent = "All three paper lines are filled: clear one first."; return; }
+            st.papers[i].t = workRef(snap, w); inputs[i].value = st.papers[i].t; st.paperBasis = nowBasis(); save();
+            msg.textContent = "Noted as paper " + (i + 1) + ". Say how your card differs from it.";
+          }
+          function hits(host, list, msg) {
+            var ul = H("ul", { class: "r10-hits" }, host);
+            list.slice(0, 5).forEach(function (w) {
+              var li = H("li", null, ul), v = snap.venues[w[5]];
+              H("a", { href: workURL(w), target: "_blank", rel: "noopener", text: w[2] }, li);
+              li.appendChild(document.createTextNode(" (" + w[3] + (v ? ", " + v : "") + (w[6] ? ", a review" : "") + ")"));
+              var b = H("button", { class: "lx-btn ghost small", type: "button", text: "Note it", "aria-label": "Note as a close paper: " + w[2] }, li);
+              b.addEventListener("click", function () { note(w, msg); });
+            });
+          }
+          function render(SN) {
+            snap = SN; box.textContent = "";
+            var el = snapElement(SN, D, st.picks);
+            if (!el) { H("p", { class: "lx-hint", text: "The snapshot has no collection for this element yet; copy the strings and search a database yourself, noting the date." }, box); return; }
+            H("p", { class: "lx-hint", text: snapAbout(SN, el) }, box);
+            var msg = H("p", { class: "lx-hint", "aria-live": "polite" }, null);
+            S.forEach(function (s) {
+              var sb = H("div", { class: "r10-str" }, box), m = localMatches(el, s, SN);
+              H("p", { class: "lx-eyebrow", text: s.label }, sb);
+              H("code", { text: s.text }, sb);
+              H("p", { class: "lx-hint", text: snapLine(SN, el, s, m.length) }, sb);
+              if (m.length) hits(sb, m, msg);
+              else H("p", { class: "lx-hint", text: "None in the snapshot: try your own words below, or rerun the string on OpenAlex today." }, sb);
+              var row = H("div", { class: "r10-bar" }, sb);
+              var cp = H("button", { class: "lx-btn ghost small", type: "button", text: "Copy" }, row);
+              H("a", { href: searchURL(D, s.text), target: "_blank", rel: "noopener", text: "Optional: rerun on OpenAlex today (new tab)" }, row);
+              var cm = H("span", { class: "lx-hint", "aria-live": "polite" }, row);
+              cp.addEventListener("click", function () { LX.copyText(s.text).then(function (ok) { cm.textContent = ok ? "Copied." : "Select the string and copy it."; }); });
+            });
+            var own = H("label", { class: "r10-own" }, box); own.appendChild(document.createTextNode("Search the snapshot with your own words (every word in the title or keywords)"));
+            var oi = H("input", { type: "text", maxlength: "120" }, own), out = H("div", { "aria-live": "polite" }, box);
+            oi.addEventListener("input", function () {
+              out.innerHTML = ""; var m = ownMatches(el, oi.value, SN); if (!oi.value.trim()) return;
+              H("p", { class: "lx-hint", text: m.length + " of " + el.works.length + " works have every word in their titles or keywords." }, out);
+              if (m.length) hits(out, m, msg);
+            });
+            box.appendChild(msg);
+            H("p", { class: "lx-hint", text: D.search.live }, box);
+            H("p", { class: "lx-hint", text: D.search.note + " " + D.search.noreq }, box);
+            LX.emit("layout");
+          }
+          if (S.length) LX.json(SNAP_URL).then(render, function () { box.textContent = "The snapshot could not be loaded; copy the strings and search a database yourself, noting the date."; });
           H("p", { class: "lx-eyebrow", text: "The three closest papers" }, lit);
           [0, 1, 2].forEach(function (i) {
             var row = H("div", { class: "r10-paper" }, lit), p = st.papers[i] = st.papers[i] || {};
             var l1 = H("label", null, row); l1.appendChild(document.createTextNode("Paper " + (i + 1) + ": title or DOI"));
-            var a = H("input", { type: "text", maxlength: "300" }, l1); a.value = p.t || "";
+            var a = H("input", { type: "text", maxlength: "300" }, l1); a.value = p.t || ""; inputs[i] = a;
             var l2 = H("label", null, row); l2.appendChild(document.createTextNode("How your card differs"));
             var b = H("input", { type: "text", maxlength: "300" }, l2); b.value = p.d || "";
-            a.addEventListener("input", function () { p.t = a.value; save(); });
-            b.addEventListener("input", function () { p.d = b.value; save(); });
+            a.addEventListener("input", function () { p.t = a.value; st.paperBasis = nowBasis(); save(); });
+            b.addEventListener("input", function () { p.d = b.value; st.paperBasis = nowBasis(); save(); });
           });
           var ctx = H("div", { class: "r10-ctx" }, lit);
           crowd(D, st.picks).forEach(function (x) { H("span", { html: LX.rich(crowdText(x).replace("RGI", "[[relative-growth-index|RGI]]")) }, ctx); });
@@ -466,9 +616,11 @@
       { text: "Save your work. Copy the card, the checks, the search strings and your three papers into your notes, or share the card as a link from step 3.",
         free: true,
         build: function (act, api) {
-          var txt = summary(D, st, QC.text(LX.store.get("r10-card", null) || {}, { code: "R10" }));
+          var card = QC.text(LX.store.get("r10-card", null) || {}, { code: "R10" }), txt = summary(D, st, card, snap);
           var ta = H("textarea", { class: "r10-out", readonly: true, rows: "14", "aria-label": "Your question card, checks and search strings as text" }, act);
           ta.value = txt;
+          // the searches' counts in the snapshot, once it is loaded (it is fetched once, by step 5 or here)
+          if (!snap && searchStrings(D, st.picks).length) LX.json(SNAP_URL).then(function (SN) { snap = SN; txt = summary(D, st, card, SN); ta.value = txt; }, function () {});
           var row = H("div", { class: "r10-bar" }, act);
           var cp = H("button", { class: "lx-btn small", type: "button", text: "Copy everything" }, row);
           var m = H("span", { class: "lx-hint", "aria-live": "polite" }, row);

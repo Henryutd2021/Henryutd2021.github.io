@@ -17,6 +17,7 @@ const vm = require("vm");
 const SITE = path.resolve(__dirname, "..", "..");
 const L = p => path.join(SITE, "assets/learn", p);
 const C = require(L("ck-m-unseen-problem.js"));
+const CPK = require(L("components/checkpoint.js"));
 const CP = require(L("components/checkpoint.js"));
 const JSC = fs.readFileSync(L("ck-m-unseen-problem.js"), "utf8");
 const PR = require(L("components/profiles.js"));
@@ -226,11 +227,17 @@ const usd = v => "$" + (Math.round(v * 100) / 100).toLocaleString("en-US", { min
       ok(D.tasks[D.tasks.length - 1].kind === "open-short" && D.tasks[0].kind === "open-short" && ids.indexOf("d-line") === 5, `${k}: written tasks first and last; the defect's line is task 6`);
       D.tasks.forEach(t => { if (t.kind === "choice") ok(t.options.some(o => o[0] === t.answer) && t.options.every(o => t.why[o[0]]), `${k} ${t.id}: answer among the options, feedback for each`); });
       // the rule on made-up attempts
+      // defect: part B's three marked tasks (the line, the check, the fixed cost) right on the first try; false: the line wrong
+      const PB = J.rule.defectAll;
       const st = (right, ptsA, ptsC, defect) => { const s = { tasks: {} }; let n = 0;
         D.tasks.forEach(t => { if (t.kind === "open-short") s.tasks[t.id] = { answer: "x", points: t.points.map((p, i) => i < (t === D.tasks[0] ? ptsA : ptsC)) };
           else if (t.id === "d-line") s.tasks[t.id] = { first: defect };
-          else s.tasks[t.id] = { first: n++ < right - (defect ? 1 : 0) }; });
+          else if (defect && PB.includes(t.id)) s.tasks[t.id] = { first: true };
+          else s.tasks[t.id] = { first: n++ < right - (defect ? PB.length : 0) }; });
         return s; };
+      ok(PB.join() === "d-line,d-check,d-fixed", `${k} rule: part B's competence is the line, the check and the fixed cost`);
+      { const noCheck = st(9, 4, 3, true); noCheck.tasks["d-check"].first = false; const noFix = st(9, 4, 3, true); noFix.tasks["d-fixed"].first = false;
+        ok(C.level(D, noCheck).level === "Developing" && C.level(D, noFix).level === "Developing" && !C.level(D, noFix).defect, `${k} rule: a wrong diagnostic check or fixed cost caps at Developing, even with 8 of 9`); }
       ok(C.level(D, st(9, 4, 3, true)).level === "Strong", `${k} rule: 9 of 9, all points: Strong`);
       ok(C.level(D, st(8, 4, 3, true)).level === "Strong" && C.level(D, st(8, 3, 3, true)).level === "Proficient", `${k} rule: 8 of 9 needs every point for Strong`);
       ok(C.level(D, st(6, 3, 2, true)).level === "Proficient" && C.level(D, st(6, 2, 2, true)).level === "Developing", `${k} rule: Proficient needs 3 of 4 points in part A`);
@@ -247,7 +254,18 @@ const usd = v => "$" + (Math.round(v * 100) / 100).toLocaleString("en-US", { min
       const gate = st(9, 4, 3, true); gate.solEarly = "2026-11-03T11:00:00.000Z";
       ok(C.level(D, gate).level === J.rule.practice && C.level(D, gate).assisted === "early", `${k} rule: the full worked solutions opened early by this attempt (the lock's button, recorded as solEarly): practice`);
       const own = st(9, 4, 3, true); own.tasks[last].solFirst = true;
-      ok(C.level(D, own).level === "Strong" && !C.level(D, own).assisted, `${k} rule: task 11's own early solution opens only its own answer (gateAll), not the full solutions: no practice`);
+      const LO = C.level(D, own);
+      ok(LO.level === "Developing" && !LO.assisted && LO.pointsC === 0 && LO.writtenEarly === 1 && /1 written task with the solution opened first: no points/.test(C.describe(D, LO)),
+        `${k} rule: task 11's own early solution opens only its own answer (gateAll, no practice), and its points do not count: ${LO.level}`);
+      // no worked solution, point or feedback names another task's answer before that task is submitted; written tasks keep
+      // their first submission
+      // listed coincidences, not leaks: different quantities within 0.5% of each other (the wind mean, 52.75% of the highest
+      // hour, against both farms' 52.9 MW at net-load peaks; the clock time 19:00 against the 19.0-point gap)
+      const COINCIDE = ["e-cf>e-net", "e-net>e-cf", "e-net>e-gap", "e-gap>e-net"];
+      const leaks = CPK.solLeaks(D).map(x => x.task + ">" + x.names).filter(x => COINCIDE.indexOf(x) < 0);
+      ok(leaks.length === 0 && CPK.openProblems(D).length === 0, `${k}: no solution leaks an unanswered task's answer ${leaks.join(", ")}`);
+      ok(k === "model" ? CP.task(D, "m-valid").solAfter.join() === "m-cost,m-ub,m-lb" : CP.task(D, "e-gap").solAfter.join() === "e-cf,e-why", `${k}: the solutions that name other answers wait for those tasks`);
+      ok(D.tasks.filter(t => t.kind === "open-short").every(t => t.freeze === true) && D.tasks.filter(t => t.kind !== "open-short").every(t => !t.freeze), `${k}: the written tasks keep their first submission`);
       // an earlier fault: task 11 submitted first used to open the full solutions; answers after an
       // opening are late (the shared rule) and the attempt is practice
       const skip = st(9, 4, 3, true); D.tasks.forEach(t => { skip.tasks[t.id].at = t.id === last ? "2026-11-03T10:00:00.000Z" : "2026-11-03T10:05:00.000Z"; });

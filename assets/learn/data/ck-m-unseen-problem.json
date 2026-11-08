@@ -7,6 +7,11 @@
   "autoStrong": 8,
   "autoDeveloping": 4,
   "defect": "d-line",
+  "defectAll": [
+   "d-line",
+   "d-check",
+   "d-fixed"
+  ],
   "pointsA": 3,
   "pointsC": 2,
   "levels": [
@@ -19,8 +24,9 @@
  },
  "intro": [
   "Eleven tasks in three parts, about 240 minutes: A, the brief (about 120); B, the planted defect (about 60); C, a validation (about 45); then submit (about 15).",
-  "The level: at least 6 of the 9 auto-marked tasks right on the first try, with the defect's line (task 6), for Proficient; 8 of 9 and every written point for Strong. Each number task states its tolerance.",
-  "No hints. Each task's worked solution opens after your first answer. A task whose solution you open before answering counts as not right; opening the full worked solutions before all eleven tasks are answered makes the attempt practice, with no level.",
+  "The level: at least 6 of the 9 auto-marked tasks right on the first try, including all three of part B (tasks 6 to 8), for Proficient; 8 of 9 and every written point for Strong. Each number task states its tolerance.",
+  "No hints. Each task's worked solution opens after your first answer; two wait until the tasks whose answers they name are answered too. A task whose solution you open before answering counts as not right (a written task: no points); opening the full worked solutions before all eleven tasks are answered makes the attempt practice, with no level.",
+  "A written task stays as you first submit it: that is the text you rate.",
   "Work in the starter notebook and enter your results here. Your answers stay in this browser; “Copy my results” gives a summary to share, including what you typed."
  ],
  "brief": {
@@ -108,7 +114,7 @@
   "demandCharge": 0.4
  },
  "empirical": {
-  "text": "Prairie Town's planners want to know how far its wind and solar farms can be counted on when the town needs power most. Report what the town can and cannot count on, and how far your results depend on the dataset's scaling.",
+  "text": "How far can Prairie Town count on its wind and solar farms when it needs power most? Report what it can and cannot count on, and how far that depends on the dataset's scaling.",
   "facts": [
    [
     "Data",
@@ -190,7 +196,7 @@
   }
  },
  "defect": {
-  "about": "The supplied model: what should Prairie Town build (wind, solar, a gas combined-cycle plant, a gas peaker) to meet demand on three representative days of 2025, each weighted by the days of the year it stands for? One planted defect.",
+  "about": "The supplied model: what should Prairie Town build (wind, solar, a gas [[combined-cycle|combined-cycle plant]], a gas [[peaker|peaker]]) to meet demand on three representative days of 2025, each weighted by the days of the year it stands for? One planted defect.",
   "V": 10000,
   "techs": {
    "wind": {
@@ -593,6 +599,7 @@
      "title": "Your formulation",
      "skill": "Formulate",
      "kind": "open-short",
+     "freeze": true,
      "prompt": "Write your formulation of the water brief: sets, parameters with units, decision variables, the objective and every rule. A short version here is enough; keep the full one in your notebook.",
      "points": [
       "Every parameter and variable has a unit: m³, m³ an hour, kWh per m³, $ per kWh, $ per kW.",
@@ -719,7 +726,7 @@
       "tol": 0.02,
       "show": "about $6.83"
      },
-     "solution": "About $6.83, or 6.8 cents a day for each m³ of extra room. The [[shadow-price|duals]] of the tower's upper limits (each one the cost change from loosening that limit by one m³) add up to the same $0.0683 per m³ over this step."
+     "solution": "About $6.83, or 6.8 cents a day for each m³ of extra room. The [[shadow-price|duals]] of the tower's upper limits, each the cost change from loosening that limit by one m³, add up to −$0.0683 per m³: the same saving over this step."
     }
    ],
    "tasksC": [
@@ -794,13 +801,19 @@
      "title": "Your validation statement",
      "skill": "Validate and submit",
      "kind": "open-short",
+     "freeze": true,
      "prompt": "State whether your optimum lies between your two bounds, one special case your model reproduces exactly, and what these checks cannot show.",
      "points": [
       "The optimum, $526.90, lies between the hand bounds, $375.67 and $731.80.",
       "One clearly specified special case, matched exactly by an independent hand calculation; for example, with no demand charge and no limits on the tower or the pumps, the night price times the day's energy, $294.00 (another: one flat price and no demand charge).",
       "Bounds and a special case show the model is plausible, not that its schedule is the cheapest; that rests on a correct formulation and the solver's optimality."
      ],
-     "solution": "A [[validation|validation]] against hand calculations: the bounds bracket the optimum, and a special case is matched exactly."
+     "solution": "A [[validation|validation]] against hand calculations: the bounds bracket the optimum, and a special case is matched exactly.",
+     "solAfter": [
+      "m-cost",
+      "m-ub",
+      "m-lb"
+     ]
     }
    ]
   },
@@ -815,6 +828,7 @@
      "title": "Your analysis design",
      "skill": "Design the analysis",
      "kind": "open-short",
+     "freeze": true,
      "prompt": "Write your design before computing: the question's type, the metrics with units, how you scale the data and pick the hours (with ties), and what the analysis leaves out.",
      "points": [
       "A descriptive question with metrics in units: average output in the chosen hours, as a share of each farm's size and in MW.",
@@ -952,7 +966,11 @@
       "tol": 0.02,
       "show": "about 19.0 percentage points"
      },
-     "solution": "52.75% − 33.8% = 18.95 percentage points. The two figures divide by different things: the year's highest hour, and installed capacity."
+     "solution": "52.75% − 33.8% = 18.95 percentage points. The two figures divide by different things: the year's highest hour, and installed capacity.",
+     "solAfter": [
+      "e-cf",
+      "e-why"
+     ]
     },
     {
      "id": "e-why",
@@ -996,13 +1014,14 @@
      "title": "Your validation statement",
      "skill": "Validate and submit",
      "kind": "open-short",
+     "freeze": true,
      "prompt": "Name the benchmark and its date, read the gap, and say which of your results survive a rescaling of wind to EIA's 33.8% and which do not.",
      "points": [
       "The benchmark named with its date: EIA, Electric Power Monthly, Table 6.07.B, 2025 annual: 33.8% for U.S. utility-scale wind.",
-      "The gap read as a definition difference (shares of the year's highest hour, not of capacity), plus a different fleet and region, without splitting it between them; a like-for-like check needs SPP's installed wind capacity.",
+      "The gap read as a definition difference (shares of the year's highest hour, not of capacity) plus a different fleet and region. The year file alone cannot separate them; if you use SPP's like-for-like capacity factor (Sources), say how it splits the gap and why the comparison is fair.",
       "What survives a linear rescaling of wind to 33.8%, for the same 100 net-load hours: its ratio to its own average (about 0.56); the MW and the percentages do not. Picking the hours again after rescaling changes them (82 of 100 stay) and the ratio (0.71): say which you did."
      ],
-     "solution": "A check against a published benchmark, and an honest note on which results depend on the dataset's scaling."
+     "solution": "A check against a published benchmark: it tests how the dataset's percentages are defined, not its values, which come from the same EIA-930 data. Then an honest note on which results depend on the scaling."
     }
    ]
   }

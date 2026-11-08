@@ -8,7 +8,7 @@
 // 100 MWh it started with. Demand, wind and solar follow the real hourly shapes of 20 August 2025 on the Southwest Power
 // Pool grid (town_year.json, EIA-930), scaled to the town exactly as in lesson 0 (town.json) and B3.
 //
-// Eleven step cards: the study (its rules, plants and code symbols); five versions of its code, each with one planted
+// Twelve step cards: the study (its claim and rules; then its plants, code symbols and three words); five versions of its code, each with one planted
 // bug (a unit error, a sign flip, a free lunch, a missing rule, a leaked future), each run with the real solver to see
 // its symptom, then the check that catches it and the fix; a benchmark day worked out by hand in three steps, run on
 // every version; a validation (the day-before plan's forecast of 20 August against 20 August as measured, with a
@@ -297,7 +297,9 @@
     var C = {}; J.checks.forEach(function (c) { C[c.id] = c.label; });
     var h = ['<p class="lx-eyebrow">The study, its five buggy versions and the checks that catch them</p>',
       "<p><b>" + esc(J.study.question) + "</b> One day of dispatch as a linear program; " + esc(J.study.battery.label) + " battery, 85% " + rich("[[round-trip-efficiency|round trip]]") + "; data: " + esc(J.study.dateLabel) + ".</p>",
+      '<p class="lx-hint">' + rich(J.study.savingNote) + "</p>",
       '<ul class="r5-static-rules">' + J.rules.map(function (r) { return "<li><b>" + esc(r.name) + ":</b> " + rich(r.words) + " <span class=\"lx-hint\">(" + esc(r.rows) + ")</span></li>"; }).join("") + "</ul>",
+      '<p class="lx-hint">' + rich(J.study.rowsNote) + "</p>",
       '<p class="r5-sym-k">Prairie Town\'s plants (lesson 0):</p><div class="lx-scroll-x"><table class="lx-facts r5-fleet" aria-label="Prairie Town\'s plants"><thead><tr>' + FLEET_HEAD.map(function (x) { return '<th scope="col">' + esc(x) + "</th>"; }).join("") + "</tr></thead><tbody>"
         + fleetRows(J).map(function (r) { return '<tr><th scope="row">' + esc(r[0]) + '</th><td class="n" data-l="' + FLEET_HEAD[1] + '">' + r[1] + '</td><td class="n" data-l="' + esc(FLEET_HEAD[2]) + '">' + r[2] + '</td><td data-l="' + FLEET_HEAD[3] + '">' + esc(r[3]) + "</td></tr>"; }).join("") + "</tbody></table></div>",
       '<p class="r5-sym-k">In the code:</p><ul class="r5-sym">' + J.study.symbols.map(function (s) { return "<li><code>" + esc(s[0]) + "</code>: " + rich(s[1]) + "</li>"; }).join("") + "</ul>",
@@ -306,7 +308,7 @@
       h.push("<li><p><b>Version " + b.n + ": " + esc(b.kind) + ".</b> " + b.symptoms.map(function (s) { return esc(fill(s[0], v)) + ": <b>" + esc(fill(s[1], v)) + "</b>"; }).join(". ") + ".</p>"
         + "<p>Caught by: <b>" + esc(C[b.check]) + "</b>. " + rich(fill(b.right, v).replace(/^Right\.\s*/, "")) + "</p>"
         + '<p class="r5-static-code"><code>' + esc(b.line.before) + "</code> → <code>" + esc(b.line.after).replace(/\n/g, "<br>") + "</code></p>"
-        + "<p>" + rich(fill(b.fixed, v)) + "</p>" + (b.tie ? "<p>" + rich(fill(b.tie, v)) + "</p>" : "") + "</li>");
+        + "<p>" + rich(fill(b.fixed, v)) + "</p>" + (b.tie ? "<p>" + rich(fill(b.tie, v)) + "</p>" : "") + (b.scope ? "<p>" + rich(fill(b.scope, v)) + "</p>" : "") + "</li>");
     });
     h.push("</ol>");
     h.push("<p><b>Benchmark</b> (" + esc(J.bench.label) + "). " + rich(fill(J.bench.intro, v)) + "</p>");
@@ -314,9 +316,11 @@
     h.push('<div class="lx-scroll-x"><table class="lx-facts r5-bench"><thead><tr><th scope="col">Version</th><th scope="col">Saving on the benchmark</th><th scope="col">Matches the hand answer?</th></tr></thead><tbody>'
       + J.benchVersions.map(function (b) { var k = "bench" + b.id.charAt(0).toUpperCase() + b.id.slice(1); return "<tr><td>" + esc(b.label) + '</td><td class="n">' + v[k] + "</td><td>" + (v[k] === v.benchHand ? "yes" : "no") + "</td></tr>"; }).join("")
       + "</tbody></table></div>");
-    h.push("<p><b>Validation:</b> " + rich(J.validationText) + " " + rich(fill(J.validationSaw, v)) + "</p>");
-    h.push("<p><b>Input check:</b> " + rich(J.inputCheck.text) + " " + rich(fill(J.inputCheck.saw, v)) + "</p>");
-    h.push("<p><b>Rerun from a clean clone (simulated here):</b> it failed on a data file read from one laptop's desktop; a download script with a checksum, relative paths, a pinned environment and a tag fix it. The notebook's practice does the rerun for real.</p>");
+    h.push('<p><b>Validation of the forecast component</b></p><ul class="r5-static-rules"><li><b>Prediction:</b> ' + rich(J.validationText) + "</li><li><b>Tolerance:</b> " + rich(J.validationTol.replace(/^Tolerance, set first: /, "set first: ")) +
+      "</li><li><b>Outcome:</b> " + rich(fill(J.validationSaw, v)) + "</li><li><b>Not validated:</b> " + rich(J.validationLimit.replace(/^Not validated here: /, "")) + "</li></ul>");
+    h.push('<p><b>Input check</b></p><ul class="r5-static-rules"><li>' + rich(J.inputCheck.text) + "</li><li>" + rich(J.inputCheck.assumed) + " " + rich(J.inputCheck.measured) + "</li><li><b>Result:</b> " + rich(fill(J.inputCheck.saw, v)) + "</li></ul>");
+    h.push("<p><b>Rerun from a clean clone (simulated here):</b> it failed on a data file read from one laptop's desktop.</p>");
+    h.push("<p>The fixes: a download script with a checksum, relative paths, the package versions written down (a pinned environment) and a fixed name on the reported commit (a tag). The notebook's practice does the rerun for real.</p>");
     return h.join("\n");
   }
 
@@ -385,7 +389,7 @@
         spec.refs.push({ y: B.E, label: "Battery size, 200 MWh", labelN: "200 MWh", dash: "5 4" });
         spec.lines.push({ pts: socPts(A), color: kind === "plan" ? "var(--lx-bat)" : "var(--lx-bad)", width: 2.6, dots: false });
         spec.legend.push({ label: kind === "plan" ? "Planned on 20 August itself (perfect foresight)" : "This version", color: kind === "plan" ? "var(--lx-bat)" : "var(--lx-bad)" });
-        if (Bfix) { spec.lines.push({ pts: socPts(Bfix), color: "var(--lx-good)", width: 2.4, dash: "6 4" }); spec.legend.push({ label: kind === "plan" ? "Planned on 19 August, then followed" : "Fixed", color: "var(--lx-good)", dash: true }); }
+        if (Bfix) { spec.lines.push({ pts: socPts(Bfix), color: "var(--lx-good)", width: 2.4, dash: "6 4" }); spec.legend.push({ label: kind === "plan" ? "Battery schedule planned on 19 August, then followed" : "Fixed", color: "var(--lx-good)", dash: true }); }
         head.push(kind === "plan" ? "Perfect foresight (MWh)" : "This version (MWh)"); if (Bfix) head.push(kind === "plan" ? "Planned the day before (MWh)" : "Fixed (MWh)");
         A.rows.forEach(function (w, t) { var r = [hh(t + 1), num(w.e)]; if (Bfix) r.push(num(Bfix.rows[t].e)); rows.push(r); });
         spec.text = { head: head.map(function (h0, i) { return i ? h0 : "Hour ending"; }), rows: rows, note: "Stored energy at the end of each hour; the day starts with " + B.E0 + " MWh." };
@@ -480,10 +484,11 @@
               else draw(card, b.chart, S, sol.ok, "Version " + b.n + " and the fixed study, " + J.study.dateLabel);
               card.clear();
               if (b.id === "missing") { card.chip("Day without a battery", v.l0missingBase + " (should be " + v.l0base + ")", "bad"); card.chip("Battery saves", v.l0missing + " (should be " + v.l0ok + ")", "bad"); }
-              else if (b.id === "leak") { card.chip("Perfect foresight", v.ok, "warn"); card.chip("Planned the day before", v.honest, "good"); }
+              else if (b.id === "leak") { card.chip("Perfect foresight", v.ok, "warn"); card.chip("Battery planned the day before", v.honest, "good"); }
               else { card.chip("Fixed: saving", v.ok, "good"); card.chip("Most energy stored", v.okMaxE + " MWh", "good"); }
               api.saw(fill(b.fixed, v));
               if (b.tie) H("p", { class: "lx-hint", html: rb(fill(b.tie, v)) }, after);
+              if (b.scope) H("p", { class: "lx-hint", html: rb(fill(b.scope, v)) }, after);
               api.done();
             });
           }
@@ -494,10 +499,16 @@
     var steps = [
       { free: true, text: "The claim to check: " + J.study.question + " The study is one day of dispatch as a [[linear-program|linear program]], with these five rules.",
         build: function (act) {
+          H("p", { class: "lx-hint", html: LX.rich(J.study.savingNote) }, act);
           var t = H("div", { class: "lx-scroll-x" }, act), tb = H("table", { class: "lx-facts r5-rules" }, t), hr = H("tr", null, H("thead", null, tb));
           ["Rule", "In words", "In the code"].forEach(function (h0) { H("th", { scope: "col", text: h0 }, hr); });
           var bd = H("tbody", null, tb);
           J.rules.forEach(function (r) { var tr = H("tr", null, bd); H("th", { scope: "row", text: r.name }, tr); H("td", { html: LX.rich(r.words) }, tr); H("td", { text: r.rows }, tr); });
+          H("p", { class: "lx-hint", text: J.study.rowsNote }, act);
+          H("p", { class: "lx-hint", text: J.study.dataNote }, act);
+        } },
+      { free: true, text: "Before the first version runs: Prairie Town's plants, the code's names for the battery, and three words this studio keeps apart.",
+        build: function (act) {
           // the plants (lesson 0's fleet): the sizes and running costs the benchmark below is worked from
           H("p", { class: "r5-sym-k", text: "Prairie Town's plants (lesson 0):" }, act);
           var ft = H("table", { class: "lx-facts r5-fleet", "aria-label": "Prairie Town's plants" }, H("div", { class: "lx-scroll-x" }, act));
@@ -510,7 +521,6 @@
           J.study.symbols.forEach(function (x) { H("li", { html: "<code>" + LX.esc(x[0]) + "</code>: " + LX.rich(x[1]) }, sy); });
           var q = H("ul", { class: "r5-three" }, act);
           J.three.forEach(function (x) { H("li", { html: "<b>" + LX.rich(x[0]) + "</b> " + LX.rich(x[1]) }, q); });
-          H("p", { class: "lx-hint", text: J.study.dataNote }, act);
         } }
     ].concat(J.bugs.map(bugStep)).concat([
       { text: "A [[benchmark|benchmark]] is a case with a known answer. Work this made-up day out by hand in three steps, then run every version on it.",
@@ -549,6 +559,7 @@
             } }, g);
           });
           H("p", { html: rb(J.validationText) }, more);
+          H("p", { class: "lx-hint", html: rb(J.validationTol) }, more);
           var row = H("div", { class: "r5-run" }, more), go = H("button", { type: "button", class: "lx-btn small", html: "Compare the forecast with 20 August" + LX.icon("arrow") }, row);
           var card = chartCard(more); card.title.textContent = "Net load, 20 August 2025: forecast and measured"; card.el.hidden = true;
           go.addEventListener("click", function () {
@@ -556,11 +567,13 @@
             var w = v || v0;
             draw(card, "fc", null, null, "Net load on 20 August: the day-before forecast and the measured day");
             card.clear(); card.chip("Average miss", w.fcMAE + " MW"); card.chip("Largest miss", w.fcMax + " MW at " + w.fcMaxHour, "bad"); card.chip("Hours beyond 50 MW", w.fcOver + " of 24", "bad");
+            H("p", { class: "lx-hint", html: rb(J.validationLimit) }, more);
             api.saw(fill(J.validationSaw, w)); api.done();
           });
         } },
       { text: J.inputCheck.text + " Run the study with 82%.",
         build: function (act, api) {
+          var ic = H("ul", { class: "r5-three" }, act); [J.inputCheck.assumed, J.inputCheck.measured].forEach(function (t2) { H("li", { html: rb(t2) }, ic); });
           var row = H("div", { class: "r5-run" }, act), go = H("button", { type: "button", class: "lx-btn small", html: "Run with the measured 82%" + LX.icon("arrow") }, row), st = LX.SolverStatus(row);
           var chipsBox = H("div", { class: "lx-readouts", "aria-live": "polite" }, act);
           go.addEventListener("click", function () {
@@ -622,9 +635,9 @@
       L.push("- " + C[b.check].label + ": caught version " + b.n + " (" + b.kind + ")" + (p ? (p.right ? "; my first pick was right" : "; my first pick was " + C[p.first].label) : "; not tried yet") + ".");
     });
     L.push("Benchmark: " + J.bench.label + "; hand answer " + v.benchHand + ", fixed model " + v.benchOk + ". Version 4 (missing rule) also passes it.");
-    L.push("Validation: the day-before forecast of net load against 20 August as measured (SPP shapes, EIA-930); tolerance set first, " + v.fcTol + " MW in every hour; missed by " + v.fcMAE + " MW on average and " + v.fcMax + " MW at " + v.fcMaxHour + ", so the claim is narrowed.");
+    L.push("Validation of the forecast component: the day-before forecast of net load against 20 August as measured (SPP shapes, EIA-930); illustrative tolerance set first, " + v.fcTol + " MW in every hour; missed by " + v.fcMAE + " MW on average and " + v.fcMax + " MW at " + v.fcMaxHour + ", so the claim is narrowed. The battery's dispatch and the savings are not validated by it.");
     L.push("Input check and sensitivity run: round trip 85% (study) against 82% measured for the U.S. fleet in 2019 (EIA): saving " + v.ok + " against " + v.eta82 + ".");
-    L.push("Result: " + v.honest + " with a plan made the day before (persistence forecast; tie rule: keep the most energy in store); " + v.ok + " with perfect foresight (an upper bound).");
+    L.push("Result (cut in the day's modeled running cost): " + v.honest + " with the battery's schedule planned the day before (persistence forecast; tie rule: keep the most energy in store; the plants still dispatched on the measured day); " + v.ok + " with perfect foresight (an upper bound).");
     L.push("Rerun (simulated on this page): a fresh clone failed on a data file outside the repository; fixes: a download script and checksum, relative paths, a pinned environment and a tag.");
     L.push("My own clean-clone rerun: not done yet. Record the tag and the result of shasum -a 256 -c first-run.sha256 here.");
     L.push("");
@@ -660,7 +673,7 @@
         traces: [
           { label: "Version 1 (unit)", path: ["paper", "code", "ver", "q1", "fix"], text: fill("The size check fails: **{unitMaxE} MWh** stored in a 200 MWh battery. Fix the line, run again.", v) },
           { label: "Version 4 (missing rule)", path: ["paper", "code", "ver", "q1", "fix"], text: fill("Only paper against code catches it: {rampRows} ramp rows on paper, {rampRowsMissing} in the code. It would pass the benchmark (**{benchMissing}**).", v) },
-          { label: "The fixed study", path: ["paper", "code", "ver", "q1", "bench", "q2", "val", "q3", "rev", "rep", "end"], text: fill("Checks pass and the benchmark matches (**{benchOk}**). The forecast misses its {fcTol} MW tolerance at {fcMaxHour}, so the claim is narrowed: **{honest}** planned the day before, **{ok}** only as an upper bound. Then a clean clone reruns it.", v) }
+          { label: "The fixed study", path: ["paper", "code", "ver", "q1", "bench", "q2", "val", "q3", "rev", "rep", "end"], text: fill("Checks pass and the benchmark matches (**{benchOk}**). The forecast misses its {fcTol} MW tolerance at {fcMaxHour}, so the claim is narrowed: **{honest}** with the battery planned the day before, **{ok}** only as an upper bound. Then a clean clone reruns it.", v) }
         ], sel: 2 });
     }
     var x2 = document.getElementById("r5-exemplars");
@@ -677,9 +690,9 @@
 
   LX.mount("r05-build-validate", function (live, data, root) {
     var V = view(live, data, root);
-    // demo states (core.js LX.demo): "mid" = version 1 run and checked; "step-N" opens card N (its action done where it is a run)
+    // demo states (core.js LX.demo): "mid" = version 1 (card 3) run and checked; "step-N" opens card N (its action done where it is a run)
     LX.demo(root, function (state) {
-      var n = state === "mid" ? 2 : +((/^step-(\d+)$/.exec(state) || [])[1] || 0); if (!n) return null;
+      var n = state === "mid" ? 3 : +((/^step-(\d+)$/.exec(state) || [])[1] || 0); if (!n) return null;
       V.cards.go(n - 1);
       var card = live.querySelector(".lx-stepcard");
       // a card that asks first (validation, rerun): pick the right answer, then run

@@ -33,7 +33,7 @@
   {
    "id": "honest",
    "label": "Honest reporting",
-   "sub": "all the results, and corrections",
+   "sub": "material results, and corrections",
    "color": "var(--lx-ink-3)"
   }
  ],
@@ -52,9 +52,9 @@
   },
   {
    "id": "c3",
-   "text": "List who did what, using contributor roles.",
+   "text": "Write down what each author did, using a standard list of roles.",
    "bin": "credit",
-   "why": "Roles make authorship credit specific and checkable."
+   "why": "Named [[credit-roles|contributor roles]] make authorship credit specific and checkable."
   },
   {
    "id": "c4",
@@ -84,7 +84,7 @@
    "id": "c8",
    "text": "Keep the attribution line and the licence when you share an edited map layer.",
    "bin": "licences",
-   "why": "Share-alike terms apply to the layer you derive and share; the credit line goes with any map made from it."
+   "why": "Check the layer's license: keep the attribution it requires, and follow any conditions it sets for sharing modified data."
   },
   {
    "id": "c9",
@@ -168,7 +168,7 @@
    "id": "data",
    "title": "A co-author's data",
    "norm": "licences",
-   "case": "A co-author shared a rural co-op's hourly meter data with you under a data agreement. You want to post the data with your code so that others can rerun the study.",
+   "case": "A co-author shared hourly meter data from a rural electric cooperative (co-op) with you under a data agreement. You want to post the data with your code so that others can rerun the study.",
    "options": [
     {
      "id": "c",
@@ -206,7 +206,7 @@
      "id": "b",
      "text": "Say what the model includes and leaves out, record the concern, and report back how you treated it.",
      "verdict": "good",
-     "why": "Fair process and recognition: the people affected are heard and can see what changed. Treating farmland could mean a new criterion or a sensitivity run."
+     "why": "Fair process and recognition: the people affected are heard and can see what changed. Treating farmland could mean adding it as a factor, or rerunning the ranking with different assumptions."
     },
     {
      "id": "a",
@@ -232,7 +232,7 @@
    "id": "survey",
    "title": "A survey without consent",
    "norm": "consent",
-   "case": "A student on a DOE-supported project plans to survey renters door to door next week about their energy bills, recording names and addresses. No one has asked the [[ethics-board|ethics board]].",
+   "case": "A student on a project supported by the U.S. Department of Energy (DOE) plans to survey renters door to door next week about their energy bills, recording names and addresses. No one has asked the [[ethics-board|ethics board]].",
    "options": [
     {
      "id": "a",
@@ -243,8 +243,8 @@
     {
      "id": "c",
      "text": "Go ahead, but do not record names.",
-     "verdict": "ok",
-     "why": "Collecting less is good practice, but the ethics determination is still needed, and addresses identify people."
+     "verdict": "bad",
+     "why": "Collecting fewer identifiers helps, but addresses still identify people, and the survey must wait for the required ethics determination."
     },
     {
      "id": "b",
@@ -338,12 +338,12 @@
     {
      "id": "regulator",
      "label": "The utility and the regulator",
-     "owed": "Results with their limits, all scenarios, and no overclaiming."
+     "owed": "Results with their limits, how the scenarios were chosen, and no overclaiming."
     },
     {
      "id": "readers",
      "label": "The journal and its readers",
-     "owed": "All the results, prompt corrections, and the data or code where allowed."
+     "owed": "The material results, including those that weaken the conclusion; prompt corrections; and the data or code where allowed."
     },
     {
      "id": "ratepayers",
@@ -424,7 +424,7 @@
   "good": [
    "Funding: ",
    {
-    "text": "a regional utility association funded the study; it saw the results one week before publication and could not change them",
+    "text": "the Prairie Utilities Association funded the study; under its contract it saw the results one week before publication and could not change them",
     "note": "The funder is named, with its role and its limits."
    },
    ".\nCompeting interests: ",
@@ -439,7 +439,7 @@
    },
    ".\nData: ",
    {
-    "text": "EIA-930, public domain, cited with its access date; the co-op's meter data are under an agreement that bars sharing, so the code, a synthetic sample and the request route are public",
+    "text": "EIA-930, public domain, cited with its access date (3 March 2026); the co-op's meter data are under an agreement that bars sharing, so the code, a synthetic sample and the request route are public",
     "note": "Each source with its terms: as open as possible, as closed as necessary."
    },
    ".\nEthics: ",
@@ -484,7 +484,7 @@
    },
    {
     "k": "Funding",
-    "v": "A regional utility association. Its contract lets it see the results one week before publication; it cannot change them."
+    "v": "The Prairie Utilities Association (fictional), a regional utility association. Under its contract it saw the results one week before publication; it could not change them."
    },
    {
     "k": "Team",
@@ -496,7 +496,11 @@
    },
    {
     "k": "Data",
-    "v": "EIA-930 hourly grid data (public domain); the co-op's hourly meter data, shared under an agreement that bars passing them on."
+    "v": "EIA-930 hourly grid data (public domain, accessed 3 March 2026); the co-op's hourly meter data, shared under an agreement that bars passing them on."
+   },
+   {
+    "k": "Sharing",
+    "v": "The code and a synthetic sample of the meter data are posted with the paper; requests for the real data go to the co-op."
    },
    {
     "k": "Survey",

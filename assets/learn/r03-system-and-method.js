@@ -4,8 +4,9 @@
    Page: learn/r03-system-and-method.qmd (studio form: Task, Exemplars, Self-check, Sources).
    Task (step cards): choose a brief; place it on the scale ladder; draw its boundary (LX.CardSort into inside, given and
    left out, then LX.Boundary of the reader's own sort: i-boundary); pick a time step and a horizon; choose one of nine
-   method families (method-neutral: optimization is one family among several, and several can fit one question); defend it against
-   two alternatives, one from another family, in labelled parts (the step is done when the five required parts are there;
+   method families (method-neutral: optimization is one family among several, and several can fit one question); name the
+   method and defend it against two alternatives, one from another family, in labelled parts (the step is done when the six
+   required parts are there;
    opening the example defence completes nothing); then a design card to copy, built from the same parts.
    Exemplars: a weak and a strong method defence (LX.Exemplars), the steps as a flowchart (LX.Flowchart, e-flowchart) and
    the nine families compared (LX.CompareTable, e-table). Self-check: the five scales with typical time steps and horizons
@@ -26,6 +27,7 @@
   function str(v) { return String(v == null ? "" : v).trim(); }
   // the parts of a method defence, in order: the reader's form, the example defences and the design card share them
   var DEF = [
+    { k: "choice", ex: "choice", label: "Your method, named, and how it answers this question" },
     { k: "same", ex: "same", label: "Alternative 1: a simpler or different version in the same family" },
     { k: "why1", ex: "alt1", label: "Why yours, not alternative 1" },
     { k: "other", ex: "other", label: "Alternative 2: a family you did not choose" },
@@ -61,11 +63,13 @@
     });
     return out;
   }
-  // the defence's structure (never its quality, and never particular wording): each required part is there. The five
-  // required parts are done when each is written; "reduce" is optional.
+  // the defence's structure (never its quality, and never particular wording): each required part is there. The six
+  // required parts are done when each is written (the method itself first, so "why yours?" has a referent); "reduce" is
+  // optional.
   function defenceChecks(v, method) {
     v = v || {};
     return [
+      { id: "choice", label: "Your method named, with how it answers this question", ok: !!str(v.choice) },
       { id: "same", label: "Alternative 1 named: a simpler or different version in the same family", ok: !!str(v.same) },
       { id: "why1", label: "A reason for preferring your method to alternative 1", ok: !!str(v.why1) },
       { id: "other", label: "Alternative 2 picked: a family other than yours", ok: !!v.other && v.other !== method },
@@ -94,7 +98,7 @@
     f.push(["Scale", S ? S.id + " " + S.name.toLowerCase() : dash]);
     D.bins.forEach(function (b) { f.push(["Boundary, " + b.label.toLowerCase(), groups[b.id].join("; ") || dash]); });
     f.push(["Time step", (option(B.steps, v.step) || {}).label || dash], ["Horizon", (option(B.horizons, v.horizon) || {}).label || dash],
-      ["Method family", m ? m.label : dash], ["Alternative 1", str(v.same) || dash], ["Why not alternative 1", str(v.why1) || dash],
+      ["Method family", m ? m.label : dash], ["Method", str(v.choice) || dash], ["Alternative 1", str(v.same) || dash], ["Why not alternative 1", str(v.why1) || dash],
       ["Alternative 2", o ? o.label : dash], ["Why not alternative 2", str(v.why2) || dash], ["Main limit", str(v.limit) || dash],
       ["Reduced or checked by", str(v.reduce) || dash]);
     return f;
@@ -198,9 +202,10 @@
     function V() { var b = B(); if (!b) return {}; st.per[b.id] = st.per[b.id] || {}; return st.per[b.id]; }
     function fitLine(o) { return "<b>" + LX.esc(D.fitLabels[o.fit]) + ".</b> " + LX.rich(o.why); }
     function needBrief(act, api) { if (B()) return false; H("p", { class: "lx-hint", text: "Choose a brief in step 1 first." }, act); return true; }
+    // the question and its assumption as two elements, each within the text budget
     function showQ(act) {
-      var q = H("p", { class: "r3-q", html: LX.rich(B().question) }, act);
-      if (B().assume) H("span", { class: "r3-assume", html: "<br>" + LX.rich(B().assume) }, q);
+      H("p", { class: "r3-q", html: LX.rich(B().question) }, act);
+      if (B().assume) H("p", { class: "r3-assume lx-hint", html: LX.rich(B().assume) }, act);
     }
 
     var steps = [
@@ -217,6 +222,8 @@
             });
             btns.push(bt);
           });
+          // the buttons hold plain text, so the briefs' terms get their glossary help beside them
+          if (D.terms) H("p", { class: "lx-hint r3-terms", html: "Words in these briefs: " + LX.rich(D.terms) }, act);
           if (st.brief) api.done();
         } },
       { text: "Place the brief on the scale ladder. A scale is set by who decides and what physics a model needs, not by geography alone.",
@@ -321,7 +328,7 @@
           }
           if (V().method) pick(V().method, false);
         } },
-      { text: "Defend your choice against two alternatives: a simpler version in the same family, and one from another family. End with the method's main limit.",
+      { text: "Name your method and defend it against two alternatives: a simpler version in the same family, and one from another family. End with the method's main limit.",
         build: function (act, api) {
           if (needBrief(act, api)) return;
           var b = B(), v = V(), m = family(D, v.method);
@@ -338,6 +345,7 @@
               el.addEventListener("change", keep);
             } else {
               el = f.k === "same" ? H("input", { type: "text", maxlength: "200", placeholder: "for example, a single run instead of many" }, lab)
+                : f.k === "choice" ? H("textarea", { maxlength: "600", rows: "2", placeholder: "for example, a linear program of the campus's outage days" }, lab)
                 : H("textarea", { maxlength: "600", rows: "2" }, lab);
               el.value = v[f.k] || "";
               el.addEventListener("input", keep);
@@ -359,7 +367,7 @@
             if (done) api.done();
             // said once per change of state, not at every keystroke
             if (done !== wasDone) {
-              if (done) api.saw("All five parts are there. Read them as a reviewer would: is each reason tied to this question?");
+              if (done) api.saw("All six parts are there. Read them as a reviewer would: is each reason tied to this question?");
               else if (wasDone !== null) api.saw("Fill in the parts still marked to do.", true);
               wasDone = done;
             }

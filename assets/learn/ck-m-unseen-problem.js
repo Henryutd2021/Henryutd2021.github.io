@@ -148,6 +148,8 @@
   var checkNumeric = CPK.checkNumeric;
   function isAuto(t) { return t.kind === "choice" || t.kind === "order" || t.kind === "numeric"; }
   function points(st, t) { var r = st.tasks[t.id] || {}; return (r.points || []).filter(Boolean).length; }
+  // a written task whose worked solution was opened before it was submitted earns no points
+  function opened(st, t) { var r = st.tasks[t.id]; return !!(r && r.solFirst); }
   // CK-M's published rule (the page's rubric section says it in words). Levels: 0 Not yet ... 3 Strong.
   // Independent work only: a task whose worked solution was opened before its first answer (solFirst) counts as not
   // right; an answer given after the page's full worked solutions opened counts as practice (the runner's shared
@@ -171,24 +173,27 @@
   function level(D, st) {
     var R = D.rule, auto = D.tasks.filter(isAuto), opens = D.tasks.filter(function (t) { return t.kind === "open-short"; });
     var k = auto.filter(function (t) { return firstRight(st, t, D); }).length;
-    var defect = firstRight(st, { id: R.defect }, D);
-    var pa = late(D, st, opens[0]) ? 0 : points(st, opens[0]), pc = late(D, st, opens[1]) ? 0 : points(st, opens[1]), na = opens[0].points.length, nc = opens[1].points.length;
+    // part B's competence: the defect's line, the check that shows it and the fixed model's cost, each on the first try
+    var defect = (R.defectAll || [R.defect]).every(function (id) { return firstRight(st, { id: id }, D); });
+    var pa = late(D, st, opens[0]) || opened(st, opens[0]) ? 0 : points(st, opens[0]), pc = late(D, st, opens[1]) || opened(st, opens[1]) ? 0 : points(st, opens[1]), na = opens[0].points.length, nc = opens[1].points.length;
     var nLate = D.tasks.filter(function (t) { return late(D, st, t); }).length;
     var complete = auto.every(function (t) { return st.tasks[t.id] && st.tasks[t.id].first != null; }) && opens.every(function (t) { return st.tasks[t.id] && st.tasks[t.id].answer; });
     var early = auto.filter(function (t) { return st.tasks[t.id] && st.tasks[t.id].solFirst; }).length, help = assisted(D, st);
+    var writtenEarly = opens.filter(function (t) { return opened(st, t); }).length;
     var lv = R.levels[0];
     if (help) lv = R.practice;
     else if (k >= R.autoStrong && defect && pa === na && pc === nc) lv = R.levels[3];
     else if (k >= R.autoProficient && defect && pa >= R.pointsA && pc >= R.pointsC) lv = R.levels[2];
     else if (k >= R.autoDeveloping) lv = R.levels[1];
     return { level: lv, auto: k, autoOf: auto.length, defect: defect, pointsA: pa, pointsAOf: na, pointsC: pc, pointsCOf: nc, complete: complete,
-      early: early, late: nLate, assisted: help, estMin: -1, explainOk: pa === na };   // the shared rule's field names, for code that reads either rule
+      early: early, writtenEarly: writtenEarly, late: nLate, assisted: help, estMin: -1, explainOk: pa === na };   // the shared rule's field names, for code that reads either rule
   }
   function describe(D, L) {
     if (L.assisted) return (L.assisted === "early" ? "The full worked solutions were opened before all " + D.tasks.length + " tasks were answered" : "The full worked solutions had been open in this browser before every task was answered (an earlier attempt, or the other variant)") +
       ", so this attempt is practice and gets no level. Your answers and their feedback stay. An independent attempt needs worked solutions you have not seen.";
-    return "Auto-marked tasks right on the first try: " + L.auto + " of " + L.autoOf + (L.early ? " (" + L.early + " with the solution opened first, counted as not right)" : "") + ". The defect's line on the first try: " + (L.defect ? "yes" : "no") +
-      ". Points you ticked: " + L.pointsA + " of " + L.pointsAOf + " in part A, " + L.pointsC + " of " + L.pointsCOf + " in part C." + (L.complete ? "" : " Some tasks are not finished; the level counts them as not right.");
+    return "Auto-marked tasks right on the first try: " + L.auto + " of " + L.autoOf + (L.early ? " (" + L.early + " with the solution opened first, counted as not right)" : "") + ". Part B (the defect's line, the check that shows it and the fixed cost) all on the first try: " + (L.defect ? "yes" : "no") +
+      ". Points counted: " + L.pointsA + " of " + L.pointsAOf + " in part A, " + L.pointsC + " of " + L.pointsCOf + " in part C" +
+      (L.writtenEarly ? " (" + L.writtenEarly + " written task" + (L.writtenEarly > 1 ? "s" : "") + " with the solution opened first: no points)" : "") + "." + (L.complete ? "" : " Some tasks are not finished; the level counts them as not right.");
   }
   function fmtMs(ms) {
     if (ms == null) return "–";
@@ -216,7 +221,7 @@
       lines.push((i + 1) + " | " + t.part + " | " + t.title + " | " + firstWord(t, r) + " | " + (r.tries || 0) + " | " + fmtMs(r.msFirst) + " | " + (late(D, st, t) ? "yes (the full worked solutions)" : r.solFirst ? "yes" : "no"));
     });
     D.tasks.filter(function (t) { return t.kind === "open-short"; }).forEach(function (t) {
-      var r = st.tasks[t.id]; if (r && r.answer) lines.push("Your text, " + t.title.toLowerCase() + ": " + String(r.answer).replace(/\s+/g, " ").slice(0, 800));
+      var r = st.tasks[t.id]; if (r && r.answer) lines.push("Your text, " + t.title.toLowerCase() + ": " + String(r.answer).replace(/\s+/g, " "));   // in full: nothing is cut
     });
     D.tasks.filter(function (t) { return t.kind === "numeric"; }).forEach(function (t) {
       var r = st.tasks[t.id]; if (r && r.answer) lines.push("Your number, " + t.title.toLowerCase() + ": " + r.answer.value + " " + r.answer.unit);
@@ -245,6 +250,8 @@
   // answers are in the page's worked solutions, which a reader without JavaScript can open; they are not in this list.
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
   function plain(t) { return esc(String(t).replace(/\[\[[a-z0-9-]+\|([^\]]+)\]\]/g, "$1")); }
+  // glossary marks to the page's term spans, with the course's own writer (core.js)
+  function rich(t) { var R = (typeof window !== "undefined" && window.LX && window.LX.rich) || require("./components/core.js").rich; return R(t); }
   function staticTasks(J) {
     var h = ['<p class="lx-hint">Without JavaScript nothing here is locked: the worked solutions are further down the page. Do the tasks first, and keep your answers; the level rule is in the rubric section.</p>'];
     ["model", "empirical"].forEach(function (key) {
@@ -285,7 +292,7 @@
     });
   }
   function suppliedHTML(J, R) {
-    var M = J.defect, h = ["<p>" + esc(M.about) + "</p>"];
+    var M = J.defect, h = ["<p>" + rich(M.about) + "</p>"];
     h.push('<p class="lx-eyebrow">On paper</p><ul class="ckm-paper">' + M.paper.map(function (p) { return "<li><b>" + esc(p[0]) + ":</b> <code>" + esc(p[1]) + "</code></li>"; }).join("") + "</ul>");
     h.push('<details class="lx-textalt ckm-sym"><summary>The symbols, with their units</summary><div class="lx-scroll-x"><table class="lx-mini-table"><thead><tr><th scope="col">Symbol</th><th scope="col">Meaning</th><th scope="col">Unit</th></tr></thead><tbody>' +
       M.symbols.map(function (r) { return "<tr><td><code>" + esc(r[0]) + "</code></td><td>" + esc(r[1]) + "</td><td>" + esc(r[2]) + "</td></tr>"; }).join("") +

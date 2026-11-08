@@ -51,11 +51,15 @@ const Q = D.questions;
 ok(Q.length === 20, "twenty questions");
 ok(count(Q, q => q.bin === "research") === 10 && count(Q, q => q.bin === "vague") === 4 && count(Q, q => q.bin === "answered") === 3 && count(Q, q => q.bin === "nodata") === 3, "bins: 10 researchable, 4 too vague, 3 already answered, 3 not answerable with the data at hand");
 [1, 2].forEach(r => { const R = Q.filter(q => q.round === r); ok(R.length === 10 && D.bins.every(b => R.some(q => q.bin === b.id)), "round " + r + ": ten questions, every bin present"); });
-M.TYPE_IDS.forEach(t => ok(count(Q, q => q.type === t) === 2, "two researchable questions of type " + t));
+M.TYPE_IDS.forEach(t => ok(count(Q, q => q.bin === "research" && q.type === t) === 2, "two researchable questions of type " + t));
 ok(JSON.stringify(M.TYPE_IDS) === JSON.stringify(QC.TYPES.map(t => t.id)), "the five types are the question card's");
 ok(Q.filter(q => q.bin === "research").every(q => q.typeWhy && q.typeWhy.toLowerCase().indexOf(q.type) === 0), "every type reason starts with its type");
 ok(Q.filter(q => q.bin === "nodata").every(q => /^Using /.test(q.text)), "every 'not answerable' question names the data at hand");
-ok(M.cards(D, "types").length === 10 && M.cards(D, "types").every(c => M.TYPE_IDS.indexOf(c.bin) >= 0), "the type sort has the ten researchable questions");
+ok(M.cards(D, "types").length === 16 && M.cards(D, "types").every(c => M.TYPE_IDS.indexOf(c.bin) >= 0), "the type sort has the sixteen questions clear enough to type (all but the four too vague)");
+ok(["answered", "nodata"].every(b => Q.filter(q => q.bin === b).every(q => M.TYPE_IDS.indexOf(q.type) >= 0 && q.typeWhy)) && Q.filter(q => q.bin === "vague").every(q => !q.type), "type and researchability are separate: answered and data-short questions keep a type and its reason; too-vague ones get one once rewritten");
+ok(Q.find(q => q.id === "q05").why.indexOf("feeder totals would also need a way to separate charging from other loads") >= 0, "q05: hourly charger data could show charging hours; feeder totals would also need the charging separated from other loads");
+ok(/\[\[feeder\|/.test(D.terms["1"]) && /\[\[retrofit\|/.test(D.terms["1"]), "round 1's vocabulary strip has feeder and retrofit, which its questions and reasons use");
+ok(/descriptive question needs a reference instead/.test(D.checklist.find(c => c.id === "cf").text) && /descriptive question: the expectation you state before counting/.test(D.checklist.find(c => c.id === "wrong").text), "the checklist says what a descriptive question compares with and how it can be shown wrong");
 
 // ---------------- grading and the shortcut
 const c1 = M.cards(D, 1), mine = { q01: "vague", q02: "vague" };
@@ -91,6 +95,14 @@ ok(["type", "scale", "boundary", "wrong", "uncertainty", "units", "counterfactua
 sw = M.switchCard(sw.cards, sw.from, Object.assign({}, sw.card, { type: "predictive" }), "rw1", rwA);
 ok(sw.card.boundary === "members, 2022-2025" && sw.card.type === "evaluative" && sw.card.question === rwA.question, "card: switching back to rewrite 1 restores what the reader added to it");
 ok(sw.cards.rw2.type === "predictive", "card: rewrite 2's card is kept too");
+// a revision made on the card itself survives switching away and back (the question, metric and counterfactual too)
+let sv = M.switchCard({}, null, {}, "rw1", rwA);
+sv = M.switchCard(sv.cards, sv.from, Object.assign({}, sv.card, { question: "Did the co-op's array lower members' bills by 2025?", metric: "median bill", counterfactual: "the 2021 tariff" }), "rw2", rwB);
+sv = M.switchCard(sv.cards, sv.from, sv.card, "rw1", rwA);
+ok(sv.card.question === "Did the co-op's array lower members' bills by 2025?" && sv.card.metric === "median bill" && sv.card.counterfactual === "the 2021 tariff", "card: edits to rewrite 1's question, metric and counterfactual on the card come back after switching to rewrite 2 and back");
+const svr = M.switchCard(sv.cards, sv.from, Object.assign({}, sv.card, { boundary: "members" }), "rw1", rwA, true);
+ok(svr.card.question === rwA.question && svr.card.metric === rwA.metric && svr.card.boundary === "members", "card: refreshing from the rewrite takes its five parts again and keeps the card's other parts");
+ok(/Refresh from the rewrite/.test(JS), "the refresh is an explicit button, not a side effect of switching");
 sw = M.switchCard({}, null, { question: "My own question?", type: "descriptive" }, "rw1", rwA);
 ok(sw.cards.own.question === "My own question?" && M.switchCard(sw.cards, sw.from, sw.card, "own", null).card.question === "My own question?", "card: a card typed by hand is kept and can be brought back");
 
@@ -129,6 +141,8 @@ ok(/About 30 minutes guided here, then about an hour on your own/.test(PAGE), "g
 const words = s => String(s).trim().split(/\s+/).length;
 const stepTexts = [...JS.matchAll(/\{ text: "([^"]+)",\s*\n?\s*build/g)].map(m => m[1]);
 ok(stepTexts.length === 6 && stepTexts.every(t => words(t.replace(/\[\[[^|]+\|([^\]]+)\]\]/g, "$1")) <= 35), "six step cards, each at most 35 words");
+ok(stepTexts.every(t => (t.replace(/\b(U\.S\.|e\.g\.|i\.e\.)/g, "x").match(/[.!?](\s|$)/g) || []).length <= 2), "every step card is at most two sentences");
+ok(/^Sort ten questions into four bins: tap a question, then its bin\.$/.test(stepTexts[0]) && /hint: "Researchable means specific, still open, and answerable with data you could get\."/.test(JS), "step 1 gives one instruction; the definition of researchable is a separate hint");
 const sawTexts = [...JS.matchAll(/return "(You (?:placed|typed)[^\n]+?)"; \}/g)].map(m => m[1].replace(/" \+ g\.\w+ \+ "/g, "8"));
 ok(sawTexts.length === 3 && sawTexts.every(t => M.words(t) <= 35), "the three sort feedback lines, each at most 35 words");
 // every text element the page shows, with JavaScript off (the page's own text and its no-JS blocks): at most 35 words and

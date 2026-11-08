@@ -73,6 +73,11 @@
   }
   var TRUNC = 20;   // the misleading chart's axis start, %
   function dayLabel(d) { return d.day + " " + MONTH[d.month]; }
+  // the clock a local day runs on: Central Daylight Time from the second Sunday of March to the first of November
+  function tzOf(d) {
+    var Y = +d.date.slice(0, 4), t = Date.parse(d.date + "T12:00:00Z");
+    return t >= sundayUTC(Y, 2, 2) && t < sundayUTC(Y, 10, 1) ? "Central Daylight Time" : "Central Standard Time";
+  }
   function facts(D, C) {
     var F = {}, lo = Math.min.apply(null, C.wm), hi = Math.max.apply(null, C.wm);
     F.cfYear = C.cfYear.toFixed(1); F.cfLo = lo.toFixed(1); F.cfHi = hi.toFixed(1);
@@ -82,7 +87,7 @@
     F.winFall = String(Math.round((1 - C.win.f) * 100)); F.winA = String(Math.round(C.win.a)); F.winB = String(Math.round(C.win.b));
     F.dLo = String(Math.round(Math.min.apply(null, C.dm))); F.dHi = String(Math.round(Math.max.apply(null, C.dm))); F.dMean = String(Math.round(mean(C.dm)));
     F.avgPeak = String(Math.round(C.avgTop.mean)); F.avgHour = hh(C.avgTop.h); F.p90Max = String(Math.round(C.p90Top.p90)); F.p90Hour = hh(C.p90Top.h);
-    F.yearPeak = String(Math.round(C.top.v / 1000 * C.peakMW)); F.peakHour = hh(C.top.h); F.peakDay = dayLabel(C.top.date);
+    F.yearPeak = String(Math.round(C.top.v / 1000 * C.peakMW)); F.peakHour = hh(C.top.h); F.peakDay = dayLabel(C.top.date); F.peakTZ = tzOf(C.top.date);
     F.sumDays = String(C.sumDays); F.winMorn = String(C.winMorn); F.winDays = String(C.winDays);
     Object.keys(D.fromR6).forEach(function (k) { if (k !== "about") F[k] = D.fromR6[k]; });
     return F;
@@ -130,10 +135,10 @@
             lines: [{ pts: H.map(function (x) { return [x.h, x.mean]; }), color: "var(--lx-accent)", width: 2.6, dots: true }],
             bars: fx.spread ? H.map(function (x) { return { x0: x.h - 0.36, x1: x.h + 0.36, y0: x.p10, y1: x.p90, color: "var(--lx-accent)", op: 0.22, rx: 2 }; }) : [],
             refs: fx.max ? [{ y: C.top.v / 1000 * C.peakMW, label: "Highest hour of 2025: " + F.yearPeak + " MW", labelN: F.yearPeak + " MW", color: "var(--lx-bad)", dash: "5 4" }] : [],
-            text: { head: ["Hour", "Average (MW)"].concat(fx.spread ? ["P10 (MW)", "P90 (MW)"] : []), rows: H.map(function (x) { return [hh(x.h), Math.round(x.mean)].concat(fx.spread ? [Math.round(x.p10), Math.round(x.p90)] : []).map(String); }) } };
-      var topLine = "Highest hourly demand in 2025: " + F.yearPeak + " MW, at " + F.peakHour + " on " + F.peakDay + ".";
+            text: { head: ["Hour (Central local time)", "Average (MW)"].concat(fx.spread ? ["P10 (MW)", "P90 (MW)"] : []), rows: H.map(function (x) { return [hh(x.h), Math.round(x.mean)].concat(fx.spread ? [Math.round(x.p10), Math.round(x.p90)] : []).map(String); }) } };
+      var topLine = "Highest hourly demand in 2025: " + F.yearPeak + " MW, at " + F.peakHour + " " + F.peakTZ + " on " + F.peakDay + ".";
       if (fx.max) s.text.note = topLine;
-      s.caption = title + (fx.title ? " (Prairie Town on SPP's 2025 pattern" + (fx.spread ? "; band: [[percentile|P10–P90]] across days, the middle 8 days in 10" : "") + ")" : "");
+      s.caption = title + (fx.title ? " (Prairie Town on SPP's 2025 pattern, Central local time" + (fx.spread ? "; band: [[percentile|P10–P90]] across days, the middle 8 days in 10" : "") + ")" : "");
       s.aria = plain(s.caption) + ". Average day peaks at " + F.avgPeak + " MW at " + F.avgHour + (fx.spread ? "; 1 day in 10 the " + F.p90Hour + " hour is above " + F.p90Max + " MW" : "") + "." + (fx.max ? " " + topLine : "");
     }
     s.height = 250; s.heightN = 220;
@@ -142,17 +147,24 @@
 
   // a chart's state: repaired only when a diagnosis is picked and the key fix and the title fix are both on, so the title,
   // the scope and the drawing agree; otherwise what is still open, in one line
+  function needed(c) { return c.fixes.filter(function (f) { return f.key || f.id === "title" || f.need; }); }
   function chartState(D, F, c, st) {
     var fx = (st && st.fx) || {}, kf = keyFix(c), tf = c.fixes.filter(function (f) { return f.id === "title"; })[0];
-    var open = [kf, tf].filter(function (f) { return !fx[f.id]; });
     if (!st || !st.pick) return { done: false, text: null };
-    if (!open.length) { var r = D.chartsTable[D.charts.indexOf(c)]; return { done: true, text: "Redrawn, and the title says what is drawn. " + fill(r.finding, F) + " Next you write that as a sentence." }; }
-    if (open.length === 2) return { done: false, text: "Now apply the fix that removes the problem, “" + kf.label + "”, then make the title match what is drawn." };
-    if (open[0] === kf) return { done: false, text: "The title is honest now, but the drawing still misleads: apply “" + kf.label + "”." };
-    return { done: false, text: "The drawing is fixed, but its title still says “" + fill(c.badTitle, F) + "”: apply “" + tf.label + "”." };
+    var pick = c.options.filter(function (o) { return o.id === st.pick; })[0], wrong = !pick || pick.verdict !== "good";
+    var open = needed(c).filter(function (f) { return !fx[f.id]; }), rest = open.filter(function (f) { return f !== kf && f !== tf; }), out = [];
+    if (!open.length && !wrong) { var r = D.chartsTable[D.charts.indexOf(c)]; return { done: true, text: "Redrawn, and the title says what is drawn. " + fill(r.finding, F) + " Next you write that as a sentence." }; }
+    if (wrong) return { done: false, text: "First pick the diagnosis that explains it; the feedback says why this one does not." + (open.length ? " Fixes still open: " + open.map(function (f) { return "“" + f.label + "”"; }).join(", ") + "." : "") };
+    if (open.indexOf(kf) >= 0 && open.indexOf(tf) >= 0) out.push("Apply “" + kf.label + "”, then make the title match what is drawn.");
+    else if (open.indexOf(kf) >= 0) out.push("The title is honest now, but the drawing still misleads: apply “" + kf.label + "”.");
+    else if (open.indexOf(tf) >= 0) out.push("The drawing is fixed, but its title still says “" + fill(c.badTitle, F) + "”: apply “" + tf.label + "”.");
+    rest.forEach(function (f) { out.push("Still needed: “" + f.label + "”."); });
+    return { done: false, text: out.join(" ") };
   }
   // the writing checks (form only: which parts are there)
   var RANGE = /\d[\d,.]*\s*(?:%|MW|megawatts?)?\s*(?:–|—|-|to|and)\s*\d/i;
+  // a range of demand: two numbers joined by a dash, "to" or "and", with MW or megawatts on one of them
+  var MWRANGE = /\d[\d,.]*\s*(?:MW|megawatts?)\s*(?:–|—|-|to|and)\s*\d|\d[\d,.]*\s*(?:–|—|-|to|and)\s*\d[\d,.]*\s*(?:MW|megawatts?)\b/i;
   function findingChecks(t) {
     t = String(t || ""); var n = words(t);
     return [
@@ -163,7 +175,7 @@
   }
   function briefChecks(id, t) {
     t = String(t || ""); var n = words(t);
-    if (id === "finding") return [{ id: "range", label: "a range", ok: RANGE.test(t) }, { id: "case", label: "the case it belongs to", ok: /(central|fast|slow|uptake|if |with |under )/i.test(t) }];
+    if (id === "finding") return [{ id: "range", label: "a range in MW", ok: MWRANGE.test(t) }, { id: "case", label: "the case it belongs to", ok: /(central|fast|slow|uptake|if |with |under )/i.test(t) }];
     if (id === "programme") return [{ id: "num", label: "a number with its unit", ok: /\d[\d,.]*\s*(?:%|MW|megawatts?)/i.test(t) }, { id: "case", label: "the case it holds in", ok: /(central|fast|slow|uptake|if |with |when |under |hour by hour|hourly)/i.test(t) }];
     if (id === "change") return [{ id: "signal", label: "a signal to watch", ok: n >= 4 && /(if |when|unless|request|trigger|review|new forecast|would|should)/i.test(t) }];
     return [{ id: "words", label: "at least four words", ok: n >= 4 }];
@@ -171,7 +183,7 @@
   function publicChecks(D, t) {
     t = String(t || ""); var n = words(t), jar = D.public.jargon.filter(function (j) { return new RegExp("\\b" + j.replace(/ /g, "\\s+") + "\\b", "i").test(t); });
     return [
-      { id: "range", label: "a range", ok: RANGE.test(t) },
+      { id: "range", label: "a range in megawatts", ok: MWRANGE.test(t) },
       { id: "plain", label: "plain words" + (jar.length ? " (try without: " + jar.join(", ") + ")" : ""), ok: n > 0 && !jar.length },
       { id: "limit", label: "what it leaves out or depends on", ok: /(leave[s]? out|left out|depend|unless|if |do not include|does not include|not included|would add)/i.test(t) },
       { id: "short", label: "at most " + D.public.limit + " words (" + n + ")", ok: n > 0 && n <= D.public.limit }];
@@ -205,10 +217,13 @@
     return '<p class="lx-eyebrow">' + esc(B.title) + '</p><div class="lx-scroll-x"><table class="lx-facts"><thead><tr><th scope="col">It holds when</th><th scope="col">It leaves out</th></tr></thead><tbody><tr><td><ul>'
       + B.holds.map(function (t) { return "<li>" + rich(t) + "</li>"; }).join("") + "</ul></td><td><ul>" + B.leaves.map(function (t) { return "<li>" + rich(t) + "</li>"; }).join("") + '</ul></td></tr></tbody></table></div><p class="lx-hint">' + esc(B.source) + "</p>";
   }
+  // the two terms the sort's first card needs, said before the sort (cards are plain text)
+  var SORT_TERMS = "Two terms first. [[utility-scale|Utility-scale]]: plants of at least 1 MW. [[capacity-factor|Capacity factor]]: a fleet's output over what it would make at full power all the time.";
   // the no-JS version of the task: the findings sorted, the three charts as numbers with their diagnoses, the examples
   function staticTask(D, C) {
     var F = facts(D, C), h = [], V = { good: "Defensible", ok: "Partly", bad: "Not it" }, B = {};
     D.bins.forEach(function (b) { B[b.id] = b.label; });
+    h.push('<p class="lx-hint">' + rich(SORT_TERMS) + "</p>");
     h.push('<details class="lx-textalt"><summary>Nine findings, sorted, with reasons</summary><div class="lx-scroll-x"><table class="lx-facts"><thead><tr><th scope="col">Finding</th><th scope="col">Where it goes</th><th scope="col">Why</th></tr></thead><tbody>');
     D.findings.forEach(function (f) { h.push("<tr><td>" + rich(fill(f.text, F)) + "</td><td>" + esc(B[f.bin]) + "</td><td>" + rich(fill(f.why, F)) + "</td></tr>"); });
     h.push("</tbody></table></div></details>");
@@ -218,7 +233,13 @@
       c.options.forEach(function (o) { h.push("<li>" + esc(o.text) + " <b>" + V[o.verdict] + ".</b> " + rich(fill(o.why, F)) + "</li>"); });
       h.push("</ul><p>Fixes: " + c.fixes.map(function (f) { return esc(f.label) + (f.key ? " (the key one)" : ""); }).join("; ") + ".</p>");
       var s = spec(D, C, F, c.id, (function () { var o = {}; c.fixes.forEach(function (f) { o[f.id] = true; }); return o; })());
-      if (c.id === "window") h.push("<p>The whole year in numbers: daily means from " + F.dLo + "% to " + F.dHi + "% of 2025's windiest hour, averaging " + F.dMean + "%; " + F.winStart + " to " + F.winEnd + " fell from " + F.winA + "% to " + F.winB + "%.</p>");
+      if (c.id === "window") {
+        h.push("<p>The whole year in numbers: daily means from " + F.dLo + "% to " + F.dHi + "% of 2025's windiest hour, averaging " + F.dMean + "%; " + F.winStart + " to " + F.winEnd + " fell from " + F.winA + "% to " + F.winB + "%.</p>");
+        [["The two weeks, day by day", spec(D, C, F, "window", {}).text], ["The whole year, day by day", s.text]].forEach(function (x) {
+          h.push('<details class="lx-textalt"><summary>' + x[0] + '</summary><div class="lx-scroll-x"><table class="lx-mini-table"><thead><tr>' + x[1].head.map(function (k) { return '<th scope="col">' + esc(k) + "</th>"; }).join("") + "</tr></thead><tbody>"
+            + x[1].rows.map(function (r) { return "<tr>" + r.map(function (k) { return "<td>" + esc(k) + "</td>"; }).join("") + "</tr>"; }).join("") + "</tbody></table></div></details>");
+        });
+      }
       else h.push('<div class="lx-scroll-x"><table class="lx-mini-table"><thead><tr>' + s.text.head.map(function (x) { return '<th scope="col">' + esc(x) + "</th>"; }).join("") + "</tr></thead><tbody>"
         + s.text.rows.map(function (r) { return "<tr>" + r.map(function (x) { return "<td>" + esc(x) + "</td>"; }).join("") + "</tr>"; }).join("") + "</tbody></table></div>"
         + (s.text.note ? '<p class="lx-hint">' + esc(s.text.note) + "</p>" : ""));
@@ -234,7 +255,7 @@
   }
   var model = { MONTH: MONTH, TRUNC: TRUNC, localDays: localDays, prepare: prepare, facts: facts, fill: fill, fillDeep: fillDeep, chart: chart, keyFix: keyFix, spec: spec,
                 titleOf: titleOf, chartState: chartState, findingsState: findingsState, briefState: briefState, publicState: publicState,
-                findingChecks: findingChecks, briefChecks: briefChecks, publicChecks: publicChecks, briefExample: briefExample, briefText: briefText, exemplarsSpec: exemplarsSpec,
+                findingChecks: findingChecks, briefChecks: briefChecks, needed: needed, tzOf: tzOf, SORT_TERMS: SORT_TERMS, MWRANGE: MWRANGE, publicChecks: publicChecks, briefExample: briefExample, briefText: briefText, exemplarsSpec: exemplarsSpec,
                 chartsHTML: chartsHTML, boundaryHTML: boundaryHTML, factsHTML: factsHTML, staticTask: staticTask, pct: pct, mean: mean, rich: rich, plain: plain, words: words, RANGE: RANGE };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
@@ -292,6 +313,7 @@
       box.insertAdjacentHTML("beforeend", factsHTML(D, F));
     }
     function sortStep(act, api) {
+      H("p", { class: "lx-hint", html: LX.rich(SORT_TERMS) }, act);
       var key = "r8-sort", placed = LX.store.get(key, {}) || {};
       var cards = D.findings.map(function (f) { return { id: f.id, text: fill(f.text, F), bin: f.bin, why: fill(f.why, F) }; });
       var cs = LX.CardSort(act, { bins: D.bins, cards: cards, maxWhy: 9, checkLabel: "Check my sort",
@@ -349,7 +371,7 @@
       var last = null;
       function paint() {
         D.findingsStep.fields.forEach(function (f) { checkList(lists[f.id], findingChecks(v[f.id])); });
-        if (!D.findingsStep.fields.every(function (f) { return words(v[f.id]) >= 8; })) return;
+        if (!D.findingsStep.fields.every(function (f) { return words(v[f.id]) > 0; })) return;
         var ws = findingsState(D, v), msg = ws.done ? "Every check met in all three findings. The checks see only which parts are there; whether each would survive a sceptical reader is yours to judge."
           : "Drafts entered; still open: " + ws.open.join("; ") + ".";
         if (ws.done) api.done();
@@ -371,7 +393,7 @@
       var last = null;
       function paint() {
         D.briefing.fields.forEach(function (f) { checkList(lists[f.id], briefChecks(f.id, v[f.id])); });
-        if (!D.briefing.fields.every(function (f) { return words(v[f.id]) >= 4; })) return;
+        if (!D.briefing.fields.every(function (f) { return words(v[f.id]) > 0; })) return;
         var ws = briefState(D, v), msg = ws.done ? "Every check met in all six parts. Read it as a council member who has ten minutes and no chart: could you vote on it without misreading it?"
           : "Draft entered; still open: " + ws.open.join("; ") + ".";
         if (ws.done) api.done();
@@ -396,7 +418,7 @@
       function paint() {
         checkList(ul, publicChecks(D, ta.value));
         pre.textContent = briefText(D, LX.store.get("r8-brief", {}) || {}, ta.value);
-        if (words(ta.value) < 30) return;
+        if (!words(ta.value)) return;
         var ws = publicState(D, ta.value), msg = ws.done ? "Every check met. Now ask someone outside the field to read it and tell you what it says. If they repeat a single number, the range did not land."
           : "Draft entered; still open: " + ws.open.join("; ") + ".";
         if (ws.done) api.done();

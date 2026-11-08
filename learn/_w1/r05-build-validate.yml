@@ -9,7 +9,7 @@ glossary:
     def: "A case whose right answer is known in advance, from a hand calculation or an independent source, used to test a model."
   - id: perfect-foresight
     term: Perfect foresight
-    def: "A model assumption that every future value in the horizon, such as tomorrow's demand and weather, is known when decisions are made; it gives an upper bound on what flexibility can earn."
+    def: "A model assumption that every future value in the horizon, such as tomorrow's demand and weather, is known when decisions are made; it gives an upper bound on how much flexibility can cut a model's running cost."
   - id: clone
     term: Clone
     def: "A complete new copy of a repository, with its files and its whole history."

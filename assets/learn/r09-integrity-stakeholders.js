@@ -49,6 +49,9 @@
     var stage = v.mode === "done" ? "Stage: completed study" : "Stage: planned study (lines marked pending are next actions)";
     return ["INTEGRITY STATEMENT", stage].concat(D.statement.map(function (f) { return f.label + ": " + ((v[f.id] || "").trim() || "(to write)"); })).join("\n");
   }
+  // the guided step finishes once three of the six parts hold text (the task card asks for all six, on your own)
+  var GUIDED = 3;
+  function drafted(D, v) { return D.statement.filter(function (f) { return ((v || {})[f.id] || "").trim(); }).length; }
   // the hint a statement field shows for a planned or a completed study
   function hint(f, mode) { return mode === "done" ? f.hint : f.planned || f.hint; }
   function exemplarsSpec(D) {
@@ -108,11 +111,11 @@
     edges: [["s", "f"], ["f", "q1"], ["q1", "a1", "yes"], ["q1", "q2", "no"], ["a1", "q2"], ["q2", "a2", "yes"], ["q2", "q3", "no"], ["a2", "q3"], ["q3", "a3", "yes"], ["q3", "e", "no"], ["a3", "e"]],
     traces: [
       { label: "The survey", path: ["s", "f", "q1", "a1", "q2", "q3", "e"], text: "People's answers: the ethics determination and a consent plan before the first door. Funding is declared, as on every path." },
-      { label: "A co-author's data", path: ["s", "f", "q1", "a1", "q2", "a2", "q3", "e"], text: "Household meter data under someone else's agreement: the ethics basis (review, waiver or the agreement's permission) and the agreement's terms both apply." },
+      { label: "A co-author's data", path: ["s", "f", "q1", "a1", "q2", "a2", "q3", "e"], text: "Household meter data under someone else's agreement: two separate checks. The ethics determination, with its consent or waiver conditions; and the agreement's terms." },
       { label: "The funder's headline", path: ["s", "f", "q1", "q2", "q3", "a3", "e"], text: "Readers would take 9% as the result when the range is 2 to 9%: give the range. The funding was declared at the start." },
       { label: "The error", path: ["s", "f", "q1", "q2", "q3", "a3", "e"], text: "The main result changes: tell co-authors and the journal, and correct the record." }
     ], sel: 0 };
-  var model = { FLOW: FLOW, normLabel: normLabel, best: best, score: score, people: people, statement: statement, hint: hint, exemplarsSpec: exemplarsSpec, staticTask: staticTask,
+  var model = { FLOW: FLOW, GUIDED: GUIDED, drafted: drafted, normLabel: normLabel, best: best, score: score, people: people, statement: statement, hint: hint, exemplarsSpec: exemplarsSpec, staticTask: staticTask,
                 factsHTML: factsHTML, mapHTML: mapHTML, mapRings: mapRings, rich: rich, plain: plain };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
@@ -188,15 +191,15 @@
       paintHints();
       var row = H("div", { class: "r9-row" }, act), cp = H("button", { class: "lx-btn small", type: "button", text: "Copy my statement" }, row), st = H("span", { class: "lx-hint", "aria-live": "polite", text: "Your statement stays in this browser." }, row);
       H("a", { class: "lx-btn small ghost", href: "#exemplars", text: "Compare with two answers" }, row);
-      cp.addEventListener("click", function () { LX.copyText(pre.textContent).then(function (ok) { st.textContent = ok ? "Copied." : "Select the statement and copy it."; }); api.done(); });
-      function draw() { pre.textContent = statement(D, v); if (D.statement.filter(function (f) { return (v[f.id] || "").trim(); }).length >= 3) api.done(); }
+      cp.addEventListener("click", function () { LX.copyText(pre.textContent).then(function (ok) { st.textContent = ok ? "Copied." : "Select the statement and copy it."; }); });
+      function draw() { pre.textContent = statement(D, v); if (drafted(D, v) >= GUIDED) api.done(); }
       draw();
     }
     var steps = [{ text: "Integrity rests on a few norms, such as [[informed-consent|consent]] and declaring [[conflict-of-interest|conflicts of interest]]. Sort ten everyday practices by the norm each serves: tap a card, then its box.", build: sortStep }];
     D.dilemmas.forEach(function (d, i) {
       steps.push({ text: "Dilemma " + (i + 1) + " of 6 · " + d.title + ". Read the case, choose what you would do, then read the norm behind it.", build: dilemmaStep(d, i) });
     });
-    steps.push({ text: "Now your own study, planned or done. Write a line or two for each part; “pending” or “not applicable, because …” is fine when it is the honest answer. Three parts finish here.", build: statementStep });
+    steps.push({ text: "Now your own study, planned or done. Draft three of the six parts here; finish all six on your own. “Pending” or “not applicable, because …” is fine when it is the honest answer.", build: statementStep });
     var cards = LX.StepCards(live, { id: "r9-steps", steps: steps });
     return { cards: cards, D: D };
   }
@@ -219,10 +222,10 @@
     LX.Checklist(H("div", { class: "lx-xcard" }, x), { id: "r9-checklist", title: "An integrity check for your own study", columns: 2,
       lede: "Tick each line before you submit anything with your name on it.", doneText: "Put the answers in your integrity statement.",
       items: [
-        { id: "licences", label: "Licences", text: "The terms of every data source checked, with the attribution each asks for." },
+        { id: "licences", label: "Licences", text: "The terms of every data source checked, with the attribution each asks for; data agreements obeyed." },
         { id: "credit", label: "Credit", text: "Authorship agreed early; contributor roles written down." },
         { id: "coi", label: "Funding and ties", text: "Funders and your own ties declared, with what the funder could see or change." },
-        { id: "ethics", label: "Ethics review", text: "Any work with people reviewed before it starts; consent recorded." },
+        { id: "ethics", label: "Ethics review", text: "Any work with people has its required ethics determination before it starts; its consent or waiver conditions followed." },
         { id: "runs", label: "All the material results", text: "How scenarios were chosen; results that weaken the story reported; run records kept; any exclusion justified." },
         { id: "people", label: "The people affected", text: "Heard before publication, and told how their views were treated." },
         { id: "fix", label: "Corrections", text: "A way for readers to report errors, and a promise to correct them." }

@@ -4,7 +4,7 @@
     "creator": "Honglin Li",
     "date": "2026-11-07",
     "status": "Illustrative: Prairie Town, its plants, costs and battery are fictional, and the benchmark day is made up; three days follow real SPP 2025 hourly shapes (EIA-930).",
-    "source": "Written by hand for research studio R5; the precomputed results are solved with HiGHS.",
+    "source": "Illustrative teaching dataset for research studio R5; the precomputed results are solved with HiGHS.",
     "license": "CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/), Honglin Li. Values taken from the sources listed in this file keep their publishers' terms; EIA data are U.S. government works in the public domain."
   },
   "version": "r5 v2 (3 Nov 2026)",
@@ -40,6 +40,7 @@
   "accessed": "2026-11-03",
   "study": {
     "question": "How much would a 50 MW, 200 MWh battery have saved Prairie Town on Wednesday 20 August 2025?",
+    "savingNote": "A saving here is the cut in the day's modeled running cost, the unserved-demand penalty included. It is not the owner's earnings: the battery's own cost, wear and market prices are left out.",
     "date": "2025-08-20",
     "dateLabel": "Wednesday 20 August 2025",
     "short": "20 August",
@@ -56,6 +57,7 @@
       "label": "50 MW, 200 MWh (4 hours)"
     },
     "dataNote": "Demand, wind and solar: the real hourly shapes of 20 August 2025 on the Southwest Power Pool grid (EIA-930), scaled to Prairie Town as in lesson 0. The plants, costs and battery are illustrative.",
+    "rowsNote": "A row is one equation or limit the solver must meet: the balance has one row per hour.",
     "symbols": [
       [
         "c[t], d[t]",
@@ -72,6 +74,10 @@
       [
         "cc[t], cc_prev[t]",
         "the gas [[combined-cycle|combined-cycle]] plant's output in hour t and in the hour before, MW (115 MW before the first hour)"
+      ],
+      [
+        "T, m.add(…), supply[t]",
+        "pseudocode in the fixes below: the 24 hours, “add this row to the model”, and everything that feeds the town in hour t, MW; the notebook builds the same rows as arrays for SciPy"
       ]
     ]
   },
@@ -121,7 +127,7 @@
     {
       "id": "bal",
       "name": "Balance",
-      "words": "Plants + battery discharge − battery charge + unserved = demand, every hour (MW).",
+      "words": "Plants + battery discharge − battery charge + [[unserved-energy|unserved]] = demand, every hour (MW). Unserved demand is demand not supplied, at an illustrative $10,000/MWh.",
       "rows": "24 rows"
     },
     {
@@ -145,7 +151,7 @@
     {
       "id": "size",
       "name": "Sizes",
-      "words": "Each plant within its size and the weather; battery 0–50 MW, 0–200 MWh.",
+      "words": "The nuclear plant at its 100 MW; each other plant within its size and the weather; battery 0–50 MW, 0–200 MWh.",
       "rows": "limits on the variables"
     }
   ],
@@ -286,7 +292,8 @@
       "right": "Right. The schedule is set at midnight, as 20 August begins: all 24 hours of 19 August are measured by then, and none of 20 August.",
       "wrong": "That check passes here. Ask what had been measured when the schedule was set, at midnight.",
       "fixed": "Planned on 19 August's measured day (a [[persistence-forecast|persistence forecast]]) and then followed: **{honest}**, {honestShare}% of the {ok} that [[perfect-foresight|perfect foresight]] gives.",
-      "tie": "Many schedules tie at {planCost} on 19 August. The rule, set in advance: keep the most energy in store. One that empties the battery first ties too, yet saves only {honestEarly} on 20 August."
+      "tie": "Many schedules tie at {planCost} on 19 August. The rule, set in advance: keep the most energy in store. One that empties the battery first ties too, yet saves only {honestEarly} on 20 August.",
+      "scope": "Only the battery's schedule is set the day before. The plants are still dispatched knowing all of 20 August, ramp limits included; a fuller test would dispatch them hour by hour."
     }
   ],
   "benchVersions": [
@@ -351,10 +358,14 @@
     },
     "tol": 50
   },
-  "validationText": "The plan's prediction of 20 August is its forecast: 19 August's measured net load (demand minus wind and solar). Compare it with 20 August as measured. Tolerance, set first: the battery's 50 MW, in every hour.",
-  "validationSaw": "The forecast misses by **{fcMAE} MW** on average and **{fcMax} MW** at {fcMaxHour}: beyond the tolerance in {fcOver} of 24 hours. So the claim is narrowed: **{honest}** with this forecast; **{ok}** only as an upper bound.",
+  "validationText": "This validates one component, the plan's forecast: 19 August's measured net load (demand minus wind and solar), against 20 August as measured.",
+  "validationTol": "Tolerance, set first: the battery's 50 MW in every hour, an illustrative screening choice; a fuller one would also weigh the stored energy and the other plants.",
+  "validationSaw": "The forecast misses by **{fcMAE} MW** on average and **{fcMax} MW** at {fcMaxHour}: beyond the tolerance in {fcOver} of 24 hours. The claim narrows: **{honest}** with this forecast; **{ok}** only as an upper bound.",
+  "validationLimit": "Not validated here: the battery's dispatch and both savings. They stay model results; checking them needs measured operation or an independent model.",
   "inputCheck": {
-    "text": "One input can be checked against measured data: the [[round-trip-efficiency|round trip]]. The study assumed 85% (NLR's 2025 ATB); the U.S. battery fleet averaged 82% in 2019 (EIA). Does the saving hinge on it?",
+    "text": "One input can be checked against measured data: the [[round-trip-efficiency|round trip]]. Does the saving hinge on it?",
+    "assumed": "Assumed: 85% (NLR's 2025 ATB).",
+    "measured": "Measured: the U.S. battery fleet averaged 82% in 2019 (EIA).",
     "saw": "**{eta82}** instead of **{ok}**: {eta82Change}% less, so the conclusion does not hinge on this input. That is an input check and a [[sensitivity-analysis|sensitivity run]], not a validation of the saving."
   },
   "repro": {
@@ -484,7 +495,7 @@
           },
           ".\nResult: ",
           {
-            "text": "{honest} with the plan made the day before, {ok} with perfect foresight, an upper bound",
+            "text": "{honest} with the battery's schedule planned the day before, {ok} with perfect foresight, an upper bound",
             "note": "Both numbers, each labelled with what the plan knew."
           },
           ".\nRerun: ",

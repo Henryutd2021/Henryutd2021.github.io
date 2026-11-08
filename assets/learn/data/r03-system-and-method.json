@@ -6,12 +6,13 @@
     "note": "The three briefs, Prairie Campus, Prairie City, the Plains Grid and the exemplars are illustrative. The fit notes are judgements for teaching, not rules: several families can answer one question.",
     "license": "CC BY 4.0"
   },
+  "terms": "[[expected-unserved-energy|expected unserved energy]] · [[islanding|islanding]] · [[heat-pump|heat pump]]",
   "families": [
     { "id": "opt", "label": "Optimization", "types": ["prescriptive"],
       "answers": "What is the best choice under stated rules and goals?",
       "needs": "Decisions, a goal, rules (constraints) and their data.",
       "tools": "Solvers for linear programs (LP) and mixed-integer programs (MILP), such as HiGHS, with Pyomo, JuMP or PyPSA",
-      "limit": "Best only inside the model, for its stated goal; a full-horizon run also assumes [[perfect-foresight|perfect foresight]], unless built to decide step by step (a rolling horizon)." },
+      "limit": "Best only inside the model, for its goal. A deterministic run may treat future weather and demand as known ([[perfect-foresight|perfect foresight]]) unless built otherwise (a rolling horizon): say what each decision can know." },
     { "id": "sim", "label": "Simulation", "types": ["predictive", "explanatory"],
       "answers": "What happens when the system runs by given rules, under given conditions?",
       "needs": "Operating rules, inputs over time and the designs to test.",
@@ -196,7 +197,7 @@
         "choice": "A [[monte-carlo|Monte Carlo]] adequacy simulation that runs the heat-wave year many times with random outages.",
         "resolution": "Hourly steps; one year, run many times.",
         "alt1": "The question asks how often and how much, not only whether.",
-        "alt2": "The question keeps today's plants and asks for a risk, not a plan.",
+        "alt2": "One deterministic dispatch run cannot estimate the expected shortfall across random outages; repeated outage cases are needed, possibly with optimized dispatch inside each.",
         "limit": "Outages are drawn independently, while a heat wave can cause several at once.",
         "check": "Add a run with linked outages as a sensitivity." } }
   ],
@@ -243,7 +244,7 @@
           "\nMethod: a capacity-expansion model (optimization), ",
           { "text": "run under many disruption cases drawn at random", "note": "Matches the question: “how sensitive” needs a range, not one plan." },
           "\nTime step and horizon: ",
-          { "text": "yearly steps to 2040, representative hours inside each year", "note": "Time step and horizon stated, matched to a build-out over years." },
+          { "text": "yearly steps to 2040, [[representative-period|representative hours]] inside each year", "note": "Time step and horizon stated, matched to a build-out over years." },
           "\nAlternative 1: ",
           { "text": "a single run with expected prices", "note": "A simpler version of the same family, rejected for a reason." },
           "; it hides the risk the question asks about\nAlternative 2: ",

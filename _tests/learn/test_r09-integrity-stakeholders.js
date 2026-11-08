@@ -77,7 +77,7 @@ ok(D.statement.every(f => f.hint && f.planned && M.hint(f, "planned") === f.plan
 ok(/pending/.test(D.statement.find(f => f.id === "ethics").planned) && /not applicable/.test(D.statement.find(f => f.id === "ethics").hint), "statement: 'pending' and 'not applicable' are offered where they are honest answers");
 
 // ---------------- the flowchart: disclosure is unconditional
-const FL = M.FLOW;
+const FL = M.FLOW, FL0 = FL;
 ok(FL.edges.filter(e => e[0] === "s").map(e => e[1]).join() === "f" && FL.edges.filter(e => e[1] === "q1").map(e => e[0]).join() === "f", "flowchart: every path goes through 'declare funding and ties' before the first question");
 ok(FL.traces.every(t => t.path[0] === "s" && t.path[1] === "f" && t.path[t.path.length - 1] === "e"), "flowchart: every trace declares funding and ends in the statement");
 ok(FL.traces.every(t => t.path.slice(1).every((n, i) => FL.edges.some(e => e[0] === t.path[i] && e[1] === n))), "flowchart: every trace follows the edges");
@@ -108,7 +108,23 @@ ok(D.dilemmas.every(d => task.indexOf(d.title) >= 0) && D.dilemmas.every(d => d.
 ok(/approved 5 August 2026/.test(PAGE) && /CC BY 4\.0/.test(PAGE) && /174–182/.test(PAGE) && /151–155/.test(PAGE), "sources: dates and pages as checked");
 ok(/https:\/\/doi\.org\/10\.3789\/ansi\.niso\.z39\.104-2022/.test(PAGE) && /ANSI\/NISO Z39\.104-2022/.test(PAGE), "sources: CRediT's 2022 standard cited by its own DOI");
 ok(/without justification/.test(PAGE) && /without justification/.test(JSON.stringify(D.practices)), "honest reporting: ALLEA's 'without justification' kept");
-ok(!/Report every scenario/.test(JSON.stringify(D) + JS) && /designee/.test(JSON.stringify(D)) && /DOE-supported/.test(D.dilemmas.find(d => d.id === "survey").case), "no 'report every scenario'; DOE's order applies to a DOE-supported study and names the designee");
+ok(!/Report every scenario/.test(JSON.stringify(D) + JS) && /designee/.test(JSON.stringify(D)) && /supported by the U\.S\. Department of Energy \(DOE\)/.test(D.dilemmas.find(d => d.id === "survey").case), "no 'report every scenario'; DOE's order applies to a DOE-supported study (DOE spelled out at first use) and names the designee");
+ok(!/all scenarios|all the results/i.test(JSON.stringify(D.stakeholders) + JSON.stringify(D.norms)) && /material results/.test(JSON.stringify(D.stakeholders)) && /owed the material results/.test(PAGE), "stakeholders are owed the material results and how scenarios were chosen, not an unconditional 'all the results'");
+// proceeding before the ethics determination is never partly right; a data agreement is not an ethics basis
+{ const sv = D.dilemmas.find(d => d.id === "survey");
+  ok(sv.options.filter(o => /^Go ahead/.test(o.text)).every(o => o.verdict === "bad"), "survey: every 'go ahead' option is hard to defend (collecting less does not replace the determination)");
+  const tr = FL0.traces.find(t => /co-author/i.test(t.label)).text;
+  ok(!/agreement's permission/.test(tr) && /ethics determination/.test(tr) && /agreement's terms/.test(tr), "flowchart: the ethics determination and the data agreement are two separate checks"); }
+ok(!/Share-alike/i.test(JSON.stringify(D.practices)) && /license/.test(D.practices.find(p => p.id === "c8").why), "map layer: the reason checks the layer's own license, assuming no share-alike terms");
+ok(/electric cooperative \(co-op\)/.test(D.dilemmas.find(d => d.id === "data").case), "co-op introduced at first use in the dilemmas");
+// the guided step: three parts finish it, as its text says; copying does not finish it
+ok(M.GUIDED === 3 && M.drafted(D, { funding: "x", credit: " ", data: "y" }) === 2 && M.drafted(D, { funding: "x", data: "y", ethics: "z" }) === 3, "statement: the guided step counts the parts that hold text (three finish it)");
+ok(/Draft three of the six parts here; finish all six on your own/.test(JS) && !/Three parts finish here/.test(JS), "statement step: says three here, all six on your own");
+ok(!/copyText\([^)]*\)\.then\([^;]*;\s*\}\);\s*api\.done\(\)/.test(JS) && !/\}\); api\.done\(\); \}\);/.test(JS), "statement step: copying an empty statement does not finish the step");
+// the strong exemplar uses only the fact sheet: every fact it states is on it
+{ const fs2 = D.exemplars.facts.map(f => f.v).join(" ");
+  ok(/Prairie Utilities Association \(fictional\)/.test(fs2) && /saw the results one week before publication/.test(fs2) && /accessed 3 March 2026/.test(fs2) && /synthetic sample/.test(fs2) && /requests for the real data go to the co-op/.test(fs2), "fact sheet: the funder's name, the preview that took place, the access date, the posted code and sample and the request route");
+  ok(/Prairie Utilities Association funded/.test(EX.plain(M.exemplarsSpec(D).answers[1])) && /3 March 2026/.test(EX.plain(M.exemplarsSpec(D).answers[1])), "strong answer: names the funder and the access date from the fact sheet"); }
 ok(/after seeing the results/i.test(D.dilemmas.find(d => d.id === "scenario").case) && !/outlier/.test(JSON.stringify(D.dilemmas)), "the convenient scenario: chosen after the results, not called an outlier by count");
 const OWN = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?<!-- learn:\1:end -->/g, "");
 const urls = (OWN + JSON.stringify(D)).match(/https?:\/\/[^\s"'<>)]+/g) || [];
@@ -126,6 +142,10 @@ D.statement.forEach(f => ok(words(f.hint) <= 30 && words(f.planned) <= 30, f.id 
   ok(dn.length >= 2, "data note in labelled rows");
   dn.forEach((r, i) => ok(words(r) <= 35, "data note row " + (i + 1) + ": at most 35 words (" + words(r) + ")")); }
 FL.traces.forEach(t => ok(words(t.text) <= 35, "flowchart trace " + t.label + ": at most 35 words"));
+// the Go-deeper boxes: every list item and paragraph within the budget
+{ const deep = OWN.match(/<div class="lx-deeper-body">[\s\S]*?<\/div>/g) || [];
+  ok(deep.length >= 3, "three Go-deeper boxes");
+  deep.forEach((d, i) => (d.match(/<(li|p)>[\s\S]*?<\/\1>/g) || []).forEach((el, j) => { const w = el.replace(/<[^>]+>/g, " ").trim().split(/\s+/).length; ok(w <= 35, "Go deeper " + (i + 1) + ", element " + (j + 1) + ": at most 35 words (" + w + ")"); })); }
 D.dilemmas.forEach(d => { ok(words(d.case) <= 40, d.id + ": case at most 40 words (" + words(d.case) + ")"); d.options.forEach(o => ok(words(o.why) <= 35, d.id + "/" + o.id + ": reason at most 35 words (" + words(o.why) + ")")); });
 D.practices.forEach(p => ok(words(p.text) <= 18, p.id + ": a short card"));
 const stepTexts = (JS.match(/text: "([^"]+)", build/g) || []).map(t => t.slice(7, -8));
@@ -133,6 +153,36 @@ ok(stepTexts.length === 2, "the first and last step texts");
 D.dilemmas.forEach((d, i) => stepTexts.push("Dilemma " + (i + 1) + " of 6 · " + d.title + ". Read the case, choose what you would do, then read the norm behind it."));
 ok(/"Dilemma " \+ \(i \+ 1\) \+ " of 6 · " \+ d\.title \+ "\. Read the case, choose what you would do, then read the norm behind it\."/.test(JS), "dilemma step text template");
 stepTexts.forEach((t, i) => ok(words(t) <= 35, "step text " + (i + 1) + ": at most 35 words (" + words(t) + ")"));
+
+// ---------------- the page on a stub document: the statement step finishes with three parts, never on Copy alone
+{
+  const vm = require("vm"), { env, load } = require("./stubdom.js"), E = env();
+  E.LX.ready = () => {}; E.LX.progress.guess = () => null; E.LX.visible = E.LX.visible || (() => false);
+  ["cards", "cardsort", "exemplars", "flowchart", "stakeholders", "steelman", "rubric", "checklist"].forEach(n => { try { load(n, E); } catch (e) { /* a component the stub cannot run is not needed below */ } });
+  const SC = E.LX.StepCards, doneAt = {};
+  E.LX.StepCards = (host, o) => SC(host, Object.assign({}, o, { steps: o.steps.map((st, k) => Object.assign({}, st, { build: (act, api) => { const d = api.done; api.done = () => { doneAt[k] = (doneAt[k] || 0) + 1; d(); }; return st.build(act, api); } })) }));
+  let init = null, demo = null;
+  E.LX.mount = (slug, f) => { if (slug === "r09") init = f; };
+  E.LX.demo = (root, fn, cards) => { demo = { fn, cards }; return () => null; };
+  E.LX.H("div", { id: "r09-exemplars" }, E.body); E.LX.H("div", { id: "r09-rubric" }, E.body);
+  vm.runInNewContext(JS, { window: E.window, document: E.document, location: E.location, navigator: {}, console, module: { exports: {} }, performance: E.window.performance, setTimeout: () => 0, clearTimeout: () => {}, requestAnimationFrame: () => 0 });
+  const root = E.LX.H("div", { class: "lx-interactive", "data-learn": "r09" }, E.body), live = E.LX.H("div", { class: "lx-live" }, root);
+  let threw = null;
+  try { init(live, { r09_integrity_stakeholders: D }, root); } catch (e) { threw = e.stack; }
+  ok(!threw && demo && demo.cards, "the page mounts on the stub document" + (threw ? ": " + threw : ""));
+  if (!threw && demo) {
+    const last = demo.cards.count - 1; demo.cards.go(last);
+    const card = demo.cards.el, copy = card.querySelectorAll("button").filter(b => /Copy my statement/.test(b.textContent))[0];
+    copy.click();
+    ok(!doneAt[last], "statement step: copying an empty statement does not finish it");
+    const tas = card.querySelectorAll("textarea");
+    ok(tas.length === 6, "statement step: six parts to write");
+    [0, 1].forEach(i => { tas[i].value = "pending: agreed with the team next week"; tas[i].fire("input"); });
+    ok(!doneAt[last], "statement step: two parts do not finish it");
+    tas[2].value = "EIA-930, public domain; meter data under agreement"; tas[2].fire("input");
+    ok(doneAt[last] >= 1 && /Draft three of the six parts here/.test(card.textContent), "statement step: three parts finish the guided step, as its text says");
+  }
+}
 
 console.log(`${checks - fails} of ${checks} checks passed`);
 process.exit(fails ? 1 : 0);

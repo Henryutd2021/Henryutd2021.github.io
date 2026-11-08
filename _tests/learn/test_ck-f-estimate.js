@@ -15,6 +15,7 @@ const path = require("path");
 const SITE = path.resolve(__dirname, "..", "..");
 const L = p => path.join(SITE, "assets/learn", p);
 const C = require(L("ck-f-estimate.js"));
+const CPK = require(L("components/checkpoint.js"));
 const D = JSON.parse(fs.readFileSync(L("data/ck-f-estimate.json"), "utf8"));
 const year = JSON.parse(fs.readFileSync(L("data/town_year.json"), "utf8"));
 const days = JSON.parse(fs.readFileSync(L("data/town_days.json"), "utf8"));
@@ -134,6 +135,37 @@ ok(/version/.test(D.version) === false && /ck-f v1/.test(D.version), "results ca
   });
   ok(/includes what you typed/.test(JS) && /includes what you typed/.test(PAGE), "summary: the intro and the data note tell testers the copied summary includes what they typed");
   ok(!/forms\.|docs\.google|typeform|<a [^>]*form/i.test(PAGE + JS), "summary: no form link on the page");
+}
+
+// ---------------- the pass rule before the tasks; early opening; first submissions; scale against checks; purchases
+{
+  const before = PAGE.slice(0, PAGE.indexOf('<div class="lx-interactive"'));
+  ok(/How it is marked, before you start/.test(before) && /<b>Proficient:<\/b> at least 5 of the 7 auto-marked tasks right on the first try, both points of task 1, and Proficient or better on all four estimate criteria\./.test(before) &&
+    /Opening a solution early:<\/b> that task counts as not right/.test(before), "the pass rule and the early-opening rule are stated before the tasks, with and without JavaScript");
+  ok(D.rule.openFirst === "not-right", "rule: a task whose worked solution was opened first counts as not right");
+  const early = state(7, { units: "Strong", range: "Strong", uncertainty: "Strong", check: "Strong" }, true);
+  early.tasks["t5-cf"].solFirst = true; early.tasks["t0-explain"].solFirst = true;
+  const LE = C.level(D, early);
+  ok(LE.auto === 6 && !LE.explainOk && LE.level === "Developing", "solution opened first: that auto task not right, task 1 no points (" + LE.level + ")");
+  early.tasks["t0-explain"].solFirst = false; early.tasks["est-buses"].solFirst = true;
+  ok(C.level(D, early).estMin === -1 && C.level(D, early).level === "Not yet", "the estimate opened first: its self-ratings do not count");
+  ok(T("t0-explain").freeze === true && T("est-buses").freeze === true && D.tasks.filter(t => t.freeze).length === 2, "the two written tasks keep their first submission");
+  const sum2 = C.summary(D, Object.assign(state(5, P, true), {}), {}), long = state(5, P, true);
+  long.tasks["est-buses"].answer.reasoning = "x ".repeat(700) + "END"; long.tasks["t0-explain"].answer = "y ".repeat(500) + "LAST";
+  const s3 = C.summary(D, long, {});
+  ok(/END$/m.test(s3) && /LAST$/m.test(s3) && /a comparison, not a mark/.test(sum2), "the copied summary keeps the texts in full, and calls the range comparison what it is");
+  ok(CPK.solLeaks(D).length === 0 && CPK.openProblems(D).length === 0, "no worked solution names another task's answer");
+  const visible = PAGE.slice(PAGE.indexOf("::: {#sources"));
+  ok(!/14,084|1\.26–1\.58|under 100 to over 300/.test(visible) && /14,084 miles/.test(PAGE.slice(PAGE.indexOf('id="ckf-solution-body"'), PAGE.indexOf("::: {#rubric"))),
+    "the bus inputs (miles, energy per mile, battery sizes) are in the gated worked solution, not the always-visible sources table");
+  ok(/Scale, not a check: homes/.test(PAGE) && /Scale, not a check: the town/.test(PAGE) && !/Check with homes|Check with the town/.test(PAGE) && /gives scale, not a check/.test(PAGE), "comparisons with homes and the town are scale, not independent checks");
+  ok(!/only the spinning machines/.test(JSON.stringify(D)) && /a fast reserve such as a battery/.test(T("t0-explain").points[0]), "task 1 accepts other fast responses, not only spinning machines");
+  ok(/buys about 10,800 kWh/.test(T("t1-units").prompt) && /yearly purchases does it equal/.test(T("n1-headline").prompt) && !/home's use|yearly use/.test(JSON.stringify(D.tasks)), "home figures are purchases, as EIA defines them");
+  ok(/\[\[capacity-factor\|/.test(T("t5-cf").solution) && /\[\[firm-capacity\|/.test(T("t6-jobs").solution) && /\[\[peaker\|/.test(T("t6-jobs").solution) && !/\[\[/.test(C.staticTasks(D)), "the feedback marks its terms; the no-JS list shows them as terms, not raw marks");
+  const words = x => x.replace(/<[^>]+>/g, " ").split(/\s+/).filter(Boolean).length;
+  const notes = [...PAGE.matchAll(/<p class="lx-datanote">[\s\S]*?<span>([\s\S]*?)<\/span><\/p>/g)].map(m => m[1]);
+  const bullets = [...PAGE.slice(PAGE.indexOf('id="ckf-solution-body"'), PAGE.indexOf("::: {#rubric")).matchAll(/<li>([\s\S]*?)<\/li>/g)].map(m => m[1]);
+  ok(notes.length === 3 && notes.every(x => words(x) <= 35) && bullets.every(x => words(x) <= 40), "the data notes and the worked solution's bullets stay within the text budget: " + notes.map(words).join(", ") + " / max " + Math.max(...bullets.map(words)));
 }
 
 // ---------------- sources: every source URL is on the allow-list hosts used by Learn

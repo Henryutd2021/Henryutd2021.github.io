@@ -7,7 +7,7 @@
 
    The fictional study: Prairie Town's peak demand in 2035 (the town's 2025 peak hour is 450 MW, lesson 0's scale).
    Model (closed form; every input illustrative except the 2025 hourly pattern):
-     year k = 1 ... 10 after 2025:  c = (1 + g)^k × w        g: growth a year apart from cars; w: the year's weather
+     year k = 1 ... 10 after 2025:  c = (1 + g)^k × w        g: growth a year apart from cars; w: a weather multiplier on background demand
      added cars  n = (cars2035 − cars2025) × k / 10           a scenario (slow, central, fast); 2025's cars are in the 450
      charging energy a day  D = n × e / 1,000 MWh              e: a car's daily kWh
      form "peaks" (peaks added):  peak = c × 450 + D × max_h s_h
@@ -195,6 +195,25 @@
     return { text: "Peaks added, " + lab + ": P10 " + R(e.p10) + ", median " + R(e.p50) + ", P90 **" + R(e.p90) + " MW** in 2035, from " + F.runs + " runs. The single number, " + F.claim + " MW, is one point inside it." };
   }
 
+  // the study's single number, step by step (middle inputs, central uptake, peaks added): what the page shows under the
+  // claim, so a reader can rebuild it without the code
+  function worked(M) {
+    var m = M.m, b = base(M), k = m.y1 - m.y0, s = M.prof.unmanaged, top = Math.max.apply(null, s);
+    var grown = m.p0 * Math.pow(1 + b.g, k) * b.w, day = charging(M, k, b, "central"), add = day * top;
+    return { p0: m.p0, g: b.g, w: b.w, k: k, grown: grown, cars2025: m.cars2025, cars2035: M.sc.central.cars2035, cars: M.sc.central.cars2035 - m.cars2025,
+      kwh: b.kwh, day: day, share: top, hour: s.indexOf(top), add: add, total: grown + add };
+  }
+  function workedHTML(M) {
+    var W = worked(M), f1 = function (v) { return v.toFixed(1); }, hh = function (h) { return (h < 10 ? "0" : "") + h + ":00"; };
+    var row = function (k, v) { return '<tr><th scope="row">' + k + "</th><td>" + v + "</td></tr>"; };
+    return '<details class="lx-textalt r6-worked"><summary>How the single number is built</summary><div class="lx-scroll-x"><table class="lx-facts"><tbody>' +
+      row("Demand apart from cars, " + M.m.y1, fmt(W.p0) + " MW × " + (1 + W.g).toFixed(3) + "<sup>" + W.k + "</sup> (growth " + (100 * W.g).toFixed(1) + "% a year) × " + W.w.toFixed(2) + " (middle weather) = " + f1(W.grown) + " MW") +
+      row("Cars added since " + M.m.y0, fmt(W.cars2035) + " − " + fmt(W.cars2025) + " = " + fmt(W.cars) + " (central uptake; the " + fmt(W.cars2025) + " of " + M.m.y0 + " are already in the " + fmt(W.p0) + " MW)") +
+      row("Their charging in a day", fmt(W.cars) + " × " + W.kwh + " kWh = " + fmt(W.day) + " MWh, in the same pattern every day") +
+      row("Its busiest hour", Math.round(100 * W.share) + "% of a day's charging, " + hh(W.hour) + " to " + hh(W.hour + 1) + ": " + fmt(W.day) + " MWh × " + W.share.toFixed(2) + " = " + f1(W.add) + " MWh in one hour, " + f1(W.add) + " MW") +
+      row("Peaks added", f1(W.grown) + " + " + f1(W.add) + " = " + fmt(W.total) + " MW, the study's single number") +
+      '</tbody></table></div><p class="lx-hint">Middle inputs, central uptake. Adding the two peaks assumes they fall in the same hour; the model-form step tests that.</p></details>';
+  }
   // the band chart's key: what P10, the median and P90 mean (shown under the chart)
   var KEY = "[[percentile|Percentiles]] of the runs: P10, about 1 run in 10 is below it; median, half below; P90, about 9 in 10 below.";
   // the sort's feedback: a count against the course's piles, read as given this exercise's assumptions
@@ -255,6 +274,7 @@
     var F = facts(M), h = [], V = { good: "Defensible", ok: "Partly", bad: "Hard to defend" };
     h.push('<p class="lx-eyebrow">The claim</p><p class="r6-claim">“' + esc(fill(D.study.claim, F)) + "”</p>");
     h.push('<p class="lx-hint">' + esc(D.study.assume) + "</p>");
+    h.push(workedHTML(M));
     h.push('<details class="lx-textalt"><summary>Twelve uncertainties behind it, sorted, with reasons</summary><div class="lx-scroll-x"><table class="lx-facts"><thead><tr><th scope="col">Uncertainty</th><th scope="col">Pile</th><th scope="col">Why</th></tr></thead><tbody>');
     D.cards.forEach(function (c) { h.push("<tr><td>" + esc(c.text) + "</td><td>" + esc(kindLabel(D, c.bin)) + "</td><td>" + rich(c.why) + "</td></tr>"); });
     h.push("</tbody></table></div></details>");
@@ -273,7 +293,7 @@
       h.push("<tr><td>" + FORMS[f] + ", " + esc(M.sc[sc].label.toLowerCase()) + "</td><td class=\"n\">" + fmt(r5(e.p10)) + "</td><td class=\"n\">" + fmt(r5(e.p50)) + "</td><td class=\"n\">" + fmt(r5(e.p90)) + "</td></tr>");
     }); });
     h.push("<tr><td>What-if: " + esc(D.model.newLoad.label.charAt(0).toLowerCase() + D.model.newLoad.label.slice(1)) + " (hours added, central)</td><td class=\"n\" colspan=\"3\">median " + F.cNew + " MW</td></tr>");
-    h.push('</tbody></table></div><p class="lx-hint">MW, rounded to 5; ' + F.runs + " runs, seed " + F.seed + ", each input drawn independently with equal odds across its range; no odds across the three uptake scenarios.</p></details>");
+    h.push('</tbody></table></div><p class="lx-hint">MW, rounded to 5; ' + F.runs + " runs, seed " + F.seed + ", each input drawn independently with equal odds across its range; no odds across the three uptake scenarios.</p><p class=\"lx-hint\">" + rich(KEY) + "</p></details>");
     h.push('<details class="lx-textalt"><summary>The claim rewritten for three readers (examples)</summary><dl class="lx-ideas">');
     D.rewrite.fields.forEach(function (f) { h.push("<dt>" + esc(f.label) + "</dt><dd>" + exHTML(D, f.id, F) + "</dd>"); });
     h.push("</dl></details>");
@@ -300,7 +320,7 @@
     edges: [["s", "q1"], ["q1", "a1", "yes"], ["q1", "q2", "no"], ["q2", "a2", "yes"], ["q2", "q3", "no"], ["q3", "a3", "yes"], ["q3", "q4", "no"], ["q4", "a4", "yes"], ["q4", "a5", "no"]],
     traces: [
       { label: "Growth a year", path: ["s", "q1", "q2", "q3", "a3"], text: "Not a choice, not the model's form. This exercise gives it a range with equal odds across it (a real study would need data for both): sample it with the other parameters." },
-      { label: "Peaks or hours", path: ["s", "q1", "q2", "a2"], text: "It is how the model is built, so sampling cannot reveal it: run both forms and report the gap." },
+      { label: "Peaks or hours", path: ["s", "q1", "q2", "a2"], text: "It is how the model is built, and these runs vary numbers only: run both forms and report the gap." },
       { label: "Car uptake", path: ["s", "q1", "q2", "q3", "q4", "a4"], text: "No odds anyone can defend, but three storylines the town accepts: run each and show them side by side." },
       { label: "A large customer", path: ["s", "q1", "q2", "q3", "q4", "a5"], text: "No odds, and no agreed size or arrival: a what-if beside the result, a plan that holds either way, and a signal to review." },
       { label: "Managed charging", path: ["s", "q1", "a1"], text: "The utility's own decision: run the study with and without it, and compare." }
@@ -318,7 +338,7 @@
                 study: study, line: line, r5: r5, rho: rho, ranks: ranks, corr: corr, evpi: evpi, facts: facts, fill: fill, fillDeep: fillDeep, kindLabel: kindLabel,
                 card: card, best: best, bandView: bandView, bandSaw: bandSaw, rwChecks: rwChecks, exLines: exLines, exText: exText, exHTML: exHTML,
                 planText: planText, planRow: planRow, planDone: planDone, planRowsHTML: planRowsHTML, exemplarsSpec: exemplarsSpec, kindsHTML: kindsHTML,
-                staticTask: staticTask, FLOW: FLOW, flowHTML: flowHTML, KEY: KEY, sortSaw: sortSaw, rich: rich, plain: plain, words: words, fmt: fmt, RANGE: RANGE };
+                staticTask: staticTask, worked: worked, workedHTML: workedHTML, FLOW: FLOW, flowHTML: flowHTML, KEY: KEY, sortSaw: sortSaw, rich: rich, plain: plain, words: words, fmt: fmt, RANGE: RANGE };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -376,6 +396,7 @@
     function sortStep(act, api) {
       H("p", { class: "r6-claim", text: "“" + fill(D.study.claim, F) + "”" }, act);
       H("p", { class: "lx-hint", text: D.study.assume }, act);
+      H("div", { html: workedHTML(M) }, act);
       var key = "r6-sort", placed = LX.store.get(key, {}) || {};
       var cs = LX.CardSort(act, { bins: D.kinds, cards: D.cards, maxWhy: 12, checkLabel: "Check my sort",
         onCheck: function (g) {
@@ -529,8 +550,8 @@
       var cd = card(D, t.card);
       steps.push({ text: "Treatment " + (i + 1) + " of 5 · " + kindLabel(D, cd.bin) + ". Choose how you would handle this one, then read why.", build: treatStep(t) });
     });
-    steps.push({ text: "One number hides the spread. Vary the three [[parameter|parameters]] together: growth, a car's daily energy and the year's weather, each drawn independently with equal odds across its range, in " + F.runs + " runs (seed " + F.seed + ").", build: bandStep("params") });
-    steps.push({ text: "Sampling cannot cover two things. Pick a car-uptake [[scenario|scenario]], then switch the [[structural-uncertainty|model form]]: peaks added, or hours added on 2025's real hourly pattern.", build: bandStep("scen") });
+    steps.push({ text: "One number hides the spread. Vary three [[parameter|parameters]] together (growth, a car's daily energy, a weather multiplier on demand), each drawn independently with equal odds across its range, in " + F.runs + " runs (seed " + F.seed + ").", build: bandStep("params") });
+    steps.push({ text: "These runs vary three numbers only. Pick a car-uptake [[scenario|scenario]], then switch the [[structural-uncertainty|model form]]: peaks added, or hours added on 2025's real hourly pattern. This exercise gives neither any odds.", build: bandStep("scen") });
     steps.push({ text: "Last, a [[deep-uncertainty|deep uncertainty]]: a customer drawing a constant 60 MW that may connect from 2030, or never. Show it as a what-if line, not inside the band.", build: bandStep("deep") });
     steps.push({ text: "Rewrite the claim for three readers. The checks look only for the parts each version needs; judge the wording yourself against the examples.", build: rewriteStep });
     steps.push({ text: "Now your own study. List up to four uncertainties, put each on a pile, and write its treatment in your own words. Three complete rows finish here.", build: planStep });

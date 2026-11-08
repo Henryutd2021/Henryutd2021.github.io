@@ -145,14 +145,25 @@ has("Every track is judged on the same nine competences.", "the same rubric for 
   ok(C({ family: "opt", alts: ["opt", "sim"] })[0].ok && !C({ family: "opt", alts: [] })[0].ok, "two alternatives, one from the same family and one from another: in place");
   ok(M.altName(F, { family: "opt" }, "opt") === "Optimization (another method of the same family, named in the proposal)" && M.altName(F, { family: "opt" }, "sim") === "Simulation", "a same-family alternative is another method of that family, named in the proposal");
   ok(M.noteOf(D, Object.assign({}, d, { alts: ["opt", "sim"] }), {}, F, "").plan.find(r => r.label === "Method").value === "Optimization; alternatives: Optimization (another method of the same family, named in the proposal), Simulation", "the proposal says so too");
-  ok(/name a same-family one exactly/.test(D.fields.find(f => f.key === "method").hint), "the proposal's method field asks for that method by name");
+  ok(/if one is from your method's family, name that method exactly/.test(D.fields.find(f => f.key === "method").hint) && !/name a same-family one exactly/.test(JSON.stringify(D)), "the proposal's method field asks for a same-family alternative by name only when there is one");
   ok(!C({ track: "empirical", family: "opt" })[1].ok && /unusual for an empirical study/.test(C({ track: "empirical", family: "opt" })[1].why), "optimization on the empirical track: to do, said why");
   ok(C({ track: "mixed", family: "qual", alts: ["stat", "abm"] })[1].ok, "qualitative methods fit the mixed track");
   ok(!C({ unc: "oat" })[2].ok && /Proficient level asks for scenarios or a global sensitivity analysis/.test(C({ unc: "oat" })[2].why), "one input at a time is below Proficient");
   // a treatment counts only where it fits the method family: every treatment against every family
   { const bad = []; D.uncertainty.filter(u => u.id !== "oat").forEach(u => D.families.forEach(f => { if (C({ unc: u.id, family: f })[2].ok !== u.fits.includes(f)) bad.push(u.id + "/" + f); }));
     ok(!bad.length && D.uncertainty.filter(u => u.ok).every(u => u.fits.length && u.fits.every(f => D.families.includes(f))), "each treatment fits its listed families and no others: " + bad.join(", ")); }
-  ok(!C({ unc: "tri", family: "opt" })[2].ok && /Triangulation suits Qualitative methods and Mixed methods, not Optimization/.test(C({ unc: "tri", family: "opt" })[2].why), "triangulation on an optimization study: to do, said why");
+  ok(!C({ unc: "tri", family: "opt" })[2].ok && /Triangulation is usually paired with Qualitative methods and Mixed methods\. It can still suit Optimization: in the proposal, say which uncertain inputs you will vary and how you will analyze their effect/.test(C({ unc: "tri", family: "opt" })[2].why), "triangulation on an optimization study: a suggestion, with what to explain, not a ban");
+  ok(D.uncertainty.every(u => !/, not /.test(C({ unc: u.id, family: "stat" })[2].why)) && /can still suit Statistics and econometrics/.test(C({ unc: "gsa", family: "stat" })[2].why), "a usual pairing is a suggestion: a global sensitivity analysis with statistics is not ruled out");
+  ok(D.uncertainty.every(u => u.def && u.def.split(/\s+/).length <= 25) && /\[\[triangulation\|/.test(D.uncertainty.find(u => u.id === "tri").def) && /fDef\.innerHTML/.test(JS) && /uDef\.innerHTML = U && U\.def \? LX\.rich\(U\.def\)/.test(JS), "each uncertainty treatment and the chosen family are explained under their controls, with glossary marks");
+  // ethics before collection: the data stage settles the ethics review before anyone is contacted
+  { const ds = D.stages.find(x => x.id === "data"), is = D.stages.find(x => x.id === "integrity");
+    ok(/settle the ethics review with a mentor before contacting anyone/.test(ds.does) && ds.done.some(d => /ethics approval or exemption before recruiting/.test(d)) && !/plan and hold your interviews/.test(JSON.stringify(D)), "interviews: the ethics determination comes before recruiting, in the data stage");
+    ok(/report and release keep your promises/.test(is.does) && /approved the interview protocol before recruitment began/.test(EXS.plain(D.exemplars.find(e => e.comp === "integrity").answers[1])), "the integrity stage checks reporting and release; its exemplar's approval came before recruitment"); }
+  // the weatherization exemplar: a candidate comparison group, change against change; ranges identified
+  { const fr = EXS.plain(D.exemplars.find(e => e.comp === "framing").answers[1]), frN = EXS.marks(D.exemplars.find(e => e.comp === "framing").answers[1]).map(m => m.note).join(" ");
+    ok(/A candidate comparison group/.test(frN) && /cut their gas use/.test(fr) && /the change in winter gas use per home, two winters before against two after/.test(fr) && /Selection: homes that waited may differ/.test(fr), "framing exemplar: the waiting list is a candidate comparison group; the question, metric and falsification compare changes; selection is named");
+    const un = EXS.plain(D.exemplars.find(e => e.comp === "uncertainty").answers[1]), co = EXS.plain(D.exemplars.find(e => e.comp === "communication").answers[1]);
+    ok(/the middle 90% of 1,000 Monte Carlo runs/.test(un) && /\(the same 90%\)/.test(un) && /a 95% confidence interval/.test(co), "the exemplars' ranges say what they are (coverage and construction)"); }
   ok(C({ unc: "tri", family: "qual" })[2].ok && C({ unc: "ci", family: "stat" })[2].ok && C({ unc: "scen", family: "opt" })[2].ok && !C({ unc: "ci", family: "opt" })[2].ok, "triangulation fits qualitative work, intervals statistics, scenarios optimization");
   { const mx = M.noteOf(D, Object.assign({}, d, { track: "mixed", family: "mixed", unc: "tri" }), {}, F, "").sensitivity, mq = M.noteOf(D, Object.assign({}, d, { track: "mixed", family: "mixed", unc: "mc" }), {}, F, "").sensitivity;
     ok(/the numbers need a range too/.test(mx) && /qualitative findings need triangulation too/.test(mq) && !/Mixed study/.test(M.noteOf(D, d, {}, F, "").sensitivity), "a mixed study's proposal names the treatment of its other part"); }
@@ -203,6 +214,13 @@ ok(M.msKey(D) === "Underlined: a stage that ends on a milestone (3, the one-page
   // the other numbers are assumed for the example, and said so
   ok(/its numbers are assumed, not computed/.test(M.exOpts(D, 4).note) && TX.includes("Every number in the weak and strong fragments: assumed for the example, not computed."), "the fragments' numbers are labelled assumed, not computed");
   ok(/we treat a heat wave hotter than any on record as a stress scenario, because we cannot defend a probability for it/.test(EXS.plain(D.exemplars.find(e => e.comp === "uncertainty").answers[1])), "deep uncertainty from the evidence, not the record alone");
+  // the text budget reaches the fragments and their introductions: every line of every fragment, and each element of a
+  // pair's static introduction, at most 35 words
+  { const wc = t => String(t).replace(/<[^>]+>/g, " ").trim().split(/\s+/).filter(Boolean).length, over = [];
+    D.exemplars.forEach(e => e.answers.forEach(a => EXS.plain(a).split("\n").forEach(l => { if (wc(l) > 35) over.push(e.comp + ": " + l.slice(0, 40)); })));
+    const SX = M.staticExemplars(D);
+    (SX.match(/<p class="lx-hint">[\s\S]*?<\/p>/g) || []).forEach(p => { if (wc(p) > 35) over.push("intro: " + p.replace(/<[^>]+>/g, "").slice(0, 40)); });
+    ok(!over.length, "every fragment line and every introduction element within 35 words: " + over.join(" | ")); }
   const pos = EXS.plain(D.exemplars.find(e => e.comp === "positioning").answers[1]);
   ok(/14 studies/.test(pos) && 14 >= 12 && /9 use billing data and 3 compare/.test(pos), "the gap's matrix holds 14 sources, more than the 12 Proficient asks for");
   const weakPos = EXS.marks(D.exemplars.find(e => e.comp === "positioning").answers[0])[0].note;
