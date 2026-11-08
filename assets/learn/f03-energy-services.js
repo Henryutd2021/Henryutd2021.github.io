@@ -1,11 +1,10 @@
-// f03-energy-services.js — F3, "What do people actually want from energy?" (step cards, W3, 2026-11-03).
+// f03-energy-services.js — F3, "What do people actually want from energy?" (step cards).
 //
-// The Sankey (LX.Sankey) was this file's first part; at the W3 integration it moved, unchanged, to the shared
-// components/sankey.js and sankey.css (F3 and F4 use it). This file holds F3's model and view.
+// The Sankey (LX.Sankey) is the shared components/sankey.js and sankey.css (F3 and F4 use it). This file holds F3's model and view.
 (function () {
   "use strict";
 
-  // the Sankey's pure layout (LX.Sankey, components/sankey.js since the W3 integration); kept on the model as before
+  // the Sankey's pure layout (LX.Sankey, components/sankey.js); kept on the model
   var sankey = (typeof window !== "undefined" && window.LX && window.LX.Sankey && window.LX.Sankey.flows) ?
     { layout: window.LX.Sankey.layout, band: window.LX.Sankey.band, flows: window.LX.Sankey.flows } : require("./components/sankey.js");
 

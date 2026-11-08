@@ -1,5 +1,5 @@
 // m10-ml-forecasting.js — Modeler lesson M10, "Forecasting load, wind and solar with machine learning, and judging it
-// honestly" (model-lab in the step-card form, statistical mode, no solver; Learn W4, 2026-11-05).
+// honestly" (model-lab in the step-card form, statistical mode, no solver).
 //
 // Data (real, as reported; no download): the course's hourly 2025 shapes of the Southwest Power Pool (SPP) in
 // assets/learn/data/town_year.json (EIA-930; demand, wind and solar, each in thousandths of its own 2025 maximum; index i
@@ -12,7 +12,7 @@
 // issue hour (its index at most the issue's):
 //   persistence           y(issue): the latest actual, held flat
 //   same hour yesterday   the same clock hour (hour ending) on the day before: 24 hours earlier on most days, 23 or 25
-//                         next to a clock change. Rule (review M10 #3): a clock hour that occurs twice (hour ending 2 on
+//                         next to a clock change. Rule: a clock hour that occurs twice (hour ending 2 on
 //                         2 November) is read as the later one; one that does not exist (hour ending 3 on 9 March) as
 //                         the clock hour before it (hour ending 2). Always on the day before, so known at the issue hour.
 //   same hour last week   the same clock hour seven days earlier, by the same rule
@@ -282,7 +282,7 @@
     };
   }
   // a week chart's text version: every hour's actual and forecasts; with a band, its two edges and whether the actual
-  // falls inside (review M10 #7)
+  // falls inside
   function bandText(P, S, lines, band) {
     var inside = 0, rows = S.map(function (x) {
       var r = [dayLabel(x.date) + ", hour ending " + x.he + ":00", mw(P.d[x.i])].concat(lines.map(function (l) { return mw(l.f(x)); }));
@@ -292,7 +292,7 @@
     return { head: ["Hour", "Actual"].concat(lines.map(function (l) { return l.label; }), band ? ["Band, low", "Band, high", "Inside the band?"] : []), rows: rows,
              note: band ? "Inside the band: " + inside + " of these " + S.length + " hours." : null };
   }
-  // the first chart's text version: every day's mean demand and its period (review M10 #7)
+  // the first chart's text version: every day's mean demand and its period
   function dailyRows(P, D) {
     var S = D.split, per = function (k) { return k >= S.train[0] && k <= S.train[1] ? "train" : k >= S.val[0] && k <= S.val[1] ? "choose" : k >= S.test[0] && k <= S.test[1] ? "test" : k < S.train[0] ? "inputs only (lags)" : "not used"; };
     return Object.keys(P.dayMean).sort().map(function (k) { return [dayLabel(k), mw(P.dayMean[k]), per(k)]; });

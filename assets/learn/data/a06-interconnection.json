@@ -1,5 +1,5 @@
 {
-  "about": "Lesson A6 (a06-interconnection), builder learn-w4-a, 2026-11-05. Data centers appear only as loads. Real numbers carry their source and date in 'facts' and 'sources'. Illustrative: Prairie Town's cluster of four generator requests, the line headroom, the upgrade and its cost, each project's impact factor and the most it would pay, the 150-day length of every restudy round, the east substation's two lines, the east side's peak and the proposed 300 MW data center campus. The money ledger uses case file CF7's toy unchanged (cf7-cost-of-waiting.json, 'idea': a 100 MW load, invented round numbers, not the study's inputs, equations or results); this file adds only the starting wait and the staged-service extension.",
+  "about": "Lesson A6 (a06-interconnection). Data centers appear only as loads. Real numbers carry their source and date in 'facts' and 'sources'. Illustrative: Prairie Town's cluster of four generator requests, the line headroom, the upgrade and its cost, each project's impact factor and the most it would pay, the 150-day length of every restudy round, the east substation's two lines, the east side's peak and the proposed 300 MW data center campus. The money ledger uses case file CF7's toy unchanged (cf7-cost-of-waiting.json, 'idea': a 100 MW load, invented round numbers, not the study's inputs, equations or results); this file adds only the starting wait and the staged-service extension.",
   "built": "2026-11-05",
   "guess": {
     "ticks": ["6 months", "1 year", "2 years", "3 years", "Over 5 years"],
@@ -96,7 +96,7 @@
     {"text": "ERCOT (29 July 2026). ERCOT Update, Senate Committee on Business and Commerce (PDF). Batch study outputs, slide 3; milestones, slides 4–5; large-load requests, slide 6.", "url": "https://www.ercot.com/files/docs/2026/07/29/ERCOT-Senate-July-29-Panel-1-Assessing-The-Grid.pdf", "label": "Slides"},
     {"text": "ERCOT. 2026 all-time and monthly demand records (updated 21 August 2026; values preliminary).", "url": "https://www.ercot.com/static-assets/data/news/content/a-peak-demand/2026/all-time-records.htm", "label": "Records page"},
     {"text": "U.S. Secretary of Energy (2025). Letter to the Federal Energy Regulatory Commission on the interconnection of large loads (PDF). 23 October 2025.", "url": "https://www.energy.gov/sites/default/files/2025-10/403%20Large%20Loads%20Letter.pdf", "label": "Letter"},
-    {"text": "Li et al. (2026). Accepted paper on the cost of delayed grid energization for large loads, 2026 North American Power Symposium (NAPS), presented October 2026; DOI pending.", "url": "", "label": ""},
+    {"text": "Li et al. (2026). Accepted paper on the cost of delayed energization for large loads, 2026 North American Power Symposium (NAPS), presented October 2026; DOI pending.", "url": "", "label": ""},
     {"text": "code-delayed-energization on GitHub, version 1.0.0 (30 October 2026): open code with illustrative inputs.", "url": "https://github.com/Henryutd2021/code-delayed-energization", "label": "Repository"}
   ]
 }

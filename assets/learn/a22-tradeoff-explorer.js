@@ -1,4 +1,4 @@
-// a22-tradeoff-explorer.js — A22, "Cheap, clean, reliable, fair, secure: can you have them all?" (play-first, W2).
+// a22-tradeoff-explorer.js — A22, "Cheap, clean, reliable, fair, secure: can you have them all?" (play-first).
 //
 // Data: assets/learn/data/a22-tradeoff-explorer.json (the five measures with their units, scales and alternative
 // definitions; the household groups from EIA RECS 2020; eight hand-made plans with their precomputed full-year results;
@@ -450,8 +450,8 @@
     S("polygon", { points: axes.map(function (a, i) { return P(i, 0.04 + 0.96 * sc[a.key]); }).join(" "), fill: color, "fill-opacity": 0.22, stroke: color, "stroke-width": 1.6, "stroke-linejoin": "round" }, svg);
   };
 
-  // who decides, who pays, who benefits: LX.Stakeholders (components/stakeholders.js, e-stakeholders; promoted from this
-  // file at the W2 integration)
+  // who decides, who pays, who benefits: LX.Stakeholders (components/stakeholders.js, e-stakeholders; shared
+  // with R9)
 
   // ---------------------------------------------------------------- the play
   LX.mount("tradeoff-explorer", function (live, data, root) {

@@ -403,7 +403,7 @@ window.Quarto = {
 
 
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "name": "Capacity factor: why is 1 MW not always 1 MW? Run three 100 MW plants for a year and count what they make", "description": "Lesson 5 of Energy Systems, Step by Step: compare a year of output from nuclear, wind and solar plants of the same size, compute a capacity factor from 24 hourly outputs, meet the wind's cube law and turn megawatts into megawatt-hours.", "learningResourceType": "Interactive lesson", "educationalLevel": "Beginner", "timeRequired": "PT15M", "inLanguage": "en", "isAccessibleForFree": true, "teaches": ["capacity factor", "power and energy over a year", "the wind power curve and the cube law"], "license": "https://creativecommons.org/licenses/by/4.0/", "author": {"@type": "Person", "name": "Honglin Li", "url": "https://henryutd2021.github.io/"}, "url": "https://henryutd2021.github.io/learn/05-capacity-factor.html", "isPartOf": {"@type": "Course", "name": "Energy Systems, Step by Step", "url": "https://henryutd2021.github.io/learn/"}}</script>
-<script type="application/json" class="lx-lesson-data">{"id":"05-capacity-factor","starter":5,"total":14,"code":null,"title":"Capacity factor: why is 1 MW not always 1 MW?","subtitle":"Run three 100 MW plants for a year and count what they make","short":"Capacity factor","tier":"foundations","tier2":null,"tierLabel":"Foundations · L1","level":"L1","slot":1,"slot2":null,"minutes":15,"does":"A year of output from nuclear, wind and solar plants of equal size; double a light wind's speed and get eight times the power.","outcome":"Turn a plant's size in MW into the energy it makes in a year.","icon":"turbine","form":"cards","scales":[],"teaches":["capacity factor","power and energy over a year","the wind power curve and the cube law"],"lab":"compute capacity factors from a year of hourly data in Python (bridge B2).","href":"05-capacity-factor.html","ready":true,"after":[{"id":"01-power-energy","starter":1,"title":"Power or energy? What is the difference between kW and kWh?","short":"Power or energy?","does":"An appliance board with live power and the energy it adds up, and a ladder of scales from a phone to the whole country.","href":"01-power-energy.html","ready":true}],"prev":{"id":"04-forecasts","starter":4,"title":"Forecasts and surprises: how do you plan for weather you can't see yet?","short":"Forecasts and surprises","does":"Forecast against actual demand and wind, a simple baseline to beat, and a band of possibilities instead of one line.","href":"04-forecasts.html","ready":true},"next":{"id":"06-three-jobs","starter":6,"title":"Cheap energy, firm capacity, flexibility: which plant does which job?","short":"Three jobs","does":"Sort technologies into the jobs they do, with key numbers for each.","href":"06-three-jobs.html","ready":true}}</script>
+<script type="application/json" class="lx-lesson-data">{"id":"05-capacity-factor","starter":5,"total":14,"code":null,"title":"Capacity factor: why is 1 MW not always 1 MW?","subtitle":"Run three 100 MW plants for a year and count what they make","short":"Capacity factor","tier":"foundations","tier2":null,"tierLabel":"Foundations · L1","level":"L1","slot":1,"slot2":null,"minutes":15,"does":"A year of output from nuclear, wind and solar plants of equal size; double a light wind's speed and get eight times the power.","outcome":"Turn a plant's size in MW into the energy it makes in a year.","icon":"turbine","form":"cards","scales":["S0"],"teaches":["capacity factor","power and energy over a year","the wind power curve and the cube law"],"lab":"compute capacity factors from a year of hourly data in Python (bridge B2).","href":"05-capacity-factor.html","ready":true,"after":[{"id":"01-power-energy","starter":1,"title":"Power or energy? What is the difference between kW and kWh?","short":"Power or energy?","does":"An appliance board with live power and the energy it adds up, and a ladder of scales from a phone to the whole country.","href":"01-power-energy.html","ready":true}],"prev":{"id":"04-forecasts","starter":4,"title":"Forecasts and surprises: how do you plan for weather you can't see yet?","short":"Forecasts and surprises","does":"Forecast against actual demand and wind, a simple baseline to beat, and a band of possibilities instead of one line.","href":"04-forecasts.html","ready":true},"next":{"id":"06-three-jobs","starter":6,"title":"Cheap energy, firm capacity, flexibility: which plant does which job?","short":"Three jobs","does":"Sort technologies into the jobs they do, with key numbers for each.","href":"06-three-jobs.html","ready":true}}</script>
 <div class="lx-head" data-lesson-id="05-capacity-factor" data-starter="5" data-total="14" data-tier="foundations" data-level="L1" data-minutes="15" data-form="cards" data-prev-href="04-forecasts.html" data-next-href="06-three-jobs.html">
 <div>
 <nav class="lx-crumbs" aria-label="Breadcrumb"><ol><li><a href="index.html">Learn</a></li><li aria-current="page">Lesson 5</li></ol></nav>
@@ -967,8 +967,8 @@ P(v) = \begin{cases}
 })();
 </script>
 <script>
-// pages.js — publications, projects listing and project pages (third redesign, 2026-10-30).
-// Inlined on every page (scripts/build_site.py writes pages-js.html), so each part is guarded by element presence.
+// pages.js — publications, projects listing and project pages.
+// Inlined on every page (the site build step writes pages-js.html), so each part is guarded by element presence.
 //   1. BIB buttons: show / hide an entry's BibTeX; copy button (Publications, home page, project pages)
 //   2. Publications: search box and type tabs; hides empty year groups; live result count; the pressed type is
 //      highlighted in the publications-per-year chart; #journal, #conference, #preprint or #thesis in the URL
@@ -1124,13 +1124,13 @@ P(v) = \begin{cases}
 // home.js — about/home page (third redesign, 2026-10-30). Guard by element presence.
 </script>
 <script>
-// map.js — "Collaborations around the world" map on the About page (2026-10-30).
-// The section, its legend, the institution list and the data (<script id="cmap-data">) come from scripts/build_map.py
-// (_map.qmd); styles in assets/map.css. Inlined on every page (scripts/build_site.py writes map-js.html), so it does
+// map.js — "Collaborations around the world" map on the About page.
+// The section, its legend, the institution list and the data (<script id="cmap-data">) come from the map build step
+// (_map.qmd); styles in assets/map.css. Inlined on every page (the site build step writes map-js.html), so it does
 // nothing unless #cmap is on the page.
 //   - Lazy: Leaflet 1.9.4 (cdnjs, with SRI) and the tiles load only when the section nears the viewport.
 //   - The basemap follows Quarto's day/night toggle (body.quarto-light / body.quarto-dark): CARTO light_all / dark_all
-//     when #cmap carries data-tiles-key (CARTO basemaps need a free key; set in scripts/build_map.py); otherwise the
+//     when #cmap carries data-tiles-key (CARTO basemaps need a free key, set in the map build step); otherwise the
 //     OpenStreetMap standard tiles, toned grey by day and inverted by night in map.css (.cmap.tiles-osm).
 //   - Scroll-wheel zoom (and one-finger dragging on touch screens) stays off until the map is clicked.
 //   - Keyboard: the map takes focus (arrows pan, +/- zoom); Tab reaches each marker, Enter opens its popup, Esc closes.

@@ -1,11 +1,11 @@
 {
  "about": {
   "line": "Prairie City is fictional; its numbers are illustrative.",
-  "what": "Shared data of Prairie City, Learn's city-and-region scale (S3, wave W5): three districts, household groups, transport, the industrial park, the data-center campus, annual energy flows by sector and carrier, representative days for hourly models, 2025 prices and emission factors. Read by F9, F11, A13, A15, A18, SB3 (engine E3), M12, C3 and CK-A; pages read these numbers and never retype them.",
+  "what": "Shared data of Prairie City, Learn's city-and-region scale (S3): three districts, household groups, transport, the industrial park, the data-center campus, annual energy flows by sector and carrier, representative days for hourly models, 2025 prices and emission factors. Read by F9, F11, A13, A15, A18, SB3 (engine E3), M12, C3 and CK-A; pages read these numbers and never retype them.",
   "fictional": "Prairie City is fictional. It is anchored to the U.S. Plains (Kansas, the Southwest Power Pool), as Prairie Town and the Plains Grid are: its income and household size are close to Wichita's, its weather is Wichita's 1991-2020 normals, its prices are Kansas's (or the Midwest's) 2025 averages, and its hourly shapes are SPP's 2025 grid. Everything else is set for teaching and labelled so in the builder.",
   "dollarYear": 2025,
-  "built": "2026-11-06",
-  "builtBy": "scripts/build_learn_prairie_city.py (ResearchPortfolio repository): python3 scripts/build_learn_prairie_city.py --site <site>; tested by _tests/learn/test_prairie_city.js",
+  "built": "2026-11-07",
+  "builtBy": "Written by the Prairie City data build step (do not edit by hand); tested by _tests/learn/test_prairie_city.js",
   "method": "Bottom-up: homes from dwellings, floor area, envelope vintage and heating fuel (RECS 2020 West North Central end uses; DOE efficiencies), commercial floor area by intensity, vehicles by household, the industrial park and the data-center campus from their sizes. Hourly: eight representative days of 2025 (weights sum to 365), temperatures from NOAA normals (two extreme days set for teaching), heat by degree-hours below 18.3 C, heat-pump COP from lesson F3's curve, the base load spread by SPP's 2025 demand shape, wind and solar per unit of capacity from SPP's 2025 shapes scaled to EIA's 2025 monthly capacity factors. Annual flows close: every node of the Sankey balances.",
   "simplifications": [
    "One substation per district is a teaching simplification; real districts are served by many feeders and several substations.",
@@ -1449,6 +1449,112 @@
   "solar": "MW per MW of solar capacity: the same with EIA's 2025 solar factors (24.0% for the year), method scale, as F7 and E1: LX.townProfile('solar', 1, {year, targets, monthlyCF: true}).",
   "districts": "Per district, MW: base = electricity for everything but space heating and EVs (the district's annual base energy spread over the year by SPP's demand shape); heat = space heat delivered (thermal MW) by the heat model. Electricity for heating = heat x (share.resistance + share.heatPump / COP(T)); EV charging = evMWhPerDay x transport.evProfile.",
   "dataCenterMW": "The data-center campus's facility power, MW, by the hour's temperature."
+ },
+ "fullYear": {
+  "what": "The 8,760 hours of 2025 built by the same rule as the eight representative days, for engine E3's full-year check: its constants and sums only (the hourly series is rebuilt by the rule from town_year.json and cf_targets.json; the check's results are in e3-full-year.json).",
+  "rule": {
+   "days": "Every local day of 2025 (Central time, hours 00 to 23): SPP's 2025 demand, wind and solar from local midnight, as the eight days take theirs, so the eight days are days of this year, unchanged. On 9 March one hour repeats and on 2 November one is left out (the clock changes).",
+   "temp": "The same daily cosine, from each day's own month's NOAA 1991-2020 normal minimum and maximum (a typical day takes its months' average). The days the two extreme days stand for take their temperatures set for teaching: the 3 days of December to February and the 10 days of July and August with SPP's highest 2025 hourly demand (designDays, heatWaveDays).",
+   "base": "Each district's annual base energy spread over the year's hours by SPP's demand shape: base = baseMWPerShape x demand, so the year keeps the annual base energy, as the eight days' weights do.",
+   "heat": "heat = uaMWperC x max(0, 18.3 - T), with uaMWperC fitted so the year's hours give the district's annual heat need, as the eight days' fit does for them.",
+   "windSolar": "Per MW, LX.townProfile's hours (EIA's 2025 capacity factors for the year). The eight days carry their own days' output, not scaled to the year (windCF, solarCF). Rooftop solar is scaled to its 17.6% capacity factor on either time set.",
+   "campus": "The campus's power = IT x PUE(T) each hour, as on the eight days; EV charging the same every day.",
+   "rounding": "Temperature to 0.1 C, base and heat to 0.1 MW, wind and solar per MW to 0.001, as the eight days are stored.",
+   "weather": "The year's weather is the same synthetic rule as the eight days': the check tests the choice and weighting of the days, not another weather year."
+  },
+  "designDays": [
+   "2025-01-21",
+   "2025-02-19",
+   "2025-02-20"
+  ],
+  "heatWaveDays": [
+   "2025-07-22",
+   "2025-07-23",
+   "2025-07-28",
+   "2025-07-29",
+   "2025-08-07",
+   "2025-08-08",
+   "2025-08-15",
+   "2025-08-16",
+   "2025-08-18",
+   "2025-08-19"
+  ],
+  "degreeHours": 59479.1,
+  "degreeHoursDays": 58372.2,
+  "hdd": 4308.9,
+  "hddDays": 4123.4,
+  "hddNoaa": 4413.6,
+  "shapeSum": 5486952,
+  "shapeSumDays": 5546002,
+  "windCF": {
+   "year": 0.338,
+   "days": 0.3116
+  },
+  "solarCF": {
+   "year": 0.24,
+   "days": 0.2587
+  },
+  "dataCenterMWh": {
+   "year": 1075865.0,
+   "days": 1075444.0
+  },
+  "districts": [
+   {
+    "key": "core",
+    "uaMWperC": 10.688643,
+    "baseMWPerShape": 0.14555051,
+    "heatMWh": 635766.0,
+    "heatNeedMWh": 635751.0,
+    "baseMWh": 798628.0,
+    "baseNeedMWh": 798629.0,
+    "heatingElectricityMWh": 141173.0,
+    "heatingElectricityDaysMWh": 141115.0,
+    "peak2025MW": 215.5,
+    "peakAt": {
+     "date": "2025-02-20",
+     "hour": 6
+    },
+    "peak2025DaysMW": 212.8,
+    "hoursOverLimit2025": 0
+   },
+   {
+    "key": "suburbs",
+    "uaMWperC": 11.979122,
+    "baseMWPerShape": 0.14247996,
+    "heatMWh": 712513.0,
+    "heatNeedMWh": 712507.0,
+    "baseMWh": 781781.0,
+    "baseNeedMWh": 781781.0,
+    "heatingElectricityMWh": 104618.0,
+    "heatingElectricityDaysMWh": 104528.0,
+    "peak2025MW": 195.0,
+    "peakAt": {
+     "date": "2025-02-20",
+     "hour": 6
+    },
+    "peak2025DaysMW": 192.4,
+    "hoursOverLimit2025": 0
+   },
+   {
+    "key": "fringe",
+    "uaMWperC": 2.794993,
+    "baseMWPerShape": 0.03226299,
+    "heatMWh": 166253.0,
+    "heatNeedMWh": 166244.0,
+    "baseMWh": 177030.0,
+    "baseNeedMWh": 177025.0,
+    "heatingElectricityMWh": 31061.0,
+    "heatingElectricityDaysMWh": 31037.0,
+    "peak2025MW": 48.7,
+    "peakAt": {
+     "date": "2025-02-20",
+     "hour": 6
+    },
+    "peak2025DaysMW": 48.0,
+    "hoursOverLimit2025": 0
+   }
+  ],
+  "note": "Sums at 2025's buildings and cars. The year keeps each district's annual base energy and heat need (by construction); what moves is when they fall: the year has more degree-hours than the weighted eight days (April's, May's and October's warm afternoons are above the balance point; their months' averages are not), so its UA, and each cold hour's heat, is lower. peak2025MW is the 2025 load's busiest hour in the year, peak2025DaysMW on the eight days."
  },
  "sources": {
   "census-quickfacts": {

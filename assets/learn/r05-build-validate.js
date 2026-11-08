@@ -1,5 +1,5 @@
 // r05-build-validate.js — Research studio R5, "Can you trust your analysis? Verification, validation and
-// reproducibility" (studio form, Learn W2, 2026-11-03).
+// reproducibility" (studio form).
 //
 // The study under test: "How much would a 50 MW, 200 MWh battery have saved Prairie Town on Wednesday 20 August 2025?"
 // One day of dispatch with a battery, as a linear program: Prairie Town's five plants (lesson 0's fleet and costs), a

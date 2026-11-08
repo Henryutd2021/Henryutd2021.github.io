@@ -1,5 +1,5 @@
 // f09-city-energy.js — Lesson F9, "What does a city run on, and who controls what?" (step cards, Foundations, D1, no
-// model; wave W5, builder learn-w5-a, 2026-11-06). The data-center campus appears only as a load.
+// model). The data-center campus appears only as a load.
 //
 // Data: data/prairie-city.json (Prairie City's 2025 flows in GWh: flows, balance, supply; read, never retyped),
 // data/f09-city-energy.json (how sectors group, colours, who typically decides what, each with a dated primary source,

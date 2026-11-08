@@ -1,4 +1,4 @@
-// grid-operator.js — Lesson 0, "Be the grid operator for a day" (play-first form, 2026-11-02).
+// grid-operator.js — Lesson 0, "Be the grid operator for a day" (play-first form).
 //
 // Data: assets/learn/data/town.json (Prairie Town's fleet and the lesson's scenario; illustrative) and
 // assets/learn/data/town_year.json (every hour of 2025 on the Southwest Power Pool grid, from EIA-930, as shapes).

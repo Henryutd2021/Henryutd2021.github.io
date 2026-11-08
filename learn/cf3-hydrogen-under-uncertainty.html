@@ -375,7 +375,7 @@ ul.task-list li input[type="checkbox"] {
 
 
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "name": "Where should hydrogen go when nobody knows how much wind will be built? Why a hydrogen plan sized for one forecast can cost too much in the others, and how a plan that weighs every build-out differs", "description": "Case file CF3 of Energy Systems, Step by Step: why a hydrogen plan sized for one forecast can cost too much in the others, and how a plan that weighs every build-out differs.", "learningResourceType": "Case study", "educationalLevel": "Intermediate", "timeRequired": "PT10M", "inLanguage": "en", "isAccessibleForFree": true, "teaches": ["sizing before uncertainty resolves", "scenarios with chances", "reading a published stochastic planning model"], "license": "https://creativecommons.org/licenses/by/4.0/", "author": {"@type": "Person", "name": "Honglin Li", "url": "https://henryutd2021.github.io/"}, "url": "https://henryutd2021.github.io/learn/cf3-hydrogen-under-uncertainty.html", "isPartOf": {"@type": "Course", "name": "Energy Systems, Step by Step", "url": "https://henryutd2021.github.io/learn/"}}</script>
-<script type="application/json" class="lx-lesson-data">{"id":"cf3-hydrogen-under-uncertainty","starter":null,"total":14,"code":"CF3","title":"Where should hydrogen go when nobody knows how much wind will be built?","subtitle":"Why a hydrogen plan sized for one forecast can cost too much in the others, and how a plan that weighs every build-out differs","short":"Hydrogen under uncertain wind","tier":"analyst","tier2":null,"tierLabel":"Analyst · L2","level":"L2","slot":2,"slot2":null,"minutes":10,"does":"A case file in six parts and a timeline; then size an electrolyzer before the wind is built and compare the plan for the average, the hedged plan and the worst-case plan in three build-outs.","outcome":"Say how a two-stage stochastic program sizes equipment before renewable build-out is known, and why its plan differs from a plan for the average future.","icon":"map","form":"case","scales":[],"teaches":["sizing before uncertainty resolves","scenarios with chances","reading a published stochastic planning model"],"lab":null,"href":"cf3-hydrogen-under-uncertainty.html","ready":true,"after":[{"id":"12-trade-offs","starter":12,"title":"Cheap or clean? How do you weigh cost against emissions?","short":"Cheap or clean?","does":"Spot the plans nobody should pick, slide a carbon price, and trace the frontier between cost and CO₂.","href":"12-trade-offs.html","ready":true}],"prev":null,"next":null}</script>
+<script type="application/json" class="lx-lesson-data">{"id":"cf3-hydrogen-under-uncertainty","starter":null,"total":14,"code":"CF3","title":"Where should hydrogen go when nobody knows how much wind will be built?","subtitle":"Why a hydrogen plan sized for one forecast can cost too much in the others, and how a plan that weighs every build-out differs","short":"Hydrogen under uncertain wind","tier":"analyst","tier2":null,"tierLabel":"Analyst · L2","level":"L2","slot":2,"slot2":null,"minutes":10,"does":"A case file in six parts and a timeline; then size an electrolyzer before the wind is built and compare the plan for the average, the hedged plan and the worst-case plan in three build-outs.","outcome":"Say how a two-stage stochastic program sizes equipment before renewable build-out is known, and why its plan differs from a plan for the average future.","icon":"map","form":"case","scales":["S2"],"teaches":["sizing before uncertainty resolves","scenarios with chances","reading a published stochastic planning model"],"lab":null,"href":"cf3-hydrogen-under-uncertainty.html","ready":true,"after":[{"id":"12-trade-offs","starter":12,"title":"Cheap or clean? How do you weigh cost against emissions?","short":"Cheap or clean?","does":"Spot the plans nobody should pick, slide a carbon price, and trace the frontier between cost and CO₂.","href":"12-trade-offs.html","ready":true}],"prev":null,"next":null}</script>
 <div class="lx-head" data-lesson-id="cf3-hydrogen-under-uncertainty" data-total="14" data-tier="analyst" data-level="L2" data-minutes="10" data-form="case">
 <div>
 <nav class="lx-crumbs" aria-label="Breadcrumb"><ol><li><a href="index.html">Learn</a></li><li aria-current="page">CF3</li></ol></nav>
@@ -663,8 +663,8 @@ ul.task-list li input[type="checkbox"] {
 })();
 </script>
 <script>
-// pages.js — publications, projects listing and project pages (third redesign, 2026-10-30).
-// Inlined on every page (scripts/build_site.py writes pages-js.html), so each part is guarded by element presence.
+// pages.js — publications, projects listing and project pages.
+// Inlined on every page (the site build step writes pages-js.html), so each part is guarded by element presence.
 //   1. BIB buttons: show / hide an entry's BibTeX; copy button (Publications, home page, project pages)
 //   2. Publications: search box and type tabs; hides empty year groups; live result count; the pressed type is
 //      highlighted in the publications-per-year chart; #journal, #conference, #preprint or #thesis in the URL
@@ -820,13 +820,13 @@ ul.task-list li input[type="checkbox"] {
 // home.js — about/home page (third redesign, 2026-10-30). Guard by element presence.
 </script>
 <script>
-// map.js — "Collaborations around the world" map on the About page (2026-10-30).
-// The section, its legend, the institution list and the data (<script id="cmap-data">) come from scripts/build_map.py
-// (_map.qmd); styles in assets/map.css. Inlined on every page (scripts/build_site.py writes map-js.html), so it does
+// map.js — "Collaborations around the world" map on the About page.
+// The section, its legend, the institution list and the data (<script id="cmap-data">) come from the map build step
+// (_map.qmd); styles in assets/map.css. Inlined on every page (the site build step writes map-js.html), so it does
 // nothing unless #cmap is on the page.
 //   - Lazy: Leaflet 1.9.4 (cdnjs, with SRI) and the tiles load only when the section nears the viewport.
 //   - The basemap follows Quarto's day/night toggle (body.quarto-light / body.quarto-dark): CARTO light_all / dark_all
-//     when #cmap carries data-tiles-key (CARTO basemaps need a free key; set in scripts/build_map.py); otherwise the
+//     when #cmap carries data-tiles-key (CARTO basemaps need a free key, set in the map build step); otherwise the
 //     OpenStreetMap standard tiles, toned grey by day and inverted by night in map.css (.cmap.tiles-osm).
 //   - Scroll-wheel zoom (and one-finger dragging on touch screens) stays off until the map is clicked.
 //   - Keyboard: the map takes focus (arrows pan, +/- zoom); Tab reaches each marker, Enter opens its popup, Esc closes.

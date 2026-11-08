@@ -1,4 +1,4 @@
-// m02-unit-commitment.js — M2, "On or off? Unit commitment as a mixed-integer program" (model lab, wave W2, 2026-11-03).
+// m02-unit-commitment.js — M2, "On or off? Unit commitment as a mixed-integer program" (model lab).
 //
 // Data: assets/learn/data/m02-unit-commitment.json: 29 July 2025, the 2025 summer day with the highest hourly demand on the
 // Southwest Power Pool grid (EIA-930 shapes from town_days.json), scaled to Prairie Town exactly as lesson 0 scales its
@@ -35,7 +35,7 @@
 // is an expectation its assert cells check, not a guarantee across solver versions (tolerances differ).
 //
 // Every number the page states is produced by this model and checked by _tests/learn/test_m02-unit-commitment.js.
-// Lesson-local components (candidates to promote): SwitchBoard (on/off switches of several units over 24 hours, with
+// Lesson-local components (used by this page only): SwitchBoard (on/off switches of several units over 24 hours, with
 // fractional switches marked), TreeView (a branch-and-bound tree that grows node by node), and the pure Tree engine.
 (function () {
   "use strict";

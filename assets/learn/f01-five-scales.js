@@ -1,6 +1,6 @@
-// f01-five-scales.js — F1, "Who decides what, from a light switch to a nation?" (step cards, W2, 2026-11-03).
+// f01-five-scales.js — F1, "Who decides what, from a light switch to a nation?" (step cards).
 //
-// Data: assets/learn/data/f01-five-scales.json (the five scales after curriculum v2 §5.3, the card rounds, the predict and
+// Data: assets/learn/data/f01-five-scales.json (the five scales, each by its decisions, authority, physics, inputs and outputs, the card rounds, the predict and
 // apply questions, the lessons per scale), 01-power-energy.json (a U.S. home's year and the Lower 48 record hour, with
 // sources), town_days.json (the Southwest Power Pool's 2025 statistics, EIA-930) and town.json (Prairie Town's peak and
 // wind farm, illustrative).
@@ -16,7 +16,7 @@
 // A scale is set apart by who decides what, not by size or by land: a city and a grid region can overlap on the map, but
 // their boundaries and decisions differ. The scales are overlapping views, not levels of authority.
 //
-// Lesson-local component (a candidate for promotion): ScaleZoom (the powers-of-ten zoom through five drawn scenes,
+// Lesson-local component (used by this page only): ScaleZoom (the powers-of-ten zoom through five drawn scenes,
 // keyboard rail, text version). Shared components: LX.StepCards, LX.Predict, LX.CardSort ("cards" mode), LX.CompareTable,
 // LX.ScaleStrip (e-scale-strip: the five scales with the reader's sorts, signals passed down and needs passed up, and the
 // lessons per scale, linked when live by data/path.json). The five scale colours are the shared --lx-scale-0 ... 4.

@@ -1,4 +1,4 @@
-// k01-units.js — Toolbox K1, "Units and orders of magnitude" (step cards, Learn W2, 2026-11-03).
+// k01-units.js — Toolbox K1, "Units and orders of magnitude" (step cards).
 //
 // Just-in-time math for lesson 1 (power against energy, kWh), lesson 5 (MW held for the hours of a year) and lesson 7
 // ($ per kW against $ per MWh). Six step cards, an explain layer and a practice drill.

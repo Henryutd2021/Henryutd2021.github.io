@@ -1,4 +1,4 @@
-// wind-hydrogen.js — interactive explainer on the co-located wind–hydrogen project page (website v2, 2026-11-02).
+// wind-hydrogen.js — interactive explainer on the co-located wind–hydrogen project page.
 // Mechanism (the paper in J. Mech. Des. 146(2):020903, 2024, §3.2.1 and Fig. 7): a higher hydrogen selling price makes
 // the optimizer install a larger electrolyzer; its utilization falls, so the levelized cost of hydrogen (LCOH) rises
 // while the system's net cost falls. LCOH alone can therefore point to the wrong design.

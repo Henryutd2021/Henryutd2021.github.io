@@ -1,4 +1,4 @@
-// k03-discounting.js — Toolbox K3, "Exponentials and discounting" (step cards, Learn W2, 2026-11-03).
+// k03-discounting.js — Toolbox K3, "Exponentials and discounting" (step cards).
 //
 // Just-in-time math for lesson 7 (discounting, the capital recovery factor, LCOE) and for the yearly ("annualised") plant
 // costs of lessons 12 and 13. Six step cards, an explain layer and a practice drill.

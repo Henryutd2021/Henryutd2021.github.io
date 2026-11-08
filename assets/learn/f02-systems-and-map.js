@@ -1,5 +1,5 @@
 // f02-systems-and-map.js — F2, "How does everything connect? Stocks, flows, feedback and the whole-system map"
-// (play-first form, W2, 2026-11-03).
+// (play-first form).
 //
 // Data: assets/learn/data/f02-systems-and-map.json (the three stock-and-flow presets, the two causal-loop diagrams, the
 // whole-system map with four levers, and the sourced real-world numbers). Everything in the presets is illustrative.
@@ -28,7 +28,7 @@
 //                        A wave is a step in tracing causes; its label says roughly when it plays out. A node's details
 //                        show only the waves the reader has opened.
 //
-// Lesson-local components (candidates for promotion): StockFlow (i-stockflow: tub, flow and stock charts, a time
+// Lesson-local components (used by this page only): StockFlow (i-stockflow: tub, flow and stock charts, a time
 // scrubber), LoopBuilder (i-cld: sign the links, polarity check, name the loops; a static mode for e-loop) and
 // RippleMap (i-ripple: lanes by dimension, levers, waves, edges drawn between the cards, hubs).
 // Shared components: LX.Missions, LX.Notes, LX.Slider, LX.Predict, LX.Plot, LX.ConceptMap, LX.CompareTable.

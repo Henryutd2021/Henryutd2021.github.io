@@ -1,13 +1,13 @@
 // m14-did-it-work.js — Modeler lesson M14, "Did it work? Learning from data with regression and natural experiments"
-// (model-lab in the step-card form, statistical mode, no solver; Learn W5, 2026-11-06).
+// (model-lab in the step-card form, statistical mode, no solver).
 //
-// Every dataset here is SIMULATED, with a known true effect (curriculum §4 W5 brief: empirical methods), so the reader
+// Every dataset here is SIMULATED, with a known true effect (a lesson on empirical methods), so the reader
 // sees when an estimator recovers the truth and when confounding, selection, spillovers or anticipation move it away.
 // Settings: assets/learn/data/m14-did-it-work.json. No download, no real household or region.
 //
 // The generator: LX.mulberry32 (core.js) with the seed in the settings, one stream per panel, draws in a fixed order;
 // an approximately normal draw is the sum of 12 uniform draws minus 6 (Irwin-Hall: mean 0, standard deviation 1). Only
-// + - x / are used, so the notebook's Python port (scripts/build_learn_m14_notebook.py) gives the same panel exactly.
+// + - x / are used, so the notebook's Python port (written by its notebook build step) gives the same panel exactly.
 //
 // Panel 1, a time-of-use (TOU) tariff: 400 homes, 24 months, the tariff from month 13 for homes that opt in. For home i,
 // in order of draws: air conditioning ac (uniform < 0.6), size s (thousand sq ft, uniform 1 to 3), engagement e (normal,
@@ -427,7 +427,7 @@
           host.innerHTML = "";
           LX.Plot(host, { text: "Text version of the chart" }).render(regionEvent(R, X, "Event study for the regions: each year's change in the adopter–other gap against 2020, with about-95% intervals.", R.effect));
           out.innerHTML = "DiD <b>" + mwy(X.did.est) + "</b> per adopting region (" + band(X.did, mwy) + "); truth +10.0.";
-          // the border case's accounting: the moved projects are inside the adopters' gross gain (review #2)
+          // the border case's accounting: the moved projects are inside the adopters' gross gain
           if (k === "border") table(tb, ["Border case, all regions", "MW a year"], [
             ["Claimed by DiD: " + X.nOn + " regions × " + sgn(X.did.est, 1), String(Math.round(B.claimed))],
             ["Gross gain in the " + X.nOn + " adopting regions (" + X.nOn + " × " + R.effect + ")", String(Math.round(B.gross))],
@@ -496,7 +496,7 @@
         d: { t: "Who is compared with whom?", tN: ["Who against", "whom?"] },
         rnd: { t: "Assigned at random?", tN: ["Assigned at", "random?"], k: "q" },
         did: { t: "Two groups, before and after", tN: ["Before and", "after"], s: "DiD", sN: "DiD" },
-        pt: { t: "Earlier trends support it?", tN: ["Earlier trends", "support it?"], k: "q" },   // a diagnostic, not a certificate (review #3)
+        pt: { t: "Earlier trends support it?", tN: ["Earlier trends", "support it?"], k: "q" },   // a diagnostic, not a certificate
         stop: { t: "Find a better comparison", tN: ["Find a better", "comparison"], k: "end" },
         thr: { t: "List the threats", tN: ["List the", "threats"], s: "four kinds (step 10)", sN: "four kinds" },   // the long list overflowed the box
         rep: { t: "Report effect, interval, for whom", tN: ["Effect, interval,", "for whom"], k: "end" }

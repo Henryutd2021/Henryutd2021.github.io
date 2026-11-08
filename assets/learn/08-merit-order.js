@@ -1,4 +1,4 @@
-// 08-merit-order.js — Lesson 8, "Who runs, and what sets the price?" (step cards, Analyst tier; W1, 2026-11-02).
+// 08-merit-order.js — Lesson 8, "Who runs, and what sets the price?" (step cards, Analyst tier).
 //
 // Data: assets/learn/data/08-merit-order.json (the hour, gas-price settings, heat rates, the illustrative credit and
 // inflexible offer, sources), assets/learn/data/town.json (Prairie Town's fleet) and town_year.json (real 2025 SPP shapes).
@@ -302,7 +302,7 @@
   }
 
   // ---------------------------------------------------------------- the optional solver check (Go deeper · Modeler)
-  // A next-tier preview (curriculum §4.6): the same hour handed to HiGHS; the core path stays closed form.
+  // A next-tier preview (optional, not a required step): the same hour handed to HiGHS; the core path stays closed form.
   function solverCheck(D, town, h) {
     var host = document.getElementById("merit-solver"); if (!host) return;
     host.innerHTML = "";

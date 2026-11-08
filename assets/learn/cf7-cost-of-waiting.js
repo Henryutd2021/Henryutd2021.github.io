@@ -1,10 +1,10 @@
-// cf7-cost-of-waiting.js — Case file CF7, "What does waiting for the grid cost, and who pays?" (case form, wave W2,
-// 2026-11-03). Delay economics only; data centers appear only as loads.
+// cf7-cost-of-waiting.js — Case file CF7, "What does waiting for the grid cost, and who pays?" (case form).
+// Delay economics only; data centers appear only as loads.
 //
 // Data: assets/learn/data/cf7-cost-of-waiting.json: the question's dated steps (LX.Timeline: two public events with
 // their primary sources, then the study), where the study's result holds (LX.Boundary), the illustrative toy ("idea")
 // and the numbers to remember. The research text in the data file is approved excerpt wording
-// (reports/learn/excerpts_for_approval.md, E7, and its revisions); this script adds none of its own.
+// (E7, with its revisions); this script adds none of its own.
 //
 // The idea (illustrative; invented round numbers, not the study's inputs, equations or results): a P MW load waits tau
 // months for its grid connection. Money is discounted monthly at i = (1 + r)^(1/12) - 1; a cost c every month of the

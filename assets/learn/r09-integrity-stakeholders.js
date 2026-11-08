@@ -1,5 +1,5 @@
 // r09-integrity-stakeholders.js — Research studio R9, "Research integrity, and working with the people your study is
-// about" (W2, 2026-11-03).
+// about".
 //
 // Data: assets/learn/data/r09-integrity-stakeholders.json — the five norms and ten practices for the sort, six fictional
 // dilemmas set around Prairie Town (each with three options, a verdict, the norm and its primary source and section),
@@ -142,7 +142,7 @@
     H("div", { class: "lx-saw" + (kind === "good" ? "" : " no"), html: LX.icon(kind === "good" ? "check" : "question") + "<div>" + html + "</div>" }, host);
   }
   // the stakeholder map: three rings, a chip per group; a chip opens what the group is owed and the dilemmas it appears in
-  // (LX.StakeholderMap, components/stakeholders.js; promoted from this file at the W2 integration; mapRings above)
+  // (LX.StakeholderMap, components/stakeholders.js, shared with A22; mapRings above)
 
   function view(live, data, root) {
     var D = data.r09_integrity_stakeholders, picks = LX.store.get("r9-picks", {}) || {};

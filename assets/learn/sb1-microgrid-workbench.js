@@ -1,4 +1,4 @@
-// sb1-microgrid-workbench.js — SB1, "Microgrid Workbench" (sandbox, wave W3, 2026-11-03), on engine E1
+// sb1-microgrid-workbench.js — SB1, "Microgrid Workbench" (sandbox), on engine E1
 // (assets/learn/components/engine-e1.js, LX.E1, in the bundle; data assets/learn/data/e1-prairie-campus.json).
 //
 // The page: the brief (static), the bench (E1.Bench: the one-line diagram with each load's priority, the sizes, the
@@ -51,7 +51,7 @@
     var T = LX.BenchRun(tRow, { label: "Run the " + P.seeded.length + " outages", state: function () { return B.plan(); }, partial: true, results: [tRes], stale: tStale, busy: tStop.busy,
       solve: function (st, ctx) { return E1.solve(st, P, { task: "run", scenarios: P.seeded, signal: ctx.signal, attempt: ctx.attempt }); },
       render: function (R) { drawSeeded(R); } });
-    tStop.attach(T);   // a Stop button while the ten outages run (W3 review SB1 9)
+    tStop.attach(T);   // a Stop button while the ten outages run
     function drawSeeded(R) {
       tRes.innerHTML = "";
       var w = seededWords(R);

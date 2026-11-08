@@ -1,4 +1,4 @@
-// k02-rates-efficiencies.js — Toolbox K2, "Rates and efficiencies" (step cards, Learn W2, 2026-11-03).
+// k02-rates-efficiencies.js — Toolbox K2, "Rates and efficiencies" (step cards).
 //
 // Just-in-time math for lesson 1 (the average power a home buys from the grid), lesson 5 (capacity factor), lesson 7 (fuel cost per MWh from a
 // heat rate) and lessons 9 and 13 (a battery's round trip). Five step cards, an explain layer and a practice drill.

@@ -1,5 +1,5 @@
 // m13-national-pathway.js — M13, "Build a nation's pathway: a multi-region, multi-decade model" (Modeler, model-lab in
-// the cards form, wave W6, 2026-11-07), on engine E4 (assets/learn/components/engine-e4.js, LX.E4, in the bundle; the
+// the cards form), on engine E4 (assets/learn/components/engine-e4.js, LX.E4, in the bundle; the
 // Pathway Explorer SB4 and capstone C4 run the same model). Data: prairieland.json, e4-pathways.json, e4-library.json.
 //
 // Steps: predict whether a straight line to zero is in reach; vintages and residual value; the twelve slices and their
@@ -31,7 +31,7 @@
       (v.residual > 0.0005 ? "; the other " + (v.life - v.years) + " are its residual value, " + pct(v.residual) + " of its payments' present value." : ": its whole life fits before 2050, so no residual value.");
   }
   // the budget's value as a price in each model year's own 2025 dollars, from the LP's coefficients: the budget row counts
-  // that year's CO2 w_p times, the goal its yearly costs D_p times (M13 review: never the endpoint formula)
+  // that year's CO2 w_p times, the goal its yearly costs D_p times (never the endpoint formula)
   function carbonPath(dual, w, D) { return w.map(function (x, p) { return dual == null ? null : dual * x / D[p]; }); }
   // the same tonne in a model of every year, each counted once: Hotelling's rule, rising at the discount rate (for comparison)
   function hotelling(dual, rate, Y) { return Y.map(function (y) { return dual == null ? null : dual * Math.pow(1 + rate, y - 2025); }); }
@@ -242,7 +242,7 @@
         } }];
     var cards = LX.StepCards(live, { steps: steps });
 
-    // ---- explain: the equation card, the flowchart of a run (M13 review: it was missing), a comparison
+    // ---- explain: the equation card, the flowchart of a run, a comparison
     var x = document.getElementById("m13-explain");
     function refresh() {
       x.innerHTML = "";

@@ -1,8 +1,8 @@
 // a12-policy-instruments.js — Analyst lesson A12, "How do governments steer energy? Taxes, credits, standards and carbon
-// prices" (step cards with a linear program), wave W4, builder learn-w4-c, 2026-11-05.
+// prices" (step cards with a linear program).
 //
 // The model is the Plains Grid's planning LP in assets/learn/components/plainsplan.js (window.LX.plainsPlan, in the
-// learn.js bundle since the W4 integration; Node: require). Data: a10-emissions-questions.json (the existing fleet),
+// learn.js bundle; Node: require). Data: a10-emissions-questions.json (the existing fleet),
 // m06-carbon-in-models.json (what may be built, its costs in 2025 dollars, the representative days, the tie rule),
 // a12-policy-instruments.json (the four instruments, a real rule of each kind, the reference block), town_year.json,
 // cf_targets.json and path.json (the last step names case file CF4 through LX.lessonRefHTML).
@@ -22,7 +22,7 @@
 // tonnes avoided), what is built, wind and sun used and curtailed, the money that changes hands. The test proves that each
 // is the same for every best plan of the LP at every slider setting (minimum and maximum over the optimal face), and that
 // the certificate price is unique (both one-sided changes of the cost agree).
-// Guard (curriculum §20.2, G-POL): instruments act on wind, solar, storage and gas only; the page never searches for a
+// Scope rule: instruments act on wind, solar, storage and gas only; the page never searches for a
 // level of any instrument; the reader sets each level on a fixed slider.
 (function () {
   "use strict";

@@ -1,6 +1,6 @@
 {
  "about": {
-  "what": "Engine E4's own settings (wave W6, builder learn-w6-h, 2026-11-07): what the national pathway model adds to prairieland.json, which it reads and never retypes. The plan's levers and their ranges, the operating settings of the existing fleet, the penalty costs that keep every run solvable, the tie rule, the presets, capstone C4's accounting inputs and the precomputed default runs (written by the SB4, M13 and C4 tests' --write). Read by SB4 (learn/sb4-pathway-explorer.qmd), M13 (learn/m13-national-pathway.qmd) and C4 (learn/c4-prairieland-2050.qmd).",
+  "what": "Engine E4's own settings: what the national pathway model adds to prairieland.json, which it reads and never retypes. The plan's levers and their ranges, the operating settings of the existing fleet, the penalty costs that keep every run solvable, the tie rule, the presets, capstone C4's accounting inputs and the precomputed default runs (written by the SB4, M13 and C4 tests' --write). Read by SB4 (learn/sb4-pathway-explorer.qmd), M13 (learn/m13-national-pathway.qmd) and C4 (learn/c4-prairieland-2050.qmd).",
   "line": "Prairieland is fictional; its numbers are illustrative.",
   "built": "2026-11-07",
   "dollarYear": 2025
@@ -53,7 +53,7 @@
   "flowPerMWh": 0.05,
   "batteryPerMWh": 0.5,
   "importPremiumPerGJ": 0.01,
-  "what": "The tie rule (W2 review finding 2): $0.05 per MWh carried on any link, $0.50 per MWh out of a battery, $0.01 per GJ more for imported crude than domestic crude; left out of every reported cost."
+  "what": "The tie rule (so that every reported number has one value): $0.05 per MWh carried on any link, $0.50 per MWh out of a battery, $0.01 per GJ more for imported crude than domestic crude; left out of every reported cost."
  },
  "levers": {
   "electrification": {

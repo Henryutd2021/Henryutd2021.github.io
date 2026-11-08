@@ -1,5 +1,5 @@
 /* r07-cost-carbon-properly.js — research studio R7, "Cost and carbon done properly: one boundary, a fair baseline, a
-   stated counterfactual" (curriculum v2 §11; W5, builder learn-w5-c, 2026-11-06).
+   stated counterfactual".
    Data: assets/learn/data/r07-cost-carbon-properly.json (a fictional study of electric buses in a fictional city, its
    illustrative inputs in 2025 dollars, the four flaws, the exemplars, the evidence ladder, the rubric line and the
    checklist; two real dated numbers: diesel's 10.19 kg CO2 per gallon and the U.S. grid's 1.53 billion tonnes of CO2 over
@@ -20,14 +20,14 @@
      accounting: the system's real change needs a consequential analysis, A10); cost per attributed tonne = −saving / cut
      (only when electric costs more). Society's view: the credit moves money from the state to the agency, so it leaves
      out the credit altogether. Every fix is independent of the others' order: the test runs all 16 combinations. The
-     waterfall is built from the fixes that are on (review 2026-11-06).
+     waterfall is built from the fixes that are on.
    Task (step cards): read the study; find the boundary mismatch; state the counterfactual; add the grid costs; count the
    credit once; watch the conclusion change (waterfall on LX.Plot, each fix on or off, the grid factor); write the audit
    note (form-only checks, then the strong exemplar). Exemplars: LX.Exemplars, the who-pays ledger (LX.Ledger, i-ledger),
    where the conclusion holds (LX.Boundary, e-boundary) and the evidence ladder (LX.EvidenceLadder). Self-check:
    LX.Rubric (accounting, realism) and LX.Checklist (e-checklist).
    Node: module.exports = the pure model; _tests/learn/test_r07-cost-carbon-properly.js checks it and writes the no-JS
-   blocks. Guard G-SRC: the study is not the course author's, and resembles none of his studies in its technology or its story. */
+   blocks. Sourcing rule: the study is not the course author's, and resembles none of his studies in its technology or its story. */
 (function () {
   "use strict";
   var FIX = ["boundary", "baseline", "grid", "credit"];
@@ -101,7 +101,7 @@
     return which === "depot" ? "**Depot connection:** " + money(r.e.depotUpfront) + " up front, " + usd(r.e.depot) + " a year as an annual equivalent. The demand charges are still missing."
       : "**Demand charges:** " + usd(r.e.demand) + " a year. The depot connection is still missing."; }
   function lineVerdict(D, F, gid) { return "**Now:** " + verdict(run(D, F, gid)); }
-  // the study's inputs, its fleet plan and two numbers worked from them (review finding 3); the units key (finding 8)
+  // the study's inputs, its fleet plan and two numbers worked from them; the units key
   function inputRows(D) {
     var E = D.inputs.electric, G = D.inputs.diesel, C = D.inputs.credit;
     return [["Price per bus", usd(E.price) + " + " + usd(E.charger) + " charger", usd(G.price)],

@@ -1,5 +1,5 @@
-// f08-large-loads.js — Lesson F8, "What happens when a data center moves to town?" (step cards, Foundations, D1;
-// wave W4, 2026-11-05). A data center appears only as a load.
+// f08-large-loads.js — Lesson F8, "What happens when a data center moves to town?" (step cards, Foundations, D1).
+// A data center appears only as a load.
 //
 // Data: assets/learn/data/f08-large-loads.json (the campus, the sliders' ranges, the sourced real-world numbers, the
 // numbers to remember), town_days.json (29 July and 17 April 2025) and town_year.json (every hour of 2025) on the
@@ -203,7 +203,7 @@
         x: { min: 0, max: 24, ticks: [[0, "00:00"], [6, "06:00"], [12, "12:00"], [18, "18:00"], [24, "24:00"]], ticksN: [[0, "0"], [6, "6"], [12, "12"], [18, "18"], [24, "24 h"]] },
         y: { min: 0, max: 800, step: 200, fmt: function (v) { return fmtN(v); }, unit: "MW" }, height: 240, heightN: 210, bars: bars,
         lines: [{ values: s.mw, step: 1, color: TOWN, width: 2.6, area: 0.14 }].concat(on ? [{ values: s.tot, step: 1, color: CAMPUS, width: 2 }] : []),
-        // with the campus on, the record line runs through its band: its words move to the legend (W3 contrast rule)
+        // with the campus on, the record line runs through its band: its words move to the legend (the course's contrast rule)
         refs: [on ? { y: D.town.peakMW, dash: "5 4", color: "var(--lx-ink-3)" } : { y: D.town.peakMW, label: "Town's 2025 record, " + D.town.peakMW + " MW", labelN: D.town.peakMW + " MW", dash: "5 4", color: "var(--lx-ink-3)" }],
         legend: [{ label: "Prairie Town's demand on " + s.label + " (real SPP shape, scaled)", color: TOWN }].concat(on ? [{ label: "The campus: " + D.campus.drawMW + " MW in every hour (illustrative)", color: CAMPUS },
                  { label: "The town's 2025 record, " + D.town.peakMW + " MW", color: "var(--lx-ink-3)", dash: "5 4" }] : []),

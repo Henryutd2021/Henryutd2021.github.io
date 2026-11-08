@@ -1,4 +1,4 @@
-// k06-vectors-matrices.js — Toolbox K6, "Vectors and matrices: what Ax ≤ b means" (step cards, Learn W3, 2026-11-03).
+// k06-vectors-matrices.js — Toolbox K6, "Vectors and matrices: what Ax ≤ b means" (step cards).
 //
 // A refresher for the lessons that write a model as arrays: lesson 10 (one hour as a linear program), lesson 11 (a day
 // solved by HiGHS) and B1 (the same model as A x ≤ b). Seven cards of one idea and one action each, an explain layer and

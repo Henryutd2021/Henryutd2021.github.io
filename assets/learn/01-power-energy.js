@@ -1,5 +1,4 @@
-// 01-power-energy.js — Lesson 1, "Power or energy? What is the difference between kW and kWh?" (step-card form, W1,
-// 2026-11-02).
+// 01-power-energy.js — Lesson 1, "Power or energy? What is the difference between kW and kWh?" (step-card form).
 //
 // Data: assets/learn/data/01-power-energy.json (appliance powers, illustrative; sourced real-world anchors with URLs and
 // dates; the ladder and the wind-farm claim), assets/learn/data/town.json and town_year.json (Prairie Town's lesson-0 day:
@@ -22,7 +21,7 @@
 // Every number the page states comes from this model or from the sourced anchors; _tests/learn/test_01-power-energy.js
 // checks them against the .qmd.
 //
-// Lesson-local components (candidates for the shared library, see learn/_w1/01-power-energy.yml): the appliance board
+// Lesson-local components (used by this page only): the appliance board
 // (toggles, power and energy meters, a two-panel power/energy chart), the energy ladder (place items on rungs), the
 // bathtub annotated diagram and the scale strip.
 (function () {

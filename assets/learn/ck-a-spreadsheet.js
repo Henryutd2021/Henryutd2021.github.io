@@ -1,4 +1,4 @@
-// ck-a-spreadsheet.js — CK-A, the Analyst checkpoint (curriculum v2 §3.3; wave W5, 2026-11-06).
+// ck-a-spreadsheet.js — CK-A, the Analyst checkpoint (the Analyst tier's end-of-tier task).
 //
 // About 150 minutes on a case the course has not shown: a school's rooftop solar and battery behind its meter. The learner
 // builds an auditable spreadsheet (the starter workbook, assets/learn/data/ck-a-starter.xlsx): a boundary, an assumptions
@@ -8,8 +8,8 @@
 // workbook with live formulas, ck-a-worked.xlsx, and the page's tables) opens once all nine tasks are answered, in any
 // order (the runner's gateAll option).
 //
-// Data: assets/learn/data/ck-a-spreadsheet.json, written with both workbooks by scripts/build_learn_cka_sheet.py
-// (ResearchPortfolio folder). This file's pure model recomputes every worked number from the log's values (derive, model);
+// Data: assets/learn/data/ck-a-spreadsheet.json, written with both workbooks by its data build step.
+// This file's pure model recomputes every worked number from the log's values (derive, model);
 // _tests/learn/test_ck-a-spreadsheet.js checks it against the data file and against the worked workbook's formulas,
 // evaluated with the course's own formula engine (components/sheet.js).
 //
@@ -23,7 +23,7 @@
 //
 // Level rule (the page's rubric section says it in words): first-try answers of the seven auto-marked tasks and the points
 // ticked in the two written tasks; a task whose worked solution was opened first counts as not right. The full worked
-// solution opens only once every task is answered (gateAll; review, 2026-11-06: submitting task 9 first used to open it,
+// solution opens only once every task is answered (gateAll: otherwise submitting task 9 first would open it,
 // and the other answers could be copied from it); an answer given after it opened counts as practice (the runner's shared
 // late-answer rule, late "practice": not right, no points for a written task); and an attempt during which it had been
 // open before every task was answered (opened early on purpose, or by an earlier attempt) is practice, with no level
@@ -86,7 +86,7 @@
   function usdK(v) { return (v < 0 ? "−" : "") + "$" + (Math.round(Math.abs(v) / 1000) * 1000).toLocaleString("en-US"); }
   function pct(f, d) { return (100 * f).toFixed(d == null ? 0 : d) + "%"; }
   function n0(v) { return Math.round(v).toLocaleString("en-US"); }
-  // a low-to-high range with its unit, for the sensitivity table and the tornado's labels (review #9)
+  // a low-to-high range with its unit, for the sensitivity table and the tornado's labels
   function unitOf(r) { return /\$\/kWh/.test(r.unit) ? " per kWh" : r.unit === "$/kW-month" ? " per kW-month" : /^\$ \(2025\)/.test(r.unit) && r.id === "upkeep" ? " a year" : ""; }
   function showRange(r, lo, hi) { return showVal(r, lo) + " to " + showVal(r, hi) + unitOf(r); }
   function showOne(r, v) { var u = unitOf(r); return showVal(r, v) + (u === " per kWh" ? "/kWh" : u === " per kW-month" ? "/kW-month" : u); }
@@ -172,7 +172,7 @@
   // text with glossary marks to safe HTML with the page's term spans, in static blocks: the course's own writer (core.js)
   var RICH = (typeof window !== "undefined" && window.LX && window.LX.rich) || require("./components/core.js").rich;
   function term(t) { return RICH(t); }
-  // the case in three parts: situation, deliverable, inputs (review #7)
+  // the case in three parts: situation, deliverable, inputs
   function staticBrief(D) {
     return '<p><b>Situation:</b> ' + term(D.case.situation) + "</p>\n<p><b>Deliverable:</b> " + term(D.case.deliverable) + "</p>\n" +
       '<p class="lx-eyebrow cka-in">Inputs, illustrative where marked</p>\n' +
@@ -296,7 +296,7 @@
     LX.demo(root, function (state) {
       if (state === "mid") { cp.show(1); return { view: "task 2" }; }
       if (state === "done") { cp.results(); return { view: "results" }; }
-      // the solution state opens it as the lock button does, recorded (practice), never silently (review #1)
+      // the solution state opens it as the lock button does, recorded (practice), never silently
       if (state === "solution") { cp.solutionNow(); var s = document.getElementById("solution"); if (s) s.scrollIntoView(); return { view: "solution" }; }
       return null;
     });

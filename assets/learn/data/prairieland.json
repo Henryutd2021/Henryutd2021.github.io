@@ -1,11 +1,11 @@
 {
  "about": {
   "line": "Prairieland is fictional; its numbers are illustrative.",
-  "what": "Shared data of Prairieland, Learn's national scale (S4, wave W6): five regions, the 2025 energy balance, the supply fleet with vintages, transmission, imports and minerals, the battery factory, fixed cost ranges, the carbon budget, time slices for engine E4, shocks and demand scenarios. Read by F10, A20, A21, M13, SB4 (engine E4) and C4; pages read these numbers and never retype them.",
+  "what": "Shared data of Prairieland, Learn's national scale (S4): five regions, the 2025 energy balance, the supply fleet with vintages, transmission, imports and minerals, the battery factory, fixed cost ranges, the carbon budget, time slices for engine E4, shocks and demand scenarios. Read by F10, A20, A21, M13, SB4 (engine E4) and C4; pages read these numbers and never retype them.",
   "fictional": "Prairieland is fictional. Its card (people, primary energy and shares, imports, Ridge County) is the course's own; costs come from EIA's 2026 assumptions; hourly shapes from SPP's 2025 grid; CO2 factors from the IPCC. Everything else is set for teaching and labelled so in the builder.",
   "dollarYear": 2025,
   "built": "2026-11-07",
-  "builtBy": "scripts/build_learn_prairieland.py (ResearchPortfolio repository): python3 scripts/build_learn_prairieland.py --site <site>; tested by _tests/learn/test_prairieland.js",
+  "builtBy": "Written by the Prairieland data build step (do not edit by hand); tested by _tests/learn/test_prairieland.js",
   "method": "Top-down from the card: primary energy 3.5 EJ split by its shares, then refinery, power plants and grid to final energy by sector and carrier, then useful energy; the fleet's generation unit by unit; regions by teaching weights that add up to the nation exactly. Time slices from SPP's 2025 hourly shapes, 12 slices with the peak net-load day and the scarce-wind winter week kept whole.",
   "simplifications": [
    "All fossil energy is counted as burned (no non-energy use such as plastics or asphalt).",
@@ -62,7 +62,7 @@
   },
   "set": "card: people, GDP, primary energy and its shares, the import shares, the CO2 total; teaching: the split of renewables, the workforce (A13's), everything derived below",
   "src": [
-   "dossier-card"
+   "parameter-card"
   ]
  },
  "regions": [
@@ -2525,7 +2525,7 @@
  },
  "ridgeCounty": {
   "a13": {
-   "note": "Ridge County is Prairieland's coal-dependent county (curriculum v2 §6, scale S4). A13 sets its numbers here and wave W6 (SB4, C4) reuses them: change them together with W6. Anchors from the national-strategy dossier §8.0: Prairieland has 20 million people; Ridge County holds 3% of its workforce; coal provides 40% of the county's local tax revenue. Everything else is set for teaching.",
+   "note": "Ridge County is Prairieland's coal-dependent county (scale S4). A13 sets its numbers here and SB4 and C4 reuse them through Prairieland's data: change them in both together. Anchors from Prairieland's parameter card: Prairieland has 20 million people; Ridge County holds 3% of its workforce; coal provides 40% of the county's local tax revenue. Everything else is set for teaching.",
    "fiction": "Ridge County and Prairieland are fictional; their numbers are illustrative.",
    "prairielandPeople": 20000000,
    "prairielandWorkforce": 10000000,
@@ -2601,7 +2601,7 @@
   "ipcc-2006": {
    "title": "2006 IPCC Guidelines for National Greenhouse Gas Inventories, Volume 2: Energy, chapters 1 and 2",
    "publisher": "Intergovernmental Panel on Climate Change",
-   "date": "2006; read 2 Nov 2026 for the course dossier",
+   "date": "2006; read 2 Nov 2026",
    "url": "https://www.ipcc.ch/report/2006-ipcc-guidelines-for-national-greenhouse-gas-inventories/",
    "where": "default CO2 factors on net calorific values: crude oil 73.3, natural gas 56.1, other bituminous coal 94.6 t per TJ; other bituminous coal 25.8 TJ per Gg"
   },
@@ -2622,56 +2622,56 @@
   "iea-gcmo-2025": {
    "title": "Global Critical Minerals Outlook 2025, executive summary",
    "publisher": "International Energy Agency",
-   "date": "2025; read 2 Nov 2026 for the course dossier",
+   "date": "2025; read 2 Nov 2026",
    "url": "https://www.iea.org/reports/global-critical-minerals-outlook-2025/executive-summary",
    "where": "one country is the leading refiner for 19 of 20 strategic minerals, with an average share of about 70%"
   },
   "iea-stocks": {
    "title": "Oil stocks of IEA countries",
    "publisher": "International Energy Agency",
-   "date": "read 2 Nov 2026 for the course dossier",
+   "date": "read 2 Nov 2026",
    "url": "https://www.iea.org/data-and-statistics/data-tools/oil-stocks-of-iea-countries",
    "where": "IEA members that are net importers of oil must hold stocks of at least 90 days of their net imports"
   },
   "iea-ger-2026": {
    "title": "Global Energy Review 2026: CO2 emissions",
    "publisher": "International Energy Agency",
-   "date": "20 Apr 2026; read 2 Nov 2026 for the course dossier",
+   "date": "20 Apr 2026; read 2 Nov 2026",
    "url": "https://www.iea.org/reports/global-energy-review-2026/co2-emissions",
    "where": "global energy-related CO2 about 38 Gt in 2025"
   },
   "forster-2026": {
    "title": "Forster et al. 2026, Indicators of Global Climate Change 2025, Earth System Science Data, section 9 and Table 8",
    "publisher": "Earth System Science Data (Copernicus)",
-   "date": "11 Jun 2026; read 2 Nov 2026 for the course dossier",
+   "date": "11 Jun 2026; read 2 Nov 2026",
    "url": "no link",
    "where": "remaining CO2 budget for a 50% chance of 1.5 C: about 130 Gt from the start of 2026 (a peer-reviewed update, not a new IPCC assessment)"
   },
   "eia-aeo2026": {
    "title": "Annual Energy Outlook 2026",
    "publisher": "U.S. Energy Information Administration",
-   "date": "8 Apr 2026; read 2 Nov 2026 for the course dossier",
+   "date": "8 Apr 2026; read 2 Nov 2026",
    "url": "https://www.eia.gov/outlooks/aeo/",
    "where": "modelled U.S. electricity use grows 0.9% to 1.6% a year to 2050 across the cases"
   },
   "eia-mer-13": {
    "title": "Monthly Energy Review, Table 1.3: primary energy consumption by source",
    "publisher": "U.S. Energy Information Administration",
-   "date": "October 2026 edition; read 2 Nov 2026 for the course dossier",
+   "date": "October 2026 edition; read 2 Nov 2026",
    "url": "https://www.eia.gov/totalenergy/data/browser/?tbl=T01.03",
    "where": "2025: 96.5 quads; petroleum 37%, natural gas 36%, coal 9%, renewables 9%, nuclear 8.5% (rounded)"
   },
   "eurostat-id": {
    "title": "Energy import dependency by products (nrg_ind_id)",
    "publisher": "Eurostat",
-   "date": "updated 16 Jul 2026; read 2 Nov 2026 for the course dossier",
+   "date": "updated 16 Jul 2026; read 2 Nov 2026",
    "url": "https://ec.europa.eu/eurostat/databrowser/view/nrg_ind_id/default/table",
    "where": "EU 2024: 57.3%; gas 85.0%, oil 96.6%, solid fossil fuels 34.2%"
   },
   "eia-steo-security": {
    "title": "Short-Term Energy Outlook, energy security supplement, tables 1, 2 and 4",
    "publisher": "U.S. Energy Information Administration",
-   "date": "12 Aug 2026; read 2 Nov 2026 for the course dossier",
+   "date": "12 Aug 2026; read 2 Nov 2026",
    "url": "https://www.eia.gov/outlooks/steo/report/energysecurity/article.php",
    "where": "oil flows through the Strait of Hormuz 21.6 million barrels a day in the fourth quarter of 2025 (about 21% of world supply)"
   },
@@ -2689,8 +2689,8 @@
    "url": "https://www.ncei.noaa.gov/products/us-climate-normals",
    "where": "heating degree days 4,413.6 and cooling degree days 1,773.6 (base 65 F): Capital Valley's climate, in C-days"
   },
-  "dossier-card": {
-   "title": "Prairieland parameter card (the course's national-strategy dossier, section 8.0)",
+  "parameter-card": {
+   "title": "Prairieland parameter card (compiled for this course from the sources listed)",
    "publisher": "Learn (this course)",
    "date": "fact-checked 2 Nov 2026",
    "url": "no link",

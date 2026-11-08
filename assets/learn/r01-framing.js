@@ -1,9 +1,9 @@
-/* r01-framing.js — research studio R1, "What makes a question worth researching?" (curriculum v2 §11; W2, 2026-11-03).
+/* r01-framing.js — research studio R1, "What makes a question worth researching?".
    Data: assets/learn/data/r01-framing.json (twenty illustrative questions, three rewrites, the exemplars, the checklist and
    the two sourced numbers) and data/path.json (to link the lessons that are live, and name the rest as upcoming).
    Page: learn/r01-framing.qmd (studio form: Task, Exemplars, Self-check, Sources).
    Task (step cards): sort twenty questions in two rounds into researchable, too vague, already answered and not answerable
-   with the data at hand (LX.CardSort); name the type of the ten researchable ones (five types, §11.2); rewrite three vague
+   with the data at hand (LX.CardSort); name the type of the ten researchable ones (the course's five question types); rewrite three vague
    questions with an audience, a metric with units and a counterfactual, then compare with an example.
    A rewrite is done when all five parts are written; its example can be opened at any time and does not complete it.
    Exemplars: a weak and a strong card for the same vague question (LX.Exemplars) and the four tests as a flowchart

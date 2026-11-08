@@ -1,21 +1,22 @@
-// c3-prairie-city-2040.js — C3, "Prairie City 2040: write the city's energy plan" (capstone, wave W5, 2026-11-06), on
+// c3-prairie-city-2040.js — C3, "Prairie City 2040: write the city's energy plan" (capstone), on
 // the City Planner's engine E3 (assets/learn/components/engine-e3.js, LX.E3; data prairie-city.json and e3-city-hub.json).
 //
 // The page: the brief (static), the plan (E3's C3 schema: buildings, district heat, cars, the industrial park, local
 // supply, the grid, assumptions; the solar farm's site; Run the 2040 plan; the plan link), the results (against the
-// $1,500M budget, cost and CO2 against 2025 for the whole city, the substations, the screening household table, jobs,
+// $1,500M budget, cost and CO2 against 2025 for the whole city, the substations, the full-year check (precomputed for
+// the presets and the reference plan: data/e3-full-year.json; never solved on the page), the screening household table, jobs,
 // the stakeholder panel, the sensitivity chart and table: one input at a time, then all together), the answer boxes (one
 // per stakeholder) and the two-page plan summary (LX.ReportNote), the self-check (LX.Exemplars,
 // LX.Rubric) and the sources. Every number comes from E3 and is checked by _tests/learn/test_c3-prairie-city-2040.js.
 //
 // Two pieces come from parallel lessons; each sits behind a clearly marked hook (search "HOOK"):
-//   HOOK(A19)  wired (learn-w5-e merged, 2026-11-06): the siting step runs A19's map model (assets/learn/components/siting.js,
-//              LX.A19 and LX.SiteMap, in the bundle since the W5 integration; data a19-gis-siting.json, read through A19.withCity with prairie-city.json): the five best
+//   HOOK(A19)  wired: the siting step runs A19's map model (assets/learn/components/siting.js,
+//              LX.A19 and LX.SiteMap, in the bundle; data a19-gis-siting.json, read through A19.withCity with prairie-city.json): the five best
 //              solar blocks by A19's default weights, each with a least-cost line to a transmission substation (S1 to S4,
 //              not the districts' substations), its access road, its land and its capacity factor, in 2025 dollars. The
 //              chosen site enters the plan as state.siteInfo = { connectUSD, cfK } (siteInfo below); a farm is at most
-//              A19's 150 MW block. G-GIS: the only siting here is a solar farm.
-//   HOOK(A13)  wired (learn-w5-b merged, 2026-11-06): the household table's money and burden come from lesson A13's
+//              A19's 150 MW block. Siting scope: the only siting here is a solar farm.
+//   HOOK(A13)  wired: the household table's money and burden come from lesson A13's
 //              accounting layer (LX.A13.allocate, through E3.households) and the jobs from LX.A13.jobs with A13's
 //              coefficients (data/a13-fairness-jobs.json); both are screening estimates and say so.
 // Prairie City is fictional; its numbers are illustrative.
@@ -76,15 +77,14 @@
     return { id: id, connectUSD: co.connect + co.road + co.land * f, cfK: co.cf / M.cft.solar, cf: co.cf, line: co.connect, road: co.road, land: co.land * f,
       acres: co.acres * f, km: co.route ? co.route.km : null, sub: co.sub, where: M.A19.place(M.R, t.i, t.j, t.k), score: t.score };
   }
-  // HOOK(A13), wired (learn-w5-b merged, 2026-11-06): jobs by lesson A13's model (LX.A13.jobs) with A13's coefficients
+  // HOOK(A13), wired: jobs by lesson A13's model (LX.A13.jobs) with A13's coefficients
   // (data/a13-fairness-jobs.json, `jobs`: the reader can change them on A13's page; here at their defaults). Building:
   // gross job-years from all the plan's up-front spending, the share spent locally times A13's job-years per $M, times
   // the multiplier, over the 15 years 2026 to 2040; net: less A13's displacement share (building work that would have
-  // happened anyway), passed as buildDisplacement as A13 does (A13's options from its review fixes: buildJobYearsNet).
+  // happened anyway), passed as buildDisplacement as A13 does (A13's option buildJobYearsNet).
   // Ongoing: the wind and solar farms' upkeep jobs per 100 MW, direct; gross supported (times the multiplier: supplier
   // and spending jobs, not all at the farms); and net of the same displacement. Other equipment's upkeep jobs are not
-  // counted. Nothing retires in this plan (no jobs lost). (C3 review finding 12; net building job-years at the W5 final
-  // integration.)
+  // counted. Nothing retires in this plan (no jobs lost).
   function jobs(R, A13, Jd) {
     if (!A13 || !Jd || !R) return null;
     var c = { staff: 0, mineJobs: 0, multiplier: Jd.multiplier.start, localShare: Jd.localShare, jobYearsPerM: Jd.jobYearsPerM.start,
@@ -101,7 +101,7 @@
       screening: A13.SCREENING, assume: A13.ASSUME.jobs };
   }
   // the sensitivity: the plan held fixed, one input at a time (re-solved where the LP depends on it), then every input at
-  // the end that lowers this plan's cost and at the end that raises it, together (a joint test; C3 review finding 6). Each
+  // the end that lowers this plan's cost and at the end that raises it, together (a joint test). Each
   // input is classed: set for teaching, or from public data. The park's gas price is no plan field: its runs read a copy
   // of P with that price (gasP), and the 2025 baseline is re-costed at it, so the change against 2025 stays like for like.
   // Which end raises the cost is read from the one-at-a-time runs (a plan that burns less gas than 2025 gains from a
@@ -165,7 +165,7 @@
       .concat([{ label: "Sensitivity: all inputs at their lower-, then higher-cost ends", value: mil(sens.joint.cheap) + " to " + mil(sens.joint.dear) }]);
   }
   // the reference plan of the exemplars (within the budget) and the two notes on it, written from a precomputed run.
-  // Site A: the screen's best block and the cheapest of the five to connect (C3 review finding 3)
+  // Site A: the screen's best block and the cheapest of the five to connect
   var REF_PLAN = { hp: 70, ret: 10, dh: 0, dhp: 0, sto: 0, ev: 40, evm: "managed", pv: 0, bat: 30, ihp: 100, ely: 0, wind: 200, farm: 100, site: "A" };
   // one answer per stakeholder who objects, from the run's own numbers (x: below); true of the run by construction
   var ANSWER = {
@@ -178,7 +178,8 @@
   function exemplars(x) {
     // x: { upfront, budget, dCost, co2, cut, up, worst, burden0, burden, altBurden, objectors: [keys], contractT, dPark,
     //      dParkShare, site: { id, connectUSD, km, sub, acres, cf }, jobs: { jobYears, jobYearsNet, permDirect, permGross, permNet, mw },
-    //      sens: { cheap, dear, top: { label, loText, hiText } } } from a run of REF_PLAN
+    //      sens: { cheap, dear, top: { label, loText, hiText } }, full: { extra, days } } from a run of REF_PLAN (full: its
+    //      full-year check, data/e3-full-year.json: the MW of upgrade the year needs beyond the eight days', on which days)
     var obj = x.objectors.map(function (k) { return ANSWER[k](x); });
     return { title: "Two summaries of the same brief", task: "Recommend Prairie City's 2040 energy plan within the budget, and say who gains and who pays.", id: "c3-ex", lines: true,
       answers: [
@@ -194,10 +195,16 @@
           "Site: ", { text: "site " + x.site.id + ", the best of A19's five blocks and the cheapest to connect (" + mil(x.site.connectUSD) + "), at a " + (x.site.cf * 100).toFixed(1) + "% capacity factor", note: "The site's choice with its evidence from the map." }, ".\n",
           "Sensitivity: ", { text: "the yearly cost runs from " + mil(x.sens.cheap) + " to " + mil(x.sens.dear) + " with every input at its lower- or higher-cost end; " + lc1(x.sens.top.label) + " moves it most, " + x.sens.top.loText + " to " + x.sens.top.hiText + "; every tested input is set for teaching", note: "A range, the input that matters most, and what kind of number each input is." }, ".\n",
           "Panel: ", { text: obj.length ? "to " + obj.join("; to ") : "no stakeholder objects", note: "Each objection answered with a reason or a change, from the run's own numbers." }, ".\n",
-          "Limits: ", { text: "2025's people and prices held to 2040, one substation per district, eight representative days of synthetic weather, the household rule an assumption, the map's layers simulated", note: "What the plan leaves out, so the council does not over-read it." }, "."] }],
+          "Limits: ", { text: "2025's people and prices held to 2040, one substation per district, eight representative days of synthetic weather" + (x.full ? " (on all 8,760 hours the upgrades fall " + x.full.extra.toFixed(1) + " MW short, on " + x.full.days + ")" : "") + ", the household rule an assumption, the map's layers simulated", note: "What the plan leaves out, and what the full-year check found, so the council does not over-read it." }, "."] }],
       note: "Both summaries are illustrative. The strong one quotes this engine's numbers for one reference plan within the budget, precomputed; another plan is just as strong when its evidence supports it." };
   }
-  var page = { REF_PLAN: REF_PLAN, ANSWER: ANSWER, exemplars: exemplars, siteModel: siteModel, siteInfo: siteInfo, kilo: kilo, mil: mil, smil: smil, pct1: pct1, pct0: pct0, upTotal: upTotal, budget: budget, co2Cut: co2Cut, PANEL: PANEL, panel: panel, parkCost: parkCost,
+  // the summary's sentence for a plan with a full-year check: the eight days, then what the year found (as short as the
+  // general sentence it replaces)
+  function fullAssume(e) {
+    var extra = e.year.dist.reduce(function (t, d, i) { return t + d.upg - e.days.dist[i].upg; }, 0);
+    return "Eight days stand for the year; on all 8,760 hours its upgrades " + (e.year.unserved >= 0.5 ? "fall " + extra.toFixed(1) + " MW short." : "hold.");
+  }
+  var page = { REF_PLAN: REF_PLAN, ANSWER: ANSWER, exemplars: exemplars, fullAssume: fullAssume, siteModel: siteModel, siteInfo: siteInfo, kilo: kilo, mil: mil, smil: smil, pct1: pct1, pct0: pct0, upTotal: upTotal, budget: budget, co2Cut: co2Cut, PANEL: PANEL, panel: panel, parkCost: parkCost,
     SENS: SENS, lc1: lc1, sensRange: sensRange, gasP: gasP, runSens: runSens, sensWords: sensWords, sensRows: sensRows, biggest: biggest,
     GROUPS: [{ title: "Buildings", fields: ["hp", "ret"], color: "var(--lx-cc)", hint: "Heat pumps' [[coefficient-of-performance|COP]] falls on cold nights; retrofits cut the heat buildings need." },
       { title: "District heat (dense core)", fields: ["dh", "dhp", "sto"], color: "var(--lx-tier-4)", hint: "A hot-water network: a large heat pump, a heat store, and a gas boiler for the rest, assumed to exist already (its fuel counts, not its construction)." },
@@ -206,7 +213,7 @@
       { title: "Local supply and storage", fields: ["pv", "bat", "wind", "farm"], color: "var(--lx-solar)", hint: "A wind contract and a solar farm count against what the city buys, hour by hour; output the city cannot use earns nothing. They do not lower the [[location-based|location-based]] CO₂." },
       { title: "The grid", fields: ["up", "upc"], color: "var(--lx-bad)", hint: "Each district's [[substation|substation]] carries at most its limit each hour, unless the plan buys an upgrade." },
       { title: "Assumptions you can change", fields: ["av", "save", "rc", "dhc", "rule", "rec"], color: "var(--lx-ink-2)", hint: "Set for teaching. \"Who adopts first\" and how shared costs are recovered move only the household table ([[lesson:a13-fairness-jobs|A13]])." }],
-    // C3's own words for the levels the page's workflow supports (C3 review finding 6): the test gives one-at-a-time and
+    // C3's own words for the levels the page's workflow supports: the test gives one-at-a-time and
     // joint cases with each input classed; the summary has a sources field and one answer per stakeholder
     RUBRIC: [{ id: "accounting", look: "Cost and CO₂ on one boundary (the whole city, a year, 2025 dollars, location-based); who pays named by household group, as a screening estimate; jobs as construction job-years and ongoing jobs, gross and net." },
       { id: "uncertainty", look: "The sensitivity table: each input one at a time and all together at their cheaper and dearer ends, each input classed as public data or set for teaching.",
@@ -240,7 +247,7 @@
   // ---------------------------------------------------------------- view
   var LX = window.LX, H = LX.H, E3 = LX.E3, U = E3.ui;
   LX.mount("c3", function (live, data, root) {
-    var P = E3.prepare(data.prairie_city, data.e3_city_hub), cfg = P.cfg, S = E3.c3Schema(cfg), stub = null, last = null, sens = null;
+    var P = E3.prepare(data.prairie_city, data.e3_city_hub), cfg = P.cfg, S = E3.c3Schema(cfg), stub = null, last = null, sens = null, FY = data.e3_full_year || null, FYc = data.prairie_city.fullYear;
     var rh = document.getElementById("c3-results"), fb = rh.querySelector(".lx-fallback"); if (fb) fb.hidden = true;
     H("p", { class: "lx-hint e3-line", text: P.line }, live);
     var wrap = H("div", { class: "lx-sb e3-sb" }, live);
@@ -267,12 +274,12 @@
         var k = SM.top.map(function (t) { return t.id; }).indexOf(p.site), co = SM.costs[k];
         map.draw({ layer: "suit", suit: SM.suit, X: SM.X, sites: SM.top, sel: p.site, path: co && co.route ? co.route.cells : null, sitesKey: "Five best solar blocks, A best" });
         tb.innerHTML = "";
-        U.table(tb, ["Site", "Where", "Line to", "Up front: line, road, land", "Capacity factor"], SM.top.map(function (t) {
+        U.table(tb, ["Site", "Where", "Line to", "Up front: line, road, land", "Capacity factor (a full year)"], SM.top.map(function (t) {
           var x = page.siteInfo(SM, t.id, Math.max(p.farm, 10));
           return [t.id + (t.id === p.site ? " (yours)" : ""), x.where + " of the centre", x.sub + ", " + x.km.toFixed(1) + " km", mil(x.connectUSD), (x.cf * 100).toFixed(1) + "%"];
         }), "c3-sitetbl");
         U.keys(tb, [["Up front", "for a " + kilo(Math.max(p.farm, 10)) + " MW farm, 2025 dollars: the land in proportion to the MW, the line and road as A19 costs them for its block. The panels are in the solar-farm cost."],
-          ["Capacity factor", "the site's yearly output over what it would make at full power all year ([[capacity-factor|capacity factor]])."]]);
+          ["Capacity factor", "the site's yearly output over what it would make at full power all year ([[capacity-factor|capacity factor]]). The eight representative days carry more sun than the year: see the full-year check."]]);
       }
       paint(plan);
       return { set: function (p) { sg.set(p.site); paint(p); }, info: function (id, mw) { return page.siteInfo(SM, id, mw); } };
@@ -314,6 +321,10 @@
       dv.set(R, { d: best, k: R.dist[best].at.k });
       U.table(c2, ["District", "Busiest hour", "Limit", "Upgrade", "1 MW more room saves a year (LP dual)"], R.dist.map(function (d) { return [d.label, kilo(d.peak) + " MW", kilo(d.limit) + " MW", kilo(d.upg) + " MW", d.value == null ? "–" : "$" + kilo(d.value)]; }), "c3-sub");
       U.keys(c2, [["LP dual", "the substation row's [[shadow-price|dual]], summed over the year: what one more MW of room would save, under this plan's assumptions."]]);
+      // the full-year check of the plan that ran (precomputed for the presets and the reference plan; none for others)
+      U.fullCard(res, E3.fullFind(FY, "c3", S, R.state, LX.ShareState), FYc, P, { date: FY ? FY.date : "",
+        none: "It is precomputed for the presets and the exemplars' reference plan, with every other setting at its default: a year of hours is too large to solve on a click.",
+        load: { label: "Load the reference plan (checked)", go: function () { change(Object.assign(LX.ShareState.defaults(S), page.REF_PLAN)); run.run(plan); } } });
       var c3 = H("div", { class: "lx-xcard" }, res); H("h3", { text: "Who pays: a screening estimate by household group" }, c3);
       // HOOK(A13), wired: the table is E3.households, whose money and burden are LX.A13.allocate
       U.hhTable(c3, R);
@@ -388,6 +399,10 @@
         // the stakeholder table: each one's reaction, objection and the reader's answer (from the answer boxes above the
         // summary) in the results
         n.results = n.results.concat(page.panelRows(panel(R, P), answers, LX.Stakeholders.WORD));
+        // a plan with a full-year check says what it found, in place of the general sentence on the eight days (the two
+        // pages have no room for more)
+        var fe = E3.fullFind(FY, "c3", S, last.state, LX.ShareState);
+        if (fe) n.assumptions = n.assumptions.map(function (t) { return /^Eight representative days/.test(t) ? page.fullAssume(fe) : t; });
         var jb = page.jobs(R, window.LX.A13, data.a13_fairness_jobs && data.a13_fairness_jobs.jobs);
         if (jb) { n.results.push({ label: "Jobs (screening)", value: kilo(jb.jobYears) + " construction job-years gross, " + kilo(jb.jobYearsNet) + " net; ongoing " + kilo(jb.permDirect) + " direct, " + kilo(jb.permGross) + " gross supported, " + kilo(jb.permNet) + " net", note: "lesson A13's coefficients" });
           n.assumptions.push(jb.assumeLine); }

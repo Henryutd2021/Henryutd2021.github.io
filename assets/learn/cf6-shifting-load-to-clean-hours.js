@@ -1,10 +1,10 @@
 // cf6-shifting-load-to-clean-hours.js — Case file CF6, "How much can shifting load to cleaner hours cut emissions, and
-// when?" (case form, wave W2, 2026-11-03).
+// when?" (case form).
 //
 // Data: assets/learn/data/cf6-shifting-load-to-clean-hours.json (the study's dated steps for LX.Timeline, where its
 // result holds for LX.Boundary, the idea's day and preset moves, the numbers to remember), town.json (Prairie Town's
 // fleet; illustrative) and town_year.json (every hour of 2025 on the Southwest Power Pool grid, from EIA-930, as shapes).
-// The research text in the data file is approved excerpt wording (reports/learn/excerpts_for_approval.md, E6, and its
+// The research text in the data file is approved excerpt wording (E6, with its
 // revisions); this script adds none of its own.
 //
 // The idea (Prairie Town; illustrative plants on real 2025 shapes): average against marginal emission factors.
@@ -109,7 +109,7 @@
       "<div class=\"lx-scroll-x\"><table class=\"lx-facts\"><caption class=\"lx-hint\">Each hour of the stylized day: average intensity (g CO₂ per kWh), load before and after (MWh) and the change.</caption>" +
       "<thead><tr><th scope=\"col\">Hour</th><th scope=\"col\">Intensity</th><th scope=\"col\">Before</th><th scope=\"col\">After</th><th scope=\"col\">Change</th></tr></thead><tbody>" + rows + "</tbody></table></div>";
   }
-  // the explainer's own text version, live (W4 carry-over): its "explainer-update" event (d = {range, grid, model}) rewrites
+  // the explainer's own text version, live: its "explainer-update" event (d = {range, grid, model}) rewrites
   // the table in the page's text version (details.lx-textalt > .cf6-ex-table) and its summary; nothing is announced
   var LIVE_SUMMARY = "Text version: the day hour by hour, at the slider's setting";
   function liveTable(details, d) {

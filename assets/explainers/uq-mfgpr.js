@@ -1,4 +1,4 @@
-// explainers/uq-mfgpr.js — interactive explainer for the uq-mfgpr project page (website v2, 2026-11-02).
+// explainers/uq-mfgpr.js — interactive explainer for the uq-mfgpr project page.
 //
 // Method (ASME IDETC 2023, doi:10.1115/DETC2023-114762, Sections 2.2-2.3; framework docs staging/mfgpr-framework/docs/method.md):
 // Gaussian process regression (Eqs. 4-5) on measured points alone, versus linear autoregressive multi-fidelity regression

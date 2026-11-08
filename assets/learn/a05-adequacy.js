@@ -1,5 +1,5 @@
 // a05-adequacy.js — Analyst lesson A5, "Will there be enough power when it matters? Resource adequacy and capacity
-// accreditation" (step cards, simulation mode, Learn W4, 2026-11-05).
+// accreditation" (step cards, simulation mode).
 //
 // Data (read through data-src):
 //   assets/learn/data/town_year.json                    SPP's 2025 hourly shapes (EIA-930), local standard time
@@ -9,8 +9,8 @@
 //                                                       simulation, PJM's class ratings and a reference block (test)
 //   assets/learn/data/path.json                         live lessons, for LX.lessonRef
 //
-// The model is the shared adequacy simulator, LX.A5 (assets/learn/components/adequacy.js, in the learn.js bundle; promoted
-// from this file at the W4 integration, unchanged): sources, simulate, evaluate, efc, accredit, study, blocks, mix and the
+// The model is the shared adequacy simulator, LX.A5 (assets/learn/components/adequacy.js, in the learn.js bundle; it
+// began in this file and is shared with A9): sources, simulate, evaluate, efc, accredit, study, blocks, mix and the
 // formats fm. This file keeps the page's own pure parts (the drill, the two feedback texts) and the page; in Node it
 // exports the simulator with them, as before.
 // Every number the page states comes from these functions; _tests/learn/test_a05-adequacy.js checks them.

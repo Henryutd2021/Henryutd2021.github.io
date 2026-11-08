@@ -1,6 +1,6 @@
 {
   "meta": {
-    "about": "Data of Learn research studio R7 (r07-cost-carbon-properly), Cost and carbon done properly (wave W5, builder learn-w5-c, 2026-11-06). The study, its authors, its consultancy, its city and its transit agency are fictional, and every fleet, price and cost input is illustrative, in 2025 dollars. Two numbers are real and dated: diesel's CO2 per gallon (EIA) and the U.S. grid's average CO2 per kWh in 2023 (EIA). The lesson's script recomputes every number the page shows from these inputs, and its test checks each one.",
+    "about": "Data of Learn research studio R7 (r07-cost-carbon-properly), Cost and carbon done properly. The study, its authors, its consultancy, its city and its transit agency are fictional, and every fleet, price and cost input is illustrative, in 2025 dollars. Two numbers are real and dated: diesel's CO2 per gallon (EIA) and the U.S. grid's average CO2 per kWh in 2023 (EIA). The lesson's script recomputes every number the page shows from these inputs, and its test checks each one.",
     "dollarYear": 2025
   },
   "study": {

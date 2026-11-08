@@ -3,7 +3,7 @@
   "what": "Engine E3's settings and costs: Prairie City's energy hub (the three districts behind their substation limits) as a linear program over prairie-city.json's eight representative days. Prairie City's own numbers are in prairie-city.json; this file holds only what the engine adds.",
   "line": "Prairie City is fictional; its numbers are illustrative.",
   "built": "2026-11-06",
-  "builtBy": "scripts/build_learn_e3_data.py (ResearchPortfolio repository): python3 scripts/build_learn_e3_data.py --site <site>; the `precomputed` block is written by the tests' --write mode",
+  "builtBy": "Written by the engine E3 data build step (do not edit by hand); the `precomputed` block is written by the tests' --write mode",
   "set": "Costs read from other course files say so in `via`; everything marked \"teaching\" is illustrative, set for this course, with a range the reader can change."
  },
  "dollarYear": 2025,
@@ -204,6 +204,12 @@
    "note": "Set for teaching: the range C3's sensitivity test moves the industrial park's gas price over (prairie-city.json prices.gasPerMcf.industrial, itself set for teaching from EIA's Kansas citygate price); not a forecast."
   },
   "note": "C3 plans Prairie City for 2040 with 2025's people, homes and prices and the course's synthetic weather: only the plan changes. The industrial park and the data-center campus take power at their own substations (no limit modelled); the park's new loads are flat all year."
+ },
+ "fullYear": {
+  "unservedPerMWh": 10000,
+  "via": "13-capstone.json unservedPenalty",
+  "note": "The full-year check re-runs a plan on every hour of 2025 with the same LP and constraints, keeping what the eight days decided: the building shares, the sizes and each district's substation upgrade. Load a substation cannot carry is left unserved at $10,000 per MWh (lesson 13's illustrative penalty), never part of a reported cost. 2025 as it is is re-run the same way, so each change against 2025 is like for like.",
+  "set": "teaching"
  },
  "sources": {
   "atb2025-fin": {
@@ -437,7 +443,7 @@
     ],
     [
      "Reference plan: the city's yearly cost against 2025",
-     "−$29.2M"
+     "−$28.9M"
     ],
     [
      "Reference plan: the city's CO₂ (location-based, operating)",
@@ -501,7 +507,7 @@
       ".\n",
       "Budget and cost: ",
       {
-       "text": "$1,227.9M up front against $1,500.0M; the city's yearly cost −$29.2M against 2025 (energy bills plus equipment as yearly payments, 2025 dollars)",
+       "text": "$1,227.9M up front against $1,500.0M; the city's yearly cost −$28.9M against 2025 (energy bills plus equipment as yearly payments, 2025 dollars)",
        "note": "Up front and yearly kept apart, on one boundary."
       },
       ".\n",
@@ -531,7 +537,7 @@
       ".\n",
       "Sensitivity: ",
       {
-       "text": "the yearly cost runs from −$72.6M to −$2.9M with every input at its lower- or higher-cost end; value of a contract MWh moves it most, $20/MWh to $80/MWh; every tested input is set for teaching",
+       "text": "the yearly cost runs from −$72.3M to −$2.6M with every input at its lower- or higher-cost end; value of a contract MWh moves it most, $20/MWh to $80/MWh; every tested input is set for teaching",
        "note": "A range, the input that matters most, and what kind of number each input is."
       },
       ".\n",
@@ -543,8 +549,8 @@
       ".\n",
       "Limits: ",
       {
-       "text": "2025's people and prices held to 2040, one substation per district, eight representative days of synthetic weather, the household rule an assumption, the map's layers simulated",
-       "note": "What the plan leaves out, so the council does not over-read it."
+       "text": "2025's people and prices held to 2040, one substation per district, eight representative days of synthetic weather (on all 8,760 hours the upgrades fall 5.7 MW short, on 19 Feb and 20 Feb), the household rule an assumption, the map's layers simulated",
+       "note": "What the plan leaves out, and what the full-year check found, so the council does not over-read it."
       },
       "."
      ]

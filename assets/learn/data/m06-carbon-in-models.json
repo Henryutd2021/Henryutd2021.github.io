@@ -1,5 +1,5 @@
 {
- "about": "Learn M6, Putting carbon in the model (wave W4, builder learn-w4-c, 2026-11-05). The Plains Grid's planning LP (also used by A12): what may be built and at what cost, the six representative days and their weights, the tie rule, the caps and the procurement cases, and a reference block written by the test. The existing fleet is in a10-emissions-questions.json. Money in 2025 dollars.",
+ "about": "Learn M6, Putting carbon in the model. The Plains Grid's planning LP (also used by A12): what may be built and at what cost, the six representative days and their weights, the tie rule, the caps and the procurement cases, and a reference block written by the test. The existing fleet is in a10-emissions-questions.json. Money in 2025 dollars.",
  "accessed": "2026-11-05",
  "priceYear": 2025,
  "deflator": {

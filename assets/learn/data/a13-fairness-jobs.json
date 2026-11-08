@@ -1,5 +1,5 @@
 {
-  "about": "Lesson A13 (a13-fairness-jobs), 2026-11-06, builder learn-w5-b. Part 1 splits the yearly cost of a Prairie City plan across its five household groups (prairie-city.json, read and never retyped) by kWh, by a fixed charge and in proportion to income, and reads energy burden before and after; the cost is a learner input. Part 2 counts jobs and Ridge County's tax base when its coal plant retires and wind and solar are built there; every coefficient (jobs per $M, jobs per 100 MW, the multiplier, displacement, the tax rate, the taxable share) is a learner input set for teaching, with the sources real coefficients come from. Every output is a screening estimate. The accounting is the pure model assets/learn/components/whopays.js (LX.A13), which SB3 and C3 can load.",
+  "about": "Lesson A13 (a13-fairness-jobs). Part 1 splits the yearly cost of a Prairie City plan across its five household groups (prairie-city.json, read and never retyped) by kWh, by a fixed charge and in proportion to income, and reads energy burden before and after; the cost is a learner input. Part 2 counts jobs and Ridge County's tax base when its coal plant retires and wind and solar are built there; every coefficient (jobs per $M, jobs per 100 MW, the multiplier, displacement, the tax rate, the taxable share) is a learner input set for teaching, with the sources real coefficients come from. Every output is a screening estimate. The accounting is the pure model assets/learn/components/whopays.js (LX.A13), which SB3 and C3 can load.",
   "built": "2026-11-06",
   "plan": {
     "costM": { "min": 0, "max": 60, "step": 2, "start": 24 },
@@ -17,7 +17,7 @@
   },
   "lines": { "high": 0.06, "severe": 0.10 },
   "ridgeCounty": {
-    "note": "Ridge County is Prairieland's coal-dependent county (curriculum v2 §6, scale S4). A13 sets its numbers here and wave W6 (SB4, C4) reuses them: change them together with W6. Anchors from the national-strategy dossier §8.0: Prairieland has 20 million people; Ridge County holds 3% of its workforce; coal provides 40% of the county's local tax revenue. Everything else is set for teaching.",
+    "note": "Ridge County is Prairieland's coal-dependent county (scale S4). A13 sets its numbers here and SB4 and C4 reuse them through Prairieland's data: change them in both together. Anchors from Prairieland's parameter card: Prairieland has 20 million people; Ridge County holds 3% of its workforce; coal provides 40% of the county's local tax revenue. Everything else is set for teaching.",
     "fiction": "Ridge County and Prairieland are fictional; their numbers are illustrative.",
     "prairielandPeople": 20000000,
     "prairielandWorkforce": 10000000,

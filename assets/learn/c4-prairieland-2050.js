@@ -1,5 +1,5 @@
-// c4-prairieland-2050.js — C4, "Prairieland 2050: design and defend a nation's pathway" (capstone, Modeler–Researcher, wave
-// W6, 2026-11-07), on the Pathway Explorer's engine E4 (assets/learn/components/engine-e4.js, LX.E4, in the bundle). Data:
+// c4-prairieland-2050.js — C4, "Prairieland 2050: design and defend a nation's pathway" (capstone, Modeler–Researcher), on
+// the Pathway Explorer's engine E4 (assets/learn/components/engine-e4.js, LX.E4, in the bundle). Data:
 // prairieland.json, e4-pathways.json, the precomputed library e4-library.json, a13-fairness-jobs.json (A13's coefficients
 // and Ridge County) and prairie-city.json (its five household groups, a stand-in for Prairieland's households).
 //
@@ -59,13 +59,13 @@
     return { j: j, mineLost: mine, coalLost: coalLost, perPJ: perPJ, staff: V.ridge.closeP === null ? 0 : a.plant.staff, newMW: mw, capex: capex, assume: A13.ASSUME.jobs, screening: A13.SCREENING };
   }
   // the four shocks as rows, and the brief's sensitivity line
-  // the four shocks as rows; a plan without the peak-hour rule has its stress hours "not tested", never "met" (C4 review)
+  // the four shocks as rows; a plan without the peak-hour rule has its stress hours "not tested", never "met"
   function shockRows(V, X) {
     return Object.keys(X).map(function (k) { var x = X[k], y = V.Y.indexOf(x.year);
       return [x.label + " (" + x.year + ")", sbn(x.dPV), kilo(x.cum) + " Mt" + (x.over > 0.5 ? " (" + kilo(x.over) + " over)" : ""), pct(x.imp[y]) + (x.capOver[y] > 0.5 ? " (above the cap)" : ""),
         x.rule === null ? "not tested (rule off)" : x.reserveShort[y] > 0.5 ? kilo(x.reserveShort[y]) + " MW short" : "met", x.unserved[y] > 0.005 ? fix(x.unserved[y], 2) + " TWh" : "none"]; });
   }
-  // the brief's sensitivity, one result a sentence (C4 review: cost, carbon, imports and the peak hours apart)
+  // the brief's sensitivity, one result a sentence (cost, carbon, imports and the peak hours apart)
   function sensLines(V, X) {
     var ks = Object.keys(X), d = ks.map(function (k) { return X[k].dPV; }), worst = ks[d.indexOf(Math.max.apply(null, d))], lab = function (k) { return X[k].label.toLowerCase(); };
     var over = ks.filter(function (k) { return X[k].over > 0.5; }), short = ks.filter(function (k) { return max(X[k].reserveShort) > 0.5; }), cap = ks.filter(function (k) { return sum(X[k].capOver) > 0.5; }), off = ks.some(function (k) { return X[k].rule === null; });
@@ -86,7 +86,7 @@
     out.push({ kind: "", text: "**Construction:** " + kilo(jb.j.buildJobYears) + " job-years (" + kilo(jb.j.buildJobYearsNet) + " net), under the same assumption: an upper bound for the county." });
     return out;
   }
-  // the brief's assumptions, one sentence each, generated from the plan as run (C4 review: the accounting, the peak-hour
+  // the brief's assumptions, one sentence each, generated from the plan as run (the accounting, the peak-hour
   // rule, the household share, the county's jobs and the full-year status follow the plan, never a fixed sentence).
   // V: the plan's view; full: the library's full-year checks or null
   var ACC = { linear: "the budget counts 2025 twice and the model years with straight lines between (weights 2, 5, 5, 5, 5, 3)", step: "the budget counts each model year for the five years ending in it (weights 0, 5, 5, 5, 5, 5): 2025 not at all" };
@@ -109,7 +109,7 @@
       .concat([fullStatus(full, E4)]);
   }
   // A13's household assumptions, with its first ("the plan's yearly cost is recovered in full from households") replaced
-  // by the share C4 sets: C4 allocates only the households' share (C4 review)
+  // by the share C4 sets: C4 allocates only the households' share
   function A13split(af) {
     return ["The households' share (" + pct(af.share) + ") is spread in full over the household groups; the rest of the change is outside this screening."].concat(af.assume.filter(function (x) { return !/recovered in full from households/.test(x); }));
   }
@@ -129,7 +129,7 @@
     { id: "communication", look: "Two pages a minister can act on: the recommendation first, then the evidence, the shocks, who pays, Ridge County and the limits; the notebook's run of the same pathway.",
       levels: { proficient: "a two-page policy brief with the pathway link and the notebook's run of the same plan: the recommendation first, then cost, carbon and security, the shocks with their range, who pays and Ridge County (gross and net), and the limits" } }];
   // a weak and a strong brief for the same plan (numbers from that plan's run; Vs: the security-first preset's run, for
-  // the trade-off). The strong one meets its own rubric (C4 review): every lever with its size, the reason against
+  // the trade-off). The strong one meets its own rubric: every lever with its size, the reason against
   // another pathway, the result that would change it, the screening assumptions and the limits
   function exemplars(V, X, af, jb, Vs, st, full, E4) {
     var sMiss = Vs.capOver.map(function (x, p) { return x > 0.5 ? V.Y[p] : null; }).filter(Boolean);

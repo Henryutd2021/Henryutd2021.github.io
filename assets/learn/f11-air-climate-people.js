@@ -1,5 +1,5 @@
 // f11-air-climate-people.js — Lesson F11, "What does energy do to the air, the climate and people's lives?" (step cards,
-// Foundations, D1; wave W5, 2026-11-06, builder learn-w5-b).
+// Foundations, D1).
 //
 // Data: assets/learn/data/f11-air-climate-people.json (the fuels' IPCC defaults, the methane GWP and the leak studies, the
 // AP-42 emission factors and controls, the spreading toy, EPA's benefit-per-ton values, WHO's figures, the burden lines

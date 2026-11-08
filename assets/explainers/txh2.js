@@ -1,4 +1,4 @@
-// txh2.js — interactive explainer on the Texas hydrogen (ERCOT) project page (website v2, 2026-11-02).
+// txh2.js — interactive explainer on the Texas hydrogen (ERCOT) project page.
 // Mechanism (the paper in Int. J. Hydrogen Energy 113:77–89, 2025, §3.3 p. 86 and Fig. 8b): when power from gas-fired
 // (CCGT) plants costs more, the model installs fuel cells and turns green hydrogen into electricity; reformer (grey)
 // hydrogen then fills industrial demand. Gas-plant CO2 falls, reformer CO2 rises more (the hydrogen-to-power round trip

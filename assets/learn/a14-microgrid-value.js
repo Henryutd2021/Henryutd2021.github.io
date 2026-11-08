@@ -1,5 +1,5 @@
-// a14-microgrid-value.js — Lesson A14, "Does a microgrid pay off, and for whom?" (Analyst, step cards, wave W3,
-// 2026-11-03). Closed form: no solver.
+// a14-microgrid-value.js — Lesson A14, "Does a microgrid pay off, and for whom?" (Analyst, step cards).
+// Closed form: no solver.
 //
 // Data: assets/learn/data/a14-microgrid-value.json. One price year, 2025 dollars. Real: a 2025 survey of rural co-op
 // members' outage costs (Berkeley Lab and partners), EIA's 2025 retail prices, FERC's 2024 Energy Primer. Illustrative:

@@ -1,8 +1,7 @@
-// cf5-drawing-the-boundary.js — Case file CF5, "Where should a cogeneration study's boundary be drawn?" (case form,
-// wave W5, builder learn-w5-f, 2026-11-06; review fixes on learn-w5-cf5, 2026-11-06). Live since 2026-11-07, when
-// Henry approved every E14 sentence (reports/learn/excerpts_for_approval.md, "W5 sources").
-// Method only (guards G-NUC, G-DC, G-SRC). Depth D2 (working knowledge), closed-form toy; the Go deeper box gives its
-// arithmetic, nothing more.
+// cf5-drawing-the-boundary.js — Case file CF5, "Where should a cogeneration study's boundary be drawn?" (case form;
+// its research wording is the approved excerpt E14).
+// Method only, within the course's scope rules for nuclear plants and data centers; the research wording matches the
+// approved excerpts. Depth D2 (working knowledge), closed-form toy; the Go deeper box gives its arithmetic, nothing more.
 //
 // Data: assets/learn/data/cf5-drawing-the-boundary.json: the study in time (LX.Timeline: one entry), where the study's
 // result holds (LX.Boundary: E14.21 split at its clauses, word for word, with E14.24 as its source line), and the toy
@@ -15,7 +14,7 @@
 // an electric chiller (C / COPe MW of electricity) or from an absorption chiller driven by steam taken from the turbine
 // (C / COPa MW of steam heat), which lowers the turbine's output by w MW of electricity for each MW of steam heat taken.
 // The reference is the same plant and load, using electric cooling; the grid takes what the site does not use or
-// supplies what it lacks. Two choices, kept apart (review #2):
+// supplies what it lacks. Two choices, kept apart:
 //   where the boundary is   "plant only": the measure is the electricity the turbine makes
 //                           "plant and load": the measure is the site's net exchange with the grid (out minus in)
 //   how steam is counted    "priced": the physical flows, so the turbine work the steam gives up is counted
@@ -187,7 +186,7 @@
     function paint(acted) {
       marks.forEach(function (f) { f(); });
       var V = views(I, S), id = S.where + "-" + S.steam, val = V.v[id], hr = V.a.hour;
-      // the absorption chiller's cooling per MW of steam this hour, beside its slider (review #7)
+      // the absorption chiller's cooling per MW of steam this hour, beside its slider
       sliders.copA.hint(hr.derate != null ? "This hour: " + V.a.copA.toFixed(2) + ", " + pct(hr.derate) + " less in a hot, humid hour (illustrative; efficiency only, no capacity limit)." : hr.outage ? "This hour: no steam." : "");
       scene.innerHTML = "";
       var box = H("div", { class: "cf5-box" }, scene); H("p", { text: "Inside the boundary · measured: " + (S.where === "plant" ? "the electricity the turbine makes" : "the site's net exchange with the grid") }, box);

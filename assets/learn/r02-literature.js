@@ -1,7 +1,7 @@
-// r02-literature.js — Research studio R2, "How do you find out what is already known?" (W2, 2026-11-03).
+// r02-literature.js — Research studio R2, "How do you find out what is already known?".
 //
 // Data:
-//   assets/learn/data/r02-literature-openalex.json  a dated OpenAlex snapshot (scripts/build_learn_r02_snapshot.py): five
+//   assets/learn/data/r02-literature-openalex.json  a dated OpenAlex snapshot (from its data build step): five
 //                                                   search strings with their counts, the follow-up search, the five
 //                                                   most-cited hits, the twelve matrix papers, the review used for
 //                                                   snowballing and the three papers the follow-up search brings in
@@ -9,8 +9,8 @@
 //   assets/learn/data/r02-literature.json           the studio's own text: concept blocks, the ladder questions, one-line
 //                                                   summaries and the first-pass coding of the twelve papers, the
 //                                                   three-pass worked example, practice plan, exemplars, rubric line
-// No live API call: the page reads the snapshot and links the same searches on OpenAlex's own search page (W2 brief
-// §3): openalex.org/works takes the API's filter, so the stored API addresses map one to one (checked in a browser on
+// No live API call: the page reads the snapshot and links the same searches on OpenAlex's own search page:
+// openalex.org/works takes the API's filter, so the stored API addresses map one to one (checked in a browser on
 // 3 November 2026: the direct search's page shows the snapshot's 23 works).
 //
 // The coding is from abstracts only (first pass): a cell is "yes" (the abstract reports it), "partly" (it hints at it)
@@ -22,7 +22,7 @@
 // finds; code four papers into a twelve-paper concept matrix (LX.CardSort, toggles); find the empty cell of storage
 // against extreme periods; decide whether it is a gap; search the cell directly; do a first pass on the closest paper;
 // draft a gap statement. The exemplars (LX.Exemplars), the rubric (LX.Rubric, positioning), a flowchart, a comparison
-// table and a checklist follow. No originality judgement is made: an empty cell is a lead, not a gap (curriculum §11.3).
+// table and a checklist follow. No originality judgement is made: an empty cell is a lead, not a gap.
 //
 // The pure model is exported for Node: _tests/learn/test_r02-literature.js checks every number on the page against the
 // two data files and writes the no-JS fallbacks (task, exemplars, rubric) in its --write mode.

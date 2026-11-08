@@ -1,4 +1,4 @@
-// 02-demand.js — Lesson 2, "Why does electricity demand rise and fall?" (step-card form, W1, 2026-11-02).
+// 02-demand.js — Lesson 2, "Why does electricity demand rise and fall?" (step-card form).
 //
 // Data: assets/learn/data/town_days.json (named real days) and town_year.json (all 8,760 hours of 2025) on the Southwest
 // Power Pool grid, from EIA-930, as shapes in thousandths of SPP's 2025 peak hour; assets/learn/data/02-demand.json (which
@@ -20,8 +20,8 @@
 // Every number the page states comes from this model or from the sourced anchors; _tests/learn/test_02-demand.js checks
 // them against the .qmd, and checks the clock against the separately stored days of town_days.json.
 //
-// The hourly line and area charts (the curriculum's "i-curve-viewer") are drawn by the shared LX.Plot (components/plot.js,
-// W1 integration); hourly() below only turns this lesson's series into its spec. Lesson-local: YearDots (8,760 hours as
+// The hourly line and area charts (the curriculum's "i-curve-viewer") are drawn by the shared LX.Plot (components/plot.js);
+// hourly() below only turns this lesson's series into its spec. Lesson-local: YearDots (8,760 hours as
 // dots on a canvas that re-sort into a load-duration curve, with a month highlight and a threshold line).
 (function () {
   "use strict";

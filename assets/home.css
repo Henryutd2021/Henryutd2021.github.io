@@ -114,7 +114,7 @@ main.home > #title-block-header { display: none; }   /* guard: Quarto inserts an
 @media (max-width: 575.98px) { .home .door-grid { grid-template-columns: 1fr; gap: .6rem; } .home .home-doors { padding-top: 1.6rem; } }
 @media (prefers-reduced-motion: reduce) { .home .door { transition: none; } }
 
-/* ---------- 3a. what I bring: ability cards (website v2, 2026-11-02) ---------- */
+/* ---------- 3a. what I bring: ability cards ---------- */
 .home .ability-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
 .home .ability { display: flex; flex-direction: column; gap: .5rem; padding: 1.15rem 1.25rem 1.1rem; background: var(--surface); border: 1px solid var(--line);
   border-radius: var(--r); box-shadow: var(--shadow-sm); }
@@ -174,7 +174,7 @@ main.home > #title-block-header { display: none; }   /* guard: Quarto inserts an
   .home .section-title a .bi, .home .fw-name, .home .social-icons a { transition: none; }
 }
 
-/* ---------- 4b. latest from Field Notes (website v3) ---------- */
+/* ---------- 4b. latest from Field Notes ---------- */
 .home .home-fn .quarto-listing-default .quarto-post { border-bottom: 0; padding: .4rem 0; }
 .home .home-fn .listing-title { font-size: 1.05rem; }
 .home .home-fn .listing-title a { display: inline-block; padding-block: 2px; }   /* a 24 px touch target (2026-11-05) */

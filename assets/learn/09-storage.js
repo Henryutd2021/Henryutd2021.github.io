@@ -1,12 +1,12 @@
-// 09-storage.js — Lesson 9, "How does storage move energy through time?" (step cards, Analyst tier; W1, 2026-11-02).
+// 09-storage.js — Lesson 9, "How does storage move energy through time?" (step cards, Analyst tier).
 //
 // Data: assets/learn/data/09-storage.json (the day, the battery, sizes to compare, real-world numbers with sources and a
 // precomputed answer used only if the solver cannot load), town.json (Prairie Town's fleet; illustrative) and
 // town_year.json (every hour of 2025 on the Southwest Power Pool grid, from EIA-930, as shapes).
 //
 // The day: 9 June 2025, cut from the year by local date (Central daylight time, UTC-5) as lesson 0 does, and scaled the
-// same way: demand = shape x 450 MW, wind = shape x 150 MW, solar = shape x 200 MW, each rounded to whole MW. Chosen on
-// 2026-11-02 as the 2025 day (no filled or frozen hours) with the longest midday surplus of sun (9 hours, 08:00-17:00) and an
+// same way: demand = shape x 450 MW, wind = shape x 150 MW, solar = shape x 200 MW, each rounded to whole MW. Chosen as
+// the 2025 day (no filled or frozen hours) with the longest midday surplus of sun (9 hours, 08:00-17:00) and an
 // evening that needs the peaker (3 hours, 20:00-23:00) under these rules. Hour t runs from t:00 to (t+1):00.
 // The town without a battery (closed form, one hour at a time; no ramp limit in this lesson): the nuclear plant runs
 // flat at 100 MW (lesson 0); gap = demand - nuclear - wind - sun. A gap below zero is spilled wind and sun; otherwise

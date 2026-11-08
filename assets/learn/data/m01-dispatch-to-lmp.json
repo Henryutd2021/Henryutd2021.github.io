@@ -51,7 +51,7 @@
  },
  "sources": {
   "ferc-primer": { "text": "FERC staff, Energy Primer: A Handbook of Energy Market Basics, chapter 3, p. 64", "url": "https://www.ferc.gov/sites/default/files/2020-06/energy-primer-2020_0.pdf", "asOf": "April 2020 edition; checked 2 November 2026" },
-  "ferc-markets": { "text": "FERC, Electric Power Markets", "url": "https://www.ferc.gov/electric-power-markets", "asOf": "page accessed 2 November 2026 (regional-grid dossier, verified)" },
+  "ferc-markets": { "text": "FERC, Electric Power Markets", "url": "https://www.ferc.gov/electric-power-markets", "asOf": "page accessed 2 November 2026" },
   "eia-930": { "text": "EIA, Hourly Electric Grid Monitor (Form EIA-930), Southwest Power Pool", "url": "https://www.eia.gov/electricity/gridmonitor/", "asOf": "2025 data, accessed 2 November 2026" },
   "highs": { "text": "HiGHS, open-source linear and mixed-integer solver (documentation)", "url": "https://ergo-code.github.io/HiGHS/", "asOf": "solver 1.15 in the browser; accessed 2 November 2026" }
  }

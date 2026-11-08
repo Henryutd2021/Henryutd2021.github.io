@@ -1,5 +1,5 @@
 // 10-write-it-down.js — Lesson 10, "Write it down: what are the decisions, the goal and the rules?" (step cards,
-// Analyst tier; W1, 2026-11-02).
+// Analyst tier).
 //
 // Data: assets/learn/data/10-write-it-down.json (the hour, the CO2 cap, slider ranges, the ten formulation cards),
 // assets/learn/data/town.json (Prairie Town's fleet; illustrative) and town_year.json (real 2025 SPP shapes).

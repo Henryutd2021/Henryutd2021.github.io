@@ -1,4 +1,4 @@
-// sb0-site-bench.js — Sandbox SB0, the Site Bench (wave W3, 2026-11-03). Page: learn/sb0-site-bench.qmd (sandbox form:
+// sb0-site-bench.js — Sandbox SB0, the Site Bench. Page: learn/sb0-site-bench.qmd (sandbox form:
 // Brief, Bench, Results, Explain, Sources).
 // The page is a thin layer over engine E0 (assets/learn/components/engine-e0.js, LX.E0, in the bundle): the bench (its
 // controls, presets, run box, sizing run and plan link) is LX.E0.ui.bench; every number comes from LX.E0.solve and

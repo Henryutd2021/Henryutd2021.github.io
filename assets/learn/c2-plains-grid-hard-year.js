@@ -1,14 +1,14 @@
-// c2-plains-grid-hard-year.js — C2, "The Plains Grid in a hard year" (capstone, wave W4, 2026-11-05), built on the Grid
+// c2-plains-grid-hard-year.js — C2, "The Plains Grid in a hard year" (capstone), built on the Grid
 // Room's engine E2 (assets/learn/components/engine-e2.js, LX.E2; data assets/learn/data/e2-plains-grid.json).
 //
 // The capstone: a 300 MW data center (a load) asks to connect at Prairie Town. The reader chooses how much connects this
 // year, its flexibility, what to build (peakers, a battery, wind, solar), a Town–Metro uprate, the reserve and the share
-// of new costs the large load pays, within cost ranges the reader sets (guard G-COST). Three run boxes: the year (12
+// of new costs the large load pays, within cost ranges the reader sets (no cost changes with how much is built). Three run boxes: the year (12
 // representative days plus the two hard weeks, each day committed by the MILP and priced by the dispatch LP with the
 // commitment fixed), the adequacy check (a seeded Monte Carlo over 2025 and 2024 weather and plant outages, with the
 // sensitivity: the plan's builds held fixed as the connected load grows), and who pays (a ledger from the year's
 // conditional prices and the stated allocation rules, against today's grid, precomputed with the same engine; the
-// 26-day estimate's error is carried from the full-year check of four plans, C2 review finding 1). The note is
+// 26-day estimate's error is carried from the full-year check of four plans). The note is
 // LX.ReportNote (two pages, with the sensitivity chart the reader downloads and a paragraph from M2's notebook); the
 // self-check LX.Exemplars and LX.Rubric. Every number is checked by _tests/learn/test_c2-plains-grid-hard-year.js.
 // Nothing is saved or sent: the reader copies the note and the link, and downloads the chart to their own device.
@@ -75,12 +75,12 @@
     return Math.ceil(e);
   }
   // a loss-of-load figure, with enough decimals to stay on the right side of the criterion (0.1002768 is "0.1003", not
-  // "0.10"; C2 review finding 4)
+  // "0.10")
   function loleTxt(v, crit) {
     for (var k = 2; k < 6; k++) { var t = v.toFixed(k); if ((+t > crit) === (v > crit) && (+t < crit) === (v < crit)) return t; }
     return v.toFixed(6);
   }
-  // the full-year check of the ledger (C2 review finding 1): for each of the four checked plans, other customers' change
+  // the full-year check of the ledger: for each of the four checked plans, other customers' change
   // against today on the 26-day estimate, over every day of 2025 and over every day of 2024 (today's grid run the same
   // way); err25 and err24: the smallest and largest (full year − estimate), in $ a year
   function ledgerCheck(cfg) {

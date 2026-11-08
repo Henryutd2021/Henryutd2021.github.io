@@ -403,7 +403,7 @@ window.Quarto = {
 
 
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "name": "How does the grid stay balanced every second? Trip a plant and watch the grid catch it", "description": "Lesson 3 of Energy Systems, Step by Step: trip a power plant on a small regional grid and watch inertia, governors, automatic generation control and, as a last resort, automatic load shedding hold the frequency; then step through the real night of 15 February 2021 in Texas.", "learningResourceType": "Interactive lesson", "educationalLevel": "Beginner", "timeRequired": "PT15M", "inLanguage": "en", "isAccessibleForFree": true, "teaches": ["frequency", "inertia", "primary frequency response", "automatic generation control", "operating reserves", "under-frequency load shedding"], "license": "https://creativecommons.org/licenses/by/4.0/", "author": {"@type": "Person", "name": "Honglin Li", "url": "https://henryutd2021.github.io/"}, "url": "https://henryutd2021.github.io/learn/03-balancing.html", "isPartOf": {"@type": "Course", "name": "Energy Systems, Step by Step", "url": "https://henryutd2021.github.io/learn/"}}</script>
-<script type="application/json" class="lx-lesson-data">{"id":"03-balancing","starter":3,"total":14,"code":null,"title":"How does the grid stay balanced every second?","subtitle":"Trip a plant and watch the grid catch it","short":"Balancing every second","tier":"foundations","tier2":null,"tierLabel":"Foundations · L1","level":"L1","slot":1,"slot2":null,"minutes":15,"does":"Trip a power plant and watch the frequency fall, then the fast response and the reserves step in.","outcome":"Explain frequency, reserves and why outages can cascade.","icon":"wave","form":"cards","scales":[],"teaches":["frequency","inertia","primary frequency response","automatic generation control","operating reserves","under-frequency load shedding"],"lab":null,"href":"03-balancing.html","ready":true,"after":[{"id":"00-grid-operator","starter":0,"title":"How does the grid keep the lights on?","short":"Be the grid operator","does":"Run Prairie Town's power plants hour by hour for one day and keep supply equal to demand.","href":"00-grid-operator.html","ready":true}],"prev":{"id":"02-demand","starter":2,"title":"Why does electricity demand rise and fall?","short":"The shape of demand","does":"Daily, weekly and seasonal demand curves, and a solar slider that digs the “duck curve”.","href":"02-demand.html","ready":true},"next":{"id":"04-forecasts","starter":4,"title":"Forecasts and surprises: how do you plan for weather you can't see yet?","short":"Forecasts and surprises","does":"Forecast against actual demand and wind, a simple baseline to beat, and a band of possibilities instead of one line.","href":"04-forecasts.html","ready":true}}</script>
+<script type="application/json" class="lx-lesson-data">{"id":"03-balancing","starter":3,"total":14,"code":null,"title":"How does the grid stay balanced every second?","subtitle":"Trip a plant and watch the grid catch it","short":"Balancing every second","tier":"foundations","tier2":null,"tierLabel":"Foundations · L1","level":"L1","slot":1,"slot2":null,"minutes":15,"does":"Trip a power plant and watch the frequency fall, then the fast response and the reserves step in.","outcome":"Explain frequency, reserves and why outages can cascade.","icon":"wave","form":"cards","scales":["S2"],"teaches":["frequency","inertia","primary frequency response","automatic generation control","operating reserves","under-frequency load shedding"],"lab":null,"href":"03-balancing.html","ready":true,"after":[{"id":"00-grid-operator","starter":0,"title":"How does the grid keep the lights on?","short":"Be the grid operator","does":"Run Prairie Town's power plants hour by hour for one day and keep supply equal to demand.","href":"00-grid-operator.html","ready":true}],"prev":{"id":"02-demand","starter":2,"title":"Why does electricity demand rise and fall?","short":"The shape of demand","does":"Daily, weekly and seasonal demand curves, and a solar slider that digs the “duck curve”.","href":"02-demand.html","ready":true},"next":{"id":"04-forecasts","starter":4,"title":"Forecasts and surprises: how do you plan for weather you can't see yet?","short":"Forecasts and surprises","does":"Forecast against actual demand and wind, a simple baseline to beat, and a band of possibilities instead of one line.","href":"04-forecasts.html","ready":true}}</script>
 <div class="lx-head" data-lesson-id="03-balancing" data-starter="3" data-total="14" data-tier="foundations" data-level="L1" data-minutes="15" data-form="cards" data-prev-href="02-demand.html" data-next-href="04-forecasts.html">
 <div>
 <nav class="lx-crumbs" aria-label="Breadcrumb"><ol><li><a href="index.html">Learn</a></li><li aria-current="page">Lesson 3</li></ol></nav>
@@ -697,8 +697,8 @@ window.Quarto = {
 })();
 </script>
 <script>
-// pages.js — publications, projects listing and project pages (third redesign, 2026-10-30).
-// Inlined on every page (scripts/build_site.py writes pages-js.html), so each part is guarded by element presence.
+// pages.js — publications, projects listing and project pages.
+// Inlined on every page (the site build step writes pages-js.html), so each part is guarded by element presence.
 //   1. BIB buttons: show / hide an entry's BibTeX; copy button (Publications, home page, project pages)
 //   2. Publications: search box and type tabs; hides empty year groups; live result count; the pressed type is
 //      highlighted in the publications-per-year chart; #journal, #conference, #preprint or #thesis in the URL
@@ -854,13 +854,13 @@ window.Quarto = {
 // home.js — about/home page (third redesign, 2026-10-30). Guard by element presence.
 </script>
 <script>
-// map.js — "Collaborations around the world" map on the About page (2026-10-30).
-// The section, its legend, the institution list and the data (<script id="cmap-data">) come from scripts/build_map.py
-// (_map.qmd); styles in assets/map.css. Inlined on every page (scripts/build_site.py writes map-js.html), so it does
+// map.js — "Collaborations around the world" map on the About page.
+// The section, its legend, the institution list and the data (<script id="cmap-data">) come from the map build step
+// (_map.qmd); styles in assets/map.css. Inlined on every page (the site build step writes map-js.html), so it does
 // nothing unless #cmap is on the page.
 //   - Lazy: Leaflet 1.9.4 (cdnjs, with SRI) and the tiles load only when the section nears the viewport.
 //   - The basemap follows Quarto's day/night toggle (body.quarto-light / body.quarto-dark): CARTO light_all / dark_all
-//     when #cmap carries data-tiles-key (CARTO basemaps need a free key; set in scripts/build_map.py); otherwise the
+//     when #cmap carries data-tiles-key (CARTO basemaps need a free key, set in the map build step); otherwise the
 //     OpenStreetMap standard tiles, toned grey by day and inverted by night in map.css (.cmap.tiles-osm).
 //   - Scroll-wheel zoom (and one-finger dragging on touch screens) stays off until the map is clicked.
 //   - Keyboard: the map takes focus (arrows pan, +/- zoom); Tab reaches each marker, Enter opens its popup, Esc closes.

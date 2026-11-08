@@ -1,5 +1,5 @@
-// cr-your-own-study.js — CR, the research capstone "Your own study: from a question to a report" (curriculum v2 §7.9,
-// §11.2, §3.1, §3.4; wave W7, builder learn-w7-b, 2026-11-07).
+// cr-your-own-study.js — CR, the research capstone "Your own study: from a question to a report" (the research
+// capstone: method-neutral, marked with the course rubric, and the statuses it leads to).
 //
 // A capstone without a sandbox: the reader's study runs in their own tools, at the scale of their chosen route. The page
 // guides it in stages and gives the deliverable's first milestone:
@@ -10,7 +10,7 @@
 //     and the plan's checks (alternatives from another family, a family that fits the track, an uncertainty treatment at
 //     the rubric's Proficient level that fits the method family, the card's scale: pending until the card has one);
 //     the chosen family may be one of its own alternatives only as another method of that family, named in the
-//     proposal (the rubric's "two alternatives, one of them a different family"; Codex review #4);
+//     proposal (the rubric's "two alternatives, one of them a different family");
 //   - the note (#note): the one-page proposal, from the reader's question card (LX.QuestionCard, which can take the card
 //     the reader saved in the question studio R10) and their own words (LX.ReportNote), with the proposal's checks (the
 //     card's eight parts, its scale the plan's, two alternatives, the seven fields, one page);
@@ -134,7 +134,7 @@
       altsOK: planChecks(D, s, F, null)[0].ok
     };
   }
-  // a mixed study treats both parts: the numbers get a range, the qualitative findings triangulation (Codex review #6)
+  // a mixed study treats both parts: the numbers get a range, the qualitative findings triangulation
   function mixedLine(s) {
     return s.unc === "tri" ? "Mixed study: the numbers need a range too (scenarios, a sensitivity analysis or intervals); say which."
       : "Mixed study: the qualitative findings need triangulation too; say how.";
@@ -355,7 +355,7 @@
         H("h4", { text: s.label }, hd);
         H("span", { class: "cr-when", text: "about " + fmtH(r.typ) + " h" + (r.lo === r.hi ? "" : " (" + r.lo + " to " + r.hi + ")") + " · week" + (r.from === r.to ? " " + r.from : "s " + r.from + " to " + r.to) }, hd);
         H("p", { html: LX.rich(s.does) }, li);
-        // the evidence a stage needs, as a checklist to open (Codex review #9: one short action visible per stage)
+        // the evidence a stage needs, as a checklist to open (one short action visible per stage)
         var dw = H("details", { class: "cr-done-when" }, li);
         H("summary", { text: "Done when: " + s.done.length + " check" + (s.done.length > 1 ? "s" : "") }, dw);
         H("div", { html: doneList(s) }, dw);

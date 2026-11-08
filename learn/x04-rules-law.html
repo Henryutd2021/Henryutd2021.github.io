@@ -375,7 +375,7 @@ ul.task-list li input[type="checkbox"] {
 
 
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "name": "How are energy rules made? Follow a rule from a law to a regulator's rule, a rate case and a permit, and spot who decides, who may speak and when", "description": "X4 of Energy Systems, Step by Step: put one finished federal rulemaking (FERC Order No. 2222) in order, step through a Kansas rate case, sort which decisions are federal, state or local, and find where the public can take part.", "learningResourceType": "Interactive lesson", "educationalLevel": "Intermediate", "timeRequired": "PT12M", "inLanguage": "en", "isAccessibleForFree": true, "teaches": ["laws and regulators", "federal rulemaking", "tariffs", "state rate cases", "permits and jurisdictions", "public participation"], "license": "https://creativecommons.org/licenses/by/4.0/", "author": {"@type": "Person", "name": "Honglin Li", "url": "https://henryutd2021.github.io/"}, "url": "https://henryutd2021.github.io/learn/x04-rules-law.html", "isPartOf": {"@type": "Course", "name": "Energy Systems, Step by Step", "url": "https://henryutd2021.github.io/learn/"}}</script>
-<script type="application/json" class="lx-lesson-data">{"id":"x04-rules-law","starter":null,"total":14,"code":"X4","title":"How are energy rules made?","subtitle":"Follow a rule from a law to a regulator's rule, a rate case and a permit, and spot who decides, who may speak and when","short":"Energy rules","tier":"analyst","tier2":null,"tierLabel":"Analyst · L2","level":"L2","slot":2,"slot2":null,"minutes":12,"does":"Put the six stages of FERC's Order No. 2222 in order, step through a Kansas rate case and its 240-day clock, decide whether a settlement binds the commission, sort permits and rules into federal, state and local, and find where the public can speak.","outcome":"Trace how a U.S. energy rule travels from a law to a rule, a tariff or rate and a permit; say which level of government decides each; and read the dates and the points where the public can take part.","icon":"scale","form":"cards","scales":[],"teaches":["laws and regulators","federal rulemaking","tariffs","state rate cases","permits and jurisdictions","public participation"],"lab":null,"href":"x04-rules-law.html","ready":true,"after":[{"id":"a03-market-design","code":"A3","title":"Energy-only or capacity market? How wholesale markets are designed for high renewable shares","short":"Market design","does":"Clear a year of hourly prices on the Plains market; watch negative prices and solar's falling capture price as solar grows; see which new plants cover their costs energy-only and with a capacity market, and what consumers pay; match five arrangements around the world.","href":"a03-market-design.html","ready":true}],"prev":null,"next":null}</script>
+<script type="application/json" class="lx-lesson-data">{"id":"x04-rules-law","starter":null,"total":14,"code":"X4","title":"How are energy rules made?","subtitle":"Follow a rule from a law to a regulator's rule, a rate case and a permit, and spot who decides, who may speak and when","short":"Energy rules","tier":"analyst","tier2":null,"tierLabel":"Analyst · L2","level":"L2","slot":2,"slot2":null,"minutes":12,"does":"Put the six stages of FERC's Order No. 2222 in order, step through a Kansas rate case and its 240-day clock, decide whether a settlement binds the commission, sort permits and rules into federal, state and local, and find where the public can speak.","outcome":"Trace how a U.S. energy rule travels from a law to a rule, a tariff or rate and a permit; say which level of government decides each; and read the dates and the points where the public can take part.","icon":"scale","form":"cards","scales":["S2","S4"],"teaches":["laws and regulators","federal rulemaking","tariffs","state rate cases","permits and jurisdictions","public participation"],"lab":null,"href":"x04-rules-law.html","ready":true,"after":[{"id":"a03-market-design","code":"A3","title":"Energy-only or capacity market? How wholesale markets are designed for high renewable shares","short":"Market design","does":"Clear a year of hourly prices on the Plains market; watch negative prices and solar's falling capture price as solar grows; see which new plants cover their costs energy-only and with a capacity market, and what consumers pay; match five arrangements around the world.","href":"a03-market-design.html","ready":true}],"prev":null,"next":null}</script>
 <div class="lx-head" data-lesson-id="x04-rules-law" data-total="14" data-tier="analyst" data-level="L2" data-minutes="12" data-form="cards">
 <div>
 <nav class="lx-crumbs" aria-label="Breadcrumb"><ol><li><a href="index.html">Learn</a></li><li aria-current="page">X4</li></ol></nav>
@@ -691,8 +691,8 @@ ul.task-list li input[type="checkbox"] {
 })();
 </script>
 <script>
-// pages.js — publications, projects listing and project pages (third redesign, 2026-10-30).
-// Inlined on every page (scripts/build_site.py writes pages-js.html), so each part is guarded by element presence.
+// pages.js — publications, projects listing and project pages.
+// Inlined on every page (the site build step writes pages-js.html), so each part is guarded by element presence.
 //   1. BIB buttons: show / hide an entry's BibTeX; copy button (Publications, home page, project pages)
 //   2. Publications: search box and type tabs; hides empty year groups; live result count; the pressed type is
 //      highlighted in the publications-per-year chart; #journal, #conference, #preprint or #thesis in the URL
@@ -848,13 +848,13 @@ ul.task-list li input[type="checkbox"] {
 // home.js — about/home page (third redesign, 2026-10-30). Guard by element presence.
 </script>
 <script>
-// map.js — "Collaborations around the world" map on the About page (2026-10-30).
-// The section, its legend, the institution list and the data (<script id="cmap-data">) come from scripts/build_map.py
-// (_map.qmd); styles in assets/map.css. Inlined on every page (scripts/build_site.py writes map-js.html), so it does
+// map.js — "Collaborations around the world" map on the About page.
+// The section, its legend, the institution list and the data (<script id="cmap-data">) come from the map build step
+// (_map.qmd); styles in assets/map.css. Inlined on every page (the site build step writes map-js.html), so it does
 // nothing unless #cmap is on the page.
 //   - Lazy: Leaflet 1.9.4 (cdnjs, with SRI) and the tiles load only when the section nears the viewport.
 //   - The basemap follows Quarto's day/night toggle (body.quarto-light / body.quarto-dark): CARTO light_all / dark_all
-//     when #cmap carries data-tiles-key (CARTO basemaps need a free key; set in scripts/build_map.py); otherwise the
+//     when #cmap carries data-tiles-key (CARTO basemaps need a free key, set in the map build step); otherwise the
 //     OpenStreetMap standard tiles, toned grey by day and inverted by night in map.css (.cmap.tiles-osm).
 //   - Scroll-wheel zoom (and one-finger dragging on touch screens) stays off until the map is clicked.
 //   - Keyboard: the map takes focus (arrows pan, +/- zoom); Tab reaches each marker, Enter opens its popup, Esc closes.

@@ -1,10 +1,8 @@
-// f04-power-plants.js — F4, "How do power plants turn heat, water, wind and sunlight into electricity?" (step cards, W3,
-// 2026-11-03).
+// f04-power-plants.js — F4, "How do power plants turn heat, water, wind and sunlight into electricity?" (step cards).
 //
 // Data: assets/learn/data/f04-power-plants.json (sources, plants, scenes, toy settings; every real number with its source
 // and date), town.json (Prairie Town's fleet, illustrative), town_year.json (the Southwest Power Pool's 2025 hourly shapes,
-// EIA-930) and path.json (lesson links). LX.Sankey, the Sankey F3 and F4 share, is in the bundle (components/sankey.js,
-// promoted from F3 at the W3 integration).
+// EIA-930) and path.json (lesson links). LX.Sankey, the Sankey F3 and F4 share, is in the bundle (components/sankey.js).
 //
 // Closed-form model (pure, exported for Node):
 //   share(p, btu)         the share of the energy going in that reaches the wire, per 100 units: thermal plants
@@ -33,7 +31,7 @@
 // its reservoir are illustrative; the solar shapes and the plant data are real (see the data file). Thermal shares are
 // full-load test values (EIA Table 8.2), not a year's measured fuel use; the solar share is DC at the module.
 //
-// Lesson-local component (a candidate for promotion): PlantExplorer (six cutaways, a keyboard rail, the energy chain,
+// Lesson-local component (used by this page only): PlantExplorer (six cutaways, a keyboard rail, the energy chain,
 // a text version). Shared: LX.StepCards, LX.Predict, LX.Sankey (components/sankey.js), LX.NumAnswer, LX.Plot/LX.PlotCard, LX.Slider,
 // LX.Toggle, LX.CardSort, LX.CompareTable.
 (function () {

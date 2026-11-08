@@ -1,5 +1,5 @@
 // m11-tea-in-models.js — Modeler lesson M11, "Techno-economic analysis inside an optimization model" (model-lab: step
-// cards with solver runs), wave W5, builder learn-w5-f, 2026-11-06.
+// cards with solver runs).
 //
 // Data: assets/learn/data/m11-tea-in-models.json (the plant, the electrolyzer's costs, the credit as the IRS states it, the
 // counting rules, the boundaries, the tie rule, a reference block written by the test, and a "lesson13" block the test
@@ -34,7 +34,7 @@
 //   annual matching, the year's imp minus the certificates (wind sold), which may go negative in the row because the
 //   right side is never negative (e x max(0, X) <= L x kg is e x X <= L x kg); e = the grid's t CO2 per MWh.
 //   A tier's rule is a step, which no single LP can hold: the page solves one LP per tier (and one with no credit) and keeps
-//   the best (pick(): the largest value; within $1 a year of it, the case listed first). Credit amounts are the law's; no page searches over them (guard G-POL).
+//   the best (pick(): the largest value; within $1 a year of it, the case listed first). Credit amounts are the law's; no page searches over them.
 // Reported numbers leave out the tie rule's hair costs (data "tie"); the test proves the reported numbers the same on every
 // best plan and re-runs the plans on all 8,760 hours of 2025 (data reference.fullYear).
 (function () {

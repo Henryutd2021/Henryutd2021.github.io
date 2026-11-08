@@ -604,7 +604,7 @@ ul.task-list li input[type="checkbox"] {
 <li><em>Modeled, not metered.</em> The IEA notes that there are no comprehensive global statistics on data-center electricity use. Its figures come from its own model, so treat them as estimates.</li>
 <li><em>Cases and editions.</em> The cases diverge widely by 2035. Always name the case and the publication you cite, and check whether a later IEA publication has updated the figure.</li>
 <li><em>Granularity.</em> The figures are national and regional. They cannot stand in for utility, interconnection or nodal load data.</li>
-<li><em>Recording.</em> In my framework for the cost of delayed grid energization (CoDE), values drawn from capacity outlooks become scenario values, such as case sizes, and never observations. Each one is recorded in a provenance table with its source and access date.</li>
+<li><em>Recording.</em> In my framework for the cost of delayed energization (CoDE), values drawn from capacity outlooks become scenario values, such as case sizes, and never observations. Each one is recorded in a provenance table with its source and access date.</li>
 </ul>
 <p><strong>Used in.</strong> Not used directly in my published studies. For the provenance rule, see the <a href="https://github.com/Henryutd2021/code-delayed-energization/blob/main/docs/data_pipeline.md">code-delayed-energization data pipeline</a>.</p>
 </section>
@@ -835,8 +835,8 @@ ul.task-list li input[type="checkbox"] {
 })();
 </script>
 <script>
-// pages.js — publications, projects listing and project pages (third redesign, 2026-10-30).
-// Inlined on every page (scripts/build_site.py writes pages-js.html), so each part is guarded by element presence.
+// pages.js — publications, projects listing and project pages.
+// Inlined on every page (the site build step writes pages-js.html), so each part is guarded by element presence.
 //   1. BIB buttons: show / hide an entry's BibTeX; copy button (Publications, home page, project pages)
 //   2. Publications: search box and type tabs; hides empty year groups; live result count; the pressed type is
 //      highlighted in the publications-per-year chart; #journal, #conference, #preprint or #thesis in the URL
@@ -992,13 +992,13 @@ ul.task-list li input[type="checkbox"] {
 // home.js — about/home page (third redesign, 2026-10-30). Guard by element presence.
 </script>
 <script>
-// map.js — "Collaborations around the world" map on the About page (2026-10-30).
-// The section, its legend, the institution list and the data (<script id="cmap-data">) come from scripts/build_map.py
-// (_map.qmd); styles in assets/map.css. Inlined on every page (scripts/build_site.py writes map-js.html), so it does
+// map.js — "Collaborations around the world" map on the About page.
+// The section, its legend, the institution list and the data (<script id="cmap-data">) come from the map build step
+// (_map.qmd); styles in assets/map.css. Inlined on every page (the site build step writes map-js.html), so it does
 // nothing unless #cmap is on the page.
 //   - Lazy: Leaflet 1.9.4 (cdnjs, with SRI) and the tiles load only when the section nears the viewport.
 //   - The basemap follows Quarto's day/night toggle (body.quarto-light / body.quarto-dark): CARTO light_all / dark_all
-//     when #cmap carries data-tiles-key (CARTO basemaps need a free key; set in scripts/build_map.py); otherwise the
+//     when #cmap carries data-tiles-key (CARTO basemaps need a free key, set in the map build step); otherwise the
 //     OpenStreetMap standard tiles, toned grey by day and inverted by night in map.css (.cmap.tiles-osm).
 //   - Scroll-wheel zoom (and one-finger dragging on touch screens) stays off until the map is clicked.
 //   - Keyboard: the map takes focus (arrows pan, +/- zoom); Tab reaches each marker, Enter opens its popup, Esc closes.

@@ -1,8 +1,8 @@
 // m06-carbon-in-models.js — Modeler lesson M6, "Putting carbon in the model: caps, prices, frontiers and procurement rules"
-// (model lab: step cards with solver runs), wave W4, builder learn-w4-c, 2026-11-05.
+// (model lab: step cards with solver runs).
 //
-// The model is the Plains Grid's planning LP, LX.plainsPlan (assets/learn/components/plainsplan.js, in the learn.js bundle;
-// promoted from this file at the W4 integration, unchanged), which A12 ("How do governments steer energy?") uses too;
+// The model is the Plains Grid's planning LP, LX.plainsPlan (assets/learn/components/plainsplan.js, in the learn.js bundle),
+// which A12 ("How do governments steer energy?") uses too;
 // its data, decisions, rules, options and tie rule are described there. This file is M6's page; in Node it exports the
 // model, as before. Every number the page states is checked by _tests/learn/test_m06-carbon-in-models.js.
 // The stage has two views: "carbon" (steps 1-4: the frontier, the reader's cap and price) and "buy" (steps 5-7: the

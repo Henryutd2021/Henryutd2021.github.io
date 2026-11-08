@@ -1,9 +1,9 @@
 // cf2-cost-per-kg-vs-system-cost.js — Case file CF2, "When the cost per kilogram and the cost of the system disagree"
-// (case form, wave W2, 2026-11-03).
+// (case form).
 //
 // Data: assets/learn/data/cf2-cost-per-kg-vs-system-cost.json: the studies' dated steps (LX.Timeline), where the
 // journal result holds (LX.Boundary), the illustrative toy ("idea") and the numbers to remember. The research text in
-// the data file is approved excerpt wording (reports/learn/excerpts_for_approval.md, E3-E5 and its revisions); this
+// the data file is approved excerpt wording (E3-E5, with its revisions); this
 // script adds none of its own.
 //
 // The idea (illustrative; invented round numbers, not the studies' inputs or results): an electrolyzer next to a wind

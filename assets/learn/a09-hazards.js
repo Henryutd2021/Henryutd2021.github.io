@@ -1,11 +1,11 @@
 // a09-hazards.js — Analyst lesson A9, "How do heat waves, droughts, wildfires and cold snaps break energy systems, and how
-// do planners prepare?" (step cards, simulation mode, Learn W4, 2026-11-05).
+// do planners prepare?" (step cards, simulation mode).
 //
 // Data (read through data-src): lesson A5's files (town_year.json, m03-capacity-expansion-2024.json, cf_targets.json,
 // a05-adequacy.json: the Plains Grid, its units, the 500 resampled years) and assets/learn/data/a09-hazards.json (four
 // hazards, three pairs, five defences with illustrative yearly costs, a budget, real events and preparation steps with
 // their primary sources, and a reference block written by the test).
-// The simulator is lesson A5's, shared since the W4 integration (assets/learn/components/adequacy.js, in the learn.js
+// The simulator is lesson A5's, shared (assets/learn/components/adequacy.js, in the learn.js
 // bundle; LX.A5 on the page, require in Node): the same weather years, outages and seed, with the hazards as multipliers over the calendar hours of every
 // simulated year (A5's o.mod), so a result reads "in a year when the hazard strikes".
 //   mods(H, ids, defs)  multiplier arrays for the hazards ids, eased by the defences defs: in each window of a hazard, every

@@ -1,19 +1,21 @@
 {
   "meta": {
-    "lesson": "CK-R, the Researcher checkpoint (curriculum v2 §3.3), wave W7, builder learn-w7-b, 7 November 2026",
+    "lesson": "CK-R, the Researcher checkpoint, 7 November 2026",
     "note": "The co-op study (Prairie Valley Co-op, its 112 irrigation pumps, its tariff and every number about them) is fictional and illustrative: no dataset was simulated or measured, so its results (6.2, 4.6, 4.3 and 4.1 kW, the intervals) are assumed example outputs, not computed. The reader's own study is their research capstone (CR). Read by assets/learn/ck-r-defend-revise.js; the page's static blocks are written from this file by node _tests/learn/test_ck-r-defend-revise.js --write."
   },
   "version": "ck-r v1 (7 Nov 2026)",
   "rule": { "auto": 7, "autoProficient": 5, "autoStrong": 6, "autoDeveloping": 3, "pointsProficient": 3,
     "levels": ["Not yet", "Developing", "Proficient", "Strong"], "practice": "Practice (no level)", "openFirst": "not-right" },
   "numbers": { "pumps": 112, "joined2024": 41, "joined2025": 29, "never": 42, "notJoined2024": 71, "first": 6.2, "revised": 4.6, "lo": 2.9, "hi": 6.3,
-    "rerun": 4.3, "tolerancePct": 1, "removed": 3, "holdout": 4.1, "holdLo": 1.8, "holdHi": 6.4, "gapLo": -2.4, "gapHi": 3.4, "keep": 1.5, "pretrend": 0.5, "summersBefore": 4, "hours": 20 },
+    "rerun": 4.3, "tolerancePct": 1, "removed": 3, "holdout": 4.1, "holdLo": 1.8, "holdHi": 6.4, "keep": 1.5, "pretrend": 0.5, "summersBefore": 4, "hours": 20 },
   "intro": [
     "Twelve tasks: seven marked at once, on a fictional co-op study; five texts on your own study, which you rate against stated points.",
     "No hints. Part A works on the co-op proposal above; parts B to D on your research capstone, with work outside this page.",
-    "Task 1 first: the seven marked tasks open once your review of the co-op proposal is submitted, and the review then stays as written.",
+    "Task 1 first: the seven marked tasks open once your review of the co-op proposal is submitted. Each written text then stays as you submitted it.",
     "Your answers and times stay in this browser. At the end, “Copy my results” gives a plain-text summary, with what you typed, for a mentor."
   ],
+  "wait": { "question": "This task opens once task 1, your review of the co-op proposal, is submitted.",
+    "why": "<b>Task 1 first.</b> The marked tasks name concerns about the co-op proposal, so your review finds its own before you see them. Tasks 6, 7, 8 and 12, on your own study, are open now." },
   "study": {
     "title": "Did a night-pumping tariff move irrigation out of the co-op's peak?",
     "who": "A graduate student's proposal, with a first result, for the board of Prairie Valley Co-op.",
@@ -33,7 +35,7 @@
   },
   "forms": [
     { "id": "review", "title": "The review form", "use": "Parts A and B",
-      "lines": ["1. The study in two sentences: question, method, data.", "2. The main claim it will make, and the evidence it plans.", "3. Major concerns (at most three): ones that could change the conclusion. For each: the rubric competence, and what evidence or change would answer it.", "4. Minor concerns.", "5. One alternative method from another family, and what it would show that this one cannot.", "6. Can the main result be rerun from the repository? What is missing?", "7. Recommendation: proceed; proceed once the major concerns are answered; or rethink the question."] },
+      "lines": ["1. The study in one or two sentences: question, method, data.", "2. The main claim it will make, and the evidence it plans.", "3. Major concerns (at most three): ones that could change the conclusion. For each: the rubric competence, and what evidence or change would answer it.", "4. Minor concerns.", "5. One alternative method from another family, and what it would show that this one cannot.", "6. Can the main result be rerun from the repository? What is missing?", "7. Recommendation: proceed; proceed once the major concerns are answered; or rethink the question."] },
     { "id": "response", "title": "The response", "use": "Part C",
       "lines": ["For each concern, in the reviewer's order:", "Concern 1 (competence): accepted / partly accepted / declined.", "Reason: one or two sentences.", "Change: what changed, and where (a section of the proposal, a file in the repository).", "Evidence: a test, a figure or a number, where you have one."] },
     { "id": "log", "title": "The change log", "use": "Part C",
@@ -43,15 +45,16 @@
   ],
   "tasks": [
     { "id": "review", "part": "A", "lesson": "R1, R3, R5", "title": "Your review of the co-op proposal", "skill": "Write a review", "kind": "open-short",
-      "prompt": "Review the co-op proposal above with the review form: the study in two sentences, at most three major concerns, the minor ones, and what would answer each. Paste your review.",
+      "freeze": true, "freezeNote": "Submitted: your review stays as you wrote it, before the marked tasks. Tick the points it makes below.",
+      "prompt": "Review the co-op proposal above with the review form: the study in one or two sentences, at most three major concerns, the minor ones, and what would answer each. Paste your review.",
       "points": [
-        "The study summarized fairly in two sentences (question, method, data) before any criticism.",
+        "The study summarized fairly in one or two sentences (question, method, data) before any criticism.",
         "Major concerns (those that could change the conclusion) kept apart from minor ones.",
         "Each major concern tied to a rubric competence by name.",
         "For each major concern, the evidence or change that would answer it."
       ],
       "solution": "Your own review. Tick the points it makes; the worked review of this proposal, with notes, opens in the Worked solution section once all twelve tasks are answered." },
-    { "id": "rank", "part": "A", "lesson": "M14, R3", "title": "The most serious concern", "skill": "Rank the concerns", "kind": "choice",
+    { "id": "rank", "part": "A", "lesson": "M14, R3", "title": "The most serious concern", "skill": "Rank the concerns", "kind": "choice", "opensAfter": ["review"],
       "prompt": "Which concern could most change the study's conclusion?",
       "options": [
         ["a", "Only five studies are cited, all of households, so the map of what is known is thin."],
@@ -61,13 +64,13 @@
       ],
       "answer": "b",
       "why": {
-        "a": "A real gap in Positioning, but a minor one: better sources would not move the estimate.",
+        "a": "A real gap in Positioning: farm studies might show a factor the proposal misses. It needs checking, but threatens the causal claim less directly than selection.",
         "b": "Farms that could shift easily (a storage pond, pump timers) may have joined first, and their demand might have moved differently anyway: [[selection-bias|selection]] could produce much of the fall.",
-        "c": "Worth a line in the methods; the software does not change the answer.",
+        "c": "Worth a line in the methods, since versions can change results; it threatens the conclusion less directly than selection.",
         "d": "A constraint on the study, not a flaw in its conclusion."
       },
-      "solution": "Joiners chose the tariff, so their demand might have moved differently even without it ([[selection-bias|selection bias]]). Different starting levels alone do no harm: [[parallel-trends|parallel trends]] needs evidence. The other three concerns are minor." },
-    { "id": "competence", "part": "A", "lesson": "R1", "title": "Whose peak?", "skill": "Name the competence", "kind": "choice",
+      "solution": "Joiners chose the tariff, so their demand might have moved differently even without it ([[selection-bias|selection bias]]). Different starting levels alone do no harm: [[parallel-trends|parallel trends]] needs evidence. The other three need checking too, but threaten this causal claim less directly." },
+    { "id": "competence", "part": "A", "lesson": "R1", "title": "Whose peak?", "skill": "Name the competence", "kind": "choice", "opensAfter": ["review"],
       "prompt": "A reviewer writes: “The proposal never says whose peak: each pump's own highest hour, or the co-op's highest-load hours.” Which rubric competence does this concern?",
       "options": [["a", "Framing"], ["b", "Positioning"], ["c", "Integrity"], ["d", "Communication"]],
       "answer": "a",
@@ -78,7 +81,7 @@
         "d": "Communication is about how results are shown; this is about what is measured."
       },
       "solution": "Framing: a metric with units. The board pays for the co-op's highest-load hours ([[coincident-peak|coincident peak]]), so the pumps' average kW in the co-op's 20 highest-load summer hours answers its question; each pump's own peak does not." },
-    { "id": "respond", "part": "A", "lesson": "R9, M14", "title": "Answering the selection concern", "skill": "Answer a critique", "kind": "choice",
+    { "id": "respond", "part": "A", "lesson": "R9, M14", "title": "Answering the selection concern", "skill": "Answer a critique", "kind": "choice", "opensAfter": ["review"],
       "prompt": "The authors answer the selection concern. Which response answers it, rather than deflecting it?",
       "options": [
         ["a", "Self-selection affects most observational studies, so we list it as an accepted limitation in section 6."],
@@ -94,7 +97,7 @@
         "d": "A claim about why farms join, with no evidence for it."
       },
       "solution": "Answer with a change and evidence. The 2025 joiners are one possible comparison; their four summers before 2024 test whether the two groups' demand moved alike ([[parallel-trends|parallel trends]]), which matters more than equal starting levels." },
-    { "id": "strong", "part": "A", "lesson": "R3", "title": "From Proficient to Strong", "skill": "Move a competence up a level", "kind": "choice",
+    { "id": "strong", "part": "A", "lesson": "R3", "title": "From Proficient to Strong", "skill": "Move a competence up a level", "kind": "choice", "opensAfter": ["review"],
       "prompt": "The revised study is Proficient on Method fit: difference-in-differences, defended against a matched comparison and a pump-scheduling simulation. Which change moves it to Strong?",
       "options": [
         ["a", "Add a third alternative method, an agent-based model of the farmers, to the methods compared."],
@@ -110,7 +113,7 @@
         "d": "Length is not a level."
       },
       "solution": "Method fit's Strong level: “limits of the chosen method stated and partly mitigated”. Limit: the later joiners' demand might still have moved differently. Mitigation: the two groups moved together, within 0.5 kW a year, in the four summers before 2024." },
-    { "id": "mine-review", "part": "B", "lesson": "R8, R9", "title": "Your mock review", "skill": "Get a review", "kind": "open-short",
+    { "id": "mine-review", "part": "B", "lesson": "R8, R9", "title": "Your mock review", "skill": "Get a review", "kind": "open-short", "freeze": true,
       "prompt": "Get a written review of your research capstone's question and method (the review form; a mentor, a peer, or you after a day away). Paste it, and say who wrote it.",
       "points": [
         "The reviewer named by role: a mentor, a peer, or you after a day away, with the form.",
@@ -119,7 +122,7 @@
         "Each major concern says what evidence or change would answer it."
       ],
       "solution": "Your own review. A reviewer other than you catches what you cannot see; a self-review with the form, after a pause, still finds most gaps in framing and method." },
-    { "id": "mine-response", "part": "C", "lesson": "R8", "title": "Your response", "skill": "Answer the critique", "kind": "open-short",
+    { "id": "mine-response", "part": "C", "lesson": "R8", "title": "Your response", "skill": "Answer the critique", "kind": "open-short", "freeze": true,
       "prompt": "Answer each major concern point by point: accepted, partly accepted or declined, with a reason, and for each accepted one the change and where it is made. Paste your response.",
       "points": [
         "Every major concern answered: accepted, partly accepted or declined, each with a reason.",
@@ -128,7 +131,7 @@
         "Any declined concern answered with evidence or a stated limit, not an assertion (tick it if you declined none)."
       ],
       "solution": "Your own response. The worked response to the co-op study's selection concern shows a change, its place and new evidence." },
-    { "id": "mine-revision", "part": "C", "lesson": "R1, R10", "title": "Your revision", "skill": "Revise and log", "kind": "open-short",
+    { "id": "mine-revision", "part": "C", "lesson": "R1, R10", "title": "Your revision", "skill": "Revise and log", "kind": "open-short", "freeze": true,
       "prompt": "Revise your proposal. Paste your change log (before → after, and the concern each change answers) and your rubric self-rating after the revision.",
       "points": [
         "A change log: each change as before → after, with the concern it answers.",
@@ -137,7 +140,7 @@
         "Each competence that moved up shown with its evidence; if none could (one already Strong, say), the log says why."
       ],
       "solution": "Your own revision. The worked revision of the co-op study shows what moved it from Proficient to Strong." },
-    { "id": "steps", "part": "D", "lesson": "R5, K8", "title": "A clean-clone rerun", "skill": "Rerun from a clean clone", "kind": "order",
+    { "id": "steps", "part": "D", "lesson": "R5, K8", "title": "A clean-clone rerun", "skill": "Rerun from a clean clone", "kind": "order", "opensAfter": ["review"],
       "prompt": "After the review, the authors rerun the revised co-op study from a clean clone. Each step needs the one before it. Put the steps in order.",
       "items": [
         ["clone", "Clone the repository into a new, empty folder."],
@@ -149,14 +152,14 @@
       ],
       "start": ["compare", "env", "run", "clone", "log", "data"],
       "solution": "Clone, environment, data, run, compare, log. The download script runs in the environment, so the environment comes first; each step uses only what the repository holds, so a missing file or a hand step shows up." },
-    { "id": "gap", "part": "D", "lesson": "R5", "title": "How far apart?", "skill": "Report a difference", "kind": "numeric",
+    { "id": "gap", "part": "D", "lesson": "R5", "title": "How far apart?", "skill": "Report a difference", "kind": "numeric", "opensAfter": ["review"],
       "prompt": "Reported: a fall of 4.6 kW per pump. The clean-clone rerun: 4.3 kW. How far apart are they, as a share of the reported value?",
       "units": [["%", 1], ["share (0 to 1)", 100], ["kW", null]],
       "unitNote": { "kW": "kW gives the gap's size; the task asks for it as a share of the reported value." },
       "answer": { "value": 6.521739130434782, "tol": 0.02, "show": "about 6.5%: (4.6 − 4.3) ÷ 4.6 = 0.3 ÷ 4.6 = 0.065" },
       "tolNote": "Within 2% of the value (about 0.13 percentage points) counts as right.",
       "solution": "(4.6 − 4.3) ÷ 4.6 = 0.3 ÷ 4.6 = 0.065, or 6.5% of the reported value: far over the 1% tolerance written down before the rerun." },
-    { "id": "report", "part": "D", "lesson": "R5, R9", "title": "What to report", "skill": "Report it honestly", "kind": "choice",
+    { "id": "report", "part": "D", "lesson": "R5, R9", "title": "What to report", "skill": "Report it honestly", "kind": "choice", "opensAfter": ["review"],
       "prompt": "The tolerance written down before the rerun was 1%. What should the authors do?",
       "options": [
         ["a", "Report 4.6 kW, the published value: a gap of 0.3 kW is small next to the interval."],
@@ -171,8 +174,8 @@
         "c": "A difference beyond the tolerance is a finding: explain it, fix it in the repository, and say so.",
         "d": "Moving the tolerance after seeing the result defeats it."
       },
-      "solution": "Here the cause was three pumps whose meters were replaced mid-summer, removed by hand before the first run. The rule is now in the cleaning script and the data note; the rerun gives 4.6 kW, and the log says so." },
-    { "id": "mine-rerun", "part": "D", "lesson": "R5, K8", "title": "Your rerun", "skill": "Rerun your own result", "kind": "open-short",
+      "solution": "Here the cause was three pumps whose meters were replaced mid-summer, removed by hand under a rule the data note set before any result. The rule is now in the cleaning script; the rerun gives 4.6 kW, and the log says so." },
+    { "id": "mine-rerun", "part": "D", "lesson": "R5, K8", "title": "Your rerun", "skill": "Rerun your own result", "kind": "open-short", "freeze": true,
       "prompt": "Rerun your own main result from a clean clone, or follow your audit trail for qualitative work. Paste your rerun report (the form above).",
       "points": [
         "A new, empty folder and the environment built from the repository's own files; or the audit trail followed from the raw material.",
@@ -207,7 +210,7 @@
           "\nMajor 3 · Trustworthy analysis: ",
           { "text": "the data were cleaned by hand in a spreadsheet, so the result cannot be rerun from the repository.", "note": "A result no one can rerun cannot be checked." },
           "\nMinor · Positioning: ",
-          { "text": "the five studies are of households; add studies of farm or business tariffs.", "note": "Kept minor: better sources would not move the estimate." },
+          { "text": "the five studies are of households; add studies of farm or business tariffs.", "note": "Kept minor: it could sharpen the method, but threatens the conclusion less than selection." },
           "\nAnother family: ",
           { "text": "a pump-scheduling simulation would show how much pumping could move at most, which meter data cannot.", "note": "An alternative from another method family, and what it adds." },
           "\nRecommendation: ",
@@ -266,7 +269,7 @@
           "\nValidation, set up first: ",
           { "text": "summer 2025, not used to build the analysis: the same code on the 29 farms that joined in 2025, against the 42 that never joined.", "note": "Second half: data not used to build it, a named comparison group, and a rule written down before looking." },
           "\nRule and result: ",
-          { "text": "agree if the gap between the two estimates, treated as independent, has a 95% interval that includes zero. 2025: 4.1 kW (1.8 to 6.4); gap 0.5 kW (−2.4 to 3.4): they agree.", "note": "Consistent with the main estimate, which supports it; on its own it does not prove the method: the never-joiners' demand may have moved differently." },
+          { "text": "the check supports the main estimate if its whole 95% interval is above 1.5 kW, so the board's decision would not change. 2025: 4.1 kW (1.8 to 6.4): it is.", "note": "Compatible with 4.6 kW, not proof the effects are equal; the two estimates share farms (the 29 were comparison farms before), so no interval for their gap is given. The never-joiners' demand may also have moved differently." },
           "\nResult: 4.6 kW per pump (95% interval 2.9 to 6.3), above 1.5 kW across the interval."
         ] }
       ],
@@ -279,8 +282,8 @@
     "rerun": [
       ["Tolerance", "1% of the main result, written down before the rerun."],
       ["Values", "Reported 4.6 kW; rerun 4.3 kW. Difference: (4.6 − 4.3) ÷ 4.6 = 0.3 ÷ 4.6 = 0.065, or 6.5%: over the tolerance."],
-      ["Cause", "Three pumps whose meters were replaced mid-summer had been removed by hand before the first run; the code kept them."],
-      ["Fix", "The rule is now in the cleaning script and the data note; the rerun from a clean clone gives 4.6 kW."],
+      ["Cause", "Three pumps whose meters were replaced mid-summer were removed by hand before the first run; the code kept them. The data note had set that rule before any result."],
+      ["Fix", "The rule, not agreement with the old number, decides: it is now in the cleaning script, and the rerun from a clean clone gives 4.6 kW."],
       ["Logged", "Both numbers, the cause and the fix, in the verification log. Then a co-op engineer reran it from the repository: 4.6 kW."]
     ]
   },

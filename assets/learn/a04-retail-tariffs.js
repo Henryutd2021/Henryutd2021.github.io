@@ -1,5 +1,5 @@
 // a04-retail-tariffs.js — Lesson A4, "How should an electricity bill be designed? Retail, dynamic and large-load
-// tariffs" (step cards, Analyst tier; wave W3, 2026-11-03).
+// tariffs" (step cards, Analyst tier).
 //
 // Data: assets/learn/data/a04-retail-tariffs.json (the customers, the utility's unit costs, the four tariffs, the large
 // load, the numbers to remember with their sources), town.json (Prairie Town's fleet; illustrative) and town_year.json

@@ -1,5 +1,5 @@
 // b02-python-data.js — Lesson B2, "Python and data for energy: how do you load, plot and check a year of hourly data?"
-// (bridge lesson, step cards; W1, 2026-11-02).
+// (bridge lesson, step cards).
 //
 // Data (all real, Southwest Power Pool 2025, from EIA Form EIA-930):
 //   assets/learn/data/b02-python-data.json  demand, wind and solar in MW from EIA's adjusted columns, BEFORE this course's

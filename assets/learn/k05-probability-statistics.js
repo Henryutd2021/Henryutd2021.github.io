@@ -1,4 +1,4 @@
-// k05-probability-statistics.js — Toolbox K5, "Probability and statistics" (step cards, Learn W2, 2026-11-03).
+// k05-probability-statistics.js — Toolbox K5, "Probability and statistics" (step cards).
 //
 // Just-in-time statistics for lesson 4 (forecasts) and the Modeler lessons on uncertainty (M7 Monte Carlo, M8 stochastic
 // optimization, M9 surrogates; A5 adequacy). Eight step cards on one chart of real data, a practice drill and four data tasks.

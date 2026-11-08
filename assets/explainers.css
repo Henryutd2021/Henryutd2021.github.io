@@ -1,4 +1,4 @@
-/* explainers.css — interactive mechanism explainers on project pages (website v2, 2026-11-02; JS in assets/explainers/).
+/* explainers.css — interactive mechanism explainers on project pages (JS in assets/explainers/).
    A bordered card in the page's theme colour (--t from .theme-<key>, helpers --t-ink/--t-soft/--t-line in pubs.css):
    title, controls, chart, readouts and one live sentence. Without JS only the static fallback paragraph shows. */
 

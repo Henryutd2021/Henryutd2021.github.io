@@ -1,5 +1,5 @@
 {
- "about": "Data of Learn case file CF5, Where should a cogeneration study's boundary be drawn? (wave W5, builder learn-w5-f, 2026-11-06; review fixes on learn-w5-cf5, 2026-11-06; live since 2026-11-07). The timeline and the boundary card are approved excerpt wording (reports/learn/excerpts_for_approval.md, E14, approved 2026-11-07), word for word (E14.22, E14.21); the boundary card's source line is E14.24. The idea is the course's own toy: a generic steam plant and one generic load with round numbers the reader sets, average power over one hour; nothing in it is the study's input, equation or result.",
+ "about": "Data of Learn case file CF5, Where should a cogeneration study's boundary be drawn? The timeline and the boundary card are approved excerpt wording (E14), word for word (E14.22, E14.21); the boundary card's source line is E14.24. The idea is the course's own toy: a generic steam plant and one generic load with round numbers the reader sets, average power over one hour; nothing in it is the study's input, equation or result.",
  "built": "2026-11-06",
  "timeline": {
   "title": "The study in time",
