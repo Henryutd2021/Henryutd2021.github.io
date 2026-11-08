@@ -1233,7 +1233,7 @@
     "power": 0,
     "h2": 0,
     "heat": 0,
-    "why": "Power is worth $0 here: one more MWh of wind could be neither sold nor used, so hydrogen and heat made from it are worth $0 too."
+    "why": "The connection is full: 50 MW already sold at the town's $40. One more MWh could make more hydrogen or heat, but it would only replace some that costs nothing to make: $0 to the plant."
    },
    {
     "id": "pump",
@@ -1253,6 +1253,71 @@
     "heat": 15,
     "why": "Power is dear ($100 per MWh), so the boiler sets heat's price at $15, below $100 ÷ 3. Hydrogen is worth $2.13 per kg, set through the tank by other hours, below the $2.50 truck."
    }
-  ]
+  ],
+  "practice": {
+   "about": "Answers to the notebook's practice tasks, solved with this model in HiGHS (the LP relaxation unless named). Savings in $ a week against Power only with the same changes; sizes in MW; one-sided values in $ per MWh.",
+   "wider": {
+    "mw": 100,
+    "value": {
+     "h2": {
+      "winter": 38344,
+      "summer": 11144
+     },
+     "heat": {
+      "winter": 49877.2,
+      "summer": 13204.6
+     },
+     "all": {
+      "winter": 53697.6,
+      "summer": 16926.8
+     }
+    }
+   },
+   "pem": {
+    "minLoad": 0.05,
+    "relaxed": -178649.2,
+    "exact": -178649.2,
+    "on": -177199.4
+   },
+   "size": {
+    "config": "h2",
+    "perKW": 2000,
+    "rate": 0.04,
+    "years": 30,
+    "weeklyPerMW": 2218.1,
+    "MW": {
+     "winter": 12.61,
+     "summer": 8.9
+    }
+   },
+   "co2": {
+    "perT": 50,
+    "boilerT": 0.2,
+    "truckKg": 10,
+    "value": {
+     "h2": {
+      "winter": 73870.1,
+      "summer": 43080.8
+     },
+     "heat": {
+      "winter": 114952.9,
+      "summer": 49801.7
+     },
+     "all": {
+      "winter": 116235.2,
+      "summer": 52218.2
+     }
+    }
+   },
+   "corner": {
+    "config": "nobat",
+    "week": "winter",
+    "t": 0,
+    "wind": 50,
+    "price": 40,
+    "up": 0,
+    "down": 40
+   }
+  }
  }
 }
