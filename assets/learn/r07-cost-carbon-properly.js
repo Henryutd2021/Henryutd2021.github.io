@@ -101,6 +101,12 @@
     return which === "depot" ? "**Depot connection:** " + money(r.e.depotUpfront) + " up front, " + usd(r.e.depot) + " a year as an annual equivalent. The demand charges are still missing."
       : "**Demand charges:** " + usd(r.e.demand) + " a year. The depot connection is still missing."; }
   function lineVerdict(D, F, gid) { return "**Now:** " + verdict(run(D, F, gid)); }
+  // the step's audited line: all four fixes at the grid factor chosen (so it never disagrees with the readout), and the
+  // reader's prediction (the audit makes electric cost more at every grid factor; the factor moves CO2 only)
+  function auditLine(D, gid, predicted) {
+    var A = run(D, all(true), gid), v = verdict(A), head = "audited (all four fixes, grid at " + A.co2.factor.toFixed(3) + " t per MWh), ";
+    return predicted ? (predicted === "more" ? "You predicted it: " : "You predicted otherwise: ") + head + v.charAt(0).toLowerCase() + v.slice(1) : "A" + head.slice(1) + v.charAt(0).toLowerCase() + v.slice(1);
+  }
   // the study's inputs, its fleet plan and two numbers worked from them; the units key
   function inputRows(D) {
     var E = D.inputs.electric, G = D.inputs.diesel, C = D.inputs.credit;
@@ -114,7 +120,8 @@
   function planText(D) { return fillT(D.study.plan.text, facts(D)); }
   function worked(D) {
     var I = D.inputs, S0 = run(D, all(false)), miles = S0.miles;
-    return ["Charging energy: " + I.buses + " buses × " + grp(I.milesPerBus) + " miles × " + I.electric.kWhPerMile + " kWh per mile = " + grp(S0.e.mwh) + " MWh a year; at $" + I.electric.energyPrice.toFixed(2) + " per kWh, " + usd(S0.e.energy) + " a year.",
+    return ["Charging energy: " + I.buses + " buses × " + grp(I.milesPerBus) + " miles × " + I.electric.kWhPerMile + " kWh per mile = " + grp(S0.e.mwh * 1000) + " kWh = " + grp(S0.e.mwh) + " MWh a year.",
+      "Its bill: " + grp(S0.e.mwh * 1000) + " kWh × $" + I.electric.energyPrice.toFixed(2) + " per kWh = " + usd(S0.e.energy) + " a year.",
       "Diesel fuel, as the study runs it: " + grp(miles) + " miles ÷ " + I.diesel.oldMpg + " mpg = " + grp(S0.d.gallons) + " gallons a year; at $" + I.diesel.fuelPrice.toFixed(2) + " per gallon, " + usd(S0.d.fuel) + " a year."];
   }
 
@@ -204,7 +211,7 @@
   function checksOf(D, text) { var s = String(text || ""); return D.writeChecks.map(function (c) { return { id: c.id, label: c.label, ok: new RegExp(c.re, "i").test(s) }; }); }
 
   var model = { FIX: FIX, crf: crf, gridUS: gridUS, gridFactor: gridFactor, all: all, run: run, waterfall: waterfall, gridOn: gridOn, grp: grp, money: money, usd: usd, thou: thou, t: t, pct: pct,
-    fillT: fillT, fillDeep: fillDeep, facts: facts, verdict: verdict, lineBoundary: lineBoundary, lineBaseline: lineBaseline, lineGrid: lineGrid, lineGridPart: lineGridPart, lineCredit: lineCredit, lineVerdict: lineVerdict,
+    fillT: fillT, fillDeep: fillDeep, facts: facts, verdict: verdict, lineBoundary: lineBoundary, lineBaseline: lineBaseline, lineGrid: lineGrid, lineGridPart: lineGridPart, lineCredit: lineCredit, lineVerdict: lineVerdict, auditLine: auditLine,
     inputRows: inputRows, fleetLine: fleetLine, planText: planText, worked: worked, inputsHTML: inputsHTML,
     ledgerRows: ledgerRows, staticTask: staticTask, whoHTML: whoHTML, ladderHTML: ladderHTML, ledgerHTML: ledgerHTML, whoRows: whoRows, boundarySpec: boundarySpec, boundaryHTML: boundaryHTML, exemplarsSpec: exemplarsSpec, checksOf: checksOf, esc: esc, rich: rich };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
@@ -237,7 +244,7 @@
     var audit = H("section", { class: "r07-audit", "aria-label": "Your audit" }, cols);
     H("p", { class: "lx-eyebrow", text: "Your audit" }, audit);
     var chips = H("div", { class: "lx-readouts", "aria-live": "polite" }, audit), fixList = H("ul", { class: "r07-fixes" }, audit), verdictEl = H("p", { class: "r07-verdict" }, audit);
-    H("p", { class: "lx-hint", html: LX.rich("[[attributed-emissions|Attributed]] CO₂: diesel at the tailpipe and, once the boundary is fixed, charging at the grid's average factor. What the grid really emits less needs a consequential analysis: ") + ref("A10") + "." }, audit);
+    H("p", { class: "lx-hint", html: LX.rich("[[attributed-emissions|Attributed]] CO₂: diesel at the tailpipe and, once the boundary is fixed, charging at the grid's [[average-emission-factor|average factor]]. What the grid really emits less needs a [[consequential-analysis|consequential analysis]]: ") + ref("A10") + "." }, audit);
     function chip(label, value, tone) { var c = H("div", { class: "lx-readout" + (tone ? " " + tone : "") }, chips); H("span", { text: label }, c); H("b", { text: value }, c); }
     function paint() {
       var r = run(D, S.fx, S.grid);
@@ -336,12 +343,13 @@
           var g = H("div", { class: "lx-seg", role: "group", "aria-labelledby": id }, w), gb = {};
           D.co2.gridChoices.forEach(function (c) {
             var b = H("button", { type: "button", text: c.v != null ? c.label : gridUS(D).toFixed(3) + ", " + c.label }, g); gb[c.id] = b;
-            b.addEventListener("click", function () { S.grid = c.id; keep(); Object.keys(gb).forEach(function (k) { gb[k].setAttribute("aria-pressed", String(k === S.grid)); }); paint(); draw(); api.saw(lineVerdict(D, S.fx, S.grid)); api.done(); });
+            b.addEventListener("click", function () { S.grid = c.id; keep(); Object.keys(gb).forEach(function (k) { gb[k].setAttribute("aria-pressed", String(k === S.grid)); }); paint(); draw(); if (ah) aud(); api.saw(lineVerdict(D, S.fx, S.grid)); api.done(); });
           });
           Object.keys(gb).forEach(function (k) { gb[k].setAttribute("aria-pressed", String(k === S.grid)); });
           draw();
-          var A = run(D, all(true)), msg = predicted === "more" ? "You predicted it: " : "You predicted otherwise: ";
-          H("p", { class: "lx-hint", text: predicted ? msg + "audited, " + verdict(A).charAt(0).toLowerCase() + verdict(A).slice(1) : "Audited: " + verdict(A) }, act);
+          var ah = H("p", { class: "lx-hint r07-audited", "aria-live": "polite" }, act);
+          function aud() { ah.textContent = auditLine(D, S.grid, predicted); }
+          aud();
           H("p", { class: "lx-hint", html: "The same audit inside an optimization model, where the plan itself responds: " + ref("M11") + "." }, act);
         } },
       { text: "Write your audit note: each flaw, its fix and its effect, then the corrected conclusion with its condition. The checks see only whether each part is there; compare with the strong note under Exemplars.",

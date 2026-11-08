@@ -203,6 +203,19 @@ ok(D.plan.examples.rows.length === 2 && D.plan.examples.rows.map(r => r.key).joi
 }
 function cards(id) { return D.cards.find(c => c.id === id); }
 
+// ---------------- the single number, rebuilt step by step; what the weather input is; what sampling covers
+{ const W = R.worked(M);
+  ok(near(W.grown, 450 * Math.pow(1.01, 10), 1e-9) && W.grown.toFixed(1) === "497.1" && W.cars === 13000 && W.day === 130 && W.add.toFixed(1) === "18.2" && Math.round(W.total) === Number(F.claim), "worked: 450 × 1.010^10 = 497.1 MW, 13,000 cars × 10 kWh = 130 MWh a day, 14% in one hour = 18.2 MW, total " + F.claim + " MW");
+  ok(near(W.total, R.peakAt(M, 10, R.base(M), "central", "peaks"), 1e-9) && W.hour === D.model.profiles.unmanaged.indexOf(Math.max.apply(null, D.model.profiles.unmanaged)), "worked: the same as the model's single number, at the unmanaged pattern's busiest hour");
+  const st = R.staticTask(D, M), wh = R.workedHTML(M);
+  ok(st.indexOf(wh) >= 0 && JS.indexOf('H("div", { html: workedHTML(M) }, act)') >= 0 && /497\.1 MW/.test(wh) && /130 MWh/.test(wh) && /18\.2 MW/.test(wh) && /same pattern every day/.test(wh), "worked: shown under the claim, live and without JavaScript");
+  ok(st.indexOf(R.rich(R.KEY)) > st.indexOf("The 2035 peak as bands, in numbers"), "no-JS band table: the percentile key beneath it"); }
+ok(!/±4/.test(JSON.stringify(D) + JS) && /multiplier, 0\.96 to 1\.04/.test(cards("heat").text) && D.model.weather.join() === "0.96,1.04" && /not computed from temperature/.test(cards("heat").why), "weather: a multiplier on background demand, 0.96 to 1.04 as the model draws it, not a temperature");
+ok(!/Sampling cannot/i.test(JSON.stringify(D) + JS) && /vary three numbers only/.test(JS), "sampling's limit is what these runs vary, not sampling as such");
+{ const cb = D.treatments.find(t => t.id === "t-cars").options.find(o => o.id === "b");
+  ok(!/more likely/.test(cb.why) && /not bounds/.test(cb.why), "car uptake: a likelier central case does not make the others extremes"); }
+ok(/shifts car charging to quieter hours/.test(cards("programme").text), "managed charging defined on its card");
+
 // ---------------- exemplars, page, blocks
 const spec = R.exemplarsSpec(D, F);
 ok(EX.validate(spec).length === 0, "exemplars well formed: " + EX.validate(spec).join("; "));
@@ -269,6 +282,23 @@ D.checklist.forEach(c => ok(words(c.text) <= 25, "checklist " + c.id + ": at mos
 { const P = fs.readFileSync(path.join(SITE, "learn/path.yml"), "utf8"), row = P.slice(P.indexOf("id: r06-uncertainty-properly"), P.indexOf("code: R7"));
   ok(/Sort twelve uncertainties/.test(row) && D.cards.length === 12, "path.yml: 'Sort twelve uncertainties', as many as the data hold");
   ok(/after: \[M7(, M8)?\]/.test(row) && /practice_minutes: 60/.test(row) && /minutes: 30/.test(row), "path.yml: prerequisites (M7; M8 once live) and minutes as the curriculum row"); }
+
+// ---------------- the page on a stub document: the first card shows the claim and how it is built
+{
+  const vm = require("vm"), { env, load } = require("./stubdom.js"), E = env();
+  E.LX.ready = () => {}; E.LX.progress.guess = () => null; E.LX.visible = E.LX.visible || (() => false);
+  E.LX.lessonRef = () => ({ ready: true, href: "#", label: "R6" });
+  ["cards", "cardsort", "plot", "exemplars", "comparetable", "flowchart", "rubric", "checklist"].forEach(n => { try { load(n, E); } catch (e) { /* not needed below */ } });
+  let init = null, demo = null;
+  E.LX.mount = (slug, f) => { if (slug === "r06-uncertainty-properly") init = f; };
+  E.LX.demo = (root, fn, cards) => { demo = { fn, cards }; return () => null; };
+  vm.runInNewContext(JS, { window: E.window, document: E.document, location: E.location, navigator: {}, console, module: { exports: {} }, performance: E.window.performance, setTimeout: () => 0, clearTimeout: () => {}, requestAnimationFrame: () => 0 });
+  const root = E.LX.H("div", { class: "lx-interactive", "data-learn": "r06-uncertainty-properly" }, E.body), live = E.LX.H("div", { class: "lx-live" }, root);
+  let threw = null;
+  try { init(live, { r06_uncertainty_properly: D, town_year: Y, path: { starter: [], more: [] } }, root); } catch (e) { threw = e.stack; }
+  ok(!threw, "the page mounts on the stub document" + (threw ? ": " + threw : ""));
+  ok(!threw && /How the single number is built/.test(live.textContent) && /497\.1 MW/.test(live.textContent) && /18\.2 MW/.test(live.textContent), "the first card: the claim, and how its 515 MW is built");
+}
 
 console.log(`${checks - fails} of ${checks} checks passed`);
 process.exit(fails ? 1 : 0);

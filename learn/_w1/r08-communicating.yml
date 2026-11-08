@@ -3,6 +3,7 @@ lesson: r08-communicating
 glossary:
   - {id: boundary-condition, term: "Boundary condition (of a finding)", def: "The place, time, data and assumptions a result holds under, stated next to it so readers do not stretch it further."}
   - {id: truncated-axis, term: "Truncated axis", def: "A chart axis that starts above zero; on a bar chart it makes differences look larger than they are."}
+  - {id: utility-scale, term: "Utility-scale", def: "Large enough to sell power to the grid; in EIA's statistics, plants of at least 1 MW."}
   - {id: spp, term: "SPP (Southwest Power Pool)", def: "The regional grid operator that runs the transmission grid and wholesale electricity market across much of the central U.S.; the course's hourly data come from its area (EIA-930)."}
 requests:
   - "R8 reports R6's fictional study; its data file carries R6's numbers (fromR6), and _tests/learn/test_r08-communicating.js recomputes each with R6's model. A change to R6's model or data needs R8's --write run too."

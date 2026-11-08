@@ -17,7 +17,7 @@
   ],
   "findings": [
     { "id": "cf", "bin": "holds", "text": "The U.S. utility-scale wind fleet's capacity factor was {cfYear}% in 2025 (EIA).", "why": "A number, the fleet (plants of 1 MW or more), the year and the source: a reader can check it and knows where it stops. [[capacity-factor|Capacity factor]]: output over full-power output." },
-    { "id": "pk", "bin": "holds", "text": "In SPP's 2025 data, the busiest hour of demand began at {peakHour} on {peakDay}.", "why": "Place, year, hour and data named; it says when, and claims nothing about why." },
+    { "id": "pk", "bin": "holds", "text": "In SPP's 2025 data, the busiest hour of demand began at {peakHour} {peakTZ} on {peakDay}.", "why": "Place, year, hour with its time zone, and data named; it says when, and claims nothing about why." },
     { "id": "band", "bin": "holds", "text": "With central car uptake, the town's 2035 peak is {c10}–{c90} MW in about 8 of 10 model runs.", "why": "A range, the case it belongs to (central uptake: 15,000 electric cars in 2035) and what the range means. The model's other conditions belong in the next sentence." },
     { "id": "third", "bin": "missing", "text": "Wind farms run at about a third of their capacity.", "why": "Which fleet, which year? True of the U.S. fleet in 2025 ({cfYear}%), but it moved from {cfLo}% to {cfHi}% month to month." },
     { "id": "after", "bin": "missing", "text": "Demand peaks in the afternoon.", "why": "In summer, yes: all {sumDays} June to August days peaked between 12:00 and 18:00. In winter, {winMorn} of {winDays} days peaked before noon (SPP, 2025)." },
@@ -29,7 +29,7 @@
   "charts": [
     { "id": "axis",
       "badTitle": "Wind collapses in late summer",
-      "goodTitle": "Wind's capacity factor peaks in spring and dips in late summer",
+      "goodTitle": "Wind's capacity factor was highest in {monthHi} and lowest in {monthLo}",
       "question": "What makes the late-summer dip look so deep?",
       "options": [
         { "id": "a", "verdict": "bad", "text": "The months run in calendar order.", "why": "Calendar order is right for a seasonal pattern; it misleads nothing." },
@@ -38,7 +38,7 @@
       ],
       "fixes": [
         { "id": "zero", "key": true, "label": "Start the axis at zero" },
-        { "id": "scope", "label": "Name the fleet, the year and the source" },
+        { "id": "scope", "need": true, "label": "Name the fleet, the year and the source" },
         { "id": "title", "label": "Make the title say what the data show" }
       ]
     },
@@ -48,7 +48,7 @@
       "partTitle": "SPP's daily wind output, {winStart} to {winEnd} 2025",
       "question": "Why does wind seem to be falling?",
       "options": [
-        { "id": "a", "verdict": "good", "text": "Two weeks were cut from a year, starting on a windy day and ending on a calm one.", "why": "The window makes a fall look like a trend. Over the whole year, daily output swung between {dLo}% and {dHi}% of the windiest hour, averaging {dMean}%." },
+        { "id": "a", "verdict": "good", "text": "Two weeks were cut from the year, from a windy day to a calm one.", "why": "The window makes a fall look like a trend. Across 2025, days ran from {dLo}% to {dHi}% of the windiest hour." },
         { "id": "b", "verdict": "bad", "text": "Output is shown as a share of the year's windiest hour.", "why": "A fair scale, if the axis says so. It does not create the fall." },
         { "id": "c", "verdict": "ok", "text": "Daily averages hide the hours.", "why": "True, but the hours would show the same fall. The window creates it." }
       ],
@@ -78,7 +78,7 @@
   "findingsStep": {
     "fields": [
       { "id": "axis", "label": "Chart 1, the wind fleet by month", "example": "In 2025, the U.S. utility-scale wind fleet's monthly capacity factor ranged from {cfLo}% in September to {cfHi}% in March (EIA)." },
-      { "id": "window", "label": "Chart 2, SPP's daily wind", "example": "In SPP's 2025 data, daily wind output ranged from {dLo}% to {dHi}% of the year's windiest hour, averaging {dMean}%; a two-week window cannot show a trend." },
+      { "id": "window", "label": "Chart 2, SPP's daily wind", "example": "In SPP's 2025 data, daily wind output ranged from {dLo}% to {dHi}% of the year's windiest hour, averaging {dMean}%; this selected fortnight does not establish a year-long decline." },
       { "id": "average", "label": "Chart 3, Prairie Town's average day", "example": "On Prairie Town's 2025 pattern, the average day peaks at {avgPeak} MW at {avgHour}, but on 1 day in 10 the {p90Hour} hour tops {p90Max} MW, and the year's highest hour was {yearPeak} MW." }
     ]
   },
@@ -86,7 +86,7 @@
     "facts": [
       { "k": "The 2035 peak", "v": "{c10}–{c90} MW with central car uptake (15,000 electric cars), {f10}–{f90} MW with fast uptake (30,000): [[percentile|P10–P90]], about 8 in 10 of 1,000 runs. 450 MW in 2025." },
       { "k": "Managed charging", "v": "A programme moving most charging after 23:00. With fast uptake, the [[median|median]] falls from {f50} to {fm50} MW when demand is added hour by hour; adding the separate peaks ignores timing and misses this." },
-      { "k": "Inputs", "v": "Varied in the runs: growth (0.4–1.6% a year), the year's weather (±4%) and a car's daily energy (7–13 kWh). Fixed: 2025's hourly pattern; cars charging at home." },
+      { "k": "Inputs", "v": "Varied in the runs: growth (0.4–1.6% a year), a weather multiplier on background demand (0.96–1.04) and a car's daily energy (7–13 kWh). Fixed: 2025's hourly pattern; cars charging at home." },
       { "k": "Not in the model", "v": "A new customer (a constant 60 MW would raise each 2035 figure by 60 MW), workplace charging, the programme's cost and sign-up. Outcomes outside the ranges remain possible." }
     ],
     "fields": [
@@ -108,7 +108,7 @@
   },
   "public": {
     "limit": 150,
-    "example": "Prairie Town uses the most electricity on summer afternoons. We looked at how that busiest hour could change by 2035 as more people drive electric cars. If they spread at a middle pace, about 8 in 10 of our model runs put it between {c10} and {c90} megawatts, compared with 450 in 2025. If they spread fast, the range moves up to {f10} to {f90}, and higher values are possible. Charging cars late at night instead of in the early evening would keep it lower, by about {mHours} megawatts if car numbers grow fast. These numbers leave out a large new factory or business, which would add more, and we will update them as new car numbers come in.",
+    "example": "Prairie Town uses the most electricity on summer afternoons. We looked at how that busiest hour could change by 2035 as more people drive electric cars. If they spread at a middle pace, about 8 in 10 of our model runs put it between {c10} and {c90} megawatts, compared with 450 in 2025. If they spread fast, the range moves up to {f10} to {f90}, and higher values are possible. With fast growth in car numbers, charging late at night instead of in the early evening lowered the middle estimate by about {mHours} megawatts in our model. These numbers leave out a large new factory or business, which would add more, and we will update them as new car numbers come in.",
     "jargon": ["P10", "P90", "P50", "percentile", "Monte Carlo", "median", "stochastic", "parameter", "scenario", "uptake", "capacity factor"]
   },
   "exemplars": {
@@ -144,7 +144,7 @@
   },
   "chartsTable": [
     { "chart": "Wind fleet by month", "misled": "An axis from 20% made a {realRatio}× difference look {truncRatio}×.", "fix": "Bars from zero; fleet, year and source named.", "finding": "Monthly [[capacity-factor|capacity factor]] ranged from {cfLo}% to {cfHi}% in 2025 (U.S. fleet, EIA)." },
-    { "chart": "SPP's daily wind", "misled": "Two weeks chosen from windy to calm looked like a fall of {winFall}%.", "fix": "The whole year, with the two weeks marked.", "finding": "Daily output swung between {dLo}% and {dHi}% of the windiest hour through 2025; two weeks cannot show a trend." },
+    { "chart": "SPP's daily wind", "misled": "Two weeks chosen from windy to calm looked like a fall of {winFall}%.", "fix": "The whole year, with the two weeks marked.", "finding": "Daily output swung between {dLo}% and {dHi}% of the windiest hour through 2025; this selected fortnight does not establish a year-long decline." },
     { "chart": "Prairie Town's average day", "misled": "An average of 365 days peaked at {avgPeak} MW; no plan can use that alone.", "fix": "The spread across days, and the year's highest hour.", "finding": "The average day peaks at {avgPeak} MW; 1 day in 10 tops {p90Max} MW; the highest hour was {yearPeak} MW." }
   ],
   "boundary": {
