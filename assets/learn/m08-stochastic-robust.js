@@ -202,7 +202,7 @@
           });
         } },
       // 5 the stochastic program
-      { text: "The [[two-stage-stochastic-program|two-stage stochastic program]] chooses one size and each branch's operation together, weighting each branch's cost by its chance. Solve it.",
+      { text: "The [[two-stage-stochastic-program|two-stage stochastic program]] chooses one size and each branch's operation, its [[recourse|recourse]], together, weighting each branch's cost by its chance. Solve it.",
         build: function (act, api) {
           solveRow(act, api, "Solve the stochastic program", function () { return jobSP(); }, function (out) {
             out.innerHTML = ""; var p = St.sp, k = H("div", { class: "m8-kpis" }, out), m = build(D, S);

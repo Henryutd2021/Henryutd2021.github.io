@@ -165,7 +165,7 @@ const text = s => s.replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/\\\$
     ok(near(q.o.x, R.presets[p.id].sp) && near(q.o.x, argmin(E2, kinks(S2)).x) && near(ev.o.x, R.presets[p.id].ev.x) && near(ev.o.x, argmin(x => cost0(W2, x), kinks([{ W: W2 }])).x), `${p.label}: stochastic ${fm.mw(q.o.x)}, for the average (${W2} MW) ${fm.mw(ev.o.x)}`);
     unique(E2, q.o.x, p.label + " stochastic", side => pSlope(S2, q.o.x, side)); unique(x => cost0(W2, x), ev.o.x, p.label + " plan for the average", side => bSlope(W2, ev.o.x, side));
   });
-  ok(R.presets.pess.sp < R.presets.even.sp && R.presets.even.sp < R.presets.opt.sp && R.presets.pess.ev.x < R.presets.opt.ev.x, "the stochastic plan and the plan for the average grow with the chance of more wind");
+  ok(R.presets.pess.sp < R.presets.baseline.sp && R.presets.baseline.sp < R.presets.opt.sp && R.presets.pess.ev.x < R.presets.opt.ev.x, "the stochastic plan and the plan for the average grow with the chance of more wind");
   { const m0 = M.build(D, S); ok(m0.variables.length === 31 && m0.constraints.length === 30 && R.size.cols === 31 && R.size.rows === 30, "the extensive form: 31 columns and 30 rows (1 + 10 × 3)"); }
   // operation unique given the size: each MWh of surplus used saves $27 > 0, so e = min(x, surplus) in every block
   { const q = solveX(S, { fix: R.sp.x }); let u = true; S.forEach(s => D.blocks.cf.forEach((f, b) => { if (!near(q.r.values["e_" + s.id + "_" + b], Math.min(R.sp.x, sig(s.W, b)), 1e-6)) u = false; }));
@@ -198,8 +198,9 @@ const text = s => s.replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/\\\$
   // data notes and step texts against the data file
   has("a fictional windy zone with 3,000 MW of wind and 4,000 MW planned; its lines take 1,000 MW", "data note: the zone");
   ok(D.wind.existingMW === 3000 && D.wind.plannedMW === 4000 && D.zone.lineMW === 1000, "the zone's numbers are the data file's");
-  has("Electrolyzer: it uses electricity to make hydrogen from water. $80,000 per MW a year; 18 kg of hydrogen per MWh; it runs only on surplus wind.", "data note: the electrolyzer, defined");
-  has("Hydrogen: industry takes 54,000 kg an hour; gas reformers, which make hydrogen from natural gas and steam, supply the rest at $1.50 per kg.", "data note: the hydrogen and the gas reformers, defined");
+  has("Electrolyzer: it uses electricity to make hydrogen from water. $80,000 per MW a year; 18 kg of hydrogen per MWh; it runs only on surplus wind, which would otherwise be curtailed and costs it nothing.", "data note: the electrolyzer, defined, and its free surplus");
+  has("Hydrogen: industry takes 54,000 kg an hour; gas reformers, which make hydrogen from natural gas and steam, supply the rest at $1.50 per kg, with no limit.", "data note: the hydrogen and the gas reformers, defined, without a capacity limit");
+  has("Other costs: the wind and the lines are the same whatever the electrolyzer's size, so they are left out; surplus wind is taken at no charge.", "limits: the costs outside the calculation");
   ok(D.electrolyzer.costPerMWYear === 80000 && D.electrolyzer.kgPerMWh === 18 && D.hydrogen.demandKgPerHour === 54000 && D.hydrogen.reformerPerKg === 1.5, "the electrolyzer's numbers are the data file's");
   has("scaled to 33.8%, U.S. wind's 2025 capacity factor", "data note: the capacity factor"); ok(T.targets.wind.cf === 0.338 && T.targets.wind.year === 2025, "33.8% is cf_targets.json's 2025 wind value");
   ok(JS.includes("The windy zone has 3,000 MW of wind and 4,000 MW planned; its lines carry 1,000 MW, and an [[electrolyzer|electrolyzer]] could use the rest.") && JS.includes("plan for the average future, 5,000 MW of wind here") && M.meanW(S) === 5000, "step texts: the zone's numbers and the 5,000 MW mean");
@@ -252,6 +253,10 @@ const text = s => s.replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/\\\$
   if (NB) {
     ok(NB.includes(ID + ".json") && NB.includes("reference") && NB.includes("assert") && NB.includes("linprog"), "notebook: reads the reference block and asserts it with linprog");
     ok(NB.includes("town_year.json") && NB.includes("cf_targets.json"), "notebook: rebuilds the wind blocks from the 2025 shape");
+    const NBT = JSON.parse(NB).cells.map(c => [].concat(c.source).join("")).join("\n");   // the cells' text, as a reader sees it
+    ok(/\\min\\big\(x, \\sigma_\{s,b\}, H\/k\\big\)/.test(NBT) && /the demand cap H\/k binds/.test(NB), "notebook: the closed form shows the hydrogen-demand cap that its code applies, and asserts where it binds");
+    ok(/The cutoff need not be unique/.test(NB) && !/at the optimum it is the value-at-risk/.test(NB) && /conditional value-at-risk \(CVaR\) is the average cost/.test(NB), "notebook: CVaR named before use; its cutoff is not read as a unique value-at-risk");
+    ok(/JupyterLab, or VS Code with its Jupyter extension/.test(NB) && /Start it from that folder/.test(NB) && /surplus wind would otherwise be curtailed|Surplus wind would otherwise be curtailed/.test(NB), "notebook: how to run it locally, and what the costs leave out");
   } else ok(false, "the notebook exists (learn/notebooks/" + ID + ".ipynb)");
 
   // ---------------- the excerpt: approved sentences, word for word (E10 and E11)
@@ -351,18 +356,18 @@ const text = s => s.replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/\\\$
       failing = false; btns(/Try again/)[0].click(); await flush(); await flush(); await flush();
       seg()[2].click(); await flush(); await flush(); await flush();
       ok(!next().disabled && card().textContent.includes(fm.mw(R.presets.pess.sp)) && card().textContent.includes(fm.mw(R.presets.opt.sp)) && /stays at 380 MW/.test(card().textContent), "step 10: two presets solved; the stochastic plan moves, the worst-case plan stays"); saw(10);
-      // step 10 with a slow solver: while Even solves, every preset button is off, so a tap on Pessimistic changes nothing;
-      // the Even row then shows Even's own plans (before the fix, a second tap mixed two presets' results)
+      // step 10 with a slow solver: while Baseline solves, every preset button is off, so a tap on Pessimistic changes nothing;
+      // the Baseline row then shows its own plans (before the fix, a second tap mixed two presets' results)
       hold = true; seg()[1].click(); await flush();
       ok(held.length === 1 && seg().every(b => b.disabled), "step 10, slow solver: one solve waiting, every preset button off while it runs");
       seg()[0].click(); hold = false;
       while (held.length) { held.shift()(); await flush(); await flush(); await flush(); }
       await flush(); await flush();
       const rows10 = card().querySelectorAll("tbody tr").map(r => r.textContent);
-      const evenRow = rows10.find(t => /^Even/.test(t)) || "";
+      const evenRow = rows10.find(t => /^Baseline/.test(t)) || "";
       ok(seg().every(b => !b.disabled) && seg()[1].getAttribute("aria-pressed") === "true" && seg()[0].getAttribute("aria-pressed") === "false" &&
-         evenRow.includes(fm.mw(R.presets.even.sp)) && evenRow.includes(fm.mw(R.presets.even.ev.x)) && rows10.length === 3,
-         "step 10, slow solver: Even's row shows Even's plans (" + fm.mw(R.presets.even.sp) + ", " + fm.mw(R.presets.even.ev.x) + "), Even is pressed, the buttons are back on: " + rows10.join(" | "));
+         evenRow.includes(fm.mw(R.presets.baseline.sp)) && evenRow.includes(fm.mw(R.presets.baseline.ev.x)) && rows10.length === 3,
+         "step 10, slow solver: the Baseline row shows its own plans (" + fm.mw(R.presets.baseline.sp) + ", " + fm.mw(R.presets.baseline.ev.x) + "), Baseline is pressed, the buttons are back on: " + rows10.join(" | "));
       ok(Object.keys(sawn).length === 10 && Object.keys(sawn).every(k => sawn[k].split(" ").length <= 40), "every step's feedback is 40 words at most: " + Object.keys(sawn).filter(k => sawn[k].split(" ").length > 40).map(k => "step " + k + " (" + sawn[k].split(" ").length + ")").join(", ") + " [" + Object.keys(sawn).map(k => k + ":" + sawn[k].split(" ").length).join(" ") + "]");
       // the chart: the plans found so far are marked; its text version lists every kink
       const last = specs[specs.length - 1];
