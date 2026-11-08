@@ -43,7 +43,9 @@ function rowsOf(E3, R, tag) {
   const withPre = Object.assign({}, P, { cfg: Object.assign({}, cfg, { precomputed: Object.assign({}, cfg.precomputed, { sb3: pre }) }) });
   const FY = JSON.parse(fs.readFileSync(L("data/e3-full-year.json"), "utf8")), FYc = city.fullYear, fel = E3.fullById(FY, "sb3", "electrify");
   const fullHTML = () => E3.tableHTML(["Full-year check of \"Electrify heat and cars\"", "Eight days", "Full year", "Gap"], E3.fullRows(fel, P), "e3-fullt", [null, "n", "n", "n"]) +
-    '<p class="lx-hint">Precomputed with HiGHS on ' + FY.date + ": the preset run again on all 8,760 hours of 2025 with the shares and substation upgrades its eight days chose kept (cost, CO₂ and unserved energy), then a second time with the upgrades sized on the year (each district's busiest hour and upgrade). With JavaScript on, each preset shows its own check.</p>";
+    '<p class="lx-hint">Precomputed with HiGHS on ' + FY.date + ": the preset run twice on all 8,760 hours of 2025. With JavaScript on, each preset shows its own check.</p>" +
+    '<ul class="e3-notes"><li><b>First run:</b> the shares and substation upgrades its eight days chose, kept: cost, CO₂ and unserved energy.</li><li><b>Second run:</b> the upgrades sized on the year: each district\'s busiest hour and upgrade.</li>' +
+    "<li><b>What it tests:</b> the year is scaled to the same annual heat and base energy, so the totals agree partly by construction; the hours' timing is what is checked.</li></ul>";
   const BLOCKS = { "sb3-bench": () => SS.staticHTML(S, def), "sb3-results": () => E3.fallback(withPre, "sb3"), "sb3-full": fullHTML, "sb3-inputs": () => E3.inputsHTML(P) };
   if (process.argv.includes("--write")) {
     const d = JSON.parse(fs.readFileSync(DPATH, "utf8")); d.precomputed = Object.assign({}, d.precomputed, { sb3: pre });
@@ -131,6 +133,22 @@ function rowsOf(E3, R, tag) {
   ok(!/nuclear|reactor|\bSMR\b|small modular/i.test(PAGE + JS), "no nuclear term on the page or in its script");
   ok(!/\bAI\b|artificial intelligence|ChatGPT|Claude/.test(PAGE + JS), "no AI wording");
 
+  // the heat network's plant and store: switched off, with a line saying why, while no share of the core is on the network
+  {
+    const SD = require("./stubdom.js"), E = SD.env(); SD.load("controls", E); SD.load("engine-e3", E);
+    const host = E.LX.H("div", null, E.body);
+    let last = null;
+    const C = E.LX.E3.ui.controls(host, S, def, PG.GROUPS, p => { last = p; });
+    const off = () => host.querySelectorAll("input").filter(x => x.disabled).length, note = host.querySelector(".e3-dh-off");
+    ok(note && !note.hidden && off() === 2 && /0% of the core on the network, its heat pump and heat store do nothing/.test(note.textContent), "no network share: the plant and store sliders are off, and a line says why");
+    C.set(Object.assign({}, def, { dh: 20 })); ok(off() === 0 && note.hidden, "a network share: both sliders on again, the line hidden");
+    C.set(def); ok(off() === 2 && !note.hidden, "back to 0%: off again");
+    has("Every heat pump is large enough for the coldest modeled hour: equipment sizes and their limits are not modeled.");
+    has("stays within the test's tolerances (0.5 MW, 0.05 MW and 5 MWh) over all plans within $1 of the best cost");
+    has("where a limit binds without an upgrade, the reported cost saves about $9 per MW a year more than the dual shows: the tie costs' share");
+    has("so the totals agree partly by construction: it checks the hours' timing");
+    ok(/\["The tie costs", "the objective includes the \[\[tie-rule\|tie rule\]\]'s small costs/.test(JS) && !/what a little more room saves/.test(JS), "the dual is read as the objective's value, the tie costs named");
+  }
   console.log((fails ? "FAILED " : "ok ") + (checks - fails) + "/" + checks + " checks (SB3)");
   process.exit(fails ? 1 : 0);
 })();

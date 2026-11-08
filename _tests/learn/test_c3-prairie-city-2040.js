@@ -71,11 +71,13 @@ const RUN_DATE = "6 November 2026";
   // the reference plan's full-year check (data/e3-full-year.json, rebuilt by test_e3-full-year.js)
   const FY = JSON.parse(fs.readFileSync(L("data/e3-full-year.json"), "utf8")), FYc = city.fullYear, c3F = FY.plans.filter(e => e.page === "c3"), er = c3F.find(e => e.id === "ref");
   const upF = V => V.dist.reduce((t, d) => t + d.upg, 0), erExtra = upF(er.year) - upF(er.days);
-  x.full = { extra: erExtra, days: E3.dateList(er.year.shortDays.map(s => s.day)), cost: erExtra * er.upYearly };
+  x.full = { extra: erExtra, days: E3.dateList(er.year.shortDays.map(s => s.day)), cost: erExtra * er.upYearly, upfront: erExtra * ref.upc * 1000 };
   const c3ex = PG.exemplars(x);
   // the evidence pack: small tables from the same runs, for the summary without JavaScript
   const tb = (head, rows) => E3.tableHTML(head, rows, "c3-ev");
+  const refLink = "#" + SS.encode(S, ref), why = PG.siteEvidence(SM);
   const evidence = () => [
+    "<p class=\"lx-hint\"><b>The reference plan's link:</b> <a href=\"" + refLink + "\">this page with the reference plan</a>; open it and copy the address into your summary. Then take its numbers from the tables below, write each field of the outline, and answer each stakeholder who objects.</p>",
     "<p class=\"lx-hint\"><b>Who pays (screening, an accounting layer, not the linear program (LP); every group adopting alike; <span class=\"lx-term\" data-term=\"energy-burden\">energy burden</span>: home energy bills ÷ income):</b></p>",
     tb(["Household group", "Home energy bills", "Energy burden", "Transport: fuel and charging"], R1.hh.rows.map(r => [r.label, E3.money(r.home0) + " → " + E3.money(r.home), PG.pct1(r.burden0) + " → " + PG.pct1(r.burden), E3.money(r.tr0) + " → " + E3.money(r.tr)])),
     "<p class=\"lx-hint\"><b>Jobs (screening, lesson A13's coefficients):</b> " + E3.kilo(jb.jobYears) + " construction job-years, 2026 to 2040 (gross), " + E3.kilo(jb.jobYearsNet) + " net of displacement; ongoing at the farms " + E3.kilo(jb.permDirect) + " direct, " + E3.kilo(jb.permGross) + " gross supported, " + E3.kilo(jb.permNet) + " net of displacement.</p>",
@@ -84,8 +86,10 @@ const RUN_DATE = "6 November 2026";
     "<p class=\"lx-hint\"><b>Sensitivity</b> (each case solved again: " + PG.SENS_HOW + "):</p>",
     tb(["Input", "Range tested", "Yearly cost against 2025", "Substation upgrades: MW, up front", "What kind of number"], sens1.rows.map(r => [r.label, r.loText + " to " + r.hiText, PG.mil(r.atLo) + " to " + PG.mil(r.atHi), PG.upText(r.upLo, r.upHi), r.kind]).concat([["All together", "every cheaper end, then every dearer end", PG.mil(sens1.joint.cheap) + " to " + PG.mil(sens1.joint.dear), PG.upText(sens1.joint.cheapUp, sens1.joint.dearUp), "a joint test"]])),
     "<p class=\"lx-hint\"><b>The five solar sites</b> (A19's screen, a " + E3.kilo(ref.farm) + " MW farm; up front: line, road and land, 2025 dollars):</p>",
-    tb(["Site", "Score (A19's default weights)", "Where", "Line to", "Up front", "Capacity factor (a full year)"], SM.top.map(t => { const q = PG.siteInfo(SM, t.id, ref.farm); return [t.id + (t.id === ref.site ? " (the plan's)" : ""), Math.round(100 * t.score) + " of 100", q.where + " of the centre", q.sub + ", " + q.km.toFixed(1) + " km", PG.mil(q.connectUSD), (q.cf * 100).toFixed(1) + "%"]; })),
-    "<p class=\"lx-hint\"><b>Full-year check</b> (all 8,760 hours of 2025, precomputed): substation upgrades " + E3.kilo(upF(er.days)) + " MW on the eight days, " + E3.kilo(upF(er.year)) + " MW sized on the year; with the eight days' upgrades, " + E3.kilo(er.year.unserved) + " MWh unserved on " + E3.dateList(er.year.shortDays.map(s => s.day)) + "; cost and CO₂ within " + (Math.max(Math.abs(er.year.cost / er.days.cost - 1), Math.abs(er.year.co2 / er.days.co2 - 1)) < 0.001 ? "0.1%" : "about " + PG.pct1(Math.max(Math.abs(er.year.cost / er.days.cost - 1), Math.abs(er.year.co2 / er.days.co2 - 1)))) + ".</p>",
+    tb(["Site", "Score (A19's default weights)", "Where", "Line to", "Up front", "Capacity factor (a full year)"], SM.top.map(t => { const q = PG.siteInfo(SM, t.id, ref.farm); return [t.id + (t.id === ref.site ? " (the plan's)" : ""), Math.round(100 * t.score) + " of 100", q.where + " of the center", q.sub + ", " + q.km.toFixed(1) + " km", PG.mil(q.connectUSD), (q.cf * 100).toFixed(1) + "%"]; })),
+    "<p class=\"lx-hint\"><b>Why they rank</b> (each criterion's score, 0 to 100, the block's average, rounded here, with its weight; the score is their weighted average: each times its weight, summed, divided by the weights' total):</p>",
+    tb(why.head, why.rows),
+    "<p class=\"lx-hint\"><b>Full-year check</b> (all 8,760 hours of 2025, precomputed): substation upgrades " + E3.kilo(upF(er.days)) + " MW on the eight days, " + E3.kilo(upF(er.year)) + " MW sized on the year; with the eight days' upgrades, " + E3.kilo(er.year.unserved) + " MWh unserved on " + E3.dateList(er.year.shortDays.map(s => s.day)) + "; cost and CO₂ within " + (Math.max(Math.abs(er.year.cost / er.days.cost - 1), Math.abs(er.year.co2 / er.days.co2 - 1)) < 0.001 ? "0.1%" : "about " + PG.pct1(Math.max(Math.abs(er.year.cost / er.days.cost - 1), Math.abs(er.year.co2 / er.days.co2 - 1)))) + ", partly by construction: the year is scaled to the same annual heat and base energy, so the check tests the hours' timing.</p>",
     "<p class=\"lx-hint\"><b>The city's wind and solar:</b> the city used " + E3.kilo(R1.acc.contract.mwh / 1000) + " GWh a year of its farms' " + E3.kilo(R1.acc.contract.gen / 1000) + " GWh; not deducted from the location-based CO₂.</p>",
     "<p class=\"lx-hint\"><b>Grid-average comparison:</b> those MWh × the grid's average rate ≈ " + E3.kilo(R1.acc.contract.t) + " t. Illustrative only: the model tracks no contractual instruments and builds no market-based inventory, and the figure is not a physical cut.</p>",
     "<p class=\"lx-hint\"><b>Assumptions</b> (as the summary states them):</p>",
@@ -113,7 +117,13 @@ const RUN_DATE = "6 November 2026";
   ok(er.days.dCost === Math.round(R1.delta.cityCost / 1e3) / 1e3 && er.days.co2 === Math.round(R1.acc.city.co2), "the check's eight days are the reference plan's own run");
   const wr = E3.fullWhy(er, FYc, FY.date).map(k => k[0] + ": " + k[1]).join(" ");
   const strongF = EX.plain(c3ex.answers[1]);
-  ok(er.year.unserved >= 0.5 && strongF.indexOf("(on all 8,760 hours the upgrades fall " + erExtra.toFixed(1) + " MW short, on " + E3.dateList(er.year.shortDays.map(s => s.day)) + ")") >= 0, "the strong summary states what the full-year check found (" + erExtra.toFixed(1) + " MW short)");
+  ok(er.year.unserved >= 0.5 && strongF.indexOf("Full-year check: on all 8,760 hours this plan's upgrades fall " + erExtra.toFixed(1) + " MW short, on " + E3.dateList(er.year.shortDays.map(s => s.day)) + "; I would add them, about " + PG.mil(x.full.upfront) + " more up front and " + PG.mil(x.full.cost) + " a year (a remedy, not rerun on the bench)") >= 0 && near(x.full.upfront, erExtra * cfg.upgrade.capex.def * 1000, 1e-6),
+    "the strong summary states what the full-year check found (" + erExtra.toFixed(1) + " MW short), prices the remedy up front and yearly, and says it was not rerun");
+  ok(strongF.indexOf("up front against " + PG.mil(b1.budget) + ", energy equipment and the grid only (the cars households buy are outside it)") >= 0 && !/finds short/.test(PG.ANSWER.utility(x)), "the strong summary states the budget's boundary; the utility's answer keeps the tested plan apart from the remedy");
+  ok(PG.NO_FULL === "Eight days stand for the year; this plan has no full-year check (the presets and the reference plan have one)." && /\(fe \? page\.fullAssume\(fe\) : page\.NO_FULL\)/.test(JS), "a plan without a full-year check says so in its summary's assumptions");
+  ok(PG.ANSWER.climate(x).indexOf(PG.mil(x.budget - x.upfront) + " of the budget left (" + PG.mil(x.budget - x.upfront - x.full.upfront) + " after the full-year remedy)") >= 0, "the climate answer's budget left, before and after the remedy");
+  ok(/the site's score is their weighted average: each times its weight, summed, divided by the weights' total/.test(JS) && /partly by construction: the year is scaled to the same annual heat and base energy/.test(T), "why they rank: a weighted average; the full-year evidence holds partly by construction");
+  ok(/for a plan without one, what that leaves open and how you would check it/.test(PG.RUBRIC[2].look), "realism: a plan without a check can meet the bar by saying what that leaves open");
   ok(PG.fullAssume(er) === "Eight days stand for the year; on all 8,760 hours its upgrades fall " + erExtra.toFixed(1) + " MW short." && PG.fullAssume(c3F[0]) === "Eight days stand for the year; on all 8,760 hours its upgrades hold." &&
     /n\.assumptions = n\.assumptions\.map/.test(JS), "the summary's assumption names the full-year check's finding for a checked plan");
   ok(wr.indexOf((upF(er.year) - upF(er.days)).toFixed(1) + " MW more") >= 0 && wr.indexOf(E3.kilo(er.year.unserved) + " MWh unserved on 19 Feb and 20 Feb") >= 0 && /Wind and sun/.test(wr), "the reference plan's words: the MW more the year would buy, the unserved MWh and days, wind and sun");
@@ -123,6 +133,13 @@ const RUN_DATE = "6 November 2026";
 
   // ---------------- the brief
   has("$" + E3.kilo(cfg.c3.budget.def) + " million of up-front spending");
+  has("The budget counts the city's energy equipment and grid work. The electric cars households buy, and their chargers, are outside it and outside the yearly cost.");
+  ok(/\["Cars", "fuel and charging only: the price of the cars households buy, and their chargers, is in neither the budget nor the yearly cost\."\]/.test(JS) && /energy equipment and the grid only/.test(JS), "beside the results: the budget's boundary and the cars' prices left out");
+  { const n = E3.note(ref, R1, P); ok(n.results.some(r => /^Up-front spending/.test(r.label) && /; equipment and grid only$/.test(r.note)) && n.limits.some(t => /car and charger prices, and heat-pump sizes \(each assumed big enough\)/.test(t)), "the summary's results and limits state the budget's boundary, the cars' prices and the heat pumps' sizes"); }
+  { const lk = X.between(PAGE, "c3-evidence").text; ok(lk.indexOf('href="' + refLink + '"') >= 0 && SS.decode(S, refLink).status === "ok" && JSON.stringify(SS.decode(S, refLink).state) === JSON.stringify(ref), "the no-JS evidence links the reference plan (" + refLink + "), which decodes to it"); }
+  ok(why.rows.every((r, i) => near(SM.D.types.solar.criteria.reduce((t, k, j) => t + SM.c.weights[k] * SM.top[i].m[k], 0) / SM.D.types.solar.criteria.reduce((t, k) => t + SM.c.weights[k], 0), SM.top[i].score, 1e-12)) && why.head.length === 7, "why they rank: the five criteria and their weights add up to each site's score");
+  ok(/\["suit", "Suitability"\], \["protected", "Protected land"\]/.test(JS) && /if \(layer === "suit"\) \{ st\.suit = SM\.suit; st\.X = SM\.X; \}/.test(JS), "the siting map has a layer choice (suitability and the layers behind it)");
+  ok(/partly for a farm on any of the five screened sites \(set for teaching\): a site's score is not their consent/.test(PG.PANEL[5].rule), "rural: the rule says what it is, partly for any screened site");
   const mins = (T.match(/About 150 minutes: (\d+) to build and test plans, (\d+) to site the solar farm, (\d+) to write the summary, (\d+) to check it/) || []).slice(1).map(Number);
   ok(mins.length === 4 && mins.reduce((a, b) => a + b, 0) === 150, "the time split adds to 150 minutes");
   const PY = fs.readFileSync(path.join(X.SITE, "learn/path.yml"), "utf8"), row = PY.slice(PY.indexOf("id: c3-prairie-city-2040"), PY.indexOf("id: c3-prairie-city-2040") + 1500);
@@ -220,7 +237,7 @@ const RUN_DATE = "6 November 2026";
     ok(auto <= PG.TWO_PAGES - 350, "the run's own lines take " + auto + " of the two pages' " + PG.TWO_PAGES + " words, leaving the reader at least 350");
   }
   // the rubric: C3's own words for uncertainty, integrity and communication; jobs and the site in the look-fors
-  ok(["uncertainty", "integrity", "communication"].every(k => PG.RUBRIC.filter(c => c.id === k)[0].levels.proficient) && /joint/.test(PG.RUBRIC[1].levels.proficient) && /sources and licences/.test(PG.RUBRIC[3].levels.proficient) &&
+  ok(["uncertainty", "integrity", "communication"].every(k => PG.RUBRIC.filter(c => c.id === k)[0].levels.proficient) && /joint/.test(PG.RUBRIC[1].levels.proficient) && /sources and licenses/.test(PG.RUBRIC[3].levels.proficient) &&
     /jobs/.test(PG.RUBRIC[0].look) && /site/.test(PG.RUBRIC[2].look), "the rubric's levels fit what the page lets the reader do");
 
   // ---------------- the hooks

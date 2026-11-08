@@ -553,7 +553,7 @@
  },
  "condensing-furnace": {
   "term": "Condensing furnace",
-  "short": "A gas furnace that also recovers the heat in its exhaust's water vapour, so 90% or more of the gas's energy becomes heat, against about 80% for a non-condensing one.",
+  "short": "A gas furnace that also recovers the heat in its exhaust's water vapor, so 90% or more of the gas's energy becomes heat, against about 80% for a non-condensing one.",
   "lesson": "A18",
   "href": "a18-city-plan.html"
  },
@@ -3729,7 +3729,7 @@
  },
  "vertically-integrated-utility": {
   "term": "Vertically integrated utility",
-  "short": "A utility that owns and runs the power plants, transmission and distribution in its service territory, as Kansas's investor-owned utilities do; its rates are approved by the state regulator.",
+  "short": "An electric utility that owns and runs the power plants, transmission and distribution in its service territory, as Kansas's investor-owned utilities do; its rates are approved by the state regulator.",
   "lesson": "F9",
   "href": "f09-city-energy.html"
  },

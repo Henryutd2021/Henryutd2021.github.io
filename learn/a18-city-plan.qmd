@@ -40,17 +40,17 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-fallback">
 <p class="lx-eyebrow">Prairie City's cost curve, 2026 to 2035: six measures, each alone, cheapest first</p>
 <table class="lx-facts a18-fb">
-<thead><tr><th scope="col">Measure</th><th scope="col">Tonnes CO₂ a year by 2035</th><th scope="col">Cost per tonne</th><th scope="col">Up front</th></tr></thead>
+<thead><tr><th scope="col">Measure</th><th scope="col">Tonnes CO₂ a year by 2035</th><th scope="col">Cost per tonne</th><th scope="col">Up front, above usual replacements</th></tr></thead>
 <tbody>
 <tr><td>1 · Heat-pump water heaters</td><td data-label="Tonnes">19,206 t</td><td data-label="Cost">−$266 per t</td><td data-label="Up front">$18.4M</td></tr>
-<tr><td>2 · Efficiency programmes in shops and offices</td><td data-label="Tonnes">33,562 t</td><td data-label="Cost">−$137 per t</td><td data-label="Up front">$42.7M</td></tr>
+<tr><td>2 · Efficiency programs in shops and offices</td><td data-label="Tonnes">33,562 t</td><td data-label="Cost">−$137 per t</td><td data-label="Up front">$42.7M</td></tr>
 <tr><td>3 · Condensing gas furnaces</td><td data-label="Tonnes">11,337 t</td><td data-label="Cost">−$92 per t</td><td data-label="Up front">$20.1M</td></tr>
 <tr><td>4 · Weatherize homes built before 1980</td><td data-label="Tonnes">20,280 t</td><td data-label="Cost">$153 per t</td><td data-label="Up front">$125.4M</td></tr>
 <tr><td>5 · Rooftop solar on homes</td><td data-label="Tonnes">37,978 t</td><td data-label="Cost">$159 per t</td><td data-label="Up front">$284.1M</td></tr>
 <tr><td>6 · Heat pumps instead of gas furnaces</td><td data-label="Tonnes">42,329 t</td><td data-label="Cost">$212 per t</td><td data-label="Up front">$157.5M</td></tr>
 </tbody>
 </table>
-<p class="lx-hint">The inventory: 2,766,098 t of CO₂ in 2025; scope 1 (burned in the city) 1,418,605 t, scope 2 (grid electricity, not rooftop solar used on site) 1,282,744 t, scope 3 (losses on the wires) 64,749 t.</p>
+<p class="lx-hint">The inventory: 2,765,472 t of CO₂ in 2025; scope 1 (burned in the city) 1,418,605 t, scope 2 (grid electricity, not rooftop solar used on site) 1,282,744 t, scope 3 (losses on the wires) 64,123 t.</p>
 <p class="lx-hint">Alone, the six bars add to 164,692 t; together they cut 150,854 t (5.5% of 2025), because measures overlap.</p>
 <p class="lx-hint">Heat pumps alone put the suburbs 10.8 MW over their 230 MW substation limit on the cold design day; with all six measures every district stays within its limit.</p>
 <p class="lx-hint">With JavaScript on, you sort the inventory, set a target, build the plan from the curve and test it.</p>
@@ -59,7 +59,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Prairie City is fictional; its numbers are illustrative.</b> Its inventory, districts, days, prices and household groups are the course's shared Prairie City data, anchored to Wichita and Kansas.</span></p>
 <p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Real costs, one price year.</b> Equipment from <a href="https://www.eia.gov/outlooks/aeo/assumptions/pdf/RDM_Assumptions.pdf">EIA</a> (2022 dollars), shops and offices from LBNL (2012), weatherization from ORNL (2008). All are in 2025 dollars, converted with BEA's <span class="lx-term" data-term="gdp-deflator">GDP deflator</span> (<a href="https://apps.bea.gov/iTable/?reqid=19&amp;step=3&amp;isuri=1&amp;1921=survey&amp;1903=13&amp;1904=2022&amp;1905=2026&amp;1906=a&amp;1911=0">NIPA Table 1.1.9</a>).</span></p>
 <p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Money and CO₂.</b> A 4% real rate, as in lessons 7 and 13; energy at Kansas's 2025 retail prices. Grid electricity at eGRID2023's SPP North rate plus 5% wire losses; rooftop solar used on site has none.</span></p>
-<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Set for teaching.</b> Each measure's potential by 2035, two lives (weatherization 20 years, shops 12), the two cleaner grids, the programme's 40% share and who takes part.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Set for teaching.</b> Each measure's potential by 2035, two lives (weatherization 20 years, shops 12), the two cleaner grids, the program's 40% share and who takes part.</span></p>
 <p class="lx-hint" style="margin-top:.6rem">About 30 guided minutes in ten steps. Helpful first: <span class="a18-ref" data-code="F9"><a href="f09-city-energy.html">F9</a></span>, what a city runs on and who controls what.</p>
 <style>/* lesson-local */
 .a18-measures { margin-top: .5rem; }
@@ -84,8 +84,8 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <dt>Inventory</dt><dd>Count first, by scope: what the city burns (scope 1), the grid electricity it uses (scope 2) and the losses on the wires (scope 3).</dd>
 <dt>Curve</dt><dd>Each bar is one measure alone: its width the tonnes it avoids, its height the cost per tonne. Below zero it saves more than it costs.</dd>
 <dt>Tests</dt><dd>A plan also needs money up front, room at each substation on the coldest morning, and a fair answer to who gains and who pays.</dd>
-<dt>Where it misleads</dt><dd>Measures overlap and compete, order and lock-in matter, the baseline and prices move the bars, and a saving on paper does not install itself.</dd>
-<dt>Who decides</dt><dd>The city counts and adopts; the utility runs programmes and supply; the state regulator approves the utility's parts; owners make most choices.</dd>
+<dt>Where it misleads</dt><dd>Measures overlap and compete, so a bar's credit depends on the bars counted before it; the baseline and prices move the bars, and a saving on paper does not install itself.</dd>
+<dt>Who decides</dt><dd>The city counts and adopts; the utility runs programs and supply; the state regulator approves the utility's parts; owners make most choices.</dd>
 </dl>
 </div>
 </div>
@@ -102,7 +102,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 - **Scopes** (Table 3.2, p. 31). Scope 1: sources inside the city boundary. Scope 2: grid-supplied electricity, heat, steam or cooling used inside it. Scope 3: other emissions outside the boundary caused by activities inside it.
 - **Rooftop solar.** Power from panels used where they stand is not grid-supplied, so Prairie City's scope 2 leaves it out: the homes' and businesses' electricity less their rooftop share.
 - **Two reporting levels** (Box 4.1, p. 36). BASIC: scopes 1 and 2 of stationary energy and transport, and waste. BASIC+ adds industrial processes (IPPU), agriculture and land, trips across the boundary, and losses on the wires.
-- **Prairie City's subtotals.** Scopes 1 and 2: 2,701,349 t. With the losses (scope 3): 2,766,098 t, the inventory the targets use.
+- **Prairie City's subtotals.** Scopes 1 and 2: 2,701,349 t. With the losses (scope 3): 2,765,472 t, the inventory the targets use.
 - **Not BASIC or BASIC+.** They count CO₂ only (the GPC asks for seven gases, p. 30), leave out waste and do not split out the fertilizer plant's feedstock: teaching subtotals, not GPC reporting totals.
 - **Farm machinery.** Tractors and other farm machinery go under stationary energy, agriculture (Table 6.5, p. 62), not transport.
 - **Feedstock.** Fossil fuel used as a feedstock, like the gas the fertilizer plant turns into hydrogen, goes under IPPU (p. 56). This data does not split it from the gas the plant burns.
@@ -145,9 +145,10 @@ $$\text{cost per tonne} = \frac{\text{extra capital} \times \mathrm{CRF} + \text
 <div class="lx-deeper-body">
 <ul>
 <li>Transport, 31% of the inventory, the industrial park and the grid's own plan: none has a bar here. The grid's change still counts toward the target (step 8).</li>
-<li>Rebound, comfort, health and the soft costs of taking part.</li>
+<li><span class="lx-term" data-term="rebound-effect">Rebound</span> (using more of a service once it costs less), comfort, health, and the time and hassle of taking part.</li>
 <li>How lower sales move rates for every customer, and energy burden: <span class="a18-ref" data-code="A13"><a href="a13-fairness-jobs.html">A13</a></span>.</li>
 <li>The cost of a bigger substation, and furnace fans at the peak hour.</li>
+<li>When each measure is installed, and lock-in: a furnace bought now delays a heat pump for its life. The bars' order changes only how the cut is credited.</li>
 <li>Cooling when a heat pump replaces an air conditioner: counted as unchanged.</li>
 </ul>
 </div>
@@ -166,22 +167,22 @@ $$\text{cost per tonne} = \frac{\text{extra capital} \times \mathrm{CRF} + \text
 <div class="lx-qq" data-id="grid" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “A city decides its own electricity emissions.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. Prairie City's 1,282,744 t of scope 2 follow the regional grid's rate. In step 8 the much cleaner grid alone cuts 830,547 t a year of scope 2 and the losses' scope 3.</p><p>Cities influence demand, and some run their own utility, as Los Angeles does; the regional supply's emissions involve utilities, markets and public policy.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. Prairie City's 1,282,744 t of scope 2 follow the regional grid's rate. In step 8 the much cleaner grid alone cuts 830,161 t a year of scope 2 and the losses' scope 3.</p><p>Cities influence demand, and some run their own utility, as Los Angeles does; the regional supply's emissions involve utilities, markets and public policy.</p></details>
 </div>
 <div class="lx-qq" data-id="negative" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “A measure below zero on the curve will happen by itself, because it saves money.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. Its cost leaves out the time and hassle of taking part, and a landlord who pays gets none of a tenant's savings. Programmes, rules and financing exist for that gap.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. Its cost leaves out the time and hassle of taking part, and a landlord who pays gets none of a tenant's savings. Programs, rules and financing exist for that gap.</p></details>
 </div>
 <div class="lx-qq" data-id="add" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “Adding up the bars you pick gives your plan's cut.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. Alone, the six bars add to 164,692 t; together they cut 150,854 t. Heat pumps and condensing furnaces compete for the same furnaces, and weatherized homes need less heat.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. With the starting settings, the six bars add to 164,692 t alone; together they cut 150,854 t. Heat pumps and condensing furnaces compete for the same furnaces, and weatherized homes need less heat.</p></details>
 </div>
 <div class="lx-qq" data-id="solar" data-answer="myth">
-<p class="lx-qtext">Myth or fact? “New rooftop solar lowers Prairie City's highest hour of the year.”</p>
+<p class="lx-qtext">Myth or fact? “New rooftop solar substantially lowers Prairie City's highest hour.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth, here. Each district's highest hour is 07:00 on the cold design day, before the sun is up enough: 60 MW of new panels lower it by under 0.1 MW.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth, here. On the eight representative days, each district's highest hour is 07:00 on the cold design day, before the sun is up enough: 60 MW of new panels lower it by under 0.1 MW.</p></details>
 </div>
 </div>
 
@@ -207,7 +208,7 @@ $$\text{cost per tonne} = \frac{\text{extra capital} \times \mathrm{CRF} + \text
 <table class="lx-facts">
 <thead><tr><th scope="col">Number</th><th scope="col">What it means</th><th scope="col">Source</th></tr></thead>
 <tbody>
-<tr><td class="n">$0.046 per kWh</td><td>Average total cost of saving electricity through U.S. utility customer-funded efficiency programmes, 2009 to 2013: programme and participants together, in 2012 dollars.</td><td class="s"><a href="https://www.energy.gov/sites/prod/files/2017/01/f34/The%20Total%20Cost%20of%20Saving%20Electricity%20through%20Utility%20Customer-Funded%20Energy%20Efficiency%20Programs%20Estimates%20at%20the%20National%2C%20State%2C%20Sector%20and%20Program%20Level.pdf">LBNL, Table 1</a> · April 2015</td></tr>
+<tr><td class="n">$0.046 per kWh</td><td>Average total cost of saving electricity through U.S. utility customer-funded efficiency programs, 2009 to 2013: program and participants together, in 2012 dollars.</td><td class="s"><a href="https://www.energy.gov/sites/prod/files/2017/01/f34/The%20Total%20Cost%20of%20Saving%20Electricity%20through%20Utility%20Customer-Funded%20Energy%20Efficiency%20Programs%20Estimates%20at%20the%20National%2C%20State%2C%20Sector%20and%20Program%20Level.pdf">LBNL, Table 1</a> · April 2015</td></tr>
 <tr><td class="n">$8,620 and $3,690</td><td>Installed cost of the most efficient air-source heat pump and of a minimum-efficiency gas furnace, in 2022 dollars.</td><td class="s"><a href="https://www.eia.gov/outlooks/aeo/assumptions/pdf/RDM_Assumptions.pdf">EIA, AEO2026 Residential Demand Module, Table 2</a> · April 2026</td></tr>
 <tr><td class="n">22.5 years</td><td>Average life of a gas furnace in the northern U.S.: one bought in 2026 is expected to run past 2045.</td><td class="s"><a href="https://www.eia.gov/analysis/studies/buildings/equipcosts/pdf/appendix-a.pdf">EIA, equipment costs, Appendix A, p. 10</a> · March 2023</td></tr>
 </tbody>

@@ -334,6 +334,12 @@ ok(LS.ruleWords(D, false) === "Thresholds now: slopes over 10% and 61 m from hom
     for (let n = 0; n < N; n++) { const i = n % 44, j = (n - i) / 44, len = clip(a, b, i, j), listed = A19.gridAt(R, n).lines.indexOf(name) >= 0;
       if (len > 0.02 && !listed) miss++; if (listed && len < 0) extra++; if (listed) crossed++; } });
   ok(miss === 0 && extra === 0 && crossed > 40, "the lines named in each cell match an exact clip of each line (" + crossed + " cell crossings)");
+  { let hc = 0, nw = 0, bad = 0; const Rn = M.region({ newer: true });
+    for (let n = 0; n < R.N; n++) { const c = A19.homesIn(R, n), t = A19.cellText(R, n); hc += c.all;
+      if (c.all ? t.indexOf(c.all + (c.all === 1 ? " home" : " homes")) < 0 : t.indexOf("no homes") < 0) bad++;
+      if (!R.built[n] && !R.water[n] && t.indexOf("nearest home or built-up land") < 0) bad++; }
+    for (let n = 0; n < Rn.N; n++) { const c = A19.homesIn(Rn, n); nw += c.newer; if (c.newer && A19.cellText(Rn, n).indexOf("(" + c.newer + " built since 2019)") < 0) bad++; }
+    ok(hc === R.homes.length && nw === R.nNewer && bad === 0, "every cell's line names its homes (" + hc + "), the newer ones apart (" + nw + "), and the nearest home or built-up land"); }
   const cs = A19.cellText(M.region({ coarse: true }), Math.floor(14.5 / 2) * 22 + Math.floor(22.5 / 2));
   ok(/substation S3 \(West\), 250 MW spare/.test(cs) && /^Cell \(2 km\)/.test(A19.cellText(M.region({ coarse: true }), 0)) === false, "2 km cells name their substation too"); }
 ok(/function keep\(k, v\) \{[^\n]*setTimeout\(buildExplain/.test(JS), "every saved setting refreshes the explain layer");
@@ -349,7 +355,7 @@ has("1 at 0 km, 0 from 15 km (solar)"); ok(T.solar.ramps.sub[0] === 0 && T.solar
 has("default solar weights 20, 35, 15, 20, 10"); ok(["res", "sub", "road", "land", "homes"].map(k => T.solar.weights[k]).join(",") === "20,35,15,20,10", "data: default solar weights");
 has("land price falls from 1 at $2,500 an acre to 0 at $15,000"); ok(T.solar.ramps.land.join(",") === "2500,15000", "data: the land ramp");
 has("NREL's $1,615,100 a mile (2022 dollars) × 128.893 / 118.026 (BEA's GDP deflator, to 2025 dollars) ÷ 1.609344 km a mile");
-has("checked at 16 points"); ok(D.grid.sub * D.grid.sub === 16, "16 setback points per cell");
+has("estimated from 16 points 250 m apart: a narrow setback can fall between them"); ok(D.grid.sub * D.grid.sub === 16, "16 setback points per cell");
 has("about 67,000 cells of 11.5 km × 11.5 km");
 has("Wind site A costs $16.6 million up front, site E $12.4 million.");
 has("Priced at " + LS.mitWords(D) + ", the new line crossed 3.4 km of protected land");
@@ -360,7 +366,7 @@ has("Priced at " + LS.mitWords(D) + ", the new line crossed 3.4 km of protected 
   ok(Math.round(spread("res")) === 19 && Math.round(spread("land")) === 17 && spread("res") > spread("land") && r.c.weights.res === 20, "sunshine (weight 20) spreads blocks' scores by about 19 points, cheap land by about 17 (" + spread("res").toFixed(2) + ", " + spread("land").toFixed(2) + ")");
   has("“Sunshine differs by only 4.5% across this region, so it barely moves a solar site's score.”");
   has("Min–max scaling stretches the 4.5% to a full 0 to 1: at weight 20, sunshine spreads blocks' scores by about 19 points, more than cheap land's 17."); }
-has("this map checks 16 points in each cell, and NREL's supply curves check setbacks on 90 m cells");
+has("this map estimates it from 16 points 250 m apart, and NREL's supply curves check setbacks on 90 m cells"); ok(D.grid.sub === 4 && D.grid.cellKm === 1, "16 points 250 m apart: 4 × 4 in a 1 km cell");
 has("In step 8, 36 homes built since 2019 push solar site A out of the top five.");
 // practice, recomputed
 {
@@ -387,7 +393,7 @@ has("In step 8, 36 homes built since 2019 push solar site A out of the top five.
   for (;;) { let u = null, b = Infinity; for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) if (!done[r + "," + c] && dist[r][c] < b) { b = dist[r][c]; u = [r, c]; } if (!u) break; done[u.join(",")] = 1;
     [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([dr, dc]) => { const r = u[0] + dr, c = u[1] + dc; if (r < 0 || c < 0 || r > 2 || c > 2) return; const nd = dist[u[0]][u[1]] + (G[u[0]][u[1]] + G[r][c]) / 2; if (nd < dist[r][c]) dist[r][c] = nd; }); }
   const top = (1 + 1) / 2 + (1 + 4) / 2 + (4 + 1) / 2 + (1 + 1) / 2;
-  ok(dist[2][2] === 5 && top === 7, "practice 7: the cheapest path costs 5, the top-and-right one 7"); has("1 + 1.5 + 1.5 + 1 = 5"); has("costs 7");
+  ok(dist[2][2] === 5 && top === 7, "practice 7: the cheapest path costs 5, the top-and-right one 7"); has("1 + 1.5 + 1.5 + 1 = $5 million"); has("costs $7 million"); has("Each 1 km step to a side-by-side cell costs the two cells' average ($ million per km");
   const gt = (PAGE.match(/<table class="lx-facts a19-pr" data-practice="grid">([\s\S]*?)<\/table>/) || [, ""])[1];
   const grow = [...gt.matchAll(/<tr><th scope="row">[^<]+<\/th>((?:<td class="n">\d+<\/td>){3})<\/tr>/g)].map(m => [...m[1].matchAll(/>(\d+)</g)].map(x => +x[1]));
   ok(JSON.stringify(grow) === JSON.stringify(G), "practice 7: the page's grid table is the grid solved here");
@@ -439,6 +445,23 @@ ok(hrefs.length > 8 && hrefs.every(h => ALLOW.test(h) || /^[0-9a-z-]+\.html$/.te
   const prose = OWN.replace(/<!-- a19-fallback:start[\s\S]*?<!-- a19-fallback:end -->/, " ").replace(/<style>[\s\S]*?<\/style>/, " ").replace(/<table class="lx-facts">[\s\S]*?<\/table>/g, " ").replace(/^---[\s\S]*?\n---\n/, " ")
     .replace(/<div class="lx-card lx-sources">[\s\S]*?<\/div>/, " ").replace(/<blockquote[\s\S]*?<\/blockquote>/g, " ").replace(/<!--[\s\S]*?-->/g, " ").split(/<\/?(?:p|li|dd|dt|summary|td|th)\b[^>]*>|<br>|\n\n|\n- /).filter(s => /[A-Za-z]{3}/.test(text(s)) && !/^\|/.test(text(s)) && !/^(:::|```)/.test(text(s)));
   prose.forEach(raw => { const s = text(raw), w = s.split(" ").length, n = nSent(text(raw.replace(/^\s*<b>[^<]*<\/b>/, "").replace(/^\s*\*\*[^*]+\*\*/, "")).replace(/^(Myth|Fact)\. /, "")); ok(w <= 36 && n <= 2, "text element of " + w + " words, " + n + " sentences (≤ 36, ≤ 2 after a label or 'Myth.'): " + s.slice(0, 70)); });
+}
+
+// the notebook's prose: each paragraph, list item or table row 80 words at most (long explanations are split into
+// labelled lists), and the setback sample, the zero-weight rule and the gross supply curve said where they apply
+{
+  const NBJ = JSON.parse(require("fs").readFileSync(path.join(SITE, "learn/notebooks/a19-gis-siting.ipynb"), "utf8"));
+  const mdTxt = NBJ.cells.filter(c => c.cell_type === "markdown").map(c => [].concat(c.source).join(""));
+  const paras = [].concat(...mdTxt.map(t => t.split(/\n\s*\n|\n(?=\s*(?:- |\d+\. |\|))/)));
+  const long = paras.map(p => [p.split(/\s+/).filter(w => /[A-Za-z0-9]/.test(w)).length, p.slice(0, 60)]).filter(x => x[0] > 80);
+  ok(long.length === 0, "notebook prose: no paragraph over 80 words (" + long.map(x => x[0] + ": " + x[1]).join(" | ") + ")");
+  const all = mdTxt.join("\n"), code = NBJ.cells.filter(c => c.cell_type === "code").map(c => [].concat(c.source).join("")).join("\n");
+  ok(/\*estimates\* the share of the cell left/.test(all) && /127 of the 159 cells with a home keep all 16 points/.test(all) && /assert \(missed, len\(home_cells\)\) == \(127, 159\)/.test(code), "notebook: the setback share is an estimate, and the misses at 61 m are counted (127 of 159)");
+  { const f = R.frac(0.061), cells = new Set(R.homes.map(h => Math.floor(h.y) * 44 + Math.floor(h.x))); let miss = 0; cells.forEach(n => { if (f[n] === 1) miss++; });
+    ok(miss === 127 && cells.size === 159, "the page's model agrees: " + miss + " of " + cells.size + " cells with a home keep all 16 points at 61 m"); }
+  ok(/assert sum\(c\["weights"\]\[k\] for k in keys\) > 0/.test(code) && /every weight at 0 nothing ranks the blocks/.test(all), "notebook: every weight 0 gives no short list, as on the page");
+  ok(/A gross supply curve/.test(all) && /not capacity the grid could connect at once/.test(all) && /their substations' spare capacity/.test(code), "notebook: the supply curve is gross, and its shared substations are counted");
+  ok(/state and regional averages, not parcel prices/.test(all) && !/county averages/.test(all) && !/octave/i.test(all), "notebook: USDA's land values by state and region; no unexplained 'octaves'");
 }
 
 // ---------------- 9 path.yml entry, front matter, sidecar, glossary
@@ -507,6 +530,17 @@ ok(hrefs.length > 8 && hrefs.every(h => ALLOW.test(h) || /^[0-9a-z-]+\.html$/.te
     demo.cards.go(6); act().lxSet("any");
     ok(gb() && !gb().hidden && /\$6\.3M \+ upgrade/.test(act().textContent) && /not comparable/.test(act().textContent), "step 7, any substation: site B's cost says + upgrade, and the note says it is not comparable");
     act().lxSet("spare"); ok(!/\+ upgrade/.test(act().querySelector(".a19-sites-box").textContent), "step 7, spare capacity only: no upgrade");
+    // step 8: a row's button highlights its site on the map, with the homes layer in force; a switch clears it
+    demo.cards.go(7); act().lxSet("newer", true);
+    const onSites = () => act().querySelectorAll("rect").filter(e => e.getAttribute("class") === "a19-site on").length;
+    const pick = id => act().querySelectorAll("button.a19-pick").filter(b => b.textContent === id)[0];
+    ok(onSites() === 0 && pick("B"), "step 8: no site highlighted before a row is picked");
+    pick("B").click();
+    ok(onSites() === 1 && pick("B").getAttribute("aria-pressed") === "true" && act().querySelectorAll("circle").some(c => / new/.test(c.getAttribute("class") || "")), "step 8: site B's button highlights it on the map, the newer homes still drawn");
+    act().lxSet("coarse", true); ok(onSites() === 0, "step 8: another check clears the highlight");
+    // the homes layer in words: the legend counts the dots; a cell's line names its homes
+    demo.cards.go(0); act().lxSet("homes");
+    ok(act().querySelector(".a19-legend").textContent.indexOf("Homes (dots): " + R.homes.length + " in the 2019 layer") >= 0, "step 1, homes layer: the legend counts the homes (" + R.homes.length + ")");
   } catch (e) { ok(false, "the stub page test threw: " + (e && e.stack || e)); }
 }
 

@@ -69,7 +69,7 @@ F.groups.forEach(x => {
 });
 const P = M.power(C);
 ok(near(P.own, outOf("src_solar") / into("el")) && near(P.lost, C.flows.links.filter(l => l.from === "el" && l.to === "grid_losses")[0].value) && P.meters === C.balance.totals.el, "the city's own electricity and the wires' losses");
-ok(near(P.meters * P.lossShare, P.lost, 0.1), "the wires lose 5% of what the meters take (the file's teaching value)");
+ok(near(P.gridMeters * P.lossShare, P.lost, 0.1) && near(P.gridMeters, P.meters - outOf("src_solar"), 1e-9), "the wires lose 5% of the grid electricity the meters take, rooftop solar aside (the file's teaching value)");
 
 // ---------------- every prediction and reveal true
 {
@@ -105,7 +105,7 @@ ok(near(P.meters * P.lossShare, P.lost, 0.1), "the wires lose 5% of what the met
   ok(ck.indexOf("of what they buy is gas") > 0 && ck.indexOf(M.fmtN(h.gas, 1) + " ÷ " + M.fmtN(X.bought, 1) + " = " + M.pct(X.gasBought)) > 0 && ck.indexOf(M.fmtN(h.gas, 1) + " ÷ " + M.fmtN(X.all, 1) + " = " + M.pct(X.gasAll)) > 0 && /free outdoor-air heat/.test(ck), "the gas-share answer gives both denominators");
   ok(Math.abs(X.gasBought - 0.5) < 0.125 && Math.abs(X.gasAll - 0.5) < 0.125, "'about half' holds on both counts");
   // the grid-mix myth turns on authority, not on where the power is made
-  ok(/council alone decides which power plants make its electricity/.test(ck) && /utility picks its plants and contracts, the state regulator reviews their costs and SPP runs the regional grid/.test(ck) && !/decides how clean its own electricity/.test(ck), "the myth on the grid's mix rests on who decides");
+  ok(/council alone decides which power plants make its electricity/.test(ck) && /utility owns plants and signs supply contracts, the state regulator reviews their costs, and SPP's market decides which plants run across the region/.test(ck) && !/decides how clean its own electricity/.test(ck), "the myth on the grid's mix rests on who decides");
   // step 6 says three, counts them, and lists the lit parts in words
   ok(/Compare at least three actors/.test(M.STEPS[5]) && M.LENS_MIN === 3 && /LENS_MIN\) \{ api\.done\(\)/.test(JS) && M.countLine(1) === "Actors compared: 1 of at least 3." && M.countLine(3) === "Actors compared: 3 of 5.", "step 6 says how many actors open Next, and counts them aloud");
   F.actors.forEach(a => {
@@ -174,7 +174,15 @@ lines.forEach(t => { ok(nWords(t) <= 36, "a reveal of " + nWords(t) + " words: "
 const PROSE = OWN.replace(/^---[\s\S]*?\n---\n/, " ").replace(/<script[\s\S]*?<\/script>/g, " ").replace(/<style[\s\S]*?<\/style>/g, " ").replace(/<!-- f09-(sources|facts):start[\s\S]*?:end -->/g, " ")
   .replace(/<!--[\s\S]*?-->/g, " ").replace(/^- (.*)$/gm, "<li>$1</li>");
 PROSE.split(/<\/?(?:p|li|dd|dt|td|th|summary|br|caption)\b[^>]*>/).map(plain).filter(x => /[A-Za-z]/.test(x) && !/^[:{]/.test(x)).forEach(x => {
-  const n = nWords(x); ok(n <= 40, "text element of " + n + " words: " + x.slice(0, 70)); ok(nSent(x) <= 2, "text element of " + nSent(x) + " sentences: " + x.slice(0, 70)); });
+  const n = nWords(x); ok(n <= 36, "text element of " + n + " words: " + x.slice(0, 70)); ok(nSent(x) <= 2, "text element of " + nSent(x) + " sentences: " + x.slice(0, 70)); });
+// later fixes: the electric utility's vertical integration, the loss share's denominator, the hydrogen boundary,
+// procurement against dispatch, plain words on the cards
+ok(/electric utility is \[\[vertically-integrated-utility\|vertically integrated\]\], owning plants and wires/.test(M.WHO_LINE) && /also runs the gas mains \(set for teaching\)/.test(M.WHO_LINE) && !/owns plants, wires and gas mains/.test(JS), "vertical integration is the electric utility's; the gas mains are a stated teaching assumption");
+ok(/of the grid electricity users take, set for teaching/.test(M.powerLine(C)) && near(P.lost / P.gridMeters, P.lossShare, 0.001), "the loss share names its denominator, grid electricity at the meters, as the data computes it");
+ok(/stops at the hydrogen its gas reformers make, at its higher heating value; turning that hydrogen into ammonia is outside this count/.test(M.H2_LINE) && M.staticFallback(C, F).indexOf(M.H2_LINE) > 0 && (JS.match(/text: H2_LINE/g) || []).length === 1 && /hydrogen-properties/.test(JSON.stringify(M.CITY_SRC)) && /eia-aeo2026-hmm/.test(JSON.stringify(M.CITY_SRC)), "the hydrogen branch: its boundary stated with the convention, its sources listed");
+{ const lv = id => F.levers.filter(l => l.id === id)[0];
+  ok(/^Which plants the utility owns and which electricity contracts it signs$/.test(lv("supply").text) && /\[\[spp\|SPP\]\]'s market decides which plants run/.test(lv("supply").why), "supply: what the utility owns and contracts, apart from SPP's dispatch");
+  ok(/sold to utilities for resale/.test(lv("wholesale").text) && /minimum energy rules new buildings/.test(lv("code").text) && /^PHMSA, the federal pipeline-safety agency,/.test(lv("pipes").why), "the cards explain wholesale sales and the energy code; PHMSA is expanded"); }
 ok(/<!-- f09-fallback:start/.test(OWN) && !/f09-\(fallback/.test(fs.readFileSync(__filename, "utf8").split("const PROSE =")[1].split("\n")[0]), "the text budget covers the no-JS block too");
 
 // ---------------- controls
