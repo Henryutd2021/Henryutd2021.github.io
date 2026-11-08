@@ -341,10 +341,10 @@
     const usNames = {};
     Object.keys(D.names).forEach(function (k) { if (k.indexOf("US-") === 0) usNames[D.names[k]] = k; });
     let marks = [], focusIdx = 0, shown = new Set(), shownRegions = new Set(), proj = null, openKey = null, lastW = 0, lastH = 0, maskSeq = 0, animEnd = 0;
-    // usFailed: the U.S. states could not be loaded; readerHasMap: the reader has focused, clicked or zoomed the map (the
-    // first autoplay then does not start); gen: counts the reader's view and timeline choices, so a late answer (the U.S.
-    // states) acts only if no other choice came after it
-    let usFailed = false, readerHasMap = false, gen = 0, refocusing = false;
+    // usFailed: the U.S. states could not be loaded; readerActed: the reader has used the map or its view and timeline
+    // controls (the first autoplay then does not start); gen: counts the reader's view and timeline choices, so a late
+    // answer (the U.S. states) acts only if no other choice came after it
+    let usFailed = false, readerActed = false, gen = 0, refocusing = false;
     // zt: the zoom now; tR: the zoom the dots were last placed for; frameKey: the view and size the zoom belongs to
     let zt = ID, tR = ID, frameKey = "", bcMain = new Map(), Z = null, routeEls = [];
 
@@ -1004,7 +1004,7 @@
     }
     // the reader takes the map (focus inside it, a click or a tap on it, a zoom gesture): the timeline stops, since each
     // step draws every footprint again, and the first autoplay no longer starts
-    function takeMap() { readerHasMap = true; gen++; if (timer) stop(); }
+    function takeMap() { readerActed = true; gen++; if (timer) stop(); }
     mapEl.addEventListener("focusin", function () { if (!refocusing) takeMap(); });   // not when a redraw gives the focus back
     let touchAt = null;
     mapEl.addEventListener("pointerdown", function (ev) { if (ev.pointerType === "touch") touchAt = [ev.clientX, ev.clientY]; else takeMap(); });
@@ -1014,7 +1014,7 @@
       touchAt = null;
     });
     slider.addEventListener("input", function () {
-      gen++;
+      readerActed = true; gen++;
       stop();
       const y = +slider.value;
       let k = -1;
@@ -1057,12 +1057,13 @@
     }
     function showFinal() { stop(); state.upto = last; readout(); draw(false); }
     play.addEventListener("click", function () {
-      gen++;
+      readerActed = true; gen++;
       if (timer) stop(); else if (!lacking(state.view)) playFrom(false);
     });
     viewBtns.forEach(function (b) {
       b.addEventListener("click", function () {
         const g = ++gen;
+        readerActed = true;
         state.view = b.getAttribute("data-view");
         viewBtns.forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
         focusIdx = 0; closeCard(false);
@@ -1076,10 +1077,10 @@
     redraw = function () { draw(false); };
     readout();
     draw(false);
-    // the world view plays once by itself when the map first comes into view
+    // the world view plays once by itself when the map first comes into view (unless the reader has used it already)
     if (!reduceMotion && "IntersectionObserver" in window) {
       const seen = new IntersectionObserver(function (es) {
-        if (es.some(function (e) { return e.isIntersecting; })) { seen.disconnect(); if (!readerHasMap) playFrom(true); }
+        if (es.some(function (e) { return e.isIntersecting; })) { seen.disconnect(); if (!readerActed) playFrom(true); }
       }, { threshold: 0.5 });
       seen.observe(mapEl);
     }

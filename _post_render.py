@@ -144,12 +144,27 @@ def problems_of(html, rel, out, base):
 
 
 def sitemap(out, base):
-    """Directory indexes in the sitemap as the canonical links write them (.../ rather than .../index.html)."""
+    """Directory indexes in the sitemap as the canonical links write them (.../ rather than .../index.html). A partial
+    render looks its pages up by the .../index.html address and adds them again, so entries with the same address are
+    then merged into one, with the latest lastmod."""
     f = os.path.join(out, "sitemap.xml")
     if not base or not os.path.exists(f):
         return
     text = open(f, encoding="utf8").read()
     new = re.sub(r"<loc>(%s(?:[^<]*/)?)index\.html</loc>" % re.escape(base), r"<loc>\1</loc>", text)
+    blocks = re.findall(r"[ \t]*<url>.*?</url>\n?", new, re.S)
+
+    def mod(block):
+        m = re.search(r"<lastmod>([^<]*)</lastmod>", block)
+        return m.group(1) if m else ""
+    keep = {}   # address -> its entry (first position, latest lastmod)
+    for b in blocks:
+        loc = re.search(r"<loc>([^<]*)</loc>", b).group(1)
+        if loc not in keep or mod(b) > mod(keep[loc]):
+            keep[loc] = b
+    if blocks and len(keep) < len(blocks):
+        start, end = new.find(blocks[0]), new.rfind(blocks[-1]) + len(blocks[-1])
+        new = new[:start] + "".join(keep.values()) + new[end:]
     if new != text:
         open(f, "w", encoding="utf8").write(new)
 
