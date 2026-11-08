@@ -279,12 +279,12 @@ ok(PR.length === 7, "seven worked exercises");
   ok(near(PR[2].check.cse, r2(+PR[2].a.match(/\$([0-9.]+) ÷/)[1] / 0.8, 2), 0.005), "exercise 3: ÷ (1 - 0.20)");
   ok(near(PR[3].check.cse, r2(+PR[3].a.match(/\$([0-9.]+) ×/)[1] * +PR[3].a.match(/× ([0-9.]+) =/)[1], 2), 0.005), "exercise 4: × the seasonal COP");
   ok(PR[3].check.curve != null && near(PR[3].check.curve, PR[3].check.cse, 0.5) && PR[3].a.indexOf(M.usd(PR[3].check.curve, 2)) > 0, "exercise 4 agrees with the curve's block (the COP unrounded)");
-  const e5 = PR[4].a.replace(/,/g, "").match(/([0-9.]+) \+ \(([0-9.]+) \+ ([0-9.]+)\) ÷ 2 = ([0-9.]+); ([0-9.]+) × \(([0-9.]+) \+ ([0-9.]+) ÷ ([0-9.]+)\) = ([0-9.]+) MW of heating; plus ([0-9.]+) MW base and ([0-9.]+) MW of cars: ([0-9.]+) MW/);
+  const e5 = PR[4].a.replace(/,/g, "").match(/([0-9.]+) \+ \(([0-9.]+) \+ ([0-9.]+)\) ÷ 2 = ([0-9.]+);<br>heating electricity: ([0-9.]+) × \(([0-9.]+) \+ ([0-9.]+) ÷ ([0-9.]+)\) = ([0-9.]+) MW;<br>total load: [0-9.]+ \+ ([0-9.]+) MW base \+ ([0-9.]+) MW of cars = ([0-9.]+) MW/);   // three lines: share, heating electricity, total
   ok(e5 && near(+e5[1] + (+e5[2] + +e5[3]) / 2, +e5[4], 0.00051) && +e5[4] === +e5[7] && near(r2(+e5[5] * (+e5[6] + +e5[7] / +e5[8]), 1), +e5[9], 0.05) && near(r2(+e5[9] + +e5[10] + +e5[11], 1), +e5[12], 0.051) && near(PR[4].check.model, +e5[12], 0.15), "exercise 5 balances from its givens and matches the model");
   // every number exercise 5's answer uses is in its givens
   const g5 = PR[4].givens.map(g => g[1]).join(" ").replace(/,/g, "");
   ok(e5 && [e5[1], e5[2], e5[3], e5[5], e5[6], e5[8], e5[10], e5[11]].every(v => g5.indexOf(v) >= 0), "exercise 5's givens hold every input: the four heat shares, the heat, the COP, the base load and the cars");
-  const e6 = PR[5].a.match(/([0-9.]+) × ([0-9.]+) = ([0-9.]+) MW/); ok(e6 && near(r2(+e6[1] * +e6[2], 1), +e6[3], 0.051) && near(PR[5].check.model, +e6[3], 0.06), "exercise 6 balances");
+  const e6 = PR[5].a.match(/([0-9.]+) MWh × ([0-9.]+) = ([0-9.]+) MWh in that hour; ÷ 1 h = ([0-9.]+) MW/); ok(e6 && near(r2(+e6[1] * +e6[2], 1), +e6[3], 0.051) && e6[3] === e6[4] && near(PR[5].check.model, +e6[4], 0.06), "exercise 6 balances: MWh in the hour, ÷ 1 h = MW");
   ok(PR.every((p, i) => { const html = M.practiceHTML(C, D); return html.indexOf(M.givensHTML(p.givens)) > 0; }), "the givens tables are on the page");
   ok(/140,000 ÷ 2\.5 = 56,000 MWh a year; ÷ 8,760 h = 6\.4 MW/.test(PR[6].a), "exercise 7 balances");
   ok(M.practiceHTML(C, D).indexOf("about 30 minutes") >= 0, "the practice set states its time");
@@ -305,7 +305,7 @@ ok(!/nuclear|reactor|\bSMR\b|small modular|fission|uranium/i.test(ALL), "no nucl
 ok(!/\(via [a-z0-9_.-]+\.json/.test(PAGE), "no internal file names in the page's source lines");
 ok(!/\bAI\b|artificial intelligence/.test(ALL), "no 'AI'");
 ok(!/projects\/|research\.html|smr-dc/.test(ALL), "no project page and no Research page");
-const hrefs = [...OWN.matchAll(/href="([^"]+)"/g)].map(m => m[1].replace(/&amp;/g, "&")).concat([...RAW.matchAll(/"url": "([^"]+)"/g)].map(m => m[1]));
+const hrefs = [...OWN.matchAll(/href="([^"]+)"/g)].map(m => m[1].replace(/&amp;/g, "&")).concat([...RAW.matchAll(/"url": "([^"]+)"/g)].map(m => m[1]).filter(u => u !== "no link"));   // a source cited by name only has "no link"
 const ALLOW = /^https:\/\/([a-z0-9.-]+\.)?(eia\.gov|energy\.gov|lbl\.gov|nlr\.gov|nrel\.gov|bea\.gov|doi\.org|noaa\.gov|epa\.gov|census\.gov|dot\.gov)\//;
 ok(hrefs.every(h => ALLOW.test(h) || /^[0-9a-z-]+\.html(#[a-z-]+)?$/.test(h) || /^#/.test(h)), "links on the allow-list (" + hrefs.filter(h => !(ALLOW.test(h) || /^[0-9a-z-]+\.html(#[a-z-]+)?$/.test(h) || /^#/.test(h))).join(", ") + ")");
 ok((JS.match(/fictional\((act|res)\)/g) || []).length >= 9 && /C\.about\.line/.test(JS) && /caption: C\.about\.line/.test(JS) && /note: C\.about\.line/.test(JS), "the fictional line on every interactive, read from prairie-city.json");
@@ -326,6 +326,12 @@ const S0 = { rate: 0.06, rebound: 0 }, lines = [M.line1(C, D, S0), M.reboundLine
   M.netLine(C, D, {}, 0.3), M.annNet(C, D, {}, 0.3, true), M.annNet(C, D, {}, 0.3, false), M.netHint(C, D), M.copHint(D)].concat(M.curve(C, D, S0, "el").map(M.blockLine), M.curve(C, D, S0, "gas").map(M.blockLine), Object.values(M.HINTS), M.industryCards(C, D).map(c => c.why),
   M.practice(C, D).map(p => p.a), M.practice(C, D).map(p => p.q));
 lines.forEach(t => { ok(nWords(t) <= 40, "a reveal of " + nWords(t) + " words: " + plain(t).slice(0, 60)); ok(nSent(t) <= 2, "a reveal of " + nSent(t) + " sentences: " + plain(t).slice(0, 60)); });
+ok(/core\.peak > core\.limit \? \{ title: "The substation binds"/.test(JS) && /title: "The substation holds"/.test(JS) && /title: "The peak can grow"/.test(JS) && M.districtDay(C, D, 0, dd, {}).peak < M.districtDay(C, D, 0, dd, {}).limit, "the explain chain follows the reader's core: at the defaults its peak fits, so the substation holds");
+ok(/big enough for the design day/.test(M.HINTS.capacity) && /hintP\(res, HINTS\.capacity\)/.test(JS) && /Heat pumps big enough for the design day, with no backup heat/.test(JS), "the heat pumps' capacity is an assumption, said in step 5 and the boundary");
+ok(/15,000 t × 57\.5 kWh per kg = 862\.5 GWh a year/.test(M.h2Hint(C)) && /DOE's assumed/.test(M.h2Hint(C)) && M.CITY_SRC.indexOf("doe-h2-24005") >= 0 && /Program Record 24005/.test(M.sourcesHTML(C, D)), "the hydrogen's electricity is worked, with DOE's record in the sources");
+ok(D.coldClimate.src === "energystar-cchp" && /ENERGY STAR/.test(D.sources["energystar-cchp"].publisher) && /read 8 November 2026/.test(D.sources["energystar-cchp"].date) && /70% of that at 47 F/.test(D.sources["energystar-cchp"].where), "the cold-climate COP cites ENERGY STAR's criteria, with the date read");
+ok(M.curve(C, D, { rate: 0.06, rebound: 0 }, "gas").some(b => /\[\[condensing-furnace\|/.test(M.blockLine(b))) && /\[\[feedstock\|/.test(M.industryCards(C, D)[3].why) && /\[\[gas-reformer\|/.test(M.industryCards(C, D)[3].why) && /changing magnetic field/.test(M.industryCards(C, D)[2].why), "condensing furnace, feedstock, gas reformer and induction explained where they appear");
+ok(!/comes back every few years/.test(PAGE) && /no assigned return period/.test(PAGE), "the design day has no stated return period");
 ok(!/class: "lx-hint", text: "[A-Z]/.test(JS), "every hint under a control is a tested constant or function (HINTS, netHint, copHint, subsLine), not an untested literal");
 const PROSE = OWN.replace(/^---[\s\S]*?\n---\n/, " ").replace(/<script[\s\S]*?<\/script>/g, " ").replace(/<style[\s\S]*?<\/style>/g, " ").replace(/<!-- a15-(sources|facts):start[\s\S]*?:end -->/g, " ")
   .replace(/<!--[\s\S]*?-->/g, " ").replace(/^- (.*)$/gm, "<li>$1</li>");
@@ -355,7 +361,7 @@ ok(PR.every(p => Array.isArray(p.givens) && p.givens.length >= 2 && p.givens.eve
     ok(near(nr.store.peak, want.peak, 1e-9) && near(nr.store.peak, 310.7, 0.05) && M.netLine(C, D, {}, 0.3).indexOf("310.7 MW with one") > 0, "the explain's step-9 line: 310.7 MW with the store at 30% (the review's number)"); }
   // 165 C is this exercise's figure, dated; part of the steam band within reach
   const med = M.industryCards(C, D).filter(c => c.id === "medium")[0];
-  ok(!/today's commercial heat pumps/i.test(JS) && /the 165 °C this exercise uses \(LBNL, 2022; DOE's 2024 tip sheet says about 175 °C\)/.test(med.why) && /lower-pressure part/.test(med.why) && D.industry.hpMaxC2024 === 175 && /up to about 175 C/.test(D.sources["doe-iac-tip2"].where) && /11 January 2024/.test(D.sources["doe-iac-tip2"].date), "165 C labelled as LBNL 2022's, DOE's 2024 175 C named, part of the steam within reach");
+  ok(!/today's commercial heat pumps/i.test(JS) && /the 165 °C this exercise takes as heat pumps' reach \(LBNL, 2022; DOE's 2024 tip sheet says about 175 °C\)/.test(med.why) && /For simplicity it all goes to electric boilers; heat pumps could take its lower-temperature part/.test(med.why) && !/Most of this steam/.test(JS) && D.industry.hpMaxC2024 === 175 && /up to about 175 C/.test(D.sources["doe-iac-tip2"].where) && /11 January 2024/.test(D.sources["doe-iac-tip2"].date), "165 C labelled as LBNL 2022's, DOE's 2024 175 C named, part of the steam within reach");
   ok(/some low-pressure steam included/.test(M.ideasHTML(C, D)) && /\(LBNL, 2022\)/.test(M.industryBins(D)[0].sub), "the ideas and the bin say the same");
   // "below the average price", not "pays"
   ok(!/"Pays:|pays, under|does not pay|Paying savings/.test(JS) && /Kansas's 2025 average retail prices of electricity and gas \(EIA\), taken as a flat price per MWh/.test(OWN) && /flat yardstick; real bills add fixed, demand or time-of-use charges/.test(JS), "the yardstick is a flat statewide average price, said so");

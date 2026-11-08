@@ -62,7 +62,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-datanote a13-note"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><ul>
 <li><b>Prairie City is fictional; its numbers are illustrative.</b> Its five household groups (bands of area median income) come from the course's shared city data, anchored to Wichita's incomes and Kansas's 2025 prices.</li>
 <li><b>Ridge County and Prairieland are fictional; their numbers are illustrative.</b> The plant, its jobs, the county's tax revenue and the new farms are set for teaching.</li>
-<li><b>Screening estimates.</b> The plan's cost and every coefficient (direct jobs per $M and per 100 MW, the multiplier, displacement, the tax rate) are your inputs, not predictions; the sources below say where real values come from.</li>
+<li><b>Screening estimates.</b> The plan's cost and every coefficient, a number that turns spending or size into an estimate (direct jobs per $M and per 100 MW, the multiplier, displacement, the tax rate), are your inputs, not predictions.</li>
 </ul></div>
 <p class="lx-hint" style="margin-top:10px">Need a refresher? <a href="a04-retail-tariffs.html">A4</a> designs tariffs and finds cross-subsidies; <a href="f11-air-climate-people.html">F11</a> reads energy burden by income.</p>
 ```
@@ -108,10 +108,10 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-deeper-body">
 ```
 
-- **Input-output models.** NREL's JEDI models turn spending into jobs and count a construction job as one full-time year; they report gross jobs only.
+- **Input-output models** trace what each industry buys from the others. NREL's JEDI models turn spending into jobs this way and count a construction job as one full-time year; they report gross jobs only.
 - **Multipliers.** BEA's RIMS II sells regional multipliers for output, earnings and employment; new ones came out on 5 May 2026.
 - **Baselines.** BLS's Quarterly Census of Employment and Wages counts jobs and wages by county and industry; DOE's USEER counts energy jobs by technology.
-- **Taxes.** Rates, assessments and abatements are set by each state and county: read the local rules, not a national average.
+- **Taxes.** Rates, assessments (the value set for tax) and abatements (tax reductions) are set by each state and county: read the local rules, not a national average.
 
 ```{=html}
 </div>
@@ -125,6 +125,7 @@ Take groups $g$ with $n_g$ households, income $y_g$, use $e_g$ (kWh) and home en
 
 $$c_g = \frac{C\,e_g}{\sum_h n_h e_h} \ \text{(per kWh)}, \qquad c_g = \frac{C}{\sum_h n_h} \ \text{(fixed)}, \qquad c_g = \frac{C\,y_g}{\sum_h n_h y_h} \ \text{(by income)}$$
 
+- **In words.** Per kWh, each group pays the cost's share of the kWh it uses; fixed, every household pays the same; by income, each pays the share of the city's income it earns.
 - **Burden after:** $(s_g + c_g)/y_g$. Every design gives $\sum_g n_g c_g = C$, so the difference between two designs sums to zero: a transfer.
 - **Jobs.** With direct (on-site) new permanent jobs $J_{\text{new}}$, direct jobs lost $J_{\text{lost}}$, multiplier $m$ and displacement $d$: net permanent jobs $= m\,(J_{\text{new}}(1 - d) - J_{\text{lost}})$.
 - **Job-years over $T$ years** from retirement, building first for $b$ years: $m\,[(B + (T - b)\,J_{\text{new}})(1 - d) - T\,J_{\text{lost}}]$, with $B$ the direct building job-years (spending in the county $\times$ direct job-years per \$M).
@@ -155,7 +156,7 @@ $$c_g = \frac{C\,e_g}{\sum_h n_h e_h} \ \text{(per kWh)}, \qquad c_g = \frac{C}{
 :::
 
 ```{=html}
-<p class="lx-lede">Practice, about 30 minutes: four myths, then six exercises with worked answers.</p>
+<p class="lx-lede">Practice, about 30 minutes: four myths, then six exercises with worked answers, all at the page's default inputs.</p>
 <div class="lx-myths" data-quiz="a13-myth">
 <div class="lx-qq" data-id="cheaper" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “Moving a plan's cost from one group of households to another makes the plan cheaper.”</p>
@@ -170,7 +171,7 @@ $$c_g = \frac{C\,e_g}{\sum_h n_h e_h} \ \text{(per kWh)}, \qquad c_g = \frac{C}{
 <div class="lx-qq" data-id="boom" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “A two-year construction boom of 3,600 jobs replaces 1,840 permanent jobs.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. With this page's inputs, building gives 7,200 job-years before displacement; the lost jobs add up to 36,800 job-years over 20 years.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. With this page's default inputs, building gives 7,200 job-years before displacement; the lost jobs add up to 36,800 job-years over 20 years.</p></details>
 </div>
 <div class="lx-qq" data-id="tax" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “A plant's property tax is a resource cost, like the fuel it burns.”</p>
@@ -180,7 +181,7 @@ $$c_g = \frac{C\,e_g}{\sum_h n_h e_h} \ \text{(per kWh)}, \qquad c_g = \frac{C}{
 </div>
 <div class="lx-card a13-practice">
 <!-- a13-practice:start (written from the model by the test's --write mode; do not edit) -->
-<p class="lx-eyebrow">Practice · about 30 minutes on your own</p><ol class="lx-fb-practice"><li><p><b>The per-kWh rate by hand.</b> Prairie City's households use 1,162,169,159 kWh a year. What rate recovers $24M?</p><details class="lx-answer"><summary>Answer</summary><p>$24M ÷ 1,162,169,159 kWh = $0.0207, about 2.07¢ a kWh.</p></details></li><li><p><b>A fixed charge against income.</b> Split $24M equally over 101,410 households. How much does it add to the burden of a household earning $13,000?</p><details class="lx-answer"><summary>Answer</summary><p>$237 a year each; 236.66 ÷ 13,000 = 1.82%, so +1.8 points.</p></details></li><li><p><b>The same share of income.</b> By income, what share of its income does every household pay?</p><details class="lx-answer"><summary>Answer</summary><p>$24M ÷ total household income $8,428M = 0.285%; +0.3 points for every group.</p></details></li><li><p><b>Group, then read.</b> Households below 80% of area median income: how does their merged burden compare with the poorest group's, before the plan?</p><details class="lx-answer"><summary>Answer</summary><p>Merged: total spending ÷ total income = 6.1%; the 0–30% group alone: 14.9%. The merged average hides the tail.</p></details></li><li><p><b>Job-years against jobs.</b> $1,500 per kW for 2,000 MW, 30% spent locally, 5.0 direct job-years per $M, multiplier 1.6. Compare with 1,840 permanent jobs lost over 20 years.</p><details class="lx-answer"><summary>Answer</summary><p>$3,000M × 30% = $900M; × 5.0 = 4,500 direct job-years; × 1.6 = 7,200 job-years in all (gross), against 1,840 × 20 = 36,800 job-years lost.</p></details></li><li><p><b>The county's budget.</b> Plant value $3,000M, new farms $3,000M with 50% taxable, rate 2.0%. What changes for the county's budget, and what does this model leave open?</p><details class="lx-answer"><summary>Answer</summary><p>$60M lost, $30M gained: −$30M a year for the county's budget, the mines' taxes held fixed. The payments use up nothing; what a smaller budget does to services, and to the region, is not estimated.</p></details></li></ol><p class="lx-hint">Screening estimate: your inputs and the stated assumptions, not a prediction. Prairie City is fictional; its numbers are illustrative. Ridge County and Prairieland are fictional; their numbers are illustrative.</p>
+<p class="lx-eyebrow">Practice · about 30 minutes on your own</p><ol class="lx-fb-practice"><li><p><b>The per-kWh rate by hand.</b> Prairie City's households use 1,162,169,159 kWh a year. What rate recovers $24M?</p><details class="lx-answer"><summary>Answer</summary><p>$24M ÷ 1,162,169,159 kWh = $0.0207, about 2.07¢ a kWh.</p></details></li><li><p><b>A fixed charge against income.</b> Split $24M equally over 101,410 households. How much does it add to the burden of a household earning $13,000?</p><details class="lx-answer"><summary>Answer</summary><p>$237 a year each; 236.66 ÷ 13,000 = 1.82%, so +1.8 points.</p></details></li><li><p><b>The same share of income.</b> Prairie City's households earn $8,428M a year in all. Charged by income, what share of its income does every household pay?</p><details class="lx-answer"><summary>Answer</summary><p>$24M ÷ total household income $8,428M = 0.285%; +0.3 points for every group.</p></details></li><li><p><b>Group, then read.</b> Households below 80% of area median income: how does their merged burden compare with the poorest group's, before the plan?</p><details class="lx-answer"><summary>Answer</summary><p>Merged: total spending ÷ total income = 6.1%; the 0–30% group alone: 14.9%. The merged average hides the tail.</p></details></li><li><p><b>Job-years against jobs.</b> $1,500 per kW for 2,000 MW, 30% spent locally, 5.0 direct job-years per $M, multiplier 1.6. Compare with 1,840 permanent jobs lost over 20 years.</p><details class="lx-answer"><summary>Answer</summary><p>$3,000M × 30% = $900M; × 5.0 = 4,500 direct job-years; × 1.6 = 7,200 job-years in all (gross), against 1,840 × 20 = 36,800 job-years lost.</p></details></li><li><p><b>The county's budget.</b> Plant value $3,000M, new farms $3,000M with 50% taxable, rate 2.0%. What changes for the county's budget, and what does this model leave open?</p><details class="lx-answer"><summary>Answer</summary><p>$60M lost, $30M gained: −$30M a year for the county's budget, the mines' taxes held fixed. The payments use up nothing; what a smaller budget does to services, and to the region, is not estimated.</p></details></li></ol><p class="lx-hint">Screening estimate: your inputs and the stated assumptions, not a prediction. Prairie City is fictional; its numbers are illustrative. Ridge County and Prairieland are fictional; their numbers are illustrative.</p>
 <!-- a13-practice:end -->
 </div>
 ```
