@@ -39,7 +39,8 @@
 .lx-stage { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; background: var(--lx-surface); border: 1px solid var(--lx-line); border-radius: var(--lx-r-lg); padding: 14px 16px; box-shadow: var(--lx-shadow); min-width: 0; }
 .lx-stage[hidden] { display: none; }
 .lx-stage-head { display: flex; justify-content: space-between; align-items: baseline; gap: 6px 12px; flex-wrap: wrap; }
-.page-learn .lx-stage-head h3 { font-size: 16px; margin: 0; }
+.page-learn .lx-stage-head :is(h2, h3) { font-size: 16px; margin: 0; }
+.page-learn .lx-stage-head h2 { opacity: .9; }   /* an h2 when the stage sits right under the page title (LX.hTag): the h3's look */
 .lx-stage-status { font-size: 14.5px; color: var(--lx-ink-2); min-height: 1.3em; }
 .lx-stage-status b { font-family: var(--lx-f-display); font-weight: 600; }
 .lx-ctls { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px 18px; }

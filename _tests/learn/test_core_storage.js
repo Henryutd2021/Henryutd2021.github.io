@@ -4,6 +4,9 @@
 //   - storage refused on read (site data blocked): progress, answers and drafts are kept in memory for the page, and one
 //     short notice (p.lx-store-note, role status) says they last only until a reload; LX.store.persistent() is false
 //   - storage refused on write (a full quota): what was stored stays readable, new values are kept in memory, one notice
+//   - the site's first head script (assets/head/metadata.html): when reading storage throws, the page gets an in-memory
+//     store for the visit (marked inMemory: true) and nothing else throws; with working storage it changes nothing; on a
+//     Learn page that stand-in counts as refused storage (one notice, persistent() false)
 //   - LX.store.clearAll() leaves no reader data (only the time of the reset), in storage or in memory; a page opened
 //     before the reset (another tab) cannot write its old state back: its writes are dropped and it says so once
 //   - the reset control ([data-lx-reset]): shown only with JavaScript, asks first, then clears; a "no" changes nothing
@@ -20,7 +23,8 @@ function ok(c, msg) { checks++; if (!c) { fails++; console.log("FAIL:", msg); } 
 const CORE = fs.readFileSync(path.join(SITE, "assets/learn/components/core.js"), "utf8");
 
 // a page: core.js run against a stub document whose localStorage behaves as `mode` says
-//   "ok": a working store; "read": every access throws (blocked); "write": reads work, writes throw (quota)
+//   "ok": a working store; "read": every access throws (blocked); "write": reads work, writes throw (quota);
+//   "memory": the in-memory stand-in the site's first head script gives a page whose storage is refused
 function page(mode, initial, confirmAnswer, shared) {   // shared: another page's storage (two tabs of one browser)
   const data = shared || Object.assign({}, initial || {}), body = new El("body"), main = new El("main"), html = new El("html");
   body.appendChild(main);
@@ -44,6 +48,7 @@ function page(mode, initial, confirmAnswer, shared) {   // shared: another page'
   const asked = [];
   const window = { document, addEventListener() {}, innerWidth: 1280, innerHeight: 800, matchMedia: () => ({ matches: true }),
     confirm: q => { asked.push(q); return confirmAnswer !== false; } };
+  if (mode === "memory") Object.defineProperty(ls, "inMemory", { value: true });
   Object.defineProperty(window, "localStorage", { get() { if (mode === "read") throw new Error("SecurityError"); return ls; } });
   const later = [];
   const ctx = { window, document, location: { search: "", hash: "", protocol: "https:" }, console, setTimeout: f => { later.push(f); return 0; },
@@ -137,6 +142,41 @@ const notes = P => P.main.querySelectorAll(".lx-store-note");
   const B = mk(false);
   B.box.querySelector("button").click();
   ok("learn.v1" in B.P.data && B.tick.classList.contains("is-done") && B.box.querySelector("[aria-live]").textContent === "", "reset: no changes nothing");
+}
+// the site's first head script: an in-memory stand-in when storage is refused, nothing changed when it works
+{
+  const META = fs.readFileSync(path.join(SITE, "assets/head/metadata.html"), "utf8");
+  const lines = META.split("\n").filter(l => !l.startsWith("$--"));
+  ok(/^<meta charset="utf-8" \/>$/.test(lines[0]) && /^<script>/.test(lines[1]), "head script: the first element after the charset line, before every other script");
+  const src = (META.match(/<script>([\s\S]*?)<\/script>/) || [])[1] || "";
+  ok(META.split("<script").length === 2 && !/\$/.test(src), "head script: one inline script, with no template marks in it");
+  const refused = () => { const e = new Error("Access is denied for this document."); e.name = "SecurityError"; throw e; };
+  const run = (blocked) => {
+    const real = { getItem: () => null, setItem() {}, removeItem() {} }, win = {};
+    for (const n of ["localStorage", "sessionStorage"]) Object.defineProperty(win, n, { configurable: true, enumerable: true, get: blocked ? refused : () => real });
+    vm.runInNewContext(src, { window: win, Object, String });
+    return { win, real };
+  };
+  const B = run(true);
+  let threw = false, s;
+  try { s = B.win.localStorage; s.setItem("quarto-color-scheme", "alternate"); } catch (e) { threw = true; }
+  ok(!threw && s.inMemory === true && s.getItem("quarto-color-scheme") === "alternate" && s.getItem("none") === null && s.length === 1 && s.key(0) === "quarto-color-scheme",
+    "head script, storage refused: localStorage is an in-memory store that keeps values for the visit");
+  s.removeItem("quarto-color-scheme"); s.setItem("__proto__", 1);
+  ok(s.getItem("quarto-color-scheme") === null && s.getItem("__proto__") === "1" && s.key(1) === null, "head script, storage refused: remove, any key name, key() past the end");
+  s.clear(); ok(s.length === 0 && Object.keys(s).indexOf("inMemory") < 0, "head script, storage refused: clear() empties it; the mark is not an enumerable key");
+  ok(B.win.sessionStorage.inMemory === true && B.win.sessionStorage !== s, "head script, storage refused: sessionStorage has its own stand-in");
+  const W = run(false);
+  ok(W.win.localStorage === W.real && W.win.sessionStorage === W.real && W.real.inMemory === undefined, "head script, working storage: nothing is replaced or marked");
+}
+// a Learn page under the head script's stand-in: the course treats it as refused storage
+{
+  const P = page("memory"); P.run();
+  P.LX.progress.done("02-demand");
+  ok(P.LX.progress.isDone("02-demand") && P.LX.store.persistent() === false, "stand-in: progress is kept for the page, and persistent() is false");
+  const n = notes(P);
+  ok(n.length === 1 && n[0].getAttribute("data-kind") === "blocked" && /until you reload/.test(n[0].textContent), "stand-in: the one notice that progress lasts only until a reload");
+  ok(!("learn.v1" in P.data), "stand-in: the course keeps its state in its own memory, not in the stand-in");
 }
 // the Learn index's words
 {

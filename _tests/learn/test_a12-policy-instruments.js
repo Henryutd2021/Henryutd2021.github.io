@@ -148,7 +148,7 @@ ${D.rules.map(r => { const src = x => `<p class="lx-hint">Source: ${x.url ? `<a 
 <p class="lx-hint">The model's instruments are simpler than these rules: no phase-outs, eligibility tests or trading.</p>
 </div>`;
   const blocks = { "a12-fallback": FALLBACK, "a12-explain": EXPLAIN, "a12-check": CHECK, "a12-rules": RULES };
-  const reference = { about: "Written by node _tests/learn/test_a12-policy-instruments.js --write; re-solved on every run.", base: { co2: base.co2, resource: base.resource },
+  const reference = { about: "Results of the Plains Grid's planning LP, solved with HiGHS 1.15.1: CO2 and resource cost with no policy, and each instrument at its default setting.", base: { co2: base.co2, resource: base.resource },
     defaults: {} };
   defs.forEach(z => { reference.defaults[z.x.id] = { cut: f.pct(z.c.cutPct), per: f.pt(z.c.perT), co2: z.r.co2, resource: z.r.resource }; });
   const blockRx = k => new RegExp("(<!-- " + k + ":start[^>]*-->\\n)[\\s\\S]*?(<!-- " + k + ":end -->)");
@@ -159,6 +159,11 @@ ${D.rules.map(r => { const src = x => `<p class="lx-hint">Source: ${x.url ? `<a 
   }
   Object.keys(blocks).forEach(k => { const m = PAGE.match(blockRx(k)); ok(m && PAGE.includes(m[1] + blocks[k] + "\n<!-- " + k + ":end -->"), "the page's block " + k + " is written from the model (run --write)"); });
   Object.keys(reference.defaults).forEach(k => ok(JSON.stringify(D.reference.defaults[k]) === JSON.stringify(reference.defaults[k]), "reference block: " + k));
+  {   // the reference block names the solver's own version (the WebAssembly package's number differs)
+    const dir = fs.readdirSync(path.join(SITE, "assets/learn/vendor")).find(n => /^highs-/.test(n)), h = await require(path.join(SITE, "assets/learn/vendor", dir, "highs.js"))();
+    const HV = h.UTF8ToString(h._Highs_version());
+    ok(new RegExp("HiGHS " + HV.replace(/\./g, "\\.") + "\\b").test(D.reference.about) && D.reference.about === reference.about, "the reference block names the solver's own version, HiGHS " + HV);
+  }
 
   // ---------------- scope (credit and threshold exercises: wind, solar, storage and gas only), links, text
   const OWN = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1:end -->/g, "").replace(/<!--[\s\S]*?-->/g, "").replace(/^---[\s\S]*?\n---\n/, "");

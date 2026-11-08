@@ -74,7 +74,7 @@
     }
 
     // ---------- the stage: readouts and the year's energy mix against no policy
-    var stage = H("div", { class: "lx-stage" }, live), title = H("h3", null, H("div", { class: "lx-stage-head" }, stage));
+    var stage = H("div", { class: "lx-stage" }, live), sh = H("div", { class: "lx-stage-head" }, stage), title = H(LX.hTag(3, sh), null, sh);   // an h2 when the stage sits right under the page title
     var chips = H("div", { class: "lx-readouts", "aria-live": "polite" }, stage), mixHost = H("div", null, stage);
     var mixText = H("p", { class: "lx-hint" }, stage), status = H("p", { class: "lx-stage-status", "aria-live": "polite" }, stage);
     H("p", { class: "lx-hint", text: "Units: Mt = million tonnes of CO₂; TWh = million MWh; money a year, in 2025 dollars." }, stage);

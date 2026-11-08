@@ -78,7 +78,8 @@ body-classes: "page-learn page-lesson lx-form-studio"
 .r07-cols { display: grid; gap: 14px; }
 @media (min-width: 960px) { .r07-cols { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); } }
 .r07-paper { padding: 12px 14px; border: 1px solid var(--lx-line); border-radius: 12px; background: var(--lx-surface-2); }
-.page-learn .r07-paper h3 { margin: .1rem 0 .2rem; font-size: 18px; }
+.page-learn .r07-paper :is(h2, h3) { margin: .1rem 0 .2rem; font-size: 18px; }
+.page-learn .r07-paper h2 { opacity: .9; }   /* the study's title as an h2 (the scene is right under the page title): the h3's look */
 .r07-by { margin: 0 0 .5rem; font-size: 13.5px; color: var(--lx-ink-3); }
 .r07-head { margin: 0 0 .4rem; font-weight: 600; }
 .r07-audit { min-width: 0; }

@@ -5,6 +5,7 @@
 //              keep their publishers' terms, named in the same line) }, among the file's first three keys
 //   no string in the file reads as an instruction to the course's maintainers: no test or script paths, no "--write",
 //   no "node <file>.js", no "never this block", no "do not edit by hand", no "written by the test"
+// Also: the data files of A3, A5, A8, A9 and A12, read by their pages but not offered, carry no maintenance wording either.
 // Not covered here: the shared data of Prairie City and of engine E3, whose `about` blocks are written by their own data
 // builders. Prairieland's data and engine E4's files are covered.
 // Run from the site folder: node _tests/learn/test_learn_downloads.js
@@ -55,6 +56,13 @@ covered.forEach(n => {
   // third-party data named in the file are named in the license line, with their terms
   if (/\bEIA\b/.test(raw.replace(JSON.stringify(B), ""))) ok(/\bEIA\b.*public domain/.test(B.license), n + ": the license line gives EIA data's terms");
   if (/\bOpenAlex\b/.test(raw.replace(JSON.stringify(B), ""))) ok(/OpenAlex data are CC0/.test(B.license), n + ": the license line gives OpenAlex data's terms");
+  strings(D, "", []).forEach(([at, s]) => MAINT.forEach(([rx, what]) => ok(!rx.test(s), n + ": " + at + " has no maintenance wording (" + what + "): " + s.slice(0, 120))));
+});
+
+// data files the pages read but do not offer, whose about lines once held maintenance wording: none of it may come back
+const READ_ONLY = ["a03-market-design", "a05-adequacy", "a08-storage-duration", "a09-hazards", "a12-policy-instruments"];
+READ_ONLY.forEach(n => {
+  const D = JSON.parse(fs.readFileSync(path.join(DATA, n + ".json"), "utf8"));
   strings(D, "", []).forEach(([at, s]) => MAINT.forEach(([rx, what]) => ok(!rx.test(s), n + ": " + at + " has no maintenance wording (" + what + "): " + s.slice(0, 120))));
 });
 

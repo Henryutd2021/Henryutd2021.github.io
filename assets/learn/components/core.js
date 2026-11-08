@@ -1,5 +1,7 @@
 /* core.js — the LX namespace every Learn component builds on (component library).
    Helpers:  LX.H(tag, attrs, parent)   HTML element; attrs: text, html, class, on<event>, any attribute
+             LX.hTag(level, box)        the tag for a heading drawn in box: h<level>, or higher so the page's outline
+                                        never skips a level (a scene right under the page title gets an h2)
              LX.S(tag, attrs, parent)   SVG element
              LX.icon(name, cls)         24-unit stroke pictogram as an SVG string (names in LX.IC)
              LX.rich(text)              text with [[glossary-id|shown words]] marks -> HTML with tap-to-define terms, and
@@ -88,6 +90,24 @@
     if (parent) parent.appendChild(e);
     return e;
   };
+  // the tag for a heading a script draws inside `box` (the component's own element, already on the page): "h<level>",
+  // or higher when the page's outline needs it, never more than one level below the last heading before `box`. A scene
+  // drawn right under the page title, before the first section, gets an h2 instead of an h3 that would skip a level.
+  // Headings inside `box` do not count, so sibling headings of one component share a level; a box not on the page yet
+  // keeps the level asked for. Only the level changes: each component's styles give the raised heading the same look.
+  LX.hTag = function (level, box) {
+    var prev = 0, body = document.body;
+    if (box && body && body.contains && body.contains(box) && box.compareDocumentPosition) {
+      var hs = document.querySelectorAll("h1,h2,h3,h4,h5,h6");
+      for (var i = 0; i < hs.length; i++) {
+        var h = hs[i];
+        if (box.contains(h) || (h.closest && h.closest("template"))) continue;
+        if (h.compareDocumentPosition(box) & 4) prev = +h.tagName.charAt(1);   // 4: box follows h
+        else break;
+      }
+    }
+    return "h" + (prev ? Math.min(level, prev + 1) : level);
+  };
   LX.clamp = function (x, a, b) { return Math.max(a, Math.min(b, x)); };
   LX.lerp = function (a, b, t) { return a + (b - a) * t; };
   var RMQ = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : null;
@@ -173,9 +193,11 @@
   // Everything the course keeps lives under one localStorage key, "learn.v1". When the browser refuses it (site data
   // blocked, some private windows, a full quota), the state is kept in memory for the rest of this page's life, as JSON
   // text so it behaves like storage, and one short notice says that it will not survive a reload
-  // (LX.store.persistent() is then false). LX.store.clearAll() is the course-wide reset: it replaces everything with
-  // {reset: <time>}, and the mark keeps a page opened before the reset (another tab, a page restored from the back-forward
-  // cache) from writing its old state back: such a page's writes are dropped, and it says so once.
+  // (LX.store.persistent() is then false). Every page's first head script puts an in-memory stand-in in place of storage
+  // the browser refuses (marked inMemory: true); it counts as refused here, so the notice still shows.
+  // LX.store.clearAll() is the course-wide reset: it replaces everything with {reset: <time>}, and the mark keeps a page
+  // opened before the reset (another tab, a page restored from the back-forward cache) from writing its old state back:
+  // such a page's writes are dropped, and it says so once.
   var KEY = "learn.v1", MEM = null, warned = {}, EPOCH;   // EPOCH: the reset mark this page started with
   var NOTES = { blocked: "This browser is not keeping site data, so your answers and progress last only until you reload or leave this page.",
     stale: "This course's data was cleared in this browser, from another tab. Reload this page to start afresh; until then, nothing on it is saved." };
@@ -184,7 +206,7 @@
     if (MEM != null) s = JSON.parse(MEM);
     else {
       var txt;
-      try { txt = window.localStorage.getItem(KEY); } catch (e) { MEM = "{}"; notice("blocked"); txt = null; }
+      try { if (window.localStorage.inMemory === true) throw 0; txt = window.localStorage.getItem(KEY); } catch (e) { MEM = "{}"; notice("blocked"); txt = null; }
       try { s = JSON.parse(txt) || {}; } catch (e) { s = {}; }   // unreadable text: start afresh (the next write replaces it)
     }
     if (EPOCH === undefined) EPOCH = s.reset || null;

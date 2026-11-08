@@ -28,7 +28,7 @@ const NOON = M.hour(D, X, M.hourOf(D.hours[0]), { solar: S0, ct: C0, design: "eo
 const RP = M.restingPoint(D, X, S0), STAY = M.upkeepPoint(D, X, S0);
 const SOL = []; for (let s = G.solar.min; s <= G.solar.max; s += G.solar.step) SOL.push(M.year(D, X, { solar: s, ct: C0, design: "eo" }));
 const reference = {
-  about: "Written by node _tests/learn/test_a03-market-design.js --write at the defaults (1,200 MW of solar, 700 MW of peakers) and checked on every run.",
+  about: "Results of the lesson's market model at the defaults (1,200 MW of solar, 700 MW of peakers): the year under each design, a noon and an evening hour, and the energy-only resting point.",
   ct: C0, solar: S0,
   eo: { avg: +EO.avg.toFixed(4), neg: EO.neg, scarce: EO.scarce, short: EO.short, top: +EO.top.toFixed(2), consumer: +EO.consumer.toFixed(4) },
   cm: { avg: +CM.avg.toFixed(4), capPrice: +CM.capPrice.toFixed(4), consumer: +CM.consumer.toFixed(4), top: +CM.top.toFixed(2) },

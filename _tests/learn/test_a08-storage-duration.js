@@ -51,7 +51,7 @@ const fm = M.fm, r1 = v => Math.round(v * 10) / 10;
   const run = (s, o) => { const r = solve(M.build(W, s, Object.assign({ plains: G }, o || {}))); return { r, o: M.read(W, s, r) }; };
 
   if (process.argv.includes("--write")) {
-    const ref = { about: "Written by node _tests/learn/test_a08-storage-duration.js --write; re-solved by the same test on every run. Energy in MWh.", stores: {} };
+    const ref = { about: "Results of the lesson's week, solved with HiGHS 1.15.1 once for each store (unserved energy and the share of the shortfall covered), and the week's shortfall figures the page states. Energy in MWh.", stores: {} };
     D.techs.forEach(t => { const x = run(M.store(D, t.id)).o; ref.stores[t.id] = { unserved: r1(x.unserved), covered: Math.round(x.covered * 1e4) / 1e4 }; });
     Object.assign(ref, { shortSum: W.shortSum, peakGap: W.peakGap, shortHours: W.shortHours, floor1000: M.powerFloor(W, 1000), hoursAbove: W.short0.filter(x => x > 1000).length, cyclesShown: 250, priceShown: 20 });
     D.reference = ref; fs.writeFileSync(DPATH, JSON.stringify(D, null, 1) + "\n"); D = J(ID + ".json");
@@ -59,6 +59,8 @@ const fm = M.fm, r1 = v => Math.round(v * 10) / 10;
   }
   const R = D.reference;
   ok(R && R.stores, "the data file has a reference block (run with --write once)");
+  const HV = highs.UTF8ToString(highs._Highs_version()), HVRX = new RegExp("HiGHS " + HV.replace(/\./g, "\\.") + "\\b");   // the solver's own version, not the package's
+  ok(R && HVRX.test(R.about) && HVRX.test(D.about), "the about lines name the solver's own version, HiGHS " + HV);
 
   // ---------------- the week
   ok(W.i0 === 24 && W.T === 168 && M.weekStart(year, D.week) === 24, "the week starts at index 24 (00:00 CST on 2 January 2025) and has 168 hours");

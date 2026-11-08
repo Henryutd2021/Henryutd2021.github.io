@@ -93,6 +93,8 @@ function env(opt) {
     return e;
   };
   LX.S = LX.H;
+  LX.hTag = level => "h" + level;   // as core.js's for a box it cannot place on a page (the stub has no document order);
+                                    // the outline of the rendered pages is checked in a browser
   let uid = 0; LX.uid = p => (p || "lx") + "-" + (++uid);
   LX.esc = escH;
   LX.rich = require(path.join(SITE, "assets/learn/components/core.js")).rich;   // core.js's own (lesson links too)

@@ -34,7 +34,7 @@ for (let s = D.sim.repeats.first; s <= D.sim.repeats.last; s++) {
   REP.push({ seed: s, b, yw: M.yearsWith(b), mix: mx, one: Object.fromEntries(IDS.map(id => [id, M.evaluate(Sx, M.block(D, id)).lole])), solar3: M.blocks(D, Sx, "solar").rows.map(r => r.share) });
 }
 const reference = {
-  about: "Written by node _tests/learn/test_a05-adequacy.js --write at seed 2025 and checked on every run; repeats use seeds 1 to 20.",
+  about: "Results of the lesson's simulation of 500 resampled years at seed 2025: the grid as it is, each resource added alone, three blocks of solar and the solar-battery mix; repeats counts, over seeds 1 to 20, the runs in which solar counts for more with the battery than alone, and the battery with solar.",
   base: { lole: B0.lole, lolh: +B0.lolh.toFixed(4), eue: +B0.eue.toFixed(2), se: +ST.se.toFixed(5), yearsWith: ST.yearsWith, days: B0.days },
   single: Object.fromEntries(IDS.map(id => { const x = ST.single[id]; return [id, { lole: x.lole, eue: +x.eue.toFixed(2), mw: +x.mw.toFixed(2), share: +x.share.toFixed(4) }]; })),
   solarBlocks: SOL3.rows.map(r => +r.share.toFixed(4)),

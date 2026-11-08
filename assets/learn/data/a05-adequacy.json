@@ -1,5 +1,5 @@
 {
-  "about": "Data of Learn lesson A5, Will there be enough power when it matters? The Plains Grid, its fleet, its outage rates and every resource added are fictional and illustrative. Demand, wind and sun follow the real hourly shapes of the Southwest Power Pool grid in 2025 (town_year.json) and 2024 (m03-capacity-expansion-2024.json), both from EIA-930, scaled as stated below. The 500 simulated years are resampled: each week of a simulated year is a real week of 2024 or 2025, shifted by at most one week; they are not 500 observed weather years. The reference block is written by node _tests/learn/test_a05-adequacy.js --write and recomputed by the same test on every run.",
+  "about": "Data of Learn lesson A5, Will there be enough power when it matters? The Plains Grid, its fleet, its outage rates and every resource added are fictional and illustrative. Demand, wind and sun follow the real hourly shapes of the Southwest Power Pool grid in 2025 (town_year.json) and 2024 (m03-capacity-expansion-2024.json), both from EIA-930, scaled as stated below. The 500 simulated years are resampled: each week of a simulated year is a real week of 2024 or 2025, shifted by at most one week; they are not 500 observed weather years. The reference block holds the simulation's results at seed 2025.",
   "grid": {
     "name": "Plains Grid",
     "note": "Illustrative: a grid planned for a 4,000 MW peak, with a gas and coal fleet, wind and solar, set so that it misses the 1-in-10 criterion before anything is added. Not a model of any real grid.",
@@ -158,7 +158,7 @@
     ]
   },
   "texts": {
-    "about": "Notes and feedback the page shows (step 2's interval and seed, step 4's screen, a rating at a zero target, step 8's question); the test checks each against the model and the text budget.",
+    "about": "Notes and feedback the page shows (step 2's interval and seed, step 4's screen, a rating at a zero target, step 8's question), each with the model's own numbers.",
     "ZERO_NOTE": "No shortfall is left in the 500 years, so the rating is the smallest perfect MW that also leaves none: a limit of the sample, not proof of zero risk.",
     "SE_NOTE": "± two [[standard-error|standard errors]] of the average over 500 years ([[monte-carlo-error|Monte Carlo error]]), given these inputs. It leaves out uncertainty in the weather history and the model's assumptions.",
     "SEED_NOTE": "The [[random-seed|seed]] numbers the random draws so a run can be repeated; another seed draws other years with the same assumptions.",
@@ -171,7 +171,7 @@
     }
   },
   "reference": {
-    "about": "Written by node _tests/learn/test_a05-adequacy.js --write at seed 2025 and checked on every run; repeats use seeds 1 to 20.",
+    "about": "Results of the lesson's simulation of 500 resampled years at seed 2025: the grid as it is, each resource added alone, three blocks of solar and the solar-battery mix; repeats counts, over seeds 1 to 20, the runs in which solar counts for more with the battery than alone, and the battery with solar.",
     "base": {
       "lole": 0.228,
       "lolh": 0.698,

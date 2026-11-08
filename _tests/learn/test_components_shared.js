@@ -102,6 +102,7 @@ function env() {
     return e;
   };
   LX.S = LX.H;
+  LX.hTag = level => "h" + level;   // as core.js's for a box it cannot place on a page (no document order in this stub)
   let uid = 0; LX.uid = p => (p || "lx") + "-" + (++uid);
   LX.esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   LX.rich = t => LX.esc(t).replace(/\[\[([a-z0-9-]+)\|([^\]]+)\]\]/g, (m, id, w) => '<span class="lx-term" data-term="' + id + '">' + w + "</span>");
