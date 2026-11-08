@@ -1,5 +1,5 @@
 {
- "about": "Capstone C0, Behind one meter: the note's fields, the exemplars and the rubric's look-for lines. The plan runs on engine E0 (assets/learn/components/engine-e0.js, data e0.json), the Site Bench's engine. The exemplars are illustrative notes about the default plan (the Prairie Town home with 6 kW of rooftop solar); every number in them is the engine's, checked by _tests/learn/test_c0-behind-one-meter.js.",
+ "about": "Capstone C0, Behind one meter: the note's fields, the exemplars and the rubric's look-for lines. The plan runs on engine E0, the Site Bench's engine (its data: e0.json). The exemplars are illustrative notes about the default plan (the Prairie Town home with 6 kW of rooftop solar); every number in them is the engine's, checked against a fresh run.",
  "note": {
   "title": "Your one-page note",
   "lede": "Write three short parts in your own words; the plan, its results, the assumptions, the sensitivity (every bar of the chart, in numbers) and the limits fill in from your last run.",
@@ -50,5 +50,5 @@
   "title": "Test the plan: what moves its NPV?",
   "lede": "Each bar swings one input; the equipment stays as you set it. A case that changes how the site runs is run again through every hour of 2025, as 52 weeks and 31 December."
  },
- "reference": {"about":"Written by node _tests/learn/test_c0-behind-one-meter.js --write: the default plan's sensitivity, for the page's no-JS route.","date":"2026-11-05","sens":{"base":-17813.125192874868,"rows":[{"key":"cost","label":"Equipment cost","loText":"75% of sourced","hiText":"125% of sourced","atLo":-10236.872198555666,"atHi":-25389.378187194045,"rerun":false,"limit":false,"why":null},{"key":"rate","label":"Discount rate (real)","loText":"2.0%","hiText":"7.0%","atLo":-15161.631912865387,"atHi":-20510.235411396825,"rerun":false,"limit":false,"why":null},{"key":"xc","label":"Export credit","loText":"0.0¢/kWh","hiText":"8.0¢/kWh","atLo":-20909.097798352108,"atHi":-14717.152587397595,"rerun":true,"limit":false,"why":null}]}}
+ "reference": {"about":"The default plan's sensitivity, shown when JavaScript is off, solved with engine E0 and HiGHS.","date":"2026-11-05","sens":{"base":-17813.125192874868,"rows":[{"key":"cost","label":"Equipment cost","loText":"75% of sourced","hiText":"125% of sourced","atLo":-10236.872198555666,"atHi":-25389.378187194045,"rerun":false,"limit":false,"why":null},{"key":"rate","label":"Discount rate (real)","loText":"2.0%","hiText":"7.0%","atLo":-15161.631912865387,"atHi":-20510.235411396825,"rerun":false,"limit":false,"why":null},{"key":"xc","label":"Export credit","loText":"0.0¢/kWh","hiText":"8.0¢/kWh","atLo":-20909.097798352108,"atHi":-14717.152587397595,"rerun":true,"limit":false,"why":null}]}}
 }

@@ -2,6 +2,22 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
+<script>(function () {
+  ["localStorage", "sessionStorage"].forEach(function (name) {
+    try { window[name].getItem("_"); return; } catch (e) { }   // storage works: leave it as it is
+    var data = Object.create(null);
+    var mem = {
+      getItem: function (k) { k = String(k); return k in data ? data[k] : null; },
+      setItem: function (k, v) { data[String(k)] = String(v); },
+      removeItem: function (k) { delete data[String(k)]; },
+      clear: function () { data = Object.create(null); },
+      key: function (i) { var keys = Object.keys(data); return i >= 0 && i < keys.length ? keys[i] : null; }
+    };
+    Object.defineProperty(mem, "length", { get: function () { return Object.keys(data).length; } });
+    Object.defineProperty(mem, "inMemory", { value: true });
+    try { Object.defineProperty(window, name, { configurable: true, enumerable: true, get: function () { return mem; } }); } catch (e) { }
+  });
+})();</script>
 <meta name="generator" content="quarto-1.10.19">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
@@ -95,8 +111,10 @@ ul.task-list li input[type="checkbox"] {
 <link rel="stylesheet" href="../../assets/explainers.css">
 <meta property="og:title" content="Three Pillars, Three Jobs: How Renewables, Nuclear and Gas Will Share the U.S. Power System – Honglin Li">
 <meta property="og:description" content="Through 2050 the U.S. grid will rest on three jobs rather than three fuels: cheap energy, firm capacity and flexibility. This decade the scarce job is firm capacity that can actually connect, and policy should pay for the service a plant delivers.">
-<meta property="og:image" content="https://henryutd2021.github.io/field-notes/perspectives/images/profile-square.jpg">
+<meta property="og:image" content="https://henryutd2021.github.io/images/profile-square.jpg">
 <meta property="og:site_name" content="Honglin Li">
+<meta property="og:url" content="https://henryutd2021.github.io/field-notes/perspectives/2026-11-three-jobs.html">
+<link rel="canonical" href="https://henryutd2021.github.io/field-notes/perspectives/2026-11-three-jobs.html">
 </head>
 
 <body class="nav-fixed fullcontent quarto-light"><script id="quarto-html-before-body" type="application/javascript">
@@ -303,7 +321,7 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">Learn</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../../field-notes.html"> 
+    <a class="nav-link active" href="../../field-notes.html" aria-current="true"> 
 <span class="menu-text">Notes</span></a>
   </li>  
   <li class="nav-item">
@@ -347,6 +365,7 @@ ul.task-list li input[type="checkbox"] {
 
 <main class="content" id="quarto-document-content">
 
+<noscript><style>@media (max-width: 1199.98px) { #quarto-header { position: relative; } #quarto-header .navbar-toggler { display: none; } #quarto-header #navbarCollapse { display: block !important; } } #quarto-header .quarto-navbar-tools { display: none; }</style></noscript>
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
@@ -395,7 +414,7 @@ ul.task-list li input[type="checkbox"] {
 <h2 class="anchored" data-anchor-id="three-jobs-not-three-fuels">Three jobs, not three fuels</h2>
 <p>Today these three pillars already carry the system: in 2025, gas supplied about 41% of U.S. utility-scale generation, nuclear about 18%, wind about 11% and solar about 7% (<a href="https://www.eia.gov/energyexplained/electricity/electricity-in-the-us.php">EIA</a>). Listing fuels, though, hides what each one is for.</p>
 <ul>
-<li><strong>Cheap energy.</strong> Wind and solar produce the cheapest megawatt-hours when they run, and they dominate what is being built: of the 86 GW planned for 2026, solar and batteries make up nearly 80% (<a href="https://www.eia.gov/todayinenergy/detail.php?id=67205">EIA</a>). I count geothermal here too. The first next-generation geothermal units only began commercial operation this year (<a href="https://fervoenergy.com/fervo-energy-declares-commercial-operation-at-cape-station-ahead-of-schedule-leading-the-race-for-next-generation-geothermal-energy/">Fervo</a>), so its contribution is still ahead of us.</li>
+<li><strong>Cheap energy.</strong> Wind and solar produce the cheapest megawatt-hours when they run, and they dominate what is being built: of the 86 GW planned for 2026, solar and batteries make up nearly 80% (<a href="https://www.eia.gov/todayinenergy/detail.php?id=67205">EIA</a>). I count geothermal here too. Fervo’s Cape Station in Utah, the first greenfield enhanced geothermal development to reach commercial operation, only did so this year (<a href="https://fervoenergy.com/fervo-energy-declares-commercial-operation-at-cape-station-ahead-of-schedule-leading-the-race-for-next-generation-geothermal-energy/">Fervo</a>), so the contribution of next-generation geothermal is still ahead of us.</li>
 <li><strong>Firm capacity.</strong> Nuclear and gas run when the weather does not cooperate and when a large load needs power around the clock.</li>
 <li><strong>Flexibility.</strong> Batteries, hydrogen and flexible demand move energy in time. In my own work, hydrogen earned its place as a flexibility tool, not as a fourth pillar: in Texas, renewable hydrogen covered only a small share of industrial demand (<a href="https://doi.org/10.1016/j.ijhydene.2025.02.303"><em>International Journal of Hydrogen Energy</em>, 2025</a>), while at nuclear plants its value came from turning baseload output into a flexible product (<a href="https://doi.org/10.1038/s41467-026-73630-y"><em>Nature Communications</em>, 2026</a>).</li>
 </ul>
@@ -410,15 +429,15 @@ ul.task-list li input[type="checkbox"] {
 <h2 class="anchored" data-anchor-id="why-now-the-scarce-job-is-firm-capacity-that-can-connect">Why now: the scarce job is firm capacity that can connect</h2>
 <p>Data centers used about 4.7% of U.S. electricity in 2024, and the Lawrence Berkeley National Laboratory’s reference case reaches 11.8% by 2030 (<a href="https://www.energy.gov/documents/united-states-data-center-energy-usage-report-2025-update">LBNL, 2025 update</a>). That demand arrives faster than the grid can absorb it:</p>
 <ul>
-<li>Projects that reached operation in 2025 spent a median of more than five years in interconnection queues, and only 13% of the capacity that requested interconnection from 2000 to 2020 was built (<a href="https://eta-publications.lbl.gov/publications/queued-2026-edition-characteristics">LBNL Queued Up</a>).</li>
+<li>On the supply side, generation and storage projects built in 2025 spent a median of more than five years between their interconnection request and commercial operation, in the regions with data, and only 13% of the capacity that requested interconnection from 2000 to 2020 had been built by the end of 2025 (<a href="https://eta-publications.lbl.gov/publications/queued-2026-edition-characteristics">LBNL Queued Up</a>). These queues cover new supply; they do not include load requests such as data centers.</li>
 <li>The country built 322 miles of new high-voltage (345 kV and above) transmission in 2024 (<a href="https://gridstrategiesllc.com/wp-content/uploads/ACEG_Grid-Strategies_Fewer-New-Miles-2025_vF.pdf">Grid Strategies and ACEG</a>).</li>
 <li>PJM’s 2028/29 capacity auction cleared at its price cap and still fell about 6.8 GW short of its reliability requirement (<a href="https://insidelines.pjm.com/pjm-capacity-auction-procures-138318-mw-of-generation-resources-as-work-continues-to-address-growing-electricity-demand/">PJM</a>).</li>
 </ul>
-<p>When connection is the bottleneck, waiting becomes a cost in its own right. In my work on delayed grid energization, the cost to the developer of a 300 MW (IT) data center waiting 36 months ran to the order of $0.7 billion in present value, and who ends up paying depended on how large-load tariffs are designed (<a href="https://github.com/Henryutd2021/code-delayed-energization">CoDE framework</a>).</p>
+<p>When connection is the bottleneck, waiting becomes a cost in its own right. In my work on delayed grid energization, an illustrative modeled case put the cost to the developer of a 300 MW (IT) data center waiting 36 months on the order of $0.7 billion in present value, and who ends up paying depended on how large-load tariffs are designed (<a href="../../projects/data-center-delay-economics.html">NAPS 2026 study</a>, <a href="https://github.com/Henryutd2021/code-delayed-energization">CoDE framework</a>).</p>
 </section>
 <section id="the-nuclear-pillar-starts-with-the-plants-we-already-have" class="level2">
 <h2 class="anchored" data-anchor-id="the-nuclear-pillar-starts-with-the-plants-we-already-have">The nuclear pillar starts with the plants we already have</h2>
-<p>The fastest firm, carbon-free megawatts are often the ones already built. In a study of 42 U.S. reactors at 2024 prices, nearly all had negative net present value when run as baseload plants; adding hydrogen production and grid services, with the assumed hydrogen credit, brought most of them above zero (<a href="https://doi.org/10.1038/s41467-026-73630-y"><em>Nature Communications</em>, 2026</a>). The same logic shows up in today’s news: DOE has offered up to $5 billion for uprates that add about 1.1 GW at eight existing plants (<a href="https://www.energy.gov/articles/energy-department-announces-5-billion-loan-boost-nuclear-power-and-help-lower-costs">DOE</a>), and retired reactors are being prepared for restart. New reactors are a different decision: for a reactor serving a hyperscale data center, I found that capital cost and policy, far more than operating choices, decide whether it beats grid supply (<a href="https://arxiv.org/abs/2608.10999"><em>Energy Conversion and Management</em>, accepted</a>).</p>
+<p>The fastest firm, carbon-free megawatts are often the ones already built. In a study of 42 U.S. reactors at 2024 prices, nearly all had negative net present value when run as baseload plants selling only electricity, without capacity payments or the 45U nuclear credit; adding hydrogen production and grid services, with the assumed hydrogen production credit of $3/kg for ten years, brought most of them above zero (<a href="https://doi.org/10.1038/s41467-026-73630-y"><em>Nature Communications</em>, 2026</a>). The same logic shows up in today’s news: DOE has offered up to $5 billion for uprates that add about 1.1 GW at eight existing plants (<a href="https://www.energy.gov/articles/energy-department-announces-5-billion-loan-boost-nuclear-power-and-help-lower-costs">DOE</a>), and retired reactors are being prepared for restart. New reactors are a different decision: for a reactor serving a hyperscale data center, I found that capital cost and policy, far more than operating choices, decide whether it beats grid supply (<a href="https://arxiv.org/abs/2608.10999"><em>Energy Conversion and Management</em>, accepted</a>).</p>
 </section>
 <section id="policy-should-pay-for-the-service-not-for-one-output" class="level2">
 <h2 class="anchored" data-anchor-id="policy-should-pay-for-the-service-not-for-one-output">Policy should pay for the service, not for one output</h2>
@@ -432,8 +451,8 @@ ul.task-list li input[type="checkbox"] {
 <li>If large loads show verified, measured flexibility in the gigawatts, flexibility becomes a pillar in its own right and the firm-capacity gap shrinks.</li>
 </ul>
 <hr>
-<p><em>Every item is checked against its primary source; the views are my own.</em></p>
-<p><em>Views are my own and do not represent my employer. Corrections are made in place and noted here with the date.</em></p>
+<p><em>Every item is checked against its primary source. Views are my own and do not represent my employer. Corrections are made in place and noted here with the date.</em></p>
+<p><em>Corrected November 7, 2026: the geothermal milestone now names Fervo’s Cape Station, the first greenfield enhanced geothermal development to reach commercial operation; the interconnection-queue figures are identified as generation and storage projects; the delayed-energization cost is identified as an illustrative modeled case; and the nuclear result now states its baseline conditions (2024 prices, no capacity payments or 45U credit, and the assumed $3/kg hydrogen production credit for ten years).</em></p>
 
 
 </section>

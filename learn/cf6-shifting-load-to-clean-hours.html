@@ -2,6 +2,22 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
+<script>(function () {
+  ["localStorage", "sessionStorage"].forEach(function (name) {
+    try { window[name].getItem("_"); return; } catch (e) { }   // storage works: leave it as it is
+    var data = Object.create(null);
+    var mem = {
+      getItem: function (k) { k = String(k); return k in data ? data[k] : null; },
+      setItem: function (k, v) { data[String(k)] = String(v); },
+      removeItem: function (k) { delete data[String(k)]; },
+      clear: function () { data = Object.create(null); },
+      key: function (i) { var keys = Object.keys(data); return i >= 0 && i < keys.length ? keys[i] : null; }
+    };
+    Object.defineProperty(mem, "length", { get: function () { return Object.keys(data).length; } });
+    Object.defineProperty(mem, "inMemory", { value: true });
+    try { Object.defineProperty(window, name, { configurable: true, enumerable: true, get: function () { return mem; } }); } catch (e) { }
+  });
+})();</script>
 <meta name="generator" content="quarto-1.10.19">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
@@ -94,8 +110,10 @@ ul.task-list li input[type="checkbox"] {
 <link rel="stylesheet" href="../assets/learn/learn.css">
 <meta property="og:title" content="How much can shifting load to cleaner hours cut emissions, and when? – Honglin Li">
 <meta property="og:description" content="Case file CF6 of Energy Systems, Step by Step: average and marginal emission factors, and when moving electricity use to cleaner hours lowers CO₂.">
-<meta property="og:image" content="https://henryutd2021.github.io/learn/images/profile-square.jpg">
+<meta property="og:image" content="https://henryutd2021.github.io/images/profile-square.jpg">
 <meta property="og:site_name" content="Honglin Li">
+<meta property="og:url" content="https://henryutd2021.github.io/learn/cf6-shifting-load-to-clean-hours.html">
+<link rel="canonical" href="https://henryutd2021.github.io/learn/cf6-shifting-load-to-clean-hours.html">
 </head>
 
 <body class="nav-fixed page-learn page-lesson lx-form-case quarto-light"><script id="quarto-html-before-body" type="application/javascript">
@@ -298,7 +316,7 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">Teaching</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../learn/index.html"> 
+    <a class="nav-link active" href="../learn/index.html" aria-current="true"> 
 <span class="menu-text">Learn</span></a>
   </li>  
   <li class="nav-item">
@@ -346,6 +364,7 @@ ul.task-list li input[type="checkbox"] {
 
 <main class="content column-page" id="quarto-document-content">
 
+<noscript><style>@media (max-width: 1199.98px) { #quarto-header { position: relative; } #quarto-header .navbar-toggler { display: none; } #quarto-header #navbarCollapse { display: block !important; } } #quarto-header .quarto-navbar-tools { display: none; }</style></noscript>
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
@@ -398,7 +417,7 @@ ul.task-list li input[type="checkbox"] {
 <div class="lx-case-part"><p class="lx-eyebrow">4 · Decisions, goal and rules, in words</p><ul><li><b>Decisions:</b> how much each hour's load moves up or down.</li><li><b>Goal:</b> the lowest attributed emissions over the window, plus a <span class="lx-term" data-term="penalty">penalty</span> for each adjusted hour.</li><li><b>Rules:</b> the window's total use does not fall; no hour moves beyond the allowed range, such as ±5%.</li></ul></div>
 <div class="lx-case-part wide"><p class="lx-eyebrow">5 · Data and method</p><ul><li>A <span class="lx-term" data-term="mixed-integer-program">mixed-integer</span> load-regulation model, solved for each window with EIA's hourly data for 2023.</li><li>Regions are grouped by renewable share, the diversity of their generation and how much their intensity swings; the window, the range and the penalty are varied.</li></ul></div>
 <div class="lx-case-part wide"><p class="lx-eyebrow">6 · What came out, and where it holds</p>
-<blockquote class="lx-excerpt blockquote" data-source="excerpt:ghg"><p>Longer optimization windows and wider adjustment ranges increased the reduction in attributed emissions, most in renewable-rich and diverse grids.</p><p>In grids with diverse generation resources, expanding the adjustment range from ±5% to ±8% can boost carbon reductions from 1.19% to 1.64%.</p><p>In the reported scenarios, reductions in attributed emissions were on the order of one to two percent of regional totals or less.</p><p>Regions with low intensity fluctuation were more sensitive to the cost of regulating load.</p><p>Reductions are computed under average-emission-intensity accounting with perfect foresight; they are not estimates of the consequential (marginal) system response.</p><footer>Approved excerpt of: Li et al. (2025), <a href="https://doi.org/10.1016/j.crsus.2025.100367">Cell Reports Sustainability</a>.</footer></blockquote>
+<blockquote class="lx-excerpt blockquote" data-source="excerpt:ghg"><p>Longer optimization windows and wider adjustment ranges increased the reduction in attributed emissions, most in renewable-rich and diverse grids.</p><p>In grids with diverse generation resources, expanding the adjustment range from ±5% to ±8% can boost carbon reductions from 1.19% to 1.64%.</p><p>In the reported scenarios, reductions in attributed emissions were on the order of one to two percent of regional totals or less.</p><p>Regions with low intensity fluctuation were more sensitive to the cost of regulating load.</p><p>Reductions are computed under average-emission-intensity accounting with perfect foresight; they are not estimates of the consequential (marginal) system response.</p><footer>From: Li et al. (2025), <a href="https://doi.org/10.1016/j.crsus.2025.100367">Cell Reports Sustainability</a>.</footer></blockquote>
 <p class="lx-hint">Holds when: each hour keeps its average intensity, and the whole window is known in advance. Leaves out: which plants respond.</p></div>
 </div>
 <div class="lx-interactive" data-learn="cf6" data-src="../assets/learn/data/cf6-shifting-load-to-clean-hours.json">
@@ -409,7 +428,7 @@ ul.task-list li input[type="checkbox"] {
 
 </div>
 </div>
-<p class="lx-datanote"><span>Every result about the study is quoted from the approved excerpt of the published paper named in the sources. Prairie Town below is illustrative, on real hourly shapes.</span></p>
+<p class="lx-datanote"><span>Every result about the study is quoted from the published paper named in the sources. Prairie Town below is illustrative, on real hourly shapes.</span></p>
 </div>
 <div id="explain" class="lx-sec">
 <section id="the-idea-behind-it-then-where-the-result-holds" class="level2 lx-sec-h">
@@ -839,7 +858,7 @@ ul.task-list li input[type="checkbox"] {
 <div id="cf6-explain" class="lx-xgrid">
 <div class="lx-fallback">
 
-<p class="lx-eyebrow">Where the result holds</p><dl class="lx-ideas"><dt>It holds when</dt><dd><ul><li>emissions are counted at each hour's <span class="lx-term" data-term="average-emission-factor">average</span> intensity;</li><li>each window is known in advance (perfect foresight);</li><li>each window's total use does not fall;</li><li>hourly EIA data for U.S. grid regions in 2023.</li></ul></dd><dt>It leaves out</dt><dd><ul><li>the grid's consequential response: which plants actually change output (the <span class="lx-term" data-term="marginal-emission-factor">marginal</span> view);</li><li>forecast errors;</li><li>the cost of moving load, apart from a penalty on each adjusted hour.</li></ul></dd></dl><p class="lx-hint">From the approved excerpt of Li et al. (2025), Cell Reports Sustainability.</p>
+<p class="lx-eyebrow">Where the result holds</p><dl class="lx-ideas"><dt>It holds when</dt><dd><ul><li>emissions are counted at each hour's <span class="lx-term" data-term="average-emission-factor">average</span> intensity;</li><li>each window is known in advance (perfect foresight);</li><li>each window's total use does not fall;</li><li>hourly EIA data for U.S. grid regions in 2023.</li></ul></dd><dt>It leaves out</dt><dd><ul><li>the grid's consequential response: which plants actually change output (the <span class="lx-term" data-term="marginal-emission-factor">marginal</span> view);</li><li>forecast errors;</li><li>the cost of moving load, apart from a penalty on each adjusted hour.</li></ul></dd></dl><p class="lx-hint">From Li et al. (2025), Cell Reports Sustainability.</p>
 
 </div>
 </div>

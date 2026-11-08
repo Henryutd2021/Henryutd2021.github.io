@@ -2,6 +2,22 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
+<script>(function () {
+  ["localStorage", "sessionStorage"].forEach(function (name) {
+    try { window[name].getItem("_"); return; } catch (e) { }   // storage works: leave it as it is
+    var data = Object.create(null);
+    var mem = {
+      getItem: function (k) { k = String(k); return k in data ? data[k] : null; },
+      setItem: function (k, v) { data[String(k)] = String(v); },
+      removeItem: function (k) { delete data[String(k)]; },
+      clear: function () { data = Object.create(null); },
+      key: function (i) { var keys = Object.keys(data); return i >= 0 && i < keys.length ? keys[i] : null; }
+    };
+    Object.defineProperty(mem, "length", { get: function () { return Object.keys(data).length; } });
+    Object.defineProperty(mem, "inMemory", { value: true });
+    try { Object.defineProperty(window, name, { configurable: true, enumerable: true, get: function () { return mem; } }); } catch (e) { }
+  });
+})();</script>
 <meta name="generator" content="quarto-1.10.19">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
@@ -122,8 +138,10 @@ window.Quarto = {
 <link rel="stylesheet" href="../assets/learn/learn.css">
 <meta property="og:title" content="Why does electricity demand rise and fall? – Honglin Li">
 <meta property="og:description" content="Lesson 2 of Energy Systems, Step by Step: read a real year of hourly electricity demand, scaled to a small fictional town: a hot day against a cold one, weekdays against weekends, the seasons, a load-duration curve built by sorting 8,760 hours, and the duck curve that solar digs.">
-<meta property="og:image" content="https://henryutd2021.github.io/learn/images/profile-square.jpg">
+<meta property="og:image" content="https://henryutd2021.github.io/images/profile-square.jpg">
 <meta property="og:site_name" content="Honglin Li">
+<meta property="og:url" content="https://henryutd2021.github.io/learn/02-demand.html">
+<link rel="canonical" href="https://henryutd2021.github.io/learn/02-demand.html">
 </head>
 
 <body class="nav-fixed page-learn page-lesson lx-form-cards quarto-light"><script id="quarto-html-before-body" type="application/javascript">
@@ -326,7 +344,7 @@ window.Quarto = {
 <span class="menu-text">Teaching</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../learn/index.html"> 
+    <a class="nav-link active" href="../learn/index.html" aria-current="true"> 
 <span class="menu-text">Learn</span></a>
   </li>  
   <li class="nav-item">
@@ -374,6 +392,7 @@ window.Quarto = {
 
 <main class="content column-page" id="quarto-document-content">
 
+<noscript><style>@media (max-width: 1199.98px) { #quarto-header { position: relative; } #quarto-header .navbar-toggler { display: none; } #quarto-header #navbarCollapse { display: block !important; } } #quarto-header .quarto-navbar-tools { display: none; }</style></noscript>
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
@@ -546,12 +565,12 @@ window.Quarto = {
 <tr class="odd">
 <td class="n">54.4 GW</td>
 <td>The Southwest Power Pool's busiest hour of 2025: 16:00 to 17:00 on 29 July.</td>
-<td class="s"><a href="https://www.eia.gov/electricity/gridmonitor/sixMonthFiles/">EIA-930 six-month files</a>, computed · data for 2025</td>
+<td class="s"><a href="https://www.eia.gov/electricity/gridmonitor/dashboard/electric_overview/US48/US48">EIA-930 six-month files</a> (Download Data → Six-Month Files), computed · data for 2025</td>
 </tr>
 <tr class="even">
 <td class="n">299 TWh</td>
 <td>SPP's demand over 2025: an average of 34 GW, so a load factor of 0.63.</td>
-<td class="s"><a href="https://www.eia.gov/electricity/gridmonitor/sixMonthFiles/">EIA-930 six-month files</a>, computed · data for 2025</td>
+<td class="s"><a href="https://www.eia.gov/electricity/gridmonitor/dashboard/electric_overview/US48/US48">EIA-930 six-month files</a> (Download Data → Six-Month Files), computed · data for 2025</td>
 </tr>
 <tr class="odd">
 <td class="n">759 GW</td>
@@ -561,12 +580,12 @@ window.Quarto = {
 <tr class="even">
 <td class="n">180 hours</td>
 <td>Hours of 2025 with demand above 90% of the year's peak (SPP's shape): 2.1% of the year.</td>
-<td class="s"><a href="https://www.eia.gov/electricity/gridmonitor/sixMonthFiles/">EIA-930 six-month files</a>, computed · data for 2025</td>
+<td class="s"><a href="https://www.eia.gov/electricity/gridmonitor/dashboard/electric_overview/US48/US48">EIA-930 six-month files</a> (Download Data → Six-Month Files), computed · data for 2025</td>
 </tr>
 <tr class="odd">
 <td class="n">0.8%</td>
 <td>Solar's share of SPP's net generation in 2025.</td>
-<td class="s"><a href="https://www.eia.gov/electricity/gridmonitor/sixMonthFiles/">EIA-930 six-month files</a>, computed · data for 2025</td>
+<td class="s"><a href="https://www.eia.gov/electricity/gridmonitor/dashboard/electric_overview/US48/US48">EIA-930 six-month files</a> (Download Data → Six-Month Files), computed · data for 2025</td>
 </tr>
 </tbody>
 </table>
@@ -588,7 +607,7 @@ window.Quarto = {
 <div class="lx-card lx-sources">
 <p class="lx-eyebrow">Sources and further reading</p>
 <ul>
-<li>EIA. <a href="https://www.eia.gov/electricity/gridmonitor/">Hourly Electric Grid Monitor</a> (Form EIA-930), and its <a href="https://www.eia.gov/electricity/gridmonitor/sixMonthFiles/">six-month files</a>: the Southwest Power Pool's 2025 data behind every curve here.</li>
+<li>EIA. <a href="https://www.eia.gov/electricity/gridmonitor/">Hourly Electric Grid Monitor</a> (Form EIA-930), and its <a href="https://www.eia.gov/electricity/gridmonitor/dashboard/electric_overview/US48/US48">six-month files</a> (on the dashboard: Download Data → Six-Month Files): the Southwest Power Pool's 2025 data behind every curve here.</li>
 <li>EIA (2025). <a href="https://www.eia.gov/todayinenergy/detail.php?id=65864">U.S. electricity peak demand set new records twice in July</a>. Today in Energy.</li>
 <li>EIA (2023). <a href="https://www.eia.gov/todayinenergy/detail.php?id=56880">As solar capacity grows, duck curves are getting deeper in California</a>. Today in Energy.</li>
 <li>EIA. <a href="https://www.eia.gov/energyexplained/electricity/use-of-electricity.php">Electricity explained: Use of electricity</a> (2025 data).</li>

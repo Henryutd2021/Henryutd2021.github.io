@@ -2,6 +2,22 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
+<script>(function () {
+  ["localStorage", "sessionStorage"].forEach(function (name) {
+    try { window[name].getItem("_"); return; } catch (e) { }   // storage works: leave it as it is
+    var data = Object.create(null);
+    var mem = {
+      getItem: function (k) { k = String(k); return k in data ? data[k] : null; },
+      setItem: function (k, v) { data[String(k)] = String(v); },
+      removeItem: function (k) { delete data[String(k)]; },
+      clear: function () { data = Object.create(null); },
+      key: function (i) { var keys = Object.keys(data); return i >= 0 && i < keys.length ? keys[i] : null; }
+    };
+    Object.defineProperty(mem, "length", { get: function () { return Object.keys(data).length; } });
+    Object.defineProperty(mem, "inMemory", { value: true });
+    try { Object.defineProperty(window, name, { configurable: true, enumerable: true, get: function () { return mem; } }); } catch (e) { }
+  });
+})();</script>
 <meta name="generator" content="quarto-1.10.19">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
@@ -122,8 +138,10 @@ window.Quarto = {
 <link rel="stylesheet" href="../assets/learn/learn.css">
 <meta property="og:title" content="What does electricity cost to make? – Honglin Li">
 <meta property="og:description" content="Lesson 7 of Energy Systems, Step by Step: split a power plant’s cost into building, upkeep and fuel, see why money later is worth less, build a levelized cost of electricity (LCOE) from EIA and ATB inputs, rank what moves it with a tornado chart, and find what LCOE leaves out: when the energy arrives.">
-<meta property="og:image" content="https://henryutd2021.github.io/learn/images/profile-square.jpg">
+<meta property="og:image" content="https://henryutd2021.github.io/images/profile-square.jpg">
 <meta property="og:site_name" content="Honglin Li">
+<meta property="og:url" content="https://henryutd2021.github.io/learn/07-cost.html">
+<link rel="canonical" href="https://henryutd2021.github.io/learn/07-cost.html">
 </head>
 
 <body class="nav-fixed page-learn page-lesson lx-form-cards quarto-light"><script id="quarto-html-before-body" type="application/javascript">
@@ -326,7 +344,7 @@ window.Quarto = {
 <span class="menu-text">Teaching</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../learn/index.html"> 
+    <a class="nav-link active" href="../learn/index.html" aria-current="true"> 
 <span class="menu-text">Learn</span></a>
   </li>  
   <li class="nav-item">
@@ -374,6 +392,7 @@ window.Quarto = {
 
 <main class="content column-page" id="quarto-document-content">
 
+<noscript><style>@media (max-width: 1199.98px) { #quarto-header { position: relative; } #quarto-header .navbar-toggler { display: none; } #quarto-header #navbarCollapse { display: block !important; } } #quarto-header .quarto-navbar-tools { display: none; }</style></noscript>
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
@@ -649,7 +668,7 @@ Need a refresher? Toolbox <a href="k03-discounting.html">K3</a> (discounting and
 <div class="lx-card lx-real">
 <p class="lx-eyebrow">In the real world</p>
 <p>A levelized cost and a system's cost can move in opposite directions.</p>
-<blockquote class="lx-excerpt blockquote" data-source="excerpt:wind-hydrogen"><p>A higher hydrogen price makes each kilogram worth more, so the optimizer builds a larger <span class="lx-term" data-term="electrolyzer">electrolyzer</span> to capture more surplus wind.</p><p>The extra capacity runs fewer full-load hours, so the cost per kilogram, the <span class="lx-term" data-term="lcoh">levelized cost of hydrogen</span>, goes up.</p><p>Yet the added hydrogen revenue lowers the net cost of the whole system.</p><p>The cost per kilogram and the system's cost move in opposite directions.</p><footer>Approved excerpt of: Li et al. (2024), <a href="https://doi.org/10.1115/1.4063971">Journal of Mechanical Design</a>.</footer></blockquote>
+<blockquote class="lx-excerpt blockquote" data-source="excerpt:wind-hydrogen"><p>A higher hydrogen price makes each kilogram worth more, so the optimizer builds a larger <span class="lx-term" data-term="electrolyzer">electrolyzer</span> to capture more surplus wind.</p><p>The extra capacity runs fewer full-load hours, so the cost per kilogram, the <span class="lx-term" data-term="lcoh">levelized cost of hydrogen</span>, goes up.</p><p>Yet the added hydrogen revenue lowers the net cost of the whole system.</p><p>The cost per kilogram and the system's cost move in opposite directions.</p><footer>From: Li et al. (2024), <a href="https://doi.org/10.1115/1.4063971">Journal of Mechanical Design</a>.</footer></blockquote>
 <p class="lx-hint">The full case: case file <a href="cf2-cost-per-kg-vs-system-cost.html">CF2</a> (when the cost per kilogram and the cost of the system disagree).</p>
 <p class="lx-hint">Case file <a href="cf7-cost-of-waiting.html">CF7</a> (what waiting for a grid connection costs, and who pays).</p>
 </div>

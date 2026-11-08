@@ -224,7 +224,7 @@
     var stage = H("div", { class: "lx-stage r07-stage" }, live), cols = H("div", { class: "r07-cols" }, stage);
     var paper = H("article", { class: "r07-paper", "aria-label": "The study, as published (fictional)" }, cols);
     H("p", { class: "lx-eyebrow", text: "The study, as published · fictional" }, paper);
-    H("h3", { text: D.study.title }, paper);
+    H(LX.hTag(3, paper), { text: D.study.title }, paper);   // an h2 when the scene sits right under the page title
     H("p", { class: "r07-by", text: D.study.authors }, paper);
     H("p", { class: "r07-head", text: fillT(D.study.headline, F0) }, paper);
     H("p", { class: "lx-hint", text: D.study.method }, paper);

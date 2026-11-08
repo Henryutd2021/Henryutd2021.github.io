@@ -131,7 +131,7 @@
     ".w9-stage{display:grid;gap:10px;background:var(--lx-surface);border:1px solid var(--lx-line);border-radius:var(--lx-r-lg);padding:14px 16px;box-shadow:var(--lx-shadow)}",
     ".w9-stage[hidden]{display:none}",
     ".w9-stage>*{min-width:0}",   // an open text version's table scrolls in its box instead of widening the stage on phones
-    ".w9-head{display:flex;justify-content:space-between;align-items:baseline;gap:6px 12px;flex-wrap:wrap}.page-learn .w9-head h3{font-size:16px;margin:0}",
+    ".w9-head{display:flex;justify-content:space-between;align-items:baseline;gap:6px 12px;flex-wrap:wrap}.page-learn .w9-head :is(h2,h3){font-size:16px;margin:0}.page-learn .w9-head h2{opacity:.9}",
     ".w9-chips{display:flex;flex-wrap:wrap;gap:8px}",
     ".w9-chip{display:grid;gap:1px;padding:5px 10px;border-radius:10px;background:var(--lx-surface-2)}",
     ".w9-chip span{font-family:var(--lx-f-display);font-size:12px;color:var(--lx-ink-3)}",
@@ -182,7 +182,8 @@
 
     // ---------- stage: chips, the 24 hours, state of charge
     var stage = H("div", { class: "w9-stage" }, live);
-    H("h3", { text: W.dateLabel + " in Prairie Town · battery " + B.P + " MW / " + B.E + " MWh, " + Math.round(B.eta * 100) + "% round trip" }, H("div", { class: "w9-head" }, stage));
+    var w9h = H("div", { class: "w9-head" }, stage);   // the scene's title: an h2 when the stage sits right under the page title
+    H(LX.hTag(3, w9h), { text: W.dateLabel + " in Prairie Town · battery " + B.P + " MW / " + B.E + " MWh, " + Math.round(B.eta * 100) + "% round trip" }, w9h);
     var chips = H("div", { class: "w9-chips", "aria-live": "polite" }, stage);
     var tiles = H("div", { class: "w9-tiles", role: "group", "aria-label": "The day's 24 hours: price and the battery's action" }, stage);
     var lg = H("div", { class: "w9-legend", "aria-hidden": "true" }, stage);

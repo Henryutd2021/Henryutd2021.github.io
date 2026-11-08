@@ -2,6 +2,22 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
+<script>(function () {
+  ["localStorage", "sessionStorage"].forEach(function (name) {
+    try { window[name].getItem("_"); return; } catch (e) { }   // storage works: leave it as it is
+    var data = Object.create(null);
+    var mem = {
+      getItem: function (k) { k = String(k); return k in data ? data[k] : null; },
+      setItem: function (k, v) { data[String(k)] = String(v); },
+      removeItem: function (k) { delete data[String(k)]; },
+      clear: function () { data = Object.create(null); },
+      key: function (i) { var keys = Object.keys(data); return i >= 0 && i < keys.length ? keys[i] : null; }
+    };
+    Object.defineProperty(mem, "length", { get: function () { return Object.keys(data).length; } });
+    Object.defineProperty(mem, "inMemory", { value: true });
+    try { Object.defineProperty(window, name, { configurable: true, enumerable: true, get: function () { return mem; } }); } catch (e) { }
+  });
+})();</script>
 <meta name="generator" content="quarto-1.10.19">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
@@ -122,8 +138,10 @@ window.Quarto = {
 <link rel="stylesheet" href="../assets/learn/learn.css">
 <meta property="og:title" content="Learning from few runs: surrogates, Gaussian processes and multi-fidelity data – Honglin Li">
 <meta property="og:description" content="Modeler lesson M9 of Energy Systems, Step by Step: fit a Gaussian process to a few records of an illustrative wind turbine, let the records choose its settings by maximum likelihood, score its band on held-out records for calibration, add the maker’s power curve as a cheap second source, and see when that helps and when it misleads; a Python notebook rebuilds it.">
-<meta property="og:image" content="https://henryutd2021.github.io/learn/images/profile-square.jpg">
+<meta property="og:image" content="https://henryutd2021.github.io/images/profile-square.jpg">
 <meta property="og:site_name" content="Honglin Li">
+<meta property="og:url" content="https://henryutd2021.github.io/learn/m09-surrogates-uq.html">
+<link rel="canonical" href="https://henryutd2021.github.io/learn/m09-surrogates-uq.html">
 </head>
 
 <body class="nav-fixed page-learn page-lesson lx-form-cards quarto-light"><script id="quarto-html-before-body" type="application/javascript">
@@ -326,7 +344,7 @@ window.Quarto = {
 <span class="menu-text">Teaching</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../learn/index.html"> 
+    <a class="nav-link active" href="../learn/index.html" aria-current="true"> 
 <span class="menu-text">Learn</span></a>
   </li>  
   <li class="nav-item">
@@ -374,6 +392,7 @@ window.Quarto = {
 
 <main class="content column-page" id="quarto-document-content">
 
+<noscript><style>@media (max-width: 1199.98px) { #quarto-header { position: relative; } #quarto-header .navbar-toggler { display: none; } #quarto-header #navbarCollapse { display: block !important; } } #quarto-header .quarto-navbar-tools { display: none; }</style></noscript>
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
@@ -665,7 +684,7 @@ window.Quarto = {
 <div class="lx-card lx-real">
 <p class="lx-eyebrow">Where this came up in research</p>
 <blockquote class="lx-excerpt blockquote" data-source="excerpt:uq-mfgpr"><p>From the course author's research: a wind turbine's real power curve is a band, not a line. Adding the turbine's theoretical curve to about two hundred measurements can narrow that band, but whether it helps depends on how the fit is scored. (<a href="https://doi.org/10.1115/detc2023-114762">Li et al., ASME IDETC 2023</a>)</p></blockquote>
-<blockquote class="lx-excerpt blockquote" data-source="excerpt:uq-mfgpr"><p>Linear (autoregressive) and nonlinear multi-fidelity Gaussian process regression fuse the turbine type's theoretical power curve (low fidelity) with a few hundred kernel-density-sampled <span class="lx-term" data-term="scada">SCADA</span> points from the open <span class="lx-term" data-term="sdwpf">SDWPF</span> dataset (high fidelity), and are compared with single-fidelity regression on point and probabilistic metrics.</p><p>The kernel density sample keeps the shape of the scatter without manual cleaning; a compact training set matters because a Gaussian process solve grows with the cube of the training points.</p><footer>Approved excerpt of: <a href="https://doi.org/10.1115/detc2023-114762">Li et al., ASME IDETC 2023</a>.</footer></blockquote>
+<blockquote class="lx-excerpt blockquote" data-source="excerpt:uq-mfgpr"><p>Linear (autoregressive) and nonlinear multi-fidelity Gaussian process regression fuse the turbine type's theoretical power curve (low fidelity) with a few hundred kernel-density-sampled <span class="lx-term" data-term="scada">SCADA</span> points from the open <span class="lx-term" data-term="sdwpf">SDWPF</span> dataset (high fidelity), and are compared with single-fidelity regression on point and probabilistic metrics.</p><p>The kernel density sample keeps the shape of the scatter without manual cleaning; a compact training set matters because a Gaussian process solve grows with the cube of the training points.</p><footer>From: <a href="https://doi.org/10.1115/detc2023-114762">Li et al., ASME IDETC 2023</a>.</footer></blockquote>
 <blockquote class="lx-excerpt blockquote" data-source="excerpt:wind-uq"><p>In a research project (2022–2023), the course author worked on this question: can uncertainty metrics of a wind power model's inputs (weather data products, forecast ensembles and turbine-level data) predict calibrated plant-level power uncertainty at wind plants that have no power measurements?</p><p>The course author developed the surrogate-modeling workflow: calibrated uncertainty targets, surrogate models and validation on held-out plants.</p><p>Inputs: uncertainty metrics of four kinds: how a series varies over time (moving windows), how data sources disagree, how widely a forecast ensemble spreads, and how values vary across a plant's turbines (a variogram).</p><p>Targets: at plants with power measurements, the scale of a predictive distribution around the point forecast, chosen to minimize pinball loss.</p><p>Surrogates: Gaussian process regression and other regressors learn a mapping from the metrics to that scale, then predict probabilistic power at plants without measurements.</p><p>Validation holds out whole plants, scored with <span class="lx-term" data-term="pinball-loss">pinball loss</span>, <span class="lx-term" data-term="crps">CRPS</span> and <span class="lx-term" data-term="calibration">reliability</span>, with recalibration of the predictive distributions.</p><p>A surrogate is useful only if it beats a constant baseline on held-out plants.</p><p>The project has no paper. The public framework is a fresh implementation tested on synthetic data; project data and results are not public.</p><footer>This work was developed based upon funding from the Alliance for Sustainable Energy, LLC, Managing and Operating Contractor for the National Renewable Energy Laboratory for the U.S. Department of Energy.</footer></blockquote>
 <p>This page's turbine is a toy: invented round numbers, not the studies' data, equations or results.</p>
 <p class="lx-hint">Case file <a href="cf8-power-curves-from-scarce-data.html">CF8</a>: learning a wind turbine's power curve from scarce data.</p>

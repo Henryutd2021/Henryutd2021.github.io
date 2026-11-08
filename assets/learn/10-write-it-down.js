@@ -119,7 +119,8 @@
 
     // ---------- the stage: chips, plot, status
     var stage = H("div", { class: "lx-stage" }, live);
-    H("h3", { text: hh + " on " + day.dateLabel + ": two gas plants, one hour" }, H("div", { class: "lx-stage-head" }, stage));
+    var sh = H("div", { class: "lx-stage-head" }, stage);
+    H(LX.hTag(3, sh), { text: hh + " on " + day.dateLabel + ": two gas plants, one hour" }, sh);   // an h2 when the stage sits right under the page title
     var chips = H("div", { class: "lx-readouts", "aria-live": "polite" }, stage);
     var plot = LX.LPPlane(stage, {
       fluid: true, view: D.view, xLabel: "Combined-cycle x (MW)", yLabel: "Peaker y (MW)", styles: RULE_STYLE,

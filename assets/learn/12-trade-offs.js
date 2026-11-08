@@ -93,7 +93,7 @@
     var lay = H("div", { class: "lx-play" }, live);
     var stage = H("div", { class: "lx-play-stage lx13-stage" }, lay), side = H("div", null, lay);
     var card = H("section", { class: "lx13-card", "aria-label": "Plans for Prairie Town, cost against CO₂" }, stage);
-    var hd = H("div", { class: "lx13-head" }, card); H("h3", { text: "Prairie Town's plans: cost against CO₂" }, hd);
+    var hd = H("div", { class: "lx13-head" }, card); H(LX.hTag(3, hd), { text: "Prairie Town's plans: cost against CO₂" }, hd);   // an h2 right under the page title
     var status = LX.SolverStatus(hd);
     H("p", { class: "lx13-sub", text: "Each dot is one plan's year, estimated from seven representative weeks: cost up the side, CO₂ along the bottom. Down and left is better on both." }, card);
     var fc = LX.Frontier(card, { label: "Six plans for Prairie Town and the frontier you trace, cost against CO₂", shadeLabel: "out of reach (approximately)" });

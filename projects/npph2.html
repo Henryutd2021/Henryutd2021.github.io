@@ -2,6 +2,22 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
+<script>(function () {
+  ["localStorage", "sessionStorage"].forEach(function (name) {
+    try { window[name].getItem("_"); return; } catch (e) { }   // storage works: leave it as it is
+    var data = Object.create(null);
+    var mem = {
+      getItem: function (k) { k = String(k); return k in data ? data[k] : null; },
+      setItem: function (k, v) { data[String(k)] = String(v); },
+      removeItem: function (k) { delete data[String(k)]; },
+      clear: function () { data = Object.create(null); },
+      key: function (i) { var keys = Object.keys(data); return i >= 0 && i < keys.length ? keys[i] : null; }
+    };
+    Object.defineProperty(mem, "length", { get: function () { return Object.keys(data).length; } });
+    Object.defineProperty(mem, "inMemory", { value: true });
+    try { Object.defineProperty(window, name, { configurable: true, enumerable: true, get: function () { return mem; } }); } catch (e) { }
+  });
+})();</script>
 <meta name="generator" content="quarto-1.10.19">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
@@ -93,9 +109,11 @@ ul.task-list li input[type="checkbox"] {
 <link rel="stylesheet" href="../assets/explainers.css">
 <meta property="og:title" content="Hydrogen integration and policy support for U.S. nuclear power plants – Honglin Li">
 <meta property="og:description" content="Can existing and new U.S. nuclear power plants improve their economics and operating flexibility by adding high-temperature electrolysis, hydrogen storage and batteries, and by selling energy, hydrogen and ancillary services?">
-<meta property="og:image" content="https://henryutd2021.github.io/images/projects/npph2.svg">
+<meta property="og:image" content="https://henryutd2021.github.io/images/projects/npph2.jpg">
 <meta property="og:site_name" content="Honglin Li">
-<meta property="og:image:alt" content="">
+<meta property="og:url" content="https://henryutd2021.github.io/projects/npph2.html">
+<meta property="og:image:alt" content="Cover illustration: Hydrogen integration and policy support for U.S. nuclear power plants">
+<link rel="canonical" href="https://henryutd2021.github.io/projects/npph2.html">
 </head>
 
 <body class="nav-fixed page-inner project-page theme-hydrogen quarto-light"><script id="quarto-html-before-body" type="application/javascript">
@@ -282,7 +300,7 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">Research</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../projects.html"> 
+    <a class="nav-link active" href="../projects.html" aria-current="true"> 
 <span class="menu-text">Projects</span></a>
   </li>  
   <li class="nav-item">
@@ -346,6 +364,7 @@ ul.task-list li input[type="checkbox"] {
 
 <main class="content column-page" id="quarto-document-content">
 
+<noscript><style>@media (max-width: 1199.98px) { #quarto-header { position: relative; } #quarto-header .navbar-toggler { display: none; } #quarto-header #navbarCollapse { display: block !important; } } #quarto-header .quarto-navbar-tools { display: none; }</style></noscript>
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
@@ -392,7 +411,7 @@ ul.task-list li input[type="checkbox"] {
 <section class="proj-insight" id="insight" aria-labelledby="h-insight">
 <h2 id="h-insight" class="anchored"><i class="bi bi-stars" aria-hidden="true"></i>Key insight</h2>
 <p class="insight-title">With the assumed hydrogen credit, hydrogen revenue can sustain an existing reactor but not pay for a new one</p>
-<p>The study treats an existing reactor's capital as already spent, so revenue from power, hydrogen and reserves, with the assumed hydrogen credit, must cover running costs and the new equipment; most reactors studied then reached positive net present value. A new plant must also recover the reactor's capital cost, and new builds stayed below zero even with tax credits.</p>
+<p>The study treats an existing reactor's capital as already spent. At 2024 prices, without capacity payments or the 45U credit, electricity sales alone left nearly all reactors below zero net present value; adding hydrogen and reserves, with the assumed $3/kg hydrogen credit for ten years, lifted most above zero. A new plant must also recover the reactor's capital cost, and new builds stayed below zero even with tax credits.</p>
 </section>
 <section class="proj-sec proj-explainer" id="explainer" aria-labelledby="h-explainer">
 <h2 id="h-explainer" class="anchored"><i class="bi bi-sliders" aria-hidden="true"></i>Why does hydrogen help an existing reactor more than a new one?</h2>
@@ -428,15 +447,15 @@ ul.task-list li input[type="checkbox"] {
 <section class="proj-sec" aria-labelledby="h-findings">
 <h2 id="h-findings" class="anchored"><i class="bi bi-lightbulb" aria-hidden="true"></i>Key findings</h2>
 <ol class="findings">
-<li>Operated as baseload-only plants at 2024 market prices, nearly all reactors studied had negative net present value.</li>
-<li>With hydrogen integration, including the assumed hydrogen production credit, a majority of the reactors reached positive net present value.</li>
+<li>Operated as electricity-only baseload plants at 2024 market prices, without capacity payments or the 45U nuclear credit, nearly all reactors studied had negative net present value.</li>
+<li>With hydrogen integration and the assumed hydrogen production credit ($3/kg for ten years), a majority of the reactors reached positive net present value, even without the 45U credit.</li>
 <li>Integrated operation added output flexibility; ancillary-service revenue was a few percent of the total.</li>
 <li>For new builds, investment and production tax credits substantially lowered the levelized cost of hydrogen.</li>
 </ol>
 </section>
 <section class="proj-sec proj-bounds" aria-labelledby="h-bounds">
 <h2 id="h-bounds" class="anchored"><i class="bi bi-exclamation-circle" aria-hidden="true"></i>Boundary conditions</h2>
-<p>Results rely on 2024 prices, price-taking market participation, modeled ancillary-service participation parameters, the assumed hydrogen credit ($3/kg for ten years) and a dispatch held fixed after the credit expires; price feedback from large-scale adoption is not modeled.</p>
+<p>Results rely on 2024 prices, price-taking market participation, modeled ancillary-service participation parameters, the assumed hydrogen credit ($3/kg for ten years, applied in every scenario) and a dispatch held fixed after the credit expires. Capacity-market revenues and price feedback from large-scale adoption are not modeled, and the electricity-only baseline is stated without the 45U nuclear credit.</p>
 </section>
 <section class="proj-next" id="led-to" aria-labelledby="h-next">
 <h2 id="h-next" class="anchored"><i class="bi bi-arrow-right-circle" aria-hidden="true"></i>What it led to</h2>

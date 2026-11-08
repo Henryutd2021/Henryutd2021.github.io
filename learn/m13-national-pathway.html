@@ -2,6 +2,22 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
+<script>(function () {
+  ["localStorage", "sessionStorage"].forEach(function (name) {
+    try { window[name].getItem("_"); return; } catch (e) { }   // storage works: leave it as it is
+    var data = Object.create(null);
+    var mem = {
+      getItem: function (k) { k = String(k); return k in data ? data[k] : null; },
+      setItem: function (k, v) { data[String(k)] = String(v); },
+      removeItem: function (k) { delete data[String(k)]; },
+      clear: function () { data = Object.create(null); },
+      key: function (i) { var keys = Object.keys(data); return i >= 0 && i < keys.length ? keys[i] : null; }
+    };
+    Object.defineProperty(mem, "length", { get: function () { return Object.keys(data).length; } });
+    Object.defineProperty(mem, "inMemory", { value: true });
+    try { Object.defineProperty(window, name, { configurable: true, enumerable: true, get: function () { return mem; } }); } catch (e) { }
+  });
+})();</script>
 <meta name="generator" content="quarto-1.10.19">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
@@ -122,8 +138,10 @@ window.Quarto = {
 <link rel="stylesheet" href="../assets/learn/learn.css">
 <meta property="og:title" content="Build a nation’s pathway: a multi-region, multi-decade model – Honglin Li">
 <meta property="og:description" content="Modeler lesson M13 of Energy Systems, Step by Step: a fictional nation’s five regions to 2050 as one linear program with plant vintages, residual value, transmission, a cumulative carbon budget and an import cap; the budget’s dual as a carbon value; perfect foresight against decade-by-decade decisions; shocks; twelve time slices checked against full years of hours.">
-<meta property="og:image" content="https://henryutd2021.github.io/learn/images/profile-square.jpg">
+<meta property="og:image" content="https://henryutd2021.github.io/images/profile-square.jpg">
 <meta property="og:site_name" content="Honglin Li">
+<meta property="og:url" content="https://henryutd2021.github.io/learn/m13-national-pathway.html">
+<link rel="canonical" href="https://henryutd2021.github.io/learn/m13-national-pathway.html">
 </head>
 
 <body class="nav-fixed page-learn page-lesson lx-form-cards quarto-light"><script id="quarto-html-before-body" type="application/javascript">
@@ -326,7 +344,7 @@ window.Quarto = {
 <span class="menu-text">Teaching</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../learn/index.html"> 
+    <a class="nav-link active" href="../learn/index.html" aria-current="true"> 
 <span class="menu-text">Learn</span></a>
   </li>  
   <li class="nav-item">
@@ -374,6 +392,7 @@ window.Quarto = {
 
 <main class="content column-page" id="quarto-document-content">
 
+<noscript><style>@media (max-width: 1199.98px) { #quarto-header { position: relative; } #quarto-header .navbar-toggler { display: none; } #quarto-header #navbarCollapse { display: block !important; } } #quarto-header .quarto-navbar-tools { display: none; }</style></noscript>
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
@@ -403,7 +422,7 @@ window.Quarto = {
 
 
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "name": "Build a nation's pathway: a multi-region, multi-decade model Write Prairieland's five regions to 2050 as one linear program with vintages, residual value, links, a cumulative carbon budget and an import cap, then test it against foresight, shocks and full years of hours", "description": "Modeler lesson M13 of Energy Systems, Step by Step: a fictional nation's five regions to 2050 as one linear program with plant vintages, residual value, transmission, a cumulative carbon budget and an import cap; the budget's dual as a carbon value; perfect foresight against decade-by-decade decisions; shocks; twelve time slices checked against full years of hours.", "learningResourceType": "Interactive lesson", "educationalLevel": "Advanced", "timeRequired": "PT225M", "inLanguage": "en", "isAccessibleForFree": true, "teaches": ["multi-period capacity expansion", "asset vintages and residual value", "cumulative carbon budgets", "import-share caps", "perfect against myopic foresight", "the budget's dual as a carbon value, representative slices checked against full years, near-optimal plans"], "license": "https://creativecommons.org/licenses/by/4.0/", "author": {"@type": "Person", "name": "Honglin Li", "url": "https://henryutd2021.github.io/"}, "url": "https://henryutd2021.github.io/learn/m13-national-pathway.html", "isPartOf": {"@type": "Course", "name": "Energy Systems, Step by Step", "url": "https://henryutd2021.github.io/learn/"}}</script>
-<script type="application/json" class="lx-lesson-data">{"id":"m13-national-pathway","starter":null,"total":14,"code":"M13","title":"Build a nation's pathway: a multi-region, multi-decade model","subtitle":"Write Prairieland's five regions to 2050 as one linear program with vintages, residual value, links, a cumulative carbon budget and an import cap, then test it against foresight, shocks and full years of hours","short":"A nation's pathway","tier":"modeler","tier2":null,"tierLabel":"Modeler · L3","level":"L3","slot":3,"slot2":null,"minutes":45,"does":"A five-region Prairieland model to 2050 with asset vintages, retirements and residual value, transmission, a cumulative carbon budget built from period emissions, and a cap on import share; representative slices checked against full-year runs of selected years; compare perfect foresight with decade-by-decade decisions; inject shocks.","outcome":"Formulate a multi-region, multi-decade capacity-expansion LP with vintages, residual value, a cumulative budget and an import cap, read its budget dual as a carbon value that rises at the discount rate, and say which conclusions survive myopic decisions, shocks and full years of hours.","icon":"frontier","form":"cards","scales":["S4"],"teaches":["multi-period capacity expansion","asset vintages and residual value","cumulative carbon budgets","import-share caps","perfect against myopic foresight","the budget's dual as a carbon value, representative slices checked against full years, near-optimal plans"],"lab":"a SciPy/HiGHS notebook that rebuilds engine E4's pathway LP and asserts the browser's numbers, about 60 minutes, then 120 minutes of practice.","href":"m13-national-pathway.html","ready":true,"after":[{"id":"m03-capacity-expansion","code":"M3","title":"What should be built? Capacity expansion with representative periods, validated","short":"Capacity expansion, validated","does":"Co-optimize what to build and how to run it on weighted representative weeks, with the battery linked across them and the extreme weeks kept; then re-run the plan on every hour of 2025 and of 2024 and see which conclusions survive.","href":"m03-capacity-expansion.html","ready":true},{"id":"m08-stochastic-robust","code":"M8","title":"Deciding before the uncertainty resolves: stochastic and robust optimization","short":"Stochastic and robust","does":"Size an electrolyzer now and run it later across three wind build-outs; compute the value of the stochastic solution and of perfect information, and compare with worst-case and least-regret robust plans.","href":"m08-stochastic-robust.html","ready":true},{"id":"a20-national-scenarios","code":"A20","title":"Why do national energy scenarios disagree?","short":"Why scenarios disagree","does":"Line up four scenarios for Prairieland built on one data set; read each one's question and assumptions; sort them and four real outlooks as exploratory or target-seeking; trace the gaps in CO₂, electricity and imports to demand, fuel prices, policy and fixed technology costs, one at a time and in order; then move a budget and watch the carbon price it needs.","href":"a20-national-scenarios.html","ready":true},{"id":"a21-security-minerals","code":"A21","title":"What makes a nation's energy secure? Imports, minerals, supply chains and factories","short":"Energy security","does":"Read Prairieland's supply fuel by fuel; compute its import dependence under two conventions and the share on one strait; compute an HHI and cap the leading refiner; stress the nation with an LNG price spike, a closed strait, a mineral export restriction and a factory fire, alone and together; then sort stockpiles, more suppliers, recycling, a second site and using less by the shocks they help against.","href":"a21-security-minerals.html","ready":true}],"prev":null,"next":null,"practice":120,"labMinutes":60}</script>
+<script type="application/json" class="lx-lesson-data">{"id":"m13-national-pathway","starter":null,"total":14,"code":"M13","title":"Build a nation's pathway: a multi-region, multi-decade model","subtitle":"Write Prairieland's five regions to 2050 as one linear program with vintages, residual value, links, a cumulative carbon budget and an import cap, then test it against foresight, shocks and full years of hours","short":"A nation's pathway","tier":"modeler","tier2":null,"tierLabel":"Modeler · L3","level":"L3","slot":3,"slot2":null,"minutes":45,"does":"A five-region Prairieland model to 2050 with asset vintages, retirements and residual value, transmission, a cumulative carbon budget built from period emissions, and a cap on import share; representative slices checked against full-year runs of selected years; compare perfect foresight with decade-by-decade decisions; inject shocks.","outcome":"Formulate a multi-region, multi-decade capacity-expansion LP with vintages, residual value, a cumulative budget and an import cap, turn its budget dual into each model year's carbon price through the discount factors and year weights, and say which conclusions survive myopic decisions, shocks and full years of hours.","icon":"frontier","form":"cards","scales":["S4"],"teaches":["multi-period capacity expansion","asset vintages and residual value","cumulative carbon budgets","import-share caps","perfect against myopic foresight","the budget's dual as a carbon value, representative slices checked against full years, near-optimal plans"],"lab":"a SciPy/HiGHS notebook that rebuilds engine E4's pathway LP and asserts the browser's numbers, about 60 minutes, then 120 minutes of practice.","href":"m13-national-pathway.html","ready":true,"after":[{"id":"m03-capacity-expansion","code":"M3","title":"What should be built? Capacity expansion with representative periods, validated","short":"Capacity expansion, validated","does":"Co-optimize what to build and how to run it on weighted representative weeks, with the battery linked across them and the extreme weeks kept; then re-run the plan on every hour of 2025 and of 2024 and see which conclusions survive.","href":"m03-capacity-expansion.html","ready":true},{"id":"m08-stochastic-robust","code":"M8","title":"Deciding before the uncertainty resolves: stochastic and robust optimization","short":"Stochastic and robust","does":"Size an electrolyzer now and run it later across three wind build-outs; compute the value of the stochastic solution and of perfect information, and compare with worst-case and least-regret robust plans.","href":"m08-stochastic-robust.html","ready":true},{"id":"a20-national-scenarios","code":"A20","title":"Why do national energy scenarios disagree?","short":"Why scenarios disagree","does":"Line up four scenarios for Prairieland built on one data set; read each one's question and assumptions; sort them and four real outlooks as exploratory or target-seeking; trace the gaps in CO₂, electricity and imports to demand, fuel prices, policy and fixed technology costs, one at a time and in order; then move a budget and watch the carbon price it needs.","href":"a20-national-scenarios.html","ready":true},{"id":"a21-security-minerals","code":"A21","title":"What makes a nation's energy secure? Imports, minerals, supply chains and factories","short":"Energy security","does":"Read Prairieland's supply fuel by fuel; compute its import dependence under two conventions and the share on one strait; compute an HHI and cap the leading refiner; stress the nation with an LNG price spike, a closed strait, a mineral export restriction and a factory fire, alone and together; then sort stockpiles, more suppliers, recycling, a second site and using less by the shocks they help against.","href":"a21-security-minerals.html","ready":true}],"prev":null,"next":null,"practice":120,"labMinutes":60}</script>
 <div class="lx-head" data-lesson-id="m13-national-pathway" data-total="14" data-tier="modeler" data-level="L3" data-minutes="45" data-form="cards">
 <div>
 <nav class="lx-crumbs" aria-label="Breadcrumb"><ol><li><a href="index.html">Learn</a></li><li aria-current="page">M13</li></ol></nav>
@@ -436,35 +455,35 @@ window.Quarto = {
 <tbody>
 <tr class="odd">
 <td>Central, perfect foresight</td>
-<td class="n">$401.6 billion</td>
+<td class="n">$410.7 billion</td>
 <td class="n">3,600 of 3,600 Mt</td>
 <td class="n">32%</td>
 <td class="n">all 4 checks survive</td>
 </tr>
 <tr class="even">
 <td>Central, decade by decade</td>
-<td class="n">$412.0 billion</td>
+<td class="n">$421.1 billion</td>
 <td class="n">3,600 of 3,600 Mt</td>
 <td class="n">36%</td>
 <td class="n">all 4 checks survive</td>
 </tr>
 <tr class="odd">
 <td>Deep cuts (3,000 Mt), perfect foresight</td>
-<td class="n">$394.6 billion</td>
+<td class="n">$403.7 billion</td>
 <td class="n">3,000 of 3,000 Mt</td>
 <td class="n">35%</td>
 <td class="n">2 of 4 checks fail (CO₂ more than 10% above the slices)</td>
 </tr>
 <tr class="even">
 <td>Central without the peak-hour rule</td>
-<td class="n">$391.9 billion</td>
+<td class="n">$401.0 billion</td>
 <td class="n">3,600 of 3,600 Mt</td>
 <td class="n">35%</td>
 <td class="n">4 of 4 checks fail (demand unserved, up to 240 hours)</td>
 </tr>
 </tbody>
 </table>
-</div><p class="lx-hint">Precomputed with this engine on 7 November 2026. Cost: the supply side and every fuel bought, 2026–2050 in 2025 dollars; end-use equipment left out.</p>
+</div><p class="lx-hint">Precomputed with this engine on 7 November 2026. Cost: the supply side and every fuel bought, 2026–2050 in 2025 dollars, with the existing wind, solar and batteries' upkeep; end-use equipment left out.</p>
 
 <p class="lx-hint">With JavaScript on, you solve each pathway with a real solver in your browser, move the budget and read its dual, compare perfect foresight with decade-by-decade decisions, inject a shock and map near-optimal plans. Prairieland is fictional; its numbers are illustrative.</p>
 </div>
@@ -473,13 +492,15 @@ window.Quarto = {
 <li><b>Illustrative:</b> Prairieland, its regions, fleet, links, demand and shocks (prairieland.json); the existing plants' operating costs, the penalties and the peak-hour rule are set for teaching (e4-pathways.json).</li>
 <li><b>Based on public data:</b> new plants' costs from EIA's 2026 assumptions, fuel prices from EIA's 2025 data, CO₂ factors from the IPCC, hourly shapes from SPP's 2025 and 2024 grid (EIA-930).</li>
 <li><b>Left out of the cost:</b> end-use equipment (heat pumps, cars, boilers): electrification is a choice you set, not one the model makes.</li>
+<li><b>Also left out:</b> the upkeep of the existing hydro and steady plants (the data give no figure; the same in every pathway).</li>
 <li><b>Solver:</b> <a href="https://ergo-code.github.io/HiGHS/dev/">HiGHS</a> (open source), loaded on your first run (about 3.5 MB, once). The full-year checks come from a library precomputed with this engine.</li>
 <li><b>Against lesson A20:</b> no pathway here gets below about 2,700 Mt (straight-line counting, central demand). <a href="a20-national-scenarios.html">A20</a> meets 2,600 Mt because its fastest path electrifies buildings and industry years sooner (step 7).</li>
+<li><b>Corrected 7 Nov 2026:</b> costs now include the existing wind, solar and batteries' fixed O&amp;M, the same in every pathway at one discount rate ($9.1 billion at 5%; central: $410.7 billion, was $401.6 billion). The full-year check buys gas in the slice run's own mix.</li>
 </ul></div>
 <div class="lx-card lx-notebook m13-nb">
 <p class="lx-eyebrow">Build it in Python · notebook lab, about 60 minutes, then 120 minutes of practice</p>
 <p>The engine's pathway with <code>scipy.optimize.linprog</code> and HiGHS.</p>
-<ul class="m13-nb-steps"><li><b>The LP:</b> vintages and residual value, the slices and their stores, links with losses, fuels bought domestic first, the budget and the import cap.</li><li><b>Reading it:</b> the budget's dual as a carbon value, a tighter budget, the run without the peak-hour rule.</li><li><b>Practice:</b> the straight line to zero, decade by decade, a shock's re-plan, near-optimal plans, two ways of counting the years.</li></ul>
+<ul class="m13-nb-steps"><li><b>The LP:</b> vintages and residual value, the slices and their stores, links with losses, fuels bought at least cost, the budget and the import cap.</li><li><b>Reading it:</b> the budget's dual as a carbon value, a tighter budget, the run without the peak-hour rule.</li><li><b>Practice:</b> the straight line to zero, decade by decade, a shock's re-plan, near-optimal plans, two ways of counting the years.</li></ul>
 <p><b>What it checks:</b> <code>assert</code> cells match the browser's cost, CO₂ by model year, imports, what is built and the budget's dual.</p>
 <ol class="m13-nb-steps">
 <li>Download the notebook and the three data files; put them in one folder.</li>
@@ -596,7 +617,7 @@ window.Quarto = {
 </tr>
 <tr class="odd">
 <td><span class="math inline">\(L_{r,p}\)</span>, <span class="math inline">\(d_s\)</span></td>
-<td>average busbar load (the region’s use plus 6% grid losses, at the plants’ outlets); the slice’s demand factor</td>
+<td>average busbar load (the region’s use ÷ 0.94, at the plants’ outlets: grid losses are 6% of what enters the grid); the slice’s demand factor</td>
 <td>MW; ratio</td>
 <td>given (the plan)</td>
 </tr>
@@ -626,15 +647,28 @@ window.Quarto = {
 </tr>
 <tr class="even">
 <td><span class="math inline">\(w_p\)</span></td>
-<td>the budget’s weight of each model year (2, 5, 5, 5, 5, 3 with straight lines between)</td>
+<td>the budget’s weight of each model year (5, 5, 5, 5, 3 for 2030–2050 with straight lines between)</td>
 <td>years</td>
 <td>given</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(w_{2025}\)</span></td>
+<td>the weight of 2025’s observed CO₂ (2 with straight lines between, 0 when each model year counts its five years)</td>
+<td>years</td>
+<td>given</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(K^{\text{exist}}_{g,r,p}\)</span></td>
+<td>existing capacity open in <span class="math inline">\(p\)</span>: for coal, gas and oil units the kept-open <span class="math inline">\(k_{u,p}\)</span>; for the others, units not yet retired</td>
+<td>MW</td>
+<td>decided (fossil), given (the rest)</td>
 </tr>
 </tbody>
 </table>
 </div>
 <p><span class="math display">\[\min \sum_p D_p \Big(\sum_f c_f f_p + \text{O\&amp;M}_p\Big) + \sum_{r,g,q} \frac{A_g}{1000}\, n_{r,g,q} \sum_{p \ge q,\; y_p - y_q &lt; \text{life}_g} D_p + \text{links} + \text{penalties} + \text{ties}\]</span></p>
-<p>Fuel <span class="math inline">\(f_p\)</span> in PJ times <span class="math inline">\(c_f\)</span> in $ per GJ is $M (1 PJ is a million GJ); <span class="math inline">\(A_g\)</span> in $ per kW-year times MW, divided by 1,000, is $M a year. Penalties and the tie rule are never part of a reported cost.</p>
+<p>Units: fuel <span class="math inline">\(f_p\)</span> in PJ times <span class="math inline">\(c_f\)</span> in $ per GJ is $M (1 PJ is a million GJ); <span class="math inline">\(A_g\)</span> in $ per kW-year times MW, divided by 1,000, is $M a year.</p>
+<p>The reported cost leaves out penalties and the tie rule. The reported cost adds the existing wind, solar and batteries’ fixed O&amp;M, a constant that moves no decision.</p>
 <p><span class="math display">\[\sum_g x_{g,r,s,p} + x^{\text{dis}}_{r,s,p} - x^{\text{ch}}_{r,s,p} + \sum_{\ell \to r} (1 - \lambda_\ell)\, x_{\ell,s,p} - \sum_{r \to \ell} x_{\ell,s,p} + u_{r,s,p} = L_{r,p}\, d_s\]</span></p>
 <p><span class="math display">\[x_{g,r,s,p} \le \alpha_{g,s}\Big(K^{\text{exist}}_{g,r,p} + \sum_{q \le p,\; y_p - y_q &lt; \text{life}_g} n_{r,g,q}\Big)\]</span></p>
 <p><span class="math display">\[\sum_p w_p\, \text{CO}_2(f_p) + w_{2025}\cdot 214.9 \le B \qquad \text{imports}(f_p) \le \text{cap} \cdot \text{primary}_p \quad \forall p\]</span></p>
@@ -647,6 +681,12 @@ window.Quarto = {
 </li>
 <li>
 <b>Stress hours.</b> At two stress hours of 2025, each region’s load plus 10% must be covered by available capacity and the links.
+</li>
+<li>
+<b>Gas.</b> The LP buys domestic gas and LNG in the least-cost mix within the import cap, so under a tight budget LNG can win: the national inventory counts the gas burned in domestic fields, not LNG’s upstream emissions abroad.
+</li>
+<li>
+<b>Retirements.</b> An existing plant counts in a model year only if its retirement year is later, so it leaves in the five-year period that contains that year: a conservative simplification.
 </li>
 </ul>
 </div>

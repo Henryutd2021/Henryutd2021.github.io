@@ -1,5 +1,12 @@
 {
- "about": "Learn M6, Putting carbon in the model. The Plains Grid's planning LP (also used by A12): what may be built and at what cost, the six representative days and their weights, the tie rule, the caps and the procurement cases, and a reference block written by the test. The existing fleet is in a10-emissions-questions.json. Money in 2025 dollars.",
+ "about": "Learn M6, Putting carbon in the model. The Plains Grid's planning LP (also used by A12): what may be built and at what cost, the six representative days and their weights, the tie rule, the caps and the procurement cases, and the lesson's reference results, solved with this LP in HiGHS. The existing fleet is in a10-emissions-questions.json. Money in 2025 dollars.",
+ "dataset": {
+  "creator": "Honglin Li",
+  "date": "2026-11-07",
+  "status": "Illustrative: the Plains Grid is fictional; its costs and finance come from cited EIA and NREL sources, in 2025 dollars.",
+  "source": "Prepared by hand for lesson M6 from the cited sources; the reference results are solved with HiGHS.",
+  "license": "CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/), Honglin Li. Values taken from the sources listed in this file keep their publishers' terms; EIA data are U.S. government works in the public domain."
+ },
  "accessed": "2026-11-05",
  "priceYear": 2025,
  "deflator": {
@@ -50,7 +57,7 @@
    "sn": 0.003,
    "wn": 0.004
   },
-  "note": "No tie-breaking costs on the pages: every reported number is the same for every best plan of the LP (the tests prove it over the optimal face), and the pages show no split that can differ between best plans (which plant is curtailed, how a battery cycles surplus). These hair costs ($0.01 per MWh discharged; existing solar $0.001, existing wind $0.002, new solar $0.003, new wind $0.004 per MWh used) are used only by build(Y, {tie: true}), for the notebook's practice task on ties."
+  "note": "No tie-breaking costs on the pages: every reported number is the same for every best plan of the LP (each was checked by minimizing and maximizing it over the LP's optimal face), and the pages show no split that can differ between best plans (which plant is curtailed, how a battery cycles surplus). These hair costs ($0.01 per MWh discharged; existing solar $0.001, existing wind $0.002, new solar $0.003, new wind $0.004 per MWh used) are used only by build(Y, {tie: true}), for the notebook's practice task on ties."
  },
  "seasons": [
   {
@@ -176,7 +183,7 @@
   30
  ],
  "reference": {
-  "about": "Written by node _tests/learn/test_m06-carbon-in-models.js --write; re-solved by the same test on every run. CO2 in t, money in $ a year (2025 dollars).",
+  "about": "Reference results, solved with the lesson's LP in HiGHS. CO2 in t, money in $ a year (2025 dollars).",
   "size": {
    "cols": 1443,
    "rows": 1008

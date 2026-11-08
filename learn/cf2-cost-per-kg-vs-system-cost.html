@@ -2,6 +2,22 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
+<script>(function () {
+  ["localStorage", "sessionStorage"].forEach(function (name) {
+    try { window[name].getItem("_"); return; } catch (e) { }   // storage works: leave it as it is
+    var data = Object.create(null);
+    var mem = {
+      getItem: function (k) { k = String(k); return k in data ? data[k] : null; },
+      setItem: function (k, v) { data[String(k)] = String(v); },
+      removeItem: function (k) { delete data[String(k)]; },
+      clear: function () { data = Object.create(null); },
+      key: function (i) { var keys = Object.keys(data); return i >= 0 && i < keys.length ? keys[i] : null; }
+    };
+    Object.defineProperty(mem, "length", { get: function () { return Object.keys(data).length; } });
+    Object.defineProperty(mem, "inMemory", { value: true });
+    try { Object.defineProperty(window, name, { configurable: true, enumerable: true, get: function () { return mem; } }); } catch (e) { }
+  });
+})();</script>
 <meta name="generator" content="quarto-1.10.19">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
@@ -94,8 +110,10 @@ ul.task-list li input[type="checkbox"] {
 <link rel="stylesheet" href="../assets/learn/learn.css">
 <meta property="og:title" content="When the cost per kilogram and the cost of the system disagree – Honglin Li">
 <meta property="og:description" content="Case file CF2 of Energy Systems, Step by Step: why a costlier kilogram of hydrogen can come with a cheaper system, and which number answers which question.">
-<meta property="og:image" content="https://henryutd2021.github.io/learn/images/profile-square.jpg">
+<meta property="og:image" content="https://henryutd2021.github.io/images/profile-square.jpg">
 <meta property="og:site_name" content="Honglin Li">
+<meta property="og:url" content="https://henryutd2021.github.io/learn/cf2-cost-per-kg-vs-system-cost.html">
+<link rel="canonical" href="https://henryutd2021.github.io/learn/cf2-cost-per-kg-vs-system-cost.html">
 </head>
 
 <body class="nav-fixed page-learn page-lesson lx-form-case quarto-light"><script id="quarto-html-before-body" type="application/javascript">
@@ -298,7 +316,7 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">Teaching</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../learn/index.html"> 
+    <a class="nav-link active" href="../learn/index.html" aria-current="true"> 
 <span class="menu-text">Learn</span></a>
   </li>  
   <li class="nav-item">
@@ -346,6 +364,7 @@ ul.task-list li input[type="checkbox"] {
 
 <main class="content column-page" id="quarto-document-content">
 
+<noscript><style>@media (max-width: 1199.98px) { #quarto-header { position: relative; } #quarto-header .navbar-toggler { display: none; } #quarto-header #navbarCollapse { display: block !important; } } #quarto-header .quarto-navbar-tools { display: none; }</style></noscript>
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
@@ -398,15 +417,15 @@ ul.task-list li input[type="checkbox"] {
 <div class="lx-case-part"><p class="lx-eyebrow">4 · Decisions, goal and rules, in words</p><ul><li><b>Decisions:</b> the sizes of the battery, electrolyzer, hydrogen tank and fuel cell, and how each runs every hour.</li><li><b>Goal:</b> the lowest life-cycle cost of the whole system, net of what it earns from electricity and hydrogen.</li><li><b>Rules:</b> deliver the largest steady output it can in every hour; no machine runs above its size.</li></ul></div>
 <div class="lx-case-part wide"><p class="lx-eyebrow">5 · Data and method</p><ul><li>A <span class="lx-term" data-term="mixed-integer-program">mixed-integer linear program</span>, an extension of NREL's REopt model, sizes and runs the equipment over a year of hours with ERCOT wholesale prices.</li><li>Sensitivity runs vary the hydrogen price, the wind profile (four regions) and projected equipment costs to 2050.</li></ul></div>
 <div class="lx-case-part wide"><p class="lx-eyebrow">6 · What came out, and where it holds</p>
-<blockquote class="lx-excerpt blockquote" data-source="excerpt:wind-hydrogen"><p>As the hydrogen price rose, the optimizer built a larger electrolyzer to use more surplus wind.</p><p>The larger unit ran at lower utilization, so each kilogram carried more capital and the <span class="lx-term" data-term="lcoh">levelized cost of hydrogen</span> rose, while hydrogen revenue lowered total system cost.</p><p>Compared with wind and a battery alone, adding an electrolyzer reduced total system cost by about 7%, and using hydrogen as the storage medium for fuel cells reduced it by about 26%.</p><footer>Approved excerpt of: Li et al. (2024), <a href="https://doi.org/10.1115/1.4063971">Journal of Mechanical Design</a>.</footer></blockquote>
+<blockquote class="lx-excerpt blockquote" data-source="excerpt:wind-hydrogen"><p>As the hydrogen price rose, the optimizer built a larger electrolyzer to use more surplus wind.</p><p>The larger unit ran at lower utilization, so each kilogram carried more capital and the <span class="lx-term" data-term="lcoh">levelized cost of hydrogen</span> rose, while hydrogen revenue lowered total system cost.</p><p>Compared with wind and a battery alone, adding an electrolyzer reduced total system cost by about 7%, and using hydrogen as the storage medium for fuel cells reduced it by about 26%.</p><footer>From: Li et al. (2024), <a href="https://doi.org/10.1115/1.4063971">Journal of Mechanical Design</a>.</footer></blockquote>
 <p class="lx-hint">Battery, hydrogen and hybrid storage were compared, each set to deliver the largest stabilized output in every hour at the lowest life-cycle cost.</p>
 <p class="lx-hint">Hybrid hydrogen and battery storage delivered the highest stabilized output of the four configurations.</p>
 <p class="lx-hint">Holds when: one planned West Texas wind farm, ERCOT prices, costs from 2020 to 2023. Leaves out: final federal hydrogen credit rules.</p></div>
 <div class="lx-case-part"><p class="lx-eyebrow">Related study · solar and hydrogen</p>
-<blockquote class="lx-excerpt blockquote" data-source="excerpt:solar-hydrogen"><p>Among the cases studied, <span class="lx-term" data-term="concentrated-solar">concentrated solar power</span> with <span class="lx-term" data-term="thermal-storage">thermal storage</span> running a <span class="lx-term" data-term="high-temperature-electrolyzer">high-temperature electrolyzer</span> at variable power gave the lowest levelized cost of hydrogen; constant-power operation was the most expensive.</p><footer>Approved excerpt of: Li et al. (2023), <a href="https://doi.org/10.1109/EEM58374.2023.10161786">EEM 2023</a>.</footer></blockquote>
+<blockquote class="lx-excerpt blockquote" data-source="excerpt:solar-hydrogen"><p>Among the cases studied, <span class="lx-term" data-term="concentrated-solar">concentrated solar power</span> with <span class="lx-term" data-term="thermal-storage">thermal storage</span> running a <span class="lx-term" data-term="high-temperature-electrolyzer">high-temperature electrolyzer</span> at variable power gave the lowest levelized cost of hydrogen; constant-power operation was the most expensive.</p><footer>From: Li et al. (2023), <a href="https://doi.org/10.1109/EEM58374.2023.10161786">EEM 2023</a>.</footer></blockquote>
 <p class="lx-hint">Yardstick here: the cost per kilogram across designs. Holds for: one West Texas site, cost projections from NREL's Annual Technology Baseline, a conference-length study.</p></div>
 <div class="lx-case-part"><p class="lx-eyebrow">Related study · maintenance offshore</p>
-<blockquote class="lx-excerpt blockquote" data-source="excerpt:offshore-om"><p><span class="lx-term" data-term="prognostics">Prognostics</span>-based maintenance lowered wind operation-and-maintenance cost by about 10% and downtime by about 11%.</p><p>The saving applies to the turbines alone, so its effect on the whole system was smaller: the levelized cost of hydrogen fell by about 2%.</p><footer>Approved excerpt of: Li et al. (2024), <a href="https://doi.org/10.1088/1742-6596/2767/6/062016">J. Phys.: Conf. Ser. 2767</a>.</footer></blockquote>
+<blockquote class="lx-excerpt blockquote" data-source="excerpt:offshore-om"><p><span class="lx-term" data-term="prognostics">Prognostics</span>-based maintenance lowered wind operation-and-maintenance cost by about 10% and downtime by about 11%.</p><p>The saving applies to the turbines alone, so its effect on the whole system was smaller: the levelized cost of hydrogen fell by about 2%.</p><footer>From: Li et al. (2024), <a href="https://doi.org/10.1088/1742-6596/2767/6/062016">J. Phys.: Conf. Ser. 2767</a>.</footer></blockquote>
 <p class="lx-hint">Prognostics: predicting failures to plan repairs. Holds for: one Gulf of Mexico site and one weather year.</p></div>
 </div>
 <div class="lx-interactive" data-learn="cf2" data-src="../assets/learn/data/cf2-cost-per-kg-vs-system-cost.json">
@@ -417,7 +436,7 @@ ul.task-list li input[type="checkbox"] {
 
 </div>
 </div>
-<p class="lx-datanote"><span>Every result about the studies is quoted from approved excerpts of the published papers named in the sources. The toy below uses illustrative round numbers.</span></p>
+<p class="lx-datanote"><span>Every result about the studies is quoted from the published papers named in the sources. The toy below uses illustrative round numbers.</span></p>
 </div>
 <div id="explain" class="lx-sec">
 <section id="the-idea-behind-it-then-where-the-result-holds" class="level2 lx-sec-h">
@@ -560,7 +579,7 @@ ul.task-list li input[type="checkbox"] {
 <div id="cf2-explain" class="lx-xgrid">
 <div class="lx-fallback">
 
-<p class="lx-eyebrow">Where the result holds</p><dl class="lx-ideas"><dt>It holds when</dt><dd><ul><li>one planned 253 MW wind farm in West Texas, with <span class="lx-term" data-term="ercot">ERCOT</span> wholesale prices;</li><li>hydrogen sold at a set price per kilogram;</li><li>cost assumptions dated 2020 to 2023.</li></ul></dd><dt>It leaves out</dt><dd><ul><li>final federal hydrogen credit rules, which came later;</li><li>the rest of the grid, which enters only through wholesale prices;</li><li>where the hydrogen goes after it is sold.</li></ul></dd></dl><p class="lx-hint">From the approved excerpt of Li et al. (2024), Journal of Mechanical Design.</p>
+<p class="lx-eyebrow">Where the result holds</p><dl class="lx-ideas"><dt>It holds when</dt><dd><ul><li>one planned 253 MW wind farm in West Texas, with <span class="lx-term" data-term="ercot">ERCOT</span> wholesale prices;</li><li>hydrogen sold at a set price per kilogram;</li><li>cost assumptions dated 2020 to 2023.</li></ul></dd><dt>It leaves out</dt><dd><ul><li>final federal hydrogen credit rules, which came later;</li><li>the rest of the grid, which enters only through wholesale prices;</li><li>where the hydrogen goes after it is sold.</li></ul></dd></dl><p class="lx-hint">From Li et al. (2024), Journal of Mechanical Design.</p>
 
 </div>
 </div>

@@ -1,5 +1,5 @@
 {
- "about": "A22 (Cheap, clean, reliable, fair, secure): nine hand-made plans for Prairie Town, each run hour by hour through all 8,760 hours of 2025 with lesson 13's planning model (13-capstone.json costs, EIA and NREL, dated; town_year.json shapes from EIA-930). 'm' holds each plan's precomputed measures; _tests/learn/test_a22-tradeoff-explorer.js re-solves every plan and checks every number the page states. Plans, tariffs, priority weights and radar scales are illustrative choices, not recommendations. Prairie Town is fictional.",
+ "about": "A22 (Cheap, clean, reliable, fair, secure): nine hand-made plans for Prairie Town, each run hour by hour through all 8,760 hours of 2025 with lesson 13's planning model (13-capstone.json costs, EIA and NREL, dated; town_year.json shapes from EIA-930). 'm' holds each plan's measures, solved in advance with HiGHS 1.15.1 so the nine plans show at once, and checked against fresh solves. Plans, tariffs, priority weights and radar scales are illustrative choices, not recommendations. Prairie Town is fictional.",
  "accessed": "2026-11-03",
  "groups": {
   "incomeLimit": 40000,

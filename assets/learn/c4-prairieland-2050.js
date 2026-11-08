@@ -7,8 +7,10 @@
 // after each of C4's four shocks and solves the "policies as in 2025" reference with the same costs); the results (what
 // the run says, the shock table, security, screening affordability and Ridge County's jobs from LX.A13, the map, the mix,
 // CO2 and imports, the full-year check from the library when the plan is a preset); the two-page policy brief
-// (LX.ReportNote); the self-check (exemplars, rubric); the sources. A plan on the library is drawn from it at once,
-// labelled with its date. Every number comes from E4, the library or LX.A13; _tests/learn/test_c4-prairieland-2050.js
+// (LX.ReportNote); the self-check (exemplars, rubric); the sources. The first view (the plan on load, when it is in the
+// library) is drawn from the library, labelled with its date; every run the reader starts (Run, a preset) solves in the
+// browser. The full-year checks stay precomputed and follow the plan's key. Every number comes from E4, the library or
+// LX.A13; _tests/learn/test_c4-prairieland-2050.js
 // checks them. Prairieland and Ridge County are fictional; their numbers are illustrative.
 (function () {
   "use strict";
@@ -98,6 +100,8 @@
   function assumptions(st, af, jb, V, full, E4) {
     var hh = A13split(af);
     return ["Prairieland and Ridge County are fictional; their numbers are illustrative.", "2025 dollars; costs are fixed ranges the plan sets, the same in every period, whatever is built.",
+      "The cost counts the existing wind, solar and batteries' fixed O&M while they are open; the data give none for existing hydro and the steady plants, so their upkeep is left out (the same in every pathway).",
+      "An existing plant leaves the plan in the five-year period that contains its retirement year: a conservative simplification.",
       "Twelve time slices of 2025's weather stand for each model year, with the peak net-load day and the scarce-wind week kept whole.",
       st.rm === "off" ? "No peak-hour rule: the stress hours were not tested." : "A peak-hour rule at two stress hours of 2025, each region's load plus " + { r0: "0%", r10: "10%", r20: "20%" }[st.rm] + ".",
       "CO₂: fuels burned inside Prairieland at the IPCC's factors; " + ACC[st.acc] + ".",
@@ -122,6 +126,9 @@
     { key: "notebook", label: "M13's notebook on your pathway", hint: "Paste the lines its section 8 printed for your plan (cost, CO₂, imports, what it builds) and say whether they match the page.", rows: 3, need: true, min: 8 },
     { key: "sources", label: "Sources and credit", hint: "One or two sentences: the data behind your numbers (EIA, IPCC, SPP through EIA-930; the course's teaching settings) and any conflict of interest.", rows: 2, need: true, min: 8 }];
   var TWO_PAGES = 1100;
+  // the two-page check counts the learner's own writing (the brief's fields); the plan, results, assumptions and limits
+  // the page adds are not counted (about 1,000 words on their own)
+  function ownWords(words, countWords) { var t = 0; FIELDS.forEach(function (f) { t += countWords((words || {})[f.key] || ""); }); return t; }
   var RUBRIC = [{ id: "accounting", look: "Cost and CO₂ on one boundary (the nation, 2026–2050, 2025 dollars, fuels burned inside Prairieland); imports against the cap; affordability and jobs as screening estimates, gross and net kept apart." },
     { id: "uncertainty", look: "All four shocks reported as ranges, with the rule for what was kept; the result that would change the recommendation named.",
       levels: { proficient: "the four shocks re-planned on this plan and reported (cost, budget, imports, the peak-hour rule), the range stated, and the shock or assumption that would flip the recommendation named" } },
@@ -142,16 +149,17 @@
           "Why this one: ", { text: "a security-first plan (imports at most " + pct(Vs.cap) + ") costs " + bn(Vs.pv.total - V.pv.total) + " more" + (sMiss.length ? " and still cannot meet its cap in " + sMiss.join(" and ") : ""), note: "A reason against another pathway, from a second run." }, ".\n",
           "Cost and carbon: ", { text: bn(V.pv.total) + " to 2050 (present value, 2025 dollars, supply side and every fuel); CO₂ " + kilo(V.cum) + " of " + kilo(V.budget) + " Mt", note: "One boundary, the budget's arithmetic stated." }, ".\n",
           "Security: ", { text: "imports at most " + pct(Math.max.apply(null, V.imp)) + " of primary energy against a " + pct(V.cap) + " cap", note: "A measure and its limit." }, ".\n",
-          "Shocks: ", { text: sensLine(V, X), note: "All four, with the rule for what was kept, as a range." }, "\n",
+          "Shocks: ", { text: sensLine(V, X) + " Operating shocks kept each year's builds; the mineral restriction re-planned that year's battery purchases", note: "All four, with the rule for what was kept, as a range." }, ".\n",
           "What would change it: ", { text: "the " + X2.label.toLowerCase() + " costs most (" + sbn(X2.dPV) + ")" + (X2.rule !== null && X2.reserveShort[V.Y.indexOf(X2.year)] > 0.5 ? " and leaves the stress hours " + kilo(X2.reserveShort[V.Y.indexOf(X2.year)]) + " MW short in " + X2.year : "") + "; if it looked likely, I would build more firm capacity before " + X2.year, note: "The result that would change the recommendation, named." }, ".\n",
           "Who pays (screening): ", { text: "about $" + kilo(af.perHH) + " a household a year in " + af.year + " if households pay " + pct(af.share) + "; equipment not counted", note: "A screening estimate with its share and what it leaves out." }, ".\n",
           "Ridge County (screening): ", { text: kilo(jb.j.lostTotal) + " jobs lost against " + kilo(jb.j.newPermGross) + " new ongoing jobs (" + kilo(jb.j.newPermNet) + " net), with a multiplier of " + fix(st.jm, 1) + ", " + st.jd + "% displacement and all the Ridge region's new wind and solar in the county", note: "Gross and net kept apart; the multiplier, displacement and the county assumption stated." }, ".\n",
+          "Evidence: ", { text: "the plan link from the bench (the default plan), and M13's notebook run on the same plan, which prints the same cost and CO₂", note: "The link and the notebook's run, as the hand-in asks." }, ".\n",
           "Limits: ", { text: "twelve slices, no clean fuels for the oil and gas that stay, perfect foresight" + (full ? "; the full-year check passes " + ok + " of 4, with CO₂ up to " + pct(gap, 0) + " above the slices, and does not test the budget" : "; the full-year check is not known for this plan"), note: "What the model leaves out, and what the checks do and do not show." }, "."] }],
       diff: [{ label: "Sizes", weak: "none", good: "every lever" }, { label: "Boundary", weak: "none", good: "stated" }, { label: "Shocks", weak: "none", good: "all four, a range" }, { label: "Reversal", weak: "none", good: "named" }, { label: "Jobs", weak: "none", good: "gross and net" }],
       note: "Both briefs are illustrative; the strong one quotes the default plan's run. Other recommendations reach Proficient with equally sound reasoning." };
   }
   var page = { c4Schema: c4Schema, toE4: toE4, libEntry: libEntry, refState: refState, afford: afford, ridgeJobs: ridgeJobs, shockRows: shockRows, sensLine: sensLine, sensLines: sensLines, says: says, assumptions: assumptions, fullStatus: fullStatus, ACC: ACC, LIMITS: LIMITS,
-    FIELDS: FIELDS, TWO_PAGES: TWO_PAGES, RUBRIC: RUBRIC, RUBRIC_BAR: "the bar for this policy brief", exemplars: exemplars, kilo: kilo, fix: fix, pct: pct, bn: bn, sbn: sbn };
+    FIELDS: FIELDS, TWO_PAGES: TWO_PAGES, ownWords: ownWords, RUBRIC: RUBRIC, RUBRIC_BAR: "the bar for this policy brief", exemplars: exemplars, kilo: kilo, fix: fix, pct: pct, bn: bn, sbn: sbn };
   if (typeof module !== "undefined" && module.exports) module.exports = page;
   if (typeof window === "undefined" || !window.LX || !window.LX.E4) return;
 
@@ -159,7 +167,7 @@
   var LX = window.LX, H = LX.H, E4 = LX.E4, U = E4.ui, A13 = LX.A13;
   LX.mount("c4", function (live, data, root) {
     var P = E4.prepare(data.prairieland, data.e4_pathways), A = data.a13_fairness_jobs, PC = data.prairie_city, LIB = data.e4_library, PL = data.prairieland;
-    var S = c4Schema(E4, P, A), stub = null, forceLive = false;
+    var S = c4Schema(E4, P, A), stub = null, first = false;
     var rh = document.getElementById("c4-results"), fb = rh.querySelector(".lx-fallback"); if (fb) fb.hidden = true;
     H("p", { class: "lx-hint e4-line", text: P.line }, live);
     var wrap = H("div", { class: "lx-sb e4-sb" }, live), ctr = H("div", { class: "lx-sb-controls" }, wrap), side = H("div", { class: "lx-sb-side" }, wrap);
@@ -167,7 +175,7 @@
     var ss = LX.ShareState(side, { schema: S, id: "c4-link", onLoad: function (s) { plan = s; C.set(plan); run.changed(plan); rn.refresh(); } });
     plan = ss.state;
     var groups = [{ title: "Demand and electrification", fields: ["dem", "eb", "et", "ei"], color: "var(--lx-demand)", hint: "Electricity's share of each sector's [[useful-energy|useful energy]] in 2050; end-use equipment costs are left out." },
-      { title: "The limits you set", fields: ["bud", "acc", "cap", "rm"], color: "var(--lx-bad)", hint: "A [[carbon-budget|cumulative carbon budget]], an import cap in every model year, a rule for the peak hours.",
+      { title: "The limits you set", fields: ["bud", "acc", "cap", "rm"], color: "var(--lx-bad)", hint: "A [[carbon-budget|cumulative carbon budget]], an import cap in every model year, and a peak-hour rule: at two hard hours of 2025's weather, available capacity must cover each region's load plus the margin you pick.",
         extra: function (fs) { E4.GAP.slice(0, 2).forEach(function (t) { H("p", { class: "lx-hint e4-ghint", html: LX.rich(t) }, fs); }); } },
       { title: "What the model may do", fields: ["fs", "fm", "tx", "rt"], color: "var(--lx-accent)", hint: "[[perfect-foresight|Perfect foresight]] or decade by decade; the generic firm clean option; new links; early retirement." },
       { title: "Who pays and Ridge County (screening)", fields: ["hs", "rc", "jm", "jd"], color: "var(--lx-tier-4)", hint: "Inputs to the accounting layer ([[lesson:a13-fairness-jobs|A13]]): they move the screening tables, never the pathway." },
@@ -176,13 +184,17 @@
     var C = U.controls(ctr, S, plan, groups, change);
     var pre = H("div", { class: "lx-sb-presets", role: "group", "aria-label": "Start from a preset (only the choices it names change)" }, side);
     E4.presetsOf(P).forEach(function (pr) { H("button", { class: "lx-btn ghost small", type: "button", text: pr.label, onclick: function () { change(E4.withPreset(plan, pr)); run.run(plan); } }, pre); });
+    H("p", { class: "lx-hint e4-prehint", text: "A preset changes only the choices it names; your other settings stay." }, side);
     var stale = H("p", null, rh), src = H("p", { class: "e4-src", "aria-live": "polite" }), res = H("div", { class: "lx-sb-results c4-res" }, rh), ro = H("div", { class: "lx-readouts e4-ro" }), stopB = U.stopper();
     function solver() { if (!stub) return null; var k = stub; stub = null; return function () { return Promise.resolve({ status: k === "tl" ? "time-limit" : "error", ok: false, message: "solver stopped (demo)" }); }; }
     var run = LX.BenchRun(side, { label: "Run and test against four shocks", state: function () { return plan; }, results: [res, ro], stale: stale, busy: function (on) { stopB.busy(on); },
       solve: function (st, ctx) {
-        var e4 = toE4(E4, P, st), rs = refState(E4, P, st), e = !forceLive && !stub ? libEntry(LIB, LX.ShareState, E4, P, st) : null, er = !forceLive && !stub ? libEntry(LIB, LX.ShareState, E4, P, rs) : null; forceLive = false;
+        // only the first view comes from the library; every run the reader starts solves live (the plan, four re-plans
+        // and the reference)
+        var e4 = toE4(E4, P, st), rs = refState(E4, P, st), lib1 = first && !stub; first = false;
+        var e = lib1 ? libEntry(LIB, LX.ShareState, E4, P, st) : null, er = e ? libEntry(LIB, LX.ShareState, E4, P, rs) : null;
         var sol = solver(), refP = er ? Promise.resolve({ ok: true, V: er.view }) : E4.solve(rs, P, { signal: ctx.signal, attempt: ctx.attempt, solver: sol }).then(function (r) { return r.ok ? { ok: true, V: E4.view(r.results.plan, P) } : r; });
-        // the full-year checks follow the plan's key whether the run is from the library or live (the same plan)
+        // the full-year checks (precomputed) follow the plan's key whether the run is from the library or live (the same plan)
         var full = (e || libEntry(LIB, LX.ShareState, E4, P, st) || {}).full || null;
         if (e) return refP.then(function (rf) { return rf.ok ? { status: "optimal", ok: true, kind: "lp", message: E4.doneWords(e4, e.view, { four: true }) + " From the library.", results: { V: e.view, X: e.shocks, Vref: rf.V, full: full, lib: true } } : rf; });
         return E4.shockTest(e4, P, { signal: ctx.signal, attempt: ctx.attempt, solver: sol }).then(function (r) {
@@ -194,15 +206,14 @@
       render: function (R, st) { last = { R: R, state: st }; draw(R, st); rn.refresh(); } });
     stopB.attach(run);
     side.appendChild(ro); side.insertBefore(ss.status, pre);
-    var liveB = H("button", { class: "lx-btn ghost small", type: "button", text: "Solve it live", hidden: true, onclick: function () { forceLive = true; run.run(plan); } });
-    side.appendChild(src); side.appendChild(liveB); side.appendChild(ss.el);
+    side.appendChild(src); side.appendChild(ss.el);
     function change(p) { plan = p; C.set(plan); ss.set(plan); run.changed(plan); rn.refresh(); }
 
     function draw(R, st) {
       var V = R.V, X = R.X, af = afford(V, R.Vref, st, PL, PC, A13), jb = ridgeJobs(V, st, PL, A, A13), L = V.Y.length - 1;
       R.af = af; R.jb = jb;
-      src.textContent = R.lib ? "From the library: precomputed with this engine on " + LIB.date + " (the same LPs)." : "Solved in your browser just now (HiGHS: the pathway, four re-plans and the reference).";
-      src.className = "e4-src" + (R.lib ? " lib" : ""); liveB.hidden = !R.lib;
+      src.textContent = R.lib ? "The first view, precomputed with this engine on " + LIB.date + " (the same LPs). Run it, or pick a preset, to solve in your browser." : "Solved in your browser just now (HiGHS: the pathway, four re-plans and the reference).";
+      src.className = "e4-src" + (R.lib ? " lib" : "");
       ro.innerHTML = "";
       U.readouts(V).forEach(function (x) { var d = H("div", { class: "lx-readout " + x[2] }, ro); H("span", { text: x[0] }, d); H("b", { text: x[1] }, d); });
       res.innerHTML = "";
@@ -213,7 +224,7 @@
       U.table(c1, ["Shock (model year)", "Cost to 2050, against the plan", "CO₂ 2026–2050", "Imports that year", "Peak-hour rule that year", "Not served that year"], shockRows(V, X), "c4-shocks");
       H("h4", { text: "What each shock changes, in the model" }, c1);
       U.table(c1, ["Shock", "When, in the model", "What changes", "What the re-plan keeps"], E4.shockTable(P), "c4-shockwhat e4-wrap");
-      U.keys(c1, [["Five years", "a model year stands for five years, so each shock lasts five years here, longer than its story."]]);
+      U.keys(c1, [["Five years", "a model year stands for five years: the gas-price spike, the drought and the mineral restriction each last one period, longer than their stories; the demand surprise lasts from 2031 to 2050."]]);
       var c2 = H("div", { class: "lx-xcard lx-sb-chart" }, res); H("h3", { text: "Security, model year by model year" }, c2);
       U.table(c2, ["Model year", "Imports, share of primary energy", "Through the strait, PJ", "LNG, share of gas", "Oil stocks, days of crude imports", "Batteries, GWh"], V.Y.map(function (y, p) {
         var s = V.sec[p]; return [String(y), pct(V.imp[p]), kilo(s.strait), pct(s.lngShare), s.stockDays == null ? "no imports" : kilo(s.stockDays), fix(s.batteryGWh, 1)]; }), "c4-sec");
@@ -244,11 +255,11 @@
     var nh = document.getElementById("c4-note"); nh.innerHTML = "";
     var rn = LX.ReportNote(H("div", { class: "lx-xcard" }, nh), { id: "c4-note", code: "C4", title: "Your two-page policy brief", lede: "Your words: the recommendation, the evidence, the shocks and what would change your mind, who pays and Ridge County, the notebook's lines and your sources. The plan, its numbers, the shock table, the assumptions and the limits come from your run.",
       fields: FIELDS,
-      checks: ["link", "run", "fields", "assumptions", "sensitivity", { id: "pages", label: "Fits on two pages (about " + kilo(TWO_PAGES) + " words)", test: function (note, words) { return LX.ReportNote.countWords(LX.ReportNote.compose(note, words, FIELDS, { format: "text" })) <= TWO_PAGES; } }],
+      checks: ["link", "run", "fields", "assumptions", "sensitivity", { id: "pages", label: "Your writing fits on two pages (about " + kilo(TWO_PAGES) + " words; the tables and assumptions the page adds are not counted)", test: function (note, words) { return ownWords(words, LX.ReportNote.countWords) <= TWO_PAGES; } }],
       get: function () {
         if (!last) return null;
         var R = last.R, V = R.V, st = last.state, L = V.Y.length - 1;
-        var rows = [{ label: "Cost to 2050", value: bn(V.pv.total), note: "present value in 2025; supply side and every fuel bought; 2025 dollars" },
+        var rows = [{ label: "Cost to 2050", value: bn(V.pv.total), note: "present value in 2025; supply side and every fuel bought, with the existing wind, solar and batteries' upkeep; 2025 dollars" },
           { label: "CO₂ 2026–2050", value: kilo(V.cum) + " of " + kilo(V.budget) + " Mt" + (V.over > 0.5 ? " (" + kilo(V.over) + " Mt over)" : ""), note: "fuels burned inside Prairieland" },
           { label: "Imports, highest model year", value: pct(Math.max.apply(null, V.imp)) + " (cap " + pct(V.cap) + ")", note: "crude and LNG, share of primary energy" },
           { label: "Built 2026–2050", value: ["wind", "solar", "battery", "gasCC", "gasCT", "firm"].map(function (t) { return U.NAME[t].toLowerCase() + " " + fix(sum(V.built[t]), 1) + " GW"; }).join(", ") }]
@@ -272,7 +283,7 @@
 
     // ---- the first run, once in view
     var started = false;
-    function start() { if (started) return; started = true; run.run(plan); }
+    function start() { if (started) return; started = true; first = true; run.run(plan); }
     if (typeof IntersectionObserver !== "undefined") {
       var io = new IntersectionObserver(function (es) { if (es.some(function (e) { return e.isIntersecting; })) { io.disconnect(); start(); } }, { rootMargin: "200px" });
       io.observe(root); io.observe(rh);
@@ -281,7 +292,7 @@
     LX.demo(root, function (s) {
       started = true;
       if (s === "mid" || s === "done") { change(E4.withPreset(plan, E4.presetsOf(P)[2])); run.run(plan); return { view: "mid" }; }
-      if (s === "live") { forceLive = true; run.run(plan); return { view: "mid" }; }
+      if (s === "live") { run.run(plan); return { view: "mid" }; }
       if (s === "fail") { stub = "fail"; run.run(plan); return { view: "fail" }; }
       return null;
     });

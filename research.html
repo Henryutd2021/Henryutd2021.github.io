@@ -2,6 +2,22 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
+<script>(function () {
+  ["localStorage", "sessionStorage"].forEach(function (name) {
+    try { window[name].getItem("_"); return; } catch (e) { }   // storage works: leave it as it is
+    var data = Object.create(null);
+    var mem = {
+      getItem: function (k) { k = String(k); return k in data ? data[k] : null; },
+      setItem: function (k, v) { data[String(k)] = String(v); },
+      removeItem: function (k) { delete data[String(k)]; },
+      clear: function () { data = Object.create(null); },
+      key: function (i) { var keys = Object.keys(data); return i >= 0 && i < keys.length ? keys[i] : null; }
+    };
+    Object.defineProperty(mem, "length", { get: function () { return Object.keys(data).length; } });
+    Object.defineProperty(mem, "inMemory", { value: true });
+    try { Object.defineProperty(window, name, { configurable: true, enumerable: true, get: function () { return mem; } }); } catch (e) { }
+  });
+})();</script>
 <meta name="generator" content="quarto-1.10.19">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
@@ -95,6 +111,8 @@ ul.task-list li input[type="checkbox"] {
 <meta property="og:description" content="Research of Honglin Li: optimization and techno-economic analysis of hydrogen, nuclear and firm low-carbon power for large new loads such as AI data centers.">
 <meta property="og:image" content="https://henryutd2021.github.io/images/profile-square.jpg">
 <meta property="og:site_name" content="Honglin Li">
+<meta property="og:url" content="https://henryutd2021.github.io/research.html">
+<link rel="canonical" href="https://henryutd2021.github.io/research.html">
 </head>
 
 <body class="nav-fixed page-inner page-folio page-research quarto-light"><script id="quarto-html-before-body" type="application/javascript">
@@ -367,6 +385,7 @@ ul.task-list li input[type="checkbox"] {
 
 <main class="content quarto-banner-title-block column-page" id="quarto-document-content">
 
+<noscript><style>@media (max-width: 1199.98px) { #quarto-header { position: relative; } #quarto-header .navbar-toggler { display: none; } #quarto-header #navbarCollapse { display: block !important; } } #quarto-header .quarto-navbar-tools { display: none; }</style></noscript>
 
 
 
@@ -408,13 +427,13 @@ ul.task-list li input[type="checkbox"] {
       <a class="rp-link" href="projects/offshore-wind-hydrogen-om.html">Offshore wind–hydrogen</a>
     </li>
     <li class="rp-step theme-hydrogen">
-      <span class="rp-when">2022–2025 · Ph.D.</span>
+      <span class="rp-when">2022–2023 · Ph.D.</span>
       <span class="rp-scale">State</span>
       <span class="rp-what">Hydrogen across the Texas grid under uncertain renewable build-out</span>
       <a class="rp-link" href="projects/txh2.html">Texas hydrogen</a>
     </li>
     <li class="rp-step theme-hydrogen">
-      <span class="rp-when">2025–2026 · Ph.D. and INL</span>
+      <span class="rp-when">2025 · Ph.D. and INL internship</span>
       <span class="rp-scale">National fleet</span>
       <span class="rp-what">Hydrogen and grid services for U.S. nuclear plants</span>
       <a class="rp-link" href="projects/npph2.html">Nuclear–hydrogen</a>
@@ -457,7 +476,7 @@ ul.task-list li input[type="checkbox"] {
     <li class="step">
       <span class="step-scale">National fleet</span>
       <h3 class="anchored">Making firm low-carbon supply flexible</h3>
-      <p>During my internship at Idaho National Laboratory, I co-developed an hourly model that splits a reactor's output among grid sales, high-temperature electrolysis, storage and reserves, linked to a lifetime cash-flow analysis of 42 reactors in seven U.S. markets. Operated as baseload-only plants at 2024 prices, nearly all had negative net present value; with hydrogen integration, including the assumed hydrogen production credit, a majority reached positive net present value.</p>
+      <p>During my internship at Idaho National Laboratory, I co-developed an hourly model that splits a reactor's output among grid sales, high-temperature electrolysis, storage and reserves, linked to a lifetime cash-flow analysis of 42 reactors in seven U.S. markets. Selling electricity alone at 2024 prices, without capacity payments or the 45U nuclear credit, nearly all had negative net present value; with hydrogen integration and the assumed hydrogen production credit of $3/kg for ten years, a majority reached positive net present value.</p>
       <p class="step-links"><a href="projects/npph2.html">Nuclear–hydrogen</a></p>
     </li>
   </ol>

@@ -2,6 +2,22 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
+<script>(function () {
+  ["localStorage", "sessionStorage"].forEach(function (name) {
+    try { window[name].getItem("_"); return; } catch (e) { }   // storage works: leave it as it is
+    var data = Object.create(null);
+    var mem = {
+      getItem: function (k) { k = String(k); return k in data ? data[k] : null; },
+      setItem: function (k, v) { data[String(k)] = String(v); },
+      removeItem: function (k) { delete data[String(k)]; },
+      clear: function () { data = Object.create(null); },
+      key: function (i) { var keys = Object.keys(data); return i >= 0 && i < keys.length ? keys[i] : null; }
+    };
+    Object.defineProperty(mem, "length", { get: function () { return Object.keys(data).length; } });
+    Object.defineProperty(mem, "inMemory", { value: true });
+    try { Object.defineProperty(window, name, { configurable: true, enumerable: true, get: function () { return mem; } }); } catch (e) { }
+  });
+})();</script>
 <meta name="generator" content="quarto-1.10.19">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
@@ -122,8 +138,10 @@ window.Quarto = {
 <link rel="stylesheet" href="../assets/learn/learn.css">
 <meta property="og:title" content="Where should a cogeneration study’s boundary be drawn? – Honglin Li">
 <meta property="og:description" content="Case file CF5 of Energy Systems, Step by Step. Where should an hourly cogeneration study draw its boundary: which plant streams, which loads and which alternatives must it include to price the steam sent to cooling?">
-<meta property="og:image" content="https://henryutd2021.github.io/learn/images/profile-square.jpg">
+<meta property="og:image" content="https://henryutd2021.github.io/images/profile-square.jpg">
 <meta property="og:site_name" content="Honglin Li">
+<meta property="og:url" content="https://henryutd2021.github.io/learn/cf5-drawing-the-boundary.html">
+<link rel="canonical" href="https://henryutd2021.github.io/learn/cf5-drawing-the-boundary.html">
 </head>
 
 <body class="nav-fixed page-learn page-lesson lx-form-case quarto-light"><script id="quarto-html-before-body" type="application/javascript">
@@ -326,7 +344,7 @@ window.Quarto = {
 <span class="menu-text">Teaching</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../learn/index.html"> 
+    <a class="nav-link active" href="../learn/index.html" aria-current="true"> 
 <span class="menu-text">Learn</span></a>
   </li>  
   <li class="nav-item">
@@ -374,6 +392,7 @@ window.Quarto = {
 
 <main class="content column-page" id="quarto-document-content">
 
+<noscript><style>@media (max-width: 1199.98px) { #quarto-header { position: relative; } #quarto-header .navbar-toggler { display: none; } #quarto-header #navbarCollapse { display: block !important; } } #quarto-header .quarto-navbar-tools { display: none; }</style></noscript>
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
@@ -429,7 +448,7 @@ window.Quarto = {
 <details class="lx-deeper cf5-more"><summary><span class="k">Detail</span>Two design choices</summary><div class="lx-deeper-body"><ul><li>Steam is extracted at the high- to low-pressure turbine crossover rather than from a parallel tap on main steam:<ul><li>crossover steam has already expanded through the high-pressure turbine, so it costs about half as much turbine work, and a sweep of the penalty tests this assumption.</li></ul></li><li>A full-size electric chiller stays beside the absorption chiller, and the optimizer chooses between the chillers hour by hour.</li></ul></div></details>
 <details class="lx-deeper cf5-more"><summary><span class="k">Detail</span>Scenario runs and how results are reported</summary><div class="lx-deeper-body"><ul><li>Scenario runs vary the market year (2022 to 2024), the carbon price, the cost of capital, cooling efficiency, battery storage and the size of the load.</li><li>The load's size is swept with the plant fixed, and the grid connection is enlarged only for loads above the baseline size.</li><li>Margins measured against grid cost are distorted across market years, because the grid cost itself falls in low-price years, so cross-year results are also reported in absolute annualized cost.</li></ul></div></details></div>
 <div class="lx-case-part wide"><p class="lx-eyebrow">6 · What came out, and where it holds</p>
-<blockquote class="lx-excerpt blockquote" data-source="excerpt:cogen-boundary-methods"><p>Pricing diverted steam matters: treating it as a free by-product can by itself decide the sign of a cogeneration result.</p><footer>Approved excerpt of: Li et al. (2026), accepted paper, Energy Conversion and Management; DOI pending.</footer></blockquote>
+<blockquote class="lx-excerpt blockquote" data-source="excerpt:cogen-boundary-methods"><p>Pricing diverted steam matters: treating it as a free by-product can by itself decide the sign of a cogeneration result.</p><footer>From: Li et al. (2026), accepted paper, Energy Conversion and Management; DOI pending.</footer></blockquote>
 <p class="lx-hint">Holds when: steam sent to cooling would otherwise turn the low-pressure turbine; the study used one load profile, ERCOT's hourly prices for 2022 to 2024, and one fixed plant.</p><p class="lx-hint">Leaves out: demand charges, ancillary-service revenues, and reliability on a common basis across options.</p></div>
 </div>
 <div class="lx-interactive" data-learn="cf5" data-src="../assets/learn/data/cf5-drawing-the-boundary.json">
@@ -489,7 +508,7 @@ window.Quarto = {
 <div id="cf5-explain" class="lx-xgrid">
 <div class="lx-fallback">
 
-<p class="lx-eyebrow">Where the result holds</p><dl class="lx-ideas"><dt>It holds when</dt><dd><ul><li>steam sent to cooling is steam the low-pressure turbine does not convert, so it costs the turbine work it gives up;</li><li>one load profile;</li><li>ERCOT's hourly prices for the market years 2022 to 2024;</li><li>hourly average, not marginal, emission factors;</li><li>the plant is one fixed unit;</li><li>steam is taken at the turbine crossover, and a sweep of the penalty tests that choice.</li></ul></dd><dt>It leaves out</dt><dd><ul><li>demand charges and ancillary-service revenues;</li><li>reliability on a common basis across options;</li><li>other load profiles and sites.</li></ul></dd></dl><p class="lx-hint">Approved excerpt of: Li et al. (2026), accepted paper, Energy Conversion and Management; DOI pending.</p>
+<p class="lx-eyebrow">Where the result holds</p><dl class="lx-ideas"><dt>It holds when</dt><dd><ul><li>steam sent to cooling is steam the low-pressure turbine does not convert, so it costs the turbine work it gives up;</li><li>one load profile;</li><li>ERCOT's hourly prices for the market years 2022 to 2024;</li><li>hourly average, not marginal, emission factors;</li><li>the plant is one fixed unit;</li><li>steam is taken at the turbine crossover, and a sweep of the penalty tests that choice.</li></ul></dd><dt>It leaves out</dt><dd><ul><li>demand charges and ancillary-service revenues;</li><li>reliability on a common basis across options;</li><li>other load profiles and sites.</li></ul></dd></dl><p class="lx-hint">From: Li et al. (2026), accepted paper, Energy Conversion and Management; DOI pending.</p>
 
 </div>
 </div>

@@ -2,6 +2,22 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
+<script>(function () {
+  ["localStorage", "sessionStorage"].forEach(function (name) {
+    try { window[name].getItem("_"); return; } catch (e) { }   // storage works: leave it as it is
+    var data = Object.create(null);
+    var mem = {
+      getItem: function (k) { k = String(k); return k in data ? data[k] : null; },
+      setItem: function (k, v) { data[String(k)] = String(v); },
+      removeItem: function (k) { delete data[String(k)]; },
+      clear: function () { data = Object.create(null); },
+      key: function (i) { var keys = Object.keys(data); return i >= 0 && i < keys.length ? keys[i] : null; }
+    };
+    Object.defineProperty(mem, "length", { get: function () { return Object.keys(data).length; } });
+    Object.defineProperty(mem, "inMemory", { value: true });
+    try { Object.defineProperty(window, name, { configurable: true, enumerable: true, get: function () { return mem; } }); } catch (e) { }
+  });
+})();</script>
 <meta name="generator" content="quarto-1.10.19">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
@@ -152,8 +168,10 @@ window.Quarto = {
 <link rel="stylesheet" href="../assets/explainers.css">
 <link rel="alternate" type="application/rss+xml" title="Honglin Li" href="briefings.xml" data-external="1"><meta property="og:title" content="Briefings – Honglin Li">
 <meta property="og:description" content="Briefings by Honglin Li on AI data-center load, interconnection, nuclear and SMRs, hydrogen, electricity markets and energy policy.">
-<meta property="og:image" content="https://henryutd2021.github.io/field-notes/images/profile-square.jpg">
+<meta property="og:image" content="https://henryutd2021.github.io/images/profile-square.jpg">
 <meta property="og:site_name" content="Honglin Li">
+<meta property="og:url" content="https://henryutd2021.github.io/field-notes/briefings.html">
+<link rel="canonical" href="https://henryutd2021.github.io/field-notes/briefings.html">
 </head>
 
 <body class="nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
@@ -360,7 +378,7 @@ window.Quarto = {
 <span class="menu-text">Learn</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../field-notes.html"> 
+    <a class="nav-link active" href="../field-notes.html" aria-current="true"> 
 <span class="menu-text">Notes</span></a>
   </li>  
   <li class="nav-item">
@@ -401,10 +419,11 @@ window.Quarto = {
 
 
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(1)</span></div><div class="category" data-category="RGF0YSUyMCUyNiUyMG1ldGhvZHM=">Data &amp; methods <span class="quarto-category-count">(1)</span></div><div class="category" data-category="SHlkcm9nZW4=">Hydrogen <span class="quarto-category-count">(1)</span></div><div class="category" data-category="TGFyZ2UlMjBsb2FkcyUyMCUyNiUyMGludGVyY29ubmVjdGlvbg==">Large loads &amp; interconnection <span class="quarto-category-count">(1)</span></div><div class="category" data-category="TWFya2V0cyUyMCUyNiUyMHRhcmlmZnM=">Markets &amp; tariffs <span class="quarto-category-count">(1)</span></div><div class="category" data-category="TnVjbGVhciUyMCUyNiUyMFNNUnM=">Nuclear &amp; SMRs <span class="quarto-category-count">(1)</span></div><div class="category" data-category="UG9saWN5JTIwJTI2JTIwY3JlZGl0cw==">Policy &amp; credits <span class="quarto-category-count">(1)</span></div></div></div>
+    <h2 class="quarto-listing-category-title h5">Categories</h2><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(1)</span></div><div class="category" data-category="RGF0YSUyMCUyNiUyMG1ldGhvZHM=">Data &amp; methods <span class="quarto-category-count">(1)</span></div><div class="category" data-category="SHlkcm9nZW4=">Hydrogen <span class="quarto-category-count">(1)</span></div><div class="category" data-category="TGFyZ2UlMjBsb2FkcyUyMCUyNiUyMGludGVyY29ubmVjdGlvbg==">Large loads &amp; interconnection <span class="quarto-category-count">(1)</span></div><div class="category" data-category="TWFya2V0cyUyMCUyNiUyMHRhcmlmZnM=">Markets &amp; tariffs <span class="quarto-category-count">(1)</span></div><div class="category" data-category="TnVjbGVhciUyMCUyNiUyMFNNUnM=">Nuclear &amp; SMRs <span class="quarto-category-count">(1)</span></div><div class="category" data-category="UG9saWN5JTIwJTI2JTIwY3JlZGl0cw==">Policy &amp; credits <span class="quarto-category-count">(1)</span></div></div></div>
 
 <main class="content column-page-left" id="quarto-document-content">
 
+<noscript><style>@media (max-width: 1199.98px) { #quarto-header { position: relative; } #quarto-header .navbar-toggler { display: none; } #quarto-header #navbarCollapse { display: block !important; } } #quarto-header .quarto-navbar-tools { display: none; }</style></noscript>
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
@@ -440,11 +459,11 @@ window.Quarto = {
 
 <div class="quarto-listing quarto-listing-container-default" id="listing-listing">
 <div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="TGFyZ2UlMjBsb2FkcyUyMCUyNiUyMGludGVyY29ubmVjdGlvbiUyQ01hcmtldHMlMjAlMjYlMjB0YXJpZmZzJTJDTnVjbGVhciUyMCUyNiUyMFNNUnMlMkNIeWRyb2dlbiUyQ1BvbGljeSUyMCUyNiUyMGNyZWRpdHMlMkNEYXRhJTIwJTI2JTIwbWV0aG9kcw==" data-listing-date-sort="1793682000000" data-listing-file-modified-sort="1793641905061" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="5" data-listing-word-count-sort="933">
+<div class="quarto-post image-right" data-index="0" data-categories="TGFyZ2UlMjBsb2FkcyUyMCUyNiUyMGludGVyY29ubmVjdGlvbiUyQ01hcmtldHMlMjAlMjYlMjB0YXJpZmZzJTJDTnVjbGVhciUyMCUyNiUyMFNNUnMlMkNIeWRyb2dlbiUyQ1BvbGljeSUyMCUyNiUyMGNyZWRpdHMlMkNEYXRhJTIwJTI2JTIwbWV0aG9kcw==" data-listing-date-sort="1793682000000" data-listing-file-modified-sort="1794146131752" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="5" data-listing-word-count-sort="929">
 <div class="body">
-<h3 class="no-anchor listing-title">
+<h2 class="no-anchor listing-title h3">
 <a href="../field-notes/briefings/2026-11-03.html" class="no-external">Briefing — 3 November 2026</a>
-</h3>
+</h2>
 <div class="listing-categories">
 
 <div class="listing-category" onclick="window.quartoListingCategory('TGFyZ2UlMjBsb2FkcyUyMCUyNiUyMGludGVyY29ubmVjdGlvbg=='); return false;">Large loads &amp; interconnection</div>

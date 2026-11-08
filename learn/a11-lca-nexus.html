@@ -2,6 +2,22 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
+<script>(function () {
+  ["localStorage", "sessionStorage"].forEach(function (name) {
+    try { window[name].getItem("_"); return; } catch (e) { }   // storage works: leave it as it is
+    var data = Object.create(null);
+    var mem = {
+      getItem: function (k) { k = String(k); return k in data ? data[k] : null; },
+      setItem: function (k, v) { data[String(k)] = String(v); },
+      removeItem: function (k) { delete data[String(k)]; },
+      clear: function () { data = Object.create(null); },
+      key: function (i) { var keys = Object.keys(data); return i >= 0 && i < keys.length ? keys[i] : null; }
+    };
+    Object.defineProperty(mem, "length", { get: function () { return Object.keys(data).length; } });
+    Object.defineProperty(mem, "inMemory", { value: true });
+    try { Object.defineProperty(window, name, { configurable: true, enumerable: true, get: function () { return mem; } }); } catch (e) { }
+  });
+})();</script>
 <meta name="generator" content="quarto-1.10.19">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
@@ -94,8 +110,10 @@ ul.task-list li input[type="checkbox"] {
 <link rel="stylesheet" href="../assets/learn/learn.css">
 <meta property="og:title" content="What does ‘clean’ mean from cradle to grave? Life cycles, water and land – Honglin Li">
 <meta property="og:description" content="Analyst lesson A11 of Energy Systems, Step by Step: drag a life-cycle boundary around a solar farm, a gas plant and a data center and read carbon, water and land by stage from published medians and ranges; compare on one boundary, tell withdrawal from consumption, compare an attributional and a consequential answer, and follow a drought from reservoirs to gas plants.">
-<meta property="og:image" content="https://henryutd2021.github.io/learn/images/profile-square.jpg">
+<meta property="og:image" content="https://henryutd2021.github.io/images/profile-square.jpg">
 <meta property="og:site_name" content="Honglin Li">
+<meta property="og:url" content="https://henryutd2021.github.io/learn/a11-lca-nexus.html">
+<link rel="canonical" href="https://henryutd2021.github.io/learn/a11-lca-nexus.html">
 </head>
 
 <body class="nav-fixed page-learn page-lesson lx-form-cards quarto-light"><script id="quarto-html-before-body" type="application/javascript">
@@ -298,7 +316,7 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">Teaching</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../learn/index.html"> 
+    <a class="nav-link active" href="../learn/index.html" aria-current="true"> 
 <span class="menu-text">Learn</span></a>
   </li>  
   <li class="nav-item">
@@ -346,6 +364,7 @@ ul.task-list li input[type="checkbox"] {
 
 <main class="content column-page" id="quarto-document-content">
 
+<noscript><style>@media (max-width: 1199.98px) { #quarto-header { position: relative; } #quarto-header .navbar-toggler { display: none; } #quarto-header #navbarCollapse { display: block !important; } } #quarto-header .quarto-navbar-tools { display: none; }</style></noscript>
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
@@ -375,7 +394,7 @@ ul.task-list li input[type="checkbox"] {
 
 
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "name": "What does 'clean' mean from cradle to grave? Life cycles, water and land Drag a boundary around a solar farm, a gas plant and a data center, and watch carbon, water and land change with what you count", "description": "Analyst lesson A11 of Energy Systems, Step by Step: drag a life-cycle boundary around a solar farm, a gas plant and a data center and read carbon, water and land by stage from published medians and ranges; compare on one boundary, tell withdrawal from consumption, compare an attributional and a consequential answer, and follow a drought from reservoirs to gas plants.", "learningResourceType": "Interactive lesson", "educationalLevel": "Intermediate", "timeRequired": "PT55M", "inLanguage": "en", "isAccessibleForFree": true, "teaches": ["life-cycle stages", "system boundaries", "functional units", "water withdrawal against consumption", "land-use intensity", "attributional against consequential answers", "water and power in a drought"], "license": "https://creativecommons.org/licenses/by/4.0/", "author": {"@type": "Person", "name": "Honglin Li", "url": "https://henryutd2021.github.io/"}, "url": "https://henryutd2021.github.io/learn/a11-lca-nexus.html", "isPartOf": {"@type": "Course", "name": "Energy Systems, Step by Step", "url": "https://henryutd2021.github.io/learn/"}}</script>
-<script type="application/json" class="lx-lesson-data">{"id":"a11-lca-nexus","starter":null,"total":14,"code":"A11","title":"What does 'clean' mean from cradle to grave? Life cycles, water and land","subtitle":"Drag a boundary around a solar farm, a gas plant and a data center, and watch carbon, water and land change with what you count","short":"Life cycles, water, land","tier":"analyst","tier2":null,"tierLabel":"Analyst · L2","level":"L2","slot":2,"slot2":null,"minutes":25,"does":"Drag a life-cycle boundary around a solar farm, a gas plant and a data center and read carbon, water and land by stage from published medians and ranges; compare on one boundary; pick a cooling system; count the land between; compare an attributional and a consequential answer; switch on a drought.","outcome":"Name the boundary and functional unit behind a footprint, compare options on one boundary, tell water withdrawn from water consumed, and say whether a number is an attributional share or a consequential change.","icon":"drop","form":"cards","scales":["S0","S3"],"teaches":["life-cycle stages","system boundaries","functional units","water withdrawal against consumption","land-use intensity","attributional against consequential answers","water and power in a drought"],"lab":null,"href":"a11-lca-nexus.html","ready":true,"after":[{"id":"f11-air-climate-people","code":"F11","title":"What does energy do to the air, the climate and people's lives?","short":"Air, climate and bills","does":"Burn one tonne of coal, natural gas or oil and count its CO₂, the methane leaked before gas is burned and its SO₂, NOx and fine particles before and after controls; walk away from the stack; price the harm with EPA's estimates; then slide a Prairie City household's income and read its energy burden.","href":"f11-air-climate-people.html","ready":true}],"prev":null,"next":{"id":"a12-policy-instruments","code":"A12","title":"How do governments steer energy? Taxes, credits, standards and carbon prices","short":"Steering with policy","does":"Re-plan the Plains Grid's wind, solar, storage and gas under a carbon price, a production credit, an investment credit and a clean-energy standard; compare the CO₂ cut, the resource cost, the money that changes hands and the side effects, with a real rule of each kind, its jurisdiction and its date.","href":"a12-policy-instruments.html","ready":true},"practice":30}</script>
+<script type="application/json" class="lx-lesson-data">{"id":"a11-lca-nexus","starter":null,"total":14,"code":"A11","title":"What does 'clean' mean from cradle to grave? Life cycles, water and land","subtitle":"Drag a boundary around a solar farm, a gas plant and a data center, and watch carbon, water and land change with what you count","short":"Life cycles, water, land","tier":"analyst","tier2":null,"tierLabel":"Analyst · L2","level":"L2","slot":2,"slot2":null,"minutes":25,"does":"Drag a life-cycle boundary around a solar farm, a gas plant and a data center and read carbon, water and land by stage from published medians and ranges; compare on one boundary; pick a cooling system; count the land between; compare an attributional and a consequential answer; switch on a drought.","outcome":"Name the boundary and functional unit behind a footprint, compare options on one boundary, tell water withdrawn from water consumed, and say whether a number is an attributional share or a consequential change.","icon":"drop","form":"cards","scales":["S0","S3"],"teaches":["life-cycle stages","system boundaries","functional units","water withdrawal against consumption","land-use intensity","attributional against consequential answers","water and power in a drought"],"lab":null,"href":"a11-lca-nexus.html","ready":true,"after":[{"id":"f11-air-climate-people","code":"F11","title":"What does energy do to the air, the climate and people's lives?","short":"Air, climate and bills","does":"Burn one tonne of coal, natural gas or oil and count its CO₂, the methane leaked before gas is burned and its SO₂, NOx and fine particles before and after controls; walk away from the stack; price the harm with EPA's estimates; then slide a Prairie City household's income and read its energy burden.","href":"f11-air-climate-people.html","ready":true}],"prev":null,"next":{"id":"a12-policy-instruments","code":"A12","title":"How do governments steer energy? Taxes, credits, standards and carbon prices","short":"Steering with policy","does":"Re-plan the Plains Grid's wind, solar, storage and gas under a carbon price, a production credit, an investment credit and a clean-energy standard; compare the CO₂ cut, the resource cost, the money that changes hands and the side effects, with a real rule of each kind, its jurisdiction and its date.","href":"a12-policy-instruments.html","ready":true},"nextNeeds":[{"id":"12-trade-offs","starter":12,"title":"Cheap or clean? How do you weigh cost against emissions?","short":"Cheap or clean?","does":"Spot the plans nobody should pick, slide a carbon price, and trace the frontier between cost and CO₂.","href":"12-trade-offs.html","ready":true},{"id":"a01-project-tea","code":"A1","title":"Is this project worth building? Cash flows, discounting and the cost of capital","short":"Is it worth building?","does":"Build a wind farm's cash flows year by year; discount them at the cost of capital; move the loan share, the rate, the life and the price; read NPV, IRR and payback; a tornado chart ranks what matters.","href":"a01-project-tea.html","ready":true}],"practice":30}</script>
 <div class="lx-head" data-lesson-id="a11-lca-nexus" data-total="14" data-tier="analyst" data-level="L2" data-minutes="25" data-form="cards" data-next-href="a12-policy-instruments.html">
 <div>
 <nav class="lx-crumbs" aria-label="Breadcrumb"><ol><li><a href="index.html">Learn</a></li><li aria-current="page">A11</li></ol></nav>
@@ -611,6 +630,7 @@ ul.task-list li input[type="checkbox"] {
 <div class="lx-next lx-card" data-next-id="a12-policy-instruments">
 <p class="lx-eyebrow">Next</p>
 <p class="lx-next-t"><a href="a12-policy-instruments.html">A12 · How do governments steer energy? Taxes, credits, standards and carbon prices</a></p>
+<p class="lx-next-d lx-next-needs">Needs first: <a href="12-trade-offs.html">Lesson 12 · Cheap or clean?</a> and <a href="a01-project-tea.html">A1 · Is it worth building?</a>.</p>
 <button type="button" class="lx-btn ghost small lx-complete" data-complete="a11-lca-nexus" aria-pressed="false" hidden="">Mark this lesson as complete</button>
 </div>
 

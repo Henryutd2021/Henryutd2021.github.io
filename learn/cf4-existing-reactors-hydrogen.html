@@ -2,6 +2,22 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
+<script>(function () {
+  ["localStorage", "sessionStorage"].forEach(function (name) {
+    try { window[name].getItem("_"); return; } catch (e) { }   // storage works: leave it as it is
+    var data = Object.create(null);
+    var mem = {
+      getItem: function (k) { k = String(k); return k in data ? data[k] : null; },
+      setItem: function (k, v) { data[String(k)] = String(v); },
+      removeItem: function (k) { delete data[String(k)]; },
+      clear: function () { data = Object.create(null); },
+      key: function (i) { var keys = Object.keys(data); return i >= 0 && i < keys.length ? keys[i] : null; }
+    };
+    Object.defineProperty(mem, "length", { get: function () { return Object.keys(data).length; } });
+    Object.defineProperty(mem, "inMemory", { value: true });
+    try { Object.defineProperty(window, name, { configurable: true, enumerable: true, get: function () { return mem; } }); } catch (e) { }
+  });
+})();</script>
 <meta name="generator" content="quarto-1.10.19">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
@@ -122,8 +138,10 @@ window.Quarto = {
 <link rel="stylesheet" href="../assets/learn/learn.css">
 <meta property="og:title" content="Can existing reactors earn more by making hydrogen and providing grid services? – Honglin Li">
 <meta property="og:description" content="Case file CF4 of Energy Systems, Step by Step. Can existing U.S. nuclear power plants improve their economics and operating flexibility by adding high-temperature electrolysis, hydrogen storage and batteries, and by selling energy, hydrogen and ancillary services?">
-<meta property="og:image" content="https://henryutd2021.github.io/learn/images/profile-square.jpg">
+<meta property="og:image" content="https://henryutd2021.github.io/images/profile-square.jpg">
 <meta property="og:site_name" content="Honglin Li">
+<meta property="og:url" content="https://henryutd2021.github.io/learn/cf4-existing-reactors-hydrogen.html">
+<link rel="canonical" href="https://henryutd2021.github.io/learn/cf4-existing-reactors-hydrogen.html">
 </head>
 
 <body class="nav-fixed page-learn page-lesson lx-form-case quarto-light"><script id="quarto-html-before-body" type="application/javascript">
@@ -326,7 +344,7 @@ window.Quarto = {
 <span class="menu-text">Teaching</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../learn/index.html"> 
+    <a class="nav-link active" href="../learn/index.html" aria-current="true"> 
 <span class="menu-text">Learn</span></a>
   </li>  
   <li class="nav-item">
@@ -374,6 +392,7 @@ window.Quarto = {
 
 <main class="content column-page" id="quarto-document-content">
 
+<noscript><style>@media (max-width: 1199.98px) { #quarto-header { position: relative; } #quarto-header .navbar-toggler { display: none; } #quarto-header #navbarCollapse { display: block !important; } } #quarto-header .quarto-navbar-tools { display: none; }</style></noscript>
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
@@ -433,8 +452,8 @@ window.Quarto = {
 <details class="lx-deeper cf4-more"><summary><span class="k">Detail</span>From one year to a lifetime</summary><div class="lx-deeper-body"><ul><li>The study treats an existing plant's capital as already spent (a <span class="lx-term" data-term="sunk-cost">sunk cost</span>); the retrofit's cash flow adds the capital cost of the new hydrogen and battery equipment.</li><li>A <span class="lx-term" data-term="discounted-cash-flow">discounted cash-flow analysis</span> turns the optimized year into <span class="lx-term" data-term="net-present-value">net present value</span>, <span class="lx-term" data-term="internal-rate-of-return">internal rate of return</span>, <span class="lx-term" data-term="payback-period">payback</span> and levelized costs, with component-level capital costs and scheduled replacements.</li><li>Electricity and hydrogen prices are taken as given (<span class="lx-term" data-term="price-taker">price-taking</span>): the study evaluates plant operation against observed 2024 prices, and price feedback from wide adoption is stated as a limit and left to future work.</li></ul></div></details>
 <details class="lx-deeper cf4-more"><summary><span class="k">Detail</span>Sensitivity runs</summary><div class="lx-deeper-body"><p>Sensitivity runs on a representative reactor vary the electrolyzer's capacity bound and the level of electricity prices.</p></div></details></div>
 <div class="lx-case-part wide"><p class="lx-eyebrow">6 · What came out, and where it holds</p>
-<blockquote class="lx-excerpt blockquote" data-source="excerpt:npph2-existing"><p>Operated as baseload-only plants at 2024 market prices, with no credits, nearly all of the plants studied had negative <span class="lx-term" data-term="net-present-value">net present value</span>.</p><p>With hydrogen integration, including the assumed hydrogen production credit, a majority of the plants studied reached positive net present value.</p><p>With the assumed hydrogen credit, integrated operation added output flexibility: flexible output (the range of a plant's hourly output to the grid) expanded by more than 115 MW for most of the plants studied.</p><p>Ancillary-service revenue was a few percent of total revenue, which includes the hydrogen credit.</p><footer>Approved excerpt of: Li et al. (2026), <a href="https://doi.org/10.1038/s41467-026-73630-y">Nature Communications</a>.</footer></blockquote>
-<dl class="lx-ideas cf4-holds"><dt>Holds when</dt><dd data-e15="E15.24"><ul><li>2024 prices, taken as given;</li><li>modeled ancillary-service participation parameters;</li><li>the assumed hydrogen credit ($3/kg for ten years), with the dispatch held fixed after the credit expires;</li><li>an existing plant's capital treated as already spent;</li><li>no credits in the baseload case.</li></ul></dd><dt>Leaves out</dt><dd data-e15="E15.24"><p>price feedback from large-scale adoption.</p></dd></dl></div>
+<blockquote class="lx-excerpt blockquote" data-source="excerpt:npph2-existing"><p>Operated as electricity-only baseload plants at 2024 market prices, without capacity payments or the 45U credit, nearly all of the plants studied had negative <span class="lx-term" data-term="net-present-value">net present value</span>.</p><p>With hydrogen integration and the assumed hydrogen production credit ($3/kg for ten years), a majority of the plants studied reached positive net present value, even without the 45U credit.</p><p>With the assumed hydrogen credit, integrated operation added output flexibility: flexible output (the range of a plant's hourly output to the grid) expanded by more than 115 MW for most of the plants studied.</p><p>Ancillary-service revenue was a few percent of total revenue, which includes the hydrogen credit.</p><footer>From: Li et al. (2026), <a href="https://doi.org/10.1038/s41467-026-73630-y">Nature Communications</a>.</footer></blockquote>
+<dl class="lx-ideas cf4-holds"><dt>Holds when</dt><dd data-e15="E15.24"><ul><li>2024 prices, taken as given;</li><li>modeled ancillary-service participation parameters;</li><li>the assumed hydrogen credit ($3/kg for ten years), with the dispatch held fixed after the credit expires;</li><li>an existing plant's capital treated as already spent;</li><li>no capacity payments and no 45U credit in the baseload case.</li></ul></dd><dt>Leaves out</dt><dd data-e15="E15.24"><ul><li>capacity-market revenues;</li><li>price feedback from large-scale adoption.</li></ul></dd></dl></div>
 </div>
 <div class="lx-interactive" data-learn="cf4" data-src="../assets/learn/data/cf4-existing-reactors-hydrogen.json ../assets/learn/data/f01-five-scales.json">
 <div class="lx-fallback">
@@ -680,7 +699,7 @@ window.Quarto = {
 <div id="cf4-explain" class="lx-xgrid">
 <div class="lx-fallback">
 
-<p class="lx-eyebrow">Where the result holds</p><dl class="lx-ideas"><dt>It holds when</dt><dd><ul><li>42 existing plants in seven U.S. ISO/RTO markets, each at its own 2024 hourly prices, taken as given;</li><li>one year of hourly operation (8,760 hours) turned into a lifetime cash flow;</li><li>the existing plant's capital treated as already spent, so the capital counted is that of the new hydrogen and battery equipment;</li><li>the assumed hydrogen production credit ($3/kg for ten years) in the retrofit results shown here, with the dispatch held fixed after it expires;</li><li>no credits in the baseload case;</li><li>modeled ancillary-service participation parameters.</li></ul></dd><dt>It leaves out</dt><dd><ul><li>price feedback from large-scale adoption;</li><li>re-optimized operation after the credit expires.</li></ul></dd></dl><p class="lx-hint">Approved excerpt of: Li et al. (2026), Nature Communications.</p>
+<p class="lx-eyebrow">Where the result holds</p><dl class="lx-ideas"><dt>It holds when</dt><dd><ul><li>42 existing plants in seven U.S. ISO/RTO markets, each at its own 2024 hourly prices, taken as given;</li><li>one year of hourly operation (8,760 hours) turned into a lifetime cash flow;</li><li>the existing plant's capital treated as already spent, so the capital counted is that of the new hydrogen and battery equipment;</li><li>the assumed hydrogen production credit ($3/kg for ten years) in the retrofit results shown here, with the dispatch held fixed after it expires;</li><li>no capacity payments and no 45U credit in the baseload case;</li><li>modeled ancillary-service participation parameters.</li></ul></dd><dt>It leaves out</dt><dd><ul><li>capacity-market revenues;</li><li>price feedback from large-scale adoption;</li><li>re-optimized operation after the credit expires.</li></ul></dd></dl><p class="lx-hint">From: Li et al. (2026), Nature Communications.</p>
 
 </div>
 </div>

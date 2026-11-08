@@ -2,6 +2,22 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
+<script>(function () {
+  ["localStorage", "sessionStorage"].forEach(function (name) {
+    try { window[name].getItem("_"); return; } catch (e) { }   // storage works: leave it as it is
+    var data = Object.create(null);
+    var mem = {
+      getItem: function (k) { k = String(k); return k in data ? data[k] : null; },
+      setItem: function (k, v) { data[String(k)] = String(v); },
+      removeItem: function (k) { delete data[String(k)]; },
+      clear: function () { data = Object.create(null); },
+      key: function (i) { var keys = Object.keys(data); return i >= 0 && i < keys.length ? keys[i] : null; }
+    };
+    Object.defineProperty(mem, "length", { get: function () { return Object.keys(data).length; } });
+    Object.defineProperty(mem, "inMemory", { value: true });
+    try { Object.defineProperty(window, name, { configurable: true, enumerable: true, get: function () { return mem; } }); } catch (e) { }
+  });
+})();</script>
 <meta name="generator" content="quarto-1.10.19">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
@@ -93,9 +109,11 @@ ul.task-list li input[type="checkbox"] {
 <link rel="stylesheet" href="../assets/explainers.css">
 <meta property="og:title" content="Emission-intensity-informed load regulation for grid decarbonization – Honglin Li">
 <meta property="og:description" content="How much do the emissions attributed to electricity consumption fall when load is re-timed according to hourly average grid emission intensity across U.S. regions, and which strategies suit which types of grid?">
-<meta property="og:image" content="https://henryutd2021.github.io/images/projects/ghg.svg">
+<meta property="og:image" content="https://henryutd2021.github.io/images/projects/ghg.jpg">
 <meta property="og:site_name" content="Honglin Li">
-<meta property="og:image:alt" content="">
+<meta property="og:url" content="https://henryutd2021.github.io/projects/ghg.html">
+<meta property="og:image:alt" content="Cover illustration: Emission-intensity-informed load regulation for grid decarbonization">
+<link rel="canonical" href="https://henryutd2021.github.io/projects/ghg.html">
 </head>
 
 <body class="nav-fixed page-inner project-page theme-carbon quarto-light"><script id="quarto-html-before-body" type="application/javascript">
@@ -282,7 +300,7 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">Research</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../projects.html"> 
+    <a class="nav-link active" href="../projects.html" aria-current="true"> 
 <span class="menu-text">Projects</span></a>
   </li>  
   <li class="nav-item">
@@ -346,6 +364,7 @@ ul.task-list li input[type="checkbox"] {
 
 <main class="content column-page" id="quarto-document-content">
 
+<noscript><style>@media (max-width: 1199.98px) { #quarto-header { position: relative; } #quarto-header .navbar-toggler { display: none; } #quarto-header #navbarCollapse { display: block !important; } } #quarto-header .quarto-navbar-tools { display: none; }</style></noscript>
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">

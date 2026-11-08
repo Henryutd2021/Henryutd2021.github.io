@@ -1,5 +1,5 @@
 {
- "about": "CK-M, the Modeler checkpoint: an unseen problem in two variants (a water utility's pumping LP, or an analysis of Prairie Town's 2025 year), a supplied model with one planted defect, and a validation against an independent reference. Every number and brief is illustrative except the 2025 SPP shapes (town_year.json, EIA-930) and EIA's 2025 capacity factors. _tests/learn/test_ck-m-unseen-problem.js solves every model with the vendored HiGHS and checks every answer below.",
+ "about": "CK-M, the Modeler checkpoint: an unseen problem in two variants (a water utility's pumping LP, or an analysis of Prairie Town's 2025 year), a supplied model with one planted defect, and a validation against an independent reference. Every number and brief is illustrative except the 2025 SPP shapes (town_year.json, EIA-930) and EIA's 2025 capacity factors. The course's tests solve every model with the same HiGHS build the page uses and check every answer below.",
  "version": "ck-m v2 (3 Nov 2026)",
  "accessed": "2026-11-03",
  "rule": {
@@ -180,7 +180,7 @@
      "sha256": "1146158b972439db7c7f4cc7d0491e07644ddbf244d03b8ecb44cb2c833d10f1"
     }
    ],
-   "outputUrl": "https://www.eia.gov/electricity/gridmonitor/sixMonthFiles/",
+   "outputUrl": "https://www.eia.gov/electricity/gridmonitor/dashboard/electric_overview/US48/US48",
    "outputAccessed": "2026-11-05",
    "outputDerivedBy": "the same extraction step on the EIA-930 files, with the cleaning rules of the course's year file (town_year.json)",
    "src": [

@@ -1,5 +1,5 @@
 {
-  "about": "Lesson 11 (T11, 11-solver). Prairie Town is fictional; its plants, costs and the unserved-energy penalty are illustrative. The day is lesson 0's (3 September 2025, SPP shapes from EIA-930 in town_year.json). 'rule', 'signError', 'threshold' and 'precomputed' are written by node _tests/learn/test_11-solver.js --write from the lesson-0 model (grid-operator.js) and this lesson's model with the vendored HiGHS; the page solves live and uses 'precomputed' only if the solver cannot load. The test fails if any of them drifts.",
+  "about": "Lesson 11 (T11, 11-solver). Prairie Town is fictional; its plants, costs and the unserved-energy penalty are illustrative. The day is lesson 0's (3 September 2025, SPP shapes from EIA-930 in town_year.json). 'rule', 'signError', 'threshold' and 'precomputed' are computed from lesson 0's model and this lesson's model, solved with HiGHS 1.15.1, and checked against fresh solves; the page solves live and uses 'precomputed' only if the solver cannot load.",
   "built": "2026-11-02",
   "penalty": 3000,
   "penaltyNote": "Cost per MWh of unserved demand: a large illustrative number so that the solver keeps the lights on whenever it can.",

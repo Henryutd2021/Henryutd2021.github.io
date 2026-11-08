@@ -2,6 +2,22 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
+<script>(function () {
+  ["localStorage", "sessionStorage"].forEach(function (name) {
+    try { window[name].getItem("_"); return; } catch (e) { }   // storage works: leave it as it is
+    var data = Object.create(null);
+    var mem = {
+      getItem: function (k) { k = String(k); return k in data ? data[k] : null; },
+      setItem: function (k, v) { data[String(k)] = String(v); },
+      removeItem: function (k) { delete data[String(k)]; },
+      clear: function () { data = Object.create(null); },
+      key: function (i) { var keys = Object.keys(data); return i >= 0 && i < keys.length ? keys[i] : null; }
+    };
+    Object.defineProperty(mem, "length", { get: function () { return Object.keys(data).length; } });
+    Object.defineProperty(mem, "inMemory", { value: true });
+    try { Object.defineProperty(window, name, { configurable: true, enumerable: true, get: function () { return mem; } }); } catch (e) { }
+  });
+})();</script>
 <meta name="generator" content="quarto-1.10.19">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
@@ -94,7 +110,7 @@ ul.task-list li input[type="checkbox"] {
       valueNames: ['listing-kind','listing-id','listing-title','listing-short','listing-path','listing-starter','listing-tier','listing-tier2','listing-code','listing-status','listing-minutes','listing-does','listing-outcome','listing-after','listing-next','listing-form','listing-icon','listing-scales','listing-slot','listing-level','listing-reader','listing-math','listing-assumes','listing-goal','listing-door','listing-doord','listing-doorcta','listing-doorlink',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-file-modified-sort'] },{ data: ['listing-reading-time-sort'] },{ data: ['listing-word-count-sort'] }],
       page: 25,
     pagination: { item: "<li class='page-item'><a class='page page-link' href='#'></a></li>" },
-      searchColumns: ["listing-kind","listing-id","listing-slot","listing-icon","listing-title","listing-level","listing-reader","listing-math","listing-assumes","listing-goal","listing-door","listing-doord","listing-doorcta","listing-doorlink","listing-short","listing-project","listing-website","listing-format","listing-engines","listing-language","listing-subtitle","listing-description","listing-page-layout","listing-toc","listing-title-block-banner","listing-css","listing-body-classes","listing-path","listing-outputHref","listing-author","listing-filename","listing-file-modified","listing-reading-time","listing-word-count","listing-starter","listing-form","listing-tier","listing-status","listing-minutes","listing-teaches","listing-lab","listing-does","listing-outcome","listing-after","listing-scales","listing-tier2","listing-code","listing-next","listing-practice_minutes","listing-lab_minutes","listing-sandbox"],
+      searchColumns: ["listing-kind","listing-id","listing-slot","listing-icon","listing-title","listing-level","listing-reader","listing-math","listing-assumes","listing-goal","listing-door","listing-doord","listing-doorcta","listing-doorlink","listing-short","listing-project","listing-website","listing-format","listing-engines","listing-language","listing-subtitle","listing-description","listing-page-layout","listing-toc","listing-title-block-banner","listing-css","listing-body-classes","listing-path","listing-outputHref","listing-author","listing-filename","listing-file-modified","listing-reading-time","listing-word-count","listing-starter","listing-form","listing-tier","listing-status","listing-minutes","listing-teaches","listing-lab","listing-does","listing-outcome","listing-after","listing-scales","listing-tier2","listing-code","listing-next","listing-next_needs","listing-practice_minutes","listing-lab_minutes","listing-sandbox"],
     };
 
     window['quarto-listings'] = window['quarto-listings'] || {};
@@ -154,8 +170,10 @@ window.Quarto = {
 <link rel="stylesheet" href="../assets/learn/learn.css">
 <meta property="og:title" content="Energy Systems, Step by Step – Honglin Li">
 <meta property="og:description" content="Free interactive lessons on energy systems by Honglin Li: run a small town’s power grid, then learn what electricity costs and how to build and question optimization models, in tiers from beginner to graduate level.">
-<meta property="og:image" content="https://henryutd2021.github.io/learn/images/profile-square.jpg">
+<meta property="og:image" content="https://henryutd2021.github.io/images/profile-square.jpg">
 <meta property="og:site_name" content="Honglin Li">
+<meta property="og:url" content="https://henryutd2021.github.io/learn/">
+<link rel="canonical" href="https://henryutd2021.github.io/learn/">
 </head>
 
 <body class="nav-fixed page-learn page-learn-home quarto-light"><script id="quarto-html-before-body" type="application/javascript">
@@ -406,6 +424,7 @@ window.Quarto = {
 
 <main class="content column-page" id="quarto-document-content">
 
+<noscript><style>@media (max-width: 1199.98px) { #quarto-header { position: relative; } #quarto-header .navbar-toggler { display: none; } #quarto-header #navbarCollapse { display: block !important; } } #quarto-header .quarto-navbar-tools { display: none; }</style></noscript>
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
@@ -442,7 +461,7 @@ window.Quarto = {
 <summary>All lessons as a list</summary>
 <div class="lx-list-tiers">
 <section aria-labelledby="h-path">
-<h3 id="h-path" class="anchored"><i style="--c:var(--lx-ink-3)"></i>The starter path: 14 lessons across the tiers</h3>
+<h2 id="h-path" class="anchored"><i style="--c:var(--lx-ink-3)"></i>The starter path: 14 lessons across the tiers</h2>
 <ol start="0">
 
 <li id="lesson-0" data-lesson-id="00-grid-operator"><a href="../learn/00-grid-operator.html">How does the grid keep the lights on?</a> <span class="lx-code">· Foundations · 15 min · open</span></li>
@@ -477,7 +496,7 @@ window.Quarto = {
 </section>
 
 <section id="foundations" aria-labelledby="h-foundations">
-<h3 id="h-foundations" class="anchored"><i style="--c:var(--lx-tier-1)"></i>Foundations · L1</h3>
+<h2 id="h-foundations" class="anchored"><i style="--c:var(--lx-tier-1)"></i>Foundations · L1</h2>
 <p class="lx-hint">Explain how the power system works and reason with its numbers.</p>
 
 <ul>
@@ -488,7 +507,7 @@ window.Quarto = {
 </section>
 
 <section id="analyst" aria-labelledby="h-analyst">
-<h3 id="h-analyst" class="anchored"><i style="--c:var(--lx-tier-2)"></i>Analyst · L2</h3>
+<h2 id="h-analyst" class="anchored"><i style="--c:var(--lx-tier-2)"></i>Analyst · L2</h2>
 <p class="lx-hint">Work out costs, prices and trade-offs on paper and in a spreadsheet, and read an energy study critically.</p>
 
 <ul>
@@ -499,7 +518,7 @@ window.Quarto = {
 </section>
 
 <section id="modeler" aria-labelledby="h-modeler">
-<h3 id="h-modeler" class="anchored"><i style="--c:var(--lx-tier-3)"></i>Modeler · L3</h3>
+<h2 id="h-modeler" class="anchored"><i style="--c:var(--lx-tier-3)"></i>Modeler · L3</h2>
 <p class="lx-hint">Formulate, build, solve and critique an energy-system optimization model.</p>
 
 <ul>
@@ -510,7 +529,7 @@ window.Quarto = {
 </section>
 
 <section id="researcher" aria-labelledby="h-researcher">
-<h3 id="h-researcher" class="anchored"><i style="--c:var(--lx-tier-4)"></i>Researcher · L4</h3>
+<h2 id="h-researcher" class="anchored"><i style="--c:var(--lx-tier-4)"></i>Researcher · L4</h2>
 <p class="lx-hint">Prepare for supervised research: design, run and communicate a study at one chosen scale, and form independent, well-founded views.</p>
 
 <ul>
@@ -521,12 +540,12 @@ window.Quarto = {
 </section>
 
 <section id="toolbox" aria-labelledby="h-toolbox">
-<h3 id="h-toolbox" class="anchored"><i style="--c:var(--lx-ink-3)"></i>The math toolbox</h3>
+<h2 id="h-toolbox" class="anchored"><i style="--c:var(--lx-ink-3)"></i>The math toolbox</h2>
 <ul><li data-lesson-id="k01-units"><span class="lx-code">K1</span><a href="../learn/k01-units.html">Units and orders of magnitude</a> <span class="lx-code">· 10 min · open</span></li><li data-lesson-id="k02-rates-efficiencies"><span class="lx-code">K2</span><a href="../learn/k02-rates-efficiencies.html">Rates and efficiencies</a> <span class="lx-code">· 10 min · open</span></li><li data-lesson-id="k03-discounting"><span class="lx-code">K3</span><a href="../learn/k03-discounting.html">Exponentials and discounting</a> <span class="lx-code">· 15 min · open</span></li><li data-lesson-id="k04-linear-equations"><span class="lx-code">K4</span><a href="k04-linear-equations.html">Linear equations and inequalities</a> <span class="lx-code">· 15 min · open</span></li><li data-lesson-id="k05-probability-statistics"><span class="lx-code">K5</span><a href="../learn/k05-probability-statistics.html">Probability and statistics</a> <span class="lx-code">· 25 min · open</span></li><li data-lesson-id="k06-vectors-matrices"><span class="lx-code">K6</span><a href="../learn/k06-vectors-matrices.html">Vectors and matrices: what Ax ≤ b means</a> <span class="lx-code">· 25 min · open</span></li><li data-lesson-id="k07-spreadsheets"><span class="lx-code">K7</span><a href="k07-spreadsheets.html">Spreadsheets in practice</a> <span class="lx-code">· 20 min · open</span></li><li data-lesson-id="k08-git-notebooks"><span class="lx-code">K8</span><a href="../learn/k08-git-notebooks.html">Git and reproducible notebooks</a> <span class="lx-code">· 20 min · open</span></li></ul>
 </section>
 
 <section id="reference" aria-labelledby="h-reference">
-<h3 id="h-reference" class="anchored"><i style="--c:var(--lx-ink-3)"></i>Reference</h3>
+<h2 id="h-reference" class="anchored"><i style="--c:var(--lx-ink-3)"></i>Reference</h2>
 <ul><li><a href="regions.html">Regional profile cards</a> <span class="lx-code">· twelve energy systems in one structure, with dated key numbers · opened from F10</span></li></ul>
 </section>
 </div>
@@ -537,7 +556,12 @@ window.Quarto = {
 </nav>
 </div>
 <div class="lx-landing-note">
-<p>Reference: the <a href="regions.html">regional profile cards</a>, twelve energy systems in one structure with dated key numbers. Prairie Town is fictional; every real-world number in the lessons carries a source and a date. Your guesses and progress stay in this browser. Written by Honglin Li.</p>
+<p>Reference: the <a href="regions.html">regional profile cards</a>, twelve energy systems in one structure with dated key numbers. Prairie Town is fictional; every real-world number in the lessons carries a source and a date. Your guesses and progress stay in this browser, as long as it keeps site data; nothing is sent anywhere. Written by Honglin Li.</p>
+<div class="lx-reset" data-lx-reset="" hidden="">
+<button type="button" class="lx-btn ghost small">Clear all course data in this browser</button>
+<span class="lx-hint">Removes every guess, answer, draft, checkpoint attempt and completed-lesson tick this course keeps here (under <code>learn.v1</code>).</span>
+<span class="lx-hint" aria-live="polite"></span>
+</div>
 </div>
 
 <div class="lx-foot">

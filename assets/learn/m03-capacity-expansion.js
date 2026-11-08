@@ -181,6 +181,9 @@
   }
 
   // ---------------------------------------------------------------- the lesson
+  // the usual time of the two longest steps, seconds, at 6x CPU slowdown (a phone stand-in; solver bench, 8 November 2026):
+  // step 6 solves three plans and their full-year runs, step 8 the three storage rules' plans and their full-year runs
+  var STEP6_USUAL = 19, STEP8_USUAL = 13;
   LX.mount(LESSON, function (live, data, root) {
     css(); root.classList.add("m3-lab");
     var cfg = data["13_capstone"], D = data.m03_capacity_expansion, R = D.reference;
@@ -189,19 +192,19 @@
     function remember(k, v) { own[k] = v; LX.store.set(KEY, own); }
     var res = {};   // live results by set id: {est, y25, y24, size, ms}
     function sizeOf(id) { var m = planModel(S.C, S.weeks(id), { cap: cap }); return { cols: m.variables.length, rows: m.constraints.length }; }
-    // the plan for a set: solved here when the set is light enough for a phone, else the reference (precomputed, labelled)
+    // a step that runs several solves counts them on its status line's progress (count.st, count.n: the solves still
+    // missing when the step starts; each finished solve moves it on)
+    var count = { st: null, k: 0, n: 0 };
+    function counted() { if (count.st) count.st.step(Math.min(++count.k + 1, count.n), count.n); }
+    function counting(st, n) { count.st = n > 1 ? st : null; count.k = 0; count.n = n; return { steps: n > 1 ? n : null }; }
+    // the plan for a set, solved here (12 + 3 weeks is the largest: about 8 s at 6x CPU slowdown, a phone stand-in)
     function plan(id) {
       if (res[id] && res[id].est) return Promise.resolve(res[id]);
-      var set = setOf(D, id), RW = S.weeks(id);
+      var RW = S.weeks(id);
       res[id] = res[id] || {};
-      if (!set.live) {
-        var p = R.sets[id];
-        res[id].est = { plan: p.plan, cost: p.cost, co2: p.co2, weeks: p.weeks, hours: p.hours }; res[id].pre = true; res[id].size = { cols: p.cols, rows: p.rows };
-        res[id].y25 = p.y2025; res[id].y24 = p.y2024;
-        return Promise.resolve(res[id]);
-      }
       var m = planModel(S.C, RW, { cap: cap });
-      return LX.solver.solve(m, { timeLimit: 20, key: "m3-" + id, label: "m3-plan" }).then(function (r) {
+      return LX.solver.solve(m, { timeLimit: 30, key: "m3-" + id, label: "m3-plan" }).then(function (r) {
+        counted();
         if (!r.ok) { res[id].fail = r; return res[id]; }
         res[id].r = r; res[id].est = readPlan(S.C, RW, r, { cap: cap }); res[id].size = { cols: m.variables.length, rows: m.constraints.length }; res[id].ms = r.ms.roundTrip;
         return res[id];
@@ -213,14 +216,14 @@
       return plan(id).then(function (x) {
         if (x[k] || !x.est) return x;
         var Yx = y === 2024 ? S.Y2 : S.Y;
-        return LX.solver.solve(checkModel(S.C, Yx, x.est.plan), { timeLimit: 20, key: "m3-check-" + id + k, label: "m3-check" }).then(function (r) {
-          x["r" + k] = r; if (r.ok) x[k] = TP.readCheck(S.C, Yx, r, x.est.plan); else x.fail = r;
+        return LX.solver.solve(checkModel(S.C, Yx, x.est.plan), { timeLimit: 30, key: "m3-check-" + id + k, label: "m3-check" }).then(function (r) {
+          counted(); x["r" + k] = r; if (r.ok) x[k] = TP.readCheck(S.C, Yx, r, x.est.plan); else x.fail = r;
           return x;
         });
       });
     }
     // what a full-year run's cost counts: plants and fuel only
-    var SPEND = "Spending: building and running the plants. The re-run enforces no CO₂ cap and does not price unserved demand.";
+    var SPEND = "Spending: building and running the plants. The re-run's $" + S.C.voll.toLocaleString("en-US") + " per MWh shortage penalty steers its dispatch but is left out of spending; it enforces no CO₂ cap.";
     function verdict(host, x, k, year) {
       var c = x[k], e = TP.errors(x.est, c, cap, null), ul = H("ul", { class: "m3-verdict" }, host);
       function line(good, html) { var li = H("li", null, ul); H("span", { class: good ? "ok" : "no", html: LX.icon(good ? "check" : "question") }, li); H("span", { html: html }, li); }
@@ -235,7 +238,7 @@
       host.innerHTML = "";
       var t = table(host, ["Weeks", "~Modelled hours", "~LP columns", "Estimate", "~Full year: spending", "Full year: CO₂", "Full year: unserved"], ids.filter(function (id) { return res[id] && res[id].y25; }).map(function (id) {
         var x = res[id], c = x.y25, set = setOf(D, id);
-        return { cls: x.pre ? "pre" : "", cells: [set.label, String(x.est.hours.toLocaleString("en-US")), x.size.cols.toLocaleString("en-US"), fm.musd(x.est.cost), fm.musd(c.cost),
+        return { cells: [set.label, String(x.est.hours.toLocaleString("en-US")), x.size.cols.toLocaleString("en-US"), fm.musd(x.est.cost), fm.musd(c.cost),
           { text: fm.kt(c.co2), cls: c.co2 > cap + 0.5 ? "bad" : "ok" }, { text: c.unserved < 0.5 ? "0" : fm.mwh(c.unserved) + " · " + c.hours + " h", cls: c.unserved < 0.5 ? "ok" : "bad" }] };
       }), "Each way of choosing the weeks: its estimate and its full-year check");
       H("p", { class: "m3-note", text: SPEND }, host);
@@ -269,7 +272,7 @@
         build: function (act, api) {
           var f, key, pr = LX.Predict(act, { id: "m3-weights", fresh: true, q: "How does the goal turn a few weeks of running costs into a year's?", answer: "weight",
             options: [{ value: "weight", label: "Weight each modelled hour by the hours of the year it stands for" }, { value: "52", label: "Multiply every week's cost by 52" }, { value: "none", label: "Leave it: a few weeks are close enough" }],
-            feedback: { weight: "Each modelled hour counts as many hours of the year as it stands for.", "52": "A typical winter week does not stand for all 52 weeks.", none: "A year of building costs against a few weeks of fuel would make plants that are cheap to run look far too good." },
+            feedback: { weight: "Each modelled hour counts as many hours of the year as it stands for.", "52": "A typical winter week does not stand for all 52 weeks.", none: "A year of building costs against a few weeks of fuel counts fuel for too few hours, so plants that are cheap to build would look better than they are." },
             onPick: function () {
               pr.reveal(); f.hidden = false; key.hidden = false; api.done();
               api.saw("Build costs count once a year. Each modelled hour's running cost counts **w** times: its [[period-weight|weight]], the hours of 2025 it stands for.");
@@ -357,37 +360,40 @@
       // 6 more weeks
       { text: "More weeks make a larger LP. Predict first: on the full year, which leaves less demand unserved?",
         build: function (act, api) {
-          var tb, note, st, run;
+          var tb, st, run;
           var pr = LX.Predict(act, { id: "m3-more", fresh: true, q: "Which leaves less unserved energy on the full year?", answer: "x",
             options: [{ value: "t8", label: "8 typical weeks" }, { value: "x", label: "4 typical + 3 extreme weeks" }, { value: "same", label: "About the same" }],
             feedback: { t8: "More typical weeks still average the hardest weeks away.", x: "On the full year of 2025, keeping three extreme weeks beats doubling the typical ones.", same: "They differ several times over." },
             onPick: function () { run(); } });
           st = LX.SolverStatus(H("div", { class: "m3-row" }, act));
-          tb = H("div", null, act); note = H("p", { class: "m3-note", hidden: true, text: "Precomputed rows: their LPs are too large to solve quickly on a phone. The Node test and the notebook solve them again." }, act);
-          // every set's plan run on all of 2025; a failed solve leaves a message and "Try again"
-          run = action({ api: api, st: st, host: act, go: null,
-            job: function () { return Promise.all(SETROWS.map(function (id) { return check(id, 2025); })); },
+          tb = H("div", null, act);
+          // every set's plan run on all of 2025 (up to six solves); a failed solve leaves a message and "Try again"
+          run = action({ api: api, st: st, host: act, go: null, progress: { usual: STEP6_USUAL, unit: "solve" },
+            job: function () {
+              st.set("solving", counting(st, SETROWS.reduce(function (n, id) { var x = res[id]; return n + (x && x.est ? 0 : 1) + (x && x.y25 ? 0 : 1); }, 0)));
+              return Promise.all(SETROWS.map(function (id) { return check(id, 2025); }));
+            },
             failed: function () { return firstFail(SETROWS.map(function (id) { return [id, "y25"]; })); },
             show: function () {
-              st.set(res.typ8.ry25 || res.typ8.r); pr.reveal(); resultsTable(tb, SETROWS); note.hidden = false; api.done();
+              st.set(res.typ8.ry25 || res.typ8.r); pr.reveal(); resultsTable(tb, SETROWS); api.done();
               var a = res.typ8.y25, b = res.wk7.y25, c = res.wk15.y25;
               api.saw("8 typical weeks: " + fm.mwh(a.unserved) + " short; 4 + 3 extreme: " + fm.mwh(b.unserved) + ". With 12 + 3 weeks " + (c.unserved < 0.5 ? "every hour of 2025 is served" : fm.mwh(c.unserved) + " remain") +
                 ", yet CO₂ is " + fm.kt(c.co2) + ", and its LP has " + (res.wk15.size.cols / res.typ4.size.cols).toFixed(1) + " times the columns of the four-week one.");
             } });
-          if (res.wk15 && res.wk15.y25 && res.typ8 && res.typ8.y25) { resultsTable(tb, SETROWS); note.hidden = false; }
+          if (res.wk15 && res.wk15.y25 && res.typ8 && res.typ8.y25) resultsTable(tb, SETROWS);
         } },
       // 7 the estimate against the full-year optimum
       { text: function () { return "A second error measure: each estimate against the cheapest " + D.cap + " kt plan solved on all 8,760 hours (precomputed: an LP with " + D.reference.full.cols.toLocaleString("en-US") + " columns, too heavy for a phone). Predict first."; },
         build: function (act, api) {
           var ul, pr = LX.Predict(act, { id: "m3-sign", fresh: true, q: "The seven-week estimate, against the full-year optimum, is…", answer: "below",
             options: [{ value: "above", label: "above it" }, { value: "below", label: "below it" }, { value: "equal", label: "equal to it" }],
-            feedback: { above: "Fewer hard hours in the weeks make the plan look cheaper, not dearer.", below: "Fewer hard hours in the weeks make the plan look cheaper.", equal: "Fewer hard hours in the weeks make the plan look cheaper." },
+            feedback: { above: "Here the weeks miss hard hours, so the plan looks cheaper, not dearer.", below: "Here the weeks miss hard hours, so the plan looks cheaper.", equal: "Here the weeks miss hard hours, so the plan looks cheaper." },
             onPick: function () {
               pr.reveal(); ul.hidden = false; ul.innerHTML = "";
               var errs = SETROWS.map(function (id) { var e = R.sets[id].cost / R.full.cost - 1; return [setOf(D, id).label, e]; }), mx = Math.max.apply(null, errs.map(function (e) { return Math.abs(e[1]); }));
               errs.forEach(function (e) { var li = H("li", null, ul); H("span", { text: e[0] }, li); var b = H("span", { class: "bar" }, li); H("i", { style: "width:" + (Math.abs(e[1]) / mx * 100).toFixed(1) + "%" }, b); H("b", { text: fm.spct(e[1]) }, li); });
               api.done();
-              api.saw("All five estimates are below the full-year optimum of " + fm.musd(R.full.cost) + ": from " + fm.spct(errs[0][1]) + " (4 typical weeks) to " + fm.spct(errs[4][1]) + " (12 + 3). Fewer hard hours make a plan look cheaper.");
+              api.saw("All five estimates are below the full-year optimum of " + fm.musd(R.full.cost) + ": from " + fm.spct(errs[0][1]) + " (4 typical weeks) to " + fm.spct(errs[4][1]) + " (12 + 3). These weeks miss hard hours; other choices of weeks can err either way.");
             } });
           ul = H("ul", { class: "m3-bars", hidden: true, "aria-label": "Estimate error of each way of choosing the weeks" }, act);
           H("p", { class: "m3-note", html: LX.rich("Estimate error = (the weeks' optimal cost) ÷ (the full-year optimal cost) − 1, both at " + D.cap + " kt; reference numbers, the same on every device.") }, act);
@@ -402,7 +408,7 @@
           var info = H("ul", { class: "m3-info" }, act);
           [["What-if", "battery energy at $" + D.storage.energyCapex + " per kWh, not the sourced $" + Math.round(cfg.techs.battery.energyCapex) + " in " + cfg.priceYear + " dollars (lesson 13). An illustrative what-if, not a forecast or a sourced cost."],
            ["Why", "so the solver builds a battery large enough for the rules to differ."],
-           ["Runs", "three solves, a few seconds on a laptop. Each plan's full-year run was solved in advance; a plan that differs is run here."]]
+           ["Runs", "six solves: each rule's plan on the seven weeks, then that plan on all 8,760 hours of 2025."]]
             .forEach(function (r) { H("li", { html: "<b>" + r[0] + ":</b> " + LX.esc(r[1]) }, info); });
           var tb, st, run, out = {}, fail = null;
           var NAMES = { linked: "Linked", cyclic: "Cyclic", free: "No link" };   // short, so the table fits a phone (the rules list above explains them)
@@ -415,19 +421,21 @@
             // what each rule lets the battery carry from one week to the next
             H("p", { class: "m3-note", text: "Largest net change of the battery over one representative week: " + D.storage.modes.map(function (m) { return NAMES[m].toLowerCase() + " " + fm.mwh(largest(out[m].net)); }).join(", ") + "." }, tb);
           }
-          // the three planning LPs, solved here; each plan's full-year run is the stored one when the plan is the reference
-          // plan (it never depends on the reader's input), else solved here. Results already solved are kept for a retry.
+          // the three planning LPs and each plan's full-year run, solved here (six solves). Results already solved are
+          // kept for a retry.
           function solveAll() {
             var RW = S.weeks(D.storage.set), scap = D.storage.cap * 1e3; fail = null;
+            st.set("solving", counting(st, 2 * D.storage.modes.filter(function (m) { return !out[m]; }).length));
             return D.storage.modes.reduce(function (p, m) {
               return p.then(function () {
                 if (fail || out[m]) return;
                 st.set("solving");
-                return LX.solver.solve(planModel(S.Cw, RW, { cap: scap, mode: m }), { timeLimit: 20, label: "m3-storage" }).then(function (r) {
+                return LX.solver.solve(planModel(S.Cw, RW, { cap: scap, mode: m }), { timeLimit: 30, label: "m3-storage" }).then(function (r) {
+                  counted();
                   if (!r.ok) { fail = r; return; }
-                  var o = { est: readPlan(S.Cw, RW, r, { cap: scap }), net: netChanges(r, RW), r: r }, ref = R.storage[m];
-                  if (samePlan(o.est.plan, ref.plan)) { o.full = ref.full; o.stored = true; out[m] = o; return; }
-                  return LX.solver.solve(checkModel(S.Cw, S.Y, o.est.plan), { timeLimit: 20, label: "m3-storage-check" }).then(function (rc) {
+                  var o = { est: readPlan(S.Cw, RW, r, { cap: scap }), net: netChanges(r, RW), r: r };
+                  return LX.solver.solve(checkModel(S.Cw, S.Y, o.est.plan), { timeLimit: 30, label: "m3-storage-check" }).then(function (rc) {
+                    counted();
                     if (!rc.ok) { fail = rc; return; }
                     o.full = TP.readCheck(S.Cw, S.Y, rc, o.est.plan); out[m] = o;
                   });
@@ -441,7 +449,7 @@
             onPick: function () { pr.reveal(); run(); } });
           st = LX.SolverStatus(H("div", { class: "m3-row" }, act)); tb = H("div", null, act);
           H("p", { class: "m3-note", html: LX.rich("At the sourced $" + Math.round(cfg.techs.battery.energyCapex) + "/kWh the three rules' estimates agree within $0.1M: the battery built holds about an hour, so it has little to carry from one week to the next.") }, act);
-          run = action({ api: api, st: st, host: act, go: null, job: solveAll,
+          run = action({ api: api, st: st, host: act, go: null, job: solveAll, progress: { usual: STEP8_USUAL, unit: "solve" },
             failed: function () { return D.storage.modes.every(function (m) { return out[m]; }) ? null : fail || { status: "error", ok: false, message: "no result" }; },
             show: function () {
               st.set(out.free.r); show(); api.done();

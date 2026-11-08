@@ -199,6 +199,10 @@ body.lx-totop-off .to-top { opacity: 0 !important; pointer-events: none !importa
 .lx-intro p { margin: 0; }
 .lx-landing-note { margin-top: 1.6rem; font-size: 13.5px; color: var(--lx-ink-3); max-width: 80ch; }
 .lx-landing-note p { margin: 0; }
+.lx-landing-note .lx-reset { margin-top: .6rem; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
+.lx-landing-note .lx-reset[hidden] { display: none; }
+/* the notice when the browser keeps no site data (core.js): progress lasts only until a reload */
+.lx-store-note { margin: 0 0 1rem; padding: 8px 12px; border-left: 4px solid var(--lx-warn); border-radius: 0 8px 8px 0; background: var(--lx-warn-soft); color: var(--lx-ink); font-size: 14.5px; max-width: 80ch; }
 .lx-real p:not(.lx-eyebrow), .lx-sources ul, .lx-real ol { font-size: 14.5px; color: var(--lx-ink-2); }
 .lx-card > .lx-eyebrow { margin-bottom: 6px; }
 
@@ -519,7 +523,9 @@ details.lx-deeper .k { font-size: 11.5px; letter-spacing: .07em; text-transform:
 .lx-xgrid { display: grid; gap: 18px; }
 .lx-xcard { background: var(--lx-surface); border: 1px solid var(--lx-line); border-radius: var(--lx-r-lg); padding: 18px 20px; display: grid; gap: 12px; min-width: 0; }
 .lx-x-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 6px 16px; }
-.page-learn .lx-x-head h3 { font-size: 20px; }
+.page-learn .lx-x-head :is(h2, h3) { font-size: 20px; }
+/* the title as an h2 (a card right under the page title: LX.hTag in core.js) keeps the h3's look */
+.page-learn .lx-x-head h2 { margin: 0; opacity: .9; }
 .lx-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
 .lx-chip { display: inline-flex; align-items: center; gap: 7px; min-height: 36px; padding: 4px 12px 4px 10px; border-radius: 10px; border: 1px solid var(--lx-line-2);
   background: var(--lx-surface); color: var(--lx-ink); cursor: pointer; font-family: var(--lx-f-display); font-size: 14px; font-weight: 500; }
@@ -545,7 +551,7 @@ details.lx-deeper .k { font-size: 11.5px; letter-spacing: .07em; text-transform:
 .cedge.dim path { opacity: .35; }   /* the label keeps its colour (ink-3, 4.5:1) */
 .lx-cmap.narrow .cedge text { display: none; }
 .lx-cdetail { border: 1px solid var(--lx-line); border-radius: 12px; padding: 14px; display: grid; gap: 8px; background: var(--lx-surface-2); align-content: start; }
-.page-learn .lx-cdetail h4 { font-size: 18px; margin: 0; }
+.page-learn .lx-cdetail :is(h3, h4) { font-size: 18px; margin: 0; }   /* h3 under a map titled with an h2 */
 .lx-cdetail p { font-size: 15px; }
 .lx-cdetail .ingame { font-size: 14px; color: var(--lx-ink-2); border-top: 1px dashed var(--lx-line-2); padding-top: 8px; }
 .lx-cdetail .ingame > b { font-family: var(--lx-f-display); font-weight: 500; font-size: 12px; letter-spacing: .05em; text-transform: uppercase; color: var(--lx-ink-3); display: block; }
@@ -791,7 +797,7 @@ details.lx-deeper .k { font-size: 11.5px; letter-spacing: .07em; text-transform:
 .lx-preview .ic { width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center; background: color-mix(in srgb, var(--c) 15%, var(--lx-surface)); color: var(--c); flex: none; }
 .lx-preview .ic .lx-ic { width: 22px; height: 22px; }
 .lx-preview .k { font-family: var(--lx-f-mono); font-size: 12px; color: var(--lx-ink-3); }
-.page-learn .lx-preview h3 { font-size: 16.5px; margin: 0; }
+.page-learn .lx-preview h2 { font-size: 16.5px; margin: 0; }
 .lx-preview p { font-size: 14.5px; color: var(--lx-ink-2); }
 .lx-preview .pf { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
 .lx-preview-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 5px; font-size: 14.5px; line-height: 1.35; }
@@ -834,8 +840,8 @@ details.lx-deeper .k { font-size: 11.5px; letter-spacing: .07em; text-transform:
 details.lx-listview { margin-top: 14px; background: var(--lx-surface); border: 1px solid var(--lx-line); border-radius: var(--lx-r); padding: 0 16px; }
 details.lx-listview > summary { cursor: pointer; min-height: 48px; display: flex; align-items: center; font-family: var(--lx-f-display); font-weight: 500; font-size: 15px; color: var(--lx-ink); }
 .lx-list-tiers { display: grid; gap: 14px; padding-bottom: 14px; }
-.page-learn .lx-list-tiers h3 { font-size: 16px; display: flex; align-items: center; gap: 8px; margin: 0 0 4px; }
-.lx-list-tiers h3 i { width: 18px; height: 5px; border-radius: 3px; background: var(--c); }
+.page-learn .lx-list-tiers h2 { font-size: 16px; display: flex; align-items: center; gap: 8px; margin: 0 0 4px; }
+.lx-list-tiers h2 i { width: 18px; height: 5px; border-radius: 3px; background: var(--c); }
 .lx-list-tiers ol, .lx-list-tiers ul { margin: 0; padding-left: 1.3rem; font-size: 14.5px; color: var(--lx-ink-2); }
 .lx-list-tiers li { margin: 3px 0; }
 .lx-list-tiers .lx-code { font-family: var(--lx-f-mono); font-size: 12px; color: var(--lx-ink-3); margin-right: 6px; }
@@ -858,6 +864,16 @@ details.lx-listview > summary { cursor: pointer; min-height: 48px; display: flex
 .lx-solver-status[data-status="loading"]::before, .lx-solver-status[data-status="solving"]::before { animation: lx-solver-pulse 1s ease-in-out infinite alternate; }
 @keyframes lx-solver-pulse { from { opacity: .25; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .lx-solver-status::before { animation: none !important; } }
+/* the progress line of a long solve (LX.SolveProgress): appears after two seconds, next to the control that started
+   the solve; a moving bar (none with reduced motion), the seconds elapsed, step k of n and the usual time. No
+   percentage: the solver cannot know one. */
+.lx-solve-prog { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin: 6px 0 0; font-size: 13.5px; line-height: 1.4; color: var(--lx-ink-2); }
+.lx-solve-prog[hidden] { display: none; }
+.lx-solve-prog-bar { position: relative; flex: none; width: 88px; height: 6px; overflow: hidden; border-radius: 3px; background: var(--lx-surface-3); }
+.lx-solve-prog-bar::after { content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: 36%; border-radius: 3px; background: var(--lx-accent); animation: lx-solve-slide 1.6s ease-in-out infinite; }
+.lx-solve-prog-text { min-width: 0; font-variant-numeric: tabular-nums; }
+@keyframes lx-solve-slide { 0% { transform: translateX(-100%); } 100% { transform: translateX(280%); } }
+@media (prefers-reduced-motion: reduce) { .lx-solve-prog-bar { display: none; } }
 
 /* plot.css — LX.Plot and LX.PlotCard (plot.js): the XY chart's text and focus ring, the caption, and the chart card with
    value chips (readouts) above the chart; also the model-lab stage (.lx-stage: a card with a head, readouts, sliders,
@@ -900,7 +916,8 @@ details.lx-listview > summary { cursor: pointer; min-height: 48px; display: flex
 .lx-stage { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; background: var(--lx-surface); border: 1px solid var(--lx-line); border-radius: var(--lx-r-lg); padding: 14px 16px; box-shadow: var(--lx-shadow); min-width: 0; }
 .lx-stage[hidden] { display: none; }
 .lx-stage-head { display: flex; justify-content: space-between; align-items: baseline; gap: 6px 12px; flex-wrap: wrap; }
-.page-learn .lx-stage-head h3 { font-size: 16px; margin: 0; }
+.page-learn .lx-stage-head :is(h2, h3) { font-size: 16px; margin: 0; }
+.page-learn .lx-stage-head h2 { opacity: .9; }   /* an h2 when the stage sits right under the page title (LX.hTag): the h3's look */
 .lx-stage-status { font-size: 14.5px; color: var(--lx-ink-2); min-height: 1.3em; }
 .lx-stage-status b { font-family: var(--lx-f-display); font-weight: 600; }
 .lx-ctls { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px 18px; }
@@ -1780,7 +1797,12 @@ body.page-learn { --t: var(--lx-accent); }
    hourly table and the verdict list. The lx13- prefix stays because both lessons use these classes. Colours from --lx-* tokens only. */
 .lx13-stage{display:grid;gap:14px;min-width:0}
 .lx13-card{background:var(--lx-surface);border:1px solid var(--lx-line);border-radius:var(--lx-r-lg);padding:14px 16px;display:grid;gap:10px;min-width:0}
-.page-learn .lx13-card h3{font-size:17px}
+.page-learn .lx13-card :is(h2,h3){font-size:17px}
+/* the card's title as an h2 (right under the page title: LX.hTag in core.js) keeps the h3's look; the id and three classes
+   outweigh the theme's first-h2-in-a-section margin on narrow screens */
+.page-learn #quarto-content .lx13-card .lx13-head h2{margin:0;opacity:.9}
+/* the same for the play panel's title (lesson 13's "What to build"), at the size of the theme's h3 */
+.page-learn #quarto-content .lx-play-panel .lx13-head h2{font-size:18px;margin:0;opacity:.9}
 .lx13-head{display:flex;justify-content:space-between;align-items:center;gap:6px 12px;flex-wrap:wrap}
 .lx13-sub{font-size:13.5px;color:var(--lx-ink-3)}
 /* nothing in a card may widen it: wide tables scroll in their own box (.lx13-hours, lesson 12's .lx12-scroll; without
@@ -2433,6 +2455,11 @@ body.page-learn.quarto-dark { --lx-scale-0: #5CC0B1; --lx-scale-1: #5AAED2; --lx
 .e3-keys b { font-weight: 600; color: var(--lx-ink); }
 .e3-hh-off { margin: 0 !important; padding: 8px 12px; border-radius: 10px; background: var(--lx-warn-soft, var(--lx-surface-2)); }
 .e3-notes { margin: .3rem 0 0; padding-left: 1.1rem; display: grid; gap: 2px; font-size: 13.5px; color: var(--lx-ink-2); }
+/* SB3's presets said beside their buttons: the last one picked, and all of them in a fold */
+.e3-pre-say { margin: 4px 0 0 !important; }
+.e3-fold { margin: 4px 0 0; font-size: 13.5px; }
+.e3-fold > summary { cursor: pointer; color: var(--lx-ink-2); }
+.e3-fold .e3-notes { margin-top: 4px; }
 
 /* engine-e4.css — the view pieces of engine E4 (LX.E4.ui: the bench's controls, the nation's map, the mix, CO2 and import
    charts, tables), shared by SB4, M13 and C4. Colours from --lx-* tokens only; no overflow clipping (chart tips stay

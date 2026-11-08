@@ -1,46 +1,6 @@
 [
   {
-    "listing": "/learn/index.html",
-    "items": [
-      "/learn/00-grid-operator.html",
-      "/learn/01-power-energy.html",
-      "/learn/02-demand.html",
-      "/learn/05-capacity-factor.html",
-      "/learn/06-three-jobs.html",
-      "/learn/07-cost.html",
-      "/learn/08-merit-order.html",
-      "/learn/12-trade-offs.html",
-      "/learn/13-capstone.html",
-      "/learn/a19-gis-siting.html",
-      "/learn/m02-unit-commitment.html",
-      "/learn/m07-monte-carlo.html",
-      "/learn/m08-stochastic-robust.html",
-      "/learn/m09-surrogates-uq.html",
-      "/learn/m10-ml-forecasting.html",
-      "/learn/m14-did-it-work.html",
-      "/learn/k01-units.html",
-      "/learn/k02-rates-efficiencies.html",
-      "/learn/k03-discounting.html",
-      "/learn/k05-probability-statistics.html",
-      "/learn/k06-vectors-matrices.html",
-      "/learn/k08-git-notebooks.html"
-    ]
-  },
-  {
-    "listing": "/field-notes/perspectives.html",
-    "items": [
-      "/field-notes/perspectives/2026-11-three-jobs.html"
-    ]
-  },
-  {
-    "listing": "/field-notes.html",
-    "items": [
-      "/field-notes/briefings/2026-11-03.html",
-      "/field-notes/perspectives/2026-11-three-jobs.html"
-    ]
-  },
-  {
-    "listing": "/index.html",
+    "listing": "/field-notes/briefings.html",
     "items": [
       "/field-notes/briefings/2026-11-03.html"
     ]
@@ -65,9 +25,49 @@
     ]
   },
   {
-    "listing": "/field-notes/briefings.html",
+    "listing": "/index.html",
     "items": [
       "/field-notes/briefings/2026-11-03.html"
+    ]
+  },
+  {
+    "listing": "/field-notes.html",
+    "items": [
+      "/field-notes/briefings/2026-11-03.html",
+      "/field-notes/perspectives/2026-11-three-jobs.html"
+    ]
+  },
+  {
+    "listing": "/field-notes/perspectives.html",
+    "items": [
+      "/field-notes/perspectives/2026-11-three-jobs.html"
+    ]
+  },
+  {
+    "listing": "/learn/index.html",
+    "items": [
+      "/learn/00-grid-operator.html",
+      "/learn/01-power-energy.html",
+      "/learn/02-demand.html",
+      "/learn/05-capacity-factor.html",
+      "/learn/06-three-jobs.html",
+      "/learn/07-cost.html",
+      "/learn/08-merit-order.html",
+      "/learn/12-trade-offs.html",
+      "/learn/13-capstone.html",
+      "/learn/a19-gis-siting.html",
+      "/learn/m02-unit-commitment.html",
+      "/learn/m07-monte-carlo.html",
+      "/learn/m08-stochastic-robust.html",
+      "/learn/m09-surrogates-uq.html",
+      "/learn/m10-ml-forecasting.html",
+      "/learn/m14-did-it-work.html",
+      "/learn/k01-units.html",
+      "/learn/k02-rates-efficiencies.html",
+      "/learn/k03-discounting.html",
+      "/learn/k05-probability-statistics.html",
+      "/learn/k06-vectors-matrices.html",
+      "/learn/k08-git-notebooks.html"
     ]
   }
 ]

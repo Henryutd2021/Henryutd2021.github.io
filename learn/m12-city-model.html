@@ -2,6 +2,22 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
+<script>(function () {
+  ["localStorage", "sessionStorage"].forEach(function (name) {
+    try { window[name].getItem("_"); return; } catch (e) { }   // storage works: leave it as it is
+    var data = Object.create(null);
+    var mem = {
+      getItem: function (k) { k = String(k); return k in data ? data[k] : null; },
+      setItem: function (k, v) { data[String(k)] = String(v); },
+      removeItem: function (k) { delete data[String(k)]; },
+      clear: function () { data = Object.create(null); },
+      key: function (i) { var keys = Object.keys(data); return i >= 0 && i < keys.length ? keys[i] : null; }
+    };
+    Object.defineProperty(mem, "length", { get: function () { return Object.keys(data).length; } });
+    Object.defineProperty(mem, "inMemory", { value: true });
+    try { Object.defineProperty(window, name, { configurable: true, enumerable: true, get: function () { return mem; } }); } catch (e) { }
+  });
+})();</script>
 <meta name="generator" content="quarto-1.10.19">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
@@ -122,8 +138,10 @@ window.Quarto = {
 <link rel="stylesheet" href="../assets/learn/learn.css">
 <meta property="og:title" content="Model a city’s energy system: an energy hub with grid limits and screening fairness outputs – Honglin Li">
 <meta property="og:description" content="Modeler lesson M12 of Energy Systems, Step by Step: a fictional city’s heat pumps, retrofits, district heat, car charging, rooftop solar and batteries in one linear program with a limit on each district’s substation; the limits’ and a CO2 cap’s duals; bills by household group as screening estimates from an accounting layer.">
-<meta property="og:image" content="https://henryutd2021.github.io/learn/images/profile-square.jpg">
+<meta property="og:image" content="https://henryutd2021.github.io/images/profile-square.jpg">
 <meta property="og:site_name" content="Honglin Li">
+<meta property="og:url" content="https://henryutd2021.github.io/learn/m12-city-model.html">
+<link rel="canonical" href="https://henryutd2021.github.io/learn/m12-city-model.html">
 </head>
 
 <body class="nav-fixed page-learn page-lesson lx-form-cards quarto-light"><script id="quarto-html-before-body" type="application/javascript">
@@ -326,7 +344,7 @@ window.Quarto = {
 <span class="menu-text">Teaching</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../learn/index.html"> 
+    <a class="nav-link active" href="../learn/index.html" aria-current="true"> 
 <span class="menu-text">Learn</span></a>
   </li>  
   <li class="nav-item">
@@ -374,6 +392,7 @@ window.Quarto = {
 
 <main class="content column-page" id="quarto-document-content">
 
+<noscript><style>@media (max-width: 1199.98px) { #quarto-header { position: relative; } #quarto-header .navbar-toggler { display: none; } #quarto-header #navbarCollapse { display: block !important; } } #quarto-header .quarto-navbar-tools { display: none; }</style></noscript>
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
@@ -471,7 +490,7 @@ window.Quarto = {
 </div>
 <div class="lx-datanote m12-note"><svg class="lx-ic" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5M12 8v.2"></path></svg><ul>
 <li><b>Illustrative:</b> Prairie City, its three districts, one substation each and its household groups (prairie-city.json); retrofit, district-heat and upgrade costs are set for teaching, fixed here at their defaults (the inputs table lists them; the <a href="sb3-city-planner.html">City Planner</a> changes them).</li>
-<li><b>Based on public data:</b> Kansas's 2025 prices (EIA), Wichita's weather normals (NOAA), SPP's 2025 hourly shapes (EIA-930), eGRID's 2023 SPP North CO₂ rate (EPA), DOE LEAD's income bands; heat pumps and rooftop solar from EIA, batteries from NREL, 2025 dollars.</li>
+<li><b>Based on public data:</b> Kansas's 2025 prices (EIA), Wichita's weather normals (NOAA), the Southwest Power Pool's (SPP's) 2025 hourly shapes (EIA-930), eGRID's 2023 SPP North CO₂ rate (EPA), DOE LEAD's income bands; heat pumps and rooftop solar from EIA, batteries from NREL, 2025 dollars.</li>
 <li><b>Time:</b> eight representative days of 2025, weighted to 365 days; a cold design day and the summer peak day kept. Weather: NOAA's normals on SPP's 2025 days (synthetic). The full-year check, below the steps, runs the four plans on every hour of 2025.</li>
 <li><b>Solver:</b> <a href="https://ergo-code.github.io/HiGHS/dev/">HiGHS</a> (open source), loaded on your first run (about 3.5 MB, once).</li>
 </ul></div>
@@ -518,7 +537,7 @@ window.Quarto = {
 <dt>The substation's ceiling</dt><dd>Each hour's purchase stays under the limit plus any upgrade; its dual is the value of one more MW of room in that hour.</dd>
 <dt>The cap's dual</dt><dd>When the LP chooses under a CO₂ cap, the cap's dual is the cost of the last tonne cut, under this model's assumptions.</dd>
 <dt>Kept apart</dt><dd>Bills and energy burden by household group come from an accounting layer after the LP, with a stated rule for who adopts first.</dd>
-<dt>The full-year check</dt><dd>The four plans, run again on every hour of 2025 with what the eight days decided kept: cost and CO₂ hold; the upgrades the eight days buy fall a little short on 19 or 20 February.</dd>
+<dt>The full-year check</dt><dd>The four plans, run again on every hour of 2025 with what the eight days decided kept: total cost and CO₂ hold; the upgrades the eight days buy fall a little short on 19 or 20 February.</dd>
 </dl>
 
 <div class="lx-scroll-x">
@@ -626,20 +645,20 @@ window.Quarto = {
 <td>given</td>
 </tr>
 <tr class="odd">
-<td><span class="math inline">\(p_d\)</span>, <span class="math inline">\(a\)</span></td>
-<td><span class="math inline">\(d\)</span>’s 2025 electricity price; the upgrade’s yearly cost</td>
-<td>$/MWh; $ per MW a year</td>
+<td><span class="math inline">\(p_d\)</span>, <span class="math inline">\(p_{ind}\)</span>, <span class="math inline">\(a\)</span></td>
+<td><span class="math inline">\(d\)</span>’s 2025 electricity price; the industrial price the network’s plant pays; the upgrade’s yearly cost</td>
+<td>$/MWh; $/MWh; $ per MW a year</td>
 <td>given</td>
 </tr>
 <tr class="even">
 <td><span class="math inline">\(B_{dkh}\)</span>, <span class="math inline">\(Q_{dkh}\)</span></td>
-<td>base load; heat needed</td>
+<td>base load; heat needed: the hour’s temperature deficit below 18.3 °C × the heat-loss rate (MW of heat per °C)</td>
 <td>MW; MW of heat</td>
 <td>given (prairie-city.json)</td>
 </tr>
 <tr class="odd">
 <td><span class="math inline">\(\sigma\)</span>, <span class="math inline">\(COP_{kh}\)</span></td>
-<td>heat a retrofit saves; heat pump’s heat per unit of power</td>
+<td>heat a retrofit saves; the heat pump’s coefficient of performance (heat out per unit of electricity in)</td>
 <td>share; MWh/MWh</td>
 <td>given</td>
 </tr>
@@ -664,8 +683,9 @@ window.Quarto = {
 </tbody>
 </table>
 </div>
-<p><span class="math display">\[\min\; \sum_k w_k \sum_h \sum_d p_d\, imp_{dkh} \;+\; a \sum_d up_d \;+\; \text{fuel}(y) \;[+\; \text{equipment}(y, \text{sizes})]\]</span></p>
-<p>Each district-hour (the balance; its dual is the marginal cost of one more MWh there):</p>
+<p><span class="math display">\[\min\; \sum_k w_k \sum_h \Big[\sum_d p_d\, imp_{dkh} + (p_{ind} - p_{core})\, pl_{kh}\Big] \;+\; a \sum_d up_d \;+\; \text{fuel}(y, boil) \;[+\; \text{equipment}(y, \text{sizes})]\]</span></p>
+<p>The plant’s power comes through the core’s substation but is bought at the industrial price: the second term swaps one price for the other. Fuel is the furnaces’ gas and propane (set by <span class="math inline">\(y\)</span>) and the network boiler’s gas: <span class="math inline">\(\sum_k w_k \sum_h boil_{kh} \div 0.9\)</span> at the commercial gas price.</p>
+<p>Each district-hour (the balance). Its dual carries the day’s weight <span class="math inline">\(w_k\)</span>: divided by <span class="math inline">\(w_k\)</span>, it is the marginal cost of one more MWh in one such hour, as the engine reports it. The substation duals stay summed over the year, in $ per MW a year.</p>
 <p><span class="math display">\[imp + pv + o - c - ev - \sum_{e,s} Q_{dkh}\,(1 - \sigma e)\; y_{d,e,s}\;\kappa_s - [d = \text{core}]\, pl_{kh} = B_{dkh}, \qquad \kappa_{res} = 1,\; \kappa_{hp} = \frac{1}{COP_{kh}},\; \kappa_{fuel} = \kappa_{dh} = 0\]</span></p>
 <p>The heat network in the core (its own heat balance, with 10% lost in the pipes and a store that loses 0.5% an hour):</p>
 <p><span class="math display">\[hp_{kh} + boil_{kh} + so_{kh} - si_{kh} = \frac{1}{0.9}\sum_{e} Q_{\text{core},kh}\,(1 - \sigma e)\; y_{\text{core},e,dh}, \qquad pl_{kh} = \frac{hp_{kh}}{3}\]</span></p>
@@ -723,7 +743,7 @@ window.Quarto = {
 <div class="lx-deeper-body">
 <ul class="m12-rules">
 <li>One ceiling per substation stands for a whole distribution network; real planning checks each feeder's power flow and voltage (<a href="a17-physical-feasibility.html">A17</a>).</li>
-<li>Storage resets every day, on the eight days and in the full-year check: no carrying heat or charge between days.</li>
+<li>Each day ends with the stored energy it started with, a level the LP picks day by day, on the eight days and in the full-year check: no heat or charge carried between days.</li>
 <li>The full-year check uses the same synthetic weather rule: it tests the choice of days, not another weather year.</li>
 <li>Many plans cost nearly the same; methods that map near-optimal plans show the choice is wider than one optimum.</li>
 </ul>
@@ -737,7 +757,7 @@ window.Quarto = {
 </section>
 <div class="lx-myths" data-quiz="m12-myths">
 <div class="lx-qq" data-id="kwh" data-answer="myth"><p class="lx-qtext">Electrifying heat only adds yearly kWh; the grid sees a small rise.</p><ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. The limit binds in the coldest night's hours, when heat pumps' COP is lowest and every home heats at once; the yearly total hides that hour.</p></details></div>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. Cold weather, when heat pumps' COP is low, lifts heating in every home at once; with the base load and car charging it sets the busiest hour (06:00 or 20:00 here), which the yearly total hides.</p></details></div>
 <div class="lx-qq" data-id="dual" data-answer="fact"><p class="lx-qtext">Where the LP buys an upgrade, the substation's duals summed over the year equal the upgrade's yearly cost per MW.</p><ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
 <details class="lx-answer"><summary>Answer</summary><p>Fact. One more MW of limit saves one MW of upgrade; the test checks it as a cost slope both ways.</p></details></div>
 <div class="lx-qq" data-id="burden" data-answer="myth"><p class="lx-qtext">The LP tells you how a plan changes each household group's energy burden.</p><ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
@@ -783,14 +803,14 @@ window.Quarto = {
 <td class="s">EPA eGRID2023, SPP North</td>
 </tr>
 <tr class="odd">
-<td>Heat pump COP, an illustrative curve</td>
+<td>Heat pump coefficient of performance (COP), an illustrative curve</td>
 <td class="n">2.4 at −15 °C; 3.2 at 0 °C; 1 below −23 °C</td>
 <td class="s">anchored to DOE's cold-climate challenge target, 2.4 at −15 °C (U.S. Department of Energy, 24 Sep 2021); the rest is the course's curve (lesson F3), with resistance backup assumed below −23 °C</td>
 </tr>
 <tr class="even">
 <td>Heat pump, per home</td>
 <td class="n">$7,355, 15 years</td>
-<td class="s">EIA AEO2026, residential (2022 dollars, converted)</td>
+<td class="s">cost: EIA AEO2026, residential (2022 dollars, converted); the 15-year life set for teaching</td>
 </tr>
 <tr class="odd">
 <td>Rooftop solar</td>
@@ -798,7 +818,7 @@ window.Quarto = {
 <td class="s">EIA AEO2026, residential (2022 dollars, converted)</td>
 </tr>
 <tr class="even">
-<td>Battery, 4 hours</td>
+<td>Battery, 4 hours (each MW stores 4 MWh)</td>
 <td class="n">$1,371 per kW, 15 years</td>
 <td class="s">NREL 2025 update (2024 dollars, converted)</td>
 </tr>
@@ -808,7 +828,7 @@ window.Quarto = {
 <td class="s">set for teaching (illustrative); fixed here at the defaults: change them in the City Planner or the notebook</td>
 </tr>
 <tr class="even">
-<td>Heat network: per home-equivalent · plant heat pump · heat store</td>
+<td>Heat network: per home-equivalent (an average home's heat need) · plant heat pump · heat store</td>
 <td class="n">$12,000 (40 years) · $1,200 per kW of heat, COP 3 (25 years) · $3,000 per MWh (30 years)</td>
 <td class="s">set for teaching (illustrative); 10% of the heat lost in the pipes; the gas boiler (90%) is assumed to exist already: its fuel is counted, not its construction</td>
 </tr>
@@ -824,7 +844,7 @@ window.Quarto = {
 </tr>
 <tr class="odd">
 <td>Yearly payments</td>
-<td class="n">4% real, over each item's life</td>
+<td class="n">4% a year after inflation (real), over each item's life</td>
 <td class="s">lesson 13's rate (NLR ATB 2025)</td>
 </tr>
 </tbody>

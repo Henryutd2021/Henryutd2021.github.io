@@ -1,5 +1,12 @@
 {
- "about": "Engine E1 (assets/learn/components/engine-e1.js): the Microgrid Workbench (SB1), capstone C1 and Modeler lesson M5. Prairie Campus and its county hospital are fictional; the loads and the microgrid as built are lesson F7's. Equipment costs, the generator's fuel curve, the export credit, the fuel tank's cost and the three owners' costs of capital are illustrative, in 2025 dollars. Real: the solar shapes (SPP's 2025 hourly solar from EIA-930, assets/learn/data/town_year.json, turned into output per kW of panels with LX.townProfile, method 'scale', monthlyCF: EIA's 2025 monthly capacity factors, exactly as F7 does), the tariff's level (EIA's 2025 U.S. commercial average), the diesel price (EIA, 2025) and the CO2 factors (EIA). Written by its data build step (do not edit by hand); _tests/learn/test_e1-engine.js recomputes the solar values.",
+ "about": "Engine E1 (assets/learn/components/engine-e1.js): the Microgrid Workbench (SB1), capstone C1 and Modeler lesson M5. Prairie Campus and its county hospital are fictional; the loads and the microgrid as built are lesson F7's. Equipment costs, the generator's fuel curve, the export credit, the fuel tank's cost and the three owners' costs of capital are illustrative, in 2025 dollars. Real: the solar shapes (SPP's 2025 hourly solar from EIA-930, assets/learn/data/town_year.json, turned into output per kW of panels with LX.townProfile, method 'scale', monthlyCF: EIA's 2025 monthly capacity factors, exactly as F7 does), the tariff's level (EIA's 2025 U.S. commercial average), the diesel price (EIA, 2025) and the CO2 factors (EIA).",
+ "dataset": {
+  "creator": "Honglin Li",
+  "date": "2026-11-07",
+  "status": "Illustrative: Prairie Campus, its hospital, the equipment costs and the owners are fictional; the solar shapes, the tariff level, the diesel price and the CO2 factors are EIA's 2025 data.",
+  "source": "Prepared for engine E1 from lesson F7's campus and the cited EIA sources; the reference results are solved with HiGHS.",
+  "license": "CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/), Honglin Li. Values taken from the sources listed in this file keep their publishers' terms; EIA data are U.S. government works in the public domain."
+ },
  "built": "2026-11-03",
  "campus": {
   "name": "Prairie Campus",
@@ -2331,7 +2338,7 @@
      "fuel": 668.535
     }
    ],
-   "note": "Written by node _tests/learn/test_m05-microgrid-size-and-run.js --write from engine E1 (HiGHS 1.15.4 in Node); the M5 notebook asserts against it."
+   "note": "Reference results of lesson M5, solved with engine E1 in HiGHS 1.15.1; the M5 notebook checks its answers against them."
   }
  }
 }

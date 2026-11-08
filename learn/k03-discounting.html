@@ -2,6 +2,22 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
+<script>(function () {
+  ["localStorage", "sessionStorage"].forEach(function (name) {
+    try { window[name].getItem("_"); return; } catch (e) { }   // storage works: leave it as it is
+    var data = Object.create(null);
+    var mem = {
+      getItem: function (k) { k = String(k); return k in data ? data[k] : null; },
+      setItem: function (k, v) { data[String(k)] = String(v); },
+      removeItem: function (k) { delete data[String(k)]; },
+      clear: function () { data = Object.create(null); },
+      key: function (i) { var keys = Object.keys(data); return i >= 0 && i < keys.length ? keys[i] : null; }
+    };
+    Object.defineProperty(mem, "length", { get: function () { return Object.keys(data).length; } });
+    Object.defineProperty(mem, "inMemory", { value: true });
+    try { Object.defineProperty(window, name, { configurable: true, enumerable: true, get: function () { return mem; } }); } catch (e) { }
+  });
+})();</script>
 <meta name="generator" content="quarto-1.10.19">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
@@ -122,8 +138,10 @@ window.Quarto = {
 <link rel="stylesheet" href="../assets/learn/learn.css">
 <meta property="og:title" content="Exponentials and discounting – Honglin Li">
 <meta property="og:description" content="Math toolbox K3 of Energy Systems, Step by Step: compound growth, present value, a stream of equal payments, and the capital recovery factor that turns a building cost into a yearly cost.">
-<meta property="og:image" content="https://henryutd2021.github.io/learn/images/profile-square.jpg">
+<meta property="og:image" content="https://henryutd2021.github.io/images/profile-square.jpg">
 <meta property="og:site_name" content="Honglin Li">
+<meta property="og:url" content="https://henryutd2021.github.io/learn/k03-discounting.html">
+<link rel="canonical" href="https://henryutd2021.github.io/learn/k03-discounting.html">
 </head>
 
 <body class="nav-fixed page-learn page-lesson lx-form-cards quarto-light"><script id="quarto-html-before-body" type="application/javascript">
@@ -326,7 +344,7 @@ window.Quarto = {
 <span class="menu-text">Teaching</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../learn/index.html"> 
+    <a class="nav-link active" href="../learn/index.html" aria-current="true"> 
 <span class="menu-text">Learn</span></a>
   </li>  
   <li class="nav-item">
@@ -374,6 +392,7 @@ window.Quarto = {
 
 <main class="content column-page" id="quarto-document-content">
 
+<noscript><style>@media (max-width: 1199.98px) { #quarto-header { position: relative; } #quarto-header .navbar-toggler { display: none; } #quarto-header #navbarCollapse { display: block !important; } } #quarto-header .quarto-navbar-tools { display: none; }</style></noscript>
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
@@ -403,7 +422,7 @@ window.Quarto = {
 
 
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "name": "Exponentials and discounting Grow money forward, discount it back, and spread a building cost into equal yearly payments", "description": "Math toolbox K3 of Energy Systems, Step by Step: compound growth, present value, a stream of equal payments, and the capital recovery factor that turns a building cost into a yearly cost.", "learningResourceType": "Interactive lesson", "educationalLevel": "Beginner", "timeRequired": "PT30M", "inLanguage": "en", "isAccessibleForFree": true, "teaches": ["compound growth", "present value", "discount rate", "annuities", "capital recovery factor"], "license": "https://creativecommons.org/licenses/by/4.0/", "author": {"@type": "Person", "name": "Honglin Li", "url": "https://henryutd2021.github.io/"}, "url": "https://henryutd2021.github.io/learn/k03-discounting.html", "isPartOf": {"@type": "Course", "name": "Energy Systems, Step by Step", "url": "https://henryutd2021.github.io/learn/"}}</script>
-<script type="application/json" class="lx-lesson-data">{"id":"k03-discounting","starter":null,"total":14,"code":"K3","title":"Exponentials and discounting","subtitle":"Grow money forward, discount it back, and spread a building cost into equal yearly payments","short":"Exponentials and discounting","tier":null,"tier2":null,"tierLabel":"Math toolbox","level":null,"slot":null,"slot2":null,"minutes":15,"does":"Watch growth compound, discount future dollars to today, add up a stream of equal payments, and build the capital recovery factor that lessons 7, 12 and 13 use to turn a building cost into a yearly cost.","outcome":"Compute present values and the capital recovery factor, and turn a building cost into an annualised cost.","icon":null,"form":"cards","scales":[],"teaches":["compound growth","present value","discount rate","annuities","capital recovery factor"],"lab":null,"href":"k03-discounting.html","ready":true,"after":[],"prev":null,"next":{"id":"07-cost","starter":7,"title":"What does electricity cost to make?","short":"What it costs","does":"Building, fuel and upkeep; a discounting slider; a levelized-cost calculator, and what it misses.","href":"07-cost.html","ready":true},"practice":15}</script>
+<script type="application/json" class="lx-lesson-data">{"id":"k03-discounting","starter":null,"total":14,"code":"K3","title":"Exponentials and discounting","subtitle":"Grow money forward, discount it back, and spread a building cost into equal yearly payments","short":"Exponentials and discounting","tier":null,"tier2":null,"tierLabel":"Math toolbox","level":null,"slot":null,"slot2":null,"minutes":15,"does":"Watch growth compound, discount future dollars to today, add up a stream of equal payments, and build the capital recovery factor that lessons 7, 12 and 13 use to turn a building cost into a yearly cost.","outcome":"Compute present values and the capital recovery factor, and turn a building cost into an annualised cost.","icon":null,"form":"cards","scales":[],"teaches":["compound growth","present value","discount rate","annuities","capital recovery factor"],"lab":null,"href":"k03-discounting.html","ready":true,"after":[],"prev":null,"next":{"id":"07-cost","starter":7,"title":"What does electricity cost to make?","short":"What it costs","does":"Building, fuel and upkeep; a discounting slider; a levelized-cost calculator, and what it misses.","href":"07-cost.html","ready":true},"nextNeeds":[{"id":"05-capacity-factor","starter":5,"title":"Capacity factor: why is 1 MW not always 1 MW?","short":"Capacity factor","does":"A year of output from nuclear, wind and solar plants of equal size; double a light wind's speed and get eight times the power.","href":"05-capacity-factor.html","ready":true}],"practice":15}</script>
 <div class="lx-head" data-lesson-id="k03-discounting" data-total="14" data-minutes="15" data-form="cards" data-next-href="07-cost.html">
 <div>
 <nav class="lx-crumbs" aria-label="Breadcrumb"><ol><li><a href="index.html">Learn</a></li><li aria-current="page">K3</li></ol></nav>
@@ -664,6 +683,7 @@ window.Quarto = {
 <div class="lx-next lx-card" data-next-id="07-cost">
 <p class="lx-eyebrow">Next</p>
 <p class="lx-next-t"><a href="07-cost.html">Lesson 7 · What does electricity cost to make?</a></p>
+<p class="lx-next-d lx-next-needs">Needs first: <a href="05-capacity-factor.html">Lesson 5 · Capacity factor</a>.</p>
 <button type="button" class="lx-btn ghost small lx-complete" data-complete="k03-discounting" aria-pressed="false" hidden="">Mark this lesson as complete</button>
 </div>
 

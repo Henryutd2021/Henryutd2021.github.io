@@ -2,6 +2,22 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
+<script>(function () {
+  ["localStorage", "sessionStorage"].forEach(function (name) {
+    try { window[name].getItem("_"); return; } catch (e) { }   // storage works: leave it as it is
+    var data = Object.create(null);
+    var mem = {
+      getItem: function (k) { k = String(k); return k in data ? data[k] : null; },
+      setItem: function (k, v) { data[String(k)] = String(v); },
+      removeItem: function (k) { delete data[String(k)]; },
+      clear: function () { data = Object.create(null); },
+      key: function (i) { var keys = Object.keys(data); return i >= 0 && i < keys.length ? keys[i] : null; }
+    };
+    Object.defineProperty(mem, "length", { get: function () { return Object.keys(data).length; } });
+    Object.defineProperty(mem, "inMemory", { value: true });
+    try { Object.defineProperty(window, name, { configurable: true, enumerable: true, get: function () { return mem; } }); } catch (e) { }
+  });
+})();</script>
 <meta name="generator" content="quarto-1.10.19">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
@@ -122,8 +138,10 @@ window.Quarto = {
 <link rel="stylesheet" href="../assets/learn/learn.css">
 <meta property="og:title" content="Does a microgrid pay off, and for whom? – Honglin Li">
 <meta property="og:description" content="A14 of Energy Systems, Step by Step: price an outage for a household, a dairy and a hospital, size a fictional campus microgrid against a year of outages, stack its everyday savings, compare four owners, and lower a village mini-grid’s cost per kWh.">
-<meta property="og:image" content="https://henryutd2021.github.io/learn/images/profile-square.jpg">
+<meta property="og:image" content="https://henryutd2021.github.io/images/profile-square.jpg">
 <meta property="og:site_name" content="Honglin Li">
+<meta property="og:url" content="https://henryutd2021.github.io/learn/a14-microgrid-value.html">
+<link rel="canonical" href="https://henryutd2021.github.io/learn/a14-microgrid-value.html">
 </head>
 
 <body class="nav-fixed page-learn page-lesson lx-form-cards quarto-light"><script id="quarto-html-before-body" type="application/javascript">
@@ -326,7 +344,7 @@ window.Quarto = {
 <span class="menu-text">Teaching</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../learn/index.html"> 
+    <a class="nav-link active" href="../learn/index.html" aria-current="true"> 
 <span class="menu-text">Learn</span></a>
   </li>  
   <li class="nav-item">
@@ -374,6 +392,7 @@ window.Quarto = {
 
 <main class="content column-page" id="quarto-document-content">
 
+<noscript><style>@media (max-width: 1199.98px) { #quarto-header { position: relative; } #quarto-header .navbar-toggler { display: none; } #quarto-header #navbarCollapse { display: block !important; } } #quarto-header .quarto-navbar-tools { display: none; }</style></noscript>
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
@@ -808,7 +827,7 @@ window.Quarto = {
 <p class="lx-eyebrow">In the real world</p>
 <p>In the 2025 survey of rural co-op members, 65% of businesses said a three-day outage would shut them down, and 16% would keep going on backup generation (<a href="https://eta-publications.lbl.gov/sites/default/files/2026-10/ice_2.0_nreca_final_report_28oct2026.pdf">Berkeley Lab and partners, p. 11</a>).</p>
 <p class="a14-bridge">Beyond outages, on-site energy can also change where a business chooses to build:</p>
-<blockquote class="lx-excerpt blockquote" data-source="excerpt:supply-chain-mg"><p>Because the <span class="lx-term" data-term="transactive-energy">transactive energy</span> market brought a new revenue stream, locations with stronger renewables became competitive to establish facilities despite higher fixed and <span class="lx-term" data-term="logistics-cost">logistics cost</span>.</p><p>Contrary to intuition, energy storage systems, which balance intermittent power and uncertain load, had limited benefits for cost saving.</p><footer>Approved excerpt of: Li et al. (2023), <a href="https://doi.org/10.1016/j.apm.2023.02.014">Applied Mathematical Modelling</a>.</footer></blockquote>
+<blockquote class="lx-excerpt blockquote" data-source="excerpt:supply-chain-mg"><p>Because the <span class="lx-term" data-term="transactive-energy">transactive energy</span> market brought a new revenue stream, locations with stronger renewables became competitive to establish facilities despite higher fixed and <span class="lx-term" data-term="logistics-cost">logistics cost</span>.</p><p>Contrary to intuition, energy storage systems, which balance intermittent power and uncertain load, had limited benefits for cost saving.</p><footer>From: Li et al. (2023), <a href="https://doi.org/10.1016/j.apm.2023.02.014">Applied Mathematical Modelling</a>.</footer></blockquote>
 <ul class="lx-hint a14-holds"><li>Holds when: <span class="lx-term" data-term="stylized-network">stylized networks</span> with synthetic distances and costs, candidate sites in California, Arizona and Nevada, and one year, planned week by week for products and hour by hour for energy.</li><li>Leaves out: grid outages, which the studies do not model.</li></ul>
 <p class="lx-hint">The full case: <a href="cf1-supply-chain-microgrids.html">case file CF1</a>.</p>
 </div>

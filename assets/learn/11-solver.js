@@ -200,7 +200,8 @@
     // ---------- stage
     var stage = H("div", { class: "lx-stage" }, live);
     var head = H("div", { class: "lx-stage-head" }, stage);
-    H("h3", { text: W.dateLabel + ": lesson 0's day as one linear program" }, head);
+    var sceneTag = LX.hTag(3, head);   // the scene's title: an h2 when the stage sits right under the page title
+    H(sceneTag, { text: W.dateLabel + ": lesson 0's day as one linear program" }, head);
     var st = LX.SolverStatus(head);
     var chips = H("div", { class: "lx-readouts", "aria-live": "polite" }, stage);
     var chartHost = H("div", null, stage);
@@ -210,7 +211,7 @@
     var chart = LX.DayChart(chartHost, { series: SER, demand: chartDemand, rows: function () { return chartRows; }, yMax: 400, label: "Hourly output by plant for lesson 0's day, with demand as a dashed line." });
     var priceBox = H("div", { hidden: true, style: "display:grid;gap:6px" }, stage);
     var ph = H("div", { class: "w11-pricehead" }, priceBox);
-    H("h3", { text: "Shadow price of the demand rule, $/MWh", style: "font-size:15px;margin:0" }, ph);
+    H("h" + (+sceneTag.charAt(1) + 1), { text: "Shadow price of the demand rule, $/MWh", style: "font-size:15px;margin:0" }, ph);   // one level below the scene's title
     var pnote = H("p", { text: "Tap an hour." }, ph);
     var prices = H("div", { class: "w11-prices", role: "group", "aria-label": "Shadow price of the demand rule for each hour" }, priceBox);
     var pout = H("p", { class: "lx-stage-status", "aria-live": "polite" }, priceBox);

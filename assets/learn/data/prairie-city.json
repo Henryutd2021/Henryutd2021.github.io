@@ -2,11 +2,10 @@
  "about": {
   "line": "Prairie City is fictional; its numbers are illustrative.",
   "what": "Shared data of Prairie City, Learn's city-and-region scale (S3): three districts, household groups, transport, the industrial park, the data-center campus, annual energy flows by sector and carrier, representative days for hourly models, 2025 prices and emission factors. Read by F9, F11, A13, A15, A18, SB3 (engine E3), M12, C3 and CK-A; pages read these numbers and never retype them.",
-  "fictional": "Prairie City is fictional. It is anchored to the U.S. Plains (Kansas, the Southwest Power Pool), as Prairie Town and the Plains Grid are: its income and household size are close to Wichita's, its weather is Wichita's 1991-2020 normals, its prices are Kansas's (or the Midwest's) 2025 averages, and its hourly shapes are SPP's 2025 grid. Everything else is set for teaching and labelled so in the builder.",
+  "fictional": "Prairie City is fictional. It is anchored to the U.S. Plains (Kansas, the Southwest Power Pool), as Prairie Town and the Plains Grid are: its income and household size are close to Wichita's, its weather is Wichita's 1991-2020 normals, its prices are Kansas's (or the Midwest's) 2025 averages, and its hourly shapes are SPP's 2025 grid. Everything else is set for teaching.",
   "dollarYear": 2025,
   "built": "2026-11-07",
-  "builtBy": "Written by the Prairie City data build step (do not edit by hand); tested by _tests/learn/test_prairie_city.js",
-  "method": "Bottom-up: homes from dwellings, floor area, envelope vintage and heating fuel (RECS 2020 West North Central end uses; DOE efficiencies), commercial floor area by intensity, vehicles by household, the industrial park and the data-center campus from their sizes. Hourly: eight representative days of 2025 (weights sum to 365), temperatures from NOAA normals (two extreme days set for teaching), heat by degree-hours below 18.3 C, heat-pump COP from lesson F3's curve, the base load spread by SPP's 2025 demand shape, wind and solar per unit of capacity from SPP's 2025 shapes scaled to EIA's 2025 monthly capacity factors. Annual flows close: every node of the Sankey balances.",
+  "method": "Bottom-up: homes from dwellings, floor area, envelope vintage and heating fuel (RECS 2020 West North Central end uses; DOE efficiencies), commercial floor area by intensity, vehicles by household, the industrial park and the data-center campus from their sizes. Hourly: eight representative days of 2025 (weights sum to 365), temperatures from NOAA normals (two extreme days set for teaching), heat each hour as the temperature deficit below 18.3 C times each district's heat-loss rate (MW per C), heat-pump COP from lesson F3's curve, the base load spread by SPP's 2025 demand shape, wind and solar per unit of capacity from SPP's 2025 shapes scaled to EIA's 2025 monthly capacity factors. Annual flows close: every node of the Sankey balances.",
   "simplifications": [
    "One substation per district is a teaching simplification; real districts are served by many feeders and several substations.",
    "The industrial park and the data-center campus take power at their own substations, not the districts'.",
@@ -14,6 +13,13 @@
    "Every EV is counted as a battery EV; EV charging is the same every day.",
    "Industrial loads are flat over the year."
   ]
+ },
+ "dataset": {
+  "creator": "Honglin Li",
+  "date": "2026-11-07",
+  "status": "Illustrative: Prairie City is fictional. Its prices are Kansas's (or the Midwest's) 2025 averages (EIA), its weather Wichita's 1991-2020 normals (NOAA), its hourly shapes SPP's 2025 grid (EIA-930); everything else is set for teaching.",
+  "source": "Built bottom-up for the course from the public sources listed in `sources`, by the method in `about.method`; the representative days and the full year follow the rules stated in `daysNote` and `fullYear`.",
+  "license": "CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/), Honglin Li. Values taken from the sources listed in this file keep their publishers' terms; EIA and DOE data are U.S. government works in the public domain, and NOAA's 1991-2020 climate normals are listed as CC0 in NOAA's catalog record."
  },
  "dollarYear": 2025,
  "units": {
@@ -1453,7 +1459,7 @@
  "fullYear": {
   "what": "The 8,760 hours of 2025 built by the same rule as the eight representative days, for engine E3's full-year check: its constants and sums only (the hourly series is rebuilt by the rule from town_year.json and cf_targets.json; the check's results are in e3-full-year.json).",
   "rule": {
-   "days": "Every local day of 2025 (Central time, hours 00 to 23): SPP's 2025 demand, wind and solar from local midnight, as the eight days take theirs, so the eight days are days of this year, unchanged. On 9 March one hour repeats and on 2 November one is left out (the clock changes).",
+   "days": "Every local day of 2025 (Central time, hours 00 to 23): SPP's 2025 demand, wind and solar from local midnight, as the eight days take theirs, so the eight days are days of this year with their demand, wind and solar shapes unchanged; their base and heat are scaled to the city's annual energy separately (the base and heat rules below), so close annual totals partly follow from that scaling. On 9 March one hour repeats and on 2 November one is left out (the clock changes).",
    "temp": "The same daily cosine, from each day's own month's NOAA 1991-2020 normal minimum and maximum (a typical day takes its months' average). The days the two extreme days stand for take their temperatures set for teaching: the 3 days of December to February and the 10 days of July and August with SPP's highest 2025 hourly demand (designDays, heatWaveDays).",
    "base": "Each district's annual base energy spread over the year's hours by SPP's demand shape: base = baseMWPerShape x demand, so the year keeps the annual base energy, as the eight days' weights do.",
    "heat": "heat = uaMWperC x max(0, 18.3 - T), with uaMWperC fitted so the year's hours give the district's annual heat need, as the eight days' fit does for them.",

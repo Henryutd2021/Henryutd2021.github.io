@@ -2,6 +2,22 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
+<script>(function () {
+  ["localStorage", "sessionStorage"].forEach(function (name) {
+    try { window[name].getItem("_"); return; } catch (e) { }   // storage works: leave it as it is
+    var data = Object.create(null);
+    var mem = {
+      getItem: function (k) { k = String(k); return k in data ? data[k] : null; },
+      setItem: function (k, v) { data[String(k)] = String(v); },
+      removeItem: function (k) { delete data[String(k)]; },
+      clear: function () { data = Object.create(null); },
+      key: function (i) { var keys = Object.keys(data); return i >= 0 && i < keys.length ? keys[i] : null; }
+    };
+    Object.defineProperty(mem, "length", { get: function () { return Object.keys(data).length; } });
+    Object.defineProperty(mem, "inMemory", { value: true });
+    try { Object.defineProperty(window, name, { configurable: true, enumerable: true, get: function () { return mem; } }); } catch (e) { }
+  });
+})();</script>
 <meta name="generator" content="quarto-1.10.19">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
@@ -94,8 +110,10 @@ ul.task-list li input[type="checkbox"] {
 <link rel="stylesheet" href="../assets/learn/learn.css">
 <meta property="og:title" content="Pathway Explorer – Honglin Li">
 <meta property="og:description" content="Sandbox SB4 of Energy Systems, Step by Step: plan a fictional nation’s electricity and fuels to 2050, run its five regions as one linear program within a cumulative carbon budget and an import cap, and test the pathway against shocks, decade-by-decade decisions and full years of hours.">
-<meta property="og:image" content="https://henryutd2021.github.io/learn/images/profile-square.jpg">
+<meta property="og:image" content="https://henryutd2021.github.io/images/profile-square.jpg">
 <meta property="og:site_name" content="Honglin Li">
+<meta property="og:url" content="https://henryutd2021.github.io/learn/sb4-pathway-explorer.html">
+<link rel="canonical" href="https://henryutd2021.github.io/learn/sb4-pathway-explorer.html">
 </head>
 
 <body class="nav-fixed page-learn page-lesson lx-form-sandbox quarto-light"><script id="quarto-html-before-body" type="application/javascript">
@@ -298,7 +316,7 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">Teaching</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../learn/index.html"> 
+    <a class="nav-link active" href="../learn/index.html" aria-current="true"> 
 <span class="menu-text">Learn</span></a>
   </li>  
   <li class="nav-item">
@@ -346,6 +364,7 @@ ul.task-list li input[type="checkbox"] {
 
 <main class="content column-page" id="quarto-document-content">
 
+<noscript><style>@media (max-width: 1199.98px) { #quarto-header { position: relative; } #quarto-header .navbar-toggler { display: none; } #quarto-header #navbarCollapse { display: block !important; } } #quarto-header .quarto-navbar-tools { display: none; }</style></noscript>
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
@@ -557,8 +576,10 @@ ul.task-list li input[type="checkbox"] {
 <li><b>Illustrative:</b> Prairieland, its regions, fleet, links, demand and shocks (prairieland.json); the existing plants' operating costs, the penalties and the peak-hour rule are set for teaching (e4-pathways.json).</li>
 <li><b>Based on public data:</b> new plants' costs from EIA's 2026 assumptions, fuel prices from EIA's 2025 data, CO₂ factors from the IPCC, hourly shapes from SPP's 2025 and 2024 grid.</li>
 <li><b>Left out of the cost:</b> heat pumps, cars and boilers (end-use equipment), so a plan that electrifies more looks cheaper here than it would be.</li>
-<li><b>Precomputed:</b> the presets, perfect and decade by decade, with their shocks and full-year checks, come from a library made with this engine; any other plan runs in your browser.</li>
+<li><b>Also left out:</b> the upkeep of the existing hydro and steady plants (the data give no figure; the same in every pathway).</li>
+<li><b>Precomputed:</b> the first view and the presets' full-year checks (about a minute of solving each) come from a library made with this engine; every run you start solves in your browser.</li>
 <li><b>Against lesson A20:</b> no pathway here gets below about 2,700 Mt (straight-line counting, central demand). <a href="a20-national-scenarios.html">A20</a> meets 2,600 Mt because its fastest path electrifies buildings and industry years sooner.</li>
+<li><b>Corrected 7 Nov 2026:</b> costs now include the existing wind, solar and batteries' fixed O&amp;M, the same in every pathway at one discount rate ($9.1 billion at 5%; central: $410.7 billion, was $401.6 billion). The full-year check buys gas in the slice run's own mix.</li>
 </ul></div>
 <style>/* lesson-local */
 .page-learn .sb4-note ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 2px; }
@@ -590,7 +611,7 @@ ul.task-list li input[type="checkbox"] {
 <tbody>
 <tr class="odd">
 <td>Cost 2026–2050, present value in 2025 (2025 dollars; supply side and every fuel bought)</td>
-<td class="n">$401.6 billion</td>
+<td class="n">$410.7 billion</td>
 </tr>
 <tr class="even">
 <td>CO₂ 2026–2050 against the budget</td>
@@ -659,7 +680,7 @@ ul.task-list li input[type="checkbox"] {
 <details class="lx-deeper">
 <summary><span class="k">Go deeper</span>When two answers cost the same: the tie rule and penalties</summary>
 <div class="lx-deeper-body">
-<p>Small stated costs, left out of every reported number, pick one plan when several cost the same:</p>
+<p>Small stated costs, left out of every reported number, pick one plan when several cost the same or almost the same, so they can move a result slightly:</p>
 <ul class="sb4-rules">
 <li>$0.05 per MWh carried on any link, so power does not wander between regions;</li>
 <li>$0.50 per MWh out of a battery, so it does not cycle for nothing;</li>

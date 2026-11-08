@@ -152,7 +152,7 @@
     var BUILD = [["none", "Nothing new"], ["cc", "A new 300 MW gas plant"], ["wind", "New wind"]];
 
     // ---------- the stage: readouts, the day's factors, status
-    var stage = H("div", { class: "lx-stage" }, live), head = H("div", { class: "lx-stage-head" }, stage), title = H("h3", null, head);
+    var stage = H("div", { class: "lx-stage" }, live), head = H("div", { class: "lx-stage-head" }, stage), title = H(LX.hTag(3, head), null, head);   // an h2 when the stage sits right under the page title
     var chips = H("div", { class: "lx-readouts", "aria-live": "polite" }, stage);
     var plot = LX.Plot(stage, { text: "Text version of the chart" });
     var status = H("p", { class: "lx-stage-status", "aria-live": "polite" }, stage);

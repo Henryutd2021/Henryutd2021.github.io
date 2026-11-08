@@ -2,6 +2,22 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
+<script>(function () {
+  ["localStorage", "sessionStorage"].forEach(function (name) {
+    try { window[name].getItem("_"); return; } catch (e) { }   // storage works: leave it as it is
+    var data = Object.create(null);
+    var mem = {
+      getItem: function (k) { k = String(k); return k in data ? data[k] : null; },
+      setItem: function (k, v) { data[String(k)] = String(v); },
+      removeItem: function (k) { delete data[String(k)]; },
+      clear: function () { data = Object.create(null); },
+      key: function (i) { var keys = Object.keys(data); return i >= 0 && i < keys.length ? keys[i] : null; }
+    };
+    Object.defineProperty(mem, "length", { get: function () { return Object.keys(data).length; } });
+    Object.defineProperty(mem, "inMemory", { value: true });
+    try { Object.defineProperty(window, name, { configurable: true, enumerable: true, get: function () { return mem; } }); } catch (e) { }
+  });
+})();</script>
 <meta name="generator" content="quarto-1.10.19">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
@@ -94,8 +110,10 @@ ul.task-list li input[type="checkbox"] {
 <link rel="stylesheet" href="../assets/learn/learn.css">
 <meta property="og:title" content="City Planner – Honglin Li">
 <meta property="og:description" content="Sandbox SB3 of Energy Systems, Step by Step: plan a fictional city’s heat pumps, retrofits, district heat, electric cars, rooftop solar and batteries, run its energy hub as a linear program against each district’s substation limit, and read a screening estimate of who pays.">
-<meta property="og:image" content="https://henryutd2021.github.io/learn/images/profile-square.jpg">
+<meta property="og:image" content="https://henryutd2021.github.io/images/profile-square.jpg">
 <meta property="og:site_name" content="Honglin Li">
+<meta property="og:url" content="https://henryutd2021.github.io/learn/sb3-city-planner.html">
+<link rel="canonical" href="https://henryutd2021.github.io/learn/sb3-city-planner.html">
 </head>
 
 <body class="nav-fixed page-learn page-lesson lx-form-sandbox quarto-light"><script id="quarto-html-before-body" type="application/javascript">
@@ -298,7 +316,7 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">Teaching</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../learn/index.html"> 
+    <a class="nav-link active" href="../learn/index.html" aria-current="true"> 
 <span class="menu-text">Learn</span></a>
   </li>  
   <li class="nav-item">
@@ -346,6 +364,7 @@ ul.task-list li input[type="checkbox"] {
 
 <main class="content column-page" id="quarto-document-content">
 
+<noscript><style>@media (max-width: 1199.98px) { #quarto-header { position: relative; } #quarto-header .navbar-toggler { display: none; } #quarto-header #navbarCollapse { display: block !important; } } #quarto-header .quarto-navbar-tools { display: none; }</style></noscript>
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
@@ -438,13 +457,13 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 <tr class="even">
 <td>Network's heat pump</td>
-<td class="n">0 MW heat</td>
-<td>0 to 250 MW heat, in steps of 10 MW heat</td>
+<td class="n">0 MW of heat</td>
+<td>0 to 250 MW of heat, in steps of 10 MW of heat</td>
 </tr>
 <tr class="odd">
 <td>Network's heat store</td>
-<td class="n">0 MWh</td>
-<td>0 to 2,000 MWh, in steps of 100 MWh</td>
+<td class="n">0 MWh of heat</td>
+<td>0 to 2,000 MWh of heat, in steps of 100 MWh of heat</td>
 </tr>
 <tr class="even">
 <td>Cars that are electric</td>
@@ -462,7 +481,7 @@ ul.task-list li input[type="checkbox"] {
 <td>0 to 400 MW, in steps of 10 MW</td>
 </tr>
 <tr class="odd">
-<td>Batteries at the substations (4 hours)</td>
+<td>Batteries at the substations (4 hours of storage)</td>
 <td class="n">0 MW</td>
 <td>0 to 200 MW, in steps of 10 MW</td>
 </tr>
@@ -510,9 +529,9 @@ ul.task-list li input[type="checkbox"] {
 </div>
 <div class="lx-datanote sb3-note"><svg class="lx-ic" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5M12 8v.2"></path></svg><ul>
 <li><b>Illustrative:</b> Prairie City, its districts, substation limits and household groups (prairie-city.json); retrofit, district-heat, store and upgrade costs are set for teaching, within ranges you can change.</li>
-<li><b>Assumed:</b> the heat network's gas boiler already exists (fuel only); managed cars are plugged in whenever needed; the weather is NOAA's normals on SPP's 2025 days (synthetic).</li>
+<li><b>Assumed:</b> the heat network's gas boiler already exists (fuel only); managed cars are plugged in whenever needed; the weather is NOAA's normals on the Southwest Power Pool's (SPP's) 2025 days (synthetic).</li>
 <li><b>Based on public data:</b> Kansas's 2025 prices (EIA), Wichita's weather normals (NOAA), SPP's 2025 hourly shapes (EIA-930), eGRID's 2023 SPP North CO₂ rate (EPA), DOE LEAD's income bands.</li>
-<li><b>Costs:</b> 2025 dollars; heat pumps and rooftop solar from EIA, batteries from NREL, paid yearly at 4% real over each item's life.</li>
+<li><b>Costs:</b> 2025 dollars; heat pumps and rooftop solar from EIA (the heat pump's 15-year life set for teaching), batteries from NREL, paid yearly at 4% a year after inflation (a real rate) over each item's life.</li>
 </ul></div>
 <style>/* lesson-local */
 .page-learn .sb3-note ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 2px; }
@@ -583,7 +602,7 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 </tbody>
 </table>
-</div><p class="lx-hint">Precomputed with HiGHS on 6 November 2026: the hub as a linear program over eight representative days. Prairie City is fictional; its numbers are illustrative. With JavaScript on, the bench runs your own plan.</p>
+</div><p class="lx-hint">Precomputed with HiGHS on 6 November 2026: the hub as a linear program over eight representative days. $M: millions of 2025 dollars; t: metric tonnes of CO₂. Prairie City is fictional; its numbers are illustrative. With JavaScript on, the bench runs your own plan.</p>
 
 
 <div class="lx-scroll-x">
@@ -635,7 +654,7 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 </tbody>
 </table>
-</div><p class="lx-hint">Precomputed with HiGHS on 7 November 2026: the preset run again on all 8,760 hours of 2025, with the shares and substation upgrades its eight days chose kept. With JavaScript on, each preset shows its own check.</p>
+</div><p class="lx-hint">Precomputed with HiGHS on 7 November 2026: the preset run again on all 8,760 hours of 2025 with the shares and substation upgrades its eight days chose kept (cost, CO₂ and unserved energy), then a second time with the upgrades sized on the year (each district's busiest hour and upgrade). With JavaScript on, each preset shows its own check.</p>
 
 </div>
 </div>
@@ -650,7 +669,7 @@ ul.task-list li input[type="checkbox"] {
 <dt>The hub</dt><dd>Each hour, electricity through the substation, gas and rooftop sun must meet each district's heat, base load and car charging; heat pumps, furnaces, a heat network, batteries and managed charging sit between.</dd>
 <dt>The limit</dt><dd>Each substation's flow stays below its limit every hour, unless the plan buys more room; the busiest hour decides, not the year's total.</dd>
 <dt>It holds when</dt><dd>Eight representative days stand for 2025, storage shifts energy only within a day, and 2025's prices, people and homes stay as they are.</dd>
-<dt>The full-year check</dt><dd>The presets, run again on every hour of 2025: cost and CO₂ within 0.1%.</dd>
+<dt>The full-year check</dt><dd>The presets, run again on every hour of 2025: total yearly cost and CO₂ within 0.1% (the change against 2025 moves by a little more).</dd>
 <dt>Cold days in the year</dt><dd>The tightest hours fall on 19 or 20 February, two other days the design day stands for; plans that buy upgrades need a little more room.</dd>
 <dt>Who pays</dt><dd>Bills and energy burden by household group come from an accounting layer after the LP, with a stated rule for who adopts first.</dd>
 </dl>
@@ -722,14 +741,14 @@ ul.task-list li input[type="checkbox"] {
 <td class="s">EPA eGRID2023, SPP North</td>
 </tr>
 <tr class="odd">
-<td>Heat pump COP, an illustrative curve</td>
+<td>Heat pump coefficient of performance (COP), an illustrative curve</td>
 <td class="n">2.4 at −15 °C; 3.2 at 0 °C; 1 below −23 °C</td>
 <td class="s">anchored to DOE's cold-climate challenge target, 2.4 at −15 °C (U.S. Department of Energy, 24 Sep 2021); the rest is the course's curve (lesson F3), with resistance backup assumed below −23 °C</td>
 </tr>
 <tr class="even">
 <td>Heat pump, per home</td>
 <td class="n">$7,355, 15 years</td>
-<td class="s">EIA AEO2026, residential (2022 dollars, converted)</td>
+<td class="s">cost: EIA AEO2026, residential (2022 dollars, converted); the 15-year life set for teaching</td>
 </tr>
 <tr class="odd">
 <td>Rooftop solar</td>
@@ -737,7 +756,7 @@ ul.task-list li input[type="checkbox"] {
 <td class="s">EIA AEO2026, residential (2022 dollars, converted)</td>
 </tr>
 <tr class="even">
-<td>Battery, 4 hours</td>
+<td>Battery, 4 hours (each MW stores 4 MWh)</td>
 <td class="n">$1,371 per kW, 15 years</td>
 <td class="s">NREL 2025 update (2024 dollars, converted)</td>
 </tr>
@@ -747,7 +766,7 @@ ul.task-list li input[type="checkbox"] {
 <td class="s">set for teaching (illustrative): the defaults, which you change on the bench</td>
 </tr>
 <tr class="even">
-<td>Heat network: per home-equivalent · plant heat pump · heat store</td>
+<td>Heat network: per home-equivalent (an average home's heat need) · plant heat pump · heat store</td>
 <td class="n">$12,000 (40 years) · $1,200 per kW of heat, COP 3 (25 years) · $3,000 per MWh (30 years)</td>
 <td class="s">set for teaching (illustrative); 10% of the heat lost in the pipes; the gas boiler (90%) is assumed to exist already: its fuel is counted, not its construction</td>
 </tr>
@@ -763,7 +782,7 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 <tr class="odd">
 <td>Yearly payments</td>
-<td class="n">4% real, over each item's life</td>
+<td class="n">4% a year after inflation (real), over each item's life</td>
 <td class="s">lesson 13's rate (NLR ATB 2025)</td>
 </tr>
 </tbody>

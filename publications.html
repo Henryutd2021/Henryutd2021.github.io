@@ -2,11 +2,27 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
+<script>(function () {
+  ["localStorage", "sessionStorage"].forEach(function (name) {
+    try { window[name].getItem("_"); return; } catch (e) { }   // storage works: leave it as it is
+    var data = Object.create(null);
+    var mem = {
+      getItem: function (k) { k = String(k); return k in data ? data[k] : null; },
+      setItem: function (k, v) { data[String(k)] = String(v); },
+      removeItem: function (k) { delete data[String(k)]; },
+      clear: function () { data = Object.create(null); },
+      key: function (i) { var keys = Object.keys(data); return i >= 0 && i < keys.length ? keys[i] : null; }
+    };
+    Object.defineProperty(mem, "length", { get: function () { return Object.keys(data).length; } });
+    Object.defineProperty(mem, "inMemory", { value: true });
+    try { Object.defineProperty(window, name, { configurable: true, enumerable: true, get: function () { return mem; } }); } catch (e) { }
+  });
+})();</script>
 <meta name="generator" content="quarto-1.10.19">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="Publications of Honglin Li: journal articles, conference papers, papers under review and theses.">
+<meta name="description" content="Publications of Honglin Li: journal articles, conference papers and theses.">
 
 <title>Publications – Honglin Li</title>
 <style>
@@ -92,9 +108,11 @@ ul.task-list li input[type="checkbox"] {
 <link rel="stylesheet" href="assets/map.css">
 <link rel="stylesheet" href="assets/explainers.css">
 <meta property="og:title" content="Publications – Honglin Li">
-<meta property="og:description" content="Publications of Honglin Li: journal articles, conference papers, papers under review and theses.">
+<meta property="og:description" content="Publications of Honglin Li: journal articles, conference papers and theses.">
 <meta property="og:image" content="https://henryutd2021.github.io/images/profile-square.jpg">
 <meta property="og:site_name" content="Honglin Li">
+<meta property="og:url" content="https://henryutd2021.github.io/publications.html">
+<link rel="canonical" href="https://henryutd2021.github.io/publications.html">
 </head>
 
 <body class="nav-fixed page-inner page-publications quarto-light"><script id="quarto-html-before-body" type="application/javascript">
@@ -342,10 +360,10 @@ ul.task-list li input[type="checkbox"] {
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-page">
       <h1 class="title">Publications</h1>
-            <p class="subtitle lead">Journal articles, conference papers, papers under review and theses</p>
+            <p class="subtitle lead">Journal articles, conference papers and theses</p>
                   <div>
         <div class="description">
-          Publications of Honglin Li: journal articles, conference papers, papers under review and theses.
+          Publications of Honglin Li: journal articles, conference papers and theses.
         </div>
       </div>
                 </div>
@@ -367,6 +385,7 @@ ul.task-list li input[type="checkbox"] {
 
 <main class="content quarto-banner-title-block column-page" id="quarto-document-content">
 
+<noscript><style>@media (max-width: 1199.98px) { #quarto-header { position: relative; } #quarto-header .navbar-toggler { display: none; } #quarto-header #navbarCollapse { display: block !important; } } #quarto-header .quarto-navbar-tools { display: none; }</style></noscript>
 
 
 
@@ -376,7 +395,7 @@ ul.task-list li input[type="checkbox"] {
 <div class="pg">
 <div class="pub-head">
 <div class="pub-head-text">
-<p class="pg-lede">Newest first: 8 journal articles, 10 conference papers and 2 theses. My name is shown in <span class="me">bold</span>; * marks equal contribution. The list is also on <a href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en">Google Scholar</a>. PDF links give the open-access published version or, where the publisher allows it, the accepted manuscript with the publisher’s notice.</p>
+<p class="pg-lede">Newest first: 8 journal articles (1 accepted), 10 conference papers and 2 theses. My name is shown in <span class="me">bold</span>; * marks equal contribution. The list is also on <a href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en">Google Scholar</a>. PDF links give the open-access published version or, where the publisher allows it, the accepted manuscript with the publisher’s notice.</p>
 <p class="pub-cites"><i class="bi bi-quote" aria-hidden="true"></i><span><strong>121 citations</strong> · h-index 7 · i10-index 6 (<a href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en">Google Scholar</a>, as of October 30, 2026). Per-paper counts are from the same profile; papers it does not list use OpenAlex.</span></p>
 </div>
 <figure class="pub-chart figure" data-type="all">
@@ -699,7 +718,7 @@ ul.task-list li input[type="checkbox"] {
 <div class="pub-authors">G. Shen, <span class="me">H. Li</span>, G. Singh, A. Behjat, G. Toge, S. Senemmar, C. Feng, J. Zhang, A. Mehmani</div>
 <div class="pub-venue"><em>2024 ACEEE Summer Study on Energy Efficiency in Buildings</em>, 2024.</div>
 <div class="pub-links">
-<a class="btn-xs" href="files/papers/shen2024demand.pdf" title="Published version; the authors keep the copyright (ACEEE holds a non-exclusive licence)">PDF</a>
+<a class="btn-xs" href="files/papers/shen2024demand.pdf" title="Published version; the authors keep the copyright (ACEEE holds a non-exclusive license)">PDF</a>
 <a class="btn-xs" href="projects/ghg.html">Project</a>
 <button type="button" class="btn-xs bib-toggle" aria-expanded="false" aria-controls="bib-shen2024demand">Bib</button>
 <a class="chip cite-chip" href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en" title="Citations on Google Scholar (as of October 30, 2026)"><i class="bi bi-quote" aria-hidden="true"></i>Cited by 1</a>

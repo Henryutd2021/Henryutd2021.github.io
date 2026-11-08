@@ -2,6 +2,22 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
+<script>(function () {
+  ["localStorage", "sessionStorage"].forEach(function (name) {
+    try { window[name].getItem("_"); return; } catch (e) { }   // storage works: leave it as it is
+    var data = Object.create(null);
+    var mem = {
+      getItem: function (k) { k = String(k); return k in data ? data[k] : null; },
+      setItem: function (k, v) { data[String(k)] = String(v); },
+      removeItem: function (k) { delete data[String(k)]; },
+      clear: function () { data = Object.create(null); },
+      key: function (i) { var keys = Object.keys(data); return i >= 0 && i < keys.length ? keys[i] : null; }
+    };
+    Object.defineProperty(mem, "length", { get: function () { return Object.keys(data).length; } });
+    Object.defineProperty(mem, "inMemory", { value: true });
+    try { Object.defineProperty(window, name, { configurable: true, enumerable: true, get: function () { return mem; } }); } catch (e) { }
+  });
+})();</script>
 <meta name="generator" content="quarto-1.10.19">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
@@ -122,8 +138,10 @@ window.Quarto = {
 <link rel="stylesheet" href="../assets/learn/learn.css">
 <meta property="og:title" content="Size and run a microgrid that survives an outage – Honglin Li">
 <meta property="og:description" content="Modeler lesson M5 of Energy Systems, Step by Step: a mixed-integer program sizes Prairie Campus’s solar, battery and whole generator sets for a three-day winter storm; the feeder’s export limit and a time-of-use tariff move the optimum; the plan is checked hour by hour, tested on ten drawn outages and run on forecasts with a rolling horizon.">
-<meta property="og:image" content="https://henryutd2021.github.io/learn/images/profile-square.jpg">
+<meta property="og:image" content="https://henryutd2021.github.io/images/profile-square.jpg">
 <meta property="og:site_name" content="Honglin Li">
+<meta property="og:url" content="https://henryutd2021.github.io/learn/m05-microgrid-size-and-run.html">
+<link rel="canonical" href="https://henryutd2021.github.io/learn/m05-microgrid-size-and-run.html">
 </head>
 
 <body class="nav-fixed page-learn page-lesson lx-form-cards quarto-light"><script id="quarto-html-before-body" type="application/javascript">
@@ -326,7 +344,7 @@ window.Quarto = {
 <span class="menu-text">Teaching</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../learn/index.html"> 
+    <a class="nav-link active" href="../learn/index.html" aria-current="true"> 
 <span class="menu-text">Learn</span></a>
   </li>  
   <li class="nav-item">
@@ -374,6 +392,7 @@ window.Quarto = {
 
 <main class="content column-page" id="quarto-document-content">
 
+<noscript><style>@media (max-width: 1199.98px) { #quarto-header { position: relative; } #quarto-header .navbar-toggler { display: none; } #quarto-header #navbarCollapse { display: block !important; } } #quarto-header .quarto-navbar-tools { display: none; }</style></noscript>
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
@@ -778,7 +797,7 @@ td.m5-bad { color: var(--lx-bad); }
 
 <div class="lx-card lx-real">
 <p class="lx-eyebrow">In the real world</p>
-<blockquote class="lx-excerpt blockquote" data-source="excerpt:supply-chain-mg"><p>When each facility can install its own wind, solar and storage and trade energy with the grid, a candidate site's renewable resource affects its operating cost.</p><details class="m5-more"><summary>Three more sentences from the study: its findings and its model</summary><p><span class="lx-term" data-term="transactive-energy">Transactive energy</span>, <span class="lx-term" data-term="time-of-use-tariff">time-of-use tariffs</span> and climate conditions played a critical role in locating factories, warehouses, wind turbines, <span class="lx-term" data-term="photovoltaic">solar photovoltaics</span> and energy storage systems.</p><p>Contrary to intuition, energy storage systems, which balance intermittent power and uncertain load, had limited benefits for cost saving.</p><p>A mixed-integer model opens factories and warehouses, routes products and sizes each open site's wind, solar and storage, with an hourly energy balance and grid trade. Uncertain weekly store demand enters as a <span class="lx-term" data-term="chance-constraint">chance constraint</span> with a set <span class="lx-term" data-term="service-level">service level</span>, written as its <span class="lx-term" data-term="deterministic-equivalent">deterministic equivalent</span>, so the model stays a mixed-integer linear program.</p></details><p>Holds when: stylized networks with synthetic distances and costs, candidate sites in California, Arizona and Nevada, and one year, planned week by week for products and hour by hour for energy. Leaves out: grid outages, which the studies do not model.</p><footer>Approved excerpt of: Li et al. (2023), <a href="https://doi.org/10.1016/j.apm.2023.02.014">Applied Mathematical Modelling</a>.</footer></blockquote>
+<blockquote class="lx-excerpt blockquote" data-source="excerpt:supply-chain-mg"><p>When each facility can install its own wind, solar and storage and trade energy with the grid, a candidate site's renewable resource affects its operating cost.</p><details class="m5-more"><summary>Three more sentences from the study: its findings and its model</summary><p><span class="lx-term" data-term="transactive-energy">Transactive energy</span>, <span class="lx-term" data-term="time-of-use-tariff">time-of-use tariffs</span> and climate conditions played a critical role in locating factories, warehouses, wind turbines, <span class="lx-term" data-term="photovoltaic">solar photovoltaics</span> and energy storage systems.</p><p>Contrary to intuition, energy storage systems, which balance intermittent power and uncertain load, had limited benefits for cost saving.</p><p>A mixed-integer model opens factories and warehouses, routes products and sizes each open site's wind, solar and storage, with an hourly energy balance and grid trade. Uncertain weekly store demand enters as a <span class="lx-term" data-term="chance-constraint">chance constraint</span> with a set <span class="lx-term" data-term="service-level">service level</span>, written as its <span class="lx-term" data-term="deterministic-equivalent">deterministic equivalent</span>, so the model stays a mixed-integer linear program.</p></details><p>Holds when: stylized networks with synthetic distances and costs, candidate sites in California, Arizona and Nevada, and one year, planned week by week for products and hour by hour for energy. Leaves out: grid outages, which the studies do not model.</p><footer>From: Li et al. (2023), <a href="https://doi.org/10.1016/j.apm.2023.02.014">Applied Mathematical Modelling</a>.</footer></blockquote>
 <ul class="m5-links">
 <li>The full case: <a href="cf1-supply-chain-microgrids.html">case file CF1</a>.</li>
 <li>Open code: <a href="https://github.com/Henryutd2021/supply-chain-microgrid-models">supply-chain-microgrid-models</a> on GitHub.</li>

@@ -1,5 +1,5 @@
 {
-  "about": "Data of Learn lesson A3, Energy-only or capacity market? The Plains market is fictional and illustrative: one year of hourly uniform-price clearing on the 2025 shapes of the Southwest Power Pool (town_year.json, EIA-930), every unit at its average availability (no random outages: a closed-form year, not lesson A5's simulation). Gas running costs and every new plant's building and upkeep costs are lesson 7's (07-cost.json: EIA, 2025 dollars, 4% real over 30 years); the coal running cost, the production credit, the scarcity curve, the capacity market's energy cap and the wind and solar ratings are illustrative and say so. The reference block is written by node _tests/learn/test_a03-market-design.js --write and checked on every run.",
+  "about": "Data of Learn lesson A3, Energy-only or capacity market? The Plains market is fictional and illustrative: one year of hourly uniform-price clearing on the 2025 shapes of the Southwest Power Pool (town_year.json, EIA-930), every unit at its average availability (no random outages: a closed-form year, not lesson A5's simulation). Gas running costs and every new plant's building and upkeep costs are lesson 7's (07-cost.json: EIA, 2025 dollars, 4% real over 30 years); the coal running cost, the production credit, the scarcity curve, the capacity market's energy cap and the wind and solar ratings are illustrative and say so. The reference block holds the model's results at the defaults.",
   "market": {
     "name": "Plains market",
     "peakMW": 4000,
@@ -225,7 +225,7 @@
     "measure": "A value factor counts energy and capacity value against a flat 24-hour block's; this lesson's capture ratio counts energy only."
   },
   "reference": {
-    "about": "Written by node _tests/learn/test_a03-market-design.js --write at the defaults (1,200 MW of solar, 700 MW of peakers) and checked on every run.",
+    "about": "Results of the lesson's market model at the defaults (1,200 MW of solar, 700 MW of peakers): the year under each design, a noon and an evening hour, and the energy-only resting point.",
     "ct": 700,
     "solar": 1200,
     "eo": {

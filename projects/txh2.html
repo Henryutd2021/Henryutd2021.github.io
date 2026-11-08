@@ -2,6 +2,22 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
+<script>(function () {
+  ["localStorage", "sessionStorage"].forEach(function (name) {
+    try { window[name].getItem("_"); return; } catch (e) { }   // storage works: leave it as it is
+    var data = Object.create(null);
+    var mem = {
+      getItem: function (k) { k = String(k); return k in data ? data[k] : null; },
+      setItem: function (k, v) { data[String(k)] = String(v); },
+      removeItem: function (k) { delete data[String(k)]; },
+      clear: function () { data = Object.create(null); },
+      key: function (i) { var keys = Object.keys(data); return i >= 0 && i < keys.length ? keys[i] : null; }
+    };
+    Object.defineProperty(mem, "length", { get: function () { return Object.keys(data).length; } });
+    Object.defineProperty(mem, "inMemory", { value: true });
+    try { Object.defineProperty(window, name, { configurable: true, enumerable: true, get: function () { return mem; } }); } catch (e) { }
+  });
+})();</script>
 <meta name="generator" content="quarto-1.10.19">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
@@ -93,9 +109,11 @@ ul.task-list li input[type="checkbox"] {
 <link rel="stylesheet" href="../assets/explainers.css">
 <meta property="og:title" content="Hydrogen’s role in expanding renewable energy in Texas – Honglin Li">
 <meta property="og:description" content="Where should electrolyzers, hydrogen storage and fuel cells be built in ERCOT, and how should hydrogen move between zones, to absorb surplus renewable generation and supply industrial hydrogen demand under uncertain 2030 renewable build-out?">
-<meta property="og:image" content="https://henryutd2021.github.io/images/projects/txh2.svg">
+<meta property="og:image" content="https://henryutd2021.github.io/images/projects/txh2.jpg">
 <meta property="og:site_name" content="Honglin Li">
-<meta property="og:image:alt" content="">
+<meta property="og:url" content="https://henryutd2021.github.io/projects/txh2.html">
+<meta property="og:image:alt" content="Cover illustration: Hydrogen's role in expanding renewable energy in Texas">
+<link rel="canonical" href="https://henryutd2021.github.io/projects/txh2.html">
 </head>
 
 <body class="nav-fixed page-inner project-page theme-hydrogen quarto-light"><script id="quarto-html-before-body" type="application/javascript">
@@ -282,7 +300,7 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">Research</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../projects.html"> 
+    <a class="nav-link active" href="../projects.html" aria-current="true"> 
 <span class="menu-text">Projects</span></a>
   </li>  
   <li class="nav-item">
@@ -346,6 +364,7 @@ ul.task-list li input[type="checkbox"] {
 
 <main class="content column-page" id="quarto-document-content">
 
+<noscript><style>@media (max-width: 1199.98px) { #quarto-header { position: relative; } #quarto-header .navbar-toggler { display: none; } #quarto-header #navbarCollapse { display: block !important; } } #quarto-header .quarto-navbar-tools { display: none; }</style></noscript>
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
@@ -412,14 +431,14 @@ ul.task-list li input[type="checkbox"] {
 <ol class="approach">
 <li class="ap-card"><p class="ap-challenge"><span class="ap-k">Challenge</span>The model needed hourly wind and solar output for each of ERCOT's eight weather zones.</p><p class="ap-did"><span class="ap-k">What I did</span>I built it from ERCOT's 60-day market disclosures: each wind and solar resource mapped to its county and zone, averaged to hours, gap-filled and summed, then turned into zone capacity factors.</p><p class="ap-why"><span class="ap-k">Why it mattered</span>The same capacity factors scaled planned capacity from the interconnection queue, so existing and future renewables shared one hourly basis.</p></li>
 <li class="ap-card"><p class="ap-challenge"><span class="ap-k">Challenge</span>How much planned renewable capacity is built by 2030, and how fast demand grows, are both uncertain.</p><p class="ap-did"><span class="ap-k">What I did</span>I formulated a two-stage stochastic program: hydrogen equipment is sized once, then operated hour by hour in nine scenarios combining three completion rates and three demand levels.</p><p class="ap-why"><span class="ap-k">Why it mattered</span>The sizes minimize expected cost over all nine scenarios instead of fitting a single forecast.</p></li>
-<li class="ap-card"><p class="ap-challenge"><span class="ap-k">Challenge</span>Wind and solar output is concentrated far from electricity demand in the north and southeast, and from hydrogen demand on the Gulf Coast.</p><p class="ap-did"><span class="ap-k">What I did</span>I added hydrogen pipelines between adjacent weather zones, with transport cost set by the distance between zone centres.</p><p class="ap-why"><span class="ap-k">Why it mattered</span>The model could then choose between making hydrogen near surplus power and moving it, or making it where it is used.</p></li>
+<li class="ap-card"><p class="ap-challenge"><span class="ap-k">Challenge</span>Wind and solar output is concentrated far from electricity demand in the north and southeast, and from hydrogen demand on the Gulf Coast.</p><p class="ap-did"><span class="ap-k">What I did</span>I added hydrogen pipelines between adjacent weather zones, with transport cost set by the distance between zone centers.</p><p class="ap-why"><span class="ap-k">Why it mattered</span>The model could then choose between making hydrogen near surplus power and moving it, or making it where it is used.</p></li>
 </ol>
 </section>
 <section class="proj-sec" id="choices" aria-labelledby="h-choices">
 <h2 id="h-choices" class="anchored"><i class="bi bi-signpost-split" aria-hidden="true"></i>Design choices</h2>
 <dl class="choices">
 <div class="choice"><dt>Hold hydrogen demand fixed across scenarios</dt><dd><span class="ch-alt">Alternatives considered: treating hydrogen demand as a third uncertain factor</span>Reliable hydrogen-demand data were lacking and computational cost mattered; the paper names this as future work.</dd></div>
-<div class="choice"><dt>Move hydrogen only by pipeline between neighbouring zones</dt><dd><span class="ch-alt">Alternatives considered: adding truck or rail transport</span>Pipelines are the relevant mode for large-scale, long-term deployment; other modes were left out to keep the focus on supply and demand uncertainty.</dd></div>
+<div class="choice"><dt>Move hydrogen only by pipeline between neighboring zones</dt><dd><span class="ch-alt">Alternatives considered: adding truck or rail transport</span>Pipelines are the relevant mode for large-scale, long-term deployment; other modes were left out to keep the focus on supply and demand uncertainty.</dd></div>
 </dl>
 </section>
 <section class="proj-sec" aria-labelledby="h-method">

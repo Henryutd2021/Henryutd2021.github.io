@@ -2,6 +2,22 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
+<script>(function () {
+  ["localStorage", "sessionStorage"].forEach(function (name) {
+    try { window[name].getItem("_"); return; } catch (e) { }   // storage works: leave it as it is
+    var data = Object.create(null);
+    var mem = {
+      getItem: function (k) { k = String(k); return k in data ? data[k] : null; },
+      setItem: function (k, v) { data[String(k)] = String(v); },
+      removeItem: function (k) { delete data[String(k)]; },
+      clear: function () { data = Object.create(null); },
+      key: function (i) { var keys = Object.keys(data); return i >= 0 && i < keys.length ? keys[i] : null; }
+    };
+    Object.defineProperty(mem, "length", { get: function () { return Object.keys(data).length; } });
+    Object.defineProperty(mem, "inMemory", { value: true });
+    try { Object.defineProperty(window, name, { configurable: true, enumerable: true, get: function () { return mem; } }); } catch (e) { }
+  });
+})();</script>
 <meta name="generator" content="quarto-1.10.19">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
@@ -94,8 +110,10 @@ ul.task-list li input[type="checkbox"] {
 <link rel="stylesheet" href="../assets/learn/learn.css">
 <meta property="og:title" content="What is a microgrid? From a hospital that keeps its lights on to a village with no grid – Honglin Li">
 <meta property="og:description" content="F7 of Energy Systems, Step by Step: island a fictional campus in a storm, choose which loads its battery and generator can carry and for how long in July and January, then size panels and a battery for a village with no grid.">
-<meta property="og:image" content="https://henryutd2021.github.io/learn/images/profile-square.jpg">
+<meta property="og:image" content="https://henryutd2021.github.io/images/profile-square.jpg">
 <meta property="og:site_name" content="Honglin Li">
+<meta property="og:url" content="https://henryutd2021.github.io/learn/f07-microgrids.html">
+<link rel="canonical" href="https://henryutd2021.github.io/learn/f07-microgrids.html">
 </head>
 
 <body class="nav-fixed page-learn page-lesson lx-form-cards quarto-light"><script id="quarto-html-before-body" type="application/javascript">
@@ -298,7 +316,7 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">Teaching</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../learn/index.html"> 
+    <a class="nav-link active" href="../learn/index.html" aria-current="true"> 
 <span class="menu-text">Learn</span></a>
   </li>  
   <li class="nav-item">
@@ -346,6 +364,7 @@ ul.task-list li input[type="checkbox"] {
 
 <main class="content column-page" id="quarto-document-content">
 
+<noscript><style>@media (max-width: 1199.98px) { #quarto-header { position: relative; } #quarto-header .navbar-toggler { display: none; } #quarto-header #navbarCollapse { display: block !important; } } #quarto-header .quarto-navbar-tools { display: none; }</style></noscript>
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
@@ -375,7 +394,7 @@ ul.task-list li input[type="checkbox"] {
 
 
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "name": "What is a microgrid? From a hospital that keeps its lights on to a village with no grid Island a campus to keep its hospital lit, then power a village that no grid reaches", "description": "F7 of Energy Systems, Step by Step: island a fictional campus in a storm, choose which loads its battery and generator can carry and for how long in July and January, then size panels and a battery for a village with no grid.", "learningResourceType": "Interactive lesson", "educationalLevel": "Beginner", "timeRequired": "PT30M", "inLanguage": "en", "isAccessibleForFree": true, "teaches": ["microgrids and islanding", "the point of common coupling", "grid-forming and grid-following sources", "critical load", "power and stored energy in an outage", "village mini-grids"], "license": "https://creativecommons.org/licenses/by/4.0/", "author": {"@type": "Person", "name": "Honglin Li", "url": "https://henryutd2021.github.io/"}, "url": "https://henryutd2021.github.io/learn/f07-microgrids.html", "isPartOf": {"@type": "Course", "name": "Energy Systems, Step by Step", "url": "https://henryutd2021.github.io/learn/"}}</script>
-<script type="application/json" class="lx-lesson-data">{"id":"f07-microgrids","starter":null,"total":14,"code":"F7","title":"What is a microgrid? From a hospital that keeps its lights on to a village with no grid","subtitle":"Island a campus to keep its hospital lit, then power a village that no grid reaches","short":"Microgrids","tier":"foundations","tier2":null,"tierLabel":"Foundations · L1","level":"L1","slot":1,"slot2":null,"minutes":20,"does":"Island Prairie Campus in a storm, choose which loads its battery and generator can carry and for how long, in July and in January; then size panels and a battery for a village that no grid reaches.","outcome":"Say what makes a microgrid, why ordinary rooftop solar goes dark in an outage, and how power (kW) and stored energy (kWh) limit what an island carries and for how long.","icon":"lamp","form":"cards","scales":["S1"],"teaches":["microgrids and islanding","the point of common coupling","grid-forming and grid-following sources","critical load","power and stored energy in an outage","village mini-grids"],"lab":null,"href":"f07-microgrids.html","ready":true,"after":[{"id":"09-storage","starter":9,"title":"How does storage move energy through time?","short":"Storage","does":"A battery with power and energy ratings and losses: charge cheap, sell dear, then compare with the best schedule.","href":"09-storage.html","ready":true},{"id":"f06-grid-and-outages","code":"F6","title":"How does power reach your plug, and why does it sometimes fail?","short":"Grid and outages","does":"Power followed from plant to lamp through each voltage step; then a storm: tap the failed parts, see which homes go dark, and why many outages start on local wires.","href":"f06-grid-and-outages.html","ready":true}],"prev":null,"next":{"id":"a14-microgrid-value","code":"A14","title":"Does a microgrid pay off, and for whom?","short":"Microgrid value","does":"Price an outage for a household, a dairy and a hospital; size Prairie Campus's microgrid against a year of outages; add everyday savings; compare a utility, a co-op, the county and a private company as owners; then lower a village mini-grid's cost per kWh with a mill and a cold store.","href":"a14-microgrid-value.html","ready":true},"practice":10}</script>
+<script type="application/json" class="lx-lesson-data">{"id":"f07-microgrids","starter":null,"total":14,"code":"F7","title":"What is a microgrid? From a hospital that keeps its lights on to a village with no grid","subtitle":"Island a campus to keep its hospital lit, then power a village that no grid reaches","short":"Microgrids","tier":"foundations","tier2":null,"tierLabel":"Foundations · L1","level":"L1","slot":1,"slot2":null,"minutes":20,"does":"Island Prairie Campus in a storm, choose which loads its battery and generator can carry and for how long, in July and in January; then size panels and a battery for a village that no grid reaches.","outcome":"Say what makes a microgrid, why ordinary rooftop solar goes dark in an outage, and how power (kW) and stored energy (kWh) limit what an island carries and for how long.","icon":"lamp","form":"cards","scales":["S1"],"teaches":["microgrids and islanding","the point of common coupling","grid-forming and grid-following sources","critical load","power and stored energy in an outage","village mini-grids"],"lab":null,"href":"f07-microgrids.html","ready":true,"after":[{"id":"09-storage","starter":9,"title":"How does storage move energy through time?","short":"Storage","does":"A battery with power and energy ratings and losses: charge cheap, sell dear, then compare with the best schedule.","href":"09-storage.html","ready":true},{"id":"f06-grid-and-outages","code":"F6","title":"How does power reach your plug, and why does it sometimes fail?","short":"Grid and outages","does":"Power followed from plant to lamp through each voltage step; then a storm: tap the failed parts, see which homes go dark, and why many outages start on local wires.","href":"f06-grid-and-outages.html","ready":true}],"prev":null,"next":{"id":"a14-microgrid-value","code":"A14","title":"Does a microgrid pay off, and for whom?","short":"Microgrid value","does":"Price an outage for a household, a dairy and a hospital; size Prairie Campus's microgrid against a year of outages; add everyday savings; compare a utility, a co-op, the county and a private company as owners; then lower a village mini-grid's cost per kWh with a mill and a cold store.","href":"a14-microgrid-value.html","ready":true},"nextNeeds":[{"id":"a01-project-tea","code":"A1","title":"Is this project worth building? Cash flows, discounting and the cost of capital","short":"Is it worth building?","does":"Build a wind farm's cash flows year by year; discount them at the cost of capital; move the loan share, the rate, the life and the price; read NPV, IRR and payback; a tornado chart ranks what matters.","href":"a01-project-tea.html","ready":true},{"id":"a04-retail-tariffs","code":"A4","title":"How should an electricity bill be designed? Retail, dynamic and large-load tariffs","short":"Designing a bill","does":"Bill a renter, a home with solar and an EV, and a factory under flat, time-of-use, demand-charge and real-time tariffs; see who pays more and what behaviour each tariff rewards; then set a large load's minimum bill.","href":"a04-retail-tariffs.html","ready":true}],"practice":10}</script>
 <div class="lx-head" data-lesson-id="f07-microgrids" data-total="14" data-tier="foundations" data-level="L1" data-minutes="20" data-form="cards" data-next-href="a14-microgrid-value.html">
 <div>
 <nav class="lx-crumbs" aria-label="Breadcrumb"><ol><li><a href="index.html">Learn</a></li><li aria-current="page">F7</li></ol></nav>
@@ -671,6 +690,7 @@ ul.task-list li input[type="checkbox"] {
 <div class="lx-next lx-card" data-next-id="a14-microgrid-value">
 <p class="lx-eyebrow">Next</p>
 <p class="lx-next-t"><a href="a14-microgrid-value.html">A14 · Does a microgrid pay off, and for whom?</a></p>
+<p class="lx-next-d lx-next-needs">Needs first: <a href="a01-project-tea.html">A1 · Is it worth building?</a> and <a href="a04-retail-tariffs.html">A4 · Designing a bill</a>.</p>
 <button type="button" class="lx-btn ghost small lx-complete" data-complete="f07-microgrids" aria-pressed="false" hidden="">Mark this lesson as complete</button>
 </div>
 
@@ -678,7 +698,7 @@ ul.task-list li input[type="checkbox"] {
 <p class="lx-eyebrow">In the real world</p>
 <p>In Puerto Rico, a small microgrid that serves a community organization kept the power on for nine days during Hurricane Fiona, while other parts of the island were dark (<a href="https://www.energy.gov/cmei/articles/success-story-new-tool-connects-multiple-microgrids-increase-community-resilience">U.S. DOE, 8 November 2023</a>).</p>
 <blockquote class="lx-excerpt blockquote" data-source="excerpt:campus-resilience-question"><p>In an industry internship, the course author worked on this question: how should solar <span class="lx-term" data-term="photovoltaic">PV</span>, battery storage and backup generation be sized for an industrial campus to meet demand through grid outages?</p><p>The work used a <span class="lx-term" data-term="techno-economic-optimization">techno-economic optimization</span> model to size a resilient microgrid for the campus.</p><p>The company's data, models and results are confidential and are not shown here.</p></blockquote>
-<blockquote class="lx-excerpt blockquote" data-source="excerpt:supply-chain-mg"><p>From the course author's research: in the modeled supply chains, each open factory or warehouse could run its own microgrid, with on-site wind, solar and storage, an energy balance every hour, and energy bought from and sold to the grid.</p><footer>Approved excerpt of: Li et al. (2023), <a href="https://doi.org/10.1016/j.apm.2023.02.014">Applied Mathematical Modelling</a>.</footer></blockquote>
+<blockquote class="lx-excerpt blockquote" data-source="excerpt:supply-chain-mg"><p>From the course author's research: in the modeled supply chains, each open factory or warehouse could run its own microgrid, with on-site wind, solar and storage, an energy balance every hour, and energy bought from and sold to the grid.</p><footer>From: Li et al. (2023), <a href="https://doi.org/10.1016/j.apm.2023.02.014">Applied Mathematical Modelling</a>.</footer></blockquote>
 <ul class="lx-hint f7-holds"><li>Holds when: <span class="lx-term" data-term="stylized-network">stylized networks</span> with synthetic distances and costs, candidate sites in California, Arizona and Nevada, and one year, planned week by week for products and hour by hour for energy.</li><li>Leaves out: grid outages, which the studies do not model.</li></ul>
 <p class="lx-hint">The full case: <a href="cf1-supply-chain-microgrids.html">case file CF1</a>.</p>
 </div>

@@ -2,6 +2,22 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
+<script>(function () {
+  ["localStorage", "sessionStorage"].forEach(function (name) {
+    try { window[name].getItem("_"); return; } catch (e) { }   // storage works: leave it as it is
+    var data = Object.create(null);
+    var mem = {
+      getItem: function (k) { k = String(k); return k in data ? data[k] : null; },
+      setItem: function (k, v) { data[String(k)] = String(v); },
+      removeItem: function (k) { delete data[String(k)]; },
+      clear: function () { data = Object.create(null); },
+      key: function (i) { var keys = Object.keys(data); return i >= 0 && i < keys.length ? keys[i] : null; }
+    };
+    Object.defineProperty(mem, "length", { get: function () { return Object.keys(data).length; } });
+    Object.defineProperty(mem, "inMemory", { value: true });
+    try { Object.defineProperty(window, name, { configurable: true, enumerable: true, get: function () { return mem; } }); } catch (e) { }
+  });
+})();</script>
 <meta name="generator" content="quarto-1.10.19">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
@@ -122,8 +138,10 @@ window.Quarto = {
 <link rel="stylesheet" href="../assets/learn/learn.css">
 <meta property="og:title" content="How do governments steer energy? Taxes, credits, standards and carbon prices – Honglin Li">
 <meta property="og:description" content="Analyst lesson A12 of Energy Systems, Step by Step: re-plan a regional grid’s wind, solar, storage and gas under a carbon price, a production credit, an investment credit and a clean-energy standard, solved as a linear program in the browser; compare the CO₂ cut, the resource cost, the money that changes hands and the side effects, with a real rule of each kind and its date.">
-<meta property="og:image" content="https://henryutd2021.github.io/learn/images/profile-square.jpg">
+<meta property="og:image" content="https://henryutd2021.github.io/images/profile-square.jpg">
 <meta property="og:site_name" content="Honglin Li">
+<meta property="og:url" content="https://henryutd2021.github.io/learn/a12-policy-instruments.html">
+<link rel="canonical" href="https://henryutd2021.github.io/learn/a12-policy-instruments.html">
 </head>
 
 <body class="nav-fixed page-learn page-lesson lx-form-cards quarto-light"><script id="quarto-html-before-body" type="application/javascript">
@@ -326,7 +344,7 @@ window.Quarto = {
 <span class="menu-text">Teaching</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../learn/index.html"> 
+    <a class="nav-link active" href="../learn/index.html" aria-current="true"> 
 <span class="menu-text">Learn</span></a>
   </li>  
   <li class="nav-item">
@@ -374,6 +392,7 @@ window.Quarto = {
 
 <main class="content column-page" id="quarto-document-content">
 
+<noscript><style>@media (max-width: 1199.98px) { #quarto-header { position: relative; } #quarto-header .navbar-toggler { display: none; } #quarto-header #navbarCollapse { display: block !important; } } #quarto-header .quarto-navbar-tools { display: none; }</style></noscript>
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
@@ -403,7 +422,7 @@ window.Quarto = {
 
 
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "name": "How do governments steer energy? Taxes, credits, standards and carbon prices Apply a carbon price, two credits and a clean-energy standard to the same wind, solar, storage and gas plan, and see what each cuts, costs and who pays", "description": "Analyst lesson A12 of Energy Systems, Step by Step: re-plan a regional grid's wind, solar, storage and gas under a carbon price, a production credit, an investment credit and a clean-energy standard, solved as a linear program in the browser; compare the CO₂ cut, the resource cost, the money that changes hands and the side effects, with a real rule of each kind and its date.", "learningResourceType": "Interactive lesson", "educationalLevel": "Intermediate", "timeRequired": "PT55M", "inLanguage": "en", "isAccessibleForFree": true, "teaches": ["carbon prices", "production and investment credits", "clean-energy standards", "resource cost against transfers", "cost per tonne avoided", "who pays"], "license": "https://creativecommons.org/licenses/by/4.0/", "author": {"@type": "Person", "name": "Honglin Li", "url": "https://henryutd2021.github.io/"}, "url": "https://henryutd2021.github.io/learn/a12-policy-instruments.html", "isPartOf": {"@type": "Course", "name": "Energy Systems, Step by Step", "url": "https://henryutd2021.github.io/learn/"}}</script>
-<script type="application/json" class="lx-lesson-data">{"id":"a12-policy-instruments","starter":null,"total":14,"code":"A12","title":"How do governments steer energy? Taxes, credits, standards and carbon prices","subtitle":"Apply a carbon price, two credits and a clean-energy standard to the same wind, solar, storage and gas plan, and see what each cuts, costs and who pays","short":"Steering with policy","tier":"analyst","tier2":null,"tierLabel":"Analyst · L2","level":"L2","slot":2,"slot2":null,"minutes":25,"does":"Re-plan the Plains Grid's wind, solar, storage and gas under a carbon price, a production credit, an investment credit and a clean-energy standard; compare the CO₂ cut, the resource cost, the money that changes hands and the side effects, with a real rule of each kind, its jurisdiction and its date.","outcome":"Explain how four policy instruments change a least-cost plan, compare them on emissions cut, resource cost and who pays, and keep transfers apart from real costs.","icon":"scale","form":"cards","scales":["S4","S2"],"teaches":["carbon prices","production and investment credits","clean-energy standards","resource cost against transfers","cost per tonne avoided","who pays"],"lab":null,"href":"a12-policy-instruments.html","ready":true,"after":[{"id":"a01-project-tea","code":"A1","title":"Is this project worth building? Cash flows, discounting and the cost of capital","short":"Is it worth building?","does":"Build a wind farm's cash flows year by year; discount them at the cost of capital; move the loan share, the rate, the life and the price; read NPV, IRR and payback; a tornado chart ranks what matters.","href":"a01-project-tea.html","ready":true},{"id":"12-trade-offs","starter":12,"title":"Cheap or clean? How do you weigh cost against emissions?","short":"Cheap or clean?","does":"Spot the plans nobody should pick, slide a carbon price, and trace the frontier between cost and CO₂.","href":"12-trade-offs.html","ready":true}],"prev":null,"next":{"id":"m06-carbon-in-models","code":"M6","title":"Putting carbon in the model: caps, prices, frontiers and procurement rules","short":"Carbon in models","does":"Cap CO₂ in the Plains Grid's planning LP and read the cap's dual; trace the cost-emissions frontier; set a carbon price and see where it lands, ties included; add a data center with annual or hourly matching rules and compare what each costs, claims and changes at the plants.","href":"m06-carbon-in-models.html","ready":true},"practice":30}</script>
+<script type="application/json" class="lx-lesson-data">{"id":"a12-policy-instruments","starter":null,"total":14,"code":"A12","title":"How do governments steer energy? Taxes, credits, standards and carbon prices","subtitle":"Apply a carbon price, two credits and a clean-energy standard to the same wind, solar, storage and gas plan, and see what each cuts, costs and who pays","short":"Steering with policy","tier":"analyst","tier2":null,"tierLabel":"Analyst · L2","level":"L2","slot":2,"slot2":null,"minutes":25,"does":"Re-plan the Plains Grid's wind, solar, storage and gas under a carbon price, a production credit, an investment credit and a clean-energy standard; compare the CO₂ cut, the resource cost, the money that changes hands and the side effects, with a real rule of each kind, its jurisdiction and its date.","outcome":"Explain how four policy instruments change a least-cost plan, compare them on emissions cut, resource cost and who pays, and keep transfers apart from real costs.","icon":"scale","form":"cards","scales":["S4","S2"],"teaches":["carbon prices","production and investment credits","clean-energy standards","resource cost against transfers","cost per tonne avoided","who pays"],"lab":null,"href":"a12-policy-instruments.html","ready":true,"after":[{"id":"a01-project-tea","code":"A1","title":"Is this project worth building? Cash flows, discounting and the cost of capital","short":"Is it worth building?","does":"Build a wind farm's cash flows year by year; discount them at the cost of capital; move the loan share, the rate, the life and the price; read NPV, IRR and payback; a tornado chart ranks what matters.","href":"a01-project-tea.html","ready":true},{"id":"12-trade-offs","starter":12,"title":"Cheap or clean? How do you weigh cost against emissions?","short":"Cheap or clean?","does":"Spot the plans nobody should pick, slide a carbon price, and trace the frontier between cost and CO₂.","href":"12-trade-offs.html","ready":true}],"prev":null,"next":{"id":"m06-carbon-in-models","code":"M6","title":"Putting carbon in the model: caps, prices, frontiers and procurement rules","short":"Carbon in models","does":"Cap CO₂ in the Plains Grid's planning LP and read the cap's dual; trace the cost-emissions frontier; set a carbon price and see where it lands, ties included; add a data center with annual or hourly matching rules and compare what each costs, claims and changes at the plants.","href":"m06-carbon-in-models.html","ready":true},"nextNeeds":[{"id":"a10-emissions-questions","code":"A10","title":"Which emissions question are you asking? Inventories, consequences and procurement claims","short":"Which emissions question?","does":"Run a data center or an electrolyzer for a day on the Plains Grid; count its inventory share at average factors, its short-run change at the plants under two dispatch models, its long-run change under three build responses, and what five purchases let it claim.","href":"a10-emissions-questions.html","ready":true},{"id":"m01-dispatch-to-lmp","code":"M1","title":"From dispatch to locational prices: the linear program behind the market","short":"Dispatch to locational prices","does":"Build a 24-hour dispatch LP with ramps and read its balance duals as marginal values under stated assumptions; add a three-bus DC power-flow network, congest a line and watch one price split into three.","href":"m01-dispatch-to-lmp.html","ready":true}],"practice":30}</script>
 <div class="lx-head" data-lesson-id="a12-policy-instruments" data-total="14" data-tier="analyst" data-level="L2" data-minutes="25" data-form="cards" data-next-href="m06-carbon-in-models.html">
 <div>
 <nav class="lx-crumbs" aria-label="Breadcrumb"><ol><li><a href="index.html">Learn</a></li><li aria-current="page">A12</li></ol></nav>
@@ -602,6 +621,7 @@ window.Quarto = {
 <div class="lx-next lx-card" data-next-id="m06-carbon-in-models">
 <p class="lx-eyebrow">Next</p>
 <p class="lx-next-t"><a href="m06-carbon-in-models.html">M6 · Putting carbon in the model: caps, prices, frontiers and procurement rules</a></p>
+<p class="lx-next-d lx-next-needs">Needs first: <a href="a10-emissions-questions.html">A10 · Which emissions question?</a> and <a href="m01-dispatch-to-lmp.html">M1 · Dispatch to locational prices</a>.</p>
 <button type="button" class="lx-btn ghost small lx-complete" data-complete="a12-policy-instruments" aria-pressed="false" hidden="">Mark this lesson as complete</button>
 </div>
 

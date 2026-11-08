@@ -2,6 +2,22 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
+<script>(function () {
+  ["localStorage", "sessionStorage"].forEach(function (name) {
+    try { window[name].getItem("_"); return; } catch (e) { }   // storage works: leave it as it is
+    var data = Object.create(null);
+    var mem = {
+      getItem: function (k) { k = String(k); return k in data ? data[k] : null; },
+      setItem: function (k, v) { data[String(k)] = String(v); },
+      removeItem: function (k) { delete data[String(k)]; },
+      clear: function () { data = Object.create(null); },
+      key: function (i) { var keys = Object.keys(data); return i >= 0 && i < keys.length ? keys[i] : null; }
+    };
+    Object.defineProperty(mem, "length", { get: function () { return Object.keys(data).length; } });
+    Object.defineProperty(mem, "inMemory", { value: true });
+    try { Object.defineProperty(window, name, { configurable: true, enumerable: true, get: function () { return mem; } }); } catch (e) { }
+  });
+})();</script>
 <meta name="generator" content="quarto-1.10.19">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
@@ -93,7 +109,7 @@ ul.task-list li input[type="checkbox"] {
     const options = {
       valueNames: ['listing-title','listing-subtitle','listing-description','listing-themekey','listing-themelabel','listing-themeicon','listing-slug',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-file-modified-sort'] },{ data: ['listing-reading-time-sort'] },{ data: ['listing-word-count-sort'] }],
       
-      searchColumns: ["listing-project","listing-website","listing-format","listing-engines","listing-language","listing-title","listing-subtitle","listing-description","listing-order","listing-categories","listing-themekey","listing-themelabel","listing-themeicon","listing-slug","listing-body-classes","listing-page-layout","listing-toc","listing-path","listing-outputHref","listing-author","listing-filename","listing-file-modified","listing-reading-time","listing-word-count"],
+      searchColumns: ["listing-project","listing-website","listing-format","listing-engines","listing-language","listing-title","listing-subtitle","listing-description","listing-order","listing-categories","listing-themekey","listing-themelabel","listing-themeicon","listing-slug","listing-image","listing-image-alt","listing-body-classes","listing-page-layout","listing-toc","listing-path","listing-outputHref","listing-author","listing-filename","listing-file-modified","listing-reading-time","listing-word-count"],
     };
 
     window['quarto-listings'] = window['quarto-listings'] || {};
@@ -154,7 +170,9 @@ window.Quarto = {
 <meta property="og:description" content="Case studies by Honglin Li: SMR cogeneration for data centers, hydrogen-integrated nuclear and renewable systems, carbon-aware load, microgrid supply chains and wind uncertainty.">
 <meta property="og:image" content="https://henryutd2021.github.io/images/projects/nuclear-dc.svg">
 <meta property="og:site_name" content="Honglin Li">
+<meta property="og:url" content="https://henryutd2021.github.io/projects.html">
 <meta property="og:image:alt" content="">
+<link rel="canonical" href="https://henryutd2021.github.io/projects.html">
 </head>
 
 <body class="nav-fixed page-inner page-projects quarto-light"><script id="quarto-html-before-body" type="application/javascript">
@@ -427,6 +445,7 @@ window.Quarto = {
 
 <main class="content quarto-banner-title-block column-page" id="quarto-document-content">
 
+<noscript><style>@media (max-width: 1199.98px) { #quarto-header { position: relative; } #quarto-header .navbar-toggler { display: none; } #quarto-header #navbarCollapse { display: block !important; } } #quarto-header .quarto-navbar-tools { display: none; }</style></noscript>
 
 
 
@@ -447,7 +466,7 @@ window.Quarto = {
 <div class="quarto-listing quarto-listing-container-custom" id="listing-listing">
 <div class="project-grid">
 
-<div data-index="0" data-categories="TnVjbGVhciUyMCUyNiUyMGRhdGElMjBjZW50ZXJz" data-listing-file-modified-sort="1794105511374" data-listing-reading-time-sort="7" data-listing-word-count-sort="1393" class="pc-cell" data-theme="datacenter" data-label="Nuclear &amp; data centers">
+<div data-index="0" data-categories="TnVjbGVhciUyMCUyNiUyMGRhdGElMjBjZW50ZXJz" data-listing-file-modified-sort="1794146131831" data-listing-reading-time-sort="8" data-listing-word-count-sort="1454" class="pc-cell" data-theme="datacenter" data-label="Nuclear &amp; data centers">
 <article class="project-card card is-link theme-datacenter">
 <div class="pc-cover"><img src="images/projects/nuclear-dc.svg" alt="" width="640" height="360" loading="lazy"></div>
 <div class="pc-body">
@@ -460,7 +479,7 @@ window.Quarto = {
 </article>
 </div>
 
-<div data-index="1" data-categories="TnVjbGVhciUyMCUyNiUyMGRhdGElMjBjZW50ZXJz" data-listing-file-modified-sort="1794105511374" data-listing-reading-time-sort="4" data-listing-word-count-sort="728" class="pc-cell" data-theme="datacenter" data-label="Nuclear &amp; data centers">
+<div data-index="1" data-categories="TnVjbGVhciUyMCUyNiUyMGRhdGElMjBjZW50ZXJz" data-listing-file-modified-sort="1794146131831" data-listing-reading-time-sort="4" data-listing-word-count-sort="742" class="pc-cell" data-theme="datacenter" data-label="Nuclear &amp; data centers">
 <article class="project-card card is-link theme-datacenter">
 <div class="pc-cover"><img src="images/projects/smr-dc.svg" alt="" width="640" height="360" loading="lazy"></div>
 <div class="pc-body">
@@ -473,7 +492,7 @@ window.Quarto = {
 </article>
 </div>
 
-<div data-index="2" data-categories="TnVjbGVhciUyMCUyNiUyMGRhdGElMjBjZW50ZXJz" data-listing-file-modified-sort="1794105511374" data-listing-reading-time-sort="2" data-listing-word-count-sort="209" class="pc-cell" data-theme="datacenter" data-label="Nuclear &amp; data centers">
+<div data-index="2" data-categories="TnVjbGVhciUyMCUyNiUyMGRhdGElMjBjZW50ZXJz" data-listing-file-modified-sort="1794146131831" data-listing-reading-time-sort="2" data-listing-word-count-sort="209" class="pc-cell" data-theme="datacenter" data-label="Nuclear &amp; data centers">
 <article class="project-card card is-link theme-datacenter">
 <div class="pc-cover"><img src="images/projects/smr-dc-national.svg" alt="" width="640" height="360" loading="lazy"></div>
 <div class="pc-body">
@@ -486,7 +505,7 @@ window.Quarto = {
 </article>
 </div>
 
-<div data-index="3" data-categories="TnVjbGVhciUyMCUyNiUyMGRhdGElMjBjZW50ZXJz" data-listing-file-modified-sort="1794105511371" data-listing-reading-time-sort="4" data-listing-word-count-sort="773" class="pc-cell" data-theme="datacenter" data-label="Nuclear &amp; data centers">
+<div data-index="3" data-categories="TnVjbGVhciUyMCUyNiUyMGRhdGElMjBjZW50ZXJz" data-listing-file-modified-sort="1794146131829" data-listing-reading-time-sort="4" data-listing-word-count-sort="783" class="pc-cell" data-theme="datacenter" data-label="Nuclear &amp; data centers">
 <article class="project-card card is-link theme-datacenter">
 <div class="pc-cover"><img src="images/projects/data-center-delay-economics.svg" alt="" width="640" height="360" loading="lazy"></div>
 <div class="pc-body">
@@ -499,7 +518,7 @@ window.Quarto = {
 </article>
 </div>
 
-<div data-index="4" data-categories="SHlkcm9nZW4lMjBzeXN0ZW1z" data-listing-file-modified-sort="1794105511376" data-listing-reading-time-sort="7" data-listing-word-count-sort="1251" class="pc-cell" data-theme="hydrogen" data-label="Hydrogen systems">
+<div data-index="4" data-categories="SHlkcm9nZW4lMjBzeXN0ZW1z" data-listing-file-modified-sort="1794146131832" data-listing-reading-time-sort="7" data-listing-word-count-sort="1251" class="pc-cell" data-theme="hydrogen" data-label="Hydrogen systems">
 <article class="project-card card is-link theme-hydrogen">
 <div class="pc-cover"><img src="images/projects/wind-hydrogen.svg" alt="" width="640" height="360" loading="lazy"></div>
 <div class="pc-body">
@@ -512,7 +531,7 @@ window.Quarto = {
 </article>
 </div>
 
-<div data-index="5" data-categories="SHlkcm9nZW4lMjBzeXN0ZW1z" data-listing-file-modified-sort="1794105511375" data-listing-reading-time-sort="4" data-listing-word-count-sort="739" class="pc-cell" data-theme="hydrogen" data-label="Hydrogen systems">
+<div data-index="5" data-categories="SHlkcm9nZW4lMjBzeXN0ZW1z" data-listing-file-modified-sort="1794146131832" data-listing-reading-time-sort="4" data-listing-word-count-sort="739" class="pc-cell" data-theme="hydrogen" data-label="Hydrogen systems">
 <article class="project-card card is-link theme-hydrogen">
 <div class="pc-cover"><img src="images/projects/solar-hydrogen.svg" alt="" width="640" height="360" loading="lazy"></div>
 <div class="pc-body">
@@ -525,7 +544,7 @@ window.Quarto = {
 </article>
 </div>
 
-<div data-index="6" data-categories="SHlkcm9nZW4lMjBzeXN0ZW1z" data-listing-file-modified-sort="1794105511374" data-listing-reading-time-sort="5" data-listing-word-count-sort="811" class="pc-cell" data-theme="hydrogen" data-label="Hydrogen systems">
+<div data-index="6" data-categories="SHlkcm9nZW4lMjBzeXN0ZW1z" data-listing-file-modified-sort="1794146131831" data-listing-reading-time-sort="5" data-listing-word-count-sort="832" class="pc-cell" data-theme="hydrogen" data-label="Hydrogen systems">
 <article class="project-card card is-link theme-hydrogen">
 <div class="pc-cover"><img src="images/projects/offshore-wind-hydrogen-om.svg" alt="" width="640" height="360" loading="lazy"></div>
 <div class="pc-body">
@@ -538,7 +557,7 @@ window.Quarto = {
 </article>
 </div>
 
-<div data-index="7" data-categories="SHlkcm9nZW4lMjBzeXN0ZW1z" data-listing-file-modified-sort="1794105511375" data-listing-reading-time-sort="6" data-listing-word-count-sort="1093" class="pc-cell" data-theme="hydrogen" data-label="Hydrogen systems">
+<div data-index="7" data-categories="SHlkcm9nZW4lMjBzeXN0ZW1z" data-listing-file-modified-sort="1794146131832" data-listing-reading-time-sort="6" data-listing-word-count-sort="1093" class="pc-cell" data-theme="hydrogen" data-label="Hydrogen systems">
 <article class="project-card card is-link theme-hydrogen">
 <div class="pc-cover"><img src="images/projects/txh2.svg" alt="" width="640" height="360" loading="lazy"></div>
 <div class="pc-body">
@@ -551,7 +570,7 @@ window.Quarto = {
 </article>
 </div>
 
-<div data-index="8" data-categories="SHlkcm9nZW4lMjBzeXN0ZW1z" data-listing-file-modified-sort="1794105511373" data-listing-reading-time-sort="6" data-listing-word-count-sort="1120" class="pc-cell" data-theme="hydrogen" data-label="Hydrogen systems">
+<div data-index="8" data-categories="SHlkcm9nZW4lMjBzeXN0ZW1z" data-listing-file-modified-sort="1794146131831" data-listing-reading-time-sort="6" data-listing-word-count-sort="1166" class="pc-cell" data-theme="hydrogen" data-label="Hydrogen systems">
 <article class="project-card card is-link theme-hydrogen">
 <div class="pc-cover"><img src="images/projects/npph2.svg" alt="" width="640" height="360" loading="lazy"></div>
 <div class="pc-body">
@@ -564,7 +583,7 @@ window.Quarto = {
 </article>
 </div>
 
-<div data-index="9" data-categories="Q2FyYm9uLWF3YXJlJTIwZ3JpZA==" data-listing-file-modified-sort="1794105511372" data-listing-reading-time-sort="5" data-listing-word-count-sort="971" class="pc-cell" data-theme="carbon" data-label="Carbon-aware grid">
+<div data-index="9" data-categories="Q2FyYm9uLWF3YXJlJTIwZ3JpZA==" data-listing-file-modified-sort="1794146131830" data-listing-reading-time-sort="5" data-listing-word-count-sort="971" class="pc-cell" data-theme="carbon" data-label="Carbon-aware grid">
 <article class="project-card card is-link theme-carbon">
 <div class="pc-cover"><img src="images/projects/ghg.svg" alt="" width="640" height="360" loading="lazy"></div>
 <div class="pc-body">
@@ -577,7 +596,7 @@ window.Quarto = {
 </article>
 </div>
 
-<div data-index="10" data-categories="TWljcm9ncmlkcyUyMCUyNiUyMHN1cHBseSUyMGNoYWlucw==" data-listing-file-modified-sort="1794105511371" data-listing-reading-time-sort="6" data-listing-word-count-sort="1093" class="pc-cell" data-theme="microgrid" data-label="Microgrids &amp; supply chains">
+<div data-index="10" data-categories="TWljcm9ncmlkcyUyMCUyNiUyMHN1cHBseSUyMGNoYWlucw==" data-listing-file-modified-sort="1794146131830" data-listing-reading-time-sort="6" data-listing-word-count-sort="1093" class="pc-cell" data-theme="microgrid" data-label="Microgrids &amp; supply chains">
 <article class="project-card card is-link theme-microgrid">
 <div class="pc-cover"><img src="images/projects/facility-microgrid-location.svg" alt="" width="640" height="360" loading="lazy"></div>
 <div class="pc-body">
@@ -590,7 +609,7 @@ window.Quarto = {
 </article>
 </div>
 
-<div data-index="11" data-categories="V2luZCUyMHVuY2VydGFpbnR5" data-listing-file-modified-sort="1794105511375" data-listing-reading-time-sort="5" data-listing-word-count-sort="872" class="pc-cell" data-theme="wind" data-label="Wind uncertainty">
+<div data-index="11" data-categories="V2luZCUyMHVuY2VydGFpbnR5" data-listing-file-modified-sort="1794146131832" data-listing-reading-time-sort="5" data-listing-word-count-sort="872" class="pc-cell" data-theme="wind" data-label="Wind uncertainty">
 <article class="project-card card is-link theme-wind">
 <div class="pc-cover"><img src="images/projects/uq-mfgpr.svg" alt="" width="640" height="360" loading="lazy"></div>
 <div class="pc-body">
@@ -603,7 +622,7 @@ window.Quarto = {
 </article>
 </div>
 
-<div data-index="12" data-categories="V2luZCUyMHVuY2VydGFpbnR5" data-listing-file-modified-sort="1794105511372" data-listing-reading-time-sort="2" data-listing-word-count-sort="340" class="pc-cell" data-theme="wind" data-label="Wind uncertainty">
+<div data-index="12" data-categories="V2luZCUyMHVuY2VydGFpbnR5" data-listing-file-modified-sort="1794146131830" data-listing-reading-time-sort="2" data-listing-word-count-sort="380" class="pc-cell" data-theme="wind" data-label="Wind uncertainty">
 <article class="project-card card is-link theme-wind">
 <div class="pc-cover"><img src="images/projects/national-wind-uq.svg" alt="" width="640" height="360" loading="lazy"></div>
 <div class="pc-body">
@@ -616,7 +635,7 @@ window.Quarto = {
 </article>
 </div>
 
-<div data-index="13" data-categories="SW5kdXN0cnk=" data-listing-file-modified-sort="1794105511371" data-listing-reading-time-sort="2" data-listing-word-count-sort="310" class="pc-cell" data-theme="industry" data-label="Industry">
+<div data-index="13" data-categories="SW5kdXN0cnk=" data-listing-file-modified-sort="1794146131830" data-listing-reading-time-sort="2" data-listing-word-count-sort="310" class="pc-cell" data-theme="industry" data-label="Industry">
 <article class="project-card card is-link theme-industry">
 <div class="pc-cover"><img src="images/projects/fm-global-internship.svg" alt="" width="640" height="360" loading="lazy"></div>
 <div class="pc-body">

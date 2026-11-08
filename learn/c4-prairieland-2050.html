@@ -2,6 +2,22 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
+<script>(function () {
+  ["localStorage", "sessionStorage"].forEach(function (name) {
+    try { window[name].getItem("_"); return; } catch (e) { }   // storage works: leave it as it is
+    var data = Object.create(null);
+    var mem = {
+      getItem: function (k) { k = String(k); return k in data ? data[k] : null; },
+      setItem: function (k, v) { data[String(k)] = String(v); },
+      removeItem: function (k) { delete data[String(k)]; },
+      clear: function () { data = Object.create(null); },
+      key: function (i) { var keys = Object.keys(data); return i >= 0 && i < keys.length ? keys[i] : null; }
+    };
+    Object.defineProperty(mem, "length", { get: function () { return Object.keys(data).length; } });
+    Object.defineProperty(mem, "inMemory", { value: true });
+    try { Object.defineProperty(window, name, { configurable: true, enumerable: true, get: function () { return mem; } }); } catch (e) { }
+  });
+})();</script>
 <meta name="generator" content="quarto-1.10.19">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
@@ -94,8 +110,10 @@ ul.task-list li input[type="checkbox"] {
 <link rel="stylesheet" href="../assets/learn/learn.css">
 <meta property="og:title" content="Prairieland 2050: design and defend a nation’s pathway – Honglin Li">
 <meta property="og:description" content="Capstone C4 of Energy Systems, Step by Step: choose a fictional nation’s pathway to 2050 on the Pathway Explorer’s engine, test it against a gas-price spike, a drought, a mineral export restriction and a demand surprise, and defend it in a two-page policy brief with its cost, emissions against a cumulative budget, security, screening affordability and a coal county’s jobs.">
-<meta property="og:image" content="https://henryutd2021.github.io/learn/images/profile-square.jpg">
+<meta property="og:image" content="https://henryutd2021.github.io/images/profile-square.jpg">
 <meta property="og:site_name" content="Honglin Li">
+<meta property="og:url" content="https://henryutd2021.github.io/learn/c4-prairieland-2050.html">
+<link rel="canonical" href="https://henryutd2021.github.io/learn/c4-prairieland-2050.html">
 </head>
 
 <body class="nav-fixed page-learn page-lesson lx-form-capstone quarto-light"><script id="quarto-html-before-body" type="application/javascript">
@@ -298,7 +316,7 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">Teaching</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../learn/index.html"> 
+    <a class="nav-link active" href="../learn/index.html" aria-current="true"> 
 <span class="menu-text">Learn</span></a>
   </li>  
   <li class="nav-item">
@@ -346,6 +364,7 @@ ul.task-list li input[type="checkbox"] {
 
 <main class="content column-page" id="quarto-document-content">
 
+<noscript><style>@media (max-width: 1199.98px) { #quarto-header { position: relative; } #quarto-header .navbar-toggler { display: none; } #quarto-header #navbarCollapse { display: block !important; } } #quarto-header .quarto-navbar-tools { display: none; }</style></noscript>
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
@@ -404,6 +423,7 @@ ul.task-list li input[type="checkbox"] {
 <dl class="lx-sb-facts c4-units">
 <div><dt>Units</dt><dd>Power in GW; energy in TWh and PJ (1 TWh = 3.6 PJ; 1 PJ = a million GJ); CO₂ in Mt, million tonnes; fuel prices per GJ on <span class="lx-term" data-term="net-calorific-value">net calorific values</span>.</dd></div>
 <div><dt>Terms</dt><dd><span class="lx-term" data-term="primary-energy">Primary energy</span>: fuels as found, before conversion. <span class="lx-term" data-term="lng">LNG</span>: liquefied natural gas. The LP's dual: the modelled cost change from tightening the budget by one tonne.</dd></div>
+<div><dt>More terms</dt><dd><span class="lx-term" data-term="linear-program">LP</span>: linear program. <span class="lx-term" data-term="firm-capacity">Firm clean</span>: the generic plant that runs steadily, within its availability. <span class="lx-term" data-term="energy-burden">Energy burden</span>: home-energy spending ÷ household income.</dd></div>
 </dl>
 </div>
 </div>
@@ -585,7 +605,7 @@ ul.task-list li input[type="checkbox"] {
 <tbody>
 <tr class="odd">
 <td>Cost 2026–2050, present value in 2025 (2025 dollars; supply side and every fuel bought)</td>
-<td class="n">$401.6 billion</td>
+<td class="n">$410.7 billion</td>
 </tr>
 <tr class="even">
 <td>CO₂ 2026–2050 against the budget</td>
@@ -695,7 +715,44 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 </tbody>
 </table>
-</div>
+</div><div class="lx-scroll-x">
+<table class="lx-facts c4-shockwhat e4-wrap caption-top table">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">Shock</th>
+<th data-quarto-table-cell-role="th" scope="col">When, in the model</th>
+<th data-quarto-table-cell-role="th" scope="col">What changes</th>
+<th data-quarto-table-cell-role="th" scope="col">What the re-plan keeps</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Gas-price spike</td>
+<td class="n">2030 (all of 2026–2030)</td>
+<td class="n">LNG × 3 and domestic gas × 1.5 in price.</td>
+<td class="n">Builds and retirements through 2030 kept; 2030 runs what was built; later years re-plan.</td>
+</tr>
+<tr class="even">
+<td>Drought</td>
+<td class="n">2035 (all of 2031–2035)</td>
+<td class="n">Hydro output × 0.65 in every slice. River-cooled plants (coal, combined cycles, the existing nuclear plants) at × 0.9 of their capacity in the summer slices and the summer stress hour. The generic firm option too.</td>
+<td class="n">Builds and retirements through 2035 kept; 2035 runs what was built; later years re-plan.</td>
+</tr>
+<tr class="odd">
+<td>Mineral export restriction</td>
+<td class="n">2035 (all of 2031–2035)</td>
+<td class="n">New batteries bought in 2031–2035 cost × 1.5.</td>
+<td class="n">Decisions through 2030 kept; 2035's new plants re-planned at the higher price.</td>
+</tr>
+<tr class="even">
+<td>Demand surprise</td>
+<td class="n">from 2035 on (2031–2050)</td>
+<td class="n">Electricity demand × 1.1 in every slice and stress hour.</td>
+<td class="n">Builds and retirements through 2035 kept; 2035 runs what was built; later years re-plan.</td>
+</tr>
+</tbody>
+</table>
+</div><p class="lx-eyebrow">The default pathway's assumptions, for the brief</p><ul class="c4-assume"><li>Prairieland and Ridge County are fictional; their numbers are illustrative.</li><li>2025 dollars; costs are fixed ranges the plan sets, the same in every period, whatever is built.</li><li>The cost counts the existing wind, solar and batteries' fixed O&amp;M while they are open; the data give none for existing hydro and the steady plants, so their upkeep is left out (the same in every pathway).</li><li>An existing plant leaves the plan in the five-year period that contains its retirement year: a conservative simplification.</li><li>Twelve time slices of 2025's weather stand for each model year, with the peak net-load day and the scarce-wind week kept whole.</li><li>A peak-hour rule at two stress hours of 2025, each region's load plus 10%.</li><li>CO₂: fuels burned inside Prairieland at the IPCC's factors; the budget counts 2025 twice and the model years with straight lines between (weights 2, 5, 5, 5, 5, 3).</li><li>Electrification follows the plan; end-use equipment (heat pumps, cars, boilers) is left out of every cost.</li><li>Shocks: an operating shock keeps the plan's builds through its year, which runs what was built; the mineral restriction keeps decisions through the year before it and re-plans that year's purchases at its price; later years re-plan.</li><li>Affordability: households pay 50% of the change in 2050's yearly cost against the 2025-policies pathway, per kWh; Prairie City's five groups stand in for Prairieland's households.</li><li>The households' share (50%) is spread in full over the household groups; the rest of the change is outside this screening.</li><li>Each group is its average household; households within a group differ.</li><li>Use does not change when the price changes (no response to the charge).</li><li>Ridge County: mine jobs scale with coal mined at A13's ratio (5.22 jobs per PJ).</li><li>New jobs come from all the wind and solar built in the Ridge region, assumed to be in Ridge County: an upper bound for the county.</li><li>Jobs use A13's coefficients, a multiplier of 1.6 and 20% displacement.</li><li>Lost jobs count in full: no re-employment of the plant's or mines' workers is assumed.</li><li>The multiplier turns direct (on-site) jobs into direct, supplier and spending jobs, the same on both sides.</li><li>Displacement, new work that would have existed anyway, comes off every count marked net; gross counts keep it.</li><li>Full-year check (2030 and 2050, 2025's and 2024's weather): 4 of 4 pass both tests, all demand served and CO₂ within 10% of the slices (a teaching tolerance); it does not test the cumulative budget.</li></ul>
 
 </div>
 </div>
@@ -703,9 +760,11 @@ ul.task-list li input[type="checkbox"] {
 <li><b>Illustrative:</b> Prairieland, its regions, fleet, links, demand, shocks and Ridge County (prairieland.json); the existing plants' operating costs, the penalties and the peak-hour rule (e4-pathways.json); A13's jobs coefficients.</li>
 <li><b>Based on public data:</b> new plants' costs from EIA's 2026 assumptions, fuel prices from EIA's 2025 data, CO₂ factors from the IPCC, hourly shapes from SPP's 2025 and 2024 grid.</li>
 <li><b>Left out of every cost:</b> end-use equipment (heat pumps, cars, boilers), so a pathway that electrifies more looks cheaper than it would be for households.</li>
+<li><b>Also left out:</b> the upkeep of the existing hydro and steady plants (the data give no figure; the same in every pathway).</li>
 <li><b>Who pays and jobs:</b> <a href="a13-fairness-jobs.html">A13</a>'s accounting layer: screening estimates with stated assumptions, not outputs of the linear program; Prairie City's five household groups stand in for Prairieland's.</li>
-<li><b>Precomputed:</b> the presets (perfect foresight and decade by decade) with their shocks and full-year checks come from a library made with this engine; any other pathway runs in your browser.</li>
+<li><b>Precomputed:</b> the first view and the presets' full-year checks (about a minute of solving each) come from a library made with this engine; every run you start solves in your browser.</li>
 <li><b>Against lesson A20:</b> no pathway here gets below about 2,700 Mt (straight-line counting, central demand). <a href="a20-national-scenarios.html">A20</a> meets 2,600 Mt because its fastest path electrifies buildings and industry years sooner.</li>
+<li><b>Corrected 7 Nov 2026:</b> costs now include the existing wind, solar and batteries' fixed O&amp;M, the same in every pathway at one discount rate ($9.1 billion at 5%; central: $410.7 billion, was $401.6 billion). The full-year check buys gas in the slice run's own mix.</li>
 </ul></div>
 <style>/* lesson-local */
 .page-learn .c4-note ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 2px; }
@@ -752,13 +811,14 @@ ul.task-list li input[type="checkbox"] {
 <div class="lx-ex-ans weak"><p class="lx-eyebrow">Weak brief · Developing</p><p class="lx-ex-lines">Prairieland should go renewable [1]. It meets the climate goal [2] and is secure [3]. Ridge County will be fine [4].</p><ol class="lx-ex-static"><li value="1"><b>Falls short:</b> No sizes or years: what is built, where, and when?</li><li value="2"><b>Falls short:</b> Which budget, on what boundary, by how much?</li><li value="3"><b>Falls short:</b> Against what? Imports, the strait, the peak hours: name the measure and the shocks.</li><li value="4"><b>Falls short:</b> Jobs lost and gained, gross and net, with the coefficients stated.</li></ol></div>
 <div class="lx-ex-ans good"><p class="lx-eyebrow">Strong brief · Proficient</p><p class="lx-ex-lines"><b>Recommendation:</b> follow the central pathway: by 2050 build 72.0 GW of wind, 32.5 GW of solar, 35.5 GW of gas, 0.0 GW of batteries and 3.3 GW of the generic firm option, and widen links by 8.9 GW [1].
 <b>Why this one:</b> a security-first plan (imports at most 25%) costs $109.6 billion more and still cannot meet its cap in 2030 [2].
-<b>Cost and carbon:</b> $401.6 billion to 2050 (present value, 2025 dollars, supply side and every fuel); CO₂ 3,600 of 3,600 Mt [3].
+<b>Cost and carbon:</b> $410.7 billion to 2050 (present value, 2025 dollars, supply side and every fuel); CO₂ 3,600 of 3,600 Mt [3].
 <b>Security:</b> imports at most 32% of primary energy against a 40% cap [4].
-<b>Shocks:</b> Cost: against the four shocks, each re-planned from its year, the cost to 2050 moves by $0.0 billion to +$26.5 billion, most for the demand surprise. Carbon: the budget is met under all four. Imports: within the cap under all four. Peak hours: short in the shock's year under the drought and the demand surprise. [5]
+<b>Shocks:</b> Cost: against the four shocks, each re-planned from its year, the cost to 2050 moves by $0.0 billion to +$26.5 billion, most for the demand surprise. Carbon: the budget is met under all four. Imports: within the cap under all four. Peak hours: short in the shock's year under the drought and the demand surprise. Operating shocks kept each year's builds; the mineral restriction re-planned that year's battery purchases [5].
 <b>What would change it:</b> the demand surprise costs most (+$26.5 billion) and leaves the stress hours 4,766 MW short in 2035; if it looked likely, I would build more firm capacity before 2035 [6].
 <b>Who pays (screening):</b> about $−130 a household a year in 2050 if households pay 50%; equipment not counted [7].
 <b>Ridge County (screening):</b> 5,533 jobs lost against 1,152 new ongoing jobs (922 net), with a multiplier of 1.6, 20% displacement and all the Ridge region's new wind and solar in the county [8].
-<b>Limits:</b> twelve slices, no clean fuels for the oil and gas that stay, perfect foresight; the full-year check passes 4 of 4, with CO₂ up to 8% above the slices, and does not test the budget [9].</p><ol class="lx-ex-static"><li value="1"><b>Works:</b> Every lever with its size.</li><li value="2"><b>Works:</b> A reason against another pathway, from a second run.</li><li value="3"><b>Works:</b> One boundary, the budget's arithmetic stated.</li><li value="4"><b>Works:</b> A measure and its limit.</li><li value="5"><b>Works:</b> All four, with the rule for what was kept, as a range.</li><li value="6"><b>Works:</b> The result that would change the recommendation, named.</li><li value="7"><b>Works:</b> A screening estimate with its share and what it leaves out.</li><li value="8"><b>Works:</b> Gross and net kept apart; the multiplier, displacement and the county assumption stated.</li><li value="9"><b>Works:</b> What the model leaves out, and what the checks do and do not show.</li></ol></div>
+<b>Evidence:</b> the plan link from the bench (the default plan), and M13's notebook run on the same plan, which prints the same cost and CO₂ [9].
+<b>Limits:</b> twelve slices, no clean fuels for the oil and gas that stay, perfect foresight; the full-year check passes 4 of 4, with CO₂ up to 8% above the slices, and does not test the budget [10].</p><ol class="lx-ex-static"><li value="1"><b>Works:</b> Every lever with its size.</li><li value="2"><b>Works:</b> A reason against another pathway, from a second run.</li><li value="3"><b>Works:</b> One boundary, the budget's arithmetic stated.</li><li value="4"><b>Works:</b> A measure and its limit.</li><li value="5"><b>Works:</b> All four, with the rule for what was kept, as a range.</li><li value="6"><b>Works:</b> The result that would change the recommendation, named.</li><li value="7"><b>Works:</b> A screening estimate with its share and what it leaves out.</li><li value="8"><b>Works:</b> Gross and net kept apart; the multiplier, displacement and the county assumption stated.</li><li value="9"><b>Works:</b> The link and the notebook's run, as the hand-in asks.</li><li value="10"><b>Works:</b> What the model leaves out, and what the checks do and do not show.</li></ol></div>
 </div>
 
 <table class="lx-facts lx-ex-diff caption-top table">
@@ -983,6 +1043,9 @@ ul.task-list li input[type="checkbox"] {
 <p class="lx-eyebrow">Sources and further reading</p>
 <ul>
 <li>U.S. Energy Information Administration (April 2026). <a href="https://www.eia.gov/outlooks/aeo/assumptions/pdf/EMM_Assumptions.pdf">Assumptions to the Annual Energy Outlook 2026: Electricity Market Module</a>, Tables 3 and 4 (read 7 Nov 2026).</li>
+<li>U.S. Energy Information Administration. <a href="https://www.eia.gov/electricity/annual/html/epa_07_04.html">Electric Power Annual, Table 7.4: weighted average cost of fossil fuels for the electric power industry, 2015 through 2025</a> (2025: gas $3.85, coal $2.42 per MMBtu; read 7 Nov 2026).</li>
+<li>Cole, W., Ramasamy, V. and Turan, M. (2025). <a href="https://docs.nlr.gov/docs/fy25osti/93281.pdf">Cost Projections for Utility-Scale Battery Storage: 2025 Update</a> (PDF). NREL/TP-6A40-93281. Only its 2024 cost, in 2025 dollars, as the low end of the battery range.</li>
+<li>U.S. Energy Information Administration. <a href="https://www.eia.gov/electricity/gridmonitor/">Hourly Electric Grid Monitor (Form EIA-930)</a>, Southwest Power Pool, 2025 and 2024 (accessed 2 and 3 Nov 2026).</li>
 <li>Intergovernmental Panel on Climate Change (2006). <a href="https://www.ipcc.ch/report/2006-ipcc-guidelines-for-national-greenhouse-gas-inventories/">2006 IPCC Guidelines for National Greenhouse Gas Inventories, Volume 2: Energy</a>, chapters 1 and 2.</li>
 <li>International Energy Agency. <a href="https://www.iea.org/data-and-statistics/data-tools/oil-stocks-of-iea-countries">Oil stocks of IEA countries</a>: members that import oil hold at least 90 days of net imports (read 2 Nov 2026).</li>
 <li>National Laboratory of the Rockies (formerly NREL). <a href="https://www.nlr.gov/analysis/jedi/results">Interpreting JEDI Results</a>: construction and operating jobs, direct and supply-chain (last updated 28 Jan 2026).</li>

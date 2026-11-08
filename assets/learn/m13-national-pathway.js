@@ -5,7 +5,8 @@
 // Steps: predict whether a straight line to zero is in reach; vintages and residual value; the twelve slices and their
 // chronology; the model in four parts; solve the central pathway; the budget's dual as a carbon value and a budget sweep;
 // the straight line to zero (out of reach, and why); perfect foresight against decade by decade; a shock and the re-plan;
-// slices against full years of hours (from the library); near-optimal plans. Then the explain layer (the equation card,
+// slices against full years of hours (from the library: about a minute a check); near-optimal plans (live, eight LPs).
+// Then the explain layer (the equation card,
 // the flowchart of a run, a comparison table) built from the reader's runs.
 // Every number comes from E4 or its library; _tests/learn/test_m13-national-pathway.js checks the words against them.
 // Prairieland is fictional; its numbers are illustrative.
@@ -75,6 +76,8 @@
     return "Plans within a millionth of the least cost ($" + fix(r.slack, 1) + " million of $" + fix(r.objective / 1000, 0) + " billion) build " + fix(r.lo / 1000, 2) + " to " + fix(r.hi / 1000, 2) + " GW of " + label + "; the plan shown, " + fix(r.at / 1000, 2) + " GW.";
   }
   // near-optimal choices: one build cohort each (what is built in that model year's five years), not the capacity open
+  // the near-optimal click's usual time, seconds: the solver bench at 6x CPU slowdown (a phone stand-in), 8 November 2026
+  var NEAR_USUAL = 7;
   var NEAR = { solar: { t: "solar", q: 4, label: "new solar in 2046–2050" }, gasCC: { t: "gasCC", q: 4, label: "new gas combined cycle in 2046–2050" }, wind: { t: "wind", q: 3, label: "new wind in 2041–2045" } };
   var page = { TECH: TECH, NEAR: NEAR, vintage: vintage, vintageWords: vintageWords, carbonPath: carbonPath, hotelling: hotelling, runWords: runWords, sweepWords: sweepWords, dualText: dualText, remains: remains, deepWords: deepWords,
     foresightWords: foresightWords, shockWords: shockWords, fullWords: fullWords, nearWords: nearWords, kilo: kilo, fix: fix, pct: pct, bn: bn };
@@ -92,9 +95,9 @@
     function solver() { if (!stub) return null; stub = null; return function () { return Promise.resolve({ status: "error", ok: false, message: "solver stopped (demo)" }); }; }
     function kpi(host, label, value, tone) { var d = H("div", { class: "lx-readout " + (tone || "") }, host); H("span", { text: label }, d); H("b", { text: value }, d); }
     H("p", { class: "lx-hint e4-line", text: P.line }, live);
-    function runBox(act, api, label, state, solve, render) {
+    function runBox(act, api, label, state, solve, render, progress) {
       var kp = H("div", { class: "lx-readouts" }), res = H("div", { class: "m13-res" }), stale = H("p", null);
-      var run = LX.BenchRun(act, { label: label, busy: api.busy, results: [kp, res], stale: stale, state: state, solve: solve, render: function (R, st) { kp.innerHTML = ""; res.innerHTML = ""; render(R, st, kp, res); } });
+      var run = LX.BenchRun(act, { label: label, busy: api.busy, results: [kp, res], stale: stale, state: state, solve: solve, progress: progress, render: function (R, st) { kp.innerHTML = ""; res.innerHTML = ""; render(R, st, kp, res); } });
       act.appendChild(stale); act.appendChild(kp); act.appendChild(res);
       return run;
     }
@@ -123,13 +126,13 @@
           draw();
         } },
       // 3 time slices
-      { text: "Each model year is twelve [[time-slice|time slices]] of 2025's weather: day and night of each season, the peak net-load day and the scarce-wind week. Weights are hours; they add to 8,760.",
+      { text: "Each model year is twelve [[time-slice|time slices]] of 2025's weather: day and night of each season, the day of the highest net load (demand less wind and solar) and the scarce-wind week. Weights are hours: 8,760.",
         build: function (act, api) {
           U.table(act, ["Slice", "Hours", "Demand ÷ average", "Wind, Plains, per MW", "Solar, Coast, per MW"], P.S.map(function (s) { return [s.label, kilo(s.h), fix(s.demand, 2), fix(s.wind[2], 2), fix(s.solar[4], 2)]; }), "m13-slices");
           U.keys(act, [["Batteries", "a season's day and night form one day; the store cycles within it (state at 08:00 and 20:00 within 0 and 4 hours × power)."],
             ["The week", "the scarce-wind week's store may enter full and run down over its seven days, with no refill from other seasons."],
             ["Stress hours", P.cfg.stress.map(function (h) { return h.label; }).join(" and ") + ": the peak-hour rule checks them."]]);
-          api.done(); api.saw("Load, wind, sun and hydro all come from 2025, so their correlation survives; outages stay out of the LP.");
+          api.done(); api.saw("Demand, wind and solar follow 2025's hourly shapes, adapted to each region; hydro uses seasonal factors set for teaching. Outages stay out of the LP.");
         } },
       // 4 the model in four parts
       { text: "The [[linear-program|linear program]] in four parts. Count it: how many decisions and rules for five regions, five model years and twelve slices?",
@@ -157,7 +160,7 @@
           S0.runners.central = function () { run.run(DEF); };
         } },
       // 6 the budget's dual
-      { text: "The budget row's [[shadow-price|dual]] is what one more tonne allowed would save, in 2025's present value. As a price in a model year's own dollars it is that × w ÷ D, from the LP's own weights. Move the budget and run again.",
+      { text: "The budget row's [[shadow-price|dual]]: what one more tonne allowed would save, in 2025's present value. A model year's price is dual × w ÷ D (w: years of CO₂ counted; D: discount factors added up). Move the budget.",
         build: function (act, api) {
           var bud = 3000;
           LX.Slider(act, { label: "Budget, 2026–2050", color: "var(--lx-bad)", min: 2600, max: 5400, step: 200, value: bud, fmt: function (v) { return kilo(v) + " Mt"; }, onChange: function (v) { bud = v; run.changed({ bud: v }); } });
@@ -201,11 +204,11 @@
             U.Co2Chart(H("div", { class: "lx-xcard" }, res), P).set(Vp, Vm, "Decade by decade");
             api.done(); api.saw(foresightWords(Vp, Vm)); refresh();
           });
-          U.keys(act, [["Why it costs more", "perfect foresight could have chosen the decade-by-decade pathway; it found a cheaper one. The gap is the value of seeing ahead, in this model."]]);
+          U.keys(act, [["Why it costs more", "perfect foresight could have chosen the decade-by-decade pathway; it found a cheaper one."], ["What the gap measures", "the extra cost of this planning rule (two model years a window, each window given its share of the budget left), not the value of foresight in general."]]);
           S0.runners.myopic = function () { run.run(Object.assign({}, DEF, { fs: "myopic" })); };
         } },
       // 9 a shock
-      { text: "Inject a shock: the plan's builds up to the shock's year stay; that year runs what was built; later years re-plan knowing it. Pick one.",
+      { text: "Inject a shock. An operating shock keeps the plan's builds through its year, which runs what was built; the mineral restriction re-plans that year's purchases at its price. Later years re-plan. Pick one.",
         build: function (act, api) {
           var keys = E4.c4Shocks(P), sh = "demandSurprise", names = {}; keys.forEach(function (k) { names[k] = P.shocks[k].label; });
           U.seg(act, "Shock", keys, names, sh, function (v) { sh = v; run.changed({ sh: v }); });
@@ -230,15 +233,24 @@
             ["From the library", "precomputed with this engine on " + LIB.date + ": 53 LPs a check, too slow for a click."], ["What moves", "spilled wind and solar is several times the slices' estimate: twelve-hour averages smooth the sunniest and windiest hours."]]);
           api.done(); api.saw(fullWords(e, n, E4));
         } },
-      // 11 near-optimal plans (precomputed: three LPs a choice are too slow for a phone click)
+      // 11 near-optimal plans, solved live: the central plan's LP, then the least and the most of each choice over every
+      // plan within a millionth of the least economic cost (E4.nearRanges: eight LPs in one click)
       { text: "Many plans cost almost the same. Over every plan within a millionth of the least cost, how little and how much of each choice could be built? Two more LPs a choice.",
         build: function (act, api) {
-          var NR = P.cfg.precomputed && P.cfg.precomputed.m13near;
-          if (!NR) { H("p", { class: "lx-hint", text: "The ranges are not in this page's data." }, act); return; }
-          U.table(act, ["Choice", "Least", "The plan shown", "Most"], Object.keys(NEAR).map(function (k) { var r = NR.items[k]; return [NEAR[k].label, fix(r.lo / 1000, 2) + " GW", fix(r.at / 1000, 2) + " GW", fix(r.hi / 1000, 2) + " GW"]; }), "m13-near");
-          U.keys(act, [["Precomputed", "with this engine on " + NR.date + " for the central plan: six more LPs, too slow for a phone click."], ["Report", "what every near-optimal plan shares, or say which one you show; the notebook's practice task 4 runs it."]]);
-          S0.near = NR;
-          api.done(); api.saw(nearWords(NR.items.solar, NEAR.solar.label) + " Report what every near-optimal plan shares, or say which one you show.");
+          var list = Object.keys(NEAR).map(function (k) { return [k, E4.builtTerms(P, NEAR[k].t, NEAR[k].q)]; });
+          var near = function (st, ctx) {
+            // the progress line counts the LPs (after LP k, LP k + 1 runs)
+            return E4.nearRanges(P, st, list, 1e-6, { signal: ctx.signal, solver: solver(), onSolve: function (k, n) { if (k < n) ctx.step(k + 1, n); } }).then(function (r) {
+              return r.ok ? { status: "optimal", ok: true, kind: "lp", message: "Done: the central plan's LP, its least cost without the tie rule, then the least and the most of each choice over the plans within a millionth of that cost (" + r.solves + " LPs, each optimal).", results: r }
+                : { status: r.status, ok: false, kind: "lp", message: E4.WORDS[r.status] || r.message };
+            });
+          };
+          runBox(act, api, "Map the near-optimal plans", function () { return DEF; }, near, function (r, st, kp, res) {
+            U.table(res, ["Choice", "Least", "The plan shown", "Most"], Object.keys(NEAR).map(function (k) { var x = r.items[k]; return [NEAR[k].label, fix(x.lo / 1000, 2) + " GW", fix(x.at / 1000, 2) + " GW", fix(x.hi / 1000, 2) + " GW"]; }), "m13-near");
+            S0.near = r;
+            api.done(); api.saw(nearWords(r.items.solar, NEAR.solar.label) + " Report what every near-optimal plan shares, or say which one you show.");
+          }, { unit: "LP", usual: NEAR_USUAL });
+          U.keys(act, [["One click", "eight LPs: the central plan, its least cost without the tie rule, then the least and the most of each of three choices."], ["Cost", "the economic cost the page reports, without the tie rule's small costs."], ["Report", "what every near-optimal plan shares, or say which one you show; the notebook's practice task 4 runs it."]]);
         } }];
     var cards = LX.StepCards(live, { steps: steps });
 
@@ -262,7 +274,7 @@
           n: { name: "n_g,q", label: "n g q, MW built", unit: "MW", words: "Built in model year q, by region (the firm option: nationally, shared by demand).", you: V ? "Central: wind " + fix(sum(V.built.wind), 1) + " GW in all." : "Run step 5.", code: '"n_" + r + g + q' },
           x: { name: "x", label: "x, output in a slice", unit: "MW (average over the slice)", words: "A plant's output, a battery's or a flow, as a slice's average.", you: "12 slices × 5 regions × 5 years.", code: '"g_" + unit + "_" + s + "_" + p' },
           u: { name: "u", label: "u, unserved energy", unit: "MW (average over the slice)", words: "Load not met, at a penalty of $10,000 per MWh: every run solves, and a shortfall shows.", you: V ? fix(sum(V.unserved), 2) + " TWh in the central run" : "Run step 5.", code: '"us_" + r + "_" + s + "_" + p' },
-          L: { name: "L_r,p", label: "L r p, average busbar load", unit: "MW", words: "Busbar load: the electricity the region needs at its power plants' outlets, its use plus 6% grid losses, from the plan's electrification and demand.", you: P.R.map(function (R, r) { return R.short + " " + kilo(E4.sysOf(DEF, P).loadMW[0][r]); }).join("; ") + " MW in 2030", code: "S.loadMW[p][r]" },
+          L: { name: "L_r,p", label: "L r p, average busbar load", unit: "MW", words: "Busbar load: the electricity the region needs at its power plants' outlets: its use ÷ 0.94, since grid losses are 6% of what enters the grid.", you: P.R.map(function (R, r) { return R.short + " " + kilo(E4.sysOf(DEF, P).loadMW[0][r]); }).join("; ") + " MW in 2030", code: "S.loadMW[p][r]" },
           d: { name: "d_s", label: "d s, the slice's demand factor", unit: "÷ the year's average", words: "SPP's 2025 shape over the slice's hours.", you: P.S.map(function (s) { return fix(s.demand, 2); }).join(", "), code: "P.S[s].demand" },
           a: { name: "a_g,s", label: "a g s, availability", unit: "share", words: "Fossil plants' availability (a stand-in for outages); wind and solar the slice's output per MW.", you: "Coal " + P.cfg.existing.availability.coal + ", combined cycle " + P.cfg.existing.availability.gasCC, code: "cfg.existing.availability" },
           w: { name: "w_p", label: "w p, the budget's weight", unit: "years", words: "Straight lines between model years: 2025 counts 2, 2030–2045 count 5, 2050 counts 3 (25 in all).", you: E4.sysOf(DEF, P).w.join(", "), code: "S.w[p]" },

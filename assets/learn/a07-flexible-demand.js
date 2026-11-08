@@ -367,7 +367,7 @@
 
     // ---------- the stage: one chart and its readouts, for the part the step is on
     var stage = H("div", { class: "lx-stage" }, live);
-    var title = H("h3", null, H("div", { class: "lx-stage-head" }, stage));
+    var sh = H("div", { class: "lx-stage-head" }, stage), title = H(LX.hTag(3, sh), null, sh);   // an h2 when the stage sits right under the page title
     var chips = H("div", { class: "lx-readouts" }, stage);
     var P = LX.Plot(stage, { text: "Text version of the chart" });
     var status = H("p", { class: "lx-stage-status", "aria-live": "polite" }, stage);

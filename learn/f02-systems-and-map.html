@@ -2,6 +2,22 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
+<script>(function () {
+  ["localStorage", "sessionStorage"].forEach(function (name) {
+    try { window[name].getItem("_"); return; } catch (e) { }   // storage works: leave it as it is
+    var data = Object.create(null);
+    var mem = {
+      getItem: function (k) { k = String(k); return k in data ? data[k] : null; },
+      setItem: function (k, v) { data[String(k)] = String(v); },
+      removeItem: function (k) { delete data[String(k)]; },
+      clear: function () { data = Object.create(null); },
+      key: function (i) { var keys = Object.keys(data); return i >= 0 && i < keys.length ? keys[i] : null; }
+    };
+    Object.defineProperty(mem, "length", { get: function () { return Object.keys(data).length; } });
+    Object.defineProperty(mem, "inMemory", { value: true });
+    try { Object.defineProperty(window, name, { configurable: true, enumerable: true, get: function () { return mem; } }); } catch (e) { }
+  });
+})();</script>
 <meta name="generator" content="quarto-1.10.19">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
@@ -122,8 +138,10 @@ window.Quarto = {
 <link rel="stylesheet" href="../assets/learn/learn.css">
 <meta property="og:title" content="How does everything connect? Stocks, flows, feedback and the whole-system map – Honglin Li">
 <meta property="og:description" content="F2 of Energy Systems, Step by Step: run a stock-and-flow simulator (a reservoir, a battery, a carbon budget), sign and name feedback loops (chargers and EVs, the rebound effect), then pull four levers on a whole-system map and follow the ripples across technology, cost, emissions, people and security.">
-<meta property="og:image" content="https://henryutd2021.github.io/learn/images/profile-square.jpg">
+<meta property="og:image" content="https://henryutd2021.github.io/images/profile-square.jpg">
 <meta property="og:site_name" content="Honglin Li">
+<meta property="og:url" content="https://henryutd2021.github.io/learn/f02-systems-and-map.html">
+<link rel="canonical" href="https://henryutd2021.github.io/learn/f02-systems-and-map.html">
 </head>
 
 <body class="nav-fixed page-learn page-lesson lx-form-play quarto-light"><script id="quarto-html-before-body" type="application/javascript">
@@ -326,7 +344,7 @@ window.Quarto = {
 <span class="menu-text">Teaching</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../learn/index.html"> 
+    <a class="nav-link active" href="../learn/index.html" aria-current="true"> 
 <span class="menu-text">Learn</span></a>
   </li>  
   <li class="nav-item">
@@ -374,6 +392,7 @@ window.Quarto = {
 
 <main class="content column-page" id="quarto-document-content">
 
+<noscript><style>@media (max-width: 1199.98px) { #quarto-header { position: relative; } #quarto-header .navbar-toggler { display: none; } #quarto-header #navbarCollapse { display: block !important; } } #quarto-header .quarto-navbar-tools { display: none; }</style></noscript>
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
@@ -403,7 +422,7 @@ window.Quarto = {
 
 
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "name": "How does everything connect? Stocks, flows, feedback and the whole-system map Fill a reservoir, close a feedback loop, then pull a lever and watch the whole system ripple", "description": "F2 of Energy Systems, Step by Step: run a stock-and-flow simulator (a reservoir, a battery, a carbon budget), sign and name feedback loops (chargers and EVs, the rebound effect), then pull four levers on a whole-system map and follow the ripples across technology, cost, emissions, people and security.", "learningResourceType": "Interactive lesson", "educationalLevel": "Beginner", "timeRequired": "PT35M", "inLanguage": "en", "isAccessibleForFree": true, "teaches": ["stocks and flows", "reinforcing and balancing feedback loops", "causal-loop diagrams", "the rebound effect", "ripple effects across a whole energy system"], "license": "https://creativecommons.org/licenses/by/4.0/", "author": {"@type": "Person", "name": "Honglin Li", "url": "https://henryutd2021.github.io/"}, "url": "https://henryutd2021.github.io/learn/f02-systems-and-map.html", "isPartOf": {"@type": "Course", "name": "Energy Systems, Step by Step", "url": "https://henryutd2021.github.io/learn/"}}</script>
-<script type="application/json" class="lx-lesson-data">{"id":"f02-systems-and-map","starter":null,"total":14,"code":"F2","title":"How does everything connect? Stocks, flows, feedback and the whole-system map","subtitle":"Fill a reservoir, close a feedback loop, then pull a lever and watch the whole system ripple","short":"Stocks, loops and the system map","tier":"foundations","tier2":"analyst","tierLabel":"Foundations to Analyst · L1–L2","level":"L1","slot":1,"slot2":2,"minutes":25,"does":"A stock-and-flow simulator (a reservoir, a battery, a carbon budget), a causal-loop builder (chargers and EVs, the rebound effect) and a whole-system map: pull one lever and watch the ripples.","outcome":"Tell a stock from a flow, name a feedback loop as reinforcing or balancing, and trace how one change ripples across technology, cost, emissions, people and security.","icon":"map","form":"play","scales":["S0","S1","S2","S3","S4"],"teaches":["stocks and flows","reinforcing and balancing feedback loops","causal-loop diagrams","the rebound effect","ripple effects across a whole energy system"],"lab":null,"href":"f02-systems-and-map.html","ready":true,"after":[{"id":"f01-five-scales","code":"F1","title":"Who decides what, from a light switch to a nation?","short":"Five scales","does":"A zoom from one home to Prairieland; at each scale, sort who decides, what they decide, what physics a model needs and what passes between scales.","href":"f01-five-scales.html","ready":true},{"id":"06-three-jobs","starter":6,"title":"Cheap energy, firm capacity, flexibility: which plant does which job?","short":"Three jobs","does":"Sort technologies into the jobs they do, with key numbers for each.","href":"06-three-jobs.html","ready":true}],"prev":null,"next":{"id":"a22-tradeoff-explorer","code":"A22","title":"Cheap, clean, reliable, fair, secure: can you have them all?","short":"Five goals at once","does":"Change one plan and watch cost, CO₂, reliability, a fairness measure and a security measure move together on a radar; find the plans no other beats on all five; see whose priorities pick which plan, and how a different definition changes the answer.","href":"a22-tradeoff-explorer.html","ready":true},"practice":10}</script>
+<script type="application/json" class="lx-lesson-data">{"id":"f02-systems-and-map","starter":null,"total":14,"code":"F2","title":"How does everything connect? Stocks, flows, feedback and the whole-system map","subtitle":"Fill a reservoir, close a feedback loop, then pull a lever and watch the whole system ripple","short":"Stocks, loops and the system map","tier":"foundations","tier2":"analyst","tierLabel":"Foundations to Analyst · L1–L2","level":"L1","slot":1,"slot2":2,"minutes":25,"does":"A stock-and-flow simulator (a reservoir, a battery, a carbon budget), a causal-loop builder (chargers and EVs, the rebound effect) and a whole-system map: pull one lever and watch the ripples.","outcome":"Tell a stock from a flow, name a feedback loop as reinforcing or balancing, and trace how one change ripples across technology, cost, emissions, people and security.","icon":"map","form":"play","scales":["S0","S1","S2","S3","S4"],"teaches":["stocks and flows","reinforcing and balancing feedback loops","causal-loop diagrams","the rebound effect","ripple effects across a whole energy system"],"lab":null,"href":"f02-systems-and-map.html","ready":true,"after":[{"id":"f01-five-scales","code":"F1","title":"Who decides what, from a light switch to a nation?","short":"Five scales","does":"A zoom from one home to Prairieland; at each scale, sort who decides, what they decide, what physics a model needs and what passes between scales.","href":"f01-five-scales.html","ready":true},{"id":"06-three-jobs","starter":6,"title":"Cheap energy, firm capacity, flexibility: which plant does which job?","short":"Three jobs","does":"Sort technologies into the jobs they do, with key numbers for each.","href":"06-three-jobs.html","ready":true}],"prev":null,"next":{"id":"a22-tradeoff-explorer","code":"A22","title":"Cheap, clean, reliable, fair, secure: can you have them all?","short":"Five goals at once","does":"Change one plan and watch cost, CO₂, reliability, a fairness measure and a security measure move together on a radar; find the plans no other beats on all five; see whose priorities pick which plan, and how a different definition changes the answer.","href":"a22-tradeoff-explorer.html","ready":true},"nextNeeds":[{"id":"12-trade-offs","starter":12,"title":"Cheap or clean? How do you weigh cost against emissions?","short":"Cheap or clean?","does":"Spot the plans nobody should pick, slide a carbon price, and trace the frontier between cost and CO₂.","href":"12-trade-offs.html","ready":true}],"practice":10}</script>
 <div class="lx-head" data-lesson-id="f02-systems-and-map" data-total="14" data-tier="foundations" data-tier2="analyst" data-level="L1" data-minutes="25" data-form="play" data-next-href="a22-tradeoff-explorer.html">
 <div>
 <nav class="lx-crumbs" aria-label="Breadcrumb"><ol><li><a href="index.html">Learn</a></li><li aria-current="page">F2</li></ol></nav>
@@ -765,6 +784,7 @@ S_{t+1} = S_t + \big(\mathit{in}_t - \mathit{out}_t\big)\,\Delta t, \qquad 0 \le
 <div class="lx-next lx-card" data-next-id="a22-tradeoff-explorer">
 <p class="lx-eyebrow">Next</p>
 <p class="lx-next-t"><a href="a22-tradeoff-explorer.html">A22 · Cheap, clean, reliable, fair, secure: can you have them all?</a></p>
+<p class="lx-next-d lx-next-needs">Needs first: <a href="12-trade-offs.html">Lesson 12 · Cheap or clean?</a>.</p>
 <button type="button" class="lx-btn ghost small lx-complete" data-complete="f02-systems-and-map" aria-pressed="false" hidden="">Mark this lesson as complete</button>
 </div>
 

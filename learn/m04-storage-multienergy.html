@@ -2,6 +2,22 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
+<script>(function () {
+  ["localStorage", "sessionStorage"].forEach(function (name) {
+    try { window[name].getItem("_"); return; } catch (e) { }   // storage works: leave it as it is
+    var data = Object.create(null);
+    var mem = {
+      getItem: function (k) { k = String(k); return k in data ? data[k] : null; },
+      setItem: function (k, v) { data[String(k)] = String(v); },
+      removeItem: function (k) { delete data[String(k)]; },
+      clear: function () { data = Object.create(null); },
+      key: function (i) { var keys = Object.keys(data); return i >= 0 && i < keys.length ? keys[i] : null; }
+    };
+    Object.defineProperty(mem, "length", { get: function () { return Object.keys(data).length; } });
+    Object.defineProperty(mem, "inMemory", { value: true });
+    try { Object.defineProperty(window, name, { configurable: true, enumerable: true, get: function () { return mem; } }); } catch (e) { }
+  });
+})();</script>
 <meta name="generator" content="quarto-1.10.19">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
@@ -122,8 +138,10 @@ window.Quarto = {
 <link rel="stylesheet" href="../assets/learn/learn.css">
 <meta property="og:title" content="Storage and coupled carriers: modelling power, hydrogen and heat together – Honglin Li">
 <meta property="og:description" content="Modeler lesson M4 of Energy Systems, Step by Step: write one linear program for a wind plant behind a grid limit, add a battery’s state of charge, an electrolyzer with a part-load limit, a hydrogen tank with a minimum level and a heat store behind a heat-network limit, compare configurations in a winter and a summer week to see where coupling earns value, and read each carrier’s marginal value; a Python notebook rebuilds the model.">
-<meta property="og:image" content="https://henryutd2021.github.io/learn/images/profile-square.jpg">
+<meta property="og:image" content="https://henryutd2021.github.io/images/profile-square.jpg">
 <meta property="og:site_name" content="Honglin Li">
+<meta property="og:url" content="https://henryutd2021.github.io/learn/m04-storage-multienergy.html">
+<link rel="canonical" href="https://henryutd2021.github.io/learn/m04-storage-multienergy.html">
 </head>
 
 <body class="nav-fixed page-learn page-lesson lx-form-cards quarto-light"><script id="quarto-html-before-body" type="application/javascript">
@@ -326,7 +344,7 @@ window.Quarto = {
 <span class="menu-text">Teaching</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../learn/index.html"> 
+    <a class="nav-link active" href="../learn/index.html" aria-current="true"> 
 <span class="menu-text">Learn</span></a>
   </li>  
   <li class="nav-item">
@@ -374,6 +392,7 @@ window.Quarto = {
 
 <main class="content column-page" id="quarto-document-content">
 
+<noscript><style>@media (max-width: 1199.98px) { #quarto-header { position: relative; } #quarto-header .navbar-toggler { display: none; } #quarto-header #navbarCollapse { display: block !important; } } #quarto-header .quarto-navbar-tools { display: none; }</style></noscript>
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
@@ -403,7 +422,7 @@ window.Quarto = {
 
 
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "name": "Storage and coupled carriers: modelling power, hydrogen and heat together Add a battery, an electrolyzer, a hydrogen tank and a heat store to one plant, and find where coupling pays", "description": "Modeler lesson M4 of Energy Systems, Step by Step: write one linear program for a wind plant behind a grid limit, add a battery's state of charge, an electrolyzer with a part-load limit, a hydrogen tank with a minimum level and a heat store behind a heat-network limit, compare configurations in a winter and a summer week to see where coupling earns value, and read each carrier's marginal value; a Python notebook rebuilds the model.", "learningResourceType": "Interactive lesson", "educationalLevel": "Advanced", "timeRequired": "PT175M", "inLanguage": "en", "isAccessibleForFree": true, "teaches": ["state of charge in a linear program", "conversion between carriers", "part-load limits in an LP", "tank and heat-network limits", "value of coupling", "duals of coupled balances"], "license": "https://creativecommons.org/licenses/by/4.0/", "author": {"@type": "Person", "name": "Honglin Li", "url": "https://henryutd2021.github.io/"}, "url": "https://henryutd2021.github.io/learn/m04-storage-multienergy.html", "isPartOf": {"@type": "Course", "name": "Energy Systems, Step by Step", "url": "https://henryutd2021.github.io/learn/"}}</script>
-<script type="application/json" class="lx-lesson-data">{"id":"m04-storage-multienergy","starter":null,"total":14,"code":"M4","title":"Storage and coupled carriers: modelling power, hydrogen and heat together","subtitle":"Add a battery, an electrolyzer, a hydrogen tank and a heat store to one plant, and find where coupling pays","short":"Storage and coupled carriers","tier":"modeler","tier2":null,"tierLabel":"Modeler · L3","level":"L3","slot":3,"slot2":null,"minutes":40,"does":"Write one LP for a wind plant with a grid limit: add a battery's state of charge, an electrolyzer with a part-load limit, a hydrogen tank with a minimum level and a heat store behind a heat-network limit; compare configurations and weeks to see where coupling earns value and where it does not; read each carrier's marginal value.","outcome":"Formulate a multi-carrier plant LP with storage, solve it, and show with stated comparisons where coupling carriers earns value.","icon":"blocks","form":"cards","scales":["S0","S3"],"teaches":["state of charge in a linear program","conversion between carriers","part-load limits in an LP","tank and heat-network limits","value of coupling","duals of coupled balances"],"lab":"a SciPy/HiGHS notebook that rebuilds the plant model and asserts the browser's numbers, about 45 minutes, then 90 minutes of practice.","href":"m04-storage-multienergy.html","ready":true,"after":[{"id":"m01-dispatch-to-lmp","code":"M1","title":"From dispatch to locational prices: the linear program behind the market","short":"Dispatch to locational prices","does":"Build a 24-hour dispatch LP with ramps and read its balance duals as marginal values under stated assumptions; add a three-bus DC power-flow network, congest a line and watch one price split into three.","href":"m01-dispatch-to-lmp.html","ready":true},{"id":"a08-storage-duration","code":"A8","title":"How long should storage last? From batteries to seasonal stores","short":"Storage duration","does":"Shelve stores on DOE's duration ladder; run a battery, pumped hydro, a heat store and hydrogen through a calm winter week on the Plains Grid; see power cap the worst hours; price each MWh delivered against how often a store cycles.","href":"a08-storage-duration.html","ready":true}],"prev":null,"next":{"id":"m05-microgrid-size-and-run","code":"M5","title":"Size and run a microgrid that survives an outage","short":"Microgrid: size and run","does":"A MILP sizes solar, a battery and generator sets for Prairie Campus under outage scenarios; add the host feeder's export limit and the utility's tariff and watch the campus optimum change; then run the storm with rolling-horizon dispatch on forecasts and see what forecast error costs.","href":"m05-microgrid-size-and-run.html","ready":true},"practice":90,"labMinutes":45}</script>
+<script type="application/json" class="lx-lesson-data">{"id":"m04-storage-multienergy","starter":null,"total":14,"code":"M4","title":"Storage and coupled carriers: modelling power, hydrogen and heat together","subtitle":"Add a battery, an electrolyzer, a hydrogen tank and a heat store to one plant, and find where coupling pays","short":"Storage and coupled carriers","tier":"modeler","tier2":null,"tierLabel":"Modeler · L3","level":"L3","slot":3,"slot2":null,"minutes":40,"does":"Write one LP for a wind plant with a grid limit: add a battery's state of charge, an electrolyzer with a part-load limit, a hydrogen tank with a minimum level and a heat store behind a heat-network limit; compare configurations and weeks to see where coupling earns value and where it does not; read each carrier's marginal value.","outcome":"Formulate a multi-carrier plant LP with storage, solve it, and show with stated comparisons where coupling carriers earns value.","icon":"blocks","form":"cards","scales":["S0","S3"],"teaches":["state of charge in a linear program","conversion between carriers","part-load limits in an LP","tank and heat-network limits","value of coupling","duals of coupled balances"],"lab":"a SciPy/HiGHS notebook that rebuilds the plant model and asserts the browser's numbers, about 45 minutes, then 90 minutes of practice.","href":"m04-storage-multienergy.html","ready":true,"after":[{"id":"m01-dispatch-to-lmp","code":"M1","title":"From dispatch to locational prices: the linear program behind the market","short":"Dispatch to locational prices","does":"Build a 24-hour dispatch LP with ramps and read its balance duals as marginal values under stated assumptions; add a three-bus DC power-flow network, congest a line and watch one price split into three.","href":"m01-dispatch-to-lmp.html","ready":true},{"id":"a08-storage-duration","code":"A8","title":"How long should storage last? From batteries to seasonal stores","short":"Storage duration","does":"Shelve stores on DOE's duration ladder; run a battery, pumped hydro, a heat store and hydrogen through a calm winter week on the Plains Grid; see power cap the worst hours; price each MWh delivered against how often a store cycles.","href":"a08-storage-duration.html","ready":true}],"prev":null,"next":{"id":"m05-microgrid-size-and-run","code":"M5","title":"Size and run a microgrid that survives an outage","short":"Microgrid: size and run","does":"A MILP sizes solar, a battery and generator sets for Prairie Campus under outage scenarios; add the host feeder's export limit and the utility's tariff and watch the campus optimum change; then run the storm with rolling-horizon dispatch on forecasts and see what forecast error costs.","href":"m05-microgrid-size-and-run.html","ready":true},"nextNeeds":[{"id":"a14-microgrid-value","code":"A14","title":"Does a microgrid pay off, and for whom?","short":"Microgrid value","does":"Price an outage for a household, a dairy and a hospital; size Prairie Campus's microgrid against a year of outages; add everyday savings; compare a utility, a co-op, the county and a private company as owners; then lower a village mini-grid's cost per kWh with a mill and a cold store.","href":"a14-microgrid-value.html","ready":true},{"id":"m02-unit-commitment","code":"M2","title":"On or off? Unit commitment as a mixed-integer program","short":"Unit commitment","does":"Add start-up costs and minimum run times; watch the LP schedule become impossible to operate; grow a small branch-and-bound tree; see why a mixed-integer program gives no ordinary shadow prices; fix the commitments and re-solve the dispatch LP for conditional prices, then count the uplift payments that start-up costs need.","href":"m02-unit-commitment.html","ready":true}],"practice":90,"labMinutes":45}</script>
 <div class="lx-head" data-lesson-id="m04-storage-multienergy" data-total="14" data-tier="modeler" data-level="L3" data-minutes="40" data-form="cards" data-next-href="m05-microgrid-size-and-run.html">
 <div>
 <nav class="lx-crumbs" aria-label="Breadcrumb"><ol><li><a href="index.html">Learn</a></li><li aria-current="page">M4</li></ol></nav>
@@ -687,13 +706,14 @@ s_t = s_{t-1} + \eta\,\mathit{bc}_t - \mathit{bd}_t, \quad Q_t &amp;= (1-\lambda
 <div class="lx-next lx-card" data-next-id="m05-microgrid-size-and-run">
 <p class="lx-eyebrow">Next</p>
 <p class="lx-next-t"><a href="m05-microgrid-size-and-run.html">M5 · Size and run a microgrid that survives an outage</a></p>
+<p class="lx-next-d lx-next-needs">Needs first: <a href="a14-microgrid-value.html">A14 · Microgrid value</a> and <a href="m02-unit-commitment.html">M2 · Unit commitment</a>.</p>
 <p class="lx-next-d"><strong>Related lab:</strong> a SciPy/HiGHS notebook that rebuilds the plant model and asserts the browser's numbers, about 45 minutes, then 90 minutes of practice.</p>
 <button type="button" class="lx-btn ghost small lx-complete" data-complete="m04-storage-multienergy" aria-pressed="false" hidden="">Mark this lesson as complete</button>
 </div>
 
 <div class="lx-card lx-real">
 <p class="lx-eyebrow">In the real world</p>
-<blockquote class="lx-excerpt blockquote" data-source="excerpt:wind-hydrogen"><p>Compared with wind and a battery alone, adding an electrolyzer reduced total system cost by about 7%, and using hydrogen as the storage medium for fuel cells reduced it by about 26%.</p><footer>Approved excerpt of: Li et al. (2024), <a href="https://doi.org/10.1115/1.4063971">Journal of Mechanical Design</a>.</footer></blockquote>
+<blockquote class="lx-excerpt blockquote" data-source="excerpt:wind-hydrogen"><p>Compared with wind and a battery alone, adding an electrolyzer reduced total system cost by about 7%, and using hydrogen as the storage medium for fuel cells reduced it by about 26%.</p><footer>From: Li et al. (2024), <a href="https://doi.org/10.1115/1.4063971">Journal of Mechanical Design</a>.</footer></blockquote>
 <p class="lx-hint">Holds when: one planned West Texas wind farm, ERCOT prices, costs from 2020 to 2023. Leaves out: final federal hydrogen credit rules.</p>
 <div class="lx-case-try">
 <p class="lx-eyebrow">Try it yourself</p>
