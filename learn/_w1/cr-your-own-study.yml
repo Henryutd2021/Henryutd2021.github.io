@@ -1,6 +1,8 @@
 # Sidecar for CR (cr-your-own-study). Read by the course build step.
 id: cr-your-own-study
 lesson: CR
+glossary:
+  - {id: triangulation, term: "Triangulation", def: "Checking a finding against a second source or a second method, so that it does not rest on one kind of evidence alone."}
 requests:
   - "CR is a capstone without a sandbox (form: capstone, no sandbox:); the course build step accepts it unchanged. Its minutes (60) are the page, practice_minutes (1800) the study: the header reads '60 min guided · about 30 h practice', the page says 20 to 40 hours."
   - "The course plan's 'plus one route of track:S0 to track:S4' cannot be written in after:; the page states it, and the plan shows the reader's route (model lab and capstone, through LX.lessonRef) and whether it is done in this browser."

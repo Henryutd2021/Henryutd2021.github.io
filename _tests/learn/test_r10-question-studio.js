@@ -34,8 +34,9 @@ const CORE = require(L("components/core.js"));
 const D = JSON.parse(fs.readFileSync(L("data/r10-question-studio.json"), "utf8"));
 const P = JSON.parse(fs.readFileSync(L("data/path.json"), "utf8"));
 const QPATH = path.join(SITE, "learn/r10-question-studio.qmd");
-const BLOCKS = M.staticBlocks(D, { types: QC.TYPES, exemplars: EX.staticHTML, rubric: RB.staticHTML });
-const MARK = { task: "r10-task", exemplars: "r10-exemplars", rubric: "r10-rubric", crowding: "r10-crowding" };
+const SNAP = JSON.parse(fs.readFileSync(L("data/r10-question-studio-openalex.json"), "utf8"));
+const BLOCKS = M.staticBlocks(D, { types: QC.TYPES, exemplars: EX.staticHTML, rubric: RB.staticHTML }, SNAP);
+const MARK = { task: "r10-task", lit: "r10-lit", exemplars: "r10-exemplars", rubric: "r10-rubric", crowding: "r10-crowding" };
 function between(q, name) {
   const a = q.match(new RegExp("<!-- " + name + ":start[^>]*-->\\n")), b = q.indexOf("<!-- " + name + ":end -->");
   return a && b >= a.index ? { a: a.index + a[0].length, b: b } : null;
@@ -116,8 +117,16 @@ for (let i = 0; i < 200000; i++) {
   test(p, TYPES[i % 5]);
 }
 ok(bad.length === 0, "drafts: " + nDraft + " built (every slot value, then 200,000 full combinations); all start with a capital, end with ?, fill every slot and pass the deny-list" + (bad.length ? ": " + bad.slice(0, 3).join(" | ") : ""));
-ok(M.draft(D, base, "prescriptive") === "What should low-income renters do about heat pumps in a city or region, through new technology, to achieve a lower energy burden during a heat wave, compared with […]?", "draft: the prescriptive template, filled");
-ok(M.draft(D, Object.assign({}, base, { twist: null }), "descriptive") === "How much does energy burden vary among low-income renters with heat pumps in a city or region?", "draft: the twist is optional");
+ok(M.draft(D, base, "prescriptive") === "What should low-income renters do about heat pumps, through new technology, for a lower energy burden during a heat wave, compared with […]?", "draft: the prescriptive template, filled");
+ok(M.draft(D, Object.assign({}, base, { twist: null }), "descriptive") === "How much does energy burden vary among low-income renters with heat pumps?", "draft: the twist is optional");
+// a populated draft is a text element too: every slot value, for every type, within about 35 words (the scale is a field
+// of the card shown beside the draft, not part of the sentence)
+let longest = 0, longQ = "";
+TYPES.forEach(t => D.pickers.scale.forEach(sc => D.pickers.dimension.forEach(m => D.pickers.element.forEach(e => D.pickers.lever.forEach(l => D.pickers.stakeholder.forEach(k => D.pickers.twist.forEach(w => {
+  const q = M.draft(D, { scale: sc.id, dimension: m.id, element: e.id, lever: l.id, stakeholder: k.id, twist: w.id }, t), n = q.split(/\s+/).length;
+  if (n > longest) { longest = n; longQ = q; } })))))));
+ok(longest <= 36, "every populated draft (all " + TYPES.length + " types, every combination) is at most 36 words: the longest has " + longest + ": " + longQ);
+ok(Object.keys(D.drafts).every(k => D.drafts[k].indexOf("{scale}") < 0) && /Scale: " \+ sc\.label \+ ", on the card's scale field/.test(JS), "the scale is shown beside the draft, as the card's field, not inside the question");
 ok(D.drafts.evaluative.indexOf("compared with […]") > 0 && D.drafts.prescriptive.indexOf("compared with […]") > 0, "evaluative and prescriptive drafts leave the counterfactual to the learner");
 
 // ---------------- no originality judgement; crowding as context
@@ -142,7 +151,7 @@ D.pickers.element.forEach(e => D.pickers.dimension.forEach(d => D.pickers.stakeh
 }))));
 ok(maxOps <= 5, "search strings: at most 5 Boolean operators in all " + nStr + " (max " + maxOps + ")");
 const ss = M.searchStrings(D, base);
-ok(ss.length === 3 && ss[0].text === '("heat pump" OR "heat pumps") AND ("energy burden" OR "energy poverty")' && ss[1].text === '("heat pump" OR "heat pumps") AND (renters OR "low-income") AND ("heat wave" OR heatwave)' && /AND review$/.test(ss[2].text), "search strings for the exemplar's spin");
+ok(ss.length === 3 && ss[0].text === '("heat pump" OR "heat pumps") AND ("energy burden" OR "energy poverty")' && ss[1].text === '("heat pump" OR "heat pumps") AND (renters OR "low-income") AND ("heat wave" OR heatwave)' && ss[2].text === 'review AND ' + ss[0].text, "search strings for the exemplar's spin");
 ok(M.searchURL(D, ss[0].text) === "https://openalex.org/works?search=" + encodeURIComponent(ss[0].text), "search link: OpenAlex's works search (form checked 3 November 2026)");
 ok(M.searchStrings(D, { element: "heatpumps" }).length === 0, "no search strings without a dimension");
 
@@ -201,12 +210,38 @@ ok(/if \(st\.autoKey === key\(\)\) return;/.test(JS), "the card's automatic fiel
 // ---------------- what the checks claim; live search links; the public data file
 ok(!/passes its eight checks|checks pass\./.test(PAGE) && /all eight parts of the card are filled in and rated against the rubric/.test(PAGE), "the task: parts filled in and rated by the learner, not 'passes its checks'");
 ok(/of 8 parts filled in\. Rate their rigour against the rubric/.test(JS) && !/of 8 checks pass/.test(JS), "the card step: parts filled in; rigour is the learner's rubric review");
-ok(/live results, new tab/.test(JS) && /current results/.test(D.search.live) && /no request/.test(D.search.noreq), "search links: labelled as OpenAlex's live results; the page sends no request");
+ok(/Optional: rerun on OpenAlex today \(new tab\)/.test(JS) && /current results/.test(D.search.live) && /differ from the snapshot/.test(D.search.live) && /asks OpenAlex nothing/.test(D.search.noreq), "search links: an optional rerun of OpenAlex's live results, which differ from the snapshot; the page asks OpenAlex nothing");
+// ---------------- the literature step runs on a dated snapshot, in the page
+ok((PAGE.match(new RegExp("snapshot retrieved " + M.snapDate(SNAP) + "|retrieved " + M.snapDate(SNAP) + "</td>", "g")) || []).length === 2, "the page's data note and sources table give the snapshot's own date (" + M.snapDate(SNAP) + ")");
+ok(SNAP.meta && /^\d{4}-\d{2}-\d{2}$/.test(SNAP.meta.as_of) && /CC0/.test(SNAP.meta.license) && SNAP.venues.length > 0, "snapshot: dated (" + SNAP.meta.as_of + "), OpenAlex CC0, with its venues");
+ok(D.pickers.element.every(e => SNAP.elements.some(r => r.id === e.id && r.works.length > 0 && r.count >= r.works.length)), "snapshot: a collection for every system element of the picker, each with its OpenAlex count");
+ok(SNAP.elements.every(r => r.works.every(w => w.length === 8 && typeof w[2] === "string" && w[2] && (w[6] === 0 || w[6] === 1) && w[7].every(k => typeof SNAP.keywords[k] === "string"))) && !/"authors?"|abstract_inverted/.test(JSON.stringify(SNAP)), "snapshot: metadata only (id, DOI, title, year, citations, venue, review, OpenAlex keywords), no authors or abstracts");
+ok(SNAP.elements.every(r => r.works.every((w, i) => !i || r.works[i - 1][4] >= w[4])), "snapshot: each collection sorted by citations, most-cited first");
+D.pickers.element.forEach(e => { const r = SNAP.elements.find(x => x.id === e.id), p = Object.assign({}, base, { element: e.id });
+  ok(M.snapAbout(SNAP, r).split(/\s+/).length <= 40 && M.searchStrings(D, p).every(s => M.snapLine(SNAP, r, s, 2).split(/\s+/).length <= 20), "snapshot lines for " + e.id + " within the text budget"); });
+const e1 = M.examplePicks(D, M.example(D, "e1"));
+ok(!!M.snapElement(SNAP, D, e1) && M.snapElement(SNAP, D, e1).label === "community solar", "snapshot: example 1's element from outside the picker (community solar) has its own collection");
+const basePicks = Object.assign({}, base), bEl = M.snapElement(SNAP, D, basePicks), bS = M.searchStrings(D, basePicks);
+ok(bS.every(s => Array.isArray(s.need) && s.need.length >= 1) && bS[2].review === true, "search strings carry the blocks the page matches (the element's own block is the collection)");
+const again = bS.map(s => M.localMatches(bEl, s, SNAP).map(w => w[0]).join()), again2 = M.searchStrings(D, basePicks).map(s => M.localMatches(M.snapElement(SNAP, D, basePicks), s, SNAP).map(w => w[0]).join());
+ok(JSON.stringify(again) === JSON.stringify(again2), "the local search is reproducible: the same picks give the same works");
+ok(/^\d+ of the \d+ works have these words in their titles or keywords\.$/.test(M.snapLine(SNAP, bEl, bS[0], 3)) && /1 of the \d+ works has these words in its title or keywords and is a review\./.test(M.snapLine(SNAP, bEl, bS[2], 1)), "snapshot count lines read correctly for one and for several");
+const hayOf = w => (w[2] + " " + (w[7] || []).map(k => SNAP.keywords[k]).join(" ")).toLowerCase();
+ok(M.localMatches(bEl, bS[0], SNAP).every(w => D.pickers.dimension.find(x => x.id === "SOC").terms.some(t => hayOf(w).indexOf(t.replace(/"/g, "").toLowerCase()) >= 0)), "core string: every match has a dimension term in its title or keywords");
+ok(M.localMatches(bEl, bS[2], SNAP).every(w => w[6] === 1 || /review/i.test(w[2])), "reviews string: every match is a review");
+ok(M.ownMatches(bEl, "", SNAP).length === 0 && M.ownMatches(bEl, "the AND or", SNAP).length === 0, "own words: nothing for an empty filter or for operators and short words alone");
+const STEP5 = JS.slice(JS.indexOf('{ text: "Find out what is already known.'), JS.indexOf('{ text: "Save your work.'));
+ok(/LX\.json\(SNAP_URL\)/.test(STEP5) && /SNAP_URL = LX\.base \+ "data\/r10-question-studio-openalex\.json"/.test(JS) && !/api\.openalex\.org|fetch\(/.test(JS), "the literature step searches the page's own snapshot file and calls no API");
+ok(/Snapshot: OpenAlex, retrieved \d+ [A-Z][a-z]+ \d{4}/.test(BLOCKS.lit) && /<code>/.test(BLOCKS.lit) && (BLOCKS.lit.match(/<div class="r10-str"><p><b>/g) || []).length === 3 && /A paper record/.test(BLOCKS.lit) && /Core:<\/b> the element/.test(BLOCKS.lit), "no-JS version: the three searches worked on the snapshot, the recipe and a paper record");
+ok(/stale\(act, "realBasis"/.test(JS) && /stale\(lit, "paperBasis"/.test(JS) && M.basis(D, base, "A?") !== M.basis(D, Object.assign({}, base, { element: "rooftop" }), "A?") && M.basis(D, base, "A?") !== M.basis(D, base, "B?"), "realism answers and paper notes are marked for review when the picks or the card's question change");
+ok(D.pickers.element.filter(e => e.def).length >= 6 && ["coldchain", "agrivoltaics"].every(id => D.pickers.element.find(e => e.id === id).def) && /aria-describedby", def\.id/.test(JS), "picker options that need it have a short definition, shown under the picker");
+ok(!/by hand/i.test(JSON.stringify(D)) && !/by hand/i.test(JSON.stringify(SNAP)), "public data files: no production attribution");
 ok(!("built_by" in D.meta) && !("scope" in D.meta), "the public data file carries no production note and no guard assertions");
 ok(/Typical methods for this type: " \+ LX\.rich\(methodsMarked/.test(JS) && ["gis", "econometrics", "mcda", "monte-carlo", "difference-in-differences"].every(id => BLOCKS.task.indexOf('data-term="' + id + '"') >= 0), "method names carry glossary marks (studio and no-JS version)");
 ["energy-burden", "customer-hours", "net-present-value", "techno-economic-analysis", "life-cycle-assessment"].forEach(id => ok(D.terms.indexOf("[[" + id + "|") >= 0, "words line: " + id));
 ok(!/Those (who decide|affected)/.test(JSON.stringify(D.exemplars)) && /no use for the answer is stated/.test(JSON.stringify(D.exemplars)), "exemplar audience: a stated use, not affected against deciding");
-ok(/Realism:/.test(EX.plain(D.exemplars.answers[1])) && /Closest papers:/.test(EX.plain(D.exemplars.answers[1])) && /framing and realism/.test(D.exemplars.answers[1].level), "strong exemplar: shows the realism review and the closest-paper notes, labelled for what it rates");
+ok(/Realism, data:/.test(EX.plain(D.exemplars.answers[1])) && /Realism, physics:/.test(EX.plain(D.exemplars.answers[1])) && /Closest papers:/.test(EX.plain(D.exemplars.answers[1])) && /framing and realism/.test(D.exemplars.answers[1].level), "strong exemplar: shows the realism review and the closest-paper notes, labelled for what it rates");
+ok(/Threshold: 27 °C indoors, the limit in Prairie City's 2026 rental code \(fictional\)/.test(EX.plain(D.exemplars.answers[1])) && /sensor panel \(illustrative\) covers 40 renter homes/.test(EX.plain(D.exemplars.answers[1])) && /about 3 kW of cooling per flat/.test(EX.plain(D.exemplars.answers[1])), "strong exemplar: its realism rating rests on stated evidence (a defined, fictional threshold; a named illustrative dataset; one worked physical check)");
 
 // ---------------- exemplars, rubric, page
 ok(EX.validate(D.exemplars).length === 0, "exemplars are well formed");

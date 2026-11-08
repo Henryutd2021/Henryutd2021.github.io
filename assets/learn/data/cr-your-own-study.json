@@ -29,8 +29,9 @@
       "done": ["A [[concept-matrix|concept matrix]] of at least 12 sources.", "A gap stated with evidence, from a search a reviewer can repeat."], "lessons": ["R2"], "comps": ["positioning"] },
     { "id": "method", "label": "Method", "does": "Choose a method family, defend it, and write the one-page proposal.",
       "done": ["The method defended against two alternatives, one from another family.", "Milestone: the proposal."], "lessons": ["R3"], "route": "lab", "comps": ["method"], "milestone": "the one-page proposal" },
-    { "id": "data", "label": "Data", "does": "Get, clean and document your data, or plan and hold your interviews.",
-      "done": ["A data note: each source with its date and licence.", "A cleaning log; for interviews, consent forms and a guide."], "lessons": ["R4", "B2"], "comps": ["trust", "realism"] },
+    { "id": "data", "label": "Data", "does": "Get, clean and document your data; for interviews, settle the ethics review with a mentor before contacting anyone.",
+      "done": ["A data note: each source with its date and licence.", "A cleaning log.",
+    "Interviews: ethics approval or exemption before recruiting, then consent forms and a guide."], "lessons": ["R4", "B2"], "comps": ["trust", "realism"] },
     { "id": "build", "label": "Build and validate", "does": "Build the model or analysis under version control, verify it, and validate one result.",
       "done": ["It reruns from a [[clean-clone|clean clone]] (or a complete audit trail).", "A verification log.", "One validation against real data or an independent reference."], "lessons": ["R5", "CK-M", "K8"], "route": "lab", "comps": ["trust"] },
     { "id": "uncertainty", "label": "Uncertainty and accounting", "does": "Classify the uncertainties, treat each one, and put cost and carbon on one boundary.",
@@ -39,7 +40,7 @@
       "done": ["Every major concern answered.", "A change log.", "A clean-clone rerun within your tolerance, or the difference explained."], "lessons": ["CK-R"], "comps": ["framing", "method", "trust"], "milestone": "CK-R" },
     { "id": "communicate", "label": "Paper and poster", "does": "Write the paper and the poster, with each result's limits beside it.",
       "done": ["A six-page paper with one key figure.", "A limits paragraph and a 150-word public summary.", "A poster."], "lessons": ["R8"], "route": "cap", "comps": ["communication", "realism"], "milestone": "the paper and the poster" },
-    { "id": "integrity", "label": "Integrity and release", "does": "Check licences, credit and conflicts; treat the people your study is about fairly; release what you may.",
+    { "id": "integrity", "label": "Integrity and release", "does": "Check licences, credit and conflicts; make what you report and release keep your promises to the people studied.",
       "done": ["Licences checked; credit and conflicts stated.", "The people the study is about treated fairly.", "Data and code released with documentation where allowed.", "Your rubric sheet."], "lessons": ["R9"], "comps": ["integrity"], "milestone": "the rubric sheet" }
   ],
   "routes": {
@@ -51,19 +52,19 @@
   },
   "prereqs": ["R10", "R2", "R5", "R6", "R7", "R8", "R9", "CK-M"],
   "uncertainty": [
-    { "id": "scen", "label": "Scenarios", "line": "Scenarios for the uncertainties classified as scenario or deep, each result reported per scenario.", "ok": true,
+    { "id": "scen", "label": "Scenarios", "def": "[[scenario|Scenarios]]: a few coherent what-if sets of inputs, each reported on its own.", "line": "Scenarios for the uncertainties classified as scenario or deep, each result reported per scenario.", "ok": true,
       "fits": ["opt", "sim", "stat", "ml", "sd", "abm", "eq", "qual", "mixed"] },
-    { "id": "gsa", "label": "Global sensitivity analysis", "line": "A global sensitivity analysis, every uncertain input varied together, results as ranges.", "ok": true,
+    { "id": "gsa", "label": "Global sensitivity analysis", "def": "[[global-sensitivity-analysis|Global sensitivity analysis]]: every uncertain input varied together, then each one's influence on the result ranked.", "line": "A global sensitivity analysis, every uncertain input varied together, results as ranges.", "ok": true,
       "fits": ["opt", "sim", "ml", "sd", "abm", "eq", "mixed"] },
-    { "id": "mc", "label": "Monte Carlo", "line": "Monte Carlo over the inputs classified as parameter uncertainty, varied together, results as ranges.", "ok": true,
+    { "id": "mc", "label": "Monte Carlo", "def": "[[monte-carlo|Monte Carlo]]: uncertain inputs sampled many times and the analysis rerun, giving a spread of results.", "line": "Monte Carlo over the inputs classified as parameter uncertainty, varied together, results as ranges.", "ok": true,
       "fits": ["opt", "sim", "stat", "ml", "sd", "abm", "eq", "mixed"] },
-    { "id": "stoch", "label": "Stochastic or robust optimization", "line": "Stochastic or robust optimization over stated scenarios, with the plan's cost in each.", "ok": true,
+    { "id": "stoch", "label": "Stochastic or robust optimization", "def": "Stochastic or [[robust-optimization|robust optimization]]: a plan chosen to do well across stated scenarios, with or without their chances.", "line": "Stochastic or robust optimization over stated scenarios, with the plan's cost in each.", "ok": true,
       "fits": ["opt", "mixed"] },
-    { "id": "ci", "label": "Intervals and robustness checks", "line": "Confidence intervals, and the main estimate rerun under other reasonable specifications.", "ok": true,
+    { "id": "ci", "label": "Intervals and robustness checks", "def": "Confidence intervals give an estimate's statistical range; robustness checks rerun it under other reasonable specifications.", "line": "Confidence intervals, and the main estimate rerun under other reasonable specifications.", "ok": true,
       "fits": ["stat", "ml", "mixed"] },
-    { "id": "tri", "label": "Triangulation", "line": "Triangulation: each qualitative finding checked against a second source or method.", "ok": true,
+    { "id": "tri", "label": "Triangulation", "def": "[[triangulation|Triangulation]]: each finding checked against a second source or a second method.", "line": "Triangulation: each qualitative finding checked against a second source or method.", "ok": true,
       "fits": ["qual", "mixed"] },
-    { "id": "oat", "label": "One input at a time", "line": "One input swung at a time, the others at their base values.", "ok": false,
+    { "id": "oat", "label": "One input at a time", "def": "One input swung at a time, the others held at their base values.", "line": "One input swung at a time, the others at their base values.", "ok": false,
       "why": "Swings one at a time miss interactions; the rubric's Proficient level asks for scenarios or a global sensitivity analysis." }
   ],
   "reviews": [
@@ -74,8 +75,8 @@
   "fields": [
     { "key": "why", "label": "Why it matters", "hint": "Who would act on the answer, and what answer would change their decision.", "rows": 2, "need": true, "at": "top", "min": 10 },
     { "key": "known", "label": "What is known, and the gap", "hint": "The three closest studies and what none of them answers; the size of your concept matrix and the date of your search (R2).", "rows": 3, "need": true, "min": 15 },
-    { "key": "method", "label": "Why this method, not the alternatives", "hint": "What your method answers that the two alternatives cannot (name a same-family one exactly), and one limit you will mitigate (R3).", "rows": 3, "need": true, "min": 15 },
-    { "key": "data", "label": "Data and licences", "hint": "Each source, its date and its licence; for interviews, who you will ask and how you will ask for consent (R4, R9).", "rows": 2, "need": true, "min": 8 },
+    { "key": "method", "label": "Why this method, not the alternatives", "hint": "What your method answers that the two alternatives cannot (if one is from your method's family, name that method exactly), and one limit you will mitigate (R3).", "rows": 3, "need": true, "min": 15 },
+    { "key": "data", "label": "Data and licences", "hint": "Each source, its date and its licence; for interviews, who you will ask, how you will ask for consent, and the ethics review you need first (R4, R9).", "rows": 2, "need": true, "min": 8 },
     { "key": "check", "label": "How you will check it", "hint": "One verification check, one validation against real data or an independent reference, and the tolerance you set now (R5).", "rows": 2, "need": true, "min": 10 },
     { "key": "leaves", "label": "What the study leaves out", "hint": "The parts, people and years outside your boundary, and why that does not change the answer to your question.", "rows": 2, "need": true, "min": 8 },
     { "key": "integrity", "label": "Integrity", "hint": "Credit, conflicts, consent, and who the study affects (R9).", "rows": 2, "need": true, "min": 8 }
@@ -91,11 +92,12 @@
       "answers": [
         { "key": "weak", "label": "Weak", "level": "Developing", "parts": ["Question: ", { "text": "Is weatherization good for Prairie City?", "note": "No type, no audience, no metric, no comparison: nobody could say when it is answered." }] },
         { "key": "good", "label": "Strong", "level": "Strong", "parts": [
-          "Question: Did homes weatherized in 2023 ", { "text": "use less gas", "note": "A metric; its units follow." }, " in the next two winters than ",
-          { "text": "similar homes still on the waiting list?", "note": "The counterfactual: homes that applied too." },
+          "Question: Did homes weatherized in 2023 ", { "text": "cut their gas use", "note": "A metric; its units follow." }, " over the next two winters by more than ",
+          { "text": "similar homes still on the waiting list?", "note": "A candidate comparison group: homes that applied too, assumed alike apart from the work. It stands in for the counterfactual." },
           "\nType: evaluative.\nAudience: ", { "text": "the city's housing office, which sets next year's budget and would cut the programme if the saving is under 5%.", "note": "Who acts on the answer, and the answer that would change the decision." },
-          "\nMetric: winter gas use per home, kWh, adjusted for the weather.\nScale: S3; boundary: the homes' gas, not their electricity.\n",
-          { "text": "Wrong if: the waiting-list homes' use fell as much.", "note": "A falsification statement." }
+          "\nMetric: the change in winter gas use per home, two winters before against two after, kWh, adjusted for the weather.\nScale: S3; boundary: the homes' gas, not their electricity.\n",
+          { "text": "Wrong if: the waiting-list homes' use fell as much.", "note": "A falsification statement, on the same change." },
+          "\n", { "text": "Selection: homes that waited may differ; I compare their use before 2023 too.", "note": "The comparison's main weakness, named, with a check." }
         ] }
       ] },
     { "comp": "positioning", "stage": "literature", "study": "weather", "title": "Positioning: the gap", "task": "State what is known and the gap.", "lines": true,
@@ -132,7 +134,7 @@
       "answers": [
         { "key": "weak", "label": "Weak", "level": "Developing", "parts": ["Result: ", { "text": "the reserve falls short in 4 hours of the heat wave.", "note": "A single number, as if certain." }] },
         { "key": "good", "label": "Proficient", "level": "Proficient", "parts": [
-          "Result: ", { "text": "in 90% of 1,000 Monte Carlo runs the reserve falls short in 1 to 9 hours of the heat wave, against 0 to 2 hours with today's air conditioning.", "note": "A range, how it was made, and what it is compared with." },
+          "Result: ", { "text": "the reserve falls short in 1 to 9 hours of the heat wave (the middle 90% of 1,000 Monte Carlo runs), against 0 to 2 hours (the same 90%) with today's air conditioning.", "note": "Each range with its coverage, how it was made, and what it is compared with." },
           "\nDrivers: ", { "text": "air-conditioning growth moves it most, then the gas fleet's outage rate.", "note": "The uncertainties that matter, ranked. Strong would add what knowing them better is worth to the decision." },
           "\nKept apart: ", { "text": "we treat a heat wave hotter than any on record as a stress scenario, because we cannot defend a probability for it.", "note": "[[deep-uncertainty|Deep uncertainty]] kept out of the probabilities: the evidence, not the record alone, decides it." }
         ] }
@@ -143,7 +145,8 @@
         { "key": "good", "label": "Proficient", "level": "Proficient", "parts": [
           "Cost: ", { "text": "against no battery, the co-op's power bill falls $250,000 a year; less the battery's annualized cost, $160,000, its yearly cost falls $90,000 (2025 dollars).", "note": "Whose money, against what, in which dollars: the bill's fall less the battery's yearly cost." },
           "\nCO₂: ", { "text": "120 t a year less, location-based with the grid's hourly average factors, on the same boundary: the co-op's purchases.", "note": "One boundary for cost and carbon; the emissions question named ([[location-based|location-based]])." },
-          "\nHow: ", { "text": "it buys 2,000 MWh at night (0.39 t CO₂ per MWh) to deliver 1,800 MWh in the evening (0.50 t per MWh): 1,800 × 0.50 − 2,000 × 0.39 = 900 − 780 = 120 t.", "note": "The arithmetic, its 10% losses included. With one yearly factor for every hour, the 200 MWh lost would add CO₂ instead." },
+          "\nHow: ", { "text": "it buys 2,000 MWh at night (0.39 t CO₂ per MWh) to deliver 1,800 MWh in the evening (0.50 t per MWh).", "note": "The energy it moves, its 10% losses included." },
+          "\nArithmetic: ", { "text": "1,800 × 0.50 − 2,000 × 0.39 = 900 − 780 = 120 t.", "note": "With one yearly factor for every hour, the 200 MWh lost would add CO₂ instead." },
           "\nWho: ", { "text": "members pay for the battery through rates; farms on the feeder gain most.", "note": "Who pays and who benefits, named." }
         ] }
       ] },
@@ -160,7 +163,7 @@
       "answers": [
         { "key": "weak", "label": "Weak", "level": "Developing", "parts": ["Summary: ", { "text": "our study proves weatherization works and should be extended to every home.", "note": "Proves, works, every home: no size, no limits, and a policy the study did not test." }] },
         { "key": "good", "label": "Proficient", "level": "Proficient", "parts": [
-          "Finding: ", { "text": "weatherized homes used 9% to 15% less gas in the two winters after than similar homes still on the waiting list.", "note": "The finding, with its size and its comparison." },
+          "Finding: ", { "text": "weatherized homes cut their gas use by 9% to 15% more than similar homes still on the waiting list, over the two winters after (a 95% confidence interval).", "note": "The finding, with its size, what the range is and its comparison." },
           "\nLimits: ", { "text": "one city, two winters, homes that applied; gas use, not comfort or health.", "note": "The limits beside the result." },
           "\nFor the housing office: ", { "text": "the result holds for homes like those that applied; homes that never apply may differ.", "note": "A reading that is hard to misread." }
         ] }
@@ -169,7 +172,7 @@
       "answers": [
         { "key": "weak", "label": "Weak", "level": "Developing", "parts": ["Ethics: ", { "text": "no issues: the data are public.", "note": "The interviews and the co-op's records are not public: consent and licences unchecked." }] },
         { "key": "good", "label": "Strong", "level": "Strong", "parts": [
-          "Consent: ", { "text": "the 12 interviewees signed a consent form, and the university's ethics board approved the interviews.", "note": "[[informed-consent|Consent]] and [[ethics-board|ethics review]] for the people the study is about." },
+          "Consent: ", { "text": "the university's ethics board approved the interview protocol before recruitment began, and the 12 interviewees each signed a consent form.", "note": "[[ethics-board|Ethics review]] before anyone was contacted, then [[informed-consent|consent]]." },
           "\nData: ", { "text": "the co-op's sign-up records under a data-sharing agreement, names removed; I release the code and a synthetic copy, not the records.", "note": "The licence checked; released where allowed ([[synthetic-sample|a synthetic copy]])." },
           "\nCredit: ", { "text": "co-op staff in the acknowledgements; no funding and no conflicts.", "note": "Credit and conflicts stated." },
           "\nFindings: ", { "text": "the co-op saw them before publication, with no veto.", "note": "Stakeholders treated fairly, without control of the results." }

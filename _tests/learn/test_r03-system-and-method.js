@@ -65,30 +65,35 @@ ok(D.briefs.find(b => b.id === "rebate").fits.opt[0] === "poor", "an evaluative 
 // ---------------- defences and their checks
 D.briefs.forEach(b => {
   const d = b.defence, v = M.asReader(d), c = M.defenceChecks(v, d.method);
-  ok(c.length === 5 && c.every(x => x.ok) && M.defenceDone(v, d.method) && String(v.reduce || "").trim(), b.id + ": the example defence has the five required parts and a way to reduce its limit");
+  ok(c.length === 6 && c[0].id === "choice" && c.every(x => x.ok) && M.defenceDone(v, d.method) && String(v.reduce || "").trim(), b.id + ": the example defence has the six required parts (its method named first) and a way to reduce its limit");
   ok(b.fits[d.method][0] === "good" && d.other !== d.method, b.id + ": defends a well-fitting family against another family");
   M.defenceFields(D, d).forEach(f => ok(M.words(f[0] + " " + f[1]) <= 35, b.id + ": defence part within 35 words: " + M.plainMarks(f[0])));
 });
 ok(M.defenceChecks({}, "opt").every(x => !x.ok) && !M.defenceDone({}, "opt"), "defence checks: an empty defence passes nothing");
-ok(!M.defenceChecks({ other: "opt" }, "opt")[2].ok, "defence checks: the same family does not count as another family");
-const plainDef = { same: "a single run", why1: "One run hides the spread the question asks about.", other: "sd", why2: "It has no hourly grid.", limit: "Foresight inside each case." };
+ok(!M.defenceDone({ same: "a single run", why1: "x", other: "sd", why2: "y", limit: "z" }, "opt"), "defence checks: a defence that never names the chosen method is not done");
+ok(/function showQ\(act\) \{\n\s*H\("p", \{ class: "r3-q"[^\n]*\n\s*if \(B\(\)\.assume\) H\("p", \{ class: "r3-assume/.test(JS), "the brief's question and its assumption are two separate elements");
+D.briefs.forEach(b => ok(M.words(b.question) <= 35 && (!b.assume || M.words(b.assume) <= 35), b.id + ": the question and the assumption each within 35 words, as shown"));
+ok(/Words in these briefs: " \+ LX\.rich\(D\.terms\)/.test(JS) && /\[\[expected-unserved-energy\|/.test(D.terms), "the brief picker keeps glossary help for the briefs' terms beside its plain-text buttons");
+ok(/\[\[representative-period\|representative hours\]\]/.test(JSON.stringify(D.exemplars)), "the exemplar marks representative hours");
+ok(!M.defenceChecks({ other: "opt" }, "opt")[3].ok, "defence checks: the same family does not count as another family");
+const plainDef = { choice: "A linear program of the outage days.", same: "a single run", why1: "One run hides the spread the question asks about.", other: "sd", why2: "It has no hourly grid.", limit: "Foresight inside each case." };
 ok(M.defenceDone(plainDef, "opt") && !/because/.test(JSON.stringify(plainDef)), "defence checks: a defence passes on its parts alone, without any required word (no 'because')");
 ok(!M.defenceDone(Object.assign({}, plainDef, { why2: " " }), "opt"), "defence checks: a blank reason does not count");
-// the defence step: done only from the five parts; the example button completes nothing
-const STEP6 = JS.slice(JS.indexOf('{ text: "Defend your choice'), JS.indexOf('{ text: "Your design card'));
+// the defence step: done only from the six parts; the example button completes nothing
+const STEP6 = JS.slice(JS.indexOf('{ text: "Name your method and defend it'), JS.indexOf('{ text: "Your design card'));
 const CMP = STEP6.slice(STEP6.indexOf('cmp.addEventListener("click"'), STEP6.indexOf("paint();\n        } },"));
-ok((STEP6.match(/api\.done\(\)/g) || []).length === 1 && /if \(done\) api\.done\(\)/.test(STEP6) && CMP.length > 0 && !/api\.done/.test(CMP), "defence step: api.done() only when the five parts are there, never from 'Compare with an example defence'");
+ok((STEP6.match(/api\.done\(\)/g) || []).length === 1 && /if \(done\) api\.done\(\)/.test(STEP6) && CMP.length > 0 && !/api\.done/.test(CMP), "defence step: api.done() only when the six parts are there, never from 'Compare with an example defence'");
 const H0 = D.briefs.find(b => b.id === "hospital");
 ok(/poor fit/.test(M.compareFeedback(D, H0, "ml")) && !/Both/.test(M.compareFeedback(D, H0, "ml")), "comparison feedback: a poorly fitting family is told so, not that both can be defended");
 ok(/Same family/.test(M.compareFeedback(D, H0, "opt")) && /helps with a part/.test(M.compareFeedback(D, H0, "stat")) && /both fit/.test(M.compareFeedback(D, H0, "sim")), "comparison feedback: same family, a family that helps with a part, and one that fits well");
 D.briefs.forEach(b => D.families.forEach(f => ok(M.words(M.compareFeedback(D, b, f.id)) <= 35, "comparison feedback within 35 words (" + b.id + ", " + f.id + ")")));
-const st = { brief: "hospital", per: { hospital: { scale: "S1", placed: { a1: "inside", a6: "out" }, step: "1h", horizon: "yr", method: "opt", same: "an LP", why1: "First sentence.\nSecond sentence.", other: "sim", why2: "A ranking is not a choice.", limit: "Perfect foresight." } } };
+const st = { brief: "hospital", per: { hospital: { scale: "S1", placed: { a1: "inside", a6: "out" }, step: "1h", horizon: "yr", method: "opt", choice: "A MILP of the outage days.", same: "an LP", why1: "First sentence.\nSecond sentence.", other: "sim", why2: "A ranking is not a choice.", limit: "Perfect foresight." } } };
 const F = M.designFields(D, st), FL = F.map(x => x[0]);
 const fv = k => (F.find(x => x[0] === k) || [])[1];
-ok(FL.join("|") === "Question|Type|Assumption|Scale|Boundary, decided or computed|Boundary, fixed inputs|Boundary, left out|Time step|Horizon|Method family|Alternative 1|Why not alternative 1|Alternative 2|Why not alternative 2|Main limit|Reduced or checked by", "design card fields, in order: " + FL.join(", "));
+ok(FL.join("|") === "Question|Type|Assumption|Scale|Boundary, decided or computed|Boundary, fixed inputs|Boundary, left out|Time step|Horizon|Method family|Method|Alternative 1|Why not alternative 1|Alternative 2|Why not alternative 2|Main limit|Reduced or checked by", "design card fields, in order: " + FL.join(", "));
 ok(fv("Scale") === "S1 microgrid and community" && fv("Boundary, decided or computed") === "Sizes of solar, battery and generator" && fv("Boundary, left out") === "Wholesale prices across the Plains Grid" && fv("Boundary, fixed inputs") === "(not yet)", "design card: scale and the reader's boundary");
-ok(fv("Time step") === "1 hour" && fv("Horizon") === "A typical year plus the outage" && fv("Method family") === "Optimization" && fv("Alternative 1") === "an LP" && fv("Alternative 2") === "Simulation" && fv("Reduced or checked by") === "(not yet)", "design card: step, horizon, method, alternatives");
-ok(fv("Why not alternative 1") === "First sentence.\nSecond sentence." && F.length === 16, "design card: a reason with a line break stays one field, whole (no extra field, no lost character)");
+ok(fv("Time step") === "1 hour" && fv("Horizon") === "A typical year plus the outage" && fv("Method family") === "Optimization" && fv("Method") === "A MILP of the outage days." && fv("Alternative 1") === "an LP" && fv("Alternative 2") === "Simulation" && fv("Reduced or checked by") === "(not yet)", "design card: step, horizon, method, alternatives");
+ok(fv("Why not alternative 1") === "First sentence.\nSecond sentence." && F.length === 17, "design card: a reason with a line break stays one field, whole (no extra field, no lost character)");
 ok(/designFields\(D, st\)\.forEach/.test(JS) && !/txt\.split\("\\n"\)/.test(JS) && /white-space:pre-line/.test(JS), "design card: drawn from its fields (not by splitting the text), with line breaks kept");
 const dt = M.designText(D, st).split("\n");
 ok(dt[0] === "Learn · R3 design card" && dt[1].indexOf("Question: What sizes") === 0 && !/\[\[/.test(M.designText(D, st)), "design card text: plain, without glossary marks");
@@ -125,7 +130,7 @@ ok(!/synchronous/i.test(JSON.stringify(D) + PAGE) && /planned for a region, such
 ok(/separate, faster study/.test(BR("hospital").steps.find(x => x.id === "5m").why) && /islanding/.test(BR("hospital").assume) && /not the switch itself/.test(BR("hospital").assume), "hospital: five-minute steps do not verify the switch; the result assumes islanding works");
 ok(/four hours in a row per event/.test(BR("flexload").assume) && /events a year/.test(BR("flexload").assume) && /not made up later/.test(BR("flexload").assume) && /apart from unserved energy/.test(BR("flexload").assume), "flexible load: the pausing rule is stated (per event, events a year, no recovery, counted apart)");
 const FAMS = id => D.families.find(f => f.id === id);
-ok(/rolling horizon/.test(FAMS("opt").limit) && /unless/.test(FAMS("opt").limit) && /^Least reliable outside/.test(FAMS("ml").limit) && /^Static versions/.test(FAMS("eq").limit), "family limits by variant: foresight is a formulation choice, ML extrapolates unreliably, static equilibrium");
+ok(/rolling horizon/.test(FAMS("opt").limit) && /unless/.test(FAMS("opt").limit) && /deterministic run may treat/.test(FAMS("opt").limit) && /what each decision can know/.test(FAMS("opt").limit) && /^Least reliable outside/.test(FAMS("ml").limit) && /^Static versions/.test(FAMS("eq").limit), "family limits by variant: foresight is a formulation choice, ML extrapolates unreliably, static equilibrium");
 ["expected-unserved-energy", "linear-program", "mixed-integer-program", "perfect-foresight", "resource-adequacy", "islanding"].forEach(id => ok(JSON.stringify(D).indexOf("[[" + id + "|") >= 0, "glossary mark at first use in the data: " + id));
 ok(/\(LP\)/.test(BR("hospital").defence.same) && /\(MILP\)/.test(BR("hospital").defence.choice), "LP and MILP spelled out at first use");
 ["https://docs.pypsa.org/", "https://jump.dev/", "https://www.pyomo.org/"].forEach(u => ok(PAGE.indexOf('href="' + u + '"') >= 0, "tool link " + u));
