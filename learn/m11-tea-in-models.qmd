@@ -124,9 +124,9 @@ $$\min\; (\mathit{CRF} + f)\, c\, S \;+\; \sum_p \varphi_p \sum_{d,t} n_d \Big[ 
 
 $$
 \begin{aligned}
-\mathit{dw} + \mathit{exp} &\le w_t, \quad \mathit{ez} = \mathit{dw} + \mathit{imp} \le S, \quad \mathit{exp}, \mathit{imp} \le 50 && \text{(each hour, behind the meter)}\\
-\mathit{dw} = \mathit{exp} &= 0, \quad \mathit{ez} = \mathit{imp} \le S && \text{(each hour, across the grid)}\\
-\textstyle\sum_{d,t} n_d \big(e\, u - L\, k\, \mathit{ez} / 1000\big) &\le 0, \quad u \ge \mathit{imp} - \mathit{exp}, \quad u \ge 0 && \text{(a tier, period 1)}\\
+\mathit{dw} + \mathit{exp} &\le w_t, \quad \mathit{ez} = \mathit{dw} + \mathit{imp} \le S, \quad \mathit{exp}, \mathit{imp} \le 50, \quad x_t = \mathit{exp} && \text{(each hour, behind the meter)}\\
+\mathit{dw} = \mathit{exp} &= 0, \quad \mathit{ez} = \mathit{imp} \le S, \quad x_t = \min(w_t, 50) && \text{(each hour, across the grid)}\\
+\textstyle\sum_{d,t} n_d \big(e\, u - L\, k\, \mathit{ez} / 1000\big) &\le 0, \quad u \ge \mathit{imp} - x_t, \quad u \ge 0 && \text{(a tier, period 1)}\\
 \mathit{dw}, \mathit{exp}, \mathit{imp} &\ge 0, \quad 0 \le S \le 100 && \text{(bounds)}\\
 \varphi_1 = \mathit{AF}(r, 10) / \mathit{AF}(r, N), &\quad \varphi_2 = 1 - \varphi_1, \quad \mathit{CRF} = 1 / \mathit{AF}(r, N) && \text{(weights)}
 \end{aligned}
@@ -144,6 +144,7 @@ $$
 | $h$, $\kappa_p$ | hydrogen price ($4), the credit in period $p$ ($3.185, then 0) | \$/kg |
 | $k$ | $1000 / 57$, about 17.54 | kg/MWh |
 | $e$, $L$ | the grid's CO₂ rate (0.082), the tier's limit (0.449 for the top tier) | t/MWh, kg/kg |
+| $x_t$ | certificates from the same hour: the wind sold behind the meter; across the grid, the wind farm's own sales | MW |
 | $u$ | power bought not matched in the same hour, never below 0 | MW |
 | $\mathit{AF}(r, N)$ | annuity factor, $(1 - (1+r)^{-N}) / r$ | years |
 

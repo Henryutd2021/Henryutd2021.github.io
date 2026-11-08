@@ -19,7 +19,7 @@
 // Duals follow LX.solver's convention: d(optimal cost)/d(right-hand side). A balance dual is a local marginal value: the
 // extra cost per MWh of a small change in demand at that bus and hour, away from a corner of the model (at a corner the
 // step up and the step down differ, and the dual is one value between them). It holds under stated assumptions (fixed
-// plants, costs as offers, a lossless DC network, the modelled day) and is not a market settlement. recipe() checks a
+// plants, costs as offers, a lossless DC network, the modeled day) and is not a market settlement. recipe() checks a
 // dual by a finite difference (solve again with eps more demand) and lists how the cheapest plan would serve the extra
 // MWh, which is how the page explains a price in words; the page also solves with eps less and shows both sides.
 // ptdf() and decompose() give the textbook split LMP_n = LMP_ref - sum_l PTDF[l][n] mu_l (Go deeper). rent() is what
@@ -366,15 +366,16 @@
       return LX.solver.solve(build(D, o), { timeLimit: 3, key: key, label: "m1" }).then(function (r) { return { r: r, day: read(D, o, r) }; });
     }
     // a small step up (eps more demand) and down (eps less) at (bus, hour): the recipe of the step up, with the step
-    // down's saving per MWh as rc.down (null if that solve failed). If the step up does not solve (a time limit, an error),
-    // the result is { failed: that result }: the caller shows its status with Try again and keeps Next locked
+    // down's saving per MWh as rc.down. If either step does not solve (a time limit, an error), the result is
+    // { failed: that result }: the caller shows its status with Try again and keeps Next locked, since a check with one
+    // side missing could not tell a corner from a single price
     function bumpAt(o, base, bus, hour) {
       var up = {}, dn = {}; for (var k in o) { up[k] = o[k]; dn[k] = o[k]; }
       up.add = { bus: bus, hour: hour, mw: L.eps }; dn.add = { bus: bus, hour: hour, mw: -L.eps };
       return Promise.all([LX.solver.solve(build(D, up), { timeLimit: 3, label: "m1" }), LX.solver.solve(build(D, dn), { timeLimit: 3, label: "m1" })]).then(function (rs) {
-        if (!rs[0] || !rs[0].ok) return { failed: rs[0] || { status: "error" } };
+        for (var i = 0; i < 2; i++) if (!rs[i] || !rs[i].ok) return { failed: rs[i] || { status: "error" } };
         var rc = recipe(D, base, rs[0], L.eps);
-        rc.down = rs[1] && rs[1].ok ? r6((base.objective - rs[1].objective) / L.eps) : null;
+        rc.down = r6((base.objective - rs[1].objective) / L.eps);
         return rc;
       });
     }

@@ -301,6 +301,12 @@ const fm = M.fm, r1 = v => Math.round(v * 10) / 10, r3 = v => Math.round(v * 100
   onPage("here, " + (5 - REF.defaults.solved) + " of 5 skipped", "LPs the bound skips at the defaults"); onPage("About " + (Math.round(REF.size.cols / 100) * 100).toLocaleString("en-US") + " columns and " + (Math.round(REF.size.rows / 100) * 100).toLocaleString("en-US") + " rows", "the LP's size");
   onPage("$" + d.wear.toFixed(2), "stack wear per MWh");
   onPage("\\text{(each hour, across the grid)}", "the across-the-grid hours in the algebra"); onPage("**Two connections.**", "the two connections");
+  // the certificates the matching rows count, as the model counts them: the plant's own sales behind its meter; across the
+  // grid the wind farm's sales on their own, min(w, 50) (the model's `sold`); the algebra and the card say the same
+  onPage("x_t = \\mathit{exp} && \\text{(each hour, behind the meter)}", "the algebra: certificates behind the meter are the wind sold");
+  onPage("x_t = \\min(w_t, 50) && \\text{(each hour, across the grid)}", "the algebra: certificates across the grid are the wind farm's own sales");
+  onPage("u \\ge \\mathit{imp} - x_t", "the algebra: hourly matching counts power bought beyond the hour's certificates");
+  ok(/var sold = grid \? Math\.min\(K\.C, w\) : 0;/.test(JS) && /hu\["imp" \+ s\] = -1; if \(!grid\) hu\["exp" \+ s\] = 1;\s*cons\.push\(\{ name: "h" \+ s, terms: hu, ge: -sold \}\)/.test(JS) && /<var>u<\/var> ≥ <var>imp<\/var> − <var>x<\/var><sub><var>t<\/var><\/sub>/.test(JS) && /<var>x<\/var><sub><var>t<\/var><\/sub> = min\(<var>w<\/var><sub><var>t<\/var><\/sub>, 50\)/.test(JS), "the model's hourly row is u ≥ imp − min(w, 50) across the grid and u ≥ imp − exp behind the meter, as the equation card writes it");
   ok(/across the grid: <var>dw<\/var> = <var>exp<\/var> = 0, &nbsp; <var>ez<\/var> = <var>imp<\/var> ≤ <var>S<\/var>/.test(JS) && /behind its own connection/.test(D.boundaries.find(b => b.id === "grid").note), "the equation card and the boundary note state the electrolyzer's own connection across the grid");
   onPage("the same " + fm.mw(B("plant").S) + " plan, worth " + fm.musd(B("plant").npv) + " or " + fm.musd(B("increment").npv), "one plant and the increment: one plan, two accounts");
   ok(near(B("plant").S, B("increment").S), "one plant and the increment build the same size");

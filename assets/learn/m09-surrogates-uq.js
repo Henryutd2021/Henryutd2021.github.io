@@ -419,7 +419,7 @@
     var T = D.turbine, N0 = D.n0, a = lab.fit(N0, false), recs = campaign(D, N0), last = Math.max.apply(null, recs.map(function (r) { return r[0]; }));
     var near = recs.slice().sort(function (p, q) { return Math.abs(p[0] - 8) - Math.abs(q[0] - 8); })[0], q8 = predict(a, near[0]), q16 = predict(a, 16), w = widest(a, T);
     var card = H("div", { class: "lx-xcard" }, x);
-    H("header", { class: "lx-x-head", html: "<h3>A Gaussian process fit, labelled</h3>" }, card);
+    H("header", { class: "lx-x-head", html: "<h3>A Gaussian process fit, labeled</h3>" }, card);
     H("p", { class: "lx-hint", text: "Reference case, whatever you set above: the first " + N0 + " records and the settings they chose (step 3)." }, card);
     var P = LX.Plot(card, { text: "Text version of the chart" }), spec = fitSpec(T, { fits: [{ F: a, color: COL.one, label: "Gaussian process" }], maker: true, recs: [{ r: recs, color: COL.rec, label: N0 + " records" }], aria: "An annotated Gaussian process fit." });
     spec.marks = [{ x: near[0], y: near[1], n: "1", kind: "dot" }, { x: 6, y: predict(a, 6).m, n: "2", kind: "dot" }, { x: near[0], y: q8.m + Z90 * q8.sd, n: "3", kind: "dot" },
