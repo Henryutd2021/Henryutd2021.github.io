@@ -4,13 +4,15 @@
 //     factors, the time-of-use tariff revenue-neutral on the household use, the heat pumps' seasonal COP = HSPF / 3.412),
 //     the price index (2022 and 2024 dollars to 2025), the capital recovery factor (1 MW of wind = $133,575 a year)
 //   - the LP: energy balances, battery losses and hydrogen yields in every run; closed forms where there is no storage
-//     (the home without a battery, the farm alone); the run in 52 weeks and 31 December against one full-year LP (storage across weeks)
+//     (the home without a battery, the farm alone); the run in 52 weeks and 31 December against one full-year LP (storage across weeks);
+//     the weeks join: every store is half full where two periods meet, so the full-year LP can only do as well or better
 //   - ties: the totals the page reports are the same on the whole optimal face (each pushed up and down), own solar's
 //     share too; the busiest grid hour is not (a second least-cost schedule found), so with storage it is labelled
 //   - each hour followed (split): the bars under the chart's line add up to the line, the whole bar to the hour's sources;
 //     own solar's share is never negative; the CO₂ tile is bought power and gas, the export credit apart (review 2026-11-03)
 //   - money: NPV = the sum of the discounted cash flows; replacements and residual values; sizing ("Size it for me")
-//     beats its neighbours on the representative weeks
+//     beats its neighbours on the representative weeks; on the year, three cases and one step either side of each
+//     suggestion (a neighbour can do better there: the page shows it and its words never call the sizes the year's best)
 //   - failure states: a solver that times out, is infeasible, throws, rejects or is cancelled gives a clear status,
 //     never a rejection; BenchRun classifies each with "Try again", and the words say why and in which week
 //   - sensitivity: every case not run again equals a fresh solve; the farm's equipment cost is run again (stack wear)
@@ -150,8 +152,24 @@ const QPATH = path.join(SITE, "learn/sb0-site-bench.qmd");
     const gap = Math.abs(a.results.money.npv - b.results.money.npv), cap = a.results.money.capex;
     ok(gap <= 0.005 * Math.max(cap, 1) + 1, `preset ${p.id}: 52 weeks and one year agree within 0.5% of the equipment cost (${Math.round(gap)} of ${Math.round(cap)})`);
     if (!/(bat|tank|allin)$/.test(p.id) && p.id !== "allin") ok(gap < 1, `preset ${p.id}: no storage, so the two are the same (${gap})`);
+    // the weeks pin every store at half its size where two periods meet, so their schedule is one the full-year LP could
+    // run: the year can only do as well or better
+    ok(b.results.money.npv >= a.results.money.npv - 1e-6 * Math.max(1, Math.abs(a.results.money.npv)), `preset ${p.id}: the full-year LP does at least as well as the joined weeks (${Math.round(b.results.money.npv - a.results.money.npv)})`);
     check.rows.push({ id: p.id, label: (s.site === "home" ? "Home: " : "Wind farm: ") + p.label.toLowerCase(), weeks: Math.round(a.results.money.npv), year: Math.round(b.results.money.npv), capex: Math.round(cap) });
   }
+
+  // ---------------- the weeks join: every store is half full at each period's start and end (the review's jumps of
+  // 200 MWh and 10,000 kg between weeks), and the first hour of each period starts from that level
+  for (const id of ["solarbat", "allin", "farmbat", "farmtank"]) {
+    const s = E0.withPreset(E0.defaults(), E0.presets.find(q => q.id === id)), R0 = results[id].results, ps = R0.periods, home = s.site === "home";
+    const stores = home ? [["soc", s.hb, (S, h) => S.soc[h] - 0.85 * S.ch[h] + S.dis[h]]] : [["soc", s.fb, (S, h) => S.soc[h] - 0.85 * S.ch[h] + S.dis[h]], ["tank", s.tank * 1000, (S, h) => S.tank[h] + S.h2[h] - S.el[h] * 1000 / 57.5]].filter(x => x[1] > 0);
+    for (const [key, cap, before] of stores) {
+      let worst = 0;
+      ps.forEach((p, i) => { const S = p.series, n = S[key].length; worst = Math.max(worst, Math.abs(S[key][n - 1] - 0.5 * cap), Math.abs(before(S, 0) - 0.5 * cap)); if (i + 1 < ps.length) worst = Math.max(worst, Math.abs(S[key][n - 1] - before(ps[i + 1].series, 0))); });
+      ok(ps.length === 53 && worst <= 1e-6 * Math.max(1, cap), `the weeks join (${id}, ${key}): half full where every two periods meet, ${ps.length} periods, worst ${worst.toExponential(1)}`);
+    }
+  }
+  ok(D.weeks.boundary === 0.5 && E0.build(P, st({ hb: 10 }), { mode: "year" }).variables.every(v => v.lb === undefined), "the boundary share is e0.json's (half full); the full-year LP pins no level");
 
   // ---------------- ties: the reported totals on the optimal face (a week of each storage preset)
   // own solar's share (home) or the spilled share (farm) of one solved schedule of period p
@@ -222,8 +240,11 @@ const QPATH = path.join(SITE, "learn/sb0-site-bench.qmd");
     const s = st({ site: "farm", el: 50, h2: 3.25 }), r = await run(s), raw = E0.recost(r.raw, Object.assign({}, s, { cost: 125 }));
     ok(near(raw.tot.wear, r.raw.tot.el * E0.costs(D, Object.assign({}, s, { cost: 125 })).elWear, 1e-6) && rel(raw.tot.revenue, raw.tot.sales + raw.tot.h2Rev - raw.tot.wear, 1e-12), "recost (farm): the stack wear and the net revenue are priced again at the new cost");
   }
-  // sizing beats its neighbours on the representative weeks
-  for (const x of [{ site: "home", tariff: "tou", cost: 50 }, { site: "farm", line: 50, h2: 6 }]) {
+  // sizing beats its neighbours on the representative weeks; then each suggestion and one step either side of it run on
+  // the year (the review's case: the farm on time-of-use at 50% equipment cost, where 35 MW beats the suggested 40 MW)
+  const SIZING = [["home-tou", "Home, time-of-use, equipment at 50%", { site: "home", tariff: "tou", cost: 50 }], ["farm-line", "Wind farm, 50 MW line, hydrogen at $6/kg", { site: "farm", line: 50, h2: 6 }],
+    ["farm-tou", "Wind farm, time-of-use, equipment at 50%", { site: "farm", sale: "tou", cost: 50 }]], sizing = { date: null, rows: [] };
+  for (const [sid, slabel, x] of SIZING) {
     const s = st(x), z = await run(s, { size: true });
     ok(z.ok && z.results.sizes && z.results.snapped, `size it (${JSON.stringify(x)}): optimal with sizes`);
     const keys = s.site === "home" ? ["pv", "hb"] : ["fb", "el", "tank"];
@@ -236,6 +257,24 @@ const QPATH = path.join(SITE, "learn/sb0-site-bench.qmd");
       ok(best <= await at(zz) + 1e-6 * Math.abs(best) + 1e-6, `size it: ${k} ${d > 0 ? "+" : "−"} one step costs no less (${JSON.stringify(x)})`);
     }
     keys.forEach(k => ok(z.results.snapped[k] % (E0.field(k).step || 1) < 1e-9 || near(z.results.snapped[k] % E0.field(k).step, E0.field(k).step, 1e-9), `size it: ${k} snapped to the control's step`));
+    // on the year: the suggestion as snapped, then one control step either side of each size
+    const base = Object.assign({}, s); keys.forEach(k => { base[k] = z.results.snapped[k]; });
+    const yr = async q => { const rr = await run(q); ok(rr.ok, "size it on the year: " + JSON.stringify(q).slice(0, 60) + " runs"); return rr.results.money.npv; };
+    const npv = await yr(base); let nb = null;
+    for (const k of keys) for (const d of [-1, 1]) {
+      const f = E0.field(k), q = Object.assign({}, base); q[k] = +Math.min(f.max, Math.max(f.min, q[k] + d * f.step)).toFixed(2);
+      if (q[k] === base[k]) continue;
+      const v = await yr(q); if (v > npv + 0.5 && (!nb || v > nb.npv)) nb = { key: k, value: q[k], npv: Math.round(v) };
+    }
+    const sz = {}; keys.forEach(k => { sz[k] = base[k]; });
+    sizing.rows.push({ id: sid, label: slabel, sizes: sz, npv: Math.round(npv), best: nb });
+  }
+  ok(sizing.rows.find(r => r.id === "farm-tou").best && sizing.rows.find(r => r.id === "farm-tou").best.key === "el" && sizing.rows.find(r => r.id === "farm-tou").best.value === 35,
+    "size it on the year: the review's case, where 35 MW of electrolyzer beats the suggested 40 MW (" + JSON.stringify(sizing.rows.find(r => r.id === "farm-tou").best) + "), so the page shows it");
+  {
+    const words = [E0.sizeWords("home", 6), E0.sizeWords("farm", 5), E0.SIZED];
+    ok(words.every(w => wcount(w.replace(/\[\[[^|]+\|([^\]]+)\]\]/g, "$1")) <= 35) && words.every(w => !/least-cost sizes|cheapest sizes|best on the year/.test(w)) && /\[\[representative-period\|/.test(words[0]) && /can do better/.test(words[0]) && /^Suggested/.test(E0.SIZED),
+      "Size it for me's words: a suggestion from representative weeks (marked for the glossary), rounded, then run on the year; never the year's best; within 35 words");
   }
 
   // ---------------- failure states (a stubbed solver) and the run box's words
@@ -258,7 +297,7 @@ const QPATH = path.join(SITE, "learn/sb0-site-bench.qmd");
     const E0SRC = fs.readFileSync(L("components/engine-e0.js"), "utf8"), okWords = (/words: \{ ok: "([^"]+)" \}/.exec(E0SRC) || [])[1] || "";
     ok(BR.classify(ok1).kind === "ok" && /optimal/.test(BR.classify(ok1, { ok: okWords }).text), "a finished run says optimal, from the solver's status");
     const boxTime = (/<dt>Time<\/dt><dd>([^<]*)/.exec(fs.readFileSync(path.join(SITE, "learn/sb0-site-bench.qmd"), "utf8")) || [])[1] || "";
-    ok(/as 52 weeks and 31 December/.test(boxTime) && /every hour of 2025, as 52 weeks and 31 December \(/.test(okWords) && E0.note(st({}), ok1.results).run.text === "every hour of 2025, as 52 weeks and 31 December",
+    ok(/as 52 weeks and 31 December/.test(boxTime) && /every hour of 2025, as 52 weeks and 31 December, storage half full where they meet \(/.test(okWords) && E0.note(st({}), ok1.results).run.text === "every hour of 2025, as 52 weeks and 31 December",
        "the run's status words and the note's run line say 52 weeks and 31 December, as the model box does (" + okWords + ")");
     const mid = await E0.solve(st({}), P, { solver: (() => { let k = 0; return m => (++k === 10 ? { status: "time-limit", ok: false } : solver(m)); })() });
     ok(mid.status === "time-limit" && mid.message.indexOf("week of " + E0.periods(P, st({}), "week")[9].start) >= 0, "a stop in week 10 says which week (" + mid.message + ")");
@@ -299,7 +338,7 @@ const QPATH = path.join(SITE, "learn/sb0-site-bench.qmd");
     sizeBtn.click(); await settle();
     pl = B.plan();
     const want = await run(Object.assign({}, pl, { fb: 0, el: 0, tank: 0 }), { size: true });
-    ok(/^Sized/.test(sizerSays()) && ["fb", "el", "tank"].every(k => pl[k] === want.results.snapped[k]), "view: sizing the farm writes its own least-cost sizes (" + JSON.stringify({ fb: pl.fb, el: pl.el, tank: pl.tank }) + ")");
+    ok(/^Suggested/.test(sizerSays()) && ["fb", "el", "tank"].every(k => pl[k] === want.results.snapped[k]), "view: sizing the farm writes its own least-cost sizes (" + JSON.stringify({ fb: pl.fb, el: pl.el, tank: pl.tank }) + ")");
     homeBtn.click(); sizeBtn.click(); E.LX.E0.ui.SIZE_KEYS.home.forEach(() => {}); B.set({ pv: 8 }); await settle();
     pl = B.plan();
     ok(pl.site === "home" && pl.pv === 8 && pl.hb === 0 && /plan on the controls changed/.test(sizerSays()), "view: a control changed while the home is sized stops the sizing; the reader's value stays");
@@ -323,10 +362,13 @@ const QPATH = path.join(SITE, "learn/sb0-site-bench.qmd");
   ok(SS.decode(E0.schemaFor("c0"), SS.encode(E0.schema, D0)).status === "none", "a Site Bench link does not open on the capstone (its own key)");
 
   // ---------------- the page's generated blocks and numbers
+  function stamp(old, fresh, keys) { return old && old.date && keys.every(k => JSON.stringify(old[k]) === JSON.stringify(fresh[k])) ? old.date : new Date().toLocaleDateString("en-CA"); }
   if (WRITE) {
     const def = await run(D0);
-    D.reference = { about: "The default plan's results, shown when JavaScript is off, and each preset's run in 52 weeks and 31 December checked against one LP over the whole year, all solved with engine E0 and HiGHS.",
-      "default": { date: new Date().toLocaleDateString("en-CA"), state: D0, readouts: def.results.readouts }, check: Object.assign(check, { date: new Date().toLocaleDateString("en-CA") }) };
+    D.reference = { about: "The default plan's results, shown when JavaScript is off; each preset's run in 52 weeks and 31 December checked against one LP over the whole year; and Size it for me's suggestions for three cases run on the year with one step either side; all solved with engine E0 and HiGHS.",
+      // a stored block keeps its date while its numbers are unchanged (the date says when they were solved)
+      "default": { date: stamp(D.reference && D.reference.default, { state: D0, readouts: def.results.readouts }, ["state", "readouts"]), state: D0, readouts: def.results.readouts },
+      check: Object.assign(check, { date: stamp(D.reference && D.reference.check, check, ["rows"]) }), sizing: Object.assign(sizing, { date: stamp(D.reference && D.reference.sizing, sizing, ["rows"]) }) };
     fs.writeFileSync(L("data/e0.json"), JSON.stringify(D, null, 1) + "\n");
   }
   const DD = J("e0.json");
@@ -335,6 +377,7 @@ const QPATH = path.join(SITE, "learn/sb0-site-bench.qmd");
     const def = await run(D0);
     ok(JSON.stringify(DD.reference.default.readouts) === JSON.stringify(def.results.readouts), "the stored default results equal a fresh run");
     DD.reference.check.rows.forEach((r, i) => ok(check.rows[i] && r.weeks === check.rows[i].weeks && r.year === check.rows[i].year, "the stored check equals a fresh one: " + r.id));
+    ok(DD.reference.sizing && JSON.stringify(DD.reference.sizing.rows) === JSON.stringify(sizing.rows), "the stored sizing check (Size it for me on the year) equals a fresh one (run --write)");
   }
   const BLOCKS = PAGE_JS.staticBlocks(DD, X, P, E0, SS);
   const MARK = { bench: "sb0-bench", results: "sb0-results", explain: "sb0-explain", inputs: "sb0-inputs", sources: "sb0-sources" };
@@ -351,12 +394,23 @@ const QPATH = path.join(SITE, "learn/sb0-site-bench.qmd");
     const f = results.farmel.results;
     ok(f.readouts[1].value === m(f.money.added) && near(f.money.added, f.money.npv - f.money.aloneNpv, 1e-6), "farm: what the extra equipment adds = NPV − the farm alone's");
     ok(f.money.lcoh > 0 && near(f.money.lcoh, (50 * E0.costs(D, st({ site: "farm" })).el.eac + f.tot.wear) / f.tot.h2, 1e-9), "farm: cost per kg = the electrolyzer's yearly cost and wear ÷ kg sold");
+    const none = (await run(st({ site: "farm", el: 50, take: 0 }))).results.readouts.find(x => x.key === "h2"), noEl = results.farm.results.readouts.find(x => x.key === "h2");
+    ok(none.value === "0 t" && none.note === "no hydrogen sold under this plan" && noEl.note === "no electrolyzer", "zero hydrogen: an electrolyzer that sells nothing is not called missing (" + none.note + "; " + noEl.note + ")");
+    const rv = results.farmel.results.readouts, sp = rv.find(x => x.key === "spill").note, rev = rv.find(x => x.key === "revenue").note;
+    ok(/^unused; /.test(sp) && /less stack wear$/.test(rev) && /spill, leaving wind unused/.test(X.rules.items[0].v) && /Stack wear: an allowance per MWh for replacing its cells/.test(fs.readFileSync(L("components/engine-e0.js"), "utf8")),
+      "spilled wind (unused) and stack wear (an allowance for replacing the electrolyzer's cells) are said in plain words: the tile, the rules and the electrolyzer's control");
   }
   // text: the page's own prose stays short, no AI wording, no nuclear terms, data centers nowhere
   // (the sources list is citations, not prose: left out of the word budget)
   const OWN = Q.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?<!-- learn:\1:end -->/g, "").replace(/<!-- sb0-sources:start[\s\S]*?<!-- sb0-sources:end -->/, " ").replace(/<!--[\s\S]*?-->/g, " ");
   const elems = OWN.replace(/<table[\s\S]*?<\/table>/g, " ").split(/<\/?(?:p|li|dt|dd|div|summary|h[1-6]|blockquote)\b[^>]*>|\n- /).map(t => t.replace(/<[^>]+>/g, "").replace(/\[([^\]]+)\]\{[^}]*\}/g, "$1").replace(/\s+/g, " ").trim()).filter(t => t && /[A-Za-z]/.test(t) && !/^(:::|```|---)/.test(t));
   elems.forEach(t => ok(t.split(" ").length <= 35, "text element within 35 words: " + t.slice(0, 70)));
+  // the explanatory table cells too (the inputs, the explain layer's rules and checks): each within 35 words
+  {
+    const cells = (Q.replace(/<!-- sb0-sources:start[\s\S]*?<!-- sb0-sources:end -->/, " ").match(/<t[dh]\b[^>]*>[\s\S]*?<\/t[dh]>/g) || []).map(c => c.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim()).filter(Boolean);
+    const long = cells.filter(c => c.split(" ").length > 35);
+    ok(cells.length > 60 && !long.length, "every table cell on the page within 35 words (" + cells.length + " cells): " + long.map(c => c.slice(0, 50)).join(" | "));
+  }
   // what the results draw (captions, tile notes, the sensitivity words): each sentence group within about 35 words
   {
     const wc = t => t.replace(/<[^>]+>/g, "").split(/\s+/).filter(Boolean).length, seen = [];

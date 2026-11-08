@@ -3,10 +3,10 @@
  "rules": {
   "title": "Decisions, goal and rules, in words",
   "items": [
-   { "k": "Decisions", "v": "Every hour: how much to buy and send back (home) or sell and spill (farm), what goes into and out of the battery, and what the electrolyzer and tank do." },
+   { "k": "Decisions", "v": "Every hour: how much to buy and send back (home) or sell and spill, leaving wind unused (farm), what goes into and out of the battery, and what the electrolyzer and tank do." },
    { "k": "Goal", "v": "The lowest yearly cost for the home, or the highest yearly revenue for the farm, with the sizes you set." },
-   { "k": "Rules", "v": "Each hour balances; nothing runs above its size; the battery loses 15% of what it stores; the line and the buyer's take are limits." },
-   { "k": "Time", "v": "All 8,760 hours of 2025, as 52 weeks and 31 December, one small [[linear-program|linear program]] each." },
+   { "k": "Rules", "v": "Each hour balances; nothing runs above its size; for every 100 units charged, the battery gives back 85, and waiting loses nothing; the line and the buyer's take are limits." },
+   { "k": "Time", "v": "All 8,760 hours of 2025, as 52 weeks and 31 December, one small [[linear-program|linear program]] each. Storage is half full where they meet, so they join into one year." },
    { "k": "Tie rule", "v": "A tiny wear charge on battery use and, on the farm, a hair's preference for selling earlier in the week. Both are left out of every number shown." },
    { "k": "Ties", "v": "Every total shown is the same on every least-cost schedule. With storage, the hour-by-hour schedule, and the hour counts read from it, can differ." }
   ]
@@ -27,6 +27,10 @@
  },
  "check": {
   "title": "Checked on one full-year LP",
-  "lede": "The test runs each preset again as one LP over all 8,760 hours, with storage free to carry across weeks."
+  "lede": "The test runs each preset again as one LP over all 8,760 hours, with storage free to carry across weeks: it can only do as well or better."
+ },
+ "sizing": {
+  "title": "Size it for me, run on the year",
+  "lede": "Sizes chosen on representative weeks, then rounded, need not be the best on the year. The test runs three cases and one control step either side of each suggestion."
  }
 }

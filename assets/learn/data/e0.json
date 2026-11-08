@@ -216,7 +216,8 @@
    ],
    "perSeason": 1
   },
-  "note": "The engine runs representative weeks hour by hour, as lesson 13 and M3 do: for each season the week closest to all the others (a medoid), scaled to keep the season's energy, plus weeks kept as they are. Home: the week with the highest household use and the week with the highest need net of 6 kW of panels. Wind farm: the week with the least wind. Each week stands for its weeks of the year (weights). Batteries and the tank end each week where they started: storage from one week to the next is left out."
+  "boundary": 0.5,
+  "note": "The engine runs representative weeks hour by hour, as lesson 13 and M3 do: for each season the week closest to all the others (a medoid), scaled to keep the season's energy, plus weeks kept as they are. Home: the week with the highest household use and the week with the highest need net of 6 kW of panels. Wind farm: the week with the least wind. Each week stands for its weeks of the year (weights). Boundary: batteries and the tank are half full at the start and the end of every week, of 31 December and of each representative week, so the year's 52 weeks and 31 December join into one schedule; storage from one week to the next is left out. The full-year check lets storage carry across weeks, at a level of its own."
  },
  "tie": {
   "home": 0.0002,
@@ -322,7 +323,7 @@
   }
  },
  "reference": {
-  "about": "The default plan's results, shown when JavaScript is off, and each preset's run in 52 weeks and 31 December checked against one LP over the whole year, all solved with engine E0 and HiGHS.",
+  "about": "The default plan's results, shown when JavaScript is off; each preset's run in 52 weeks and 31 December checked against one LP over the whole year; and Size it for me's suggestions for three cases run on the year with one step either side; all solved with engine E0 and HiGHS.",
   "default": {
    "date": "2026-11-05",
    "state": {
@@ -383,7 +384,7 @@
    ]
   },
   "check": {
-   "date": "2026-11-05",
+   "date": "2026-11-08",
    "rows": [
     {
      "id": "solar",
@@ -395,7 +396,7 @@
     {
      "id": "solarbat",
      "label": "Home: solar and a battery",
-     "weeks": -37790,
+     "weeks": -37795,
      "year": -37789,
      "capex": 40930
     },
@@ -409,7 +410,7 @@
     {
      "id": "allin",
      "label": "Home: all three",
-     "weeks": -51033,
+     "weeks": -51044,
      "year": -51035,
      "capex": 59827
     },
@@ -423,7 +424,7 @@
     {
      "id": "farmbat",
      "label": "Wind farm: add a battery",
-     "weeks": -54058240,
+     "weeks": -54856298,
      "year": -54316538,
      "capex": 332850000
     },
@@ -437,9 +438,54 @@
     {
      "id": "farmtank",
      "label": "Wind farm: electrolyzer and tank",
-     "weeks": -119397859,
+     "weeks": -119962249,
      "year": -119437661,
      "capex": 374080298
+    }
+   ]
+  },
+  "sizing": {
+   "date": "2026-11-08",
+   "rows": [
+    {
+     "id": "home-tou",
+     "label": "Home, time-of-use, equipment at 50%",
+     "sizes": {
+      "pv": 3,
+      "hb": 2.5
+     },
+     "npv": 1109,
+     "best": {
+      "key": "pv",
+      "value": 2.5,
+      "npv": 1141
+     }
+    },
+    {
+     "id": "farm-line",
+     "label": "Wind farm, 50 MW line, hydrogen at $6/kg",
+     "sizes": {
+      "fb": 0,
+      "el": 50,
+      "tank": 0
+     },
+     "npv": 81270821,
+     "best": null
+    },
+    {
+     "id": "farm-tou",
+     "label": "Wind farm, time-of-use, equipment at 50%",
+     "sizes": {
+      "fb": 0,
+      "el": 40,
+      "tank": 0
+     },
+     "npv": 242428193,
+     "best": {
+      "key": "el",
+      "value": 35,
+      "npv": 243363529
+     }
     }
    ]
   }
