@@ -9,7 +9,8 @@
              LX.fmt.money/tonnes/mw/mwh/hh/int, LX.clamp, LX.lerp, LX.reduced() (prefers-reduced-motion)
    State:    LX.progress.done/isDone/guess/answer, LX.store.get/set   (this browser only; try/catch wrapped; kept in memory
                                         for the page, with one notice, when the browser refuses storage)
-             LX.store.persistent()  false once storage failed;  LX.store.clearAll()  the course-wide reset ([data-lx-reset])
+             LX.store.persistent()  false once storage failed;  LX.store.clearAll()  the course-wide reset ([data-lx-reset]);
+                                        a page opened before a reset no longer writes (its old state cannot come back)
    Runtime:  LX.mount(slug, init)  load a lesson interactive's data-src JSON files, then init(liveRoot, data)
              LX.demo(root, fn, cards) a lesson's demo states ("mid", "step-N", ...) for screenshots: window.lxDemo, ?demo=
              LX.load(urls)         Promise of {basename: parsed JSON};  LX.base = URL of assets/learn/
@@ -172,25 +173,35 @@
   // Everything the course keeps lives under one localStorage key, "learn.v1". When the browser refuses it (site data
   // blocked, some private windows, a full quota), the state is kept in memory for the rest of this page's life, as JSON
   // text so it behaves like storage, and one short notice says that it will not survive a reload
-  // (LX.store.persistent() is then false). LX.store.clearAll() removes the key: the course-wide reset.
-  var KEY = "learn.v1", MEM = null, warned = false;
+  // (LX.store.persistent() is then false). LX.store.clearAll() is the course-wide reset: it replaces everything with
+  // {reset: <time>}, and the mark keeps a page opened before the reset (another tab, a page restored from the back-forward
+  // cache) from writing its old state back: such a page's writes are dropped, and it says so once.
+  var KEY = "learn.v1", MEM = null, warned = {}, EPOCH;   // EPOCH: the reset mark this page started with
+  var NOTES = { blocked: "This browser is not keeping site data, so your answers and progress last only until you reload or leave this page.",
+    stale: "This course's data was cleared in this browser, from another tab. Reload this page to start afresh; until then, nothing on it is saved." };
   function read() {
-    if (MEM != null) return JSON.parse(MEM);
-    var txt;
-    try { txt = window.localStorage.getItem(KEY); } catch (e) { MEM = "{}"; notice(); return {}; }
-    try { return JSON.parse(txt) || {}; } catch (e) { return {}; }   // unreadable text: start afresh (the next write replaces it)
+    var s;
+    if (MEM != null) s = JSON.parse(MEM);
+    else {
+      var txt;
+      try { txt = window.localStorage.getItem(KEY); } catch (e) { MEM = "{}"; notice("blocked"); txt = null; }
+      try { s = JSON.parse(txt) || {}; } catch (e) { s = {}; }   // unreadable text: start afresh (the next write replaces it)
+    }
+    if (EPOCH === undefined) EPOCH = s.reset || null;
+    return s;
   }
   function write(s) {
+    if (EPOCH !== undefined && (s.reset || null) !== EPOCH) { notice("stale"); return false; }   // cleared since this page opened
     var txt = JSON.stringify(s);
     if (MEM != null) { MEM = txt; return false; }
-    try { window.localStorage.setItem(KEY, txt); return true; } catch (e) { MEM = txt; notice(); return false; }
+    try { window.localStorage.setItem(KEY, txt); return true; } catch (e) { MEM = txt; notice("blocked"); return false; }
   }
-  // the notice, once per page: under the page title, or at the top of the main column
-  function notice() {
-    if (warned) return; warned = true;
+  // a notice, once per page and kind: under the page title, or at the top of the main column
+  function notice(kind) {
+    if (warned[kind]) return; warned[kind] = true;
     function put() {
       var main = document.querySelector("main") || document.body; if (!main) return;
-      var p = LX.H("p", { class: "lx-store-note", role: "status", text: "This browser is not keeping site data, so your answers and progress last only until you reload or leave this page." });
+      var p = LX.H("p", { class: "lx-store-note", role: "status", "data-kind": kind, text: NOTES[kind] });
       var head = main.querySelector("#title-block-header");
       if (head && head.parentNode === main) main.insertBefore(p, head.nextSibling); else main.insertBefore(p, main.firstChild);
     }
@@ -208,8 +219,10 @@
   LX.store = { get: function (k, d) { var v = kv("kv")(k); return v === undefined ? d : v; }, set: function (k, v) { kv("kv")(k, v); },
     persistent: function () { return MEM == null; },
     clearAll: function () {   // every guess, answer, draft, checkpoint attempt and tick of the course, in this browser
-      if (MEM != null) MEM = "{}";
-      try { window.localStorage.removeItem(KEY); } catch (e) { MEM = "{}"; }
+      EPOCH = new Date().toISOString();
+      var txt = JSON.stringify({ reset: EPOCH });   // no reader data: only the time of the reset (see read and write)
+      if (MEM != null) { MEM = txt; return; }
+      try { window.localStorage.setItem(KEY, txt); } catch (e) { MEM = txt; notice("blocked"); }
     } };
   LX.progress = {
     isDone: function (id) { return !!bucket(read(), "done")[id]; },
@@ -411,6 +424,8 @@
 
   function start() {
     read();   // a first read: a browser that refuses storage shows its notice at once, not at the first answer
+    // a reset in another tab: say so here at once (this page's writes are dropped from now on; see write)
+    window.addEventListener("storage", function (e) { if ((e.key === KEY || e.key === null) && EPOCH !== undefined && (read().reset || null) !== EPOCH) notice("stale"); });
     watchTheme(); setupComplete(); setupReset(); paintTicks(); guardToTop();
     isReady = true; readyQ.splice(0).forEach(function (f) { try { f(); } catch (e) { console.error(e); } });
   }

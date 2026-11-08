@@ -3,7 +3,7 @@
  "dataset": {
   "creator": "Honglin Li",
   "date": "2026-11-05",
-  "status": "Illustrative: Prairie Town and its costs are fictional (lesson 13's inputs); the hourly shapes are real SPP data for 2025 and 2024 (EIA-930).",
+  "status": "Illustrative: Prairie Town is fictional; its technology costs are lesson 13's, from cited EIA and NREL sources in 2025 dollars (13-capstone.json); the hourly shapes are real SPP data for 2025 and 2024 (EIA-930).",
   "source": "Prepared by hand for lesson M3 on lesson 13's planning model; the reference results are solved with HiGHS.",
   "license": "CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/), Honglin Li. Values taken from the sources listed in this file keep their publishers' terms; EIA data are U.S. government works in the public domain."
  },
