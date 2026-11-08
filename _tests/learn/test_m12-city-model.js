@@ -37,7 +37,9 @@ const RUN_DATE = "6 November 2026";
   const runs = ["today", "electrify", "flex"].map(k => ({ key: k, label: PG.PLANS[k].label, R: R[k] })).concat([{ key: "choose", label: "The LP's choice, CO₂ ≤ 80% of 2025", R: c80.results }]);
   const rows = PG.compareRows(runs).map(r => [r.name, PG.signedMil(r.cost), E3.kilo(r.co2) + " t", E3.kilo(r.up) + " MW", PG.pct1(r.burden)]);
   const table = E3.tableHTML(["Plan", "Yearly cost against 2025", "CO₂ of the districts (a year)", "Substation upgrades", "Burden, homes below 80% of area median income (AMI; screening)"], rows, "m12-table") +
-    '<p class="lx-hint">Precomputed with HiGHS on ' + RUN_DATE + ". Cost includes the cars' fuel and charging, not their prices; equipment and upgrades as yearly payments.</p>";
+    '<p class="lx-hint">Precomputed with HiGHS on ' + RUN_DATE + ". Cost includes the cars' fuel and charging, not their prices; equipment and upgrades as yearly payments.</p>" +
+    E3.tableHTML(["The duals the lesson reads (precomputed)", "Value", "What it says"], [["A substation's limit, its dual summed over the year (electrified; every district)", "$" + E3.kilo(R.electrify.dist[1].value) + " per MW a year", "one more MW of room saves an upgrade's yearly cost"],
+      ["The CO₂ cap at " + PG.CHOOSE.capDef + "% of 2025 (the LP choosing)", "$" + E3.kilo(c80.results.raw.capDual) + " per t", "what cutting the last tonne costs, under this model's assumptions"]], "m12-table", [null, "n", "s"]);
   const ref = { runs: {} };
   runs.forEach(x => { ref.runs[x.key] = { peaks: x.R.dist.map(d => +d.peak.toFixed(3)), upg: x.R.dist.map(d => +d.upg.toFixed(3)), cost: Math.round(x.R.acc.total), co2: Math.round(x.R.acc.co2Hub), imp: Math.round(x.R.acc.imp), burdenLow: +x.R.hh.low.burden.toFixed(5), burdenOther: +x.R.hh.other.burden.toFixed(5) }; });
   ref.runs.choose.capDual = +c80.results.raw.capDual.toFixed(2);
@@ -59,7 +61,7 @@ const RUN_DATE = "6 November 2026";
   const FY = JSON.parse(fs.readFileSync(L("data/e3-full-year.json"), "utf8")), FYc = city.fullYear, FE = PG.fullEntries(FY);
   const fullHTML = () => E3.tableHTML(["Full-year check: plan", "Yearly cost against 2025, no penalty on unserved energy: eight days → full year", "CO₂ gap", "Upgrades: eight days → sized on the year", "Unserved with the eight days' upgrades"],
     FE.map((e, i) => E3.fullPlanRow(e, PG.fullLabel(e, i))), "e3-fullt", [null, "n", "n", "n", "n"]) + '<p class="lx-hint">Precomputed with HiGHS on ' + FY.date + ": each plan run again on all 8,760 hours of 2025, with what its eight days decided kept. On the year, step 6's plan is " +
-    E3.kilo(FE[3].year.co2 - FE[3].cap) + " t over the CO₂ cap it was chosen under.</p>";
+    E3.kilo(FE[3].year.co2 - FE[3].cap) + " t over the CO₂ cap it was chosen under. The upgrades column comes from a second run that sizes them on the year.</p>";
   const BLOCKS = { "m12-static": () => table, "m12-full": fullHTML, "m12-inputs": () => E3.inputsHTML(P, { fixed: true }) };
   if (process.argv.includes("--write")) {
     const d = JSON.parse(fs.readFileSync(DPATH, "utf8")); d.precomputed = Object.assign({}, d.precomputed, { m12: pre });
@@ -121,7 +123,9 @@ const RUN_DATE = "6 November 2026";
   ok(FE.every(e => up(e.days) < 0.5 || (e.year.unserved >= 0.5 && e.year.shortDays.length > 0 && e.year.shortDays.every(d => d.day === "2025-02-19" || d.day === "2025-02-20"))) && /every plan that buys upgrades leaves load unserved on 19 or 20 February/.test(kt), "every plan that buys upgrades leaves load unserved on 19 or 20 February (" + FE.map(e => e.year.shortDays.map(d => d.day.slice(8)).join("+") || "none").join(", ") + "), as said");
   ok(worst === FE[2] && kt.indexOf("so the plan with managed charging and batteries misses most: " + E3.kilo(worst.year.unserved) + " MWh") >= 0 && FE[2].days.batteryMW === 40, "the plan with managed charging and batteries misses most (" + E3.kilo(worst.year.unserved) + " MWh), as said");
   ok(FE[3].year.co2 > FE[3].cap && kt.indexOf(E3.kilo(FE[3].year.co2 - FE[3].cap) + " t over the cap") >= 0, "step 6's plan: over its cap on the year by " + E3.kilo(FE[3].year.co2 - FE[3].cap) + " t, as said");
-  ok(keys.length === 6 && ["The check", "What holds", "Three cold days", "The grid", "Step 6's cap", "Not tested"].every((k, i) => keys[i] && keys[i][0] === k), "the card's keys, one idea each");
+  ok(R.electrify.dist.every(d => Math.abs(d.value - R.electrify.dist[1].value) < 0.01 && d.upg > 0.05) && /What it says/.test(table) && table.indexOf("$" + E3.kilo(c80.results.raw.capDual) + " per t") > 0, "the no-JS duals: every district's summed substation dual, electrified, is the same upgrade cost; the cap's dual from the 80% run");
+  ok(keys.length === 7 && ["The check", "Two runs", "What holds", "Three cold days", "The grid", "Step 6's cap", "Not tested"].every((k, i) => keys[i] && keys[i][0] === k), "the card's keys, one idea each");
+  ok(/second run that sizes them on the year/.test(keys[1][1]) && /partly by construction/.test(keys[2][1]) && /partly by construction: it checks the hours' timing/.test(T) && /The upgrades column comes from a second run that sizes them on the year/.test(T), "the full-year columns: two runs, said on the card and in the no-JS note; the totals hold partly by construction");
   ok(FE.every(e => Math.abs(e.year.cost / e.days.cost - 1) < 0.001 && Math.abs(e.year.co2 / e.days.co2 - 1) < 0.001) && /total cost and CO₂ hold; the upgrades the eight days buy fall a little short on 19 or 20 February/.test(T) && FE[3].year.co2 > FE[3].cap, "the explain layer: cost and CO2 hold (within 0.1%); the upgrades fall a little short on 19 or 20 February; the no-JS table says step 6's plan ends over its cap");
   ok(/e3_full_year/.test(JS) && /e3-full-year\.json/.test(PAGE) && !/fullYear\s*\(/.test(JS), "the page reads the data file and never solves the year");
   has("Each day ends with the stored energy it started with, a level the LP picks day by day, on the eight days and in the full-year check: no heat or charge carried between days.");
@@ -179,6 +183,12 @@ const RUN_DATE = "6 November 2026";
   ok(/\[\[building-envelope\|envelope\]\]/.test(JS) && /\[\[retrofit\|/.test(JS) && /\[\[district-heating\|district heat\]\]/.test(JS) && /\[\[energy-burden\|/.test(JS) && /\[\[area-median-income\|/.test(JS), "terms marked at first use");
   ok(!/nuclear|reactor|\bSMR\b|small modular/i.test(PAGE + JS), "no nuclear term");
   ok(!/\bAI\b|artificial intelligence|ChatGPT|Claude/.test(PAGE + JS), "no AI wording");
+  // the notebook: everything that depends on the weather is rebuilt in one function, and practice 2 uses it
+  { const NB = fs.readFileSync(path.join(X.SITE, "learn/notebooks/m12-city-model.ipynb"), "utf8"), JSm = fs.readFileSync(L("m12-city-model.js"), "utf8");
+    ok(/def weather\(city\)/.test(NB) && /COP, DIST = weather\(CITY\)/.test(NB) && /COP, DIST = weather\(colder\(5\)\)/.test(NB) && /def colder\(dT/.test(NB) && /would leave `Qann` and `eps` on the old weather/.test(NB), "notebook: practice 2 rebuilds COP, Q, Qann and eps together (weather(colder(5)))");
+    ok(/\["Q and y", "Q is the heat a district needs that hour, in MW of heat/.test(JSm) && /"Electrical input \(MW\) for a share y of the heat Q"/.test(JSm), "step 2: Q and y defined before the table; its column is the electrical input in MW");
+    ok(/which keeps some of its winter electric heating: winter peaks and upgrades are illustrative/.test(T) && /which still carries the region's own electric heating/.test(JSm), "the base load's winter heating bias is stated");
+    ok(/saves about \$9 per MW a year more than the dual/.test(T) && /slopes of the LP's objective, cost plus the tie costs/.test(T), "the duals are slopes of the objective; the reported cost's gap is stated"); }
   console.log((fails ? "FAILED " : "ok ") + (checks - fails) + "/" + checks + " checks (M12)");
   process.exit(fails ? 1 : 0);
 })();

@@ -175,7 +175,7 @@ const PROSE = OWN.replace(/^---[\s\S]*?\n---\n/, " ").replace(/<script[\s\S]*?<\
   .replace(/<!--[\s\S]*?-->/g, " ").replace(/^- (.*)$/gm, "<li>$1</li>");
 PROSE.split(/<\/?(?:p|li|dd|dt|td|th|summary|br|caption)\b[^>]*>/).map(plain).filter(x => /[A-Za-z]/.test(x) && !/^[:{]/.test(x)).forEach(x => {
   const n = nWords(x); ok(n <= 36, "text element of " + n + " words: " + x.slice(0, 70)); ok(nSent(x) <= 2, "text element of " + nSent(x) + " sentences: " + x.slice(0, 70)); });
-// the sweep review: the electric utility's vertical integration, the loss share's denominator, the hydrogen boundary,
+// later fixes: the electric utility's vertical integration, the loss share's denominator, the hydrogen boundary,
 // procurement against dispatch, plain words on the cards
 ok(/electric utility is \[\[vertically-integrated-utility\|vertically integrated\]\], owning plants and wires/.test(M.WHO_LINE) && /also runs the gas mains \(set for teaching\)/.test(M.WHO_LINE) && !/owns plants, wires and gas mains/.test(JS), "vertical integration is the electric utility's; the gas mains are a stated teaching assumption");
 ok(/of the grid electricity users take, set for teaching/.test(M.powerLine(C)) && near(P.lost / P.gridMeters, P.lossShare, 0.001), "the loss share names its denominator, grid electricity at the meters, as the data computes it");

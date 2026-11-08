@@ -101,7 +101,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <li><b>Fictional:</b> Prairie City is fictional; its numbers are illustrative. Every layer is generated from a seed and a stated recipe; nothing was downloaded.</li>
 <li><b>Sourced:</b> tracking solar arrays take 4.2 acres per MW of panels (DC); 2019's tracking plants had 1.29 MW of panels per MW of <span class="lx-term" data-term="inverter">inverters</span> (AC, the grid side) (<a href="https://emp.lbl.gov/sites/default/files/emp-files/land_requirements_for_utility-scale_pv.pdf">LBNL</a>, slides 13 and 8).</li>
 <li><b>Sourced:</b> wind farms spread over 34.5 ha per MW, where 1 ha = 10,000 m², about 2.5 acres (<a href="https://docs.nlr.gov/docs/fy09osti/45834.pdf">NREL, 2009</a>, Table 1).</li>
-<li><b>Sourced:</b> setbacks, slope rules and the line's cost per mile come from <a href="https://docs.nlr.gov/docs/fy25osti/91900.pdf">NREL's 2024 supply curves</a> (Tables 7, 9, 11 and 12), in 2022 dollars, shown in 2025 dollars with <a href="https://apps.bea.gov/iTable/?reqid=19&amp;step=3&amp;isuri=1&amp;1921=survey&amp;1903=13&amp;1904=2022&amp;1905=2026&amp;1906=a&amp;1911=0">BEA's GDP deflator</a>.</li>
+<li><b>Sourced:</b> setbacks, slope rules and the line's cost per mile: <a href="https://docs.nlr.gov/docs/fy25osti/91900.pdf">NREL's 2024 supply curves</a> (Tables 7, 9, 11 and 12), 2022 dollars, converted to 2025 dollars with the <span class="lx-term" data-term="gdp-deflator">GDP deflator</span>, a price index (<a href="https://apps.bea.gov/iTable/?reqid=19&amp;step=3&amp;isuri=1&amp;1921=survey&amp;1903=13&amp;1904=2022&amp;1905=2026&amp;1906=a&amp;1911=0">BEA</a>).</li>
 <li><b>Shared city data:</b> the data-center campus's 150 MW contract comes from Prairie City's data, as on the course's other city pages.</li>
 <li><b>Set for teaching:</b> the four transmission substations S1–S4 and their spare capacity, land prices, access roads, water mains, block sizes and the capacity-factor rules.</li>
 </ul></div>
@@ -155,11 +155,11 @@ body-classes: "page-learn page-lesson lx-form-cards"
 | A line's cost | $\sum_\text{steps} \tfrac{c_u + c_v}{2}\,\ell$ | $c$ ≈ $1,095,979 per km on farmland (2025 dollars), × 1.8 in [flood zones]{.lx-term term="flood-zone"} |
 
 - **Scores.** $d$ is a distance in km and $d_0$, $d_1$ the ramp's ends; $w_k$ is a weight and $s_k$ a score from 0 to 1.
-- **Blocks.** $a_c$ is a cell's area in km² and $f_c$ its share outside setbacks, checked at 16 points.
+- **Blocks.** $a_c$ is a cell's area in km² and $f_c$ its share outside setbacks, estimated from 16 points 250 m apart: a narrow setback can fall between them.
 - **Lines.** $c_u$ and $c_v$ are two neighbouring cells' costs per km; the step $\ell$ is 1 km, or $\sqrt{2}$ km on a diagonal.
 - **Resources** are rescaled from the region's lowest (0) to its highest (1); land price falls from 1 at $2,500 an acre to 0 at $15,000.
 - **The line's cost per km** is NREL's $1,615,100 a mile (2022 dollars) × 128.893 / 118.026 (BEA's GDP deflator, to 2025 dollars) ÷ 1.609344 km a mile.
-- **Ties.** Equal scores go to the more northern, then the more western block. Equal-cost paths may differ in their steps but share their length and cost; the page draws the first found.
+- **Ties.** Equal scores go to the more northern, then the more western block. Equal-cost paths can differ in their steps and length; the page draws the first found.
 
 ```{=html}
 </div>
@@ -228,7 +228,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-qq" data-id="res" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “A map of 1 km cells can check a 220 m setback.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. A setback is smaller than a cell: this map checks 16 points in each cell, and NREL's supply curves check setbacks on 90 m cells.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. A setback is smaller than a cell: this map estimates it from 16 points 250 m apart, and NREL's supply curves check setbacks on 90 m cells.</p></details>
 </div>
 </div>
 
@@ -254,8 +254,8 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <li><p><b>Land for wind.</b> A 100 MW wind farm takes NREL's average 34.5 ha per MW. How large is it, and how much do turbines, roads and substations occupy for good, at 0.3 ha per MW?</p><details class="lx-answer"><summary>Answer</summary><p>3,450 ha (34.5 km²) in all; 30 ha for good, under 1%: farming goes on between the turbines.</p></details></li>
 <li><p><b>Setbacks.</b> 40 farmsteads, none within 800 m of another. How much land does a 400 m setback remove, and how much a 220 m one?</p><details class="lx-answer"><summary>Answer</summary><p>40 × π × 0.4² ≈ 20.1 km² against 40 × π × 0.22² ≈ 6.1 km²: the area grows with the square of the setback.</p></details></li>
 <li><p><b>A line's cost.</b> A 12 km route crosses 8 km of farmland and 4 km of flood zone (× 1.8). Price it in 2025 dollars: NREL's $1,615,100 a mile (2022), deflator 128.893 ÷ 118.026.</p><details class="lx-answer"><summary>Answer</summary><p>$1,615,100 × 128.893 ÷ 118.026 ÷ 1.609344 ≈ $1,095,979 a km; × (8 + 4 × 1.8) ≈ $16.7 million in 2025 dollars.</p></details></li>
-<li><p><b>A least-cost path by hand.</b> Each step goes to a side-by-side cell and costs the two cells' average (costs per km below). What is the cheapest path from top left to bottom right?</p>
-<div class="lx-scroll-x"><table class="lx-facts a19-pr" data-practice="grid"><thead><tr><th scope="col">Row</th><th scope="col">Left</th><th scope="col">Middle</th><th scope="col">Right</th></tr></thead><tbody><tr><th scope="row">Top</th><td class="n">1</td><td class="n">1</td><td class="n">4</td></tr><tr><th scope="row">Middle</th><td class="n">1</td><td class="n">5</td><td class="n">1</td></tr><tr><th scope="row">Bottom</th><td class="n">2</td><td class="n">1</td><td class="n">1</td></tr></tbody></table></div><details class="lx-answer"><summary>Answer</summary><p>Down the left column, then along the bottom row: 1 + 1.5 + 1.5 + 1 = 5. Along the top row and down the right column costs 7.</p></details></li>
+<li><p><b>A least-cost path by hand.</b> Each 1 km step to a side-by-side cell costs the two cells' average ($ million per km, below). Which path from top left to bottom right is cheapest?</p>
+<div class="lx-scroll-x"><table class="lx-facts a19-pr" data-practice="grid"><thead><tr><th scope="col">Row</th><th scope="col">Left</th><th scope="col">Middle</th><th scope="col">Right</th></tr></thead><tbody><tr><th scope="row">Top</th><td class="n">1</td><td class="n">1</td><td class="n">4</td></tr><tr><th scope="row">Middle</th><td class="n">1</td><td class="n">5</td><td class="n">1</td></tr><tr><th scope="row">Bottom</th><td class="n">2</td><td class="n">1</td><td class="n">1</td></tr></tbody></table></div><details class="lx-answer"><summary>Answer</summary><p>Down the left column, then along the bottom row: 1 + 1.5 + 1.5 + 1 = $5 million. Along the top row and down the right column costs $7 million.</p></details></li>
 <li><p><b>Read a claim critically.</b> A report says: “Our map shows the best solar site in the county.” What four questions would you ask?</p><details class="lx-answer"><summary>Answer</summary><p>Whose weights, and would other weights pick another site; which land was excluded, by what rule; how fine and how recent the layers are; who was asked, and what a visit found.</p></details></li>
 </ol>
 </div>

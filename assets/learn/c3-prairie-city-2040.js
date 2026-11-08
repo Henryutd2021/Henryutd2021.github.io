@@ -38,7 +38,7 @@
     { key: "advocates", name: "Low-income advocates", note: "speak for homes below 80% of area median income", rule: "Yes if their burden falls; partly if it rises by under 0.3 points; no above." },
     { key: "climate", name: "Climate group", note: "wants deep cuts", rule: "Yes for a 35% cut in the city's location-based CO₂ or more; partly from 15%; no below. The city's wind and solar output does not count in it." },
     { key: "park", name: "Industrial park", note: "food plants and the fertilizer plant", rule: "Yes if its yearly energy and equipment cost does not rise; partly up to 10% more; no above." },
-    { key: "rural", name: "Farmers and rural residents", note: "live near a solar farm's site", rule: "Yes with no farm; partly once a site is chosen on the map; the map's layers decide." }];
+    { key: "rural", name: "Farmers and rural residents", note: "live near a solar farm's site", rule: "Yes with no farm; partly for a farm on any of the five screened sites (set for teaching): a site's score is not their consent." }];
   function panel(R, P) {
     var b = budget(R, P), up = upTotal(R), dB = R.hh.low.burden - R.hh.low.burden0, cut = co2Cut(R), S = R.sys;
     var park = parkCost(R, P), park0 = parkCost(R.base, P), dPark = (park - park0) / park0;
@@ -78,6 +78,13 @@
     return { id: id, connectUSD: co.connect + co.road + co.land * f, cfK: co.cf / M.cft.solar, cf: co.cf, line: co.connect, road: co.road, land: co.land * f,
       acres: co.acres * f, km: co.route ? co.route.km : null, sub: co.sub, where: M.A19.place(M.R, t.i, t.j, t.k), score: t.score };
   }
+  // why the five sites rank as they do: each criterion's score (0 to 100, the block's area-weighted mean) and its weight
+  // in A19's default solar weights, then the suitability score they add up to
+  function siteEvidence(M) {
+    var keys = M.D.types.solar.criteria, w = M.c.weights, lab = function (k) { var c = M.D.criteria[k]; return typeof c === "string" ? c : c.solar; };
+    return { head: ["Site"].concat(keys.map(function (k) { return lab(k) + " (weight " + w[k] + ")"; }), ["Score"]),
+      rows: M.top.map(function (t) { return [t.id].concat(keys.map(function (k) { return String(Math.round(100 * t.m[k])); }), [Math.round(100 * t.score) + " of 100"]); }) };
+  }
   // HOOK(A13), wired: jobs by lesson A13's model (LX.A13.jobs) with A13's coefficients
   // (data/a13-fairness-jobs.json, `jobs`: the reader can change them on A13's page; here at their defaults). Building:
   // gross job-years from all the plan's up-front spending, the share spent locally times A13's job-years per $M, times
@@ -95,7 +102,7 @@
     return { jobYears: b.buildJobYears, jobYearsNet: b.buildJobYearsNet, perYear: b.buildJobsAvg, permDirect: o.newPermDirect, permGross: o.newPermGross, permNet: o.newPermNet, mw: mw, c: c, omPer100MW: Jd.omPer100MW.start,
       note: "Construction: " + Math.round(c.localShare * 100) + "% of the up-front spending spent locally, at " + c.jobYearsPerM + " job-years per $M, times " + c.multiplier + " (gross); less " + Math.round(c.buildDisplacement * 100) + "% displacement (net). " +
         "Ongoing: " + Jd.omPer100MW.start + " direct jobs per 100 MW of wind and solar; times " + c.multiplier + " for supplier and spending jobs (gross supported); less " + Math.round(c.displacement * 100) + "% displacement (net). Other equipment's upkeep not counted; nothing retires.",
-      assumeLine: "Jobs: A13's defaults; gross adds supplier and spending jobs; net takes off displacement, work that would happen anyway.",
+      assumeLine: "Jobs: A13's defaults; gross adds supplier and spending jobs, net removes displacement.",
       table: [["Up-front spending spent locally", Math.round(c.localShare * 100) + "%"], ["Construction job-years per local $M", String(c.jobYearsPerM)], ["Multiplier: supplier and spending jobs", String(c.multiplier)],
         ["Displacement: work that would happen anyway", Math.round(c.displacement * 100) + "%"], ["Direct jobs per 100 MW of wind and solar, ongoing", String(Jd.omPer100MW.start)]],
       lines: [["Construction", "job-years: one job for one year. Gross: the multiplier adds supplier and spending jobs; net: less displacement, building work that would have happened anyway."],
@@ -183,21 +190,21 @@
   // one answer per stakeholder who objects, from the run's own numbers (x: below); true of the run by construction
   var ANSWER = {
     council: function (x) { return "the city council (over budget): I would drop the solar farm or some retrofits first; the plan is " + mil(x.upfront - x.budget) + " over"; },
-    utility: function (x) { return "the electric utility (" + kilo(x.up) + " MW of upgrades): I keep them, the cheapest way to meet the " + x.worst + (/s$/.test(x.worst) ? "'" : "'s") + " busiest hour on the eight days (its dual equals the upgrade's yearly cost)" +
-      (x.full && x.full.extra >= 0.05 ? ", and add the " + x.full.extra.toFixed(1) + " MW the full-year check finds short, about " + mil(x.full.cost) + " a year" : ""); },
+    utility: function (x) { return "the electric utility (" + kilo(x.up) + " MW of upgrades): I keep them, the cheapest way to meet the " + x.worst + (/s$/.test(x.worst) ? "'" : "'s") + " busiest hour on the eight days (its dual equals the upgrade's yearly cost)"; },
     advocates: function (x) { return "the low-income advocates (burden " + pct1(x.burden0) + " → " + pct1(x.burden) + "): recovering the shared costs by income instead gives " + pct1(x.altBurden) + " (screening)"; },
     climate: function (x) { return "the climate group (" + pct0(x.cut) + " cut): the city's wind and solar do not lower the location-based CO₂; deeper cuts need more heat pumps and retrofits, with " + mil(x.budget - x.upfront) + " of the budget left"; },
     park: function (x) { return "the industrial park (" + smil(x.dPark) + " a year, " + pct0(x.dParkShare) + "): I keep the food plants' heat pumps for the gas they save, and show the park's gas price in the sensitivity table"; },
     rural: function (x) { return "farmers and rural residents (site " + x.site.id + "): it is the screen's highest-scoring block and the cheapest of the five to connect, " + mil(x.site.connectUSD) + " for its line, road and land, " + x.site.km.toFixed(1) + " km to " + x.site.sub + ", on about " + kilo(x.site.acres) + " acres"; } };
   // the note on each stakeholder's answer in the strong summary: what makes it an answer
-  var ANSWER_NOTE = { council: "A change that meets the budget, with its size.", utility: "A reason to keep the upgrades, from the LP's dual, and what the full-year check adds.",
+  var ANSWER_NOTE = { council: "A change that meets the budget, with its size.", utility: "A reason to keep the upgrades, from the LP's dual.",
     advocates: "An alternative tested, with its result.", climate: "The boundary held, and what would cut deeper, with the budget left.",
     park: "A reason, and where the risk is shown.", rural: "The site's evidence from the map." };
   function exemplars(x) {
     // x: { upfront, budget, dCost, co2, cut, up, worst, burden0, burden, altBurden, objectors: [keys], contractT, dPark,
     //      dParkShare, site: { id, connectUSD, km, sub, acres, cf }, jobs: { jobYears, jobYearsNet, permDirect, permGross, permNet, mw },
-    //      sens: { cheap, dear, top: { label, loText, hiText } }, full: { extra, days } } from a run of REF_PLAN (full: its
-    //      full-year check, data/e3-full-year.json: the MW of upgrade the year needs beyond the eight days', on which days)
+    //      sens: { cheap, dear, top: { label, loText, hiText } }, full: { extra, days, cost, upfront } } from a run of REF_PLAN
+    //      (full: its full-year check, data/e3-full-year.json: the MW of upgrade the year needs beyond the eight days', on
+    //      which days, their yearly and up-front cost; a remedy the summary proposes, not a plan the bench has run)
     var obj = x.objectors.map(function (k) { return ANSWER[k](x); });
     return { title: "Two summaries of the same brief", task: "Recommend Prairie City's 2040 energy plan within the budget, and say who gains and who pays.", id: "c3-ex", lines: true,
       answers: [
@@ -207,27 +214,28 @@
         { key: "good", label: "Strong summary", level: "Proficient", parts: [
           "Recommendation: ", { text: "electrify heat and cars, add substation batteries, move the food plants' low-temperature heat to heat pumps, and build city-owned wind and solar", note: "The plan in one sentence, before the evidence." }, ".\n",
           "Sizes: ", { text: REF_PLAN.hp + "% of furnaces and resistance heat to heat pumps · retrofits " + REF_PLAN.ret + "% · electric cars " + REF_PLAN.ev + "%, " + (REF_PLAN.evm === "managed" ? "managed" : "unmanaged") + " · batteries " + REF_PLAN.bat + " MW · food plants' low-temperature heat " + REF_PLAN.ihp + "% · wind " + REF_PLAN.wind + " MW · solar " + REF_PLAN.farm + " MW, site " + x.site.id, note: "Every lever with its size: a plan the council can cost and check." }, ".\n",
-          "Budget and cost: ", { text: mil(x.upfront) + " up front against " + mil(x.budget) + "; the city's yearly cost " + smil(x.dCost) + " against 2025 (energy bills plus equipment as yearly payments, 2025 dollars)", note: "Up front and yearly kept apart, on one boundary." }, ".\n",
+          "Budget and cost: ", { text: mil(x.upfront) + " up front against " + mil(x.budget) + ", energy equipment and the grid only (the cars households buy are outside it); the city's yearly cost " + smil(x.dCost) + " against 2025 (energy bills plus equipment as yearly payments, 2025 dollars)", note: "Up front and yearly kept apart, each with its boundary." }, ".\n",
           "CO₂ and the grid: ", { text: "the city's location-based CO₂ " + kilo(x.co2) + " t a year, " + pct0(x.cut) + " below 2025 (operating only; the city's wind and solar output not deducted); " + kilo(x.up) + " MW of substation upgrades, the " + x.worst + " the tightest", note: "The cut with its boundary, and where the plan needs grid room." }, ".\n",
           "Who pays (screening): ", { text: "energy burden of homes below 80% of area median income " + pct1(x.burden0) + " → " + pct1(x.burden) + ", every group adopting alike; the cars' fuel and charging count as transport, outside the burden", note: "The rule stated, and the estimate labelled as a screening estimate." }, ".\n",
           "Jobs (screening): ", { text: "about " + kilo(x.jobs.jobYears) + " construction job-years to 2040 (gross), " + kilo(x.jobs.jobYearsNet) + " net of displacement; at the farms " + kilo(x.jobs.permDirect) + " direct ongoing jobs, " + kilo(x.jobs.permGross) + " gross supported, " + kilo(x.jobs.permNet) + " net of displacement", note: "Job-years kept apart from ongoing jobs, gross apart from net." }, ".\n",
           "Site: ", { text: "site " + x.site.id + ", the highest-scoring of A19's five blocks under its default weights and the cheapest to connect (" + mil(x.site.connectUSD) + "), at a " + (x.site.cf * 100).toFixed(1) + "% capacity factor", note: "The site's choice with its evidence from the map." }, ".\n",
           "Sensitivity: ", { text: "the yearly cost runs from " + mil(x.sens.cheap) + " to " + mil(x.sens.dear) + " at the inputs' cheaper and dearer ends, equipment fixed (table attached); " + lc1(x.sens.top.label) + " moves it most; every input is set for teaching", note: "A range, what was held fixed, the input that matters most, what kind of number each input is, and the table." }, ".\n",
-        ].concat(obj.length ? [].concat.apply([], x.objectors.map(function (k, i) { return ["Panel: ", { text: "to " + obj[i], note: ANSWER_NOTE[k] }, ".\n"]; }))
+        ].concat(x.full && x.full.extra >= 0.05 ? ["Full-year check: ", { text: "on all 8,760 hours this plan's upgrades fall " + x.full.extra.toFixed(1) + " MW short, on " + x.full.days + "; I would add them, about " + mil(x.full.upfront) + " more up front and " + mil(x.full.cost) + " a year (a remedy, not rerun on the bench)", note: "What the check found, the remedy priced, and that it was not rerun." }, ".\n"] : []).concat(obj.length ? [].concat.apply([], x.objectors.map(function (k, i) { return ["Panel: ", { text: "to " + obj[i], note: ANSWER_NOTE[k] }, ".\n"]; }))
           : ["Panel: ", { text: "no stakeholder objects", note: "Each objection would need an answer: a reason or a change." }, ".\n"]).concat([
           "Sources: ", { text: "public data from EIA, NOAA, EPA, Census and DOE, each under its publisher's terms; A19's simulated map layers; the course's CC BY 4.0 model; no conflict of interest", note: "The data and their terms named, and the conflict of interest stated." }, ".\n",
-          "Limits: ", { text: "2025's people and prices held to 2040, one substation per district, eight representative days of synthetic weather" + (x.full ? " (on all 8,760 hours the upgrades fall " + x.full.extra.toFixed(1) + " MW short, on " + x.full.days + ")" : "") + ", the household rule an assumption, the map's layers simulated", note: "What the plan leaves out, and what the full-year check found, so the council does not over-read it." }, "."]) }],
+          "Limits: ", { text: "2025's people and prices held to 2040, one substation per district, eight representative days of synthetic weather (one year of hours checked), car prices not counted, the household rule an assumption, the map's layers simulated", note: "What the plan leaves out, so the council does not over-read it." }, "."]) }],
       note: "Both summaries are illustrative. The strong one quotes this engine's numbers for one reference plan within the budget, precomputed; another plan is just as strong when its evidence supports it." };
   }
   // the summary's sentence for a plan with a full-year check: the eight days, then what the year found (as short as the
   // general sentence it replaces)
+  var NO_FULL = "Eight days stand for the year; this plan has no full-year check (the presets and the reference plan have one).";
   function fullAssume(e) {
     var extra = e.year.dist.reduce(function (t, d, i) { return t + d.upg - e.days.dist[i].upg; }, 0);
     return "Eight days stand for the year; on all 8,760 hours its upgrades " + (e.year.unserved >= 0.5 ? "fall " + extra.toFixed(1) + " MW short." : "hold.");
   }
-  var page = { REF_PLAN: REF_PLAN, ANSWER: ANSWER, exemplars: exemplars, fullAssume: fullAssume, siteModel: siteModel, siteInfo: siteInfo, kilo: kilo, mil: mil, smil: smil, pct1: pct1, pct0: pct0, upTotal: upTotal, budget: budget, co2Cut: co2Cut, PANEL: PANEL, panel: panel, parkCost: parkCost,
+  var page = { REF_PLAN: REF_PLAN, ANSWER: ANSWER, exemplars: exemplars, fullAssume: fullAssume, NO_FULL: NO_FULL, siteModel: siteModel, siteInfo: siteInfo, siteEvidence: siteEvidence, kilo: kilo, mil: mil, smil: smil, pct1: pct1, pct0: pct0, upTotal: upTotal, budget: budget, co2Cut: co2Cut, PANEL: PANEL, panel: panel, parkCost: parkCost,
     SENS: SENS, SENS_HOW: SENS_HOW, lc1: lc1, sensRange: sensRange, gasP: gasP, runSens: runSens, sensWords: sensWords, sensRows: sensRows, biggest: biggest, upOf: upOf, upText: upText, upRange: upRange,
-    GROUPS: [{ title: "Buildings", fields: ["hp", "ret"], color: "var(--lx-cc)", hint: "Heat pumps' [[coefficient-of-performance|COP]] falls on cold nights; retrofits cut the heat buildings need." },
+    GROUPS: [{ title: "Buildings", fields: ["hp", "ret"], color: "var(--lx-cc)", hint: "Heat pumps' [[coefficient-of-performance|COP]] falls on cold nights; [[retrofit|retrofits]] (insulation and air sealing) cut the heat buildings need." },
       { title: "District heat (dense core)", fields: ["dh", "dhp", "sto"], color: "var(--lx-tier-4)", hint: "A hot-water network: a large heat pump, a heat store, and a gas boiler for the rest, assumed to exist already (its fuel counts, not its construction)." },
       { title: "Cars", fields: ["ev", "evm"], color: "var(--lx-demand)", hint: "[[managed-charging|Managed charging]] moves each day's charge within the day; it assumes cars are plugged in at home or work when needed." },
       { title: "The industrial park", fields: ["ihp", "ely"], color: "var(--lx-hyd)", hint: "Electrolysis splits water into hydrogen with electricity. Both are flat new loads at the park's own substation; the gas they replace is saved." },
@@ -239,7 +247,7 @@
     RUBRIC: [{ id: "accounting", look: "Cost and CO₂ on one boundary (the whole city, a year, 2025 dollars, location-based); who pays named by household group, as a screening estimate; jobs as construction job-years and ongoing jobs, gross and net." },
       { id: "uncertainty", look: "The sensitivity table: each input one at a time and all together at their cheaper and dearer ends, each input classed as public data or set for teaching.",
         levels: { proficient: "each tested input classed as public data or set for teaching; the one-at-a-time and the joint cheaper and dearer cases reported, the result as a range, and the inputs that could flip the recommendation named" } },
-      { id: "realism", look: "What the plan leaves out: power flow inside districts, 2025's people and prices held to 2040, the household rule an assumption; the site's evidence from A19's simulated layers; what the full-year check found, and what you would do about it." },
+      { id: "realism", look: "What the plan leaves out: power flow inside districts, 2025's people and prices held to 2040, the household rule an assumption; the site's evidence from A19's simulated layers; what the full-year check found and what you would do about it, or, for a plan without one, what that leaves open and how you would check it." },
       { id: "integrity", look: "The sources field filled; every stakeholder who objects answered fairly, with what you would change or why you would not.",
         levels: { proficient: "the data's sources and licences named (public data from EIA, NOAA, EPA and DOE; A19's simulated map layers), the numbers called illustrative, any conflict of interest stated, and every stakeholder who objects answered fairly" } },
       { id: "communication", look: "Two pages the council can act on: the recommendation first, then the evidence, the panel and the limits.",
@@ -286,14 +294,22 @@
       var gs = ctr.querySelectorAll("fieldset.lx-sb-group");
       if (gs.length > 6) ctr.insertBefore(fs, gs[5]);   // after "Local supply and storage", before "The grid"
       var f = S.fields.filter(function (x) { return x.id === "site"; })[0];
-      H("p", { class: "lx-hint e3-ghint", html: LX.rich(SM ? "A19's screen for a " + SM.mw + " MW block: protected land, flood zones, steep slopes and [[setback|setbacks]] (least distances from homes and roads) left out, the rest scored ([[lesson:a19-gis-siting|A19]]). Pick one of its five highest-scoring blocks; its line, road and land go into your plan." : "The siting map could not load: the sites differ only by name and change no number.") }, fs);
+      if (SM) U.keys(fs, [["Out", "protected land, flood zones, steep slopes and [[setback|setbacks]] from homes, as in [[lesson:a19-gis-siting|A19]]'s screen for a " + SM.mw + " MW block."],
+        ["Ranked", "the rest scored by A19's default weights; its five highest-scoring blocks are your sites, A to E."],
+        ["Costs", "the chosen site's line, access road and land go into your plan."]], "c3-site-keys");
+      else H("p", { class: "lx-hint e3-ghint", text: "The siting map could not load: the sites differ only by name and change no number." }, fs);
+      // the map's layers: the suitability first, then the layers that explain it (A19's map; its weights are changed there)
+      var LAY = SM ? [["suit", "Suitability"], ["protected", "Protected land"], ["flood", "Flood zones"], ["slope", "Slope"], ["homes", "Homes"], ["grid", "Lines and substations"], ["land", "Land price"], ["sun", "Sunshine"]] : [], layer = "suit";
+      if (SM) U.seg(H("div", { class: "e3-segrow c3-layers" }, fs), "Map layer", LAY.map(function (x) { return x[0]; }), LAY.reduce(function (o, x) { o[x[0]] = x[1]; return o; }, {}), layer, function (v) { layer = v; paint(plan); });
       var mapBox = H("div", { class: "c3-mapbox" }, fs), map = SM ? LX.SiteMap(mapBox, { R: SM.R, D: SM.D, label: "Map of the region around Prairie City with the five best solar blocks" }) : null;
       var sg = U.seg(H("div", { class: "e3-segrow" }, fs), f.label, f.values, f.names, plan.site, function (v) { var p = U.copy(plan); p.site = v; change(p); });
       var tb = H("div", { class: "c3-sites" }, fs);
       function paint(p) {
         if (!SM) return;
         var k = SM.top.map(function (t) { return t.id; }).indexOf(p.site), co = SM.costs[k];
-        map.draw({ layer: "suit", suit: SM.suit, X: SM.X, sites: SM.top, sel: p.site, path: co && co.route ? co.route.cells : null, sitesKey: "The five highest-scoring solar blocks, A highest" });
+        var st = { layer: layer, sites: SM.top, sel: p.site, path: co && co.route ? co.route.cells : null, sitesKey: "The five highest-scoring solar blocks, A highest", homes: layer === "homes" };
+        if (layer === "suit") { st.suit = SM.suit; st.X = SM.X; }
+        map.draw(st);
         tb.innerHTML = "";
         U.table(tb, ["Site", "Score (A19's default weights)", "Where", "Line to", "Up front: line, road, land", "Capacity factor (a full year)"], SM.top.map(function (t) {
           var x = page.siteInfo(SM, t.id, Math.max(p.farm, 10));
@@ -301,6 +317,9 @@
         }), "c3-sitetbl");
         U.keys(tb, [["Up front", "for a " + kilo(Math.max(p.farm, 10)) + " MW farm, 2025 dollars: the land in proportion to the MW, the line and road as A19 costs them for its block. The panels are in the solar-farm cost."],
           ["Capacity factor", "the site's yearly output over what it would make at full power all year ([[capacity-factor|capacity factor]]). The eight representative days carry more sun than the year: see the full-year check."]]);
+        var ev = page.siteEvidence(SM);
+        U.table(tb, ev.head, ev.rows, "c3-sitetbl c3-why");
+        U.keys(tb, [["Why they rank", "each criterion's score from 0 to 100 (the block's average), times its weight; the weighted sum is the score. Change the weights in [[lesson:a19-gis-siting|A19]]."]]);
       }
       paint(plan);
       return { set: function (p) { sg.set(p.site); paint(p); }, info: function (id, mw) { return page.siteInfo(SM, id, mw); } };
@@ -334,7 +353,8 @@
       var A = R.acc, A0 = R.base.acc;
       U.table(c1, ["CO₂, t a year (location-based)", "2025", "2040 plan"], [["The three districts' buildings and cars", kilo(A0.co2Hub), kilo(A.co2Hub)], ["Industrial park, data-center campus, buses, trucks and farms", kilo(A0.outside.co2), kilo(A.outside.co2)],
         { cls: "e3-tot", cells: ["The city", kilo(A0.city.co2), kilo(A.city.co2) + " (" + (co2Cut(R) >= 0 ? "−" : "+") + pct0(Math.abs(co2Cut(R))) + ")"] }], "c3-co2");
-      U.keys(c1, [["Up front, 2026 to 2040", mil(b.upfront) + " (" + (b.within ? mil(b.left) + " left" : mil(-b.left) + " over") + ")."],
+      U.keys(c1, [["Up front, 2026 to 2040", mil(b.upfront) + " (" + (b.within ? mil(b.left) + " left" : mil(-b.left) + " over") + "): energy equipment and the grid only."],
+        ["Cars", "fuel and charging only: the price of the cars households buy, and their chargers, is in neither the budget nor the yearly cost."],
         ["CO₂", "[[location-based|location-based]]: every MWh used at the grid's average rate, which the city's own farms do not change."],
         ["Wind and solar, apart", A.contract.mwh > 0 ? "the city used " + kilo(A.contract.mwh / 1000) + " GWh a year of its farms' " + kilo(A.contract.gen / 1000) + " GWh; not deducted above."  : "no wind or solar farm in this plan."]].concat(A.contract.mwh > 0 ? [
         ["Grid-average comparison", "those MWh × the grid's average rate ≈ " + kilo(A.contract.t) + " t. Illustrative only: the model tracks no contractual instruments and builds no [[market-based|market-based]] inventory, and the figure is not a physical cut."]] : []));
@@ -342,7 +362,8 @@
       var dv = U.DayView(c2, P), best = 0; R.dist.forEach(function (d, i) { if (d.peak / d.limit > R.dist[best].peak / R.dist[best].limit) best = i; });
       dv.set(R, { d: best, k: R.dist[best].at.k });
       U.table(c2, ["District", "Busiest hour", "Limit", "Upgrade", "Marginal value of room ($ per MW a year, LP dual)"], R.dist.map(function (d) { return [d.label, kilo(d.peak) + " MW", kilo(d.limit) + " MW", kilo(d.upg) + " MW", d.value == null ? "–" : "$" + kilo(d.value)]; }), "c3-sub");
-      U.keys(c2, [["LP dual", "the substation row's [[shadow-price|dual]], summed over the year: what a little more room saves, per MW, under this plan's assumptions. A whole MW can save less."]]);
+      U.keys(c2, [["LP dual", "the substation row's [[shadow-price|dual]], summed over the year: what a little more room is worth per MW in the LP's objective, under this plan's assumptions. A whole MW can be worth less."],
+        ["The tie costs", "the objective includes the [[tie-rule|tie rule]]'s small costs, so where a limit binds without an upgrade the reported cost saves slightly more."]]);
       // the full-year check of the plan that ran (precomputed for the presets and the reference plan; none for others)
       U.fullCard(res, E3.fullFind(FY, "c3", S, R.state, LX.ShareState), FYc, P, { date: FY ? FY.date : "",
         none: "It is precomputed for the presets and the exemplars' reference plan, with every other setting at its default: a year of hours is too large to solve on a click.",
@@ -431,7 +452,7 @@
         // a plan with a full-year check says what it found, in place of the general sentence on the eight days (the two
         // pages have no room for more)
         var fe = E3.fullFind(FY, "c3", S, last.state, LX.ShareState);
-        if (fe) n.assumptions = n.assumptions.map(function (t) { return /^Eight representative days/.test(t) ? page.fullAssume(fe) : t; });
+        n.assumptions = n.assumptions.map(function (t) { return /^Eight representative days/.test(t) ? (fe ? page.fullAssume(fe) : page.NO_FULL) : t; });
         var jb = page.jobs(R, window.LX.A13, data.a13_fairness_jobs && data.a13_fairness_jobs.jobs);
         if (jb) { n.results.push({ label: "Jobs (screening)", value: kilo(jb.jobYears) + " construction job-years gross, " + kilo(jb.jobYearsNet) + " net; ongoing " + kilo(jb.permDirect) + " direct, " + kilo(jb.permGross) + " gross supported, " + kilo(jb.permNet) + " net", note: "lesson A13's coefficients" });
           n.assumptions.push(jb.assumeLine); }

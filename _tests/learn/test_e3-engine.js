@@ -165,6 +165,11 @@ const near = (a, b, t) => Math.abs(a - b) <= (t == null ? 1e-6 : t);
       let val = 0; base.raw.days.forEach(d => d.d[i].lim.forEach(v => { val += v; }));
       const su = (base.r.objective - zu) / 0.1, sd = (zd - base.r.objective) / 0.1;
       ok(near(su, val, Math.max(5, 1e-3 * val)) && near(sd, val, Math.max(5, 1e-3 * val)), "flex " + P.D[i].key + ": the summed substation value ($" + Math.round(val) + " per MW a year) is the cost slope both ways ($" + Math.round(su) + ", $" + Math.round(sd) + ")");
+      // the reported cost leaves the tie costs out: where the limit binds without an upgrade it saves about $9 per MW a
+      // year more than the dual (the pages say so); with an upgrade the two are the upgrade's yearly cost
+      const rep = lims => { const m = E3.build(P, S, { limits: lims }), r = solveSync(m); return E3.account(P, S, E3.read(P, S, m, r)).total; };
+      const A0 = E3.account(P, S, base.raw).total, ru = (A0 - rep(up)) / 0.1, rd = (rep(dn) - A0) / 0.1, gap = ru - val;
+      ok(base.raw.upg[i] > 0.05 ? near(ru, val, 1) && near(rd, val, 1) : gap > 5 && gap < 12 && near(ru, rd, 1), "flex " + P.D[i].key + ": the reported cost's slope, $" + ru.toFixed(2) + " per MW a year against the dual's $" + val.toFixed(2) + (base.raw.upg[i] > 0.05 ? " (an upgrade: the same)" : " (about $9 more: the tie costs' share)"));
     }
   }
 

@@ -278,7 +278,7 @@
       tot += buildable[n];
     }
     if (!frac) { frac = new Float64Array(N); frac.fill(1); }
-    return { reason: reason, frac: frac, buildable: buildable, areaKm2: tot, share: tot / (N * R.area) };
+    return { reason: reason, frac: frac, buildable: buildable, areaKm2: tot, share: tot / (N * R.area), setback: !!E.setback, setbackM: c.setbackM };
   }
   function needMW(D, type, c) { return c && c.anySub ? 0 : D.types[type].mw; }
   function criteria(R, D, type, c) {
@@ -562,6 +562,19 @@
     var ew = dx === 0 ? "" : Math.abs(dx) + " km " + (dx < 0 ? "W" : "E"), ns = dy === 0 ? "" : Math.abs(dy) + " km " + (dy < 0 ? "N" : "S");
     return (ew && ns ? ew + ", " + ns : ew || ns || "at the centre");
   }
+  // the homes in a cell (the newer ones apart) and the distance from its centre to the nearest home or built-up land:
+  // the homes layer's text version, cell by cell (a home's dot is drawn on the map only)
+  function homesIn(R, n) {
+    var k = R.cellKm, i = n % R.W, j = (n - i) / R.W, all = 0, nw = 0;
+    (R.homes || []).forEach(function (h) { if (Math.floor(h.x / k) === i && Math.floor(h.y / k) === j) { all++; if (h.newer) nw++; } });
+    return { all: all, newer: nw };
+  }
+  function homeWords(R, n) {
+    var c = homesIn(R, n), d = R.dHome[n], out = [];
+    out.push(c.all === 0 ? "no homes" : c.all + (c.all === 1 ? " home" : " homes") + (c.newer ? " (" + c.newer + " built since " + R.D.homes.vintage + ")" : ""));
+    if (!R.built[n] && !R.water[n]) out.push("nearest home or built-up land " + (d >= 3 ? "3 km or more" : d < 1 ? Math.round(d * 100) * 10 + " m" : d.toFixed(1) + " km") + " from its centre");
+    return out;
+  }
   function cellText(R, n) {
     var i = n % R.W, j = (n - i) / R.W, bits = [];
     var kind = R.water[n] ? "river" : R.built[n] ? "built-up" : R.ind[n] ? "industrial park" : R.prot[n] ? R.D.protected[R.prot[n] - 1].name : R.flood[n] ? "flood zone" : "farmland";
@@ -570,11 +583,11 @@
     bits.push("wind " + R.wind[n].toFixed(1) + " m/s");
     bits.push("sun " + R.sun[n].toFixed(2) + " kWh/m² a day");
     bits.push("land $" + Math.round(R.land[n] / 100) * 100 + " an acre");
-    return "Cell " + place(R, i, j, 1) + " of the centre: " + bits.concat(gridWords(R, n)).join(", ") + ".";
+    return "Cell " + place(R, i, j, 1) + " of the centre: " + bits.concat(homeWords(R, n), gridWords(R, n)).join(", ") + ".";
   }
 
   var A19 = { build: build, coarsen: coarsen, cfg: cfg, exclude: exclude, criteria: criteria, suitability: suitability, need: need, blocks: blocks,
-    blockScore: blockScore, sites: sites, surface: surface, paths: paths, route: route, cost: cost, shares: shares, place: place, cellText: cellText,
+    blockScore: blockScore, sites: sites, surface: surface, paths: paths, route: route, cost: cost, shares: shares, place: place, cellText: cellText, homesIn: homesIn, homeWords: homeWords,
     gridAt: gridAt, gridRows: gridRows, gridWords: gridWords,
     REASONS: REASONS, riverY: riverY, floodHalf: floodHalf, ridgeX: ridgeX, roadDist: roadDist, subDist: subDist, noise: noise, fbm: fbm, lattice: lattice,
     ACRES_PER_KM2: ACRES_PER_KM2, KM_PER_MILE: KM_PER_MILE, overlap: overlap, connCell: connCell, needMW: needMW, usd: usd, withCity: withCity };
@@ -676,7 +689,7 @@
       base: { kind: "cat", items: [["a19-c-built", "Built-up land"], ["a19-c-ind", "Industrial park"], ["a19-c-water", "River"], ["a19-c-farm", "Farmland"]] },
       protected: { kind: "cat", items: [["a19-c-prot", "Protected land"], ["a19-c-farm", "Other land"]] },
       flood: { kind: "cat", items: [["a19-c-flood", "Flood zone"], ["a19-c-water", "River"]] },
-      homes: { kind: "cat", items: [["a19-c-home", "Home (dot)"], ["a19-c-built", "Built-up land"]] },
+      homes: { kind: "cat", items: [["a19-c-built", "Built-up land"]] },
       grid: { kind: "cat", items: [["a19-c-sub", "Substation"], ["a19-c-line", "Power line"]] },
       roads: { kind: "cat", items: [["a19-c-road", "Paved road"]] },
       slope: { kind: "ramp", cls: "a19-r-slope", lo: "0%", hi: "15% or more", what: "Slope" },
@@ -709,6 +722,12 @@
         });
         var cutAny = false; for (n = 0; n < st.X.frac.length; n++) if (!st.X.reason[n] && st.X.frac[n] < 1) { cutAny = true; break; }
         if (cutAny) { var sc = H("span", { class: "a19-key" }, legend); H("i", { class: "a19-sw a19-c-cutk", "aria-hidden": "true" }, sc); H("span", { text: "Part lost to setbacks" }, sc); }
+      }
+      // the homes layer in words: how many dots the map draws (the newer ones apart)
+      if (layer === "homes" || layer === "base" || st.homes) {
+        var hs = Rx.homes || R0.homes, nn = hs.filter(function (h) { return h.newer; }).length, hk = H("span", { class: "a19-key" }, legend);
+        H("i", { class: "a19-sw a19-c-home", "aria-hidden": "true" }, hk);
+        H("span", { text: "Homes (dots): " + (hs.length - nn).toLocaleString("en-US") + " in the " + D.homes.vintage + " layer" + (nn ? ", " + nn + " built since (larger dots)" : "") }, hk);
       }
       if (st.sites && st.sites.length) { var sk = H("span", { class: "a19-key" }, legend); H("i", { class: "a19-sw a19-c-site", "aria-hidden": "true" }, sk); H("span", { text: st.sitesKey || "Top sites, A best" }, sk); }
       if (st.ghost) { var gk = H("span", { class: "a19-key" }, legend); H("i", { class: "a19-sw a19-c-ghost", "aria-hidden": "true" }, gk); H("span", { text: st.ghost.key }, gk); }
@@ -794,14 +813,15 @@
       var v = R.cellKm * VB, i = n % R.W, j = (n - i) / R.W;
       cur.setAttribute("x", i * v); cur.setAttribute("y", j * v); cur.setAttribute("width", v); cur.setAttribute("height", v); cur.setAttribute("visibility", "visible");
       var extra = "";
-      if (st.X) { var rs = st.X.reason[n]; extra = rs ? " Excluded: " + A19.REASONS[rs] + "." : st.X.frac[n] < 1 ? " " + Math.round(100 * (1 - st.X.frac[n])) + "% of it inside home setbacks." : " Open for this site."; }
+      // the share inside setbacks is estimated from sample points 250 m apart: a narrow setback can fall between them
+      if (st.X) { var rs = st.X.reason[n]; extra = rs ? " Excluded: " + A19.REASONS[rs] + "." : st.X.frac[n] < 1 ? " About " + Math.round(100 * (1 - st.X.frac[n])) + "% of it inside home setbacks (estimated from points 250 m apart)." : st.X.setback && homesIn(R, n).all ? " Open for this site: none of its sample points (250 m apart) is within " + st.X.setbackM + " m of a home, though a setback can lie between them." : " Open for this site."; }
       if (st.suit && !isNaN(st.suit[n]) && !(st.X && st.X.reason[n])) extra += " Suitability " + Math.round(100 * st.suit[n]) + ".";
       live.textContent = (R.fine ? cellTextCoarse(R, n) : cellText(R, n)) + extra;
       if (o.onCell) o.onCell(n);
     }
     function cellTextCoarse(Rc, n) {
       var i = n % Rc.W, j = (n - i) / Rc.W;
-      return "Cell (2 km) " + place(Rc, i, j, 1) + " of the centre: " + ["slope " + Rc.slope[n].toFixed(1) + "% on average", "sun " + Rc.sun[n].toFixed(2) + " kWh/m² a day", "land $" + Math.round(Rc.land[n] / 100) * 100 + " an acre"].concat(A19.gridWords(Rc, n)).join(", ") + ".";
+      return "Cell (2 km) " + place(Rc, i, j, 1) + " of the centre: " + ["slope " + Rc.slope[n].toFixed(1) + "% on average", "sun " + Rc.sun[n].toFixed(2) + " kWh/m² a day", "land $" + Math.round(Rc.land[n] / 100) * 100 + " an acre"].concat(A19.homeWords(Rc, n), A19.gridWords(Rc, n)).join(", ") + ".";
     }
     fig.addEventListener("keydown", function (e) {
       var d = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[e.key];

@@ -230,13 +230,13 @@
   // the top-sites table: the map's text version (cf-two: labelled lines on phones); a row's button highlights its site
   function SitesTable(host, onSel) {
     var box = H("div", { class: "a19-sites-box" }, host), cap = H("p", { class: "a19-tcap" }, box);
-    var tbl = H("table", { class: "a19-tbl" }, H("div", { class: "lx-scroll-x" }, box)), note = H("p", { class: "a19-tnote" }, box), sel = null;
+    var tbl = H("table", { class: "a19-tbl" }, H("div", { class: "lx-scroll-x" }, box)), note = H("p", { class: "a19-tnote" }, box), sel = null, btns = {};
     function set(rows, opts) {
       opts = opts || {};
       cap.textContent = opts.caption || "The five best sites, the map's text version (km from the city centre)";
       note.textContent = opts.note || "Up front: the site's own costs in 2025 dollars (the new line, an access road" + (opts.lastKey === "water" ? ", land and a water main); the campus itself" : " and land); the plant itself") + " costs the same anywhere and is left out.";
       var head = ["Site", "Where", "Score", "Up front", "Grid", opts.last || "Energy a year"];
-      tbl.innerHTML = "";
+      tbl.innerHTML = ""; btns = {};
       var th = H("thead", null, tbl), tr = H("tr", null, th);
       head.forEach(function (h) { H("th", { scope: "col", text: h }, tr); });
       var tb = H("tbody", null, tbl);
@@ -244,7 +244,8 @@
       rows.forEach(function (r) {
         var row = H("tr", { class: r.id === sel ? "on" : "" }, tb), h = H("th", { scope: "row" }, row);
         var b = H("button", { type: "button", class: "a19-pick", "aria-pressed": r.id === sel ? "true" : "false", "aria-label": "Show site " + r.id + " on the map", text: r.id }, h);
-        b.addEventListener("click", function () { sel = sel === r.id ? null : r.id; onSel(sel); set(rows, opts); var nb = tbl.querySelector('button[aria-label="Show site ' + r.id + ' on the map"]'); if (nb) nb.focus(); });
+        btns[r.id] = b;
+        b.addEventListener("click", function () { sel = sel === r.id ? null : r.id; onSel(sel); set(rows, opts); if (btns[r.id]) btns[r.id].focus(); });
         [r.where, r.score, r.upfront, r.subId + (r.upgrade ? ", needs an upgrade" : ""), opts.lastKey ? r[opts.lastKey] : r.energy].forEach(function (c, i) { H("td", { class: i === 1 || i === 2 ? "n" : null, text: c == null ? "–" : c }, row); });
       });
     }
@@ -286,7 +287,7 @@
           act.lxSet = function (k) { show(k); };
         } },
       // 2 exclusions
-      { text: "A solar farm cannot go everywhere. [[exclusion-layer|Exclusion layers]] remove land outright: protected land, [[flood-zone|flood zones]], steep slopes and a setback from homes. Switch them and watch the land left.",
+      { text: "A solar farm cannot go everywhere. [[exclusion-layer|Exclusion layers]] remove land outright: protected land, [[flood-zone|flood zones]], steep slopes and a [[setback|setback]] from homes. Switch them and watch the land left.",
         build: function (act, api) {
           var map = mapIn(act, "Map of the solar farm's exclusions: hatched cells are excluded, shaded ones lose land to setbacks"), s = st(), moved = !!log.exMoved;
           var tg = H("div", { class: "lx-toggles a19-ctl", role: "group", "aria-label": "Exclusions for the solar farm" }, act), ts = {};
@@ -442,12 +443,14 @@
           }
           var ro = H("div", { class: "lx-readouts", "aria-live": "polite" }, act);
           H("p", { class: "lx-hint", text: TX.limits }, act);
-          var tbl = SitesTable(act, function () {});
+          // a row's button highlights its site on the current map (the cells and homes layer in force); a switch clears it
+          var shown = null, tbl = SitesTable(act, function (id) { if (shown) drawRun(map, shown.r, { homes: newer, ghost: shown.ghost, sel: id }); });
           function paint() {
             keep("lim", seen);
             var over = Object.assign({ exclusions: s.ex }, strictOver(D, "solar", s.strict));
             var r = M.run("solar", over, coarse ? { coarse: true } : newer ? { newer: true } : {}), A0 = M.run("solar", over).top[0], f = coarse ? 2 : 1;
             var ghost = (coarse || newer) && A0 ? { i: A0.i / f, j: A0.j / f, k: A0.k / f, label: "was A", key: "Site A before the change (dashed)" } : null;
+            shown = { r: r, ghost: ghost }; tbl.sel(null);
             drawRun(map, r, { homes: newer, ghost: ghost });
             tbl.set(tableRows(r), { caption: coarse ? "The five best sites on 2 km cells (km from the city centre)" : "The five best sites (km from the city centre)", note: coarse ? "Costs need the 1 km cost surface, so this table leaves them out." : null });
             readouts(ro, [["Cells", coarse ? "2 km" : "1 km"], ["Homes layer", newer ? M.D.homes.newer.year : String(D.homes.vintage)], ["Land left", km2(r.X.areaKm2)]]);
