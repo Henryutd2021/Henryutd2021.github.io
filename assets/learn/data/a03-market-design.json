@@ -57,7 +57,7 @@
       "label": "Energy-only with scarcity pricing",
       "short": "Energy-only",
       "cap": 5000,
-      "capNote": "a teaching assumption that caps the clearing price: $5,000/MWh is ERCOT's day-ahead offer cap and value of lost load; its real-time offer cap is $2,000/MWh (January 2026)"
+      "capNote": "a teaching assumption that caps the clearing price: $5,000/MWh is ERCOT's high day-ahead offer cap and value of lost load; its real-time offer cap is $2,000/MWh (January 2026)"
     },
     "cm": {
       "label": "Capacity market (simplified)",
@@ -139,7 +139,7 @@
       "label": "Texas (ERCOT)",
       "who": "ERCOT, the one RTO that FERC does not regulate",
       "how": "An energy market with no capacity market. A reserve demand curve added a scarcity adder from 2014; since 5 December 2025, energy and reserves are priced together.",
-      "facts": "Offers are capped at $5,000/MWh day-ahead and $2,000/MWh in real time (January 2026); the cap was $9,000 until 1 January 2022.",
+      "facts": "Offer caps (January 2026): $5,000/MWh day-ahead, $2,000 in real time; once peakers' yearly net margin passes a threshold, the day-ahead cap also drops to $2,000. The cap was $9,000 until 2022.",
       "sources": [
         {
           "label": "ERCOT, 2024 Biennial Report on the ORDC (1 November 2024), pp. 1 and 7–10",
@@ -206,7 +206,7 @@
       "label": "China",
       "who": "The NDRC, China's national planning and price regulator, and the provinces",
       "how": "Capacity payments set nationally, technology by technology, coal's since 2024; a January 2026 notice revised them and set a national framework for grid-side storage.",
-      "facts": "Coal's payment covered 30% of a set fixed cost in most provinces in 2024–25; from 2026, at least 50%. With a continuous spot market, a province is to pay one price for all reliable capacity instead.",
+      "facts": "Coal was paid 30% of a set fixed cost in most provinces in 2024–25, at least 50% from 2026. Where a spot market runs continuously, qualifying reliable capacity is gradually to be paid under one rule.",
       "sources": [
         {
           "label": "NDRC, questions and answers with NDRC and National Energy Administration officials on the notice improving the generation-side capacity price mechanism (30 January 2026)",

@@ -168,7 +168,7 @@ const S = sm.solar;
   // utility-scale (EIA Table 4.08.B covers utility-scale generators)
   ok(/U\.S\. utility-scale solar photovoltaic generators in 2025/.test(QMD) && /U\.S\. utility-scale solar PV generators, 2025; October 2026/.test(QMD) && !/U\.S\. solar photovoltaic plants/.test(QMD) && /U\.S\. utility-scale solar PV, 2025/.test(JS), "source: 24.0% is U.S. utility-scale solar PV");
   // capture ratio and basis are output-weighted
-  ok(/hours with more output count more/.test(SIDE) && /each hour weighted by its output/.test(DA.sim.capture.note) && /weighted by the solar farm's output/.test(DA.sim.basis.note), "capture ratio and basis: weighted by output (glossary, data)");
+  ok(/weighted by its output/.test(SIDE) && /each hour weighted by its output/.test(DA.sim.capture.note) && /weighted by the solar farm's output/.test(DA.sim.basis.note), "capture ratio and basis: weighted by output (glossary, data)");
   // every element of the no-JS fallback, the data note and Go deeper holds one idea within the budget (about 35 words)
   const elems = [].concat((QMD.match(/<li>[\s\S]*?<\/li>/g) || []).filter(t => !/data-value=/.test(t) && !/<li>(Schwabe|EPA|FERC|Kahrl|Millstein|Where this goes)/.test(t)), QMD.match(/^- \*\*[\s\S]*?$/gm) || []);
   const words = t => t.replace(/<[^>]+>/g, " ").replace(/\*\*/g, "").split(/\s+/).filter(Boolean).length;
@@ -215,7 +215,10 @@ function evalSide(side) { const e = side.replace(/×/g, "*").replace(/÷/g, "/")
   {
     const y = sm.years[0], o = M.year(P0, y, "merchant", "none");
     ok(near(o.solar, o.E * (y.c * y.P + y.b), 1e-6) && T.year(y, 1) === "Price year 1: the hub averaged $68.14/MWh and output was " + M.pct(y.v) + " of typical. With no contract the solar farm sold " + musd(o.solar) + ", earning the hub's solar-hours price plus the basis." && !/fetched/.test(JS), "messages: price year 1 says the plant earns the hub's solar-hours price plus the basis");
-    ok(/divided by the same price's all-hours average/.test(SIDE) && /the plant's own price also differs by the basis/.test(SIDE) && /the plant sells at the hub's solar-hours price plus the basis/.test(QMD), "glossary and drivers table: capture ratio is a hub-price ratio; the plant's price adds the basis");
+    ok(/def: "A market price averaged over the hours a plant produces, weighted by its output, divided by that price's average over all hours\."/.test(SIDE) && /the plant sells at the hub's solar-hours price plus the basis/.test(QMD), "glossary and drivers table: capture ratio is a price ratio; the drivers table says the plant's price adds the basis");
+    // every definition in the sidecar is one short idea
+    const defs = [...SIDE.matchAll(/def: "([^"]+)"/g)].map(m => m[1]);
+    ok(defs.length >= 7 && defs.every(d => d.split(/\s+/).length <= 36), "glossary: every definition in the sidecar is 36 words or fewer");
     ok(T.own === "Run by its owner again, the battery's margin, " + M.mrange(sm.batM) + " over these years, swings the seller's result; the buyer's bill carries only the solar contract.", "messages: the battery switched back to its owner says so");
   }
   Object.keys(msgs).forEach(k => { const w = msgs[k].replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1").split(/\s+/).filter(Boolean).length; ok(w <= 36, `budget: message ${k} is ${w} words (≤ 36)`); });

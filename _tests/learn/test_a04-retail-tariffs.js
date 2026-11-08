@@ -233,6 +233,7 @@ D.facts.forEach(fc => {
 ok(/in December 2023 \(128\.4 of 167\.2 million\)/.test(D.facts[1].what) && D.facts[1].asof === "December 2025; data for December 2023" && !/2024/.test(D.facts[1].what + D.facts[1].asof),
   "the meter statistic is dated December 2023 (FERC 2025 Assessment, Table 2-1), not 2024");
 ok(/Time-of-use needs use split by price period; real-time pricing needs hourly readings\./.test(D.facts[1].what), "time-of-use needs use by price period, not hourly records");
+ok(!/_tests|test_a04/.test(D.about), "data: the public metadata names no test file");
 
 // ---------------- wording: costs of service, recovery, the real-time adder, the large load
 const ALLTXT = T_PAGE + " " + RAW + " " + JS.replace(/\/\/[^\n]*/g, "");

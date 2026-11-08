@@ -410,7 +410,7 @@
         status.textContent = bare(shiftLine(W, D, S));
       } else if (part === "vpp" || part === "earn") {
         // step 6 ("earn") prices all four kinds together, so its chart shows the same pool as its ledger
-        var v = vpp(W, D, part === "earn" ? allKinds(D) : S.kinds, S.stagger);
+        var pool = part === "earn" ? allKinds(D) : S.kinds, v = vpp(W, D, pool, S.stagger);
         title.textContent = "Prairie Town's gas plants, " + W.dateLabel + " · a pool of " + mw(v.mw);
         chip("Pool", mw(v.mw)); chip("Peaker", dmwh(v.peakerMWh)); chip("Use that comes back", mwh(v.backMWh)); chip("Running cost that day", dusd(v.cost)); chip("Plants' CO₂", dt(v.co2));
         var g0 = W.h.map(function (x) { return x.cc + x.pk; }), g1 = v.h.map(function (x) { return x.cc + x.pk; });
@@ -420,7 +420,7 @@
           legend: [{ label: "Gas output without the pool", color: "var(--lx-ink-3)", dash: "5 4" }, { label: "With the pool", color: "var(--lx-pk)" }],
           aria: "Gas output on " + W.dateLabel + " with and without the pool; above 150 MW the peaker runs.",
           text: { head: ["Hour", "Gas without, MW", "Gas with, MW", "Pool cut, MW", "Use coming back, MW"], rows: g0.map(function (x, t) { return [span(t), String(x), (Math.round(g1[t] * 10) / 10).toFixed(1), v.cut[t].toFixed(2), v.back[t].toFixed(2)]; }) } });
-        status.textContent = vppLine(W, D, S.kinds, S.stagger);
+        status.textContent = vppLine(W, D, pool, S.stagger);
       } else if (part === "feeder") {
         var f = feeder(W, D, S.stagger), F = D.feeder;
         title.textContent = F.name + " · " + F.homes.toLocaleString("en-US") + " homes · " + (S.stagger ? "staggered restart" : "everyone back at once");

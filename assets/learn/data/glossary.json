@@ -361,7 +361,7 @@
  },
  "capture-ratio": {
   "term": "Capture ratio",
-  "short": "A market price averaged over the hours a plant produces, weighted by its output, divided by the same price's all-hours average, so hours with more output count more; measured at a hub, the plant's own price also differs by the basis.",
+  "short": "A market price averaged over the hours a plant produces, weighted by its output, divided by that price's average over all hours.",
   "lesson": "A2",
   "href": "a02-contracts-risk.html"
  },

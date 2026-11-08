@@ -225,7 +225,16 @@ ok(/caption: moneyCaption\(I7, L, S\.tau, st\)/.test(JS), "the step's caption co
 ok(/I7\.assumptions\.map/.test(JS) && I7.assumptions.length === 9 && I7.assumptions.every(a => a.length === 2), "the toy's inputs: CF7's own assumptions table, shown beside the ledger");
 ok(/LEDGER_WORDS\.forEach/.test(JS) && ["present-value", "margin", "carrying-cost", "stranded-cost", "bridge-power"].every(t => new RegExp("\\[\\[" + t + "\\|").test(JS)) && /\[\[bridge-power\|bridge power\]\]/.test(LIT), "step 9 defines present value, margin, carrying cost, stranded upgrades and bridge power (temporary on-site generation)");
 { const GL = JSON.parse(fs.readFileSync(L("data/glossary.json"), "utf8")); const used = [...JS.matchAll(/\[\[([a-z0-9-]+)\|/g)].map(m => m[1]); ok(used.every(t => GL[t]), "every glossary mark in the script is defined: " + used.filter(t => !GL[t]).join(", ")); }
-ok(/\["wd", "rest"\], \["rest", "study", "back to study"/.test(JS) && /wd: \{ t: "Those projects leave"[^}]*s: "the too-dear ones exit"/.test(JS) && /rest: \{ t: "The rest: restudy"/.test(JS), "the explain flowchart: leaving the queue is apart from the rest's return to study, with the return arrow drawn");
+ok(/\["dear", "rest", "the rest"/.test(JS) && /\["rest", "study", "back to study"/.test(JS) && !/\["wd", "rest"\]/.test(JS) && /wd: \{ t: "Those projects leave"[^}]*s: "the too-dear ones exit"[^}]*k: "end" \}/.test(JS) && /rest: \{ t: "The rest: restudy"/.test(JS), "the explain flowchart: the leavers' path ends; the others' branch goes to the restudy, with the return arrow drawn");
+// every step of every trace follows an edge the flowchart draws
+{ const charts = JS.split("LX.Flowchart(").slice(1).map(c => c.slice(0, c.indexOf("sel: 0 });")));
+  let missing = [];
+  charts.forEach((c, i) => {
+    const eb = c.slice(c.indexOf("edges: ["), c.indexOf("traces: ["));
+    const E = new Set([...eb.matchAll(/\["([a-z]+)", "([a-z]+)"/g)].map(m => m[1] + ">" + m[2]));
+    [...c.matchAll(/path: \[([^\]]+)\]/g)].forEach(m => { const p = m[1].split(",").map(x => x.trim().replace(/"/g, "")); for (let k = 1; k < p.length; k++) if (!E.has(p[k - 1] + ">" + p[k])) missing.push("chart " + (i + 1) + ": " + p[k - 1] + " → " + p[k]); });
+  });
+  ok(charts.length === 2 && missing.length === 0, "explain flowcharts: every step of every trace is a drawn edge: " + missing.join(", ")); }
 ok(/label: "Wind farm", path: \["req", "study", "up", "dear", "rest", "study", "up", "dear", "agr", "on"\]/.test(JS) && /label: "Placeholder", path: \["req", "study", "up", "dear", "wd"\]/.test(JS) && /the wind farm stayed and was restudied/.test(JS), "the explain flowchart: the wind farm's trace never passes through 'leave'; the placeholder's ends there");
 ok(/lede: "The page's original cluster, whatever you chose above: no withdrawal of yours, no readiness rule\./.test(JS) && /lede: "The page's original " \+ N\.campusMW \+ " MW campus, whatever the slider shows\./.test(JS), "explain: the flowcharts say they show the original example, not the reader's settings");
 ok(/title: "A large load: its utility's process"/.test(JS) && /path: \["lreq", "lfit", "lup", "lstage", "lon"\]/.test(JS) && !/label: "Data center", path: \["req"/.test(JS), "the large load has its own trace (utility study, upgrades and contract, staged energization), not the generator's nodes");
