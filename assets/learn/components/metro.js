@@ -504,7 +504,7 @@
       H("button", { class: "x", type: "button", "aria-label": "Close", text: "×", onclick: function () { close(true); } }, card);
       var ph = H("div", { class: "ph" }, card);
       H("div", { class: "ic", html: LX.icon(icon) }, ph);
-      var tt = H("div", null, ph); H("div", { class: "k", text: kicker }, tt); H("h3", { id: hid, text: title }, tt);
+      var tt = H("div", null, ph); H("div", { class: "k", text: kicker }, tt); H("h2", { id: hid, text: title }, tt);
       var bd = H("div", { class: "bd" }, card);
       H("div", { class: "cue", "aria-hidden": "true", html: "<span>More below" + LX.icon("arrow") + "</span>" }, card);
       bd.addEventListener("scroll", cue, { passive: true });

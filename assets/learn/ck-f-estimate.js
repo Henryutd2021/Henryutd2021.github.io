@@ -12,7 +12,7 @@
 // Measured in this browser only (LX.store, key "ckf-v1", unchanged since the
 // first testers): active time per task (the clock runs only while the task is on screen and the tab is visible), time to
 // the first answer, whether the first answer was right, the number of tries, and whether the solution was opened before
-// answering. "Copy my results" puts a plain-text summary on the clipboard for the tester to paste into a form; nothing is
+// answering. "Copy my results" puts a plain-text summary on the clipboard for the reader to keep or share; nothing is
 // sent anywhere. The summary format is the component's, with the code "CK-F".
 //
 // Pure part (exported for _tests/learn/test_ck-f-estimate.js): worked() and staticTasks() here; task, the checks, the
