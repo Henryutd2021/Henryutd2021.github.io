@@ -736,10 +736,11 @@
   function GitStage(host, o) {
     var box = H("div", { class: "k8-git" }, host);
     var only = o.only || ["w", "s", "h"], zones = H("div", { class: "k8-zones", style: "--k8-cols:" + only.length }, box);
+    var zt = LX.hTag(4, zones);   // the three zones' headings share a level: h4, or higher when the stage sits right under the page title
     var zW = zone("w", "Working folder", "your files as you edit them"), zS = zone("s", "Staging area", "picked for the next commit"),
         zH = zone("h", "History", "commits, newest first; [[git-head|HEAD]] marks the one you are on");
     function zone(k, t, s) {
-      var z = H("section", { class: "k8-zone" }, only.indexOf(k) >= 0 ? zones : null); H("h4", { text: t }, z); H("p", { class: "k8-zsub", html: LX.rich(s) }, z);
+      var z = H("section", { class: "k8-zone" }, only.indexOf(k) >= 0 ? zones : null); H(zt, { text: t }, z); H("p", { class: "k8-zsub", html: LX.rich(s) }, z);
       return H("ul", { class: "k8-list" }, z);
     }
     var res = H("p", { class: "k8-result", "aria-live": "polite" }, box);

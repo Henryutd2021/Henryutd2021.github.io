@@ -8,7 +8,7 @@
   var LX = window.LX, H = LX.H;
   LX.EnergyChain = function (host, o) {
     var hd = H("header", { class: "lx-x-head" }, host);
-    H("h3", { text: o.title }, hd);
+    H(LX.hTag(3, hd), { text: o.title }, hd);   // an h2 right under the page title
     if (o.aside) H("span", { class: "lx-hint", text: o.aside }, hd);
     if (o.lede) H("p", { class: "lx-lede", html: LX.rich(o.lede) }, host);
     var ch = H("ol", { class: "lx-echain", style: "--n:" + o.stops.length }, host);

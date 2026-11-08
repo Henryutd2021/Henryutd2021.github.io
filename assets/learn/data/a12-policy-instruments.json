@@ -1,5 +1,5 @@
 {
- "about": "Learn A12, How do governments steer energy? The four instruments with their slider ranges and defaults, a real rule of each kind with its jurisdiction and date, and a reference block written by the test (node _tests/learn/test_a12-policy-instruments.js --write). The model is the Plains Grid's planning LP in assets/learn/components/plainsplan.js, with the fleet in a10-emissions-questions.json and the costs in m06-carbon-in-models.json. Money in 2025 dollars a year.",
+ "about": "Learn A12, How do governments steer energy? The four instruments with their slider ranges and defaults, a real rule of each kind with its jurisdiction and date, and a reference block with the model's results. The model is the Plains Grid's planning LP (assets/learn/components/plainsplan.js), with the fleet in a10-emissions-questions.json and the costs in m06-carbon-in-models.json. Money in 2025 dollars a year.",
  "accessed": "2026-11-05",
  "instruments": [
   {
@@ -115,7 +115,7 @@
   }
  ],
  "reference": {
-  "about": "Written by node _tests/learn/test_a12-policy-instruments.js --write; re-solved on every run.",
+  "about": "Results of the Plains Grid's planning LP, solved with HiGHS 1.15.1: CO2 and resource cost with no policy, and each instrument at its default setting.",
   "base": {
    "co2": 4777392.205142699,
    "resource": 388910266.25449985

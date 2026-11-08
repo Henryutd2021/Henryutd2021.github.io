@@ -338,7 +338,7 @@
     function refText(code) { var r = LX.lessonRef(PATH, code); return r.ready ? r.label : r.label + " (upcoming)"; }
 
     // ---------- the stage: title, readouts, the chart, the measures
-    var stage = H("div", { class: "lx-stage a18-stage" }, live), head = H("div", { class: "lx-stage-head" }, stage), title = H("h3", null, head);
+    var stage = H("div", { class: "lx-stage a18-stage" }, live), head = H("div", { class: "lx-stage-head" }, stage), title = H(LX.hTag(3, head), null, head);   // an h2 when the stage sits right under the page title
     H("p", { class: "lx-hint a18-fict", text: PC.about.line }, stage);
     var chips = H("div", { class: "lx-readouts", "aria-live": "polite" }, stage);
     var invHost = H("div", { class: "a18-inv" }, stage), maccHost = H("div", { class: "a18-macc" }, stage);

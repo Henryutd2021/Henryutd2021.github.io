@@ -1,5 +1,5 @@
 {
-  "about": "Data of Learn lesson A9, How do heat waves, droughts, wildfires and cold snaps break energy systems? The hazards are stress tests on lesson A5's Plains Grid (a05-adequacy.json: the same illustrative fleet, the same 500 resampled weather years, seed 2025): each hazard's dates, sizes and the defences' effects and yearly costs are illustrative, chosen to show the mechanisms the real events below record. A hazard is applied in every simulated year, so a result reads 'in a year when it strikes', not a forecast of how often it strikes. The events are real, each from a primary report, with dates. The reference block is written by node _tests/learn/test_a09-hazards.js --write and recomputed by the same test on every run.",
+  "about": "Data of Learn lesson A9, How do heat waves, droughts, wildfires and cold snaps break energy systems? The hazards are stress tests on lesson A5's Plains Grid (a05-adequacy.json: the same illustrative fleet, the same 500 resampled weather years, seed 2025): each hazard's dates, sizes and the defences' effects and yearly costs are illustrative, chosen to show the mechanisms the real events below record. A hazard is applied in every simulated year, so a result reads 'in a year when it strikes', not a forecast of how often it strikes. The events are real, each from a primary report, with dates. The reference block holds the stress tests' results at seed 2025.",
   "seed": 2025,
   "hazards": [
     {
@@ -315,7 +315,7 @@
     }
   ],
   "reference": {
-    "about": "Written by node _tests/learn/test_a09-hazards.js --write at seed 2025 and checked on every run.",
+    "about": "Results of the stress tests at seed 2025: the year with each hazard, the pairs of hazards together, and the best set of defences within the budget.",
     "years": {
       "none": {
         "lole": 0.228,

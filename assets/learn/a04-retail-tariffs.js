@@ -371,7 +371,7 @@
 
     // ---------- the stage: one customer's day, its cost and its bill
     var stage = H("div", { class: "lx-stage" }, live);
-    var title = H("h3", null, H("div", { class: "lx-stage-head" }, stage));
+    var sh = H("div", { class: "lx-stage-head" }, stage), title = H(LX.hTag(3, sh), null, sh);   // an h2 when the stage sits right under the page title
     var ctl = H("div", { class: "a4-ctlrow" }, stage);
     var cc = H("div", { class: "cf-ctl" }, ctl);
     H("p", { class: "cf-ctl-l", id: "a4-cust-l", text: "Customer" }, cc);

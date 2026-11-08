@@ -19,7 +19,7 @@
   var LX = window.LX, H = LX.H, S = LX.S;
   LX.Flowchart = function (host, o) {
     var hd = H("header", { class: "lx-x-head" }, host);
-    H("h3", { text: o.title }, hd);
+    H(LX.hTag(3, hd), { text: o.title }, hd);   // an h2 right under the page title
     if (o.lede) H("p", { class: "lx-lede", html: LX.rich(o.lede) }, host);
     var trace = H("div", { class: "lx-ftrace", role: "group", "aria-label": "Trace a case" }, host);
     var box = H("div", { class: "lx-flow" }, host);
