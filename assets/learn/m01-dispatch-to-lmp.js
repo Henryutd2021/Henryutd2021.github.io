@@ -291,7 +291,7 @@
       sym: "<i>p</i>" + SUB("nuc,<i>t</i>") + "&nbsp;=&nbsp;100", rows: function (net, n) { return "bounds, " + n; }, dual: "–" },
     { id: "ramp", name: "Ramp", words: "The gas combined-cycle plant changes its output by at most 40 MW from one hour to the next; it starts the day from 115 MW.",
       sym: "&minus;40&nbsp;&le;&nbsp;<i>p</i>" + SUB("cc,<i>t</i>") + "&nbsp;&minus;&nbsp;<i>p</i>" + SUB("cc,<i>t</i>&minus;1") + "&nbsp;&le;&nbsp;40,&nbsp;&nbsp;<i>p</i>" + SUB("cc,&minus;1") + "&nbsp;=&nbsp;115",
-      rows: function (net, n) { return n + " (one per hour)"; }, dual: "signed, $ per MW: d(cost)/d(limit). At 14:00 it is −$40, so 1 MW more ramp then would save $40" },
+      rows: function (net, n) { return n + " (one per hour)"; }, dual: "signed, $ per MW: d(cost)/d(limit). On the one-bus day it is −$40 at 14:00, so 1 MW more ramp then would save $40" },
     { id: "flow", name: "DC power flow", net: true, words: "Each line's flow is set by the [[voltage-angle|voltage-angle]] difference between its ends. The town's angle is the zero point (the reference bus). Power splits over every path, by the lines' reactance.",
       sym: "<i>f</i>" + SUB("<i>ℓ,t</i>") + "&nbsp;=&nbsp;<i>b</i>" + SUB("<i>ℓ</i>") + "&thinsp;(<i>θ</i>" + SUB("<i>i,t</i>") + "&nbsp;&minus;&nbsp;<i>θ</i>" + SUB("<i>j,t</i>") + "),&nbsp;&nbsp;<i>θ</i>" + SUB("Town,<i>t</i>") + "&nbsp;=&nbsp;0",
       rows: function (net, n) { return net ? "3 lines × " + n + " = " + 3 * n : "added on the map"; }, dual: "–" },
@@ -591,7 +591,7 @@
         build: function (act, api) {
           var sp = E("div", { class: "m1-split" }, act), net = Network(E("div", null, sp), { D: D }), right = E("div", null, sp);
           var hp = HourPicker(right, { start: L.noon, jumps: [[L.t8Hour, "19:00"], [L.noon, "12:00"]], onChange: function (t) { show(t); } });
-          var kp = E("div", { class: "m1-kpis" }, right), rentP = E("p", { class: "m1-note", hidden: true }, right);
+          var kp = E("div", { class: "m1-kpis" }, right), rentP = E("p", { class: "m1-note", "aria-live": "polite", hidden: true }, right);
           function show(t) {
             if (!Bcur) return;
             var h = Bcur.hours[t], lim = limits(D, oB(Bcur.limit));

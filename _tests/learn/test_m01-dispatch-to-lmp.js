@@ -223,7 +223,8 @@ const has = (s, msg) => ok(PAGE.indexOf(s) >= 0, "page states " + JSON.stringify
    ["1,000 MW per radian", D.lines.every(l => l.b === 1000)], ["running cost, $/MWh: 10, 0, 0, 40, 100", ["nuclear", "wind", "solar", "cc", "pk"].map(k => D.fleet[k].cost).join() === "10,0,0,40,100"],
    ["output before the day starts: 115 MW", D.fleet.cc.start === 115], ["SUB(\"cc,&minus;1\") + \"&nbsp;=&nbsp;115\"", D.fleet.cc.start === 115],
    ["a little more demand there (away from a corner)", true], ["in this hour only, would save", near(n12.mu.RT, R.mu)],
-   ["At 14:00 it is −$40, so 1 MW more ramp then would save $40", near(A.day.hours[14].ramp, -40)], ["[[voltage-angle|voltage-angle]]", SIDE.indexOf("id: voltage-angle") >= 0]]
+   ["On the one-bus day it is −$40 at 14:00, so 1 MW more ramp then would save $40", near(A.day.hours[14].ramp, -40)],
+   ["One more MWh at 14:00 costs $40 at 14:00 and $40 at 13:00: $80.", near(rc14.fd, 80) && it({ p: "cc", h: 13 }) && it({ p: "cc", h: 14 }) && D.fleet.cc.cost === 40], ["[[voltage-angle|voltage-angle]]", SIDE.indexOf("id: voltage-angle") >= 0]]
     .forEach(([s, c]) => ok(JS.indexOf(s) >= 0 && c, "step text " + JSON.stringify(s) + " is in the script and true"));
   ok(NB.indexOf("104000") >= 0 && NB.indexOf("133160") >= 0 && NB.indexOf("[0, 40, 80]") >= 0, "notebook asserts the browser's numbers");
   ok(NB.indexOf("p_{\\\\text{cc},-1} = 115") >= 0 && NB.indexOf("not the price gap") >= 0, "notebook: ramp start condition and the rent wording");
