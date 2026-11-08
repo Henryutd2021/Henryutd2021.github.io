@@ -106,7 +106,7 @@
     options: [{ value: "ops", label: "Operators in the control room" }, { value: "spin", label: "Energy stored in spinning machines" },
               { value: "gov", label: "Governors on power plants" }, { value: "ufls", label: "Relays that cut customers" }],
     feedback: { ops: "People take minutes; the first second belongs to physics.", spin: "Every machine turning in step with the grid slows together and gives up stored energy at once.",
-                gov: "Governors act within seconds, but they are not first.", ufls: "Relays are the last line of defence, used only if the fall reaches 59.3 Hz." }
+                gov: "Governors act within seconds, but they are not first.", ufls: "Relays are the last line of defense, used only if the fall reaches 59.3 Hz." }
   };
 
   function view(live, data, root) {
@@ -300,7 +300,7 @@
           S_.tripped = true; S_.gov = true; enter("seconds", 4);
           function said(v) {
               var a = story(G, S_.inertia, v);
-              if (a.ufls != null) api.saw("At " + v + " MW the fall reaches 59.3 Hz after " + sec1(a.ufls) + (a.late ? ", just past the chart" : "") + ". Relays cut " + mw(a.shedMW) + " of customers ([[ufls|under-frequency load shedding]]), the last line of defence, and frequency overshoots to " + hz(a.peak.f) + ".", true);
+              if (a.ufls != null) api.saw("At " + v + " MW the fall reaches 59.3 Hz after " + sec1(a.ufls) + (a.late ? ", just past the chart" : "") + ". Relays cut " + mw(a.shedMW) + " of customers ([[ufls|under-frequency load shedding]]), the last line of defense, and frequency overshoots to " + hz(a.peak.f) + ".", true);
               else if (v < G.tripMW) api.saw("At " + v + " MW the frequency sinks to about " + hz(60 - a.gap) + ", and the reserve runs out before 60 Hz can return.", true);
               else api.saw("At " + v + " MW the fall stops at " + hz(a.nadir.f) + (tryLow ? ". Enough reserve keeps the relays out of it." : ". Now try less than " + G.tripMW + " MW."));
           }
@@ -446,7 +446,7 @@
     LX.on("l3-change", function () { mineTrace(); fc.update(traces); });   // the selected trace shows its new path and text
     var L = D.layers;
     LX.CompareTable(c3, {
-      title: "Four layers of defence", text: true,   // a column of words: on phones each layer is a card of labelled lines
+      title: "Four layers of defense", text: true,   // a column of words: on phones each layer is a card of labelled lines
       columns: [{ key: "name", label: "Layer", main: true }, { key: "time", label: "Typical time scale" }, { key: "from", label: "Where the power comes from" }],
       rows: L.rows.map(function (r) { return { key: r.key, color: { inertia: "var(--lx-ink-3)", primary: "var(--lx-accent)", secondary: "var(--lx-good)", tertiary: "var(--lx-tier-3)" }[r.key], name: r.name, note: r.who, time: r.time, from: r.from }; }),
       sorts: [{ label: "Fastest first", order: ["inertia", "primary", "secondary", "tertiary"], note: "Typical time scales from NERC's control continuum (" + L.asOf + "). The layers overlap: governors start while machines still give up stored energy." }]

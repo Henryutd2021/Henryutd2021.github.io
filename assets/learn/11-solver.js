@@ -218,6 +218,9 @@
     var town = data.town, D = data["11_solver"], W = dayOf(town, data.town_year), f = town.fleet, V = D.penalty;
     var hh = LX.fmt.hh;
     var set = settings(), cur = null, base = null, shown = null, editPlan = null, hook = null, pricePick = null, solving = 0;
+    // shownSet: the settings the shown solution was solved under (prices and explanations use these, never newer slider
+    // values); req: the latest slider or button solve, so an older result that comes back late is dropped
+    var shownSet = set, req = 0;
 
     // ---------- stage
     var stage = H("div", { class: "lx-stage" }, live);
@@ -251,7 +254,7 @@
     function clearPick() { pricePick = null; pout.textContent = ""; markPick(); }
     function show(sol, s, label) {
       if (sol !== shown) clearPick();
-      shown = sol; chartRows = rowsOf(sol, s);
+      shown = sol; shownSet = s; chartRows = rowsOf(sol, s);
       var hs = hours(W, s); hs.forEach(function (x, t) { chartDemand[t] = x.demand; });
       if (LX.visible(chartHost)) chart.render();
       chips.innerHTML = "";
@@ -282,8 +285,8 @@
         if (y == null) b.disabled = true;
         priceBtns.push(b);
         b.addEventListener("click", function () {
-          pricePick = t; markPick(); var w = why(W, set, sol, t); pout.textContent = w.text;
-          fdAt(t, sol).then(function (fd) { if (pricePick !== t || shown !== sol) return; if (fd) { w = why(W, set, sol, t, fd); pout.textContent = w.text; } if (hook) hook({ price: t, why: w }); });   // a stale result is dropped
+          pricePick = t; markPick(); var w = why(W, shownSet, sol, t); pout.textContent = w.text;
+          fdAt(t, sol).then(function (fd) { if (pricePick !== t || shown !== sol) return; if (fd) { w = why(W, shownSet, sol, t, fd); pout.textContent = w.text; } if (hook) hook({ price: t, why: w }); });   // a stale result is dropped
         });
       })(t);
     }
@@ -291,8 +294,8 @@
     var fdCache = {};
     function fdAt(t, sol) {
       if (!sol || !sol.duals || sol.precomputed) return Promise.resolve(null);
-      var key = JSON.stringify(set) + "|" + t; if (fdCache[key]) return Promise.resolve(fdCache[key]);
-      var s0 = set, mk = function (v) { var a = {}; a[t] = v; var x = settings(s0); x.add = a; return x; }, c0 = sol.totals.cost + (sol.penalty || 0);
+      var key = JSON.stringify(shownSet) + "|" + t; if (fdCache[key]) return Promise.resolve(fdCache[key]);
+      var s0 = shownSet, mk = function (v) { var a = {}; a[t] = v; var x = settings(s0); x.add = a; return x; }, c0 = sol.totals.cost + (sol.penalty || 0);
       return Promise.all([solve(mk(1), { key: "fd-up", quiet: true }), solve(mk(-1), { key: "fd-down", quiet: true })]).then(function (rs) {
         if (!proven(rs[0]) || !proven(rs[1])) return null;
         var o = { up: rs[0].totals.cost + rs[0].penalty - c0, down: c0 - (rs[1].totals.cost + rs[1].penalty) }; fdCache[key] = o; return o;
@@ -318,6 +321,8 @@
       o.totals = { cc: sum(o.cc), pk: sum(o.pk), sp: sum(o.sp), un: 0, cost: P.cost, co2: f.cc.co2 * sum(o.cc) + f.peaker.co2 * sum(o.pk) };
       return o;
     }
+    // the day as given, shown only if no newer step or solve has started meanwhile
+    function showBase() { var my = req, s0 = set; solveBase().then(function (sol) { if (sol && my === req) show(sol, s0); }); }
     function solveBase() { return base ? Promise.resolve(base) : solve(settings()).then(function (s) { if (proven(s)) base = s; return s; }); }   // only a proven optimum is kept
     function checksUI(host) {
       var ul = H("ul", { class: "w11-checks" }, host), sv = H("p", { class: "w11-served", hidden: true }, host);
@@ -335,6 +340,7 @@
     var steps = [
       { text: "Lesson 0's day as one [[linear-program|linear program]], sized in the readouts above. Press Solve to hand it to HiGHS, a [[solver|solver]] running in your browser.",
         build: function (act, api) {
+          req++;
           hook = null; pricePick = null;
           set = settings(); priceBox.hidden = true; show(base, set);
           if (!base) show(null, set);
@@ -353,6 +359,7 @@
         } },
       { text: "Try to beat it. Pick an hour and move the combined-cycle; the peaker and curtailment adjust where they can. Can you find a cheaper day that keeps every rule?",
         build: function (act, api) {
+          req++;
           hook = null; pricePick = null;
           set = settings(); priceBox.hidden = true;
           solveBase().then(function (sol) {
@@ -387,11 +394,12 @@
         } },
       { text: "A solver answers the model you wrote, not the world. Check its answer as a modeler would: are the rules met, and do the energy and the money add up?",
         build: function (act, api) {
+          req++;
           hook = null; pricePick = null;
           set = settings(); priceBox.hidden = true;
           var b = H("button", { type: "button", class: "lx-btn small", html: LX.icon("check") + "Run the four checks" }, act);
           var run = checksUI(act);
-          solveBase().then(function (sol) { if (sol) show(sol, set); });
+          showBase();
           b.addEventListener("click", function () {
             solveBase().then(function (sol) {
               if (!sol) return;
@@ -402,13 +410,14 @@
         } },
       { text: "Why check at all? Plant a sign error: curtailed wind and solar now adds to supply instead of taking away. Re-solve, then run the checks again.",
         build: function (act, api) {
+          req++;
           hook = null; pricePick = null;
           set = settings({ signError: false }); priceBox.hidden = true;
           var row = H("div", { class: "w11-row" }, act);
           var bErr = H("button", { type: "button", class: "lx-btn small", text: "Plant the error and re-solve" }, row);
           var bRun = H("button", { type: "button", class: "lx-btn ghost small", html: LX.icon("check") + "Run the checks" }, row);
           var run = checksUI(act), bad = null;
-          solveBase().then(function (sol) { if (sol) show(sol, set); });
+          showBase();
           bErr.addEventListener("click", function () {
             set = settings({ signError: true }); bErr.disabled = true;
             solve(set).then(function (sol) {
@@ -425,9 +434,10 @@
         } },
       { text: "Predict, then test: add 1 MWh of demand at 03:00. By how much does the best cost rise?",
         build: function (act, api) {
+          req++;
           hook = null; pricePick = null;
           set = settings(); priceBox.hidden = true;
-          solveBase().then(function (sol) { if (sol) show(sol, set); });
+          showBase();
           var pr = LX.Predict(act, { id: "w11-dual", q: "", title: false, options: [{ value: "0", label: "$0" }, { value: "10", label: "$10" }, { value: "40", label: "$40" }, { value: "100", label: "$100" }],
             answer: String(D.probe.answer), feedback: { "40": "One more MWh at 03:00 comes from the combined-cycle, the [[marginal-cost|marginal]] plant, at $40.", "0": "Nothing is spare at 03:00: the gas plant must make it.", "10": "The nuclear plant already runs flat; it cannot make more.", "100": "The peaker is off and not needed: the cheaper combined-cycle has room." },
             fresh: true, onPick: function () { go.disabled = false; } });
@@ -446,9 +456,10 @@
         } },
       { text: "Every hour has a shadow price. Most are $40, the combined-cycle's cost. Some are not. Tap a highlighted hour to see which rule bends its price.",
         build: function (act, api) {
+          req++;
           hook = null; pricePick = null;
           set = settings(); priceBox.hidden = false; pricePick = null; pout.textContent = "";
-          solveBase().then(function (sol) { if (sol) show(sol, set); });
+          showBase();
           hook = function (e) {
             if (e.why.kind === "ramp") { api.done(); saw(api, "A ramp rule bends this price: one MWh more or less here moves the plan in a neighboring hour too, and the price counts both."); }
             else saw(api, "That hour's price is set by one plant. Now tap a highlighted hour.");
@@ -457,35 +468,40 @@
         } },
       { text: "Now play ([[sensitivity-analysis|sensitivity analysis]]): each slider re-solves at once. Lower the peaker's cost until the solver starts to use it. At what cost, and why that number?",
         build: function (act, api) {
+          req++;
           hook = null; pricePick = null;
           set = settings(); priceBox.hidden = false; hook = null;
           var g = H("div", { class: "lx-ctls" }, act), R = D.ranges;
-          var go = function () { solve(set, { key: "sens" }).then(function (sol) { if (!sol) return; show(sol, set); say(sol); }); };
+          var go = function () {   // solve a copy of the settings; while it runs the old prices cannot be tapped
+            var s = settings(set), my = ++req; priceBtns.forEach(function (b) { b.disabled = true; });
+            solve(s, { key: "sens" }).then(function (sol) { if (my !== req) return; if (!sol) { paintPrices(); return; } show(sol, s); say(sol, s); });
+          };
           LX.Slider(g, { label: "Peaker running cost", color: "var(--lx-pk)", min: R.pkCost[0], max: R.pkCost[1], step: 5, value: set.pkCost, fmt: function (v) { return "$" + v + "/MWh"; }, onChange: function (v) { set.pkCost = v; clearPick(); go(); } });
           LX.Slider(g, { label: "Combined-cycle ramp limit", color: "var(--lx-cc)", min: R.ramp[0], max: R.ramp[1], step: 5, value: set.ramp, fmt: function (v) { return v + " MW/h"; }, onChange: function (v) { set.ramp = v; clearPick(); go(); } });
           LX.Slider(g, { label: "Demand, every hour", color: "var(--lx-ink)", min: R.demandPct[0], max: R.demandPct[1], step: 5, value: set.demandPct, fmt: function (v) { return (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v) + "%"; }, onChange: function (v) { set.demandPct = v; clearPick(); go(); } });
           LX.Slider(g, { label: "Wind farm size", color: "var(--lx-wind)", min: R.windMW[0], max: R.windMW[1], step: 25, value: set.windMW, fmt: function (v) { return v + " MW"; }, onChange: function (v) { set.windMW = v; clearPick(); go(); } });
-          function say(sol) {
+          function say(sol, s) {
             if (!proven(sol)) { saw(api, "Stopped early (" + sol.status + "): this plan is not proven best. Move a slider to solve again.", true); return; }
             if (sol.totals.pk > 1e-6) {
               api.done();
-              var only = set.ramp === DEFAULTS.ramp && set.demandPct === 0 && set.windMW === DEFAULTS.windMW;
+              var only = s.ramp === DEFAULTS.ramp && s.demandPct === 0 && s.windMW === DEFAULTS.windMW;
               saw(api, "The peaker runs " + fmt1(sol.totals.pk) + " MWh." + (only ? " It starts below **$" + D.threshold + "/MWh**, the shadow price of the ramp hours: until then, curtailing wind and solar to keep the combined-cycle within its ramp costs less." : " Other rules changed too; try the peaker's cost alone, with the rest as given."));
             } else saw(api, "Still no peaker: " + usd(sol.totals.cost) + " for the day.");
           }
-          solveBase().then(function (sol) { if (sol) show(sol, set); });
+          showBase();
         } },
       { text: "Real peakers are off, or on at " + DEFAULTS.pkMin + " MW or more: an on-or-off choice that makes a [[mixed-integer-program|mixed-integer program]]. Compare it with the linear program at a " + D.milpRamp + " MW/h ramp.",
         build: function (act, api) {
+          req++;
           hook = null; pricePick = null;
           set = settings({ ramp: D.milpRamp }); priceBox.hidden = false; hook = null;
           var row = H("div", { class: "w11-row" }, act), lpSol = null;
           var bLP = H("button", { type: "button", class: "lx-btn ghost small", text: "Linear program" }, row);
           var bMI = H("button", { type: "button", class: "lx-btn small", text: "On-or-off peaker" }, row);
           function run(on) {
-            set = settings({ ramp: D.milpRamp, onoff: on }); bLP.setAttribute("aria-pressed", on ? "false" : "true"); bMI.setAttribute("aria-pressed", on ? "true" : "false");
-            solve(set, { key: "milp" }).then(function (sol) {
-              if (!sol) return; show(sol, set);
+            var s = settings({ ramp: D.milpRamp, onoff: on }), my = ++req; set = s; bLP.setAttribute("aria-pressed", on ? "false" : "true"); bMI.setAttribute("aria-pressed", on ? "true" : "false");
+            solve(s, { key: "milp" }).then(function (sol) {
+              if (!sol || my !== req) return; show(sol, s);
               if (!on && !proven(sol)) { lpSol = null; saw(api, "The linear program stopped early (" + sol.status + "): not proven best. Press Linear program again.", true); return; }
               if (!on) { lpSol = sol; saw(api, "As a linear program: " + usd(sol.totals.cost) + ", the peaker runs " + fmt1(sol.totals.pk) + " MWh, and every hour has a price. Now make the peaker on-or-off."); return; }
               chip("Optimality gap", gapText(sol.mipGap));

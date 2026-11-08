@@ -132,7 +132,7 @@ Every rule and the goal add up outputs times fixed numbers, so this is a [linear
 <summary><span class="k">Go deeper</span>What the game leaves out</summary>
 <div class="lx-deeper-body">
 <ul>
-<li>Prairie Town is an island: it cannot buy power from its neighbours.</li>
+<li>Prairie Town is an island: it cannot buy power from its neighbors.</li>
 <li>The forecast is perfect; real operators plan with forecasts that miss (lesson 4).</li>
 <li>The game moves in one-hour steps; real grids balance second by second (lesson 3).</li>
 <li>Nothing breaks: plants never fail, and power lines never fill up.</li>

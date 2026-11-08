@@ -472,14 +472,14 @@
     var cfW = capacityFactor(P.wind, P.sizes.wind), cfS = capacityFactor(P.solar, P.sizes.solar), h90 = hoursAbove(P.demand, 0.9 * P.sizes.demand), h95 = hoursAbove(P.demand, 0.95 * P.sizes.demand);
     steps.push({ text: "Sort a year of hours from highest to lowest: a [[duration-curve|duration curve]]. It shows how many hours a level is reached, and the capacity factor as an area.",
       build: function (act, api) {
-        var col = "demand", sorted = false;
+        var col = "demand", sorted = false, wasSorted = false;
         var sg = seg(act, "Series", [["demand", "Demand"], ["wind", "Wind farm"], ["solar", "Solar farm"]], function (k) { col = k; draw(); feedback(); });
         var tg = H("button", { class: "lx-btn small", type: "button", "aria-pressed": "false", text: "Sort the hours" }, act);
         var host = H("div", null, act), res = H("div", { class: "b2-res", "aria-live": "polite" }, act);
-        tg.addEventListener("click", function () { sorted = !sorted; tg.setAttribute("aria-pressed", sorted ? "true" : "false"); tg.textContent = sorted ? "Back to calendar order" : "Sort the hours"; draw(); feedback(); });
+        tg.addEventListener("click", function () { sorted = !sorted; wasSorted = true; tg.setAttribute("aria-pressed", sorted ? "true" : "false"); tg.textContent = sorted ? "Back to calendar order" : "Sort the hours"; draw(); feedback(); });
         // feedback once the sorted curve is on screen: demand first, then a farm with its shaded area (the step is done there)
         function feedback() {
-          if (!sorted) return;
+          if (!sorted) { if (wasSorted) api.saw("Calendar order again: January to December, no shaded area. Sort the hours to read the duration curve."); return; }
           if (col === "demand") { api.saw("Demand is above 90% of its peak for only " + h90 + " of 8,760 hours, yet the system must be ready for them. Now choose a farm."); return; }
           api.done(); api.saw("The shaded area is the farm's energy as a share of running flat out all year: its capacity factor, wind " + pct1(cfW) + ", solar " + pct1(cfS) + ".");
         }
@@ -487,8 +487,11 @@
           var size = P.sizes[col], v = sorted ? sortedDesc(P[col]) : P[col];
           host.innerHTML = "";
           var sv = sortedDesc(P[col]), ranks = [1, 100, 500, 1000, 2000, 4380, 6000, 8000, 8760];
+          // the text version follows the chart: sorted levels for the duration curve, each month's average in calendar order
+          var alt = sorted ? "<p>" + COLS[col].label + " of Prairie Town, MW: the level reached in at least this many hours of 2025.</p>" + htable(["Hours", "MW"], ranks.map(function (r) { return [int(r), int(sv[r - 1])]; }))
+                           : "<p>" + COLS[col].label + " of Prairie Town in calendar order: each month's average, MW.</p>" + htable(["Month", "MW"], resample(C, P[col], "month", "mean").map(function (x, i) { return [MONTHS[i], int(x.value)]; }));
           chart(host, { n: v.length, yMax: nice(size).max, yStep: nice(size).step, series: [{ values: v, color: COLS[col].color, area: col !== "demand" && sorted, width: sorted ? 2 : 0.6 }],
-            alt: "<p>" + COLS[col].label + " of Prairie Town, MW: the level reached in at least this many hours of 2025.</p>" + htable(["Hours", "MW"], ranks.map(function (r) { return [int(r), int(sv[r - 1])]; })),
+            alt: alt,
             ticks: sorted ? function (W) { return W < 480 ? [[0, "1", "start"], [4380, "4,380"], [8759, "8,760 h", "end"]] : [[0, "1", "start"], [2190, "2,190"], [4380, "4,380"], [6570, "6,570"], [8759, "8,760 h", "end"]]; } : ticksH,
             level: col === "demand" ? 0.9 * size : null, levelLabel: col === "demand" ? "90% of peak" : null,
             title: (sorted ? "Hours sorted from highest to lowest" : "Calendar order") + " (MW)", label: COLS[col].label + " of Prairie Town, " + (sorted ? "as a duration curve." : "in calendar order.") });
@@ -567,7 +570,7 @@
         { id: "repeat", label: "Repeats", text: "Runs of the same non-zero value: a sign of a stuck sensor or feed.", note: "repeats(df[col]).sum()" },
         { id: "physics", label: "Physics", text: "Sun at night, negative demand, output above [[capacity|capacity]].", note: "bad_night(df).sum()" },
         { id: "gaps", label: "Gaps and fills", text: "Count missing values, and record how each was filled.", note: "df.isna().sum()" },
-        { id: "source", label: "Provenance", text: "Source, file names, download date, checksums and licence.", note: "" }
+        { id: "source", label: "Provenance", text: "Source, file names, download date, checksums and license.", note: "" }
       ] });
   }
 

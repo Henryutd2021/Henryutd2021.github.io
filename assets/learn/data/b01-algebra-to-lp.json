@@ -89,7 +89,7 @@
   "imports": {
    "title": "Prairie Town's imports tonight",
    "labels": ["Need", "Prices", "Limits", "Decisions"],
-   "text": ["Tonight Prairie Town must import at least 100 MWh from two neighbours.", "The north sells at $30 per MWh and emits 0.9 t CO₂ per MWh; the south sells at $50 per MWh and emits 0.4 t.", "The north contract allows at most 80 MWh tonight, and the town's permit caps tonight's emissions at 64 t.", "x is the energy from the north and y from the south, in MWh."],
+   "text": ["Tonight Prairie Town must import at least 100 MWh from two neighbors.", "The north sells at $30 per MWh and emits 0.9 t CO₂ per MWh; the south sells at $50 per MWh and emits 0.4 t.", "The north contract allows at most 80 MWh tonight, and the town's permit caps tonight's emissions at 64 t.", "x is the energy from the north and y from the south, in MWh."],
    "vars": [
     {"sym": "x", "name": "energy from the north", "unit": "MWh"},
     {"sym": "y", "name": "energy from the south", "unit": "MWh"}],

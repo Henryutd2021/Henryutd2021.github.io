@@ -14,7 +14,7 @@
   },
   "wind": { "min": 150, "max": 750, "step": 25, "big": 750 },
   "credit": { "value": 25, "note": "Illustrative: a payment per MWh produced, so the wind farm still earns at prices down to minus the credit." },
-  "inflexible": { "offer": -40, "note": "Illustrative: the offer the plant makes to avoid stopping and restarting later. The switch changes this offer only; restarts themselves are not modelled." },
+  "inflexible": { "offer": -40, "note": "Illustrative: the offer the plant makes to avoid stopping and restarting later. The switch changes this offer only; restarts themselves are not modeled." },
   "teaser": { "lineMW": 200 },
   "sources": {
     "eia-2012-negative": { "text": "EIA, Today in Energy: Negative wholesale electricity prices occur in RTOs", "url": "https://www.eia.gov/todayinenergy/detail.php?id=6730", "asOf": "18 June 2012" },

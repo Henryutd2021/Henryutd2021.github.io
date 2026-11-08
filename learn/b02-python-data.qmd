@@ -44,7 +44,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <tbody>
 <tr><td class="n">Load</td><td>8,760 rows: one per hour, in MW, stamped in UTC at the end of each hour.</td><td><code>df.shape</code></td></tr>
 <tr><td class="n">Inspect</td><td>Demand reads 1,505 MW for one hour on 21 June, under 5% of the median: almost certainly a reporting error.</td><td><code>df.describe()</code></td></tr>
-<tr><td class="n">Time</td><td>On local time, labelled by each hour's start: 363 days of 24 hours, 9 March with 23 and 2 November with 25.</td><td><code>tz_convert("America/Chicago")</code></td></tr>
+<tr><td class="n">Time</td><td>On local time, labeled by each hour's start: 363 days of 24 hours, 9 March with 23 and 2 November with 25.</td><td><code>tz_convert("America/Chicago")</code></td></tr>
 <tr><td class="n">Repeats</td><td>Runs of 3 or more identical non-zero readings: 671 wind hours and 1,377 solar hours, the counts the data build flagged.</td><td><code>(s != s.shift()).cumsum()</code></td></tr>
 <tr><td class="n">Plot</td><td>From 15 to 21 December every column stands still for 155 hours; solar holds 617 MW through the nights.</td><td><code>df.loc[...].plot()</code></td></tr>
 <tr><td class="n">Physics</td><td>Solar above 5% of its peak between midnight and 4 a.m.: 214 hours in the raw file, none in the cleaned file.</td><td><code>df.index.hour &lt; 4</code></td></tr>
@@ -104,7 +104,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-deeper-body">
 <p>A capacity factor is energy divided by (nameplate capacity × hours). EIA-930 reports generation, not capacity, so a real fleet's capacity factor needs a second source, such as EIA's generator inventory (Form EIA-860).</p>
 <p>Observed peak output is not a capacity measurement. If it is below nameplate capacity, using it as the denominator overstates the capacity factor.</p>
-<p>Prairie Town's farms are defined to reach full output in SPP's best hour, which is why their 52.8% and 23.4% are labelled illustrative. <a href="05-capacity-factor.html">Lesson 5</a> builds capacity factors from scratch.</p>
+<p>Prairie Town's farms are defined to reach full output in SPP's best hour, which is why their 52.8% and 23.4% are labeled illustrative. <a href="05-capacity-factor.html">Lesson 5</a> builds capacity factors from scratch.</p>
 </div>
 </details>
 <details class="lx-deeper">

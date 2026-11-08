@@ -289,14 +289,31 @@
     var sg = LP.segment(r.a, r.b, view);
     return "The line " + fmtLin(r.a, sy || ["x", "y"]) + " = " + num(r.b) + (sg ? " runs from " + pt(sg[0]) + " to " + pt(sg[1]) : " lies outside the drawing") + "; " + sideWords(r) + ".";
   }
-  // the best plan of any rules a learner writes (rules with a decision in them): unbounded only when a direction the
-  // region runs along forever improves the goal (LX.lp2.rays), so an open region with a finite best (minimize x with
-  // x, y >= 0) is not called unbounded; exact corners (LX.lp2.solve) when the region has one, which x >= 0 and y >= 0
-  // guarantee. -> {status: "optimal" | "tied" | "unbounded" | "infeasible", x: [x, y] or null}
-  function bestPlan(m, view) {
+  // whether any plan passes the rules, decided exactly, without a drawing box (a rule such as x >= 10000 lies far
+  // outside any drawing). Rules whose directions span the plane: a region that is not empty has a corner. Rules that
+  // are all parallel (or none): one number n.p must fit between their lower and upper limits. 0 <= -1 fails at once.
+  function feasible(rows) {
+    var hs = [], never = false;
+    (rows || []).forEach(function (r) { le(r).forEach(function (h) { if (h.a[0] || h.a[1]) hs.push(h); else if (h.b < -1e-9) never = true; }); });
+    if (never) return false;
+    if (!hs.length) return true;
+    var n = hs[0].a, nn = n[0] * n[0] + n[1] * n[1];
+    if (hs.some(function (h) { return Math.abs(n[0] * h.a[1] - n[1] * h.a[0]) > 1e-12 * (1 + nn); })) return LP.corners(rows).length > 0;
+    var lo = -Infinity, hi = Infinity;
+    hs.forEach(function (h) { var k = (h.a[0] * n[0] + h.a[1] * n[1]) / nn; if (k > 0) hi = Math.min(hi, h.b / k); else lo = Math.max(lo, h.b / k); });
+    return lo <= hi + 1e-9 * (1 + Math.abs(hi));
+  }
+  // the best plan of any rules a learner writes (rules with a decision in them), decided exactly. Unbounded when some
+  // direction the region runs along forever improves the goal: the cheapest such direction is either straight against
+  // the goal (-c) or along a rule's edge (LX.lp2.rays), so both are tried; an open region with a finite best (minimize
+  // x with x, y >= 0) is not called unbounded. Exact corners (LX.lp2.solve) when the region has one; with none, a whole
+  // line ties. -> {status: "optimal" | "tied" | "unbounded" | "infeasible", x: [x, y] or null}
+  function bestPlan(m) {
     var rows = m.rows, sg = m.sense === "max" ? -1 : 1, c = [sg * m.c[0], sg * m.c[1]];
-    if (!region(rows, bigBox(view)).length) return { status: "infeasible", x: null };
-    if (LP.rays(rows).some(function (r) { return c[0] * r[0] + c[1] * r[1] < -1e-9; })) return { status: "unbounded", x: null };
+    if (!feasible(rows)) return { status: "infeasible", x: null };
+    var hs = []; rows.forEach(function (r) { le(r).forEach(function (h) { hs.push(h); }); });
+    var forever = function (r) { return hs.every(function (h) { return h.a[0] * r[0] + h.a[1] * r[1] <= 1e-12; }); };
+    if (LP.rays(rows).concat([[-c[0], -c[1]]]).some(function (r) { return forever(r) && c[0] * r[0] + c[1] * r[1] < -1e-9; })) return { status: "unbounded", x: null };
     if (LP.corners(rows).length) { var e = LP.solve(m); return { status: e.status, x: [r6(e.x), r6(e.y)] }; }
     return { status: "tied", x: null };   // no corner: the best plans fill a whole line
   }
@@ -309,12 +326,12 @@
     var never = all.filter(function (r) { return !r.a[0] && !r.a[1] && !holds(r, [0, 0], 1e-9); });
     if (never.length) { out.push(fmtRule(never[0], sy) + " has no decision in it and is never true: no plan passes."); return out; }
     if (!rows.length) { out.push("None of them has a decision in it: every plan passes."); return out; }
-    if (!region(rows, bigBox(view)).length) { out.push("No plan passes all of them."); return out; }
+    if (!feasible(rows)) { out.push("No plan passes all of them."); return out; }
     var C = LP.corners(rows), open = LP.rays(rows).length > 0;
     out.push(C.length ? "The plans that pass them all form a region with corners " + C.map(function (p) { return pt([r6(p.x), r6(p.y)]); }).join(", ") + (open ? "; it goes on forever in some direction." : ".")
                       : "The plans that pass them all form a region without corners" + (open ? " that goes on forever." : "."));
     if (m.sense && (m.c[0] || m.c[1])) {
-      var o = bestPlan({ sense: m.sense, c: m.c, rows: rows }, view);
+      var o = bestPlan({ sense: m.sense, c: m.c, rows: rows });
       if (o.status === "optimal") out.push("Best plan for your goal: " + pt(o.x) + ".");
       else if (o.status === "tied" && o.x) out.push("Best plan for your goal: " + pt(o.x) + "; other plans tie with it.");
       else if (o.status === "tied") out.push("Many plans tie for best: a whole line of them.");
@@ -333,7 +350,7 @@
   var model = { townDay: townDay, le: le, lhs: LP.lhs, holds: holds, clip: LP.clip, region: region, optimum: optimum, compare: compare,
                 toArrays: toArrays, dispatchStory: dispatchStory, planningStory: planningStory, withKey: withKey, readiness: readiness, adviceFor: adviceFor,
                 cornerTable: cornerTable, checkArrays: checkArrays, practiceSpecs: practiceSpecs, fill: fill, num: num, money: money, pt: pt,
-                fmtRule: fmtRule, ruleWords: ruleWords, describeModel: describeModel, bestPlan: bestPlan, solverLine: solverLine, tolAt: tolAt, HOUR: HOUR, PREV_CC: PREV_CC };
+                fmtRule: fmtRule, ruleWords: ruleWords, describeModel: describeModel, bestPlan: bestPlan, feasible: feasible, solverLine: solverLine, tolAt: tolAt, HOUR: HOUR, PREV_CC: PREV_CC };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -439,7 +456,7 @@
       usable.forEach(function (r) { pl.rule(r, { label: r.b === 0 && (!r.a[0] || !r.a[1]) ? null : fmtRule(r, sy), cls: "on" }); });
       var never = m.rows.some(function (r) { return !r.a[0] && !r.a[1] && !holds(r, [0, 0], 1e-9); });
       if (m.sense && (m.c[0] || m.c[1]) && usable.length && !never) {
-        var opt = bestPlan({ sense: m.sense, c: m.c, rows: usable }, st.view);
+        var opt = bestPlan({ sense: m.sense, c: m.c, rows: usable });
         if (opt.x && (opt.status === "optimal" || opt.status === "tied")) pl.point(opt.x, { label: "best: (" + num(opt.x[0]) + ", " + num(opt.x[1]) + ")" });
       }
       setItems(altList, describeModel(m, sy, st.view));

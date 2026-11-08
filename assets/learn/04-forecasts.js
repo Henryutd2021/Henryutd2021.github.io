@@ -228,7 +228,7 @@
           enter({ chart: "day", day: "typical", show: "actual", series: "demand" });
           LX.Predict(act, { id: "l4-guess", q: PRED.q, options: PRED.options, answer: "2", fresh: true, lockText: "Locked in. Reveal the forecast next.", onPick: function (p) { S_.pick = p; api.done(); } });
         } },
-      { text: "Here is SPP's [[day-ahead-forecast|day-ahead forecast]]. Each shaded bar is one hour's [[forecast-error|forecast error]]. Now switch to the biggest daily miss among January–April days with no repaired hours.",
+      { text: "Here is SPP's [[day-ahead-forecast|day-ahead forecast]]; each shaded bar is one hour's [[forecast-error|forecast error]]. Now switch to the biggest daily miss among January–April days with no repaired hours.",
         build: function (act, api) {
           enter({ chart: "day", show: "forecast", series: "demand", named: false }); draw(true);
           var mpT = mape(typ.A, typ.F).value, ok = S_.pick === "2";

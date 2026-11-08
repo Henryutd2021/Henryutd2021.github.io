@@ -294,7 +294,30 @@ if (process.argv.includes("--fallback")) { console.log(fallbackSVG()); process.e
       ok(B.bestPlan({ sense: "max", c: [1, 1], rows: xy }, v).status === "unbounded" && /unbounded/.test(B.describeModel({ sense: "max", c: [1, 1], rows: xy }, ["x", "y"], v).join(" ")), "best plan: maximize x + y with x, y ≥ 0 is unbounded");
       ok(B.bestPlan({ sense: "min", c: [1, 0], rows: [xy[0]] }, v).status === "tied" && B.bestPlan({ sense: "min", c: [0, 1], rows: [xy[0]] }, v).status === "unbounded", "best plan: a region without corners: a whole line ties for min x; min y is unbounded");
       ok(B.bestPlan({ sense: "max", c: stories.battery.c, rows: stories.battery.rows }, stories.battery.view).x.join() === "80,72", "best plan: the battery's exact corner (80, 72)");
-      ok(!/optimum\(\{ sense: m\.sense/.test(JS) && /bestPlan\(\{ sense: m\.sense, c: m\.c, rows: usable \}/.test(JS), "builder: the plane's best point uses the exact best plan, not the boxed search"); }
+      ok(!/optimum\(\{ sense: m\.sense/.test(JS) && /bestPlan\(\{ sense: m\.sense, c: m\.c, rows: usable \}/.test(JS), "builder: the plane's best point uses the exact best plan, not the boxed search");
+      // only x <= 1: minimizing x runs off to minus infinity (the direction straight against the goal is a way out)
+      const left = B.bestPlan({ sense: "min", c: [1, 0], rows: [{ a: [1, 0], op: "<=", b: 1 }] });
+      ok(left.status === "unbounded" && /unbounded/.test(B.describeModel({ sense: "min", c: [1, 0], rows: [{ a: [1, 0], op: "<=", b: 1 }] }, ["x", "y"], v).join(" ")), "best plan: minimize x with only x ≤ 1 is unbounded (" + left.status + ")");
+      // feasibility does not depend on the drawing: x >= 10000, y >= 0 has its best plan at (10000, 0)
+      const far = [{ a: [1, 0], op: ">=", b: 10000 }, { a: [0, 1], op: ">=", b: 0 }], bf = B.bestPlan({ sense: "min", c: [1, 1], rows: far });
+      ok(bf.status === "optimal" && bf.x.join() === "10000,0" && !/No plan passes/.test(B.describeModel({ sense: "min", c: [1, 1], rows: far }, ["x", "y"], v).join(" ")), "best plan: x ≥ 10000, y ≥ 0 far outside the drawing is feasible, best (10000, 0) (" + bf.status + ")");
+      ok(B.feasible([{ a: [1, 1], op: "<=", b: 4 }, { a: [2, 2], op: ">=", b: 6 }]) && !B.feasible([{ a: [1, 1], op: "<=", b: 4 }, { a: [2, 2], op: ">=", b: 10 }]) && B.feasible([]) && !B.feasible([{ a: [0, 0], op: "<=", b: -1 }]),
+         "feasible: parallel rules (3 ≤ x + y ≤ 4 passes, 5 ≤ x + y ≤ 4 does not), no rules, 0 ≤ −1");
+      // random two-rule and three-rule models: the exact answer agrees with the boxed search wherever the box can tell
+      { let seed = 4242; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647, pick = a => a[Math.floor(rnd() * a.length)];
+        let agree = 0, n = 0;
+        for (let k = 0; k < 400; k++) {
+          const rows = Array.from({ length: 2 + (k % 2) }, () => ({ a: [pick([-2, -1, 0, 1, 2]), pick([-2, -1, 0, 1, 2])], op: pick(["<=", ">="]), b: pick([-20, 0, 10, 40, 80]) })).filter(r => r.a[0] || r.a[1]);
+          if (!rows.length) continue;
+          const m = { sense: pick(["min", "max"]), c: [pick([-1, 0, 1, 2]), pick([-1, 0, 1])], rows };
+          if (!m.c[0] && !m.c[1]) continue;
+          const e = B.bestPlan(m), o = B.optimum(m, v); n++;
+          // the boxed search calls a best point on the box edge unbounded; it cannot tell a tie from a finite best either
+          if (e.status === "infeasible" ? o.status === "infeasible" : o.status !== "infeasible") agree++;
+          else console.log("  disagree", JSON.stringify(m), e.status, o.status);
+        }
+        ok(agree === n, `best plan: feasibility agrees with the boxed search on ${n} random small models (${agree})`); }
+    }
     // a rule with no decision in it: never true makes the model infeasible; always true changes nothing
     { const bt = stories.battery, bm = bt.rows.map(r => ({ a: r.a.slice(), op: r.op, b: r.b }));
       const bad = B.compare(bt, { sense: "max", c: bt.c, rows: bm.concat([{ a: [0, 0], op: "<=", b: -1 }]) }, bt.view);

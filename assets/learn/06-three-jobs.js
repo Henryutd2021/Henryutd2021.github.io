@@ -303,7 +303,7 @@
         { id: "energy", g: "job", label: "Cheap energy", at: [0.45, 1], atN: [0, 2], text: jobBy.energy.question },
         { id: "firm", g: "job", label: "Firm capacity", at: [1.4, 1], atN: [1, 2], text: jobBy.firm.question },
         { id: "flex", g: "job", label: "Flexibility", at: [2.35, 1], atN: [2, 2], text: jobBy.flex.question },
-        { id: "cf", g: "measure", label: "Capacity factor, running cost", lines: ["Capacity", "factor,", "running", "cost"], at: [0.45, 2], atN: [0, 3], text: "Capacity factor, energy made ÷ (size × hours), gives the MWh per MW (lesson 5). Running cost says how cheap each MWh is (lesson 7)." },
+        { id: "cf", g: "measure", label: "Capacity factor, running cost", lines: ["Capacity", "factor,", "running", "cost"], at: [0.45, 2], atN: [0, 3], text: "Capacity factor is energy made ÷ (size × hours); times the year's hours it gives the MWh per MW (lesson 5). Running cost says how cheap each MWh is (lesson 7)." },
         { id: "fs", g: "measure", label: "Firm share", lines: ["Firm", "share"], at: [1.4, 2], atN: [1, 3], text: "The part of a plant's MW a grid credits toward reliability: a planning rating per technology class (ELCC), not output promised in any hour.", later: "Later: Analyst lesson [[lesson:a05-adequacy|A5]] estimates it with many weather years." },
         { id: "ramp", g: "measure", label: "Ramp and start", lines: ["Ramp and", "start"], at: [2.35, 2], atN: [2, 3], text: "How fast a plant changes output, and how quickly it starts: the [[ramp-rate|ramp limit]] of lesson 0." }
       ],

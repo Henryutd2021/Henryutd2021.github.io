@@ -34,7 +34,7 @@
   "rows": [
    { "key": "inertia", "name": "Inertial response", "time": "0–12 s", "from": "Stored spin of the machines turning in step with the grid", "who": "Physics, no control" },
    { "key": "primary", "name": "Primary response", "time": "10–60 s", "from": "Governors on plants holding reserve; motors slowing", "who": "Automatic, at each plant" },
-   { "key": "secondary", "name": "Secondary response (AGC)", "time": "1–10 min", "from": "Reserve plants raised by the control centre's computers", "who": "Automatic, grid operator" },
+   { "key": "secondary", "name": "Secondary response (AGC)", "time": "1–10 min", "from": "Reserve plants raised by the control center's computers", "who": "Automatic, grid operator" },
    { "key": "tertiary", "name": "Tertiary response", "time": "10 min to hours", "from": "Plants started or re-dispatched to rebuild reserves", "who": "Grid operator, by hand" }
   ]
  },

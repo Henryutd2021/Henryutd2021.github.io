@@ -152,6 +152,7 @@ ok(/jupyter lab/.test(QMD) && /pip install jupyterlab pandas matplotlib/.test(QM
 ok(has("then about 60 minutes of practice tasks") && /plus about 60 minutes of practice tasks/.test(NBSRC), "time: the practice tasks' 60 minutes are shown beside the lab's");
 ok(!/practis|centre|colour|modelling/.test(QMD + NBSRC + JS), "spelling: American");
 ok(/function feedback\(\)/.test(JS) && /Now choose a farm\./.test(JS) && !/if \(sorted\) \{ api\.done\(\); api\.saw\("Demand is above 90%/.test(JS), "duration step: sorting demand asks for a farm; the step ends on a farm's shaded curve");
+ok(/if \(!sorted\) \{ if \(wasSorted\) api\.saw\("Calendar order again/.test(JS) && /var alt = sorted \?/.test(JS) && /each month's average, MW/.test(JS), "duration step: back in calendar order the feedback and the text version describe the calendar-order chart, not the sorted one");
 
 // ---------------- notebook: clean, runnable outside any repository, same checks
 ok(NB.nbformat === 4 && NB.metadata.kernelspec.name === "python3", "notebook: nbformat 4, Python 3 kernel");

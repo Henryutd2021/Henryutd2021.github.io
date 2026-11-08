@@ -131,7 +131,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div id="t6-explain" class="lx-xgrid">
 <div class="lx-fallback">
 <dl class="lx-ideas">
-<dt>Cheap energy</dt><dd>Fill the year with many MWh at a low running cost; capacity factor measures the MWh per MW, running cost (lesson 7) the rest.</dd>
+<dt>Cheap energy</dt><dd>Fill the year with many MWh at a low running cost; capacity factor times the year's hours gives the MWh per MW, running cost (lesson 7) the rest.</dd>
 <dt>Firm capacity</dt><dd>Be there in the riskiest hours; firm share rates it, as planning credit rather than a promise for any hour.</dd>
 <dt>Flexibility</dt><dd>Change output quickly on request; <span class="lx-term" data-term="ramp-rate">ramp rate</span> and start-up time measure it.</dd>
 <dt>Two different numbers</dt><dd>Gas peakers averaged 13.6% of their size in 2025, yet PJM credits 67% of their MW toward reliability; solar averaged 24.0% but is credited 7%.</dd>

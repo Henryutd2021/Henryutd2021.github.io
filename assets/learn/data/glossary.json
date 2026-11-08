@@ -3157,7 +3157,7 @@
  },
  "simplex-method": {
   "term": "Simplex method",
-  "short": "A way to solve linear programs by moving from corner to neighbouring corner of the feasible region, never making the goal worse, until no neighbour is better.",
+  "short": "A way to solve linear programs by moving from corner to neighboring corner of the feasible region, never making the goal worse, until no neighbor is better.",
   "lesson": 11,
   "href": "11-solver.html"
  },
