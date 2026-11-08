@@ -46,7 +46,7 @@ D.stories.forEach((s, k) => {
     ok(has(esc(p.text)) && has(esc(p.note)), `story ${s.id} ${p.p}: phrase and note are in the no-JS fallback`);
   });
   ok(ids.indexOf(s.missing.answer) >= 0 && words(s.missing.note) <= 50, `story ${s.id}: the unanswered question is a lens id; note under 50 words`);
-  ok(has(esc(s.headline)) && has(esc(s.take)), `story ${s.id}: headline and model take are in the fallback`);
+  ok(has(esc(s.headline)) && M.takeParts(s.take).every(x => has(`<li><strong>A researcher's take, ${x.k.toLowerCase()}</strong>: ${esc(x.v)}</li>`)), `story ${s.id}: headline and model take (in its three parts) are in the fallback`);
   ok(sentences(s.take) === 3, `story ${s.id}: the model take has three sentences`);
   const tp = M.takeParts(s.take);
   ok(tp.length === 3 && tp.every(x => x.v && words(x.v) <= 20) && !/^Confidence/.test(tp[2].v), `story ${s.id}: the take shows as three labelled lines of at most 20 words`);
@@ -58,8 +58,9 @@ D.stories.forEach((s, k) => {
     ok(has(src.url), `story ${s.id}: source ${src.url} is linked on the page`);
   });
   // the full story text, in order, as the fallback shows it
-  const body = s.parts.map(p => typeof p === "string" ? esc(p) : "<mark>" + esc(p.text) + "</mark>").join("");
-  ok(has(body), `story ${s.id}: fallback paragraph equals the data`);
+  const body = s.parts.map(p => typeof p === "string" ? esc(p) : "<mark>" + esc(p.text) + "</mark>").join("").split("\n").map(l => "<p>" + l + "</p>").join("\n");
+  ok(has(body), `story ${s.id}: the fallback holds the story one line per paragraph, as the data`);
+  if (s.intro) ok(words(s.intro.replace(/\[\[[^|]+\|([^\]]+)\]\]/g, "$1")) <= 36 && JS.indexOf("if (story.intro) H(\"p\"") > 0, `story ${s.id}: its terms are an element of their own before the story, in the page and the fallback`);
 });
 
 // ---------------- judge and score
@@ -84,7 +85,7 @@ ok(Math.abs(avg - 74.087) < 0.01, `envelope A: 649 TWh / 8,760 h = ${avg.toFixed
 ok(eA.options[eA.answer] === Math.round(avg) + " GW", "envelope A: the right option is the rounded average");
 ok(eA.options[0] === Math.round(avg / 10) + " GW" && eA.options[3] === (Math.round(eA.twh * 8.76 / 100) * 100).toLocaleString("en-US") + " GW", "envelope A: distractors are /87.6 and x8.76 slips");
 ok(Math.round(M.connectionGW(eA.twh, eA.util, eA.hours)) === eA.report_gw, "envelope A: 50% use reproduces the report's 148 GW");
-ok(Math.round(M.averageGW(192)) === 22 && A.parts.some(p => p.note && p.note.indexOf("about 22 GW") >= 0), "story A: 192 TWh is about 22 GW on average");
+ok(Math.round(M.averageGW(192, 8784)) === 22 && A.parts.some(p => p.note && p.note.indexOf("2024's 8,784 hours (a leap year) it is about 22 GW") >= 0), "story A: 192 TWh over 2024's 8,784 hours is about 22 GW on average");
 ok((843 / 521).toFixed(1) === "1.6" && A.parts.some(p => p.note && p.note.indexOf("1.6 times") >= 0), "story A: the range's top is 1.6 times its bottom");
 ok(A.take.indexOf("about 50%") >= 0 && Math.round((649 / 430 - 1) * 100) >= 45 && Math.round((649 / 430 - 1) * 100) <= 55, "story A take: 649 vs about 430 TWh differ by about 50%");
 
@@ -110,6 +111,8 @@ ok(C.missing.q && /claim of a cause/.test(C.missing.q) && JS.indexOf("missingQ: 
 // ---------------- spotter
 ok(D.spotter.length === 6 && D.spotter.filter(s => s.answer === "error").length === 4, "spotter: six sentences, four errors (as the step says)");
 ok(JS.indexOf("Four of these six sentences") >= 0, "spotter: step text matches the count");
+ok(/\["error", "Error or unsupported assumption"\]/.test(JS) && D.spotter.find(x => x.id === "s4").kind === "assumption" && M.verdict(D.spotter.find(x => x.id === "s4")) === "An unsupported assumption." && /a year's energy depends on hours and output/.test(D.spotter.find(x => x.id === "s4").fix), "spotter s4: constant rated output is an unsupported assumption, and the choice names it");
+ok(D.spotter.filter(x => x.answer === "error").every(x => ["unit", "scale", "assumption"].indexOf(x.kind) >= 0), "spotter: every error is a unit error, a scale error or an unsupported assumption");
 const home = 10791;
 ok(Math.round(13 / (home / 8760)) === 11 || Math.floor(13 / (home / 8760)) === 10, "spotter s3: 13 kWh lasts about 10 hours of average use");
 ok(Math.round(10000 * home / 1e6) === 108 && Math.round(10000 * home / 8760 / 1000) === 12, "spotter s6: 10,000 homes use about 108 GWh a year, 12 MW on average");
@@ -119,6 +122,8 @@ D.spotter.forEach(s => ok(words(s.fix) <= 40, `spotter ${s.id}: fix under 40 wor
 // ---------------- ladder
 D.ladder.items.forEach(it => ok(it.answer.every(a => a === "projection" || D.ladder.rungs.some(r => r.id === a)), `ladder ${it.id}: answers are rungs`));
 ok(M.ladderOK(D.ladder.items[0], "operating") && !M.ladderOK(D.ladder.items[0], "announced") && M.ladderOK(D.ladder.items[2], "projection"), "ladder: placements");
+ok(M.ladderOK(D.ladder.items[1], "announced") && ["funded", "permitted", "construction", "operating"].every(r => !M.ladderOK(D.ladder.items[1], r)) && /Funding, permits and building each need their own evidence/.test(D.ladder.items[1].note), "ladder l2: 'planned' establishes only announced; funding, permits and construction need their own evidence");
+ok(/funding and permits can come in either order/.test(JS), "ladder: the explain lede says the middle rungs need not come in order");
 ok(D.ladder.rungs.map(r => r.label).join(",") === "Announced,Funded,Permitted,Under construction,Operating,At design output", "ladder: the six rungs of the news lens's ladder");
 
 // ---------------- the Steelman box's sensitivity scenarios, the explain fallback and the citation
@@ -150,6 +155,24 @@ const visible = QMD + JSON.stringify(D) + stepTexts.join(" ");
 const hrefs = [...QMD.matchAll(/href="([^"]+)"/g)].map(m => m[1]);
 hrefs.forEach(h => ok(/^https:\/\/([a-z0-9-]+\.)*(eia\.gov|energy\.gov|entsoe\.eu|creativecommons\.org|opensource\.org)\//.test(h) || /^(index\.html|[a-z0-9-]+\.html(#[a-z0-9-]+)?|mailto:)$/.test(h) || /^mailto:/.test(h) || h.startsWith("#"),
   "scope: link allowed: " + h));
+
+// ---------------- wording: what each model can test; a fleet's energy; reactive power; terms; time; element budget
+{
+  const mod = QMD.slice(QMD.indexOf("Which model would test each claim?"), QMD.indexOf("</details>", QMD.indexOf("Which model would test each claim?")));
+  ok(/an estimate built up from equipment/.test(mod) && /A planning model takes that load as an input/.test(mod) && /a matter of records: each battery's commissioning date and its power and energy ratings/.test(mod), "Modeler box: demand from an equipment-based estimate, capacity expansion takes it as input; what entered service from records");
+  ok(!/Only if every battery lasts exactly one hour/.test(QMD + JSON.stringify(D)) && /15 GWh would mean an average duration of one hour at full power/.test(QMD) && /15 GWh would mean the fleet averages one hour at full power/.test(D.stories[1].envelope.feedback[0]), "batteries: 15 GWh means a one-hour average, not that every battery lasts one hour (myth and feedback)");
+  const SIDE = fs.readFileSync(path.join(SITE, "learn/_w1/n01-news-lens.yml"), "utf8");
+  ok(!/holds voltage up|held up locally/.test(SIDE + JS + JSON.stringify(D)) && /supplying or absorbing it locally helps keep voltage within safe limits/.test(SIDE) && /Supplying or absorbing \[\[reactive-power\|reactive power\]\] helps keep local voltage within safe limits, neither too low nor too high/.test(D.stories[2].intro), "reactive power: keeps voltage within limits both ways");
+  ok(/Its main scenario, the Reference Case, puts/.test(JSON.stringify(D)) && /\[\[tariff\|tariff\]\], its rules for what customers pay/.test(D.stories[0].missing.note), "terms: the Reference Case and tariff are explained where they first appear");
+  ok(/Practice on real news · about 15 minutes/.test(QMD), "practice: the independent exercise shows its time");
+  // every element of the worked checks and of the step prompts within about 35 words
+  const st = M.staticChecks(D), lis = (st.match(/<li>[\s\S]*?<\/li>/g) || []).map(t => words(t.replace(/<[^>]+>/g, " ")));
+  ok(lis.length >= 10 && lis.every(n => n <= 36), "fallback: each worked check and ladder element is at most 36 words: " + lis.join(", "));
+  const fbl = QMD.slice(QMD.indexOf("<!-- fallback:start -->"), QMD.indexOf("<!-- fallback:end -->")), fli = (fbl.match(/<li>[\s\S]*?<\/li>/g) || []).map(t => words(t.replace(/<[^>]+>/g, " ")));
+  ok(fli.length >= 18 && fli.every(n => n <= 40), "fallback: each note and take part in the stories' no-JS version is short: max " + Math.max(...fli));
+  ok(/<th scope="col">Sentence<\/th><th scope="col">Verdict<\/th><th scope="col">Why<\/th>/.test(st), "fallback: the spotter answers are a table (sentence, verdict, why), not one long line each");
+  stepTexts.forEach((t, i) => ok(words(t.replace(/\[\[[^|]+\|([^\]]+)\]\]/g, "$1")) <= 35, `step ${i + 1}: at most 35 words (${words(t)})`));
+}
 
 console.log(`${checks} checks, ${fails} failures`);
 process.exit(fails ? 1 : 0);

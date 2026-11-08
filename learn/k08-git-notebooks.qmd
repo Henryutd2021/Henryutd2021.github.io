@@ -124,7 +124,8 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-interactive lx-cards" data-learn="k08" data-src="../assets/learn/data/town.json ../assets/learn/data/town_year.json">
 <div class="lx-fallback">
 <p class="lx-eyebrow">A small model project's history, in nine steps</p>
-<p class="lx-hint">The project computes the electricity Prairie Town's gas plants make in one day, 1,965 MWh: what demand leaves after wind, solar and a 100 MW plant that runs flat. At $40/MWh it costs $78,600; a balance check asserts that supply equals demand.</p>
+<p class="lx-hint">The project computes the electricity Prairie Town's gas plants make in one day, 1,965 MWh: what demand leaves after wind, solar and a 100 MW plant that runs flat.</p>
+<p class="lx-hint">At $40/MWh that gas costs $78,600; a balance check asserts that supply equals demand.</p>
 <p class="lx-hint">A <span class="lx-term" data-term="commit">commit</span> records the staged versions of the project's <span class="lx-term" data-term="tracked-file">tracked files</span>, with a message and a link to the commit before it.</p>
 <div class="k8-staticwrap">
 <!-- k8-steps:start (written by _tests/learn/test_k08-git-notebooks.js in its write mode; do not edit) -->
@@ -136,7 +137,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <tr><td data-label="Step">3</td><td class="k8-mono">git switch -c high-gas, git add params.yml, git commit -m</td><td>A new branch, the change staged, then recorded as a commit on high-gas only.</td></tr>
 <tr><td data-label="Step">4</td><td class="k8-mono">git switch main</td><td>params.yml says 40 again and the result is $78,600; git switch high-gas brings back 55.</td></tr>
 <tr><td data-label="Step">5</td><td class="k8-mono">git pull, then git switch --detach &lt;id&gt; and python check.py</td><td>A teammate's three commits arrive; the balance check fails by 2,822 MWh. Halving the history (once a commit fails, every later one fails too): commit 3 passes, commit 4 fails, so commit 4 (2b77767) is the first bad one, found in 2 checks.</td></tr>
-<tr><td data-label="Step">6</td><td class="k8-mono">git diff 7a83e3d 2b77767, git revert 2b77767</td><td>The line became −(wind − solar): solar is added, not subtracted, so gas is 4,787 MWh instead of 1,965 (2 × 1,411 MWh too much). The revert commit brings back 1,965 MWh.</td></tr>
+<tr><td data-label="Step">6</td><td class="k8-mono">git switch main, git diff 7a83e3d 2b77767, git revert 2b77767</td><td>Back on main first, so the fix lands there. The line became −(wind − solar): solar is added, not subtracted, so gas is 4,787 MWh instead of 1,965 (2 × 1,411 MWh too much). The revert commit brings back 1,965 MWh.</td></tr>
 <tr><td data-label="Step">7</td><td class="k8-mono">a notebook: edit cell 2, run only cell 4</td><td>Cell 4 still shows 78600 (memory holds gas_cost = 40) under a cell that says 55; Restart and run all gives 108075.</td></tr>
 <tr><td data-label="Step">8</td><td class="k8-mono">five fixes</td><td>Before sharing: exact versions (pandas==2.2.3, an illustrative version); a path inside the project; the raw data's source, download date and checksum; a fixed random seed; .env, data/raw/ and charts in .gitignore before anything is staged.</td></tr>
 <tr><td data-label="Step">9</td><td class="k8-mono">git clone, pip install -r requirements.txt, jupyter nbconvert --to notebook --execute day.ipynb</td><td>The fresh copy has no .env and no raw data. Its notebook runs top to bottom: cell 3 gives 1,965 MWh, cell 4 shows 78600 (dollars), and cell 6's balance assert prints “balance OK”, as the README says.</td></tr>
@@ -162,7 +163,8 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <li>Source: demand, wind and solar follow the real hourly shapes of 3 September 2025 on the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), scaled as in <a href="00-grid-operator.html">lesson 0</a>.</li>
 <li>Illustrative: the 100 MW plant that runs flat all day and the $40/MWh gas cost, as in <a href="k07-spreadsheets.html">K7</a>.</li>
 <li>The project, its files, its messages and the teammate are illustrative. Nothing on this page creates or touches a real repository; commands are shown as text.</li>
-<li>Commit ids here are 7-character fingerprints this page computes. Git's own ids are 40-character SHA-1 hashes. The version numbers in requirements.txt (pandas==2.2.3 and the others) are illustrative: they show what an exact pin looks like and are not a recommendation.</li>
+<li>Commit ids here are 7-character fingerprints this page computes. Git's own ids are 40-character SHA-1 hashes, fingerprints computed from each commit's content.</li>
+<li>The version numbers in requirements.txt (pandas==2.2.3 and the others) are illustrative: they show what an exact pin, one required version, looks like and are not a recommendation.</li>
 </ul></div>
 ```
 :::
@@ -181,7 +183,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <dt>Branch</dt><dd>A movable label on a line of commits: a what-if lives on its own branch while main stays as it was.</dd>
 <dt>Halving the history</dt><dd>With one good and one bad commit, check the middle each time: 1,000 commits need at most 10 checks, if every commit after the first bad one also fails.</dd>
 <dt><span class="lx-term" data-term="hidden-state">Hidden state</span></dt><dd>A notebook's memory can be older than its code; only Restart and run all shows the outputs come from the cells as written.</dd>
-<dt>Clean rerun</dt><dd>A fresh clone and a pinned install give the same numbers: the code and inputs reproduce the result, which is not the same as the result being right.</dd>
+<dt>Clean rerun</dt><dd>A fresh clone, installed from exact versions, gives the README's numbers: a check that the project reproduces its expected results on another computer, not that they are right.</dd>
 </dl>
 </div>
 </div>
@@ -203,7 +205,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
   |---|---|
   | main has not moved | moves main's label forward (a fast-forward) |
   | both lines changed | combines them line by line |
-  | both edited the same lines | stops with a conflict for you to resolve |
+  | both made overlapping edits it cannot combine | stops with a conflict for you to resolve |
 
   This page's simulation compares whole files, not lines.
 
@@ -217,7 +219,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 
 - **Tests that run themselves.** Keep the asserts (the balance, totals, a known case) in test files and run them on every commit, on your computer or on a hosted service that runs them for each push.
 - **Notebooks without hidden state.** Execute them from a fresh kernel without a browser (`jupyter nbconvert --to notebook --execute day.ipynb`), or keep the model in `.py` files and let the notebook call and plot.
-- **Exact environments.** A lock file records the exact version of every package, including the ones your packages depend on.
+- **Exact environments.** A lock file records the exact version of every package, including the ones your packages depend on; an isolated environment with a stated Python version keeps the rest of the computer out.
 - **Tag the result.** `git tag v1.0` marks the commit behind a published number, so anyone can return to it.
 - **Where next:** [M1](m01-dispatch-to-lmp.html)'s notebook asserts the browser's prices; [R5](r05-build-validate.html) puts a whole model through planted bugs, a benchmark and a clean-clone rerun.
 
@@ -258,19 +260,19 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <ul class="lx-choices"><li data-value="a">Both edits</li><li data-value="b">Only the first edit</li><li data-value="c">Only the second edit</li><li data-value="d">Nothing</li></ul>
 <details class="lx-answer"><summary>Answer</summary><p>Only the first edit: git add staged that version. The second edit waits in the working folder until you add it too.</p></details>
 </div>
-<div class="lx-qq" data-id="halve" data-answer="b">
-<p class="lx-qtext">Commit 1 of 9 passes the balance check and commit 9 fails it; once the bug appears, every later commit fails. Checking the middle each time, at most how many commits must you check?</p>
-<ul class="lx-choices"><li data-value="a">2</li><li data-value="b">3</li><li data-value="c">4</li><li data-value="d">8</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>3: eight suspects (commits 2 to 9), halved three times, leave one. Checking one by one can take 7.</p></details>
+<div class="lx-qq" data-id="detached" data-answer="b">
+<p class="lx-qtext">You ran git switch --detach to check an old commit, and now run git revert on the bad one. Where does the revert commit go?</p>
+<ul class="lx-choices"><li data-value="a">On main</li><li data-value="b">On the detached HEAD, on no branch: main stays broken</li><li data-value="c">Nowhere: Git refuses</li><li data-value="d">On every branch</li></ul>
+<details class="lx-answer"><summary>Answer</summary><p>On the detached HEAD: no branch label moves. Run git switch main first, as in step 6, so the fix lands on main.</p></details>
 </div>
 </div>
 <div id="k8-drill">
 <div class="lx-card lx-drill"><div class="lx-x-head"><h3>Practice drill</h3></div>
-<p class="lx-hint">With JavaScript on, a drill of seven kinds of item, about two minutes each (fifteen items take about 30 minutes). Three worked items:</p>
+<p class="lx-hint">With JavaScript on, a drill of six kinds of item, about two minutes each (fifteen items take about 30 minutes). Three worked items:</p>
 <!-- k8-drill:start (written by _tests/learn/test_k08-git-notebooks.js in its write mode; do not edit) -->
 <ol class="k8-static-drill">
+<li><p>git status prints: “On branch main / Changes to be committed: /   modified:   README.md / Changes not staged for commit: /   modified:   params.yml”. What does the next git commit record?</p><p><b>Answer: README.md.</b></p><p>Why: Only staged changes go into a commit: README.md. The edit to params.yml waits in the working folder until you run git add params.yml.</p></li>
 <li><p>A commit's diff shows “- gas_cost: 40” and “+ gas_cost: 30” in params.yml. The model makes 1,965 MWh of electricity from gas. What is the day's gas cost after this commit, in $?</p><p><b>Answer: $58,950.</b></p><p>Why: 1,965 MWh × $30/MWh = $58,950 (it was $78,600).</p></li>
-<li><p>Commit 1 of 64 passes the check; commit 64 fails it, and once the bug appears every later commit fails. Checking the middle commit each time, at most how many commits must you check to find the first bad one?</p><p><b>Answer: 6.</b></p><p>Why: 63 suspects; each check halves them: 2^6 = 64 ≥ 63 &gt; 2^5 = 32, so 6 checks.</p></li>
 <li><p>Fresh kernel. Cells: (1) load the day, (2) gas_cost = 40, (3) gas_mwh = … (1,965), (4) gas_mwh * gas_cost. You: run cell 3, run cell 1, run cell 2, run cell 4. What does cell 4 show?</p><p><b>Answer: an error: a name is not defined.</b></p><p>Why: NameError: name 'gas_mwh' is not defined: a cell it needs has not run yet.</p></li>
 </ol>
 <!-- k8-drill:end -->
@@ -299,7 +301,8 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <tr><td class="n">git log --oneline</td><td>The history, one commit per line, newest first.</td></tr>
 <tr><td class="n">git switch -c &lt;name&gt;</td><td>Starts a branch here; git switch &lt;name&gt; moves between branches.</td></tr>
 <tr><td class="n">git restore &lt;file&gt;</td><td>Throws away a file's edits since it was last staged.</td></tr>
-<tr><td class="n">git revert &lt;id&gt;</td><td>Adds a commit that undoes an earlier one.</td></tr>
+<tr><td class="n">git switch --detach &lt;id&gt;</td><td>Visits an old commit on no branch; git switch main comes back before you commit.</td></tr>
+<tr><td class="n">git revert &lt;id&gt;</td><td>Adds a commit that undoes an earlier one, on the branch you are on.</td></tr>
 <tr><td class="n">git clone &lt;source&gt;</td><td>Makes a fresh copy of a project with its whole history.</td></tr>
 </tbody>
 </table>

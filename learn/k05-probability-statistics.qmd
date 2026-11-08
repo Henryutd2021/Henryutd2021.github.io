@@ -78,7 +78,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 </div>
 <ol>
 <li>A histogram counts hours per bin: with 1-point bins, 74% of the 2,716 hours lie from −2% up to +3%; the errors run from −8.3% to +9.8%.</li>
-<li>Centre: mean +0.8%, median +0.7%. Demand came in above the forecast in 61% of hours.</li>
+<li>Center: mean +0.8%, median +0.7%. Demand came in above the forecast in 61% of hours.</li>
 <li>Spread: standard deviation 2.45 points; mean ± 1 SD, from −1.65% to +3.25%, holds 72% of hours; the quartiles are −0.8% and +2.2%.</li>
 <li>Chance by counting: 134 of 2,716 hours, 4.9%, had demand more than 5% above the forecast.</li>
 <li>Nominal intervals from percentiles: 50% from −0.8% to +2.2%; 80% from −2.1% to +3.8% (lesson 4's band); 95% from −3.5% to +6.2%. Hours tied at the ends make them hold 51.3%, 81.1% and 95.0%.</li>
@@ -144,7 +144,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-fallback">
 <dl class="lx-ideas">
 <dt>Histogram</dt><dd>Hours counted per bin of error; the bin width changes how jagged it looks, not the data.</dd>
-<dt>Mean and median</dt><dd>Two centres: the average, pulled by every value, and the middle value, which a few wild values barely move.</dd>
+<dt>Mean and median</dt><dd>Two centers: the average, pulled by every value, and the middle value, which a few wild values barely move.</dd>
 <dt>Standard deviation, quartiles</dt><dd>Two spreads: a typical distance from the mean, and the range of the middle half.</dd>
 <dt>Percentile and interval</dt><dd>The value a given share of hours stays at or below; two of them bound an interval.</dd>
 <dt>Probability as a share</dt><dd>Count the hours where the event happened and divide by all hours; with few hours, the share is rough.</dd>
@@ -165,8 +165,10 @@ body-classes: "page-learn page-lesson lx-form-cards"
 - **Mean.** $\bar e = \frac{1}{n}\sum_{i=1}^{n} e_i$, where $e_i$ is hour $i$'s error in % and $n = 2716$ hours.
 - **Standard deviation.** $s = \sqrt{\frac{1}{n}\sum_{i=1}^{n} (e_i - \bar e)^2}$, in percentage points. Dividing by $n - 1$, as many tools do, gives 2.4533 points against 2.4528: with this many hours the choice hardly matters.
 - **Percentile.** Sort the errors and write the share as a fraction $p$ ($p = 0.9$ for the 90th percentile). The percentile sits at position $(n - 1)\,p$ counting from 0, between two neighbours when that is not a whole number.
-- **How sure a share is.** Draw $m$ hours at random and find the share $\hat p$ above +5%. It scatters by about $\sqrt{\hat p\,(1 - \hat p)/m}$, its [standard error]{.lx-term term="standard-error"}: for $\hat p$ = 4.9%, 6.8 points for $m$ = 10 hours, 2.2 for 100 and 0.7 for 1,000.
-- **Two standard errors.** For large samples, about 95% of estimates land within two standard errors. With 10 hours the rule is rough: the share can only be 0%, 10%, 20% and so on.
+- **How sure a share is.** All 2,716 hours have the share $p = 134/2716$, 4.9%, above +5%. Across repeated random samples of $m$ hours, the sample share scatters around $p$ by about $\sqrt{p\,(1 - p)/m}$, its [standard error]{.lx-term term="standard-error"}; times 100, it is in percentage points.
+- **The scatter by sample size.** 6.8 points for $m$ = 10 hours, 2.2 for 100 and 0.7 for 1,000.
+- **Two standard errors.** For large samples, about 95% of estimates land within two standard errors. A sample of 100 hours with 9% above: 4.9% + 2 × 2.2 ≈ 9.3%, so 9% is within two standard errors.
+- **Small samples.** With 10 hours the rule is rough: the share can only be 0%, 10%, 20% and so on.
 - **Draws with replacement.** Each draw can pick any hour, even one already drawn, so the draws are independent with the same chances. Real hours in a row may move together, which this sampling leaves out.
 
 ```{=html}
@@ -177,10 +179,8 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-deeper-body">
 ```
 
-- **Monte Carlo.** Draw a model's uncertain inputs from their distributions, run the model each time, and read percentiles of the result (Modeler lesson [M7](m07-monte-carlo.html)).
-- **Scenarios with chances.** A stochastic program is an optimization model that plans against several scenarios at once, weighted by their chances, to minimise expected cost: step 8's expected value inside a model ([M8](m08-stochastic-robust.qmd)).
-- **Surrogates.** A surrogate is a fast stand-in fitted to a slow model's runs. One kind, a Gaussian-process model, gives each prediction a mean and a standard deviation ([M9](m09-surrogates-uq.qmd)).
-- **Draw together what moves together.** Sample whole hours or days, so demand, wind and outages keep their joint behaviour; drawing each input separately assumes independence.
+- **Where these ideas go next.** Running a model on many random draws of its inputs: Modeler lesson [M7](m07-monte-carlo.html). Planning against scenarios weighted by their chances: [M8](m08-stochastic-robust.html). Fast stand-ins for slow models, each prediction with its own spread: [M9](m09-surrogates-uq.html).
+- **Draw together what moves together.** Sample whole hours or days, so demand, wind and outages keep their joint behavior; drawing each input separately assumes independence.
 
 ```{=html}
 </div>
@@ -207,7 +207,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <details class="lx-answer"><summary>Answer</summary><p>Myth, as a general rule. The product holds only if the outages are independent; a shared cause makes both-out hours more common.</p></details>
 </div>
 <div class="lx-qq" data-id="wild" data-answer="fact">
-<p class="lx-qtext">Myth or fact? “One wildly wrong reading moves the median less than the mean.”</p>
+<p class="lx-qtext">Myth or fact? “Adding one +100% reading to these 2,716 hours moves the median less than the mean.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
 <details class="lx-answer"><summary>Answer</summary><p>Fact. Adding one +100% reading to these hours moves the mean by +0.04 points and the median by 0.</p></details>
 </div>
@@ -222,7 +222,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-qq" data-id="sample" data-answer="b">
 <p class="lx-qtext">A random sample of 100 of these hours has 9% above +5%; all 2,716 hours have 4.9%. The best reading?</p>
 <ul class="lx-choices"><li data-value="a">The forecast got worse</li><li data-value="b">A share from 100 hours is rough; 9% is within its usual scatter</li><li data-value="c">9% is the true chance</li><li data-value="d">Samples cannot tell you anything</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Rough: with 100 hours the standard error is about 2.2 points, and 4.9% + 2 × 2.2 ≈ 9.3%, so 9% is within two standard errors.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Rough. Step 6 showed shares from 100 hours scattering by several points from sample to sample, so one sample at 9% is no sign the forecast changed. Go deeper · Analyst puts a number on that scatter.</p></details>
 </div>
 </div>
 <div id="k5-drill"></div>

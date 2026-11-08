@@ -94,7 +94,8 @@ if (process.argv.includes("--fallback")) { console.log(fallbackSVG(s)); process.
   has("90 MW the combined-cycle plant made at 18:00 are illustrative", "the illustrative label on the 18:00 assumption");
   has("3 September 2025", "the named day");
   // Go deeper: A x <= b is a short preview with one symbolic line and a link to B1 (curriculum 4.6); K6 is upcoming
-  has("the rows stack into $A x \\le b$", "the one symbolic line of the preview"); has("[Bridge B1](b01-algebra-to-lp.html)", "the forward link to B1");
+  has("the rows stack into $A\\mathbf{z} \\le b$", "the one symbolic line of the preview"); has("collect both outputs in a vector $\\mathbf{z} = (x, y)$", "the vector of both outputs is named, so x stays one plant's output");
+  has("Why a linear equation in two unknowns draws a straight line", "the Analyst heading says it is about a linear equation"); has("[Bridge B1](b01-algebra-to-lp.html)", "the forward link to B1");
   ok(QMD.indexOf("pmatrix") < 0, "the preview shows no full matrix");
   has("keeps the line $x = 130$ and everything to its left", "an inequality is not a line: its boundary is");
   has("with $a_1$ and $a_2$ not both 0", "the general rule excludes both coefficients zero");
@@ -104,10 +105,13 @@ if (process.argv.includes("--fallback")) { console.log(fallbackSVG(s)); process.
   has("the extra is matched by spilling wind or sun", "the fallback states the spill");
   ok(JS.indexOf("how fast the plant can drop is left out here") > 0 && QMD.indexOf("The ramp rule limits only the climb from 90 MW") > 0, "ramp: upward only, said in the text version and the fallback");
   // interaction: the displayed sign counts, the counts are shown, x >= 0 and y >= 0 are fixed
+  ok(/sides\.above && sides\.below \? null : "move the test plan to the other side of the line/.test(JS) && !/moved >= 1/.test(JS), "step 4: Next waits for the test plan on both sides of the line, not any move");
+  ok(/<b>Why “at least”\.<\/b> Wind and solar can be turned down, so gas may make more than " \+ s\.need/.test(JS) && /Why “at least”[^\n]+\n\s+var right = \{\}, list = H\("div", \{ class: "k4-words" \}/.test(JS), "step 3: extra gas is explained above the sentences, before the first ≥ rule");
+  ok(/Some \[\[solver\|solvers\]\], the programs that find a model's best plan, take every inequality as ≤/.test(JS) && !/\(B1 uses it\)/.test(JS), "step 5: solver is defined and marked at its first use");
   ok(/tried = \{ ">=": 1 \}/.test(JS) && /Still to do: /.test(JS) && /Positions tried: /.test(JS) && /Slide x to four positions/.test(JS), "steps 2 and 4: what Next waits for is said and counted");
   ok(/Always on: x ≥ 0, y ≥ 0/.test(JS) && !/\[lim\[2\], "x ≥ 0"\]/.test(JS), "step 6: x ≥ 0 and y ≥ 0 are fixed, not switches");
   ok(/start: \{ t: "a·x \+ m ≤ n", s: "a ≠ 0"/.test(JS) && /Spot-check one value/.test(JS) && /a is not 0/.test(JS), "flowchart: a ≠ 0, and one value is a spot-check");
-  ok(/One common solver form writes every inequality one way round/.test(JS) && !/Solvers store every rule/.test(JS), "step 5: ≤ is one convention, not how every solver stores rules");
+  ok(/Some \[\[solver\|solvers\]\]/.test(JS) && !/Solvers store every rule/.test(JS), "step 5: ≤ is what some solvers take, not how every solver stores rules");
   // quick questions
   const pass = (x, y) => x <= 130 && x + y >= 145;
   ok(!pass(120, 20) && pass(130, 15) && !pass(140, 10) && !pass(100, 40), "quiz: only (130, 15) passes both rules");
@@ -128,6 +132,10 @@ if (process.argv.includes("--fallback")) { console.log(fallbackSVG(s)); process.
     ok(t.path[3] === (e.a < 0 ? "flip" : "keep"), `trace ${t.label}: the flowchart path flips only for a negative a`);
   });
   ok(/traces\(\)\.map/.test(JS), "explain: the flowchart's traces come from traces()");
+  // the no-JS explain carries the same procedure and the same two worked examples
+  const a = QMD.indexOf("<!-- k4-traces:start"), b = QMD.indexOf("<!-- k4-traces:end -->"), lis = (QMD.slice(a, b).match(/<li>[^<]*<\/li>/g) || []).map(l => l.slice(4, -5));
+  ok(a > 0 && b > a && lis.length === 2 && lis.every((l, i) => l === T[i].label + ": " + T[i].text.replace(/\*\*/g, "")), "fallback: the two worked examples equal traces(): " + lis.join(" | "));
+  ok(/Move m across: a·x ≤ n − m\./.test(QMD) && /Then divide by a and flip the sign: x ≥ \(n − m\) \/ a\. If not, divide by a: x ≤ \(n − m\) \/ a\./.test(QMD), "fallback: the procedure of the flowchart, in order");
 }
 
 // ---------------- drill items
@@ -138,7 +146,13 @@ if (process.argv.includes("--fallback")) { console.log(fallbackSVG(s)); process.
     if (it.kind === "solve") { const m = /Solve (\d+)x \+ (\d+) = (\d+)/.exec(it.q); ok(+m[1] * it.answer + +m[2] === +m[3], `drill ${i}: solve answer`); }
     if (it.kind === "flip") { const m = /−(\d+)x ≤ (\d+)/.exec(it.q), a = +m[1], b = +m[2]; ok(it.choices[it.answer] === "x ≥ −" + (b / a), `drill ${i}: flip answer`); ok(-a * (-b / a) <= b + 1e-9 && -a * (-b / a - 1) > b, `drill ${i}: flip boundary`); }
     if (it.kind === "test") { const m = /x = (\d+), y = (\d+) pass x \+ y (≤|≥) (\d+)/.exec(it.q), v = +m[1] + +m[2], c = +m[4]; ok((it.answer === 0) === (m[3] === "≤" ? v <= c : v >= c), `drill ${i}: test answer`); }
-    if (it.kind === "words") ok(["≤", "≥", "="][it.answer] && it.why.indexOf(["≤", "≥", "="][it.answer]) > 0, `drill ${i}: words answer`);
+    if (it.kind === "words") {
+      const sign = ["≤", "≥", "="][it.answer], m = /^“(.+) (\d+) MW\.” Which sign\?$/.exec(it.q);
+      ok(sign && it.why.indexOf(sign) > 0 && m, `drill ${i}: words answer`);
+      // the sentence says what it means: a cap on a flow or output is ≤, a floor or a need is ≥; never "can carry"
+      const exp = /at most|no more than|must not exceed/.test(m[1]) ? "≤" : /at least|no less than|must not fall below/.test(m[1]) ? "≥" : /exactly/.test(m[1]) ? "=" : null;
+      ok(exp === sign && !/can carry/.test(m[1]) && !/carry must|can carry must/.test(it.q), `drill ${i}: the sentence reads as its sign: ${it.q} → ${sign}`);
+    }
   });
   ok(new Set(items.map(i => i.kind)).size === 5, "drill: all five kinds appear");
 }

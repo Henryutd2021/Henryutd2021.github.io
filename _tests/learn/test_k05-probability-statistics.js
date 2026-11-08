@@ -28,7 +28,7 @@ function fallback() {
   const L = S.levels;
   const facts = [
     `A histogram counts hours per bin: with 1-point bins, ${share(S.mid, 0)} of the ${int(S.n)} hours lie from −2% up to +3%; the errors run from ${pct(S.min)} to ${pct(S.max)}.`,
-    `Centre: mean ${pct(S.mean)}, median ${pct(S.median)}. Demand came in above the forecast in ${share(S.pos, 0)} of hours.`,
+    `Center: mean ${pct(S.mean)}, median ${pct(S.median)}. Demand came in above the forecast in ${share(S.pos, 0)} of hours.`,
     `Spread: standard deviation ${S.sd.toFixed(2)} points; mean ± 1 SD, from ${pct(S.lo1sd, 2)} to ${pct(S.hi1sd, 2)}, holds ${share(S.in1sd, 0)} of hours; the quartiles are ${pct(S.q25)} and ${pct(S.q75)}.`,
     `Chance by counting: ${int(S.above)} of ${int(S.n)} hours, ${share(S.aboveShare)}, had demand more than 5% above the forecast.`,
     `Nominal intervals from percentiles: 50% from ${pct(L["50"].lo)} to ${pct(L["50"].hi)}; 80% from ${pct(L["80"].lo)} to ${pct(L["80"].hi)} (lesson 4's band); 95% from ${pct(L["95"].lo)} to ${pct(L["95"].hi)}. Hours tied at the ends make them hold ${share(L["50"].n / S.n)}, ${share(L["80"].n / S.n)} and ${share(L["95"].n / S.n)}.`,
@@ -167,9 +167,18 @@ function sgn2(v) { return K.sgn(v, 2); }
   has("($p = 0.9$ for the 90th percentile). The percentile sits at position $(n - 1)\\,p$", "the percentile rank uses p as a fraction");
   ok(K.quantile(K.errors(fc), 0.9) === S.levels["80"].hi, "the percentile rule with p = 0.9 gives the 80% interval's upper end");
   inJS("Each draw picks one of the \" + N + \" hours at random, so an hour can repeat. This shows how samples scatter, not how next winter will differ.", "the sampling card says draws repeat and what the scatter is not");
-  has("A stochastic program is an optimization model"); has("A surrogate is a fast stand-in"); has("where p and q are their separate chances");
+  has("where p and q are their separate chances");
+  { const mod = QMD.slice(QMD.indexOf("Go deeper · Modeler"), QMD.indexOf("</details>", QMD.indexOf("Go deeper · Modeler")));
+    ok(!/stochastic program|Gaussian|surrogate is/i.test(mod) && /\[M7\]\(m07-monte-carlo\.html\)/.test(mod) && /\[M8\]\(m08-stochastic-robust\.html\)/.test(mod) && /\[M9\]\(m09-surrogates-uq\.html\)/.test(mod), "Modeler preview: short pointers to M7 to M9, no stochastic-program or Gaussian-process teaching"); }
+  has("All 2,716 hours have the share $p = 134/2716$, 4.9%, above +5%. Across repeated random samples of $m$ hours, the sample share scatters around $p$", "the standard error uses the full list's share p, not a sample's");
+  ok(!/\\hat p/.test(QMD), "the standard error is not written with a sample share");
   // the view's strings
-  inJS("Mean ± 1 SD"); inJS("Find the threshold that only 1 hour in 20 (5%) exceeds"); inJS("Draw 20 random samples of 10, 100 and 1,000 hours");
+  inJS("Mean ± 1 SD"); inJS("Find a threshold that about 1 hour in 20 (about 5%) exceeds");
+  ok(/api\.saw\("Above " \+ pct\(t\) \+ ": " \+ int\(c\) \+ " of " \+ N \+ " hours, " \+ share\(f\) \+ ", about 1 in 20\./.test(JS), "step 4: the success message reports the reader's own threshold, count and share");
+  [4.9, 5, 5.1].forEach(t => { const c = K.countAbove(K.errors(fc), t), f = c / 2716; ok(f >= 0.045 && f <= 0.055, `step 4: +${t}% is accepted (${c} hours, ${share(f)}) and is what the message then says`); });
+  inJS("Bin width, percentage points"); inJS("A percentage point is the gap between two percentages");
+  ok(JS.indexOf("Bin width, percentage points") < JS.indexOf("Spreads are in <b>percentage points</b>"), "step 1 explains percentage points before step 3 uses them");
+  inJS("(one [[standard-error|standard error]])"); inJS("Draw 20 random samples of 10, 100 and 1,000 hours");
   ok(K.SIZES.join() === "10,100,1000" && K.REPS === 20 && K.THRESH === 5 && K.PLANT_P === 0.05 && K.WILD === 100, "view constants: sample sizes, 20 samples, +5%, 5%, +100%");
   inJS("[[normal-distribution|normal (Gaussian) distribution]] puts about 68% of values within 1 SD");
   ok(!/bell-shaped curve would/.test(JS), "the 68% rule names the normal distribution");
@@ -188,6 +197,8 @@ function sgn2(v) { return K.sgn(v, 2); }
   ok(9 <= 100 * S.aboveShare + 2 * 100 * S.se[1], "quiz: 9% in a sample of 100 lies within two standard errors of 4.9%");
   // the myths
   has("moves the mean by +0.04 points and the median by 0", "the wild-reading myth");
+  has("“Adding one +100% reading to these 2,716 hours moves the median less than the mean.”", "the myth names its dataset and its reading");
+  has("Step 6 showed shares from 100 hours scattering by several points from sample to sample", "the core quiz answer is qualitative (the number is in Go deeper)");
   // scope
   ok(!/nuclear|reactor|\bSMR\b/i.test(QMD + JS), "scope: no nuclear wording");
   ok(!/data[- ]cent/i.test(QMD + JS), "scope: no data centers");
@@ -229,7 +240,8 @@ function sgn2(v) { return K.sgn(v, 2); }
       ok(v[1] + v[3] + v[5] === 100 && v[1] > 0 && v[3] > 0 && v[5] > 0 && near(it.answer, (v[0] * v[1] + v[2] * v[3] + v[4] * v[5]) / 100, 1e-9) && it.why.indexOf(String(it.answer) + " MW") >= 0, `drill ${seed}/${i}: ev ${it.q} -> ${it.answer}`);
     }
     if (it.kind === "sample") {
-      const m = /Sample 1: ([\d,]+) hours, ([\d,]+) of them above \(([\d.]+)%\)\. Sample 2: ([\d,]+) hours, ([\d,]+) of them above \(([\d.]+)%\)/.exec(it.q);
+      const m = /sample 1, ([\d,]+) hours, ([\d,]+) of them above \(([\d.]+)%\); sample 2, ([\d,]+) hours, ([\d,]+) of them above \(([\d.]+)%\)\. Which share is more trustworthy\?$/.exec(it.q);
+      ok(m && it.q.split(/(?<=[.?!])\s+(?=[A-Z])/).length <= 2 && it.q.split(/\s+/).length <= 36, `drill ${seed}/${i}: the sample question is two sentences, at most 36 words`);
       const v = m ? m.slice(1).map(t => +t.replace(/,/g, "")) : [];
       ok(m && it.answer === (v[0] > v[3] ? 0 : 1), `drill ${seed}/${i}: the bigger sample`);
       ok(m && [0, 3].every(j => Number.isInteger(v[j + 1]) && v[j + 1] >= 0 && v[j + 1] <= v[j] && near(100 * v[j + 1] / v[j], v[j + 2], 1e-9)), `drill ${seed}/${i}: each share is a whole number of hours out of its sample: ${it.q}`);
@@ -245,7 +257,11 @@ function sgn2(v) { return K.sgn(v, 2); }
   ok(by.below0.answer === 36.9 && K.countBelow(x, 0) === K.countIn(x, -9, -0.1), "task 1: below 0% = 36.9%, the range −9.0% to −0.1%");
   ok(by.within2.answer === 63 && by.within2.how.indexOf("63.0%") > 0, "task 2: within ±2% = 63.0%");
   ok(by.below5.answer === 27 && K.countIn(x, -9, -5.1) === 27 && x[0] >= -9, "task 3: 27 hours more than 5% below; the explorer's −9.0% floor holds every hour");
-  ok(by.p99.answer === 8 && K.countIn(x, -100, 8.0) / x.length >= 0.99 && K.countIn(x, -100, 7.7) / x.length < 0.99, "task 4: the 99th percentile +8.0% (the explorer reaches 99% at +8.0%, not at +7.7%)");
+  ok(by.p99.answer === 8 && K.countIn(x, -100, 8.0) / x.length >= 0.99 && K.countIn(x, -100, 7.9) / x.length < 0.99, "task 4: the 99th percentile +8.0% (the explorer reaches 99% at +8.0%, not at +7.9%)");
+  { const NA = require(path.join(SITE, "assets/learn/components/numanswer.js")), okv = v => NA.close(v, by.p99.answer, by.p99.tol);
+    ok(okv(8) && okv(8.0) && !okv(7.9) && !okv(8.1) && !okv(7.8) && !okv(8.2), "task 4: only +8.0% is accepted at one decimal (7.8, 7.9, 8.1 and 8.2 are not)"); }
+  ok(by.p99.how === "The lowest upper end with at least 99% of hours at or below it: +8.0% (99.01%; one step lower, 98.97%).", "task 4: the worked answer shows enough precision to tell +7.9% from +8.0%: " + by.p99.how);
+  ok(/share\(at \/ n, 2\)/.test(JS), "explorer: the at-or-below share has two decimals");
   ok(x[x.length - 1] <= 10, "explorer: its +10% ceiling holds every hour");
 }
 

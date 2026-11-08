@@ -82,7 +82,7 @@ const has = (str, msg) => ok(QMD.indexOf(str) >= 0, "page states " + (msg || JSO
   const d10 = L10.dayOf(TOWN, YEAR);
   ok(M.spill === 86 && M.spill === d10.wind[19] + d10.solar[19], "toy model: 86 MW of wind and sun could be spilled at 19:00, as lesson 10");
   ok(s.target.join() === "130,100" && K.onlyFails(M, s.target, "co2") && near(s.targetCo2, 103.1, 1e-9) && s.targetExtra === 85 && s.targetExtra <= M.spill, "step 6: the example (130, 100) fails only the CO2 row (103.1 t), its 85 MW extra within the spill limit");
-  ok(T.fail(s.target) === "x = (130, 100) passes cover and both sizes but emits 103.1 t: only the CO₂ row fails. Its 85 MW extra would be spilled as wind and sun (lesson 10)." && /Its 105 MW extra exceeds the 86 MW that could be spilled, a limit left out here\./.test(T.fail([150, 100])), "step 6: the message says where a plan's extra goes, or that the toy model lets it pass");
+  ok(T.fail(s.target) === "x = (130, 100) passes cover and both sizes but emits 103.1 t: only the CO₂ row fails. Its 85 MW of extra gas means [[curtailment|curtailing]], turning down, 85 MW of wind and sun (lesson 10)." && /Its 105 MW extra gas exceeds the 86 MW of wind and sun, a limit left out here\./.test(T.fail([150, 100])) && !/spill/i.test(T.fail(s.target) + T.fail([150, 100])), "step 6: the message says where a plan's extra goes, or that the toy model lets it pass");
   ok(/autos\[5\] = function \(\) \{ sl\.set\(s\.target\)/.test(JS), "step 6: the shortcut sets the example within the spill limit");
   // nonnegativity: the four rows let (150, −5) pass; the sliders stop at 0, and the page says so
   ok(K.check(M, [150, -5]).every(r => r.pass) && /min: 0, max: 160/.test(JS) && /min: 0, max: 120/.test(JS) && /Outputs cannot be negative, x₁ ≥ 0 and x₂ ≥ 0: the sliders stop at 0/.test(QMD) && /hint: T\.nonneg/.test(JS) && /text: T\.nonneg/.test(JS), "nonnegativity: stated in the data note, step 6 and the explain layer; the sliders enforce it");
@@ -96,14 +96,20 @@ const has = (str, msg) => ok(QMD.indexOf(str) >= 0, "page states " + (msg || JSO
 {
   has("x = (x₁, x₂) = (100, 45) is 100 MW from the <span class=\"lx-term\" data-term=\"combined-cycle\">combined-cycle plant</span> and 45 MW from the <span class=\"lx-term\" data-term=\"peaker\">peaker</span>; (45, 100) is a different plan.");
   has("Each output lasts one hour (100 MW × 1 h = 100 MWh), so the cost is a dot product: c · x = 40 × 100 + 100 × 45 = 8,500 dollars.");
-  ok(T.hour === "Each output runs one hour: 100 MW × 1 h = 100 MWh, so dollars per MWh times MW gives dollars for the hour." && /H\("p", \{ class: "lx-hint", text: T\.hour \}, act\)/.test(JS), "units: step 2 says each output runs one hour");
+  ok(T.hour === "Each output runs one hour: 100 MW × 1 h = 100 MWh, and dollars per MWh times MWh gives dollars for the hour." && /H\("p", \{ class: "lx-hint", text: T\.hour \}, act\)/.test(JS), "units: step 2 says each output runs one hour");
   has("A x is every row's dot product with x: (145, 100, 45, 61.75), one number per rule.");
   has("Multiplying the cover row by −1 turns x₁ + x₂ ≥ 145 into −x₁ − x₂ ≤ −145, so every row reads ≤.");
   has("(130, 100) supplies at least the 145 MW and fits both plants, but emits 103.1 t, so only the CO₂ row fails.");
-  has("Lesson 11's day, as its solver stores it, is 72 rows × 96 columns, 24 of the rows equalities; only 190 of its 6,912 entries are not zero.");
+  has("A is 4 × 2 here. Lesson 11's day has 4 decisions in each of 24 hours, so 96 columns.");
+  has("As lesson 11's <span class=\"lx-term\" data-term=\"solver\">solver</span> stores that day, it has 72 rows, 24 of them equalities; only 190 of its 6,912 entries are not zero.");
   has("The count depends on the form. Lesson 11's day, as stored, has 72 rows, 24 of them equalities; strictly as A x ≤ b, each becomes two rows: 96 rows, 286 non-zero entries.");
   has("Lesson 11's day as its solver stores it, 24 of the rows equalities; 190 entries are not zero.");
-  has("A toy model, as lesson 10's chart: the cover rule asks for at least 145 MW. Extra gas would be spilled as wind and sun, at most 86 MW at 19:00, a limit left out here.");
+  has("A toy model, as in lesson 10: the cover rule asks for at least 145 MW. Extra gas means <span class=\"lx-term\" data-term=\"curtailment\">curtailing</span> as much wind and sun, at most 86 MW at 19:00, a limit left out here.");
+  ok(!/spilled|spilling/.test(QMD.replace(/<!--[\s\S]*?-->/g, "")) && !/spilled|spilling/.test(JS.replace(/^\s*\/\/.*$/gm, "")), "curtailment: extra gas turns wind and sun down; nothing is 'spilled as wind and sun'");
+  ok(!/Solvers often want/.test(JS) && /We write every rule with ≤, so the four rows share one form/.test(JS), "step 5: ≤ is this page's chosen form, not a solver requirement (HiGHS takes row bounds)");
+  ok(/their limits form a vector b\./.test(JS) && /st\.b \? "Limit b" : ""/.test(JS), "step 3: b is introduced with the matrix, and its column is labelled Limit b");
+  ok(T.size === "4 decisions × 24 hours = 96 columns: one per decision in each hour, as here." && /^Rows and zeros: /.test(T.sizeRows), "step 7: the feedback counts columns; rows and zeros are their own labelled element");
+  ok(/hint: T\.nonneg\n/.test(JS) && /H\("p", \{ class: "lx-hint", text: "Building these arrays in code comes later, in B2 and M1\." \}, eqHost\)/.test(JS), "explain: the nonnegativity hint and the coding pointer are separate elements");
   has("running costs ($40 and $100 per MWh, 2025 dollars)");
   has("Lessons 10 and B1 call the two outputs x and y; here they are x₁ and x₂, the entries of the plan vector x.");
   has("the first costs 8,500 dollars, the second 11,800"); has("x + y ≥ 145 and −x − y ≤ −145 pass exactly the same plans.");
@@ -148,7 +154,9 @@ const has = (str, msg) => ok(QMD.indexOf(str) >= 0, "page states " + (msg || JSO
 function normCalc(str) { let t = String(str).replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1").replace(/[−–]/g, "-").replace(/\$/g, ""); while (/(\d),(\d{3})/.test(t)) t = t.replace(/(\d),(\d{3})/g, "$1$2"); return t; }
 function evalSide(side) { const e = side.replace(/×/g, "*").replace(/÷/g, "/"); if (!/^[\d.\s()+\-*/]+$/.test(e)) return null; try { const v = Function('"use strict"; return (' + e + ");")(); return isFinite(v) ? v : null; } catch (err) { return null; } }
 {
-  const msgs = { plan: T.plan, hour: T.hour, cost: T.cost, rows: T.rows, co2: T.co2, flip: T.flip, fail: T.fail(s.target), fail2: T.fail([150, 100]), nonneg: T.nonneg, size: T.size };
+  const msgs = { plan: T.plan, hour: T.hour, cost: T.cost, rows: T.rows, co2: T.co2, flip: T.flip, fail: T.fail(s.target), fail2: T.fail([150, 100]), nonneg: T.nonneg, size: T.size, sizeRows: T.sizeRows,
+                 now1: T.now([100, 45]), now2: T.now([60, 40]), now3: T.now([130, 100]) };
+  ok(T.now([100, 45]) === "x = (100, 45) passes every row, at 61.75 t of CO₂." && T.now([60, 40]) === "x = (60, 40) fails the cover row." && T.now([130, 100]) === T.fail([130, 100]) && T.now([155, 120]) === "x = (155, 120) fails the combined-cycle size and peaker size and CO₂ rows.", "step 6: the after-success message describes the current plan: " + T.now([155, 120]));
   Object.keys(msgs).forEach(k => { const w = msgs[k].replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1").split(/\s+/).filter(Boolean).length; ok(w <= 36, `budget: message ${k} is ${w} words (≤ 36)`); });
   let calc = 0;
   const runCalc = (label, str) => (normCalc(str).match(/[\d.()+\-× ]+=[ \d.\-]+/g) || []).forEach(run => { const [L, R0] = run.split("="), R = R0.trim().replace(/\.$/, ""); const lv = evalSide(L.trim()); if (lv !== null && /^-?[\d.]+$/.test(R)) { calc++; ok(Math.abs(lv - +R) < 1e-6, `${label}: ${run.trim()}`); } });
@@ -222,6 +230,15 @@ function evalSide(side) { const e = side.replace(/×/g, "*").replace(/÷/g, "/")
     demo.cards.go(3);
     const rows = card().querySelectorAll("button").filter(b => /k6-row/.test(b.getAttribute("class") || ""));
     ok(rows.length === 4 && rows[3].getAttribute("aria-label") === "CO₂ cap row: 0.37 times x₁ plus 0.55 times x₂, not worked out yet, at most 100 t of CO₂.", "stub: step 4's matrix rows carry their spoken names (" + (rows[3] && rows[3].getAttribute("aria-label")) + ")");
+    // step 6: reach a CO2-only failure, then move back inside: the feedback follows the plan
+    demo.cards.go(5);
+    const btn = re => card().querySelectorAll("button").filter(b => re.test(b.getAttribute("aria-label") || b.textContent))[0];
+    const saw = () => (card().querySelector(".lx-saw") || { textContent: "" }).textContent;
+    const upX = btn(/^Raise x₁/), downX = btn(/^Lower x₁/), upY = btn(/^Raise x₂/), downY = btn(/^Lower x₂/);
+    for (let i = 0; i < 6; i++) upX.click(); for (let i = 0; i < 11; i++) upY.click();   // (100, 45) → (130, 100)
+    ok(/only the CO₂ row fails/.test(saw()) && /103\.1 t/.test(saw()), "stub: (130, 100) fails only the CO₂ row: " + saw());
+    for (let i = 0; i < 6; i++) downX.click(); for (let i = 0; i < 11; i++) downY.click();   // back to (100, 45)
+    ok(/x = \(100, 45\) passes every row, at 61\.75 t of CO₂/.test(saw()) && !/103\.1/.test(saw()), "stub: back at (100, 45), the feedback says every row passes: " + saw());
   } catch (e) { ok(false, "stub: the page test threw: " + (e && e.stack || e)); }
 }
 

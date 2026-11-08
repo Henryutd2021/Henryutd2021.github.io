@@ -8,7 +8,7 @@ glossary:
   - {id: gigawatt, term: "Gigawatt (GW)", def: "A thousand megawatts, a rate of energy flow used for large plants, whole fleets and national demand."}
   - {id: battery-duration, term: "Battery duration", def: "How many hours a battery can discharge at its rated power: its energy in MWh divided by its power in MW."}
   - {id: voltage, term: "Voltage", def: "The electrical push that drives current through a wire, measured in volts (V); 1 kilovolt (kV) is 1,000 V."}
-  - {id: reactive-power, term: "Reactive power", def: "The part of alternating-current power that does no net work but holds voltage up; it is supplied and absorbed locally."}
+  - {id: reactive-power, term: "Reactive power", def: "The part of alternating-current power that flows back and forth and does no net work; supplying or absorbing it locally helps keep voltage within safe limits."}
 requests:
   - "Field Notes link: the scope scan flags ../field-notes/briefings.html as an internal link outside learn/, so the page names Field Notes in plain text only. A link would need field-notes/ on the scan's internal allow-list."
   - "No-JS fallback of learn/n01-news-lens.qmd, both generated from assets/learn/data/n01-news-lens.json and checked by the test: the stories and notes (fallback markers) by the lesson's fallback build step; the worked checks, spotter answers and ladder placements (fallback-checks markers) by node _tests/learn/test_n01-news-lens.js --write. Run both after a data edit."

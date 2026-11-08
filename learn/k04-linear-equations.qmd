@@ -111,6 +111,18 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <dt>Flip rule</dt><dd>Multiplying or dividing both sides by a negative number flips the sign.</dd>
 <dt>Feasible region</dt><dd>The plans that pass every rule at once.</dd>
 </dl>
+<p class="lx-eyebrow">Solve a linear inequality a·x + m ≤ n, with a not 0</p>
+<ol>
+<li>Move m across: a·x ≤ n − m.</li>
+<li>Is a negative? Then divide by a and flip the sign: x ≥ (n − m) / a. If not, divide by a: x ≤ (n − m) / a.</li>
+<li>Spot-check one value (it checks the arithmetic, not the whole solution set).</li>
+</ol>
+<!-- k4-traces:start (the explain layer's two worked examples, from traces(); the test checks they agree) -->
+<ul>
+<li>2x + 10 ≤ 50: 2x ≤ 40, so x ≤ 20. Spot-check x = 10: 2 × 10 + 10 = 30 ≤ 50.</li>
+<li>−2x ≤ 6: Divide by −2 and flip: x ≥ −3. Spot-check x = 0: −2 × 0 = 0 ≤ 6.</li>
+</ul>
+<!-- k4-traces:end -->
 </div>
 </div>
 ```
@@ -118,7 +130,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 ```{=html}
 <div class="lx-deepers">
 <details class="lx-deeper">
-<summary><span class="k">Go deeper · Analyst</span>Why a rule with two unknowns is a straight line</summary>
+<summary><span class="k">Go deeper · Analyst</span>Why a linear equation in two unknowns draws a straight line</summary>
 <div class="lx-deeper-body">
 ```
 
@@ -138,7 +150,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 
 - **Decisions:** the two outputs, $x$ and $y$.
 - **Rules:** each of step 6's five inequalities becomes one row of a table, all written as ≤ (the ≥ rules flipped).
-- **In one line:** the rows stack into $A x \le b$, with $A$ holding the numbers in front of $x$ and $y$, and $b$ the limits.
+- **In one line:** collect both outputs in a vector $\mathbf{z} = (x, y)$, a list of numbers; the rows stack into $A\mathbf{z} \le b$, with $A$ holding the numbers in front of $x$ and $y$, and $b$ the limits.
 - **Where next:** [Bridge B1](b01-algebra-to-lp.html) builds this table from a word problem and hands it to a real solver; toolbox [K6](k06-vectors-matrices.html) covers vectors and matrices.
 
 ```{=html}

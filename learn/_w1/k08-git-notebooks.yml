@@ -4,7 +4,7 @@ lesson: K8
 glossary:
   - id: version-control
     term: Version control
-    def: "Keeping every saved state of a project's files, with who changed what and why, so any earlier state can be compared or brought back."
+    def: "Keeping selected recorded versions of a project's files, with who changed what and why, so any recorded version can be compared or brought back."
   - id: repository
     term: Repository
     def: "A project folder together with its full history of commits, as kept by a version-control tool such as Git."
@@ -53,3 +53,9 @@ glossary:
   - id: random-seed
     term: Random seed
     def: "A fixed starting number for a random-number generator, so a random draw comes out the same on every run."
+  - id: python-package
+    term: Python package
+    def: "A ready-made library of Python code, such as pandas, that a project installs with pip instead of writing it itself."
+  - id: version-pin
+    term: Version pin
+    def: "A line such as pandas==2.2.3 in requirements.txt that asks the installer for one exact version of a package."

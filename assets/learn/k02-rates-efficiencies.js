@@ -166,7 +166,7 @@
 
   function view(live, data, root) {
     var s = story(data["01_power_energy"], data["07_cost"], data["13_capstone"], data.town, data.cf_targets, data.k02_rates_efficiencies);
-    var steps = [], autos = {};
+    var steps = [], autos = {}, eqRef = {};
     var HR = num(s.hrCC, 3), HRP = num(s.hrPK, 3), G = usd(s.gas), CO = num(s.co2Coef, 2), KK = num(s.k, 3);
 
     // ---- step 1: a rate is a "per"
@@ -241,6 +241,7 @@
             btns.forEach(function (x, j) { x.setAttribute("aria-pressed", j === i ? "true" : "false"); x.classList.toggle("right", j === i && ok); x.classList.toggle("wrong", j === i && !ok); });
             reveal();
             LX.store.set("k2-own", Object.assign({}, LX.store.get("k2-own") || {}, { plant: "pk" }));
+            if (eqRef.card) eqRef.card.select(eqRef.card.current());   // the explain card's open symbol shows the plant just looked at
             api.done();
             api.saw((ok ? "Right: " : "Less: ") + KK + " ÷ " + HRP + " = " + pct(s.effPK) + ", so the peaker burns " + num(s.gasRatio, 2) + " times as much gas per MWh. A higher heat rate means a lower efficiency; the rest leaves as heat.");
           });
@@ -262,9 +263,9 @@
       }
     });
 
-    // ---- step 4: losses multiply; dividing undoes them
+    // ---- step 4: efficiencies multiply going forward; dividing undoes them
     steps.push({
-      text: "Lesson 13's battery gives back " + pct(s.rte, 0) + " of what it takes in, its [[round-trip-efficiency|round-trip efficiency]]: charge " + num(s.target) + " MWh and " + num(s.back) + " come back. To get " + num(s.target) + " MWh back, how much must you charge?",
+      text: "Lesson 13's battery gives back " + pct(s.rte, 0) + " of what it takes in, its [[round-trip-efficiency|round-trip efficiency]]: charge " + num(s.target) + " MWh and " + num(s.back) + " come back. To get " + num(s.target) + " MWh back, how much must you charge, to one decimal place?",
       build: function (act, api) {
         var uc = LX.UnitChain(act, { label: "Battery round trip", steps: [{ v: "? MWh", u: "charged" }, { op: "× " + num(s.rte, 2) + " =" }, { v: num(s.target) + " MWh", u: "back", out: true }] });
         var tries = 0;
@@ -282,7 +283,7 @@
 
     // ---- step 5: capacity factor is a ratio
     steps.push({
-      text: "A [[capacity-factor|capacity factor]] is energy made ÷ energy at full output over the same period; here, one year. Prairie Town's " + num(s.windMW) + " MW wind farm could make " + num(s.windMax) + " MWh: at U.S. wind's " + pct(s.windCF) + " in 2025, how many MWh?",
+      text: "A [[capacity-factor|capacity factor]] is energy made ÷ the most possible over the same period. In a year, Prairie Town's " + num(s.windMW) + " MW wind farm could make " + num(s.windMax) + " MWh: at U.S. wind's " + pct(s.windCF) + " in 2025, how many MWh?",
       build: function (act, api) {
         var rows = H("div", { class: "k2-cf" }, act);
         var r1 = H("div", { class: "k2-effrow" }, rows); H("span", { class: "k2-effnm", text: "Most possible" }, r1);
@@ -290,12 +291,14 @@
         var r2 = H("div", { class: "k2-effrow" }, rows); H("span", { class: "k2-effnm", text: "At " + pct(s.windCF) }, r2);
         var bar = LX.CostSplit.bar(r2, [], 100, { height: 18 }), made = H("b", { text: "?" }, r2);
         H("p", { class: "k2-key", text: num(s.windMW) + " MW × " + num(s.hours) + " h = " + num(s.windMax) + " MWh: the farm at full output every hour of the year." }, act);
+        var gwh = H("p", { class: "k2-key", "aria-live": "polite" }, act);   // the GWh conversion, a caption of its own once the answer is in
         var tries = 0;
         var n = LX.NumAnswer(act, { label: "A year's energy:", unit: "MWh", onCheck: function (v) {
           tries++;
           if (close(v, s.windE, 1000)) {
             LX.CostSplit.fill(bar, [{ color: "var(--lx-wind)", value: s.windCF * 100 }], 100); made.textContent = num(s.windE);
-            api.done(); api.saw(num(s.windMax) + " × " + num(s.windCF, 3) + " = " + num(s.windE) + " MWh, about " + num(s.windE / 1000) + " GWh (thousand MWh). Backwards, MWh ÷ (MW × " + num(s.hours) + " h) gives the capacity factor, as in lesson 5: energy over energy, so no unit.");
+            gwh.textContent = "In GWh (thousands of MWh): " + num(s.windE) + " MWh ≈ " + num(s.windE / 1000) + " GWh.";
+            api.done(); api.saw(num(s.windMax) + " × " + num(s.windCF, 3) + " = " + num(s.windE) + " MWh in a year.");
           } else if (v != null && close(v, s.windE / 1000, 1)) api.saw("That is in GWh. One GWh is 1,000 MWh: multiply by 1,000.", true);
           else api.saw(tries < 2 ? "Not yet. Multiply the most possible by " + num(s.windCF, 3) + " (" + pct(s.windCF) + " as a fraction)." : num(s.windMax) + " × " + num(s.windCF, 3) + " = " + num(s.windE) + " MWh.", true);
         } });
@@ -312,14 +315,14 @@
       return { view: "step " + (k + 1) };
     }, cards);
 
-    explain(s);
+    explain(s, eqRef);
     drillView();
   }
 
   // ---------------------------------------------------------------- explain layer
-  function explain(s) {
+  function explain(s, eqRef) {
     var x = document.getElementById("k2-explain"); if (!x) return; x.innerHTML = "";
-    var HR = num(s.hrCC, 3), KK = num(s.k, 3);
+    var KK = num(s.k, 3);
     function plant() { var o = LX.store.get("k2-own"); return o && o.plant === "pk" ? { name: "the peaker", hr: s.hrPK, eff: s.effPK, fuel: s.fuelPK, co2: s.co2PK, own: true } : { name: "the combined-cycle plant", hr: s.hrCC, eff: s.effCC, fuel: s.fuelCC, co2: s.co2CC, own: false }; }
     function you(kind) {
       return function () {
@@ -331,7 +334,7 @@
         return null;
       };
     }
-    LX.EquationCard(H("div", { class: "lx-xcard" }, x), {
+    eqRef.card = LX.EquationCard(H("div", { class: "lx-xcard" }, x), {
       title: "Three rates from one heat rate", lede: "Tap a symbol: its meaning, its unit and your numbers from step 3.",
       rows: [
         { parts: [{ k: "eta" }, "=", { k: "k" }, "÷", { k: "hr" }], say: "Efficiency equals 3.412 MMBtu per MWh divided by the heat rate.", tag: "efficiency" },
@@ -340,7 +343,7 @@
       symbols: {
         eta: { sym: "η", name: "Efficiency", unit: "%", color: "var(--lx-good)", words: "The share of the fuel's energy that leaves as electricity.", you: you("eta"), code: "eta = 3.412 / hr" },
         k: { sym: "3.412", name: "Energy in one MWh", unit: "MMBtu per MWh", color: "var(--lx-ink-3)", words: "One MWh of electricity holds 3.412 MMBtu (3,412 Btu per kWh, EIA).", code: "k = 3.412" },
-        hr: { sym: "HR", name: "Heat rate", unit: "MMBtu per MWh", color: "var(--lx-cc)", words: "Gas burned per MWh made; lower is better.", you: you("hr"), code: "hr = " + HR },
+        hr: { sym: "HR", name: "Heat rate", unit: "MMBtu per MWh", color: "var(--lx-cc)", words: "Gas burned per MWh made; lower is better.", you: you("hr"), code: function () { return "hr = " + num(plant().hr, 3); } },
         fuel: { sym: "F", name: "Fuel cost", unit: "$ per MWh", color: "var(--lx-tier-2)", words: "What the gas for one MWh costs; lesson 7 adds upkeep and building cost to it.", you: you("fuel"), code: "fuel = hr * gas" },
         p: { sym: "p", name: "Gas price", unit: "$ per MMBtu", color: "var(--lx-tier-5)", words: "The 2025 U.S. average cost of gas to power plants, " + usd(s.gas) + " (EIA).", code: "gas = " + num(s.gas, 2) },
         co2: { sym: "CO₂", name: "CO₂ per MWh", unit: "kg per MWh", color: "var(--lx-ink)", words: "[[operating-emissions|Operating CO₂]] at the plant's stack; the gas's supply chain is outside this boundary.", you: you("co2"), code: "co2 = hr * 52.91" },
@@ -354,7 +357,7 @@
       rows: rateRows(s).map(function (r, i) { return { key: r.key, color: ["var(--lx-demand)", "var(--lx-cc)", "var(--lx-tier-2)", "var(--lx-ink)", "var(--lx-good)", "var(--lx-tier-3)", "var(--lx-wind)"][i], name: r.name, unit: r.unit, ex: r.ex, used: r.used }; })
     });
     LX.EnergyChain(H("div", { class: "lx-xcard" }, x), {
-      title: "Losses multiply along a chain", aside: "Gas to a stored MWh",
+      title: "Efficiencies multiply along a chain", aside: "Gas to a stored MWh",
       lede: "Burn " + num(s.gasIn) + " MMBtu of gas in the combined-cycle plant, store the electricity, and take it back out.",
       stops: [
         { icon: "flame", title: "Gas burned", text: "energy in", value: num(s.gasIn) + " MMBtu" },

@@ -99,7 +99,7 @@ const usd = K.usd, f4 = K.f4;
   has("The fraction is the [annuity factor]{.lx-term term=\"annuity-factor\"}: 17.29 at 4% over 30 years");
   has("7% nominal with 2.5% inflation, is 4.39% real");
   has("one MW of wind adds \\$133,575 a year");
-  has("30 years for plants, 15 for lesson 13's battery");
+  ok(/" for plants in lessons 7, 12 and 13, " \+ s\.batteryLife \+ " for lesson 13's battery\."/.test(JS), "the recovery periods (30 years for plants, 15 for lesson 13's battery) are on the equation card");
   has("At 4% the yearly share is 0.0578, not 0.0333");
   has("From 3.5% to 7% it falls from $35.63 to $13.14, by 63%");
   has("$25.84: 100 ÷ 1.07²⁰. $41.67 divides by 1 + 20 × 0.07 (simple interest); $386.97 grows the $100 forward instead.");
@@ -136,7 +136,7 @@ const usd = K.usd, f4 = K.f4;
   add(K.f5(s.crf)); add(s.af.toFixed(2)); add(s.af.toFixed(3)); add((1 + s.rate).toFixed(2)); add(s.rate.toFixed(2)); add(s.doubling.toFixed(1)); add(s.wind.total.toFixed(3));
   add((s.blendReal * 100).toFixed(2)); add(D7.finance.inflation); add((s.half.lo * 100).toFixed(1)); money(s.amount / 2); add(Math.round(s.half.cut * 100));
   // structural numbers: rates and years of the story, lesson numbers, years and dates, step counts, the 1,000 kW per MW
-  [0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 15, 17, 20, 30, 70, 2024, 2025, 2026, "1,000", "1000", "2.5"].forEach(add);
+  [0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 15, 17, 20, 30, 70, 2024, 2025, 2026, "1,000", "1000", "2.5", "0.04"].forEach(add);
   const found = (body.match(/\d[\d,]*(?:\.\d+)?/g) || []).map(t => t.replace(/[.,]$/, ""));
   const unknown = [...new Set(found.filter(t => !allowed.has(t)))];
   ok(unknown.length === 0, "every number on the page is from the model or a structural count; unknown: " + unknown.join(" "));
@@ -248,7 +248,10 @@ function calcCheck(label, str, skips) {
 {
   const T = K.texts(s);
   // 2: the planning equation carries the 1,000 kW per MW
-  ok(/\$1000 \\sum_k \(\\mathrm\{CRF\}_k\\, C_k \+ \\mathrm\{FOM\}_k\)\\,K_k\$/.test(QMD) && /\\\$ per kW and \$K_k\$ is in MW/.test(QMD), "modeler: the yearly-cost sum is 1000 Σ (CRF C + FOM) K, with K in MW");
+  { const mod = QMD.slice(QMD.indexOf("Go deeper · Modeler"), QMD.indexOf("</details>", QMD.indexOf("Go deeper · Modeler")));
+    ok(!/\\sum|_k|\$/.test(mod.replace(/\\\$/g, "")) && /Building cost is \\\$ per kW; the CRF turns it into \\\$ per kW a year, the unit fixed upkeep already has\./.test(mod) && (mod.match(/^- \*\*/gm) || []).length === 3,
+       "modeler: a short pointer in words (K3 is D1), no indexed objective; building cost $/kW, CRF × it and fixed upkeep both $/kW a year"); }
+  ok(!/fixed upkeep\) are \\\$ per kW/.test(QMD) && /Rate r and years t<\/dt><dd>r is the yearly rate written as a fraction \(4% is 0\.04\); t counts the years from now\./.test(QMD), "terms: fixed upkeep is never $ per kW alone; the no-JS explain defines r and t");
   ok(near(1000 * (s.crf * s.capex + s.fom), s.wind.perMW, 1e-6) && usd(s.wind.perMW, 0) === "$133,575", "modeler: 1,000 × (CRF × C + FOM) = $133,575 for one MW of wind");
   // 4: the code handles r = 0 (read the Python line as JavaScript and run it)
   const code = K.CRF_CODE.replace(/^crf = (.+) if (.+) else (.+)$/, "($2) ? ($1) : ($3)").replace(/==/g, "===");
@@ -282,6 +285,55 @@ function calcCheck(label, str, skips) {
   ok(/With the same recovery period and output, a larger repayment share makes the cost per MWh more sensitive, in percent, to the rate/.test(JS) && !/moves more than a gas plant's/.test(JS), "causal chain: the wind-against-gas claim is proportional and conditional");
   // the number box labels carry their unit
   ok(/label: "Worth today, in dollars:"/.test(JS) && /label: "Yearly payment, \$ per kW:"/.test(JS), "labels: the number boxes name their unit");
+}
+
+// ---------------- step prompts: at most two sentences and about 35 words each; card 6 asks one thing, its 0% check is labelled
+{
+  const T = K.texts(s);
+  const prompts = [...JS.matchAll(/\n      text: (.+),\n      build:/g)].map(m => m[1]);
+  ok(prompts.length === 6, "prompts: six step cards (" + prompts.length + ")");
+  prompts.forEach((p, i) => {
+    const t = p.replace(/" \+ [^"]+? \+ "/g, " X ").replace(/^"|"$/g, "").replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1");
+    const sentences = t.split(/(?<=[.?!])\s+(?=[A-Z$])/).filter(Boolean).length, words = t.split(/\s+/).filter(Boolean).length;
+    ok(sentences <= 2 && words <= 36, `prompts: step ${i + 1} has ${sentences} sentences and ${words} words (≤ 2, ≤ 36)`);
+  });
+  ok(!/Then check the factor/.test(JS) && /<b>Check the factor\.<\/b> Set the rate to 0%/.test(JS), "prompts: step 6's 0% check is its own labelled line");
+  ok(/text: "Keep the wind costs; try " \+ s\.batteryLife \+ " years \(lesson 13's battery period\)"/.test(JS), "step 6: the 15-year shortcut says the wind costs stay");
+  ok(/The wind farm burns no fuel and has no variable upkeep, so lesson 7's levelized cost/.test(JS) && /Gas plants add those running costs\./.test(JS), "explain: the LCOE hint is qualified to the wind example");
+  ok(/- \*\*Exact doubling time\.\*\*[^\n]*natural logarithm \(a calculator's ln key\)\.\n- \*\*Against the rule of 70\.\*\* At 7% the exact time is 10\.2 years; the rule says 10\./.test(QMD), "deeper: solving for the doubling time and comparing with the rule of 70 are two items");
+  ok(T.zeroAfter(4, 15) === "At 4% over 15 years, CRF = " + f4(K.crf(0.04, 15)) + ", above 1 ÷ 15 = 0.0667: it adds the return for the wait." && T.zeroAfter(4, 15).split(/\s+/).length <= 30, "step 6: the after-0% message names the current setting: " + T.zeroAfter(4, 15));
+}
+
+// ---------------- the page on a stub document: step 6's feedback follows both controls after the 0% check
+{
+  const vm = require("vm");
+  const { env, load } = require("./stubdom.js");
+  const E = env();
+  E.LX.ready = () => {}; E.LX.visible = () => false; E.LX.progress.guess = () => null;
+  ["numanswer", "drill", "cards", "controls", "plot", "equation", "table", "causal"].forEach(n => load(n, E));
+  let init = null, demo = null;
+  E.LX.mount = (slug, f) => { if (slug === "k03") init = f; };
+  E.LX.demo = (root, fn, cards) => { demo = { fn, cards }; return () => null; };
+  const mctx = { window: E.window, document: E.document, location: E.location, navigator: {}, console, module: { exports: {} }, performance: E.window.performance, setTimeout: () => 0, clearTimeout: () => {} };
+  let threw = null;
+  try {
+    vm.runInNewContext(JS, mctx);
+    const root = E.LX.H("div", { class: "lx-interactive", "data-learn": "k03" }, E.body), live = E.LX.H("div", null, root);
+    init(live, { "07_cost": D7, "13_capstone": D13 }, root);
+  } catch (e) { threw = e.message; }
+  ok(!threw && demo && demo.cards, "stub: the page mounts" + (threw ? ": " + threw : ""));
+  if (!threw && demo) try {
+    const card = () => demo.cards.el, btn = re => card().querySelectorAll("button").filter(b => re.test(b.getAttribute("aria-label") || b.textContent))[0];
+    const saw = () => (card().querySelector(".lx-saw") || { textContent: "" }).textContent;
+    demo.cards.go(5);
+    const down = btn(/^Lower Rate \(real\)/), up = btn(/^Raise Rate \(real\)/);
+    for (let i = 0; i < 8; i++) down.click();   // 4% → 0%
+    ok(/At 0%, CRF = 1 ÷ 30 = 0\.0333/.test(saw()), "stub: at 0% over 30 years the feedback says 1 ÷ 30: " + saw());
+    btn(/^Keep the wind costs; try 15 years/).click();
+    ok(/At 0%, CRF = 1 ÷ 15 = 0\.0667/.test(saw()) && !/1 ÷ 30/.test(saw()), "stub: moving the period to 15 years updates the 0% feedback: " + saw());
+    for (let i = 0; i < 8; i++) up.click();     // back to 4%
+    ok(/At 4% over 15 years, CRF = 0\.0899, above 1 ÷ 15 = 0\.0667/.test(saw()) && !/^At 0%/.test(saw()), "stub: back at 4%, the feedback names the current setting: " + saw());
+  } catch (e) { ok(false, "stub: the page test threw: " + (e && e.stack || e)); }
 }
 
 console.log(`k03-discounting: ${checks - fails} of ${checks} checks passed`);

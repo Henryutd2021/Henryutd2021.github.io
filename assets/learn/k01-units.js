@@ -80,7 +80,7 @@
     s.dayWh = s.dayMWh * 1e6;
     s.items = [
       { id: "phone", label: "Charging a smartphone once", short: "Phone charge", given: num(A.phone_charge.value, 3) + " kWh", wh: A.phone_charge.value * 1000, src: "EPA", url: A.phone_charge.url, asOf: "checked 2 Nov 2026" },
-      { id: "home", label: "An average U.S. home's year", short: "Home's year", given: num(A.home_year.value) + " kWh", wh: A.home_year.value * 1000, src: "EIA", url: A.home_year.url, asOf: "2022 data" },
+      { id: "home", label: "Electricity an average U.S. home buys in a year", short: "Home's year", given: num(A.home_year.value) + " kWh", wh: A.home_year.value * 1000, src: "EIA", url: A.home_year.url, asOf: "2022 data" },
       { id: "town", label: "Prairie Town's day, 3 September 2025", short: "Town's day", given: num(s.dayMWh) + " MWh", wh: s.dayMWh * 1e6, src: "this page", url: null, asOf: "EIA-930 shape, scaled" },
       { id: "spp", label: "The Southwest Power Pool's year, 2025", short: "SPP's year", given: st.annual_demand_TWh + " TWh", wh: st.annual_demand_TWh * 1e12, src: "EIA-930", url: "https://www.eia.gov/electricity/gridmonitor/", asOf: "2025 data" },
       { id: "us", label: "The United States' year, 2025", short: "U.S. year", given: "about " + num(A.us_year.value / 1e9) + " TWh", wh: A.us_year.value * 1000, src: "EIA", url: A.us_year.url, asOf: "2025 data" }];
@@ -101,8 +101,9 @@
   }
 
   // one pair of items: the ratio worked as (a1 / a2) x 10^(n1 - n2). The ratio is then a x 10^k (1 <= a < 10); its
-  // nearest power of ten is 10^k when a < 3.16 (half a power of ten: sqrt 10) and 10^(k+1) from 3.16 up, which is
-  // round(log10 ratio), the same rule as powersApart
+  // nearest power of ten is 10^k when a < 3.16 and 10^(k+1) from 3.16 up: sqrt 10 = 3.16 is the midpoint of 1 and 10 on a
+  // log scale (log10 sqrt 10 = 0.5), so this is round(log10 ratio), the same rule as powersApart. The exponent k of the
+  // ratio and its nearest power are told apart in the text
   var HALF = Math.sqrt(10);
   function pairText(s, a, b) {
     var A = s.byId[a], B = s.byId[b]; if (!A || !B || a === b) return null;
@@ -111,9 +112,11 @@
              rexp: expOf(r), rmant: mant(r), up: mant(r) >= HALF,
              ratioText: r >= 1e6 ? sci(r, 2) : num(r) };
   }
-  // the reader-facing reason for the nearest power, e.g. "6.45 is above 3.16 (half a power of ten), so 10³"
+  // the reader-facing reason for the nearest power, e.g. "645 = 6.45 × 10²: 6.45 is above 3.16 (√10, the midpoint of 1 and 10
+  // on a log scale), so the nearest power is 10³." (a ratio already shown as a × 10ⁿ is not written twice)
   function nearestWhy(p) {
-    return sig(p.rmant, p.ratio >= 1e6 ? 2 : 3) + (p.up ? " is above" : " is below") + " 3.16, half a power of ten, so the nearest power is 10" + sup(p.apart) + ".";
+    var m = sig(p.rmant, p.ratio >= 1e6 ? 2 : 3);
+    return (p.ratio >= 1e6 ? "" : p.ratioText + " = " + m + " × 10" + sup(p.rexp) + ": ") + m + (p.up ? " is above" : " is below") + " 3.16 (√10, the midpoint of 1 and 10 on a log scale), so the nearest power is 10" + sup(p.apart) + ".";
   }
 
   // ---------------------------------------------------------------- the no-JS table (written into the page by the test)
@@ -214,7 +217,7 @@
 
     // ---- step 1: the prefix ladder
     steps.push({
-      text: "Each prefix is 1,000 times the one below: kilo (k), mega (M), giga (G), tera (T). Write Prairie Town's busiest hour of 2025, " + s.peak + " [[megawatt|MW]], in [[kilowatt|kW]] and in [[gigawatt|GW]].",
+      text: "Each prefix is 1,000 times the one below: kilo (k), mega (M), giga (G), tera (T). Write " + s.peak + " [[megawatt|MW]], the busiest hour Prairie Town's demand is scaled to in 2025, in [[kilowatt|kW]] and in [[gigawatt|GW]].",
       build: function (act, api) {
         var lad = H("ol", { class: "k1-ladder", "aria-label": "The prefix ladder for " + s.peak + " MW" }, act), cells = {};
         var vals = [s.peakW, s.peakKW, s.peak, s.peakGW, s.peakTW];
@@ -349,7 +352,7 @@
 
     // ---- step 6: check a number by its order of magnitude
     steps.push({
-      text: "Bound the day by its lowest hour (" + s.loMW + " MW) and its highest (" + s.hiMW + " MW), each held for 24 h. Which reports of its energy fit, and which slipped a prefix, a factor of 1,000?",
+      text: "Bound the day by its lowest hour (" + s.loMW + " MW) and its highest (" + s.hiMW + " MW), each held for 24 h. Which reports of its energy fit, and which are off by a power of ten or more?",
       build: function (act, api) {
         H("p", { class: "k1-eq", text: s.loMW + " MW × 24 h = " + num(s.loBound) + " MWh  ≤  the day  ≤  " + s.hiMW + " MW × 24 h = " + num(s.hiBound) + " MWh" }, act);
         var right = {}, list = H("div", { class: "k1-rows" }, act);
@@ -399,7 +402,7 @@
     function drawPair() {
       var o = LX.store.get("k1-pair"), p = o && pairText(s, o.a, o.b), own = !!p;
       if (!p) p = pairText(s, "town", "home");
-      lede.textContent = (own ? "Your pair from step 5: " : "Prairie Town's day against an average U.S. home's year: ") + "divide the leading numbers, subtract the exponents. " + nearestWhy(p);
+      lede.textContent = (own ? "Your pair from step 5: " : "Prairie Town's day against a U.S. home's year of purchases: ") + "divide the leading numbers, subtract the exponents. " + nearestWhy(p);
       uc.set([{ v: p.big.sci, u: p.big.short }, { op: "÷" }, { v: p.small.sci, u: p.small.short }, { op: "≈" },
               { v: "(" + sig(p.big.mant, 3) + " ÷ " + sig(p.small.mant, 3) + ") × 10" + sup(p.dexp), u: "leading numbers, exponents" }, { op: "≈" },
               { v: p.ratioText, u: "nearest power of ten: 10" + sup(p.apart), out: true }]);

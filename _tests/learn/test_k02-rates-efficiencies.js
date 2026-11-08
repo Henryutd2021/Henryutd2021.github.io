@@ -96,20 +96,18 @@ const { num, usd, pct } = K;
   has("Efficiency = 3.412 MMBtu per MWh ÷ heat rate: 54.8% for the combined-cycle plant, 37.3% for the peaker (heat rate 9.142)");
   has("an 85% battery gives back 85 of 100 MWh; 100 MWh back needs 100 ÷ 0.85 = 117.6 MWh in, not 115");
   has("A capacity factor is energy made ÷ the most possible over the same period; for a year, 150 MW × 8,760 h × 33.8% = 444,132 MWh");
-  ok(/capacity factor\]\] is energy made ÷ energy at full output over the same period; here, one year\./.test(JS), "step 5 defines a capacity factor for any period, then uses one year");
+  ok(/capacity factor\]\] is energy made ÷ the most possible over the same period\. In a year, /.test(JS), "step 5 defines a capacity factor for any period, then uses one year");
+  ok(/api\.saw\(num\(s\.windMax\) \+ " × " \+ num\(s\.windCF, 3\) \+ " = " \+ num\(s\.windE\) \+ " MWh in a year\."\);/.test(JS) && /gwh\.textContent = "In GWh \(thousands of MWh\): "/.test(JS), "step 5: the feedback is the year's energy only; the GWh conversion is its own caption (the reverse calculation is the quiz's)");
   has("Stage efficiencies multiply: 54.8% × 85% = 46.6%");
   has("$\\eta = 3{,}412 \\div 6{,}226 = 54.8\\%$");
   has("From the peaker's 37.3% to the combined-cycle plant's 54.8% is 17.5 percentage points");
   has("the peaker burns $9.142 \\div 6.226 = 1.47$ times the gas: 47% more");
-  // the Modeler box is a short preview (curriculum 4.6): words, one symbolic line with every symbol and unit defined, forward links
+  // the Modeler box is a short pointer (curriculum 4.6; K2 is D1): fixed rates as a model's coefficients, then links on
   const mod = QMD.slice(QMD.indexOf("Go deeper · Modeler"), QMD.indexOf("</details>", QMD.indexOf("Go deeper · Modeler")));
-  const maths = mod.replace(/\\\$/g, "USD").match(/\$[^$]*?\$/g) || [], lines = maths.filter(m => /=/.test(m));
-  ok(lines.length === 1 && lines[0] === "$\\text{cost in the hour} = (\\mathrm{HR} \\times p + \\mathrm{VOM}) \\times g$" && !/\\sum|e_\{t|_t/.test(mod), "Modeler preview: one symbolic line, no sums or time indices: " + lines.join(" | "));
-  ok(/A simplified example\.\*\* One gas plant and one battery, in one-hour steps, so every flow is in MWh per hour/.test(mod) && /with HR the heat rate \(MMBtu per MWh\) and \$p\$ the gas price \(\\\$ per MMBtu\)/.test(mod)
-     && /\$g\$, the MWh the gas plant makes in an hour/.test(mod) && /VOM: variable operation and maintenance, in \\\$ per MWh/.test(mod), "Modeler preview: a single-plant example with every symbol and unit defined");
-  ok(/\[Lesson 13\]\(13-capstone\.html\) writes the full model: two gas plants, CO₂ in tonnes, each modelled hour weighted/.test(mod) && /\[M3\]\(m03-capacity-expansion\.html\)/.test(mod), "Modeler preview: forward links to lesson 13's full formulation and M3");
-  ["decision-variable", "variable-om", "linear-program"].forEach(t => ok(mod.indexOf('term="' + t + '"') >= 0, "Modeler preview: glossary term " + t));
-  ok(num(s.co2CC / 1000, 3) === "0.329" && /The CO₂, 0\.329 t per MWh made, adds up under a yearly cap/.test(mod) && /6\.226 × \\\$3\.85 = \\\$23\.97/.test(mod), "Modeler preview: its numbers are the page's (0.329 t, $23.97)");
+  const items = (mod.match(/^- \*\*/gm) || []).length;
+  ok(items === 2 && !/\$g\$|decision variable|VOM|linear program|MWh per hour|\\text\{/.test(mod), "Modeler preview: two short items, no formulation, symbols or units of flow (" + items + " items)");
+  ok(/\[Lesson 13\]\(13-capstone\.html\) writes such a model in full/.test(mod) && /\[M3\]\(m03-capacity-expansion\.html\)/.test(mod), "Modeler preview: forward links to lesson 13 and M3");
+  ok(num(s.co2CC / 1000, 3) === "0.329" && /6\.226 × \\\$3\.85 = \\\$23\.97 of fuel and 0\.329 t of CO₂/.test(mod), "Modeler preview: its numbers are the page's (0.329 t, $23.97)");
   has("9.142 gives 37.3%, 6.226 gives 54.8%");
   has("115 × 0.85 = 97.75 MWh. Divide instead: 100 ÷ 0.85 = 117.6 MWh.");
   has("$35.20: 9.142 × 3.85, and MMBtu cancels. $2.37 divides instead; $12.99 adds numbers with different units.");
@@ -162,7 +160,10 @@ const { num, usd, pct } = K;
   // one idea per card: step 3's prompt is two sentences; step 4's feedback checks the division only (chained losses are the energy chain)
   ok(/text: "One MWh of electricity holds " \+ KK \+ " MMBtu, so \[\[efficiency\|efficiency\]\] = " \+ KK \+ " ÷ heat rate: " \+ pct\(s\.effCC\) \+ " for the combined-cycle plant\. Is the \[\[peaker\|peaker\]\], with a heat rate of " \+ HRP \+ ", more or less efficient\?"/.test(JS), "step 3: a two-sentence prompt");
   ok(/" MWh\. Going forward through a loss, multiply; going backwards, divide\."\);/.test(JS) && !/Losses also multiply/.test(JS), "step 4: the feedback teaches one move (divide going backwards)");
-  ok(/LX\.EnergyChain\(/.test(JS) && /Losses multiply along a chain/.test(JS), "chained losses keep their own explain diagram");
+  ok(/LX\.EnergyChain\(/.test(JS) && /Efficiencies multiply along a chain/.test(JS) && !/[Ll]osses multiply/.test(JS + QMD), "chained losses keep their own explain diagram, which says efficiencies (not losses) multiply");
+  ok(near(s.chainEff, s.effCC * s.rte) && !near(1 - s.chainEff, (1 - s.effCC) * (1 - s.rte)), "chain: the overall efficiency is the product of the efficiencies; multiplying the losses would be wrong");
+  ok(/to get " \+ num\(s\.target\) \+ " MWh back, how much must you charge, to one decimal place\?"/i.test(JS) && K.close(117.6, s.need, 0.06) && !K.close(118, s.need, 0.06), "step 4: the prompt asks for one decimal place, the precision its tolerance needs");
+  ok(/code: function \(\) \{ return "hr = " \+ num\(plant\(\)\.hr, 3\); \}/.test(JS) && /eqRef\.card\.select\(eqRef\.card\.current\(\)\)/.test(JS), "explain: the heat rate's code line and the open panel follow the plant chosen in step 3");
   ok(/close\(v, s\.naive, 0\.5\)/.test(JS) && /close\(v, s\.homeKW, 0\.002\)/.test(JS) && /close\(v, s\.windE \/ 1000, 1\)/.test(JS), "steps: the common slips (115, kW, GWh) get their own hint");
   ok((JS.match(/"aria-live": "polite"/g) || []).length >= 2, "steps: results are announced in live regions (the drill's are LX.Drill's)");
   ok(/LX\.demo\(root,/.test(JS) && /state === "mid" \? 1/.test(JS) && /state === "done"/.test(JS) && /autos\[4\]/.test(JS), "demo: mid, step-N and done states");

@@ -48,6 +48,8 @@
     var s = take.split(/(?<=[.!?])\s+(?=[A-Z])/);
     return [{ k: "Claim", v: s[0] }, { k: "What would change my mind", v: s[1] || "" }, { k: "Confidence", v: (s[2] || "").replace(/^Confidence:\s*(\w)/, function (m, c) { return c.toUpperCase(); }) }];
   }
+  // a spotter sentence's verdict: "A unit error.", "A scale error." or "An unsupported assumption."
+  function verdict(s) { return s.answer !== "error" ? "Reads right." : s.kind === "assumption" ? "An unsupported assumption." : "A " + s.kind + " error."; }
   var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
   var f0 = function (v) { return Math.round(v).toLocaleString("en-US"); };
   var f1 = function (v) { return (Math.round(v * 10) / 10).toLocaleString("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 1 }); };
@@ -56,18 +58,20 @@
     var A = D.stories[0].envelope, B = D.stories[1].envelope, C = D.stories[2].envelope, h = [];
     var gwh = storedGWh(B.gw, B.duration), us = averageGW(B.us_twh, B.hours);
     h.push('<details class="lx-textalt"><summary>The three checks with units, worked</summary><ul>');
-    h.push("<li><strong>Story 1</strong>: " + f0(A.twh) + " TWh × 1,000 = " + f0(A.twh * 1000) + " GWh a year; ÷ " + f0(A.hours) + " h ≈ " + f1(averageGW(A.twh, A.hours)) +
-      " GW of average power. At " + A.util + "% average use of the connections (the report's assumption), that needs about " + f0(connectionGW(A.twh, A.util, A.hours)) + " GW of connections.</li>");
-    h.push("<li><strong>Story 2</strong>: " + B.gw + " GW × " + B.duration + " h (an illustrative duration) = " + f0(gwh) + " GWh. That energy equals about " + f1(minutesOfUse(gwh, B.us_twh, B.hours)) +
-      " minutes of U.S. use at the 2025 average of about " + f0(Math.round(us / 10) * 10) + " GW, but " + B.gw + " GW is only about " + Math.round(B.gw / us * 100) + "% of that average power. Actual additions were about " +
-      Math.round(B.gw / B.planned_gw * 100) + "% of the " + B.planned_gw + " GW first planned.</li>");
+    h.push("<li><strong>Story 1, the calculation</strong>: " + f0(A.twh) + " TWh × 1,000 = " + f0(A.twh * 1000) + " GWh a year; ÷ " + f0(A.hours) + " h ≈ " + f1(averageGW(A.twh, A.hours)) + " GW of average power.</li>");
+    h.push("<li><strong>Story 1, the connections</strong>: at " + A.util + "% average use (the report's assumption), that needs about " + f0(connectionGW(A.twh, A.util, A.hours)) + " GW of connections.</li>");
+    h.push("<li><strong>Story 2, the calculation</strong>: " + B.gw + " GW × " + B.duration + " h (an illustrative duration) = " + f0(gwh) + " GWh.</li>");
+    h.push("<li><strong>Story 2, what it means</strong>: that energy equals about " + f1(minutesOfUse(gwh, B.us_twh, B.hours)) + " minutes of U.S. use at the 2025 average of about " +
+      f0(Math.round(us / 10) * 10) + " GW, but " + B.gw + " GW is only about " + Math.round(B.gw / us * 100) + "% of that average power.</li>");
+    h.push("<li><strong>Story 2, planned against built</strong>: actual additions were about " + Math.round(B.gw / B.planned_gw * 100) + "% of the " + B.planned_gw + " GW first planned.</li>");
     h.push("<li><strong>Story 3</strong>: the expert panel's factual report came " + days(C.event, C.factual) + " days after the blackout, and its final report " + days(C.event, C.final) +
       " days after: about " + C.ticks[C.answer] + ".</li></ul></details>");
-    h.push('<details class="lx-textalt"><summary>Units or scale? Six sentences, with answers</summary><ul>');
+    h.push('<details class="lx-textalt"><summary>Units, scale or assumptions? Six sentences, with answers</summary><div class="lx-scroll-x"><table class="lx-facts">');
+    h.push('<thead><tr><th scope="col">Sentence</th><th scope="col">Verdict</th><th scope="col">Why</th></tr></thead><tbody>');
     D.spotter.forEach(function (s) {
-      h.push("<li>“" + esc(s.text) + "” <strong>" + (s.answer === "error" ? "A " + esc(s.kind) + " error." : "Reads right.") + "</strong> " + esc(s.fix) + "</li>");
+      h.push("<tr><td>“" + esc(s.text) + "”</td><td><strong>" + verdict(s) + "</strong></td><td>" + esc(s.fix) + "</td></tr>");
     });
-    h.push("</ul></details>");
+    h.push("</tbody></table></div></details>");
     h.push('<details class="lx-textalt"><summary>The evidence ladder, with the stories\' claims placed</summary><ol>');
     D.ladder.rungs.forEach(function (r) { h.push("<li><strong>" + esc(r.label) + "</strong>: " + esc(r.text) + "</li>"); });
     h.push("</ol><ul>");
@@ -85,7 +89,7 @@
   }
   var model = { HOURS_PER_YEAR: HOURS_PER_YEAR, phrases: phrases, judge: judge, score: score, averageGW: averageGW, connectionGW: connectionGW,
                 storedGWh: storedGWh, minutesOfUse: minutesOfUse, days: days, ladderOK: ladderOK, caught: caught, takeParts: takeParts,
-                staticChecks: staticChecks };
+                staticChecks: staticChecks, verdict: verdict };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -150,6 +154,7 @@
   function tagStep(D, story, idx) {
     return function (act, api) {
       var compared = false;
+      if (story.intro) H("p", { class: "lx-hint n1-intro", html: LX.rich(story.intro) }, act);   // terms the story needs, before it
       LX.PhraseTagger(act, { key: "n1-tags-" + story.id, tags: D.lens, kicker: "Story " + (idx + 1) + " of 3 · " + story.kicker,
         title: story.headline, framing: story.framing, parts: story.parts, sources: story.sources, missing: story.missing, missingQ: story.missing.q,
         onCompare: function (sc) {
@@ -242,7 +247,7 @@
         var li = H("li", null, ul), sid = LX.uid("sp");
         H("p", { class: "s", id: sid, text: "“" + s.text + "”" }, li);
         var g = H("div", { class: "lx-qbtns", role: "group", "aria-labelledby": sid }, li), fb = H("div", { "aria-live": "polite" }, li);
-        [["ok", "Reads right"], ["error", "Unit or scale error"]].forEach(function (o) {
+        [["ok", "Reads right"], ["error", "Error or unsupported assumption"]].forEach(function (o) {
           var b = H("button", { class: "lx-choice", type: "button", "aria-pressed": "false", text: o[1] }, g);
           b.addEventListener("click", function () {
             [].forEach.call(g.children, function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); x.classList.remove("right", "wrong"); });
@@ -250,7 +255,7 @@
             if (!(s.id in answered)) { answered[s.id] = ok; if (ok) right++; }
             fb.innerHTML = "";
             H("div", { class: "lx-saw" + (ok ? "" : " no"), html: LX.icon(ok ? "check" : "question") + "<div><b>" + (ok ? "Right." : "Not quite.") + "</b> " +
-              (s.answer === "error" ? "A " + s.kind + " error. " : "") + LX.rich(s.fix) + "</div>" }, fb);
+              (s.answer === "error" ? verdict(s) + " " : "") + LX.rich(s.fix) + "</div>" }, fb);
             var n = Object.keys(answered).length;
             tally.textContent = n + " of " + D.spotter.length + " judged; " + right + " right on the first try.";
             if (n === D.spotter.length) { api.done(); api.saw("Most errors are a rate written as an amount (MW for MWh) or a number with no sense of scale. Divide by 8,760 hours, or compare with a known total, before you believe it."); }
@@ -307,7 +312,7 @@
         return { id: l.id, label: l.n + ". " + l.label + ": " + l.ask, text: "Trap: " + l.trap, note: "Caught today: " + by[l.id].join(" · ") };
       }) });
     LX.EvidenceLadder(c2, { title: "The evidence ladder", rungs: D.ladder.rungs, items: D.ladder.items,
-      lede: "A project climbs these rungs. Headlines often report a low rung as if it were the top one. Place each claim from today's stories.",
+      lede: "A project climbs these rungs; funding and permits can come in either order. Headlines often report a low rung as if it were the top one. Place each claim from today's stories.",
       off: { id: "projection", label: D.ladder.projection_label } });
     return L;
   }
@@ -322,9 +327,9 @@
       { text: "Now one check with units. The report gives [[energy|energy]] per year; grids are sized in [[power|power]]. Turn 649 TWh a year into average GW.", build: envelopeA(A) },
       { text: "Tag the second story. Watch for power against energy, and for plans against results. Then compare with a researcher's notes.", build: tagStep(D, B, 1) },
       { text: "The story gives power, not energy. Choose a [[battery-duration|duration]] and see how much energy 15 GW could hold, and how it compares with the whole country's use.", build: envelopeB(B) },
-      { text: "Story 3 claims a cause for a blackout. Two terms first: [[voltage|voltage]] is the electrical push on the lines, held up locally by [[reactive-power|reactive power]]. Tag the phrases, then pick the question that would test the claim.", build: tagStep(D, C, 2) },
+      { text: "Story 3 claims a cause for a blackout. Tag the phrases, then pick the question that would test the claim.", build: tagStep(D, C, 2) },
       { text: "Evidence takes time. Guess how long the formal investigation took before its final report, then lock in your guess.", build: clockStep(C) },
-      { text: "Spot the units or scale error. Four of these six sentences break a unit or a sense of scale; two read right. Judge each one.", build: spotStep(D) },
+      { text: "Spot the error. Four of these six sentences have a unit error, a scale error or an unsupported assumption; two read right. Judge each one.", build: spotStep(D) },
       { text: "Write your take in three sentences: the claim you accept or reject, what would change your mind, and your confidence. Then compare with a researcher's take.", build: takeStep(D) }
     ];
     var cards = LX.StepCards(live, { id: "n1-steps", steps: steps });

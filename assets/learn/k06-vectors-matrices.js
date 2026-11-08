@@ -16,7 +16,7 @@
 //   costs       c = (40, 100) $/MWh (2025 dollars, illustrative);  cost c · x = c₁x₁ + c₂x₂  (B1 writes it cᵀx)
 //   rules       A = [[1, 1], [1, 0], [0, 1], [0.37, 0.55]], with b = (145, 150, 100, 100) and the signs (≥, ≤, ≤, ≤):
 //               cover the 145 MW gas must supply, each plant's size, the hour's CO2 cap (t CO2 per MWh × MWh). The cover
-//               rule asks for at least 145 MW: extra gas would be spilled as wind and sun, at most 86 MW at 19:00, a limit
+//               rule asks for at least 145 MW: extra gas means turning down (curtailing) as much wind and sun, at most 86 MW at 19:00, a limit
 //               this toy model leaves out (lesson 10 says the same); step 6's example plan stays within it
 //   A x         the vector of each row's dot product with x: the left-hand side of every rule at once
 //   A x ≤ b     every row checked at once; the ≥ row enters as its negative, −x − y ≤ −145 (as in B1)
@@ -52,7 +52,7 @@
   function hour(town, year, D10) {
     var f = town.fleet, day = dayOf(town, year), h = D10.hour, need = day.need[h];
     var rows = [
-      { key: "cover", name: "Cover", a: [1, 1], op: ">=", b: need, words: "the gas plants supply at least " + need + " MW (any extra is spilled as wind and sun)" },
+      { key: "cover", name: "Cover", a: [1, 1], op: ">=", b: need, words: "the gas plants supply at least " + need + " MW (any extra gas means turning down as much wind and sun)" },
       { key: "cc", name: "Combined-cycle size", a: [1, 0], op: "<=", b: f.cc.mw, words: "the combined-cycle plant makes at most " + f.cc.mw + " MW" },
       { key: "pk", name: "Peaker size", a: [0, 1], op: "<=", b: f.peaker.mw, words: "the peaker makes at most " + f.peaker.mw + " MW" },
       { key: "co2", name: "CO₂ cap", a: [f.cc.co2, f.peaker.co2], op: "<=", b: D10.cap, words: "the hour emits at most " + D10.cap + " t of CO₂" }];
@@ -107,7 +107,7 @@
     var M = s.M, c = M.c, x = s.plan, r4 = M.rows[3].a;
     return {
       plan: "x = " + vec(x) + ": " + X1 + " = " + x[0] + " MW from the [[combined-cycle|combined-cycle plant]], " + X2 + " = " + x[1] + " from the [[peaker|peaker]]. " + vec(s.swap) + " is a different plan: in a vector, the order is the meaning.",
-      hour: "Each output runs one hour: " + x[0] + " MW × 1 h = " + x[0] + " MWh, so dollars per MWh times MW gives dollars for the hour.",
+      hour: "Each output runs one hour: " + x[0] + " MW × 1 h = " + x[0] + " MWh, and dollars per MWh times MWh gives dollars for the hour.",
       cost: "c · x = " + c[0] + " × " + x[0] + " + " + c[1] + " × " + x[1] + " = " + s.cost.toLocaleString("en-US") + " dollars for the hour: multiply in pairs, then add.",
       costHint: "Not yet. Multiply the first entries, then the second ones, and add: " + c[0] + " × " + x[0] + " + " + c[1] + " × " + x[1] + ".",
       rows: "Each row of A holds one rule's numbers, one column per decision. A 1 means the decision counts fully, a 0 that it is not in the rule.",
@@ -119,10 +119,19 @@
       fail: function (x2) {
         var co = dot(r4, x2), extra = x2[0] + x2[1] - M.need;
         return "x = " + vec(x2) + " passes cover and both sizes but emits " + fmt(co) + " t: only the CO₂ row fails. " +
-          (extra <= M.spill ? "Its " + extra + " MW extra would be spilled as wind and sun (lesson 10)." : "Its " + extra + " MW extra exceeds the " + M.spill + " MW that could be spilled, a limit left out here.");
+          (extra <= M.spill ? "Its " + extra + " MW of extra gas means [[curtailment|curtailing]], turning down, " + extra + " MW of wind and sun (lesson 10)." : "Its " + extra + " MW extra gas exceeds the " + M.spill + " MW of wind and sun, a limit left out here.");
+      },
+      // after the first success, step 6's feedback follows the plan (it never reports a plan the sliders have left)
+      now: function (x2) {
+        var ck = check(M, x2), bad = ck.filter(function (q) { return !q.pass; }).map(function (q) { return q.key; });
+        var NM = { cover: "cover", cc: "combined-cycle size", pk: "peaker size", co2: "CO₂" };
+        if (bad.join() === "co2") return this.fail(x2);
+        if (!bad.length) return "x = " + vec(x2) + " passes every row, at " + fmt(dot(r4, x2)) + " t of CO₂.";
+        return "x = " + vec(x2) + " fails the " + bad.map(function (k) { return NM[k]; }).join(" and ") + (bad.length > 1 ? " rows." : " row.");
       },
       nonneg: "Outputs cannot be negative, " + X1 + " ≥ 0 and " + X2 + " ≥ 0: the sliders stop at 0, so the four rows are the rules left to check.",
-      size: "Lesson 11's day has 4 decisions in each of 24 hours, so " + s.l11.cols + " columns, and " + s.l11.rows + " rules, " + s.l11.eq + " of them equalities. In that form only " + s.l11.nz + " of its " + s.l11.cells.toLocaleString("en-US") + " entries are not zero."
+      size: "4 decisions × 24 hours = " + s.l11.cols + " columns: one per decision in each hour, as here.",
+      sizeRows: "Rows and zeros: as lesson 11's [[solver|solver]] stores the day, " + s.l11.rows + " rules, " + s.l11.eq + " of them equalities; only " + s.l11.nz + " of its " + s.l11.cells.toLocaleString("en-US") + " entries are not zero."
     };
   }
   // the seven cards' prompts (pure, so the test can check each is one or two sentences within the text budget)
@@ -131,9 +140,9 @@
     return [
       "At 19:00 on lesson 0's day, Prairie Town's gas plants must supply " + M.need + " MW, and a plan is a [[vector|vector]], an ordered list x = (" + X1 + ", " + X2 + "). Set the plan (" + x[0] + ", " + x[1] + ").",
       "Costs form a vector too, c = (" + M.c[0] + ", " + M.c[1] + ") dollars per MWh. The [[dot-product|dot product]] c · x multiplies in pairs and adds: what does the plan cost for the hour?",
-      "The four rules of lesson 10's hour stack into a [[matrix|matrix]] A: one row per rule, one column per decision. Tap each row to read it as a rule.",
+      "The four rules of lesson 10's hour stack into a [[matrix|matrix]] A, one row per rule and one column per decision; their limits form a vector b. Tap each row to read it.",
       "A x takes every row's dot product with x, one number per rule, and three are done for x = (" + x[0] + ", " + x[1] + "). Work out the CO₂ row, in t.",
-      "[[solver|Solvers]] often want every row as ≤ (lesson B1), but the cover rule says ≥. Multiply its row and its limit by −1, and the sign flips.",
+      "We write every rule with ≤, so the four rows share one form. The cover rule says ≥: multiply its row and its limit by −1, and the sign flips.",
       "Now A x ≤ b checks all four rules at once. Move the plan until only the CO₂ row fails: enough gas, both plants within size, too much CO₂.",
       "A has m rows (rules) and n columns (decisions), " + M.rows.length + " × " + M.c.length + " here. Lesson 11 solves a day with four decisions in each of 24 hours: how many columns has its A?"];
   }
@@ -230,7 +239,7 @@
       // screen readers
       var hd = H("div", { class: "k6-row head", "aria-hidden": "true" }, box);
       // always seven columns (rule, x₁, x₂, A x, sign, b, check), empty when not shown, so the rows line up with the header
-      ["Rule", X1, X2, st.ax ? "A x" : "", "", st.b ? "b" : "", st.check ? "Check" : ""].forEach(function (t) { H("span", { text: t }, hd); });
+      ["Rule", X1, X2, st.ax ? "A x" : "", "", st.b ? "Limit b" : "", st.check ? "Check" : ""].forEach(function (t) { H("span", { text: t }, hd); });
       M.rows.forEach(function (r, i) {
         var a = st.le && r.op === ">=" ? r.a.map(function (v) { return -v; }) : r.a, op = st.le ? "<=" : r.op, b = st.le && r.op === ">=" ? -r.b : r.b;
         var row = H("button", { type: "button", "data-k": r.key, class: "k6-row" + (st.sel === r.key ? " sel" : "") + (st.check ? (st.check[i].pass ? " ok" : " bad") : ""), "aria-pressed": st.sel === r.key ? "true" : "false", "aria-label": rowSpeech(r, i, st) }, box);
@@ -344,7 +353,8 @@
           var only = onlyFails(M, p, "co2");
           pl.point(p, { label: only || ck.every(function (q) { return q.pass; }) ? null : vec(p), cls: ck.every(function (q) { return q.pass; }) ? "good" : "bad" });
           LX.store.set("k6-own", { x: p[0], y: p[1] });
-          if (only && !hit) { hit = true; api.done(); api.saw(T.fail(p)); }
+          if (only && !hit) { hit = true; api.done(); }
+          if (hit) api.saw(T.now(p), !only && !ck.every(function (q) { return q.pass; }));
           if (refresh) refresh();
         }
         pl.onPick(function (q) { sl.set([Math.min(160, Math.round(q[0] / 5) * 5), Math.min(120, Math.round(q[1] / 5) * 5)]); draw(sl.p); }, 5);
@@ -358,13 +368,13 @@
     steps.push({
       text: Q[6],
       build: function (act, api) {
-        var row = H("div", { class: "lx-choices-row", role: "group", "aria-label": "Columns of lesson 11's A" }, act), bs = [];
+        var row = H("div", { class: "lx-choices-row", role: "group", "aria-label": "Columns of lesson 11's A" }, act), bs = [], rowsNote = null;
         OPTS.forEach(function (v) {
           var b = H("button", { type: "button", class: "lx-choice", "aria-pressed": "false", text: v + " columns" }, row);
           b.addEventListener("click", function () {
             bs.forEach(function (q) { q.setAttribute("aria-pressed", q === b ? "true" : "false"); q.classList.remove("right", "wrong"); });
             b.classList.add(v === s.l11.cols ? "right" : "wrong");
-            if (v === s.l11.cols) { api.done(); api.saw(T.size); } else api.saw("Not quite: count one column per decision, 4 in each of 24 hours.", true);
+            if (v === s.l11.cols) { api.done(); api.saw(T.size); if (!rowsNote) rowsNote = H("p", { class: "lx-hint", html: LX.rich(T.sizeRows) }, act); } else api.saw("Not quite: count one column per decision, 4 in each of 24 hours.", true);
           });
           bs.push(b);
         });
@@ -393,7 +403,8 @@
     function own() { var o = LX.store.get("k6-own"); return o && typeof o.x === "number" ? [o.x, o.y] : null; }
     // every value in the ≤ form the equation shows (explainVals); the original signs are named apart
     function you(kind) { return function () { var o = own(); return explainVals(s, o || s.plan, !!o)[kind] || null; }; }
-    var card = LX.EquationCard(H("div", { class: "lx-xcard" }, x), {
+    var eqHost = H("div", { class: "lx-xcard" }, x);
+    var card = LX.EquationCard(eqHost, {
       title: "A x ≤ b, symbol by symbol", lede: "Tap a symbol: what it holds, its size, and your plan from step 6, with the cover row flipped as in step 5.",
       rows: [{ parts: ["minimize", { k: "c" }, "·", { k: "x" }], say: "Minimize c dot x.", tag: "goal" },
              { parts: [{ k: "A" }, { k: "x" }, "≤", { k: "b" }], say: "A times x is at most b, row by row.", tag: "rules" }],
@@ -403,8 +414,9 @@
         A: { sym: "A", name: "The rule matrix", unit: "m rows × n columns", color: "var(--lx-tier-2)", words: "One row per rule, one column per decision. A x is every row's dot product with x.", you: you("A") },
         b: { sym: "b", name: "The limits", unit: "a vector of m numbers", color: "var(--lx-warn)", words: "One limit per rule, in that rule's unit: MW for the first three, t of CO₂ for the last.", you: you("b") } },
       fields: [{ key: "you", label: "Your numbers" }], sel: "A",
-      hint: T.nonneg + " Building these arrays in code comes later, in B2 and M1."
+      hint: T.nonneg
     });
+    H("p", { class: "lx-hint", text: "Building these arrays in code comes later, in B2 and M1." }, eqHost);
     var le = leForm(M);
     LX.LinkedViews(H("div", { class: "lx-xcard" }, x), {
       panels: [

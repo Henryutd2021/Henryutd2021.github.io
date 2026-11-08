@@ -89,7 +89,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-fallback">
 <p class="lx-eyebrow">Units and powers of ten, in six moves</p>
 <ol>
-<li>Each prefix is 1,000 times the one below: Prairie Town's busiest hour of 2025, 450 MW, is 450,000 kW or 0.45 GW.</li>
+<li>Each prefix is 1,000 times the one below: Prairie Town's demand is scaled so its busiest hour of 2025 is 450 MW, which is 450,000 kW or 0.45 GW.</li>
 <li>Energy is power × time: on 3 September 2025 the town's 24 hourly values add up to 6,957 MWh, or 6.957 GWh.</li>
 <li>Units cancel like numbers: at a flat $40/MWh, 1,965 MWh × $40/MWh = $78,600; and 6,957 MWh ÷ 24 h ≈ 289.9 MW, the day's average power.</li>
 <li>Scientific notation writes a number as a × 10ⁿ, with a at least 1 and less than 10: 1,000 = 10³, and the day's 6,957,000,000 Wh ≈ 6.96 × 10⁹ Wh.</li>
@@ -102,7 +102,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <thead><tr><th scope="col">Amount of energy</th><th scope="col">As published</th><th scope="col" class="k1-wh">In Wh</th><th scope="col">Scientific notation (3 figures)</th></tr></thead>
 <tbody>
 <tr><td>Charging a smartphone once</td><td>0.019 kWh</td><td class="k1-wh">19</td><td>1.9 × 10¹ Wh</td></tr>
-<tr><td>An average U.S. home's year</td><td>10,791 kWh</td><td class="k1-wh">10,791,000</td><td>1.08 × 10⁷ Wh</td></tr>
+<tr><td>Electricity an average U.S. home buys in a year</td><td>10,791 kWh</td><td class="k1-wh">10,791,000</td><td>1.08 × 10⁷ Wh</td></tr>
 <tr><td>Prairie Town's day, 3 September 2025</td><td>6,957 MWh</td><td class="k1-wh">6,957,000,000</td><td>6.96 × 10⁹ Wh</td></tr>
 <tr><td>The Southwest Power Pool's year, 2025</td><td>298.6 TWh</td><td class="k1-wh">298,600,000,000,000</td><td>2.99 × 10¹⁴ Wh</td></tr>
 <tr><td>The United States' year, 2025</td><td>about 4,200 TWh</td><td class="k1-wh">4,200,000,000,000,000</td><td>4.2 × 10¹⁵ Wh</td></tr>
@@ -114,9 +114,9 @@ body-classes: "page-learn page-lesson lx-form-cards"
 </div>
 <div class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><ul>
 <li><b>Source.</b> Prairie Town's day is the real hourly demand shape of 3 September 2025 on the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>).</li>
-<li><b>Illustrative.</b> The shape is scaled as in <a href="00-grid-operator.html">lesson 0</a> so that the town's busiest hour of 2025 is 450 MW. The town, its scale and the flat $40/MWh gas running cost are illustrative.</li>
-<li><b>Not a schedule.</b> $78,600 prices all 1,965 MWh of gas at $40/MWh. Lesson 0's schedule also runs the $100/MWh peaker for 20 MWh, so its gas costs $80,400.</li>
-<li><b>Anchors.</b> A phone charge: <a href="https://www.epa.gov/energy/greenhouse-gas-equivalencies-calculator-calculations-and-references">EPA</a> (checked 2 November 2026). A home's year: <a href="https://www.eia.gov/tools/faqs/faq.php?id=97&amp;t=3">EIA</a> (2022 data). The Southwest Power Pool's year: EIA-930 (2025 data). The U.S. year: <a href="https://www.eia.gov/energyexplained/electricity/use-of-electricity.php">EIA</a> (2025 data).</li>
+<li><b>Illustrative.</b> Scaled as in <a href="00-grid-operator.html">lesson 0</a>: 450 MW in 2025's busiest hour, before lesson 0's rounding (at most 2.5 MW an hour). The town, its scale and the flat $40/MWh gas running cost are illustrative.</li>
+<li><b>Not a schedule.</b> $78,600 prices all 1,965 MWh of gas at one flat $40/MWh. Lesson 0's schedule, held to ramp limits, runs 1,960 MWh at $40/MWh and 20 MWh on a $100/MWh peak plant: $80,400.</li>
+<li><b>Anchors.</b> A phone charge: <a href="https://www.epa.gov/energy/greenhouse-gas-equivalencies-calculator-calculations-and-references">EPA</a> (checked 2 November 2026). A home's yearly purchases: <a href="https://www.eia.gov/tools/faqs/faq.php?id=97&amp;t=3">EIA</a> (2022 data). The Southwest Power Pool's year: EIA-930 (2025 data). The U.S. year: <a href="https://www.eia.gov/energyexplained/electricity/use-of-electricity.php">EIA</a> (2025 data).</li>
 </ul></div>
 ```
 :::
@@ -160,10 +160,9 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-deeper-body">
 ```
 
-- **Choose units that keep numbers modest.** Models write MW and \$/MWh, not W and \$/Wh, so their coefficients (the fixed numbers in front of each unknown) stay within a few powers of ten of each other.
-- **Why it matters.** A [solver]{.lx-term term="solver"} treats values within a small tolerance, an allowed rounding error, as equal or zero; coefficients spread over many powers of ten can hide an error or slow a solve.
+- **Choose units that keep numbers modest.** Models write MW and \$/MWh, not W and \$/Wh, so their coefficients (the fixed numbers in front of each unknown) are not needlessly far apart in size. Sensible units help a [solver]{.lx-term term="solver"}; they do not guarantee a well-scaled model.
 - **Put the unit in the name.** `demand_mw * hours` is MWh and `gas_mwh * price_usd_per_mwh` is dollars. Terms added together must share a unit: MW plus MW, never MW plus MWh.
-- **Where next.** Bridge [B3](b03-read-check-formulation.html) checks that every term of a model's balance has one unit; [M1](m01-dispatch-to-lmp.html) builds a dispatch model in MW and \$/MWh.
+- **Where next.** Bridge [B3](b03-read-check-formulation.html) checks that every term of a model's balance has one unit; [M1](m01-dispatch-to-lmp.html) builds a dispatch model in MW and \$/MWh. Checking a model's numerical scaling belongs to those lessons.
 
 ```{=html}
 </div>
@@ -198,9 +197,9 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <details class="lx-answer"><summary>Answer</summary><p>298,600 GWh: a TWh is 1,000 GWh, and a smaller unit takes a bigger number. 298,600,000 is the same energy in MWh.</p></details>
 </div>
 <div class="lx-qq" data-id="apart" data-answer="b">
-<p class="lx-qtext">About how many powers of ten from an average U.S. home's year (1.08 × 10⁷ Wh) to the Southwest Power Pool's year (2.99 × 10¹⁴ Wh)?</p>
+<p class="lx-qtext">About how many powers of ten from the electricity an average U.S. home buys in a year (1.08 × 10⁷ Wh) to the Southwest Power Pool's year (2.99 × 10¹⁴ Wh)?</p>
 <ul class="lx-choices"><li data-value="a">5</li><li data-value="b">7</li><li data-value="c">14</li><li data-value="d">21</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>7: the exponents differ by 14 − 7 = 7, and 2.99 ÷ 1.08 is about 2.8, so the ratio is about 2.8 × 10⁷. 2.8 is below 3.16, half a power of ten, so the nearest power stays 10⁷.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>7. Exponents: 14 − 7 = 7. Leading numbers: 2.99 ÷ 1.08 ≈ 2.8. So the ratio is about 2.8 × 10⁷.</p><p>2.8 is below 3.16 (√10, the midpoint of 1 and 10 on a log scale), so the nearest power stays 10⁷.</p></details>
 </div>
 </div>
 <div id="k1-drill"></div>
@@ -222,7 +221,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <tr><td class="n">× 1,000</td><td>Each step of the prefix ladder: W, kW, MW, GW, TW.</td><td class="s">SI Brochure (BIPM), 9th edition, 2019</td></tr>
 <tr><td class="n">1 MW × 1 h</td><td>= 1 <span class="lx-term" data-term="megawatt-hour">MWh</span>: power held for an hour is energy.</td><td class="s">Definition</td></tr>
 <tr><td class="n">10,791 kWh</td><td>Electricity an average U.S. home buys in a year: about 10⁷ Wh.</td><td class="s"><a href="https://www.eia.gov/tools/faqs/faq.php?id=97&amp;t=3">EIA FAQ</a> · 2022 data</td></tr>
-<tr><td class="n">298.6 TWh</td><td>The Southwest Power Pool's demand in 2025: about 3 × 10¹⁴ Wh.</td><td class="s"><a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a> · 2025 data</td></tr>
+<tr><td class="n">298.6 TWh</td><td>The Southwest Power Pool's demand in 2025: about 3 × 10¹⁴ Wh.</td><td class="s">Summed from <a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a> hourly data, 2025 (accessed 2 November 2026); 699 implausible hours filled from the day-ahead forecast</td></tr>
 <tr><td class="n">about 4,200 TWh</td><td>U.S. electricity use in 2025: about 4 × 10¹⁵ Wh.</td><td class="s"><a href="https://www.eia.gov/energyexplained/electricity/use-of-electricity.php">EIA</a> · 2025 data</td></tr>
 </tbody>
 </table>
@@ -244,7 +243,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-card lx-sources">
 <p class="lx-eyebrow">Sources and further reading</p>
 <ul>
-<li>EIA. <a href="https://www.eia.gov/electricity/gridmonitor/">Hourly Electric Grid Monitor</a> (Form EIA-930): the Southwest Power Pool data behind Prairie Town's day and the 2025 total.</li>
+<li>EIA. <a href="https://www.eia.gov/electricity/gridmonitor/">Hourly Electric Grid Monitor</a> (Form EIA-930), accessed 2 November 2026: the Southwest Power Pool data behind Prairie Town's day and the 2025 total. The total sums the year's hourly demand after 699 implausible hours (under half the median, or repeated values) were replaced by the day-ahead forecast, rescaled to the adjacent actual demand.</li>
 <li>EIA. <a href="https://www.eia.gov/tools/faqs/faq.php?id=97&amp;t=3">How much electricity does an American home use?</a> (2022 data) and <a href="https://www.eia.gov/energyexplained/electricity/use-of-electricity.php">Electricity explained: use of electricity</a> (2025 data).</li>
 <li>U.S. EPA. <a href="https://www.epa.gov/energy/greenhouse-gas-equivalencies-calculator-calculations-and-references">Greenhouse Gas Equivalencies Calculator: calculations and references</a> (smartphones charged; page updated 4 August 2026).</li>
 <li>BIPM (2019). The International System of Units (SI Brochure), 9th edition: the prefixes.</li>
