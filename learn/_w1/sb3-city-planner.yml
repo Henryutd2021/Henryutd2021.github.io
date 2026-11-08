@@ -5,7 +5,7 @@ lesson: SB3
 glossary:
   - id: energy-hub
     term: Energy hub
-    def: "A model of a place where energy carriers come in, are converted and stored, and meet the uses: a district, a campus or a city, not a building."
+    def: "A model of energy carriers coming in, being converted and stored, and meeting the uses inside a chosen boundary: a building, a campus, a district or a city."
   - id: linearized-feeder-limit
     term: Linearized feeder limit
     def: "A ceiling on the power through a substation or feeder in each hour, written as a straight-line rule a linear program can use, with no voltage or power-flow physics."

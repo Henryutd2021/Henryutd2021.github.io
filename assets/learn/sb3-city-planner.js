@@ -20,7 +20,7 @@
     var out = [], A = R.acc, A0 = R.base ? R.base.acc : A;
     R.dist.forEach(function (d) {
       if (d.upg > 0.05) out.push({ kind: "bad", text: "**" + d.label + ": " + kilo(d.peak) + " MW in its busiest hour against a " + kilo(d.limit) + " MW limit.** The plan buys " + kilo(d.upg) + " MW of substation upgrade (" + mil(d.upg * R.sys.a.up) + " a year)." });
-      else if (d.value != null && d.value > 0.5) out.push({ kind: "", text: "**" + d.label + " reaches its limit:** busiest hour " + kilo(d.peak) + " of " + kilo(d.limit) + " MW; flexible loads keep it there. One more MW of room would save about $" + kilo(d.value) + " a year (the LP's dual)." });
+      else if (d.value != null && d.value > 0.5) out.push({ kind: "", text: "**" + d.label + " reaches its limit:** busiest hour " + kilo(d.peak) + " of " + kilo(d.limit) + " MW; flexible loads keep it there. More room is worth about $" + kilo(d.value) + " per MW a year at the margin ([[shadow-price|the LP's dual]])." });
       else out.push({ kind: "good", text: "**" + d.label + " stays within its limit:** busiest hour " + kilo(d.peak) + " of " + kilo(d.limit) + " MW." });
     });
     var dc = R.delta.co2;
@@ -44,7 +44,7 @@
   function presetSay(pr) { return pr ? "“" + pr.label + "”: " + pr.note.charAt(0).toLowerCase() + pr.note.slice(1) + "." : KEEP; }
   var UNITS = "$M: millions of 2025 dollars; t: metric tonnes of CO₂.";
   var page = { says: says, pick: pick, kilo: kilo, mil: mil, pct1: pct1, KEEP: KEEP, UNITS: UNITS, presetSay: presetSay,
-    GROUPS: [{ title: "Buildings", fields: ["hp", "ret"], color: "var(--lx-cc)", hint: "A [[heat-pump|heat pump]]'s [[coefficient-of-performance|COP]] falls on cold nights; a retrofit cuts the heat a building needs." },
+    GROUPS: [{ title: "Buildings", fields: ["hp", "ret"], color: "var(--lx-cc)", hint: "Resistance heaters turn electricity straight into heat. A [[heat-pump|heat pump]]'s [[coefficient-of-performance|COP]] falls on cold nights; a retrofit cuts the heat a building needs." },
       { title: "District heat (dense core)", fields: ["dh", "dhp", "sto"], color: "var(--lx-tier-4)", hint: "A hot-water network for part of the core: its plant's heat pump, a heat store, and a gas boiler for the rest, assumed to exist already (its fuel counts, not its construction)." },
       { title: "Cars", fields: ["ev", "evm"], color: "var(--lx-demand)", hint: "[[managed-charging|Managed charging]] moves each day's charge to any hours of that day, at most a sixth in one hour. It assumes cars are plugged in at home or work when needed." },
       { title: "Local supply and storage", fields: ["pv", "bat"], color: "var(--lx-solar)", hint: "Rooftop solar a district cannot use is spilled. Batteries sit at the substations: each MW of power stores 4 MWh, four hours at full power." },
@@ -66,9 +66,10 @@
     plan = ss.state;
     var C = U.controls(ctr, S, plan, page.GROUPS, change);
     var pre = H("div", { class: "lx-sb-presets", role: "group", "aria-label": "Start from a preset (only the choices it names change)" }, side);
-    var preSay = H("p", { class: "lx-hint e3-pre-say", "aria-live": "polite", text: page.presetSay(null) }, side);
+    var preSay = H("p", { class: "lx-hint e3-pre-say", "aria-live": "polite", hidden: true }, side);
+    H("p", { class: "lx-hint e3-pre-say", text: KEEP }, side);
     E3.presets.forEach(function (pr) {
-      H("button", { class: "lx-btn ghost small", type: "button", text: pr.label, onclick: function () { change(E3.withPreset(plan, pr)); preSay.textContent = page.presetSay(pr) + " " + KEEP; } }, pre);
+      H("button", { class: "lx-btn ghost small", type: "button", text: pr.label, onclick: function () { change(E3.withPreset(plan, pr)); preSay.textContent = page.presetSay(pr); preSay.hidden = false; } }, pre);
     });
     var preAll = H("details", { class: "e3-fold" }, side); H("summary", { text: "What each preset sets" }, preAll);
     var preUl = H("ul", { class: "e3-notes" }, preAll);
@@ -105,11 +106,11 @@
       U.keys(c1, [["Read the lines", "the solid line is what the district bought through its substation; the dashed line is what it used. The gap is its rooftop solar and batteries."],
         ["The limit", "each hour's flow may not pass it (a [[linearized-feeder-limit|linearized feeder limit]]) unless the plan buys an upgrade."],
         ["Ties", "hourly schedules can cost the same: the chart shows the one the [[tie-rule|tie rule]] picks."]]);
-      var c2 = H("div", { class: "lx-xcard lx-sb-chart" }, res); H("h3", { text: "What 1 MW more room is worth, from the LP" }, c2);
-      U.table(c2, ["District", "Busiest hour", "Limit", "Upgrade bought", "1 MW more room saves a year", "Hours a year at the limit"], R.dist.map(function (d) {
+      var c2 = H("div", { class: "lx-xcard lx-sb-chart" }, res); H("h3", { text: "What more room is worth, from the LP" }, c2);
+      U.table(c2, ["District", "Busiest hour", "Limit", "Upgrade bought", "Marginal value of room ($ per MW a year)", "Hours a year at the limit"], R.dist.map(function (d) {
         return [d.label, kilo(d.peak) + " MW", kilo(d.limit) + " MW", kilo(d.upg) + " MW", d.value == null ? "–" : "$" + kilo(d.value), kilo(d.bindHours)];
       }), "sb3-val");
-      U.keys(c2, [["The value", "the substation row's [[shadow-price|dual]], summed over the year: what one more MW of room would save."],
+      U.keys(c2, [["The value", "the substation row's [[shadow-price|dual]], summed over the year: what a little more room saves, per MW. A whole MW can save less, once the upgrade it replaces is gone."],
         ["Its assumptions", "this plan, 2025's prices and the eight days: a marginal value, not a market price."],
         ["With an upgrade", "it equals the upgrade's yearly cost per MW."],
         ["Hours at the limit", "representative hours with the flow at the limit (plus any upgrade), each counted for the days its day stands for."]]);
@@ -134,7 +135,8 @@
     LX.Boundary(H("div", { class: "lx-xcard" }, x), { title: "Where the engine's answer holds",
       holds: ["eight representative days stand for 2025 (weights add to 365), with a cold design day and the summer peak day kept", "each district's substation is one ceiling on each hour's flow (a linearized feeder limit)",
         "batteries, the heat store and managed charging only shift energy within a day", "2025's prices, people and homes; costs fixed in 2025 dollars, whatever is built",
-        "synthetic weather: NOAA's 1991–2020 normals for Wichita on SPP's 2025 days, with a cold design day and a heat wave set for teaching"],
+        "synthetic weather: NOAA's 1991–2020 normals for Wichita on SPP's 2025 days, with a cold design day and a heat wave set for teaching",
+        "the base load follows SPP's whole-grid shape, which carries the region's own electric heating, so winter peaks can come out a little high"],
       leaves: ["a full year of hours for your own plan (the presets are checked) and any other weather year: the annual numbers are representative-day estimates", "power flow inside a district: voltage and each feeder's own limit (A17)", "outages and cold snaps colder than the design day", "how fast the plan could be built, and who decides it", "how bills are really set: the household table is a screening estimate"],
       source: "Prairie City is fictional; its numbers are illustrative. Prices: EIA, Kansas 2025; 2025 dollars." });
 

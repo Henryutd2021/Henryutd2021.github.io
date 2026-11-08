@@ -75,7 +75,15 @@ const RUN_DATE = "6 November 2026";
 
   // ---------------- the steps' words
   const w0 = PG.words("today", R.today, P);
-  ok(R.today.dist.every(d => d.upg < 1e-6 && d.peak <= d.limit) && R.today.dist.every(d => w0.indexOf(E3.kilo(d.peak) + " of " + E3.kilo(d.limit) + " MW") >= 0), "step 3: every substation within its limit, as said");
+  ok(R.today.dist.every(d => d.upg < 1e-6 && d.peak <= d.limit) && /^Every substation stays within its limit/.test(w0) && w0.split(/\s+/).length <= 35, "step 3: every substation within its limit, as said, in a short line (the peaks in the readouts)");
+  // the slider's floor: the least CO2 the choice's limits allow, by bisection, is the page's number
+  {
+    const st = async pct => (await E3.solve(Object.assign({}, DEF, PG.CHOOSE.base), P, { solver, size: true, cap: R.today.acc.co2Hub * pct / 100, retMax: PG.CHOOSE.retMax, dhMax: PG.CHOOSE.dhMax, pvMax: PG.CHOOSE.pvMax, batMax: PG.CHOOSE.batMax })).status;
+    let lo = 50, hi = PG.CHOOSE.capMin; for (let i = 0; i < 16; i++) { const m = (lo + hi) / 2; if ((await st(m)) === "optimal") hi = m; else lo = m; }
+    ok(Math.abs(hi - PG.CHOOSE.floorPct) < 0.05 && (await st(PG.CHOOSE.floorPct + 0.1)) === "optimal" && (await st(PG.CHOOSE.floorPct - 0.1)) === "infeasible" && PG.CHOOSE.capMin > PG.CHOOSE.floorPct,
+      "the least CO2 these limits allow is " + hi.toFixed(2) + "% of 2025, as the page says (" + PG.CHOOSE.floorPct + "%); the slider stops above it");
+    ok(/"The slider's floor"/.test(JS) && !/Below about 65%/.test(JS), "the floor said as the least CO2 the limits allow, not as a 65% threshold");
+  }
   ok(R.today.dist.every((d, i) => near(d.limit, Math.ceil(city.districts[i].peak2025MW * 1.15 / 10) * 10)), "each limit is 15% above the 2025 peak, rounded up to 10 MW, as said");
   const w1 = PG.words("electrify", R.electrify, P), up1 = PG.upTotal(R.electrify);
   ok(w1.indexOf(E3.kilo(up1) + " MW of upgrades") >= 0 && R.electrify.dist.filter(d => d.upg > 0.05).every(d => near(d.value, E3.sysOf(DEF, P).a.up, 1)), "step 4: upgrades and the summed duals = the upgrade's yearly cost");
@@ -114,9 +122,13 @@ const RUN_DATE = "6 November 2026";
   ok(worst === FE[2] && kt.indexOf("so the plan with managed charging and batteries misses most: " + E3.kilo(worst.year.unserved) + " MWh") >= 0 && FE[2].days.batteryMW === 40, "the plan with managed charging and batteries misses most (" + E3.kilo(worst.year.unserved) + " MWh), as said");
   ok(FE[3].year.co2 > FE[3].cap && kt.indexOf(E3.kilo(FE[3].year.co2 - FE[3].cap) + " t over the cap") >= 0, "step 6's plan: over its cap on the year by " + E3.kilo(FE[3].year.co2 - FE[3].cap) + " t, as said");
   ok(keys.length === 6 && ["The check", "What holds", "Three cold days", "The grid", "Step 6's cap", "Not tested"].every((k, i) => keys[i] && keys[i][0] === k), "the card's keys, one idea each");
-  ok(FE.every(e => Math.abs(e.year.cost / e.days.cost - 1) < 0.001 && Math.abs(e.year.co2 / e.days.co2 - 1) < 0.001) && /cost and CO₂ hold; the upgrades the eight days buy fall a little short on 19 or 20 February/.test(T) && FE[3].year.co2 > FE[3].cap, "the explain layer: cost and CO2 hold (within 0.1%); the upgrades fall a little short on 19 or 20 February; the no-JS table says step 6's plan ends over its cap");
+  ok(FE.every(e => Math.abs(e.year.cost / e.days.cost - 1) < 0.001 && Math.abs(e.year.co2 / e.days.co2 - 1) < 0.001) && /total cost and CO₂ hold; the upgrades the eight days buy fall a little short on 19 or 20 February/.test(T) && FE[3].year.co2 > FE[3].cap, "the explain layer: cost and CO2 hold (within 0.1%); the upgrades fall a little short on 19 or 20 February; the no-JS table says step 6's plan ends over its cap");
   ok(/e3_full_year/.test(JS) && /e3-full-year\.json/.test(PAGE) && !/fullYear\s*\(/.test(JS), "the page reads the data file and never solves the year");
-  has("Storage resets every day, on the eight days and in the full-year check: no carrying heat or charge between days.");
+  has("Each day ends with the stored energy it started with, a level the LP picks day by day, on the eight days and in the full-year check: no heat or charge carried between days.");
+  ok(/How much smaller do the upgrades get\?/.test(JS) && R.flex.dist.every(d => d.upg > 0.05), "step 5 asks how much smaller the upgrades get: none disappears");
+  ok(T.indexOf("Fuel is the furnaces' gas and propane (set by $y$) and the network boiler's gas") >= 0 && /fuel \(furnaces and the network's boiler\)/.test(JS) && cfg.dh.plant.boilerEff === 0.9, "the goal's fuel includes the network boiler's gas");
+  ok(/if \(S0\.runs\[id\]\) show\(S0\.runs\[id\]\);/.test(JS) && /if \(S0\.choose\) show\(S0\.choose\.R, S0\.choose\.cap\);/.test(JS), "a step shows its kept run again when the reader comes back");
+  { const sb = R.electrify.dist.map(d => d.at.h); ok(sb.every(h => h === 6 || h === 20) && T.indexOf("(06:00 or 20:00 here)") >= 0, "the myth's answer names the busiest hours the model finds (" + sb.join(", ") + ":00)"); }
   ok(!/no full-year check here/.test(PAGE), "the old 'no full-year check here' is gone");
 
   // ---------------- the page

@@ -15257,12 +15257,12 @@
     var ua = 1 - FYc.degreeHoursDays / FYc.degreeHours;   // the year's heat-loss rate against the eight days' (same heat need)
     out.push(["The check", "the plan as the eight days decided it (shares, sizes, substation upgrades), run on every hour of 2025 with the same model. Precomputed on " + date + ": too large for a click."]);
     out.push(["Two runs", "cost, CO₂ and unserved energy keep the eight days' upgrades; the busiest hours and upgrades come from a second run with the upgrades sized on the year."]);
-    out.push(["What holds", "yearly cost and CO₂, within " + (gap < 0.001 ? "0.1%" : "about " + pct(gap, 1)) + ": like the days, the year is scaled to the city's annual base and heat energy (its heat-loss rate " + pct(ua, 1) + " lower)."]);
+    out.push(["What holds", "total yearly cost and CO₂, within " + (gap < 0.001 ? "0.1%" : "about " + pct(gap, 1)) + ": like the days, the year is scaled to the city's annual base and heat energy (its heat-loss rate " + pct(ua, 1) + " lower)."]);
     var cost = extra * e.upYearly;
     out.push(["Three cold days", "the design day stands for 3 days: in the year, " + dateList(FYc.designDays) + ", equally cold. Only their base load (SPP's demand) differs, and February's is higher in the hours that matter."]);
     out.push(["The grid", Y.unserved >= 0.5 ? "the eight days' upgrades leave " + kilo(Y.unserved) + " MWh unserved on " + dateList(Y.shortDays.map(function (x) { return x.day; })) + " (load the model's substations cannot carry). Sized on the year, the plan buys " + (extra).toFixed(1) + " MW more, about " + (cost < 1e5 ? money(Math.round(cost / 1000) * 1000) : millions(cost)) + " a year."
       : "every hour of the year stays within the limits" + (up >= 0.5 ? " and the eight days' upgrades" : "") + (most >= 0.5 ? "; the busiest hour is up to " + kilo(most) + " MW higher than on the eight days." : ".")]);
-    if (c3 && Math.max(D.contractGWh, Y.contractGWh) > 0) out.push(["Wind and sun", "the eight days are picked by their shapes, not scaled: " + pct(FYc.windCF.days, 1) + " wind and " + pct(FYc.solarCF.days, 1) + " solar capacity factors, against 2025's " + pct(FYc.windCF.year, 1) + " and " + pct(FYc.solarCF.year, 1) + ". Hence the contract row and the cost gap."]);
+    if (c3 && Math.max(D.contractGWh, Y.contractGWh) > 0) out.push(["Wind and sun", "the eight days are picked by their shapes, not scaled: " + pct(FYc.windCF.days, 1) + " wind and " + pct(FYc.solarCF.days, 1) + " solar capacity factors, against 2025's " + pct(FYc.windCF.year, 1) + " and " + pct(FYc.solarCF.year, 1) + ". Hence the wind and solar row and the cost gap."]);
     out.push(["Not tested", "another weather year, cold beyond the design day, or storage from one day to the next: the year uses the eight days' synthetic weather rule."]);
     return out;
   }
@@ -15356,7 +15356,7 @@
       ["Rooftop solar", money(cfg.rooftop.capex) + " per kW, " + cfg.rooftop.life + " years", "EIA AEO2026, residential (2022 dollars, converted)"],
       ["Battery, 4 hours (each MW stores 4 MWh)", money(cfg.battery.capex) + " per kW, " + cfg.battery.life + " years", "NREL 2025 update (2024 dollars, converted)"],
       ["Retrofit: cost a home · heat saved · life", money(cfg.retrofit.cost.def) + " · " + cfg.retrofit.save.def + "% · " + cfg.retrofit.life + " years", where],
-      ["Heat network: per home-equivalent · plant heat pump · heat store", money(dh.network.cost.def) + " (" + dh.network.life + " years) · " + money(dh.plant.capex.def) + " per kW of heat, COP " + dh.plant.cop + " (" + dh.plant.life + " years) · " + money(dh.store.capex.def) + " per MWh (" + dh.store.life + " years)",
+      ["Heat network: per home-equivalent (an average home's heat need) · plant heat pump · heat store", money(dh.network.cost.def) + " (" + dh.network.life + " years) · " + money(dh.plant.capex.def) + " per kW of heat, COP " + dh.plant.cop + " (" + dh.plant.life + " years) · " + money(dh.store.capex.def) + " per MWh (" + dh.store.life + " years)",
         "set for teaching (illustrative); " + pct(dh.loss) + " of the heat lost in the pipes; the gas boiler (" + pct(dh.plant.boilerEff) + ") is assumed to exist already: its fuel is counted, not its construction"],
       ["Substation upgrade", money(cfg.upgrade.capex.def) + " per kW, " + cfg.upgrade.life + " years", where],
       ["Managed charging", "any hours of the same day, at most a " + (cfg.ev.minHours === 6 ? "sixth" : "1/" + cfg.ev.minHours) + " of the day's charge in one hour", "set for teaching: cars plugged in at home or work whenever needed (an upper bound on what managed charging can do)"],
@@ -15474,9 +15474,9 @@
         marks: [{ x: bi + 0.5, y: d.imp[bi], label: kilo(d.imp[bi]) + " MW at " + hh(bi), kind: "dot", pos: "above" }],
         caption: D.label + ", " + P.days[k].label.toLowerCase() + " (" + P.days[k].date + ")",
         legend: [{ label: "Bought through the substation", color: DCOL[di] }, { label: "Used in the district", color: "var(--lx-ink-3)", dash: "5 4" }].concat(lines.length > 2 ? [{ label: "Rooftop solar used", color: "var(--lx-solar)" }] : []),
-        tip: function (x) { var h = Math.max(0, Math.min(23, Math.floor(x))); return "<div><b>" + hh(h) + "</b></div><div>Bought " + kilo(d.imp[h]) + " MW</div><div>Used " + kilo(load[h]) + " MW</div>" + (d.lim[h] > 0.5 ? "<div>Room worth $" + kilo(d.lim[h]) + " per MW a year</div>" : ""); },
+        tip: function (x) { var h = Math.max(0, Math.min(23, Math.floor(x))); return "<div><b>" + hh(h) + "</b></div><div>Bought " + kilo(d.imp[h]) + " MW</div><div>Used " + kilo(load[h]) + " MW</div>" + (d.lim[h] > 0.5 ? "<div>More room worth $" + kilo(d.lim[h]) + " per MW a year at the margin</div>" : ""); },
         aria: "Hourly chart: " + D.label + ", " + P.days[k].label + ". Busiest hour " + hh(bi) + " at " + kilo(d.imp[bi]) + " MW against a limit of " + kilo(lim) + " MW.",
-        text: { head: ["Hour", "Bought (MW)", "Used (MW)", "Base load (MW)", "Heating (MW)", "EV charging (MW)", "Rooftop solar used (MW)", "Battery in − out (MW)", "Value of 1 MW more room ($ a year)"],
+        text: { head: ["Hour", "Bought (MW)", "Used (MW)", "Base load (MW)", "Heating (MW)", "EV charging (MW)", "Rooftop solar used (MW)", "Battery in − out (MW)", "Marginal value of room ($ per MW a year)"],
           rows: d.imp.map(function (v, h) { return [hh(h), kilo(v), kilo(load[h]), kilo(d.base[h]), kilo(d.heat[h] + d.plant[h]), kilo(d.ev[h]), kilo(d.pv[h]), kilo(d.bc[h] - d.bd[h]), d.lim[h] == null ? "–" : kilo(d.lim[h])]; }) } }, true);
       say.textContent = "Busiest hour " + hh(bi) + ": " + kilo(d.imp[bi]) + " MW bought against the " + kilo(lim) + " MW limit" + (up > 0.05 ? " (" + kilo(up) + " MW of upgrade bought for the year's busiest hour)." : ".");
     }

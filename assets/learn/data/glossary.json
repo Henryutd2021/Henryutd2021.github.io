@@ -1093,7 +1093,7 @@
  },
  "energy-hub": {
   "term": "Energy hub",
-  "short": "A model of a place where energy carriers come in, are converted and stored, and meet the uses: a district, a campus or a city, not a building.",
+  "short": "A model of energy carriers coming in, being converted and stored, and meeting the uses inside a chosen boundary: a building, a campus, a district or a city.",
   "lesson": "SB3",
   "href": "sb3-city-planner.html"
  },

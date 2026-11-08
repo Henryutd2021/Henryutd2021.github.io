@@ -22,11 +22,12 @@
     today: { label: "2025 as it is", state: { hp: 0, ret: 0, dh: 0, dhp: 0, sto: 0, ev: 1, evm: "home", pv: 0, bat: 0, up: "yes" } },
     electrify: { label: "Electrify heat and cars", state: { hp: 80, ret: 0, dh: 0, dhp: 0, sto: 0, ev: 50, evm: "home", pv: 0, bat: 0, up: "yes" } },
     flex: { label: "Electrify, managed charging, 40 MW of batteries", state: { hp: 80, ret: 0, dh: 0, dhp: 0, sto: 0, ev: 50, evm: "managed", pv: 0, bat: 40, up: "yes" } } };
-  var CHOOSE = { base: { ev: 50, evm: "managed" }, retMax: 0.6, dhMax: 0.4, pvMax: 400, batMax: 200, capDef: 80, capMin: 65, capMax: 100, capStep: 5 };
+  // floorPct: the least CO2 the choice's limits allow, as a share of 2025, rounded to 0.1 (the test finds it by bisection)
+  var CHOOSE = { base: { ev: 50, evm: "managed" }, retMax: 0.6, dhMax: 0.4, pvMax: 400, batMax: 200, capDef: 80, capMin: 65, capMax: 100, capStep: 5, floorPct: 63.4 };
   function upTotal(R) { return R.dist.reduce(function (s, d) { return s + d.upg; }, 0); }
   function peaksText(R) { return R.dist.map(function (d) { return d.label.toLowerCase() + " " + kilo(d.peak) + " of " + kilo(d.limit) + " MW"; }).join(", "); }
   function words(id, R, P) {
-    if (id === "today") return "Every substation stays within its limit in 2025's busiest hours: " + peaksText(R) + ". Each limit is its district's 2025 peak × 1.15, rounded up to the next 10 MW, by construction.";
+    if (id === "today") return (R.dist.every(function (d) { return d.peak <= d.limit + 1e-6; }) ? "Every substation stays within its limit in 2025's busiest hours (see the readouts)." : "A substation passes its limit (see the readouts).") + " By construction: each limit is its district's 2025 peak × 1.15, rounded up to the next 10 MW.";
     if (id === "electrify") {
       var over = R.dist.filter(function (d) { return d.upg > 0.05; });
       var sb = R.dist[1], when = "The suburbs' busiest hour: " + (sb.at.h < 10 ? "0" : "") + sb.at.h + ":00 on the " + P.days[sb.at.k].label.toLowerCase() + ". ";
@@ -89,18 +90,22 @@
     // a run step: one plan through E3 with BenchRun (failure states, Try again, busy holds Next)
     function runStep(act, api, id, after) {
       var kp = H("div", { class: "lx-readouts" }), res = H("div", { class: "m12-res" });
+      // the run's readouts, results and words (also when the reader comes back to the step: the run is kept)
+      function show(R) {
+        kp.innerHTML = ""; R.dist.forEach(function (d) { kpi(kp, d.label, kilo(d.peak) + " / " + kilo(d.limit) + " MW", d.upg > 0.05 ? "warn" : "good"); }); kpi(kp, "Upgrades", kilo(upTotal(R)) + " MW", upTotal(R) > 0.05 ? "warn" : "good");
+        res.innerHTML = ""; if (after) after(R, res);
+        api.done(); api.saw(words(id, R, P) + (id === "flex" && !R.prev ? " (Run step 4 first to compare.)" : ""));
+      }
       var run = LX.BenchRun(act, { label: "Run: " + PLANS[id].label, busy: api.busy, results: [kp, res], state: function () { return planOf(id); },
         solve: function (st, ctx) { return E3.solve(st, P, { signal: ctx.signal, attempt: ctx.attempt, solver: solver() }); },
         render: function (R) {
           if (id === "flex" && S0.runs.electrify) R.prev = S0.runs.electrify;
           S0.runs[id] = R;
-          kp.innerHTML = ""; R.dist.forEach(function (d) { kpi(kp, d.label, kilo(d.peak) + " / " + kilo(d.limit) + " MW", d.upg > 0.05 ? "warn" : "good"); }); kpi(kp, "Upgrades", kilo(upTotal(R)) + " MW", upTotal(R) > 0.05 ? "warn" : "good");
-          res.innerHTML = ""; if (after) after(R, res);
-          api.done(); api.saw(words(id, R, P) + (id === "flex" && !R.prev ? " (Run step 4 first to compare.)" : ""));
+          show(R);
           refreshExplain();
         } });
       act.appendChild(kp); act.appendChild(res);
-      if (S0.runs[id]) api.done();
+      if (S0.runs[id]) show(S0.runs[id]);
       S0.runners[id] = function () { run.run(planOf(id)); };
       return run;
     }
@@ -140,7 +145,7 @@
           });
         } },
       // 5 flexibility
-      { text: "Add flexibility: managed charging (each day's charge in any hours of that day) and 40 MW of batteries at the substations. Which upgrades disappear?",
+      { text: "Add flexibility: managed charging (each day's charge in any hours of that day) and 40 MW of batteries at the substations. How much smaller do the upgrades get?",
         build: function (act, api) {
           U.keys(act, [["Assumed", "managed cars are plugged in at home or work whenever needed, and a day's charge takes 6 hours or more: an upper bound on what managed charging can do."]]);
           runStep(act, api, "flex"); } },
@@ -162,17 +167,22 @@
             },
             render: function (R, st) {
               S0.choose = { R: R, cap: st.cap };
-              kp.innerHTML = ""; chooseReadouts(R).forEach(function (x) { kpi(kp, x[0], x[1], x[2]); });
-              res.innerHTML = "";
-              U.table(res, ["District (shares of its heat)", "Heat pumps", "Retrofitted", "District heat", "Furnaces left"], R.acc.d.map(function (o) { return [o.label, pct0(o.share.hp), pct0(o.retShare), pct0(o.share.dh), pct0(o.share.fuel)]; }), "m12-chosen");
-              api.done(); api.saw(chooseWords(R, st.cap));
+              show(R, st.cap);
               refreshExplain();
             } });
+          // the LP's choice: readouts, the shares it chose and the words (also when the reader comes back to the step)
+          function show(R, cap) {
+            kp.innerHTML = ""; chooseReadouts(R).forEach(function (x) { kpi(kp, x[0], x[1], x[2]); });
+            res.innerHTML = "";
+            U.table(res, ["District (shares of its heat)", "Heat pumps", "Retrofitted", "District heat", "Furnaces left"], R.acc.d.map(function (o) { return [o.label, pct0(o.share.hp), pct0(o.retShare), pct0(o.share.dh), pct0(o.share.fuel)]; }), "m12-chosen");
+            if (cap !== S0.cap) H("p", { class: "lx-hint", text: "Shown: your last run, at " + cap + "% of 2025. Press Let the LP choose for " + S0.cap + "%." }, res);
+            api.done(); api.saw(chooseWords(R, cap));
+          }
           act.appendChild(stale); act.appendChild(kp); act.appendChild(res);
           S0.runners.choose = function () { run.run({ cap: S0.cap }); };
           U.keys(act, [["Fixed", "half the cars electric, with managed charging."], ["Limits", "retrofits up to 60% of buildings; district heat up to 40% of the core's heat."],
-            ["Below about 65%", "no plan within these limits meets the cap: gasoline and water heating stay."]]);
-          if (S0.choose) api.done();
+            ["The slider's floor", "65%: just above the least CO₂ these limits allow, about " + CHOOSE.floorPct + "% of 2025 (gasoline and water heating stay)."]]);
+          if (S0.choose) show(S0.choose.R, S0.choose.cap);
         } },
       // 7 screening outputs
       { text: "Bills by household group are not in the LP. An [[screening-estimate|accounting layer]] spreads each measure over the groups by a stated rule. Change the rule: the LP's plan does not move.",
@@ -222,7 +232,7 @@
         title: "The hub's linear program, symbol by symbol", lede: "Tap a symbol: what it means, its unit and, once you have run it, its value. The sums run over days k (8), hours h (24), districts d (3), envelopes e (as built, retrofitted) and heating systems s.", dense: true, label: "The hub's linear program; each symbol is a button",
         fields: [{ key: "you", label: "In this lesson" }, { key: "code", label: "In code", code: true }],
         rows: [
-          { html: "min Σ<sub><var>k</var>,<var>h</var></sub> " + sym("w", "<var>w</var><sub><var>k</var></sub>") + " [Σ<sub><var>d</var></sub> " + sym("p", "<var>p</var><sub><var>d</var></sub>") + " " + sym("imp", "<var>imp</var>") + " + (" + sym("pind", "<var>p</var><sub>ind</sub>") + " − <var>p</var><sub>core</sub>) " + sym("pl", "<var>pl</var>") + "] + Σ<sub><var>d</var></sub> " + sym("a", "<var>a</var>") + " " + sym("up", "<var>up</var><sub><var>d</var></sub>") + " + fuel and equipment", tag: "goal", say: "Minimise the year's cost: purchases at each district's price, weighted by the days each representative day stands for; the network plant's power at the industrial price, not the core's; upgrades at their yearly cost; fuel and, when the LP chooses, equipment." },
+          { html: "min Σ<sub><var>k</var>,<var>h</var></sub> " + sym("w", "<var>w</var><sub><var>k</var></sub>") + " [Σ<sub><var>d</var></sub> " + sym("p", "<var>p</var><sub><var>d</var></sub>") + " " + sym("imp", "<var>imp</var>") + " + (" + sym("pind", "<var>p</var><sub>ind</sub>") + " − <var>p</var><sub>core</sub>) " + sym("pl", "<var>pl</var>") + "] + Σ<sub><var>d</var></sub> " + sym("a", "<var>a</var>") + " " + sym("up", "<var>up</var><sub><var>d</var></sub>") + " + fuel (furnaces and the network's boiler) and equipment", tag: "goal", say: "Minimise the year's cost: purchases at each district's price, weighted by the days each representative day stands for; the network plant's power at the industrial price; upgrades at their yearly cost; the furnaces' and the network boiler's fuel; and, when the LP chooses, equipment." },
           { html: "<var>imp</var> + " + sym("pv", "<var>pv</var>") + " + " + sym("out", "<var>out</var>") + " − " + sym("in", "<var>in</var>") + " − " + sym("ev", "<var>ev</var>") + " − Σ<sub><var>e</var>,<var>s</var></sub> " + sym("Q", "<var>Q</var>") + " (1 − " + sym("sig", "σ") + "<var>e</var>) " + sym("y", "<var>y</var><sub><var>e</var>,<var>s</var></sub>") + " " + sym("kap", "κ<sub><var>s</var></sub>") + " − " + sym("pl", "<var>pl</var>") + " = " + sym("B", "<var>B</var>"), tag: "balance", say: "Each district-hour: purchases, rooftop sun and battery output, less charging, heating power and (in the core) the plant's power, meet the base load. Its dual ÷ w_k is $ per MWh in one such hour." },
           { html: "κ<sub>res</sub> = 1,  κ<sub>hp</sub> = 1 ÷ " + sym("cop", "<var>COP</var><sub><var>kh</var></sub>") + ",  κ<sub>fuel</sub> = κ<sub>dh</sub> = 0", tag: "heating power", say: "A share of heat becomes electric power by its system: all of it for a resistance heater, 1 ÷ COP for a heat pump, none for a furnace (it burns fuel) or district heat (its plant's power is pl)." },
           { html: sym("net", "<var>hp</var> + <var>boil</var> + <var>so</var> − <var>si</var>") + " = Σ<sub><var>e</var></sub> <var>Q</var> (1 − σ<var>e</var>) <var>y</var><sub><var>e</var>,dh</sub> ÷ 0.9,  " + sym("pl", "<var>pl</var>") + " = <var>hp</var> ÷ 3", tag: "heat network (core)", say: "The network's heat each hour: its heat pump, the gas boiler and the store meet the connected buildings' heat plus the 10% lost in the pipes; the heat pump's power is in the core's balance." },

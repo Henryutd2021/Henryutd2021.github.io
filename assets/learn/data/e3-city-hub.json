@@ -519,7 +519,7 @@
       ".\n",
       "Sizes: ",
       {
-       "text": "heat pumps 70% · retrofits 10% · electric cars 40%, managed · batteries 30 MW · food plants' low-temperature heat 100% · wind 200 MW · solar 100 MW, site A",
+       "text": "70% of furnaces and resistance heat to heat pumps · retrofits 10% · electric cars 40%, managed · batteries 30 MW · food plants' low-temperature heat 100% · wind 200 MW · solar 100 MW, site A",
        "note": "Every lever with its size: a plan the council can cost and check."
       },
       ".\n",
@@ -549,25 +549,25 @@
       ".\n",
       "Site: ",
       {
-       "text": "site A, the best of A19's five blocks and the cheapest to connect ($5.3M), at a 23.8% capacity factor",
+       "text": "site A, the highest-scoring of A19's five blocks under its default weights and the cheapest to connect ($5.3M), at a 23.8% capacity factor",
        "note": "The site's choice with its evidence from the map."
       },
       ".\n",
       "Sensitivity: ",
       {
-       "text": "the yearly cost runs from −$72.3M to −$2.6M with every input at its lower- or higher-cost end (equipment fixed, upgrades re-optimized); value of a wind or solar MWh moves it most, $20/MWh to $80/MWh; every tested input is set for teaching",
-       "note": "A range, what was held fixed, the input that matters most, and what kind of number each input is."
+       "text": "the yearly cost runs from −$72.3M to −$2.6M at the inputs' cheaper and dearer ends, equipment fixed (table attached); value of a wind or solar MWh moves it most; every input is set for teaching",
+       "note": "A range, what was held fixed, the input that matters most, what kind of number each input is, and the table."
       },
       ".\n",
       "Panel: ",
       {
-       "text": "to the electric utility (26 MW of upgrades): I keep them, since with the plan's levers fixed they are the cheapest way to meet the suburbs' busiest hour (its dual equals the upgrade's yearly cost)",
-       "note": "A reason to keep the upgrades, from the LP's dual."
+       "text": "to the electric utility (26 MW of upgrades): I keep them, the cheapest way to meet the suburbs' busiest hour on the eight days (its dual equals the upgrade's yearly cost), and add the 5.7 MW the full-year check finds short, about $0.2M a year",
+       "note": "A reason to keep the upgrades, from the LP's dual, and what the full-year check adds."
       },
       ".\n",
       "Panel: ",
       {
-       "text": "to the climate group (12% cut): the city's wind and solar do not lower the location-based CO₂ (at the grid's average rate their MWh are about 301,316 t, illustrative only); deeper cuts need more heat pumps and retrofits, with $272.1M of the budget left",
+       "text": "to the climate group (12% cut): the city's wind and solar do not lower the location-based CO₂; deeper cuts need more heat pumps and retrofits, with $272.1M of the budget left",
        "note": "The boundary held, and what would cut deeper, with the budget left."
       },
       ".\n",
@@ -579,8 +579,14 @@
       ".\n",
       "Panel: ",
       {
-       "text": "to farmers and rural residents (site A): it is the screen's best block and the cheapest of the five to connect, $5.3M for its line, road and land, 1.0 km to S4, on about 542 acres",
+       "text": "to farmers and rural residents (site A): it is the screen's highest-scoring block and the cheapest of the five to connect, $5.3M for its line, road and land, 1.0 km to S4, on about 542 acres",
        "note": "The site's evidence from the map."
+      },
+      ".\n",
+      "Sources: ",
+      {
+       "text": "EIA, NOAA, EPA and DOE public data (U.S. government works); A19's simulated map layers; the course's CC BY 4.0 model; no conflict of interest",
+       "note": "The data and their terms named, and the conflict of interest stated."
       },
       ".\n",
       "Limits: ",
