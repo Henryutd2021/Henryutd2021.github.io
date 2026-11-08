@@ -587,6 +587,12 @@
   "lesson": "A10",
   "href": "a10-emissions-questions.html"
  },
+ "consequential-emissions": {
+  "term": "Consequential emissions",
+  "short": "The change in what power plants actually emit because of a decision, as the grid re-dispatches; it is counted with marginal, not average, emission factors.",
+  "lesson": "A7",
+  "href": "a07-flexible-demand.html"
+ },
  "constraint": {
   "term": "Constraint",
   "short": "A rule every solution must obey, such as supply equals demand or no plant above its size.",

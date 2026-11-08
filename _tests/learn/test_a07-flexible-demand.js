@@ -178,36 +178,36 @@ const has = (s, msg) => ok(T_PAGE.indexOf(s) >= 0, msg + ": '" + s + "' on the p
       for (const user of users) { const o = { share, goal: "cost", loss, user }, r = M.shift(W, D, o), ld = M.landing(W, r), line = M.shiftLine(W, D, o);
         if (r.moved > 1e-9 && !(ld.gas < 1e-6 && near(ld.fromGas, r.moved, 1e-6) && /from gas hours into spare-sun hours/.test(line))) bad.push(JSON.stringify(o)); }
       const oa = { share, goal: "attr", loss }, ra = M.shift(W, D, oa), la = M.landing(W, ra), lnA = M.shiftLine(W, D, oa);
-      if (ra.moved > 1e-9 && !(la.gas > 0.5 && /move to hours with a lower average factor; /.test(lnA) && lnA.indexOf(M.mwh(la.gas) + " of what arrives still needs gas") >= 0)) bad.push(JSON.stringify(oa));
+      if (ra.moved > 1e-9 && !(la.gas > 0.5 && /move to hours with a lower average factor, /.test(lnA) && lnA.indexOf(M.mwh(la.gas) + " into hours that need gas") >= 0)) bad.push(JSON.stringify(oa));
     }
     ok(bad.length === 0, "the shift line names where use lands, as the dispatch has it, at every setting: " + bad.slice(0, 4).join("; "));
-    ok(near(a5.up[7], 12.15, 1e-9) && near(a5.h[7].cc, 58.15, 1e-9) && W.h[7].cc === 46 && M.shiftLine(W, D, { share: 0.05, goal: "attr" }).indexOf("62 MWh of what arrives still needs gas") >= 0,
+    ok(near(a5.up[7], 12.15, 1e-9) && near(a5.h[7].cc, 58.15, 1e-9) && W.h[7].cc === 46 && M.shiftLine(W, D, { share: 0.05, goal: "attr" }).indexOf("62 MWh into hours that need gas") >= 0,
       "attributed goal at 5%: 12.15 MWh into 07:00 lifts the combined-cycle plant from 46 to 58.15 MW; 62 MWh land where gas runs"); }
   // step 3 with the settings kept from step 4
   { const L5 = M.goalLine(W, D, { share: 0.05, loss: true });
-    ok(L5 === "The attributed goal moves 150 MWh, 60 MWh more, and books 20.8 t less attributed CO₂, against 16.7 t. The plants' CO₂ falls 37.3 t under it, against 39.5 t under the cheapest goal.",
+    ok(L5 === "The attributed goal moves 150 MWh, 60 MWh more, booking 20.8 t less attributed CO₂ against 16.7 t. The plants' CO₂ falls 37.3 t under it, against 39.5 t under the cheapest goal.",
       "step 3 with 10% extra energy kept: 150 against 90 MWh; plants' CO₂ 37.3 against 39.5 t (" + L5 + ")");
     let bad = [];
     for (const share of shares) { if (!share) continue; for (const loss of [false, true]) for (const user of users) {
       const o = { share, loss, user }, c = M.shift(W, D, { share, goal: "cost", loss, user }), a = M.shift(W, D, { share, goal: "attr", loss }), t = M.goalLine(W, D, o);
       const same = Math.round(a.co2 * 10) === Math.round(c.co2 * 10);
-      if (!(t.indexOf("moves " + M.mwh(a.moved) + ", ") >= 0 && t.indexOf("books " + M.tAbs(a.attr) + " less attributed CO₂, against " + M.tAbs(c.attr) + ".") >= 0 && a.attr <= 1e-9 && c.attr <= 1e-9 &&
+      if (!(t.indexOf("moves " + M.mwh(a.moved) + ", ") >= 0 && t.indexOf("booking " + M.tAbs(a.attr) + " less attributed CO₂ against " + M.tAbs(c.attr) + ".") >= 0 && a.attr <= 1e-9 && c.attr <= 1e-9 &&
             (same ? Math.round(a.moved) > Math.round(c.moved) && t.indexOf("the same " + M.tAbs(c.co2) + " less") >= 0 : t.indexOf("falls " + M.tAbs(a.co2) + " under it, against " + M.tAbs(c.co2)) >= 0))) bad.push(JSON.stringify(o));
       if (!!M.settingsNote(o) !== !!(loss || user)) bad.push("note " + JSON.stringify(o));
     } }
     ok(bad.length === 0, "step 3's line follows the kept settings at every setting, and says which are kept: " + bad.slice(0, 4).join("; "));
     ok(/api\.saw\(goalLine\(W, D, S\)\)/.test(JS) && !/goalLine\(W, D, S\.share\)/.test(JS) && (JS.match(/if \(settingsNote\(S\)\) H\("p", \{ class: "lx-hint", text: settingsNote\(S\) \}, act\);/g) || []).length === 2,
       "steps 2 and 3 pass the reader's settings and show the kept ones"); }
-  ok(/moves 161 MWh, 62 MWh more, and books 22\.0 t less attributed CO₂, against 17\.5 t\. The plants emit the same 42\.8 t less/.test(M.goalLine(W, D, 0.05)), "step 3 line at 5%");
+  ok(/moves 161 MWh, 62 MWh more, booking 22\.0 t less attributed CO₂ against 17\.5 t\. The plants emit the same 42\.8 t less/.test(M.goalLine(W, D, 0.05)), "step 3 line at 5%");
   has("The attributed goal moves 62 MWh more than the cheapest shift and books 4.5 t more attributed savings, yet the plants emit the same", "myth 2");
   ok(Math.round(a5.moved - c5.moved) === 62 && (Math.round(-a5.attr * 10) - Math.round(-c5.attr * 10)) / 10 === 4.5, "myth 2's 62 MWh and 4.5 t");
   has("Moving electricity use to another hour reduces the total electricity used.", "myth 1 asks about shifting, not about demand response as a whole");
-  has("The 5% cheapest shift moves 99 MWh and saves 0 MWh; with 10% extra energy the town uses 9 MWh more. Using less is a different response: the pool's warmer homes skip 4 MWh an event.", "myth 1");
+  has("the 5% cheapest shift moves 99 MWh and saves 0 MWh; with 10% extra energy the town uses 9 MWh more. Using less is a different response: warmer homes skip 4 MWh an event.", "myth 1");
   ok(M.mwh(M.vpp(W, D, { thermostat: true }, false).savedMWh) === "4 MWh" && M.mwh(v.savedMWh) === "4 MWh", "the warmer homes skip 4 MWh an event (the only energy the pool saves)");
   has("At $40 a device for coordination, a thermostat's owner loses $4 a year, while a dairy still earns $11,556.", "myth 3");
   { const E40 = M.earnings(W, D, 40); ok(M.ownerWords(E40.thermostat.owner) === "loses $4" && M.usd(E40.dairy.owner) === "$11,556" && D.vpp.coordination[0] <= 40 && 40 <= D.vpp.coordination[1] && (40 - D.vpp.coordination[0]) % D.vpp.coordination[2] === 0,
     "at $40 (a slider setting) a thermostat's owner loses $4 a year and a dairy earns $11,556"); }
-  ok(/averages ten cooler, otherwise similar weekdays/.test(T_PAGE) && /Programs may adjust it/.test(T_PAGE) && /<span class="lx-term" data-term="baseline">baseline<\/span>, an estimate of what they would have used/.test(OWN),
+  ok(/averages ten cooler, otherwise similar weekdays/.test(T_PAGE) && /Programs may adjust it/.test(T_PAGE) && /<span class="lx-term" data-term="baseline">baseline<\/span>, an estimate of their use/.test(OWN),
     "the baseline quiz states its assumptions and defines baseline where it asks");
   // earnings follow the restart setting
   { const Es = M.earnings(W, D, 30, null, true); ok(M.usd(Es.thermostat.owner) === "$7" && M.usd(Es.dairy.owner) === "$11,621" && M.usd(E30.thermostat.owner) === "$6", "staggered, a thermostat's owner earns $7 and a dairy $11,621 (at once: $6 and $11,566)");
@@ -301,25 +301,37 @@ const has = (s, msg) => ok(T_PAGE.indexOf(s) >= 0, msg + ": '" + s + "' on the p
   ok(!/projects\/|research\.html/.test(PAGE), "no project page and no Research page");
 
   // ---------------- text budget
-  const plain = t => t.replace(/<[^>]+>/g, " ").replace(/\$\$[\s\S]*?\$\$/g, " ").replace(/\$[^$\n]+\$/g, "x").replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1").replace(/&amp;/g, "&").trim();
+  // inline math is $...$ holding TeX (a backslash, _, ^ or braces); "$40 ... $100" is prose with two dollar amounts
+  const plain = t => t.replace(/<[^>]+>/g, " ").replace(/\$\$[\s\S]*?\$\$/g, " ").replace(/\$[^$\n]*[\\_^{}][^$\n]*\$/g, "x").replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1").replace(/&amp;/g, "&").trim();
   const nWords = t => plain(t).split(/\s+/).filter(w => /[A-Za-z0-9$]/.test(w)).length;
   const stepSrc = [...JS.matchAll(/\{ text: ((?:"|D\.)[^\n]*?),\n\s*(?:free: true,\n\s*)?build/g)].map(m => m[1]);
   ok(stepSrc.length === 9, "nine step cards (" + stepSrc.length + ")");
-  stepSrc.map(src => Function("W", "D", "hm", "cents", "wires", "pct", "return " + src)(W, D, M.hm, M.cents, wires, M.pct)).forEach((t, i) => { const n = nWords(t); ok(n >= 18 && n <= 42, "step " + (i + 1) + ": " + n + " words (about 35)"); });
+  stepSrc.map(src => Function("W", "D", "hm", "cents", "wires", "pct", "return " + src)(W, D, M.hm, M.cents, wires, M.pct)).forEach((t, i) => { const n = nWords(t); ok(n >= 18 && n <= 36, "step " + (i + 1) + ": " + n + " words (about 35)"); });
   const nSent = t => plain(t).split(/(?<=[.?!])\s+(?=[A-Z“])/).filter(x => /[A-Za-z]/.test(x)).length;
-  stepSrc.map(src => Function("W", "D", "hm", "cents", "wires", "pct", "return " + src)(W, D, M.hm, M.cents, wires, M.pct)).forEach((t, i) => ok(nSent(t) <= 3, "step " + (i + 1) + ": " + nSent(t) + " sentences (at most three)"));
+  stepSrc.map(src => Function("W", "D", "hm", "cents", "wires", "pct", "return " + src)(W, D, M.hm, M.cents, wires, M.pct)).forEach((t, i) => ok(nSent(t) <= 2, "step " + (i + 1) + ": " + nSent(t) + " sentences (one or two)"));
   const LINES = [M.hookReveal(W, D), M.vppLine(W, D, all, true), M.feederLine(W, D, false), M.feederLine(W, D, true), M.tradeLine(A4, W, wires, 0.05, false), M.tradeLine(A4, W, wires, 0.05, true)];
   for (const share of shares) for (const loss of [false, true]) { for (const user of users) LINES.push(M.shiftLine(W, D, { share, goal: "cost", loss, user }), M.goalLine(W, D, { share, loss, user }), M.costsLine(W, D, { share, goal: "cost", loss, user }), M.settingsNote({ loss, user }));
     LINES.push(M.shiftLine(W, D, { share, goal: "attr", loss })); }
   for (let c = D.vpp.coordination[0]; c <= D.vpp.coordination[1]; c += D.vpp.coordination[2]) [false, true].forEach(st => LINES.push(M.earnLine(D, M.earnings(W, D, c, null, st), c)));
   [false, true].forEach(st => M.chainLinks(W, D, all, st).links.forEach(l => LINES.push(l.text)));
-  LINES.forEach(t => { if (nWords(t) > 42 || nSent(t) > 3) ok(false, "a line of " + nWords(t) + " words, " + nSent(t) + " sentences: " + t.slice(0, 70)); });
-  ok(true, LINES.length + " step lines within 42 words and three sentences");
+  LINES.forEach(t => { if (nWords(t) > 36 || nSent(t) > 2) ok(false, "a line of " + nWords(t) + " words, " + nSent(t) + " sentences: " + t.slice(0, 70)); });
+  ok(true, LINES.length + " step lines within 36 words and two sentences");
   // every learner-facing element of the page, the no-JS blocks and the quoted excerpts included
-  const PROSE = OWN.replace(/^---[\s\S]*?\n---\n/, " ").replace(/<script[\s\S]*?<\/script>/g, " ").replace(/<style[\s\S]*?<\/style>/g, " ")
+  // the quoted excerpts and the note under them keep their approved words, so the budget leaves them out (the
+  // research-wording checks above read them word for word); the sources list is citations
+  const PROSE = OWN.replace(/^---[\s\S]*?\n---\n/, " ").replace(/<script[\s\S]*?<\/script>/g, " ").replace(/<style[\s\S]*?<\/style>/g, " ").replace(/<blockquote class="lx-excerpt"[\s\S]*?<\/blockquote>/g, " ").replace(SNAP["E8.7"], " ").replace(/<div class="lx-card lx-sources">[\s\S]*?<\/div>/, " ")
     .replace(/<!--[\s\S]*?-->/g, " ").replace(/^- (.*)$/gm, "<li>$1</li>").replace(/^\|(.*)\|$/gm, "<td>$1</td>");
   PROSE.split(/<\/?(?:p|li|dd|dt|td|th|summary|br|caption|footer)\b[^>]*>/).map(plain).filter(x => /[A-Za-z]/.test(x) && !/^[:{]/.test(x)).forEach(x => {
-    const n = nWords(x); ok(n <= 42, "text element of " + n + " words: " + x.slice(0, 70)); ok(nSent(x) <= 3, "text element of " + nSent(x) + " sentences: " + x.slice(0, 70)); });
+    const n = nWords(x); ok(n <= 36, "text element of " + n + " words: " + x.slice(0, 70)); ok(nSent(x) <= 2, "text element of " + nSent(x) + " sentences: " + x.slice(0, 70)); });
+  ok(nWords("Each MWh leaves a $40 or $100 hour and arrives in a $0 one") === 14, "budget: prose between dollar amounts is counted");
+  // the plant on the margin after a change comes from the new dispatch: at 5% attributed, 08:00 needs gas, 22:00 leaves the peaker
+  { const ra = M.shift(W, D, { share: 0.05, goal: "attr" });
+    ok(M.marginal(W.h[8]) === "spare sun" && M.marginal(ra.h[8]) === "combined-cycle" && M.marginal(W.h[22]) === "peaker" && M.marginal(ra.h[22]) !== "peaker" && /"On the margin before", "On the margin after"/.test(JS) && /label: "Spare sun, before"/.test(JS), "charts: the margin before and after the change, each from its own dispatch; the shading says it is the day before"); }
+  ok(/var v = vpp\(W, D, part === "earn" \? allKinds\(D\) : S\.kinds, S\.stagger\)/.test(JS) && /part = "earn"; showStage\(true\); paint\(\);/.test(JS) && /Here all four kinds are in the pool, whatever you enrolled in step 5/.test(JS), "step 6: the chart and the ledger price the same pool, all four kinds, and the card says so");
+  ok(/batteries are lossless and refill from the next day's otherwise spilled sun, at no cost and no CO₂/.test(JS) && /<b>Batteries<\/b> are lossless here and refill from the next day's otherwise spilled sun/.test(OWN) && D.vpp.devices.filter(x => x.key === "battery")[0].refill === "sun", "batteries: their lossless refill from spilled sun is stated");
+  ok(/In this example, most response shifts energy in time; other programs can cut use for good\./.test(JS) && !/it saves little/.test(JS), "the closing is about this example, not demand response in general");
+  ok(!/approved|E6 and E8|word for word by/.test(D.about), "data: the public metadata carries no editorial workflow");
+  ok(/data-term="perfect-foresight">perfect foresight<\/span>/.test(OWN) && /data-term="consequential-emissions">consequential \(marginal\) system response<\/span>/.test(OWN) && /\[merit order\]\{\.lx-term term="merit-order"\}/.test(OWN), "terms: perfect foresight, consequential emissions and merit order are marked");
 
   ok(/aria-live/.test(JS) && /LX\.store\.(get|set)\("a07"/.test(JS), "live status region; the reader's choices persist in this browser");
   console.log((fails ? "FAILED " + fails + " of " : "ok: ") + checks + " checks (" + ID + ")");
