@@ -7,4 +7,4 @@ glossary:
     def: "A way to write a number as a value at least 1 and less than 10, times a power of ten, so very large and very small numbers are easy to compare."
   - id: order-of-magnitude
     term: Order of magnitude
-    def: "The power of ten a quantity sits at; two quantities are an order of magnitude apart when one is about ten times the other."
+    def: "The power of ten nearest a quantity on a log scale, where a leading number from √10 ≈ 3.16 up rounds to the next power; two quantities are an order of magnitude apart when one is about ten times the other."

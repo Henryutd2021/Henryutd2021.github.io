@@ -118,6 +118,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div id="k3-explain" class="lx-xgrid">
 <div class="lx-fallback">
 <dl class="lx-ideas">
+<dt>Rate r and years t</dt><dd>r is the yearly rate written as a fraction (4% is 0.04); t counts the years from now.</dd>
 <dt>Compound growth</dt><dd>Each year adds a percentage of what is there now, so the amount grows faster and faster: × (1 + r)<sup>t</sup> after t years.</dd>
 <dt>Present value</dt><dd>What an amount paid t years from now is worth today: divide by (1 + r)<sup>t</sup>.</dd>
 <dt>Annuity factor</dt><dd>What $1 at the end of each year for n years is worth today: the sum of the discounted dollars, 17.29 at 4% over 30 years.</dd>
@@ -139,7 +140,8 @@ body-classes: "page-learn page-lesson lx-form-cards"
 - **Add it up.** $n$ yearly payments $P$, each at the end of its year: $\frac{P}{1+r} + \dots + \frac{P}{(1+r)^n} = P\,\frac{1-(1+r)^{-n}}{r}$. The fraction is the [annuity factor]{.lx-term term="annuity-factor"}: 17.29 at 4% over 30 years.
 - **Set it equal to the building cost** $C$ (\$ per kW): $P = \frac{r}{1-(1+r)^{-n}}\,C = \mathrm{CRF} \cdot C$, the yearly repayment before upkeep.
 - **Two ways to write it.** Multiply top and bottom by $(1+r)^n$: $\frac{r}{1-(1+r)^{-n}} = \frac{r(1+r)^n}{(1+r)^n - 1}$. [Lesson 7](07-cost.html) writes the first, lesson 13's code the second.
-- **Exact doubling time.** Solve $(1+r)^t = 2$ for $t$: $t = \ln 2 \div \ln(1+r)$, where $\ln$ is the natural logarithm (a calculator's ln key). At 7% that is 10.2 years; the rule of 70 says 10.
+- **Exact doubling time.** Solve $(1+r)^t = 2$ for $t$: $t = \ln 2 \div \ln(1+r)$, where $\ln$ is the natural logarithm (a calculator's ln key).
+- **Against the rule of 70.** At 7% the exact time is 10.2 years; the rule says 10.
 - **Real against nominal.** A [nominal rate]{.lx-term term="nominal-rate"} includes inflation; a real rate takes it out: $(1 + \text{nominal}) = (1 + \text{real})(1 + \text{inflation})$. Lesson 7's illustrative blend, 7% nominal with 2.5% inflation, is 4.39% real.
 - **Do not mix them.** Costs in today's dollars go with a [real rate]{.lx-term term="real-rate"}; cash in the dollars of each future year goes with a nominal rate.
 
@@ -151,10 +153,9 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-deeper-body">
 ```
 
-- **One year stands for the life.** [Lessons 12](12-trade-offs.html) and [13](13-capstone.html) minimise one year's cost, $1000 \sum_k (\mathrm{CRF}_k\, C_k + \mathrm{FOM}_k)\,K_k$ plus running costs, with $K_k$ the MW built of plant $k$.
-- **Units.** $C_k$ (building cost) and $\mathrm{FOM}_k$ (fixed upkeep) are \$ per kW and $K_k$ is in MW, so the 1,000 (kW per MW) makes the units match: one MW of wind adds \$133,575 a year.
-- **The assumption.** Every year of the life looks like the modelled year, and each plant's cost is recovered over $n$ years at the same rate: 30 years for plants, 15 for lesson 13's battery.
-- **Where next.** A model that spans decades discounts each year's cash instead, and credits plants that outlive its horizon (Modeler lesson [M13](m13-national-pathway.html)); [M11](m11-tea-in-models.html) puts a project's full cash flow inside the optimization.
+- **One year stands for the life.** [Lessons 12](12-trade-offs.html) and [13](13-capstone.html) charge each MW built its yearly cost, as if every year of its life looked like the modelled one. One MW is 1,000 kW, so one MW of wind adds \$133,575 a year.
+- **Units.** Building cost is \$ per kW; the CRF turns it into \$ per kW a year, the unit fixed upkeep already has.
+- **Where next.** A model that spans decades discounts each year's cash instead (Modeler lesson [M13](m13-national-pathway.html)); [M11](m11-tea-in-models.html) puts a project's full cash flow inside the optimization.
 
 ```{=html}
 </div>

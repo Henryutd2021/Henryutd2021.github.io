@@ -34,12 +34,21 @@ const num = K.num;
 {
   const W = G0.prepare(town, year, "lesson0"), D = s.D;
   ["demand", "need"].forEach(k => ok(D[k].join() === W[k].join(), `data: ${k} equals lesson 0's prepare()`));
-  ok(D.dateLabel === "3 September 2025" && s.peak === 450 && town.scenarios.lesson0.demandPeakMW === 450, "data: 3 September 2025, the town's busiest hour of 2025 = 450 MW");
+  ok(D.dateLabel === "3 September 2025" && s.peak === 450 && town.scenarios.lesson0.demandPeakMW === 450, "data: 3 September 2025, the town's demand scaled to 450 MW in its busiest hour of 2025");
+  // 450 MW is the scale: the busiest hour of the scaled shape, before lesson 0 rounds a day's hours (by at most step / 2)
+  // so that its gas need is a multiple of the step; the page calls it the hour the demand is scaled to, never a rounded day's peak
+  ok(Math.max.apply(null, year.demand) / 1000 * s.peak === 450, "data: the scaled 2025 shape peaks at exactly 450 MW");
+  { const sc = town.scenarios.lesson0; let worst = 0;
+    const t0 = Date.parse(year.start_utc + "Z"), d0 = Date.parse(sc.date + "T00:00:00Z"), i = Math.round((d0 - t0) / 3600000) + 1 - (sc.utcOffsetHours || 0);
+    D.demand.forEach((v, t) => { worst = Math.max(worst, Math.abs(v - year.demand[i + t] / 1000 * sc.demandPeakMW)); });
+    ok(worst <= sc.step / 2 + 1e-9, `data: the day's rounding moves an hour by at most ${sc.step / 2} MW (${worst.toFixed(2)})`); }
+  ok(/Prairie Town's demand is scaled so its busiest hour of 2025 is " \+ s\.peak/.test(JS) && !/Write Prairie Town's busiest hour of 2025/.test(JS), "step 1: 450 MW is named as the scale, not as a rounded hour");
   ok(s.dayMWh === 6957 && s.gasMWh === 1965 && s.gasCost === 40 && s.gasDollars === 78600, "data: the day 6,957 MWh, gas need 1,965 MWh at a flat $40 = $78,600 (as K7)");
   // $78,600 is a flat-price product, not a schedule: lesson 0's cheapest-first day (ramp limits, curtailment, the peaker) differs
   const EX = G0.expert(W).totals, schedGas = EX.cc * town.fleet.cc.cost + EX.pk * town.fleet.peaker.cost;
   ok(EX.cc === 1960 && EX.pk === 20 && s.pkCost === 100 && schedGas === 80400 && schedGas !== s.gasDollars, `data: lesson 0's schedule runs gas CC ${EX.cc} MWh and the peaker ${EX.pk} MWh: $${schedGas}, not the flat $${s.gasDollars}`);
-  has("<b>Not a schedule.</b> $78,600 prices all 1,965 MWh of gas at $40/MWh. Lesson 0's schedule also runs the $100/MWh peaker for 20 MWh, so its gas costs $80,400.", "the flat price is labelled, with lesson 0's schedule");
+  has("<b>Not a schedule.</b> $78,600 prices all 1,965 MWh of gas at one flat $40/MWh. Lesson 0's schedule, held to ramp limits, runs 1,960 MWh at $40/MWh and 20 MWh on a $100/MWh peak plant: $80,400.", "the flat price is labelled, with lesson 0's schedule and both of its quantities");
+  ok(EX.cc * 40 + EX.pk * 100 === 80400, "data note: 1,960 MWh × $40 + 20 MWh × $100 = $80,400");
   ok(/note: "the day's gas need, all at one flat price"/.test(JS) && !/at its running cost/.test(JS), "step 3: the $ row says it is a flat price, not the day's running cost");
   ok(s.hiMW === 353 && s.loMW === 235 && s.hiAt === 16 && s.loAt === 3 && s.need19 === 145 && s.ramp === 40, "data: highest hour 353 MW (16:00), lowest 235 MW (03:00), gas at 19:00 145 MW, ramp 40 MW/h");
   const Wd = L1.world(D1, town, year, days);
@@ -84,7 +93,7 @@ const num = K.num;
 
 // ---------------- the page: statements one by one
 {
-  has("Prairie Town's busiest hour of 2025, 450 MW, is 450,000 kW or 0.45 GW");
+  has("Prairie Town's demand is scaled so its busiest hour of 2025 is 450 MW, which is 450,000 kW or 0.45 GW");
   has("on 3 September 2025 the town's 24 hourly values add up to 6,957 MWh, or 6.957 GWh");
   has("at a flat $40/MWh, 1,965 MWh × $40/MWh = $78,600; and 6,957 MWh ÷ 24 h ≈ 289.9 MW, the day's average power");
   has("Scientific notation writes a number as a × 10ⁿ, with a at least 1 and less than 10: 1,000 = 10³, and the day's 6,957,000,000 Wh ≈ 6.96 × 10⁹ Wh");
@@ -99,11 +108,13 @@ const num = K.num;
   has("1 Wh = 3,600 J and 1 kWh = 3.6 MJ, exactly");
   has("ramp limit</span> of 40 MW per hour"); ok(town.fleet.cc.ramp === 40, "myth: lesson 0's ramp limit is 40 MW/h");
   has("298,600 GWh: a TWh is 1,000 GWh"); has("298,600,000 is the same energy in MWh");
-  has("7: the exponents differ by 14 − 7 = 7, and 2.99 ÷ 1.08 is about 2.8, so the ratio is about 2.8 × 10⁷. 2.8 is below 3.16, half a power of ten, so the nearest power stays 10⁷");
+  has("7. Exponents: 14 − 7 = 7. Leading numbers: 2.99 ÷ 1.08 ≈ 2.8. So the ratio is about 2.8 × 10⁷.</p><p>2.8 is below 3.16 (√10, the midpoint of 1 and 10 on a log scale), so the nearest power stays 10⁷");
+  ok(near(Math.log10(K.HALF), 0.5), "quiz: √10 is the midpoint of 1 and 10 on a log scale");
   ok(!K.pairText(s, "home", "spp").up && K.pairText(s, "home", "spp").apart === 7 && near(K.HALF, Math.sqrt(10)) && K.HALF.toFixed(2) === "3.16", "quiz: 2.8 < 3.16 = √10, so 10⁷");
   has("Terms added together must share a unit: MW plus MW, never MW plus MWh");
   ok(!/A sum of terms with different names/.test(QMD), "modeler: the naming advice is about units, not names");
-  has("coefficients (the fixed numbers in front of each unknown)"); has('A [solver]{.lx-term term="solver"} treats values within a small tolerance, an allowed rounding error, as equal or zero');
+  has("coefficients (the fixed numbers in front of each unknown)"); has('Sensible units help a [solver]{.lx-term term="solver"}; they do not guarantee a well-scaled model');
+  ok(!/tolerance/.test(QMD), "modeler: no solver-tolerance teaching on a units page (that belongs to B3 and M1)");
   ok(/data-id="spp" data-answer="b"[\s\S]{0,300}<li data-value="b">298,600 GWh<\/li>/.test(QMD), "quiz: spp's answer b is 298,600 GWh");
   ok(/data-id="apart" data-answer="b"[\s\S]{0,300}<li data-value="b">7<\/li>/.test(QMD), "quiz: apart's answer b is 7");
   ok(298.6 * 1000 === 298600 && Math.round(298.6 * 1e6) === 298600000, "quiz: the distractors are the TWh in GWh and MWh");
@@ -132,7 +143,7 @@ const num = K.num;
   [s.peak, num(s.peakKW), s.peakGW, s.dayMWh, num(s.dayMWh), s.dayGWh, K.sig(s.dayGWh, 3), num(s.gasMWh), s.gasCost, num(s.gasDollars), num(s.avgMW, 1),
    s.loMW, s.hiMW, num(s.loBound), num(s.hiBound), s.span, s.ramp, num(s.sppGWh), num(s.sppGWh * 1000), s.homeToSpp, num(s.dayMWh * 1000),
    Math.round(s.dayGWh), Math.round(s.dayGWh) * 10, "298.6", "0.2986", "2,986", "10,791", "4,200", "1,000", "0.019",
-   num(G0.expert(G0.prepare(town, year, "lesson0")).totals.pk), s.pkCost, num(80400), K.HALF.toFixed(2)].forEach(add);
+   num(G0.expert(G0.prepare(town, year, "lesson0")).totals.pk), num(G0.expert(G0.prepare(town, year, "lesson0")).totals.cc), s.pkCost, num(80400), K.HALF.toFixed(2), days.stats.missing_hours_filled.demand].forEach(add);
   s.items.forEach(it => { add(K.sig(it.mant, 3)); add(it.exp); add(K.plain(it.wh)); });
   ["2.2", "2.8", "9.84", "3,600", "3.6", "8,760", "24", "1", "2", "3", "4", "5", "6", "7", "9", "10", "12", "13", "14", "15", "16", "21", "100", "0", "2019", "2022", "2025", "2026", "0.45", "930"].forEach(add);
   const found = (body.match(/\d[\d,]*(?:\.\d+)?/g) || []).map(t => t.replace(/[.,]$/, ""));
@@ -150,8 +161,8 @@ const num = K.num;
   // the default pair: 6,957 MWh against 10,791 kWh
   const P = K.pairText(s, "town", "home");
   ok(near(P.ratio, 6957e6 / 10791e3) && K.num(P.ratio) === "645" && !K.isExact(6.96 / 1.08 * 100, P.ratio) && K.num(6.96 / 1.08 * 100) === "644" && P.up && P.rexp === 2 && K.sig(P.rmant, 3) === "6.45", "default pair: the unrounded ratio 644.7 shows as 645; the rounded leading numbers give 644, so the page writes ≈");
-  ok(K.nearestWhy(P) === "6.45 is above 3.16, half a power of ten, so the nearest power is 10³.", "default pair: why 645 is assigned to 10³: " + K.nearestWhy(P));
-  ok(K.nearestWhy(K.pairText(s, "phone", "us")) === "2.2 is below 3.16, half a power of ten, so the nearest power is 10¹⁴." && K.sci(s.spanRatio, 2) === "2.2 × 10¹⁴", "step 5: the phone-to-U.S. reason uses the 2.2 the feedback shows");
+  ok(K.nearestWhy(P) === "645 = 6.45 × 10²: 6.45 is above 3.16 (√10, the midpoint of 1 and 10 on a log scale), so the nearest power is 10³.", "default pair: the ratio's exponent (2) and its nearest power (10³) are told apart: " + K.nearestWhy(P));
+  ok(K.nearestWhy(K.pairText(s, "phone", "us")) === "2.2 is below 3.16 (√10, the midpoint of 1 and 10 on a log scale), so the nearest power is 10¹⁴." && K.sci(s.spanRatio, 2) === "2.2 × 10¹⁴", "step 5: the phone-to-U.S. reason uses the 2.2 the feedback shows");
   // every pair: the stated reason agrees with the count (above 3.16 rounds up, below stays)
   s.items.forEach(a => s.items.forEach(b => { if (a.id !== b.id) { const p = K.pairText(s, a.id, b.id); ok(p.apart === p.rexp + (p.up ? 1 : 0) && p.apart === Math.round(Math.log10(p.ratio)) && p.rmant >= 1 && p.rmant < 10, `pair ${a.id}/${b.id}: nearest power ${p.apart} = exponent ${p.rexp} + (${K.sig(p.rmant, 3)} ≥ 3.16)`); } }));
   // the flowchart traces: the slipped report is not a round number in Wh, so it takes ≈; the right one is exact
