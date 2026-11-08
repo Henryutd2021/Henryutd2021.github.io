@@ -60,8 +60,8 @@ function reference() {
   const cor = p => { const c = LS.corridor(M, T.wind.setbackM, p); return { sub: c.route.sub, km: r6(c.route.km), cost: Math.round(c.route.cost), cells: c.route.cells.length, start: c.route.cells[0], end: c.route.cells[c.route.cells.length - 1] }; };
   const sh = M.shares("solar");
   return {
-    note: "Written by node _tests/learn/test_a19-gis-siting.js --write from the page's model; the notebook rebuilds these numbers from the seed and asserts them.",
-    cityDataCenter: { contractMW: PC.dataCenter.contractMW, from: "prairie-city.json, dataCenter.contractMW (copied here by the test for the notebook, which reads only this file)" },
+    note: "Computed from the seed by the page's model; the lesson's notebook rebuilds these numbers from the seed and checks them.",
+    cityDataCenter: { contractMW: PC.dataCenter.contractMW, from: "prairie-city.json, dataCenter.contractMW (copied here, so the notebook needs only this file)" },
     layers: { sums: { slope: r6(sum(R.slope)), wind: r6(sum(R.wind)), sun: r6(sum(R.sun)), land: r6(sum(R.land)), dHome: r6(sum(R.dHome)), dRoad: r6(sum(R.dRoad)), dWater: r6(sum(R.dWater)) },
       counts: { water: cnt(R.water), flood: cnt(R.flood), built: cnt(R.built), ind: cnt(R.ind), prot: cnt(R.prot), subc: cnt(R.subc) }, homes: R.homes.length, newer: R.nNewer,
       cells: [0, 300, 615, 900, 1319].map(n => ({ n, slope: r6(R.slope[n]), wind: r6(R.wind[n]), sun: r6(R.sun[n]), land: r6(R.land[n]) })),
@@ -430,7 +430,7 @@ ok(hrefs.length > 8 && hrefs.every(h => ALLOW.test(h) || /^[0-9a-z-]+\.html$/.te
     ok(bq.length === 1 && bq[0][1] === "excerpt:code" && sent.join("|") === [REG.raw["E7.2"], REG.raw["E7.3"]].map(X.norm).join("|"), "one excerpt (excerpt:code): E7.2 and E7.3, word for word");
     ok(PAGE.indexOf('<p class="lx-hint">' + REG.raw["E7.8"] + "</p>") > 0, "E7.8 under the excerpt, word for word");
   } else console.log("note: the approved excerpt wording is not available (set LEARN_SOURCES); excerpt wording not checked");
-  ok(bq.length === 1 && bq[0][3] === "Approved excerpt of: Li et al. (2026), accepted paper, 2026 North American Power Symposium (NAPS); DOI pending.", "the excerpt's footer is CF7's citation");
+  ok(bq.length === 1 && bq[0][3] === "From: Li et al. (2026), accepted paper, 2026 North American Power Symposium (NAPS); DOI pending.", "the excerpt's footer is CF7's citation");
   ok(!/Li et al|NAPS|accepted paper/.test(JS + MJS + RAW), "no research wording in the scripts or the data");
 }
 

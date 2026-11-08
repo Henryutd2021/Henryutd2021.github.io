@@ -256,13 +256,14 @@ ok(OWN.includes('href="cr-your-own-study.html"'), "the page links the research c
   await gateSequence();
   await earlySequence();
   await firstSequence();
+  await draftSequence();
   finish();
 })().catch(err => { ok(false, "the stub page test threw: " + (err && err.stack || err)); finish(); });
 
-function mountFresh() {
+function mountFresh(store) {   // store: an earlier page's stored values (a reload)
   const { env, load, El } = require("./stubdom.js");
   if (!El.prototype.getBoundingClientRect) El.prototype.getBoundingClientRect = () => ({ top: 0, left: 0, width: 0, height: 0, bottom: 0, right: 0 });
-  const E = env(); E.LX.ready = () => {}; E.LX.reduced = () => true; E.window.innerWidth = 1280;
+  const E = env({ store }); E.LX.ready = () => {}; E.LX.reduced = () => true; E.window.innerWidth = 1280;
   const subs = {}; E.LX.on = (ev, f) => { (subs[ev] = subs[ev] || []).push(f); }; E.LX.emit = (ev, x) => (subs[ev] || []).forEach(f => f(x));   // as core.js
   ["checkpoint", "rubric", "exemplars"].forEach(n => load(n, E));
   let init = null, demo = null; E.LX.mount = (slug, f) => { if (slug === ID) init = f; }; E.LX.demo = (root, fn) => { demo = fn; return () => null; };
@@ -357,6 +358,40 @@ async function firstSequence() {
   ok(ta().hasAttribute("readonly") && !P.btn(/^Submit my explanation$/) && P.live.querySelectorAll(".lx-ck-points input").length === 4, "runner: back on task 1, the text stays read-only and the points can still be ticked");
   for (let i = 1; i < 12; i++) P.answer(i);
   ok(P.level() === "Level: Strong", "runner: task 1 first, then the rest: Strong");
+}
+
+// drafts (task 1, the reader's own review): type, Next, Back, reload. The text comes back each time, apart from the
+// attempt; it never counts as a submission: the marked tasks stay shut, task 1 does not freeze, no try, time or answer
+// is recorded, and neither the results nor the copied summary show it. Submitting clears the draft.
+async function draftSequence() {
+  const P = mountFresh(), ta = () => P.live.querySelector("textarea"), q = () => P.live.querySelector(".lx-ck-q").textContent;
+  const DRAFT = "My unfinished review: the farms chose whether to join, so the comparison is not like for like.";
+  P.goTo(0); ta().value = DRAFT; ta().fire("input");
+  ok(/Draft kept in this browser; not submitted yet\./.test(text(P.live.textContent)), "drafts: typing in task 1 shows that a draft is kept");
+  P.btn(/^Next task$/).click();
+  ok(/^Task 2 of 12/.test(P.live.querySelector(".lx-ck-tag").textContent) && /opens once task 1/.test(q()), "drafts: after Next, task 2 is still shut: a draft does not satisfy opensAfter");
+  P.btn(/^Back$/).click();
+  ok(ta().value === DRAFT, "drafts: Back restores task 1's unfinished text");
+  ok(!ta().hasAttribute("readonly") && !!P.btn(/^Submit my explanation$/), "drafts: a draft does not freeze task 1 (still editable, Submit still there)");
+  const st = P.E.LX.store.get(M.KEY, {}), r = st.tasks.review || {};
+  ok(r.answer == null && r.first == null && !r.tries && !r.at, "drafts: nothing is recorded on the attempt (no answer, try or time of answer)");
+  ok((P.E.LX.store.get(M.KEY + "-drafts", {}).tasks || {}).review.text === DRAFT, "drafts: kept under the runner's own drafts key, apart from the attempt");
+  // the results and the summary before submitting: task 1 not answered, the draft text nowhere
+  P.goTo(11); P.btn(/See my results/).click();
+  ok(!P.live.querySelector("textarea.lx-ck-out").value.includes("farms chose") && P.live.querySelectorAll(".lx-ck-res tbody tr")[0].children[1].textContent !== "submitted",
+    "drafts: the copied summary and the results do not include the draft");
+  P.btn(/^Back to the tasks$/).click();
+  // a reload: a new page on the same stored values
+  const R = mountFresh(P.E.store), tb = () => R.live.querySelector("textarea");
+  R.btn(/^Back to the tasks$/).click();   // the attempt was looked at once, so the page opens on the results
+  R.goTo(0);
+  ok(tb() && tb().value === DRAFT, "drafts: after a reload, task 1's text is back");
+  R.goTo(1); ok(/opens once task 1/.test(R.live.querySelector(".lx-ck-q").textContent), "drafts: after a reload, the marked tasks are still shut");
+  R.goTo(0); R.btn(/^Submit my explanation$/).click();
+  const st2 = R.E.LX.store.get(M.KEY, {});
+  ok(st2.tasks.review.answer === DRAFT && tb().hasAttribute("readonly"), "drafts: submitting records the text and freezes task 1");
+  ok(!(R.E.LX.store.get(M.KEY + "-drafts", {}).tasks || {}).review && !/Draft kept/.test(text(R.live.textContent)), "drafts: submitting clears the draft and its line");
+  R.goTo(1); ok(!/opens once task 1/.test(R.live.querySelector(".lx-ck-q").textContent), "drafts: once submitted, task 2 opens");
 }
 
 function finish() {

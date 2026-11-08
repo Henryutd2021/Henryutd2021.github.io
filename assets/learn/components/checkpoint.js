@@ -1,7 +1,7 @@
 /* checkpoint.js — LX.Checkpoint: the runner of the tier checkpoints (CK-F, CK-A, CK-M and CK-R use it). One task at
    a time; a clock that runs only while a task is on screen and the tab is visible; first-try recording; five task
-   kinds; a rubric self-rating read from the page's rubric table; a results view; and a plain-text summary the tester
-   copies into a form (nothing is sent anywhere).
+   kinds; a rubric self-rating read from the page's rubric table; a results view; and a plain-text summary the reader can
+   copy, to keep or to share with a mentor (nothing is sent anywhere). Unfinished answers are kept as drafts (below).
    var cp = LX.Checkpoint(host, { data: D, key: "ckf-v1", code: "CK-F", lessonId: "ck-f-estimate",
      intro: ["Nine tasks, about 40 minutes: ...", "No hints. ...", "Your answers and times stay in this browser. ..."],
      rubric: "#ckf-rubric", lock: "#ckf-lock", solution: "#ckf-solution-body",
@@ -37,7 +37,7 @@
                            number is not kept
    Options:
      key         LX.store key of the attempt; an attempt stored under another data.version starts afresh. Keep it fixed
-                 once testers use a checkpoint (CK-F: "ckf-v1"), so their summaries stay comparable.
+                 once readers use a checkpoint (CK-F: "ckf-v1"), so their summaries stay comparable.
      code        the checkpoint's code: the summary's first line is "Learn · <code> results (<version>)"
      lessonId    marked complete (LX.progress.done) when the level is Proficient or Strong
      intro       the overview card's sentences (default: a generic three)
@@ -84,6 +84,12 @@
    window and lock-button listeners and its markup, so a page can swap runners (CK-M keeps one per variant on screen); the
    page's worked-solution block stays as it is. A stored, finished attempt opens on the results (unless the address has a
    #hash); otherwise the overview.
+   Drafts: what a reader types or picks in a task before submitting it (a text, a number and its unit, the estimate's
+   fields, an order not yet checked) is saved on input under "<key>-drafts" ({version, tasks: {id: draft}}), apart from
+   the attempt, and restored when the task is shown again (Next, Back, the overview, a reload). A draft is never a
+   submission: it does not open a task that waits (opensAfter), does not freeze, record a try or a time, open a worked
+   solution or enter the results and the copied summary. Submitting the task clears its draft; "Start again" clears all.
+   A frozen task shows its submitted answer, never a draft.
    Measures, per task (stored under data.tasks ids): ms (active time), msFirst (time to the first answer), tries, first
    (first answer right; for open-short, all points ticked), solFirst (solution opened before answering), skipped, answer,
    at (ISO time of the first answer). The time the page's worked solution first opened is kept per runner, under
@@ -280,7 +286,7 @@
     if (t.kind === "estimate") return "submitted";
     return r.first ? "right" : "not right";
   }
-  // the copied summary: keep its format fixed once testers use it (their summaries are compared across versions)
+  // the copied summary: keep its format fixed once readers use it (summaries are compared across versions)
   function summary(D, st, env, o) {
     env = env || {}; o = o || {};
     var L = o.level ? o.level(D, st, { solOpen: o.solOpen || null, late: o.late }) : level(D, st, { openFirst: o.openFirst, late: o.late, solOpen: o.solOpen }), total = 0, lines = [];
@@ -321,6 +327,8 @@
 
   // ---------------------------------------------------------------- view
   var LX = window.LX, E = LX.H, S = LX.S;
+  var DRAFT_NOTE = "Draft kept in this browser; not submitted yet.";
+  var COPIED = "Copied. Keep these results, or share them with a mentor.";
   function now() { return (window.performance && performance.now) ? performance.now() : Date.now(); }
   function q(sel) { return !sel ? null : typeof sel === "string" ? document.querySelector(sel) : sel; }
 
@@ -371,6 +379,17 @@
     if (!st || st.version !== D.version) st = fresh();
     var wrap = E("div", { class: "lx-ck" }, host), clock = { id: null, t0: null };
     function save() { LX.store.set(KEY, st); }
+    // drafts: unfinished answers, kept apart from the attempt (see the header); never a submission
+    var DR = KEY + "-drafts";
+    function drafts() { var d = LX.store.get(DR, null); return d && d.version === D.version && d.tasks ? d : { version: D.version, tasks: {} }; }
+    function draftOf(id) { return drafts().tasks[id] || null; }
+    function keepDraft(id, v) {
+      var d = drafts();
+      if (v == null) { if (!(id in d.tasks)) return; delete d.tasks[id]; } else d.tasks[id] = v;
+      LX.store.set(DR, d);
+    }
+    // the line under a task's fields that says a draft is kept (shown once the reader types; hidden after submitting)
+    function draftLine(host, has) { return E("p", { class: "lx-hint lx-ck-draft", "aria-live": "polite", text: has ? DRAFT_NOTE : "" }, host); }
     function rec(id) { if (!st.tasks[id]) st.tasks[id] = { ms: 0, msFirst: null, tries: 0, first: null, solFirst: false }; return st.tasks[id]; }
     // ---- the clock: runs only while a task is on screen and the tab is visible
     function tick() { if (clock.id && clock.t0 != null) { var r = rec(clock.id), t = now(); r.ms += t - clock.t0; clock.t0 = t; } }
@@ -388,6 +407,8 @@
       if (answer !== undefined) r.answer = answer;
       if (extra) for (var k in extra) r[k] = extra[k];
       save();
+      keepDraft(id, null);   // submitted: the draft has done its job
+      var dl = wrap.querySelector(".lx-ck-draft"); if (dl) dl.textContent = "";
       if (o.gateAll) { if (allAnswered(D, st)) openSolution(r.at); }   // every task answered, in any order (this answer's `at`)
       else if (gateT && id === gateT.id && gateT !== esT) openSolution(r.at);   // the estimate opens it itself, after its range check
       if (o.onAnswer) o.onAnswer(id, r, st);
@@ -412,15 +433,15 @@
       E("p", { class: "lx-eyebrow", text: "How this checkpoint works" }, c);
       var ul = E("ul", { class: "lx-ck-intro" }, c);
       (o.intro || [N + " tasks, one at a time.", "No hints. Each worked solution opens after your first answer; you may open it earlier, and that is recorded.",
-        "Your answers and times stay in this browser. At the end, “Copy my results” gives you a summary to paste into a form."]).concat(o.late === "practice" ? [lateRule({ gateAll: o.gateAll, n: N, submit: gateT ? D.tasks.indexOf(gateT) + 1 : null })] : [])
+        "Your answers, drafts and times stay in this browser. At the end, “Copy my results” gives you a summary to keep or to share with a mentor."]).concat(o.late === "practice" ? [lateRule({ gateAll: o.gateAll, n: N, submit: gateT ? D.tasks.indexOf(gateT) + 1 : null })] : [])
         .forEach(function (s) { E("li", { text: s }, ul); });
       var row = E("div", { class: "lx-ck-row" }, c), started = !!st.started;
       E("button", { type: "button", class: "lx-btn", html: (started ? "Resume at task " + (st.cur + 1) : "Start the checkpoint") + LX.icon("arrow"), onclick: function () { if (!st.started) { st.started = new Date().toISOString(); save(); } show(st.cur); } }, row);
       if (started) E("button", { type: "button", class: "lx-btn ghost", text: "Start again (clears this browser's answers)", onclick: reset }, row);
     }
     function reset() {
-      if (!window.confirm("Clear your " + code + " answers and times in this browser?")) return;
-      st = fresh(); save(); lockSolution(); intro();
+      if (!window.confirm("Clear your " + code + " answers, drafts and times in this browser?")) return;
+      st = fresh(); save(); LX.store.set(DR, null); lockSolution(); intro();
     }
     function show(i) {
       st.cur = i; save(); wrap.innerHTML = "";
@@ -506,10 +527,14 @@
       if (frozen(t)) fix();
     }
     function order(t, body, fb, unlock) {
-      var r = rec(t.id), cur = (r.answer && r.answer.length === t.items.length) ? r.answer.slice() : t.start.slice();
+      var r = rec(t.id), keys = t.items.map(function (x) { return x[0]; }).sort().join("|");
+      var perm = function (a) { return !!(a && a.length === t.items.length && a.slice().sort().join("|") === keys); };
+      if (frozen(t)) keepDraft(t.id, null);
+      var dr = frozen(t) ? null : draftOf(t.id);
+      var cur = dr && perm(dr.order) ? dr.order.slice() : perm(r.answer) ? r.answer.slice() : t.start.slice();
       var text = {}; t.items.forEach(function (x) { text[x[0]] = x[1]; });
       var ol = E("ol", { class: "lx-ck-order" }, body), row = E("div", { class: "lx-ck-row" }, body);
-      var go = E("button", { type: "button", class: "lx-btn small", text: "Check the order" }, row), marks = null;
+      var go = E("button", { type: "button", class: "lx-btn small", text: "Check the order" }, row), marks = null, dl = draftLine(body, !!(dr && perm(dr.order)));
       function paint(focusKey, dir) {
         ol.innerHTML = "";
         cur.forEach(function (k, i) {
@@ -522,7 +547,11 @@
           if (k === focusKey) (dir < 0 ? (up.disabled ? dn : up) : (dn.disabled ? up : dn)).focus();
         });
       }
-      function move(i, d) { var j = i + d; if (j < 0 || j >= cur.length) return; var k = cur[i]; cur[i] = cur[j]; cur[j] = k; marks = null; paint(k, d); }
+      function move(i, d) {
+        var j = i + d; if (j < 0 || j >= cur.length) return; var k = cur[i]; cur[i] = cur[j]; cur[j] = k; marks = null; paint(k, d);
+        var same = perm(rec(t.id).answer) && rec(t.id).answer.join("|") === cur.join("|");   // back to the checked order: no draft
+        keepDraft(t.id, same ? null : { order: cur.slice() }); dl.textContent = same ? "" : DRAFT_NOTE;
+      }
       go.addEventListener("click", function () {
         var res = cOrder(t, cur); marks = res.places; answered(t.id, res.right, cur.slice()); paint();
         feedback(fb, res.right, res.right ? "That is the sequence." : res.n + " of " + cur.length + " in the right place (green)." + retry(t));
@@ -542,11 +571,21 @@
     }
     function numeric(t, body, fb, unlock) {
       var r = rec(t.id), g = E("div", { class: "lx-ck-grid2" }, body);
+      if (frozen(t)) keepDraft(t.id, null);
+      var dr = frozen(t) ? null : draftOf(t.id);
       var f1 = E("div", { class: "lx-ck-field" }, g), id1 = LX.uid("ck");
       E("label", { for: id1, text: "Your answer" }, f1);
-      var inp = E("input", { type: "number", id: id1, min: "0", step: "any", inputmode: "decimal", value: r.answer ? r.answer.value : "" }, f1);
-      var sel = unitSelect(g, t, r.answer && r.answer.unit), tt = o.tolerance === false ? "" : tolText(t);
+      var inp = E("input", { type: "number", id: id1, min: "0", step: "any", inputmode: "decimal", value: dr ? dr.value : r.answer ? r.answer.value : "" }, f1);
+      if (dr) inp.value = dr.value;
+      var sel = unitSelect(g, t, dr ? dr.unit : r.answer && r.answer.unit), tt = o.tolerance === false ? "" : tolText(t);
       if (tt) { var tid = id1 + "-tol"; E("p", { id: tid, class: "lx-hint lx-ck-tol", text: tt }, body); inp.setAttribute("aria-describedby", tid); }
+      var dl = draftLine(body, !!dr);
+      function draft() {
+        if (frozen(t)) return;
+        var a = rec(t.id).answer, same = a ? String(a.value) === String(inp.value) && a.unit === sel.value : !inp.value && !sel.value;   // as submitted, or still empty
+        keepDraft(t.id, same ? null : { value: inp.value, unit: sel.value }); dl.textContent = same ? "" : DRAFT_NOTE;
+      }
+      inp.addEventListener("input", draft); sel.addEventListener("change", draft);
       var row = E("div", { class: "lx-ck-row" }, body);
       var chk = E("button", { type: "button", class: "lx-btn small", text: "Check", onclick: function () {
         if (!sel.value) { feedback(fb, false, "Choose a unit first."); return; }
@@ -562,8 +601,16 @@
     }
     function openShort(t, body, fb, unlock) {
       var r = rec(t.id), id = LX.uid("ck");
+      if (frozen(t)) keepDraft(t.id, null);
+      var dr = frozen(t) ? null : draftOf(t.id);
       E("label", { for: id, class: "lx-sr", text: "Your explanation" }, body);
-      var ta = E("textarea", { id: id, rows: "3", placeholder: "Your explanation" }, body); ta.value = r.answer || "";
+      var ta = E("textarea", { id: id, rows: "3", placeholder: "Your explanation" }, body); ta.value = dr && dr.text != null ? dr.text : (r.answer || "");
+      var dl = draftLine(body, !!dr);
+      ta.addEventListener("input", function () {
+        if (frozen(t)) return;
+        var same = ta.value.trim() === String(rec(t.id).answer || "");   // the submitted text, or nothing yet: no draft
+        keepDraft(t.id, same ? null : { text: ta.value }); dl.textContent = same ? "" : DRAFT_NOTE;
+      });
       var row = E("div", { class: "lx-ck-row" }, body), self = E("div", { hidden: r.points == null }, body);
       E("p", { class: "lx-hint", text: "Compare with the worked solution, then tick each point your answer makes." }, self);
       var ul = E("ul", { class: "lx-ck-points" }, self), boxes = t.points.map(function (p, k) {
@@ -584,17 +631,27 @@
     }
     function estimate(t, body, fb, unlock) {
       var r = rec(t.id), a = r.answer || {}, g = E("div", { class: "lx-ck-grid2" }, body), F = {};
+      if (frozen(t)) keepDraft(t.id, null);
+      var dr = frozen(t) ? null : draftOf(t.id), from = dr || a;   // a draft wins over the submitted answer it edits
       function field(host, key, label, type) {
         var f = E("div", { class: "lx-ck-field" }, host), id = LX.uid("ck");
         E("label", { for: id, text: label }, f);
         var el = type === "textarea" ? E("textarea", { id: id, rows: "2" }, f) : E("input", { type: "number", id: id, min: "0", step: "any", inputmode: "decimal" }, f);
-        el.value = a[key] != null ? a[key] : ""; F[key] = el; return el;
+        el.value = from[key] != null ? from[key] : ""; F[key] = el; return el;
       }
       field(g, "low", "Low value"); field(g, "high", "High value");
-      var sel = unitSelect(g, t, a.unit);
+      var sel = unitSelect(g, t, from.unit);
       field(body, "reasoning", "How you got there: your inputs and steps", "textarea");
       field(body, "uncertainty", "The main uncertainty, and why it matters most", "textarea");
       field(body, "check", "One way to check your answer", "textarea");
+      var dl = draftLine(body, !!dr);
+      function draft() {
+        if (frozen(t)) return;
+        var v = { unit: sel.value }, ra = rec(t.id).answer || { unit: "" }, same = (ra.unit || "") === sel.value;   // as submitted, or still empty
+        Object.keys(F).forEach(function (k) { v[k] = F[k].value; if (String(ra[k] != null ? ra[k] : "") !== (k === "low" || k === "high" ? v[k] : v[k].trim())) same = false; });
+        keepDraft(t.id, same ? null : v); dl.textContent = same ? "" : DRAFT_NOTE;
+      }
+      Object.keys(F).forEach(function (k) { F[k].addEventListener("input", draft); }); sel.addEventListener("change", draft);
       var row = E("div", { class: "lx-ck-row" }, body);
       fb = E("div", { class: "lx-ck-fb", "aria-live": "polite" }, body);
       var out = E("div", { class: "lx-ck-rating" }, body);
@@ -671,8 +728,10 @@
       var ta = E("textarea", { id: id, class: "lx-ck-out", readonly: "readonly", rows: "10" }, c); ta.value = text;
       E("button", { type: "button", class: "lx-btn small", html: LX.icon("check") + "Copy my results", onclick: function () {
         // the clipboard API where allowed; else select the text and copy, or ask the reader to copy it by hand
-        function fallback() { ta.focus(); ta.select(); try { document.execCommand("copy"); msg.textContent = "Copied. Paste it into the tester form."; } catch (e) { msg.textContent = "Select the text below and copy it."; } }
-        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(function () { msg.textContent = "Copied. Paste it into the tester form."; }, fallback);
+        // execCommand returns false when the browser refuses: then only the selection is left, and the reader is told so
+        function fallback() { ta.focus(); ta.select(); var done = false; try { done = document.execCommand("copy") === true; } catch (e) { done = false; }
+          msg.textContent = done ? COPIED : "This browser did not copy it. The text below is selected: copy it with Ctrl+C (⌘C on a Mac)."; }
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(function () { msg.textContent = COPIED; }, fallback);
         else fallback();
       } }, row);
       E("button", { type: "button", class: "lx-btn ghost small", text: "Back to the tasks", onclick: function () { show(0); } }, row);

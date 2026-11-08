@@ -36,7 +36,7 @@ const status = l => live(l) ? "open" : "coming soon";
 <summary>All lessons as a list</summary>
 <div class="lx-list-tiers">
 <section aria-labelledby="h-path">
-<h3 id="h-path"><i style="--c:var(--lx-ink-3)"></i>The starter path: <%= starter.length %> lessons across the tiers</h3>
+<h2 id="h-path"><i style="--c:var(--lx-ink-3)"></i>The starter path: <%= starter.length %> lessons across the tiers</h2>
 <ol start="0">
 <% for (const l of starter) { %>
 <li id="lesson-<%= l.starter %>" data-lesson-id="<%= l.id %>"><% if (live(l)) { %><a href="<%- link(page(l)) %>"><%= l.title %></a><% } else { %><%= l.title %><% } %> <span class="lx-code">· <%= span(l) %> · <%= l.minutes %> min · <%= status(l) %></span></li>
@@ -48,7 +48,7 @@ const status = l => live(l) ? "open" : "coming soon";
      const more = lessons.map((l, j) => ({ l, j })).filter(x => x.l.tier === t.id && !has(x.l.starter))
        .sort((a, b) => rank(a.l)[0] - rank(b.l)[0] || rank(a.l)[1] - rank(b.l)[1] || a.j - b.j).map(x => x.l); %>
 <section id="<%= t.id %>" aria-labelledby="h-<%= t.id %>">
-<h3 id="h-<%= t.id %>"><i style="--c:var(--lx-tier-<%= t.slot || (tiers.indexOf(t) + 1) %>)"></i><%= t.title %><%= has(t.level) ? " · " + t.level : "" %><%= t.status === "upcoming" ? " · coming later" : "" %></h3>
+<h2 id="h-<%= t.id %>"><i style="--c:var(--lx-tier-<%= t.slot || (tiers.indexOf(t) + 1) %>)"></i><%= t.title %><%= has(t.level) ? " · " + t.level : "" %><%= t.status === "upcoming" ? " · coming later" : "" %></h2>
 <p class="lx-hint"><%= t.goal %></p>
 <% if (tour.length || more.length) { %>
 <ul>
@@ -62,12 +62,12 @@ const status = l => live(l) ? "open" : "coming soon";
 <% } %>
 <% if (tools.length) { %>
 <section id="toolbox" aria-labelledby="h-toolbox">
-<h3 id="h-toolbox"><i style="--c:var(--lx-ink-3)"></i>The math toolbox</h3>
+<h2 id="h-toolbox"><i style="--c:var(--lx-ink-3)"></i>The math toolbox</h2>
 <ul><% for (const t of tools) { %><li<% if (has(t.id)) { %> data-lesson-id="<%= t.id %>"<% } %>><% if (has(t.code)) { %><span class="lx-code"><%= t.code %></span><% } %><% if (live(t)) { %><a href="<%- link(page(t)) %>"><%= t.title %></a><% } else { %><%= t.title %><% } %> <span class="lx-code">· <%= has(t.minutes) ? t.minutes + " min · " : "" %><%= status(t) %></span></li><% } %></ul>
 </section>
 <% } %>
 <section id="reference" aria-labelledby="h-reference">
-<h3 id="h-reference"><i style="--c:var(--lx-ink-3)"></i>Reference</h3>
+<h2 id="h-reference"><i style="--c:var(--lx-ink-3)"></i>Reference</h2>
 <ul><li><a href="regions.html">Regional profile cards</a> <span class="lx-code">· twelve energy systems in one structure, with dated key numbers · opened from F10</span></li></ul>
 </section>
 </div>

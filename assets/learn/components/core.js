@@ -7,7 +7,10 @@
                                         draws can link a live lesson; _tests/learn/test_components_w3_shared.js checks
                                         that every such mark names a live page)
              LX.fmt.money/tonnes/mw/mwh/hh/int, LX.clamp, LX.lerp, LX.reduced() (prefers-reduced-motion)
-   State:    LX.progress.done/isDone/guess/answer, LX.store.get/set   (this browser only; try/catch wrapped)
+   State:    LX.progress.done/isDone/guess/answer, LX.store.get/set   (this browser only; try/catch wrapped; kept in memory
+                                        for the page, with one notice, when the browser refuses storage)
+             LX.store.persistent()  false once storage failed;  LX.store.clearAll()  the course-wide reset ([data-lx-reset]);
+                                        a page opened before a reset no longer writes (its old state cannot come back)
    Runtime:  LX.mount(slug, init)  load a lesson interactive's data-src JSON files, then init(liveRoot, data)
              LX.demo(root, fn, cards) a lesson's demo states ("mid", "step-N", ...) for screenshots: window.lxDemo, ?demo=
              LX.load(urls)         Promise of {basename: parsed JSON};  LX.base = URL of assets/learn/
@@ -167,9 +170,43 @@
   LX.rich = rich;
 
   // ---------------------------------------------------------------- browser storage (never required)
-  var KEY = "learn.v1";
-  function read() { try { return JSON.parse(window.localStorage.getItem(KEY)) || {}; } catch (e) { return {}; } }
-  function write(s) { try { window.localStorage.setItem(KEY, JSON.stringify(s)); return true; } catch (e) { return false; } }
+  // Everything the course keeps lives under one localStorage key, "learn.v1". When the browser refuses it (site data
+  // blocked, some private windows, a full quota), the state is kept in memory for the rest of this page's life, as JSON
+  // text so it behaves like storage, and one short notice says that it will not survive a reload
+  // (LX.store.persistent() is then false). LX.store.clearAll() is the course-wide reset: it replaces everything with
+  // {reset: <time>}, and the mark keeps a page opened before the reset (another tab, a page restored from the back-forward
+  // cache) from writing its old state back: such a page's writes are dropped, and it says so once.
+  var KEY = "learn.v1", MEM = null, warned = {}, EPOCH;   // EPOCH: the reset mark this page started with
+  var NOTES = { blocked: "This browser is not keeping site data, so your answers and progress last only until you reload or leave this page.",
+    stale: "This course's data was cleared in this browser, from another tab. Reload this page to start afresh; until then, nothing on it is saved." };
+  function read() {
+    var s;
+    if (MEM != null) s = JSON.parse(MEM);
+    else {
+      var txt;
+      try { txt = window.localStorage.getItem(KEY); } catch (e) { MEM = "{}"; notice("blocked"); txt = null; }
+      try { s = JSON.parse(txt) || {}; } catch (e) { s = {}; }   // unreadable text: start afresh (the next write replaces it)
+    }
+    if (EPOCH === undefined) EPOCH = s.reset || null;
+    return s;
+  }
+  function write(s) {
+    if (EPOCH !== undefined && (s.reset || null) !== EPOCH) { notice("stale"); return false; }   // cleared since this page opened
+    var txt = JSON.stringify(s);
+    if (MEM != null) { MEM = txt; return false; }
+    try { window.localStorage.setItem(KEY, txt); return true; } catch (e) { MEM = txt; notice("blocked"); return false; }
+  }
+  // a notice, once per page and kind: under the page title, or at the top of the main column
+  function notice(kind) {
+    if (warned[kind]) return; warned[kind] = true;
+    function put() {
+      var main = document.querySelector("main") || document.body; if (!main) return;
+      var p = LX.H("p", { class: "lx-store-note", role: "status", "data-kind": kind, text: NOTES[kind] });
+      var head = main.querySelector("#title-block-header");
+      if (head && head.parentNode === main) main.insertBefore(p, head.nextSibling); else main.insertBefore(p, main.firstChild);
+    }
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", put); else put();
+  }
   function bucket(s, n) { if (!s[n] || typeof s[n] !== "object") s[n] = {}; return s[n]; }
   function kv(name) {
     return function (id, value) {
@@ -179,7 +216,14 @@
       write(s);
     };
   }
-  LX.store = { get: function (k, d) { var v = kv("kv")(k); return v === undefined ? d : v; }, set: function (k, v) { kv("kv")(k, v); } };
+  LX.store = { get: function (k, d) { var v = kv("kv")(k); return v === undefined ? d : v; }, set: function (k, v) { kv("kv")(k, v); },
+    persistent: function () { return MEM == null; },
+    clearAll: function () {   // every guess, answer, draft, checkpoint attempt and tick of the course, in this browser
+      EPOCH = new Date().toISOString();
+      var txt = JSON.stringify({ reset: EPOCH });   // no reader data: only the time of the reset (see read and write)
+      if (MEM != null) { MEM = txt; return; }
+      try { window.localStorage.setItem(KEY, txt); } catch (e) { MEM = txt; notice("blocked"); }
+    } };
   LX.progress = {
     isDone: function (id) { return !!bucket(read(), "done")[id]; },
     done: function (id, on) {
@@ -311,6 +355,21 @@
       b.addEventListener("click", function () { var id = b.getAttribute("data-complete"); LX.progress.done(id, !LX.progress.isDone(id)); });
     });
   }
+  // the course-wide reset (the Learn index): <div class="lx-reset" data-lx-reset hidden> holding a button and a status
+  // line (aria-live); shown only with JavaScript, it asks first, then clears everything kept under learn.v1
+  var RESET_ASK = "Clear all course data in this browser? This removes your guesses, answers, drafts, checkpoint attempts and completed-lesson ticks for every lesson (everything kept under learn.v1). It cannot be undone.";
+  function setupReset() {
+    document.querySelectorAll("[data-lx-reset]").forEach(function (box) {
+      var b = box.querySelector("button"), msg = box.querySelector("[aria-live]");
+      if (!b) return;
+      box.hidden = false;
+      b.addEventListener("click", function () {
+        if (!window.confirm(RESET_ASK)) return;
+        LX.store.clearAll(); paintTicks(); LX.emit("progress");
+        if (msg) msg.textContent = "Cleared. This browser now keeps no data from this course.";
+      });
+    });
+  }
 
   // ---------------------------------------------------------------- keep the site's back-to-top button off lesson controls
   function guardToTop() {
@@ -364,7 +423,10 @@
   }
 
   function start() {
-    watchTheme(); setupComplete(); paintTicks(); guardToTop();
+    read();   // a first read: a browser that refuses storage shows its notice at once, not at the first answer
+    // a reset in another tab: say so here at once (this page's writes are dropped from now on; see write)
+    window.addEventListener("storage", function (e) { if ((e.key === KEY || e.key === null) && EPOCH !== undefined && (read().reset || null) !== EPOCH) notice("stale"); });
+    watchTheme(); setupComplete(); setupReset(); paintTicks(); guardToTop();
     isReady = true; readyQ.splice(0).forEach(function (f) { try { f(); } catch (e) { console.error(e); } });
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start); else setTimeout(start, 0);

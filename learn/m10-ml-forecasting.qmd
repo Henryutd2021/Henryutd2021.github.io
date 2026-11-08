@@ -236,7 +236,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-card lx-real">
 <p class="lx-eyebrow">Where this came up in research</p>
 <blockquote class="lx-excerpt" data-source="excerpt:uq-mfgpr"><p>From the course author's research: a wind turbine's real power curve is a band, not a line. Adding the turbine's theoretical curve to about two hundred measurements can narrow that band, but whether it helps depends on how the fit is scored. (<a href="https://doi.org/10.1115/detc2023-114762">Li et al., ASME IDETC 2023</a>)</p></blockquote>
-<blockquote class="lx-excerpt" data-source="excerpt:uq-mfgpr"><p>In the reported nine-turbine test, nonlinear multi-fidelity regression achieved lower RMSE for most turbines; performance depended on the evaluation metric.</p><p>Testing both point and probabilistic metrics showed that the gain depended on which error matters.</p><footer>Approved excerpt of: <a href="https://doi.org/10.1115/detc2023-114762">Li et al., ASME IDETC 2023</a>.</footer></blockquote>
+<blockquote class="lx-excerpt" data-source="excerpt:uq-mfgpr"><p>In the reported nine-turbine test, nonlinear multi-fidelity regression achieved lower RMSE for most turbines; performance depended on the evaluation metric.</p><p>Testing both point and probabilistic metrics showed that the gain depended on which error matters.</p><footer>From: <a href="https://doi.org/10.1115/detc2023-114762">Li et al., ASME IDETC 2023</a>.</footer></blockquote>
 <p>The same lesson as this page: say which score, on which held-out data. The method is in <a href="m09-surrogates-uq.html">M9</a>.</p>
 <p class="lx-hint">Case file <a href="cf8-power-curves-from-scarce-data.html">CF8</a>: learning a wind turbine's power curve from scarce data.</p>
 </div>

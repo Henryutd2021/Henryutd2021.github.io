@@ -40,6 +40,7 @@ body-classes: "page-learn page-lesson lx-form-checkpoint"
 
 ::: {#task .lx-sec}
 ```{=html}
+<h2 class="lx-sr">Task</h2>
 <div class="lx-card ckm-intro">
 <p class="lx-eyebrow">How this checkpoint works · about 240 minutes, no hints</p>
 <ol class="ckm-parts">

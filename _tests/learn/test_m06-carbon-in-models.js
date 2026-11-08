@@ -130,7 +130,7 @@ function dmt(v) { const r = Math.round(v / 1e4) / 100; return (r < 0 ? "−" : r
   ok(Math.round(FY.shortMWh) === 290 && (FY.shortMWh / loadYear * 100).toFixed(2) === "0.01", "the full year: about 290 MWh unmatched, 0.01% of the load's year (the least possible: the optimum, the same for every best schedule)");
 
   // ---------------- the reference block and the page's generated blocks
-  const ref = { about: "Written by node _tests/learn/test_m06-carbon-in-models.js --write; re-solved by the same test on every run. CO2 in t, money in $ a year (2025 dollars).",
+  const ref = { about: "Reference results, solved with the lesson's LP in HiGHS. CO2 in t, money in $ a year (2025 dollars).",
     size: { cols: base.m.variables.length, rows: base.m.constraints.length }, E0: E0, base: { cost: base.R.resource },
     caps: caps.map(z => ({ cap: z.c, co2: z.x.R.co2, cost: z.x.R.resource, dual: z.x.R.capPrice, Wn: z.x.R.Wn, Sn: z.x.R.Sn })),
     ties: ties.map(t => ({ cap: t.c, tau: t.tau, lo: t.lo, hi: t.hi })),
@@ -236,7 +236,7 @@ ${buyRow("New wind, sun and batteries, matched hour by hour", Hr, "0 t", `${mw(H
   ok(PAGE.includes(`<p class="lx-hint">${SNAP["E10.4"]}</p>`), "E10.4 under the txh2 excerpt");
   const OWN = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1:end -->/g, "").replace(/<!--[\s\S]*?-->/g, "").replace(/^---[\s\S]*?\n---\n/, "");
   const RX = /\b(stud(y|ies)|paper|Li et al|course author|excerpt|ERCOT|Texas|weather zones?|load regulation)\b/i;
-  const LABELS = [/^Approved excerpt of: Li et al\. \(2025\), (Cell Reports Sustainability|International Journal of Hydrogen Energy)\.$/, /^Li et al\. \(2025\)\. .+\.$/,
+  const LABELS = [/^From: Li et al\. \(2025\), (Cell Reports Sustainability|International Journal of Hydrogen Energy)\.$/, /^Li et al\. \(2025\)\. .+\.$/,
     /^Case file CF6: how much shifting load to cleaner hours can cut emissions, and when\.$/];
   const elems = OWN.replace(/^- (.*)$/gm, "<li>$1</li>").split(/<\/?(?:p|li|ul|ol|dl|dt|dd|div|blockquote|footer|table|thead|tbody|tr|td|th|summary|details|h[1-6]|header|script)\b[^>]*>/i).map(norm).filter(s => /[A-Za-z]/.test(s));
   const strs = (JS.replace(/\/\/[^\n]*/g, " ").match(/"(?:[^"\\\n]|\\.)*"/g) || []).map(s => s.slice(1, -1));

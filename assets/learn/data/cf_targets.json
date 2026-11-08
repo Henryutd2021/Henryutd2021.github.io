@@ -5,6 +5,7 @@
   "built_by": "by hand from the source table below; checked 2026-11-02",
   "license": "EIA data are U.S. government works in the public domain; this file CC BY 4.0"
  },
+ "dataset": { "creator": "Honglin Li", "date": "2026-11-02", "status": "Real: EIA's 2025 national capacity factors, as published.", "source": "Copied by hand from EIA's Electric Power Monthly, Table 6.07.B (see source).", "license": "This file: CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/), Honglin Li. The EIA values are U.S. government works in the public domain." },
  "targets": {
   "wind": {"cf": 0.338, "label": "Wind, U.S. utility-scale fleet", "year": 2025, "time_adjusted_capacity_MW": 155344.4},
   "solar": {"cf": 0.240, "label": "Solar photovoltaic, U.S. utility-scale fleet", "year": 2025, "time_adjusted_capacity_MW": 134526.3}

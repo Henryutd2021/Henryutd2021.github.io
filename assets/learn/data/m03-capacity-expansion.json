@@ -1,5 +1,12 @@
 {
- "about": "Modeler lesson M3: the choices the lesson offers and its reference results. The model is lesson 13's planning LP (13-capstone.json holds its costs and sources); the year is town_year.json (2025) and the second weather year m03-capacity-expansion-2024.json. The reference block is written by node _tests/learn/test_m03-capacity-expansion.js --write and re-solved by the same test on every run.",
+ "about": "Modeler lesson M3: the choices the lesson offers and its reference results. The model is lesson 13's planning LP (13-capstone.json holds its costs and sources); the year is town_year.json (2025) and the second weather year m03-capacity-expansion-2024.json. The reference block holds the lesson's results, solved with this LP in HiGHS; the lab notebook checks its answers against them.",
+ "dataset": {
+  "creator": "Honglin Li",
+  "date": "2026-11-05",
+  "status": "Illustrative: Prairie Town is fictional; its technology costs are lesson 13's, from cited EIA and NREL sources in 2025 dollars (13-capstone.json); the hourly shapes are real SPP data for 2025 and 2024 (EIA-930).",
+  "source": "Prepared by hand for lesson M3 on lesson 13's planning model; the reference results are solved with HiGHS.",
+  "license": "CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/), Honglin Li. Values taken from the sources listed in this file keep their publishers' terms; EIA data are U.S. government works in the public domain."
+ },
  "accessed": "2026-11-03",
  "cap": 200,
  "sets": [
@@ -68,7 +75,7 @@
   ]
  },
  "reference": {
-  "about": "Written by node _tests/learn/test_m03-capacity-expansion.js --write; re-solved by the same test on every run. Costs in $ a year, CO2 in t a year, energy in MWh, power in MW.",
+  "about": "Reference results, solved with the lesson's planning LP in HiGHS. Costs in $ a year, CO2 in t a year, energy in MWh, power in MW.",
   "sets": {
    "typ4": {
     "weeks": 4,

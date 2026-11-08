@@ -160,12 +160,12 @@ ok(quotes.length === 2 && quotes.map(q => q[1]).join(",") === "excerpt:txh2,exce
 quotes.forEach(q => [...q[2].matchAll(/<p>([\s\S]*?)<\/p>/g)].forEach(p => ok(approved(p[1]), `${q[1]}: approved sentence: ${norm(p[1]).slice(0, 60)}`)));
 ok(norm(quotes[0][2]).startsWith(SNAP["E10.2"]) && norm(quotes[0][2]).endsWith(SNAP["E10.3"]), "txh2: E10.2 then E10.3, word for word");
 onPage(`<p class="lx-hint">${SNAP["E10.4"]}</p>`, "E10.4 under the txh2 excerpt"); onPage(`<p class="lx-hint">${SNAP["E4.2"]}</p>`, "E4.2 under the solar excerpt");
-ok(/Approved excerpt of: Li et al\. \(2025\), <a href="https:\/\/doi\.org\/10\.1016\/j\.ijhydene\.2025\.02\.303">International Journal of Hydrogen Energy<\/a>\./.test(PAGE), "txh2 footer and DOI as approved");
+ok(/From: Li et al\. \(2025\), <a href="https:\/\/doi\.org\/10\.1016\/j\.ijhydene\.2025\.02\.303">International Journal of Hydrogen Energy<\/a>\./.test(PAGE), "txh2 footer and DOI as approved");
 const exSteps = [...PAGE.matchAll(/<ol class="ex-fallback[^"]*">([\s\S]*?)<\/ol>/g)].flatMap(m => [...m[1].matchAll(/<li>([\s\S]*?)<\/li>/g)].map(x => x[1]));
 ok(exSteps.length === 4 && exSteps.every(approved), "the explainer's no-JS steps are E3.14, sentence by sentence");
 // any element that names a study, a paper, its author or method must be approved, or one of these labels
 const RX = /\b(stud(y|ies)|paper|Li et al|course author|excerpt|ERCOT|West Texas|optimizer|stochastic|weather zones?)\b/i;
-const LABELS = [/^Approved excerpt of: Li et al\. \(20\d\d\), (International Journal of Hydrogen Energy|EEM 2023)\.$/, /^A separate example with stylized numbers, from the course author's open explainer: not the study's data or results\.$/,
+const LABELS = [/^From: Li et al\. \(20\d\d\), (International Journal of Hydrogen Energy|EEM 2023)\.$/, /^A separate example with stylized numbers, from the course author's open explainer: not the study's data or results\.$/,
   /^Li et al\. \(20\d\d\)\. .+\.$/, /^Case file CF2: when the cost per kilogram and the cost of the system disagree\.$/, /^Case file CF2 tells a published study's version\.$/];
 const OWN = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1:end -->/g, "").replace(/<!--[\s\S]*?-->/g, "").replace(/^---[\s\S]*?\n---\n/, "");
 const elems = OWN.replace(/^- (.*)$/gm, "<li>$1</li>").split(/<\/?(?:p|li|ul|ol|dl|dt|dd|div|blockquote|footer|table|thead|tbody|tr|td|th|summary|details|h[1-6]|header|script)\b[^>]*>/i).map(norm).filter(s => /[A-Za-z]/.test(s));

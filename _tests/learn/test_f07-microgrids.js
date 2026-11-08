@@ -193,7 +193,7 @@ const APPROVED_SNAPSHOT = {   // the approved wording of E8.2, E8.7 and E9.1-E9.
 };
 const RX = /\b(course author|research|stud(y|ies)|paper|article|Li et al|excerpt|internship|confidential|supply chains?|factor(y|ies)|warehouses?|transactive|Applied Mathematical Modelling|SEGRE|California|Arizona|Nevada|synthetic|techno-economic)\b/i;
 const NOT_RESEARCH = [
-  [/^Approved excerpt of: Li et al\. \(2023\), Applied Mathematical Modelling\.$/, "provenance label"],
+  [/^From: Li et al\. \(2023\), Applied Mathematical Modelling\.$/, "provenance label"],
   [/^In the real world$/, "heading"],
   [/^The full case: case file CF1( \(upcoming\))?\.$/, "pointer to the case file"],
   [/^In Puerto Rico, a small microgrid that serves a community organization kept the power on for nine days during Hurricane Fiona, while other parts of the island were dark \(U\.S\. DOE, 8 November 2023\)\.$/, "a public case, sourced, not the course author's work"],

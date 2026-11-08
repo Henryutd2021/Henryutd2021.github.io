@@ -198,6 +198,10 @@ body.lx-totop-off .to-top { opacity: 0 !important; pointer-events: none !importa
 .lx-intro p { margin: 0; }
 .lx-landing-note { margin-top: 1.6rem; font-size: 13.5px; color: var(--lx-ink-3); max-width: 80ch; }
 .lx-landing-note p { margin: 0; }
+.lx-landing-note .lx-reset { margin-top: .6rem; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
+.lx-landing-note .lx-reset[hidden] { display: none; }
+/* the notice when the browser keeps no site data (core.js): progress lasts only until a reload */
+.lx-store-note { margin: 0 0 1rem; padding: 8px 12px; border-left: 4px solid var(--lx-warn); border-radius: 0 8px 8px 0; background: var(--lx-warn-soft); color: var(--lx-ink); font-size: 14.5px; max-width: 80ch; }
 .lx-real p:not(.lx-eyebrow), .lx-sources ul, .lx-real ol { font-size: 14.5px; color: var(--lx-ink-2); }
 .lx-card > .lx-eyebrow { margin-bottom: 6px; }
 

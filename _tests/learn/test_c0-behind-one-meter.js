@@ -160,11 +160,11 @@ const QPATH = path.join(SITE, "learn/c0-behind-one-meter.qmd");
   ok(quotes.length === 2 && quotes.map(q => q[1]).join() === "excerpt:wind-hydrogen,excerpt:solar-hydrogen", "two excerpts, from C0's sources (excerpt:wind-hydrogen, excerpt:solar-hydrogen)");
   const qs = quotes.flatMap(q => [...q[2].matchAll(/<p>([\s\S]*?)<\/p>/g)].map(x => norm(x[1])));
   ok(qs.length === 3 && qs.every(s => UNITS.indexOf(s) >= 0), "every excerpt sentence is approved, word for word: " + qs.filter(s => UNITS.indexOf(s) < 0).join(" | "));
-  quotes.forEach(q => ok(/^Approved excerpt of: Li et al\. \(\d{4}\), <a href="https:\/\/doi\.org\/[^"]+">(Journal of Mechanical Design|EEM 2023)<\/a>\.$/.test(q[3]), "excerpt footer: a provenance label with the DOI"));
+  quotes.forEach(q => ok(/^From: Li et al\. \(\d{4}\), <a href="https:\/\/doi\.org\/[^"]+">(Journal of Mechanical Design|EEM 2023)<\/a>\.$/.test(q[3]), "excerpt footer: a provenance label with the DOI"));
   // every other text element that names a study, an author, a site or a method is approved or listed
   const RX = /\b(stud(y|y's|ies|ies')|paper|article|journal|Li et al|course author|excerpt|research|published|REopt|ERCOT|West Texas|253 MW|optimizer|configurations?|utilization|conference)\b/i;
   // LISTED: what may name a study (or use a study word) without describing the course author's work, each with its reason
-  const LISTED = [/^Approved excerpt of: Li et al\. \(\d{4}\), (Journal of Mechanical Design|EEM 2023)\.$/,   // provenance label
+  const LISTED = [/^From: Li et al\. \(\d{4}\), (Journal of Mechanical Design|EEM 2023)\.$/,   // provenance label
     /^Li et al\. \(20\d\d\)\. .+\.$/,                                                                // citation (title checked below)
     /^Say which yardstick your note uses\. Case file CF2 takes the first case apart\.$/,                 // pointer to CF2
     /^Go deeper · ResearcherFrom this capstone to your own study$/,                                       // course label

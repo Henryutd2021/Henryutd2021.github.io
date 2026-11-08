@@ -229,7 +229,7 @@ $$
 ```{=html}
 <div class="lx-card lx-real">
 <p class="lx-eyebrow">In the real world</p>
-<blockquote class="lx-excerpt" data-source="excerpt:wind-hydrogen"><p>Compared with wind and a battery alone, adding an electrolyzer reduced total system cost by about 7%, and using hydrogen as the storage medium for fuel cells reduced it by about 26%.</p><footer>Approved excerpt of: Li et al. (2024), <a href="https://doi.org/10.1115/1.4063971">Journal of Mechanical Design</a>.</footer></blockquote>
+<blockquote class="lx-excerpt" data-source="excerpt:wind-hydrogen"><p>Compared with wind and a battery alone, adding an electrolyzer reduced total system cost by about 7%, and using hydrogen as the storage medium for fuel cells reduced it by about 26%.</p><footer>From: Li et al. (2024), <a href="https://doi.org/10.1115/1.4063971">Journal of Mechanical Design</a>.</footer></blockquote>
 <p class="lx-hint">Battery, hydrogen and hybrid storage were compared, each set to deliver the largest stabilized output in every hour at the lowest life-cycle cost.</p>
 <p class="lx-hint">Holds when: one planned West Texas wind farm, ERCOT prices, costs from 2020 to 2023. Leaves out: final federal hydrogen credit rules.</p>
 <p class="lx-hint">Case file <a href="cf2-cost-per-kg-vs-system-cost.html">CF2</a> tells that study in full.</p>

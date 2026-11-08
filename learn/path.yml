@@ -16,7 +16,9 @@
 #   status        `status: active` makes a lesson or tool live: linked, with generated blocks, page learn/<id>.qmd (or
 #                 `path:`); `status: upcoming` or no page = coming soon. A tier with `status: upcoming` shows as later.
 #   off the path  lessons with a `code` (N1, B1, M1, CK-F, ...) may list prerequisites as starter numbers or codes
-#                 (`after: [10, K4]`) and the module that follows (`next: B2`); `form: checkpoint` for checkpoint pages,
+#                 (`after: [10, K4]`) and the module that follows (`next: B2`); when `next` has a prerequisite the route
+#                 to this lesson has not met, `next_needs: [R5]` names it and the hand-off says "Needs first: R5"
+#                 (the build fails when a route skips one unnamed); `form: checkpoint` for checkpoint pages,
 #                 `studio` and `case`, `sandbox` and `capstone` (a capstone names its sandbox: `sandbox: SB0`);
 #                 see assets/learn/README.md
 # (The name has no leading underscore because Quarto listings skip files that start with "_".)
@@ -361,6 +363,7 @@
   does: "Dissect a headline: tag phrases with the seven lens questions, run a back-of-envelope check, then write your take in three sentences (claim, what would change your mind, confidence)."
   after: [1]
   next: CK-F
+  next_needs: [6]
   scales: [S0, S1, S2, S3, S4]
 - kind: lesson
   id: ck-f-estimate
@@ -393,6 +396,7 @@
   does: "Start with a ten-question readiness check that routes you to the toolbox if needed; turn three word problems into equations and inequalities, then into a linear program; drag the constraints of a two-variable LP; write the same model as Ax <= b with a linked view."
   after: [10, K4]
   next: B2
+  next_needs: [K7]
   scales: [S2]
 - kind: lesson
   id: b02-python-data
@@ -432,6 +436,7 @@
   does: "Read a published-style formulation (sets, indices, parameters, variables, constraints) and translate each line into words and units; find five planted errors (unit, sign, missing index, wrong sum, a free lunch); check a solved model's energy balance and the signs of its duals."
   after: [B1]
   next: M1
+  next_needs: [11]
   scales: [S2]
 - kind: lesson
   id: m01-dispatch-to-lmp
@@ -472,6 +477,7 @@
   outcome: "Place a question at its scale and name who decides it, what a model of it needs and what it takes from other scales."
   after: [0]
   next: F2
+  next_needs: [6]
   scales: [S0, S1, S2, S3, S4]
 - kind: lesson
   id: f02-systems-and-map
@@ -491,6 +497,7 @@
   outcome: "Tell a stock from a flow, name a feedback loop as reinforcing or balancing, and trace how one change ripples across technology, cost, emissions, people and security."
   after: [F1, 6]
   next: A22
+  next_needs: [12]
   scales: [S0, S1, S2, S3, S4]
 # ---------- Foundations: energy services, power plants, nuclear basics, the grid and outages
 - kind: lesson
@@ -510,6 +517,7 @@
   outcome: "Tell a service from a carrier, estimate the useful energy a home gets from what it buys, and explain why a heat pump's COP changes with the weather."
   after: [1]
   next: F4
+  next_needs: [5]
   scales: [S0]
 - kind: lesson
   id: f04-power-plants
@@ -564,6 +572,7 @@
   outcome: "Trace the path from a power plant to a socket, name the equipment at each voltage step, and explain what SAIDI and SAIFI measure."
   after: [3]
   next: F7
+  next_needs: [9]
   scales: [S2, S3]
 # ---------- Foundations and Analyst modules; live once a row has status: active
 - kind: lesson
@@ -583,6 +592,7 @@
   does: "Change one plan and watch cost, CO₂, reliability, a fairness measure and a security measure move together on a radar; find the plans no other beats on all five; see whose priorities pick which plan, and how a different definition changes the answer."
   after: [F2, 12]
   next: R1
+  next_needs: [13]
   scales: [S0, S1, S2, S3, S4]
 # ---------- Analyst modules A4 and A7
 - kind: lesson
@@ -602,6 +612,7 @@
   does: "Bill a renter, a home with solar and an EV, and a factory under flat, time-of-use, demand-charge and real-time tariffs; see who pays more and what behaviour each tariff rewards; then set a large load's minimum bill."
   after: [8]
   next: A7
+  next_needs: [9]
   scales: [S0, S1]
 - kind: lesson
   id: a07-flexible-demand
@@ -656,6 +667,7 @@
   outcome: "Compute a hydrogen chain's energy and mass balance and cost per kilogram, tell it from the system's cost, and rank uses of hydrogen against their alternatives."
   after: [9, 7, A8]
   next: M4
+  next_needs: [M1]
   scales: [S0, S3]
 # ---------- the microgrid line: F7 and A14. F7's prerequisites are T9 and F6, A14's F7, A1 and A4.
 - kind: lesson
@@ -675,6 +687,7 @@
   outcome: "Say what makes a microgrid, why ordinary rooftop solar goes dark in an outage, and how power (kW) and stored energy (kWh) limit what an island carries and for how long."
   after: [9, F6]
   next: A14
+  next_needs: [A1, A4]
   scales: [S1]
 - kind: lesson
   id: a14-microgrid-value
@@ -925,6 +938,7 @@
   outcome: "Name which of four emissions questions a number answers, compute each for a load with its stated method and assumptions, and say why a claim is not a measure of emissions caused."
   after: [12, 8]
   next: A12
+  next_needs: [A1]
   scales: [S2]
 # A11
 - kind: lesson
@@ -944,6 +958,7 @@
   outcome: "Name the boundary and functional unit behind a footprint, compare options on one boundary, tell water withdrawn from water consumed, and say whether a number is an attributional share or a consequential change."
   after: [F11]
   next: A12
+  next_needs: [12, A1]
   scales: [S0, S3]
 - kind: lesson
   id: a12-policy-instruments
@@ -962,6 +977,7 @@
   outcome: "Explain how four policy instruments change a least-cost plan, compare them on emissions cut, resource cost and who pays, and keep transfers apart from real costs."
   after: [A1, 12]
   next: M6
+  next_needs: [A10, M1]
   scales: [S4, S2]
 # A13
 - kind: lesson
@@ -1216,6 +1232,7 @@
   does: "Add start-up costs and minimum run times; watch the LP schedule become impossible to operate; grow a small branch-and-bound tree; see why a mixed-integer program gives no ordinary shadow prices; fix the commitments and re-solve the dispatch LP for conditional prices, then count the uplift payments that start-up costs need."
   after: [M1]
   next: M3
+  next_needs: [13]
   scales: [S2]
 - kind: lesson
   id: m03-capacity-expansion
@@ -1236,6 +1253,7 @@
   does: "Co-optimize what to build and how to run it on weighted representative weeks, with the battery linked across them and the extreme weeks kept; then re-run the plan on every hour of 2025 and of 2024 and see which conclusions survive."
   after: [M1, 7, 13]
   next: CK-M
+  next_needs: [R5]
   scales: [S2, S4]
 - kind: lesson
   id: m04-storage-multienergy
@@ -1256,6 +1274,7 @@
   outcome: "Formulate a multi-carrier plant LP with storage, solve it, and show with stated comparisons where coupling carriers earns value."
   after: [M1, A8]
   next: M5
+  next_needs: [A14, M2]
   scales: [S0, S3]
 - kind: lesson
   id: m05-microgrid-size-and-run
@@ -1295,6 +1314,7 @@
   outcome: "Put a CO₂ cap, a carbon price and a procurement rule into an LP, read their duals and ties correctly, and show with stated comparisons that meeting a procurement rule is not the same as causing an emissions cut."
   after: [M1, A10, 12]
   next: M7
+  next_needs: [K5]
   scales: [S2]
 - kind: lesson
   id: m07-monte-carlo
@@ -1316,6 +1336,7 @@
   does: "Sample uncertain inputs with a Latin hypercube, run a model a thousand times, rank inputs by influence and read the distribution, not one number."
   after: [A1, B2, K5]
   next: M8
+  next_needs: [M3]
   scales: [S0, S1, S2, S3, S4]
 # M8
 - kind: lesson
@@ -1598,6 +1619,7 @@
   outcome: "Choose the scale, boundary, time step, horizon and method family for a question, and defend the method against two alternatives, one from another family."
   after: [R1, F1]
   next: R4
+  next_needs: [B2]
   scales: [S0, S1, S2, S3, S4]
 - kind: lesson
   id: r04-data
@@ -1616,6 +1638,7 @@
   does: "Clean SPP's raw 2025 hourly file by choosing a time base, a spike rule, a frozen-reading rule and a fill method; watch four reported numbers move with each choice; sort eight data sources by licence; pick coordinate systems for a spatial layer; write the data note."
   after: [R3, B2]
   next: R5
+  next_needs: [K8, M1]
   scales: [S0, S1, S2, S3, S4]
 - kind: lesson
   id: r05-build-validate
@@ -1635,6 +1658,7 @@
   does: "Find five planted bugs in a one-day battery study (a unit error, a sign flip, a free lunch, a missing rule, a leaked future), each with a named check and a real solver; match a benchmark worked by hand; validate the day-before forecast against measured data and check one input; see why a clean clone fails, rerun it for real in the notebook and write a verification log."
   after: [R4, M1, K8]
   next: R6
+  next_needs: [M7, M8]
   scales: [S0, S1, S2, S3, S4]
 - kind: lesson
   id: r06-uncertainty-properly
@@ -1653,6 +1677,7 @@
   outcome: "Classify the uncertainties of a study, choose a defensible treatment for each, and report the result as a range that a paper, a decision-maker and the public can each read correctly."
   after: [M7, M8]
   next: R7
+  next_needs: [A11, M11]
   scales: [S0, S1, S2, S3, S4]
 # R7
 - kind: lesson
@@ -1708,6 +1733,7 @@
   does: "Sort ten practices by the norm they serve; work through six dilemmas (a funder's headline, a convenient scenario, a co-author's data, a community meeting, a survey without consent, an error after publication); map who the study affects; write an integrity statement."
   after: [R1]
   next: CR
+  next_needs: [CK-M]
   scales: [S0, S1, S2, S3, S4]
 - kind: lesson
   id: r10-question-studio
@@ -1726,6 +1752,7 @@
   outcome: "Generate a research question of your own and test it for rigour and realism before you take it to a mentor."
   after: [R1, F1]
   next: R2
+  next_needs: [N1]
   scales: [S0, S1, S2, S3, S4]
 
 # X6: side-topic shelf, D1; method-neutral
@@ -1865,6 +1892,7 @@
   teaches: [sizing equipment behind one meter, hourly operation as a linear program, net present value of a plan, what one site cannot do alone]
   after: [9]
   next: C0
+  next_needs: [A1, F4]
   scales: [S0]
 - kind: lesson
   id: c0-behind-one-meter
@@ -2044,6 +2072,7 @@
   teaches: [compound growth, present value, discount rate, annuities, capital recovery factor]
   after: []
   next: 7
+  next_needs: [5]
 
 - kind: tool
   id: k04-linear-equations
@@ -2057,6 +2086,7 @@
   outcome: "Solve a balance for one unknown and read a set of inequalities as the region of plans that pass them."
   teaches: [linear equations, inequalities, half-planes, systems of rules]
   next: B1
+  next_needs: [10]
 
 - kind: tool
   id: k05-probability-statistics
@@ -2074,6 +2104,7 @@
   teaches: [histograms, mean and median, standard deviation and percentiles, probability as frequency, sampling and Monte Carlo, independence and expected value]
   after: []
   next: 4
+  next_needs: [2, 3]
 
 - kind: tool
   id: k06-vectors-matrices
@@ -2091,6 +2122,7 @@
   teaches: [vectors, the dot product, matrices, matrix-vector products, the form A x ≤ b, sparse matrices]
   after: [K4]
   next: B1
+  next_needs: [10]
 
 - kind: tool
   id: k07-spreadsheets
@@ -2103,6 +2135,7 @@
   outcome: "Build a small energy calculation in a spreadsheet with relative and absolute references and a check cell."
   teaches: [cell references, fill-down, absolute references, SUM and MAX, check cells]
   next: B2
+  next_needs: [5]
 
 - kind: tool
   id: k08-git-notebooks
@@ -2120,3 +2153,4 @@
   teaches: [version control, commits and diffs, branches, notebook hidden state, reproducible environments]
   after: []
   next: M1
+  next_needs: [8, 11, B1, B2, B3]

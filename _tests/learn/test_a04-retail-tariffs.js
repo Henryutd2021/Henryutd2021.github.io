@@ -223,7 +223,7 @@ ok(/\[\[tariff\|tariff\]\]/.test(JS) && /\[\[customer-class\|class\]\]/.test(JS)
 
 // ---------------- research wording: E7.6, word for word (the sourcing rule)
 const E76 = "Ratepayer exposure depends strongly on large-load tariff design.";
-const CF7_FOOT = "Approved excerpt of: Li et al. (2026), accepted paper, 2026 North American Power Symposium (NAPS); DOI pending.";
+const CF7_FOOT = "From: Li et al. (2026), accepted paper, 2026 North American Power Symposium (NAPS); DOI pending.";
 const RP = PRIV.path("excerpts");
 if (RP) {
   const reg = fs.readFileSync(RP, "utf8");

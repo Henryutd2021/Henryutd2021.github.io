@@ -1,5 +1,12 @@
 {
- "about": "Data of Learn lesson M11, Techno-economic analysis inside an optimization model. The plant, the hydrogen buyer, Prairie Town's grid and the charges are fictional and illustrative; wind and Prairie Town's demand follow the real hourly shapes of the Southwest Power Pool grid in 2025 (town_year.json, EIA-930). Every dollar is a real 2025 dollar: the electrolyzer's 2022-dollar costs are converted here with BEA's GDP deflator. The wind farm's costs, the rate and the life are read from lesson 13's data (13-capstone.json) and the electrolyzer's energy use from A16's (a16-hydrogen-ptx.json), so the pages agree. The credit is U.S. federal section 45V as the IRS states it for 2025; its use here is a teaching simplification (see creditNote). The reference block is written by node _tests/learn/test_m11-tea-in-models.js --write and re-solved by the same test on every run.",
+ "about": "Data of Learn lesson M11, Techno-economic analysis inside an optimization model. The plant, the hydrogen buyer, Prairie Town's grid and the charges are fictional and illustrative; wind and Prairie Town's demand follow the real hourly shapes of the Southwest Power Pool grid in 2025 (town_year.json, EIA-930). Every dollar is a real 2025 dollar: the electrolyzer's 2022-dollar costs are converted here with BEA's GDP deflator. The wind farm's costs, the rate and the life are read from lesson 13's data (13-capstone.json) and the electrolyzer's energy use from A16's (a16-hydrogen-ptx.json), so the pages agree. The credit is U.S. federal section 45V as the IRS states it for 2025; its use here is a teaching simplification (see creditNote). The reference block holds the lesson's results, solved with this model in HiGHS; the lab notebook checks its answers against them.",
+ "dataset": {
+  "creator": "Honglin Li",
+  "date": "2026-11-07",
+  "status": "Illustrative: the plant, the hydrogen buyer, the grid and the charges are fictional; wind and demand follow real SPP 2025 hourly shapes (EIA-930); the credit follows the IRS rules as cited.",
+  "source": "Prepared by hand for lesson M11 from the cited sources and lesson 13's data; the reference results are solved with HiGHS.",
+  "license": "CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/), Honglin Li. Values taken from the sources listed in this file keep their publishers' terms; EIA data are U.S. government works in the public domain."
+ },
  "accessed": "2026-11-06",
  "priceYear": 2025,
  "deflator": {
@@ -234,7 +241,7 @@
   }
  },
  "reference": {
-  "about": "Written by node _tests/learn/test_m11-tea-in-models.js --write; re-solved by the same test on every run. Defaults: $4 per kg, $10 per MWh charge, DOE's middle installed cost, lesson 13's rate and life, Prairie Town's grid rate, hourly matching, construction in 2027 with the wage rules met. Money in real 2025 dollars; NPV over the life, annual = NPV / annuity factor; kg a year in the credit years.",
+  "about": "Reference results, solved with the lesson's model in HiGHS. Defaults: $4 per kg, $10 per MWh charge, DOE's middle installed cost, lesson 13's rate and life, Prairie Town's grid rate, hourly matching, construction in 2027 with the wage rules met. Money in real 2025 dollars; NPV over the life, annual = NPV / annuity factor; kg a year in the credit years.",
   "days": [
    {
     "date": "2025-01-03",
@@ -584,7 +591,7 @@
   }
  },
  "lesson13": {
-  "about": "Copied from lesson 13's data (13-capstone.json) by node _tests/learn/test_m11-tea-in-models.js --write and checked against it on every run: the wind farm's installed cost and fixed upkeep (2025 dollars), the real rate and the life. Edit lesson 13's data, never this block.",
+  "about": "Copied from lesson 13's data (13-capstone.json), so the two lessons agree: the wind farm's installed cost and fixed upkeep (2025 dollars), the real rate and the life.",
   "techs": {
    "wind": {
     "label": "Wind farm",

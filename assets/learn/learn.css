@@ -199,6 +199,10 @@ body.lx-totop-off .to-top { opacity: 0 !important; pointer-events: none !importa
 .lx-intro p { margin: 0; }
 .lx-landing-note { margin-top: 1.6rem; font-size: 13.5px; color: var(--lx-ink-3); max-width: 80ch; }
 .lx-landing-note p { margin: 0; }
+.lx-landing-note .lx-reset { margin-top: .6rem; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
+.lx-landing-note .lx-reset[hidden] { display: none; }
+/* the notice when the browser keeps no site data (core.js): progress lasts only until a reload */
+.lx-store-note { margin: 0 0 1rem; padding: 8px 12px; border-left: 4px solid var(--lx-warn); border-radius: 0 8px 8px 0; background: var(--lx-warn-soft); color: var(--lx-ink); font-size: 14.5px; max-width: 80ch; }
 .lx-real p:not(.lx-eyebrow), .lx-sources ul, .lx-real ol { font-size: 14.5px; color: var(--lx-ink-2); }
 .lx-card > .lx-eyebrow { margin-bottom: 6px; }
 
@@ -791,7 +795,7 @@ details.lx-deeper .k { font-size: 11.5px; letter-spacing: .07em; text-transform:
 .lx-preview .ic { width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center; background: color-mix(in srgb, var(--c) 15%, var(--lx-surface)); color: var(--c); flex: none; }
 .lx-preview .ic .lx-ic { width: 22px; height: 22px; }
 .lx-preview .k { font-family: var(--lx-f-mono); font-size: 12px; color: var(--lx-ink-3); }
-.page-learn .lx-preview h3 { font-size: 16.5px; margin: 0; }
+.page-learn .lx-preview h2 { font-size: 16.5px; margin: 0; }
 .lx-preview p { font-size: 14.5px; color: var(--lx-ink-2); }
 .lx-preview .pf { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
 .lx-preview-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 5px; font-size: 14.5px; line-height: 1.35; }
@@ -834,8 +838,8 @@ details.lx-deeper .k { font-size: 11.5px; letter-spacing: .07em; text-transform:
 details.lx-listview { margin-top: 14px; background: var(--lx-surface); border: 1px solid var(--lx-line); border-radius: var(--lx-r); padding: 0 16px; }
 details.lx-listview > summary { cursor: pointer; min-height: 48px; display: flex; align-items: center; font-family: var(--lx-f-display); font-weight: 500; font-size: 15px; color: var(--lx-ink); }
 .lx-list-tiers { display: grid; gap: 14px; padding-bottom: 14px; }
-.page-learn .lx-list-tiers h3 { font-size: 16px; display: flex; align-items: center; gap: 8px; margin: 0 0 4px; }
-.lx-list-tiers h3 i { width: 18px; height: 5px; border-radius: 3px; background: var(--c); }
+.page-learn .lx-list-tiers h2 { font-size: 16px; display: flex; align-items: center; gap: 8px; margin: 0 0 4px; }
+.lx-list-tiers h2 i { width: 18px; height: 5px; border-radius: 3px; background: var(--c); }
 .lx-list-tiers ol, .lx-list-tiers ul { margin: 0; padding-left: 1.3rem; font-size: 14.5px; color: var(--lx-ink-2); }
 .lx-list-tiers li { margin: 3px 0; }
 .lx-list-tiers .lx-code { font-family: var(--lx-f-mono); font-size: 12px; color: var(--lx-ink-3); margin-right: 6px; }

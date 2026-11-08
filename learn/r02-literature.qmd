@@ -213,7 +213,7 @@ Remaining question: does choosing periods after a first model run still keep ext
 <thead><tr><th scope="col">Tool or source</th><th scope="col">What it is for</th><th scope="col">Link</th></tr></thead>
 <tbody>
 <tr><td class="n">OpenAlex</td><td>An open index of research works, with a search page and an API; its data are CC0. This page's counts are a snapshot; its links open the same searches on the search page.</td><td class="s"><a href="https://openalex.org/works">openalex.org</a> · snapshot of 3 November 2026</td></tr>
-<tr><td class="n">OpenAlex licence</td><td>The terms of the index data (CC0).</td><td class="s"><a href="https://help.openalex.org/data/licenses">help.openalex.org</a> · checked 2 November 2026</td></tr>
+<tr><td class="n">OpenAlex licence</td><td>The terms of the index data (CC0).</td><td class="s"><a href="https://help.openalex.org/data/licenses/">help.openalex.org</a> · checked 2 November 2026</td></tr>
 <tr><td class="n">Semantic Scholar, Crossref</td><td>Open databases for the second search in your log. Google Scholar is free to search but not open and has no API: log what you screened there.</td><td class="s">semanticscholar.org · search.crossref.org</td></tr>
 </tbody>
 </table>

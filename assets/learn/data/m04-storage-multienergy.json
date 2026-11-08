@@ -1,5 +1,12 @@
 {
- "about": "Data of Learn lesson M4, Storage and coupled carriers. The plant, its customers and every price are fictional and illustrative; wind and Prairie Town's demand follow the real hourly shapes of the Southwest Power Pool grid in 2025 (town_year.json, EIA-930). Conversion efficiencies carry their sources. The reference block is written by node _tests/learn/test_m04-storage-multienergy.js --write and re-solved by the same test on every run.",
+ "about": "Data of Learn lesson M4, Storage and coupled carriers. The plant, its customers and every price are fictional and illustrative; wind and Prairie Town's demand follow the real hourly shapes of the Southwest Power Pool grid in 2025 (town_year.json, EIA-930). Conversion efficiencies carry their sources. The reference block holds the lesson's results, solved with this model in HiGHS; the lab notebook checks its answers against them.",
+ "dataset": {
+  "creator": "Honglin Li",
+  "date": "2026-11-07",
+  "status": "Illustrative: the plant, its customers and every price are fictional; wind and demand follow real SPP 2025 hourly shapes (EIA-930); conversion efficiencies are from cited sources.",
+  "source": "Prepared by hand for lesson M4; the reference results are solved with HiGHS.",
+  "license": "CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/), Honglin Li. Values taken from the sources listed in this file keep their publishers' terms; EIA data are U.S. government works in the public domain."
+ },
  "plant": {
   "windMW": 100,
   "profileMethod": "power",
@@ -134,7 +141,7 @@
   }
  ],
  "reference": {
-  "about": "Written by node _tests/learn/test_m04-storage-multienergy.js --write; re-solved by the same test on every run. Costs in $ a week (negative: the plant earns), energy in MWh, hydrogen in kg.",
+  "about": "Reference results, solved with the lesson's model in HiGHS. Costs in $ a week (negative: the plant earns), energy in MWh, hydrogen in kg.",
   "costs": {
    "winter": {
     "nobat": -96099.1,

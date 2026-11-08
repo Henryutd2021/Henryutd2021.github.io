@@ -197,7 +197,7 @@
   function reference(Y, D) {
     var F = facts(Y, D), P = F.P, cut = function (v) { return +v.toPrecision(10); };
     return {
-      about: "Written by node _tests/learn/test_m10-ml-forecasting.js --write; recomputed by the same test on every run. MW; shares are fractions of the hours.",
+      about: "Reference results, computed from these settings and the hourly data. MW; shares are fractions of the hours.",
       hours: { train: P.train.length, val: P.val.length, test: P.test.length },
       baselines: ["persist", "day", "week"].reduce(function (o, k) { o[k] = { val: cut(F.base[k].val.mae), test: cut(F.base[k].test.mae) }; return o; }, {}),
       mixes: F.mixes.map(function (m) { return [m.key, cut(m.val), cut(m.test)]; }),

@@ -143,6 +143,6 @@
  "rubric": [{"id": "positioning", "look": "Your matrix has at least 12 papers and a written coding rule; the empty cell was searched directly; the closest prior work is read in a second pass."}],
  "sources": [
   {"label": "OpenAlex (open index of research works; data CC0)", "url": "https://openalex.org/", "as_of": "3 November 2026"},
-  {"label": "OpenAlex data licence", "url": "https://help.openalex.org/data/licenses", "as_of": "2 November 2026"}
+  {"label": "OpenAlex data licence", "url": "https://help.openalex.org/data/licenses/", "as_of": "2 November 2026"}
  ]
 }

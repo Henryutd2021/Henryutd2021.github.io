@@ -15,8 +15,6 @@ glossary:
   - id: job-year
     term: Job-year
     def: "One person working full time for one year; 100 workers for six months make 50 job-years."
-  - id: transfer
-    term: Transfer
-    def: "A payment, such as a tax, that moves money from one party to another without using up any resources itself."
+  - {id: transfer, alias: transfer-payment}
 requests:
   - "A4's real-world box (large-load tariffs) and CF7's puzzle (a large new load) could name F8 as the Foundations lesson on large loads."

@@ -7,7 +7,7 @@ glossary:
   - {id: falsification-statement, term: "Falsification statement", def: "A sentence naming the result that would show your expected answer wrong."}
   - {id: energy-burden, term: "Energy burden", def: "The share of a household's income spent on energy bills."}
   - {id: co-op, term: "Co-op (electric cooperative)", def: "An electric utility owned by the members it serves, common in rural areas."}
-  - {id: time-of-use-tariff, term: "Time-of-use tariff", def: "An electricity price that changes with the hour of the day, usually higher in the evening peak."}
+  - {id: time-of-use-tariff, term: "Time-of-use tariff", def: "A retail electricity price that changes with the hour of the day, higher at peak times and lower off-peak.", lesson: A4}
   - {id: substation, term: "Substation", def: "A fenced yard of transformers, breakers and switches where the grid changes voltage and where feeders start."}
 requests:
   - "Rubric competence picks are per studio (R1: framing). The rubric note on all three studios says a studio is practice, not a certificate."

@@ -158,7 +158,7 @@
     var F = facts(D), E = F.E, cut = function (v) { return +v.toPrecision(10); };
     var pair = function (x) { return [cut(x.est), cut(x.se)]; };
     return {
-      about: "Written by node _tests/learn/test_m14-did-it-work.js --write; recomputed by the same test on every run. kW for panel 1, MW a year for panel 2; [estimate, standard error].",
+      about: "Reference estimates, computed from the two seeded panels. kW for panel 1, MW a year for panel 2; [estimate, standard error].",
       tou: { nOn: E.nOn, nOff: E.nOff, att: cut(E.att), ate: cut(E.ate), naive: pair(E.naive), regSize: cut(E.reg.size), regBoth: cut(E.reg.both),
         beforeAfter: pair(E.ba), did: pair(E.did), cells: [E.cells.onPre, E.cells.onPost, E.cells.offPre, E.cells.offPost].map(cut),
         eventStudy: E.es.map(function (x) { return cut(x.est); }), firstY: cut(F.hh[0].y[0]), lastY: cut(F.hh[F.hh.length - 1].y[23]),

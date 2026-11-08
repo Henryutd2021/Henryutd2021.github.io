@@ -61,14 +61,14 @@ function data() {
 }
 
 // ---------------- the runner on a stub document
-function mount(opts) {
+function mount(opts, store) {   // store: an earlier page's stored values (a reload)
   if (!El.prototype.getBoundingClientRect) El.prototype.getBoundingClientRect = () => ({ top: 0, left: 0, width: 0, height: 0, bottom: 0, right: 0 });
-  const E = env(); let clock = 0;
+  const E = env({ store }); let clock = 0;
   E.window.performance.now = () => (clock += 1000);   // every reading one second later, so time on a task shows
   load("checkpoint", E);
   const tb = E.LX.H("tbody", null, E.LX.H("table", { id: "opts-rubric" }, E.body)), tr = E.LX.H("tr", { "data-c": "units" }, tb);
   E.LX.H("th", { text: "Units" }, tr); ["No unit", "A unit of power", "Energy, wrong scale", "Energy per year"].forEach(x => E.LX.H("td", { text: x }, tr));
-  const D = data(), live = E.LX.H("div", null, E.body);
+  const D = (opts && opts.data) || data(), live = E.LX.H("div", null, E.body);
   const cp = E.LX.Checkpoint(live, Object.assign({ data: D, key: "opts-v1", code: "TEST", rubric: "#opts-rubric" }, opts || {}));
   const btn = re => live.querySelectorAll("button").filter(x => re.test(x.textContent))[0];
   const tag = () => { const t = live.querySelector(".lx-ck-tag"); return t ? +/Task (\d+)/.exec(t.textContent)[1] - 1 : -1; };
@@ -176,6 +176,68 @@ function mount(opts) {
   const F = mount({ waitNote: (t, ids, D) => { seen.push(t.id + ":" + ids.join("+") + ":" + D.tasks.length); return { question: "Wait for " + ids.join(" and ") + ".", why: "Because." }; } });
   F.btn(/Start the checkpoint/).click(); F.goTo(2);
   ok(F.q() === "Wait for own and num." && seen.indexOf("seq:own+num:6") >= 0, "waitNote as a function of the task, the ids waited for and the data");
+}
+// drafts: what is typed or picked before submitting is kept apart from the attempt, restored on Back, Next and a reload,
+// and never counts as a submission; submitting clears it, and so does "Start again"
+{
+  const plain = () => { const D = data(); D.version = "options v1 drafts"; D.tasks.forEach(t => { delete t.freeze; delete t.opensAfter; }); return D; };
+  const P = mount({ data: plain() }), { live, btn, goTo, all, rec, E } = P, DK = () => ((E.LX.store.get("opts-v1-drafts", {}) || {}).tasks || {});
+  goTo(0); const ta = () => live.querySelector("textarea");
+  ta().value = "Half a sentence"; ta().fire("input");
+  goTo(3);   // a number and its unit, not checked
+  live.querySelector("input").value = "12"; live.querySelector("input").fire("input"); live.querySelector("select").value = "W"; live.querySelector("select").fire("change");
+  goTo(2);   // an order, moved once, not checked
+  const first = () => live.querySelectorAll(".lx-ck-order li")[0].children[1].textContent;
+  live.querySelectorAll("button").filter(b => b.getAttribute("aria-label") === "Move up: First")[0].click();
+  const moved = live.querySelectorAll(".lx-ck-order li").map(li => li.children[1].textContent).join("|");
+  goTo(4);   // the estimate's fields
+  { const ins = live.querySelectorAll("input"); ins[0].value = "90"; ins[0].fire("input"); live.querySelectorAll("textarea")[0].value = "Buses times miles"; live.querySelectorAll("textarea")[0].fire("input"); }
+  ok(/Draft kept in this browser; not submitted yet\./.test(all()), "drafts: the line under the fields says a draft is kept");
+  ok(DK().own.text === "Half a sentence" && DK().num.value === "12" && DK().num.unit === "W" && DK().seq.order.length === 3 && DK().est.low === "90", "drafts: each kind keeps its draft under '<key>-drafts'");
+  ok(["own", "num", "seq", "est"].every(id => rec(id).answer == null && rec(id).first == null && !rec(id).tries && !rec(id).at), "drafts: nothing is recorded on the attempt");
+  goTo(0); ok(ta().value === "Half a sentence", "drafts: Back restores the text");
+  goTo(3); ok(live.querySelector("input").value === "12" && live.querySelector("select").querySelectorAll("option").some(o => o.getAttribute("selected") === "selected" && o.getAttribute("value") === "W"), "drafts: the number and its unit come back");
+  goTo(2); ok(live.querySelectorAll(".lx-ck-order li").map(li => li.children[1].textContent).join("|") === moved, "drafts: the unchecked order comes back: " + moved);
+  goTo(4); ok(live.querySelectorAll("input")[0].value === "90" && live.querySelectorAll("textarea")[0].value === "Buses times miles", "drafts: the estimate's fields come back");
+  P.cp.results();
+  ok(!live.querySelector("textarea.lx-ck-out").value.includes("Half a sentence") && !live.querySelector("textarea.lx-ck-out").value.includes("Buses times") && CP.level(P.D, P.cp.state()).auto === 0,
+    "drafts: not in the copied summary or the level");
+  // a reload
+  const R = mount({ data: plain() }, E.store);
+  R.btn(/^Back to the tasks$/).click(); R.goTo(0);
+  ok(R.live.querySelector("textarea").value === "Half a sentence", "drafts: after a reload, the text is back");
+  R.goTo(3); ok(R.live.querySelector("input").value === "12", "drafts: after a reload, the number is back");
+  // submitting clears the draft; a later edit of a submitted text is a new draft
+  R.goTo(0); R.btn(/^Submit my explanation$/).click();
+  const DR = () => ((R.E.LX.store.get("opts-v1-drafts", {}) || {}).tasks || {});
+  ok(R.rec("own").answer === "Half a sentence" && !DR().own && !/Draft kept/.test(text(R.live.querySelector(".lx-ck-body").textContent)), "drafts: submitting records the text and clears its draft and line");
+  R.live.querySelector("textarea").value = "Half a sentence, now finished."; R.live.querySelector("textarea").fire("input");
+  ok(DR().own.text === "Half a sentence, now finished." && R.rec("own").answer === "Half a sentence", "drafts: editing a submitted text keeps a draft; the submission stays until submitted again");
+  R.live.querySelector("textarea").value = "Half a sentence"; R.live.querySelector("textarea").fire("input");
+  ok(!DR().own, "drafts: back to the submitted text: no draft");
+  R.goTo(3); R.live.querySelector("select").value = "W"; R.btn(/^Check$/).click();   // (the stub select does not read its selected option)
+  ok(R.rec("num").tries === 1 && !DR().num, "drafts: checking the number clears its draft");
+  // "Start again" clears every draft
+  R.cp.results(); R.btn(/^Start again$/).click();
+  ok(Object.keys(DR()).length === 0, "drafts: Start again clears them");
+  // a draft stored for a frozen task is never shown: the submitted answer is
+  const F = mount(), FD = F.E.LX.store;
+  F.goTo(0); F.live.querySelector("textarea").value = "Kept text"; F.btn(/^Submit my explanation$/).click();
+  FD.set("opts-v1-drafts", { version: F.D.version, tasks: { own: { text: "A stale draft" } } });
+  F.goTo(1); F.goTo(0);
+  ok(F.live.querySelector("textarea").value === "Kept text" && !((FD.get("opts-v1-drafts", {}) || {}).tasks || {}).own, "drafts: a frozen task shows its submission and drops a stale draft");
+}
+// the copy button: "Copied" only when the browser copied; otherwise the text is selected and the reader is asked to copy it
+{
+  const P = mount(); P.cp.results();
+  const copy = () => P.btn(/Copy my results/).click(), msg = () => P.live.querySelector("p.lx-hint[aria-live]").textContent;
+  P.E.document.execCommand = () => false; copy();
+  ok(/did not copy it\. The text below is selected: copy it with Ctrl\+C/.test(msg()) && !/^Copied/.test(msg()), "copy refused (execCommand false): no 'Copied', the reader is asked to copy: " + msg());
+  P.E.document.execCommand = () => { throw new Error("blocked"); }; copy();
+  ok(/did not copy it/.test(msg()), "copy throws: the same request");
+  P.E.document.execCommand = () => true; copy();
+  ok(msg() === "Copied. Keep these results, or share them with a mentor.", "copy done: " + msg());
+  ok(!/tester|form/.test(msg()), "no tester or form wording");
 }
 console.log((fails ? "FAILED " + fails + " of " : "ok: ") + checks + " checks (checkpoint per-task options)");
 process.exit(fails ? 1 : 0);

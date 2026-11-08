@@ -1,5 +1,12 @@
 {
- "about": "M2 (On or off? Unit commitment as a mixed-integer program). Prairie Town's fleet from lesson 0 (town.json) on 29 July 2025, the 2025 summer day with the highest hourly demand on the Southwest Power Pool grid (EIA-930 shapes in town_days.json, key summer_peak), scaled to the town exactly as lesson 0 scales its day (grid-operator.js prepare(): wind and solar = shape x farm size, rounded; demand = shape x 450 MW, rounded so that the need left for gas is a multiple of 5 MW). The switching data of the two gas plants (minimum output, no-load and start-up costs, minimum run and down times, states before and after the day) and the unserved-energy penalty are illustrative. The reference block is precomputed with the vendored HiGHS (labelled precomputed where the page shows it before a solve); _tests/learn/test_m02-unit-commitment.js re-solves every number in it.",
+ "about": "M2 (On or off? Unit commitment as a mixed-integer program). Prairie Town's fleet from lesson 0 (town.json) on 29 July 2025, the 2025 summer day with the highest hourly demand on the Southwest Power Pool grid (EIA-930 shapes in town_days.json, key summer_peak), scaled to the town exactly as lesson 0 scales its day (grid-operator.js prepare(): wind and solar = shape x farm size, rounded; demand = shape x 450 MW, rounded so that the need left for gas is a multiple of 5 MW). The switching data of the two gas plants (minimum output, no-load and start-up costs, minimum run and down times, states before and after the day) and the unserved-energy penalty are illustrative. The reference block is precomputed with HiGHS from this model (labeled precomputed where the page shows it before a solve).",
+ "dataset": {
+  "creator": "Honglin Li",
+  "date": "2026-11-03",
+  "status": "Illustrative: the gas plants' switching data and the unserved-energy penalty are invented; the day's shapes are real SPP data from 29 July 2025 (EIA-930), scaled to Prairie Town.",
+  "source": "Prepared by hand for lesson M2 from lesson 0's town data; the reference results are solved with HiGHS as a mixed-integer program.",
+  "license": "CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/), Honglin Li. Values taken from the sources listed in this file keep their publishers' terms; EIA data are U.S. government works in the public domain."
+ },
  "accessed": "2026-11-03",
  "day": {
   "date": "2025-07-29",

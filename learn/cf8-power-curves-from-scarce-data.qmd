@@ -50,7 +50,7 @@ body-classes: "page-learn page-lesson lx-form-case"
 <div class="lx-case-part"><p class="lx-eyebrow">4 · Decisions, goal and rules, in words</p><ul><li><b>Decisions:</b> which few hundred measured points to train on, drawn from a <span class="lx-term" data-term="kernel-density-estimate">kernel density estimate</span> of the records, and how to link the theoretical curve to them: a linear or a nonlinear multi-fidelity model.</li><li><b>Goal:</b> a power curve given as a probability distribution, not a single line.</li><li><b>Rules:</b> every model is scored on the same turbines, with point metrics (such as <span class="lx-term" data-term="rmse">RMSE</span>) and probabilistic metrics (<span class="lx-term" data-term="pinball-loss">pinball loss</span>, <span class="lx-term" data-term="sharpness">sharpness</span>, <span class="lx-term" data-term="calibration">reliability</span>).</li></ul><p class="lx-hint">Scores: RMSE, the typical size of a miss; pinball loss, a charge for misses and for width; sharpness, how narrow a band is; reliability, whether a 90% band holds about 90% of new measurements.</p></div>
 <div class="lx-case-part wide"><p class="lx-eyebrow">5 · Data and method</p><ul><li>Linear (autoregressive) and nonlinear multi-fidelity Gaussian process regression fuse the turbine type's theoretical power curve (low fidelity) with a few hundred kernel-density-sampled SCADA points from the open SDWPF dataset (high fidelity), and are compared with single-fidelity regression on point and probabilistic metrics.</li><li>The kernel density sample keeps the shape of the scatter without manual cleaning; a compact training set matters because a Gaussian process solve grows with the cube of the training points.</li></ul></div>
 <div class="lx-case-part wide"><p class="lx-eyebrow">6 · What came out, and where it holds</p>
-<blockquote class="lx-excerpt" data-source="excerpt:uq-mfgpr"><p>In the reported nine-turbine test, nonlinear multi-fidelity regression achieved lower RMSE for most turbines; performance depended on the evaluation metric.</p><p>The probabilistic multi-fidelity model was also able to generate confidence intervals that encompassed the measured power.</p><footer>Approved excerpt of: <a href="https://doi.org/10.1115/detc2023-114762">Li et al., ASME IDETC 2023</a>.</footer></blockquote>
+<blockquote class="lx-excerpt" data-source="excerpt:uq-mfgpr"><p>In the reported nine-turbine test, nonlinear multi-fidelity regression achieved lower RMSE for most turbines; performance depended on the evaluation metric.</p><p>The probabilistic multi-fidelity model was also able to generate confidence intervals that encompassed the measured power.</p><footer>From: <a href="https://doi.org/10.1115/detc2023-114762">Li et al., ASME IDETC 2023</a>.</footer></blockquote>
 <p class="lx-hint">Holds when: one wind farm in one open dataset, one generic theoretical curve, and about two hundred sampled measurements; probabilistic scores for one turbine. Leaves out: other wind farms and datasets.</p></div>
 <div class="lx-case-part wide"><p class="lx-eyebrow">Related project · uncertainty at plants without measurements</p>
 <details class="lx-deeper cf8-related"><summary><span class="k">Optional</span>Read its question and method</summary><div class="lx-deeper-body">
@@ -66,7 +66,7 @@ body-classes: "page-learn page-lesson lx-form-case"
 <!-- cf8-timeline:end -->
 </div>
 </div>
-<p class="lx-datanote"><span>Every result about the studies is quoted from approved excerpts of the published paper and the public framework named in the sources. The toy below uses lesson M9's illustrative turbine.</span></p>
+<p class="lx-datanote"><span>Every result about the studies is quoted from the published paper and the public framework named in the sources. The toy below uses lesson M9's illustrative turbine.</span></p>
 ```
 :::
 
@@ -96,7 +96,7 @@ body-classes: "page-learn page-lesson lx-form-case"
 <div id="cf8-explain" class="lx-xgrid">
 <div class="lx-fallback">
 <!-- cf8-bound:start (written from the data file by the test's --write mode; do not edit) -->
-<p class="lx-eyebrow">Where the result holds</p><dl class="lx-ideas"><dt>It holds when</dt><dd><ul><li>one wind farm's records from one open dataset;</li><li>one generic theoretical curve for the turbine type;</li><li>about two hundred sampled measurements;</li><li>point scores for nine test turbines and probabilistic scores for one;</li><li>which model ranks first depends on the metric.</li></ul></dd><dt>It leaves out</dt><dd><ul><li>other wind farms, datasets and theoretical curves.</li></ul></dd></dl><p class="lx-hint">From the approved excerpt of Li et al. (2023), ASME IDETC 2023.</p>
+<p class="lx-eyebrow">Where the result holds</p><dl class="lx-ideas"><dt>It holds when</dt><dd><ul><li>one wind farm's records from one open dataset;</li><li>one generic theoretical curve for the turbine type;</li><li>about two hundred sampled measurements;</li><li>point scores for nine test turbines and probabilistic scores for one;</li><li>which model ranks first depends on the metric.</li></ul></dd><dt>It leaves out</dt><dd><ul><li>other wind farms, datasets and theoretical curves.</li></ul></dd></dl><p class="lx-hint">From Li et al. (2023), ASME IDETC 2023.</p>
 <!-- cf8-bound:end -->
 </div>
 </div>

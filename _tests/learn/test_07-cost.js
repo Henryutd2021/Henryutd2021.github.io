@@ -155,7 +155,7 @@ const E314 = "A higher hydrogen price makes each kilogram worth more, so the opt
   const bq = real.match(/<blockquote class="lx-excerpt" data-source="excerpt:wind-hydrogen">([\s\S]*?)<footer>([\s\S]*?)<\/footer><\/blockquote>/);
   const words = h => h.replace(/<\/p><p>/g, " ").replace(/<[^>]+>/g, "").trim();
   ok(bq && words(bq[1]) === E314, "real world: the approved excerpt E3.14, word for word");
-  ok(bq && bq[2] === 'Approved excerpt of: Li et al. (2024), <a href="https://doi.org/10.1115/1.4063971">Journal of Mechanical Design</a>.', "real world: the excerpt's citation footer is CF2's, with the DOI");
+  ok(bq && bq[2] === 'From: Li et al. (2024), <a href="https://doi.org/10.1115/1.4063971">Journal of Mechanical Design</a>.', "real world: the excerpt's citation footer is CF2's, with the DOI");
   ok((own.match(/lx-excerpt/g) || []).length === 1, "page: one excerpt only");
   const rest = real.replace(/<blockquote[\s\S]*?<\/blockquote>/, "");
   ok(/<p>A levelized cost and a system's cost can move in opposite directions\.<\/p>/.test(rest), "real world: the box's own first sentence stays");

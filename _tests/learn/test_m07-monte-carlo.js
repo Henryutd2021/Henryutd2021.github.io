@@ -428,7 +428,7 @@ function researchWording(entry) {
   const RX = /\b(the study|study's|paper|article|NAPS|Li et al|course author|excerpt|research|published|accepted|300 MW-IT|36-month delay|0\.7 billion|ledgers?|framework|exogenous|net-benefit test|staged (service|energization))\b/i;
   const NOT_RESEARCH = [
     [/^Where this came up in research$/, "heading"],
-    [/^Approved excerpt of: Li et al\. \(2026\), accepted paper, 2026 North American Power Symposium \(NAPS\); DOI pending\.$/, "provenance label (E7.14's citation, short), as in CF7"],
+    [/^From: Li et al\. \(2026\), accepted paper, 2026 North American Power Symposium \(NAPS\); DOI pending\.$/, "provenance label (E7.14's citation, short), as in CF7"],
     [/^The whole case, with its accounts and a toy of its own: CF7, the cost of waiting\.$/, "navigation to the case file"],
     [/^This page's toy borrows CF7's load\.$/, "provenance of the toy"],
     [/^Illustrative round numbers, not the study's inputs, equations or results\.$/, "provenance label (the toy), as in CF7"],

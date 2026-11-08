@@ -53,7 +53,7 @@ const text = s => s.replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/\\\$
   const priced = (S2, x) => { const q = solveX(S2, { fix: x }); return { per: q.o.per, exp: q.r.objective }; };
 
   if (process.argv.includes("--write")) {
-    const R = { about: "Written by node _tests/learn/test_m08-stochastic-robust.js --write; re-solved by the same test on every run. Costs in $ a year (2025 dollars), sizes in MW.", ws: {} };
+    const R = { about: "Reference results, solved with the lesson's model in HiGHS. Costs in $ a year (2025 dollars), sizes in MW.", ws: {} };
     S.forEach(s => { const q = solveX(one(s)); R.ws[s.id] = { x: q.o.x, cost: Math.round(q.r.objective) }; });
     R.wsExp = Math.round(S.reduce((a, s) => a + s.p * R.ws[s.id].cost, 0));
     const W = M.meanW(S), e = solveX([{ id: "ev", p: 1, W }]), ep = priced(S, e.o.x);
@@ -277,7 +277,7 @@ const text = s => s.replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/\\\$
   const sents = q.length ? [...q[0][2].matchAll(/<p>([\s\S]*?)<\/p>/g)].map(m => norm(m[1])) : [];
   ok(sents.length === 3 && sents[0] === APP["E10.1"] && sents[1] === APP["E11.6"] && sents[2] === APP["E11.7"], "the excerpt is E10.1, E11.6 and E11.7, word for word");
   ok(/<!-- E11\.7 \(approved for M8 only; optional\): drop this paragraph to remove it --><p>/.test(PAGE), "E11.7 is marked optional, easy to drop");
-  ok(q.length && norm(q[0][3]) === "Approved excerpt of: Li et al. (2025), International Journal of Hydrogen Energy." && q[0][3].includes("https://doi.org/10.1016/j.ijhydene.2025.02.303"), "the excerpt's footer and DOI (E11.18)");
+  ok(q.length && norm(q[0][3]) === "From: Li et al. (2025), International Journal of Hydrogen Energy." && q[0][3].includes("https://doi.org/10.1016/j.ijhydene.2025.02.303"), "the excerpt's footer and DOI (E11.18)");
   ok(PAGE.includes('</blockquote>\n<p class="lx-hint">' + APP["E10.4"] + "</p>"), "E10.4 is the note under the excerpt, word for word");
   ok(PAGE.includes("<li>Li et al. (2025). <a href=\"https://doi.org/10.1016/j.ijhydene.2025.02.303\">Hydrogen’s role in expanding renewable energy and reducing carbon emissions in Texas</a>. International Journal of Hydrogen Energy 113, 77–89.</li>") && PAGE.includes("txh2-ercot-hydrogen</a> on GitHub, version 1.0.2 (30 October 2026)."), "the citations are E11.18's");
   // nothing else on the page describes the study: sentences naming it are the excerpt, its note, the provenance line or citations

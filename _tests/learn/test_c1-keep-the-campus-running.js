@@ -93,7 +93,7 @@ const APPROVED_SNAPSHOT = {
   ok(all.every(x => Object.values(APP).map(X.norm).indexOf(x.s) >= 0), "every excerpt sentence on the page is an approved row");
   const e9 = ex.filter(e => e.source === "excerpt:campus-resilience-question")[0], e8 = ex.filter(e => e.source === "excerpt:supply-chain-mg")[0];
   ok(e9 && !e9.footer && !/<a\b/.test(e9.html), "E9: no citation and no link");
-  ok(e8 && /Approved excerpt of: Li et al\. \(2023\), <a href="https:\/\/doi\.org\/10\.1016\/j\.apm\.2023\.02\.014">Applied Mathematical Modelling<\/a>\./.test(e8.footer), "E8: the footer cites the AMM paper by its DOI");
+  ok(e8 && /From: Li et al\. \(2023\), <a href="https:\/\/doi\.org\/10\.1016\/j\.apm\.2023\.02\.014">Applied Mathematical Modelling<\/a>\./.test(e8.footer), "E8: the footer cites the AMM paper by its DOI");
 
   // ---------------- the exemplars' and owners' numbers
   const R = RS, d4 = Ls.filter(x => x.days === 4)[0], good = EX.plain(exo.answers[1]);
