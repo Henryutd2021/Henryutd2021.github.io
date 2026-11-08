@@ -332,6 +332,8 @@ if (process.argv.includes("--fallback")) { console.log(fallbackSVG()); process.e
     { const bt = stories.battery, t1 = B.solverLine(bt, ["c", "d"], 80, 72, -6240), t2 = B.solverLine(bt, ["c", "d"], 80, 72, 6240);
       ok(/earns \$6,240; your goal's own value is −6,240/.test(t1) && t2 === "c = 80, d = 72, earns $6,240" && B.solverLine(d1, ["x", "y"], 130, 15, 6700) === "x = 130, y = 15, costs $6,700", "solver line: " + t1);
       ok(/solverLine\(story, names, x, y, r\.objective\)/.test(JS) && /"Your battery model" : "The battery model \(yours is not finished yet\)", battery\)/.test(JS), "solver run: the battery is valued with the story's goal"); }
+    // the solver run is labeled a guided preview of lesson 11 (B1's depth covers the formulation)
+    ok(/H\("p", \{ class: "lx-hint", html: 'A guided preview: <a href="11-solver\.html">lesson 11<\/a> covers asking a solver and checking its answer in full\.' \}, act\);\n\s+var row = H\("div", \{ class: "b1-acts" \}, act\);\n\s+var b1 = H\("button"[^\n]*Solve the dispatch model/.test(JS), "solver run: labeled a guided preview of lesson 11, above its buttons");
     // text versions follow the interaction: step 4's switched-on rules, the arrays exercises' rows
     ok(/describeModel\(\{ rows: rules \}, \["x", "y"\], d1\.view, "Rules on: "\)/.test(JS) && /describeModel\(\{ rows: rs \}, sy, st\.view, "Your rows and the bounds: "\)/.test(JS), "text versions: step 4 and the arrays exercises describe what is drawn");
     // the page hosts the set; the view builds every exercise
