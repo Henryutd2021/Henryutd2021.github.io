@@ -463,7 +463,7 @@
  },
  "clearing-price": {
   "term": "Clearing price",
-  "short": "The price at which supply meets demand in a market, paid to every seller that runs in that hour.",
+  "short": "The price at which supply meets demand in a market; in a uniform-price market, every seller that runs in that hour is paid it.",
   "lesson": 8,
   "href": "08-merit-order.html"
  },
@@ -721,7 +721,7 @@
  },
  "cube-law": {
   "term": "Cube law",
-  "short": "The power carried by the wind grows with the cube of its speed (twice the speed, eight times the power); a turbine's output follows it only between its cut-in and rated speeds.",
+  "short": "The power carried by the wind grows with the cube of its speed (twice the speed, eight times the power); a real turbine's output follows it only roughly, and only between its cut-in and rated speeds.",
   "lesson": 5,
   "href": "05-capacity-factor.html"
  },
@@ -1333,7 +1333,7 @@
  },
  "firm-share": {
   "term": "Firm share (ELCC)",
-  "short": "The part of a plant's capacity that a grid counts on in its riskiest hours, often estimated as its effective load-carrying capability (ELCC) and set per technology class.",
+  "short": "The share of a plant's capacity that a grid credits toward its reliability needs, often estimated as its effective load-carrying capability (ELCC) and set per technology class; a planning rating, not output guaranteed in any hour.",
   "lesson": 6,
   "href": "06-three-jobs.html"
  },
@@ -2329,7 +2329,7 @@
  },
  "net-demand": {
   "term": "Net demand (net load)",
-  "short": "Demand minus the output of wind and solar, which is what the other power plants must still supply.",
+  "short": "Demand left after subtracting wind and solar output; other generation, storage, imports or lower demand must cover it.",
   "lesson": 2,
   "href": "02-demand.html"
  },
@@ -3163,7 +3163,7 @@
  },
  "simplex-method": {
   "term": "Simplex method",
-  "short": "A way to solve linear programs by moving from corner to neighbouring corner of the feasible region, never making the goal worse, until no neighbour is better.",
+  "short": "A way to solve linear programs by moving from corner to neighboring corner of the feasible region, never making the goal worse, until no neighbor is better.",
   "lesson": 11,
   "href": "11-solver.html"
  },

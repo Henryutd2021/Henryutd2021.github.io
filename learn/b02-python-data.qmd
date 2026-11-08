@@ -44,13 +44,13 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <tbody>
 <tr><td class="n">Load</td><td>8,760 rows: one per hour, in MW, stamped in UTC at the end of each hour.</td><td><code>df.shape</code></td></tr>
 <tr><td class="n">Inspect</td><td>Demand reads 1,505 MW for one hour on 21 June, under 5% of the median: almost certainly a reporting error.</td><td><code>df.describe()</code></td></tr>
-<tr><td class="n">Time</td><td>On local time, labelled by each hour's start: 363 days of 24 hours, 9 March with 23 and 2 November with 25.</td><td><code>tz_convert("America/Chicago")</code></td></tr>
+<tr><td class="n">Time</td><td>On local time, labeled by each hour's start: 363 days of 24 hours, 9 March with 23 and 2 November with 25.</td><td><code>tz_convert("America/Chicago")</code></td></tr>
 <tr><td class="n">Repeats</td><td>Runs of 3 or more identical non-zero readings: 671 wind hours and 1,377 solar hours, the counts the data build flagged.</td><td><code>(s != s.shift()).cumsum()</code></td></tr>
 <tr><td class="n">Plot</td><td>From 15 to 21 December every column stands still for 155 hours; solar holds 617 MW through the nights.</td><td><code>df.loc[...].plot()</code></td></tr>
 <tr><td class="n">Physics</td><td>Solar above 5% of its peak between midnight and 4 a.m.: 214 hours in the raw file, none in the cleaned file.</td><td><code>df.index.hour &lt; 4</code></td></tr>
 <tr><td class="n">Resample</td><td>Prairie Town's 150 MW wind farm makes the most energy in March (70.7 GWh) and the least in September (45.1 GWh).</td><td><code>resample("MS").sum()</code></td></tr>
-<tr><td class="n">Duration</td><td>Demand is above 90% of its peak for 180 hours; the farms' capacity factors are 52.8% (wind) and 23.4% (solar), illustrative.</td><td><code>sort_values()</code></td></tr>
-<tr><td class="n">Assert</td><td>The raw file fails 3 of 5 asserts; the cleaned file passes all 5.</td><td><code>assert ...</code></td></tr>
+<tr><td class="n">Duration</td><td>In the cleaned file, demand is above 90% of its peak for 180 hours; the farms' capacity factors are 52.8% (wind) and 23.4% (solar), illustrative.</td><td><code>sort_values()</code></td></tr>
+<tr><td class="n">Assert</td><td>The raw file fails 3 of 6 asserts; the cleaned file passes all 6.</td><td><code>assert ...</code></td></tr>
 </tbody>
 </table>
 <p class="lx-hint">With JavaScript on, you run each step yourself on the real data, with the pandas code beside it.</p>
@@ -58,9 +58,9 @@ body-classes: "page-learn page-lesson lx-form-cards"
 </div>
 <p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Data:</b> hourly demand, wind and solar of the Southwest Power Pool, 2025, from EIA's <a href="https://www.eia.gov/electricity/gridmonitor/">Hourly Electric Grid Monitor</a> (Form EIA-930, public domain); accessed 2 November 2026.<br><b>Raw file:</b> EIA's adjusted values before this course's cleaning; each fuel's columns summed, negatives set to zero.<br><b>Cleaned file:</b> the shapes Prairie Town uses.<br><b>Illustrative:</b> 150 MW wind, 200 MW solar, 450 MW demand, as in lesson 0.</span></p>
 <div class="lx-card lx-notebook" style="margin-top:1.2rem">
-<p class="lx-eyebrow">Do it in pandas · notebook lab, about 60 minutes</p>
+<p class="lx-eyebrow">Do it in pandas · notebook lab, about 60 minutes, then about 60 minutes of practice tasks</p>
 <p>The notebook repeats every step in pandas, and an <code>assert</code> cell checks each result.</p>
-<p>Run it in Google Colab (upload it with the two data files), or locally with Python 3, pandas and matplotlib.</p>
+<p>Run it in Google Colab (upload it with the two data files), or locally in JupyterLab: <code>pip install jupyterlab pandas matplotlib</code>, then <code>jupyter lab</code> in a folder that holds the notebook and both data files.</p>
 <p class="b2-dl" style="margin-top:.6rem"><a class="lx-btn small" href="notebooks/b02-python-data.ipynb" download>Notebook (.ipynb)</a> <a class="lx-btn small ghost" href="../assets/learn/data/b02-python-data.json" download>Raw SPP data (JSON)</a> <a class="lx-btn small ghost" href="../assets/learn/data/town_year.json" download>Cleaned shapes (JSON)</a></p>
 <p class="lx-hint" style="margin-top:10px">Need a refresher? Toolbox <a href="k08-git-notebooks.html">K8</a> (Git and reproducible notebooks).</p>
 </div>
@@ -104,7 +104,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-deeper-body">
 <p>A capacity factor is energy divided by (nameplate capacity × hours). EIA-930 reports generation, not capacity, so a real fleet's capacity factor needs a second source, such as EIA's generator inventory (Form EIA-860).</p>
 <p>Observed peak output is not a capacity measurement. If it is below nameplate capacity, using it as the denominator overstates the capacity factor.</p>
-<p>Prairie Town's farms are defined to reach full output in SPP's best hour, which is why their 52.8% and 23.4% are labelled illustrative. <a href="05-capacity-factor.html">Lesson 5</a> builds capacity factors from scratch.</p>
+<p>Prairie Town's farms are defined to reach full output in SPP's best hour, which is why their 52.8% and 23.4% are labeled illustrative. <a href="05-capacity-factor.html">Lesson 5</a> builds capacity factors from scratch.</p>
 </div>
 </details>
 <details class="lx-deeper">
@@ -119,7 +119,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 </tbody>
 </table>
 <ul>
-<li><b>The night rule</b> is a documented heuristic for this SPP, Central-time example: hours whose monthly median solar is zero, 22:00 to 05:00 all year, and hours when the sun is below the horizon at SPP's centre.</li>
+<li><b>The night rule</b> is a documented heuristic for this SPP, Central-time example: hours whose monthly median solar is zero, 22:00 to 05:00 all year, and hours when the sun is below the horizon at SPP's center.</li>
 <li><b>What it proves.</b> Hours set to zero pass a night check by construction; the check does not test the daytime values, so look at those too.</li>
 <li>The notebook applies the median and clock parts of the rule to the raw file.</li>
 </ul>
@@ -185,7 +185,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <tr><td class="n">23 h, 25 h</td><td>9 March and 2 November 2025 in U.S. Central time, when the clocks change.</td><td class="s"><a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a> SPP data · 2025</td></tr>
 <tr><td class="n">54.4 GW</td><td>SPP's highest hourly demand in 2025, on 29 July.</td><td class="s"><a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a> · data for 2025, accessed November 2026</td></tr>
 <tr><td class="n">1,377 h</td><td>SPP solar hours in 2025 flagged as repeated readings (3 or more identical non-zero values in a row).</td><td class="s"><a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a> · this lesson's check</td></tr>
-<tr><td class="n">180 h</td><td>Hours a year that demand spends above 90% of its peak (SPP's 2025 shape).</td><td class="s"><a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a> · this lesson's check</td></tr>
+<tr><td class="n">180 h</td><td>Hours a year that demand spends above 90% of its peak, in the course's cleaned, rounded SPP 2025 profile (the raw file: 176).</td><td class="s"><a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a> · this lesson's check</td></tr>
 </tbody>
 </table>
 </div>

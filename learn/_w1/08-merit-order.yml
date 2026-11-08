@@ -6,7 +6,7 @@ glossary:
     def: "All the offers to sell power in one hour, lined up from the cheapest to the most expensive."
   - id: clearing-price
     term: Clearing price
-    def: "The price at which supply meets demand in a market, paid to every seller that runs in that hour."
+    def: "The price at which supply meets demand in a market; in a uniform-price market, every seller that runs in that hour is paid it."
   - id: marginal-plant
     term: Marginal plant
     def: "The plant that serves the last megawatt of demand, whose offer sets the clearing price."

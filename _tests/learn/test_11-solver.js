@@ -5,6 +5,10 @@
 //     shadow price lies between the one-sided finite differences, equals them where they agree, and why() explains it;
 //     the redispatch behind the two kinks (07:00 and 09:00); the 5 MWh quiz; the sign error; the peaker threshold;
 //     the sliders' corners; the MILP (no duals, the on-or-off minimum)
+//   - why() under the sliders: a $0 hour with curtailment is blamed on a ramp rule only when a ramp rule holds the
+//     combined-cycle up; with both gas plants off it is a plain surplus (demand -10%, 300 MW of wind, 80 MW/h ramps)
+//   - optimality wording: "optimal" and "proven best" only for the optimal status; a time-limited MILP keeps its gap,
+//     an unknown gap stays unknown, and a tiny gap never rounds to 0% (a fake time-limited result)
 //   - the editor (evalPlan): no one-hour edit that keeps every rule beats the solver; plans that break a ramp, leave a
 //     surplus after all curtailment, or leave demand unserved are rejected (each with a reproducible case)
 //   - the checks: they pass on the solver's plans, fail on the sign error, catch a peaker below its on-or-off minimum,
@@ -83,6 +87,22 @@ const sum = a => a.reduce((x, y) => x + y, 0);
   ok(counts[40] === 18 && counts[0] === 3 && counts[80] === 3, `duals: 18 hours at $40, 3 at $0, 3 at $80 (${JSON.stringify(counts)})`);
   ok(degenerate.join() === D.degenerateHours.join(), `duals: the hours with a non-unique price are ${D.degenerateHours} (${degenerate})`);
   ok(near(B.duals[D.probe.hour], D.probe.answer), `probe: the shadow price at ${D.probe.hour}:00 is the predicted answer $${D.probe.answer}`);
+  // why() under the sliders: "ramp" only where a ramp rule is at its limit at t (with t-1, or t+1); a $0 hour with both
+  // gas plants off is a surplus of the fixed-output plant, wind and solar
+  const sSur = M.settings({ demandPct: -10, windMW: 300, ramp: 80 }), xSur = run(sSur).o, w10 = M.why(W, sSur, xSur, 10);
+  ok(near(xSur.duals[10], 0) && xSur.cc[10] < 1e-6 && xSur.cc[9] < 1e-6 && xSur.cc[11] < 1e-6 && near(xSur.sp[10], 45.6, 0.05) && w10.kind === "surplus" && !/ramp/i.test(w10.text),
+     `why: demand -10%, 300 MW of wind, 80 MW/h ramps, 10:00 curtails ${xSur.sp[10].toFixed(1)} MW with the gas plants off: a surplus, not a ramp (${w10.text})`);
+  let rampWhy = 0, rampHeld = 0, surplus = 0;
+  [M.settings(), sSur, M.settings({ windMW: 300 }), M.settings({ ramp: 10 }), M.settings({ demandPct: 20, windMW: 0, ramp: 10 }), M.settings({ demandPct: -10 })].forEach(st => {
+    const x = run(st).o;
+    for (let t = 0; t < 24; t++) {
+      const w = M.why(W, st, x, t), prev = t ? x.cc[t - 1] : W.startCC, next = t < 23 ? x.cc[t + 1] : null;
+      const binds = near(Math.abs(x.cc[t] - prev), st.ramp, 0.01) || (next != null && near(Math.abs(x.cc[t] - next), st.ramp, 0.01));
+      if (w.kind === "ramp") { rampWhy++; if (binds) rampHeld++; }
+      if (w.kind === "surplus") { surplus++; ok(x.cc[t] < 1e-6 && x.sp[t] > 1e-6 && near(x.duals[t], 0, 0.01), `why: a surplus hour has the gas plants off and curtails (${t}:00)`); }
+    }
+  });
+  ok(rampWhy > 0 && rampWhy === rampHeld && surplus > 0, `why: across six slider settings, every ramp explanation has a ramp rule at its limit (${rampHeld} of ${rampWhy}); ${surplus} surplus hours`);
   // what the solver changes at the two kinks (the page's table)
   const diff = (o, k) => o[k].map((v, h) => Math.abs(v - B[k][h]) > 1e-6 ? h + ":" + Math.round(v - B[k][h]) : "").filter(Boolean).join(" ");
   const dOne = (t, d) => { const a = {}; a[t] = d; return run(M.settings({ add: a })).o; };
@@ -147,6 +167,18 @@ const sum = a => a.reduce((x, y) => x + y, 0);
   ok(mi30.o.pk.every(v => v < 1e-6 || v >= sM.pkMin - 1e-6), "milp: the peaker is off or at least its minimum every hour");
   ok(lp30.o.totals.pk > 0 && lp30.o.pk.some(v => v > 1e-6 && v < sM.pkMin - 1e-6), "milp: the LP at this ramp runs the peaker below its minimum somewhere (so the on-or-off rule bites)");
   ok(M.checks(W, sM, mi30.o).every(c => c.ok), "milp: its plan passes the checks");
+  // optimality wording: optimal status only; the gap as reported (a fake time-limited result with the same plan)
+  const usd = v => (v < 0 ? "−$" : "$") + Math.round(Math.abs(v)).toLocaleString("en-US"), f1 = v => (Math.round(v * 10) / 10 + 0).toLocaleString("en-US", { maximumFractionDigits: 1 });
+  const mt = M.milpText(mi30.o, lp30.o.totals.cost, usd, f1);
+  ok(M.proven(mi30.o) && mt.startsWith("Optimal at " + money(mi30.o.totals.cost) + ", " + money(mi30.o.totals.cost - lp30.o.totals.cost) + " more than the linear program") && mt.includes("|Gap]] " + M.gapText(mi30.r.mipGap)) && /so proven best/.test(mt),
+     `milp: the optimal verdict states the reported gap (${mt})`);
+  const tl = M.parse(W, sM, Object.assign({}, mi30.r, { status: "time-limit", ok: false, mipGap: 0.05 }), V), tlText = M.milpText(tl, lp30.o.totals.cost, usd, f1);
+  ok(!M.proven(tl) && tlText.startsWith("Stopped early (time-limit)") && tlText.includes("|Gap]] 5.00%, so not proven best") && !/Optimal|proven best|best plan/.test(tlText.replace("not proven best", "")),
+     `milp: a time-limited result is never called optimal or best (${tlText})`);
+  const nogap = M.parse(W, sM, Object.assign({}, mi30.r, { mipGap: null }), V);
+  ok(M.gapText(null) === "not reported" && M.gapText(undefined) === "not reported" && M.gapText(0) === "0%" && M.gapText(0.00009) === "under 0.01%" && M.gapText(0.0123) === "1.23%" && !/proven best/.test(M.milpText(nogap, null, usd, f1)),
+     "milp: an unknown gap stays unknown (no 'proven best'); a tiny gap never shows as 0%");
+  ok(!M.proven(M.parse(W, M.settings(), Object.assign({}, base.r, { status: "time-limit" }), V)) && M.proven(B), "optimal: only the optimal status counts");
   // review case: a peaker at 10 MW, matched by extra curtailment and a recomputed cost, passes every check but the
   // limits check, and only because of the on-or-off minimum
   const h10 = mi30.o.sp.findIndex((v, t) => W.wind[t] + W.solar[t] - v >= 10 && mi30.o.pk[t] < 1e-6);
@@ -160,6 +192,7 @@ const sum = a => a.reduce((x, y) => x + y, 0);
   const want = {
     rule: { cost: ex.cost, pk: ex.pk, sp: ex.curtailed, co2: Math.round(ex.co2 * 10) / 10 },
     signError: { cost: bad.totals.cost },
+    solver: "HiGHS " + VERSION,
     threshold: thr,
     precomputed: { cost: B.totals.cost, cc: B.cc, pk: B.pk, sp: B.sp, duals: B.duals },
     milp: { lpCost: lp30.o.totals.cost, lpPk: lp30.o.totals.pk, cost: mi30.o.totals.cost, pk: mi30.o.totals.pk }
@@ -187,9 +220,15 @@ const sum = a => a.reduce((x, y) => x + y, 0);
     ok(/July 2017/.test(Q), "page: the 5-minute dispatch fact is dated (EIA, July 2017)");
     // the simplex method in general: a move is never worse (a degenerate pivot can keep the cost); this hour's walk is
     // strictly downhill, which is what the step-through text ("to a cheaper neighbour") says
-    ok(!/to a cheaper neighbouring corner/.test(Q) && /moves along an edge to a neighbouring corner that is never worse/.test(Q) && /On this hour every move is cheaper\./.test(Q),
+    ok(!/to a cheaper neighboring corner/.test(Q) && /<li>Move along an edge to a neighboring corner that is never worse\.<\/li>/.test(Q) && /On this hour every move is cheaper\./.test(Q),
        "page: the simplex method's moves are never worse (not always cheaper); this hour's are cheaper");
-    ok(/var sol = LX\.lp2\.solve\(m10\), walk = LX\.lp2\.simplexWalk\(m10\)/.test(JS) && /to a cheaper neighbour\. /.test(JS), "peek: the step-through walks lesson 10's hour (its steps are tested downhill in test_10)");
+    ok(/var sol = LX\.lp2\.solve\(m10\), walk = LX\.lp2\.simplexWalk\(m10\)/.test(JS) && /to a cheaper neighbor\. /.test(JS), "peek: the step-through walks lesson 10's hour (its steps are tested downhill in test_10)");
+    // the merit-order price holds only where no ramp rule is at its limit; the solver's facts row names no algorithms
+    ok(/Where no ramp rule is at its limit, a price is the marginal plant's cost/.test(Q) && !/It is the merit-order price of \[lesson 8\]/.test(Q), "page: lesson 8's merit-order price is stated for hours without a ramp rule at its limit");
+    ok(!/interior point|first-order|branch-and-cut/.test(Q) && Q.includes("open source under the MIT license and solves linear and mixed-integer programs"), "page: the HiGHS row says what it is and its license, without algorithm names");
+    // the page code: optimality claims gated on the status; stale price explanations cleared; an unknown gap never 0
+    ok(!/mipGap \|\| 0/.test(JS) && /if \(proven\(s\)\) base = s/.test(JS) && /if \(!proven\(sol\)\) \{ saw\(api, "Stopped early/.test(JS) && /saw\(api, milpText\(/.test(JS), "page code: 'optimal' and 'proven best' only for the optimal status; only a proven optimum is kept");
+    ok(/if \(sol !== shown\) clearPick\(\);/.test(JS) && /if \(pricePick !== t \|\| shown !== sol\) return;/.test(JS) && (JS.match(/clearPick\(\); go\(\);/g) || []).length === 4, "page code: a new solution or a slider move clears the selected hour; a stale explanation is dropped");
     // every symbol button of the equation card has its words (a source check of the explain layer)
     const symIds = [...JS.matchAll(/sym\("(\w+)"/g)].map(m => m[1]), defs = new Set([...JS.matchAll(/^ {10}(\w+): \{ name: /gm)].map(m => m[1]));
     ok(symIds.length >= 15 && symIds.every(k => defs.has(k)), `equation card: all ${new Set(symIds).size} symbols have words (${symIds.filter(k => !defs.has(k))})`);
@@ -220,6 +259,7 @@ function fallbackSVG(W, B) {
   let g = "<g>";
   for (let v = 0; v <= ymax; v += 100) g += `<line x1="${m.l}" x2="${Wd - m.r}" y1="${y(v)}" y2="${y(v)}" stroke="var(--lx-line)"/><text x="${m.l - 6}" y="${(+y(v) + 4).toFixed(1)}" text-anchor="end" font-size="13" fill="var(--lx-ink-3)">${v}</text>`;
   [0, 6, 12, 18, 24].forEach(h => { g += `<text x="${(m.l + h * bw).toFixed(1)}" y="${Hh - 8}" text-anchor="${h === 0 ? "start" : h === 24 ? "end" : "middle"}" font-size="13" fill="var(--lx-ink-3)">${String(h).padStart(2, "0")}:00</text>`; });
+  g += `<text x="${m.l + 6}" y="${m.t + 14}" font-size="13" fill="var(--lx-ink-2)">Average power (MW)</text>`;
   out.push(g + "</g>");
   let bars = "<g>";
   for (let t = 0; t < 24; t++) {

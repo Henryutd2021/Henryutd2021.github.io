@@ -59,7 +59,10 @@ const pct = (x, d) => (x * 100).toFixed(d === undefined ? 1 : d) + "%";
     ok(t.jobs[j] === "partly" ? r.agree === r0.agree : r.agree === r0.agree - 1 && r.differ === 1, `score: toggling ${t.key}.${j}`);
   }));
   // the sort's evidence agrees with the numbers: every 'yes' for firm has a high rating or no rating; every 'no' for firm a low one
-  D.tech.forEach(t => { if (t.firm != null && t.jobs.firm === "no") ok(t.firm < 0.4, `${t.key}: 'no' for firm matches a rating under 40%`); if (t.firm != null && t.jobs.firm === "yes") ok(t.firm >= 0.6, `${t.key}: 'yes' for firm matches a rating of 60% or more`); });
+  // the lesson's stated cutoff (data file, meta.about): 'yes' at 60% or more, 'no' only for solar's 7% and 10%, 'partly' between
+  D.tech.forEach(t => { if (t.firm != null && t.jobs.firm === "no") ok(t.firm <= 0.10, `${t.key}: 'no' for firm matches a rating of 10% or less`); if (t.firm != null && t.jobs.firm === "yes") ok(t.firm >= 0.6, `${t.key}: 'yes' for firm matches a rating of 60% or more`);
+    if (t.firm != null && t.firm > 0.10 && t.firm < 0.6) ok(t.jobs.firm === "partly", `${t.key}: a rating between 10% and 60% is 'partly' for firm`); });
+  ok(/'yes' at 60% or more/.test(D.meta.about) && /teaching choice, not PJM's/.test(D.meta.about) && T.wind.jobs.firm === "partly" && T.solar.jobs.firm === "no", "firm cutoff stated in the data file; onshore wind is 'partly', solar 'no'");
   D.tech.forEach(t => { if (t.cf == null) ok(t.jobs.energy === "no", `${t.key}: makes no energy, so 'no' for cheap energy`); });
   // the no-JS table lists exactly the 'yes' technologies of each job
   const fb = (QMD.match(/<div class="lx-fallback">[\s\S]*?<\/table>/) || [""])[0];
@@ -100,7 +103,8 @@ const pct = (x, d) => (x * 100).toFixed(d === undefined ? 1 : d) + "%";
   const P = new Set();
   D.tech.forEach(t => { if (t.cf != null) P.add(+(t.cf * 100).toFixed(1)); if (t.firm != null) P.add(Math.round(t.firm * 100)); });
   Object.values(D.steelman.storageRatings).forEach(v => P.add(Math.round(v * 100)));
-  P.add(Math.round(T.battery.rte * 100));
+  P.add(Math.round(T.battery.rte * 100)); P.add(Math.round(D.steelman.offshoreWind * 100));
+  D.tech.forEach(t => ((t.firmNote || "").match(/\d+(?:\.\d+)?(?=%)/g) || []).forEach(v => P.add(+v)));   // rating notes: dual fuel, tracking, offshore
   const rx = /(\d[\d,]*(?:\.\d+)?)\s*(MWh|MW|%)/g;
   let m, seen = 0;
   while ((m = rx.exec(prose))) { seen++; const v = +m[1].replace(/,/g, ""); ok(m[2] === "%" && P.has(v), `page states "${m[0]}" — in the data file`); }
@@ -132,6 +136,14 @@ const pct = (x, d) => (x * 100).toFixed(d === undefined ? 1 : d) + "%";
   ok(bad.length === 1 && bad[0].key === "solar" && !bad[0].ok, "regression: 'Solar ... 58.7%' is rejected");
   const good = M.claims("Solar's capacity factor was 24.0% in 2025.", tech);
   ok(good.length === 1 && good[0].ok, "control: 'Solar ... 24.0%' is accepted");
+  // regression: a technology's own numbers swapped between metrics are caught too
+  [["Solar capacity factor is 7%.", false], ["Solar firm share is 24.0%.", false], ["Gas peakers averaged 67% of their size.", false], ["PJM's class rating for the gas peaker is 13.6%.", false],
+   ["The battery fleet gave back 59% of what it stored.", false], ["Solar firm share is 7%.", true], ["Gas peakers averaged 13.6% of their size.", true], ["Wind: a 33.8% capacity factor.", true], ["Wind: a 34% capacity factor.", false]]
+    .forEach(([txt, want]) => { const c = M.claims(txt, tech); ok(c.length === 1 && c[0].ok === want && c[0].metric, `metric check: "${txt}" ${want ? "accepted" : "rejected"} (${c[0] && c[0].metric})`); });
+  // the sentences the page assembles from the data (scatter feedback, Steelman card, concept map)
+  const TX = M.texts(D, year), live = [TX.scatterRight].concat(TX.steelFor, Object.values(TX.map));
+  let nl = 0; live.forEach(txt => M.claims(txt, tech).forEach(c => { nl++; ok(c.ok, `assembled claim ${c.value}% (${c.metric}) belongs to ${c.key}: "…${c.text.trim()}"`); }));
+  ok(nl >= 14 && TX.lull.hours === 67, `${nl} percentage claims in the assembled texts; the calm spell is 67 hours`);
   // the rendered page, when present, carries the same claims
   const html = path.join(SITE, "_site/learn/06-three-jobs.html");
   if (fs.existsSync(html)) {
@@ -156,6 +168,22 @@ const pct = (x, d) => (x * 100).toFixed(d === undefined ? 1 : d) + "%";
   ok(/4 hours at full power/.test(JS) && /4-hour battery runs at full power for four hours/.test(T.battery.how), "4-hour battery explained");
   ok(/\[\[ramp-rate\|/.test(JSON.stringify(D.jobs)) && /data-term="ramp-rate"/.test(QMD), "ramp rate marked as a glossary term");
   ok(/Regions reward these services differently/.test(QMD), "real-world card: regions reward the services differently");
+  // a firm share is a planning credit, not a promise of output at the peak
+  const firmWords = JSON.stringify(D.jobs) + JS + QMD;
+  ok(!/counts? (on )?(at the peak|in (its|the) riskiest hours)|whatever the weather|counted toward peak needs/i.test(firmWords), "firm share: no 'counts at the peak' or 'whatever the weather' wording");
+  ok(/not a promise/.test(JS) && /not output promised in any hour/.test(QMD) && /not output promised in any hour/.test(JS) && /planning rating, not output guaranteed/.test(D.meta.about), "firm share described as a planning rating (step 3, data note, concept map, data file)");
+  ok(!/jumps to any level/.test(JSON.stringify(D)) && /start-up, ramp and minimum-output limits/.test(T.pk.why.flex), "peaker: changes output within start-up, ramp and minimum-output limits");
+  ok(/Two plants have the same size in MW/.test(QMD) && /size × firm share/.test(QMD), "quiz: firm share compared at equal size; size × firm share otherwise");
+  ok(/label: "Capacity factor, running cost"/.test(JS) && /Running cost says how cheap/.test(JS), "concept map: cheap energy is measured by capacity factor and running cost");
+  ok(!/td small \{ display: none/.test(QMD), "phones keep the firm-share qualifiers (onshore, fixed, 4-hour) visible");
+  ok(/\$D_\\text\{peak\}\$ is the year's peak demand/.test(modeler) && /\$\\sum_g\$ adds over every technology/.test(modeler) && /illustrative planning choice/.test(modeler), "Modeler box: every symbol defined, the margin labelled illustrative");
+  ok(/\[\[round-trip-efficiency\|Round-trip efficiency\]\]/.test(JS) && /data-term="capacity-market"/.test(QMD) && /data-term="reserves"/.test(QMD) && !/accredited MW/.test(QMD), "terms: round trip, capacity payments and reserves marked; no 'accredited MW'");
+  // the no-JS fallback: every technology with both numbers, and both sides of the contested pairing
+  const fbt = (QMD.match(/<table class="lx-mini-table lx6-fbtech">[\s\S]*?<\/table>/) || [""])[0];
+  D.tech.forEach(t => { const row = (fbt.match(new RegExp("<tr><td>" + t.label + "</td><td>([^<]*)</td><td>([^<]*)</td></tr>")) || []);
+    ok(row.length === 3 && (t.cf == null ? /^none/.test(row[1]) : row[1] === pct(t.cf)) && (t.firm == null ? row[2] === "not rated" : row[2].indexOf(t.firmLabel) === 0), `fallback table: ${t.label} ${row[1]} · ${row[2]}`); });
+  const fbs = (QMD.match(/Contested: can wind plus storage do the firm job\?<\/summary>[\s\S]*?<\/details>/) || [""])[0];
+  ok(fbs.indexOf(TX.lull.hours + " hours in a row, from 30 August to 1 September") >= 0 && /For:/.test(fbs) && /Against:/.test(fbs) && /EIA-930/.test(fbs), "fallback: both sides of the wind-plus-storage case, with the computed calm spell");
 }
 
 // ---------------- scope: deny-list, the nuclear-plus-risk combination (sentence level), links on the allow-list

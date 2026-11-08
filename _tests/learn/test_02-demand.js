@@ -80,7 +80,7 @@ ok(h90 === 180 && (h90 / W.n * 100).toFixed(1) === "2.1" && (e90 * 100).toFixed(
   ok(r.thr === 405 && r.hrs === 180 && near(r.extraShare, e90) && (r.duringShare * 100).toFixed(2) === "3.08" && r.duringShare > 20 * r.extraShare, "readout: 0.12% above the line, 3.08% used in those hours");
   ok(r.line1 === "180 hours above 405 MW: 2.1% of the year." && r.line2 === "Energy above the line (the shaded sliver): 0.12% of the year's energy.", "readout: two separate statements");
   ok(!/of its energy/.test(JS), "readout: no ambiguous 'of its energy'");
-  ok(n0(e90 * W.totalMWh) === "3,068" && n0(W.totalMWh) === "2,469,131" && has("it is 3,068 MWh, only 0.12% of $E$") && has("\\approx 2{,}469{,}131$ MWh, about 2,469 GWh"), "page: energy in MWh with the one-hour interval");
+  ok(n0(e90 * W.totalMWh) === "3,068" && n0(W.totalMWh) === "2,469,131" && has("For $L = 405$ MW it is 3,068 MWh, only 0.12% of $E$") && has("\\approx 2{,}469{,}131\\ \\text{MWh}.$$") && has("about 2,469 GWh, sorted or not"), "page: energy in MWh with the one-hour interval");
   ok(has("\\times 1\\ \\text{h}"), "page: the one-hour interval is written out");
 }
 ok(has("only 180 of 8,760 hours needed more than 90% of the peak") && has("180 of the year's 8,760 hours need more than 405 MW") && has("2.1%: 180 ÷ 8,760 = 0.021") && has(">180 hours<"), "page: load-duration numbers");
@@ -99,6 +99,31 @@ ok(Math.round(d200.ramp) === 114 && Math.round(d0.ramp) === 20 && D.solar.target
 ok(has("with 200 MW of solar, net demand's steepest three-hour climb after noon is 114 MW, against 20 MW without it"), "page: duck myth numbers");
 ok(d200.rampFrom >= 12 && d200.rampFrom <= 20 && /steepest three-hour climb after noon/.test(JS), "duck: the climb is searched from noon, and the page says so");
 ok(M.duck(W, D.solar.max).min < 0 && M.duck(W, D.solar.target).neg === 0, "duck: the slider range reaches below zero; 200 MW does not");
+// the low is searched from 06:00 to 18:00, so the page calls it the daytime low (the day's own low can come at night)
+{
+  const dayMin = Math.min(...d0.net), dayMinT = d0.net.indexOf(dayMin);
+  ok(d0.tmin === 6 && Math.round(d0.min) === 225 && dayMinT === 3 && near(dayMin, 211.5, 0.05), `duck: with no solar the daytime low is ${d0.min} MW at 06:00, the day's low ${dayMin} MW at 03:00`);
+  const r0 = M.duckReadout(W, 0), r200 = M.duckReadout(W, D.solar.target), rMax = M.duckReadout(W, D.solar.max);
+  ok(r0.low === "Daytime low (06:00–18:00): 225 MW at 06:00." && r200.climb === "Steepest three-hour climb after noon: +114 MW, 17:00 to 20:00." && r200.surplus === "" && /^For \d+ hours solar alone exceeds demand/.test(rMax.surplus),
+     `duck readouts: daytime low, climb and surplus kept apart (${r0.low} | ${r200.climb})`);
+  ok(/net demand's lowest hour between 06:00 and 18:00/.test(JS) && !/net demand falls to/.test(JS), "duck chart: its text names the 06:00-18:00 window");
+  // the readouts are rewritten at every slider value (0 -> 200 -> 0 shows the 0 MW numbers again); only "done" waits for 200 MW
+  ok(/function upd\(\) \{[\s\S]{0,200}var r = duckReadout\(Wd, solarMW\);[\s\S]{0,200}H\("p", \{ text: r\.low \}, out\);[\s\S]{0,200}if \(solarMW >= D\.solar\.target\)/.test(JS), "duck step: readouts written before the 200 MW check");
+  ok(M.duckReadout(W, 0).low !== r200.low && M.duckReadout(W, 0).low === r0.low, "duck readouts: a return to 0 MW gives the 0 MW numbers");
+  // the myth: the steeper climb, and the lower highest net demand after noon, both from the model
+  ok(Math.round(d0.peak) === 294 && Math.round(d200.peak) === 265 && has("Solar does lower the highest net demand after noon, from 294 to 265 MW."), "duck myth: solar lowers the after-noon high, 294 -> 265 MW");
+  ok(has("In this example, adding 200 MW of solar makes net demand's steepest three-hour climb after noon smaller.") && !has("makes the evening easier"), "duck myth: a precise statement");
+}
+// wording: net demand, the seasonal shapes, the cleaning rule, first-use terms
+{
+  const SIDE = fs.readFileSync(path.join(SITE, "learn/_w1/02-demand.yml"), "utf8");
+  ok(/Demand left after subtracting wind and solar output; other generation, storage, imports or lower demand must cover it/.test(SIDE) && !/what the other power plants must still supply/.test(SIDE + JS), "net demand: defined as what is left, not as what plants alone supply");
+  ok(/Our selected summer day has one main hump; our selected winter day has two/.test(JS) && !/one hump in summer, two in winter/.test(JS), "concept map: the two shapes belong to the selected days");
+  ok(/comes in only " \+ num\(h90\) \+ " hours of this demand record/.test(JS) && !/only in the hottest hours/.test(JS), "causal chain: 180 hours of the record, no temperature claim");
+  ok(has("Our cleaning rule flagged 1,377 hours (about 16%)") && !has("telemetry froze"), "data limits: a cleaning rule flagged the solar hours; no diagnosed freeze");
+  ok(has('data-term="day-ahead-forecast">day-ahead forecast</span>, made the day before') && !/nameplate/.test(QMD + JS) && has("net generation: plant output after subtracting the electricity the plants use themselves"), "terms: day-ahead forecast, rated maximum, net generation");
+  ok(has("in the course's cleaned, rounded SPP profile"), "facts: the 180 hours come from the cleaned profile");
+}
 
 // ---------------- SPP and U.S. numbers on the page
 const st = days.stats;
@@ -108,13 +133,13 @@ ok(near(st.annual_demand_TWh * 1000 / 8760 / st.peak_demand_GW, W.loadFactor, 0.
 ok(has(">0.8%<") && st.share_of_net_generation.solar === 0.008 && has("SPP has little solar (0.8% of its 2025 generation)"), "page: SPP solar share 0.8%");
 ok(has(">759 GW<") && D.anchors.us_peak.value === 759180, "page: 759 GW");
 ok(st.demand_hours_flagged_as_implausible === 699 && has("For 699 hours of 2025 (about 8%)") && Math.round(699 / 8760 * 100) === 8, "page: 699 rebuilt hours, about 8%");
-ok(st.frozen_hours_filled.solar === 1377 && has("SPP's solar telemetry froze for 1,377 hours (about 16%)") && Math.round(1377 / 8760 * 100) === 16, "page: 1,377 filled solar hours, about 16%");
+ok(st.frozen_hours_filled.solar === 1377 && has("flagged 1,377 hours (about 16%)") && Math.round(1377 / 8760 * 100) === 16, "page: 1,377 filled solar hours, about 16%");
 Object.keys(D.anchors).forEach(k => ok(/^https:\/\/www\.eia\.gov\//.test(D.anchors[k].url) && D.anchors[k].as_of && QMD.indexOf(D.anchors[k].url) >= 0, `anchor ${k}: EIA URL, as-of date, cited on the page`));
 
 // ---------------- wording checks: removed claims, the solar slider, causes, the Modeler preview
 ["sits idle the other 98%", "Every curve is the real hourly demand", "which sets how much capacity", "\\max_t", "Planning models therefore run", "the most?</p>",
  "LEDs and fewer workdays lower demand", "buildings had soaked up heat all day"].forEach(t => ok((QMD + JS + fs.readFileSync(path.join(SITE, "learn/_w1/02-demand.yml"), "utf8")).indexOf(t) < 0, `review: "${t}" is gone`));
-ok(/Illustrative: the farm's output in SPP's top solar hour of 2025, not a nameplate rating/.test(JS) && has("it is not a nameplate rating"), "review: the solar slider's MW is an illustrative maximum");
+ok(/Illustrative: the farm's output in SPP's top solar hour of 2025, not its rated maximum/.test(JS) && has("it is not the farm's rated maximum"), "review: the solar slider's MW is an illustrative maximum");
 ok(/numbers are measured, the causes typical/.test(JS) && /A typical chain: the data show the demand, not its causes/.test(JS), "review: causes marked as typical");
 { // the Modeler preview: one symbolic line at most, forward links to live lessons
   const b0 = QMD.indexOf("Why models keep the hours in order"), box = QMD.slice(b0, QMD.indexOf("</details>", b0));

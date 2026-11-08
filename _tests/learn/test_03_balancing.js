@@ -102,7 +102,7 @@ ok(G.govMWperHz === 600 && G.reliefMWperHz === 80 && (100 / 680).toFixed(2) === 
 has("f \\approx 59.85");
 ok(G.govMWperHz === 1800 / (0.05 * 60), "Go deeper: 5% droop on 1,800 MW gives 600 MW/Hz"); has("1,800 MW");
 has("\\text{drop} = \\frac{\\Delta P}{K + D}", "the settling drop as a positive quantity (one sign convention)");
-has("about 8 s behind"); ok(G.govT === 8, "Modeler preview: governors about 8 s behind");
+has("building up gradually (an illustrative 8-second response time)"); ok(G.govT === 8 && QMD.indexOf("8 s behind") < 0, "Modeler preview: governors build up with an 8-second response time (a lag, not a delay)");
 has("at 59.3 Hz relays cut one block of 5% of load"); ok(G.uflsPct === 5 && G.uflsHz === 59.3, "Modeler preview: 5% of load at 59.3 Hz");
 ok(!/T_g|\\beta|K_b|\\operatorname\{clip\}/.test(QMD), "Modeler preview: no implementation equations (depth)");
 has("[Lesson 10](10-write-it-down.qmd)"); has("[lesson 11](11-solver.qmd)");
@@ -115,7 +115,14 @@ has("<td class=\"n\">59.304 Hz</td>"); has("below 59.4 Hz for 4 min 23 s of the 
 has("<td class=\"n\">20,000 MW</td>"); has("<td class=\"n\">4.5 million</td>"); ok(U.customersMillion === 4.5, "numbers: 4.5 million customers");
 has("ERCOT, at least 5% of load) and in the Southwest Power Pool (at least 10%)"); ok(D.ufls_real.spp_first_step.pct === 10, "numbers: SPP 10%");
 has("0–12 s · 1–10 min"); ok(D.layers.rows[0].time === "0–12 s" && D.layers.rows[2].time === "1–10 min", "numbers: NERC time frames");
-has("1,045 generating units had 4,124 outages"); has("58% were gas-fired, 27% wind and 6% coal: shares of units, not of lost MW"); has("across ERCOT, SPP and MISO South");
+has("1,045 generating units had 4,124 outages"); has("across ERCOT, SPP and MISO South");
+has("<caption>The 1,045 units with outages across ERCOT, SPP and MISO South, by fuel: shares of units, not of lost MW</caption>"); has("<tbody><tr><td>58%</td><td>27%</td><td>6%</td></tr></tbody>");
+has("caused only by frozen wind turbines"); has("Frozen wind turbines played a part");
+// the settling formula holds only while the governors' extra output fits within the reserve (150 MW example; 50 MW settles lower)
+has("With governors only (150 MW of reserve, no AGC, no shedding)");
+ok(Math.round(G.govMWperHz * M.settleGap(G, 150)) === 88 && 88 <= 150, "Go deeper: the governors' extra output, about 88 MW, fits within 150 MW"); has("about 88 MW here");
+ok((60 - M.settleGap(G, 50)).toFixed(3) === "59.375" && near(sim({ inertia: 16, reserve: 50, gov: true, tEnd: G.minutesWindow, sample: 1 }).end, 59.375, 0.002), "Go deeper: with 50 MW held the model settles at 59.375 Hz"); has("With 50 MW held, it settles at 59.375 Hz instead.");
+has("Use: fall rate = 60 × lost MW ÷ (2 × stored MW·s).");
 
 // ---------------- wording the reviews asked for (the no-controls trace includes load relief; overlap; the stage rule)
 ok(/"No controls \(inertia and load relief\)"/.test(JS) && !/Inertia only \(nothing else acts\)/.test(JS), "chart: the no-controls trace is labelled with its load relief");
@@ -123,6 +130,21 @@ has("No controls (inertia and load relief)");
 ok(/gov = S_\.gov && S_\.stage >= 3/.test(JS) && /ffr = S_\.ffr && S_\.stage === 6/.test(JS), "cards: a card shows only the controls introduced so far");
 ok(/LX\.on\("l3-change", function \(\) \{\s*mineTrace\(\); fc\.update\(traces\);/.test(JS) && !/lx-ftrace button/.test(JS), "explain: the 'Your settings' trace follows changes (LX.Flowchart's update)");
 ok(/label: "Typical time scale"/.test(JS) && /The layers overlap/.test(JS), "explain: time scales overlap, not a relay race");
+// the causal chain's AGC link follows the case: raise to 60 Hz, turn plants down after shedding, or run out of reserve
+{
+  const k = (E, R) => M.agcLink(G, M.story(G, E, R)).title;
+  ok(k(16, 150) === "AGC restores 60 Hz" && k(16, 0) === "AGC turns plants down" && k(16, 50) === "AGC runs out of reserve" && k(30, 40) === "AGC turns plants down",
+     "causal chain: AGC restores (150 MW), turns plants down after shedding (0 MW; 30 GW·s and 40 MW), runs out (50 MW)");
+  ok(M.agcLink(G, M.story(G, 16, 50)).value === "still 59.38 Hz" && /agcLink\(G, st\)/.test(JS) && !/title: "AGC restores 60 Hz", text: "Reserve plants are raised over minutes.", value: st\.back/.test(JS), "causal chain: the reader's case picks the link");
+  // Texas readout: only readings already shown, nothing past the latest one
+  const pts = U.points.filter(p => M.clock(p[0]) <= M.clock("1:51"));
+  ok(M.uriTip(pts, M.clock("2:20")) === null && /1:50 a\.m\./.test(M.uriTip(pts, M.clock("1:51"))) && M.uriTip(pts, M.clock("1:30")).indexOf("1:26") >= 0, "Texas readout: restricted to the readings shown");
+  ok(/vline: true/.test(JS) && /the line only joins them/.test(JS) && /at selected times, up to 21 minutes apart/.test(U.note) && !/minute by minute/.test(U.note + QMD + JS), "Texas chart: readings as dots, crossings as time lines, gaps up to 21 minutes stated");
+  let gap = 0; for (let i = 1; i < U.points.length; i++) gap = Math.max(gap, M.clock(U.points[i][0]) - M.clock(U.points[i - 1][0]));
+  ok(gap === 21, "Texas chart: the longest gap between readings is 21 minutes");
+}
+ok(!/every spinning machine|Every turbine on the grid|synchronous machine/i.test(QMD + JS + JSON.stringify(D)) && /machines turning in step with the grid/.test(QMD) && /turning in step with the grid/.test(JS), "inertia: machines turning in step with the grid, not every spinning machine");
+ok(/data-term="derate"/.test(QMD) && /a dead band/.test(QMD), "terms: derates marked; dead band explained");
 // every glossary mark on the page and in the script names a known term (glossary.yml or a sidecar)
 const GIDS = new Set();
 [path.join(SITE, "learn/glossary.yml")].concat(fs.readdirSync(path.join(SITE, "learn/_w1")).filter(f => f.endsWith(".yml")).map(f => path.join(SITE, "learn/_w1", f)))
@@ -158,10 +180,21 @@ function fallbackSvg() {
   s += `<div class="lx-legend" aria-hidden="true"><span><i class="line" style="border-top-color:var(--lx-ink-3)"></i>No controls (inertia and load relief)</span><span><i style="--c:var(--lx-accent)"></i>With governors (reserve ${G.reserve.start} MW)</span></div>`;
   return s;
 }
+// the battery comparison and the Texas night, for readers without JavaScript (the same model and data as the steps)
+function fallbackMore() {
+  const a = sim({ inertia: G.lowInertia, reserve: G.reserve.start, gov: true, tEnd: G.secondsWindow }), b = sim({ inertia: G.lowInertia, reserve: G.reserve.start, gov: true, ffr: true, tEnd: G.secondsWindow });
+  let s = `<p><b>A battery.</b> At low inertia (${G.lowInertia} GW·s), a ${G.ffrMW} MW battery set for fast frequency response raises the lowest point from ${a.nadir.f.toFixed(2)} to ${b.nadir.f.toFixed(2)} Hz.</p>\n`;
+  s += `<div class="lx-scroll-x"><table class="lx-mini-table"><caption>Texas, 15 February 2021 (FERC–NERC report, pp. 135–138): frequency and customer demand ordered off</caption>\n`;
+  s += `<thead><tr><th scope="col">Time</th><th scope="col">Frequency</th><th scope="col">Ordered off</th><th scope="col">What happened</th></tr></thead>\n<tbody>\n`;
+  U.events.forEach(e => { s += `<tr><td>${e.at} a.m.</td><td>${M.hzEvent(e)}</td><td>${e.shedMW.toLocaleString("en-US")} MW</td><td>${e.title}</td></tr>\n`; });
+  return s + `</tbody>\n</table></div>`;
+}
 const FB = fallbackSvg(), re = /(<!-- fallback-svg:start -->\n)([\s\S]*?)(<!-- fallback-svg:end -->)/;
-if (process.argv.includes("--fallback")) { QMD = QMD.replace(re, (m0, a, b, c) => a + FB + "\n" + c); fs.writeFileSync(QMD_PATH, QMD); console.log("wrote the static figure into learn/03-balancing.qmd"); }
-const cur = re.exec(QMD);
+const FM = fallbackMore(), reM = /(<!-- fallback-more:start -->\n)([\s\S]*?)(<!-- fallback-more:end -->)/;
+if (process.argv.includes("--fallback")) { QMD = QMD.replace(re, (m0, a, b, c) => a + FB + "\n" + c).replace(reM, (m0, a, b, c) => a + FM + "\n" + c); fs.writeFileSync(QMD_PATH, QMD); console.log("wrote the static figure, the battery line and the Texas table into learn/03-balancing.qmd"); }
+const cur = re.exec(QMD), curM = reM.exec(QMD);
 ok(cur && cur[2].trim() === FB.trim(), "page: the static figure matches the model (run with --fallback to rewrite it)");
+ok(curM && curM[2].trim() === FM.trim() && /59\.45 to 59\.69 Hz/.test(FM) && (FM.match(/<tr><td>/g) || []).length === U.events.length, "page: the static battery line and Texas table match the model and data (run with --fallback to rewrite them)");
 
 console.log(`default case: rocof ${st0.rocof.toFixed(3)} Hz/s, inertia-only 59.3 Hz at ${st0.hitT.toFixed(2)} s, nadir ${st0.nadir.f.toFixed(3)} Hz at ${st0.nadir.t.toFixed(2)} s, AGC back at ${(st0.back / 60).toFixed(2)} min`);
 console.log(`${checks} checks, ${fails} failures`);

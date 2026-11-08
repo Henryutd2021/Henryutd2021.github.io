@@ -58,11 +58,25 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-legend" aria-hidden="true"><span><i class="line" style="border-top-color:var(--lx-ink-3)"></i>No controls (inertia and load relief)</span><span><i style="--c:var(--lx-accent)"></i>With governors (reserve 150 MW)</span></div>
 <!-- fallback-svg:end -->
 <ol>
-<li>Inertia: every spinning machine slows together and gives up stored energy (the first seconds).</li>
+<li>Inertia: the machines turning in step with the grid slow together and give up stored energy (the first seconds).</li>
 <li>Primary response: governors on plants holding reserve add power and stop the fall (seconds).</li>
 <li>Secondary response: automatic generation control raises reserve plants until 60 Hz returns (minutes).</li>
 <li>Last line: if the fall reaches 59.3 Hz, relays disconnect a block of customers automatically.</li>
 </ol>
+<!-- fallback-more:start -->
+<p><b>A battery.</b> At low inertia (6 GW·s), a 50 MW battery set for fast frequency response raises the lowest point from 59.45 to 59.69 Hz.</p>
+<div class="lx-scroll-x"><table class="lx-mini-table"><caption>Texas, 15 February 2021 (FERC–NERC report, pp. 135–138): frequency and customer demand ordered off</caption>
+<thead><tr><th scope="col">Time</th><th scope="col">Frequency</th><th scope="col">Ordered off</th><th scope="col">What happened</th></tr></thead>
+<tbody>
+<tr><td>1:20 a.m.</td><td>59.944 Hz</td><td>1,000 MW</td><td>Highest emergency level</td></tr>
+<tr><td>1:49 a.m.</td><td>59.504 Hz</td><td>2,000 MW</td><td>Plants keep failing</td></tr>
+<tr><td>1:51 a.m.</td><td>below 59.4 Hz</td><td>5,000 MW</td><td>The nine-minute timer starts</td></tr>
+<tr><td>1:54 a.m.</td><td>59.304 Hz</td><td>5,000 MW</td><td>The lowest point</td></tr>
+<tr><td>1:55 a.m.</td><td>59.401 Hz</td><td>8,500 MW</td><td>Back above 59.4 Hz</td></tr>
+<tr><td>2:02 a.m.</td><td>above 60 Hz</td><td>10,500 MW</td><td>60 Hz again, at a price</td></tr>
+</tbody>
+</table></div>
+<!-- fallback-more:end -->
 <p class="lx-hint">With JavaScript on, you trip the plant yourself, set the inertia and the reserve, and step through a real night in Texas.</p>
 </div>
 </div>
@@ -80,7 +94,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-fallback">
 <dl class="lx-ideas">
 <dt>Frequency</dt><dd>The grid's pulse, 60 Hz in North America; it falls whenever supply is short of demand.</dd>
-<dt>Inertia</dt><dd>Energy stored in spinning machines; it slows the fall but cannot stop it.</dd>
+<dt>Inertia</dt><dd>Energy stored in machines turning in step with the grid; it slows the fall but cannot stop it.</dd>
 <dt>Primary response</dt><dd>Governors add power within seconds and stop the fall at its lowest point, the nadir.</dd>
 <dt>Secondary response</dt><dd>Automatic generation control brings frequency back to 60 Hz within minutes.</dd>
 <dt>Reserve</dt><dd>Spare capacity held back for a trip. In this model, governors and AGC share it on running plants; real reserves can also come from offline plants, storage and responsive loads.</dd>
@@ -101,9 +115,13 @@ Let $f_0 = 60$ Hz, $\Delta P$ the lost power in MW and $E$ the stored rotational
 
 $$\frac{df}{dt}\Big|_{t=0} = -\frac{f_0\,\Delta P}{2E} = -\frac{60 \times 100}{2 \times 16{,}000} \approx -0.19 \text{ Hz/s}.$$
 
-Halve $E$ and the fall is twice as fast. Once governors have caught up, the frequency settles where the governors' extra output, $K$ MW per Hz of drop, and the load's own relief, $D$ MW per Hz, cover the lost power. The size of that drop, in Hz below 60, is
+Halve $E$ and the fall is twice as fast.
+
+With governors only (150 MW of reserve, no AGC, no shedding), the frequency settles where the governors' extra output, $K$ MW per Hz of drop, and the load's relief, $D$ MW per Hz, cover the lost power:
 
 $$\text{drop} = \frac{\Delta P}{K + D} = \frac{100}{600 + 80} \approx 0.15 \text{ Hz}, \quad f \approx 59.85 \text{ Hz}.$$
+
+This holds while the governors' extra output, about 88 MW here, fits within the reserve. With 50 MW held, it settles at 59.375 Hz instead.
 
 $K = 600$ MW/Hz is what a 5% **droop** setting gives on 1,800 MW of plants: a 5% drop in frequency (3 Hz) would call for their full output. All Plains Grid numbers are illustrative.
 
@@ -117,7 +135,7 @@ $K = 600$ MW/Hz is what a 5% **droop** setting gives on 1,800 MW of plants: a 5%
 
 - **One frequency.** The whole region shares it; there are no power lines.
 - **Stored spin.** It sets how fast the frequency moves when power is short.
-- **Governors.** They add power in step with the drop, about 8 s behind, never more than the reserve.
+- **Governors.** They add power in step with the drop, building up gradually (an illustrative 8-second response time), never more than the reserve.
 - **AGC.** It keeps adding, slowly, until 60 Hz returns, also within the reserve.
 - **Load.** Demand eases a little as frequency falls; at 59.3 Hz relays cut one block of 5% of load.
 
@@ -144,10 +162,10 @@ Scheduling and planning models usually skip these seconds and keep a rule instea
 <div class="lx-deeper-body">
 <ul>
 <li>One frequency for the whole region: on a real grid, machines in different places swing against each other along the power lines.</li>
-<li>Governors have dead bands and limits, and many plants run with no spare capacity at all.</li>
-<li>Real load-shedding programmes cut customers in several smaller steps.</li>
-<li>Real AGC also watches the power flowing to neighbouring regions, not only the frequency.</li>
-<li>Voltage, which can collapse on its own, is not modelled; Analyst lesson <a href="a17-physical-feasibility.html">A17</a> makes first estimates of steady voltages and line loadings with short formulas, not a power flow.</li>
+<li>Real governors ignore very small frequency changes (a dead band) and have limits, and many plants run with no spare capacity at all.</li>
+<li>Real load-shedding programs cut customers in several smaller steps.</li>
+<li>Real AGC also watches the power flowing to neighboring regions, not only the frequency.</li>
+<li>Voltage, which can collapse on its own, is not modeled; Analyst lesson <a href="a17-physical-feasibility.html">A17</a> makes first estimates of steady voltages and line loadings with short formulas, not a power flow.</li>
 </ul>
 </div>
 </details>
@@ -173,15 +191,18 @@ Scheduling and planning models usually skip these seconds and keep a rule instea
 <details class="lx-answer"><summary>Answer</summary><p>Fact. The first-second fall rate is proportional to the lost power divided by the stored energy: half the inertia, twice the speed.</p></details>
 </div>
 <div class="lx-qq" data-id="uri" data-answer="myth">
-<p class="lx-qtext">Myth or fact? “The February 2021 Texas outages were caused by frozen wind turbines.”</p>
+<p class="lx-qtext">Myth or fact? “The February 2021 Texas outages were caused only by frozen wind turbines.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. Every kind of plant failed. Of the 1,045 units with outages across ERCOT, SPP and MISO South, 58% were gas-fired, 27% wind and 6% coal: shares of units, not of lost MW (FERC–NERC report, 2021, p. 15).</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. Frozen wind turbines played a part, but every kind of plant failed (FERC–NERC report, 2021, p. 15).</p>
+<table class="lx-mini-table"><caption>The 1,045 units with outages across ERCOT, SPP and MISO South, by fuel: shares of units, not of lost MW</caption>
+<thead><tr><th scope="col">Gas-fired</th><th scope="col">Wind</th><th scope="col">Coal</th></tr></thead>
+<tbody><tr><td>58%</td><td>27%</td><td>6%</td></tr></tbody></table></details>
 </div>
 </div>
 
 <div class="lx-quiz" data-quiz="l3">
 <div class="lx-qq" data-id="rocof" data-answer="b">
-<p class="lx-qtext">A 200 MW plant trips on a grid storing 20 GW·s (20,000 MW·s) of rotational energy. How fast does the frequency fall in the first instant?</p>
+<p class="lx-qtext">A 200 MW plant trips on a grid storing 20 GW·s (20,000 MW·s) of rotational energy. How fast does the frequency fall in the first instant? Use: fall rate = 60 × lost MW ÷ (2 × stored MW·s).</p>
 <ul class="lx-choices"><li data-value="a">0.03 Hz per second</li><li data-value="b">0.3 Hz per second</li><li data-value="c">3 Hz per second</li><li data-value="d">0.6 Hz per second</li></ul>
 <details class="lx-answer"><summary>Answer</summary><p>0.3 Hz per second: 60 × 200 ÷ (2 × 20,000) = 0.3. Twice the lost power or half the inertia doubles it.</p></details>
 </div>
@@ -230,7 +251,7 @@ Scheduling and planning models usually skip these seconds and keep a rule instea
 ```{=html}
 <div class="lx-card lx-real">
 <p class="lx-eyebrow">In the real world</p>
-<p><b>Across the region.</b> In ERCOT, SPP and MISO South, 1,045 generating units had 4,124 outages, derates or failures to start; three-quarters came from freezing or fuel problems.</p>
+<p><b>Across the region.</b> In ERCOT, SPP and MISO South, 1,045 generating units had 4,124 outages, <span class="lx-term" data-term="derate">derates</span> or failures to start; three-quarters came from freezing or fuel problems.</p>
 <p><b>In Texas.</b> Plants failed faster than the reserve could be rebuilt, so operators cut customers by hand to hold the frequency.</p>
 <p><b>Next.</b> Lesson 4 looks at the forecasts that tell operators how much reserve to hold.</p>
 </div>

@@ -50,12 +50,12 @@ body-classes: "page-learn page-lesson lx-form-play"
 <path d="M46.0,103.3V103.3H73.8V107.4H101.5V110.4H129.3V112.2H157.0V111.6H184.8V111.0H212.5V101.5H240.3V97.3H268.0V93.7H295.8V86.6H323.5V81.8H351.3V73.5H379.0V67.0H406.8V57.4H434.5V49.7H462.3V47.3H490.0V42.0H517.8V44.3H545.5V47.3H573.3V55.1H601.0V62.2H628.8V71.7H656.5V82.4H684.3V91.9H712.0" fill="none" stroke="var(--lx-ink)" stroke-width="2" stroke-dasharray="5 3"/>
 </svg>
 <div class="lx-legend" aria-hidden="true"><span><i style="--c:var(--lx-nuc)"></i>Nuclear</span><span><i style="--c:var(--lx-solar)"></i>Solar</span><span><i style="--c:var(--lx-wind)"></i>Wind</span><span><i style="--c:var(--lx-cc)"></i>Gas combined-cycle</span><span><i style="--c:var(--lx-pk)"></i>Gas peaker</span><span><i class="line"></i>Demand</span></div>
-<details class="lx-textalt"><summary>Text version: the day as a table, in MW</summary><div class="lx-scroll-x"><table class="lx-mini-table"><thead><tr><th scope="col">Hour</th><th scope="col">Demand</th><th scope="col">Nuclear</th><th scope="col">Wind</th><th scope="col">Solar</th><th scope="col">Gas CC</th><th scope="col">Peaker</th><th scope="col">Spilled</th></tr></thead><tbody><tr><td>00:00</td><td>250</td><td>100</td><td>30</td><td>0</td><td>120</td><td>0</td><td>0</td></tr><tr><td>01:00</td><td>243</td><td>100</td><td>28</td><td>0</td><td>115</td><td>0</td><td>0</td></tr><tr><td>02:00</td><td>238</td><td>100</td><td>28</td><td>0</td><td>110</td><td>0</td><td>0</td></tr><tr><td>03:00</td><td>235</td><td>100</td><td>30</td><td>0</td><td>105</td><td>0</td><td>0</td></tr><tr><td>04:00</td><td>236</td><td>100</td><td>36</td><td>0</td><td>100</td><td>0</td><td>0</td></tr><tr><td>05:00</td><td>237</td><td>100</td><td>42</td><td>0</td><td>95</td><td>0</td><td>0</td></tr><tr><td>06:00</td><td>253</td><td>100</td><td>43</td><td>0</td><td>110</td><td>0</td><td>0</td></tr><tr><td>07:00</td><td>260</td><td>100</td><td>48</td><td>7</td><td>105</td><td>0</td><td>0</td></tr><tr><td>08:00</td><td>266</td><td>100</td><td>40</td><td>61</td><td>65</td><td>0</td><td>15</td></tr><tr><td>09:00</td><td>278</td><td>100</td><td>35</td><td>118</td><td>25</td><td>0</td><td>0</td></tr><tr><td>10:00</td><td>286</td><td>100</td><td>36</td><td>130</td><td>20</td><td>0</td><td>0</td></tr><tr><td>11:00</td><td>300</td><td>100</td><td>38</td><td>147</td><td>15</td><td>0</td><td>0</td></tr><tr><td>12:00</td><td>311</td><td>100</td><td>35</td><td>156</td><td>20</td><td>0</td><td>0</td></tr><tr><td>13:00</td><td>327</td><td>100</td><td>33</td><td>149</td><td>45</td><td>0</td><td>0</td></tr><tr><td>14:00</td><td>340</td><td>100</td><td>33</td><td>112</td><td>85</td><td>10</td><td>0</td></tr><tr><td>15:00</td><td>344</td><td>100</td><td>37</td><td>147</td><td>60</td><td>0</td><td>0</td></tr><tr><td>16:00</td><td>353</td><td>100</td><td>47</td><td>161</td><td>45</td><td>0</td><td>0</td></tr><tr><td>17:00</td><td>349</td><td>100</td><td>54</td><td>130</td><td>65</td><td>0</td><td>0</td></tr><tr><td>18:00</td><td>344</td><td>100</td><td>59</td><td>70</td><td>105</td><td>10</td><td>0</td></tr><tr><td>19:00</td><td>331</td><td>100</td><td>72</td><td>14</td><td>145</td><td>0</td><td>0</td></tr><tr><td>20:00</td><td>319</td><td>100</td><td>89</td><td>0</td><td>130</td><td>0</td><td>0</td></tr><tr><td>21:00</td><td>303</td><td>100</td><td>98</td><td>0</td><td>105</td><td>0</td><td>0</td></tr><tr><td>22:00</td><td>285</td><td>100</td><td>95</td><td>0</td><td>90</td><td>0</td><td>0</td></tr><tr><td>23:00</td><td>269</td><td>100</td><td>89</td><td>0</td><td>80</td><td>0</td><td>0</td></tr></tbody></table></div></details>
+<details class="lx-textalt"><summary>Text version: the day as a table, in MW</summary><div class="lx-scroll-x"><table class="lx-mini-table"><thead><tr><th scope="col">Hour</th><th scope="col">Demand</th><th scope="col">Nuclear</th><th scope="col">Wind used</th><th scope="col">Solar used</th><th scope="col">Gas combined-cycle</th><th scope="col">Gas peaker</th><th scope="col">Wind and solar spilled</th></tr></thead><tbody><tr><td>00:00</td><td>250</td><td>100</td><td>30</td><td>0</td><td>120</td><td>0</td><td>0</td></tr><tr><td>01:00</td><td>243</td><td>100</td><td>28</td><td>0</td><td>115</td><td>0</td><td>0</td></tr><tr><td>02:00</td><td>238</td><td>100</td><td>28</td><td>0</td><td>110</td><td>0</td><td>0</td></tr><tr><td>03:00</td><td>235</td><td>100</td><td>30</td><td>0</td><td>105</td><td>0</td><td>0</td></tr><tr><td>04:00</td><td>236</td><td>100</td><td>36</td><td>0</td><td>100</td><td>0</td><td>0</td></tr><tr><td>05:00</td><td>237</td><td>100</td><td>42</td><td>0</td><td>95</td><td>0</td><td>0</td></tr><tr><td>06:00</td><td>253</td><td>100</td><td>43</td><td>0</td><td>110</td><td>0</td><td>0</td></tr><tr><td>07:00</td><td>260</td><td>100</td><td>48</td><td>7</td><td>105</td><td>0</td><td>0</td></tr><tr><td>08:00</td><td>266</td><td>100</td><td>40</td><td>61</td><td>65</td><td>0</td><td>15</td></tr><tr><td>09:00</td><td>278</td><td>100</td><td>35</td><td>118</td><td>25</td><td>0</td><td>0</td></tr><tr><td>10:00</td><td>286</td><td>100</td><td>36</td><td>130</td><td>20</td><td>0</td><td>0</td></tr><tr><td>11:00</td><td>300</td><td>100</td><td>38</td><td>147</td><td>15</td><td>0</td><td>0</td></tr><tr><td>12:00</td><td>311</td><td>100</td><td>35</td><td>156</td><td>20</td><td>0</td><td>0</td></tr><tr><td>13:00</td><td>327</td><td>100</td><td>33</td><td>149</td><td>45</td><td>0</td><td>0</td></tr><tr><td>14:00</td><td>340</td><td>100</td><td>33</td><td>112</td><td>85</td><td>10</td><td>0</td></tr><tr><td>15:00</td><td>344</td><td>100</td><td>37</td><td>147</td><td>60</td><td>0</td><td>0</td></tr><tr><td>16:00</td><td>353</td><td>100</td><td>47</td><td>161</td><td>45</td><td>0</td><td>0</td></tr><tr><td>17:00</td><td>349</td><td>100</td><td>54</td><td>130</td><td>65</td><td>0</td><td>0</td></tr><tr><td>18:00</td><td>344</td><td>100</td><td>59</td><td>70</td><td>105</td><td>10</td><td>0</td></tr><tr><td>19:00</td><td>331</td><td>100</td><td>72</td><td>14</td><td>145</td><td>0</td><td>0</td></tr><tr><td>20:00</td><td>319</td><td>100</td><td>89</td><td>0</td><td>130</td><td>0</td><td>0</td></tr><tr><td>21:00</td><td>303</td><td>100</td><td>98</td><td>0</td><td>105</td><td>0</td><td>0</td></tr><tr><td>22:00</td><td>285</td><td>100</td><td>95</td><td>0</td><td>90</td><td>0</td><td>0</td></tr><tr><td>23:00</td><td>269</td><td>100</td><td>89</td><td>0</td><td>80</td><td>0</td><td>0</td></tr></tbody></table></div></details>
 <!-- fallback-svg:end -->
 <p class="lx-hint">With JavaScript on, you run this day yourself: set two gas plants, hour by hour, so that supply equals demand.</p>
 </div>
 </div>
-<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span>Demand, wind and solar follow the real hourly shapes of 3 September 2025 on the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), scaled to the town. Prairie Town, its plants, prices and CO₂ rates are illustrative; CO₂ counts fuel burned at the plants only.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Data:</b> real hourly shapes of demand, wind and solar from the Southwest Power Pool grid on 3 September 2025 (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), scaled to the town.<br><b>Model:</b> Prairie Town, its plants, prices and CO₂ rates are illustrative; CO₂ counts fuel burned at the plants only.</span></p>
 ```
 :::
 
@@ -86,9 +86,9 @@ body-classes: "page-learn page-lesson lx-form-play"
 <div class="lx-deeper-body">
 ```
 
-For every hour $t$, with $p_g(t)$ the output of plant $g$ in MW, $u(t)$ the [unserved]{.lx-term term="unserved-energy"} demand, $s(t)$ the [spilled]{.lx-term term="curtailment"} power and $d(t)$ the demand:
+For every hour $t$: $p_g(t)$ is what plant $g$ actually makes, in MW (wind and solar make at most what the weather allows; the rest is [spilled]{.lx-term term="curtailment"}); $u(t)$ is [unserved]{.lx-term term="unserved-energy"} demand, $o(t)$ any power made beyond demand, and $d(t)$ the demand:
 
-$$\sum_g p_g(t) + u(t) - s(t) = d(t).$$
+$$\sum_g p_g(t) + u(t) - o(t) = d(t).$$
 
 Energy, cost and CO₂ are sums over the hours, with $\Delta t = 1$ hour, a running cost $c_g$ in \$/MWh and an operating emission rate $e_g$ in t/MWh (t = metric tonnes):
 
@@ -107,7 +107,7 @@ Check it on the cheapest-first rule's day:
 <summary><span class="k">Go deeper · Modeler</span>Preview: the operator's day as an optimization problem</summary>
 <div class="lx-deeper-body">
 <dl class="lx-ideas">
-<dt>Decisions</dt><dd>Each gas plant's output, every hour: 48 numbers.</dd>
+<dt>Decisions</dt><dd>Each hour: each gas plant's output, and how much surplus wind and solar to <span class="lx-term" data-term="curtailment">spill</span>.</dd>
 <dt>Goal</dt><dd>The lowest gas running cost for the day. The flat nuclear output costs the same in every plan, so the goal leaves it out.</dd>
 <dt>Rules</dt><dd>Supply equals demand each hour; each plant stays within its size; the combined-cycle changes by at most 40 MW an hour, starting from 115 MW at midnight.</dd>
 </dl>
@@ -121,7 +121,7 @@ $$\min \; \sum_{t} \big( 40\,p_\mathrm{cc}(t) + 100\,p_\mathrm{pk}(t) \big)$$
 | Running cost | \$104,400 | \$104,000 |
 | Peaker energy | 20 MWh | 0 MWh |
 
-Planning saves \$400, about 0.4%, by warming the combined-cycle plant up before the solar dip and the sunset.
+Planning saves \$400, about 0.4%: it raises the combined-cycle plant's output earlier, before the solar dip and the sunset, and accepts spilling 20 MWh more wind and solar.
 
 Every rule and the goal add up outputs times fixed numbers, so this is a [linear program]{.lx-term term="linear-program"}. [Lesson 10](10-write-it-down.qmd) writes it down step by step; [lesson 11](11-solver.qmd) hands it to a solver.
 
@@ -132,7 +132,7 @@ Every rule and the goal add up outputs times fixed numbers, so this is a [linear
 <summary><span class="k">Go deeper</span>What the game leaves out</summary>
 <div class="lx-deeper-body">
 <ul>
-<li>Prairie Town is an island: it cannot buy power from its neighbours.</li>
+<li>Prairie Town is an island: it cannot buy power from its neighbors.</li>
 <li>The forecast is perfect; real operators plan with forecasts that miss (lesson 4).</li>
 <li>The game moves in one-hour steps; real grids balance second by second (lesson 3).</li>
 <li>Nothing breaks: plants never fail, and power lines never fill up.</li>
@@ -163,9 +163,9 @@ Every rule and the goal add up outputs times fixed numbers, so this is a [linear
 <details class="lx-answer"><summary>Answer</summary><p>Fact. Extra power speeds up the spinning generators, so the <span class="lx-term" data-term="frequency">frequency</span> climbs above 60 Hz.</p></details>
 </div>
 <div class="lx-qq" data-id="wind" data-answer="myth">
-<p class="lx-qtext">Myth or fact? “A wind farm can be told to make more power when demand rises.”</p>
+<p class="lx-qtext">Myth or fact? “A wind farm can always make more power when demand rises.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. A wind farm can be turned down, but not up beyond what the wind allows: that is what <span class="lx-term" data-term="variable-renewables">variable</span> means.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. It can give back output it was told to turn down, but never more than the wind allows: that is what <span class="lx-term" data-term="variable-renewables">variable</span> means.</p></details>
 </div>
 </div>
 
@@ -198,8 +198,8 @@ Every rule and the goal add up outputs times fixed numbers, so this is a [linear
 <tbody>
 <tr><td class="n">60 Hz</td><td>The frequency North American grids are designed to hold.</td><td class="s"><a href="https://www.eia.gov/todayinenergy/detail.php?id=3990">EIA, Today in Energy</a> · design standard; checked 2 Nov 2026</td></tr>
 <tr><td class="n">63</td><td>Balancing authorities in the contiguous U.S., each keeping supply equal to demand in its area.</td><td class="s"><a href="https://www.eia.gov/survey/frn/electricity/FRN-30-Day-Electricity-March-23-2026.pdf">EIA notice on Form EIA-930</a> (PDF) · as of March 2026</td></tr>
-<tr><td class="n">759 GW</td><td>Record peak demand of the Lower 48 states, set on 29 July 2025 (preliminary).</td><td class="s"><a href="https://www.eia.gov/todayinenergy/detail.php?id=65864">EIA, Today in Energy</a> · as of August 2025</td></tr>
-<tr><td class="n">4.20 trillion kWh</td><td>U.S. electricity use in 2025, the highest on record.</td><td class="s"><a href="https://www.eia.gov/energyexplained/electricity/use-of-electricity.php">EIA, Energy Explained</a> · data for 2025</td></tr>
+<tr><td class="n">759 GW</td><td>Record peak demand of the Lower 48 states, set on 29 July 2025 (preliminary). A <span class="lx-term" data-term="gigawatt">GW</span> is 1,000 MW.</td><td class="s"><a href="https://www.eia.gov/todayinenergy/detail.php?id=65864">EIA, Today in Energy</a> · as of August 2025</td></tr>
+<tr><td class="n">4.20 trillion kWh</td><td>U.S. electricity use in 2025, the highest on record. A <span class="lx-term" data-term="kilowatt-hour">kWh</span> is 1/1,000 of an MWh.</td><td class="s"><a href="https://www.eia.gov/energyexplained/electricity/use-of-electricity.php">EIA, Energy Explained</a> · data for 2025</td></tr>
 <tr><td class="n">10,791 kWh</td><td>Electricity bought by an average U.S. home in a year, about 899 kWh a month.</td><td class="s"><a href="https://www.eia.gov/tools/faqs/faq.php?id=97&amp;t=3">EIA, Frequently Asked Questions</a> · data for 2022</td></tr>
 </tbody>
 </table>
@@ -221,7 +221,7 @@ Every rule and the goal add up outputs times fixed numbers, so this is a [linear
 ```{=html}
 <div class="lx-card lx-real">
 <p class="lx-eyebrow">In the real world</p>
-<p><b>CO₂ per MWh.</b> Each hour's <span class="lx-term" data-term="carbon-intensity">CO₂ per MWh</span> depends on the mix. Under the cheapest-first rule, gas output peaks at 19:00, but CO₂ per MWh peaks at 00:00: gas is a bigger share of a smaller demand.</p>
+<p><b><span class="lx-term" data-term="carbon-intensity">CO₂ per MWh</span></b> depends on each hour's mix. Under the cheapest-first rule, gas output peaks at 19:00, but CO₂ per MWh peaks at 00:00: gas is a bigger share of a smaller demand.</p>
 <p><b>Real data.</b> U.S. grids report hourly demand and generation by fuel in EIA's <a href="https://www.eia.gov/electricity/gridmonitor/">Hourly Electric Grid Monitor</a>.</p>
 <p><b>Open code.</b> My <a href="https://github.com/Henryutd2021/ghg-load-regulation">open framework for carbon-aware electricity use</a> builds on those data.</p>
 <p class="lx-hint">Case file <a href="cf6-shifting-load-to-clean-hours.html">CF6</a> (average and marginal emission factors, and when moving electricity use to cleaner hours lowers CO₂).</p>

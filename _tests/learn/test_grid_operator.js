@@ -158,7 +158,7 @@ const save = T.cost - opt.totals.cost, pct = 100 * save / T.cost;
   const allowed = {
     MW: new Set([F.nuclear.mw, F.wind.mw, F.solar.mw, F.cc.mw, F.peaker.mw, F.cc.ramp, G.startCC /* Modeler preview */, q.demand, q.nuclear, q.wind, need21,
                  50, /* quiz 2 */ q.demand - q.nuclear, need21 + 100 /* quiz 1 distractors */]),
-    MWh: new Set([T.nuclear, T.cc, T.pk, opt.totals.pk, 150, 50, 53 /* quiz 2 answer and distractors */]),
+    MWh: new Set([T.nuclear, T.cc, T.pk, opt.totals.pk, opt.totals.curtailed - T.curtailed /* Modeler preview: extra spill */, 150, 50, 53 /* quiz 2 answer and distractors */]),
     "$": new Set([T.cost, opt.totals.cost, save]), t: new Set([+T.co2.toFixed(1)]), Hz: new Set([60, G.hzPerMW, G.hzLimit]), "%": new Set([+pct.toFixed(1)])
   };
   const rx = /(\$?)(\d[\d,]*(?:\.\d+)?)(?:\\?\{,\}\d+)?\s*(MWh|MW|Hz|%|t\b)?/g;
@@ -239,6 +239,23 @@ const save = T.cost - opt.totals.cost, pct = 100 * save / T.cost;
   const fb = (QMD.match(/<!-- fallback-svg:start -->[\s\S]*?<!-- fallback-svg:end -->/) || [""])[0];
   ok((fb.match(/<tr><td>/g) || []).length === H && fb.indexOf("lx-textalt") >= 0, "accessibility: the static fallback carries a 24-hour text table");
   ok(QMD.indexOf("ANSI") < 0 && QMD.indexOf("p. A-6") >= 0 && JS.indexOf("DOE, July 2015, p. 12") >= 0, "voltages: DOE sources with date and page; no undated ANSI reference");
+  // the full-day optimum also turns down surplus wind and solar, and the preview names that decision
+  const optSpill = opt.hours.filter(r => r.curtailed > 0).map(r => r.t);
+  ok(optSpill.length > 0 && opt.totals.over === 0, `optimum: spills surplus wind and solar at ${optSpill.join(", ")}:00, never extra gas`);
+  ok(opt.totals.curtailed - T.curtailed === 20 && QMD.indexOf("how much surplus wind and solar to") >= 0 && QMD.indexOf("accepts spilling 20 MWh more wind and solar") >= 0,
+     `page: the preview's decisions include spilling; the plan spills ${opt.totals.curtailed} MWh against the rule's ${T.curtailed} MWh`);
+  // one convention in the balance equation: p_g is what each plant makes; o(t) is power beyond demand
+  ok(QMD.indexOf("\\sum_g p_g(t) + u(t) - o(t) = d(t)") >= 0 && QMD.indexOf("what plant $g$ actually makes") >= 0, "page: the balance equation uses delivered output and over-supply");
+  ok(ex.hours.every(r => near(r.nuclear + r.wind + r.solar + r.cc + r.pk + r.unserved - r.over, r.demand)), "model: delivered output + unserved - over-supply = demand, every hour");
+  // the model has ramp limits but no warm-up state, so the page never says "warm up"
+  ok(!/warm(ing)? (the|up)|warm the/i.test(QMD) && !/warm the|warming/i.test(JS), "wording: planning raises output earlier; no warm-up state is claimed");
+  // the wind myth carries its qualifier; the frequency note is collected by holding 60 Hz too
+  ok(QMD.indexOf("A wind farm can always make more power when demand rises") >= 0 && QMD.indexOf("never more than the wind allows") >= 0, "check: the wind myth says 'always'");
+  ok(JS.indexOf("Let supply fall short once") < 0 && JS.indexOf("You held 60.00 Hz all day.") >= 0, "debrief: the frequency note never asks the reader to cause a shortage");
+  const facts = (QMD.match(/<table class="lx-facts">[\s\S]*?<\/table>/) || [""])[0];
+  // first-use terms: the two gas plants, voltage, GW and kWh
+  ok(JS.indexOf("[[combined-cycle|Combined-cycle]]") >= 0 && JS.indexOf("[[peaker|Peaker]]") >= 0 && JS.indexOf("[[voltage|Voltage]]") >= 0, "terms: combined-cycle, peaker and voltage marked at first use");
+  ok(facts.indexOf("A <span class=\"lx-term\" data-term=\"gigawatt\">GW</span> is 1,000 MW") >= 0 && facts.indexOf('data-term="kilowatt-hour"') >= 0, "facts table: GW and kWh explained");
 }
 
 // ---------------- stars and share links

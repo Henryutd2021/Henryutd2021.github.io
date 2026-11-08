@@ -49,8 +49,8 @@ function svg() {
   const rows = ex.hours.map(r => `<tr><td>${hh(r.t)}</td><td>${r.demand}</td>` +
     ["nuclear", "wind", "solar", "cc", "pk"].map(k => `<td>${Math.round(r[k])}</td>`).join("") + `<td>${Math.round(r.curtailed)}</td></tr>`).join("");
   const table = `<details class="lx-textalt"><summary>Text version: the day as a table, in MW</summary><div class="lx-scroll-x"><table class="lx-mini-table">` +
-    `<thead><tr><th scope="col">Hour</th><th scope="col">Demand</th><th scope="col">Nuclear</th><th scope="col">Wind</th><th scope="col">Solar</th>` +
-    `<th scope="col">Gas CC</th><th scope="col">Peaker</th><th scope="col">Spilled</th></tr></thead><tbody>${rows}</tbody></table></div></details>`;
+    `<thead><tr><th scope="col">Hour</th><th scope="col">Demand</th><th scope="col">Nuclear</th><th scope="col">Wind used</th><th scope="col">Solar used</th>` +
+    `<th scope="col">Gas combined-cycle</th><th scope="col">Gas peaker</th><th scope="col">Wind and solar spilled</th></tr></thead><tbody>${rows}</tbody></table></div></details>`;
   return out.join("\n") + `\n<div class="lx-legend" aria-hidden="true">${legend}</div>\n${table}`;
 }
 

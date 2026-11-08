@@ -55,7 +55,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <p class="lx-hint">With JavaScript on, you switch a home's appliances on and off, place these amounts on a ladder of units, and test a wind-farm claim.</p>
 </div>
 </div>
-<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span>Appliance powers are typical values, rounded and illustrative. Prairie Town's day is lesson 0's: the real Southwest Power Pool shape of 3 September 2025 (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>) scaled to the town, with lesson 0's hourly MW, which add up to 6,957 MWh. Every other number has a source and a date below.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Appliances:</b> typical powers, rounded and illustrative.<br><b>Prairie Town:</b> lesson 0's day, the real Southwest Power Pool shape of 3 September 2025 (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>) scaled to the town, with lesson 0's hourly MW, which add up to 6,957 MWh.<br><b>Everything else:</b> sourced and dated below.</span></p>
 <p class="lx-hint" style="margin-top:10px">Need a refresher? Toolbox <a href="k01-units.html">K1</a> (units and prefixes, kW against kWh) and <a href="k02-rates-efficiencies.html">K2</a> (rates, such as the average power a home buys).</p>
 ```
 :::
@@ -90,17 +90,17 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-deeper-body">
 ```
 
-When power changes in steps, energy is the sum of power times duration over the steps, in kWh when power is in kW and time in hours:
+When power changes in steps, multiply each step's power by its duration, then add the results. In symbols: $P_i$ is the power during step $i$ (kW), $\Delta t_i$ its duration (h), and $\sum_i$ means "add over every step $i$":
 
-$$E = \sum_i P_i\,\Delta t_i .$$
+$$E = \sum_i P_i\,\Delta t_i \quad \text{(kWh)}.$$
 
 The two jobs: $1.5\ \text{kW} \times \tfrac{10}{60}\ \text{h} = 0.25\ \text{kWh}$ and $0.05\ \text{kW} \times 5\ \text{h} = 0.25\ \text{kWh}$. Same area, very different shapes: a tall thin block and a long low one in the top panel of your chart.
 
 Going the other way, average power is energy divided by time, $\bar P = E / T$. For the U.S. in 2025: $4{,}200\ \text{TWh} \div 8{,}760\ \text{h} \approx 479\ \text{GW}$.
 
-Peak against average needs one data set. The Southwest Power Pool used 298.6 TWh in 2025, an average of 34.1 GW; its peak hour needed 54.4 GW, about 1.6 times the average. [Lesson 2](02-demand.qmd) reads both from the hourly data.
+Peak against average needs one data set. In the course's cleaned copy of EIA's 2025 data (699 implausible demand hours repaired), the Southwest Power Pool used 298.6 TWh in 2025, an average of 34.1 GW; its peak hour needed 54.4 GW, about 1.6 times the average. [Lesson 2](02-demand.qmd) reads both from the hourly data.
 
-Physicists measure energy in joules: $1\ \text{kWh} = 1{,}000\ \text{W} \times 3{,}600\ \text{s} = 3.6\ \text{MJ}$.
+Physicists measure energy in joules: $1\ \text{kWh} = 1{,}000\ \text{W} \times 3{,}600\ \text{s} = 3.6\ \text{MJ}$ (megajoules, millions of joules).
 
 ```{=html}
 </div>
@@ -125,7 +125,7 @@ Storage needs both kinds of number: MW (how fast it charges) and MWh (how much i
 <summary><span class="k">Go deeper</span>What the board leaves out</summary>
 <div class="lx-deeper-body">
 <ul>
-<li>Appliance powers are typical nameplate values; your own appliance's label gives its real one.</li>
+<li>The board gives each appliance one constant electrical power. A label may state its rated or maximum power; the actual draw depends on how it runs.</li>
 <li>Many appliances cycle: a refrigerator or a heater switches on and off under its thermostat, so its average power is below its rating.</li>
 <li>Devices on standby still draw a few watts, all day.</li>
 <li>The board ignores losses in the home's wiring.</li>
@@ -151,12 +151,12 @@ Storage needs both kinds of number: MW (how fast it charges) and MWh (how much i
 <div class="lx-qq" data-id="rating" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “The appliance with the highest power rating always costs the most to run.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. Cost follows energy, power × time: a 50 W laptop for 5 hours uses as much as a 1,500 W hair dryer for 10 minutes.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. At the same price per kWh, cost follows energy, power × time: a 50 W laptop for 5 hours uses as much as a 1,500 W hair dryer for 10 minutes.</p></details>
 </div>
 <div class="lx-qq" data-id="wind" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “A 100 MW wind farm powers 100,000 homes.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth, as stated: it divides 100 MW by 1 kW per home.</p><p>U.S. wind ran at 33.8% of its capacity in 2025. An average home bought 10,791 kWh a year (about 1,232 W on average), so the farm's yearly energy matches what about 27,400 homes buy.</p><p>That is an illustrative equivalent: on calm hours the farm makes little.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth, as stated: it divides 100 MW by 1 kW per home.</p><p>U.S. wind ran at 33.8% of its capacity in 2025. An average home bought 10,791 kWh a year (about 1,232 W on average).</p><p>So the farm's yearly energy matches what about 27,400 homes buy: 100 MW × 33.8% ÷ 1,232 W.</p><p>That is an illustrative equivalent: on calm hours the farm makes little.</p></details>
 </div>
 </div>
 
@@ -213,7 +213,7 @@ Storage needs both kinds of number: MW (how fast it charges) and MWh (how much i
 <p class="lx-eyebrow">In the real world</p>
 <p>Your bill counts kWh.</p>
 <p>EIA's own worked example: a 40 W bulb used for five hours uses 200 Wh, or 0.2 kWh.</p>
-<p>Many business tariffs also charge for the month's highest power, in $/kW. Analyst lesson <a href="a04-retail-tariffs.qmd">A4</a> covers tariffs.</p>
+<p>Many business <span class="lx-term" data-term="tariff">tariffs</span> (electricity pricing plans) also charge for the month's highest power, in $/kW. Analyst lesson <a href="a04-retail-tariffs.qmd">A4</a> covers them.</p>
 </div>
 <div class="lx-card lx-sources">
 <p class="lx-eyebrow">Sources and further reading</p>

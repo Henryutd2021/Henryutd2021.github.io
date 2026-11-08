@@ -140,7 +140,7 @@ const KEYS = ["nuclear", "wind", "solar"];
   ok(int(W.nuclear.perMW) === "7,980" && int(W.wind.perMW) === "2,961" && int(W.solar.perMW) === "2,102", "1 MW: 7,980 / 2,961 / 2,102 MWh");
   ok(int(W.nuclear.homesPerMW) === "740" && int(W.wind.homesPerMW) === "274" && int(W.solar.homesPerMW) === "195", "homes: 740 / 274 / 195");
   ok(int(W.applyMWh) === "444,132", "apply: 150 MW x 8,760 h x 0.338 = 444,132 MWh");
-  ok(JS.indexOf("8,760 hours of 2025, it would make 8,760 MWh") >= 0, "step 7 text: 8,760 h and MWh");
+  ok(JS.indexOf("8,760 hours of 2025, 1 MW would make 8,760 MWh in the year") >= 0, "step 7 text: 8,760 h and MWh");
   ok(JS.indexOf("32.5 days in spring") >= 0, "year step note: the 32.5-day outage");
   ok(JS.indexOf("enough for about") < 0 && JS.indexOf("yearly electricity purchases of about") >= 0 && JS.indexOf("not supply in every hour") >= 0, "homes: a yearly energy match, not hourly supply");
   ok(/residential utility customer/.test(D.sources.eia_homes.as_of) && /residential customer/.test(QMD), "homes: EIA's denominator is a residential customer");
@@ -183,6 +183,11 @@ const KEYS = ["nuclear", "wind", "solar"];
   });
   ok(QMD.indexOf("best $C_p$, 0.52") >= 0 && QMD.indexOf("capped at 1,500 kW") >= 0 && MS.ratedKW === 1500, "measured: page states Cp 0.52 and 1,500 kW");
   ok(Math.round(Math.PI * 50 * 50) === 7854, "Go deeper: a 100 m rotor sweeps 7,854 m²");
+  // the wind-power formula gives watts; the page says so and converts to kW
+  ok(Math.round(M.windPower(12, tb) * 1000 / 1000) === 8313 && QMD.indexOf("With the units below this gives watts; divide by 1,000 for kilowatts.") >= 0 && QMD.indexOf("about 8,313,000 W, or 8,313 kW") >= 0, "Go deeper: ½ρAv³ in watts, divided by 1,000 for kW");
+  // the measured curve's vocabulary: bins and one standard deviation of the records, not an error bar on the mean
+  ok(QMD.indexOf("(a 0.5 m/s bin)") >= 0 && /term="standard-deviation"/.test(QMD) && QMD.indexOf("not an error bar on the average") >= 0 && !/±1 SD/.test(QMD + JS), "measured curve: bin and standard deviation explained; no bare 'SD'");
+  ok(/two stated exceptions, for which it added uncertainty/.test(MS.about) && /section 8\.1/.test(MS.about) && !/The test met the IEC/.test(MS.about), "measured: the data file states the report's two exceptions to IEC 61400-12-1");
 }
 
 // ---------------- every number with a unit in the page's prose matches the model, the data file or a quiz option
@@ -199,7 +204,7 @@ const KEYS = ["nuclear", "wind", "solar"];
     "%": new Set([91.1, 33.8, 24.0, 100, 48.0, 12.0, +(W.dayCF * 100).toFixed(1)].concat(
       [Math.min(...m12("wind")), Math.max(...m12("wind")), Math.min(...m12("solar")), Math.max(...m12("solar")), Math.min(...m12("nuclear")), Math.max(...m12("nuclear"))])),
     "MW": new Set([3, 50, 1, 100, D.measured.ratedKW / 1000]), "kW": new Set([8313, tb.ratedKW, D.measured.ratedKW]),
-    "m/s": new Set([tb.cutIn, tb.ratedSpeed, tb.cutOut, 8, 10, D.measured.ratedSpeed]), "h": new Set([8760]), "hours": new Set([8760])
+    "m/s": new Set([tb.cutIn, tb.ratedSpeed, tb.cutOut, 8, 10, D.measured.ratedSpeed, /Bins of 0\.5 m\/s/.test(D.measured.about) ? 0.5 : NaN]), "h": new Set([8760]), "hours": new Set([8760])
   };
   ok(+(105120 / (50 * 8760) * 100).toFixed(1) === 24.0 && near(7980, Math.round(8760 * T.nuclear)), "quiz answers: 24.0% and 7,980 MWh");
   ok(int(W.nuclear.energy) === "798,000" && int(W.wind.energy) === "296,088" && int(W.solar.energy) === "210,240" && int(P * H) === "876,000", "fallback table energies from the model");

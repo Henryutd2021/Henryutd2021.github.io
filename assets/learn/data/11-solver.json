@@ -1,5 +1,5 @@
 {
-  "about": "Lesson 11 (T11, 11-solver). Prairie Town is fictional; its plants, costs and the unserved-energy penalty are illustrative. The day is lesson 0's (3 September 2025, SPP shapes from EIA-930 in town_year.json). 'rule', 'signError', 'threshold' and 'precomputed' are computed from lesson 0's model and this lesson's model, solved with HiGHS 1.15.1, and checked against fresh solves; the page solves live and uses 'precomputed' only if the solver cannot load.",
+  "about": "Lesson 11 (T11, 11-solver). Prairie Town is fictional; its plants, costs and the unserved-energy penalty are illustrative. The day is lesson 0's (3 September 2025, SPP shapes from EIA-930 in town_year.json). 'rule', 'signError', 'threshold', 'precomputed' and 'milp' are computed from lesson 0's model and this lesson's model with the HiGHS version in 'solver' (the one the page runs), and the lesson's tests check them against fresh solves with that version; the page solves live and uses 'precomputed' only if the solver cannot load.",
   "built": "2026-11-02",
   "penalty": 3000,
   "penaltyNote": "Cost per MWh of unserved demand: a large illustrative number so that the solver keeps the lights on whenever it can.",
@@ -34,7 +34,7 @@
   "facts": [
     {
       "n": "MIT",
-      "what": "HiGHS, the solver on this page, is open source under the MIT licence; it solves linear programs by simplex, interior point or first-order methods, and mixed-integer programs by branch-and-cut.",
+      "what": "HiGHS, the solver on this page, is open source under the MIT license and solves linear and mixed-integer programs.",
       "source": "HiGHS documentation",
       "url": "https://ergo-code.github.io/HiGHS/dev/",
       "asof": "checked 2 Nov 2026"
@@ -169,5 +169,6 @@
     "lpPk": 35,
     "cost": 107200,
     "pk": 0
-  }
+  },
+  "solver": "HiGHS 1.15.4"
 }

@@ -16,7 +16,8 @@
 //   load-duration  the 8,760 hours sorted from highest to lowest; hours above a line; the share of the year's energy
 //                  that lies above the line, sum(max(0, d - line)) / sum(d)
 //   load factor    average / peak
-//   duck curve     net demand(t) = demand(t) - S x solar shape(t); its midday low, and the steepest 3-hour climb after noon
+//   duck curve     net demand(t) = demand(t) - S x solar shape(t); its daytime low (lowest hour from 06:00 to 18:00; the
+//                  day's own low can come at night), and the steepest 3-hour climb after noon
 // Every number the page states comes from this model or from the sourced anchors; _tests/learn/test_02-demand.js checks
 // them against the .qmd, and checks the clock against the separately stored days of town_days.json.
 //
@@ -106,6 +107,14 @@
     return { S: S, net: net, solar: d.solar.map(function (v) { return v * S; }), min: net[tmin], tmin: tmin, ramp: best, rampFrom: from, rampTo: from + 3,
              peak: net[tpk], tpeak: tpk, neg: net.filter(function (v) { return v < -1e-9; }).length };
   }
+  // step 7's readouts at any farm size S: the daytime low and the climb, apart; the surplus note only when solar alone
+  // exceeds demand (written at every slider value, so they never describe an earlier setting)
+  function duckReadout(Wd, S) {
+    var k = duck(Wd, S);
+    return { k: k, low: "Daytime low (06:00–18:00): " + num(k.min) + " MW at " + hh(k.tmin) + ".",
+             climb: "Steepest three-hour climb after noon: +" + num(k.ramp) + " MW, " + hh(k.rampFrom) + " to " + hh(k.rampTo) + ".",
+             surplus: k.neg ? "For " + k.neg + " hours solar alone exceeds demand: the surplus must be spilled, stored or exported." : "" };
+  }
   function predictAnswer(D, Wd) { var o = D.predict.options; return o.reduce(function (b, x) { return Math.abs(x - Wd.s.tmax) < Math.abs(b - Wd.s.tmax) ? x : b; }, o[0]); }
   function weekLabel(Wd, k) {
     var w = Wd.weeks[k], a = new Date(w.start + "T00:00:00Z"), b = new Date(a.getTime() + 6 * 86400000);
@@ -142,7 +151,7 @@
     });
     return s + "</svg>";
   }
-  var model = { MON: MON, MONTH: MONTH, num: num, hh: hh, clock: clock, prepare: prepare, hoursAbove: hoursAbove, energyAbove: energyAbove, duck: duck,
+  var model = { MON: MON, MONTH: MONTH, num: num, hh: hh, clock: clock, prepare: prepare, hoursAbove: hoursAbove, energyAbove: energyAbove, duck: duck, duckReadout: duckReadout,
                 predictAnswer: predictAnswer, weekLabel: weekLabel, weekStats: weekStats, weekTicks: weekTicks, lineReadout: lineReadout, fallbackSVG: fallbackSVG,
                 niceUp: niceUp, argmax: argmax, argmin: argmin };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
@@ -311,7 +320,7 @@
     var duckChart = hourly(H("div"), {
       n: function () { return 24; }, yMax: niceUp(Wd.PK),
       title: function () { return Wd.duckDay.label + ": demand, solar and net demand"; },
-      label: function () { var k = duck(Wd, solarMW); return "With " + solarMW + " MW of solar on " + Wd.duckDay.label + ", net demand falls to " + num(k.min) + " MW at " + hh(k.tmin) + " and climbs " + num(k.ramp) + " MW from " + hh(k.rampFrom) + " to " + hh(k.rampTo) + "."; },
+      label: function () { var k = duck(Wd, solarMW); return "With " + solarMW + " MW of solar on " + Wd.duckDay.label + ", net demand's lowest hour between 06:00 and 18:00 is " + num(k.min) + " MW at " + hh(k.tmin) + "; its steepest three-hour climb after noon is " + num(k.ramp) + " MW, from " + hh(k.rampFrom) + " to " + hh(k.rampTo) + "."; },
       series: function () {
         var k = duck(Wd, solarMW);
         return [{ label: "Demand", color: "var(--lx-ink-3)", values: Wd.duckDay.demand, dash: "6 4", width: 2 },
@@ -419,20 +428,23 @@
           }
           sl.set(P.thr || D.threshold.start); upd();
         } },
-      { text: Wd.duckDay.label + " was mild and sunny. Slide Prairie Town's solar farm up and watch [[net-demand|net demand]]: the demand left for other plants after solar.",
+      { text: Wd.duckDay.label + " was mild and sunny. Slide Prairie Town's solar farm up and watch [[net-demand|net demand]]: the demand left after subtracting solar.",
         build: function (act, api) {
           year.thr(null);
           var sl = LX.Slider(act, { label: "Solar farm", min: D.solar.min, max: D.solar.max, step: D.solar.step, unit: "MW", color: "var(--lx-solar)",
-            hint: function () { return "Illustrative: the farm's output in SPP's top solar hour of 2025, not a nameplate rating. Lesson 0's farm: " + townSolar + " MW."; },
+            hint: function () { return "Illustrative: the farm's output in SPP's top solar hour of 2025, not its rated maximum. Lesson 0's farm: " + townSolar + " MW."; },
             onChange: function (v) { solarMW = v; upd(); } });
+          var out = H("div", { class: "t2-read", "aria-live": "polite" }, act);
           attach(act, duckChart);
           function upd() {
             duckChart.render(); keep("solar", solarMW);
-            var k = duck(Wd, solarMW);
+            var r = duckReadout(Wd, solarMW);
+            out.innerHTML = "";
+            H("p", { text: r.low }, out); H("p", { text: r.climb }, out);
+            if (r.surplus) H("p", { class: "lx-hint", text: r.surplus }, out);
             if (solarMW >= D.solar.target) {
               api.done(); LX.progress.done(LESSON); toExplain(act);
-              api.saw("With " + solarMW + " MW of solar, net demand falls to " + num(k.min) + " MW at " + hh(k.tmin) + ". Its steepest three-hour climb after noon is " + num(k.ramp) + " MW, " + hh(k.rampFrom) + " to " + hh(k.rampTo) +
-                ": the [[duck-curve|duck curve]]'s belly and neck." + (k.neg ? " For " + k.neg + " hours solar alone exceeds demand: the surplus must be spilled, stored or exported." : ""));
+              api.saw("The [[duck-curve|duck curve]]: solar digs a midday belly and steepens the evening neck that other plants must climb.");
             }
           }
           sl.set(solarMW); upd();
@@ -486,7 +498,7 @@
               { title: "Buildings soak up heat", text: "Walls and roofs warm all day, so cooling needs often keep rising after noon." },
               { title: "Air conditioners work harder", text: "Millions of units run longer, at the same time." },
               { title: "Demand climbs", text: "Prairie Town, night low to peak.", value: num(s.min) + " → " + num(s.max) + " MW" },
-              { title: "Rarely needed resources are called on", text: "Demand above 90% of the peak comes only in the hottest hours.", value: num(h90) + " h a year" }],
+              { title: "Rarely needed resources are called on", text: "Demand above 90% of the peak comes in only " + num(h90) + " hours of this demand record.", value: num(h90) + " h in 2025" }],
       note: "A typical chain: the data show the demand, not its causes. Prices tend to jump in these hours; lesson 8 shows why."
     });
     // 3. comparison table
@@ -520,11 +532,11 @@
         { id: "calendar", g: "drv", label: "Weeks and seasons", lines: ["Weeks and", "seasons"], at: [2, 0], atN: [2, 0], text: "Weekends run a little lower; summer and winter run higher than spring and autumn.", game: "Step 3: the week slider." },
         { id: "growth", g: "drv", label: "Long-term growth", lines: ["Long-term", "growth"], at: [3, 0], atN: [1, 1], text: "Population, the economy, efficiency, [[electrification|electrification]] and new large loads move demand year by year.", game: "Not in this lesson's single year of data." },
         { id: "demand", g: "dem", label: "Demand (MW)", lines: ["Demand", "(MW)"], at: [1.5, 1], atN: [1, 2], text: "The total power all users draw at a moment. Prairie Town peaks at " + num(Wd.peak) + " MW and averages " + num(Wd.mean) + " MW.", game: "Every curve in the steps." },
-        { id: "daily", g: "read", label: "Daily shape", lines: ["Daily", "shape"], at: [0, 2], atN: [0, 3], text: "Demand hour by hour through one day: one hump in summer, two in winter.", game: "Step 2." },
+        { id: "daily", g: "read", label: "Daily shape", lines: ["Daily", "shape"], at: [0, 2], atN: [0, 3], text: "Demand hour by hour through one day. Our selected summer day has one main hump; our selected winter day has two.", game: "Step 2." },
         { id: "ldc", g: "read", label: "Load-duration curve", lines: ["Load-duration", "curve"], at: [1.5, 2], atN: [1, 3], text: "The year's hours sorted from highest to lowest demand; it shows how many hours each level is needed.", game: "Steps 5 and 6." },
         { id: "peak", g: "read", label: "Peak hour", lines: ["Peak", "hour"], at: [3, 2], atN: [2, 3], text: "The year's highest hour: " + num(Wd.peak) + " MW on " + Wd.summer.label + ".", game: "Step 1, your prediction." },
         { id: "solar", g: "drv", label: "Solar output", lines: ["Solar", "output"], at: [0, 3], atN: [0, 4], text: "Solar panels make power only in daylight, most at midday.", game: "Step 7, the slider." },
-        { id: "net", g: "read", label: "Net demand", lines: ["Net", "demand"], at: [1, 3], atN: [1, 4], text: "Demand minus solar (and, in real grids, wind): what other plants must still supply.", game: "Step 7, the dark line." },
+        { id: "net", g: "read", label: "Net demand", lines: ["Net", "demand"], at: [1, 3], atN: [1, 4], text: "Demand minus solar (and, in real grids, wind). Other plants, storage, imports or lower demand must cover the rest.", game: "Step 7, the dark line." },
         { id: "duck", g: "read", label: "Duck curve", lines: ["Duck", "curve"], at: [2, 3], atN: [2, 4], text: "Net demand on a sunny day: a midday belly and a steep evening neck.", game: "Step 7." },
         { id: "plants", g: "grid", label: "Plants and wires", lines: ["Plants and", "wires"], at: [3, 3], atN: [1, 5], text: "Together they must meet the peak hour, with a margin, and climb the evening ramp.", game: "Step 6: demand above 90% of the peak comes in only " + num(h90) + " hours.", later: "Later: lesson 6 sorts plants by job; lesson 9 shows storage filling the duck's belly." }
       ],

@@ -9,7 +9,7 @@ glossary:
     def: "The ability of a plant, a store or a group of users to raise or lower power quickly when the grid asks."
   - id: firm-share
     term: Firm share (ELCC)
-    def: "The part of a plant's capacity that a grid counts on in its riskiest hours, often estimated as its effective load-carrying capability (ELCC) and set per technology class."
+    def: "The share of a plant's capacity that a grid credits toward its reliability needs, often estimated as its effective load-carrying capability (ELCC) and set per technology class; a planning rating, not output guaranteed in any hour."
   - id: demand-response
     term: Demand response
     def: "Electricity users cutting or shifting their use when the grid asks, usually in return for a payment."

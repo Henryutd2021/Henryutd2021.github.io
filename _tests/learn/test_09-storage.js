@@ -78,6 +78,29 @@ const rnd = () => { seed = (seed * 1103515245 + 12345) % 2147483648; return seed
   const g8 = M.simulate(W, B, W.price.map((p, t) => t === 8 ? -1 : 0), V).hours[8];
   ok(near(g8.fromSpill, 3) && near(g8.fromGas, 22), "hand: at 08:00 full-power charging takes 3 MW of spilled sun and 22 MW of gas");
 
+  // step 4's feedback names the hour's actual charging power: with 95 MWh stored, 09:00 can take only 6.25 MW (3 MW of
+  // spilled sun and 3.25 MW of gas), not the 25 MW rating
+  {
+    const plan = new Array(24).fill(0); [0, 1, 2, 3, 4, 6, 9].forEach(t => { plan[t] = -1; }); plan[5] = 1;
+    const r = M.simulate(W, B, plan, V), h9 = r.hours[9];
+    ok(near(r.hours[6].soc, 95) && near(h9.ch, 6.25) && near(h9.fromSpill, 3) && near(h9.fromGas, 3.25), `hand: with 95 MWh stored, 09:00 charges 6.25 MW: 3 from spilled sun, 3.25 from gas (${h9.ch}, ${h9.fromSpill}, ${h9.fromGas})`);
+    const first = r.hours.filter(x => x.fromGas > 0.5 && W.marginal[x.t] === "spill")[0];
+    ok(first && first.t === 9, "hand: 09:00 is the hour the feedback describes");
+  }
+  const JS9 = fs.readFileSync(L("09-storage.js"), "utf8");
+  ok(/so charging " \+ f1\(gas\.ch\) \+ " MW" \+ \(gas\.ch < B\.P - 0\.05 \? " \(slower: the battery is nearly full\)" : ""\)/.test(JS9), "step 4: the feedback states the hour's actual charging power, and why it is lower");
+  // the strip's prices are the cost of one more MWh without the battery; savings re-run the plants
+  ok(/"Without the battery, one more MWh costs, \$: 0 \(sun spilled\)"/.test(JS9) && /"One more MWh without the battery, \$"/.test(JS9) && /Savings re-run the plants with the battery\./.test(JS9) && /: without the battery, one more MWh costs \$" \+ W\.price\[t\]/.test(JS9),
+     "prices: labelled 'without the battery' in the legend, the tiles' names and the text version");
+  // "best" only from an optimal solve; otherwise the precomputed optimum, labelled as such
+  ok(/var o = r && r\.status === "optimal" \? parseLP\(W, b, r, V\) : null;/.test(JS9) && /The solver stopped before proving the best plan/.test(JS9), "best: only an optimal status counts; an early stop shows the precomputed best, labelled");
+  // both predictions carry their question as an accessible name; the size comparison hides the 100 MWh scene
+  ok(!/q: "", title: false/.test(JS9) && /id: "w9-hours", q: "Flat out, how long can it discharge\?", title: false/.test(JS9) && /id: "w9-when", q: "When should the battery charge\?", title: false/.test(JS9), "predictions: each names its question for assistive technology");
+  ok(/mode = "best"; hook = null; stage\.hidden = true;/.test(JS9) && /"Each bar is a separate " \+ B\.P \+ " MW battery, solved for its own best schedule on "/.test(JS9), "sizes: the scene is hidden and each bar is labelled a separate battery");
+  // midday: the sun alone never exceeds demand; the surplus comes from sun, wind and the flat plant together
+  ok(W.solar.every((s, t) => s < W.demand[t]) && W.gap.some(g => g < 0), "day: the sun alone never exceeds demand, yet some hours have a surplus");
+  ok(!/the sun gives more than the town needs|Sun floods the town/i.test(JS9) && /sun, wind and the flat nuclear plant together make more than the town needs/.test(JS9), "midday: the surplus is named as sun, wind and the flat plant together");
+
   // step 1's feedback: 15 minutes would need E / 0.25 h = 400 MW, 16 times 25 MW
   const hq = M.hoursQuiz(B);
   ok(hq.fast === 400 && hq.fast / B.P === 16 && hq.feedback.a.includes("400 MW, 16 times") && hq.feedback.b.startsWith("4 hours"), `step 1: 15 minutes needs 400 MW, 16 times the rating (${hq.feedback.a})`);
@@ -145,7 +168,8 @@ const rnd = () => { seed = (seed * 1103515245 + 12345) % 2147483648; return seed
     ok(Q.includes(svg), "page: the static fallback figure matches the model");
     [money(b4.save), money(W.base), money(bestHand.save).replace("$", "\\$"), money(b4.save).replace("$", "\\$"), "$96", money(sols[8].save), "only 3 MW of sun is spilled", "takes 22 MW",
      "above \\$50", "four hours", "9 June 2025", "25 MW, 100 MWh", "80%", "$2,800", "80 × $60 = $4,800", "$2,000", "$36 at $45", "selling price above $50",
-     "last 3 MWh of spilled sun", "returns 2.4 MWh at $40", "last 5 MWh remain", "at most 25 MW", "\\$24,000", `\\$${V.toLocaleString("en-US")}/MWh`,
+     "last 3 MWh of spilled sun", "returns 2.4 MWh at $40", "last 5 MWh remain", "at most 25 MW", "Buying 1 MWh for charging at", "lets this battery sell 0.8 MWh later",
+     "the cost of one more MWh without the battery", "Over a full charge and discharge, a battery delivers more electrical energy than it takes in.", "\\$24,000", `\\$${V.toLocaleString("en-US")}/MWh`,
      ...D.durations.map(h => money(sols[h].save)), "$72", "$37", "utility-scale battery storage capacity", "utility-scale battery capacity"].forEach(x => ok(Q.includes(x), `page: states ${x}`));
     ok(24 * f.nuclear.mw * f.nuclear.cost === 24000, "page: the nuclear plant's $24,000 a day");
     D.facts.forEach(fc => ok(Q.includes(fc.url) && Q.includes(fc.n) && Q.includes(fc.asof), `page: number to remember ${fc.n} with its source and date`));

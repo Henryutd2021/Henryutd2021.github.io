@@ -6,7 +6,7 @@ glossary:
     def: "A year's hourly demand sorted from highest to lowest, showing for how many hours each level of demand is needed."
   - id: net-demand
     term: Net demand (net load)
-    def: "Demand minus the output of wind and solar, which is what the other power plants must still supply."
+    def: "Demand left after subtracting wind and solar output; other generation, storage, imports or lower demand must cover it."
   - id: load-factor
     term: Load factor
     def: "Average demand over a period divided by the peak demand in that period."
