@@ -3,8 +3,8 @@
 // Built on the Site Bench (SB0): the plan runs on engine E0 (assets/learn/components/engine-e0.js, LX.E0, in the bundle)
 // through the same bench kit (LX.E0.ui.bench), under its own plan-link key (#c0-v1-...). This file adds the sensitivity
 // chart (LX.Tornado over LX.E0.sensitivity, the equipment held fixed), the one-page note (LX.ReportNote: the reader's
-// three fields plus LX.E0.note, with every bar of the chart in numbers, LX.E0.sensWords), the exemplars (LX.Exemplars)
-// and the self-check (LX.Rubric). The no-JS route gets the default plan's link and sensitivity (data file, reference).
+// three fields plus LX.E0.note, with every bar of the chart as a row of numbers, LX.E0.sensNote), the exemplars
+// (LX.Exemplars, and the strong note assembled with the bench's parts) and the self-check (LX.Rubric). The no-JS route gets the default plan's link and sensitivity (data file, reference).
 // Data: e0.json, town_year.json, cf_targets.json (the engine's), c0-behind-one-meter.json (note fields, exemplars,
 // rubric), path.json (links to other lessons).
 // The no-JS blocks (the plan's controls, the default plan's link, sensitivity and results, the note's outline, the
@@ -13,8 +13,8 @@
   "use strict";
   // ---------------------------------------------------------------- pure (no DOM; exported for Node)
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
-  // the note's sensitivity part: every bar of the chart in numbers, widest swing first, and what was held or re-run
-  function sensLine(s, sens, E0) { var w = E0.sensWords(s, sens); return w ? w.line : null; }
+  // the note's sensitivity part: every bar of the chart as a row of numbers, widest swing first, and what was held or re-run
+  function sensLine(s, sens, E0) { return E0.sensNote(s, sens); }
   // the plan link's end (after this page's address) for a plan on this page
   function hashOf(SS, E0, s) { return "#" + SS.encode(E0.schemaFor("c0"), s); }
   // the no-JS route: the default plan's link, and its sensitivity (C.reference, written by the test) as a table
@@ -32,6 +32,16 @@
       note: RN.outlineHTML(C.note.fields, { sensitivity: "Sensitivity: every bar of the sensitivity chart in numbers, and what was held fixed" }),
       exemplars: EX.staticHTML(C.exemplars), rubric: RB.staticHTML(C.rubric.competences, { bar: C.rubric.bar }), inputs: E0.inputsHTML(D, P) };
   }
+  // the strong note assembled: its three parts with the bench's (the plan, results, assumptions, every sensitivity case,
+  // the limits), for the default plan, as LX.ReportNote copies it (written into the page by the test's --write mode)
+  // (page: this page's address, given by the caller)
+  function wholeHTML(C, E0, SS, RN, results, sens, date, page) {
+    var n = E0.note(E0.defaults(), results);
+    n.link = page + hashOf(SS, E0, E0.defaults());
+    n.sensitivity = sensLine(E0.defaults(), sens, E0);
+    return '<details class="lx-textalt c0-whole"><summary>The strong note, assembled: its three parts with the bench\'s (plan, results, assumptions, every sensitivity case, limits)</summary><pre>' +
+      esc(RN.compose(n, exemplarWords(C), C.note.fields, { format: "text", date: date, code: "C0" })) + "</pre></details>";
+  }
   // the strong exemplar's lines as the note's three fields (the screenshot's "done" state and the test)
   function exemplarWords(C) {
     var g = C.exemplars.answers.filter(function (a) { return a.key === "good"; })[0];
@@ -39,7 +49,7 @@
     t.split("\n").forEach(function (line) { var m = /^([A-Z][^:]{0,40}):\s*(.*)$/.exec(line); if (m) L[m[1]] = m[2]; });
     return { recommend: L.Recommendation + " " + L["CO₂"], alone: L.Alone, change: L.Sensitivity };
   }
-  var model = { sensLine: sensLine, staticBlocks: staticBlocks, nojsHTML: nojsHTML, hashOf: hashOf, exemplarWords: exemplarWords };
+  var model = { sensLine: sensLine, staticBlocks: staticBlocks, nojsHTML: nojsHTML, hashOf: hashOf, exemplarWords: exemplarWords, wholeHTML: wholeHTML };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
