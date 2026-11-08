@@ -97,7 +97,7 @@ One repository per framework, each with the paper or papers it accompanies.
 
 ::: {.repo-grid}
 
-<!-- NPPH2 (2026-11-02, v1.0.0; v1.1.0 2026-11-07 adds the article's 2024 PJM price inputs, scripts/henry_release_npph2_pjm_2026-11-07.sh) -->
+<!-- NPPH2 (v1.0.0; v1.1.0 adds the article's 2024 PJM price inputs) -->
 ::: {.repo .theme-hydrogen}
 ::: {.repo-top}
 [<i class="bi bi-droplet-half" aria-hidden="true"></i>]{.repo-icon} [Hydrogen systems]{.repo-theme} [Hourly MILP and lifecycle TEA]{.repo-type}
@@ -126,7 +126,7 @@ Hourly operation and sizing of a nuclear plant with high-temperature electrolysi
 :::
 :::
 
-<!-- SMR cogeneration (website v2, 2026-11-02; published by Henry with scripts/henry_release_nuclear_dc_2026-11-02.sh) -->
+<!-- SMR cogeneration -->
 ::: {.repo .theme-datacenter}
 ::: {.repo-top}
 [<i class="bi bi-cpu" aria-hidden="true"></i>]{.repo-icon} [Nuclear & data centers]{.repo-theme} [Hourly MILP co-optimization]{.repo-type}
@@ -297,7 +297,7 @@ Supply-chain facility location with on-site microgrids; virtual power plant sche
 :::
 :::
 
-<!-- Wind UQ (2026-11-02; published by Henry with scripts/henry_release_wind_uq_2026-11-02.sh) -->
+<!-- Wind UQ -->
 ::: {.repo .theme-wind}
 ::: {.repo-top}
 [<i class="bi bi-wind" aria-hidden="true"></i>]{.repo-icon} [Wind uncertainty]{.repo-theme} [Uncertainty metrics and surrogates]{.repo-type}

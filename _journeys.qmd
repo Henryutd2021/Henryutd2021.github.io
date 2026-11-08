@@ -1,5 +1,5 @@
 ```{=html}
-<!-- _journeys.qmd: written by scripts/build_journeys.py from data/journeys.json; edit the data or the script, not this file.
+<!-- _journeys.qmd: written by the journeys build step from data/journeys.json; edit the data or the build step, not this file.
      Map, tooltips, Play and the Firsts filter: assets/journeys/journeys.js (d3-geo, topojson-client and the map data load
      from jsDelivr after the page). Styles: assets/journeys/journeys.css. Without JS the map stays hidden and the chapter
      list is the content. -->

@@ -1,6 +1,6 @@
-/* pubs.css — publications, projects listing and project pages (third redesign, 2026-10-30).
+/* pubs.css — publications, projects listing and project pages.
    al-folio / Hugo Academic conventions on the tokens of assets/base.css (white by day, night via the navbar toggle).
-   Also styles the home page's selected publications: scripts/build_site.py emits the same rows (ol.pubs > li.pub)
+   Also styles the home page's selected publications: the site build step emits the same rows (ol.pubs > li.pub)
    for _selected.qmd, the Publications page and each project page's Publications list.
    Also styles the publications stat row (.pub-stats, site/_stats.qmd), which the About page can include.
    Sections: tokens · page header · publications header and chart · stat row · filter bar · publication rows ·
@@ -56,7 +56,7 @@ body.page-publications #title-block-header .description, body.page-projects #tit
 .pg-lede { margin: 0 0 1.6rem; max-width: 76ch; font-size: 1.04rem; line-height: 1.7; color: var(--ink-2); }
 
 /* ---------- Publications header: counts, citation total (OpenAlex) and the publications-per-year chart ----------
-   The chart is an inline SVG from scripts/build_site.py: bar segments carry .pt-<type> (badge colours, both themes),
+   The chart is an inline SVG from the site build step: bar segments carry .pt-<type> (badge colours, both themes),
    text takes the ink tokens. pages.js sets data-type on .pub-chart to fade the types a pressed tab leaves out. */
 .pub-head { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 1.4rem clamp(2rem, 5vw, 3.75rem); align-items: start; margin-bottom: 1.8rem; }
 .pub-head .pg-lede { margin: 0; }
@@ -294,7 +294,7 @@ ol.findings li::before { content: counter(finding); position: absolute; left: 1.
 
 .pub-cite-src { margin: .6rem 0 0; font-size: .8rem; color: var(--muted); }
 
-/* ---------- website v2 case-study blocks (scripts/build_site.py case_blocks; 2026-11-02) ---------- */
+/* ---------- project pages: case-study blocks (written by the site build step) ---------- */
 /* at a glance: role and scale/method tags above the question */
 .proj-glance { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem .9rem; }
 .proj-main .glance-role { display: inline-flex; align-items: center; gap: .45rem; margin: 0; font-size: .9rem; font-weight: 600; color: var(--ink); }

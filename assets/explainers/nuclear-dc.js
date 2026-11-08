@@ -1,4 +1,4 @@
-// explainers/nuclear-dc.js — interactive explainer for the nuclear-dc project page (website v2, 2026-11-02).
+// explainers/nuclear-dc.js — interactive explainer for the nuclear-dc project page.
 //
 // Mechanism (Energy Conversion and Management, 2026, accepted; text as in arXiv:2608.10999, Secs. 2.2.1, 2.2.6, 3.2,
 // Discussion and Conclusion): the Section 45Y production credit is

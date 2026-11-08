@@ -21,7 +21,7 @@ listing:
     fields: [date, title, description]
 ---
 
-<!-- Field Notes hub (website v3, reports/08_field_notes_design.md). draft: true until the first briefing is
+<!-- Field Notes hub. draft: true until the first briefing is
      approved; then the navbar item is added in _quarto.yml. Listings skip draft posts. -->
 
 ::: {.fn-intro}

@@ -400,7 +400,7 @@ body.page-folio main .chip { font-size: .78rem; padding: .16rem .6rem; color: va
   .page-cv .cv-layout { display: block; }
 }
 
-/* ---------- research v2 (2026-11-02): path, chapters, turning point, proposal, supporting work, outlook ---------- */
+/* ---------- Research page: path, chapters, turning point, proposal, supporting work, outlook ---------- */
 .page-research .rs-h2 { margin: 0 0 1rem; font-size: 1.5rem; font-weight: 700; color: var(--ink); letter-spacing: -.015em; }
 .page-research .ix .dot-plain { background: transparent; border: 2px solid var(--muted); box-shadow: none; }
 .page-research .rp-sec { margin-top: 3.6rem; }
@@ -526,7 +526,7 @@ body.page-folio main .chip { font-size: .78rem; padding: .16rem .6rem; color: va
   .page-teaching .lc-principles { border-left: 0; border-top: 1px solid var(--accent-line); }
 }
 
-/* ---------- Field Notes (website v3, 2026-11-02) ---------- */
+/* ---------- Field Notes ---------- */
 .page-fieldnotes .fn-intro { max-width: 78ch; font-size: 1.04rem; line-height: 1.75; color: var(--ink-2); }
 .page-fieldnotes .fn-intro .btn-outline { margin: .9rem .5rem 0 0; }
 .fn-disclosure { margin-top: 2.6rem; padding-top: 1rem; border-top: 1px solid var(--line); font-size: .85rem; color: var(--muted); }

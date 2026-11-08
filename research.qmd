@@ -8,11 +8,12 @@ toc: false
 body-classes: "page-inner page-folio page-research"
 ---
 
-<!-- Research page (website v2, 2026-11-02; reports/07_website_v2_design.md §8; styles in assets/pages.css, "research v2").
+<!-- Research page (styles in assets/pages.css, "Research page").
      The story of the research, not the project details: the path, then one question at three scales (Ph.D.), the
      turning point, firm low-carbon supply for AI data centers (current), supporting capabilities, methods, outlook.
-     Follows the past-research part of Henry's research statement; findings stay within the audited project-page text
-     and the accepted boundary paper (arXiv preprint). Upcoming work: broad question and status only. No collaborator names (Henry 2026-11-02).
+     Follows the past-research part of the author's research statement; findings stay within the audited project-page
+     text and the accepted boundary paper (arXiv preprint). Upcoming work: broad question and status only. No
+     collaborator names.
      Anchors linked from the home page: path, flexibility, data-centers, sei, supporting, methods. -->
 
 ```{=html}
@@ -245,7 +246,7 @@ Gaussian-process and machine-learning surrogates
 :::
 :::
 
-<!-- ============ looking ahead: brief and general (Henry 2026-11-02: no named future projects) ============ -->
+<!-- ============ looking ahead: brief and general (no named future projects) ============ -->
 ```{=html}
 <section class="outlook" id="outlook" aria-labelledby="h-outlook">
   <h2 id="h-outlook" class="rs-h2">Looking ahead</h2>

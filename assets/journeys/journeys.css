@@ -1,6 +1,6 @@
-/* journeys.css — the Journeys page (journeys.qmd; v2, 2026-11-05). Loaded only by that page; the frame (title band,
+/* journeys.css — the Journeys page (journeys.qmd). Loaded only by that page; the frame (title band,
    content column) is the page-folio frame of assets/pages.css. Colours come from the base.css tokens plus the local ones
-   below; chapter colours (--ch-<id>, day and night) are written by scripts/build_journeys.py into _journeys.qmd.
+   below; chapter colours (--ch-<id>, day and night) are written by the journeys build step into _journeys.qmd.
    The look: a colourful atlas (places visited filled in the colour of the chapter of the first visit, quiet borders),
    passport stamps for the firsts, medals for the summits. The ten-segment mark above the title is the ten chapters. */
 

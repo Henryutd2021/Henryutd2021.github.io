@@ -1,4 +1,4 @@
-// npph2.js — interactive explainer on the nuclear–hydrogen (42 U.S. reactors) project page (website v2, 2026-11-02).
+// npph2.js — interactive explainer on the nuclear–hydrogen (42 U.S. reactors) project page.
 // Mechanism (the paper in Nature Communications 2026, Results on Cases 1–3 and Fig. 3): an existing reactor's capital is
 // sunk, so revenue from electricity, hydrogen (with the assumed $3/kg hydrogen production credit) and reserves is set
 // against running costs and the hydrogen equipment; a new plant must also repay its capital, which the same additions

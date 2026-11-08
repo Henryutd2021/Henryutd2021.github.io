@@ -1,5 +1,5 @@
-/* map.css — "Collaborations around the world" section on the About page (2026-10-30).
-   Markup from scripts/build_map.py (_map.qmd); behaviour in assets/map.js (Leaflet 1.9.4 + CARTO tiles).
+/* map.css — "Collaborations around the world" section on the About page.
+   Markup from the map build step (_map.qmd); behaviour in assets/map.js (Leaflet 1.9.4 + CARTO tiles).
    Colours come from the base.css tokens, so day and night follow Quarto's toggle; the presentation colour is local. */
 
 body.quarto-light { --cmap-talk: #ea580c; --cmap-talk-text: #c2410c; --cmap-attr-bg: rgba(255, 255, 255, .82); }  /* text: AA on white */

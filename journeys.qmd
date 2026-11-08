@@ -10,8 +10,8 @@ body-classes: "page-inner page-folio page-journeys"
 css: assets/journeys/journeys.css
 ---
 
-<!-- Journeys page (2026-11-05; design: the site's Journeys design note). A personal travel log, open to anyone curious.
-     The body is generated: scripts/build_journeys.py writes _journeys.qmd from data/journeys.json (edit the data, not the
+<!-- Journeys page. A personal travel log, open to anyone curious.
+     The body is generated: the journeys build step writes _journeys.qmd from data/journeys.json (edit the data, not the
      output). Map and filters: assets/journeys/journeys.js; styles: assets/journeys/journeys.css. -->
 
 {{< include _journeys.qmd >}}

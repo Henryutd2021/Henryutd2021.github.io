@@ -1,7 +1,7 @@
-// explainers/common.js — shared helpers for the interactive mechanism explainers on project pages (website v2, 2026-11-02).
+// explainers/common.js — shared helpers for the interactive mechanism explainers on project pages.
 // Each explainer file calls Explainer.register(slug, init). On load, every <div class="explainer" data-explainer="slug">
 // is handed to init(root, h); the container's static fallback (.ex-fallback) stays visible until init succeeds.
-// Rules (reports/07_website_v2_design.md §7): illustrative toy models only, controls act on user input (no autoplay),
+// Rules: illustrative toy models only, controls act on user input (no autoplay),
 // colours from the CSS tokens in assets/base.css so both themes work, keyboard-operable labelled controls.
 (function () {
   const registry = {};

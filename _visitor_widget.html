@@ -3,7 +3,7 @@
   "Visitors" section below the collaboration map. Only this page loads it.
 
   While this file holds only comments, the site outputs nothing for it (the container in _map.qmd stays hidden).
-  With a snippet below this comment, scripts/build_map.py puts it in an inert <template> in _map.qmd; assets/map.js
+  With a snippet below this comment, the map build step puts it in an inert <template> in _map.qmd; assets/map.js
   then inserts it after the page has loaded (never blocking the page), sizes it to the column (drawn at twice the
   size on high-DPI screens), sets the MapMyVisitors colours (co, cl, ct) to the site's day or night theme, and hides
   the "Visitors" section again if the provider's script fails or draws nothing within 15 seconds.
@@ -11,10 +11,9 @@
   To change or add the widget:
     1. Copy the provider's HTML snippet (use an explicit https:// URL in src).
     2. Paste it below this comment, unchanged otherwise.
-    3. From the repository root run: python3 scripts/build_map.py   then   python3 scripts/build_site.py
-       and re-render the site.
+    3. Run the map build step, then the site build step, and re-render the site.
   To remove it, delete the snippet again (keep this comment) and repeat step 3.
 
-  Current widget: MapMyVisitors, set up by Henry on 2026-10-30.
+  Current widget: MapMyVisitors.
 -->
 <script type="text/javascript" id="mapmyvisitors" src="https://mapmyvisitors.com/map.js?d=dTtq3oTCLFrNLMK0zar8qTaqpgqc0SdBITzkxt5uIvg&cl=ffffff&w=a"></script>

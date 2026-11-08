@@ -1,5 +1,5 @@
-// journeys.js — the Journeys page (journeys.qmd; v2, 2026-11-05). Loaded only by that page.
-// The markup, the chapter list and the data (<script id="jr-data">) come from scripts/build_journeys.py (_journeys.qmd);
+// journeys.js — the Journeys page (journeys.qmd). Loaded only by that page.
+// The markup, the chapter list and the data (<script id="jr-data">) come from the journeys build step (_journeys.qmd);
 // styles in assets/journeys/journeys.css. Without JS the map box stays hidden and the chapter list is the content.
 //   1. "Firsts only": one toggle (in the map's toolbar and above the chapters) shows only the firsts and the milestones.
 //   2. Tile grids: the year of the first visit on hover, focus or tap; one Tab stop per grid, arrow keys move.
@@ -140,7 +140,7 @@
     { src: CDN + "d3-geo@3.1.1/dist/d3-geo.min.js", sri: "sha256-I+V08ejUcW1iK85FNWo3m2aidxYrFF9fFH5Mja77c9I=" },
     { src: CDN + "topojson-client@3.1.0/dist/topojson-client.min.js", sri: "sha256-Jc0CrkhsxQY+AhWk5M+xXeg3AMh6xIusTVfcaq8+u4k=" },
   ];
-  // the world view's projection (Patterson cylindrical, Henry 2026-11-06); optional: without it the world view falls back
+  // the world view's projection (Patterson cylindrical); optional: without it the world view falls back
   const PROJ_LIB = { src: CDN + "d3-geo-projection@4.0.0/dist/d3-geo-projection.min.js", sri: "sha256-gxNpQbz283+4qeQzGGAd+s8CkB3GBN7BO4FaLNicgTs=" };
   const DATA = {
     world: { url: CDN + "world-atlas@2.0.2/countries-110m.json", sri: "sha256-JRbJFYZ8e68Y3exyeuxGwxVUGgfPs9eaZVmwXV6U7ug=" },
@@ -414,7 +414,7 @@
       if (r.m === "ground") return smooth(r.p.map(function (p) { return pj(p); }).filter(Boolean));
       return arcs(r, pj, path, gc);
     }
-    // a route drawn leg by leg in its own colours (the 2013 loop, as Henry's route image shows it): [{d, color}]
+    // a route drawn leg by leg in its own colours (the 2013 loop, as the author's route image shows it): [{d, color}]
     function legsD(r, pj) {
       const pts = r.p.map(function (p) { return pj(p); });
       if (pts.some(function (q) { return !q; })) return null;
@@ -1024,9 +1024,9 @@
 
     // ---------- the chapter pages: one zoomable world map per chapter ----------
     // Each chapter page has one map in the world view's projection, with every route of the chapter (the long flights
-    // too) and its places. It shows one view, the chapter's map_open (data; Henry 2026-11-07: no zoom choices):
+    // too) and its places. It shows one view, the chapter's map_open (data; no zoom choices):
     //   all    every footprint of the chapter
-    //   main   the chapter's home region: where Henry lived and the trips from there. Its centre is the chapter's home
+    //   main   the chapter's home region: where the author lived and the trips from there. Its centre is the chapter's home
     //          (the place lived that the chapter's name names, D.chapters[].hm; of two, the one with more places around
     //          it), and it holds the chapter's places within CORE_KM of it, except stops made only in transit and visits
     //          to the hometown, with the road routes that stay within a quarter more than that (roads detour)

@@ -11,8 +11,8 @@ rendered page:
     (build notes, generated-block markers) into every page, and they are for the source only. The page's text, markup and
     scripts are unchanged.
 A CDN <script> or stylesheet without integrity that is not in SRI is reported and the render fails, so a version bump
-cannot ship without its hash: after changing a version, run  python3 scripts/site_sri.py --update  from the repository
-root that holds scripts/; it recomputes the hashes here and in the other files that hold them.
+cannot ship without its hash: after changing a version, run the SRI update step; it recomputes the hashes here and
+in the other files that hold them.
 Standard library only. Quarto sets QUARTO_PROJECT_OUTPUT_DIR and QUARTO_PROJECT_OUTPUT_FILES.
 """
 import os
@@ -67,7 +67,7 @@ def main():
                 missing.setdefault(tag, []).append(f)
     for tag, pages in missing.items():
         print(f"post-render: no SRI hash for {tag} ({len(pages)} pages, e.g. {pages[0]}); "
-              "run python3 scripts/site_sri.py --update", file=sys.stderr)
+              "run the SRI update step", file=sys.stderr)
     sys.exit(1 if missing else 0)
 
 

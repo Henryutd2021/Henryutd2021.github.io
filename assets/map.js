@@ -1,10 +1,10 @@
-// map.js — "Collaborations around the world" map on the About page (2026-10-30).
-// The section, its legend, the institution list and the data (<script id="cmap-data">) come from scripts/build_map.py
-// (_map.qmd); styles in assets/map.css. Inlined on every page (scripts/build_site.py writes map-js.html), so it does
+// map.js — "Collaborations around the world" map on the About page.
+// The section, its legend, the institution list and the data (<script id="cmap-data">) come from the map build step
+// (_map.qmd); styles in assets/map.css. Inlined on every page (the site build step writes map-js.html), so it does
 // nothing unless #cmap is on the page.
 //   - Lazy: Leaflet 1.9.4 (cdnjs, with SRI) and the tiles load only when the section nears the viewport.
 //   - The basemap follows Quarto's day/night toggle (body.quarto-light / body.quarto-dark): CARTO light_all / dark_all
-//     when #cmap carries data-tiles-key (CARTO basemaps need a free key; set in scripts/build_map.py); otherwise the
+//     when #cmap carries data-tiles-key (CARTO basemaps need a free key, set in the map build step); otherwise the
 //     OpenStreetMap standard tiles, toned grey by day and inverted by night in map.css (.cmap.tiles-osm).
 //   - Scroll-wheel zoom (and one-finger dragging on touch screens) stays off until the map is clicked.
 //   - Keyboard: the map takes focus (arrows pan, +/- zoom); Tab reaches each marker, Enter opens its popup, Esc closes.

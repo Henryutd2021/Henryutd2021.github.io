@@ -1,5 +1,5 @@
 ```{=html}
-<!-- _map.qmd: written by scripts/build_map.py from site/data/map.json; edit the script, not this file.
+<!-- _map.qmd: written by the map build step from data/map.json; edit the build step, not this file.
      Map: assets/map.js (Leaflet 1.9.4 and tiles, loaded when the section scrolls into view); styles: assets/map.css.
      Without JS the map box stays hidden and the list below is the content. -->
 <section class="home-wrap home-sec cmap-sec" id="collaborations" aria-labelledby="h-map">

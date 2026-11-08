@@ -1,4 +1,4 @@
-// explainers/ghg.js — interactive explainer for the ghg project page (website v2, 2026-11-02).
+// explainers/ghg.js — interactive explainer for the ghg project page.
 //
 // Mechanism (Cell Reports Sustainability 2, 100367, 2025, doi:10.1016/j.crsus.2025.100367; Methods, "Load regulation optimization model",
 // Equations 1-3): within an optimization cycle, each hour's load d_t may change by a fraction x_t with -a <= x_t <= a
