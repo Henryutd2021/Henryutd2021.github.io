@@ -52,13 +52,13 @@ body-classes: "page-inner page-folio page-research"
       <a class="rp-link" href="projects/offshore-wind-hydrogen-om.html">Offshore wind–hydrogen</a>
     </li>
     <li class="rp-step theme-hydrogen">
-      <span class="rp-when">2022–2025 · Ph.D.</span>
+      <span class="rp-when">2022–2023 · Ph.D.</span>
       <span class="rp-scale">State</span>
       <span class="rp-what">Hydrogen across the Texas grid under uncertain renewable build-out</span>
       <a class="rp-link" href="projects/txh2.html">Texas hydrogen</a>
     </li>
     <li class="rp-step theme-hydrogen">
-      <span class="rp-when">2025–2026 · Ph.D. and INL</span>
+      <span class="rp-when">2025 · Ph.D. and INL internship</span>
       <span class="rp-scale">National fleet</span>
       <span class="rp-what">Hydrogen and grid services for U.S. nuclear plants</span>
       <a class="rp-link" href="projects/npph2.html">Nuclear–hydrogen</a>
@@ -101,7 +101,7 @@ body-classes: "page-inner page-folio page-research"
     <li class="step">
       <span class="step-scale">National fleet</span>
       <h3>Making firm low-carbon supply flexible</h3>
-      <p>During my internship at Idaho National Laboratory, I co-developed an hourly model that splits a reactor's output among grid sales, high-temperature electrolysis, storage and reserves, linked to a lifetime cash-flow analysis of 42 reactors in seven U.S. markets. Operated as baseload-only plants at 2024 prices, nearly all had negative net present value; with hydrogen integration, including the assumed hydrogen production credit, a majority reached positive net present value.</p>
+      <p>During my internship at Idaho National Laboratory, I co-developed an hourly model that splits a reactor's output among grid sales, high-temperature electrolysis, storage and reserves, linked to a lifetime cash-flow analysis of 42 reactors in seven U.S. markets. Selling electricity alone at 2024 prices, without capacity payments or the 45U nuclear credit, nearly all had negative net present value; with hydrogen integration and the assumed hydrogen production credit of $3/kg for ten years, a majority reached positive net present value.</p>
       <p class="step-links"><a href="projects/npph2.html">Nuclear–hydrogen</a></p>
     </li>
   </ol>

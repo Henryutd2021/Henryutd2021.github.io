@@ -15,7 +15,7 @@ body-classes: "page-inner page-folio page-software"
 
 ::: {.rs-intro .sw-intro}
 ::: {.rs-lede}
-Documented model frameworks associated with published and accepted research. Each repository gives the model formulation with references to the source equations, describes the data pipeline and the input formats, and includes a runnable implementation with examples on synthetic data and tests.
+Documented model frameworks for my published and accepted studies and for a funded research project without a paper. Each repository gives the model formulation with references to its sources, describes the data pipeline and the input formats, and includes a runnable implementation with examples on synthetic or public data and tests.
 
 ::: {.sw-cta}
 [<i class="bi bi-github" aria-hidden="true"></i> All repositories on GitHub](https://github.com/Henryutd2021){.btn-solid}
@@ -43,7 +43,7 @@ Documented model frameworks associated with published and accepted research. Eac
 
 [Formulation]{.ct-title}
 
-The mathematics, keyed to the article's equation numbers.
+The mathematical formulation, with its sources and, where a paper exists, the article's equation numbers.
 :::
 
 ::: {.ct}
@@ -67,7 +67,7 @@ A Python package with a command line.
 
 [Examples]{.ct-title}
 
-Runnable examples on synthetic or illustrative data.
+Runnable examples on synthetic, illustrative or public data.
 :::
 
 ::: {.ct}
@@ -81,7 +81,7 @@ A pytest suite, run with one command after installation.
 ::: {.ct}
 [<i class="bi bi-unlock" aria-hidden="true"></i>]{.ct-icon}
 
-[Open licences]{.ct-title}
+[Open licenses]{.ct-title}
 
 MIT for code, CC BY 4.0 for documentation; citation metadata in CITATION.cff.
 :::
@@ -92,7 +92,7 @@ MIT for code, CC BY 4.0 for documentation; citation metadata in CITATION.cff.
 ::: {.fx-head}
 ## Repositories {#repositories}
 
-One repository per framework, each with the paper or papers it accompanies.
+One repository per framework, each with the study or project it accompanies.
 :::
 
 ::: {.repo-grid}
@@ -363,6 +363,6 @@ Multi-fidelity Gaussian process regression for probabilistic wind power curves, 
 ::: {.dn-body}
 [Data availability]{.dn-title}
 
-The repositories present the modelling frameworks. They do not contain the code, the input data or the results used for the published articles. For the data and code of individual studies, see each paper's data availability statement.
+The repositories present the modeling frameworks; they are not complete replication packages. Apart from the 2024 PJM price inputs in the nuclear–hydrogen repository, they do not contain the code, the input data or the results used for the published articles. For the data and code of individual studies, see each project page and each paper's data availability statement.
 :::
 :::

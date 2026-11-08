@@ -33,7 +33,7 @@ toc: false
 <section class="proj-insight" id="insight" aria-labelledby="h-insight">
 <h2 id="h-insight"><i class="bi bi-stars" aria-hidden="true"></i>Key insight</h2>
 <p class="insight-title">With the assumed hydrogen credit, hydrogen revenue can sustain an existing reactor but not pay for a new one</p>
-<p>The study treats an existing reactor&#x27;s capital as already spent, so revenue from power, hydrogen and reserves, with the assumed hydrogen credit, must cover running costs and the new equipment; most reactors studied then reached positive net present value. A new plant must also recover the reactor&#x27;s capital cost, and new builds stayed below zero even with tax credits.</p>
+<p>The study treats an existing reactor&#x27;s capital as already spent. At 2024 prices, without capacity payments or the 45U credit, electricity sales alone left nearly all reactors below zero net present value; adding hydrogen and reserves, with the assumed $3/kg hydrogen credit for ten years, lifted most above zero. A new plant must also recover the reactor&#x27;s capital cost, and new builds stayed below zero even with tax credits.</p>
 </section>
 <section class="proj-sec proj-explainer" id="explainer" aria-labelledby="h-explainer">
 <h2 id="h-explainer"><i class="bi bi-sliders" aria-hidden="true"></i>Why does hydrogen help an existing reactor more than a new one?</h2>
@@ -69,15 +69,15 @@ toc: false
 <section class="proj-sec" aria-labelledby="h-findings">
 <h2 id="h-findings"><i class="bi bi-lightbulb" aria-hidden="true"></i>Key findings</h2>
 <ol class="findings">
-<li>Operated as baseload-only plants at 2024 market prices, nearly all reactors studied had negative net present value.</li>
-<li>With hydrogen integration, including the assumed hydrogen production credit, a majority of the reactors reached positive net present value.</li>
+<li>Operated as electricity-only baseload plants at 2024 market prices, without capacity payments or the 45U nuclear credit, nearly all reactors studied had negative net present value.</li>
+<li>With hydrogen integration and the assumed hydrogen production credit ($3/kg for ten years), a majority of the reactors reached positive net present value, even without the 45U credit.</li>
 <li>Integrated operation added output flexibility; ancillary-service revenue was a few percent of the total.</li>
 <li>For new builds, investment and production tax credits substantially lowered the levelized cost of hydrogen.</li>
 </ol>
 </section>
 <section class="proj-sec proj-bounds" aria-labelledby="h-bounds">
 <h2 id="h-bounds"><i class="bi bi-exclamation-circle" aria-hidden="true"></i>Boundary conditions</h2>
-<p>Results rely on 2024 prices, price-taking market participation, modeled ancillary-service participation parameters, the assumed hydrogen credit ($3/kg for ten years) and a dispatch held fixed after the credit expires; price feedback from large-scale adoption is not modeled.</p>
+<p>Results rely on 2024 prices, price-taking market participation, modeled ancillary-service participation parameters, the assumed hydrogen credit ($3/kg for ten years, applied in every scenario) and a dispatch held fixed after the credit expires. Capacity-market revenues and price feedback from large-scale adoption are not modeled, and the electricity-only baseline is stated without the 45U nuclear credit.</p>
 </section>
 <section class="proj-next" id="led-to" aria-labelledby="h-next">
 <h2 id="h-next"><i class="bi bi-arrow-right-circle" aria-hidden="true"></i>What it led to</h2>

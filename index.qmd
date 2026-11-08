@@ -122,7 +122,7 @@ include-in-header:
     <li><a class="door door-journeys" href="journeys.html">
       <span class="door-icon" aria-hidden="true"><i class="bi bi-compass"></i></span>
       <span class="door-who">I'd like to know the person</span>
-      <span class="door-what">Read widely, travel far: the places I have lived and travelled since 2010</span></a></li>
+      <span class="door-what">Read widely, travel far: the places I have lived and traveled since 2010</span></a></li>
   </ul>
 </nav>
 
@@ -225,7 +225,7 @@ include-in-header:
 <section class="home-band" aria-labelledby="h-code">
   <div class="home-wrap home-sec">
     <div class="section-title"><h2 id="h-code">Open-source model frameworks</h2><a href="software-data.html">Software <i class="bi bi-arrow-right" aria-hidden="true"></i></a></div>
-    <p class="sec-lede">Documented model frameworks associated with published and accepted research: formulations, data pipelines and runnable implementations with examples and tests.</p>
+    <p class="sec-lede">Documented model frameworks for my published and accepted studies and a funded research project: formulations, data pipelines and runnable implementations with examples and tests.</p>
     <ul class="fw-grid">
       <li><a class="card fw theme-hydrogen" href="https://github.com/Henryutd2021/nuclear-hydrogen-integration">
         <span class="fw-theme">Hydrogen systems</span>
