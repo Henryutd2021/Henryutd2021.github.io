@@ -8,6 +8,8 @@ themekey: "datacenter"
 themelabel: "Nuclear & data centers"
 themeicon: "cpu"
 slug: "data-center-delay-economics"
+image: "../images/projects/data-center-delay-economics.jpg"
+image-alt: "Cover illustration: The cost of delayed energization for AI data centers"
 body-classes: "page-inner project-page theme-datacenter"
 page-layout: full
 toc: false

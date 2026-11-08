@@ -8,6 +8,8 @@ themekey: "hydrogen"
 themelabel: "Hydrogen systems"
 themeicon: "droplet-half"
 slug: "solar-hydrogen"
+image: "../images/projects/solar-hydrogen.jpg"
+image-alt: "Cover illustration: Co-located solar and hydrogen plants"
 body-classes: "page-inner project-page theme-hydrogen"
 page-layout: full
 toc: false

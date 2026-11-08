@@ -8,6 +8,8 @@ themekey: "microgrid"
 themelabel: "Microgrids & supply chains"
 themeicon: "diagram-3"
 slug: "facility-microgrid-location"
+image: "../images/projects/facility-microgrid-location.jpg"
+image-alt: "Cover illustration: Supply chains with on-site microgrids and transactive energy"
 body-classes: "page-inner project-page theme-microgrid"
 page-layout: full
 toc: false

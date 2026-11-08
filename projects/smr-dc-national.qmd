@@ -8,6 +8,8 @@ themekey: "datacenter"
 themelabel: "Nuclear & data centers"
 themeicon: "cpu"
 slug: "smr-dc-national"
+image: "../images/projects/smr-dc-national.jpg"
+image-alt: "Cover illustration: Data-center demand and the commercialization of small modular reactors"
 body-classes: "page-inner project-page theme-datacenter"
 page-layout: full
 toc: false

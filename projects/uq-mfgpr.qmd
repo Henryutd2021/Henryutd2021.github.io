@@ -8,6 +8,8 @@ themekey: "wind"
 themelabel: "Wind uncertainty"
 themeicon: "wind"
 slug: "uq-mfgpr"
+image: "../images/projects/uq-mfgpr.jpg"
+image-alt: "Cover illustration: Multi-fidelity Gaussian processes for wind power curves"
 body-classes: "page-inner project-page theme-wind"
 page-layout: full
 toc: false

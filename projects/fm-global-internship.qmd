@@ -8,6 +8,8 @@ themekey: "industry"
 themelabel: "Industry"
 themeicon: "gear"
 slug: "fm-global-internship"
+image: "../images/projects/fm-global-internship.jpg"
+image-alt: "Cover illustration: Industry internship at FM: resilience and operations modeling"
 body-classes: "page-inner project-page theme-industry"
 page-layout: full
 toc: false

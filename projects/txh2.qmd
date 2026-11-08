@@ -8,6 +8,8 @@ themekey: "hydrogen"
 themelabel: "Hydrogen systems"
 themeicon: "droplet-half"
 slug: "txh2"
+image: "../images/projects/txh2.jpg"
+image-alt: "Cover illustration: Hydrogen's role in expanding renewable energy in Texas"
 body-classes: "page-inner project-page theme-hydrogen"
 page-layout: full
 toc: false

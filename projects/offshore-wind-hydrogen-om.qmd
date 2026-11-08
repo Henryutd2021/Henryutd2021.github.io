@@ -8,6 +8,8 @@ themekey: "hydrogen"
 themelabel: "Hydrogen systems"
 themeicon: "droplet-half"
 slug: "offshore-wind-hydrogen-om"
+image: "../images/projects/offshore-wind-hydrogen-om.jpg"
+image-alt: "Cover illustration: Intelligent operation and maintenance in offshore wind–hydrogen systems"
 body-classes: "page-inner project-page theme-hydrogen"
 page-layout: full
 toc: false

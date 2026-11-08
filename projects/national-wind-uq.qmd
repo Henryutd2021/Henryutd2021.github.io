@@ -8,6 +8,8 @@ themekey: "wind"
 themelabel: "Wind uncertainty"
 themeicon: "wind"
 slug: "national-wind-uq"
+image: "../images/projects/national-wind-uq.jpg"
+image-alt: "Cover illustration: UQ metrics and surrogate models for plant-level wind power"
 body-classes: "page-inner project-page theme-wind"
 page-layout: full
 toc: false

@@ -8,6 +8,8 @@ themekey: "datacenter"
 themelabel: "Nuclear & data centers"
 themeicon: "cpu"
 slug: "nuclear-dc"
+image: "../images/projects/nuclear-dc.jpg"
+image-alt: "Cover illustration: Small modular reactor cogeneration for a hyperscale data center"
 body-classes: "page-inner project-page theme-datacenter"
 page-layout: full
 toc: false

@@ -8,6 +8,8 @@ themekey: "datacenter"
 themelabel: "Nuclear & data centers"
 themeicon: "cpu"
 slug: "smr-dc"
+image: "../images/projects/smr-dc.jpg"
+image-alt: "Cover illustration: Small modular reactors for data centers"
 body-classes: "page-inner project-page theme-datacenter"
 page-layout: full
 toc: false

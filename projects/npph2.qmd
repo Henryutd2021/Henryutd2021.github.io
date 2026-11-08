@@ -8,6 +8,8 @@ themekey: "hydrogen"
 themelabel: "Hydrogen systems"
 themeicon: "droplet-half"
 slug: "npph2"
+image: "../images/projects/npph2.jpg"
+image-alt: "Cover illustration: Hydrogen integration and policy support for U.S. nuclear power plants"
 body-classes: "page-inner project-page theme-hydrogen"
 page-layout: full
 toc: false

@@ -8,6 +8,8 @@ themekey: "carbon"
 themelabel: "Carbon-aware grid"
 themeicon: "globe-americas"
 slug: "ghg"
+image: "../images/projects/ghg.jpg"
+image-alt: "Cover illustration: Emission-intensity-informed load regulation for grid decarbonization"
 body-classes: "page-inner project-page theme-carbon"
 page-layout: full
 toc: false
