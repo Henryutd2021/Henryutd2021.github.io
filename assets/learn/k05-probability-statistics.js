@@ -161,7 +161,7 @@
     var cA = pick(0, nA / 5), cB = nB / 100 * (4 + pick(0, 2));
     var A = { n: nA, c: cA, e: 100 * cA / nA }, B = { n: nB, c: cB, e: 100 * cB / nB }, first = aFirst ? A : B, second = aFirst ? B : A;
     var said = function (o) { return int(o.n) + " hours, " + int(o.c) + " of them above (" + o.e + "%)"; };
-    return { kind: kind, q: "Two random samples estimate the share of hours with demand more than 5% above the forecast. Sample 1: " + said(first) + ". Sample 2: " + said(second) + ". Which estimate is more trustworthy?",
+    return { kind: kind, q: "Two random samples of hours; the event is demand more than 5% above the forecast. Sample 1: " + said(first) + ". Sample 2: " + said(second) + ". Which share is more trustworthy?",
              choices: ["Sample 1", "Sample 2", "Equally trustworthy"], answer: aFirst ? 1 : 0,
              why: "The sample of " + int(nB) + " hours: a share from more hours scatters less (its standard error shrinks with the square root of the sample size)." };
   }
@@ -176,15 +176,15 @@
         how: "From −2.0% to +2.0%: " + int(S.within2) + " hours, " + share(S.within2 / n) + "." },
       { key: "below5", text: "Number of hours with demand more than 5% below the forecast.", answer: S.below5, tol: 0.5, unit: "hours",
         how: "From −9.0% to −5.1%: " + int(S.below5) + " hours, " + share(S.below5 / n) + "." },
-      { key: "p99", text: "The error that 99% of hours stay at or below (the 99th percentile), in %.", answer: Math.round(10 * S.p99) / 10, tol: 0.25, unit: "%",
-        how: "Move the upper end until 99.0% of hours are at or below it: " + pct(S.p99) + "." }];
+      { key: "p99", text: "The error that 99% of hours stay at or below (the 99th percentile), in %, to one decimal.", answer: Math.round(10 * S.p99) / 10, tol: 0.05, unit: "%",
+        how: "The lowest upper end with at least 99% of hours at or below it: " + pct(Math.round(10 * S.p99) / 10) + " (" + share(countIn(x, -100, Math.round(10 * S.p99) / 10) / n, 2) + "; one step lower, " + share(countIn(x, -100, Math.round(10 * S.p99) / 10 - 0.1) / n, 2) + ")." }];
   }
 
   // the explain layer's flowchart traces: estimate a chance by counting, with all hours, a small sample, or the reader's threshold
   function traces(fc, own) {
     var x = errors(fc), n = x.length, c = countAbove(x, THRESH), out = [
       { label: "All " + int(n) + " hours", path: ["event", "count", "divide", "q", "report"], text: "**" + int(c) + " of " + int(n) + " hours above " + pct(THRESH, 0) + ", " + share(c / n) + ".** Report it with the period (January–April 2025) and the count." },
-      { label: "A sample of 10 hours", path: ["event", "count", "divide", "q", "more"], text: "**A share above " + pct(THRESH, 0) + " from 10 hours** scatters by about " + (100 * stdErr(c / n, 10)).toFixed(1) + " points (one standard error): say it is rough, or use more hours." }];
+      { label: "A sample of 10 hours", path: ["event", "count", "divide", "q", "more"], text: "**A share above " + pct(THRESH, 0) + " from 10 hours** scatters by about " + (100 * stdErr(c / n, 10)).toFixed(1) + " points (one [[standard-error|standard error]]): say it is rough, or use more hours." }];
     if (own && own.t != null && Math.abs(own.t - THRESH) > 1e-9) {
       var k = countAbove(x, own.t);
       out.push({ label: "Your threshold, " + pct(own.t), path: ["event", "count", "divide", "q", "report"], text: "**" + int(k) + " of " + int(n) + " hours above " + pct(own.t) + ", " + share(k / n) + ".**" });
@@ -259,8 +259,9 @@
       text: "Each of " + N + " hours (January–April 2025) has a [[forecast-error|forecast error]]: actual demand minus the day-ahead forecast, as a % of the forecast. Count the hours per bin, a [[histogram|histogram]], with all three bin widths.",
       build: function (act, api) {
         var tried = { 10: 1 }, w = 10;
-        var ctl = H("div", { class: "k5-ctl" }, act); H("span", { class: "k5-lab", text: "Bin width, points" }, ctl);
+        var ctl = H("div", { class: "k5-ctl" }, act); H("span", { class: "k5-lab", text: "Bin width, percentage points" }, ctl);
         seg(ctl, ["0.2", "1", "4"], 1, function (i) { w = WIDTHS[i]; tried[w] = 1; drawIt(); }, "Bin width");
+        H("p", { class: "lx-hint", text: "A percentage point is the gap between two percentages: errors of +2% and +3% are 1 point apart." }, act);
         var P = LX.Plot(act, { text: "Text version of the chart" }), prog = H("p", { class: "k5-prog", "aria-live": "polite" }, act);
         function drawIt() {
           P.render(histSpec(t10, w, { note: "Bins " + (w / 10) + (w === 10 ? " point" : " points") + " wide; each runs from its lower edge up to, not including, its upper edge." }).spec);
@@ -331,7 +332,7 @@
 
     // ---- 4 probability as a frequency
     steps.push({
-      text: "Pick one of these hours at random: the chance its error is above a threshold is the share of hours above it. Find the threshold that only 1 hour in 20 (5%) exceeds.",
+      text: "Pick one of these hours at random: the chance its error is above a threshold is the share of hours above it. Find a threshold that about 1 hour in 20 (about 5%) exceeds.",
       build: function (act, api) {
         var P = LX.Plot(act, { text: "Text version of the chart" }), out = H("p", { class: "k5-test", "aria-live": "polite" }, act);
         var sl = LX.Slider(act, { label: "Threshold", color: COL.warn, min: 0, max: 9, step: 0.1, value: 2, fmt: function (v) { return pct(v); }, onChange: function () { drawIt(true); } });
@@ -341,7 +342,7 @@
                                        note: "Shaded: the " + int(c) + " hours above " + pct(t) + ", a share of " + share(f) + ".", aria: "Histogram with the hours above " + pct(t) + " shaded: " + int(c) + " hours." }).spec);
           out.innerHTML = "Above " + pct(t) + ": <b>" + int(c) + " of " + N + "</b> hours, a share of <b>" + share(f) + "</b>.";
           if (user) keep("t", t);
-          if (user && f >= 0.045 && f <= 0.055) { api.done(); api.saw("Above " + pct(THRESH) + ": " + int(S.above) + " of " + N + " hours, " + share(S.aboveShare) + ". That share estimates the chance for hours like these; other months or years may differ."); }
+          if (user && f >= 0.045 && f <= 0.055) { api.done(); api.saw("Above " + pct(t) + ": " + int(c) + " of " + N + " hours, " + share(f) + ", about 1 in 20. That share estimates the chance for hours like these; other months or years may differ."); }
           else if (user) api.saw(f > 0.055 ? "More than 5% of hours lie above it: move the threshold right." : "Fewer than 5% lie above it: move it left.", true);
         }
         drawIt(false);
@@ -517,7 +518,7 @@
       var a = lo.val(), b = hi.val();
       if (a > b) { out.innerHTML = "“From” is above “To”: no hours in that range."; return; }
       var c = countIn(x, a, b), at = countIn(x, -100, b);
-      out.innerHTML = "From " + pct(a) + " to " + pct(b) + ": <b>" + int(c) + " hours</b>, " + share(c / n) + ". At or below " + pct(b) + ": " + share(at / n) + ".";
+      out.innerHTML = "From " + pct(a) + " to " + pct(b) + ": <b>" + int(c) + " hours</b>, " + share(c / n) + ". At or below " + pct(b) + ": " + share(at / n, 2) + ".";   // two decimals, so +7.9% (98.97%) and +8.0% (99.01%) differ
     }
     upd();
     var ol = H("ol", { class: "k5-tasks" }, card);

@@ -11,8 +11,11 @@
 // and the rest are re-exported here so the lesson's test reads as before. The "sheet you can trust" list is LX.Checklist.
 // Grading: a formula counts when it gives the right number AND still gives the right number after the inputs change
 // (follows(): the day's demand, wind and solar and the gas cost are nudged in a copy of the sheet), so a typed constant
-// such as =6957 does not pass. No-JS version: staticSheet() (the whole day, the totals and the five practice tasks with
-// their answers), written into the page by `node _tests/learn/test_k07-spreadsheets.js --write`.
+// such as =6957 does not pass. The nuclear input is checked the same way (followsE1(): E1 changed in a copy), so a typed
+// 100 in place of E1 does not pass steps 2 to 4; F30 must add the hourly costs (sumsHours(): one hourly cost changed in
+// a copy moves F30), so step 7's check against E30 × E2 is a real second route. No-JS version: staticSheet() (the whole
+// day, the totals, the four ways to write an address, and the five practice tasks with their answers), written into the
+// page by `node _tests/learn/test_k07-spreadsheets.js --write`.
 (function () {
   "use strict";
 
@@ -63,7 +66,15 @@
       { cell: "E34", label: "Wind and solar share, %", ask: "Share of the day's demand met by wind and solar, in %.", answer: 100 * sum(D.wind.concat(D.solar)) / sum(D.demand), hint: "=SUM(C5:D28)/SUM(B5:B28)*100" },
       { cell: "E35", label: "Gas, rows 17:00–21:00, avg MW", ask: "Average gas need over the five hourly rows labelled 17:00 to 21:00, in MW.", answer: sum(ev) / ev.length, hint: "=AVERAGE(E22:E26)" },
       { cell: "E36", label: "Highest solar, MW", ask: "The day's highest solar output, in MW.", answer: Math.max.apply(null, D.solar), hint: "=MAX(D5:D28)" },
-      { cell: "E37", label: "Gas cost at $55/MWh", ask: "The day's gas cost if gas cost $55 per MWh, without changing E2.", answer: 55 * sum(D.need), hint: "=E30*55" }];
+      { cell: "E37", label: "Gas cost at the E32 cost", ask: "The day's gas cost at the alternative gas cost in E32, $55 per MWh, without changing E2.", answer: ALT * sum(D.need), hint: "=E30*E32" }];
+  }
+  // the practice sheet: the finished sheet, the alternative gas cost as a labelled input (E32), the five task rows
+  var ALT = 55;
+  function practiceSheet(D) {
+    var S = filled(D), T = tasks(D); S.rows = 37;
+    S.cells.A32 = "Alternative gas cost, $/MWh"; S.cells.E32 = String(ALT); S.labels[32] = 1;
+    T.forEach(function (t) { S.cells["A" + t.cell.slice(1)] = t.label; });
+    return S;
   }
 
   // the inputs nudged: demand, wind and solar rows and the gas cost change; nuclear (E1) stays, so gas need follows
@@ -81,6 +92,22 @@
     c.E2 = String(N.price);
     return close(value({ cells: c, rows: sheet.rows, cols: sheet.cols }, cell), want(N));
   }
+  // does the gas need in `cells` (E5 or the whole column) follow a change of the nuclear input E1? (a copy)
+  function followsE1(sheet, D, rows) {
+    var c = {}, nuc = D.fleet.nuclear.mw + 10;
+    Object.keys(sheet.cells).forEach(function (k) { c[k] = sheet.cells[k]; });
+    c.E1 = String(nuc);
+    var cp = { cells: c, rows: sheet.rows, cols: sheet.cols };
+    return (rows || [0]).every(function (t) { return close(value(cp, "E" + (R0 + t)), D.demand[t] - D.wind[t] - D.solar[t] - nuc); });
+  }
+  // does F30 add the hourly costs? One hourly cost changed in a copy must move F30 by the same amount
+  function sumsHours(sheet) {
+    var c = {}, f0 = value(sheet, "F30");
+    Object.keys(sheet.cells).forEach(function (k) { c[k] = sheet.cells[k]; });
+    var v = value(sheet, "F15"); if (typeof v !== "number" || typeof f0 !== "number") return false;
+    c.F15 = String(v + 1);
+    return close(value({ cells: c, rows: sheet.rows, cols: sheet.cols }, "F30"), f0 + 1);
+  }
   // a practice task is done when its cell holds a formula with the right value that also follows the inputs
   function graded(sheet, D) {
     var T = tasks(D);
@@ -88,6 +115,12 @@
       return /^=/.test(sheet.cells[t.cell] || "") && close(value(sheet, t.cell), t.answer) && follows(sheet, t.cell, function (N) { return tasks(N)[i].answer; }, D);
     });
   }
+  // the four ways to write an address (the explain layer's table and the no-JS version)
+  var ADDR = [
+    { key: "rel", name: "B5", note: "relative", down: "B6", right: "C5", use: "data that changes row by row" },
+    { key: "abs", name: "$E$1", note: "absolute", down: "$E$1", right: "$E$1", use: "one input, such as a price" },
+    { key: "row", name: "E$1", note: "row fixed", down: "E$1", right: "F$1", use: "a row of inputs, one per column" },
+    { key: "col", name: "$E1", note: "column fixed", down: "$E2", right: "$E1", use: "a column of inputs, one per row" }];
   // the no-JS version: the whole day with its totals, and the five practice tasks with closed answers
   function staticSheet(D) {
     var f = function (v) { return Math.round(v).toLocaleString("en-US"); }, sum = function (a) { return a.reduce(function (x, y) { return x + y; }, 0); };
@@ -102,17 +135,21 @@
     rows.push("</tbody></table>");
     var T = tasks(D), unit = ["MWh", "%", "MW", "MW", "$"], pr = [];
     pr.push('<div class="lx-card k7-practice"><div class="lx-x-head"><h3>Practice sheet</h3></div>');
-    pr.push('<p class="lx-hint">Use the table of the day above. With JavaScript on, you type each answer as a formula in a working sheet (about 30 minutes).</p><ol class="k7-tasks">');
+    pr.push('<p class="lx-hint">Use the table of the day above, about 30 minutes. With JavaScript on, you type each answer as a formula in a working sheet.</p><ol class="k7-tasks">');
     T.forEach(function (x, i) {
       var a = i === 1 ? (Math.round(x.answer * 10) / 10).toFixed(1) + "%" : i === 4 ? "$" + f(x.answer) : f(x.answer) + " " + unit[i];
       pr.push("<li>" + x.ask + ' <details class="k7-hint"><summary>Answer</summary><code>' + x.hint + "</code> = " + a + "</details></li>");
     });
     pr.push("</ol></div>");
-    return { table: rows.join("\n"), practice: pr.join("\n") };
+    var ad = ['<table class="k7-static" aria-label="Four ways to write one address, and what fill-down and fill-right do to each">',
+      '<thead><tr><th scope="col">Address</th><th scope="col">Kind</th><th scope="col">Filled down one row</th><th scope="col">Filled right one column</th><th scope="col">Use it for</th></tr></thead>', "<tbody>"];
+    ADDR.forEach(function (a) { ad.push("<tr><td>" + a.name + "</td><td>" + a.note + "</td><td>" + a.down + "</td><td>" + a.right + "</td><td>" + a.use + "</td></tr>"); });
+    ad.push("</tbody></table>");
+    return { table: rows.join("\n"), practice: pr.join("\n"), addr: ad.join("\n") };
   }
 
   var model = { townDay: townDay, value: value, changed: changed, shift: shift, refsIn: refsIn, isErr: isErr,
-                nudge: nudge, follows: follows, graded: graded, staticSheet: staticSheet,
+                nudge: nudge, follows: follows, followsE1: followsE1, sumsHours: sumsHours, graded: graded, staticSheet: staticSheet, practiceSheet: practiceSheet, ADDR: ADDR, ALT: ALT,
                 tokenize: function (src) { return engine().tokenize(src); }, parse: function (src) { return engine().parse(src); },
                 colName: function (n) { return engine().colName(n); }, colNum: function (s) { return engine().colNum(s); },
                 layout: layout, filled: filled, tasks: tasks, R0: R0 };
@@ -131,6 +168,7 @@
 
   function view(live, data, root) {
     var D = townDay(data.town, data.town_year), S = layout(D), need = D.need, steps = [], stepIdx = 0, checks = [];
+    var HOURS24 = []; for (var h = 0; h < 24; h++) HOURS24.push(h);
     var sum = function (a) { return a.reduce(function (x, y) { return x + y; }, 0); };
     // locked: the day's data, the headers, the labels and the nuclear input E1 (so gas need never goes below zero)
     S.lock = function (n) { var c = n.replace(/\d+/, ""), r = +n.replace(/[A-Z]+/, ""); return (r >= R0 && r < R0 + 24 && "ABCD".indexOf(c) >= 0) || r === 4 || (c === "A") || n === "E1"; };
@@ -146,7 +184,8 @@
         if (!S.cells.E5) return;
         if (!isFormula("E5")) { api.saw("That is a typed number, not a formula: change the demand and it will not follow. Start with =.", true); return; }
         var refs = refsIn(S.cells.E5).map(function (x) { return x.replace(/\$/g, ""); });
-        if (v === need[0] && ["B5", "C5", "D5"].every(function (x) { return refs.indexOf(x) >= 0; })) { api.done(); api.saw("E5 = " + D.demand[0] + " − " + D.wind[0] + " − " + D.solar[0] + " − " + D.fleet.nuclear.mw + " = " + need[0] + " MW, the gas need at 00:00 in lesson 0."); }
+        if (v === need[0] && ["B5", "C5", "D5"].every(function (x) { return refs.indexOf(x) >= 0; }) && !followsE1(S, D)) { api.saw("Right number, but the nuclear output is typed in: change E1 and E5 will not follow. Point at it: =B5-C5-D5-E1.", true); return; }
+        if (v === need[0] && ["B5", "C5", "D5", "E1"].every(function (x) { return refs.indexOf(x) >= 0; })) { api.done(); api.saw("E5 = " + D.demand[0] + " − " + D.wind[0] + " − " + D.solar[0] + " − " + D.fleet.nuclear.mw + " = " + need[0] + " MW, the gas need at 00:00 in lesson 0."); }
         else api.saw("E5 shows " + show(v) + ". Use the four cells: =B5-C5-D5-E1.", true);
       }; } });
     steps.push({ text: "Select E5 and press Fill down to copy it to every hour. Then select E6 and read its formula: what happened to E1?",
@@ -161,20 +200,25 @@
         checks[2] = function (sel, how) {
           if (how !== "fill") return;
           if (refsIn(S.cells.E5).indexOf("E1") >= 0) { q.hidden = false; q.querySelector(".lx-qtext").textContent = "E6 now shows " + show(value(S, "E6")) + " MW, not " + need[1] + ". Why?"; }
-          else if (value(S, "E6") === need[1]) { api.done(); api.saw("You pinned E1 already. Fill down moves every relative address one row per row; $ stops it."); }
+          else if (value(S, "E6") === need[1] && followsE1(S, D, [0, 1, 19])) { api.done(); api.saw("You pinned E1 already. Fill down moves every relative address one row per row; $ stops it."); }
+          else if (value(S, "E6") === need[1]) api.saw("The rows match, but the nuclear output is typed in, not taken from E1: edit E5 to =B5-C5-D5-E1 and fill down again.", true);
         };
       } });
     steps.push({ text: "Pin the input with an [[absolute-reference|absolute address]]. Edit E5 to =B5-C5-D5-$E$1, then fill down again. Every hour should now match lesson 0: " + need[19] + " MW at 19:00.",
       build: function (act, api) { mountSheet(act, "E5"); checks[3] = function () {
+        if (colOK("E", function (t) { return need[t]; }) && !followsE1(S, D, HOURS24)) { api.saw("Every hour matches, but the nuclear output is typed in: point every row at $E$1, as =B5-C5-D5-$E$1.", true); return; }
         if (colOK("E", function (t) { return need[t]; })) { api.done(); api.saw("$E$1 never moves, so every row subtracts the same nuclear input. Peak gas need: " + Math.max.apply(null, need) + " MW at 19:00, as in lesson 0."); }
       }; } });
     steps.push({ text: "Now the cost. In F5, type =E5*$E$2 and fill down. A row's [[megawatt|MW]], held for one hour, is [[megawatt-hour|MWh]]; MWh times $/MWh is dollars.",
       build: function (act, api) { mountSheet(act, "F5"); checks[4] = function () {
         if (colOK("F", function (t) { return need[t] * 40; })) { api.done(); api.saw("Each row: MW × 1 h × $/MWh = $. At midnight, " + need[0] + " MW × 1 h × $40/MWh = " + show(need[0] * 40, "F") + "."); }
       }; } });
-    steps.push({ text: "Functions work on whole ranges: SUM adds the cells, MAX finds the largest. E30 and E31 already hold =SUM(E5:E28) and =MAX(E5:E28). In F30, add up the day's gas cost.",
-      build: function (act, api) { mountSheet(act, "F30"); checks[5] = function () {
+    steps.push({ text: "Functions work on whole ranges of cells, such as E5:E28. In F30, use one to add up the day's hourly gas costs.",
+      build: function (act, api) {
+        H("p", { class: "lx-hint", html: "<b>SUM</b>(E5:E28) adds the cells from E5 to E28; <b>MAX</b>(E5:E28) finds the largest. E30 and E31 already use them." }, act);
+        mountSheet(act, "F30"); checks[5] = function () {
         var v = value(S, "F30");
+        if (isFormula("F30") && v === sum(need) * 40 && !sumsHours(S)) { api.saw("Right number, but F30 does not add the hourly costs, so step 7's check would compare it with itself. Use =SUM(F5:F28).", true); return; }
         var ok = isFormula("F30") && v === sum(need) * 40 && follows(S, "F30", function (N) { return sum(N.need) * N.price; }, D);
         if (ok) { api.done(); api.saw("F30 = " + show(v, "F") + ". E30 is energy: each hour's MW × 1 h, added up, " + sum(need).toLocaleString("en-US") + " MWh. F5:F28 means every cell from F5 to F28."); }
         else if (S.cells.F30 && v === sum(need) * 40) api.saw("Right number, but it would not follow a change in the inputs. Point at the cells: =SUM(F5:F28).", true);
@@ -208,13 +252,9 @@
     LX.CompareTable(H("div", { class: "lx-xcard w1h-stack" }, x), {
       title: "Four ways to write one address",
       columns: [{ key: "name", label: "Address", main: true }, { key: "down", label: "Filled down one row" }, { key: "right", label: "Filled right one column", phoneHide: true }, { key: "use", label: "Use it for" }],
-      rows: [
-        { key: "rel", color: "var(--lx-accent)", name: "B5", note: "relative", down: "B6", right: "C5", use: "data that changes row by row" },
-        { key: "abs", color: "var(--lx-cc)", name: "$E$1", note: "absolute", down: "$E$1", right: "$E$1", use: "one input, such as a price" },
-        { key: "row", color: "var(--lx-wind)", name: "E$1", note: "row fixed", down: "E$1", right: "F$1", use: "a row of inputs, one per column" },
-        { key: "col", color: "var(--lx-solar)", name: "$E1", note: "column fixed", down: "$E2", right: "$E1", use: "a column of inputs, one per row" }]
+      rows: ADDR.map(function (a, i) { return Object.assign({ color: ["var(--lx-accent)", "var(--lx-cc)", "var(--lx-wind)", "var(--lx-solar)"][i] }, a); })
     });
-    var items = [["Inputs apart", "Every input in its own labelled cell, with its unit."], ["No numbers inside formulas", "Formulas point at input cells, so one change updates everything."],
+    var items = [["Inputs apart", "Every input in its own labelled cell, with its unit."], ["Assumptions in input cells", "Formulas point at input cells, not at typed numbers, so one change updates everything."],
                  ["$ for inputs", "Absolute addresses for inputs, relative ones for data."], ["One formula per column", "Write it once, fill it down, spot-check one row by hand."],
                  ["A check cell", "Compute a total two ways and compare, as F30 against E30 × E2. Agreement shows consistency, not correctness."], ["Source and date", "Name where the data came from and when, beside the data."]];
     LX.Checklist(H("div", { class: "lx-xcard" }, x), { id: "k7-check", title: "A sheet you can trust", count: "head", soft: true, inline: true, sep: ". ", ordered: true,
@@ -225,11 +265,10 @@
   // ---- practice: the finished sheet and five tasks, each checked when its cell holds a formula with the right value
   function practice(D) {
     var host = document.getElementById("k7-practice"); if (!host) return; host.innerHTML = "";
-    var S = filled(D), T = tasks(D); S.rows = 37; var card = H("div", { class: "lx-card k7-practice" }, host);
-    var hd = H("div", { class: "lx-x-head" }, card); H("h3", { text: "Practice sheet" }, hd);
+    var S = practiceSheet(D), T = tasks(D), card = H("div", { class: "lx-card k7-practice" }, host);
+    var hd = H("div", { class: "lx-x-head" }, card); H("h3", { text: "Practice sheet · about 30 minutes" }, hd);
     var score = H("span", { class: "lx-step-n", "aria-live": "polite" }, hd);
-    H("p", { class: "lx-hint", text: "The finished sheet from the steps, about 30 minutes of practice. Type each answer as a formula that points at the cells, in its yellow cell (E33 to E37). A typed number, even after =, does not count." }, card);
-    T.forEach(function (t) { S.cells["A" + t.cell.slice(1)] = t.label; });
+    H("p", { class: "lx-hint", text: "Type each answer in its yellow cell (E33 to E37) as a formula that points at the cells; a typed number, even after =, does not count." }, card);
     S.lock = function (n) { return T.every(function (t) { return t.cell !== n; }) && n !== "E2"; };
     var ul = H("ol", { class: "k7-tasks" }, card), lis = {};
     T.forEach(function (t) { var li = H("li", null, ul); H("span", { text: t.ask + " " }, li); H("b", { text: "→ " + t.cell }, li); var h = H("details", { class: "k7-hint" }, li); H("summary", { text: "Hint" }, h); H("code", { text: t.hint }, h); lis[t.cell] = li; });

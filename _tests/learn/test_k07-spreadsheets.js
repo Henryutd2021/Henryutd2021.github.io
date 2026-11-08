@@ -13,7 +13,7 @@ const G0 = require(path.join(SITE, "assets/learn/grid-operator.js"));
 const town = JSON.parse(fs.readFileSync(path.join(SITE, "assets/learn/data/town.json"), "utf8"));
 const year = JSON.parse(fs.readFileSync(path.join(SITE, "assets/learn/data/town_year.json"), "utf8"));
 const QPATH = path.join(SITE, "learn/k07-spreadsheets.qmd");
-const BLOCKS = { "k7-table": "table", "k7-practice": "practice" };
+const BLOCKS = { "k7-table": "table", "k7-practice": "practice", "k7-addr": "addr" };
 function blockRe(name) { return [new RegExp("<!-- " + name + ":start[^>]*-->\\n"), "<!-- " + name + ":end -->"]; }
 if (process.argv.includes("--write")) {
   const S0 = K.staticSheet(K.townDay(JSON.parse(fs.readFileSync(path.join(SITE, "assets/learn/data/town.json"), "utf8")), JSON.parse(fs.readFileSync(path.join(SITE, "assets/learn/data/town_year.json"), "utf8"))));
@@ -87,7 +87,8 @@ const D = K.townDay(town, year), sum = a => a.reduce((x, y) => x + y, 0), fmt = 
 
 // ---------------- practice tasks
 {
-  const T = K.tasks(D), F = K.filled(D); F.rows = 37;
+  const T = K.tasks(D), F = K.practiceSheet(D);
+  ok(F.rows === 37 && F.cells.E32 === "55" && /Alternative gas cost, \$\/MWh/.test(F.cells.A32) && T[4].hint === "=E30*E32" && !/\*55|55\*/.test(T.map(t => t.hint).join(" ")), "practice: the $55 assumption is a labelled input cell (E32), and no hint types a changeable number");
   T.forEach(t => { F.cells[t.cell] = t.hint; }); K.changed(F);
   T.forEach(t => ok(near(K.value(F, t.cell), t.answer, 1e-9), `practice ${t.cell}: the hint formula ${t.hint} gives ${t.answer}`));
   ok(T[0].answer === sum(D.demand) && T[3].answer === Math.max(...D.solar) && T[4].answer === 55 * 1965, "practice: answers from the day");
@@ -95,7 +96,7 @@ const D = K.townDay(town, year), sum = a => a.reduce((x, y) => x + y, 0), fmt = 
   ok(/five hourly rows labelled 17:00 to 21:00/.test(T[2].ask), "practice: the evening average names its five hourly rows");
   ok(K.graded(F, D).every(Boolean), "practice: the hint formulas pass, values and dependencies");
   // typed constants, even after =, do not pass; alternative formulas that point at the cells do
-  const G = K.filled(D); G.rows = 37;
+  const G = K.practiceSheet(D);
   T.forEach(t => { G.cells[t.cell] = "=" + t.answer; }); K.changed(G);
   ok(K.graded(G, D).every(g => !g), "practice: =<the number> fails every task (it does not follow the inputs)");
   G.cells.E33 = "=SUM(B5:B28)"; G.cells.E34 = "=(SUM(C5:C28)+SUM(D5:D28))/E33*100"; G.cells.E35 = "=(E22+E23+E24+E25+E26)/5"; G.cells.E36 = "=MAX(D5:D28)+0*B5"; G.cells.E37 = "=F30/E2*55"; K.changed(G);
@@ -107,9 +108,25 @@ const D = K.townDay(town, year), sum = a => a.reduce((x, y) => x + y, 0), fmt = 
 {
   const F = K.filled(D), want = N => N.need.reduce((a, b) => a + b, 0) * N.price;
   ok(K.follows(F, "F30", want, D), "step 6: =SUM(F5:F28) follows the inputs");
-  F.cells.F30 = "=E30*E2"; K.changed(F); ok(K.follows(F, "F30", want, D), "step 6: =E30*E2 also follows");
+  ok(K.sumsHours(F), "step 6: =SUM(F5:F28) adds the hourly costs (one changed hour moves it)");
+  F.cells.F30 = "=E30*E2"; K.changed(F); ok(K.follows(F, "F30", want, D) && !K.sumsHours(F), "step 6: =E30*E2 follows the inputs but does not add the hours, so step 6 refuses it (step 7 would compare it with itself)");
+  F.cells.F30 = "=F5+F6+F7+F8+F9+F10+F11+F12+F13+F14+F15+F16+F17+F18+F19+F20+F21+F22+F23+F24+F25+F26+F27+F28"; K.changed(F); ok(K.sumsHours(F) && K.follows(F, "F30", want, D), "step 6: adding the 24 cells one by one is another valid route");
+  ok(/!sumsHours\(S\)\) \{ api\.saw\("Right number, but F30 does not add the hourly costs/.test(JS), "step 6: the page refuses a total that does not add the hours");
   F.cells.F30 = "=78600"; K.changed(F); ok(!K.follows(F, "F30", want, D) && K.value(F, "F30") === 78600, "step 6: =78600 has the right value but does not follow");
   const N = K.nudge(D); ok(N.need.every((v, t) => v === D.need[t] + 7 + (t % 3) - 2 - 3) && N.price !== 40, "nudge: demand, wind, solar and the gas cost all move");
+}
+
+// ---------------- the nuclear input: E1 by address, never a typed 100 (steps 2 to 4)
+{
+  const L = K.layout(D);
+  L.cells.E5 = "=B5-C5-D5-100"; K.changed(L);
+  ok(K.value(L, "E5") === D.need[0] && !K.followsE1(L, D), "step 2: =B5-C5-D5-100 has the right value but does not follow E1");
+  L.cells.E5 = "=B5-C5-D5-E1"; K.changed(L); ok(K.followsE1(L, D), "step 2: =B5-C5-D5-E1 follows E1");
+  const H = K.layout(D); for (let r = 5; r < 29; r++) H.cells["E" + r] = K.shift("=B5-C5-D5-100", r - 5, 0); K.changed(H);
+  const all = [...Array(24).keys()];
+  ok(all.every(t => K.value(H, "E" + (5 + t)) === D.need[t]) && !K.followsE1(H, D, all), "steps 3 and 4: a hard-coded 100 filled down matches every hour but fails the E1 check");
+  const P = K.filled(D); ok(K.followsE1(P, D, all), "step 4: =B5-C5-D5-$E$1 filled down follows E1 in every row");
+  ok(/if \(v === need\[0\] && \["B5", "C5", "D5", "E1"\]\.every/.test(JS) && /followsE1\(S, D, \[0, 1, 19\]\)\) \{ api\.done\(\); api\.saw\("You pinned E1 already/.test(JS) && /!followsE1\(S, D, HOURS24\)\) \{ api\.saw/.test(JS), "steps 2 to 4 check E1 by address before they open Next");
 }
 
 // ---------------- the page
@@ -129,6 +146,20 @@ const D = K.townDay(town, year), sum = a => a.reduce((x, y) => x + y, 0), fmt = 
   has("<td>24</td><td>19:00</td><td>331</td><td>72</td><td>14</td><td>145</td><td>5,800</td>");
   has("<td>6</td><td>01:00</td><td>243</td><td>28</td><td>0</td><td>115</td><td>4,600</td>");
   has("3 September 2025"); has("$40/MWh");
+  // the units quiz asks for the energy the sum stands for, not the unit of a sum of MW
+  has("In what unit is the day's gas energy that =SUM(E5:E28) stands for?"); has("A sum of MW values is still in MW; energy is power × duration, each row's MW × 1 h.");
+  ok(!/What unit does =SUM\(E5:E28\) have/.test(QMD), "quiz: no claim that summing MW changes the unit");
+  // the no-JS explain teaches all four address forms the quiz uses ($A10 is column fixed)
+  ok(K.staticSheet(D).addr.indexOf("<tr><td>$E1</td><td>column fixed</td><td>$E2</td><td>$E1</td>") > 0 && K.ADDR.length === 4 && /rows: ADDR\.map/.test(JS), "explain: the four address forms come from one list, in the page and in the no-JS version");
+  ok(K.shift("=" + K.ADDR[3].name, 1, 0) === "=" + K.ADDR[3].down && K.shift("=" + K.ADDR[3].name, 0, 1) === "=" + K.ADDR[3].right && K.ADDR.every(a => K.shift("=" + a.name, 1, 0) === "=" + a.down && K.shift("=" + a.name, 0, 1) === "=" + a.right), "explain: every row of the address table is what fill-down and fill-right do");
+  // words and wording
+  has("Here pandas, a Python tool for tables, holds the day in a table named `df`"); has("A preview: [bridge B2](b02-python-data.html) loads and runs code like this.");
+  has("for larger optimization problems, use a solver, through a spreadsheet add-in or code (bridge B1)"); ok(!/choosing the best plan needs a solver/.test(QMD), "Modeler box: a solver is not the only way to compare plans");
+  ok(/\["Assumptions in input cells", "Formulas point at input cells, not at typed numbers/.test(JS) && !/No numbers inside formulas/.test(JS), "habits: changeable assumptions in input cells (the practice uses E32)");
+  const desc = (QMD.match(/^description: "([^"]+)"/m) || [])[1] || "";
+  ok(desc.split(/\s+/).length <= 30, `budget: the description is ${desc.split(/\s+/).length} words (≤ 30)`);
+  ok(/"Practice sheet · about 30 minutes"/.test(JS) && /text: "Type each answer in its yellow cell \(E33 to E37\) as a formula that points at the cells; a typed number, even after =, does not count\."/.test(JS), "practice: the time is in the heading; the instruction is one sentence");
+  ok(/text: "Functions work on whole ranges of cells, such as E5:E28\. In F30, use one to add up the day's hourly gas costs\."/.test(JS) && /<b>SUM<\/b>\(E5:E28\) adds the cells from E5 to E28; <b>MAX<\/b>\(E5:E28\) finds the largest/.test(JS), "step 6: two-sentence prompt; SUM and MAX in a reference line beside it");
   ok(JS.indexOf("=SUM(F5:F28)") > 0 && JS.indexOf("=B5-C5-D5-$E$1") > 0 && JS.indexOf("=E5*$E$2") > 0, "js: the step texts name the formulas");
 }
 
