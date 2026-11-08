@@ -260,6 +260,8 @@ function solData() {
   goTo(2); live.querySelector("textarea").value = "My check."; btn(/^Submit my explanation$/).click();
   ok(!live.querySelectorAll(".lx-ck-points input").length && !/776,324/.test(all()) && /and the points to tick name the answer to task 2/.test(all()) && /open later/.test(all()) && !shown(/Show the worked solution now/),
     "a written task's points wait with its solution (they name task 2's answer); no early button");
+  { const sd = solData(); sd.tasks[2].freeze = true; const Q = mount({ data: sd, key: "sol-frozen" }); Q.goTo(2); Q.live.querySelector("textarea").value = "Text."; Q.btn(/^Submit my explanation$/).click();
+    ok(/Its points to tick open once the tasks they name are answered\./.test(Q.live.querySelector(".lx-ck-kept").textContent) && !/Tick the points it makes below/.test(Q.all()), "a frozen written task whose points wait: the kept line says when they open"); }
   goTo(1);
   ok(live.querySelector(".lx-ck-sol").hidden && !/866,046/.test(all()) && !shown(/Show the worked solution now/) && /names the answer to task 1, so it opens once that is submitted/.test(all()),
     "task 2 before task 1: no early button, its solution's text absent, a notice says why");

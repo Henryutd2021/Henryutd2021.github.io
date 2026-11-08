@@ -553,7 +553,8 @@
     // button that had focus is gone or disabled
     function kept(t, btn, host, els, move) {
       var where = btn ? btn.parentNode : host, p = where ? where.querySelector(".lx-ck-kept") : null;
-      if (!p && where) p = E("p", { class: "lx-hint lx-ck-kept", id: LX.uid("ck-kept"), tabindex: "-1", text: t.freezeNote || (t.kind === "open-short" ? "Submitted: your text stays as you wrote it. Tick the points it makes below."
+      if (!p && where) p = E("p", { class: "lx-hint lx-ck-kept", id: LX.uid("ck-kept"), tabindex: "-1", text: t.freezeNote || (t.kind === "open-short" ? "Submitted: your text stays as you wrote it. " +
+          (solWaits(D, st, t).length ? "Its points to tick open once the tasks they name are answered." : "Tick the points it makes below.")
         : t.kind === "estimate" ? "Submitted: your estimate stays as you gave it. Rate it below." : "Submitted: your answer stays as you gave it.") }, where);
       if (btn) btn.remove();
       if (!p) return;
