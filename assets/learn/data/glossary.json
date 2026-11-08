@@ -3733,6 +3733,12 @@
   "lesson": "F6",
   "href": "f06-grid-and-outages.html"
  },
+ "voltage-angle": {
+  "term": "Voltage angle",
+  "short": "How far the alternating voltage at one bus runs ahead of the voltage at the reference bus, whose angle is set to zero; in DC power flow a line's flow is proportional to the angle difference across it.",
+  "lesson": "M1",
+  "href": "m01-dispatch-to-lmp.html"
+ },
  "wait-and-see": {
   "term": "Wait-and-see problem",
   "short": "The planning problem solved as if the future were known: one best plan for each branch, which no real planner can choose in advance.",

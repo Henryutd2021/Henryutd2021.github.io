@@ -19,3 +19,6 @@ glossary:
   - id: congestion-rent
     term: Congestion rent
     def: "What loads pay at their locational prices minus what generators are paid at theirs; in a DC model it equals the sum, over the full lines, of each line's shadow price times its flow."
+  - id: voltage-angle
+    term: Voltage angle
+    def: "How far the alternating voltage at one bus runs ahead of the voltage at the reference bus, whose angle is set to zero; in DC power flow a line's flow is proportional to the angle difference across it."
