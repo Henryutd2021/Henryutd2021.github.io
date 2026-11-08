@@ -9,7 +9,8 @@
 //     no location (one national build per period, shared by demand) and the generic build limit
 //   - the plan links: the schema is valid; defaults and presets are valid and round-trip
 //   - the model as built, for the presets: every region-slice balances; plants within their availability; wind and solar
-//     within the hour's output; batteries cyclic within each representative day, the scarce-wind week within its store;
+//     within the hour's output; batteries cyclic within each representative day, the scarce-wind week within its store
+//     and paid back by the winter day (over a year a store gives out 85% of what it takes in: no energy from nowhere);
 //     flows within the links; the fuel rows; CO2 = fuels x IPCC factors; the cumulative budget with its weights; imports
 //     within the cap; the stress-hour rule; kept-open capacity never rises
 //   - money: the present value from each year's cost equals the LP's economic objective (penalties and the tie rule left
@@ -31,7 +32,11 @@
 //     byte (the default and one more by default, every entry with --library), written exactly as --write writes it
 //   - limits first: the high-electrification 2,800 Mt plan without the firm option meets its budget
 //     (the hard-limit LP's cost and a dual above the $1,000 penalty); the straight line to zero is out of reach, and the
-//     closest pathway is the least-CO2 plan that serves every slice and stress hour; an out-of-reach window has no duals
+//     closest pathway is the least-CO2 plan that serves every slice and stress hour; an out-of-reach window has no duals,
+//     no electricity prices and no fuel values (its full-year check prices fuels as bought); a plan 0.45 Mt over its budget
+//     is flagged over (never rounded to met); under a binding or out-of-reach import cap no battery charges and discharges
+//     at once and no link carries power both ways (what they lose is left out of the cap's base), and every MWh made is
+//     used or lost
 //   - the other engine checks: a unit retired in an earlier window stays at 0 (no reopening); a drought derates
 //     the summer stress hour as it derates the summer slices; the mineral restriction keeps decisions through the year
 //     before it and never reprices plants already decided; the stress shortfall is the worse hour's, never the sum of the
@@ -121,6 +126,15 @@ const WRITE = process.argv.includes("--write"), FULLLIB = process.argv.includes(
     P.Y.forEach((y, p) => { const f = raw.per[p].fuel, c = ((f.crudeDom + f.crudeImp) * 73.3 + (f.gasDom + f.lng) * 56.1 + f.coal * 94.6) / 1000; ok(near(c, raw.per[p].co2, 1e-6), pr.id + " " + y + ": CO2 = fuels x IPCC factors (" + c.toFixed(2) + " Mt)"); });
     ok(near(R.cum, 2 * 214.9 + E4.sum(P.Y.map((y, p) => [5, 5, 5, 5, 3][p] * R.co2[p])), 1e-6) && R.cum <= st.bud + raw.over + 1e-4, pr.id + ": cumulative CO2 = 2 x 214.9 + 5, 5, 5, 5, 3 x each model year's, within the budget plus any overshoot");
     P.Y.forEach((y, p) => ok(R.importShare[p] <= Sx.cap + raw.per[p].importOver / raw.per[p].primary + 1e-6, pr.id + " " + y + ": imports within the cap (" + (100 * R.importShare[p]).toFixed(1) + "%)"));
+    P.Y.forEach((y, p) => { const q = raw.per[p]; ok(q.imports <= Sx.cap * (q.primary - q.lossPJ) + q.importOver + 1e-6 && q.lossPJ >= -1e-9, pr.id + " " + y + ": imports within the cap x (primary energy less the " + q.lossPJ.toFixed(1) + " PJ that batteries and links lose)"); });
+    // batteries: over a year (each representative day x its days, the week x 7) a store gives out 85% of what it takes in
+    const eta = T.battery.roundTrip;
+    let bal0 = 0; P.Y.forEach((y, p) => P.R.forEach((Rr, r) => { const t = E4.sum(P.S.map(s => s.h * (eta * val(x, "bc_" + r + "_" + s.i + "_" + p) - val(x, "bd_" + r + "_" + s.i + "_" + p)))); bal0 = Math.max(bal0, Math.abs(t)); }));
+    ok(bal0 < 1e-2, pr.id + ": every region's batteries give out 85% of what they take in over each model year, the scarce-wind week included (worst " + bal0.toExponential(1) + " MWh)");
+    // every MWh made is used or lost: generation (batteries left out) = busbar load + what batteries and links lose - unserved
+    let gl = 0; P.Y.forEach((y, p) => { const q = raw.per[p], gen = E4.sum(Object.keys(q.genMWh).filter(t => t !== "battery").map(t => q.genMWh[t])), load = E4.sum(Sx.loadMW[p]) * E4.sum(P.S.map(s => s.demand * s.h));
+      gl = Math.max(gl, Math.abs(gen - load - q.lossPJ / E4.PJ_PER_MWH + q.unservedMWh) / load); });
+    ok(gl < 1e-6, pr.id + ": generation = load + what batteries and links lose, every model year (worst " + gl.toExponential(1) + " of the load)");
     // the money: present value from each year's cost = the LP's economic objective + the existing fleet's upkeep (a
     // constant outside the LP), recomputed here from prairieland.json's units and fixed O&M coefficients
     const econ = m.variables.reduce((a, v) => a + val(x, v.name) * (m.meta.cat[v.name] === "penalty" ? 0 : v.cost - (m.meta.tieC[v.name] || 0)), 0);
@@ -240,6 +254,28 @@ const WRITE = process.argv.includes("--write"), FULLLIB = process.argv.includes(
     ok(r2.ok && V2.over > 0.5 && !V2.reach && V2.carbonValue[0] === null && Math.abs(V2.cum - least) <= 0.5 && /out of reach/.test(r2.message),
       "the straight line to zero is out of reach: the closest pathway emits " + V2.cum + " Mt, the least any plan serving every slice and stress hour emits (" + least.toFixed(1) + " Mt); no dual reported");
     ok(Math.round(V2.cum / 100) * 100 === 2700 && E4.GAP[0].indexOf("about 2,700 Mt") >= 0, "the pages' 'about 2,700 Mt' floor is this run's (" + V2.cum + " Mt)");
+    // a plan 0.45 Mt over its budget is over, though it rounds to the budget (100/66/60, 2,800 Mt, a 60% cap)
+    const r4 = await run(Object.assign({}, def, { eb: 100, et: 66, ei: 60, bud: 2800, cap: 60 })), V4 = E4.view(r4.results.plan, P);
+    ok(r4.ok && !V4.reach && V4.missBudget === true && V4.over === 0 && V4.over1 === 0.5 && V4.cum === 2800 && !V4.missCap.some(Boolean) && V4.carbonValue[0] === null && E4.cumText(V4) === "2,800.5" && E4.overText(V4) === "0.5 Mt" &&
+      E4.resultRows(V4, P)[1][1] === "2,800.5 of 2,800 Mt (0.5 Mt over)",
+      "a plan " + (r4.results.plan.over).toFixed(3) + " Mt over its 2,800 Mt budget is flagged over (" + E4.resultRows(V4, P)[1][1] + "), the cap met, no dual");
+    // under a binding import cap (30%) and one out of reach (25%): no battery charges and discharges at once, no link carries
+    // power both ways, and every MWh made is used or lost (the extra LPs of an out-of-reach run cost nothing for waste, so
+    // they would waste if it helped)
+    {
+      let last = null; const cap = (m, o) => { const rr = solveSync(m, o); last = rr; return Promise.resolve(rr); };
+      for (const c of [30, 25]) {
+        const stc = Object.assign({}, def, { cap: c }), rc = await E4.solve(stc, P, { solver: cap, timeLimit: 120 }), xc = last.values, Sc = E4.sysOf(stc, P);
+        let both = 0, two = 0, gl2 = 0;
+        P.Y.forEach((y, p) => { P.R.forEach((Rr, r) => P.S.forEach(s => { both += Math.min(val(xc, "bc_" + r + "_" + s.i + "_" + p), val(xc, "bd_" + r + "_" + s.i + "_" + p)) * s.h; }));
+          P.links.forEach(l => P.S.forEach(s => { two += Math.min(val(xc, "fw_" + l.i + "_" + s.i + "_" + p), val(xc, "fb_" + l.i + "_" + s.i + "_" + p)) * s.h; }));
+          const q = rc.results.plan.raw.per[p], gen = E4.sum(Object.keys(q.genMWh).filter(t => t !== "battery").map(t => q.genMWh[t])), load = E4.sum(Sc.loadMW[p]) * E4.sum(P.S.map(s => s.demand * s.h));
+          gl2 = Math.max(gl2, Math.abs(gen - load - q.lossPJ / E4.PJ_PER_MWH + q.unservedMWh) / load); });
+        const Vc = E4.view(rc.results.plan, P);
+        ok(rc.ok && both < 1e3 && two < 1e3 && gl2 < 1e-6 && (c === 30 ? Vc.reach && Vc.importValue[0] > 1 : !Vc.reach && Vc.price.every(a => a.every(v => v === null)) && rc.results.plan.raw.per.every(q => !q.dualsOk && q.fuelValue.oil === Sc.price[q.p].oil)),
+          "import cap " + c + "% (" + (c === 30 ? "binding, $" + Vc.importValue[0] + " a GJ in 2030" : "out of reach: no prices, fuels as bought") + "): batteries at once " + (both / 1e3).toFixed(1) + " MWh, links both ways " + (two / 1e3).toFixed(1) + " MWh, generation = load + losses");
+      }
+    }
     // an out-of-reach window has no duals; decade by decade names the window
     const r3 = await run(Object.assign({}, E4.withPreset(def, cfg.presets.find(x => x.id === "secure")), { fs: "myopic" })), V3 = E4.view(r3.results.plan, P);
     ok(V3.windowReach[0] === false && V3.carbonValue[0] === null && V3.importValue[0] === null && V3.carbonPrice[0] === null && /window 2030–2035 cannot meet its share/.test(r3.message) && /not guaranteed the cheapest/.test(r3.message),
@@ -316,7 +352,7 @@ const WRITE = process.argv.includes("--write"), FULLLIB = process.argv.includes(
     ok(same(RA, "LNG cheaper") && same(RB, "2,800 Mt") && qA.fuel.gasDom < 1e-6 && qA.fuel.lng > 900 && qB.fuel.gasDom < 1e-6 && qB.fuel.lng > 400,
       "the LP's own mix kept: LNG at $6 and domestic gas at $9, 2030 buys " + qA.fuel.lng.toFixed(1) + " PJ of LNG and no domestic gas; at 2,800 Mt (100/78/60, no firm option), 2045 buys " + qB.fuel.lng.toFixed(1) + " PJ of LNG and no domestic gas");
     const need = qB.fuel.lng, gd0 = Math.min(P.domGas, need / own), old = E4.co2Of(P, 0, { gasDom: gd0, lng: Math.max(0, need - gd0 * own) }, 0), now = E4.co2Of(P, 0, E4.procure(P, qB, need), 0);
-    ok(near(old - now, 1.295, 0.002), "domestic first would have added " + (old - now).toFixed(3) + " Mt to that year's CO2 for the same delivered gas (the gas burned in the fields)");
+    ok(near(old - now, 1.298, 0.002), "domestic first would have added " + (old - now).toFixed(3) + " Mt to that year's CO2 for the same delivered gas (the gas burned in the fields)");
     const cA = await E4.fullYear(P, E4.sysOf(stA, P), RA.raw, 0, H24, { solver });
     ok(cA.status === "optimal" && cA.gasDom === 0 && cA.lng > 0 && near(cA.co2, E4.co2Of(P, E4.sysOf(stA, P).fuel[0].oil / P.refYield + cA.oilPJ, { gasDom: 0, lng: cA.lng }, (E4.sysOf(stA, P).fuel[0].coal + cA.coalPJ) / (1 - P.coalOwn)), 1e-9),
       "the full-year check of that 2030 buys LNG only, as the LP did (" + cA.lng.toFixed(1) + " PJ; CO2 " + cA.co2.toFixed(1) + " Mt)");
@@ -334,8 +370,16 @@ const WRITE = process.argv.includes("--write"), FULLLIB = process.argv.includes(
     const LIB = fs.existsSync(LPATH) ? JSON.parse(fs.readFileSync(LPATH, "utf8")) : null;
     ok(LIB && LIB.plans.length === GRID.length && LIB.plans.every((e, i) => e.key === SS.encode(S, GRID[i].state)), "the library holds every preset, perfect and decade by decade, and the central plan without the peak-hour rule (" + GRID.length + "), in order");
     const nr = LIB && LIB.plans.find(e => e.preset === "central-norule");
-    ok(LIB && LIB.plans.every(e => { const sp = P.Y.indexOf(cfg.levers.shockYear.mineralBan); return e.view.built.battery[sp] > 0.005 || Math.abs(e.shocks.mineralBan.dPV) <= 1; }), "a shock that touches nothing the plan uses changes nothing: the mineral restriction with no new batteries in its year leaves the cost as it was (perfect and decade by decade)");
+    // (where the plan's window met its limits: re-planning part of a window that missed one is a new search for the closest
+    // plan, which can differ by a few million dollars whatever the shock)
+    ok(LIB && LIB.plans.every(e => { const sp = P.Y.indexOf(cfg.levers.shockYear.mineralBan); return e.view.built.battery[sp] > 0.005 || !e.view.reach || Math.abs(e.shocks.mineralBan.dPV) <= 1; }), "a shock that touches nothing the plan uses changes nothing: the mineral restriction with no new batteries in its year leaves the cost as it was (perfect and decade by decade, limits in reach)");
     ok(nr && nr.full.some(c => c.unservedMWh > 1e4), "the central plan without the peak-hour rule fails the full-year check (" + (nr ? nr.full.map(c => c.unservedHours + " h").join(", ") : "?") + ")");
+    const reachAt = (V, p) => V.windowReach[V.fs === "myopic" ? [0, 0, 1, 1, 2][p] : 0] !== false;
+    ok(LIB && LIB.plans.every(e => e.full.every(c => c.fuelAt === (reachAt(e.view, e.view.Y.indexOf(c.year)) ? "value" : "price")) && e.view.price.every((a, p) => a.every(v => v === null) === !reachAt(e.view, p))) &&
+      LIB.plans.some(e => e.full.some(c => c.fuelAt === "price")),
+      "every library entry: a model year whose window missed a limit has no electricity prices, and its full-year check prices fuels as bought; the others use the slice run's marginal values");
+    ok(LIB && LIB.plans.every(e => e.full.every(c => { const v = E4.fullVerdict(c); return c.fuelAt === "price" ? v.near === null && v.ok === v.served && /CO₂ not compared/.test(v.text) : v.near !== null && v.ok === (v.served && Math.abs(c.gap) <= E4.FULL_TOL); })),
+      "the verdict compares CO2 with the slices only where the slice run had marginal values; elsewhere it tests demand served and says CO2 was not compared");
     ok(LIB && fs.readFileSync(LPATH, "utf8") === X.libText(LIB.plans) + "\n", "the library file is written exactly as the test writes it");
     ok(LIB && LIB.date === X.LIB_DATE && LIB.plans.every(e => e.status === "optimal" && e.full.length === 4 && e.full.every(c => c.status === "optimal" && c.solves === 53)), "every library run optimal; four full-year checks each, 53 LPs each");
     const idx = FULLLIB ? GRID.map((g, i) => i) : [2, 5];

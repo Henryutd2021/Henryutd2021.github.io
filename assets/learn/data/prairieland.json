@@ -509,7 +509,7 @@
     "transport": 285.5,
     "agriculture": 48.0
    },
-   "note": "Useful energy, a teaching convention: heat delivered by furnaces and boilers, motion from engines (30%) and EVs (89%) (DOE's figures, read from prairie-city.json); electricity's other uses count at 100% by convention. Heat pumps are few in 2025, so no outdoor heat is shown."
+   "note": "Useful energy, a teaching convention: heat delivered by furnaces and boilers, motion from engines (30%) and EVs (89%, the middle of DOE's 87% to 91%; DOE Fact of the Week #1360, 16 Sep 2024); electricity's other uses count at 100% by convention. Heat pumps are few in 2025, so no outdoor heat is shown."
   },
   "sankey": {
    "unit": "PJ",
@@ -1610,7 +1610,7 @@
    "primaryPJ": 3500,
    "share": 0.4,
    "throughStraitPJ": 1085.0,
-   "method": "Import dependence = net imports / primary energy (Eurostat's indicator divides by gross available energy; here the two are the same, with no exports or bunkers). E4's import-share cap uses the same ratio in each period."
+   "method": "Import dependence = net imports / primary energy (Eurostat's indicator divides by gross available energy; here the two are the same, with no exports or bunkers). E4's import-share cap uses the same ratio in each period, with what batteries and links lose left out of its primary energy, so losing electricity on purpose cannot help meet the cap."
   },
   "minerals": {
    "suppliers": [
@@ -2329,7 +2329,7 @@
   "chronology": {
    "weights": "Each slice's hours; they sum to 8,760.",
    "days": "A season's day and night slices form one representative day (12 + 12 hours) that stands for `days` days; batteries cycle within it (end of night = start of day).",
-   "week": "The scarce-wind week is 7 consecutive days: a store may enter it full but must cover the week's shortfall from what it holds (no refill from other seasons).",
+   "week": "The scarce-wind week is 7 consecutive days: a store may enter it full but must cover the week's shortfall from what it holds (no refill from other seasons). The winter day pays it back: over winter's days and the week, a store gives out 85% of what it takes in, as on every other day.",
    "extremes": "The peak net-load day and the scarce-wind winter week get slices of their own: each its average day and night, repeated over its days. Their hourly sequence is not kept; the full-year check runs every hour in order.",
    "sameYear": "Load, wind, solar and the hydro factor all come from one weather year (2025), so each slice averages hours in which they occurred together; averaging removes the variation within a slice.",
    "outages": "Forced outages are left out of the planning LP (availability factors stand in); adequacy is never judged from slices (lesson A5)."
@@ -2513,7 +2513,10 @@
    "transport": {
     "ratio": 0.89,
     "fossil": 0.3,
-    "what": "EVs (89%) against engines (30%): DOE's figures, read from prairie-city.json"
+    "what": "EVs (89%, the middle of 87% to 91%) against engines (30%): DOE Fact of the Week #1360 (16 Sep 2024)",
+    "src": [
+     "doe-fotw1360"
+    ]
    },
    "industry": {
     "ratio": 1.5,
@@ -2660,6 +2663,13 @@
    "date": "8 Apr 2026; read 2 Nov 2026",
    "url": "https://www.eia.gov/outlooks/aeo/",
    "where": "modelled U.S. electricity use grows 0.9% to 1.6% a year to 2050 across the cases"
+  },
+  "doe-fotw1360": {
+   "title": "A Typical EV is 87%–91% Efficient Compared to 30% for a Conventional Gasoline Vehicle",
+   "publisher": "U.S. Department of Energy, Vehicle Technologies (Fact of the Week #1360)",
+   "date": "16 Sep 2024 (via f03-energy-services.json)",
+   "url": "https://www.energy.gov/cmei/vehicles/articles/fotw-1360-sept-16-2024-typical-ev-87-91-efficient-compared-30-conventional",
+   "where": "EVs 87-91% efficient; gasoline vehicles about 30%"
   },
   "eia-mer-13": {
    "title": "Monthly Energy Review, Table 1.3: primary energy consumption by source",

@@ -84,7 +84,7 @@ const QPATH = path.join(X.SITE, "learn/m13-national-pathway.qmd");
   const st7 = Object.assign({}, DEEP, { bud: LINE.mt }), V7 = E4.view((await run(st7)).results.plan, P), S7 = E4.sysOf(st7, P), w7 = PG.deepWords(V7, LINE.mt);
   ok(V7.over > 0.5 && w7.indexOf(PG.kilo(V7.over) + " Mt over") >= 0 && w7.indexOf("no pathway emits less than " + PG.kilo(V7.cum) + " Mt") >= 0, "step 7: the straight line to zero (" + LINE.mt + " Mt) is out of reach by " + V7.over + " Mt: the prediction's answer is no");
   // the budget gap with A20 (E4.GAP, shown on SB4, M13 and C4): the floor about 2,700 Mt; the build-rate and transmission
-  // limits lifted a hundredfold move it by about 5 Mt; A20's electrification path inside a copy of the engine lowers it to
+  // limits lifted a hundredfold move it by about 1 Mt; A20's electrification path inside a copy of the engine lowers it to
   // about 2,400 Mt and meets 2,600 Mt
   {
     const floor = async (EE, PP) => { const st = Object.assign({}, EE.defaults(EE.schema(PP)), { eb: PP.elRange.buildings.hi, et: PP.elRange.transport.hi, ei: PP.elRange.industry.hi, bud: 500 }); return EE.view((await EE.solve(st, PP, { solver })).results.plan, PP).cum; };
@@ -95,7 +95,7 @@ const QPATH = path.join(X.SITE, "learn/m13-national-pathway.qmd");
     const ctx = { module: { exports: {} } }; vm.runInNewContext(SRC.replace(pat, "z = (function () { var s0 = P.sigma0[k], e50 = s0 + Z[k] * (1 - s0), e = Math.min(e50, s0 + 0.15 * (y - P.base) / 5); return Math.max(0, (e - s0) / (1 - s0)); })()"), ctx);
     const EA = ctx.module.exports, PA = EA.prepare(PL, cfg), f2 = await floor(EA, PA);
     const stA = Object.assign({}, EA.defaults(EA.schema(PA)), { eb: PA.elRange.buildings.hi, et: PA.elRange.transport.hi, ei: PA.elRange.industry.hi, bud: 2600 }), VA = EA.view((await EA.solve(stA, PA, { solver })).results.plan, PA);
-    ok(SRC.indexOf(pat) >= 0 && Math.round(f0 / 100) * 100 === 2700 && f0 - f1 >= 2 && f0 - f1 <= 8 && Math.round(f2 / 100) * 100 === 2400 && VA.over === 0 && /about 5 Mt/.test(E4.GAP[2]) && /about 2,400 Mt/.test(E4.GAP[2]),
+    ok(SRC.indexOf(pat) >= 0 && Math.round(f0 / 100) * 100 === 2700 && f0 - f1 >= 0 && f0 - f1 <= 3 && Math.round(f2 / 100) * 100 === 2400 && VA.over === 0 && /about 1 Mt/.test(E4.GAP[2]) && /about 2,400 Mt/.test(E4.GAP[2]),
       "the gap with A20: the floor " + f0 + " Mt; limits x100: " + f1 + " Mt (" + (f0 - f1) + " Mt lower); A20's electrification path inside the engine: " + f2 + " Mt, and 2,600 Mt met ($" + (VA.pv.total / 1000).toFixed(1) + " bn)");
   }
   const rem = PG.remains(S7), rr = PG.remainRows(S7);

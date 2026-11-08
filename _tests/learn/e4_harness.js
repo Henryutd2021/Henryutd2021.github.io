@@ -14,7 +14,7 @@ const vm = require("vm");
 const X1 = require("./e1_harness.js");
 const SITE = path.resolve(__dirname, "..", "..");
 const L = p => path.join(SITE, "assets/learn", p);
-const LIB_DATE = "7 November 2026", LIB_ISO = "2026-11-07";   // the library's solve date, as words and as the dataset block's date
+const LIB_DATE = "8 November 2026", LIB_ISO = "2026-11-08";   // the library's solve date, as words and as the dataset block's date
 async function load() {
   const ctx = { window: { LX: {} }, module: { exports: {} }, performance };
   vm.runInNewContext(fs.readFileSync(L("components/solver.js"), "utf8"), ctx);
@@ -50,7 +50,8 @@ function grid(E4, P, S) {
 function fullOf(E4, c, R, p, weather) {
   const r = E4.rd;
   return { year: c.year, weather: weather, status: c.status, unservedMWh: r(c.unservedMWh, 0), unservedHours: c.unservedHours, co2: r(c.co2, 1), co2Slices: r(c.co2Slices, 1), gap: r(c.co2Gap, 4),
-    curtailTWh: r(c.curtailMWh / 1e6, 1), curtailSlices: r(R.curtailTWh[p], 1), linkHours: c.linkHours.slice(), weekLowMWh: c.weekLow == null ? null : r(c.weekLow, 0), solves: c.solves };
+    curtailTWh: r(c.curtailMWh / 1e6, 1), curtailSlices: r(R.curtailTWh[p], 1), linkHours: c.linkHours.slice(), weekLowMWh: c.weekLow == null ? null : r(c.weekLow, 0), solves: c.solves,
+    fuelAt: c.fuelAt };   // "value": the slice run's marginal values of fuel; "price": as bought (the window missed a limit)
 }
 async function libEntry(X, g, H25, H24, o) {
   const { E4, P, S, SS, solver } = X;
@@ -72,7 +73,7 @@ async function libEntry(X, g, H25, H24, o) {
 function libText(plans) {
   return JSON.stringify({
     about: "Engine E4's precomputed runs for SB4, M13 and C4: every preset, with perfect foresight and decade by decade, and the central plan without the peak-hour rule. " +
-      "Each entry holds the plan's view (every number a page shows), C4's four shocks re-planned, and the full-year checks of 2030 and 2050 in 2025's and 2024's weather (52 weeks and 31 December, an LP each). " +
+      "Each entry holds the plan's view (every number a page shows), C4's four shocks re-planned, and the full-year checks of 2030 and 2050 in 2025's and 2024's weather (52 weeks and 31 December, an LP each; fuels at the slice run's marginal values, or as bought where its window missed a limit). " +
       "Solved with engine E4 in HiGHS on " + LIB_DATE + ", each LP optimal within its 120 s limit. The pages show it before the reader's first run and read the full-year checks from it, since those are too slow for a click; every run a reader starts solves in the browser.",
     dataset: { creator: "Honglin Li", date: LIB_ISO,
       status: "Simulated: engine E4's runs of Prairieland, a fictional nation with illustrative inputs (prairieland.json and e4-pathways.json); the full-year checks use SPP's 2025 and 2024 hourly shapes (EIA-930).",
