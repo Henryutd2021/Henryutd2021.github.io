@@ -42,7 +42,7 @@ body-classes: "page-learn page-lesson lx-form-checkpoint"
 <p class="lx-eyebrow">How it is marked, before you start</p>
 <ul class="ckf-list">
 <li><b>Proficient:</b> at least 5 of the 7 auto-marked tasks right on the first try, both points of task 1, and Proficient or better on all four estimate criteria.</li>
-<li><b>Strong:</b> at least 6 of 7, both points of task 1, and Strong on at least two estimate criteria.</li>
+<li><b>Strong:</b> at least 6 of 7, both points of task 1, and Proficient or better on all four estimate criteria, with Strong on at least two.</li>
 <li><b>Opening a solution early:</b> that task counts as not right. For task 1 that means no points; for the estimate, no self-ratings.</li>
 <li><b>Written answers</b> (tasks 1 and 9) stay as you first submit them, and that is what you rate.</li>
 </ul>

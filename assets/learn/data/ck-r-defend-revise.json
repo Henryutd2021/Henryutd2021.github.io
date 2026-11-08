@@ -169,7 +169,7 @@
       ],
       "answer": "c",
       "why": {
-        "a": "6.5% is far over the 1% set beforehand: until the cause is known, neither number can be trusted.",
+        "a": "the gap is far over the 1% set beforehand: until the cause is known, neither number can be trusted.",
         "b": "The rerun may be the wrong one; a quiet swap hides the problem.",
         "c": "A difference beyond the tolerance is a finding: explain it, fix it in the repository, and say so.",
         "d": "Moving the tolerance after seeing the result defeats it."

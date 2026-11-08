@@ -264,7 +264,7 @@ const usd = v => "$" + (Math.round(v * 100) / 100).toLocaleString("en-US", { min
       const COINCIDE = ["e-cf>e-net", "e-net>e-cf", "e-net>e-gap", "e-gap>e-net"];
       const leaks = CPK.solLeaks(D).map(x => x.task + ">" + x.names).filter(x => COINCIDE.indexOf(x) < 0);
       ok(leaks.length === 0 && CPK.openProblems(D).length === 0, `${k}: no solution leaks an unanswered task's answer ${leaks.join(", ")}`);
-      ok(k === "model" ? CP.task(D, "m-valid").solAfter.join() === "m-cost,m-ub,m-lb" : CP.task(D, "e-gap").solAfter.join() === "e-cf", `${k}: the solutions that name other answers wait for those tasks`);
+      ok(k === "model" ? CP.task(D, "m-valid").solAfter.join() === "m-cost,m-ub,m-lb" : CP.task(D, "e-gap").solAfter.join() === "e-cf,e-why", `${k}: the solutions that name other answers wait for those tasks`);
       ok(D.tasks.filter(t => t.kind === "open-short").every(t => t.freeze === true) && D.tasks.filter(t => t.kind !== "open-short").every(t => !t.freeze), `${k}: the written tasks keep their first submission`);
       // an earlier fault: task 11 submitted first used to open the full solutions; answers after an
       // opening are late (the shared rule) and the attempt is practice

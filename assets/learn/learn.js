@@ -5838,10 +5838,12 @@
   function solLeaks(D) {
     var out = [];
     D.tasks.forEach(function (u) {
-      var n = numsIn(afterText(u)), wait = u.solAfter || [];
+      // a choice's feedback shows with its answer, whatever solAfter says, so it is checked against every other task
+      var n = numsIn(afterText(u)), nw = numsIn(Object.keys(u.why || {}).map(function (k) { return u.why[k]; }).join(" ")), wait = u.solAfter || [];
       D.tasks.forEach(function (t) {
-        if (t === u || wait.indexOf(t.id) >= 0) return;
-        answerNums(t).forEach(function (a) { if (n.some(function (x) { return Math.abs(x - a) <= a * 0.005; })) out.push({ task: u.id, names: t.id, value: a }); });
+        if (t === u) return;
+        var held = wait.indexOf(t.id) >= 0, m = held ? nw : n;
+        answerNums(t).forEach(function (a) { if (m.some(function (x) { return Math.abs(x - a) <= a * 0.005; })) out.push({ task: u.id, names: t.id, value: a }); });
       });
     });
     return out;
