@@ -1313,7 +1313,9 @@
       // sea and the strait
       mk("path", { d: "M0 448 Q160 432 320 446 T640 436 L640 470 L0 470 Z", class: "e4-sea" });
       var st = mk("g", { class: "e4-strait" }); mk("path", { d: "M628 462 L520 446 L352 386", class: "e4-route" }, st);
-      var tx = mk("text", { x: 632, y: 430, "text-anchor": "end", class: "e4-mlab small e4-halo" }, st); tx.textContent = straitText(P);
+      // in two short lines at the map's right edge, clear of Coast's labels (the text version has it in one sentence)
+      var sl = straitText(P).split(" and "), tx = mk("text", { x: 632, y: 416, "text-anchor": "end", class: "e4-mlab small e4-halo" }, st); tx.textContent = sl[0] + " and";
+      var tx2 = mk("text", { x: 632, y: 430, "text-anchor": "end", class: "e4-mlab small e4-halo" }, st); tx2.textContent = sl.slice(1).join(" and ");
       // links
       P.links.forEach(function (l, i) {
         var a = POS[P.R[l.a].key], b = POS[P.R[l.b].key], gw = V.linkGW[p][i], at = V.linkAt[p][i];

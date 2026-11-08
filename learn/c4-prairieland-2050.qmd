@@ -105,7 +105,8 @@ body-classes: "page-learn page-lesson lx-form-capstone"
 .c4-units { margin-top: .6rem; }
 .c4-nb { margin-top: 1rem; } .c4-nb-steps { margin: .4rem 0 0; padding-left: 1.3rem; display: grid; gap: 2px; }
 .page-learn #exemplars .lx-ex-lines { overflow-wrap: anywhere; }   /* the strong brief quotes a whole plan link */
-.page-learn .c4-note details { margin: 0; } .page-learn .c4-note summary { cursor: pointer; }
+.page-learn .c4-note details { margin: 0; } .page-learn .c4-note summary { cursor: pointer; padding: 3px 0; min-height: 24px; }
+.page-learn .c4-note li + li > details.e4-corr { margin-top: 4px; }
 </style>
 ```
 :::

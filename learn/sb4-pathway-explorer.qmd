@@ -89,7 +89,8 @@ body-classes: "page-learn page-lesson lx-form-sandbox"
 .sb4-res h3 { margin: 0 0 6px; font-size: 16px; }
 .sb4-rules { margin: .4rem 0 0; padding-left: 1.2rem; display: grid; gap: 2px; }
 .lx-facts.sb4-pen { margin: .3rem 0 .6rem; }
-.page-learn .sb4-note details { margin: 0; } .page-learn .sb4-note summary { cursor: pointer; }
+.page-learn .sb4-note details { margin: 0; } .page-learn .sb4-note summary { cursor: pointer; padding: 3px 0; min-height: 24px; }
+.page-learn .sb4-note li + li > details.e4-corr { margin-top: 4px; }
 </style>
 ```
 :::
