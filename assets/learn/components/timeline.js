@@ -1,7 +1,7 @@
 /* timeline.js — LX.Timeline: dated events, each with its source, in order (e-timeline; case files CF1-CF8, also A1 and
    X3).
    var tl = LX.Timeline(host, {
-     title: "The study in time",  lede: "One sentence.",   both optional (the title is an h3 in .lx-x-head)
+     title: "The study in time",  lede: "One sentence.",   both optional (the title is an h3 in .lx-x-head; an h2 right under the page title)
      events: [{ date: "2023" | "2023-05" | "2023-05-14",   ISO, to the year, month or day
                 label: "Data year ends",                    a few words
                 text: "One sentence.",                      optional ([[glossary|marks]] and **bold** work)
@@ -106,7 +106,7 @@
     if (bad.length) throw new Error("LX.Timeline: " + bad.join("; "));
     var kinds = {}; Object.keys(KINDS).forEach(function (k) { kinds[k] = (o.kinds && o.kinds[k]) || KINDS[k]; });
     var ev = sortEvents(o.events, o.order), box = H("div", { class: "lx-tl" }, host);
-    if (o.title) { var hd = H("header", { class: "lx-x-head" }, box); H("h3", { text: o.title }, hd); }
+    if (o.title) { var hd = H("header", { class: "lx-x-head" }, box); H(LX.hTag(3, hd), { text: o.title }, hd); }
     if (o.lede) H("p", { class: "lx-tl-lede", html: rich(o.lede) }, box);
     var ol = H("ol", { class: "lx-tl-list", "aria-label": o.title || "Timeline" }, box);
     ev.forEach(function (e, i) {

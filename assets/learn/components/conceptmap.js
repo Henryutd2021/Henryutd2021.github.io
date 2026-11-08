@@ -14,7 +14,8 @@
   var LX = window.LX, H = LX.H, S = LX.S;
   LX.ConceptMap = function (host, o) {
     var hd = H("header", { class: "lx-x-head" }, host);
-    H("h3", { text: o.title || "The ideas, and how they connect" }, hd);
+    var tag = LX.hTag(3, hd), sub = "h" + (+tag.charAt(1) + 1);   // an h2 right under the page title; the panel's heading one below
+    H(tag, { text: o.title || "The ideas, and how they connect" }, hd);
     var gl = H("div", { class: "lx-cgroups", "aria-hidden": "true" }, hd);
     Object.keys(o.groups).forEach(function (k) { var s = H("span", null, gl); H("i", { style: "--c:" + o.groups[k][1] }, s); H("span", { text: o.groups[k][0] }, s); });
     if (o.lede) H("p", { class: "lx-lede", html: LX.rich(o.lede) }, host);
@@ -86,7 +87,7 @@
       Object.keys(nodes).forEach(function (k) { nodes[k].classList.toggle("sel", k === id); nodes[k].setAttribute("aria-pressed", k === id ? "true" : "false"); nodes[k].classList.toggle("dim", !nb[k]); });
       var n = byId[id]; det.innerHTML = "";
       H("p", { class: "lx-eyebrow", text: o.groups[n.g][0] }, det);
-      H("h4", { text: n.label }, det); H("p", { html: LX.rich(n.text) }, det);
+      H(sub, { text: n.label }, det); H("p", { html: LX.rich(n.text) }, det);
       if (n.game) { var ig = H("div", { class: "ingame" }, det); H("b", { text: o.gameLabel || (LX.lesson() && LX.lesson().form === "play" ? "In the game" : "In this lesson") }, ig); H("span", { html: LX.rich(n.game) }, ig);
         var gm = o.moment && o.moment(id); if (gm) H("div", { class: "you", text: gm }, ig); }
       var links = o.edges.filter(function (e) { return e[0] === id || e[1] === id; });
