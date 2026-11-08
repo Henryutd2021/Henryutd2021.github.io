@@ -82,7 +82,7 @@ const APPROVED_SNAPSHOT = {
     plan: { pv: plan.pv, bat: plan.bat, gen: plan.gen }, check: { must: +o.must.toFixed(3), keep: +o.keep.toFixed(3), shed: +o.shed.toFixed(3), fuel: +o.fuel.toFixed(3) },
     seeded: { starts: P.seeded.map(s => s.start), hours: P.seeded.map(s => s.hours), must: sd.results.outages.map(x => +x.must.toFixed(3)) },
     roll: rows.map(r => ({ key: r.key, must: +r.totals.must.toFixed(3), keep: +r.totals.keep.toFixed(3), fuel: +r.totals.fuel.toFixed(3) })),
-    note: "Reference results of lesson M5, solved with engine E1 in HiGHS 1.15.4; the M5 notebook checks its answers against them." };
+    note: "Reference results of lesson M5, solved with engine E1 in HiGHS 1.15.1; the M5 notebook checks its answers against them." };
   if (process.argv.includes("--write")) {
     X.writeBlocks(QPATH, { "m5-static": html });
     const DP = X.L("data/e1-prairie-campus.json"), d = JSON.parse(fs.readFileSync(DP, "utf8")); d.reference = Object.assign({}, d.reference, { m5: ref });

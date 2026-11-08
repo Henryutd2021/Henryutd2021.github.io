@@ -325,7 +325,7 @@ const QPATH = path.join(SITE, "learn/sb0-site-bench.qmd");
   // ---------------- the page's generated blocks and numbers
   if (WRITE) {
     const def = await run(D0);
-    D.reference = { about: "Written by node _tests/learn/test_sb0-site-bench.js --write: the default plan's results (the no-JS blocks) and the check of the run in 52 weeks and 31 December against one full-year LP for each preset.",
+    D.reference = { about: "The default plan's results, shown when JavaScript is off, and each preset's run in 52 weeks and 31 December checked against one LP over the whole year, all solved with engine E0 and HiGHS.",
       "default": { date: new Date().toLocaleDateString("en-CA"), state: D0, readouts: def.results.readouts }, check: Object.assign(check, { date: new Date().toLocaleDateString("en-CA") }) };
     fs.writeFileSync(L("data/e0.json"), JSON.stringify(D, null, 1) + "\n");
   }

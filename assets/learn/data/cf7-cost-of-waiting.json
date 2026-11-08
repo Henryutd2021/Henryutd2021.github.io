@@ -64,7 +64,7 @@
     ]
   },
   "facts": [
-    { "n": "on the order of $0.7 billion", "what": "For a 300 MW-IT facility, a 36-month delay costs the developer on the order of $0.7 billion in present value.", "source": "Li et al. (2026), NAPS 2026 (accepted)", "url": "", "asof": "presented October 2026; DOI pending" },
+    { "n": "on the order of $0.7 billion", "what": "In the study's illustrative base case, a 36-month delay for a 300 MW-IT facility cost the developer on the order of $0.7 billion in present value.", "source": "Li et al. (2026), NAPS 2026 (accepted)", "url": "", "asof": "presented October 2026; DOI pending" },
     { "n": "about 4.4%", "what": "Share of U.S. electricity used by data centers in 2023 (about 176 TWh).", "source": "U.S. Department of Energy (Berkeley Lab report)", "url": "https://www.energy.gov/articles/doe-releases-new-report-evaluating-increase-electricity-demand-data-centers", "asof": "published 20 December 2024; data for 2023" }
   ]
 }

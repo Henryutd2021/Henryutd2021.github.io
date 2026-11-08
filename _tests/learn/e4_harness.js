@@ -14,7 +14,7 @@ const vm = require("vm");
 const X1 = require("./e1_harness.js");
 const SITE = path.resolve(__dirname, "..", "..");
 const L = p => path.join(SITE, "assets/learn", p);
-const LIB_DATE = "7 November 2026";
+const LIB_DATE = "7 November 2026", LIB_ISO = "2026-11-07";   // the library's solve date, as words and as the dataset block's date
 async function load() {
   const ctx = { window: { LX: {} }, module: { exports: {} }, performance };
   vm.runInNewContext(fs.readFileSync(L("components/solver.js"), "utf8"), ctx);
@@ -70,8 +70,14 @@ async function libEntry(X, g, H25, H24, o) {
   return { key: SS.encode(S, Object.assign({}, g.state, { sh: "none" })), preset: g.preset, foresight: g.state.fs, status: "optimal", view: V, shocks: shocks, full: full };
 }
 function libText(plans) {
-  return JSON.stringify({ about: "Engine E4's precomputed library for SB4, M13 and C4 (learn/sb4-pathway-explorer.qmd, m13-national-pathway.qmd, c4-prairieland-2050.qmd): every preset with perfect foresight and decade by decade, and the central plan without the peak-hour rule, solved with E4 itself on " + LIB_DATE +
-    " (each LP optimal, at most 120 s a solve), its view (every number a page shows), C4's four shocks re-planned, and the full-year checks of 2030 and 2050 in 2025's and 2024's weather (52 weeks and 31 December, an LP each). Phones read it instead of loading the solver; the full-year checks are too slow for a click. Written by node _tests/learn/test_e4-engine.js --write; checked byte for byte (--library: every entry).",
+  return JSON.stringify({
+    about: "Engine E4's precomputed runs for SB4, M13 and C4: every preset, with perfect foresight and decade by decade, and the central plan without the peak-hour rule. " +
+      "Each entry holds the plan's view (every number a page shows), C4's four shocks re-planned, and the full-year checks of 2030 and 2050 in 2025's and 2024's weather (52 weeks and 31 December, an LP each). " +
+      "Solved with engine E4 in HiGHS on " + LIB_DATE + ", each LP optimal within its 120 s limit. The pages show it before the reader's first run and read the full-year checks from it, since those are too slow for a click; every run a reader starts solves in the browser.",
+    dataset: { creator: "Honglin Li", date: LIB_ISO,
+      status: "Simulated: engine E4's runs of Prairieland, a fictional nation with illustrative inputs (prairieland.json and e4-pathways.json); the full-year checks use SPP's 2025 and 2024 hourly shapes (EIA-930).",
+      source: "Solved with engine E4's linear programs in HiGHS on " + LIB_DATE + ", for the plans listed in `plans`.",
+      license: "CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/), Honglin Li. The underlying EIA-930 data are U.S. government works in the public domain." },
     date: LIB_DATE, timeLimit: 120, plans: plans });
 }
 // the dated correction line of SB4, M13 and C4 (7 Nov 2026), from the library: the existing fleet's upkeep is the same in
@@ -83,4 +89,4 @@ function correction(E4, LIB, PL) {
   return { text: "Corrected 7 Nov 2026: costs now include the existing wind, solar and batteries' fixed O&M, the same in every pathway at one discount rate (" + E4.bn(ups[0]) + " at " + PL.periods.discount.def + "%; central: " + E4.bn(V.pv.total) + ", was " + E4.bn(V.pv.total - V.pv.upkeep) +
     "). The full-year check buys gas in the slice run's own mix.", upkeep: ups[0], now: V.pv.total, was: V.pv.total - V.pv.upkeep };
 }
-module.exports = { SITE, L, LIB_DATE, load, face, grid, libEntry, libText, fullOf, correction, between: X1.between, writeBlocks: X1.writeBlocks, norm: X1.norm };
+module.exports = { SITE, L, LIB_DATE, LIB_ISO, load, face, grid, libEntry, libText, fullOf, correction, between: X1.between, writeBlocks: X1.writeBlocks, norm: X1.norm };

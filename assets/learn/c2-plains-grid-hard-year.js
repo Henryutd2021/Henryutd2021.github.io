@@ -19,7 +19,7 @@
   function mil(v) { var r = Math.round(v / 1e5) / 10; if (r === 0) r = 0; return (r < 0 ? "−$" : "$") + Math.abs(r).toFixed(1) + "M"; }
   function price(v) { var r = Math.round(v); return (r < 0 ? "−$" : "$") + Math.abs(r).toLocaleString("en-US"); }
   var SWEEP = [0, 100, 200, 300];
-  var LIB_LIMIT = 120;   // s per solve when the library is built (the page's live solves: 3 s, then 10 s)
+  var LIB_LIMIT = 120;   // s per solve when the library is built (the page's live solves: 10 s, then 30 s)
   function r0(v) { return Math.round(v); }
   function r1(v) { return Math.round(v * 10) / 10; }
   function r2(v) { return Math.round(v * 100) / 100; }
@@ -187,7 +187,7 @@
     var wrap = H("div", { class: "lx-sb e2-sb" }, live);
     var ctr = H("div", { class: "lx-sb-controls" }, wrap), side = H("div", { class: "lx-sb-side" }, wrap);
     var plan;
-    var ss = LX.ShareState(side, { schema: S, id: "c2-link", onLoad: function (s) { plan = s; C.set(plan); show(); AD.changed(plan); DY.changed(plan); rn.refresh(); } });
+    var ss = LX.ShareState(side, { schema: S, id: "c2-link", onLoad: function (s) { plan = s; C.set(plan); show(); AD.changed(plan); DY.changed(dayState()); rn.refresh(); } });
     plan = ss.state;
     var C = U.controls(ctr, S, plan, page.GROUPS, change);
     var pre = H("div", { class: "lx-sb-presets", role: "group", "aria-label": "Start from a preset (only the choices it names change)" }, side);
@@ -202,7 +202,7 @@
       plan = p; C.set(plan); ss.set(plan);
       var moneyOnly = !!adeq && page.moneyOnly(S, adeq.plan, p);
       if (moneyOnly) adeq.plan = U.copy(p); else AD.changed(plan);
-      DY.changed(plan); show(); rn.refresh();
+      DY.changed(dayState()); show(); rn.refresh();
     }
 
     // ---- the year, from the library: what it says, who pays, the hard weeks
@@ -235,7 +235,7 @@
       var Y = ["Production cost " + page.mil(e.year.prod) + " (running, no-load, start-up; 2025 dollars); uplift " + page.mil(e.year.uplift) + ".",
         "Average price (conditional on the commitment): " + P.zones.map(function (z, i) { return z.name + " " + price(e.year.avg[i]); }).join(", ") + " per MWh.",
         "CO₂ " + kilo(e.year.co2 / 1000) + " kt (operating, from the fuel burned); wind and sun spilled " + kilo(e.year.spill / 1000) + " GWh.",
-        "12 representative days, each weighted by its month's days, plus the two hard weeks day by day: 365 days in all.",
+        "12 representative days stand for the rest of each month, and each day of the two hard weeks counts once: 365 days in all.",
         "For the four plans checked against every day, production cost and CO₂ come close; Town's average price within " + page.priceErr(cfg) + "%; other customers' change, uplift and the hours at Town–Metro's limit less so (the check below)."];
       var ul3 = H("ul", { class: "e2-notes" }, c3); Y.forEach(function (t) { H("li", { text: t }, ul3); });
     }
@@ -253,7 +253,8 @@
         text: { head: ["Hour", "Prairie Town, $/MWh"], rows: v.map(function (x, i) { return [E2.dayLabel(dayList[12 + Math.floor(i / 24)].day) + " " + E2.hh(i % 24), price(x)]; }) } });
     }
 
-    // ---- one day, solved live (within the phone budget; a day that stops early can show its precomputed result)
+    // ---- one day, solved live (10 s a solve, 30 s on Try again; a day that still stops at its limit is drawn as not
+    // proven optimal, beside the library's run of that day)
     var dc = H("div", { class: "lx-xcard c2-day" }, rh);
     H("h3", { text: "Solve one day live" }, dc);
     H("p", { class: "lx-hint", html: LX.rich("Your browser commits the plants for one day with the [[mixed-integer-program|mixed-integer program]], then prices it with the dispatch [[linear-program|linear program]]: the same model the library used. A day of a hard week starts as the week's first day does.") }, dc);
@@ -263,21 +264,22 @@
     var sel = H("select", { class: "c2-sel" }, pick);
     opts.forEach(function (o) { H("option", { value: String(o.i), text: o.label }, sel); });
     sel.value = String(opts.filter(function (o) { return dayList[o.i].period === "hot"; })[0].i);
-    var dRow = H("div", null, dc), dStale = H("p", null, dc), dRes = H("div", { class: "c2-dayres" }, dc), dStop = U.stopper(), fbBox = H("div", { class: "c2-dayfb" }, dc);
+    var dRow = H("div", null, dc), dStale = H("p", null, dc), dRes = H("div", { class: "c2-dayres" }, dc), dStop = U.stopper();
     function dayIdx() { return +sel.value; }
-    var DY = LX.BenchRun(dRow, { label: "Solve this day live", state: function () { return plan; }, partial: true, results: [dRes], stale: dStale, busy: dStop.busy,
-      solve: function (st, ctx) { var d = dayList[dayIdx()]; return E2.solve(st, P, { task: "day", only: { y: d.y, day: d.day }, signal: ctx.signal, attempt: ctx.attempt, solver: stubSolver() }); },
-      render: function (R, st, r) { drawDay(R, r); },
-      onDone: function (r) { offer(r); } });
+    // the run's state: the plan and the chosen day (another day marks the results stale; the solved day is compared)
+    function dayState() { return { plan: plan, day: dayIdx() }; }
+    var DY = LX.BenchRun(dRow, { label: "Solve this day live", state: dayState, partial: true, results: [dRes], stale: dStale, busy: dStop.busy,
+      solve: function (x, ctx) { var d = dayList[x.day]; return E2.solve(x.plan, P, { task: "day", only: { y: d.y, day: d.day }, signal: ctx.signal, attempt: ctx.attempt, solver: stubSolver() }); },
+      render: function (R, x, r) { drawDay(R, r, x); } });
     dStop.attach(DY);
-    sel.addEventListener("change", function () { DY.changed(plan); fbBox.innerHTML = ""; });
+    sel.addEventListener("change", function () { DY.changed(dayState()); });
     function stubSolver() { if (!stub) return null; var k = stub; stub = null; return function (m, o) {
       if (k === "fail") return Promise.resolve({ status: "error", ok: false, message: "solver stopped (demo)" });
       return LX.solver.solve(m, o).then(function (r) { if (r.values && m.variables.some(function (v) { return v.type === "integer"; })) { r.status = "time-limit"; r.ok = false; r.mipGap = 0.0123; } return r; }); }; }
-    function libDay() { var e = entry(plan); return e ? e.days[dayIdx()] : null; }
-    function drawDay(R, r) {
-      dRes.innerHTML = ""; fbBox.innerHTML = "";
-      var T = R.tot, ld = libDay(), same = ld && r.ok && Math.abs(ld[2] - Math.round(T.prod)) <= 1;
+    function libDay(x) { var e = entry(x.plan); return e ? e.days[x.day] : null; }
+    function drawDay(R, r, x) {
+      dRes.innerHTML = "";
+      var T = R.tot, ld = libDay(x), same = ld && r.ok && Math.abs(ld[2] - Math.round(T.prod)) <= 1;
       H("p", { class: "e2-say", html: "<b>" + LX.esc(E2.dayLong(R.days[0].day)) + ":</b> production cost " + LX.esc(U.moneyK(T.prod)) + ", " + kilo(T.shed) + " MWh unserved, Town's highest price " + price(R.maxPrice[P.zix.T]) + "/MWh." +
         (ld ? " " + LX.esc(same ? "The same as the library's run of this day." : "The library's run of this day: " + U.moneyK(ld[2]) + ", " + kilo(ld[3]) + " MWh unserved (" + (ld[0] === "optimal" ? "optimal" : "not proven optimal") + ").") : "") }, dRes);
       var mc = H("div", { class: "c2-mapcard" }, dRes), map = U.ZoneMap(mc, P), best = 0, bp = -Infinity;
@@ -286,19 +288,6 @@
       U.priceChart(H("div", { class: "lx-sb-chart" }, dRes), P, R);
       U.commitTable(H("div", null, dRes), P, R, 0);
     }
-    // a live day that stopped early or failed: offer the library's result for that day
-    function offer(r) {
-      fbBox.innerHTML = "";
-      if (!r || r.ok || r.status === "superseded" || r.status === "cancelled") return;
-      var ld = libDay(); if (!ld) return;
-      var b = H("button", { class: "lx-btn ghost small", type: "button", text: "Show the precomputed result for this day" }, fbBox);
-      b.addEventListener("click", function () {
-        fbBox.innerHTML = "";
-        H("p", { class: "e2-say", html: "<b>Precomputed with this engine on " + LX.esc(LIB.date) + " (at most " + LIB.timeLimit + " s a solve):</b> " + LX.esc(E2.dayLong(dayList[dayIdx()].day) + ": production cost " + U.moneyK(ld[2]) + ", " + kilo(ld[3]) + " MWh unserved, Town's highest price " + price(ld[4]) + "/MWh; " +
-          (ld[0] === "optimal" ? "reported optimal." : "not proven optimal (gap " + ((ld[1] || 0) * 100).toFixed(2) + "%).")) }, fbBox);
-      });
-    }
-
     // ---- adequacy, with the sensitivity: the plan held fixed as the connected load grows (today's grid precomputed)
     var ac = H("div", { class: "lx-xcard c2-adeq" }, rh);
     H("h3", { text: "Check adequacy: enough supply in nearly every hour?" }, ac);
@@ -370,7 +359,7 @@
 
     // ---- the note
     var nh = document.getElementById("c2-note"); nh.innerHTML = "";
-    var rn = LX.ReportNote(H("div", { class: "lx-xcard" }, nh), { id: "c2-note", code: "C2", title: "Your two-page study note", lede: "Write three parts in your own words; the plan, its numbers, the assumptions and the sensitivity come from the precomputed year and your adequacy check.",
+    var rn = LX.ReportNote(H("div", { class: "lx-xcard" }, nh), { id: "c2-note", code: "C2", title: "Your two-page study note", lede: "Write four parts in your own words; the plan, its numbers, the assumptions and the sensitivity come from the precomputed year and your adequacy check.",
       fields: page.FIELDS,
       checks: ["link", "run", "fields", "assumptions", "sensitivity",
         { id: "pages", label: "Fits on two pages (about " + kilo(page.TWO_PAGES) + " words)", test: function (note, words) { return LX.ReportNote.countWords(LX.ReportNote.compose(note, words, page.FIELDS, { format: "text" })) <= page.TWO_PAGES; } },
@@ -411,7 +400,7 @@
 
     show(); rn.refresh();
     LX.demo(root, function (s) {
-      if (s === "mid") { DY.run(plan); return { view: "mid" }; }
+      if (s === "mid") { DY.run(dayState()); return { view: "mid" }; }
       if (s === "done") {
         change(Object.assign(U.copy(plan), E2.c2presets[1].state, { share: 50 }));
         AD.run(plan);
@@ -420,8 +409,8 @@
           risks: "The study has two weather years, no power-flow physics and illustrative plants; a colder winter or a late peaker could change the answer." });
         return { view: "done" };
       }
-      if (s === "fail") { stub = "fail"; DY.run(plan); return { view: "fail" }; }
-      if (s === "tl") { stub = "tl"; DY.run(plan); return { view: "tl" }; }
+      if (s === "fail") { stub = "fail"; DY.run(dayState()); return { view: "fail" }; }
+      if (s === "tl") { stub = "tl"; DY.run(dayState()); return { view: "tl" }; }
       return null;
     });
   });

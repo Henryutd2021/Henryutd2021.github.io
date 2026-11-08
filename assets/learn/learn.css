@@ -864,6 +864,16 @@ details.lx-listview > summary { cursor: pointer; min-height: 48px; display: flex
 .lx-solver-status[data-status="loading"]::before, .lx-solver-status[data-status="solving"]::before { animation: lx-solver-pulse 1s ease-in-out infinite alternate; }
 @keyframes lx-solver-pulse { from { opacity: .25; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .lx-solver-status::before { animation: none !important; } }
+/* the progress line of a long solve (LX.SolveProgress): appears after two seconds, next to the control that started
+   the solve; a moving bar (none with reduced motion), the seconds elapsed, step k of n and the usual time. No
+   percentage: the solver cannot know one. */
+.lx-solve-prog { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin: 6px 0 0; font-size: 13.5px; line-height: 1.4; color: var(--lx-ink-2); }
+.lx-solve-prog[hidden] { display: none; }
+.lx-solve-prog-bar { position: relative; flex: none; width: 88px; height: 6px; overflow: hidden; border-radius: 3px; background: var(--lx-surface-3); }
+.lx-solve-prog-bar::after { content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: 36%; border-radius: 3px; background: var(--lx-accent); animation: lx-solve-slide 1.6s ease-in-out infinite; }
+.lx-solve-prog-text { min-width: 0; font-variant-numeric: tabular-nums; }
+@keyframes lx-solve-slide { 0% { transform: translateX(-100%); } 100% { transform: translateX(280%); } }
+@media (prefers-reduced-motion: reduce) { .lx-solve-prog-bar { display: none; } }
 
 /* plot.css — LX.Plot and LX.PlotCard (plot.js): the XY chart's text and focus ring, the caption, and the chart card with
    value chips (readouts) above the chart; also the model-lab stage (.lx-stage: a card with a head, readouts, sliders,
@@ -1791,6 +1801,8 @@ body.page-learn { --t: var(--lx-accent); }
 /* the card's title as an h2 (right under the page title: LX.hTag in core.js) keeps the h3's look; the id and three classes
    outweigh the theme's first-h2-in-a-section margin on narrow screens */
 .page-learn #quarto-content .lx13-card .lx13-head h2{margin:0;opacity:.9}
+/* the same for the play panel's title (lesson 13's "What to build"), at the size of the theme's h3 */
+.page-learn #quarto-content .lx-play-panel .lx13-head h2{font-size:18px;margin:0;opacity:.9}
 .lx13-head{display:flex;justify-content:space-between;align-items:center;gap:6px 12px;flex-wrap:wrap}
 .lx13-sub{font-size:13.5px;color:var(--lx-ink-3)}
 /* nothing in a card may widen it: wide tables scroll in their own box (.lx13-hours, lesson 12's .lx12-scroll; without

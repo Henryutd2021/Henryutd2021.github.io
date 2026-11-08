@@ -212,7 +212,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-card lx-sources">
 <p class="lx-eyebrow">Sources and further reading</p>
 <ul>
-<li>EIA. <a href="https://www.eia.gov/electricity/gridmonitor/">Hourly Electric Grid Monitor</a> (Form EIA-930) and its <a href="https://www.eia.gov/electricity/gridmonitor/sixMonthFiles/">six-month files</a>: EIA930_BALANCE_2025_Jan_Jun.csv and EIA930_BALANCE_2025_Jul_Dec.csv, balancing authority SWPP.</li>
+<li>EIA. <a href="https://www.eia.gov/electricity/gridmonitor/">Hourly Electric Grid Monitor</a> (Form EIA-930) and its <a href="https://www.eia.gov/electricity/gridmonitor/dashboard/electric_overview/US48/US48">six-month files</a> (on the dashboard: Download Data → Six-Month Files): EIA930_BALANCE_2025_Jan_Jun.csv and EIA930_BALANCE_2025_Jul_Dec.csv, balancing authority SWPP.</li>
 <li>EIA. <a href="https://www.eia.gov/survey/form/eia_930/instructions.pdf">Form EIA-930 instructions</a> (PDF): hourly integrated values in MW by hour ending, with UTC time stamps.</li>
 <li>EIA. <a href="https://www.eia.gov/about/copyrights_reuse.php">Copyrights and reuse</a>: EIA data are in the public domain.</li>
 </ul>

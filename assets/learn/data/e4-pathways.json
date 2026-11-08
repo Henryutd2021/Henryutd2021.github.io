@@ -5,6 +5,13 @@
   "built": "2026-11-07",
   "dollarYear": 2025
  },
+ "dataset": {
+  "creator": "Honglin Li",
+  "date": "2026-11-07",
+  "status": "Illustrative: engine E4's settings for fictional Prairieland (the levers and their ranges, the existing fleet's operating settings, penalty costs, the tie rule, the presets and C4's accounting inputs), set for teaching or derived from prairieland.json; the two stress hours come from SPP's 2025 hourly shapes (EIA-930).",
+  "source": "Prepared for the course's engine E4, which takes every Prairieland number from prairieland.json and from this file only what the model adds; the stress hours (`stress`) are read from SPP's 2025 hours (town_year.json) by prairieland.json's hour rule.",
+  "license": "CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/), Honglin Li. The underlying EIA-930 data are U.S. government works in the public domain."
+ },
  "existing": {
   "availability": {
    "coal": 0.85,

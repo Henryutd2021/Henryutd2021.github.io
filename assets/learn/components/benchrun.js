@@ -16,7 +16,11 @@
                        aria-busy while a run is on, data-stale="true" (dimmed) while they show another plan's results
      stale: element,   where the "results are for an earlier plan" line goes (a <p> above the results; hidden when fresh)
      label: "Run the year",  busy: function (on) {},  onDone: function (r, state) {},  partial: false,
-     words: { ok: "...", infeasible: "..." } });   the engine's own sentence for a kind (else r.message, else ours)
+     words: { ok: "...", infeasible: "..." },   the engine's own sentence for a kind (else r.message, else ours)
+     progress: { usual: 12 or function (state) { return seconds or null; }, unit: "day" } });
+                       the progress line under the buttons (LX.SolveProgress, solver.js): it appears when a run lasts more
+                       than two seconds; usual is the click's expected time from the solver bench (6x), unit names a step.
+                       A run of several solves passes its count through ctx.step(k, n) (ctx = { signal, attempt, step })
    run.run(state) -> Promise of the result ({ status: "superseded" } when a newer run replaced it)
    run.changed(state)   call when the reader changes the plan: drawn results are marked stale until the next run
    run.last() -> { state, r } of the last run that drew results, or null;  run.running();  run.cancel();  run.el
@@ -74,13 +78,15 @@
     var label = o.label || "Run";
     var btn = H("button", { class: "lx-btn small", type: "button", text: label }, row);
     var again = H("button", { class: "lx-btn ghost small", type: "button", text: "Try again", hidden: true }, row);
+    var po = o.progress || {}, prog = LX.SolveProgress ? LX.SolveProgress(box, { unit: po.unit }) : null;
     var status = H("p", { class: "lx-br-status", role: "status", "aria-live": "polite" }, box);
     var areas = o.results ? [].concat(o.results).filter(Boolean) : [];
     areas.forEach(function (a) { a.classList.add("lx-br-results"); });
     if (o.stale) { o.stale.classList.add("lx-br-stale"); o.stale.hidden = true; }
     var token = 0, ctl = null, busyNow = false, last = null, lastTried = null, attempt = 0, planKey = null;
-    function setBusy(on) {
+    function setBusy(on, state) {
       busyNow = on;
+      if (prog) { if (on) prog.start({ usual: typeof po.usual === "function" ? po.usual(state) : po.usual }); else prog.stop(); }
       // aria-disabled, not disabled: a disabled button would drop the keyboard focus of a reader who pressed it
       if (on) btn.setAttribute("aria-disabled", "true"); else btn.removeAttribute("aria-disabled");
       btn.textContent = on ? "Running…" : label;
@@ -103,9 +109,9 @@
       ctl = typeof AbortController !== "undefined" ? new AbortController() : null;
       attempt = isRetry && lastTried === k ? attempt + 1 : 1;
       lastTried = k; planKey = k;
-      setBusy(true); say("busy", "Running…");
-      var p;
-      try { p = Promise.resolve(o.solve(JSON.parse(k), { signal: ctl ? ctl.signal : null, attempt: attempt })); }
+      setBusy(true, JSON.parse(k)); say("busy", "Running…");
+      var p, step = function (s, n) { if (my === token && prog) prog.step(s, n); };
+      try { p = Promise.resolve(o.solve(JSON.parse(k), { signal: ctl ? ctl.signal : null, attempt: attempt, step: step })); }
       catch (e) { p = Promise.resolve({ status: "error", ok: false, error: e && e.message }); }
       return p.then(null, function (e) { return { status: "error", ok: false, error: e && e.message }; }).then(function (r) {
         if (my !== token) return { status: "superseded", ok: false };   // a newer run (or a cancel) owns the page now

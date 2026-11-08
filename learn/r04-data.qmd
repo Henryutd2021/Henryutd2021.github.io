@@ -195,7 +195,7 @@ body-classes: "page-learn page-lesson lx-form-studio"
 <tr><td class="n">R4's starter notebook</td><td>This page's rules in pandas: your four numbers, the sensitivity table, the night check, the data note, and the spatial practice for Ford County, Kansas. Needs only the raw file.</td><td class="s"><a href="notebooks/r04-data.ipynb">.ipynb</a></td></tr>
 <tr><td class="n">B2's notebook</td><td>Loading, checking and plotting the same file, with the night rule; it also needs <a href="../assets/learn/data/town_year.json">town_year.json</a>.</td><td class="s"><a href="notebooks/b02-python-data.ipynb">.ipynb</a></td></tr>
 <tr><td class="n">QGIS</td><td>Free desktop GIS for the spatial practice: reproject, buffer, measure areas.</td><td class="s"><a href="https://qgis.org/">qgis.org</a></td></tr>
-<tr><td class="n">EIA-930 six-month files</td><td>The source files, with their checksums in the JSON's metadata.</td><td class="s"><a href="https://www.eia.gov/electricity/gridmonitor/sixMonthFiles/">eia.gov</a> · as of 2 November 2026</td></tr>
+<tr><td class="n">EIA-930 six-month files</td><td>The source files, with their checksums in the JSON's metadata.</td><td class="s"><a href="https://www.eia.gov/electricity/gridmonitor/dashboard/electric_overview/US48/US48">EIA Grid Monitor</a>, Download Data → Six-Month Files · as of 2 November 2026</td></tr>
 <tr><td class="n">U.S. Wind Turbine Database</td><td>Turbine locations for the spatial step; public domain, acknowledgment requested.</td><td class="s"><a href="https://energy.usgs.gov/uswtdb/">usgs.gov</a> · v9.1, checked 3 November 2026</td></tr>
 </tbody>
 </table>

@@ -24,7 +24,8 @@
 //   - scope (the nuclear scope rule; credit exercises without nuclear; the sourcing rule; framing C): no sentence pairs a
 //     nuclear term with a risk term of the scope scan's word lists (DENY_NUC, DENY_RISK), nor with a cost word (cost,
 //     capital, sunk, upkeep, O&M, levelized: a stricter check); a nuclear term only in the E15 rows that the approved wording
-//     writes with one, the title and the earlier-lessons line; no credit name, no new-plant case, no "without policy
+//     writes with one, the title and the earlier-lessons line; no credit name except the 45U credit in the clauses of
+//     E15.20, E15.21, E15.24 and E15.25 that state the baseline's conditions, no new-plant case, no "without policy
 //     support", none of the abstract's left-out figures, no market-data or PJM wording; the toy has no credit, no
 //     hydrogen-price slider, no nuclear term and no break-even, threshold or parity wording; links only to the paper's
 //     DOI, the allow-listed repository and learn pages, and A1, M11 and A12 through LX.lessonRef; no numbers to remember
@@ -269,12 +270,12 @@ const APPROVED_SNAPSHOT = {
   "E15.17": "A discounted cash-flow analysis turns the optimized year into net present value, internal rate of return, payback and levelized costs, with component-level capital costs and scheduled replacements.",
   "E15.18": "Electricity and hydrogen prices are taken as given (price-taking): the study evaluates plant operation against observed 2024 prices, and price feedback from wide adoption is stated as a limit and left to future work.",
   "E15.19": "Sensitivity runs on a representative reactor vary the electrolyzer's capacity bound and the level of electricity prices.",
-  "E15.20": "Operated as baseload-only plants at 2024 market prices, with no credits, nearly all of the plants studied had negative net present value.",
-  "E15.21": "With hydrogen integration, including the assumed hydrogen production credit, a majority of the plants studied reached positive net present value.",
+  "E15.20": "Operated as electricity-only baseload plants at 2024 market prices, without capacity payments or the 45U credit, nearly all of the plants studied had negative net present value.",
+  "E15.21": "With hydrogen integration and the assumed hydrogen production credit ($3/kg for ten years), a majority of the plants studied reached positive net present value, even without the 45U credit.",
   "E15.22": "With the assumed hydrogen credit, integrated operation added output flexibility: flexible output (the range of a plant's hourly output to the grid) expanded by more than 115 MW for most of the plants studied.",
   "E15.23": "Ancillary-service revenue was a few percent of total revenue, which includes the hydrogen credit.",
-  "E15.24": "Holds when: 2024 prices, taken as given; modeled ancillary-service participation parameters; the assumed hydrogen credit ($3/kg for ten years), with the dispatch held fixed after the credit expires; an existing plant's capital treated as already spent; no credits in the baseload case. Leaves out: price feedback from large-scale adoption.",
-  "E15.25": "Where the result holds: 42 existing plants in seven U.S. ISO/RTO markets, each at its own 2024 hourly prices, taken as given; one year of hourly operation (8,760 hours) turned into a lifetime cash flow; the existing plant's capital treated as already spent, so the capital counted is that of the new hydrogen and battery equipment; the assumed hydrogen production credit ($3/kg for ten years) in the retrofit results shown here, with the dispatch held fixed after it expires; no credits in the baseload case; modeled ancillary-service participation parameters. It leaves out: price feedback from large-scale adoption; re-optimized operation after the credit expires.",
+  "E15.24": "Holds when: 2024 prices, taken as given; modeled ancillary-service participation parameters; the assumed hydrogen credit ($3/kg for ten years), with the dispatch held fixed after the credit expires; an existing plant's capital treated as already spent; no capacity payments and no 45U credit in the baseload case. Leaves out: capacity-market revenues; price feedback from large-scale adoption.",
+  "E15.25": "Where the result holds: 42 existing plants in seven U.S. ISO/RTO markets, each at its own 2024 hourly prices, taken as given; one year of hourly operation (8,760 hours) turned into a lifetime cash flow; the existing plant's capital treated as already spent, so the capital counted is that of the new hydrogen and battery equipment; the assumed hydrogen production credit ($3/kg for ten years) in the retrofit results shown here, with the dispatch held fixed after it expires; no capacity payments and no 45U credit in the baseload case; modeled ancillary-service participation parameters. It leaves out: capacity-market revenues; price feedback from large-scale adoption; re-optimized operation after the credit expires.",
   "E15.26": "Hourly operation of 42 existing reactors with high-temperature electrolysis, hydrogen storage and batteries, in seven U.S. ISO/RTO markets at 2024 prices, is linked to a lifetime cash-flow model; published online on 2 June 2026.",
   "E15.27": "A documented, runnable implementation of the modelling framework, with synthetic examples (version 1.0.0).",
   "E15.28": "Try it yourself: the framework's minimal example compares business as usual with the integrated system over two synthetic weeks, solved with HiGHS. Generate synthetic inputs, then run the hourly operation again with energy prices 15% higher, or with ancillary services in dispatch mode, and compare the revenues and the flexibility. Its numbers say nothing about any real plant, market, policy or year.",
@@ -462,7 +463,13 @@ if (RG) {
   ok(withN.every(s => NROWS.some(u => u.includes(s)) || OTHER.some(o => X.norm(o).includes(s))), "a nuclear term only in those rows, the title and the earlier-lessons line: " + withN.filter(s => !NROWS.some(u => u.includes(s)) && !OTHER.some(o => X.norm(o).includes(s))).join(" | ").slice(0, 240));
 }
 const ALL = (PAGE.replace(/<!--[\s\S]*?-->/g, "") + "\n" + JSON.stringify(D) + "\n" + JSSTR.join("\n") + "\n" + SIDE + "\n" + row);
-ok(!/\b45[UVY]\b|\b48E\b|MACRS|greenfield|new[- ]plant|new[- ]build|Cases? [34]\b|subsidy|profitab|without (policy|subsid|credit)|PJM|Data Miner|market data/i.test(ALL), "no credit name, no new-plant case, no 'without policy support' or 'profitable', no PJM or market-data wording (credit and nuclear scope)");
+// the one credit named: the 45U credit, only in the approved clauses that state the baseline's conditions (E15.20,
+// E15.21, E15.24, E15.25); every other credit name, and the 45U credit anywhere else, fails the check below
+const R45 = { units: ["E15.20", "E15.21", "E15.24", "E15.25"].map(k => X.norm(EFF[k])), raw: EFF };
+const with45 = UNITS.filter(u => /\b45U\b/.test(u));
+ok(with45.length >= 4 && with45.every(u => X.approved(R45, u)), "the 45U credit is named only in clauses of E15.20, E15.21, E15.24 and E15.25 (" + with45.length + " elements): " + with45.filter(u => !X.approved(R45, u)).join(" | ").slice(0, 240));
+const ALL45 = ALL.replace(/without capacity payments or the 45U credit|even without the 45U credit|no capacity payments and no 45U credit in the baseload case/g, " ");
+ok(!/\b45[UVY]\b|\b48E\b|MACRS|greenfield|new[- ]plant|new[- ]build|Cases? [34]\b|subsidy|profitab|without (policy|subsid|credit)|PJM|Data Miner|market data/i.test(ALL45), "no other credit name, no new-plant case, no 'without policy support' or 'profitable', no PJM or market-data wording (credit and nuclear scope)");
 ok(!/data[- ]?cent|hyperscale|\bcampus\b|colocat|small modular|\bSMR\b|\bAI\b|artificial intelligence/i.test(ALL), "no data-center or small-modular wording, no AI wording");
 const hrefs = [...PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1:end -->/g, "").matchAll(/(?:href|src)="([^"]+)"/g)].map(m => m[1]).concat([...PAGE.matchAll(/\]\(([^)]+)\)/g)].map(m => m[1]), strings(D).filter(s => /^https?:/.test(s)));
 const HOK = h => h === DOI || h === REPO || h === REPO + "#quick-start" || /^[0-9a-z-]+\.html$/.test(h) || /^\.\.\/assets\/learn\//.test(h);

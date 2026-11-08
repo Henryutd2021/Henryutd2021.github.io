@@ -1,5 +1,5 @@
 {
-  "about": "Lesson 9 (T9, 09-storage). Prairie Town is fictional; its plants, costs and the battery are illustrative. The day's hourly demand, wind and solar follow the real shapes of 9 June 2025 on the Southwest Power Pool grid (EIA-930, in town_year.json), scaled to the town as lesson 0 does. 'precomputed' is written by node _tests/learn/test_09-storage.js --write from the same model with the vendored HiGHS, and is used on the page only if the solver cannot load and for the comparison table; the test fails if it drifts from a fresh solve.",
+  "about": "Lesson 9 (T9, 09-storage). Prairie Town is fictional; its plants, costs and the battery are illustrative. The day's hourly demand, wind and solar follow the real shapes of 9 June 2025 on the Southwest Power Pool grid (EIA-930, in town_year.json), scaled to the town as lesson 0 does. 'precomputed' holds the same model's best schedules, solved with HiGHS 1.15.1: the page shows them only if the solver cannot load, and in the comparison table; each is checked against a fresh solve.",
   "built": "2026-11-02",
   "day": {
     "date": "2025-06-09",

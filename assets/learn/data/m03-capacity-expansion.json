@@ -15,8 +15,7 @@
    "label": "4 typical weeks",
    "short": "4 typical",
    "perSeason": 1,
-   "extremes": [],
-   "live": true
+   "extremes": []
   },
   {
    "id": "wk7",
@@ -27,16 +26,14 @@
     "peak",
     "netpeak",
     "calm"
-   ],
-   "live": true
+   ]
   },
   {
    "id": "typ8",
    "label": "8 typical weeks",
    "short": "8 typical",
    "perSeason": 2,
-   "extremes": [],
-   "live": true
+   "extremes": []
   },
   {
    "id": "wk11",
@@ -47,8 +44,7 @@
     "peak",
     "netpeak",
     "calm"
-   ],
-   "live": false
+   ]
   },
   {
    "id": "wk15",
@@ -59,8 +55,7 @@
     "peak",
     "netpeak",
     "calm"
-   ],
-   "live": false
+   ]
   }
  ],
  "storage": {

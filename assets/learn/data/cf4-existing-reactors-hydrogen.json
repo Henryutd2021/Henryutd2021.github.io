@@ -36,10 +36,11 @@
    "one year of hourly operation (8,760 hours) turned into a lifetime cash flow;",
    "the existing plant's capital treated as already spent, so the capital counted is that of the new hydrogen and battery equipment;",
    "the assumed hydrogen production credit ($3/kg for ten years) in the retrofit results shown here, with the dispatch held fixed after it expires;",
-   "no credits in the baseload case;",
+   "no capacity payments and no 45U credit in the baseload case;",
    "modeled ancillary-service participation parameters."
   ],
   "leaves": [
+   "capacity-market revenues;",
    "price feedback from large-scale adoption;",
    "re-optimized operation after the credit expires."
   ],

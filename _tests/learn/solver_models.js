@@ -110,7 +110,9 @@ function uc24(town, days, which) {
 // them (LX.townPlan.weekModel, .link, .fullYearModel; data/m03-capacity-expansion.json, its reference plans):
 //   m3typ4    the plan LP on 4 typical weeks at 200 kt (step 3; solved on the page)
 //   m3typ8    the plan LP on 8 typical weeks (step 6; solved on the page). 4 + 3 extreme weeks is lesson 13's t13week
-//   m3wk11    the plan LP on 8 typical + 3 extreme weeks (precomputed on the page, as are 12 + 3 and the full-year optimum)
+//   m3wk11    the plan LP on 8 typical + 3 extreme weeks (step 6; solved on the page)
+//   m3wk15    the plan LP on 12 typical + 3 extreme weeks (step 6; solved on the page; the full-year optimum is not: it
+//             is the stated reference, an LP on all 8,760 hours)
 //   m3link, m3cyc, m3free   step 8's storage what-if (battery energy at an illustrative $20 per kWh) on the seven weeks,
 //             the battery linked across the calendar, cyclic within each week, or free between weeks (solved on the page)
 //   m3chk25   the 4-week plan, fixed, on all 8,760 hours of 2025 (step 4's check; steps 5-6 run the same LP for other plans)
@@ -151,7 +153,8 @@ function lessonSet(site) {
     ["m2fixed", "M2 LP with switches fixed", M2.build(D2, { onoff: true, relax: true, fix: M2.planFix(D2, on2) })],
     ["m3typ4", "M3 plan LP, 4 typical weeks, 200 kt", m3plan(S3.C, "typ4", cap3)],
     ["m3typ8", "M3 plan LP, 8 typical weeks, 200 kt", m3plan(S3.C, "typ8", cap3)],
-    ["m3wk11", "M3 plan LP, 8 + 3 weeks (precomputed)", m3plan(S3.C, "wk11", cap3)],
+    ["m3wk11", "M3 plan LP, 8 + 3 weeks", m3plan(S3.C, "wk11", cap3)],
+    ["m3wk15", "M3 plan LP, 12 + 3 weeks", m3plan(S3.C, "wk15", cap3)],
     ["m3link", "M3 storage what-if, linked", m3plan(S3.Cw, D3.storage.set, scap3, "linked")],
     ["m3cyc", "M3 storage what-if, cyclic", m3plan(S3.Cw, D3.storage.set, scap3, "cyclic")],
     ["m3free", "M3 storage what-if, no link", m3plan(S3.Cw, D3.storage.set, scap3, "free")],
@@ -178,4 +181,27 @@ function e1Set(A, J) {
     ["e1outf7", "E1 outage check MILP, F7's campus", E1.outageModel(def, P, P.scen.jan3)]];
 }
 
-module.exports = { dispatch3, dispatch24, storage168, uc24, lessonSet };
+// Clicks that run several LPs in turn, as the pages queue them (the bench solves each list in order through LX.solver and
+// times the whole click): [id, label, [models]]
+//   t13front  lesson 13's frontier solved again for changed costs: the seven-week LP at each of the frontier's caps
+//   m3step6   M3 step 6: the plan LPs of 8 typical, 8 + 3 and 12 + 3 weeks and each plan's check on all of 2025 (the
+//             4-week and seven-week results are already there from steps 3-5); checks use the reference plans
+//   m3step8   M3 step 8: the three storage what-if plan LPs and each plan's check on all of 2025
+function clickSet(site) {
+  const path = require("path"), fs = require("fs");
+  const A = p => path.join(site, "assets/learn", p), J = p => JSON.parse(fs.readFileSync(A("data/" + p), "utf8"));
+  const year = J("town_year.json"), targets = J("cf_targets.json"), prof = require(A("components/profiles.js")).townProfile;
+  const M13 = require(A("components/planengine.js")), cfg = J("13-capstone.json"), Y = M13.prepareYear(year, targets, cfg, prof);
+  const RW = M13.selectWeeks(Y, cfg.weeks), C = M13.costs(cfg, { gas: 4.5, nucCapex: cfg.techs.nuc.capex });
+  const M3 = require(A("m03-capacity-expansion.js")), D3 = J("m03-capacity-expansion.json"), R3 = D3.reference;
+  const S3 = M3.prepare(cfg, D3, year, targets, J("m03-capacity-expansion-2024.json"), prof), cap3 = D3.cap * 1e3, scap3 = D3.storage.cap * 1e3;
+  const m3plan = (Cx, id, cap, mode) => M13.link(M13.weekModel(Cx, S3.weeks(id), { cap }), S3.weeks(id), mode);
+  const six = ["typ8", "wk11", "wk15"];
+  return [
+    ["t13front", "T13 frontier for changed costs (" + cfg.frontier.caps.length + " LPs)", cfg.frontier.caps.map(c => M13.weekModel(C, RW, c == null ? {} : { cap: c * 1e3 }))],
+    ["m3step6", "M3 step 6 (3 plan LPs + 3 full-year checks)", six.map(id => m3plan(S3.C, id, cap3)).concat(six.map(id => M13.fullYearModel(S3.C, S3.Y, { plan: R3.sets[id].plan })))],
+    ["m3step8", "M3 step 8 (3 storage plan LPs + 3 full-year checks)", ["linked", "cyclic", "free"].map(m => m3plan(S3.Cw, D3.storage.set, scap3, m))
+      .concat(["linked", "cyclic", "free"].map(m => M13.fullYearModel(S3.Cw, S3.Y, { plan: R3.storage[m].plan })))]];
+}
+
+module.exports = { dispatch3, dispatch24, storage168, uc24, lessonSet, clickSet };

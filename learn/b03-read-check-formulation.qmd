@@ -213,7 +213,7 @@ A [balance dual]{.lx-term term="shadow-price"} is the change in the cheapest tot
 
 - **19:00 and 20:00: \$40.** The combined-cycle plant simply makes 1 MW more.
 - **18:00: \$80.** The plant already climbs its full 40 MW from 17:00, so 1 MW more at 18:00 needs 1 MW more at 17:00 too, where it pushes out free wind: \$40 + \$40 = \$80, still below the \$100 peaker.
-- **17:00: \$0.** The plan already spills 10 MW of wind and sun to warm the plant up for the evening; one more MWh there just spills less.
+- **17:00: \$0.** The plan already spills 10 MW of wind and sun so the combined-cycle plant can raise its output early enough for the evening ramp; one more MWh there just spills less.
 - **Linked hours.** The ramp links the hours, so it links their prices. The Modeler lesson M1 reads such duals as marginal values for a whole day.
 
 ```{=html}

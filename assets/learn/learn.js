@@ -2495,7 +2495,18 @@
      queued solves: the worker is terminated and restarted on the next call), .stats(label) ({n, p50, p95, max} of
      roundTrip ms, optionally for opts.label only), .timings (raw records), .describe(result) (one plain sentence),
      .fixedModel(model, values) (the pure LP behind fixAndReprice), .core (the pure functions, also used by Node tests),
-     LX.SolverStatus(host) (a live status pill: .set("loading" | "solving" | result)).
+     LX.SolverStatus(host) (a live status pill: .set("loading" | "solving" | result), with the progress line below).
+   Progress for a long solve: LX.SolveProgress(host, { usual, unit, after }) -> { start(o), step(k, n), stop(), running(),
+     el }. A line in place, next to the control that started the solve (never a modal): hidden for the first `after` ms
+     (2,000), then a moving bar, the seconds elapsed, "step k of n" when a click runs several solves (the page passes its
+     count: start({ steps: n }) or step(k, n); `unit` names a step, e.g. "day"), and "usually about N s" when the page
+     gives the click's expected time (`usual`, seconds, from the solver bench at 6x: a phone stand-in). It never shows a
+     percentage. When it appears it is announced once (a polite live region beside it); with reduced motion the bar is
+     not drawn (text only). stop() hides it: the status words of the outcome (optimal, time limit, error) stay where they
+     were. LX.SolverStatus starts it on "loading" or "solving" and stops it on any outcome (set(x, { usual, steps,
+     unit }), .step(k, n), .done()); a second "solving" while it runs continues the same count (one click, several
+     solves). A control whose status line is shared with others keeps its own line (LX.SolveProgress beside it) and
+     calls set("solving", { progress: false }). LX.BenchRun has one under its Run button.
    Node: module.exports = { solverCore, core } — tests load the vendored highs.js with require() and call
      core.solveWith(highs, model, opts) synchronously (_tests/learn/test_solver.js). */
 (function () {
@@ -2649,7 +2660,23 @@
   }
 
   var core = solverCore();
-  if (typeof module !== "undefined" && module.exports) module.exports = { solverCore: solverCore, core: core, VERSION: VERSION };
+  // ---------------------------------------------------------------- the words of the progress line (pure; Node tests)
+  // o: { secs (elapsed, whole seconds), k, n (step k of n, when a click runs several solves), unit ("step"), usual (s) }
+  var PROGRESS_AFTER = 2000;
+  function progressText(o) {
+    o = o || {};
+    var t = "Still solving · " + Math.max(0, Math.floor(o.secs || 0)) + " s";
+    if (o.n > 1 && o.k >= 1) t += " · " + (o.unit || "step") + " " + Math.min(o.k, o.n) + " of " + o.n;
+    if (o.usual > 0) t += " · usually about " + Math.max(1, Math.round(o.usual)) + " s";
+    return t;
+  }
+  // the one sentence a screen reader hears when the line appears
+  function progressSay(o) {
+    o = o || {};
+    return "Still solving: the page is working" + (o.n > 1 ? ", " + o.n + " " + (o.unit || "step") + "s in all" : "") + (o.usual > 0 ? "; this usually takes about " + Math.max(1, Math.round(o.usual)) + " s" : "") + ".";
+  }
+  var progress = { text: progressText, say: progressSay, AFTER: PROGRESS_AFTER };
+  if (typeof module !== "undefined" && module.exports) module.exports = { solverCore: solverCore, core: core, VERSION: VERSION, progress: progress };
   if (typeof document === "undefined" || typeof window === "undefined" || !window.LX || !window.LX.H) return;
 
   // ---------------------------------------------------------------- the page side: lazy worker, queue, watchdog
@@ -2807,17 +2834,69 @@
     if (r.conditional) s += " Prices are conditional on the fixed integer decisions.";
     return s;
   };
-  // a small live status line: "Loading the solver...", "Solving...", "Optimal · 12 ms"
+  // progress for a long solve (see the header): o = { usual (s), unit, after (ms) }; start(o2) takes the same fields
+  // plus steps; every timer stops on stop()
+  S.progress = progress;
+  LX.SolveProgress = function (host, o) {
+    o = o || {};
+    var el = H("div", { class: "lx-solve-prog", hidden: true }, host);
+    H("span", { class: "lx-solve-prog-bar", "aria-hidden": "true" }, el);
+    var txt = H("span", { class: "lx-solve-prog-text" }, el);
+    // the live region lives beside the line, always in the page, so the one announcement is heard when the line appears
+    var sr = H("span", { class: "lx-sr", "aria-live": "polite" }, host);
+    var t0 = 0, shown = false, wait = null, tick = null, cur = {};
+    function paint() { txt.textContent = progressText({ secs: (now() - t0) / 1000, k: cur.k, n: cur.n, unit: cur.unit, usual: cur.usual }); }
+    function show() {
+      wait = null; shown = true; el.hidden = false; paint();
+      sr.textContent = progressSay(cur);
+      tick = setInterval(paint, 1000);
+      if (LX.emit) LX.emit("layout");
+    }
+    var api = {
+      el: el,
+      start: function (s2) {
+        s2 = s2 || {};
+        api.stop();
+        cur = { usual: s2.usual != null ? s2.usual : o.usual, unit: s2.unit || o.unit, n: s2.steps || null, k: s2.steps ? 1 : null };
+        t0 = now();
+        wait = setTimeout(show, s2.after != null ? s2.after : o.after != null ? o.after : PROGRESS_AFTER);
+      },
+      step: function (k, n) {
+        if (n != null) cur.n = n;
+        cur.k = k;
+        if (shown) paint();
+      },
+      update: function (s2) { s2 = s2 || {}; if (s2.usual != null) cur.usual = s2.usual; if (s2.unit) cur.unit = s2.unit; if (s2.steps) { cur.n = s2.steps; if (!cur.k) cur.k = 1; } if (shown) paint(); },
+      stop: function () {
+        if (wait) clearTimeout(wait); if (tick) clearInterval(tick);
+        wait = tick = null;
+        var was = shown; shown = false; el.hidden = true; txt.textContent = ""; sr.textContent = "";
+        if (was && LX.emit) LX.emit("layout");
+      },
+      running: function () { return !!wait || shown; },
+      shown: function () { return shown; }
+    };
+    return api;
+  };
+  // a small live status line: "Loading the solver...", "Solving...", "Optimal · 12 ms"; the progress line below it
+  // appears when a solve runs past two seconds (set(x, { usual, steps, unit }) passes the page's expected time and steps)
   LX.SolverStatus = function (host) {
     var el = H("p", { class: "lx-solver-status", role: "status", "aria-live": "polite" }, host);
-    return { el: el, set: function (x) {
+    var prog = null;
+    function pg() { if (!prog) prog = LX.SolveProgress(host); return prog; }
+    return { el: el, set: function (x, po) {
       var st = typeof x === "string" ? x : x && x.status;
       el.setAttribute("data-status", st || "");
       if (st === "loading") el.textContent = "Loading the solver (about 3.5 MB, once)…";
       else if (st === "solving") el.textContent = "Solving…";
       else if (x && typeof x === "object") el.textContent = (SAY[st] || st) + (x.ms && x.ms.roundTrip ? " · " + Math.max(1, Math.round(x.ms.roundTrip)) + " ms" : "");
       else el.textContent = "";
-    } };
+      if ((st === "loading" || st === "solving") && !(po && po.progress === false)) { if (prog && prog.running()) { if (po) prog.update(po); } else pg().start(po); }
+      else if (prog) prog.stop();
+    },
+      step: function (k, n) { if (prog && prog.running()) prog.step(k, n); },
+      done: function () { if (prog) prog.stop(); },
+      progress: function () { return pg(); } };
   };
 })();
 
@@ -8889,7 +8968,11 @@
                        aria-busy while a run is on, data-stale="true" (dimmed) while they show another plan's results
      stale: element,   where the "results are for an earlier plan" line goes (a <p> above the results; hidden when fresh)
      label: "Run the year",  busy: function (on) {},  onDone: function (r, state) {},  partial: false,
-     words: { ok: "...", infeasible: "..." } });   the engine's own sentence for a kind (else r.message, else ours)
+     words: { ok: "...", infeasible: "..." },   the engine's own sentence for a kind (else r.message, else ours)
+     progress: { usual: 12 or function (state) { return seconds or null; }, unit: "day" } });
+                       the progress line under the buttons (LX.SolveProgress, solver.js): it appears when a run lasts more
+                       than two seconds; usual is the click's expected time from the solver bench (6x), unit names a step.
+                       A run of several solves passes its count through ctx.step(k, n) (ctx = { signal, attempt, step })
    run.run(state) -> Promise of the result ({ status: "superseded" } when a newer run replaced it)
    run.changed(state)   call when the reader changes the plan: drawn results are marked stale until the next run
    run.last() -> { state, r } of the last run that drew results, or null;  run.running();  run.cancel();  run.el
@@ -8947,13 +9030,15 @@
     var label = o.label || "Run";
     var btn = H("button", { class: "lx-btn small", type: "button", text: label }, row);
     var again = H("button", { class: "lx-btn ghost small", type: "button", text: "Try again", hidden: true }, row);
+    var po = o.progress || {}, prog = LX.SolveProgress ? LX.SolveProgress(box, { unit: po.unit }) : null;
     var status = H("p", { class: "lx-br-status", role: "status", "aria-live": "polite" }, box);
     var areas = o.results ? [].concat(o.results).filter(Boolean) : [];
     areas.forEach(function (a) { a.classList.add("lx-br-results"); });
     if (o.stale) { o.stale.classList.add("lx-br-stale"); o.stale.hidden = true; }
     var token = 0, ctl = null, busyNow = false, last = null, lastTried = null, attempt = 0, planKey = null;
-    function setBusy(on) {
+    function setBusy(on, state) {
       busyNow = on;
+      if (prog) { if (on) prog.start({ usual: typeof po.usual === "function" ? po.usual(state) : po.usual }); else prog.stop(); }
       // aria-disabled, not disabled: a disabled button would drop the keyboard focus of a reader who pressed it
       if (on) btn.setAttribute("aria-disabled", "true"); else btn.removeAttribute("aria-disabled");
       btn.textContent = on ? "Running…" : label;
@@ -8976,9 +9061,9 @@
       ctl = typeof AbortController !== "undefined" ? new AbortController() : null;
       attempt = isRetry && lastTried === k ? attempt + 1 : 1;
       lastTried = k; planKey = k;
-      setBusy(true); say("busy", "Running…");
-      var p;
-      try { p = Promise.resolve(o.solve(JSON.parse(k), { signal: ctl ? ctl.signal : null, attempt: attempt })); }
+      setBusy(true, JSON.parse(k)); say("busy", "Running…");
+      var p, step = function (s, n) { if (my === token && prog) prog.step(s, n); };
+      try { p = Promise.resolve(o.solve(JSON.parse(k), { signal: ctl ? ctl.signal : null, attempt: attempt, step: step })); }
       catch (e) { p = Promise.resolve({ status: "error", ok: false, error: e && e.message }); }
       return p.then(null, function (e) { return { status: "error", ok: false, error: e && e.message }; }).then(function (r) {
         if (my !== token) return { status: "superseded", ok: false };   // a newer run (or a cancel) owns the page now
@@ -10698,7 +10783,7 @@
   }
   function solve(state, P, opts) {
     opts = opts || {};
-    var task = opts.task || "run", attempt = opts.attempt || 1, limit = opts.timeLimit != null ? opts.timeLimit : (attempt > 1 ? 10 : 3);
+    var task = opts.task || "run", attempt = opts.attempt || 1, limit = opts.timeLimit != null ? opts.timeLimit : (attempt > 1 ? 30 : 10);
     var call = opts.solver || (typeof window !== "undefined" && window.LX && window.LX.solver ? function (m, so) { return window.LX.solver.solve(m, so); } : null);
     var t0 = Date.now(), raw = { task: task, state: state, solves: [] };
     function fail(e) { return { status: "error", ok: false, kind: "milp", message: "The run failed before it gave an answer" + (e && e.message ? " (" + e.message + ")." : "."), results: null, mipGap: null }; }
@@ -11423,7 +11508,9 @@
    solved are kept, so a retry solves only what is missing.
    var go = LX.SolveStep.action({
      api,              the step card's api (api.busy(on))
-     st,               an LX.SolverStatus (st.set("solving" | "loading" | "") )
+     st,               an LX.SolverStatus (st.set("solving" | "loading" | "") ); its progress line runs while the job does
+     progress: { usual: 12, steps: 6, unit: "solve" },   optional: the step's expected time (solver bench, 6x) and its
+                       solve count; the job may call st.step(k, n) as each solve finishes
      host,             where the failure note goes
      go,               the step's own button (disabled while it runs), or null
      job: function () { return Promise },   the solves; it may resolve to the failed result (or { r: result }), else null
@@ -11455,12 +11542,13 @@
     var note = null;
     function end(r) {
       o.api.busy(false); if (o.go) o.go.disabled = false;
+      if (o.st.done) o.st.done();
       if (r) { o.st.set(""); if (note) note.remove(); note = failNote(o.host, r, attempt, o); }
     }
     function attempt() {
       if (note) { note.remove(); note = null; }
       if (o.go) o.go.disabled = true;
-      o.st.set(LX.solver && LX.solver.mode ? "solving" : "loading"); o.api.busy(true);
+      o.st.set(LX.solver && LX.solver.mode ? "solving" : "loading", o.progress); o.api.busy(true);
       return Promise.resolve().then(o.job).then(function (bad) {
         var f = o.failed ? o.failed() : bad ? (bad.r || bad) : null;
         end(f); if (!f) o.show();
@@ -12098,7 +12186,7 @@
   function solve(state, P, opts) {
     opts = opts || {};
     var task = opts.task || (state.conn != null ? "year" : "period"), attempt = opts.attempt || 1;
-    var limit = opts.timeLimit != null ? opts.timeLimit : (attempt > 1 ? 10 : 3);
+    var limit = opts.timeLimit != null ? opts.timeLimit : (attempt > 1 ? 30 : 10);
     var call = opts.solver || (typeof window !== "undefined" && window.LX && window.LX.solver ? function (m, so) { return window.LX.solver.solve(m, so); } : null);
     var t0 = Date.now(), sys = sysOf(state, P), days = opts.only ? [{ y: String(opts.only.y), day: opts.only.day, carry: false, label: dayLong(opts.only.day) }] : daysOf(state, P, task), raw = { task: task, state: state, sys: sys, days: [], solves: [] };
     function fail(e) { return { status: "error", ok: false, kind: "milp", message: "The run failed before it gave an answer" + (e && e.message ? " (" + e.message + ")." : "."), results: null, mipGap: null }; }

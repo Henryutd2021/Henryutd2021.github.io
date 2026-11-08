@@ -101,7 +101,7 @@
   function symptom(bug, s, ref, inst) {
     if (!s.ok) return "The solver reports: " + s.status + ".";
     var short = s.rows.map(function (x) { return x.d - x.supply; }), hrs = inst.T;
-    if (bug === "unit") return "Optimal. The peaker, the dearest plant, runs every hour (" + range(s.rows.map(function (x) { return x.pk; })) + " MW). The model reports " + money(s.objective) + "; at real prices the plan costs " + money(s.trueCost) + ".";
+    if (bug === "unit") return "Optimal. The peaker, the dearest plant, runs every hour (" + range(s.rows.map(function (x) { return x.pk; })) + " MW). The model reports " + money(s.objective) + "; at the intended (illustrative) costs the plan costs " + money(s.trueCost) + ".";
     if (bug === "sign") return "Optimal at " + money(s.objective) + ". Only nuclear and the combined-cycle plant's ramp minimum run; supply falls short of demand by " + range(short) + " MW every hour.";
     if (bug === "index") return "Optimal at " + money(s.objective) + ". " + hrs[0] + ":00 balances; from " + hrs[1] + ":00 to " + hrs[hrs.length - 1] + ":00 supply falls short by up to " + Math.round(Math.max.apply(null, short)) + " MW, and no unserved demand is counted.";
     if (bug === "double") return "Optimal. The model reports " + money(s.objective) + ", but the plan's true cost is " + money(s.trueCost) + ", and it now runs the peaker: " + money(s.trueCost - ref.trueCost) + " dearer than the right plan's " + money(ref.trueCost) + ".";
@@ -339,7 +339,7 @@
       var key = bug || "ok";
       if (solved[key]) return Promise.resolve(solved[key]);
       if (!LX.solver) return Promise.resolve({ ok: false, status: "unavailable" });
-      return LX.solver.solve(buildModel(inst, bug), { timeLimit: 3, key: "b3-" + key }).then(function (r) { var sm = summarize(inst, r); sm.ms = r.ms; solved[key] = sm; return sm; });
+      return LX.solver.solve(buildModel(inst, bug), { timeLimit: 10, key: "b3-" + key }).then(function (r) { var sm = summarize(inst, r); sm.ms = r.ms; solved[key] = sm; return sm; });
     }
     var col19 = T.indexOf(19), sumCol = G.reduce(function (a, g) { return a + ref.p[g][col19]; }, 0), sumRow = ref.p.cc.reduce(function (a, v) { return a + v; }, 0);
 
@@ -662,7 +662,7 @@
       var i = practiceInst(town, year, J, key), status = LX.SolverStatus ? LX.SolverStatus(stHost) : null, note = H("p", { class: "b3-note" }, stHost);
       if (!LX.solver) { note.textContent = "The solver could not load here; this is the precomputed answer."; return Promise.resolve(sol[key]); }
       if (status) status.set("solving");
-      return LX.solver.solve(buildModel(i, PRACTICE_RUN[key].bug), { timeLimit: 3, key: "b3p-" + key }).then(function (r) {
+      return LX.solver.solve(buildModel(i, PRACTICE_RUN[key].bug), { timeLimit: 10, key: "b3p-" + key }).then(function (r) {
         if (status) status.set(r);
         if (!r || !r.ok) { note.textContent = "The solver did not finish here; this is the precomputed answer."; return sol[key]; }
         var S = summarize(i, r); live[key] = S; return S;

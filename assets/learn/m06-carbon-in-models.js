@@ -51,7 +51,7 @@
     function dmt(v) { var r = Math.round(v / 1e4) / 100; return (r < 0 ? "−" : r > 0 ? "+" : "") + Math.abs(r).toFixed(2) + " Mt"; }
 
     // ---------- the stage: the frontier chart and readouts
-    var stage = H("div", { class: "lx-stage" }, live), title = H("h3", null, H("div", { class: "lx-stage-head" }, stage));
+    var stage = H("div", { class: "lx-stage" }, live), sh = H("div", { class: "lx-stage-head" }, stage), title = H(LX.hTag(3, sh), null, sh);   // an h2 when the stage sits right under the page title
     var chips = H("div", { class: "lx-readouts", "aria-live": "polite" }, stage), fhost = H("div", null, stage);
     var status = H("p", { class: "lx-stage-status", "aria-live": "polite" }, stage);
     // the frontier as an XY chart (LX.Plot): x CO2 in Mt, y cost in $M; the price's equal-score line clipped to the box

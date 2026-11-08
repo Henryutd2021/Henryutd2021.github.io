@@ -166,11 +166,11 @@ ok(/title: "Check supply and wires", text: "Planners check whether existing supp
 ok(/label: "What-if: the campus's average draw"/.test(JS) && M.HOMES_WHATIF === "A what-if for this step only: the next steps keep the campus at its steady 240 MW.", "the homes slider is labelled a what-if, and the later steps' 240 MW is said");
 ok(!/homes' yearly use|homes use as much|homes' yearly electricity|yearly electricity use/.test(PAGE + JS) && /homes' yearly purchases/.test(JS) && /homes buy as much electricity in a year/.test(JS) && /each buying 10,791 kWh a year\) buy as much electricity in a year/.test(PAGE), "homes: always electricity bought (EIA counts purchases)");
 ok(!/screening/i.test(PAGE + RAW + JS.replace(/\/\/[^\n]*/g, "")) && /\$M means millions of dollars/.test(M.TAX_NOTE), "rough estimates, not 'screening'; $M explained");
-ok(/costs the developer on the order of \$0\.7 billion in <span class="lx-term" data-term="present-value">present value<\/span>\./.test(PAGE), "present value is a glossary term inside the excerpt (wording unchanged)");
+ok(/cost the developer on the order of \$0\.7 billion in <span class="lx-term" data-term="present-value">present value<\/span>\./.test(PAGE), "present value is a glossary term inside the excerpt (wording unchanged)");
 ok(!/Go deeper · Modeler/.test(PAGE) && (PAGE.match(/Go deeper · Analyst/g) || []).length === 3, "a Foundations lesson's deeper boxes are Analyst tier (one tier up, a preview only)");
 
 // ---------------- research wording: E7.4 and E7.5, word for word (the sourcing rule)
-const E74 = "For a 300 MW-IT facility, a 36-month delay costs the developer on the order of $0.7 billion in present value.";
+const E74 = "In the study's illustrative base case, a 36-month delay for a 300 MW-IT facility cost the developer on the order of $0.7 billion in present value.";
 const E75 = "Staged energization can recover a large share of that cost.";
 const CF7_FOOT = "From: Li et al. (2026), accepted paper, 2026 North American Power Symposium (NAPS); DOI pending.";
 const CITE = "<li>Li et al. (2026). Accepted paper on the cost of delayed energization for large loads, 2026 North American Power Symposium (NAPS), presented October 2026; DOI pending.</li>";

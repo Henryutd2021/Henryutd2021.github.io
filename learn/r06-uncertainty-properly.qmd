@@ -245,7 +245,7 @@ body-classes: "page-learn page-lesson lx-form-studio"
 <table class="lx-facts">
 <thead><tr><th scope="col">Number or data</th><th scope="col">What it is</th><th scope="col">Source</th></tr></thead>
 <tbody>
-<tr><td class="n">2025 hourly demand</td><td>SPP's demand, every hour of 2025: the real pattern the model adds car charging to. Its highest hour began at 16:00 on 29 July 2025 (Central daylight time).</td><td class="s"><a href="https://www.eia.gov/electricity/gridmonitor/sixMonthFiles/">EIA-930, six-month files, SWPP</a> · accessed 2 November 2026</td></tr>
+<tr><td class="n">2025 hourly demand</td><td>SPP's demand, every hour of 2025: the real pattern the model adds car charging to. Its highest hour began at 16:00 on 29 July 2025 (Central daylight time).</td><td class="s"><a href="https://www.eia.gov/electricity/gridmonitor/dashboard/electric_overview/US48/US48">EIA-930, six-month files, SWPP</a> (Download Data → Six-Month Files) · accessed 2 November 2026</td></tr>
 <tr><td class="n">450 MW</td><td>Prairie Town's highest hour of 2025: the course's scale for the fictional town (lesson 0).</td><td class="s">The course's own convention</td></tr>
 <tr><td class="n">33 to 66%</td><td>The probability the IPCC's calibrated language gives “about as likely as not” (Table 1).</td><td class="s"><a href="https://www.ipcc.ch/site/assets/uploads/2017/08/AR5_Uncertainty_Guidance_Note.pdf">Mastrandrea et al. (2010)</a></td></tr>
 <tr><td class="n">42%</td><td>Highly cited papers in Saltelli et al.'s review that did not explore the space of inputs properly (abstract).</td><td class="s"><a href="https://doi.org/10.1016/j.envsoft.2019.01.012">Saltelli et al. (2019)</a></td></tr>

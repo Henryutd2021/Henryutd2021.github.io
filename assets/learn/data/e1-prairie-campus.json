@@ -2338,7 +2338,7 @@
      "fuel": 668.535
     }
    ],
-   "note": "Reference results of lesson M5, solved with engine E1 in HiGHS 1.15.4; the M5 notebook checks its answers against them."
+   "note": "Reference results of lesson M5, solved with engine E1 in HiGHS 1.15.1; the M5 notebook checks its answers against them."
   }
  }
 }

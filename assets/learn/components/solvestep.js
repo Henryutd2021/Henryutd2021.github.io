@@ -5,7 +5,9 @@
    solved are kept, so a retry solves only what is missing.
    var go = LX.SolveStep.action({
      api,              the step card's api (api.busy(on))
-     st,               an LX.SolverStatus (st.set("solving" | "loading" | "") )
+     st,               an LX.SolverStatus (st.set("solving" | "loading" | "") ); its progress line runs while the job does
+     progress: { usual: 12, steps: 6, unit: "solve" },   optional: the step's expected time (solver bench, 6x) and its
+                       solve count; the job may call st.step(k, n) as each solve finishes
      host,             where the failure note goes
      go,               the step's own button (disabled while it runs), or null
      job: function () { return Promise },   the solves; it may resolve to the failed result (or { r: result }), else null
@@ -37,12 +39,13 @@
     var note = null;
     function end(r) {
       o.api.busy(false); if (o.go) o.go.disabled = false;
+      if (o.st.done) o.st.done();
       if (r) { o.st.set(""); if (note) note.remove(); note = failNote(o.host, r, attempt, o); }
     }
     function attempt() {
       if (note) { note.remove(); note = null; }
       if (o.go) o.go.disabled = true;
-      o.st.set(LX.solver && LX.solver.mode ? "solving" : "loading"); o.api.busy(true);
+      o.st.set(LX.solver && LX.solver.mode ? "solving" : "loading", o.progress); o.api.busy(true);
       return Promise.resolve().then(o.job).then(function (bad) {
         var f = o.failed ? o.failed() : bad ? (bad.r || bad) : null;
         end(f); if (!f) o.show();
