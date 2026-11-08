@@ -121,7 +121,7 @@
   function why(net, failed, id) {
     var out = outage(net, failed), L = byId(net.lines), S = byId(net.sections), nm = partName(net, id);
     if (!failed[id]) return nm + ": working.";
-    if (L[id]) return nm + " is down. " + (out.upstream === "loop" ? "With no working line left into the substation, all " + out.homesTotal + " homes are dark." : "Power takes another way round the loop, which we assume can carry it: no home loses power.");
+    if (L[id]) return nm + " is down, cut off by breakers at its ends (not drawn). " + (out.upstream === "loop" ? "No working line is left into the substation, so all " + out.homesTotal + " homes are dark." : "Another line still feeds the substation, which we assume can carry it, so this failure darkens no home.");
     if (id === "XF") return net.xf.name + " failed: every feeder loses power, all " + out.homesTotal + " homes.";
     var n = 0; below(net, id).forEach(function (x) { n += S[x].homes; });
     if (out.upstream) return nm + " is down, but the substation is already dark.";
@@ -160,8 +160,8 @@
   }
   function medRunText(rows) {
     var r = medRun(rows);
-    return "Major event days, mostly storms, gave more than half of each year's minutes from " + r.from + " to " + r.to +
-      (r.before ? " (" + r.before.year + ": " + fmtN(100 * medShare(r.before)) + "%)" : "") + ". Elsewhere, and in other years, the ranking of causes can differ.";
+    return "Major event days gave more than half of each year's minutes from " + r.from + " to " + r.to +
+      (r.before ? " (" + r.before.year + ": " + fmtN(100 * medShare(r.before)) + "%)" : "") + ". They often involve severe weather, but this table does not record causes.";
   }
   function fmtN(v, d) { return v.toLocaleString("en-US", { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 }); }
   function kvText(v) { return (v < 10 ? fmtN(v, 2).replace(/0$/, "") : fmtN(v, v % 1 ? 2 : 0)) + " kV"; }
@@ -203,7 +203,7 @@
   function VoltPath(host, o) {
     var stops = o.stops, w = H("div", { class: "f6p" }, host), sel = o.start || 0, seen = {}, mode = null;
     var fig = H("div", { class: "f6p-fig" }, w);
-    var legend = H("ul", { class: "f6p-legend", "aria-label": "Wire colours" }, w);
+    var legend = H("ul", { class: "f6p-legend", "aria-label": "Wire colors" }, w);
     ["gen", "tx", "dist", "low"].forEach(function (k) { var li = H("li", null, legend); H("i", { class: "v-" + k }, li); H("span", { text: VCLS[k] }, li); });
     var rail = H("div", { class: "f6p-rail", role: "group", "aria-label": "Stops from plant to socket, with each one's voltage" }, w), btns = [];
     var lo = Math.log10(50), hi = Math.log10(1e6);
@@ -216,6 +216,7 @@
       b.addEventListener("click", function () { go(i); });
       btns.push(b);
     });
+    H("p", { class: "lx-hint f6p-scale", text: "Bar heights are compressed (a logarithmic scale): " + fmtN(VOUT.line / 1000) + " kV is about " + fmtN(Math.round(VOUT.line / VOUT.socket / 100) * 100) + " times the socket's " + VOUT.socket + " V." }, w);
     var panel = H("div", { class: "f6p-panel", "aria-live": "polite" }, w);
     var nav = H("div", { class: "f6p-nav" }, w);
     var bPrev = H("button", { type: "button", class: "lx-btn ghost small", html: LX.icon("back") + "Back a stop" }, nav);
@@ -394,7 +395,7 @@
     var D = data.f06_grid_and_outages, U = data["03_balancing"].uri, P = data.path, net = D.net, faults = D.storm.faults;
     var log = LX.store.get("f6-log", {}) || {};
     function keep(k, v) { log[k] = v; LX.store.set("f6-log", log); }
-    var served = homesTotal(net), best = bestOrders(net, faults), last = D.reliability.rows[D.reliability.rows.length - 1];
+    var served = homesTotal(net), best = bestOrders(net, faults);
     var stormOut = outage(net, (function () { var f = {}; faults.forEach(function (x) { f[x.id] = true; }); return f; })());
     var FA = byId(faults);
     function faultName(id) { var s = byId(net.sections)[id]; return s ? s.short : byId(net.lines)[id].short; }
@@ -406,7 +407,7 @@
           VoltPath(act, { stops: D.stops, seen: seen0, aria: "The path from Prairie Town's plant to a lamp: generator, step-up transformer, transmission tower, substation, feeder pole, service transformer, a home's meter and a socket.",
             onGo: function (i, n) {
               if (seen0.indexOf(i) < 0) { seen0.push(i); keep("path", seen0); }
-              if (n === D.stops.length) { api.done(); api.saw("Up from **" + D.town.genKV + " kV** to **" + D.town.txKV + " kV** for the long trip, then down in steps to **" + D.town.socketV + " V** at the socket. Transformers make each step."); }
+              if (n === D.stops.length) { api.done(); api.saw("Transformers raise **" + D.town.genKV + " kV** to **" + D.town.txKV + " kV** for the long trip, then lower it in steps to **" + D.voltages.service.text + "** at the home. A socket takes **" + D.town.socketV + " V** of that, between a live wire and the [[neutral|neutral]]."); }
             } });
           if (seen0.length >= D.stops.length) api.done();
         } },
@@ -427,7 +428,7 @@
               if (!id) return;
               if (byId(net.lines)[id]) tried.tx = true; else if (id !== "XF") tried.dist = true;
               keep("tried", tried);
-              if (tried.tx && tried.dist) { api.done(); api.saw("One loop line down: power goes round the other way, the **[[n-minus-one|N−1]]** idea. A feeder [[fault|fault]]: the closest device opens and every home below it goes dark, because a radial feeder has one path."); }
+              if (tried.tx && tried.dist) { api.done(); api.saw("One high-voltage line down: another line still feeds the substation, the **[[n-minus-one|N−1]]** idea. A feeder [[fault|fault]]: the closest device opens and every home below it goes dark, because a radial feeder has one path."); }
             } });
           H("p", { class: "lx-hint", text: "In this drawing, the loop's remaining lines are assumed able to carry the load. Real grids also check each line's loading and operating limits." }, act);
           if (tried.tx && tried.dist) api.done();
@@ -448,7 +449,7 @@
         build: function (act, api) { restoreStep(act, api); } },
       { text: "Reliability has two yardsticks: [[saidi|SAIDI]] counts minutes without power per customer, [[saifi|SAIFI]] counts interruptions per customer. If the crew worked twice as fast, which would fall?",
         build: function (act, api) { measureStep(act, api); } },
-      { text: "Now the real U.S. numbers, from utilities using the IEEE method. Pick a year to see how much outage time came on a few stormy days.", free: true,
+      { text: "Now the real U.S. numbers, from utilities that follow the IEEE reporting standard. Pick a year to compare minutes on [[major-event-day|major event days]], the unusually disruptive days, with the rest.", free: true,
         build: function (act, api) { realStep(act, api); } }
     ];
 
@@ -459,7 +460,7 @@
       var ro = H("div", { class: "lx-readouts", "aria-live": "polite" }, row);
       var sl = LX.Slider(row, { label: "Line voltage", color: "var(--lx-pk)", min: 0, max: L.classes_kV.length - 1, step: 1, value: log.kvi != null ? log.kvi : L.start,
         fmt: function (v) { return fmtN(L.classes_kV[v]) + " kV"; }, onChange: paint });
-      H("p", { class: "lx-hint", html: LX.rich("Illustrative: a line of three wires (three phases, as real lines have), each with " + L.R_ohm + " ohms (Ω) of resistance, carrying " + L.P_MW + " MW.") }, row);
+      H("p", { class: "lx-hint", html: LX.rich("Illustrative: " + L.P_MW + " MW on a line of three wires, as real lines have. Each wire has " + L.R_ohm + " ohms (Ω) of resistance, its opposition to current.") }, row);
       function paint(v) {
         var kv = L.classes_kV[v], r = loss(L.P_MW, kv, L.R_ohm), wpx = 2 + 10 * Math.sqrt(r.I / loss(L.P_MW, L.classes_kV[0], L.R_ohm).I), heat = Math.min(1, r.pct / 10);
         fig.innerHTML = '<svg viewBox="0 0 320 72"><rect class="pl" x="4" y="18" width="40" height="34" rx="3"/><path class="town" d="M282 52 V34 L296 22 L310 34 V52 Z"/><text x="24" y="66">Plant</text><text x="296" y="66">Town</text>' +
@@ -489,7 +490,7 @@
       var again = H("button", { type: "button", class: "lx-btn ghost small", text: "Start a new order", hidden: true }, wrap);
       var Pl = LX.Plot(chart, { text: "Text version of the chart", legend: true });
       H("p", { class: "lx-hint", html: LX.rich("The shaded area is your storm's [[customer-minutes|customer-minutes]]: homes dark × hours × 60.") }, wrap);
-      var btns = {};
+      var btns = {}, HOURS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
       ids.forEach(function (id) {
         var f = FA[id], homes = 0; below(net, id).forEach(function (x) { homes += byId(net.sections)[x].homes; });
         var b = H("button", { type: "button", class: "lx-btn ghost small f6r-b", "aria-label": "Repair next: " + faultName(id) + ", " + homes + " homes, " + f.repair_h + " hours of work" }, pick);
@@ -506,11 +507,12 @@
         var full = order.length === ids.length, B = best.best[0];
         var spec = { x: { min: 0, max: 12, ticks: [[0, "0 h"], [3, "3"], [6, "6"], [9, "9"], [12, "12 h"]] }, y: { min: 0, max: 30, step: 10, fmt: LX.fmt.int, unit: "homes dark" },
           lines: [{ pts: series(B), color: "var(--lx-ink-3)", dash: "5 4", width: 2 }], legend: [{ label: "Best order", color: "var(--lx-ink-3)", dash: "5 4" }],
-          aria: "Homes without power hour by hour after the storm", height: 200, heightN: 180 };
+          aria: "Homes without power hour by hour after the storm", height: 200, heightN: 180,
+          text: { head: ["Hour", "Homes dark, best order"], rows: HOURS.map(function (h) { return [h + ":00 to " + (h + 1) + ":00", String(at(B, h + 0.5))]; }), note: "Your order appears here once all three repairs are chosen." } };
         if (full) {
           var r = restore(net, faults, order); keep("order", order); buildExplain();
           spec.lines.push({ pts: series(r), color: "var(--lx-bad)", width: 3, area: 0.12 }); spec.legend.unshift({ label: "Your order", color: "var(--lx-bad)" });
-          spec.text = { head: ["Hour", "Homes dark, your order", "Homes dark, best order"], rows: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(function (h) { return [h + ":00 to " + (h + 1) + ":00", String(at(r, h + 0.5)), String(at(B, h + 0.5))]; }) };
+          spec.text = { head: ["Hour", "Homes dark, your order", "Homes dark, best order"], rows: HOURS.map(function (h) { return [h + ":00 to " + (h + 1) + ":00", String(at(r, h + 0.5)), String(at(B, h + 0.5))]; }) };
           [["Your order", fmtN(r.customerMinutes) + " customer-minutes"], ["Best order", fmtN(best.min) + " customer-minutes"]].forEach(function (x, i) { var c = H("div", { class: "lx-readout" + (i === 0 && r.customerMinutes === best.min ? " good" : "") }, out); H("span", { text: x[0] }, c); H("b", { text: x[1] }, c); });
           again.hidden = false;
           api.done();
@@ -579,7 +581,6 @@
       paint(sel);
       var pred = log.pred, right = pred === "dist";
       H("p", { class: "f6y-p", html: LX.rich("**Your prediction: " + (pred ? (right ? "right." : "not quite.") : "none.") + "** DOE found in 2017 that over " + D.distribution_share.pct + "% of U.S. power interruptions start on the [[distribution|distribution]] system, mostly in bad weather.").replace(/\*\*(.+?)\*\*/g, "<b>$1</b>") }, rev);
-      H("p", { class: "f6y-p", text: "EIA's " + last.year + " columns: " + fmtN(last.saidi, 1) + " minutes for all events, " + fmtN(last.saidi_nolos, 1) + " with outages from lost high-voltage supply removed. The two columns can cover different utilities, so the gap does not measure upstream failures." }, rev);
       H("p", { class: "f6y-p", html: LX.rich("Failures upstream are rarer but can darken millions at once: in Texas in 2021, plant outages forced " + fmtN(U.peakShedMW) + " MW of demand off (") + LX.lessonRefHTML(P, 3) + ")." }, rev);
       yearPick = paint;
     }
@@ -648,7 +649,7 @@
           { id: "out", g: "rel", label: "Outage", text: "Homes beyond an opened device lose power until the crew repairs the fault.", game: stormOut.homesDark + " of " + served + " homes after the storm.", at: [1, 1], atN: [1, 1] },
           { id: "cm", g: "rel", label: "Customer-minutes", lines: ["Customer-", "minutes"], text: "Homes without power times minutes without it; the repair order changes the total.", game: "Your order: " + fmtN(r.customerMinutes) + ".", at: [0, 1], atN: [0, 1] },
           { id: "idx", g: "rel", label: "SAIDI and SAIFI", lines: ["SAIDI and", "SAIFI"], text: "Minutes and interruptions per customer, the yardsticks utilities report to EIA every year.", game: "SAIDI " + fmtN(m.saidi) + " min, SAIFI " + fmtN(m.saifi, 2) + ".", at: [0, 2], atN: [0, 2] },
-          { id: "med", g: "rel", label: "Major event days", lines: ["Major", "event days"], text: "A few stormy days that give most of a year's outage minutes in recent U.S. data.", game: "Step 8: EIA's 2015–2025 table.", at: [1, 2], atN: [1, 2] }],
+          { id: "med", g: "rel", label: "Major event days", lines: ["Major", "event days"], text: "Days whose outage minutes pass a threshold set from past years; they often involve severe weather.", game: "Step 8: EIA's 2015–2025 table.", at: [1, 2], atN: [1, 2] }],
         edges: [["gen", "tx", "steps up into"], ["tx", "dist", "steps down into"], ["dist", "prot", "is guarded by"], ["prot", "out", "opens, causing an"], ["out", "cm", "adds up to"], ["cm", "idx", "per customer gives"], ["med", "idx", "dominate"]],
         cols: 3, rows: 3, colsN: 3, rowsN: 3, gameLabel: "In this lesson" });
       var c4 = H("div", { class: "lx-xcard" }, host);

@@ -51,8 +51,8 @@
     "rate": { "min": 0.5, "max": 2.5, "step": 0.1, "start": 1.0 }
   },
   "cooling": [
-    { "key": "evap", "name": "Evaporative heat rejection", "water": "uses water that evaporates in a cooling tower", "power": "less electricity for cooling" },
-    { "key": "dry", "name": "Dry, air-cooled heat rejection", "water": "little operational water on site", "power": "may need more electricity, depending on the weather and the design" }
+    { "key": "evap", "name": "Cooling tower", "water": "releases heat by evaporating water", "power": "needs less electricity for cooling" },
+    { "key": "dry", "name": "Dry cooling", "water": "releases heat to the outdoor air, with little operational water on site", "power": "may need more electricity, depending on the weather and the design" }
   ],
   "coolingSource": {
     "source": "U.S. Department of Energy, Federal Energy Management Program: Cooling Water Efficiency Opportunities for Federal Data Centers",

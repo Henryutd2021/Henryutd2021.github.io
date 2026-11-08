@@ -11,7 +11,7 @@ glossary:
     def: "One customer, such as a data center or a large factory, that draws tens of megawatts or more; utilities and grid operators set their own thresholds."
   - id: power-usage-effectiveness
     term: Power usage effectiveness (PUE)
-    def: "A data center's total electricity use divided by the electricity its computing equipment uses; the rest goes to cooling, power conversion and lighting."
+    def: "A data center's total electricity use over a year divided by its computing equipment's use over the same year; the rest goes to cooling, power conversion and lighting."
   - id: job-year
     term: Job-year
     def: "One person working full time for one year; 100 workers for six months make 50 job-years."

@@ -76,7 +76,7 @@ const R = Object.fromEntries(rows.map(r => [r.year, r]));
   // which equals the one-wire P² R / V², so the shares lost do not depend on the phase count
   L.classes_kV.forEach(kv => { const x = at(kv); ok(near(x.I, P * 1e6 / (Math.sqrt(3) * kv * 1e3)) && near(x.lossMW, 3 * x.I * x.I * Rw / 1e6) && near(x.lossMW, Math.pow(P * 1e6 / (kv * 1e3), 2) * Rw / 1e6, 1e-9) && near(x.pct, 100 * x.lossMW / P), `${kv} kV: I = P/(√3 V) per wire, loss = 3 I²R = P²R/V²`); });
   ok(fmt(at(345).I) === "167" && fmt(at(69).I) === "837", `current in each wire: ${fmt(at(345).I)} A at 345 kV, ${fmt(at(69).I)} A at 69 kV (a one-wire I = P/V would give 290 A and 1,449 A)`);
-  ok(/"Current in each wire"/.test(JS) && /a line of three wires \(three phases, as real lines have\)/.test(JS) && /I = P \/ \(√3 × V\)/.test(D.losses.about), "the readout says the current is per wire; the data note gives the three-phase formula");
+  ok(/"Current in each wire"/.test(JS) && / MW on a line of three wires, as real lines have\. Each wire has /.test(JS) && /of resistance, its opposition to current\./.test(JS) && !/three phases/.test(JS) && /I = P \/ \(√3 × V\)/.test(D.losses.about), "the readout says the current is per wire, the hint explains resistance without phase terms; the data note gives the three-phase formula");
   ok(L.classes_kV.every((kv, i) => i === 0 || at(kv).lossMW < at(L.classes_kV[i - 1]).lossMW), "loss falls at every higher voltage class");
   [69, 115, 230, 345].forEach(kv => ok(near(at(2 * kv).lossMW, at(kv).lossMW / 4, 1e-12), `doubling ${kv} kV quarters the loss (quiz)`));
   ok(L.classes_kV[4] === 5 * L.classes_kV[0] && near(at(L.classes_kV[4]).lossMW * 25, at(L.classes_kV[0]).lossMW, 1e-9), "345 kV is five times 69 kV, with one twenty-fifth of the loss");
@@ -110,8 +110,13 @@ const R = Object.fromEntries(rows.map(r => [r.year, r]));
     if (f.length === 1) ok(o.homesDark === 0, `N−1: ${f[0]} alone darkens no home`);
   }
   ok(M.outage(net, set(["XF"])).homesDark === 30 && M.outage(net, set(["XF"])).upstream === "XF", "substation transformer fault: all 30 homes");
-  // the fallback's fourth row ("None: power goes round the loop") and the quiz's "only when both lines into the substation fall"
-  ok(/One loop line down: power goes round the other way/.test(JS) && /Only when both lines into the substation fall do all 30 homes go dark/.test(QMD), "page wording of the loop matches the model");
+  // the fallback's fourth row (line-end breakers isolate the line; another line feeds the substation) and the quiz's
+  // "among line failures, only losing both lines into the substation darkens all 30; a failed transformer would too"
+  ok(/One high-voltage line down: another line still feeds the substation/.test(JS) && /Among line failures, only losing both lines into the substation darkens all 30 homes; a failed substation transformer would too\./.test(QMD) && /<td>Breakers at its two ends \(not drawn\); another line still feeds the substation<\/td><td>0<\/td>/.test(QMD), "page wording of the loop matches the model");
+  // with the plant–grid line gone for good, either line into the substation still leaves no home dark: the page credits
+  // the second line into the substation, not the loop, and never says power goes "round the loop"
+  ["GS", "NS"].forEach(x => ok(M.outage(net, set(["GN", x])).homesDark === 0, `GN and ${x} down: no home dark (the other line into the substation feeds it)`));
+  ok(!/round the (other way|loop)/.test(JS + QMD.replace(/<!--[\s\S]*?-->/g, "")), "no claim that power goes round the loop");
   ok(net.lines.filter(l => l.to === "S" || l.from === "S").map(l => l.id).sort().join() === "GS,NS", "two lines enter the substation");
 }
 
@@ -122,7 +127,7 @@ const R = Object.fromEntries(rows.map(r => [r.year, r]));
   ok(g.map(x => x.cause + ":" + x.homes).join() === "FU2:6,R1:10,B2:10", "storm: the fuse on L2 (6), recloser R1 (10), the south breaker (10)");
   const fbStorm = (QMD.match(/Then a storm[\s\S]*?<\/table>/) || [""])[0];
   faults.forEach(f => ok(fbStorm.indexOf("<td>" + f.repair_h + " h") >= 0, `fallback lists the ${f.id} repair time (${f.repair_h} h)`));
-  ok(/<td>Its fuse<\/td><td>6<\/td>/.test(fbStorm) && /<td>Recloser R1<\/td><td>10<\/td>/.test(fbStorm) && /breaker<\/td><td>10<\/td>/.test(fbStorm) && /loop<\/td><td>0<\/td>/.test(fbStorm), "fallback storm table matches the model");
+  ok(/<td>Its fuse<\/td><td>6<\/td>/.test(fbStorm) && /<td>Recloser R1<\/td><td>10<\/td>/.test(fbStorm) && /breaker<\/td><td>10<\/td>/.test(fbStorm) && /feeds the substation<\/td><td>0<\/td>/.test(fbStorm), "fallback storm table matches the model");
   const bo = M.bestOrders(net, faults);
   ok(bo.all.length === 6 && M.crewFaults(faults).join() === "L2,F1B,F2A", "six orders of the three local faults; the loop line has its own crew");
   ok(bo.best.length === 1 && bo.best[0].order.join() === "F1B,L2,F2A" && bo.min === 10200, `the best order is unique: ${bo.best.map(r => r.order.join(">")).join(" | ")}, ${bo.min} customer-minutes`);
@@ -175,12 +180,19 @@ const R = Object.fromEntries(rows.map(r => [r.year, r]));
     const gs = M.groups(net, o);
     ok(gs.reduce((a, g) => a + g.homes, 0) === o.homesDark, `text version [${c.join(",") || "none"}]: the causes add up to ${o.homesDark} dark homes`);
     gs.forEach(g => { const t = M.causeText(net, g); ok(words(t) <= 12 && sentences(t) === 1, `cause line: ${t}`); });
-    c.forEach(id => { const t = M.why(net, f, id); ok(words(t) <= 40 && sentences(t) <= 2, `reason for ${id} within budget (${words(t)} words): ${t.slice(0, 60)}`); });
+    c.forEach(id => { const t = M.why(net, f, id); ok(words(t) <= 35 && sentences(t) <= 2, `reason for ${id} within budget (${words(t)} words): ${t.slice(0, 60)}`); });
   });
   const storm = M.netRows(net, set(faults.map(f => f.id))), xf = storm.find(r => r.id === "XF");
   ok(xf.dark === 26 && xf.serves === 30 && storm.filter(r => r.all).every(r => r.dark === 26), "storm: the transformer and loop rows read 26 of 30 dark, matching the 26 dark homes");
   ok(M.groups(net, M.outage(net, set(faults.map(f => f.id)))).map(g => M.causeText(net, g)).join(" | ") === "Fuse on L2 opened: 6 homes dark. | Recloser R1 opened: 10 homes dark. | South feeder's breaker opened: 10 homes dark.", "storm: the text version lists the three causes");
   ok(/which we assume can carry it/.test(M.why(net, set(["GN"]), "GN")) && /Protection here is set so the closest device upstream opens first/.test(M.why(net, set(["L2"]), "L2")), "the reasons state the loop and protection assumptions");
+  // a downed line's reason speaks of that failure alone, true in every state: breakers isolate it, and while the
+  // substation is fed it darkens no home (even when other faults have darkened 26)
+  const stormSet = set(faults.map(f => f.id)), gnWhy = M.why(net, stormSet, "GN");
+  ok(/cut off by breakers at its ends \(not drawn\)/.test(gnWhy) && /this failure darkens no home/.test(gnWhy) && !/no home loses power/.test(gnWhy), "storm: the downed loop line's reason is about that line, beside a count of 26 dark: " + gnWhy);
+  const twoWhy = M.why(net, set(["GS", "GN"]), "GN");
+  ok(/Another line still feeds the substation/.test(twoWhy) && !/loop/.test(twoWhy), "GS and GN down: the reason names the remaining line, not a loop that no longer exists");
+  ok(/No working line is left into the substation, so all 30 homes are dark\./.test(M.why(net, set(["GS", "NS"]), "NS")), "both lines into the substation down: all 30 dark");
 }
 
 // ---------------- the real U.S. reliability numbers (EIA Table 11.1) and the claims about them
@@ -190,7 +202,8 @@ const R = Object.fromEntries(rows.map(r => [r.year, r]));
   ok(rows.every(r => r.saidi_nomed >= 110 && r.saidi_nomed <= 135), "without major event days: 116 to 131.6 minutes every year, 'near two hours'");
   const run = M.medRun(rows);
   ok(run.from === 2016 && run.to === 2025 && run.before.year === 2015 && rows.filter(r => r.year >= 2016).every(r => M.medShare(r) > 0.5) && M.medShare(R[2015]) < 0.5, "major event days: over half of SAIDI in every year 2016-2025, not in 2015");
-  ok(M.medRunText(rows) === "Major event days, mostly storms, gave more than half of each year's minutes from 2016 to 2025 (2015: 44%). Elsewhere, and in other years, the ranking of causes can differ.", "the run sentence");
+  ok(M.medRunText(rows) === "Major event days gave more than half of each year's minutes from 2016 to 2025 (2015: 44%). They often involve severe weather, but this table does not record causes.", "the run sentence: a share of minutes, with no cause claimed");
+  ok(!/mostly storms|few stormy days|usually from a big storm/.test(JS + SIDE + QMD.replace(/<!--[\s\S]*?-->/g, "")), "major event days are a statistical class, never called storm days");
   ok(fmt(100 * M.medShare(R[2025])) === "53" && fmt(100 * M.medShare(R[2024])) === "80" && D.year2024.med_share_pct === 80, "2025: 53% from major event days; 2024: 80%, as EIA's Today in Energy says");
   ok(near(R[2024].saidi / 60, D.year2024.hours, 0.05), `2024: ${R[2024].saidi} min = ${(R[2024].saidi / 60).toFixed(2)} h, EIA's '11 hours'`);
   ok(fmt(R[2025].saidi / R[2025].saifi) === "201", "CAIDI 2025: 269.2 ÷ 1.34 = 201 minutes (EIA's table: 201)");
@@ -199,7 +212,6 @@ const R = Object.fromEntries(rows.map(r => [r.year, r]));
     const want = "| " + lab + " | " + R[2024][k] + u + " | " + R[2025][k] + u + " |";
     ok(QMD.indexOf(want) >= 0, `Analyst table row: ${want}`);
   });
-  ok(/" columns: " \+ fmtN\(last\.saidi, 1\) \+ " minutes for all events, " \+ fmtN\(last\.saidi_nolos, 1\) \+ " with outages from lost high-voltage supply removed\. The two columns can cover different utilities, so the gap does not measure upstream failures\."/.test(JS), "step 8 reads the loss-of-supply numbers from the data and says the gap is not the upstream share");
   ok(R[2020].saidi_nolos > R[2020].saidi, "2020: the loss-of-supply-removed column exceeds all events, so the two columns cover different groups (the Analyst box says so)");
   ok(/\*\*Loss of supply\.\*\* That column can cover a different group of utilities \(its 2020 value is above all events\)/.test(QMD), "the Analyst box warns about the loss-of-supply column");
   ok(!/\b8%|8 ?percent/.test(JS + QMD.replace(/<!--[\s\S]*?-->/g, "")), "no loss-of-supply share stated (the column's 2020 value exceeds all events: populations differ)");
@@ -220,7 +232,7 @@ const R = Object.fromEntries(rows.map(r => [r.year, r]));
     "10,200 customer-minutes", "36,000 customer-minutes", Math.round(B3.uri.peakShedMW).toLocaleString("en-US") + " MW", st.saidi + " minutes", "3.6 minutes", "36 minutes", "90 minutes", "0.04 minutes", "201 minutes",
     "269.2 minutes", "125.3 minutes", fmt(R[2025].saidi, 1) + " min", fmt(R[2025].saidi_nomed, 1) + " min", fmt(R[2024].saidi, 1) + " min", fmt(R[2024].saidi_nomed, 1) + " min",
     fmt(R[2024].saidi_nolos, 1) + " min", fmt(R[2025].saidi_nolos, 1) + " min", "11 hours", "80%", "53%", "47%", "215%", "27%", "5 V", D.practice + " minutes",
-    "2 h", "3 h", "6 h", "12 h"
+    "2 h", "3 h", "6 h", "12 h", "6 hours", "3 hours"
   ]));
   const rx = /(\d[\d,]*(?:\.\d+)?)\s*(kV|V|MW|%|customer-minutes|minutes|min|hours|h)(?![\w-])/g;
   let m, n = 0;
@@ -230,8 +242,14 @@ const R = Object.fromEntries(rows.map(r => [r.year, r]));
   }
   ok(n >= 45, `${n} numbers with units on the page checked`);
   // the quiz's wrong options (47%, 27%, 215%, 5 V, 36 and 90 minutes) are distractors; their right answers are recomputed here
-  ok(near(400 * 90 / 10000, 3.6) && near(400 / 10000, 0.04), "quiz: 400 × 90 ÷ 10,000 = 3.6 minutes; SAIFI share 0.04");
-  ok(fmt(100 * (R[2025].saidi - R[2025].saidi_nomed) / R[2025].saidi) === "53", "quiz: (269.2 − 125.3) ÷ 269.2 = 53%");
+  ok(near(400 * 90 / 10000, 3.6) && near(400 / 10000, 0.04) && /400 × 90 ÷ 10,000 = 3\.6 minutes to the year's SAIDI, and 0\.04 to its SAIFI/.test(QMD), "Analyst box: 400 × 90 ÷ 10,000 = 3.6 minutes; SAIFI share 0.04");
+  ok(fmt(100 * (R[2025].saidi - R[2025].saidi_nomed) / R[2025].saidi) === "53" && /\(269\.2 − 125\.3\) ÷ 269\.2 = 53%/.test(QMD), "Analyst box: (269.2 − 125.3) ÷ 269.2 = 53%");
+  // the practice's storms A and B: the same minutes per home (SAIDI equal), twice the interruptions (SAIFI doubles)
+  { const a = M.reliability(400 * 6 * 60, 400, 1000), b = M.reliability(400 * 2 * 3 * 60, 800, 1000);
+    ok(a.saidi === b.saidi && b.saifi === 2 * a.saifi && /data-id="twice" data-answer="b"/.test(QMD), "quiz: storm B has the same SAIDI and twice the SAIFI of storm A, so the answer is SAIFI only"); }
+  // the required path stays qualitative: the practice asks no index arithmetic; the worked sums sit in the Analyst box
+  { const quiz = (QMD.match(/<div class="lx-quiz" data-quiz="f6">[\s\S]*?\n<\/div>\n```/) || [""])[0];
+    ok(quiz && !/÷/.test(quiz.replace(/<details[\s\S]*?<\/details>/g, "")) && !/How much does it add/.test(quiz), "practice questions ask no SAIDI or share calculation"); }
   // the script never hard-codes a data number in its text; it reads them from the data
   const lits = [...JS.matchAll(/"((?:[^"\\\n]|\\.)*)"/g)].map(x => x[1]).join("\n");
   ok(!/\b(269\.2|125\.3|662\.6|10,200|20,000|345 kV|18 kV|12\.47|240\/120|90%|5%)/.test(lits), "the script's text never hard-codes a sourced or modelled number");
@@ -258,10 +276,11 @@ const R = Object.fromEntries(rows.map(r => [r.year, r]));
   ok(steps.length === 8, `${steps.length} step texts`);
   steps.forEach(t => { ok(words(t) <= 40 && sentences(t) <= 2, `step text within budget (${words(t)} words): "${t.slice(0, 50)}…"`); ok(t.indexOf("**") < 0, "no ** in step text"); });
   ok(words(M.medRunText(rows)) <= 40 && sentences(M.medRunText(rows)) <= 2, "the run sentence is within budget");
-  // the "what you saw" lines, assembled as the reader sees them
+  // the "what you saw" lines, assembled as the reader sees them; step 1 says one transformer gives the home 240/120 V
+  ok(/then lower it in steps to \*\*" \+ D\.voltages\.service\.text \+ "\*\* at the home\. A socket takes \*\*" \+ D\.town\.socketV \+ " V\*\* of that, between a live wire and the \[\[neutral\|neutral\]\]\."/.test(JS) && !/Transformers make each step/.test(JS), "step 1: 240/120 V at the home; the socket's 120 V is live to neutral, not a further transformer step");
   const L = D.losses, lo = M.loss(L.P_MW, L.classes_kV[0], L.R_ohm), hi = M.loss(L.P_MW, L.classes_kV[4], L.R_ohm);
   const saw2 = "At " + L.classes_kV[0] + " kV the line loses **" + fmt(lo.pct, 1) + "%**; at " + L.classes_kV[4] + " kV, five times higher, only **" + fmt(hi.pct, 2) + "%**, one twenty-fifth. All U.S. lines and wires together lose about " + L.real_pct + "% (EIA, " + L.real_years + ").";
-  ok(words(saw2) <= 45 && sentences(saw2) <= 2, `loss feedback within budget (${words(saw2)} words)`);
+  ok(words(saw2) <= 40 && sentences(saw2) <= 2, `loss feedback within budget (${words(saw2)} words)`);
   ok(JS.indexOf('kV, five times higher, only **"') > 0, "loss feedback is assembled as tested");
   // the no-JS fallback carries the key numbers and tables
   const fb = QMD.match(/<div class="lx-fallback">[\s\S]*?lx-hint/)[0];
@@ -289,7 +308,7 @@ const R = Object.fromEntries(rows.map(r => [r.year, r]));
   ok(!threw && cards && cards.count === 8, "the lesson mounts on the stub document" + (threw ? ": " + threw : ""));
   if (!threw && cards) {
     const card = () => cards.el, txt = e => e.textContent.replace(/\s+/g, " ").trim();
-    const budget = (where, t, w) => ok(words(t) <= (w || 40) && sentences(t) <= 2, `${where}: within budget (${words(t)} words, ${sentences(t)} sentences): "${t.slice(0, 70)}…"`);
+    const budget = (where, t, w) => ok(words(t) <= (w || 36) && sentences(t) <= 2, `${where}: within budget (${words(t)} words, ${sentences(t)} sentences): "${t.slice(0, 70)}…"`);
     const supporting = where => card().querySelectorAll(".lx-step-text, .lx-hint, .f6y-p, .f6n-why, .f6p-what, .lx-saw, .lx-predict-out p").forEach(e => { const t = txt(e); if (t) budget(where, t); });
     // step 5, the storm: the text table counts the dark homes the same way on every row, and names the causes
     cards.go(4);
@@ -308,10 +327,18 @@ const R = Object.fromEntries(rows.map(r => [r.year, r]));
     cards.go(1);
     ok(card().querySelectorAll(".lx-readout").some(e => /Current in each wire\s*167 A/.test(txt(e))), "step 2: 345 kV shows 167 A in each wire");
     supporting("step 2");
-    // step 6: an order is chosen; its feedback stays within budget
+    // step 6: the chart's text version matches the chart in every state (only the best order before a full order;
+    // both after; only the best order again after "Start a new order")
     cards.go(5);
+    const altHead = () => card().querySelectorAll(".f6r .lx-textalt th").map(txt).join(" | ");
+    const altRows = () => card().querySelectorAll(".f6r .lx-textalt tbody tr").length;
+    ok(altHead() === "Hour | Homes dark, best order" && altRows() === 12, "step 6, before an order: the text version lists the best order's 12 hours: " + altHead());
     ["North feeder's far half", "Oak Street (L2)", "South feeder"].forEach(n => { const b = card().querySelectorAll("button.f6r-b").find(x => txt(x).indexOf(n) === 0); if (b) b.click(); });
     ok(/That is the best order: 10,200 customer-minutes/.test(txt(card())), "step 6: the best order is recognised");
+    ok(altHead() === "Hour | Homes dark, your order | Homes dark, best order" && altRows() === 12, "step 6, order complete: the text version adds the reader's order: " + altHead());
+    card().querySelectorAll("button").find(b => txt(b) === "Start a new order").click();
+    ok(altHead() === "Hour | Homes dark, best order" && altRows() === 12, "step 6, after Start a new order: the text version drops the old order with the plotted curve: " + altHead());
+    ["North feeder's far half", "Oak Street (L2)", "South feeder"].forEach(n => { const b = card().querySelectorAll("button.f6r-b").find(x => txt(x).indexOf(n) === 0); if (b) b.click(); });
     supporting("step 6");
     // step 7: the worked SAIDI and SAIFI, then the question; the answer reveals the model's numbers
     cards.go(6);
@@ -322,10 +349,14 @@ const R = Object.fromEntries(rows.map(r => [r.year, r]));
     card().querySelectorAll(".lx-choice").find(b => /SAIFI only/.test(txt(b))).click();
     ok(/Not quite\..*SAIDI falls from 340 to 170 minutes, SAIFI stays 0\.87\./.test(txt(card().querySelector(".lx-predict-out"))) && !next().disabled, "step 7: a wrong pick gets the model's numbers, and Next opens");
     supporting("step 7");
-    // step 8: one takeaway, the source and three short paragraphs, each its own element
+    // step 8: one takeaway, the source and two short paragraphs, each its own element (the loss-of-supply caution is
+    // in the Analyst box)
     cards.go(7);
     const ps = card().querySelectorAll(".f6y-p").map(txt);
-    ok(ps.length === 3 && /^EIA's 2025 columns: 269\.2 minutes for all events, 246\.8 with/.test(ps[1]) && /lesson 3/.test(ps[2]) && /20,000 MW/.test(ps[2]), "step 8: the prediction, the EIA columns and the Texas link are separate paragraphs");
+    ok(ps.length === 2 && /^Your prediction/.test(ps[0]) && /lesson 3/.test(ps[1]) && /20,000 MW/.test(ps[1]), "step 8: the prediction and the Texas link are separate paragraphs");
+    // step 1: the voltage bars say their scale is compressed
+    cards.go(0);
+    ok(card().querySelectorAll(".f6p-scale").some(e => /^Bar heights are compressed \(a logarithmic scale\): 345 kV is about 2,900 times the socket's 120 V\.$/.test(txt(e))), "step 1: the bars' compressed scale is labelled");
     supporting("step 8");
     cards.go(0); supporting("step 1");
     cards.go(2); supporting("step 3");
@@ -336,8 +367,8 @@ const R = Object.fromEntries(rows.map(r => [r.year, r]));
   ok(li(note).length === 4, `data note: ${li(note).length} labelled rows`);
   li(note).forEach(t => ok(words(t) <= 35 && sentences(t) <= 2, `data note row within budget (${words(t)} words): ${t.slice(0, 50)}`));
   const fbl = (QMD.match(/<\/table><\/div>\s*<ul>[\s\S]*?<\/ul>/) || [""])[0];
-  ok(li(fbl).length === 4, "no-JS summary: four items");
-  li(fbl).forEach(t => ok(words(t) <= 46 && sentences(t) <= 3, `no-JS summary item within budget (${words(t)} words): ${t.slice(0, 50)}`));
+  ok(li(fbl).length === 7, "no-JS summary: seven items, one idea each");
+  li(fbl).forEach(t => ok(words(t) <= 35 && sentences(t) <= 2, `no-JS summary item within budget (${words(t)} words): ${t.slice(0, 50)}`));
   const dd = [...QMD.matchAll(/<dd>([\s\S]*?)<\/dd>/g)].map(x => x[1].replace(/<[^>]+>/g, ""));
   ok(dd.length === 6, "explain fallback: six ideas");
   dd.forEach(t => ok(words(t) <= 35 && sentences(t) <= 2, `explain idea within budget (${words(t)} words): ${t.slice(0, 50)}`));

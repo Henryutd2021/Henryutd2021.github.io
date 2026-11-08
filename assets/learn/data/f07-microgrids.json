@@ -120,7 +120,7 @@
   {
    "key": "battery",
    "name": "Battery, 500 kW and 2,000 kWh",
-   "note": "Its [[grid-forming|grid-forming]] inverter can set the island's voltage and frequency at once."
+   "note": "Its [[grid-forming|grid-forming]] inverter is designed to start the island and set its voltage and frequency."
   },
   {
    "key": "gen",
@@ -154,6 +154,7 @@
   "formBattery": "The battery's [[grid-forming|grid-forming]] inverter sets the island's voltage and frequency, and the solar inverters follow it. The controller picks up the hospital and the water plant first.",
   "formGen": "Once it has started, the generator sets the island's voltage and frequency, and the solar inverters follow it. The controller picks up the hospital and the water plant first.",
   "keepCritical": "The hospital and the water plant are critical: the hospital needs water and heat. Switch both back on.",
+  "boundary": "We assume the switching and the start succeed: this lesson checks power and energy, not a seamless changeover.",
   "villageToy": "Toy check: one average day; the battery can give any power the village needs, so only stored energy is tested, not cloudy days."
  },
  "flow": {
@@ -450,7 +451,7 @@
     "id": "standby",
     "text": "A standby generator on its own, with no controller, that starts after the grid fails",
     "bin": "no",
-    "why": "Backup, not a microgrid: no controller runs sources and loads as one unit. A microgrid can still serve a single building."
+    "why": "Backup only: nothing runs sources and loads as one unit. A microgrid can still serve one building."
    },
    {
     "id": "windfarm",
