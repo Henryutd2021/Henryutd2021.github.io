@@ -1,5 +1,5 @@
 {
- "about": "CK-F, the Foundations checkpoint (curriculum v2 §3.3): nine short tasks on unfamiliar situations across T0-T6 and N1, then the main estimate (a town's school buses go electric). Prairie Town is fictional; its numbers are illustrative. The two charts use real Southwest Power Pool shapes (EIA-930, 2025) scaled to Prairie Town as in lesson 0 (450 MW = SPP's 2025 peak hour); _tests/learn/test_ck-f-estimate.js checks them against town_year.json and town_days.json and checks every answer below.",
+ "about": "CK-F, the Foundations checkpoint: nine short tasks on unfamiliar situations across T0-T6 and N1, then the main estimate (a town's school buses go electric). Prairie Town is fictional; its numbers are illustrative. The two charts use real Southwest Power Pool shapes (EIA-930, 2025) scaled to Prairie Town as in lesson 0 (450 MW = SPP's 2025 peak hour); _tests/learn/test_ck-f-estimate.js checks them against town_year.json and town_days.json and checks every answer below.",
  "version": "ck-f v1 (2 Nov 2026)",
  "accessed": "2026-11-02",
  "rule": { "auto": 7, "autoProficient": 5, "autoStrong": 6, "criteria": ["units", "range", "uncertainty", "check"], "levels": ["Not yet", "Developing", "Proficient", "Strong"] },

@@ -1,11 +1,11 @@
 {
  "about": {
   "line": "Prairieland is fictional; its numbers are illustrative.",
-  "what": "Shared data of Prairieland, Learn's national scale (S4, wave W6): five regions, the 2025 energy balance, the supply fleet with vintages, transmission, imports and minerals, the battery factory, fixed cost ranges, the carbon budget, time slices for engine E4, shocks and demand scenarios. Read by F10, A20, A21, M13, SB4 (engine E4) and C4; pages read these numbers and never retype them.",
+  "what": "Shared data of Prairieland, Learn's national scale (S4): five regions, the 2025 energy balance, the supply fleet with vintages, transmission, imports and minerals, the battery factory, fixed cost ranges, the carbon budget, time slices for engine E4, shocks and demand scenarios. Read by F10, A20, A21, M13, SB4 (engine E4) and C4; pages read these numbers and never retype them.",
   "fictional": "Prairieland is fictional. Its card (people, primary energy and shares, imports, Ridge County) is the course's own; costs come from EIA's 2026 assumptions; hourly shapes from SPP's 2025 grid; CO2 factors from the IPCC. Everything else is set for teaching and labelled so in the builder.",
   "dollarYear": 2025,
   "built": "2026-11-07",
-  "builtBy": "scripts/build_learn_prairieland.py (ResearchPortfolio repository): python3 scripts/build_learn_prairieland.py --site <site>; tested by _tests/learn/test_prairieland.js",
+  "builtBy": "Written by the Prairieland data build step (do not edit by hand); tested by _tests/learn/test_prairieland.js",
   "method": "Top-down from the card: primary energy 3.5 EJ split by its shares, then refinery, power plants and grid to final energy by sector and carrier, then useful energy; the fleet's generation unit by unit; regions by teaching weights that add up to the nation exactly. Time slices from SPP's 2025 hourly shapes, 12 slices with the peak net-load day and the scarce-wind winter week kept whole.",
   "simplifications": [
    "All fossil energy is counted as burned (no non-energy use such as plastics or asphalt).",
@@ -2525,7 +2525,7 @@
  },
  "ridgeCounty": {
   "a13": {
-   "note": "Ridge County is Prairieland's coal-dependent county (curriculum v2 §6, scale S4). A13 sets its numbers here and wave W6 (SB4, C4) reuses them: change them together with W6. Anchors from the national-strategy dossier §8.0: Prairieland has 20 million people; Ridge County holds 3% of its workforce; coal provides 40% of the county's local tax revenue. Everything else is set for teaching.",
+   "note": "Ridge County is Prairieland's coal-dependent county (scale S4). A13 sets its numbers here and SB4 and C4 reuse them through Prairieland's data: change them in both together. Anchors from Prairieland's parameter card: Prairieland has 20 million people; Ridge County holds 3% of its workforce; coal provides 40% of the county's local tax revenue. Everything else is set for teaching.",
    "fiction": "Ridge County and Prairieland are fictional; their numbers are illustrative.",
    "prairielandPeople": 20000000,
    "prairielandWorkforce": 10000000,

@@ -1,6 +1,6 @@
 {
  "generated": "2026-11-02",
- "note": "Built by scripts/build_map.py from OpenAlex (institutions, geo), Crossref (event locations), the publication list and the public CV. Institutions only; no people's names.",
+ "note": "Built by the map build step from OpenAlex (institutions, geo), Crossref (event locations), the publication list and the public CV. Institutions only; no people's names.",
  "institutions": [
   {
    "id": "I162577319",

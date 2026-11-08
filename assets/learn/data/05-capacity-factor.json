@@ -4,7 +4,7 @@
     "title": "Lesson 5 data: capacity factors, the year profiles' targets, the solar day and the illustrative turbine",
     "built": "2026-11-02",
     "license": "Numbers from EIA are U.S. government works in the public domain; this file CC BY 4.0",
-    "about": "The wind and solar shapes in town_year.json are each divided by their own 2025 maximum hour, so their mean is NOT a capacity factor (wind 0.528, solar 0.235). The lesson turns them into a plant's output with the shared helper LX.townProfile (assets/learn/components/profiles.js), method \"power\", to the annual targets in the shared cf_targets.json (EIA Table 6.07.B, 2025), with each month first brought to the 2025 U.S. monthly capacity factor (the helper's monthlyCF option; the values are in cf_targets.json, monthly). Night-time solar telemetry is already zero in town_year.json (scripts/build_learn_town_data.py). Nuclear runs at full size except for one illustrative refuelling outage (nuclear). Why \"power\": the best hours reach the plant's size, so the year view shows output against nameplate."
+    "about": "The wind and solar shapes in town_year.json are each divided by their own 2025 maximum hour, so their mean is NOT a capacity factor (wind 0.528, solar 0.235). The lesson turns them into a plant's output with the shared helper LX.townProfile (assets/learn/components/profiles.js), method \"power\", to the annual targets in the shared cf_targets.json (EIA Table 6.07.B, 2025), with each month first brought to the 2025 U.S. monthly capacity factor (the helper's monthlyCF option; the values are in cf_targets.json, monthly). Night-time solar telemetry is already zero in town_year.json (the town data build step). Nuclear runs at full size except for one illustrative refuelling outage (nuclear). Why \"power\": the best hours reach the plant's size, so the year view shows output against nameplate."
   },
   "sources": {
     "eia930": {
@@ -71,7 +71,7 @@
     "source": "eia_refuel"
   },
   "day": {
-    "about": "An illustrative solar day based on SPP observations: the 100 MW solar farm's hourly output on the lesson-0 day, Central daylight time (UTC-5), rounded to whole MW. It is the year profile's day (SPP's 2025 shape, reshaped month by month to the U.S. capacity factors) as built from town_year.json after the 2026-11-02 night-time solar refresh (scripts/build_learn_town_data.py: solar is zero when the sun is below the horizon at SPP's centre), stored here so the page's static table, the steps and the explain layer state the same 24 numbers. The lesson's test checks it against the year profile hour by hour (within 1 MW).",
+    "about": "An illustrative solar day based on SPP observations: the 100 MW solar farm's hourly output on the lesson-0 day, Central daylight time (UTC-5), rounded to whole MW. It is the year profile's day (SPP's 2025 shape, reshaped month by month to the U.S. capacity factors) as built from town_year.json (whose solar is zero when the sun is below the horizon at SPP's centre), stored here so the page's static table, the steps and the explain layer state the same 24 numbers. The lesson's test checks it against the year profile hour by hour (within 1 MW).",
     "date": "2025-09-03",
     "dateLabel": "3 September 2025",
     "utcOffsetHours": -5,

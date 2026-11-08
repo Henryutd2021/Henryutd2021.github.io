@@ -1,5 +1,5 @@
 {
-  "about": "Lesson X3 (x03-transitions-history), side-topic shelf, Foundations, D1, wave W6, builder learn-w6-x, 2026-11-07. Adoption curves of the United States as shares over time, each point transcribed from a dated primary source (the Census Bureau's Historical Statistics and decennial housing tables, EIA's Electric Power Annual); solar's share is our arithmetic on EIA's table. Diffusion only: no cost curve of any technology and no forecast of future speed.",
+  "about": "Lesson X3 (x03-transitions-history), side-topic shelf, Foundations, D1. Adoption curves of the United States as shares over time, each point transcribed from a dated primary source (the Census Bureau's Historical Statistics and decennial housing tables, EIA's Electric Power Annual); solar's share is our arithmetic on EIA's table. Diffusion only: no cost curve of any technology and no forecast of future speed.",
   "series": [
     { "key": "elec", "label": "Homes with electric service", "short": "Electricity, all homes", "measure": "the share of all homes (dwelling units) with electric service", "color": "var(--lx-bat)", "dash": null, "src": "hsus-s", "where": "Series S 109",
       "pts": [[1907, 8.0], [1912, 15.9], [1917, 24.3], [1920, 34.7], [1925, 53.2], [1930, 68.2], [1935, 68.0], [1940, 78.7], [1945, 85.0], [1950, 94.0], [1955, 98.4], [1956, 98.8]] },

@@ -1,5 +1,5 @@
 {
- "generated_by": "scripts/build_learn.py from learn/path.yml",
+ "generated_by": "the course build step, from learn/path.yml",
  "course": "Energy Systems, Step by Step",
  "license": {
   "text": "https://creativecommons.org/licenses/by/4.0/",

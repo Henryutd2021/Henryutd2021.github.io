@@ -3,7 +3,7 @@
   "what": "Engine E3's settings and costs: Prairie City's energy hub (the three districts behind their substation limits) as a linear program over prairie-city.json's eight representative days. Prairie City's own numbers are in prairie-city.json; this file holds only what the engine adds.",
   "line": "Prairie City is fictional; its numbers are illustrative.",
   "built": "2026-11-06",
-  "builtBy": "scripts/build_learn_e3_data.py (ResearchPortfolio repository): python3 scripts/build_learn_e3_data.py --site <site>; the `precomputed` block is written by the tests' --write mode",
+  "builtBy": "Written by the engine E3 data build step (do not edit by hand); the `precomputed` block is written by the tests' --write mode",
   "set": "Costs read from other course files say so in `via`; everything marked \"teaching\" is illustrative, set for this course, with a range the reader can change."
  },
  "dollarYear": 2025,

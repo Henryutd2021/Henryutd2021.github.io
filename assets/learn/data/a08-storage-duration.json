@@ -1,5 +1,5 @@
 {
- "about": "Data of Learn lesson A8, How long should storage last? (wave W3, 2026-11-03). The Plains Grid and its fleet are fictional and illustrative; demand, wind and solar follow the real hourly shapes of the Southwest Power Pool grid in 2025 (town_year.json, EIA-930), scaled as stated below. Storage parameters and costs come from the primary sources listed with each item. The reference block is written by node _tests/learn/test_a08-storage-duration.js --write and re-solved by the same test on every run.",
+ "about": "Data of Learn lesson A8, How long should storage last? The Plains Grid and its fleet are fictional and illustrative; demand, wind and solar follow the real hourly shapes of the Southwest Power Pool grid in 2025 (town_year.json, EIA-930), scaled as stated below. Storage parameters and costs come from the primary sources listed with each item. The reference block is written by node _tests/learn/test_a08-storage-duration.js --write and re-solved by the same test on every run.",
  "plains": {
   "name": "Plains Grid",
   "note": "Illustrative: a future Plains Grid with much wind and little firm power, so that a calm week leaves a gap. Not a forecast of any real grid.",
@@ -166,7 +166,7 @@
     "why": "Weeks are more than 160 hours; DOE's seasonal bin is mainly chemical storage, a fuel that keeps."
    }
   ],
-  "note": "Cards with a range that spans two bins carry one example rating (an 8-hour pumped storage plant, a 100-hour iron-air battery), so each has one right bin (A8 review, finding 7)."
+  "note": "Cards with a range that spans two bins carry one example rating (an 8-hour pumped storage plant, a 100-hour iron-air battery), so each has one right bin."
  },
  "costs": {
   "about": "Total installed costs of 100 MW systems in the report's own sizes, from data gathered in 2021 (the report's 'current' year; it states no other dollar year). One source, one year. Fixed operation and maintenance, cycling wear and replacements are left out.",

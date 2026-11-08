@@ -16,7 +16,7 @@
   "accessed": "2026-11-02",
   "license": "EIA data are U.S. government works in the public domain; derived profiles CC BY 4.0",
   "method": "Same reader and cleaning rules as town_days.json (EIA adjusted demand; demand hours flagged as implausible are left out). Relative error e = (actual demand - day-ahead forecast) / forecast; positive e means demand came in above the forecast. January-April only: from May 2025 the day-ahead forecast SPP reports to EIA averages 8-15% above its reported demand in every month (monthly_forecast_ratio). The cause is unverified: a reporting or definition mismatch between the two series is possible, and leaving May-December out is an editorial choice pending validation. EIA-930 instructions let a balancing authority report the day-ahead forecast it makes in the normal course of business even when it is not defined exactly like reported demand. Persistence baselines: demand in the same hour one day (lag 24 h) or one week (lag 168 h) earlier, over the same valid hours. Wind persistence: |w(t) - w(t-L)| over hours where both values are valid, divided by the 2025 maximum hourly wind output.",
-  "built_by": "scripts/learn_build_04_forecasts_data.py (Learn W1, lesson 4)"
+  "built_by": "the lesson 4 data build step"
  },
  "spp_peak_demand_mw": 54411,
  "spp_max_solar_mw": 991,

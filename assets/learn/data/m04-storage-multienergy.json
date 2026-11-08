@@ -1,5 +1,5 @@
 {
- "about": "Data of Learn lesson M4, Storage and coupled carriers (wave W3, 2026-11-03). The plant, its customers and every price are fictional and illustrative; wind and Prairie Town's demand follow the real hourly shapes of the Southwest Power Pool grid in 2025 (town_year.json, EIA-930). Conversion efficiencies carry their sources. The reference block is written by node _tests/learn/test_m04-storage-multienergy.js --write and re-solved by the same test on every run.",
+ "about": "Data of Learn lesson M4, Storage and coupled carriers. The plant, its customers and every price are fictional and illustrative; wind and Prairie Town's demand follow the real hourly shapes of the Southwest Power Pool grid in 2025 (town_year.json, EIA-930). Conversion efficiencies carry their sources. The reference block is written by node _tests/learn/test_m04-storage-multienergy.js --write and re-solved by the same test on every run.",
  "plant": {
   "windMW": 100,
   "profileMethod": "power",

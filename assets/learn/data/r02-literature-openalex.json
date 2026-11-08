@@ -6,7 +6,7 @@
   "license": "OpenAlex data CC0 (https://help.openalex.org/data/licenses); this file CC BY 4.0",
   "as_of": "2026-11-03",
   "note": "Counts and citations are as of the run date; OpenAlex adds works every day, so a rerun gives larger numbers. Metadata only: titles, authors, venues and DOIs; no abstracts.",
-  "built_by": "scripts/build_learn_r02_snapshot.py"
+  "built_by": "the R2 snapshot build step"
  },
  "ladder": [
   {
