@@ -15,4 +15,4 @@ glossary:
     term: Medoid
     def: "The member of a group whose total distance to the other members is smallest; unlike an average, it is a real member."
 requests:
-  - "Planning engine: M3 uses the shared LX.townPlan (components/planengine.js, in learn.js) through its public API only (weekModel, fullYearModel, selectWeeks, summarize, costs, prepareYear); planengine.js is unchanged."
+  - "Planning engine: M3 uses the shared LX.townPlan (components/planengine.js, in learn.js) through its public API only (weekModel, fullYearModel, selectWeeks, summarize, costs, prepareYear, link, readCheck, errors)."

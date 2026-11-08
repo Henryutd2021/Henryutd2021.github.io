@@ -56,7 +56,15 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <p class="lx-hint">With JavaScript on, you solve these plans yourself in the browser, check them on both years and try three rules for a battery between weeks, with storage energy at $20 per kWh: an illustrative what-if, not a forecast or a sourced cost.</p>
 </div>
 </div>
-<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Model:</b> <a href="13-capstone.html">lesson 13</a>'s planning LP with EIA and NREL costs, dated in <a href="13-capstone.html#sources">its sources</a>; constant within the year.<br><b>Price year:</b> 2025 dollars throughout; NREL's 2024 battery costs are converted with BEA's GDP implicit price deflator (×1.0263). The battery is under 1% of the seven-week plan's yearly cost.<br><b>Weather and demand:</b> real 2025 and 2024 hourly shapes of the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>).<br><b>2024:</b> scaled to 2025's yearly demand energy and <span class="lx-term" data-term="capacity-factor">capacity factors</span>; 29 February left out.<br><b>Precomputed:</b> the full-year optimum, labelled where shown. <b>Prairie Town:</b> fictional.<br><b>Storage what-if (step 8):</b> battery energy at $20 per kWh instead of the sourced $247 in 2025 dollars (lesson 13): an illustrative what-if, not a forecast or a sourced cost.</span></p>
+<div class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><ul>
+<li><b>Model:</b> <a href="13-capstone.html">lesson 13</a>'s planning LP with EIA and NREL costs, dated in <a href="13-capstone.html#sources">its sources</a>; constant within the year.</li>
+<li><b>Price year:</b> 2025 dollars throughout; NREL's 2024 battery costs are converted with BEA's GDP implicit price deflator (×1.0263). The battery is under 1% of the seven-week plan's yearly cost.</li>
+<li><b>Demand, wind and sun:</b> 2025 and 2024 hourly profiles of the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>).</li>
+<li><b>2024:</b> scaled to 2025's yearly demand energy and <span class="lx-term" data-term="capacity-factor">capacity factors</span>; 29 February left out.</li>
+<li><b>Precomputed:</b> the full-year optimum, labeled where shown.</li>
+<li><b>Prairie Town:</b> fictional.</li>
+<li><b>Storage what-if (step 8):</b> battery energy at $20 per kWh instead of the sourced $247 in 2025 dollars (lesson 13): an illustrative what-if, not a forecast or a sourced cost.</li>
+</ul></div>
 <p class="lx-hint" style="margin-top:.6rem">About 45 guided minutes in ten steps. Solver: <a href="https://ergo-code.github.io/HiGHS/">HiGHS</a> (open source), loaded on your first solve (about 3.5 MB, once).</p>
 <div class="lx-card lx-notebook m3-nb">
 <p class="lx-eyebrow">Build it in Python · notebook lab, about 60 minutes, then 120 minutes of practice</p>
@@ -73,6 +81,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 .m3-nb { margin-top: 1.2rem; max-width: 980px; } .m3-dl { margin-top: .6rem !important; display: flex; flex-wrap: wrap; gap: 8px; }
 .m3-nb-steps { margin: .4rem 0 0; padding-left: 1.3rem; display: grid; gap: 2px; }
 .m3-links { margin: .4rem 0 0; padding-left: 1.1rem; display: grid; gap: 4px; }
+.page-learn .lx-datanote ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 2px; } .page-learn .lx-datanote li { margin: 0; }
 @media (max-width: 640px) { .m3-fb td:first-child { font-weight: 600; } .m3-fb td[data-label]::before { content: attr(data-label) ": "; color: var(--lx-ink-3); font-size: 12.5px; } }
 </style>
 ```
@@ -140,7 +149,7 @@ The weight of a modelled hour: $w_p = n_p \times 8{,}760 / 8{,}736$, where $n_p$
 | $D$ | demand | MW |
 | $0.329, 0.484$ | CO₂ per MWh of gas output ([heat rate]{.lx-term term="heat-rate"} × 0.05291 t per [MMBtu]{.lx-term term="mmbtu"}): operating CO₂ only | t/MWh |
 
-Cyclic storage replaces the link with $s_{p,168} = 0$ for every $p$; no link drops the equation $S_{i+1} = S_i + s_{k(i),168}$, so each week may start at any level. Fixing every $K_i$ and running all 8,760 hours as one week, with unserved demand allowed at an illustrative \$10,000 per MWh, gives the full-year check.
+Cyclic storage replaces the chain $S_{i+1} = S_i + s_{k(i),168}$ with $s_{p,168} = 0$ for every $p$: each week ends where it starts, from a start level of its own. No link drops the chain only: each week may start at any level, whatever the week before left. Fixing every $K_i$ and running all 8,760 hours as one period, with unserved demand allowed at an illustrative \$10,000 per MWh, gives the full-year check.
 
 ```{=html}
 </div>
@@ -171,9 +180,9 @@ Cyclic storage replaces the link with $s_{p,168} = 0$ for every $p$; no link dro
 | Unserved energy | demand not met when the plan is re-run, in MWh, hours and largest shortfall | 108 MWh in 8 hours |
 | CO₂ against the cap | the plan's full-year CO₂ ÷ cap − 1 | +8.7% on 2025 (217 kt), +7.3% on 2024 (215 kt) |
 
-- **Four typical weeks** leave 879 MWh unserved in 53 hours of 2025, spread over 12 weeks.
+- **Four typical weeks** leave 879 MWh unserved in 54 hours of 2025, spread over 12 weeks.
 - **The second year.** At 2025's yearly demand energy, 2024's demand peaks at 462 MW, against 450 MW in 2025.
-- **What they cannot tell you.** Even the plan optimal on all of 2025 leaves 235 MWh in 18 hours of 2024 unserved.
+- **What they cannot tell you.** Even the plan optimal on all of 2025 leaves 235 MWh in 17 hours of 2024 unserved.
 - **Adequacy** is judged over many weather years with plant outages, in a Monte Carlo study ([A5](a05-adequacy.qmd)), by measures such as the [loss-of-load expectation]{.lx-term term="lole"} (LOLE).
 - **LOLE** is the expected number of days a year with a shortage of any size or length. One criterion is 0.1 days a year, “1 day in 10 years” ([PJM Manual 20A](https://www.pjm.com/-/media/DotCom/documents/manuals/m20a.pdf), §1.3, June 2026): an expectation, not a promise of one outage a decade.
 
@@ -219,7 +228,7 @@ Cyclic storage replaces the link with $s_{p,168} = 0$ for every $p$; no link dro
 <div class="lx-qq" data-id="adequate" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “A plan that serves every hour of one full year is adequate.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. The plan optimized on all 8,760 hours of 2025 is short in 18 hours of 2024. Adequacy needs plant outages and many weather years.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. The plan optimized on all 8,760 hours of 2025 is short in 17 hours of 2024. Adequacy needs plant outages and many weather years.</p></details>
 </div>
 </div>
 
@@ -227,7 +236,7 @@ Cyclic storage replaces the link with $s_{p,168} = 0$ for every $p$; no link dro
 <div class="lx-qq" data-id="err" data-answer="a">
 <p class="lx-qtext">The seven weeks estimate $129.28M a year; the full-year optimum costs $133.25M. What is the estimate error, as this lesson defines it?</p>
 <ul class="lx-choices"><li data-value="a">−3.0%</li><li data-value="b">+3.1%</li><li data-value="c">0.970</li><li data-value="d">−$3.97M</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>−3.0%: 129.28 ÷ 133.25 − 1 = −0.030, with the reference in the denominator. +3.1% reverses the comparison: the full-year optimum is 3.1% above the estimate (133.25 ÷ 129.28 − 1). 0.970 is the ratio before subtracting 1, and −$3.96M is the gap in dollars.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>−3.0%: 129.28 ÷ 133.25 − 1 = −0.030, with the reference in the denominator. +3.1% reverses the comparison: the full-year optimum is 3.1% above the estimate (133.25 ÷ 129.28 − 1). 0.970 is the ratio before subtracting 1, and −$3.97M is the gap in dollars (129.28 − 133.25).</p></details>
 </div>
 </div>
 ```

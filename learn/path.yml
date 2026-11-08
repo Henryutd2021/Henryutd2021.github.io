@@ -337,7 +337,7 @@
   path: 13-capstone.qmd
   minutes: 15
   title: "What should Prairie Town build? Plan its power system"
-  subtitle: "Choose what to build, run a year of real weather, and ask the optimizer"
+  subtitle: "Choose what to build, run it on 2025's hourly demand, wind and sun, and ask the optimizer"
   short: "Capstone: plan the town"
   does: "Choose how much wind, solar, gas, nuclear and battery to build, then ask the optimizer for the cheapest plan under a CO₂ cap."
   outcome: "Reason about planning trade-offs and know what real planning models do."

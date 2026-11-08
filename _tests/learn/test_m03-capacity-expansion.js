@@ -4,8 +4,9 @@
 //     the seven-week set is lesson 13's model exactly (same objective as 13-capstone.json's 200 kt frontier point)
 //   - the weeks: for every set, weights add up to 8,760 h and every calendar week maps to the representative standing
 //     for it
-//   - the three storage rules: linked (the calendar chain closes, the year's net change is zero), cyclic (every
-//     representative week ends where it starts), no link (energy appears: the calendar weeks' net changes sum below zero)
+//   - the three storage rules: linked (the calendar chain closes, the year's net change is zero), cyclic (no chain; every
+//     representative week ends where it starts, from a level of its own), no link (energy appears: the calendar weeks' net
+//     changes sum below zero)
 //   - the reference block of data/m03-capacity-expansion.json: every number re-solved (plans, estimates, the full-year
 //     checks on 2025 and 2024, the full-year optimum, the storage what-if, the real-cost storage agreement)
 //   - every number the page states: the fallback table, Go deeper, myths and quiz, the step cards' fixed text, the
@@ -206,7 +207,7 @@ const r1 = (v, d) => Math.round(v * 10 ** d) / 10 ** d;
   onPage(`| ${fm.spct(S7.wk7.y2025.cost / S7.wk7.cost - 1)} on 2025 |`, "the cost gap in the Go deeper table");
   onPage(`| ${fm.mwh(S7.wk7.y2025.unserved)} in ${S7.wk7.y2025.hours} hours |`, "the 4 + 3 shortfall in the Go deeper table");
   onPage(`cut the full-year shortfall from ${fm.mwh(S7.typ4.y2025.unserved).replace(" MWh", "")} to ${fm.mwh(S7.wk7.y2025.unserved)}`, "the explain fallback");
-  onPage(`−$${((F.cost - S7.wk7.cost) / 1e6).toFixed(2)}M is the gap in dollars`, "the quiz's dollar gap");
+  onPage(`−$${(+b - +a).toFixed(2)}M is the gap in dollars (${a} − ${b})`, "the quiz's dollar gap, from the numbers the question shows");
   onPage(`<td class="n">${fm.spct(E("wk7"))}</td>`, "numbers to remember: the seven weeks' error");
   onPage(`an LP with ${F.cols.toLocaleString("en-US")} columns solved on all 8,760 hours`, "the full-year LP in the fallback hint");
   onPage("$" + D.storage.energyCapex + " per kWh", "the what-if storage cost");
@@ -250,9 +251,13 @@ const r1 = (v, d) => Math.round(v * 10 ** d) / 10 ** d;
   const NBtext = JSON.parse(NB).cells.map(c => c.source.join("")).join("\n");
   // 1: linked and cyclic estimates are close, yet the linked battery moves energy between weeks (the page says so and shows it)
   const netL = M.netChanges(sol.linked, RWs), netC = M.netChanges(sol.cyclic, RWs), gapLC = (SR.cyclic.cost - SR.linked.cost) / SR.linked.cost;
-  ok(gapLC >= -1e-9 && gapLC < 0.001 && M.largest(netL) > 100 && M.largest(netC) < 1e-6,
+  ok(Math.abs(gapLC) < 0.001 && M.largest(netL) > 100 && M.largest(netC) < 1e-6,
      `step 8: linked and cyclic within 0.1% (${(gapLC * 100).toFixed(4)}%), yet linked moves up to ${Math.round(M.largest(netL))} MWh over one week; cyclic none`);
-  ok(SR.linked.cost < SR.cyclic.cost, "linked is strictly cheaper than cyclic, so its battery must carry energy between some weeks");
+  // cyclic is no link plus one row per representative week: no calendar chain, so no start level is shared between weeks
+  const mCyc = M.planModel(S.Cw, RWs, { cap: scap, mode: "cyclic" }), mFree = M.planModel(S.Cw, RWs, { cap: scap, mode: "free" });
+  ok(!mCyc.constraints.some(c => /^W\d+$/.test(c.name)) && mCyc.constraints.length === mFree.constraints.length + RWs.reps.length && SR.cyclic.cost >= SR.free.cost - 1,
+     "cyclic: no calendar chain (each week starts at a level of its own), one row per week more than no link, never cheaper than no link");
+  ok(/from a start level of its own/.test(PAGE) && /`mode="cyclic"` drops the link equations and adds/.test(NBtext), "page and notebook: cyclic replaces the chain and lets each week start at its own level");
   ok(!/empties and refills/.test(JS) && JS.includes("though the linked battery still moves energy between weeks") && JS.includes("Largest net change of the battery over one representative week"),
      "step 8 no longer infers storage behaviour from the costs; it states and shows the net changes");
   ok(/largest net change in one week/.test(NBtext) && /week_net < 1e-6/.test(NBtext), "notebook: prints the largest weekly net change and asserts cyclic's is zero");
@@ -284,6 +289,10 @@ const r1 = (v, d) => Math.round(v * 10 ** d) / 10 ** d;
   // 12: LOLE defined, with a dated primary source
   onPage("https://www.pjm.com/-/media/DotCom/documents/manuals/m20a.pdf", "the PJM Manual 20A link"); onPage("§1.2–1.3 (rev. 3, effective 24 June 2026)", "the LOLE source's sections and date");
   ok(!/one day of (outage|shortage) in ten years|one-day-in-ten-years/.test(PAGE + JS + SIDE + NBtext) && /id: lole\b/.test(SIDE), "no undefined one-day-in-ten shorthand; the sidecar defines LOLE");
+  // the data note: one short labelled item per subject
+  const dnote = (PAGE.match(/<div class="lx-datanote">[\s\S]*?<\/ul><\/div>/) || [""])[0], items = dnote.match(/<li>[\s\S]*?<\/li>/g) || [];
+  const plainW = h => h.replace(/<[^>]+>/g, " ").trim().split(/\s+/).length;
+  ok(items.length >= 6 && items.every(li => /^<li><b>[^<]+:<\/b>/.test(li) && plainW(li) <= 35), "data note: " + items.length + " labelled items, each 35 words at most");
   // 13: one price year stated, with the deflator's ratio from lesson 13's data
   const batShare = (C.techs.bp.fixed * S7.wk7.plan.bp + C.techs.be.fixed * S7.wk7.plan.be) / S7.wk7.cost;
   ok(batShare < 0.01, `the battery is under 1% of the seven-week plan's yearly cost (${(batShare * 100).toFixed(2)}%)`);
@@ -323,6 +332,9 @@ const r1 = (v, d) => Math.round(v * 10 ** d) / 10 ** d;
     const btn = re => card().querySelectorAll("button").filter(b => re.test(b.textContent))[0];
     const next = () => card().querySelectorAll(".lx-step-foot button").filter(b => /Next/.test(b.textContent))[0];
     const failBox = () => card().querySelector(".m3-fail");
+    // the course's text budget (about 35 words per element) on what a step shows after it solves: its result line and notes
+    const words = t => t.trim().split(/\s+/).filter(Boolean).length, long = [];
+    const budget = label => card().querySelectorAll(".lx-saw").concat(card().querySelectorAll(".m3-note")).forEach(e => { if (words(e.textContent) > 45) long.push(label + ": " + e.textContent.slice(0, 60)); });
     async function failsThenWorks(n, label, start, failWhen, expectRetryCalls, after) {
       demo.cards.go(n - 1); failIf = failWhen; calls = 0;
       start(); await flush();
@@ -334,6 +346,7 @@ const r1 = (v, d) => Math.round(v * 10 ** d) / 10 ** d;
       if (!again) { ok(false, `${label}: no "Try again" button, so the retry cannot run`); return; }
       again.click(); await flush();
       ok(!failBox() && !next().disabled && (expectRetryCalls == null || calls === expectRetryCalls), `${label}: "Try again" solves${expectRetryCalls != null ? " only what was missing (" + calls + " solves)" : ""} and unlocks Next`);
+      budget(label);
       if (after) after();
     }
     try {
@@ -352,12 +365,15 @@ const r1 = (v, d) => Math.round(v * 10 ** d) / 10 ** d;
     await failsThenWorks(8, "step 8", () => card().querySelectorAll(".lx-choice")[2].click(), () => true, 6, () => {
       const t = card().textContent;
       ok(/Largest net change of the battery over one representative week: linked [\d,]+ MWh, cyclic 0 MWh, no link [\d,]+ MWh\./.test(t), "step 8: the net-change line");
-      ok(t.includes("differ by less than 0.1%, though the linked battery still moves energy between weeks: up to " + fm.mwh(M.largest(netL))), "step 8: the result sentence, with the linked net change");
+      ok(t.includes("differ by less than 0.1%, though the linked battery still moves energy between weeks: up to " + fm.mwh(M.largest(netL))), "step 8: the linked-cyclic note, with the linked net change");
+      const first = card().querySelectorAll(".m3-tbl tbody tr").map(tr => tr.querySelectorAll("td")[0].textContent);
+      ok(first.length === 3 && st.modes.every((m, i) => first[i].includes("Battery " + batText(SR[m].plan) + " MW / MWh")), "step 8: each rule names its battery sizes for phones, where the battery column is hidden: " + first.join(" | "));
     });
     await failsThenWorks(9, "step 9", () => btn(/Run on 2024/).click(), () => true, 1, () => {
       ok(card().textContent.includes("2025 full-year-optimal plan, run on 2024"), "step 9: the table names the 2025 plan run on 2024");
     });
     await flush();
+    ok(!long.length, "result lines and notes keep to the text budget (45 words at most): " + long.join(" | "));
     } catch (e) { ok(false, "the stub page test threw: " + (e && e.message || e)); }
     process.removeListener("unhandledRejection", onUn);
     ok(!unhandled.length, "no unhandled promise rejection on the page: " + unhandled.join(" | "));

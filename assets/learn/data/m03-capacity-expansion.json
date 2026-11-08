@@ -118,7 +118,7 @@
      "cost": 127380620,
      "co2": 217867,
      "unserved": 878.9,
-     "hours": 53,
+     "hours": 54,
      "maxShort": 53.1,
      "shortWeeks": [
       0,
@@ -139,7 +139,7 @@
      "cost": 127094717,
      "co2": 214474,
      "unserved": 2343.1,
-     "hours": 85,
+     "hours": 83,
      "maxShort": 67.6,
      "shortWeeks": [
       1,
@@ -221,7 +221,7 @@
      "co2": 217467,
      "unserved": 107.9,
      "hours": 8,
-     "maxShort": 22.6,
+     "maxShort": 26.1,
      "shortWeeks": [
       31,
       32
@@ -231,7 +231,7 @@
      "cost": 130491419,
      "co2": 214552,
      "unserved": 588.5,
-     "hours": 35,
+     "hours": 36,
      "maxShort": 35.3,
      "shortWeeks": [
       1,
@@ -313,8 +313,8 @@
      "cost": 128433590,
      "co2": 209800,
      "unserved": 750,
-     "hours": 42,
-     "maxShort": 64.2,
+     "hours": 36,
+     "maxShort": 66.8,
      "shortWeeks": [
       0,
       3,
@@ -331,7 +331,7 @@
      "cost": 128063655,
      "co2": 205386,
      "unserved": 2559.4,
-     "hours": 83,
+     "hours": 80,
      "maxShort": 86.4,
      "shortWeeks": [
       1,
@@ -436,8 +436,8 @@
      "cost": 131666279,
      "co2": 209372,
      "unserved": 16.6,
-     "hours": 1,
-     "maxShort": 16.6,
+     "hours": 2,
+     "maxShort": 11.9,
      "shortWeeks": [
       31
      ]
@@ -446,7 +446,7 @@
      "cost": 131367835,
      "co2": 205826,
      "unserved": 395.2,
-     "hours": 23,
+     "hours": 21,
      "maxShort": 36.3,
      "shortWeeks": [
       1,
@@ -575,7 +575,7 @@
      "co2": 206952,
      "unserved": 39.6,
      "hours": 7,
-     "maxShort": 9.5,
+     "maxShort": 16.8,
      "shortWeeks": [
       1,
       2
@@ -599,7 +599,7 @@
      "cost": 127851181,
      "co2": 217866,
      "unserved": 2101.3,
-     "hours": 59,
+     "hours": 52,
      "maxShort": 125.1,
      "shortWeeks": [
       26,
@@ -614,21 +614,21 @@
    },
    "cyclic": {
     "plan": {
-     "wind": 594.827,
-     "solar": 55.222,
-     "cc": 197.475,
-     "pk": 36.241,
+     "wind": 594.885,
+     "solar": 55.224,
+     "cc": 195.306,
+     "pk": 38.398,
      "nuc": 0,
-     "bp": 80.975,
-     "be": 729.284
+     "bp": 80.98,
+     "be": 729.355
     },
-    "cost": 126373315,
+    "cost": 126369983,
     "full": {
-     "cost": 127853109,
-     "co2": 217849,
-     "unserved": 2101.4,
-     "hours": 59,
-     "maxShort": 125.1,
+     "cost": 127862986,
+     "co2": 218016,
+     "unserved": 2101.7,
+     "hours": 53,
+     "maxShort": 126.5,
      "shortWeeks": [
       26,
       30,
@@ -637,8 +637,8 @@
       33
      ]
     },
-    "fullCo2": 217849,
-    "realCost": 129296529
+    "fullCo2": 218016,
+    "realCost": 129283807
    },
    "free": {
     "plan": {
@@ -655,11 +655,10 @@
      "cost": 127809957,
      "co2": 246750,
      "unserved": 8111.8,
-     "hours": 118,
-     "maxShort": 170.1,
+     "hours": 130,
+     "maxShort": 178.9,
      "shortWeeks": [
       0,
-      1,
       26,
       27,
       30,
@@ -692,8 +691,8 @@
     "cost": 132908024,
     "co2": 195955,
     "unserved": 235.1,
-    "hours": 18,
-    "maxShort": 22.5,
+    "hours": 17,
+    "maxShort": 29.3,
     "shortWeeks": [
      1,
      2

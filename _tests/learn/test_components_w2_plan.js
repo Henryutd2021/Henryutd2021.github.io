@@ -3,9 +3,10 @@
 // (components/weekstrip.js, weekstrip.css).
 //   - files: exported for Node and in the browser, in the generated bundle (learn.js, learn.css), colours from --lx-*
 //     tokens only, and no copy left in M3
-//   - link: "linked" returns the model unchanged; "cyclic" adds one row s<p>_167 = 0 per representative week; "free" drops
-//     exactly the 52 calendar-chain rows; any other mode throws; solved with the vendored HiGHS on a small what-if, the
-//     three rules order the costs (no link <= cyclic, linked) and keep their identities
+//   - link: "linked" returns the model unchanged; "cyclic" drops the 52 calendar-chain rows and adds one row s<p>_167 = 0
+//     per representative week (each week starts at a level of its own); "free" drops exactly the 52 chain rows; any other
+//     mode throws; solved with the vendored HiGHS on a small what-if, the three rules order the costs (no link <= cyclic,
+//     linked) and keep their identities
 //   - readCheck on a synthetic full-year result: unserved MWh, hours above 0.05 MW, the largest shortfall, each calendar
 //     week's MWh (31 December in week 52) and the totals of summarize(); errors: the stated formulas and tolerances
 //   - the week strip's pure part (names, letters, colours, dates, the label and the text version) and its view on a stub
@@ -48,7 +49,8 @@ const C = TP.costs(cfg, {});
   ok(W === 52 && RW.chrono.length === 52, "the linked model has one chain row per calendar week (52)");
   ok(TP.link(base, RW, "linked") === base && TP.link(base, RW) === base && TP.link(base, RW, null) === base, "linked (or no mode): the model unchanged");
   const cyc = TP.link(base, RW, "cyclic"), free = TP.link(base, RW, "free");
-  ok(cyc.variables === base.variables && cyc.constraints.length === base.constraints.length + RW.reps.length, "cyclic: the same variables and one row more per representative week");
+  ok(cyc.variables === base.variables && cyc.constraints.length === base.constraints.length - 52 + RW.reps.length && !cyc.constraints.some(c => /^W\d+$/.test(c.name)) &&
+     cyc.constraints.filter(c => /^W[lh]\d+$/.test(c.name)).length === 104, "cyclic: the same variables, the 52 chain rows dropped (no common start level), the level bounds kept, one row more per representative week");
   ok(RW.reps.every((r, p) => cyc.constraints.some(c => c.name === "cyc" + p && c.eq === 0 && Object.keys(c.terms).join() === "s" + p + "_167" && c.terms["s" + p + "_167"] === 1)),
      "cyclic: each representative week ends where it starts (s<p>_167 = 0)");
   ok(free.variables === base.variables && free.constraints.length === base.constraints.length - 52 && !free.constraints.some(c => /^W\d+$/.test(c.name)) &&
@@ -68,6 +70,7 @@ const C = TP.costs(cfg, {});
   ok(r.free.objective <= r.cyclic.objective + 1 && r.free.objective <= r.linked.objective + 1, "no link is a relaxation of both: never dearer on paper");
   const d = (x, k) => x.values["s" + k + "_167"] || 0;
   ok(RW.reps.every((q, k) => near(d(r.cyclic, k), 0, 1e-6)), "cyclic solved: every week ends where it started");
+  ok(r.cyclic.objective >= r.free.objective - 1, "cyclic is no link plus one row per week: never cheaper on paper than no link");
   ok(near(RW.chrono.reduce((a, k) => a + d(r.linked, k), 0), 0, 1e-4), "linked solved: the calendar chain closes over the year");
 
   // ---------------------------------------------------------------- yearPeriods, readCheck, errors

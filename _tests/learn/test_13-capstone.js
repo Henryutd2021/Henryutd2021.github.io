@@ -4,7 +4,9 @@
 //   - inputs: EIA and NREL costs and their sources; capital recovery factors, yearly fixed costs, running costs, CO2 rates
 //   - the town's year: wind and solar at EIA's 2025 capacity factors, no solar at night, a 450 MW peak
 //   - the seven weeks: weights add up to 8,760 hours, every calendar week is mapped, season energy is kept
-//   - the LP: balance, battery limits and the calendar link of the battery's level; objective = reported cost
+//   - the LP: balance, battery limits and the calendar link of the battery's level; objective = reported cost; one power
+//     row per hour, charge + discharge <= battery MW, for the optimizer and for fixed plans (weeks and full year), and no
+//     solved hour above it
 //   - the precomputed frontier: every point re-solved; cost falls and the cap's shadow price rises as the cap loosens
 //   - the optimizer's cap read as zero, binding or loose (a zero cap is never called loose)
 //   - the game: the starting plan goes short; the optimizer's 200 kt plan, rounded up, wins every mission on seven weeks
@@ -178,6 +180,12 @@ function batteryNote(cfg) {
   const start = cfg.start.plan, rS = solve(M.weekModel(C, RW, { plan: start })), sS = M.summarize(C, per, rS, { plan: start });
   ok(rel(rS.objective, sS.cost - sS.fixed - sS.energy.nuc * C.techs.nuc.run + cfg.unservedPenalty * sS.unserved, 1e-9), "fixed plan: objective = gas running cost + penalty x unserved");
   ok(sS.unserved > 1, `the starting plan (lesson 0's plants) goes short: ${sS.unserved.toFixed(0)} MWh unserved, so the opening question's answer is "no"`);
+  // the battery's power: one row per modelled hour, charge + discharge <= battery MW, in the optimizer and in a fixed plan
+  const powerRows = (m, bp) => { const P = m.constraints.filter(c => /^P\d+_\d+$/.test(c.name)); return { n: P.length, ok: P.every(c => Object.keys(c.terms).length === (bp == null ? 3 : 2) && (bp == null ? c.le === 0 && c.terms.K_bp === -1 : c.le === bp)) }; };
+  const maxCD = (r) => Object.keys(r.values).filter(k => /^c\d+_\d+$/.test(k)).reduce((mx, k) => Math.max(mx, r.values[k] + (r.values["d" + k.slice(1)] || 0)), 0);
+  const pOpt = powerRows(opt200), batPlan = cfg.frontier.points.find(p => p.cap === 100).plan, pFix = powerRows(M.weekModel(C, RW, { plan: batPlan }), batPlan.bp), pYear = powerRows(M.fullYearModel(C, Y, { plan: batPlan }), batPlan.bp);
+  ok(pOpt.n === 7 * 168 && pOpt.ok && pFix.n === 7 * 168 && pFix.ok && pYear.n === 8760 && pYear.ok, `charge + discharge <= battery MW: one row per hour in the optimizer (${pOpt.n}), a fixed plan's weeks (${pFix.n}) and its full year (${pYear.n})`);
+  ok(maxCD(rO) <= sO.plan.bp + 1e-6 && maxCD(solve(M.weekModel(C, RW, { plan: batPlan }))) <= batPlan.bp + 1e-6, "no solved hour charges and discharges above the battery's MW (optimizer, fixed plan)");
 
   // ---------------- the precomputed frontier
   const pts = cfg.frontier.points;
@@ -234,6 +242,7 @@ function batteryNote(cfg) {
     const w = M.summarize(C, per, solve(M.weekModel(C, RW, { plan })), { plan });
     const rf = solve(M.fullYearModel(C, Y, { plan })), f = M.summarize(C, fy, rf, { plan });
     fullTimes.push(rf.ms.solve);
+    ok(maxCD(rf) <= plan.bp + 1e-6, `full-year check at ${cap} kt: no hour above the battery's ${plan.bp} MW (charge + discharge)`);
     const row = `| Optimizer at ${cap} kt | ${musd(w.cost)} | ${musd(f.cost)} | ${kt(w.co2)} | ${kt(f.co2)} | ${Math.round(f.unserved).toLocaleString("en-US")} MWh |`;
     onPage(row, `the full-year check at ${cap} kt`);
     console.log(`  full-year check at ${cap} kt: cost ${((f.cost / w.cost - 1) * 100).toFixed(1)}%, CO2 ${((f.co2 / w.co2 - 1) * 100).toFixed(1)}%, unserved ${f.unserved.toFixed(0)} MWh (${(f.unserved / f.demand * 1e6).toFixed(0)} per million), spilled ${(w.spilledShare * 100).toFixed(1)}% -> ${(f.spilledShare * 100).toFixed(1)}%`);
@@ -257,6 +266,20 @@ function batteryNote(cfg) {
   ok(!v400.served && v400.co2ok, "full-year verdict judges demand and CO2 separately (400 kt plan: short, but under its cap)");
   ok(M.fullVerdict({ unserved: 0, co2: 1 }, { unserved: 0, co2: 1, unservedShare: 0 }, 2).held, "full-year verdict: a plan that passes both stays held");
   ok(JS.indexOf("model.fullVerdict(s, f, target)") > 0 && JS.indexOf('ms.set("co2", { frac: f.co2 / target, text: "Full year: "') > 0, "the debrief re-judges the missions with the full year");
+
+  // ---------------- the concept map quotes a stored full-year check only for the plan it checked
+  ok(JS.includes('LX.store.set("t13-full", { key: key,') && JS.includes("key = snap.key") && JS.includes("key: S_.sumKey") && JS.includes("S_.sumPlan = plan; S_.sumKey = key;") &&
+     JS.includes("F && F.key && F.key === L.key ?"), "the stored full-year check names the plan it ran (the scored seven-week result's plan and scenario); the concept map quotes it only for that plan");
+  ok(JS.includes("if (S_.sumKey !== planKey(S_.plan, S_.sc)) { clearTimeout(timer); return run().then(") && JS.includes("snap.key !== planKey(S_.plan, S_.sc)"),
+     "scoring waits for a due re-run, so it never scores one plan's seven weeks under another plan's key");
+  ok(JS.includes('LX.on("t13-run", function () {') && JS.includes("if ((moment(id) || \"\") !== (you ? you.textContent : \"\")) cm.select(id);"), "the concept map's open idea follows each new run and full-year check");
+  // ---------------- the data note: short labelled items; profiles, not weather
+  const dn = (page.match(/<div class="lx-datanote">[\s\S]*?<\/ul><\/div>/) || [""])[0], dli = dn.match(/<li>[\s\S]*?<\/li>/g) || [];
+  ok(dli.length === 5 && dli.every(li => /^<li><b>[^<]+:<\/b>/.test(li) && li.replace(/<[^>]+>/g, " ").trim().split(/\s+/).length <= 30), "data note: five labelled items, each 30 words at most");
+  ok(!/real weather|real 2025 weather|hot evening|still, hot|hot, still/i.test(page.replace(/<!-- learn:meta:start[\s\S]*?learn:meta:end -->/, "") + JS), "no weather or temperature claim: the inputs are demand, wind and solar profiles");
+  onPage("gas combined-cycle (CC)", "CC spelled out where the symbol table uses it");
+  ok(JS.includes('"A [[combined-cycle|combined-cycle]] plant (CC): "') && JS.includes('"A [[peaker|peaker]]: "') && JS.includes('"% [[round-trip-efficiency|round trip]]: " + rt + " MWh back for every 100 MWh charged."') &&
+     JS.includes('tally("Spilled, share of wind, solar and nuclear")'), "slider hints define CC, peaker and round trip; the spill tally names its base");
 
   // ---------------- share links
   const enc = M.encodePlan(p200, null), dec = M.decodePlan("#" + enc, cfg);
