@@ -35,6 +35,12 @@
   "lesson": "F3",
   "href": "f03-energy-services.html"
  },
+ "agent-based-model": {
+  "term": "Agent-based model",
+  "short": "A simulation in which many decision-makers, such as farmers or households, each follow their own rules, so that the system's behavior comes out of their choices.",
+  "lesson": "CK-R",
+  "href": "ck-r-defend-revise.html"
+ },
  "aggregator": {
   "term": "Aggregator",
   "short": "A company that enrols many customers' devices, offers their combined response to a grid operator or utility, and shares the payment with the owners.",
@@ -1139,6 +1145,12 @@
   "lesson": 12,
   "href": "12-trade-offs.html"
  },
+ "equal-area-projection": {
+  "term": "Equal-area projection",
+  "short": "A map projection that keeps areas true, at the cost of shapes and distances; Albers equal-area (EPSG:5070) is the usual one for the contiguous U.S.",
+  "lesson": "R4",
+  "href": "r04-data.html"
+ },
  "equivalent-firm-capacity": {
   "term": "Equivalent firm capacity",
   "short": "The MW of a perfect, always-available plant that would make a grid as reliable as a given resource does; divided by the resource's MW, it is an accreditation.",
@@ -1180,6 +1192,12 @@
   "short": "A formal hearing at which the parties present their evidence and question each other's witnesses before the commissioners.",
   "lesson": "X4",
   "href": "x04-rules-law.html"
+ },
+ "ex-post-review": {
+  "term": "Ex-post review",
+  "short": "An evaluation made after a program or project has run, comparing what happened with what was planned or expected.",
+  "lesson": "R1",
+  "href": "r01-framing.html"
  },
  "exajoule": {
   "term": "Exajoule (EJ)",
@@ -1234,6 +1252,12 @@
   "short": "A cost that falls on people outside a deal, such as the damage from CO₂, which neither the buyer nor the seller pays.",
   "lesson": "CF7",
   "href": "cf7-cost-of-waiting.html"
+ },
+ "extreme-period": {
+  "term": "Extreme period",
+  "short": "An unusually demanding stretch of time, such as a cold, still week with high demand and little wind, kept in a model so its plan copes with it.",
+  "lesson": "R2",
+  "href": "r02-literature.html"
  },
  "falsification-statement": {
   "term": "Falsification statement",
@@ -1819,7 +1843,7 @@
  },
  "kw-dc": {
   "term": "kW-DC",
-  "short": "A solar array's size as the direct-current rating of its panels at standard test conditions; its AC output, after the inverter, is a little lower.",
+  "short": "A solar array's size as the combined direct-current rated power of its panels at standard test conditions, while its actual output varies with sunlight, temperature and the inverter's limits.",
   "lesson": "CK-A",
   "href": "ck-a-spreadsheet.html"
  },
@@ -2545,7 +2569,7 @@
  },
  "perfect-foresight": {
   "term": "Perfect foresight",
-  "short": "A model assumption that every future value in the horizon, such as tomorrow's demand and weather, is known when decisions are made; it gives an upper bound on what flexibility can earn.",
+  "short": "A model assumption that every future value in the horizon, such as tomorrow's demand and weather, is known when decisions are made; it gives an upper bound on how much flexibility can cut a model's running cost.",
   "lesson": "R5",
   "href": "r05-build-validate.html"
  },
@@ -2837,6 +2861,12 @@
   "lesson": "A4",
   "href": "a04-retail-tariffs.html"
  },
+ "reanalysis": {
+  "term": "Reanalysis",
+  "short": "A gridded record of past weather made by running a weather model over historical observations, hour by hour for decades.",
+  "lesson": "R2",
+  "href": "r02-literature.html"
+ },
  "rebound-effect": {
   "term": "Rebound effect",
   "short": "Part of an efficiency saving taken back because the cheaper service gets used more.",
@@ -3119,6 +3149,12 @@
   "lesson": "M14",
   "href": "m14-did-it-work.html"
  },
+ "self-organizing-map": {
+  "term": "Self-organizing map",
+  "short": "A clustering method that places similar items, such as days, in neighboring cells of a small grid.",
+  "lesson": "R2",
+  "href": "r02-literature.html"
+ },
  "sensitivity-analysis": {
   "term": "Sensitivity analysis",
   "short": "Changing a model's inputs one at a time and re-solving, to see which inputs the answer depends on.",
@@ -3304,6 +3340,12 @@
   "short": "An amount that builds up or drains over time, such as water in a reservoir, energy in a battery or CO₂ emitted so far.",
   "lesson": "F2",
   "href": "f02-systems-and-map.html"
+ },
+ "storage-link": {
+  "term": "Storage link (between periods)",
+  "short": "In a model of representative periods, the energy stored at the end of one period carried into the next, so storage can move energy across days or seasons.",
+  "lesson": "R2",
+  "href": "r02-literature.html"
  },
  "stranded-cost": {
   "term": "Stranded cost",
@@ -3559,6 +3601,12 @@
   "lesson": "SB2",
   "href": "sb2-grid-room.html"
  },
+ "triangulation": {
+  "term": "Triangulation",
+  "short": "Checking a finding against a second source or a second method, so that it does not rest on one kind of evidence alone.",
+  "lesson": "CR",
+  "href": "cr-your-own-study.html"
+ },
  "truncated-axis": {
   "term": "Truncated axis",
   "short": "A chart axis that starts above zero; on a bar chart it makes differences look larger than they are.",
@@ -3630,6 +3678,12 @@
   "short": "The part of the energy bought that a device actually delivers as the wanted heat, light or motion, after its own losses.",
   "lesson": "F3",
   "href": "f03-energy-services.html"
+ },
+ "utility-scale": {
+  "term": "Utility-scale",
+  "short": "Large enough to sell power to the grid; in EIA's statistics, plants of at least 1 MW.",
+  "lesson": "R8",
+  "href": "r08-communicating.html"
  },
  "utm": {
   "term": "UTM (Universal Transverse Mercator)",

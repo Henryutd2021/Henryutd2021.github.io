@@ -6,9 +6,13 @@
 //   - freeze: true: once submitted, the task's answer stays as given (every kind: text, choice, order, number, estimate);
 //     points and self-ratings can still be ticked; feedback on a wrong first answer points to the worked solution; the
 //     kept line describes the kept controls and takes focus after a submission; an empty number is not kept
+//   - solAfter: [task ids]: a worked solution that names another task's answer (and a written task's points) opens only once
+//     that task is submitted; no early button meanwhile, a notice says why; solWaits and solLeaks
 //   - the pure helpers: submitted, waitsFor, outOfOrder, taskList, waitText, openProblems
 //   - a task without either option behaves as before (its retry line; no notice, no kept line)
-// CK-R's own test checks the page that uses them; CK-F, CK-A and CK-M use neither and keep their own tests.
+//   - every runner: an empty number is never an answer; with openFirst "not-right" a written task opened first earns no
+//     points and an estimate opened first no self-ratings (writtenCounts); the estimate's range is a neutral comparison
+// Each checkpoint's own test checks the page that uses them (CK-R: opensAfter; CK-A and CK-M: solAfter; all four: freeze).
 // Usage (from the site folder):  node _tests/learn/test_components_checkpoint_options.js
 "use strict";
 const path = require("path");
@@ -226,6 +230,74 @@ function mount(opts, store) {   // store: an earlier page's stored values (a rel
   FD.set("opts-v1-drafts", { version: F.D.version, tasks: { own: { text: "A stale draft" } } });
   F.goTo(1); F.goTo(0);
   ok(F.live.querySelector("textarea").value === "Kept text" && !((FD.get("opts-v1-drafts", {}) || {}).tasks || {}).own, "drafts: a frozen task shows its submission and drops a stale draft");
+}
+// ---------------- solAfter: a worked solution that names another task's answer waits for that task as well
+function solData() {
+  return { version: "sol v1", rule: { auto: 2, autoProficient: 2, autoStrong: 2, criteria: ["units"], levels: LEVELS, openFirst: "not-right" },
+    tasks: [
+      { id: "cost", kind: "numeric", title: "The cost", skill: "Compute", lesson: "R1", prompt: "What does it cost?", answer: { value: 866046, tol: 0.01, show: "$866,046" }, units: [["$", 1]], solution: "$866,046 in 2025 dollars." },
+      { id: "npv", kind: "numeric", title: "The result", skill: "Compute", lesson: "R2", prompt: "By how much?", answer: { value: 776324, tol: 0.01, show: "$776,324" }, units: [["$", 1]],
+        solution: "−$866,046 up front, then the savings: $776,324.", solAfter: ["cost"] },
+      { id: "valid", kind: "open-short", title: "Your check", skill: "Validate", lesson: "R3", prompt: "Check it.", points: ["The result, $776,324, lies between the bounds.", "A special case."],
+        solution: "A check.", solAfter: ["npv"] }
+    ] };
+}
+{
+  const D = solData(), st = { tasks: {} };
+  ok(CP.solWaits(D, st, D.tasks[1]).join() === "cost" && CP.solWaits(D, st, D.tasks[0]).length === 0, "solWaits: the solAfter names not yet submitted");
+  ok(CP.solLeaks(D).length === 0, "solLeaks: none when every named answer is waited for");
+  const leaky = solData(); delete leaky.tasks[1].solAfter; delete leaky.tasks[2].solAfter;
+  const L = CP.solLeaks(leaky).map(x => x.task + ">" + x.names);
+  ok(L.indexOf("npv>cost") >= 0 && L.indexOf("valid>npv") >= 0, "solLeaks: a solution or a point naming another task's answer is found: " + L.join(", "));
+  const bad = solData(); bad.tasks[0].solAfter = ["cost", "nope"];
+  ok(CP.openProblems(bad).join("; ") === "cost's solution waits for itself; cost's solution waits for an unknown task nope", "openProblems: solAfter names itself or an unknown task");
+  st.tasks.cost = { first: false, answer: { value: 1, unit: "$" } };
+  ok(CP.solWaits(D, st, D.tasks[1]).length === 0, "solWaits: none once the named task is submitted");
+}
+{
+  const P = mount({ data: solData(), openFirst: "not-right" }), { live, btn, goTo, all, rec } = P;
+  const shown = re => { const b = btn(re); return !!(b && !b.hidden); };
+  goTo(2); live.querySelector("textarea").value = "My check."; btn(/^Submit my explanation$/).click();
+  ok(!live.querySelectorAll(".lx-ck-points input").length && !/776,324/.test(all()) && /and the points to tick name the answer to task 2/.test(all()) && /open later/.test(all()) && !shown(/Show the worked solution now/),
+    "a written task's points wait with its solution (they name task 2's answer); no early button");
+  goTo(1);
+  ok(live.querySelector(".lx-ck-sol").hidden && !/866,046/.test(all()) && !shown(/Show the worked solution now/) && /names the answer to task 1, so it opens once that is submitted/.test(all()),
+    "task 2 before task 1: no early button, its solution's text absent, a notice says why");
+  live.querySelector("input").value = "5"; live.querySelector("select").value = "$"; btn(/^Check$/).click();
+  ok(rec("npv").first === false && live.querySelector(".lx-ck-sol").hidden && !/866,046/.test(all()) && /Try again\./.test(all()) && !/open the worked solution/.test(all()),
+    "a wrong answer to task 2: still no solution (it names task 1's answer), and the retry line does not offer it");
+  goTo(0); live.querySelector("input").value = "866000"; live.querySelector("select").value = "$"; btn(/^Check$/).click();
+  goTo(1);
+  ok(!live.querySelector(".lx-ck-sol").hidden && /866,046/.test(all()) && !live.querySelector(".lx-ck-solwait"), "task 1 submitted: task 2's worked solution opens");
+  goTo(2);
+  ok(live.querySelectorAll(".lx-ck-points input").length === 2 && /776,324/.test(all()) && rec("valid").answer === "My check.", "task 2 submitted: task 3's points and solution open, its text as submitted");
+}
+// the early-open rule for written tasks (openFirst "not-right"), the empty number, and the estimate's neutral comparison
+{
+  const D = data(), base = { tasks: { pick: { first: true }, seq: { first: true }, num: { first: true }, free: { first: true },
+    own: { first: true, answer: "t", points: [true, true] }, est: { first: true, answer: { low: 100, high: 200, unit: "MWh" }, rating: { units: "Strong" } } } };
+  D.rule.criteria = ["units"]; D.rule.autoStrong = 4; D.rule.autoProficient = 3;
+  const lv = (st, of) => CP.level(D, st, { openFirst: of });
+  ok(lv(base, "not-right").explainOk && lv(base, "not-right").estMin === 3, "level: a written task and the estimate count as before");
+  const opened = JSON.parse(JSON.stringify(base)); opened.tasks.own.solFirst = true; opened.tasks.est.solFirst = true;
+  const L1 = lv(opened, "not-right"), L2 = lv(opened, "counts");
+  ok(!L1.explainOk && L1.explainOpened && L1.estMin === -1 && L1.estimateOpened && L1.level === "Not yet", "openFirst not-right: a written task opened first earns no points, an estimate opened first no self-ratings");
+  ok(L2.explainOk && L2.estMin === 3, "openFirst counts: as before");
+  ok(/Explanation: worked solution opened before answering, so no points\./.test(CP.describe(D, L1)) && /self-ratings do not count/.test(CP.describe(D, L1)), "describe says why: " + CP.describe(D, L1));
+  ok(CP.writtenCounts({ answer: "x" }, "not-right") && !CP.writtenCounts({ answer: "x", solFirst: true }, "not-right") && CP.writtenCounts({ answer: "x", solFirst: true }, "counts") && !CP.writtenCounts(null), "writtenCounts");
+  const far = CP.checkEstimate(D.tasks[4], 300, 900, "MWh");
+  ok(!far.overlaps && /comparison, not a mark/.test(far.rangeMsg) && /can be right if its inputs are stated and defensible/.test(far.rangeMsg), "estimate: a range apart from the worked one is a comparison, not a mark");
+}
+{
+  const free = data(); free.tasks.forEach(t => { delete t.freeze; delete t.opensAfter; });
+  const P = mount({ data: free }), { live, btn, goTo, all, rec } = P;
+  goTo(3); live.querySelector("input").value = ""; live.querySelector("select").value = "kW"; btn(/^Check$/).click();
+  ok(rec("num").first == null && !rec("num").tries && /Enter a positive number\./.test(all()) && live.querySelector(".lx-ck-sol").hidden, "a number task without freeze: an empty field is not an answer either (no try, no solution)");
+  live.querySelector("input").value = "10"; btn(/^Check$/).click();
+  ok(rec("num").first === true && rec("num").tries === 1, "its first real answer is its first try");
+  goTo(4); const f = live.querySelectorAll("input"); f[0].value = "300"; f[1].value = "900"; live.querySelector("select").value = "MWh"; btn(/^Submit my estimate$/).click();
+  const rng = live.querySelectorAll(".lx-saw").filter(x => /Range\./.test(x.textContent))[0];
+  ok(rec("est").first === true && rng && /info/.test(rng.getAttribute("class")) && !/\bno\b/.test(rng.getAttribute("class")), "a valid estimate apart from the worked range: recorded as valid, shown as a neutral comparison");
 }
 // the copy button: "Copied" only when the browser copied; otherwise the text is selected and the reader is asked to copy it
 {

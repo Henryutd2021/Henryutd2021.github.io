@@ -5636,7 +5636,9 @@
              "open-short"  points: [the sentences a full answer makes]; after submitting, the reader ticks the points made
              "estimate"    units (as numeric), range: [lo, hi] MWh a year, show: [lo, hi] as printed; low, high (above the low), unit and
                            three short texts (inputs and steps, the main uncertainty, a check); then a self-rating per rubric
-                           criterion. The worked-solution section of the page opens on submit.
+                           criterion. The worked-solution section of the page opens on submit. Where the range sits against
+                           the worked one is shown as a neutral comparison, not a mark (the rubric judges the reasoning);
+                           the record's `first` is true for a valid estimate (energy units, a high above the low)
      per task (any kind; a task without them behaves as before)
              opensAfter    [task ids]: the task opens only once each named task is submitted (a first answer recorded, or
                            a written task submitted). Until then its card shows, in place of its question, answers, early
@@ -5649,8 +5651,14 @@
                            fixed unit, choices and order buttons disabled); a line in place of the submit button says so
                            (freezeNote, else a default), describes the kept controls and takes focus after the submission.
                            A written task's points and the estimate's self-ratings can still be ticked. Feedback on a wrong
-                           first answer then points to the worked solution, not to a retry; an empty or non-positive
-                           number is not kept
+                           first answer then points to the worked solution, not to a retry. Written tasks (open-short,
+                           estimate) take it so that the first submission is the one assessed
+             solAfter      [task ids]: the task's worked solution, and a written task's points to tick, open only once each
+                           named task is submitted too: for a task whose solution names another task's answer (CK-A: the
+                           main result's solution names the up-front cost). Until then a notice stands in their place and
+                           the early button is not offered. solWaits(D, st, task) names the tasks still waited for; a
+                           page's test checks with solLeaks(D) that no solution names an answer it does not wait for
+   An empty or non-positive number is never recorded as an answer (every number task asks for a positive value).
    Options:
      key         LX.store key of the attempt; an attempt stored under another data.version starts afresh. Keep it fixed
                  once readers use a checkpoint (CK-F: "ckf-v1"), so their summaries stay comparable.
@@ -5669,7 +5677,9 @@
      tolerance   false hides the line under a number task's answer field that states its tolerance (default: shown, from
                  the task's tolNote, else "Within 1% of the right value counts as right." from answer.tol)
      openFirst   "not-right": in the shared level rule, a task whose worked solution was opened before its first answer
-                 counts as not right (independent work only; data.rule.openFirst sets it too); default "counts" (CK-F)
+                 counts as not right (independent work only; data.rule.openFirst sets it too): an auto-marked task as
+                 not right, a written task with no points, the estimate with no self-ratings (writtenCounts below);
+                 default "counts"
      level, summary  replace the pure level rule or the summary text (same arguments)
      describe    function (D, L): the results view's sentence under the level (L = the level rule's result); default
                  describe(), which names CK-F's parts (auto-marked tasks, the estimate's lowest self-rating, the explanation)
@@ -5715,11 +5725,11 @@
    order task's ↑ ↓ buttons keep focus on the moved item. The results table becomes labelled lines on phones.
    Text version: LX.Checkpoint.lineChart adds a table of the hourly values.
    Pure (Node: module.exports): task, checkChoice, checkOrder, checkNumeric (either answer form), checkMWh, checkValue,
-   checkEstimate, level(D, st, {openFirst, late, solOpen}), firstRight(record, openFirst), lateAnswer(record, solOpen),
-   allAnswered(D, st), lastAnswerAt(D, st), lateRule({gateAll, n}), tolText(task), describe, summary, fmtMs, firstWord;
-   for the per-task options: submitted(record), waitsFor(D, st, task), outOfOrder(D, st), taskList(D, ids),
-   waitText(D, task, ids), shownTitle(D, st, task), openProblems(D) (unknown or circular opensAfter names; a page's test
-   should find none).
+   checkEstimate, level(D, st, {openFirst, late, solOpen}), firstRight(record, openFirst), writtenCounts(record,
+   openFirst), lateAnswer(record, solOpen), allAnswered(D, st), lastAnswerAt(D, st), lateRule({gateAll, n}), tolText(task),
+   describe, summary, fmtMs, firstWord; for the per-task options: submitted(record), waitsFor(D, st, task),
+   solWaits(D, st, task), solLeaks(D), outOfOrder(D, st), taskList(D, ids), waitText(D, task, ids), shownTitle(D, st,
+   task), openProblems(D) (unknown or circular opensAfter or solAfter names; a page's test should find none).
    level and summary find the explanation and the estimate as the first "open-short" and the first "estimate" task. */
 (function () {
   "use strict";
@@ -5755,7 +5765,9 @@
       msg: rel <= a.tol ? a.show.charAt(0).toUpperCase() + a.show.slice(1) + "." : v > a.value * 1.5 ? "Too high. Recheck your model and its units." : v < a.value / 1.5 ? "Too low. Recheck your model and its units." : "Close, but outside the tolerance (" + Math.round(a.tol * 1000) / 10 + "%). Recheck your numbers." };
   }
   // the estimate: units, order, and how the range sits against the worked solution's range (MWh a year). A range needs
-  // a high above its low: one number (low = high) shows no uncertainty, which the rubric marks Not yet.
+  // a high above its low: one number (low = high) shows no uncertainty, which the rubric marks Not yet. Where the range
+  // sits is a comparison, not a mark: another range is fine when its inputs are stated and defensible (the rubric)
+  var NOT_A_MARK = " That is a comparison, not a mark: a different range can be right if its inputs are stated and defensible. Compare them with its two routes.";
   function checkEstimate(t, low, high, unit) {
     var f = unitFactor(t, unit), out = { unitsOk: f > 0, ordered: low > 0 && high > low };
     if (f === null) out.unitMsg = unit + " is a unit of power. Electricity used over a year is energy: kWh, MWh or GWh per year.";
@@ -5765,8 +5777,8 @@
       var lo = low * f, hi = high * f, R = t.range;
       out.lo = lo; out.hi = hi; out.overlaps = lo <= R[1] && hi >= R[0]; out.width = lo > 0 ? hi / lo : Infinity;
       if (out.overlaps) out.rangeMsg = "Your range overlaps the worked solution's (about " + t.show[0] + " to " + t.show[1] + " MWh a year).";
-      else if (hi < R[0]) out.rangeMsg = "Your range lies below the worked solution's, by about " + Math.round(R[0] / hi) + " times at its closest. Compare your inputs with its two routes.";
-      else out.rangeMsg = "Your range lies above the worked solution's, by about " + Math.round(lo / R[1]) + " times at its closest. Compare your inputs with its two routes.";
+      else if (hi < R[0]) out.rangeMsg = "Your range lies below the worked solution's, by about " + Math.round(R[0] / hi) + " times at its closest." + NOT_A_MARK;
+      else out.rangeMsg = "Your range lies above the worked solution's, by about " + Math.round(lo / R[1]) + " times at its closest." + NOT_A_MARK;
       if (out.width > 10) out.rangeMsg += " Your high is more than ten times your low: narrow it with a stated input.";
     } else if (!out.ordered) out.rangeMsg = low > 0 && high === low
       ? "Your low and high are the same number, so they show no range. Give a high above your low that brackets your uncertainty."
@@ -5784,6 +5796,9 @@
   // a task's first answer counts as right; with openFirst "not-right" (independent work), not when its worked solution
   // was opened before that answer (solFirst). Default "counts": CK-F's published rule.
   function firstRight(r, openFirst) { return !!(r && r.first === true && !(openFirst === "not-right" && r.solFirst)); }
+  // a written task (open-short, estimate) counts: its points or self-ratings, unless openFirst is "not-right" and its
+  // worked solution was opened before it was submitted
+  function writtenCounts(r, openFirst) { return !!r && !(openFirst === "not-right" && r.solFirst); }
   // the shared late-answer rule (option late "practice"): a task first answered after the page's worked solution opened
   // (solOpen, ISO time) is practice. The answer that opened it is not late: the runner records the opening at that
   // answer's own `at`. ISO strings from toISOString compare in time order.
@@ -5799,6 +5814,37 @@
   function waitsFor(D, st, t) {
     var need = (t && t.opensAfter) || [];
     return D.tasks.filter(function (x) { return need.indexOf(x.id) >= 0 && !submitted(st.tasks[x.id]); }).map(function (x) { return x.id; });
+  }
+  // the tasks a task's worked solution still waits for (its solAfter ids not yet submitted), in task order
+  function solWaits(D, st, t) {
+    var need = (t && t.solAfter) || [];
+    return D.tasks.filter(function (x) { return need.indexOf(x.id) >= 0 && x.id !== t.id && !submitted(st.tasks[x.id]); }).map(function (x) { return x.id; });
+  }
+  // the numbers a task's answer is given as (a number task's value, in its own unit; CK-F's in MWh and GWh)
+  function numsIn(s) { return (String(s).match(/\d[\d,]*(?:\.\d+)?/g) || []).map(function (x) { return parseFloat(x.replace(/,/g, "")); }); }
+  function answerNums(t) {
+    if (t.kind !== "numeric" || !t.answer) return [];
+    var a = t.answer, out = [];
+    if (a.value != null) out.push(Math.abs(a.value));
+    if (a.mwh != null) out.push(a.mwh, a.mwh / 1000);
+    return out.filter(function (v) { return v >= 10; });   // its value (0.5% covers the rounded forms); small numbers match by chance
+  }
+  // the texts a task shows after its answer (its worked solution, its points, its choices' feedback)
+  function afterText(t) {
+    var w = t.why || {}; return [t.solution || ""].concat(t.points || [], Object.keys(w).map(function (k) { return w[k]; })).join(" ");
+  }
+  // solution leaks: a task whose after-answer texts name another number task's answer (within 0.5%) that its solAfter
+  // does not list: [{task, names, value}]. A page's test should find none (or only the ones it lists as coincidences)
+  function solLeaks(D) {
+    var out = [];
+    D.tasks.forEach(function (u) {
+      var n = numsIn(afterText(u)), wait = u.solAfter || [];
+      D.tasks.forEach(function (t) {
+        if (t === u || wait.indexOf(t.id) >= 0) return;
+        answerNums(t).forEach(function (a) { if (n.some(function (x) { return Math.abs(x - a) <= a * 0.005; })) out.push({ task: u.id, names: t.id, value: a }); });
+      });
+    });
+    return out;
   }
   // the tasks named in another task's opensAfter that were submitted after that task's first answer, in task order
   // (the runner keeps a waiting task shut, so only an attempt stored elsewhere shows one)
@@ -5832,6 +5878,10 @@
       (t.opensAfter || []).forEach(function (id) {
         if (id === t.id) out.push(t.id + " waits for itself");
         else if (ids.indexOf(id) < 0) out.push(t.id + " waits for an unknown task " + id);
+      });
+      (t.solAfter || []).forEach(function (id) {   // no circle is possible: a submission never waits for a solution
+        if (id === t.id) out.push(t.id + "'s solution waits for itself");
+        else if (ids.indexOf(id) < 0) out.push(t.id + "'s solution waits for an unknown task " + id);
       });
     });
     var state = {};
@@ -5870,17 +5920,20 @@
     var k = autoIds.filter(function (id) { return firstRight(st.tasks[id], of) && !isLate(id); }).length;
     var early = autoIds.filter(function (id) { return st.tasks[id] && st.tasks[id].solFirst; }).length;
     var exT = ofKind(D, "open-short"), esT = ofKind(D, "estimate");
-    var ex = (exT && st.tasks[exT.id]) || {}, es = (esT && st.tasks[esT.id]) || {}, rt = (esT && isLate(esT.id)) ? {} : es.rating || {};
+    var ex = (exT && st.tasks[exT.id]) || {}, es = (esT && st.tasks[esT.id]) || {};
+    var exOpen = !!(exT && ex.solFirst && !writtenCounts(ex, of)), esOpen = !!(esT && es.solFirst && !writtenCounts(es, of));   // opened first: not counted
+    var rt = (esT && isLate(esT.id)) || esOpen ? {} : es.rating || {};
     var crit = R.criteria.map(function (c) { return rt[c] != null ? R.levels.indexOf(rt[c]) : -1; });
     var estMin = Math.min.apply(null, crit), estStrong = crit.filter(function (x) { return x === 3; }).length;
-    var pts = ex.points || [], explainOk = pts.length > 0 && pts.length === (exT && exT.points ? exT.points.length : 2) && pts.every(Boolean) && !(exT && isLate(exT.id));
+    var pts = ex.points || [], explainOk = pts.length > 0 && pts.length === (exT && exT.points ? exT.points.length : 2) && pts.every(Boolean) && !(exT && isLate(exT.id)) && !exOpen;
     var lateIds = lateOn ? D.tasks.filter(function (t) { return isLate(t.id); }).map(function (t) { return t.id; }) : [];
-    var complete = autoIds.every(function (id) { return st.tasks[id] && st.tasks[id].first != null; }) && estMin >= 0 && ex.points != null;
+    var complete = autoIds.every(function (id) { return st.tasks[id] && st.tasks[id].first != null; }) && (esOpen ? !!es.answer : estMin >= 0) && ex.points != null;
     var lv = R.levels[0];
     if (k >= R.autoStrong && estMin >= 2 && estStrong >= 2 && explainOk) lv = R.levels[3];
     else if (k >= R.autoProficient && estMin >= 2 && explainOk) lv = R.levels[2];
     else if (k >= (R.autoDeveloping != null ? R.autoDeveloping : 3) && estMin >= 1) lv = R.levels[1];
-    return { level: lv, auto: k, autoOf: autoIds.length, estMin: estMin, explainOk: explainOk, complete: complete, early: early, openFirst: of, late: lateIds.length, lateIds: lateIds };
+    return { level: lv, auto: k, autoOf: autoIds.length, estMin: estMin, explainOk: explainOk, complete: complete, early: early, openFirst: of, late: lateIds.length, lateIds: lateIds,
+      explainOpened: exOpen, estimateOpened: esOpen };
   }
   // the late tasks in words, for a results sentence ("" when none)
   function lateText(L) {
@@ -5888,8 +5941,9 @@
   }
   // the results view's sentence under the level (CK-F's parts; a checkpoint with another rule passes its own describe)
   function describe(D, L) {
-    return "Auto-marked tasks right on the first try: " + L.auto + " of " + L.autoOf + (L.openFirst === "not-right" && L.early ? " (" + L.early + " with the solution opened first, counted as not right)" : "") + ". Estimate: lowest self-rating " + (L.estMin >= 0 ? D.rule.levels[L.estMin] : "not rated yet") +
-      ". Explanation: " + (L.explainOk ? "both points." : "not both points ticked.") + lateText(L) + (L.complete ? "" : " Some tasks are not finished; the level counts them as not right.");
+    return "Auto-marked tasks right on the first try: " + L.auto + " of " + L.autoOf + (L.openFirst === "not-right" && L.early ? " (" + L.early + " with the solution opened first, counted as not right)" : "") +
+      ". Estimate: " + (L.estimateOpened ? "worked solution opened before submitting, so its self-ratings do not count" : "lowest self-rating " + (L.estMin >= 0 ? D.rule.levels[L.estMin] : "not rated yet")) +
+      ". Explanation: " + (L.explainOpened ? "worked solution opened before answering, so no points." : L.explainOk ? "both points." : "not both points ticked.") + lateText(L) + (L.complete ? "" : " Some tasks are not finished; the level counts them as not right.");
   }
   function fmtMs(ms) {
     if (ms == null) return "–";
@@ -5923,21 +5977,21 @@
     if (es && es.answer) {
       var a = es.answer;
       lines.push("");
-      lines.push("Estimate: " + a.low + " to " + a.high + " " + a.unit + (es.check ? " · " + (es.check.overlaps ? "overlaps" : "does not overlap") + " the worked range" : ""));
+      lines.push("Estimate: " + a.low + " to " + a.high + " " + a.unit + (es.check ? " · " + (es.check.overlaps ? "overlaps" : "does not overlap") + " the worked range (a comparison, not a mark)" : ""));
       if (es.rating) lines.push("Self-rating: " + D.rule.criteria.map(function (c) { return c + " " + (es.rating[c] || "not rated"); }).join(", "));
-      ["reasoning", "uncertainty", "check"].forEach(function (k) { if (a[k]) lines.push("Your " + k + ": " + String(a[k]).replace(/\s+/g, " ").slice(0, 600)); });
+      ["reasoning", "uncertainty", "check"].forEach(function (k) { if (a[k]) lines.push("Your " + k + ": " + String(a[k]).replace(/\s+/g, " ")); });   // in full: nothing is cut
     }
     var exT = ofKind(D, "open-short"), ex = exT && st.tasks[exT.id];
-    if (ex && ex.answer) lines.push("Your explanation (task " + (D.tasks.indexOf(exT) + 1) + "): " + String(ex.answer).replace(/\s+/g, " ").slice(0, 400));
+    if (ex && ex.answer) lines.push("Your explanation (task " + (D.tasks.indexOf(exT) + 1) + "): " + String(ex.answer).replace(/\s+/g, " "));
     lines.push("");
     lines.push("Screen width " + (env.width || "?") + " px. Kept in this browser only; copied by you.");
     return lines.join("\n");
   }
 
   var pure = { task: task, checkChoice: checkChoice, checkOrder: checkOrder, checkNumeric: checkNumeric, checkMWh: checkMWh, checkValue: checkValue,
-    checkEstimate: checkEstimate, level: level, firstRight: firstRight, lateAnswer: lateAnswer, allAnswered: allAnswered, lastAnswerAt: lastAnswerAt, lateRule: lateRule, lateText: lateText,
+    checkEstimate: checkEstimate, level: level, firstRight: firstRight, writtenCounts: writtenCounts, lateAnswer: lateAnswer, allAnswered: allAnswered, lastAnswerAt: lastAnswerAt, lateRule: lateRule, lateText: lateText,
     tolText: tolText, describe: describe, summary: summary, fmtMs: fmtMs, firstWord: firstWord,
-    submitted: submitted, waitsFor: waitsFor, outOfOrder: outOfOrder, taskList: taskList, waitText: waitText, openProblems: openProblems, shownTitle: shownTitle };
+    submitted: submitted, waitsFor: waitsFor, solWaits: solWaits, solLeaks: solLeaks, outOfOrder: outOfOrder, taskList: taskList, waitText: waitText, openProblems: openProblems, shownTitle: shownTitle };
   if (typeof module !== "undefined" && module.exports) module.exports = pure;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -6081,14 +6135,22 @@
     // an open task: its answer controls, the feedback line, its worked solution and the early button
     function open(t, c, r) {
       var body = E("div", { class: "lx-ck-body" }, c), fb = E("div", { "aria-live": "polite" }, c);
-      var sol = E("details", { class: "lx-ck-sol", hidden: r.first == null && !r.solFirst }, c);
+      var sw = solWaits(D, st, t);   // solAfter: the solution names another task's answer, so it waits for that task too
+      var sol = E("details", { class: "lx-ck-sol", hidden: sw.length > 0 || (r.first == null && !r.solFirst) }, c);
       E("summary", { text: "Worked solution" }, sol);
-      solution(t, sol);
-      var earlyBtn = E("button", { type: "button", class: "lx-link", text: "Show the worked solution now (recorded as opened before answering)", hidden: r.first != null || r.solFirst,
+      if (!sw.length) solution(t, sol);
+      var swNote = sw.length ? E("p", { class: "lx-hint lx-ck-solwait", text: solWaitText(t, sw) }, c) : null;   // said before answering too: it is why no early button shows
+      var earlyBtn = E("button", { type: "button", class: "lx-link", text: "Show the worked solution now (recorded as opened before answering)", hidden: sw.length > 0 || r.first != null || r.solFirst,
         onclick: function () { var rr = rec(t.id); rr.solFirst = true; save(); sol.hidden = false; sol.open = true; earlyBtn.hidden = true;
           if (t === gateT && !o.gateAll) openSolution(); if (o.onAnswer) o.onAnswer(t.id, rr, st); } }, c);
-      function unlock() { sol.hidden = false; earlyBtn.hidden = true; }
-      ({ "choice": choice, "order": order, "numeric": numeric, "open-short": openShort, "estimate": estimate })[t.kind](t, body, fb, unlock);
+      function unlock() { if (sw.length) return; sol.hidden = false; earlyBtn.hidden = true; }
+      ({ "choice": choice, "order": order, "numeric": numeric, "open-short": openShort, "estimate": estimate })[t.kind](t, body, fb, unlock, sw);
+    }
+    // the line in place of a waiting worked solution (solAfter): which tasks it waits for, and why
+    function solWaitText(t, sw) {
+      var w = taskList(D, sw), many = sw.length > 1;
+      return "This worked solution" + (t.kind === "open-short" ? " and the points to tick" : "") + " name" + (t.kind === "open-short" ? "" : "s") + " the answer" + (many ? "s" : "") + " to " + w +
+        ", so " + (t.kind === "open-short" ? "they open" : "it opens") + " once " + (many ? "those are" : "that is") + " submitted. Come back to this task then.";
     }
     // a task that waits for others (opensAfter): a notice and a way to the first task it waits for, nothing to answer
     function waitNoteOf(t, wait) {
@@ -6119,7 +6181,10 @@
     }
     function readOnly(els) { els.forEach(function (el) { if (el) { el.setAttribute("readonly", ""); el.readOnly = true; } }); }
     // the line after a wrong first answer: a retry, or for a frozen task the worked solution
-    function retry(t) { return t.freeze ? " The worked solution is below." : " Try again, or open the worked solution."; }
+    function retry(t) {
+      if (solWaits(D, st, t).length) return t.freeze ? " Its worked solution opens later (below)." : " Try again.";   // solAfter: not open yet
+      return t.freeze ? " The worked solution is below." : " Try again, or open the worked solution.";
+    }
     function feedback(fb, ok, html) { fb.innerHTML = ""; E("div", { class: "lx-saw" + (ok ? "" : " no"), html: LX.icon(ok ? "check" : "question") + "<div><b>" + (ok ? "Right." : "Not quite.") + "</b> " + html + "</div>" }, fb); }
     function solution(t, sol) {
       if (t.kind === "estimate") { E("p", { html: o.estimateNote || "The worked solution and the marking guide are in the <a href=\"#solution\">Worked solution</a> section below; it opens when you submit." }, sol); return; }
@@ -6205,7 +6270,7 @@
       var row = E("div", { class: "lx-ck-row" }, body);
       var chk = E("button", { type: "button", class: "lx-btn small", text: "Check", onclick: function () {
         if (!sel.value) { feedback(fb, false, "Choose a unit first."); return; }
-        if (t.freeze && !(parseFloat(inp.value) > 0)) { feedback(fb, false, "Enter a positive number."); return; }   // not kept as an answer
+        if (!(parseFloat(inp.value) > 0)) { feedback(fb, false, "Enter a positive number."); return; }   // not recorded: an empty field is not an answer
         var res = cNum(t, parseFloat(inp.value), sel.value);
         answered(t.id, res.right, { value: parseFloat(inp.value), unit: sel.value });
         feedback(fb, res.right, LX.esc(res.msg) + (res.right ? "" : retry(t)));
@@ -6215,8 +6280,8 @@
       function fix(move) { readOnly([inp]); sel.disabled = true; kept(t, chk, null, [inp, sel], move); }
       if (frozen(t)) fix();
     }
-    function openShort(t, body, fb, unlock) {
-      var r = rec(t.id), id = LX.uid("ck");
+    function openShort(t, body, fb, unlock, sw) {
+      var r = rec(t.id), id = LX.uid("ck"), waiting = !!(sw && sw.length);   // solAfter: the points name other answers too
       if (frozen(t)) keepDraft(t.id, null);
       var dr = frozen(t) ? null : draftOf(t.id);
       E("label", { for: id, class: "lx-sr", text: "Your explanation" }, body);
@@ -6227,9 +6292,9 @@
         var same = ta.value.trim() === String(rec(t.id).answer || "");   // the submitted text, or nothing yet: no draft
         keepDraft(t.id, same ? null : { text: ta.value }); dl.textContent = same ? "" : DRAFT_NOTE;
       });
-      var row = E("div", { class: "lx-ck-row" }, body), self = E("div", { hidden: r.points == null }, body);
+      var row = E("div", { class: "lx-ck-row" }, body), self = E("div", { hidden: r.points == null || waiting }, body);
       E("p", { class: "lx-hint", text: "Compare with the worked solution, then tick each point your answer makes." }, self);
-      var ul = E("ul", { class: "lx-ck-points" }, self), boxes = t.points.map(function (p, k) {
+      var ul = E("ul", { class: "lx-ck-points" }, self), boxes = (waiting ? [] : t.points).map(function (p, k) {
         var lab = E("label", null, E("li", null, ul)), cb = E("input", { type: "checkbox" }, lab); cb.checked = !!(r.points && r.points[k]);
         E("span", { html: LX.rich(p) }, lab);
         cb.addEventListener("change", function () { var rr = rec(t.id); rr.points = boxes.map(function (b) { return b.checked; }); rr.first = rr.points.every(Boolean); save(); });
@@ -6238,8 +6303,8 @@
       var sub = E("button", { type: "button", class: "lx-btn small", text: "Submit my explanation", onclick: function () {
         if (!ta.value.trim()) { feedback(fb, false, "Write a sentence or two first."); return; }
         var rr = answered(t.id, false, ta.value.trim()); rr.points = rr.points || t.points.map(function () { return false; }); rr.first = rr.points.every(Boolean); save();
-        self.hidden = false; unlock(); fb.innerHTML = "";
-        E("div", { class: "lx-saw", html: LX.icon("check") + "<div><b>Submitted.</b> Open the worked solution below and tick the points you made.</div>" }, fb);
+        self.hidden = waiting; unlock(); fb.innerHTML = "";
+        E("div", { class: "lx-saw", html: LX.icon("check") + "<div><b>Submitted.</b> " + (waiting ? "Its worked solution and points open later (below)." : "Open the worked solution below and tick the points you made.") + "</div>" }, fb);
         if (frozen(t)) fix(true);
       } }, row);
       function fix(move) { readOnly([ta]); kept(t, sub, null, [ta], move); }
@@ -6278,10 +6343,10 @@
         var chk = cEst(t, lo, hi, sel.value);
         // a range needs its high above its low: say why and wait (not recorded as an answer, like an empty field)
         if (!chk.ordered) { fb.innerHTML = ""; E("div", { class: "lx-saw no", html: LX.icon("question") + "<div><b>Range.</b> " + LX.esc(chk.rangeMsg) + "</div>" }, fb); return; }
-        var er = answered(t.id, chk.unitsOk && chk.ordered && !!chk.overlaps, ans, { check: chk });
+        var er = answered(t.id, chk.unitsOk && chk.ordered, ans, { check: chk });   // a valid estimate; where it sits is a comparison, not a mark
         fb.innerHTML = "";
         E("div", { class: "lx-saw" + (chk.unitsOk ? "" : " no"), html: LX.icon(chk.unitsOk ? "check" : "question") + "<div><b>Units.</b> " + LX.esc(chk.unitMsg) + "</div>" }, fb);
-        if (chk.rangeMsg) E("div", { class: "lx-saw" + (chk.overlaps ? "" : " no"), html: LX.icon(chk.overlaps ? "check" : "question") + "<div><b>Range.</b> " + LX.esc(chk.rangeMsg) + "</div>" }, fb);
+        if (chk.rangeMsg) E("div", { class: "lx-saw" + (chk.overlaps ? "" : " info"), html: LX.icon(chk.overlaps ? "check" : "chart") + "<div><b>Range.</b> " + LX.esc(chk.rangeMsg) + "</div>" }, fb);   // neutral when apart
         if (!o.gateAll) openSolution(er.at); rate(out);
         if (frozen(t)) fix(true);
       } }, row);
@@ -7178,7 +7243,10 @@
      onChange: function (values, checks) {} });
    Returns { el, get(), set(values), text(), checks() }.
    Fields: native, labelled controls with a one-line hint; the type is a set of five radio buttons (the course's question types) that shows the
-   chosen type's template and typical methods (one method family among several). Checks: eight lines (the question
+   chosen type's template and typical methods (one method family among several), the method names with their glossary
+   help (TYPES[i].marked: the same list as `methods`, with glossary marks; `methods` stays plain for the copied text and
+   for pages that mark it themselves). The hints of "Compared with" and "I would be wrong if" say what a descriptive
+   question puts there (a reference; an expectation or a check), as it tests no causal claim. Checks: eight lines (the question
    written, with no bracketed placeholder such as "[…]" left from a draft, then the seven parts that the question
    studio's rigour checks need), each "filled in" or "to do" in words and with an icon, never colour alone. The head counts "N of 8
    parts filled in": the checks see only whether a part is there, not how rigorous it is (the rubric does that); they
@@ -7187,11 +7255,16 @@
 (function () {
   "use strict";
   var TYPES = [
-    { id: "descriptive", label: "Descriptive", template: "How much / how often / where …?", methods: "data analysis, accounting, GIS" },
-    { id: "explanatory", label: "Explanatory", template: "Why did … happen?", methods: "statistics, econometrics, case studies, simulation" },
-    { id: "evaluative", label: "Evaluative", template: "Did … achieve …, compared with …?", methods: "difference-in-differences, matched comparisons, ex-post review" },
-    { id: "predictive", label: "Predictive", template: "What will … be, with what uncertainty?", methods: "forecasting, scenarios, Monte Carlo" },
-    { id: "prescriptive", label: "Prescriptive", template: "What should [decision-maker] do about … to achieve …, compared with …?", methods: "optimization, decision analysis, MCDA" }
+    { id: "descriptive", label: "Descriptive", template: "How much / how often / where …?", methods: "data analysis, accounting, GIS",
+      marked: "data analysis, accounting, [[gis|GIS]]" },
+    { id: "explanatory", label: "Explanatory", template: "Why did … happen?", methods: "statistics, econometrics, case studies, simulation",
+      marked: "statistics, [[econometrics|econometrics]], case studies, simulation" },
+    { id: "evaluative", label: "Evaluative", template: "Did … achieve …, compared with …?", methods: "difference-in-differences, matched comparisons, ex-post review",
+      marked: "[[difference-in-differences|difference-in-differences]], [[matched-comparison|matched comparisons]], [[ex-post-review|ex-post review]]" },
+    { id: "predictive", label: "Predictive", template: "What will … be, with what uncertainty?", methods: "forecasting, scenarios, Monte Carlo",
+      marked: "forecasting, [[scenario|scenarios]], [[monte-carlo|Monte Carlo]]" },
+    { id: "prescriptive", label: "Prescriptive", template: "What should [decision-maker] do about … to achieve …, compared with …?", methods: "optimization, decision analysis, MCDA",
+      marked: "[[optimization|optimization]], [[decision-analysis|decision analysis]], [[mcda|MCDA]] (multi-criteria decision analysis)" }
   ];
   var SCALES = [["S0", "device and plant"], ["S1", "microgrid and community"], ["S2", "regional grid"], ["S3", "city and region"], ["S4", "nation"]];
   // the card's fields, in order; `short` names the field in links (the #q- hash) and `max` caps its length there
@@ -7201,10 +7274,10 @@
     { key: "audience", short: "a", label: "Audience or decision-maker", hint: "Who would use the answer, and who it affects: a co-op board, a regulator or a city council; low-income renters, farmers…" },
     { key: "metric", short: "m", label: "Metric", hint: "What you would measure or compute." },
     { key: "units", short: "u", label: "Units", hint: "MWh, $/MWh, t CO₂ a year, hours without heat…" },
-    { key: "counterfactual", short: "c", label: "Compared with (the counterfactual)", hint: "What happens otherwise: the baseline you compare against." },
+    { key: "counterfactual", short: "c", label: "Compared with (the counterfactual)", hint: "What happens otherwise: the baseline you compare against. A descriptive question names a reference instead: another year, place or threshold." },
     { key: "scale", short: "s", label: "Scale" },
     { key: "boundary", short: "b", label: "Boundary", hint: "What is inside the study, and what is left out." },
-    { key: "wrong", short: "w", label: "I would be wrong if…", hint: "A result that would show your expectation false." },
+    { key: "wrong", short: "w", label: "I would be wrong if…", hint: "A result that would show your expectation false. For a descriptive question: the expectation you state before counting, or a check on the count." },
     { key: "uncertainty", short: "x", label: "The uncertainty that matters most", hint: "The input or assumption that could change the answer most." }
   ];
   var MAX = 600;
@@ -7414,7 +7487,7 @@
     function paintType() {
       var t = typeOf(v.type);
       TYPES.forEach(function (x) { tin[x.id].input.checked = x.id === v.type; tin[x.id].label.classList.toggle("on", x.id === v.type); });
-      tinfo.innerHTML = t ? "<b>Template:</b> " + LX.esc(t.template) + " <span>Typical methods: " + LX.esc(t.methods) + ".</span>"
+      tinfo.innerHTML = t ? "<b>Template:</b> " + LX.esc(t.template) + " <span>Typical methods: " + LX.rich(t.marked || t.methods) + ".</span>"
         : "Five types, each with its own template and typical methods.";
     }
     function paintChecks() {

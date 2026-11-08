@@ -17,7 +17,10 @@
      onChange: function (values, checks) {} });
    Returns { el, get(), set(values), text(), checks() }.
    Fields: native, labelled controls with a one-line hint; the type is a set of five radio buttons (the course's question types) that shows the
-   chosen type's template and typical methods (one method family among several). Checks: eight lines (the question
+   chosen type's template and typical methods (one method family among several), the method names with their glossary
+   help (TYPES[i].marked: the same list as `methods`, with glossary marks; `methods` stays plain for the copied text and
+   for pages that mark it themselves). The hints of "Compared with" and "I would be wrong if" say what a descriptive
+   question puts there (a reference; an expectation or a check), as it tests no causal claim. Checks: eight lines (the question
    written, with no bracketed placeholder such as "[…]" left from a draft, then the seven parts that the question
    studio's rigour checks need), each "filled in" or "to do" in words and with an icon, never colour alone. The head counts "N of 8
    parts filled in": the checks see only whether a part is there, not how rigorous it is (the rubric does that); they
@@ -26,11 +29,16 @@
 (function () {
   "use strict";
   var TYPES = [
-    { id: "descriptive", label: "Descriptive", template: "How much / how often / where …?", methods: "data analysis, accounting, GIS" },
-    { id: "explanatory", label: "Explanatory", template: "Why did … happen?", methods: "statistics, econometrics, case studies, simulation" },
-    { id: "evaluative", label: "Evaluative", template: "Did … achieve …, compared with …?", methods: "difference-in-differences, matched comparisons, ex-post review" },
-    { id: "predictive", label: "Predictive", template: "What will … be, with what uncertainty?", methods: "forecasting, scenarios, Monte Carlo" },
-    { id: "prescriptive", label: "Prescriptive", template: "What should [decision-maker] do about … to achieve …, compared with …?", methods: "optimization, decision analysis, MCDA" }
+    { id: "descriptive", label: "Descriptive", template: "How much / how often / where …?", methods: "data analysis, accounting, GIS",
+      marked: "data analysis, accounting, [[gis|GIS]]" },
+    { id: "explanatory", label: "Explanatory", template: "Why did … happen?", methods: "statistics, econometrics, case studies, simulation",
+      marked: "statistics, [[econometrics|econometrics]], case studies, simulation" },
+    { id: "evaluative", label: "Evaluative", template: "Did … achieve …, compared with …?", methods: "difference-in-differences, matched comparisons, ex-post review",
+      marked: "[[difference-in-differences|difference-in-differences]], [[matched-comparison|matched comparisons]], [[ex-post-review|ex-post review]]" },
+    { id: "predictive", label: "Predictive", template: "What will … be, with what uncertainty?", methods: "forecasting, scenarios, Monte Carlo",
+      marked: "forecasting, [[scenario|scenarios]], [[monte-carlo|Monte Carlo]]" },
+    { id: "prescriptive", label: "Prescriptive", template: "What should [decision-maker] do about … to achieve …, compared with …?", methods: "optimization, decision analysis, MCDA",
+      marked: "[[optimization|optimization]], [[decision-analysis|decision analysis]], [[mcda|MCDA]] (multi-criteria decision analysis)" }
   ];
   var SCALES = [["S0", "device and plant"], ["S1", "microgrid and community"], ["S2", "regional grid"], ["S3", "city and region"], ["S4", "nation"]];
   // the card's fields, in order; `short` names the field in links (the #q- hash) and `max` caps its length there
@@ -40,10 +48,10 @@
     { key: "audience", short: "a", label: "Audience or decision-maker", hint: "Who would use the answer, and who it affects: a co-op board, a regulator or a city council; low-income renters, farmers…" },
     { key: "metric", short: "m", label: "Metric", hint: "What you would measure or compute." },
     { key: "units", short: "u", label: "Units", hint: "MWh, $/MWh, t CO₂ a year, hours without heat…" },
-    { key: "counterfactual", short: "c", label: "Compared with (the counterfactual)", hint: "What happens otherwise: the baseline you compare against." },
+    { key: "counterfactual", short: "c", label: "Compared with (the counterfactual)", hint: "What happens otherwise: the baseline you compare against. A descriptive question names a reference instead: another year, place or threshold." },
     { key: "scale", short: "s", label: "Scale" },
     { key: "boundary", short: "b", label: "Boundary", hint: "What is inside the study, and what is left out." },
-    { key: "wrong", short: "w", label: "I would be wrong if…", hint: "A result that would show your expectation false." },
+    { key: "wrong", short: "w", label: "I would be wrong if…", hint: "A result that would show your expectation false. For a descriptive question: the expectation you state before counting, or a check on the count." },
     { key: "uncertainty", short: "x", label: "The uncertainty that matters most", hint: "The input or assumption that could change the answer most." }
   ];
   var MAX = 600;
@@ -253,7 +261,7 @@
     function paintType() {
       var t = typeOf(v.type);
       TYPES.forEach(function (x) { tin[x.id].input.checked = x.id === v.type; tin[x.id].label.classList.toggle("on", x.id === v.type); });
-      tinfo.innerHTML = t ? "<b>Template:</b> " + LX.esc(t.template) + " <span>Typical methods: " + LX.esc(t.methods) + ".</span>"
+      tinfo.innerHTML = t ? "<b>Template:</b> " + LX.esc(t.template) + " <span>Typical methods: " + LX.rich(t.marked || t.methods) + ".</span>"
         : "Five types, each with its own template and typical methods.";
     }
     function paintChecks() {
