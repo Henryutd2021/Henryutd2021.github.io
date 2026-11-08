@@ -29,6 +29,10 @@ function sourcePath(name) {
   const p = map()[name];
   return p && fs.existsSync(p) ? p : null;
 }
+// the path of the first name when every named source is available, else null (for a check that needs them together)
+function all(...names) {
+  return names.every(n => sourcePath(n)) ? sourcePath(names[0]) : null;
+}
 function read(name) {
   const p = sourcePath(name);
   return p ? fs.readFileSync(p, "utf8") : null;
@@ -47,4 +51,4 @@ function block(t, at) {
   const j = t.indexOf("\n#", i + 1);
   return t.slice(i, j < 0 ? t.length : j + 1);
 }
-module.exports = { path: sourcePath, read, section, block };
+module.exports = { path: sourcePath, all, read, section, block };

@@ -146,13 +146,13 @@ const QPATH = path.join(SITE, "learn/c0-behind-one-meter.qmd");
     });
     return out;
   }
-  const RP = PRIV.path("excerpts");
+  const RP = PRIV.all("excerpts", "publications");   // the wording checks also read the publication list
   let APPROVED = SNAPSHOT;
   if (RP) {
     const reg = register(fs.readFileSync(RP, "utf8"));
     Object.keys(SNAPSHOT).forEach(k => ok(reg[k] === SNAPSHOT[k], `the approved wording's ${k} equals this test's snapshot`));
     APPROVED = reg;
-  } else console.log("note: the approved excerpt wording is not available (set LEARN_SOURCES); checked against the snapshot");
+  } else console.log("note: the approved excerpt wording and the publication list are not both available (set LEARN_SOURCES); checked against the snapshot");
   const UNITS = Object.values(APPROVED).map(norm);
   const approved = s => { s = norm(s); return s.length > 0 && UNITS.some(u => u === s || u.indexOf(s) === 0 && /^[.;:]? ?/.test(u.slice(s.length)) && /[.;:]$/.test(s) || u.indexOf(" " + s) > 0 && /[.;:] $/.test(u.slice(0, u.indexOf(" " + s) + 1)) && (u.endsWith(s) || /[.;:]$/.test(s))); };
   const OWN = Q.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?<!-- learn:\1:end -->/g, "").replace(/<!-- (?!c0-)[\s\S]*?-->/g, " ");

@@ -295,7 +295,10 @@ if (REG) {
   ok(Object.keys(reg).length === 30 && Array.from({ length: 30 }, (x, i) => "E15." + (i + 1)).every(k => reg[k]), "the approved wording's 30 E15 rows are read (the [N] and optional rows included)");
   // the revisions after review: each "Was" is the approved row, word for word; "Now" takes its place
   const rv = w6.indexOf("### E15 revisions after review (2026-11-07)"), REV = {};
-  ok(rv > 0 && /^\*\*Status \(2026-11-07\): accepted by [^*\n]+\*\*/m.test(w6.slice(rv)), "the approved wording has the E15 revisions after review (2026-11-07), accepted");
+  // accepted by the same person whose approval the section's status line records ("(<name>: ...")
+  const approver = ((st[2] || "").match(/^ \(([^:()*]+):/) || [])[1];
+  ok(rv > 0 && !!approver && w6.slice(rv).split("\n").some(l => l.startsWith("**Status (2026-11-07): accepted by " + approver + "**")),
+    "the approved wording has the E15 revisions after review (2026-11-07), accepted by the approver of the section");
   if (rv > 0) w6.slice(rv).split("\n").forEach(line => { const m = line.match(/^\| (E15\.\d+) \| (.*?) \| (.*?) \| /); if (m) REV[m[1]] = { was: m[2].replace(/^(Timeline, [^:]+|Citations|Source): /, ""), now: m[3].replace(/^(Timeline, [^:]+|Citations|Source): /, "") }; });
   Object.keys(REV).forEach(k => { ok(REV[k].was === reg[k], k + ": the revision's 'Was' is the approved row"); REPLACED[k] = reg[k]; reg[k] = REV[k].now; });
   ok(Object.keys(reg).length === Object.keys(APPROVED_SNAPSHOT).length && Object.keys(reg).every(k => reg[k] === APPROVED_SNAPSHOT[k]),
@@ -363,8 +366,9 @@ const RG = { units: Object.values(EFF).map(X.norm), raw: EFF };
   // the citation (E15.29), split into its two sentences; the title as in the author's publication list
   const src = (OWN.match(/<div class="lx-card lx-sources">([\s\S]*?)<\/div>/) || [])[1] || "", li = X.elements(src).map(X.norm);
   ok(X.norm(li[1] + " " + li[2]) === X.norm(RG.raw["E15.29"]) && src.includes('<a href="' + DOI + '">') && src.includes('<a href="' + REPO + '">'), "sources: E15.29, word for word, with the DOI and the repository linked");
-  const bib = fs.readFileSync(PRIV.path("publications"), "utf8");
-  ok(bib.includes("title   = {Rethinking the economics and flexibility of {U.S.} nuclear power through hydrogen integration and policy support}") && li[1].includes("Rethinking the economics and flexibility of U.S. nuclear power through hydrogen integration and policy support."), "the paper's title as in the publication list");
+  const bib = PRIV.read("publications");
+  if (bib) ok(bib.includes("title   = {Rethinking the economics and flexibility of {U.S.} nuclear power through hydrogen integration and policy support}") && li[1].includes("Rethinking the economics and flexibility of U.S. nuclear power through hydrogen integration and policy support."), "the paper's title as in the publication list");
+  else console.log("note: the publication list is not available (set LEARN_SOURCES); the cited title was not compared with it");
   // the description is E15.4
   const desc = (PAGE.match(/^description: "Case file CF4 of Energy Systems, Step by Step\. ([^"]+)"/m) || [])[1] || "";
   ok(desc && X.norm(desc) === X.norm(RG.raw["E15.4"]), "the description's sentence is E15.4");

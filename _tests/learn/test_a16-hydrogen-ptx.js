@@ -134,7 +134,7 @@ const SNAP = {
   "E10.3": "Industry then drew more hydrogen from gas reformers, and the round trip from power to hydrogen and back lost energy, so total emissions rose although gas-plant emissions fell.",
   "E10.4": "Inputs reflect 2022–2023 conditions; post-2023 federal hydrogen credit rules are not modeled."
 };
-const RP = PRIV.path("excerpts");
+const RP = PRIV.all("excerpts", "publications");   // the wording checks also read the publication list
 const norm = s => String(s).replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/\s+/g, " ").trim();
 let APPROVED = SNAP;
 if (RP) {
@@ -152,7 +152,7 @@ if (RP) {
     const entry = bib.split("\n@").find(e => e.includes("title={" + m[2].toLowerCase() + "}")) || "", doi = (entry.match(/doi\s*=\s*\{([^}]+)\}/) || [])[1];
     ok(entry && (!doi || doi === m[1].replace("https://doi.org/", "").toLowerCase()), "citation title (and DOI where the list has one) as in the publication list: " + m[2].slice(0, 50));
   });
-} else console.log("note: the approved excerpt wording is not available (set LEARN_SOURCES); checked against the snapshot");
+} else console.log("note: the approved excerpt wording and the publication list are not both available (set LEARN_SOURCES); checked against the snapshot");
 const UNITS = Object.values(APPROVED).map(norm);
 const approved = s => { s = norm(s); return s.length > 0 && UNITS.some(u => u === s || u.split(/(?<=[.?!])\s+/).indexOf(s) >= 0); };
 const quotes = [...PAGE.matchAll(/<blockquote class="lx-excerpt" data-source="([^"]+)">([\s\S]*?)<footer>/g)];

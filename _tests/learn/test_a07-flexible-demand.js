@@ -252,7 +252,7 @@ const has = (s, msg) => ok(T_PAGE.indexOf(s) >= 0, msg + ": '" + s + "' on the p
     "E8.4": "Because the transactive energy market brought a new revenue stream, locations with stronger renewables became competitive to establish facilities despite higher fixed and logistics cost.",
     "E8.7": "Holds when: stylized networks with synthetic distances and costs, candidate sites in California, Arizona and Nevada, and one year, planned week by week for products and hour by hour for energy. Leaves out: grid outages, which the studies do not model."
   };
-  const RP = PRIV.path("excerpts");
+  const RP = PRIV.all("excerpts", "publications");   // the wording checks also read the publication list
   if (RP) {
     const reg = fs.readFileSync(RP, "utf8"), revs = reg.slice(reg.indexOf("## Revisions after review"));
     Object.keys(SNAP).forEach(id => {
@@ -269,7 +269,7 @@ const has = (s, msg) => ok(T_PAGE.indexOf(s) >= 0, msg + ": '" + s + "' on the p
     const cites = [...OWN.matchAll(/<li>Li et al\. \((\d{4})\)\. <a href="(https:\/\/doi\.org\/[^"]+)">([^<]+)<\/a>\./g)];
     ok(cites.length === 2, "two Li et al. papers cited with titles (" + cites.length + ")");
     cites.forEach(c => ok(titles.indexOf(c[3].toLowerCase()) >= 0, "sources: '" + c[3].slice(0, 50) + "' is the title in the publication list"));
-  } else console.log("note: the approved excerpt wording is not available (set LEARN_SOURCES); excerpts checked against this test's snapshot");
+  } else console.log("note: the approved excerpt wording and the publication list are not both available (set LEARN_SOURCES); excerpts checked against this test's snapshot");
   const norm = s => s.replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/\s+/g, " ").trim();
   const bq = [...OWN.matchAll(/<blockquote class="lx-excerpt" data-source="([^"]+)">([\s\S]*?)<footer>([\s\S]*?)<\/footer><\/blockquote>/g)];
   ok(bq.length === 2 && bq[0][1] === "excerpt:ghg" && bq[1][1] === "excerpt:supply-chain-mg", "two excerpts: excerpt:ghg, then excerpt:supply-chain-mg");

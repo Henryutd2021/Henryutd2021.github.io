@@ -199,7 +199,7 @@ function register(md) {
   });
   return out;
 }
-const RP = PRIV.path("excerpts");
+const RP = PRIV.all("excerpts", "publications");   // the wording checks also read the publication list
 let APPROVED = APPROVED_SNAPSHOT;
 if (RP) {
   const MD = fs.readFileSync(RP, "utf8");
@@ -207,7 +207,7 @@ if (RP) {
   ok(RG.used.every(k => reg[k] === APPROVED_SNAPSHOT[k]), "the approved-sentence snapshot in this test equals the approved wording; differs at: " + RG.used.filter(k => reg[k] !== APPROVED_SNAPSHOT[k]).join(", "));
   ok(/E8\.1–E8\.10 and E8\.13–E8\.17; E8\.11–E8\.12 dropped/.test(MD), "the approved wording records E8 (without E8.11-E8.12) as approved");
   APPROVED = {}; Object.keys(reg).filter(k => k !== "E8.11" && k !== "E8.12").forEach(k => { APPROVED[k] = reg[k]; });
-} else console.log("note: the approved excerpt wording is not available (set LEARN_SOURCES); research wording checked against the snapshot in this test");
+} else console.log("note: the approved excerpt wording and the publication list are not both available (set LEARN_SOURCES); research wording checked against the snapshot in this test");
 const UNITS = Object.values(APPROVED).map(norm);
 function approved(seg) {
   const s = norm(seg);

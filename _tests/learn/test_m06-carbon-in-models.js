@@ -213,7 +213,7 @@ ${buyRow("New wind, sun and batteries, matched hour by hour", Hr, "0 t", `${mw(H
     "E10.3": "Industry then drew more hydrogen from gas reformers, and the round trip from power to hydrogen and back lost energy, so total emissions rose although gas-plant emissions fell.",
     "E10.4": "Inputs reflect 2022–2023 conditions; post-2023 federal hydrogen credit rules are not modeled."
   };
-  const RP = PRIV.path("excerpts"); let APPROVED = SNAP;
+  const RP = PRIV.all("excerpts", "publications"); let APPROVED = SNAP;   // the wording checks also read the publication list
   if (RP) {
     const md = fs.readFileSync(RP, "utf8"), reg = {};
     md.split("\n").forEach(line => { const m = line.match(/^\| (E(6|10|11)\.\d+)(?: \[N\])? \| (.*) \|\s*$/); if (m && !reg[m[1]]) reg[m[1]] = norm(m[3].split(" | ")[0]); });
@@ -225,7 +225,7 @@ ${buyRow("New wind, sun and batteries, matched hour by hour", Hr, "0 t", `${mw(H
       const entry = bib.split("\n@").find(e => e.includes("title={" + m[2].toLowerCase() + "}")) || "", doi = (entry.match(/doi\s*=\s*\{([^}]+)\}/) || [])[1];
       ok(entry && (!doi || doi === m[1].replace("https://doi.org/", "").toLowerCase()), "citation title (and DOI) as in the publication list: " + m[2].slice(0, 50));
     });
-  } else console.log("note: the approved excerpt wording is not available (set LEARN_SOURCES); checked against the snapshot");
+  } else console.log("note: the approved excerpt wording and the publication list are not both available (set LEARN_SOURCES); checked against the snapshot");
   const UNITS = Object.values(APPROVED).map(norm), approved = s => { s = norm(s); return s.length > 0 && UNITS.some(u => u === s || u.split(/(?<=[.?!])\s+/).indexOf(s) >= 0); };
   const quotes = [...PAGE.matchAll(/<blockquote class="lx-excerpt" data-source="([^"]+)">([\s\S]*?)<footer>/g)];
   ok(quotes.map(q => q[1]).join(",") === "excerpt:ghg,excerpt:txh2", "two excerpts: ghg and txh2");

@@ -193,7 +193,7 @@ function register(md) {
   });
   return out;
 }
-const RP = PRIV.path("excerpts");
+const RP = PRIV.all("excerpts", "publications");   // the wording checks also read the publication list
 let APPROVED = APPROVED_SNAPSHOT;
 if (RP) {
   const reg = register(fs.readFileSync(RP, "utf8"));
@@ -201,7 +201,7 @@ if (RP) {
   ok(same(reg, APPROVED_SNAPSHOT), "the approved-sentence snapshot in this test equals the approved wording (" + CF.sections.join(", ") + ", revisions applied); differs at: " +
     Object.keys(Object.assign({}, reg, APPROVED_SNAPSHOT)).filter(k => reg[k] !== APPROVED_SNAPSHOT[k]).join(", "));
   APPROVED = reg;
-} else console.log("note: the approved excerpt wording is not available (set LEARN_SOURCES); research wording checked against the snapshot in this test");
+} else console.log("note: the approved excerpt wording and the publication list are not both available (set LEARN_SOURCES); research wording checked against the snapshot in this test");
 const UNITS = Object.values(APPROVED).map(norm);
 function approved(seg) {
   const s = norm(seg);

@@ -207,7 +207,7 @@ function register(md) {
   });
   return out;
 }
-const RP = PRIV.path("excerpts");
+const RP = PRIV.all("excerpts", "publications");   // the wording checks also read the publication list
 let APPROVED = APPROVED_SNAPSHOT;
 if (RP) {
   const md = fs.readFileSync(RP, "utf8"), reg = register(md);
@@ -217,7 +217,7 @@ if (RP) {
   const e11 = md.indexOf("### E11"), w4 = md.slice(md.lastIndexOf("\n## ", e11) + 1, e11);   // the section that opens with E11's status line
   ok(/approved/i.test(w4) && !/waiting for/i.test((w4.match(/\*\*Status[^\n]*/) || [""])[0]), "the status line of E11's section says approved");
   APPROVED = reg;
-} else console.log("note: the approved excerpt wording is not available (set LEARN_SOURCES); research wording checked against the snapshot in this test");
+} else console.log("note: the approved excerpt wording and the publication list are not both available (set LEARN_SOURCES); research wording checked against the snapshot in this test");
 const UNITS = Object.values(APPROVED).map(norm);
 function approved(seg) {
   const s = norm(seg);

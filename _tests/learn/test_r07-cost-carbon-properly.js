@@ -12,7 +12,7 @@
 //     sentence describes the course author's study; the fictional study is labelled fictional everywhere it appears
 //   - scope: no nuclear term and no data center in the lesson's own files (nothing like the author's studies); links on
 //     allowed hosts; text budget (steps and every assembled line, for every input); glossary marks; path.yml
-//   - the review of 2026-11-06: the two grid costs enter one by one; the waterfall follows the switches; CO2 is called
+//   - also checked: the two grid costs enter one by one; the waterfall follows the switches; CO2 is called
 //     attributed (average-factor accounting), never "avoided"; the study's inputs, fleet plan, units and two worked numbers
 //     are shown; the strong note gives evidence status and what is left out; the meter boundary of 2.2 kWh per mile and
 //     grid losses are stated; the checklist's boundary rule matches the audit; M11 joins the prerequisites once live
@@ -147,7 +147,7 @@ const OWN = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?<!-- learn:
     const qs = [...OWN.matchAll(/<blockquote class="lx-excerpt" data-source="([^"]+)">([\s\S]*?)<\/blockquote>/g)];
     ok(qs.length === 1 && qs[0][1] === "excerpt:ghg", "one excerpt, from excerpt:ghg");
     const paras = qs.length ? [...qs[0][2].matchAll(/<p>([\s\S]*?)<\/p>/g)].map(m => m[1]) : [];
-    ok(paras.length === 2 && paras.every(p => X.approved(R, p)) && X.norm(paras[0]) === X.norm(R.raw["E6.4"]) && X.norm(paras[1]) === X.norm(R.raw["E6.6"]), "the excerpt is E6.4 and E6.6, word for word from the register");
+    ok(paras.length === 2 && paras.every(p => X.approved(R, p)) && X.norm(paras[0]) === X.norm(R.raw["E6.4"]) && X.norm(paras[1]) === X.norm(R.raw["E6.6"]), "the excerpt is E6.4 and E6.6, word for word from the approved wording");
   } }
 ok(!/Li et al\./.test(OWN.replace(/<blockquote[\s\S]*?<\/blockquote>/g, "").replace(/<div class="lx-card lx-sources">[\s\S]*?<\/div>/, "")), "no other sentence on the page names the course author's study");
 ok(/fictional/i.test(D.study.authors) && /fictional/.test(PAGE.match(/<b>Fictional study\.<\/b>[^<]*/)[0] + "fictional") && JS.includes("The study, as published · fictional"), "the study is labelled fictional in its byline, the data note and the scene");
