@@ -1,6 +1,6 @@
-# Sidecar for M6 (m06-carbon-in-models), builder learn-w4-c, 2026-11-05. Read by scripts/build_learn.py.
+# Sidecar for M6 (m06-carbon-in-models). Read by the course build step.
 id: m06-carbon-in-models
 lesson: M6
 glossary: []
 requests:
-  - "The notebook learn/notebooks/m06-carbon-in-models.ipynb is written by scripts/build_learn_m06_notebook.py in the ResearchPortfolio folder (uncommitted there)."
+  - "The notebook learn/notebooks/m06-carbon-in-models.ipynb is written by the lesson's notebook build step, not by hand."

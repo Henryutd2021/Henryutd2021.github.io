@@ -1,5 +1,4 @@
-# Sidecar for CK-M (ck-m-unseen-problem), builder learn-w2-h, 2026-11-03; updated by the W2 fix branch learn-w2-fix-h
-# after the Codex review. Read by scripts/build_learn.py (which reads learn/_w1/ only, so the W2 sidecar lives here too).
+# Sidecar for CK-M (ck-m-unseen-problem). Read by the course build step, which reads sidecars from learn/_w1/ only.
 id: ck-m-unseen-problem
 lesson: CK-M
 glossary:
@@ -7,5 +6,5 @@ glossary:
     term: Capacity credit
     def: "The share of a plant's size that planners count on to meet the year's peak, judged by how much it lowers the risk of a shortage."
 requests:
-  - "State after the W2 integration and fix: CK-M uses the shared runner's options (describe, submitTask, onAnswer, level, summary, destroy) and its general numeric check; nothing lesson-local patches the runner."
-  - "Notebooks: ck-m-start and the three worked solutions run end to end with NumPy 2.5 and SciPy 1.18 (HiGHS); the empirical ones read town_year.json from their own folder. The briefs-only download is assets/learn/data/ck-m-unseen-problem-briefs.json (written by scripts/build_learn_ckm_data.py)."
+  - "CK-M uses the shared runner's options (describe, submitTask, onAnswer, level, summary, destroy) and its general numeric check; nothing lesson-local patches the runner."
+  - "Notebooks: ck-m-start and the three worked solutions run end to end with NumPy 2.5 and SciPy 1.18 (HiGHS); the empirical ones read town_year.json from their own folder. The briefs-only download is assets/learn/data/ck-m-unseen-problem-briefs.json (written by the checkpoint's data build step)."

@@ -1,5 +1,6 @@
-# Sidecar for X6 (x06-social-methods), builder learn-w7-a, 2026-11-07. Read by scripts/build_learn.py.
-# No excerpt of Henry's research appears in X6. Method-neutral (curriculum §11.2). Prairie City is fictional.
+# Sidecar for X6 (x06-social-methods). Read by the course build step.
+# No excerpt of the course author's research appears in X6. Method-neutral: no method is ranked above another.
+# Prairie City is fictional.
 id: x06-social-methods
 lesson: X6
 glossary:

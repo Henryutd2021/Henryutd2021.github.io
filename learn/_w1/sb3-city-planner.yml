@@ -1,5 +1,5 @@
-# Sidecar for SB3 (sb3-city-planner), M12 (m12-city-model) and C3 (c3-prairie-city-2040), builder learn-w5-h, 2026-11-06.
-# Read by scripts/build_learn.py.
+# Sidecar for SB3 (sb3-city-planner), M12 (m12-city-model) and C3 (c3-prairie-city-2040).
+# Read by the course build step.
 id: sb3-city-planner
 lesson: SB3
 glossary:
@@ -25,4 +25,4 @@ glossary:
     term: Building envelope
     def: "A building's outer shell, its walls, roof, windows and floor, whose insulation and air sealing set how fast heat leaks out."
 requests:
-  - "Engine E3's data: assets/learn/data/e3-city-hub.json from scripts/build_learn_e3_data.py (index repo, uncommitted); its precomputed block from the SB3, M12 and C3 tests' --write."
+  - "Engine E3's data: assets/learn/data/e3-city-hub.json from engine E3's data build step; its precomputed block from the SB3, M12 and C3 tests' --write."

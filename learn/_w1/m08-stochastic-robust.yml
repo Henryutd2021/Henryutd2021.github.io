@@ -1,4 +1,4 @@
-# Sidecar for M8 (m08-stochastic-robust), builder learn-w4-d, 2026-11-05. Read by scripts/build_learn.py.
+# Sidecar for M8 (m08-stochastic-robust). Read by the course build step.
 id: m08-stochastic-robust
 lesson: M8
 glossary:

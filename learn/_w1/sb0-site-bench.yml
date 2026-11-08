@@ -1,6 +1,6 @@
-# Sidecar for SB0 (sb0-site-bench) and engine E0, builder learn-w3-g, 2026-11-03. Read by scripts/build_learn.py.
+# Sidecar for SB0 (sb0-site-bench) and engine E0. Read by the course build step.
 id: sb0-site-bench
 lesson: SB0
 requests:
-  - "A8 (learn-w3-e) can move onto E0 at integration: LX.E0.build(P, s, { periods }) takes any list of periods, so a lesson can pass its own week; the farm site (wind, a 4-hour battery, an electrolyzer, a tank) is the closest match."
+  - "A8 can move onto E0: LX.E0.build(P, s, { periods }) takes any list of periods, so a lesson can pass its own week; the farm site (wind, a 4-hour battery, an electrolyzer, a tank) is the closest match."
   - "Possible shared improvement: LX.solver could pass a HiGHS option such as solver or simplex_strategy; E0's 53 weekly LPs would gain most from it. Not needed for the budget now."

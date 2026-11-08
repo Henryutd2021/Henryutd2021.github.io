@@ -1,4 +1,4 @@
-# Sidecar for F6 (f06-grid-and-outages), builder learn-w3-a (F6 fork), 2026-11-03. Read by scripts/build_learn.py.
+# Sidecar for F6 (f06-grid-and-outages). Read by the course build step.
 id: f06-grid-and-outages
 lesson: F6
 glossary:

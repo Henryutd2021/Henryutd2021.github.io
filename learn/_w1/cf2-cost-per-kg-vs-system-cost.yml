@@ -1,5 +1,5 @@
-# Sidecar for CF2 (cf2-cost-per-kg-vs-system-cost), builder learn-w2-i, 2026-11-03; fixes learn-w2-fix-i. Read by
-# scripts/build_learn.py. Henry approved the page's excerpts on 2026-11-03 (reports/learn/excerpts_for_approval.md, E3-E5).
+# Sidecar for CF2 (cf2-cost-per-kg-vs-system-cost). Read by the course build step. The page's excerpts are approved
+# wording (E3-E5).
 id: cf2-cost-per-kg-vs-system-cost
 lesson: CF2
 glossary:

@@ -1,4 +1,4 @@
-# Sidecar for lesson 12 (T12, 12-trade-offs), builder learn-w1-g, 2026-11-02. Read by scripts/build_learn.py.
+# Sidecar for lesson 12 (T12, 12-trade-offs). Read by the course build step.
 id: 12-trade-offs
 lesson: 12
 glossary:

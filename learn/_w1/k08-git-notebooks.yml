@@ -1,4 +1,4 @@
-# Sidecar for toolbox K8 (k08-git-notebooks), builder learn-w2-e (fork for K8), 2026-11-03. Read by scripts/build_learn.py.
+# Sidecar for toolbox K8 (k08-git-notebooks). Read by the course build step.
 id: k08-git-notebooks
 lesson: K8
 glossary:

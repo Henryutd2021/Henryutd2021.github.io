@@ -1,4 +1,4 @@
-# Sidecar for lesson 2 (02-demand), W1 builder a, 2026-11-02: new glossary terms and requests for shared files.
+# Sidecar for lesson 2 (02-demand): new glossary terms and requests for shared files.
 lesson: 2
 glossary:
   - id: load-duration-curve

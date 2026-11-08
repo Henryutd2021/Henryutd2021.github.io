@@ -1,6 +1,6 @@
-# Sidecar for A7 (a07-flexible-demand), builder learn-w3-d, 2026-11-03. Read by scripts/build_learn.py.
+# Sidecar for A7 (a07-flexible-demand). Read by the course build step.
 # The real-world box quotes E6.4 and E6.6 (excerpt:ghg) and E8.2, E8.4 with the note E8.7 (excerpt:supply-chain-mg),
-# approved by Henry on 2026-11-03 (reports/learn/excerpts_for_approval.md).
+# in their approved wording.
 id: a07-flexible-demand
 lesson: A7
 glossary:

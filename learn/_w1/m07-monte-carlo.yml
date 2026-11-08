@@ -1,4 +1,4 @@
-# Sidecar for M7 (m07-monte-carlo), builder learn-w3-f, 2026-11-03. Read by scripts/build_learn.py.
+# Sidecar for M7 (m07-monte-carlo). Read by the course build step.
 id: m07-monte-carlo
 lesson: M7
 glossary:
@@ -18,6 +18,6 @@ glossary:
     term: Monte Carlo error
     def: "How far an estimate from a Monte Carlo study would move with another random seed; it shrinks roughly with the square root of the number of runs."
 requests:
-  - "Promote candidate (i-montecarlo): the rank-correlation bars with ± 2 standard-error whiskers and tie-rule ranks (RhoBars in m07-monte-carlo.js), the seeded Latin hypercube with its permutation ranks (units, study), the repeat-based Monte Carlo error (repeats, se) and the tie rule (rankGroups). M8, M9, A5 and C1 can reuse them; mulberry32 (rng) could sit beside LX.Drill.rng as the generator for studies."
+  - "Candidate shared component (i-montecarlo): the rank-correlation bars with ± 2 standard-error whiskers and tie-rule ranks (RhoBars in m07-monte-carlo.js), the seeded Latin hypercube with its permutation ranks (units, study), the repeat-based Monte Carlo error (repeats, se) and the tie rule (rankGroups). M8, M9, A5 and C1 can reuse them; mulberry32 (rng) could sit beside LX.Drill.rng as the generator for studies."
   - "Lesson 11's glossary entry sensitivity-analysis says 'one at a time'; M7 adds global-sensitivity-analysis for the all-together view. No change needed, listed for the glossary review."
   - "Popover demo state: m07-monte-carlo.js answers lxDemo('gloss') (step 9 with its rank-correlation term open) for the layout audit of popovers at 375 px."

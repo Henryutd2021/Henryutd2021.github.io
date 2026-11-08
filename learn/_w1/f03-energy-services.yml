@@ -1,4 +1,4 @@
-# Sidecar for F3 (f03-energy-services), builder learn-w3-a, 2026-11-03. Read by scripts/build_learn.py.
+# Sidecar for F3 (f03-energy-services). Read by the course build step.
 id: f03-energy-services
 lesson: F3
 glossary:
@@ -27,5 +27,5 @@ glossary:
     term: Cut-out temperature (heat pump)
     def: "The outdoor temperature below which a heat pump's compressor, the pump that moves its heat, switches off, so a backup heater must take over."
 requests:
-  - "Lesson-local, no promotion needed: HomeScene (the home cutaway with six service buttons) and ColdDay (the COP slider, bars and curve)."
+  - "Lesson-local, not needed elsewhere: HomeScene (the home cutaway with six service buttons) and ColdDay (the COP slider, bars and curve)."
   - "When A15, F9, F10 and M12 go live, F3 names them in plain text as upcoming (Go deeper boxes); link them then."

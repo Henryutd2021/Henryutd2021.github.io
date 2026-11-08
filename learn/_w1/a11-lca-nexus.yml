@@ -1,4 +1,4 @@
-# Sidecar for A11 (a11-lca-nexus), builder learn-w5-c, 2026-11-06. Read by scripts/build_learn.py.
+# Sidecar for A11 (a11-lca-nexus). Read by the course build step.
 id: a11-lca-nexus
 lesson: A11
 glossary:

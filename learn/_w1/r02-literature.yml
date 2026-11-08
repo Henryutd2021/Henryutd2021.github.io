@@ -1,4 +1,4 @@
-# Sidecar of research studio R2 (builder g, W2, 2026-11-03): new glossary terms and requests for shared files.
+# Sidecar of research studio R2: new glossary terms and requests for shared files.
 lesson: r02-literature
 glossary:
   - {id: snowballing, term: "Snowballing", def: "Finding papers from one you already have: backward through its references, forward through the works that cite it."}
@@ -8,5 +8,5 @@ glossary:
   - {id: clustering, term: "Clustering", def: "Grouping similar items, such as days with similar demand and weather, so that one representative can stand for each group."}
   - {id: time-series-aggregation, term: "Time-series aggregation", def: "Shrinking a long series, such as a year of hours, to a few representative periods that a model can solve quickly."}
 requests:
-  - "Data: assets/learn/data/r02-literature-openalex.json is written by scripts/build_learn_r02_snapshot.py in the ResearchPortfolio folder (new, untracked there). It queries OpenAlex once (about ten requests) and stores a dated snapshot; the page makes no live API call."
-  - "Snapshot note: r02-literature-openalex.json's meta.note says 'a rerun gives larger numbers'; counts can move either way (the review's reference list shows 193 on 3 November 2026 against the snapshot's 196). Change the note in build_learn_r02_snapshot.py at the next dated refresh; the page no longer repeats it."
+  - "Data: assets/learn/data/r02-literature-openalex.json is written by the studio's snapshot build step. It queries OpenAlex once (about ten requests) and stores a dated snapshot; the page makes no live API call."
+  - "Snapshot note: r02-literature-openalex.json's meta.note says 'a rerun gives larger numbers'; counts can move either way (a reference list of 3 November 2026 shows 193 against the snapshot's 196). The note can change at the next dated refresh of the snapshot; the page does not repeat it."

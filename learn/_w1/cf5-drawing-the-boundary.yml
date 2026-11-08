@@ -1,6 +1,5 @@
-# Sidecar for CF5 (cf5-drawing-the-boundary), builder learn-w5-f, 2026-11-06; review fixes on learn-w5-cf5, 2026-11-06.
-# Read by scripts/build_learn.py. Live since 2026-11-07 (Henry approved E14; path.yml status: active). Depth D2
-# (working knowledge), closed-form toy, as CF6-CF8.
+# Sidecar for CF5 (cf5-drawing-the-boundary). Read by the course build step. Depth D2 (working knowledge),
+# closed-form toy, as CF6-CF8.
 # Glossary: these terms are taught in CF5 (glossary.json names it); each is marked at its first use on the page.
 id: cf5-drawing-the-boundary
 lesson: CF5

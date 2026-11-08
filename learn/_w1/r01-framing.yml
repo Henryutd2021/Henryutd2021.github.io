@@ -1,7 +1,6 @@
-# Sidecar of research studio R1 (r01-framing), builder learn-w2-f, 2026-11-03: new glossary terms and requests for shared files.
-# Provenance of assets/learn/data/r01-framing.json (kept here, out of the public data file since the 2026-11-03 review):
-# written by hand for curriculum v2 §11 (R1); question types and templates from §11.2; rubric from §3.4
-# (assets/learn/components/rubric.js).
+# Sidecar of research studio R1 (r01-framing): new glossary terms and requests for shared files.
+# Provenance of assets/learn/data/r01-framing.json: written by hand for the course's research studios (R1); question
+# types and templates from the course's question types; rubric from the course rubric (assets/learn/components/rubric.js).
 lesson: R1
 glossary:
   - {id: question-type, term: "Question type", def: "The kind of answer a research question asks for: descriptive, explanatory, evaluative, predictive or prescriptive."}
@@ -11,4 +10,4 @@ glossary:
   - {id: time-of-use-tariff, term: "Time-of-use tariff", def: "An electricity price that changes with the hour of the day, usually higher in the evening peak."}
   - {id: substation, term: "Substation", def: "A fenced yard of transformers, breakers and switches where the grid changes voltage and where feeders start."}
 requests:
-  - "Rubric competence picks are per studio (R1: framing). The rubric note on all three studios says a studio is practice, not a certificate (curriculum v2 §3.1)."
+  - "Rubric competence picks are per studio (R1: framing). The rubric note on all three studios says a studio is practice, not a certificate."

@@ -1,4 +1,4 @@
-# Sidecar for M3 (m03-capacity-expansion), builder learn-w2-d, 2026-11-03. Read by scripts/build_learn.py.
+# Sidecar for M3 (m03-capacity-expansion). Read by the course build step.
 id: m03-capacity-expansion
 lesson: M3
 glossary:

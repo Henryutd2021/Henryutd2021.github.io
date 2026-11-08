@@ -1,5 +1,5 @@
-# Sidecar for lesson 11 (T11, 11-solver), builder learn-w1-f, 2026-11-02; review fixes (branch learn-w1-fix-c1) the
-# same day. Glossary terms for lessons 9-11 are in learn/_w1/09-storage.yml; the two below are new with the fixes.
+# Sidecar for lesson 11 (T11, 11-solver). Read by the course build step. Glossary terms for lessons 9-11 are in
+# learn/_w1/09-storage.yml; the two below are lesson 11's own.
 # Numerical note (checked by _tests/learn/test_11-solver.js): in this LP with ramp limits the demand rule's shadow price
 # equals the marginal plant's cost in 18 of 24 hours ($40); three hours are $0 and three $80 where a ramp rule is at its
 # limit. At 07:00 and 09:00 the best cost has a kink and the price is not unique: at 07:00 one more MWh costs $100 and

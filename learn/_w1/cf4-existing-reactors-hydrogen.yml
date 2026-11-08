@@ -1,7 +1,6 @@
-# Sidecar for CF4 (cf4-existing-reactors-hydrogen), wave W6, 2026-11-07; live since Henry approved E15 on 2026-11-07.
-# Read by scripts/build_learn.py. Depth D2 (working knowledge), closed-form toy, as CF5-CF8. Glossary: the six terms CF4
-# teaches, each marked at its first use on the page; ancillary-services is CF5's (its sidecar defines it, with the same
-# wording CF4's draft used), so CF4 only marks it.
+# Sidecar for CF4 (cf4-existing-reactors-hydrogen). Read by the course build step. Depth D2 (working knowledge),
+# closed-form toy, as CF5-CF8. Glossary: the six terms CF4 teaches, each marked at its first use on the page;
+# ancillary-services is CF5's (its sidecar defines it, in the same wording), so CF4 only marks it.
 id: cf4-existing-reactors-hydrogen
 lesson: CF4
 glossary:
@@ -24,4 +23,4 @@ glossary:
     term: Discounted cash flow
     def: "Valuing a project's future yearly cash flows in today's money, each discounted at a chosen rate: their sum is the net present value, while the internal rate of return (the rate that makes that sum zero) and the payback time are found from the same flows."
 requests:
-  - "Curriculum row (scripts/learn_curriculum/data.py, CF4): add depth: D2 and model_mode: closed-form, as CF5-CF8 have (CF4 review #10)."
+  - "Course plan row (CF4): add depth: D2 and model_mode: closed-form, as CF5-CF8 have."

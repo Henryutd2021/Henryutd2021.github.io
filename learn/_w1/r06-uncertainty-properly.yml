@@ -1,4 +1,4 @@
-# Sidecar of research studio R6 (builder learn-w4-f, W4, 2026-11-05): new glossary terms and requests for shared files.
+# Sidecar of research studio R6: new glossary terms and requests for shared files.
 lesson: r06-uncertainty-properly
 glossary:
   - {id: structural-uncertainty, term: "Structural uncertainty", def: "Doubt about how a model is built (its equations, time steps and what it leaves out), which sampling its inputs cannot reveal; compare model forms instead."}

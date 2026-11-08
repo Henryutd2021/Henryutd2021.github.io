@@ -1,5 +1,5 @@
-# Sidecar for A15 (a15-efficiency-electrification), builder learn-w5-a, 2026-11-06. Read by scripts/build_learn.py.
-# No excerpt of Henry's research appears in A15.
+# Sidecar for A15 (a15-efficiency-electrification). Read by the course build step.
+# No excerpt of the course author's research appears in A15.
 id: a15-efficiency-electrification
 lesson: A15
 glossary:
@@ -25,7 +25,7 @@ glossary:
     term: Process heat
     def: "Heat that factories use to make things, such as hot water for washing, steam for cooking and drying, or ovens and furnaces above a few hundred degrees."
 requests:
-  - "A15 runs closed form. At integration, the coordinator may let its electrification steps call engine E3 (SB3's LP); the boundary card already names SB3 through LX.lessonRefHTML."
+  - "A15 runs closed form. Its electrification steps could call engine E3 (SB3's LP); the boundary card already names SB3 through LX.lessonRefHTML."
   - "prairie-city.json: no change needed. A15 reads districts, homes, dwellingTypes, vintages, heatModel, cop (supplyC is also the heat network's supply temperature), days (design day, with dataCenterMW for step 8's note on the loads with their own substations), transport.evProfile, industry (processHeat; food and fertilizer electricityMWh), annual, prices, units and sources. It shows no inventory2025 number."
-  - "Review fixes (2026-11-06): the cost-of-saved-energy curve is now a sequence (each block counts what it saves after the blocks to its left: heat pumps and weatherization, condensing furnaces and weatherization overlap), as A18's 'in order' bars do; no shared measure cost or source changed. The design-day definition follows A18's fix-branch wording (learn-w5-fix-d), so the two sidecars match once both merge."
-  - "Cross-page (brief §2 item 8): the measures A18 also prices use A18's sources and values: heat-pump water heaters (EIA AEO2026 RDM Table 2: $905 against $1,715, UEF 0.92 against 3.73), condensing furnaces (99% $4,320 against 80% $3,690, upkeep and fan electricity), weatherization (ORNL $4,695 in 2008 dollars, 20 years, 115 to 80 kWh per m2) and the heat pump's cost (read from e0.json, $8,620 in 2022 dollars, $150 a year, 15.3 years). A15's own: LED tubes (EIA Appendix C), the resistance furnace it replaces ($1,480, $50 a year), the rebound range and the LBNL 2018 programme figure ($0.049 per kWh, 2016 dollars; A18 cites the 2015 brief's $0.045 for commercial rebates)."
+  - "The cost-of-saved-energy curve is a sequence (each block counts what it saves after the blocks to its left: heat pumps and weatherization, condensing furnaces and weatherization overlap), as A18's 'in order' bars are; no shared measure cost or source differs. The design-day definition uses A18's wording, so the two sidecars match."
+  - "Cross-page: the measures A18 also prices use A18's sources and values: heat-pump water heaters (EIA AEO2026 RDM Table 2: $905 against $1,715, UEF 0.92 against 3.73), condensing furnaces (99% $4,320 against 80% $3,690, upkeep and fan electricity), weatherization (ORNL $4,695 in 2008 dollars, 20 years, 115 to 80 kWh per m2) and the heat pump's cost (read from e0.json, $8,620 in 2022 dollars, $150 a year, 15.3 years). A15's own: LED tubes (EIA Appendix C), the resistance furnace it replaces ($1,480, $50 a year), the rebound range and the LBNL 2018 programme figure ($0.049 per kWh, 2016 dollars; A18 cites the 2015 brief's $0.045 for commercial rebates)."

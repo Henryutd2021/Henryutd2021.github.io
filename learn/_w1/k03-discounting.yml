@@ -1,4 +1,4 @@
-# Sidecar for toolbox K3 (k03-discounting), builder learn-w2-e (K3 fork), 2026-11-03. Read by scripts/build_learn.py.
+# Sidecar for toolbox K3 (k03-discounting). Read by the course build step.
 id: k03-discounting
 lesson: K3
 glossary:

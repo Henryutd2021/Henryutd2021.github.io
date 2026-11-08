@@ -1,4 +1,4 @@
-# Sidecar for F4 (f04-power-plants), builder learn-w3-a (fork f04), 2026-11-03. Read by scripts/build_learn.py.
+# Sidecar for F4 (f04-power-plants). Read by the course build step.
 id: f04-power-plants
 lesson: F4
 glossary:
@@ -52,5 +52,5 @@ glossary:
     def: "The equipment housing on top of a wind turbine's tower, holding the gearbox and generator that the rotor turns."
 requests:
   - "Promote, if wanted: PlantExplorer (assets/learn/f04-power-plants.js: a rail of plants, a cutaway each from tokens only, energy in, what spins, the energy chain and a text version). Its six cutaway drawings (SCENE: gas, steam, hydro, geothermal, wind, PV) could serve T6, A15, F10 and X1."
-  - "Sources: the renewable shares (geothermal 16%, hydro 90%, wind 26% at rated speed) are EIA's notional equipment efficiencies from the Annual Energy Review 2010, Appendix F, Table F1 (p. 358), the only EIA table that gives all three; EIA says they are notional, not measured operating efficiencies, and the page says so. A newer primary source for hydro and geothermal efficiencies would be welcome (usgs.gov and ferc.gov pages blocked the fetch tool on 3 November 2026)."
-  - "The SPP solar shape on 12 September 2025 holds near full output through the last daylight hour and then drops to zero (881 thousandths of its 2025 maximum in the hour from 19:00 local, then zero): a likely telemetry error that scripts/build_learn_town_data.py does not flag (its frozen-value rule needs three identical values). F4 does not use that day; the data builder may want a rule for solar that stays high into the last daylight hour."
+  - "Sources: the renewable shares (geothermal 16%, hydro 90%, wind 26% at rated speed) are EIA's notional equipment efficiencies from the Annual Energy Review 2010, Appendix F, Table F1 (p. 358), the only EIA table that gives all three; EIA says they are notional, not measured operating efficiencies, and the page says so. A newer primary source for hydro and geothermal efficiencies would be welcome (the usgs.gov and ferc.gov pages could not be fetched on 3 November 2026)."
+  - "The SPP solar shape on 12 September 2025 holds near full output through the last daylight hour and then drops to zero (881 thousandths of its 2025 maximum in the hour from 19:00 local, then zero): a likely telemetry error that the town data build step does not flag (its frozen-value rule needs three identical values). F4 does not use that day; that build step could add a rule for solar that stays high into the last daylight hour."

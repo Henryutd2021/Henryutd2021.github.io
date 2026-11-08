@@ -1,4 +1,4 @@
-# Sidecar for toolbox K1 (k01-units), builder learn-w2-e (fork k1), 2026-11-03. Read by scripts/build_learn.py.
+# Sidecar for toolbox K1 (k01-units). Read by the course build step.
 id: k01-units
 lesson: K1
 glossary:

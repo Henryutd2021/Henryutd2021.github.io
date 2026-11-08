@@ -1,4 +1,4 @@
-# Sidecar of research studio R8 (builder learn-w4-f, W4, 2026-11-05): new glossary terms and requests for shared files.
+# Sidecar of research studio R8: new glossary terms and requests for shared files.
 lesson: r08-communicating
 glossary:
   - {id: boundary-condition, term: "Boundary condition (of a finding)", def: "The place, time, data and assumptions a result holds under, stated next to it so readers do not stretch it further."}
@@ -6,4 +6,4 @@ glossary:
   - {id: spp, term: "SPP (Southwest Power Pool)", def: "The regional grid operator that runs the transmission grid and wholesale electricity market across much of the central U.S.; the course's hourly data come from its area (EIA-930)."}
 requests:
   - "R8 reports R6's fictional study; its data file carries R6's numbers (fromR6), and _tests/learn/test_r08-communicating.js recomputes each with R6's model. A change to R6's model or data needs R8's --write run too."
-  - "Possible promotion (third user after R1 and R6): the form-only writing checks (a list of check chips under a text area, aria-live) appear in R6's rewrite, R8's findings, briefing and public steps; a shared LX.WriteChecks could carry the chips and the 'compare with examples' toggle."
+  - "Candidate shared component (a third user after R1 and R6): the form-only writing checks (a list of check chips under a text area, aria-live) appear in R6's rewrite, R8's findings, briefing and public steps; a shared LX.WriteChecks could carry the chips and the 'compare with examples' toggle."

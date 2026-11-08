@@ -10,7 +10,7 @@ css: ../assets/learn/learn.css
 body-classes: "page-learn page-lesson lx-form-capstone"
 ---
 
-<!-- Capstone (path.yml form: capstone, `sandbox: SB<n>`; curriculum v2 §7.9, §16.3 and §3.4). Guide:
+<!-- Capstone (path.yml form: capstone, `sandbox: SB<n>`). Guide:
      assets/learn/README.md, "Sandboxes and capstones". Replace <slug> with the capstone's JS name and <id> with its
      path.yml id.
      Order: the brief (the decision, who it is for, the deliverable and when it is done, the time) -> the plan (the
@@ -26,21 +26,23 @@ body-classes: "page-learn page-lesson lx-form-capstone"
      schema, presets, engine.solve (through LX.BenchRun), summarize and note (see _template-sandbox.qmd). Do not fork
      the engine: a capstone narrows the controls (which site, which choices) and adds its brief, its note fields and its
      rubric. The engine's failure states, tie rule and wording rules apply here unchanged.
-     The deliverable (curriculum §7.9): the plan link, the one-page note with a sensitivity chart (the note carries the
+     The deliverable: the plan link, the one-page note with a sensitivity chart (the note carries the
      sensitivity line and table; the chart stays on the page), and for the Modeler version the notebook (a Go deeper box
      in #note with the allow-listed repository's Colab link). Nothing is saved or sent anywhere: the reader copies the
      note and the link, and the page says so (ReportNote's privacy line).
-     Rubric (§3.4): pick the competences (C0 and C1: accounting, uncertainty, realism, communication) and add a "look
-     for" line each; never reword the levels, except where the course's words describe another deliverable: then give
+     Rubric (the course rubric): pick the competences (C0 and C1: accounting, uncertainty, realism, communication) and
+     add a "look for" line each; never reword the levels, except where the course's words describe another
+     deliverable: then give
      that competence its own `levels` and the rubric a `bar` label (C0 and C1: Communication's Proficient is the one-page
      note; README, Rubric self-check). The exemplars are illustrative and say so; they use the engine's real
      numbers for the default plan, checked by the test.
      Time: path.yml `minutes` is the whole capstone (60 for C0, 90 for C1); `lab_minutes` the Modeler notebook. Count the
      runs and the writing honestly.
-     Scope (§20): the sites are fictional; data centers appear only as loads; Henry's research only through approved
-     excerpts (held in learn/_drafts/ until approved, like a case file), allow-listed repositories and citations.
-     After editing path.yml, run in the ResearchPortfolio folder:
-     python3 scripts/build_learn.py --site <site>   (fills the three marker blocks below; never edit them by hand) -->
+     Scope (the course's scope rules): the sites are fictional; data centers appear only as loads; the course author's
+     research only through approved excerpts (in learn/_drafts/ until the wording is approved, like a case file),
+     allow-listed repositories and citations.
+     After editing path.yml, run the course build step (it fills the three marker blocks below; never edit them by
+     hand). -->
 
 <!-- learn:meta:start -->
 <!-- learn:meta:end -->

@@ -1,5 +1,5 @@
-# Sidecar for CF7 (cf7-cost-of-waiting), builder learn-w2-i, 2026-11-03; fixes learn-w2-fix-i. Read by
-# scripts/build_learn.py. Henry approved the page's excerpt on 2026-11-03 (reports/learn/excerpts_for_approval.md, E7).
+# Sidecar for CF7 (cf7-cost-of-waiting). Read by the course build step. The page's excerpt is approved
+# wording (E7).
 id: cf7-cost-of-waiting
 lesson: CF7
 glossary:

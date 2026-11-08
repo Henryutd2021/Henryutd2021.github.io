@@ -1,4 +1,4 @@
-# Sidecar for A19 (a19-gis-siting), builder learn-w5-e, 2026-11-06. Read by scripts/build_learn.py.
+# Sidecar for A19 (a19-gis-siting). Read by the course build step.
 id: a19-gis-siting
 lesson: A19
 glossary:

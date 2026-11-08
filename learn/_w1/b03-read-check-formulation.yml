@@ -1,4 +1,4 @@
-# Sidecar for bridge B3 (b03-read-check-formulation), builder learn-w1-h, 2026-11-02. Read by scripts/build_learn.py.
+# Sidecar for bridge B3 (b03-read-check-formulation). Read by the course build step.
 id: b03-read-check-formulation
 lesson: B3
 glossary:

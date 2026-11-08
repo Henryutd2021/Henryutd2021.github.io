@@ -1,5 +1,5 @@
-# Sidecar for F9 (f09-city-energy), builder learn-w5-a, 2026-11-06. Read by scripts/build_learn.py.
-# No excerpt of Henry's research appears in F9. The data-center campus appears only as a load (guard G-DC).
+# Sidecar for F9 (f09-city-energy). Read by the course build step.
+# No excerpt of the course author's research appears in F9. The data-center campus appears only as a load.
 id: f09-city-energy
 lesson: F9
 glossary:

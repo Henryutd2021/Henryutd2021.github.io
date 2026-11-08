@@ -1,5 +1,4 @@
-# Sidecar for lesson 13 (T13, 13-capstone), builder learn-w1-g, 2026-11-02; updated by fix group D, 2026-11-02.
-# Read by scripts/build_learn.py.
+# Sidecar for lesson 13 (T13, 13-capstone). Read by the course build step.
 id: 13-capstone
 lesson: 13
 glossary:
@@ -10,4 +9,4 @@ glossary:
     term: Capacity expansion model
     def: "An optimization model that decides what to build, as well as how to run it, at least cost."
 requests:
-  - "Time: path.yml now gives the curriculum's 15 guided minutes (it said 20); the page states the 20 practice minutes in a hint under the game. The generated header could show both if path.yml took a practice_minutes field (build_learn.py, header and JSON-LD)."
+  - "Time: path.yml gives the course plan's 15 guided minutes; the page states the 20 practice minutes in a hint under the game. The generated header could show both if this row took a practice_minutes field (the course build step's header and JSON-LD)."

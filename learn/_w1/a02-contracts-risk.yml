@@ -1,4 +1,4 @@
-# Sidecar for Analyst lesson A2 (a02-contracts-risk), builder learn-w3-c, 2026-11-03. Read by scripts/build_learn.py.
+# Sidecar for Analyst lesson A2 (a02-contracts-risk). Read by the course build step.
 id: a02-contracts-risk
 lesson: A2
 glossary:
@@ -26,4 +26,4 @@ glossary:
 requests:
   - "Candidate shared component (i-montecarlo): the seeded histogram pair of A2 (Hist and pair in assets/learn/a02-contracts-risk.js: 200 runs in bins on LX.Plot, the P10 to P90 band, the median line, a comparison band and a seed row with New seed). A5, M5 and M7 could reuse it."
   - "Candidate shared component (e-ledger): A2's two explain tables use LX.CompareTable in text mode; an e-ledger component (rows of parties or contracts, P10 to P90 cells) could serve A4, A6, A7, A13 and A14."
-  - "Guard G-FIN: A2's contracts cover solar and a battery only; no other technology, no company names."
+  - "Contract examples: A2's contracts cover solar and a battery only; no other technology, no company names."

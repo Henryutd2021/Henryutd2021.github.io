@@ -1,5 +1,5 @@
-# Sidecar for X2 (x02-fossil-transition), builder learn-w6-x, 2026-11-07. Read by scripts/build_learn.py.
-# No excerpt of Henry's research appears in X2.
+# Sidecar for X2 (x02-fossil-transition). Read by the course build step.
+# No excerpt of the course author's research appears in X2.
 id: x02-fossil-transition
 lesson: X2
 glossary:
@@ -23,4 +23,4 @@ glossary:
     def: "When long-lived plants, pipes and habits keep a fuel in use for decades after they are built, because leaving them early is costly."
 requests:
   - "X2 reads Ridge County from a13-fairness-jobs.json (ridgeCounty: the plant, its staff, the mine jobs, coal's share of the county's taxes, the fiction line); no change requested. prairieland.json's ridgeCounty.a13 copies the same block."
-  - "X2's explain layer names A13, F11, A21, A20 and X3 through LX.lessonRefHTML (all live since the W6+W7 integration, which also added F10 to X2's after list and moved the shelf's xs- stop-box rules into components/explain.css); no change requested."
+  - "X2's explain layer names A13, F11, A21, A20 and X3 through LX.lessonRefHTML (all live; F10 is in X2's after list, and the shelf's xs- stop-box rules are in components/explain.css); no change requested."

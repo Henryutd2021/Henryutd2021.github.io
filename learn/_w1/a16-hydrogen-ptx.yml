@@ -1,4 +1,4 @@
-# Sidecar for A16 (a16-hydrogen-ptx), builder learn-w3-e, 2026-11-03. Read by scripts/build_learn.py.
+# Sidecar for A16 (a16-hydrogen-ptx). Read by the course build step.
 id: a16-hydrogen-ptx
 lesson: A16
 glossary:
@@ -39,6 +39,6 @@ glossary:
     term: Deliverability
     def: "Whether power from a plant can actually reach the buyer over the grid, usually judged by both being in the same region."
 requests:
-  - "excerpt:txh2: Henry approved E10.1–E10.4 on 2026-11-03; A16 quotes E10.2–E10.3 with E10.4 as the note (E10.1 left out for room), and its test checks them against the register."
-  - "Review date: A16 carries 'review: yearly (hydrogen rules)' in learn_map_v2.yml; the Go deeper box on matching rules cites DOE's 45VH2-GREET guidelines (Rev. December 2025)."
+  - "excerpt:txh2: E10.1–E10.4 are approved; A16 quotes E10.2–E10.3 with E10.4 as the note (E10.1 left out for room), and its test checks them against the approved wording."
+  - "Review date: A16 is reviewed yearly (hydrogen rules); the Go deeper box on matching rules cites DOE's 45VH2-GREET guidelines (Rev. December 2025)."
   - "Explainer: A16 embeds the allow-listed wind-hydrogen explainer exactly as CF2 does (E3.14 as its no-JS steps)."

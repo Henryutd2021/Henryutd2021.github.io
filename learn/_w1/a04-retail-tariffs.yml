@@ -1,6 +1,6 @@
-# Sidecar for A4 (a04-retail-tariffs), builder learn-w3-d, 2026-11-03. Read by scripts/build_learn.py.
-# The real-world box quotes E7.6 (excerpt:code), approved by Henry on 2026-11-03 (reports/learn/excerpts_for_approval.md).
-# W3 fix (learn-w3-fix-d, 2026-11-03): customer-class added (the review asked for "class" to be defined at first use).
+# Sidecar for A4 (a04-retail-tariffs). Read by the course build step.
+# The real-world box quotes E7.6 (excerpt:code) in its approved wording.
+# customer-class is defined here so that "class" is defined at its first use.
 id: a04-retail-tariffs
 lesson: A4
 glossary:
@@ -32,4 +32,4 @@ glossary:
     term: Customer class
     def: "A group of customers, such as homes or businesses, that a utility bills under the same tariffs."
 requests:
-  - "Ledger table: a04-retail-tariffs.js builds the e-ledger as a table.cf-two (rows: parties, columns: options, cells: signed $ with 'above'/'below' words, no colour tones); A7 builds the same for owners and neighbours. Candidate for promotion as LX.Ledger (i-ledger/e-ledger, curriculum §16.1), with a staticHTML for the no-JS block."
+  - "Ledger table: a04-retail-tariffs.js builds the e-ledger as a table.cf-two (rows: parties, columns: options, cells: signed $ with 'above'/'below' words, no colour tones); A7 builds the same for owners and neighbours. A shared LX.Ledger (i-ledger/e-ledger) serves both, with a staticHTML for the no-JS block."

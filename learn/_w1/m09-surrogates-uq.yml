@@ -1,4 +1,4 @@
-# Sidecar for M9 (m09-surrogates-uq), builder learn-w4-e, 2026-11-05. Read by scripts/build_learn.py.
+# Sidecar for M9 (m09-surrogates-uq). Read by the course build step.
 id: m09-surrogates-uq
 lesson: M9
 glossary:

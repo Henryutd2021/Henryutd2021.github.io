@@ -1,5 +1,5 @@
-# Sidecar for CF6 (cf6-shifting-load-to-clean-hours), builder learn-w2-i, 2026-11-03; fixes learn-w2-fix-i. Read by
-# scripts/build_learn.py. Henry approved the page's excerpt on 2026-11-03 (reports/learn/excerpts_for_approval.md, E6).
+# Sidecar for CF6 (cf6-shifting-load-to-clean-hours). Read by the course build step. The page's excerpt is approved
+# wording (E6).
 id: cf6-shifting-load-to-clean-hours
 lesson: CF6
 glossary:

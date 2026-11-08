@@ -1,4 +1,4 @@
-# Sidecar for A12 (a12-policy-instruments), builder learn-w4-c, 2026-11-05. Read by scripts/build_learn.py.
+# Sidecar for A12 (a12-policy-instruments). Read by the course build step.
 id: a12-policy-instruments
 lesson: A12
 glossary:

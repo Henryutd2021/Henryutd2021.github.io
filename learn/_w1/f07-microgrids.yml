@@ -1,4 +1,4 @@
-# Sidecar for F7 (f07-microgrids), builder learn-w3-b, 2026-11-03. Read by scripts/build_learn.py.
+# Sidecar for F7 (f07-microgrids). Read by the course build step.
 id: f07-microgrids
 lesson: F7
 glossary:
@@ -22,6 +22,6 @@ glossary:
     def: "A model that compares equipment sizes and ways of running them by both their performance and their cost, and picks the best for a stated goal."
 requests:
   - "glossary: F1's sidecar defines microgrid and islanding with lesson F1; F7 is the lesson that teaches them. Please consider pointing their 'Taught in' link to F7."
-  - "Component for promotion: CampusLine (assets/learn/f07-microgrids.js), a one-line diagram of a microgrid (feeder, switch, controller, sources, loads) whose parts are buttons, with a phone layout, a numbered annotated mode and a text version. M5, SB1 and C1 could reuse it."
-  - "Excerpts: the Real-world box quotes E8.2 (with the E8.7 note under it) and E9.1-E9.3 word for word, as approved on 2026-11-03; the test checks them against the register. E9 has no citation and no link. The register's row for E9.1 places it at 'the islanding step'; it sits in the Real-world box at the end, as the other W1-W3 lessons place theirs."
-  - "Screenshots: learn_screenshots.mjs cannot show an open glossary popover (captureBeyondViewport resizes the window, and glossary.js closes the popover on resize). A viewport-only helper used for F7, A14 and CF1 is in the builder's scratchpad: w3b_tools/popshot.mjs."
+  - "Candidate shared component: CampusLine (assets/learn/f07-microgrids.js), a one-line diagram of a microgrid (feeder, switch, controller, sources, loads) whose parts are buttons, with a phone layout, a numbered annotated mode and a text version. M5, SB1 and C1 could reuse it."
+  - "Excerpts: the Real-world box quotes E8.2 (with the E8.7 note under it) and E9.1-E9.3 word for word, in their approved wording; the test checks them against it. E9 has no citation and no link. The approved row for E9.1 places it at 'the islanding step'; it sits in the Real-world box at the end, as other lessons place theirs."
+  - "Screenshots: the screenshot check cannot show an open glossary popover (captureBeyondViewport resizes the window, and glossary.js closes the popover on resize); F7, A14 and CF1 need a viewport-only capture for it."

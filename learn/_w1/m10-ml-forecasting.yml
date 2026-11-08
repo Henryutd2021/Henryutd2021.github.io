@@ -1,4 +1,4 @@
-# Sidecar for M10 (m10-ml-forecasting), builder learn-w4-e, 2026-11-05. Read by scripts/build_learn.py.
+# Sidecar for M10 (m10-ml-forecasting). Read by the course build step.
 id: m10-ml-forecasting
 lesson: M10
 glossary:
@@ -21,4 +21,4 @@ glossary:
     term: Coverage
     def: "The share of actual outcomes that land inside a forecast's band; on its own it rewards wide bands."
 requests:
-  - "M10's page title follows the coordinator's 2026-11-05 decision: 'Forecasting load, wind and solar with machine learning, and judging it honestly' (no real hourly price series in the course); learn_map_v2.yml and curriculum_v2.md still name prices. One card in the explain layer says why prices are harder and links M1 and A3 through LX.lessonRefHTML (A3 links itself once live)."
+  - "M10's page title is 'Forecasting load, wind and solar with machine learning, and judging it honestly' (the course has no real hourly price series); the course plan still names prices. One card in the explain layer says why prices are harder and links M1 and A3 through LX.lessonRefHTML (A3 links itself once live)."

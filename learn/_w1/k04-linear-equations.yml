@@ -1,4 +1,4 @@
-# Sidecar for toolbox K4 (k04-linear-equations), builder learn-w1-h, 2026-11-02. Read by scripts/build_learn.py.
+# Sidecar for toolbox K4 (k04-linear-equations). Read by the course build step.
 id: k04-linear-equations
 lesson: K4
 glossary:

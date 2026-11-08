@@ -1,4 +1,4 @@
-# Sidecar of research studio R9 (builder g, W2, 2026-11-03): new glossary terms and requests for shared files.
+# Sidecar of research studio R9: new glossary terms and requests for shared files.
 lesson: r09-integrity-stakeholders
 glossary:
   - {id: informed-consent, term: "Informed consent", def: "A person's agreement to take part in research, given freely after being told what will happen, the risks and how their data will be used."}

@@ -1,6 +1,6 @@
 ---
-# TEMPLATE (not rendered: the leading underscore). Copy to learn/_drafts/<id>.qmd (held until Henry approves every excerpt
-# sentence), later `git mv` to learn/<id>.qmd; title and subtitle must equal learn/path.yml.
+# TEMPLATE (not rendered: the leading underscore). Copy to learn/_drafts/<id>.qmd (kept there until every excerpt
+# sentence is approved), later `git mv` to learn/<id>.qmd; title and subtitle must equal learn/path.yml.
 title: "A case-file question a learner would type into a search box?"
 subtitle: "What the reader finds out in this case file"
 description: "Case file CF<n> of Energy Systems, Step by Step: the puzzle and what the reader finds out, in one sentence (for search and sharing). Any wording about the study is approved excerpt wording, word for word."
@@ -11,25 +11,25 @@ css: ../assets/learn/learn.css
 body-classes: "page-learn page-lesson lx-form-case"
 ---
 
-<!-- Case file (path.yml form: case; curriculum v2 §13 and §16.3), about 10 minutes. Guide: assets/learn/README.md,
-     "Studios and case files". Replace <slug> with the case file's JS name.
-     Henry's research enters ONLY through approved sources (§13, guard G-SRC): approved excerpts, allow-listed repositories
-     (github.com/Henryutd2021/<repo>), allow-listed explainers and citations (doi.org). Never a project page or the
-     Research page. Mark every excerpt with its source key, <blockquote class="lx-excerpt" data-source="excerpt:<key>">, and
-     list each sentence with its source in reports/learn/excerpts_for_approval.md; the scope scan fails on a key that is not
-     approved. No list of open questions.
+<!-- Case file (path.yml form: case), about 10 minutes. Guide: assets/learn/README.md, "Studios and case files".
+     Replace <slug> with the case file's JS name.
+     The course author's research enters ONLY through approved sources (the course's sourcing rule): approved excerpts,
+     allow-listed repositories (github.com/Henryutd2021/<repo>), allow-listed explainers and citations (doi.org). Never a
+     project page or the Research page. Mark every excerpt with its source key,
+     <blockquote class="lx-excerpt" data-source="excerpt:<key>">, and list each sentence with its source in the approved
+     excerpt wording; the scope scan fails on a key that is not approved. No list of open questions.
      Wording: every sentence about the study, the front matter's description included, is approved excerpt wording, word
      for word; anything else describes the course's own content (the puzzle, the toy), never the study. "Allow-listed" is
      the course's internal term: on the page a repository is "open code".
      Drafting: keep this page in learn/_drafts/ (Quarto does not render it; the build fills its blocks and checks it; the
-     scope scan reads its source) and its path.yml status `upcoming` until Henry approves. Write links for the page's live
-     place (learn/<id>.html): ../assets/..., index.html, 03-balancing.html.
+     scope scan reads its source) and its path.yml status `upcoming` until its excerpt wording is approved. Write links
+     for the page's live place (learn/<id>.html): ../assets/..., index.html, 03-balancing.html.
      Order: the case (static: the puzzle, the question in one sentence, scale and boundary, decisions, goal and rules in
      words, data and method, what came out with its boundary conditions; then LX.Timeline for the dated steps, from the
      data file, its no-JS list written by the test) -> explain (where the
      result holds: LX.Boundary; an allow-listed explainer, if any) -> check (one or two questions; try it yourself with
-     the repository) -> sources. After editing path.yml, run in the ResearchPortfolio folder:
-     python3 scripts/build_learn.py --site <site>   (fills the three marker blocks below; never edit them by hand) -->
+     the repository) -> sources. After editing path.yml, run the course build step (it fills the three marker blocks
+     below; never edit them by hand). -->
 
 <!-- learn:meta:start -->
 <!-- learn:meta:end -->
@@ -38,7 +38,7 @@ body-classes: "page-learn page-lesson lx-form-case"
 ```{=html}
 <div class="lx-case">
 <div class="lx-case-part"><p class="lx-eyebrow">1 · The puzzle</p><p>One or two sentences: what looked odd, or what someone needed to decide.</p></div>
-<div class="lx-case-part"><p class="lx-eyebrow">2 · The question in one sentence</p><p class="lx-case-q">The study's question, typed (§11.2), from the approved excerpt.</p></div>
+<div class="lx-case-part"><p class="lx-eyebrow">2 · The question in one sentence</p><p class="lx-case-q">The study's question, typed (one of the course's question types), from the approved excerpt.</p></div>
 <div class="lx-case-part"><p class="lx-eyebrow">3 · Scale and boundary</p><ul><li><b>Inside:</b> one line.</li><li><b>Left out:</b> one line.</li></ul></div>
 <div class="lx-case-part"><p class="lx-eyebrow">4 · Decisions, goal and rules, in words</p><ul><li><b>Decisions:</b> one line.</li><li><b>Goal:</b> one line.</li><li><b>Rules:</b> one line.</li></ul></div>
 <div class="lx-case-part wide"><p class="lx-eyebrow">5 · Data and method</p><p>One or two sentences, with the data's source and date.</p></div>

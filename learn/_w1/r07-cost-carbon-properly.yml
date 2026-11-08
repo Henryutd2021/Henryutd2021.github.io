@@ -1,8 +1,8 @@
-# Sidecar for R7 (r07-cost-carbon-properly), builder learn-w5-c, 2026-11-06. Read by scripts/build_learn.py.
+# Sidecar for R7 (r07-cost-carbon-properly). Read by the course build step.
 id: r07-cost-carbon-properly
 lesson: R7
 glossary: []
 requests:
-  - "R7's prerequisite M11 is built in parallel (learn-w5-f): add M11 to R7's after list at the merge (curriculum row: prereqs A1, A11, M11). R7's step 6 names M11 with LX.lessonRefHTML, so its link appears by itself once M11 is live."
-  - "R7 places approved excerpt E6.4 and E6.6 (excerpt:ghg) in its Real-world box, word for word, with A10's footer and CF6 line: a new placement of approved sentences for the register's list."
+  - "R7's after list is the course plan's prerequisites (A1, A11, M11). R7's step 6 names M11 with LX.lessonRefHTML, so its link follows M11's status."
+  - "R7 places approved excerpt E6.4 and E6.6 (excerpt:ghg) in its Real-world box, word for word, with A10's footer and CF6 line: a new placement of approved sentences."
   - "Its fictional study (Port Alder, Harbourline Consulting, the state's clean-bus credit) is the course's own invention, not any real report or the course author's work."

@@ -1,5 +1,5 @@
-# Sidecar for X5 (x05-project-finance), builder learn-w7-a, 2026-11-07. Read by scripts/build_learn.py.
-# No excerpt of Henry's research appears in X5. Guard G-FIN: contract and offtake examples are wind and storage only.
+# Sidecar for X5 (x05-project-finance). Read by the course build step.
+# No excerpt of the course author's research appears in X5. Contract and offtake examples are wind and storage only.
 id: x05-project-finance
 lesson: X5
 glossary:
@@ -20,4 +20,4 @@ glossary:
     def: "The developer's or owner's own money in a project: paid last, so it carries the most risk and keeps what is left."
 requests:
   - "X5 reads 07-cost.json (wind), 13-capstone.json (battery), a02-contracts-risk.json (A2's battery and margin), a01-project-tea.json (price) and town.json (wind farm size); no change requested."
-  - "The 'where we stop' box (xs-* styles, written by _tests/learn/shelf_stop.js) is the same on X1, X4, X5 and X6: promote its styles to forms.css and the writer to a component (and offer it to X2 and X3, built on learn-w6-x)."
+  - "The 'where we stop' box (xs-* styles, written by _tests/learn/shelf_stop.js) is the same on every side-topic page; its styles are shared in components/explain.css."

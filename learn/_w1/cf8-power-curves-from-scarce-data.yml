@@ -1,4 +1,4 @@
-# Sidecar for CF8 (cf8-power-curves-from-scarce-data), builder learn-w4-e, 2026-11-05. Read by scripts/build_learn.py.
+# Sidecar for CF8 (cf8-power-curves-from-scarce-data). Read by the course build step.
 id: cf8-power-curves-from-scarce-data
 lesson: CF8
 glossary:
@@ -12,4 +12,4 @@ glossary:
     term: Variogram
     def: "A measure of how much values at two places differ, on average, as a function of the distance between them; here, across a wind plant's turbines."
 requests:
-  - "Shared fix (assets/explainers/uq-mfgpr.js, a site explainer): its SVG title gives only the average band widths. A text version that follows the slider (by wind-speed region: measured points, both estimates and their bands) would serve the project page too; CF8 carries a static text version at 5, 10 and 25 points meanwhile (review CF8 #7)."
+  - "Shared fix (assets/explainers/uq-mfgpr.js, a site explainer): its SVG title gives only the average band widths. A text version that follows the slider (by wind-speed region: measured points, both estimates and their bands) would serve the project page too; CF8 carries a static text version at 5, 10 and 25 points meanwhile."

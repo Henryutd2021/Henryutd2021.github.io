@@ -1,6 +1,6 @@
-# Sidecar for CK-F (ck-f-estimate), builder learn-w1-i, 2026-11-02. Read by scripts/build_learn.py.
+# Sidecar for CK-F (ck-f-estimate). Read by the course build step.
 id: ck-f-estimate
 lesson: CK-F
 requests:
-  - "W1 validation: CK-F's 'Copy my results' gives a plain-text summary (level by the published rule; per task: first answer right or not, tries, time to first answer, active time on task, solution opened before answering; the estimate, self-ratings and the tester's own words; screen width). The coordinator needs a form (or a shared document) for testers to paste it into, and should tell testers that the summary includes what they typed."
-  - "The task message called the page ck-f; learn/path.yml and learn_map_v2.yml use the id ck-f-estimate, so the page is learn/ck-f-estimate.qmd."
+  - "Validation: CK-F's 'Copy my results' gives a plain-text summary (level by the published rule; per task: first answer right or not, tries, time to first answer, active time on task, solution opened before answering; the estimate, self-ratings and the tester's own words; screen width). Testers need a form (or a shared document) to paste it into, and should be told that the summary includes what they typed."
+  - "The page's id is ck-f-estimate (as in learn/path.yml), so the page is learn/ck-f-estimate.qmd."

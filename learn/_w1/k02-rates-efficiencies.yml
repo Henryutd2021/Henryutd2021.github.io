@@ -1,4 +1,4 @@
-# Sidecar for toolbox K2 (k02-rates-efficiencies), builder learn-w2-e (fork K2), 2026-11-03. Read by scripts/build_learn.py.
+# Sidecar for toolbox K2 (k02-rates-efficiencies). Read by the course build step.
 id: k02-rates-efficiencies
 lesson: K2
 glossary:

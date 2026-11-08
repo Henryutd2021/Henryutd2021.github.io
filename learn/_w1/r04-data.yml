@@ -1,4 +1,4 @@
-# Sidecar of research studio R4 (builder g, W2, 2026-11-03): new glossary terms and requests for shared files.
+# Sidecar of research studio R4: new glossary terms and requests for shared files.
 lesson: r04-data
 glossary:
   - {id: data-licence, term: "Data licence", def: "The terms under which a dataset may be used and shared, such as public domain, CC BY or a signed data agreement."}
@@ -11,4 +11,4 @@ glossary:
   - {id: buffer, term: "Buffer (GIS)", def: "The zone within a set distance of a map feature, such as everything within 1 km of a wind turbine."}
 requests:
   - "R4 reuses B2's raw file (assets/learn/data/b02-python-data.json) and town_days.json (the data build's counts); it adds no data file but its own text (r04-data.json). The Node test checks that its counts at a 3-hour run equal the build's (699, 671, 1,377) and that its local clock equals B2's model and the ICU database for all 8,760 hours."
-  - "Notebook (W2 fix g, 2026-11-03): learn/notebooks/r04-data.ipynb is R4's starter notebook (the four decisions as parameters, the four numbers, the sensitivity table, the night check, the data-note writer, a QGIS practice for Ford County, Kansas). Its builder is in the fix agent's scratch folder (build_learn_r04_notebook.py); it ran clean with learn_nbtools.py run, and its asserts carry the page's numbers."
+  - "Notebook: learn/notebooks/r04-data.ipynb is R4's starter notebook (the four decisions as parameters, the four numbers, the sensitivity table, the night check, the data-note writer, a QGIS practice for Ford County, Kansas). It is written by the studio's notebook build step and runs clean end to end; its asserts carry the page's numbers."

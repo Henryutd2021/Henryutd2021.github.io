@@ -1,9 +1,9 @@
-# Sidecar for CK-R (ck-r-defend-revise), builder learn-w7-b, 2026-11-07. Read by scripts/build_learn.py.
+# Sidecar for CK-R (ck-r-defend-revise). Read by the course build step.
 id: ck-r-defend-revise
 lesson: CK-R
 requests:
   - "CK-R uses the shared runner unchanged: gateAll, the late-answer rule (late: practice), openFirst not-right, and its own level, describe and summary. The worked review, response and revision are LX.Exemplars inside the gated solution; a key other than weak or good ('prof') draws the neutral card, with its own lead word."
-  - "The fictional co-op study (Prairie Valley Co-op, 112 irrigation pumps, a night-pumping tariff) is new in W7 and lives only in ck-r-defend-revise.json; its numbers are illustrative, not simulated."
+  - "The fictional co-op study (Prairie Valley Co-op, 112 irrigation pumps, a night-pumping tariff) lives only in ck-r-defend-revise.json; its numbers are illustrative, not simulated."
 glossary:
   - term: Software environment
     id: software-environment

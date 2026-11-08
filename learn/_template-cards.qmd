@@ -12,8 +12,8 @@ body-classes: "page-learn page-lesson lx-form-cards"
 
 <!-- Step-card lesson (the default form). Guide: assets/learn/README.md. Replace <slug> with the lesson's JS name.
      Order: step cards (the interactive) -> explain layer (diagrams) -> check -> sources. Text budget: one or two
-     sentences per element; depth goes in Go deeper boxes. After editing path.yml, run in the ResearchPortfolio folder:
-     python3 scripts/build_learn.py --site <site>   (fills the three marker blocks below; never edit them by hand) -->
+     sentences per element; depth goes in Go deeper boxes. After editing path.yml, run the course build step (it fills
+     the three marker blocks below; never edit them by hand). -->
 
 <!-- learn:meta:start -->
 <!-- learn:meta:end -->

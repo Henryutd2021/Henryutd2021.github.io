@@ -1,4 +1,4 @@
-# Lesson 8 (08-merit-order) sidecar, W1 builder d (2026-11-02): new glossary terms and requests for shared files.
+# Lesson 8 (08-merit-order) sidecar: new glossary terms and requests for shared files.
 lesson: 8
 glossary:
   - id: supply-stack
@@ -20,4 +20,4 @@ glossary:
     term: Congestion
     def: "A power line carrying all it is allowed to, so cheaper power cannot reach where it is needed and prices can differ by location."
 requests:
-  - "Lesson 8 uses LX.solver (on request only, in the Modeler box of the explain section since the W1 fixes; the core steps stay closed form) to show that the stack equals the LP solution and that the demand row's dual equals the clearing price; the Node test checks this with the vendored HiGHS on 200 random hours."
+  - "Lesson 8 uses LX.solver (on request only, in the Modeler box of the explain section; the core steps stay closed form) to show that the stack equals the LP solution and that the demand row's dual equals the clearing price; the Node test checks this with the vendored HiGHS on 200 random hours."

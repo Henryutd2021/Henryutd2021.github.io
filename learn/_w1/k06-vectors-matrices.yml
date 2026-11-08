@@ -1,4 +1,4 @@
-# Sidecar for toolbox K6 (k06-vectors-matrices), builder learn-w3-c, 2026-11-03. Read by scripts/build_learn.py.
+# Sidecar for toolbox K6 (k06-vectors-matrices). Read by the course build step.
 id: k06-vectors-matrices
 lesson: K6
 glossary:

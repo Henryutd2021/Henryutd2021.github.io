@@ -1,6 +1,6 @@
-# Sidecar for X1 (x01-under-the-hood), builder learn-w7-a, 2026-11-07. Read by scripts/build_learn.py.
-# No excerpt of Henry's research appears in X1. Guard G-NUC: the reactor core card is physics, thermal hydraulics and
-# materials only (no cost, timing, deployment, siting or commercialization; no design or vendor names).
+# Sidecar for X1 (x01-under-the-hood). Read by the course build step.
+# No excerpt of the course author's research appears in X1. Nuclear scope: the reactor core card is physics, thermal
+# hydraulics and materials only, with no design or vendor names.
 id: x01-under-the-hood
 lesson: X1
 glossary: []

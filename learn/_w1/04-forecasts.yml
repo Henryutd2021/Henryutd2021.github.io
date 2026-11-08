@@ -1,4 +1,4 @@
-# Sidecar for lesson 4 (T4, 04-forecasts), builder learn-w1-b, 2026-11-02. Read by scripts/build_learn.py.
+# Sidecar for lesson 4 (T4, 04-forecasts). Read by the course build step.
 id: 04-forecasts
 lesson: 4
 glossary:
@@ -24,4 +24,4 @@ glossary:
     term: Prediction interval
     def: "A range that should contain the actual value with a stated probability, drawn as a band around a forecast."
 requests:
-  - "Approved source excerpt:uq-mfgpr: Henry approved the E1 wording on 2026-11-03; it is in the Real-world box as a blockquote.lx-excerpt, word for word, with the DOI. Lesson 5 carries no excerpt (E2)."
+  - "Approved source excerpt:uq-mfgpr: the approved E1 wording is in the Real-world box as a blockquote.lx-excerpt, word for word, with the DOI. Lesson 5 carries no excerpt (E2)."

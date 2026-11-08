@@ -1,4 +1,4 @@
-# Sidecar for A6 (a06-interconnection), builder learn-w4-a, 2026-11-05. Read by scripts/build_learn.py.
+# Sidecar for A6 (a06-interconnection). Read by the course build step.
 id: a06-interconnection
 lesson: A6
 glossary:

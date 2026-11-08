@@ -1,6 +1,6 @@
-# Sidecar for R5 (r05-build-validate), builder learn-w2-h, 2026-11-03. Read by scripts/build_learn.py (which reads
-# learn/_w1/ only, so the W2 sidecar lives here too). clone, repository, version-control and checksum repeat the
-# definitions of the K8 builder (learn-w2-e) word for word, so the merge keeps one definition without a conflict.
+# Sidecar for R5 (r05-build-validate). Read by the course build step, which reads sidecars from learn/_w1/ only.
+# clone, repository, version-control and checksum repeat K8's definitions word for word, so the glossary keeps one
+# definition without a clash.
 id: r05-build-validate
 lesson: R5
 glossary:

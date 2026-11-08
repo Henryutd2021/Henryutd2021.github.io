@@ -1,4 +1,4 @@
-# Sidecar for F1 (f01-five-scales), builder learn-w2-a, 2026-11-03. Read by scripts/build_learn.py.
+# Sidecar for F1 (f01-five-scales). Read by the course build step.
 id: f01-five-scales
 lesson: F1
 glossary:

@@ -1,6 +1,5 @@
-# Sidecar for F8 (f08-large-loads), builder learn-w4-a (F8 fork), 2026-11-05. Read by scripts/build_learn.py.
-# The real-world box quotes E7.4 and E7.5 (excerpt:code), approved by Henry on 2026-11-03 (reports/learn/excerpts_for_approval.md):
-# a new placement of approved sentences, listed for Henry by the coordinator.
+# Sidecar for F8 (f08-large-loads). Read by the course build step.
+# The real-world box quotes E7.4 and E7.5 (excerpt:code) in their approved wording.
 id: f08-large-loads
 lesson: F8
 glossary:

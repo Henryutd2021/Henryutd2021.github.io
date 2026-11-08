@@ -1,4 +1,4 @@
-# Sidecar for A20 (a20-national-scenarios), builder learn-w6-b, 2026-11-07. Read by scripts/build_learn.py.
+# Sidecar for A20 (a20-national-scenarios). Read by the course build step.
 id: a20-national-scenarios
 lesson: A20
 glossary:

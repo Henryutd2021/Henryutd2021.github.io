@@ -1,4 +1,4 @@
-# Sidecar for Analyst lesson A9 (a09-hazards), builder learn-w4-b, 2026-11-05. Read by scripts/build_learn.py.
+# Sidecar for Analyst lesson A9 (a09-hazards). Read by the course build step.
 id: a09-hazards
 lesson: A9
 glossary:

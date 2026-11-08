@@ -1,6 +1,6 @@
-# Sidecar for lessons 9-11 (T9 09-storage, T10 10-write-it-down, T11 11-solver), builder learn-w1-f, 2026-11-02.
-# Read by scripts/build_learn.py. Glossary terms for all three lessons live here (one file per builder is enough; the
-# other two sidecars carry only their lesson's requests).
+# Sidecar for lessons 9-11 (T9 09-storage, T10 10-write-it-down, T11 11-solver). Read by the course build step.
+# Glossary terms for all three lessons live here (one file is enough; the other two sidecars carry only their lesson's
+# requests).
 id: 09-storage
 lesson: 9
 glossary:

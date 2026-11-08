@@ -1,4 +1,4 @@
-# Sidecar for C0 (c0-behind-one-meter), builder learn-w3-g, 2026-11-03. Read by scripts/build_learn.py.
+# Sidecar for C0 (c0-behind-one-meter). Read by the course build step.
 id: c0-behind-one-meter
 lesson: C0
 requests:

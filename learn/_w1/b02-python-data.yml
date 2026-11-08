@@ -1,5 +1,4 @@
-# Sidecar of lesson B2 (builder e, W1, 2026-11-02; updated by fix group D, 2026-11-02): new glossary terms and requests
-# for shared files.
+# Sidecar of lesson B2 (b02-python-data): new glossary terms and requests for shared files.
 lesson: b02-python-data
 glossary:
   - {id: utc, term: "Coordinated Universal Time (UTC)", def: "The world reference clock, with no daylight saving; EIA stamps its hourly grid data in it."}

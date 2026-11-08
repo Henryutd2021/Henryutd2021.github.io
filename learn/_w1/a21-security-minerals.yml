@@ -1,8 +1,8 @@
-# Sidecar for A21 (a21-security-minerals), builder learn-w6-b, 2026-11-07. Read by scripts/build_learn.py.
+# Sidecar for A21 (a21-security-minerals). Read by the course build step.
 id: a21-security-minerals
 lesson: A21
 glossary:
-  # import-dependence: one definition, in F10's sidecar (it is taught there first; W6 integration merged the two)
+  # import-dependence: one definition, in F10's sidecar (it is taught there first)
   - id: hhi
     term: Herfindahl-Hirschman index (HHI)
     def: "A measure of how concentrated a supply is: the sum of each supplier's squared percentage share, from near 0 for many small suppliers to 10,000 for one."
@@ -13,6 +13,6 @@ glossary:
     term: Petajoule (PJ)
     def: "A unit of energy equal to a million gigajoules (10^15 joules, about 278 GWh), used for a country's yearly fuel use."
 requests:
-  - "excerpt placement (new in W6): A21's Real-world card quotes excerpt:supply-chain-mg E8.3 with E8.7 under it, and cites the AMM paper (E8.17); the curriculum row lists excerpt:supply-chain-mg for A21, the register's 'Where it would appear' column does not."
-  - "prairieland.json (W6 fix, via scripts/build_learn_prairieland.py): realWorld 'iea-gcmo-2025' says 'Leading refiner of strategic minerals, 2025', the report year; the IEA's figure uses the latest year available for each mineral. Suggest 'Leading refiner of strategic minerals, IEA report of 2025 (latest year available for each mineral; years vary)'; A21 shows that label from its own data (facts.what) until then."
-  - "prairieland.json (W6 fix): imports.minerals.suppliers lists three countries and 'Other refiners', a group; A21 now calls the four 'supply groups' and its HHI an upper bound. Optional: say so in hhiMethod."
+  - "Excerpt placement: A21's Real-world card quotes excerpt:supply-chain-mg E8.3 with E8.7 under it, and cites the AMM paper (E8.17); the course plan lists excerpt:supply-chain-mg for A21, while the approved wording's 'Where it would appear' column does not."
+  - "prairieland.json (via its data build step): realWorld 'iea-gcmo-2025' says 'Leading refiner of strategic minerals, 2025', the report year; the IEA's figure uses the latest year available for each mineral. Suggest 'Leading refiner of strategic minerals, IEA report of 2025 (latest year available for each mineral; years vary)'; A21 shows that label from its own data (facts.what) until then."
+  - "prairieland.json: imports.minerals.suppliers lists three countries and 'Other refiners', a group; A21 now calls the four 'supply groups' and its HHI an upper bound. Optional: say so in hhiMethod."

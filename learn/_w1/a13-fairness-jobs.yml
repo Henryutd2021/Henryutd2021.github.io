@@ -1,4 +1,4 @@
-# Sidecar for A13 (a13-fairness-jobs), builder learn-w5-b, 2026-11-06. Read by scripts/build_learn.py.
+# Sidecar for A13 (a13-fairness-jobs). Read by the course build step.
 id: a13-fairness-jobs
 lesson: A13
 glossary:
@@ -25,4 +25,4 @@ glossary:
     def: "A utility charge that varies with household income, such as a fixed charge set in a few income tiers."
 requests:
   - "A22 (a22-tradeoff-explorer) could link A13 from its fairness indicator (energy burden)."
-  - "SB3 and C3 can use LX.A13 (assets/learn/components/whopays.js, in the bundle since the W5 integration; no separate script tag) for household burden by group, transfers between rate designs, jobs (job-years, gross and net) and tax base; its header documents inputs and outputs."
+  - "SB3 and C3 can use LX.A13 (assets/learn/components/whopays.js, in the bundle; no separate script tag) for household burden by group, transfers between rate designs, jobs (job-years, gross and net) and tax base; its header documents inputs and outputs."

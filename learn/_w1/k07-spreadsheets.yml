@@ -1,4 +1,4 @@
-# Sidecar for toolbox K7 (k07-spreadsheets), builder learn-w1-h, 2026-11-02. Read by scripts/build_learn.py.
+# Sidecar for toolbox K7 (k07-spreadsheets). Read by the course build step.
 id: k07-spreadsheets
 lesson: K7
 glossary:

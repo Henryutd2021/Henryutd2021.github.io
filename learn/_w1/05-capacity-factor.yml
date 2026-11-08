@@ -1,6 +1,6 @@
-# Sidecar for lesson 5 (T5, 05-capacity-factor), builder learn-w1-c, 2026-11-02; review fixes learn-w1-fix-b, 2026-11-02.
-# Read by scripts/build_learn.py. The earlier requests (night-time solar cleaning, the monthly option of the profile
-# helper, promoting the equation card, demo states for screenshots) were done at the W1 merge and are removed.
+# Sidecar for lesson 5 (T5, 05-capacity-factor). Read by the course build step. No open requests: night-time solar
+# cleaning, the monthly option of the profile helper, the shared equation card and the demo states for screenshots
+# are in place.
 id: 05-capacity-factor
 lesson: 5
 glossary:

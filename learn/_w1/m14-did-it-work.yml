@@ -1,4 +1,4 @@
-# Sidecar for M14 (m14-did-it-work), builder learn-w5-g, 2026-11-06. Read by scripts/build_learn.py.
+# Sidecar for M14 (m14-did-it-work). Read by the course build step.
 id: m14-did-it-work
 lesson: M14
 glossary:
@@ -27,4 +27,4 @@ glossary:
     term: Dummy variable
     def: "A 0/1 flag in a regression, such as 1 for a home on the tariff and 0 for one that is not; its coefficient is the fitted difference between the two groups."
 requests:
-  - "M14 builds the curriculum row's play on simulated panels with known effects (W5 brief §4 and the task message), not on public data: the row's 'Use public data' (curriculum_v2.md §7.5, learn_map_v2.yml play) could read 'Use simulated panels with a known effect, then read a public study'. Real programme evidence comes from DOE's November 2016 consumer behaviour studies report (energy.gov)."
+  - "M14 builds the course plan's play on simulated panels with known effects, not on public data: the plan's 'Use public data' could read 'Use simulated panels with a known effect, then read a public study'. Real programme evidence comes from DOE's November 2016 consumer behaviour studies report (energy.gov)."

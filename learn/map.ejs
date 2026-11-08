@@ -9,8 +9,8 @@
    regional profile cards, learn/regions.qmd: no tier, code or time row, so not a station on the map). Progress ticks:
    elements with data-lesson-id get .is-done from learn.js.
    A lesson or tool links to its page only when it is live: `path`, or `status: active` (page <id>.qmd), and not
-   status: upcoming (path.yml; the same rule as scripts/build_learn.py). A held row (status: hold, a draft whose title
-   may not be listed before Henry approves it) is left out of every list, as build_learn.py leaves it out of path.json. */
+   status: upcoming (path.yml; the same rule as the course build step). A held row (status: hold, a draft whose title
+   is not listed yet) is left out of every list, as the build step leaves it out of path.json. */
 const has = v => v !== undefined && v !== null && v !== "";
 const tiers = items.filter(i => i.kind === "tier");
 const lessons = items.filter(i => i.kind === "lesson" && i.status !== "hold");

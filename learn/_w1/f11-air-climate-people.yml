@@ -1,4 +1,4 @@
-# Sidecar for F11 (f11-air-climate-people), builder learn-w5-b, 2026-11-06. Read by scripts/build_learn.py.
+# Sidecar for F11 (f11-air-climate-people). Read by the course build step.
 id: f11-air-climate-people
 lesson: F11
 glossary:

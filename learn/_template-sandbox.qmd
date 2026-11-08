@@ -10,7 +10,7 @@ css: ../assets/learn/learn.css
 body-classes: "page-learn page-lesson lx-form-sandbox"
 ---
 
-<!-- Sandbox (path.yml form: sandbox; curriculum v2 §16.3 and §16.4). Guide: assets/learn/README.md, "Sandboxes and
+<!-- Sandbox (path.yml form: sandbox). Guide: assets/learn/README.md, "Sandboxes and
      capstones". Replace <slug> with the sandbox's JS name and <id> with its path.yml id.
      Order: the brief (the site or system, what the reader decides, what the engine works out, what it leaves out, and
      presets to start from) -> the bench (controls; Run; the run's status; the plan link) -> the results (readouts, the
@@ -18,7 +18,7 @@ body-classes: "page-learn page-lesson lx-form-sandbox"
      -> sources. The step links are #brief, #bench, #results, #explain and #sources (the build checks that each exists);
      the screenshot tool reaches each one as sec-brief, sec-bench, sec-results and sec-sources, and `explain` shows
      #explain.
-     The engine (E0 for SB0, E1 for SB1, ...) is a shared component the sandbox builder writes in
+     The engine (E0 for SB0, E1 for SB1, ...) is a shared component, written in
      assets/learn/components/<engine>.js, so the capstones (and A8, M5) run the same model. The page expects:
        engine.schema                      the plan as an LX.ShareState schema (fields, ranges, steps, defaults, version,
                                           older versions with up()); one source for the controls, the link and the tests
@@ -34,23 +34,23 @@ body-classes: "page-learn page-lesson lx-form-sandbox"
                                           sensitivity, limits); the capstone adds its own fields
        engine.fallback(data) -> HTML      the default plan's inputs and results as plain tables (a precomputed run, with
                                           its date), for the no-JS blocks below
-     Failure states (W2 review finding 1): run through LX.BenchRun. It shows a clear message and "Try again" after a
+     Failure states: run through LX.BenchRun. It shows a clear message and "Try again" after a
      failure, a time limit or an infeasible plan, clears the busy state, keeps the results already drawn (marked as an
      earlier plan's) and passes `attempt` so a retry can raise the time limit. Test it with a stubbed solve that fails.
-     Ties (finding 2): an LP or MILP with several optima of equal cost makes "the" dispatch arbitrary: state the tie rule
+     Ties: an LP or MILP with several optima of equal cost makes "the" dispatch arbitrary: state the tie rule
      in the engine (a tiny cost on battery throughput, a fixed order) or show only what every optimum shares; prove it in
-     the test. No false certificates (finding 3): "optimal" only for status optimal; a MILP shows its gap; an early stop
+     the test. No false certificates: "optimal" only for status optimal; a MILP shows its gap; an early stop
      never says best. A "jump", "always" or "never" in the text must hold in the model as built, shown by the test.
-     State (finding 8): controls continue from the reader's plan (presets fill the controls; they never reset hidden
+     State: controls continue from the reader's plan (presets fill the controls; they never reset hidden
      parts), focus survives a re-render, results are announced (BenchRun's status line), and a busy run holds Next.
      The plan link (LX.ShareState): numbers and choices only, no free text and no personal data; the schema's version
      goes up whenever a field, a range, a step or a meaning changes, with an `old` entry so earlier links still open.
      Prices in one dollar year, labelled; data scaled or invented is "illustrative" or "based on ...", never "real".
-     Scope (§20): Prairie Town, Prairie Campus and their sites are fictional; data centers appear only as loads; no
-     links to project pages or the Research page; Henry's research only through approved excerpts, allow-listed
-     repositories and citations (§13).
-     After editing path.yml, run in the ResearchPortfolio folder:
-     python3 scripts/build_learn.py --site <site>   (fills the three marker blocks below; never edit them by hand) -->
+     Scope (the course's scope rules): Prairie Town, Prairie Campus and their sites are fictional; data centers appear
+     only as loads; no links to project pages or the Research page; the course author's research only through approved
+     excerpts, allow-listed repositories and citations (the sourcing rule).
+     After editing path.yml, run the course build step (it fills the three marker blocks below; never edit them by
+     hand). -->
 
 <!-- learn:meta:start -->
 <!-- learn:meta:end -->

@@ -1,7 +1,7 @@
-# Sidecar of research studio R3 (r03-system-and-method), builder learn-w2-f, 2026-11-03.
-# Provenance of assets/learn/data/r03-system-and-method.json (kept here, out of the public data file since the 2026-11-03
-# review): written by hand for curriculum v2 §11 (R3), §5.3 (what a scale is) and §11.2 (question types and typical
-# methods); rubric from §3.4 (assets/learn/components/rubric.js).
+# Sidecar of research studio R3 (r03-system-and-method).
+# Provenance of assets/learn/data/r03-system-and-method.json: written by hand for the course's research studios (R3),
+# its definition of a scale (decisions, authority, physics, inputs, outputs) and its question types and typical
+# methods; rubric from the course rubric (assets/learn/components/rubric.js).
 lesson: R3
 glossary:
   - {id: method-family, term: "Method family", def: "A group of research methods that answer the same kind of question in a similar way, such as optimization, simulation or statistics."}

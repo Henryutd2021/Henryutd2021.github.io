@@ -1,6 +1,6 @@
-# Sidecar for M1 (m01-dispatch-to-lmp), builder learn-w1-i, 2026-11-02; review fixes (learn-w1-fix-c1) the same day.
-# Read by scripts/build_learn.py. The four W1 requests (promote Formulation, Network and PriceChart; live back links;
-# deeper.css one-column body; path.yml outcome and lab) were done at the W1 merge and are removed.
+# Sidecar for M1 (m01-dispatch-to-lmp). Read by the course build step. No open requests: Formulation, Network and
+# PriceChart are shared components, the back links are live, deeper.css has a one-column body, and path.yml gives the
+# outcome and the lab.
 id: m01-dispatch-to-lmp
 lesson: M1
 glossary:

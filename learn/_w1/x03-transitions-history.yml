@@ -1,5 +1,6 @@
-# Sidecar for X3 (x03-transitions-history), builder learn-w6-x, 2026-11-07. Read by scripts/build_learn.py.
-# No excerpt of Henry's research appears in X3. Diffusion only: no cost curve of any technology, no forecast (curriculum §4.4).
+# Sidecar for X3 (x03-transitions-history). Read by the course build step.
+# No excerpt of the course author's research appears in X3. Diffusion only: no cost curve of any technology, no
+# forecast (the side topic's depth budget).
 id: x03-transitions-history
 lesson: X3
 glossary:
@@ -7,4 +8,4 @@ glossary:
     term: Diffusion curve
     def: "How the share of homes, firms or output using a new technology grows over time, often slowly at first, then faster, then levelling off."
 requests:
-  - "X3's explain layer names F10, X2 and A20 through LX.lessonRefHTML (all live since the W6+W7 integration, which also added F10 to X3's after list and moved the shelf's xs- stop-box rules into components/explain.css); no change requested."
+  - "X3's explain layer names F10, X2 and A20 through LX.lessonRefHTML (all live; F10 is in X3's after list, and the shelf's xs- stop-box rules are in components/explain.css); no change requested."

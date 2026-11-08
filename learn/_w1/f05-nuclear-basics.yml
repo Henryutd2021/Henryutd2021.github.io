@@ -1,4 +1,4 @@
-# Sidecar for F5 (f05-nuclear-basics), builder learn-w3-a (F5 fork), 2026-11-03. Read by scripts/build_learn.py.
+# Sidecar for F5 (f05-nuclear-basics). Read by the course build step.
 id: f05-nuclear-basics
 lesson: F5
 glossary:
@@ -66,7 +66,7 @@ glossary:
     term: Desalination
     def: "Removing salt from seawater or salty groundwater to make fresh water, with heat or with electricity."
 requests:
-  - "Allow-list request (curriculum §20.3): nrc.gov and iaea.org; declined for now by the coordinator (W3 fix, 2026-11-03), so F5 stays on DOE and EIA. F5 uses only energy.gov and eia.gov links; the DOE Fundamentals Handbook (DOE-HDBK-1019/1-93, on osti.gov, also not allow-listed) is cited in plain text without a link, for a sentence with no number."
+  - "Allowed links: nrc.gov and iaea.org are not allowed link destinations, so F5 stays on DOE and EIA. F5 uses only energy.gov and eia.gov links; the DOE Fundamentals Handbook (DOE-HDBK-1019/1-93, on osti.gov, also not allow-listed) is cited in plain text without a link, for a sentence with no number."
   - "Promote if later lessons want them (all lesson-local in assets/learn/f05-nuclear-basics.js, tokens only, with text versions): PlantDiagram (an annotated plant drawing with tappable parts, numbered markers mirrored by keyboard chips, a type toggle and an aria-live note: e-annotated, candidates F4, X1); HeatLadder (rows on a temperature axis against bands, rows as buttons: candidates A15 process heat by temperature, A16); ChainToy and FissionScene stay F5-only."
-  - "Scope: F5 cites no study of Henry's, links no repository, names no vendor or project, and mentions no costs, deployment, siting or data centers. Its Node test runs the nuclear-plus-risk sentence rule over every page sentence, JS string, JSON value and this sidecar's definitions, and fails on any data-center mention."
+  - "Scope: F5 cites no study of the course author's, links no repository, names no vendor or project, and mentions no costs, deployment, siting or data centers. Its Node test runs the nuclear-plus-risk sentence rule over every page sentence, JS string, JSON value and this sidecar's definitions, and fails on any data-center mention."
   - "DOE's '3 Advanced Reactor Systems to Watch by 2030' (DOE NE, 2021) was read but not cited: its title names a year, which reads as deployment timing next to reactor terms. The same facts come from DOE's 2015 Quadrennial Technology Review assessments."

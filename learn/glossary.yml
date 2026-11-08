@@ -1,5 +1,5 @@
-# glossary.yml — terms used in the Learn lessons (source for assets/learn/data/glossary.json, written by
-# python3 scripts/build_learn.py). One short, plain-English sentence per term; no numbers that need a source.
+# glossary.yml — terms used in the Learn lessons (source for assets/learn/data/glossary.json, written by the
+# course build step). One short, plain-English sentence per term; no numbers that need a source.
 #   id      lower-case slug, used as the anchor (glossary.html#id) and the JSON key
 #   term    as shown to readers
 #   short   one sentence

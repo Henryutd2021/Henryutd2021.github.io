@@ -1,4 +1,4 @@
-# Sidecar for lesson 3 (T3, 03-balancing), builder learn-w1-b, 2026-11-02. Read by scripts/build_learn.py.
+# Sidecar for lesson 3 (T3, 03-balancing). Read by the course build step.
 id: 03-balancing
 lesson: 3
 glossary:

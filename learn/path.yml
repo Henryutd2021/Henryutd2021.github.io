@@ -1,6 +1,6 @@
 # path.yml — the curriculum behind the course map (learn/index.qmd) and every lesson's header, next box and footer.
-# Edit this file to change the course; no code changes are needed. Then run, in the ResearchPortfolio folder:
-#   python3 scripts/build_learn.py --site <site folder>        (writes assets/learn/data/path.json and the lesson blocks)
+# Edit this file to change the course; no code changes are needed. Then run the course build step, which writes
+# assets/learn/data/path.json and the lesson blocks.
 # Kinds of entries (a flat YAML subset: "- key: value" lines, or one "- {key: value, ...}" line; nothing nested):
 #   kind: tier    one per tier, in display order; any number of tiers (the map draws one line each, first at the bottom).
 #                 id, title, level, slot (colour 1-5: --lx-tier-<slot> in assets/learn/components/base.css), icon (a name
@@ -17,14 +17,12 @@
 #                 `path:`); `status: upcoming` or no page = coming soon. A tier with `status: upcoming` shows as later.
 #   off the path  lessons with a `code` (N1, B1, M1, CK-F, ...) may list prerequisites as starter numbers or codes
 #                 (`after: [10, K4]`) and the module that follows (`next: B2`); `form: checkpoint` for checkpoint pages,
-#                 `studio` and `case` (W2), `sandbox` and `capstone` (W3; a capstone names its sandbox: `sandbox: SB0`);
+#                 `studio` and `case`, `sandbox` and `capstone` (a capstone names its sandbox: `sandbox: SB0`);
 #                 see assets/learn/README.md
 # (The name has no leading underscore because Quarto listings skip files that start with "_".)
-# Source: design report 09, sections 2 and 5 (revised 2026-11-02); course map form chosen by Henry on 2026-11-02 (metro).
-# Curriculum v2 (reports/learn/learn_map_v2.yml, approved 2026-11-02): fourth tier Researcher, the W1 modules
-# N1, B1-B3, M1 and CK-F, the Modeler and Researcher module lists and the toolbox K1-K8, titles as in that file.
-# Wave W2 (2026-11-03): F1, F2, A22, M2, M3, CK-M, the studios R1-R5, R9 and R10 (the Researcher tier is live), the
-# toolbox K1, K2, K3, K5 and K8, and the case files CF2, CF6 and CF7 as drafts (upcoming until Henry approves them).
+# The course map is drawn as a metro map. Four tiers (Foundations, Analyst, Modeler, Researcher), the starter path, the
+# modules off the path, the toolbox K1-K8, the research studios, case files, sandboxes and capstones; titles as in the
+# course plan.
 
 - kind: tier
   id: foundations
@@ -83,8 +81,8 @@
   doorcta: "Go to the Researcher tier"
   doorlink: "#researcher"
 
-# ---------- the course's five scales (curriculum S0-S4), with the names lesson F1 teaches; each lesson lists the scales
-# its curriculum row names (`scales:`, its primary scale first); a tier's checkpoint and the toolbox name none
+# ---------- the course's five scales (S0-S4), with the names lesson F1 teaches; each lesson lists the scales of its
+# row in the course plan (`scales:`, its primary scale first); a tier's checkpoint and the toolbox name none
 - kind: scale
   id: S0
   title: "Device and plant"
@@ -344,8 +342,8 @@
   after: [9, 12]
   scales: [S2]
 
-# ---------- wave W1 modules off the starter path (curriculum v2: the news lens, the Foundations checkpoint, the bridges
-#            into modelling and the first Modeler lesson); live once a builder sets status: active
+# ---------- modules off the starter path: the news lens, the Foundations checkpoint, the bridges into modelling and
+#            the first Modeler lesson; live once a row has status: active
 - kind: lesson
   id: n01-news-lens
   code: N1
@@ -386,7 +384,7 @@
   icon: pencil
   status: active
   minutes: 30
-  practice_minutes: 45   # the practice set (Check section); the badge needs build_learn.py to show it (coordinator)
+  practice_minutes: 45   # the practice set (Check section), shown in the header badge
   title: "From algebra to a linear program: how do equations become a model?"
   subtitle: "Turn word problems into a linear program, find its best corner on a graph, and hand it to a real solver"
   short: "Algebra to a linear program"
@@ -425,7 +423,7 @@
   icon: question
   status: active
   minutes: 30
-  practice_minutes: 45   # the practice set (Check section); the badge needs build_learn.py to show it (coordinator)
+  practice_minutes: 45   # the practice set (Check section), shown in the header badge
   title: "How do you read a formulation, and check that a model is right?"
   subtitle: "Read a dispatch model line by line, hunt five planted bugs, and check a solved model's balance and duals"
   short: "Read and check a formulation"
@@ -456,7 +454,7 @@
   next: M2
   scales: [S2]
 
-# ---------- wave W2 hubs (curriculum v2 §8): the five scales (F1) and the whole system (F2), builder learn-w2-a
+# ---------- the hubs of system-ness: the five scales (F1) and the whole system (F2)
 - kind: lesson
   id: f01-five-scales
   code: F1
@@ -494,8 +492,7 @@
   after: [F1, 6]
   next: A22
   scales: [S0, S1, S2, S3, S4]
-# ---------- wave W3 Foundations (curriculum v2 §7.2): energy services, power plants, nuclear basics, the grid and outages,
-# builder learn-w3-a
+# ---------- Foundations: energy services, power plants, nuclear basics, the grid and outages
 - kind: lesson
   id: f03-energy-services
   code: F3
@@ -568,7 +565,7 @@
   after: [3]
   next: F7
   scales: [S2, S3]
-# ---------- wave W2 modules (curriculum v2 §18.4); live once a builder sets status: active
+# ---------- Foundations and Analyst modules; live once a row has status: active
 - kind: lesson
   id: a22-tradeoff-explorer
   code: A22
@@ -587,7 +584,7 @@
   after: [F2, 12]
   next: R1
   scales: [S0, S1, S2, S3, S4]
-# ---------- wave W3 Analyst modules A4 and A7 (curriculum v2 §18.4; builder learn-w3-d)
+# ---------- Analyst modules A4 and A7
 - kind: lesson
   id: a04-retail-tariffs
   code: A4
@@ -623,7 +620,7 @@
   does: "Shift Prairie Town's load toward cheap or clean hours within limits and see what the shift costs users; pool batteries, thermostats, EV chargers and a dairy's pumps in an aggregator and see what each owner earns, where coordination costs bite and where a feeder's limit stops it; then let neighbours trade."
   after: [9, A4]
   scales: [S1, S2]
-# ---------- wave W3 Analyst modules (curriculum v2 §18.4), builder learn-w3-e
+# ---------- Analyst modules
 - kind: lesson
   id: a08-storage-duration
   code: A8
@@ -660,8 +657,7 @@
   after: [9, 7, A8]
   next: M4
   scales: [S0, S3]
-# ---------- wave W3 microgrid line (curriculum v2 §7.2, §7.3): F7 and A14, builder learn-w3-b. F7's prerequisites in
-# the curriculum are T9 and F6, A14's F7, A1 and A4: F6, A1 and A4 are added to `after` when their rows exist (coordinator).
+# ---------- the microgrid line: F7 and A14. F7's prerequisites are T9 and F6, A14's F7, A1 and A4.
 - kind: lesson
   id: f07-microgrids
   code: F7
@@ -733,10 +729,8 @@
   outcome: "Say which party carries price, shape, output, basis and battery-margin risk under each contract, and read the risk as a stated statistic of a simulated distribution."
   after: [A1]
   scales: [S0, S2]
-# ---------- the rest of each tier, in curriculum v2 order (reports/learn/learn_map_v2.yml; coming soon until built).
-#            Replaces the pre-v2 placeholder rows (2026-11-03). CF4 and CF5 went live on 2026-11-07, with the case files
-#            below.
-# ---------- wave W4 Foundations module F8 (curriculum v2 §18.4; builder learn-w4-a)
+# ---------- the rest of each tier, in the course plan's order (coming soon until built); the case files are below.
+# ---------- Foundations module F8
 - kind: lesson
   id: f08-large-loads
   code: F8
@@ -754,7 +748,7 @@
   outcome: "Describe a large load by its size, shape and wait to connect, tell an annual-energy equivalent from a peak one and a request from demand, and name who decides, pays and benefits when it connects."
   after: [2, F6]
   scales: [S2]
-# ---------- wave W5 Foundations module F9 (curriculum v2 §18.4; builder learn-w5-a)
+# ---------- Foundations module F9
 - kind: lesson
   id: f09-city-energy
   code: F9
@@ -772,7 +766,7 @@
   outcome: "Read a city's energy flows by carrier and sector, say where its accounting starts and how little of its electricity it makes, and name who typically decides rates, codes, standards, wires and equipment, knowing that the roles differ by state and utility."
   after: [F3, F6]
   scales: [S3]
-# ---------- wave W6 Foundations module F10 (curriculum v2 §18.4; builder learn-w6-a)
+# ---------- Foundations module F10
 - kind: lesson
   id: f10-nations-differ
   code: F10
@@ -790,7 +784,7 @@
   outcome: "Read a national energy balance as a Sankey, say how much is lost before the meter and at the point of use, explain why a country's renewable share changes with the accounting convention, and name what lines up with a mix without claiming any one cause."
   after: [F4]
   scales: [S4]
-# F11, builder learn-w5-b (wave W5)
+# F11
 - kind: lesson
   id: f11-air-climate-people
   code: F11
@@ -808,7 +802,7 @@
   outcome: "Explain why fuels compare by heat, not by tonne; count leaked methane as CO₂e with a stated GWP; tell pollutants that controls catch from CO₂ that they do not; and read energy burden as bills over income against conventional lines."
   after: [F4]
   scales: [S4, S3]
-# X1, builder learn-w7-a (wave W7): side-topic shelf, D1; guard G-NUC
+# X1: side-topic shelf, D1; nuclear scope: physics, operation and uses of existing or generic reactors only
 - kind: lesson
   id: x01-under-the-hood
   code: X1
@@ -825,7 +819,7 @@
   outcome: "Name the discipline that designs each major energy device, say which numbers a system model borrows from it (ratings, efficiencies, ramp limits, outlet temperatures, failure rates and operating rules), and where the course stops."
   after: [F4]
   scales: [S0]
-# X3, builder learn-w6-x (wave W6; side-topic shelf, D1)
+# X3 (side-topic shelf, D1)
 - kind: lesson
   id: x03-transitions-history
   code: X3
@@ -842,7 +836,7 @@
   outcome: "Read an adoption curve as a share of a named whole, say how fast past U.S. changes moved and what sped or slowed them, and explain why the answer to how fast depends on what is measured, without forecasting the next one."
   after: [F10]
   scales: [S4]
-# ---------- wave W4 Analyst module A3 (curriculum v2 §18.4; builder learn-w4-b)
+# ---------- Analyst module A3
 - kind: lesson
   id: a03-market-design
   code: A3
@@ -860,7 +854,7 @@
   outcome: "Explain how energy-only markets with scarcity pricing and capacity markets each pay for enough capacity, what each costs consumers and who carries which risk, and why more solar lowers solar's own capture price."
   after: [8]
   scales: [S2]
-# ---------- wave W4 Analyst module A5 (curriculum v2 §18.4; builder learn-w4-b)
+# ---------- Analyst module A5
 - kind: lesson
   id: a05-adequacy
   code: A5
@@ -878,7 +872,7 @@
   outcome: "Estimate a grid's loss-of-load expectation from a simulation with its Monte Carlo error, rate a resource by the firm capacity it adds at equal reliability, and explain why a rating depends on the grid and its mix."
   after: [3, 6, K5]
   scales: [S2]
-# A6, builder learn-w4-a (wave W4, 2026-11-05)
+# A6
 - kind: lesson
   id: a06-interconnection
   code: A6
@@ -896,7 +890,7 @@
   outcome: "Explain why connecting to the grid takes years, show how cluster studies split upgrade costs and how a withdrawal moves cost and time onto others, size a large load against N−1, and price a wait in separate accounts."
   after: [F8, 8]
   scales: [S2]
-# ---------- wave W4 Analyst module A9 (curriculum v2 §18.4; builder learn-w4-b)
+# ---------- Analyst module A9
 - kind: lesson
   id: a09-hazards
   code: A9
@@ -932,7 +926,7 @@
   after: [12, 8]
   next: A12
   scales: [S2]
-# A11, builder learn-w5-c (wave W5)
+# A11
 - kind: lesson
   id: a11-lca-nexus
   code: A11
@@ -969,7 +963,7 @@
   after: [A1, 12]
   next: M6
   scales: [S4, S2]
-# A13, builder learn-w5-b (wave W5)
+# A13
 - kind: lesson
   id: a13-fairness-jobs
   code: A13
@@ -987,7 +981,7 @@
   outcome: "Allocate a cost across household groups under three designs and read the burden each produces, tell a transfer from a real cost, and report jobs and tax effects as screening estimates that keep job-years apart from permanent jobs and gross apart from net."
   after: [A4, F11]
   scales: [S3]
-# ---------- wave W5 Analyst module A15 (curriculum v2 §18.4; builder learn-w5-a)
+# ---------- Analyst module A15
 - kind: lesson
   id: a15-efficiency-electrification
   code: A15
@@ -1005,7 +999,7 @@
   outcome: "Price a saved MWh with the capital recovery factor and judge it against what it saves, show how rebound and the order of measures change the curve, and explain why electrifying heat raises the cold-day peak more than the year's energy, and what envelopes, stores and charging rules do about it."
   after: [F3, F9]
   scales: [S3]
-# A17, builder learn-w4-a (A17 fork, wave W4)
+# A17
 - kind: lesson
   id: a17-physical-feasibility
   code: A17
@@ -1023,7 +1017,7 @@
   outcome: "Name the physical limits an hourly energy plan can break, say when each binds, and say which check (an AC check, a ramp check at the plan's time step and finer, or a check of the first seconds) would catch it."
   after: [F6, 3]
   scales: [S2, S1, S3]
-# A18, builder learn-w5-d (wave W5)
+# A18
 - kind: lesson
   id: a18-city-plan
   code: A18
@@ -1062,7 +1056,7 @@
   does: "Stack map layers for the region around Prairie City; exclude land by rule and weight the criteria for a solar farm, a wind farm and a data-center campus; route a new line along a least-cost path; then change the cell size and the homes layer's date."
   after: [A11]
   scales: [S3, S4]
-# A20, builder learn-w6-b (wave W6)
+# A20
 - kind: lesson
   id: a20-national-scenarios
   code: A20
@@ -1080,7 +1074,7 @@
   outcome: "Tell an exploratory scenario from a target-seeking one, trace a gap between two scenarios to their assumptions in a stated order, explain why the parts depend on that order, and say why a target-seeking scenario's policy is an output, not an input."
   after: [A1, 13]
   scales: [S4]
-# A21, builder learn-w6-b (wave W6)
+# A21
 - kind: lesson
   id: a21-security-minerals
   code: A21
@@ -1098,7 +1092,7 @@
   outcome: "Compute import dependence and a concentration index and say what each does and does not measure, size stocks against a closure, find the scarcest input in a supply chain, and match each security lever to the shocks it helps against."
   after: [F10]
   scales: [S4]
-# X2, builder learn-w6-x (wave W6; side-topic shelf, D2)
+# X2 (side-topic shelf, D2)
 - kind: lesson
   id: x02-fossil-transition
   code: X2
@@ -1116,7 +1110,7 @@
   outcome: "Say what gas, coal and oil systems do today and which questions a transition opens, read a retirement or gas-network scenario by its assumptions, and compare carbon-removal methods by permanence, readiness, cost range and how they are measured, without a verdict."
   after: [F10, F11]
   scales: [S4, S3]
-# X4, builder learn-w7-a (wave W7): side-topic shelf, D1; review yearly (policy)
+# X4: side-topic shelf, D1; review yearly (policy)
 - kind: lesson
   id: x04-rules-law
   code: X4
@@ -1133,7 +1127,7 @@
   outcome: "Trace how a U.S. energy rule travels from a law to a rule, a tariff or rate and a permit; say which level of government decides each; and read the dates and the points where the public can take part."
   after: [A3]
   scales: [S2, S4]
-# X5, builder learn-w7-a (wave W7): side-topic shelf, D1, closed form; guard G-FIN
+# X5: side-topic shelf, D1, closed form; contract examples use wind, solar, storage and gas only
 - kind: lesson
   id: x05-project-finance
   code: X5
@@ -1150,7 +1144,7 @@
   outcome: "Name the layers of a project's capital stack and the order in which they are paid, size a loan from cash flow and a coverage ratio, and explain why contracted revenue supports more debt than revenue sold at market prices."
   after: [A1, A2]
   scales: [S0]
-# CK-A, builder learn-w5-g (wave W5). Curriculum prerequisites A1, A4, A13, A15.
+# CK-A, the Analyst checkpoint. Prerequisites A1, A4, A13, A15.
 - kind: lesson
   id: ck-a-spreadsheet
   code: CK-A
@@ -1164,7 +1158,7 @@
   short: "Analyst checkpoint"
   does: "Build an auditable spreadsheet for a new case (a school's solar-plus-storage project): state the boundary, the assumptions with sources, who pays and who benefits, and a sensitivity of the main result. A worked workbook with live formulas, an assumptions log and the course rubric open when you submit."
   after: [A1, A4, A13, A15]
-# SB3 and C3, builder learn-w5-h (wave W5), on engine E3; C3's after list is SB3 and its curriculum prerequisites
+# SB3 and C3, on engine E3; C3's after list is SB3 and its prerequisites in the course plan
 - kind: lesson
   id: sb3-city-planner
   code: SB3
@@ -1212,7 +1206,7 @@
   status: active
   minutes: 40
   practice_minutes: 90   # the notebook's practice questions, after its 45-minute lab
-  lab_minutes: 45   # the notebook lab: build_learn.py adds it to the header badge and timeRequired
+  lab_minutes: 45   # the notebook lab: in the header badge and timeRequired
   title: "On or off? Unit commitment as a mixed-integer program"
   subtitle: "Switch the gas plants on and off, grow a branch-and-bound tree, and see what the prices leave unpaid"
   short: "Unit commitment"
@@ -1232,7 +1226,7 @@
   status: active
   minutes: 45
   practice_minutes: 120
-  lab_minutes: 60   # the notebook lab (learn_map_v2.yml): in the header badge and timeRequired
+  lab_minutes: 60   # the notebook lab: in the header badge and timeRequired
   title: "What should be built? Capacity expansion with representative periods, validated"
   subtitle: "Plan on a few weeks, then test the plan on every hour of two weather years"
   short: "Capacity expansion, validated"
@@ -1252,7 +1246,7 @@
   status: active
   minutes: 40
   practice_minutes: 90   # the notebook's practice tasks, after its 45-minute lab
-  lab_minutes: 45   # the notebook lab: build_learn.py adds it to the header badge and timeRequired
+  lab_minutes: 45   # the notebook lab: in the header badge and timeRequired
   title: "Storage and coupled carriers: modelling power, hydrogen and heat together"
   subtitle: "Add a battery, an electrolyzer, a hydrogen tank and a heat store to one plant, and find where coupling pays"
   short: "Storage and coupled carriers"
@@ -1272,7 +1266,7 @@
   status: active
   minutes: 45
   practice_minutes: 90   # the notebook's practice questions, after its 60-minute lab
-  lab_minutes: 60   # the notebook lab (learn_map_v2.yml)
+  lab_minutes: 60   # the notebook lab
   title: "Size and run a microgrid that survives an outage"
   subtitle: "Size solar, a battery and generator sets for a winter storm, add the feeder's limit and the tariff, then run the storm on forecasts"
   short: "Microgrid: size and run"
@@ -1291,7 +1285,7 @@
   status: active
   minutes: 40
   practice_minutes: 90   # the notebook's practice tasks, after its 45-minute lab
-  lab_minutes: 45   # the notebook lab: build_learn.py adds it to the header badge and timeRequired
+  lab_minutes: 45   # the notebook lab: in the header badge and timeRequired
   title: "Putting carbon in the model: caps, prices, frontiers and procurement rules"
   subtitle: "Cap the Plains Grid's CO₂ in a planning LP, trace the frontier, compare a carbon price, then add an hourly-matching rule and see what it costs and what it changes"
   short: "Carbon in models"
@@ -1311,7 +1305,7 @@
   icon: bars
   status: active
   minutes: 35
-  practice_minutes: 60   # the notebook's practice tasks, after its 45-minute lab (learn_map_v2.yml)
+  practice_minutes: 60   # the notebook's practice tasks, after its 45-minute lab
   lab_minutes: 45   # the notebook lab: in the header badge and timeRequired
   title: "What could happen? Scenarios, Monte Carlo and global sensitivity"
   subtitle: "Sample five uncertain inputs with a Latin hypercube, run a delay-cost model 1,000 times and rank the inputs by influence"
@@ -1323,7 +1317,7 @@
   after: [A1, B2, K5]
   next: M8
   scales: [S0, S1, S2, S3, S4]
-# M8, builder learn-w4-d (wave W4, 2026-11-05)
+# M8
 - kind: lesson
   id: m08-stochastic-robust
   path: m08-stochastic-robust.qmd
@@ -1333,7 +1327,7 @@
   icon: frontier
   status: active
   minutes: 45
-  practice_minutes: 90   # the notebook's practice tasks, after its 60-minute lab (learn_map_v2.yml)
+  practice_minutes: 90   # the notebook's practice tasks, after its 60-minute lab
   lab_minutes: 60   # the notebook lab: in the header badge and timeRequired
   title: "Deciding before the uncertainty resolves: stochastic and robust optimization"
   subtitle: "Size an electrolyzer before anyone knows how much wind gets built: plan for the average, hedge across the branches, or guard the worst case"
@@ -1353,7 +1347,7 @@
   icon: curve
   status: active
   minutes: 40
-  practice_minutes: 60   # the notebook's practice tasks, after its 45-minute lab (learn_map_v2.yml)
+  practice_minutes: 60   # the notebook's practice tasks, after its 45-minute lab
   lab_minutes: 45   # the notebook lab: in the header badge and timeRequired
   title: "Learning from few runs: surrogates, Gaussian processes and multi-fidelity data"
   subtitle: "Fit a wind turbine's power curve from 16 records with a Gaussian process, check its band on 400 new records, and add the maker's curve as a cheap second source"
@@ -1373,7 +1367,7 @@
   icon: chart
   status: active
   minutes: 40
-  practice_minutes: 90   # the notebook's practice tasks, after its 60-minute lab (learn_map_v2.yml)
+  practice_minutes: 90   # the notebook's practice tasks, after its 60-minute lab
   lab_minutes: 60   # the notebook lab: in the header badge and timeRequired
   title: "Forecasting load, wind and solar with machine learning, and judging it honestly"
   subtitle: "Beat 'same hour yesterday' on a held-out month of SPP's hourly demand, score point and band forecasts honestly, and find the leak in a model that looks too good"
@@ -1392,7 +1386,7 @@
   icon: coin
   status: active
   minutes: 40
-  practice_minutes: 90   # the notebook's practice tasks, after its 45-minute lab (learn_map_v2.yml)
+  practice_minutes: 90   # the notebook's practice tasks, after its 45-minute lab
   lab_minutes: 45   # the notebook lab: in the header badge and timeRequired
   title: "Techno-economic analysis inside an optimization model"
   subtitle: "Put a wind-hydrogen plant's capital, a tax credit in its own years and the credit's emissions tiers into one LP, then move the boundary and watch the conclusion change"
@@ -1403,7 +1397,7 @@
   outcome: "Formulate a techno-economic analysis as an LP with annualized capital and a time-limited credit, handle a stepped rule by enumeration, and state how the boundary changes the conclusion."
   after: [M3, A1, A12]
   scales: [S0, S1]
-# M12, builder learn-w5-h (wave W5), on engine E3
+# M12, on engine E3
 - kind: lesson
   id: m12-city-model
   code: M12
@@ -1413,7 +1407,7 @@
   status: active
   minutes: 45
   practice_minutes: 120   # the notebook's practice tasks, after its 60-minute lab
-  lab_minutes: 60   # the notebook lab (learn_map_v2.yml)
+  lab_minutes: 60   # the notebook lab
   title: "Model a city's energy system: an energy hub with grid limits and screening fairness outputs"
   subtitle: "Write Prairie City's energy hub as a linear program with a ceiling on each substation, read its duals, let it choose under a CO2 cap, and keep the household estimates apart"
   short: "A city's energy hub"
@@ -1423,8 +1417,7 @@
   lab: "a SciPy/HiGHS notebook that rebuilds engine E3's hub and asserts the browser's numbers, about 60 minutes, then 120 minutes of practice."
   after: [M4, A15, A13]
   scales: [S3]
-# M13, builder learn-w6-h (wave W6), on engine E4; A20 and A21 (curriculum prerequisites, built in parallel on
-# learn-w6-b) join `after` at integration
+# M13, on engine E4; A20 and A21 are among its prerequisites
 - kind: lesson
   id: m13-national-pathway
   code: M13
@@ -1434,7 +1427,7 @@
   status: active
   minutes: 45
   practice_minutes: 120   # the notebook's practice tasks, after its 60-minute lab
-  lab_minutes: 60   # the notebook lab (learn_map_v2.yml)
+  lab_minutes: 60   # the notebook lab
   title: "Build a nation's pathway: a multi-region, multi-decade model"
   subtitle: "Write Prairieland's five regions to 2050 as one linear program with vintages, residual value, links, a cumulative carbon budget and an import cap, then test it against foresight, shocks and full years of hours"
   short: "A nation's pathway"
@@ -1444,7 +1437,7 @@
   lab: "a SciPy/HiGHS notebook that rebuilds engine E4's pathway LP and asserts the browser's numbers, about 60 minutes, then 120 minutes of practice."
   after: [M3, M8, A20, A21]
   scales: [S4]
-# M14, builder learn-w5-g (wave W5)
+# M14
 - kind: lesson
   id: m14-did-it-work
   path: m14-did-it-work.qmd
@@ -1454,7 +1447,7 @@
   icon: target
   status: active
   minutes: 40
-  practice_minutes: 90   # the notebook's practice tasks, after its 60-minute lab (learn_map_v2.yml)
+  practice_minutes: 90   # the notebook's practice tasks, after its 60-minute lab
   lab_minutes: 60   # the notebook lab: in the header badge and timeRequired
   title: "Did it work? Learning from data with regression and natural experiments"
   subtitle: "Estimate a tariff's effect on simulated homes whose true effect is known, then break difference-in-differences on purpose with selection, confounding, spillovers and anticipation"
@@ -1490,7 +1483,7 @@
   icon: target
   status: active
   minutes: 180
-  lab_minutes: 45   # the Modeler version adds M2's notebook (learn_map_v2.yml: M2 lab_minutes)
+  lab_minutes: 45   # the Modeler version adds M2's notebook (M2's lab_minutes)
   title: "The Plains Grid in a hard year"
   subtitle: "A 300 MW data center asks to connect at Prairie Town: choose what connects and what to build, test a peak-demand week and a low-wind winter week, check adequacy and show who pays"
   short: "The Plains Grid in a hard year"
@@ -1500,7 +1493,7 @@
   lab: "M2's notebook: unit commitment and conditional prices in SciPy and HiGHS, about 45 minutes."
   after: [SB2, M2, A5, A6, A9]
   scales: [S2]
-# SB4 and C4, builder learn-w6-h (wave W6), on engine E4; A20 and A21 join C4's `after` at integration (learn-w6-b)
+# SB4 and C4, on engine E4; A20 and A21 are among C4's prerequisites
 - kind: lesson
   id: sb4-pathway-explorer
   code: SB4
@@ -1526,7 +1519,7 @@
   sandbox: SB4
   icon: target
   status: active
-  minutes: 240      # M13's notebook run on the learner's pathway is part of the hand-in, within the 240 minutes (C4 review 10)
+  minutes: 240      # M13's notebook run on the learner's pathway is part of the hand-in, within the 240 minutes
   title: "Prairieland 2050: design and defend a nation's pathway"
   subtitle: "Choose a pathway for five regions to 2050, test it against four shocks, and defend its cost, emissions, security, affordability and Ridge County's jobs in a two-page policy brief"
   short: "Prairieland 2050"
@@ -1536,7 +1529,7 @@
   lab: "M13's notebook, section 8: your pathway in SciPy and HiGHS, part of the hand-in (about 40 of the 240 minutes)."
   after: [SB4, M13, A20, A21, A12]
   scales: [S4]
-# ---------- the Modeler checkpoint (curriculum v2 §3.3), wave W2
+# ---------- the Modeler checkpoint
 - kind: lesson
   id: ck-m-unseen-problem
   code: CK-M
@@ -1551,7 +1544,7 @@
   does: "Formulate an unseen problem from a one-paragraph brief and implement it (or, in the empirical variant, analyse a supplied dataset); find a planted defect in a supplied model; validate one result against an independent reference. Worked formulations and code open when you submit."
   after: [M1, M3, B3, R5]
 
-# ---------- research studios (curriculum v2 §11; R1-R5, R9 and R10 in wave W2)
+# ---------- research studios R1-R10
 - kind: lesson
   id: r01-framing
   code: R1
@@ -1578,7 +1571,7 @@
   icon: map
   status: active
   minutes: 30
-  practice_minutes: 240   # the literature matrix, honestly budgeted (curriculum v2 §11.1)
+  practice_minutes: 240   # the literature matrix, honestly budgeted
   title: "How do you find out what is already known?"
   subtitle: "Search, snowball and map twelve papers"
   short: "Finding what is known"
@@ -1661,7 +1654,7 @@
   after: [M7, M8]
   next: R7
   scales: [S0, S1, S2, S3, S4]
-# R7, builder learn-w5-c (wave W5)
+# R7
 - kind: lesson
   id: r07-cost-carbon-properly
   code: R7
@@ -1735,7 +1728,7 @@
   next: R2
   scales: [S0, S1, S2, S3, S4]
 
-# X6, builder learn-w7-a (wave W7): side-topic shelf, D1; method-neutral
+# X6: side-topic shelf, D1; method-neutral
 - kind: lesson
   id: x06-social-methods
   code: X6
@@ -1752,7 +1745,7 @@
   outcome: "Say which social-science method answers which kind of question, what each can and cannot tell a modeller, why research with people needs consent and review first, and why a difference between joiners and others is not by itself an effect."
   after: [A13]
   scales: [S3]
-# CK-R and CR, builder learn-w7-b (wave W7). CK-R's curriculum prerequisites are R8 and R9 (§3.3). CR's are R10, R2, R5,
+# CK-R and CR. CK-R's prerequisites are R8 and R9. CR's are R10, R2, R5,
 # R6, R7, R8, R9 and CK-M, plus one scale route (track:S0 to track:S4: a model lab and its capstone), which `after`
 # cannot express: CR's page says it and shows the reader's route. CR is a capstone without a sandbox: the study runs in
 # the reader's own tools; its minutes are the page (the plan and the proposal), practice_minutes the study itself.
@@ -1777,7 +1770,7 @@
   icon: flask
   status: active
   minutes: 60
-  practice_minutes: 1800   # the study itself: 20 to 40 hours, CK-R's four among them (curriculum v2 §7.9, §7.10)
+  practice_minutes: 1800   # the study itself: 20 to 40 hours, CK-R's four among them
   title: "Your own study: from a question to a report"
   subtitle: "Plan a study at one scale, write a one-page proposal, carry it out, and report it in a paper, a poster and a rubric sheet"
   short: "Capstone: your own study"
@@ -1787,8 +1780,7 @@
   after: [R10, R2, R5, R6, R7, R8, R9, CK-M]
   next: CK-R
   scales: [S0, S1, S2, S3, S4]
-# ---------- research case files (curriculum v2 §13; Henry approved every excerpt sentence on 2026-11-03,
-# reports/learn/excerpts_for_approval.md; live from wave W2; tier confirmed by the coordinator)
+# ---------- research case files: every excerpt sentence is approved wording (the course's sourcing rule)
 - kind: lesson
   id: cf2-cost-per-kg-vs-system-cost
   code: CF2
@@ -1837,8 +1829,7 @@
   teaches: [present value of a delay, private ratepayer and social accounts, large-load tariffs]
   after: [8]
   scales: [S2]
-# CF1, builder learn-w3-b (wave W3): a draft in learn/_drafts/ until its review fixes are done (Henry approved E8 on
-# 2026-11-03); tier to be confirmed by the coordinator
+# CF1 (approved wording E8)
 - kind: lesson
   id: cf1-supply-chain-microgrids
   code: CF1
@@ -1856,9 +1847,7 @@
   after: [10]
   scales: [S1]
 
-# ---------- sandboxes and capstones (curriculum v2 §16.3, §16.4, §7.9; wave W3). SB0 runs engine E0
-# (assets/learn/components/engine-e0.js); C0 is built on it. Prerequisites A1 and F4 (curriculum §7.9) join C0's `after`
-# once their rows exist (other W3 branches).
+# ---------- sandboxes and capstones. SB0 runs engine E0 (assets/learn/components/engine-e0.js); C0 is built on it.
 - kind: lesson
   id: sb0-site-bench
   code: SB0
@@ -1887,7 +1876,7 @@
   icon: target
   status: active
   minutes: 60
-  lab_minutes: 45   # the Modeler version's M4 notebook (learn_map_v2.yml: M4 lab_minutes)
+  lab_minutes: 45   # the Modeler version's M4 notebook (M4's lab_minutes)
   title: "Behind one meter: what should one home or one plant install?"
   subtitle: "Build a plan, test what could change it, and defend it in a one-page note"
   short: "Capstone: behind one meter"
@@ -1898,7 +1887,7 @@
   after: [9, A1, F4, SB0]
   scales: [S0]
 
-# ---------- sandboxes and capstones (curriculum v2 §16.3, §16.4, §7.9; wave W3)
+# ---------- sandboxes and capstones
 - kind: lesson
   id: sb1-microgrid-workbench
   code: SB1
@@ -1936,8 +1925,7 @@
   after: [SB1, F7, A14, A4]
   scales: [S1]
 
-# CF3, builder learn-w4-d (wave W4); Henry approved E11 on 2026-11-05; live after its review fixes (learn-w4-fix-d,
-# 2026-11-05); Analyst tier, as CF1 and CF2 (coordinator, 2026-11-05)
+# CF3 (approved wording E11); Analyst tier, as CF1 and CF2
 - kind: lesson
   id: cf3-hydrogen-under-uncertainty
   code: CF3
@@ -1954,8 +1942,7 @@
   teaches: [sizing before uncertainty resolves, scenarios with chances, reading a published stochastic planning model]
   after: [12]
   scales: [S2]
-# CF4, builder learn-w6-cf4 (wave W6); review fixes on learn-w6-cf4; went live on 2026-11-07 after Henry approved E15 and
-# its revisions after review (register, "W6 sources"; DECISIONS 2026-11-07): framing C; analyst tier, as the other case files
+# CF4 (approved wording E15, with its revisions after review): framing C; analyst tier, as the other case files
 - kind: lesson
   id: cf4-existing-reactors-hydrogen
   code: CF4
@@ -1972,8 +1959,7 @@
   teaches: ["hydrogen at an existing plant", "reserves from an electrolyzer's headroom", "sunk costs", "price-taking", "reading a published dispatch and cash-flow study"]
   after: [7]
   scales: [S4]
-# CF5, builder learn-w5-f (wave W5); review fixes on learn-w5-cf5; went live on 2026-11-07 after Henry approved E14
-# (register, "W5 sources"; DECISIONS 2026-11-07): framing C, E14.16b; analyst tier (coordinator, 2026-11-06)
+# CF5 (approved wording E14): framing C, E14.16b; analyst tier
 - kind: lesson
   id: cf5-drawing-the-boundary
   code: CF5
@@ -1990,8 +1976,7 @@
   teaches: [system boundaries, pricing a diverted by-product, cogeneration, absorption and electric chillers]
   after: [7]
   scales: [S1]
-# CF8, builder learn-w4-e (wave W4): a draft in learn/_drafts/ until its review fixes are done (Henry approved E12 and E13
-# on 2026-11-05)
+# CF8 (approved wording E12 and E13)
 - kind: lesson
   id: cf8-power-curves-from-scarce-data
   code: CF8
@@ -2008,7 +1993,7 @@
   teaches: [probabilistic power curves, multi-fidelity data, from a power-curve band to a capacity-factor band]
   after: [5]
   scales: [S0]
-# ---------- the math toolbox (curriculum v2 K1-K8; guided minutes; K4 and K7 built in wave W1; K1, K2, K3, K5, K8 in W2)
+# ---------- the math toolbox (K1-K8; guided minutes)
 - kind: tool
   id: k01-units
   code: K1
@@ -2065,7 +2050,7 @@
   code: K4
   status: active
   minutes: 15
-  practice_minutes: 20   # the drill (Check section); the badge needs build_learn.py to show it (coordinator)
+  practice_minutes: 20   # the drill (Check section), shown in the header badge
   title: "Linear equations and inequalities"
   subtitle: "Solve a balance for one unknown, turn words into ≤, ≥ and =, and find the plans that pass several rules at once"
   short: "Linear equations"

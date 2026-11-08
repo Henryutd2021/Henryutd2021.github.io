@@ -1,5 +1,5 @@
-# Sidecar for CF1 (cf1-supply-chain-microgrids), builder learn-w3-b, 2026-11-03. Read by scripts/build_learn.py.
-# Henry approved the page's excerpts on 2026-11-03 (reports/learn/excerpts_for_approval.md, E8 without E8.11-E8.12).
+# Sidecar for CF1 (cf1-supply-chain-microgrids). Read by the course build step.
+# The page's excerpts are approved wording (E8, without E8.11-E8.12).
 id: cf1-supply-chain-microgrids
 lesson: CF1
 glossary:
@@ -23,7 +23,7 @@ glossary:
     def: "The cost of moving and storing goods between factories, warehouses and stores: shipping, warehousing and handling."
 requests:
   - "New glossary terms here (deterministic-equivalent, stylized-network, logistics-cost) are marked in CF1, F7 and A14."
-  - "Tier: CF1 is filed under analyst (like CF2, CF6 and CF7); please confirm."
-  - "Excerpts: the page uses E8.1, E8.3-E8.10 and E8.13-E8.17 word for word (approved 2026-11-03); E8.11 and E8.12 (JORS) are left out, as Henry decided. E8 proposes no numbers to remember, so the case file has no numbers card."
-  - "Glossary: time-of-use may also be defined by A4's builder (learn-w3-d); keep one definition."
+  - "Tier: CF1 is filed under analyst, like CF2, CF6 and CF7."
+  - "Excerpts: the page uses E8.1, E8.3-E8.10 and E8.13-E8.17 word for word (approved wording); E8.11 and E8.12 (JORS) are left out. E8 proposes no numbers to remember, so the case file has no numbers card."
+  - "Glossary: time-of-use may also be defined in A4's sidecar; keep one definition."
   - "The toy runs a full year of hours at two sites in the browser (81 size pairs per site and setting, about 6 million hour steps in all, once at load); it needs town_year.json."

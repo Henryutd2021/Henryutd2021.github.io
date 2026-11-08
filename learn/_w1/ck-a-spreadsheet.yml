@@ -1,4 +1,4 @@
-# Sidecar for CK-A (ck-a-spreadsheet), builder learn-w5-g, 2026-11-06. Read by scripts/build_learn.py.
+# Sidecar for CK-A (ck-a-spreadsheet). Read by the course build step.
 id: ck-a-spreadsheet
 lesson: CK-A
 glossary:
@@ -12,6 +12,6 @@ glossary:
     term: Elective pay
     def: "A rule of United States tax law that lets tax-exempt and governmental bodies, such as school districts, receive the value of certain clean-energy tax credits as a payment from the IRS."
 requests:
-  - "path.yml: CK-A's curriculum prerequisites are A1, A4, A13 and A15 (curriculum v2 §3.3). A13 was added at the W5 batch-1 merge; add A15 (learn-w5-a) when it is live."
+  - "path.yml: CK-A's after list is the course plan's prerequisites for the Analyst checkpoint: A1, A4, A13 and A15."
   - "The case is the school's solar-plus-storage project only. The town heat-pump programme would need A15's numbers (not live); it can become a second variant later, as CK-M has two."
-  - "Downloads: assets/learn/data/ck-a-starter.xlsx and ck-a-worked.xlsx (XLSX with live formulas, written with ck-a-spreadsheet.json by scripts/build_learn_cka_sheet.py in the ResearchPortfolio folder; standard library only). assets/learn/data/ is in _quarto.yml's resources, so both are published."
+  - "Downloads: assets/learn/data/ck-a-starter.xlsx and ck-a-worked.xlsx (XLSX with live formulas, written with ck-a-spreadsheet.json by the checkpoint's data build step; standard library only). assets/learn/data/ is in _quarto.yml's resources, so both are published."

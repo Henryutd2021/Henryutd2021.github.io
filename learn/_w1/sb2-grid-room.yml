@@ -1,5 +1,4 @@
-# Sidecar for SB2 (sb2-grid-room) and C2 (c2-plains-grid-hard-year), builder learn-w4-g, 2026-11-05. Read by
-# scripts/build_learn.py.
+# Sidecar for SB2 (sb2-grid-room) and C2 (c2-plains-grid-hard-year). Read by the course build step.
 id: sb2-grid-room
 lesson: SB2
 glossary:
@@ -16,4 +15,4 @@ glossary:
     term: Uprate (of a line or link)
     def: "Raising the most power a line or link may carry, for example with new conductors or a second circuit."
 requests:
-  - "C2 (c2-plains-grid-hard-year) quotes approved E7 sentences word for word (E7.2, E7.3, E7.5, E7.6; excerpt:code, CF7's footer, no title; Henry confirmed W4 placements of E7). E7.4 is left out on purpose: its 300 MW-IT number sits too close to C2's own 300 MW load."
+  - "C2 (c2-plains-grid-hard-year) quotes approved E7 sentences word for word (E7.2, E7.3, E7.5, E7.6; excerpt:code, CF7's footer, no title; the placements are approved). E7.4 is left out on purpose: its 300 MW-IT number sits too close to C2's own 300 MW load."

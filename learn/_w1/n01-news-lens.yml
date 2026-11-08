@@ -1,4 +1,4 @@
-# Sidecar of lesson N1 (builder e, W1, 2026-11-02): new glossary terms and requests for shared files.
+# Sidecar of lesson N1: new glossary terms and requests for shared files.
 lesson: n01-news-lens
 glossary:
   - {id: counterfactual, term: "Counterfactual", def: "What would have happened without the change being judged; every saving or effect is measured against one."}
@@ -10,5 +10,5 @@ glossary:
   - {id: voltage, term: "Voltage", def: "The electrical push that drives current through a wire, measured in volts (V); 1 kilovolt (kV) is 1,000 V."}
   - {id: reactive-power, term: "Reactive power", def: "The part of alternating-current power that does no net work but holds voltage up; it is supplied and absorbed locally."}
 requests:
-  - "Field Notes link: learn_scope_scan.py flags ../field-notes/briefings.html as an internal link outside learn/, so the page names Field Notes in plain text only (scan not weakened). If Henry wants the link, the scanner needs field-notes/ on its internal allow-list."
-  - "No-JS fallback of learn/n01-news-lens.qmd, both generated from assets/learn/data/n01-news-lens.json and checked by the test: the stories and notes (fallback markers) by scripts/learn_n01_fallback.js; the worked checks, spotter answers and ladder placements (fallback-checks markers) by node _tests/learn/test_n01-news-lens.js --write. Run both after a data edit."
+  - "Field Notes link: the scope scan flags ../field-notes/briefings.html as an internal link outside learn/, so the page names Field Notes in plain text only. A link would need field-notes/ on the scan's internal allow-list."
+  - "No-JS fallback of learn/n01-news-lens.qmd, both generated from assets/learn/data/n01-news-lens.json and checked by the test: the stories and notes (fallback markers) by the lesson's fallback build step; the worked checks, spotter answers and ladder placements (fallback-checks markers) by node _tests/learn/test_n01-news-lens.js --write. Run both after a data edit."

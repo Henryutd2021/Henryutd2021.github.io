@@ -1,5 +1,4 @@
-# Sidecar for M2 (m02-unit-commitment), builder learn-w2-c, 2026-11-03. Read by scripts/build_learn.py (which reads
-# learn/_w1/ only, so the W2 sidecar lives here too).
+# Sidecar for M2 (m02-unit-commitment). Read by the course build step, which reads sidecars from learn/_w1/ only.
 id: m02-unit-commitment
 lesson: M2
 glossary:

@@ -1,9 +1,9 @@
-# Sidecar for CR (cr-your-own-study), builder learn-w7-b, 2026-11-07. Read by scripts/build_learn.py.
+# Sidecar for CR (cr-your-own-study). Read by the course build step.
 id: cr-your-own-study
 lesson: CR
 requests:
-  - "CR is a capstone without a sandbox (form: capstone, no sandbox:); build_learn.py accepts it unchanged. Its minutes (60) are the page, practice_minutes (1800) the study: the header reads '60 min guided · about 30 h practice', the page says 20 to 40 hours."
-  - "Curriculum §7.9's 'plus one route of track:S0 to track:S4' cannot be written in after:; the page states it, and the plan shows the reader's route (model lab and capstone, through LX.lessonRef) and whether it is done in this browser. M13 and C4 (the S4 route) appear as upcoming until W6 lands."
-  - "path.yml (coordinator's cross-link pass): R9 has no next; next: CR would lead the studio track into the capstone."
-  - "Mixed track: the data stage links X6 through LX.lessonRef (upcoming until learn-w7-a lands); no static text names X6."
+  - "CR is a capstone without a sandbox (form: capstone, no sandbox:); the course build step accepts it unchanged. Its minutes (60) are the page, practice_minutes (1800) the study: the header reads '60 min guided · about 30 h practice', the page says 20 to 40 hours."
+  - "The course plan's 'plus one route of track:S0 to track:S4' cannot be written in after:; the page states it, and the plan shows the reader's route (model lab and capstone, through LX.lessonRef) and whether it is done in this browser."
+  - "path.yml: R9's next is CR, which leads the studio track into the capstone."
+  - "Mixed track: the data stage links X6 through LX.lessonRef; no static text names X6."
   - "base.css (shared): a header 'After ...' badge with many links (CR names eight) wraps its short links one above another, and the layout audit flags them as small tap targets at 414 px (the li is inline-flex, so its links are blockified and lose WCAG 2.5.8's inline exception). CR sets that one badge as text with page-local CSS (.lx-head .lx-badges li:has(> a) { display: block; padding: 3px 12px; line-height: 1.6; }); the same rule in base.css would cover any page."

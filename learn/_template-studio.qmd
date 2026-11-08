@@ -10,16 +10,16 @@ css: ../assets/learn/learn.css
 body-classes: "page-learn page-lesson lx-form-studio"
 ---
 
-<!-- Research studio (path.yml form: studio; curriculum v2 §11 and §16.3). Guide: assets/learn/README.md, "Studios and
+<!-- Research studio (path.yml form: studio). Guide: assets/learn/README.md, "Studios and
      case files". Replace <slug> with the studio's JS name.
      Order: the task (what to produce, from what, by when) -> exemplars (a good and a weak answer to the same task, side by
-     side, with tap-to-reveal notes: LX.Exemplars) -> self-check against the §3.4 rubric (LX.Rubric; R1 and R10 also
+     side, with tap-to-reveal notes: LX.Exemplars) -> self-check against the course rubric (LX.Rubric; R1 and R10 also
      LX.QuestionCard) -> sources. path.yml: `form: studio`, `minutes` (the guided part) and `practice_minutes` (the
      independent work, honestly: R2's literature matrix is 240), so the header shows both.
-     Rules: method-neutral (§11.2: optimization is one family among several); the rubric's words are the course's own and
+     Rules: method-neutral (optimization is one family among several); the rubric's words are the course's own and
      are not rewritten per studio (pick the competences, add a "look for" line); exemplars are illustrative and say so.
-     After editing path.yml, run in the ResearchPortfolio folder:
-     python3 scripts/build_learn.py --site <site>   (fills the three marker blocks below; never edit them by hand) -->
+     After editing path.yml, run the course build step (it fills the three marker blocks below; never edit them by
+     hand). -->
 
 <!-- learn:meta:start -->
 <!-- learn:meta:end -->

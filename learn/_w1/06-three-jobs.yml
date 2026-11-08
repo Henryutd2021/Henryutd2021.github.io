@@ -1,7 +1,6 @@
-# Sidecar for lesson 6 (T6, 06-three-jobs), builder learn-w1-c, 2026-11-02; review fixes learn-w1-fix-b, 2026-11-02.
-# Read by scripts/build_learn.py. The earlier requests are done: pjm.com joined the allow-list on 2026-11-02 (the lesson now
-# links PJM's class ratings), and the job sorter, dot chart, Steelman card, technology palette and ConceptMap gameLabel
-# were promoted at the W1 merge.
+# Sidecar for lesson 6 (T6, 06-three-jobs). Read by the course build step. No open requests: pjm.com is an allowed
+# link destination (the lesson links PJM's class ratings), and the job sorter, dot chart, Steelman card, technology
+# palette and ConceptMap gameLabel are shared components.
 id: 06-three-jobs
 lesson: 6
 glossary:
