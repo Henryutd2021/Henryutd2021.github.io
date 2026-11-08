@@ -56,11 +56,17 @@ body-classes: "page-learn page-lesson lx-form-cards"
 </div>
 <p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Illustrative plant and prices.</b> 100 MW of wind behind a 50 MW connection, trading at Prairie Town's cost of one more MWh ($0, $40 or $100, <a href="09-storage.html">lesson 9</a>). Trucked hydrogen $2.50 per kg; boiler heat $15 per MWh.</span></p>
 <p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Real shapes.</b> Wind and the town's demand follow the Southwest Power Pool's 2025 hours (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>); wind is scaled to 33.8%, the U.S. wind fleet's 2025 capacity factor (<a href="https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_b">EIA</a>). Heat demand follows the town's shape to a 15 MW winter peak.</span></p>
-<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Efficiencies.</b> Battery round trip 0.8259 (DOE 2022 assessment); alkaline minimum load 15% (IRENA 2020); heat pump 3 MWh of heat per MWh (DOE). Electrolyzer 57 kWh per kg: <a href="https://www.hydrogen.energy.gov/docs/hydrogenprogramlibraries/pdfs/24005-clean-hydrogen-production-cost-pem-electrolyzer.pdf">DOE's</a> PEM figure, illustrative here, inside IRENA's 50–78 for alkaline systems.</span></p>
+<div class="lx-datanote m4-eff"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><div><b>Efficiencies.</b><ul>
+<li>Battery: round trip 0.8259 (DOE 2022 assessment).</li>
+<li>Alkaline electrolyzer: minimum load 15% (IRENA 2020).</li>
+<li>Electrolyzer: 57 kWh per kg, <a href="https://www.hydrogen.energy.gov/docs/hydrogenprogramlibraries/pdfs/24005-clean-hydrogen-production-cost-pem-electrolyzer.pdf">DOE's</a> figure for a <span class="lx-term" data-term="pem-electrolyzer">proton exchange membrane (PEM)</span> electrolyzer, another type. Illustrative here: IRENA gives 50–78 for alkaline systems.</li>
+<li>Heat pump: 3 MWh of heat per MWh (DOE).</li>
+</ul></div></div>
 <p class="lx-hint" style="margin-top:.6rem">About 40 guided minutes in eight steps. Solver: <a href="https://ergo-code.github.io/HiGHS/">HiGHS</a> (open source), loaded on your first solve (about 3.5 MB, once).</p>
 <div class="lx-card lx-notebook m4-nb">
 <p class="lx-eyebrow">Build it in Python · notebook lab, about 45 minutes, then 90 minutes of practice</p>
-<p>The same plant in <code>scipy.optimize.linprog(method="highs")</code>, and its exact on/off version with <code>scipy.optimize.milp</code>. <code>assert</code> cells check your costs, savings and prices against the lesson's reference block.</p>
+<p>The same plant in <code>scipy.optimize.linprog(method="highs")</code>, and its exact on/off version with <code>scipy.optimize.milp</code>.</p>
+<p><code>assert</code> cells check your costs, savings and prices against the lesson's reference block; check functions test your practice answers.</p>
 <p class="lx-hint">Schedules are printed, not asserted: other plans of the same cost can run the devices differently.</p>
 <ol class="m4-nb-steps">
 <li>Download the notebook and the four data files into one folder (in Colab, upload them with the folder icon).</li>
@@ -72,6 +78,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <style>/* lesson-local */
 .m4-nb { margin-top: 1.2rem; max-width: 980px; } .m4-dl { margin-top: .6rem !important; display: flex; flex-wrap: wrap; gap: 8px; }
 .m4-nb-steps { margin: .4rem 0 0; padding-left: 1.3rem; display: grid; gap: 2px; }
+.page-learn .m4-eff ul { margin: 2px 0 0; padding-left: 1.1rem; display: grid; gap: 2px; } .page-learn .m4-eff li { margin: 0; }
 @media (max-width: 640px) { .m4-fb td:first-child { font-weight: 600; } .m4-fb td[data-label]::before { content: attr(data-label) ": "; color: var(--lx-ink-3); font-size: 12.5px; } }
 </style>
 ```
@@ -89,7 +96,8 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <dt>One LP, three carriers</dt><dd>A balance row each hour for power, hydrogen and heat: 2,520 columns and 1,176 rows for a week.</dd>
 <dt>Storage links the hours</dt><dd>Battery, tank and heat store each carry a level from hour to hour and end the week where they start.</dd>
 <dt>Conversion couples the balances</dt><dd><span class="lx-term" data-term="sector-coupling">Coupling</span>: the electrolyzer turns 1 MWh into about 17.5 kg (1,000 ÷ 57); the heat pump turns it into 3 MWh of heat.</dd>
-<dt>Where coupling pays</dt><dd>The <span class="lx-term" data-term="value-of-coupling">value of coupling</span>: heat coupling saves $21.0k in the winter week, $2.7k in summer. Conversion and storage need cheap power and heat demand to connect; summer has little heat demand.</dd>
+<dt>Where coupling saves</dt><dd>The <span class="lx-term" data-term="value-of-coupling">value of coupling</span>, in operating cost: heat coupling saves $21.0k in the winter week, $2.7k in summer, when there is little heat demand.</dd>
+<dt>Savings, not payback</dt><dd>An added device may sit idle, so no saving is below zero. Whether it pays for itself needs its investment cost, which this model leaves out.</dd>
 <dt>Coupled prices</dt><dd>When the heat pump sets heat's price, heat is worth power's price ÷ 3: $40 ÷ 3 = $13.33 per MWh of heat.</dd>
 <dt>LP relaxation</dt><dd>These costs, savings and prices let the electrolyzer run below its 15% minimum; the exact on/off cost is shown only for the winter hydrogen case.</dd>
 </dl>
@@ -136,8 +144,9 @@ $$
 | $\lambda$ | the heat store's loss, $1 - 0.98^{1/24}$ (2% a day) | per hour |
 
 - **Duals.** The power row's dual, with its sign flipped, is power's marginal value in that hour; the hydrogen and heat rows' duals are the marginal costs of one more kg and one more MWh of heat.
-- **Under this model's assumptions:** fixed sizes, the modelled prices, and the LP relaxation of the minimum load.
-- **Unique or not.** Step 7 offers only hours where each dual is unique; the test checks that raising and lowering the hour's demand by 0.01 changes the cost at the same rate.
+- **Under this model's assumptions:** fixed sizes, the modeled prices, and the LP relaxation of the minimum load.
+- **Unique here.** Each dual step 7 shows is unique: raising and lowering the hour's demand by 0.01 changes the cost at the same rate.
+- **Not always.** At a corner of the cost, raising and lowering demand change it at different rates, and several duals fit (the notebook's practice task 5 builds one).
 - **Size.** 2,520 columns and 1,176 rows; HiGHS solves it in tens of milliseconds.
 
 ```{=html}

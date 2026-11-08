@@ -115,9 +115,12 @@
       chip("Without the data center", mt(base.co2) + " · " + musd(base.resource));
       if (none && none.ok) chip("With it, no rule", mt(none.co2) + " · " + musd(none.resource));
       var Rb = view.buy && cache[JSON.stringify(caseOf(view.buy))];
-      if (Rb && Rb.ok) { chip(view.buy === "annual" ? "Matched over the year" : "Matched hour by hour", mt(Rb.co2) + " · " + musd(Rb.resource)); chip("Built for it", builtText(Rb)); }
+      if (Rb && Rb.ok) { chip(view.buy === "annual" ? "Matched over the year" : "Matched hour by hour", mt(Rb.co2) + " · " + musd(Rb.resource)); chip("Built for it", builtText(Rb)); chip("On all of 2025", yearText(view.buy)); }
       status.textContent = "Each point is a year's plan with the data center, except the ring: the grid without it. Cost in 2025 dollars; Mt = million tonnes.";
     }
+    // what the six days' 0 t claim leaves on all 8,760 hours of 2025 (the reference block's full-year checks; the two
+    // purchases take no reader setting, so the stored portfolios are the reader's)
+    function yearText(k) { var Y8 = REF.fullYear; return k === "annual" ? Math.round(Y8.annualShare * 100) + "% of the load matched" : k === "hourly" ? Math.round(Y8.shortMWh).toLocaleString("en-US") + " MWh unmatched" : "the load's year covered"; }
     function builtText(R) { return [["Wb", " wind"], ["Sb", " solar"], ["Bb", " battery"]].filter(function (x) { return Math.round(R[x[0]]) > 0; }).map(function (x) { return mw(R[x[0]]) + x[1]; }).join(", ") || "nothing"; }
     function tieText(pr) { return Math.abs(pr.hi - pr.lo) < 5000 ? mt(pr.R.co2) : "any of " + mt(pr.lo) + " to " + mt(pr.hi); }
 
@@ -151,16 +154,21 @@
       });
     }
     function capLine(c, R) { return "**Cap at " + c + "%:** CO₂ " + mt(R.co2) + ", cost " + musd(R.resource) + " (" + dm(R.resource - base.resource) + "); new wind " + mw(R.Wn) + ", solar " + mw(R.Sn) + ". The cap's dual: one more tonne allowed would save " + f2(R.capPrice) + "."; }
+    function modeText(tau) { return S.tauFrom != null ? "Price in use: the " + view.cap + "% cap's exact dual, " + f2(tau) + " per t rounded, not the slider. Move the slider to use it again." : "Price in use: the slider's $" + S.tau + " per t."; }
     function priceLine(pr) {
       var tie = Math.abs(pr.hi - pr.lo) >= 5000;
       return (pr.tau % 1 ? "**A price at the cap's exact dual** (" + f2(pr.tau) + " per t, rounded): " : "**A price of " + f2(pr.tau) + " per t:** ") + (tie ? "every plan from " + mt(pr.lo) + " to " + mt(pr.hi) + " scores the same. The solver returns one, so the price picks no single plan."
         : "one CO₂ outcome at this precision, " + mt(pr.R.co2) + " at " + musd(pr.R.resource) + "; schedules may still differ.");
     }
     var BUY = { none: "No rule on what it buys", old: "Certificates from existing wind", annual: "New wind and sun, matched over the year", hourly: "New wind, sun and batteries, matched hour by hour" };
+    var SHORT = { annual: "Matched over the year", hourly: "Matched hour by hour" };
+    // what a 0 t claim assumes, and what the cost column measures (beside every claim and every cost of a purchase)
+    var CLAIMS = "Claims follow the [[market-based|market-based method]]: each certificate counted once and retired for this buyer alone. They hold on the six days; the full year is checked apart.";
+    var BILL = "System cost: new plants and gas for the whole grid. The buyer's own bill depends on contracts and prices, which this model does not calculate.";
     function caseOf(k) { return k === "none" || k === "old" ? { load: M.load.mw } : { load: M.load.mw, buy: k }; }
     function buyLine(k, R) {
       var noRule = cache[JSON.stringify(caseOf("none"))];
-      return "**" + BUY[k] + ":** may claim 0 t; cost " + dm(R.resource - noRule.resource) + " against no rule; the plants emit " + dmt(R.co2 - base.co2) + " against the grid without the data center.";
+      return "**" + SHORT[k] + ":** may claim 0 t on the six days; on all of 2025, " + yearText(k) + ". System cost " + dm(R.resource - noRule.resource) + " against no rule; the plants emit " + dmt(R.co2 - base.co2) + " against the grid without the data center.";
     }
     var steps = [
       { text: "One linear program plans the Plains Grid's year at least cost: what to build and how to run it, on six real days of 2025 that stand for the year. Solve it with no carbon rule.",
@@ -199,12 +207,14 @@
       { text: "Now price CO₂ instead: cost plus price times CO₂, the [[weighted-sum|weighted sum]], where most prices pick one CO₂ outcome. Set the price to your cap's dual and see what happens on that straight stretch.",
         build: function (act, api) {
           enter("carbon"); var tau = null;
+          var mode = null;
           var run = liveRun(act, api, function () {
-            tau = S.tauFrom != null ? S.tauFrom : S.tau; var t = tau;
+            tau = S.tauFrom != null ? S.tauFrom : S.tau; var t = tau; mode.textContent = modeText(t);
             return solveBase().then(function (b) { return b.ok ? priceRun(t) : b; }).then(function (pr) { return pr.ok ? null : pr; });
           }, function () { view.price = tau; paint(); api.saw(priceLine(cache["range" + tau])); api.done(); });
           LX.Slider(H("div", null, act), { label: "Carbon price, $ per t", color: "var(--lx-warn)", min: 0, max: 140, step: 10, value: S.tau,
             fmt: function (v) { return "$" + v; }, onChange: function (v) { S.tau = v; S.tauFrom = null; keep(); run(); } });
+          mode = H("p", { class: "lx-hint m6-mode", "aria-live": "polite" }, act);
           var b = H("button", { type: "button", class: "lx-btn small ghost", text: "Use the dual of a cap at " + S.cap + "%" }, H("div", { class: "m6-row" }, act));
           H("p", { class: "lx-hint", text: "The button uses the dual at full precision; the page prints it rounded to the cent, and a tie needs the exact value." }, act);
           b.addEventListener("click", function () {
@@ -218,11 +228,11 @@
           enter("buy"); view.buy = null; paint();
           solveAct(act, api, "Solve with the data center", function () { return solveBase().then(function (b) { return b.ok ? solve(caseOf("none"), "m6-load") : b; }); }, function () {
             var R = cache[JSON.stringify(caseOf("none"))];
-            api.saw("**With the data center, no rule:** CO₂ " + dmt(R.co2 - base.co2) + " (" + (Math.round((R.co2 - base.co2) / (M.load.mw * 8760) * 100) / 100).toFixed(2) + " t per MWh), cost " + dm(R.resource - base.resource) + "; new wind " + mw(R.Wn) + ". Gas serves it.");
+            api.saw("**With the data center, no rule:** CO₂ " + dmt(R.co2 - base.co2) + " (" + (Math.round((R.co2 - base.co2) / (M.load.mw * 8760) * 100) / 100).toFixed(2) + " t per MWh), system cost " + dm(R.resource - base.resource) + "; new wind " + mw(R.Wn) + ". Gas serves it.");
             api.done();
           });
         } },
-      { text: "Now the buyer must cover its use with new wind, sun and batteries of its own, over the year or hour by hour ([[hourly-matching|hourly matching]]), and may then claim zero. Compare what each rule costs.",
+      { text: "Now the buyer must cover its use with its own new wind, sun and batteries, over the year or hour by hour ([[hourly-matching|hourly matching]]), and may then claim zero for the six days. Compare each rule's system cost.",
         build: function (act, api) {
           enter("buy"); view.buy = S.buy; paint();
           var go = liveRun(act, api, function () {
@@ -230,6 +240,7 @@
             return solveBase().then(function (b) { return b.ok ? solve(caseOf("none"), "m6-load") : b; }).then(function (r) { return r.ok ? solve(caseOf(k), "m6-buy") : r; }).then(function (R) { return R.ok ? null : R; });
           }, function () { view.buy = S.buy; paint(); api.saw(buyLine(S.buy, cache[JSON.stringify(caseOf(S.buy))])); api.done(); });
           seg(act, "m6-buy-l", "Matching rule", [["annual", "Over the year"], ["hourly", "Hour by hour"]], S.buy, function (k) { S.buy = k; keep(); go(); });
+          H("p", { class: "lx-hint", html: LX.rich(CLAIMS) }, act); H("p", { class: "lx-hint", text: BILL }, act);
           go();
         } },
       { text: "Meeting a rule is not causing a cut: certificates from existing wind meet an annual rule too. Compare what each purchase changes at the plants, against the grid without the data center.",
@@ -240,20 +251,21 @@
           }, function () {
             host.innerHTML = ""; ledger(host);
             var none = cache[JSON.stringify(caseOf("none"))];
-            api.saw("**Same claim, different consequences:** three purchases may claim 0 t, yet against no data center the plants emit from " + dmt(cache[JSON.stringify(caseOf("hourly"))].co2 - base.co2) + " to " + dmt(none.co2 - base.co2) + "."); api.done();
+            api.saw("**Same claim, different consequences:** three purchases may claim 0 t on the six days, yet against no data center the plants emit from " + dmt(cache[JSON.stringify(caseOf("hourly"))].co2 - base.co2) + " to " + dmt(none.co2 - base.co2) + "."); api.done();
           });
         } }
     ];
     var cards = LX.StepCards(live, { steps: steps });
     function ledger(host) {
       var none = cache[JSON.stringify(caseOf("none"))];
-      LX.Ledger(host, { cls: "m6-led", caption: "A year with the 300 MW data center; the plants' change is against the grid without it, the cost against no rule.",
-        columns: ["Purchase", "May claim", "The plants emit", "Cost", "Built for it"],
+      LX.Ledger(host, { cls: "m6-led", caption: "A year with the 300 MW data center; the plants' change is against the grid without it, the added system cost against no rule.",
+        columns: ["Purchase", "May claim, six days", "On all of 2025", "The plants emit", "Added system cost", "Built for it"],
         rows: ["none", "old", "annual", "hourly"].map(function (k) {
           var R = cache[JSON.stringify(caseOf(k))];
           return { head: BUY[k], sub: k === "old" ? "not additional: nothing new is built" : k === "none" ? "the location-based count applies" : "additional and on this grid",
-            cells: [k === "none" ? "its share at average factors" : "0 t", dmt(R.co2 - base.co2), dm(R.resource - none.resource), k === "annual" || k === "hourly" ? builtText(R) : "nothing"] };
+            cells: [k === "none" ? "its share at average factors" : "0 t", k === "none" ? "–" : yearText(k), dmt(R.co2 - base.co2), dm(R.resource - none.resource), k === "annual" || k === "hourly" ? builtText(R) : "nothing"] };
         }) });
+      H("p", { class: "lx-hint", html: LX.rich(CLAIMS) }, host); H("p", { class: "lx-hint", text: BILL }, host);
     }
 
     // ---------- the explain layer (precomputed reference until the reader solves)
@@ -271,7 +283,7 @@
                 { k: "A price", color: "var(--lx-good)", text: "A cost: each tonne adds the price to the goal. At the cap's dual, a whole stretch of plans ties." },
                 { k: "A procurement rule", color: "var(--lx-tier-2)", text: "A rule on one buyer's purchases. It sets a claim; what the plants emit is a separate result." }] });
       LX.Boundary(H("div", { class: "lx-xcard" }, xhost), { title: "Where these answers hold",
-        holds: ["six real days of 2025 stand for the year, two of them extreme;", "perfect foresight, one year, fixed demand, no lines inside the grid;", "costs in 2025 dollars at 4% real; existing gas plants stay."],
+        holds: ["six real days of 2025 stand for the year, two of them extreme;", "[[perfect-foresight|perfect foresight]], one year, fixed demand, no lines inside the grid;", "costs in 2025 dollars at a 4% [[real-rate|real]] rate; existing gas plants stay."],
         leaves: ["the full year: the Go deeper box checks two plans on every hour;", "other years' weather, and plants retiring;", "CO₂ beyond the stack, and the cost of the existing fleet."],
         source: "The Plains Grid is fictional; demand, wind and sun follow the Southwest Power Pool's 2025 hours (EIA-930)." });
     }

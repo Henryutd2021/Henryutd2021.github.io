@@ -249,6 +249,12 @@ const arr = (a, b, t) => a.length === b.length && a.every((v, i) => near(v, b[i]
   const w7 = w(7).text;
   ok(w(7).done && w7 === "**Up to 5 MWh:** $40/MWh. **Then** $3,000/MWh, unserved. **From 6 MWh:** the peaker stays on at 23:00, and each MWh costs $40/MWh again. The slope fell, which it never does in a linear program.", "step 6 at 7 MWh: " + w7);
   ok(w7.replace(/\*\*/g, "").split(/\s+/).length <= 35, "step 6's message is within the 35-word budget");
+  // above about 5.7 MWh the combined-cycle plant makes each extra MWh; the peaker stays at its 30 MW minimum
+  const at23 = x => { const r = solve(M.build(D, { onoff: true, add: { hour: 23, mw: x } })); return { cc: r.values.p_cc_23, pk: r.values.p_pk_23, shed: r.values.shed_23 }; };
+  const a6 = at23(6), a65 = at23(6.5), a8 = at23(8);
+  ok(near(a6.cc, 121) && near(a65.cc, 121.5) && near(a8.cc, 123) && [a6, a65, a8].every(a => near(a.pk, 30) && near(a.shed, 0)), `above 5.7 MWh: the combined-cycle plant covers each MWh (121, 121.5, 123 MW), the peaker stays at 30 MW`);
+  // unserved demand keeps shortages feasible, but switches that break a minimum run time still make a node infeasible
+  ok(solve(M.build(D, { onoff: true, relax: true, fix: { u_pk_16: 0, u_pk_17: 1, u_pk_18: 0 } })).status === "infeasible", "a node with the peaker off at 16:00, on at 17:00, off at 18:00 is infeasible despite unserved energy");
 
   // ---------------- step 7: conditional prices
   const fx = core.fixedModel(mm, mr.values), fr = solve(fx.model), fixed = M.read(D, { onoff: true }, fr);
@@ -294,8 +300,10 @@ const arr = (a, b, t) => a.length === b.length && a.every((v, i) => near(v, b[i]
    "costs $40/MWh, then $3,000/MWh (unserved), then $40/MWh once the peaker stays on", "| Root | nothing | \\$168,975 |", "| 2 | on at 19:00 | \\$169,510 |", "| 4 | and 21:00 | \\$169,735 |",
    "| 6 | and 18:00 | \\$170,575 |", "| 8 | and 22:00 | \\$171,415 |", "| 10 | and 17:00: every switch whole | \\$173,200 |", "The root gap was \\$4,225, or 2.4% of the best plan",
    "| MWh added at 23:00 | Each extra MWh costs | What covers it |", "| 0 to 5 | \\$40/MWh | the combined-cycle plant, up to its 150 MW |",
-   "| 5 to about 5.7 | \\$3,000/MWh | nothing: it is unserved |", "| above about 5.7 | \\$40/MWh | the peaker, kept on at 30 MW |",
-   "Keeping the peaker on at 23:00 costs \\$2,100 (\\$300 no-load, and 30 MWh at \\$100/MWh instead of \\$40/MWh), plus \\$40/MWh for each MWh added. Above about 5.7 MWh that is cheaper than unserved energy",
+   "| 5 to about 5.7 | \\$3,000/MWh | nothing: it is unserved |", "| above about 5.7 | \\$40/MWh | the combined-cycle plant again; the peaker stays on at its 30 MW minimum |",
+   "**Keeping the peaker on at 23:00** costs \\$2,100: \\$300 no-load, and 30 MWh at \\$100/MWh instead of \\$40/MWh.", "**Then** each MWh added costs \\$40/MWh, made by the combined-cycle plant.",
+   "above about 5.7 MWh, keeping the peaker on is cheaper than leaving demand unserved", "presolve (simplifying the model before it starts), cutting planes (extra rows", "Away from a corner, a balance dual is the local slope",
+   "JupyterLab or VS Code (with its Jupyter extension), with Python 3.9 or later",
    "\\$40/MWh at 23:00, the slope of the first 5 MWh only", "$40/MWh, then $3,000/MWh, then $40/MWh again once the peaker stays on",
    "| Paid: 90 MWh at \\$40/MWh, 180 MWh at \\$100/MWh | \\$21,600 |", "| Running cost: 270 MWh at \\$100/MWh | \\$27,000 |", "| No-load: 6 hours at \\$300 an hour | \\$1,800 |",
    "| One start | \\$2,000 |", "| Short: the uplift | \\$9,200 |", "on only at 19:00 and 20:00 and leaves 90 MWh unserved", "paid $21,600 against $30,800 of costs",
@@ -304,7 +312,7 @@ const arr = (a, b, t) => a.length === b.length && a.every((v, i) => near(v, b[i]
    "the $3,000/MWh unserved-energy penalty", "29 July 2025", "p. 55", "p. 37", "P 7", "Peaker on 17:00 to 22:00"].forEach(s => has(s));
   ok(R.settle.pk.running === 27000 && 270 * 100 === 27000 && 6 * 300 === 1800, "page tables' arithmetic");
   // wording guards: no MILP duals presented as prices, prices labelled conditional
-  ["MILP prices", "mixed-integer program's prices", "shadow prices of the mixed-integer", "always optimal", "cost jumps", "the 6th $2,140", "nuclear plant's flat cost", "and a smaller tree"].forEach(s => ok(PAGE.indexOf(s) < 0 && JS.indexOf(s) < 0, "page and script do not say " + JSON.stringify(s)));
+  ["MILP prices", "mixed-integer program's prices", "every node of the tree has an answer", "the peaker, kept on at 30 MW", "A dual is the slope", "Gas CC above its costs", "shadow prices of the mixed-integer", "always optimal", "cost jumps", "the 6th $2,140", "nuclear plant's flat cost", "and a smaller tree"].forEach(s => ok(PAGE.indexOf(s) < 0 && JS.indexOf(s) < 0, "page and script do not say " + JSON.stringify(s)));
   // a price is written with its unit: no "$40," or "$100 " standing alone for a price in the page's sentences about prices
   ok(!/[Pp]rices? \$\d+[ ,]|\$(40|100)(, and| from| at 2| in most)/.test(PAGE.replace(/\\/g, "")), "page: prices carry /MWh");
   ok(/conditional on this commitment/.test(JS) && /Conditional on the commitment/.test(JS), "the step-7 prices are labelled conditional on the commitment");
@@ -317,6 +325,10 @@ const arr = (a, b, t) => a.length === b.length && a.every((v, i) => near(v, b[i]
   ok(SIDE.indexOf("portion of the cost") < 0, "sidecar: uplift definition in our own words");
   ["159500", "168975", "173200", "185900", "9200", "430300", "[168975, 169510, 169735, 170575, 171415, 173200]", "1700, 2340", "3000, 1280", "16900 / 2960", "max(0, t - UT_g + 1)"].forEach(s => ok(NB.indexOf(s) >= 0, "notebook has " + s));
   ok(NB.indexOf("2140") < 0 && NB.indexOf("Minimum run and down times count within this day only") >= 0, "notebook: no $2,140 jump; run times within the day");
+  ["the objective, not a row", "Rows: 1 + 2 × 2 + 2 + 2 + 2 = 11 per hour, so 264 for the day", "| Bounds | $0 \\\\le r_t \\\\le", "1. **Open** the node with the lowest bound", "cutting planes (extra rows", "JupyterLab"].forEach(s => ok(NB.indexOf(s) >= 0, "notebook has " + s));
+  ok(D.penalty_note.indexOf("has an answer") < 0 && /never makes a node of the branch-and-bound tree infeasible/.test(D.penalty_note), "data: the penalty note's claim is limited to shortages");
+  ok(/tag: "bounds"/.test(JS) && /tag: "minimum down"/.test(JS) && /DT: \{ name: "DT_g"/.test(JS), "the equation card shows the bounds and the minimum down time as rows");
+  ok(/\[\[combined-cycle\|combined-cycle plant\]\]/.test(JS), "step 1 marks the combined-cycle plant");
 
   console.log(`${checks - fails} of ${checks} checks passed`);
   process.exit(fails ? 1 : 0);

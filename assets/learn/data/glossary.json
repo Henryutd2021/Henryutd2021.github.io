@@ -61,7 +61,7 @@
  },
  "anticipation-effect": {
   "term": "Anticipation",
-  "short": "When people change their behaviour before a programme starts because they know it is coming.",
+  "short": "When people change their behavior before a program starts because they know it is coming.",
   "lesson": "M14",
   "href": "m14-did-it-work.html"
  },
@@ -565,7 +565,7 @@
  },
  "confounding": {
   "term": "Confounding",
-  "short": "When something other than the programme, such as a second change at the same time, also differs between the groups and moves the outcome.",
+  "short": "When something other than the program, such as a second change at the same time, also differs between the groups and moves the outcome.",
   "lesson": "M14",
   "href": "m14-did-it-work.html"
  },
@@ -1036,6 +1036,12 @@
   "short": "A machine that uses electricity to split water into hydrogen and oxygen.",
   "lesson": "CF2",
   "href": "cf2-cost-per-kg-vs-system-cost.html"
+ },
+ "electrolyzer-stack": {
+  "term": "Electrolyzer stack",
+  "short": "The stack of cells inside an electrolyzer where electricity splits water into hydrogen and oxygen; it wears with use and is replaced several times over a plant's life.",
+  "lesson": "M11",
+  "href": "m11-tea-in-models.html"
  },
  "emission-factor": {
   "term": "Emission factor",
@@ -1993,7 +1999,7 @@
  },
  "lower-bound": {
   "term": "Lower bound",
-  "short": "A value the best answer cannot fall below; in a cost-minimising model, the cost of a relaxation is one.",
+  "short": "A value the best answer cannot fall below; in a cost-minimizing model, the cost of a relaxation is one.",
   "lesson": "M2",
   "href": "m02-unit-commitment.html"
  },
@@ -2467,7 +2473,7 @@
  },
  "parallel-trends": {
   "term": "Parallel trends",
-  "short": "The assumption behind difference-in-differences: without the programme, the treated and comparison groups would have changed by the same amount.",
+  "short": "The assumption behind difference-in-differences: without the program, the treated and comparison groups would have changed by the same amount.",
   "lesson": "M14",
   "href": "m14-did-it-work.html"
  },
@@ -2587,7 +2593,7 @@
  },
  "pinball-loss": {
   "term": "Pinball loss",
-  "short": "The score of a quantile forecast: a miss above the quantile is weighted by its level, a miss below by one minus it; lower is better.",
+  "short": "The score of a percentile forecast: a 90th-percentile forecast should sit above about 90% of outcomes, so an outcome above it costs 0.9 times the miss and one below it 0.1 times; lower is better.",
   "lesson": "M9",
   "href": "m09-surrogates-uq.html"
  },
@@ -2773,7 +2779,7 @@
  },
  "rank-correlation": {
   "term": "Rank correlation (Spearman's ρ)",
-  "short": "The correlation of the ranks of two quantities, from −1 to 1: how consistently one rises or falls with the other, whatever the shape of the link.",
+  "short": "The correlation of the ranks of two quantities, from −1 to 1: how consistently one rises or falls as the other rises; it can miss U-shaped links and interactions.",
   "lesson": "M7",
   "href": "m07-monte-carlo.html"
  },
@@ -3115,7 +3121,7 @@
  },
  "selection-bias": {
   "term": "Selection bias",
-  "short": "A false effect that appears when the people or places that take up a programme differ, before it starts, from those that do not.",
+  "short": "A false effect from who joins: those who take up a program differ from the rest in a way the comparison does not remove (difference-in-differences removes a fixed gap, not a different trend).",
   "lesson": "M14",
   "href": "m14-did-it-work.html"
  },
@@ -3217,7 +3223,7 @@
  },
  "spillover-effect": {
   "term": "Spillover",
-  "short": "When a programme also changes the comparison group, for example neighbours copying a habit or projects moving across a border.",
+  "short": "When a program also changes the comparison group, for example neighbors copying a habit or projects moving across a border.",
   "lesson": "M14",
   "href": "m14-did-it-work.html"
  },
@@ -3579,7 +3585,7 @@
  },
  "two-stage-stochastic-program": {
   "term": "Two-stage stochastic program",
-  "short": "An optimization model that chooses the here-and-now decisions and each branch's recourse together, to minimise the expected cost over all branches.",
+  "short": "An optimization model that chooses the here-and-now decisions and each branch's recourse together, to minimize the expected cost over all branches.",
   "lesson": "M8",
   "href": "m08-stochastic-robust.html"
  },
@@ -3726,6 +3732,12 @@
   "short": "The electrical push that drives current through a wire, measured in volts (V); 1 kilovolt (kV) is 1,000 V.",
   "lesson": "F6",
   "href": "f06-grid-and-outages.html"
+ },
+ "voltage-angle": {
+  "term": "Voltage angle",
+  "short": "How far the alternating voltage at one bus runs ahead of the voltage at the reference bus, whose angle is set to zero; in DC power flow a line's flow is proportional to the angle difference across it.",
+  "lesson": "M1",
+  "href": "m01-dispatch-to-lmp.html"
  },
  "wait-and-see": {
   "term": "Wait-and-see problem",

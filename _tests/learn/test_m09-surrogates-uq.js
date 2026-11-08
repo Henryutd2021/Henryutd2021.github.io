@@ -164,7 +164,7 @@ has("$H$ stacks $h$ at every record, one row each.", "Go deeper: H defined");
 ok(/\*\*Symbols\.\*\* \$v\$ wind speed/.test(PAGE), "Go deeper: a symbol key before the formulas");
 has("64 to fit (seed 9, used in order) and 400 others to score (seed 2023)", "data note: counts and seeds");
 ok(/12% turbulence\) and 3% lower\./.test(TX) && /power scatter combines 15 kW of background noise with an approximate wind-error term, 0\.3 m\/s times the curve's slope/.test(TX) && T.ti === 0.12 && T.loss === 0.03 && T.powErr === 15 && T.windErr === 0.3, "data note: the toy's recipe");
-ok(/k = 2, c = 8 m\/s\) between 3 and 20 m\/s/.test(TX) && T.weibull.k === 2 && T.weibull.c === 8, "data note: the Weibull wind speeds");
+ok(/k = 2, c = 8 m\/s\) between 3 and 20 m\/s/.test(TX) && /Check whether the band is too narrow, wrongly centered, or both\./.test(TX) && T.weibull.k === 2 && T.weibull.c === 8, "data note: the Weibull wind speeds");
 ok(/1\.645/.test(PAGE) && near(M.ZL[90], 1.6448536269514722, 1e-12), "Go deeper: the 90% band is m ± 1.645 σ");
 
 // ---------------- the page on a stub document
@@ -216,6 +216,7 @@ const sliders = [];
   cards.go(1); card().querySelectorAll(".lx-seg button").forEach(x => x.click());
   ok(!next().disabled && saw() === "The band is narrow near records and widest beyond the last one: 11.9 m/s with 16 records. Records up to 15.5 m/s cut its mean width from " + kw(F.step2[1].w.mean) + " to " + kw(F.step2[2].w.mean) + ".", "step 2 (" + saw() + ")"); sawBudget(2);
   ok(/32 records, up to 15\.5 m\/s: the 90% band is 576 kW wide on average, widest at 20 m\/s\./.test(text(card().innerHTML)), "step 2: the readout");
+  ok(card().innerHTML.includes('data-term="length-scale"') && /length-scale 3\.0 m\/s \(how far one record's pull reaches\)|length-scale [0-9.]+ m\/s \(how far one record's pull reaches\)/.test(text(card().innerHTML)), "step 2: the length-scale is marked and explained where it first appears");
   // 3
   cards.go(2);
   ok(/below the best on the grid/.test(text(card().innerHTML)), "step 3: the start settings are below the best");
@@ -239,7 +240,7 @@ const sliders = [];
   // 7
   cards.go(6); const sl7 = sliders[sliders.length - 1];
   for (let i = 1; i < SW.length; i++) sl7._set(i);
-  ok(!next().disabled && saw() === "At 16 records two sources are 41 kW closer; at 64, 5 kW. Once records cover the speeds that matter, the cheap curve adds little.", "step 7 (" + saw() + ")"); sawBudget(7);
+  ok(!next().disabled && saw() === "At 16 records two sources are 41 kW closer; at 64, 5 kW. In this example, the cheap curve's added benefit shrinks as records cover more wind speeds.", "step 7 (" + saw() + ")"); sawBudget(7);
   // 8
   cards.go(7); card().querySelectorAll(".lx-choice")[0].click();
   ok(!next().disabled && saw() === "Above 13 m/s the two-source band holds 58% of new records; the wider one-source band holds 100% in this example. Neither was validated beyond its last record: cheap data mislead where they are wrong and unchecked.", "step 8 (" + saw() + ")"); sawBudget(8);
@@ -248,7 +249,9 @@ const sliders = [];
   ok(/the first 16 records stop at 11\.9 m\/s\./.test(stepText()), "step 8 text: where the records stop");
   { const a8 = M.fitStored(D, N0, false, "reduce"); ok(new RegExp("falls back toward its average, " + kw(a8.beta[0]).replace(",", ",") + ": close to this turbine by luck").test(text(card().innerHTML)) && a8.beta[0] > 900 && a8.beta[0] < 1000 && M.predict(a8, 20).m < 1200 && M.predict(M.fitStored(D, N0, false), 20).m < 1200 && M.field(T, 20) > 1900, "step 8: the one-source curve falls toward its average beyond the records in both cases (" + kw(a8.beta[0]) + ")"); }
   // 9
-  cards.go(8); card().querySelectorAll(".lx-seg button")[3].click();
+  cards.go(8);
+  ok(card().innerHTML.includes('data-term="pinball-loss"') && /a 90th-percentile forecast should sit above about 90% of outcomes/.test(text(card().innerHTML)), "step 9: pinball loss is explained, with its glossary mark, before the reader picks it");
+  card().querySelectorAll(".lx-seg button")[3].click();
   ok(next().disabled && /This one shows the failure/.test(saw()), "step 9: high-wind coverage shows the failure, Next still waits");
   card().querySelectorAll(".lx-seg button")[2].click();
   ok(!next().disabled && saw() === "Averaged over all 400 records, pinball loss rates them about equal; only 26 records lie above 13 m/s, where the two-source band fails. Score where the decision needs it, not only on average.", "step 9 (" + saw() + ")"); sawBudget(9);
@@ -267,6 +270,9 @@ function finish() {
   if (NB) {
     const nb = JSON.parse(NB), src = nb.cells.map(c => c.source.join("")).join("\n");
     ok(nb.cells.every(c => c.cell_type === "markdown" || (c.outputs.length === 0 && c.execution_count === null)), "the notebook is stored without outputs");
+    ok(!/time order|next in time/.test(src) && /stored campaign order/.test(src), "practice task 3: the records are in a stored campaign order, not a time order");
+    ok(/def check_task4/.test(src) && /check_task4\(np\.quantile/.test(src), "practice task 4 has a checked answer (check_task4, itself checked)");
+    ok(/uncertainty in its fitted mean coefficients/.test(src), "the library comparison names the band term it leaves out");
     ok(/m09-surrogates-uq\.json/.test(src) && /REF\["ml16"\]/.test(src) && /REF\["scores"\]/.test(src) && /REF\["predict16"\]/.test(src) && /REF\["sweepRMSE"\]/.test(src), "the notebook asserts the reference block");
     ok(/about 45 minutes, plus 60 minutes of practice/.test(src), "the notebook's times");
   }

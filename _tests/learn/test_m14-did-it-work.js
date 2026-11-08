@@ -146,8 +146,8 @@ ok((TX.match(/[Ss]imulated/g) || []).length >= 6, "the page says 'simulated' thr
 // the DOE card: every number from the settings file's record of the report
 {
   const f = D.doe.facts;
-  has("ten utilities ran eleven consumer behaviour studies", "DOE: 10 utilities, 11 studies"); ok(f.utilities === 10 && f.studies === 11, "DOE record: 10 and 11");
-  has("(" + f.optOutEnroll + "% against " + f.optInEnroll + "%)", "DOE: enrolment"); has("(" + f.optOutTOU + "% against " + f.optInTOU + "% for TOU)", "DOE: TOU cuts");
+  has("ten utilities ran eleven consumer behavior studies", "DOE: 10 utilities, 11 studies"); ok(f.utilities === 10 && f.studies === 11, "DOE record: 10 and 11");
+  has("(" + f.optOutEnroll + "% against " + f.optInEnroll + "%)", "DOE: enrollment"); has("(" + f.optOutTOU + "% against " + f.optInTOU + "% for TOU)", "DOE: TOU cuts");
   has("(" + f.optOutRetain + "% against " + f.optInRetain + "%) (p. vi)", "DOE: retention, page vi");
   ok(OWN.includes('<td class="n">' + f.optInTOU + "% and " + f.optOutTOU + "%</td>") && OWN.includes('<td class="n">' + f.touLow + "% and " + f.touHigh + "%</td>"), "numbers to remember: 12% and 6%; 6% and 18%");
   has("DOE's studies reported peak cuts of " + f.optInTOU + "% for opt-in TOU customers and " + f.optOutTOU + "% for opt-out (2016)", "myth 3: DOE");
@@ -195,6 +195,8 @@ ok((TX.match(/[Ss]imulated/g) || []).length >= 6, "the page says 'simulated' thr
   cards.go(1); btns(/Compare months/)[0].click();
   sawIs(2, "The gap is 2.9 times the truth. Homes that opted in were smaller and more engaged before any tariff: selection, not effect.");
   ok((E.naive.est / truth).toFixed(1) === "2.9", "step 2: 2.9 times");
+  ok(/Engagement is a made-up score for interest in cutting evening use: unitless, 0 on average, higher means keener\./.test(text(card().innerHTML)), "step 2: engagement explained where it first appears");
+  { const me = F.hh.reduce((a, h) => a + h.e, 0) / F.hh.length; ok(Math.abs(me) < 0.15, "engagement averages about 0 over the 400 homes, as step 2 says: " + me.toFixed(3)); }
   cards.go(2); btns(/^Fit$/)[0].click();
   ok(next().disabled, "step 3: one fit is not enough");
   card().querySelectorAll(".lx-toggle")[0].click(); btns(/^Fit$/)[0].click(); card().querySelectorAll(".lx-toggle")[1].click(); btns(/^Fit$/)[0].click();
@@ -218,10 +220,13 @@ ok((TX.match(/[Ss]imulated/g) || []).length >= 6, "the page says 'simulated' thr
   cards.go(6); const sg7 = () => card().querySelectorAll(".lx-seg button");
   sg7()[1].click(); sg7()[2].click(); ok(next().disabled, "step 7: two threats are not enough");
   sg7()[3].click();
-  sawIs(7, "None of these intervals holds the truth. Only a trend that starts before month 13 (already cutting, early cuts) shows in the months before; spillovers and a second change hide.");
-  sg7()[4].click(); ok(card().querySelectorAll("tbody tr").length === 5 && /no$/.test(text(card().querySelectorAll("tbody tr")[4].innerHTML)), "step 7: the table, every threat 'no'");
+  const said7 = "Each threat's interval misses the truth; the no-threat one holds it. Only a trend that starts before month 13 (already cutting, early cuts) shows in the months before; spillovers and a second change hide.";
+  sawIs(7, said7);
+  sg7()[4].click(); { const rows = card().querySelectorAll("tbody tr").map(tr => text(tr.innerHTML)); ok(rows.length === 5 && /yes$/.test(rows[0]) && rows.slice(1).every(r => /no$/.test(r)), "step 7: the table, the no-threat case 'yes', every threat 'no'"); }
+  sg7()[0].click(); { const rows = card().querySelectorAll("tbody tr").map(tr => text(tr.innerHTML)); ok(saw() === said7 && rows.length === 5 && /^None/.test(rows[0]) && /yes$/.test(rows[0]), "step 7: back on None, the result still agrees with the table"); }
   cards.go(7); card().querySelectorAll(".lx-choice")[2].click();
-  sawIs(8, "Smaller: −0.20 kW per home on average, against −0.29 kW for those who chose it; engaged owners respond more. A result holds for the group it was measured on.");
+  ok(/here, engaged homes join more and cut more/.test(stepText()), "step 8: the simulation's assumption is said before the prediction");
+  sawIs(8, "Smaller: −0.20 kW per home on average, against −0.29 kW for those who chose it, since the rest are less engaged. A result holds for the group it was measured on.");
   cards.go(8); const sg9 = () => card().querySelectorAll(".lx-seg button");
   sg9()[1].click(); ok(next().disabled, "step 9: one threat is not enough");
   sg9()[2].click();
@@ -238,7 +243,7 @@ ok((TX.match(/[Ss]imulated/g) || []).length >= 6, "the page says 'simulated' thr
     D.classify.forEach((c, k) => segs[k].querySelectorAll("button")[(kinds.indexOf(c.answer) + 1) % 4].click());
     ok(next().disabled && /Not all right yet/.test(saw()), "step 10: wrong names are not accepted");
     D.classify.forEach((c, k) => segs[k].querySelectorAll("button")[kinds.indexOf(c.answer)].click()); }
-  sawIs(10, "Selection, confounding, spillover, anticipation: four reasons a comparison group stops being the counterfactual. Write them down before the estimate, not after.");
+  sawIs(10, "Selection, confounding, spillover, anticipation: four ways a comparison group can stop showing what would have happened. Write them down before the estimate, not after.");
   ok(live.querySelectorAll("[aria-live]").length >= 2, "results are announced in aria-live regions");
   ["mid", "step-1", "step-3", "step-5", "step-7", "step-9", "step-10"].forEach(sname => { let q = null; try { q = demo.fn(sname); } catch (err) { q = null; } ok(q && q.view === sname, "demo state " + sname + " runs"); });
   const XT = text(xp.innerHTML);
@@ -256,6 +261,8 @@ function finish() {
     ok(nb.cells.every(c => c.cell_type === "markdown" || (c.outputs.length === 0 && c.execution_count === null)), "the notebook is stored without outputs");
     ok(/m14-did-it-work\.json/.test(src) && /REF\["tou"\]/.test(src) && /REF\["regions"\]/.test(src) && /import numpy/.test(src) && !/import pandas|from sklearn|import scipy/.test(src), "the notebook asserts the reference block, with NumPy only");
     ok(/about 60 minutes, plus 90 minutes of practice/.test(src) && /[Ss]imulated/.test(src), "the notebook's times; it says simulated");
+    ok([1, 2, 3, 4, 5].every(k => new RegExp("def check_task" + k + "\\(").test(src) && new RegExp("assert [^\\n]*\"task " + k + ":").test(src)), "the notebook checks every practice task: a check function and an assert on its premise");
+    ok(/\| \$D_\{it\}\$ \| tariff indicator/.test(src) && /\| \$e\$ \| engagement/.test(src) && /\| \$z\$, \$\\varepsilon\$ \| random noise/.test(src), "the notebook defines its outcome equation's symbols");
   }
   const ALL = [PAGE, RAW, JS, SIDEYML, NB].join("\n");
   ok(!/nuclear|reactor|\bSMR\b|small modular|fission|uranium/i.test(ALL), "no nuclear term");

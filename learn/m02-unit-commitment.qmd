@@ -78,7 +78,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <p>The same model with <code>scipy.optimize.milp</code> and <code>linprog(method="highs")</code>; the notebook grows the same tree, and <code>assert</code> cells check every browser number.</p>
 <ol class="m2-nb-steps">
 <li>Download the notebook; the data are inside it.</li>
-<li>Upload it to Google Colab (<em>File → Upload notebook</em>), or open it locally with Python 3, NumPy and SciPy 1.9 or later.</li>
+<li>Upload it to Google Colab (<em>File → Upload notebook</em>), or open it locally in JupyterLab or VS Code (with its Jupyter extension), with Python 3.9 or later, NumPy and SciPy 1.9 or later.</li>
 <li>Run all cells, then try the practice questions at the end.</li>
 </ol>
 <p class="m2-dl"><a class="lx-btn small" href="notebooks/m02-unit-commitment.ipynb" download>Notebook (.ipynb)</a> <a class="lx-btn small ghost" href="../assets/learn/data/m02-unit-commitment.json" download>Lesson data (JSON)</a></p>
@@ -134,7 +134,7 @@ The tree on this page branched only on the peaker's switches. Each branching fix
 
 The root gap was \$4,225, or 2.4% of the best plan. A tighter formulation (other ways to write minimum run times, start-ups and ramps) can raise the relaxation's bound and may shrink the search, though a tree's size also depends on the solver's choices; [Knueven, Ostrowski and Watson (2020)](https://doi.org/10.1287/ijoc.2019.0944) compare many.
 
-HiGHS adds presolve, cutting planes and heuristics to the same search. By default it stops once the gap is below 0.01% (`mip_rel_gap = 0.0001`, [HiGHS options](https://ergo-code.github.io/HiGHS/dev/options/definitions/)); here it reached 0%.
+HiGHS adds three things to the same search: presolve (simplifying the model before it starts), cutting planes (extra rows that remove fractional answers no plan with whole switches can reach) and heuristics (quick searches for workable whole-switch plans). By default it stops once the gap is below 0.01% (`mip_rel_gap = 0.0001`, [HiGHS options](https://ergo-code.github.io/HiGHS/dev/options/definitions/)); here it reached 0%.
 
 ```{=html}
 </div>
@@ -144,15 +144,18 @@ HiGHS adds presolve, cutting planes and heuristics to the same search. By defaul
 <div class="lx-deeper-body">
 ```
 
-A dual is the slope of the best cost as one right-hand side changes. In a linear program that slope never falls as demand grows. With switches it can:
+Away from a corner, a balance dual is the local slope of the best cost as that hour's demand changes, with everything else fixed; at a corner, more demand and less demand have different marginal costs. In a linear program the slope never falls as demand grows. With switches it can:
 
 | MWh added at 23:00 | Each extra MWh costs | What covers it |
 |---|---|---|
 | 0 to 5 | \$40/MWh | the combined-cycle plant, up to its 150 MW |
 | 5 to about 5.7 | \$3,000/MWh | nothing: it is unserved |
-| above about 5.7 | \$40/MWh | the peaker, kept on at 30 MW |
+| above about 5.7 | \$40/MWh | the combined-cycle plant again; the peaker stays on at its 30 MW minimum |
 
-Keeping the peaker on at 23:00 costs \$2,100 (\$300 no-load, and 30 MWh at \$100/MWh instead of \$40/MWh), plus \$40/MWh for each MWh added. Above about 5.7 MWh that is cheaper than unserved energy. The cost has no jump here, because demand may go unserved; its slope falls instead.
+- **Keeping the peaker on at 23:00** costs \$2,100: \$300 no-load, and 30 MWh at \$100/MWh instead of \$40/MWh.
+- **Then** each MWh added costs \$40/MWh, made by the combined-cycle plant.
+- **The crossover:** above about 5.7 MWh, keeping the peaker on is cheaper than leaving demand unserved at \$3,000/MWh.
+- **No jump:** demand may go unserved, so the cost stays continuous; its slope falls instead.
 
 HiGHS returns no duals for the mixed-integer solve. Fixing the switches gives LP prices again, conditional on that commitment: \$40/MWh at 23:00, the slope of the first 5 MWh only.
 

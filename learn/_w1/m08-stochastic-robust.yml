@@ -19,7 +19,7 @@ glossary:
     def: "The planning problem solved for one average future, every uncertain input set to its mean; its plan is then priced in the real branches."
   - id: two-stage-stochastic-program
     term: Two-stage stochastic program
-    def: "An optimization model that chooses the here-and-now decisions and each branch's recourse together, to minimise the expected cost over all branches."
+    def: "An optimization model that chooses the here-and-now decisions and each branch's recourse together, to minimize the expected cost over all branches."
   - id: value-of-stochastic-solution
     term: Value of the stochastic solution (VSS)
     def: "How much the stochastic program's plan saves, in expectation, against the plan built for the average future."

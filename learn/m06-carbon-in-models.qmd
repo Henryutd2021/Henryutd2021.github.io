@@ -43,6 +43,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-fallback">
 <!-- m06-fallback:start (written from the model by the test's --write mode; do not edit) -->
 <p class="lx-eyebrow">The Plains Grid's planning LP: caps, their duals, and four purchases for a data center</p>
+<p class="lx-hint">Mt = million tonnes of CO₂; costs a year in 2025 dollars.</p>
 <table class="lx-facts m6-fb">
 <thead><tr><th scope="col">Cap, share of 4.78 Mt</th><th scope="col">CO₂</th><th scope="col">Cost</th><th scope="col">Dual, $ per t</th></tr></thead>
 <tbody>
@@ -58,29 +59,31 @@ body-classes: "page-learn page-lesson lx-form-cards"
 </table>
 <p class="lx-hint">At the 70% cap's dual, $22.81 per t rounded (the tie needs its full precision), every plan from 3.15 Mt to 3.64 Mt scores the same: a price there picks no single plan.</p>
 <table class="lx-facts m6-fb">
-<thead><tr><th scope="col">The 300 MW data center buys</th><th scope="col">May claim</th><th scope="col">The plants emit</th><th scope="col">Cost</th><th scope="col">Built for it</th></tr></thead>
+<thead><tr><th scope="col">The 300 MW data center buys</th><th scope="col">May claim, six days</th><th scope="col">On all of 2025</th><th scope="col">The plants emit</th><th scope="col">Added system cost</th><th scope="col">Built for it</th></tr></thead>
 <tbody>
-<tr><td>No rule on what it buys</td><td data-label="May claim">its share at average factors</td><td data-label="The plants emit">+1.14 Mt</td><td data-label="Cost">$0.0M</td><td data-label="Built for it">nothing</td></tr>
-<tr><td>Certificates from existing wind</td><td data-label="May claim">0 t</td><td data-label="The plants emit">+1.14 Mt</td><td data-label="Cost">$0.0M</td><td data-label="Built for it">nothing</td></tr>
-<tr><td>New wind and sun, matched over the year</td><td data-label="May claim">0 t</td><td data-label="The plants emit">+0.04 Mt</td><td data-label="Cost">+$23.0M</td><td data-label="Built for it">844 MW wind</td></tr>
-<tr><td>New wind, sun and batteries, matched hour by hour</td><td data-label="May claim">0 t</td><td data-label="The plants emit">−2.48 Mt</td><td data-label="Cost">+$127.1M</td><td data-label="Built for it">2,382 MW wind, 615 MW solar, 199 MW battery</td></tr>
+<tr><td>No rule on what it buys</td><td data-label="May claim, six days">its share at average factors</td><td data-label="On all of 2025">–</td><td data-label="The plants emit">+1.14 Mt</td><td data-label="Added system cost">$0.0M</td><td data-label="Built for it">nothing</td></tr>
+<tr><td>Certificates from existing wind</td><td data-label="May claim, six days">0 t</td><td data-label="On all of 2025">the load's year covered</td><td data-label="The plants emit">+1.14 Mt</td><td data-label="Added system cost">$0.0M</td><td data-label="Built for it">nothing</td></tr>
+<tr><td>New wind and sun, matched over the year</td><td data-label="May claim, six days">0 t</td><td data-label="On all of 2025">95% of the load matched</td><td data-label="The plants emit">+0.04 Mt</td><td data-label="Added system cost">+$23.0M</td><td data-label="Built for it">844 MW wind</td></tr>
+<tr><td>New wind, sun and batteries, matched hour by hour</td><td data-label="May claim, six days">0 t</td><td data-label="On all of 2025">290 MWh unmatched</td><td data-label="The plants emit">−2.48 Mt</td><td data-label="Added system cost">+$127.1M</td><td data-label="Built for it">2,382 MW wind, 615 MW solar, 199 MW battery</td></tr>
 </tbody>
 </table>
-<p class="lx-hint">The plants' change is against the grid without the data center; the cost against no rule. A year in 2025 dollars.</p>
+<p class="lx-hint">Claims follow the <span class="lx-term" data-term="market-based">market-based method</span>: each certificate counted once and retired for this buyer alone. They hold on the six days; the full year is checked apart.</p>
+<p class="lx-hint">The plants' change is against the grid without the data center; the added system cost, new plants and gas for the whole grid, against no rule.</p>
+<p class="lx-hint">The buyer's own bill depends on contracts and prices, which this model does not calculate.</p>
 <!-- m06-fallback:end -->
 <p class="lx-hint">With JavaScript on, you set each cap, price and rule yourself and the solver re-plans the year in your browser.</p>
 </div>
 </div>
 <p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Illustrative grid.</b> The Plains Grid of <a href="a10-emissions-questions.html">A10</a> and <a href="a12-policy-instruments.html">A12</a>, fictional, with EIA's 2025 gas heat rates, gas price and CO₂ coefficient.</span></p>
-<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Costs.</b> New wind and solar at <a href="https://www.eia.gov/outlooks/aeo/assumptions/pdf/EMM_Assumptions.pdf">EIA's AEO2026 values</a>; a 4-hour battery at <a href="https://docs.nlr.gov/docs/fy25osti/93281.pdf">NREL's 2025 update</a>, moved to 2025 dollars; 4% real.</span></p>
-<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Six days for a year.</b> Each season's most typical day of 2025, plus the calmest day and the day of the highest net load, weighted by the days they stand for (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a> shapes).</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Costs.</b> New wind and solar at <a href="https://www.eia.gov/outlooks/aeo/assumptions/pdf/EMM_Assumptions.pdf">EIA's AEO2026 values</a>; a 4-hour battery at <a href="https://docs.nlr.gov/docs/fy25osti/93281.pdf">NREL's 2025 update</a>, moved to 2025 dollars; a 4% <span class="lx-term" data-term="real-rate">real</span> discount rate.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Six days for a year.</b> Each season's most typical day of 2025, plus the calmest day and the day of the highest <span class="lx-term" data-term="net-demand">net load</span> (demand minus existing wind and sun), weighted by the days they stand for (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a> shapes).</span></p>
 <p class="lx-hint" style="margin-top:.6rem">About 40 guided minutes in seven steps. Solver: <a href="https://ergo-code.github.io/HiGHS/">HiGHS</a> (open source), loaded on your first solve (about 3.5 MB, once).</p>
 <div class="lx-card lx-notebook m6-nb">
 <p class="lx-eyebrow">Build it in Python · notebook lab, about 45 minutes, then 90 minutes of practice</p>
 <p>The same planning LP in <code>scipy.optimize.linprog(method="highs")</code>: caps and their duals, the frontier, prices and their ties, the two matching rules, and the full-year checks. <code>assert</code> cells check your numbers against the lesson's reference block.</p>
 <ol class="m6-nb-steps">
 <li>Download the notebook and the four data files into one folder (in Colab, upload them with the folder icon).</li>
-<li>Open it in Google Colab (<em>File → Upload notebook</em>) or locally with Python 3, NumPy and SciPy 1.9 or later.</li>
+<li>Open it in Google Colab (<em>File → Upload notebook</em>), or locally in JupyterLab or VS Code with Python 3.9 or later, NumPy and SciPy 1.9 or later, started in that folder.</li>
 <li>Run all cells (about a minute), then try the practice tasks at the end.</li>
 </ol>
 <p class="m6-dl"><a class="lx-btn small" href="notebooks/m06-carbon-in-models.ipynb" download>Notebook (.ipynb)</a> <a class="lx-btn small ghost" href="../assets/learn/data/m06-carbon-in-models.json" download>Lesson data</a> <a class="lx-btn small ghost" href="../assets/learn/data/a10-emissions-questions.json" download>The fleet</a> <a class="lx-btn small ghost" href="../assets/learn/data/town_year.json" download>Year 2025</a> <a class="lx-btn small ghost" href="../assets/learn/data/cf_targets.json" download>Capacity factors</a></p>
@@ -107,8 +110,8 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <dt>A cap</dt><dd>A rule on the year's CO₂. At 70% of 4.78 Mt the plan costs $32.1M more, and the cap's dual is $22.81 per t.</dd>
 <dt>The frontier</dt><dd>The dual is the extra cost of cutting one more tonne, the magnitude of the frontier's downward slope: from $21.98 at 90% to $130.61 at 30%.</dd>
 <dt>A price and its ties</dt><dd>A price at the 70% cap's unrounded dual ties every plan from 3.15 Mt to 3.64 Mt; the cap picks one CO₂ level.</dd>
-<dt>A procurement rule</dt><dd>A rule on one buyer's purchases. Hourly matching costs $104.1M a year more than annual matching here.</dd>
-<dt>Claim and cause</dt><dd>The three certificate or matching purchases may claim 0 t; with no rule, the load's share counts at average factors. The plants emit from −2.48 Mt to +1.14 Mt against the grid without the data center.</dd>
+<dt>A procurement rule</dt><dd>A rule on one buyer's purchases. Hourly matching's system cost is $104.1M a year above annual matching's here.</dd>
+<dt>Claim and cause</dt><dd>Under the market-based method, three purchases may claim 0 t on the six days; with no rule, the load's share counts at average factors. Against no data center, the plants emit −2.48 Mt to +1.14 Mt.</dd>
 </dl>
 <!-- m06-explain:end -->
 </div>
@@ -151,10 +154,24 @@ Every variable is zero or more.
 | $V$ | the value of lost load, \$10,000 | \$/MWh |
 | $f^w_t$, $f^s_t$, $D_t$ | capacity factors per MW, and demand | share; MW |
 | $\varepsilon$ | the cap | t a year |
+| $L$ | the data center's flat load, 300 MW | MW |
+| $W_b$, $S_b$, $B_b$ | the buyer's own new wind, solar and battery | MW |
+| $\mathit{wb}, \mathit{sb}$; $c^b, d^b, e^b$ | their wind and solar used; their battery's charge, discharge and energy | MW; MW; MWh |
 
 - **A price** $\tau$ drops the cap and adds $\tau \sum_t w_t (r_{cc}\,\mathit{cc}_t + r_{ct}\,\mathit{ct}_t)$ to the goal.
-- **Hourly matching** adds the buyer's own $W_b, S_b, B_b$ and, every hour, $\mathit{wb}_t + \mathit{sb}_t + d^b_t - c^b_t \ge 300$, with $c^b_t \le \mathit{wb}_t + \mathit{sb}_t$.
-- **Annual matching** keeps one row: $\sum_t w_t (\mathit{wb}_t + \mathit{sb}_t) \ge 300 \times 8{,}760$.
+- **The data center** adds its flat load $L$ to the balance's right side: $D_t + L$.
+- **A matching rule** gives the buyer its own new wind $W_b$, solar $S_b$ and, for hourly matching only, a battery $B_b$. Each costs $C_k$ a MW, with the grid's build limits and these rows:
+
+$$
+\begin{aligned}
+\mathit{wb}_t \le f^w_t\, W_b, \quad \mathit{sb}_t \le f^s_t\, S_b, \quad c^b_t, d^b_t &\le B_b, \quad e^b_t \le 4B_b\\
+e^b_t &= e^b_{t-1} + 0.85\, c^b_t - d^b_t
+\end{aligned}
+$$
+
+- **Their output** joins the balance's left side: $+\,\mathit{wb}_t + \mathit{sb}_t + d^b_t - c^b_t$.
+- **Hourly matching** adds, every hour, $\mathit{wb}_t + \mathit{sb}_t + d^b_t - c^b_t \ge L$, with $c^b_t \le \mathit{wb}_t + \mathit{sb}_t$: the battery charges only from the buyer's own wind and sun.
+- **Annual matching** has no buyer battery and one row: $\sum_t w_t (\mathit{wb}_t + \mathit{sb}_t) \ge L \times 8{,}760$.
 
 ```{=html}
 </div>
@@ -277,6 +294,7 @@ Every variable is zero or more.
 <li>EIA. <a href="https://www.eia.gov/outlooks/aeo/assumptions/pdf/EMM_Assumptions.pdf">Assumptions to the Annual Energy Outlook 2026: Electricity Market Module</a>, Table 3, April 2026.</li>
 <li>Cole, W., Ramasamy, V. and Turan, M. (2025). <a href="https://docs.nlr.gov/docs/fy25osti/93281.pdf">Cost Projections for Utility-Scale Battery Storage: 2025 Update</a>. NREL/TP-6A40-93281, June 2025.</li>
 <li>NLR. <a href="https://atb.nlr.gov/electricity/2025/financial_cases_&amp;_methods">2025 Electricity Annual Technology Baseline: Financial Cases and Methods</a>.</li>
+<li>GHG Protocol (2015). <a href="https://ghgprotocol.org/sites/default/files/2023-03/Scope%202%20Guidance.pdf">Scope 2 Guidance</a>: the location-based and market-based methods; Table 7.1, the quality criteria for certificates and contracts, page 60.</li>
 <li>EIA. <a href="https://www.eia.gov/electricity/annual/html/epa_08_02.html">Electric Power Annual, Table 8.2</a>, 2025 data; <a href="https://www.eia.gov/environment/emissions/co2_vol_mass.php">Carbon Dioxide Emissions Coefficients</a>; <a href="https://www.eia.gov/electricity/gridmonitor/">Hourly Electric Grid Monitor (EIA-930)</a>, 2025.</li>
 <li>Ricks, W., Xu, Q. and Jenkins, J. (2023). <a href="https://doi.org/10.1088/1748-9326/acacb5">Minimizing emissions from grid-based hydrogen production in the United States</a>. Environmental Research Letters 18(1), 014025.</li>
 <li>Gagnon, P. and Cole, W. (2022). <a href="https://doi.org/10.1016/j.isci.2022.103915">Planning for the evolution of the electric grid with a long-run marginal emission rate</a>. iScience 25(3), 103915.</li>

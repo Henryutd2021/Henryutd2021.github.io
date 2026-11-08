@@ -55,20 +55,21 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <p class="lx-hint">With JavaScript on, you build this model step by step and solve it with a real solver in your browser: first a day with every plant in one place, then the same day on this network.</p>
 </div>
 </div>
-<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span>Demand, wind and solar follow lesson 0's real day, 3 September 2025 on the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), scaled to the town. Prairie Town, its plants, costs, network and line limits are illustrative. The solver is <a href="https://ergo-code.github.io/HiGHS/">HiGHS</a> (open source), loaded on your first solve (about 3.5 MB, once).</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span>Demand, wind and solar follow lesson 0's real day, 3 September 2025 on the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), scaled to the town. Prairie Town, its plants, costs, network and line limits are illustrative.</span></p>
+<p class="lx-hint m1-solver">Solver: <a href="https://ergo-code.github.io/HiGHS/">HiGHS</a> (open source), loaded on your first solve (about 3.5 MB, once).</p>
 <div class="lx-card lx-notebook m1-nb">
 <p class="lx-eyebrow">Build it in Python · notebook lab, about 45 minutes, then 90 minutes of practice</p>
-<p>The same linear program in <code>scipy.optimize.linprog(method="highs")</code>; <code>assert</code> cells check every browser number.</p>
+<p>The same linear program in <code>scipy.optimize.linprog(method="highs")</code>; <code>assert</code> cells check the main reference costs, prices and identities, and a last cell checks the practice answers.</p>
 <ol class="m1-nb-steps">
 <li>Download the notebook; the data are inside it.</li>
-<li>Upload it to Google Colab (<em>File → Upload notebook</em>), or open it locally with Python 3, NumPy and SciPy 1.9 or later.</li>
+<li>Upload it to Google Colab (<em>File → Upload notebook</em>), or open it locally in JupyterLab or VS Code (with its Jupyter extension), with Python 3.9 or later, NumPy and SciPy 1.9 or later.</li>
 <li>Run all cells, then try the practice questions at the end.</li>
 </ol>
 <p class="m1-dl"><a class="lx-btn small" href="notebooks/m01-dispatch-to-lmp.ipynb" download>Notebook (.ipynb)</a> <a class="lx-btn small ghost" href="../assets/learn/data/m01-dispatch-to-lmp.json" download>Lesson data (JSON)</a></p>
 <p class="lx-hint" style="margin-top:10px">Need a refresher? Toolbox <a href="k08-git-notebooks.html">K8</a> (Git and reproducible notebooks).</p>
 </div>
 <style>/* lesson-local */
-.m1-nb { margin-top: 1.2rem; max-width: 980px; } .m1-dl { margin-top: .6rem !important; display: flex; flex-wrap: wrap; gap: 8px; }
+.m1-solver { margin: .3rem 0 0 !important; } .m1-nb { margin-top: 1.2rem; max-width: 980px; } .m1-dl { margin-top: .6rem !important; display: flex; flex-wrap: wrap; gap: 8px; }
 .m1-nb-steps { margin: .4rem 0 0; padding-left: 1.3rem; display: grid; gap: 2px; }
 .m1-links { margin: .4rem 0 0; padding-left: 1.1rem; display: grid; gap: 4px; }
 </style>
@@ -101,11 +102,11 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-deeper-body">
 ```
 
-Take Prairie Town as the reference bus. A power transfer distribution factor $\text{PTDF}_{\ell n}$ is the share of 1 MW injected at bus $n$, and taken out in town, that flows on line $\ell$. In an equal triangle, an injection at the Ridge puts $2/3$ on Ridge–Town and $1/3$ on the path through the Gas Hub. In a lossless DC model, with $\mu_\ell$ the value of 1 MW more limit on line $\ell$ in that hour:
+Take Prairie Town as the reference bus: the bus whose voltage angle is set to zero, so that every other angle is measured from it. A power transfer distribution factor $\text{PTDF}_{\ell n}$ is the share of 1 MW injected at bus $n$, and taken out in town, that flows on line $\ell$. In an equal triangle, an injection at the Ridge puts $2/3$ on Ridge–Town and $1/3$ on the path through the Gas Hub. In a lossless DC model, with $\mu_\ell$ the value of 1 MW more limit on line $\ell$ in that hour:
 
 $$\text{LMP}_n = \text{LMP}_\text{Town} - \sum_\ell \text{PTDF}_{\ell n}\,\mu_\ell .$$
 
-At noon with the line at 110 MW, $\mu = \$120$: the Ridge gets $80 - \tfrac{2}{3} \times 120 = \$0$ and the Gas Hub $80 - \tfrac{1}{3} \times 120 = \$40$.
+At noon with the line at 110 MW, $\mu = \$120$ per MW of limit: the Ridge gets $80 - \tfrac{2}{3} \times 120 = \$0$ and the Gas Hub $80 - \tfrac{1}{3} \times 120 = \$40$.
 
 Congestion rent is what loads pay minus what generators are paid, each at its own bus's price:
 
@@ -117,7 +118,7 @@ Congestion rent is what loads pay minus what generators are paid, each at its ow
 | Wind Ridge: 119 MWh × \$0 | \$0 |
 | Congestion rent: loads minus generators | \$13,200 for the hour |
 
-In this DC model the rent also equals each full line's $\mu$ times its flow, $120 \times 110$ MW. It is not the price gap between the line's two ends times its flow ($80 \times 110 = \$8{,}800$).
+In this DC model the rent also equals each full line's $\mu$ times its flow. For this one-hour interval, $\mu$ is \$120 per MW of limit; times the 110 MW flow, that is \$13,200. It is not the price gap between the line's two ends times its flow (\$80 per MWh × 110 MWh = \$8,800).
 
 Many organized markets use congestion revenue to fund financial transmission rights, under their own settlement and funding rules. Their prices also add a third part for losses, which a DC model leaves out ([FERC Energy Primer](https://www.ferc.gov/sites/default/files/2020-06/energy-primer-2020_0.pdf), p. 64).
 

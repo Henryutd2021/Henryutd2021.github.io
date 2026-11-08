@@ -12,6 +12,8 @@
 //     the heat pump sets it, the boiler's $15 when the boiler does, and so on)
 //   - every number on the page (fallback, explain, Go deeper, myths, quiz) against the model and the reference block;
 //     the notebook reads the same data and asserts the same reference
+//   - the notebook's practice tasks: their answers (reference block, "practice") re-solved here, and its check functions
+//   - text budget: page elements, every step's result line and the notebook's prose, 40 words at most
 //   - the page on a stub document with a solver that fails, then works
 // Usage (from the site folder):  node _tests/learn/test_m04-storage-multienergy.js [--write]
 "use strict";
@@ -33,6 +35,7 @@ const DPATH = L("data/" + ID + ".json");
 const readOr = p => (fs.existsSync(p) ? fs.readFileSync(p, "utf8") : "");
 const PAGE = fs.readFileSync(path.join(SITE, "learn", ID + ".qmd"), "utf8"), JS = fs.readFileSync(L(ID + ".js"), "utf8");
 const NB = readOr(path.join(SITE, "learn/notebooks", ID + ".ipynb")), SIDE = readOr(path.join(SITE, "learn/_w1", ID + ".yml"));
+const NBJ = NB ? JSON.parse(NB) : { cells: [] }, NBS = NBJ.cells.map(c => c.source.join("")).join("\n");   // the notebook's own text
 let checks = 0, fails = 0;
 function ok(c, msg) { checks++; if (!c) { fails++; console.log("FAIL:", msg); } }
 const near = (a, b, t) => Math.abs(a - b) <= (t == null ? 1e-6 : t);
@@ -50,6 +53,28 @@ const DAYN = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"], MON = ["Jan", "F
   const cfg = id => M.cfgOf(D, id), shown = D.configs.filter(c => !c.hidden);
   const run = (w, c, o) => { const r = solve(M.build(Wk[w], D, cfg(c), o)); return { r, o: M.read(Wk[w], D, cfg(c), r) }; };
   const rowOf = { power: "p", h2: "h", heat: "q" };
+  const clone = x => JSON.parse(JSON.stringify(x));
+  const opt = (m, what) => { const r = solve(m); if (r.status !== "optimal") throw new Error(what + ": " + r.status); return r; };
+  // the answers of the notebook's practice tasks, solved with this model (LP relaxation unless named)
+  function practiceBlock() {
+    const P = { about: "Answers to the notebook's practice tasks, solved with this model in HiGHS (the LP relaxation unless named). Savings in $ a week against Power only with the same changes; sizes in MW; one-sided values in $ per MWh." };
+    const sav = Dx => { const v = { h2: {}, heat: {}, all: {} }; D.weeks.forEach(w => { const base = opt(M.build(Wk[w.id], Dx, M.cfgOf(Dx, "power")), "power").objective;
+      ["h2", "heat", "all"].forEach(c => { v[c][w.id] = r1(base - opt(M.build(Wk[w.id], Dx, M.cfgOf(Dx, c)), c).objective); }); }); return v; };
+    { const Dx = clone(D); Dx.plant.exportMW = 100; Dx.plant.importMW = 100; P.wider = { mw: 100, value: sav(Dx) }; }
+    { const Dx = clone(D); Dx.electrolyzer.minLoad = 0.05; const c = M.cfgOf(Dx, "h2");
+      P.pem = { minLoad: 0.05, relaxed: r1(opt(M.build(Wk.winter, Dx, c), "pem relaxed").objective), exact: r1(opt(M.build(Wk.winter, Dx, c, { minLoad: "binary" }), "pem exact").objective), on: r1(opt(M.build(Wk.winter, Dx, c, { minLoad: "on" }), "pem on").objective) }; }
+    { const crf = 0.04 / (1 - Math.pow(1.04, -30)), wk = 2000 * 1000 * crf * 168 / 8760, Dx = clone(D); Dx.electrolyzer.MW = 1e4;
+      P.size = { config: "h2", perKW: 2000, rate: 0.04, years: 30, weeklyPerMW: r1(wk), MW: {} };
+      D.weeks.forEach(w => { const m = M.build(Wk[w.id], Dx, M.cfgOf(Dx, "h2")); m.variables.push({ name: "X", cost: wk });
+        for (let t = 0; t < Wk[w.id].T; t++) m.constraints.push({ name: "sz" + t, terms: { ["ez" + t]: 1, X: -1 }, le: 0 });
+        P.size.MW[w.id] = Math.round(opt(m, "size").values.X * 100) / 100; }); }
+    { const Dx = clone(D); Dx.heat.boilerPerMWh = D.heat.boilerPerMWh + 50 * 0.2; Dx.hydrogen.truckPerKg = D.hydrogen.truckPerKg + 50 * 0.01; P.co2 = { perT: 50, boilerT: 0.2, truckKg: 10, value: sav(Dx) }; }
+    { const Wc = clone(Wk.winter); Wc.wind[0] = D.plant.exportMW; const c = M.cfgOf(D, "nobat"), f = d => opt(M.build(Wc, D, c, d ? { delta: { p0: d } } : {}), "corner").objective, f0 = f(0);
+      P.corner = { config: "nobat", week: "winter", t: 0, wind: D.plant.exportMW, price: Wk.winter.price[0], up: Math.round((f0 - f(0.01)) / 0.01 * 1e4) / 1e4, down: Math.round((f(-0.01) - f0) / 0.01 * 1e4) / 1e4 }; }
+    return P;
+  }
+  function sameTree(a, b, tol, at) { if (typeof a === "number" && typeof b === "number") return Math.abs(a - b) <= tol || (console.log("  differs at " + at + ": " + a + " vs " + b), false);
+    if (a && typeof a === "object") return b && typeof b === "object" && Object.keys(a).length === Object.keys(b).length && Object.keys(a).every(k => sameTree(a[k], b[k], tol, at + "." + k)); return a === b || (console.log("  differs at " + at), false); }
   // one-sided changes of the optimal cost when the hour's demand of a carrier rises or falls by d
   function sides(w, c, t, key, f0, d) {
     const row = rowOf[key] + t, sg = key === "power" ? -1 : 1;
@@ -71,8 +96,8 @@ const DAYN = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"], MON = ["Jan", "F
     const m0 = M.build(Wk.winter, D, cfg("all")); ref.size = { cols: m0.variables.length, rows: m0.constraints.length };
     ref.series = {}; D.weeks.forEach(w => { ref.series[w.id] = { wind: Wk[w.id].wind, price: Wk[w.id].price, heat: Wk[w.id].heat }; });
     const pats = [
-      { id: "free", test: p => near(p.power, 0, 1e-6) && near(p.h2, 0, 1e-6) && near(p.heat, 0, 1e-6),
-        why: p => "Power is worth $0 here: one more MWh of wind could be neither sold nor used, so hydrogen and heat made from it are worth $0 too." },
+      { id: "free", test: (p, t) => near(p.power, 0, 1e-6) && near(p.h2, 0, 1e-6) && near(p.heat, 0, 1e-6) && Wk.winter.price[t] > 0 && near(all.r.values["exp" + t], D.plant.exportMW, 1e-6) && all.r.values["ez" + t] < D.electrolyzer.MW - 1e-6,
+        why: (p, t) => "The connection is full: 50 MW already sold at the town's $" + Wk.winter.price[t] + ". One more MWh could make more hydrogen or heat, but it would only replace some that costs nothing to make: $0 to the plant." },
       { id: "pump", test: p => near(p.power, 40, 1e-6) && near(p.heat, 40 / 3, 1e-4) && near(p.h2, 0, 1e-6),
         why: p => "The heat pump sets heat's price: $40 ÷ 3 = $13.33 per MWh of heat. Hydrogen is worth $0: the tank links this hour to hours of curtailed wind." },
       { id: "dear", test: p => near(p.power, 100, 1e-6) && near(p.heat, D.heat.boilerPerMWh, 1e-6) && p.h2 > 0.01 && p.h2 < D.hydrogen.truckPerKg - 0.01,
@@ -81,13 +106,14 @@ const DAYN = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"], MON = ["Jan", "F
     ref.hours = [];
     pats.forEach(pt => {
       for (let t = 0; t < Wk.winter.T; t++) {
-        const p = M.prices(all.r, t); if (!pt.test(p)) continue;
+        const p = M.prices(all.r, t); if (!pt.test(p, t)) continue;
         const okU = ["power", "h2", "heat"].every(k => { const s = sides("winter", "all", t, k, all.r.objective, 0.01); return near(s[0], s[1], 1e-4); });
         if (!okU) continue;
-        ref.hours.push({ id: pt.id, t, label: label("winter", t), power: Math.round(p.power * 1e4) / 1e4, h2: Math.round(p.h2 * 1e4) / 1e4, heat: Math.round(p.heat * 1e4) / 1e4, why: pt.why(p) });
+        ref.hours.push({ id: pt.id, t, label: label("winter", t), power: Math.round(p.power * 1e4) / 1e4, h2: Math.round(p.h2 * 1e4) / 1e4, heat: Math.round(p.heat * 1e4) / 1e4, why: pt.why(p, t) });
         break;
       }
     });
+    ref.practice = practiceBlock();
     D.reference = ref; fs.writeFileSync(DPATH, JSON.stringify(D, null, 1) + "\n"); D = J(ID + ".json");
     console.log("  wrote the reference block");
   }
@@ -157,9 +183,14 @@ const DAYN = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"], MON = ["Jan", "F
   { const syms = ["p", "exp", "imp", "cur", "bc", "bd", "hp", "w", "rec", "hin", "hout", "s", "Q", "eta", "lam", "tr", "boil", "ez", "k", "L", "cop", "H"];
     ok(syms.every(k => new RegExp("sym\\(\"" + k + "\"").test(JS) && new RegExp("\\b" + k + ": \\{ name: [^}]*unit: ").test(JS)), "equation card: every symbol is a button with a name and a unit: " + syms.filter(k => !new RegExp("\\b" + k + ": \\{ name: [^}]*unit: ").test(JS)).join(","));
     ["exp", "imp", "cur", "bc", "bd", "ez", "tr", "hp", "rec", "hin", "hout", "boil"].forEach(n => ok(PAGE.includes("\\mathit{" + n + "}") && NB.includes("\\\\mathit{" + n + "}"), "the algebra and the notebook use the code's name " + n)); }
+  ok(JS.includes('"min Σ<sub><var>t</var></sub> [ " + sym("p"') && JS.includes('sym("boil", "<var>boil</var>") + " ]"') && NBS.includes("\\min \\sum_t \\big[") && PAGE.includes("\\min \\sum_t \\Big("), "the objective's hourly terms sit inside its sum (equation card, notebook, algebra)");
+  ok(/boil: \{ name: "boil_t", [^}]*unit: "MW of heat"/.test(JS) && /rec: \{ name: "rec_t", [^}]*unit: "MW of heat"/.test(JS) && !/track power's/.test(JS), "boiler and recovered heat in MW of heat, as the algebra's table; k states the conversion, not a price rule");
+  ok(/\["hp", "net", "heat"\], \["store", "net", "heat"\], \["ez", "net", "waste heat"\], \["net", "town", "≤ 12 MW"\]/.test(JS) && !/\["store", "town"|\["ez", "town"/.test(JS) && /id: "net", g: "q", label: "Heat network", text: "At most 12 MW of heat in each hour: the heat pump, the store and waste heat share it\./.test(JS),
+     "the diagram: one heat-network node carries the shared 12 MW limit of the pump, the store and waste heat");
+  ok(/Whether a device pays for itself needs its investment cost/.test(JS) && /<dt>Savings, not payback<\/dt>/.test(PAGE) && !/In some other hours several prices fit/.test(JS) && /\*\*Not always\.\*\* At a corner of the cost/.test(PAGE), "step 6 and the explain layer tell operating savings from payback; no unchecked claim about other hours' prices");
   ok(/\["s", "state of charge at the end of hour t, MWh/.test(JS) && /\["bc, bd", "charging and discharging/.test(JS), "step 2 defines every symbol beside its equation");
   // the efficiency is an illustrative value inside the alkaline range; the 33.8% names its source
-  ok(/illustrative value for the alkaline unit/.test(D.electrolyzer.source.label) && /50-78 kWh per kg/.test(D.electrolyzer.rangeSource.label) && 57 >= 50 && 57 <= 78 && PAGE.includes("PEM figure, illustrative here, inside IRENA's 50–78 for alkaline systems"), "57 kWh per kg is labelled illustrative for the alkaline unit, inside IRENA's alkaline range");
+  ok(/illustrative value for the alkaline unit/.test(D.electrolyzer.source.label) && /50-78 kWh per kg/.test(D.electrolyzer.rangeSource.label) && 57 >= 50 && 57 <= 78 && PAGE.includes("Illustrative here: IRENA gives 50–78 for alkaline systems.") && PAGE.includes('<span class="lx-term" data-term="pem-electrolyzer">proton exchange membrane (PEM)</span> electrolyzer, another type') && /\[\[pem-electrolyzer\|PEM\]\] \(proton exchange membrane\)/.test(JS), "57 kWh per kg is labelled illustrative for the alkaline unit, inside IRENA's alkaline range; PEM is spelled out and marked where it first appears");
   ok(/EIA's " \+ CF\.year \+ " capacity factor of the U\.S\. utility-scale wind fleet \(" \+ CFsrc\.short/.test(JS) && T.targets.wind.cf === 0.338 && T.source.accessed && PAGE.includes("33.8%, the U.S. wind fleet's 2025 capacity factor"), "the diagram and the data note give the 33.8% benchmark its geography, year and source");
 
   // ---------------- prices: unique in every offered hour, and the sentence holds
@@ -171,6 +202,18 @@ const DAYN = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"], MON = ["Jan", "F
     ["power", "h2", "heat"].forEach(k => { const s = sides("winter", "all", h.t, k, all.r.objective, 0.01); ok(near(s[0], s[1], 1e-4) && near(s[0], p[k], 1e-3), `${h.label}, ${k}: unique (one-sided ${s[0].toFixed(4)} and ${s[1].toFixed(4)})`); });
     ok(h.why.split(" ").length <= 40 && h.label === label("winter", h.t), `${h.label}: short sentence and the right label`);
   });
+  { const fr = R.hours.find(h => h.id === "free"), t = fr.t, x = all.r.values;
+    ok(Wk.winter.price[t] > 0 && near(x["exp" + t], D.plant.exportMW, 1e-6) && x["ez" + t] < D.electrolyzer.MW - 1e-6 && fr.why.includes("at the town's $" + Wk.winter.price[t] + "."),
+       `${fr.label}: the plant's power is worth $0 while the town pays $${Wk.winter.price[t]}: the connection is full (${x["exp" + t]} MW sold) and the electrolyzer has room (${x["ez" + t].toFixed(2)} of 20 MW)`);
+    ok(!/neither sold nor used/.test(JSON.stringify(D)) && /kpi\(k, "Town's price", fm\.p\(W\.price\[hr\.t\]\)/.test(JS) && /"Power, to the plant"/.test(JS), "step 7 names the town's price beside the plant's own value of power"); }
+  { const P = practiceBlock(); ok(R.practice && sameTree(R.practice, P, 0.06, "practice"), "the notebook's practice answers in the reference block re-solve (tasks 1 to 5)");
+    ok(P.wider.value.h2.winter < R.value.h2.winter - 10000 && P.wider.value.h2.summer < R.value.h2.summer - 10000 && ["winter", "summer"].every(w => R.value.h2[w] - P.wider.value.h2[w] > (R.value.heat[w] - R.value.h2[w]) - (P.wider.value.heat[w] - P.wider.value.h2[w])),
+       "task 1: with 100 MW each way, the electrolyzer and tank lose the most value in both weeks");
+    ok(P.pem.relaxed <= P.pem.exact + 0.1 && P.pem.exact <= P.pem.on + 0.1 && P.pem.on - P.pem.relaxed < R.on.cost - R.costs.winter.h2, "task 2: at 5% the two LP bounds sit closer than at 15%");
+    ok(P.size.MW.winter > P.size.MW.summer + 1 && P.size.MW.winter < 20, `task 3: the weeks choose different sizes (${P.size.MW.winter} and ${P.size.MW.summer} MW)`);
+    { const up = c => w => P.co2.value[c][w] - (c === "h2" ? 0 : P.co2.value[c === "heat" ? "h2" : "heat"][w]) - (R.value[c][w] - (c === "h2" ? 0 : R.value[c === "heat" ? "h2" : "heat"][w]));
+      ok(up("heat")("winter") > up("h2")("winter") && up("h2")("summer") > up("heat")("summer") && up("h2")("winter") > up("all")("winter"), "task 4: the CO2 price raises the heat pump's value most in winter, the electrolyzer's in summer"); }
+    ok(near(P.corner.up, 0, 1e-4) && near(P.corner.down, P.corner.price, 1e-4) && P.corner.price > 0, `task 5: at 50 MW of wind the two one-sided values differ (${P.corner.up} and ${P.corner.down} $/MWh): a corner`); }
   const hp = R.hours.find(h => h.id === "pump"), dr = R.hours.find(h => h.id === "dear");
   ok(near(hp.heat, hp.power / 3, 1e-3) && near(dr.heat, 15, 1e-6) && dr.power / 3 > 15 && dr.h2 < 2.5, "the sentences: heat = power ÷ 3 when the pump sets it; boiler $15 below $100 ÷ 3; hydrogen below the truck");
 
@@ -194,7 +237,7 @@ const DAYN = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"], MON = ["Jan", "F
     const els = OWN.replace(/^- (.*)$/gm, "<li>$1</li>").replace(/^\|(.*)\|$/gm, "<td>$1</td>").split(/<\/?(?:p|li|dd|dt|td|th|summary|blockquote|footer)\b[^>]*>/i).map(x => x.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim()).filter(x => /[A-Za-z]/.test(x));
     const long = els.filter(x => x.split(" ").length > 40);
     ok(long.length === 0, "every page element is 40 words or fewer: " + long.map(x => x.slice(0, 60) + " (" + x.split(" ").length + ")").join(" | "));
-    ok((PAGE.match(/<p class="lx-datanote">/g) || []).length === 3 && /<b>Illustrative plant and prices\.<\/b>/.test(PAGE) && /<b>Real shapes\.<\/b>/.test(PAGE) && /<b>Efficiencies\.<\/b>/.test(PAGE), "the data note is three labelled entries"); }
+    ok((PAGE.match(/class="lx-datanote[ "]/g) || []).length === 3 && /<b>Illustrative plant and prices\.<\/b>/.test(PAGE) && /<b>Real shapes\.<\/b>/.test(PAGE) && /<b>Efficiencies\.<\/b><ul>\n(<li>[^\n]+<\/li>\n){4}<\/ul>/.test(PAGE), "the data note is three labelled entries; the efficiencies one item per device"); }
 
   // ---------------- sources, scope, notebook, sidecar
   ok(D.battery.source.url && D.electrolyzer.source.url && D.electrolyzer.loadSource.url && D.heat.copSource.url, "efficiencies carry sources");
@@ -205,6 +248,16 @@ const DAYN = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"], MON = ["Jan", "F
   ok(!/\bAI\b|data cent/i.test(PAGE + JS), "no AI wording, no data centers");
   ok(/github\.com\/Henryutd2021\/reopt-hydrogen-framework/.test(PAGE) && !/projects\/|research\.html/.test(PAGE), "the allow-listed repository is linked; no project page");
   ok(NB.includes(ID + ".json") && NB.includes("reference") && NB.includes("assert") && NB.includes("linprog") && NB.includes("milp"), "notebook: reads the reference block and asserts it with linprog and milp");
+  // the practice tasks: each one with a check function that reads its answer from the reference block
+  { const tasks = { check_wider: "wider", check_pem: "pem", check_size: "size", check_co2: "co2", check_corner: "corner" };
+    ok(NBS.includes('P = REF["practice"]') && Object.keys(tasks).every(f => new RegExp("def " + f + "\\(").test(NBS) && NBS.includes("`" + f + "(") && NBS.includes('P["' + tasks[f] + '"]')),
+       "notebook: practice tasks 1 to 5 each name a check function, defined on the reference block's answers");
+    ok(NBS.includes('`D["plant"]["exportMW"]`') && NBS.includes('`E["minLoad"] = 0.05`') && NBS.includes("set the winter week's wind in hour 0 to exactly 50 MW") && NBS.includes("\\$2,000 per kW at 4% real over 30 years"),
+       "notebook: the practice tasks state the changes the reference answers were solved with"); }
+  // the notebook's prose: every paragraph, list item and table cell 40 words at most
+  { const els = []; NBJ.cells.filter(c => c.cell_type === "markdown").forEach(c => c.source.join("").replace(/\$\$[\s\S]*?\$\$/g, "").split(/\n\s*\n|\n(?=\d+\. |- |\|)/).forEach(e => (e.startsWith("|") ? e.split("|") : [e]).forEach(x => { if (x.trim()) els.push(x.trim()); })));
+    const long = els.filter(x => x.split(/\s+/).length > 40);
+    ok(els.length > 40 && long.length === 0, "every notebook paragraph, list item and table cell is 40 words or fewer: " + long.map(x => x.slice(0, 60) + " (" + x.split(/\s+/).length + ")").join(" | ")); }
   ["reservoir-limit", "sector-coupling", "value-of-coupling"].forEach(id => ok(new RegExp("id: " + id + "\\b").test(SIDE), "sidecar defines " + id));
   const E3 = "Compared with wind and a battery alone, adding an electrolyzer reduced total system cost by about 7%, and using hydrogen as the storage medium for fuel cells reduced it by about 26%.";
   const q = [...PAGE.matchAll(/<blockquote class="lx-excerpt" data-source="([^"]+)"><p>([\s\S]*?)<\/p><footer>/g)];
@@ -233,15 +286,16 @@ const DAYN = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"], MON = ["Jan", "F
     ok(!threw && demo && demo.cards, "the page mounts on the stub document" + (threw ? ": " + threw : ""));
     const flush = () => new Promise(r => setImmediate(r));
     const card = () => demo.cards.el, btns = re => card().querySelectorAll("button").filter(b => re.test(b.textContent)), next = () => btns(/Next/)[0], failBox = () => card().querySelector(".m4-fail");
+    const saws = {}, saw = i => { const b = card().querySelector(".lx-saw"); saws[i] = b ? b.textContent.replace(/\s+/g, " ").trim() : ""; };
     try {
       demo.cards.go(2); failing = true; calls = 0;
       btns(/Solve with hydrogen/)[0].click(); await flush();
       ok(failBox() && failBox().getAttribute("role") === "alert" && /time limit/.test(failBox().textContent) && /Try again/.test(failBox().textContent), "step 3: a failed solve shows a plain message and Try again");
       ok(card().getAttribute("aria-busy") == null && next().disabled && !btns(/Solve with hydrogen/)[0].disabled, "step 3: busy cleared, the button works again, Next waits");
       failing = false; calls = 0; btns(/Try again/)[0].click(); await flush();
-      ok(!failBox() && /Value of coupling/.test(card().textContent) && !next().disabled && calls === 2, "step 3: Try again solves both configurations and unlocks Next (" + calls + " solves)");
+      ok(!failBox() && /Value of coupling/.test(card().textContent) && !next().disabled && calls === 2, "step 3: Try again solves both configurations and unlocks Next (" + calls + " solves)"); saw(3);
       demo.cards.go(5); failing = false; calls = 0; card().querySelectorAll(".lx-choice")[0].click(); await flush();
-      ok(card().querySelectorAll(".m4-tbl tbody tr").length === 3 && !next().disabled && calls === 6, "step 6: the eight cases solve (one already solved) and the table has three rows (" + calls + " solves)");
+      ok(card().querySelectorAll(".m4-tbl tbody tr").length === 3 && !next().disabled && calls === 6, "step 6: the eight cases solve (one already solved) and the table has three rows (" + calls + " solves)"); saw(6);
       // the tank's chart has an hourly text version, with its lowest and highest level
       const tankTxt = specs.find(sp => /kg in the tank/.test(sp.text.head[1])).text;
       ok(tankTxt.rows.length === 168 && tankTxt.rows[0][0] === "9 Dec 00:00" && /^Lowest [\d,]+ \(\d+ Dec \d\d:00\), highest [\d,]+ \(\d+ Dec \d\d:00\)/.test(tankTxt.note), "step 3: the tank's text version lists all 168 hours, with the lowest and highest level and when (" + tankTxt.rows.length + " rows)");
@@ -253,9 +307,14 @@ const DAYN = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"], MON = ["Jan", "F
       ok(failBox() && /Try again/.test(failBox().textContent) && !/\/kg/.test(card().textContent) && card().getAttribute("aria-busy") == null, "step 7: a failed solve shows the note and no prices");
       failing = false; btns(/Try again/)[0].click(); await flush();
       const p7 = M.prices(root.lxLesson.res["winter|all|stop|50"].r, hr.t);
-      ok(!failBox() && card().textContent.includes(fm.p(p7.heat) + "/MWh") && hb()[1].getAttribute("aria-pressed") === "true", "step 7: Try again solves, shows the chosen hour's prices (" + hr.label + ") and removes the note");
+      ok(!failBox() && card().textContent.includes(fm.p(p7.heat) + "/MWh") && card().textContent.includes("Town's price" + fm.p(Wk.winter.price[hr.t]) + "/MWh") && hb()[1].getAttribute("aria-pressed") === "true", "step 7: Try again solves, shows the chosen hour's prices (" + hr.label + ") beside the town's price, and removes the note");
       hb()[0].click(); await flush();
-      ok(!next().disabled && /Coupling ties the carriers' prices together/.test(card().textContent), "step 7: a second hour unlocks Next");
+      ok(!next().disabled && /Coupling ties the carriers' prices together/.test(card().textContent), "step 7: a second hour unlocks Next"); saw(7);
+      // steps 1, 2, 4 and 5 solved too; every result line within budget: 40 words, two sentences
+      for (const [i, re] of [[1, /Solve: power only/], [2, /Solve with the battery/], [4, /Solve both/], [5, /Solve with heat/]]) { demo.cards.go(i - 1); btns(re)[0].click(); await flush(); saw(i); }
+      { const n = t => t.split(" ").length, sn = t => t.split(/[.?!](?:\s|$)/).filter(x => x.trim()).length, bad = Object.keys(saws).filter(i => !saws[i] || n(saws[i]) > 40 || sn(saws[i]) > 2);
+        ok(Object.keys(saws).length === 7 && bad.length === 0, "steps 1 to 7: each result line is 40 words and two sentences at most: " + bad.map(i => i + " (" + n(saws[i]) + " words, " + sn(saws[i]) + " sentences)").join(", ")); }
+      ok(/forcing it on costs \$6\.0k more\. The two LPs bound the exact answer\./.test(saws[4]) && card().textContent !== "", "step 4: two sentences; the forced-on cost difference in the table too");
     } catch (e) { ok(false, "the stub page test threw: " + (e && e.stack || e)); }
     process.removeListener("unhandledRejection", onUn);
     ok(!unhandled.length, "no unhandled promise rejection: " + unhandled.join(" | "));

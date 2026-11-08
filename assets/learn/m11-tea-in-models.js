@@ -335,6 +335,8 @@
       ".m11-tbl thead th{font-family:var(--lx-f-display);font-size:12px;color:var(--lx-ink-3);vertical-align:bottom}.m11-tbl td{font-family:var(--lx-f-mono);font-variant-numeric:tabular-nums}.m11-tbl td:first-child{font-family:var(--lx-f-body)}",
       ".m11-tbl tr.best td{background:var(--lx-good-soft);font-weight:600}",
       ".m11-note{font-size:13.5px;color:var(--lx-ink-3);margin:0}",
+      /* a result whose settings have changed since it was solved */
+      ".m11-stale{opacity:.5}.m11-stale-note{margin:0;font-size:13.5px;font-weight:600;color:var(--lx-bad)}",
       ".m11-key{margin:0;padding-left:1.1rem;display:grid;gap:2px;font-size:13.5px;color:var(--lx-ink-2)}.m11-key var{font-style:italic}",
       ".m11-law{border:1px solid var(--lx-line);border-radius:12px;padding:10px 12px;background:var(--lx-surface-2);display:grid;gap:6px}",
       ".m11-law p{margin:0;font-size:14px}.m11-law .src{font-size:12.5px;color:var(--lx-ink-3)}",
@@ -371,6 +373,11 @@
   function choice(host, label) { var d = H("div", { class: "m11-choice" }, host); H("span", { text: label }, d); return d; }
   // rich text with glossary marks and **bold** (LX.rich escapes any HTML tag)
   function rb(t) { return LX.rich(t).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>"); }
+  // a step's result that its controls have overtaken: the note (hidden until then) says so, the result is dimmed and the
+  // step's conclusion is replaced, until the reader solves again (fresh() undoes it)
+  function staleNote(host) { var p = H("p", { class: "m11-stale-note", role: "status", text: "Settings changed since this result: solve again to update it." }, host); p.hidden = true; return p; }
+  function stale(note, out, api, has) { if (!has) return; note.hidden = false; out.forEach(function (o) { o.classList.add("m11-stale"); }); api.saw("Settings changed: solve again to see what they do.", true); }
+  function fresh(note, out) { note.hidden = true; out.forEach(function (o) { o.classList.remove("m11-stale"); }); }
 
   LX.mount(SLUG, function (live, data, root) {
     css(); root.classList.add("m11-lab");
@@ -433,7 +440,7 @@
       var b = (o && o.boundary) || st.boundary, B = D.boundaries.filter(function (x) { return x.id === b; })[0];
       var hd = H("div", { class: "m11-scene-h" }, scene);
       H("p", { class: "lx-eyebrow", text: "The plant's boundary: " + B.label }, hd);
-      H("p", { class: "m11-note", text: R ? "Numbers: your last solved plan, a year" + (R.per.length > 1 ? " in its credit years" : "") : "Solve step 1 to fill in the numbers" }, hd);
+      H("p", { class: "m11-note", text: R ? "Numbers: your last solved plan, a year" + (R.per.length > 1 ? " in its credit years" : "") : "Solve to fill in the numbers" }, hd);
       var row = H("div", { class: "m11-scene-row" }, scene), box = H("div", { class: "m11-box", role: "group", "aria-label": "Inside the boundary" }, row);
       H("p", { class: "m11-box-l", text: "Inside the boundary" }, box);
       var out = H("div", { class: "m11-out", role: "group", "aria-label": "Outside the boundary" }, row), a = R ? R.per[0] : null;
@@ -478,22 +485,25 @@
       // 1 the operating model
       { text: "The plant: 100 MW of new wind behind a 50 MW [[point-of-common-coupling|grid connection]], and an [[electrolyzer|electrolyzer]] of a size you set, whose hydrogen a buyer takes at a set price. Solve its year, hour by hour.",
         build: function (act, api) {
-          var c = H("div", { class: "lx-ctls" }, act);
-          LX.Slider(c, { label: "Hydrogen price", min: D.hydrogen.price.min, max: D.hydrogen.price.max, step: D.hydrogen.price.step, value: st.h, color: "var(--lx-good)", fmt: function (q) { return "$" + q.toFixed(2) + " per kg"; }, onChange: function (q) { st.h = q; } });
-          LX.Slider(c, { label: "Electrolyzer size (given)", min: D.fixedSize.min, max: D.fixedSize.max, step: D.fixedSize.step, value: st.size, color: "var(--lx-good)", fmt: function (q) { return q + " MW"; }, onChange: function (q) { st.size = q; } });
+          var c = H("div", { class: "lx-ctls" }, act), sn = null, out = null, ph = null, last = null;
+          function moved() { if (sn) stale(sn, [out, ph], api, !!(last && last.R)); }
+          LX.Slider(c, { label: "Hydrogen price", min: D.hydrogen.price.min, max: D.hydrogen.price.max, step: D.hydrogen.price.step, value: st.h, color: "var(--lx-good)", fmt: function (q) { return "$" + q.toFixed(2) + " per kg"; }, onChange: function (q) { st.h = q; moved(); } });
+          LX.Slider(c, { label: "Electrolyzer size (given)", min: D.fixedSize.min, max: D.fixedSize.max, step: D.fixedSize.step, value: st.size, color: "var(--lx-good)", fmt: function (q) { return q + " MW"; }, onChange: function (q) { st.size = q; moved(); } });
           H("p", { class: "m11-note", html: LX.rich("The year: 36 real 2025 days, three per month (calm, middle and windy thirds), each weighted by the days it stands for. Power bought pays Prairie Town's price plus a $" + st.c + " per MWh delivery charge (illustrative).") }, act);
-          var row = H("div", { class: "m11-row" }, act), go = H("button", { type: "button", class: "lx-btn small", html: LX.icon("play") + "Solve the year" }, row), stt = LX.SolverStatus(row), out = H("div", { "aria-live": "polite" }, act), ph = H("div", null, act), last = null;
+          var row = H("div", { class: "m11-row" }, act), go = H("button", { type: "button", class: "lx-btn small", html: LX.icon("play") + "Solve the year" }, row), stt = LX.SolverStatus(row);
+          sn = staleNote(act); out = H("div", { "aria-live": "polite" }, act); ph = H("div", null, act);
           go.addEventListener("click", LX.SolveStep.action({ api: api, st: stt, host: act, go: go, cls: "m11-fail", job: function () { var o = base({ boundary: "plant", size: st.size }); return solve1(o).then(function (x) { last = x; return x.R ? null : x.r; }); },
             show: function () {
-              var R = last.R, a = R.per[0]; stt.set(last.r); out.innerHTML = ""; var k = H("div", { class: "m11-kpis" }, out);
+              var R = last.R, a = R.per[0]; stt.set(last.r); fresh(sn, [out, ph]); out.innerHTML = ""; var k = H("div", { class: "m11-kpis" }, out);
               kpi(k, "Hydrogen a year", fm.t(a.kg)); kpi(k, "Capacity utilization", fm.pct(R.util)); kpi(k, "Power bought", fm.mwh(a.imp)); kpi(k, "Wind curtailed", fm.mwh(a.cur));
+              H("p", { class: "m11-note", html: rb("[[capacity-utilization|Capacity utilization]]: the MWh it used ÷ (size × 8,760 h). Half power all year would be 50%.") }, out);
               drawScene(R, last.o);
               ph.innerHTML = ""; var sel = H("select", { class: "m11-sel", "aria-label": "Day to show" }, H("label", { class: "m11-choice" }, ph));
               Y.days.forEach(function (dy, i) { H("option", { value: String(i), text: dayLabel(dy) }, sel); }); sel.value = "8";
               var pl = H("div", null, ph); dayPlot(pl, last, 8);
               sel.addEventListener("change", function () { pl.innerHTML = ""; dayPlot(pl, last, +sel.value); });
               remember("s1", { S: R.S, kg: a.kg });
-              api.done(); api.saw("[[capacity-utilization|Capacity utilization]] " + fm.pct(R.util) + ": the MWh it used ÷ (size × 8,760 h); half power all year would be 50%. Wind comes first, then power bought when a kilogram earns more than power and charge. **An operating model: hours given a size.**");
+              api.done(); api.saw("Capacity utilization " + fm.pct(R.util) + ". Wind comes first; power is bought only when a kilogram earns more than the power and its charge. **An operating model: the hours, given a size.**");
             } }));
         } },
       // 2 annualize capital
@@ -520,7 +530,7 @@
           show(); if (!moved) H("p", { class: "m11-note", text: "Move a slider or pick a cost to go on." }, act);
         } },
       // 3 capital in the goal: the model sizes the electrolyzer
-      { text: "Now put that annual capital in the LP's goal and let the solver choose the size too: each MW costs its capital recovery and upkeep every year, and earns what its hours earn.",
+      { text: "Now put that annual capital in the goal of the [[linear-program|linear program (LP)]] and let the solver choose the size too: each MW costs its capital recovery and upkeep every year, and earns what its hours earn.",
         build: function (act, api) {
           var out, go, fixedX = null, freeX = null;
           var po = { id: "m11-size", fresh: true, q: "Against your " + st.size + " MW, the model will build…", answer: null, feedback: {},
@@ -590,7 +600,13 @@
               var k = A.K, phi = af(k.r, D.credit.years) / k.af, kp = perKg(D.credit.tiers[0]), share = A.R.creditLev / kp, mkg = function (v) { return (v / 1e6).toFixed(2) + " million kg"; };
               H("p", { class: "m11-note", text: "Both runs claim the top tier: in the credit years, the counted grid CO₂ (operating only, illustrative) stays under 0.45 kg per kg." }, out);
               H("p", { class: "m11-note", text: "The first copy carries " + fm.pct(phi) + " of the life's discounted years: AF(" + st.r.toFixed(1) + "%, 10) ÷ AF(" + st.r.toFixed(1) + "%, " + st.N + ") = " + af(k.r, D.credit.years).toFixed(2) + " ÷ " + k.af.toFixed(2) + "." }, out);
-              if (A.R.per.length > 1) H("p", { class: "m11-note", text: "It makes " + mkg(A.R.per[0].kg) + " a year under the cap, " + mkg(A.R.per[1].kg) + " after the credit ends. So the credit years hold " + (share * 100).toFixed(1) + "% of the discounted kilograms: $" + kp.toFixed(3) + " × " + share.toFixed(3) + " ≈ " + fm.kg(A.R.creditLev) + " over the life." }, out);
+              if (A.R.per.length > 1) {
+                // the two copies side by side: why the credit years hold fewer discounted kilograms than discounted years
+                table(out, ["Copy of the year", "Years", "Share of discounted years", "Hydrogen a year", "Share of discounted kg"], [
+                  ["With the credit, under the cap", "1 to " + D.credit.years, fm.pct(phi), mkg(A.R.per[0].kg), (share * 100).toFixed(1) + "%"],
+                  ["After the credit", (D.credit.years + 1) + " to " + st.N, fm.pct(1 - phi), mkg(A.R.per[1].kg), ((1 - share) * 100).toFixed(1) + "%"]], "The credit's years and the rest of the life");
+                H("p", { class: "m11-note", text: "Credit per kg over the life: $" + kp.toFixed(3) + " × " + share.toFixed(3) + " ≈ " + fm.kg(A.R.creditLev) + "." }, out);
+              }
               table(out, ["Credit counted", "Size", "Hydrogen a year", "NPV", "Credit per kg over the life"], [["Its 10 years (right)", fm.mw(A.R.S), fm.t(A.R.kg), fm.musd(A.R.npv), fm.kg(A.R.creditLev)], ["All " + st.N + " years (wrong)", fm.mw(B.R.S), fm.t(B.R.kg), fm.musd(B.R.npv), fm.kg(B.R.creditLev)]], "The credit in its own years against in every year", 0);
               cashChart(out, A.R, A.K, "Its 10 years: the credit stops after year 10");
               drawScene(A.R, A.o); remember("s6", { npv: A.R.npv, wrong: B.R.npv, lev: A.R.creditLev });
@@ -600,19 +616,23 @@
       // 7 tiers: one LP per step
       { text: "The tier depends on the grid power you count. A step rule cannot sit in one LP, so solve one LP per tier, each capping the counted CO₂ per kg, and one with no credit. Keep the best.",
         build: function (act, api) {
-          var c1 = choice(act, "The grid's CO₂ rate counted for power bought");
-          seg(c1, "Grid CO₂ rate", D.grid.presets.map(function (g) { return { id: g.id, label: g.label + ": " + eOf(g.id).toFixed(3) + " t/MWh" }; }), st.eKey, function (id) { st.eKey = id; });
-          H("p", { class: "m11-note", html: rb("Counting rule: [[hourly-matching|hourly matching]], the rule from 2030. Operating CO₂ only: the rules' life-cycle grid rate is higher (simplified).") }, act);
-          var row = H("div", { class: "m11-row" }, act), go = H("button", { type: "button", class: "lx-btn small", html: LX.icon("play") + "Solve the tiers" }, row), stt = LX.SolverStatus(row), prog = H("p", { class: "m11-note", "aria-live": "polite" }, act), out = H("div", { "aria-live": "polite" }, act), ev = null;
+          var c1 = choice(act, "The grid's CO₂ rate counted for power bought"), sn = null, out = null, ev = null;
+          seg(c1, "Grid CO₂ rate", D.grid.presets.map(function (g) { return { id: g.id, label: g.label + ": " + eOf(g.id).toFixed(3) + " t/MWh" }; }), st.eKey, function (id) { st.eKey = id; if (sn) stale(sn, [out], api, !!(ev && ev.best)); });
+          H("p", { class: "m11-note", html: rb("Counting rule: [[hourly-matching|hourly matching]], the rule from 2030. Bought power counts as clean only against the wind farm's [[energy-attribute-certificate|certificates]] from the same hour.") }, act);
+          H("p", { class: "m11-note", text: "Operating CO₂ only: the rules' life-cycle grid rate is higher (simplified)." }, act);
+          var row = H("div", { class: "m11-row" }, act), go = H("button", { type: "button", class: "lx-btn small", html: LX.icon("play") + "Solve the tiers" }, row), stt = LX.SolverStatus(row), prog = H("p", { class: "m11-note", "aria-live": "polite" }, act);
+          sn = staleNote(act); out = H("div", { "aria-live": "polite" }, act);
           go.addEventListener("click", LX.SolveStep.action({ api: api, st: stt, host: act, go: go, cls: "m11-fail",
             job: function () { prog.textContent = ""; return evaluate(base({ boundary: "plant", rule: "hourly" }), "right", progress(prog)).then(function (e) { ev = e; return e.failed || null; }); },
             show: function () {
-              stt.set(ev.best.r); prog.textContent = done(ev); out.innerHTML = ""; var L = ev.cases, bi = L.indexOf(ev.best);
-              table(out, ["Case", "Credit per kg", "Size", "~Counted grid CO₂ per kg", "Value a year"], L.map(function (c) {
-                var name = c.id === "none" ? "No credit" : c.tier.label + " kg";
+              stt.set(ev.best.r); prog.textContent = done(ev); fresh(sn, [out]); out.innerHTML = ""; var L = ev.cases, bi = L.indexOf(ev.best);
+              // each case is a tier's credit with an upper cap on the counted CO2 per kg, not the tier's whole range
+              table(out, ["Case: a tier's CO₂ cap", "Credit per kg", "Size", "~Counted grid CO₂ per kg", "Value a year"], L.map(function (c) {
+                var name = c.id === "none" ? "No credit" : (c.tier.strict ? "under " : "at most ") + c.tier.max.toFixed(c.tier.max < 1 ? 2 : 1) + " kg";
                 if (!c.R || c.same) return [name, c.credit ? "$" + c.credit.toFixed(3) : "–", c.same ? fm.mw(c.R.S) : "–", "–", c.same ? fm.musd(c.R.annual) : "skipped: bound"];
                 return [name, c.credit ? "$" + c.credit.toFixed(3) : "–", fm.mw(c.R.S), c.R.kg > 0 ? fm.rate(c.R.rate) : "–", fm.musd(c.R.annual)]; }), "One LP per tier", bi);
               H("p", { class: "m11-note", text: "Best plan highlighted: the largest value, or the first row listed within $1 a year of it. Each cap sits 0.001 under its 'less than' limit." }, out);
+              H("p", { class: "m11-note", text: "A case caps the CO₂ from above only, so its plan can be cleaner than its tier and earn less than it could. Such a case never wins: the cleaner tier's LP holds the same plan and pays more." }, out);
               if (ev.solved < L.length) H("p", { class: "m11-note", html: "<b>Bounding.</b> With no cap, a case's hours solve in a few lines: that bounds its value. A case that cannot win even at its bound needs no LP: " + (L.length - ev.solved) + " of " + L.length + " skipped." }, out);
               drawScene(ev.best.R, null); remember("s7", { best: ev.best.id });
               var b = ev.best, why = b.id === "none" ? (L.length === 1 ? "No credit applies, so one LP is all there is." : "Claiming any tier costs more than it pays: the grid power it rules out is worth more.") : b.id === "t1" ? "The top tier wins: the grid power it rules out is worth less than the larger credit." : "A lower tier wins: buying more grid power is worth more than the larger credit.";
@@ -622,20 +642,24 @@
       // 8 move the boundary
       { text: "Move the boundary: what belongs to the plant, and what to the grid? Change one thing at a time, solve, and watch the conclusion in the table.",
         build: function (act, api) {
-          var c1 = choice(act, "The plant's boundary"), c2 = choice(act, "Bought power counts as clean with"), c = H("div", { class: "lx-ctls" }, act);
-          seg(c1, "Boundary", D.boundaries.map(function (b) { return { id: b.id, label: b.label }; }), st.boundary, function (id) { st.boundary = id; note(); });
+          var c1 = choice(act, "The plant's boundary"), c2 = choice(act, "Bought power counts as clean with"), c = H("div", { class: "lx-ctls" }, act), sn = null, ev = null;
+          seg(c1, "Boundary", D.boundaries.map(function (b) { return { id: b.id, label: b.label }; }), st.boundary, function (id) { st.boundary = id; note(true); });
           H("p", { class: "m11-note", html: rb("**Increment**: the electrolyzer's value against keeping the wind farm alone, an [[incremental-analysis|incremental analysis]].") }, c1);
-          seg(c2, "Counting rule", D.rules.map(function (r) { return { id: r.id, label: r.label }; }), st.rule, function (id) { st.rule = id; note(); });
-          LX.Slider(c, { label: "Delivery charge on power bought", min: D.charge.min, max: D.charge.max, step: D.charge.step, value: st.c, color: "var(--lx-cc)", fmt: function (q) { return "$" + q + " per MWh"; }, onChange: function (q) { st.c = q; } });
+          seg(c2, "Counting rule", D.rules.map(function (r) { return { id: r.id, label: r.label }; }), st.rule, function (id) { st.rule = id; note(true); });
+          H("p", { class: "m11-note", html: rb("[[energy-attribute-certificate|Certificates]]: the wind farm's records of the MWh it sells, which a rule may let cover power bought.") }, c2);
+          LX.Slider(c, { label: "Delivery charge on power bought", min: D.charge.min, max: D.charge.max, step: D.charge.step, value: st.c, color: "var(--lx-cc)", fmt: function (q) { return "$" + q + " per MWh"; }, onChange: function (q) { st.c = q; note(true); } });
           var nt = H("p", { class: "m11-note" }, act);
-          function note() { var b = D.boundaries.filter(function (x) { return x.id === st.boundary; })[0], r = D.rules.filter(function (x) { return x.id === st.rule; })[0]; nt.textContent = (b.note ? b.note + " " : "") + r.note; drawScene(null, { boundary: st.boundary }); }
+          // changed: a control moved (the last run's conclusion no longer describes these settings; the runs table keeps
+          // each run's own settings in its first column)
+          function note(changed) { var b = D.boundaries.filter(function (x) { return x.id === st.boundary; })[0], r = D.rules.filter(function (x) { return x.id === st.rule; })[0]; nt.textContent = (b.note ? b.note + " " : "") + r.note; drawScene(null, { boundary: st.boundary }); if (changed && sn) stale(sn, [], api, !!(ev && ev.best)); }
           note();
-          var row = H("div", { class: "m11-row" }, act), go = H("button", { type: "button", class: "lx-btn small", html: LX.icon("play") + "Solve this boundary" }, row), stt = LX.SolverStatus(row), prog = H("p", { class: "m11-note", "aria-live": "polite" }, act), out = H("div", { "aria-live": "polite" }, act), ev = null, o = null;
+          var row = H("div", { class: "m11-row" }, act), go = H("button", { type: "button", class: "lx-btn small", html: LX.icon("play") + "Solve this boundary" }, row), stt = LX.SolverStatus(row), prog = H("p", { class: "m11-note", "aria-live": "polite" }, act), o = null;
+          sn = staleNote(act); sn.textContent = "Settings changed since the last run: solve again to add them to the table."; var out = H("div", { "aria-live": "polite" }, act);
           if (PJ && LX.lessonRefHTML) H("p", { class: "m11-note", html: "Case file " + LX.lessonRefHTML(PJ, "CF5") + ": where should a cogeneration study's boundary be drawn?" }, act);
           go.addEventListener("click", LX.SolveStep.action({ api: api, st: stt, host: act, go: go, cls: "m11-fail",
             job: function () { o = base({}); prog.textContent = ""; return evaluate(o, "right", progress(prog)).then(function (e) { ev = e; return e.failed || null; }); },
             show: function () {
-              var b = ev.best, R = b.R; stt.set(b.r); prog.textContent = done(ev); drawScene(R, o);
+              var b = ev.best, R = b.R; stt.set(b.r); prog.textContent = done(ev); fresh(sn, []); drawScene(R, o);
               var lab = D.boundaries.filter(function (x) { return x.id === o.boundary; })[0].short + ", " + o.rule + ", $" + o.c;
               runs = runs.filter(function (q) { return q.lab !== lab; }); runs.push({ lab: lab, R: R, best: b }); if (runs.length > 6) runs.shift();
               out.innerHTML = "";
@@ -704,10 +728,11 @@
       title: "The plant's LP, symbol by symbol", lede: "One LP for the whole life, in annual-equivalent dollars. Tap a symbol: what it means, its unit and its value at the lesson's defaults.", dense: true, label: "The plant's linear program; each symbol is a button",
       fields: [{ key: "you", label: "At the defaults" }, { key: "code", label: "In code", code: true }],
       rows: [
-        { html: "min (" + sym("crf", "<var>CRF</var>") + " + " + sym("fom", "<var>f</var>") + ") " + sym("capex", "<var>c</var>") + " " + sym("S", "<var>S</var>") + " + Σ<sub><var>p</var></sub> " + sym("phi", "<var>φ</var><sub><var>p</var></sub>") + " Σ<sub><var>d</var>,<var>t</var></sub> " + sym("wd", "<var>n</var><sub><var>d</var></sub>") + " [(" + sym("p", "<var>p</var><sub><var>t</var></sub>") + " + " + sym("ch", "<var>q</var>") + ") " + sym("imp", "<var>imp</var>") + " − <var>p</var><sub><var>t</var></sub> " + sym("exp", "<var>exp</var>") + " + (" + sym("wear", "<var>v</var>") + " − (" + sym("h", "<var>h</var>") + " + " + sym("cr", "<var>κ</var><sub><var>p</var></sub>") + ") " + sym("k", "<var>k</var>") + ") " + sym("ez", "<var>ez</var>") + "]", tag: "goal", say: "Minimise the annual equivalent net cost: capital recovery and upkeep of the size, plus each period's weighted hours of power bought and sold, stack wear, hydrogen sales and the credit." },
-        { html: sym("dw", "<var>dw</var>") + " + <var>exp</var> ≤ " + sym("w", "<var>w</var><sub><var>t</var></sub>") + ", &nbsp; <var>ez</var> = <var>dw</var> + <var>imp</var> ≤ <var>S</var>, &nbsp; <var>exp</var>, <var>imp</var> ≤ 50", tag: "hours", say: "Wind goes to the electrolyzer or is sold, the rest curtailed; the electrolyzer takes wind and bought power up to its size; the connection carries at most 50 megawatts each way." },
+        { html: "min (" + sym("crf", "<var>CRF</var>") + " + " + sym("fom", "<var>f</var>") + ") " + sym("capex", "<var>c</var>") + " " + sym("S", "<var>S</var>") + " + Σ<sub><var>p</var></sub> " + sym("phi", "<var>φ</var><sub><var>p</var></sub>") + " Σ<sub><var>d</var>,<var>t</var></sub> " + sym("wd", "<var>n</var><sub><var>d</var></sub>") + " [(" + sym("p", "<var>p</var><sub><var>t</var></sub>") + " + " + sym("ch", "<var>q</var>") + ") " + sym("imp", "<var>imp</var>") + " − <var>p</var><sub><var>t</var></sub> " + sym("exp", "<var>exp</var>") + " + (" + sym("wear", "<var>v</var>") + " − (" + sym("h", "<var>h</var>") + " + " + sym("cr", "<var>κ</var><sub><var>p</var></sub>") + ") " + sym("k", "<var>k</var>") + ") " + sym("ez", "<var>ez</var>") + "]", tag: "goal", say: "Minimize the annual equivalent net cost: capital recovery and upkeep of the size, plus each period's weighted hours of power bought and sold, stack wear, hydrogen sales and the credit." },
+        { html: sym("dw", "<var>dw</var>") + " + <var>exp</var> ≤ " + sym("w", "<var>w</var><sub><var>t</var></sub>") + ", &nbsp; <var>ez</var> = <var>dw</var> + <var>imp</var> ≤ <var>S</var>, &nbsp; <var>exp</var>, <var>imp</var> ≤ 50, &nbsp; " + sym("x", "<var>x</var><sub><var>t</var></sub>") + " = <var>exp</var>", tag: "hours", say: "Wind goes to the electrolyzer or is sold, the rest curtailed; the electrolyzer takes wind and bought power up to its size; the wind farm's connection carries at most 50 megawatts each way." },
+        { html: "across the grid: <var>dw</var> = <var>exp</var> = 0, &nbsp; <var>ez</var> = <var>imp</var> ≤ <var>S</var>, &nbsp; <var>x</var><sub><var>t</var></sub> = min(<var>w</var><sub><var>t</var></sub>, 50)", tag: "hours, across the grid", say: "Across the grid the electrolyzer has its own connection at the buyer: it buys all its power, up to its size. The wind farm sells what its 50 megawatt connection carries on its own, and those sales are the hour's certificates." },
         { html: "<var>dw</var>, <var>exp</var>, <var>imp</var>, <var>u</var> ≥ 0, &nbsp; 0 ≤ <var>S</var> ≤ 100", tag: "bounds", say: "Every power variable is zero or more, and the size runs from 0 to 100 megawatts. Without u ≥ 0, an hour that sells could cancel power bought in another hour: that would be annual matching, not hourly." },
-        { html: "Σ<sub><var>d</var>,<var>t</var></sub> <var>n</var><sub><var>d</var></sub> (" + sym("e", "<var>e</var>") + " " + sym("u", "<var>u</var>") + " − " + sym("L", "<var>L</var>") + " <var>k</var> <var>ez</var> ÷ 1000) ≤ 0, &nbsp; <var>u</var> ≥ <var>imp</var> − <var>exp</var>, &nbsp; <var>u</var> ≥ 0", tag: "tier (period 1)", say: "In the credit years, the counted grid power's CO2 stays under the tier's limit per kilogram; with hourly matching, only power bought beyond the same hour's sales counts, and never less than zero." }
+        { html: "Σ<sub><var>d</var>,<var>t</var></sub> <var>n</var><sub><var>d</var></sub> (" + sym("e", "<var>e</var>") + " " + sym("u", "<var>u</var>") + " − " + sym("L", "<var>L</var>") + " <var>k</var> <var>ez</var> ÷ 1000) ≤ 0, &nbsp; <var>u</var> ≥ <var>imp</var> − <var>x</var><sub><var>t</var></sub>, &nbsp; <var>u</var> ≥ 0", tag: "tier (period 1)", say: "In the credit years, the counted grid power's CO2 stays under the tier's limit per kilogram; with hourly matching, only power bought beyond the same hour's certificates counts, and never less than zero." }
       ],
       symbols: {
         crf: { name: "CRF", label: "CRF, the capital recovery factor", unit: "per year", words: "r ÷ (1 − (1 + r)^−N): the equal yearly share of an up-front cost over N years at rate r.", you: d.crf.toFixed(4) + " (4% real, 30 years).", code: "crf(K.r, K.N)" },
@@ -718,9 +743,9 @@
         wd: { name: "n_d", label: "n d, a day's weight", unit: "days", words: "The days of its month's third that a representative day stands for; 365 in all.", you: weightWords(Y.days) + " days each, " + Y.days.length + " days.", code: "dy.weight" },
         p: { name: "p_t", label: "p t, the grid price", unit: "$/MWh", words: "Prairie Town's cost of one more MWh in hour t: $0, $40 or $100.", you: R.priceShare.zero + " of 2025's hours at $0.", code: "dy.p[t]" },
         ch: { name: "q", label: "q, the delivery charge", unit: "$/MWh", words: "A transmission and delivery charge on power bought (illustrative).", you: "$" + D.charge.def + ".", code: "o.c" },
-        imp: { name: "imp", label: "imp, power bought", unit: "MW", words: "Bought from the grid in an hour, at most 50 MW (all of the electrolyzer's power across the grid).", you: "Top tier: " + Math.round(d.t1.imp).toLocaleString("en-US") + " MWh a year.", code: '"imp" + s' },
+        imp: { name: "imp", label: "imp, power bought", unit: "MW", words: "Bought from the grid in an hour: at most 50 MW behind the plant's meter; across the grid, all the electrolyzer's power, up to its size.", you: "Top tier: " + Math.round(d.t1.imp).toLocaleString("en-US") + " MWh a year.", code: '"imp" + s' },
         exp: { name: "exp", label: "exp, wind sold", unit: "MW", words: "Wind sold through the 50 MW connection at the hour's price.", you: "Its certificates count only under annual or hourly matching.", code: '"exp" + s' },
-        wear: { name: "v", label: "v, stack wear", unit: "$/MWh", words: "11% of the installed cost every 40,000 full-load hours, charged per MWh (illustrative).", you: "$" + d.wear.toFixed(2) + " per MWh.", code: "K.wear" },
+        wear: { name: "v", label: "v, stack wear", unit: "$/MWh", words: "The stack, the cells that split the water, wears out: replacing it costs 11% of the installed cost every 40,000 full-load hours, charged per MWh (illustrative).", you: "$" + d.wear.toFixed(2) + " per MWh.", code: "K.wear" },
         h: { name: "h", label: "h, the hydrogen price", unit: "$/kg", words: "What the buyer pays per kilogram, set by you.", you: "$" + D.hydrogen.price.def.toFixed(2) + ".", code: "o.h" },
         cr: { name: "κ_p", label: "kappa p, the credit", unit: "$/kg", words: "The tier's amount in the credit years, 0 after them.", you: "$" + (D.credit.tiers[0].amount * D.credit.multiplier).toFixed(3) + " at the top tier with the wage rules.", code: "pp.credit" },
         k: { name: "k", label: "k, kilograms per MWh", unit: "kg/MWh", words: "1,000 ÷ 57 kWh per kg, about 17.54 (DOE).", you: "17.54", code: "K.k" },
@@ -729,15 +754,16 @@
         w: { name: "w_t", label: "w t, the plant's wind", unit: "MW", words: "100 MW following SPP's 2025 shape at EIA's 33.8% capacity factor.", you: "Representative days: " + (R.repCF * 100).toFixed(1) + "% against the year's 33.8%.", code: "dy.w[t]" },
         e: { name: "e", label: "e, the grid's CO2 rate", unit: "t/MWh", words: "The rate counted for power bought (operating CO2 only; simplified).", you: "Prairie Town's 2025 average, " + R.townRate.toFixed(3) + ".", code: "o.e" },
         u: { name: "u", label: "u, unmatched power", unit: "MW", words: "Bought power not covered by certificates from the same hour (hourly matching); never below 0.", you: "No certificates: u = imp; annual matching: the year's bought minus sold, in one row.", code: '"u" + s' },
+        x: { name: "x_t", label: "x t, the hour's certificates", unit: "MW", words: "Wind sold in the same hour that matching may count: the plant's own sales behind its meter; across the grid, the wind farm's sales, min(w t, 50).", you: "Counted only under annual or hourly matching.", code: 'grid ? Math.min(K.C, w) : "exp" + s' },
         L: { name: "L", label: "L, the tier's limit", unit: "kg CO2e per kg", words: "0.45, 1.5, 2.5 or 4.0 kg per kg; the LP uses 0.001 below each 'less than' and counts operating CO2 against it (simplified).", you: "Top tier: 0.449.", code: "o.tier.max" }
       }
     });
     LX.CompareTable(H("div", { class: "lx-xcard" }, x), {
-      title: "One plant, three boundaries", lede: "The lesson's defaults ($" + D.hydrogen.price.def.toFixed(2) + " per kg, $" + D.charge.def + " charge, Prairie Town's grid rate, hourly matching), with the credit's tier chosen by the five LPs.",
+      title: "One wind farm and one buyer, three boundaries", lede: "The lesson's defaults ($" + D.hydrogen.price.def.toFixed(2) + " per kg, $" + D.charge.def + " charge, Prairie Town's grid rate, hourly matching), with the credit's tier chosen by the five LPs.",
       columns: [{ key: "name", label: "Boundary", main: true }, { key: "size", label: "Size", num: true, phone: "MW" }, { key: "npv", label: "NPV", num: true }, { key: "lcoh", label: "Cost per kg", num: true, phone: "$/kg" }, { key: "none", label: "NPV with no credit", num: true, phoneHide: true }],
       rows: R.boundaries.map(function (b) { return { key: b.id, color: "var(--lx-good)", name: b.label, size: { text: b.S.toFixed(1) + " MW", value: b.S }, npv: { text: fm.musd(b.npv), value: b.npv }, lcoh: { text: b.lcoh == null ? "–" : fm.kg(b.lcoh), value: b.lcoh || 0 }, none: { text: fm.musd(b.npvNone), value: b.npvNone } }; }),
-      sorts: [{ label: "As listed", order: R.boundaries.map(function (b) { return b.id; }), note: "Each row draws the boundary differently around the same wind and the same buyer." },
-              { label: "By NPV", order: R.boundaries.slice().sort(function (a, b) { return b.npv - a.npv; }).map(function (b) { return b.id; }), ranked: true, note: "The ranking is a statement about the boundary as much as about the plant." }]
+      sorts: [{ label: "As listed", order: R.boundaries.map(function (b) { return b.id; }), note: "One plant and the increment are the same plan, counted two ways. Across the grid moves the electrolyzer to the buyer, so its plan changes." },
+              { label: "By NPV", order: R.boundaries.slice().sort(function (a, b) { return b.npv - a.npv; }).map(function (b) { return b.id; }), ranked: true, note: "One plant also counts the wind farm's own costs and sales. The other two are both measured against the wind farm alone, so only they compare as investments." }]
     });
   }
 })();

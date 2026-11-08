@@ -11,6 +11,9 @@
 //   - ties: each reported size, kilograms and NPV is the same on the whole optimal face (minimized and
 //     maximized with the objective held within $1 a year)
 //   - the full-year check: each default plan's size re-run on all 8,760 hours of 2025; the page states the largest gap
+//   - a tier's case caps CO2 from above only: on every setting of the bound's grid, the best case's plan lies in its own tier
+//   - the notebook's practice tasks 1 to 3 have the answers their wording presumes (a binding cap at $5, a tier at the
+//     combined-cycle rate, a counting difference across the grid)
 //   - every number on the page (fallback, explain, Go deeper, myths, quiz, numbers to remember) against the reference
 //   - research wording: the Real-world box quotes approved E3 sentences word for word (excerpt_check.js)
 //   - the page on a stub document: a solve that fails shows the note and Try again, which then works
@@ -226,9 +229,11 @@ const fm = M.fm, r1 = v => Math.round(v * 10) / 10, r3 = v => Math.round(v * 100
   const EV = evaluate(base);
   // the bound: on a grid of settings the pruned evaluation picks the same case, with the same value, as all five LPs
   {
-    let bad = 0, cnt = 0, saved = 0, bnd = 0;
+    let bad = 0, cnt = 0, saved = 0, bnd = 0, own = 0;
     [3, 4, 5].forEach(h => [Y.rate, Y.ccRate].forEach(e => ["none", "annual", "hourly"].forEach(rule => ["plant", "grid"].forEach(boundary => {
       const o = { ...base, h, e, rule, boundary }, full = evaluate(o), pr = pruned(o); cnt++; saved += 5 - pr.solved;
+      const ti = D.credit.tiers.findIndex(t => t.id === full.best.id), prevT = D.credit.tiers[ti - 1];
+      if (ti > 0 && full.best.R.rate < prevT.max - (prevT.strict ? D.credit.strictMargin : 0) - 1e-6) own++;   // cleaner than its tier
       if (full.best.id !== pr.best.id || Math.abs(full.best.R.annual - pr.best.R.annual) > 1e-6) bad++;
       pr.cases.forEach((c, i) => { const f = full.cases[i];
         // a skipped case is more than $1 below the best, or no better than a solved case listed before it (which wins the tie)
@@ -237,6 +242,7 @@ const fm = M.fm, r1 = v => Math.round(v * 10) / 10, r3 = v => Math.round(v * 100
     }))));
     ok(bad === 0, `the bound never changes the answer; each skipped case is more than $1 a year below the best or tied with an earlier solved case: ${cnt} settings, ${saved} of ${cnt * 5} LPs skipped`);
     ok(bnd === 0, "every case's annual equivalent is at most its bound (M.annualBound), on every setting");
+    ok(own === 0, "a case caps CO2 from above only, yet the best case's plan always lies in its own tier (" + cnt + " settings)");
     ok(pruned(base).solved === REF.defaults.solved, "the defaults solve " + REF.defaults.solved + " of 5 LPs");
   }
   // the bound is the uncapped LP's optimum, in closed form
@@ -262,6 +268,14 @@ const fm = M.fm, r1 = v => Math.round(v * 10) / 10, r3 = v => Math.round(v * 100
     ok(near(RUN.increment.R.npv, RUN.t1.R.npv - alone, 1) && near(RUN.increment.R.S, RUN.t1.R.S, 1e-6), "the increment's NPV is the plant's minus the wind farm alone (" + fm.musd(alone) + "), with the same plan");
   }
   ok(REF.fullYear.plans.length === 7 && REF.fullYear.maxNpvGapM * 1e6 >= Math.max(...REF.fullYear.plans.map(f => Math.abs(f.npvRep - f.npvFull))) && REF.fullYear.maxKgGapPct >= Math.max(...REF.fullYear.plans.map(f => Math.abs(f.kgGapPct))), "the full-year check covers seven plans; the stated gaps are their largest");
+  // the notebook's practice tasks 1 to 3: the facts their wording presumes
+  {
+    const p1 = evaluate({ ...base, h: 5 }).best, p2 = evaluate({ ...base, e: Y.ccRate }).best;
+    ok(p1.id === "t1" && p1.R.rate > t1.max - 0.001 - 1e-4 && p1.R.S > REF.defaults.t1.S, "task 1: at $5 the top tier still wins, larger (" + fm.mw(p1.R.S) + "), with its cap binding (" + p1.R.rate.toFixed(4) + ")");
+    ok(p2.id !== "none" && p2.R.kg > 0 && near((t1.max - 0.001) / Y.ccRate, 0.449 / 0.37, 1e-9), "task 2: at the combined-cycle rate a tier wins (" + p2.id + "); the top tier allows " + ((t1.max - 0.001) / Y.ccRate).toFixed(2) + " kWh of grid power per kg");
+    const pa = evaluate({ ...base, boundary: "grid", rule: "annual" }).best.R.per[0], ph = evaluate({ ...base, boundary: "grid", rule: "hourly" }).best.R.per[0];
+    ok(Math.abs(pa.counted - ph.counted) > 100 && near(pa.certs, ph.certs, 1e-6), "task 3: across the grid, annual and hourly matching count different MWh (" + Math.round(pa.counted) + " against " + Math.round(ph.counted) + ") from the same certificates");
+  }
   if (process.argv.includes("--full")) {
     REF.fullYear.plans.forEach(f => { const F = run({ ...PLANS[f.id], size: RUN[f.id].R.S, days: ALL }).R; ok(Math.abs(Math.round(F.npv) - f.npvFull) <= 1, "full year re-run: " + f.id); });
   }
@@ -286,6 +300,24 @@ const fm = M.fm, r1 = v => Math.round(v * 10) / 10, r3 = v => Math.round(v * 100
   onPage(REF.townRate.toFixed(3), "Prairie Town's grid rate");
   onPage("here, " + (5 - REF.defaults.solved) + " of 5 skipped", "LPs the bound skips at the defaults"); onPage("About " + (Math.round(REF.size.cols / 100) * 100).toLocaleString("en-US") + " columns and " + (Math.round(REF.size.rows / 100) * 100).toLocaleString("en-US") + " rows", "the LP's size");
   onPage("$" + d.wear.toFixed(2), "stack wear per MWh");
+  onPage("\\text{(each hour, across the grid)}", "the across-the-grid hours in the algebra"); onPage("**Two connections.**", "the two connections");
+  // the certificates the matching rows count, as the model counts them: the plant's own sales behind its meter; across the
+  // grid the wind farm's sales on their own, min(w, 50) (the model's `sold`); the algebra and the card say the same
+  onPage("x_t = \\mathit{exp} && \\text{(each hour, behind the meter)}", "the algebra: certificates behind the meter are the wind sold");
+  onPage("x_t = \\min(w_t, 50) && \\text{(each hour, across the grid)}", "the algebra: certificates across the grid are the wind farm's own sales");
+  onPage("u \\ge \\mathit{imp} - x_t", "the algebra: hourly matching counts power bought beyond the hour's certificates");
+  ok(/var sold = grid \? Math\.min\(K\.C, w\) : 0;/.test(JS) && /hu\["imp" \+ s\] = -1; if \(!grid\) hu\["exp" \+ s\] = 1;\s*cons\.push\(\{ name: "h" \+ s, terms: hu, ge: -sold \}\)/.test(JS) && /<var>u<\/var> ≥ <var>imp<\/var> − <var>x<\/var><sub><var>t<\/var><\/sub>/.test(JS) && /<var>x<\/var><sub><var>t<\/var><\/sub> = min\(<var>w<\/var><sub><var>t<\/var><\/sub>, 50\)/.test(JS), "the model's hourly row is u ≥ imp − min(w, 50) across the grid and u ≥ imp − exp behind the meter, as the equation card writes it");
+  ok(/across the grid: <var>dw<\/var> = <var>exp<\/var> = 0, &nbsp; <var>ez<\/var> = <var>imp<\/var> ≤ <var>S<\/var>/.test(JS) && /behind its own connection/.test(D.boundaries.find(b => b.id === "grid").note), "the equation card and the boundary note state the electrolyzer's own connection across the grid");
+  onPage("the same " + fm.mw(B("plant").S) + " plan, worth " + fm.musd(B("plant").npv) + " or " + fm.musd(B("increment").npv), "one plant and the increment: one plan, two accounts");
+  ok(near(B("plant").S, B("increment").S), "one plant and the increment build the same size");
+  onPage("the wind farm on its own, worth " + fm.musd(B("plant").npv - B("increment").npv), "the wind farm alone (one plant minus the increment)");
+  onPage(fm.mw(B("grid").S) + ", worth " + fm.musd(B("grid").npv) + " against the same wind farm alone, where the increment is worth " + fm.musd(B("increment").npv), "across the grid against the increment");
+  ok(/no LP \[shadow prices\]\{\.lx-term term="shadow-price"\} directly; fixing its binaries/.test(PAGE) && !/come only from LPs/.test(PAGE), "a mixed-integer solve: no LP shadow prices directly, conditional ones after fixing the binaries");
+  ok(/data-term="electrolyzer-stack">stack<\/span> wear/.test(PAGE) && /id: electrolyzer-stack\b/.test(SIDE), "stack wear: the stack is a glossary term (sidecar)");
+  ok(/\[\[linear-program\|linear program \(LP\)\]\]/.test(JS) && /\[\[energy-attribute-certificate\|certificates\]\]/.test(JS) && /\[\[energy-attribute-certificate\|Certificates\]\]/.test(JS), "LP and certificates are explained where the steps first use them");
+  ok(/least net cost is a convex, piecewise-linear function/.test(NB) && !/best value is a convex/.test(NB), "notebook: the bound is a convex least net cost; its negative bounds the value");
+  ok(NB.includes("One day's hours") && /x=x\)/.test(NB) && PAGE.includes("One representative day's hours are printed, not asserted"), "notebook prints one representative day's hours, as the page says");
+  { const t4 = d.tiers.find(t => t.id === "t4"); ok(NB.includes("4.0 case's plan counts about " + t4.rate.toFixed(2) + " kg per kg") && t4.rate < D.credit.tiers[2].max, "notebook: the 4.0 case's plan (" + t4.rate + ") is cleaner than its tier, as it says"); }
   ok(!/break[- ]even/i.test(PAGE + (JS.match(/"[^"\n]*"/g) || []).join(" ") + NB), "no break-even wording on the page, in its strings or the notebook");
 
   // ---------------- scope and research wording
@@ -339,12 +371,23 @@ const fm = M.fm, r1 = v => Math.round(v * 10) / 10, r3 = v => Math.round(v * 100
       ok(!failBox() && card().querySelectorAll(".m11-tbl tbody tr").length === 5 && !next().disabled && calls === d.solved, "step 7: Try again solves the tiers it needs (" + calls + " of 5; the rest bounded) and unlocks Next");
       ok(card().textContent.includes("Solved " + d.solved + " of 5 LPs" + (d.solved < 5 ? "; " + (5 - d.solved) + " skipped by their bounds." : ".")) && /skipped: bound/.test(card().textContent) === (d.solved < 5) && card().textContent.includes((5 - d.solved) + " of 5 skipped") === (d.solved < 5) && !/\*\*/.test(card().textContent), "step 7: progress, the skipped rows and the bounding note say why");
       ok(card().textContent.includes(fm.mw(d.t1.S)) && /The top tier wins/.test(card().textContent), "step 7: the best tier and its size as the reference says");
+      const sn = () => card().querySelector(".m11-stale-note"), segB = re => card().querySelectorAll(".lx-seg button").filter(b => re.test(b.textContent))[0];
+      ok(sn() && sn().hidden && /under 0\.45 kg/.test(card().textContent) && /at most 4\.0 kg/.test(card().textContent) && /never wins/.test(card().textContent), "step 7: the cases are named by their caps, and the note says why a cap from above suffices");
+      segB(/combined-cycle/).click();
+      ok(!sn().hidden && card().querySelector(".m11-stale") && /Settings changed: solve again/.test(card().textContent) && !/The top tier wins/.test(card().textContent), "step 7: a new grid rate marks the table stale and replaces the conclusion");
+      segB(/2025 average/).click(); calls = 0; btns(/Solve the tiers/)[0].click(); await flush();
+      ok(sn().hidden && !card().querySelector(".m11-stale") && /The top tier wins/.test(card().textContent) && calls === 0, "step 7: solving again (from the cache) clears the stale mark");
       demo.cards.go(7); failing = false; calls = 0;
       btns(/Solve this boundary/)[0].click(); await flush();
       ok(calls === 0 && !failBox() && /Now change the boundary/.test(card().textContent), "step 8: the default boundary reuses the LPs step 7 solved");
       card().querySelectorAll(".lx-seg button").filter(b => /increment/.test(b.textContent))[0].click();
+      ok(!card().querySelector(".m11-stale-note").hidden && /New books, the same plant/.test(card().textContent), "step 8: a new boundary after a run says to solve again; the note calls the increment new books");
       btns(/Solve this boundary/)[0].click(); await flush();
       ok(calls === d.solved && !next().disabled && card().textContent.includes(fm.musd(B("increment").npv)), "step 8: a second boundary solves (" + calls + " LPs) and unlocks Next, NPV " + fm.musd(B("increment").npv));
+      ok(card().querySelector(".m11-stale-note").hidden, "step 8: the new run clears the stale note");
+      demo.cards.go(5); failing = false; btns(/ten years, and all years/)[0].click(); await flush();
+      const t6 = card().querySelectorAll(".m11-tbl tbody tr");
+      ok(t6.length === 4 && card().textContent.includes((d.t1.kgShare * 100).toFixed(1) + "%") && card().textContent.includes("Credit per kg over the life: $" + top.toFixed(3) + " × " + d.t1.kgShare.toFixed(3) + " ≈ " + fm.kg(d.t1.creditLev) + "."), "step 6: the two copies of the year as a table, then the credit per kg over the life");
     } catch (e) { ok(false, "the stub page test threw: " + (e && e.stack || e)); }
     process.removeListener("unhandledRejection", onUn);
     ok(!unhandled.length, "no unhandled promise rejection: " + unhandled.join(" | "));

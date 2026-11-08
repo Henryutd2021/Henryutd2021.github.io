@@ -10,7 +10,7 @@ glossary:
     def: "A rule that says how likely each value of an uncertain input is; a uniform distribution makes every value in its range equally likely."
   - id: rank-correlation
     term: Rank correlation (Spearman's ρ)
-    def: "The correlation of the ranks of two quantities, from −1 to 1: how consistently one rises or falls with the other, whatever the shape of the link."
+    def: "The correlation of the ranks of two quantities, from −1 to 1: how consistently one rises or falls as the other rises; it can miss U-shaped links and interactions."
   - id: global-sensitivity-analysis
     term: Global sensitivity analysis
     def: "Ranking a model's inputs by their influence on a result while all of them vary together across their assumed ranges, rather than one at a time."

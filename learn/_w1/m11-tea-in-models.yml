@@ -14,6 +14,9 @@ glossary:
   - id: capacity-utilization
     term: Capacity utilization
     def: "The energy a machine used or made over a year divided by its size times 8,760 hours, its average loading, so half power all year gives 50%, as full power for half the year does."
+  - id: electrolyzer-stack
+    term: Electrolyzer stack
+    def: "The stack of cells inside an electrolyzer where electricity splits water into hydrogen and oxygen; it wears with use and is replaced several times over a plant's life."
   - id: prevailing-wage-apprenticeship
     term: Prevailing wage and apprenticeship requirements
     def: "Two federal conditions of many clean-energy tax credits, the hydrogen credit among them, that raise the credit fivefold when both are met: those who build or repair the facility are paid at least the local prevailing wage, and apprentices from registered programs work a set number of hours."

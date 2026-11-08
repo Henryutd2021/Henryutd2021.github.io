@@ -118,7 +118,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <li>Monte Carlo error over 20 seeds: P90 $200.1M ± $1.3M (two standard errors) with 1,000 runs, ± $4.7M with 100.</li>
 <li>A chance under these inputs: above $200M, 0.0% of runs at 12 months, 10.1% at 24 and 92.9% at 36.</li>
 <li>Spearman's rank correlation with the developer's cost: margin 0.86 (rank 1); then capital 0.38 and discount rate 0.31 (tied, rank 2–3); with other customers' cost: upgrades 0.81 (rank 1); then never arrives 0.54 (rank 2).</li>
-<li>Narrow the margin's range to ± $5,000: capital 0.64 and discount rate 0.59 (tied, rank 1–2), and the margin (0.47) ranks 3.</li>
+<li>Narrow the margin's range to ± $6,000: capital 0.61 (rank 1–2) and discount rate 0.56 (rank 1–3) tie for first, and the margin (0.54) ranks 2–3.</li>
 </ol>
 <p class="lx-eyebrow">The summaries on this page</p>
 <div class="lx-scroll-x"><table class="lx-facts m7-fbtab">
@@ -171,7 +171,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <p class="lx-hint" style="margin-top:.6rem">About 35 guided minutes in ten steps. Every run is computed in your browser; nothing is sent anywhere.</p>
 <div class="lx-card lx-notebook m7-nb">
 <p class="lx-eyebrow">Build it in Python · notebook lab, about 45 minutes, then 60 minutes of practice</p>
-<p>The same toy and the same seeded Latin hypercube in NumPy: <code>assert</code> cells check your runs against the page, then SciPy's own Latin hypercube, Spearman's ρ and variance shares (Sobol indices) take over.</p>
+<p>The same toy and the same seeded Latin hypercube in NumPy: <code>assert</code> cells check your runs against the page, then SciPy's own Latin hypercube and Spearman's ρ take over. An optional extension estimates variance shares (Sobol indices).</p>
 <ol class="m7-nb-steps">
 <li>Download the notebook and the lesson data into one folder (in Colab, upload the data with the folder icon).</li>
 <li>Open it in Google Colab (<em>File → Upload notebook</em>) or locally with Python 3, NumPy and SciPy 1.9 or later.</li>
@@ -211,13 +211,15 @@ body-classes: "page-learn page-lesson lx-form-cards"
 
 - **The toy.** With $i = (1+r)^{1/12} - 1$ and $A = \frac{1 - (1+i)^{-\tau}}{i}$, the developer's cost is $D = (m P + K i)\,A$ and other customers' is $R = U i A + \min(0.5,\, h\tau)\, U (1+i)^{-\tau}$.
 - **Symbols.** $m$ margin (\$ per MW a month), $P$ = 100 MW, $K$ idle capital (\$), $r$ yearly discount rate, $U$ upgrade cost (\$), $\tau$ the wait (months).
-- **The never-arrives chance.** $h$ is in percentage points added a month, not compounded: $h\tau$ = 24 × 0.5 points = 12%, capped at 50%.
+- **The never-arrives chance.** Added each month, not compounded: $h\tau$ = 24 × 0.5 points = 12%, capped at 50%.
+- **Its unit in the formula.** $h$ enters as a fraction: $h$ = 0.005 a month (0.5 percentage points), so $h\tau$ = 0.12 and the cap is 0.5.
 - **Latin hypercube.** Run $a$'s draw of input $j$ is $u_{a,j} = (\pi_j(a) + \xi_{a,j})/N$, with $\pi_j$ a random ordering of $0, \dots, N-1$ and $\xi$ uniform on $[0, 1)$; the value is $\text{lo} + u\,(\text{hi} - \text{lo})$.
 - **Spearman's ρ.** The correlation of the ranks; with no ties, $\rho = 1 - \frac{6 \sum_a d_a^2}{N (N^2 - 1)}$, where $d_a$ is run $a$'s rank of the input minus its rank of the cost.
 - **Monte Carlo error.** The standard error of an estimate is the standard deviation of that estimate over 20 repeats with other seeds; 20 repeats make the error itself rough, about ± 16%.
 - **What the hypercube buys.** Over 20 seeds, the mean cost of 1,000 runs scatters by \$0.03M with a Latin hypercube and \$0.80M with plain random draws (one standard error); the P90, by \$0.65M and \$0.80M.
 - **A share's error.** For plain random draws, K5's $\sqrt{p(1-p)/N}$ gives 0.95 points for the 10.1% above \$200M; the Latin hypercube repeats scatter by 0.52 points.
-- **Near a corner.** With continuous inputs, an exact corner has zero chance. Near one (the margin, capital and discount rate all in the same outer tenth of their ranges) has 0.1³ = 0.1% per corner, so 1,000 runs expect 2; seed 7 has 2, both at the high-cost end.
+- **An exact corner.** With continuous inputs, an exact corner has zero chance.
+- **Near a corner.** The margin, capital and discount rate all in the same outer tenth of their ranges: 0.1³ = 0.1% per corner, so 1,000 runs expect 2. Seed 7 has 2, both at the high-cost end.
 
 ```{=html}
 </div>
@@ -228,7 +230,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 ```
 
 - **Monotone effects only.** ρ reads how consistently the cost rises or falls with an input. An input that matters only through another (an interaction) or pushes the cost up and then down can show ρ near 0.
-- **Variance shares.** Sobol indices split the variance of the cost among the inputs and their interactions; with $k$ inputs they need about $N(k+2)$ runs. The lab estimates them for this toy.
+- **Variance shares.** Sobol indices split the variance of the cost among the inputs and their interactions; with $k$ inputs they need about $N(k+2)$ runs. The lab's optional extension estimates them for this toy.
 - **Inputs that move together.** Draw them with a stated rank correlation (Iman and Conover's method; the lab's practice task 3 uses a simplified two-input version), or sample whole records from data, as [K5](k05-probability-statistics.html) suggests.
 - **Slow models.** When 1,000 runs take too long, a fast stand-in fitted to a few runs does the sampling ([M9](m09-surrogates-uq.qmd)); deciding before the uncertainty resolves is [M8](m08-stochastic-robust.qmd).
 
@@ -259,7 +261,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-qq" data-id="rank" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “The input with the largest rank correlation matters most in the real world.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. ρ ranks inputs within the ranges you assumed: narrow the margin's to ± $5,000 and it drops from first to third.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. ρ ranks inputs within the ranges you assumed: narrow the margin's to ± $6,000 and capital ranks clearly above it.</p></details>
 </div>
 </div>
 
@@ -281,7 +283,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <ul>
 <li>Clone and install the repository (its README's quick start), then write the illustrative files: <code>code-delay example my_scenario.json --grid grid.json --ranges ranges.json</code>.</li>
 <li>Run <code>code-delay lhs my_scenario.json ranges.json --samples 500 --seed 1 --out-dir outputs/lhs</code>; open <code>rank_correlations.csv</code>.</li>
-<li>Rerun with <code>--seed 2</code>. Do any two inputs swap places? Then treat them as tied, as step 9 does.</li>
+<li>Rerun with <code>--seed 2</code>. Do any two inputs swap places? A swap warns that their order may be unstable; step 9's rule settles it from 20 seeds.</li>
 </ul>
 <p><a href="https://github.com/Henryutd2021/code-delayed-energization">code-delayed-energization</a>: public example repository · MIT licence · illustrative inputs.</p>
 </div>

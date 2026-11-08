@@ -15,6 +15,10 @@
 //     out: nothing public says total demand stays constant); the repository
 //     commands are the README's; scope; links; text budget; the notebook reads the same data and asserts the reference;
 //     the page on a stub document with a failing, then working, solver
+//   - claims: each 0 t claim is labelled as holding on the six days under the market-based method, with the full year's
+//     result beside it; the cost of a purchase is the added system cost, and the buyer's bill is said not to be modeled
+//   - practice task 2 (the notebook's check_task2): at the 50% cap the total curtailed energy is the same for every best
+//     plan, while the share of it at the existing wind farms is not (reference block "practice", from a fresh solve)
 //   - the details: the printed (rounded) dual does not tie, the unrounded one does; the full-year check
 //     reports only the unmatched energy (the optimum; which hours carry it can differ); the no-rule purchase is counted
 //     at average factors, not 0 t; the dual is the magnitude of the frontier's downward slope; the stage switches to the
@@ -127,7 +131,30 @@ function dmt(v) { const r = Math.round(v / 1e4) / 100; return (r < 0 ? "−" : r
   { const six = Y.days.reduce((s, d) => s + d.weight * PP.sum(d.cfw), 0) / (365 * 24);
     ok(FY.annualShare < 1 && FY.shortMWh > 1 && six > 0.338 && near(FY.annualShare, 0.338 / six, 1e-9), `the full year shows what six days miss: the six weighted days' wind (${(six * 100).toFixed(1)}%) is above the year's 33.8%, so annual matching falls short; some energy goes unmatched`); }
   ok(shortI.length > 0 && shortI.every(i => PF.w[i] * hr.Wb + PF.s[i] * hr.Sb < L0), "the unmatched energy falls in hours of low wind and sun (the portfolio's own output below 300 MW) in the solved schedule: " + shortI.map(i => (PF.w[i] * hr.Wb + PF.s[i] * hr.Sb).toFixed(0) + " MW").join(", "));
+  { const ew = PF.w.reduce((s, x) => s + x, 0) * F.A.plains.windMW; ok(ew > loadYear, `certificates from existing wind hold on the full year too: existing wind makes ${(ew / 1e6).toFixed(2)} TWh against the load's ${(loadYear / 1e6).toFixed(2)} TWh`); }
   ok(Math.round(FY.shortMWh) === 290 && (FY.shortMWh / loadYear * 100).toFixed(2) === "0.01", "the full year: about 290 MWh unmatched, 0.01% of the load's year (the least possible: the optimum, the same for every best schedule)");
+
+  // ---------------- practice task 2: what can differ between the best plans at the 50% cap
+  // min and max of a linear quantity (terms over the LP's variables, plus a constant) over the optimal face, the cost held
+  // within the page's tolerance (a cent plus 1e-9 of the cost, as faceModel and the notebook's section 4)
+  function faceRange(o, terms, k0) {
+    const m0 = PP.build(Y, Object.assign({}, o, { tie: false })), r0 = F.solve(m0), cost = {};
+    m0.variables.forEach(v => { if (v.cost) cost[v.name] = v.cost; });
+    return [1, -1].map(sg => { const r = F.solve({ sense: "min", variables: m0.variables.map(v => Object.assign({}, v, { cost: sg * (terms[v.name] || 0) })),
+      constraints: m0.constraints.concat([{ name: "face", terms: cost, le: r0.objective + 0.01 + 1e-9 * Math.abs(r0.objective) }]) }); return r.ok ? k0 + sg * r.objective : NaN; });
+  }
+  const PRACTICE = (() => {
+    const o = { cap: 0.5 * E0 }, curt = {}, wcur = {}; let kAll = 0, kW = 0, cfw = 0, cfs = 0;
+    Y.days.forEach((d, k) => { for (let t = 0; t < 24; t++) { const j = k * 24 + t, w = d.weight;
+      ["we", "se", "wn", "sn"].forEach(v => { curt[v + j] = -w; }); wcur["we" + j] = -w;
+      kAll += w * (d.we[t] + d.se[t]); kW += w * d.we[t]; cfw += w * d.cfw[t]; cfs += w * d.cfs[t]; } });
+    curt.Wn = cfw; curt.Sn = cfs;   // curtailed = what the weather gives (existing, plus new sizes x capacity factor) - what is used
+    return { cap: 50, curtailed: faceRange(o, curt, kAll), existingWindCurtailed: faceRange(o, wcur, kW) };
+  })();
+  ok(PRACTICE.curtailed.every(Number.isFinite) && PRACTICE.curtailed[1] - PRACTICE.curtailed[0] < 1 && PRACTICE.curtailed[0] > 1e5,
+    `practice task 2: at the 50% cap every best plan curtails the same energy, ${PRACTICE.curtailed.map(v => v.toFixed(1)).join(" to ")} MWh a year`);
+  ok(PRACTICE.existingWindCurtailed[0] < 1 && PRACTICE.existingWindCurtailed[1] > PRACTICE.curtailed[0] - 1,
+    `practice task 2: the existing wind farms' share of it can be anything from ${PRACTICE.existingWindCurtailed[0].toFixed(1)} to ${PRACTICE.existingWindCurtailed[1].toFixed(1)} MWh: a tie in the schedule`);
 
   // ---------------- the reference block and the page's generated blocks
   const ref = { about: "Reference results, solved with the lesson's LP in HiGHS. CO2 in t, money in $ a year (2025 dollars).",
@@ -136,10 +163,12 @@ function dmt(v) { const r = Math.round(v / 1e4) / 100; return (r < 0 ? "−" : r
     ties: ties.map(t => ({ cap: t.c, tau: t.tau, lo: t.lo, hi: t.hi })),
     prices: prices.map(p => ({ tau: p.tau, co2: p.R.co2, cost: p.R.resource })),
     buy: Object.fromEntries(Object.keys(cases).map(k => [k, { co2: cases[k].R.co2, cost: cases[k].R.resource, Wb: cases[k].R.Wb, Sb: cases[k].R.Sb, Bb: cases[k].R.Bb }])),
-    fullYear: FY };
+    fullYear: FY, practice: { cap50: PRACTICE } };
   const c70 = caps.find(z => z.c === 70), t70 = ties.find(t => t.c === 70), N = cases.none.R, An = cases.annual.R, Hr = cases.hourly.R;
-  const buyRow = (lab, R, claim, built) => `<tr><td>${lab}</td><td data-label="May claim">${claim}</td><td data-label="The plants emit">${dmt(R.co2 - E0)}</td><td data-label="Cost">${dm(R.resource - N.resource)}</td><td data-label="Built for it">${built}</td></tr>`;
+  const buyRow = (lab, R, claim, yr, built) => `<tr><td>${lab}</td><td data-label="May claim, six days">${claim}</td><td data-label="On all of 2025">${yr}</td><td data-label="The plants emit">${dmt(R.co2 - E0)}</td><td data-label="Added system cost">${dm(R.resource - N.resource)}</td><td data-label="Built for it">${built}</td></tr>`;
+  const YR = { annual: `${Math.round(FY.annualShare * 100)}% of the load matched`, hourly: `${Math.round(FY.shortMWh).toLocaleString("en-US")} MWh unmatched` };
   const FALLBACK = `<p class="lx-eyebrow">The Plains Grid's planning LP: caps, their duals, and four purchases for a data center</p>
+<p class="lx-hint">Mt = million tonnes of CO₂; costs a year in 2025 dollars.</p>
 <table class="lx-facts m6-fb">
 <thead><tr><th scope="col">Cap, share of ${mt(E0)}</th><th scope="col">CO₂</th><th scope="col">Cost</th><th scope="col">Dual, $ per t</th></tr></thead>
 <tbody>
@@ -149,21 +178,23 @@ ${caps.map(z => `<tr><td>${z.c}%</td><td data-label="CO₂">${mt(z.x.R.co2)}</td
 </table>
 <p class="lx-hint">At the 70% cap's dual, ${f2(t70.tau)} per t rounded (the tie needs its full precision), every plan from ${mt(t70.lo)} to ${mt(t70.hi)} scores the same: a price there picks no single plan.</p>
 <table class="lx-facts m6-fb">
-<thead><tr><th scope="col">The 300 MW data center buys</th><th scope="col">May claim</th><th scope="col">The plants emit</th><th scope="col">Cost</th><th scope="col">Built for it</th></tr></thead>
+<thead><tr><th scope="col">The 300 MW data center buys</th><th scope="col">May claim, six days</th><th scope="col">On all of 2025</th><th scope="col">The plants emit</th><th scope="col">Added system cost</th><th scope="col">Built for it</th></tr></thead>
 <tbody>
-${buyRow("No rule on what it buys", N, "its share at average factors", "nothing")}
-${buyRow("Certificates from existing wind", N, "0 t", "nothing")}
-${buyRow("New wind and sun, matched over the year", An, "0 t", `${mw(An.Wb)} wind`)}
-${buyRow("New wind, sun and batteries, matched hour by hour", Hr, "0 t", `${mw(Hr.Wb)} wind, ${mw(Hr.Sb)} solar, ${mw(Hr.Bb)} battery`)}
+${buyRow("No rule on what it buys", N, "its share at average factors", "–", "nothing")}
+${buyRow("Certificates from existing wind", N, "0 t", "the load's year covered", "nothing")}
+${buyRow("New wind and sun, matched over the year", An, "0 t", YR.annual, `${mw(An.Wb)} wind`)}
+${buyRow("New wind, sun and batteries, matched hour by hour", Hr, "0 t", YR.hourly, `${mw(Hr.Wb)} wind, ${mw(Hr.Sb)} solar, ${mw(Hr.Bb)} battery`)}
 </tbody>
 </table>
-<p class="lx-hint">The plants' change is against the grid without the data center; the cost against no rule. A year in 2025 dollars.</p>`;
+<p class="lx-hint">Claims follow the <span class="lx-term" data-term="market-based">market-based method</span>: each certificate counted once and retired for this buyer alone. They hold on the six days; the full year is checked apart.</p>
+<p class="lx-hint">The plants' change is against the grid without the data center; the added system cost, new plants and gas for the whole grid, against no rule.</p>
+<p class="lx-hint">The buyer's own bill depends on contracts and prices, which this model does not calculate.</p>`;
   const EXPLAIN = `<dl class="lx-ideas">
 <dt>A cap</dt><dd>A rule on the year's CO₂. At 70% of ${mt(E0)} the plan costs ${dm(c70.x.R.resource - base.R.resource).replace("+", "")} more, and the cap's dual is ${f2(c70.x.R.capPrice)} per t.</dd>
 <dt>The frontier</dt><dd>The dual is the extra cost of cutting one more tonne, the magnitude of the frontier's downward slope: from ${f2(caps[0].x.R.capPrice)} at 90% to ${f2(caps[caps.length - 1].x.R.capPrice)} at 30%.</dd>
 <dt>A price and its ties</dt><dd>A price at the 70% cap's unrounded dual ties every plan from ${mt(t70.lo)} to ${mt(t70.hi)}; the cap picks one CO₂ level.</dd>
-<dt>A procurement rule</dt><dd>A rule on one buyer's purchases. Hourly matching costs ${dm(Hr.resource - An.resource).replace("+", "")} a year more than annual matching here.</dd>
-<dt>Claim and cause</dt><dd>The three certificate or matching purchases may claim 0 t; with no rule, the load's share counts at average factors. The plants emit from ${dmt(Hr.co2 - E0)} to ${dmt(N.co2 - E0)} against the grid without the data center.</dd>
+<dt>A procurement rule</dt><dd>A rule on one buyer's purchases. Hourly matching's system cost is ${dm(Hr.resource - An.resource).replace("+", "")} a year above annual matching's here.</dd>
+<dt>Claim and cause</dt><dd>Under the market-based method, three purchases may claim 0 t on the six days; with no rule, the load's share counts at average factors. Against no data center, the plants emit ${dmt(Hr.co2 - E0)} to ${dmt(N.co2 - E0)}.</dd>
 </dl>`;
   const FULL = `<ul>
 <li><b>Annual matching.</b> On all 8,760 hours of 2025 the ${mw(An.Wb)} of wind make ${Math.round(FY.annualShare * 100)}% of the data center's load over the year: the six weighted days were windier than the year.</li>
@@ -249,7 +280,7 @@ ${buyRow("New wind, sun and batteries, matched hour by hour", Hr, "0 t", `${mw(H
   ok(!/\bAI\b|artificial intelligence/.test(OWN + JS), "no AI wording");
   { const dc = (OWN + JS).match(/[^.;:!?"]*data cent[^.;:!?"]*/gi) || []; ok(dc.every(s => /load|buy|claim|purchas|300 MW|plants emit|without the|with the|for it|serves|cost|matching/i.test(s)), "data centers appear only as a load: " + dc.filter(s => !/load|buy|claim|purchas|300 MW|plants emit|without the|with the|for it|serves|cost|matching/i.test(s)).join(" | ")); }
   const hrefs = [...OWN.matchAll(/href="([^"]+)"/g)].map(m => m[1].replace(/&amp;/g, "&"));
-  const ALLOW = /^(https:\/\/(doi\.org|www\.eia\.gov|docs\.nlr\.gov|atb\.nlr\.gov|ergo-code\.github\.io|github\.com\/Henryutd2021\/ghg-load-regulation)(\/|$)|notebooks\/m06-carbon-in-models\.ipynb$|[0-9a-z-]+\.html|\.\.\/assets\/|#)/;
+  const ALLOW = /^(https:\/\/(doi\.org|www\.eia\.gov|docs\.nlr\.gov|atb\.nlr\.gov|ergo-code\.github\.io|ghgprotocol\.org|github\.com\/Henryutd2021\/ghg-load-regulation)(\/|$)|notebooks\/m06-carbon-in-models\.ipynb$|[0-9a-z-]+\.html|\.\.\/assets\/|#)/;
   ok(hrefs.every(h => ALLOW.test(h)), "links only to allowed domains and learn pages: " + hrefs.filter(h => !ALLOW.test(h)).join(", "));
   const stepTexts = [...JS.matchAll(/\{ text: "([^\n]+)",\n\s+build:/g)].map(m => m[1].replace(/\[\[[^|]+\|([^\]]+)\]\]/g, "$1"));
   const sentences = t => t.replace(/\*\*/g, "").split(/(?<=[.?!])\s+(?=[A-Z0-9“"$])/).filter(x => /[A-Za-z]/.test(x)).length;
@@ -268,6 +299,8 @@ ${buyRow("New wind, sun and batteries, matched hour by hour", Hr, "0 t", `${mw(H
     ok(/status: active/.test(r.split("- kind:")[0]) && r.includes("after: [M1, A10, 12]") && /lab_minutes: 45/.test(r) && PAGE.includes('subtitle: "' + (r.match(/subtitle: "([^"]+)"/) || [])[1] + '"'), "path.yml: active, after M1, A10 and lesson 12, a 45-minute lab, subtitle equal to the page's"); }
   // the notebook reads the same data and asserts the reference
   ok(NB.length > 0 && ["a10-emissions-questions.json", "m06-carbon-in-models.json", "town_year.json", "cf_targets.json"].every(n => NB.includes(n)) && /REF\[\\"caps\\"\]|REF\["caps"\]/.test(NB) && /REF\[\\"buy\\"\]|REF\["buy"\]/.test(NB) && /REF\[\\"fullYear\\"\]|REF\["fullYear"\]/.test(NB), "the notebook reads the four data files and asserts the caps, purchases and full-year checks");
+  ok(/def check_task2/.test(NB) && /REF\[\\"practice\\"\]|REF\["practice"\]/.test(NB) && /test whether/.test(NB) && !/Why can the curtailed energy differ/.test(NB), "practice task 2 asks whether total curtailment can differ, and the notebook's check_task2 checks it against the reference block");
+  ok(/within a small numerical tolerance/.test(NB) && !/plus a cent\)/.test(NB), "the notebook states the optimal face's tolerance as it is");
 
   // ---------------- the page on a stub document: a solve that fails, then works
   {
@@ -301,8 +334,12 @@ ${buyRow("New wind, sun and batteries, matched hour by hour", Hr, "0 t", `${mw(H
       demo.cards.go(3); await tick(10);
       btns(/Use the dual/)[0].click(); await tick(20);
       ok(card().textContent.includes(mt(t70.lo)) && card().textContent.includes(mt(t70.hi)), "step 4: the cap's dual as a price shows the tied stretch");
+      ok(card().textContent.includes("Price in use: the 70% cap's exact dual, " + f2(t70.tau) + " per t rounded, not the slider."), "step 4: the price in use is named (the cap's exact dual, not the slider's value)");
       demo.cards.go(6); await tick(4); btns(/Compare the four purchases/)[0].click(); await tick(30);
       ok(card().textContent.includes(dmt(N.co2 - E0)) && card().textContent.includes(dmt(Hr.co2 - E0)), "step 7: the purchase ledger");
+      { const th = [...card().querySelectorAll("th")].map(e => e.textContent).join("|");
+        ok(/May claim, six days\|On all of 2025\|The plants emit\|Added system cost/.test(th) && card().textContent.includes(YR.annual) && card().textContent.includes(YR.hourly) && card().textContent.includes("which this model does not calculate"),
+          "step 7: the ledger puts the full year beside each claim and names the cost as the added system cost, not the buyer's bill: " + th); }
       ok(xp.textContent.includes("Three ways to put carbon in the LP"), "explain: the three ways");
       const ttl = () => live.querySelector("h3").textContent;
       ok(/with the 300 MW data center/.test(ttl()) && !live.textContent.includes("Your cap") && !live.textContent.includes("The cap's dual"), "steps 5-7: the stage shows the year with the data center, not the earlier cap: " + ttl());
@@ -320,10 +357,13 @@ ${buyRow("New wind, sun and batteries, matched hour by hour", Hr, "0 t", `${mw(H
       demo.cards.go(3); await tick(10);
       for (let i = 0; i < 4; i++) { press(/^Lower/).click(); await tick(12); }
       for (let i = 0; i < 15; i++) { grab(); if (i < 14) { press(/^Raise/).click(); await tick(12); } }
+      ok(card().textContent.includes("Price in use: the slider's $140 per t."), "step 4: after the slider moves, the slider's price is the one in use");
       btns(/Use the dual/)[0].click(); await tick(20); grab();
       ok(said.some(t => /^A price at the cap's exact dual \(\$\d+\.\d\d per t, rounded\): every plan from/.test(t)), "step 4: the dual's price is labelled exact, its print rounded");
       demo.cards.go(4); await tick(4); btns(/Solve with the data center/)[0].click(); await tick(10); grab();
       demo.cards.go(5); await tick(10); grab(); btns(/^Hour by hour/)[0].click(); await tick(10); grab();
+      ok(card().textContent.includes("may claim 0 t on the six days; on all of 2025, " + YR.hourly) && live.textContent.includes("On all of 2025") && card().textContent.includes("Claims follow the market-based method: each certificate counted once and retired for this buyer alone."),
+        "step 6: the claim holds on the six days, under the market-based method, with the full year beside it");
       ok(live.textContent.includes("Built for it") && /hour by hour/.test(ttl()), "step 6: the purchase's capacities are readouts on the stage, not in the sentence");
       demo.cards.go(6); await tick(4); btns(/Compare the four purchases/)[0].click(); await tick(30); grab();
       said.filter(t => /[A-Za-z]/.test(t)).forEach(t => { if (t.split(" ").length > 40 || sentences(t) > 2) over.push(t.slice(0, 70) + " (" + t.split(" ").length + "/" + sentences(t) + ")"); });

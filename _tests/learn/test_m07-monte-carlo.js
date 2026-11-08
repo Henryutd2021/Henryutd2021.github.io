@@ -181,10 +181,28 @@ ok(r2(F.main.rho.dev.margin) === "0.86" && r2(F.main.rho.dev.capital) === "0.38"
 ok(Math.abs(F.main.rho.dev.upgrade) < 0.05 && Math.abs(F.main.rho.dev.strand) < 0.05 && Math.abs(F.main.rho.rate.margin) < 0.05 && Math.abs(F.main.rho.rate.capital) < 0.05, "inputs that do not enter an account have rho near 0 (sampling noise only)");
 // step 10
 const NR = F.narrow, at = h => NR.rows.find(r => r.half === h);
-ok(NR.flip && NR.flip.half === 5000 && NR.flip.marginRank === "3" && NR.flip.groups[0].map(x => x.key).sort().join() === "capital,rate", "step 10: at ± $5,000 capital and the discount rate tie for first and the margin ranks third");
-ok(NR.rows.filter(r => r.half > 5000).every(r => r.groups[0].some(x => x.key === "margin")), "step 10: at every wider range the margin is first or tied first");
-ok(r2(NR.flip.rho.capital) === "0.64" && r2(NR.flip.rho.rate) === "0.59" && r2(NR.flip.rho.margin) === "0.47", "step 10: rho 0.64, 0.59 and the margin's 0.47 at ± $5,000");
+ok(NR.flip && NR.flip.half === 6000 && NR.flip.marginRank === "2–3" && NR.flip.first.map(x => x.key).sort().join() === "capital,rate", "step 10: at ± $6,000 capital and the discount rate tie for first and the margin ranks 2–3");
+ok(NR.rows.filter(r => r.half > 6000).every(r => r.first.some(x => x.key === "margin")), "step 10: at every wider range the margin is first or tied first");
+ok(r2(NR.flip.rho.capital) === "0.61" && r2(NR.flip.rho.rate) === "0.56" && r2(NR.flip.rho.margin) === "0.54", "step 10: rho 0.61, 0.56 and the margin's 0.54 at ± $6,000");
 ok(at(D.marginWidth.max).marginRank === "1", "step 10 starts with the margin first");
+ok(at(5000).marginRank === "3", "step 10: at ± $5,000 the margin ranks third (myth 3)");
+// the tie rule tests every pair: at ± $7,000 the margin and capital are within two standard errors, and so are capital and
+// the discount rate, but the margin is clearly above the discount rate; chaining neighbours would tie all three at 1–3
+{
+  const r7 = at(7000), rk = k => r7.order.find(x => x.key === k).rank;
+  ok(rk("margin") === "1–2" && rk("capital") === "1–3" && rk("rate") === "2–3" && r7.first.map(x => x.key).join() === "margin,capital", "step 10 at ± $7,000: margin 1–2, capital 1–3, discount rate 2–3; margin and capital tied first (" + r7.order.map(x => x.key + " " + x.rank).join(", ") + ")");
+  // at every slider position and in step 9: each rank range counts exactly the inputs clearly above and below, and no input
+  // is called tied first with one that ranks clearly above it
+  const check = (G, rh, reps, out, where) => {
+    const n = G.order.length, clear = (a, b) => Math.abs(rh[a]) - Math.abs(rh[b]) > 2 * M.se(reps, r => Math.abs(r.rho[out][a]) - Math.abs(r.rho[out][b]));
+    const okAll = G.order.every(x => x.lo === 1 + G.order.filter(y => y !== x && clear(y.key, x.key)).length && x.hi === n - G.order.filter(y => y !== x && clear(x.key, y.key)).length) &&
+                  G.first.every(x => G.first.every(y => !clear(x.key, y.key))) && G.groups.every(g => g.every(x => g.every(y => !clear(x.key, y.key))));
+    ok(okAll, "the tie rule, pair by pair: " + where);
+  };
+  NR.rows.forEach(r => { const ins = M.inputsOf(D, r.half), reps = M.repeats(D, { n: D.runs, ins }); check(M.rankGroups(r.rho, reps, "dev", ins), r.rho, reps, "dev", "step 10 at ± $" + int(r.half)); });
+  const big = M.repeats(D, { n: D.runs, tau: T });
+  M.OUTS.forEach(o => check(F.groups[o], F.main.rho[o], big, o, "step 9, " + o));
+}
 // step 9's text version: every input against both accounts, in ten slices of 100 runs; flat exactly when the input is
 // outside the account's equation
 {
@@ -203,7 +221,7 @@ ok(at(D.marginWidth.max).marginRank === "1", "step 10 starts with the margin fir
 {
   const ref = M.reference(D), same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
   ok(same(ref, D.reference), "the data file's reference block is up to date (run with --write)");
-  ok(D.reference.flip && D.reference.flip.half === 5000 && D.reference.budget["24"].n === 101, "the reference block carries step 10's change and step 8's count");
+  ok(D.reference.flip && D.reference.flip.half === 6000 && D.reference.budget["24"].n === 101, "the reference block carries step 10's change and step 8's count");
 }
 // the histogram axes hold every run
 ok(sm.min >= 100e6 && sm.max < 250e6, "step 6's axis ($100M to $250M) holds every run");
@@ -227,7 +245,8 @@ const TX = text(OWN);
 const has = (s, what) => ok(TX.includes(s), "page: " + what + ": '" + s + "'");
 has("A P90 of $200.1M means a 10% chance that the real wait costs more.", "myth 1 = the main run's P90");
 has("Over 20 seeds, the P90 of 1,000 runs scatters by ± " + musd(2 * e.p90["1000lhs"].se) + " (2 standard errors).", "myth 2 = the repeats");
-has("narrow the margin's to ± $" + int(NR.flip.half) + " and it drops from first to third.", "myth 3 = step 10");
+has("narrow the margin's to ± $" + int(NR.flip.half) + " and capital ranks clearly above it.", "myth 3 = step 10");
+ok(NR.flip.order.find(x => x.key === "margin").lo > 1 && NR.flip.order[0].key === "capital", "myth 3: at the flip capital ranks first and clearly above the margin");
 has("√(0.05 × 0.95 ÷ 1,000) = " + Math.sqrt(0.05 * 0.95 / 1000).toFixed(4) + ", about 0.7 percentage points", "quiz 1 = K5's formula");
 has("the mean cost of 1,000 runs scatters by $0.03M with a Latin hypercube and $0.80M with plain random draws (one standard error); the P90, by $0.65M and $0.80M", "Go deeper = the repeats");
 has("gives 0.95 points for the " + shr(bw[24].share) + " above $200M; the Latin hypercube repeats scatter by 0.52 points", "Go deeper = the share's error");
@@ -236,7 +255,10 @@ has("from ± " + musd(2 * e.p90["100lhs"].se) + " to ± " + musd(2 * e.p90["1000
 has("ρ = " + r2(F.main.rho.dev.margin), "numbers to remember: the margin's rho");
 ok(OWN.includes('<td class="n">0.1³ = 1 in 1,000</td><td>The chance, under these inputs, that the margin, capital and discount rate all land in the top tenth of their ranges: near the high-cost corner. 2 of the 1,000 runs did.</td>') && F.near.hi === 2 && near(Math.pow(D.near, 3), 0.001, 1e-15), "numbers to remember: 0.1³ = 1 in 1,000 near the high-cost corner, 2 runs");
 has("$h\\tau$ = 24 × 0.5 points = 12%, capped at 50%", "Go deeper: the never-arrives chance in percentage points");
-has("With continuous inputs, an exact corner has zero chance. Near one (the margin, capital and discount rate all in the same outer tenth of their ranges) has 0.1³ = 0.1% per corner, so 1,000 runs expect " + int(F.near.expect) + "; seed 7 has " + F.near.n + ", both at the high-cost end.", "Go deeper: an exact corner has zero chance; near one, 0.1³");
+has("$h$ enters as a fraction: $h$ = 0.005 a month (0.5 percentage points), so $h\\tau$ = 0.12 and the cap is 0.5.", "Go deeper: h in the formula is a fraction");
+ok(byKey.strand.base === 0.005 && D.toy.strandCap === 0.5, "h is stored as a fraction (0.005 a month) and the cap as 0.5");
+has("With continuous inputs, an exact corner has zero chance.", "Go deeper: an exact corner");
+has("The margin, capital and discount rate all in the same outer tenth of their ranges: 0.1³ = 0.1% per corner, so 1,000 runs expect " + int(F.near.expect) + ". Seed 7 has " + F.near.n + ", both at the high-cost end.", "Go deeper: an exact corner has zero chance; near one, 0.1³");
 ok(F.near.hi === F.near.n, "Go deeper: the near-corner runs are all at the high-cost end");
 ok(near(D.wait * byKey.strand.base, 0.12, 1e-12) && D.toy.strandCap === 0.5 && /24 months × 0\.5 points = 12%, at most 50%/.test(byKey.strand.why), "the never-arrives example: 24 × 0.5 points = 12%, cap 50% (data and Go deeper)");
 has("Latin hypercube, seed " + D.seed + ", generator mulberry32", "data note: the seed and the generator");
@@ -320,9 +342,13 @@ const sliders = [];
   ok(!next().disabled && /Seed 7, Latin hypercube: 0 of 10 margin slices and 0 of 10 discount-rate slices empty\./.test(text(card().innerHTML)), "step 5: the hypercube, seed 7"); sawBudget(5);
   btns(/New seed/)[0].click();
   ok(/Seed 8, Latin hypercube: 0 of 10/.test(text(card().innerHTML)), "step 5: a new seed is shown and the hypercube still fills every slice");
+  ok(card().innerHTML.includes('data-term="random-seed"') && /A seed fixes the random draws: the same seed repeats them, a new seed gives new ones\./.test(text(card().innerHTML)), "step 5: the seed is explained, with its glossary mark, where the reader first changes it");
   // step 6
   cards.go(5); btns(/Run 1,000 times/)[0].click();
-  ok(!next().disabled && saw() === "P90, the 90th percentile, is $200.1M: 9 runs in 10 cost less. Near a corner (margin, capital and discount rate all in the same outer tenth of their ranges): 2 runs; a chance of 0.1³ per corner predicts 2.", "step 6: the run (" + saw() + ")"); sawBudget(6);
+  ok(!next().disabled && saw() === "P90, the 90th percentile, is $200.1M: 9 runs in 10 cost less.", "step 6: the run (" + saw() + ")"); sawBudget(6);
+  { const outs = card().querySelectorAll(".m7-out").map(x => text(x.innerHTML)), nl = outs.find(t => /^Near a corner/.test(t)) || "";
+    ok(nl === "Near a corner (margin, capital and discount rate all in the same outer tenth of their ranges): 2 runs; a chance of 0.1³ per corner predicts 2.", "step 6: corner rarity on its own line (" + nl + ")");
+    budget("step 6 corner line", nl, 35); }
   ok(/Median \$170\.3M · 80% of runs from \$140\.9M to \$200\.1M · runs from \$120\.0M to \$230\.2M\. Your guess, about \$200M, was the closest\./.test(text(card().innerHTML)), "step 6: the readout, with the guess checked");
   const hs = plotSpecs[plotSpecs.length - 1];
   ok(hs.bars.reduce((s, b) => s + b.y1, 0) === 1000 && hs.text.rows.length > 10 && hs.bars.every(b => b.y1 > 0), "step 6: the histogram counts all 1,000 runs, draws no empty bins and has a text version");
@@ -349,11 +375,11 @@ const sliders = [];
   {
     // the scatter's text version: its shape in a sentence and the runs in ten slices; the CSV of every run
     const sp = plotSpecs[plotSpecs.length - 1], h = text(sp.text.html || "");
-    ok(/^The developer's cost rises with the idle capital: the median run goes from \$156\.5M in the lowest tenth of its range to \$184\.2M in the highest; within a tenth, the middle 80% of runs spans about \$54\.7M\. ρ = 0\.38 over 1,000 runs\./.test(h) && (sp.text.html.match(/<tr>/g) || []).length === 11 && sp.aria.includes("rises with the idle capital"),
+    ok(/^The developer's cost rises with the idle capital\. ρ = 0\.38 over 1,000 runs\./.test(h) && (sp.text.html.match(/<tr>/g) || []).length === 11 && sp.aria.includes("rises with the idle capital") && /\$156\.5M/.test(h) && /\$184\.2M/.test(h),
        "step 9: the scatter's text version gives its shape, then ten slices (" + h.slice(0, 90) + ")");
     card().querySelectorAll(".lx-seg button")[1].click(); card().querySelectorAll(".m7-rho-row")[0].click();
     const h2 = text(plotSpecs[plotSpecs.length - 1].text.html || "");
-    ok(/^Flat: other customers' cost does not depend on the margin, so the median run stays between \$13\.4M and \$15\.3M in every tenth of its range\./.test(h2), "step 9: an input outside the account reads as flat (" + h2.slice(0, 80) + ")");
+    ok(/^Flat: other customers' cost does not depend on the margin\. ρ = /.test(h2), "step 9: an input outside the account reads as flat (" + h2.slice(0, 80) + ")");
     const a = card().querySelectorAll("a").filter(x => /CSV/.test(x.textContent))[0], href = a ? a.getAttribute("href") : "";
     const csv = href.indexOf("data:text/csv") === 0 ? decodeURIComponent(href.slice(href.indexOf(",") + 1)) : "";
     ok(a && a.getAttribute("download") === "m7-runs-seed7-24-months.csv" && csv === M.csvRuns(M.study(D, { seed: D.seed })), "step 9: a CSV download of the 1,000 runs (all five inputs, both costs)");
@@ -364,11 +390,11 @@ const sliders = [];
   const sl = card().querySelector(".stub-slider"), slider = sliders.pop();
   ok(!!sl && !!slider, "step 10: the range slider");
   for (let h = D.marginWidth.max - D.marginWidth.step; h >= NR.flip.half; h -= D.marginWidth.step) slider._set(h);
-  ok(saw() === "At ± $5,000 the margin ranks 3. Global sensitivity answers which inputs move the result within these ranges, not which matter in the world.", "step 10: the change (" + saw() + ")");
-  ok(/± \$5,000: tied first: capital 0\.64 and discount rate 0\.59; the margin \(0\.47\) ranks 3\./.test(text(card().innerHTML)), "step 10: the readout at ± $5,000"); sawBudget(10);
+  ok(saw() === "At ± $6,000 the margin ranks 2–3. Global sensitivity answers which inputs move the result within these ranges, not which matter in the world.", "step 10: the change (" + saw() + ")");
+  ok(/± \$6,000: tied first: capital 0\.61 and discount rate 0\.56; the margin \(0\.54\) ranks 2–3\./.test(text(card().innerHTML)), "step 10: the readout at ± $6,000"); sawBudget(10);
   ok(card().querySelectorAll(".m7-rho-row").length === 5 && card().querySelectorAll("button.m7-rho-row").length === 0 && !/Show its cloud/.test(card().innerHTML) && card().querySelector(".m7-rho-list").getAttribute("role") === "list",
      "step 10: the rank rows are a plain list (no buttons, no promise of a cloud)");
-  ok(card().querySelectorAll(".m7-rho-row .lx-sr").map(x => x.textContent)[0] === "Margin: rho 0.47, plus or minus " + r2(2 * NR.flip.se.margin) + ", rank 3.", "step 10: each plain row is read as one sentence");
+  ok(card().querySelectorAll(".m7-rho-row .lx-sr").map(x => x.textContent)[0] === "Margin: rho 0.54, plus or minus " + r2(2 * NR.flip.se.margin) + ", rank 2 to 3.", "step 10: each plain row is read as one sentence");
   // live regions
   ok(live.querySelectorAll("[aria-live]").length >= 2, "results are announced in aria-live regions");
   // demo states

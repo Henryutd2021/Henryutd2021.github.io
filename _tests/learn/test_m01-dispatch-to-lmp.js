@@ -10,9 +10,15 @@
 //   - the 110 MW case: prices, recipe, flows, mu, rent ($24,880 - $11,680 = $13,200, not the gap x flow $8,800), the
 //     step down at noon at every bus, the 14:00 corner ($200 up, $80 down), the noon-only quiz (+1 MW limit at noon:
 //     $120, Ridge +3 MW and gas -3 MW, nothing else moves; the all-day change differs) and the reference data block
+//   - the formulation table's ramp dual: signed, -$40 at 14:00, and 1 MW more ramp then saves $40
+//   - step 9's text (noonText) at a full and at an open noon line
+//   - the notebook's practice tasks, each solved here: the edge (86 MW solves, 85 does not, 16:00 alone fails); the
+//     nuclear plant on Wind Ridge (110 MW infeasible, 153 MW the lowest whole limit, set at 16:00; noon prices at 160 MW
+//     with their finite differences); Ridge-Gas Hub at 40 MW (full hours, price order, mu, the town's recipe); the
+//     noon-only and all-day limit raises (the sum of mu against the all-day saving, and the 09:00 hour that explains it)
 //   - page text: chosen strings in learn/m01-dispatch-to-lmp.qmd (numbers and the corrected wordings) and the absence
 //     of the wordings found wrong; fixed numbers in the step cards' script text; the sidecar's
-//     glossary definitions; the notebook's asserted numbers. The step cards' other sentences are built at run time from
+//     glossary definitions; the notebook's asserted numbers and its practice answer check. The step cards' other sentences are built at run time from
 //     the solver's result, so they cannot drift; the rendered HTML and the page's interaction (stale-solve guard, Next
 //     lock) are not exercised here: check them in the browser (the screenshot check).
 // Usage (from the site folder):  node _tests/learn/test_m01-dispatch-to-lmp.js
@@ -152,15 +158,57 @@ const has = (s, msg) => ok(PAGE.indexOf(s) >= 0, "page states " + JSON.stringify
   ok(D.day.demand[12] === 311 && near(n12.price.T, 80) && 311 * 80 === 24880 && D.fleet.nuclear.mw * 80 === 8000 && near(n12.gen.cc, 92) && 92 * 40 === 3680 && near(n12.gen.wind + n12.gen.solar, 119) &&
      24880 - 8000 - 3680 - 0 === 13200 && 120 * 110 === 13200, "rent arithmetic on the page (Go deeper table)");
 
+  // ---------------- the formulation table's ramp dual (signed) and step 9's text
+  ok(near(A.day.hours[14].ramp, -40), "part A: the 14:00 ramp row's dual is -$40 (signed: d cost / d limit)");
+  const mR = M.build(D, oA); mR.constraints.find(c => c.name === "ramp_14").ub += 1;
+  ok(near(A.r.objective - core.solveWith(highs, mR).objective, 40), "part A: 1 MW more ramp at 14:00 saves $40");
+  ok(M.noonText(D, B.day).indexOf("At noon the town pays $80 per MWh, yet no plant offers that.") === 0, "step 9 at 110 MW: " + M.noonText(D, B.day));
+  ok(M.noonText(D, B140.day) === "At 140 MW the line has room at noon: the town pays $40, the gas combined-cycle plant's offer. Lower the limit in step 8 until the line fills, or tap Prairie Town.", "step 9 at 140 MW: " + M.noonText(D, B140.day));
+  ok(M.noonText(D, B200.day).indexOf("At 200 MW the line has room at noon: the town pays $40, the gas combined-cycle plant's offer") === 0, "step 9 at 200 MW");
+
+  // ---------------- the notebook's practice tasks, solved with the page's model
+  const relaxAt = (DD, o, line, t) => { const m = M.build(DD, o); const c = m.constraints.find(x => x.name === "cap_" + line + "_" + t); c.lb = -1e4; c.ub = 1e4; return core.solveWith(highs, m).status; };
+  // 1: the edge
+  ok(run(oB(86)).r.status === "optimal" && run(oB(85)).r.status === "infeasible", "practice 1: 86 MW solves, 85 MW does not");
+  ok(JSON.stringify([...Array(24).keys()].filter(t => relaxAt(D, oB(85), "RT", t) === "optimal")) === "[16]", "practice 1: at 85 MW only 16:00 fails");
+  ok(D.day.demand[16] - D.fleet.nuclear.mw - (D.fleet.cc.mw + D.fleet.pk.mw) === 3 && near((2 * 3 + 250) / 3, 256 / 3), "practice 1: the Ridge must send 3 MW at 16:00; the line then carries 85.3 MW");
+  // 2: the nuclear plant on Wind Ridge
+  const DR = JSON.parse(JSON.stringify(D)); DR.fleet.nuclear.bus = "R";
+  const runR = o => { const r = core.solveWith(highs, M.build(DR, o)); return { r, day: M.read(DR, o, r) }; };
+  ok(runR(oB(110)).r.status === "infeasible" && D.day.demand[12] === 311 && 110 + 200 < 311, "practice 2: at 110 MW no plan (311 MW at noon, lines of 110 and 200 MW)");
+  ok(runR(oB(153)).r.status === "optimal" && runR(oB(152)).r.status === "infeasible", "practice 2: 153 MW is the lowest whole limit that solves");
+  ok(JSON.stringify([...Array(24).keys()].filter(t => relaxAt(DR, oB(152.5), "RT", t) === "optimal")) === "[16]" && D.day.demand[16] - 200 === 153, "practice 2: 16:00 sets it (353 MW less 200 MW on Gas Hub-Town)");
+  const N160 = runR(oB(160)), q12 = N160.day.hours[12];
+  ok(near(N160.day.cost, 175440) && near(q12.price.T, 80) && near(q12.price.R, 0) && near(q12.price.G, 40), `practice 2 at 160 MW: $175,440; noon Town $80, Ridge $0, Gas Hub $40 (${N160.day.cost})`);
+  ["T", "R", "G"].forEach(b => {
+    const up = M.recipe(DR, N160.r, core.solveWith(highs, M.build(DR, Object.assign(oB(160), { add: { bus: b, hour: 12, mw: 0.1 } }))), 0.1);
+    const dn = M.recipe(DR, N160.r, core.solveWith(highs, M.build(DR, Object.assign(oB(160), { add: { bus: b, hour: 12, mw: -0.1 } }))), -0.1);
+    ok(near(up.fd, q12.price[b], 1e-4) && near(dn.fd, q12.price[b], 1e-4), `practice 2 at 160 MW: finite differences at ${b} = ${q12.price[b]}`);
+    if (b === "T") ok(up.items.some(i => i.plant === "cc" && near(i.d, 2)) && up.items.some(i => i.plant === "ren" && near(i.d, -1)) && up.items.length === 2, "practice 2: the town's MWh is 2 gas - 1 Ridge");
+  });
+  // 3: Ridge-Gas Hub at 40 MW
+  const o3 = { network: true, limit: 200, limits: { RG: 40 } }, R40 = run(o3), f40 = M.fullHours(R40.day, "RG");
+  ok(JSON.stringify(f40) === "[9,10,11,12,15,16]" && near(R40.day.cost, 107640), `practice 3: full ${f40}, $107,640 (${R40.day.cost})`);
+  ok(f40.every(t => { const h = R40.day.hours[t]; return near(h.price.G, 40) && near(h.price.T, 20) && near(h.price.R, 0) && near(h.mu.RG, 60) && near(h.flow.RG, 40); }), "practice 3: Gas Hub $40 > Town $20 > Ridge $0, mu $60, flow 40 MW from the Ridge");
+  ok(near(20 - P.RG.R * 60, 0) && near(20 - P.RG.G * 60, 40), "practice 3: the PTDF form gives the order");
+  const r3 = M.recipe(D, R40.r, core.solveWith(highs, M.build(D, Object.assign({}, o3, { add: { bus: "T", hour: 12, mw: 0.1 } }))), 0.1);
+  ok(near(r3.fd, 20) && r3.items.some(i => i.plant === "cc" && near(i.d, 0.5)) && r3.items.some(i => i.plant === "ren" && near(i.d, 0.5)), "practice 3: the town's MWh is half gas, half Ridge " + JSON.stringify(r3.items));
+  // 6: the sum of mu over the full hours against the all-day raise
+  const sumMu = fh.reduce((a, t) => a + B.day.hours[t].mu.RT, 0);
+  ok(near(sumMu, 1920), `practice 6: the full hours' mu sum to $1,920 (${sumMu})`);
+  const m9 = M.build(D, oB(110)), c9 = m9.constraints.find(c => c.name === "cap_RT_9"); c9.lb = -111; c9.ub = 111;
+  ok(near(B.r.objective - core.solveWith(highs, m9).objective, 40) && near(B.day.hours[9].mu.RT, 120), "practice 6: at 09:00 a whole MW saves $40, not mu = $120");
+
   // ---------------- the page and the notebook state these numbers
   ["311 MWh × \\$80 | \\$24,880", "100 MWh × \\$80 | \\$8,000", "92 MWh × \\$40 | \\$3,680", "119 MWh × \\$0 | \\$0", "costs \\$200", "saves only \\$80", "134 MW",
-   "$120 \\times 110$ MW", "($80 \\times 110 = \\$8{,}800$)", "\\$13,200 for the hour", "$13,200 at noon with the line at 110 MW"].forEach(s => has(s));
+   "\\$120 per MW of limit; times the 110 MW flow, that is \\$13,200", "(\\$80 per MWh × 110 MWh = \\$8,800)", "\\$13,200 for the hour", "$13,200 at noon with the line at 110 MW",
+   "the bus whose voltage angle is set to zero", "check the main reference costs, prices and identities"].forEach(s => has(s));
   // the corrected wordings: rent, the dual, the quiz, $0 offers, voltage, FTRs, MILP duals, RTO/ISO
   ["Congestion rent is what loads pay minus what generators are paid", "extra cost per MWh of a small change in that row's demand", "step up and the step down differ",
    "for the noon interval only", "2/3 − 1/3 = 1/3 MW", "3 MW of free Ridge power replace 3 MW of $40 gas", "the $80 matches no plant's offer",
    "holds voltage magnitudes fixed", "Many organized markets use congestion revenue to fund financial transmission rights",
    "does not provide these LP shadow prices", "prices conditional on them"].forEach(s => has(s));
-  ["gap times the flow", "no plant offers either", "no duals at all", "Real markets pass it to", "Losses, voltage and reactive power", "RTO or ISO", "If its limit were 111 MW, noon"]
+  ["gap times the flow", "no plant offers either", "check every browser number", "$120 \\times 110$ MW", "no duals at all", "Real markets pass it to", "Losses, voltage and reactive power", "RTO or ISO", "If its limit were 111 MW, noon"]
     .forEach(s => ok(PAGE.indexOf(s) < 0, "page no longer says " + JSON.stringify(s)));
   ok(SIDE.indexOf("holds voltage magnitudes fixed") >= 0 && SIDE.indexOf("ignores losses and voltage") < 0, "sidecar: DC power flow keeps voltage angles and fixed magnitudes");
   ok(SIDE.indexOf("What loads pay at their locational prices minus what generators are paid") >= 0, "sidecar: congestion rent = load payments - generator payments");
@@ -174,10 +222,15 @@ const has = (s, msg) => ok(PAGE.indexOf(s) >= 0, "page states " + JSON.stringify
    ["The nuclear plant makes 100 MW every hour", D.fleet.nuclear.mw === 100], ["at most 40 MW from one hour to the next; it starts the day from 115 MW", D.fleet.cc.ramp === 40 && D.fleet.cc.start === 115],
    ["1,000 MW per radian", D.lines.every(l => l.b === 1000)], ["running cost, $/MWh: 10, 0, 0, 40, 100", ["nuclear", "wind", "solar", "cc", "pk"].map(k => D.fleet[k].cost).join() === "10,0,0,40,100"],
    ["output before the day starts: 115 MW", D.fleet.cc.start === 115], ["SUB(\"cc,&minus;1\") + \"&nbsp;=&nbsp;115\"", D.fleet.cc.start === 115],
-   ["a small rise in its demand, away from a corner of the model", true], ["in this hour only, would save", near(n12.mu.RT, R.mu)]]
+   ["a little more demand there (away from a corner)", true], ["in this hour only, would save", near(n12.mu.RT, R.mu)],
+   ["On the one-bus day it is −$40 at 14:00, so 1 MW more ramp then would save $40", near(A.day.hours[14].ramp, -40)],
+   ["One more MWh at 14:00 costs $40 at 14:00 and $40 at 13:00: $80.", near(rc14.fd, 80) && it({ p: "cc", h: 13 }) && it({ p: "cc", h: 14 }) && D.fleet.cc.cost === 40], ["[[voltage-angle|voltage-angle]]", SIDE.indexOf("id: voltage-angle") >= 0]]
     .forEach(([s, c]) => ok(JS.indexOf(s) >= 0 && c, "step text " + JSON.stringify(s) + " is in the script and true"));
   ok(NB.indexOf("104000") >= 0 && NB.indexOf("133160") >= 0 && NB.indexOf("[0, 40, 80]") >= 0, "notebook asserts the browser's numbers");
   ok(NB.indexOf("p_{\\\\text{cc},-1} = 115") >= 0 && NB.indexOf("not the price gap") >= 0, "notebook: ramp start condition and the rent wording");
+  ["All six practice answers check out", "limits={\\\"RG\\\": 40}", "175440", "107640", "full40 == [9, 10, 11, 12, 15, 16]", "status(network=True, limit_RT=86) == 0 and status(network=True, limit_RT=85) == 2",
+   "status(network=True, limit_RT=153) == 0 and status(network=True, limit_RT=152) == 2", "abs(sum_mu - 1920)", "- 1840)", "the objective, not a row", "JupyterLab"].forEach(s => ok(NB.indexOf(s) >= 0, "notebook has " + s));
+  ["Limit the Gas Hub–Town line to 100 MW", "predict the noon prices at 110 MW"].forEach(s => ok(NB.indexOf(s) < 0, "notebook no longer asks " + JSON.stringify(s)));
 
   console.log(`${checks - fails} of ${checks} checks passed`);
   process.exit(fails ? 1 : 0);
