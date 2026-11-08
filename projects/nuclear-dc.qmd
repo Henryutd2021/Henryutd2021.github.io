@@ -67,7 +67,7 @@ toc: false
 </section>
 <section class="proj-sec" aria-labelledby="h-method">
 <h2 id="h-method"><i class="bi bi-diagram-3" aria-hidden="true"></i>Method</h2>
-<p>Mixed-integer linear program that co-optimizes, for every hour of a year, reactor output, steam extraction at the turbine crossover, absorption and electric cooling, and grid exchange for a 200 MWe data center in Houston (ERCOT) colocated with a BWRX-300 reactor; grid supply and an on-site gas combined cycle are evaluated on the same hourly basis. 109 scenario runs vary reactor and chiller capital cost, market year (2022–2024), carbon price, cost of capital, cooling efficiency, battery storage and campus size, with the Section 45Y production tax credit as the baseline policy.</p>
+<p>The model compares supplying a data center&#x27;s electricity and cooling from a colocated reactor with buying from the grid or running an on-site gas plant, and works out hour by hour how each option would run. In technical terms: a mixed-integer linear program that co-optimizes, for every hour of a year, reactor output, steam extraction at the turbine crossover, absorption and electric cooling, and grid exchange for a 200 MWe data center in Houston (ERCOT) colocated with a BWRX-300 reactor; grid supply and an on-site gas combined cycle are evaluated on the same hourly basis. 109 scenario runs vary reactor and chiller capital cost, market year (2022–2024), carbon price, cost of capital, cooling efficiency, battery storage and campus size, with the Section 45Y production tax credit as the baseline policy.</p>
 </section>
 <section class="proj-sec" aria-labelledby="h-findings">
 <h2 id="h-findings"><i class="bi bi-lightbulb" aria-hidden="true"></i>Key findings</h2>
