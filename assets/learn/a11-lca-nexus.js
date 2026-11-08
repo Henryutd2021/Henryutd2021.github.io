@@ -117,6 +117,7 @@
     if (r.kind === "sep") return "not separate (in Build)";
     var t = (r.kind === "bound" ? r.dir + " " + numBound(meter, r.v) : num(meter, r.v)) + " " + UNIT[meter], x = [];
     if (r.nc.length) x.push(r.nc.length + (r.nc.length === 1 ? " stage" : " stages") + " not counted");
+    if (r.sep && r.sep.length) x.push("End of life not separate: it is in Build, outside");
     if (r.incl && r.incl.length) x.push("Build includes End of life");
     return t + (x.length ? " (" + x.join("; ") + ")" : "");
   }
@@ -259,6 +260,7 @@
         var wn = wholeNote(D, S.obj, m[0], S.L, S.R);
         if (wn) H("small", { text: wn }, c);
         else if (r.kind === "sep") H("small", { text: "End of life is counted in Build" }, c);
+        else if (r.sep.length) H("small", { text: "End of life missing: it is in Build, outside" + (r.nc.length ? "; " + r.nc.length + " not counted" : "") }, c);
         else if (r.incl.length) H("small", { text: "Build includes End of life" + (r.nc.length ? "; " + r.nc.length + " not counted" : "") }, c);
         else if (r.nc.length && r.kind !== "nc") H("small", { text: r.nc.length + " not counted" }, c);
       });

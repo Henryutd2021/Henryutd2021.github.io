@@ -208,8 +208,8 @@ const has = (s, msg) => ok(T.indexOf(s) >= 0, "page states " + JSON.stringify(s)
   ok(near(60 * 200 / (2 * 10000), 0.6, 1e-12) && near(M.rocof(Object.assign({}, G, { tripMW: 200 }), 10), 0.6, 1e-12), "practice 5: 0.6 Hz/s");
   { const d0 = 100, d1 = 210, cc0 = 100, pk0 = 0, cc1 = cc0 + 40, pk1 = d1 - cc1;
     ok(cc0 + pk0 === d0 && cc1 + pk1 === d1 && cc1 <= 150 && pk1 <= 100 && cc1 - cc0 <= 40 && pk1 === 70 && cc1 === 140, "practice 6: 100 = 100 + 0 before, 210 = 140 + 70 after, within both plants' sizes and the 40 MW ramp"); }
-  has("Demand climbs steadily for an hour, taking the gas plants from 100 to 210 MW"); has("by the hour's end the combined-cycle plant is at 140 MW and the peaker gives 70 MW");
-  { let okAll = true; for (let k = 0; k <= 60; k++) { const tau = k / 60, need = 110 * tau, cc = Math.min(40 * tau, 50), pk = need - cc; if (pk < -1e-9 || pk > 100 + 1e-9) okAll = false; } ok(okAll, "practice 6: with demand climbing steadily, the peaker's share stays within 0 to 100 MW at every minute"); }
+  has("Demand climbs steadily for an hour, from 100 to 210 MW of gas"); has("the 100 MW peaker starts at once, climbing 100 MW an hour"); has("by the hour's end the combined-cycle plant is at 140 MW and the peaker gives 70 MW");
+  { let okAll = true; for (let k = 0; k <= 60; k++) { const tau = k / 60, need = 110 * tau, cc = Math.min(40 * tau, 50), pk = need - cc; if (pk < -1e-9 || pk > 100 + 1e-9 || pk > 100 * tau + 1e-9) okAll = false; } ok(okAll, "practice 6: with demand climbing steadily, the peaker's share stays within its size and its 100 MW-an-hour climb at every minute"); }
   // numbers to remember and the band
   ok(Bd.volts[0] === Bd.nominalV * Bd.lo && Bd.volts[1] === Math.round(Bd.nominalV * Bd.hi), "band: 114 and 126 V = 0.95 and 1.05 of 120 V");
   has("The normal range of service voltage, ANSI C84.1 Range A: 114 to 126 V on a 120 V service.");

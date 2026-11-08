@@ -105,9 +105,9 @@
   };
   // the cost per kg, worked: capital a year (size x $/kW x the capital recovery factor) plus power, over the year's kg
   function costWorked(o, E) {
-    var f = crf(E.rate, E.life);
-    return "Worked: " + o.X + " MW × $" + E.capexPerKW.toLocaleString("en-US") + " per kW × " + f.toFixed(4) + " (" + Math.round(E.rate * 100) + "%, " + E.life + " years) = $" + Math.round(o.capital).toLocaleString("en-US") + " a year" +
-      (o.elecCost > 0.5 ? " + $" + Math.round(o.elecCost).toLocaleString("en-US") + " of power" : ", power free") + "; ÷ " + Math.round(o.kg).toLocaleString("en-US") + " kg = " + fm.kg2(o.lcoh) + " per kg.";
+    var f = crf(E.rate, E.life), kw = o.X * 1000, up = kw * E.capexPerKW;
+    return "Worked: " + o.X + " MW = " + kw.toLocaleString("en-US") + " kW; × $" + E.capexPerKW.toLocaleString("en-US") + " per kW = $" + (up / 1e6).toFixed(1) + "M; × " + f.toFixed(4) + " (" + Math.round(E.rate * 100) + "%, " + E.life + " years) ≈ $" + Math.round(o.capital).toLocaleString("en-US") + " a year" +
+      (o.elecCost > 0.5 ? " + $" + Math.round(o.elecCost).toLocaleString("en-US") + " of power" : ", power free") + "; ÷ " + Math.round(o.kg).toLocaleString("en-US") + " kg ≈ " + fm.kg2(o.lcoh) + " per kg.";
   }
   var model = { costWorked: costWorked, HOURS: HOURS, prepare: prepare, crf: crf, run: run, net: net, sweep: sweep, best: best, lossPrice: lossPrice, tank: tank, chain: chain, sum: sum, fm: fm };
   if (typeof module !== "undefined" && module.exports) module.exports = model;

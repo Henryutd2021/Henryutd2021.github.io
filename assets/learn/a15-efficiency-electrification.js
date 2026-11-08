@@ -249,7 +249,7 @@
   // the hydrogen's electricity, worked (step 10 and the no-JS version)
   function h2Hint(C) {
     var F = C.industry.fertilizer;
-    return "Hydrogen, worked: " + fmtN(F.hydrogenT) + " t × " + fmtN(F.electrolysisKWhPerKg, 1) + " kWh per kg = " + fmtN(F.electrolysisEquivalentMWh / 1000, 1) + " GWh a year. " + fmtN(F.electrolysisKWhPerKg, 1) + " kWh per kg is DOE's assumed electrolyzer system use (2024), not a fixed constant.";
+    return "Hydrogen, worked: " + fmtN(F.hydrogenT) + " t = " + fmtN(F.hydrogenT / 1000, 0) + " million kg; × " + fmtN(F.electrolysisKWhPerKg, 1) + " kWh per kg = " + fmtN(F.electrolysisEquivalentMWh / 1000, 1) + " million kWh, or " + fmtN(F.electrolysisEquivalentMWh / 1000, 1) + " GWh a year. " + fmtN(F.electrolysisKWhPerKg, 1) + " kWh per kg is DOE's assumed electrolyzer use (2024), not a constant.";
   }
   function copHint(D) {
     var I = D.industry;
@@ -353,7 +353,7 @@
     var I = D.industry, b = C.industry.processHeat.map(function (x) { return { band: x.band, deliveredMWh: x.deliveredMWh, label: x.label.replace(/(\d) C\b/g, "$1 °C") }; });
     return [
       { id: "low", text: "Food plants: " + b[0].label + ", " + fmtN(b[0].deliveredMWh) + " MWh a year", bin: "hp", why: "Below 100 °C is easy for an industrial heat pump, and it delivers several units of heat per unit of electricity." },
-      { id: "medium", text: "Food plants: " + b[1].label + ", " + fmtN(b[1].deliveredMWh) + " MWh a year", bin: "boiler", why: "This band crosses the " + I.hpMaxC + " °C this exercise takes as heat pumps' reach (LBNL, 2022; DOE's 2024 tip sheet says about " + I.hpMaxC2024 + " °C). For simplicity it all goes to electric boilers; heat pumps could take its lower-temperature part." },
+      { id: "medium", text: "Food plants: " + b[1].label + ", " + fmtN(b[1].deliveredMWh) + " MWh a year", bin: "boiler", why: "It crosses heat pumps' " + I.hpMaxC + " °C reach here, so it all goes to electric boilers, for simplicity; heat pumps could take its cooler part." },
       { id: "high", text: "Food plants: " + b[2].label + ", " + fmtN(b[2].deliveredMWh) + " MWh a year", bin: "oven", why: "Above 400 °C, electric resistance or induction (heating metal with a changing magnetic field) heats directly, at about one unit of heat per unit of electricity." },
       { id: "h2", text: "The fertilizer plant: " + fmtN(C.industry.fertilizer.hydrogenT) + " t of hydrogen a year from gas reformers (natural gas and steam)", bin: "elys", why: "The plant needs hydrogen as a [[feedstock|feedstock]], not only heat: an [[electrolyzer|electrolyzer]] would make it from electricity and water instead of a [[gas-reformer|gas reformer]]." }];
   }
@@ -396,6 +396,7 @@
       "<p class=\"lx-eyebrow\">The industrial park's heat, sorted by temperature</p>" +
       tableHTML(["What is needed", "Electric option", "Electricity, MWh a year"], cards.map(function (c) { return [c.text, binOf[c.bin], fmtN(elOf[c.id])]; })) +
       "<p class=\"lx-hint\">" + indLine(C, D, D.industry.cop.start).replace(/\*\*/g, "") + " A ceiling, not a forecast.</p><p class=\"lx-hint\">" + h2Hint(C) + "</p>" +
+      "<p class=\"lx-hint\">" + HINTS.capacity + "</p>" +
       "<p class=\"lx-hint\">With JavaScript on, you build the curve, add a rebound, electrify each district on the cold design day, try charging rules and a heat network, and sort the park's heat.</p>";
   }
   // the explain layer's no-JS ideas, and the Check section's myths and question (written into the page by the test)

@@ -35,7 +35,7 @@
    { "id": "steel", "text": "Steel from iron ore (hydrogen-based direct reduction)", "bin": "feed", "why": "Hydrogen can replace the gas that strips oxygen from the ore; about 10% of industry's hydrogen today (IEA). Electricity-only routes are still in development." },
    { "id": "ships", "text": "Fuel for ocean shipping", "bin": "both", "why": "Long voyages need dense fuels; ammonia and methanol made from hydrogen compete with others." },
    { "id": "storage", "text": "Power storage for weeks", "bin": "both", "why": "Salt caverns hold weeks of energy cheaply, but little comes back: about 35% here (step 1), 31% in DOE's 2022 storage assessment (A8)." },
-   { "id": "trucks", "text": "Long-haul trucks, heavy and on long daily routes", "bin": "both", "why": "Batteries do not yet meet every heavy long-haul duty, so fuel cells are tried too, though a battery truck uses far less electricity per mile." },
+   { "id": "trucks", "text": "Long-haul trucks, on routes longer than today's batteries cover", "bin": "both", "why": "Where batteries do not yet cover the route, fuel cells and batteries are both tried; a battery truck still uses far less electricity per mile." },
    { "id": "cars", "text": "Passenger cars", "bin": "elec", "why": "Electric car: 100 miles on 25–40 kWh. Fuel cell car: about 60 miles per kg, made with 57 kWh: about 1 mile per kWh." },
    { "id": "homes", "text": "Heating homes", "bin": "elec", "why": "A heat pump gives up to three times the heat of the power it uses; hydrogen loses about 40% before any heat is made." }
   ],
