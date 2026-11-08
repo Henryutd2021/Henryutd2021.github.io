@@ -178,7 +178,7 @@ $$
 
 - **Size.** 31 columns and 30 rows; with $n$ branches it has $1 + 10n$ columns, so it grows with every branch you add.
 - **The order of the costs.** WS ≤ RP ≤ EEV: here \$653.54M ≤ \$671.10M ≤ \$673.72M. So EVPI = RP − WS and VSS = EEV − RP are both zero or more ([Birge and Louveaux, ch. 4](https://doi.org/10.1007/978-1-4614-0237-4)).
-- **Robust plans.** Add a free variable $z$ and minimise it, with $z \ge \text{cost}_s(x)$ in every branch (worst case), or $z \ge \text{cost}_s(x) - \text{WS}_s$ (least regret). Neither row uses $p_s$.
+- **Robust plans.** Add a free variable $z$ and minimize it, with $z \ge \text{cost}_s(x)$ in every branch (worst case), or $z \ge \text{cost}_s(x) - \text{WS}_s$ (least regret). Neither row uses $p_s$.
 
 ```{=html}
 </div>

@@ -144,7 +144,7 @@ $$
 | $\lambda$ | the heat store's loss, $1 - 0.98^{1/24}$ (2% a day) | per hour |
 
 - **Duals.** The power row's dual, with its sign flipped, is power's marginal value in that hour; the hydrogen and heat rows' duals are the marginal costs of one more kg and one more MWh of heat.
-- **Under this model's assumptions:** fixed sizes, the modelled prices, and the LP relaxation of the minimum load.
+- **Under this model's assumptions:** fixed sizes, the modeled prices, and the LP relaxation of the minimum load.
 - **Unique here.** Each dual step 7 shows is unique: raising and lowering the hour's demand by 0.01 changes the cost at the same rate.
 - **Not always.** At a corner of the cost, raising and lowering demand change it at different rates, and several duals fit (the notebook's practice task 5 builds one).
 - **Size.** 2,520 columns and 1,176 rows; HiGHS solves it in tens of milliseconds.

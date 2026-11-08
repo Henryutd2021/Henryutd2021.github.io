@@ -7,7 +7,7 @@ glossary:
     def: "The same model with every whole-number decision allowed to take any value in between, such as a switch anywhere from 0 to 1; its best cost is a lower bound for the real model."
   - id: lower-bound
     term: Lower bound
-    def: "A value the best answer cannot fall below; in a cost-minimising model, the cost of a relaxation is one."
+    def: "A value the best answer cannot fall below; in a cost-minimizing model, the cost of a relaxation is one."
   - id: branch-and-bound
     term: Branch and bound
     def: "A search for the best whole-number plan that solves relaxations, splits on a fractional decision (off or on), and drops every branch whose bound cannot beat the best plan found."

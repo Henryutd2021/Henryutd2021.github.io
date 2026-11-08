@@ -147,7 +147,7 @@
         return t;
       }, tipStep: 0.5,
       aria: o.aria || "Power against wind speed.",
-      text: { head: rows.head, rows: rows.rows, note: "Records are counted within each 1 m/s bin; curves and bands are read at the bin's centre." }
+      text: { head: rows.head, rows: rows.rows, note: "Records are counted within each 1 m/s bin; curves and bands are read at the bin's center." }
     };
   }
   function binText(T, o) {
