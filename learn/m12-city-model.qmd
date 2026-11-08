@@ -83,7 +83,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 .m12-symbols th, .m12-symbols td { text-align: left; vertical-align: top; padding: 6px 8px; border-bottom: 1px solid var(--lx-line); }
 .m12-symbols th { font-family: var(--lx-f-display); font-size: 12.5px; font-weight: 600; color: var(--lx-ink-2); border-bottom: 2px solid var(--lx-line-2); }
 .m12-rules { margin: .4rem 0 0; padding-left: 1.2rem; display: grid; gap: 2px; }
-.lx-facts.m12-ties td.n, .lx-facts.m12-lin td.n { white-space: normal; text-align: left; }   /* words, not numbers: they wrap on phones */
+.lx-facts.m12-ties td.n, .lx-facts.m12-lin td.n, .lx-facts.m12-idx td.n { white-space: normal; text-align: left; }   /* words, not numbers: they wrap on phones */
 </style>
 ```
 :::
