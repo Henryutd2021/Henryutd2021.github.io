@@ -2,9 +2,15 @@
  "about": {
   "what": "Engine E3's settings and costs: Prairie City's energy hub (the three districts behind their substation limits) as a linear program over prairie-city.json's eight representative days. Prairie City's own numbers are in prairie-city.json; this file holds only what the engine adds.",
   "line": "Prairie City is fictional; its numbers are illustrative.",
-  "built": "2026-11-06",
-  "builtBy": "Written by the engine E3 data build step (do not edit by hand); the `precomputed` block is written by the tests' --write mode",
+  "built": "2026-11-07",
   "set": "Costs read from other course files say so in `via`; everything marked \"teaching\" is illustrative, set for this course, with a range the reader can change."
+ },
+ "dataset": {
+  "creator": "Honglin Li",
+  "date": "2026-11-07",
+  "status": "Illustrative: the costs that say `via` are read from the course's other data files (EIA, NREL and DOE figures, converted to 2025 dollars); everything marked teaching is set for this course. `precomputed` holds the pages' default runs of engine E3, solved with HiGHS, which the lab notebook checks its answers against.",
+  "source": "Prepared for the course's engine E3 (Prairie City's energy hub); each cost names its course file in `via` and its publications in `src` (listed in `sources`).",
+  "license": "CC BY 4.0, Honglin Li. Values taken from the sources listed in this file keep their publishers' terms; EIA, NOAA, EPA, Census and DOE data are U.S. government works in the public domain."
  },
  "dollarYear": 2025,
  "finance": {

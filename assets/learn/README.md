@@ -1179,6 +1179,7 @@ No build change: `explain.css` is already in the bundle. A new side topic copies
 | Field | What it holds (units) | Read by |
 |---|---|---|
 | `about` | `line` (the fictional line, word for word), what the file is, how it was built (`method`), the `simplifications` to state on a page | every page |
+| `dataset` | for a reader who downloads the file: creator, date, status (fictional, illustrative), source and licence | the downloads (M12) |
 | `dollarYear`, `units` | 2025 dollars; MWh, MW, C, m2 unless a key says otherwise; Btu factors (EIA) and MWh per MMBtu | every page |
 | `city` | people, households, persons per household, median household income (2025 $; Wichita's, BEA-deflated), `ami` (set for teaching), `anchors`, and `totals`: the sums of the districts | F9, A13, C3 |
 | `dwellingTypes`, `vintages` | heated m2 per home by type; delivered space heat per m2 a year by envelope vintage (teaching) | A15, M12, SB3 |

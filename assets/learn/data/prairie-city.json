@@ -2,11 +2,10 @@
  "about": {
   "line": "Prairie City is fictional; its numbers are illustrative.",
   "what": "Shared data of Prairie City, Learn's city-and-region scale (S3): three districts, household groups, transport, the industrial park, the data-center campus, annual energy flows by sector and carrier, representative days for hourly models, 2025 prices and emission factors. Read by F9, F11, A13, A15, A18, SB3 (engine E3), M12, C3 and CK-A; pages read these numbers and never retype them.",
-  "fictional": "Prairie City is fictional. It is anchored to the U.S. Plains (Kansas, the Southwest Power Pool), as Prairie Town and the Plains Grid are: its income and household size are close to Wichita's, its weather is Wichita's 1991-2020 normals, its prices are Kansas's (or the Midwest's) 2025 averages, and its hourly shapes are SPP's 2025 grid. Everything else is set for teaching and labelled so in the builder.",
+  "fictional": "Prairie City is fictional. It is anchored to the U.S. Plains (Kansas, the Southwest Power Pool), as Prairie Town and the Plains Grid are: its income and household size are close to Wichita's, its weather is Wichita's 1991-2020 normals, its prices are Kansas's (or the Midwest's) 2025 averages, and its hourly shapes are SPP's 2025 grid. Everything else is set for teaching.",
   "dollarYear": 2025,
   "built": "2026-11-07",
-  "builtBy": "Written by the Prairie City data build step (do not edit by hand); tested by _tests/learn/test_prairie_city.js",
-  "method": "Bottom-up: homes from dwellings, floor area, envelope vintage and heating fuel (RECS 2020 West North Central end uses; DOE efficiencies), commercial floor area by intensity, vehicles by household, the industrial park and the data-center campus from their sizes. Hourly: eight representative days of 2025 (weights sum to 365), temperatures from NOAA normals (two extreme days set for teaching), heat by degree-hours below 18.3 C, heat-pump COP from lesson F3's curve, the base load spread by SPP's 2025 demand shape, wind and solar per unit of capacity from SPP's 2025 shapes scaled to EIA's 2025 monthly capacity factors. Annual flows close: every node of the Sankey balances.",
+  "method": "Bottom-up: homes from dwellings, floor area, envelope vintage and heating fuel (RECS 2020 West North Central end uses; DOE efficiencies), commercial floor area by intensity, vehicles by household, the industrial park and the data-center campus from their sizes. Hourly: eight representative days of 2025 (weights sum to 365), temperatures from NOAA normals (two extreme days set for teaching), heat each hour as the temperature deficit below 18.3 C times each district's heat-loss rate (MW per C), heat-pump COP from lesson F3's curve, the base load spread by SPP's 2025 demand shape, wind and solar per unit of capacity from SPP's 2025 shapes scaled to EIA's 2025 monthly capacity factors. Annual flows close: every node of the Sankey balances.",
   "simplifications": [
    "One substation per district is a teaching simplification; real districts are served by many feeders and several substations.",
    "The industrial park and the data-center campus take power at their own substations, not the districts'.",
@@ -14,6 +13,13 @@
    "Every EV is counted as a battery EV; EV charging is the same every day.",
    "Industrial loads are flat over the year."
   ]
+ },
+ "dataset": {
+  "creator": "Honglin Li",
+  "date": "2026-11-07",
+  "status": "Illustrative: Prairie City is fictional. Its prices are Kansas's (or the Midwest's) 2025 averages (EIA), its weather Wichita's 1991-2020 normals (NOAA), its hourly shapes SPP's 2025 grid (EIA-930); everything else is set for teaching.",
+  "source": "Built bottom-up for the course from the public sources listed in `sources`, by the method in `about.method`; the representative days and the full year follow the rules stated in `daysNote` and `fullYear`.",
+  "license": "CC BY 4.0, Honglin Li. Values taken from the sources listed in this file keep their publishers' terms; EIA, NOAA, EPA, Census and DOE data are U.S. government works in the public domain."
  },
  "dollarYear": 2025,
  "units": {
