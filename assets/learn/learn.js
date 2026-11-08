@@ -16875,6 +16875,7 @@
     // the cap's own measure: imports / (primary energy - what batteries and links lose); imp is the statistic (imports /
     // primary energy), at most the cap whenever the cap is met, and a tenth of a point or so below this measure
     o.impCap = Y.map(function (y, p) { var q = R.raw.per[p]; return rd(q.imports / (q.primary - (q.lossPJ || 0)), 4); });
+    o.lossPJ = Y.map(function (y, p) { return rd(R.raw.per[p].lossPJ || 0, 1); });   // what batteries and links lose, PJ a year
     o.clean = R.clean.map(function (v) { return rd(v, 3); });
     o.unserved = R.unservedTWh.map(function (v) { return rd(v, 2); }); o.curtail = R.curtailTWh.map(function (v) { return rd(v, 1); });
     o.capGW = R.cap.map(function (c) { var x = {}; TECHS.forEach(function (t) { x[t] = rd(c[t] / 1000, 2); }); return x; });

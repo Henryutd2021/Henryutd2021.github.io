@@ -143,6 +143,17 @@ const QPATH = path.join(X.SITE, "learn/m13-national-pathway.qmd");
   ["steps", "explain", "check", "sources"].forEach(id => ok(new RegExp("::: \\{#" + id + " \\.lx-sec\\}").test(PAGE), "section #" + id));
   ok(/data-learn="m13" data-src="\.\.\/assets\/learn\/data\/prairieland\.json \.\.\/assets\/learn\/data\/e4-pathways\.json \.\.\/assets\/learn\/data\/e4-library\.json \.\.\/assets\/learn\/data\/path\.json"/.test(PAGE), "data-src: the nation, the engine's settings, the library, the course map");
   ok(/m13-national-pathway\.js/.test(PAGE) && /learn\.js/.test(PAGE), "scripts");
+  // the engine's rules as the page and the notebook state them: the cap's base less battery and link losses; winter in
+  // order, its days paying back the scarce-wind week; the budget's verdicts from the LP's flag (0.4 Mt over is over)
+  { const NBX = fs.readFileSync(path.join(X.SITE, "learn/notebooks/m13-national-pathway.ipynb"), "utf8");
+    ok(/imports\}?\(f_p\) \\le \\text\{cap\} \\cdot \(\\text\{primary\}_p - \\text\{losses\}_p\)/.test(PAGE) && T.indexOf("Primary energy less what batteries and links lose: electricity lost there does not count toward the cap.") >= 0 &&
+      /imports ≤ cap × \(primary energy − battery and link losses\)/.test(JS) && /Lo: \{ name: "loss_p"/.test(JS) && /V\.lossPJ/.test(JS) && /cap × \(primary energy − what batteries and links lose\)/.test(NBX) && /for x, c in lossE: t\[x\] = t\.get\(x, 0\) \+ S\[\\"cap\\"\] \* c/.test(NBX),
+      "the import cap's base, less battery and link losses, in the page's equation and rules, the equation card and the notebook's LP");
+    ok(/and winter's days pay it back/.test(PAGE) && /winter's days pay back what the week draws/.test(JS) && /REFILL/.test(NBX) && /\(sw, 1\)\] \+ \[\(v, c \* WEEK\[\\"days\\"\]\)/.test(NBX) && !/no refill from other seasons/.test(JS),
+      "the scarce-wind week paid back by winter's days, in the page, its key and the notebook's LP");
+    ok(JS.split(/\.over [<>]=? ?0\.5/).length === 2 && /E4\.missB\(V\)/.test(JS) && /E4\.missB\(X\)/.test(JS) && /E4\.missB\(x\)/.test(JS) && /missB\(x\)/.test(JS),
+      "M13's verdicts on the budget read the LP's flag (E4.missB, or its Node copy), never a rounded overshoot");
+    ok(/the security-first plan \(its import cap out of reach in 2030\)/.test(NBX), "the notebook checks a run that misses a limit (security first) against the library"); }
   const NB = path.join(X.SITE, "learn/notebooks/m13-national-pathway.ipynb");
   ok(fs.existsSync(NB) && /href="notebooks\/m13-national-pathway\.ipynb" download/.test(PAGE) && /e4-library\.json" download/.test(PAGE) && /prairieland\.json" download/.test(PAGE) && /e4-pathways\.json" download/.test(PAGE), "the notebook and its three data files are offered for download");
   const NBT = fs.existsSync(NB) ? fs.readFileSync(NB, "utf8") : "";

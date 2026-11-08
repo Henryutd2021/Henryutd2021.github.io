@@ -103,7 +103,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <dl class="lx-ideas">
 <dt>Vintages</dt><dd>A plant runs in its model year and the later ones its life covers; it pays only for the years up to 2050, the rest is its residual value.</dd>
 <dt>The budget</dt><dd>CO₂ summed over the model years, each with its weight, stays within the budget; its dual is what one more tonne allowed would save.</dd>
-<dt>The import cap</dt><dd>Crude imports and LNG stay within a share of primary energy in every model year.</dd>
+<dt>The import cap</dt><dd>Crude imports and LNG stay within a share of primary energy, less what batteries and links lose, in every model year.</dd>
 <dt>Foresight</dt><dd>Perfect foresight plans 2030–2050 at once; decade by decade sees two model years at a time and costs more.</dd>
 <dt>Time</dt><dd>Twelve slices stand for each year; a full year of hours checks which conclusions survive.</dd>
 </dl>
@@ -151,11 +151,12 @@ $$\sum_g x_{g,r,s,p} + x^{\text{dis}}_{r,s,p} - x^{\text{ch}}_{r,s,p} + \sum_{\e
 
 $$x_{g,r,s,p} \le \alpha_{g,s}\Big(K^{\text{exist}}_{g,r,p} + \sum_{q \le p,\; y_p - y_q < \text{life}_g} n_{r,g,q}\Big)$$
 
-$$\sum_p w_p\, \text{CO}_2(f_p) + w_{2025}\cdot 214.9 \le B \qquad \text{imports}(f_p) \le \text{cap} \cdot \text{primary}_p \quad \forall p$$
+$$\sum_p w_p\, \text{CO}_2(f_p) + w_{2025}\cdot 214.9 \le B \qquad \text{imports}(f_p) \le \text{cap} \cdot (\text{primary}_p - \text{losses}_p) \quad \forall p$$
 
 <ul class="m13-rules">
 <li><b>The dual as a price.</b> The budget's dual $\mu$ is in present-value dollars a tonne. As a price in model year $p$'s own dollars it is $\mu\, w_p / D_p$; only in a model of every year, each counted once, is it $\mu (1+i)^{t-2025}$.</li>
-<li><b>Batteries.</b> They cycle within each representative day; the scarce-wind week's store may enter full and run down over seven days.</li>
+<li><b>Batteries.</b> They cycle within each representative day; the scarce-wind week's store may enter full and run down over seven days, and winter's days pay it back.</li>
+<li><b>The cap's base.</b> Primary energy less what batteries and links lose: electricity lost there does not count toward the cap.</li>
 <li><b>Stress hours.</b> At two stress hours of 2025, each region's load plus 10% must be covered by available capacity and the links.</li>
 <li><b>Gas.</b> The LP buys domestic gas and LNG in the least-cost mix within the import cap, so under a tight budget LNG can win: the national inventory counts the gas burned in domestic fields, not LNG's upstream emissions abroad.</li>
 <li><b>Retirements.</b> An existing plant counts in a model year only if its retirement year is later, so it leaves in the five-year period that contains that year: a conservative simplification.</li>
