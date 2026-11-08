@@ -629,7 +629,7 @@
   "peakMW": 142.8,
   "annualMWh": 1075518.0,
   "averagePUE": 1.204,
-  "cooling": "Evaporative heat rejection (cooling towers), with outside air doing more of the work in cold hours; the dry, air-cooled alternative uses little water but may need more electricity (lesson F8's two options).",
+  "cooling": "Cooling towers release heat by evaporating water, with outside air doing more of the work in cold hours; dry cooling releases heat to the outdoor air, uses little water and may need more electricity (lesson F8's two options).",
   "connection": "Its own substation on the transmission grid, not a district's.",
   "sizeReason": "Lesson F8's Prairie Town campus is a 300 MW contract drawing a steady 240 MW. Prairie City's campus is a different, fictional place: a 150 MW contract with 120 MW of IT, large against the city (at its hottest hour it draws more than the rural fringe's peak, less than the core's or the suburbs') without dwarfing the three districts together.",
   "shape": "IT draws 85% of its capacity every hour; facility power = IT x PUE, PUE = 1.12 + 0.008 per C above 5 C, so hot afternoons draw the most.",

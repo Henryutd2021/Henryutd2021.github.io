@@ -3,7 +3,7 @@
 # assets/learn/data/path.json and the lesson blocks.
 # Kinds of entries (a flat YAML subset: "- key: value" lines, or one "- {key: value, ...}" line; nothing nested):
 #   kind: tier    one per tier, in display order; any number of tiers (the map draws one line each, first at the bottom).
-#                 id, title, level, slot (colour 1-5: --lx-tier-<slot> in assets/learn/components/base.css), icon (a name
+#                 id, title, level, slot (color 1-5: --lx-tier-<slot> in assets/learn/components/base.css), icon (a name
 #                 in LX.IC), door (the entry-door question), doord, reader, math, assumes, goal
 #   kind: scale   the course's system scales, S0 device and plant to S4 nation: id, title, short, icon (a name in LX.IC);
 #                 lessons list theirs in `scales: [id, ...]`, the primary scale first (in path.json and each lesson's
@@ -344,7 +344,7 @@
   after: [9, 12]
   scales: [S2]
 
-# ---------- modules off the starter path: the news lens, the Foundations checkpoint, the bridges into modelling and
+# ---------- modules off the starter path: the news lens, the Foundations checkpoint, the bridges into modeling and
 #            the first Modeler lesson; live once a row has status: active
 - kind: lesson
   id: n01-news-lens
@@ -355,6 +355,7 @@
   icon: globe
   status: active
   minutes: 20
+  practice_minutes: 15   # practice on real news (its heading on the page: about 15 minutes)
   title: "How do you read an energy headline like a researcher?"
   subtitle: "Tag, check and weigh three real energy stories"
   short: "Read a headline"
@@ -408,6 +409,7 @@
   status: active
   minutes: 20
   lab_minutes: 60   # the notebook lab (its eyebrow on the page: about 60 minutes)
+  practice_minutes: 60   # the notebook's practice tasks, after the lab (as the page's notebook card says)
   title: "Python and data for energy: how do you load, plot and check a year of hourly data?"
   subtitle: "Find the bad hours in a real year of grid data"
   short: "Python and data"
@@ -472,9 +474,9 @@
   title: "Who decides what, from a light switch to a nation?"
   subtitle: "Zoom from one home to a whole nation, and sort who decides what at each scale"
   short: "Five scales"
-  teaches: [system scales, who decides at each scale, what a model needs at each scale, signals and needs passed between scales, local and system optimum]
-  does: "A zoom from one home to Prairieland; at each scale, sort who decides, what they decide, what physics a model needs and what passes between scales."
-  outcome: "Place a question at its scale and name who decides it, what a model of it needs and what it takes from other scales."
+  teaches: [system scales, who decides at each scale, what models at each scale usually focus on, signals and needs passed between scales, one scale's best plan against the whole system's]
+  does: "A zoom from one home to Prairieland; at each scale, sort who decides, what they decide, what a model usually focuses on and what passes between scales."
+  outcome: "Place a question at its scale and name who decides it, what a model of it usually focuses on and what it takes from other scales."
   after: [0]
   next: F2
   next_needs: [6]
@@ -529,10 +531,10 @@
   minutes: 20
   practice_minutes: 10
   title: "How do power plants turn heat, water, wind and sunlight into electricity?"
-  subtitle: "Open six plants, follow 100 units of energy to the wire, and compare three real days on a solar farm"
+  subtitle: "Open six plants, follow 100 units of energy to the wire, and compare three real days of solar output"
   short: "Power plants"
   teaches: [heat engines and turbines, conversion efficiency and waste heat, hydro head and flow, solar and wind conversion, ramp and reservoir limits]
-  does: "Cutaways of gas, steam, hydro, geothermal, wind and solar plants; 100 units of energy followed to the wire and to waste heat; three real days of output on a solar farm; reservoir and ramp limits."
+  does: "Cutaways of gas, steam, hydro, geothermal, wind and solar plants; 100 units of energy followed to the wire and to waste heat; three real days of regional solar output, scaled to a fictional farm; reservoir and ramp limits."
   outcome: "Explain how each kind of plant turns its energy source into electricity, where the losses go, and what limits how fast it can change its output."
   after: [5]
   next: F5
@@ -609,7 +611,7 @@
   short: "Designing a bill"
   outcome: "Bill customers under flat, time-of-use, demand-charge and real-time tariffs, find who pays above or below the cost of serving them, say what each tariff rewards, and show how a large-load tariff's minimum bill keeps cost off other customers."
   teaches: [cost of service, tariff design, net metering and net billing, cross-subsidies, time-of-use and real-time pricing, demand charges, large-load tariffs]
-  does: "Bill a renter, a home with solar and an EV, and a factory under flat, time-of-use, demand-charge and real-time tariffs; see who pays more and what behaviour each tariff rewards; then set a large load's minimum bill."
+  does: "Bill a renter, a home with solar and an EV, and a factory under flat, time-of-use, demand-charge and real-time tariffs; see who pays more and what behavior each tariff rewards; then set a large load's minimum bill."
   after: [8]
   next: A7
   next_needs: [9]
@@ -624,11 +626,11 @@
   minutes: 30
   practice_minutes: 30   # the practice set (Check section)
   title: "Can demand and small resources act like a power plant? Demand response, EV charging, virtual power plants and local trading"
-  subtitle: "Shift a town's load, pool small devices into a virtual power plant, and let neighbours trade"
+  subtitle: "Shift a town's load, pool small devices into a virtual power plant, and let neighbors trade"
   short: "Flexible demand"
   outcome: "Tell energy shifted from energy saved and attributed emissions from what the plants emit, price what a virtual power plant earns each owner, and find where coordination costs and a feeder's limit stop it."
   teaches: [load shifting, energy shifted against energy saved, demand response, virtual power plants and aggregators, rebound after an event, local energy trading]
-  does: "Shift Prairie Town's load toward cheap or clean hours within limits and see what the shift costs users; pool batteries, thermostats, EV chargers and a dairy's pumps in an aggregator and see what each owner earns, where coordination costs bite and where a feeder's limit stops it; then let neighbours trade."
+  does: "Shift Prairie Town's load toward cheap or clean hours within limits and see what the shift costs users; pool batteries, thermostats, EV chargers and a dairy's pumps in an aggregator and see what each owner earns, where coordination costs bite and where a feeder's limit stops it; then let neighbors trade."
   after: [9, A4]
   scales: [S1, S2]
 # ---------- Analyst modules
@@ -844,7 +846,7 @@
   title: "How fast have energy transitions happened before?"
   subtitle: "Overlay a century of U.S. adoption curves, from electric service in homes to solar's share of electricity, and see what sped some up and held others back"
   short: "Past transitions"
-  teaches: [diffusion curves, shares over time, network build-out, public programmes, what you measure decides the speed]
+  teaches: [diffusion curves, shares over time, network build-out, public programs, what you measure decides the speed]
   does: "Guess how long electricity took to reach nine U.S. homes in ten; compare towns and farms; watch piped gas overtake coal as the main heating fuel; read the car and solar curves; sort what sped each change up and what held it back; then a dated timeline and two readings of the record."
   outcome: "Read an adoption curve as a share of a named whole, say how fast past U.S. changes moved and what sped or slowed them, and explain why the answer to how fast depends on what is measured, without forecasting the next one."
   after: [F10]
@@ -914,11 +916,11 @@
   minutes: 25
   practice_minutes: 30   # the questions and the drill (Check section)
   title: "How do heat waves, droughts, wildfires and cold snaps break energy systems, and how do planners prepare?"
-  subtitle: "Hit the Plains Grid with four hazards, alone and two at once, then choose defences under a budget"
-  short: "Hazards and defences"
-  teaches: [extreme weather and the grid, correlated failures, compound hazards, wildfire shutoffs, stress tests, defences under a budget]
-  does: "Sort what heat waves, droughts, cold snaps and wildfire shutoffs hit; read Winter Storm Uri from the FERC–NERC report; stress the Plains Grid with each hazard and with two at once; choose defences under a budget."
-  outcome: "Explain how each hazard breaks a power system, why correlated failures defeat independent-outage planning, and compare defences by what they avoid for what they cost."
+  subtitle: "Hit the Plains Grid with four hazards, alone and two at once, then choose defenses under a budget"
+  short: "Hazards and defenses"
+  teaches: [extreme weather and the grid, correlated failures, compound hazards, wildfire shutoffs, stress tests, defenses under a budget]
+  does: "Sort what heat waves, droughts, cold snaps and wildfire shutoffs hit; read Winter Storm Uri from the FERC–NERC report; stress the Plains Grid with each hazard and with two at once; choose defenses under a budget."
+  outcome: "Explain how each hazard breaks a power system, why correlated failures defeat independent-outage planning, and compare defenses by what they avoid for what they cost."
   after: [F6, A5]
   scales: [S2, S3]
 - kind: lesson
@@ -1087,7 +1089,7 @@
   short: "Why scenarios disagree"
   teaches: [exploratory and target-seeking scenarios, "scenario assumptions (demand, fuel prices, policy, technology costs)", one-at-a-time against ordered swaps, interactions between assumptions, the average over every order, an implied carbon price, reading outlooks as their authors describe them]
   does: "Line up four scenarios for Prairieland built on one data set; read each one's question and assumptions; sort them and four real outlooks as exploratory or target-seeking; trace the gaps in CO₂, electricity and imports to demand, fuel prices, policy and fixed technology costs, one at a time and in order; then move a budget and watch the carbon price it needs."
-  outcome: "Tell an exploratory scenario from a target-seeking one, trace a gap between two scenarios to their assumptions in a stated order, explain why the parts depend on that order, and say why a target-seeking scenario's policy is an output, not an input."
+  outcome: "Tell an exploratory scenario from a target-seeking one, trace a gap between two scenarios to their assumptions in a stated order, explain why the parts depend on that order, and say why, once the budget and the other assumptions are fixed, the target-seeking pathway's carbon price is an output."
   after: [A1, 13]
   scales: [S4]
 # A21
@@ -1265,7 +1267,7 @@
   minutes: 40
   practice_minutes: 90   # the notebook's practice tasks, after its 45-minute lab
   lab_minutes: 45   # the notebook lab: in the header badge and timeRequired
-  title: "Storage and coupled carriers: modelling power, hydrogen and heat together"
+  title: "Storage and coupled carriers: modeling power, hydrogen and heat together"
   subtitle: "Add a battery, an electrolyzer, a hydrogen tank and a heat store to one plant, and find where coupling pays"
   short: "Storage and coupled carriers"
   teaches: [state of charge in a linear program, conversion between carriers, part-load limits in an LP, tank and heat-network limits, value of coupling, duals of coupled balances]
@@ -1473,7 +1475,7 @@
   title: "Did it work? Learning from data with regression and natural experiments"
   subtitle: "Estimate a tariff's effect on simulated homes whose true effect is known, then break difference-in-differences on purpose with selection, confounding, spillovers and anticipation"
   short: "Regression and natural experiments"
-  outcome: "Estimate a programme's effect with a regression and a difference-in-differences design, check parallel trends with an event study, and name the threats to validity (selection, confounding, spillovers, anticipation) before trusting the answer."
+  outcome: "Estimate a program's effect with a regression and a difference-in-differences design, check parallel trends with an event study, and name the threats to validity (selection, confounding, spillovers, anticipation) before trusting the answer."
   teaches: [counterfactuals, selection bias, regression with controls, before-after comparisons, difference-in-differences, parallel trends, event studies, clustered standard errors, threats to validity]
   lab: "a NumPy notebook that rebuilds both simulated panels, fits the two-way fixed-effects and event-study regressions, clusters standard errors by home and redraws 200 panels: about 60 minutes, then 90 of practice."
   does: "Ask whether a time-of-use tariff lowered household peaks or whether a policy changed investment, on simulated panels with known effects: describe, regress, try a difference-in-differences design, and list the threats to validity (confounding, selection, spillovers, anticipation) before trusting the answer."
@@ -1526,7 +1528,7 @@
   title: "Pathway Explorer"
   subtitle: "Plan Prairieland's five regions to 2050 within a carbon budget and an import cap, run the pathway as one linear program, and test it against shocks and full years of hours"
   short: "Pathway Explorer"
-  does: "Five regions to 2050 with vintages, transmission, a cumulative carbon budget, an import cap, a peak-hour rule, security indicators and shocks, as one linear program on twelve time slices; perfect foresight or decade by decade; a labelled precomputed library for phones and for the full-year checks."
+  does: "Five regions to 2050 with vintages, transmission, a cumulative carbon budget, an import cap, a peak-hour rule, security indicators and shocks, as one linear program on twelve time slices; perfect foresight or decade by decade; a labeled precomputed library for phones and for the full-year checks."
   outcome: "Run a national pathway model, read what its budget and cap cost and what their duals say, and tell which results survive a shock, myopic decisions and a full year of hours."
   teaches: [national pathway model, cumulative carbon budget, import-share cap, perfect and myopic foresight, shocks and re-planning, representative slices against full years]
   after: [M3]
@@ -1562,7 +1564,7 @@
   title: "Modeler checkpoint: formulate an unseen problem, find a defect, validate a result"
   subtitle: "About four hours on problems the course has not shown; worked formulations and code open when you submit"
   short: "Modeler checkpoint"
-  does: "Formulate an unseen problem from a one-paragraph brief and implement it (or, in the empirical variant, analyse a supplied dataset); find a planted defect in a supplied model; validate one result against an independent reference. Worked formulations and code open when you submit."
+  does: "Formulate an unseen problem from a one-paragraph brief and implement it (or, in the empirical variant, analyze a supplied dataset); find a planted defect in a supplied model; validate one result against an independent reference. Worked formulations and code open when you submit."
   after: [M1, M3, B3, R5]
 
 # ---------- research studios R1-R10
@@ -1633,9 +1635,9 @@
   title: "Data you can defend: sources, cleaning, licences and provenance"
   subtitle: "Log every cleaning choice and show what it changes"
   short: "Data you can defend"
-  outcome: "Make and log each cleaning choice on a real hourly dataset, show how much each choice moves the results, check the licences and write a data note."
-  teaches: [cleaning log, time base and daylight saving, outliers and frozen readings, gap filling, data licences, provenance]
-  does: "Clean SPP's raw 2025 hourly file by choosing a time base, a spike rule, a frozen-reading rule and a fill method; watch four reported numbers move with each choice; sort eight data sources by licence; pick coordinate systems for a spatial layer; write the data note."
+  outcome: "Make and log each cleaning choice on a real hourly dataset, show how much each choice moves the results, check the licenses and write a data note."
+  teaches: [cleaning log, time base and daylight saving, outliers and frozen readings, gap filling, data licenses, provenance]
+  does: "Clean SPP's raw 2025 hourly file by choosing a time base, a spike rule, a frozen-reading rule and a fill method; watch four reported numbers move with each choice; sort eight data sources by license; pick coordinate systems for a spatial layer; write the data note."
   after: [R3, B2]
   next: R5
   next_needs: [K8, M1]
@@ -1728,8 +1730,8 @@
   title: "Research integrity, and working with the people your study is about"
   subtitle: "Six dilemmas, the norms behind them, and your own statement"
   short: "Integrity and stakeholders"
-  outcome: "Name the norm behind an integrity dilemma (consent, credit, conflicts of interest, data licences, corrections), choose a defensible action, and write an integrity statement for your own study."
-  teaches: [informed consent, ethics review, authorship and credit, conflicts of interest, data licences, corrections, stakeholders]
+  outcome: "Name the norm behind an integrity dilemma (consent, credit, conflicts of interest, data licenses, corrections), choose a defensible action, and write an integrity statement for your own study."
+  teaches: [informed consent, ethics review, authorship and credit, conflicts of interest, data licenses, corrections, stakeholders]
   does: "Sort ten practices by the norm they serve; work through six dilemmas (a funder's headline, a convenient scenario, a co-author's data, a community meeting, a survey without consent, an error after publication); map who the study affects; write an integrity statement."
   after: [R1]
   next: CR
@@ -1765,11 +1767,11 @@
   status: active
   minutes: 12
   title: "How do social scientists study energy and people?"
-  subtitle: "Match six questions about a city's heat-pump programme to six methods, and see what each can and cannot tell a modeller"
+  subtitle: "Match six questions about a city's heat-pump program to six methods, and see what each can and cannot tell a modeler"
   short: "Social-science methods"
   teaches: [surveys, interviews, choice experiments, ethnography, policy analysis, participatory mapping, consent and ethics review, selection]
-  does: "Match six of Prairie City's questions about a heat-pump programme to six methods; open each method to see what it gives a model and cannot tell; mark which involve people as participants; then test whether a survey difference shows a programme's effect."
-  outcome: "Say which social-science method answers which kind of question, what each can and cannot tell a modeller, why research with people needs consent and review first, and why a difference between joiners and others is not by itself an effect."
+  does: "Match six of Prairie City's questions about a heat-pump program to six methods; open each method to see what it gives a model and cannot tell; mark which involve people as participants; then test whether a survey difference shows a program's effect."
+  outcome: "Say which social-science method answers which kind of question, what each can and cannot tell a modeler, why research with people needs consent and review first, and why a difference between joiners and others is not by itself an effect."
   after: [A13]
   scales: [S3]
 # CK-R and CR. CK-R's prerequisites are R8 and R9. CR's are R10, R2, R5,
@@ -1926,7 +1928,7 @@
   status: active
   minutes: 30
   title: "Microgrid Workbench"
-  subtitle: "Island a fictional campus: set what must stay on, size solar, a battery and diesel, and test hypothetical outages on 2025 solar profiles within the feeder's limits"
+  subtitle: "Keep a fictional campus running on its own power: set what must stay on, size solar, a battery and diesel, and test hypothetical outages on 2025 solar profiles within the feeder's limits"
   short: "Microgrid Workbench"
   outcome: "Build a campus microgrid plan, run it through outage scenarios within the host feeder's limits, and read its cost, unserved load and emissions per scenario."
   teaches: [one-line diagram, islanding, load priorities in an outage, outage scenarios, host-feeder limits, ownership and cost of capital]
@@ -1982,7 +1984,7 @@
   title: "Can existing reactors earn more by making hydrogen and providing grid services?"
   subtitle: "Follow one study through six parts, then run a toy plant that sells power, makes hydrogen and holds reserves at prices you set"
   short: "Hydrogen at existing plants"
-  does: "A case file in six parts and a timeline; then split a toy plant's output hour by hour between the grid, an electrolyzer and reserves, at prices you set, and see what the day earns against selling all the power."
+  does: "A case file in six parts and a timeline; then split a toy plant's electricity hour by hour between grid sales and hydrogen, offer the electrolyzer's load as reserve at prices you set, and see what the day earns against selling all the power."
   outcome: "Say what an hourly dispatch model and a lifetime cash flow each add when judging hydrogen at an existing plant, why the plant's own capital drops out, and which assumptions a result rests on."
   teaches: ["hydrogen at an existing plant", "reserves from an electrolyzer's headroom", "sunk costs", "price-taking", "reading a published dispatch and cash-flow study"]
   after: [7]
@@ -2035,7 +2037,7 @@
   short: "Units and magnitudes"
   does: "Convert between kW, MW and GW and between power and energy, carry units through a calculation so they cancel, and place a phone charge, a town's day and a nation's year on one powers-of-ten scale."
   outcome: "Convert power and energy units with prefixes, check a result by its units, and estimate a quantity to the nearest power of ten."
-  teaches: [SI prefixes, power and energy units, unit cancelling, scientific notation, orders of magnitude]
+  teaches: [SI prefixes, power and energy units, unit canceling, scientific notation, orders of magnitude]
   after: []
   next: K2
 
@@ -2068,7 +2070,7 @@
   subtitle: "Grow money forward, discount it back, and spread a building cost into equal yearly payments"
   short: "Exponentials and discounting"
   does: "Watch growth compound, discount future dollars to today, add up a stream of equal payments, and build the capital recovery factor that lessons 7, 12 and 13 use to turn a building cost into a yearly cost."
-  outcome: "Compute present values and the capital recovery factor, and turn a building cost into an annualised cost."
+  outcome: "Compute present values and the capital recovery factor, and turn a building cost into an annualized cost."
   teaches: [compound growth, present value, discount rate, annuities, capital recovery factor]
   after: []
   next: 7
@@ -2097,10 +2099,10 @@
   minutes: 25
   practice_minutes: 30
   title: "Probability and statistics"
-  subtitle: "Read four months of real forecast errors as a distribution: centre, spread, tails and chance"
+  subtitle: "Read four months of real forecast errors as a distribution: center, spread, tails and chance"
   short: "Probability and statistics"
   does: "With a grid operator's real day-ahead forecast errors, build a histogram, compare mean and median, measure spread, read percentiles and intervals, and estimate a chance by counting and by sampling; then combine two plants' outages into a joint chance and an expected value."
-  outcome: "Describe a distribution by its centre, spread and quantiles, estimate a probability from data, and say when probabilities multiply."
+  outcome: "Describe a distribution by its center, spread and quantiles, estimate a probability from data, and say when probabilities multiply."
   teaches: [histograms, mean and median, standard deviation and percentiles, probability as frequency, sampling and Monte Carlo, independence and expected value]
   after: []
   next: 4
@@ -2129,6 +2131,7 @@
   code: K7
   status: active
   minutes: 20
+  practice_minutes: 30   # the practice sheet (its heading on the page: about 30 minutes)
   title: "Spreadsheets in practice"
   subtitle: "Work through Prairie Town's real day in a spreadsheet: formulas, fill-down, absolute references and a check cell"
   short: "Spreadsheets"

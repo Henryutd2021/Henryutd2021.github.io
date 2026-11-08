@@ -1412,7 +1412,7 @@
    "id": "a09-hazards",
    "minutes": 25,
    "form": "cards",
-   "short": "Hazards and defences"
+   "short": "Hazards and defenses"
   },
   {
    "tier": "analyst",
@@ -1678,7 +1678,7 @@
   {
    "tier": "modeler",
    "code": "M4",
-   "title": "Storage and coupled carriers: modelling power, hydrogen and heat together",
+   "title": "Storage and coupled carriers: modeling power, hydrogen and heat together",
    "ready": true,
    "href": "m04-storage-multienergy.html",
    "scales": [

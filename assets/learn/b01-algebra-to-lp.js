@@ -787,6 +787,7 @@
       text: "Hand the arrays to HiGHS, an open-source [[solver|solver]], running here in your browser. Does it agree with the corner you found by hand?",
       build: function (act, api) {
         if (LX.solver && LX.solver.preload) LX.solver.preload();
+        H("p", { class: "lx-hint", html: 'A guided preview: <a href="11-solver.html">lesson 11</a> covers asking a solver and checking its answer in full.' }, act);
         var row = H("div", { class: "b1-acts" }, act);
         var b1 = H("button", { type: "button", class: "lx-btn small", html: LX.icon("play") + "Solve the dispatch model" }, row);
         var b2 = H("button", { type: "button", class: "lx-btn ghost small", text: "Solve your battery model" }, row);
