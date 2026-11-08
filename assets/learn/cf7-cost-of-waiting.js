@@ -80,7 +80,8 @@
   function workedMore(I) {
     var L = ledgers(I, I.delays.start, 0, false), half = I.bridgeShare * I.loadMW, mwh = half * I.hoursPerMonth;
     return ["The load runs around the clock, so a month is " + I.hoursPerMonth + " hours: bridge power for " + half + " MW is " + half + " MW × " + I.hoursPerMonth + " h = " + mwh.toLocaleString("en-US") + " MWh a month, " + musd(mwh * I.bridgePremiumPerMWh) + " above grid power.",
-      "Per MW-month: " + musd(L.developer) + " ÷ " + I.loadMW + " MW ÷ " + I.delays.start + " months = " + kusd(L.dci) + " of the developer's cost."];
+      "Per MW-month: " + musd(L.developer) + " ÷ " + I.loadMW + " MW ÷ " + I.delays.start + " months = " + kusd(L.dci) + " of the developer's cost.",
+      "The chance it never arrives rises by " + (100 * I.strandPerMonth).toFixed(1) + " percentage points a month: " + Math.round(100 * Math.min(I.strandCap, I.strandPerMonth * I.delays.start)) + "% after " + I.delays.start + " months, at most " + Math.round(100 * I.strandCap) + "%."];
   }
   // each account and its parts, as text (the bars' text version)
   function accountLines(L) {
