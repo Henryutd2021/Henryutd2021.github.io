@@ -28,7 +28,7 @@
    "color": "var(--lx-wind)",
    "pays": "Taxpayers pay the credit on every MWh new wind and solar deliver.",
    "payer": "taxpayers, to new wind and solar",
-   "side": "It pays per MWh used, so plants get built past what the grid can take in windy hours."
+   "side": "It pays per MWh used; at larger credits, plants get built past what the grid can take in windy hours."
   },
   {
    "id": "itc",
@@ -56,6 +56,7 @@
    "color": "var(--lx-good)",
    "pays": "Customers are assumed to fund the certificates, at the model's marginal compliance cost; who bears it in the end is not modeled.",
    "payer": "customers, assumed",
+   "intro": "A [[energy-attribute-certificate|certificate]] records one MWh from an eligible plant, here wind or sun. Sellers hand in enough certificates to cover the required share.",
    "side": "Wind and sun that ran anyway earn certificates too."
   }
  ],
@@ -65,7 +66,7 @@
    "kind": "Carbon price",
    "where": "European Union",
    "name": "EU Emissions Trading System",
-   "text": "A cap-and-trade scheme launched in 2005: covered plants, electricity and heat generation among them, surrender one allowance per tonne of CO₂ equivalent.",
+   "text": "A cap-and-trade scheme, launched in 2005: a cap limits total emissions, and covered plants, electricity and heat generation among them, surrender one allowance, a permit to emit, per tonne of [[co2e|CO₂ equivalent]].",
    "source": {
     "label": "European Commission, About the EU Emissions Trading System (page updated 13 May 2026)",
     "url": "https://climate.ec.europa.eu/eu-action/carbon-markets/about-eu-ets_en",

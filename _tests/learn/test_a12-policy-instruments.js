@@ -30,6 +30,7 @@ let PAGE = fs.readFileSync(QMD, "utf8"), D = JSON.parse(fs.readFileSync(DPATH, "
 let checks = 0, fails = 0;
 function ok(c, msg) { checks++; if (!c) { fails++; console.log("FAIL:", msg); } }
 const f = A12.fmt;
+const { rich } = require(L("components/core.js"));
 const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
 (async () => {
@@ -82,17 +83,20 @@ const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(
   const cuts = defs.map(z => z.c.cutPct), pers = defs.map(z => z.c.perT);
   ok(Math.max(...cuts) - Math.min(...cuts) < 0.06 && Math.max(...pers) - Math.min(...pers) < 3, "defaults: similar cuts (within 6 points) at similar cost per tonne (within $3)");
   ok(A12.compare(base, R.ptc30).perT > A12.compare(base, R.ptc10).perT + 10 && R.ptc30.curtailed > 1e6, "a $30 production credit costs much more per tonne than $10, and curtails over 1 TWh");
+  ok(R.ptc5.curtailed < 1e3 && R.ptc30.curtailed > 1e6 && /at larger credits/.test(D.instruments[1].side), "the production credit's side effect is stated for larger credits: none curtailed at $5, over 1 TWh at $30");
+  ok(R.tau10.Wn + R.tau10.Sn < 0.5 && R.tau30.Wn > 1, "a $10 carbon price builds nothing, $30 builds wind: the chain says the plan can change");
   ok(f.m(R.itc30.itcUpfront) === "$681.3M" && f.m(R.itc30.itcPay) === "$39.4M", "the default investment credit: $681.3M up front, $39.4M a year as its annual equivalent");
   // no battery: building one is not worth its annual cost here (the reduced cost of a battery MW is positive at every setting)
   grid.concat([[null, 0]]).forEach(([x, v]) => { const o = x ? A12.opts(x.id, v) : {}, r0 = F.run(o).r.objective, r1 = F.solve(PP.build(Y, Object.assign({}, o, { fix: { Bn: 1 } }))).objective;
     ok(r1 > r0 + 1, (x ? x.id + " " + v : "no policy") + ": a 1 MW battery raises the year's cost (its energy shifting saves less than its annual cost): +$" + Math.round(r1 - r0).toLocaleString("en-US")); });
 
   // ---------------- the page's generated blocks
-  const ROWS = defs.map(z => `<tr><td>${z.x.label}, ${f.val(z.x, z.x.def)}</td><td data-label="CO₂">${f.mt(z.r.co2)}</td><td data-label="Cut">${f.pct(z.c.cutPct)}</td><td data-label="Resource cost">${f.dm(z.c.dRes)}</td><td data-label="Per tonne">${f.pt(z.c.perT)}</td><td data-label="Money moved, a year">${A12.moneyCell(z.x.id, z.r)}</td></tr>`).join("\n");
+  const ROWS = defs.map(z => `<tr><td>${z.x.label}, ${f.val(z.x, z.x.def)}</td><td data-label="CO₂">${f.mt(z.r.co2)}</td><td data-label="Cut">${f.pct(z.c.cutPct)}</td><td data-label="Change in resource cost">${f.dm(z.c.dRes)}</td><td data-label="Per tonne">${f.pt(z.c.perT)}</td><td data-label="Money moved, a year">${A12.moneyCell(z.x.id, z.r)}</td></tr>`).join("\n");
   const t0 = defs[0];
-  const FALLBACK = `<p class="lx-hint">No policy: nothing new is built; CO₂ ${f.mt(base.co2)} a year, resource cost ${f.m(base.resource)}, wind and sun ${f.pct(base.shareClean)} of demand.</p>
+  const FALLBACK = `<p class="lx-hint">Units: Mt = million tonnes of CO₂; $M = million dollars, a year, in 2025 dollars.</p>
+<p class="lx-hint">No policy: nothing new is built; CO₂ ${f.mt(base.co2)} a year, resource cost ${f.m(base.resource)}, wind and sun ${f.pct(base.shareClean)} of demand.</p>
 <table class="lx-facts a12-fb">
-<thead><tr><th scope="col">Instrument, default setting</th><th scope="col">CO₂</th><th scope="col">Cut</th><th scope="col">Resource cost</th><th scope="col">Per tonne avoided</th><th scope="col">Money that changes hands, a year</th></tr></thead>
+<thead><tr><th scope="col">Instrument, default setting</th><th scope="col">CO₂</th><th scope="col">Cut</th><th scope="col">Change in resource cost</th><th scope="col">Per tonne avoided</th><th scope="col">Money that changes hands, a year</th></tr></thead>
 <tbody>
 ${ROWS}
 </tbody>
@@ -143,7 +147,7 @@ ${ROWS}
 <p class="lx-eyebrow">In the real world: one rule of each kind</p>
 <ul class="a12-rules">
 ${D.rules.map(r => { const src = x => `<p class="lx-hint">Source: ${x.url ? `<a href="${esc(x.url)}">${esc(x.label)}</a>` : esc(x.label)}, ${esc(x.asOf)}.</p>`;
-    return `<li><p><b>${esc(r.kind)} · ${esc(r.where)}.</b> ${esc(r.name)}.</p><p>${esc(r.text)}</p>${src(r.source)}${r.context ? `<p>${esc(r.context.text)}</p>${src(r.context.source)}` : ""}</li>`; }).join("\n")}
+    return `<li><p><b>${esc(r.kind)} · ${esc(r.where)}.</b> ${esc(r.name)}.</p><p>${rich(r.text)}</p>${src(r.source)}${r.context ? `<p>${esc(r.context.text)}</p>${src(r.context.source)}` : ""}</li>`; }).join("\n")}
 </ul>
 <p class="lx-hint">The model's instruments are simpler than these rules: no phase-outs, eligibility tests or trading.</p>
 </div>`;
@@ -221,11 +225,15 @@ ${D.rules.map(r => { const src = x => `<p class="lx-hint">Source: ${x.url ? `<a 
       ok(card().querySelectorAll(".a12-fail").length === 0 && live.textContent.includes(f.mt(base.co2)), "after Try again the plan is solved: CO₂ " + f.mt(base.co2));
       demo.cards.go(1); for (let i = 0; i < 8; i++) await tick();
       const d0 = R["tau" + D.instruments[0].def];
-      ok(card().textContent.includes(f.mt(d0.co2)) && card().textContent.includes(f.pct(A12.compare(base, d0).cutPct)), "step 2 solves the default carbon price on entry");
+      ok(live.textContent.includes(f.mt(d0.co2)) && card().textContent.includes(f.pct(A12.compare(base, d0).cutPct)), "step 2 solves the default carbon price on entry: CO₂ in the readouts, the cut in the line");
       demo.cards.go(5); for (let i = 0; i < 20; i++) await tick();
-      ok(card().textContent.includes("EU Emissions Trading System") && card().textContent.includes(f.m(R["ces" + D.instruments[3].def].certPay)), "step 6: the ledger of all four and the real rules");
-      ok(xp.textContent.includes("Four instruments, one plan"), "explain: the comparison table");
-      ok(card().textContent.includes("California") && card().textContent.includes("16 states") && card().querySelectorAll(".a12-rules li").every(li => li.querySelectorAll("p").length >= 3), "step 6: each real rule as name, mechanism and source, the LBNL count as context");
+      ok(card().textContent.includes(f.m(R["ces" + D.instruments[3].def].certPay)) && !card().textContent.includes("EU Emissions Trading System") && card().textContent.includes("is in Sources, below") && card().textContent.includes("Paid directly by (assumed)") && card().textContent.includes("not modeled"), "step 6: the ledger of all four, direct payers labelled assumed; the real rules left to Sources");
+      ok(xp.textContent.includes("Four instruments, one plan") && xp.textContent.includes("Direct payer (assumed)"), "explain: the comparison table, direct payers labelled assumed");
+      ok(xp.textContent.includes("The plan can change") && xp.textContent.includes("CO₂ can fall") && !xp.textContent.includes("nothing is built"), "explain: the carbon-price chain is conditional; at the default $30 wind is built");
+      ok(/fixed upkeep, plus gas fuel and the gas plants' variable upkeep/.test(live.textContent) && /gas plants' fuel and variable upkeep/.test(PAGE), "the resource cost names the gas plants' variable upkeep, which the model counts");
+      demo.cards.go(4); for (let i = 0; i < 8; i++) await tick();
+      ok(card().textContent.includes("records one MWh from an eligible plant"), "step 5: what a certificate is, before the standard's numbers");
+      ok(PAGE.includes("EU Emissions Trading System") && PAGE.includes("16 states") && /<span class="lx-term" data-term="co2e">CO₂ equivalent<\/span>/.test(PAGE), "Sources: each real rule as name, mechanism and source, the LBNL count as context; CO₂ equivalent marked");
       // a solve that ends after the reader has left its step paints nothing: enter the production
       // credit at a new setting, go Back to step 1 before the solve ends, then let it end
       const ttl = () => live.querySelector("h3").textContent;

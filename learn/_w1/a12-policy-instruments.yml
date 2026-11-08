@@ -7,7 +7,7 @@ glossary:
     def: "A payment, often through the tax code, of a share of what a new plant costs to build, whatever it later produces."
   - id: clean-energy-standard
     term: Clean-energy standard
-    def: "A rule that a set share of the electricity sold in a year comes from sources the rule counts as clean; sellers prove it with certificates."
+    def: "A rule that a set share of the electricity sold in a year comes from sources the rule counts as clean; sellers prove it with certificates, each a record of one MWh from a counted source."
   - id: resource-cost
     term: Resource cost
     def: "What a plan uses up, such as plants built, their upkeep and the fuel burned, leaving out payments that only move money between groups."

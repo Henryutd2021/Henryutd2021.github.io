@@ -107,13 +107,15 @@ onPage(`the data center adds ${fm.t(Q.dc.short)}, mostly at the combined-cycle p
 onPage(`the electrolyzer's change falls from ${fm.t(Q.ez.short)} to ${fm.t(Q.ezM.short)}`, "explain: the model matters");
 onPage(`${fm.dt(Q.dc.long.cc)} with a new gas plant, ${fm.dt(Q.dc.long.wind)} with new wind, for the data center that day`, "explain: long run");
 onPage(`From 00:00 to 12:00 the average is ${Math.min(...loads.ez.map((v, t) => v ? b0.avg[t] : 9)).toFixed(2)} to ${Math.max(...loads.ez.map((v, t) => v ? b0.avg[t] : 0)).toFixed(2)} t per MWh, yet each extra MWh comes from the combined-cycle plants at ${F.cc.rate.toFixed(2)} t.`, "myth 1");
+ok(loads.ez.every((v, t) => !v || (b0.key[t] === "cc" && near(b0.marg[t], F.cc.rate))), "myth 1: in each of the electrolyzer's hours the next MWh is served by the combined-cycle plants");
+onPage("each extra MWh adds about that average.”", "myth 1: the statement compares values (average against marginal), not rankings of hours");
 onPage(`the data center may claim 0 t, while the plants emit ${fm.t(Q.dc.plants.old)} more that day`, "myth 2");
 ok(2000 / 8000 * 100 === 25, "quiz: 2,000 / 8,000 x 100 = 25"); onPage("2,000 ÷ 8,000 = 0.25 t per MWh, times 100 MWh", "quiz");
 onPage(`40 t would be the ${F.cc.rate.toFixed(2)} t of a combined-cycle plant`, "quiz: the marginal distractor");
 onPage(`${P.windMW.toLocaleString("en-US")} MW of wind, ${P.solarMW} MW of solar, ${P.plants.cc.mw.toLocaleString("en-US")} MW of gas combined-cycle plants and ${P.plants.ct.mw.toLocaleString("en-US")} MW of gas peakers`, "data note: the fleet");
-onPage("0.40 and 0.58 t per MWh, counted at the stack", "data note: the rates");
-ok(Math.round(7.535 * 52.91) === 399, "the worked bridge: 7.535 MMBtu per MWh x 52.91 kg = 399 kg"); onPage("7,535 Btu per kWh = 7.535 <span class=\"lx-term\" data-term=\"mmbtu\">MMBtu</span> per MWh; × 52.91 kg = 399 kg", "data note: the worked bridge");
-onPage("t is a metric tonne, 1,000 kg", "data note: t is a metric tonne");
+onPage("399 kg CO₂ per MWh: 0.40 t at the stack", "data note: the combined-cycle rate"); onPage("peakers, 0.58 t.", "data note: the peakers' rate");
+ok(Math.round(7.535 * 52.91) === 399, "the worked bridge: 7.535 MMBtu per MWh x 52.91 kg = 399 kg"); onPage("7,535 Btu per kWh = 7.535 <span class=\"lx-term\" data-term=\"mmbtu\">MMBtu</span> per MWh; × 52.91 kg CO₂ per MMBtu ≈ 399 kg CO₂ per MWh", "data note: the worked bridge, units shown");
+onPage("(1 t = 1,000 kg)", "data note: t is a metric tonne");
 ok(/full-load <span class="lx-term" data-term="heat-rate">heat rates<\/span>/.test(PAGE) && /held at every output/.test(PAGE) && /Part-load efficiency: each plant burns its full-load fuel per MWh at every output/.test(PAGE) && /reported at full load/.test(P.sources.heat.label), "heat rates: full load (EIA Table 8.2's note), held at every output, said on the page");
 // a 300 MW step can overflow the combined-cycle plants' spare room: the next-MWh marginal factor times the load is then not
 // the change; the page draws the load's own extra CO2 per MWh, whose load-weighted sum is the change
@@ -226,8 +228,11 @@ ok(!/\b(always|never)\b/i.test(strs.join(" ")), "no 'always' or 'never' in the p
     demo.cards.go(4); btns(/^New wind/)[0].click();
     ok(card().textContent.includes(fm.dt(Q.ez.long.wind)) && card().textContent.includes(fm.mw(Q.ez.newWindMW)), "step 5: new wind's long-run change and its size");
     demo.cards.go(5);
-    ok(card().textContent.includes(fm.t(Q.ez.claims.hourly)) && card().textContent.includes(fm.dt(Q.ez.plants.old)), "step 6: the purchase table");
+    { const s6 = card().querySelector("#a10-buy"); s6.value = "hourly"; s6.fire("change"); }
+    ok(card().textContent.includes(fm.t(Q.ez.claims.hourly)) && card().textContent.includes(fm.dt(Q.ez.plants.hourly)) && !card().querySelector(".a10-led"), "step 6: the selected purchase's claim and plant change, without the five-row table");
+    ok(card().textContent.includes(A.procure.find(p => p.id === "hourly").note) && /records one MWh from a named plant/.test(card().textContent) && card().querySelector("details.lx-textalt"), "step 6: the purchase's note, what a certificate is, and the rules in a collapsed box");
     ok(xp.textContent.includes("Four questions, four methods") && xp.textContent.includes(fm.t(Q.ez.inv.share)), "explain: the four-question table with the reader's numbers");
+    ok(xp.querySelector(".a10-led") && xp.textContent.includes("Five purchases, one load") && A.procure.every(p => xp.textContent.includes(p.label)) && xp.textContent.includes(fm.t(Q.ez.claims.hourly)) && xp.textContent.includes(fm.dt(Q.ez.plants.old)), "explain: all five purchases with the reader's claims and plant changes");
     // the chart draws the scenario of the step: new wind in step 5 and with a new-wind purchase in step 6, not the old fleet
     demo.cards.go(4); btns(/^New wind/)[0].click();
     const ttl = () => live.querySelector("h3").textContent;

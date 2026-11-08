@@ -51,7 +51,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <tr><td>4 · Claim, new wind matched hour by hour (short hours at the grid average, a proxy)</td><td data-label="Data center">441 t</td><td data-label="Electrolyzer">137 t</td></tr>
 </tbody>
 </table>
-<p class="lx-hint">Claims follow illustrative rules after the GHG Protocol's Scope 2 Guidance (2015): certificates are assumed to be the buyer's alone, retired for it and from the same market.</p>
+<p class="lx-hint">Claims follow illustrative rules after the GHG Protocol's Scope 2 Guidance (2015): certificates (each a record of one MWh from a named plant) are assumed to be the buyer's alone, retired (canceled) for it and from the same market.</p>
 <p class="lx-hint">New wind is assumed to be built for the buyer (additional) and to reach this grid (deliverable).</p>
 <p class="lx-hint">The electrolyzer runs from 00:00 to 12:00, the 12 hours with the lowest average factor (0.10 to 0.17 t CO₂ per MWh). Each of its extra MWh is still served by the combined-cycle plants, at 0.40 t.</p>
 <p class="lx-hint">With JavaScript on, you pick the load, switch the model's rule, choose what gets built and compare five purchases.</p>
@@ -59,7 +59,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 </div>
 <p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Illustrative grid.</b> The Plains Grid is fictional: a 4,000 MW peak; 3,000 MW of wind, 600 MW of solar, 2,000 MW of gas combined-cycle plants and 2,300 MW of gas peakers.</span></p>
 <p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Real plant data.</b> Gas plants' full-load <span class="lx-term" data-term="heat-rate">heat rates</span> are 7,535 and 10,975 Btu per kWh (<a href="https://www.eia.gov/electricity/annual/html/epa_08_02.html">EIA, 2025</a>), held at every output; gas emits 52.91 kg CO₂ per MMBtu (<a href="https://www.eia.gov/environment/emissions/co2_vol_mass.php">EIA</a>).</span></p>
-<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>From heat to CO₂.</b> 7,535 Btu per kWh = 7.535 <span class="lx-term" data-term="mmbtu">MMBtu</span> per MWh; × 52.91 kg = 399 kg. So 0.40 and 0.58 t per MWh, counted at the stack; t is a metric tonne, 1,000 kg.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>From heat to CO₂.</b> 7,535 Btu per kWh = 7.535 <span class="lx-term" data-term="mmbtu">MMBtu</span> per MWh; × 52.91 kg CO₂ per MMBtu ≈ 399 kg CO₂ per MWh: 0.40 t at the stack (1 t = 1,000 kg); peakers, 0.58 t.</span></p>
 <p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Real hours.</b> Demand, wind and sun follow the Southwest Power Pool's hours of 7 November 2025 (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), wind and sun scaled to EIA's 2025 capacity factors (<a href="https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_b">Table 6.07.B</a>). Each hour runs cheapest first, with no ramp limits.</span></p>
 <p class="lx-hint" style="margin-top:.6rem">About 30 guided minutes in seven steps.</p>
 <style>/* lesson-local */
@@ -96,7 +96,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-deeper-body">
 ```
 
-- **[Scope 2]{.lx-term term="scope-2"}.** A company's reported emissions from the electricity, heat or steam it buys. Where buyers can choose contracts, the GHG Protocol's Scope 2 Guidance (2015) asks for two counts.
+- **[Scope 2]{.lx-term term="scope-2"}.** A company's reported emissions from the electricity, steam, heat or cooling it buys. Where buyers can choose contracts, the GHG Protocol's Scope 2 Guidance (2015) asks for two counts.
 - **[Location-based]{.lx-term term="location-based"}.** Each MWh is counted at the grid's average factor where it is used: question 1.
 - **[Market-based]{.lx-term term="market-based"}.** Each MWh is counted at the factor of the electricity the buyer purchased, through contracts or certificates: question 4.
 - **Conditions.** Among other criteria, a certificate must be the buyer's alone, retired for it and from the same market (Table 7.1). Unclaimed use takes a [residual mix]{.lx-term term="residual-mix"}; this lesson uses the grid average instead, as a proxy.
@@ -143,9 +143,9 @@ body-classes: "page-learn page-lesson lx-form-cards"
 ```{=html}
 <div class="lx-myths" data-quiz="a10-myth">
 <div class="lx-qq" data-id="clean-hours" data-answer="myth">
-<p class="lx-qtext">Myth or fact? “The hours with the lowest average CO₂ factor are the hours when extra use adds the least CO₂.”</p>
+<p class="lx-qtext">Myth or fact? “In the hours with the lowest average CO₂ factor, each extra MWh adds about that average.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth, here. From 00:00 to 12:00 the average is 0.10 to 0.17 t per MWh, yet each extra MWh comes from the combined-cycle plants at 0.40 t.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth, on this day. From 00:00 to 12:00 the average is 0.10 to 0.17 t per MWh, yet each extra MWh comes from the combined-cycle plants at 0.40 t.</p></details>
 </div>
 <div class="lx-qq" data-id="certificates" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “When a buyer may claim zero emissions, its use adds no CO₂ at the plants.”</p>
