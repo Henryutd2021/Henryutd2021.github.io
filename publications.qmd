@@ -1,7 +1,7 @@
 ---
 title: "Publications"
-subtitle: "Journal articles, conference papers, papers under review and theses"
-description: "Publications of Honglin Li: journal articles, conference papers, papers under review and theses."
+subtitle: "Journal articles, conference papers and theses"
+description: "Publications of Honglin Li: journal articles, conference papers and theses."
 title-block-banner: true
 page-layout: full
 toc: false
@@ -14,7 +14,7 @@ body-classes: "page-inner page-publications"
 <div class="pg">
 <div class="pub-head">
 <div class="pub-head-text">
-<p class="pg-lede">Newest first: 8 journal articles, 10 conference papers and 2 theses. My name is shown in <span class="me">bold</span>; * marks equal contribution. The list is also on <a href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en">Google Scholar</a>. PDF links give the open-access published version or, where the publisher allows it, the accepted manuscript with the publisher&#8217;s notice.</p>
+<p class="pg-lede">Newest first: 8 journal articles (1 accepted), 10 conference papers and 2 theses. My name is shown in <span class="me">bold</span>; * marks equal contribution. The list is also on <a href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en">Google Scholar</a>. PDF links give the open-access published version or, where the publisher allows it, the accepted manuscript with the publisher&#8217;s notice.</p>
 <p class="pub-cites"><i class="bi bi-quote" aria-hidden="true"></i><span><strong>121 citations</strong> · h-index 7 · i10-index 6 (<a href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en">Google Scholar</a>, as of October 30, 2026). Per-paper counts are from the same profile; papers it does not list use OpenAlex.</span></p>
 </div>
 <figure class="pub-chart" data-type="all">
@@ -337,7 +337,7 @@ body-classes: "page-inner page-publications"
 <div class="pub-authors">G. Shen, <span class="me">H. Li</span>, G. Singh, A. Behjat, G. Toge, S. Senemmar, C. Feng, J. Zhang, A. Mehmani</div>
 <div class="pub-venue"><em>2024 ACEEE Summer Study on Energy Efficiency in Buildings</em>, 2024.</div>
 <div class="pub-links">
-<a class="btn-xs" href="files/papers/shen2024demand.pdf" title="Published version; the authors keep the copyright (ACEEE holds a non-exclusive licence)">PDF</a>
+<a class="btn-xs" href="files/papers/shen2024demand.pdf" title="Published version; the authors keep the copyright (ACEEE holds a non-exclusive license)">PDF</a>
 <a class="btn-xs" href="projects/ghg.html">Project</a>
 <button type="button" class="btn-xs bib-toggle" aria-expanded="false" aria-controls="bib-shen2024demand">Bib</button>
 <a class="chip cite-chip" href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en" title="Citations on Google Scholar (as of October 30, 2026)"><i class="bi bi-quote" aria-hidden="true"></i>Cited by 1</a>

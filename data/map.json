@@ -45,6 +45,12 @@
      "status": "published"
     },
     {
+     "title": "Demand-side Management Under Real-time Greenhouse Gas Emission Factor for Electricity",
+     "year": 2024,
+     "doi": null,
+     "status": "published"
+    },
+    {
      "title": "Techno-economic analysis incorporating intelligent operation and maintenance management: a case study of an integrated offshore wind and hydrogen energy system",
      "year": 2024,
      "doi": "10.1088/1742-6596/2767/6/062016",
@@ -93,7 +99,46 @@
      "status": "published"
     }
    ],
-   "count": 13
+   "count": 14
+  },
+  {
+   "id": "I13511017",
+   "name": "Texas State University",
+   "type": "education",
+   "city": "San Marcos",
+   "region": "Texas",
+   "country": "United States",
+   "country_code": "US",
+   "lat": 29.88327,
+   "lon": -97.94139,
+   "home": true,
+   "papers": [
+    {
+     "title": "Facility and microgrid location-allocation for integrated supply chain and transactive energy operations",
+     "year": 2023,
+     "doi": "10.1016/j.apm.2023.02.014",
+     "status": "published"
+    },
+    {
+     "title": "Locating and Allocating Warehouse Facilities and Prosumer Microgrid in Transactive Energy Paradigm",
+     "year": 2023,
+     "doi": "10.1109/segre58867.2023.00071",
+     "status": "published"
+    },
+    {
+     "title": "Supply chain design for transactive energy operations in the nexus of manufacturing, microgrid and climate",
+     "year": 2022,
+     "doi": "10.1080/01605682.2022.2035273",
+     "status": "published"
+    },
+    {
+     "title": "System availability considering redundancy, maintenance and spare parts with dual repair processes",
+     "year": 2021,
+     "doi": null,
+     "status": "published"
+    }
+   ],
+   "count": 4
   },
   {
    "id": "I189590672",
@@ -129,39 +174,6 @@
    "count": 3
   },
   {
-   "id": "I13511017",
-   "name": "Texas State University",
-   "type": "education",
-   "city": "San Marcos",
-   "region": "Texas",
-   "country": "United States",
-   "country_code": "US",
-   "lat": 29.88327,
-   "lon": -97.94139,
-   "home": true,
-   "papers": [
-    {
-     "title": "Facility and microgrid location-allocation for integrated supply chain and transactive energy operations",
-     "year": 2023,
-     "doi": "10.1016/j.apm.2023.02.014",
-     "status": "published"
-    },
-    {
-     "title": "Locating and Allocating Warehouse Facilities and Prosumer Microgrid in Transactive Energy Paradigm",
-     "year": 2023,
-     "doi": "10.1109/segre58867.2023.00071",
-     "status": "published"
-    },
-    {
-     "title": "Supply chain design for transactive energy operations in the nexus of manufacturing, microgrid and climate",
-     "year": 2022,
-     "doi": "10.1080/01605682.2022.2035273",
-     "status": "published"
-    }
-   ],
-   "count": 3
-  },
-  {
    "id": "I2800102766",
    "name": "Idaho National Laboratory",
    "type": "facility",
@@ -189,27 +201,6 @@
    "count": 2
   },
   {
-   "id": "I136199984",
-   "name": "Harvard University",
-   "type": "education",
-   "city": "Cambridge",
-   "region": "Massachusetts",
-   "country": "United States",
-   "country_code": "US",
-   "lat": 42.3751,
-   "lon": -71.10561,
-   "home": false,
-   "papers": [
-    {
-     "title": "Real-time greenhouse gas emission intensity informed demand-side load regulation for power grid decarbonization",
-     "year": 2025,
-     "doi": "10.1016/j.crsus.2025.100367",
-     "status": "published"
-    }
-   ],
-   "count": 1
-  },
-  {
    "name": "Nantum AI",
    "type": "company",
    "city": "New York",
@@ -226,9 +217,15 @@
      "year": 2025,
      "doi": "10.1016/j.crsus.2025.100367",
      "status": "published"
+    },
+    {
+     "title": "Demand-side Management Under Real-time Greenhouse Gas Emission Factor for Electricity",
+     "year": 2024,
+     "doi": null,
+     "status": "published"
     }
    ],
-   "count": 1
+   "count": 2
   },
   {
    "id": "I1297288678",
@@ -243,9 +240,36 @@
    "home": false,
    "papers": [
     {
+     "title": "Demand-side Management Under Real-time Greenhouse Gas Emission Factor for Electricity",
+     "year": 2024,
+     "doi": null,
+     "status": "published"
+    },
+    {
      "title": "A Multi-Fidelity Gaussian Process Regression Method for Probabilistic Wind Farm Power Curve Estimation",
      "year": 2023,
      "doi": "10.1115/detc2023-114762",
+     "status": "published"
+    }
+   ],
+   "count": 2
+  },
+  {
+   "id": "I136199984",
+   "name": "Harvard University",
+   "type": "education",
+   "city": "Cambridge",
+   "region": "Massachusetts",
+   "country": "United States",
+   "country_code": "US",
+   "lat": 42.3751,
+   "lon": -71.10561,
+   "home": false,
+   "papers": [
+    {
+     "title": "Real-time greenhouse gas emission intensity informed demand-side load regulation for power grid decarbonization",
+     "year": 2025,
+     "doi": "10.1016/j.crsus.2025.100367",
      "status": "published"
     }
    ],
@@ -374,18 +398,7 @@
  ],
  "dropped_institutions": [],
  "institutions_without_geo": [],
- "papers_not_on_map": [
-  {
-   "key": "jin2021system",
-   "doi": null,
-   "reason": "no DOI and no manual affiliations"
-  },
-  {
-   "key": "shen2024demand",
-   "doi": null,
-   "reason": "no DOI and no manual affiliations"
-  }
- ],
+ "papers_not_on_map": [],
  "presentations_skipped": [
   {
    "event": "2021 International Research Conference",
