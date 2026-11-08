@@ -8,6 +8,10 @@
 //     with no fire inside it the monthly count equals the restriction's closed form, and together the loss lies between
 //     the larger single loss and the two added, and depends on when the fire comes
 //   - the lever sort agrees with the model where the model can show it (each "yes" lever improves its shock)
+//   - the explain layer over every restriction lever: the chain's share, its branch (shortage or none) and every tied
+//     mineral; the concept map's links all labelled, its text version read on a stub document (stubdom.js)
+//   - the one-country benchmark over the whole need, recycling included, single countries only; steps 5 and 8 show their
+//     inputs and a worked line that balances; the board's rows read as separate tests; terms spelled out in the no-JS block
 //   - the excerpt: E8.3 word for word against the approved wording, E8.7 under it, the AMM citation; no other research wording
 //   - the page: generated blocks up to date (--write rewrites them); no Prairieland number retyped; the fictional line;
 //     links on the allow-list; no nuclear term; text budget; the sidecar's terms
@@ -180,12 +184,14 @@ const stepTexts = [...JS.matchAll(/\{ text: "((?:[^"\\]|\\.)*)",\n\s*build/g)].m
 ok(stepTexts.length === 10, "ten step cards (" + stepTexts.length + ")");
 stepTexts.forEach((t, i) => { const n = nWords(t); ok(n >= 18 && n <= 36, "step " + (i + 1) + ": " + n + " words (about 35)"); ok(nSent(t) <= 2, "step " + (i + 1) + ": " + nSent(t) + " sentences"); });
 { const S = S0, on = { spike: true, closure: true, ban: true, fire: true };
-  const lines = [M.depLine(PL), M.depLine(PL, "substitution"), M.depSaw(PL), M.straitSaw(PL), M.hhiLine(PL, D, 90), M.hhiLine(PL, D, 30), M.hhiSaw(PL, D, 90), M.spikeLine(PL, 0), M.spikeSaw(PL, 0), M.spikeSaw(PL, 30),
+  const lines = [M.depLine(PL), M.depLine(PL, "substitution"), M.depSaw(PL), M.straitSaw(PL), M.hhiLine(PL, D, 90), M.hhiLine(PL, D, 30, 0), M.hhiLine(PL, D, 90, 40), M.hhiSaw(PL, D, 90), M.spikeLine(PL, 0), M.spikeSaw(PL, 0), M.spikeSaw(PL, 30),
     M.closureLine(PL, D, S), M.closureSaw(PL, D, S), M.closureLine(PL, D, Object.assign({}, S, { weeks: 26, restraint: 20 })), M.closureSaw(PL, D, Object.assign({}, S, { weeks: 26, stockDays: 0 })),
     M.banLine(PL, S), M.banSaw(PL, S), M.fireLine(PL, S), M.fireLine(PL, Object.assign({}, S, { split: 50 })), M.fireSaw(PL, S), M.boardLine(PL, D, on, S), M.boardSaw(PL, D, on, S)].concat(Object.values(M.PREDICT.feedback), [D.thresholds.hhiWhat, D.thresholds.oneCountryWhat]);
   ["dep", "strait", "hhi", "spike", "closure", "ban", "fire", "board"].forEach(k => lines.push(...M.notesFor(PL, D, k)));
   D.fireTiming.forEach(x => lines.push(M.boardSaw(PL, D, on, S, x.key), M.boardSaw(PL, D, { spike: false, closure: false, ban: true, fire: true }, S, x.key)));
-  lines.push(M.hhiSaw(PL, D, 30), M.fireLine(PL, Object.assign({}, S, { split: 30 })));
+  lines.push(M.hhiSaw(PL, D, 30), M.fireLine(PL, Object.assign({}, S, { split: 30 })), M.groupNote(PL, D), M.spikeWork(PL, 0), M.spikeWork(PL, 30), M.fireWork(PL, S), M.fireWork(PL, Object.assign({}, S, { split: 50 })));
+  // the explain chain in each of its branches: a shortage, a tie, no shortage
+  [S, Object.assign({}, S, { cap: 30 }), Object.assign({}, S, { cap: 30, recycled: 40, mineralDays: 360 })].forEach(o => { const c = M.explainChain(PL, D, o, "with your levers"); lines.push(c.note); c.links.forEach(l => lines.push(l.title + ". " + l.text)); });
   lines.forEach(t => { ok(nWords(t) <= 40, "a line of " + nWords(t) + " words: " + plain(t).slice(0, 60)); ok(nSent(t) <= 2, "a line of " + nSent(t) + " sentences: " + plain(t).slice(0, 60)); }); }
 // every step's notes are on the page through notes(act, key); the assumptions behind each stress test are listed there
 ok(["dep", "strait", "hhi", "spike", "closure", "ban", "fire", "board"].every(k => new RegExp("notes\\(act, \"" + k + "\"\\)").test(JS)) && M.notesFor(PL, D, "board").indexOf(D.assume.overlap) >= 0 && M.notesFor(PL, D, "spike").indexOf(D.assume.spikeStocks) >= 0, "each step lists its notes, one idea per line; the combined count and the stocks caveat among them");
@@ -207,7 +213,7 @@ ok(/id: hhi\b/.test(SIDE) && /\[\[hhi\||term="hhi"/.test(JS + PAGE), "the sideca
 // layer, the refiner label, the shadow price
 { const sp = M.spikeSaw(PL, 0), my = M.myths(PL, D);
   ok(!/do not help|only using less gas helps/.test(sp + my + JS) && /cushions? .*while it lasts/.test(my) && /stored gas can cushion purchases while it lasts/.test(D.assume.spikeStocks) && D.sort.items.find(x => x.key === "stocks").ref.spike === "partly", "stocks against a price spike: partly, in the step, the myth and the sort alike");
-  ok(/supply groups/.test(M.hhiSaw(PL, D, 90)) && /upper bound/.test(M.hhiSaw(PL, D, 90)) && /upper bound/.test(PAGE) && !/four refiners/.test(PAGE + JS), "the four suppliers are supply groups; the HHI shown is an upper bound");
+  ok(/supply group/.test(M.hhiLine(PL, D, 90)) && M.notesFor(PL, D, "hhi").indexOf(M.groupNote(PL, D)) >= 0 && /upper bound/.test(M.groupNote(PL, D)) && /upper bound/.test(PAGE) && !/four refiners/.test(PAGE + JS), "the four suppliers are supply groups; the HHI shown is an upper bound, in a note of its own");
   ok(PL.imports.minerals.hhiMethod.indexOf(M.fmtN(D.thresholds.hhiHigh)) >= 0 && /2023/.test(PL.imports.minerals.hhiMethod), "the shared data's HHI reading is the 2023 guidelines' " + M.fmtN(D.thresholds.hhiHigh) + ", as the page says");
   const si = M.straitInputs(PL); ok(si.length === 3 && si[0][1] === M.fmtN(I.oil.importPJ) && si[1][1] === M.fmtN(I.lng.importPJ) && si[2][1] === M.fmtN(M.dependence(PL).primary) && /straitInputs\(PL\)/.test(JS), "step 3 shows the inputs its question needs");
   ok(/function paintExplain\(\)/.test(JS) && /setTimeout\(paintExplain/.test(JS) && /ban\(PL, S\)/.test(JS) && /with your levers/.test(JS) && /with 2025's settings/.test(JS), "the explain layer is drawn from the reader's levers and says whose numbers they are");
@@ -216,6 +222,114 @@ ok(/id: hhi\b/.test(SIDE) && /\[\[hhi\||term="hhi"/.test(JS + PAGE), "the sideca
 // import-dependence: one definition for the course, in F10's sidecar (F10 teaches it first)
 const F10SIDE = fs.readFileSync(path.join(SITE, "learn/_w1/f10-nations-differ.yml"), "utf8");
 ok(/id: import-dependence\b/.test(F10SIDE) && !/id: import-dependence\b/.test(SIDE) && /\[\[import-dependence\||term="import-dependence"/.test(JS + PAGE), "F10's sidecar defines import-dependence (one definition); the page marks it");
+
+// ---------------- the explain layer follows the reader's levers (the chain, the concept map)
+{ const R = M.shockOf(PL, "mineralBan").params.supplier, txt = c => c.links.map(l => l.title + " | " + l.text + " | " + l.value).join(" / ");
+  const avgR = o => M.ban(PL, o).rows.reduce((s, x) => s + x.sR, 0) / M.ban(PL, o).rows.length;
+  // the case where output does not fall: no shortage, no slowdown, the stopped country's share as it now stands
+  const A = Object.assign({}, S0, { cap: 30, recycled: 40, mineralDays: 360 }), cA = M.explainChain(PL, D, A, "with your levers"), bA = M.ban(PL, A);
+  ok(bA.q >= 1 && cA.links[0].value === "30% of the minerals, on average" && /^No mineral runs short$/.test(cA.links[1].title) && cA.links[2].value === M.gwh(bA.output) + " of " + M.gwh(bA.output) && !/runs short first|run short together|slows/.test(txt(cA)) && /with your levers$/.test(cA.title),
+    "explain chain, cap 30%, recycling 40%, 360 days: no mineral runs short, 24.0 of 24.0 GWh, Country R at 30% (" + txt(cA) + ")");
+  // a case where output falls: 2025's settings, graphite alone first, Country R at its 2025 average
+  const c0 = M.explainChain(PL, D, S0, "with 2025's settings"), b0 = M.ban(PL, S0);
+  ok(b0.q < 1 && c0.links[0].title === M.refiner(PL, R) + " stops exporting" && c0.links[0].value === M.pct(I.minerals.leadingShareAverage) + " of the minerals, on average" && c0.links[1].title === "Graphite (anodes) runs short first" && c0.links[2].title === "The factory slows" && c0.links[2].value === M.gwh(b0.made) + " of " + M.gwh(b0.output),
+    "explain chain at 2025's settings: graphite runs short first, the factory slows to " + M.gwh(b0.made));
+  // a tie: with every share capped at 30%, all four minerals run short together and the chain names each one
+  const cT = M.explainChain(PL, D, Object.assign({}, S0, { cap: 30 }), "with your levers"), bT = M.ban(PL, Object.assign({}, S0, { cap: 30 }));
+  ok(bT.q < 1 && bT.binds.length === 4 && /run short together$/.test(cT.links[1].title) && bT.binds.every(x => cT.links[1].title.toLowerCase().indexOf(x.label.toLowerCase()) >= 0), "explain chain, cap 30%: every tied mineral named (" + cT.links[1].title + ")");
+  // over every restriction lever: the displayed share from the current distribution, the branch on the output, ties named
+  let good = true, n = 0;
+  range(D.levers.cap).forEach(cap => range(D.levers.recycled).forEach(r => range(D.levers.mineralDays).forEach(md => {
+    const o = Object.assign({}, S0, { cap: cap, recycled: r, mineralDays: md }), b = M.ban(PL, o), c = M.explainChain(PL, D, o, "with your levers"), t = txt(c); n++;
+    if (c.links.length !== 4 || c.links[0].value !== M.pct(avgR(o)) + " of the minerals, on average" || c.links[2].value !== M.gwh(b.made) + " of " + M.gwh(b.output)) good = false;
+    if ((b.q < 1) !== /The factory slows/.test(t) || (b.q >= 1) !== /No mineral runs short/.test(t)) good = false;
+    if (b.q < 1 && (!b.binds.every(x => c.links[1].title.toLowerCase().indexOf(x.label.toLowerCase()) >= 0) || (b.binds.length > 1) !== /run short together/.test(c.links[1].title) || c.links[1].value !== M.pct(b.bind.a) + " a year, plus stocks")) good = false;
+    if (/undefined|NaN/.test(t + c.note)) good = false;
+  })));
+  ok(good && n === 13 * 9 * 13, "explain chain: share, branch and every tied mineral follow the levers (" + n + " cases)");
+  ok(/explainChain\(PL, D, S, whose\)/.test(JS) && /explainMap\(PL, D, S, whose\)/.test(JS) && !/leadingShareAverage\) \+ " of the minerals/.test(JS), "the page draws the chain and the map from the reader's levers");
+  // the concept map: every link carries its relationship; the text version (as LX.ConceptMap writes it) has no gap
+  const cm = M.explainMap(PL, D, S0, "with 2025's settings"), byId = {}; cm.nodes.forEach(x => { byId[x.id] = x; });
+  ok(cm.edges.length === 7 && cm.edges.every(e => e.length === 3 && byId[e[0]] && byId[e[1]] && typeof e[2] === "string" && /^[a-z][a-z ]+[a-z]$/.test(e[2])), "concept map: every edge has two known ends and a relationship label");
+  const alt = cm.nodes.map(x => { const links = cm.edges.filter(e => e[0] === x.id || e[1] === x.id).map(e => e[0] === x.id ? x.label + " " + e[2] + " " + byId[e[1]].label : byId[e[0]].label + " " + e[2] + " " + x.label); return x.label + ": " + x.text + (links.length ? " Links: " + links.join("; ") + "." : ""); }).join("\n");
+  ok(!/undefined/.test(alt) && /Prices hurt more with Import dependence/.test(alt) && /Sites backed up by A second site/.test(alt) && /HHI offset by Diversify, recycle/.test(alt), "concept map's text version reads each link with its relationship, no 'undefined'");
+  const cmA = M.explainMap(PL, D, A, "with your levers");
+  ok(cmA.nodes.find(x => x.id === "sup").game === "Step 7: output " + M.pct(bA.q) + "." && /with your levers/.test(cmA.lede), "concept map's step numbers follow the levers");
+  // the shared components themselves, on a stub document: the map's text version and the chain as a reader gets them
+  const { env, load } = require("./stubdom.js"), E = env(); load("conceptmap", E); load("causal", E);
+  const h1 = E.LX.H("div", null, E.body); E.LX.ConceptMap(h1, cm);
+  const tv = (h1.querySelectorAll(".lx-textalt")[0] || { textContent: "" }).textContent;
+  ok(/Prices hurt more with Import dependence/.test(tv) && /Routes bridged by Days of stocks/.test(tv) && !/undefined/.test(tv), "stub: LX.ConceptMap's text version names every relationship, no 'undefined'");
+  const h2 = E.LX.H("div", null, E.body), h3 = E.LX.H("div", null, E.body); E.LX.CausalChain(h2, cA); E.LX.CausalChain(h3, c0);
+  ok(/No mineral runs short/.test(h2.textContent) && /24\.0 GWh of 24\.0 GWh/.test(h2.textContent) && !/slows|runs short first/.test(h2.textContent) && /Graphite \(anodes\) runs short first/.test(h3.textContent) && /The factory slows/.test(h3.textContent), "stub: LX.CausalChain shows the branch the levers give"); }
+
+// ---------------- the one-country benchmark: share of the whole need, single countries only; the HHI unchanged
+{ const n = I.minerals.suppliers.length;
+  ok(/^Other refiners$/.test(M.refiner(PL, n - 1)) && /'Other refiners' is one group/.test(I.minerals.hhiMethod), "the last supply group is the group of other refiners, as the shared data says");
+  const b5 = M.benchmark(PL, D, 90, 5), b40 = M.benchmark(PL, D, 90, 40), g40 = b40.find(x => x.key === "graphite");
+  ok(b5.filter(x => x.over).map(x => x.key).join() === "graphite,cobalt" && near(g40.share, 0.6 * 0.9) && !g40.over && b40.every(x => !x.over), "benchmark: graphite and cobalt above 65% with 5% recycled; graphite 54% of the need with 40% recycled, none above");
+  let good = true;
+  range(D.levers.cap).forEach(cap => range(D.levers.recycled).forEach(r => { const B = M.benchmark(PL, D, cap, r), Mn = M.minerals(PL, cap), cnt = B.filter(x => x.over).length;
+    B.forEach((x, i) => { const top = Math.max.apply(null, Mn[i].shares.slice(0, n - 1)); if (!near(x.share, (1 - r / 100) * top) || x.top === n - 1 || x.over !== (x.share > D.thresholds.oneCountry + 1e-9)) good = false; });
+    const ln = M.hhiLine(PL, D, cap, r); if (cnt ? ln.indexOf("In " + cnt + " of " + B.length + ", one country supplies") < 0 : !/For no mineral does one country supply/.test(ln)) good = false;
+    if (!(r > 0 ? ln.indexOf("counting the " + r + "% recycled at home") >= 0 : /nothing recycled at home/.test(ln))) good = false; }));
+  ok(good, "benchmark: (1 - recycled) x the largest single country's share, every cap and recycling share; the line's count and recycling agree");
+  // a group never counts as one country: give "Other refiners" 90% of graphite; the HHI is the same, the count is not
+  const PX = JSON.parse(JSON.stringify(PL)); PX.imports.minerals.items.graphite.shares = I.minerals.items.graphite.shares.slice().reverse();
+  const gx = M.benchmark(PX, D, 90, 5).find(x => x.key === "graphite");
+  ok(!gx.over && gx.top !== n - 1 && near(M.minerals(PX).find(x => x.key === "graphite").hhi, M.minerals(PL).find(x => x.key === "graphite").hhi), "benchmark: a group with 90% is not one country above 65%; the HHI is unchanged");
+  ok(/hhiLine\(PL, D, S\.cap, S\.recycled\)/.test(JS), "step 4's line reads the recycling lever for the benchmark"); }
+
+// ---------------- the inputs beside steps 5 and 8, and one worked multiplication each
+{ const num = t => Number(String(t).replace(/[$,]/g, ""));
+  let good = true;
+  range(D.levers.gasCut).forEach(c => { const s = M.spike(PL, c), w = M.spikeWork(PL, c), rows = M.spikeInputs(PL, c);
+    const m = [...w.matchAll(/([\d,.]+) PJ × \$([\d.]+) × \(([\d.]+) − 1\) = \$([\d,]+) million/g)];
+    if (m.length !== 2 || m.some(x => !near(num(x[1]) * num(x[2]) * (num(x[3]) - 1), num(x[4]), 0.5))) good = false;
+    if (!near(num(m[0][4]) / 1000, s.abroad, 0.0005) || !near(num(m[1][4]) / 1000, s.home, 0.0005)) good = false;
+    if (rows.length !== 2 || num(rows[0][1]) !== num(m[0][1]) || num(rows[1][1]) !== num(m[1][1]) || num(rows[0][2]) !== s.lngPrice || num(rows[1][2]) !== s.gasPrice) good = false; });
+  ok(good && /\$4\.05/.test(M.spikeWork(PL, 0)), "step 5: the LNG and domestic gas volumes and prices beside the result; the worked line balances for every cut");
+  good = true; const Fb = PL.factories.battery;
+  range(D.levers.split).forEach(sp => { const o = Object.assign({}, S0, { split: sp }), f = M.fire(PL, o), w = M.fireWork(PL, o), rows = M.fireInputs(PL, o).map(r => r[1]).join(" | ");
+    const mc = w.match(/^Cells: (\d+)\/12 × (?:\((\d+) − (\d+) × ([\d.]+)\)|(\d+)) = ([\d.]+) GWh\. Work: ([\d,]+) × (?:\(1 − ([\d.]+)\) × )?(\d+)\/12 = ([\d,]+) job-years\.$/);
+    if (!mc) { good = false; return; }
+    const lost = mc[5] ? num(mc[1]) / 12 * num(mc[5]) : num(mc[1]) / 12 * (num(mc[2]) - num(mc[3]) * num(mc[4])), jy = num(mc[7]) * (1 - (mc[8] ? num(mc[8]) : 0)) * num(mc[9]) / 12;
+    if (!near(lost, num(mc[6]), 0.05) || !near(lost, f.lost, 0.05) || !near(jy, num(mc[10]), 0.5) || !near(jy, f.jobYears, 0.5)) good = false;
+    if (rows.indexOf(M.fmtN(Fb.output2025GWh) + " GWh") < 0 || rows.indexOf(M.fmtN(Fb.capacityGWh) + " GWh") < 0 || rows.indexOf(M.fmtN(Fb.jobs)) < 0) good = false; });
+  ok(good, "step 8: output, capacity and jobs beside the result; the worked line balances for every split");
+  ok(/spikeInputs\(PL, S\.gasCut\)/.test(JS) && /spikeWork\(PL, S\.gasCut\)/.test(JS) && /fireInputs\(PL, S\)/.test(JS) && /fireWork\(PL, S\)/.test(JS), "steps 5 and 8 show their inputs and worked lines"); }
+
+// ---------------- wording: the board's coupling, the lever sort's boundary, terms, the HHI takeaway
+{ const t9 = stepTexts[8];
+  ok(/separate stress test/.test(t9) && /restriction and the fire/.test(t9) && !/Now combine them/.test(JS) && M.notesFor(PL, D, "board").indexOf(D.assume.parallel) >= 0 && /not the LNG a closure stops/.test(D.assume.parallel), "step 9: parallel stress tests; only the restriction and the fire are counted together");
+  const lw = D.sort.items.find(x => x.key === "less").why.ban;
+  ok(!/Electrifying/.test(RAW) && /On this page/.test(lw) && /mineral need stays the same/.test(lw), "lever sort: using less is judged inside the page's boundary (gas and oil only)");
+  const dep = M.notesFor(PL, D, "dep")[0], fb = M.staticFallback(PL, D);
+  ok(!/bunkers/.test(JS + RAW + PAGE) && /gross available energy: all the energy supplied in a country/.test(dep) && /\*\*Gross available energy\.\*\*/.test(PAGE), "gross available energy explained where it appears; no unexplained 'bunkers'");
+  ok(/LNG \(liquefied natural gas\)/.test(fb) && /PJ \(petajoules\)/.test(fb) && /Herfindahl-Hirschman index \(HHI\)/.test(fb) && /refining, the step that makes mined minerals battery-grade/.test(fb), "the no-JS block spells out LNG, PJ, HHI and refining");
+  ok(/id: refining\b/.test(SIDE) && /\[\[refining\|/.test(JS), "the sidecar defines and the page marks refining");
+  const hs = M.hhiSaw(PL, D, 90);
+  ok(nSent(hs) === 1 && nWords(hs) <= 20 && !/upper bound|cannot go below/.test(hs), "the HHI takeaway is one idea; the grouped-data caveat is a note, the floor under Go deeper"); }
+
+// ---------------- the page on a stub document, with levers saved from an earlier visit
+{ const vm = require("vm"), { env, load } = require("./stubdom.js");
+  const E = env({ store: { a21: JSON.stringify({ cap: 30, recycled: 40, mineralDays: 360, fireAt: "start" }) } });
+  E.LX.ready = () => {}; E.LX.visible = () => false; E.LX.lesson = () => ({ form: "cards" }); E.LX.progress.guess = () => null;
+  ["cards", "controls", "toggle", "predict", "numanswer", "ledger", "cardsort", "conceptmap", "causal", "boundary", "table"].forEach(n => load(n, E));
+  let init = null, demo = null, threw = null;
+  E.LX.mount = (slug, f) => { if (slug === "security-minerals") init = f; };
+  E.LX.demo = (root, fn, cards) => { demo = { fn, cards }; };
+  const ctx = { window: E.window, document: E.document, location: E.location, navigator: {}, console, module: undefined, require: undefined, setTimeout: f => { f(); return 0; }, clearTimeout: () => {} };
+  const ex = E.LX.H("div", { id: "a21-explain" }, E.body);
+  try { vm.runInNewContext(JS, ctx); const root = E.LX.H("div", null, E.body); init(E.LX.H("div", null, root), { prairieland: PL, a21_security_minerals: D }, root); } catch (e) { threw = e.stack || e.message; }
+  ok(!threw && demo && demo.cards, "stub: the page mounts" + (threw ? ": " + threw : ""));
+  if (!threw && demo) {
+    const xt = ex.textContent, card = () => demo.cards.el.textContent;
+    ok(/with your levers/.test(xt) && /No mineral runs short/.test(xt) && /30% of the minerals, on average/.test(xt) && !/The factory slows/.test(xt) && !/undefined/.test(xt), "stub: the explain layer follows the saved levers (no shortage, Country R at 30%)");
+    demo.cards.go(4); ok(card().indexOf("$" + M.fmtN(PL.costs.fuels.gas.def, 2)) >= 0 && card().indexOf(M.spikeWork(PL, 0)) >= 0, "stub: step 5 shows the domestic gas price and its worked line");
+    demo.cards.go(7); ok(/Jobs at the factory/.test(card()) && card().indexOf(M.fmtN(PL.factories.battery.jobs)) >= 0 && card().indexOf(M.fmtN(PL.factories.battery.capacityGWh) + " GWh a year") >= 0 && card().indexOf(M.fireWork(PL, M.defaults(PL, D))) >= 0, "stub: step 8 shows output, capacity, jobs and its worked line");
+    demo.cards.go(3); ok(card().indexOf("counting the 40% recycled at home") >= 0 && card().indexOf(M.groupNote(PL, D)) >= 0, "stub: step 4's benchmark reads the saved recycling share; the group note is listed");
+  } }
 
 console.log((fails ? "FAILED " + fails + " of " : "ok: ") + checks + " checks (" + ID + ")");
 process.exit(fails ? 1 : 0);

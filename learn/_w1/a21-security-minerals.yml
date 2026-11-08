@@ -12,6 +12,9 @@ glossary:
   - id: petajoule
     term: Petajoule (PJ)
     def: "A unit of energy equal to a million gigajoules (10^15 joules, about 278 GWh), used for a country's yearly fuel use."
+  - id: refining
+    term: Refining (of minerals)
+    def: "Processing mined ore or concentrate into the pure chemicals and materials a factory can use, such as battery-grade lithium chemicals or graphite."
 requests:
   - "Excerpt placement: A21's Real-world card quotes excerpt:supply-chain-mg E8.3 with E8.7 under it, and cites the AMM paper (E8.17); the course plan lists excerpt:supply-chain-mg for A21, while the approved wording's 'Where it would appear' column does not."
   - "prairieland.json (via its data build step): realWorld 'iea-gcmo-2025' says 'Leading refiner of strategic minerals, 2025', the report year; the IEA's figure uses the latest year available for each mineral. Suggest 'Leading refiner of strategic minerals, IEA report of 2025 (latest year available for each mineral; years vary)'; A21 shows that label from its own data (facts.what) until then."

@@ -84,7 +84,7 @@ const QPATH = path.join(X.SITE, "learn/m13-national-pathway.qmd");
   const st7 = Object.assign({}, DEEP, { bud: LINE.mt }), V7 = E4.view((await run(st7)).results.plan, P), S7 = E4.sysOf(st7, P), w7 = PG.deepWords(V7, LINE.mt);
   ok(V7.over > 0.5 && w7.indexOf(PG.kilo(V7.over) + " Mt over") >= 0 && w7.indexOf("no pathway emits less than " + PG.kilo(V7.cum) + " Mt") >= 0, "step 7: the straight line to zero (" + LINE.mt + " Mt) is out of reach by " + V7.over + " Mt: the prediction's answer is no");
   // the budget gap with A20 (E4.GAP, shown on SB4, M13 and C4): the floor about 2,700 Mt; the build-rate and transmission
-  // limits lifted a hundredfold move it by about 5 Mt; A20's electrification path inside a copy of the engine lowers it to
+  // limits lifted a hundredfold move it by about 1 Mt; A20's electrification path inside a copy of the engine lowers it to
   // about 2,400 Mt and meets 2,600 Mt
   {
     const floor = async (EE, PP) => { const st = Object.assign({}, EE.defaults(EE.schema(PP)), { eb: PP.elRange.buildings.hi, et: PP.elRange.transport.hi, ei: PP.elRange.industry.hi, bud: 500 }); return EE.view((await EE.solve(st, PP, { solver })).results.plan, PP).cum; };
@@ -95,7 +95,7 @@ const QPATH = path.join(X.SITE, "learn/m13-national-pathway.qmd");
     const ctx = { module: { exports: {} } }; vm.runInNewContext(SRC.replace(pat, "z = (function () { var s0 = P.sigma0[k], e50 = s0 + Z[k] * (1 - s0), e = Math.min(e50, s0 + 0.15 * (y - P.base) / 5); return Math.max(0, (e - s0) / (1 - s0)); })()"), ctx);
     const EA = ctx.module.exports, PA = EA.prepare(PL, cfg), f2 = await floor(EA, PA);
     const stA = Object.assign({}, EA.defaults(EA.schema(PA)), { eb: PA.elRange.buildings.hi, et: PA.elRange.transport.hi, ei: PA.elRange.industry.hi, bud: 2600 }), VA = EA.view((await EA.solve(stA, PA, { solver })).results.plan, PA);
-    ok(SRC.indexOf(pat) >= 0 && Math.round(f0 / 100) * 100 === 2700 && f0 - f1 >= 2 && f0 - f1 <= 8 && Math.round(f2 / 100) * 100 === 2400 && VA.over === 0 && /about 5 Mt/.test(E4.GAP[2]) && /about 2,400 Mt/.test(E4.GAP[2]),
+    ok(SRC.indexOf(pat) >= 0 && Math.round(f0 / 100) * 100 === 2700 && f0 - f1 >= 0 && f0 - f1 <= 3 && Math.round(f2 / 100) * 100 === 2400 && VA.over === 0 && /about 1 Mt/.test(E4.GAP[2]) && /about 2,400 Mt/.test(E4.GAP[2]),
       "the gap with A20: the floor " + f0 + " Mt; limits x100: " + f1 + " Mt (" + (f0 - f1) + " Mt lower); A20's electrification path inside the engine: " + f2 + " Mt, and 2,600 Mt met ($" + (VA.pv.total / 1000).toFixed(1) + " bn)");
   }
   const rem = PG.remains(S7), rr = PG.remainRows(S7);
@@ -143,6 +143,17 @@ const QPATH = path.join(X.SITE, "learn/m13-national-pathway.qmd");
   ["steps", "explain", "check", "sources"].forEach(id => ok(new RegExp("::: \\{#" + id + " \\.lx-sec\\}").test(PAGE), "section #" + id));
   ok(/data-learn="m13" data-src="\.\.\/assets\/learn\/data\/prairieland\.json \.\.\/assets\/learn\/data\/e4-pathways\.json \.\.\/assets\/learn\/data\/e4-library\.json \.\.\/assets\/learn\/data\/path\.json"/.test(PAGE), "data-src: the nation, the engine's settings, the library, the course map");
   ok(/m13-national-pathway\.js/.test(PAGE) && /learn\.js/.test(PAGE), "scripts");
+  // the engine's rules as the page and the notebook state them: the cap's base less battery and link losses; winter in
+  // order, its days paying back the scarce-wind week; the budget's verdicts from the LP's flag (0.4 Mt over is over)
+  { const NBX = fs.readFileSync(path.join(X.SITE, "learn/notebooks/m13-national-pathway.ipynb"), "utf8");
+    ok(/imports\}?\(f_p\) \\le \\text\{cap\} \\cdot \(\\text\{primary\}_p - \\text\{losses\}_p\)/.test(PAGE) && T.indexOf("Primary energy less what batteries and links lose: electricity lost there does not count toward the cap.") >= 0 &&
+      /imports ≤ cap × \(primary energy − battery and link losses\)/.test(JS) && /Lo: \{ name: "loss_p"/.test(JS) && /V\.lossPJ/.test(JS) && /cap × \(primary energy − what batteries and links lose\)/.test(NBX) && /for x, c in lossE: t\[x\] = t\.get\(x, 0\) \+ S\[\\"cap\\"\] \* c/.test(NBX),
+      "the import cap's base, less battery and link losses, in the page's equation and rules, the equation card and the notebook's LP");
+    ok(/and winter's days pay it back/.test(PAGE) && /winter's days pay back what the week draws/.test(JS) && /REFILL/.test(NBX) && /\(sw, 1\)\] \+ \[\(v, c \* WEEK\[\\"days\\"\]\)/.test(NBX) && !/no refill from other seasons/.test(JS),
+      "the scarce-wind week paid back by winter's days, in the page, its key and the notebook's LP");
+    ok(JS.split(/\.over [<>]=? ?0\.5/).length === 2 && /E4\.missB\(V\)/.test(JS) && /E4\.missB\(X\)/.test(JS) && /E4\.missB\(x\)/.test(JS) && /missB\(x\)/.test(JS),
+      "M13's verdicts on the budget read the LP's flag (E4.missB, or its Node copy), never a rounded overshoot");
+    ok(/the security-first plan \(its import cap out of reach in 2030\)/.test(NBX), "the notebook checks a run that misses a limit (security first) against the library"); }
   const NB = path.join(X.SITE, "learn/notebooks/m13-national-pathway.ipynb");
   ok(fs.existsSync(NB) && /href="notebooks\/m13-national-pathway\.ipynb" download/.test(PAGE) && /e4-library\.json" download/.test(PAGE) && /prairieland\.json" download/.test(PAGE) && /e4-pathways\.json" download/.test(PAGE), "the notebook and its three data files are offered for download");
   const NBT = fs.existsSync(NB) ? fs.readFileSync(NB, "utf8") : "";

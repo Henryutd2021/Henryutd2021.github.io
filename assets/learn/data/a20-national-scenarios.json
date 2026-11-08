@@ -17,7 +17,7 @@
     "halfWidthWhat": "Dollars per MWh: at equal full costs, half of the new power is clean; when the clean mix is this much cheaper, all of it is; this much dearer, none.",
     "earlyClose": ["coal", "gasCC"],
     "earlyCloseWhat": "An existing coal or combined-cycle plant closes early when its fuel and carbon cost per MWh is above the clean mix's full cost; peakers and oil plants are kept for the peak hours.",
-    "domestic": "Domestic crude and gas output stay at their 2025 levels; any extra oil or gas is imported (no exports).",
+    "domestic": "Domestic crude and gas meet demand up to their 2025 output; imports cover any excess. When demand falls below that output, domestic production falls with it: there are no exports.",
     "gasBlend": "New gas plants and early closures are judged at a blend of the domestic gas and LNG prices, weighted by 2025's supply.",
     "carbonFrom": 2030,
     "priceMax": 300,
@@ -72,8 +72,8 @@
     },
     {
       "key": "budget", "name": "Budget pathway", "short": "Budget", "kind": "target", "color": "var(--lx-good)",
-      "question": "What would it take to keep Prairieland's CO₂ from 2026 to 2050 within its budget?",
-      "story": "Central demand, today's fuel prices, the fastest electrification allowed, technology costs at their defaults; the carbon price is found, not assumed: the lowest that meets the budget.",
+      "question": "What carbon price would keep Prairieland's CO₂ from 2026 to 2050 within its budget?",
+      "story": "Assumed: central demand, today's fuel prices, the fastest electrification allowed and technology costs at their defaults. Found: the carbon price, the lowest that meets the budget with those assumptions fixed.",
       "demand": "central",
       "fuel": { "gas": "def", "lng": "def" },
       "policy": { "price": null, "elec": "fast", "target": { "metric": "cum", "budget": "def" } },
@@ -83,7 +83,9 @@
   "pathwayModel": {
     "floorMt": 2700,
     "about": true,
-    "what": "The least cumulative CO₂ 2026–2050 that the pathway model of M13 and SB4 reaches at its most electrification and central demand, rounded, as its data says (e4-pathways.json, levers.budget.why). It raises each sector's electric share in a straight line from 2025 to its 2050 value; this page lets each sector electrify early, up to the most a period allows."
+    "what": "The least cumulative CO₂ 2026–2050 that engine E4, the pathway model of M13 and SB4, reaches at central demand with every sector's 2050 electric share at its highest, rounded to the nearest 100 Mt; the page calls it 'about'. E4 raises each sector's electric share in a straight line from 2025 to its 2050 value; this page lets each sector electrify early, up to the most a period allows.",
+    "withThisPathMt": 2400,
+    "withThisPathWhat": "E4's floor, as M13 reports it, when this page's electrification path replaces E4's straight line, all else in E4 unchanged; rounded to the nearest 100 Mt. A reported comparison, not computed on this page."
   },
   "pairs": [
     { "a": "announced", "b": "gasboom" },

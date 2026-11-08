@@ -15956,8 +15956,10 @@
                                      clean option (national, no location): within the generic limits per region and period,
                                      wind and solar within each region's most; a plant runs in its model year and the later
                                      ones its life covers (vintages)
-     batteries: cyclic within each representative day (state at 08:00 and 20:00 within 0 and 4 h x power); in the
-                                     scarce-wind week the store may enter full and runs down over the seven days
+     batteries: outside winter, cyclic within each representative day (state at 08:00 and 20:00 within 0 and 4 h x power); in the
+                                     scarce-wind week the store may enter full and run down over the seven days; winter
+                                     runs in order (its 83 days, then the week, cyclic over the season), so winter's days
+                                     pay the week back (energy in x 85% = energy out) and the level stays within the store
      links: flows each way within the link's limit (existing + additions), 1% lost per 100 km
      fuels (national, each year): crude = refinery input + oil plants (domestic crude, up to 2025's output, then imports);
                                      gas = final + plants, delivered by domestic fields (up to 2025's output; 5% of it
@@ -15966,7 +15968,10 @@
                                      County; final fuel use fixed by the plan's demand and electrification
      CO2 (Mt a year) = fuels burned x IPCC factors; cumulative 2026-2050 = sum_p w_p CO2_p + w_2025 x 214.9 <= budget
                                      (+ an overshoot, see "limits first"); w linear (2, 5, 5, 5, 5, 3) or step (0, 5, 5, 5, 5, 5)
-     imports (crude imports + LNG) <= cap x primary energy, each year (+ an overshoot, see "limits first")
+     imports (crude imports + LNG) <= cap x (primary energy - what batteries and links lose), each year (+ an overshoot,
+                                     see "limits first"): electricity lost in batteries and links does not count toward the
+                                     cap's base (the cheapest waste loops); burning more fuel still raises primary energy, as
+                                     in the statistic itself
      the stress hours (peak-hour rule): plants at their availability (the summer hour with a drought's derating), wind and
                                      solar at that hour, batteries at full power, the firm option's share, the links
      goal: min the present value in 2025 of new plants' and links' yearly payments for the years they serve up to 2050
@@ -15985,7 +15990,9 @@
    serving demand comes first), then the least cost at that overshoot. Overshoot 0: the limits hold (e.g. a 2,800 Mt
    budget); above 0: they are out of reach, the run is the closest plan, and their duals are not marginal values (null).
    Foresight: perfect (one LP over 2030-2050) or decade by decade (myopic: 2030-2035 seeing only them, their builds fixed;
-   then 2040-2045; then 2050; each window gets the remaining budget in proportion to its weights).
+   then 2040-2045; then 2050; each window gets the remaining budget in proportion to its weights). A window that misses a
+   limit has no marginal values at all: no budget or cap dual, no electricity prices, no fuel values (its full-year check
+   prices fuels as the LP bought them).
    Shocks (C4, SB4): the plan's builds and retirements up to and including the shock's model year stay as planned; that
    year runs with what was built; later years re-plan knowing the shock. A price shock on new plants (the mineral export
    restriction, e4-pathways.json levers.shockRule "before") arrives before the shock year's plants are bought: decisions
@@ -16047,6 +16054,9 @@
       var stem = s.key.replace(/_day$/, ""), n = P.S.filter(function (x) { return x.key === stem + "_night"; })[0];
       P.days.push({ key: stem, d: s.i, n: n.i, days: s.days, week: stem === "lowwind" });
     });
+    // the representative day of the week's season (winter): it pays back what the scarce-wind week's store draws
+    var wk0 = P.days.filter(function (d) { return d.week; })[0];
+    P.refill = wk0 ? P.days.filter(function (d) { return !d.week && !P.S[d.d].extreme && P.S[d.d].season === P.S[wk0.d].season; })[0] || null : null;
     P.hours = sum(P.S.map(function (s) { return s.h; }));
     // existing units: fossil unit by unit; nuclear, hydro, wind, solar and batteries by region
     var U = PL.fleet.units, av = cfg.existing.availability;
@@ -16264,11 +16274,11 @@
       for (var q = 0; q <= p; q++) if (online(q, p, life)) { if (typeof list[q] === "string") terms.push([list[q], 1]); else c += list[q]; }
       return [terms, c];
     }
-    var fuelTerms = [], CO2 = {}, PRIM = {}, IMP = {};
+    var fuelTerms = [], CO2 = {}, PRIM = {}, IMP = {}, LOSS = {};
     only.forEach(function (p) {
       var y = S.Y[p], D = S.D[p], pr = S.price[p], tg = "_" + p, sh = S.share[p];
       var bal = P.R.map(function () { return P.S.map(function () { return []; }); });
-      var oilF = [], gasF = [], coalF = [], nucE = [], renE = [];
+      var oilF = [], gasF = [], coalF = [], nucE = [], renE = [], lossE = [];
       // existing fossil units
       P.units.forEach(function (u) {
         var k = kv[u.j][p]; if (k === 0) return;
@@ -16333,21 +16343,36 @@
             bal[r][s.i].push([dis[s.i], 1], [ch[s.i], -1]);
           });
           var E = function (extra, c) { return extra.concat(bt.map(function (x) { return [x[0], -hrs]; })); };   // terms - 4 x P
+          // a day's net change of the store (MWh): its day and night charging x 85% less what they give back
+          var delta = function (d) { var hd = P.S[d.d].h / P.S[d.d].days, hn = P.S[d.n].h / P.S[d.n].days; return [[ch[d.d], hd * eta], [dis[d.d], -hd], [ch[d.n], hn * eta], [dis[d.n], -hn]]; };
+          var times = function (T, k) { return T.map(function (x) { return [x[0], x[1] * k]; }); };
           P.days.forEach(function (d) {
-            var s0 = v("bs_" + r + "_" + d.key + tg, 0, Infinity, 0), hd = P.S[d.d].h / P.S[d.d].days, hn = P.S[d.n].h / P.S[d.n].days;   // 12 h
+            var s0 = v("bs_" + r + "_" + d.key + tg, 0, Infinity, 0), hd = P.S[d.d].h / P.S[d.d].days;   // 12 h
             var dayEnd = [[s0, 1], [ch[d.d], hd * eta], [dis[d.d], -hd]];
             row("b0_" + r + "_" + d.key + tg, E([[s0, 1]]), null, hrs * b0);
             row("b1_" + r + "_" + d.key + tg, dayEnd, 0, null);
             row("b2_" + r + "_" + d.key + tg, E(dayEnd), null, hrs * b0);
-            if (!d.week) row("bz_" + r + "_" + d.key + tg, [[ch[d.d], hd * eta], [dis[d.d], -hd], [ch[d.n], hn * eta], [dis[d.n], -hn]], 0, 0);
-            else {
-              var N = d.days, delta = [[ch[d.d], hd * eta], [dis[d.d], -hd], [ch[d.n], hn * eta], [dis[d.n], -hn]];
-              var times = function (k) { return delta.map(function (x) { return [x[0], x[1] * k]; }); };
-              var endW = [[s0, 1]].concat(times(N)), lastDay = [[s0, 1]].concat(times(N - 1)).concat([[ch[d.d], hd * eta], [dis[d.d], -hd]]);
+            if (d.week) {
+              // the scarce-wind week: the store may enter it full and run down over its seven days
+              var N = d.days, endW = [[s0, 1]].concat(times(delta(d), N)), lastDay = [[s0, 1]].concat(times(delta(d), N - 1)).concat([[ch[d.d], hd * eta], [dis[d.d], -hd]]);
               row("bw0_" + r + tg, endW, 0, null); row("bw1_" + r + tg, E(endW), null, hrs * b0);
               row("bw2_" + r + tg, lastDay, 0, null); row("bw3_" + r + tg, E(lastDay), null, hrs * b0);
-            }
+            } else if (d === P.refill) {
+              // winter in order: its K representative days, then the scarce-wind week, and back (cyclic over the season).
+              // The store starts winter at s0 and changes by delta each day; the week starts where the last winter day
+              // ends and must end where winter began, so the winter days pay back what the week draws (energy in x 85% =
+              // energy out). The level is linear in the day, so the first and the last winter day bound every one
+              var wk = P.days.filter(function (x) { return x.week; })[0], K = d.days, sw = "bs_" + r + "_" + wk.key + tg;
+              var at = function (k) { return [[s0, 1]].concat(times(delta(d), k)); };            // the level at the start of day k
+              var lastStart = at(K - 1), lastNoon = lastStart.concat([[ch[d.d], hd * eta], [dis[d.d], -hd]]);
+              row("b3_" + r + "_" + d.key + tg, lastStart, 0, null); row("b4_" + r + "_" + d.key + tg, E(lastStart), null, hrs * b0);
+              row("b5_" + r + "_" + d.key + tg, lastNoon, 0, null); row("b6_" + r + "_" + d.key + tg, E(lastNoon), null, hrs * b0);
+              row("bk_" + r + "_" + d.key + tg, [[sw, 1]].concat(times(at(K), -1)), 0, 0);                   // the week starts where winter's days end
+              row("bz_" + r + "_" + d.key + tg, [[sw, 1]].concat(times(delta(wk), wk.days), [[s0, -1]]), 0, 0);   // and ends where winter began
+            } else row("bz_" + r + "_" + d.key + tg, delta(d), 0, 0);
           });
+          // what the batteries lose (MWh in - MWh out, as PJ): left out of the import cap's primary energy (below)
+          P.S.forEach(function (s) { lossE.push([ch[s.i], s.h * PJ_PER_MWH], [dis[s.i], -s.h * PJ_PER_MWH]); });
         }
         // unserved energy
         P.S.forEach(function (s) { var u = v("us_" + r + "_" + s.i + tg, 0, Infinity, pen.unservedPerMWh * s.h * D / 1e6, "penalty"); bal[r][s.i].push([u, 1]); });
@@ -16369,6 +16394,7 @@
           var fw = v("fw_" + l.i + "_" + s.i + tg, 0, Infinity, c, null, c), bw = v("fb_" + l.i + "_" + s.i + tg, 0, Infinity, c, null, c);
           row("cl_" + l.i + "_" + s.i + tg, [[fw, 1], [bw, 1]].concat(cap[0].map(function (x) { return [x[0], -1]; })), null, c0);
           bal[l.a][s.i].push([fw, -1], [bw, 1 - l.loss]); bal[l.b][s.i].push([fw, 1 - l.loss], [bw, -1]);
+          lossE.push([fw, l.loss * s.h * PJ_PER_MWH], [bw, l.loss * s.h * PJ_PER_MWH]);   // what the link loses (PJ)
         });
       });
       // the peak-hour reserve rule: at each stress hour of 2025's weather (e4-pathways.json stress), every region's load x
@@ -16408,10 +16434,15 @@
       row("cl" + tg, [[qc, 1 - P.coalOwn]].concat(coalF.map(function (x) { return [x[0], -x[1]]; })), F.coal, F.coal);
       CO2[p] = [[cd, P.f.oil / 1000], [ci, P.f.oil / 1000], [gd, P.f.gas / 1000], [gl, P.f.gas / 1000], [qc, P.f.coal / 1000]];
       PRIM[p] = [[cd, 1], [ci, 1], [gd, 1], [gl, 1], [qc, 1]].concat(nucE, renE);
-      IMP[p] = [[ci, 1], [gl, 1]];
-      // the import cap: imports - cap x primary - over <= 0
+      IMP[p] = [[ci, 1], [gl, 1]]; LOSS[p] = lossE;
+      // the import cap: imports - cap x (primary - what batteries and links lose) - over <= 0. Losses count in primary
+      // energy (the generation that covers them does), but not in the cap's base: else losing electricity on purpose
+      // (a battery charging and discharging at once, a link carrying power both ways) would help meet the cap. Extra fuel
+      // or nuclear output into such a loss still adds its conversion loss to the base: it costs fuel or runs a plant
+      // harder, and the tests find no such loop in the presets' or a binding cap's solutions
       var oi = v("oimp" + tg, 0, o.noPenalty ? 0 : Infinity, pen.importPerGJ, "penalty");
       var t = {}; IMP[p].forEach(function (x) { t[x[0]] = (t[x[0]] || 0) + x[1]; }); PRIM[p].forEach(function (x) { t[x[0]] = (t[x[0]] || 0) - S.cap * x[1]; });
+      LOSS[p].forEach(function (x) { t[x[0]] = (t[x[0]] || 0) + S.cap * x[1]; });
       t[oi] = (t[oi] || 0) - 1;
       row("imp" + tg, Object.keys(t).map(function (k) { return [k, t[k]]; }), null, 0);
     });
@@ -16431,7 +16462,7 @@
     row("budget", bt, null, left);
     var m = { sense: "min", variables: V, constraints: C };
     if (o.objective) { var obj = o.objective(CO2, S); V.forEach(function (x) { x.cost = 0; }); m.objective = { terms: obj }; }
-    m.meta = { only: only.slice(), CO2: CO2, PRIM: PRIM, IMP: IMP, left: left, cat: cat, tieC: tieC };
+    m.meta = { only: only.slice(), CO2: CO2, PRIM: PRIM, IMP: IMP, LOSS: LOSS, left: left, cat: cat, tieC: tieC };
     return m;
   }
 
@@ -16532,13 +16563,21 @@
       q.fuel = { crudeDom: val("cdom" + tg), crudeImp: val("cimp" + tg), gasDom: val("gdom" + tg), lng: val("lng" + tg), coal: val("coal" + tg) };
       var lin = function (T) { return T.reduce(function (a, t) { return a + val(t[0]) * t[1]; }, 0); };
       q.co2 = lin(m.meta.CO2[p]); q.primary = lin(m.meta.PRIM[p]); q.imports = lin(m.meta.IMP[p]); q.importShare = q.imports / q.primary;
-      q.fuelValue = { oil: (duals["oil" + tg] || 0) / D, gas: (duals["gas" + tg] || 0) / D, coal: (duals["cl" + tg] || 0) / D };   // $/GJ that year, carbon value included
+      q.lossPJ = lin(m.meta.LOSS[p] || []);                       // what batteries and links lose (left out of the cap's base)
+      // a window that missed a limit is solved pinned at its least overshoot: its duals are not marginal values of the plan
+      // asked for (they can reach a million dollars a MWh), so it has no electricity prices and no fuel values; its
+      // full-year check prices fuels at what the LP paid (fuelAt "price", no carbon value)
+      q.dualsOk = r.reach !== false;
+      var pr0 = S.price[p], dg = q.fuel.gasDom * (1 - P.gasOwn), gasPaid = dg + q.fuel.lng > 0 ? (q.fuel.gasDom * pr0.gas + q.fuel.lng * pr0.lng) / (dg + q.fuel.lng) : pr0.gas;
+      q.fuelValue = q.dualsOk ? { oil: (duals["oil" + tg] || 0) / D, gas: (duals["gas" + tg] || 0) / D, coal: (duals["cl" + tg] || 0) / D }   // $/GJ that year, carbon value included
+        : { oil: pr0.oil, gas: gasPaid, coal: pr0.coal / (1 - P.coalOwn) };                                                       // $/GJ delivered, as bought
       q.importOver = val("oimp" + tg); q.importDual = duals["imp" + tg] ? -duals["imp" + tg] / D : 0;   // $ per GJ a year, in that year
       q.price = P.R.map(function (R, rr) {                       // load-weighted marginal cost of electricity ($/MWh, that year's dollars)
+        if (!q.dualsOk) return null;
         var a = 0, b = 0; P.S.forEach(function (s) { var L = S.loadMW[p][rr] * s.demand * s.h, d = duals["bal_" + rr + "_" + s.i + tg]; if (d == null) return; a += L * d * 1e6 / (s.h * D); b += L; });
         return b ? a / b : null;
       });
-      q.slicePrice = P.R.map(function (R, rr) { return P.S.map(function (s) { var d = duals["bal_" + rr + "_" + s.i + tg]; return d == null ? null : d * 1e6 / (s.h * D); }); });
+      q.slicePrice = P.R.map(function (R, rr) { return P.S.map(function (s) { var d = duals["bal_" + rr + "_" + s.i + tg]; return d == null || !q.dualsOk ? null : d * 1e6 / (s.h * D); }); });
       q.linkAt = P.links.map(function (l) {                      // hours a year the link runs at its limit (slice hours)
         var cap = l.mw; for (var qq = 0; qq <= p; qq++) cap += raw.a[l.i][qq];
         var h = 0; P.S.forEach(function (s) { if (val("fw_" + l.i + "_" + s.i + tg) + val("fb_" + l.i + "_" + s.i + tg) >= cap - 0.5 && cap > 0) h += s.h; }); return h;
@@ -16717,12 +16756,12 @@
   function presetsOf(P) { return P.cfg.presets; }
   // the budget gap with lesson A20 (A20 states the other side): A20's closed-form
   // accounting meets 2,600 Mt, this LP's floor is about 2,700 Mt (most electrification, central demand, straight-line
-  // counting: 2,673 Mt). Tested: lifting the build-rate and transmission limits a hundredfold moves the floor by about 5 Mt;
+  // counting: 2,674.9 Mt). Tested: lifting the build-rate and transmission limits a hundredfold moves the floor by about 1 Mt (0.9 Mt);
   // A20's electrification path inside a copy of this engine lowers it to about 2,414 Mt (test_m13-national-pathway.js).
   // [the floor, the reason, what it is not]; [[lesson:...]] marks for LX.rich
   var GAP = ["Counted with straight lines between model years, no pathway here gets below about 2,700 Mt at central demand, even at the most electrification.",
     "[[lesson:a20-national-scenarios|A20]]'s simpler accounting meets 2,600 Mt: its fastest path electrifies buildings and industry years sooner (15 points a period from 2025), while here each share rises in a straight line to 2050.",
-    "Not the build limits: lifting this engine's build-rate and transmission limits a hundredfold lowers its floor by about 5 Mt; A20's electrification path inside it lowers the floor to about 2,400 Mt."];
+    "Not the build limits: lifting this engine's build-rate and transmission limits a hundredfold lowers its floor by about 1 Mt; A20's electrification path inside it lowers the floor to about 2,400 Mt."];
   // the run's status line, by foresight (decade by decade solves each window to optimality, which does
   // not make the combined pathway the cheapest over 2026-2050); V: a view, or { reach } from a run
   var WIN_NAMES = ["2030–2035", "2040–2045", "2050"];
@@ -16740,12 +16779,16 @@
   // a full-year check's verdict (prairieland.json timeSlices.fullYearCheck.survives, a teaching rule): survives when all
   // demand is served and the year's CO2 is within 10% of the slices' estimate; why, in words. It checks the dispatch of one
   // model year, not the cumulative budget and not adequacy
+  // A year whose window missed a limit (fuelAt "price") has no marginal values: its check buys fuels at their prices, with
+  // no carbon value and no import cap, so its CO2 is not comparable with the slices' and only demand served is tested
   var FULL_TOL = 0.1;
   function fullVerdict(c) {
-    var served = c.unservedMWh < 0.5, near = Math.abs(c.gap) <= FULL_TOL, why = [];
+    var priced = c.fuelAt === "price", served = c.unservedMWh < 0.5, near = priced ? null : Math.abs(c.gap) <= FULL_TOL, why = [];
     if (!served) why.push(kilo(c.unservedHours) + " h unserved");
-    if (!near) why.push("CO₂ " + (c.gap >= 0 ? "+" : "") + pct(c.gap, 1) + " against the slices");
-    return { ok: served && near, served: served, near: near, text: served && near ? "survives" : "does not survive (" + why.join("; ") + ")" };
+    if (near === false) why.push("CO₂ " + (c.gap >= 0 ? "+" : "") + pct(c.gap, 1) + " against the slices");
+    var ok = served && near !== false;
+    return { ok: ok, served: served, near: near, compared: !priced,
+      text: (ok ? "survives" : "does not survive (" + why.join("; ") + ")") + (priced ? (ok ? " on demand served; CO₂ not compared (the run missed a limit)" : "; CO₂ not compared") : "") };
   }
   // the four shocks (and the two A21 keeps for itself) as the engine runs them: one row each, with the model year it hits,
   // what changes, and what the re-plan keeps (magnitudes and durations, modelled effects apart from the story)
@@ -16768,7 +16811,7 @@
   // 52 weeks of 168 hours and 31 December, one LP each, batteries cyclic within each week, hydro's energy fixed day by day
   // (its season's factor), the links' limits, unserved energy at the penalty; fuels at the slice run's marginal values for
   // that year (fuel plus the carbon budget's value: the fuel rows' duals), so the check runs the same economics hour by
-  // hour. CO2 of the year: the plants' fuel plus the fixed final fuels, with gas bought in the slice run's own mix of
+  // hour; a year whose window missed a limit has no marginal values, so its fuels are priced as the LP bought them. CO2 of the year: the plants' fuel plus the fixed final fuels, with gas bought in the slice run's own mix of
   // domestic gas and LNG for that model year (procure): the same delivered gas gives the LP's procurement and CO2.
   var MONTH0 = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365];
   function seasonOfDay(d) { var m = 0; while (d >= MONTH0[m + 1]) m++; return m === 11 || m < 2 ? "winter" : m < 5 ? "spring" : m < 8 ? "summer" : "autumn"; }
@@ -16845,6 +16888,7 @@
       t.gasDom = g.gasDom; t.lng = g.lng;
       t.co2 = co2Of(P, crude, g, coal); t.co2Slices = q.co2; t.co2Gap = t.co2 / q.co2 - 1;
       t.coalOverMine = coal > P.coalMax + 1e-6;
+      t.fuelAt = q.dualsOk === false ? "price" : "value";   // fuels at the slice run's marginal values, or as bought
       t.year = y; t.p = p;
       return t;
     });
@@ -16920,13 +16964,22 @@
     var Y = R.Y, o = { Y: Y.slice() };
     o.pv = {}; for (var k in R.pv) o.pv[k] = rd(R.pv[k], 0);
     o.yearly = R.money.yearly.map(function (q) { var x = {}; for (var k2 in q) x[k2] = rd(q[k2], 0); return x; });
-    o.budget = R.S.budget; o.cum = rd(R.cum, 0); o.over = rd(R.over, 0); o.w = R.S.w.slice(); o.w0 = R.S.w0;
+    // a flag for each limit, unrounded: a run 0.4 Mt over its budget is over, though it rounds to the budget (the flags
+    // follow the LP's overshoot variables, at the engine's tolerance: 50 t, 0.001 PJ); cum1 and over1 to 0.1 Mt for such a run
+    o.budget = R.S.budget; o.cum = rd(R.cum, 0); o.over = rd(R.over, 0); o.cum1 = rd(R.cum, 1); o.over1 = rd(R.over, 1); o.w = R.S.w.slice(); o.w0 = R.S.w0;
+    o.missBudget = R.over > 5e-5; o.missCap = R.capOver.map(function (v) { return v > 1e-3; });
     o.co2 = R.co2.map(function (v) { return rd(v, 1); });
     o.imp = R.importShare.map(function (v) { return rd(v, 3); }); o.cap = R.S.cap; o.capOver = R.capOver.map(function (v) { return rd(v, 1); });
+    // the cap's own measure: imports / (primary energy - what batteries and links lose); imp is the statistic (imports /
+    // primary energy), at most the cap whenever the cap is met, and a tenth of a point or so below this measure
+    o.impCap = Y.map(function (y, p) { var q = R.raw.per[p]; return rd(q.imports / (q.primary - (q.lossPJ || 0)), 4); });
+    o.lossPJ = Y.map(function (y, p) { return rd(R.raw.per[p].lossPJ || 0, 1); });   // what batteries and links lose, PJ a year
     o.clean = R.clean.map(function (v) { return rd(v, 3); });
     o.unserved = R.unservedTWh.map(function (v) { return rd(v, 2); }); o.curtail = R.curtailTWh.map(function (v) { return rd(v, 1); });
     o.capGW = R.cap.map(function (c) { var x = {}; TECHS.forEach(function (t) { x[t] = rd(c[t] / 1000, 2); }); return x; });
     o.genTWh = R.gen.map(function (g) { var x = {}; TECHS.forEach(function (t) { x[t] = rd(g[t], 1); }); return x; });
+    // batteries store, they make nothing: what they take in each year (TWh; genTWh.battery is what they give back)
+    o.batIn = Y.map(function (y, p) { return rd(R.raw.per[p].batteryIn / 1e6, 1); });
     o.genR = Y.map(function (y, p) { return R.raw.per[p].genR.map(function (g) { var x = {}; TECHS.forEach(function (t) { if (g[t]) x[t] = rd(g[t] / 1e6, 1); }); return x; }); });
     o.built = {}; for (var t in R.built) o.built[t] = R.built[t].map(function (v) { return rd(v / 1000, 2); });
     o.builtR = R.builtR.map(function (b) { var x = {}; for (var t2 in b) x[t2] = rd(b[t2] / 1000, 2); return x; });
@@ -16955,7 +17008,7 @@
   // a shock's view: what changes against the plan
   function shockView(Q, V0, P) {
     var v = view(Q, P);
-    return { key: Q.key, year: Q.year, label: Q.label, pv: v.pv.total, dPV: rd(Q.dPV != null ? Q.dPV : v.pv.total - V0.pv.total, 0), cum: v.cum, over: v.over, co2: v.co2, imp: v.imp, capOver: v.capOver, unserved: v.unserved,
+    return { key: Q.key, year: Q.year, label: Q.label, pv: v.pv.total, dPV: rd(Q.dPV != null ? Q.dPV : v.pv.total - V0.pv.total, 0), cum: v.cum, over: v.over, cum1: v.cum1, over1: v.over1, missBudget: v.missBudget, missCap: v.missCap, co2: v.co2, imp: v.imp, capOver: v.capOver, unserved: v.unserved,
       carbonValue: v.carbonValue, reserveShort: v.reserve.map(function (x) { return x.shortMW; }), clean: v.clean, rule: v.rule, reach: v.reach, keptThrough: Q.keptThrough == null ? null : V0.Y[Q.keptThrough] || null };
   }
   // the reserve rule's spare at the tighter stress hour, nation-wide, each model year (from the plan's capacities, with the
@@ -17047,11 +17100,17 @@
     return '<div class="lx-scroll-x"><table class="lx-facts' + (cls ? " " + cls : "") + '"><thead><tr>' + head.map(function (h) { return '<th scope="col">' + esc(h) + "</th>"; }).join("") +
       "</tr></thead><tbody>" + rows.map(function (r) { return "<tr>" + r.map(function (c, i) { return i ? '<td class="n">' + esc(c) + "</td>" : "<td>" + esc(c) + "</td>"; }).join("") + "</tr>"; }).join("") + "</tbody></table></div>";
   }
+  // the budget's words: the cumulative CO2 to 0.1 Mt when a run misses the budget by less than 10 Mt (it would round
+  // to the budget), and the overshoot ("under 0.1 Mt" when it rounds to 0.0); missBudget is the LP's flag, never a rounding
+  function missB(V) { return V.missBudget != null ? V.missBudget : V.over > 0.5; }
+  function cumText(V) { return missB(V) && V.over1 != null && V.over1 < 10 ? fix(V.cum1, 1) : kilo(V.cum); }
+  function overText(V) { var o = V.over1 != null ? V.over1 : V.over; return o >= 0.05 ? (o < 10 ? fix(o, 1) : kilo(V.over)) + " Mt" : "under 0.1 Mt"; }
+  function missCapAny(V) { return V.missCap ? V.missCap.some(Boolean) : sum(V.capOver) > 0.5; }
   // a view's main results as rows [label, value]
   function resultRows(V, P) {
     var L = V.Y.length - 1, b = function (t) { return fix(sum(V.built[t]), 1) + " GW"; };
     return [["Cost 2026–2050, present value in 2025 (2025 dollars; supply side and every fuel bought)", bn(V.pv.total)],
-      ["CO₂ 2026–2050 against the budget", kilo(V.cum) + " of " + kilo(V.budget) + " Mt" + (V.over > 0.5 ? " (" + kilo(V.over) + " Mt over)" : "")],
+      ["CO₂ 2026–2050 against the budget", cumText(V) + " of " + kilo(V.budget) + " Mt" + (missB(V) ? " (" + overText(V) + " over)" : "")],
       ["CO₂ a year, " + V.Y.join(", "), V.co2.map(function (x) { return fix(x, 0); }).join(", ") + " Mt"],
       ["Imports, share of primary energy, " + V.Y.join(", "), V.imp.map(function (x) { return pct(x); }).join(", ") + " (cap " + pct(V.cap) + ")"],
       ["Clean share of electricity, 2030 and 2050", pct(V.clean[0]) + " and " + pct(V.clean[L])],
@@ -17060,6 +17119,9 @@
       ["The budget's marginal value (the LP's dual: what one more tonne allowed would save)", V.carbonValue.map(cvText).join(", ") + (V.carbonValue.some(function (x) { return x != null; }) ? " a tonne, present value in 2025" : "")],
       ["Ridge Station (2,400 MW of coal)", V.ridge.closeP === null ? "open to 2050" : "closed by " + V.Y[V.ridge.closeP]]];
   }
+  // what passes the strait, from prairieland.json imports (all crude, a quarter of LNG)
+  function straitText(P) { var o = P.imports.oil.throughStraitShare, g = P.imports.lng.throughStraitShare, w = function (x) { return x >= 1 ? "all" : pct(x); };
+    return w(o) + " imported crude and " + w(g) + " of LNG through the strait"; }
   // a budget's marginal value as text: none when the budget (or the window's share) is out of reach
   function cvText(x) { return x == null ? "none (out of reach)" : "$" + fix(x, 0); }
   function fallbackHTML(V, P, o) {
@@ -17079,7 +17141,7 @@
       ["Domestic gas", gj(F.gas.def) + " (EIA, 2025: $" + fix(F.gas.anchor.usdPerMMBtu, 2) + " per MMBtu, on net calorific values)", rg(F.gas, gj), "EIA Electric Power Annual, Table 7.4"], ["LNG imports", gj(F.lng.def) + " (set for teaching)", rg(F.lng, gj), "set for teaching"],
       ["Coal (Ridge County)", gj(F.coal.def) + " (EIA, 2025: $" + fix(F.coal.anchor.usdPerMMBtu, 2) + " per MMBtu, on net calorific values)", rg(F.coal, gj), "EIA Electric Power Annual, Table 7.4"], ["Crude oil", gj(F.oil.def) + " (set for teaching: about $70 a barrel)", rg(F.oil, gj), "set for teaching"],
       ["CO₂ factors: crude oil, gas, coal", P.f.oil + ", " + P.f.gas + ", " + P.f.coal + " t per TJ", "fixed", "IPCC 2006 Guidelines, Volume 2, net calorific values"],
-      ["Build limits, a region a period", "wind " + P.lim.gwPerRegionPerPeriod.wind + ", solar " + P.lim.gwPerRegionPerPeriod.solar + ", batteries " + P.lim.gwPerRegionPerPeriod.battery + ", gas " + P.lim.gwPerRegionPerPeriod.gasCC + " + " + P.lim.gwPerRegionPerPeriod.gasCT + ", firm " + P.lim.gwPerRegionPerPeriod.firm + " GW", "fixed", "set for teaching: one generic rule, no technology's own timeline"],
+      ["Build limits, a period", "each region: wind " + P.lim.gwPerRegionPerPeriod.wind + ", solar " + P.lim.gwPerRegionPerPeriod.solar + ", batteries " + P.lim.gwPerRegionPerPeriod.battery + ", gas " + P.lim.gwPerRegionPerPeriod.gasCC + " + " + P.lim.gwPerRegionPerPeriod.gasCT + " GW; the generic firm option " + fix(P.lim.gwPerRegionPerPeriod.firm * P.R.length, 0) + " GW for the nation (" + P.lim.gwPerRegionPerPeriod.firm + " GW × " + P.R.length + " regions), with no location: its output is shared by each region's demand", "fixed", "set for teaching: one generic rule, no technology's own timeline"],
       ["Discount rate (real)", P.PL.periods.discount.def + "% (set for teaching)", rg(P.PL.periods.discount, function (v) { return v + "%"; }), "set for teaching"],
       ["Hourly shapes", "SPP's 2025 grid (slices); 2024 for the independent year", "fixed", "EIA Hourly Electric Grid Monitor (Form EIA-930)"]];
     return tableHTML(["Input (2025 dollars)", "Default", "Range you can set (set for teaching)", "Source, and the source's own range"], rows, "e4-inputs");
@@ -17095,6 +17157,7 @@
   var E4 = { REG: REG, NEW: NEW, FOSSIL: FOSSIL, prepare: prepare, schema: schema, defaults: defaults, withPreset: withPreset, sysOf: sysOf, build: build, crf: crf, dsum: dsum,
     hourly: hourly, stressHours: stressHours, fullYear: fullYear, seasonOfDay: seasonOfDay, newCap: newCap, read: read, capNow: capNow, merge: merge, fixedOf: fixedOf, money: money, windowsOf: windowsOf, runWindows: runWindows, planRun: planRun, shockRun: shockRun, solve: solve, shockTest: shockTest, c4Shocks: c4Shocks, presetsOf: presetsOf, summarize: summarize, faceModel: faceModel, builtTerms: builtTerms, nearRange: nearRange, nearRanges: nearRanges, econModel: econModel, resultRows: resultRows, fallbackHTML: fallbackHTML, inputsHTML: inputsHTML, tableHTML: tableHTML, planRows: planRows, esc: esc, view: view, shockView: shockView, stressMargins: stressMargins, TECHS: TECHS, rd: rd, WORDS: WORDS,
     GAP: GAP, UPKEEP: UPKEEP, upkeepYear: upkeepYear, upkeepPV: upkeepPV, procure: procure, co2Of: co2Of, solveWindow: solveWindow, LIM_TOL: LIM_TOL, keptThrough: keptThrough, doneWords: doneWords, fullVerdict: fullVerdict, FULL_TOL: FULL_TOL, shockTable: shockTable, cvText: cvText,
+    cumText: cumText, overText: overText, missB: missB, missCapAny: missCapAny, straitText: straitText,
     kilo: kilo, fix: fix, pct: pct, bn: bn, copy: copy, sum: sum, PJ_PER_MWH: PJ_PER_MWH, MWH_PER_PJ: MWH_PER_PJ };
   if (typeof module !== "undefined" && module.exports) module.exports = E4;
   if (typeof window === "undefined" || !window.LX) return;
@@ -17184,12 +17247,14 @@
       if (!V) return;
       var NS = "http://www.w3.org/2000/svg", y = P.Y[p];
       var svg = document.createElementNS(NS, "svg"); svg.setAttribute("viewBox", "0 0 640 470"); svg.setAttribute("class", "e4-svg"); svg.setAttribute("role", "img");
-      svg.setAttribute("aria-label", "Prairieland's five regions and seven links in " + y + ": each region's mix of electricity and the transfer limit of each link (details in the text version).");
+      svg.setAttribute("aria-label", "Prairieland's five regions and seven links in " + y + ": each region's mix of electricity and the transfer limit of each link; " + straitText(P) + " (details in the text version).");
       var mk = function (tag, at, par) { var e = document.createElementNS(NS, tag); for (var k in at) e.setAttribute(k, at[k]); (par || svg).appendChild(e); return e; };
       // sea and the strait
       mk("path", { d: "M0 448 Q160 432 320 446 T640 436 L640 470 L0 470 Z", class: "e4-sea" });
       var st = mk("g", { class: "e4-strait" }); mk("path", { d: "M628 462 L520 446 L352 386", class: "e4-route" }, st);
-      var tx = mk("text", { x: 632, y: 430, "text-anchor": "end", class: "e4-mlab small e4-halo" }, st); tx.textContent = "oil and LNG through the strait";
+      // in two short lines at the map's right edge, clear of Coast's labels (the text version has it in one sentence)
+      var sl = straitText(P).split(" and "), tx = mk("text", { x: 632, y: 416, "text-anchor": "end", class: "e4-mlab small e4-halo" }, st); tx.textContent = sl[0] + " and";
+      var tx2 = mk("text", { x: 632, y: 430, "text-anchor": "end", class: "e4-mlab small e4-halo" }, st); tx2.textContent = sl.slice(1).join(" and ");
       // links
       P.links.forEach(function (l, i) {
         var a = POS[P.R[l.a].key], b = POS[P.R[l.b].key], gw = V.linkGW[p][i], at = V.linkAt[p][i];
@@ -17208,7 +17273,7 @@
           a0 = a1;
         });
         var t1 = mk("text", { x: c[0], y: c[1] + rad + 22, "text-anchor": "middle", class: "e4-mlab e4-halo" }); t1.textContent = R.name;
-        var pr = V.price[p][r], t2 = mk("text", { x: c[0], y: c[1] + rad + 38, "text-anchor": "middle", class: "e4-mlab small e4-halo" }); t2.textContent = pr == null ? "" : "about $" + Math.round(pr) + "/MWh";
+        var pr = V.price[p][r], t2 = mk("text", { x: c[0], y: c[1] + rad + 38, "text-anchor": "middle", class: "e4-mlab small e4-halo" }); t2.textContent = pr == null ? "marginal cost unavailable" : "about $" + Math.round(pr) + "/MWh";
       });
       var rc = POS.ridge, rcm = mk("g", { class: "e4-rc" }); mk("rect", { x: rc[0] - 62, y: rc[1] - 70, width: 124, height: 20, rx: 10, class: "e4-rc-box" }, rcm);
       var t3 = mk("text", { x: rc[0], y: rc[1] - 56, "text-anchor": "middle", class: "e4-mlab small" }, rcm); t3.textContent = "Ridge County: coal";
@@ -17218,13 +17283,16 @@
       // every wedge of every disc (not only the largest source)
       table(altBody, ["Region, " + y, "Electricity made", "By source (TWh, share)", "Marginal cost (LP)"], P.R.map(function (R, r) { var g = mixOf(V, P, r, p), t = sum(g.map(function (x) { return x[1]; }));
         var mix = g.filter(function (x) { return x[1] > 0; }).sort(function (u, w) { return w[1] - u[1]; }).map(function (x) { return NAME[x[0]] + " " + fix(x[1], 1) + " (" + pct(x[1] / t) + ")"; }).join("; ");
-        return [R.name, fix(t, 1) + " TWh", mix || "none", V.price[p][r] == null ? "–" : "about $" + Math.round(V.price[p][r]) + "/MWh"]; }), "e4-wrap");
+        return [R.name, fix(t, 1) + " TWh", mix || "none", V.price[p][r] == null ? "unavailable: a limit out of reach, so no marginal values" : "about $" + Math.round(V.price[p][r]) + "/MWh"]; }), "e4-wrap");
+      H("p", { class: "lx-hint", text: "Batteries store electricity and make none, so they are not a source here. The strait: " + straitText(P) + "." }, altBody);
       table(altBody, ["Link, " + y, "Transfer limit", "Hours a year at the limit (slices)"], P.links.map(function (l, i) { return [P.R[l.a].short + " – " + P.R[l.b].short, fix(V.linkGW[p][i], 1) + " GW", kilo(V.linkAt[p][i])]; }));
     }
     return { el: el, set: function (v, pp) { V = v; if (pp != null) { p = pp; yp.set(p); } draw(); } };
   }
-  // a region's generation by technology in model year p (TWh): from the view's genR when present, else the nation's mix
-  function mixOf(V, P, r, p) { var g = V.genR ? V.genR[p][r] : null; return TECHS.map(function (t) { return [t, g ? (g[t] || 0) : 0]; }); }
+  // a region's generation by source in model year p (TWh), from the view's genR; batteries are storage, not a source (what
+  // they give back was made by the sources that charged them), so they are left out
+  var SOURCES = TECHS.filter(function (t) { return t !== "battery"; });
+  function mixOf(V, P, r, p) { var g = V.genR ? V.genR[p][r] : null; return SOURCES.map(function (t) { return [t, g ? (g[t] || 0) : 0]; }); }
 
   // capacity (GW) or generation (TWh) by technology, stacked, the five model years
   function MixChart(host, P, o) {
@@ -17236,13 +17304,16 @@
     TECHS.forEach(function (t) { var i = H("span", { class: "e4-key" }, leg); H("i", { style: "background:" + COL[t] }, i); H("span", { text: NAME[t] }, i); });
     function draw() {
       if (!V) return;
-      var src = mode === "cap" ? V.capGW : V.genTWh, bars = [], top = 0;
-      src.forEach(function (c, p) { var y0 = 0; TECHS.forEach(function (t) { var v = c[t] || 0; if (v > 0) { bars.push({ x0: p + 0.18, x1: p + 0.82, y0: y0, y1: y0 + v, color: COL[t], op: 0.95 }); y0 += v; } }); top = Math.max(top, y0); });
+      // electricity: the sources only (batteries give back what others made); capacity: every technology
+      var src = mode === "cap" ? V.capGW : V.genTWh, ts = mode === "cap" ? TECHS : SOURCES, bars = [], top = 0;
+      src.forEach(function (c, p) { var y0 = 0; ts.forEach(function (t) { var v = c[t] || 0; if (v > 0) { bars.push({ x0: p + 0.18, x1: p + 0.82, y0: y0, y1: y0 + v, color: COL[t], op: 0.95 }); y0 += v; } }); top = Math.max(top, y0); });
+      var rows = ts.map(function (t) { return [NAME[t]].concat(src.map(function (c) { return fix(c[t] || 0, 1); })); });
+      if (mode !== "cap" && V.batIn) rows.push(["Batteries (storage): taken in"].concat(V.batIn.map(function (x) { return fix(x, 1); })), ["Batteries (storage): given back"].concat(V.genTWh.map(function (c) { return fix(c.battery || 0, 1); })));
       var step = mode === "cap" ? (top > 160 ? 50 : 25) : (top > 400 ? 100 : 50), ymax = Math.ceil(top / step) * step;
       pl.render({ x: { min: 0, max: P.Y.length, ticks: P.Y.map(function (y, i) { return [i + 0.5, String(y)]; }) },
         y: { min: 0, max: ymax, step: step, fmt: function (v) { return kilo(v); }, unit: mode === "cap" ? "GW" : "TWh" }, bars: bars, height: 260, heightN: 240,
-        aria: (mode === "cap" ? "Capacity open" : "Electricity made") + " by technology in each model year, stacked.",
-        text: { head: ["Technology"].concat(P.Y.map(String)), rows: TECHS.map(function (t) { return [NAME[t]].concat(src.map(function (c) { return fix(c[t] || 0, 1); })); }) } }, true);
+        aria: (mode === "cap" ? "Capacity open by technology" : "Electricity made by source (batteries, which store and make none, left out)") + " in each model year, stacked.",
+        text: { head: [mode === "cap" ? "Technology" : "Source"].concat(P.Y.map(String)), rows: rows } }, true);
     }
     return { el: el, set: function (v) { V = v; draw(); }, mode: function (m) { mode = m; sg.set(m); draw(); } };
   }
@@ -17253,7 +17324,8 @@
       var xs = [2025].concat(V.Y), base = P.carbon.base2025Mt, line = [base].concat(V.co2), lines = [{ pts: xs.map(function (x, i) { return [x, line[i]]; }), color: "var(--lx-cc)", width: 2.5, dots: true }];
       if (other) lines.push({ pts: xs.map(function (x, i) { return [x, i ? other.co2[i - 1] : base]; }), color: "var(--lx-ink-2)", dash: "5 4", width: 2 });
       var head = ["Year", "Plan"]; if (other) head.push(otherLabel || "Compared");
-      pl.render({ x: { min: 2025, max: 2050, ticks: xs.map(function (x) { return [x, String(x)]; }) }, y: { min: 0, max: 250, step: 50, fmt: function (v) { return kilo(v); }, unit: "Mt CO₂ a year" },
+      var top = Math.max.apply(null, line.concat(other ? other.co2 : [])), ymax = Math.max(250, Math.ceil(top / 50) * 50);   // never clips a run
+      pl.render({ x: { min: 2025, max: 2050, ticks: xs.map(function (x) { return [x, String(x)]; }) }, y: { min: 0, max: ymax, step: 50, fmt: function (v) { return kilo(v); }, unit: "Mt CO₂ a year" },
         lines: lines, legend: other ? [{ label: "Plan", color: "var(--lx-cc)" }, { label: otherLabel || "Compared", color: "var(--lx-ink-2)", dash: "5 4" }] : null, height: 230, heightN: 220,
         aria: "CO₂ a year from 2025 to 2050 (model years).", text: { head: head, rows: xs.map(function (x, i) { var r = [String(x), fix(line[i], 1) + " Mt"]; if (other) r.push(fix(i ? other.co2[i - 1] : base, 1) + " Mt"); return r; }) } }, true);
     } };
@@ -17265,7 +17337,8 @@
       var xs = [2025].concat(V.Y), d0 = P.imports.dependence.share, line = [d0].concat(V.imp);
       var lines = [{ pts: xs.map(function (x, i) { return [x, 100 * line[i]]; }), color: "var(--lx-accent)", width: 2.5, dots: true }];
       if (other) lines.push({ pts: xs.map(function (x, i) { return [x, 100 * (i ? other.imp[i - 1] : d0)]; }), color: "var(--lx-ink-2)", dash: "5 4", width: 2 });
-      pl.render({ x: { min: 2025, max: 2050, ticks: xs.map(function (x) { return [x, String(x)]; }) }, y: { min: 0, max: 60, step: 10, fmt: function (v) { return v + "%"; }, unit: "imports, % of primary energy" },
+      var top = 100 * Math.max.apply(null, line.concat(other ? other.imp : []).concat([V.cap])), ymax = Math.max(60, Math.ceil(top / 10) * 10);   // never clips a run
+      pl.render({ x: { min: 2025, max: 2050, ticks: xs.map(function (x) { return [x, String(x)]; }) }, y: { min: 0, max: ymax, step: 10, fmt: function (v) { return v + "%"; }, unit: "imports, % of primary energy" },
         lines: lines, refs: [{ y: 100 * V.cap, label: "Cap " + pct(V.cap), dash: "5 4" }], height: 220, heightN: 210, legend: other ? [{ label: "Plan", color: "var(--lx-accent)" }, { label: otherLabel || "Compared", color: "var(--lx-ink-2)", dash: "5 4" }] : null,
         aria: "Imports as a share of primary energy, 2025 to 2050, against the cap.",
         text: { head: ["Year", "Plan"].concat(other ? [otherLabel || "Compared"] : []), rows: xs.map(function (x, i) { var r = [String(x), pct(line[i], 1)]; if (other) r.push(pct(i ? other.imp[i - 1] : d0, 1)); return r; }) } }, true);
@@ -17278,8 +17351,8 @@
   function readouts(V) {
     var maxImp = Math.max.apply(null, V.imp), un = sum(V.unserved), short = Math.max.apply(null, V.reserve.map(function (x) { return x.shortMW; }).concat([0]));
     return [["Cost to 2050 (present value)", bn(V.pv.total), ""],
-      ["CO₂ 2026–2050", kilo(V.cum) + " of " + kilo(V.budget) + " Mt", V.over > 0.5 ? "bad" : "good"],
-      ["Imports, highest year", pct(maxImp) + " (cap " + pct(V.cap) + ")", maxImp > V.cap + 0.0005 ? "bad" : "good"],
+      ["CO₂ 2026–2050", cumText(V) + " of " + kilo(V.budget) + " Mt", missB(V) ? "bad" : "good"],
+      ["Imports, highest year", pct(maxImp) + " (cap " + pct(V.cap) + ")", missCapAny(V) || maxImp > V.cap + 0.0005 ? "bad" : "good"],
       ["Clean electricity, 2050", pct(V.clean[V.clean.length - 1]), ""],
       un > 0.005 ? ["Electricity not served in the slices", fix(un, 2) + " TWh", "bad"] : !ruleOn(V) ? ["Slices served; stress hours", "not tested (rule off)", "warn"]
         : short > 0.5 ? ["Short of the peak-hour rule (worst year)", kilo(short) + " MW", "warn"] : ["Every slice and stress hour served", "yes", "good"]];

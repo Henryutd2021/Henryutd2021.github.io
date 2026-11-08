@@ -60,7 +60,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-interactive lx-cards" data-learn="security-minerals" data-src="../assets/learn/data/a21-security-minerals.json ../assets/learn/data/prairieland.json ../assets/learn/data/path.json">
 <div class="lx-fallback">
 <!-- a21-fallback:start (written from the model by the test's --write mode; do not edit) -->
-<p class="lx-eyebrow">The idea in one table: four ways Prairieland's supply can fail</p><div class="lx-scroll-x"><table class="lx-mini-table a21-fbt"><caption class="lx-hint">Prairieland is fictional; its numbers are illustrative. With 2025's settings.</caption><thead><tr><th scope="col">Shock</th><th scope="col">What it hits</th><th scope="col">Result</th></tr></thead><tbody><tr><td>LNG price spike</td><td>Prices</td><td>$8.40 billion more paid abroad in a year; $1.28 billion moved at home</td></tr><tr><td>Strait closed 8 weeks</td><td>A route</td><td>150.4 PJ of crude lost; 60 days of stocks (161.1 PJ) cover it</td></tr><tr><td>Mineral export restriction</td><td>A supplier</td><td>the factory makes 23% of its output for 2 years; the first to run short is graphite (anodes)</td></tr><tr><td>Factory fire</td><td>A site</td><td>6.0 GWh of cells lost in 6 months</td></tr></tbody></table></div><ul><li><b>Import dependence.</b> 1,400 ÷ 3,500 PJ = 40.0%; 31.0% of primary energy passes one strait.</li><li><b>Concentration.</b> Refining HHI from 3,150 to 8,138 (0 to 10,000).</li></ul><p class="lx-hint">With JavaScript on, you test stockpiles, diversification, recycling and a second factory site yourself.</p>
+<p class="lx-eyebrow">The idea in one table: four ways Prairieland's supply can fail</p><div class="lx-scroll-x"><table class="lx-mini-table a21-fbt"><caption class="lx-hint">Prairieland is fictional; its numbers are illustrative. With 2025's settings.</caption><thead><tr><th scope="col">Shock</th><th scope="col">What it hits</th><th scope="col">Result</th></tr></thead><tbody><tr><td>Price spike for LNG (liquefied natural gas)</td><td>Prices</td><td>$8.40 billion more paid abroad in a year; $1.28 billion moved at home</td></tr><tr><td>Strait closed 8 weeks</td><td>A route</td><td>150.4 PJ (petajoules) of crude lost; 60 days of stocks (161.1 PJ) cover it</td></tr><tr><td>Mineral export restriction</td><td>A supplier</td><td>the factory makes 23% of its output for 2 years; the first to run short is graphite (anodes)</td></tr><tr><td>Factory fire</td><td>A site</td><td>6.0 GWh (gigawatt-hours of storage) of cells lost in 6 months</td></tr></tbody></table></div><ul><li><b>Import dependence.</b> Net imports ÷ primary energy: 1,400 ÷ 3,500 PJ = 40.0%; 31.0% of primary energy passes one strait.</li><li><b>Concentration.</b> The Herfindahl-Hirschman index (HHI) of refining, the step that makes mined minerals battery-grade, runs from 3,150 to 8,138; it sums each supplier's squared percentage share, up to 10,000.</li></ul><p class="lx-hint">With JavaScript on, you test stockpiles, diversification, recycling and a second factory site yourself.</p>
 <!-- a21-fallback:end -->
 </div>
 </div>
@@ -94,6 +94,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 
 $$\text{import dependence} = \frac{\text{net imports}}{\text{gross available energy}}, \qquad \mathrm{HHI} = \sum_i (100\, s_i)^2$$
 
+- **Gross available energy.** Eurostat's denominator: all the energy supplied in a country, including fuel sold there for international ships and flights; Prairieland makes no such sales, so its gross available energy is its primary energy.
 - **Symbols.** $s_i$ is supplier $i$'s share of a supply, from 0 to 1; the HHI runs from near 0 (many small suppliers) to 10,000 (one).
 - **Equal shares.** With $n$ equal suppliers the HHI is $10{,}000/n$; four suppliers can never bring it below 2,500.
 - **Supply groups.** Prairieland lists four supply groups, the last grouping other refiners; counting those firms one by one would lower the index, so the HHI shown is an upper bound.
@@ -122,7 +123,7 @@ $$\text{import dependence} = \frac{\text{net imports}}{\text{gross available ene
 <ul>
 <li>How prices, demand and trade respond during a shock, beyond the levers you set.</li>
 <li>Shipping, insurance and the cost of holding and refreshing stocks.</li>
-<li>Mining, refining and trade law, and any judgement of a country's policies.</li>
+<li>Mining, refining and trade law, and any judgment of a country's policies.</li>
 <li>Cybersecurity and the physical security of grids and plants.</li>
 <li>The odds of any shock: these are stress tests, not forecasts.</li>
 </ul>
