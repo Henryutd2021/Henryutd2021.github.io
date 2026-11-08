@@ -157,7 +157,7 @@ const P = k => M.plantByKey(D, k);
     ok(x.tot.balanced === (r >= 20) && y.tot.balanced === (r >= 50), `ramp ${r}: balanced with the peaker from 20 MW/h, alone from 50 MW/h`);
     x.need.forEach((v, i) => ok(x.cc[i] + x.pk[i] + x.short[i] - x.over[i] === v, `ramp ${r}, hour ${x.hours[i]}: made + short - over = need`));
     const fb = x.tot.balanced ? M.rampText({ r, pk: true }, x, D, TOWN) : M.rampFeedback({ r, pk: true }, x), fb2 = y.tot.balanced ? M.rampText({ r, pk: false }, y, D, TOWN) : M.rampFeedback({ r, pk: false }, y);
-    [fb, fb2].forEach(t => ok(words(t) <= 40 && sentences(t) <= 2, `ramp ${r} feedback within budget (${words(t)} words): ${t.slice(0, 60)}…`));
+    [fb, fb2].forEach(t => ok(words(t) <= 36 && sentences(t) <= 2, `ramp ${r} feedback within budget (${words(t)} words): ${t.slice(0, 60)}…`));
   }
   ok(M.rampFeedback({ r: 10, pk: true }, r10p) === "Nothing short, but **5 MWh** too much, first at 16:00: at 10 MW per hour the combined-cycle plant cannot turn down as fast as the need falls. Raise the ramp limit.", "feedback names the 5 MWh surplus at 16:00");
   ok(/^Short by \*\*10 MWh\*\*, first at 18:00/.test(M.rampFeedback({ r: 40, pk: false }, r40)), "feedback at 40 MW/h alone: 10 MWh short, first at 18:00");
@@ -175,7 +175,7 @@ const P = k => M.plantByKey(D, k);
   L.cards.forEach(c => ok(sentences(c.why) <= 2 && words(c.why) <= 20, `card ${c.id}: one short reason`));
   ok(D.scenes.length === 6 && D.scenes.map(s => s.key).join() === "gas,steam,hydro,geo,wind,pv", "six plants in the explorer");
   ok(D.scenes.filter(s => /^Nothing/.test(s.spins)).map(s => s.key).join() === "pv", "only solar PV has nothing spinning");
-  D.scenes.forEach(s => { ok(s.chain.length === 4 && s.chain[3] === "Electricity", `${s.key}: a four-stop energy chain to electricity`); ok(words(s.text) <= 40 && sentences(s.text) <= 2, `${s.key}: text within budget`); });
+  D.scenes.forEach(s => { ok(s.chain.length === 4 && s.chain[3] === "Electricity", `${s.key}: a four-stop energy chain to electricity`); ok(words(s.text) <= 36 && sentences(s.text) <= 2, `${s.key}: text within budget`); });
   ok(/2,000 °F/.test(D.scenes[0].chain[1]) && D.facts.gasTempF.value === 2000, "gas: burned above 2,000 °F (DOE)");
   ok(/300 to 700 °F/.test(D.scenes[3].energy) && D.facts.geoTempF.lo === 300 && D.facts.geoTempF.hi === 700, "geothermal: 300 to 700 °F (EIA)");
   ok(/^Flash-steam/.test(D.scenes[3].name) && /binary/.test(D.scenes[3].text) && /flash steam \(the most common\)/.test(D.sources.eia_geo.where), "geothermal: named as the flash-steam example, binary plants noted");
@@ -198,7 +198,9 @@ const P = k => M.plantByKey(D, k);
     // hydro and ramp
     "105.9 MW", "55.6 hours", "100 m", "150 MW", "40 MW", "10 MWh", "50 MW", "100 MW", "120 m", "100 m³/s", "20 million m³",
     // temperatures and shares of generation
-    "300 °F", "700 °F", "2,000 °F", "42%", "34%", "6%", "3%", "10 minutes", "12 hours"
+    "300 °F", "700 °F", "2,000 °F", "42%", "34%", "6%", "3%", "10 minutes", "12 hours",
+    // the Analyst box: the NREL test turbine (its 1.5 MW rating is in the report's title) and its best power coefficient
+    "1.5 MW", Math.round(D.facts.cpBest.value * 100) + "%"
   ]);
   ok(sh("cc") === "45.3" && sh("geo") === "16" && sh("pv") === "25", "share strings");
   ok((P("ct").heatRate / BTU * 100).toFixed(1) === "321.7", "the quiz distractor 321.7% is the heat rate divided the wrong way");
@@ -315,7 +317,8 @@ const P = k => M.plantByKey(D, k);
   // the feedback sentences carry the model's numbers
   D.plants.forEach(p => ok(M.plantNote(p, D).indexOf(M.shareText(p, BTU) + " of 100 units") >= 0, `plant note ${p.key} states its share`));
   ok(/leave the module as direct current/.test(M.plantNote(P("pv"), D)) && !/reach the wire/.test(M.plantNote(P("pv"), D)), "solar's note: DC at the module, not the wire");
-  ok(/At some lower speeds, NREL's test turbine converted a larger share, up to 52%, while making less power/.test(M.plantNote(P("wind"), D)) && D.facts.cpBest.value === 0.52, "wind's note: a larger share at some lower speeds, less power");
+  ok(/about 26 of 100 units reach the wire \(EIA's typical value at rated wind speed\); no rotor can catch more than 59\.3% of the wind's power\.$/.test(strip(M.plantNote(P("wind"), D))), "wind's note keeps one message: the typical share, and the Betz limit");
+  ok(QMD.indexOf("At some lower wind speeds, NREL's 1.5 MW test turbine turned up to " + Math.round(D.facts.cpBest.value * 100) + "% of the wind's power into electricity, while making less power (NREL, 2015).") >= 0 && D.facts.cpBest.value === 0.52, "the larger share at lower wind speeds sits in the Analyst box, with its source");
   ok(M.dayText(days).indexOf(`**${fmt(days[2].energy)} MWh**, ${Math.round(days[2].energy / days[0].energy * 100)}% of the high-output day's ${fmt(days[0].energy)} MWh`) >= 0 && /cannot show the cause/.test(M.dayText(days)) && !/Clouds, not the panels/.test(JS), "day feedback: 776 MWh, 47%, no causal claim");
 }
 
@@ -328,17 +331,79 @@ const P = k => M.plantByKey(D, k);
   notes.forEach(n => ok(words(n) <= 35 && sentences(n) <= 2, `data note within budget (${words(n)} words): ${n.slice(0, 50)}…`));
   const hint = strip((QMD.match(/<p class="lx-hint">With JavaScript on[\s\S]*?<\/p>/) || [""])[0]);
   ok(hint && words(hint) <= 20, `fallback hint is one short instruction (${words(hint)} words)`);
-  [...QMD.matchAll(/<details class="lx-answer"><summary>Answer<\/summary><p>([\s\S]*?)<\/p>/g)].map(m => strip(m[1]).replace(/^(Myth|Fact)\. /, "")).forEach(a => ok(words(a) <= 40 && sentences(a) <= 2, `answer within budget (${words(a)} words): ${a.slice(0, 50)}…`));
-  [...QMD.matchAll(/<dd>([\s\S]*?)<\/dd>/g)].map(m => strip(m[1])).forEach(a => ok(words(a) <= 40 && sentences(a) <= 2, `explain idea within budget (${words(a)} words): ${a.slice(0, 50)}…`));
+  [...QMD.matchAll(/<details class="lx-answer"><summary>Answer<\/summary><p>([\s\S]*?)<\/p>/g)].map(m => strip(m[1]).replace(/^(Myth|Fact)\. /, "")).forEach(a => ok(words(a) <= 36 && sentences(a) <= 2, `answer within budget (${words(a)} words): ${a.slice(0, 50)}…`));
+  { const fbq = (QMD.match(/<div class="lx-fallback">[\s\S]*?<p class="lx-hint">With JavaScript on/) || [""])[0];
+    const items = [...fbq.matchAll(/<li>([\s\S]*?)<\/li>/g)].map(m => strip(m[1].replace(/<b>[^<]*<\/b>/, "")));
+    ok(items.length >= 4, `${items.length} fallback list items`);
+    items.forEach(a => ok(words(a) <= 36 && sentences(a) <= 2, `fallback item within budget (${words(a)} words): ${a.slice(0, 50)}…`)); }
+  [...QMD.matchAll(/<dd>([\s\S]*?)<\/dd>/g)].map(m => strip(m[1])).forEach(a => ok(words(a) <= 36 && sentences(a) <= 2, `explain idea within budget (${words(a)} words): ${a.slice(0, 50)}…`));
   const fbx = [];
   D.plants.forEach(p => fbx.push(strip(M.plantNote(p, D))));
   D.predict.options.forEach(o => fbx.push(M.predictText(o.value, D)));
   fbx.push(M.compareText(["cc", "geo", "pv"], D), M.dayText(M.solarDays(Y, D)));
   [...JS.matchAll(/api\.saw\("((?:[^"\\]|\\.)*)"/g)].forEach(m => fbx.push(m[1]));
-  fbx.forEach(t => ok(words(t) <= 40 && sentences(t) <= 2, `feedback within budget (${words(t)} words): ${t.slice(0, 60)}…`));
+  fbx.forEach(t => ok(words(t) <= 35 && sentences(t) <= 2, `feedback within budget (${words(t)} words): ${t.slice(0, 60)}…`));
   ok(fbx.length >= 15, `${fbx.length} feedback texts checked`);
 }
 
+// ---------------- the sweep fixes: wording, units, terms and drawings
+{
+  const strip = h => h.replace(/<[^>]+>/g, " ").replace(/&amp;/g, "&").replace(/\s+/g, " ").trim();
+  const own = QMD.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1:end -->/g, "").replace(/<!--[\s\S]*?-->/g, "");
+  // looking ahead: on this evening nothing else can take the early surplus
+  ok(/run the slow plant higher early only if other plants can turn down or storage can take the surplus; on this evening, nothing can, so the peaker or a faster ramp is still needed/.test(QMD) && !/warm the slow plant up early/.test(QMD), "the Modeler box: looking ahead helps only where the surplus can go");
+  { const need = M.gasNeed(TOWN, Y), R = D.ramp, t = 18, r = TOWN.fleet.cc.ramp; ok(need[t] - r > need[t - 1] && need[t] - r - need[t - 1] === 10, "18:00 needs " + need[t] + " MW: at 40 MW/h the plant must already make " + (need[t] - r) + " MW at 17:00, 10 MW above that hour's need, which nothing can take"); }
+  // solar: DC at the module; the table's heading is neutral; best modules, not typical; no "costs nothing"
+  ok(/<th scope="col">Of 100 units in, electricity out<\/th>/.test(QMD) && /label: "Electricity out, of 100 in"/.test(JS) && /q\.key === "pv" \? "best modules; DC at the module, before the inverter"/.test(JS), "the tables say electricity out, and solar's value is the best modules' DC at the module");
+  ok(/A panel turns nearly 25 of 100 units of sunlight into DC electricity, and the sunlight it misses adds no fuel bill/.test(QMD) && !/no significant cost|costs nothing/.test(QMD + JS) && /Efficiency still sets how much equipment and land each MWh needs/.test(QMD), "free sunlight means no fuel bill, not no cost");
+  ok(/the green band becomes electricity/.test(JS) && /turns the most into electricity/.test(JS), "step 3 and its feedback say electricity, not the wire, for solar's DC");
+  // the hydro calculation names each factor and the watts-to-MW step
+  ok(/\["water density", int\(Hy\.rho\) \+ " kg\/m³"\], \["× gravity", Hy\.g \+ " m\/s²"\], \["× flow: cubic meters passing each second"/.test(JS) && /"= power in watts; ÷ 1,000,000 watts per MW"/.test(JS) && /water density 1,000 kg\/m³ × gravity 9\.81 m\/s² × flow \(m³ each second\) × head \(the height the water falls\) × efficiency 0\.9; divide by 1,000,000 for MW/.test(QMD), "the hydro formula labels density, gravity, flow, head, efficiency and the conversion to MW");
+  // terms at first use
+  ok(/\[\[peaker\|peaker\]\]/.test(D.scenes[0].text) && /splitting uranium atoms, fission: F5/.test(D.scenes[1].energy) && /binary plants instead boil a second fluid with the heat/.test(D.scenes[3].text) && /data-term="btu">Btu<\/span> per kWh/.test(M.plantNote(P("coal"), D)), "peaker marked, fission and binary plants explained, Btu marked in step 3's notes");
+  // units: an efficiency is Btu per kWh over Btu per kWh; the fuel symbol is defined
+  ok(/Share to the wire = 3,412 Btu per kWh ÷ the <span class="lx-term" data-term="heat-rate">heat rate<\/span> in Btu per kWh/.test(QMD) && /two views of one conversion/i.test(QMD) && !/are one number/.test(QMD), "the efficiency equation's units cancel");
+  ok(/The fuel rule for time step \$t\$: \$F_t\$ is the fuel burned in that step, in Btu/.test(QMD), "F_t and t are defined");
+  // the generation shares name their boundary
+  ok(/2022 U\.S\. utility-scale net generation from single-cycle steam plants and from combined-cycle plants/.test(QMD) && /of 2022 U\.S\. utility-scale generation, single-cycle steam plants made about 42%/.test(QMD) && /utility-scale net generation/.test(D.facts.shares2022.note), "the 42% and 34% are utility-scale net generation, single-cycle steam apart from combined cycle");
+  // the solar days are regional output scaled to a fictional farm
+  ok(/Three real September days of regional solar output \(SPP's 2025 shape\), scaled to Prairie Town's fictional 200 MW farm/.test(QMD) && /fictional 200 MW solar farm follows the regional solar fleet's output/.test(JS), "the solar days are regional output scaled to a fictional farm");
+  // the steam drawings join the turbine to the condenser and show the loop's direction
+  ok(/<path class="f4c-pipe steam" d="M176 127V140"\/>/.test(JS) && /<path class="f4c-pipe steam" d="M306 130V146"\/>/.test(JS) && (JS.match(/arrow\([^)]*"f4c-flow( water)?"\)/g) || []).length >= 5, "steam flows from each steam turbine into its condenser, with arrows round the loop");
+  ok(/then flows down into a condenser/.test(JS) && /then flows into a condenser/.test(JS), "the drawings' text versions follow the steam into the condenser");
+}
+// ---------------- step 1 on a stub document: the first plant shown counts as opened and is saved, so a reload that
+// shows "All six plants opened" also opens Next
+{
+  const vm = require("vm");
+  const { env, load } = require("./stubdom.js");
+  function mount(store) {
+    const E = env({ store });
+    E.LX.visible = () => false; E.LX.ready = () => {}; E.LX.lessonRefHTML = () => "F5";
+    load("cards", E);
+    E.LX.Sankey = () => ({ set() {} }); E.LX.CompareTable = () => {};
+    let init = null, cards = null;
+    E.LX.mount = (slug, f) => { if (slug === "power-plants") init = f; };
+    E.LX.demo = (root, fn, c) => { cards = c; };
+    vm.runInNewContext(JS, { window: E.window, document: E.document, location: E.location, navigator: {}, console, module: { exports: {} }, setTimeout: () => 0, clearTimeout: () => {} });
+    const root = E.LX.H("div", { class: "lx-interactive" }, E.body), live = E.LX.H("div", null, root);
+    let threw = null;
+    try { init(live, { f04_power_plants: D, town: TOWN, town_year: Y, path: {} }, root); } catch (e) { threw = e.stack; }
+    return { E, cards, threw, log: () => (E.store["f4-log"] ? JSON.parse(E.store["f4-log"]) : {}), next: () => cards.el.querySelectorAll(".lx-step-foot button").find(b => /Next/.test(b.innerHTML)), count: () => cards.el.querySelector(".f4x-count").textContent };
+  }
+  const A = mount({});
+  ok(!A.threw && A.cards, "step 1 mounts on the stub document" + (A.threw ? ": " + A.threw : ""));
+  if (!A.threw && A.cards) {
+    ok((A.log().seen || []).join() === D.scenes[0].key && A.count() === "Plants opened: 1 of 6." && A.next().disabled, "first visit: the plant shown is saved as opened; Next stays shut");
+    A.cards.el.querySelectorAll(".f4x-stop").slice(1).forEach(b => b.click());
+    ok(A.count() === "All six plants opened." && !A.next().disabled, "all six opened: Next opens");
+    // the earlier fault: five saved plants without the first one; the reload then showed six opened with Next shut
+    const B = mount({ "f4-log": JSON.stringify({ seen: D.scenes.slice(1).map(s => s.key) }) });
+    ok(!B.threw && B.count() === "All six plants opened." && !B.next().disabled && (B.log().seen || []).length === D.scenes.length, "reload with the first plant unsaved: six opened, saved, and Next open");
+    const C = mount({ "f4-log": JSON.stringify(A.log()) });
+    ok(!C.threw && C.count() === "All six plants opened." && !C.next().disabled, "reload after finishing: six opened and Next open");
+  }
+}
 // ---------------- the rendered page (only when _site holds a render newer than the source; run after quarto render)
 {
   const html = path.join(SITE, "_site/learn/f04-power-plants.html");

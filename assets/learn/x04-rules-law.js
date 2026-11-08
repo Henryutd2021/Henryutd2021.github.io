@@ -40,10 +40,10 @@
   // ---------------------------------------------------------------- the words the page shows (pure, tested)
   var STEPS = [
     "One federal rule, start to finish: how long did it take, from the regulator's first public meeting on the topic to the final rule?",
-    "The rule was FERC's Order No. 2222, which lets groups of small, distributed resources sell into the regional grid markets. Tap six selected milestones in the order they happened.",
-    "Your electricity bill follows a different track, the state's: a Kansas utility asks the commission to change its rates in a [[rate-case|rate case]]. Tap each stage to see who may speak.",
-    "Partway through, the utility, the commission's staff and the consumers' advocate sign a settlement. Must the commission accept it?",
-    "Prairie Town's utility (fictional), in Kansas, plans a wind farm and a new 345 [[voltage|kV]] line about 40 miles long. Sort who decides each item: federal, state or local.",
+    "The rule was FERC's Order No. 2222, which lets groups of small, distributed resources sell into the regional grid markets. Guess the order of six selected milestones; the dates come with the answer.",
+    "Your electricity bill follows a different track, the state's: a Kansas [[investor-owned-utility|investor-owned utility]] asks the commission to change its rates in a [[rate-case|rate case]]. Tap each stage to see who may speak.",
+    "Partway through, the utility, the commission's staff and the consumers' advocate sign a [[settlement|settlement]], a joint proposal for how the case should end. Must the commission accept it?",
+    "Prairie Town's investor-owned utility (fictional), in Kansas, plans a wind farm and a new 345 [[voltage|kV]] line about 40 miles long. Sort who decides each item: federal, state or local.",
     "Last, your own voice. Which of these can any member of the public do?"
   ];
   function hookFeedback(D) {
@@ -58,7 +58,7 @@
   function chainHTML(D, icon) {
     var C = D.chain, ic = function (n) { return icon ? "<span class=\"x4-ic\">" + icon(n) + "</span>" : ""; };
     return "<div class=\"x4-branch\"><div class=\"x4-root\">" + ic(C.root.icon) + "<b>" + esc(C.root.title) + "</b><span>" + esc(C.root.text) + "</span></div>" +
-      "<ul class=\"x4-tracks\" aria-label=\"Three separate tracks\">" + C.tracks.map(function (t) { return "<li>" + ic(t.icon) + "<b>" + esc(t.title) + "</b><span>" + esc(t.text) + "</span></li>"; }).join("") + "</ul>" +
+      "<ul class=\"x4-tracks\" aria-label=\"Three separate tracks\">" + C.tracks.map(function (t) { return "<li>" + ic(t.icon) + "<b>" + esc(t.title) + "</b><span>" + richS(t.text) + "</span></li>"; }).join("") + "</ul>" +
       "<p class=\"x4-note\">" + esc(C.note) + "</p></div>";
   }
   function orderLine(D, picks) {
@@ -85,6 +85,11 @@
   // (the attribute is built in pieces so the build's term scanner does not read "$1" as an id, as A4 does)
   function richS(t) { return esc(t).replace(/\[\[([a-z0-9-]+)\|([^\]]+)\]\]/g, function (m, id, w) { return '<span class="lx-term" data-term=' + '"' + id + '">' + w + "</span>"; }); }
   function cap(t) { return t.charAt(0).toUpperCase() + t.slice(1); }
+  // the participation question with its choices written out (the no-JS block has no buttons): "Which can ...: a, b, or c"
+  function voiceQ(V) {
+    var o = V.options.filter(function (x) { return x.value !== V.answer; }).map(function (x) { return x.label.charAt(0).toLowerCase() + x.label.slice(1); });
+    return V.q + ": " + o.slice(0, -1).join(", ") + ", or " + o[o.length - 1];
+  }
   function staticFallback(D) {
     var binLabel = function (id) { return byId(D.bins, id).label; }, S = D.settlement, V = D.voice;
     var qa = function (q, a) { return "<details class=\"x4-qa\"><summary>" + esc(q) + "?</summary><p>" + esc(a) + "</p></details>"; };
@@ -96,14 +101,14 @@
       qa(S.q, S.feedback[S.answer].replace(/^Right: /, "No: ")) +
       "<p class=\"lx-eyebrow\">Who decides</p><div class=\"lx-scroll-x\"><table class=\"lx-mini-table x4-fbt\"><thead><tr><th scope=\"col\">Decision</th><th scope=\"col\">Level</th></tr></thead><tbody>" +
       D.cards.map(function (c) { return "<tr><td>" + esc(c.text) + "</td><td>" + esc(binLabel(c.bin)) + "</td></tr>"; }).join("") + "</tbody></table></div>" +
-      qa(V.q, V.feedback[V.answer].replace(/^Right: /, "Both: ")) +
+      qa(voiceQ(V), V.static) +
       "<p class=\"lx-hint\">With JavaScript on, you put the rule's milestones in order, step through a rate case, sort who decides what and find where the public can speak.</p>";
   }
   function ideasHTML(D) {
     var s = span(D.hook.start, D.hook.end);
     return "<dl class=\"lx-ideas\">" +
       "<dt>Separate tracks</dt><dd>A law gives a regulator its authority; market rules and tariffs, retail rates and project permits then follow separate tracks, which can overlap.</dd>" +
-      "<dt>Who regulates what</dt><dd>FERC regulates interstate transmission and wholesale sales; state commissions such as the KCC approve retail rates.</dd>" +
+      "<dt>Who regulates what</dt><dd>FERC regulates interstate transmission and wholesale sales; state commissions such as the KCC approve the retail rates of the utilities they regulate.</dd>" +
       "<dt>Dates</dt><dd>One federal rule, Order No. 2222, took " + spanText(s) + " from first panel to final rule; a Kansas rate case runs on a 240-day decision clock in most cases.</dd>" +
       "<dt>Voices</dt><dd>Rulemakings take comments; rate cases take testimony from parties and comments from the public; the commissioners decide.</dd>" +
       "<dt>Siting</dt><dd>Where turbines may stand is decided mostly by local governments, sometimes with the state.</dd></dl>";
@@ -140,14 +145,15 @@
   // return on the rate base), and every term defined at first use
   function deeperHTML() {
     return "<ul><li><b>Step one: how much.</b> The commission sets a <span class=\"lx-term\" data-term=\"revenue-requirement\">revenue requirement</span>: the year's approved expenses, including depreciation (recovering past investment) and income taxes, plus an allowed return.</li>" +
-      "<li><b>The return.</b> It is earned on the <span class=\"lx-term\" data-term=\"rate-base\">rate base</span>, the net value of what the utility has built, at a rate that blends the cost of its debt and its shareholders' return.</li>" +
+      "<li><b>The rate base.</b> The <span class=\"lx-term\" data-term=\"rate-base\">rate base</span> is the plant the commission approves as serving customers, valued after depreciation.</li>" +
+      "<li><b>The return.</b> Rates give the utility an opportunity, not a guarantee, to earn a return on the rate base, at a rate that blends the cost of its debt and its shareholders' return.</li>" +
       "<li><b>Step two: who pays it.</b> Rate design splits that amount among <span class=\"lx-term\" data-term=\"customer-class\">customer classes</span>, such as homes and businesses: fixed charges, prices per kWh and, for large users, demand charges.</li>" +
       "<li><b>Where to see it.</b> The KCC describes both steps in its guide; the bills that result are the subject of lesson A4.</li></ul>";
   }
 
   var model = { span: span, spanText: spanText, addDays: addDays, longDate: longDate, orderScore: orderScore, STEPS: STEPS, hookFeedback: hookFeedback, CHAIN_SAW: CHAIN_SAW, chainHTML: chainHTML, richS: richS,
     orderLine: orderLine, orderSaw: orderSaw, stepLi: stepLi, caseHTML: caseHTML, CASE_SAW: CASE_SAW, sortLine: sortLine, SORT_SAW: SORT_SAW,
-    staticFallback: staticFallback, ideasHTML: ideasHTML, checkHTML: checkHTML, factsHTML: factsHTML, sourcesHTML: sourcesHTML, deeperHTML: deeperHTML, timelineEvents: timelineEvents };
+    staticFallback: staticFallback, voiceQ: voiceQ, ideasHTML: ideasHTML, checkHTML: checkHTML, factsHTML: factsHTML, sourcesHTML: sourcesHTML, deeperHTML: deeperHTML, timelineEvents: timelineEvents };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -174,7 +180,7 @@
           var grid = H("div", { class: "x4-order", role: "group", "aria-label": "Six selected milestones, to tap in order" }, act), btn = {};
           var ctl = H("div", { class: "lx-choices-row x4-ctl" }, act);
           var undo = H("button", { type: "button", class: "lx-btn small", text: "Undo" }, ctl), check = H("button", { type: "button", class: "lx-btn small", text: "Check my order", disabled: "" }, ctl);
-          var line = H("p", { class: "lx-step-line", "aria-live": "polite", text: "Tap the milestone that came first." }, act), out = H("div", { class: "x4-truth" }, act);
+          var line = H("p", { class: "lx-step-line", "aria-live": "polite", text: "Tap the one you think came first." }, act), out = H("div", { class: "x4-truth" }, act);
           D.shuffle.forEach(function (id) {
             var s = byId(D.steps, id), b = H("button", { type: "button", class: "x4-stage", "aria-pressed": "false" }, grid);
             H("span", { class: "n", "aria-hidden": "true" }, b); H("span", { class: "t", text: s.label }, b);
@@ -183,7 +189,7 @@
           });
           function paint() {
             Object.keys(btn).forEach(function (id) { var i = picks.indexOf(id), b = btn[id]; b.querySelector(".n").textContent = i >= 0 ? String(i + 1) : ""; b.setAttribute("aria-pressed", String(i >= 0)); b.setAttribute("aria-label", byId(D.steps, id).label + (i >= 0 ? ", placed " + (i + 1) : "")); });
-            if (picks.length < D.steps.length) { check.setAttribute("disabled", ""); line.textContent = picks.length ? "Placed " + picks.length + " of " + D.steps.length + ". Tap the next one." : "Tap the milestone that came first."; }
+            if (picks.length < D.steps.length) { check.setAttribute("disabled", ""); line.textContent = picks.length ? "Placed " + picks.length + " of " + D.steps.length + ". Tap the next one." : "Tap the one you think came first."; }
             else { check.removeAttribute("disabled"); line.textContent = "All six placed. Check your order."; }
           }
           undo.addEventListener("click", function () { picks.pop(); out.innerHTML = ""; paint(); });
@@ -232,7 +238,7 @@
           var V = D.voice;
           var pr = LX.Predict(act, { id: "x4-voice", q: V.q, title: false, answer: V.answer, options: V.options, feedback: V.feedback, onPick: function () { pr.reveal(); api.done(); buildExplain(); } });
           if (pr.picked()) { pr.reveal(); api.done(); }
-          H("a", { class: "lx-btn small", style: "justify-self:start;margin-top:10px", href: "#explain", html: "The two tracks, as diagrams" + LX.icon("arrow") }, act);
+          H("a", { class: "lx-btn small", style: "justify-self:start;margin-top:10px", href: "#explain", html: "The three tracks, as diagrams" + LX.icon("arrow") }, act);
           demo[5] = function () { if (!pr.picked()) { var b = act.querySelectorAll(".lx-choice")[2]; if (b) b.click(); } };
         } }
     ] });
@@ -243,15 +249,15 @@
       if (!xhost) return;
       xhost.innerHTML = ""; xhost.classList.add("is-live");
       LX.Flowchart(H("div", { class: "lx-xcard" }, xhost), {
-        title: "Two tracks from a law to what you pay and what gets built", lede: "Trace three cases; each box names who decides.",
+        title: "Three tracks from a law to what you pay and what gets built", lede: "Trace four cases; each box names who decides.",
         nodes: {
           cong: { t: "Congress passes a law", tN: ["Congress", "passes a law"], k: "end" },
           leg: { t: "Kansas passes a law", tN: ["Kansas passes", "a law"], k: "end" },
           ferc: { t: "FERC writes a rule", tN: ["FERC writes", "a rule"], s: "proposal, comments, rule", sN: "comments first" },
-          kcc: { t: "The KCC hears the case", tN: ["The KCC", "hears the case"], s: "rate cases, line permits", sN: "rates, lines" },
+          kcc: { t: "The KCC hears the case", tN: ["The KCC", "hears the case"], s: "rate cases", sN: "rate cases" },
           tar: { t: "Tariff filed at FERC", tN: ["Tariff filed", "at FERC"], s: "by SPP or a utility", sN: "SPP, utilities" },
           rate: { t: "KCC issues its decision", tN: ["KCC issues", "its decision"], s: "usually within 240 days of filing", sN: "usually 240 days" },
-          loc: { t: "County and city permits", tN: ["County and", "city permits"], s: "zoning, building", sN: "zoning" },
+          loc: { t: "Project permits", tN: ["Project", "permits"], s: "county zoning; KCC for big lines", sN: "county, KCC" },
           out: { t: "Bills or projects may change", tN: ["Bills or projects", "may change"], k: "end" }
         },
         cols: 3, at: { cong: [0, 0], leg: [1, 0], loc: [2, 0], ferc: [0, 1], kcc: [1, 1], tar: [0, 2], rate: [1, 2], out: [1, 3] },
@@ -259,7 +265,8 @@
         edges: [["cong", "ferc"], ["leg", "kcc"], ["ferc", "tar", "wholesale"], ["kcc", "rate", "retail"], ["tar", "out", null, { v: true }], ["rate", "out", "if approved"], ["loc", "out", null, { v: true }]],
         traces: [{ label: "Order No. 2222", path: ["cong", "ferc", "tar", "out"], text: "Federal track: FERC's rule changed each regional market's tariff, filed at FERC." },
                  { label: "A Kansas rate change", path: ["leg", "kcc", "rate", "out"], text: "State track: the KCC decides the utility's application, usually within 240 days of filing; it may approve, change or reject it, and any rate change follows its order." },
-                 { label: "A wind farm's site", path: ["loc", "out"], text: "Local track, in most places: the county, sometimes with the state; a tall-turbine check is federal." }], sel: 1 });
+                 { label: "A wind farm's site", path: ["loc", "out"], text: "Permit track, in most places: the county decides, sometimes with the state; a tall-turbine check is federal." },
+                 { label: "The 345 kV line", path: ["loc", "out"], text: "Permit track: in Kansas a line of 230 kV or more and at least 5 miles long needs a KCC siting permit, with a final order within 180 days of filing." }], sel: 1 });
       LX.Timeline(H("div", { class: "lx-card x4-tl" }, xhost), { title: "One federal rule in time: Order No. 2222",
         events: timelineEvents(D) });
       var nx = H("div", { class: "lx-xcard" }, xhost);

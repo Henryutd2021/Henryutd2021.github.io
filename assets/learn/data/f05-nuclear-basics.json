@@ -26,7 +26,7 @@
    "publisher": "U.S. Department of Energy",
    "title": "Quadrennial Technology Review 2015, Technology Assessment 4.J: High Temperature Reactors",
    "url": "https://www.energy.gov/sites/prod/files/2016/03/f30/QTR2015-4J-High-Temperature-Reactors.pdf",
-   "where": "Introduction and Process Heat Applications (p. 1: HTRs have core outlet temperatures between 700 and 950 °C; industrial processes need heat at 650 to 950 °C); Gas-Cooled HTRs (p. 3: an intermediate heat exchanger passes the helium's heat to another fluid); Molten-salt cooled HTR (p. 5: the fluoride salt-cooled high-temperature reactor, FHR, with solid graphite-moderated fuel, high temperature and low pressure, to drive generators or industrial processes); glossary entries FHR (a subset of the high-temperature reactor systems) and Moderator",
+   "where": "Introduction and Process Heat Applications (p. 1: HTRs have core outlet temperatures between 700 and 950 °C; industrial processes need heat at 650 to 950 °C); Gas-Cooled HTRs (p. 3: an intermediate heat exchanger passes the helium's heat to another fluid; to ensure passive decay heat removal, gas-cooled HTRs are limited to 600 MWt each or less, while the seven gas-cooled HTRs built so far ranged from 10 to 842 MWt, p. 1); Molten-salt cooled HTR (p. 5: the fluoride salt-cooled high-temperature reactor, FHR, with solid graphite-moderated fuel, high temperature and low pressure, to drive generators or industrial processes); glossary entries FHR (a subset of the high-temperature reactor systems) and Moderator",
    "as_of": "2015",
    "read": "2026-11-03"
   },
@@ -154,15 +154,6 @@
    "text": "about 1 centimeter",
    "src": "eia_fuel"
   },
-  "rods_per_assembly": {
-   "value": 200,
-   "text": "more than 200",
-   "src": "doe101"
-  },
-  "assemblies_per_core": {
-   "text": "a couple hundred",
-   "src": "doe101"
-  },
   "pwr_share_pct": {
    "value": 65,
    "text": "more than 65%",
@@ -266,7 +257,8 @@
   },
   "htr_mwt_max": {
    "value": 600,
-   "src": "qtr_htr"
+   "src": "qtr_htr",
+   "note": "per module, so that decay heat can be removed passively (DOE 2015, p. 3); earlier gas-cooled plants were built larger (p. 1)"
   },
   "proc_lo_c": {
    "value": 650,
@@ -318,7 +310,7 @@
  },
  "plant": {
   "townMW": 100,
-  "about": "Prairie Town's 100 MW plant (illustrative, town.json) at the efficiency implied by EIA's 2025 weighted average tested heat rate for nuclear units. Core heat minus electricity is rejected heat plus other losses (such as the plant's own use), most of it through the condenser."
+  "about": "Prairie Town's 100 MW plant (illustrative; the same size as in town.json, which this page does not load) at the efficiency implied by EIA's 2025 weighted average tested heat rate for nuclear units. Core heat minus electricity is rejected heat plus other losses (such as the plant's own use), most of it through the condenser."
  },
  "designs": [
   {
@@ -353,7 +345,7 @@
    "key": "micro",
    "name": "Microreactor",
    "size": "1 to 20 MWt",
-   "coolant": "gas, liquid metal, molten salt or heat pipes",
+   "coolant": "gas, liquid metal, molten salt, or a fluid inside heat pipes",
    "moderator": "depends on the design",
    "outlet": "depends on the coolant",
    "lo": null,
@@ -380,7 +372,7 @@
   {
    "key": "htgr",
    "name": "High-temperature gas-cooled",
-   "size": "up to 600 MWt each",
+   "size": "up to 600 MWt per module, for passive cooling",
    "coolant": "helium",
    "moderator": "graphite",
    "outlet": "700 to 950 °C",

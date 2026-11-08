@@ -121,7 +121,8 @@ svg.f3h-pic { display: block; width: 100%; height: auto; }
 <ul>
 <li><b>Services, carriers, devices.</b> People want services (a warm room, a hot shower, a trip); carriers (gas, electricity, gasoline) bring the energy; devices turn one into the other.</li>
 <li><b>Warmth is the biggest home service:</b> 16,900 of the house's 31,100 kWh. The one car uses about as much: 16,900 kWh of gasoline.</li>
-<li><b>Swap the furnace for a heat pump:</b> the same 13,500 kWh of heat comes from 5,400 kWh of electricity plus 8,100 kWh moved in from the outdoor air (seasonal COP 2.5). Home and car then buy 36,500 kWh.</li>
+<li><b>COP:</b> a heat pump's coefficient of performance, heat delivered ÷ electricity used; COP 2.5 means 2.5 kWh of heat for each kWh of electricity.</li>
+<li><b>Swap the furnace for a heat pump:</b> the same 13,500 kWh of heat comes from 5,400 kWh of electricity plus 8,100 kWh moved in from the outdoor air (an assumed seasonal COP 2.5, from a DOE test rating). Home and car then buy 36,500 kWh.</li>
 </ul>
 <p class="lx-eyebrow">The heat pump on a cold day (illustrative model)</p>
 <table class="lx-mini-table">
@@ -180,9 +181,16 @@ svg.f3h-pic { display: block; width: 100%; height: auto; }
 <div class="lx-deeper-body">
 ```
 
-The kWh on a meter are [final energy]{.lx-term term="final-energy"}: what the home buys. [Primary energy]{.lx-term term="primary-energy"} counts the energy before it was converted. For electricity from a gas plant, more fuel energy enters the plant than electrical energy reaches the home.
+The kWh on a meter are [final energy]{.lx-term term="final-energy"}: what the home buys. [Primary energy]{.lx-term term="primary-energy"} counts the energy before conversion, so electricity from a gas plant starts as more fuel energy than reaches the home.
 
-Suppose the heat pump's 5,400 kWh came from a gas combined-cycle plant at EIA's 2025 full-load test heat rate, 7,535 Btu of gas per kWh ([F4](f04-power-plants.html)), through a grid that loses about 5% on the way (U.S. average for 2018–2022, [EIA](https://www.eia.gov/tools/faqs/faq.php?id=105&t=3); [F6](f06-grid-and-outages.html)):
+Suppose the heat pump's 5,400 kWh came from one gas plant, through the grid:
+
+| Assumption | Value | Source |
+|---|---|---|
+| The plant | Gas combined cycle, 7,535 Btu of gas per kWh (full-load test heat rate, 2025) | [EIA](https://www.eia.gov/electricity/annual/html/epa_08_02.html) |
+| The grid | About 5% lost on the way (U.S. average, 2018–2022) | [EIA](https://www.eia.gov/tools/faqs/faq.php?id=105&t=3) |
+
+[F4](f04-power-plants.html) and [F6](f06-grid-and-outages.html) explain where each number comes from.
 
 $$
 \text{sent out} = \frac{5{,}400 \text{ kWh}}{1 - 0.05} \approx 5{,}700 \text{ kWh}
@@ -217,7 +225,10 @@ A demand model starts from the service and divides by the device's efficiency. O
 
 **Where 144 comes from.** It is a chosen number, not physics: the curve is set to give COP 2.4 at −15 °C, DOE's target (2.4 × 60 = 144).
 
-**What it means for a model.** Above the cut-out, $E(T)$ grows faster than $Q(T)$ as $T$ falls, so a model that uses one average temperature underestimates the electricity of the coldest days. At the cut-out $E$ jumps up; below it, $E$ grows in step with $Q$.
+**What it means for a model.**
+
+- Above the cut-out, $E(T)$ grows faster than $Q(T)$ as $T$ falls, so a model using one average temperature underestimates the coldest days' electricity.
+- At the cut-out $E$ jumps up; below it, $E$ grows in step with $Q$.
 
 Analyst lesson [A15](a15-efficiency-electrification.html) prices efficiency and electrification; Modeler lesson [M12](m12-city-model.html) puts heat, buildings and transport into one city model.
 
@@ -314,7 +325,8 @@ Analyst lesson [A15](a15-efficiency-electrification.html) prices efficiency and 
 <tr><td class="n">57.6 million Btu</td><td>Natural gas for space heating in a West North Central home that heats with gas: 16,900 kWh.</td><td class="s"><a href="https://www.eia.gov/consumption/residential/data/2020/index.php?view=consumption">EIA, RECS 2020, Table CE4.6</a> · 2020 data, revised March 2024</td></tr>
 <tr><td class="n">22.8 mpg</td><td>Average fuel economy of U.S. cars and light trucks in 2022, driven 10,917 miles a year: 16,900 kWh of gasoline.</td><td class="s"><a href="https://www.epa.gov/energy/greenhouse-gas-equivalencies-calculator-calculations-and-references">EPA, Greenhouse Gas Equivalencies: Calculations and References</a> · 2022 data, page updated August 2026</td></tr>
 <tr><td class="n">about 30%</td><td>Share of a typical gasoline car's fuel energy that moves it, depending on the drive.</td><td class="s"><a href="https://www.energy.gov/cmei/vehicles/articles/fotw-1360-sept-16-2024-typical-ev-87-91-efficient-compared-30-conventional">DOE, Fact of the Week #1360</a> · 16 September 2024</td></tr>
-<tr><td class="n">COP 2.4</td><td>DOE's target for a cold-climate heat pump at −15 °C (5 °F). Its seasonal target, HSPF2 8.5, is a heating-season test rating in Btu of heat per Wh of electricity: 8.5 ÷ 3.412 is a seasonal COP of about 2.5.</td><td class="s"><a href="https://www.energy.gov/sites/default/files/2021-10/bto-cchp-tech-challenge-spec-102521.pdf">DOE, Cold-Climate Heat Pump Challenge Specification</a>, Table II-2, p. 6 · version 1.2, September 2021</td></tr>
+<tr><td class="n">COP 2.4</td><td>DOE's target at −15 °C (5 °F) for cold-climate heat pumps of 24,000 to 48,000 Btu/h.</td><td class="s"><a href="https://www.energy.gov/sites/default/files/2021-10/bto-cchp-tech-challenge-spec-102521.pdf">DOE, Cold-Climate Heat Pump Challenge Specification</a>, Table II-2, p. 6 · version 1.2, September 2021</td></tr>
+<tr><td class="n">HSPF2 8.5</td><td>The same challenge's seasonal target, a Region V test rating in Btu of heat per Wh of electricity: 8.5 ÷ 3.412 is a seasonal COP of about 2.5, the value this lesson assumes.</td><td class="s"><a href="https://www.energy.gov/sites/default/files/2021-10/bto-cchp-tech-challenge-spec-102521.pdf">DOE, Cold-Climate Heat Pump Challenge Specification</a>, p. 3 · version 1.2, September 2021</td></tr>
 <tr><td class="n">3,412 Btu</td><td>The energy in 1 kWh, the factor used to turn RECS's million Btu into kWh.</td><td class="s"><a href="https://www.eia.gov/energyexplained/units-and-calculators/british-thermal-units.php">EIA, Energy explained: British thermal units</a> · read 3 November 2026</td></tr>
 </tbody>
 </table>

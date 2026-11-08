@@ -1,5 +1,5 @@
 {
-  "about": "Side topic X5 (How are big energy projects actually financed?): a capital-stack builder for one wind and storage project, closed form. The project is Prairie Town's wind farm (town.json, illustrative) with lesson A2's battery; their building costs, upkeep and output come from lessons 7 and 13 and A2's data files, and the contract price from A1's, read through x05-inputs.json (the finance-only projection of those files, written by the X5 test). Every dollar is a 2025 dollar. The lender's settings below are illustrative values inside the dated ranges of the sources. One typical year stands for every year of the loan: no inflation, taxes, depreciation, construction loans, reserve accounts or tax-equity flip.",
+  "about": "Side topic X5 (How are big energy projects actually financed?): a capital-stack builder for one wind and storage project, closed form. The project is Prairie Town's wind farm (town.json, illustrative) with lesson A2's battery; their building costs, upkeep and output come from lessons 7 and 13 and A2's data files, and the contract price from A1's, read through x05-inputs.json (the finance-only projection of those files, written by the X5 test). Every dollar is a 2025 dollar. The lender's settings below are illustrative; its two coverage ratios lie within the range the 2025 ATB assumes across technologies, which differ by technology, not by contract. One typical year stands for every year of the loan: no inflation, taxes, depreciation, construction loans, reserve accounts or tax-equity flip.",
   "accessed": "2026-11-07",
   "priceYear": 2025,
   "lender": {
@@ -9,7 +9,7 @@
     "termNote": "15 years, illustrative: the battery's life in lesson 13's data. The 2025 ATB amortizes its loans over 18 years.",
     "dscrContract": 1.3,
     "dscrMerchant": 2.0,
-    "dscrNote": "Illustrative: the lender asks 1.30 times the loan payment from contracted cash and 2.00 times from cash sold at market prices. The 2025 ATB assumes minimum coverage ratios from 1.275 (utility solar) to 2.0 (utility batteries).",
+    "dscrNote": "Illustrative: the lender asks 1.30 times the payment from contracted cash and 2.00 from market cash. The 2025 ATB's minimums differ by technology, from 1.275 (utility solar) to 2.0 (utility batteries).",
     "src": [
       "atb2025-fin"
     ]
@@ -84,7 +84,7 @@
       "color": "var(--lx-wind)",
       "who": "Banks and other lenders.",
       "gets": "Fixed loan payments: interest, plus repayment of the amount borrowed (the principal).",
-      "paid": "First, right after operating costs; the project's assets pledged as security (collateral) and rules the borrower must follow (covenants) protect it, so it asks the lowest return.",
+      "paid": "First, right after operating costs; the project's assets pledged as security (collateral) and rules the borrower must follow (covenants) protect it, so it asks a lower return than equity.",
       "src": "schwabe2017",
       "where": "pp. 15-16, 20"
     },
@@ -137,7 +137,7 @@
     },
     {
       "n": "48% · 29% · 9%",
-      "what": "Of the new U.S. wind capacity of 2023: at least 48% sold to direct retail buyers (corporations among them), 29% bought or owned by utilities, at least 9% merchant or quasi-merchant.",
+      "what": "Of the new U.S. wind capacity of 2023: at least 48% sold to direct retail buyers (corporations among them), 29% bought or owned by utilities, at least 9% with revenue tied mainly to market prices (merchant or quasi-merchant).",
       "src": "lbnl2024",
       "where": "p. 3"
     },
@@ -170,7 +170,7 @@
       "Why contracted revenue supports more debt than revenue sold at market prices."
     ],
     "leaves": [
-      "Structuring a deal: partnership flips, back-leverage, reserve accounts, term sheets.",
+      "Structuring a deal: how a tax-equity partnership divides cash over time, loans to the sponsor alone, reserve accounts, term sheets.",
       "Tax law, eligibility for credits and accounting standards.",
       "Investment advice: this lesson rates no project and no investor."
     ],

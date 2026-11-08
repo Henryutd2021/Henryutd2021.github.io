@@ -116,11 +116,11 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-fallback">
 <p class="lx-eyebrow">The idea in one table: five scales, five sets of decisions</p>
 <div class="lx-scroll-x"><table class="lx-mini-table f1-fbt">
-<thead><tr><th scope="col">Scale</th><th scope="col">Who decides</th><th scope="col">What they decide</th><th scope="col">What a model needs</th></tr></thead>
+<thead><tr><th scope="col">Scale</th><th scope="col">Who decides</th><th scope="col">What they decide</th><th scope="col">What a model usually focuses on</th></tr></thead>
 <tbody>
 <tr><td>S0 Device and plant</td><td>The owner of a home or plant</td><td>What to install at one site, and how to run it hour by hour</td><td>Device ratings, efficiencies, one meter</td></tr>
 <tr><td>S1 Microgrid and community</td><td>A campus owner or a rural co-op</td><td>Size, and which loads stay on when it islands</td><td>A small network that can run alone</td></tr>
-<tr><td>S2 Regional bulk grid</td><td>A grid operator, overseen by regulators</td><td>Which plants run in its region, reserves, lines, connections</td><td>Power flow on lines; frequency and inertia for fast events</td></tr>
+<tr><td>S2 Regional bulk grid</td><td>A grid operator, overseen by regulators</td><td>Which plants run and the reserves; a say in new lines and connections</td><td>Power flow on lines; frequency and inertia for fast events</td></tr>
 <tr><td>S3 City and region</td><td>A city or county</td><td>Building codes, heat, transit, land, feeder upgrades</td><td>Feeders, heat networks, links between sectors</td></tr>
 <tr><td>S4 Nation</td><td>A national government and regulators</td><td>Targets, instruments, infrastructure, trade</td><td>Regional energy balances, main corridors</td></tr>
 </tbody>
@@ -130,12 +130,13 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <li>The Southwest Power Pool's highest hour of 2025: 54.4 GW.</li>
 <li>The Lower 48 states' record hour: 759 GW (29 July 2025).</li>
 <li>Units: 1 kW = 1,000 W (watts); 1 MW = 1,000 kW; 1 GW = 1,000 MW.</li>
+<li>Terms: a co-op is a utility owned by its members; reserves are spare capacity kept ready for a sudden loss; inertia, stored in spinning generators, slows changes in the grid's frequency.</li>
 </ul>
 <p>The scales overlap. Signals and limits usually pass down, such as a utility's tariff to a home; profiles and needs pass up, such as a home's load to the grid operator.</p>
 <p class="lx-hint">With JavaScript on, you work through this step by step: a zoom through five scenes, five sorts and one question about a campus.</p>
 </div>
 </div>
-<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Home:</b> EIA's 10,791 kWh a year bought per residential customer (<a href="https://www.eia.gov/tools/faqs/faq.php?id=97&amp;t=3">2022 data</a>) ÷ 8,760 hours.<br><b>Southwest Power Pool:</b> its 2025 peak, from <a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>.<br><b>Lower 48:</b> EIA's <a href="https://www.eia.gov/todayinenergy/detail.php?id=65864">preliminary record</a>.<br><b>Fictional:</b> Prairie Town, Prairie Campus, the Plains Grid, Prairie City and Prairieland; their sizes are illustrative. Prairie Town's 450 MW is the highest hour of its illustrative year.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Home:</b> EIA's 10,791 kWh a year bought per residential customer (<a href="https://www.eia.gov/tools/faqs/faq.php?id=97&amp;t=3">2022 data</a>) ÷ 8,760 hours.<br><b>Southwest Power Pool:</b> its 2025 peak, from <a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>.<br><b>Lower 48:</b> EIA's <a href="https://www.eia.gov/todayinenergy/detail.php?id=65864">preliminary record</a>.<br><b>Fictional:</b> Prairie Town, Prairie Campus, the Plains Grid, Prairie City and Prairieland; their sizes are illustrative.<br><b>Prairie Town's peak:</b> 450 MW is the highest hour of its illustrative year.</span></p>
 ```
 :::
 
@@ -151,7 +152,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <dt>A scale</dt><dd>A view of the system with its own decision makers, decisions and physics, not just a size on the map. A <span class="lx-term" data-term="microgrid">microgrid</span> (S1) can even <span class="lx-term" data-term="islanding">island</span>.</dd>
 <dt>Who decides</dt><dd>An owner (S0), a campus or co-op (S1), a grid operator (S2), a city (S3), a nation (S4).</dd>
 <dt>Between scales</dt><dd>Prices, tariffs, limits and targets usually pass down, such as a utility's tariff to a home; load profiles, flexibility and needs pass up.</dd>
-<dt>Local optimum</dt><dd>The best plan for one scale, a <span class="lx-term" data-term="local-optimum">local optimum</span>, holds only inside its boundary; a limit from the scale above can change it.</dd>
+<dt>One scale's best plan</dt><dd>The cheapest plan for one campus holds only inside its boundary; a limit from the scale above can change it.</dd>
 </dl>
 </div>
 </div>
@@ -160,11 +161,11 @@ body-classes: "page-learn page-lesson lx-form-cards"
 ```{=html}
 <div class="lx-deepers">
 <details class="lx-deeper">
-<summary><span class="k">Go deeper · Analyst</span>Real organisations straddle scales</summary>
+<summary><span class="k">Go deeper · Analyst</span>Real organizations straddle scales</summary>
 <div class="lx-deeper-body">
 ```
 
-The five scales are a lens for questions, not an organisation chart.
+The five scales are a lens for questions, not an organization chart.
 
 - **A co-op can sit on two scales.** It can own a campus microgrid (S1) and buy power on the regional grid (S2).
 - **One site can matter to a whole grid.** A large factory or data-center campus is one site (S0), yet large enough to change regional planning (S2): Analyst lesson [A6](a06-interconnection.qmd).
@@ -216,12 +217,12 @@ When two scales' models pass numbers back and forth, a modeler must check whethe
 <div class="lx-qq" data-id="size" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “A scale is just a size on the map.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. A scale is set by who decides what and which physics a model needs. Prairie City lies inside the Plains Grid's area, yet the city and the grid operator decide different things.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. A scale is set by who decides what: Prairie City lies inside the Plains Grid's area, yet the city and the grid operator decide different things.</p></details>
 </div>
 <div class="lx-qq" data-id="local" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “The cheapest plan for one campus is also the best plan for the grid it sits on.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. A local optimum holds only inside its boundary; the grid weighs everyone's costs and limits, and the two answers can differ.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. The campus's best plan holds only inside its boundary; the grid weighs everyone's costs and limits, and the two answers can differ.</p></details>
 </div>
 <div class="lx-qq" data-id="homes" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “One household's choices are too small to matter at the national scale.”</p>
@@ -254,7 +255,7 @@ When two scales' models pass numbers back and forth, a modeler must check whethe
 <div class="lx-qq" data-id="physics" data-answer="b">
 <p class="lx-qtext">Which physics might a regional grid model need that a one-home scheduling model usually leaves out?</p>
 <ul class="lx-choices"><li data-value="a">A battery's state of charge</li><li data-value="b">Power flow on lines and the grid's frequency</li><li data-value="c">The efficiency of a heat pump</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Power flow on lines, and the grid's frequency when a study looks at fast disturbances. A home scheduling model needs its devices, not the network.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Power flow on lines, and the grid's frequency when a study looks at fast disturbances. A home scheduling model usually represents its devices and treats the grid connection as a limit.</p></details>
 </div>
 <div class="lx-qq" data-id="arrow" data-answer="c">
 <p class="lx-qtext">Which of these is usually sent down, from a larger scale to a smaller one?</p>

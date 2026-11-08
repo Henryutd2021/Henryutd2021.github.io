@@ -5,6 +5,9 @@ glossary:
   - id: fission
     term: Fission
     def: "The splitting of a heavy atom, such as uranium-235, into two smaller atoms when it absorbs a neutron, which releases heat and a few new neutrons."
+  - id: uranium-235
+    term: Uranium-235
+    def: "The form of uranium whose atoms split easily when they catch a slow neutron; natural uranium holds only a small share of it."
   - id: neutron
     term: Neutron
     def: "A particle with no electric charge in the nucleus of an atom; in a reactor, the neutrons from one fission go on to split more atoms."

@@ -50,6 +50,7 @@ const sentences = s => s.split(/(?<=[.!?])\s+/).filter(Boolean).length;
     if (r > 115) ok(x.firstDry >= 0, `reservoir ${r} MW: above the window it runs dry`);
     if (r < 100) ok(x.firstSpill >= 0, `reservoir ${r} MW: below the window it spills`);
   });
+  range(0, 200, 5).forEach(r => { const t = M.reservoirMessage(RS, M.simReservoir(RS, r)); ok(words(t) <= 30 && sentences(t) <= 1, `reservoir ${r} MW: one-sentence message (${words(t)} words)`); });
   ok(/fed by a river averaging 101 MW/.test(QMD) && /Holding up to 350 GWh/.test(QMD) && /from 100 to 115 MW \(the slider moves in 5 MW steps\)/.test(QMD), "fallback: 350 GWh, 101 MW, 100 to 115 MW in 5 MW steps");
   // the units of the stock balance: one week at a net flow in MW changes the stock by net × 168 ÷ 1,000 GWh
   const x1 = M.simReservoir(RS, 100);
@@ -73,7 +74,16 @@ const sentences = s => s.split(/(?<=[.!?])\s+/).filter(Boolean).length;
   }));
   ok(winners.join() === "25/25", "only 25 MW / 25 MW delivers the full 100 MWh");
   const s = M.simBattery(B, B.chargeMW.start, B.dischargeMW.start);
-  ok(!s.won && s.short === 40 && s.emptyAt === 20 && s.stored === 60, "start: 15 MW in stores 60 MWh; empty at 20:00, 40 MWh short");
+  ok(!s.won && s.short === 40 && s.emptyAt === 20 && s.stored === 60, "start: 15 MW in stores 60 MWh; the first short hour is 20:00 to 21:00, 40 MWh short");
+  // the battery still holds energy at the start of its first short hour, so the message names the hour, not a moment
+  const sm = M.batteryMessage(B, s, B.dischargeMW.start);
+  ok(s.stock[20] === 10 && s.stock[21] === 0 && /runs out during the hour from 20:00 to 21:00/.test(sm) && !/runs empty at/.test(sm + JS), `start: 10 MWh left at 20:00, empty by 21:00, and the message says so ("${sm.slice(0, 70)}")`);
+  range(0, 25, 5).forEach(c => range(0, 25, 5).forEach(d => {
+    const r = M.simBattery(B, c, d), t = M.batteryMessage(B, r, d);
+    ok(words(t) <= 35 && sentences(t) <= 2, `battery ${c}/${d}: message within budget (${words(t)} words)`);
+    if (r.short) ok(r.stock[r.emptyAt] > 1e-9 ? t.indexOf("runs out during the hour from " + r.emptyAt + ":00 to " + (r.emptyAt + 1) + ":00") > 0 : t.indexOf("is empty from " + r.emptyAt + ":00:") > 0, `battery ${c}/${d}: the message matches the stock at the start of the first short hour (${r.stock[r.emptyAt]} MWh)`);
+  }));
+  ok(/gives back 80% of the electricity bought to charge it/.test(B.about[0].t) && !/round trip/.test(JSON.stringify(B.about)), "battery setup: 80% in plain words, not 'round trip'");
   ok(/must buy 125 MWh to deliver 100/.test(QMD) && /25 MW, 100 MWh battery that loses 20% on charging/.test(QMD), "fallback: 125 MWh to deliver 100");
 }
 
@@ -139,6 +149,10 @@ const sentences = s => s.split(/(?<=[.!?])\s+/).filter(Boolean).length;
   ok((QMD.match(/Abstract read/g) || []).length === 3, "three sources read from the abstract only, each marked");
   // naming a loop opens only once every sign is right, so the verdict cannot contradict the reader's signs
   ok(/if \(!S0\.checked \|\| g\.right < g\.total\) \{/.test(JS), "loop naming waits for correct signs");
+  // the verdict as the reader sees it: one result and one reason; the study's evidence sits apart, in a source line
+  ["ev", "rebound"].forEach(k => { const L = D.loops[k], ref = {}; L.links.forEach(l => { ref[l.id] = l.sign; }); L.loops.forEach(lp => [true, false].forEach(okk => {
+    const t = M.loopVerdict(lp, M.loopType(L, lp, ref), okk); ok(words(t) <= 35 && sentences(t) <= 2, `${k}.${lp.id} verdict: two sentences (${words(t)} words)`); })); });
+  ok(/class: "lx-hint f2-evidence", text: "Evidence: a study of "/.test(JS) && !/delays\. A study of/.test(JS), "the EV study is a separate evidence line, not part of the verdict");
   // a balancing loop opposes change; settling is one possible response
   ok(/overshoot/.test(SIDE.match(/id: balancing-loop[\s\S]*?def: "[^"]+"/)[0]) && !/pulled back toward a level/.test(QMD + JS + SIDE) && /without long delays/.test(JS), "balancing: opposes change; the settling sketch is labelled as one response without long delays");
 }
@@ -152,7 +166,7 @@ const sentences = s => s.split(/(?<=[.!?])\s+/).filter(Boolean).length;
   ok(R.levers.every(l => l.loop == null) && /not a feedback loop/.test(R.levers[0].note) && !/balancing loop closes/.test(JSON.stringify(D)), "gas: an adaptation chain, not a closed loop");
   // measurable labels; import spending apart from import dependence
   const lab = id => R.nodes.find(n => n.id === id).label;
-  ok(lab("health") === "Heat-related health risk" && lab("local") === "Local pollution and water use" && lab("imports") === "Dependence on imported gas" && lab("impbill") === "Gas import bill" && R.nodes.find(n => n.id === "impbill").dim === "cost", "nodes: measurable labels");
+  ok(lab("health") === "Heat-related health risk" && lab("local") === "Local air pollution" && lab("water") === "Water use" && R.nodes.find(n => n.id === "water").dim === "env" && lab("imports") === "Dependence on imported gas" && lab("impbill") === "Gas import bill" && R.nodes.find(n => n.id === "impbill").dim === "cost", "nodes: measurable labels");
   const gas = R.levers[0];
   ok(gas.waves[0].effects.some(e => e.node === "impbill" && e.dir === "up") && gas.waves[2].effects.some(e => e.node === "imports" && e.dir === "down") && !gas.waves[0].effects.some(e => e.node === "imports"), "gas: the import bill rises first; dependence falls later");
   // every node defines itself in one or two short sentences
@@ -167,7 +181,7 @@ const sentences = s => s.split(/(?<=[.!?])\s+/).filter(Boolean).length;
   ok(/^If /.test(eff(carb, "co2").why) && /^If /.test(eff(carb, "bill").why) && /^If /.test(eff(carb, "local").why) && /^if /.test(carb.predict.cond) && /pr2\.cond/.test(JS), "carbon price: CO₂, bills and pollution stated with their condition, and so is the verdict");
   ok(/can encourage/.test(eff(R.levers.find(l => l.id === "heat"), "build").why) && /can bring/.test(eff(R.levers.find(l => l.id === "heat"), "whp").why), "heat wave: investment and scarcity prices are possible, not certain");
   // a node's details show only the waves the reader opened
-  ok(M.nodeSoFar(R, "imports", { gas: 1 }).length === 0 && M.nodeSoFar(R, "imports", { gas: 3 })[0].dirs.join() === "down" && M.nodeSoFar(R, "co2", { gas: 1 }).length === 0 && M.nodeSoFar(R, "co2", {}).length === 0, "node details: only effects in opened waves");
+  ok(M.nodeSoFar(R, "imports", { gas: 1 }).length === 0 && M.nodeSoFar(R, "imports", { gas: 3 })[0].dirs.join() === "down" && M.nodeSoFar(R, "burden", { gas: 1 }).length === 0 && M.nodeSoFar(R, "burden", { gas: 2 })[0].dirs.join() === "up" && M.nodeSoFar(R, "co2", {}).length === 0, "node details: only effects in opened waves");
   ok(/nodeSoFar\(R, id, st\.levers\)/.test(JS) && !/ripple\(lv, lv\.waves\.length - 1\)\.by\[id\]/.test(JS), "the view uses the opened waves for node details");
   R.levers.forEach(lv => {
     const seen = new Set();
@@ -179,7 +193,10 @@ const sentences = s => s.split(/(?<=[.!?])\s+/).filter(Boolean).length;
     // a "from" is the lever or a card reached before it: in an earlier wave, or earlier in the same wave
     const before = new Set();
     lv.waves.forEach(w => w.effects.forEach(e => { ok(e.from === "lever" || before.has(e.from), `${lv.id}: ${e.from} → ${e.node} follows the waves`); before.add(e.node); }));
-    ok(lv.waves.slice(1).every(w => w.effects.every(e => e.from !== "lever")) || lv.id === "carbon", `${lv.id}: only the first wave comes straight from the lever`);
+    ok(lv.waves.slice(1).every(w => w.effects.every(e => e.from !== "lever" || /tariff passes/.test(e.why))), `${lv.id}: only the first wave comes straight from the lever, except a bill that waits for the tariff`);
+    // operating responses (which plants run, emissions) sit in a wave labelled in hours; nothing that runs hour by hour is
+    // labelled months or years
+    ["mix", "co2"].forEach(nd => lv.waves.forEach(w => { if (w.effects.some(e => e.node === nd)) ok(/^(Hours|From its first hours)/.test(w.label), `${lv.id}: ${nd} plays out within hours ("${w.label}")`); }));
     ok(M.dimsReached(R, lv).length === 5, `${lv.id}: reaches all five dimensions`);
     const first = M.ripple(lv, 2).by[lv.predict.node];
     ok(first && first[0] === lv.predict.answer, `${lv.id}: the prediction's answer is the map's direction for ${lv.predict.node}`);
@@ -191,9 +208,20 @@ const sentences = s => s.split(/(?<=[.!?])\s+/).filter(Boolean).length;
   const fb = (QMD.match(/<table class="lx-mini-table[^"]*">[\s\S]*?<\/table>/) || [""])[0];
   R.levers.forEach(lv => ok(fb.indexOf("<td>" + lv.label + "</td>") >= 0, `fallback table: ${lv.label}`));
   const mixed = []; R.levers.forEach(lv => lv.waves.forEach(w => w.effects.forEach(e => { if (e.dir === "mixed") mixed.push(lv.id + ":" + e.node); })));
-  ok(mixed.sort().join() === "carbon:burden,carbon:margin,dc:bill,dc:co2,dc:local,gas:co2", `"depends" cells: ${mixed.join(", ")}`);
-  ok(/CO₂ depends on what replaces gas/.test(fb) && /the burden depends on the revenue/.test(fb) && /CO₂ depends on what serves it/.test(fb) && /cooling water depends on the design/.test(fb) && /who pays for upgrades depends on the tariff/.test(fb), "fallback table: the 'depends' cells");
+  ok(mixed.sort().join() === "carbon:burden,carbon:margin,dc:bill,dc:co2,dc:water,gas:co2", `"depends" cells: ${mixed.join(", ")}`);
+  ok(/CO₂ depends on what replaces gas/.test(fb) && /the burden depends on the revenue/.test(fb) && /CO₂ depends on which plants serve it/.test(fb) && /cooling water depends on the design/.test(fb) && /who pays for upgrades depends on the tariff/.test(fb), "fallback table: the 'depends' cells");
   ok(/Each of four levers reaches technology, cost, emissions, people and security within three waves/.test(QMD), "fallback: four levers, five dimensions, three waves");
+  // the carbon question states its assumption before the choices; both prediction controls are named by their question
+  ok(/assume demand stays the same and gas plants with spare capacity can replace coal\. What happens to CO₂ emissions\?/.test(R.levers.find(l => l.id === "carbon").predict.q), "carbon price: the condition comes before the choices");
+  ok((JS.match(/title: false, q: pr\.q/g) || []).length === 2, "both prediction controls pass their question as the accessible name");
+  // a hub is a pattern of this map's four scenarios, not a rule for every study
+  ok(!/any study|should check these first/.test(JS) && (JS.match(/In your own study, the question and the boundary decide what to track/g) || []).length === 2, "hubs: this map's pattern; a study chooses what to track from its question");
+  // physical limits apart from a chosen budget
+  const eq = (QMD.match(/\$\$[\s\S]*?\$\$/) || [""])[0];
+  ok(!/bar\{S\}/.test(eq) && /a carbon budget is a chosen limit that emissions can exceed/.test(QMD) && /A carbon budget is a chosen limit that emissions can exceed/.test(JS) && !/A stock has a floor and a ceiling/.test(JS), "a carbon budget is a chosen limit, not a physical ceiling");
+  // first-use terms on the map
+  const allWhy = JSON.stringify(R);
+  ok(/thermal plants \(plants that make electricity from heat\)/.test(allWhy) && /\[\[peaker\|Peakers\]\], plants used mainly in the hours of highest demand/.test(allWhy), "thermal plants and peakers explained at first use");
   // data centers appear only as a load
   const dc = R.levers.find(l => l.id === "dc");
   ok(/300 MW data-center campus, an illustrative large load/.test(dc.about) && /illustrative 300 MW load/.test(QMD), "the data center is an illustrative 300 MW load");

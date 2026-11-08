@@ -26,7 +26,7 @@ const JS = fs.readFileSync(L_(ID + ".js"), "utf8");
 const SIDE = fs.readFileSync(path.join(SITE, "learn/_w1/" + ID + ".yml"), "utf8");
 const QPATH = path.join(SITE, "learn", ID + ".qmd");
 let checks = 0, fails = 0;
-const plain = S.plain, nWords = S.nWords, nSent = S.nSent;
+const plain = S.plain, nWords = S.nWords, nSent = S.nSent, LX_esc = S.esc;
 function ok(c, msg) { checks++; if (!c) { fails++; console.log("FAIL:", msg); } }
 
 // ---------------- the generated blocks
@@ -109,7 +109,19 @@ ok(/KCC issues its decision/.test(JS) && /usually within 240 days of filing/.tes
 { const dp = M.deeperHTML(); ok(/depreciation/.test(dp) && /income taxes/.test(dp) && /data-term="rate-base"/.test(dp) && /data-term="customer-class"/.test(dp) && /debt and its shareholders/.test(dp), "the revenue requirement: approved expenses incl. depreciation and taxes, a financing return; terms marked"); }
 ok(/depreciation and taxes/.test(SIDE) && ["rate-base", "intervenor", "evidentiary-hearing"].every(t => new RegExp("id: " + t + "\\b").test(SIDE)), "the sidecar defines the revenue requirement fully, and the rate base, an intervenor and an evidentiary hearing");
 ok(/Citizens Utility Ratepayer Board \(CURB\)/.test(D.rateCase.filter(c => c.id === "testimony")[0].text) && /\[\[intervenor\|/.test(RAW) && /\[\[evidentiary-hearing\|/.test(RAW), "CURB expanded and the legal terms marked at first use");
-{ const fb = M.staticFallback(D); ok(/may accept, reject or modify a settlement/.test(fb) && /Both: KCC comments enter the case record/.test(fb) && !/\[\[/.test(fb), "the no-JS block has the settlement answer and where the public can comment, with no raw marks"); }
+{ const fb = M.staticFallback(D), vq = M.voiceQ(D.voice);
+  ok(/may accept, reject or modify a settlement/.test(fb) && fb.indexOf(LX_esc(vq) + "?") > 0 && fb.indexOf(LX_esc(D.voice.static)) > 0 && !/\[\[/.test(fb), "the no-JS block has the settlement answer and the public-voice question with its choices and a self-contained answer, with no raw marks");
+  ok(/comment on a KCC rate case, comment on a FERC proposed rule, or vote on the commission's final order$/.test(vq) && /KCC rate case/.test(D.voice.static) && /FERC proposed rule/.test(D.voice.static) && /only commissioners vote/.test(D.voice.static), "the no-JS question names its three choices; the answer names both kinds of comment and who votes"); }
+// jurisdiction, first-use terms and the permit track (the sweep review's points)
+{ const retail = D.chain.tracks[1].text, fed = D.chain.tracks[0].text;
+  ok(/investor-owned utilities but not most electric cooperatives or city-run utilities/.test(retail) && D.chain.tracks[1].src.indexOf("kcc-role") >= 0 && /does not regulate most electric cooperatives or municipalities/.test(TXT("kcc-role")), "the retail track states the KCC's jurisdiction as the KCC does (not every Kansas utility)");
+  ok(/\[\[ferc\|FERC\]\]/.test(fed) && /\[\[rto\|RTO\]\]/.test(fed) && /its tariff, its service rules and prices/.test(fed) && /data-term="ferc"/.test(M.chainHTML(D)), "FERC, RTO and the filed tariff explained at first use, in the reveal and the no-JS block");
+  ok(/investor-owned/.test(D.project) && /\[\[investor-owned-utility\|/.test(M.STEPS[2]) && /investor-owned utility \(fictional\)/.test(M.STEPS[4]), "Prairie Town's utility is investor-owned from the outset");
+  ok(/\[\[settlement\|settlement\]\], a joint proposal/.test(M.STEPS[3]) && /id: settlement\b/.test(SIDE), "a settlement is explained where it first appears, and defined in the sidecar");
+  ok(/Southwest Power Pool \(SPP\)/.test(D.cards[0].text) && /North American Electric Reliability Corporation \(NERC\)/.test(D.cards.filter(c => c.id === "nerc")[0].why), "SPP and NERC are spelled out");
+  ok(/Guess the order/.test(M.STEPS[1]) && /dates come with the answer/.test(M.STEPS[1]) && /Tap the one you think came first/.test(JS) && !/Tap the milestone that came first/.test(JS), "the ordering task is framed as a guess, answered with the dates");
+  ok(/kcc: \{[^}]*s: "rate cases", sN: "rate cases"/.test(JS) && !/line permits/.test(JS) && /loc: \{ t: "Project permits"[^}]*KCC for big lines/.test(JS) && /label: "The 345 kV line", path: \["loc", "out"\][^}]*230 kV[^}]*5 miles[^}]*180 days of filing/.test(JS), "the flowchart's KCC box is rate cases only; line permits have their own trace with the 180-day order");
+  ok(/opportunity, not a guarantee/.test(M.deeperHTML()) && /approves as serving customers/.test(M.deeperHTML()) && /approves as serving customers[^"]*opportunity, not a guarantee/.test(SIDE) && /opportunity, not a guarantee/.test(TXT("kcc-rates")), "the rate base: approved plant after depreciation, and an opportunity to earn the return, as the KCC says"); }
 ok(/if \(g\.placed < g\.total\) \{ api\.saw\(sortLine\(g\), true\); return; \}/.test(JS) && /^Place every card first/.test(M.sortLine({ right: 0, placed: 0, total: 7 })), "the sort counts only with every card placed");
 
 // ---------------- the stop box, scope and links
@@ -127,9 +139,9 @@ ok(/fictional/.test(D.project) && /fictional/.test(PAGE), "Prairie Town's utilit
 
 // ---------------- text budget
 ok(M.STEPS.length === 6, "six step cards");
-M.STEPS.forEach((t, i) => { const n = nWords(t); ok(n >= 14 && n <= 40, "step " + (i + 1) + ": " + n + " words"); ok(nSent(t) <= 2, "step " + (i + 1) + ": " + nSent(t) + " sentences"); });
-const lines = [M.CHAIN_SAW, M.orderSaw(D), M.CASE_SAW, M.SORT_SAW, M.orderLine(D, D.shuffle)].concat(Object.values(M.hookFeedback(D)), Object.values(D.settlement.feedback), Object.values(D.voice.feedback), D.cards.map(c => c.why), D.rateCase.map(c => c.text), D.steps.map(s => s.text));
-lines.forEach(t => { ok(nWords(t) <= 40, "a reveal of " + nWords(t) + " words: " + plain(t).slice(0, 60)); ok(nSent(t) <= 2, "a reveal of " + nSent(t) + " sentences: " + plain(t).slice(0, 60)); });
+M.STEPS.forEach((t, i) => { const n = nWords(t); ok(n >= 14 && n <= 36, "step " + (i + 1) + ": " + n + " words"); ok(nSent(t) <= 2, "step " + (i + 1) + ": " + nSent(t) + " sentences"); });
+const lines = [M.CHAIN_SAW, M.orderSaw(D), M.CASE_SAW, M.SORT_SAW, M.orderLine(D, D.shuffle)].concat(Object.values(M.hookFeedback(D)), Object.values(D.settlement.feedback), Object.values(D.voice.feedback), D.cards.map(c => c.why), D.rateCase.map(c => c.text), D.steps.map(s => s.text), D.chain.tracks.map(t => t.text), [D.chain.note, D.voice.static]);
+lines.forEach(t => { ok(nWords(t) <= 36, "a reveal of " + nWords(t) + " words: " + plain(t).slice(0, 60)); ok(nSent(t) <= 2, "a reveal of " + nSent(t) + " sentences: " + plain(t).slice(0, 60)); });
 const PROSE = OWN.replace(/^---[\s\S]*?\n---\n/, " ").replace(/<script[\s\S]*?<\/script>/g, " ").replace(/<style[\s\S]*?<\/style>/g, " ").replace(/<!--[\s\S]*?-->/g, " ");
 PROSE.split(/<\/?(?:p|li|dd|dt|td|th|summary|br|caption|h3|h4)\b[^>]*>/).map(plain).filter(x => /[A-Za-z]/.test(x) && !/^[:{]/.test(x)).forEach(x => {
   const n = nWords(x); ok(n <= 42, "text element of " + n + " words: " + x.slice(0, 70)); ok(nSent(x) <= 3, "text element of " + nSent(x) + " sentences: " + x.slice(0, 70)); });

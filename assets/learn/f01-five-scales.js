@@ -46,12 +46,11 @@
   };
   function feedback(D, key, g, pred) {
     if (key !== "who") return scoreText(g) + " " + NOTE[key];
-    var right = pred === D.predict.answer;
-    return scoreText(g) + " Your prediction: " + (pred ? (right ? "right. " : "not quite. ") : "none. ") +
-      "Next hour's plants are chosen by the regional grid operator, a [[balancing-authority|balancing authority]] that keeps supply equal to demand in its region.";
+    var right = pred === D.predict.answer, lead = pred ? (right ? "Your prediction was right: the" : "Not quite: the") : "The";
+    return scoreText(g) + " " + lead + " regional grid operator, a [[balancing-authority|balancing authority]], chooses next hour's plants to keep supply equal to demand in its region.";
   }
   function zoomDone(W) {
-    return "From about " + W.homeText + " (one home's average) to " + W.usText + " (the Lower 48's record hour). Size grows, but a scale is set apart by **who decides what**: a city and a grid region can overlap on the map.";
+    return "From about " + W.homeText + " (one home's average) to " + W.usText + " (the Lower 48's record hour), size grows, but a scale is set apart by **who decides what**.";
   }
   function ladder(D, placedBy) {
     var out = {};
@@ -177,7 +176,7 @@
   var SCENE_ALT = {
     S0: "A Prairie Town home with rooftop solar, lit windows, a meter, a heat pump, an electric car and its charger; on the ridge, the wind farm.",
     S1: "Prairie Campus inside a dashed microgrid boundary: a college, the county hospital, a co-op, solar, a battery and a generator; a switch at the boundary to the host feeder; the home next door marked.",
-    S2: "The Plains Grid: three zones joined by transmission lines, with wind in the west, a gas plant in the centre and solar in the east; Prairie Town is one node in the west; a grid operator's desk.",
+    S2: "The Plains Grid: three zones joined by transmission lines, with wind in the west, a gas plant in the center and solar in the east; Prairie Town is one node in the west; a grid operator's desk.",
     S3: "Prairie City, inside the area of the Plains Grid: blocks of buildings ringed by a heat network, a transit line, a substation with feeders, an industrial park, farms and a data-center campus as a large load.",
     S4: "Prairieland: five regions, coal-dependent Ridge County, the capital, Prairie City and Prairie Town, the Plains Grid's area outlined, and oil tankers arriving through a strait."
   };
@@ -277,17 +276,17 @@
             onPick: function (p) { pred = p; keep("pred", p); api.done(); } });
           if (pred) api.done();
         } },
-      { text: "Who decides? Put each decision maker on its scale.",
+      { text: "Who decides? Put each decision maker on its scale; a [[co-op|co-op]] is a utility owned by its members, and a [[tariff|tariff]] is the rule that sets a bill.",
         build: function (act, api) {
           round("who", act, api, null, function (g) {
             api.saw(feedback(D, "who", g, pred || log.pred), g.right < 3);
           });
         } },
-      { text: "What does each one decide? Sort the decisions onto the scales.",
+      { text: "What does each one decide? Sort the decisions onto the scales; [[reserves|reserves]] are spare capacity kept ready for a sudden loss.",
         build: function (act, api) {
           round("what", act, api, null, function (g) { api.saw(feedback(D, "what", g), g.right < 3); });
         } },
-      { text: "A model of each scale needs different physics. Match each description to its scale.",
+      { text: "Models at each scale usually focus on different physics, such as a battery's [[state-of-charge|state of charge]] (the energy it holds) or a grid's [[inertia|inertia]]. Match each description to its scale.",
         build: function (act, api) {
           round("physics", act, api, null, function (g) { api.saw(feedback(D, "physics", g), g.right < 3); });
         } },
@@ -344,12 +343,12 @@
     LX.CompareTable(c2, {
       title: "What sets each scale apart", text: true,
       columns: [{ key: "name", label: "Scale", main: true }, { key: "who", label: "Who decides" }, { key: "what", label: "What they decide" },
-                { key: "physics", label: "What a model needs" }, { key: "inputs", label: "Takes in from other scales" }, { key: "outputs", label: "Passes on" }],
+                { key: "physics", label: "What a model usually focuses on" }, { key: "inputs", label: "Takes in from other scales" }, { key: "outputs", label: "Passes on" }],
       rows: D.scales.map(function (s) { return { key: s.id, color: scol(s), name: s.id + " · " + s.name, note: s.power, who: s.who, what: s.what, physics: s.physics, inputs: s.inputs, outputs: s.outputs }; }),
       caption: "Read across a row for one scale; read down a column to see one question change with scale."
     });
     var c3 = H("div", { class: "lx-xcard" }, host), h3 = H("header", { class: "lx-x-head" }, c3);
-    H("h3", { text: "Local and system optimum" }, h3);
+    H("h3", { text: "The campus's best plan and the grid's" }, h3);
     H("p", { class: "lx-lede", html: LX.rich(D.optimum) }, c3);
   }
 

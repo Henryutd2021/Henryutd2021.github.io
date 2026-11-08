@@ -1,5 +1,6 @@
 // test_f05-nuclear-basics.js — Node tests for F5 (assets/learn/f05-nuclear-basics.js), its data
-// (assets/learn/data/f05-nuclear-basics.json with town.json and cf_targets.json) and every number the page states.
+// (assets/learn/data/f05-nuclear-basics.json, the only file the page loads; town.json and cf_targets.json are read here to
+// check it) and every number the page states.
 // Usage (from the site folder):  node _tests/learn/test_f05-nuclear-basics.js
 "use strict";
 const fs = require("fs");
@@ -20,6 +21,7 @@ let checks = 0, fails = 0;
 function ok(cond, msg) { checks++; if (!cond) { fails++; console.log("FAIL:", msg); } }
 const near = (a, b, e) => Math.abs(a - b) <= (e == null ? 1e-9 : e);
 const sentences = s => s.split(/(?<=[.!?])\s+(?=[A-Z*“"(])/).filter(Boolean).length;
+const plainT = s => s.replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1");
 const words = s => s.replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1").replace(/\*\*/g, "").split(/\s+/).filter(Boolean).length;
 const fmt = v => v.toLocaleString("en-US");
 
@@ -55,9 +57,11 @@ const fmt = v => v.toLocaleString("en-US");
     if (r > 0 && !(M.kOf(T, r - 10, m) > k)) mono = false; if (m > 0 && !(M.kOf(T, r, m - 10) < k)) mono = false; }));
   ok(mono, "k falls as rods go in and rises with the moderator, at every grid point");
   ok(near(maxK, 1.25) && near(minK, 0.25), `slider extremes: k from ${minK} to ${maxK}`);
-  const kRow = (QMD.match(/\| \$k\$ \| multiplication factor[^|]*\| ([\d.]+) to ([\d.]+) \|/) || []);
-  ok(+kRow[1] === minK && +kRow[2] === maxK, `the Modeler table's k range (${kRow[1]} to ${kRow[2]}) is the sliders' range`);
-  ok(/\| \$k_\\text\{min\}\$, \$k_\\text\{max\}\$ \|[^|]*\| 0\.5 and 1\.25 \|/.test(QMD) && /\| \$a\$ \|[^|]*\| 0\.5 \|/.test(QMD) && /at \$m = 1\$, \$r = 0\.4\$/.test(QMD), "the Modeler table's parameters are the data's (kMin, kMax, rodAbsorb) and the steady point is rods 40%, moderator 100%");
+  // the Modeler box keeps the toy qualitative (a Foundations lesson at awareness level): no equation, no parameter table;
+  // its formula is documented in the data file's toy.about
+  const modeler = (QMD.match(/<summary><span class="k">Go deeper · Modeler<\/span>[\s\S]*?<\/details>/) || [""])[0];
+  ok(modeler && !/\$\$|\| Symbol|k_\\text|rodAbsorb/.test(modeler) && /Each generation holds \$k\$ times the neutrons of the one before\. Pushing the rods in lowers \$k\$, and so does draining the moderator/.test(modeler), "the Modeler box describes the toy in words, without its equation or parameters");
+  ok(/Steady means exactly \$k = 1\$: here only with the moderator full and the rods 40% in/.test(modeler) && /k = kFull\(moderator\) x \(1 - rodAbsorb x rods\)/.test(T.about), "the steady point (rods 40%, moderator full) matches the toy; its formula stays in the data file");
   ok(M.stateOf(0.99, T.steadyBand) === "dying" && M.stateOf(1, T.steadyBand) === "steady" && M.stateOf(1.01, T.steadyBand) === "growing" &&
      M.stateOf(0.999, T.steadyBand) === "dying" && M.stateOf(1.001, T.steadyBand) === "growing" && M.stateOf(1 + 1e-12, T.steadyBand) === "steady", "k < 1 dies, only k = 1 is steady (critical), k > 1 grows");
   const st = M.series(1, 100, 12); ok(st.length === 13 && st.every(v => v === 100), "k = 1: every generation equals the first");
@@ -71,7 +75,7 @@ const fmt = v => v.toLocaleString("en-US");
   // rods 30%, moderator 90% gives k = 0.99875, a slow decline; the page must not call it steady or show 1.00
   const k3090 = M.kOf(T, 30, 90), t3090 = M.toyText(T, 30, 90);
   ok(near(k3090, 0.99875) && M.stateOf(k3090, T.steadyBand) === "dying" && M.fmtK(k3090) === "0.999", `30/90: k = ${k3090}, shown ${M.fmtK(k3090)}, dying`);
-  ok(/^k = 0\.999 .*\*\*dying out\*\*, from 100 neutrons to 99 in 12 generations\.$/.test(t3090), `30/90 line: "${t3090}"`);
+  ok(/^k = 0\.999 .*\*\*dying out\*\*, from 100 neutrons to 99 in 12 generations\.$/.test(plainT(t3090)) && /^\[\[multiplication-factor\|k\]\] = /.test(t3090), `30/90 line, k marked as the multiplication factor: "${t3090}"`);
   let shown100 = 0; R.forEach(r => Mo.forEach(m => { const k = M.kOf(T, r, m); if (M.fmtK(k) === "1.00" && M.stateOf(k, T.steadyBand) !== "steady") shown100++; }));
   ok(shown100 === 0, "no setting shows k = 1.00 unless it is steady");
   // step 3 always starts with the moderator full, whatever step 4 left; its rods-out promise and its goal hold
@@ -81,15 +85,16 @@ const fmt = v => v.toLocaleString("en-US");
   ok(M.step3Start(T, { rods: 0, mod: 100 }).refilled === false, "step 3 on first visit: nothing to refill");
   ok(M.stateOf(M.kOf(T, 40, 90), T.steadyBand) === "dying", "step 4: from the steady setting, one notch of draining kills the chain (the step can be finished)");
   // the sentences shown after a slider move, for every setting: one sentence, within budget
-  R.forEach(r => Mo.forEach(m => { const t = M.toyText(T, r, m); ok(words(t) <= 25 && sentences(t) === 1 && t.indexOf("k = " + M.fmtK(M.kOf(T, r, m))) === 0, `toy line at ${r}/${m}: one sentence, ${words(t)} words`); }));
+  R.forEach(r => Mo.forEach(m => { const t = M.toyText(T, r, m); ok(words(t) <= 25 && sentences(t) === 1 && plainT(t).indexOf("k = " + M.fmtK(M.kOf(T, r, m))) === 0, `toy line at ${r}/${m}: one sentence, ${words(t)} words`); }));
   Object.keys(M.SAW).forEach(k => ok(words(M.SAW[k]) <= 35 && sentences(M.SAW[k]) <= 2, `step feedback ${k}: within budget`));
   ok(/kOf\(T, 0, T\.moderator\.max\)/.test(JS) && !/leads to 1\.25/.test(JS), "step 3's 1.25 is computed from the toy, not typed");
 }
 
 // ---------------- model validation: the plant, pressures and the designs' reach
 {
-  const W = M.plant(F, TOWN.fleet.nuclear.mw);
-  ok(TOWN.fleet.nuclear.mw === 100 && D.plant.townMW === 100, "Prairie Town's plant: 100 MW (town.json, illustrative)");
+  const W = M.plant(F, D.plant.townMW);
+  ok(TOWN.fleet.nuclear.mw === 100 && D.plant.townMW === TOWN.fleet.nuclear.mw, "Prairie Town's plant: 100 MW, the same as town.json (illustrative)");
+  ok(/plant\(F, D\.plant\.townMW\)/.test(JS) && !/data\.town\b/.test(JS), "the page takes the plant's size from its own data, not from town.json");
   ok(F.heat_rate_btu_kwh.value === 10443 && F.heat_rate_btu_kwh.year === 2025 && F.btu_per_kwh.value === 3412, "EIA: 10,443 Btu/kWh (2025) and 3,412 Btu per kWh");
   ok(near(W.eff, 3412 / 10443) && M.pct1(W.eff) === "32.7%", `efficiency 3,412 ÷ 10,443 = ${M.pct1(W.eff)}`);
   ok(Math.round(W.heat) === 306 && Math.round(W.waste) === 206 && near(W.heat - W.waste, 100), `heat ${W.heat.toFixed(2)} MW, low-temperature heat ${W.waste.toFixed(2)} MW`);
@@ -112,7 +117,10 @@ const fmt = v => v.toLocaleString("en-US");
   ok(/concept/.test(msr.name) && /fluoride/.test(msr.coolant) && !/chloride/.test(msr.coolant) && msr.moderator === "graphite" && /FHR/.test(msr.note), "the salt-cooled row is DOE's fluoride salt-cooled high-temperature concept, not every molten-salt reactor");
   const byKey = {}; D.designs.forEach(d => { byKey[d.key] = d; });
   ok(byKey.large.hi === F.pwr_c.value && byKey.large.lo === F.bwr_c.value && byKey.htgr.lo === F.htr_lo_c.value && byKey.htgr.hi === F.htr_hi_c.value && byKey.sfr.lo === F.sfr_lo_c.value && byKey.sfr.hi === F.sfr_hi_c.value, "design bars use the sourced temperatures");
-  ok(byKey.large.size === F.large_mwe.text && byKey.small.size === F.small_mwe.text && byKey.micro.size === F.micro_mwt_lo.value + " to " + F.micro_mwt_hi.value + " MWt" && byKey.htgr.size === "up to " + F.htr_mwt_max.value + " MWt each", "design sizes from the facts");
+  ok(byKey.large.size === F.large_mwe.text && byKey.small.size === F.small_mwe.text && byKey.micro.size === F.micro_mwt_lo.value + " to " + F.micro_mwt_hi.value + " MWt" && byKey.htgr.size === "up to " + F.htr_mwt_max.value + " MWt per module, for passive cooling", "design sizes from the facts");
+  ok(/so that decay heat can be removed passively/.test(F.htr_mwt_max.note) && /limited to 600 MWt each or less/.test(D.sources.qtr_htr.where) && /10 to 842 MWt/.test(D.sources.qtr_htr.where), "the 600 MWt ceiling is DOE's for passively cooled modules, not every gas-cooled reactor");
+  ok(byKey.micro.coolant === "gas, liquid metal, molten salt, or a fluid inside heat pipes", "a heat pipe is a device holding a fluid, not a coolant");
+  ok(!("rods_per_assembly" in F) && !("assemblies_per_core" in F), "no rod or assembly count that would fit one design only");
   ok(D.uses.find(u => u.key === "soec").lo === F.soec_lo_c.value && D.uses.find(u => u.key === "industry").hi === F.proc_hi_c.value, "use bands from the facts");
   ok(CF.reference.nuclear.cf === 0.911 && CF.reference.nuclear.year === 2025, "the Modeler box's 91.1% is EIA's 2025 nuclear capacity factor (cf_targets.json)");
 }
@@ -171,7 +179,7 @@ const fmt = v => v.toLocaleString("en-US");
   ok(sub && fm.indexOf('subtitle: "' + sub + '"') >= 0, "front-matter subtitle = path.yml subtitle");
   ok(/code: F5/.test(blk) && /minutes: 15/.test(blk) && /practice_minutes: 5/.test(blk) && /status: active/.test(blk) && /after: \[F4\]/.test(blk) && /next: F6/.test(blk), "path.yml: F5, 15 + 5 min, active, after F4, next F6");
   ok(/id="f5-explain"/.test(QMD) && /data-learn="nuclear-basics"/.test(QMD) && /LX\.mount\("nuclear-basics"/.test(JS) && /getElementById\("f5-explain"\)/.test(JS), "mount points match");
-  ok(/data-src="\.\.\/assets\/learn\/data\/f05-nuclear-basics\.json \.\.\/assets\/learn\/data\/town\.json"/.test(QMD), "the page loads its data and town.json");
+  ok(/data-src="\.\.\/assets\/learn\/data\/f05-nuclear-basics\.json"/.test(QMD), "the page loads its own data only (no town.json, whose records carry running costs)");
   ok((QMD.match(/class="lx-qq"/g) || []).length === 7 && /about 5 minutes: five myths, then two questions/.test(QMD), "practice: five myths and two questions, about 5 minutes");
   const stepsSrc = JS.slice(JS.indexOf("var steps = ["), JS.indexOf("function energyBars"));
   const steps = [...stepsSrc.matchAll(/\{ text: "((?:[^"\\]|\\.)*)"/g)].map(x => x[1]);
@@ -191,6 +199,15 @@ const fmt = v => v.toLocaleString("en-US");
   [...stepsSrc.matchAll(/why: "((?:[^"\\]|\\.)*)"/g)].forEach(x => budget("sort card", x[1], 20, 1));
   // the answers keep the facts as stated
   ok(/DOE estimated in October 2022 that all 90,000 metric tons/.test(QMD) && /the fuel alone, without a storage site's spacing and buildings/.test(QMD) && /October 2022 estimate/.test(QMD), "spent fuel: dated estimate, compact volume only");
+  ok(/More than 90% of its potential energy is still there \(DOE, 2022\)\. Recycling can turn part of the used fuel into new fuel; as of 2022, France recycles and the United States does not\./.test(QMD) && !/It can be recycled into new fuel/.test(QMD), "spent fuel: recycling recovers part of the used fuel, dated, not nearly all its energy");
+  ok(/uranium pellets sealed in metal rods about 1 cm wide, grouped into \[\[fuel-assembly\|fuel assemblies\]\]; how many depends on the design and its power/.test(JS) && /how many rods and assemblies a core holds depends on its design and power/.test(QMD) && !/more than 200 rods|couple hundred/.test(QMD + JS), "fuel: no rod or assembly count applied to every design");
+  ok(/at the nucleus, the central core, of a \[\[uranium-235\|uranium-235\]\] atom/.test(JS), "step 1 says what a nucleus is and marks uranium-235");
+  { const fbx = QMD.slice(QMD.indexOf('<div class="lx-fallback">'), QMD.indexOf('<p class="lx-hint">With JavaScript on'));
+    ok(/<b>After shutdown:<\/b> the control rods stop the chain reaction, but the fission products keep giving off decay heat, so cooling must go on\./.test(fbx) && /<dt>After shutdown<\/dt><dd>Stopping the chain reaction does not stop decay heat/.test(QMD), "the no-JS blocks keep the shutdown lesson: decay heat, so cooling goes on"); }
+  // every data note: one or two sentences, about 35 words (its bold label is a label, not a sentence)
+  { const notes = [...QMD.matchAll(/<p class="lx-datanote">([\s\S]*?)<\/p>/g)].map(m => m[1].replace(/<svg[\s\S]*?<\/svg>/, "").replace(/<b>[^<]*<\/b>/, "").replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim());
+    ok(notes.length === 3, `${notes.length} data notes (illustrative, designs, efficiency)`);
+    notes.forEach(n => budget("data note", n, 35, 2)); }
   ok(/Most microreactor designs need fuel with more uranium-235/.test(QMD) && !/Microreactors will need/.test(QMD), "microreactor fuel: most designs, not all");
   ok(/two separate water loops in a pressurized-water plant, one in a boiling-water plant\. Both also have a separate condenser-cooling loop/.test(JS), "the loop count names its boundary");
   ok(/MPa \(\[\[megapascal\|megapascals\]\]\)/.test(JS) && /data-term="megapascal">MPa<\/span>, megapascals/.test(QMD) && /data-term="btu">Btu<\/span> \(British thermal units/.test(QMD), "MPa and Btu expanded at first use");
@@ -198,10 +215,10 @@ const fmt = v => v.toLocaleString("en-US");
   ok(/if \(focusReset\) \{ focusReset = false; again\.focus/.test(JS) && !/go\(\); again\.focus/.test(JS), "Fire moves focus to Reset only once Reset is shown");
   // glossary sidecar: one sentence each, ids used on the page
   const ids = [...SIDE.matchAll(/- id: ([a-z0-9-]+)/g)].map(x => x[1]);
-  ok(ids.length === 21 && ids.indexOf("fission") >= 0 && ids.indexOf("decay-heat") >= 0, `${ids.length} new glossary terms`);
+  ok(ids.length === 22 && ids.indexOf("fission") >= 0 && ids.indexOf("uranium-235") >= 0 && ids.indexOf("decay-heat") >= 0, `${ids.length} new glossary terms`);
   ["turbine", "generator", "waste-heat", "heat-engine", "transformer", "substation", "voltage"].forEach(t => ok(ids.indexOf(t) < 0, `sidecar leaves ${t} to F4 or F6`));
   const used = new Set([...(JS + QMD + JSON.stringify(D)).matchAll(/\[\[([a-z0-9-]+)\||data-term="([a-z0-9-]+)"|term="([a-z0-9-]+)"/g)].map(x => x[1] || x[2] || x[3]));
-  ["neutron", "fission", "chain-reaction", "control-rod", "criticality", "moderator", "coolant", "outlet-temperature", "decay-heat", "steam-generator", "mwt-mwe", "passive-safety", "megapascal", "btu", "heat-exchanger", "district-heating", "desalination", "high-temperature-electrolyzer"].forEach(i => ok(used.has(i), `glossary term ${i} is marked on the page`));
+  ["uranium-235", "multiplication-factor", "neutron", "fission", "chain-reaction", "control-rod", "criticality", "moderator", "coolant", "outlet-temperature", "decay-heat", "steam-generator", "mwt-mwe", "passive-safety", "megapascal", "btu", "heat-exchanger", "district-heating", "desalination", "high-temperature-electrolyzer"].forEach(i => ok(used.has(i), `glossary term ${i} is marked on the page`));
 }
 
 // ---------------- scope: deny-list, nuclear-plus-risk combination, no data centers, links on the allow-list
@@ -250,7 +267,7 @@ const fmt = v => v.toLocaleString("en-US");
   vm.runInNewContext(JS, { window: E.window, document: E.document, location: E.location, navigator: {}, console, module: { exports: {} }, setTimeout: () => 0, clearTimeout: () => {} });
   const root = E.LX.H("div", { class: "lx-interactive", "data-learn": "nuclear-basics" }, E.body), live = E.LX.H("div", { class: "lx-live" }, root);
   let threw = null;
-  try { init(live, { f05_nuclear_basics: D, town: TOWN }, root); } catch (e) { threw = e.stack; }
+  try { init(live, { f05_nuclear_basics: D }, root); } catch (e) { threw = e.stack; }
   ok(!threw && cards && cards.count === 9, "the lesson mounts on the stub document" + (threw ? ": " + threw : ""));
   if (!threw && cards) {
     const card = () => cards.el, txt = e => e.textContent.replace(/\s+/g, " ").trim();

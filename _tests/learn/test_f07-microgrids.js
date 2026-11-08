@@ -86,8 +86,19 @@ ok(H.jul650 === 20 && H.jan650 === 8 && H.jul400 === 51 && H.jan400 === 40 && H.
 ok(X.every(x => x.jan.lasts < x.jul.lasts), "January is shorter than July for both stated cases (step 6, explain)");
 // the seasons idea (explain) and the January step's words follow the runs: no "refill" where no run charges the battery
 const charges = r => r.rows.some(h => h.charge > 0.5);
-ok(!charges(X[0].jul) && !charges(X[0].jan) && !/refill|recharg/i.test(M.staticExplain(D)) && /weaker sun leaves more of the load to the generator and battery/.test(M.staticExplain(D)),
+ok(!charges(X[0].jul) && !charges(X[0].jan) && !/refill|recharg/i.test(M.staticExplain(D)) && /weaker sun drains the battery sooner/.test(M.staticExplain(D)),
   "650 kW: spare sun never charges the battery in either season, so the seasons idea names less sun for the load, not refilling");
+// the seasons idea names what stops the January run: at its first short hour the battery is empty and the generator runs at
+// full power with fuel left, so power, not energy, is short; it never says the fuel ran out when fuel remains
+{ const h = X[0].jan.rows[X[0].jan.lasts];
+  ok(h.stored < 1e-6 && h.gen === C.gen.kw && h.fuel > 0 && /cannot carry the load, though fuel remains/.test(M.staticExplain(D)) && !/their energy runs out/.test(M.staticExplain(D)),
+    "650 kW in January: the first short hour has an empty battery and " + Math.round(h.fuel) + " kWh of fuel left; the explain idea says so");
+  const h4 = X[1].jan.rows[X[1].jan.lasts];
+  ok(M.seasonsWhy(C, X[1].jan) === (h4.fuel > 0.5 && h4.gen >= C.gen.kw ? M.seasonsWhy(C, X[0].jan) : "weaker sun leaves more of the load to the generator and battery, so the battery and the fuel run out sooner") && h4.fuel < 0.5,
+    "400 kW in January: fuel is gone at the first short hour, and the reason says the fuel ran out too"); }
+// "full hours": the run is hourly, so a result counts whole hours before the first short hour, never an exact time
+ok(M.lastsText(X[0].jul) === "gave 20 full hours before falling short" && M.hoursOf(X[0].jan) === "8 full hours" && !/lasted \d/.test(JS + PAGE) && X[0].jul.rows[19].stored > 0,
+  "results count full hours before the first short hour (the battery still holds " + Math.round(X[0].jul.rows[19].stored) + " kWh entering it)");
 ok(charges(X[1].jul) && !charges(X[1].jan) && /Only July had spare sun to recharge the battery/.test(M.winter(C, X[1].keep).line), "400 kW: July recharges, January does not, and the result line says so");
 ok(H.double > H.jul400 && H.double < 2 * H.jul400, "doubling the battery lengthens the island but does not double it (myth 3)");
 ok(X[0].jul.lasts < X[1].jul.lasts && X[0].jan.lasts < X[1].jan.lasts, "shedding the dorms lengthens the island");
@@ -292,18 +303,64 @@ if (RP) {
 // ---------------- text budget: every text element of the page's own prose stays short (one idea, about 35 words),
 // the generated no-JS blocks and the facts table included
 const prose = elements(OWN.replace(/<style>[\s\S]*?<\/style>/g, " ").replace(/<script[\s\S]*?<\/script>/g, " ").replace(/^---[\s\S]*?\n---\n/, " "));
-prose.forEach(s => { const w = s.split(" ").length; ok(w <= 40 || approved(s), "text element of " + w + " words (40 at most unless one approved sentence): " + s.slice(0, 70)); });
+prose.forEach(s => { const w = s.split(" ").length; ok(w <= 36 || approved(s), "text element of " + w + " words (36 at most unless one approved sentence): " + s.slice(0, 70)); });
 // the step texts and their seen-lines, as the script writes them: no more than about 45 words each
 const stepSrc = [...JS.matchAll(/\n      \{ text: ([\s\S]*?),\n        build:/g)].map(m => m[1]);
 ok(stepSrc.length === 8, "eight step cards (" + stepSrc.length + ")");
 stepSrc.forEach((src, i) => {
   const t = norm(Function("C", "V", "kw", "kwh", "nightKW", "totalKW", "return " + src)(C, V, M.kw, M.kwh, M.nightKW, M.totalKW));
-  ok(t.split(" ").length <= 40, "step " + (i + 1) + " text: " + t.split(" ").length + " words (40 at most): " + t.slice(0, 60));
+  ok(t.split(" ").length <= 38, "step " + (i + 1) + " text: " + t.split(" ").length + " words (38 at most): " + t.slice(0, 60));
   ok(!/\d/.test(src.replace(/C\.[\w.]+|V\.[\w.]+|\d{2}:\d{2}/g, "")), "step " + (i + 1) + " text: every number comes from the data (no number typed into the script)");
 });
 Object.keys(D.texts).forEach(k => ok(norm(D.texts[k]).split(" ").length <= 40, "data text '" + k + "' stays short"));
 D.parts.forEach(p => ok((p.name + " " + norm(p.note)).split(" ").length <= 30, "part note stays short: " + p.key));
 D.sort.cards.forEach(c => ok(c.why.split(" ").length <= 25 && c.text.split(" ").length <= 25, "sort card stays short: " + c.id));
+
+// ---------------- the page on a stub document: step 4's loads, valid then invalid, and the run that follows
+{
+  const vm = require("vm");
+  const { env, load } = require("./stubdom.js");
+  const E = env();
+  E.LX.fmt = { int: v => Math.round(v).toLocaleString("en-US"), hh: h => (h < 10 ? "0" : "") + h + ":00" };
+  E.LX.visible = () => false; E.LX.ready = () => {}; E.LX.iconInto = () => {}; E.LX.progress = Object.assign(E.LX.progress || {}, { guess: () => null });
+  ["cards", "predict", "toggle", "controls", "plot"].forEach(n => load(n, E));
+  let init = null, cards = null;
+  E.LX.mount = (slug, f) => { if (slug === "f7") init = f; };
+  E.LX.demo = (root, fn, c) => { cards = c; };
+  vm.runInNewContext(JS, { window: E.window, document: E.document, location: E.location, navigator: {}, console, module: { exports: {} }, setTimeout: () => 0, clearTimeout: () => {} });
+  const root = E.LX.H("div", { class: "lx-interactive", "data-learn": "f7" }, E.body), live = E.LX.H("div", { class: "lx-live" }, root);
+  let threw = null;
+  try { init(live, { f07_microgrids: D, path: JSON.parse(fs.readFileSync(L("data/path.json"), "utf8")) }, root); } catch (e) { threw = e.stack; }
+  ok(!threw && cards && cards.count === 8, "the lesson mounts on the stub document" + (threw ? ": " + threw : ""));
+  if (!threw && cards) {
+    const txt = e => e.textContent.replace(/\s+/g, " ").trim(), card = () => cards.el;
+    const saw = () => card().querySelectorAll(".lx-saw").map(txt).join(" ");
+    const next = () => card().querySelectorAll(".lx-step-foot button")[1];
+    const toggle = name => card().querySelectorAll("button.lx-toggle").find(b => txt(b).indexOf(name + " ·") === 0);
+    const diagram = name => (live.querySelectorAll(".f7-line .lx-textalt li").map(txt).find(t => t.indexOf(name) === 0) || "");
+    cards.go(3);
+    ok(next().disabled && /is more than the island's 900 kW/.test(saw()), "step 4 starts with every load on: over the night's power, Next shut");
+    toggle("Labs").click();
+    ok(!next().disabled && /You keep 650 kW, within the island's 900 kW\./.test(saw()), "shedding the labs fits: Next opens");
+    toggle("Hospital").click();
+    ok(/Switch both back on\. The run keeps your last set that fits, 650 kW\./.test(saw()) && /: shed\.$/.test(diagram("Hospital")),
+      "switching the hospital off: the step says the run keeps the last set that fits (650 kW), and the diagram shows the hospital shed: " + saw());
+    toggle("Hospital").click(); toggle("Labs").click();
+    ok(/1,200 kW is more than the island's 900 kW\. Switch off another load\. The run keeps your last set that fits, 650 kW\./.test(saw()), "every load back on: over, and the step names the set the run keeps");
+    next().click();
+    ok(cards.index() === 4 && /connected and supplied\.$/.test(diagram("Hospital")) && /connected and supplied\.$/.test(diagram("Dorms")) && /: shed\.$/.test(diagram("Labs")),
+      "step 5 draws the set it runs (hospital, water plant and dorms), not the last toggles");
+    card().querySelectorAll("button").find(b => /^Run the July outage/.test(txt(b))).click();
+    const chips = card().querySelectorAll(".lx-readout").map(txt);
+    ok(chips.indexOf("Loads kept650 kW") >= 0 && chips.indexOf("Full hours before a shortfall20") >= 0, "the July run uses that set: 650 kW, 20 full hours: " + chips.join(" | "));
+    ok(/^650 kW gave 20 full hours before falling short\./.test(saw()), "the run's result counts full hours: " + saw().slice(0, 60));
+    // every supporting element of the campus steps stays within about 35 words and two sentences (the prediction's own
+    // label, "You called it." or "Not quite.", not counted); the village steps' texts are checked from the data above
+    [0, 1, 2, 3, 4, 5].forEach(i => { cards.go(i); card().querySelectorAll(".lx-choices-row .lx-choice").slice(0, 1).forEach(b => b.click());
+      card().querySelectorAll(".lx-step-text, .lx-hint, .lx-saw").forEach(e => { const t = norm(txt(e)).replace(/^(You called it|Not quite|The answer)\. /, ""), w = t.split(" ").length;
+      ok(w <= 38 && t.split(/(?<=[.?!])\s+(?=[A-Z*])/).length <= 2, "step " + (i + 1) + " element within budget (" + w + " words): " + t.slice(0, 60)); }); });
+  }
+}
 
 console.log((fails ? "FAILED " + fails + " of " : "ok: ") + checks + " checks (" + ID + ")");
 process.exit(fails ? 1 : 0);

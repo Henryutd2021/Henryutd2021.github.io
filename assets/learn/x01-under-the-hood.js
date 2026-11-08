@@ -3,16 +3,17 @@
 // thermal hydraulics and materials only.
 //
 // Data (read through data-src, never retyped):
-//   data/x01-under-the-hood.json   eight components (discipline, two questions, what models borrow, reading), the six
+//   data/x01-under-the-hood.json   eight components (discipline, two questions, what models borrow, reading), the seven
 //                                  kinds of borrowed number, the predict, the sort, the cyber question, the stop box
-//   data/f04-power-plants.json     the Betz limit, the best measured power coefficient, U.S. combined-cycle heat rate (2025)
-//   data/f05-nuclear-basics.json   the outlet temperature of large water-cooled reactors, the 2025 nuclear heat rate,
-//                                  3,412 Btu in a kWh
-//   data/13-capstone.json          the course battery's round trip and life
-//   data/a16-hydrogen-ptx.json     the electrolyzer's kWh per kg and its minimum loads
-//   data/town.json                 the combined-cycle plant's ramp limit (illustrative)
+//   data/x01-inputs.json           only the fields X1 reads from five other lessons' files, written and checked by the
+//                                  test (PROJ below): from f04-power-plants.json the Betz limit, the best measured power
+//                                  coefficient and the U.S. combined-cycle heat rate (2025); from f05-nuclear-basics.json
+//                                  the outlet temperature of large water-cooled reactors, the 2025 nuclear heat rate and
+//                                  3,412 Btu in a kWh; from 13-capstone.json the course battery's round trip and life;
+//                                  from a16-hydrogen-ptx.json the electrolyzer's kWh per kg and minimum loads; from
+//                                  town.json the combined-cycle plant's ramp limit (illustrative)
 //   data/path.json                 lesson links that appear once a lesson is live
-// Arithmetic only: efficiency = 3,412 Btu ÷ heat rate (Btu per kWh).
+// Each efficiency shown is read as a share: 3,412 Btu per kWh ÷ heat rate (Btu per kWh). The reader does no arithmetic.
 //
 // Shared components: LX.StepCards, LX.Predict, LX.CardSort, LX.ConceptMap, LX.CompareTable, LX.lessonRefHTML,
 // LX.demo. Lesson-local: the component board (tiles that open cards, lit by kind).
@@ -21,7 +22,23 @@
   var KEY = "x01_under_the_hood";
 
   // ---------------------------------------------------------------- pure (no DOM; exported for Node)
-  function inputs(data) { return { X: data[KEY], F4: data.f04_power_plants, F5: data.f05_nuclear_basics, C13: data["13_capstone"], A16: data.a16_hydrogen_ptx, T: data.town }; }
+  function inputs(data) { var Y = data.x01_inputs; return { X: data[KEY], F4: Y.F4, F5: Y.F5, C13: Y.C13, A16: Y.A16, T: Y.T }; }
+  // the projection of the other lessons' files: only the fields X1 reads (the test writes and checks it). A list names the
+  // fields to copy whole; an object recurses; "plants" keeps only the combined-cycle row.
+  var SRC4 = ["publisher", "title", "url", "as_of"];
+  var PROJ = { F4: { plants: ["key", "heatRate"], facts: { betz: ["value"], cpBest: ["value"] }, sources: { eia_pv: SRC4, nrel_dl15: SRC4, eia_t82: SRC4 } },
+    F5: { facts: { btu_per_kwh: ["value"], heat_rate_btu_kwh: ["value", "year"], lwr_outlet_c: ["text"] }, sources: { qtr_lwr: SRC4, eia_heatrate: SRC4 } },
+    C13: { techs: { battery: ["rte", "life"] }, sources: { "nrel-battery-2025": ["text", "url", "asOf"] } },
+    A16: { electrolyzer: ["kWhPerKg", "minLoad", "source", "loadSource"] }, T: { fleet: { cc: ["label", "ramp"] } } };
+  function projectInputs(full) {   // full: { F4, F5, C13, A16, T } as the lessons' files hold them
+    function pick(src, spec) {
+      if (Array.isArray(spec)) { var o = {}; spec.forEach(function (k) { o[k] = src[k]; }); return o; }
+      var r = {}; Object.keys(spec).forEach(function (k) {
+        r[k] = k === "plants" ? src.plants.filter(function (p) { return p.key === "cc"; }).map(function (p) { return pick(p, spec.plants); }) : pick(src[k], spec[k]); });
+      return r;
+    }
+    var out = {}; Object.keys(PROJ).forEach(function (k) { out[k] = pick(full[k], PROJ[k]); }); return out;
+  }
   function fmtN(v, d) { return Number(v).toLocaleString("en-US", { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 }); }
   function src4(s) { return { label: s.publisher + ", " + s.title, url: s.url, asof: s.as_of }; }
   function plant(F4, key) { return F4.plants.filter(function (p) { return p.key === key; })[0]; }
@@ -36,15 +53,15 @@
       relay: [{ n: "Thermal rating", label: "a line's limit", kind: "rating", what: "The most current a line or transformer can carry before it overheats; models keep flows under it. A relay is different: it detects a [[fault|fault]] and tells a breaker to open.", lesson: "A17", src: { label: "Lesson A17", url: null, asof: "this course" } }],
       blade: [{ n: fmtN(I.F4.facts.betz.value, 1) + "%", label: "the Betz limit", kind: "efficiency", what: "The most of the wind's power any rotor can take, the Betz limit (physics).", lesson: "F4", src: { label: "Physics: 16/27 of the wind's power", url: null, asof: "lesson 5" } },
               { n: fmtN(I.F4.facts.cpBest.value, 2), label: "best measured power coefficient", kind: "efficiency", what: "The best measured [[power-coefficient|power coefficient]] of DOE's 1.5 MW test turbine: the share of the wind's power it turned into electricity.", lesson: "F4", src: src4(I.F4.sources.nrel_dl15) }],
-      combustor: [{ n: fmtN(cc.heatRate) + " Btu/kWh", label: "full-load tested heat rate, 2025", kind: "efficiency", what: "EIA's 2025 average full-load tested heat rate for U.S. natural-gas combined-cycle plants: " + fmtN(btu) + " ÷ " + fmtN(cc.heatRate) + " = " + fmtN(100 * effCC, 1) + "% of the fuel's energy becomes electricity at full load.", lesson: "F4", src: src4(I.F4.sources.eia_t82), eff: effCC },
-                  { n: fmtN(I.T.fleet.cc.ramp) + " MW per hour", label: "ramp limit, Prairie Town", kind: "ramp", what: "The ramp limit of Prairie Town's combined-cycle plant (illustrative).", lesson: "0", src: { label: "Prairie Town (fictional)", url: null, asof: "illustrative" } }],
+      combustor: [{ n: fmtN(cc.heatRate) + " Btu/kWh", label: "whole-plant heat rate, 2025 full-load test", kind: "efficiency", what: "EIA's 2025 average full-load tested heat rate for U.S. natural-gas combined-cycle plants, a whole-plant value the turbines and cooling shape too: about " + fmtN(100 * effCC, 1) + "% of the fuel's energy becomes electricity at full load.", lesson: "F4", src: src4(I.F4.sources.eia_t82), eff: effCC },
+                  { n: fmtN(I.T.fleet.cc.ramp) + " MW per hour", label: "whole-plant ramp limit, Prairie Town", kind: "ramp", what: "The ramp limit of Prairie Town's whole combined-cycle plant (illustrative).", lesson: "0", src: { label: "Prairie Town (fictional)", url: null, asof: "illustrative" } }],
       core: [{ n: I.F5.facts.lwr_outlet_c.text, label: "outlet temperature", kind: "outlet", what: "The outlet temperature of large water-cooled reactors.", lesson: "F5", src: src4(I.F5.sources.qtr_lwr) },
-             { n: fmtN(hrN.value) + " Btu/kWh", label: "fleet heat rate, " + hrN.year, kind: "efficiency", what: "The U.S. nuclear fleet's " + hrN.year + " heat rate: " + fmtN(btu) + " ÷ " + fmtN(hrN.value) + " = " + fmtN(100 * effN, 1) + "% of the heat becomes electricity.", lesson: "F5", src: src4(I.F5.sources.eia_heatrate), eff: effN }],
+             { n: fmtN(hrN.value) + " Btu/kWh", label: "whole-plant heat rate, " + hrN.year, kind: "efficiency", what: "The U.S. nuclear fleet's " + hrN.year + " heat rate, a whole-plant value the turbine and cooling shape too: about " + fmtN(100 * effN, 1) + "% of the core's heat becomes electricity.", lesson: "F5", src: src4(I.F5.sources.eia_heatrate), eff: effN }],
       electrolyzer: [{ n: fmtN(E.kWhPerKg) + " kWh/kg", label: "whole-system electricity use", kind: "efficiency", what: "A16 assumes about " + fmtN(E.kWhPerKg) + " kWh per kilogram of hydrogen for the complete PEM electrolyzer system; stack design helps set that system value.", lesson: "A16", src: { label: E.source.label, url: E.source.url, asof: E.source.as_of } },
-                     { n: "PEM " + fmtN(100 * E.minLoad.pem) + "%, alkaline " + fmtN(100 * E.minLoad.alk) + "%", label: "minimum loads", kind: "minload", what: "The lowest steady load of [[pem-electrolyzer|PEM]] and of [[alkaline-electrolyzer|alkaline]] electrolyzers, as a share of their size.", lesson: "A16", src: { label: E.loadSource.label, url: E.loadSource.url, asof: E.loadSource.as_of } }],
+                     { n: "PEM " + fmtN(100 * E.minLoad.pem) + "%, alkaline " + fmtN(100 * E.minLoad.alk) + "%", label: "minimum loads", kind: "minload", what: "A16 assumes these lowest steady loads for [[pem-electrolyzer|PEM]] and [[alkaline-electrolyzer|alkaline]] electrolyzers, as a share of their size, from IRENA's 2020 overview; real equipment varies.", lesson: "A16", src: { label: E.loadSource.label, url: E.loadSource.url, asof: E.loadSource.as_of } }],
       cell: [{ n: fmtN(100 * b.rte) + "%", label: "round trip of the battery system", kind: "efficiency", what: "The course assumes " + fmtN(100 * b.rte) + "% of the electricity sent into its utility-scale battery system comes back out: charging and discharging losses together, for the whole system, not one cell.", lesson: "13", src: bat },
              { n: b.life + " years", label: "life", kind: "reliability", what: "The life the course gives that battery system.", lesson: "13", src: bat }],
-      control: [{ n: "CIP", label: "cybersecurity standards", kind: "rules", what: "The mandatory Critical Infrastructure Protection (CIP) standards of the North American Electric Reliability Corporation (NERC) cover the bulk power system's cyber systems, in general not those on the distribution grid.", lesson: null, src: { label: I.X.sources["nerc-sites"].text.split(" (")[0], url: I.X.sources["nerc-sites"].url, asof: "December 2022" } }]
+      control: [{ n: "CIP", label: "cybersecurity standards", kind: "rules", what: "The mandatory Critical Infrastructure Protection (CIP) standards of the North American Electric Reliability Corporation (NERC) cover the [[bulk-power-system|bulk power system]]'s cyber systems, in general not those on the distribution grid.", lesson: null, src: { label: I.X.sources["nerc-sites"].text.split(" (")[0], url: I.X.sources["nerc-sites"].url, asof: "December 2022" } }]
     };
   }
   // the values of one kind for one component, or none (the kinds step: "This course does not quantify this property here.")
@@ -78,7 +95,7 @@
   // the sort is checked only with every card placed (an empty check no longer unlocks Next)
   function sortNote(g) { return g.placed < g.total ? "Place every card first: " + (g.total - g.placed) + " still in the pool." : g.right + " of " + g.total + " match."; }
   var BOARD_SAW = "Each discipline answers its own questions; a system model keeps only the numbers it needs from each answer.";
-  var SORT_SAW = "Borrowed: heat rate, round trip, power curve, kWh per kilogram. Kept: flame shape, electrode coating, fiber layup, catalyst. Each kept design shows up in the model only through a borrowed number.";
+  var SORT_SAW = "Borrowed: heat rate, round trip, power curve, kWh per kilogram. Kept: flame shape, electrode coating, fiber layup and catalyst, which reach the model only through those numbers.";
   var KIND_SAW = "Ratings, efficiencies, ramp limits, minimum loads, outlet temperatures, and reliability and life carry the devices into the model; operating rules carry the control room.";
   var KINDS_LIST = "ratings, efficiencies, ramp limits, minimum loads, outlet temperatures, and reliability and life";
 
@@ -110,14 +127,15 @@
       "<dt>Disciplines</dt><dd>Power electronics, protection, aerodynamics, combustion, reactor physics, electrochemistry and control each design a part of the system.</dd>" +
       "<dt>What crosses over</dt><dd>A system model borrows " + KINDS_LIST + ", plus the control room's operating rules.</dd>" +
       "<dt>What stays</dt><dd>Designs, materials and calculations stay with each discipline; the model sees them only through the numbers they lead to.</dd>" +
-      "<dt>Cybersecurity</dt><dd>NERC's mandatory standards protect the bulk power system's cyber systems; distribution-grid devices are in general outside them.</dd></dl>";
+      "<dt>Cybersecurity</dt><dd>" + richS("NERC's mandatory standards protect the [[bulk-power-system|bulk power system]]'s cyber systems; distribution-grid devices are in general outside them.") + "</dd></dl>";
   }
+  // the second check matches a device's limit to the kind of number it is (no arithmetic: this side topic stays at awareness)
   function checkHTML(I) {
-    var btu = I.F5.facts.btu_per_kwh.value, hr = plant(I.F4, "cc").heatRate, e = 100 * btu / hr;
+    var X = I.X, K = function (id) { return esc(kind(X, id).label); };
     return "<div class=\"lx-myths\" data-quiz=\"x01-myth\">" +
-      "<div class=\"lx-qq\" data-id=\"design\" data-answer=\"myth\"><p class=\"lx-qtext\">Myth or fact? “To plan a grid, a modeller needs the full design of every turbine and inverter.”</p><ul class=\"lx-choices\"><li data-value=\"myth\">Myth</li><li data-value=\"fact\">Fact</li></ul><details class=\"lx-answer\"><summary>Answer</summary><p>Myth. A system model borrows a few numbers from each design (" + KINDS_LIST + "); the design itself stays with the engineers.</p></details></div>" +
+      "<div class=\"lx-qq\" data-id=\"design\" data-answer=\"myth\"><p class=\"lx-qtext\">Myth or fact? “To plan a grid, a modeler needs the full design of every turbine and inverter.”</p><ul class=\"lx-choices\"><li data-value=\"myth\">Myth</li><li data-value=\"fact\">Fact</li></ul><details class=\"lx-answer\"><summary>Answer</summary><p>Myth. A system model borrows a few numbers from each design (" + KINDS_LIST + "); the design itself stays with the engineers.</p></details></div>" +
       "</div><div class=\"lx-quiz\" data-quiz=\"x01\">" +
-      "<div class=\"lx-qq\" data-id=\"eff\" data-answer=\"b\"><p class=\"lx-qtext\">EIA reports an average full-load tested heat rate of " + fmtN(hr) + " Btu per kWh for U.S. natural-gas combined-cycle plants in 2025; one kWh holds " + fmtN(btu) + " Btu. About what share of the fuel's energy becomes electricity at full load?</p><ul class=\"lx-choices\"><li data-value=\"a\">About " + fmtN(e / 2) + "%</li><li data-value=\"b\">About " + fmtN(e) + "%</li><li data-value=\"c\">About " + fmtN(Math.min(99, e * 1.5)) + "%</li></ul><details class=\"lx-answer\"><summary>Answer</summary><p>" + fmtN(btu) + " ÷ " + fmtN(hr) + " = " + fmtN(e / 100, 3) + ", about " + fmtN(e) + "%: the full-load efficiency a model borrows as a heat rate (lesson F4).</p></details></div>" +
+      "<div class=\"lx-qq\" data-id=\"kind\" data-answer=\"b\"><p class=\"lx-qtext\">An electrolyzer engineer reports the lowest output the stack can hold steadily, as a share of its size. Which kind of number does a system model borrow?</p><ul class=\"lx-choices\"><li data-value=\"a\">" + K("rating") + "</li><li data-value=\"b\">" + K("minload") + "</li><li data-value=\"c\">" + K("ramp") + "</li></ul><details class=\"lx-answer\"><summary>Answer</summary><p>" + K("minload") + ": below it the stack must stop. A rating is the most it can take; a ramp limit is how fast its output can change.</p></details></div>" +
       "</div>";
   }
   function factsRows(I) {
@@ -136,7 +154,7 @@
       "<p class=\"lx-hint\">One book per discipline (cited by name; any recent edition):</p><ul>" + X.components.map(function (c) { return "<li>" + esc(c.discipline) + ": " + esc(c.read) + ".</li>"; }).join("") + "</ul>";
   }
 
-  var model = { inputs: inputs, numbers: numbers, comp: comp, kind: kind, withKind: withKind, kindValues: kindValues, NONE: NONE, cardParts: cardParts, STEPS: STEPS, BOARD_MIN: BOARD_MIN, KIND_MIN: KIND_MIN,
+  var model = { inputs: inputs, projectInputs: projectInputs, PROJ: PROJ, numbers: numbers, comp: comp, kind: kind, withKind: withKind, kindValues: kindValues, NONE: NONE, cardParts: cardParts, STEPS: STEPS, BOARD_MIN: BOARD_MIN, KIND_MIN: KIND_MIN,
     boardCount: boardCount, kindCount: kindCount, kindLine: kindLine, sortNote: sortNote, BOARD_SAW: BOARD_SAW, SORT_SAW: SORT_SAW, KIND_SAW: KIND_SAW, KINDS_LIST: KINDS_LIST, kindsOf: kindsOf, numsLine: numsLine,
     staticFallback: staticFallback, ideasHTML: ideasHTML, checkHTML: checkHTML, factsRows: factsRows, factsHTML: factsHTML, sourcesHTML: sourcesHTML, fmtN: fmtN, richS: richS };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
@@ -248,7 +266,7 @@
           { id: "chem", g: "disc", label: "Electrochemistry", lines: ["Electro-", "chemistry"], at: [0, 4.25], text: "Design battery cells and electrolyzer stacks: energy held, kWh per kilogram, wear." },
           { id: "ctl", g: "disc", label: "Control, cyber", lines: ["Control,", "cyber"], at: [2, 0], text: "Control engineering and cybersecurity design the control room's software and protect it; NERC's CIP standards cover the bulk power system." },
           { id: "rating", g: "num", label: "Ratings", at: [1, 0], text: "MW, MWh and line limits." },
-          { id: "eff", g: "num", label: "Efficiencies", at: [1, 1], text: "Heat rates, round trips, kWh per kilogram." },
+          { id: "eff", g: "num", label: "Efficiencies", at: [1, 1], text: "A round trip is output per input; a heat rate and kWh per kilogram are input per output, so lower is better." },
           { id: "ramp", g: "num", label: "Ramp limits", lines: ["Ramp", "limits"], at: [1, 2], text: "How fast output can change, in MW per hour." },
           { id: "minl", g: "num", label: "Minimum loads", lines: ["Minimum", "loads"], at: [1, 3], text: "The lowest output a machine can hold steadily, as a share of its size: a separate limit from the ramp." },
           { id: "out", g: "num", label: "Outlet temperatures", lines: ["Outlet", "temps"], at: [1, 4], text: "How hot the heat is, which sets its uses." },

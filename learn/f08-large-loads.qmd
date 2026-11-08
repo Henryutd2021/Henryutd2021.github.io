@@ -65,7 +65,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-interactive lx-cards" data-learn="large-loads" data-src="../assets/learn/data/f08-large-loads.json ../assets/learn/data/town_days.json ../assets/learn/data/town_year.json ../assets/learn/data/path.json">
 <div class="lx-fallback">
 <!-- f08-fallback:start (written from the model by the test's --write mode; do not edit) -->
-<p class="lx-eyebrow">The idea in one table: a 300 MW data center joins Prairie Town (illustrative)</p><p class="lx-hint">The town's demand on two real-shape days, and with the campus's steady 240 MW (this lesson's assumption) added to every hour.</p><div class="lx-scroll-x"><table class="lx-mini-table f8-fbt"><thead><tr><th scope="col">Day</th><th scope="col">Town's busiest hour</th><th scope="col">Town's quietest hour</th><th scope="col">With the campus: busiest and quietest</th><th scope="col">Campus share of the day</th></tr></thead><tbody><tr><td>29 July 2025</td><td>450 MW</td><td>298 MW</td><td>690 MW and 538 MW</td><td>39%</td></tr><tr><td>17 April 2025</td><td>300 MW</td><td>216 MW</td><td>540 MW and 456 MW</td><td>48%</td></tr></tbody></table></div><ul><li><b>Its contract.</b> Up to 300 MW: on 29 July 2025 the busiest hour could reach 750 MW.</li><li><b>Homes.</b> 240 MW all year is 2,102,400 MWh: as much as about 195,000 average U.S. homes buy in a year (10,791 kWh each), and 85% of the town's own use.</li><li><b>The year.</b> With the campus, demand is above the town's 2025 record in 8,690 of 8,760 hours; the load factor rises from 63% to 76%.</li><li><b>Requests.</b> ERCOT counted about 474 GW of large loads asking to connect (June 2026), 5.2 times its record peak of 91,134 MW: proposals, not committed demand.</li><li><b>The wait.</b> Built in 24 months, connected after 36: 12 idle months.</li><li><b>Cooling.</b> Evaporative heat rejection: uses water that evaporates in a cooling tower; less electricity for cooling. Dry, air-cooled heat rejection: little operational water on site; may need more electricity, depending on the weather and the design.</li><li><b>A closed loop.</b> A closed water loop inside the building can still send its heat out through an evaporative cooling tower (U.S. Department of Energy).</li><li><b>Jobs and taxes.</b> 1,000 workers for 24 months make 2,000 job-years, then 50 permanent jobs; $1,000M of property at 1.0% pays $10.0M a year in local tax (illustrative).</li><li><b>Who pays.</b> If the utility builds wires for the campus and the company cancels, the cost can land on other customers, unless a large-load tariff makes the company pay.</li></ul><p class="lx-hint">With JavaScript on, you work through this step by step: the day, a spring day, the homes, the year, the requests, the wait, water, jobs and taxes, and who pays.</p>
+<p class="lx-eyebrow">The idea in one table: a 300 MW data center joins Prairie Town (illustrative)</p><p class="lx-hint">The town's demand on two real-shape days, and with the campus's steady 240 MW (this lesson's assumption) added to every hour.</p><div class="lx-scroll-x"><table class="lx-mini-table f8-fbt"><thead><tr><th scope="col">Day</th><th scope="col">Town's busiest hour</th><th scope="col">Town's quietest hour</th><th scope="col">With the campus: busiest and quietest</th><th scope="col">Campus share of the day</th></tr></thead><tbody><tr><td>29 July 2025</td><td>450 MW</td><td>298 MW</td><td>690 MW and 538 MW</td><td>39%</td></tr><tr><td>17 April 2025</td><td>300 MW</td><td>216 MW</td><td>540 MW and 456 MW</td><td>48%</td></tr></tbody></table></div><ul><li><b>Its contract.</b> Up to 300 MW: on 29 July 2025 the busiest hour could reach 750 MW.</li><li><b>Homes.</b> 240 MW all year is 2,102,400 MWh: as much as about 195,000 average U.S. homes buy in a year (10,791 kWh each), and 85% of the town's own use.</li><li><b>The year.</b> With the campus, this 2025 profile is above the town's record in 8,690 of 8,760 hours; the load factor rises from 63% to 76%.</li><li><b>Requests.</b> ERCOT counted about 474 GW of large loads asking to connect (June 2026), 5.2 times its record peak of 91,134 MW: proposals, not committed demand.</li><li><b>The wait.</b> Built in 24 months, connected after 36: 12 idle months.</li><li><b>Cooling tower.</b> Releases heat by evaporating water; needs less electricity for cooling.</li><li><b>Dry cooling.</b> Releases heat to the outdoor air, with little operational water on site; may need more electricity, depending on the weather and the design.</li><li><b>A closed loop.</b> A closed water loop inside the building can still send its heat out through an evaporative cooling tower (U.S. Department of Energy).</li><li><b>Jobs and taxes.</b> 1,000 workers for 24 months make 2,000 job-years, then 50 permanent jobs; $1,000M of property at 1.0% pays $10.0M a year in local tax (illustrative).</li><li><b>Who pays.</b> If the utility builds wires for the campus and the company cancels, the cost can land on other customers, unless a large-load tariff makes the company pay.</li></ul><p class="lx-hint">With JavaScript on, you work through this step by step: the day, a spring day, the homes, the year, the requests, the wait, water, jobs and taxes, and who pays.</p>
 <!-- f08-fallback:end -->
 </div>
 </div>
@@ -73,6 +73,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <li><b>Illustrative.</b> Prairie Town and its data center are fictional: the 300 MW contract, the steady 240 MW, the 24-month build, the 36-month wait, the jobs, the taxes and the cooling choices.</li>
 <li><b>Assumed.</b> The campus draws a steady 240 MW in every hour; real campuses vary with their computing work and with cooling.</li>
 <li><b>Real hourly patterns.</b> The town's demand follows the Southwest Power Pool's 2025 hours (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>, accessed 2 November 2026), scaled so its highest hour is 450 MW, as in <a href="02-demand.html">lesson 2</a>.</li>
+<li><b>Repaired hours.</b> Before scaling, 699 of the 8,760 demand hours looked implausible and were replaced with SPP's day-ahead forecast, rescaled; the two days shown have none.</li>
 <li><b>Real numbers.</b> Homes from <a href="https://www.eia.gov/tools/faqs/faq.php?id=97&amp;t=3">EIA</a> (2022 data) and requests from ERCOT (June 2026), each dated in the sources below.</li>
 </ul></div>
 <p class="lx-hint" style="margin-top:10px">Need a refresher? <a href="02-demand.html">Lesson 2</a> reads demand curves and load factors; <a href="f06-grid-and-outages.html">F6</a> follows power from the plant to the plug.</p>
@@ -106,7 +107,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 ```
 
 - **[Power usage effectiveness]{.lx-term term="power-usage-effectiveness"} (PUE)** is a data center's total electricity divided by its computing equipment's electricity.
-- **For example,** 200 MW of computers at a PUE of 1.2 need 200 × 1.2 = 240 MW from the grid.
+- **For example,** if the computers average 200 MW over a year and the annual PUE is 1.2, the whole campus averages 200 × 1.2 = 240 MW. Its busiest hour can be higher.
 - **Sizes in [MW-IT]{.lx-term term="mw-it"}** count the computers only; the grid must plan for the whole campus.
 - **Cooling works harder on hot days,** so a real campus is not perfectly flat; this lesson keeps it flat to show the idea.
 
@@ -120,7 +121,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 
 - **A request is a place in line,** not a building: ERCOT's 474 GW of requests is 5.2 times its record peak of 91,134 MW.
 - **A range, not a number.** Berkeley Lab's scenarios put U.S. data centers at 325 to 580 TWh in 2028, 6.7% to 12% of U.S. electricity; planners study the whole range.
-- **Read next.** Why connecting takes years: Analyst lesson [A6](a06-interconnection.html). Who pays for a wait: case file [CF7](cf7-cost-of-waiting.html).
+- **Read next.** Why connecting takes years: Analyst lesson [A6](a06-interconnection.html); who pays for a wait: case file [CF7](cf7-cost-of-waiting.html).
 
 ```{=html}
 </div>
@@ -173,7 +174,7 @@ $$\text{LF} = \frac{\bar d + c}{d_{\max} + c} = \frac{281.9 + 240}{450 + 240} = 
 <div class="lx-qq" data-id="requests" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “Requests to connect show how much new demand will arrive.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. ERCOT's requests were about 474 GW in June 2026, 5.2 times its record peak. Requests are proposals, not committed demand: projects may change or be cancelled.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. ERCOT's requests were about 474 GW in June 2026, 5.2 times its record peak, but requests are proposals, not committed demand: projects may change or be cancelled.</p></details>
 </div>
 <div class="lx-qq" data-id="jobs" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “1,000 people building a campus for two years means 1,000 permanent jobs.”</p>
@@ -189,7 +190,7 @@ $$\text{LF} = \frac{\bar d + c}{d_{\max} + c} = \frac{281.9 + 240}{450 + 240} = 
 <details class="lx-answer"><summary>Answer</summary><p>About 97,000: 120 MW × 8,760 h = 1,051,200 MWh, ÷ 10.791 MWh a home = 97,415.</p></details>
 </div>
 <div class="lx-qq" data-id="spring" data-answer="a">
-<p class="lx-qtext">At 03:00 on 17 April 2025, Prairie Town draws 216 MW. Add the campus's 240 MW. Is the total above the town's 2025 record of 450 MW?</p>
+<p class="lx-qtext">At 03:00 on 17 April 2025, Prairie Town draws 216 MW. Add the campus's 240 MW: is the total above the town's 2025 record of 450 MW?</p>
 <ul class="lx-choices"><li data-value="a">Yes: 456 MW</li><li data-value="b">No: 216 MW</li><li data-value="c">No: exactly 450 MW</li></ul>
 <details class="lx-answer"><summary>Answer</summary><p>Yes: 216 + 240 = 456 MW, above the record, at the quietest hour of a mild day.</p></details>
 </div>

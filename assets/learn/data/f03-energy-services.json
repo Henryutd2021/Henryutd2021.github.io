@@ -67,7 +67,7 @@
   { "key": "gas", "label": "Natural gas", "short": "Gas", "color": "var(--lx-cc)" },
   { "key": "el", "label": "Electricity", "short": "Electricity", "color": "var(--lx-bat)" },
   { "key": "gasoline", "label": "Gasoline", "short": "Gasoline", "color": "var(--lx-pk)" },
-  { "key": "air", "label": "Heat from outdoor air", "short": "Outdoor air", "color": "var(--lx-wind)" }
+  { "key": "air", "label": "Heat from outdoor air (not bought)", "short": "Outdoor air", "color": "var(--lx-wind)" }
  ],
  "services": [
   { "key": "warmth", "label": "Warmth", "icon": "flame", "want": "A living room at about 20 °C on a winter evening.", "device": "Gas furnace", "mmbtu": { "gas": 57.6 }, "useful": "furnace", "zone": "living" },

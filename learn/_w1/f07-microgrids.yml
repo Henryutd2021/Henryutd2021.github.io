@@ -4,10 +4,10 @@ lesson: F7
 glossary:
   - id: point-of-common-coupling
     term: Point of common coupling
-    def: "The one place where a microgrid meets the main grid, with the switch that opens to let it run on its own."
+    def: "The place where a grid-connected microgrid meets the main grid, with the switch that opens to let it run on its own."
   - id: grid-forming
     term: Grid-forming
-    def: "Said of an inverter or a generator that sets voltage and frequency itself, so it can start and hold an island with no grid behind it."
+    def: "Said of an inverter or a generator that sets voltage and frequency itself, so it can hold an island with no grid behind it; starting a dead island also takes equipment designed for that."
   - id: grid-following
     term: Grid-following
     def: "Said of an inverter, such as an ordinary solar inverter, that follows a voltage something else sets and stops when there is none."

@@ -123,6 +123,28 @@
     return { right: L.links.length - wrong.length, total: L.links.length, wrong: wrong, set: L.links.filter(function (l) { return signs[l.id]; }).length };
   }
   function reboundKept(eng, pct) { return r6(eng * (1 - pct / 100)); }
+  // the assembled feedback of the reservoir and battery tanks and of a named loop: one result and one reason each; the
+  // numbers behind them are in the tallies beside the tank
+  var fx = function (v, d) { return (+v).toLocaleString("en-US", { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 }); };
+  var HH = function (h) { return (h < 10 ? "0" : "") + h + ":00"; };
+  var MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  function weekLabel(w) { var d = new Date(Date.UTC(2025, 0, 1) + w * 7 * 86400000); return "week " + (w + 1) + " (from " + d.getUTCDate() + " " + MONTHS[d.getUTCMonth()] + ")"; }
+  function reservoirMessage(P, res) {
+    if (res.short) return "The reservoir runs dry in " + weekLabel(res.firstDry) + ": a steady release above the river's average drains the stock, so try less.";
+    if (res.spill) return "It spills " + fx(res.spill) + " GWh from " + weekLabel(res.firstSpill) + ": at this release the spring flood is more than the reservoir can hold, so try more.";
+    return "No spill, never dry: your steady **" + res.release + " MW** release moved spring's water into summer, autumn and winter.";
+  }
+  // the battery runs hour by hour: emptyAt is the first hour whose request it cannot meet in full; stock[h] is the energy
+  // at the start of hour h, so either the battery is already empty when that hour starts, or it runs out within it
+  function batteryMessage(P, res, dMW) {
+    if (res.short) return (res.stock[res.emptyAt] > 1e-9 ? "The battery runs out during the hour from " + HH(res.emptyAt) + " to " + HH(res.emptyAt + 1) : "The battery is empty from " + HH(res.emptyAt)) + (res.stored > 1e-9 ? ": it stored only " + fx(res.stored) + " MWh, so " : ": it stored nothing, so ") + fx(res.short) + " MWh of the evening's request went unmet. Charge more, or ask for less.";
+    if (res.won) return "Delivered **" + fx(res.delivered) + " MWh**, " + dMW + " MW for " + (P.discharge.to - P.discharge.from) + " hours, after " + fx(res.lost) + " MWh was lost as heat on charging. MW is the flow; MWh is the stock.";
+    return "No shortfall, but only " + fx(res.delivered) + " MWh delivered" + (res.left > 1e-9 ? " and " + fx(res.left) + " MWh left unused" : "") + ". The battery holds " + P.E + " MWh: can you deliver all of it?";
+  }
+  function loopVerdict(lp, mine, ok) {
+    return (ok ? "**Right:** your" : "**Not quite:** your") + " signs on this loop have " + mine.minus + " − link" + (mine.minus === 1 ? "" : "s") + ", " +
+      (mine.minus % 2 ? "odd, so balancing" : "even, so reinforcing") + ". " + lp.why;
+  }
   // the ripple: every effect of a lever up to a wave (0-based, inclusive); per node, the directions in order
   function ripple(lever, upTo) {
     var by = {}, eff = [];
@@ -147,16 +169,13 @@
   }
   var model = { reservoirInflow: reservoirInflow, stepStock: stepStock, simReservoir: simReservoir, simBattery: simBattery, carbonPath: carbonPath,
                 simCarbon: simCarbon, carbonMessage: carbonMessage, loopLinks: loopLinks, loopType: loopType, gradeSigns: gradeSigns, reboundKept: reboundKept,
-                ripple: ripple, dimsReached: dimsReached, hubs: hubs, nodeSoFar: nodeSoFar };
+                ripple: ripple, dimsReached: dimsReached, hubs: hubs, nodeSoFar: nodeSoFar, reservoirMessage: reservoirMessage, batteryMessage: batteryMessage,
+                loopVerdict: loopVerdict, weekLabel: weekLabel };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
   // ---------------------------------------------------------------- view helpers
   var LX = window.LX, H = LX.H, S = LX.S, LESSON = "f02-systems-and-map";
-  var fx = function (v, d) { return (+v).toLocaleString("en-US", { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 }); };
-  var HH = function (h) { return (h < 10 ? "0" : "") + h + ":00"; };
-  var MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  function weekLabel(w) { var d = new Date(Date.UTC(2025, 0, 1) + w * 7 * 86400000); return "week " + (w + 1) + " (from " + d.getUTCDate() + " " + MONTHS[d.getUTCMonth()] + ")"; }
   function rich(t) { return LX.rich(t).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>"); }
   function loopName(lp) { return "Loop " + lp.id.replace(/^L/, ""); }
   function lower(s) { return s.replace(/^[A-Z](?=[a-z])/, function (c) { return c.toLowerCase(); }); }
@@ -269,7 +288,7 @@
           enable(false);
           var box = H("div", { class: "f2-pred" }, predBox);
           H("p", { class: "lx-q", text: pr.q }, box);
-          var pp = LX.Predict(box, { id: pr.id, answer: pr.answer, fresh: true, options: pr.options, title: false,
+          var pp = LX.Predict(box, { id: pr.id, answer: pr.answer, fresh: true, options: pr.options, title: false, q: pr.q,
             onPick: function (v) {
               st.pred = v; c.l35 = pr.l35; c.nz = pr.nz; ctx.save();
               sliders[0].set(pr.l35); sliders[1].set(pr.nz); enable(true); run();
@@ -352,15 +371,11 @@
     function judge() {
       var P = D[kind]; chips.innerHTML = ""; var won = res.won, msg, bad = !won;
       if (kind === "reservoir") {
-        chip("Lowest", fx(res.min) + " GWh", res.short ? "bad" : null); chip("Highest", fx(res.max) + " GWh", res.spill ? "bad" : null); chip("End of year", fx(res.end) + " GWh");
-        if (res.short) msg = "The reservoir runs dry in " + weekLabel(res.firstDry) + ". The river brings " + fx(res.avgIn) + " MW on average, and a steady release above that drains the stock. Try less.";
-        else if (res.spill) msg = "It spills " + fx(res.spill) + " GWh, from " + weekLabel(res.firstSpill) + ": the spring flood is more than the reservoir can hold at this release. Try more.";
-        else msg = "No spill, never dry. Your release of **" + res.release + " MW** against an average inflow of " + fx(res.avgIn) + " MW ends the year at " + fx(res.end) + " GWh (it started at " + P.start + "). The stock moved spring's water into summer, autumn and winter.";
+        chip("Lowest", fx(res.min) + " GWh", res.short ? "bad" : null); chip("Highest", fx(res.max) + " GWh", res.spill ? "bad" : null); chip("Start → end of year", fx(P.start) + " → " + fx(res.end) + " GWh");
+        msg = reservoirMessage(P, res);
       } else if (kind === "battery") {
         chip("Bought", fx(res.bought) + " MWh"); chip("Stored", fx(res.stored) + " MWh"); chip("Delivered", fx(res.delivered) + " MWh", res.short ? "bad" : null);
-        if (res.short) msg = "The battery runs empty at " + HH(res.emptyAt) + ": it stored only " + fx(res.stored) + " MWh, so " + fx(res.short) + " MWh of the evening's request could not be met. Charge more, or ask for less.";
-        else if (won) msg = "You bought " + fx(res.bought) + " MWh, stored " + fx(res.stored) + " (" + fx(res.lost) + " lost as heat) and delivered **" + fx(res.delivered) + " MWh**: " + st.ctl.battery.d + " MW for 4 hours. MW is the flow; MWh is the stock.";
-        else msg = "No shortfall, but only " + fx(res.delivered) + " MWh delivered" + (res.left > 1e-9 ? " and " + fx(res.left) + " MWh left unused" : "") + ". The battery holds " + P.E + " MWh: can you deliver all of it?";
+        msg = batteryMessage(P, res, st.ctl.battery.d);
       } else {
         chip("Emitted " + P.start_year + "–" + P.end_year, fx(res.end) + " Mt", won ? null : "bad"); chip("Budget", fx(P.budget) + " Mt"); chip(P.end_year + " emissions", fx(res.e[res.e.length - 1], 1) + " Mt/yr");
         msg = carbonMessage(P, res, st.pred); if (!st.pred) bad = true;
@@ -427,7 +442,7 @@
   // settling toward a level (with long delays a balancing loop can overshoot instead); illustrative shapes
   function sketch(host, type) {
     var d = type === "R" ? "M14 70 C60 68 92 60 116 46 C134 34 146 20 154 8" : "M14 70 C34 34 58 22 92 18 C118 16 136 15 154 15";
-    var svg = S("svg", { viewBox: "0 0 168 84", class: "f2-sketch " + type, role: "img", "aria-label": type === "R" ? "Typical behaviour of a reinforcing loop: growth that feeds itself" : "One possible response of a balancing loop without long delays: it settles toward a level" }, host);
+    var svg = S("svg", { viewBox: "0 0 168 84", class: "f2-sketch " + type, role: "img", "aria-label": type === "R" ? "Typical behavior of a reinforcing loop: growth that feeds itself" : "One possible response of a balancing loop without long delays: it settles toward a level" }, host);
     svg.innerHTML = '<path class="ax" d="M12 6 V74 H160"/>' + (type === "B" ? '<path class="goal" d="M12 15 H160"/>' : "") + '<path class="cv" d="' + d + '"/>' +
       '<text x="16" y="82">time</text>';
     return svg;
@@ -492,8 +507,7 @@
           var pick = S0.named[lp.id];
           if (pick) {
             var ok = pick === lp.type;
-            H("p", { class: "f2-verdict " + (ok ? "ok" : "no"), html: (ok ? LX.icon("check") + "<b>Right.</b> " : LX.icon("question") + "<b>Not quite.</b> ") +
-              "Your signs on this loop have " + mine.minus + " − link" + (mine.minus === 1 ? "" : "s") + ": " + (mine.minus % 2 ? "odd, so balancing" : "even, so reinforcing") + ". " + rich(lp.why) }, row);
+            H("p", { class: "f2-verdict " + (ok ? "ok" : "no"), html: LX.icon(ok ? "check" : "question") + "<span>" + rich(loopVerdict(lp, mine, ok)) + "</span>" }, row);
             cld.loopLabel(lp.id, ok ? lp.type : "?");
           } else cld.loopLabel(lp.id, "?");
         });
@@ -504,8 +518,9 @@
           if (!S0.done) { var fk = focusKey(); S0.done = true; ctx.save(); ctx.note(); build(); refocus(el, fk); return; }
           var src = ctx.D.sources;
           H("div", { class: "lx-saw", html: LX.icon("check") + "<div>" + rich(which === "ev"
-            ? "Both [[feedback-loop|feedback loops]] closed; which one wins depends on their strength and delays. A study of " + src.li_ev.value + " U.S. metro areas, 2011 to 2013, found effects running both ways between EV sales and chargers (Li et al., 2017)."
+            ? "Both [[feedback-loop|feedback loops]] closed; which one wins depends on their strength and delays."
             : "Loop closed. The [[rebound-effect|rebound effect]] takes back part of the saving, not all of it: move the slider.") + "</div>" }, saw);
+          if (which === "ev") H("p", { class: "lx-hint f2-evidence", text: "Evidence: a study of " + src.li_ev.value + " U.S. metro areas, 2011 to 2013, found effects running both ways between EV sales and chargers (Li et al., 2017)." }, saw);
           if (which === "rebound") rebound(extra);
         } else extra.innerHTML = "";
       }
@@ -603,14 +618,14 @@
       panel.insertBefore(pv, live);
       if (showHubs) {
         var hc = hubs(R), all = R.nodes.filter(function (n) { return hc[n.id] === R.levers.length; }).map(function (n) { return lower(n.label); });
-        H("div", { class: "lx-saw", html: LX.icon("check") + "<div>" + rich("**Hubs.** " + cap(list(all)) + " moved under every one of the four levers. A study that changes any part of the system should check these first.") + "</div>" }, live);
+        H("div", { class: "lx-saw", html: LX.icon("check") + "<div>" + rich("**Hubs.** " + cap(list(all)) + " moved under all four of this map's levers. In your own study, the question and the boundary decide what to track.") + "</div>" }, live);
         return;
       }
       if (!lever) { H("p", { class: "lx-hint", text: "Pick a lever above. Each wave is one step in tracing causes; its label says roughly when that step plays out." }, pv); return; }
       if (wave < 0) {
         var pr = lever.predict, q = H("div", { class: "f2-pred" }, pv);
         H("p", { class: "lx-q", text: pr.q }, q);
-        LX.Predict(q, { id: "f2-" + lever.id, answer: pr.answer, fresh: true, title: false,
+        LX.Predict(q, { id: "f2-" + lever.id, answer: pr.answer, fresh: true, title: false, q: pr.q,
           options: ["up", "down", "mixed"].map(function (d) { return { value: d, label: d === "mixed" ? "It depends" : cap(dirs[d].word) }; }),
           onPick: function (v) { st.preds[lever.id] = v; wave = 0; st.levers[lever.id] = Math.max(st.levers[lever.id] || 0, 1); ctx.save(); render(); focusWave(); } });
         return;
@@ -768,7 +783,7 @@
           game: won.reservoir && ctl.reservoir ? "Your reservoir ended the year at " + fx(simReservoir(D.stockflow.reservoir, ctl.reservoir.release).end) + " GWh." : "The reservoir, the battery and the carbon budget." },
         { id: "flow", g: "parts", label: "Flow", at: [1, 0], atN: [1, 0], text: "A rate that fills or drains a stock: MW, Mt a year, cars sold a year. Only flows change a stock.",
           game: "The battery took in MW and held MWh: lesson 1's power and energy." },
-        { id: "limit", g: "parts", label: "Limits", at: [2, 0], atN: [2, 0], text: "A stock has a floor and a ceiling: a full reservoir spills, an empty battery delivers nothing, a budget can be overrun.",
+        { id: "limit", g: "parts", label: "Limits", at: [2, 0], atN: [2, 0], text: "Reservoirs and batteries have physical floors and ceilings: a full one spills, an empty one delivers nothing. A carbon budget is a chosen limit that emissions can exceed.",
           game: "Spill, run dry, or overrun the budget." },
         { id: "delay", g: "parts", label: "Delay", at: [3, 0], atN: [0, 1], text: "Time between a cause and its effect: a stock fills slowly, a new line takes years.", game: "The time labels on the system map's waves: hours, months, years." },
         { id: "R", g: "loops", label: "Reinforcing loop", lines: ["Reinforcing", "loop"], at: [0.5, 1], atN: [1, 1], text: "An even number of − links: change feeds itself, growth or decline.", game: "More EVs, more chargers, more EVs." },
@@ -777,7 +792,7 @@
           game: st.rb != null ? "Your rebound: " + st.rb + "%, so " + fx(reboundKept(100, st.rb)) + " of 100 units kept." : "The LED bulbs." },
         { id: "lever", g: "whole", label: "Lever", at: [0.5, 2], atN: [1, 2], text: "A change from outside the part you study: a price shock, the weather, a policy, a new load.", game: "Gas price, heat wave, carbon price, new data center." },
         { id: "ripple", g: "whole", label: "Ripple", at: [1.5, 2], atN: [2, 2], text: "A lever's effects spread step by step across technology, cost, emissions, people and security.", game: "Every lever reached all five dimensions." },
-        { id: "hub", g: "whole", label: "Hub", at: [2.5, 2], atN: [1, 3], text: "A part that many levers move: watch it first in any study.", game: "The wholesale price, household bills, the plant mix, CO₂ and what gets built moved under all four levers." }
+        { id: "hub", g: "whole", label: "Hub", at: [2.5, 2], atN: [1, 3], text: "A part that many levers move. In your own study, the question and the boundary decide what to track.", game: "The wholesale price, household bills, the plant mix, CO₂ and what gets built moved under all four levers." }
       ],
       edges: [["flow", "stock", "changes"], ["limit", "stock", "bounds"], ["stock", "delay", "creates"], ["R", "stock", "grows or drains"], ["B", "stock", "pushes back on"],
               ["rebound", "B", "is a"], ["lever", "ripple", "starts"], ["ripple", "hub", "meets"], ["delay", "ripple", "spaces"]]

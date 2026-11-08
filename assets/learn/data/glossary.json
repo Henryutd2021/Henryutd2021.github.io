@@ -275,6 +275,12 @@
   "lesson": "A15",
   "href": "a15-efficiency-electrification.html"
  },
+ "bulk-power-system": {
+  "term": "Bulk power system",
+  "short": "The large power plants and the high-voltage transmission network that carry electricity over long distances, as distinct from the local distribution grid.",
+  "lesson": "X1",
+  "href": "x01-under-the-hood.html"
+ },
  "bus": {
   "term": "Bus",
   "short": "A point of the network where plants, loads and lines meet, such as a substation; a network model has one balance rule per bus.",
@@ -1531,7 +1537,7 @@
  },
  "grid-forming": {
   "term": "Grid-forming",
-  "short": "Said of an inverter or a generator that sets voltage and frequency itself, so it can start and hold an island with no grid behind it.",
+  "short": "Said of an inverter or a generator that sets voltage and frequency itself, so it can hold an island with no grid behind it; starting a dead island also takes equipment designed for that.",
   "lesson": "F7",
   "href": "f07-microgrids.html"
  },
@@ -1937,12 +1943,6 @@
   "lesson": 2,
   "href": "02-demand.html"
  },
- "local-optimum": {
-  "term": "Local optimum",
-  "short": "The best plan for one part of a system judged inside its own boundary, which need not be best for the system it sits in.",
-  "lesson": "F1",
-  "href": "f01-five-scales.html"
- },
  "location-based": {
   "term": "Location-based method",
   "short": "A way to report electricity's emissions that counts each MWh at the average emission factor of the grid where it is used.",
@@ -2017,7 +2017,7 @@
  },
  "major-event-day": {
   "term": "Major event day",
-  "short": "A day with so many outage minutes, usually from a big storm, that it passes a threshold set from a utility's past five years (IEEE 1366); reports give reliability with and without them.",
+  "short": "A day whose outage minutes per customer pass a threshold set from a utility's past five years of daily values (IEEE 1366), often in severe weather; reports give reliability with and without them.",
   "lesson": "F6",
   "href": "f06-grid-and-outages.html"
  },
@@ -2179,7 +2179,7 @@
  },
  "microgrid": {
   "term": "Microgrid",
-  "short": "A local group of loads and sources, such as a campus or a village, that is managed as one system and can disconnect from the main grid and run on its own.",
+  "short": "Loads and sources inside one electrical boundary, such as a campus or a village, run as one system; a grid-connected microgrid can disconnect and run alone, and an isolated one always does.",
   "lesson": "F1",
   "href": "f01-five-scales.html"
  },
@@ -2368,6 +2368,12 @@
   "short": "New or stronger lines, transformers or substation equipment that the grid needs before a project can connect.",
   "lesson": "A6",
   "href": "a06-interconnection.html"
+ },
+ "neutral": {
+  "term": "Neutral",
+  "short": "The grounded wire from a service transformer's midpoint: a home gets 120 V between it and either live wire, and 240 V between the two live wires.",
+  "lesson": "F6",
+  "href": "f06-grid-and-outages.html"
  },
  "neutron": {
   "term": "Neutron",
@@ -2605,7 +2611,7 @@
  },
  "point-of-common-coupling": {
   "term": "Point of common coupling",
-  "short": "The one place where a microgrid meets the main grid, with the switch that opens to let it run on its own.",
+  "short": "The place where a grid-connected microgrid meets the main grid, with the switch that opens to let it run on its own.",
   "lesson": "F7",
   "href": "f07-microgrids.html"
  },
@@ -2641,7 +2647,7 @@
  },
  "power-usage-effectiveness": {
   "term": "Power usage effectiveness (PUE)",
-  "short": "A data center's total electricity use divided by the electricity its computing equipment uses; the rest goes to cooling, power conversion and lighting.",
+  "short": "A data center's total electricity use over a year divided by its computing equipment's use over the same year; the rest goes to cooling, power conversion and lighting.",
   "lesson": "F8",
   "href": "f08-large-loads.html"
  },
@@ -2791,7 +2797,7 @@
  },
  "rate-base": {
   "term": "Rate base",
-  "short": "The net value of what a regulated utility has built, its plant less depreciation, on which the regulator allows it to earn a return.",
+  "short": "The plant a regulator approves as serving customers, valued after depreciation; rates give the utility an opportunity, not a guarantee, to earn an allowed return on it.",
   "lesson": "X4",
   "href": "x04-rules-law.html"
  },
@@ -2977,7 +2983,7 @@
  },
  "revenue-requirement": {
   "term": "Revenue requirement",
-  "short": "The annual revenue a regulated utility may collect: its approved expenses, including depreciation and taxes, plus an allowed financing return on the net value of what it has built.",
+  "short": "The annual revenue a regulated utility may collect: its approved expenses, including depreciation and taxes, plus an allowed financing return on its rate base.",
   "lesson": "X4",
   "href": "x04-rules-law.html"
  },
@@ -3148,6 +3154,12 @@
   "short": "The least distance a project must keep from a home, road, line or other feature, usually set by local rules.",
   "lesson": "A19",
   "href": "a19-gis-siting.html"
+ },
+ "settlement": {
+  "term": "Settlement (in a regulatory case)",
+  "short": "An agreement among some or all parties to a case on how it should end, filed for the commission's decision.",
+  "lesson": "X4",
+  "href": "x04-rules-law.html"
  },
  "shadow-price": {
   "term": "Shadow price",
@@ -3379,7 +3391,7 @@
  },
  "synchronous-grid": {
   "term": "Synchronous grid",
-  "short": "A grid that runs at one shared frequency, so every spinning generator in it turns in step; the Lower 48 states have three main ones, called interconnections.",
+  "short": "A connected AC network whose generators and other equipment run at one shared electrical frequency; the Lower 48 states have three main ones, called interconnections.",
   "lesson": "F1",
   "href": "f01-five-scales.html"
  },
@@ -3631,9 +3643,15 @@
   "lesson": "SB2",
   "href": "sb2-grid-room.html"
  },
+ "uranium-235": {
+  "term": "Uranium-235",
+  "short": "The form of uranium whose atoms split easily when they catch a slow neutron; natural uranium holds only a small share of it.",
+  "lesson": "F5",
+  "href": "f05-nuclear-basics.html"
+ },
  "useful-energy": {
   "term": "Useful energy",
-  "short": "The part of the energy bought that a device actually delivers as the wanted heat, light or motion, after its own losses.",
+  "short": "Energy a device delivers in the wanted form, such as heat, light or motion; a heat pump's delivered heat includes heat drawn from the outdoor air, not only the energy bought.",
   "lesson": "F3",
   "href": "f03-energy-services.html"
  },

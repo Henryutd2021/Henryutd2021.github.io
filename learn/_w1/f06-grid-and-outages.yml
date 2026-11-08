@@ -58,7 +58,10 @@ glossary:
     def: "Customer Average Interruption Duration Index: the average minutes to restore one interruption, SAIDI divided by SAIFI."
   - id: major-event-day
     term: Major event day
-    def: "A day with so many outage minutes, usually from a big storm, that it passes a threshold set from a utility's past five years (IEEE 1366); reports give reliability with and without them."
+    def: "A day whose outage minutes per customer pass a threshold set from a utility's past five years of daily values (IEEE 1366), often in severe weather; reports give reliability with and without them."
+  - id: neutral
+    term: Neutral
+    def: "The grounded wire from a service transformer's midpoint: a home gets 120 V between it and either live wire, and 240 V between the two live wires."
 requests:
   - "Promote, if wanted: GridNet (assets/learn/f06-grid-and-outages.js, i-network for distribution plus i-hazard): a one-line diagram whose parts are SVG buttons (role button, Enter and Space, aria-pressed) that fail and repair; pure protection logic (outage(): the closest fuse, recloser or breaker upstream of a fault opens; a meshed loop checked for a path to a source); dark homes; a free mode and a storm mode; a text-version table. F7, A9 and A17 could reuse it with their own layouts."
   - "Promote, if wanted: VoltPath (same file): a plant-to-socket path drawn in two layouts (one row from 560 px, two rows below), a rail of stop buttons with a log-scale voltage staircase, a live detail panel and a text version."

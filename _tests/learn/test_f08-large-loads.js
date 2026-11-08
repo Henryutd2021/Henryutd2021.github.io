@@ -121,15 +121,15 @@ ok(M.taxM(1000, 1.0) === 10 && M.taxM(800, 1.5) === 12, "tax: $1,000M at 1% = $1
 ok(/transfer/.test(M.taxLine(D, 1000, 1)) && /not new wealth/.test(M.taxLine(D, 1000, 1)), "tax is called a transfer");
 // every prediction gets a true answer
 ok(M.WHEN.options.every(o => M.WHEN.feedback[o.value]) && M.WHEN.answer === "flat", "step 1: feedback for every choice; the campus is flat by assumption");
-ok(Object.values(M.WHEN.feedback).every(t => !/\b(so it adds as much|it adds about the same)\b/.test(t)) && M.whenAssume(D) === "Assumed in this lesson: a steady 240 MW in every hour. Real campuses vary with their computing work and with cooling.",
+ok(Object.values(M.WHEN.feedback).every(t => !/\b(so it adds as much|it adds about the same)\b/.test(t)) && M.whenAssume(D) === "Around the clock is not the same as constant: real campuses vary with computing work and cooling. This lesson simplifies to a steady 240 MW in every hour." && M.WHEN.options.find(o => o.value === "flat").label === "In every hour, by a similar amount" && !/About the same in every hour/.test(JS),
   "step 1: running around the clock is not made to imply a constant draw; the steady 240 MW is stated as an assumption, with real variation");
 ok(/pr\.reveal\(\); as\.textContent = whenAssume\(D\)/.test(JS) && /\["At its full " \+ D\.campus\.contractMW \+ " MW contract", s\.atContract \+ " MW", "warn"\]/.test(JS), "step 1: normal and maximum power in labelled readouts; the assumption in its own line");
 ok(M.PAY.options.every(o => M.PAY.feedback[o.value]) && M.PAY.answer === "others" && /can land on/.test(M.PAY.feedback.others), "step 8: feedback for every choice; 'can land on', under the stated assumption");
-ok(/Assume regulators let the utility recover such costs from customers/.test(JS), "step 8 states the recovery assumption");
+ok(M.PAY_ASSUME === "regulators let the utility recover such costs from customers, and the contract has no special terms." && /class: "lx-hint f8-assume", html: "<b>Assume:<\/b> " \+ LX\.esc\(PAY_ASSUME\)/.test(JS), "step 8 states the recovery assumption in its own labelled line, before the question");
 ok(A.newPeak === 690 && A.atContract === 750, "step 1 readouts: 690 MW with the campus, 750 MW at the full contract");
 ok(M.dayLine(D, B) === "17 April 2025: the campus is **48%** of the day's electricity. The quietest hour goes from 216 to 456 MW, above the town's 2025 record of 450 MW.", "step 2 line, 17 April");
 ok(M.dayLine(D, A).indexOf("from 298 to 538 MW, above") >= 0, "step 2 line, 29 July");
-ok(M.yearSaw(D, Y) === "With the campus, demand is above the town's old record in **8,690 of 8,760** hours. The quietest hour rises from 196 to 436 MW, and the [[load-factor|load factor]] from 63% to 76%.", "step 4 line = the model");
+ok(M.yearSaw(D, Y) === "With the campus, this profile is above the town's old record in **8,690 of 8,760** hours. The quietest hour rises from 196 to 436 MW, and the [[load-factor|load factor]] from 63% to 76%.", "step 4 line = the model");
 
 // ---------------- numbers on the page
 has("adds 240 MW in every hour, so the town's busiest hour on 29 July 2025 rises from 450 to 690 MW", "myth 1");
@@ -142,7 +142,8 @@ has("$12M: 800 × 1.5% = 12", "question 4");
 has("here, a steady 240 MW against Prairie Town's busiest hour of 450 MW", "ideas: sizes");
 has("240 MW all year is as much electricity as about 195,000 average U.S. homes buy in a year", "ideas: homes");
 has("ERCOT's requests to connect were 5.2 times its record peak in 2026", "ideas: requests");
-has("200 MW of computers at a PUE of 1.2 need 200 × 1.2 = 240 MW from the grid", "Go deeper: PUE example");
+has("if the computers average 200 MW over a year and the annual PUE is 1.2, the whole campus averages 200 × 1.2 = 240 MW. Its busiest hour can be higher.", "Go deeper: PUE example, an annual average");
+ok(/over a year divided by its computing equipment's use over the same year/.test(SIDE) && !/need 200 × 1\.2 = 240 MW from the grid/.test(PAGE), "PUE is an annual energy ratio (DOE FEMP): it gives an average, not the busiest hour");
 has("ERCOT's 474 GW of requests is 5.2 times its record peak of 91,134 MW", "Go deeper: requests");
 has("325 to 580 TWh in 2028, 6.7% to 12% of U.S. electricity", "Go deeper: Berkeley Lab range");
 ok(/\\frac\{281\.9 \+ 240\}\{450 \+ 240\} = 0\.756/.test(PAGE), "Go deeper: load factor formula with the model's numbers");
@@ -158,8 +159,8 @@ ok(D.home_year.value === 10791 && /2022/.test(D.home_year.as_of), "EIA's 2022 av
 { const L1 = require(L("data/01-power-energy.json")); const hy = JSON.stringify(L1).match(/"home_year":\{"value":(\d+)/); ok(hy && +hy[1] === D.home_year.value, "the same benchmark as lesson 1"); }
 
 // ---------------- wording details
-ok(D.cooling.map(c => c.name).join() === "Evaporative heat rejection,Dry, air-cooled heat rejection" && /little operational water on site/.test(M.coolLine(D.cooling[1])) && /depending on the weather and the design/.test(M.coolLine(D.cooling[1])) && !/closed-loop cooling/i.test(PAGE + RAW + JS),
-  "cooling compares evaporative with dry heat rejection; a closed loop is not called low-water");
+ok(D.cooling.map(c => c.name).join() === "Cooling tower,Dry cooling" && /^Cooling tower: releases heat by evaporating water;/.test(M.coolLine(D.cooling[0])) && /^Dry cooling: releases heat to the outdoor air/.test(M.coolLine(D.cooling[1])) && !/heat rejection/.test(JSON.stringify(D.cooling) + JS) && /little operational water on site/.test(M.coolLine(D.cooling[1])) && /depending on the weather and the design/.test(M.coolLine(D.cooling[1])) && !/closed-loop cooling/i.test(PAGE + RAW + JS),
+  "cooling compares a cooling tower with dry cooling, each named by what it does; a closed loop is not called low-water");
 ok(/closed water loop inside the building can still send its heat out through an evaporative cooling tower/.test(M.WATER_HINTS[1]) && D.coolingSource.url === "https://www.energy.gov/cmei/femp/cooling-water-efficiency-opportunities-federal-data-centers" && OWN.indexOf(D.coolingSource.url) >= 0, "cooling: the DOE source is in the data file and the sources list");
 ok(/\{ key: "local", name: "Local government", cells: \{ dec: \{ v: "yes"[^}]*\}, pay: \{ v: "part", t: "possibly: roads, water and services the campus needs" \}, ben: \{ v: "part", t: "tax receipts; the net gain depends on local costs" \}/.test(JS), "stakeholders: local government may pay for services; the net gain depends on local costs");
 ok(/title: "Check supply and wires", text: "Planners check whether existing supply and wires can serve the added load; upgrades may be needed\."/.test(JS) && !/More plants and wires/.test(JS), "the causal chain checks supply and wires rather than asserting new plants");
@@ -211,7 +212,13 @@ ok(hrefs.every(okHref), "links: EIA, DOE, ERCOT, PJM and learn pages only (" + h
 ok(!/projects\/|research\.html/.test(PAGE + JS), "no project page and no Research page");
 ok(/LX\.lessonRefHTML\(P, "A6"\)/.test(JS) && !/\[\[lesson:a06|\[\[lesson:a17/.test(JS), "A6 is named through lessonRefHTML (it may still be upcoming)");
 ok(/\[\[lesson:a04-retail-tariffs\|A4\]\]/.test(JS), "the live A4 is linked with a lesson mark");
-{ const dl = OWN.match(/<div class="lx-datanote[\s\S]*?<\/div>/); ok(dl && /Illustrative\./.test(dl[0]) && /EIA-930/.test(dl[0]), "the data note says what is illustrative and what is real"); }
+{ const dl = OWN.match(/<div class="lx-datanote[\s\S]*?<\/div>/); ok(dl && /Illustrative\./.test(dl[0]) && /EIA-930/.test(dl[0]), "the data note says what is illustrative and what is real");
+  // the repaired hours of the town's profile: the count is the data's own, and the two days shown have none (the town
+  // data's day picks skip days with repaired hours)
+  const rep = days.stats && days.stats.demand_hours_flagged_as_implausible;
+  ok(rep === 699 && dl && new RegExp("Before scaling, " + M.fmtN(rep) + " of the " + M.fmtN(Y.n) + " demand hours looked implausible and were replaced with SPP's day-ahead forecast, rescaled; the two days shown have none\\.").test(dl[0]) && /excluded from day picks/.test(days.meta.normalisation),
+    "the data note gives the repaired demand hours (" + rep + ") and says the shown days have none"); }
+ok(/text: "Every hour rises by " \+ D\.campus\.drawMW \+ " MW, the quiet night hours included\."/.test(JS) && !/quiet nights are gone/.test(JS), "the causal chain: a constant load raises every hour equally; nights stay the quietest hours");
 
 // ---------------- text budget
 const plain = t => String(t).replace(/<[^>]+>/g, " ").replace(/\$\$[\s\S]*?\$\$/g, " ").replace(/\$[^$\n]+\$/g, "x").replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1").replace(/\*\*/g, "").replace(/&amp;/g, "&").trim();
@@ -219,9 +226,9 @@ const nWords = t => plain(t).split(/\s+/).filter(w => /[A-Za-z0-9$]/.test(w)).le
 const nSent = t => plain(t).replace(/U\.S\./g, "US").split(/(?<=[.?!])\s+(?=[A-Z“$0-9])/).filter(x => /[A-Za-z]/.test(x)).length;
 const stepTexts = [...JS.matchAll(/\{ text: "((?:[^"\\]|\\.)*)",\n\s*build/g)].map(m => m[1].replace(/\\"/g, '"'));
 ok(stepTexts.length === 8, "eight step cards (" + stepTexts.length + ")");
-stepTexts.forEach((t, i) => { const n = nWords(t); ok(n >= 18 && n <= 36, "step " + (i + 1) + ": " + n + " words (about 35)"); ok(nSent(t) <= 3, "step " + (i + 1) + ": " + nSent(t) + " sentences"); });
+stepTexts.forEach((t, i) => { const n = nWords(t); ok(n >= 18 && n <= 36, "step " + (i + 1) + ": " + n + " words (about 35)"); ok(nSent(t) <= 2, "step " + (i + 1) + ": " + nSent(t) + " sentences"); });
 // every reveal, hint and feedback the page shows, as the reader sees it: one or two sentences, about 35 words
-const lines = [M.whenAssume(D), M.dayLine(D, A), M.dayLine(D, B), M.daysSaw(D, A, B), M.yearSaw(D, Y), M.ercotLine(D), M.HOMES_NOTE + " Homes figure: EIA's average U.S. home buys 10,791 kWh a year (2022).", M.HOMES_WHATIF, M.TAX_NOTE, M.PAY.extra, M.SAW7]
+const lines = ["Assume: " + M.PAY_ASSUME, M.whenAssume(D), M.dayLine(D, A), M.dayLine(D, B), M.daysSaw(D, A, B), M.yearSaw(D, Y), M.ercotLine(D), M.HOMES_NOTE + " Homes figure: EIA's average U.S. home buys 10,791 kWh a year (2022).", M.HOMES_WHATIF, M.TAX_NOTE, M.PAY.extra, M.SAW7]
   .concat(M.WATER_HINTS, D.cooling.map(M.coolLine))
   .concat([12, 18, 24, 30, 36, 42, 48, 60].map(g => M.waitLine(D, g)), [60, 90, 120, 150, 180, 210, 240, 270, 300].map(v => M.homesLine(D, Y, v)), [M.jobsLine(D, 2000, 200), M.jobsLine(D, 200, 20), M.taxLine(D, 2000, 2.5), M.taxLine(D, 200, 0.5)]);
 lines.forEach(t => { ok(nWords(t) <= 36, "a reveal of " + nWords(t) + " words: " + plain(t).slice(0, 60)); ok(nSent(t) <= 2, "a reveal of " + nSent(t) + " sentences: " + plain(t).slice(0, 60)); });
@@ -231,10 +238,12 @@ lines.forEach(t => { ok(nWords(t) <= 36, "a reveal of " + nWords(t) + " words: "
   ok(nWords(t) <= 35 && nSent(t) <= 2, k + " feedback as shown for '" + o.value + "': " + nWords(t) + " words, " + nSent(t) + " sentences");
 }));
 ok(/pr\.reveal\(\);/.test(JS) && !/pr\.reveal\([^)]/.test(JS), "the predictions' reveals add no extra sentence (the extra lines sit in their own elements)");
-const PROSE = OWN.replace(/^---[\s\S]*?\n---\n/, " ").replace(/<script[\s\S]*?<\/script>/g, " ").replace(/<style[\s\S]*?<\/style>/g, " ")
+const SOURCES_CARD = (OWN.match(/<div class="lx-card lx-sources">[\s\S]*?<\/div>/) || [""])[0];
+SOURCES_CARD.split(/<\/?li\b[^>]*>/).map(plain).filter(x => /[A-Za-z]/.test(x)).forEach(x => ok(nWords(x) <= 45, "source entry of " + nWords(x) + " words: " + x.slice(0, 60)));
+const PROSE = OWN.replace(SOURCES_CARD, " ").replace(/^---[\s\S]*?\n---\n/, " ").replace(/<script[\s\S]*?<\/script>/g, " ").replace(/<style[\s\S]*?<\/style>/g, " ")
   .replace(/<!--[\s\S]*?-->/g, " ").replace(/<blockquote[\s\S]*?<\/blockquote>/g, " ").replace(/^- (.*)$/gm, "<li>$1</li>").replace(/^\|(.*)\|$/gm, "<td>$1</td>");
 PROSE.split(/<\/?(?:p|li|dd|dt|td|th|summary|br|caption)\b[^>]*>/).map(plain).filter(x => /[A-Za-z]/.test(x) && !/^[:{]/.test(x)).forEach(x => {
-  const n = nWords(x); ok(n <= 40, "text element of " + n + " words: " + x.slice(0, 70)); ok(nSent(x) <= 3, "text element of " + nSent(x) + " sentences: " + x.slice(0, 70)); });
+  const n = nWords(x); ok(n <= 36, "text element of " + n + " words: " + x.slice(0, 70)); ok(nSent(x) <= 2, "text element of " + nSent(x) + " sentences: " + x.slice(0, 70)); });
 
 // ---------------- the page's controls
 ok(!Object.values(M.WHEN.feedback).concat(Object.values(M.PAY.feedback), [M.PAY.extra, M.whenAssume(D)]).some(t => /\*\*/.test(t)), "Predict reveals and their extra lines carry no **bold** marks");

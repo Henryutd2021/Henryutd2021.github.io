@@ -142,10 +142,10 @@ const T0 = M.totals(D, {}), T1 = M.totals(D, { car: true }), T2 = M.totals(D, { 
   ok(Math.round(P.sent / 100) * 100 === 5700 && Math.round(5700 * 7535 / 3412 / 100) * 100 === 12600, "primary: 5,400 ÷ 0.95 = 5,700 kWh sent out; 5,700 × 7,535 ÷ 3,412 = 12,600 kWh of gas (both lines of the box)");
   ok(Math.round(P.gas / 100) * 100 === 12600 && Math.round(P.cut * 100) === 26 && P.furnaceGas === 16900, `primary: ${f(P.gas)} kWh of gas at the plant, ${Math.round(P.cut * 100)}% less than the furnace's 16,900`);
   const box = QMD.match(/Primary energy: count the power plant too[\s\S]*?<\/details>/)[0];
-  ["5{,}400", "1 - 0.05", "5{,}700", "7{,}535", "3{,}412", "12{,}600", "about 12,600 kWh", "16,900 kWh", "about 26% less gas", "EIA's 2025 full-load test heat rate, 7,535 Btu of gas per kWh", "about 5%", "U.S. average for 2018–2022"].forEach(s => ok(box.indexOf(s) >= 0, `primary box states "${s}"`));
+  ["5{,}400", "1 - 0.05", "5{,}700", "7{,}535", "3{,}412", "12{,}600", "about 12,600 kWh", "16,900 kWh", "about 26% less gas", "Gas combined cycle, 7,535 Btu of gas per kWh (full-load test heat rate, 2025)", "About 5% lost on the way", "U.S. average, 2018–2022"].forEach(s => ok(box.indexOf(s) >= 0, `primary box states "${s}"`));
   ok(/f04-power-plants\.html/.test(box) && /f06-grid-and-outages\.html/.test(box) && /eia\.gov\/tools\/faqs\/faq\.php\?id=105/.test(box), "primary box links F4, F6 (both live) and EIA's loss estimate");
   ok(P6.losses.real_years === "2018 through 2022" && /2018 to 2022 data/.test(P6.sources.losses.as_of) && /epa_08_02/.test(P4.sources.eia_t82.url) && /full load/.test(P4.sources.eia_t82.where), "primary box's dates: EIA losses 2018-2022 (F6's data), heat rate at full load (F4's data)");
-  ok(!/primary energy\]\{[^}]*\} is larger/.test(box) && /For electricity from a gas plant, more fuel energy enters the plant than electrical energy reaches the home/.test(box), "primary energy: no universal 'larger' claim, the gas-plant case only");
+  ok(!/primary energy\]\{[^}]*\} is larger/.test(box) && /so electricity from a gas plant starts as more fuel energy than reaches the home/.test(box), "primary energy: no universal 'larger' claim, the gas-plant case only");
   const md = QMD.match(/From services to demand[\s\S]*?<\/details>/)[0];
   ok(!/carnot|kelvin|318\.15/i.test(md) && !/carnot|kelvin/i.test(JSON.stringify(D.heatpump)), "Modeler box and data: no device thermodynamics (no Carnot derivation; the depth budget stops at D2)");
   ok(/2\.4 × 60 = 144/.test(md) && near(D.heatpump.anchorCOP * (D.heatpump.supplyC - D.heatpump.anchorC), 144) && /chosen number, not physics/.test(md), "Modeler box: 144 is the chosen curve through COP 2.4 at −15 °C");
@@ -168,10 +168,12 @@ const T0 = M.totals(D, {}), T1 = M.totals(D, { car: true }), T2 = M.totals(D, { 
   const P = M.primary(D, P4, P6); add(Math.round(P.gas / 100) * 100, "kWh");
   // the practice questions' own arithmetic: 20,000 × 0.80, the 20% left; 10,000 ÷ 2.5, the rest from the air
   [20000, 20000 * 0.8, 20000 * 0.2, 20000 / 0.8, 10000, 10000 / 2.5, 10000 - 10000 / 2.5, 7500].forEach(v => add(v, "kWh"));
-  ["1 kWh", "2.4 kWh"].forEach(s => allowed.add(s));   // "1 kWh of electricity delivers 2.4 kWh of heat" at COP 2.4
+  ["1 kWh", "2.4 kWh", "2.5 kWh"].forEach(s => allowed.add(s));   // "1 kWh of electricity delivers 2.4 kWh of heat" at COP 2.4; the fallback's "COP 2.5 means 2.5 kWh of heat"
   allowed.add(D.day.kWhPerDegreeDay + " kWh");          // the Modeler box: "5 kWh for each °C the day is below 18 °C"
   // sourced numbers
   ["22.8 mpg", "57.6 million Btu", "3,412 Btu", "7,535 Btu", "4,026 trillion Btu", "9,481 trillion Btu"].forEach(s => allowed.add(s));
+  ok(/units from 24,000 to 48,000 Btu\/h/.test(D.sources.doe_cchp.where), "the COP 2.4 target's equipment range is in the data");
+  allowed.add("48,000 Btu");   // "24,000 to 48,000 Btu/h": the equipment range of DOE's COP 2.4 target (Table II-2)
   ["42%", "80%", "60%", "30%", "26%", "5%", "45%", "54%", "87%", "91%"].forEach(s => allowed.add(s));   // 87%–91%: FOTW #1360's title
   ["15 °C", "5 °C", "−5 °C", "−15 °C", "−25 °C", "−23 °C", "18 °C", "45 °C", "20 °C", "5 °F"].forEach(s => allowed.add(s));
   ["10,917 miles", "22.8 miles"].forEach(s => allowed.add(s));   // "22.8 miles per gallon"
@@ -194,7 +196,8 @@ const T0 = M.totals(D, {}), T1 = M.totals(D, { car: true }), T2 = M.totals(D, { 
   const lits = [...JS.matchAll(/"((?:[^"\\\n]|\\.)*)"/g)].map(x => x[1]).join("\n");
   ok(!/\b(16,900|13,500|5,400|8,100|36,500|48,000|21,700|2\.40|3\.60)\b/.test(lits), "the script's strings hard-code no model number");
   const facts = (QMD.match(/<table class="lx-facts">[\s\S]*?<\/table>/) || [""])[0];
-  ok((facts.match(/<tr>/g) || []).length - 1 === 6 && [/eia\.gov\/consumption\/residential/, /epa\.gov\/energy/, /fotw-1360/, /bto-cchp-tech-challenge-spec/, /british-thermal-units/].every(r => r.test(facts)), "facts table: six rows, each with its primary source");
+  ok((facts.match(/<tr>/g) || []).length - 1 === 7 && [/eia\.gov\/consumption\/residential/, /epa\.gov\/energy/, /fotw-1360/, /bto-cchp-tech-challenge-spec/, /british-thermal-units/].every(r => r.test(facts)), "facts table: seven rows, each with its primary source");
+  ok(/COP 2\.4<\/td><td>DOE's target at −15 °C \(5 °F\) for cold-climate heat pumps of 24,000 to 48,000 Btu\/h\.<\/td>/.test(facts) && /HSPF2 8\.5<\/td><td>The same challenge's seasonal target, a Region V test rating/.test(facts) && /Region V/.test(D.sources.doe_cchp.where), "facts: the COP target with its equipment range, and the seasonal rating as its own row with its region");
   ok(/Table II-2, p\. 6/.test(facts) && /revised March 2024/.test(facts) && /16 September 2024/.test(facts), "facts table: table, page and dates");
 }
 
@@ -233,7 +236,23 @@ const T0 = M.totals(D, {}), T1 = M.totals(D, { car: true }), T2 = M.totals(D, { 
   [...JS.matchAll(/(?:text|caption|note): "((?:[^"\\]|\\.)*)"/g)].map(x => x[1]).filter(t => words(t) > 3).forEach(t => ok(words(t) <= 35 && sentences(t) <= 2, `explain text within budget: "${t.slice(0, 40)}…"`));
   ok(!/\bflue\b/i.test(QMD + JS) && !/Energy bought is not energy used/.test(JS), "plain words: 'exhaust vent', not 'flue'; 'not all the energy bought becomes useful'");
   ok(/Assume no duct losses/.test(QMD) && /leaves the furnace as heat/.test(rd("learn/_w1/f03-energy-services.yml")) && /assumes no duct losses/.test(QMD), "AFUE: heat leaving the furnace; the example assumes no duct losses");
-  ok(/HSPF2 8\.5, is a heating-season test rating in Btu of heat per Wh of electricity: 8\.5 ÷ 3\.412 is a seasonal COP of about 2\.5/.test(QMD) && M.seasonCOP(D).toFixed(1) === "2.5", "HSPF2 explained, with its unit, as the seasonal COP 2.5");
+  ok(/Region V test rating in Btu of heat per Wh of electricity: 8\.5 ÷ 3\.412 is a seasonal COP of about 2\.5, the value this lesson assumes/.test(QMD) && M.seasonCOP(D).toFixed(1) === "2.5", "HSPF2 explained, with its unit and region, as the seasonal COP 2.5 the lesson assumes");
+  ok(/Assume a seasonal \[\[coefficient-of-performance\|COP\]\], heat out per unit of electricity, of " \+ seasonCOP\(D\)\.toFixed\(1\) \+ ", from DOE's Region V cold-climate rating, not Prairie Town's weather\./.test(JS) && /an assumed seasonal COP 2\.5, from a DOE test rating/.test(QMD), "the heat-pump swap states that its seasonal COP is assumed from a test rating");
+  // the no-JS fallback defines COP before its first use
+  const fbx = QMD.match(/<div class="lx-fallback">[\s\S]*?lx-hint/)[0];
+  ok(fbx.indexOf("coefficient of performance, heat delivered ÷ electricity used") >= 0 && fbx.indexOf("coefficient of performance") < fbx.indexOf("COP 2.5 means") && fbx.indexOf("COP:") === fbx.indexOf("COP"), "fallback: COP defined at its first use");
+  // useful energy can exceed the energy bought (a heat pump): the definition and the diagram's columns allow it
+  const SIDE = rd("learn/_w1/f03-energy-services.yml");
+  ok(!/part of the energy bought/.test(SIDE) && /includes heat drawn from the outdoor air/.test(SIDE), "glossary: useful energy is what a device delivers, including outdoor heat, not a part of the energy bought");
+  ok(/colNames: \[\(o && o\.first\) \|\| "Bought"/.test(JS) && /sk\(act, \{ first: "Energy in" \}\)/.test(JS) && /colNames: \[hp \? "Energy in" : "Bought"/.test(JS) && /Heat from outdoor air \(not bought\)/.test(JSON.stringify(D.carriers)), "with the heat pump, the left column is the energy coming in, and outdoor heat is marked not bought");
+  ok(M.totals(D, { car: true, heatPump: true }).bought + M.totals(D, { car: true, heatPump: true }).air > M.totals(D, { car: true, heatPump: true }).bought, "the energy coming in with the heat pump exceeds the energy bought by the outdoor heat");
+  // back on an answered step, the control shows the saved answer, locked, with its feedback
+  ok(/if \(log\.pred\) \{[\s\S]{0,400}Locked in: <b>[\s\S]{0,200}api\.done\(\);\s*return;/.test(JS) && !/fresh: true, options: D\.predict\.options[\s\S]{0,200}\}\);\s*if \(log\.pred\) api\.done\(\);/.test(JS), "prediction step: a saved prediction shows locked, not a fresh question with Next open");
+  ok(/if \(log\.guess != null\) \{[\s\S]{0,400}answer\(log\.guess\)[\s\S]{0,200}return;\s*\}\s*LX\.Guess\(/.test(JS), "guess step: a saved guess shows locked with its answer, and no fresh guess control");
+  // the Analyst and Modeler boxes: short elements, one idea each
+  const an = QMD.match(/Primary energy: count the power plant too[\s\S]*?<\/details>/)[0];
+  ok(/\| The plant \| Gas combined cycle, 7,535 Btu of gas per kWh/.test(an) && /\| The grid \| About 5% lost on the way/.test(an), "primary energy: the plant and grid assumptions in a table");
+  an.split(/\n\n/).filter(x => /^(The kWh|Suppose|That is)/.test(x)).forEach(t => ok(words(t) <= 36 && sentences(t) <= 2, `Analyst box paragraph within budget (${words(t)} words)`));
   ok(/A different device can change how much energy you buy, which carrier you use, or both\./.test(JS), "comparison caption: a different device, not 'a better device changes the carrier'");
   D.services.forEach(s => ok(words(s.want) <= 14 && sentences(s.want) === 1 && (!s.note || sentences(s.note) <= 1), `${s.key}: one short line of what people want`));
   D.sort.cards.forEach(c => ok(sentences(c.why) === 1 && c.why.length < 90, `sort ${c.id}: a one-sentence reason`));

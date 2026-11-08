@@ -11,7 +11,8 @@
 //   bat_t     = min(need_t − gen_t, batKW, stored)        the battery gives the rest, up to its power and its energy
 //   short_t   = need_t − gen_t − bat_t                    kW the island cannot carry: the kept loads must shrink
 //   spare sun charges the battery: stored += min(spare, batKW, room / eff) × eff (eff: the share of a charge it gives back)
-//   lasts     = the number of hours before the first short hour (72 when it rides through)
+//   lasts     = the number of full hours before the first short hour (72 when it rides through); the page says "full
+//               hours", since the run is hourly and the battery may hold a little energy into the short hour
 // The battery starts full; the fuel holds fuelHours at full generator power. Power (kW) sets what the island can carry at
 // one moment; stored energy and fuel (kWh) set for how long.
 //
@@ -86,14 +87,14 @@
     var jul = island(C, keep, "jul"), jan = island(C, keep, "jan");
     var ans = jan.lasts < jul.lasts ? "short" : jan.lasts > jul.lasts ? "long" : "same";
     var charged = function (r) { return r.rows.some(function (h) { return h.charge > 0.5; }); }, cj = charged(jul), cn = charged(jan);
-    var hrs = function (r) { return r.full ? "all 72 hours" : r.lasts + " hours"; };
+    var hrs = hoursOf;
     var why = "weaker sun leaves more load to the generator and battery";
     var fb = ans === "short" ? { short: "Yes: " + why + ".", same: "January's " + why + ", so the hours differ.", long: "January's sun is weaker, not stronger." } :
              ans === "same" ? { short: "Not here: both runs last " + hrs(jan) + ".", same: "Yes: both runs last " + hrs(jan) + ".", long: "Not here: both runs last " + hrs(jan) + "." } :
                               { short: "Not here: January lasts " + hrs(jan) + ", July " + hrs(jul) + ".", same: "Not here: January lasts " + hrs(jan) + ", July " + hrs(jul) + ".", long: "Yes: January lasts " + hrs(jan) + ", July " + hrs(jul) + "." };
     var refill = cj && !cn ? " Only July had spare sun to recharge the battery." : cj && cn ? " Spare sun recharged the battery in both runs." : "";
-    var line = "**" + kw(jan.load) + " " + lastsText(jan) + " in January**, against " + hrs(jul) + " in July" +
-      (ans === "short" ? ": " + why + "." + refill + " The microgrid is weaker in winter." :
+    var line = "**" + kw(jan.load) + " in January: " + hrs(jan) + "**, against " + hrs(jul) + " in July" +
+      (ans === "short" ? ": " + why + ", so the island is weaker in winter." + refill :
        ans === "same" ? ": the battery and fuel ran out before the sun could make a difference." : "." + refill);
     return { jul: jul, jan: jan, answer: ans, feedback: fb, line: line, charged: { jul: cj, jan: cn } };
   }
@@ -163,7 +164,10 @@
   function int(v) { return Math.round(v).toLocaleString("en-US"); }
   function pct(v) { return (Math.floor(v * 1000 + 1e-9) / 10).toFixed(1).replace(/\.0$/, "") + "%"; }
   // the campus result in words (step 5, step 6, the explain layer)
-  function lastsText(r) { return r.full ? "rode through all 72 hours" : "lasted " + r.lasts + " hours"; }
+  function lastsText(r) { return r.full ? "rode through all 72 hours" : "gave " + r.lasts + " full hours before falling short"; }
+  function hoursOf(r) { return r.full ? "all 72 hours" : r.lasts + " full hours"; }
+  // the July and January results together (the explain layer)
+  function bothText(jul, jan) { return hoursOf(jul) + " in July and " + hoursOf(jan) + " in January" + (jul.full && jan.full ? "" : " before falling short"); }
 
   // ---------------------------------------------------------------- no-JS blocks (the test's --write mode writes them)
   function rich(t) {
@@ -184,11 +188,12 @@
   function staticSteps(D) {
     var C = D.campus, V = D.village, X = cases(C), v0 = smallest(V, null), vn = smallest(V, "noon"), ve = smallest(V, "evening");
     var rows = C.loads.map(function (l) { return "<tr><td>" + l.label + "</td><td>" + kw(l.kw) + "</td><td>" + (l.critical ? "critical" : "can be shed") + "</td></tr>"; }).join("");
-    var hours = function (r) { return r.full ? "all 72 hours" : r.lasts + " hours"; };
+    var hours = hoursOf;
     return "<p class=\"lx-eyebrow\">" + C.name + " in a storm, and a village with no grid (illustrative)</p>" +
       "<div class=\"lx-scroll-x\"><table class=\"lx-mini-table f7-fb\"><caption class=\"lx-hint\">The campus's loads; its sources: " + kw(C.solarKW) + " of solar, a " + kw(C.battery.kw) + " battery holding " + kwh(C.battery.kwh) + ", a " + kw(C.gen.kw) + " generator with fuel for " + C.gen.fuelHours + " hours at full power.</caption>" +
       "<thead><tr><th scope=\"col\">Load</th><th scope=\"col\">Power</th><th scope=\"col\">In an outage</th></tr></thead><tbody>" + rows + "</tbody></table></div>" +
       "<ul><li>Ordinary grid-connected solar switches off when the grid fails. The battery's " + rich("[[grid-forming|grid-forming]]") + " inverter, or the generator, can form an island.</li>" +
+      "<li>" + rich(D.texts.boundary) + "</li>" +
       "<li>At night the island can give " + kw(nightKW(C)) + " (battery plus generator); the campus draws " + kw(totalKW(C)) + ", so some loads must be shed. The hospital and the water plant must stay on.</li>" +
       X.map(function (x) { return "<li>Keeping " + names(C, x.keys) + " (" + kw(x.kw) + "): " + hours(x.jul) + " from midnight on " + C.windows.jul.first + ", " + hours(x.jan) + " from midnight on " + C.windows.jan.first + ".</li>"; }).join("") + "</ul>" +
       "<div class=\"lx-scroll-x\"><table class=\"lx-mini-table f7-fb\"><caption class=\"lx-hint\">The village's smallest designs on the sliders, for an average day. " + D.texts.villageToy + "</caption>" +
@@ -196,13 +201,20 @@
       [[V.households + " households alone", v0], ["With the mill at 10:00–14:00", vn], ["With the mill at 18:00–22:00", ve]].map(function (r) { return "<tr><td>" + r[0] + "</td><td>" + kw(r[1].kw) + "</td><td>" + kwh(r[1].kwh) + "</td></tr>"; }).join("") +
       "</tbody></table></div>";
   }
+  // why January falls short first, read from the run's first short hour: the battery is empty and the generator, at full
+  // power with fuel left, cannot carry the load alone; or the fuel has run out too
+  function seasonsWhy(C, r) {
+    var h = r.full ? null : r.rows[r.lasts];
+    if (h && h.fuel > 0.5 && h.gen >= C.gen.kw - 1e-9) return "weaker sun drains the battery sooner, and the " + kw(C.gen.kw) + " generator alone cannot carry the load, though fuel remains";
+    return "weaker sun leaves more of the load to the generator and battery, so the battery and the fuel run out sooner";
+  }
   function staticExplain(D) {
     var C = D.campus, X = cases(C)[0];
     var ideas = [
-      ["A microgrid", "Loads and sources inside one boundary, run as one unit by a controller, that can island: open its switch and run on its own."],
+      ["A microgrid", "Loads and sources inside one electrical boundary, run as one unit by a controller. A grid-connected one can open its switch and run alone; an isolated one, like the village, always does."],
       ["Forming an island", "A " + rich("[[grid-forming|grid-forming]]") + " source, such as a battery's " + rich("[[inverter|inverter]]") + " or a generator, sets " + rich("[[voltage|voltage]]") + " and " + rich("[[frequency|frequency]]") + "; ordinary solar inverters follow it."],
       ["Power, then energy", "Power (kW) decides which loads the island can carry at once; stored energy and fuel (kWh) decide for how long."],
-      ["Seasons", "The same campus kept " + kw(X.kw) + " for " + X.jul.lasts + " hours in July and " + X.jan.lasts + " in January: weaker sun leaves more of the load to the generator and battery, so their energy runs out sooner."],
+      ["Seasons", "The same campus kept " + kw(X.kw) + " for " + X.jul.lasts + " full hours in July and " + X.jan.lasts + " in January: " + seasonsWhy(C, X.jan) + "."],
       ["No grid at all", "A village " + rich("[[mini-grid|mini-grid]]") + " runs as an island every day; running big loads while the sun shines keeps its battery small."]
     ];
     return "<dl class=\"lx-ideas\">" + ideas.map(function (i) { return "<dt>" + i[0] + "</dt><dd>" + i[1] + "</dd>"; }).join("") + "</dl>" +
@@ -215,7 +227,7 @@
     var C = D.campus, X = cases(C)[1];
     return "<div class=\"lx-qq\" data-id=\"double\" data-answer=\"myth\">\n<p class=\"lx-qtext\">Myth or fact? “Doubling the battery doubles how long the hospital stays lit.”</p>\n" +
       "<ul class=\"lx-choices\"><li data-value=\"myth\">Myth</li><li data-value=\"fact\">Fact</li></ul>\n" +
-      "<details class=\"lx-answer\"><summary>Answer</summary><p>Myth. Keeping the hospital and the water plant from midnight on " + C.windows.jul.first + ", " + kwh(C.battery.kwh) + " lasts " + X.jul.lasts + " hours and " + kwh(2 * C.battery.kwh) + " lasts " + X.jul2.lasts + ": the fuel and the sun set the rest.</p></details>\n</div>";
+      "<details class=\"lx-answer\"><summary>Answer</summary><p>Myth. Keeping the hospital and the water plant from midnight on " + C.windows.jul.first + ", " + kwh(C.battery.kwh) + " gives " + X.jul.lasts + " full hours and " + kwh(2 * C.battery.kwh) + " gives " + X.jul2.lasts + ": the fuel and the sun set the rest.</p></details>\n</div>";
   }
   function staticSort(D) {
     var bin = {}; D.sort.bins.forEach(function (b) { bin[b.id] = b.label; });
@@ -229,7 +241,7 @@
   var model = { HOURS: HOURS, cases: cases, staticSteps: staticSteps, staticExplain: staticExplain, staticMyth: staticMyth, staticSort: staticSort, staticFacts: staticFacts, rich: rich, keptKW: keptKW, totalKW: totalKW, nightKW: nightKW, fuelKWh: fuelKWh, island: island, liveState: liveState,
                 criticalKeys: criticalKeys, keepStatus: keepStatus, partWords: partWords, loadLit: loadLit, winter: winter, millMove: millMove, villageTrace: villageTrace,
                 villageLoad: villageLoad, villageDay: villageDay, minBattery: minBattery, smallest: smallest, batteryChoices: batteryChoices,
-                panelChoices: panelChoices, kw: kw, kwh: kwh, int: int, pct: pct, lastsText: lastsText };
+                panelChoices: panelChoices, kw: kw, kwh: kwh, int: int, pct: pct, lastsText: lastsText, hoursOf: hoursOf, bothText: bothText, seasonsWhy: seasonsWhy };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -439,7 +451,7 @@
     }
 
     var cards = LX.StepCards(live, { id: "f7-steps", onStep: function (i) { stageBox.hidden = i >= 6; vStage.hidden = i < 6; if (i !== 0) pickHook = null; if (i >= 6) villageHead(); }, steps: [
-      { text: C.name + " (fictional) holds a college and the county hospital. One [[feeder|feeder]] brings grid power through one switch, the [[point-of-common-coupling|point of common coupling]]. Tap the parts; then tap the switch.",
+      { text: C.name + " (fictional) holds a college and the county hospital. One [[feeder|feeder]] brings grid power through one switch, the [[point-of-common-coupling|point of common coupling]]: tap the parts, then the switch.",
         build: function (act, api) {
           line.set({ grid: true, sw: "closed", former: null, pick: null });
           var seen = {}, n = H("p", { class: "lx-hint", text: "Parts met: 0 of 10." }, act);
@@ -448,7 +460,7 @@
             api.saw(parts(k)); if (seen.switch) api.done();
           };
         } },
-      { text: "A storm brings down the feeder. The campus has " + kw(C.solarKW) + " of solar panels on its roofs. With the switch still closed, do they keep the hospital lit?",
+      { text: "A storm brings down the feeder, but the campus has " + kw(C.solarKW) + " of solar panels on its roofs. With the switch still closed, do they keep the hospital lit?",
         build: function (act, api) {
           line.set({ grid: false, sw: "closed", former: null, pick: null });
           var pr = LX.Predict(act, { id: "f7-solar", q: "", title: false, fresh: true, answer: "no",
@@ -456,7 +468,7 @@
             feedback: { yes: D.texts.solarOff, no: D.texts.solarOff },
             onPick: function () { pr.reveal("The whole campus is dark, hospital included."); api.done(); } });
         } },
-      { text: "A [[microgrid|microgrid]] can open its switch and run alone: it [[islanding|islands]]. Something must set the island's [[voltage|voltage]] and [[frequency|frequency]]. Open the switch, then pick what forms the island.",
+      { text: "A grid-connected [[microgrid|microgrid]] can open its switch and run alone: it [[islanding|islands]]. Something must set the island's [[voltage|voltage]] and [[frequency|frequency]]: open the switch, then pick what forms the island.",
         build: function (act, api) {
           line.set({ grid: false, sw: "closed", former: null, pick: null });
           var row = H("div", { class: "cf-row" }, act);
@@ -474,8 +486,9 @@
             return b;
           });
           open.addEventListener("click", function () { line.set({ sw: "open" }); open.setAttribute("aria-disabled", "true"); seg.hidden = false; open.textContent = "Switch open"; bs[0].focus(); });
+          H("p", { class: "lx-hint", html: LX.rich(D.texts.boundary) }, act);
         } },
-      { text: "At night the island has the battery (" + kw(C.battery.kw) + ") and the generator (" + kw(C.gen.kw) + "): " + kw(nightKW(C)) + ". The campus draws " + kw(totalKW(C)) + ". Choose the loads to keep; the critical ones must stay on.",
+      { text: "At night the battery (" + kw(C.battery.kw) + ") and generator (" + kw(C.gen.kw) + ") give " + kw(nightKW(C)) + "; the campus draws " + kw(totalKW(C)) + ". Keep the [[critical-load|critical loads]], which must stay on, and shed others: switch them off for now.",
         build: function (act, api) {
           line.set({ grid: false, sw: "open", former: S0.former === "gen" ? "gen" : "battery" });
           var keep = saved ? Object.assign(critical(), saved) : all();   // the last set kept (a valid one), else every load: the reader sheds
@@ -491,14 +504,14 @@
             [["Loads kept", kw(k), fits ? null : "bad"], ["The island can give at night", kw(nightKW(C)), null]].forEach(function (c) {
               var d = H("div", { class: "lx-readout" + (c[2] ? " " + c[2] : "") }, sum); H("span", { text: c[0] }, d); H("b", { text: c[1] }, d);
             });
-            var stt = keepStatus(C, keep);
-            if (stt === "critical") api.saw(D.texts.keepCritical, true);
-            else if (stt === "over") api.saw("**" + kw(k) + "** is more than the island's " + kw(nightKW(C)) + ". Switch off another load.", true);
-            else { saved = keep; api.saw("You keep **" + kw(k) + "**, within the island's " + kw(nightKW(C)) + ". Loads that must stay on are its [[critical-load|critical load]]."); api.done(); }
+            var stt = keepStatus(C, keep), last = saved ? " The run keeps your last set that fits, " + kw(keptKW(C, S0.keep)) + "." : "";
+            if (stt === "critical") api.saw(D.texts.keepCritical + last, true);
+            else if (stt === "over") api.saw("**" + kw(k) + "** is more than the island's " + kw(nightKW(C)) + ". Switch off another load." + last, true);
+            else { saved = keep; api.saw("You keep **" + kw(k) + "**, within the island's " + kw(nightKW(C)) + "."); api.done(); }
           }
           paint();
         } },
-      { text: "Power (kW) sets what the island can carry; stored energy and fuel (kWh) set for how long. The storm hit at midnight on " + C.windows.jul.first + ". Run the outage with your loads.",
+      { text: "Power (kW) sets what the island can carry; stored energy and fuel (kWh) set for how long. The storm hit at midnight on " + C.windows.jul.first + ": run the outage with your loads.",
         build: function (act, api) { runStep(act, api, "jul"); } },
       { text: "Same campus, same loads, but the storm hits at midnight on " + C.windows.jan.first + ": shorter days and weaker sun. Predict first, then run it.",
         build: function (act, api) {
@@ -511,7 +524,7 @@
         } },
       { text: "This village (fictional) has no grid at all: " + V.households + " households and a grain mill that runs from 10:00 to 14:00. Pick panels and a battery that serve every hour of an average day.",
         build: function (act, api) { S0.mill = "noon"; villageStep(act, api, "noon"); } },
-      { text: "The miller would rather grind from 18:00 to 22:00. Which part of the smallest design that serves every hour has to grow? Predict, then fix the village.",
+      { text: "The miller would rather grind from 18:00 to 22:00: which part of the smallest design that serves every hour has to grow? Predict, then fix the village.",
         build: function (act, api) {
           var box = H("div", {}, act), mv = millMove(V);
           var pr = LX.Predict(act, { id: "f7-mill", q: "", title: false, fresh: true, answer: mv.answer,
@@ -540,8 +553,8 @@
       function paint() {
         var r = island(C, keep, season); ran = true; S0.ran[season] = r;
         chips.innerHTML = "";
-        var cs = [["Loads kept", kw(r.load)], ["They lasted", r.full ? "all 72 hours" : r.lasts + " hours"], ["Fuel left at the end", kwh(r.fuelLeft)]];
-        if (other) cs.splice(2, 1, ["In July", other.full ? "all 72 hours" : other.lasts + " hours"]);
+        var cs = [["Loads kept", kw(r.load)], ["Full hours before a shortfall", r.full ? "all 72" : String(r.lasts)], ["Fuel left at the end", kwh(r.fuelLeft)]];
+        if (other) cs.splice(2, 1, ["In July", other.full ? "all 72" : String(other.lasts)]);
         cs.forEach(function (c) { var d = H("div", { class: "lx-readout" + (c[2] ? " " + c[2] : "") }, chips); H("span", { text: c[0] }, d); H("b", { text: c[1] }, d); });
         P.render(islandSpec(C, r, season), true);
         if (season === "jul") {
@@ -631,12 +644,12 @@
       var keep = own ? st.keep : null;
       if (!keep) { keep = {}; C.loads.forEach(function (l) { keep[l.key] = l.key !== "labs"; }); }
       var jul = island(C, keep, "jul"), jan = island(C, keep, "jan");
-      mineP.textContent = (own ? "Your island: " : "An island that keeps the hospital, the water plant and the dorms: ") + kw(jul.load) + " kept, " + lastsText(jul) + " in July and " + lastsText(jan) + " in January. Tap a part to read about it.";
+      mineP.textContent = (own ? "Your island: " : "An island that keeps the hospital, the water plant and the dorms: ") + kw(jul.load) + " kept, " + bothText(jul, jan) + ". Tap a part to read about it.";
       dg.set({ grid: false, sw: "open", former: "battery", keep: keep });
       if (mine) {
         mine.label = own ? "Prairie Campus, your loads" : "Prairie Campus, three loads kept";
         mine.path = jul.full ? ["start", "q1", "q2", "q3", "q4", "ok"] : ["start", "q1", "q2", "q3", "shed", "q4", "lasts"];
-        mine.text = (own ? "You kept " : "Kept: ") + kw(jul.load) + " of the campus's " + kw(totalKW(C)) + ": the island " + lastsText(jul) + " in July and " + lastsText(jan) + " in January.";
+        mine.text = (own ? "You kept " : "Kept: ") + kw(jul.load) + " of the campus's " + kw(totalKW(C)) + ": " + bothText(jul, jan) + ".";
       }
       if (vil) { var vt = villageTrace(V, st && st.vkw, st && st.vkwh, st && st.mill, !!(st && st.vseen)); vil.path = vt.path; vil.text = vt.text; vil.label = vt.label; }
       if (fc) fc.update(traces);

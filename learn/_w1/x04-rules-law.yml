@@ -8,13 +8,16 @@ glossary:
     def: "A formal proceeding in which a utility asks its regulator to change its rates; staff, consumer advocates and other parties file testimony, and the commission decides."
   - id: revenue-requirement
     term: Revenue requirement
-    def: "The annual revenue a regulated utility may collect: its approved expenses, including depreciation and taxes, plus an allowed financing return on the net value of what it has built."
+    def: "The annual revenue a regulated utility may collect: its approved expenses, including depreciation and taxes, plus an allowed financing return on its rate base."
   - id: rate-base
     term: Rate base
-    def: "The net value of what a regulated utility has built, its plant less depreciation, on which the regulator allows it to earn a return."
+    def: "The plant a regulator approves as serving customers, valued after depreciation; rates give the utility an opportunity, not a guarantee, to earn an allowed return on it."
   - id: intervenor
     term: Intervenor
     def: "A person or organization that formally joins a regulatory case as a party, so it can file testimony and question witnesses."
+  - id: settlement
+    term: Settlement (in a regulatory case)
+    def: "An agreement among some or all parties to a case on how it should end, filed for the commission's decision."
   - id: evidentiary-hearing
     term: Evidentiary hearing
     def: "A formal hearing at which the parties present their evidence and question each other's witnesses before the commissioners."

@@ -89,10 +89,14 @@ ok(near(M.last(D, "solar")[1], 100 * 393343 / (4425029 + 93041), 1e-9), "2025's 
   ok(M.GUESS_SAW === "From 8% of homes in 1907, electric service took roughly four more decades to pass 90%." && M.first(D, "elec")[0] === 1907 && N.mid > 35 && N.mid < 45, "step 1's takeaway counts from 8% in 1907, not from electricity's start");
   const P = M.passes(D, "gas", "coal");
   ok(P.before === 1950 && P.after === 1960, "gas passed coal between the 1950 and 1960 censuses");
-  ok(M.heatLine(D).indexOf("Gas overtook coal as the most common main heating fuel between the 1950 and 1960 censuses.") > 0 && M.heatLine(D).indexOf("54.7%") > 0 && M.heatLine(D).indexOf("55.2%") > 0, "step 3 line");
+  ok(M.heatLine(D) === "Coal heated 34.6% of homes in 1950 and piped gas 43.1% in 1960. Gas overtook coal as the most common main heating fuel between the 1950 and 1960 censuses." && M.mostCommon(D, 1950) === "coal" && M.mostCommon(D, 1960) === "gas", "step 3 line: one crossover, its two census points (the 1940-1970 endpoints stay in the timeline and the facts)");
+  ok((M.heatLine(D).match(/\d+\.\d%/g) || []).length === 2, "step 3's reveal carries two shares, not eight numbers");
   ok(/do not track homes switching/.test(M.HEAT_NOTE) && /Other fuels/.test(M.HEAT_NOTE) && /HEAT_NOTE \}, act\)/.test(JS) && /do not track homes switching/.test(M.ideasHTML(D)) && !/rise was another's fall|replaced coal|rise is also a fall/.test(RAW + JS + M.ideasHTML(D)), "gas overtaking coal is not read as homes switching from one to the other");
   ok(M.carLine(D) === "Families owning a car: 54% in 1948, 82% in 1970. Registered cars rose from 0.46 million in 1910 to 23.0 million in 1930.", "step 4 line (Q 175 and Q 153)");
-  ok(/starts only in 1948/.test(M.STEPS[3]), "step 4 says when the household series starts");
+  ok(/starts only in 1948/.test(M.STEPS[3]) && /beside electric service/.test(M.STEPS[3]) && /they count cars, not families/.test(M.STEPS[3]) && !/compare it with the cars registered/.test(M.STEPS[3]), "step 4 says when the household series starts, what the chart shows beside it, and that registrations count cars");
+  ok(M.carSaw(D) === "The first point, 1948, already shows 54% of families owning a car, so this series misses the start of adoption: a gap in the data, not in history." && !/Most of the car's early spread/.test(JS), "step 4's takeaway claims only what the first point shows");
+  ok(/U\.S\. records or a study of British history/.test(M.STEPS[5]) && !/from this lesson into its box/.test(M.STEPS[5]), "step 6 says the reasons come from U.S. records or a study of British history");
+  ok(D.sort.cards.filter(c => /Fouquet/.test(c.why)).every(c => /on British transitions from 1500 to 1920/.test(c.why)) && /in the United Kingdom/.test(D.sources.fouquet2010.where) && /in British history/.test(M.ideasHTML(D)), "Fouquet's findings are labelled with the transitions they study (British, 1500 to 1920)");
   ok(M.solarLine(D).indexOf("1.0% of U.S. electricity in 2015 and 8.7% in 2025") > 0 && /our arithmetic/.test(M.solarLine(D)), "step 5 line, labelled as our arithmetic");
   ok(/not how fast the next one will/.test(M.SOLAR_SAW), "step 5 says the chart is history, not a forecast");
   ok(/almost half of farms had power by 1942, against 11% in 1932/.test(M.FARM_SAW) && /almost half of American farms had electricity, compared with 11 percent in 1932|1942, almost half of farms had electricity, against 11% in 1932/.test(D.sources["eia-kids-elec"].where), "step 2's EIA fact matches its source line");
@@ -133,9 +137,13 @@ ok(near(M.last(D, "solar")[1], 100 * 393343 / (4425029 + 93041), 1e-9), "2025's 
   ok(D.timeline.filter(e => e.date === "1970")[0].text.indexOf("55.2%") > 0 && D.timeline.filter(e => e.date === "2025")[0].text.indexOf(M.pct(M.last(D, "solar")[1])) > 0, "the timeline's numbers match the curves");
   ok(D.debate.sides.length === 2 && D.debate.sides.every(s => D.sources[s.src] && /abstract/.test(D.sources[s.src].where)) && /takes no side/.test(D.debate.note), "the debate: both sides from abstracts, no verdict");
   ok(Object.values(D.sources).every(s => s.url && s.date && s.where && s.short && s.publisher && s.title) && Object.values(D.sources).every(s => /\b(1[89]|20)\d\d\b/.test(s.date) || /undated page; read/.test(s.date)), "every source complete and dated (or read on a date)");
-  const used = new Set([].concat(D.series.map(s => s.src), D.timeline.map(e => e.src), D.facts.map(f => f.src), D.debate.sides.map(s => s.src), ["fouquet2010", "eia-pipelines", "grubler2012"]));
+  const used = new Set([].concat(D.series.map(s => s.src), D.series.filter(s => s.srcScale).map(s => s.srcScale), D.timeline.map(e => e.src), D.facts.map(f => f.src), D.debate.sides.map(s => s.src), ["fouquet2010", "eia-pipelines", "grubler2012"]));
   ok(Object.keys(D.sources).every(k => used.has(k)), "every source is used on the page");
   ok(/Grubler \(2012, abstract\)/.test(PAGE), "Grubler (2012) cited from its abstract");
+  const sol = D.series.filter(s => s.key === "solar")[0];
+  ok(/utility-scale plants \(1 MW or larger\) and from small systems, including rooftop panels/.test(sol.measure) && sol.srcScale === "eia-faq427" && /at least one megawatt/.test(D.sources["eia-faq427"].where) && !/small-scale \(rooftop\)/.test(RAW + JS) && /small systems such as rooftop panels/.test(M.solarLine(D)), "solar counts large plants and small systems, rooftop panels among them; utility-scale explained (EIA)");
+  const dbt = [].concat(...D.debate.sides.map(s => s.points), [D.debate.note]).join(" ");
+  ok(!/protracted|characterized|abstracts/.test(dbt) && /measure different things, so their slopes alone cannot say which spread faster/.test(D.debate.note), "the debate in plain words, with the lesson's own example of an unfair comparison");
 }
 
 // ---------------- the stop box
@@ -165,7 +173,7 @@ ok(/code: X3/.test(ROW) && /\n  minutes: 12\n/.test(ROW) && !/practice_minutes|l
 const nWords = S.nWords, nSent = S.nSent;
 ok(M.STEPS.length === 6, "six step cards");
 M.STEPS.forEach((t, i) => { const n = nWords(t); ok(n >= 18 && n <= 36, "step " + (i + 1) + ": " + n + " words"); ok(nSent(t) <= 2, "step " + (i + 1) + ": " + nSent(t) + " sentences"); });
-const lines = [M.guessLine(D, 0), M.guessLine(D, 2), M.GUESS_SAW, M.farmLine(D), M.FARM_SAW, M.heatLine(D), M.HEAT_NOTE, M.HEAT_SAW, M.carLine(D), M.CAR_SAW, M.solarLine(D), M.SOLAR_SAW, M.SORT_NOTE, M.EXPLAIN_LEDE]
+const lines = [M.guessLine(D, 0), M.guessLine(D, 2), M.GUESS_SAW, M.farmLine(D), M.FARM_SAW, M.heatLine(D), M.HEAT_NOTE, M.HEAT_SAW, M.carLine(D), M.carSaw(D), M.solarLine(D), M.SOLAR_SAW, M.SORT_NOTE, M.EXPLAIN_LEDE]
   .concat(D.series.map(s => s.measure))
   .concat(D.sort.cards.map(c => c.why), D.sort.cards.map(c => c.text), D.timeline.map(e => e.text), [].concat(...D.debate.sides.map(s => s.points)), [D.debate.note], D.stop.includes, D.stop.leaves, D.stop.ladder.map(r => r.text), D.facts.map(f => f.what));
 lines.forEach(t => { ok(nWords(t) <= 36, "a text of " + nWords(t) + " words: " + S.plain(t).slice(0, 60)); ok(nSent(t) <= 2, "a text of " + nSent(t) + " sentences: " + S.plain(t).slice(0, 60)); });

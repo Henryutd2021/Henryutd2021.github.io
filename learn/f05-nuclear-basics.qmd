@@ -12,8 +12,8 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <!-- F5 (Foundations) in the step-card form. Text budget: one idea and one action per card, about 35 words; depth
      lives in the Go deeper boxes. Steps and explain layer: assets/learn/f05-nuclear-basics.js with
      assets/learn/data/f05-nuclear-basics.json (the illustrative chain-reaction toy; the plant, the designs and the heat
-     uses, every real number with its source, place in the document and date), town.json (Prairie Town's 100 MW plant,
-     illustrative). Tests: node _tests/learn/test_f05-nuclear-basics.js checks every number
+     uses, every real number with its source, place in the document and date; Prairie Town's 100 MW plant, illustrative,
+     is the same size as in town.json, which the page does not load). Tests: node _tests/learn/test_f05-nuclear-basics.js checks every number
      on this page against those files and runs the scope rules (physics and technology only; research only through
      approved sources).
      Generated, do not edit by hand: the learn:meta, learn:next and learn:footer blocks (the course build step).
@@ -161,7 +161,7 @@ button.f5-lad-row[aria-pressed="true"] { border-color: var(--lx-accent); box-sha
 
 ::: {#steps .lx-sec}
 ```{=html}
-<div class="lx-interactive lx-cards" data-learn="nuclear-basics" data-src="../assets/learn/data/f05-nuclear-basics.json ../assets/learn/data/town.json">
+<div class="lx-interactive lx-cards" data-learn="nuclear-basics" data-src="../assets/learn/data/f05-nuclear-basics.json">
 <div class="lx-fallback">
 <p class="lx-eyebrow">The idea in one table: hold the chain reaction steady (an illustrative toy)</p>
 <div class="lx-scroll-x"><table class="lx-mini-table f5-fbt">
@@ -187,18 +187,20 @@ button.f5-lad-row[aria-pressed="true"] { border-color: var(--lx-accent); box-sha
 <tbody>
 <tr><td>Large water-cooled</td><td>1,000 MWe or higher</td><td>ordinary water</td><td>about 300 °C</td><td>electricity; some district heating and desalination</td></tr>
 <tr><td>Small water-cooled</td><td>300 MWe or less</td><td>ordinary water</td><td>about 300 °C</td><td>electricity; some district heating and desalination</td></tr>
-<tr><td>Microreactor</td><td>1 to 20 MWt</td><td>gas, liquid metal, molten salt or heat pipes</td><td>depends on the coolant</td><td>heat used directly, or electricity</td></tr>
+<tr><td>Microreactor</td><td>1 to 20 MWt</td><td>gas, liquid metal, molten salt, or a fluid inside heat pipes</td><td>depends on the coolant</td><td>heat used directly, or electricity</td></tr>
 <tr><td>Sodium-cooled fast</td><td>varies</td><td>liquid sodium, at low pressure</td><td>about 500 to 550 °C</td><td>electricity</td></tr>
-<tr><td>High-temperature gas-cooled</td><td>up to 600 MWt each</td><td>helium</td><td>700 to 950 °C</td><td>electricity; industrial heat at 650 to 950 °C, hydrogen production among it</td></tr>
+<tr><td>High-temperature gas-cooled</td><td>up to 600 MWt per module, for passive cooling</td><td>helium</td><td>700 to 950 °C</td><td>electricity; industrial heat at 650 to 950 °C, hydrogen production among it</td></tr>
 <tr><td>Salt-cooled high-temperature (concept)</td><td>varies</td><td>molten fluoride salt, at low pressure</td><td>700 to 950 °C</td><td>electricity or industrial heat</td></tr>
 </tbody>
 </table></div>
 <p>A design's outlet temperature can overlap a heat use's band, but overlap is not capability: heat flows only from hotter to cooler, through heat exchangers, and the chosen design decides.</p>
+<p><b>After shutdown:</b> the control rods stop the chain reaction, but the fission products keep giving off decay heat, so cooling must go on.</p>
 <p class="lx-hint">With JavaScript on, you work through this step by step: fire a neutron, steady a chain reaction, open a plant, sort its parts, guess its heat and line designs up against heat uses.</p>
 </div>
 </div>
 <p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Illustrative.</b> The chain-reaction toy (its k values and generations are chosen to show the idea, not taken from a real core) and Prairie Town's 100 MW plant.</span></p>
-<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Real numbers.</b> Pressures, temperatures, sizes and heat uses: U.S. Department of Energy, <a href="https://www.energy.gov/sites/prod/files/2016/01/f28/QTR2015-4M-Light-Water-Reactors.pdf">Quadrennial Technology Review 2015</a> and its companion assessments (2015). Efficiency: EIA's 2025 <a href="https://www.eia.gov/electricity/annual/html/epa_08_01.html">tested heat rate for nuclear units</a>, 10,443 <span class="lx-term" data-term="btu">Btu</span> (British thermal units, a unit of heat) per kWh, against 3,412 Btu in a kWh. All read 3 November 2026.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Real numbers, designs.</b> Pressures, temperatures, sizes and heat uses: U.S. Department of Energy, <a href="https://www.energy.gov/sites/prod/files/2016/01/f28/QTR2015-4M-Light-Water-Reactors.pdf">Quadrennial Technology Review 2015</a> and its companion assessments (2015), read 3 November 2026.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Real numbers, efficiency.</b> EIA's 2025 <a href="https://www.eia.gov/electricity/annual/html/epa_08_01.html">tested heat rate for nuclear units</a>, 10,443 <span class="lx-term" data-term="btu">Btu</span> (British thermal units, a unit of heat) per kWh, against 3,412 Btu in a kWh; read 3 November 2026.</span></p>
 <p class="lx-hint" style="margin-top:10px">Need a refresher? <a href="f04-power-plants.html">F4</a> (how heat turns into electricity) and <a href="05-capacity-factor.html">lesson 5</a> (why 1 MW is not always 1 MW).</p>
 ```
 :::
@@ -216,6 +218,7 @@ button.f5-lad-row[aria-pressed="true"] { border-color: var(--lx-accent); box-sha
 <dt>A steady chain</dt><dd>Control rods absorb neutrons and a moderator slows them; a reactor is held so each split leads to exactly one more (critical, k = 1).</dd>
 <dt>Fuel to steam</dt><dd>A pressurized-water plant keeps its core water liquid at about 15 MPa and boils a second loop; a boiling-water plant boils in the vessel at about 7 MPa.</dd>
 <dt>A heat source first</dt><dd>At the 32.7% efficiency implied by EIA's 2025 tested heat rate, Prairie Town's 100 MW plant makes about 306 MW of heat; about 206 MW is rejected heat and losses, mostly through the condenser.</dd>
+<dt>After shutdown</dt><dd>Stopping the chain reaction does not stop decay heat from the fission products, so cooling must go on.</dd>
 <dt>Temperature limits the uses</dt><dd>Water-cooled designs reach about 300 °C; high-temperature designs reach 700 to 950 °C, which overlaps the 650 to 950 °C band many industrial processes need. Overlap is not capability: the design and its heat exchangers decide.</dd>
 </dl>
 </div>
@@ -239,25 +242,13 @@ button.f5-lad-row[aria-pressed="true"] { border-color: var(--lx-accent); box-sha
 </div>
 </details>
 <details class="lx-deeper">
-<summary><span class="k">Go deeper · Modeler</span>The toy as an equation, and a plant as a model sees it</summary>
+<summary><span class="k">Go deeper · Modeler</span>How the toy works, and a plant as a model sees it</summary>
 <div class="lx-deeper-body">
 ```
 
-**The toy.** Neutrons in generation $g+1$: $N_{g+1} = k\,N_g$, with
+**The toy.** Each generation holds $k$ times the neutrons of the one before. Pushing the rods in lowers $k$, and so does draining the moderator; the toy's values show the idea and are not taken from a real core.
 
-$$
-k = \big(k_\text{min} + (k_\text{max} - k_\text{min})\,m\big)\,(1 - a\,r).
-$$
-
-| Symbol | Meaning | In the toy |
-|---|---|---|
-| $k$ | multiplication factor: new splits per split, no unit | 0.25 to 1.25 |
-| $m$ | share of the moderator left, from 0 to 1 | the moderator slider |
-| $r$ | share of the control rods pushed in, from 0 to 1 | the rods slider |
-| $k_\text{min}$, $k_\text{max}$ | $k$ with no moderator and with all of it, rods out | 0.5 and 1.25 |
-| $a$ | share of the neutrons the rods absorb when fully in | 0.5 |
-
-Steady means exactly $k = 1$: here only at $m = 1$, $r = 0.4$ (rods 30%, moderator 90% gives $k = 0.999$, a slow decline). Real cores are modelled with neutron transport and kinetics, a field of its own (side topic [X1](x01-under-the-hood.html)).
+Steady means exactly $k = 1$: here only with the moderator full and the rods 40% in (rods 30%, moderator 90% gives $k = 0.999$, a slow decline). Real cores are modeled with neutron transport and kinetics, a field of its own (side topic [X1](x01-under-the-hood.html)).
 
 **A plant in a system model.** Grid models such as [lesson 6](06-three-jobs.qmd), [M2](m02-unit-commitment.qmd) and [lesson 13](13-capstone.qmd) take a plant as a few numbers: its size in MW, its [heat rate]{.lx-term term="heat-rate"} or efficiency, its [capacity factor]{.lx-term term="capacity-factor"} and its [refuelling outages]{.lx-term term="refuelling-outage"}. The U.S. fleet's capacity factor was 91.1% in 2025 (EIA, Table 6.07.B; [lesson 5](05-capacity-factor.qmd)).
 
@@ -302,7 +293,7 @@ Steady means exactly $k = 1$: here only at $m = 1$, $r = 0.4$ (rods 30%, moderat
 <div class="lx-qq" data-id="energyleft" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “Fuel taken out after five years has used up nearly all of its energy.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. More than 90% of its potential energy is still there (DOE, 2022). It can be recycled into new fuel; France does this, and the United States does not today.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. More than 90% of its potential energy is still there (DOE, 2022). Recycling can turn part of the used fuel into new fuel; as of 2022, France recycles and the United States does not.</p></details>
 </div>
 <div class="lx-qq" data-id="boil" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “In a pressurized-water plant, the water in the core boils.”</p>
@@ -370,7 +361,7 @@ Steady means exactly $k = 1$: here only at $m = 1$, $r = 0.4$ (rods 30%, moderat
 <p class="lx-eyebrow">In the real world</p>
 <ol>
 <li><b>Two types:</b> every U.S. power plant of this kind is water-cooled; more than 65% are pressurized-water and roughly a third boiling-water plants (DOE, 2025).</li>
-<li><b>Fuel:</b> pellets are stacked in rods about 1 cm wide; more than 200 rods make an assembly, and a couple hundred assemblies make a core (EIA; DOE).</li>
+<li><b>Fuel:</b> pellets are stacked in sealed rods about 1 cm wide, bundled into assemblies; how many rods and assemblies a core holds depends on its design and power (EIA; DOE).</li>
 <li><b>Heat beyond electricity:</b> some water-cooled plants already supply district heat or desalinated water (DOE, 2015).</li>
 </ol>
 </div>

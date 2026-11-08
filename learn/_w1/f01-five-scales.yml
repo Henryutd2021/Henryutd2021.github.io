@@ -7,22 +7,19 @@ glossary:
     def: "A level of an energy system, from one device or plant to a whole nation, set apart by who decides what and by the physics a model of it needs."
   - id: microgrid
     term: Microgrid
-    def: "A local group of loads and sources, such as a campus or a village, that is managed as one system and can disconnect from the main grid and run on its own."
+    def: "Loads and sources inside one electrical boundary, such as a campus or a village, run as one system; a grid-connected microgrid can disconnect and run alone, and an isolated one always does."
   - id: islanding
     term: Islanding
     def: "A microgrid or part of a grid disconnecting from the main grid and keeping its own loads supplied."
   - id: feeder
     term: Feeder
     def: "A distribution line that carries power from a substation to the homes and businesses along it."
-  - id: local-optimum
-    term: Local optimum
-    def: "The best plan for one part of a system judged inside its own boundary, which need not be best for the system it sits in."
   - id: tariff
     term: Tariff
     def: "The rule for calculating electricity bills: fixed charges, prices per kWh, or both."
   - id: synchronous-grid
     term: Synchronous grid
-    def: "A grid that runs at one shared frequency, so every spinning generator in it turns in step; the Lower 48 states have three main ones, called interconnections."
+    def: "A connected AC network whose generators and other equipment run at one shared electrical frequency; the Lower 48 states have three main ones, called interconnections."
   - id: building-code
     term: Building code
     def: "The rules a city, county or state sets for how new buildings must be built, such as insulation, wiring and safety."

@@ -139,7 +139,7 @@ ok(!/\{[a-zA-Z0-9]+\}/.test(M.staticFallback(D) + M.ideasHTML(D) + M.factsHTML(D
   ok(/used instead may be released again/.test(M.CCS_SAW) && /used instead may be released again/.test(M.ideasHTML(D)) && D.systems.filter(x => x.key === "ccs")[0].today.indexOf("used instead may be released again") > 0 && !/store it underground or use it/.test(RAW), "capture with durable storage told apart from use, which may release the CO₂ again");
   ok(/capacity is not emissions avoided/.test(D.facts.filter(f => f.src === "iea-coal2025")[0].what), "capacity is not emissions avoided");
   const SM = M.steelmanSpec(D);
-  ok(SM.sides.length === 3 && SM.sides[0].points[0].indexOf("0.96 lb") > 0 && SM.sides[0].points[1].indexOf("41%") >= 0 && SM.sides[1].points[1].indexOf("2.3%") > 0 && /abstract/.test(SM.sides[1].points[1]) && /takes no side/.test(SM.note), "the Steelman card: both cases with dated numbers, no side taken");
+  ok(SM.sides.length === 3 && SM.sides[0].points[0].indexOf("0.96 pounds") > 0 && SM.sides[0].points[1].indexOf("41%") >= 0 && SM.sides[1].points[1].indexOf("2.3%") > 0 && /abstract/.test(SM.sides[1].points[1]) && /takes no side/.test(SM.note), "the Steelman card: both cases with dated numbers, no side taken");
   ok(/1950s and 1960s/.test(SM.sides[1].points[0]) && /1950s and 1960s/.test(src("eia-pipelines")) && /EIA reported in March 2024/.test(SM.sides[1].points[0]) && /19 March 2024/.test(D.sources["eia-pipelines"].date) && !/today's mainline/.test(RAW), "the pipelines' age matches its source line, dated at the point of use");
   ok(!/per kWh burned/.test(RAW + JS) && /per kWh of electricity generated/.test(SM.sides[0].points[0]) && /per kWh of electricity generated/.test(M.checkHTML(D)), "CO₂ per kWh of electricity generated, not per kWh burned");
 }
@@ -155,7 +155,7 @@ ok(!/\{[a-zA-Z0-9]+\}/.test(M.staticFallback(D) + M.ideasHTML(D) + M.factsHTML(D
 
 // ---------------- sources, stop box
 ok(Object.values(D.sources).every(s => s.url && s.date && s.where && s.short && s.publisher && s.title && /\b20\d\d\b/.test(s.date)), "every source complete and dated");
-const used = new Set([].concat(D.facts.map(f => f.src), [D.gen2025.src, D.primary2025.src, D.gasUse.src, D.oilUse.src, D.lng.src, D.retire.src, D.retire.src2026, D.mines.src, D.co2kwh.src, D.ccs.src, D.energyCo2.src, D.methane.src, D.gasNet.src, D.cdr.src, "eia-lng", "eia-pipelines"]));
+const used = new Set([].concat(D.facts.map(f => f.src), [D.gen2025.src, D.primary2025.src, D.gasUse.src, D.oilUse.src, D.lng.src, D.retire.src, D.retire.src2026, D.mines.src, D.co2kwh.src, D.ccs.src, D.energyCo2.src, D.methane.src, D.gasNet.src, D.cdr.src, D.gen2025.srcScale, D.units.srcMW, D.units.srcTon, "eia-lng", "eia-pipelines"]));
 ok(Object.keys(D.sources).every(k => used.has(k)), "every source is used: " + Object.keys(D.sources).filter(k => !used.has(k)).join(", "));
 ok(S.problems(D.stop).length === 0, "the stop box has its parts: " + S.problems(D.stop).join("; "));
 ok(/no forecasts/.test(D.stop.lede) && D.stop.leaves.some(t => /Forecasts/.test(t)) && D.stop.leaves.some(t => /Engineering design/.test(t)) && D.stop.leaves.some(t => /Advocacy/.test(t)), "the stop box states the curriculum's boundary (forecasts, engineering design, advocacy excluded)");
@@ -192,6 +192,27 @@ const PROSE = OWN.replace(/^---[\s\S]*?\n---\n/, " ").replace(/<script[\s\S]*?<\
   .replace(/<!--[\s\S]*?-->/g, " ").replace(/^- (.*)$/gm, "<li>$1</li>");
 PROSE.split(/<\/?(?:p|li|dd|dt|td|th|summary|br|caption|h3|h4)\b[^>]*>/).map(S.plain).filter(x => /[A-Za-z]/.test(x) && !/^[:{]/.test(x)).forEach(x => {
   const n = nWords(x); ok(n <= 40, "text element of " + n + " words: " + x.slice(0, 70)); ok(nSent(x) <= 2, "text element of " + nSent(x) + " sentences: " + x.slice(0, 70)); });
+
+// ---------------- first-use words, denominators, and the no-JS block's coverage
+{
+  const mp = M.mapSpec(D), node = id => mp.nodes.filter(n => n.id === id)[0].text, sys = k => M.systemRows(D).filter(r => r.key === k)[0];
+  ok(D.units.utilityMinMW === 1 && /at least one megawatt/.test(src("eia-faq427")) && node("gaspower").indexOf("utility-scale plants (1 MW or larger)") > 0 && sys("gaspower").today.indexOf("utility-scale plants (1 MW or larger)") > 0, "utility-scale is explained where it first appears (1 MW or larger, EIA)");
+  ok(D.units.shortTonLb === 2000 && /2,000 pounds/.test(src("eia-glossary")) && node("mines").indexOf("short tons (U.S. tons of 2,000 pounds)") > 0 && sys("coal").today.indexOf("short tons (2,000 pounds each)") > 0, "short tons are told apart from tonnes (2,000 pounds, EIA)");
+  ok(!/\d lb\b|\blb of\b/.test(RAW + JS + M.checkHTML(D) + M.staticFallback(D)), "pounds spelled out, not lb");
+  ok(node("gasnet") === "Share of U.S. gas use in 2023: power plants 40%, industry 32%. Share of U.S. homes that use gas: about 60%.", "the gas-network node keeps its two denominators apart, each labelled");
+  ok(/^Bioenergy \(energy from plant matter\)/.test(D.cdr.rows.filter(r => r.key === "beccs")[0].name) && /^New and restored forests \(afforestation and reforestation\)$/.test(D.cdr.rows.filter(r => r.key === "ar")[0].name), "bioenergy and afforestation are said in plain words");
+  ok(/bicarbonate dissolved in water or as carbonate minerals/.test(D.cdr.rows.filter(r => r.key === "ew")[0].measure) && /reacts with CO₂, which ends up as bicarbonate in water or in carbonate minerals/.test(M.checkHTML(D)) && !/stores carbon in minerals/.test(RAW + JS + PAGE), "enhanced weathering: the carbon ends up dissolved or in minerals");
+  const ccsF = D.facts.filter(f => f.src === "iea-coal2025")[0], co2F = D.facts.filter(f => f.src === "iea-ger2026")[0];
+  ok(ccsF && co2F && !/co2Gt/.test(ccsF.what + ccsF.n) && co2F.n === "{co2Gt}" && /2025/.test(co2F.what), "capture capacity and energy CO₂ are two fact rows, each with its own source");
+  const fb = M.staticFallback(D);
+  ok(fb.indexOf(M.netLine(D, 0.3, 0).replace(/\*\*/g, "")) > 0 && fb.indexOf(M.netLine(D, 0.3, 0.5).replace(/\*\*/g, "")) > 0 && fb.indexOf(M.bookLine(D, 25).replace(/\*\*/g, "").replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1")) > 0, "the no-JS block works both gas-network assumptions and the early closure");
+  ok(D.gasNet.assume.every(a => fb.indexOf(a.line) > 0), "the no-JS block states each assumption before its worked number");
+  ok(M.steelmanSpec(D).sides.every(sd => sd.points.every(t => fb.indexOf(t.replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1")) > 0)), "the no-JS block carries both gas cases and what would tell them apart");
+  fb.replace(/<table[\s\S]*?<\/table>/g, " ").split(/<\/?(?:li|p)\b[^>]*>/).map(S.plain).filter(x => /[A-Za-z]/.test(x)).forEach(x => ok(nWords(x) <= 38 && nSent(x) <= 2, "no-JS element of " + nWords(x) + " words, " + nSent(x) + " sentences: " + x.slice(0, 60)));
+  // the sources: citation, then a short evidence note on its own line, each note within the text budget
+  ok((M.sourcesHTML(D).match(/<br><span class="x2-where">/g) || []).length === Object.keys(D.sources).length, "each source's evidence note is on its own line");
+  Object.keys(D.sources).forEach(k => { const w = D.sources[k].where; ok(nWords(w) <= 36 && nSent(w) <= 2, "source note " + k + ": " + nWords(w) + " words, " + nSent(w) + " sentences"); });
+}
 
 // ---------------- controls and glossary
 ok(/aria-live/.test(JS) && (JS.match(/LX\.demo\(/g) || []).length === 1 && (JS.match(/demo\[\d\] = function/g) || []).length === 7, "live regions; a demo hook with an action for each of the seven steps");
