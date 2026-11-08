@@ -1301,6 +1301,12 @@
   "lesson": "F3",
   "href": "f03-energy-services.html"
  },
+ "financial-security": {
+  "term": "Financial security",
+  "short": "Money, or a guarantee such as a letter of credit, that a customer pledges so that the utility or grid operator is covered if the customer backs out or does not pay.",
+  "lesson": "A6",
+  "href": "a06-interconnection.html"
+ },
  "fine-particles": {
   "term": "Fine particles (PM2.5)",
   "short": "Airborne particles no wider than 2.5 micrometres, small enough to reach deep into the lungs; burning releases them and also forms them in the air from SO₂ and NOx.",
@@ -1558,6 +1564,12 @@
   "short": "The height the water falls through a hydro plant, from the reservoir's surface down to where it leaves the turbine, in metres.",
   "lesson": "F4",
   "href": "f04-power-plants.html"
+ },
+ "headroom": {
+  "term": "Headroom",
+  "short": "The spare capacity a line or other piece of equipment has left before it reaches its limit.",
+  "lesson": "A6",
+  "href": "a06-interconnection.html"
  },
  "reserve-headroom": {
   "term": "Headroom (for reserves)",
@@ -2680,6 +2692,12 @@
   "short": "Automatic extra output from power plants' governors within seconds of a frequency drop; it stops the fall but does not restore 60 Hz.",
   "lesson": 3,
   "href": "03-balancing.html"
+ },
+ "pro-forma": {
+  "term": "Pro forma rules",
+  "short": "A standard template of procedures, such as FERC's for connecting generators, that each grid operator adopts with its own changes.",
+  "lesson": "A6",
+  "href": "a06-interconnection.html"
  },
  "probability-distribution": {
   "term": "Probability distribution",

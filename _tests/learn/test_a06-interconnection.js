@@ -164,17 +164,17 @@ ok(/\*\*\$L\(t\)\$\*\* is an account's present value when the whole load waits \
 ok(/\*\*Monthly rate\.\*\* \$i = \(1\+r\)\^\{1\/12\} - 1\$ with \$r\$ = 8% a year: 0\.643% a month/.test(PAGE) && (100 * M.monthly(I7)).toFixed(3) === "0.643", "Go deeper: discounting in labelled steps (0.643% a month)");
 ok(/\| Ridge wind farm \| 200 \| 120 MW \| \$43\.0M \| \$68\.6M \|/.test(PAGE) && /\| Mill Road solar farm \| 150 \| 60 MW \| \$21\.5M \| \$34\.3M \|/.test(PAGE) && /\| Depot battery \| 100 \| 30 MW \| \$10\.7M \| \$17\.1M \|/.test(PAGE) && /\| Placeholder request \| 250 \| 125 MW \| \$44\.8M \| withdrew \|/.test(PAGE), "Go deeper table = the model");
 ok(/\$A\(36\) = 32\.04\$/.test(PAGE) && /lost margin \$144\.2M plus the carrying cost of idle capital \$103\.1M: \$247\.3M/.test(T) && /\$12\.4M plus expected stranded upgrades \$8\.6M: \$20\.9M/.test(T), "Go deeper Modeler: the parts at 36 months");
-ok(/0\.5 × \$88\.8M \+ 0\.5 × \$247\.3M = \$168\.1M/.test(T) && /\$247\.3M − \$171\.1M = \$76\.2M/.test(T), "Go deeper Modeler: staged and avoided cost");
-ok(/a 36-month wait costs the developer \$247\.3M\. Half the load is served at month 12 instead/.test(T) && /half the load waits 12 months \(\$88\.8M for the whole load\) and half waits 36 \(\$247\.3M\)/.test(T), "quiz = the model");
+ok(/0\.5 × \$88\.8M \+ 0\.5 × \$247\.3M = \$168\.1M/.test(T) && !/\$0\.5 ×/.test(PAGE) && /\$247\.3M − \$171\.1M = \$76\.2M/.test(T), "Go deeper Modeler: staged and avoided cost; the half-share is a number, not dollars");
+ok(/a 36-month wait costs the developer \$247\.3M; half the load is served at month 12 instead/.test(T) && /half the load waits 12 months \(\$88\.8M for the whole load\) and half waits 36 \(\$247\.3M\)/.test(T), "quiz = the model");
 ok(/\$247\.3M<\/li><li data-value="b">\$168\.1M<\/li><li data-value="c">\$123\.6M/.test(PAGE), "quiz choices = the model");
 ok(/13% was operating by the end of 2025/.test(T) && D.facts[1].what.indexOf("13%") < 0 && D.facts[1].n === "13%", "13%: page and data agree");
 ok(/Myth or fact\? “Most of the capacity that asks to connect ends up operating\.”/.test(T) && !/Most projects in the interconnection queue/.test(T) && /Of the capacity that asked to connect/.test(D.facts[1].what.replace("Share of the capacity", "Of the capacity")), "myth 1 asks about capacity, the statistic's own denominator");
-ok(/Now the campus\. Two 350 MW lines feed the east substation, whose own peak is 150 MW\. How much of the 300 MW fits before new wires\?/.test(LIT) && N.lineMW === 350 && N.eastMW === 150 && N.campusMW === 300, "step 7's text = the data");
+ok(/Now the campus: two 350 MW lines feed the east substation, whose own peak is 150 MW\. How much of the 300 MW fits before new wires\?/.test(LIT) && N.lineMW === 350 && N.eastMW === 150 && N.campusMW === 300, "step 7's text = the data");
 ok(/a 200 MW wind farm wants to send power in, and a 300 MW data center campus/.test(LIT) && P.W.mw === 200, "step 1's text = the data");
-ok(/asks each large load for \$50,000 of security per MW\. What would the 300 MW campus post\?/.test(LIT) && E.securityPerMW === 50000, "step 8's text = the data");
+ok(/a large load in ERCOT's first batch study holds \$50,000 of \[\[financial-security\|security\]\] per MW\. What total security would the 300 MW campus hold\?/.test(JS) && E.securityPerMW === 50000 && !/asks each large load/.test(LIT), "step 8's text = the data: a large load in the first batch study, total security");
 ok(/price a 36-month wait/.test(LIT) && /Order 2023 \(July 2023\)/.test(LIT), "step 9 and 5 texts = the data");
 ok(/text: "Penalties on the transmission provider when a study runs late, after a grace period, with caps and exceptions"/.test(JS) && /After a 10-business-day grace period, \$1,000 a business day for a late cluster study, capped at the study deposits\./.test(JS) &&
-   /penalties can apply after a 10-business-day grace period, capped at the study deposits, with exceptions: \$1,000 a business day for a cluster study, \$2,000 for a restudy, \$2,500 for a facilities study/.test(T) && /not before the third cluster cycle/.test(T) && !/for each business day a study is late/.test(JS),
+   /\| Late studies \| penalties can apply after a 10-business-day grace period, capped at the study deposits, with exceptions \|/.test(PAGE) && /\| Late-study rates \| \$1,000 a business day for a cluster study, \$2,000 for a restudy, \$2,500 for a facilities study \|/.test(PAGE) && /\| Who gets them \| the delayed cluster; not recovered through rates; not before the third cluster cycle \|/.test(PAGE) && !/for each business day a study is late/.test(JS),
    "late-study penalties as MISO slide 8 gives them: after a grace period, capped, with exceptions");
 ok(/a 45-day request window, a 60-day customer engagement window, then a 150-day study/.test(T) && /After a 60-day customer engagement window, a \[\[cluster-study\|cluster study\]\]/.test(RAW) && /after a 45-day request window and a 60-day customer engagement window/.test(T) && /Before it come a 45-day request window and a 60-day customer engagement window/.test(T),
    "the federal timeline includes the 60-day customer engagement window (MISO slide 5)");
@@ -183,7 +183,23 @@ ok(/Each restudy takes 150 days here, as long as a cluster study/.test(T) && C.s
 // the step cards' text budget
 const stepTexts = [...JS.matchAll(/\n      \{ text: "((?:[^"\\]|\\.)*)",\n        build/g)].map(m => m[1].replace(/\[\[[a-z0-9-]+\|([^\]]+)\]\]/g, "$1"));
 ok(stepTexts.length === 10, "ten step cards (" + stepTexts.length + ")");
-stepTexts.forEach(t => ok(t.split(" ").length <= 36 && nSent(t) <= 3, "step text of " + t.split(" ").length + " words, " + nSent(t) + " sentences: " + t.slice(0, 60)));
+stepTexts.forEach(t => ok(t.split(" ").length <= 36 && nSent(t) <= 2, "step text of " + t.split(" ").length + " words, " + nSent(t) + " sentences (≤ 36, ≤ 2): " + t.slice(0, 60)));
+// the rules as the pro forma procedures give them (LGIP, updated 20 August 2024): deposits that total 20% by the
+// agreement, earlier readiness deposits included (11.3); site control normally, with a deposit where regulations
+// block it (3.4.2); a restudy when the provider finds one necessary (7.5); ERCOT's security for a Batch Zero load
+{
+  const st = id => D.walk.tracks[0].stages.filter(x => x.key === id)[0].what;
+  ok(/its deposits must then total 20% of its network upgrade costs, earlier readiness deposits included/.test(st("agr")) && !/posts a deposit of 20%/.test(RAW + JS), "agreement: deposits total 20%, earlier ones included");
+  { const Wf = M.cluster(C).final.W; ok(M.musd(0.2 * Wf.share) === "$13.7M" && M.musd(0.1 * Wf.share) === "$6.9M" && /its deposits must total " \+ musd\(0\.2 \* Wf\.share\) \+ "\. With 10% held since the facilities study, it adds " \+ musd\(0\.1 \* Wf\.share\)/.test(JS), "agreement: the wind farm's deposits total $13.7M; with 10% held, it adds $6.9M"); }
+  ok(/A withdrawal can trigger a restudy of the rest, and in this toy it always does/.test(st("wd")) && /a real provider decides whether a restudy is needed/.test(T), "restudy: a withdrawal can trigger one; the toy always restudies");
+  ok(/Normally a request without land and money behind it cannot enter; a deposit can stand in for land only where regulations block it\./.test(JS) && /Normally, a request without site control cannot enter/.test(T) && /a request must normally control its site to enter/.test(JS), "site control: normally required, with the regulatory exception");
+  ok(/In \[\[ercot\|ERCOT\]\]'s 2026 Batch Zero study, a large load holds \[\[financial-security\|financial security\]\] of \$50,000 per MW/.test(RAW) && /Batch Zero: financial security brought to \$50,000 per MW, slide 5/.test(RAW) && /would hold \$15\.0M of security in all/.test(T), "security: a Batch Zero load, the total it holds, the slide cited");
+  ok(D.sources.some(x => /^FERC\. Pro forma Large Generator Interconnection Procedures/.test(x.text) && /section 11\.3/.test(x.text) && /section 3\.4\.2/.test(x.text) && /section 7\.5/.test(x.text) && /LGIP\.pdf$/.test(x.url)), "sources: the pro forma procedures, with the sections used");
+  const lad = id => D.ladder.items.filter(x => x.id === id)[0];
+  ok(lad("ercot").answer.join() === "requested" && /has at least filed a request/.test(lad("ercot").text) && /mixes stages/.test(lad("ercot").note) && lad("lbnl").answer.join() === "requested" && /had at least filed a request/.test(lad("lbnl").text) && /549 GW/.test(lad("lbnl").note) && /may count loads on any rung, or on none yet/.test(lad("fcst").note), "ladder: the mixed totals are placed on the rung they have all reached; a forecast is not a stage");
+  ok(/\[\[ferc\|FERC\]\]'s Order 2023 sets \[\[pro-forma\|pro forma\]\] rules, a standard template/.test(RAW) && /note\.innerHTML = LX\.rich\(t\.note\)/.test(JS) && /\[\[headroom\|headroom\]\] \(spare capacity\)/.test(JS) && ["pro-forma", "headroom", "financial-security"].every(id => new RegExp("id: " + id + "\\n").test(fs.readFileSync(path.join(SITE, "learn/_w1/" + ID + ".yml"), "utf8"))), "terms: FERC, pro forma, headroom and financial security marked and defined");
+  ok(/The money worked out, with the toy's inputs \(case file CF7\)/.test(PAGE) && /36 months in today's dollars: \$7\.72M × 32\.04 = \$247\.3M for the developer\./.test(T) && I7.assumptions.every(a => PAGE.indexOf("<td>" + a[0].replace(/&/g, "&amp;") + "</td>") >= 0), "fallback: the money's working and the toy's inputs, without JavaScript");
+}
 
 // ---------------- wording checks over the slider's range
 for (let c = N.slider.min; c <= N.slider.max; c += N.slider.step) {
@@ -209,7 +225,9 @@ ok(/caption: moneyCaption\(I7, L, S\.tau, st\)/.test(JS), "the step's caption co
 ok(/I7\.assumptions\.map/.test(JS) && I7.assumptions.length === 9 && I7.assumptions.every(a => a.length === 2), "the toy's inputs: CF7's own assumptions table, shown beside the ledger");
 ok(/LEDGER_WORDS\.forEach/.test(JS) && ["present-value", "margin", "carrying-cost", "stranded-cost", "bridge-power"].every(t => new RegExp("\\[\\[" + t + "\\|").test(JS)) && /\[\[bridge-power\|bridge power\]\]/.test(LIT), "step 9 defines present value, margin, carrying cost, stranded upgrades and bridge power (temporary on-site generation)");
 { const GL = JSON.parse(fs.readFileSync(L("data/glossary.json"), "utf8")); const used = [...JS.matchAll(/\[\[([a-z0-9-]+)\|/g)].map(m => m[1]); ok(used.every(t => GL[t]), "every glossary mark in the script is defined: " + used.filter(t => !GL[t]).join(", ")); }
-ok(/\["wd", "rest"\], \["rest", "study", "back to study"/.test(JS) && /wd: \{ t: "Those projects leave"[^}]*s: "they exit the queue"/.test(JS) && /rest: \{ t: "The rest: restudy"/.test(JS), "the explain flowchart: leaving the queue is apart from the rest's return to study, with the return arrow drawn");
+ok(/\["wd", "rest"\], \["rest", "study", "back to study"/.test(JS) && /wd: \{ t: "Those projects leave"[^}]*s: "the too-dear ones exit"/.test(JS) && /rest: \{ t: "The rest: restudy"/.test(JS), "the explain flowchart: leaving the queue is apart from the rest's return to study, with the return arrow drawn");
+ok(/label: "Wind farm", path: \["req", "study", "up", "dear", "rest", "study", "up", "dear", "agr", "on"\]/.test(JS) && /label: "Placeholder", path: \["req", "study", "up", "dear", "wd"\]/.test(JS) && /the wind farm stayed and was restudied/.test(JS), "the explain flowchart: the wind farm's trace never passes through 'leave'; the placeholder's ends there");
+ok(/lede: "The page's original cluster, whatever you chose above: no withdrawal of yours, no readiness rule\./.test(JS) && /lede: "The page's original " \+ N\.campusMW \+ " MW campus, whatever the slider shows\./.test(JS), "explain: the flowcharts say they show the original example, not the reader's settings");
 ok(/title: "A large load: its utility's process"/.test(JS) && /path: \["lreq", "lfit", "lup", "lstage", "lon"\]/.test(JS) && !/label: "Data center", path: \["req"/.test(JS), "the large load has its own trace (utility study, upgrades and contract, staged energization), not the generator's nodes");
 ok(M.n1(N, 150, false).fits && /A " \+ small\.c \+ " MW load/.test(JS) && /small = \{ c: 150 \}/.test(JS), "the small-load trace (150 MW) fits with one line out");
 ok(/What does the 200 MW wind farm, with 120 MW of flow, pay\?/.test(T) && /The 250 MW placeholder, which puts 125 MW of flow on the line, withdraws\./.test(T) && !/The 125 MW request withdraws/.test(T), "practice: project size and line flow kept apart");
@@ -230,7 +248,7 @@ ok(!/\bAI\b|artificial intelligence/.test(ALL), "no 'AI' anywhere");
 ok(!/data[- ]cent\w*[^.]{0,80}\b(supply|supplies|supplied|power plant|build|generat|buyer|order)/i.test(T + " " + LIT), "data centers appear as loads, never as builders or buyers of supply");
 ok(!/projects\/|research\.html/.test(PAGE + RAW + JS), "no project page and no Research page");
 const OWN = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?<!-- learn:\1:end -->/g, "");
-const ALLOWED = /^https:\/\/(github\.com\/Henryutd2021\/code-delayed-energization|eta-publications\.lbl\.gov\/|cdn\.misoenergy\.org\/|www\.ercot\.com\/|www\.energy\.gov\/)/;
+const ALLOWED = /^https:\/\/(github\.com\/Henryutd2021\/code-delayed-energization|eta-publications\.lbl\.gov\/|cdn\.misoenergy\.org\/|www\.ercot\.com\/|www\.energy\.gov\/|www\.ferc\.gov\/sites\/default\/files\/2024-08\/LGIP\.pdf$)/;
 const hrefs = [...OWN.matchAll(/href="([^"]+)"/g)].map(m => m[1]);
 ok(hrefs.length > 5 && hrefs.every(h => ALLOWED.test(h) || /^[0-9a-z-]+\.html$/.test(h) || /^#/.test(h)), "links: allowed domains, the repository and learn pages only: " + hrefs.filter(h => !(ALLOWED.test(h) || /^[0-9a-z-]+\.html$/.test(h) || /^#/.test(h))).join(", "));
 ok(D.sources.concat(D.facts).every(x => !x.url || ALLOWED.test(x.url)), "data-file links: allowed domains only");
@@ -334,7 +352,9 @@ ok(T.indexOf("0.7 billion") < 0 && T.indexOf("300 MW-IT") < 0, "the page does no
 // the generated no-JS blocks count too (their markers only are dropped); facts and sources are reference lists
 const prose = elements(OWN.replace(/<!-- a06-(fallback|practice):(start|end)[^>]*-->/g, " ").replace(/<!-- (a06-(?:facts|sources)):start[\s\S]*?<!-- \1:end -->/g, " ").replace(/<style>[\s\S]*?<\/style>/g, " ").replace(/<script[\s\S]*?<\/script>/g, " ").replace(/^---[\s\S]*?\n---\n/, " ").replace(/^\|.*\|$/gm, " ").replace(/\$\$[\s\S]*?\$\$/g, " "));
 prose.forEach(s => { const w = s.split(" ").length, n = nSent(s.replace(/^(Study \d|Step|Request|Upgrade|The [a-z]+|Order 2023's [a-z ]+|Texas|In all|Staged service|A faster connection|[A-Z][a-z−0-9]+(?: [a-z−0-9]+){0,4})\. /, ""));
-  ok((w <= 40 && n <= 3) || approved(s), "text element of " + w + " words, " + n + " sentences (≤ 40, ≤ 3): " + s.slice(0, 70)); });
+  ok((w <= 36 && n <= 2) || approved(s), "text element of " + w + " words, " + n + " sentences (≤ 36, ≤ 2): " + s.slice(0, 70)); });
+// and every cell of the page's Markdown tables, which the elements above leave out
+PAGE.split("\n").filter(l => /^\| /.test(l) && !/^\|[-| ]+\|$/.test(l)).forEach(l => l.split(" | ").forEach(c => { const x = c.replace(/^\| |\s*\|$/g, "").replace(/\$[^$]*\\[^$]*\$/g, "x"); ok(x.split(" ").length <= 36 && nSent(x) <= 2, "table cell of " + x.split(" ").length + " words: " + x.slice(0, 60)); }));
 
 console.log((fails ? "FAILED " + fails + " of " : "ok: ") + checks + " checks (" + ID + ")");
 process.exit(fails ? 1 : 0);
