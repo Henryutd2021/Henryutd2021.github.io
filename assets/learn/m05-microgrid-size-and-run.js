@@ -299,14 +299,16 @@
                 }, function (r) { prog.textContent = ""; return { status: r && r.status || "error", ok: false }; });
             },
             partial: true,
-            render: function (out, st) {
+            // a run whose re-plans did not all prove optimal is kept as a provisional row: it never completes the step
+            render: function (out, st, r) {
               var lab = F.filter(function (f) { return f.key === st.fc; })[0].label, pk = planKey(st);
               Object.keys(S0.roll).forEach(function (k) { if (S0.roll[k].plan !== pk) delete S0.roll[k]; });
-              S0.roll[st.fc] = { key: st.fc, label: lab, totals: out.totals, plan: pk };
+              S0.roll[st.fc] = { key: st.fc, label: lab, totals: out.totals, plan: pk, proven: !!(r && r.ok) };
               var rows = drawRolls(pk);
               api.saw(rollWords(rows), rows.length < 2);
-              if (S0.roll.perfect && rows.length >= 2) api.done();
+              if (rollDone(rows)) api.done();
             } });
+          function rollDone(rows) { var pr = rows.filter(function (x) { return x.proven !== false; }); return !!S0.roll.perfect && S0.roll.perfect.proven !== false && pr.length >= 2; }
           act.appendChild(prog); act.appendChild(tb);
           // the rows already run for this plan (a revisit), none for another plan
           function drawRolls(pk) {
@@ -317,12 +319,12 @@
             var t = H("table", { class: "lx-facts" }, tb), hr = H("tr", null, H("thead", null, t));
             ["Forecast", "Must stay on, unserved", "Keep if possible, unserved", "Shed first, unserved", "Diesel", "First short hour"].forEach(function (x) { H("th", { scope: "col", text: x }, hr); });
             var bd = H("tbody", null, t);
-            rows.forEach(function (x) { var r = H("tr", null, bd); H("th", { scope: "row", text: x.label }, r); H("td", { class: "n" + (x.totals.must > 0.5 ? " m5-bad" : ""), text: kilo(x.totals.must) + " kWh" }, r); H("td", { class: "n", text: kilo(x.totals.keep) + " kWh" }, r); H("td", { class: "n", text: kilo(x.totals.shed) + " kWh" }, r); H("td", { class: "n", text: kilo(x.totals.fuel) + " gal" }, r); H("td", { text: x.totals.firstShort == null ? "none" : E1.when(P.scen.jan3, x.totals.firstShort) }, r); });
+            rows.forEach(function (x) { var r = H("tr", null, bd); H("th", { scope: "row", text: x.label + (x.proven === false ? " (provisional: a re-plan stopped early)" : "") }, r); H("td", { class: "n" + (x.totals.must > 0.5 ? " m5-bad" : ""), text: kilo(x.totals.must) + " kWh" }, r); H("td", { class: "n", text: kilo(x.totals.keep) + " kWh" }, r); H("td", { class: "n", text: kilo(x.totals.shed) + " kWh" }, r); H("td", { class: "n", text: kilo(x.totals.fuel) + " gal" }, r); H("td", { text: x.totals.firstShort == null ? "none" : E1.when(P.scen.jan3, x.totals.firstShort) }, r); });
             E1.ui.label(t);
             return rows;
           }
           var pk0 = planKey(currentPlan()), had = drawRolls(pk0);
-          if (had.length) { api.saw(rollWords(had), had.length < 2); if (S0.roll.perfect && S0.roll.perfect.plan === pk0 && had.length >= 2) api.done(); }
+          if (had.length) { api.saw(rollWords(had), had.length < 2); if (S0.roll.perfect && S0.roll.perfect.plan === pk0 && rollDone(had)) api.done(); }
         } }
     ];
     cards = LX.StepCards(live, { id: "m5-steps", steps: steps });
