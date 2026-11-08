@@ -47,7 +47,9 @@
      percentage. When it appears it is announced once (a polite live region beside it); with reduced motion the bar is
      not drawn (text only). stop() hides it: the status words of the outcome (optimal, time limit, error) stay where they
      were. LX.SolverStatus starts it on "loading" or "solving" and stops it on any outcome (set(x, { usual, steps,
-     unit }), .step(k, n), .done()); LX.BenchRun has one under its Run button.
+     unit }), .step(k, n), .done()); a second "solving" while it runs continues the same count (one click, several
+     solves). A control whose status line is shared with others keeps its own line (LX.SolveProgress beside it) and
+     calls set("solving", { progress: false }). LX.BenchRun has one under its Run button.
    Node: module.exports = { solverCore, core } — tests load the vendored highs.js with require() and call
      core.solveWith(highs, model, opts) synchronously (_tests/learn/test_solver.js). */
 (function () {
@@ -432,7 +434,7 @@
       else if (st === "solving") el.textContent = "Solving…";
       else if (x && typeof x === "object") el.textContent = (SAY[st] || st) + (x.ms && x.ms.roundTrip ? " · " + Math.max(1, Math.round(x.ms.roundTrip)) + " ms" : "");
       else el.textContent = "";
-      if (st === "loading" || st === "solving") { if (prog && prog.running()) { if (po) prog.update(po); } else pg().start(po); }
+      if ((st === "loading" || st === "solving") && !(po && po.progress === false)) { if (prog && prog.running()) { if (po) prog.update(po); } else pg().start(po); }
       else if (prog) prog.stop();
     },
       step: function (k, n) { if (prog && prog.running()) prog.step(k, n); },

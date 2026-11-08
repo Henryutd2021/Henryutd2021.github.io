@@ -119,6 +119,9 @@ const visible = el => !el.hidden;
     ok(el.hidden && /error/.test(st.el.textContent), "SolverStatus: gone on an error, with the error words");
     st.set("solving"); st.done(); C.advance(5000);
     ok(el.hidden && C.pending() === 0, "SolverStatus: done() stops the line");
+    st.set("solving", { progress: false }); C.advance(5000);
+    ok(el.hidden && st.el.textContent === "Solving…" && C.pending() === 0, "SolverStatus: set('solving', { progress: false }) shows the words only (a control with a line of its own)");
+    st.set({ status: "optimal" });
   }
 
   // ---------------- LX.BenchRun: the line under the Run button, the page's usual time and steps, stopped by the outcome

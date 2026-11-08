@@ -215,10 +215,12 @@
       hint: function () { return "kt = thousand tonnes. The cheapest plan that emits at most this much in a year."; } });
     capSl.set(G.capDefault);
     var askBtn = H("button", { class: "lx-btn small", type: "button", html: "Find the cheapest plan" + LX.icon("target") }, ob);
+    var askProg = LX.SolveProgress(ob);   // the optimizer's own progress line, beside its button (the status pill sits in the week card)
     var optOut = H("div", { "aria-live": "polite" }, ob);
 
     var acts = H("div", { class: "lx13-rowb" }, panel);
     var finBtn = H("button", { class: "lx-btn", type: "button", html: "Score my plan" + LX.icon("star") }, acts);
+    var finProg = LX.SolveProgress(acts);
     // sharing (LX.Share): the plan in the address, as #plan-w530-s160-..., plus the scenario when it is not EIA's
     var sharer = LX.Share(panel, { button: acts, buttonText: "Share this plan", id: "t13-link",
       note: "Anyone who opens this link sees your plan and runs its year themselves.",
@@ -265,15 +267,23 @@
       S_.frontier = []; S_.frontierLive = false; frBtn.hidden = false; frNote.hidden = false;
       frNote.textContent = "The frontier depends on the costs: solve it again for these settings (about " + cfg.frontier.caps.length + " solves).";
     }
+    var frRun = 0;   // the frontier run that owns the progress line and the result; an older run's answers are dropped
     frBtn.addEventListener("click", function () {
-      var caps = cfg.frontier.caps, pts = [], i = 0, key = S_.sc.gas + "|" + S_.sc.nucCapex;
+      var caps = cfg.frontier.caps, pts = [], i = 0, bad = null, key = S_.sc.gas + "|" + S_.sc.nucCapex, my = ++frRun;
       frBtn.hidden = true; frNote.textContent = "Solving the frontier for these costs…"; frProg.start({ steps: caps.length });
+      var mine = function () { return my === frRun && key === S_.sc.gas + "|" + S_.sc.nucCapex; };
       (function next() {
-        if (key !== S_.sc.gas + "|" + S_.sc.nucCapex) { frProg.stop(); return; }
+        if (!mine()) { if (my === frRun) frProg.stop(); return; }
         frProg.step(i + 1, caps.length);
+        if (i >= caps.length && bad) {   // a cap did not solve: say so, keep what solved, offer the run again
+          frProg.stop(); S_.frontier = pts; S_.frontierLive = false; frBtn.hidden = false;
+          frNote.textContent = pts.length + " of " + caps.length + " caps solved, so the frontier is incomplete. " + LX.solver.describe(bad) + " Solve it again to finish it."; drawFrontier(); return;
+        }
         if (i >= caps.length) { frProg.stop(); S_.frontier = pts; S_.frontierLive = true; frNote.textContent = "Frontier solved for gas at $" + S_.sc.gas.toFixed(2) + "/MMBtu and nuclear at $" + Math.round(S_.sc.nucCapex).toLocaleString("en-US") + "/kW."; render(); return; }
         var cap = caps[i++], o = cap == null ? {} : { cap: cap * 1e3 };
         LX.solver.solve(model.weekModel(S_.C, RW, o), { label: "t13-frontier", timeLimit: 10 }).then(function (r) {
+          if (!mine()) { if (my === frRun) frProg.stop(); return; }   // a newer run, or the costs changed meanwhile: drop it
+          if (!r.ok) bad = bad || r;
           if (r.ok) { var s = model.summarize(S_.C, per, r, o); pts.push({ cap: cap, cost: s.cost, co2: s.co2, dual: s.capDual, plan: s.plan }); S_.frontier = pts.slice(); drawFrontier(); }
           next();
         });
@@ -281,9 +291,11 @@
     });
     function ask() {
       var cap = capSl.val() * 1e3, C = S_.C;
-      optOut.innerHTML = ""; status.set("solving"); askBtn.disabled = true;
+      optOut.innerHTML = ""; status.set("solving", { progress: false }); askBtn.disabled = true; askProg.start();
       LX.solver.solve(model.weekModel(C, RW, { cap: cap }), { key: "t13-opt", label: "t13-opt", timeLimit: 15 }).then(function (r) {
-        askBtn.disabled = false; status.set(r);
+        askBtn.disabled = false; askProg.stop();
+        if (C !== S_.C) { status.set(""); return; }   // the costs changed while it solved: an answer for the old costs is dropped
+        status.set(r);
         if (!r.ok) { H("p", { class: "lx13-sub", text: LX.solver.describe(r) }, optOut); return; }
         var s = model.summarize(C, per, r, { cap: cap });
         S_.asked = { cap: cap, sum: s, ms: r.ms.roundTrip };
@@ -381,10 +393,12 @@
     finBtn.addEventListener("click", finish);
     function finish() {
       if (!S_.sum) return Promise.resolve();
-      var s = S_.sum, C = S_.C;
-      finBtn.disabled = true; status.set("solving");
+      var s = S_.sum, C = S_.C, pk = JSON.stringify(S_.plan);
+      finBtn.disabled = true; status.set("solving", { progress: false }); finProg.start();
       return LX.solver.solve(model.weekModel(C, RW, { cap: s.co2 }), { key: "t13-opt", label: "t13-score", timeLimit: 15 }).then(function (r) {
-        finBtn.disabled = false; status.set(r);
+        finBtn.disabled = false; finProg.stop();
+        if (C !== S_.C || pk !== JSON.stringify(S_.plan)) { status.set(""); return; }   // the costs or the plan changed while it solved: no score for the old ones
+        status.set(r);
         var f = r.ok ? model.summarize(C, per, r, { cap: s.co2 }).cost : model.frontierAt(S_.frontier, s.co2);
         debrief(s, f);
       });
@@ -504,10 +518,10 @@
         { id: "rules", g: "dec", label: "Rules", at: [2, 0], atN: [0, 1], text: "Supply covers demand each hour; no plant above its size; the battery's charge stays within its MWh.", game: "Unserved energy appears when a rule cannot be met." },
         { id: "store", g: "time", label: "Storage link", lines: ["Storage", "link"], at: [1, 0], atN: [1, 0], text: "The battery's charge carries from each calendar week to the next, so energy can move across weeks.", game: "Charging, below zero on the chart." },
         { id: "cost", g: "out", label: "Cost a year", lines: ["Cost", "a year"], at: [3, 2], atN: [2, 2], text: "Capital and fixed costs of what is built, plus fuel for what runs. The goal the optimizer keeps as low as it can.", game: "The cost tally." },
-        { id: "co2", g: "out", label: "CO₂ a year", lines: ["CO₂", "a year"], at: [1, 2], atN: [1, 2], text: "Gas burned, times " + C.techs.cc.co2.toFixed(2) + " t per MWh in the combined-cycle plant and " + C.techs.pk.co2.toFixed(2) + " in the peaker.", game: "The CO₂ tally." },
-        { id: "cap", g: "dec", label: "CO₂ cap", lines: ["CO₂", "cap"], at: [3, 0], atN: [2, 0], text: "An extra rule: the year's CO₂ at most the cap. Its shadow price is the cost of the last tonne cut.", game: at200 ? "At " + cfg.game.co2Target + " kt the last tonne cut costs $" + Math.round(at200.dual) + "." : "" },
-        { id: "front", g: "out", label: "Frontier", at: [2, 2], atN: [1, 3], text: "The cheapest plan at each CO₂ level. Lesson 12 traced it; your plan sits on it or above it.", game: free ? "From " + fm.musd(free.cost) + " with no cap to " + fm.musd(at200.cost) + " at " + cfg.game.co2Target + " kt." : "" },
-        { id: "short", g: "out", label: "Unserved and spilled", lines: ["Unserved,", "spilled"], at: [0, 2], atN: [0, 2], text: "Demand nobody could serve, and output nobody could use: both signs that a plan is out of balance.", game: "The red bars, and the spilled tally." }
+        { id: "co2", g: "out", label: "CO₂ a year", lines: ["CO₂", "a year"], at: [1, 2], atN: [1, 2], text: "Electricity from gas, in MWh, times " + C.techs.cc.co2.toFixed(2) + " t of CO₂ per MWh from the combined-cycle plant and " + C.techs.pk.co2.toFixed(2) + " from the peaker.", game: "The CO₂ tally." },
+        { id: "cap", g: "dec", label: "CO₂ cap", lines: ["CO₂", "cap"], at: [3, 0], atN: [2, 0], text: "An extra rule: the year's CO₂ at most the cap. Its shadow price is the cost of the last tonne cut.", game: at200 ? "At EIA's costs and " + cfg.game.co2Target + " kt, the last tonne cut costs $" + Math.round(at200.dual) + "." : "" },
+        { id: "front", g: "out", label: "Frontier", at: [2, 2], atN: [1, 3], text: "The cheapest plan at each CO₂ level. Lesson 12 traced it; your plan sits on it or above it.", game: free ? "At EIA's costs: from " + fm.musd(free.cost) + " with no cap to " + fm.musd(at200.cost) + " at " + cfg.game.co2Target + " kt." : "" },
+        { id: "short", g: "out", label: "Unserved and spilled", lines: ["Unserved,", "spilled"], at: [0, 2], atN: [0, 2], text: "Demand nobody could serve is a shortfall. Output nobody could use is spilled; some spill can be the cheapest choice.", game: "The red bars, and the spilled tally." }
       ],
       edges: [["build", "run", "limits"], ["weeks", "run", "set the hours of"], ["store", "run", "links weeks in"], ["rules", "run", "constrain"],
               ["build", "cost", "capital adds to"], ["run", "co2", "gas burns"], ["run", "short", "shows"], ["cap", "build", "pushes"], ["cost", "front", "plots on"], ["co2", "front", "plots on"]],

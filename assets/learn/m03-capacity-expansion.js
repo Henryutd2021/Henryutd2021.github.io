@@ -223,7 +223,7 @@
       });
     }
     // what a full-year run's cost counts: plants and fuel only
-    var SPEND = "Spending: building and running the plants. The re-run enforces no CO₂ cap and does not price unserved demand.";
+    var SPEND = "Spending: building and running the plants. The re-run's $" + S.C.voll.toLocaleString("en-US") + " per MWh shortage penalty steers its dispatch but is left out of spending; it enforces no CO₂ cap.";
     function verdict(host, x, k, year) {
       var c = x[k], e = TP.errors(x.est, c, cap, null), ul = H("ul", { class: "m3-verdict" }, host);
       function line(good, html) { var li = H("li", null, ul); H("span", { class: good ? "ok" : "no", html: LX.icon(good ? "check" : "question") }, li); H("span", { html: html }, li); }
@@ -272,7 +272,7 @@
         build: function (act, api) {
           var f, key, pr = LX.Predict(act, { id: "m3-weights", fresh: true, q: "How does the goal turn a few weeks of running costs into a year's?", answer: "weight",
             options: [{ value: "weight", label: "Weight each modelled hour by the hours of the year it stands for" }, { value: "52", label: "Multiply every week's cost by 52" }, { value: "none", label: "Leave it: a few weeks are close enough" }],
-            feedback: { weight: "Each modelled hour counts as many hours of the year as it stands for.", "52": "A typical winter week does not stand for all 52 weeks.", none: "A year of building costs against a few weeks of fuel would make plants that are cheap to run look far too good." },
+            feedback: { weight: "Each modelled hour counts as many hours of the year as it stands for.", "52": "A typical winter week does not stand for all 52 weeks.", none: "A year of building costs against a few weeks of fuel counts fuel for too few hours, so plants that are cheap to build would look better than they are." },
             onPick: function () {
               pr.reveal(); f.hidden = false; key.hidden = false; api.done();
               api.saw("Build costs count once a year. Each modelled hour's running cost counts **w** times: its [[period-weight|weight]], the hours of 2025 it stands for.");
@@ -387,13 +387,13 @@
         build: function (act, api) {
           var ul, pr = LX.Predict(act, { id: "m3-sign", fresh: true, q: "The seven-week estimate, against the full-year optimum, is…", answer: "below",
             options: [{ value: "above", label: "above it" }, { value: "below", label: "below it" }, { value: "equal", label: "equal to it" }],
-            feedback: { above: "Fewer hard hours in the weeks make the plan look cheaper, not dearer.", below: "Fewer hard hours in the weeks make the plan look cheaper.", equal: "Fewer hard hours in the weeks make the plan look cheaper." },
+            feedback: { above: "Here the weeks miss hard hours, so the plan looks cheaper, not dearer.", below: "Here the weeks miss hard hours, so the plan looks cheaper.", equal: "Here the weeks miss hard hours, so the plan looks cheaper." },
             onPick: function () {
               pr.reveal(); ul.hidden = false; ul.innerHTML = "";
               var errs = SETROWS.map(function (id) { var e = R.sets[id].cost / R.full.cost - 1; return [setOf(D, id).label, e]; }), mx = Math.max.apply(null, errs.map(function (e) { return Math.abs(e[1]); }));
               errs.forEach(function (e) { var li = H("li", null, ul); H("span", { text: e[0] }, li); var b = H("span", { class: "bar" }, li); H("i", { style: "width:" + (Math.abs(e[1]) / mx * 100).toFixed(1) + "%" }, b); H("b", { text: fm.spct(e[1]) }, li); });
               api.done();
-              api.saw("All five estimates are below the full-year optimum of " + fm.musd(R.full.cost) + ": from " + fm.spct(errs[0][1]) + " (4 typical weeks) to " + fm.spct(errs[4][1]) + " (12 + 3). Fewer hard hours make a plan look cheaper.");
+              api.saw("All five estimates are below the full-year optimum of " + fm.musd(R.full.cost) + ": from " + fm.spct(errs[0][1]) + " (4 typical weeks) to " + fm.spct(errs[4][1]) + " (12 + 3). These weeks miss hard hours; other choices of weeks can err either way.");
             } });
           ul = H("ul", { class: "m3-bars", hidden: true, "aria-label": "Estimate error of each way of choosing the weeks" }, act);
           H("p", { class: "m3-note", html: LX.rich("Estimate error = (the weeks' optimal cost) ÷ (the full-year optimal cost) − 1, both at " + D.cap + " kt; reference numbers, the same on every device.") }, act);

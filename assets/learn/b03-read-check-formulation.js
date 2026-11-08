@@ -101,7 +101,7 @@
   function symptom(bug, s, ref, inst) {
     if (!s.ok) return "The solver reports: " + s.status + ".";
     var short = s.rows.map(function (x) { return x.d - x.supply; }), hrs = inst.T;
-    if (bug === "unit") return "Optimal. The peaker, the dearest plant, runs every hour (" + range(s.rows.map(function (x) { return x.pk; })) + " MW). The model reports " + money(s.objective) + "; at real prices the plan costs " + money(s.trueCost) + ".";
+    if (bug === "unit") return "Optimal. The peaker, the dearest plant, runs every hour (" + range(s.rows.map(function (x) { return x.pk; })) + " MW). The model reports " + money(s.objective) + "; at the intended (illustrative) costs the plan costs " + money(s.trueCost) + ".";
     if (bug === "sign") return "Optimal at " + money(s.objective) + ". Only nuclear and the combined-cycle plant's ramp minimum run; supply falls short of demand by " + range(short) + " MW every hour.";
     if (bug === "index") return "Optimal at " + money(s.objective) + ". " + hrs[0] + ":00 balances; from " + hrs[1] + ":00 to " + hrs[hrs.length - 1] + ":00 supply falls short by up to " + Math.round(Math.max.apply(null, short)) + " MW, and no unserved demand is counted.";
     if (bug === "double") return "Optimal. The model reports " + money(s.objective) + ", but the plan's true cost is " + money(s.trueCost) + ", and it now runs the peaker: " + money(s.trueCost - ref.trueCost) + " dearer than the right plan's " + money(ref.trueCost) + ".";

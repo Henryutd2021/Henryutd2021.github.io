@@ -261,7 +261,7 @@ const r1 = (v, d) => Math.round(v * 10 ** d) / 10 ** d;
   // 2: the spending boundary, and the penalty it leaves out
   ok(S.C.voll === cfg.unservedPenalty && near(M.penalty(S.C, S7.wk7.y2024), S7.wk7.y2024.unserved * 10000, 1e-6) && fm.musd(M.penalty(S.C, S7.wk7.y2024)) === "$5.9M" && fm.musd(M.penalty(S.C, S7.wk7.y2025)) === "$1.1M",
      "the shortage penalty left out of the 4 + 3 plan's spending: $1.1M (2025), $5.9M (2024)");
-  ok(JS.includes("Spending: building and running the plants. The re-run enforces no CO₂ cap and does not price unserved demand.") && JS.includes("yearly spending on plants and fuel is within 2%") && !/"Cost: <b>/.test(JS),
+  ok(JS.includes("Spending: building and running the plants. The re-run's $\" + S.C.voll.toLocaleString(\"en-US\") + \" per MWh shortage penalty steers its dispatch but is left out of spending; it enforces no CO₂ cap.") && JS.includes("yearly spending on plants and fuel is within 2%") && !/"Cost: <b>/.test(JS),
      "the full-year cost is labelled spending, with its boundary, on the verdicts, tables and conclusion cards");
   onPage("Spending: plants and fuel; no shortage penalty, no cap in the re-run", "the cost gap's boundary (Go deeper)");
   // 5, 6: the quiz's reversed comparison and the CO2 measure as defined

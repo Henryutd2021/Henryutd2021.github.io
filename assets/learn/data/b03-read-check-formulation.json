@@ -1,7 +1,7 @@
 {
  "meta": {
   "title": "Bridge B3 (How do you read a formulation, and check that a model is right?): formulation, suspects and checks",
-  "built_by": "by hand, 2026-11-02; the precomputed solution ('ref') was solved with HiGHS 1.15.1 and is checked against a fresh solve",
+  "built_by": "prepared for the course on 2026-11-02; the precomputed solution ('ref') was solved with HiGHS 1.15.1 and is checked against a fresh solve",
   "license": "CC BY 4.0",
   "notes": "Prairie Town's dispatch, 17:00-20:00 on 3 September 2025 (lesson 0's day, from EIA-930 shapes for the Southwest Power Pool, scaled). Fleet and prices from town.json; the 45 MW start of the combined-cycle plant is lesson 0's cheapest-first plan at 16:00; V = $10,000/MWh for unserved demand is illustrative. The ramp line is written with R Δt so that every side is in MW. The signs of the balance duals are those of these inputs: the Node test also solves two counterexamples (17:00 demand of 105 MW gives a negative 17:00 dual; a 150 MW start gives a positive ramp dual)."
  },

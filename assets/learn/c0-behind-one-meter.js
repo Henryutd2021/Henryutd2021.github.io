@@ -49,7 +49,7 @@
     var E0 = LX.E0, D = data.e0, C = data.c0_behind_one_meter, P = E0.prepare(D, data.town_year, data.cf_targets), S = E0.schemaFor("c0", "Behind one meter plan");
     var rh = document.getElementById("c0-results");
     rh.innerHTML = "";
-    var sens = null, sensKey = null, tornado = null, sensRun = null, sensHost = null, rn = null;
+    var sens = null, sensKey = null, sensFor = null, tornado = null, sensRun = null, sensHost = null, rn = null;
     var key = function (s) { return JSON.stringify(s); };
     // the sensitivity card sits with the results; it re-runs the plan whose results are drawn
     function onDraw(res, s, extra) {
@@ -63,18 +63,22 @@
           solve: function (st, ctx) {
             var l = B.run.last();
             if (!l) return Promise.resolve({ status: "error", ok: false, message: "Run the year first." });
+            sensFor = key(l.state);
             // inputs that change the operation re-run the whole year twice (14.6 s at 6x for the farm with everything,
             // solver bench 2026-11-08): the progress line counts the inputs
+            ctx.step(1, E0.sensRows(l.state).length);
             return E0.sensitivity(l.state, P, l.r, { signal: ctx.signal, timeLimit: ctx.attempt > 1 ? 30 : 10, progress: function (i, n) { if (i < n) ctx.step(i + 1, n); } }).then(function (x) {
               return x ? { status: "optimal", ok: true, results: x } : { status: "error", ok: false, message: "A run of the sensitivity did not finish." };
             });
           },
-          render: function (x, st) { sens = x; sensKey = key(st); drawSens(st); },
+          // a sensitivity of an earlier plan that ends after the year was run again is dropped, never drawn as this plan's
+          render: function (x, st) { var l = B.run.last(); if (!l || key(l.state) !== key(st)) return; sens = x; sensKey = key(st); drawSens(st); },
           onDone: function () { if (rn) rn.refresh(); },
           results: [chart], busy: null, progress: { unit: "input" },
           words: { ok: "Done: each bar is the NPV with one input at its low or high value, the equipment held fixed." } });
       }
       if (sens && sensKey !== key(s)) { sens = null; sensKey = null; }
+      if (sensRun.running() && sensFor !== key(s)) sensRun.cancel();   // new results for another plan: its sensitivity run stops
       drawSens(s);
       if (rn) rn.refresh();
     }
