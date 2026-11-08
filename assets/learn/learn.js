@@ -6629,6 +6629,7 @@
 /* practice.js — LX.Practice: faded practice sets with staged hints and an automatic check (bridges B1 and B3; styles and
    the small exercise pieces in practice.css).
    LX.Practice(host, { id, title, lede, foot, blank, tracks: [{ label, intro, items: [{ key, kind, minutes, title, build }] }] })
+     foot    a closing note: a string, or short labelled notes [[label, text], ...] (one list item each)
      id      LX.store key: which exercises are done, in this browser only
      blank   the reason shown when Check is pressed with an empty answer
      tracks  sets of exercises that fade from a worked example to a blank page; kind "worked" | "partly" | "scratch";
@@ -6664,7 +6665,8 @@
     var tg = seg(H("div", { class: "lx-fp-bar" }, card), o.tracks.map(function (t) { return t.label; }), 0, function (i) { go(i, null, true); }, "Choose a practice set");
     var intro = H("p", { class: "lx-fp-intro" }, card), fade = H("ol", { class: "lx-fp-fade", "aria-label": "Exercises in this set" }, card);
     var ex = H("section", { class: "lx-fp-ex", "aria-live": "off" }, card);
-    if (o.foot) H("p", { class: "lx-fp-foot", html: LX.rich(o.foot) }, card);
+    if (Array.isArray(o.foot)) { var fl = H("ul", { class: "lx-fp-foot lx-fp-notes" }, card); o.foot.forEach(function (n) { H("li", { html: "<b>" + LX.esc(n[0]) + ":</b> " + LX.rich(n[1]) }, fl); }); }
+    else if (o.foot) H("p", { class: "lx-fp-foot", html: LX.rich(o.foot) }, card);
     var items = []; o.tracks.forEach(function (t) { items = items.concat(t.items); });
     var total = items.reduce(function (s, it) { return s + it.minutes; }, 0), T = 0, I = 0, cur = null;
     function tally() { cnt.textContent = items.filter(function (it) { return done[it.key]; }).length + " of " + items.length + " done · about " + total + " min"; }
@@ -9130,6 +9132,9 @@
      assumptions  ["All money in 2025 dollars.", ...]                          one sentence each
      sensitivity  { metric: "Net present value", input: "the battery price", held: "the plan held fixed",
                     base: { at: "$400/kWh", value: "$4,210" }, cases: [{ at: "$300/kWh", value: "$5,000" }, ...] }
+                  or several inputs, each at a low and a high case (a one-at-a-time sensitivity: one table row per case,
+                  in every format): { metric: "NPV", base: { value: "−$17,813" }, held: "the equipment held fixed",
+                    rows: [{ label: "Equipment cost", lo: { at: "75% of sourced", value: "−$10,237" }, hi: { at: ..., value: ... } }] }
                   or one sentence (a string)
      limits       ["It leaves out ...", ...]
      footer       optional; default: a teaching model with illustrative assumptions, not advice for a real site
@@ -9153,9 +9158,11 @@
   function joinAnd(a) { return a.length < 2 ? a.join("") : a.slice(0, -1).join(", ") + " and " + a[a.length - 1]; }
   // "Net present value is $4,210 with the battery price at $400/kWh (this plan), $5,000 at $300/kWh and $3,100 at
   // $500/kWh, with the plan held fixed."
+  function multi(s) { return !!(s && typeof s === "object" && s.metric && s.base && list(s.rows).length); }
   function sensitivityLine(s) {
     if (!s) return "";
     if (typeof s === "string") return sentence(s);
+    if (multi(s)) return sentence(s.metric + " " + s.base.value + " at this plan; each case above moves one input to its low or high value" + (s.held ? ", " + s.held : ""));
     if (!s.metric || !s.base || !list(s.cases).length) return "";
     var parts = [s.base.value + " with " + s.input + " at " + s.base.at + " (this plan)"].concat(s.cases.map(function (c) { return c.value + " at " + c.at; }));
     return sentence(s.metric + " is " + joinAnd(parts) + (s.held ? ", with " + s.held : ""));
@@ -9184,9 +9191,10 @@
     if (list(n.results).length) out.push({ h: "Results", table: { head: ["Result", "Value"], rows: n.results.map(function (r) { return [r.label, r.value + (r.note ? " (" + r.note + ")" : "")]; }) } });
     out.push({ h: "Assumptions", list: list(n.assumptions).map(sentence), none: "(none stated)" });
     var sl = sensitivityLine(n.sensitivity), s = n.sensitivity;
-    var st = s && typeof s === "object" && s.base && list(s.cases).length ? { head: [s.inputLabel || oneLine(s.input).replace(/^the /, ""), s.metric],
+    var st = multi(s) ? { head: ["Case", s.metric], rows: [].concat.apply([], s.rows.map(function (r) { return [[r.label + " at " + r.lo.at, r.lo.value], [r.label + " at " + r.hi.at, r.hi.value]]; })) }
+      : s && typeof s === "object" && s.base && list(s.cases).length ? { head: [s.inputLabel || oneLine(s.input).replace(/^the /, ""), s.metric],
       rows: [[s.base.at + " (this plan)", s.base.value]].concat(s.cases.map(function (c) { return [c.at, c.value]; })) } : null;
-    out.push({ h: "Sensitivity", para: sl || "(no sensitivity line yet)", empty: !sl, table: st, tableMdOnly: true });
+    out.push({ h: "Sensitivity", para: sl || "(no sensitivity line yet)", empty: !sl, table: st, tableMdOnly: !multi(s) });
     fields.filter(function (f) { return f.at !== "top"; }).forEach(field);
     if (list(n.limits).length) out.push({ h: "Limits of this analysis", list: list(n.limits).map(sentence) });
     out.push({ foot: n.footer || FOOTER });
@@ -9897,7 +9905,7 @@
         payback: cfP.payback, cash: cfP.rows, items: it, horizon: N, lcoh: lcoh, extraCapex: extra.reduce(function (a, x) { return a + x.capex; }, 0) };
       out.co2 = { avoided: T.co2Avoided };
       out.readouts = [
-        { key: "npv", label: "Net present value, " + N + " years", value: money(cfP.npv), note: "the whole plant, at " + num(s.rate, 1) + "% real" },
+        { key: "npv", label: "Net present value, " + N + " years", value: money(cfP.npv), note: "the whole plant, at " + num(s.rate, 1) + "% real; the line to the grid not costed" },
         { key: "added", label: "What the extra equipment adds", value: money(cfP.npv - cfA.npv), note: "against the same wind farm alone (" + money(cfA.npv) + ")" },
         { key: "revenue", label: "Net revenue a year", value: money(T.revenue), note: "power " + money(T.sales) + (T.h2 > 0 ? ", hydrogen " + money(T.h2Rev) + ", less stack wear" : "") },
         { key: "spill", label: "Wind spilled", value: pct(T.spillShare, 1), note: "alone: " + pct(T.aloneSpillShare, 1) + "; the line is full " + num(T.lineHours || 0) + " h a year" + sched },
@@ -10044,7 +10052,15 @@
     var lim = rows.some(function (r) { return r.limit; });
     var held = "The equipment is held fixed." + (rerun.length ? " Re-run over 52 weeks and 31 December: " + joinAnd(rerun) + "." : "");
     return { line: "The NPV is " + money(sens.base) + " at this plan. " + parts.join(". ") + ". " + held + (lim ? " The line's cases change the connection limit; its cost is not counted." : ""),
-      note: "Green: above your NPV; red: below. " + held, widest: rows[0] };
+      note: "Green: above your NPV; red: below. " + held, widest: rows[0], rows: rows,
+      held: "the equipment held fixed" + (rerun.length ? "; re-run over 52 weeks and 31 December: " + joinAnd(rerun) : "") + (lim ? "; the line's cases change its limit, its cost not counted" : "") };
+  }
+  // the same, as a one-page note's sensitivity (LX.ReportNote: one table row per case, then one short line)
+  function sensNote(s, sens) {
+    var w = sensWords(s, sens);
+    if (!w) return null;
+    return { metric: "NPV", base: { value: money(sens.base) }, held: w.held,
+      rows: w.rows.map(function (r) { return { label: r.label, lo: { at: r.loText, value: money(r.atLo) }, hi: { at: r.hiText, value: money(r.atHi) } }; }) };
   }
 
   // ---------------------------------------------------------------- words: the plan, the note, the no-JS tables
@@ -10089,7 +10105,8 @@
           : "The wind follows SPP's 2025 hourly pattern, reshaped month by month to EIA's 2025 capacity factors (" + pct(res.cf.wind, 1) + " for the year); the prices are illustrative.",
         home ? "CO₂ counts operating emissions only: bought power at Kansas's 2024 average factor, and gas burned; power sent back is a separate credit."
           : "CO₂ avoided is a potential saving: it assumes each kg of hydrogen replaces one made from natural gas.",
-        "Equipment costs are " + s.cost + "% of the sourced values, with no tax credits or incentives."],
+        home ? null : "The line to the grid is an assumed available connection limit: building or upgrading it is not costed.",
+        "Equipment costs are " + s.cost + "% of the sourced values, with no tax credits or incentives."].filter(Boolean),
       sensitivity: null,
       limits: [
         "Storage starts and ends each week at the same level, so nothing is stored from one week to the next.",
@@ -10125,18 +10142,22 @@
       ["Discount rate", num(D.finance.rate) + "% real (you can change it)", ["atb2025-fin"]],
       ["Home: household use", num(H.use.kWh) + " kWh a year, the town's 2025 demand shape (illustrative)", ["eia-930"]],
       ["Home: heating need", num(H.heat.kWh) + " kWh of heat a year, from a smooth made-up temperature (illustrative)", []],
-      ["Home: rooftop solar", "$" + num(H.pv.capex) + "/kW in 2022 dollars = " + d(H.pv.capex, H.pv.capexYear) + "/kW; " + H.pv.life + " years; upkeep $" + H.pv.fom + "/kW a year (illustrative). Output: SPP's 2025 hourly solar pattern, scaled month by month to EIA's 2025 capacity factors and to a " + pct(P.home.pvCF, 1) + " year", ["eia-aeo2026-rdm", "eia-dg-2024", "eia-epm-cf"]],
+      ["Home: rooftop solar, cost", "$" + num(H.pv.capex) + "/kW in 2022 dollars = " + d(H.pv.capex, H.pv.capexYear) + "/kW; " + H.pv.life + " years; upkeep $" + H.pv.fom + "/kW a year (illustrative)", ["eia-aeo2026-rdm", "eia-dg-2024"]],
+      ["Home: rooftop solar, output", "SPP's 2025 hourly solar pattern, scaled month by month to EIA's 2025 capacity factors and to a " + pct(P.home.pvCF, 1) + " year", ["eia-epm-cf"]],
       ["Home: battery", "$" + num(H.battery.capex) + "/kWh (illustrative); 2.5 hours; " + pct(H.battery.rte) + " round trip; " + H.battery.life + " years; upkeep " + pct(H.battery.fomShare) + " a year", ["atb2025-resbat"]],
-      ["Home: heat pumps", "standard: about " + num(P.home.cop.standard, 1) + " kWh of heat for each kWh of electricity over a season (HSPF " + H.hp.standard.hspf + ", the heating seasonal performance factor), $" + num(H.hp.standard.capex) + " in 2022 dollars = " + d(H.hp.standard.capex, 2022) +
-        "; high efficiency: about " + num(P.home.cop.high, 1) + " (HSPF " + H.hp.high.hspf + "), $" + num(H.hp.high.capex) + " = " + d(H.hp.high.capex, 2022) + ". HSPF ÷ 3.412 = the season's heat over electricity", ["eia-aeo2026-rdm"]],
+      ["Home: heat pumps, cost", "standard $" + num(H.hp.standard.capex) + " in 2022 dollars = " + d(H.hp.standard.capex, 2022) + "; high efficiency $" + num(H.hp.high.capex) + " = " + d(H.hp.high.capex, 2022), ["eia-aeo2026-rdm"]],
+      ["Home: heat pumps, performance", "about " + num(P.home.cop.standard, 1) + " kWh of heat for each kWh of electricity over a season (standard, HSPF " + H.hp.standard.hspf + "); about " + num(P.home.cop.high, 1) + " (high efficiency, HSPF " + H.hp.high.hspf + ")", ["eia-aeo2026-rdm"]],
+      ["Home: heat pumps, HSPF", "the heating seasonal performance factor, in Btu of heat per Wh of electricity; HSPF ÷ 3.412 = the season's heat over its electricity", []],
       ["Home: gas furnace and gas", pct(H.gas.afue) + " efficient; $" + num(H.gas.pricePerMcf, 2) + " per thousand cubic feet = $" + num(gasMM, 2) + " per MMBtu (a million British thermal units, about 293 kWh of heat); " + H.gas.co2PerMMBtu + " kg CO₂ per MMBtu burned", ["eia-ng-ks", "eia-btu", "eia-co2"]],
       ["Home: tariffs", num(H.tariff.flat * 100) + "¢/kWh flat; time-of-use " + num(P.home.touOff * 100, 2) + "¢ and " + num(P.home.touPeak * 100, 2) + "¢ (16:00–21:00), illustrative", ["eia-epm-5-6-b"]],
       ["Home: export credit", "what the utility pays for each kWh the panels send to the grid (net billing): " + num(H["export"].def) + "¢ by default, 0 to 8¢ on the bench (illustrative)", []],
       ["Home: grid CO₂", num(H.grid.lbPerMWh) + " lb/MWh = " + num(ef, 3) + " kg CO₂/kWh (Kansas, 2024)", ["eia-ks-profile"]],
-      ["Farm: wind", "$" + num(F.wind.capex) + "/kW and $" + num(F.wind.fom, 2) + "/kW a year (2025 dollars); " + F.wind.life + " years: $" + num(C.wind.eac) + " a year per MW at " + D.finance.rate + "%. Output: SPP's 2025 hourly wind pattern, reshaped month by month to EIA's 2025 capacity factors and to a " + pct(P.farm.windCF, 1) + " year, the best hours at full size", ["eia-aeo2026-emm", "eia-epm-cf"]],
+      ["Farm: wind, cost", "$" + num(F.wind.capex) + "/kW and $" + num(F.wind.fom, 2) + "/kW a year (2025 dollars); " + F.wind.life + " years: $" + num(C.wind.eac) + " a year per MW at " + D.finance.rate + "%", ["eia-aeo2026-emm"]],
+      ["Farm: wind, output", "SPP's 2025 hourly wind pattern, reshaped month by month to EIA's 2025 capacity factors and to a " + pct(P.farm.windCF, 1) + " year, the best hours at full size", ["eia-epm-cf"]],
+      ["Farm: line to the grid", "an assumed available connection limit, set on the bench; building or upgrading it is not costed", []],
       ["Farm: battery", "$" + num(F.battery.capexPerkW) + "/kW for 4 hours = $" + num(F.battery.capexPerkW / 4, 2) + "/kWh; $" + num(F.battery.fomPerkW, 2) + "/kW a year; " + pct(F.battery.rte) + " round trip; " + F.battery.life + " years", ["eia-aeo2026-emm", "nrel-battery-2025"]],
-      ["Farm: electrolyzer", "$" + num(F.electrolyzer.capex) + "/kW in 2022 dollars = " + d(F.electrolyzer.capex, F.electrolyzer.capexYear) + "/kW; upkeep " + pct(F.electrolyzer.fomShare) + " a year; " + F.electrolyzer.kWhPerKg + " kWh/kg. Stack wear $" + num(C.elWear, 2) +
-        "/MWh used: an illustrative allowance per MWh, based on DOE's stack replacement (" + pct(F.electrolyzer.stackShare) + " of the cost after " + num(F.electrolyzer.stackHours) + " operating hours) as if every hour ran at full power", ["doe-h2-24005"]],
+      ["Farm: electrolyzer, cost", "$" + num(F.electrolyzer.capex) + "/kW in 2022 dollars = " + d(F.electrolyzer.capex, F.electrolyzer.capexYear) + "/kW; upkeep " + pct(F.electrolyzer.fomShare) + " a year; " + F.electrolyzer.kWhPerKg + " kWh/kg", ["doe-h2-24005"]],
+      ["Farm: electrolyzer, stack wear", "$" + num(C.elWear, 2) + "/MWh used, an illustrative allowance: DOE's stack replacement (" + pct(F.electrolyzer.stackShare) + " of the cost after " + num(F.electrolyzer.stackHours) + " operating hours), as if every hour ran at full power", ["doe-h2-24005"]],
       ["Farm: hydrogen tank", "$" + num(F.tank.capexPerKg) + " per kg held (illustrative); " + F.tank.life + " years", []],
       ["Farm: prices", "power $" + F.sale.flat + "/MWh fixed, or $" + F.sale.tou.off + " and $" + F.sale.tou.peak + "/MWh (16:00–21:00); hydrogen $" + num(F.h2.def, 2) + "/kg by default (all illustrative)", []],
       ["Farm: potential CO₂ avoided", num(F.h2.gasMMBtuPerKg, 2) + " MMBtu of gas per kg of hydrogen made from natural gas × " + F.h2.co2PerMMBtu + " kg CO₂ per MMBtu = " + num(F.h2.gasMMBtuPerKg * F.h2.co2PerMMBtu, 2) + " kg CO₂ per kg, if the farm's hydrogen replaces it", ["eia-aeo2026-hmm", "eia-co2"]]];
@@ -10180,7 +10201,7 @@
   var api = { HOURS: HOURS, HPW: HPW, WEEKS: WEEKS, SITES: SITES, schema: schema, schemaFor: schemaFor, presets: presets, defaults: defaults, withPreset: withPreset,
     field: field, crf: crf, usd: usd, costs: costs, temperature: temperature, prepare: prepare, weeks: weeks, periods: periods, build: build,
     read: read, start: start, add: add, finish: finish, summarize: summarize, cashflow: cashflow, items: items, solve: solve, snap: snap, sensitivity: sensitivity, sensRows: sensRows,
-    recost: recost, sensWords: sensWords, split: split, stores: stores, captions: captions, SCHED: SCHED, HINT: HINT, fmt: { money: money, num: num, pct: pct, field: fmtField }, note: note, heading: heading, planRows: planRows,
+    recost: recost, sensWords: sensWords, sensNote: sensNote, split: split, stores: stores, captions: captions, SCHED: SCHED, HINT: HINT, fmt: { money: money, num: num, pct: pct, field: fmtField }, note: note, heading: heading, planRows: planRows,
     resultsHTML: resultsHTML, fallback: fallback, inputRows: inputRows, inputsHTML: inputsHTML, sourcesHTML: sourcesHTML, checkRows: checkRows, checkHTML: checkHTML };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   if (typeof window === "undefined" || !window.LX) return;
@@ -10247,6 +10268,10 @@
     var next = H("button", { type: "button", class: "lx-btn ghost small", text: "Week after →" }, wkNav);
     var schedP = H("p", { class: "lx-hint e0-sched", hidden: true }, wkCard);
     var plot = LX.Plot(wkCard, { text: "Text version: this week, day by day", legend: true });
+    // the same week hour by hour, with what the site needs from outside and when it meets a limit (built when opened)
+    var hourAlt = H("details", { class: "lx-textalt e0-hours" }, wkCard); H("summary", { text: "Text version: this week, hour by hour" }, hourAlt);
+    var hourBody = H("div", { class: "lx-scroll-x" }, hourAlt);
+    hourAlt.addEventListener("toggle", function () { if (hourAlt.open && last) drawHours(last.res, last.s); });
     var cfCard = H("div", { class: "lx-xcard lx-sb-chart" }, charts);
     var cfHead = H("header", { class: "lx-x-head" }, cfCard); H("h3", { text: "Cash flow, year by year" }, cfHead);
     var cfLede = H("ul", { class: "e0-keys" }, cfCard);
@@ -10319,6 +10344,25 @@
           : ["Day", "Wind, MWh", "Sold, MWh", "Electrolyzer, MWh", "Into the battery, MWh", "From the battery, MWh", "Spilled, MWh", "Hydrogen sold, t"], rows: rows,
         note: cap.week };
       plot.render(spec);
+      if (hourAlt.open) drawHours(res, s); else hourBody.innerHTML = "";
+    }
+    function drawHours(res, s) {
+      var ps = res.periods.filter(function (p) { return p.kind === "week"; }), p = ps[sel[s.site]], S = p.series, home = s.site === "home", Z = res.sized, rows = [];
+      for (var k = 0; k < HPW; k++) {
+        var hh = k % 24, t = dayLabel(p.start, Math.floor(k / 24)) + ", " + (hh < 10 ? "0" : "") + hh + ":00";
+        if (home) rows.push([t, num(S.need[k], 2), num(S.pv[k], 2), num(S.imp[k], 2), S.imp[k] > 1e-3 ? "yes" : "no", num(S.ch[k], 2), num(S.dis[k], 2), num(S.exp[k], 2)]);
+        else {
+          var at = [];
+          if (Z.line > 0 && S.sell[k] >= Z.line - 1e-6) at.push("line full");
+          if (Z.take > 0 && Z.el > 0 && S.h2[k] >= Z.take - 1e-6) at.push("buyer's full take");
+          rows.push([t, num(S.wind[k]), num(S.sell[k]), num(S.el[k]), num(S.ch[k]), num(S.dis[k]), num(S.spill[k]), num(S.h2[k]), at.length ? at.join("; ") : "no"]);
+        }
+      }
+      var head = home ? ["Hour", "Use, kWh", "Solar, kWh", "Bought, kWh", "Needs the grid", "Into the battery, kWh", "From the battery, kWh", "Sent back, kWh"]
+        : ["Hour", "Wind, MW", "Sold, MW (line " + num(Z.line) + " MW)", "Electrolyzer, MW", "Into the battery, MW", "From the battery, MW", "Spilled, MW", "Hydrogen sold, kg (buyer at most " + num(Z.take) + " kg/h)", "At a limit"];
+      hourBody.innerHTML = "<table class='lx-facts'><caption class='lx-sr'>" + LX.esc(wkName.textContent) + ", hour by hour</caption><thead><tr>" + head.map(function (x) { return "<th scope='col'>" + LX.esc(x) + "</th>"; }).join("") + "</tr></thead><tbody>" +
+        rows.map(function (r) { return "<tr>" + r.map(function (c, i) { return i ? "<td class='n'>" + LX.esc(c) + "</td>" : "<th scope='row'>" + LX.esc(c) + "</th>"; }).join("") + "</tr>"; }).join("") + "</tbody></table>" +
+        (stores(s) ? "<p class='lx-hint'>" + LX.esc(SCHED.charAt(0).toUpperCase() + SCHED.slice(1)) + ".</p>" : "");
     }
     function niceTop(v) { var e = Math.pow(10, Math.floor(Math.log10(v))), m = v / e; return (m <= 1 ? 1 : m <= 2 ? 2 : m <= 2.5 ? 2.5 : m <= 5 ? 5 : 10) * e; }
     // an axis from mn to mx (mn <= 0 <= mx) with gridlines every step, 0 among them
@@ -10906,7 +10950,7 @@
         "The model knows the coming sun (perfect foresight); the sun is a teaching profile from SPP's 2025 hourly solar, not measured campus output"],
       sensitivity: null,
       limits: ["It checks only the outages chosen: a different start, a longer storm or a broken set can turn out worse",
-        "Its year is 12 average days: over a full 8,760-hour year, a large solar-and-battery plan's grid bill comes out up to 7% higher",
+        "Its year is 12 average days: for the larger solar-and-battery plans checked over a full 8,760-hour year, the grid bill came out about 4% to 7% higher",
         "It leaves out the network inside the campus, the generator's part-load fuel use and battery wear"]
     };
   }
@@ -11384,7 +11428,7 @@
     // the cost's boundary, one idea a line (SB1 5, 8 and 10)
     var cn = H("ul", { class: "lx-hint e1-cost-notes" }, c1);
     ["**Equipment**: paid over its life at the " + R.owner.label.toLowerCase().replace("-owned", "") + " owner's " + Math.round(R.rate * 100) + "% real [[cost-of-capital|cost of capital]] (through the [[capital-recovery-factor|capital recovery factor]]), plus upkeep.",
-      "**Grid bill**: estimated on 12 average days; a full 8,760-hour year comes out up to 7% higher for large solar-and-battery plans.",
+      "**Grid bill**: estimated on 12 average days; for the larger solar-and-battery plans checked over a full 8,760-hour year, it came out about 4% to 7% higher.",
       "**Not included**: the diesel burned in outages (its cost is under each outage). 2025 dollars, illustrative.",
       "**Grid electricity**: " + kilo(R.year.imports / 1000) + " MWh bought, " + kilo(R.year.exports / 1000) + " MWh exported, " + kilo(R.year.co2) + " t CO₂ (U.S. [[average-emission-factor|average factor]], [[operating-emissions|operating only]])."]
       .forEach(function (t) { H("li", { html: LX.rich(t).replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>") }, cn); });
@@ -11961,7 +12005,7 @@
       { id: "bat", short: "s", type: "int", min: 0, max: 100, step: 100, def: 0, label: "Battery at Prairie Town (4 hours)", unit: "MW" },
       { id: "up", short: "u", type: "int", min: 0, max: 300, step: 300, def: 0, label: "Town–Metro uprate", unit: "MW" },
       { id: "res", short: "r", type: "int", min: 150, max: 250, step: 100, def: 250, label: "Operating reserve required", unit: "MW" },
-      { id: "share", short: "h", type: "int", min: 0, max: 100, step: 10, def: 0, label: "Share of new costs the large load pays", unit: "%" }];
+      { id: "share", short: "h", type: "int", min: 0, max: 100, step: 10, def: 0, label: "Direct share of new fixed costs (large load)", unit: "%" }];
     ["pk", "bat", "up"].forEach(function (k) {
       var r = R[k];
       f.push({ id: "c" + k, short: "c" + k, type: "int", min: r.lo, max: r.hi, step: r.step, def: r.def, label: r.label, unit: r.unit });
@@ -17130,7 +17174,7 @@
   }
   // the readouts beside the bench: [label, value, tone]
   // the readouts; an absent rule is "not tested", never "served", and a shortfall is the worst model
-  // year's at its worse stress hour
+  // year's at its worse stress hour, against the rule (load + its margin), not unserved demand
   function ruleOn(V) { return !("rule" in V) || V.rule !== null; }
   function readouts(V) {
     var maxImp = Math.max.apply(null, V.imp), un = sum(V.unserved), short = Math.max.apply(null, V.reserve.map(function (x) { return x.shortMW; }).concat([0]));
@@ -17139,7 +17183,7 @@
       ["Imports, highest year", pct(maxImp) + " (cap " + pct(V.cap) + ")", maxImp > V.cap + 0.0005 ? "bad" : "good"],
       ["Clean electricity, 2050", pct(V.clean[V.clean.length - 1]), ""],
       un > 0.005 ? ["Electricity not served in the slices", fix(un, 2) + " TWh", "bad"] : !ruleOn(V) ? ["Slices served; stress hours", "not tested (rule off)", "warn"]
-        : short > 0.5 ? ["Short at a stress hour (worst year)", kilo(short) + " MW", "warn"] : ["Every slice and stress hour served", "yes", "good"]];
+        : short > 0.5 ? ["Short of the peak-hour rule (worst year)", kilo(short) + " MW", "warn"] : ["Every slice and stress hour served", "yes", "good"]];
   }
   E4.ui = { COL: COL, NAME: NAME, POS: POS, fmtOf: fmtOf, seg: seg, controls: controls, stopper: stopper, table: table, keys: keys, yearPick: yearPick, Map: Map, MixChart: MixChart,
     Co2Chart: Co2Chart, ImportChart: ImportChart, readouts: readouts, mixOf: mixOf, ruleOn: ruleOn };

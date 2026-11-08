@@ -97,12 +97,25 @@ const APPROVED_SNAPSHOT = {
   // ---------------- fixed numbers in the steps and on the page
   ok(/1,200 kW of loads/.test(JS) && P.total === 1200, "step 1: 1,200 kW");
   // ---------------- the details, one by one
-  ok(M.CONTROLLER.length === 3 && /shed must-stay-on loads come back first, then the sets go down to their minimum, the battery charges, the other loads come back, and only then is solar curtailed/.test(M.CONTROLLER[2]) &&
+  ok(M.CONTROLLER.length === 4 && /^Between re-plans, the sets follow the plan's on\/off schedule: only a running set's output can change\.$/.test(M.CONTROLLER[0]) && /the planned sets stay on \(or off\)/.test(fs.readFileSync(X.L("components/engine-e1.js"), "utf8")) && /a teaching rule; the forecast losses below hold for it/.test(JS),
+    "step 7's controller is a stated teaching rule, its first line the on/off schedule the engine's realTime keeps between re-plans");
+  ok(/shed must-stay-on loads come back first, then the sets go down to their minimum, the battery charges, the other loads come back, and only then is solar curtailed/.test(M.CONTROLLER[3]) &&
     /first the\s+\/\/ must-stay-on loads the plan shed come back|must-stay-on loads the plan shed come back \(the forecast/.test(fs.readFileSync(X.L("components/engine-e1.js"), "utf8")), "step 7 states the controller's rule, as the engine's realTime runs it");
   ok(/With this controller, forecast error costs this plan/.test(rw), "the forecast loss is said to hold for this controller: " + rw);
+  ok(!/no margin|so may be the margin/.test(JS) && (!/forecast error costs this plan/.test(rw) || /its sizing did not require protection against these forecast errors/.test(rw)), "a forecast loss says what the sizing left out, not that the plan has no margin");
+  // the tariff: its source and date on the page, the time-of-use shape said to be illustrative
+  ok(/teaching tariffs set to EIA's 2025 U\.S\. commercial average, 13\.37¢\/kWh \(<a href="https:\/\/www\.eia\.gov\/electricity\/annual\/html\/epa_02_04\.html">Electric Power Annual, Table 2\.4<\/a>, accessed 3 Nov 2026\); the time-of-use pattern is illustrative/.test(PAGE) &&
+    cfg.sources["eia-epa-2-4"].url === "https://www.eia.gov/electricity/annual/html/epa_02_04.html" && /3 Nov 2026/.test(cfg.sources["eia-epa-2-4"].asOf) && !/the utility's time-of-use/.test(JS + PAGE), "the tariff's source and date on the page; the time-of-use tariff illustrative, not a utility's");
+  // first uses: the time-of-use tariff (step 5), the optimality gap (step 3), the capital recovery factor (the formulation)
+  ok(/a \[\[time-of-use-tariff\|time-of-use tariff\]\] \(illustrative\)/.test(JS) && /\[\[optimality-gap\|gap\]\], how far the plan found could still be from the cheapest/.test(JS) && /\[capital recovery factor\]\{\.lx-term term="capital-recovery-factor"\}/.test(PAGE) && /repaid in equal yearly payments over its life, with interest/.test(PAGE),
+    "terms explained at first use: the time-of-use tariff, the optimality gap, annualized capital before its factor");
+  ok(/<table class="lx-facts m5-ties">/.test(PAGE) && !/unserved kWh weigh 1,000, 10 and 1 by priority; 0\.5% more/.test(PAGE), "the check's tie weights as a small table, one weight a row");
+  ok(/for the larger plans checked in the <a href="sb1-microgrid-workbench\.html">Workbench<\/a>, full-year grid bills came out about 4% to 7% higher/.test(PAGE) && !/up to 7%/.test(PAGE + fs.readFileSync(X.L("components/engine-e1.js"), "utf8")), "the 12-day bill against a full year: the four plans checked (4% to 7%), not a bound");
+  ok(/did\.check === did\.drawn\) api\.done\(\)/.test(JS) && /both\("check"\)/.test(JS) && /both\("drawn"\)/.test(JS) && !/api\.done\(\); api\.saw\(o\.must > 0\.5/.test(JS), "step 6 completes only when the storm check and the ten drawn outages both ran on the plan shown");
+  ok(/the grid's CO2 factor is EIA's U\.S\. average for 2023, and the diesel CO2 coefficient comes from EIA's release of 18 September 2024/.test(cfg.dataset.status) && /2023/.test(cfg.grid.co2Note) && /18 Sep 2024/.test(cfg.sources["eia-co2"].asOf), "the data's metadata gives each CO2 factor its own vintage (2023 grid, 2024 diesel release)");
   ok(M.planKey(plan) !== M.planKey(Object.assign({}, plan, { pv: plan.pv + 25 })) && /S0\.roll\[k\]\.plan !== pk\) delete S0\.roll\[k\]/.test(JS) && /x && x\.plan === pk/.test(JS) && /var plan = function \(\) \{ var c = currentPlan\(\)/.test(JS), "forecast rows are kept per plan and never compared across plans; step 7 runs step 6's plan");
   ["\\Delta t = 1", "q_{m,-1} = q_{m,23}", "q_{-1} = B", "o_t \\le L^{\\text{other}}", "s_t \\le \\sigma_t S", "c_t, d_t \\le B/4", "0 \\le S \\le 4{,}000", "$F$ is not sized", "\\$/kWh (EIA's ¢ ÷ 100)", "::: {.lx-scroll-x .m5-symbols}"].forEach(f => ok(PAGE.indexOf(f) >= 0, "the formulation states " + f + ""));
-  ok(/rounded up from the sizing's/.test(JS) && /"Rounded plan"/.test(JS) && /"Its annual cost", money\(R\.total\)/.test(JS), "step 6 names the rounded plan and its own annual cost");
+  ok(/rounded up to the bench's steps \(25 kW, 50 kWh\) from the sizing's/.test(JS) && /"Rounded plan"/.test(JS) && /"Its annual cost", money\(R\.total\)/.test(JS), "step 6 names the rounded plan and its own annual cost");
   ok(T.indexOf("the extra equipment-and-grid cost of carrying the hospital") >= 0 && T.indexOf("what carrying the hospital costs") < 0 && T.indexOf("Storm diesel and refilling the tank, in the annual cost") >= 0, "the storm's cost is equipment and grid only, said so");
   ok(T.indexOf("Real:") < 0 && T.indexOf("illustrative campus output per kW of panels: SPP's observed 2025 hourly shape") >= 0 && T.indexOf("an assumed grid outage") >= 0, "solar as a teaching profile; the storm an assumed outage");
   ok(!/linprog/.test(PAGE) && !/linprog/.test(fs.readFileSync(path.join(X.SITE, "learn/path.yml"), "utf8")) && T.indexOf("The rolling horizon's totals are printed beside the browser's, with each real hour's physics asserted.") >= 0, "the notebook's claims: milp only; what is asserted and what is printed");
@@ -140,6 +153,10 @@ const APPROVED_SNAPSHOT = {
 
   // ---------------- the notebook
   const NB = fs.existsSync(NBPATH) ? fs.readFileSync(NBPATH, "utf8") : "";
+  { const src = JSON.parse(NB || '{"cells":[]}').cells.filter(c => c.cell_type === "code").map(c => c.source.join("")).join("\n");
+    const uses = (src.match(/\.solve\(/g) || []).length, guarded = (src.match(/checked\([^\n]*\.solve\(/g) || []).length;
+    ok(/def checked\(r, what, provisional=False\)/.test(src) && uses === guarded && uses >= 8 && /provisional=True/.test(src) && !/assert r\["ok"\], r\["status"\]/.test(src),
+      "the notebook checks every solve's status before it uses the result (" + guarded + " of " + uses + " solves; a re-plan that is feasible but unproven is used and called provisional)"); }
   ok(NB.length > 0, "the notebook exists");
   if (NB) {
     const src = JSON.parse(NB).cells.map(c => c.source.join("")).join("\n");

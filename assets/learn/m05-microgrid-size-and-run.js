@@ -42,11 +42,12 @@
     if (!others.length) return "With a perfect forecast the plan carries the must-stay-on loads for the whole storm. Now try a real forecast.";
     var worst = others.reduce(function (a, b) { return a.totals.must >= b.totals.must ? a : b; });
     return worst.totals.must > p.totals.must + 0.5
-      ? "With this controller, forecast error costs this plan " + kilo(worst.totals.must - p.totals.must) + " kWh of must-stay-on load with “" + worst.label.toLowerCase() + "”: sized with perfect foresight, it has no margin."
+      ? "With this controller, forecast error costs this plan " + kilo(worst.totals.must - p.totals.must) + " kWh of must-stay-on load with “" + worst.label.toLowerCase() + "”: its sizing did not require protection against these forecast errors."
       : "With this controller, these forecasts leave the must-stay-on loads as well served as the perfect one; the cost shows in the other loads.";
   }
-  // the controller's rule for each real hour (engine E1's realTime), as the page states it
-  var CONTROLLER = ["All the sun goes in first, then the planned sets' output.",
+  // the controller's rule for each real hour (engine E1's realTime), as the page states it: a teaching controller
+  var CONTROLLER = ["Between re-plans, the sets follow the plan's on/off schedule: only a running set's output can change.",
+    "All the sun goes in first, then the planned sets' output.",
     "Short: the battery, then the sets up to full, then loads are shed: shed-first loads first, must-stay-on loads last.",
     "Spare: shed must-stay-on loads come back first, then the sets go down to their minimum, the battery charges, the other loads come back, and only then is solar curtailed."];
   var page = { BASE: BASE, caseKey: caseKey, caseLabel: caseLabel, planOf: planOf, caseWords: caseWords, sizedWords: sizedWords, planKey: planKey, rollWords: rollWords, CONTROLLER: CONTROLLER, money: money, kilo: kilo };
@@ -166,8 +167,8 @@
               var z = R.sized.exact; S0.sized[caseKey({ exp: 2000, tar: "flat", storm: true })] = { c: { exp: 2000, tar: "flat", storm: true }, sized: R.sized };
               kp.innerHTML = ""; kpi(kp, "Solar", kilo(z.pv) + " kW"); kpi(kp, "Battery", kilo(z.bat) + " kWh"); kpi(kp, "Generator sets", String(z.gen)); kpi(kp, "Annual cost", money(R.sized.total));
               kpi(kp, "Optimality gap", ((r.mipGap || 0) * 100).toFixed(2) + "%", r.ok ? "" : "bad"); kpi(kp, "Duals returned", "none", "warn");
-              if (!r.ok) { api.saw("Not proven: the run stopped at its time limit with the plan above, the best found so far (gap " + ((r.mipGap || 0) * 100).toFixed(2) + "%). Try again gives HiGHS more time.", true); return; }
-              api.done(); api.saw("Optimal: " + kilo(z.pv) + " kW of solar, " + kilo(z.bat) + " kWh of battery and " + z.gen + " sets, " + money(R.sized.total) + " a year (2025 dollars, illustrative). HiGHS returns no duals for a mixed-integer program, so there are no [[shadow-price|prices]] to read.");
+              if (!r.ok) { api.saw("Not proven: the run stopped at its time limit with the plan above, the best found so far. Its [[optimality-gap|gap]], " + ((r.mipGap || 0) * 100).toFixed(2) + "%, is how far it could still be from the cheapest plan. Try again gives HiGHS more time.", true); return; }
+              api.done(); api.saw("Optimal: " + kilo(z.pv) + " kW of solar, " + kilo(z.bat) + " kWh of battery and " + z.gen + " sets, " + money(R.sized.total) + " a year (2025 dollars, illustrative). The [[optimality-gap|gap]], how far the plan found could still be from the cheapest, is closed. HiGHS returns no duals for a mixed-integer program, so there are no [[shadow-price|prices]] to read.");
             } });
           act.appendChild(kp); act.appendChild(res);
           if (S0.sized[caseKey({ exp: 2000, tar: "flat", storm: true })]) api.done();
@@ -211,7 +212,7 @@
           else { view.draw(T); kpis(); controls(); var v0 = E1.bb.verdict(T); if (v0 && v0.proven) api.done(); }
         } },
       // 5 the feeder's limit, the tariff and no storm
-      { text: "Now add the host feeder's export limit and the utility's time-of-use tariff, one at a time, and size again. Then size without the storm to see what carrying the hospital costs.",
+      { text: "Now add the host feeder's export limit and a [[time-of-use-tariff|time-of-use tariff]] (illustrative), one at a time, and size again. Then size without the storm to see what carrying the hospital costs.",
         build: function (act, api) {
           var c = S0.last5 || { exp: 2000, tar: "flat", storm: true };
           var tg = H("div", { class: "lx-toggles", role: "group", "aria-label": "The case to size" }, act);
@@ -245,11 +246,13 @@
           H("p", { class: "lx-hint", text: "Do at least: the cap, then time-of-use, then time-of-use without the storm." }, act);
         } },
       // 6 the check, hour by hour, then ten drawn outages
-      { text: "The sizing left out the sets' 30% minimum. Check the last plan you sized for the storm, rounded up to the bench's steps (25 kW, 50 kWh), hour by hour, with whole sets that run at 30% or more.",
+      { text: "The sizing left out the sets' 30% minimum. Check your storm plan hour by hour with whole sets that run at 30% or more, then test it on ten drawn outages.",
         build: function (act, api) {
-          var plan = currentPlan, ex = exactOf();
+          var plan = currentPlan, ex = exactOf(), did = {};
+          // both runs, on the plan shown, complete the step (the storm check, then the ten drawn outages)
+          function both(k) { did[k] = planKey(plan()); if (did.check === did.drawn) api.done(); }
           // the rounding, said before the check: the exact sizes, and the plan the check runs
-          H("p", { class: "m5-sub", text: "The check runs " + kilo(plan().pv) + " kW · " + kilo(plan().bat) + " kWh · " + plan().gen + " set" + (plan().gen === 1 ? "" : "s") + ", rounded up from the sizing's " + kilo(ex.pv) + " kW · " + kilo(ex.bat) + " kWh: more equipment, so a slightly higher annual cost." }, act);
+          H("p", { class: "m5-sub", text: "The check runs " + kilo(plan().pv) + " kW · " + kilo(plan().bat) + " kWh · " + plan().gen + " set" + (plan().gen === 1 ? "" : "s") + ", rounded up to the bench's steps (25 kW, 50 kWh) from the sizing's " + kilo(ex.pv) + " kW · " + kilo(ex.bat) + " kWh: more equipment, so a slightly higher annual cost." }, act);
           var res = H("div", null), kp = H("div", { class: "lx-readouts" });
           var run = LX.BenchRun(act, { label: "Run the storm hour by hour", busy: api.busy, results: [res, kp], partial: true, state: plan,
             solve: function (st, ctx) { return E1.solve(st, P, { task: "run", scenarios: [P.scen.jan3], signal: ctx.signal, attempt: ctx.attempt, solver: solver() }); },
@@ -257,7 +260,7 @@
               S0.check = { R: R, plan: st, key: planKey(st) }; var o = R.outages[0];
               kp.innerHTML = ""; kpi(kp, "Rounded plan", kilo(st.pv) + " kW · " + kilo(st.bat) + " kWh · " + st.gen + " set" + (st.gen === 1 ? "" : "s")); kpi(kp, "Its annual cost", money(R.total)); kpi(kp, "Must-stay-on unserved", kilo(o.must) + " kWh", o.must > 0.5 ? "bad" : "good"); kpi(kp, "Diesel", kilo(o.fuel) + " gal");
               res.innerHTML = ""; E1.HourChart(H("div", { class: "lx-xcard" }, res), P, R, o, {});
-              api.done(); api.saw(o.must > 0.5 ? "With whole sets and their minimum, the rounded plan leaves " + kilo(o.must) + " kWh of must-stay-on load unserved: the sizing's shortcut mattered." : "With whole sets and their 30% minimum the rounded plan still carries the must-stay-on loads for all 72 hours (" + kilo(o.fuel) + " gallons burned): the shortcut did not matter here.");
+              both("check"); api.saw(o.must > 0.5 ? "With whole sets and their minimum, the rounded plan leaves " + kilo(o.must) + " kWh of must-stay-on load unserved: the sizing's shortcut mattered." : "With whole sets and their 30% minimum the rounded plan still carries the must-stay-on loads for all 72 hours (" + kilo(o.fuel) + " gallons burned): the shortcut did not matter here.");
             } });
           act.appendChild(kp); act.appendChild(res);
           var r2 = H("div", null), sum = H("p", { class: "m5-sum", "aria-live": "polite" });
@@ -267,6 +270,7 @@
             render: function (R) {
               var ok = R.outages.filter(function (o) { return o.must < 0.5; }).length; r2.innerHTML = "";
               sum.textContent = "Must-stay-on loads fully served in " + ok + " of these " + R.outages.length + " drawn outages.";
+              both("drawn");
               var t = H("table", { class: "lx-facts" }, H("div", { class: "lx-scroll-x" }, r2)), hr = H("tr", null, H("thead", null, t));
               ["Outage", "Starts", "Hours", "Must stay on, unserved"].forEach(function (x) { H("th", { scope: "col", text: x }, hr); });
               var bd = H("tbody", null, t);
@@ -281,7 +285,7 @@
           var key = "perfect", F = P.cfg.forecasts;
           var sg = E1.ui.seg(act, "Forecast", F.map(function (f) { return f.key; }), F.reduce(function (o, f) { o[f.key] = f.label; return o; }, {}), key, function (v) { key = v; note.textContent = F.filter(function (f) { return f.key === v; })[0].note; });
           var note = H("p", { class: "lx-hint", text: F[0].note }, act);
-          H("p", { class: "m5-sub", html: "<b>The controller, each real hour</b> (the forecast losses below hold for this rule):" }, act);
+          H("p", { class: "m5-sub", html: "<b>The controller, each real hour</b> (a teaching rule; the forecast losses below hold for it):" }, act);
           var ctl = H("ol", { class: "m5-ctl" }, act); CONTROLLER.forEach(function (t) { H("li", { text: t }, ctl); });
           var tb = H("div", { class: "lx-scroll-x" }), prog = H("p", { class: "m5-prog", "aria-live": "polite" });
           // the plan steps 6 and 7 share: the last one sized for the storm (rounded), or the stored one; results of an
@@ -337,7 +341,7 @@
      ["Prove", "Branch and bound on the sets: the relaxation's bound, two children, the gap closed to 0%."],
      ["Check", "Whole sets that run at 30% or more, hour by hour: the rule the sizing left out."],
      ["Test", "Ten drawn winter outages the plan was not sized for."],
-     ["Operate", "Re-plan every 6 hours on a forecast, then run 6 real hours with a stated controller: perfect foresight is gone, and so may be the margin."]].forEach(function (s) { var li = H("li", null, ol); H("b", { text: s[0] }, li); H("span", { text: s[1] }, li); });
+     ["Operate", "Re-plan every 6 hours on a forecast, then run 6 real hours with a stated controller: perfect foresight is gone, and the sizing planned for none of its errors."]].forEach(function (s) { var li = H("li", null, ol); H("b", { text: s[0] }, li); H("span", { text: s[1] }, li); });
     LX.EquationCard(H("div", { class: "lx-xcard" }, x), { title: "The storm hour, as an equation", lede: "Tap a symbol: every storm hour of the sizing must meet this balance, with no grid.", label: "Storm-hour balance",
       rows: [{ parts: [{ k: "s" }, "+", { k: "d" }, "+", { k: "g" }, "=", { k: "c" }, "+", { k: "o" }, "+", { k: "L" }], say: "Solar used plus battery discharge plus the sets' output equals battery charge plus optional loads served plus the must-stay-on load.", tag: "every storm hour" },
         { parts: [{ k: "g" }, "≤", "200", { k: "N" }], say: "The sets' output is at most 200 kilowatts times the number of sets.", note: "N is a whole number: the one integer of the sizing" },
