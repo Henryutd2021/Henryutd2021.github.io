@@ -19,7 +19,7 @@
   "size": "<i>p<sub>g,t</sub></i> ≤ <i>P̄<sub>g</sub></i> &nbsp; ∀ <i>g</i> ∈ <i>G</i>, <i>t</i> ∈ <i>T</i>",
   "wx": "<i>p<sub>g,t</sub></i> ≤ <i>a<sub>g,t</sub></i> &nbsp; ∀ <i>g</i> ∈ {wind, solar}, <i>t</i> ∈ <i>T</i>",
   "ramp": "−<i>R</i> Δ<i>t</i> ≤ <i>p</i><sub>cc,<i>t</i></sub> − <i>p</i><sub>cc,<i>t</i>−1</sub> ≤ <i>R</i> Δ<i>t</i> &nbsp; ∀ <i>t</i> ∈ <i>T</i>",
-  "must": "<i>p</i><sub>nuc,<i>t</i></sub> = <i>P̄</i><sub>nuc</sub> &nbsp; ∀ <i>t</i> ∈ <i>T</i>"
+  "must": "<i>p</i><sub>nuc,<i>t</i></sub> = <i>P̄</i><sub>nuc</sub> &nbsp; ∀ <i>t</i> ∈ <i>T</i>; &nbsp; <i>p</i>, <i>u</i> ≥ 0"
  },
  "lineNames": {"par": "costs", "obj": "objective", "bal": "balance", "size": "sizes", "wx": "weather", "ramp": "ramp", "must": "nuclear runs flat"},
  "lineTags": {"par": "data", "obj": "goal", "bal": "(1)", "size": "(2)", "wx": "(3)", "ramp": "(4)", "must": "(5)"},
@@ -30,7 +30,7 @@
   "size": "In every hour, no plant makes more than its size.",
   "wx": "In every hour, the wind and solar farms make no more than the weather allows.",
   "ramp": "From one hour to the next, the combined-cycle plant's output moves by at most R, up or down; the first hour starts from its given output.",
-  "must": "In every hour, nuclear runs at its full size."
+  "must": "In every hour, nuclear runs at its full size; every output, and any unserved demand, is zero or more."
  },
  "legend": [["g ∈ G", "plant g belongs to the set of plants G"], ["t ∈ T", "hour t belongs to the set of hours T"], ["∀", "for all: one row for each member of the set"], ["Σ", "add up the term for each member of the set below it"]],
  "bugs": [
@@ -76,7 +76,7 @@
   },
   "bugs": {
    "vkwh": {"line": "par", "html": "<i>c</i> = (10, 0, 0, 40, 100) $/MWh for (nuc, wind, solar, cc, pk); <i>V</i> = 10 $/kWh"},
-   "flat": {"line": "must", "html": "<i>p</i><sub>nuc,<i>t</i></sub> ≤ <i>P̄</i><sub>nuc</sub> &nbsp; ∀ <i>t</i> ∈ <i>T</i>"},
+   "flat": {"line": "must", "html": "<i>p</i><sub>nuc,<i>t</i></sub> ≤ <i>P̄</i><sub>nuc</sub> &nbsp; ∀ <i>t</i> ∈ <i>T</i>; &nbsp; <i>p</i>, <i>u</i> ≥ 0"},
    "twice": {"line": "bal", "html": "Σ<sub><i>g</i>∈<i>G</i></sub> <i>p<sub>g,t</sub></i> + <i>p</i><sub>wind,<i>t</i></sub> + <i>u<sub>t</sub></i> = <i>d<sub>t</sub></i> &nbsp; ∀ <i>t</i> ∈ <i>T</i>"}
   },
   "units": ["MW", "MWh", "h", "$/MWh", "no unit"],

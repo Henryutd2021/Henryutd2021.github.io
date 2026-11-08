@@ -256,8 +256,8 @@
     return [
       { sym: "nuc, wind, solar, cc, pk", name: "the plants in G: nuclear, wind farm, solar farm, combined-cycle gas plant, peaker", unit: "", value: "" },
       { sym: "<i>g</i> ∈ <i>G</i>, <i>t</i> ∈ <i>T</i>", name: "read aloud: plant g belongs to the set of plants G; hour t belongs to the set of hours T", unit: "", value: "" },
-      { sym: "<i>p<sub>g,t</sub></i>", name: "output of plant g in hour t: a variable, chosen by the solver", unit: "MW", value: "chosen" },
-      { sym: "<i>u<sub>t</sub></i>", name: "demand left unserved in hour t: a variable, charged V a MWh", unit: "MW", value: "chosen" },
+      { sym: "<i>p<sub>g,t</sub></i>", name: "output of plant g in hour t, at least 0: a variable, chosen by the solver", unit: "MW", value: "chosen" },
+      { sym: "<i>u<sub>t</sub></i>", name: "demand left unserved in hour t, at least 0: a variable, charged V a MWh", unit: "MW", value: "chosen" },
       { sym: "<i>d<sub>t</sub></i>", name: "demand in hour t", unit: "MW", value: hrs(inst.d) },
       { sym: "<i>a</i><sub>wind,<i>t</i></sub>", name: "wind the weather allows", unit: "MW", value: hrs(inst.a.wind) },
       { sym: "<i>a</i><sub>solar,<i>t</i></sub>", name: "sun the weather allows", unit: "MW", value: hrs(inst.a.solar) },

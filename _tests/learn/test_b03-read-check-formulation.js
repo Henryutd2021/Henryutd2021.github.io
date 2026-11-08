@@ -212,6 +212,9 @@ const has = (s, msg) => ok(QMD.indexOf(s) >= 0, "page states " + (msg || JSON.st
     ok(/−<i>R<\/i> Δ<i>t<\/i> ≤ .* ≤ <i>R<\/i> Δ<i>t<\/i>/.test(J.lines.ramp) && between("<!-- b3-static-lines:start -->", "<!-- b3-static-lines:end -->") === staticLines(), "ramp line: R Δt, so every side is in MW (data, and the fallback's generated lines)");
     ok(LN.every(k => J.lineWords[k] && J.lineTags[k]) && JSON.stringify(LN.map(k => J.lineTags[k])) === JSON.stringify(["data", "goal", "(1)", "(2)", "(3)", "(4)", "(5)"]) && /views: o\.onPick \? \["symbols"\] : \["symbols", "words"\]/.test(JS) && /tag: J\.lineTags\[k\]/.test(JS),
       "every line has words and one tag, the same with and without JavaScript; the read-only lines offer a words view");
+    { const dom = /<i>p<\/i>, <i>u<\/i> ≥ 0$/, m = M.buildModel(inst, null);
+      ok(m.variables.every(v => v.lb === undefined || v.lb === 0) && dom.test(J.lines.must) && dom.test(J.practice.bugs.flat.html) && /zero or more/.test(J.lineWords.must) && /at least 0/.test(M.inputs(inst).find(r => r.sym === "<i>p<sub>g,t</sub></i>").name),
+        "the variables' domain, p, u ≥ 0, as the model's bounds have it: on the formulation's last line (both versions of it), in its words and in the key"); }
     ok(J.legend.some(x => x[0] === "g ∈ G" && /belongs to the set of plants/.test(x[1])) && M.inputs(inst).some(r => r.sym === "<i>p<sub>g,t</sub></i>" && r.value === "chosen") && M.inputs(inst).some(r => r.sym === "<i>u<sub>t</sub></i>" && r.value === "chosen"), "the key defines p(g,t) and u(t) and reads g ∈ G aloud");
     ok(/line \(5\), “nuclear runs flat”/.test(J.practice.items.g2.right) && /<span class="b3-tag">\(5\)<\/span> <i>p<\/i><sub>nuc,<i>t<\/i><\/sub> ≤/.test(staticPractice()) && !/<ol class="b3-static">/.test(QMD), "the static practice names line (5) by its tag and name, as its list shows it (no 1-to-7 numbering)");
     { const K = M.inputs(inst), s16 = K.find(r => /cc,16/.test(r.sym));

@@ -50,7 +50,10 @@
     "All the sun goes in first, then the planned sets' output.",
     "Short: the battery, then the sets up to full, then loads are shed: shed-first loads first, must-stay-on loads last.",
     "Spare: shed must-stay-on loads come back first, then the sets go down to their minimum, the battery charges, the other loads come back, and only then is solar curtailed."];
-  var page = { BASE: BASE, caseKey: caseKey, caseLabel: caseLabel, planOf: planOf, caseWords: caseWords, sizedWords: sizedWords, planKey: planKey, rollWords: rollWords, CONTROLLER: CONTROLLER, money: money, kilo: kilo };
+  // step 6 is complete when both its runs (the storm check, the drawn outages) solved the plan now shown: did holds the
+  // plan key each run solved, now the current plan's key
+  function sixDone(did, now) { return !!did.check && did.check === did.drawn && did.check === now; }
+  var page = { sixDone: sixDone, BASE: BASE, caseKey: caseKey, caseLabel: caseLabel, planOf: planOf, caseWords: caseWords, sizedWords: sizedWords, planKey: planKey, rollWords: rollWords, CONTROLLER: CONTROLLER, money: money, kilo: kilo };
   if (typeof module !== "undefined" && module.exports) module.exports = page;
   if (typeof window === "undefined" || !window.LX || !window.LX.E1) return;
 
@@ -249,8 +252,8 @@
       { text: "The sizing left out the sets' 30% minimum. Check your storm plan hour by hour with whole sets that run at 30% or more, then test it on ten drawn outages.",
         build: function (act, api) {
           var plan = currentPlan, ex = exactOf(), did = {};
-          // both runs, on the plan shown, complete the step (the storm check, then the ten drawn outages)
-          function both(k) { did[k] = planKey(plan()); if (did.check === did.drawn) api.done(); }
+          // both runs, each on the plan it solved (never a later one), complete the step for the plan shown
+          function both(k, st) { did[k] = planKey(st); if (sixDone(did, planKey(plan()))) api.done(); }
           // the rounding, said before the check: the exact sizes, and the plan the check runs
           H("p", { class: "m5-sub", text: "The check runs " + kilo(plan().pv) + " kW · " + kilo(plan().bat) + " kWh · " + plan().gen + " set" + (plan().gen === 1 ? "" : "s") + ", rounded up to the bench's steps (25 kW, 50 kWh) from the sizing's " + kilo(ex.pv) + " kW · " + kilo(ex.bat) + " kWh: more equipment, so a slightly higher annual cost." }, act);
           var res = H("div", null), kp = H("div", { class: "lx-readouts" });
@@ -260,17 +263,17 @@
               S0.check = { R: R, plan: st, key: planKey(st) }; var o = R.outages[0];
               kp.innerHTML = ""; kpi(kp, "Rounded plan", kilo(st.pv) + " kW · " + kilo(st.bat) + " kWh · " + st.gen + " set" + (st.gen === 1 ? "" : "s")); kpi(kp, "Its annual cost", money(R.total)); kpi(kp, "Must-stay-on unserved", kilo(o.must) + " kWh", o.must > 0.5 ? "bad" : "good"); kpi(kp, "Diesel", kilo(o.fuel) + " gal");
               res.innerHTML = ""; E1.HourChart(H("div", { class: "lx-xcard" }, res), P, R, o, {});
-              both("check"); api.saw(o.must > 0.5 ? "With whole sets and their minimum, the rounded plan leaves " + kilo(o.must) + " kWh of must-stay-on load unserved: the sizing's shortcut mattered." : "With whole sets and their 30% minimum the rounded plan still carries the must-stay-on loads for all 72 hours (" + kilo(o.fuel) + " gallons burned): the shortcut did not matter here.");
+              both("check", st); api.saw(o.must > 0.5 ? "With whole sets and their minimum, the rounded plan leaves " + kilo(o.must) + " kWh of must-stay-on load unserved: the sizing's shortcut mattered." : "With whole sets and their 30% minimum the rounded plan still carries the must-stay-on loads for all 72 hours (" + kilo(o.fuel) + " gallons burned): the shortcut did not matter here.");
             } });
           act.appendChild(kp); act.appendChild(res);
           var r2 = H("div", null), sum = H("p", { class: "m5-sum", "aria-live": "polite" });
           H("p", { class: "m5-sub", text: "Then the same plan on ten drawn winter outages (seed 7): a test, not a reliability figure." }, act);
           LX.BenchRun(act, { label: "Run the 10 drawn outages", busy: api.busy, results: [r2], partial: true, state: plan,
             solve: function (st, ctx) { return E1.solve(st, P, { task: "run", scenarios: P.seeded, signal: ctx.signal, attempt: ctx.attempt }); },
-            render: function (R) {
+            render: function (R, st) {
               var ok = R.outages.filter(function (o) { return o.must < 0.5; }).length; r2.innerHTML = "";
               sum.textContent = "Must-stay-on loads fully served in " + ok + " of these " + R.outages.length + " drawn outages.";
-              both("drawn");
+              both("drawn", st);
               var t = H("table", { class: "lx-facts" }, H("div", { class: "lx-scroll-x" }, r2)), hr = H("tr", null, H("thead", null, t));
               ["Outage", "Starts", "Hours", "Must stay on, unserved"].forEach(function (x) { H("th", { scope: "col", text: x }, hr); });
               var bd = H("tbody", null, t);

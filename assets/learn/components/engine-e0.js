@@ -535,7 +535,7 @@
         payback: cfP.payback, cash: cfP.rows, items: it, horizon: N, lcoh: lcoh, extraCapex: extra.reduce(function (a, x) { return a + x.capex; }, 0) };
       out.co2 = { avoided: T.co2Avoided };
       out.readouts = [
-        { key: "npv", label: "Net present value, " + N + " years", value: money(cfP.npv), note: "the whole plant, at " + num(s.rate, 1) + "% real; the line to the grid not costed" },
+        { key: "npv", label: "Net present value, " + N + " years", value: money(cfP.npv), note: "the whole plant, at " + num(s.rate, 1) + "% real; grid line not costed" },
         { key: "added", label: "What the extra equipment adds", value: money(cfP.npv - cfA.npv), note: "against the same wind farm alone (" + money(cfA.npv) + ")" },
         { key: "revenue", label: "Net revenue a year", value: money(T.revenue), note: "power " + money(T.sales) + (T.h2 > 0 ? ", hydrogen " + money(T.h2Rev) + ", less stack wear" : "") },
         { key: "spill", label: "Wind spilled", value: pct(T.spillShare, 1), note: "alone: " + pct(T.aloneSpillShare, 1) + "; the line is full " + num(T.lineHours || 0) + " h a year" + sched },
@@ -677,13 +677,13 @@
     if (!sens || !sens.rows || !sens.rows.length) return null;
     var rows = sens.rows.slice().sort(function (a, b) { return Math.abs(b.atHi - b.atLo) - Math.abs(a.atHi - a.atLo); });
     var parts = rows.map(function (r) { return r.label + " at " + r.loText + ": " + money(r.atLo) + "; at " + r.hiText + ": " + money(r.atHi); });
-    var NAME = { cost: "the equipment cost (stack wear)", xc: "the export credit", h2: "the hydrogen price", line: "the line limit" };
+    var NAME = { cost: "the equipment cost (stack wear)", xc: "the export credit", h2: "the hydrogen price", line: "the line limit" }, SHORT = { cost: "stack wear", xc: "export credit", h2: "hydrogen price", line: "line limit" };
     var rerun = rows.filter(function (r) { return r.rerun; }).map(function (r) { return NAME[r.key] || r.label.toLowerCase(); });
     var lim = rows.some(function (r) { return r.limit; });
     var held = "The equipment is held fixed." + (rerun.length ? " Re-run over 52 weeks and 31 December: " + joinAnd(rerun) + "." : "");
     return { line: "The NPV is " + money(sens.base) + " at this plan. " + parts.join(". ") + ". " + held + (lim ? " The line's cases change the connection limit; its cost is not counted." : ""),
       note: "Green: above your NPV; red: below. " + held, widest: rows[0], rows: rows,
-      held: "the equipment held fixed" + (rerun.length ? "; re-run over 52 weeks and 31 December: " + joinAnd(rerun) : "") + (lim ? "; the line's cases change its limit, its cost not counted" : "") };
+      held: "the equipment held fixed" + (rerun.length ? "; re-run hour by hour: " + joinAnd(rows.filter(function (r) { return r.rerun; }).map(function (r) { return SHORT[r.key] || r.label.toLowerCase(); })) : "") };
   }
   // the same, as a one-page note's sensitivity (LX.ReportNote: one table row per case, then one short line)
   function sensNote(s, sens) {
@@ -735,7 +735,7 @@
           : "The wind follows SPP's 2025 hourly pattern, reshaped month by month to EIA's 2025 capacity factors (" + pct(res.cf.wind, 1) + " for the year); the prices are illustrative.",
         home ? "CO₂ counts operating emissions only: bought power at Kansas's 2024 average factor, and gas burned; power sent back is a separate credit."
           : "CO₂ avoided is a potential saving: it assumes each kg of hydrogen replaces one made from natural gas.",
-        home ? null : "The line to the grid is an assumed available connection limit: building or upgrading it is not costed.",
+        home ? null : "The grid line is an assumed limit; building or upgrading it is not costed.",
         "Equipment costs are " + s.cost + "% of the sourced values, with no tax credits or incentives."].filter(Boolean),
       sensitivity: null,
       limits: [

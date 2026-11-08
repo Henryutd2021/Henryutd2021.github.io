@@ -180,14 +180,11 @@ ASSUMPTIONS
 - Equipment costs are 100% of the sourced values, with no tax credits or incentives.
 
 SENSITIVITY
-- Equipment cost at 75% of sourced: −$10,237
-- Equipment cost at 125% of sourced: −$25,389
-- Export credit at 0.0¢/kWh: −$20,909
-- Export credit at 8.0¢/kWh: −$14,717
-- Discount rate (real) at 2.0%: −$15,162
-- Discount rate (real) at 7.0%: −$20,510
+- Equipment cost: −$10,237 at 75% of sourced; −$25,389 at 125% of sourced
+- Export credit: −$20,909 at 0.0¢/kWh; −$14,717 at 8.0¢/kWh
+- Discount rate (real): −$15,162 at 2.0%; −$20,510 at 7.0%
 
-NPV −$17,813 at this plan; each case above moves one input to its low or high value, the equipment held fixed; re-run over 52 weeks and 31 December: the export credit.
+NPV −$17,813 at this plan; each row moves one input, the equipment held fixed; re-run hour by hour: export credit.
 
 WHAT THE SITE CANNOT DO ALONE
 The home still needs the grid in 5,240 hours a year, every night.
