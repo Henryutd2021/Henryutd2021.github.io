@@ -72,7 +72,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 .lx6-whyp b { color: var(--lx-ink); }
 .lx-step-act details.lx-textalt { margin: 0; }
 @media (max-width: 640px) {
-  #t6-explain .lx-ctable td small { display: none; }
+  #t6-explain .lx-ctable td small { display: block; white-space: normal; }
   .lx6-jobs { grid-template-columns: minmax(0, 1fr); }
 }
 </style>
@@ -87,15 +87,37 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <thead><tr><th scope="col">Job</th><th scope="col">The question</th><th scope="col">Does it well</th></tr></thead>
 <tbody>
 <tr><td>Cheap energy</td><td>Many MWh a year at a low running cost?</td><td>Wind, solar, nuclear, hydro, geothermal</td></tr>
-<tr><td>Firm capacity</td><td>There in the riskiest hours, whatever the weather?</td><td>Nuclear, gas plants, geothermal, demand response</td></tr>
+<tr><td>Firm capacity</td><td>Can the grid count on it in the riskiest hours?</td><td>Nuclear, gas plants, geothermal, demand response</td></tr>
 <tr><td>Flexibility</td><td>Up or down quickly on request?</td><td>Gas peakers, batteries, reservoir hydro</td></tr>
 </tbody>
 </table>
+<details class="lx-textalt"><summary>The nine technologies: two numbers each</summary>
+<div class="lx-scroll-x"><table class="lx-mini-table lx6-fbtech">
+<thead><tr><th scope="col">Technology</th><th scope="col">Capacity factor, U.S. 2025</th><th scope="col">Firm share, PJM 2028/29</th></tr></thead>
+<tbody>
+<tr><td>Nuclear</td><td>91.1%</td><td>96%</td></tr>
+<tr><td>Gas combined-cycle</td><td>58.7%</td><td>78%</td></tr>
+<tr><td>Gas peaker</td><td>13.6%</td><td>67% (79% with a second fuel)</td></tr>
+<tr><td>Wind</td><td>33.8%</td><td>34% onshore, 60% offshore</td></tr>
+<tr><td>Solar</td><td>24.0%</td><td>7% fixed, 10% tracking</td></tr>
+<tr><td>Battery</td><td>none: stores energy</td><td>59% for 4 hours</td></tr>
+<tr><td>Hydro</td><td>34.4%</td><td>35% for river plants</td></tr>
+<tr><td>Geothermal</td><td>65.9%</td><td>not rated</td></tr>
+<tr><td>Demand response</td><td>none: trims use</td><td>91%</td></tr>
+</tbody>
+</table></div>
+</details>
+<details class="lx-textalt"><summary>Contested: can wind plus storage do the firm job?</summary>
+<ul>
+<li><b>For:</b> longer storage is rated higher (59% for a 4-hour battery, 71% for 8 hours, 78% for 10), and steadier offshore wind gets 60% against 34% onshore.</li>
+<li><b>Against:</b> the Southwest Power Pool's whole wind fleet stayed below a quarter of its best 2025 hour for 67 hours in a row, from 30 August to 1 September (EIA-930).</li>
+</ul>
+</details>
 <p class="lx-hint">With JavaScript on, you work through this step by step: nine technology cards, a chart of two numbers, a sort and a contested question.</p>
 </div>
 </div>
 <p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Capacity factors:</b> U.S. 2025 averages, average output ÷ size, from EIA's Electric Power Monthly, Tables <a href="https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_a">6.07.A</a> and <a href="https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_b">6.07.B</a> (released 23 October 2026).</span></p>
-<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Firm shares:</b> PJM's <a href="https://www.pjm.com/-/media/DotCom/planning/res-adeq/elcc/28-29-bra-elcc-class-ratings.pdf">ELCC class ratings for the 2028/2029 auction</a>, one market and one auction. They rate technology classes; a single plant's accredited MW can differ.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Firm shares:</b> PJM's <a href="https://www.pjm.com/-/media/DotCom/planning/res-adeq/elcc/28-29-bra-elcc-class-ratings.pdf">ELCC class ratings for the 2028/2029 auction</a>, one market and one auction: planning ratings for technology classes, not output promised in any hour. A single plant can be credited differently.</span></p>
 <p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Also:</b> battery round trip, <a href="https://www.eia.gov/todayinenergy/detail.php?id=46756">EIA</a> (2019 data); demand response, <a href="https://www.ferc.gov/sites/default/files/2025-12/25_Annual%20Assessment%20of%20Demand%20Response_1212.pdf">FERC</a> (2024 data).</span></p>
 ```
 :::
@@ -110,9 +132,9 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-fallback">
 <dl class="lx-ideas">
 <dt>Cheap energy</dt><dd>Fill the year with many MWh at a low running cost; capacity factor measures the MWh per MW, running cost (lesson 7) the rest.</dd>
-<dt>Firm capacity</dt><dd>Be there in the riskiest hours; firm share measures it.</dd>
+<dt>Firm capacity</dt><dd>Be there in the riskiest hours; firm share rates it, as planning credit rather than a promise for any hour.</dd>
 <dt>Flexibility</dt><dd>Change output quickly on request; <span class="lx-term" data-term="ramp-rate">ramp rate</span> and start-up time measure it.</dd>
-<dt>Two different numbers</dt><dd>Gas peakers averaged 13.6% of their size in 2025, yet PJM counts 67% of their MW at the peak; solar averaged 24.0% but counts 7%.</dd>
+<dt>Two different numbers</dt><dd>Gas peakers averaged 13.6% of their size in 2025, yet PJM credits 67% of their MW toward reliability; solar averaged 24.0% but is credited 7%.</dd>
 <dt>No single winner</dt><dd>No technology does all three jobs best, so grids combine them.</dd>
 </dl>
 </div>
@@ -153,7 +175,7 @@ A planning model turns the three jobs into rules. In words:
 - **Rule 2, firm capacity.** The firm MW add up to the year's peak demand plus a safety margin.
 - **Rule 3, flexibility.** No plant changes its output faster than its ramp limit.
 
-Rule 2 in symbols, with $C_g$ the MW of technology $g$, $f_g$ its firm share and $m$ the margin (for example 0.15):
+Rule 2 in symbols: $C_g$ is the MW of technology $g$, $f_g$ its firm share, $\sum_g$ adds over every technology, $D_\text{peak}$ is the year's peak demand and $m$ the safety margin (an illustrative planning choice, for example 0.15):
 
 $$
 \textstyle\sum_g f_g\, C_g \;\ge\; (1 + m)\, D_\text{peak}
@@ -187,9 +209,9 @@ $$
 ```{=html}
 <div class="lx-myths" data-quiz="t6-myth">
 <div class="lx-qq" data-id="cfirm" data-answer="myth">
-<p class="lx-qtext">Myth or fact? “A plant's capacity factor tells you how much it counts at the peak.”</p>
+<p class="lx-qtext">Myth or fact? “A plant's capacity factor tells you how much it counts toward the grid's reliability needs.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. Solar's capacity factor was 24.0% in 2025, but PJM counts 7% of its MW at the peak; gas peakers averaged 13.6% but count 67%.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. Solar's capacity factor was 24.0% in 2025, but PJM credits 7% of its MW toward reliability; gas peakers averaged 13.6% but are credited 67%.</p></details>
 </div>
 <div class="lx-qq" data-id="battery" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “A battery is a source of energy.”</p>
@@ -205,9 +227,9 @@ $$
 
 <div class="lx-quiz" data-quiz="t6">
 <div class="lx-qq" data-id="measure" data-answer="b">
-<p class="lx-qtext">Which number tells you most about a plant's <span class="lx-term" data-term="firm-capacity">firm capacity</span>?</p>
-<ul class="lx-choices"><li data-value="a">Its capacity factor</li><li data-value="b">Its firm share at the riskiest hours</li><li data-value="c">Its size in MW</li><li data-value="d">Its running cost</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Its firm share: the part of its MW a grid can count on in the riskiest hours. Size alone overstates it; capacity factor measures energy per MW.</p></details>
+<p class="lx-qtext">Two plants have the same size in MW. Which number tells you which one a grid credits with more <span class="lx-term" data-term="firm-capacity">firm capacity</span>?</p>
+<ul class="lx-choices"><li data-value="a">Its capacity factor</li><li data-value="b">Its firm share</li><li data-value="c">Its start-up time</li><li data-value="d">Its running cost</li></ul>
+<details class="lx-answer"><summary>Answer</summary><p>Its firm share: at equal size, the higher share means more MW credited. For plants of different sizes, compare size × firm share.</p></details>
 </div>
 <div class="lx-qq" data-id="flexjob" data-answer="c">
 <p class="lx-qtext">Which job does a 4-hour battery do best?</p>
@@ -232,7 +254,7 @@ $$
 <tbody>
 <tr><td class="n">58.7%</td><td>Average capacity factor of U.S. gas combined-cycle plants in 2025.</td><td class="s"><a href="https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_a">EIA, Electric Power Monthly, Table 6.07.A</a> · 2025 data (final), released October 2026</td></tr>
 <tr><td class="n">13.6%</td><td>Average capacity factor of U.S. gas turbines (peakers) in 2025.</td><td class="s"><a href="https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_a">EIA, Electric Power Monthly, Table 6.07.A</a> · 2025 data (final), released October 2026</td></tr>
-<tr><td class="n">7%</td><td>PJM's class rating for fixed-tilt solar: the share of its MW counted toward peak needs (gas peaker 67%, 4-hour battery 59%).</td><td class="s"><a href="https://www.pjm.com/-/media/DotCom/planning/res-adeq/elcc/28-29-bra-elcc-class-ratings.pdf">PJM, ELCC Class Ratings for the 2028/2029 Base Residual Auction</a> · read November 2026</td></tr>
+<tr><td class="n">7%</td><td>PJM's class rating for fixed-tilt solar: the share of its MW credited toward reliability needs (gas peaker 67%, 4-hour battery 59%).</td><td class="s"><a href="https://www.pjm.com/-/media/DotCom/planning/res-adeq/elcc/28-29-bra-elcc-class-ratings.pdf">PJM, ELCC Class Ratings for the 2028/2029 Base Residual Auction</a> · read November 2026</td></tr>
 <tr><td class="n">82%</td><td>Share of stored electricity the U.S. battery fleet gave back.</td><td class="s"><a href="https://www.eia.gov/todayinenergy/detail.php?id=46756">EIA, Today in Energy</a> · data for 2019</td></tr>
 <tr><td class="n">33,272 MW</td><td>Demand response enrolled in the seven U.S. wholesale markets, about 6.5% of their peak demand.</td><td class="s"><a href="https://www.ferc.gov/sites/default/files/2025-12/25_Annual%20Assessment%20of%20Demand%20Response_1212.pdf">FERC staff, 2025 Assessment of Demand Response</a> · data for 2024</td></tr>
 </tbody>
@@ -254,7 +276,7 @@ $$
 ```{=html}
 <div class="lx-card lx-real">
 <p class="lx-eyebrow">In the real world</p>
-<p>Regions reward these services differently: through energy prices, capacity payments or planning requirements, and payments for reserves and fast response. Which technology wins each depends on the region's rules and weather.</p>
+<p>Regions reward these services differently: through energy prices, <span class="lx-term" data-term="capacity-market">capacity payments</span> or planning requirements, and payments for <span class="lx-term" data-term="reserves">reserves</span> and fast response. Which technology wins each depends on the region's rules and weather.</p>
 </div>
 <div class="lx-card lx-sources">
 <p class="lx-eyebrow">Sources and further reading</p>

@@ -8,6 +8,9 @@
 //   - the tie step's positive cost range ties along the same edge for every equal cost, and only for equal costs;
 //     a cost line parallel to an edge without a tie (cx 40, cy 0) is a unique corner
 //   - the fixed-output plant's constant cost ($1,000 an hour) and the hour's total stated on the page
+//   - what the one-hour sketch leaves out: at the default cap every plan in the region could be dispatched (no more than
+//     the 86 MW of wind and sun spilled), at the loosest cap some could not, so the stage says so beside the graph
+//   - the words for a tie (an edge, or a ray when a size rule is off) and the broken-rule count
 //   - the simplex walk (LX.lp2.simplexWalk on the hour's model) goes downhill corner by corner and ends at the best corner
 //   - the card sort's answer key (LX.CardSort.grade); the page's numbers, the one-line formulation in the Modeler box,
 //     its forward links, the corner rule's qualification and the fallback figure
@@ -73,8 +76,11 @@ const rnd = () => { seed = (seed * 1103515245 + 12345) % 2147483648; return seed
 
   // ---------------- the steps' outcomes
   const s200 = M.solve2(M.params(town, day, D, { D: 200 }));
-  ok(s200.status === "optimal" && near(s200.x, 150) && near(s200.y, 50) && near(s200.cost, 11000), `demand 200: the corner jumps to (150, 50), $11,000 (${s200.x}, ${s200.y}, ${s200.cost})`);
+  ok(s200.status === "optimal" && near(s200.x, 150) && near(s200.y, 50) && near(s200.cost, 11000), `demand 200: the best corner is (150, 50), $11,000 (${s200.x}, ${s200.y}, ${s200.cost})`);
   ok(M.solve2(M.params(town, day, D, { D: 150 })).y === 0 && M.solve2(M.params(town, day, D, { D: 155 })).y > 0, "demand: the peaker enters just above 150 MW");
+  // the best plan moves continuously as demand rises; it turns (from along the x-axis to straight up) at the cc's size
+  const at = d => M.solve2(M.params(town, day, D, { D: d }));
+  ok(near(at(150).x, 150) && near(at(150).y, 0) && near(at(150.001).x, 150) && near(at(150.001).y, 0.001, 1e-9) && near(at(140).y, 0) && near(at(140).x, 140), "demand: the best plan turns at 150 MW, it does not jump (150 -> (150, 0); 150.001 -> (150, 0.001))");
   const minCO2 = f.cc.co2 * 145;
   ok(M.solve2(M.params(town, day, D, { cap: Math.ceil(minCO2) })).status === "optimal" && !M.solve2(M.params(town, day, D, { cap: Math.ceil(minCO2) })).binding.co2, "cap 54 t: still feasible and slack");
   ok(M.solve2(M.params(town, day, D, { cap: minCO2 })).binding.co2, "cap 53.65 t: binding at the best corner");
@@ -122,6 +128,25 @@ const rnd = () => { seed = (seed * 1103515245 + 12345) % 2147483648; return seed
   ok(/say: "Ramp limit, every hour: [^"]*" \+ f\.cc\.ramp \+ " MW, up or down\. In the hour before midnight it ran at " \+ c0 \+ " MW\."/.test(SRC),
      "explain: the ramp row's spoken text (text version) gives the starting value");
   const lv = D.level0; ok(lv > s.cost && lv <= D.ranges.level[1], "cost line starts above the best cost");
+  // the one-hour sketch leaves out the spill limit: x + y can exceed the gas need by at most the wind and sun there is
+  const spillMax = day.wind[h] + day.solar[h], over = q => Math.max(...M.solve2(q).corners.map(v => v.x + v.y - q.D));
+  ok(over(p) <= spillMax + 1e-9, `sketch: at the default cap every plan in the region spills at most ${spillMax} MW (largest ${over(p).toFixed(1)} MW)`);
+  const loose = M.params(town, day, D, { cap: D.ranges.cap[1] });
+  ok(over(loose) > spillMax && M.check(loose, { x: 150, y: 100 }).ok, `sketch: at the loosest cap (${D.ranges.cap[1]} t) the region holds plans that would spill more than ${spillMax} MW (x 150, y 100 spills ${250 - p.D} MW)`);
+  ok(/"A one-hour sketch, CO₂ in t \(metric tonnes, 1,000 kg\)\. It leaves out the ramp limit, and that at most " \+ \(day\.wind\[h\] \+ day\.solar\[h\]\) \+ " MW of wind and sun can be spilled\."/.test(SRC),
+     "sketch: the stage names the tonne and says what the one-hour sketch leaves out, with the spill limit from the day");
+  // the words for a tie: an edge between corners, or a ray (step 7 with a free combined-cycle and no size rule or cap)
+  const f1 = v => String(Math.round(v * 10) / 10 + 0), rayTie = M.solve2(M.params(town, day, D, { cx: 0, on: { cc: false, co2: false } }));
+  ok(rayTie.status === "tied" && rayTie.best.length === 1 && rayTie.ray && rayTie.ray[0] === 1 && rayTie.ray[1] === 0, "tie: a free combined-cycle with no size rule or cap ties along a ray");
+  ok(M.tieText(rayTie, f1, money) === "Every plan with combined-cycle output at least 145 MW and peaker output 0 MW ties for best at $0.", `tie: the ray tie in words (${M.tieText(rayTie, f1, money)})`);
+  ok(M.tieText(tie, f1, money) === "Every plan on the edge from (145, 0) to (45, 100) ties for best at $5,800.", `tie: the edge tie in words (${M.tieText(tie, f1, money)})`);
+  ok(/t \+= tieText\(s, fmt1, usd\)/.test(SRC) && /tieText\(sTie, fmt1, usd\)/.test(SRC) && !/[Aa]ny split|every split/.test(SRC), "tie: the chart's text version and the flowchart use these words; no 'any split'");
+  // the broken-rule readout counts the rules
+  ok(M.brokenText(M.check(p, { x: 200, y: 150 })) === "3 broken" && M.brokenText(M.check(p, { x: 100, y: 0 })) === "1 broken" && M.brokenText(M.check(p, { x: 100, y: 100 })) === "all met", "readout: (200, 150) breaks 3 rules, (100, 0) one, (100, 100) none");
+  ok(/chip\("Rules", brokenText\(c\)/.test(SRC) && !/one broken/.test(SRC), "readout: the Rules chip shows the count");
+  // wording: the corner turns (no jump); the outcomes are mathematical, and a solver can stop early
+  ok(!/corner jump|corner jumped|watch the best corner jump/.test(SRC) && /the best corner turns upward/.test(SRC), "wording: the best corner turns at the combined-cycle's size; it does not jump");
+  ok(!/Every solver run ends/.test(SRC) && /a solver can also stop early, before it knows which/.test(SRC), "wording: four outcomes of a linear program; a solver can also stop early");
   ok(M.check(p, { x: D.dot[0], y: D.dot[1] }).ok === false, "the plan dot starts outside the region (so the reader moves it in)");
 
   // ---------------- simplex walk
@@ -152,6 +177,7 @@ const rnd = () => { seed = (seed * 1103515245 + 12345) % 2147483648; return seed
     const fixH = M.fixedCost(town, 1);
     ok(Q.includes(`constant \\${money(fixH)} for the hour`) && Q.includes(`costs \\${money(s.cost + fixH)} in all`) && Q.includes(`constant ${money(fixH)} makes ${money(s.cost + fixH)} in all`), `page: gas cost ${money(s.cost)} plus the fixed-output plant's ${money(fixH)} is ${money(s.cost + fixH)}`);
     ok(Q.includes("for this two-plant model") && Q.includes("When this lesson's two-plant model has a best plan"), "page: the corner rule is stated for this model, in the box and the quiz");
+    ok(!/any split/i.test(Q) && Q.includes("Every plan on the straight segment between them also meets every rule") && Q.includes("A solver can also stop early, before it knows which."), "page: a tie needs every plan to meet the rules; a solver can stop before it knows the outcome");
     ok(!/learning[- ]curve|FOAK|NOAK/i.test(Q), "page: no excluded terms");
   } else ok(false, "page: learn/10-write-it-down.qmd missing");
 

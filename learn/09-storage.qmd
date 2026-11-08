@@ -96,9 +96,10 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-deeper-body">
 ```
 
-- **Break-even.** A MWh stored at price $p_\text{in}$ comes back as 0.8 MWh, so it pays only if the selling price beats $p_\text{in}/0.8$: buy at \$40, sell above \$50.
+- **Break-even.** Buying 1 MWh for charging at $p_\text{in}$ lets this battery sell 0.8 MWh later. Other costs aside, it pays only if the selling price beats $p_\text{in}/0.8$: buy at \$40, sell above \$50.
 - **Spilled sun.** It costs \$0, so storing it always passes that test.
-- **One more MWh.** Each hour's [price]{.lx-term term="marginal-cost"} is the cost of one more MWh. A 25 MW battery is more than that: at 08:00 only 3 MW of sun is spilled, so full-power charging takes 22 MW from gas at \$40.
+- **What the price means.** Each hour's [price]{.lx-term term="marginal-cost"} is the cost of one more MWh without the battery.
+- **Why full power can take gas.** At 08:00 only 3 MW of sun is spilled, so charging at the full 25 MW takes 22 MW from gas at \$40.
 - **The real saving.** So this lesson counts what the town actually saves. Your best full-power schedule saves \$6,360; the solver saves \$7,240 by charging at part power, matching each hour's spill.
 
 ```{=html}
@@ -173,7 +174,7 @@ $$
 <details class="lx-answer"><summary>Answer</summary><p>Myth. The MWh say how much it holds; a separate MW rating says how fast. Prairie Town's 100 MWh battery delivers at most 25 MW, for four hours.</p></details>
 </div>
 <div class="lx-qq" data-id="make" data-answer="myth">
-<p class="lx-qtext">Myth or fact? “A battery adds energy to the grid.”</p>
+<p class="lx-qtext">Myth or fact? “Over a full charge and discharge, a battery delivers more electrical energy than it takes in.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
 <details class="lx-answer"><summary>Answer</summary><p>Myth. It moves energy in time and loses some on the way: this one returns 80% of what goes in.</p></details>
 </div>

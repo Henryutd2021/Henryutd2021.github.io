@@ -93,6 +93,14 @@
     for (var v = Math.ceil(lo / step) * step; v <= hi; v += step) ticks.push(v);
     return { lo: lo, hi: hi, ticks: ticks };
   }
+  // one hour of the day read aloud: demand minus the always-on plant, wind and sun leaves the gas plants' share, and the last
+  // plant still needed sets what one more MWh saves (the step's worked hour; h from arrival().hours)
+  function hourStory(town, h) {
+    var f = town.fleet, at = "At " + (h.t < 10 ? "0" : "") + h.t + ":00, " + h.demand + " MW of demand minus " + f.nuclear.mw + " MW always on, " + h.wind + " MW of wind and " + h.solar + " MW of sun";
+    if (h.residual <= 0) return at + " leaves nothing for gas. " + (-h.residual) + " MW of wind or sun is spilled, so one more MWh saves $0.";
+    if (h.setBy === "cc") return at + " leaves " + h.residual + " MW for gas. The cheaper combined-cycle plant (up to " + f.cc.mw + " MW) covers it, so one more MWh saves $" + f.cc.cost + ".";
+    return at + " leaves " + h.residual + " MW for gas, more than the combined-cycle plant's " + f.cc.mw + " MW. The peaker runs too, so one more MWh saves $" + f.peaker.cost + ".";
+  }
   // the day's running cost of the fuel-burning plants (combined-cycle first, then the peaker), for a day from arrival()
   function runCost(town, A) {
     var f = town.fleet, c = 0;
@@ -105,7 +113,7 @@
     return { tech: "wind", p: inputs(D, "wind"), own: false };
   }
   var model = { TECHS: TECHS, crf: crf, pv: pv, realRate: realRate, blend: blend, inputs: inputs, lcoe: lcoe, npv: npv, tornado: tornado, arrival: arrival,
-                runCost: runCost, explainInputs: explainInputs, cashAxis: cashAxis };
+                runCost: runCost, hourStory: hourStory, explainInputs: explainInputs, cashAxis: cashAxis };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -165,8 +173,8 @@
       { text: "Building a plant costs money once; running it costs money every year. Over a whole life, which spends the larger share of its cost on building the plant?",
         build: function (act, api) {
           var p = LX.Predict(act, { id: "c7-share", q: "", title: false, answer: "wind", fresh: true,
-            options: [{ value: "wind", label: "The wind farm", color: T.wind.color }, { value: "cc", label: "The gas combined-cycle plant", color: T.cc.color }, { value: "same", label: "About the same" }],
-            feedback: { wind: "The wind farm. Its fuel is free, so nearly all its cost is the plant itself.", cc: "The gas plant buys fuel every hour it runs, so fuel is its biggest cost.", same: "They differ a lot, because one of them buys fuel every hour." },
+            options: [{ value: "wind", label: "The wind farm", color: T.wind.color }, { value: "cc", label: "The gas combined-cycle (CC) plant", color: T.cc.color }, { value: "same", label: "About the same" }],
+            feedback: { wind: "The wind farm. Its fuel is free, so most of its cost is the plant itself.", cc: "The gas plant buys fuel every hour it runs, so fuel is its biggest cost.", same: "They differ a lot, because one of them buys fuel every hour." },
             onPick: function () {
               p.reveal("Building the plant is " + pct(base.wind.capShare * 100, 0) + " of the wind farm's cost per MWh, but only " + pct(base.cc.capShare * 100, 0) + " of the gas plant's.");
               api.done();
@@ -184,7 +192,7 @@
               det.innerHTML = LX.rich("**" + T[k].label + "**: " + usd(L.total) + "/MWh at a " + pct(T[k].cf) + " [[capacity-factor|capacity factor]]: " + splitText(L) + ".").replace(/\*\*(.+?)\*\*/, "<b>$1</b>");
               if (Object.keys(seen).length >= 3) {
                 api.done();
-                api.saw("Wind and solar are almost all building cost; the combined-cycle plant is mostly fuel. The peaker runs only " + pct(T.peaker.cf) + " of the year, so each of its MWh carries " + usd(base.peaker.capital) + " of building cost.");
+                api.saw("Wind and solar spend " + pct(base.wind.capShare * 100, 0) + " and " + pct(base.solar.capShare * 100, 0) + " on building, the rest on fixed upkeep; the combined-cycle plant spends " + pct(base.cc.fuel / base.cc.total * 100, 0) + " on fuel. The peaker runs only " + pct(T.peaker.cf) + " of the year, so building is " + pct(base.peaker.capShare * 100, 0) + " of its cost.");
               }
             } });
           det = H("p", { class: "lx7-detail", "aria-live": "polite" }, act);
@@ -217,12 +225,12 @@
           draw(false);
         } },
       // 4 WACC
-      { text: "A plant is paid for with loans and owners' money. Owners take more risk, so they ask a higher return; the blend is the [[wacc|WACC]]. Slide the loan share.",
+      { text: "A plant is paid for with loans and owners' money; owners take more risk, so they ask a higher return. Slide the loan share to change the blend, the [[wacc|WACC]].",
         build: function (act, api) {
           var tiles = H("div", { class: "lx7-grid" }, act), mix = LX.CostSplit.bar(act, [], 100, { height: 14 });
           var sl = LX.Slider(act, { label: "Share paid with loans", color: "var(--lx-tier-5)", min: 0, max: 80, step: 5, value: fin.debtShare, fmt: function (v) { return v + "%"; },
-            hint: function () { return "Loans at " + fin.debtRate + "%, owners at " + fin.equityRate + "% (illustrative); inflation " + fin.inflation + "%."; }, onChange: draw });
-          var tW = tile("Blend (WACC)"), tR = tile("After inflation (real)"), tWi = tile("Wind LCOE"), tC = tile("Gas CC LCOE");
+            hint: function () { return "Loans at " + fin.debtRate + "%, owners at " + fin.equityRate + "% (illustrative), held fixed here; inflation " + fin.inflation + "%. In practice, more borrowing adds risk, and lenders and owners then ask more."; }, onChange: draw });
+          var tW = tile("Blend (WACC)"), tR = tile("After inflation (real)"), tWi = tile("Wind LCOE"), tC = tile("Combined-cycle gas LCOE");
           function tile(l) { var t = H("div", { class: "lx7-tile", "aria-live": "polite" }, tiles); H("span", { text: l }, t); return { b: H("b", null, t), s: H("small", null, t) }; }
           var allEq = blend(fin, 0), wEq = lcoe(inputs(D, "wind", { wacc: allEq.real })).total, cEq = lcoe(inputs(D, "cc", { wacc: allEq.real })).total;
           function draw(user) {
@@ -266,17 +274,17 @@
             alt.innerHTML = ""; H("p", { text: "At " + usd(price) + "/MWh the wind farm's discounted sales are " + usd(N.revenue, 0) + " per kW against discounted costs of " + usd(N.costs, 0) + "; after " + p.life + " years it is left with " + usd(end, 0) + " per kW. It ends at zero at " + usd(L.total) + "/MWh, its LCOE." }, alt);
             if (user && Math.abs(price - L.total) <= 0.5) {
               api.done();
-              api.saw("Close to zero: the wind farm's LCOE is " + usd(L.total) + "/MWh at " + fin.wacc + "% over " + fin.life + " years. Any lower and it never pays back; any higher and it earns more than its cost of money.");
+              api.saw("Close to zero: the wind farm's LCOE is " + usd(L.total) + "/MWh at " + fin.wacc + "% over " + fin.life + " years. Below it, discounted sales fall short of the costs at that required return; above it, they exceed them.");
             } else if (user) api.saw(end < 0 ? "Still short by " + usd(-end, 0) + " per kW after " + p.life + " years: raise the price." : "It earns " + usd(end, 0) + " per kW more than it needs: lower the price.", true);
           }
           draw(false);
           if (window.ResizeObserver) new ResizeObserver(function () { if (LX.visible(chart)) draw(false); }).observe(chart);
         } },
       // 6 the calculator
-      { text: "Now the full calculator. Pick a plant, then change its building cost, capacity factor, rate or gas price. Defaults: EIA's plant assumptions and U.S. fleet averages, in 2025 dollars.",
+      { text: "Now the full calculator: pick a plant, then change its building cost, capacity factor, rate or gas price. The defaults are EIA's plant assumptions and U.S. fleet averages, in 2025 dollars.",
         build: function (act, api) { calculator(act, api); } },
       // 7 tornado
-      { text: "Which input moves the LCOE most? Guess first. Then each bar swings one input from low to high while the others stay at their defaults: a [[tornado-chart|tornado chart]].",
+      { text: "Which input moves the LCOE most? Guess, then read the [[tornado-chart|tornado chart]]: each bar swings one input from low to high while the others stay at their defaults.",
         build: function (act, api) {
           var box = H("div", null, act), out = H("div", { hidden: true, style: "display:grid;gap:10px" }, act);
           var p = LX.Predict(box, { id: "c7-torn", q: "For the wind farm, which input moves the LCOE most?", answer: "cf", fresh: true,
@@ -299,7 +307,7 @@
           }
         } },
       // 8 when the energy arrives
-      { text: "LCOE prices every MWh the same, whatever the hour. On Prairie Town's summer peak-demand day, one more MWh saves $0, $40 or $100, depending on the hour. Grow the solar farm and watch what its MWh are worth.",
+      { text: "LCOE prices every MWh the same, whatever the hour; on Prairie Town's summer peak-demand day, one more MWh saves $0, $40 or $100. Grow the solar farm and watch what its MWh are worth.",
         build: function (act, api) { arrivalStep(act, api); } }
     ];
 
@@ -324,7 +332,7 @@
         add("capex", { label: "Building cost", min: Math.round(t.capex * 0.5 / 10) * 10, max: Math.round(t.capex * 1.5 / 10) * 10, step: 10, fmt: function (v) { return usd(v, 0) + "/kW"; },
           hint: function () { return "Default " + usd(t.capex, 0) + "/kW: EIA's AEO2026 [[overnight-cost|overnight cost]], " + t.design + "."; } });
         add("cf", { label: "Capacity factor", min: 5, max: 95, step: 0.5, fmt: function (v) { return pct(v); }, hint: function () { return t.cfNote; } });
-        add("wacc", { label: "WACC (real)", min: 0, max: 12, step: 0.5, fmt: function (v) { return pct(v); }, hint: function () { return fin.waccNote; } });
+        add("wacc", { label: "WACC, real (after inflation)", min: 0, max: 12, step: 0.5, fmt: function (v) { return pct(v); }, hint: function () { return fin.waccNote; } });
         if (t.heatRate > 0) add("gas", { label: "Gas price", min: 1.5, max: 12, step: 0.05, fmt: function (v) { return "$" + v.toFixed(2) + "/MMBtu"; }, hint: function () { return D.fuel.gasNote; } });
         draw(false);
       }
@@ -332,11 +340,11 @@
         var k = c.tech, p = cur(), L = lcoe(p), t = T[k];
         big.innerHTML = ""; H("b", { text: usd(L.total) }, big); H("span", { text: "per MWh · " + t.label }, big);
         sb.set([splitRow(k, L, T)], Math.max(L.total, 120));
-        foot.textContent = "Capital recovery factor " + L.crf.toFixed(4) + " · " + L.E.toFixed(3) + " MWh per kW per year · " + fin.life + "-year life. No taxes, credits or grid costs.";
+        foot.innerHTML = LX.rich("[[capital-recovery-factor|Capital recovery factor]] " + L.crf.toFixed(4) + " · " + L.E.toFixed(3) + " MWh per kW per year · " + fin.life + "-year life. No taxes, credits or grid costs.");
         alt.innerHTML = ""; H("p", { text: t.label + ": LCOE " + usd(L.total) + " per MWh = " + splitText(L) + "." }, alt);
         // the explain layer's equation follows the calculator once the reader has used it (finding: it read the store only once)
         if (user || acted) { LX.store.set("c7-calc", { tech: k, inputs: p, L: L }); if (refreshExplain) refreshExplain(); }
-        if (user) { api.done(); api.saw(t.short + " at your inputs: " + usd(L.total) + "/MWh, of which " + pct(L.capShare * 100, 0) + " is building the plant."); }
+        if (user) { api.done(); api.saw(t.label + " at your inputs: " + usd(L.total) + "/MWh, of which " + pct(L.capShare * 100, 0) + " is building the plant."); }
       }
       build();
     }
@@ -352,6 +360,7 @@
       var legend = H("div", { class: "lx-legend", "aria-hidden": "true" }, act);
       [["Solar output", T.solar.color], ["Wind output", T.wind.color], ["Saves $40 (combined-cycle last)", "var(--lx-cc)"], ["Saves $100 (peaker last)", "var(--lx-pk)"], ["Saves $0 (sun or wind spilled)", "var(--lx-line-2)"]]
         .forEach(function (l) { var s = H("span", null, legend); H("i", { style: "--c:" + l[1] }, s); H("span", { text: l[0] }, s); });
+      var story = H("p", { class: "lx-hint", "aria-live": "polite" }, act);   // one worked hour (12:00), at the current solar size
       var alt = textAlt(act), svg = null;
       function draw(user) {
         var A = arrival(town, days, D, sl.val()), W = Math.max(280, chart.clientWidth || 600), Hh = W < 480 ? 230 : 250, m = { l: 40, r: 8, t: 14, b: 22 };
@@ -379,11 +388,15 @@
         tW.b.textContent = usd(A.value.wind); tW.s.textContent = "the town's 150 MW wind farm";
         tF.b.textContent = usd(A.value.flat); tF.s.textContent = "1 MW in every hour";
         tX.b.textContent = A.spilled.toLocaleString("en-US") + " MWh"; tX.s.textContent = "made, but not used, on this day";
+        story.textContent = model.hourStory(town, A.hours[12]);
         alt.innerHTML = "";
         var tb = H("table", { class: "lx-mini-table" }, H("div", { class: "lx-scroll-x" }, alt)), hr = H("tr", null, H("thead", null, tb));
-        ["Hour", "Demand, MW", "Wind, MW", "Solar, MW", "One more MWh saves, $/MWh"].forEach(function (x) { H("th", { scope: "col", text: x }, hr); });
+        ["Hour", "Demand, MW", "Always on, MW", "Wind, MW", "Solar, MW", "Left for gas, MW", "Spilled, MW", "One more MWh saves, $/MWh"].forEach(function (x) { H("th", { scope: "col", text: x }, hr); });
         var body = H("tbody", null, tb);
-        A.hours.forEach(function (h) { var r = H("tr", null, body); [LX.fmt.hh(h.t), h.demand, h.wind, h.solar, "$" + h.value].forEach(function (x) { H("td", { text: x }, r); }); });
+        A.hours.forEach(function (h) {
+          var r = H("tr", null, body);
+          [LX.fmt.hh(h.t), h.demand, town.fleet.nuclear.mw, h.wind, h.solar, Math.max(0, h.residual), Math.max(0, -h.residual), "$" + h.value].forEach(function (x) { H("td", { text: x }, r); });
+        });
         H("p", { text: "Value per MWh, " + A.solarMW + " MW of solar: solar " + usd(A.value.solar) + ", wind " + usd(A.value.wind) + ", round the clock " + usd(A.value.flat) + ". Spilled: " + A.spilled + " MWh." }, alt);
         LX.store.set("c7-arrival", { solarMW: A.solarMW, solar: A.value.solar, wind: A.value.wind, flat: A.value.flat });
         if (user && A.solarMW >= 400) {

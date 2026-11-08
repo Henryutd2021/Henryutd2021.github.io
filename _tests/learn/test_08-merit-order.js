@@ -134,6 +134,24 @@ ok(BODY.indexOf('href="00-grid-operator.html"') >= 0 && BODY.indexOf('href="07-c
 const stepTexts = [...JS.matchAll(/\{ text: "([^"]+)",\s*\n?\s*(?:free: true,\s*\n?\s*)?build/g)].map(m => m[1]);
 ok(stepTexts.length === 8, `eight step cards (${stepTexts.length})`);
 stepTexts.forEach((t, i) => { const n = t.split(/\s+/).length; ok(n >= 20 && n <= 42, `step ${i + 1}: ${n} words (about 35)`); });
+const nSent = t => (t.replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1").replace(/\$\d+\.\d+/g, "$x").match(/[.?!](\s|$)/g) || []).length;
+stepTexts.forEach((t, i) => ok(nSent(t) <= 2, `step ${i + 1}: one or two sentences (${nSent(t)})`));
+// a step that starts from its own settings names them at its top (gas reset in step 5, the big wind farm in step 6, the
+// town's wind farm with the reader's gas price in step 7), so no change between steps is silent
+{
+  const body = n => { const i = JS.indexOf("// " + n + " "), j = JS.indexOf("\n      // " + (n + 1) + " ", i); return JS.slice(i, j < 0 ? undefined : j); };
+  ok(/setting\(act, "gas back at the " \+ usd\(D\.gas\.ref\)/.test(body(5)), "step 5 names its setting: gas back at the reference");
+  ok(/setting\(act, "a " \+ S_\.st\.windMW \+ " MW wind farm and gas at the "/.test(body(6)), "step 6 names its setting: the big wind farm, gas at the reference");
+  ok(/setting\(act, "the town's " \+ f\.wind\.mw \+ " MW wind farm again, with "/.test(body(7)) && /S_\.st\.gas === D\.gas\.ref/.test(body(7)), "step 7 names its setting: the town's wind farm and the reader's gas price");
+  ok(D.wind.big === D.wind.max, "step 6: the big wind farm is the slider's top, so max(reader's, big) is always the big farm the setting names");
+}
+ok(/In this uniform-price market, every plant that runs is paid the same clearing price/.test(JS), "step 3: the payment rule is scoped to a uniform-price market");
+{
+  const side = fs.readFileSync(path.join(SITE, "learn/_w1/08-merit-order.yml"), "utf8");
+  ok(/id: clearing-price\n\s+term: Clearing price\n\s+def: "[^"]*in a uniform-price market, every seller that runs/.test(side), "glossary: the clearing price is paid to every running seller in a uniform-price market");
+}
+ok((JS.match(/Demand is still met exactly/g) || []).length === 1 && BODY.indexOf("Myth. Demand is still met exactly") >= 0 && !/more power than it can use|than can be used right then/.test(BODY + JS),
+   "negative prices: demand is still met exactly (no physical surplus)");
 // every text element in the page body (paragraphs, list items, definitions, table cells), outside display math: at most 45 words
 const plain = x => x.replace(/<[^>]+>/g, " ").replace(/\$[^$]*\$/g, "x").replace(/\s+/g, " ").trim();
 [...BODY.replace(/\$\$[\s\S]*?\$\$/g, "").matchAll(/<(p|li|dd|td)\b[^>]*>([\s\S]*?)<\/\1>/g)].map(m => plain(m[2])).concat(

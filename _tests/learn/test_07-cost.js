@@ -139,6 +139,30 @@ has("$" + D.fuel.gasRange[1].toFixed(2) + " in 2022", "numbers: 2022 gas cost");
 has(D.finance.life + " years", "numbers: cost recovery period");
 ok(D.fuel.gasRange[0] === 2.40 && D.fuel.gasRange[1] === 7.21, "data: gas range = EIA Table 7.4 lowest (2020) and highest (2022) of 2015-2025");
 
+// ---------------- the cost shares the page describes (the split step, the predict feedback and the no-JS ideas)
+{
+  const sh = k => { const x = L(k); return { cap: x.capital / x.total, fom: x.fom / x.total, fuel: x.fuel / x.total }; };
+  ok(sh("wind").cap > 0.5 && sh("wind").cap < 0.9 && sh("wind").fom > 0.2 && sh("solar").cap > 0.5 && sh("solar").cap < 0.9,
+     "shares: wind and solar are mostly building cost, with a sizable fixed-upkeep share (not 'nearly all')");
+  ok(sh("cc").fuel > 0.5 && sh("peaker").cap > 0.5 && sh("peaker").fuel < 0.5, "shares: the combined-cycle plant is mostly fuel; the rarely used peaker is mostly building");
+  has("Wind and solar are mostly building cost, the combined-cycle plant mostly fuel, and a rarely used peaker mostly building.", "no-JS ideas: the shares as the model has them");
+  ok(!/nearly all its cost|almost all building cost|gas plants mostly fuel/.test(QMD + JS), "shares: no 'nearly all' or 'gas plants mostly fuel'");
+  ok(!/never pays back/.test(QMD + JS), "LCOE: below it the discounted sales fall short at the required return (not 'never pays back')");
+}
+// ---------------- the timing step's worked hour and the no-JS timing table
+{
+  const story12 = M.hourStory(town, A200.hours[12]);
+  ok(A200.hours[12].demand === 425 && A200.hours[12].wind === 35 && A200.hours[12].solar === 173 && A200.hours[12].residual === 117 && A200.hours[12].setBy === "cc", "worked hour 12:00: 425 - 100 - 35 - 173 = 117 MW for the combined-cycle plant");
+  has("<p class=\"lx-hint\">" + story12 + "</p>", "fallback: the worked hour, as the step shows it");
+  ok(/saves \$100\.$/.test(M.hourStory(town, A200.hours[19])) && A200.hours[19].setBy === "peaker", "worked hour 19:00: the peaker is needed, $100");
+  const A600 = M.arrival(town, days, D, 600), h600 = A600.hours[12];
+  ok(h600.residual <= 0 && M.hourStory(town, h600).indexOf((-h600.residual) + " MW of wind or sun is spilled, so one more MWh saves $0.") >= 0, "worked hour 12:00 at 600 MW: spilled, $0");
+  [200, 400].forEach(s => {
+    const A = M.arrival(town, days, D, s), v = A.value;
+    has("<tr><td>" + s + " MW</td><td>" + v.solar.toFixed(2) + "</td><td>" + v.wind.toFixed(2) + "</td><td>" + v.flat.toFixed(2) + "</td><td>" + A.spilled + " MWh</td></tr>", "fallback timing table at " + s + " MW of solar");
+  });
+}
+
 // ---------------- data: sources and dates
 const SRC = D.sources;
 Object.keys(D.techs).forEach(k => (D.techs[k].src || []).forEach(s => ok(SRC[s], `data: ${k} source ${s} is listed`)));
@@ -170,7 +194,7 @@ const nWords = t => plain(t).split(/\s+/).filter(w => /[A-Za-z0-9$]/.test(w)).le
 const nSent = t => (plain(t).replace(/^(Myth|Fact)\.\s+/, "").replace(/\b(e\.g|i\.e|et al|U\.S)\./g, "$1").match(/[.?!](\s|$)/g) || []).length;
 const stepTexts = [...JS.matchAll(/\{ text: "([^"]+)",\s*\n?\s*build/g)].map(m => m[1]);
 ok(stepTexts.length === 8, `eight step cards (${stepTexts.length})`);
-stepTexts.forEach((t, i) => { const n = nWords(t); ok(n >= 20 && n <= 42, `step ${i + 1}: ${n} words (about 35)`); ok(nSent(t) <= 3, `step ${i + 1}: at most three short sentences`); });
+stepTexts.forEach((t, i) => { const n = nWords(t); ok(n >= 20 && n <= 42, `step ${i + 1}: ${n} words (about 35)`); ok(nSent(t) <= 2, `step ${i + 1}: one or two sentences (${nSent(t)})`); });
 // the page: every paragraph, list item, definition, table cell and summary outside the generated blocks, and the Markdown
 // paragraphs and list items of the Go deeper boxes (display math does not count)
 const BODY = QMD.replace(/^---[\s\S]*?\n---\n/, "").replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1:end -->/g, "").replace(/<!--[\s\S]*?-->/g, "");

@@ -4,7 +4,7 @@
     "title": "Lesson 6 data: nine technologies, their key numbers and the three jobs",
     "built": "2026-11-02",
     "license": "Numbers from EIA and FERC are U.S. government works in the public domain; PJM numbers are quoted from a public PJM document; this file CC BY 4.0",
-    "about": "cf: annual capacity factor of U.S. utility-scale generators in 2025 (EIA, final): average output as a share of rated capacity, not the share of hours a plant runs. firm: the ELCC class rating PJM applies to a technology class in its 2028/2029 Base Residual Auction, the share of a resource's MW that PJM counts toward its adequacy requirement; one market and one auction, not a universal technology value, and an individual plant's accredited capacity can differ (PJM Manual 21B). jobs: the lesson's reference sort, 'yes' (does this job well), 'partly' (depends on the plant, the place or the rules; either answer is accepted) or 'no'. Neutral wording: each reason states the evidence, not a preference."
+    "about": "cf: annual capacity factor of U.S. utility-scale generators in 2025 (EIA, final): average output as a share of rated capacity, not the share of hours a plant runs. firm: the ELCC class rating PJM applies to a technology class in its 2028/2029 Base Residual Auction, the share of a resource's MW that PJM counts toward its adequacy requirement; one market and one auction, not a universal technology value, and an individual plant's accredited capacity can differ (PJM Manual 21B). A firm share is a planning rating, not output guaranteed in any particular hour. jobs: the lesson's reference sort, 'yes' (does this job well), 'partly' (depends on the plant, the place or the rules; either answer is accepted) or 'no'. For firm capacity the sort reads the class ratings: 'yes' at 60% or more, 'no' only for solar's 7% (fixed) and 10% (tracking), 'partly' in between or where ratings differ by place or plant; this cutoff is the lesson's teaching choice, not PJM's. Neutral wording: each reason states the evidence, not a preference."
   },
   "sources": {
     "eia_epm_607a": {
@@ -64,8 +64,8 @@
       "label": "Firm capacity",
       "short": "Firm",
       "icon": "clock",
-      "question": "Will it be there in the riskiest hours, whatever the weather?",
-      "measure": "Firm share: the part of its MW a grid counts at the peak"
+      "question": "Can the grid count on it in the riskiest hours of the year?",
+      "measure": "Firm share: the part of its MW a grid credits toward its reliability needs"
     },
     {
       "key": "flex",
@@ -138,7 +138,7 @@
       "why": {
         "energy": "Output averaged only 13.6% of its size in 2025: it costs too much to run for bulk energy.",
         "firm": "PJM's class rating is 67%, or 79% with a second fuel on site: there when called unless fuel or cold fails.",
-        "flex": "Starts quickly and jumps to any level, as in lesson 0."
+        "flex": "Starts quickly and changes output fast, within its start-up, ramp and minimum-output limits."
       },
       "firmUnit": "one fuel"
     },
@@ -155,12 +155,12 @@
       "firmNote": "onshore; offshore wind 60%",
       "jobs": {
         "energy": "yes",
-        "firm": "no",
+        "firm": "partly",
         "flex": "partly"
       },
       "why": {
         "energy": "No fuel: a 33.8% capacity factor in 2025 still adds up to many MWh at almost no running cost.",
-        "firm": "PJM's class rating for onshore wind is 34%: calm spells can fall on the riskiest hours.",
+        "firm": "PJM's class rating is 34% for onshore wind and 60% offshore: calm spells can fall on the riskiest hours.",
         "flex": "It turns down quickly, and can turn up again if it was held below what the wind allows."
       },
       "firmUnit": "onshore",
@@ -255,7 +255,7 @@
       },
       "why": {
         "energy": "Steady heat and no fuel to buy: a 65.9% capacity factor in 2025.",
-        "firm": "Its heat does not depend on the weather, so it is there at the peak (no PJM class rating to quote).",
+        "firm": "Its heat does not depend on the weather, so it is usually available in the riskiest hours (no PJM class rating to quote).",
         "flex": "Usually runs steadily; some plants can follow demand within limits."
       }
     },

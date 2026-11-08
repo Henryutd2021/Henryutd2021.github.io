@@ -86,6 +86,7 @@
   function css() {
     if (document.getElementById("lx8-css")) return;
     H("style", { id: "lx8-css", text: [
+      ".lx8-set{margin:0}",
       ".lx8-plants{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}",
       ".lx8-plants .lx-choice{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;align-items:center}",
       ".lx8-plants .lx-choice small{grid-column:2;font-family:var(--lx-f-mono);font-size:12.5px;font-weight:400;color:var(--lx-ink-3)}",
@@ -112,6 +113,8 @@
     ].join("\n") }, document.head);
   }
 
+  // the settings a step starts from, named at its top, so a reset between steps is never silent
+  function setting(host, text) { return H("p", { class: "lx-hint lx8-set", html: LX.rich("<b>Setting:</b> " + text) }, host); }
   function tiles(host, labels) {
     var g = H("div", { class: "lx8-grid" }, host), out = {};
     labels.forEach(function (l) { var t = H("div", { class: "lx8-tile", "aria-live": "polite" }, g); H("span", { text: l[1] }, t); out[l[0]] = { b: H("b", null, t), s: H("small", null, t) }; });
@@ -131,7 +134,7 @@
 
     var steps = [
       // 1 build the stack
-      { text: "Each plant offers its power at a price per MWh; here each offer equals its running cost. The operator lines the offers up, cheapest first: the [[supply-stack|supply stack]]. Build it, cheapest to dearest.",
+      { text: "Each plant offers its power at a price per MWh, here its running cost, and the operator lines the offers up cheapest first: the [[supply-stack|supply stack]]. Build it, cheapest to dearest.",
         build: function (act, api) {
           var box = H("div", { class: "lx8-plants" }, act), chart = stackChart(act, { noLegend: true }), blocks = stack(town, D, h, base), built = [];
           var shuffled = ["peaker", "wind", "cc", "nuclear", "solar"], btn = {};
@@ -153,7 +156,7 @@
           drawBuilt();
         } },
       // 2 move the demand line
-      { text: "Demand is a vertical line: this hour the town needs that many MW, whatever the price. Slide it. The last plant needed is the [[marginal-plant|marginal plant]], and its offer sets the [[clearing-price|clearing price]].",
+      { text: "Demand is a vertical line: this hour the town needs that many MW, whatever the price. Slide it: the last plant needed is the [[marginal-plant|marginal plant]], and its offer sets the [[clearing-price|clearing price]].",
         build: function (act, api) {
           var chart = stackChart(act, {}), tl = tiles(act, [["p", "Clearing price"], ["m", "Set by"], ["c", "Running cost this hour"]]), seen = {};
           var res0 = run(town, D, h, base);
@@ -169,7 +172,7 @@
           draw(false);
         } },
       // 3 who is paid what
-      { text: "Every plant that runs is paid the same clearing price, not its own offer. Tap a plant to see what it keeps per MWh toward its building cost from lesson 7.",
+      { text: "In this uniform-price market, every plant that runs is paid the same clearing price, not its own offer. Tap a plant to see what it keeps per MWh toward its building cost from lesson 7.",
         build: function (act, api) {
           S_.demand = h.demand;
           var chart = stackChart(act, {}), r = chart.draw(stack(town, D, h, base), h.demand), box = H("div", { class: "lx8-plants" }, act), out = H("p", { class: "lx-lede", "aria-live": "polite" }, act);
@@ -206,9 +209,10 @@
       // 5 add wind
       { text: "Wind's running cost is about zero, so new wind joins the bottom of the stack and pushes everything else to the right. Make the wind farm bigger and watch the clearing price.",
         build: function (act, api) {
+          setting(act, "gas back at the " + usd(D.gas.ref) + "/MMBtu reference; only the wind farm's size changes.");
           var chart = stackChart(act, {}), tl = tiles(act, [["p", "Clearing price"], ["m", "Set by"], ["s", "Wind and sun spilled"]]);
           var sl = LX.Slider(act, { label: "Wind farm size", color: "var(--lx-wind)", min: D.wind.min, max: D.wind.max, step: D.wind.step, value: S_.st.windMW, fmt: function (v) { return v + " MW"; },
-            hint: function (lo, hi, max, v) { return "At " + D.hourLabel + " it makes " + Math.round(h.windShape * v) + " MW (the real wind of that hour)."; }, onChange: function (v) { S_.st.windMW = v; draw(true); } });
+            hint: function (lo, hi, max, v) { return "At " + D.hourLabel + " it makes " + Math.round(h.windShape * v) + " MW (the real wind of that hour). Wind or sun that is available but not needed is [[curtailment|spilled]]."; }, onChange: function (v) { S_.st.windMW = v; draw(true); } });
           function draw(user) {
             var st = Object.assign({}, base, { windMW: sl.val() }), r = chart.draw(stack(town, D, h, st), h.demand, { xMax: 750 });
             tl.p.b.textContent = usd(r.price); tl.m.b.textContent = SHORT[r.marginal]; tl.s.b.textContent = Math.round(r.spilled) + " MW";
@@ -221,9 +225,10 @@
           draw(false);
         } },
       // 6 below zero
-      { text: "Can the price fall below zero? Only if the last plant needed offers below $0, paying to keep running. Flip each switch, alone and together, and watch who sets the price.",
+      { text: "Can the price fall below zero? Only if the last plant needed offers below $0, paying to keep running: flip each switch, alone and together, and watch who sets the price.",
         build: function (act, api) {
           S_.st.windMW = Math.max(S_.st.windMW, D.wind.big);
+          setting(act, "a " + S_.st.windMW + " MW wind farm and gas at the " + usd(D.gas.ref) + "/MMBtu reference: at " + D.hourLabel + ", wind alone could cover demand.");
           var chart = stackChart(act, {}), tl = tiles(act, [["p", "Clearing price"], ["m", "Set by"], ["s", "Spilled"], ["n", "Nuclear runs"]]);
           var sw = H("div", { class: "lx8-sw" }, act), st = Object.assign({}, base, { windMW: S_.st.windMW });
           var a = toggle("Wind farm earns a production credit", "$" + D.credit.value + "/MWh", "credit"), b = toggle("Nuclear plant: slow to stop and restart", "offers " + usd(D.inflexible.offer, 0), "inflexible");
@@ -236,7 +241,7 @@
           function draw(user, k) {
             var r = chart.draw(stack(town, D, h, st), h.demand, { xMax: 750 });
             tl.p.b.textContent = usd(r.price); tl.m.b.textContent = SHORT[r.marginal]; tl.s.b.textContent = Math.round(r.spilled) + " MW"; tl.n.b.textContent = Math.round(r.plants.nuclear.run) + " MW";
-            note.textContent = k === "credit" ? D.credit.note : k === "inflexible" ? D.inflexible.note : "A " + S_.st.windMW + " MW wind farm at " + D.hourLabel + ": wind alone could cover demand.";
+            note.textContent = k === "credit" ? D.credit.note : k === "inflexible" ? D.inflexible.note : "";
             if (!user) return;
             if (k === "credit") api.saw(st.credit ? "With a [[production-credit|production credit]], the wind farm offers down to " + usd(-D.credit.value, 0) + ". It is the last plant needed, so the price is " + usd(r.price) + "/MWh." : "Credit off: the wind farm offers $0 again.", !st.credit);
             if (k === "inflexible") api.saw(st.inflexible ? "The nuclear plant now offers " + usd(D.inflexible.offer, 0) + " rather than stop, so it runs first at " + Math.round(r.plants.nuclear.run) + " MW. The last plant needed is the " + NAME[r.marginal].toLowerCase() + ", so the price is " + usd(r.price) + "/MWh." : "Switch off: the nuclear plant offers its running cost, " + usd(f.nuclear.cost) + "/MWh, again.", !st.inflexible);
@@ -247,7 +252,9 @@
       // 7 it is an optimization (the extra-demand arithmetic; the solver check is in the Modeler box of the explain section)
       { text: "The stack is the cheapest way to meet demand: the answer to a small dispatch [[optimization|optimization]]. Check it: add 1 MW of demand and compare the extra running cost with the clearing price.",
         build: function (act, api) {
-          var st = Object.assign({}, base, { gas: S_.st.gas }), chart = stackChart(act, {}), d = h.demand, blocks = stack(town, D, h, st);
+          var st = Object.assign({}, base, { gas: S_.st.gas }), d = h.demand, blocks = stack(town, D, h, st);
+          setting(act, "the town's " + f.wind.mw + " MW wind farm again, with " + (S_.st.gas === D.gas.ref ? "gas at the " + usd(D.gas.ref) + "/MMBtu reference." : "your gas price from step 4, " + usd(S_.st.gas) + "/MMBtu."));
+          var chart = stackChart(act, {});
           var tl = tiles(act, [["c0", "Running cost at " + d + " MW"], ["c1", "Running cost at " + (d + 1) + " MW"], ["dc", "Extra cost"], ["p", "Clearing price"]]);
           var r0 = chart.draw(blocks, d), r1 = run(town, D, h, st, d + 1);
           tl.c0.b.textContent = usd(r0.cost); tl.p.b.textContent = usd(r0.price);
@@ -261,7 +268,7 @@
           } }, row);
         } },
       // 8 teaser: a full line
-      { text: "One question is left. What if the wind farm sits far away and the line into town is full? Then one price splits into two. Formulate it below, then meet M1.",
+      { text: "One question is left: what if the wind farm sits far away and the line into town is full? Then one price splits into two; compare the price at the farm with the price in town.",
         free: true,
         build: function (act) { teaser(act); } }
     ];
@@ -369,7 +376,7 @@
               { title: "Wind becomes the last plant needed", text: "Its offer sets the price.", value: usd(r.price) + " → " + usd(r1.price) },
               { title: "A credit per MWh produced", text: "Wind would still earn below $0.", value: "offer " + usd(-D.credit.value, 0) },
               { title: "The price turns negative", text: "Extra wind is spilled.", value: usd(r2.price) + "; " + Math.round(r2.spilled) + " MW spilled" }],
-      note: "A negative price says this place has more power than it can use right now. Storage, flexible demand or a bigger line would all soak it up."
+      note: "Demand is still met exactly: the last plant needed would rather pay than stop, often when more wind or sun is available than can be used there. Storage, flexible demand or a bigger line can help."
     });
     // 4 steelman
     LX.Steelman(H("div", { class: "lx-xcard" }, host), {
