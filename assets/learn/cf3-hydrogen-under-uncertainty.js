@@ -54,7 +54,7 @@
     var kg = E.kgPerMWh * M.used(D8, W, x), plant = E.costPerMWYear * x, buy = H2.reformerPerKg * (H2.demandKgPerHour * M.HOURS - kg);
     return { plant: plant, kg: kg, buy: buy, total: plant + buy, base: M.base(D8),
       lines: ["Gas reformers alone: " + fm.int(H2.demandKgPerHour) + " kg an hour × " + fm.int(M.HOURS) + " hours × $" + H2.reformerPerKg.toFixed(2) + "/kg = " + fm.m(M.base(D8)) + " a year, in every build-out.",
-        "Hedged plan, none built: " + fm.int(x) + " MW × $" + fm.int(E.costPerMWYear) + " = " + fm.m(plant) + " for the electrolyzer; it makes " + (kg / 1e6).toFixed(1) + " million kg, so reformers supply the rest for " + fm.m(buy) + ". Total " + fm.m(plant + buy) + "."] };
+        "Hedged plan, none built: " + fm.int(x) + " MW × $" + fm.int(E.costPerMWYear) + " = " + fm.m(plant) + " for the electrolyzer; it makes " + (kg / 1e6).toFixed(2) + " million kg, so reformers supply the rest for " + fm.m(buy) + ". Total " + fm.m(plant + buy) + "."] };
   }
   function chainHTML(M, D8) { return chain(M, D8).lines.map(function (t) { return "<p class=\"lx-hint\">" + t + "</p>"; }).join(""); }
   // the toy's assumptions (M8's notes, then the boundary that sets its sizes) and its five wind blocks

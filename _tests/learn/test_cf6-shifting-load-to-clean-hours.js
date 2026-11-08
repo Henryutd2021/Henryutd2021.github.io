@@ -100,14 +100,14 @@ ok(M.statusLines(cross)[0] === "Out of 22:00–23:00: the peaker runs 4 MWh less
 ok(M.move(W, 5, 5, 10).same && M.move(W, 5, 5, 10).system === 0, "the same hour twice changes nothing");
 // two changes that round alike are not called equal: 00:00 to 03:00 moves attributed CO₂ by a few hundredths of a tonne, the plants' by nothing
 { const r = M.move(W, 0, 3, 10), l = M.statusLines(r)[2];
-  ok(r.system === 0 && Math.abs(r.attributed) > 0.01 && M.tco2(r.attributed) === M.tco2(r.system) && !/agree/.test(l) && /never make\.<\/b> Both round to 0\.0 t here\./.test(l), "00:00 to 03:00: not called agreement (" + r.attributed.toFixed(4) + " t against 0): " + l);
+  ok(r.system === 0 && Math.abs(r.attributed) > 0.01 && M.tco2(r.attributed) === M.tco2(r.system) && !/agree/.test(l) && /never make\.<\/b> Both round to 0\.0 t here: −0\.03 t attributed, 0\.00 t from the plants\./.test(l), "00:00 to 03:00: not called agreement (" + r.attributed.toFixed(4) + " t against 0): " + l);
   let wrong = 0; for (let a = 0; a < 24; a++) for (let b = 0; b < 24; b++) { const x = M.move(W, a, b, 10); if (!x.same && /agree/.test(M.statusLines(x)[2]) !== (Math.abs(x.system - x.attributed) < 1e-6)) wrong++; }
   ok(wrong === 0, "every pair of hours: 'agree' only when the two changes are equal, unrounded (" + wrong + " wrong)"); }
 // the controls' plant names are explained before the controls (live and no-JS); the readouts' word "re-dispatch" is gone
 ok(D.idea.terms.length === 2 && /\[\[marginal-plant\|plant on the margin\]\]/.test(D.idea.terms[0]) && /\[\[combined-cycle\|/.test(D.idea.terms[0]) && /\[\[peaker\|/.test(D.idea.terms[0]) && /\[\[curtailment\|spilled\]\]/.test(D.idea.terms[1]) && /I\.terms\.forEach\(function \(t\) \{ H\("p", \{ class: "lx-hint", html: LX\.rich\(t\) \}, stage\); \}\);\s*var ctl/.test(JS) && !/re-dispatch/.test(RAW + PAGE),
   "plant on the margin, combined-cycle, peaker and spilled are glossary terms ahead of the controls");
 // the marginal factor is a difference over a small added demand, set in the toy by the plant that responds
-ok(/adding a small amount of demand in that hour, working out the total CO₂ again, and dividing its change by the energy added/.test(PAGE) && !/grows by one MWh/.test(PAGE) && /the change in the grid's CO₂ when use grows a little, ÷ that use; in the toy, the rate of the plant that responds/.test(PAGE), "the marginal factor is defined as a small-change difference, not one plant's rate in general");
+ok(/adding a small amount of demand in that hour, working out the total CO₂ again, and dividing its change by the energy added/.test(PAGE) && !/grows by one MWh/.test(PAGE) && /the change in the grid's CO₂ when use grows a little, ÷ the use added; in the toy, the rate of the plant that responds/.test(PAGE), "the marginal factor is defined as a small-change difference, not one plant's rate in general");
 // the general rule the page states: into a spill hour (within the spill) never raises what the plants emit
 for (let a = 0; a < 24; a++) spillH.forEach(b => { if (-W.gap[b] >= 10 && a !== b) ok(M.move(W, a, b, 10).system <= 1e-9, "into spare sun at " + b + " from " + a + " never raises CO2"); });
 

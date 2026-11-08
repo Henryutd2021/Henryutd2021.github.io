@@ -85,7 +85,7 @@ body-classes: "page-learn page-lesson lx-form-case"
 <thead><tr><th scope="col">Factor</th><th scope="col">How it is built</th><th scope="col">The question it answers</th><th scope="col">Moving 10 MWh from 06:00 to 03:00</th></tr></thead>
 <tbody>
 <tr><th scope="row"><span class="lx-term" data-term="average-emission-factor">Average</span> (t CO₂ per MWh)</th><td data-l="How it is built">the hour's CO₂ ÷ the hour's use</td><td data-l="The question it answers">How much of the grid's CO₂ is attributed to my use?</td><td data-l="Moving 10 MWh from 06:00 to 03:00">−0.3 t</td></tr>
-<tr><th scope="row"><span class="lx-term" data-term="marginal-emission-factor">Marginal</span> (t CO₂ per MWh)</th><td data-l="How it is built">the change in the grid's CO₂ when use grows a little, ÷ that use; in the toy, the rate of the plant that responds</td><td data-l="The question it answers">What do the plants emit differently if I change my use?</td><td data-l="Moving 10 MWh from 06:00 to 03:00">0.0 t</td></tr>
+<tr><th scope="row"><span class="lx-term" data-term="marginal-emission-factor">Marginal</span> (t CO₂ per MWh)</th><td data-l="How it is built">the change in the grid's CO₂ when use grows a little, ÷ the use added; in the toy, the rate of the plant that responds</td><td data-l="The question it answers">What do the plants emit differently if I change my use?</td><td data-l="Moving 10 MWh from 06:00 to 03:00">0.0 t</td></tr>
 </tbody>
 </table>
 <p class="lx-hint">Shifting cuts what the plants emit when it moves use away from a dirtier marginal plant, toward spare wind and sun or a cleaner plant. The marginal plant is <a href="08-merit-order.html">lesson 8</a>'s idea.</p>
@@ -151,7 +151,7 @@ body-classes: "page-learn page-lesson lx-form-case"
 <div class="lx-qq" data-id="spare-sun" data-answer="fact">
 <p class="lx-qtext">Myth or fact? “Moving use out of a gas hour into an hour when wind or sun is being spilled lowers what the plants emit.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Fact, up to the spilled amount.</p><p>At 14:00 Prairie Town spills 25 MWh of wind and sun, so 10 MWh moved there from 20:00 cut the peaker's CO₂ by 5.5 t; beyond the spill, the next plant serves it.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Fact, up to the spilled amount. At 14:00 Prairie Town spills 25 MWh of wind and sun, so 10 MWh moved there from 20:00 cut the peaker's CO₂ by 5.5 t; beyond the spill, the next plant serves it.</p></details>
 </div>
 </div>
 <div class="lx-card lx-case-try">

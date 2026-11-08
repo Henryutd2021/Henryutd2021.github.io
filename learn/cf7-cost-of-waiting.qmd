@@ -133,7 +133,7 @@ body-classes: "page-learn page-lesson lx-form-case"
 <div class="lx-qq" data-id="tariff" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “A tariff that makes the waiting load pay the utility's costs makes the delay cheaper.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. In the toy at 24 months it moves $14.7M from other customers to the developer; the total stays $185.8M.</p><p>In this toy, the tariff only reallocates a fixed cost; it does not change the wait or what anyone does.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. In the toy at 24 months it moves $14.7M from other customers to the developer; the total stays $185.8M. In this toy, the tariff only reallocates a fixed cost; it does not change the wait or what anyone does.</p></details>
 </div>
 <div class="lx-qq" data-id="bridge" data-answer="fact">
 <p class="lx-qtext">Myth or fact? “An option can save the developer money while adding a cost that someone else bears.”</p>

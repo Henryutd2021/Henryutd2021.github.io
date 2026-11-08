@@ -60,6 +60,7 @@
   function hm(t) { return (t < 10 ? "0" : "") + t + ":00"; }
   function span(t) { return hm(t) + "–" + hm(t + 1); }
   function f2(v) { return (Math.abs(v) < 0.005 ? 0 : v).toFixed(2); }
+  function t2(v) { var r = Math.round(v * 100) / 100; return (r < 0 ? "−" : r > 0 ? "+" : "") + Math.abs(r).toFixed(2) + " t"; }
   function tco2(v) { var r = Math.round(v * 10) / 10; return (r < 0 ? "−" : r > 0 ? "+" : "") + Math.abs(r).toFixed(1) + " t"; }
   var PLANT = { spill: "spilled wind and sun", cc: "the combined-cycle plant", pk: "the peaker", short: "unserved demand" };
   // the plants that change, in words: "the peaker 10 MWh less" / "10 MWh of spilled sun and wind used"
@@ -97,7 +98,7 @@
     var two = agree ? "<b>Here the two views agree.</b>"
       : Math.abs(r.system) < 1e-9 ? "<b>The average books a change the plants never make.</b>"
       : "<b>The plants' change is " + (Math.abs(r.system) > Math.abs(r.attributed) ? "larger" : "smaller") + " than the average says.</b>";
-    if (!agree && sys === att) two += " Both round to " + tco2(r.system) + " here.";
+    if (!agree && sys === att) two += " Both round to " + tco2(r.system) + " here: " + t2(r.attributed) + " attributed, " + t2(r.system) + " from the plants.";
     return [out, into, two];
   }
   // the allow-listed explainer's starting state as a table (its stylized day; m = the explainer's model() result)

@@ -145,10 +145,9 @@ body-classes: "page-learn page-lesson lx-form-case"
 </div>
 <div class="lx-quiz" data-quiz="cf8">
 <div class="lx-qq" data-id="score" data-answer="b">
-<p class="lx-hint">Invented numbers, not the study's: two “90%” bands for one turbine are checked on the same 100 new measurements.</p>
-<p class="lx-qtext">Band A is 150 kW wide on average and holds 62 of them; band B is 300 kW wide and holds 89. Which band better matches its claimed 90%?</p>
+<p class="lx-qtext">Invented numbers, not the study's: two “90%” bands are checked on 100 new measurements. Band A, 150 kW wide on average, holds 62; band B, 300 kW wide, holds 89. Which better matches its claimed 90%?</p>
 <ul class="lx-choices"><li data-value="a">A: a narrower band always matches better</li><li data-value="b">B: it holds about the 90% it claims</li><li data-value="c">Neither: coverage cannot be checked on 100 measurements</li><li data-value="d">A: it has the lower RMSE</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>B. It holds 89 of 100, close to the 90 it claims; A's “90%” band holds only 62.</p><p>Coverage alone does not rank the two forecasts: pinball loss also charges for how far each miss falls outside a band, so it needs the measurements themselves.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>B. It holds 89 of 100, close to the 90 it claims; A holds only 62. Coverage alone does not rank them: pinball loss also charges for how far misses fall outside a band.</p></details>
 </div>
 </div>
 <div class="lx-card lx-case-try">

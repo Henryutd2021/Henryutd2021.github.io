@@ -94,7 +94,7 @@ ok(/the fitted curve's uncertainty only/.test(I.scope) && /year-to-year weather 
 ok(!/A band on the curve is a band on the year's energy/.test(PAGE + RAW + JS), "the old 'a band on the year's energy' line is gone");
 { // the outcome "why the verdict depends on the score" is checked: invented numbers, labelled
   const q = (PAGE.match(/<div class="lx-quiz" data-quiz="cf8">[\s\S]*?\n<\/div>\n<\/div>/) || [""])[0];
-  ok(/data-id="score" data-answer="b"/.test(q) && /Invented numbers, not the study's/.test(q) && 62 / 100 < 0.9 - 2 * Math.sqrt(0.09 / 100) && Math.abs(89 / 100 - 0.9) < 2 * Math.sqrt(0.09 / 100) && /Which band better matches its claimed 90%\?/.test(q) && !/Which is better\?/.test(q) && /pinball loss also charges for how far each miss falls outside a band/.test(q), "the check asks only what coverage can show (which band matches its claim); the answer says why coverage alone does not rank the forecasts");
+  ok(/data-id="score" data-answer="b"/.test(q) && /Invented numbers, not the study's/.test(q) && 62 / 100 < 0.9 - 2 * Math.sqrt(0.09 / 100) && Math.abs(89 / 100 - 0.9) < 2 * Math.sqrt(0.09 / 100) && /<p class="lx-qtext">Invented numbers, not the study's: [^<]*Which better matches its claimed 90%\?<\/p>/.test(q) && !/Which is better\?/.test(q) && /<details class="lx-answer"><summary>Answer<\/summary><p>B\.[^<]*pinball loss also charges for how far misses fall outside a band\.<\/p><\/details>/.test(q), "the check asks only what coverage can show (which band matches its claim); the answer says why coverage alone does not rank the forecasts");
   ok(!/quoted from the published/.test(PAGE) && /describe uncertainty about the average curve\. A band for one new measurement must also hold measurement and operating scatter, so it is wider\./.test(PAGE), "no quotation claim; the two kinds of band are told apart");
   ok(/\(<span class="lx-term" data-term="autoregressive-fusion">autoregressive<\/span>\)/.test(PAGE) && /data-term="surrogate-model">Surrogates</.test(PAGE) && /data-term="negative-control">negative control</.test(PAGE), "autoregressive, surrogates and negative control are glossary terms");
   ok(/can reach below zero or above the rating/.test(M.explainerHTML(EXM, D.explainer)) && /−?\d+ kW ± \d+/.test(M.explainerHTML(EXM, D.explainer)), "the explainer's text version says its bands can pass zero and the rating");
@@ -183,7 +183,7 @@ if (R) {
     [/^Run python examples\/probabilistic\.py and compare the coverage at each nominal level with the level itself\.$/, "instruction on the open code (synthetic)"],
     [/^Run python examples\/minimal\.py, then python examples\/validation_design\.py\.$/, "instruction on the open code (synthetic); E13.7 follows"],
     [/^Try it yourself$/, "heading"], [/^Optional, about 30 minutes each; needs Python 3\.10 or later \(lesson B2\)\.$/, "time"],
-    [/^Invented numbers, not the study's: two “90%” bands for one turbine are checked on the same 100 new measurements\.$/, "the check's invented example"],
+    [/^Invented numbers, not the study's: two “90%” bands are checked on 100 new measurements\.$/, "the check's invented example"],
     [/^Li et al\. \(2023\), ASME IDETC 2023 · presented August 2023$/, "numbers-table source"],
     [/^From Li et al\. \(2023\), ASME IDETC 2023\.$/, "boundary card's source line"]];
   const bad = [];

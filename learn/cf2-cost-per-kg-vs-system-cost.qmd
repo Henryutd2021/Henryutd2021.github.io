@@ -150,7 +150,7 @@ body-classes: "page-learn page-lesson lx-form-case"
 <div class="lx-qq" data-id="part-saving" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “If one part's upkeep gets 10% cheaper, the product's cost per unit falls by 10% too.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth, unless that part is the whole cost.</p><p>In the offshore study, about 10% lower turbine upkeep cut the cost per kilogram of hydrogen by about 2%: upkeep is one share of all the costs.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth, unless that part is the whole cost. In the offshore study, about 10% lower turbine upkeep cut the cost per kilogram of hydrogen by about 2%: upkeep is one share of all the costs.</p></details>
 </div>
 </div>
 <div class="lx-card lx-case-try">
