@@ -60,3 +60,8 @@
 .e3-keys b { font-weight: 600; color: var(--lx-ink); }
 .e3-hh-off { margin: 0 !important; padding: 8px 12px; border-radius: 10px; background: var(--lx-warn-soft, var(--lx-surface-2)); }
 .e3-notes { margin: .3rem 0 0; padding-left: 1.1rem; display: grid; gap: 2px; font-size: 13.5px; color: var(--lx-ink-2); }
+/* SB3's presets said beside their buttons: the last one picked, and all of them in a fold */
+.e3-pre-say { margin: 4px 0 0 !important; }
+.e3-fold { margin: 4px 0 0; font-size: 13.5px; }
+.e3-fold > summary { cursor: pointer; color: var(--lx-ink-2); }
+.e3-fold .e3-notes { margin-top: 4px; }

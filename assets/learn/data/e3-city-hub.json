@@ -2,9 +2,15 @@
  "about": {
   "what": "Engine E3's settings and costs: Prairie City's energy hub (the three districts behind their substation limits) as a linear program over prairie-city.json's eight representative days. Prairie City's own numbers are in prairie-city.json; this file holds only what the engine adds.",
   "line": "Prairie City is fictional; its numbers are illustrative.",
-  "built": "2026-11-06",
-  "builtBy": "Written by the engine E3 data build step (do not edit by hand); the `precomputed` block is written by the tests' --write mode",
+  "built": "2026-11-07",
   "set": "Costs read from other course files say so in `via`; everything marked \"teaching\" is illustrative, set for this course, with a range the reader can change."
+ },
+ "dataset": {
+  "creator": "Honglin Li",
+  "date": "2026-11-07",
+  "status": "Illustrative: the costs that say `via` are read from the course's other data files (EIA, NREL and DOE figures, converted to 2025 dollars); everything marked teaching is set for this course. `precomputed` holds the pages' default runs of engine E3, solved with HiGHS, which the lab notebook checks its answers against.",
+  "source": "Prepared for the course's engine E3 (Prairie City's energy hub); each cost names its course file in `via` and its publications in `src` (listed in `sources`).",
+  "license": "CC BY 4.0, Honglin Li. Values taken from the sources listed in this file keep their publishers' terms; EIA, NOAA, EPA, Census and DOE data are U.S. government works in the public domain."
  },
  "dollarYear": 2025,
  "finance": {
@@ -21,7 +27,8 @@
   "capexSource": 6730,
   "capexYear": 2022,
   "life": 15,
-  "note": "EIA's minimum-efficiency air-source heat pump, installed, per home ($6,730 in 2022 dollars, x 1.0928 to 2025 dollars with EIA's GDP deflator, as engine E0 does); 15-year life. Its efficiency through the year is Prairie City's COP curve (prairie-city.json, cop), not this unit's rating. Commercial buildings are counted as home-equivalents by their heat need.",
+  "lifeSet": "teaching",
+  "note": "EIA's minimum-efficiency air-source heat pump, installed, per home ($6,730 in 2022 dollars, x 1.0928 to 2025 dollars with EIA's GDP deflator, as engine E0 does). Its 15-year life is set for teaching (engine E0's illustrative life; EIA's table gives the cost, not the life). Its efficiency through the year is Prairie City's COP curve (prairie-city.json, cop), not this unit's rating. Commercial buildings are counted as home-equivalents by their heat need.",
   "via": "e0.json home.hp.standard",
   "src": [
    "eia-aeo2026-rdm",
@@ -193,7 +200,7 @@
    "hi": 80,
    "step": 5,
    "set": "teaching",
-   "note": "Set for teaching: what one MWh from the wind contract or the solar farm saves the city's supplier when it replaces a bought MWh; the wires part of the bill is still paid."
+   "note": "Set for teaching: what one MWh from the city's own wind or solar farm saves the city's supplier when it replaces a bought MWh; the wires part of the bill is still paid."
   },
   "gasInd": {
    "lo": 3,
@@ -308,7 +315,7 @@
      "5.4%"
     ]
    ],
-   "note": "Precomputed with HiGHS on 6 November 2026: the hub as a linear program over eight representative days. Prairie City is fictional; its numbers are illustrative. With JavaScript on, the bench runs your own plan."
+   "note": "Precomputed with HiGHS on 6 November 2026: the hub as a linear program over eight representative days. $M: millions of 2025 dollars; t: metric tonnes of CO₂. Prairie City is fictional; its numbers are illustrative. With JavaScript on, the bench runs your own plan."
   },
   "m12": {
    "table": "<div class=\"lx-scroll-x\"><table class=\"lx-facts m12-table\"><thead><tr><th scope=\"col\">Plan</th><th scope=\"col\">Yearly cost against 2025</th><th scope=\"col\">CO₂ of the districts (a year)</th><th scope=\"col\">Substation upgrades</th><th scope=\"col\">Burden, homes below 80% of area median income (AMI; screening)</th></tr></thead><tbody><tr><td>2025 as it is</td><td class=\"n\">$0.0M</td><td class=\"n\">1,921,977 t</td><td class=\"n\">0 MW</td><td class=\"n\">6.1%</td></tr><tr><td>Electrify heat and cars</td><td class=\"n\">−$65.8M</td><td class=\"n\">1,527,234 t</td><td class=\"n\">91 MW</td><td class=\"n\">5.4%</td></tr><tr><td>Electrify, managed charging, 40 MW of batteries</td><td class=\"n\">−$60.5M</td><td class=\"n\">1,527,266 t</td><td class=\"n\">48 MW</td><td class=\"n\">5.5%</td></tr><tr><td>The LP's choice, CO₂ ≤ 80% of 2025</td><td class=\"n\">−$86.2M</td><td class=\"n\">1,537,582 t</td><td class=\"n\">5 MW</td><td class=\"n\">5.1%</td></tr></tbody></table></div><p class=\"lx-hint\">Precomputed with HiGHS on 6 November 2026. Cost includes the cars' fuel and charging, not their prices; equipment and upgrades as yearly payments.</p>",
@@ -393,6 +400,10 @@
        0.888
       ],
       "pvAdd": 92.314
+     },
+     "choose3000": {
+      "burdenLow": 0.0518,
+      "burdenOther": 0.01731
      }
     },
     "cap": 80,
@@ -410,12 +421,13 @@
       "bat": 20
      },
      "burdenLow": 0.05216,
-     "dhPrice": 130.8
+     "dhPrice": 130.8,
+     "cost": 569083293
     }
    }
   },
   "c3": {
-   "head": "Result: 2025 as it is, then the reference plan of the exemplars (70% heat pumps, 40% electric cars, 200 MW of wind, a 100 MW solar farm at A19's site A)",
+   "head": "Result: 2025 as it is, then the reference plan of the exemplars (70% heat pumps, 40% electric cars, 200 MW of city-owned wind, a 100 MW solar farm at A19's site A)",
    "rows": [
     [
      "2025: up front, 2026 to 2040 (2025 dollars)",
@@ -501,7 +513,13 @@
      "parts": [
       "Recommendation: ",
       {
-       "text": "switch 70% of furnaces and resistance heat to heat pumps, retrofit 10% of buildings, make 40% of cars electric with managed charging, add 30 MW of substation batteries, move the food plants' low-temperature heat to heat pumps, and contract 200 MW of wind and a 100 MW solar farm at site A",
+       "text": "electrify heat and cars, add substation batteries, move the food plants' low-temperature heat to heat pumps, and build city-owned wind and solar",
+       "note": "The plan in one sentence, before the evidence."
+      },
+      ".\n",
+      "Sizes: ",
+      {
+       "text": "70% of furnaces and resistance heat to heat pumps · retrofits 10% · electric cars 40%, managed · batteries 30 MW · food plants' low-temperature heat 100% · wind 200 MW · solar 100 MW, site A",
        "note": "Every lever with its size: a plan the council can cost and check."
       },
       ".\n",
@@ -513,7 +531,7 @@
       ".\n",
       "CO₂ and the grid: ",
       {
-       "text": "the city's location-based CO₂ 2,423,488 t a year, 12% below 2025 (operating only; the contracts not deducted); 26 MW of substation upgrades, the suburbs the tightest",
+       "text": "the city's location-based CO₂ 2,423,488 t a year, 12% below 2025 (operating only; the city's wind and solar output not deducted); 26 MW of substation upgrades, the suburbs the tightest",
        "note": "The cut with its boundary, and where the plan needs grid room."
       },
       ".\n",
@@ -531,20 +549,44 @@
       ".\n",
       "Site: ",
       {
-       "text": "site A, the best of A19's five blocks and the cheapest to connect ($5.3M), at a 23.8% capacity factor",
+       "text": "site A, the highest-scoring of A19's five blocks under its default weights and the cheapest to connect ($5.3M), at a 23.8% capacity factor",
        "note": "The site's choice with its evidence from the map."
       },
       ".\n",
       "Sensitivity: ",
       {
-       "text": "the yearly cost runs from −$72.3M to −$2.6M with every input at its lower- or higher-cost end; value of a contract MWh moves it most, $20/MWh to $80/MWh; every tested input is set for teaching",
-       "note": "A range, the input that matters most, and what kind of number each input is."
+       "text": "the yearly cost runs from −$72.3M to −$2.6M at the inputs' cheaper and dearer ends, equipment fixed (table attached); value of a wind or solar MWh moves it most; every input is set for teaching",
+       "note": "A range, what was held fixed, the input that matters most, what kind of number each input is, and the table."
       },
       ".\n",
       "Panel: ",
       {
-       "text": "to the electric utility (26 MW of upgrades): I keep them, since with the plan's levers fixed they are the cheapest way to meet the suburbs' busiest hour (its dual equals the upgrade's yearly cost); to the climate group (12% cut): the wind and solar contracts do not lower the location-based CO₂ (a market-based report could claim about 301,316 t); deeper cuts need more heat pumps and retrofits, with $272.1M of the budget left; to the industrial park (+$2.2M a year, 7%): I keep the food plants' heat pumps for the gas they save, and show the park's gas price in the sensitivity table; to farmers and rural residents (site A): it is the screen's best block and the cheapest of the five to connect, $5.3M for its line, road and land, 1.0 km to S4, on about 542 acres",
-       "note": "Each objection answered with a reason or a change, from the run's own numbers."
+       "text": "to the electric utility (26 MW of upgrades): I keep them, the cheapest way to meet the suburbs' busiest hour on the eight days (its dual equals the upgrade's yearly cost), and add the 5.7 MW the full-year check finds short, about $0.2M a year",
+       "note": "A reason to keep the upgrades, from the LP's dual, and what the full-year check adds."
+      },
+      ".\n",
+      "Panel: ",
+      {
+       "text": "to the climate group (12% cut): the city's wind and solar do not lower the location-based CO₂; deeper cuts need more heat pumps and retrofits, with $272.1M of the budget left",
+       "note": "The boundary held, and what would cut deeper, with the budget left."
+      },
+      ".\n",
+      "Panel: ",
+      {
+       "text": "to the industrial park (+$2.2M a year, 7%): I keep the food plants' heat pumps for the gas they save, and show the park's gas price in the sensitivity table",
+       "note": "A reason, and where the risk is shown."
+      },
+      ".\n",
+      "Panel: ",
+      {
+       "text": "to farmers and rural residents (site A): it is the screen's highest-scoring block and the cheapest of the five to connect, $5.3M for its line, road and land, 1.0 km to S4, on about 542 acres",
+       "note": "The site's evidence from the map."
+      },
+      ".\n",
+      "Sources: ",
+      {
+       "text": "EIA, NOAA, EPA and DOE public data (U.S. government works); A19's simulated map layers; the course's CC BY 4.0 model; no conflict of interest",
+       "note": "The data and their terms named, and the conflict of interest stated."
       },
       ".\n",
       "Limits: ",

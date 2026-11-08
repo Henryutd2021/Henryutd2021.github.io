@@ -29,11 +29,12 @@
        [+ in sizing, optionally: CO2 <= a cap, whose dual is the cost of the last tonne cut].
    C3 adds (capstone schema): the industrial park (food plants' heat below 100 C by industrial heat pumps; the fertilizer
      plant's hydrogen by electrolysis: flat loads at the park's own substation), the data-center campus (a load only, at
-     its own substation, fixed), a wind contract and a solar farm whose output is netted against the city's purchases
-     hour by hour (farmUse <= output, farmUse <= the city's meter load; the rest spilled, no CO2 credit for it), valued
-     at the reader's "avoided cost" per MWh. CO2 stays location-based: the contract MWh do not change the grid's
-     average rate, so they are never deducted (GHG Protocol Scope 2 Guidance); what a
-     market-based report could claim for them is reported apart (acc.contract).
+     its own substation, fixed), and city-owned wind and a solar farm (the city pays to build them: up front, in the
+     budget, and as yearly payments) whose output is netted against the city's purchases hour by hour (farmUse <= output,
+     farmUse <= the city's meter load; the rest spilled, no CO2 credit for it), valued at the reader's "avoided cost" per
+     MWh. CO2 stays location-based: the farms' MWh do not change the grid's average rate, so they are never deducted (GHG
+     Protocol Scope 2 Guidance). Their MWh at the grid's average rate are reported apart (acc.contract) as an
+     illustrative grid-average comparison: not a market-based inventory result, not a physical cut.
 
    Prices and duals (from LPs only, never from MILPs): only from this LP, labelled "marginal values under stated assumptions": the substation duals
    (value of 1 MW more room, $ per MW per year), the balance duals ($/MWh in a district-hour), the CO2 cap's dual.
@@ -144,12 +145,12 @@
       { id: "hp", short: "h", type: "int", min: 0, max: 100, step: 5, def: 0, label: "Furnaces and resistance heat switched to heat pumps", unit: "%" },
       { id: "ret", short: "r", type: "int", min: 0, max: 100, step: 5, def: 0, label: "Buildings retrofitted", unit: "%" },
       { id: "dh", short: "d", type: "int", min: 0, max: 50, step: 5, def: 0, label: "Dense core's heat from a district network", unit: "%" },
-      { id: "dhp", short: "p", type: "int", min: 0, max: 250, step: 10, def: 0, label: "Network's heat pump", unit: "MW heat" },
-      { id: "sto", short: "s", type: "int", min: 0, max: 2000, step: 100, def: 0, label: "Network's heat store", unit: "MWh" },
+      { id: "dhp", short: "p", type: "int", min: 0, max: 250, step: 10, def: 0, label: "Network's heat pump", unit: "MW of heat" },
+      { id: "sto", short: "s", type: "int", min: 0, max: 2000, step: 100, def: 0, label: "Network's heat store", unit: "MWh of heat" },
       { id: "ev", short: "e", type: "int", min: 1, max: 100, step: 1, def: 1, label: "Cars that are electric", unit: "%" },
       { id: "evm", short: "m", type: "enum", values: ["home", "managed"], names: { home: "Unmanaged", managed: "Managed" }, def: "home", label: "EV charging" },
       { id: "pv", short: "v", type: "int", min: 0, max: 400, step: 10, def: 0, label: "Rooftop solar added", unit: "MW" },
-      { id: "bat", short: "b", type: "int", min: 0, max: 200, step: 10, def: 0, label: "Batteries at the substations (4 hours)", unit: "MW" },
+      { id: "bat", short: "b", type: "int", min: 0, max: 200, step: 10, def: 0, label: "Batteries at the substations (4 hours of storage)", unit: "MW" },
       { id: "up", short: "u", type: "enum", values: ["yes", "no"], names: { yes: "Allowed", no: "Not allowed" }, def: "yes", label: "Substation upgrades" },
       { id: "upc", short: "c", type: "int", min: up.lo, max: up.hi, step: up.step, def: up.def, label: "Upgrade cost", unit: "$/kW" },
       { id: "save", short: "a", type: "int", min: sv.lo, max: sv.hi, step: sv.step, def: sv.def, label: "Heat a retrofit saves", unit: "%" },
@@ -165,17 +166,17 @@
     S.fields = S.fields.concat([
       { id: "ihp", short: "i", type: "int", min: 0, max: 100, step: 10, def: 0, label: "Food plants' heat below 100 °C from heat pumps", unit: "%" },
       { id: "ely", short: "y", type: "int", min: 0, max: 100, step: 10, def: 0, label: "Fertilizer plant's hydrogen from electrolysis", unit: "%" },
-      { id: "wind", short: "w", type: "int", min: 0, max: 400, step: 10, def: 0, label: "Wind contract to the west", unit: "MW" },
+      { id: "wind", short: "w", type: "int", min: 0, max: 400, step: 10, def: 0, label: "City-owned wind capacity, to the west", unit: "MW" },
       { id: "farm", short: "f", type: "int", min: 0, max: 150, step: 10, def: 0, label: "Solar farm", unit: "MW" },
       { id: "site", short: "t", type: "enum", values: ["A", "B", "C", "D", "E"], names: { A: "Site A", B: "Site B", C: "Site C", D: "Site D", E: "Site E" }, def: "A", label: "Solar farm's site" },
-      { id: "av", short: "x", type: "int", min: av.lo, max: av.hi, step: av.step, def: av.def, label: "Value of a contract MWh", unit: "$/MWh" }]);
+      { id: "av", short: "x", type: "int", min: av.lo, max: av.hi, step: av.step, def: av.def, label: "Value of a wind or solar MWh the city uses", unit: "$/MWh" }]);
     return S;
   }
   var presets = [
     { id: "today", label: "2025 as it is", state: { hp: 0, ret: 0, dh: 0, dhp: 0, sto: 0, ev: 1, evm: "home", pv: 0, bat: 0, up: "yes" }, note: "No change: 2025's buildings, cars and rooftop solar" },
     { id: "electrify", label: "Electrify heat and cars", state: { hp: 80, ret: 0, dh: 0, dhp: 0, sto: 0, ev: 50, evm: "home", pv: 0, bat: 0, up: "yes" }, note: "80% of furnaces and resistance heat to heat pumps, half the cars electric, charging unmanaged" },
-    { id: "flex", label: "Electrify with flexibility", state: { hp: 80, ret: 40, dh: 0, dhp: 0, sto: 0, ev: 50, evm: "managed", pv: 100, bat: 40, up: "yes" }, note: "The same, with retrofits, managed charging, rooftop solar and batteries" },
-    { id: "network", label: "Heat network in the core", state: { hp: 80, ret: 40, dh: 40, dhp: 120, sto: 1200, ev: 50, evm: "managed", pv: 100, bat: 0, up: "yes" }, note: "Four in ten of the core's buildings on a network with a heat pump and a store" }];
+    { id: "flex", label: "Electrify with flexibility", state: { hp: 80, ret: 40, dh: 0, dhp: 0, sto: 0, ev: 50, evm: "managed", pv: 100, bat: 40, up: "yes" }, note: "As “Electrify heat and cars”, plus 40% of buildings retrofitted, managed charging, 100 MW of rooftop solar and 40 MW of batteries" },
+    { id: "network", label: "Heat network in the core", state: { hp: 80, ret: 40, dh: 40, dhp: 120, sto: 1200, ev: 50, evm: "managed", pv: 100, bat: 0, up: "yes" }, note: "As the flexible plan without batteries, plus 40% of the core's heat from a network with a 120 MW heat pump and a 1,200 MWh heat store" }];
   // C3's "2025 as it is" resets every lever of the 2040 plan, the park's and the farms' too
   var c3presets = [
     { id: "today", label: "2025 as it is", state: { hp: 0, ret: 0, dh: 0, dhp: 0, sto: 0, ev: 1, evm: "home", pv: 0, bat: 0, up: "yes", ihp: 0, ely: 0, wind: 0, farm: 0 } },
@@ -197,11 +198,17 @@
     S.capex = { hp: cfg.heatPump.capex, ret: s.rc, net: s.dhc, plant: cfg.dh.plant.capex.def * 1000, store: cfg.dh.store.capex.def, pv: cfg.rooftop.capex * 1000, bat: cfg.battery.capex * 1000, up: s.upc * 1000 };
     S.d = P.D.map(function (D, i) {
       var s0 = D.s0, x = i === 0 ? S.dh : 0, c = S.hp, r = S.ret;
+      // district heat takes the share x from every 2025 system alike (2025's heat pumps too); then the share c of the
+      // furnaces and resistance heaters left switches to heat pumps
       var after = { fuel: (1 - x) * s0.fuel * (1 - c), res: (1 - x) * s0.res * (1 - c), hp: (1 - x) * (s0.hp + c * (s0.fuel + s0.res)), dh: x };
       var y = [{}, {}];
       SYS.forEach(function (k) { y[0][k] = (1 - r) * after[k]; y[1][k] = r * after[k]; });
       var evs = Math.max(D.evs0, Math.round(s.ev / 100 * D.ldv));
-      return { after: after, y: y, evs: evs, E: evs * P.evDay, pv: D.pv0 + S.pvAdd * P.pvShare[i], pvAdd: S.pvAdd * P.pvShare[i], bat: S.batAdd * P.batShare[i] };
+      // new heat pumps bought (share of the district's heat): the homes switched, (1 - x) c (furnaces + resistance).
+      // A 2025 heat pump that district heat replaces does not stand in for a new one elsewhere, so this is the gross
+      // number installed, not the net rise in the heat-pump share
+      return { after: after, y: y, evs: evs, E: evs * P.evDay, pv: D.pv0 + S.pvAdd * P.pvShare[i], pvAdd: S.pvAdd * P.pvShare[i], bat: S.batAdd * P.batShare[i],
+        hpNew: (1 - x) * c * (s0.fuel + s0.res) };
     });
     if (c3) {
       var c = cfg.c3;
@@ -343,7 +350,7 @@
         // C3: the park and the campus (fixed), the farms netted hour by hour against the city's meter load
         if (farmOn) {
           var gen = S.wind * P.days[k].wind[h] + S.farm * P.days[k].solar[h] * (S.siteAdj && S.siteAdj.cfK ? S.siteAdj.cfK : 1);
-          var fu = v("f" + tag, 0, gen, -w * S.av);   // money only: location-based CO2 does not count contract MWh
+          var fu = v("f" + tag, 0, gen, -w * S.av);   // money only: location-based CO2 does not count the farms' MWh
           var fixed = P.dc[k][h] + parkMW(P, S);
           row("fm" + tag, [[fu, 1]].concat(meter.map(function (m) { return [m, -1]; })), null, fixed);
         }
@@ -379,6 +386,9 @@
     });
     raw.pkC = val("pkC");
     raw.sizes = m.size ? { pvAdd: val("pvAdd"), batAdd: val("batAdd"), dhp: val("dhp"), sto: val("sto") } : { pvAdd: S.pvAdd, batAdd: S.batAdd, dhp: S.dhp, sto: S.sto };
+    // heat pumps bought (shares of each district's heat): sizing's are the LP's own (account reads them from the shares);
+    // a run keeps the plan's, so a run of a sized plan with its shares fixed (fixedSys) carries the sizing's
+    raw.hpNew = m.size ? null : S.d.map(function (sd) { return sd.hpNew; });
     for (var k = 0; k < K; k++) {
       var day = { d: [], dh: null, farm: null };
       P.D.forEach(function (D, i) {
@@ -447,13 +457,17 @@
       o.fuelHeat = 0; o.dhHeat = 0; o.share = {};
       SYS.forEach(function (k) { o.share[k] = y[0][k] + y[1][k]; });
       o.retShare = SYS.reduce(function (s, k) { return s + y[1][k]; }, 0);
+      o.y1 = copy(y[1]);   // the retrofitted shares by heating system (the household layer's retrofit savings)
       [0, 1].forEach(function (e) { o.fuelHeat += (1 - S.save * e) * D.Qann * y[e].fuel; o.dhHeat += (1 - S.save * e) * D.Qann * y[e].dh; });
       o.gas = o.fuelHeat * (1 - D.pf) / P.eta + D.otherGas;            // MWh of gas
       o.propane = o.fuelHeat * D.pf / P.eta + D.otherProp;             // MWh of propane
       o.gasoline = (D.ldv - S.d[i].evs) * P.galPerCar;                 // gallons
       o.peak = raw.pk[i]; o.limit = D.L; o.upg = raw.upg[i];
       o.pvAdd = mz.pvAdd * P.pvShare[i]; o.bat = mz.batAdd * P.batShare[i];
-      o.hpNew = Math.max(0, o.share.hp - D.s0.hp);
+      // heat pumps bought: in a run, the plan's switched homes (sysOf: gross, whatever district heat replaces); when the
+      // LP chooses the shares (sizing), it also chooses which homes change, so it keeps 2025's heat pumps and buys only
+      // the rise above 2025's share (its zhp column)
+      o.hpNew = raw.meta.size ? Math.max(0, o.share.hp - D.s0.hp) : raw.hpNew ? raw.hpNew[i] : S.d[i].hpNew;
       M.elec += o.imp * D.pEl - o.plant * (D.pEl - P.price.ind); M.gas += o.gas * D.pGas; M.propane += o.propane * P.price.propMWh; M.gasoline += o.gasoline * P.price.gasoline;
       Z.elec += o.imp * efEl; Z.gas += o.gas * P.ef.gas; Z.propane += o.propane * P.galPerMWh * P.ef.propGal; Z.gasoline += o.gasoline * P.ef.gasoline;
       M.hp += o.hpNew * D.homeEq * S.a.hp; U.hp += o.hpNew * D.homeEq * S.capex.hp;
@@ -501,9 +515,10 @@
       A.upfrontTotal += U.wind + U.farm + U.ihp + U.ely;
     }
     O.money = O.el * P.price.ind + O.gas * P.price.gasInd + O.diesel * P.price.diesel + O.prop * P.price.propGal + (M.farmSaved || 0);
-    // location-based: every MWh used at the grid's average rate; a contract does not change that rate, so its MWh are not
-    // deducted (GHG Protocol Scope 2 Guidance). What a market-based report could claim for them, at the same average rate
-    // and without a residual mix (a simplification), is kept apart in A.contract and never added to any total.
+    // location-based: every MWh used at the grid's average rate; the city's own wind and solar do not change that rate,
+    // so their MWh are not deducted (GHG Protocol Scope 2 Guidance). Their MWh at the same average rate (an illustrative
+    // grid-average comparison: no certificates, no residual mix, not a physical cut) are kept apart in A.contract and
+    // never added to any total.
     O.co2 = O.el * efEl + O.gas * P.ef.gas + O.diesel * P.ef.diesel + O.prop * P.ef.propGal;
     A.contract = { mwh: O.farmUse, gen: O.farmGen, t: O.farmUse * P.ef.grid };
     A.outside = O;
@@ -564,14 +579,19 @@
     var adopters = { hp: 0, ret: 0, dh: 0, ev: 0, pv: 0 }, clamp = false, FM = fuelMatrix(P);
     P.D.forEach(function (Dd, i) {
       var a = A.d[i], a0 = A0.d[i], H = P.hhDG[i], Hd = sum(H), r = Dd.rho;
-      // measures: (1) heating systems switched at the 2025 envelope, (2) retrofits on the switched mix, (3) EVs, (4) solar
+      // measures: (1) heating systems switched at the 2025 envelope, (2) retrofits, on the systems of the buildings
+      // retrofitted, (3) EVs, (4) solar
       var s0 = Dd.s0;
       var share = a.share, ret = a.retShare, Qr = r * Dd.Qann;
       var mix = function (sh) { return { el: Qr * (sh.res + sh.hp * Dd.eps), gas: Qr * sh.fuel * (1 - Dd.pf) / P.eta, prop: Qr * sh.fuel * Dd.pf / P.eta, dh: Qr * sh.dh }; };
       var m0 = mix(s0), m1 = mix(share);
       var changed = 1 - SYS.reduce(function (t, k) { return t + Math.min(share[k], s0[k] || 0); }, 0);
       var sw = { el: m1.el - m0.el, gas: m1.gas - m0.gas, prop: m1.prop - m0.prop, dh: m1.dh - m0.dh };
-      var rt = { el: -S.save * ret * m1.el, gas: -S.save * ret * m1.gas, prop: -S.save * ret * m1.prop, dh: -S.save * ret * m1.dh };
+      // a retrofit saves its share of the heat of the buildings retrofitted, carrier by carrier from their own heating
+      // systems (y[1][s]): when the LP chooses, it may retrofit only furnace-heated buildings, so no electricity is saved.
+      // With the plan's sliders the retrofits fall on every system alike, and this is ret x the switched mix
+      var mr = mix(a.y1);
+      var rt = { el: -S.save * mr.el, gas: -S.save * mr.gas, prop: -S.save * mr.prop, dh: -S.save * mr.dh };
       var meas = [
         // eligible homes: any home not already on a heat pump (the switch); every home (a retrofit, rooftop solar). The
         // rule decides which eligible homes adopt first.
@@ -761,6 +781,7 @@
     S.d.forEach(function (sd, i) {
       sd.y = [0, 1].map(function (e) { var q = {}; SYS.forEach(function (k) { q[k] = raw.y[i][e][k]; }); return q; });
       sd.pvAdd = z.pvAdd * P.pvShare[i]; sd.pv = P.D[i].pv0 + sd.pvAdd; sd.bat = z.batAdd * P.batShare[i];
+      sd.hpNew = Math.max(0, raw.y[i][0].hp + raw.y[i][1].hp - P.D[i].s0.hp);   // as the sizing run bought them
     });
     S.fixed = true;
     return S;
@@ -853,7 +874,7 @@
     rows.push(["Unserved, with only the eight days' upgrades", "none (sized on these days)", Y.unserved < 0.5 ? "none" : kilo(Y.unserved) + " MWh on " + dateList(Y.shortDays.map(function (x) { return x.day; })), ""]);
     if (D.batteryMW > 0) rows.push(["Batteries: MWh out a year", kilo(D.batteryOut), kilo(Y.batteryOut), sgn(Math.round(Y.batteryOut - D.batteryOut), kilo)]);
     if (D.storeMWh > 0) rows.push(["Heat store: MWh of heat out a year", D.storeOut < 0.5 ? "not used" : kilo(D.storeOut), Y.storeOut < 0.5 ? "not used" : kilo(Y.storeOut), Math.max(D.storeOut, Y.storeOut) < 0.5 ? "" : sgn(Math.round(Y.storeOut - D.storeOut), kilo)]);
-    if (c3 && Math.max(D.contractGWh, Y.contractGWh) > 0) rows.push(["Contract wind and solar the city used", kilo(D.contractGWh) + " GWh", kilo(Y.contractGWh) + " GWh", sgn(Y.contractGWh / D.contractGWh - 1, function (x) { return pct(x, 1); })]);
+    if (c3 && Math.max(D.contractGWh, Y.contractGWh) > 0) rows.push(["Wind and solar output the city used", kilo(D.contractGWh) + " GWh", kilo(Y.contractGWh) + " GWh", sgn(Y.contractGWh / D.contractGWh - 1, function (x) { return pct(x, 1); })]);
     return rows;
   }
   // the gaps in plain words, one idea a line: [[label, text]]
@@ -865,12 +886,12 @@
     var ua = 1 - FYc.degreeHoursDays / FYc.degreeHours;   // the year's heat-loss rate against the eight days' (same heat need)
     out.push(["The check", "the plan as the eight days decided it (shares, sizes, substation upgrades), run on every hour of 2025 with the same model. Precomputed on " + date + ": too large for a click."]);
     out.push(["Two runs", "cost, CO₂ and unserved energy keep the eight days' upgrades; the busiest hours and upgrades come from a second run with the upgrades sized on the year."]);
-    out.push(["What holds", "yearly cost and CO₂, within " + (gap < 0.001 ? "0.1%" : "about " + pct(gap, 1)) + ": like the days, the year is scaled to the city's annual base and heat energy (its heat-loss rate " + pct(ua, 1) + " lower)."]);
+    out.push(["What holds", "total yearly cost and CO₂, within " + (gap < 0.001 ? "0.1%" : "about " + pct(gap, 1)) + ": like the days, the year is scaled to the city's annual base and heat energy (its heat-loss rate " + pct(ua, 1) + " lower)."]);
     var cost = extra * e.upYearly;
     out.push(["Three cold days", "the design day stands for 3 days: in the year, " + dateList(FYc.designDays) + ", equally cold. Only their base load (SPP's demand) differs, and February's is higher in the hours that matter."]);
     out.push(["The grid", Y.unserved >= 0.5 ? "the eight days' upgrades leave " + kilo(Y.unserved) + " MWh unserved on " + dateList(Y.shortDays.map(function (x) { return x.day; })) + " (load the model's substations cannot carry). Sized on the year, the plan buys " + (extra).toFixed(1) + " MW more, about " + (cost < 1e5 ? money(Math.round(cost / 1000) * 1000) : millions(cost)) + " a year."
       : "every hour of the year stays within the limits" + (up >= 0.5 ? " and the eight days' upgrades" : "") + (most >= 0.5 ? "; the busiest hour is up to " + kilo(most) + " MW higher than on the eight days." : ".")]);
-    if (c3 && Math.max(D.contractGWh, Y.contractGWh) > 0) out.push(["Wind and sun", "the eight days are picked by their shapes, not scaled: " + pct(FYc.windCF.days, 1) + " wind and " + pct(FYc.solarCF.days, 1) + " solar capacity factors, against 2025's " + pct(FYc.windCF.year, 1) + " and " + pct(FYc.solarCF.year, 1) + ". Hence the contract row and the cost gap."]);
+    if (c3 && Math.max(D.contractGWh, Y.contractGWh) > 0) out.push(["Wind and sun", "the eight days are picked by their shapes, not scaled: " + pct(FYc.windCF.days, 1) + " wind and " + pct(FYc.solarCF.days, 1) + " solar capacity factors, against 2025's " + pct(FYc.windCF.year, 1) + " and " + pct(FYc.solarCF.year, 1) + ". Hence the wind and solar row and the cost gap."]);
     out.push(["Not tested", "another weather year, cold beyond the design day, or storage from one day to the next: the year uses the eight days' synthetic weather rule."]);
     return out;
   }
@@ -893,11 +914,11 @@
   // ---------------------------------------------------------------- words for the pages and the note
   function planRows(state, S) {
     var out = [["Heat pumps", state.hp + "% of furnaces and resistance heat switched"], ["Retrofits", state.ret + "% of buildings, saving " + state.save + "% of their heat"],
-      ["District heat", state.dh > 0 ? state.dh + "% of the core's heat; heat pump " + kilo(state.dhp) + " MW, store " + kilo(state.sto) + " MWh" : "none"],
+      ["District heat", state.dh > 0 ? state.dh + "% of the core's heat; heat pump " + kilo(state.dhp) + " MW of heat, store " + kilo(state.sto) + " MWh of heat" : "none"],
       ["Electric cars", state.ev + "% of cars, " + (state.evm === "managed" ? "managed charging" : "unmanaged charging")],
-      ["Rooftop solar added", kilo(state.pv) + " MW"], ["Batteries", kilo(state.bat) + " MW (4 hours)"], ["Substation upgrades", state.up === "yes" ? "allowed at $" + kilo(state.upc) + "/kW" : "not allowed"]];
+      ["Rooftop solar added", kilo(state.pv) + " MW"], ["Batteries", kilo(state.bat) + " MW (" + kilo(state.bat * 4) + " MWh)"], ["Substation upgrades", state.up === "yes" ? "allowed at $" + kilo(state.upc) + "/kW" : "not allowed"]];
     if (S && S.c3) out.push(["Industrial park", state.ihp + "% of the food plants' low-temperature heat from heat pumps; " + state.ely + "% of the hydrogen from electrolysis"],
-      ["Wind contract", kilo(state.wind) + " MW"], ["Solar farm", kilo(state.farm) + " MW at site " + state.site]);
+      ["City-owned wind", kilo(state.wind) + " MW"], ["Solar farm", kilo(state.farm) + " MW at site " + state.site]);
     return out;
   }
   function note(state, R, P, o) {
@@ -911,8 +932,8 @@
       { label: "Energy burden, homes below 80% of area median income", value: R.hh.clamped ? "not shown" : pct(R.hh.low.burden, 1) + " (2025: " + pct(R.hh.low.burden0, 1) + ")",
         note: R.hh.clamped ? CLAMPED : "screening estimate, not from the LP" }];
     if (c3) res.splice(1, 0, { label: "Up-front spending, 2026 to 2040", value: millions(A.upfrontTotal, 0), note: "against a budget of " + millions(P.cfg.c3.budget.def * 1e6, 0) });
-    if (c3 && A.contract && A.contract.mwh > 0) res.splice(3, 0, { label: "Contract wind and solar the city used", value: kilo(A.contract.mwh / 1000) + " GWh a year",
-      note: "not deducted from the location-based CO₂; a market-based claim: about " + kilo(A.contract.t) + " t" });
+    if (c3 && A.contract && A.contract.mwh > 0) res.splice(3, 0, { label: "Wind and solar output the city used", value: kilo(A.contract.mwh / 1000) + " GWh a year",
+      note: "not deducted from the location-based CO₂; an illustrative grid-average comparison: ≈ " + kilo(A.contract.t) + " t" });
     return { heading: o.heading || (c3 ? "Prairie City 2040: the energy plan" : "Prairie City: a plan for the three districts"),
       made: o.made || "the City Planner (engine E3, a linear program)", plan: planRows(state, R.sys).map(function (r) { return { label: r[0], value: r[1] }; }),
       results: res,
@@ -922,7 +943,7 @@
         "No power-flow physics inside a district, no outages, no change in population or prices to 2040."] };
   }
   // the run's assumptions, one sentence each: the model's, then the plan's own (managed charging, the boiler, the
-  // contracts), then the household table's (hhAssume)
+  // city's wind and solar), then the household table's (hhAssume)
   function assumptions(state, R, P) {
     var c3 = R.sys.c3, out = ["Prairie City is fictional; its numbers are illustrative.", "2025 dollars, prices, people and homes; synthetic weather (NOAA's 1991-2020 normals on SPP's 2025 days).",
       "Eight representative days stand for the year, the design and peak days kept; full-year checks cover the presets.",
@@ -930,7 +951,7 @@
       "CO₂ location-based: eGRID's 2023 SPP North rate plus 5% losses; fuels at EIA's coefficients."];
     if (state.evm === "managed") out.push("Managed cars are plugged in at home or work when needed; a day's charge takes 6 hours or more.");
     if (state.dh > 0) out.push("The heat network's gas boiler exists already: its fuel counts, not its construction.");
-    if (c3 && (state.wind > 0 || state.farm > 0)) out.push("A contract MWh the city uses is worth $" + kilo(state.av) + " (set for teaching); it does not lower the location-based CO₂.");
+    if (c3 && (state.wind > 0 || state.farm > 0)) out.push("The city owns its wind and solar farms; a MWh of theirs it uses is worth $" + kilo(state.av) + " (set for teaching).");
     return out.concat(hhAssume(R));
   }
 
@@ -958,23 +979,23 @@
       ["Electricity, Kansas 2025: homes · businesses", (P.price.res / 10).toFixed(2) + "¢ · " + (P.price.com / 10).toFixed(2) + "¢ per kWh", c.sources[c.prices.electricitySrc].title + " (EIA)"],
       ["Gas, Kansas 2025: homes · businesses", "$" + c.prices.gasPerMcf.residential.toFixed(2) + " · $" + c.prices.gasPerMcf.commercial.toFixed(2) + " per thousand cubic feet", c.sources["eia-ng-ks"].title + " (EIA)"],
       ["Grid CO₂", kilo(c.emissions.gridLbPerMWh.sppNorth) + " lb per MWh, plus " + pct(P.ef.loss) + " losses", "EPA eGRID2023, SPP North"],
-      ["Heat pump COP, an illustrative curve", copAt(cop, cop.anchorC).toFixed(1) + " at " + num(cop.anchorC) + " °C; " + copAt(cop, 0).toFixed(1) + " at 0 °C; 1 below " + num(cop.cutoutC) + " °C",
+      ["Heat pump coefficient of performance (COP), an illustrative curve", copAt(cop, cop.anchorC).toFixed(1) + " at " + num(cop.anchorC) + " °C; " + copAt(cop, 0).toFixed(1) + " at 0 °C; 1 below " + num(cop.cutoutC) + " °C",
         "anchored to DOE's cold-climate challenge target, " + cop.anchorCOP + " at " + num(cop.anchorC) + " °C (" + src[cop.src].publisher + ", " + src[cop.src].date.split(" (")[0] + "); the rest is the course's curve (lesson F3), with resistance backup assumed below " + num(cop.cutoutC) + " °C"],
-      ["Heat pump, per home", money(cfg.heatPump.capex) + ", " + cfg.heatPump.life + " years", "EIA AEO2026, residential (2022 dollars, converted)"],
+      ["Heat pump, per home", money(cfg.heatPump.capex) + ", " + cfg.heatPump.life + " years", "cost: EIA AEO2026, residential (2022 dollars, converted); the " + cfg.heatPump.life + "-year life set for teaching"],
       ["Rooftop solar", money(cfg.rooftop.capex) + " per kW, " + cfg.rooftop.life + " years", "EIA AEO2026, residential (2022 dollars, converted)"],
-      ["Battery, 4 hours", money(cfg.battery.capex) + " per kW, " + cfg.battery.life + " years", "NREL 2025 update (2024 dollars, converted)"],
+      ["Battery, 4 hours (each MW stores 4 MWh)", money(cfg.battery.capex) + " per kW, " + cfg.battery.life + " years", "NREL 2025 update (2024 dollars, converted)"],
       ["Retrofit: cost a home · heat saved · life", money(cfg.retrofit.cost.def) + " · " + cfg.retrofit.save.def + "% · " + cfg.retrofit.life + " years", where],
-      ["Heat network: per home-equivalent · plant heat pump · heat store", money(dh.network.cost.def) + " (" + dh.network.life + " years) · " + money(dh.plant.capex.def) + " per kW of heat, COP " + dh.plant.cop + " (" + dh.plant.life + " years) · " + money(dh.store.capex.def) + " per MWh (" + dh.store.life + " years)",
+      ["Heat network: per home-equivalent (an average home's heat need) · plant heat pump · heat store", money(dh.network.cost.def) + " (" + dh.network.life + " years) · " + money(dh.plant.capex.def) + " per kW of heat, COP " + dh.plant.cop + " (" + dh.plant.life + " years) · " + money(dh.store.capex.def) + " per MWh (" + dh.store.life + " years)",
         "set for teaching (illustrative); " + pct(dh.loss) + " of the heat lost in the pipes; the gas boiler (" + pct(dh.plant.boilerEff) + ") is assumed to exist already: its fuel is counted, not its construction"],
       ["Substation upgrade", money(cfg.upgrade.capex.def) + " per kW, " + cfg.upgrade.life + " years", where],
       ["Managed charging", "any hours of the same day, at most a " + (cfg.ev.minHours === 6 ? "sixth" : "1/" + cfg.ev.minHours) + " of the day's charge in one hour", "set for teaching: cars plugged in at home or work whenever needed (an upper bound on what managed charging can do)"],
-      ["Yearly payments", pct(P.rate) + " real, over each item's life", "lesson 13's rate (NLR ATB 2025)"]];
+      ["Yearly payments", pct(P.rate) + " a year after inflation (real), over each item's life", "lesson 13's rate (NLR ATB 2025)"]];
     if (o.c3) {
       var c3 = cfg.c3, gi = c.prices.gasIndustrialInputs;
       rows.push(["Gas, the industrial park", "$" + c.prices.gasPerMcf.industrial.toFixed(2) + " per thousand cubic feet", "set for teaching from EIA: Kansas's 2025 citygate price ($" + gi.citygate2025.toFixed(2) + ") × its 2024 ratio of industrial to citygate price (" + gi.industrial2024.toFixed(2) + " / " + gi.citygate2024.toFixed(2) + "); EIA publishes no 2025 Kansas industrial price"],
         ["Wind farm · solar farm", money(c3.wind.capex) + " · " + money(c3.solarFarm.capex) + " per kW, " + c3.wind.life + " years", "EIA AEO2026, electricity (2025 dollars; via lesson 13)"],
         ["Electrolyzer", money(c3.electrolyzer.capex) + " per kW, " + c3.electrolyzer.life + " years; 57.5 kWh per kg", "DOE Record 24005 (2022 dollars, converted)"],
-        ["Industrial heat pump · value of a contract MWh", money(c3.indHP.capex) + " per kW of heat · $" + c3.avoided.def + "/MWh", "set for teaching (illustrative)"],
+        ["Industrial heat pump · value of a MWh from the city's wind and solar", money(c3.indHP.capex) + " per kW of heat · $" + c3.avoided.def + "/MWh", "set for teaching (illustrative)"],
         ["Budget, up front 2026 to 2040", "$" + kilo(c3.budget.def) + " million", "set for teaching (illustrative)"]);
     }
     return tableHTML(["Input", "Value", "Source"], rows, "e3-inputs", [null, "n", "s"]);
@@ -1082,9 +1103,9 @@
         marks: [{ x: bi + 0.5, y: d.imp[bi], label: kilo(d.imp[bi]) + " MW at " + hh(bi), kind: "dot", pos: "above" }],
         caption: D.label + ", " + P.days[k].label.toLowerCase() + " (" + P.days[k].date + ")",
         legend: [{ label: "Bought through the substation", color: DCOL[di] }, { label: "Used in the district", color: "var(--lx-ink-3)", dash: "5 4" }].concat(lines.length > 2 ? [{ label: "Rooftop solar used", color: "var(--lx-solar)" }] : []),
-        tip: function (x) { var h = Math.max(0, Math.min(23, Math.floor(x))); return "<div><b>" + hh(h) + "</b></div><div>Bought " + kilo(d.imp[h]) + " MW</div><div>Used " + kilo(load[h]) + " MW</div>" + (d.lim[h] > 0.5 ? "<div>Room worth $" + kilo(d.lim[h]) + " per MW a year</div>" : ""); },
+        tip: function (x) { var h = Math.max(0, Math.min(23, Math.floor(x))); return "<div><b>" + hh(h) + "</b></div><div>Bought " + kilo(d.imp[h]) + " MW</div><div>Used " + kilo(load[h]) + " MW</div>" + (d.lim[h] > 0.5 ? "<div>More room worth $" + kilo(d.lim[h]) + " per MW a year at the margin</div>" : ""); },
         aria: "Hourly chart: " + D.label + ", " + P.days[k].label + ". Busiest hour " + hh(bi) + " at " + kilo(d.imp[bi]) + " MW against a limit of " + kilo(lim) + " MW.",
-        text: { head: ["Hour", "Bought (MW)", "Used (MW)", "Base", "Heating", "EV charging", "Rooftop solar used", "Battery in − out", "Value of 1 MW more room ($ a year)"],
+        text: { head: ["Hour", "Bought (MW)", "Used (MW)", "Base load (MW)", "Heating (MW)", "EV charging (MW)", "Rooftop solar used (MW)", "Battery in − out (MW)", "Marginal value of room ($ per MW a year)"],
           rows: d.imp.map(function (v, h) { return [hh(h), kilo(v), kilo(load[h]), kilo(d.base[h]), kilo(d.heat[h] + d.plant[h]), kilo(d.ev[h]), kilo(d.pv[h]), kilo(d.bc[h] - d.bd[h]), d.lim[h] == null ? "–" : kilo(d.lim[h])]; }) } }, true);
       say.textContent = "Busiest hour " + hh(bi) + ": " + kilo(d.imp[bi]) + " MW bought against the " + kilo(lim) + " MW limit" + (up > 0.05 ? " (" + kilo(up) + " MW of upgrade bought for the year's busiest hour)." : ".");
     }
@@ -1108,7 +1129,7 @@
       ["Substation upgrades, as yearly payments", M0.up, M.up]];
     if (c3) {
       var O = R.acc.outside, O0 = R.base ? R.base.acc.outside : O, ex = function (m) { return (m.wind || 0) + (m.farm || 0) + (m.ihp || 0) + (m.ely || 0); };
-      rows.push(["Park, campus, buses, trucks and farms: their energy, less the contract MWh's value", O0.money, O.money], ["Wind, solar farm and the park's new equipment, yearly", ex(M0), ex(M)]);
+      rows.push(["Park, campus, buses, trucks and farms: their energy, less the value of the city's wind and solar MWh it uses", O0.money, O.money], ["City-owned wind, solar farm and the park's new equipment, yearly", ex(M0), ex(M)]);
     }
     var t0 = rows.reduce(function (s, r) { return s + r[1]; }, 0), t1 = rows.reduce(function (s, r) { return s + r[2]; }, 0);
     rows.push(["Total a year", t0, t1]);
@@ -1149,7 +1170,7 @@
       '<div class="e3-hub-col"><p class="e3-hub-h">In</p><p class="e3-hub-n el">Grid electricity <span>through each district\'s substation, up to its limit</span></p><p class="e3-hub-n gas">Gas and propane <span>from the pipeline and tanks</span></p><p class="e3-hub-n sun">Rooftop sun <span>used or spilled</span></p></div>' +
       '<div class="e3-hub-col"><p class="e3-hub-h">Convert and store</p><p class="e3-hub-n">Furnaces <span>80%</span></p><p class="e3-hub-n">Heat pumps <span>COP falls as it gets colder</span></p><p class="e3-hub-n">District-heat plant <span>heat pump and boiler, with a heat store</span></p><p class="e3-hub-n">Batteries and managed charging <span>move electricity in time</span></p></div>' +
       '<div class="e3-hub-col"><p class="e3-hub-h">Out</p><p class="e3-hub-n">Space heat <span>less after a retrofit</span></p><p class="e3-hub-n">Lights, appliances, cooling <span>the base load</span></p><p class="e3-hub-n">Car travel <span>gasoline or charging</span></p></div></div>' +
-      '<figcaption>' + LX.rich(o.caption || "The [[energy-hub|energy hub]]: each hour, what comes in through the [[substation|substation]], the pipeline and the roofs must meet the heat, base and charging the district uses. The limit is a ceiling on each hour's flow (a [[linearized-feeder-limit|linearized feeder limit]]).") + "</figcaption>";
+      '<figcaption>' + LX.rich(o.caption || "The [[energy-hub|energy hub]]: each hour, supply through the [[substation|substation]], the pipeline and the roofs meets the district's heat, base load and charging. The limit caps each hour's flow (a [[linearized-feeder-limit|linearized feeder limit]]).") + "</figcaption>";
     return el;
   }
   // the full-year check's card (SB3, M12, C3): the table and the gaps in words, or why there is none for this plan

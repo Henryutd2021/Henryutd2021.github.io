@@ -19,8 +19,11 @@
 //     household table) is the same with the tie costs x2 and x0.1, and the min and max of each over the optimal face
 //     agree (within half a MW, 0.05 MW, 1 t, $1,000); the tie costs trade less than $30 a year of economic cost (the
 //     economic optimum: ties x0) on every preset and on a heavy SB3 plan, where the ties cost most
-//   - location-based CO2: contract wind and solar never change it; the market-based claim is
-//     reported apart; hours at the limit are weighted by the days
+//   - location-based CO2: the city's own wind and solar never change it; their MWh at the grid's average rate are
+//     reported apart, as an illustrative grid-average comparison; hours at the limit are weighted by the days
+//   - heat pumps bought: counted from the plan's own transitions (district heat does not cancel new heat pumps); in
+//     sizing, the LP's own; the same when a sized plan is run again with its shares fixed
+//   - the household layer's carriers reconcile with the homes' physical change, for the presets and the LP's plans
 //   - the household layer (kept apart from the model's costs): 2025 as it is reproduces prairie-city.json's group bills
 //     and burdens; each measure's changes add up to the engine's district changes; no group's use goes below zero for
 //     any preset, rule or slider end; the fitted gasoline table adds up both ways; the charging the plan adds is
@@ -59,6 +62,16 @@ const near = (a, b, t) => Math.abs(a - b) <= (t == null ? 1e-6 : t);
   ok(inp.indexOf("× 1.15, rounded up to the next 10 MW (" + hr[0] + ", " + hr[1] + " and " + hr[2] + " above it") >= 0 && hr.join() === "17%,20%,25%", "the limits: 2025 peak x 1.15 rounded up to 10 MW, " + hr.join(", ") + " above it");
   ok(!/ranges you set/.test(inp + inpF) && inpF.indexOf(E3.money(cfg.retrofit.cost.def) + " · " + cfg.retrofit.save.def + "% · ") >= 0 && inpF.indexOf(E3.money(cfg.upgrade.capex.def) + " per kW") >= 0 && /fixed here at the defaults/.test(inpF) && /which you change on the bench/.test(inp), "the teaching costs shown with their defaults and lives, and where they can be changed");
   ok(/assumed to exist already: its fuel is counted, not its construction/.test(inp) && /plugged in at home or work/.test(inp), "the boiler and managed-charging assumptions are stated");
+  ok(/Heat pump coefficient of performance \(COP\), an illustrative curve/.test(inp) && inp.indexOf("the " + cfg.heatPump.life + "-year life set for teaching") >= 0 && cfg.heatPump.lifeSet === "teaching" && /set for teaching/.test(cfg.heatPump.note) && e0.home.hp.life === cfg.heatPump.life && /Illustrative[^.]*lasts 15 years/.test(e0.home.hp.note),
+    "the heat pump: EIA's cost, its 15-year life labelled as set for teaching (engine E0's illustrative life); COP spelled out");
+  ok(/Battery, 4 hours \(each MW stores 4 MWh\)/.test(inp) && cfg.battery.hours === 4 && /a year after inflation \(real\)/.test(inp), "the battery's four hours as energy; the rate said as after inflation");
+  const fu = id => S3.fields.find(f => f.id === id);
+  ok(fu("sto").unit === "MWh of heat" && fu("dhp").unit === "MW of heat" && /4 hours of storage/.test(fu("bat").label) && E3.planRows(Object.assign({}, def, { bat: 40 })).some(r => r[0] === "Batteries" && /^40 MW \(160 MWh\)$/.test(r[1])),
+    "the heat store in MWh of heat, the plant in MW of heat; batteries as power with their four hours of energy");
+  ok(/head: \["Hour", "Bought \(MW\)", "Used \(MW\)", "Base load \(MW\)", "Heating \(MW\)", "EV charging \(MW\)", "Rooftop solar used \(MW\)", "Battery in − out \(MW\)"/.test(SRC), "the hourly text table gives every power column in MW");
+  ok(E3.presets.every(p => p.note && p.note.split(/\s+/).length <= 30) && /100 MW of rooftop solar and 40 MW of batteries/.test(E3.presets[2].note) && E3.presets[2].state.pv === 100 && E3.presets[2].state.bat === 40 && E3.presets[2].state.ret === 40 &&
+    /40% of the core's heat from a network with a 120 MW heat pump and a 1,200 MWh heat store/.test(E3.presets[3].note) && E3.presets[3].state.dh === 40 && E3.presets[3].state.dhp === 120 && E3.presets[3].state.sto === 1200 && E3.presets[3].state.bat === 0,
+    "each preset's description says what it sets, with the preset's own numbers");
   ok(inpC.indexOf("$" + city.prices.gasPerMcf.industrial.toFixed(2) + " per thousand cubic feet") >= 0 && /EIA publishes no 2025 Kansas industrial price/.test(inpC), "C3: the park's gas price, its derivation and source");
   ok(inp.indexOf(P.D.map(D => E3.kilo(D.L)).join(" · ") + " MW") >= 0 && inp.indexOf(E3.kilo(city.emissions.gridLbPerMWh.sppNorth) + " lb per MWh") >= 0 && inp.indexOf(E3.money(cfg.heatPump.capex)) >= 0, "the inputs table reads the data");
   ok(!/nuclear|reactor|\bSMR\b|small modular/i.test(SRC + DATA), "no nuclear term in the engine or its data");
@@ -200,16 +213,41 @@ const near = (a, b, t) => Math.abs(a - b) <= (t == null ? 1e-6 : t);
     ok(R.dist[0].bindHours === 36 && R.dist[0].bindSlots === 9, "flex, the core: 36 hours a year at its limit, 9 representative hours with a positive dual");
   }
 
-  // ---------------- C3: location-based CO2; the contract's market-based claim apart
+  // ---------------- C3: location-based CO2; the city's wind and solar at the grid's average rate apart
   {
     const wind = Object.assign({}, c3d, { wind: 400, farm: 150 }), rw = await E3.solve(wind, P, { solver }), Rw = rw.results;
-    ok(rw.ok && near(Rw.acc.city.co2, A0c.city.co2, 1e-6) && Rw.acc.contract.mwh > 1e5, "contract wind and solar alone leave the city's location-based CO2 as in 2025 (" + Math.round(Rw.acc.city.co2) + ")");
-    ok(near(Rw.acc.contract.t, Rw.acc.contract.mwh * P.ef.grid, 1e-6) && Rw.acc.contract.mwh <= Rw.acc.contract.gen + 1e-6, "the market-based claim is the contract MWh used at the grid's average rate, reported apart");
+    ok(rw.ok && near(Rw.acc.city.co2, A0c.city.co2, 1e-6) && Rw.acc.contract.mwh > 1e5, "the city's wind and solar alone leave its location-based CO2 as in 2025 (" + Math.round(Rw.acc.city.co2) + ")");
+    ok(near(Rw.acc.contract.t, Rw.acc.contract.mwh * P.ef.grid, 1e-6) && Rw.acc.contract.mwh <= Rw.acc.contract.gen + 1e-6, "the grid-average comparison is the farms' MWh used at the grid's average rate, reported apart");
     const n = E3.note(wind, Rw, P);
-    ok(n.results.some(x => /Contract wind and solar the city used/.test(x.label) && /not deducted/.test(x.note)) && n.assumptions.some(x => /does not lower the location-based CO₂/.test(x)), "the note keeps the contract apart from the location-based CO2");
+    ok(n.results.some(x => /Wind and solar output the city used/.test(x.label) && /not deducted/.test(x.note) && /an illustrative grid-average comparison: ≈ [\d,]+ t$/.test(x.note)) && n.assumptions.some(x => /owns its wind and solar farms/.test(x)) && !/market-based claim|could claim/.test(JSON.stringify(n)), "the note keeps the farms' output apart, labelled an illustrative grid-average comparison, apart from the location-based CO2");
     ok(JSON.stringify(E3.c3presets[0].state) === JSON.stringify({ hp: 0, ret: 0, dh: 0, dhp: 0, sto: 0, ev: 1, evm: "home", pv: 0, bat: 0, up: "yes", ihp: 0, ely: 0, wind: 0, farm: 0 }), "C3's \"2025 as it is\" resets every lever of the plan");
     const back = E3.withPreset(Object.assign({}, c3d, { hp: 70, ihp: 100, ely: 50, wind: 200, farm: 100 }), E3.c3presets[0]), rb = await E3.solve(back, P, { solver });
     ok(rb.ok && near(rb.results.acc.upfrontTotal, 0, 1e-6) && near(rb.results.acc.city.co2, A0c.city.co2, 1e-6), "after a plan, \"2025 as it is\" brings back 2025: no spending, 2025's CO2");
+  }
+
+  // ---------------- heat pumps bought: counted from the plan's own transitions, apart from the engine's cost formula
+  // A run moves the share x of the core's heat (2025's heat pumps too) to district heat, then switches the share c of
+  // the furnaces and resistance heaters left: (1 - x) c of each is a new heat pump. A 2025 heat pump that district heat
+  // replaces is not a new one elsewhere, so a plan with district heat buys more than the net rise in the heat-pump share
+  {
+    const hpCost = cfg.heatPump.capex, hpYear = E3.yearly(cfg.heatPump.capex, cfg.heatPump.life, cfg.finance.rate);
+    for (const pl of plans) {
+      const st = pl.st, x = st.dh / 100, c = st.hp / 100, A = E3.account(P, runs[pl.id].S, runs[pl.id].raw);
+      let homes = 0, net = 0;
+      P.D.forEach((D, i) => {
+        const xi = i === 0 ? x : 0, from = { fuel: D.s0.fuel, res: D.s0.res };   // the 2025 systems that can switch
+        const moved = Object.keys(from).reduce((t, s) => t + from[s] * (1 - xi) * c, 0);
+        homes += moved * D.homeEq; net += Math.max(0, A.d[i].share.hp - D.s0.hp) * D.homeEq;
+      });
+      ok(near(A.upfront.hp, homes * hpCost, 1) && near(A.money.hp, homes * hpYear, 1), pl.id + ": heat pumps bought = the homes switched, " + Math.round(homes) + " home-equivalents (up front " + E3.millions(A.upfront.hp, 3) + ")");
+      if (x > 0) ok(homes - net > 100 && near(homes - net, x * P.D[0].s0.hp * P.D[0].homeEq, 1e-6), pl.id + ": district heat replaces " + (homes - net).toFixed(2) + " home-equivalents of 2025 heat pumps; they are not counted as new ones elsewhere");
+    }
+    // sizing: the LP chooses which homes change, keeps 2025's heat pumps and buys the rise (its zhp column)
+    const st = Object.assign({}, def, { ev: 50, evm: "managed" }), S = E3.sysOf(st, P), o = { size: true, cap: 0.8 * R0.acc.co2Hub, retMax: 0.6, dhMax: 0.4 };
+    const m = E3.build(P, S, o), r = solveSync(m), raw = E3.read(P, S, m, r), A = E3.account(P, S, raw);
+    ok(r.status === "optimal" && A.d.every((o, i) => near(o.hpNew, (r.values["zhp" + i] || 0) / 100, 1e-7)), "sizing: the heat pumps charged are the LP's own (zhp), " + A.d.map(o => (100 * o.hpNew).toFixed(1) + "%").join(", "));
+    const Sf = E3.fixedSys(st, P, raw), mf = E3.build(P, Sf, {}), rawF = E3.read(P, Sf, mf, solveSync(mf)), Af = E3.account(P, Sf, rawF), Rf = E3.summarize(st, P, rawF, null);
+    ok(near(Af.upfront.hp, A.upfront.hp, 1) && near(Rf.acc.upfront.hp, A.upfront.hp, 1) && near(Rf.acc.total, A.total, 50), "a sized plan run again with its shares fixed (the full-year check's way) is charged the same heat pumps, also through summarize (" + E3.millions(Rf.acc.upfront.hp) + ")");
   }
 
   // ---------------- the household layer
@@ -217,6 +255,31 @@ const near = (a, b, t) => Math.abs(a - b) <= (t == null ? 1e-6 : t);
     const { S, raw } = runs[id], A = E3.account(P, S, raw), h = E3.households(P, S, A, R0.acc);
     ok(!h.clamped, id + ": no group's use goes below zero");
     ok(h.rows.every(x => isFinite(x.home) && x.home > 0 && x.burden > 0), id + ": every group has bills and a burden");
+  }
+  // the homes' carriers reconcile: the groups' changes, summed, equal the residential share of the engine's physical
+  // change (heating electricity less the added rooftop solar used; gas and propane for heat; district heat), for the
+  // presets and for the LP's own plans, among them one that retrofits only furnace-heated buildings
+  {
+    const recon = (S, raw, A) => {
+      const h = E3.households(P, S, A, R0.acc), g = c => h.rows.reduce((t, x) => t + x.households * x.d[c], 0), e = { el: 0, gas: 0, prop: 0, dh: 0 };
+      P.D.forEach((D, i) => { const a = A.d[i], a0 = R0.acc.d[i];
+        e.el += D.rho * (a.heatEl - a0.heatEl) - (a.pvUsed - a0.pvUsed); e.gas += D.rho * (a.gas - a0.gas); e.prop += D.rho * (a.propane - a0.propane); e.dh += D.rho * a.dhHeat; });
+      return Object.keys(e).map(c => [c, g(c), e[c]]);
+    };
+    const cases = Object.keys(runs).map(id => [id, runs[id].S, runs[id].raw]);
+    const sized = [[0.8, 3000], [0.8, 9000], [0.65, 9000], [1, 9000]];
+    let furnaceOnly = false;
+    for (const [cp, rc] of sized) {
+      const st = Object.assign({}, def, { ev: 50, evm: "managed", rc }), S = E3.sysOf(st, P), m = E3.build(P, S, { size: true, cap: cp * R0.acc.co2Hub, retMax: 0.6, dhMax: 0.4, pvMax: 400, batMax: 200 });
+      const raw = E3.read(P, S, m, solveSync(m));
+      if (raw.y.some(y => y[1].fuel > 0.01) && raw.y.every(y => y[1].hp + y[1].res < 1e-6)) furnaceOnly = true;
+      cases.push(["the LP's plan at " + Math.round(cp * 100) + "%, $" + rc + " retrofits", S, raw]);
+    }
+    ok(furnaceOnly, "one of the LP's plans retrofits only furnace-heated buildings (the case the per-system savings are for)");
+    for (const [id, S, raw] of cases) {
+      const A = E3.account(P, S, raw), rows = recon(S, raw, A), bad = rows.filter(([c, a, b]) => !near(a, b, Math.abs(b) * 1e-6 + 0.5));
+      ok(!bad.length, id + ": the groups' electricity, gas, propane and district heat add up to the homes' physical change" + (bad.length ? " (" + bad.map(([c, a, b]) => c + " " + Math.round(a) + " vs " + Math.round(b)).join("; ") + ")" : ""));
+    }
   }
   {
     // the measures' changes add up to the engine's: electricity, gas and propane of the homes, summed over the groups

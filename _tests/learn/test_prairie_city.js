@@ -32,7 +32,8 @@ const r = (x, n) => { const m = Math.pow(10, n); return Math.sign(x) * Math.floo
 // ---------------- the frame
 ok(D.about.line === "Prairie City is fictional; its numbers are illustrative.", "the fictional line, word for word");
 ok(D.dollarYear === 2025 && D.about.dollarYear === 2025, "2025 dollars");
-ok(/Prairie City data build step/.test(D.about.builtBy) && /test_prairie_city\.js/.test(D.about.builtBy), "about names its build step and its test");
+ok(!D.about.builtBy && D.dataset && D.dataset.creator === "Honglin Li" && D.dataset.date === D.about.built && /^Illustrative: Prairie City is fictional/.test(D.dataset.status) && /^CC BY 4\.0/.test(D.dataset.license) && /`sources`/.test(D.dataset.source),
+  "a reader's block: creator, date, status (fictional, illustrative), source and licence; no maintenance notes");
 ok(RAW.length < 100 * 1024, "the file is under 100 KB (" + (RAW.length / 1024).toFixed(1) + " KB)");
 const DIST = D.districts.map(d => d.key);
 ok(JSON.stringify(DIST) === JSON.stringify(["core", "suburbs", "fringe"]), "three districts: dense core, suburbs, rural fringe");
