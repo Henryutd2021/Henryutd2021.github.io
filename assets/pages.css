@@ -1,6 +1,6 @@
 /* pages.css — Research, Software, Teaching and CV pages (third redesign, 2026-10-30).
    al-folio / Hugo Academic conventions on the tokens of assets/base.css (white by default, night via the navbar toggle).
-   Every rule is scoped to body.page-folio, which only these four pages set in their front matter.
+   Every rule is scoped to body.page-folio, which only these pages and the 404 page set in their front matter.
    Theme colours come from .theme-* (--t, base.css). Coloured TEXT uses --t-ink: a darker mix of --t in day mode
    (keeps AA contrast on white and on the tinted panels), the plain theme colour at night. */
 
@@ -530,3 +530,20 @@ body.page-folio main .chip { font-size: .78rem; padding: .16rem .6rem; color: va
 .page-fieldnotes .fn-intro { max-width: 78ch; font-size: 1.04rem; line-height: 1.75; color: var(--ink-2); }
 .page-fieldnotes .fn-intro .btn-outline { margin: .9rem .5rem 0 0; }
 .fn-disclosure { margin-top: 2.6rem; padding-top: 1rem; border-top: 1px solid var(--line); font-size: .85rem; color: var(--muted); }
+
+/* ---------- 404 page: the address asked for, four main pages as link cards, the site search ---------- */
+.page-404 .nf { max-width: 860px; }
+.page-404 .nf-path { margin: 0 0 1.4rem; font-size: .92rem; color: var(--muted); overflow-wrap: anywhere; }
+.page-404 .nf-path code { font-size: .88rem; color: var(--ink-2); background: var(--bg-2); padding: .1rem .35rem; border-radius: 4px; }
+.page-404 .nf-links { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.page-404 .nf-link { display: grid; grid-template-columns: auto 1fr; column-gap: .8rem; row-gap: .2rem; align-items: baseline; padding: 1.1rem 1.2rem;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow-sm); color: var(--ink);
+  text-decoration: none; transition: box-shadow .2s var(--ease), border-color .2s var(--ease); }
+.page-404 .nf-link:hover { border-color: var(--accent-line); box-shadow: var(--shadow); text-decoration: none; }
+.page-404 .nf-link .bi { grid-row: span 2; font-size: 1.15rem; color: var(--accent); }
+.page-404 .nf-name { font-size: 1.02rem; font-weight: 650; color: var(--ink); }
+.page-404 .nf-what { font-size: .9rem; line-height: 1.5; color: var(--ink-2); }
+.page-404 .nf-search { margin: 1.4rem 0 0; }
+.page-404 .nf-search .bi { font-size: .95rem; }
+@media (max-width: 575.98px) { .page-404 .nf-links { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { .page-404 .nf-link { transition: none; } }

@@ -54,7 +54,8 @@
   if (typeof window === "undefined" || !window.Explainer) return;
 
   // ---------------------------------------------------------------------------------------------------------------
-  // View: one slider (hydrogen price), a sorted-surplus chart with the electrolyzer size, three readouts, one sentence.
+  // View: one slider (hydrogen price), a sorted-surplus chart with the electrolyzer size, the chart's values as a table
+  // ("Show the numbers"), three readouts, one sentence.
   window.Explainer.register("wind-hydrogen", function (root, h) {
     var state = { price: C.pStart };
     var ref = model({ price: C.pMin });  // the comparison case: the lowest price on the slider
@@ -70,6 +71,22 @@
       "A dashed line marks the electrolyzer size; the area under both is turned into hydrogen, the rest is still curtailed." });
     var g = h.el("g", {}, svg);
     var legend = h.el("div", { style: "display:flex;flex-wrap:wrap;gap:.25rem 1rem;margin-top:.45rem;font-size:.78rem;color:var(--ink-2)" }, ui.figure);
+    // the chart's values as a table, for keyboard and screen-reader users (the SVG is one image)
+    var data = h.el("details", { class: "ex-data" }, ui.figure);
+    h.el("summary", { text: "Show the numbers" }, data);
+    var table = h.el("table", {}, data);
+    function fillTable(m) {
+      var gwh = function (v) { return h.fmt(v / 1000, 0) + " GWh a year"; };
+      var rows = [["Hydrogen selling price", money(m.price)], ["Electrolyzer size", h.fmt(m.size, 0) + " MW"],
+        ["Capacity factor", h.fmt(m.cf * 100, 0) + "%"], ["Hours a year at full power", h.fmt(m.fullHours, 0)],
+        ["Surplus wind the grid cannot take", gwh(m.surplus)],
+        ["Turned into hydrogen", gwh(m.energy) + " (" + h.fmt((1 - m.curtailedShare) * 100, 0) + "%)"],
+        ["Still curtailed", gwh(m.surplus - m.energy) + " (" + h.fmt(m.curtailedShare * 100, 0) + "%)"],
+        ["Hydrogen made", h.fmt(m.hydrogen / 1000, 0) + " t a year"],
+        ["Levelized cost of hydrogen", money(m.lcoh)], ["Net system cost", "$" + h.fmt(m.netCost, 1) + "M a year"]];
+      table.innerHTML = "<caption>Illustrative values from the toy model, at the price chosen</caption><tbody>" + rows.map(function (r) {
+        return "<tr><th scope=\"row\">" + r[0] + "</th><td>" + r[1] + "</td></tr>"; }).join("") + "</tbody>";
+    }
     var set = h.readouts(ui.side, [
       { key: "size", label: "Electrolyzer size" },
       { key: "lcoh", label: "Levelized cost of hydrogen" },
@@ -81,6 +98,7 @@
     function update() {
       var m = model(state);
       set({ size: h.fmt(m.size, 0) + " MW", lcoh: money(m.lcoh), net: "$" + h.fmt(m.netCost, 1) + "M/yr" });
+      fillTable(m);
       if (state.price <= C.pMin + 1e-9) {
         say("At <strong>" + money(m.price) + "</strong>, hydrogen sells for little more than it costs to make, so the optimizer builds only a " +
             "<strong>" + h.fmt(m.size, 0) + "-MW</strong> electrolyzer with a capacity factor of " + h.fmt(m.cf * 100, 0) + "%. Raise the price to see the trade-off.");

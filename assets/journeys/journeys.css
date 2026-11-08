@@ -100,6 +100,13 @@ body.page-journeys #title-block-header .description { display: none; }   /* the 
 @keyframes jr-pop { 0% { transform: scale(0); } 70% { transform: scale(1.5); } 100% { transform: scale(1); } }
 .jr-empty { position: absolute; left: 50%; bottom: 1rem; transform: translateX(-50%); margin: 0; padding: .35rem .8rem; border-radius: 999px;
   font-size: .82rem; color: var(--ink-2); background: var(--surface); border: 1px solid var(--line); white-space: nowrap; }
+/* a view whose land did not load: a note over the empty map (no zoom controls); the whole map unavailable: a note in its place */
+.jr-gone { position: absolute; inset: 0; z-index: 4; display: grid; place-items: center; margin: 0; padding: 1rem 1.2rem; text-align: center;
+  font-size: .86rem; color: var(--ink-2); background: var(--jr-ocean); }
+.jr-gone[hidden] { display: none; }
+.jr-map.is-gone .jr-zctl, .jr-map.is-gone .jr-zpill, .jr-map.is-gone .jr-ztoast { display: none; }
+.jr-map-note { margin: 0; padding: .9rem 1.1rem; font-size: .9rem; color: var(--ink-2); background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--r-lg); }
 
 /* ---------- card ---------- */
 .jr-card { position: absolute; z-index: 5; width: min(330px, calc(100% - 16px)); max-height: calc(100% - 16px); overflow: auto; padding: .85rem 1rem .9rem;

@@ -15,7 +15,11 @@
 //      as gentle arcs). A year slider with Play adds the footprints year by year, drawing each new route stroke by stroke.
 //      Clicking a dot or a line opens a small card. Every map zooms and pans (d3-zoom 3): see "zoom and pan" below.
 //      Keyboard: one Tab stop on the footprints; the arrow keys move through them in time order, Enter opens the card,
-//      + and − zoom, Escape closes it. If the libraries cannot load, the map box is hidden again.
+//      + and − zoom, Escape closes it. A map is never drawn with land missing: if the libraries or the land every map
+//      needs (the world's countries and China's standard map) cannot load, the map box and the chapter maps stay hidden
+//      and a short note points to the chapters (the same places as text); a view whose own land did not load (the U.S.
+//      states, the South China Sea inset) shows that note in the map instead. Autoplay stops once the reader focuses,
+//      clicks or zooms the map, and a redraw keeps the footprint or card that has the focus.
 //   4. Chapter pages: one zoomable world map per chapter, showing the one view the chapter's data names (the whole
 //      chapter, its home region, or the contiguous United States; see "the chapter pages" below).
 (function () {
@@ -244,6 +248,18 @@
       }, []);
   }
 
+  // the map could not be drawn whole: the map box and the chapter maps stay hidden (as without JavaScript), and a note in
+  // the map's section points to the chapters, which hold the same places as text
+  function unavailable() {
+    box.hidden = true;
+    root.querySelectorAll(".jr-pg-map").forEach(function (h) { h.hidden = true; });
+    if (root.querySelector(".jr-map-note")) return;
+    const note = document.createElement("p");
+    note.className = "jr-map-note";
+    note.innerHTML = 'The map could not be loaded just now. The <a href="#chapters">chapters below</a> list every place.';
+    box.parentNode.insertBefore(note, box.nextSibling);
+  }
+
   function start() {
     const libs = LIBS.reduce(function (p, lib) { return p.then(function () { return loadScript(lib); }); }, Promise.resolve());
     Promise.race([libs, timeout(20000)]).then(function () {
@@ -255,13 +271,14 @@
       return Promise.all([fetchData(DATA.world).catch(function () { return null; }), fetchData(DATA.china).catch(function () { return null; }),
                           fetchData(DATA.nanhai).catch(function () { return null; })]);
     }).then(function (res) {
+      // every map needs the world's countries and China's standard map (China is left out of the countries)
+      if (!res[0] || !res[1]) throw new Error("map data missing");
       const d3 = window.d3;
-      const geo = { countries: [], china: [], nanhai: null, states: null };
-      if (res[0]) geo.countries = countriesOf(res[0]);
-      if (res[1]) geo.china = decodeChina(d3, res[1]);
+      const geo = { countries: countriesOf(res[0]), china: decodeChina(d3, res[1]), nanhai: null, states: null };
+      if (!geo.countries.length || !geo.china.length) throw new Error("map data empty");
       if (res[2]) geo.nanhai = nanhaiFeature(d3, res[2]);
       init(geo);
-    }).catch(function () { box.hidden = true; root.querySelectorAll(".jr-pg-map").forEach(function (h) { h.hidden = true; }); });
+    }).catch(unavailable);
   }
   if ("IntersectionObserver" in window) {
     const io = new IntersectionObserver(function (es) {
@@ -313,6 +330,9 @@
     const empty = document.createElement("p");
     empty.className = "jr-empty"; empty.hidden = true;
     mapEl.appendChild(empty);
+    const gone = document.createElement("p");   // a view whose land did not load: this note instead of the map
+    gone.className = "jr-gone"; gone.hidden = true; gone.setAttribute("role", "status");
+    mapEl.appendChild(gone);
 
     const slider = root.querySelector("#jr-year");
     const out = root.querySelector(".jr-year-out");
@@ -321,6 +341,10 @@
     const usNames = {};
     Object.keys(D.names).forEach(function (k) { if (k.indexOf("US-") === 0) usNames[D.names[k]] = k; });
     let marks = [], focusIdx = 0, shown = new Set(), shownRegions = new Set(), proj = null, openKey = null, lastW = 0, lastH = 0, maskSeq = 0, animEnd = 0;
+    // usFailed: the U.S. states could not be loaded; readerActed: the reader has used the map or its view and timeline
+    // controls (the first autoplay then does not start); gen: counts the reader's view and timeline choices, so a late
+    // answer (the U.S. states) acts only if no other choice came after it
+    let usFailed = false, readerActed = false, gen = 0, refocusing = false;
     // zt: the zoom now; tR: the zoom the dots were last placed for; frameKey: the view and size the zoom belongs to
     let zt = ID, tR = ID, frameKey = "", bcMain = new Map(), Z = null, routeEls = [];
 
@@ -445,7 +469,8 @@
       if (!usLoading) {
         usLoading = fetchData(DATA.us).then(function (topo) {
           geo.states = window.topojson.feature(topo, topo.objects.states).features;
-        }).catch(function () { geo.states = []; }).then(function () { mapEl.classList.remove("is-loading"); draw(false); });
+          if (!geo.states.length) throw new Error("no states");
+        }).catch(function () { geo.states = []; usFailed = true; }).then(function () { mapEl.classList.remove("is-loading"); draw(false); });
       }
       return usLoading;
     }
@@ -765,14 +790,30 @@
       marks.forEach(function (m) { if (m.kind === "route") { m.s = tApply(zt, m.b); m.at = m.s; sizeHit(m); } });
       tR = zt;
     }
+    // a view whose own land did not load (the U.S. states; the South China Sea inset of the China standard map)
+    function lacking(view) { return view === "us" ? usFailed : view === "china" ? !geo.nanhai : false; }
     function draw(animate) {
       const W = mapEl.clientWidth;
       animEnd = 0;
       if (!W) return 0;
       if (state.view === "us" && !geo.states) loadUS(true);
+      else mapEl.classList.remove("is-loading");
       const H = heightFor(W);
       mapEl.style.height = H + "px";
       lastW = W; lastH = H;
+      // the footprint or the card that has the focus: found again once the footprints are drawn anew
+      const act = document.activeElement;
+      const had = act && mapEl.contains(act) ? { key: (marks.find(function (m) { return m.g === act; }) || {}).key, card: card.contains(act) } : null;
+      gone.hidden = !lacking(state.view);
+      mapEl.classList.toggle("is-gone", !gone.hidden);
+      if (!gone.hidden) {   // no map with missing land: the note, and nothing drawn
+        gone.innerHTML = "<span>The map of " + (state.view === "us" ? "the U.S. states" : "China") +
+          ' could not be loaded just now. The <a href="#chapters">chapters below</a> list every place.</span>';   // one grid item
+        [gBase, gDetail, gRoutes, gDots].forEach(function (g) { while (g.firstChild) g.removeChild(g.firstChild); });
+        marks = []; routeEls = []; shown = new Set(); shownRegions = new Set(); proj = null; frameKey = "";
+        closeCard(false); empty.hidden = true;
+        return 0;
+      }
       const key = state.view + ":" + W + "x" + H;
       if (key !== frameKey) {   // a new view or size: the zoom starts again from the whole view
         frameKey = key; bcMain = new Map(); zt = ID; tR = ID;
@@ -876,12 +917,16 @@
         m.g.addEventListener("keydown", onKey);
         m.g.addEventListener("focus", function () { focusIdx = i; });
       });
+      if (had && had.key) { const j = marks.findIndex(function (m) { return m.key === had.key; }); if (j >= 0) focusIdx = j; }
       if (focusIdx >= marks.length) focusIdx = Math.max(0, marks.length - 1);
       marks.forEach(function (m, i) { m.g.setAttribute("tabindex", i === focusIdx ? "0" : "-1"); });
       empty.hidden = marks.length > 0 || (state.view === "us" && !geo.states);
       empty.textContent = state.firsts ? "No firsts in this view yet." : "Nothing in this view yet.";
       const still = openKey && marks.find(function (m) { return m.key === openKey; });
       if (still) openCard(still, false); else closeCard(false);
+      // the focus stays where it was: on the card's close button, or on the same footprint (else the one nearest in order)
+      const back = had && had.card && !card.hidden ? card.querySelector(".jr-c-close") : had && (had.key || had.card) && marks[focusIdx] ? marks[focusIdx].g : null;
+      if (back) { refocusing = true; back.focus({ preventScroll: true }); refocusing = false; }
       return animEnd;
     }
     // after a zoom: the detail layer for the new frame, the dots placed again, the card beside its footprint
@@ -908,7 +953,7 @@
       if (!card.hidden) card.classList.add("is-moving");
     }
     Z = zoomer({ host: mapEl, svg: svg, g: gZoom, keys: false, homeLabel: "Show the whole view", home: function () { return ID; },
-      onMove: moveMain, onEnd: function (t) { zt = t; if (!tSame(t, tR)) relayout(); else card.classList.remove("is-moving"); } });
+      onMove: function (t, byUser) { moveMain(t); if (byUser) takeMap(); }, onEnd: function (t) { zt = t; if (!tSame(t, tR)) relayout(); else card.classList.remove("is-moving"); } });
     function setFocus(i, move) {
       if (!marks.length) return;
       focusIdx = Math.max(0, Math.min(marks.length - 1, i));
@@ -957,7 +1002,19 @@
       out.textContent = y + (e ? " · " + chapterOf[e.ch].n : " · home");
       slider.value = y;
     }
+    // the reader takes the map (focus inside it, a click or a tap on it, a zoom gesture): the timeline stops, since each
+    // step draws every footprint again, and the first autoplay no longer starts
+    function takeMap() { readerActed = true; gen++; if (timer) stop(); }
+    mapEl.addEventListener("focusin", function () { if (!refocusing) takeMap(); });   // not when a redraw gives the focus back
+    let touchAt = null;
+    mapEl.addEventListener("pointerdown", function (ev) { if (ev.pointerType === "touch") touchAt = [ev.clientX, ev.clientY]; else takeMap(); });
+    mapEl.addEventListener("pointercancel", function () { touchAt = null; });   // the page scrolled: not a tap
+    mapEl.addEventListener("pointerup", function (ev) {
+      if (ev.pointerType === "touch" && touchAt && Math.hypot(ev.clientX - touchAt[0], ev.clientY - touchAt[1]) < 10) takeMap();
+      touchAt = null;
+    });
     slider.addEventListener("input", function () {
+      readerActed = true; gen++;
       stop();
       const y = +slider.value;
       let k = -1;
@@ -999,25 +1056,31 @@
       tick();
     }
     function showFinal() { stop(); state.upto = last; readout(); draw(false); }
-    play.addEventListener("click", function () { if (timer) stop(); else playFrom(false); });
+    play.addEventListener("click", function () {
+      readerActed = true; gen++;
+      if (timer) stop(); else if (!lacking(state.view)) playFrom(false);
+    });
     viewBtns.forEach(function (b) {
       b.addEventListener("click", function () {
+        const g = ++gen;
+        readerActed = true;
         state.view = b.getAttribute("data-view");
         viewBtns.forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
         focusIdx = 0; closeCard(false);
         stop(); state.upto = last; draw(false);   // lay out the view (and its projection) first; the zoom starts from the whole view
         if (reduceMotion) { showFinal(); return; }
-        if (state.view === "us" && !geo.states) { loadUS(true).then(function () { playFrom(true); }); return; }
-        playFrom(true);
+        // the U.S. states load first; when they arrive, the timeline plays only if the reader has made no other choice since
+        if (state.view === "us" && !geo.states) { loadUS(true).then(function () { if (g === gen && !lacking("us")) playFrom(true); }); return; }
+        if (!lacking(state.view)) playFrom(true);
       });
     });
     redraw = function () { draw(false); };
     readout();
     draw(false);
-    // the world view plays once by itself when the map first comes into view
+    // the world view plays once by itself when the map first comes into view (unless the reader has used it already)
     if (!reduceMotion && "IntersectionObserver" in window) {
       const seen = new IntersectionObserver(function (es) {
-        if (es.some(function (e) { return e.isIntersecting; })) { seen.disconnect(); playFrom(true); }
+        if (es.some(function (e) { return e.isIntersecting; })) { seen.disconnect(); if (!readerActed) playFrom(true); }
       }, { threshold: 0.5 });
       seen.observe(mapEl);
     }
