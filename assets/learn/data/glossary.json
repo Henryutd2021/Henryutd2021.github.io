@@ -2449,7 +2449,7 @@
  },
  "order-of-magnitude": {
   "term": "Order of magnitude",
-  "short": "The power of ten a quantity sits at; two quantities are an order of magnitude apart when one is about ten times the other.",
+  "short": "The power of ten nearest a quantity on a log scale, where a leading number from √10 ≈ 3.16 up rounds to the next power; two quantities are an order of magnitude apart when one is about ten times the other.",
   "lesson": "K1",
   "href": "k01-units.html"
  },
@@ -2741,6 +2741,12 @@
   "lesson": "F9",
   "href": "f09-city-energy.html"
  },
+ "python-package": {
+  "term": "Python package",
+  "short": "A ready-made library of Python code, such as pandas, that a project installs with pip instead of writing it itself.",
+  "lesson": "K8",
+  "href": "k08-git-notebooks.html"
+ },
  "quartile": {
   "term": "Quartile",
   "short": "The values that cut a sorted set into four equal parts: 25% of values lie below the first, 50% below the second (the median), 75% below the third.",
@@ -2821,7 +2827,7 @@
  },
  "reactive-power": {
   "term": "Reactive power",
-  "short": "The part of alternating-current power that does no net work but holds voltage up; it is supplied and absorbed locally.",
+  "short": "The part of alternating-current power that flows back and forth and does no net work; supplying or absorbing it locally helps keep voltage within safe limits.",
   "lesson": "N1",
   "href": "n01-news-lens.html"
  },
@@ -3699,7 +3705,13 @@
  },
  "version-control": {
   "term": "Version control",
-  "short": "Keeping every saved state of a project's files, with who changed what and why, so any earlier state can be compared or brought back.",
+  "short": "Keeping selected recorded versions of a project's files, with who changed what and why, so any recorded version can be compared or brought back.",
+  "lesson": "K8",
+  "href": "k08-git-notebooks.html"
+ },
+ "version-pin": {
+  "term": "Version pin",
+  "short": "A line such as pandas==2.2.3 in requirements.txt that asks the installer for one exact version of a package.",
   "lesson": "K8",
   "href": "k08-git-notebooks.html"
  },

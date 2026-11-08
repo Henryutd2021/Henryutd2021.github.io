@@ -22,10 +22,10 @@
       "framing": "Our paraphrase of how such reports get headlined.",
       "parts": [
         "A national-laboratory report estimates that data centers used ",
-        { "p": "a1", "text": "192 TWh in 2024", "tag": "time", "also": ["physics"], "note": "Energy over a whole year, not power. Spread over 8,760 hours it is about 22 GW of average demand." },
+        { "p": "a1", "text": "192 TWh in 2024", "tag": "time", "also": ["physics"], "note": "Energy over a whole year, not power. Spread over 2024's 8,784 hours (a leap year) it is about 22 GW of average demand." },
         ", or ",
         { "p": "a2", "text": "4.7% of U.S. electricity", "tag": "scale", "also": [], "note": "A share of one country's use. Read it next to the whole, and never mix it with a global share." },
-        ".\nIts Reference Case puts ",
+        ".\nIts main scenario, the Reference Case, puts ",
         { "p": "a3", "text": "2030 use at 649 TWh", "tag": "time", "also": ["uncert"], "note": "A model's projection six years ahead, not a measurement: 2024 is the report's last historical year." },
         ", ",
         { "p": "a4", "text": "within a range of 521–843 TWh", "tag": "uncert", "also": [], "note": "The authors' own range: its top is 1.6 times its bottom. The IEA's early-2025 projection, about 430 TWh, sits below it, as the report notes (p. 11)." },
@@ -35,7 +35,7 @@
         { "p": "a6", "text": "Cryptocurrency mining is not counted", "tag": "boundary", "also": [], "note": "What counts as a data center is a choice; a study that includes mining reports a larger number." },
         "."
       ],
-      "missing": { "answer": "pays", "also": ["counter"], "note": "Who pays for the new lines and plants that serve large loads depends on each utility's tariff rules, and the story does not say. Analyst lesson [[lesson:a04-retail-tariffs|A4]] covers large-load tariffs." },
+      "missing": { "answer": "pays", "also": ["counter"], "note": "Who pays for the new lines and plants that serve large loads depends on each utility's [[tariff|tariff]], its rules for what customers pay, and the story does not say. Analyst lesson [[lesson:a04-retail-tariffs|A4]] covers large-load tariffs." },
       "envelope": {
         "kind": "energy-to-power",
         "q": "649 TWh in a year is how much power, on average?",
@@ -76,7 +76,7 @@
         "options": ["15 GWh", "60 GWh", "It depends on how many hours they last"],
         "answer": 2,
         "gw": 15, "durations": [1, 2, 4, 8], "duration": 4, "us_twh": 4200, "hours": 8760, "planned_gw": 18.2,
-        "feedback": ["Only if every battery lasts exactly one hour at full power.", "Only if they average exactly four hours; the story does not say.", "Right: energy (GWh) = power (GW) × duration (h), and the duration is missing."]
+        "feedback": ["15 GW alone does not give the energy: 15 GWh would mean the fleet averages one hour at full power, which the story does not say.", "Only if they average exactly four hours; the story does not say.", "Right: energy (GWh) = power (GW) × duration (h), and the duration is missing."]
       },
       "take": "I accept that a record amount of battery power, about 15 GW, came online in 2025, as a preliminary count. Final annual data showing a much lower figure would change my mind. Confidence: high for the power; the energy stored cannot be known from this story.",
       "sources": [
@@ -90,6 +90,7 @@
     {
       "id": "c",
       "kicker": "Reliability · Spain and Portugal",
+      "intro": "Two terms first: [[voltage|voltage]] is the electrical push on the lines. Supplying or absorbing [[reactive-power|reactive power]] helps keep local voltage within safe limits, neither too low nor too high.",
       "headline": "Renewables caused the Iberian blackout",
       "framing": "Our paraphrase of a claim that circulated soon after; no single outlet is quoted.",
       "parts": [
@@ -123,7 +124,7 @@
     { "id": "s1", "text": "The new battery can store 100 MW.", "answer": "error", "kind": "unit", "fix": "Stored energy is in MWh; 100 MW is how fast it charges or discharges. A 100 MW, four-hour battery stores 400 MWh." },
     { "id": "s2", "text": "U.S. data centers used about 192 TWh of electricity in 2024.", "answer": "ok", "kind": "", "fix": "TWh over a year is an amount of energy: LBNL's estimate for 2024." },
     { "id": "s3", "text": "A 13 kWh home battery can run an average U.S. home for a month.", "answer": "error", "kind": "scale", "fix": "An average home bought about 899 kWh a month (EIA, 2022 data), so 13 kWh lasts about 10 hours." },
-    { "id": "s4", "text": "The plant's two 500 MW units will generate 1,000 MW every hour of the year.", "answer": "error", "kind": "physics", "fix": "Nameplate (the maximum rated power) is a ceiling, not an output: plants run below it and stop for maintenance. Average output ÷ nameplate is the capacity factor (lesson 5)." },
+    { "id": "s4", "text": "The plant's two 500 MW units will generate 1,000 MW every hour of the year.", "answer": "error", "kind": "assumption", "fix": "The ratings set the maximum power, not the output: plants run below nameplate and stop for maintenance, so a year's energy depends on hours and output. Average output ÷ nameplate is the capacity factor (lesson 5)." },
     { "id": "s5", "text": "In 2025 the United States used about 4,200 TWh of electricity.", "answer": "ok", "kind": "", "fix": "4.20 trillion kWh is 4,200 TWh (EIA, data for 2025)." },
     { "id": "s6", "text": "A town of 10,000 homes needs about 10 GW of power.", "answer": "error", "kind": "scale", "fix": "At EIA's 10,791 kWh a home a year (2022 data), 10,000 homes use about 108 GWh a year: about 12 MW on average. Even a peak a few times higher is far below 10 GW." }
   ],
@@ -138,7 +139,7 @@
     ],
     "items": [
       { "id": "l1", "text": "15 GW of batteries entered service in 2025 (preliminary count)", "answer": ["operating"], "note": "Operating, as counted so far. Whether each battery delivers its rated hours is the next rung up." },
-      { "id": "l2", "text": "18.2 GW of batteries planned for 2025, as reported at the start of the year", "answer": ["announced", "funded", "permitted", "construction"], "note": "Below operating: plans in EIA's inventory sit on different rungs. Actual additions were about 82% of this planned total." },
+      { "id": "l2", "text": "18.2 GW of batteries planned for 2025, as reported at the start of the year", "answer": ["announced"], "note": "Announced: a plan. Funding, permits and building each need their own evidence. Actual additions were about 82% of it." },
       { "id": "l3", "text": "649 TWh of U.S. data-center use in 2030", "answer": ["projection"], "note": "Not on the ladder at all: a projection is a model's output, not a stage of anything being built." }
     ],
     "projection_label": "Not on the ladder: a projection"

@@ -198,7 +198,7 @@ const sum = a => a.reduce((x, y) => x + y, 0), int = v => Math.round(v).toLocale
   const fx = k => K.FIXES.find(f => f.key === k);
   ok(P["requirements.txt"] === fx("pin").before && Q["requirements.txt"] === K.fixAfter(S, fx("pin")), "fix pin: requirements.txt before and after");
   ok(JSON.parse(P["day.ipynb"]).cells[0].source.join("").indexOf(fx("path").before) >= 0 && JSON.parse(Q["day.ipynb"]).cells[0].source.join("").indexOf(K.fixAfter(S, fx("path"))) >= 0, "fix path: cell 1 before and after");
-  ok(P["README.md"].indexOf(fx("data").before) >= 0 && Q["README.md"].indexOf(K.fixAfter(S, fx("data"))) >= 0 && /downloaded 2 Nov 2026, SHA-256 fac4bb99… and 1146158b…/.test(Q["README.md"]), "fix data: the README's source, date and checksums (from the data's metadata)");
+  ok(P["README.md"].indexOf(fx("data").before) >= 0 && Q["README.md"].indexOf(K.fixAfter(S, fx("data"))) >= 0 && Q["README.md"].indexOf("downloaded 2 Nov 2026; SHA-256 checksums:\n  " + year.meta.files[0].name + "  " + year.meta.files[0].sha256 + "\n  " + year.meta.files[1].name + "  " + year.meta.files[1].sha256) >= 0 && !/…/.test(K.fixAfter(S, fx("data"))) && year.meta.files.every(f => /^[0-9a-f]{64}$/.test(f.sha256)), "fix data: the README gives each raw file's name and full SHA-256 checksum (from the data's metadata), so a reader can check them");
   ok(year.meta.accessed === "2026-11-02" && year.meta.files[0].sha256.indexOf("fac4bb99") === 0 && year.meta.files[1].sha256.indexOf("1146158b") === 0, "fix data: date and checksums are town_year.json's");
   ok(JSON.parse(P["day.ipynb"]).cells[4].source.join("") === fx("seed").before && JSON.parse(Q["day.ipynb"]).cells[4].source.join("") === K.fixAfter(S, fx("seed")), "fix seed: cell 5 before and after");
   ok(P[".gitignore"] == null && Q[".gitignore"] === K.fixAfter(S, fx("secret")), "fix secret: no .gitignore before; the shown one after");
@@ -257,13 +257,27 @@ const sum = a => a.reduce((x, y) => x + y, 0), int = v => Math.round(v).toLocale
       if (it.kind === "where") ok(it.answer === where(it.ops) && it.choices[it.answer] === K.WHERE[it.answer], tag);
       if (it.kind === "next") ok(it.staged.length === 1 && it.modified.length === 1 && it.choices[it.answer] === it.staged[0] && it.modified[0] !== it.staged[0], tag);
       if (it.kind === "cost") { const c = +/\+ gas_cost: (\d+)/.exec(it.q)[1]; ok(it.answer === 1965 * c, tag); }
-      if (it.kind === "halve") { let worst = 0; for (let f = 1; f < it.n; f++) worst = Math.max(worst, K.bisect([...Array(it.n).keys()], i => i >= f).checks.length); ok(it.answer === worst, tag); }
       if (it.kind === "notebook") { const o = nbIndep(it.seq); ok(it.choices[it.answer] === (o === "err" ? "an error: a name is not defined" : String(o)), tag); }
       if (it.kind === "repro") ok(K.REPRO.some(p => p.q === it.q && p.a === it.choices[it.answer]), tag);
-      if (it.kind === "order") ok(K.ORDERS.some(p => it.q.indexOf(p.q) === 0 && p.a.join("  →  ") === it.choices[it.answer]), tag);
+      if (it.kind === "order") {
+        const o = K.ORDERS.find(p => it.q.indexOf(p.q) === 0), works = o.also.map(q => q.map(j => o.a[j]).join("  →  "));
+        ok(o && o.a.join("  →  ") === it.choices[it.answer], tag);
+        ok(it.choices.every((c, i) => i === it.answer || works.indexOf(c) < 0), tag + ": no order that also works is offered as wrong: " + it.choices.join(" | "));
+        // an independent rule for each task: which orders of its three commands reach the goal
+        const pos = (c, cmd) => c.split("  →  ").indexOf(cmd), A = o.a, valid = c => {
+          const p = A.map(cmd => pos(c, cmd));
+          if (/^See what you changed/.test(o.q)) return p[0] < p[1] && p[1] < p[2];            // diff before add (it shows unstaged edits); add before commit
+          if (/^Start a what-if/.test(o.q)) return p[2] === 2;                                    // the commit last, on the new branch; add before or after the switch
+          if (/^Look at an older version/.test(o.q)) return p[0] < p[1] && p[1] < p[2];          // the id from git log, then visit, then back to main
+          if (/^Rerun a shared project/.test(o.q)) return p[0] < p[1] && p[1] < p[2];
+          if (/^Undo a bad commit/.test(o.q)) return p[0] === 0;                                  // the ids from git log first; diff before or after the revert
+          return false;
+        };
+        ok(valid(it.choices[it.answer]) && it.choices.every((c, i) => i === it.answer || !valid(c)), tag + ": the answer reaches the goal and no wrong choice does: " + it.choices.join(" | "));
+      }
     });
   });
-  ok(kinds.size === 7, "drill: all seven kinds appear");
+  ok(kinds.size === 6 && !kinds.has("halve"), "drill: all six kinds appear; no worst-case search counts (K8 is an awareness-level toolbox; step 5 stays one guided demonstration)");
   ok(K.WHERE.length === 4, "drill: four places");
 }
 
@@ -276,21 +290,19 @@ const sum = a => a.reduce((x, y) => x + y, 0), int = v => Math.round(v).toLocale
     ok(a && b > a.index && QMD.slice(a.index + a[0].length, b) === BLOCKS[name](), `page: the ${name} block is the generated one (run with --write)`);
   });
   const R = S.R1;
-  has("make in one day, 1,965 MWh: what demand leaves after wind, solar and a 100 MW plant that runs flat. At $40/MWh it costs $78,600", "the result in the fallback lede");
+  has("make in one day, 1,965 MWh: what demand leaves after wind, solar and a 100 MW plant that runs flat.</p>\n<p class=\"lx-hint\">At $40/MWh that gas costs $78,600", "the result in the fallback lede");
   ok(R.gasMWh === 1965 && R.cost === 78600, "page: the lede's numbers from the model");
   has("1,000 commits need at most 10 checks"); ok(K.maxChecks(1000) === 10, "page: 10 checks for 1,000 commits");
   has("cell 4 showed 78600 under a cell that says 55"); ok(K.nbStale(K.nbRun(K.nbEdit(K.nbRestartRunAll(K.nbNew(), D), 55), D, 3), D), "page: the stale 78600");
   has("gave 4,787 MWh every time"); ok(S.hist[3].R.gasMWh === 4787, "page: 4,787 MWh from the model");
-  has("Checking one by one can take 7");
-  has("eight suspects (commits 2 to 9), halved three times"); ok(K.maxChecks(9) === 3, "page: 3 checks for 9 commits");
+  ok(!/eight suspects|Checking one by one can take/.test(QMD) && /data-id="detached" data-answer="b"[\s\S]{0,400}<li data-value="b">On the detached HEAD, on no branch: main stays broken<\/li>/.test(QMD), "quiz: the search-count question is gone; a question on reverting from a detached HEAD replaces it");
   has("40-character SHA-1"); has("7-character fingerprints");
   has("3 September 2025");
   has("[R5](r05-build-validate.html) puts a whole model through planted bugs");
   // a commit holds the staged versions of tracked files, not every file; halving assumes the bug stays
   ok(!/snapshot of every file/.test(QMD + JS + fs.readFileSync(path.join(SITE, "learn/_w1/k08-git-notebooks.yml"), "utf8")) && /records the staged versions of the project's/.test(QMD) && /records the staged versions of its \[\[tracked-file\|tracked files\]\]/.test(JS), "commit: defined as the staged versions of tracked files");
-  has("once the bug appears, every later commit fails. Checking the middle each time");
   has("if every commit after the first bad one also fails");
-  ok(/once a commit fails, every later one fails too/.test(JS) && /and once the bug appears every later commit fails/.test(JS) && /Once the bug appears it stays/.test(JS), "halving: the assumption is stated in step 5, the drill and the causal chain");
+  ok(/once a commit fails, every later one fails too/.test(JS) && /Once the bug appears it stays/.test(JS), "halving: the assumption is stated in step 5 and the causal chain");
   ["tracked-file", "git-head", "notebook", "api-key", "assert", "megawatt"].forEach(t => ok(new RegExp("\\[\\[" + t + "\\|").test(JS) || new RegExp('data-term="' + t + '"').test(QMD), "glossary: " + t + " is marked"));
   ["tracked-file", "git-head", "notebook", "api-key"].forEach(t => ok(new RegExp("- id: " + t + "\\n").test(fs.readFileSync(path.join(SITE, "learn/_w1/k08-git-notebooks.yml"), "utf8")), "glossary: " + t + " is defined in the sidecar"));
   // the version pins are illustrative wherever they show: step 8's fix, step 9's install, the drill item, the fallback, the data note
@@ -313,6 +325,41 @@ const sum = a => a.reduce((x, y) => x + y, 0), int = v => Math.round(v).toLocale
   ok(hrefs.length > 0 && hrefs.every(h => /^[a-z0-9-]+\.html(#.*)?$/.test(h) || /^https:\/\/(www\.)?eia\.gov\//.test(h) || /^https:\/\/doi\.org\//.test(h)), "scope: links only to learn pages, eia.gov and doi.org: " + hrefs.filter(h => !/^[a-z0-9-]+\.html/.test(h)).join(" "));
   ok(!/github\.com|colab|gitlab|git-scm|jupyter\.org/i.test(QMD + JS), "scope: no repository or documentation-site links");
   ok(!/nuclear|reactor|\bSMR\b|data cent|\bAI\b|Claude|ChatGPT|Copilot/i.test(QMD.replace(/<!--[\s\S]*?-->/g, "") + JS.replace(/^\s*\/\/.*$/gm, "").replace(/f\.nuclear\.mw/g, "")), "scope: no nuclear, data-center or production wording");
+}
+
+// ---------------- step 6 starts where step 5 left HEAD (detached) and goes back to main before the revert
+{
+  const r4 = K.stepStart(S, 4), det = K.detach(r4, S.ids.c4).repo;
+  ok(det.head.detached === S.ids.c4 && !det.head.branch, "step 6: step 5's checks leave HEAD detached");
+  const onDet = K.revert(det, S.ids.c4).repo;
+  ok(onDet.branches.main === r4.branches.main && !K.run(K.switchTo(onDet, "main").repo.work).ok, "step 6: a revert on the detached HEAD moves no branch, so main stays broken");
+  const back = K.switchTo(det, "main").repo, fixed = K.revert(back, S.ids.c4).repo;
+  ok(back.head.branch === "main" && fixed.branches.main !== r4.branches.main && K.run(fixed.work).ok && K.run(fixed.work).gasMWh === 1965, "step 6: git switch main, then git revert, fixes main (1,965 MWh, the check passes)");
+  ok(fixed.branches.main === K.stepStart(S, 5).branches.main, "step 6: the fixed main is the one steps 7 to 9 build on");
+  ok(/dx = detach\(r0, lastDetached \|\| S\.ids\.c4\)/.test(JS) && /lastDetached = h\.id;/.test(JS), "view: step 6 starts on the commit step 5 last checked out");
+  ok(/bRev\.disabled = !\(right && onMain\) \|\| revDone/.test(JS) && /if \(r\.head\.branch !== "main"\) return;/.test(JS) && /bMain = g\.button\("git switch main"/.test(JS) && /bMain\.click\(\); bRev\.click\(\)/.test(JS), "view: git revert opens only on main, after git switch main is shown and run");
+  has("git switch main, git diff " + S.hist[2].id + " " + S.hist[3].id + ", git revert " + S.hist[3].id, "the no-JS row shows the switch back to main before the revert");
+  has("<tr><td class=\"n\">git switch --detach &lt;id&gt;</td><td>Visits an old commit on no branch; git switch main comes back before you commit.</td></tr>", "the command list has the detach and the way back");
+}
+
+// ---------------- wording: what a pin and a clean rerun establish; merges; the glossary; first-use terms
+{
+  const SIDE = fs.readFileSync(path.join(SITE, "learn/_w1/k08-git-notebooks.yml"), "utf8");
+  has("A fresh clone, installed from exact versions, gives the README's numbers: a check that the project reproduces its expected results on another computer, not that they are right.");
+  ok(!/A fresh clone and a pinned install give the same numbers/.test(QMD) && /^Exact versions narrow the differences between installations/.test(K.FIXES[0].why), "pins: exact versions narrow differences; a clean rerun is a check, not a guarantee");
+  has("an isolated environment with a stated Python version keeps the rest of the computer out");
+  has("| both made overlapping edits it cannot combine | stops with a conflict for you to resolve |", "merge: a conflict only when Git cannot combine the edits");
+  ok(/Keeping selected recorded versions of a project's files/.test(SIDE) && !/every saved state/.test(SIDE), "glossary: version control keeps recorded versions, not every saved state");
+  ["python-package", "version-pin"].forEach(t => ok(new RegExp("- id: " + t + "\\n").test(SIDE) && JS.indexOf("[[" + t + "|") >= 0, "glossary: " + t + " defined in the sidecar and marked"));
+  ok(/<b>pip<\/b> installs Python packages, ready-made code libraries, from the list in requirements\.txt; a pin such as pandas==2\.2\.3 asks for one exact version\. <b>nbconvert<\/b> runs a notebook without a browser\./.test(JS), "step 9: a legend for pip, packages, requirements.txt, pins and nbconvert before its buttons");
+  has("40-character SHA-1 hashes, fingerprints computed from each commit's content");
+  // step prompts: at most two sentences and about 35 words; the step 1 note and the fallback lede in short elements
+  const prompts = [...JS.matchAll(/\n      text: (.+),\n      build:/g)].map(m => m[1].replace(/" \+ [^"]+? \+ "/g, " X ").replace(/^"|"$/g, "").replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1"));
+  ok(prompts.length === 9, "prompts: nine step cards (" + prompts.length + ")");
+  prompts.forEach((p, i) => { const n = p.split(/(?<=[.?!])\s+(?=[A-Z$])/).length, w = p.split(/\s+/).length; ok(n <= 2 && w <= 36, `prompts: step ${i + 1} has ${n} sentences and ${w} words (≤ 2, ≤ 36)`); });
+  ok(/<b>Try\.<\/b> Run cells 1 to 4\. Change cell 2 to " \+ HIGH \+ " and run only cell 4\. Then restart and run all\./.test(JS), "step 7: the actions are a labelled line apart from the definitions");
+  const leads = (QMD.match(/<p class="lx-hint">[^<]*(?:<[^>]+>[^<]*)*?<\/p>/g) || []).slice(0, 3).map(t => t.replace(/<[^>]+>/g, " ").trim().split(/\s+/).length);
+  ok(leads.every(n => n <= 36), "fallback: the lede paragraphs are within the budget: " + leads.join(", "));
 }
 
 console.log(`k08-git-notebooks: ${checks - fails} of ${checks} checks passed`);
