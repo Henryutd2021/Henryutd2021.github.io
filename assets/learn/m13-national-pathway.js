@@ -5,7 +5,8 @@
 // Steps: predict whether a straight line to zero is in reach; vintages and residual value; the twelve slices and their
 // chronology; the model in four parts; solve the central pathway; the budget's dual as a carbon value and a budget sweep;
 // the straight line to zero (out of reach, and why); perfect foresight against decade by decade; a shock and the re-plan;
-// slices against full years of hours (from the library); near-optimal plans. Then the explain layer (the equation card,
+// slices against full years of hours (from the library: about a minute a check); near-optimal plans (live, seven LPs).
+// Then the explain layer (the equation card,
 // the flowchart of a run, a comparison table) built from the reader's runs.
 // Every number comes from E4 or its library; _tests/learn/test_m13-national-pathway.js checks the words against them.
 // Prairieland is fictional; its numbers are illustrative.
@@ -230,15 +231,23 @@
             ["From the library", "precomputed with this engine on " + LIB.date + ": 53 LPs a check, too slow for a click."], ["What moves", "spilled wind and solar is several times the slices' estimate: twelve-hour averages smooth the sunniest and windiest hours."]]);
           api.done(); api.saw(fullWords(e, n, E4));
         } },
-      // 11 near-optimal plans (precomputed: three LPs a choice are too slow for a phone click)
+      // 11 near-optimal plans, solved live: the central plan's LP, then the least and the most of each choice over every
+      // plan within a millionth of its cost (E4.nearRanges: seven LPs in one click)
       { text: "Many plans cost almost the same. Over every plan within a millionth of the least cost, how little and how much of each choice could be built? Two more LPs a choice.",
         build: function (act, api) {
-          var NR = P.cfg.precomputed && P.cfg.precomputed.m13near;
-          if (!NR) { H("p", { class: "lx-hint", text: "The ranges are not in this page's data." }, act); return; }
-          U.table(act, ["Choice", "Least", "The plan shown", "Most"], Object.keys(NEAR).map(function (k) { var r = NR.items[k]; return [NEAR[k].label, fix(r.lo / 1000, 2) + " GW", fix(r.at / 1000, 2) + " GW", fix(r.hi / 1000, 2) + " GW"]; }), "m13-near");
-          U.keys(act, [["Precomputed", "with this engine on " + NR.date + " for the central plan: six more LPs, too slow for a phone click."], ["Report", "what every near-optimal plan shares, or say which one you show; the notebook's practice task 4 runs it."]]);
-          S0.near = NR;
-          api.done(); api.saw(nearWords(NR.items.solar, NEAR.solar.label) + " Report what every near-optimal plan shares, or say which one you show.");
+          var list = Object.keys(NEAR).map(function (k) { return [k, E4.builtTerms(P, NEAR[k].t, NEAR[k].q)]; });
+          var near = function (st, ctx) {
+            return E4.nearRanges(P, st, list, 1e-6, { signal: ctx.signal, solver: solver() }).then(function (r) {
+              return r.ok ? { status: "optimal", ok: true, kind: "lp", message: "Done: the central plan's LP, then the least and the most of each choice over the plans within a millionth of its cost (" + r.solves + " LPs, each optimal).", results: r }
+                : { status: r.status, ok: false, kind: "lp", message: E4.WORDS[r.status] || r.message };
+            });
+          };
+          runBox(act, api, "Map the near-optimal plans", function () { return DEF; }, near, function (r, st, kp, res) {
+            U.table(res, ["Choice", "Least", "The plan shown", "Most"], Object.keys(NEAR).map(function (k) { var x = r.items[k]; return [NEAR[k].label, fix(x.lo / 1000, 2) + " GW", fix(x.at / 1000, 2) + " GW", fix(x.hi / 1000, 2) + " GW"]; }), "m13-near");
+            S0.near = r;
+            api.done(); api.saw(nearWords(r.items.solar, NEAR.solar.label) + " Report what every near-optimal plan shares, or say which one you show.");
+          });
+          U.keys(act, [["One click", "seven LPs: the central plan, then the least and the most of each of three choices."], ["Report", "what every near-optimal plan shares, or say which one you show; the notebook's practice task 4 runs it."]]);
         } }];
     var cards = LX.StepCards(live, { steps: steps });
 

@@ -15563,9 +15563,11 @@
      batteries: cyclic within each representative day (state at 08:00 and 20:00 within 0 and 4 h x power); in the
                                      scarce-wind week the store may enter full and runs down over the seven days
      links: flows each way within the link's limit (existing + additions), 1% lost per 100 km
-     fuels (national, each year): crude = refinery input + oil plants; gas = final + plants, domestic first (up to 2025's
-                                     output) then LNG; coal from Ridge County; final fuel use fixed by the plan's demand
-                                     and electrification
+     fuels (national, each year): crude = refinery input + oil plants (domestic crude, up to 2025's output, then imports);
+                                     gas = final + plants, delivered by domestic fields (up to 2025's output; 5% of it
+                                     used in the fields, which the national inventory counts) and LNG (whose upstream
+                                     emissions fall abroad), in the least-cost mix within the import cap; coal from Ridge
+                                     County; final fuel use fixed by the plan's demand and electrification
      CO2 (Mt a year) = fuels burned x IPCC factors; cumulative 2026-2050 = sum_p w_p CO2_p + w_2025 x 214.9 <= budget
                                      (+ an overshoot, see "limits first"); w linear (2, 5, 5, 5, 5, 3) or step (0, 5, 5, 5, 5, 5)
      imports (crude imports + LNG) <= cap x primary energy, each year (+ an overshoot, see "limits first")
@@ -15574,6 +15576,13 @@
      goal: min the present value in 2025 of new plants' and links' yearly payments for the years they serve up to 2050
                                      (the rest is residual value), fixed O&M of fossil plants kept open and of new plants,
                                      variable O&M, fuels, unserved energy and stress-hour shortfall at penalties, the tie rule
+     reported cost (money): the goal's terms without penalties and ties, plus the fixed O&M of the existing wind, solar
+                                     and batteries still open (the new plants' coefficients): a constant no decision
+                                     changes, so it sits outside the LP and leaves every pathway difference as it was.
+                                     Existing hydro and the existing steady plants have no fixed O&M in the data: left out
+     the fleet: an existing unit counts in a model year only if its retire year is later (P.on, prairieland.json
+                                     capacityByYearMW), so it leaves the plan in the five-year period that contains its
+                                     retire year: a conservative simplification (up to five years less of each plant)
    Limits first: the budget and the import cap are limits, not prices. Each window's LP
    runs with the overshoots at their penalties; when it meets both limits it is the least-cost plan within them (one LP).
    When it misses one, two more LPs: the least overshoot (no more unserved energy or stress-hour shortfall than run 1:
@@ -15648,6 +15657,8 @@
     P.units = U.filter(function (u) { return FOSSIL.indexOf(u.tech) >= 0; }).map(function (u, j) {
       return { id: u.id, name: u.name, r: P.ri[u.region], tech: u.tech, mw: u.mw, built: u.built, retire: u.retire, eff: u.efficiency, j: j, av: av[u.tech] };
     });
+    // online in model year y (the five years ending in y) only if the unit's retire year is later: a unit leaves the plan
+    // in the period that contains its retire year (Plains Station, in service to the end of 2030, is out of 2026-2030)
     P.on = function (u, y) { return u.retire > y; };
     P.exist = function (tech, r, y) {                         // MW of an existing technology online in region r, model year y
       var t = 0; U.forEach(function (u) { if (u.tech === tech && P.ri[u.region] === r && u.retire > y) t += u.mw; }); return t;
@@ -16177,12 +16188,18 @@
 
   // ---------------------------------------------------------------- money: each model year's cost and the present value
   // yearly ($M a year, that year's 2025 dollars): new plants' and links' payments (annuity + fixed O&M) for what is open,
-  // fixed O&M of fossil plants kept open, variable O&M of what ran, fuels bought; pv = sum_p D_p x yearly_p
+  // fixed O&M of fossil plants kept open, the upkeep of the existing wind, solar and batteries still open, variable O&M of
+  // what ran, fuels bought; pv = sum_p D_p x yearly_p
+  // upkeep: the existing wind, solar and batteries online in model year y (their retirement years, never decided) at the
+  // new plants' fixed O&M ($ per kW-year, prairieland.json costs.technologies), $M a year: the same in every pathway
+  var UPKEEP = ["wind", "solar", "battery"];
+  function upkeepYear(P, y) { var t = 0; UPKEEP.forEach(function (k) { P.R.forEach(function (R, r) { t += P.exist(k, r, y) * P.tech[k].fom / 1000; }); }); return t; }
+  function upkeepPV(P, S) { var t = 0; S.Y.forEach(function (y, p) { t += S.D[p] * upkeepYear(P, y); }); return t; }
   function money(P, S, raw) {
     var T = P.tech, cfg = P.cfg, Y = S.Y;
     var yearly = Y.map(function (y, p) {
       var q = raw.per[p]; if (!q) return null;
-      var o = { capital: 0, transmission: 0, fom: 0, vom: 0, fuel: 0 };
+      var o = { capital: 0, transmission: 0, fom: 0, upkeep: upkeepYear(P, y), vom: 0, fuel: 0 };
       P.R.forEach(function (R, r) { NEW.forEach(function (t) { for (var b = 0; b <= p; b++) if (Y[p] - Y[b] < T[t].life) o.capital += raw.n[r][t][b] * (S.capex[b][t] * crf(S.rate, T[t].life) + T[t].fom) / 1000; }); });
       for (var b = 0; b <= p; b++) if (Y[p] - Y[b] < T.firm.life) o.capital += raw.firm[b] * (S.capex[b].firm * crf(S.rate, T.firm.life) + T.firm.fom) / 1000;
       P.links.forEach(function (l) { for (var b2 = 0; b2 <= p; b2++) o.transmission += raw.a[l.i][b2] * l.km * S.txCost * crf(S.rate, P.tx.life) / 1e6; });
@@ -16192,10 +16209,10 @@
       o.vom += (q.genMWh.firm || 0) * T.firm.vom / 1e6;
       var f = q.fuel, pr = S.price[p];
       o.fuel = (f.crudeDom + f.crudeImp) * pr.oil + f.gasDom * pr.gas + f.lng * pr.lng + f.coal * pr.coal;
-      o.total = o.capital + o.transmission + o.fom + o.vom + o.fuel;
+      o.total = o.capital + o.transmission + o.fom + o.upkeep + o.vom + o.fuel;
       return o;
     });
-    var pv = { capital: 0, transmission: 0, fom: 0, vom: 0, fuel: 0, total: 0 };
+    var pv = { capital: 0, transmission: 0, fom: 0, upkeep: 0, vom: 0, fuel: 0, total: 0 };
     yearly.forEach(function (o, p) { if (!o) return; for (var k in pv) pv[k] += o[k] * S.D[p]; });
     return { yearly: yearly, pv: pv };
   }
@@ -16259,6 +16276,7 @@
       if (!b.ok) return b;
       var rawS = merge(b.raws); for (var p2 = 0; p2 < sp; p2++) rawS.per[p2] = raw.per[p2];
       var R = summarize(state, P, Ss, rawS); R.key = shock; R.year = Ss.shockYear; R.label = P.shocks[shock].label; R.keptThrough = kt;
+      R.dPV = R.pvTotal - money(P, S, raw).pv.total;   // against the plan, unrounded (a cost both share cancels exactly)
       return { ok: true, raw: rawS, results: R, models: b.models };
     });
   }
@@ -16354,7 +16372,8 @@
   // 52 weeks of 168 hours and 31 December, one LP each, batteries cyclic within each week, hydro's energy fixed day by day
   // (its season's factor), the links' limits, unserved energy at the penalty; fuels at the slice run's marginal values for
   // that year (fuel plus the carbon budget's value: the fuel rows' duals), so the check runs the same economics hour by
-  // hour. CO2 of the year: the plants' fuel by the same domestic-first rule, plus the fixed final fuels.
+  // hour. CO2 of the year: the plants' fuel plus the fixed final fuels, with gas bought in the slice run's own mix of
+  // domestic gas and LNG for that model year (procure): the same delivered gas gives the LP's procurement and CO2.
   var MONTH0 = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365];
   function seasonOfDay(d) { var m = 0; while (d >= MONTH0[m + 1]) m++; return m === 11 || m < 2 ? "winter" : m < 5 ? "spring" : m < 8 ? "summer" : "autumn"; }
   function fullYear(P, S, raw, p, H, o) {
@@ -16424,15 +16443,27 @@
     return one(0).then(function (t) {
       if (t.status !== "optimal") return t;
       t.curtailMWh = Math.max(0, (t._avail || 0) - (t.gen.wind || 0) - (t.gen.solar || 0)); delete t._avail;
-      // CO2: the plants' fuel plus the final fuels, supplied domestic first (as the slice run's fuel rows)
-      var F = S.fuel[p], crude = F.oil / P.refYield + t.oilPJ, gasNeed = F.gas + t.gasPJ, gd = Math.min(P.domGas, gasNeed / (1 - P.gasOwn)), lng = Math.max(0, gasNeed - gd * (1 - P.gasOwn));
+      // CO2: the plants' fuel plus the final fuels; gas in the slice run's own mix for this model year (procure)
+      var F = S.fuel[p], crude = F.oil / P.refYield + t.oilPJ, gasNeed = F.gas + t.gasPJ, g = procure(P, q, gasNeed);
       var coal = (F.coal + t.coalPJ) / (1 - P.coalOwn);
-      t.co2 = (crude * P.f.oil + (gd + lng) * P.f.gas + coal * P.f.coal) / 1000; t.co2Slices = q.co2; t.co2Gap = t.co2 / q.co2 - 1;
+      t.gasDom = g.gasDom; t.lng = g.lng;
+      t.co2 = co2Of(P, crude, g, coal); t.co2Slices = q.co2; t.co2Gap = t.co2 / q.co2 - 1;
       t.coalOverMine = coal > P.coalMax + 1e-6;
       t.year = y; t.p = p;
       return t;
     });
   }
+  // gas bought for a delivered need (PJ) in the slice LP's own mix of model year p (q = raw.per[p]): the share of delivered
+  // gas the LP took from domestic fields stays; domestic production beyond 2025's output goes to LNG. The LP chooses that
+  // mix at least cost within the import cap; under a tight budget LNG can win, because the national inventory counts the
+  // gas used in domestic fields but not LNG's upstream emissions abroad. Equal delivered gas gives the LP's own purchases
+  function procure(P, q, need) {
+    var f = q.fuel, own = 1 - P.gasOwn, dd = f.gasDom * own, tot = dd + f.lng, sd = tot > 0 ? dd / tot : 0;
+    var gd = Math.min(P.domGas, sd * need / own);
+    return { gasDom: gd, lng: Math.max(0, need - gd * own) };
+  }
+  // CO2 of a year's fuels (Mt): crude, gas bought ({ gasDom, lng }, PJ) and coal mined, at the IPCC factors (as the LP's rows)
+  function co2Of(P, crude, g, coal) { return (crude * P.f.oil + (g.gasDom + g.lng) * P.f.gas + coal * P.f.coal) / 1000; }
   function newCap(P, raw, t, r, p) { var c = 0; for (var q = 0; q <= p; q++) if (raw.Y[p] - raw.Y[q] < P.tech[t].life) c += raw.n[r][t][q]; return c; }
 
   // ---------------------------------------------------------------- what a page shows (pure)
@@ -16528,7 +16559,7 @@
   // a shock's view: what changes against the plan
   function shockView(Q, V0, P) {
     var v = view(Q, P);
-    return { key: Q.key, year: Q.year, label: Q.label, pv: v.pv.total, dPV: rd(v.pv.total - V0.pv.total, 0), cum: v.cum, over: v.over, co2: v.co2, imp: v.imp, capOver: v.capOver, unserved: v.unserved,
+    return { key: Q.key, year: Q.year, label: Q.label, pv: v.pv.total, dPV: rd(Q.dPV != null ? Q.dPV : v.pv.total - V0.pv.total, 0), cum: v.cum, over: v.over, co2: v.co2, imp: v.imp, capOver: v.capOver, unserved: v.unserved,
       carbonValue: v.carbonValue, reserveShort: v.reserve.map(function (x) { return x.shortMW; }), clean: v.clean, rule: v.rule, reach: v.reach, keptThrough: Q.keptThrough == null ? null : V0.Y[Q.keptThrough] || null };
   }
   // the reserve rule's spare at the tighter stress hour, nation-wide, each model year (from the plan's capacities, with the
@@ -16567,22 +16598,38 @@
   }
   // the new capacity of one technology built in one model year, nationally, as terms
   function builtTerms(P, t, q) { var o = {}; if (t === "firm") o["n_firm" + q] = 1; else P.R.forEach(function (R, r) { o["n_" + r + t + q] = 1; }); return o; }
-  // plans within a share of the best cost: the lowest and highest of an expression (two more LPs); Promise of { lo, hi }
+  // plans within a share of the best cost: the lowest and highest of an expression (two more LPs); Promise of { lo, hi }.
+  // The best cost is the LP's goal plus the existing fleet's upkeep (a constant outside the LP), so "a millionth of the
+  // least cost" is of the cost the pages report (objective: that sum)
   function nearRange(P, state, terms, share, o) {
+    return nearRanges(P, state, [["x", terms]], share, o).then(function (r) {
+      if (!r.ok) return r; var x = r.items.x; return { status: "optimal", ok: true, lo: x.lo, hi: x.hi, at: x.at, slack: x.slack, objective: x.objective };
+    });
+  }
+  // several expressions over one solved plan: the plan's LP once, then its min and max LPs for each (list: [[key, terms]],
+  // in order; 1 + 2 x n LPs, each the same LP nearRange would solve). Promise of { status, ok, items: { key: { lo, hi, at,
+  // slack, objective } }, solves }; o.onSolve(k, n) after each LP
+  function nearRanges(P, state, list, share, o) {
     o = o || {};
-    var sol = solverOf(o), S = sysOf(state, P), m = build(P, S), tl = o.timeLimit || P.cfg.solver.timeLimit;
-    var one = function (mm) { return new Promise(function (res) { res(sol(mm, { timeLimit: tl, signal: o.signal })); }); };
+    var sol = solverOf(o), S = sysOf(state, P), m = build(P, S), tl = o.timeLimit || P.cfg.solver.timeLimit, up = upkeepPV(P, S), n = 1 + 2 * list.length, k = 0;
+    var one = function (mm) { return new Promise(function (res) { res(sol(mm, { timeLimit: tl, signal: o.signal })); }).then(function (x) { k++; if (o.onSolve) o.onSolve(k, n); return x; }); };
     return one(m).then(function (r) {
-      if (r.status !== "optimal") return { status: r.status, ok: false };
-      var slack = Math.abs(r.objective) * share;
-      return one(faceModel(m, r, terms, "min", slack)).then(function (a) {
-        if (a.status !== "optimal") return { status: a.status, ok: false };
-        return one(faceModel(m, r, terms, "max", slack)).then(function (b) {
-          if (b.status !== "optimal") return { status: b.status, ok: false };
-          var at = 0; for (var k in terms) at += (r.values[k] || 0) * terms[k];
-          return { status: "optimal", ok: true, lo: a.objective, hi: b.objective, at: at, slack: slack, objective: r.objective };
+      if (r.status !== "optimal") return { status: r.status, ok: false, message: r.message };
+      var slack = Math.abs(r.objective + up) * share, items = {};
+      var step = function (i) {
+        if (i >= list.length) return { status: "optimal", ok: true, items: items, solves: n };
+        var key = list[i][0], terms = list[i][1];
+        return one(faceModel(m, r, terms, "min", slack)).then(function (a) {
+          if (a.status !== "optimal") return { status: a.status, ok: false, message: a.message };
+          return one(faceModel(m, r, terms, "max", slack)).then(function (b) {
+            if (b.status !== "optimal") return { status: b.status, ok: false, message: b.message };
+            var at = 0; for (var t in terms) at += (r.values[t] || 0) * terms[t];
+            items[key] = { lo: a.objective, hi: b.objective, at: at, slack: slack, objective: r.objective + up };
+            return step(i + 1);
+          });
         });
-      });
+      };
+      return step(0);
     }).then(null, function (e) { return { status: "error", ok: false, message: String(e && e.message || e) }; });
   }
 
@@ -16638,8 +16685,8 @@
   }
 
   var E4 = { REG: REG, NEW: NEW, FOSSIL: FOSSIL, prepare: prepare, schema: schema, defaults: defaults, withPreset: withPreset, sysOf: sysOf, build: build, crf: crf, dsum: dsum,
-    hourly: hourly, stressHours: stressHours, fullYear: fullYear, seasonOfDay: seasonOfDay, newCap: newCap, read: read, capNow: capNow, merge: merge, fixedOf: fixedOf, money: money, windowsOf: windowsOf, runWindows: runWindows, planRun: planRun, shockRun: shockRun, solve: solve, shockTest: shockTest, c4Shocks: c4Shocks, presetsOf: presetsOf, summarize: summarize, faceModel: faceModel, builtTerms: builtTerms, nearRange: nearRange, resultRows: resultRows, fallbackHTML: fallbackHTML, inputsHTML: inputsHTML, tableHTML: tableHTML, planRows: planRows, esc: esc, view: view, shockView: shockView, stressMargins: stressMargins, TECHS: TECHS, rd: rd, WORDS: WORDS,
-    GAP: GAP, solveWindow: solveWindow, LIM_TOL: LIM_TOL, keptThrough: keptThrough, doneWords: doneWords, fullVerdict: fullVerdict, FULL_TOL: FULL_TOL, shockTable: shockTable, cvText: cvText,
+    hourly: hourly, stressHours: stressHours, fullYear: fullYear, seasonOfDay: seasonOfDay, newCap: newCap, read: read, capNow: capNow, merge: merge, fixedOf: fixedOf, money: money, windowsOf: windowsOf, runWindows: runWindows, planRun: planRun, shockRun: shockRun, solve: solve, shockTest: shockTest, c4Shocks: c4Shocks, presetsOf: presetsOf, summarize: summarize, faceModel: faceModel, builtTerms: builtTerms, nearRange: nearRange, nearRanges: nearRanges, resultRows: resultRows, fallbackHTML: fallbackHTML, inputsHTML: inputsHTML, tableHTML: tableHTML, planRows: planRows, esc: esc, view: view, shockView: shockView, stressMargins: stressMargins, TECHS: TECHS, rd: rd, WORDS: WORDS,
+    GAP: GAP, UPKEEP: UPKEEP, upkeepYear: upkeepYear, upkeepPV: upkeepPV, procure: procure, co2Of: co2Of, solveWindow: solveWindow, LIM_TOL: LIM_TOL, keptThrough: keptThrough, doneWords: doneWords, fullVerdict: fullVerdict, FULL_TOL: FULL_TOL, shockTable: shockTable, cvText: cvText,
     kilo: kilo, fix: fix, pct: pct, bn: bn, copy: copy, sum: sum, PJ_PER_MWH: PJ_PER_MWH, MWH_PER_PJ: MWH_PER_PJ };
   if (typeof module !== "undefined" && module.exports) module.exports = E4;
   if (typeof window === "undefined" || !window.LX) return;

@@ -74,4 +74,12 @@ function libText(plans) {
     " (each LP optimal, at most 120 s a solve), its view (every number a page shows), C4's four shocks re-planned, and the full-year checks of 2030 and 2050 in 2025's and 2024's weather (52 weeks and 31 December, an LP each). Phones read it instead of loading the solver; the full-year checks are too slow for a click. Written by node _tests/learn/test_e4-engine.js --write; checked byte for byte (--library: every entry).",
     date: LIB_DATE, timeLimit: 120, plans: plans });
 }
-module.exports = { SITE, L, LIB_DATE, load, face, grid, libEntry, libText, fullOf, between: X1.between, writeBlocks: X1.writeBlocks, norm: X1.norm };
+// the dated correction line of SB4, M13 and C4 (7 Nov 2026), from the library: the existing fleet's upkeep is the same in
+// every entry; the central pathway's cost with it and without it (the cost before the correction)
+function correction(E4, LIB) {
+  const ups = LIB.plans.map(e => e.view.pv.upkeep), V = LIB.plans.find(e => e.preset === "central" && e.foresight === "perfect").view;
+  if (ups.some(u => u !== ups[0])) throw new Error("correction: the upkeep differs between entries");
+  return { text: "Corrected 7 Nov 2026: costs now include the existing wind, solar and batteries' fixed O&M, " + E4.bn(ups[0]) + " in every pathway (central: " + E4.bn(V.pv.total) + ", was " + E4.bn(V.pv.total - V.pv.upkeep) +
+    "; differences unchanged). The full-year check buys gas in the slice run's own mix.", upkeep: ups[0], now: V.pv.total, was: V.pv.total - V.pv.upkeep };
+}
+module.exports = { SITE, L, LIB_DATE, load, face, grid, libEntry, libText, fullOf, correction, between: X1.between, writeBlocks: X1.writeBlocks, norm: X1.norm };

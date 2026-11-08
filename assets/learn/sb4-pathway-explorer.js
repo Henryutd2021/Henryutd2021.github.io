@@ -5,9 +5,10 @@
 // The page: the brief (static), the bench (demand and electrification, the limits you set, what the model may do, a shock,
 // costs and fuels; Run the pathway; readouts; the plan link), the results (what the run says, the map of the five regions,
 // the mix by model year, CO2 and imports, the LP's marginal values, Ridge County, the shock against the plan, the
-// full-year check from the library), then how the engine works (LX.Boundary) and the sources. A plan that is in the
-// library (the presets, perfect foresight or decade by decade) is drawn from it at once, labelled "precomputed with this
-// engine on <date>"; "Solve it live" runs it in the browser. Every number the page states comes from E4 or the library and
+// full-year check from the library), then how the engine works (LX.Boundary) and the sources. The first view (the plan
+// on load, when it is in the library) is drawn from the library, labelled "precomputed with this engine on <date>"; every
+// run the reader starts (Run, a preset) solves in the browser. The full-year checks stay precomputed: they follow the
+// plan's key, live or not (about a minute of solving each). Every number the page states comes from E4 or the library and
 // is checked by _tests/learn/test_sb4-pathway-explorer.js (with the engine's test_e4-engine.js).
 // Prairieland is fictional; its numbers are illustrative.
 (function () {
@@ -80,7 +81,7 @@
   // ---------------------------------------------------------------- view
   var LX = window.LX, H = LX.H, E4 = LX.E4, U = E4.ui;
   LX.mount("sb4", function (live, data, root) {
-    var P = E4.prepare(data.prairieland, data.e4_pathways), S = E4.schema(P), LIB = data.e4_library || null, stub = null, forceLive = false;
+    var P = E4.prepare(data.prairieland, data.e4_pathways), S = E4.schema(P), LIB = data.e4_library || null, stub = null, first = false;
     var rh = document.getElementById("sb4-results"), fb = rh.querySelector(".lx-fallback"); if (fb) fb.hidden = true;
     H("p", { class: "lx-hint e4-line", text: P.line }, live);
     var wrap = H("div", { class: "lx-sb e4-sb" }, live);
@@ -118,10 +119,11 @@
     }
     var run = LX.BenchRun(side, { label: "Run the pathway", state: function () { return plan; }, results: [res, ro], stale: stale,
       busy: function (on) { stopB.busy(on); },
-      // a plan in the library keeps its full-year checks whether it is drawn from the library or solved live (the same
-      // plan, shock set aside: the checks are of the unshocked pathway). The status line is the engine's, by foresight
+      // only the first view comes from the library; every run the reader starts solves live. A plan in the library keeps
+      // its full-year checks either way (the same plan, shock set aside: the checks are of the unshocked pathway). The
+      // status line is the engine's, by foresight
       solve: function (st, ctx) {
-        var e = page.libEntry(LIB, LX.ShareState, S, st), useLib = e && !forceLive && !stub; forceLive = false;
+        var e = page.libEntry(LIB, LX.ShareState, S, st), useLib = e && first && !stub; first = false;
         if (useLib) return Promise.resolve({ status: "optimal", ok: true, kind: "lp", message: E4.doneWords(st, e.view) + " From the library.", results: { V: e.view, X: st.sh !== "none" ? e.shocks[st.sh] : null, full: e.full, lib: true } });
         return E4.solve(st, P, { signal: ctx.signal, attempt: ctx.attempt, solver: solver() }).then(function (r) {
           if (r.ok) { var V = E4.view(r.results.plan, P); r.results = { V: V, X: r.results.shock ? E4.shockView(r.results.shock, V, P) : null, full: e ? e.full : null, lib: false, ms: r.ms }; }
@@ -132,8 +134,7 @@
     stopB.attach(run);
     side.appendChild(ro);
     side.insertBefore(ss.status, pre);
-    var liveB = H("button", { class: "lx-btn ghost small", type: "button", text: "Solve it live", hidden: true, onclick: function () { forceLive = true; run.run(plan); } });
-    side.appendChild(src); side.appendChild(liveB);
+    side.appendChild(src);
     side.appendChild(ss.el);
     function change(p) { plan = p; C.set(plan); ss.set(plan); run.changed(plan); }
 
@@ -141,8 +142,8 @@
     var map = null;
     function draw(R) {
       var V = R.V, X = R.X;
-      src.textContent = R.lib ? "From the library: precomputed with this engine on " + LIB.date + " (the same LP; " + LIB.timeLimit + " s a solve)." : "Solved in your browser just now (HiGHS, a linear program).";
-      src.className = "e4-src" + (R.lib ? " lib" : ""); liveB.hidden = !R.lib;
+      src.textContent = R.lib ? "The first view, precomputed with this engine on " + LIB.date + " (the same LP). Run the pathway, or pick a preset, to solve in your browser." : "Solved in your browser just now (HiGHS, a linear program).";
+      src.className = "e4-src" + (R.lib ? " lib" : "");
       ro.innerHTML = "";
       U.readouts(V).forEach(function (x) { var d = H("div", { class: "lx-readout " + x[2] }, ro); H("span", { text: x[0] }, d); H("b", { text: x[1] }, d); });
       res.innerHTML = "";
@@ -156,7 +157,8 @@
         ["Ties", "where two regions or routes cost the same, the map shows the one the [[tie-rule|tie rule]] picks; national totals do not depend on it."]]);
       var c2 = H("div", { class: "lx-xcard lx-sb-chart" }, res); H("h3", { text: "What is open and what runs" }, c2);
       U.MixChart(c2, P).set(V);
-      U.keys(c2, [["Vintages", "each plant's [[vintage|vintage]] counts in a model year only while its life covers it; existing plants leave on their retirement years unless the plan retires coal, gas or oil early."],
+      U.keys(c2, [["Vintages", "each plant's [[vintage|vintage]] counts in a model year only while its life covers it."],
+        ["Retirements", "an existing plant leaves in the five-year period that contains its retirement year, a conservative simplification (Plains Station, open to the end of 2030, is out of 2026–2030); the plan may retire coal, gas or oil earlier."],
         ["Residual value", "a plant built late pays only for the years it runs up to 2050; the rest of its life is its [[residual-value|residual value]], not charged."]]);
       var c3 = H("div", { class: "lx-sb-charts two" }, res);
       var c3a = H("div", { class: "lx-xcard lx-sb-chart" }, c3); H("h3", { text: "CO₂ a year" }, c3a);
@@ -176,9 +178,10 @@
       var c5 = H("div", { class: "lx-xcard lx-sb-chart" }, res); H("h3", { text: "Cost, by part (present value in 2025)" }, c5);
       var pv = V.pv;
       U.table(c5, ["Part", "Present value", "In 2050, a year"], [["New plants: yearly payments and fixed O&M", bn(pv.capital), bn(V.yearly[4].capital)], ["New links", bn(pv.transmission), bn(V.yearly[4].transmission)],
-        ["Fixed O&M of fossil plants kept open", bn(pv.fom), bn(V.yearly[4].fom)], ["Variable O&M", bn(pv.vom), bn(V.yearly[4].vom)], ["Fuels bought by the whole nation", bn(pv.fuel), bn(V.yearly[4].fuel)],
+        ["Fixed O&M of fossil plants kept open", bn(pv.fom), bn(V.yearly[4].fom)], ["Fixed O&M of the existing wind, solar and batteries", bn(pv.upkeep), bn(V.yearly[4].upkeep)], ["Variable O&M", bn(pv.vom), bn(V.yearly[4].vom)], ["Fuels bought by the whole nation", bn(pv.fuel), bn(V.yearly[4].fuel)],
         { cls: "e4-tot", cells: ["Total", bn(pv.total), bn(V.yearly[4].total)] }], "sb4-cost");
-      U.keys(c5, [["The boundary", "the energy system's supply side and every fuel bought, 2026–2050 in 2025 dollars; existing plants' capital is sunk; end-use equipment (heat pumps, cars) is left out."]]);
+      U.keys(c5, [["The boundary", "the energy system's supply side and every fuel bought, 2026–2050 in 2025 dollars; existing plants' capital is sunk; end-use equipment (heat pumps, cars) is left out."],
+        ["Existing fleet", "wind, solar and batteries at the new plants' fixed O&M while open: the same in every pathway. The data give none for existing hydro and the steady plants, so their upkeep is left out."]]);
       if (X) {
         var c6 = H("div", { class: "lx-xcard lx-sb-chart" }, res); H("h3", { text: X.label + " in " + X.year + ": the plan against the re-plan" }, c6);
         var yi = V.Y.indexOf(X.year);
@@ -220,9 +223,9 @@
       leaves: ["power-flow physics, outages and reserves within the hour", "end-use equipment costs, so the model never chooses electrification", "how fast industries, factories and workers can change", "fuels other than electricity for the oil that remains (aviation, shipping, farms)", "who decides, and prices in markets: marginal values are not market prices"],
       source: "Prairieland is fictional; its numbers are illustrative. Costs: EIA AEO2026 assumptions (2025 dollars); hourly shapes: SPP 2025 and 2024." });
 
-    // ---- the first view: the default plan from the library (no solver download), else a live run once in view
+    // ---- the first view: the plan on load from the library (no solver download), else a live run once in view
     var started = false;
-    function start() { if (started) return; started = true; run.run(plan); }
+    function start() { if (started) return; started = true; first = true; run.run(plan); }
     if (typeof IntersectionObserver !== "undefined") {
       var io = new IntersectionObserver(function (es) { if (es.some(function (e) { return e.isIntersecting; })) { io.disconnect(); start(); } }, { rootMargin: "200px" });
       io.observe(root); io.observe(rh);
@@ -232,7 +235,7 @@
     LX.demo(root, function (s) {
       started = true;
       if (s === "mid" || s === "done") { change(E4.withPreset(plan, E4.presetsOf(P)[2])); run.run(plan); return { view: "mid" }; }
-      if (s === "live") { forceLive = true; run.run(plan); return { view: "mid" }; }
+      if (s === "live") { run.run(plan); return { view: "mid" }; }
       if (s === "shock") { change(Object.assign({}, plan, { sh: "demandSurprise" })); run.run(plan); return { view: "mid" }; }
       if (s === "norule") { change(Object.assign({}, plan, { rm: "off" })); run.run(plan); return { view: "mid" }; }
       if (s === "fail") { stub = "fail"; run.run(plan); return { view: "fail" }; }

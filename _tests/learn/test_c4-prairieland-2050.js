@@ -118,6 +118,14 @@ const QPATH = path.join(X.SITE, "learn/c4-prairieland-2050.qmd");
   const nr = LIB.plans.find(x => x.preset === "central-norule");
   ok(/not tested, the peak-hour rule is off/.test(PG.sensLine(nr.view, nr.shocks)), "the sensitivity line of a plan without the rule: peak hours not tested");
   ok(RB.COMPETENCES && PG.RUBRIC.every(c => RB.COMPETENCES.some(x => x.id === c.id)), "the rubric's competences are the course's");
+  // the cost boundary and the fleet in the brief's assumptions; the flow; the dated correction
+  ok(as.some(x => /existing wind, solar and batteries' fixed O&M while they are open; the data give none for existing hydro and the steady plants, so their upkeep is left out/.test(x)) && as.some(x => /leaves the plan in the five-year period that contains its retirement year: a conservative simplification/.test(x)), "the assumptions state the cost's existing-fleet upkeep and what is left out, and the retirement convention");
+  const CJS = fs.readFileSync(L("c4-prairieland-2050.js"), "utf8"), CT = X.norm(fs.readFileSync(path.join(X.SITE, "learn/c4-prairieland-2050.qmd"), "utf8"));
+  ok(/lib1 = first && !stub; first = false;/.test(CJS) && /started = true; first = true; run\.run\(plan\)/.test(CJS) && !/Solve it live|forceLive/.test(CJS) && /The first view, precomputed with this engine on " \+ LIB\.date/.test(CJS),
+    "only the first view comes from the library; every run the reader starts (the plan, four re-plans and the reference) solves live");
+  ok(CT.indexOf("the first view and the presets' full-year checks (about a minute of solving each) come from a library made with this engine; every run you start solves in your browser.") >= 0 && CT.indexOf("Also the upkeep of the existing hydro and steady plants: the data give no figure, and it is the same in every pathway.") >= 0, "the data note says what is precomputed and what the cost leaves out");
+  const corr = X.correction(E4, LIB); ok(CT.indexOf(corr.text) >= 0, "the dated correction line, from the library");
+  ok(LIB.plans.every(e => Object.keys(e.shocks).every(k => Number.isInteger(e.shocks[k].dPV))), "shock cost differences are whole $M, from unrounded totals");
 
   // ---------------- the page frame
   ["brief", "plan", "note", "selfcheck", "sources"].forEach(id => ok(new RegExp("::: \\{#" + id + " \\.lx-sec\\}").test(PAGE), "section #" + id));

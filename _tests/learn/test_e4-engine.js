@@ -13,7 +13,9 @@
 //     flows within the links; the fuel rows; CO2 = fuels x IPCC factors; the cumulative budget with its weights; imports
 //     within the cap; the stress-hour rule; kept-open capacity never rises
 //   - money: the present value from each year's cost equals the LP's economic objective (penalties and the tie rule left
-//     out); a plant built late pays only up to 2050 (residual value)
+//     out) plus the existing wind, solar and batteries' fixed O&M (recomputed from prairieland.json's units; a constant,
+//     the same for every preset); a plant built late pays only up to 2050 (residual value)
+//   - the fleet: a unit leaves the plan in the period that contains its retire year, as the data state it
 //   - prices and duals only from the LP: the budget's dual equals the cost slope when the budget moves 20 Mt; a
 //     region's marginal cost equals the slope of one more MW in that slice
 //   - ties: every national number of the view is the same with the tie costs x10 and x0.1; built
@@ -23,7 +25,8 @@
 //   - shocks: the plan's decisions up to the shock's year are kept; earlier years unchanged; each shock moves what it
 //     names (LNG and gas prices, hydro and summer capacity, battery capital, demand)
 //   - the full-year check: its hourly balances (recomputed on a week), CO2 within 10% for the default plan; with no
-//     peak-hour rule, demand goes unserved in the full year
+//     peak-hour rule, demand goes unserved in the full year; gas: the same delivered gas gives the LP's own purchases of
+//     domestic gas and LNG and its CO2 (also where LNG wins: cheaper LNG, or a tight budget)
 //   - the library (data/e4-library.json): every preset, perfect and decade by decade; entries equal fresh runs byte for
 //     byte (the default and one more by default, every entry with --library), written exactly as --write writes it
 //   - limits first: the high-electrification 2,800 Mt plan without the firm option meets its budget
@@ -118,11 +121,27 @@ const WRITE = process.argv.includes("--write"), FULLLIB = process.argv.includes(
     P.Y.forEach((y, p) => { const f = raw.per[p].fuel, c = ((f.crudeDom + f.crudeImp) * 73.3 + (f.gasDom + f.lng) * 56.1 + f.coal * 94.6) / 1000; ok(near(c, raw.per[p].co2, 1e-6), pr.id + " " + y + ": CO2 = fuels x IPCC factors (" + c.toFixed(2) + " Mt)"); });
     ok(near(R.cum, 2 * 214.9 + E4.sum(P.Y.map((y, p) => [5, 5, 5, 5, 3][p] * R.co2[p])), 1e-6) && R.cum <= st.bud + raw.over + 1e-4, pr.id + ": cumulative CO2 = 2 x 214.9 + 5, 5, 5, 5, 3 x each model year's, within the budget plus any overshoot");
     P.Y.forEach((y, p) => ok(R.importShare[p] <= Sx.cap + raw.per[p].importOver / raw.per[p].primary + 1e-6, pr.id + " " + y + ": imports within the cap (" + (100 * R.importShare[p]).toFixed(1) + "%)"));
-    // the money: present value from each year's cost = the LP's economic objective
+    // the money: present value from each year's cost = the LP's economic objective + the existing fleet's upkeep (a
+    // constant outside the LP), recomputed here from prairieland.json's units and fixed O&M coefficients
     const econ = m.variables.reduce((a, v) => a + val(x, v.name) * (m.meta.cat[v.name] === "penalty" ? 0 : v.cost - (m.meta.tieC[v.name] || 0)), 0);
-    ok(near(R.pv.total, econ, 1e-3 * Math.abs(econ) + 1), pr.id + ": the present value of each year's cost ($" + (R.pv.total / 1000).toFixed(1) + "bn) equals the LP's economic objective ($" + (econ / 1000).toFixed(1) + "bn)");
+    const up = E4.sum(P.Y.map((y, p) => Sx.D[p] * PL.fleet.units.filter(u => ["wind", "solar", "battery"].includes(u.tech) && u.retire > y).reduce((a, u) => a + u.mw * T[u.tech].fom / 1000, 0)));
+    ok(near(R.pv.upkeep, up, 1e-6) && near(R.pv.total, econ + up, 1e-3 * Math.abs(econ) + 1), pr.id + ": the present value of each year's cost ($" + (R.pv.total / 1000).toFixed(1) + "bn) equals the LP's economic objective ($" + (econ / 1000).toFixed(1) + "bn) plus the existing wind, solar and batteries' fixed O&M ($" + (up / 1000).toFixed(2) + "bn)");
     // kept-open capacity never rises
     ok(P.units.every(u => P.Y.every((y, p) => p === 0 || !raw.k[u.j][p] || raw.k[u.j][p] <= raw.k[u.j][p - 1] + 1e-6 || !P.on(u, P.Y[p - 1]))), pr.id + ": a plant retired early stays retired");
+  }
+  // the existing fleet's upkeep: wind and solar at the new plants' fixed O&M add $8.94 billion to the default plan, batteries
+  // $0.16 billion; a constant, so the same in every pathway at the same discount rate; no hydro or other existing plant
+  // has a fixed O&M in the data (left out, as the pages say)
+  {
+    const Sx = E4.sysOf(def, P), part = k => E4.sum(P.Y.map((y, p) => Sx.D[p] * E4.sum(P.R.map((R, r) => P.exist(k, r, y))) * T[k].fom / 1000));
+    ok(near(part("wind") + part("solar"), 8939.5, 0.5) && near(part("battery"), 161.5, 0.5) && near(E4.upkeepPV(P, Sx), part("wind") + part("solar") + part("battery"), 1e-9) && JSON.stringify(E4.UPKEEP) === '["wind","solar","battery"]',
+      "upkeep of the existing fleet, default plan: wind and solar $" + ((part("wind") + part("solar")) / 1000).toFixed(4) + " bn, batteries $" + (part("battery") / 1000).toFixed(4) + " bn (present value)");
+    ok(!cfg.existing.om.hydro && !("fom" in cfg.existing.om.nuclear) && !T.hydro && /no fixed O&M for the existing hydro/.test(cfg.existing.fixedOM), "existing hydro and the steady plants have no fixed O&M in the data, and e4-pathways.json says their upkeep is left out");
+    ok(E4.presetsOf(P).every(pr => near(E4.upkeepPV(P, E4.sysOf(E4.withPreset(def, pr), P)), E4.upkeepPV(P, Sx), 1e-9)), "the upkeep is the same constant for every preset (no decision changes it)");
+    // the retirement convention, stated as the data and the engine apply it
+    const pls = P.units.find(u => u.id === "pl-coal"), plw = PL.fleet.units.find(u => u.id === "pl-wind1");
+    ok(pls.retire === 2030 && !P.on(pls, 2030) && P.on(pls, 2025) && plw.retire === 2035 && P.exist("wind", P.ri.plains, 2035) === 6000 && P.exist("wind", P.ri.plains, 2030) === 9000 && /conservative simplification/.test(PL.periods.retirement) && /conservative simplification/.test(PL.fleet.note) && /conservative simplification/.test(cfg.conventions.online) && !/retires at the end of/.test(JSON.stringify(PL) + JSON.stringify(cfg)),
+      "retirement: a unit leaves the plan in the period that contains its retire year (Plains Station, retire 2030, out of 2026-2030; 3,000 MW of Plains wind, retire 2035, out of 2031-2035), stated as a conservative simplification");
   }
   // residual value: a wind farm built in 2045 pays 2041-2050 only (two model years of five, each discounted)
   {
@@ -277,6 +296,32 @@ const WRITE = process.argv.includes("--write"), FULLLIB = process.argv.includes(
     ok(c.unservedMWh < 1 && Math.abs(c.co2Gap) <= 0.1, "the default plan survives in 2050, 2024 weather: nothing unserved, CO2 " + c.co2.toFixed(1) + " Mt against the slices' " + c.co2Slices.toFixed(1) + " (" + (100 * c.co2Gap).toFixed(1) + "%)");
     const off = await run(Object.assign({}, def, { rm: "off" })), c2 = await E4.fullYear(P, E4.sysOf(Object.assign({}, def, { rm: "off" }), P), off.results.plan.raw, 4, H24, { solver });
     ok(c2.unservedMWh > 1e4, "without the peak-hour rule, 2050 in 2024's weather leaves " + Math.round(c2.unservedMWh) + " MWh unserved over " + c2.unservedHours + " hours (the slices alone hid it)");
+  }
+  // one gas rule: the LP buys domestic gas and LNG at least cost within the import cap; the full-year check buys in the LP's
+  // own mix for that model year. The same delivered gas gives the same purchases and the same CO2 in both
+  {
+    const own = 1 - P.gasOwn;
+    const same = (Rr, lab) => P.Y.every((y, p) => {
+      const q = Rr.raw.per[p], f = q.fuel, need = f.gasDom * own + f.lng, g = E4.procure(P, q, need);
+      const c = E4.co2Of(P, f.crudeDom + f.crudeImp, g, f.coal);
+      const good = near(g.gasDom, f.gasDom, 1e-6) && near(g.lng, f.lng, 1e-6) && near(c, q.co2, 1e-9);
+      if (!good) console.log("  " + lab + " " + y + ": LP " + f.gasDom.toFixed(3) + " + " + f.lng.toFixed(3) + " PJ, checker " + g.gasDom.toFixed(3) + " + " + g.lng.toFixed(3));
+      return good;
+    });
+    const R0 = (await run(def)).results.plan;
+    ok(same(R0, "default"), "the default plan: the same delivered gas gives the LP's domestic gas and LNG and its CO2, every model year");
+    // the review's cases: LNG cheaper than domestic gas; and a tight budget at default prices, where LNG wins on CO2
+    const stA = Object.assign({}, def, { pg: 9, pl: 6, cap: 60, bud: 5400 }), RA = (await run(stA)).results.plan, qA = RA.raw.per[0];
+    const stB = Object.assign({}, def, { eb: 100, et: 78, ei: 60, fm: 0, bud: 2800 }), RB = (await run(stB)).results.plan, qB = RB.raw.per[3];
+    ok(same(RA, "LNG cheaper") && same(RB, "2,800 Mt") && qA.fuel.gasDom < 1e-6 && qA.fuel.lng > 900 && qB.fuel.gasDom < 1e-6 && qB.fuel.lng > 400,
+      "the LP's own mix kept: LNG at $6 and domestic gas at $9, 2030 buys " + qA.fuel.lng.toFixed(1) + " PJ of LNG and no domestic gas; at 2,800 Mt (100/78/60, no firm option), 2045 buys " + qB.fuel.lng.toFixed(1) + " PJ of LNG and no domestic gas");
+    const need = qB.fuel.lng, gd0 = Math.min(P.domGas, need / own), old = E4.co2Of(P, 0, { gasDom: gd0, lng: Math.max(0, need - gd0 * own) }, 0), now = E4.co2Of(P, 0, E4.procure(P, qB, need), 0);
+    ok(near(old - now, 1.295, 0.002), "domestic first would have added " + (old - now).toFixed(3) + " Mt to that year's CO2 for the same delivered gas (the gas burned in the fields)");
+    const cA = await E4.fullYear(P, E4.sysOf(stA, P), RA.raw, 0, H24, { solver });
+    ok(cA.status === "optimal" && cA.gasDom === 0 && cA.lng > 0 && near(cA.co2, E4.co2Of(P, E4.sysOf(stA, P).fuel[0].oil / P.refYield + cA.oilPJ, { gasDom: 0, lng: cA.lng }, (E4.sysOf(stA, P).fuel[0].coal + cA.coalPJ) / (1 - P.coalOwn)), 1e-9),
+      "the full-year check of that 2030 buys LNG only, as the LP did (" + cA.lng.toFixed(1) + " PJ; CO2 " + cA.co2.toFixed(1) + " Mt)");
+    const lo = Object.assign({}, def, { eb: P.elRange.buildings.hi, et: P.elRange.transport.hi, ei: P.elRange.industry.hi, dem: "low" });
+    ok(E4.sysOf(lo, P).fuel.every(f => f.gas > 100), "final gas use stays above zero at the most electrification and low demand, so the LP always buys gas and its mix is defined");
   }
 
   // ---------------- the library
