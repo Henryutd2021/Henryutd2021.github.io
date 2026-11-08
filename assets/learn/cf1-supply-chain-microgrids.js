@@ -97,6 +97,12 @@
     return "<p class=\"lx-eyebrow\">" + rich(b.title) + "</p><dl class=\"lx-ideas\"><dt>It holds when</dt><dd>" + ul(b.holds) + "</dd><dt>It leaves out</dt><dd>" + ul(b.leaves) + "</dd></dl>" +
       "<p class=\"lx-hint\">" + rich(b.source) + "</p>";
   }
+  // the toy's main assumptions in one short line, shown above the live controls
+  function assumeLine(I) {
+    var cf = function (k) { return I.sites.map(function (s) { return Math.round(s[k] * 100) + "%"; }).join(" and "); };
+    return "Both sites: a flat " + I.loadMW + " " + rich("[[megawatt|MW]]") + " load; grid power at $" + I.buyPrice + "/" + rich("[[megawatt-hour|MWh]]") +
+      ". " + rich("[[capacity-factor|Capacity factors]]") + ", " + I.sites.map(function (s) { return s.name.toLowerCase(); }).join(" and ") + ": wind " + cf("windCF") + ", solar " + cf("solarCF") + ".";
+  }
   // the live status, one idea per line
   function statusLines(I, R, key) {
     var r = R[key], w = I.sites[r.winner], o = I.sites[1 - r.winner], x = r.sites[r.winner], y = r.sites[1 - r.winner];
@@ -108,7 +114,7 @@
   }
 
   var model = { siteYear: siteYear, energy: energy, bestSite: bestSite, settings: settings, solve: solve, shapesFrom: shapesFrom, staticIdea: staticIdea, staticBoundary: staticBoundary,
-                status: statusLines, usdM: usdM, usdK: usdK, int: int, sellLabel: sellLabel };
+                status: statusLines, assumeLine: assumeLine, usdM: usdM, usdK: usdK, int: int, sellLabel: sellLabel };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -130,6 +136,8 @@
     var stage = H("div", { class: "lx-stage" }, live);
     H("h3", { text: I.title }, H("div", { class: "lx-stage-head" }, stage));
     H("p", { class: "lx-hint", text: I.note }, stage);
+    H("p", { class: "lx-hint", html: assumeLine(I) }, stage);
+    H("p", { class: "lx-hint", text: "Amounts are dollars a year: M = million, k = thousand." }, stage);
     var ctl = H("div", { class: "lx-ctls" }, stage);
     var tg = LX.Toggle(H("div", { class: "cf-ctl" }, ctl), { label: "Let each site build its own wind and solar", on: St.onsite, onChange: function (on) { St.onsite = on; acted++; paint(true); } });
     var sc = H("div", { class: "cf-ctl" }, ctl);

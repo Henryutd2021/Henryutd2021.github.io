@@ -92,7 +92,7 @@ ok(PAGE.includes('title: "' + TITLE + '"'), "the page's title is the curriculum'
   }
   const G = JSON.parse(fs.readFileSync(path.join(SITE, "assets/learn/data/glossary.json"), "utf8"));
   const side = fs.readFileSync(path.join(SITE, "learn/_w1", ID + ".yml"), "utf8"), ids = [...side.matchAll(/^  - id: ([a-z0-9-]+)$/gm)].map(m => m[1]);
-  ok(ids.length === 6 && !ids.includes("ancillary-services"), "the sidecar defines CF4's six glossary terms (ancillary-services is CF5's): " + ids.join(", "));
+  ok(ids.length === 11 && !ids.includes("ancillary-services"), "the sidecar defines CF4's eleven glossary terms (ancillary-services is CF5's): " + ids.join(", "));
   ids.forEach(g => ok(G[g] && G[g].lesson === "CF4" && G[g].href === ID + ".html", "glossary.json has " + g + ", taught in CF4"));
   ok(G["ancillary-services"] && G["ancillary-services"].lesson === "CF5", "glossary.json has ancillary-services, taught in CF5");
   ids.concat(["ancillary-services"]).forEach(g => ok(PAGE.includes('data-term="' + g + '"') || JSON.stringify(D).includes("[[" + g + "|"), "the page marks " + g));
@@ -168,11 +168,18 @@ ok(/Two different measures: the range of output to the grid over the day, from i
   }); });
   ok(sb === 0 && /var sl = sceneLines\(I, d, S\.hour\)/.test(JS), "the picked hour's sums: MW × 1 h = MWh, × the price; the reserve as MW × 1 h × $ per MW-hour");
 }
-ok(M.LEDGER.rows[4] === "Revenue less the electrolyzer's cost" && /The plant's own fuel and upkeep, the same in both columns, are left out, so neither total is the plant's profit\./.test(M.LEDGER_CAPTION) && !/Net for the day/.test(JS + PAGE), "the ledger's total is revenue less the electrolyzer's cost, not the plant's profit");
-ok(D.scale.mark === "S4" && D.scale.markText === "Its reach: plants across a nation's markets. Its model works one plant at a time, as at S0.", "the scale mark says the case's reach is national and its model works at the plant scale");
+ok(M.LEDGER.rows[4] === "Revenue less the electrolyzer's cost" && /The plant's own fuel and upkeep, the same in both columns, are left out, so neither total is the plant's profit\./.test(M.LEDGER_NOTE) && M.LEDGER_CAPTION.split(" ").length <= 20 && PAGE.indexOf('<p class="lx-hint">' + M.LEDGER_NOTE + "</p>") >= 0 && /H\("p", \{ class: "lx-hint", text: LEDGER_NOTE \}, stage\)/.test(JS) && !/Net for the day/.test(JS + PAGE), "the ledger's total is revenue less the electrolyzer's cost, not the plant's profit");
+ok(D.scale.mark === "S4" && D.scale.markText === "This case sits here.", "the scale mark is the course's label, with no description of the study");
+// the toy's day in dollars: each hourly term is multiplied by the step length Δt = 1 h
+ok(/\\sum_t \\left\( p_t\\,g_t \+ v\\,h_t \+ q\\,r_t \\right\) \\Delta t/.test(PAGE) && /\\max\(0,\\; v \+ q - p_t\)\\,\\Delta t - c\\,E/.test(PAGE) && /\$\\Delta t = 1\$ h, the length of each step/.test(PAGE), "the objective and the day's change carry Δt = 1 h, so $/MWh × MW × h is dollars");
+// the quiz answers say their numbers are the defaults'; the no-JS reader is told what to compare; the code card's level
+ok((PAGE.match(/in the toy at its defaults/g) || []).length === 2 && /class="lx-hint lx-js-hide">Without JavaScript the toy's controls do not run/.test(PAGE) && /Optional Modeler extension, about 30 minutes/.test(PAGE),
+  "quiz answers at the defaults; a no-JS instruction; the open-code card says it is a Modeler extension");
+// first use: the approved rows' technical terms are glossary terms
+ok(["renewable-penetration", "annualized-capital-cost", "capacity-bound", "baseload", "capacity-payment"].every(t => PAGE.indexOf('data-term="' + t + '"') >= 0), "renewable penetration, annualized capital costs, capacity bound, baseload and capacity payments are marked");
 // the myths: the toy's defaults
 ok(PAGE.includes("and the electrolyzer's own " + M.money(D0.cost) + " a day change."), "myth 1: the electrolyzer's daily cost at the defaults ($80,000)");
-ok(PAGE.includes("in the toy, " + M.mw(D0.s.elz) + " × " + D0.heldHours + " hours × " + M.per(D0.q) + " per MW-hour = " + M.money(D0.reserve) + ".") && D0.s.elz * D0.heldHours * D0.q === D0.reserve, "myth 2: 200 MW × 20 hours × $8 per MW-hour = $32,000, as displayed");
+ok(PAGE.includes("in the toy at its defaults, " + M.mw(D0.s.elz) + " × " + D0.heldHours + " hours × " + M.per(D0.q) + " per MW-hour = " + M.money(D0.reserve) + ".") && D0.s.elz * D0.heldHours * D0.q === D0.reserve, "myth 2: 200 MW × 20 hours × $8 per MW-hour = $32,000, as displayed");
 { // the worked answers (recomputed here): one row per setting, each from the defaults
   const W = M.worked(I), at = o => M.day(I, M.at(I, o)), Pr = I.practice;
   ok(Pr.levels.every(x => SL.level.some(y => Math.abs(x - y) < 1e-9)) && Pr.elz.every(x => SL.elz.includes(x)) && Pr.hours.every(h => h >= 0 && h < 24), "the practice's settings are on the controls");
@@ -234,7 +241,7 @@ ok(/\$0 \\le h_t \\le E\$/.test(PAGE) && /\$0 \\le r_t \\le h_t\$/.test(PAGE) &&
     ok(!!rs, "live: a Reset to the defaults button");
     if (rs) { rs.click(); ok(live.querySelectorAll(".lx-seg button")[0].getAttribute("aria-pressed") === "true" && T().includes(M.changeLine(D0)) && T().includes(M.sceneLines(I, D0, I.start.hour).grid), "live: Reset restores the defaults ($33,400 better; 13:00 picked)"); }
   }
-  ok(/LX\.lessonRefHTML\(P, "A1"\)/.test(JS) && /LX\.lessonRefHTML\(P, "M11"\)/.test(JS) && /LX\.lessonRefHTML\(P, "A12"\)/.test(JS) && /data-learn="cf4-idea" data-src="[^"]*data\/path\.json/.test(PAGE), "A1, M11 and A12 are linked with LX.lessonRef (path.json loaded by the toy)");
+  ok(/\[\["A1", [^\]]+\], \["M11", [^\]]+\],\s*\["A12", [^\]]+\]\]\.forEach\(function \(n\) \{ H\("li", \{ html: LX\.lessonRefHTML\(P, n\[0\]\) \+ n\[1\] \}, nx\); \}\)/.test(JS) && /data-learn="cf4-idea" data-src="[^"]*data\/path\.json/.test(PAGE), "A1, M11 and A12 are linked with LX.lessonRef (path.json loaded by the toy)");
   ["A1", "M11", "A12"].forEach(c => ok(CORE.lessonRef(PJ, c).ready, c + " is live, so its link shows"));
   // the other way: A1 (step 1), M11 (step 9) and A12 (the last step) name CF4 through LX.lessonRefHTML, with path.json
   // loaded, in the course's own words (CF4's short name and its outcome; no nuclear term, as their own tests require)
@@ -366,6 +373,14 @@ const RG = { units: Object.values(EFF).map(X.norm), raw: EFF };
   ok(cmds.length === 5 && cmds[0] === "python examples/minimal.py" && cmds.slice(1).every(c => /^nuclear-h2 (synthetic|run) /.test(c)) && cmds.some(c => /--price-factor 1\.15/.test(c)) && cmds.some(c => /--as-mode dispatch/.test(c)) && cmds.filter(c => /^nuclear-h2 run /.test(c)).every(c => /--out-dir /.test(c)), "part 7: only the minimal example, synthetic inputs and run (energy prices 15% higher, or ancillary services in dispatch mode)");
   ok(!/lifecycle_tea|sensitivity\.py|case_matrix|nuclear-h2 tea|tea_sweep|--reoptimize|--scale-as/.test(PAGE + JS), "part 7: no lifecycle, sensitivity, tea or case-matrix tool, no credit option");
   ok(oc.includes('<a href="' + REPO + '">nuclear-hydrogen-integration</a>: open code · MIT licence.'), "part 7: the repository is linked as open code, with its licence, and nothing said about data in it");
+  // the open-code card: every line is E15.28, a command, or one of the course's lines about what the open code writes
+  { const oc = (PAGE.match(/<p class="lx-eyebrow">With open code<\/p>([\s\S]*?)<\/div>/) || [])[1] || "";
+  const OC = [/^Optional Modeler extension, about 30 minutes; needs Python 3\.10 or later on your computer \(lesson B2\)\.$/, /^Set it up first: clone the repository and install it as its README's Quick start says; run the commands in the repository's folder\.$/,
+    /^Each run writes revenue_musd_per_yr\.csv and summary\.json into its --out-dir folder\.$/, /^Compare the revenue tables, and grid_output_range_mw under "flexibility" in summary\.json: the range of output to the grid, the toy's measure too\.$/,
+    /^(python examples\/minimal\.py|nuclear-h2 (synthetic|run) .*)$/, /^nuclear-hydrogen-integration: open code · MIT licence\.$/];
+  const E28 = X.sentencesOf(RG.raw["E15.28"]).map(X.norm);
+  const lines = X.elements(oc).map(X.norm).flatMap(s => X.sentencesOf(s)).map(X.norm).filter(Boolean);
+  ok(lines.length > 6 && lines.every(s => E28.includes(s) || OC.some(re => re.test(s))), "the open-code card: E15.28, the commands, and what the open code writes, nothing else: " + lines.filter(s => !E28.includes(s) && !OC.some(re => re.test(s))).join(" | ")); }
   // the citation (E15.29), split into its two sentences; the title as in the author's publication list
   const src = (OWN.match(/<div class="lx-card lx-sources">([\s\S]*?)<\/div>/) || [])[1] || "", li = X.elements(src).map(X.norm);
   ok(X.norm(li[1] + " " + li[2]) === X.norm(RG.raw["E15.29"]) && src.includes('<a href="' + DOI + '">') && src.includes('<a href="' + REPO + '">'), "sources: E15.29, word for word, with the DOI and the repository linked");
@@ -380,10 +395,10 @@ const RG = { units: Object.values(EFF).map(X.norm), raw: EFF };
     /^Illustrative round numbers, some of them yours: a generic existing plant, not the study's inputs or results\./, /^The study in time$/, /^Two dated steps: the journal article and its open code\.$/,
     /^Earlier lessons: lesson 3 \(reserves\), lesson 7 \(what a cost counts\) and A16 \(hydrogen from electricity\)\. F5 shows how a reactor makes heat and electricity\.$/,
     /^Where this goes next: A1 \(a project's cash flows\), M11 \(techno-economic analysis inside a model\), A12 \(the tools governments use\)\.$/,
-    /^nuclear-hydrogen-integration: open code · MIT licence\.$/, /^Optional, about 30 minutes; needs Python 3\.10 or later on your computer \(lesson B2\)\.$/,
+    /^nuclear-hydrogen-integration: open code · MIT licence\.$/, /^Optional Modeler extension, about 30 minutes; needs Python 3\.10 or later on your computer \(lesson B2\)\.$/,
     /^(python examples\/minimal\.py|nuclear-h2 (synthetic|run) [^ ]+.*)$/, /^Where the result holds$/,
     /^Go deeper · ModelerThe toy's day as a small optimization$/, /^Run a toy plant's day yourself, then where the result holds$/,
-    /^turns a year of cash flows into a project's net present value;$/];
+    /^turns a year of cash flows into a project's net present value\.$/];
   const rest = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1:end -->/g, "").replace(/<!-- cf4-(timeline|bound):start[\s\S]*?cf4-\1:end -->/g, "")
     .replace(/<!--[\s\S]*?-->/g, "").replace(/^---[\s\S]*?\n---\n/, "").replace(/<div class="lx-case">[\s\S]*?<div class="lx-interactive" data-learn="cf4"[^>]*>/, "")
     .replace(/<blockquote[\s\S]*?<\/blockquote>/g, "").replace(/<div class="lx-card lx-sources">[\s\S]*?<li>Earlier/, "<li>Earlier");
@@ -468,7 +483,7 @@ const ALL = (PAGE.replace(/<!--[\s\S]*?-->/g, "") + "\n" + JSON.stringify(D) + "
 const R45 = { units: ["E15.20", "E15.21", "E15.24", "E15.25"].map(k => X.norm(EFF[k])), raw: EFF };
 const with45 = UNITS.filter(u => /\b45U\b/.test(u));
 ok(with45.length >= 4 && with45.every(u => X.approved(R45, u)), "the 45U credit is named only in clauses of E15.20, E15.21, E15.24 and E15.25 (" + with45.length + " elements): " + with45.filter(u => !X.approved(R45, u)).join(" | ").slice(0, 240));
-const ALL45 = ALL.replace(/without capacity payments or the 45U credit|even without the 45U credit|no capacity payments and no 45U credit in the baseload case/g, " ");
+const ALL45 = ALL.replace(/<[^>]+>/g, "").replace(/without capacity payments or the 45U credit|even without the 45U credit|no capacity payments and no 45U credit in the baseload case/g, " ");
 ok(!/\b45[UVY]\b|\b48E\b|MACRS|greenfield|new[- ]plant|new[- ]build|Cases? [34]\b|subsidy|profitab|without (policy|subsid|credit)|PJM|Data Miner|market data/i.test(ALL45), "no other credit name, no new-plant case, no 'without policy support' or 'profitable', no PJM or market-data wording (credit and nuclear scope)");
 ok(!/data[- ]?cent|hyperscale|\bcampus\b|colocat|small modular|\bSMR\b|\bAI\b|artificial intelligence/i.test(ALL), "no data-center or small-modular wording, no AI wording");
 const hrefs = [...PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1:end -->/g, "").matchAll(/(?:href|src)="([^"]+)"/g)].map(m => m[1]).concat([...PAGE.matchAll(/\]\(([^)]+)\)/g)].map(m => m[1]), strings(D).filter(s => /^https?:/.test(s)));

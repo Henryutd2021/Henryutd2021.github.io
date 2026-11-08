@@ -71,7 +71,7 @@ ok(row && /\n  status: active\n/.test(row), "path.yml: CF5 is active (live)");
   ok(me && me.ready === true && me.href === ID + ".html" && me.id === ID, "path.json lists CF5 as live, linked to " + ID + ".html");
   const G = JSON.parse(fs.readFileSync(path.join(SITE, "assets/learn/data/glossary.json"), "utf8"));
   const side = fs.readFileSync(path.join(SITE, "learn/_w1", ID + ".yml"), "utf8"), ids = [...side.matchAll(/^  - id: ([a-z0-9-]+)$/gm)].map(m => m[1]);
-  ok(ids.length === 9 && !/^requests:/m.test(side), "the sidecar defines CF5's nine glossary terms and has no open request: " + ids.join(", "));
+  ok(ids.length === 13 && !/^requests:/m.test(side), "the sidecar defines CF5's thirteen glossary terms and has no open request: " + ids.join(", "));
   ids.forEach(g => ok(G[g] && G[g].lesson === "CF5", "glossary.json has " + g + ", taught in CF5"));
   ids.forEach(g => ok(PAGE.includes('data-term="' + g + '"'), "the page marks " + g + " at its first use"));
   const marks = [...PAGE.matchAll(/data-term="([a-z0-9-]+)"/g)].map(m => m[1]).concat([...JSON.stringify(D).matchAll(/\[\[([a-z0-9-]+)\|/g)].map(m => m[1]));
@@ -112,9 +112,18 @@ ok(M.grid(V0.e.siteNet) === "the site sends 56.0 MW to the grid" && M.grid(OUT.e
 const AS = M.assumptions(I).join(" ");
 ok(AS.includes("the turbine makes " + I.plantMW + " MW") && AS.includes("the load needs " + S0.load + " MW") && AS.includes("the same plant and load, using electric cooling") && AS.includes("25% less cooling per MW of steam") && /efficiency only; it has no capacity limit/.test(AS), "the assumptions are written from the data and name the reference, the derating and its limit");
 ok(/This hour: " \+ V\.a\.copA\.toFixed\(2\)/.test(JS) && /pct\(hr\.derate\) \+ " less in a hot, humid hour/.test(JS), "the live toy shows the hour's cooling per MW of steam beside its slider");
-ok(/H\("caption", \{ class: "lx-hint", text: CAPTION \}/.test(JS) && /\+ means less electricity used or more sent to the grid; − means the opposite/.test(M.CAPTION), "the live table keeps its sign caption");
-ok(/Average power during one hour, in MW; auxiliary electricity for pumps and fans is left out/.test(I.note) && !/Energy only/.test(PAGE + JSON.stringify(D)), "units: average power during one hour, auxiliaries left out");
+ok(/H\("caption", \{ class: "lx-hint", text: CAPTION \}/.test(JS) && /\+ means less electricity used or more sent to the grid; − means the opposite/.test(M.SIGNS) && /H\("p", \{ class: "lx-hint", text: SIGNS \}, tbl\)/.test(JS) && PAGE.indexOf('</table><p class="lx-hint">' + M.SIGNS + "</p>") >= 0, "the table's caption, and its sign key as a line of its own (live and no-JS)");
+ok(/Average power during one hour, in MW; auxiliary electricity for pumps and fans is left out/.test(I.units) && !/MW/.test(I.note) && PAGE.indexOf('<p class="lx-hint">' + I.units + "</p>") >= 0 && /text: I\.units/.test(JS) && !/Energy only/.test(PAGE + JSON.stringify(D)), "units: average power during one hour, auxiliaries left out");
 ok(PAGE.includes("20 MW of cooling takes 25.0 MW of steam heat, which costs the turbine 5.0 MW of electricity: more than the electric chiller's 4.0 MW") && PAGE.includes("(−5.0 MW in the toy) but not the electric chiller's 4.0 MW saved"), "the myths' numbers are the toy's defaults");
+// units: only C and the flows are MW; the COPs and w are ratios, and the w slider says so
+ok(/the other three are ratios/.test(PAGE) && /\$w\$: the MW of turbine electricity lost per MW of steam heat taken, a ratio/.test(PAGE) && SL.w && D.idea.sliders.find(o => o.key === "w").unit === "MW per MW", "units: C in MW, the COPs and w as ratios");
+// the practice starts each task from the defaults, which a Reset button restores
+ok(/Start each one from the defaults: press Reset \(an ordinary hour, plant and load, steam priced, 0\.20 MW of turbine work per MW of steam heat\)\./.test(PAGE) && I.start.w === 0.2 && I.start.hour === "mild" && /text: "Reset to the defaults", onclick: function \(\) \{\s*for \(var j in I\.start\) S\[j\] = I\.start\[j\];\s*S\.where = "site"; S\.steam = "priced";\s*I\.sliders\.forEach\(function \(o\) \{ sliders\[o\.key\]\.set\(S\[o\.key\]\); \}\);\s*paint\(true\);/.test(JS),
+  "the practice says to start each task from the defaults, and Reset restores every control");
+// what a whole-year model adds, and what M11 is about: not a claim that the toy lacks derating
+ok(!/a chiller that derates in hot weather/.test(PAGE) && /A model of a whole year adds what the toy leaves out/.test(PAGE) && /M11\]\(m11-tea-in-models\.html\) shows, for a wind and hydrogen plant/.test(PAGE), "the Go deeper box says what a year model adds and what M11 shows");
+// first use: the approved rows' technical terms are glossary terms
+ok(["turbine", "part-load-efficiency", "co-optimize", "heat-balance", "benchmark-margin", "ercot"].every(t => PAGE.indexOf('data-term="' + t + '"') >= 0), "turbine, part-load, co-optimizes, heat balance, margins and ERCOT are marked");
 { // the worked answers: recomputed from first principles
   const at = o => views(Object.assign({}, S0, o)), f = v => M.mw(v), A = at({ w: I.practice.w[0] }), B = at({ w: I.practice.w[1] }), Ht = at({ hour: "hot" });
   ok(I.practice.w.every(w => SL.w.some(x => near(x, w))), "the practice's two settings are on the slider");
@@ -210,7 +219,7 @@ const desc = (PAGE.match(/^description: "Case file CF5 of Energy Systems, Step b
 ok(desc && X.norm(desc) === X.norm(RG.raw["E14.3"]), "the description's sentence is E14.3");
 // every other element that names the study or its method is approved, or one of these labels (the course's own words)
 const OTHER = [/^The toy below is the course's own, with illustrative numbers you set; it holds none of the study's inputs or results\.$/,
-  /^Illustrative round numbers you set: a generic steam plant and one load that needs power and cooling, not the study's inputs or results\. Average power during one hour, in MW; auxiliary electricity for pumps and fans is left out\.$/,
+  /^Illustrative round numbers you set: a generic steam plant and one load that needs power and cooling, not the study's inputs or results\.$/,
   /^Earlier lessons: /, /^A model that runs every hour/, /^One dated step: the accepted paper\.$/, /^(The study in time|Absorption chiller: MW of cooling per MW of steam heat)$/,
   /^ audits a study's boundary, baseline and counterfactual; $/];
 const own = sg => X.norm(sg) === X.norm(SHOWN24) || OTHER.some(re => re.test(sg)) || /toy|steam plant|Myth|Fact|absorption chiller|turbine/i.test(sg) && !/\b(study|paper|Li et al|ERCOT|reactor|refueling|Willans|SOS2|scenario runs)\b/i.test(sg);
@@ -228,7 +237,8 @@ ok(q.length === 1 && q[0][1] === "excerpt:cogen-boundary-methods" && X.norm(q[0]
 ok(q.length === 1 && q[0][3] === SHOWN24, "part 6: the excerpt's footer is E14.24, as approved, with the label 'From: ': " + (q[0] ? q[0][3] : "none"));
 { const f7 = (fs.readFileSync(path.join(SITE, "learn/cf7-cost-of-waiting.qmd"), "utf8").match(/<footer>(From: [^<]*)<\/footer>/) || [])[1] || "", form = /^From: Li et al\. \(2026\), accepted paper, [^;]+; DOI pending\.$/;
   ok(form.test(f7) && q[0] && form.test(q[0][3]), "the footer has CF7's form, 'From: Li et al. (2026), accepted paper, <venue>; DOI pending.' (CF7: " + f7 + ")"); }
-ok(PAGE.includes('<p class="lx-hint">' + X.sentencesOf(RG.raw["E14.20"]).join('</p><p class="lx-hint">') + "</p>"), "part 6: E14.20 is the note under the excerpt, one line per sentence");
+{ const notes = (PAGE.match(/<\/blockquote>\n((?:<p class="lx-hint">[\s\S]*?<\/p>)+)<\/div>/) || [])[1] || "";
+  ok(notes && X.elements(notes).map(X.norm).join("|") === X.sentencesOf(RG.raw["E14.20"]).map(X.norm).join("|"), "part 6: E14.20 is the note under the excerpt, one line per sentence (glossary marks aside)"); }
 // the draft period is over: its source line is gone, "approved" is said nowhere a reader sees, no draft or pending wording is left
 const VIS = X.elements(OWN).concat(DATA, LIT);
 ok(!VIS.some(s => X.norm(s) === X.norm(DRAFT_SOURCE)) && !/<footer>Source:/.test(PAGE) && D.boundary.source !== DRAFT_SOURCE, "the draft-period line '" + DRAFT_SOURCE + "' is gone (footer, boundary card, no-JS text)");

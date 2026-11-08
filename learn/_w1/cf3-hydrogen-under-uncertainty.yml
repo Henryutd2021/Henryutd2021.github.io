@@ -3,6 +3,15 @@
 id: cf3-hydrogen-under-uncertainty
 lesson: CF3
 glossary:
+  - id: weather-zone
+    term: Weather zone
+    def: "One of the areas into which a grid operator divides its region for weather and demand forecasts; ERCOT has eight."
+  - id: future-scenario
+    term: Scenario (one possible future)
+    def: "One possible future of a model's uncertain inputs, such as how much planned wind and solar gets built and how fast demand grows; each scenario has a chance."
+  - id: green-hydrogen
+    term: Green hydrogen
+    def: "Hydrogen made by electrolysis with renewable electricity, such as wind or solar power, rather than from natural gas."
   - id: eia
     term: EIA
     def: "The Energy Information Administration, the statistics agency of the United States Department of Energy, which publishes data on energy production, use and prices."

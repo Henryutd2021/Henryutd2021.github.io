@@ -75,7 +75,8 @@
       "A planned outage: no steam, so the turbine makes nothing and the absorption chiller cannot run."
     ].filter(Boolean);
   }
-  var CAPTION = "Switching the cooling from the electric chiller to steam: the change in average power during the hour, as each view counts it. + means less electricity used or more sent to the grid; − means the opposite.";
+  var CAPTION = "Switching the cooling from the electric chiller to steam: the change in average power during the hour, as each view counts it.";
+  var SIGNS = "+ means less electricity used or more sent to the grid; − means the opposite.";
   // the toy's table in the no-JS version (the reader's defaults, ordinary hour)
   function staticIdea(I) {
     var s = I.start, V = views(I, s);
@@ -83,11 +84,12 @@
       return "<tr><th scope=\"row\">" + I.labels[x.id] + "</th><td class=\"n\">" + mw(V.v[x.id]) + "</td><td>" + verdict(V.v[x.id]) + "</td></tr>";
     }).join("");
     return "<p class=\"lx-eyebrow\">" + I.title + " (illustrative)</p>" +
-      "<p class=\"lx-hint\">" + I.note + "</p>" +
+      "<p class=\"lx-hint\">" + I.note + "</p><p class=\"lx-hint\">" + I.units + "</p>" +
       "<ul><li>Electric chiller: " + mw0(V.avoided) + " of electricity for " + s.cool + " MW of cooling.</li><li>Steam cooling: " + mw0(V.a.steam) + " of steam heat, which costs the turbine " + mw0(V.lost) + " of electricity.</li>" +
       "<li>The grid: in the reference " + grid(V.e.siteNet) + "; with steam cooling " + grid(V.a.siteNet) + ".</li></ul>" +
       "<table class=\"lx-facts\"><caption class=\"lx-hint\">" + CAPTION + " An ordinary hour, at the defaults.</caption>" +
       "<thead><tr><th scope=\"col\">View</th><th scope=\"col\">Change</th><th scope=\"col\">What it says</th></tr></thead><tbody>" + rows + "</tbody></table>" +
+      "<p class=\"lx-hint\">" + SIGNS + "</p>" +
       "<details class=\"lx-textalt\"><summary>The toy's assumptions</summary><ul>" + assumptions(I).map(function (t) { return "<li>" + t + "</li>"; }).join("") + "</ul></details>";
   }
   // worked answers to "Try it yourself", from the model (shown with and without JavaScript)
@@ -97,7 +99,8 @@
     var vv = function (V, id) { return mw(V.v[id]); };
     return [
       "At " + w1.toFixed(2) + " MW of turbine work per MW of steam heat: plant and load, steam priced, " + vv(A, "site-priced") + " (" + verdict(A.v["site-priced"]) + "); plant only, steam priced, " + vv(A, "plant-priced") + " (" + verdict(A.v["plant-priced"]) + ").",
-      "At " + w2.toFixed(2) + " MW: plant and load, steam priced, " + vv(B, "site-priced") + "; plant only, " + vv(B, "plant-priced") + "; both worse. The two views that ignore the turbine loss stay at " + vv(B, "plant-free") + " and " + vv(B, "site-free") + " at any setting of the turbine work: they never change.",
+      "At " + w2.toFixed(2) + " MW per MW: plant and load, steam priced, " + vv(B, "site-priced") + "; plant only, " + vv(B, "plant-priced") + "; both worse.",
+      "The two views that ignore the turbine loss stay at " + vv(B, "plant-free") + " and " + vv(B, "site-free") + " at any setting of the turbine work: they never change.",
       "A hot, humid hour: " + hot.a.copA.toFixed(2) + " MW of cooling per MW of steam, so " + s.cool + " MW of cooling takes " + mw0(hot.a.steam) + " of steam heat and " + mw0(hot.lost) + " of turbine work; plant and load, steam priced, " + vv(hot, "site-priced") + ".",
       "A planned outage: no steam, so the electric chiller carries all " + s.cool + " MW of cooling with " + mw0(out.e.chiller) + " of electricity; there is no switch to make.",
       "Plant only: the " + mw0(D.lost) + " of turbine work is inside the line and the electric chiller's " + mw0(D.avoided) + " saving is outside, so " + vv(D, "plant-priced") + ". Plant and load: both are inside, so " + vv(D, "site-priced") + ".",
@@ -117,7 +120,7 @@
     return "<p class=\"lx-eyebrow\">" + rich(b.title) + "</p><dl class=\"lx-ideas\"><dt>It holds when</dt><dd>" + ul(b.holds) + "</dd><dt>It leaves out</dt><dd>" + ul(b.leaves) + "</dd></dl>" +
       "<p class=\"lx-hint\">" + rich(b.source) + "</p>";
   }
-  var model = { VIEWS: VIEWS, hour: hour, views: views, mw: mw, mw0: mw0, verdict: verdict, grid: grid, assumptions: assumptions, CAPTION: CAPTION,
+  var model = { VIEWS: VIEWS, hour: hour, views: views, mw: mw, mw0: mw0, verdict: verdict, grid: grid, assumptions: assumptions, CAPTION: CAPTION, SIGNS: SIGNS,
                 worked: worked, staticIdea: staticIdea, staticWorked: staticWorked, staticBoundary: staticBoundary };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
@@ -161,6 +164,7 @@
     var stage = H("div", { class: "lx-stage" }, live);
     H("h3", { text: I.title }, H("div", { class: "lx-stage-head" }, stage));
     H("p", { class: "lx-hint", text: I.note }, stage);
+    H("p", { class: "lx-hint", text: I.units }, stage);
     var scene = H("div", { class: "cf5-scene", role: "group", "aria-label": "The site and the boundary you drew" }, stage);
     function seg(host, id, label, items, key) {
       var c = H("div", { class: "cf-ctl" }, host); H("p", { class: "cf-ctl-l", id: id, text: label }, c);
@@ -176,6 +180,13 @@
     I.sliders.forEach(function (o) {
       sliders[o.key] = LX.Slider(sl, { label: o.label, min: o.min, max: o.max, step: o.step, value: S[o.key], color: o.color, fmt: function (v) { return v.toFixed(o.dec) + (o.unit ? " " + o.unit : ""); }, onChange: function (v) { S[o.key] = v; paint(true); } });
     });
+    // back to the defaults, where every practice task starts
+    H("button", { type: "button", class: "lx-btn ghost small", text: "Reset to the defaults", onclick: function () {
+      for (var j in I.start) S[j] = I.start[j];
+      S.where = "site"; S.steam = "priced";
+      I.sliders.forEach(function (o) { sliders[o.key].set(S[o.key]); });
+      paint(true);
+    } }, sl);
     var chips = H("div", { class: "lx-readouts" }, stage), tbl = H("div", { class: "cf5-tbl" }, stage);
     var status = H("div", { class: "lx-stage-status", "aria-live": "polite", style: "display:grid;gap:4px" }, stage);
     var as = H("details", { class: "lx-textalt" }, stage); H("summary", { text: "The toy's assumptions" }, as);
@@ -203,6 +214,7 @@
       chip("Change, as this view counts it", V.possible ? mw(val) : "none");
       tbl.innerHTML = "";
       var t = H("table", null, tbl); H("caption", { class: "lx-hint", text: CAPTION }, t);
+      H("p", { class: "lx-hint", text: SIGNS }, tbl);
       var hrow = H("tr", null, H("thead", null, t));
       ["View", "Change", "What it says"].forEach(function (h) { H("th", { scope: "col", text: h }, hrow); });
       var tb = H("tbody", null, t);

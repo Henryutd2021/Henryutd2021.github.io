@@ -81,15 +81,24 @@ ok(I.sweep.every(n => A.fits[n].every(f => f.lo <= A.field && A.field <= f.hi)),
   const B = M.bins(I, M9D), W = I.weibull, F = v => 1 - Math.exp(-Math.pow(v / W.c, W.k));
   ok(near(B.reduce((s, b) => s + b.contrib, 0), A.maker, 1e-12) && B.length === I.bins.length + 1 && B[0].contrib === 0 && B[B.length - 1].contrib === 0, "the bins' contributions add up to the maker's capacity factor (" + pts(A.maker) + "%), below 3 and above 20 m/s count as zero");
   ok(near(B.reduce((s, b) => s + b.share, 0), 1, 3e-4) && near(B[0].share, F(3), 1e-12) && near(B[B.length - 1].share, 1 - F(20), 1e-12), "the bins' shares of hours add up to the whole year (" + B.reduce((s, b) => s + b.share, 0).toFixed(5) + ")");
-  const b2 = B[2], xs = M.grid(I).filter(v => v >= 5 && v < 7), ws = M.weights(I).filter((w, j) => M.grid(I)[j] >= 5 && M.grid(I)[j] < 7);
-  ok(near(b2.power, xs.reduce((s, v, j) => s + ws[j] * M9.maker(M9D.turbine, v), 0) / ws.reduce((s, w) => s + w, 0), 1e-9) && near(b2.contrib, b2.share * b2.power / 2000, 1e-12), "a bin by hand: 5–7 m/s, share × mean power ÷ 2,000 kW");
-  const Wd = M.binsWords(I, M9D); ok(Wd.mix.includes("(0.2% of hours)") && /2,000 kW rating/.test(Wd.how), "the averaging words: the rating and the hours above 20 m/s (0.2%)");
+  // a bin by hand: the trapezoid rule on 5 to 7 m/s alone (half weights at both edges), as the bin itself
+  const b2 = B[2], pdf = v => W.k / W.c * Math.pow(v / W.c, W.k - 1) * Math.exp(-Math.pow(v / W.c, W.k)), xs = M.grid(I).filter(v => v >= 5 - 1e-9 && v <= 7 + 1e-9);
+  const ws = xs.map((v, j) => pdf(v) * I.grid.step * (j === 0 || j === xs.length - 1 ? 0.5 : 1));
+  ok(near(b2.share, ws.reduce((s, w) => s + w, 0), 1e-12) && near(b2.power, xs.reduce((s, v, j) => s + ws[j] * M9.maker(M9D.turbine, v), 0) / ws.reduce((s, w) => s + w, 0), 1e-9) && near(b2.contrib, b2.share * b2.power / 2000, 1e-12), "a bin by hand: 5–7 m/s, its own trapezoid, share × mean power ÷ 2,000 kW");
+  const Wd = M.binsWords(I, M9D); ok(Wd.zero.includes("(0.2% of hours)") && /2,000 kW rating/.test(Wd.how), "the averaging words: the rating and the hours above 20 m/s (0.2%)");
+  // each bin's share is the Weibull probability of its speeds: a grid point on a shared edge is split between the two bins
+  B.slice(1, -1).forEach((b, k) => ok(near(b.share, F(I.bins[k + 1]) - F(I.bins[k]), 2e-5), b.label + ": share " + (100 * b.share).toFixed(3) + "% = the Weibull CDF difference " + (100 * (F(I.bins[k + 1]) - F(I.bins[k]))).toFixed(3) + "%"));
+  ok(/\[\[weibull\|Weibull distribution\]\]: shape k = 2 \(no unit\), scale c = 8 m\/s/.test(I.mix) && I.weibull.k === 2 && I.weibull.c === 8 && /data-term="weibull"/.test(PAGE), "the Weibull mix, its shape k and scale c, explained and marked");
 }
 ok(/the fitted curve's uncertainty only/.test(I.scope) && /year-to-year weather and operating changes/.test(I.scope) && /lies inside it with probability 0\.9/.test(I.levelNote) && PAGE.includes(I.scope) && PAGE.includes(I.levelNote), "the band is said to be the fitted curve's uncertainty, with what 90% means");
 ok(!/A band on the curve is a band on the year's energy/.test(PAGE + RAW + JS), "the old 'a band on the year's energy' line is gone");
 { // the outcome "why the verdict depends on the score" is checked: invented numbers, labelled
   const q = (PAGE.match(/<div class="lx-quiz" data-quiz="cf8">[\s\S]*?\n<\/div>\n<\/div>/) || [""])[0];
-  ok(/data-id="score" data-answer="b"/.test(q) && /Invented numbers, not the study's/.test(q) && 62 / 100 < 0.9 - 2 * Math.sqrt(0.09 / 100) && Math.abs(89 / 100 - 0.9) < 2 * Math.sqrt(0.09 / 100) && /pinball loss weighs both/.test(q), "the check: a narrow band that holds 62 of 100 against a wider one that holds 89; pinball loss weighs both");
+  ok(/data-id="score" data-answer="b"/.test(q) && /Invented numbers, not the study's/.test(q) && 62 / 100 < 0.9 - 2 * Math.sqrt(0.09 / 100) && Math.abs(89 / 100 - 0.9) < 2 * Math.sqrt(0.09 / 100) && /<p class="lx-qtext">Invented numbers, not the study's: [^<]*Which better matches its claimed 90%\?<\/p>/.test(q) && !/Which is better\?/.test(q) && /<details class="lx-answer"><summary>Answer<\/summary><p>B\.[^<]*pinball loss also charges for how far misses fall outside a band\.<\/p><\/details>/.test(q), "the check asks only what coverage can show (which band matches its claim); the answer says why coverage alone does not rank the forecasts");
+  ok(!/quoted from the published/.test(PAGE) && /describe uncertainty about the average curve\. A band for one new measurement must also hold measurement and operating scatter, so it is wider\./.test(PAGE), "no quotation claim; the two kinds of band are told apart");
+  ok(/\(<span class="lx-term" data-term="autoregressive-fusion">autoregressive<\/span>\)/.test(PAGE) && /data-term="surrogate-model">Surrogates</.test(PAGE) && /data-term="negative-control">negative control</.test(PAGE), "autoregressive, surrogates and negative control are glossary terms");
+  ok(/can reach below zero or above the rating/.test(M.explainerHTML(EXM, D.explainer)) && /−?\d+ kW ± \d+/.test(M.explainerHTML(EXM, D.explainer)), "the explainer's text version says its bands can pass zero and the rating");
+  ok(/<th scope="col">Measured records only<\/th><th scope="col">Records \+ maker's curve<\/th>/.test(PAGE) && !/One source|Two sources/.test(PAGE + JS), "the fits are named by what they learn from, with and without JavaScript");
   ok(/Words first: a <span class="lx-term" data-term="power-curve">power curve<\/span> gives a turbine's output at each wind speed\./.test(PAGE) && /<p class="lx-hint">Scores: RMSE, the typical size of a miss;/.test(PAGE), "terms first: the mechanism (part 1) and the scores in words (part 4)");
   const marks = [...PAGE.matchAll(/data-term="([a-z0-9-]+)"/g)].map(m => m[1]), GL = fs.readFileSync(path.join(SITE, "learn/glossary.yml"), "utf8") + fs.readdirSync(path.join(SITE, "learn/_w1")).map(f => fs.readFileSync(path.join(SITE, "learn/_w1", f), "utf8")).join("\n");
   ok(marks.length >= 12 && ["multi-fidelity", "gaussian-process", "kernel-density-estimate", "rmse", "pinball-loss", "sharpness", "calibration", "scada", "variogram", "crps"].every(m => marks.includes(m)) && marks.every(m => new RegExp("id: " + m + "\\n").test(GL)), "glossary marks on the essential terms, each defined: " + marks.filter(m => !new RegExp("id: " + m + "\\n").test(GL)).join(", "));
@@ -164,7 +173,7 @@ if (R) {
   // every other sentence that could be about the studies
   const RX = /\b(the study|study's|paper|article|IDETC|Li et al|course author|excerpt|research project|SDWPF|SCADA|kernel density|nine|plants? (with|without) (power )?measurements|held-out plants|multi-fidelity|surrogate)\b/i;
   const NOT = [[/^From: Li et al\., ASME IDETC 2023\.$/, "provenance"], [/^A separate example with synthetic numbers, from the course author's open explainer: not the study's data or results\.$/, "explainer label, as CF2's"],
-    [/^Every result about the studies is quoted from the published paper and the public framework named in the sources\.$/, "data note"], [/^The toy below uses lesson M9's illustrative turbine\.$/, "data note"],
+    [/^The toy below uses lesson M9's illustrative turbine\.$/, "data note"],
     [/^Related project · uncertainty at plants without measurements$/, "heading"], [/^Question and method only: no results\.$/, "label"], [/^(mfgpr-wind-power-curve|wind-uq-surrogate): public example repository · MIT licence · synthetic data\.$/, "repository label"],
     [/^Question type: predictive \(what power, with what uncertainty\?\), with an evaluative part \(better than records alone\?\)\.$/, "the course's question type"],
     [/^M9 fits a Gaussian process to a few records, lets the records choose its settings and adds the maker's curve as a second source; it also shows a case where that cheap curve misleads\.$/, "navigation (Go deeper)"],
@@ -174,7 +183,7 @@ if (R) {
     [/^Run python examples\/probabilistic\.py and compare the coverage at each nominal level with the level itself\.$/, "instruction on the open code (synthetic)"],
     [/^Run python examples\/minimal\.py, then python examples\/validation_design\.py\.$/, "instruction on the open code (synthetic); E13.7 follows"],
     [/^Try it yourself$/, "heading"], [/^Optional, about 30 minutes each; needs Python 3\.10 or later \(lesson B2\)\.$/, "time"],
-    [/^Invented numbers, not the study's: two “90%” bands for one turbine are scored on the same 100 new measurements\.$/, "the check's invented example"],
+    [/^Invented numbers, not the study's: two “90%” bands are checked on 100 new measurements\.$/, "the check's invented example"],
     [/^Li et al\. \(2023\), ASME IDETC 2023 · presented August 2023$/, "numbers-table source"],
     [/^From Li et al\. \(2023\), ASME IDETC 2023\.$/, "boundary card's source line"]];
   const bad = [];
@@ -224,12 +233,12 @@ ok(fm("title") === py("title") && fm("subtitle") === py("subtitle"), "the page's
   ok(!threw, "both parts mount on the stub document" + (threw ? ": " + threw : ""));
   if (!threw) {
     const t = s => s.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
-    ok(/One source, 16 records: 31\.3% ± 2\.8 points\./.test(t(live2.innerHTML)) && t(live2.innerHTML).includes(I.oneNote) && t(live2.innerHTML).includes(I.scope) && t(live2.innerHTML).includes(I.levelNote), "the toy starts at 16 records, one source: 31.3% ± 2.8 points; the band's scope and level are stated");
+    ok(/16 records only: 31\.3% ± 2\.8 points\./.test(t(live2.innerHTML)) && t(live2.innerHTML).includes(I.oneNote) && t(live2.innerHTML).includes(I.scope) && t(live2.innerHTML).includes(I.levelNote), "the toy starts at 16 records, one source: 31.3% ± 2.8 points; the band's scope and level are stated");
     ok((live2.innerHTML.match(/<table class="lx-mini-table cf8-bins">[\s\S]*?<\/table>/) || [""])[0].split("<tr>").length - 2 === I.bins.length + 2 && t(live2.innerHTML).includes("All hours100%32.4"), "the live toy shows the averaging table (9 rows and the total), adding up to 32.4%");
     live2.querySelector(".lx-toggle").click();
-    ok(/Two sources, 16 records: 31\.0% ± 1\.5 points\./.test(t(live2.innerHTML)) && /The maker's curve narrows the band by 47% here; the field curve's 31\.3% lies inside both\./.test(t(live2.innerHTML)), "two sources: 31.0% ± 1.5, narrower by 47%");
+    ok(/16 records \+ the maker's curve: 31\.0% ± 1\.5 points\./.test(t(live2.innerHTML)) && /The maker's curve narrows the band by 47% here; the field curve's 31\.3% lies inside both\./.test(t(live2.innerHTML)), "two sources: 31.0% ± 1.5, narrower by 47%");
     sliders[0]._set(4);
-    ok(/One source, 64 records: 31\.0% ± 0\.8 points\./.test(t(live2.innerHTML)), "64 records: ± 0.8 points");
+    ok(/64 records only: 31\.0% ± 0\.8 points\./.test(t(live2.innerHTML)), "64 records: ± 0.8 points");
     ok(live2.querySelectorAll("[aria-live]").length >= 1 && specs[specs.length - 1].text.rows.length === 4, "the status is announced; the chart has a text version");
     ok(/Where the result holds/.test(t(xp.innerHTML)), "the boundary card is drawn");
     const foots = live.querySelectorAll(".lx-tl-foot"), evs = live.querySelectorAll(".lx-tl-ev");

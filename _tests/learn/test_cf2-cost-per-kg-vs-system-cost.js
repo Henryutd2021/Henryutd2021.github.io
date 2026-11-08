@@ -177,7 +177,6 @@ const NOT_RESEARCH = [
   [/^Question type: prescriptive \(what should be built, and how should it run\?\)\.$/, "course label (the course's question types)"],
   [/^From: Li et al\. \(\d{4}\), (Journal of Mechanical Design|EEM 2023|J\. Phys\.: Conf\. Ser\. 2767)\.$/, "provenance label"],
   [/^From Li et al\. \(2024\), Journal of Mechanical Design\.$/, "provenance label"],
-  [/^Every result about the studies is quoted from the published papers named in the sources\.$/, "provenance label"],
   [/^Li et al\. \(\d{4}\), (Journal of Mechanical Design|J\. Phys\.: Conf\. Ser\. 2767) · published (online )?[A-Z][a-z]+ \d{4}$/, "citation label (numbers table)"],
   [/^Li et al\. \(\d{4}\), (J\. Phys\.: Conf\. Ser\. \d+, \d+|EEM 2023|Journal of Mechanical Design( 146, 020903)?|J\. Phys\.: Conf\. Ser\. 2767)$/, "citation label (timeline, data file)"],
   [/^(The studies in time|Where the result holds)$/, "heading"],
@@ -185,7 +184,7 @@ const NOT_RESEARCH = [
   [/^Illustrative numbers, not the studies' inputs or results\.$/, "provenance label (the toy)"],
   [/^A separate example with stylized numbers, from the course author's open explainer: not the study's data or results\.$/, "provenance label (the explainer)"],
   [/^Myth, unless that part is the whole cost\.$/, "general idea"],
-  [/^(An electrolyzer next to a wind farm turns spare wind into hydrogen\.|A bigger one makes each kilogram cost more\.|Can the bigger one still be the better choice\?)$/, "the puzzle: a general idea, true of the toy; no study claim"],
+  [/^(An electrolyzer next to a wind farm turns spare wind into hydrogen\.|When extra capacity runs fewer hours, a bigger one makes each kilogram cost more\.|Can the bigger one still be the better choice\?)$/, "the puzzle: a general idea, true of the toy; no study claim"],
   [/^The toy below uses illustrative round numbers\.$/, "provenance label (the toy)"],
   [/^(Run examples\/configurations\.py\.|Its hydrogen-price cases solve one synthetic site at several prices: compare the electrolyzer size, LCOH and the objective \(net life-cycle cost\) row by row\.)$/, "repository exercise on its synthetic examples, not the study"],
   [/^reopt-hydrogen-framework: public example repository · MIT licence · synthetic data\.$/, "repository label"],
@@ -249,7 +248,12 @@ const GENERATED = new RegExp("<!-- (" + CF.prefix + "-[a-z]+):start[\\s\\S]*?<!-
 let REST = OWN.replace(GENERATED, " ");
 const cut = (re, optional) => { const m = REST.match(re); ok(!!m || optional, "page zone found: " + re); if (m) REST = REST.replace(m[0], " "); return m ? m[0] : ""; };
 strict("page, the case", elements(cut(/<div class="lx-case">[\s\S]*?\n<\/div>\n(?=<div class="lx-interactive")/)));
-strict("page, the case's data note", elements(cut(/<p class="lx-datanote"><span>Every result[\s\S]*?<\/p>/)));
+strict("page, the case's data note", elements(cut(/<p class="lx-datanote"><span>The toy below uses illustrative round numbers\.<\/span><\/p>/)));
+ok(!/quoted from the published/.test(PAGE), "the data note claims no quotation: the excerpts carry their own sources");
+// the chart's text version names the toy's readout: the change against no electrolyzer, not the system's whole cost
+ok(/note: "Net cost change versus no electrolyzer at "/.test(JS) && !/Net cost of the system at/.test(JS), "the chart's text version says net cost change versus no electrolyzer");
+// first use: the terms of the case parts and the excerpt are glossary terms
+ok(["life-cycle-cost\">life-cycle cost", "sensitivity-analysis\">Sensitivity runs", "capacity-utilization\">utilization", "capital-cost\">capital", "firm-output\">stabilized output"].every(t => PAGE.indexOf('data-term="' + t) >= 0), "life-cycle cost, sensitivity runs, utilization, capital and stabilized output are marked");
 strict("page, explainer no-JS steps", elements(cut(/<ol class="ex-fallback[\s\S]*?<\/ol>/, true)));
 const SRC = cut(/<div class="lx-card lx-sources">[\s\S]*?<\/div>/);
 // a paper cited with its title and DOI is checked against the publication list below; every other item is strict

@@ -3,6 +3,9 @@
 id: cf7-cost-of-waiting
 lesson: CF7
 glossary:
+  - id: delay-cost-per-mw-month
+    term: Delay cost per MW-month
+    def: "A delay's cost in present value divided by the load's size in MW and by the months it waits, so waits of different lengths and loads of different sizes can be compared."
   - id: mw-it
     term: MW-IT
     def: "Megawatts of a data center's computing equipment; the grid must supply more, for cooling and the rest of the building."

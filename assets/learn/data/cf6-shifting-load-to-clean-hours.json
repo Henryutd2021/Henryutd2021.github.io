@@ -4,7 +4,7 @@
   "timeline": {
     "title": "The study in time",
     "events": [
-      { "date": "2025-05", "label": "Paper published", "kind": "study", "key": true,
+      { "date": "2025-05", "label": "Journal article (this case)", "kind": "study", "key": true,
         "text": "Load re-timed by hourly average emission intensity in U.S. grid regions, with windows of a month, a quarter or a year.",
         "source": { "label": "Li et al. (2025), Cell Reports Sustainability 2, 100367", "url": "https://doi.org/10.1016/j.crsus.2025.100367" } },
       { "date": "2026-10-30", "label": "Code released", "kind": "event",
@@ -32,8 +32,12 @@
     "note": "Prairie Town is illustrative: its plants and CO₂ rates are invented; the hourly shapes are real (9 June 2025, Southwest Power Pool).",
     "how": [
       "Negative means less CO₂; t means metric tonnes.",
-      "The dashed line is the factor for the next MWh. A 10 MWh move can cross from one plant to the next, so the readouts re-dispatch both hours.",
+      "The dashed line is the factor for the next MWh. A 10 MWh move can cross from one plant to the next, so the readouts work out each plant's output again in both hours.",
       "The toy moves energy freely between hours; real loads have deadlines, comfort limits and storage losses."
+    ],
+    "terms": [
+      "The [[marginal-plant|plant on the margin]] serves the next MWh: the [[combined-cycle|combined-cycle plant]], the [[peaker|peaker]], or spare wind and sun.",
+      "Spare wind and sun would otherwise be [[curtailment|spilled]]: available, but not used."
     ],
     "day": { "date": "2025-06-09", "dateLabel": "9 June 2025", "utcOffsetHours": -5, "demandPeakMW": 450 },
     "q": 10,

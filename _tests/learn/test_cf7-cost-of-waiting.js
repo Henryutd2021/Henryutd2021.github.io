@@ -91,7 +91,18 @@ ok(I.tariffShares.indexOf(I.startShare) >= 0 && I.delays.start % I.delays.step =
 const T = text(PAGE);
 ok(/In the toy, 24 months">\$171\.1M</.test(PAGE) && /In the toy, 24 months">\$14\.7M</.test(PAGE) && /In the toy, 24 months">\$0\.0M</.test(PAGE) && I.delays.start === 24, "comparison table = the toy at 24 months");
 ok(/moves \$14\.7M from other customers to the developer; the total stays \$185\.8M/.test(T), "myth 1 = the toy");
-ok(/saves the developer \$25\.6M and adds \$8\.1M of CO₂ damage above grid power/.test(T), "myth 2 = the toy");
+ok(/saves the developer \$25\.6M, while its CO₂ above grid power for the same energy is \$8\.1M of damage, borne by society/.test(T), "myth 2 = the toy");
+// the social entry is named against its baseline (grid power for the same energy), never as what switching bridge power on adds
+ok(!/adds \$[0-9.]+M of CO₂|and adds " \+ musd/.test(PAGE + JS) && /its CO₂ above grid power for the same energy is \$8\.1M of damage, for society/.test(T) && /Society's account here counts only bridge power's CO₂ above grid power for the same energy; any CO₂ change from the idle months is left out\./.test(PAGE) && I.assumptions.length === 9,
+  "society's entry: CO2 above grid power for the same energy, idle months left out, said in the assumptions");
+// a tariff only moves cost; a shorter wait or bridge power changes the costs (bridge power lowers the developer's cost)
+ok(!/Only a shorter wait shrinks the cost/.test(PAGE) && /A shorter wait, or bridge power for part of the load, changes the costs themselves\./.test(PAGE) && br.developer < base.developer, "no claim that only a shorter wait changes the cost");
+// the hours behind bridge power and the per-MW-month measure, worked; the stranding chance in percentage points
+{ const w = M.workedMore(I);
+  ok(w[0] === "The load runs around the clock, so a month is 730 hours: bridge power for 50 MW is 50 MW × 730 h = 36,500 MWh a month, $1.1M above grid power." && I.hoursPerMonth === 730 && near(I.bridgeShare * I.loadMW * 730 * I.bridgePremiumPerMWh, 1095000, 1e-6), "worked: 50 MW × 730 h = 36,500 MWh a month, $1.1M above grid power");
+  ok(w[1] === "Per MW-month: $171.1M ÷ 100 MW ÷ 24 months = $71.3k of the developer's cost." && w.every(t => T.indexOf(t) >= 0), "worked: the developer's cost per MW-month, on the page");
+  ok(w[2] === "The chance it never arrives rises by 0.5 percentage points a month: 12% after 24 months, at most 50%." && near(Math.min(I.strandCap, I.strandPerMonth * 24), 0.12, 1e-12) && T.indexOf(w[2]) >= 0, "the stranding chance: 0.5 percentage points a month, 12% after 24 months");
+  ok(/data-term="delay-cost-per-mw-month">delay cost per MW-month</.test(PAGE), "delay cost per MW-month is a glossary term where the case first names it"); }
 ok(/In the toy, 24 → 18 months avoids \$40\.3M \(\$171\.1M − \$130\.8M\)\./.test(T), "Go deeper: the avoided cost = the toy");
 ok(/Worked month: the lost margin is \$45,000 × 100 MW = \$4\.5M a month\. Over 24 months, discounted month by month, that is \$4\.5M × 22\.17 = \$99\.8M today\./.test(T), "worked month on the page = the model");
 ok(!/\bpublished\b[^.]{0,60}(NAPS|Li et al\. \(2026\))|(NAPS|Li et al\. \(2026\))[^.]{0,60}\bpublished\b/i.test(T + " " + RAW), "the NAPS paper is accepted and presented, never called published");
@@ -157,7 +168,7 @@ const NOT_RESEARCH = [
   [/^Words first: energization is switching on grid service; the developer is the company building the facility; ratepayers are the utility's other customers\.$/, "general definitions"],
   [/^From: Li et al\. \(2026\), accepted paper, 2026 North American Power Symposium \(NAPS\); DOI pending\.$/, "provenance label (E7.14's citation, short)"],
   [/^From Li et al\. \(2026\), NAPS 2026 \(accepted\)\.$/, "provenance label"],
-  [/^Every result about the study is quoted from the accepted paper named in the sources; the two public events carry their own sources\.$/, "provenance label"],
+  [/^The two public events in the timeline carry their own sources\.$/, "provenance label (the context events)"],
   [/^The toy below uses illustrative round numbers\.$/, "provenance label (the toy)"],
   [/^Li et al\. \(2026\), (NAPS 2026 \(accepted\)( · presented October 2026; DOI pending)?|North American Power Symposium \(NAPS 2026\), accepted; DOI pending)$/, "citation label"],
   [/^presented October 2026; DOI pending$/, "citation label (date)"],
@@ -230,7 +241,8 @@ const GENERATED = new RegExp("<!-- (" + CF.prefix + "-[a-z]+):start[\\s\\S]*?<!-
 let REST = OWN.replace(GENERATED, " ");
 const cut = (re, optional) => { const m = REST.match(re); ok(!!m || optional, "page zone found: " + re); if (m) REST = REST.replace(m[0], " "); return m ? m[0] : ""; };
 strict("page, the case", elements(cut(/<div class="lx-case">[\s\S]*?\n<\/div>\n(?=<div class="lx-interactive")/)));
-strict("page, the case's data note", elements(cut(/<p class="lx-datanote"><span>Every result[\s\S]*?<\/p>/)));
+strict("page, the case's data note", elements(cut(/<p class="lx-datanote"><span>The two public events in the timeline carry their own sources\.[\s\S]*?<\/p>/)));
+ok(!/quoted from the accepted/.test(PAGE), "the data note claims no quotation: the excerpts carry their own sources");
 strict("page, explainer no-JS steps", elements(cut(/<ol class="ex-fallback[\s\S]*?<\/ol>/, true)));
 const SRC = cut(/<div class="lx-card lx-sources">[\s\S]*?<\/div>/);
 // a paper cited with its title and DOI is checked against the publication list below; every other item is strict

@@ -59,6 +59,12 @@
   "lesson": "CF5",
   "href": "cf5-drawing-the-boundary.html"
  },
+ "annualized-capital-cost": {
+  "term": "Annualized capital cost",
+  "short": "A building cost spread into equal yearly amounts over the equipment's life, with interest, so it can be set against a year's revenue.",
+  "lesson": "CF4",
+  "href": "cf4-existing-reactors-hydrogen.html"
+ },
  "annuity-factor": {
   "term": "Annuity factor",
   "short": "What one dollar paid every year for a number of years is worth today, once each dollar is discounted.",
@@ -125,6 +131,12 @@
   "lesson": 3,
   "href": "03-balancing.html"
  },
+ "autoregressive-fusion": {
+  "term": "Autoregressive multi-fidelity model",
+  "short": "A linear way to combine two sources: the accurate curve is modeled as a scaled copy of the rough curve plus a learned correction.",
+  "lesson": "CF8",
+  "href": "cf8-power-curves-from-scarce-data.html"
+ },
  "average-emission-factor": {
   "term": "Average emission factor",
   "short": "An hour's CO₂ from all the plants that ran, divided by all the electricity used in that hour.",
@@ -166,6 +178,12 @@
   "short": "A simple rule, such as same hour yesterday, that any forecasting model must beat on the same hours to be worth using.",
   "lesson": "M10",
   "href": "m10-ml-forecasting.html"
+ },
+ "baseload": {
+  "term": "Baseload operation",
+  "short": "Running a plant at steady full output around the clock, whatever the hour's price.",
+  "lesson": "CF4",
+  "href": "cf4-existing-reactors-hydrogen.html"
  },
  "basis-risk": {
   "term": "Basis risk",
@@ -317,6 +335,12 @@
   "lesson": "A5",
   "href": "a05-adequacy.html"
  },
+ "capacity-bound": {
+  "term": "Capacity bound",
+  "short": "The largest size a model is allowed to choose for a piece of equipment.",
+  "lesson": "CF4",
+  "href": "cf4-existing-reactors-hydrogen.html"
+ },
  "capacity-credit": {
   "term": "Capacity credit",
   "short": "The share of a plant's size that planners count on to meet the year's peak, judged by how much it lowers the risk of a shortage.",
@@ -340,6 +364,12 @@
   "short": "An auction, run ahead of time, that pays plants and other resources for being available, in an amount a planner sets, on top of energy prices.",
   "lesson": "A3",
   "href": "a03-market-design.html"
+ },
+ "capacity-payment": {
+  "term": "Capacity payment",
+  "short": "Money a plant earns for being available to run when needed, as in a capacity market, apart from the energy it sells.",
+  "lesson": "CF4",
+  "href": "cf4-existing-reactors-hydrogen.html"
  },
  "capacity-utilization": {
   "term": "Capacity utilization",
@@ -502,6 +532,12 @@
   "short": "An electric utility owned by the members it serves, common in rural areas.",
   "lesson": "R1",
   "href": "r01-framing.html"
+ },
+ "co-optimize": {
+  "term": "Co-optimize",
+  "short": "To choose several decisions together in one model, so each is set with the others in view rather than one after another.",
+  "lesson": "CF5",
+  "href": "cf5-drawing-the-boundary.html"
  },
  "coefficient-of-performance": {
   "term": "Coefficient of performance (COP)",
@@ -863,6 +899,12 @@
   "lesson": "R6",
   "href": "r06-uncertainty-properly.html"
  },
+ "delay-cost-per-mw-month": {
+  "term": "Delay cost per MW-month",
+  "short": "A delay's cost in present value divided by the load's size in MW and by the months it waits, so waits of different lengths and loads of different sizes can be compared.",
+  "lesson": "CF7",
+  "href": "cf7-cost-of-waiting.html"
+ },
  "deliverability": {
   "term": "Deliverability",
   "short": "Whether power from a plant can actually reach the buyer over the grid, usually judged by both being in the same region.",
@@ -943,7 +985,7 @@
  },
  "discounted-cash-flow": {
   "term": "Discounted cash flow",
-  "short": "Valuing a project's future yearly cash flows in today's money, each discounted at a chosen rate: their sum is the net present value, while the internal rate of return (the rate that makes that sum zero) and the payback time are found from the same flows.",
+  "short": "Valuing a project's future yearly cash flows in today's money, each discounted at a chosen rate; their sum is the project's net present value.",
   "lesson": "CF4",
   "href": "cf4-existing-reactors-hydrogen.html"
  },
@@ -1351,7 +1393,7 @@
  },
  "firm-output": {
   "term": "Firm output",
-  "short": "Power a plant can be counted on to deliver steadily, such as the same output in every hour.",
+  "short": "Power a plant can be counted on to deliver steadily, such as the same output in every hour; also called stabilized output.",
   "lesson": "CF2",
   "href": "cf2-cost-per-kg-vs-system-cost.html"
  },
@@ -1541,6 +1583,12 @@
   "lesson": "A18",
   "href": "a18-city-plan.html"
  },
+ "green-hydrogen": {
+  "term": "Green hydrogen",
+  "short": "Hydrogen made by electrolysis with renewable electricity, such as wind or solar power, rather than from natural gas.",
+  "lesson": "CF3",
+  "href": "cf3-hydrogen-under-uncertainty.html"
+ },
  "frequency": {
   "term": "Grid frequency",
   "short": "The number of cycles per second of the grid's alternating current, 60 hertz (Hz) in North America, which falls when power is short and rises when there is too much.",
@@ -1600,6 +1648,12 @@
   "short": "The output a running unit could still add, or the load it could still shed, which it can offer to the grid as a reserve.",
   "lesson": "CF4",
   "href": "cf4-existing-reactors-hydrogen.html"
+ },
+ "heat-balance": {
+  "term": "Heat balance (steam-table)",
+  "short": "An account of the energy entering and leaving each part of a steam cycle, using tables of steam's properties at each pressure and temperature.",
+  "lesson": "CF5",
+  "href": "cf5-drawing-the-boundary.html"
  },
  "heat-engine": {
   "term": "Heat engine",
@@ -1925,6 +1979,12 @@
   "lesson": "R10",
   "href": "r10-question-studio.html"
  },
+ "life-cycle-cost": {
+  "term": "Life-cycle cost",
+  "short": "Everything a system costs over its whole life, building, running, repairs and replacements, in today's money.",
+  "lesson": "CF2",
+  "href": "cf2-cost-per-kg-vs-system-cost.html"
+ },
  "linear-program": {
   "term": "Linear program",
   "short": "An optimization problem in which the goal and all the rules are linear, so each is a sum of quantities times fixed numbers.",
@@ -2056,6 +2116,12 @@
   "short": "What a business earns from its output after paying its operating costs: revenue minus operating costs.",
   "lesson": "CF7",
   "href": "cf7-cost-of-waiting.html"
+ },
+ "benchmark-margin": {
+  "term": "Margin against a benchmark",
+  "short": "How much cheaper or dearer an option is than a benchmark, such as buying all power from the grid.",
+  "lesson": "CF5",
+  "href": "cf5-drawing-the-boundary.html"
  },
  "marginal-abatement-cost-curve": {
   "term": "Marginal abatement cost curve",
@@ -2333,6 +2399,12 @@
   "lesson": 3,
   "href": "03-balancing.html"
  },
+ "negative-control": {
+  "term": "Negative control",
+  "short": "A test run in which the method should find nothing, for example inputs with no real signal, to show that a result is not an artefact of the method.",
+  "lesson": "CF8",
+  "href": "cf8-power-curves-from-scarce-data.html"
+ },
  "negative-price": {
   "term": "Negative price",
   "short": "A wholesale price below zero, which happens when the last plant needed would rather pay than stop running.",
@@ -2518,6 +2590,12 @@
   "short": "The set of plans that cannot be made cheaper without becoming dirtier, or cleaner without becoming more expensive.",
   "lesson": 12,
   "href": "12-trade-offs.html"
+ },
+ "part-load-efficiency": {
+  "term": "Part-load efficiency",
+  "short": "How well a machine converts energy when it runs below its full size; many chillers and turbines do worse at part load.",
+  "lesson": "CF5",
+  "href": "cf5-drawing-the-boundary.html"
  },
  "participatory-mapping": {
   "term": "Participatory mapping",
@@ -2945,6 +3023,12 @@
   "lesson": "R10",
   "href": "r10-question-studio.html"
  },
+ "renewable-penetration": {
+  "term": "Renewable penetration",
+  "short": "The share of a grid's electricity that comes from wind, solar and other renewable sources.",
+  "lesson": "CF4",
+  "href": "cf4-existing-reactors-hydrogen.html"
+ },
  "repository": {
   "term": "Repository",
   "short": "A project folder together with its full history of commits, as kept by a version-control tool such as Git.",
@@ -3112,6 +3196,12 @@
   "short": "A coherent what-if set of a model's inputs, such as a 36-month wait; a scenario may be given a probability, though this lesson gives none.",
   "lesson": "M7",
   "href": "m07-monte-carlo.html"
+ },
+ "future-scenario": {
+  "term": "Scenario (one possible future)",
+  "short": "One possible future of a model's uncertain inputs, such as how much planned wind and solar gets built and how fast demand grows; each scenario has a chance.",
+  "lesson": "CF3",
+  "href": "cf3-hydrogen-under-uncertainty.html"
  },
  "scenario-tree": {
   "term": "Scenario tree",
@@ -3431,6 +3521,12 @@
   "lesson": 8,
   "href": "08-merit-order.html"
  },
+ "supply-chain-tier": {
+  "term": "Supply-chain tier",
+  "short": "One level of a supply chain, such as factories, then warehouses, then stores: a three-tier chain has all three, a two-tier chain two of them.",
+  "lesson": "CF1",
+  "href": "cf1-supply-chain-microgrids.html"
+ },
  "surrogate-model": {
   "term": "Surrogate model",
   "short": "A cheap stand-in for a model or measurement that is costly to run, fitted to a few samples and then used in its place.",
@@ -3442,6 +3538,12 @@
   "short": "A connected AC network whose generators and other equipment run at one shared electrical frequency; the Lower 48 states have three main ones, called interconnections.",
   "lesson": "F1",
   "href": "f01-five-scales.html"
+ },
+ "synthetic-data": {
+  "term": "Synthetic data",
+  "short": "Invented values made to look realistic, used in place of real records so that a model can be shown and shared.",
+  "lesson": "CF1",
+  "href": "cf1-supply-chain-microgrids.html"
  },
  "synthetic-sample": {
   "term": "Synthetic sample",
@@ -3853,6 +3955,12 @@
   "lesson": 1,
   "href": "01-power-energy.html"
  },
+ "weather-zone": {
+  "term": "Weather zone",
+  "short": "One of the areas into which a grid operator divides its region for weather and demand forecasts; ERCOT has eight.",
+  "lesson": "CF3",
+  "href": "cf3-hydrogen-under-uncertainty.html"
+ },
  "weatherization": {
   "term": "Weatherization",
   "short": "Air sealing, insulation and similar work on a building's shell that cuts the heat it loses, so it needs less heating.",
@@ -3864,6 +3972,12 @@
   "short": "The projection most web maps use: good for viewing, but it stretches distances and areas more the farther a place is from the equator.",
   "lesson": "R4",
   "href": "r04-data.html"
+ },
+ "weibull": {
+  "term": "Weibull distribution",
+  "short": "A curve often used for the share of a year's hours at each wind speed; its shape k (no unit) sets how spread out the speeds are, and its scale c, in m/s, sets how high they run.",
+  "lesson": "CF8",
+  "href": "cf8-power-curves-from-scarce-data.html"
  },
  "wacc": {
   "term": "Weighted average cost of capital (WACC)",

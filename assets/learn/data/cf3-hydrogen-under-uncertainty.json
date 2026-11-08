@@ -42,6 +42,7 @@
    "Industry's hydrogen demand is steady: the same in every hour and every build-out.",
    "One zone: no hydrogen storage, no fuel cells and no pipelines; reformer hydrogen has one fixed price."
   ],
-  "blocksCaption": "The five wind blocks: SPP's 2025 hourly wind shape scaled to 33.8%, sorted and cut"
+  "blocksCaption": "The five wind blocks: the real 2025 hourly wind of the [[spp|Southwest Power Pool (SPP)]], scaled to 33.8%, the 2025 U.S. wind capacity factor, then sorted and cut. The costs above are illustrative.",
+  "cfSource": {"label": "EIA Electric Power Monthly, Table 6.07.B", "url": "https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=table_6_07_b"}
  }
 }

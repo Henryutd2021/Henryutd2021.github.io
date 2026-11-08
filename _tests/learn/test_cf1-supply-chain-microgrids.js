@@ -113,6 +113,14 @@ ok(/<table class="lx-mini-table cf1-res">/.test(M.staticIdea(I, R)) && !/<li>/.t
 // vocabulary: capacity factor, MW and MWh, deterministic equivalent marked; PV spelt out
 ok(/data-term="capacity-factor"/.test(M.staticIdea(I, R)) && /data-term="megawatt"/.test(M.staticIdea(I, R)) && /data-term="megawatt-hour"/.test(M.staticIdea(I, R)) && /data-term="deterministic-equivalent">deterministic equivalent</.test(PAGE) && /solar photovoltaic \(PV\)/.test(PAGE),
   "capacity factor, MW, MWh and deterministic equivalent are glossary terms; PV is spelt out");
+// first use: stylized and synthetic are marked where part 3 first says them; tiers marked in the timeline; SPP spelt out
+ok(/<b>Inside:<\/b> a <span class="lx-term" data-term="stylized-network">stylized<\/span>/.test(PAGE) && (PAGE.match(/data-term="stylized-network"/g) || []).length === 1 && /which are <span class="lx-term" data-term="synthetic-data">synthetic<\/span>/.test(PAGE), "stylized and synthetic are glossary terms at their first use");
+ok(D.timeline.events.filter(e => /tier/.test(e.text)).every(e => /\[\[supply-chain-tier\|(three|two)-tier\]\]/.test(e.text)), "the timeline's tiers are glossary terms");
+ok(/Southwest Power Pool<\/span> \(SPP/.test(PAGE) && /the 8,760 real hours of 2025/.test(PAGE), "SPP spelt out; the toy's year is 8,760 hours, apart from the studies' weeks");
+// the live view shows the main assumptions above the controls, with MW and MWh marked, and explains M and k
+ok(/H\("p", \{ class: "lx-hint", html: assumeLine\(I\) \}, stage\);[\s\S]{0,200}M = million, k = thousand[\s\S]{0,60}var ctl/.test(JS) && /data-term="megawatt"/.test(M.assumeLine(I)) && /data-term="megawatt-hour"/.test(M.assumeLine(I)) && text(M.assumeLine(I)).split(" ").length <= 30,
+  "the assumptions line and the M/k note sit above the controls: " + text(M.assumeLine(I)));
+ok(/First install the repository \(linked below\) as its README's Quick start shows\. Then run <code>python examples\/sensitivity\.py<\/code>/.test(PAGE), "the exercise starts with the setup step");
 const SIDE = fs.readFileSync(path.join(SITE, "learn/_w1/cf1-supply-chain-microgrids.yml"), "utf8");
 ok(/chosen probability, for example at least a 95% chance of meeting a week's demand/.test(SIDE) && !/95 of every 100 weeks/.test(SIDE), "the chance-constraint definition is a probability, not a frequency");
 ok(/\[lesson 10\]\(10-write-it-down\.html\) introduces decisions, a goal and rules, and \[lesson 11\]\(11-solver\.html\) solves a mixed-integer program/.test(PAGE), "lesson 10 is not called a mixed-integer example");
@@ -157,7 +165,6 @@ const NOT_RESEARCH = [
   [/^Question type: prescriptive \(where should it build, and what should each site install\?\)\.$/, "course label (the course's question types)"],
   [/^From: Li et al\. \(2023\), Applied Mathematical Modelling\.$/, "provenance label"],
   [/^From Li et al\. \(2023\), Applied Mathematical Modelling\.$/, "provenance label"],
-  [/^Every result about the studies is quoted from the published papers named in the sources\.$/, "provenance label"],
   [/^The toy below uses illustrative round numbers\.$/, "provenance label (the toy)"],
   [/^Illustrative numbers, not the studies' inputs or results\.$/, "provenance label (the toy)"],
   [/^Li et al\. \(2023\), (Applied Mathematical Modelling 119, 119–136|SEGRE 2023, 410–415)$/, "citation label (timeline, data file)"],
@@ -165,7 +172,7 @@ const NOT_RESEARCH = [
   [/^(Conference paper|Journal article \(this case\)|Code released)$/, "timeline step label: the kind of output"],
   [/^(A factory usually goes where land is cheap and its customers are close\.|If it can make its own power and sell what it does not use, does a windy, sunny site far away start to look better\?)$/, "the puzzle: a general idea, true of the toy; no study claim"],
   [/^(When a factory can make and sell its own energy, its wind and sun become part of choosing where to build it\.?|Case file CF1 of Energy Systems, Step by Step: when a factory can make and sell its own energy, its wind and sun become part of choosing where to build it\.|Factories with their own energy|A case file in six parts and a timeline; then choose between two factory sites and see when on-site wind and sun, and selling energy to the grid, change the choice\.|Say how on-site energy and an hourly energy balance enter a location decision, and why a site with stronger wind and sun can win despite higher shipping costs\.|Where should a factory go when sun and wind are part of the decision\?)$/, "title, subtitle and path.yml text: the general idea of the toy, no study claim"],
-  [/^(Run examples\/sensitivity\.py\.|It solves a synthetic supply chain in several cases: compare the benchmark row with "grid supply only"\.|Do the open factories or warehouses change\?|Predict first, then read the "purchase price \+25%" row: does on-site wind and solar photovoltaic \(PV\) capacity grow or shrink\?)$/, "repository exercise on its synthetic examples, not the study"],
+  [/^(First install the repository \(linked below\) as its README's Quick start shows\.|Then run python examples\/sensitivity\.py\.|It solves a synthetic supply chain in several cases: compare the benchmark row with "grid supply only"\.|Do the open factories or warehouses change\?|Predict first, then read the "purchase price \+25%" row: does on-site wind and solar photovoltaic \(PV\) capacity grow or shrink\?)$/, "repository exercise on its synthetic examples, not the study"],
   [/^supply-chain-microgrid-models: public example repository · MIT licence · synthetic data\.$/, "repository label"],
   [/^supply-chain-microgrid-models on GitHub$/, "citation label (repository)"],
   [/^Lesson F7 islanded a campus, and A14 asked whether its microgrid pays\.$|^This case puts on-site energy inside a larger choice: where to build\.$/, "course pointer: lessons, not the study"],
@@ -234,7 +241,8 @@ const GENERATED = new RegExp("<!-- (" + CF.prefix + "-[a-z]+):start[\\s\\S]*?<!-
 let REST = OWN.replace(GENERATED, " ");
 const cut = (re, optional) => { const m = REST.match(re); ok(!!m || optional, "page zone found: " + re); if (m) REST = REST.replace(m[0], " "); return m ? m[0] : ""; };
 strict("page, the case", elements(cut(/<div class="lx-case">[\s\S]*?\n<\/div>\n(?=<div class="lx-interactive")/)));
-strict("page, the case's data note", elements(cut(/<p class="lx-datanote"><span>Every result[\s\S]*?<\/p>/)));
+strict("page, the case's data note", elements(cut(/<p class="lx-datanote"><span>The toy below uses illustrative round numbers\.<\/span><\/p>/)));
+ok(!/quoted from the published/.test(PAGE), "the data note claims no quotation: the excerpts carry their own sources");
 const SRC = cut(/<div class="lx-card lx-sources">[\s\S]*?<\/div>/);
 // a paper cited with its title and DOI is checked against the publication list below; every other item is strict
 const TITLED = /^<li>Li et al\. \((\d{4})\)\. <a href="(https:\/\/doi\.org\/[^"]+)">([^<]+)<\/a>\./;

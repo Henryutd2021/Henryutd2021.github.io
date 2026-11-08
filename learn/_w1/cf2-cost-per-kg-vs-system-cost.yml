@@ -17,7 +17,10 @@ glossary:
     def: "A device that turns hydrogen (and oxygen from the air) into electricity, with water as the by-product: an electrolyzer run backwards."
   - id: firm-output
     term: Firm output
-    def: "Power a plant can be counted on to deliver steadily, such as the same output in every hour."
+    def: "Power a plant can be counted on to deliver steadily, such as the same output in every hour; also called stabilized output."
+  - id: life-cycle-cost
+    term: Life-cycle cost
+    def: "Everything a system costs over its whole life, building, running, repairs and replacements, in today's money."
   - id: ercot
     term: ERCOT
     def: "The Electric Reliability Council of Texas: the grid operator, and its wholesale market, for most of Texas."
