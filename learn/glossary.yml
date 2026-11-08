@@ -39,7 +39,7 @@
   lesson: 0
 - id: balancing-authority
   term: Balancing authority
-  short: "The organisation that keeps supply and demand balanced, moment to moment, in its own part of the grid."
+  short: "The organization that keeps supply and demand balanced, moment to moment, in its own part of the grid."
   lesson: 0
 - id: dispatch
   term: Dispatch
@@ -103,7 +103,7 @@
   lesson: 2
 - id: firm-capacity
   term: Firm capacity
-  short: "Power that can be counted on whenever it is needed, whatever the weather."
+  short: "Capacity a grid counts on in its riskiest hours, such as a still, dark evening: a planning rating of what a plant adds to reliability, not output promised in every hour."
   lesson: 6
 - id: lcoe
   term: Levelized cost of electricity (LCOE)

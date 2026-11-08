@@ -139,7 +139,7 @@
  },
  "balancing-authority": {
   "term": "Balancing authority",
-  "short": "The organisation that keeps supply and demand balanced, moment to moment, in its own part of the grid.",
+  "short": "The organization that keeps supply and demand balanced, moment to moment, in its own part of the grid.",
   "lesson": 0,
   "href": "00-grid-operator.html"
  },
@@ -1333,7 +1333,7 @@
  },
  "firm-capacity": {
   "term": "Firm capacity",
-  "short": "Power that can be counted on whenever it is needed, whatever the weather.",
+  "short": "Capacity a grid counts on in its riskiest hours, such as a still, dark evening: a planning rating of what a plant adds to reliability, not output promised in every hour.",
   "lesson": 6,
   "href": "06-three-jobs.html"
  },
