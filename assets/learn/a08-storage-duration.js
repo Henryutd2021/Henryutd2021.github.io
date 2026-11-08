@@ -185,7 +185,7 @@
     function weekText(sol) {
       var n = function (v) { return Math.round(v).toLocaleString("en-US"); }, head = ["Hour starting", "Demand", "Available: wind + sun + firm", "Short without storage"];
       if (sol) head = head.concat([sol.store.short + " out (+) or in (−)", "Unserved with it"]);
-      return { head: head, note: "All in MW, the same as MWh over the hour. Available: wind and sun before any is spilled, firm output at its full " + fm.mw(W.firm) + ". " + (sol ? "The store's schedule is one of the best schedules; the unserved total is the same for all of them." : "Run a store in step 5 to add its schedule."),
+      return { head: head, note: "MW, the same as MWh over the hour. Available: wind and sun before spilling, firm at its full " + fm.mw(W.firm) + ". " + (sol ? "The store's schedule is one of several best ones, all with the same unserved total." : "Run a store in step 5 to add its schedule."),
         rows: W.demand.map(function (d, t) { var r = [dayTicks(W, false)[Math.floor(t / DAY)][1] + " " + fm.hm(t), n(d), n(W.wind[t] + W.solar[t] + W.firm), n(W.short0[t])]; return sol ? r.concat([n(sol.dis[t] - sol.ch[t]), n(sol.uns[t])]) : r; }) };
     }
     var TECHS = D.techs.map(function (t) { return store(D, t.id); });

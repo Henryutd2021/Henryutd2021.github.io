@@ -276,7 +276,7 @@ const fm = M.fm, r1 = v => Math.round(v * 10) / 10;
       // review 8: the week's text version lists every hour, with the store's schedule once a store is shown
       demo.cards.go(4); await flush();
       const tx = specs[specs.length - 1].text, bat = M.read(W, M.store(D, "battery"), solve(M.build(W, M.store(D, "battery"), { plains: G })));
-      ok(tx.rows.length === 168 && tx.head.join("|") === "Hour starting|Demand|Available: wind + sun + firm|Short without storage|Battery out (+) or in (−)|Unserved with it" && /Available: wind and sun before any is spilled, firm output at its full 1,000 MW\./.test(tx.note) && tx.rows[0][0] === "2 Jan 00:00" && tx.rows[167][0] === "8 Jan 23:00",
+      ok(tx.rows.length === 168 && tx.head.join("|") === "Hour starting|Demand|Available: wind + sun + firm|Short without storage|Battery out (+) or in (−)|Unserved with it" && /Available: wind and sun before spilling, firm at its full 1,000 MW\./.test(tx.note) && tx.note.split(/\s+/).length <= 35 && tx.rows[0][0] === "2 Jan 00:00" && tx.rows[167][0] === "8 Jan 23:00",
          "step 5: the week's text version has a row for each of the 168 hours, with the store's output and the unserved demand (" + tx.rows.length + " rows: " + tx.head.join(", ") + ")");
       ok(near(tx.rows.reduce((a, r) => a + +r[5].replace(/,/g, ""), 0), R.stores.battery.unserved, 168) && near(tx.rows.reduce((a, r) => a + +r[3].replace(/,/g, ""), 0), W.shortSum, 168), "step 5: the hourly text sums to the week's shortfall and the battery's unserved energy (rounding aside)");
       // review 1: step 4's tile is the largest shortfall after firm output (1,429 MW), not the largest gap (2,429 MW)

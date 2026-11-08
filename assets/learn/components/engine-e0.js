@@ -763,7 +763,7 @@
         "Equipment costs are " + s.cost + "% of the sourced values, with no tax credits or incentives."].filter(Boolean),
       sensitivity: null,
       limits: [
-        "Storage starts and ends each week at the same level, so nothing is stored from one week to the next.",
+        "Storage is half full at each week's start and end, so nothing is stored from one week to the next.",
         home ? "The grid is always there: outages and backup power are outside this bench." : "The farm only sells: it cannot buy power for the electrolyzer or the battery.",
         home ? "One average CO₂ factor for every hour: timing does not change the CO₂ here (case file CF6)." : "One buyer takes the hydrogen at one price; storage beyond the tank and delivery are outside the bench."]
     };

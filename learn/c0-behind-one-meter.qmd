@@ -193,7 +193,7 @@ WHAT WOULD CHANGE THE ANSWER
 No tested input turns the NPV positive: −$10,237 at 75% of the equipment cost, −$14,717 with an 8¢ export credit.
 
 LIMITS OF THIS ANALYSIS
-- Storage starts and ends each week at the same level, so nothing is stored from one week to the next.
+- Storage is half full at each week's start and end, so nothing is stored from one week to the next.
 - The grid is always there: outages and backup power are outside this bench.
 - One average CO₂ factor for every hour: timing does not change the CO₂ here (case file CF6).
 

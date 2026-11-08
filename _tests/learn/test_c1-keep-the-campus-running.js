@@ -101,10 +101,10 @@ const APPROVED_SNAPSHOT = {
   [E1.kilo(R.plan.pv) + " kW of solar", E1.kilo(R.plan.bat) + " kWh battery", E1.money(R.total) + " a year, community-owned, 2025 dollars: equipment, upkeep and the normal-year grid bill",
     E1.money(R.saving) + " below the grid-only bill", "powered for all 72 hours of the storm (" + E1.kilo(C.crit(R.outages[0])) + " kWh short)", "0 kWh short for a storm of 1 to 3 days, but " + E1.kilo(d4.crit) + " kWh on a fourth day, the plan held fixed",
     "The storm's " + E1.kilo(R.outages[0].fuel) + " gallons of diesel (" + E1.fuelMoney(R.outages[0].fuel * cfg.fuel.price) + ") are extra", (R.outages[0].co2 / 1000).toFixed(1) + " t of CO₂ from the storm's diesel; " + E1.kilo(R.year.co2) + " t from a normal year's grid electricity",
-    "A co-op would pay " + E1.money(pc) + " a year for the same plan, a utility " + E1.money(pu), "Community ownership costs " + E1.money(R.total - pc) + " a year more than a co-op"].forEach(s =>
+    "A co-op would pay " + E1.money(pc) + " a year for the same plan, a utility " + E1.money(pu), "it costs " + E1.money(R.total - pc) + " a year more than a co-op"].forEach(s =>
     ok(good.indexOf(s) >= 0, "the strong note quotes the engine: " + s));
   ["Recommendation:", "Cost:", "Sensitivity:", "Emissions:", "Assumptions:", "Owner:", "Limits:"].forEach(f => ok(good.indexOf(f) >= 0, "the strong note is a complete short note: " + f + " (C1 7)"));
-  ok(exo.lines === true && good.split("\n").every(l => l.split(/\s+/).length <= 50), "the strong note: one field a line, each short (C1 9): " + good.split("\n").map(l => l.split(/\s+/).length).join(", ") + " words");
+  ok(exo.lines === true && good.split("\n").every(l => l.split(/\s+/).length <= 35), "the strong note: one field a line, each within 35 words (C1 9): " + good.split("\n").map(l => l.split(/\s+/).length).join(", ") + " words");
   ok(/another plan or owner is just as strong/.test(exo.note), "the exemplars accept other plans and owners when supported (C1 7)");
   ok(C.crit(R.outages[0]) < 0.5 && Ls.filter(x => x.days <= 3).every(x => x.crit < 0.5) && d4.crit > 0.5, "the sized plan carries the storm (0 kWh) and falls short on a fourth day (" + E1.kilo(d4.crit) + " kWh)");
   ok(pc < R.total && pu > R.total, "the same plan at 4% and 6% (" + E1.money(pc) + ", " + E1.money(pu) + ")");
