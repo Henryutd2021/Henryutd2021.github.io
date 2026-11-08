@@ -98,6 +98,16 @@ for (let a = 0; a < 24; a++) for (let b = 0; b < 24; b++) {
 }
 ok(M.statusLines(cross)[0] === "Out of 22:00–23:00: the peaker runs 4 MWh less and the combined-cycle plant runs 6 MWh less." && M.statusLines(cross)[1] === "Into 14:00–15:00: 10 MWh of otherwise spilled wind and sun.", "status names each plant's change in the moved hours");
 ok(M.move(W, 5, 5, 10).same && M.move(W, 5, 5, 10).system === 0, "the same hour twice changes nothing");
+// two changes that round alike are not called equal: 00:00 to 03:00 moves attributed CO₂ by a few hundredths of a tonne, the plants' by nothing
+{ const r = M.move(W, 0, 3, 10), l = M.statusLines(r)[2];
+  ok(r.system === 0 && Math.abs(r.attributed) > 0.01 && M.tco2(r.attributed) === M.tco2(r.system) && !/agree/.test(l) && /never make\.<\/b> Both round to 0\.0 t here\./.test(l), "00:00 to 03:00: not called agreement (" + r.attributed.toFixed(4) + " t against 0): " + l);
+  let wrong = 0; for (let a = 0; a < 24; a++) for (let b = 0; b < 24; b++) { const x = M.move(W, a, b, 10); if (!x.same && /agree/.test(M.statusLines(x)[2]) !== (Math.abs(x.system - x.attributed) < 1e-6)) wrong++; }
+  ok(wrong === 0, "every pair of hours: 'agree' only when the two changes are equal, unrounded (" + wrong + " wrong)"); }
+// the controls' plant names are explained before the controls (live and no-JS); the readouts' word "re-dispatch" is gone
+ok(D.idea.terms.length === 2 && /\[\[marginal-plant\|plant on the margin\]\]/.test(D.idea.terms[0]) && /\[\[combined-cycle\|/.test(D.idea.terms[0]) && /\[\[peaker\|/.test(D.idea.terms[0]) && /\[\[curtailment\|spilled\]\]/.test(D.idea.terms[1]) && /I\.terms\.forEach\(function \(t\) \{ H\("p", \{ class: "lx-hint", html: LX\.rich\(t\) \}, stage\); \}\);\s*var ctl/.test(JS) && !/re-dispatch/.test(RAW + PAGE),
+  "plant on the margin, combined-cycle, peaker and spilled are glossary terms ahead of the controls");
+// the marginal factor is a difference over a small added demand, set in the toy by the plant that responds
+ok(/adding a small amount of demand in that hour, working out the total CO₂ again, and dividing its change by the energy added/.test(PAGE) && !/grows by one MWh/.test(PAGE) && /the change in the grid's CO₂ when use grows a little, ÷ that use; in the toy, the rate of the plant that responds/.test(PAGE), "the marginal factor is defined as a small-change difference, not one plant's rate in general");
 // the general rule the page states: into a spill hour (within the spill) never raises what the plants emit
 for (let a = 0; a < 24; a++) spillH.forEach(b => { if (-W.gap[b] >= 10 && a !== b) ok(M.move(W, a, b, 10).system <= 1e-9, "into spare sun at " + b + " from " + a + " never raises CO2"); });
 
@@ -198,14 +208,13 @@ const NOT_RESEARCH = [
   [/^\d · [A-Z][a-z ,]+$/, "part label"],
   [/^Question type: descriptive \(how much\?\), with a prescriptive part \(which strategy suits which grid\?\)\.$/, "course label (the course's question types)"],
   [/^(Grid electricity is cleaner in some hours than in others\.|If some electricity use moves into the cleaner hours, without using less in total, how much CO₂ does that save\?)$/, "the puzzle: a general idea; no study claim"],
-  [/^Words first: attributed emissions are a share of the grid's CO₂ assigned to a user; intensity is CO₂ per MWh; a window is the stretch of time within which use may move\.$/, "general definitions"],
+  [/^(Words first:|Attributed emissions: a share of the grid's CO₂ assigned to a user\.|Intensity: CO₂ per MWh\.|Window: the stretch of time within which use may move\.)$/, "general definitions"],
   [/^From: Li et al\. \(2025\), Cell Reports Sustainability\.$/, "provenance label"],
   [/^From Li et al\. \(2025\), Cell Reports Sustainability\.$/, "provenance label"],
-  [/^Every result about the study is quoted from the published paper named in the sources\.$/, "provenance label"],
   [/^Prairie Town below is illustrative, on real hourly shapes\.$/, "provenance label (the toy)"],
   [/^Li et al\. \(2025\), Cell Reports Sustainability( 2, 100367)?( · published May 2025; data for 2023)?$/, "citation label"],
   [/^(The study in time|Where the result holds)$/, "heading"],
-  [/^(Paper published|Code released)$/, "timeline step label: the kind of output"],
+  [/^(Journal article \(this case\)|Code released)$/, "timeline step label: the kind of output"],
   [/^A separate example with stylized numbers, from the course author's open explainer: not the study's data or results\.$/, "provenance label (the explainer)"],
   [/^It counts each hour at its average intensity, so it shows attributed emissions only\.$/, "describes the explainer, not the study"],
   [/^(Run examples\/strategies\.py: it compares a month, a quarter and a year as the window on four synthetic regions\.|Which kind of grid gains most from a longer window\?)$/, "repository exercise on its synthetic examples, not the study"],
@@ -271,7 +280,8 @@ const GENERATED = new RegExp("<!-- (" + CF.prefix + "-[a-z]+):start[\\s\\S]*?<!-
 let REST = OWN.replace(GENERATED, " ");
 const cut = (re, optional) => { const m = REST.match(re); ok(!!m || optional, "page zone found: " + re); if (m) REST = REST.replace(m[0], " "); return m ? m[0] : ""; };
 strict("page, the case", elements(cut(/<div class="lx-case">[\s\S]*?\n<\/div>\n(?=<div class="lx-interactive")/)));
-strict("page, the case's data note", elements(cut(/<p class="lx-datanote"><span>Every result[\s\S]*?<\/p>/)));
+strict("page, the case's data note", elements(cut(/<p class="lx-datanote"><span>Prairie Town below is illustrative, on real hourly shapes\.<\/span><\/p>/)));
+ok(!/quoted from the published/.test(PAGE), "the data note claims no quotation: the excerpt carries its own source");
 strict("page, explainer no-JS steps", elements(cut(/<ol class="ex-fallback[\s\S]*?<\/ol>/, true)));
 const SRC = cut(/<div class="lx-card lx-sources">[\s\S]*?<\/div>/);
 // a paper cited with its title and DOI is checked against the publication list below; every other item is strict

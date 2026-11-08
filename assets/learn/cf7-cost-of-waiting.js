@@ -57,7 +57,7 @@
       "<table class=\"lx-facts\"><caption class=\"lx-hint\">Present values of a " + I.loadMW + " MW load's wait, other customers paying the utility's costs, no bridge power.</caption>" +
       "<thead><tr><th scope=\"col\">Wait</th><th scope=\"col\">Developer</th><th scope=\"col\">Other customers</th><th scope=\"col\">Society</th><th scope=\"col\">Developer per MW-month</th></tr></thead><tbody>" + rows + "</tbody></table>" +
       "<ul><li>At " + t0 + " months, a tariff that makes the waiting load pay all of the utility's costs moves " + musd(base.ratepayers) + " from other customers to the developer; the total stays " + musd(tar.total) + ".</li>" +
-      "<li>Bridge power for half the load saves the developer " + musd(base.developer - br.developer) + " and adds " + musd(br.society) + " of CO₂ damage above grid power, for society.</li></ul>";
+      "<li>Bridge power for half the load saves the developer " + musd(base.developer - br.developer) + "; its CO₂ above grid power for the same energy is " + musd(br.society) + " of damage, for society.</li></ul>";
   }
   var PARTS = [
     { key: "margin", label: "Lost margin", color: "var(--lx-accent)" },
@@ -74,7 +74,13 @@
     var rows = I.assumptions.map(function (a) { return "<tr><th scope=\"row\">" + a[0] + "</th><td>" + a[1] + "</td></tr>"; }).join("");
     return "<table class=\"lx-facts cf7-assume\"><caption class=\"lx-hint\">The toy's assumptions (illustrative)</caption><tbody>" + rows + "</tbody></table>" +
       "<p class=\"lx-hint\">Worked month: the lost margin is $" + I.marginPerMWMonth.toLocaleString("en-US") + " × " + I.loadMW + " MW = " + musd(m) + " a month. Over " + I.delays.start +
-      " months, discounted month by month, that is " + musd(m) + " × " + L.A.toFixed(2) + " = " + musd(L.dev.margin) + " today.</p>";
+      " months, discounted month by month, that is " + musd(m) + " × " + L.A.toFixed(2) + " = " + musd(L.dev.margin) + " today.</p>" + workedMore(I).map(function (t) { return "<p class=\"lx-hint\">" + t + "</p>"; }).join("");
+  }
+  // two more worked lines: bridge power's energy in a month, and the developer's cost per MW-month
+  function workedMore(I) {
+    var L = ledgers(I, I.delays.start, 0, false), half = I.bridgeShare * I.loadMW, mwh = half * I.hoursPerMonth;
+    return ["The load runs around the clock, so a month is " + I.hoursPerMonth + " hours: bridge power for " + half + " MW is " + half + " MW × " + I.hoursPerMonth + " h = " + mwh.toLocaleString("en-US") + " MWh a month, " + musd(mwh * I.bridgePremiumPerMWh) + " above grid power.",
+      "Per MW-month: " + musd(L.developer) + " ÷ " + I.loadMW + " MW ÷ " + I.delays.start + " months = " + kusd(L.dci) + " of the developer's cost."];
   }
   // each account and its parts, as text (the bars' text version)
   function accountLines(L) {
@@ -89,7 +95,7 @@
     var L = ledgers(I, tau, s, bridge), base = ledgers(I, tau, 0, false), out = [];
     out.push("A " + tau + "-month wait, in present value: developer <b>" + musd(L.developer) + "</b>, other customers <b>" + musd(L.ratepayers) + "</b>, society <b>" + musd(L.society) + "</b>.");
     if (s > 0) out.push("The tariff moves " + musd(s * base.ratepayers) + " from other customers to the developer; it does not shrink the cost.");
-    if (bridge) out.push("Bridge power saves the developer " + musd(ledgers(I, tau, s, false).developer - L.developer) + " and adds " + musd(L.society) + " of CO₂ damage above grid power.");
+    if (bridge) out.push("Bridge power saves the developer " + musd(ledgers(I, tau, s, false).developer - L.developer) + "; its CO₂ above grid power is " + musd(L.society) + " of damage.");
     if (!s && !bridge) out.push("Try the tariff, then bridge power: watch which account each one changes.");
     return out;
   }
@@ -105,7 +111,7 @@
       "<p class=\"lx-hint\">" + rich(b.source) + "</p>";
   }
   var model = { monthly: monthly, annuity: annuity, ledgers: ledgers, musd: musd, kusd: kusd, pct: pct, SHARE_LABEL: SHARE_LABEL, PARTS: PARTS,
-                staticAssume: staticAssume, accountLines: accountLines, statusLines: statusLines, staticIdea: staticIdea, staticBoundary: staticBoundary };
+                staticAssume: staticAssume, workedMore: workedMore, accountLines: accountLines, statusLines: statusLines, staticIdea: staticIdea, staticBoundary: staticBoundary };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
