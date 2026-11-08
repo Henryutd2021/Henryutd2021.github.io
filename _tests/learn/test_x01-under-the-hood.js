@@ -1,14 +1,19 @@
 // test_x01-under-the-hood.js — Node tests for side topic X1 (assets/learn/x01-under-the-hood.js, its data file and the
 // page learn/x01-under-the-hood.qmd):
 //   - every number is read from the lesson that teaches it (F4, F5, A16, lesson 13, Prairie Town), never retyped: the
-//     lesson's data file holds words only, and the script no value; each efficiency recomputed as 3,412 Btu ÷ heat rate
+//     lesson's data file holds words only, and the script no value; each efficiency recomputed as 3,412 Btu ÷ heat rate.
+//     The page loads x01-inputs.json, the projection of only the fields X1 reads, which this test writes (--write) and
+//     checks against those files; the page never loads lesson 13's or Prairie Town's whole file
 //   - the eight components each have a discipline, two questions, the kinds of number models borrow (from the six
 //     kinds), a course number with a dated source and lessons; the sort's bins agree with its reasons
 //   - the nuclear scope rule, field by field: every string that names a reactor or nuclear term carries none of the
 //     scope scan's risk terms (cost change, credit, threshold, siting, timing, order, buyer, data center, ...); no design or
 //     vendor name
 //   - the no-JS block, ideas, stop box, check, facts and sources equal what the model writes (--write)
-//   - scope: no "AI", links on the allow-list, books cited by name only
+//   - scope: no "AI", links on the allow-list, books cited by name only; the deny-list and the nuclear-plus-risk sentence
+//     rule over every string of every file the page loads (its own data, the projection, the course map)
+//   - depth (a side topic at awareness level): the check asks no arithmetic; the Go deeper box names where each number
+//     goes next, without a formulation
 //   - text budget of the step cards, reveals and the page's prose
 // Usage (from the site folder):  node _tests/learn/test_x01-under-the-hood.js [--write]
 "use strict";
@@ -28,6 +33,12 @@ const CODE = JS.replace(/\/\/[^\n]*/g, "");
 const SIDE = fs.readFileSync(path.join(SITE, "learn/_w1/" + ID + ".yml"), "utf8");
 const QPATH = path.join(SITE, "learn", ID + ".qmd");
 const PATHJSON = d("path");
+// the projection the page loads (the page does not load lesson 13's, A16's or Prairie Town's whole file)
+const PJ_PATH = L_("data/x01-inputs.json");
+const PJ = Object.assign({ about: "The inputs side topic X1 reads, taken from f04-power-plants.json, f05-nuclear-basics.json, 13-capstone.json, a16-hydrogen-ptx.json and town.json (only the fields it uses). Those files hold the sources and dates." },
+  M.projectInputs({ F4: I.F4, F5: I.F5, C13: I.C13, A16: I.A16, T: I.T }));
+const PJ_TEXT = JSON.stringify(PJ, null, 1) + "\n";
+if (process.argv.includes("--write")) { fs.writeFileSync(PJ_PATH, PJ_TEXT); console.log("written: assets/learn/data/x01-inputs.json"); }
 let checks = 0, fails = 0;
 function ok(c, msg) { checks++; if (!c) { fails++; console.log("FAIL:", msg); } }
 const near = (a, b, t) => Math.abs(a - b) <= (t == null ? 1e-9 : t);
@@ -47,6 +58,13 @@ if (process.argv.includes("--write")) {
   console.log("blocks written: " + Object.keys(BLOCKS).join(", "));
 }
 const PAGE = fs.readFileSync(QPATH, "utf8");
+ok(fs.existsSync(PJ_PATH) && fs.readFileSync(PJ_PATH, "utf8") === PJ_TEXT, "x01-inputs.json equals the projection of the five lessons' files (run with --write)");
+const LOADED = ((PAGE.match(/data-learn="x01" data-src="([^"]+)"/) || [])[1] || "").split(" ");
+ok(LOADED.join(" ") === "../assets/learn/data/x01-under-the-hood.json ../assets/learn/data/x01-inputs.json ../assets/learn/data/path.json", "the page loads only its own data, the projection and the course map (" + LOADED.join(" ") + ")");
+{ const Ip = M.inputs({ x01_under_the_hood: X, x01_inputs: JSON.parse(fs.readFileSync(PJ_PATH, "utf8")) }), Np = M.numbers(Ip), Nf = M.numbers(I);
+  ok(JSON.stringify(Np) === JSON.stringify(Nf) && M.staticFallback(Ip) === M.staticFallback(I) && M.factsHTML(Ip) === M.factsHTML(I) && M.sourcesHTML(Ip) === M.sourcesHTML(I), "every number and block from the projection equals the one from the full files"); }
+{ const keys = []; (function walk(o) { if (o && typeof o === "object") Object.keys(o).forEach(k => { keys.push(k); walk(o[k]); }); })(PJ);
+  ok(!keys.some(k => /cost|capex|fom|price|note/i.test(k)) && Object.keys(PJ.T.fleet).join() === "cc" && Object.keys(PJ.C13.techs.battery).join() === "rte,life", "the projection carries no cost, price or note field, and of Prairie Town only the combined-cycle plant (" + keys.filter(k => /cost|capex|fom|price|note/i.test(k)).join() + ")"); }
 Object.keys(BLOCKS).forEach(k => { const r = between(PAGE, k); ok(PAGE.slice(r.from, r.to) === BLOCKS[k]() + "\n", k + " block is up to date (run with --write)"); });
 const OWN = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?<!-- learn:\1:end -->/g, "");
 
@@ -94,7 +112,22 @@ X.sort.cards.forEach(c => ok(X.sort.bins.some(b => b.id === c.bin) && (c.bin ===
 ok(X.sort.cards.filter(c => c.bin === "borrow").length === 4, "four borrowed, four kept");
 ok(X.cyber.answer === "b" && /apply only to bulk electric system cyber systems/.test(X.sources["nerc-sites"].text) && /not applicable to systems or assets connected to the distribution system/.test(X.sources["nerc-sites"].text), "the cyber answer follows NERC's own words (December 2022, p. 2)");
 ok(Object.values(X.cyber.feedback).every(f => /bulk electric system/.test(f)), "every cyber feedback states the rule");
-{ const html = M.checkHTML(I), e = 100 * btu / 7535; ok(html.indexOf("About " + Math.round(e) + "%") > 0 && html.indexOf(M.fmtN(e / 100, 3)) > 0 && /data-answer="b"/.test(html), "the efficiency question: 3,412 ÷ 7,535 = 0.453, about 45%"); }
+{ const html = M.checkHTML(I), q = html.slice(html.indexOf('data-id="kind"'));
+  ok(/data-id="kind" data-answer="b"/.test(html) && /<li data-value="b">Minimum load<\/li>/.test(q) && /<li data-value="a">Rating<\/li>/.test(q) && /<li data-value="c">Ramp limit<\/li>/.test(q), "the second check matches a device's limit to its kind: minimum load");
+  ok(!/÷|×|share of the fuel|About \d+%/.test(html), "the check asks no arithmetic (a side topic at awareness level; the heat-rate calculation is F4's)"); }
+// the numbers that describe a whole plant say so, under the component that helps set them
+ok(/^whole-plant/.test(N.combustor[0].label) && /^whole-plant/.test(N.combustor[1].label) && /^whole-plant/.test(N.core[1].label) && /a whole-plant value the turbines and cooling shape too/.test(N.combustor[0].what) && /a whole-plant value the turbine and cooling shape too/.test(N.core[1].what), "heat rates and the ramp limit are labelled whole-plant values");
+ok(/^Whole-plant numbers it helps set/.test(M.comp(X, "combustor").text) && /^Whole-plant numbers it helps set/.test(M.comp(X, "core").text), "the combustor and core cards name the whole-plant boundary");
+ok(/^Output per input, like a round trip; or input per output, like a heat rate or kWh per kilogram \(lower is better\)\.$/.test(M.kind(X, "efficiency").text), "efficiency: output per input, and heat rate or kWh per kilogram as input per output (lower is better)");
+ok(/^A16 assumes these lowest steady loads/.test(N.electrolyzer[1].what) && /IRENA's 2020 overview; real equipment varies\./.test(N.electrolyzer[1].what), "the electrolyzer's minimum loads are A16's assumption from a dated overview, not every device's");
+// terms explained or marked where they first appear
+ok(/\[\[grid-forming\|forms the grid\]\]/.test(M.comp(X, "inverter").text) && /\[\[power-curve\|power curve\]\] \(output at each wind speed\)/.test(M.comp(X, "blade").text), "grid-forming and the power curve are marked at first use");
+ok(/power curve \(output at each wind speed\)/.test(X.predict.options.filter(o => o.value === "b")[0].label), "the first prediction explains the power curve it asks about");
+ok(/catalyst \(the material that speeds the reaction\)/.test(X.sort.cards.filter(c => c.id === "cat")[0].text), "the catalyst card says what a catalyst is");
+ok(/\[\[bulk-power-system\|bulk power system\]\]/.test(N.control[0].what) && /data-term="bulk-power-system"/.test(M.ideasHTML(I)) && /- id: bulk-power-system/.test(SIDE), "the bulk power system is defined in the sidecar and marked where it first appears");
+// the Go deeper box names where each number goes next, without a formulation (a side topic at awareness level)
+{ const box = (PAGE.match(/Where each borrowed number is used next<\/summary>[\s\S]*?<\/details>/) || [""])[0];
+  ok(box && ["m01-dispatch-to-lmp", "m02-unit-commitment", "m04-storage-multienergy", "a05-adequacy"].every(h => box.indexOf(h + ".html") > 0) && !/lower bound|on or off|balance|chance|draws|price/.test(box), "the Go deeper box links where each number is used next, with no formulation"); }
 
 // ---------------- the nuclear scope rule, field by field (the scope scan's nuclear-plus-risk combination)
 const NUC = /nuclear|reactor|\bSMR\b|small modular/i;
@@ -109,6 +142,16 @@ let nucFields = 0;
 fields.forEach(f => S.plain(f).split(/(?<=[.?!;])\s+/).forEach(sent => { if (NUC.test(sent)) { nucFields++; if (RISK.test(sent)) ok(false, "nuclear scope: a nuclear term with a risk term: " + sent.slice(0, 90)); } }));
 ok(nucFields >= 3, "the scan saw the reactor fields (" + nucFields + " sentences)");
 { const core = JSON.stringify(M.comp(X, "core")) + JSON.stringify(N.core); ok(!RISK.test(core) && !/\$|cost|price|year of|vendor|AP1000|NuScale|BWRX|Xe-100|Natrium/i.test(core), "the reactor core card: physics, heat and materials only; no cost, timing or design names"); }
+// every string of every file the page loads: the deny-list and the nuclear-plus-risk rule, sentence by sentence
+{ const DENY = [/\bFOAK\b/i, /\bNOAK\b/i, /first[- ]of[- ]a[- ]kind/i, /nth[- ]of[- ]a[- ]kind/i, /learning[- ](curve|rate)/i, /order[- ]book/i, /anchor[- ](customer|buyer)/i, /subsidy[- ]free/i, /parity capital/i, /break[- ]even capital/i, /smr-dc/i, /smr-datacenter/i, /projects\//i, /research\.(html|qmd)/i, /\bAI\b/, /artificial intelligence/i];
+  const BENIGN = /merit[- ]order|orders? of magnitude|in order to/gi;
+  let n = 0;
+  LOADED.forEach(src => { const f = path.join(SITE, "assets/learn", src.replace("../assets/learn/", "")), strs = [], bad = [];
+    (function walk(o) { if (typeof o === "string") strs.push(o); else if (o && typeof o === "object") { Object.keys(o).forEach(k => strs.push(k)); Object.values(o).forEach(walk); } })(JSON.parse(fs.readFileSync(f, "utf8")));
+    strs.forEach(t => { DENY.forEach(r => { if (r.test(t)) bad.push(String(r) + " in " + t.slice(0, 60)); });
+      t.split(/(?<=[.?!;])\s+/).forEach(sent => { n++; const u = sent.replace(BENIGN, " "); if (NUC.test(u) && RISK.test(u)) bad.push("nuclear with risk: " + sent.slice(0, 90)); }); });
+    ok(bad.length === 0, src + ": no deny-listed term and no nuclear-plus-risk sentence (" + bad.join(" | ") + ")"); });
+  ok(n > 300, "the scope rule saw every string of the " + LOADED.length + " files the page loads (" + n + " sentences)"); }
 ok(!/\bAI\b|artificial intelligence/.test(PAGE + RAW + JS + SIDE), "no 'AI'");
 ok(!/projects\/|research\.html|smr-dc|field-notes/.test(PAGE + RAW + JS), "no project page, Research page or Field Notes link");
 ok(!/data[- ]cent/i.test(PAGE + RAW + JS), "no data-center term");
@@ -123,10 +166,10 @@ ok(["ratings", "efficiencies", "ramp limits", "outlet temperatures", "failure ra
 // ---------------- text budget
 const plain = S.plain, nWords = S.nWords, nSent = S.nSent;
 ok(M.STEPS.length === 5, "five step cards");
-M.STEPS.forEach((t, i) => { const n = nWords(t); ok(n >= 14 && n <= 40, "step " + (i + 1) + ": " + n + " words"); ok(nSent(t) <= 2, "step " + (i + 1) + ": " + nSent(t) + " sentences"); });
+M.STEPS.forEach((t, i) => { const n = nWords(t); ok(n >= 14 && n <= 35, "step " + (i + 1) + ": " + n + " words"); ok(nSent(t) <= 2, "step " + (i + 1) + ": " + nSent(t) + " sentences"); });
 const lines = [M.BOARD_SAW, M.SORT_SAW, M.KIND_SAW].concat(KINDS.map(k => M.kindLine(X, k)), Object.values(X.predict.feedback), Object.values(X.cyber.feedback), X.sort.cards.map(c => c.why),
   [].concat.apply([], X.components.map(c => c.qs.concat([c.text]))), [].concat.apply([], Object.values(N).map(l => l.map(n => n.what))));
-lines.forEach(t => { ok(nWords(t) <= 40, "a reveal of " + nWords(t) + " words: " + plain(t).slice(0, 60)); ok(nSent(t) <= 3, "a reveal of " + nSent(t) + " sentences: " + plain(t).slice(0, 60)); });
+lines.forEach(t => { ok(nWords(t) <= 38, "a reveal of " + nWords(t) + " words: " + plain(t).slice(0, 60)); ok(nSent(t) <= 2, "a reveal of " + nSent(t) + " sentences: " + plain(t).slice(0, 60)); });
 // the assembled card as it first shows (the discipline, one question, what models borrow) and each line under "More"
 // (the whole reveal was 68 to 83 words)
 X.components.forEach(c => { const P = M.cardParts(I, c.id), shown = [P.head, P.ask, P.borrow].join(" ");
@@ -136,13 +179,14 @@ X.components.forEach(c => { const P = M.cardParts(I, c.id), shown = [P.head, P.a
 ok(/if \(g\.placed < g\.total\) \{ api\.saw\(sortNote\(g\), true\); return; \}\s*api\.done\(\)/.test(JS), "the sort: Next waits until all eight cards are placed");
 ok(M.sortNote({ right: 0, placed: 0, total: 8 }) === "Place every card first: 8 still in the pool." && M.sortNote({ right: 7, placed: 8, total: 8 }) === "7 of 8 match.", "the sort's note: place every card first, then the score");
 const PROSE = OWN.replace(/^---[\s\S]*?\n---\n/, " ").replace(/<script[\s\S]*?<\/script>/g, " ").replace(/<style[\s\S]*?<\/style>/g, " ").replace(/<!-- x01-(sources|facts|fallback):start[\s\S]*?:end -->/g, " ").replace(/<!--[\s\S]*?-->/g, " ");
-PROSE.split(/<\/?(?:p|li|dd|dt|td|th|summary|br|caption|h3|h4)\b[^>]*>/).map(plain).filter(x => /[A-Za-z]/.test(x) && !/^[:{]/.test(x)).forEach(x => {
-  const n = nWords(x); ok(n <= 42, "text element of " + n + " words: " + x.slice(0, 70)); ok(nSent(x) <= 3, "text element of " + nSent(x) + " sentences: " + x.slice(0, 70)); });
+// (a reading ladder's rung label, "Start here.", is a label, not a sentence)
+PROSE.split(/<\/?(?:p|li|dd|dt|td|th|summary|br|caption|h3|h4)\b[^>]*>/).map(plain).map(x => x.replace(/^(Start here|Go further|Go deep)\.\s*/, "")).filter(x => /[A-Za-z]/.test(x) && !/^[:{]/.test(x)).forEach(x => {
+  const n = nWords(x); ok(n <= 38, "text element of " + n + " words: " + x.slice(0, 70)); ok(nSent(x) <= 2, "text element of " + nSent(x) + " sentences: " + x.slice(0, 70)); });
 
 // ---------------- controls
 ok(/aria-live/.test(JS) && (JS.match(/LX\.demo\(/g) || []).length === 1 && (JS.match(/demo\[\d\] = function/g) || []).length === 5, "live regions; a demo hook with an action for each of the five steps");
 ok(/class: "x1-tile", "aria-pressed"/.test(JS) && /role: "group", "aria-label": "Eight components"/.test(JS), "the components are buttons in a labelled group");
-ok(/glossary: \[\]/.test(SIDE), "the sidecar adds no glossary term (X1 uses the course's own)");
+ok((SIDE.match(/  - id: /g) || []).length === 1, "the sidecar adds one glossary term, the bulk power system");
 
 console.log((fails ? "FAILED " + fails + " of " : "ok: ") + checks + " checks (" + ID + ")");
 process.exit(fails ? 1 : 0);

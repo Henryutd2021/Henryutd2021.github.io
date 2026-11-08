@@ -3,7 +3,10 @@
 # hydraulics and materials only, with no design or vendor names.
 id: x01-under-the-hood
 lesson: X1
-glossary: []
+glossary:
+  - id: bulk-power-system
+    term: Bulk power system
+    def: "The large power plants and the high-voltage transmission network that carry electricity over long distances, as distinct from the local distribution grid."
 requests:
-  - "X1 reads f04-power-plants.json, f05-nuclear-basics.json, 13-capstone.json, a16-hydrogen-ptx.json and town.json; no change requested."
+  - "X1 reads only the fields it uses from f04-power-plants.json, f05-nuclear-basics.json, 13-capstone.json, a16-hydrogen-ptx.json and town.json, through x01-inputs.json (written and checked by its test); no change requested."
   - "The book list per discipline is cited by name without links or editions (publishers' sites are not on the allow-list)."
