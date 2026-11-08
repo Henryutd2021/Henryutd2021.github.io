@@ -183,13 +183,13 @@
    "id": "increment",
    "label": "The electrolyzer's increment",
    "short": "increment",
-   "note": "The same plant minus the wind farm on its own (selling what its connection takes): a with-and-without comparison."
+   "note": "New books, the same plant: the plant minus the wind farm on its own (selling what its connection takes), a with-and-without comparison."
   },
   {
    "id": "grid",
    "label": "Electrolyzer across the grid",
    "short": "across the grid",
-   "note": "The electrolyzer sits at the buyer and takes all its power from the grid; the wind farm sells to the grid on its own and its certificates go to the electrolyzer. Wind above the farm's 50 MW connection cannot reach it."
+   "note": "A new layout: the electrolyzer sits at the buyer, behind its own connection, and takes all its power from the grid, up to its size; the wind farm sells to the grid on its own and its certificates go to the electrolyzer. Wind above the farm's 50 MW connection cannot reach it."
   }
  ],
  "tie": {

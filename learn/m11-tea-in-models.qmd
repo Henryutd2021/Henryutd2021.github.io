@@ -42,7 +42,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 ```{=html}
 <div class="lx-interactive lx-cards" data-learn="m11-tea-in-models" data-src="../assets/learn/data/m11-tea-in-models.json ../assets/learn/data/a16-hydrogen-ptx.json ../assets/learn/data/town.json ../assets/learn/data/town_year.json ../assets/learn/data/cf_targets.json ../assets/learn/data/path.json">
 <div class="lx-fallback">
-<p class="lx-eyebrow">One wind-hydrogen plant, three boundaries: what the same LP concludes</p>
+<p class="lx-eyebrow">One wind farm, one hydrogen buyer, three boundaries: what the LP concludes</p>
 <table class="lx-facts m11-fb">
 <thead><tr><th scope="col">Boundary</th><th scope="col">Electrolyzer</th><th scope="col">NPV</th><th scope="col">Cost per kg</th><th scope="col">NPV with no credit</th></tr></thead>
 <tbody>
@@ -67,12 +67,12 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Illustrative plant and prices.</b> A new 100 MW wind farm behind a 50 MW connection, trading at Prairie Town's cost of one more MWh ($0, $40 or $100, <a href="09-storage.html">lesson 9</a>); a hydrogen buyer and a delivery charge you set. Real 2025 dollars.</span></p>
 <p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Real shapes, 36 days.</b> Wind and prices follow the Southwest Power Pool's 2025 hours (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), wind at EIA's 33.8% capacity factor. Three days per month stand for the year.</span></p>
 <p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Checked on the whole year.</b> The lesson's test re-runs the plans on all 8,760 hours of 2025: hydrogen within 4%, NPV within $4M.</span></p>
-<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Costs.</b> Electrolyzer: <a href="https://www.hydrogen.energy.gov/docs/hydrogenprogramlibraries/pdfs/24005-clean-hydrogen-production-cost-pem-electrolyzer.pdf">DOE Record 24005</a> (May 2024), $2,000 per kW in 2022 dollars, $2,184 per kW in 2025 dollars by <a href="https://apps.bea.gov/iTable/?reqid=19&amp;step=3&amp;isuri=1&amp;1921=survey&amp;1903=13&amp;1904=2022&amp;1905=2026&amp;1906=a&amp;1911=0">BEA's GDP deflator</a>; upkeep 5% a year; stack wear $6.01 per MWh. Wind farm, rate and life: <a href="13-capstone.html">lesson 13</a>.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Costs.</b> Electrolyzer: <a href="https://www.hydrogen.energy.gov/docs/hydrogenprogramlibraries/pdfs/24005-clean-hydrogen-production-cost-pem-electrolyzer.pdf">DOE Record 24005</a> (May 2024), $2,000 per kW in 2022 dollars, $2,184 per kW in 2025 dollars by <a href="https://apps.bea.gov/iTable/?reqid=19&amp;step=3&amp;isuri=1&amp;1921=survey&amp;1903=13&amp;1904=2022&amp;1905=2026&amp;1906=a&amp;1911=0">BEA's GDP deflator</a>; upkeep 5% a year; <span class="lx-term" data-term="electrolyzer-stack">stack</span> wear $6.01 per MWh. Wind farm, rate and life: <a href="13-capstone.html">lesson 13</a>.</span></p>
 <p class="lx-hint" style="margin-top:.6rem">About 40 guided minutes in nine steps. Solver: <a href="https://ergo-code.github.io/HiGHS/">HiGHS</a> (open source), loaded on your first solve (about 3.5 MB, once).</p>
 <div class="lx-card lx-notebook m11-nb">
 <p class="lx-eyebrow">Build it in Python · notebook lab, about 45 minutes, then 90 minutes of practice</p>
 <p>The same LP in <code>scipy.optimize.linprog(method="highs")</code>: the representative days, the capital recovery factor, the credit's two periods and the tiers. <code>assert</code> cells check your sizes, hydrogen, NPVs, costs per kg and credit per kg against the lesson's reference block.</p>
-<p class="lx-hint">Hourly schedules are printed, not asserted: other plans of the same value can run some hours differently.</p>
+<p class="lx-hint">One representative day's hours are printed, not asserted: other plans of the same value can run some hours differently.</p>
 <ol class="m11-nb-steps">
 <li>Download the notebook and the five data files into one folder (in Colab, upload them with the folder icon).</li>
 <li>Open it in Google Colab (<em>File → Upload notebook</em>) or locally with Python 3, NumPy and SciPy 1.9 or later.</li>
@@ -104,7 +104,8 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <dt>A credit in its own years</dt><dd>$3.185 per kg for 10 of 30 years is worth about $1.24/kg over the life: 3.185 × 0.388, the credit years' 38.8% of the discounted kilograms.</dd>
 <dt>Why 38.8%, not 47%</dt><dd>The credit years are 47% of the discounted years, but the plant makes 4.96 million kg a year under the tier's cap and 6.91 million after it, when it buys more grid power.</dd>
 <dt>A step rule as a set of LPs</dt><dd>One LP per emissions tier, each with a cap on counted grid CO₂ per kg; the top tier wins here, at 46.2 MW.</dd>
-<dt>The boundary is part of the answer</dt><dd>The same plant is worth $46.4M as one plant, $121.2M as the electrolyzer's increment, and $63.2M across the grid.</dd>
+<dt>New books, same plant</dt><dd>One plant or the electrolyzer's increment: the same 46.2 MW plan, worth $46.4M or $121.2M. The increment leaves out the wind farm on its own, worth −$74.8M.</dd>
+<dt>A new layout, a new plan</dt><dd>Across the grid the electrolyzer buys every MWh and pays the charge: 40.1 MW, worth $63.2M against the same wind farm alone, where the increment is worth $121.2M.</dd>
 </dl>
 </div>
 </div>
@@ -123,7 +124,8 @@ $$\min\; (\mathit{CRF} + f)\, c\, S \;+\; \sum_p \varphi_p \sum_{d,t} n_d \Big[ 
 
 $$
 \begin{aligned}
-\mathit{dw} + \mathit{exp} &\le w_t, \quad \mathit{ez} = \mathit{dw} + \mathit{imp} \le S, \quad \mathit{exp}, \mathit{imp} \le 50 && \text{(each hour)}\\
+\mathit{dw} + \mathit{exp} &\le w_t, \quad \mathit{ez} = \mathit{dw} + \mathit{imp} \le S, \quad \mathit{exp}, \mathit{imp} \le 50 && \text{(each hour, behind the meter)}\\
+\mathit{dw} = \mathit{exp} &= 0, \quad \mathit{ez} = \mathit{imp} \le S && \text{(each hour, across the grid)}\\
 \textstyle\sum_{d,t} n_d \big(e\, u - L\, k\, \mathit{ez} / 1000\big) &\le 0, \quad u \ge \mathit{imp} - \mathit{exp}, \quad u \ge 0 && \text{(a tier, period 1)}\\
 \mathit{dw}, \mathit{exp}, \mathit{imp} &\ge 0, \quad 0 \le S \le 100 && \text{(bounds)}\\
 \varphi_1 = \mathit{AF}(r, 10) / \mathit{AF}(r, N), &\quad \varphi_2 = 1 - \varphi_1, \quad \mathit{CRF} = 1 / \mathit{AF}(r, N) && \text{(weights)}
@@ -146,6 +148,7 @@ $$
 | $\mathit{AF}(r, N)$ | annuity factor, $(1 - (1+r)^{-N}) / r$ | years |
 
 - **Bounds matter.** Every power variable is $\ge 0$. Without $u \ge 0$, a negative $u$ in an hour that sells would cancel power bought in another hour: annual matching, not hourly.
+- **Two connections.** Behind the plant's meter, power bought and sold share the wind farm's 50 MW connection. Across the grid, the electrolyzer has its own connection at the buyer and buys all its power, up to $S$.
 - **Two periods, one size.** Period 1 is the credit's 10 years, period 2 the rest of the life; both run on the same 36 days and share $S$.
 - **Counting rules.** No certificates: $u = \mathit{imp}$. Annual matching: the cap counts the year's $\sum n_d (\mathit{imp} - \mathit{exp})$ in one row; it may go below zero there, because the right side never does. Across the grid, $\mathit{exp}$ is the wind farm's own sales.
 - **Behind one meter**, the plant never buys and sells in the same hour (the tie rule), so hourly matching counts every MWh bought, as no certificates do: the page's LP leaves $u$ out there.
@@ -161,8 +164,10 @@ $$
 
 - **A step is not linear.** The credit jumps from $0.635 to $3.185 per kg as the rate crosses limits; no single LP can hold the jump.
 - **Enumerate the steps.** Each tier fixes the amount and adds one linear cap; five LPs (no credit, four tiers). The largest value wins; of the cases within $1 a year of it, the one listed first.
-- **Bound, then skip.** Without its cap, a case's hours are independent once the size is set, so its best value takes a few lines of arithmetic, not an LP. That is a bound. A case needs no LP when its bound falls more than $1 a year short of the best LP so far, or is no better than a case listed before it and already solved, which wins the tie (here, 4 of 5 skipped).
-- **The alternative.** A [mixed-integer program]{.lx-term term="mixed-integer-program"} with one binary per tier picks the tier itself ([M2](m02-unit-commitment.html)); it gives no shadow prices, which come only from LPs.
+- **Caps from above only.** A case's plan can be cleaner than its tier and earn less than it could. Such a case never wins: the cleaner tier's LP holds the same plan and pays more.
+- **A bound without an LP.** With its cap removed, a case's hours are independent once the size is set: a few lines of arithmetic give its best value, a bound on the capped case.
+- **Skip what cannot win.** A case needs no LP when its bound is more than $2 a year below the best LP so far ($1 for the tie, $1 for rounding), or no better than an earlier-listed solved case, which wins the tie (here, 4 of 5 skipped).
+- **The alternative.** A [mixed-integer program]{.lx-term term="mixed-integer-program"} with one binary per tier picks the tier itself ([M2](m02-unit-commitment.html)). Its solve gives no LP [shadow prices]{.lx-term term="shadow-price"} directly; fixing its binaries and solving the LP that is left gives conditional ones.
 - **What it is not.** The amounts are the law's; the lesson never varies them.
 
 ```{=html}

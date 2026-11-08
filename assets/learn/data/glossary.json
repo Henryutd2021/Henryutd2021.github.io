@@ -1037,6 +1037,12 @@
   "lesson": "CF2",
   "href": "cf2-cost-per-kg-vs-system-cost.html"
  },
+ "electrolyzer-stack": {
+  "term": "Electrolyzer stack",
+  "short": "The stack of cells inside an electrolyzer where electricity splits water into hydrogen and oxygen; it wears with use and is replaced several times over a plant's life.",
+  "lesson": "M11",
+  "href": "m11-tea-in-models.html"
+ },
  "emission-factor": {
   "term": "Emission factor",
   "short": "The average mass of a pollutant released per unit of fuel burned or of output, such as kilograms of SO₂ per tonne of coal, taken from measurements.",
