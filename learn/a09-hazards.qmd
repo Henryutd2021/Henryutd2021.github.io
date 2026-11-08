@@ -43,7 +43,11 @@ body-classes: "page-learn page-lesson lx-form-cards"
 .a9-static th { font-family: var(--lx-f-display); font-weight: 500; font-size: 12.5px; color: var(--lx-ink-2); }
 .a9-static td { font-family: var(--lx-f-mono); }
 .a9-static td:first-child { text-align: left; font-family: var(--lx-f-body); }
-.a9-tables { overflow-x: auto; }
+.a9-tables { overflow-x: auto; display: grid; gap: 10px; }
+.a9-static.a9-words td { text-align: left; font-family: var(--lx-f-body); }
+.a9-static.a9-words td:nth-child(3) { min-width: 16em; }
+.a9-static.a9-q { margin: 6px 0 8px; }
+.a9-prep { margin: 0; padding-left: 1.2rem; display: grid; gap: 4px; }
 .page-learn .lx-datanote ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 2px; }
 .page-learn .lx-datanote li { margin: 0; }
 </style>
@@ -58,8 +62,8 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <li>A heat wave raises demand; a drought warms or starves cooling water; a cold snap raises demand, freezes plants and cuts gas; wildfire shutoffs switch lines off.</li>
 <li>In Winter Storm Uri (February 2021) units of every kind failed: 58% of the 1,045 affected units were gas, 27% wind and 6% coal.</li>
 <li>Unserved energy rises from 108 MWh a year with no hazard to 5,802 MWh in a cold-snap year (table below).</li>
-<li>A heat wave and a drought together add 1,541 MWh a year, 2.6 times the 591 MWh of the two alone.</li>
-<li>Within $60M a year, winterizing, hardening lines and demand response together leave the least unserved energy across the four hazard years: 686 MWh.</li>
+<li>Above the no-hazard years, a heat wave and a drought together add 1,541 MWh a year, 2.6 times the 591 MWh the two add alone.</li>
+<li>Within $60M a year, winterizing, hardening lines and demand response leave the least shortfall for connected customers, summed over the four hazard years: 686 MWh. Shutoffs count apart; the sum is not a yearly risk.</li>
 </ol>
 <div class="a9-tables">
 <!-- a9-table:start (written by _tests/learn/test_a09-hazards.js --write; do not edit) -->
@@ -73,6 +77,32 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <tr><td>Wildfire shutoffs</td><td>1 to 21 August, 12:00 to 20:00</td><td>0.556</td><td>230</td><td>51</td><td>28,871 → 11,548</td></tr>
 </tbody></table>
 <!-- a9-table:end -->
+<!-- a9-more:start (written by _tests/learn/test_a09-hazards.js --write; do not edit) -->
+<table class="a9-static a9-words" aria-label="The four hazards as this lesson models them (illustrative)">
+<thead><tr><th scope="col">Hazard</th><th scope="col">When</th><th scope="col">What it does here</th></tr></thead>
+<tbody>
+<tr><td>Heat wave</td><td>15 July to 14 August</td><td>Demand 7% higher; gas units lose 5% of their output in the heat.</td></tr>
+<tr><td>Drought</td><td>July to September</td><td>Coal and combined-cycle units lose 15% of their output: cooling water too warm or too scarce.</td></tr>
+<tr><td>Cold snap</td><td>14 to 20 January</td><td>Demand 12% higher; gas units lose 30% to frozen equipment and fuel, coal 10%, wind 30% to icing.</td></tr>
+<tr><td>Wildfire shutoffs</td><td>1 to 21 August, 12:00 to 20:00</td><td>A line is switched off in high wind: a third of the wind output and a quarter of the available combined-cycle output are cut off, and 5% of demand loses power directly.</td></tr>
+</tbody></table>
+<table class="a9-static a9-words" aria-label="The five defences, with illustrative yearly costs in millions of 2025 dollars">
+<thead><tr><th scope="col">Defence</th><th scope="col">Yearly cost</th><th scope="col">What it does here</th></tr></thead>
+<tbody>
+<tr><td>Winterize plants and wind turbines, secure dependable gas supply</td><td>$25M</td><td>Cold-snap losses of gas, coal and wind output cut to a third (gas 30% to 10%).</td></tr>
+<tr><td>Cooling upgrades</td><td>$30M</td><td>Drought losses cut to a third, heat-wave losses of units halved.</td></tr>
+<tr><td>Harden lines, narrower shutoffs</td><td>$20M</td><td>Shutoffs cut 40% as much supply and as much demand.</td></tr>
+<tr><td>500 MW 4-hour battery</td><td>$55M</td><td>Charges from any surplus, covers shortfalls (lesson A5's battery).</td></tr>
+<tr><td>500 MW demand response</td><td>$15M</td><td>Agreed load cuts on call, at most 4 hours a day, with no rebound later (lesson A5's program).</td></tr>
+</tbody></table>
+<p class="lx-hint">How planners prepared after Uri and Elliott:</p>
+<ol class="a9-prep">
+<li><b>November 2021, FERC–NERC report on Uri:</b> Finds that freezing and fuel problems caused 75.6% of the units' outages, derates and failures to start. (<a href="https://www.ferc.gov/sites/default/files/2021-11/Cold%20Weather%20Report_%20November%202021.pdf">FERC–NERC report, November 2021</a>)</li>
+<li><b>1 January 2022, ERCOT's offer cap lowered:</b> The high system-wide offer cap falls from $9,000 to $5,000 per MWh. (<a href="https://ercot.com/services/comm/mkt_notices/M-A120721-01">ERCOT market notice M-A120721-01 (7 December 2021)</a>)</li>
+<li><b>October 2023, FERC–NERC report on Elliott:</b> Freezing and fuel problems again cause most of the outages. (<a href="https://www.ferc.gov/sites/default/files/2024-02/24_Winter-Storm_Elliot_0207_UPDATE.pdf">FERC–NERC Elliott report, October 2023</a>)</li>
+<li><b>1 October 2025, Cold-weather standard EOP-012-3 in force:</b> Each generator owner must have and carry out plans to keep its units running in extreme cold. (<a href="https://www.nerc.com/globalassets/standards/approved-standards/eop/eop-012-3.pdf">NERC Reliability Standard EOP-012-3, purpose A.3; approved by FERC on 18 September 2025</a>)</li>
+</ol>
+<!-- a9-more:end -->
 </div>
 <p class="lx-hint">With JavaScript on, you sort what each hazard hits, run each hazard and pairs through the simulator, and choose defences yourself.</p>
 </div>
@@ -81,6 +111,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <li>Stress tests, not forecasts: each hazard strikes in every one of <a href="a05-adequacy.html">A5</a>'s 500 resampled years, so a result reads "in a year when it strikes".</li>
 <li>The hazards' dates and sizes, and the defences' effects and yearly costs, are illustrative; the real events quoted come from the primary reports named with them.</li>
 <li>Supply measures (LOLE, unserved energy) count shortfalls for the customers still connected. Customers on switched-off lines lose power whatever the supply; that energy is counted on its own.</li>
+<li>Demand response is agreed load cuts, with no rebound later; those cuts are not counted as unserved energy.</li>
 <li>Left out: the network inside the grid, imports, repair crews, and how often each hazard strikes.</li>
 </ul></div>
 <p class="lx-hint" style="margin-top:10px">Need a refresher? <a href="f06-grid-and-outages.html">F6</a> (the grid and outages) and <a href="a05-adequacy.html">A5</a> (adequacy and accreditation).</p>
@@ -99,7 +130,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <dt>Correlated failure</dt><dd>Many units failing together from one cause, such as cold, which independent outages miss.</dd>
 <dt>Compound hazard</dt><dd>Two hazards at once; together they can do more harm than each alone added up.</dd>
 <dt>Stress test</dt><dd>A grid run through a hazard on purpose, to see what breaks and what a defence buys.</dd>
-<dt>Defence</dt><dd>A measure that eases one hazard or several: winterizing, cooling upgrades, hardened lines, storage, flexible demand.</dd>
+<dt>Defence</dt><dd>A measure that eases one hazard or several: winterizing, cooling upgrades, hardened lines, storage, demand response.</dd>
 </dl>
 </div>
 </div>
@@ -150,7 +181,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-qq" data-id="add" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “Two hazards at once do the harm of each one added up.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth, here. A heat wave and a drought together added 2.6 times the unserved energy of the two alone: both squeeze the same summer evenings.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth, here. Above the no-hazard years, a heat wave and a drought together added 2.6 times the unserved energy the two add alone: both squeeze the same summer evenings.</p></details>
 </div>
 <div class="lx-qq" data-id="shutoff" data-answer="fact">
 <p class="lx-qtext">Myth or fact? “Wildfire shutoffs can cut far more customers' energy than the supply shortfall they cause.”</p>
@@ -166,7 +197,8 @@ body-classes: "page-learn page-lesson lx-form-cards"
 
 <div class="lx-quiz" data-quiz="a9">
 <div class="lx-qq" data-id="ratio" data-answer="b">
-<p class="lx-qtext">With no hazard, 108 MWh a year go unserved; with a heat wave 451, with a drought 357, with both 1,649. Subtract the no-hazard 108 from each: the increase with both is how many times the sum of the two separate increases?</p>
+<p class="lx-qtext">Subtract the no-hazard year from each: how many times the two separate increases, summed, is the increase with both?</p>
+<table class="a9-static a9-q" aria-label="Unserved energy, MWh a year"><thead><tr><th scope="col">Year with</th><th scope="col">Unserved energy (MWh a year)</th></tr></thead><tbody><tr><td>No hazard</td><td>108</td></tr><tr><td>Heat wave</td><td>451</td></tr><tr><td>Drought</td><td>357</td></tr><tr><td>Both</td><td>1,649</td></tr></tbody></table>
 <ul class="lx-choices"><li data-value="a">1.0 times</li><li data-value="b">2.6 times</li><li data-value="c">1.9 times</li><li data-value="d">0.5 times</li></ul>
 <details class="lx-answer"><summary>Answer</summary><p>(1,649 − 108) ÷ ((451 − 108) + (357 − 108)) = 1,541 ÷ 592 ≈ 2.6 times (from the rounded numbers).</p></details>
 </div>

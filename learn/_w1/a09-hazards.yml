@@ -13,7 +13,7 @@ glossary:
     def: "A utility switching off power lines in dry, windy weather so that they cannot start a fire; the customers on those lines lose power."
   - id: winterization
     term: Winterization
-    def: "Protecting power plants and fuel supply against freezing, with insulation, heat tracing, enclosures and cold-weather procedures."
+    def: "Protecting power plants and fuel supply against freezing, with insulation, electric heaters on exposed pipes (heat tracing), enclosures and cold-weather procedures."
   - id: stress-test
     term: Stress test
     def: "Running a system model through a severe event on purpose, to see what breaks and what a defence would change."

@@ -144,13 +144,15 @@
             ph.innerHTML = "";
             var P1 = LX.Plot(ph, { box: true, text: "Text version of the year" }), ticks = [], tN = [], s0 = 0;
             MD.forEach(function (d, m) { ticks.push([s0, MONTHS[m]]); if (m % 3 === 0) tN.push([s0, MONTHS[m]]); s0 += d; });
-            P1.render({ x: { min: 0, max: DAYS, ticks: ticks, ticksN: tN }, y: { min: -1000, max: 3000, step: 1000, fmt: function (v) { return v.toLocaleString("en-US").replace("-", "−"); }, unit: "MW" },
+            // the axis holds every day's value (whole thousands of MW, zero always inside), so no part of the line is cut
+            var lo = Math.min(-1000, Math.floor(Math.min.apply(null, dl.map(function (x) { return x.min; })) / 1000) * 1000), hi = Math.max(1000, Math.ceil(Math.max.apply(null, dl.map(function (x) { return x.min; })) / 1000) * 1000);
+            P1.render({ x: { min: 0, max: DAYS, ticks: ticks, ticksN: tN }, y: { min: lo, max: hi, step: 1000, fmt: function (v) { return v.toLocaleString("en-US").replace("-", "−"); }, unit: "MW" },
               lines: [{ values: dl.map(function (x) { return x.min; }), x0: 0.5, color: "var(--lx-accent)", width: 1.6 }],
               refs: [{ y: 0, label: "Short below this line", labelN: "Short", dash: "5 4" }],
-              marks: dl.filter(function (x) { return x.min < 0; }).slice(0, 6).map(function (x) { return { x: x.day + 0.5, y: Math.max(-1000, x.min), kind: "dot", label: "" }; }),
+              marks: dl.filter(function (x) { return x.min < 0; }).slice(0, 6).map(function (x) { return { x: x.day + 0.5, y: x.min, kind: "dot", label: "" }; }),
               aria: "Simulated year " + (n + 1) + ": the spare MW in the tightest hour of each day; " + short + " days below zero.",
-              text: { head: ["Day", "Spare MW in its tightest hour", "Hour starting (standard time)"], note: "Spare = available units + wind + sun − demand. Below zero is a shortfall.",
-                rows: dl.filter(function (x) { return x.min < 300; }).map(function (x) { return [dateOf(x.day), int(x.min).replace("-", "−"), hourLabel(x.hour)]; }) } });
+              text: { head: ["Day", "Spare MW in its tightest hour", "Hour starting (standard time)"], note: "Every day of the simulated year. Spare = available units + wind + sun − demand; below zero is a shortfall.",
+                rows: dl.map(function (x) { return [dateOf(x.day), int(x.min).replace("-", "−"), hourLabel(x.hour)]; }) } });
             if (rolls >= 3) { api.done(); remember("rolls", rolls); api.saw("Most simulated years have no shortfall day, and a few have several. **Adequacy is about the rare bad year, so one year shows little.**"); }
           });
           H("p", { class: "a5-note", html: LX.rich("Each week of a simulated year is a real week of 2024 or 2025, [[resampled-weather|resampled]]; units fail at random ([[forced-outage-rate|forced outages]]).") }, act);
@@ -165,12 +167,17 @@
             var st = current(), b = st.base, se = loleSE(b), h = histogram(b), y0 = h[0];
             seedL.textContent = "Seed " + st.seed + " · " + st.S.N + " years"; out.innerHTML = "";
             var k = H("div", { class: "a5-kpis" }, out);
+            // first the count of days and its division; the hours, the energy and what the ± and the seed mean wait in a box
             kpi(k, "LOLE", d3(b.lole) + " ± " + d3(2 * se) + " days/yr", b.lole > crit ? "bad" : "good"); kpi(k, "Criterion", String(crit) + " days/yr");
-            kpi(k, "Shortfall hours", d2(b.lolh) + " h/yr"); kpi(k, "Unserved energy", int(b.eue) + " MWh/yr");
+            H("p", { class: "a5-note", text: int(b.days) + " shortfall days ÷ " + st.S.N + " years = " + d3(b.lole) + " days a year. Bars: years by their number of shortfall days." }, out);
             bars(out, [{ label: "No shortfall day", value: h[0], text: String(h[0]) }, { label: "1 day", value: h[1], text: String(h[1]) }, { label: "2 days", value: h[2], text: String(h[2]) }, { label: "3 days or more", value: h[3], text: String(h[3]) }], st.S.N, "Simulated years by their number of shortfall days");
-            H("p", { class: "a5-note", html: LX.rich(TX.SE_NOTE) }, out);
-            H("p", { class: "a5-note", html: LX.rich("Shortfall hours are the [[lolh|LOLH]]. Bars: years by their number of shortfall days.") }, out);
-            H("p", { class: "a5-note", html: LX.rich(TX.SEED_NOTE) }, out);
+            var more = H("details", { class: "lx-textalt a5-more" }, out);
+            H("summary", { text: "Hours, energy, the ± and the seed" }, more);
+            var k2 = H("div", { class: "a5-kpis" }, more);
+            kpi(k2, "Shortfall hours", d2(b.lolh) + " h/yr"); kpi(k2, "Unserved energy", int(b.eue) + " MWh/yr");
+            H("p", { class: "a5-note", html: LX.rich("Shortfall hours a year are the [[lolh|LOLH]]; unserved MWh a year, the EUE.") }, more);
+            H("p", { class: "a5-note", html: LX.rich(TX.SE_NOTE) }, more);
+            H("p", { class: "a5-note", html: LX.rich(TX.SEED_NOTE) }, more);
             again.hidden = false; api.done(); remember("lole", b.lole);
             api.saw("LOLE " + d3(b.lole) + " days a year, " + (b.lole > crit ? "above" : "within") + " the 1-in-10 criterion of " + String(crit) + ". In " + y0 + " of " + st.S.N + " years nothing went short; the [[expected-unserved-energy|unserved energy]] averages " + int(b.eue) + " MWh a year.");
           }
@@ -183,7 +190,7 @@
           var out = H("div", null, act);
           var pr = LX.Predict(act, { id: "a5-when", fresh: true, q: "", title: false, answer: "eve",
             options: [{ value: "noon", label: "Summer middays" }, { value: "eve", label: "Summer evenings" }, { value: "night", label: "Winter nights" }],
-            feedback: { eve: "Yes: demand is still high when the sun sets.", noon: "Middays have the sun; the risk comes after sunset.", night: "Some winter hours go short, but most are summer evenings." },
+            feedback: { eve: "Yes: demand is still high as solar output falls.", noon: "Middays have the sun; most shortfalls come as solar output falls in the evening.", night: "Some winter hours go short, but most are summer evenings." },
             onPick: function () {
               var b = current().base, se = season(b.byMonth), top = 0;
               for (var h = 1; h < 24; h++) if (b.byHour[h] > b.byHour[top]) top = h;
@@ -211,7 +218,7 @@
             if (n >= 3) {
               var ls = Object.keys(tried).map(function (id) { return cached("one-" + id, function () { return evaluate(st.S, block(D, id)); }).lole; });
               api.done(); remember("tried", n);
-              api.saw("The same " + fm.rm(reserveMargin(D, B) - reserveMargin(D)) + " added each time, yet LOLE runs from " + d3(Math.min.apply(null, ls)) + " to " + d3(Math.max.apply(null, ls)) + ". **A margin counted at nameplate cannot tell these apart.**");
+              api.saw("The same " + fm.rm(reserveMargin(D, B) - reserveMargin(D)).replace("%", "") + " percentage points added each time, yet LOLE runs from " + d3(Math.min.apply(null, ls)) + " to " + d3(Math.max.apply(null, ls)) + ". **A margin counted at nameplate cannot tell these apart.**");
             }
           }
           D.adds.options.forEach(function (o) {
@@ -219,7 +226,7 @@
             b.addEventListener("click", function () { tried[o.id] = true; b.setAttribute("aria-pressed", "true"); show(); });
           });
           var ol = H("ul", { class: "a5-opts", "aria-label": "The five resources" }, act);
-          D.adds.options.forEach(function (o) { H("li", { text: o.label + ": " + o.detail + "." }, ol); });
+          D.adds.options.forEach(function (o) { H("li", { html: LX.rich(o.label + ": " + o.detail + ".") }, ol); });
           H("p", { class: "a5-note", text: TX.SCREEN_NOTE }, act);
           show();
         } },
@@ -248,6 +255,7 @@
               });
           });
           H("p", { class: "a5-note", html: LX.rich("The perfect MW is the [[equivalent-firm-capacity|equivalent firm capacity]]: the smallest that cuts unserved energy as much. Equal unserved energy, not days: a count of days moves in whole steps.") }, act);
+          H("p", { class: "a5-note", text: TX.RULES_NOTE }, act);
         } },
       // 6 more of the same
       { text: "Add more of the same. Pick a resource and rate three blocks of 500 MW, each on top of the blocks before it.",
@@ -360,7 +368,7 @@
         o: { t: "Draw unit outages", tN: ["Draw unit", "outages"], s: "random, independent", sN: "random" },
         h: { t: "Hour by hour: margin", tN: ["Hour by hour:", "margin"], s: "storage, demand response", sN: "8,760 h" },
         n: { t: "500 years done?", tN: ["500 years", "done?"], k: "q" },
-        m: { t: "LOLE, LOLH, EUE", tN: ["LOLE, LOLH,", "EUE"], s: "with their error", sN: "± error" },
+        m: { t: "LOLE, LOLH, EUE", tN: ["LOLE, LOLH,", "EUE"], s: "LOLE ± sampling error", sN: "LOLE ± error" },
         c: { t: "Meets 0.1 days/yr?", tN: ["Meets 0.1", "days/yr?"], k: "q" },
         a: { t: "Add a resource, re-run", tN: ["Add a resource,", "re-run"], s: "same seed; rate by EUE", sN: "same seed" },
         r: { t: "Report the rating with its mix", tN: ["Report rating", "with its mix"], k: "end" }
