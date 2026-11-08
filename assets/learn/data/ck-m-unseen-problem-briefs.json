@@ -1,5 +1,12 @@
 {
  "about": "CK-M, the Modeler checkpoint: the two briefs and the supplied model of part B, for readers who work outside Python. No tasks, answers or solutions: those are on the checkpoint page. The water brief and all costs are illustrative; the three days are real 2025 SPP shapes (EIA-930), scaled as the page says.",
+ "dataset": {
+  "creator": "Honglin Li",
+  "date": "2026-11-05",
+  "status": "Illustrative: the water brief and every cost are invented for teaching; the three days are real 2025 SPP hourly shapes (EIA-930), scaled to Prairie Town.",
+  "source": "Prepared for the Modeler checkpoint from the course's 2025 SPP hourly shapes (EIA-930) and EIA's 2025 capacity factors (Electric Power Monthly, Table 6.07.B); sources gives their dates.",
+  "license": "CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/), Honglin Li. The EIA data it uses are U.S. government works in the public domain."
+ },
  "version": "ck-m v2 (3 Nov 2026)",
  "brief": {
   "text": "Prairie Town's water utility pumps groundwater into a water tower, and the town draws its water from the tower. Find tomorrow's pumping schedule that meets the town's water use at the least electricity cost for the day.",

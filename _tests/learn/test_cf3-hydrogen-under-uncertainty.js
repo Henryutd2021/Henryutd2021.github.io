@@ -176,9 +176,9 @@ const RX = /\b(stud(y|y's|ies)|paper|article|journal|Li et al|course author|exce
 const NOT_RESEARCH = [
   [/^\d · [A-Z][a-z ,]+$/, "part label"],
   [/^Question type: prescriptive \(what should be built, where, and how should it run\?\)\.$/, "course label (the course's question types)"],
-  [/^Approved excerpt of: Li et al\. \(2025\), International Journal of Hydrogen Energy\.$/, "provenance label"],
-  [/^From the approved excerpt of Li et al\. \(2025\), International Journal of Hydrogen Energy\.$/, "provenance label"],
-  [/^Every result about the study is quoted from approved excerpts of the published paper named in the sources\.$/, "provenance label"],
+  [/^From: Li et al\. \(2025\), International Journal of Hydrogen Energy\.$/, "provenance label"],
+  [/^From Li et al\. \(2025\), International Journal of Hydrogen Energy\.$/, "provenance label"],
+  [/^Every result about the study is quoted from the published paper named in the sources\.$/, "provenance label"],
   [/^The toy below uses illustrative round numbers\.$/, "provenance label (the toy)"],
   [/^Li et al\. \(2025\), International Journal of Hydrogen Energy 113, 77–89$/, "citation label (timeline, data file)"],
   [/^txh2-ercot-hydrogen on GitHub$/, "citation label (repository)"],

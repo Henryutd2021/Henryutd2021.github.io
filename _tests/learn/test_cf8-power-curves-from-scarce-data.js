@@ -163,8 +163,8 @@ if (R) {
   ok(X.norm((PAGE.match(/<ol class="ex-fallback lx-ex-static">([\s\S]*?)<\/ol>/) || [])[1].replace(/<\/li>/g, " ")) === X.norm(R.raw["E12.11"]), "the explainer's no-JS text: E12.11");
   // every other sentence that could be about the studies
   const RX = /\b(the study|study's|paper|article|IDETC|Li et al|course author|excerpt|research project|SDWPF|SCADA|kernel density|nine|plants? (with|without) (power )?measurements|held-out plants|multi-fidelity|surrogate)\b/i;
-  const NOT = [[/^Approved excerpt of: Li et al\., ASME IDETC 2023\.$/, "provenance"], [/^A separate example with synthetic numbers, from the course author's open explainer: not the study's data or results\.$/, "explainer label, as CF2's"],
-    [/^Every result about the studies is quoted from approved excerpts of the published paper and the public framework named in the sources\.$/, "data note"], [/^The toy below uses lesson M9's illustrative turbine\.$/, "data note"],
+  const NOT = [[/^From: Li et al\., ASME IDETC 2023\.$/, "provenance"], [/^A separate example with synthetic numbers, from the course author's open explainer: not the study's data or results\.$/, "explainer label, as CF2's"],
+    [/^Every result about the studies is quoted from the published paper and the public framework named in the sources\.$/, "data note"], [/^The toy below uses lesson M9's illustrative turbine\.$/, "data note"],
     [/^Related project · uncertainty at plants without measurements$/, "heading"], [/^Question and method only: no results\.$/, "label"], [/^(mfgpr-wind-power-curve|wind-uq-surrogate): public example repository · MIT licence · synthetic data\.$/, "repository label"],
     [/^Question type: predictive \(what power, with what uncertainty\?\), with an evaluative part \(better than records alone\?\)\.$/, "the course's question type"],
     [/^M9 fits a Gaussian process to a few records, lets the records choose its settings and adds the maker's curve as a second source; it also shows a case where that cheap curve misleads\.$/, "navigation (Go deeper)"],
@@ -176,7 +176,7 @@ if (R) {
     [/^Try it yourself$/, "heading"], [/^Optional, about 30 minutes each; needs Python 3\.10 or later \(lesson B2\)\.$/, "time"],
     [/^Invented numbers, not the study's: two “90%” bands for one turbine are scored on the same 100 new measurements\.$/, "the check's invented example"],
     [/^Li et al\. \(2023\), ASME IDETC 2023 · presented August 2023$/, "numbers-table source"],
-    [/^From the approved excerpt of Li et al\. \(2023\), ASME IDETC 2023\.$/, "boundary card's source line"]];
+    [/^From Li et al\. \(2023\), ASME IDETC 2023\.$/, "boundary card's source line"]];
   const bad = [];
   // the try-it card strictly: every element approved or an exactly listed label or instruction
   X.elements((OWN.match(/<div class="lx-card lx-case-try">[\s\S]*?\n<\/div>/) || [""])[0]).forEach(sg => { const o = X.offending(R, NOT, sg); if (o) bad.push("try it: " + o); });

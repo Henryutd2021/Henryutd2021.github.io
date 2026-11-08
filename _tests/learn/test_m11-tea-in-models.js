@@ -69,7 +69,7 @@ const fm = M.fm, r1 = v => Math.round(v * 10) / 10, r3 = v => Math.round(v * 100
   const ALL = M.allDays(Y);
   // lesson 13's numbers M11 uses, as the "lesson13" block of M11's data (the page and the notebook read only this subset,
   // so neither loads lesson 13's whole file): the wind farm's installed cost and upkeep, the rate and the life, with sources
-  const sub13 = () => ({ about: "Copied from lesson 13's data (13-capstone.json) by node _tests/learn/test_m11-tea-in-models.js --write and checked against it on every run: the wind farm's installed cost and fixed upkeep (2025 dollars), the real rate and the life. Edit lesson 13's data, never this block.",
+  const sub13 = () => ({ about: "Copied from lesson 13's data (13-capstone.json), so the two lessons agree: the wind farm's installed cost and fixed upkeep (2025 dollars), the real rate and the life.",
     techs: { wind: { label: C13.techs.wind.label, capex: C13.techs.wind.capex, fom: C13.techs.wind.fom, src: C13.techs.wind.src } },
     finance: { wacc: C13.finance.wacc, life: C13.finance.life, src: C13.finance.src },
     sources: Object.fromEntries([].concat(C13.techs.wind.src, C13.finance.src).map(k => [k, C13.sources[k]])) });
@@ -84,7 +84,7 @@ const fm = M.fm, r1 = v => Math.round(v * 10) / 10, r3 = v => Math.round(v * 100
   };
 
   if (process.argv.includes("--write")) {
-    const ref = { about: "Written by node _tests/learn/test_m11-tea-in-models.js --write; re-solved by the same test on every run. Defaults: $" + D.hydrogen.price.def + " per kg, $" + D.charge.def + " per MWh charge, DOE's middle installed cost, lesson 13's rate and life, Prairie Town's grid rate, hourly matching, construction in 2027 with the wage rules met. Money in real 2025 dollars; NPV over the life, annual = NPV / annuity factor; kg a year in the credit years." };
+    const ref = { about: "Reference results, solved with the lesson's model in HiGHS. Defaults: $" + D.hydrogen.price.def + " per kg, $" + D.charge.def + " per MWh charge, DOE's middle installed cost, lesson 13's rate and life, Prairie Town's grid rate, hourly matching, construction in 2027 with the wage rules met. Money in real 2025 dollars; NPV over the life, annual = NPV / annuity factor; kg a year in the credit years." };
     ref.days = Y.days.map(d => ({ date: d.date, weight: d.weight }));
     ref.repCF = r3(Y.days.reduce((s, d) => s + d.weight * M.sum(d.w), 0) / (365 * 24 * D.plant.windMW));
     ref.townRate = r3(Y.rate); ref.ccRate = Y.ccRate;

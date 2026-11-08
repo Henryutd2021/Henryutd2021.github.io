@@ -172,7 +172,7 @@ ok(!/Go deeper · Modeler/.test(PAGE) && (PAGE.match(/Go deeper · Analyst/g) ||
 // ---------------- research wording: E7.4 and E7.5, word for word (the sourcing rule)
 const E74 = "For a 300 MW-IT facility, a 36-month delay costs the developer on the order of $0.7 billion in present value.";
 const E75 = "Staged energization can recover a large share of that cost.";
-const CF7_FOOT = "Approved excerpt of: Li et al. (2026), accepted paper, 2026 North American Power Symposium (NAPS); DOI pending.";
+const CF7_FOOT = "From: Li et al. (2026), accepted paper, 2026 North American Power Symposium (NAPS); DOI pending.";
 const CITE = "<li>Li et al. (2026). Accepted paper on the cost of delayed energization for large loads, 2026 North American Power Symposium (NAPS), presented October 2026; DOI pending.</li>";
 const RP = PRIV.path("excerpts");
 if (RP) {

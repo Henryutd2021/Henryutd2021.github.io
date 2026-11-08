@@ -138,7 +138,7 @@ if (R && quotes.length) {
   ok(sents.length === 1 && sents[0] === X.norm(R.raw["E8.3"]), "the excerpt is E8.3, word for word");
   const E87 = R.raw["E8.7"].split(/(?<=\.) (?=Leaves out:)/);
   ok(E87.length === 2 && X.norm(OWN).indexOf(X.norm("<li>" + E87[0] + "</li><li>" + E87[1] + "</li>")) >= 0, "E8.7 sits under the excerpt, word for word, as two lines");
-  ok(/<footer>Approved excerpt of: Li et al\. \(2023\), <a href="https:\/\/doi\.org\/10\.1016\/j\.apm\.2023\.02\.014">Applied Mathematical Modelling<\/a>\.<\/footer>/.test(quotes[0][2]), "the footer names the AMM paper with its DOI");
+  ok(/<footer>From: Li et al\. \(2023\), <a href="https:\/\/doi\.org\/10\.1016\/j\.apm\.2023\.02\.014">Applied Mathematical Modelling<\/a>\.<\/footer>/.test(quotes[0][2]), "the footer names the AMM paper with its DOI");
   ok(/Li et al\. \(2023\)\. <a href="https:\/\/doi\.org\/10\.1016\/j\.apm\.2023\.02\.014">Facility and microgrid location-allocation for integrated supply chain and transactive energy operations<\/a>\. Applied Mathematical Modelling 119, 119–136\./.test(OWN), "the citation as published (E8.17)");
   ok(!/(study|studies|author|research|paper)/i.test((OWN.match(/<p class="a21-bridge">([\s\S]*?)<\/p>/) || [])[1] || "x") && !/supply-chain|microgrid|transactive/i.test(JS + RAW), "no research wording outside the excerpt and its approved lines");
 }

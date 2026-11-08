@@ -215,7 +215,7 @@ $$\text{import dependence} = \frac{\text{net imports}}{\text{gross available ene
 <p>Oil through the Strait of Hormuz, second quarter of 2026: 4.9 million barrels a day during the 2026 disruption (EIA, 12 Aug 2026).</p><p>IEA collective action, 11 March 2026: members agreed to make 400 million barrels of oil stocks available, their largest collective action: an agreement, not a record of deliveries.</p>
 <!-- a21-real:end -->
 <p class="a21-bridge">Energy also shapes where a new factory is built:</p>
-<blockquote class="lx-excerpt" data-source="excerpt:supply-chain-mg"><p>When each facility can install its own wind, solar and storage and trade energy with the grid, a candidate site's renewable resource affects its operating cost.</p><footer>Approved excerpt of: Li et al. (2023), <a href="https://doi.org/10.1016/j.apm.2023.02.014">Applied Mathematical Modelling</a>.</footer></blockquote>
+<blockquote class="lx-excerpt" data-source="excerpt:supply-chain-mg"><p>When each facility can install its own wind, solar and storage and trade energy with the grid, a candidate site's renewable resource affects its operating cost.</p><footer>From: Li et al. (2023), <a href="https://doi.org/10.1016/j.apm.2023.02.014">Applied Mathematical Modelling</a>.</footer></blockquote>
 <ul class="lx-hint a21-holds"><li>Holds when: stylized networks with synthetic distances and costs, candidate sites in California, Arizona and Nevada, and one year, planned week by week for products and hour by hour for energy.</li><li>Leaves out: grid outages, which the studies do not model.</li></ul>
 <p class="lx-hint">The full case: <a href="cf1-supply-chain-microgrids.html">case file CF1</a>.</p>
 </div>

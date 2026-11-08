@@ -82,7 +82,7 @@ const APPROVED_SNAPSHOT = {
     plan: { pv: plan.pv, bat: plan.bat, gen: plan.gen }, check: { must: +o.must.toFixed(3), keep: +o.keep.toFixed(3), shed: +o.shed.toFixed(3), fuel: +o.fuel.toFixed(3) },
     seeded: { starts: P.seeded.map(s => s.start), hours: P.seeded.map(s => s.hours), must: sd.results.outages.map(x => +x.must.toFixed(3)) },
     roll: rows.map(r => ({ key: r.key, must: +r.totals.must.toFixed(3), keep: +r.totals.keep.toFixed(3), fuel: +r.totals.fuel.toFixed(3) })),
-    note: "Written by node _tests/learn/test_m05-microgrid-size-and-run.js --write from engine E1 (HiGHS 1.15.4 in Node); the M5 notebook asserts against it." };
+    note: "Reference results of lesson M5, solved with engine E1 in HiGHS 1.15.4; the M5 notebook checks its answers against them." };
   if (process.argv.includes("--write")) {
     X.writeBlocks(QPATH, { "m5-static": html });
     const DP = X.L("data/e1-prairie-campus.json"), d = JSON.parse(fs.readFileSync(DP, "utf8")); d.reference = Object.assign({}, d.reference, { m5: ref });
@@ -134,7 +134,7 @@ const APPROVED_SNAPSHOT = {
   ok(ex.length === 1 && ex[0].source === "excerpt:supply-chain-mg", "one excerpt block, excerpt:supply-chain-mg");
   const want = ["E8.3", "E8.5", "E8.6", "E8.10", "E8.7"].map(k => X.norm(APP[k]));
   ok(ex[0].sentences.length === want.length && ex[0].sentences.every((s, i) => s === want[i]), "E8.3, E8.5, E8.6, E8.10 and the E8.7 note, word for word and in order");
-  ok(/Approved excerpt of: Li et al\. \(2023\), <a href="https:\/\/doi\.org\/10\.1016\/j\.apm\.2023\.02\.014">Applied Mathematical Modelling<\/a>\./.test(ex[0].footer), "the excerpt's footer");
+  ok(/From: Li et al\. \(2023\), <a href="https:\/\/doi\.org\/10\.1016\/j\.apm\.2023\.02\.014">Applied Mathematical Modelling<\/a>\./.test(ex[0].footer), "the excerpt's footer");
   ok(/href="https:\/\/github\.com\/Henryutd2021\/supply-chain-microgrid-models"/.test(PAGE), "open code: the allow-listed repository");
   ok(!/outage/i.test(ex[0].sentences.slice(0, 4).join(" ")), "the quoted study sentences claim nothing about outages (E8.7 says the studies leave them out)");
 

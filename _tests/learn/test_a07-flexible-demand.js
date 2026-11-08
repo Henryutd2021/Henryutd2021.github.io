@@ -276,8 +276,8 @@ const has = (s, msg) => ok(T_PAGE.indexOf(s) >= 0, msg + ": '" + s + "' on the p
   const ps = b => [...b[2].matchAll(/<p>([\s\S]*?)<\/p>/g)].map(m => norm(m[1]));
   ok(bq.length === 2 && ps(bq[0]).join("|") === [SNAP["E6.4"], SNAP["E6.6"]].join("|"), "the first excerpt is E6.4 and E6.6, word for word");
   ok(bq.length === 2 && ps(bq[1]).join("|") === [SNAP["E8.2"], SNAP["E8.4"]].join("|"), "the second excerpt is E8.2 and E8.4, word for word");
-  ok(bq.length === 2 && bq[0][3] === 'Approved excerpt of: Li et al. (2025), <a href="https://doi.org/10.1016/j.crsus.2025.100367">Cell Reports Sustainability</a>.', "footer: CF6's citation, with its DOI");
-  ok(bq.length === 2 && bq[1][3] === 'Approved excerpt of: Li et al. (2023), <a href="https://doi.org/10.1016/j.apm.2023.02.014">Applied Mathematical Modelling</a>.', "footer: Li et al. (2023), Applied Mathematical Modelling, with its DOI");
+  ok(bq.length === 2 && bq[0][3] === 'From: Li et al. (2025), <a href="https://doi.org/10.1016/j.crsus.2025.100367">Cell Reports Sustainability</a>.', "footer: CF6's citation, with its DOI");
+  ok(bq.length === 2 && bq[1][3] === 'From: Li et al. (2023), <a href="https://doi.org/10.1016/j.apm.2023.02.014">Applied Mathematical Modelling</a>.', "footer: Li et al. (2023), Applied Mathematical Modelling, with its DOI");
   const real = (OWN.match(/<div class="lx-card lx-real">([\s\S]*?)<\/div>\n<div class="lx-card lx-sources">/) || ["", ""])[1];
   ok(real.indexOf('<p class="lx-hint">' + SNAP["E8.7"] + "</p>") >= 0, "the note under the second excerpt is E8.7, word for word");
   ok(/<a href="cf6-shifting-load-to-clean-hours\.html">CF6<\/a>/.test(real), "the real-world box links case file CF6");

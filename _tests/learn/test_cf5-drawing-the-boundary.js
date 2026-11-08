@@ -16,8 +16,9 @@
 //     E14.14 and E14.20 at their own breaks); the approved set is E14.1-E14.15, E14.16b (in place of E14.16),
 //     E14.17-E14.23 and E14.24 in its original wording; a snapshot of it in this test must equal the approved wording; its
 //     status line says approved; E14.16 (capital costs) is not used; the excerpt's footer and the boundary
-//     card's source line are E14.24 ("Approved excerpt of: ...", CF7's footer form) and the draft-period "Source: ..."
-//     line is gone; "approved" appears only in E14.24; each placement is where the approved wording says (--places lists them)
+//     card's source line are E14.24 with its visible label "From: " in place of the wording's "Approved excerpt of: " (CF7's
+//     footer form) and the draft-period "Source: ..." line is gone; "approved" appears nowhere a reader sees; each placement
+//     is where the approved wording says (--places lists them)
 //   - scope (the nuclear scope rule, data centers as loads only, the sourcing rule; framing C): no sentence pairs a
 //     nuclear term with a risk term of the scope scan's word lists (DENY_NUC, DENY_RISK); "reactor" only in E14.1, E14.7, E14.11 and E14.23 (and
 //     "refueling" only in E14.9); no data-center wording of any kind, no design name, no "small modular"; no link to a
@@ -182,6 +183,7 @@ const RG = { units: Object.values(APPROVED).map(X.norm), raw: APPROVED };
 ok(!X.norm(PAGE).includes("capital cost of the plant") && !RG.raw["E14.16"], "E14.16's capital-cost wording is not approved and not on the page (E14.16b instead)");
 // every text element of the case, the data file's research text and the citation
 const OWN = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1:end -->/g, "").replace(/<!--[\s\S]*?-->/g, "").replace(/^---[\s\S]*?\n---\n/, "");
+const SHOWN24 = RG.raw["E14.24"].replace(/^Approved excerpt of: /, "From: ");   // E14.24 with its visible label
 const caseHTML = (OWN.match(/<div class="lx-case">([\s\S]*?)<div class="lx-interactive" data-learn="cf5"/) || [])[1] || "";
 const LABELS = [/^\d · (The puzzle|The question in one sentence|Scale and boundary|Decisions, goal and rules, in words|Data and method|What came out, and where it holds)$/, /^So is the cooling free\?$/, /^The case's method question\.$/,
   /^Detail(How the hourly physics is modeled|Two design choices|Scenario runs and how results are reported)$/];
@@ -190,7 +192,7 @@ const split = [...caseHTML.matchAll(/<dt>([^<]+)<\/dt><dd data-e14="(E14\.\d+)">
 ok(split.map(m => m[2]).join() === "E14.4,E14.6,E14.7,E14.8,E14.9", "parts 3 and 4 are structured lists of E14.4, E14.6, E14.7, E14.8 and E14.9");
 split.forEach(m => ok(X.norm(m[1] + ": " + X.elements(m[3]).join(" ")) === X.norm(RG.raw[m[2]]), m[2] + " split into list items keeps every word in order"));
 const segs = X.elements(caseHTML.replace(/<dt>[^<]+<\/dt><dd data-e14="E14\.\d+">[\s\S]*?<\/dd>/g, "")).map(X.norm).filter(Boolean);
-segs.forEach(sg => ok(LABELS.some(re => re.test(sg)) || X.approved(RG, sg), "case text is approved E14 wording or a label: " + sg.slice(0, 70)));
+segs.forEach(sg => ok(LABELS.some(re => re.test(sg)) || X.approved(RG, sg) || sg === X.norm(SHOWN24), "case text is approved E14 wording, E14.24 as shown, or a label: " + sg.slice(0, 70)));
 { // the review's other layout-only splits, at the sentences' own breaks: E14.13 at its semicolons, E14.14 at its colon,
   // E14.20 one line per sentence; joined back, each reads word for word
   const T = X.norm(X.elements(caseHTML).join(" "));
@@ -201,7 +203,7 @@ const tl = D.timeline.events[0];
 ok(D.timeline.events.length === 1 && tl.date === "2026" && X.approved(RG, tl.label + ". " + tl.text) && X.approved(RG, tl.source.label), "the timeline is E14.22 (date 2026), its source a clause of E14.24");
 [].concat(D.boundary.holds, D.boundary.leaves).forEach(t => ok(X.approved(RG, t), "boundary item is a clause of E14.21: " + t.slice(0, 50)));
 ok(X.approved(RG, "Where the result holds: " + D.boundary.holds.join(" ").replace(/;$/, "") + " It leaves out: " + D.boundary.leaves.join(" ")), "the boundary card is E14.21, whole, in order");
-ok(D.boundary.source === RG.raw["E14.24"], "the boundary card's source line is E14.24, as approved: " + D.boundary.source);
+ok(/^Approved excerpt of: /.test(RG.raw["E14.24"]) && D.boundary.source === SHOWN24, "the boundary card's source line is E14.24, as approved, with the label 'From: ': " + D.boundary.source);
 const cite = (OWN.match(/<li>(Li et al\. \(2026\)\.[\s\S]*?)<\/li>/) || [])[1] || "";
 ok(X.approved(RG, cite) && X.norm(cite) === X.norm(RG.raw["E14.23"]), "the citation is E14.23, word for word");
 const desc = (PAGE.match(/^description: "Case file CF5 of Energy Systems, Step by Step\. ([^"]+)"/m) || [])[1] || "";
@@ -211,7 +213,7 @@ const OTHER = [/^The toy below is the course's own, with illustrative numbers yo
   /^Illustrative round numbers you set: a generic steam plant and one load that needs power and cooling, not the study's inputs or results\. Average power during one hour, in MW; auxiliary electricity for pumps and fans is left out\.$/,
   /^Earlier lessons: /, /^A model that runs every hour/, /^One dated step: the accepted paper\.$/, /^(The study in time|Absorption chiller: MW of cooling per MW of steam heat)$/,
   /^ audits a study's boundary, baseline and counterfactual; $/];
-const own = sg => OTHER.some(re => re.test(sg)) || /toy|steam plant|Myth|Fact|absorption chiller|turbine/i.test(sg) && !/\b(study|paper|Li et al|ERCOT|reactor|refueling|Willans|SOS2|scenario runs)\b/i.test(sg);
+const own = sg => X.norm(sg) === X.norm(SHOWN24) || OTHER.some(re => re.test(sg)) || /toy|steam plant|Myth|Fact|absorption chiller|turbine/i.test(sg) && !/\b(study|paper|Li et al|ERCOT|reactor|refueling|Willans|SOS2|scenario runs)\b/i.test(sg);
 const rest = OWN.replace(caseHTML, "").replace(/<blockquote[\s\S]*?<\/blockquote>/g, "");
 X.elements(rest).map(X.norm).map(s => s.replace(/^2026 · /, "").replace(/ Source: Li et al\. \(2026\), accepted paper, Energy Conversion and Management; DOI pending$/, "")).filter(s => RX.test(s))
   .forEach(sg => ok(X.approved(RG, sg) || /^Li et al\. \(2026\)\./.test(sg) && X.approved(RG, sg) || own(sg), "outside the case: approved wording or the course's own: " + sg.slice(0, 70)));
@@ -223,15 +225,16 @@ LIT.filter(s => RX.test(s)).forEach(s => ok(X.approved(RG, s) || own(s), "script
 // part 6: E14.19 the only excerpt, E14.20 its note, E14.24 its footer (CF7's form)
 const q = [...PAGE.matchAll(/<blockquote class="lx-excerpt" data-source="([^"]+)"><p>([\s\S]*?)<\/p><footer>([\s\S]*?)<\/footer><\/blockquote>/g)];
 ok(q.length === 1 && q[0][1] === "excerpt:cogen-boundary-methods" && X.norm(q[0][2]) === X.norm(RG.raw["E14.19"]), "part 6: E14.19 is the only excerpt");
-ok(q.length === 1 && q[0][3] === RG.raw["E14.24"], "part 6: the excerpt's footer is E14.24, as approved: " + (q[0] ? q[0][3] : "none"));
-{ const f7 = (fs.readFileSync(path.join(SITE, "learn/cf7-cost-of-waiting.qmd"), "utf8").match(/<footer>(Approved excerpt of: [^<]*)<\/footer>/) || [])[1] || "", form = /^Approved excerpt of: Li et al\. \(2026\), accepted paper, [^;]+; DOI pending\.$/;
-  ok(form.test(f7) && q[0] && form.test(q[0][3]), "the footer has CF7's form, 'Approved excerpt of: Li et al. (2026), accepted paper, <venue>; DOI pending.' (CF7: " + f7 + ")"); }
+ok(q.length === 1 && q[0][3] === SHOWN24, "part 6: the excerpt's footer is E14.24, as approved, with the label 'From: ': " + (q[0] ? q[0][3] : "none"));
+{ const f7 = (fs.readFileSync(path.join(SITE, "learn/cf7-cost-of-waiting.qmd"), "utf8").match(/<footer>(From: [^<]*)<\/footer>/) || [])[1] || "", form = /^From: Li et al\. \(2026\), accepted paper, [^;]+; DOI pending\.$/;
+  ok(form.test(f7) && q[0] && form.test(q[0][3]), "the footer has CF7's form, 'From: Li et al. (2026), accepted paper, <venue>; DOI pending.' (CF7: " + f7 + ")"); }
 ok(PAGE.includes('<p class="lx-hint">' + X.sentencesOf(RG.raw["E14.20"]).join('</p><p class="lx-hint">') + "</p>"), "part 6: E14.20 is the note under the excerpt, one line per sentence");
-// the draft period is over: its source line is gone, "approved" is said only by E14.24, no draft or pending wording is left
+// the draft period is over: its source line is gone, "approved" is said nowhere a reader sees, no draft or pending wording is left
 const VIS = X.elements(OWN).concat(DATA, LIT);
 ok(!VIS.some(s => X.norm(s) === X.norm(DRAFT_SOURCE)) && !/<footer>Source:/.test(PAGE) && D.boundary.source !== DRAFT_SOURCE, "the draft-period line '" + DRAFT_SOURCE + "' is gone (footer, boundary card, no-JS text)");
 const said = VIS.filter(s => /approv/i.test(s));
-ok(said.length === 3 && said.every(s => X.norm(s) === X.norm(RG.raw["E14.24"])), "'approved' is said only by E14.24: the footer, the boundary card's source line and its no-JS text (" + said.length + "): " + said.join(" | ").slice(0, 160));
+ok(said.length === 0, "'approved' is not said where a reader sees it (" + said.length + "): " + said.join(" | ").slice(0, 160));
+ok(VIS.filter(s => X.norm(s) === X.norm(SHOWN24)).length === 3, "E14.24 as shown ('From: ...') is the footer, the boundary card's source line and its no-JS text");
 ok(!VIS.some(s => /\bdrafts?\b|\bdrafted\b/i.test(s)), "no draft wording on the page, in the data or in the script's strings");
 ok(VIS.filter(s => /pending/i.test(s)).every(s => !/pending/i.test(X.norm(s).replace(/DOI pending/g, ""))), "'pending' only in 'DOI pending' (E14.23, E14.24 and the timeline's source)");
 ok(!/quoted from the excerpts/.test(PAGE), "no blanket claim that every sentence is quoted");
@@ -239,7 +242,7 @@ ok(!/quoted from the excerpts/.test(PAGE), "no blanket claim that every sentence
 { const lines = PAGE.split("\n"), rel = path.relative(SITE, QPATH), where = [];
   const find = (k, s) => { const t = X.norm(s).slice(0, 60); let i = lines.findIndex(l => X.norm(l).includes(t)); if (i < 0) i = lines.findIndex(l => l.includes('data-e14="' + k + '"')); return i >= 0 ? rel + ":" + (i + 1) : null; };
   Object.keys(RG.raw).forEach(k => {
-    let at = find(k, RG.raw[k]);
+    let at = find(k, k === "E14.24" ? SHOWN24 : RG.raw[k]);   // E14.24 is shown with its visible label
     if (k === "E14.21") at = "assets/learn/data/" + ID + ".json (boundary) and " + rel + " (no-JS block)";
     if (k === "E14.22") at = "assets/learn/data/" + ID + ".json (timeline) and " + rel + " (no-JS block)";
     if (k === "E14.24" && at) at += " (the excerpt's footer) and assets/learn/data/" + ID + ".json (the boundary card's source line)";

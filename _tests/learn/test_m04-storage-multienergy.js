@@ -59,7 +59,7 @@ const DAYN = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"], MON = ["Jan", "F
   const label = (w, t) => { const d = new Date(Date.parse(D.weeks.find(x => x.id === w).date + "T00:00:00Z") + Math.floor(t / 24) * 864e5); return DAYN[d.getUTCDay()] + " " + d.getUTCDate() + " " + MON[d.getUTCMonth()] + ", " + String(t % 24).padStart(2, "0") + ":00"; };
 
   if (process.argv.includes("--write")) {
-    const ref = { about: "Written by node _tests/learn/test_m04-storage-multienergy.js --write; re-solved by the same test on every run. Costs in $ a week (negative: the plant earns), energy in MWh, hydrogen in kg.", costs: {}, value: {} };
+    const ref = { about: "Reference results, solved with the lesson's model in HiGHS. Costs in $ a week (negative: the plant earns), energy in MWh, hydrogen in kg.", costs: {}, value: {} };
     D.weeks.forEach(w => { ref.costs[w.id] = {}; D.configs.forEach(c => { ref.costs[w.id][c.id] = r1(run(w.id, c.id).o.cost); }); });
     shown.filter(c => c.id !== "power").forEach(c => { ref.value[c.id] = {}; D.weeks.forEach(w => { ref.value[c.id][w.id] = r1(ref.costs[w.id].power - ref.costs[w.id][c.id]); }); });
     ref.on = { cost: r1(run("winter", "h2", { minLoad: "on" }).o.cost) };

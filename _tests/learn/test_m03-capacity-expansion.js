@@ -60,7 +60,7 @@ const r1 = (v, d) => Math.round(v * 10 ** d) / 10 ** d;
 
   // ---------------- --write: the reference block
   if (WRITE) {
-    const ref = { about: "Written by node _tests/learn/test_m03-capacity-expansion.js --write; re-solved by the same test on every run. Costs in $ a year, CO2 in t a year, energy in MWh, power in MW.", sets: {}, storage: {} };
+    const ref = { about: "Reference results, solved with the lesson's planning LP in HiGHS. Costs in $ a year, CO2 in t a year, energy in MWh, power in MW.", sets: {}, storage: {} };
     let t0 = Date.now();
     const fm0 = M.fullModel(S.C, S.Y, cap), rf = solve(fm0), sf = TP.summarize(S.C, TP.yearPeriods(S.Y), rf, { cap });
     const fplan = keepPlan(sf.plan), f24 = TP.readCheck(S.C, S.Y2, solve(M.checkModel(S.C, S.Y2, fplan)), fplan);

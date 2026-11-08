@@ -176,7 +176,7 @@ const APPROVED_SNAPSHOT = {   // the approved wording's E8.4, E8.6 and E8.7 (app
 };
 const RX = /\b(course author|research|stud(y|ies)|paper|article|Li et al|excerpt|internship|confidential|supply chains?|factor(y|ies)|warehouses?|transactive|Applied Mathematical Modelling|SEGRE|California|Arizona|Nevada|synthetic|techno-economic|facilit(y|ies))\b/i;
 const NOT_RESEARCH = [
-  [/^Approved excerpt of: Li et al\. \(2023\), Applied Mathematical Modelling\.$/, "provenance label"],
+  [/^From: Li et al\. \(2023\), Applied Mathematical Modelling\.$/, "provenance label"],
   [/^In the real world$/, "heading"],
   [/^The full case: case file CF1( \(upcoming\))?\.$/, "pointer to the case file"],
   [/^Beyond outages, on-site energy can also change where a business chooses to build:$/, "bridge to the excerpt: a general idea, no study claim"],
@@ -259,7 +259,7 @@ const quotes = [...PAGE.matchAll(/<blockquote class="lx-excerpt" data-source="([
 ok(quotes.length === 1 && quotes[0][1] === "excerpt:supply-chain-mg", "one excerpt block, keyed excerpt:supply-chain-mg");
 const sents = quotes.flatMap(q => [...q[2].matchAll(/<p>([\s\S]*?)<\/p>/g)].map(x => norm(x[1])));
 ok(sents.length === 2 && sents[0] === norm(APPROVED["E8.4"]) && sents[1] === norm(APPROVED["E8.6"]), "two excerpt sentences: E8.4 and E8.6, whole rows, word for word");
-ok(/<footer>Approved excerpt of: Li et al\. \(2023\), <a href="https:\/\/doi\.org\/10\.1016\/j\.apm\.2023\.02\.014">Applied Mathematical Modelling<\/a>\.<\/footer>/.test(quotes[0][2]), "the excerpt's footer names the AMM paper with its DOI");
+ok(/<footer>From: Li et al\. \(2023\), <a href="https:\/\/doi\.org\/10\.1016\/j\.apm\.2023\.02\.014">Applied Mathematical Modelling<\/a>\.<\/footer>/.test(quotes[0][2]), "the excerpt's footer names the AMM paper with its DOI");
 const E87 = APPROVED_SNAPSHOT["E8.7"].split(/(?<=\.) (?=Leaves out:)/);
 ok(E87.length === 2 && norm(PAGE).indexOf(norm("<li>" + E87[0] + "</li><li>" + E87[1] + "</li>")) >= 0, "E8.7 sits under the excerpt, word for word, as two lines (holds when; leaves out)");
 ok(/data-term="transactive-energy">transactive energy<\/span>/.test(PAGE) && /data-term="logistics-cost">logistics cost<\/span>/.test(PAGE) && /data-term="stylized-network">stylized networks<\/span>/.test(PAGE), "the excerpt's jargon is marked for the glossary");

@@ -261,7 +261,7 @@ $$
 ```{=html}
 <div class="lx-card lx-real">
 <p class="lx-eyebrow">In the real world</p>
-<blockquote class="lx-excerpt" data-source="excerpt:wind-hydrogen"><p>As the hydrogen price rose, the optimizer built a larger electrolyzer to use more surplus wind.</p><p>The larger unit ran at lower utilization, so each kilogram carried more capital and the levelized cost of hydrogen rose, while hydrogen revenue lowered total system cost.</p><footer>Approved excerpt of: Li et al. (2024), <a href="https://doi.org/10.1115/1.4063971">Journal of Mechanical Design</a>.</footer></blockquote>
+<blockquote class="lx-excerpt" data-source="excerpt:wind-hydrogen"><p>As the hydrogen price rose, the optimizer built a larger electrolyzer to use more surplus wind.</p><p>The larger unit ran at lower utilization, so each kilogram carried more capital and the levelized cost of hydrogen rose, while hydrogen revenue lowered total system cost.</p><footer>From: Li et al. (2024), <a href="https://doi.org/10.1115/1.4063971">Journal of Mechanical Design</a>.</footer></blockquote>
 <p class="lx-hint">Goal: the lowest life-cycle cost of the whole system, net of what it earns from electricity and hydrogen.</p>
 <p class="lx-hint">Where the result holds: one planned 253 MW wind farm in West Texas, with ERCOT wholesale prices; hydrogen sold at a set price per kilogram; cost assumptions dated 2020 to 2023.</p>
 <p class="lx-hint">It leaves out: final federal hydrogen credit rules, which came later; the rest of the grid, which enters only through wholesale prices; where the hydrogen goes after it is sold.</p>

@@ -256,7 +256,7 @@ const APPROVED_SNAPSHOT = {   // the approved wording, E7 with its revisions
 // names the study, its author, its case or its method: such an element is research text unless approved or listed below
 const RX = /\b(the study (keeps|reports)|the study's|paper|article|NAPS|Li et al|course author|excerpt|research|published|accepted|300 MW-IT|36-month delay|0\.7 billion|exogenous|net-benefit test|framework|present-value accounts)\b/i;   // "study" alone is this lesson's subject (an interconnection study), so it does not signal the author's study
 const NOT_RESEARCH = [
-  [/^Approved excerpt of: Li et al\. \(2026\), accepted paper, 2026 North American Power Symposium \(NAPS\); DOI pending\.$/, "provenance label (E7.14's citation, short, as CF7)"],
+  [/^From: Li et al\. \(2026\), accepted paper, 2026 North American Power Symposium \(NAPS\); DOI pending\.$/, "provenance label (E7.14's citation, short, as CF7)"],
   [/^Invented round numbers, not the study's inputs, equations or results\.$/, "provenance label of CF7's toy (CF7's data file, 'note')"],
   [/^Illustrative round numbers, not the study's inputs, equations or results\.$/, "CF7's toy note (read from CF7's data file)"],
   [/^Case file CF7's toy, unchanged: a " \+ I7\.loadMW \+ " MW load\. $/, "provenance label (the toy)"],
@@ -324,7 +324,7 @@ ok(bad.length === 0, "research wording: every sentence about the study is approv
 const bq = [...OWN.matchAll(/<blockquote class="lx-excerpt" data-source="([^"]+)">([\s\S]*?)<footer>([\s\S]*?)<\/footer><\/blockquote>/g)];
 const sent = bq.length ? [...bq[0][2].matchAll(/<p>([\s\S]*?)<\/p>/g)].map(x => norm(x[1])) : [];
 ok(bq.length === 1 && bq[0][1] === "excerpt:code" && sent.join("|") === [APPROVED["E7.2"], APPROVED["E7.3"], APPROVED["E7.7"]].map(norm).join("|"), "one excerpt (excerpt:code): E7.2, E7.3 and E7.7, word for word");
-ok(bq.length === 1 && bq[0][3] === "Approved excerpt of: Li et al. (2026), accepted paper, 2026 North American Power Symposium (NAPS); DOI pending.", "the excerpt's footer is CF7's citation");
+ok(bq.length === 1 && bq[0][3] === "From: Li et al. (2026), accepted paper, 2026 North American Power Symposium (NAPS); DOI pending.", "the excerpt's footer is CF7's citation");
 ok(PAGE.indexOf("<p class=\"lx-hint\">" + APPROVED["E7.8"] + "</p>") > 0, "E7.8 under the excerpt, word for word");
 ok(D.sources.some(x => x.text === APPROVED["E7.14"] && !x.url), "the sources cite E7.14 (no title, no link)");
 ok(!/\b(published)\b[^.]{0,60}(NAPS|Li et al)/i.test(T + RAW), "the paper is accepted, never called published");

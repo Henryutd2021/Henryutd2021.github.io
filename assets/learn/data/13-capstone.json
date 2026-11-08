@@ -1,5 +1,12 @@
 {
  "about": "Lesson 13 (What should Prairie Town build?) and lesson 12 (Cheap or clean?): the planning model's inputs. Prairie Town is fictional; its demand, wind and solar follow the real 2025 hourly shapes of the Southwest Power Pool grid (town_year.json, EIA-930). Demand = shape x 450 MW (lesson 0's scale). Wind and solar output per MW built = LX.townProfile('scale') scaled to EIA's 2025 U.S. capacity factors (cf_targets.json). Technology costs are constant for the whole year modelled (no change over time). The reader can change two inputs: the gas price and the nuclear capital cost.",
+ "dataset": {
+  "creator": "Honglin Li",
+  "date": "2026-11-05",
+  "status": "Illustrative: Prairie Town is fictional; demand, wind and solar follow real SPP 2025 hourly shapes (EIA-930); the technology costs are from cited EIA and NREL sources.",
+  "source": "Written by hand for lessons 12 and 13 from the cited sources; the frontier is precomputed with HiGHS.",
+  "license": "CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/), Honglin Li. Values taken from the sources listed in this file keep their publishers' terms; EIA data are U.S. government works in the public domain."
+ },
  "accessed": "2026-11-02",
  "priceYear": 2025,
  "deflator": {
@@ -253,7 +260,7 @@
   "note": "Missions: every light on in the modelled weeks; under 200 kt of CO2 a year (about a quarter of the least-cost plan's emissions with no limit); a cost within 5% of the frontier at the plan's own CO2."
  },
  "frontier": {
-  "about": "Least-cost plans under a CO2 cap (kt per year; null = no cap), solved with this model on the seven weeks at the default scenario (EIA and NREL costs, gas $3.85/MMBtu). Precomputed so the page can draw the frontier at once; _tests/learn/test_13-capstone.js re-solves every point. With other scenario settings the page solves the frontier again.",
+  "about": "Least-cost plans under a CO2 cap (kt per year; null = no cap), solved with this model on the seven weeks at the default scenario (EIA and NREL costs, gas $3.85/MMBtu). Precomputed so the page can draw the frontier at once, each point solved with HiGHS, the solver the page uses. With other scenario settings the page solves the frontier again.",
   "caps": [
    null,
    700,

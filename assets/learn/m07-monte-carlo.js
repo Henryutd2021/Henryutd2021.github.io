@@ -298,7 +298,7 @@
     var F = facts(D), main = study(D, { seed: D.seed });
     var cut = function (o) { var c = {}; Object.keys(o).forEach(function (k) { c[k] = typeof o[k] === "number" ? +o[k].toPrecision(12) : o[k]; }); return c; };
     return {
-      about: "Written by node _tests/learn/test_m07-monte-carlo.js --write; recomputed by the same test on every run. Dollars are present values; shares are fractions of the runs.",
+      about: "Reference results, computed from the seeded runs. Dollars are present values; shares are fractions of the runs.",
       firstRuns: [0, 1, 2].map(function (a) { var x = {}; D.inputs.forEach(function (q) { x[q.key] = +main.X[q.key][a].toPrecision(15); }); return x; }),
       base: D.waits.reduce(function (o, t) { o[t] = cut(F.base[t]); return o; }, {}),
       main: { dev: cut(F.main.dev), rate: cut(F.main.rate), rhoDev: cut(F.main.rho.dev), rhoRate: cut(F.main.rho.rate) },

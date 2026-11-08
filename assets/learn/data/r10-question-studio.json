@@ -6,6 +6,7 @@
     "note": "Draft questions, example cards and exemplars are illustrative. The studio makes no originality judgement: the counts are context only.",
     "license": "CC BY 4.0"
   },
+  "dataset": { "creator": "Honglin Li", "date": "2026-11-03", "status": "Illustrative: the draft questions, example cards and exemplars are invented for teaching; the crowding counts are dated OpenAlex search counts, for context only.", "source": "Written by hand for research studio R10; the crowding counts come from OpenAlex keyword searches (dated in crowding.source).", "license": "This file: CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/), Honglin Li. OpenAlex data are CC0." },
   "pickers": {
     "scale": [
       { "id": "S0", "label": "S0 device and plant", "phrase": "a single device or plant" },

@@ -1,5 +1,12 @@
 {
- "about": "Lesson M10's settings. The hourly data are the course's 2025 SPP shapes in town_year.json (EIA-930); this file holds the clock, the split, the scale and the steps' choices. The reference block is written by node _tests/learn/test_m10-ml-forecasting.js --write and checked by the same test on every run; the lab notebook asserts it.",
+ "about": "Lesson M10's settings. The hourly data are the course's 2025 SPP shapes in town_year.json (EIA-930); this file holds the clock, the split, the scale and the steps' choices. The reference block holds the lesson's results, computed from these settings and the hourly data; the lab notebook checks its answers against them.",
+ "dataset": {
+  "creator": "Honglin Li",
+  "date": "2026-11-05",
+  "status": "Real hourly shapes (SPP 2025, EIA-930) with illustrative settings; the forecasts are the lesson's own demonstration models.",
+  "source": "Prepared by hand for lesson M10; the hourly data are the course's cleaned SPP 2025 shapes.",
+  "license": "CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/), Honglin Li. Values taken from the sources listed in this file keep their publishers' terms; EIA data are U.S. government works in the public domain."
+ },
  "peakMW": 54411,
  "peakSource": "SPP's 2025 peak hourly demand as reported to EIA-930 (assets/learn/data/04-forecasts.json, spp_peak_demand_mw; accessed 2 Nov 2026)",
  "clock": {
@@ -66,7 +73,7 @@
   "name": "Thanksgiving Day"
  },
  "reference": {
-  "about": "Written by node _tests/learn/test_m10-ml-forecasting.js --write; recomputed by the same test on every run. MW; shares are fractions of the hours.",
+  "about": "Reference results, computed from these settings and the hourly data. MW; shares are fractions of the hours.",
   "hours": {
    "train": 6383,
    "val": 744,

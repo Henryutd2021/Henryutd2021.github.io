@@ -1,5 +1,6 @@
 {
  "about": "Data of Learn lesson A16, Where does hydrogen make sense? The wind farm, its grid limit and the hydrogen user are fictional and illustrative; the wind follows the real hourly shape of the Southwest Power Pool grid in 2025 (town_year.json, EIA-930). Every cost is in 2022 dollars, from one DOE record. Sources and dates are given with each item.",
+ "dataset": { "creator": "Honglin Li", "date": "2026-11-07", "status": "Illustrative: the wind farm, its grid limit and the hydrogen user are fictional; the wind follows SPP's real 2025 hourly shape (EIA-930); the costs are from one DOE record, in 2022 dollars.", "source": "Written by hand for lesson A16 from the sources named with each item.", "license": "CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/), Honglin Li. Values taken from the sources named in this file keep their publishers' terms; EIA and DOE data are U.S. government works in the public domain." },
  "farm": { "windMW": 100, "exportMW": 50, "profileMethod": "power", "note": "Illustrative: a 100 MW wind farm whose grid connection takes at most 50 MW." },
  "electrolyzer": {
   "kWhPerKg": 57, "capexPerKW": 2000, "life": 30, "rate": 0.04, "rateNote": "4% real, as in lesson 13.",

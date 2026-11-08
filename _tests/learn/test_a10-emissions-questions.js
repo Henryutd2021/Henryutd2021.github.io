@@ -159,9 +159,9 @@ quotes.forEach(q => [...q[2].matchAll(/<p>([\s\S]*?)<\/p>/g)].forEach(p => ok(ap
 const paras = q => [...q[2].matchAll(/<p>([\s\S]*?)<\/p>/g)].map(p => norm(p[1])).join(" ");
 ok(paras(quotes[0]) === SNAP["E6.4"] + " " + SNAP["E6.6"] && paras(quotes[1]) === SNAP["E10.2"] + " " + SNAP["E10.3"], "ghg: E6.4 then E6.6; txh2: E10.2 then E10.3, word for word");
 onPage(`<p class="lx-hint">${SNAP["E10.4"]}</p>`, "E10.4 under the txh2 excerpt");
-ok(/Approved excerpt of: Li et al\. \(2025\), <a href="https:\/\/doi\.org\/10\.1016\/j\.crsus\.2025\.100367">Cell Reports Sustainability<\/a>\./.test(PAGE) && /Approved excerpt of: Li et al\. \(2025\), <a href="https:\/\/doi\.org\/10\.1016\/j\.ijhydene\.2025\.02\.303">International Journal of Hydrogen Energy<\/a>\./.test(PAGE), "excerpt footers and DOIs");
+ok(/From: Li et al\. \(2025\), <a href="https:\/\/doi\.org\/10\.1016\/j\.crsus\.2025\.100367">Cell Reports Sustainability<\/a>\./.test(PAGE) && /From: Li et al\. \(2025\), <a href="https:\/\/doi\.org\/10\.1016\/j\.ijhydene\.2025\.02\.303">International Journal of Hydrogen Energy<\/a>\./.test(PAGE), "excerpt footers and DOIs");
 const RX = /\b(stud(y|ies)|paper|Li et al|course author|excerpt|ERCOT|Texas|weather zones?|load regulation|re-timed)\b/i;
-const LABELS = [/^Approved excerpt of: Li et al\. \(2025\), (Cell Reports Sustainability|International Journal of Hydrogen Energy)\.$/, /^Li et al\. \(2025\)\. .+\.$/,
+const LABELS = [/^From: Li et al\. \(2025\), (Cell Reports Sustainability|International Journal of Hydrogen Energy)\.$/, /^Li et al\. \(2025\)\. .+\.$/,
   /^Case file CF6: how much shifting load to cleaner hours can cut emissions, and when\.$/];
 const OWN = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1:end -->/g, "").replace(/<!--[\s\S]*?-->/g, "").replace(/^---[\s\S]*?\n---\n/, "");
 const elems = OWN.replace(/^- (.*)$/gm, "<li>$1</li>").split(/<\/?(?:p|li|ul|ol|dl|dt|dd|div|blockquote|footer|table|thead|tbody|tr|td|th|summary|details|h[1-6]|header|script)\b[^>]*>/i).map(norm).filter(s => /[A-Za-z]/.test(s));

@@ -304,7 +304,7 @@ function researchWording(entry) {
   const RX = /\b(the study|study's|paper|article|IDETC|Li et al|course author|excerpt|research project|SDWPF|SCADA|kernel density|nine test turbines|DOE|funding|plants? (with|without) (power )?measurements|held-out plants)\b/i;
   const NOT_RESEARCH = [
     [/^Where this came up in research$/, "heading"],
-    [/^Approved excerpt of: Li et al\., ASME IDETC 2023\.$/, "provenance label (E12.16's short citation, as E1's)"],
+    [/^From: Li et al\., ASME IDETC 2023\.$/, "provenance label (E12.16's short citation, as E1's)"],
     [/^This page's turbine is a toy: invented round numbers, not the studies' data, equations or results\.$/, "provenance of the toy"],
     [/^Case file CF8: learning a wind turbine's power curve from scarce data\.$/, "navigation (the case file's title)"],
     [/^(mfgpr-wind-power-curve|wind-uq-surrogate): public example repository · MIT licence · synthetic data\.$/, "repository label"],

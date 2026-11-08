@@ -155,9 +155,9 @@ const RX = /\b(stud(y|y's|ies|ies')|paper|article|journal|Li et al|course author
 const NOT_RESEARCH = [
   [/^\d · [A-Z][a-z ,]+$/, "part label"],
   [/^Question type: prescriptive \(where should it build, and what should each site install\?\)\.$/, "course label (the course's question types)"],
-  [/^Approved excerpt of: Li et al\. \(2023\), Applied Mathematical Modelling\.$/, "provenance label"],
-  [/^From the approved excerpt of Li et al\. \(2023\), Applied Mathematical Modelling\.$/, "provenance label"],
-  [/^Every result about the studies is quoted from approved excerpts of the published papers named in the sources\.$/, "provenance label"],
+  [/^From: Li et al\. \(2023\), Applied Mathematical Modelling\.$/, "provenance label"],
+  [/^From Li et al\. \(2023\), Applied Mathematical Modelling\.$/, "provenance label"],
+  [/^Every result about the studies is quoted from the published papers named in the sources\.$/, "provenance label"],
   [/^The toy below uses illustrative round numbers\.$/, "provenance label (the toy)"],
   [/^Illustrative numbers, not the studies' inputs or results\.$/, "provenance label (the toy)"],
   [/^Li et al\. \(2023\), (Applied Mathematical Modelling 119, 119–136|SEGRE 2023, 410–415)$/, "citation label (timeline, data file)"],

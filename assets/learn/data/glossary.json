@@ -3479,17 +3479,18 @@
   "lesson": "R3",
   "href": "r03-system-and-method.html"
  },
+ "time-of-use-tariff": {
+  "term": "Time-of-use tariff",
+  "short": "A retail electricity price that changes with the hour of the day, higher at peak times and lower off-peak.",
+  "lesson": "A4",
+  "href": "a04-retail-tariffs.html"
+ },
  "time-of-use": {
   "term": "Time-of-use tariff",
   "short": "A retail electricity price that changes with the hour of the day, higher at peak times and lower off-peak.",
-  "lesson": "CF1",
-  "href": "cf1-supply-chain-microgrids.html"
- },
- "time-of-use-tariff": {
-  "term": "Time-of-use tariff",
-  "short": "An electricity price that changes with the hour of the day, usually higher in the evening peak.",
-  "lesson": "R1",
-  "href": "r01-framing.html"
+  "lesson": "A4",
+  "alias": "time-of-use-tariff",
+  "href": "a04-retail-tariffs.html"
  },
  "time-series-aggregation": {
   "term": "Time-series aggregation",
@@ -3535,9 +3536,10 @@
  },
  "transfer": {
   "term": "Transfer",
-  "short": "A payment, such as a tax, that moves money from one party to another without using up any resources itself.",
-  "lesson": "F8",
-  "href": "f08-large-loads.html"
+  "short": "A payment that moves money from one group to another, such as a carbon payment to the government or a credit to a plant owner, without using anything up.",
+  "lesson": "A12",
+  "alias": "transfer-payment",
+  "href": "a12-policy-instruments.html"
  },
  "transformer": {
   "term": "Transformer",

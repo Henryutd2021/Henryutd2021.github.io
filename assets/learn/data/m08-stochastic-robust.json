@@ -1,5 +1,12 @@
 {
- "about": "Data of Learn lesson M8 (deciding before the uncertainty resolves: stochastic and robust optimization). A fictional windy zone of the Plains region: illustrative round numbers in 2025 dollars, not the inputs or results of any study. The wind blocks are rounded from SPP's 2025 hourly wind shape (EIA-930, town_year.json) scaled to EIA's 2025 U.S. wind capacity factor (cf_targets.json). The reference block is written by node _tests/learn/test_m08-stochastic-robust.js --write and re-solved by the same test on every run.",
+ "about": "Data of Learn lesson M8 (deciding before the uncertainty resolves: stochastic and robust optimization). A fictional windy zone of the Plains region: illustrative round numbers in 2025 dollars, not the inputs or results of any study. The wind blocks are rounded from SPP's 2025 hourly wind shape (EIA-930, town_year.json) scaled to EIA's 2025 U.S. wind capacity factor (cf_targets.json). The reference block holds the lesson's results, solved with this model in HiGHS; the lab notebook checks its answers against them.",
+ "dataset": {
+  "creator": "Honglin Li",
+  "date": "2026-11-05",
+  "status": "Illustrative: a fictional windy zone with round numbers in 2025 dollars; the wind blocks are rounded from SPP's 2025 hourly wind shape (EIA-930).",
+  "source": "Prepared by hand for lesson M8; the reference results are solved with HiGHS.",
+  "license": "CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/), Honglin Li. Values taken from the sources listed in this file keep their publishers' terms; EIA data are U.S. government works in the public domain."
+ },
  "zone": {
   "name": "the windy zone",
   "lineMW": 1000,
@@ -116,7 +123,7 @@
   "step": 5
  },
  "reference": {
-  "about": "Written by node _tests/learn/test_m08-stochastic-robust.js --write; re-solved by the same test on every run. Costs in $ a year (2025 dollars), sizes in MW.",
+  "about": "Reference results, solved with the lesson's model in HiGHS. Costs in $ a year (2025 dollars), sizes in MW.",
   "ws": {
    "low": {
     "x": 380,

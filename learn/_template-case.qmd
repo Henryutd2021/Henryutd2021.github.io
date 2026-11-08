@@ -43,7 +43,7 @@ body-classes: "page-learn page-lesson lx-form-case"
 <div class="lx-case-part"><p class="lx-eyebrow">4 · Decisions, goal and rules, in words</p><ul><li><b>Decisions:</b> one line.</li><li><b>Goal:</b> one line.</li><li><b>Rules:</b> one line.</li></ul></div>
 <div class="lx-case-part wide"><p class="lx-eyebrow">5 · Data and method</p><p>One or two sentences, with the data's source and date.</p></div>
 <div class="lx-case-part wide"><p class="lx-eyebrow">6 · What came out, and where it holds</p>
-<blockquote class="lx-excerpt" data-source="excerpt:<key>"><p>The approved excerpt, word for word.</p><footer>Approved excerpt of: Author et al. (year), Journal.</footer></blockquote>
+<blockquote class="lx-excerpt" data-source="excerpt:<key>"><p>The approved excerpt, word for word.</p><footer>From: Author et al. (year), Journal.</footer></blockquote>
 <p class="lx-hint">Holds when: one line. Leaves out: one line.</p></div>
 </div>
 <div class="lx-interactive" data-learn="<slug>" data-src="../assets/learn/data/<id>.json">
@@ -54,7 +54,7 @@ body-classes: "page-learn page-lesson lx-form-case"
 <!-- <slug>-timeline:end -->
 </div>
 </div>
-<p class="lx-datanote"><span>Every result on this page is quoted from the approved excerpt of the published study named in the sources; the toy numbers in the check are illustrative.</span></p>
+<p class="lx-datanote"><span>Every result on this page is quoted from the published study named in the sources; the toy numbers in the check are illustrative.</span></p>
 ```
 :::
 

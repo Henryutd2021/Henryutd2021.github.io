@@ -38,7 +38,7 @@
     var F = facts(D), cut = function (v) { return +v.toPrecision(10); }, sc = function (s) { return { rmse: cut(s.rmse), pinball: cut(s.pinball), width: cut(s.width), cov: LEVELS.reduce(function (o, l) { o[l] = cut(s.cov[l]); return o; }, {}), cov90ByRange: s.byRange.map(function (r) { return cut(r.cov90); }) }; };
     var one = fitStored(D, D.n0, false), two = F.two;
     return {
-      about: "Written by node _tests/learn/test_m09-surrogates-uq.js --write; recomputed by the same test on every run. kW, m/s; coverages are fractions of the 400 held-out records.",
+      about: "Reference results, recomputed from the seeded records. kW, m/s; coverages are fractions of the 400 held-out records.",
       field: [4, 8, 11.5, 15].map(function (v) { return [v, cut(field(D.turbine, v)), cut(field(D.turbine, v, "reduce"))]; }),
       ml16: { ell: F.ml.hp.ell, sf: F.ml.hp.sf, sn: F.ml.hp.sn, loglik: cut(F.ml.ll), margin: cut(F.ml.margin) },
       beta16: { one: one.beta.map(cut), two: two.beta.map(cut) },

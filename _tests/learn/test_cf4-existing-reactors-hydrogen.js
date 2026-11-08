@@ -16,7 +16,8 @@
 //     sentence split into list items (an element with data-e15) joins back to its row word for word; each row sits where
 //     the approved wording's "Where it would appear" column puts it (--places lists every placement with file:line); the replaced wordings and the
 //     alternatives (E15.7n, E15.20a, E15.22d, E15.31) are not used. Live: the excerpt's footer and the boundary card's
-//     source line are E15.30 ("Approved excerpt of: ...", CF7's and CF5's form), "approved" appears only there, and no
+//     source line are E15.30 with its visible label "From: " in place of the wording's "Approved excerpt of: " (CF7's and
+//     CF5's form), "approved" appears nowhere a reader sees, and no
 //     draft wording is left; the page is learn/<id>.qmd and nowhere else; path.yml status active; path.json lists CF4;
 //     its glossary terms name CF4 (ancillary-services stays CF5's); the draft-period line ("Source: ...") is gone; A1, M11
 //     and A12 name CF4 through LX.lessonRefHTML
@@ -308,9 +309,10 @@ if (REG) {
 const RG = { units: Object.values(EFF).map(X.norm), raw: EFF };
 {
   const KEYS = Array.from({ length: 30 }, (x, i) => "E15." + (i + 1));
-  // E15.30, "Approved excerpt of: ..."; the draft period's "Source: ..." line must be gone
-  const F30 = RG.raw["E15.30"], F30draft = F30.replace(/^Approved excerpt of: /, "Source: "), FOOT = F30;
-  ok(/^Approved excerpt of: Li et al\. \(2026\), Nature Communications\.$/.test(F30), "E15.30 is the footer form of CF3, CF5 and CF7");
+  // E15.30, "Approved excerpt of: ..." in the approved wording; the page shows it with the label "From: " (FOOT); the draft
+  // period's "Source: ..." line must be gone
+  const F30 = RG.raw["E15.30"], F30draft = F30.replace(/^Approved excerpt of: /, "Source: "), FOOT = F30.replace(/^Approved excerpt of: /, "From: ");
+  ok(/^Approved excerpt of: Li et al\. \(2026\), Nature Communications\.$/.test(F30), "E15.30 is the footer form of CF3, CF5 and CF7 (in the approved wording)");
   const VIS0 = X.elements(PAGE.replace(/<!--[\s\S]*?-->/g, "")).map(X.norm).join(" ");
   ok(Object.keys(REPLACED).every(k => X.sentencesOf(REPLACED[k]).filter(x => !X.sentencesOf(RG.raw[k]).includes(x)).every(x => !VIS0.includes(x) && !JSON.stringify(D).includes(x))), "the wordings the revisions replaced are not on the page or in the data: " + Object.keys(REPLACED).join(", "));
   const OWN = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1:end -->/g, "").replace(/<!--[\s\S]*?-->/g, "").replace(/^---[\s\S]*?\n---\n/, "");
@@ -327,7 +329,7 @@ const RG = { units: Object.values(EFF).map(X.norm), raw: EFF };
     /^So can an existing plant earn more by making hydrogen as well as power\?$/, /^Question type: prescriptive \(what should be added, and how should it run\?\)\.$/,
     /^Detail(What the equipment can do, and the two cases|From one year to a lifetime|Sensitivity runs)$/, /^(The pressure|The option|The open question)$/];
   const segs = X.elements(caseHTML.replace(SPLIT, "")).map(X.norm).filter(Boolean);
-  segs.forEach(sg => ok(LABELS.some(re => re.test(sg)) || X.approved(RG, sg), "case text is approved E15 wording or a label: " + sg.slice(0, 70)));
+  segs.forEach(sg => ok(LABELS.some(re => re.test(sg)) || X.approved(RG, sg) || sg === X.norm(FOOT), "case text is approved E15 wording, E15.30 as shown, or a label: " + sg.slice(0, 70)));
   // each row where the approved wording puts it
   const inPart = (k, i) => X.norm(parts[i - 1].replace(SPLIT, (m0, dt, tag, key) => key === k ? "<p>" + X.norm(joined[k].join(" ")) + "</p>" : m0)).includes(X.norm(RG.raw[k]))
     || X.elements(parts[i - 1]).map(X.norm).join(" ").includes(X.norm(RG.raw[k]));
@@ -386,17 +388,18 @@ const RG = { units: Object.values(EFF).map(X.norm), raw: EFF };
     .replace(/<blockquote[\s\S]*?<\/blockquote>/g, "").replace(/<div class="lx-card lx-sources">[\s\S]*?<li>Earlier/, "<li>Earlier");
   const restSegs = X.elements(rest).map(X.norm).concat([D.timeline.title, D.timeline.lede, I.title, I.note, D.boundary.title], JSSTR.map(X.norm)).filter(s => RX.test(s));
   restSegs.forEach(sg => ok(X.approved(RG, sg) || OWNLINES.some(re => re.test(sg)) || (/toy|electrolyzer|reserve|plant|hydrogen|grid/i.test(sg) && !/\b(stud(y|ies)|paper|article|Li et al|reactors?|nuclear|ISO\/RTO|credits?|framework|Nature Communications|retrofit|baseload|net present value)\b/i.test(sg)), "outside the case: E15 wording or the course's own: " + sg.slice(0, 80)));
-  // "approved" is said only by E15.30 (the footer, the boundary card's source line and its no-JS text), the draft-period
-  // line is gone and no draft wording is left (page, data, script strings)
+  // "approved" is said nowhere a reader sees; E15.30 in its shown form is the footer, the boundary card's source line and
+  // its no-JS text; the draft-period line is gone and no draft wording is left (page, data, script strings)
   const dstr = o => typeof o === "string" ? [o] : o && typeof o === "object" ? Object.values(o).flatMap(dstr) : [];
   const VIS = X.elements(OWN).concat(dstr(Object.assign({}, D, { about: "", built: "" })), JSSTR);
   const said = VIS.filter(s => /approv/i.test(s));
   {
-    ok(said.length === 3 && said.every(s => X.norm(s) === X.norm(F30)), "live: 'approved' is said only by E15.30: the footer, the boundary card's source line and its no-JS text (" + said.length + "): " + said.join(" | ").slice(0, 160));
-    ok(!VIS.some(s => X.norm(s) === X.norm(F30draft)) && !/<footer>Source:/.test(PAGE) && D.boundary.source === F30, "live: the draft-period line '" + F30draft + "' is gone (footer, boundary card, no-JS text)");
+    ok(said.length === 0, "live: 'approved' is not said where a reader sees it (" + said.length + "): " + said.join(" | ").slice(0, 160));
+    ok(VIS.filter(s => X.norm(s) === X.norm(FOOT)).length === 3, "live: E15.30 as shown ('From: ...') is the footer, the boundary card's source line and its no-JS text");
+    ok(!VIS.some(s => X.norm(s) === X.norm(F30draft)) && !/<footer>Source:/.test(PAGE) && D.boundary.source === FOOT, "live: the draft-period line '" + F30draft + "' is gone (footer, boundary card, no-JS text)");
     ok(!VIS.some(s => /\bdrafts?\b|\bdrafted\b|waiting for Henry|\bon hold\b/i.test(s)) && !/\bdraft|\bhold\b|\bheld\b/i.test(D.about + PAGE.match(/<!-- Case file CF4[\s\S]*?-->/)[0]), "live: no draft or hold wording on the page, in the data, in the script's strings or in the page's header comment");
-    const f7 = (fs.readFileSync(path.join(SITE, "learn/cf7-cost-of-waiting.qmd"), "utf8").match(/<footer>(Approved excerpt of: [^<]*)<\/footer>/) || [])[1] || "";
-    ok(/^Approved excerpt of: Li et al\. \(2026\), /.test(f7) && q[0] && /^Approved excerpt of: Li et al\. \(2026\), <a href="[^"]+">Nature Communications<\/a>\.$/.test(q[0][3]), "live: the footer has CF7's form, 'Approved excerpt of: Li et al. (2026), <venue>.' (CF7: " + f7 + ")");
+    const f7 = (fs.readFileSync(path.join(SITE, "learn/cf7-cost-of-waiting.qmd"), "utf8").match(/<footer>(From: [^<]*)<\/footer>/) || [])[1] || "";
+    ok(/^From: Li et al\. \(2026\), /.test(f7) && q[0] && /^From: Li et al\. \(2026\), <a href="[^"]+">Nature Communications<\/a>\.$/.test(q[0][3]), "live: the footer has CF7's form, 'From: Li et al. (2026), <venue>.' (CF7: " + f7 + ")");
   }
   // the alternatives and the left-out sentences are not used
   ok(!/nearly all reactors studied|for most reactors\.|new-plant cases|market design, not only the reactor|without policy support|about \$240 million|240 million|1\.06 billion|61\.9|\$510 million|\$12\.3 million/i.test(PAGE + JSON.stringify(D) + JS), "the alternatives (E15.7n, E15.20a, E15.22d, E15.31) and the abstract's left-out figures are not used");
@@ -411,7 +414,7 @@ const RG = { units: Object.values(EFF).map(X.norm), raw: EFF };
     if (k === "E15.25") at = "assets/learn/data/" + ID + ".json (boundary) and " + (find(k, D.boundary.holds[0]) || rel) + " (no-JS block)";
     if (k === "E15.26" || k === "E15.27") at = "assets/learn/data/" + ID + ".json (timeline) and " + (find(k, RG.raw[k]) || rel) + " (no-JS block)";
     if (k === "E15.29") at = find(k, "<li>Li et al. (2026). <a", true);
-    const pre = "Approved excerpt of:";
+    const pre = "From:";   // E15.30's visible label
     if (k === "E15.30") at = find(k, "<footer>" + pre + " Li et al. (2026)", true) + ", and the boundary card's source line: assets/learn/data/" + ID + ".json and " + (find(k, '</dl><p class="lx-hint">' + pre + ' Li et al. (2026), Nature Communications.', true) || rel) + " (no-JS block)";
     if (k === "E15.4" && at) at += " and the front matter's description (" + rel + ":" + (lines.findIndex(l => /^description:/.test(l)) + 1) + ")";
     if (k === "E15.28") at = X.sentencesOf(RG.raw[k]).map(s => find(k, s)).join(", ");
