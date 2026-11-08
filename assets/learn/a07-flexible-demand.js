@@ -379,9 +379,11 @@
     function spans() {
       var sp = [], pk = [];
       W.key.forEach(function (k, t) { if (k === "spill") sp.push(t); if (k === "pk") pk.push(t); });
-      // the shading is the day as dispatched before any change; the text versions give the margin after it too
-      return [{ x0: sp[0], x1: sp[sp.length - 1] + 1, color: "var(--lx-solar)", op: 0.13, label: "Spare sun, before" }, { x0: pk[0], x1: pk[pk.length - 1] + 1, color: "var(--lx-pk)", op: 0.13, label: "Peaker, before" }];
+      // the shading is the day as dispatched before any change (the legend says so); the text versions give the margin
+      // after it too
+      return [{ x0: sp[0], x1: sp[sp.length - 1] + 1, color: "var(--lx-solar)", op: 0.13, label: "Spare sun" }, { x0: pk[0], x1: pk[pk.length - 1] + 1, color: "var(--lx-pk)", op: 0.13, label: "Peaker" }];
     }
+    var SHADE = { label: "Shading: spare-sun and peaker hours before any change", color: "var(--lx-solar)" };
     function paint() {
       chips.innerHTML = "";
       if (part === "hook") {
@@ -391,7 +393,7 @@
         if (hookShown) { chip("Moved", mwh(H0.q)); chip("Energy saved", dmwh(hk.saved)); chip("Running cost", dusd(hk.cost)); chip("Plants' CO₂", dt(hk.co2)); }
         P.render({ x: X, y: { min: 180, max: 360, step: 30, fmt: function (v) { return String(v); }, unit: "MW" }, height: 240, heightN: 210, spans: spans(),
           lines: [{ values: W.demand, step: 1, color: "var(--lx-ink-3)", width: 2, dash: "5 4" }].concat(hookShown ? [{ values: use, step: 1, color: "var(--lx-dr)", width: 2.6 }] : []),
-          legend: [{ label: "Use as it was", color: "var(--lx-ink-3)", dash: "5 4" }].concat(hookShown ? [{ label: "Use with " + H0.q + " MWh moved", color: "var(--lx-dr)" }] : []),
+          legend: [{ label: "Use as it was", color: "var(--lx-ink-3)", dash: "5 4" }].concat(hookShown ? [{ label: "Use with " + H0.q + " MWh moved", color: "var(--lx-dr)" }] : []).concat([SHADE]),
           aria: "Prairie Town's use on " + W.dateLabel + (hookShown ? ", before and after moving " + H0.q + " MWh from " + hm(H0.from) + " to " + hm(H0.to) + "." : ", hour by hour."),
           text: { head: ["Hour", "Use before, MW", "Use after, MW", "On the margin before", "On the margin after"], rows: W.demand.map(function (d, t) { return [span(t), String(d), String(use[t]), marginal(W.h[t]), marginal(hour(W.plants, W.gap[t] + use[t] - d))]; }) } });
         status.textContent = hookShown ? hookReveal(W, D) : "Prairie Town's use on " + W.dateLabel + ", hour by hour.";
@@ -404,7 +406,7 @@
         if (S.user) chip("Users' cost", usd(r.user));
         P.render({ x: X, y: { min: 180, max: 360, step: 30, fmt: function (v) { return String(v); }, unit: "MW" }, height: 240, heightN: 210, spans: spans(),
           lines: [{ values: W.demand, step: 1, color: "var(--lx-ink-3)", width: 2, dash: "5 4" }, { values: r.use, step: 1, color: "var(--lx-dr)", width: 2.6 }],
-          legend: [{ label: "Use as it was", color: "var(--lx-ink-3)", dash: "5 4" }, { label: "Use after the shift", color: "var(--lx-dr)" }],
+          legend: [{ label: "Use as it was", color: "var(--lx-ink-3)", dash: "5 4" }, { label: "Use after the shift", color: "var(--lx-dr)" }, SHADE],
           aria: "Prairie Town's use on " + W.dateLabel + ", before and after the shift: " + mwh(r.moved) + " moved.",
           text: { head: ["Hour", "Use before, MW", "Use after, MW", "On the margin before", "On the margin after"], rows: W.demand.map(function (d, t) { return [span(t), String(d), (Math.round(r.use[t] * 10) / 10).toFixed(1), marginal(W.h[t]), marginal(r.h[t])]; }) } });
         status.textContent = bare(shiftLine(W, D, S));
@@ -417,7 +419,7 @@
         P.render({ x: X, y: { min: 0, max: 200, step: 50, fmt: function (v) { return String(v); }, unit: "MW" }, height: 240, heightN: 210, spans: spans(),
           refs: [{ y: W.plants.cc.mw, label: "Combined-cycle full", labelN: "150 MW", dash: "4 3", labelColor: "var(--lx-ink-2)" }],   // ink-2: the label sits on the shaded area
           lines: [{ values: g0, step: 1, color: "var(--lx-ink-3)", width: 2, dash: "5 4" }, { values: g1, step: 1, color: "var(--lx-pk)", width: 2.6, area: 0.12 }],
-          legend: [{ label: "Gas output without the pool", color: "var(--lx-ink-3)", dash: "5 4" }, { label: "With the pool", color: "var(--lx-pk)" }],
+          legend: [{ label: "Gas output without the pool", color: "var(--lx-ink-3)", dash: "5 4" }, { label: "With the pool", color: "var(--lx-pk)" }, SHADE],
           aria: "Gas output on " + W.dateLabel + " with and without the pool; above 150 MW the peaker runs.",
           text: { head: ["Hour", "Gas without, MW", "Gas with, MW", "Pool cut, MW", "Use coming back, MW"], rows: g0.map(function (x, t) { return [span(t), String(x), (Math.round(g1[t] * 10) / 10).toFixed(1), v.cut[t].toFixed(2), v.back[t].toFixed(2)]; }) } });
         status.textContent = vppLine(W, D, pool, S.stagger);
