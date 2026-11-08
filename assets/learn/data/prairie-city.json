@@ -19,7 +19,7 @@
   "date": "2026-11-07",
   "status": "Illustrative: Prairie City is fictional. Its prices are Kansas's (or the Midwest's) 2025 averages (EIA), its weather Wichita's 1991-2020 normals (NOAA), its hourly shapes SPP's 2025 grid (EIA-930); everything else is set for teaching.",
   "source": "Built bottom-up for the course from the public sources listed in `sources`, by the method in `about.method`; the representative days and the full year follow the rules stated in `daysNote` and `fullYear`.",
-  "license": "CC BY 4.0, Honglin Li. Values taken from the sources listed in this file keep their publishers' terms; EIA, NOAA, EPA, Census and DOE data are U.S. government works in the public domain."
+  "license": "CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/), Honglin Li. Values taken from the sources listed in this file keep their publishers' terms; EIA and DOE data are U.S. government works in the public domain, and NOAA's 1991-2020 climate normals are listed as CC0 in NOAA's catalog record."
  },
  "dollarYear": 2025,
  "units": {

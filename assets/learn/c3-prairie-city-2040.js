@@ -215,7 +215,7 @@
           "Sensitivity: ", { text: "the yearly cost runs from " + mil(x.sens.cheap) + " to " + mil(x.sens.dear) + " at the inputs' cheaper and dearer ends, equipment fixed (table attached); " + lc1(x.sens.top.label) + " moves it most; every input is set for teaching", note: "A range, what was held fixed, the input that matters most, what kind of number each input is, and the table." }, ".\n",
         ].concat(obj.length ? [].concat.apply([], x.objectors.map(function (k, i) { return ["Panel: ", { text: "to " + obj[i], note: ANSWER_NOTE[k] }, ".\n"]; }))
           : ["Panel: ", { text: "no stakeholder objects", note: "Each objection would need an answer: a reason or a change." }, ".\n"]).concat([
-          "Sources: ", { text: "EIA, NOAA, EPA and DOE public data (U.S. government works); A19's simulated map layers; the course's CC BY 4.0 model; no conflict of interest", note: "The data and their terms named, and the conflict of interest stated." }, ".\n",
+          "Sources: ", { text: "public data from EIA, NOAA, EPA, Census and DOE, each under its publisher's terms; A19's simulated map layers; the course's CC BY 4.0 model; no conflict of interest", note: "The data and their terms named, and the conflict of interest stated." }, ".\n",
           "Limits: ", { text: "2025's people and prices held to 2040, one substation per district, eight representative days of synthetic weather" + (x.full ? " (on all 8,760 hours the upgrades fall " + x.full.extra.toFixed(1) + " MW short, on " + x.full.days + ")" : "") + ", the household rule an assumption, the map's layers simulated", note: "What the plan leaves out, and what the full-year check found, so the council does not over-read it." }, "."]) }],
       note: "Both summaries are illustrative. The strong one quotes this engine's numbers for one reference plan within the budget, precomputed; another plan is just as strong when its evidence supports it." };
   }
@@ -249,7 +249,7 @@
       { key: "evidence", label: "Cost, CO₂ and the grid", hint: "Two or three sentences: what the plan costs against the budget, what it cuts, and where the substations need room.", rows: 3, need: true, min: 12 },
       { key: "fairness", label: "Who pays and who gains", hint: "Two or three sentences on the household groups, with the adoption rule you assumed.", rows: 3, need: true, min: 12 },
       { key: "siting", label: "The solar farm's site", hint: "One or two sentences: which site and why, or why no farm.", rows: 2, need: true, min: 8 },
-      { key: "sources", label: "Sources and credit", hint: "One or two sentences: the data behind your numbers and their licences (EIA, NOAA, EPA and DOE public data; A19's simulated layers), and any conflict of interest.", rows: 2, need: true, min: 8 }],
+      { key: "sources", label: "Sources and credit", hint: "One or two sentences: the data behind your numbers and their terms (public data from EIA, NOAA, EPA, Census and DOE, each under its publisher's terms; A19's simulated layers), and any conflict of interest.", rows: 2, need: true, min: 8 }],
     TWO_PAGES: 1100,
     // the panel's answers (one box per stakeholder, beside the summary; kept in this browser like the summary's words, never
     // in the plan link): four words or more from each stakeholder whose reaction is not yes

@@ -10,7 +10,7 @@
   "date": "2026-11-07",
   "status": "Illustrative: the costs that say `via` are read from the course's other data files (EIA, NREL and DOE figures, converted to 2025 dollars); everything marked teaching is set for this course. `precomputed` holds the pages' default runs of engine E3, solved with HiGHS, which the lab notebook checks its answers against.",
   "source": "Prepared for the course's engine E3 (Prairie City's energy hub); each cost names its course file in `via` and its publications in `src` (listed in `sources`).",
-  "license": "CC BY 4.0, Honglin Li. Values taken from the sources listed in this file keep their publishers' terms; EIA, NOAA, EPA, Census and DOE data are U.S. government works in the public domain."
+  "license": "CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/), Honglin Li. Values taken from the sources listed in this file keep their publishers' terms; EIA and DOE data are U.S. government works in the public domain."
  },
  "dollarYear": 2025,
  "finance": {
@@ -585,7 +585,7 @@
       ".\n",
       "Sources: ",
       {
-       "text": "EIA, NOAA, EPA and DOE public data (U.S. government works); A19's simulated map layers; the course's CC BY 4.0 model; no conflict of interest",
+       "text": "public data from EIA, NOAA, EPA, Census and DOE, each under its publisher's terms; A19's simulated map layers; the course's CC BY 4.0 model; no conflict of interest",
        "note": "The data and their terms named, and the conflict of interest stated."
       },
       ".\n",
