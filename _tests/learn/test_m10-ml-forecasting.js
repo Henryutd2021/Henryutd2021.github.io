@@ -118,6 +118,10 @@ ok(F.worst.map(w => w.date).join() === "2025-11-30,2025-11-10,2025-11-27" && pc(
 { const ref = M.reference(Y, D); ok(JSON.stringify(ref) === JSON.stringify(D.reference), "the settings file's reference block is up to date (run with --write)"); }
 const OWN = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?<!-- learn:\1:end -->/g, ""), TX = text(OWN);
 const has = (s, what) => ok(TX.includes(s), "page: " + what + ": '" + s + "'");
+has("the cleaned series sets it to zero for hours ending 23 to 5, hours whose monthly median is zero, and hours with the sun below the horizon", "data note: the night solar zeros are a processing rule");
+ok(/solar set to zero at night \(hours whose monthly median is zero, hours ending 23-24 and 1-5 local, and hours when the sun is below the horizon/.test(Y.meta.normalisation), "data note: the night-zero rule matches the data's own processing note");
+has("Check coverage and quantile scores together; choose a band on validation data, then report the test.", "myth 3: no tuning of a band to match coverage");
+has("Many small if-then trees, each fitted to the misses of those before it, then added up.", "Go deeper: gradient boosting explained");
 has("The best of 16 linear mixes beat same hour yesterday by " + pc(F.skillVal) + " on October and " + pc(F.skillTest) + " on November.", "myth 1");
 has("A model that scores " + mw(F.leakVal.lag1) + " where the best fair one scores " + mw(F.best.val) + " is simply better.", "myth 2");
 has("At twice October's width the 80% band held " + pc(F.widths[F.widths.length - 1].b.cov[80]) + " of November's hours, but its pinball loss was the worst of the widths tried.", "myth 3");
@@ -181,6 +185,9 @@ ok(!/midnight|tomorrow's average/.test(TX + JS.replace(/\/\/[^\n]*/g, "")), "the
   sawIs(2, "Same hour yesterday misses by 1,126 MW (3.6%); the latest hour held flat by 3,186 MW. A learned model must beat 1,126 MW on October to earn its place.");
   cards.go(2); card().querySelectorAll(".lx-seg button").forEach(x => x.click());
   sawIs(3, "Wind's error grows from 2.8% to 18.3% over a day; solar's falls back at 24 hours, when the sun returns. Solar is zero in 377 of 744 October hours, so MAPE cannot score it.");
+  ok(/Solar's zeros: the cleaned series sets night hours to zero \(data note\)\./.test(text(card().innerHTML)), "step 3: the night zeros are named as a cleaning rule beside the solar result");
+  { const sp = plotSpecs.filter(x => x.text && /Hours ahead/.test(x.text.head[0])).pop();
+    ok(sp && sp.text.note === "October MAE as a percentage of each series' 2025 maximum; this is not MAPE.", "step 3: the chart's text version names its denominator"); }
   cards.go(3);
   btns(/Fit and score/)[0].click();
   ok(next().disabled && /This mix: 1,144 MW on October, 1\.6% worse than same hour yesterday\./.test(text(card().innerHTML)), "step 4: yesterday alone in a regression is 1.6% worse (" + text(card().querySelector(".m10-out").innerHTML) + ")");
@@ -206,7 +213,7 @@ ok(!/midnight|tomorrow's average/.test(TX + JS.replace(/\/\/[^\n]*/g, "")), "the
     const wk = P.cal.filter(x => x.date >= D.weeks.test[0] && x.date <= D.weeks.test[1]), byHand = wk.filter(x => { const m = F.best.F.f(x); return P.d[x.i] >= m + F.Q[1] && P.d[x.i] <= m + F.Q[17]; }).length;
     ok(lo > 0 && hi > 0 && io > 0 && rows.length === 168 && rows.every((r, k) => r[lo] === mw(F.best.F.f(wk[k]) + F.Q[1]) && r[hi] === mw(F.best.F.f(wk[k]) + F.Q[17])) && inside === byHand && sp.text.note === "Inside the band: " + byHand + " of these 168 hours.", "step 7: the text version gives both band edges and whether each hour is inside (" + byHand + " of 168)"); }
   cards.go(7); const s8 = sliders[sliders.length - 1]; [0, 5, 1].forEach(i => s8._set(i));
-  sawIs(8, "Coverage keeps rising: 98.6% at × 2. Pinball loss is lowest at × 0.75 (397.3 MW) and rises on both sides: it wants bands narrow and honest.");
+  sawIs(8, "Coverage keeps rising: 98.6% at × 2. Pinball loss is lowest at × 0.75 (397.3 MW), where the 80% band holds only 73.5%: check coverage and pinball loss together.");
   cards.go(8);
   { const sp = plotSpecs[plotSpecs.length - 1], k = F.daily.findIndex(x => x.date !== F.worst[0].date); sp.pick.onPick(k);
     ok(next().disabled && /Not the worst day yet/.test(saw()), "step 9: another day does not complete the step"); }
@@ -228,6 +235,13 @@ function finish() {
   if (NB) {
     const nb = JSON.parse(NB), src = nb.cells.map(c => c.source.join("")).join("\n");
     ok(nb.cells.every(c => c.cell_type === "markdown" || (c.outputs.length === 0 && c.execution_count === null)), "the notebook is stored without outputs");
+    { // the notebook tests once: no cell before "November, opened once" scores the test month, and the weekly baseline's rows
+      // are never overwritten by another variable
+      const heads = nb.cells.map(c => c.source.join("")), at = heads.findIndex(h => /^## 6\. November, opened once/m.test(h));
+      const before = heads.slice(0, at).filter((h, k) => nb.cells[k].cell_type === "code").join("\n");
+      ok(at > 0 && !/(?<!len)\(test\)|test\.index/.test(before), "notebook: November is not scored before section 6, after every choice on October");
+      ok(!/^wk = \{/m.test(src) && /RULES\.items\(\)/.test(heads.slice(at).join("\n")), "notebook: the weekend indicators no longer overwrite the week lag's rows; all three baselines are rechecked after the test");
+    }
     ok(/m10-ml-forecasting\.json/.test(src) && /town_year\.json/.test(src) && /REF\["baselines"\]/.test(src) && /REF\["mixes"\]/.test(src) && /REF\["band"\]/.test(src), "the notebook asserts the reference block");
     ok(/about 60 minutes, plus 90 minutes of practice/.test(src) && /HistGradientBoostingRegressor/.test(src) && /MLPRegressor/.test(src), "the notebook's times; gradient boosting and a small neural network");
   }
