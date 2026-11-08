@@ -724,6 +724,7 @@
    "title": "Your boundary",
    "skill": "State the boundary",
    "kind": "open-short",
+   "freeze": true,
    "prompt": "In two or three sentences: whose money does your main result count, over what period and in which dollars, and what does it leave out?",
    "points": [
     "Whose money: the school district's, from its electricity bill, the system's capital, upkeep and the battery's replacement.",
@@ -838,7 +839,11 @@
    "title": "The main result",
    "skill": "Present value",
    "kind": "numeric",
-   "prompt": "Over 25 years at 4%, counting the brief's residual value, by how much does the present value of the school's costs exceed the present value of its savings? (If your model says the savings are larger, recheck it.)",
+   "prompt": "Using the brief's assumptions, including its residual value, by how much does the present value of the school's costs exceed that of its savings?",
+   "solAfter": [
+    "upfront",
+    "billsave"
+   ],
    "units": [
     [
      "$",
@@ -914,6 +919,9 @@
      1000
     ]
    ],
+   "solAfter": [
+    "billsave"
+   ],
    "answer": {
     "value": 12350.5005,
     "tol": 0.05,
@@ -950,7 +958,7 @@
    ],
    "answer": "a",
    "why": {
-    "a": "The capital is the largest single number in the result.",
+    "a": "Across the worked ranges, the up-front cost swings the NPV by about $433,000; the next largest, the average electricity price, by about $200,000.",
     "b": "The rate changes the weight of every future year and the replacement.",
     "c": "A higher demand charge raises the battery's saving; the energy charge falls to keep the pre-project bill, so the solar saves less. The two partly cancel.",
     "d": "Price moves the energy saving, a modest share of the total."
@@ -964,6 +972,7 @@
    "title": "Your log and your sensitivity",
    "skill": "Audit trail",
    "kind": "open-short",
+   "freeze": true,
    "prompt": "Paste three rows of your assumptions log and your sensitivity statement (the main result as a range, and the input that moves it most).",
    "points": [
     "Every input has a value, a unit, a type (sourced, course data, illustrative, choice, derived) and a source or a reason.",

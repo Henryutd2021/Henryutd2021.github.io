@@ -64,20 +64,22 @@ body-classes: "page-learn page-lesson lx-form-checkpoint"
 <p class="lx-eyebrow">How this checkpoint works · about 150 minutes, no hints</p>
 <ol class="cka-parts">
 <li><b>A · Boundary and log</b> (about 40 min). Download the starter workbook. State your boundary; finish the assumptions log: every input's type, source, date and, where you will test it, a low and a high value.</li>
-<li><b>B · The model</b> (about 50 min). Convert the costs to 2025 dollars and build the school's yearly saving and its net present value, every number a formula.</li>
+<li><b>B · The model</b> (about 50 min). Convert the costs to 2025 dollars and build the school's yearly saving and its <span class="lx-term" data-term="net-present-value">net present value</span> (NPV), every number a formula.</li>
 <li><b>C · Who pays</b> (about 20 min). Split the school's bill saving into a real cost saved and a <span class="lx-term" data-term="transfer">transfer</span>; add the parties up (refresher: <a href="a13-fairness-jobs.html">A13</a>).</li>
-<li><b>D · Sensitivity</b> (about 20 min). Swing the inputs that matter one at a time and report the main result as a range.</li>
+<li><b>D · <span class="lx-term" data-term="sensitivity-analysis">Sensitivity</span></b> (about 20 min). Swing the inputs that matter one at a time and report the main result as a range.</li>
 <li><b>Submit</b> (about 20 min). Enter your results in the nine tasks below, in any order: the worked workbook opens once all nine are answered.</li>
 </ol>
 <p class="lx-eyebrow">How it is marked, before you start</p>
 <ul class="cka-rules">
 <li><b>Proficient:</b> at least 5 of the 7 auto-marked tasks right on the first try, plus at least 3 of the 4 points of each written task (1 and 9), which you tick yourself.</li>
 <li><b>Strong:</b> at least 6 of 7 on the first try and every written point.</li>
-<li><b>Opening solutions early:</b> a task whose answer you open before answering counts as not right. Opening the worked workbook before all nine are answered makes the attempt practice, with no level.</li>
+<li><b>Opening solutions early:</b> a task whose answer you open before answering counts as not right (a written task: no points). Opening the worked workbook before all nine are answered makes the attempt practice, with no level.</li>
+<li><b>Written tasks:</b> your text stays as you first submit it, and that is the text you rate.</li>
 <li><b>After the worked workbook opens:</b> an answer given after that counts as practice, not as right, and a written task then earns no points.</li>
 </ul>
 <p class="cka-dl"><a class="lx-btn small" href="../assets/learn/data/ck-a-starter.xlsx" download>Starter workbook (.xlsx)</a></p>
-<p class="lx-hint">It opens in Excel, LibreOffice Calc, Google Sheets or Apple Numbers. It holds the case's facts with their sources and an empty layout; it gives no formulas and no answers. Refreshers: <a href="a01-project-tea.html">A1</a> (cash flows), <a href="a04-retail-tariffs.html">A4</a> (tariffs), <a href="a13-fairness-jobs.html">A13</a> (who pays), <a href="k03-discounting.html">K3</a> (discounting), <a href="k07-spreadsheets.html">K7</a> (spreadsheets).</p>
+<p class="lx-hint">It opens in Excel, LibreOffice Calc, Google Sheets or Apple Numbers. It holds the case's facts with their sources and an empty layout: no formulas, no answers.</p>
+<p class="lx-hint">Refreshers: <a href="a01-project-tea.html">A1</a> (cash flows), <a href="a04-retail-tariffs.html">A4</a> (tariffs), <a href="a13-fairness-jobs.html">A13</a> (who pays), <a href="k03-discounting.html">K3</a> (discounting), <a href="k07-spreadsheets.html">K7</a> (spreadsheets).</p>
 </div>
 
 <div class="lx-card cka-brief" id="cka-brief">
@@ -101,7 +103,7 @@ body-classes: "page-learn page-lesson lx-form-checkpoint"
 <li><p><b>Solar output</b> <span class="lx-hint">Part B · A number with units</span></p><p>How much electricity does the array make in a year? Within 2% counts as right.</p><p>Answer with a number and a unit.</p></li>
 <li><p><b>Up-front cost in 2025 dollars</b> <span class="lx-hint">Part B · Convert dollar years</span></p><p>What does the system cost up front, in 2025 dollars? Within 1% counts as right.</p><p>Answer with a number and a unit.</p></li>
 <li><p><b>The school's bill saving</b> <span class="lx-hint">Part B · Read a tariff</span></p><p>How much lower is the school's electricity bill in a year (gross: before upkeep)? Within 3% counts as right.</p><p>Answer with a number and a unit.</p></li>
-<li><p><b>The main result</b> <span class="lx-hint">Part B · Present value</span></p><p>Over 25 years at 4%, counting the brief's residual value, by how much does the present value of the school's costs exceed the present value of its savings? (If your model says the savings are larger, recheck it.) Within 3% counts as right.</p><p>Answer with a number and a unit.</p></li>
+<li><p><b>The main result</b> <span class="lx-hint">Part B · Present value</span></p><p>Using the brief's assumptions, including its residual value, by how much does the present value of the school's costs exceed that of its savings? Within 3% counts as right.</p><p>Answer with a number and a unit.</p></li>
 <li><p><b>Who pays the gap</b> <span class="lx-hint">Part C · Transfers against real costs</span></p><p>Part of the school's bill saving is not a saving in the utility's costs. Under the brief's rate-reset assumption, who pays it?</p><ul><li>a. The school district</li><li>b. The utility's other customers, at the next rate reset</li><li>c. Federal taxpayers</li><li>d. Nobody: every dollar the school saves is a real cost saved</li></ul></li>
 <li><p><b>The cost shift</b> <span class="lx-hint">Part C · A screening estimate</span></p><p>Under the same assumption, how much a year moves to the utility's other customers? Within 5% counts as right.</p><p>Answer with a number and a unit.</p></li>
 <li><p><b>What moves the result most</b> <span class="lx-hint">Part D · Sensitivity</span></p><p>Swinging one input at a time over the ranges in the worked log, which moves the school's NPV most?</p><ul><li>a. The up-front cost, ±25%</li><li>b. The discount rate, 2% to 7%</li><li>c. The demand charge, $5 to $20 per kW-month, with the energy charge re-set so the pre-project bill is unchanged</li><li>d. The average electricity price, ±20%</li></ul></li>
@@ -110,7 +112,8 @@ body-classes: "page-learn page-lesson lx-form-checkpoint"
 <!-- cka-tasks:end -->
 </div>
 </div>
-<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span>Prairie Town is fictional; its numbers are illustrative where the log says so. Prices, costs, the capacity factor and the price index are dated public figures (Sources). Nothing you type leaves this browser unless you copy it; the copied summary includes what you typed in tasks 1 and 9.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span>Prairie Town is fictional; its numbers are illustrative where the log says so. Prices, costs, the <span class="lx-term" data-term="capacity-factor">capacity factor</span> and the price index are dated public figures (Sources).</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span>Nothing you type leaves this browser unless you copy it. The copied summary includes what you typed in tasks 1 and 9.</span></p>
 ```
 :::
 

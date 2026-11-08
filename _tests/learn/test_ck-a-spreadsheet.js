@@ -158,7 +158,9 @@ ok(task("solar").units.filter(u => u[1] === null).length === 2, "the solar task 
   const early = st(7, 4, 4, { solEarly: "2026-11-06T09:00:00Z" });
   ok(M.level(D, early).level === "Practice (no level)", "the worked solution opened early by this attempt (the lock's button, before every task was answered): practice");
   const own9 = st(7, 4, 4); own9.tasks.log.solFirst = true;
-  ok(M.level(D, own9).level === "Strong", "task 9's own early solution opens only its own answer (gateAll), not the full worked solution: no practice");
+  const L9 = M.level(D, own9);
+  ok(L9.level === "Developing" && !L9.assisted && L9.pointsB === 0 && L9.writtenEarly === 1 && /1 written task with the solution opened first: no points/.test(M.describe(D, L9)),
+    "task 9's own early solution opens only its own answer (gateAll, no practice), and its points do not count (opened before answering): " + L9.level);
   const seen = st(7, 4, 4); ok(M.level(Object.assign({ solOpen: "2026-11-05T00:00:00Z" }, D), seen).level === "Practice (no level)" && M.level(Object.assign({ solOpen: "2026-11-06T10:00:00Z" }, D), seen).level === "Strong", "opened by an earlier attempt: practice; opened by submitting task 9: counts");
   const opened = st(7, 4, 4); opened.tasks.solar.solFirst = true; ok(M.level(D, opened).auto === 6, "a task opened before answering counts as not right");
   // answers given after the full worked solution opened (with gateAll it opens only once all nine are
@@ -203,7 +205,14 @@ ok(/gateAll: true, late: "practice"/.test(JS) && !/submitTask/.test(JS.slice(JS.
   ok([D.case.situation, D.case.deliverable].concat(D.case.facts.map(f => f[1].replace(/\[\[[a-z0-9-]+\|([^\]]+)\]\]/g, "$1")))
     .every(x => words(x) <= 35), "every part of the brief is at most 35 words"); }
 ok(task("tornado").options.find(o => o[0] === "c")[1].includes("with the energy charge re-set so the pre-project bill is unchanged") && /pre-project bill held/.test(F.sens.find(x => x.key === "demand").label), "the demand-charge swing is named as a rebalancing (pre-project bill held), before and after");
-ok(/Under the brief's rate-reset assumption, who pays it\?$/.test(task("transfer").prompt) && /^Under the same assumption/.test(task("shift").prompt) && /counting the brief's residual value/.test(task("npc").prompt), "tasks 5 to 7 say which given convention they rest on");
+ok(/Under the brief's rate-reset assumption, who pays it\?$/.test(task("transfer").prompt) && /^Under the same assumption/.test(task("shift").prompt) && /including its residual value/.test(task("npc").prompt) && !/recheck|savings are larger/.test(task("npc").prompt), "tasks 5 to 7 say which given convention they rest on; task 5 gives no hint of the sign");
+// no task's worked solution, points or feedback names another task's answer before that task is submitted (solAfter), and
+// the written tasks keep their first submission (freeze)
+{ const RD = M.runnerData(D), CPK = require(path.join(SITE, "assets/learn/components/checkpoint.js"));
+  ok(CPK.solLeaks(RD).length === 0, "no solution leaks an unanswered task's answer: " + JSON.stringify(CPK.solLeaks(RD)));
+  ok(task("npc").solAfter.join() === "upfront,billsave" && task("shift").solAfter.join() === "billsave" && CPK.openProblems(RD).length === 0, "the main result's solution waits for tasks 3 and 4, the cost shift's for task 4");
+  ok(T.filter(t => t.kind === "open-short").every(t => t.freeze === true) && T.filter(t => t.kind !== "open-short").every(t => !t.freeze), "the two written tasks keep their first submission; the marked ones allow retries");
+  ok(/Across the worked ranges, the up-front cost swings the NPV by about \$433,000; the next largest, the average electricity price, by about \$200,000\./.test(task("tornado").why.a), "the sensitivity feedback gives the swings, not the size of one number"); }
 ok(/the input that moves it most\)\.$/.test(task("log").prompt), "task 9 no longer asks to be submitted last (gateAll)");
 // units in the sensitivity
 { const SO = text(M.staticSolution(D));
@@ -212,6 +221,11 @@ ok(/the input that moves it most\)\.$/.test(task("log").prompt), "task 9 no long
   ok(pr.loText === "$0.0894/kWh" && pr.hiText === "$0.134/kWh" && dm.loText === "$5/kW-month" && dm.hiText === "$20/kW-month", "the tornado's labels keep their units");
   ok(["kw-dc", "residual-value", "annuity-factor", "real-rate", "islanding", "elective-pay", "full-cycle"].every(k => PAGE.includes('data-term="' + k + '"')), "kW-DC, residual value, annuity factor, real rate, islanding, elective pay and full cycles are glossary terms on the page"); }
 has("Prairie Town is fictional; its numbers are illustrative where the log says so.", "the fictional line");
+// the task section's notes: one idea each, within the text budget (the workbook, the refreshers, the data, privacy)
+{ const sec = OWN.slice(OWN.indexOf('<div class="lx-card cka-intro">'), OWN.indexOf("::: {#solution"));
+  const notes = [...sec.matchAll(/<p class="lx-(?:hint|datanote)">([\s\S]*?)<\/p>/g)].map(m => text(m[1])).filter(x => !/^Without JavaScript/.test(x));
+  const wc = x => x.split(/\s+/).filter(Boolean).length;
+  ok(notes.length >= 4 && notes.every(x => wc(x) <= 35), "the task section's notes are within about 35 words each: " + notes.map(wc).join(", ")); }
 ok(OWN.includes('href="../assets/learn/data/ck-a-starter.xlsx" download') && M.staticSolution(D).includes('href="../assets/learn/data/ck-a-worked.xlsx" download'), "the starter downloads from the task; the worked workbook from the (gated) solution only");
 ok(!between(PAGE, "cka-tasks") || !PAGE.slice(between(PAGE, "cka-tasks").from, between(PAGE, "cka-tasks").to).includes("ck-a-worked.xlsx"), "the task list does not link the worked workbook");
 // the rubric: the course's words, never reworded

@@ -61,8 +61,8 @@ ok(N.lo < N.revised && N.revised < N.hi && N.holdLo < N.holdout && N.holdout < N
 // comparison farms in the first analysis), so no interval for their gap is shown.
 { ok(N.holdLo > N.keep && N.gapLo === undefined && N.gapHi === undefined, "the rule: the 2025 interval's low end (1.8) is above 1.5 kW; no gap interval in the data");
   const good = EXS.plain(D.worked.revision.answers[1]), notes = EXS.marks(D.worked.revision.answers[1]).map(m => m.note).join(" ");
-  ok(good.includes("if its whole 95% interval is above 1.5 kW, so the board's decision would not change. 2025: 4.1 kW (1.8 to 6.4): it is.") && !/includes zero|treated as independent|−2\.4|3\.4\)/.test(good + " " + ALLTXT),
-    "the worked revision shows the rule and its numbers; no independence assumption, no 'includes zero'");
+  ok(good.includes("the check supports the same decision for the 2025 cohort if its whole 95% interval is above 1.5 kW. 2025: 4.1 kW (1.8 to 6.4): it does.") && !/supports the main estimate/.test(good) && /not the size of 4\.6 kW/.test(notes) && /need their own case/.test(notes) && !/includes zero|treated as independent|−2\.4|3\.4\)/.test(good + " " + ALLTXT),
+    "the worked revision shows the rule and its numbers: it supports the decision, not the size of the main estimate; the new comparison group needs its own case; no independence assumption, no 'includes zero'");
   ok(/not proof the effects are equal/.test(notes) && /share farms/.test(notes) && /no interval for their gap/.test(notes), "the note: compatible is not equal; the estimates share farms");
   ok(/the 29 farms that joined in 2025, against the 42 that never joined/.test(good) && !/they agree/.test(good), "the 2025 check names its comparison group, and claims no agreement");
   ok(!/\bvalidated\b/.test(ALLTXT), "nothing claims the analysis was 'validated' by one consistent number"); }
@@ -168,6 +168,9 @@ ok(D.worked.revision.answers.map(a => a.level).join() === "Proficient,Strong" &&
     R(st(4, 4)) === "Developing" && R(st(3, 0)) === "Developing" && R(st(2, 4)) === "Not yet", "the level rule on sample attempts");
   ok(M.level(D, st(7, 4, { solEarly: "2026-11-07T09:00:00Z" })).level === "Practice (no level)", "the worked solution opened early by this attempt: practice");
   const opened = st(7, 4); opened.tasks.rank.solFirst = true; ok(M.level(D, opened).auto === 6, "a task opened before answering counts as not right");
+  // a written task opened before it was submitted earns no points (the same published rule), for each of the five
+  written.forEach(t => { const w = st(7, 4); w.tasks[t.id].solFirst = true; const LW = M.level(D, w);
+    ok(LW.level === "Developing" && LW.points[written.indexOf(t)] === 0 && LW.writtenEarly === 1 && /1 written task with the solution opened first: no points/.test(M.describe(D, LW)), t.id + " opened before answering: no points, so not Strong (" + LW.level + ")"); });
   const seen = st(7, 4);
   ok(M.level(Object.assign({ solOpen: "2026-11-06T00:00:00Z" }, D), seen).level === "Practice (no level)" && M.level(Object.assign({ solOpen: "2026-11-07T10:00:00Z" }, D), seen).level === "Strong", "opened by an earlier attempt: practice; opened by the last answer: counts");
   const late = st(7, 4); T.forEach(t => { late.tasks[t.id].at = t.id === "review" ? "2026-11-07T10:00:00.000Z" : "2026-11-07T10:05:00.000Z"; });
@@ -412,6 +415,17 @@ function finish() {
   ok(fm("title") === py("title") && fm("subtitle") === py("subtitle"), "the page's title and subtitle equal path.yml's");
   const GJ = JSON.parse(fs.readFileSync(L("data/glossary.json"), "utf8")), marks = [...(JS + RAW).matchAll(/\[\[([a-z0-9-]+)\|/g)].map(m => m[1]).concat([...PAGE.matchAll(/data-term="([a-z0-9-]+)"/g)].map(m => m[1]));
   ok(marks.length >= 3 && marks.every(m => GJ[m]), "every glossary mark has a definition: " + marks.filter(m => !GJ[m]).join(", "));
-  console.log((fails ? "FAILED " + fails + " of " : "ok: ") + checks + " checks (" + ID + ")");
+  // the fixes of the 2026-11-08 review: the billing basis, the falsification statement, the intro, the solution budget, the terms
+{ const fields = D.study.fields.map(f => f[0] + ": " + f[1]).join(" | ");
+  ok(/Billing: The co-op's wholesale bill charges for its load in its 20 highest-load summer hours\./.test(fields), "the proposal states the billing basis the 'whose peak' concern rests on");
+  ok(/billing note/.test(M.runnerData(D).tasks.find(t => t.id === "competence").solution), "task 3's solution points to the proposal's billing note, not an unstated fact");
+  const prof = EXS.plain(D.worked.revision.answers[0]);
+  ok(/in kW per pump/.test(prof) && /Would count against it:/.test(prof), "the Proficient revision shows a metric with units and what would count against the causal reading");
+  ok(/five written ones you rate against stated points: your review of that study, then four on your own/.test(D.intro[0]), "the intro: one written task on the co-op study, four on your own");
+  const words = x => String(x).replace(/\[\[[a-z0-9-]+\|([^\]]+)\]\]/g, "$1").split(/\s+/).filter(Boolean).length;
+  ok(D.tasks.every(t => words(t.solution) <= 36), "every task's solution is within about 35 words: " + D.tasks.map(t => words(t.solution)).join(", "));
+  ok(["co-op", "repository", "clean-clone", "linear-regression", "agent-based-model"].every(k => OWN.indexOf('data-term="' + k + '"') >= 0), "the plain-text answer buttons' terms are explained before the tasks");
+  ok(!/cannot be rerun from the repository|no one can rerun cannot be checked/.test(RAW), "the worked review does not equate an undocumented cleaning step with a result that cannot be checked"); }
+console.log((fails ? "FAILED " + fails + " of " : "ok: ") + checks + " checks (" + ID + ")");
   process.exit(fails ? 1 : 0);
 }

@@ -105,6 +105,9 @@
   var CPK = (typeof window !== "undefined" && window.LX && window.LX.Checkpoint) || require("./components/checkpoint.js");
   function isAuto(t) { return t.kind === "choice" || t.kind === "order" || t.kind === "numeric"; }
   function points(st, t) { var r = st.tasks[t.id] || {}; return (r.points || []).filter(Boolean).length; }
+  // a written task whose worked solution was opened before it was submitted earns no points (the published rule: a task
+  // whose answer you open before answering counts as not right)
+  function opened(st, t) { var r = st.tasks[t.id]; return !!(r && r.solFirst); }
   // a task first answered after the page's full worked solution opened (D.solOpen: ISO time, the runner's record): the
   // runner's shared late-answer rule (the answer that opened it, the last of all, is not late)
   function after(D, st, t) { return CPK.lateAnswer(st.tasks[t.id], D.solOpen); }
@@ -120,24 +123,26 @@
   function level(D, st) {
     var R = D.rule, auto = D.tasks.filter(isAuto), opens = D.tasks.filter(function (t) { return t.kind === "open-short"; });
     var k = auto.filter(function (t) { return firstRight(st, t, D); }).length;
-    var pa = after(D, st, opens[0]) ? 0 : points(st, opens[0]), pb = after(D, st, opens[1]) ? 0 : points(st, opens[1]);
+    var pa = after(D, st, opens[0]) || opened(st, opens[0]) ? 0 : points(st, opens[0]), pb = after(D, st, opens[1]) || opened(st, opens[1]) ? 0 : points(st, opens[1]);
     var late = D.tasks.filter(function (t) { return after(D, st, t); }).length;
     var na = opens[0].points.length, nb = opens[1].points.length, help = assisted(D, st);
     var complete = auto.every(function (t) { return st.tasks[t.id] && st.tasks[t.id].first != null; }) && opens.every(function (t) { return st.tasks[t.id] && st.tasks[t.id].answer; });
     var early = auto.filter(function (t) { return st.tasks[t.id] && st.tasks[t.id].solFirst && !after(D, st, t); }).length;
+    var writtenEarly = opens.filter(function (t) { return opened(st, t) && !after(D, st, t); }).length;
     var lv = R.levels[0];
     if (help) lv = R.practice;
     else if (k >= R.autoStrong && pa === na && pb === nb) lv = R.levels[3];
     else if (k >= R.autoProficient && pa >= R.pointsProficient && pb >= R.pointsProficient) lv = R.levels[2];
     else if (k >= R.autoDeveloping) lv = R.levels[1];
-    return { level: lv, auto: k, autoOf: auto.length, pointsA: pa, pointsAOf: na, pointsB: pb, pointsBOf: nb, complete: complete, early: early, late: late, assisted: help, estMin: -1, explainOk: pa === na };
+    return { level: lv, auto: k, autoOf: auto.length, pointsA: pa, pointsAOf: na, pointsB: pb, pointsBOf: nb, complete: complete, early: early, writtenEarly: writtenEarly, late: late, assisted: help, estMin: -1, explainOk: pa === na };
   }
   function describe(D, L) {
     if (L.assisted) return (L.assisted === "early" ? "The worked solution was opened before all " + D.tasks.length + " tasks were answered" : "The worked solution had already been open in this browser (an earlier attempt)") +
       ", so this attempt is practice and gets no level. Your answers and their feedback stay.";
     return "Auto-marked tasks right on the first try: " + L.auto + " of " + L.autoOf + (L.early ? " (" + L.early + " with the solution opened first, counted as not right)" : "") +
       (L.late ? ". Answered after the worked solution opened, so counted as practice (not right, no points): " + L.late + " task" + (L.late > 1 ? "s" : "") : "") +
-      ". Points counted: " + L.pointsA + " of " + L.pointsAOf + " for the boundary, " + L.pointsB + " of " + L.pointsBOf + " for the log and sensitivity." + (L.complete ? "" : " Some tasks are not finished; the level counts them as not right.");
+      ". Points counted: " + L.pointsA + " of " + L.pointsAOf + " for the boundary, " + L.pointsB + " of " + L.pointsBOf + " for the log and sensitivity" +
+      (L.writtenEarly ? " (" + L.writtenEarly + " written task" + (L.writtenEarly > 1 ? "s" : "") + " with the solution opened first: no points)" : "") + "." + (L.complete ? "" : " Some tasks are not finished; the level counts them as not right.");
   }
   function summary(D, st, env) {
     env = env || {};
@@ -154,7 +159,7 @@
     });
     D.tasks.forEach(function (t) {
       var r = st.tasks[t.id]; if (!r || !r.answer) return;
-      if (t.kind === "open-short") lines.push("Your text, " + t.title.toLowerCase() + ": " + String(r.answer).replace(/\s+/g, " ").slice(0, 800));
+      if (t.kind === "open-short") lines.push("Your text, " + t.title.toLowerCase() + ": " + String(r.answer).replace(/\s+/g, " "));   // in full: nothing is cut
       if (t.kind === "numeric") lines.push("Your number, " + t.title.toLowerCase() + ": " + r.answer.value + " " + r.answer.unit);
     });
     lines.push("");
@@ -278,7 +283,8 @@
     var D = data.ck_a_spreadsheet, F = facts(D), RD = runnerData(D);
     Object.defineProperty(RD, "solOpen", { get: function () { return LX.Checkpoint.solOpened(KEY); } });
     var cp = LX.Checkpoint(live, { data: RD, key: KEY, code: CODE, lessonId: "ck-a-spreadsheet",
-      intro: ["Nine tasks on your own spreadsheet: two short texts you rate yourself, and seven answers marked at once.", "No hints. Build the spreadsheet first (about two hours); each task's worked answer opens after your first answer, and opening one early is recorded.", "Your answers and times stay in this browser. At the end, “Copy my results” gives a plain-text summary for you to share, with what you typed."],
+      intro: ["Nine tasks on your own spreadsheet: two short texts you rate yourself, and seven answers marked at once.", "No hints. Build the spreadsheet first (about two hours). Each worked answer opens after your first answer; two wait until the tasks whose answers they name are answered too. Opening one early is recorded.",
+        "A written text stays as you first submit it: that submission is the one you rate.", "Your answers and times stay in this browser. At the end, “Copy my results” gives a plain-text summary for you to share, with what you typed."],
       // gateAll: the full worked solution opens once all nine are answered; late: the shared late-answer rule, which the
       // runner adds to the intro
       lock: "#cka-lock", solution: "#cka-solution-body", gateAll: true, late: "practice", level: level, describe: describe, summary: summary, openFirst: "not-right" });

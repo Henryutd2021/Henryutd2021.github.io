@@ -9,8 +9,8 @@
   "numbers": { "pumps": 112, "joined2024": 41, "joined2025": 29, "never": 42, "notJoined2024": 71, "first": 6.2, "revised": 4.6, "lo": 2.9, "hi": 6.3,
     "rerun": 4.3, "tolerancePct": 1, "removed": 3, "holdout": 4.1, "holdLo": 1.8, "holdHi": 6.4, "keep": 1.5, "pretrend": 0.5, "summersBefore": 4, "hours": 20 },
   "intro": [
-    "Twelve tasks: seven marked at once, on a fictional co-op study; five texts on your own study, which you rate against stated points.",
-    "No hints. Part A works on the co-op proposal above; parts B to D on your research capstone, with work outside this page.",
+    "Twelve tasks: seven marked at once, on a fictional co-op study, and five written ones you rate against stated points: your review of that study, then four on your own.",
+    "No hints. Part A works on the co-op proposal above; parts B to D on your research capstone, with work outside this page. Opening a solution before answering is recorded, and that task counts as not right (a written task: no points).",
     "Task 1 first: the seven marked tasks open once your review of the co-op proposal is submitted. Each written text then stays as you submitted it.",
     "Your answers and times stay in this browser. At the end, “Copy my results” gives a plain-text summary, with what you typed, for a mentor."
   ],
@@ -22,7 +22,7 @@
     "fields": [
       ["Question", "Did Prairie Valley Co-op's 2024 night-pumping tariff lower irrigation peak demand?"],
       ["Type", "Evaluative."],
-      ["Audience", "The co-op's board, which votes in 2026 on keeping the tariff."],
+      ["Audience", "The co-op's board, which votes in 2026 on keeping the tariff."], ["Billing", "The co-op's wholesale bill charges for its load in its 20 highest-load summer hours."],
       ["The tariff", "Cheaper energy from 22:00 to 06:00 and a higher price from 14:00 to 20:00 on summer weekdays. Each farm chose whether to join."],
       ["Data", "Hourly meter readings of the co-op's 112 irrigation pumps, summers 2020 to 2024."],
       ["Metric", "Peak demand, kW per pump."],
@@ -69,7 +69,7 @@
         "c": "Worth a line in the methods, since versions can change results; it threatens the conclusion less directly than selection.",
         "d": "A constraint on the study, not a flaw in its conclusion."
       },
-      "solution": "Joiners chose the tariff, so their demand might have moved differently even without it ([[selection-bias|selection bias]]). Different starting levels alone do no harm: [[parallel-trends|parallel trends]] needs evidence. The other three need checking too, but threaten this causal claim less directly." },
+      "solution": "Joiners chose the tariff, so their demand might have moved differently anyway ([[selection-bias|selection bias]]). Different starting levels alone do no harm; [[parallel-trends|parallel trends]] needs evidence. The other three threaten the causal claim less directly." },
     { "id": "competence", "part": "A", "lesson": "R1", "title": "Whose peak?", "skill": "Name the competence", "kind": "choice", "opensAfter": ["review"],
       "prompt": "A reviewer writes: “The proposal never says whose peak: each pump's own highest hour, or the co-op's highest-load hours.” Which rubric competence does this concern?",
       "options": [["a", "Framing"], ["b", "Positioning"], ["c", "Integrity"], ["d", "Communication"]],
@@ -80,7 +80,7 @@
         "c": "Integrity is about licences, credit, conflicts and the people a study affects.",
         "d": "Communication is about how results are shown; this is about what is measured."
       },
-      "solution": "Framing: a metric with units. The board pays for the co-op's highest-load hours ([[coincident-peak|coincident peak]]), so the pumps' average kW in the co-op's 20 highest-load summer hours answers its question; each pump's own peak does not." },
+      "solution": "Framing: a metric with units. The co-op is billed for its 20 highest-load summer hours (the billing note), so the pumps' average kW in those [[coincident-peak|coincident-peak]] hours answers the board, not each pump's own peak." },
     { "id": "respond", "part": "A", "lesson": "R9, M14", "title": "Answering the selection concern", "skill": "Answer a critique", "kind": "choice", "opensAfter": ["review"],
       "prompt": "The authors answer the selection concern. Which response answers it, rather than deflecting it?",
       "options": [
@@ -112,7 +112,7 @@
         "c": "A different method, with limits of its own; not a stated limit of this one.",
         "d": "Length is not a level."
       },
-      "solution": "Method fit's Strong level: “limits of the chosen method stated and partly mitigated”. Limit: the later joiners' demand might still have moved differently. Mitigation: the two groups moved together, within 0.5 kW a year, in the four summers before 2024." },
+      "solution": "Method fit's Strong level: “limits of the chosen method stated and partly mitigated”. Limit: the later joiners' demand might still have moved differently. Mitigation: the groups moved together, within 0.5 kW a year, before 2024." },
     { "id": "mine-review", "part": "B", "lesson": "R8, R9", "title": "Your mock review", "skill": "Get a review", "kind": "open-short", "freeze": true,
       "prompt": "Get a written review of your research capstone's question and method (the review form; a mentor, a peer, or you after a day away). Paste it, and say who wrote it.",
       "points": [
@@ -174,7 +174,7 @@
         "c": "A difference beyond the tolerance is a finding: explain it, fix it in the repository, and say so.",
         "d": "Moving the tolerance after seeing the result defeats it."
       },
-      "solution": "Here the cause was three pumps whose meters were replaced mid-summer, removed by hand under a rule the data note set before any result. The rule is now in the cleaning script; the rerun gives 4.6 kW, and the log says so." },
+      "solution": "The cause: three pumps with meters replaced mid-summer, removed by hand under a rule the data note set before any result. The rule is now in the cleaning script; the rerun gives 4.6 kW, logged." },
     { "id": "mine-rerun", "part": "D", "lesson": "R5, K8", "title": "Your rerun", "skill": "Rerun your own result", "kind": "open-short", "freeze": true,
       "prompt": "Rerun your own main result from a clean clone, or follow your audit trail for qualitative work. Paste your rerun report (the form above).",
       "points": [
@@ -206,9 +206,9 @@
           "\nMajor 1 · Method fit: ",
           { "text": "farms chose whether to join, so their demand may have moved differently even without the tariff; show the summers before, and try farms that joined later as a comparison.", "note": "The concern that could change the conclusion comes first, with the evidence that would answer it." },
           "\nMajor 2 · Framing: ",
-          { "text": "say whose peak, in kW, over which hours: the board pays for the co-op's highest-load hours.", "note": "Tied to a competence, and to what the decision-maker needs." },
+          { "text": "say whose peak, in kW, over which hours: the co-op is billed for its 20 highest-load summer hours, not for each pump's own peak.", "note": "Tied to a competence, and to what the decision-maker needs." },
           "\nMajor 3 · Trustworthy analysis: ",
-          { "text": "the data were cleaned by hand in a spreadsheet, so the result cannot be rerun from the repository.", "note": "A result no one can rerun cannot be checked." },
+          { "text": "the hand cleaning in a spreadsheet is not documented, and the proposal does not supply what a rerun from the raw data needs.", "note": "Parts can still be checked independently; a full rerun from the raw data is not yet possible." },
           "\nMinor · Positioning: ",
           { "text": "the five studies are of households; add studies of farm or business tariffs.", "note": "Kept minor: it could sharpen the method, but threatens the conclusion less than selection." },
           "\nAnother family: ",
@@ -252,7 +252,9 @@
       "answers": [
         { "key": "prof", "label": "Revised: Proficient", "level": "Proficient", "lead": "Proficient", "parts": [
           "Question: ",
-          { "text": "Did the 2024 tariff lower the joining pumps' average demand in the co-op's 20 highest-load summer hours, compared with farms that joined in 2025, before they joined?", "note": "Typed, with an audience (the board), a metric with units and a counterfactual." },
+          { "text": "Did the 2024 tariff lower the joining pumps' average demand, in kW per pump, in the co-op's 20 billing hours, compared with farms that joined in 2025, before they joined?", "note": "Typed, with an audience (the board), a metric with units (the billing hours' average, not the co-op's single highest hour) and a counterfactual." },
+          "\nWould count against it: ",
+          { "text": "no larger fall among the joiners than among the 2025 joiners, or a gap between the groups that opened before 2024.", "note": "The falsification statement: the result that would show the tariff did not cause the fall." },
           "\nMethod: ",
           { "text": "difference-in-differences, defended against a matched comparison and a pump-scheduling simulation.", "note": "Two alternatives, one from another family (simulation)." },
           "\nChecks: ",
@@ -269,12 +271,12 @@
           "\nValidation, set up first: ",
           { "text": "summer 2025, not used to build the analysis: the same code on the 29 farms that joined in 2025, against the 42 that never joined.", "note": "Second half: data not used to build it, a named comparison group, and a rule written down before looking." },
           "\nRule and result: ",
-          { "text": "the check supports the main estimate if its whole 95% interval is above 1.5 kW, so the board's decision would not change. 2025: 4.1 kW (1.8 to 6.4): it is.", "note": "Compatible with 4.6 kW, not proof the effects are equal; the two estimates share farms (the 29 were comparison farms before), so no interval for their gap is given. The never-joiners' demand may also have moved differently." },
+          { "text": "the check supports the same decision for the 2025 cohort if its whole 95% interval is above 1.5 kW. 2025: 4.1 kW (1.8 to 6.4): it does.", "note": "It supports the decision threshold, not the size of 4.6 kW, and is not proof the effects are equal: the estimates share farms, so no interval for their gap is given. The never-joiners, a new comparison group, need their own case." },
           "\nResult: 4.6 kW per pump (95% interval 2.9 to 6.3), above 1.5 kW across the interval."
         ] }
       ],
       "diff": [
-        { "label": "Framing", "prof": "Typed question, audience, metric with units, counterfactual", "good": "Also the answer that would change the board's vote (1.5 kW)" },
+        { "label": "Framing", "prof": "Typed question, audience, metric with units, counterfactual, what would count against it", "good": "Also the answer that would change the board's vote (1.5 kW)" },
         { "label": "Method fit", "prof": "Defended against two alternatives", "good": "Also its limit stated and partly mitigated" },
         { "label": "Trustworthy analysis", "prof": "Clean-clone rerun, log, a meter check against an independent reference", "good": "Rerun by someone else; checked on a summer not used to build it, by a rule set first" }
       ]

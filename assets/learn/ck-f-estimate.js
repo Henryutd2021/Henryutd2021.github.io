@@ -3,7 +3,9 @@
 // Nine tasks on unfamiliar situations across T0-T6 and N1 (assets/learn/data/ck-f-estimate.json): one open explanation,
 // seven auto-marked items (choices, an ordering, a number with units) and the main estimate (a town's school buses go
 // electric: a range with units, the main uncertainty and a check), self-rated on the published rubric. No hints: each
-// task's worked solution opens after the first answer, or earlier on request, which is recorded.
+// task's worked solution opens after the first answer, or earlier on request, which is recorded, and that task then counts as
+// not right (data.rule.openFirst "not-right": no points for task 1, no self-ratings for the estimate). The two written tasks
+// keep their first submission (freeze); the estimate's range is compared with the worked one, not marked by it.
 //
 // The runner is the shared LX.Checkpoint (assets/learn/components/checkpoint.js): one task at a time, the visibility-aware
 // clock, first-try recording, the rubric self-rating, the results view and the copyable summary. This file holds CK-F's
@@ -40,6 +42,8 @@
   // the nine tasks as static HTML for readers without JavaScript: each prompt (with its options, the order task's items as
   // shuffled, and the chart tasks' hourly values as a table), then its worked solution in a closed box
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  // a solution's or point's glossary marks to the page's term spans (the course's own writer, core.js)
+  function rich(t) { var R = (typeof window !== "undefined" && window.LX && window.LX.rich) || require("./components/core.js").rich; return R(t); }
   function chartTable(C, series) {
     var h = '<details class="lx-textalt"><summary>Chart data: ' + esc(C.label) + ", MW by hour</summary><div class=\"lx-scroll-x\"><table class=\"lx-mini-table\"><thead><tr><th scope=\"col\">Hour</th>";
     series.forEach(function (s) { h += '<th scope="col">' + esc(s[0]) + " (MW)</th>"; });
@@ -63,8 +67,8 @@
       if (t.kind === "choice") x += "<p><b>Answer: " + t.answer + ". " + esc(t.options.filter(function (o) { return o[0] === t.answer; })[0][1]) + ".</b></p>";
       if (t.kind === "numeric") x += "<p><b>Answer: about " + Math.round(t.answer.mwh / 1000) + " GWh.</b></p>";
       if (t.kind === "order") x += "<ol>" + t.items.map(function (it) { return "<li>" + esc(it[1]) + "</li>"; }).join("") + "</ol>";
-      x += "<p>" + esc(t.solution) + "</p>";
-      if (t.kind === "open-short") x += "<p>A full answer makes two points:</p><ul>" + t.points.map(function (pt) { return "<li>" + esc(pt) + "</li>"; }).join("") + "</ul>";
+      x += "<p>" + rich(t.solution) + "</p>";
+      if (t.kind === "open-short") x += "<p>A full answer makes two points:</p><ul>" + t.points.map(function (pt) { return "<li>" + rich(pt) + "</li>"; }).join("") + "</ul>";
       h.push(x + "</details></li>");
     });
     h.push("</ol>");
@@ -84,8 +88,9 @@
   LX.mount("ck-f-estimate", function (live, data, root) {
     var D = data.ck_f_estimate;
     var cp = LX.Checkpoint(live, { data: D, key: KEY, code: CODE, lessonId: "ck-f-estimate",
-      intro: ["Nine tasks, about 40 minutes: seven short ones, a short explanation and one estimate.",
-        "No hints. Each worked solution opens after your first answer; you may open it earlier, and that is recorded.",
+      intro: ["Nine tasks, about 40 minutes: seven short ones, a short explanation and one estimate. How they are marked is above.",
+        "No hints. Each worked solution opens after your first answer. Opening one earlier is recorded, and that task then counts as not right.",
+        "Your written answers (tasks 1 and 9) stay as you first submit them.",
         "Your answers and times stay in this browser. At the end, “Copy my results” gives a plain-text summary for you to share; it includes what you typed in tasks 1 and 9."],
       rubric: "#ckf-rubric", lock: "#ckf-lock", solution: "#ckf-solution-body",
       estimateNote: "Two routes, a check and the marking guide are in the <a href=\"#solution\">Worked solution</a> section below; it opens when you submit.",

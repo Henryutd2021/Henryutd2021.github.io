@@ -46,19 +46,27 @@ body-classes: "page-learn page-lesson lx-form-checkpoint"
 <ol class="ckm-parts">
 <li><b>A · The brief</b> (about 120 min). Choose a variant. <b>Model:</b> formulate the water brief as a <span class="lx-term" data-term="linear-program">linear program</span>, solve it and read the solution. <b>Empirical:</b> analyse a real year of grid data.</li>
 <li><b>B · The planted defect</b> (about 60 min). Find the one defect in a supplied model, say which check shows it, fix it and solve again.</li>
-<li><b>C · Validation</b> (about 45 min). Check one of your results against an independent reference: hand calculations (model) or a published figure (empirical).</li>
+<li><b>C · Validation</b> (about 45 min). Check one of your results against an independent reference: hand calculations (model), or a published figure (empirical), saying what that comparison can and cannot confirm.</li>
 <li><b>Submit</b> (about 15 min). Enter your results in the eleven tasks below, in any order. The worked formulations and code open once all eleven are answered.</li>
 </ol>
 <p class="lx-eyebrow">How it is marked, before you start</p>
 <ul class="ckm-rules">
-<li><b>Proficient:</b> at least 6 of the 9 auto-marked tasks right on the first try, including the defect's line (task 6), plus 3 of the 4 points of task 1 and 2 of the 3 of task 11, which you tick yourself.</li>
-<li><b>Strong:</b> 8 of 9 on the first try, the defect's line among them, and every written point.</li>
+<li><b>Proficient:</b> at least 6 of the 9 auto-marked tasks right on the first try, including all three of part B (the defect's line, the check that shows it and the fixed cost, tasks 6 to 8), plus 3 of the 4 points of task 1 and 2 of the 3 of task 11, which you tick yourself.</li>
+<li><b>Strong:</b> 8 of 9 on the first try, all three of part B among them, and every written point.</li>
 <li><b>Tolerances:</b> each number task says how close counts as right.</li>
-<li><b>Opening solutions early:</b> a task whose solution you open before answering counts as not right. Opening the full worked solutions before all eleven tasks are answered makes the attempt practice, with no level.</li>
+<li><b>Opening solutions early:</b> a task whose solution you open before answering counts as not right (a written task: no points). Opening the full worked solutions before all eleven tasks are answered makes the attempt practice, with no level.</li>
+<li><b>Written tasks</b> (1 and 11) stay as you first submit them, and that is the text you rate. A solution that names another task's answer opens once that task is answered.</li>
 <li><b>After the worked solutions open:</b> an answer given after that counts as practice, not as right, and a written task then earns no points.</li>
 </ul>
 <p class="ckm-dl"><a class="lx-btn small" href="notebooks/ck-m-start.ipynb" download>Starter notebook (.ipynb)</a> <a class="lx-btn small ghost" href="../assets/learn/data/town_year.json" download>Dataset: town_year.json</a> <a class="lx-btn small ghost" href="../assets/learn/data/ck-m-unseen-problem-briefs.json" download>Briefs and model data (JSON, no answers)</a></p>
-<p class="lx-hint">The starter notebook holds both briefs' data and the supplied model, and gives no formulation and no answers. It runs in Google Colab or locally with Python 3.9 or later, NumPy and SciPy 1.9 or later. The empirical variant also needs <code>town_year.json</code> in the notebook's folder; its worked solution uses <code>zoneinfo</code> (on Windows, <code>pip install tzdata</code>; it falls back to 2025's clock rule without it).</p>
+<p class="lx-hint">The starter notebook holds both briefs' data and the supplied model. It gives no formulation and no answers.</p>
+<details class="lx-textalt ckm-setup"><summary>Notebook setup</summary>
+<ul class="ckm-list">
+<li><b>Where:</b> Google Colab, or locally with Python 3.9 or later, NumPy and SciPy 1.9 or later.</li>
+<li><b>Empirical variant:</b> put <code>town_year.json</code> in the notebook's folder.</li>
+<li><b>Time zones:</b> its worked solution uses <code>zoneinfo</code>. On Windows, run <code>pip install tzdata</code>; without it, the code falls back to 2025's clock rule.</li>
+</ul>
+</details>
 </div>
 
 <div class="lx-row2 ckm-briefs">
@@ -75,7 +83,7 @@ body-classes: "page-learn page-lesson lx-form-checkpoint"
 <p class="lx-eyebrow">Empirical variant · the brief</p>
 <h3>What can the town count on at its peaks?</h3>
 <!-- ckm-brief-empirical:start (written from the data file by the test's --write mode; do not edit) -->
-<p>Prairie Town's planners want to know how far its wind and solar farms can be counted on when the town needs power most. Report what the town can and cannot count on, and how far your results depend on the dataset's scaling.</p>
+<p>How far can Prairie Town count on its wind and solar farms when it needs power most? Report what it can and cannot count on, and how far that depends on the dataset's scaling.</p>
 <ul class="ckm-facts"><li><b>Data:</b> <a href="../assets/learn/data/town_year.json" download>town_year.json</a> (8,760 hours of 2025), the course's year file: the real 2025 hourly demand, wind and solar of the Southwest Power Pool grid (EIA-930), each as a shape in thousandths of its own highest 2025 hour</li><li><b>Metadata:</b> the file's <code>meta</code> block gives the source, the time convention and how bad hours were filled</li><li><b>Scaling:</b> as lesson 0: demand × 450 MW, the wind farm × 150 MW, the solar farm × 200 MW, so SPP's highest hour means a farm at its full size</li><li><b>Compare:</b> each farm's output in the 100 hours of highest demand, and in the 100 hours of highest net load (demand minus wind and solar), with its average over the year</li><li><b>Ties:</b> where hours tie, take the earlier one first</li></ul>
 <!-- ckm-brief-empirical:end -->
 </div>
@@ -84,7 +92,7 @@ body-classes: "page-learn page-lesson lx-form-checkpoint"
 <div class="lx-card ckm-supplied">
 <p class="lx-eyebrow">Part B · the supplied model, with one planted defect</p>
 <!-- ckm-supplied:start (written from the data file by the test's --write mode; do not edit) -->
-<p>The supplied model: what should Prairie Town build (wind, solar, a gas combined-cycle plant, a gas peaker) to meet demand on three representative days of 2025, each weighted by the days of the year it stands for? One planted defect.</p>
+<p>The supplied model: what should Prairie Town build (wind, solar, a gas <span class="lx-term" data-term="combined-cycle">combined-cycle plant</span>, a gas <span class="lx-term" data-term="peaker">peaker</span>) to meet demand on three representative days of 2025, each weighted by the days of the year it stands for? One planted defect.</p>
 <p class="lx-eyebrow">On paper</p><ul class="ckm-paper"><li><b>Weights:</b> <code>w_d = the days of the year that day d stands for (121, 122, 122; they sum to 365).</code></li><li><b>Goal:</b> <code>min Σ_g A_g K_g + Σ_d w_d Σ_t [ (Σ_g c_g p_g,d,t) + V u_d,t ]   ($ a year)</code></li><li><b>Balance:</b> <code>Σ_g p_g,d,t + u_d,t = D_d,t   (MW, every day and hour)</code></li><li><b>Wind and solar:</b> <code>p_g,d,t ≤ a_g,d,t K_g   (a: output per MW built, 0 to 1)</code></li><li><b>Gas plants:</b> <code>p_g,d,t ≤ K_g</code></li><li><b>Domains:</b> <code>K_g ≥ 0,  p_g,d,t ≥ 0,  u_d,t ≥ 0</code></li></ul>
 <details class="lx-textalt ckm-sym"><summary>The symbols, with their units</summary><div class="lx-scroll-x"><table class="lx-mini-table"><thead><tr><th scope="col">Symbol</th><th scope="col">Meaning</th><th scope="col">Unit</th></tr></thead><tbody><tr><td><code>g</code></td><td>a technology: wind, solar, gas combined-cycle (cc), gas peaker (pk)</td><td>–</td></tr><tr><td><code>d, t</code></td><td>a representative day, and an hour of it (t = 0 to 23, one hour each)</td><td>–</td></tr><tr><td><code>w_d</code></td><td>the days of the year that day d stands for</td><td>days</td></tr><tr><td><code>A_g</code></td><td>capital cost, already annualized</td><td>$ per MW of capacity per year</td></tr><tr><td><code>K_g</code></td><td>capacity built: a decision</td><td>MW</td></tr><tr><td><code>c_g</code></td><td>running cost</td><td>$/MWh</td></tr><tr><td><code>p_g,d,t</code></td><td>output in hour t of day d: a decision</td><td>MW (held for one hour, so also MWh)</td></tr><tr><td><code>u_d,t</code></td><td>demand left unserved: a decision</td><td>MW (also MWh in its hour)</td></tr><tr><td><code>V</code></td><td>the cost of unserved demand, $10,000</td><td>$/MWh</td></tr><tr><td><code>D_d,t</code></td><td>demand</td><td>MW</td></tr><tr><td><code>a_g,d,t</code></td><td>output per MW built, 0 to 1 (wind and solar)</td><td>MW per MW</td></tr></tbody></table></div><p class="lx-hint">Units of the goal: MW held for one hour × $/MWh = $ for each hour; summed over a day's 24 hours and multiplied by w_d days, $ a year, like A_g K_g.</p></details>
 <p class="lx-eyebrow">In code (the starter notebook runs it)</p><ol class="ckm-code"><li><span>DAYS = {&quot;winter&quot;: 121, &quot;shoulder&quot;: 122, &quot;summer&quot;: 122}       # days of 2025 each day stands for</span></li><li><span>weight = {d: DAYS[d] / 365 for d in DAYS}                    # share of the year</span></li><li><span>cost = {&quot;wind&quot;: 0, &quot;solar&quot;: 0, &quot;cc&quot;: 40, &quot;pk&quot;: 100}           # running cost, $ per MWh</span></li><li><span>capital = {&quot;wind&quot;: 100_000, &quot;solar&quot;: 70_000, &quot;cc&quot;: 80_000, &quot;pk&quot;: 50_000}   # $ per MW-year, annualized</span></li><li><span>V = 10_000                                                    # $ per MWh of demand left unserved</span></li><li><span>minimize( sum(capital[g] * K[g] for g) + sum(weight[d] * (sum(cost[g] * p[g,d,t] for g) + V * u[d,t]) for d, t) )</span></li><li><span>for d, t: sum(p[g,d,t] for g) + u[d,t] == demand[d][t]                 # balance, MW</span></li><li><span>for g in (&quot;wind&quot;, &quot;solar&quot;), d, t: p[g,d,t] &lt;= avail[g][d][t] * K[g]   # output per MW built</span></li><li><span>for g in (&quot;cc&quot;, &quot;pk&quot;), d, t: p[g,d,t] &lt;= K[g]</span></li><li><span>report(K, annual_cost=objective, demand_in_year=sum(weight[d] * demand[d][t] for d, t))</span></li></ol>
@@ -194,7 +202,13 @@ $$s_t = s_{t-1} + q_t - w_t \;\;(s_{-1} = S_0), \qquad \underline S \le s_t \le 
 
 $$0 \le q_t \le \bar Q\,\Delta t, \qquad P_t = k\,q_t / \Delta t \le P, \qquad s_{23} \ge S_0, \qquad P \ge 0 .$$
 
-**Units.** $\pi_t k q_t$ is \$/kWh × kWh/m³ × m³ = \$; $cP$ is \$/kW × kW = \$. The hour's draw $P_t$ is its energy $k q_t$ (kWh) divided by $\Delta t = 1$ h, in kW; with $\Delta t = 1$ h the code's coefficients are the same numbers. The model has 49 variables, 24 tower rows, 24 draw rows and one end-of-day row. $P$ plays the part of a built capacity in M3: one number every hour must stay under, paid once.
+**Units.** $\pi_t k q_t$ is \$/kWh × kWh/m³ × m³ = \$; $cP$ is \$/kW × kW = \$.
+
+**The hour's draw.** $P_t$ is its energy $k q_t$ (kWh) divided by $\Delta t = 1$ h, in kW. With $\Delta t = 1$ h, the code's coefficients are the same numbers.
+
+**Size.** 49 variables, 24 tower rows, 24 draw rows and one end-of-day row.
+
+**Reading it.** $P$ plays the part of a built capacity in M3: one number every hour must stay under, paid once.
 
 ```{=html}
 <!-- ckm-sol-model:start (written from the model by the test's --write mode; do not edit) -->
@@ -250,11 +264,11 @@ $$0 \le q_t \le \bar Q\,\Delta t, \qquad P_t = k\,q_t / \Delta t \le P, \qquad s
 <div class="lx-xcard">
 <header class="lx-x-head"><h3>The checkpoint's level</h3></header>
 <ul class="ckm-list">
-<li><b>Proficient:</b> at least 6 of the 9 auto-marked tasks right on the first try, including the defect's line (task 6); at least 3 of the 4 points of your formulation or design and 2 of the 3 points of your validation statement.</li>
-<li><b>Strong:</b> at least 8 of 9 on the first try, the defect's line on the first try, and every point of both written tasks.</li>
+<li><b>Proficient:</b> at least 6 of the 9 auto-marked tasks right on the first try, including all three of part B (the defect's line, the check and the fixed cost); at least 3 of the 4 points of your formulation or design and 2 of the 3 points of your validation statement.</li>
+<li><b>Strong:</b> at least 8 of 9 on the first try, all three of part B among them, and every point of both written tasks.</li>
 <li><b>Developing:</b> at least 4 of 9 on the first try.</li>
 <li><b>Not yet:</b> anything else. The checkpoint shows readiness to start the Researcher tier; it certifies nothing.</li>
-<li><b>Solutions opened early:</b> a task whose worked solution you open before answering counts as not right on the first try. If the worked solutions above open before all eleven tasks are answered (early, by an earlier attempt, or in the other variant), the attempt is practice and gets no level.</li>
+<li><b>Solutions opened early:</b> a task whose worked solution you open before answering counts as not right on the first try; a written task earns no points. If the worked solutions above open before all eleven tasks are answered (early, by an earlier attempt, or in the other variant), the attempt is practice and gets no level.</li>
 <li><b>Answered late:</b> an answer given after the worked solutions opened counts as practice, not as right; a written task submitted after it earns no points.</li>
 </ul>
 <p class="lx-hint">The written tasks are self-rated against their points. A teacher or mentor can rate them again with the table above, from the copied summary, which includes what you typed.</p>
