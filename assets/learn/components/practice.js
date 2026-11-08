@@ -1,6 +1,7 @@
 /* practice.js — LX.Practice: faded practice sets with staged hints and an automatic check (bridges B1 and B3; styles and
    the small exercise pieces in practice.css).
    LX.Practice(host, { id, title, lede, foot, blank, tracks: [{ label, intro, items: [{ key, kind, minutes, title, build }] }] })
+     foot    a closing note: a string, or short labelled notes [[label, text], ...] (one list item each)
      id      LX.store key: which exercises are done, in this browser only
      blank   the reason shown when Check is pressed with an empty answer
      tracks  sets of exercises that fade from a worked example to a blank page; kind "worked" | "partly" | "scratch";
@@ -36,7 +37,8 @@
     var tg = seg(H("div", { class: "lx-fp-bar" }, card), o.tracks.map(function (t) { return t.label; }), 0, function (i) { go(i, null, true); }, "Choose a practice set");
     var intro = H("p", { class: "lx-fp-intro" }, card), fade = H("ol", { class: "lx-fp-fade", "aria-label": "Exercises in this set" }, card);
     var ex = H("section", { class: "lx-fp-ex", "aria-live": "off" }, card);
-    if (o.foot) H("p", { class: "lx-fp-foot", html: LX.rich(o.foot) }, card);
+    if (Array.isArray(o.foot)) { var fl = H("ul", { class: "lx-fp-foot lx-fp-notes" }, card); o.foot.forEach(function (n) { H("li", { html: "<b>" + LX.esc(n[0]) + ":</b> " + LX.rich(n[1]) }, fl); }); }
+    else if (o.foot) H("p", { class: "lx-fp-foot", html: LX.rich(o.foot) }, card);
     var items = []; o.tracks.forEach(function (t) { items = items.concat(t.items); });
     var total = items.reduce(function (s, it) { return s + it.minutes; }, 0), T = 0, I = 0, cur = null;
     function tally() { cnt.textContent = items.filter(function (it) { return done[it.key]; }).length + " of " + items.length + " done · about " + total + " min"; }

@@ -4,7 +4,7 @@ lesson: B3
 glossary:
   - id: verification
     term: Verification
-    def: "Checking that a model does what its equations say, with tests such as units, the energy balance and hand-solved cases."
+    def: "Checking that a model's equations and code implement the intended model correctly, with tests such as units, the energy balance and hand-solved cases."
   - id: validation
     term: Validation
     def: "Checking that a model represents the real system well enough for the question it is used to answer."

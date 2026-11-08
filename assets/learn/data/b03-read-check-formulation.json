@@ -22,6 +22,17 @@
   "must": "<i>p</i><sub>nuc,<i>t</i></sub> = <i>P̄</i><sub>nuc</sub> &nbsp; ∀ <i>t</i> ∈ <i>T</i>"
  },
  "lineNames": {"par": "costs", "obj": "objective", "bal": "balance", "size": "sizes", "wx": "weather", "ramp": "ramp", "must": "nuclear runs flat"},
+ "lineTags": {"par": "data", "obj": "goal", "bal": "(1)", "size": "(2)", "wx": "(3)", "ramp": "(4)", "must": "(5)"},
+ "lineWords": {
+  "par": "The running cost of each plant, in dollars per MWh: nuclear 10, wind 0, solar 0, combined-cycle 40, peaker 100.",
+  "obj": "Make as small as possible the running cost of every plant in every hour, plus the charge V on each MWh of demand not served.",
+  "bal": "In every hour, the plants' outputs plus any unserved demand add up to that hour's demand.",
+  "size": "In every hour, no plant makes more than its size.",
+  "wx": "In every hour, the wind and solar farms make no more than the weather allows.",
+  "ramp": "From one hour to the next, the combined-cycle plant's output moves by at most R, up or down; the first hour starts from its given output.",
+  "must": "In every hour, nuclear runs at its full size."
+ },
+ "legend": [["g ∈ G", "plant g belongs to the set of plants G"], ["t ∈ T", "hour t belongs to the set of hours T"], ["∀", "for all: one row for each member of the set"], ["Σ", "add up the term for each member of the set below it"]],
  "bugs": [
   {"key": "unit", "line": "par", "html": "<i>c</i> = (10, 0, 0, 40) $/MWh for (nuc, wind, solar, cc); <i>c</i><sub>pk</sub> = 0.10 $/kWh", "name": "Unit mismatch", "fix": "Convert first: 0.10 $/kWh × 1,000 kWh per MWh = $100/MWh.", "caught": "the unit check: every parameter in the units the formula expects"},
   {"key": "sign", "line": "bal", "html": "Σ<sub><i>g</i>∈<i>G</i></sub> <i>p<sub>g,t</sub></i> + <i>u<sub>t</sub></i> ≤ <i>d<sub>t</sub></i> &nbsp; ∀ <i>t</i> ∈ <i>T</i>", "name": "Wrong sign", "fix": "Supply must meet demand, not stay under it: = d_t.", "caught": "the balance check, hour by hour"},
@@ -49,7 +60,7 @@
  "practice": {
   "title": "Practice: nine exercises in three sets",
   "lede": "Each set fades from a worked example to a blank page. Hints come one at a time, and every check says why.",
-  "foot": "The models are this lesson's dispatch of 3 September 2025, solved by HiGHS in your browser (a precomputed answer if it cannot load). The 65 MW and 45 MW starts are lesson 0's cheapest-first plan at 17:00 and 13:00; the storage and reserve lines are illustrative.",
+  "foot": [["Solver", "HiGHS in your browser; a precomputed answer if it cannot load."], ["Starting outputs", "the 65 MW and 45 MW starts are lesson 0's cheapest-first plan at 17:00 and 13:00."], ["Illustrative", "the storage and reserve lines; the models are this lesson's dispatch of 3 September 2025."]],
   "blank": "Answer every part first.",
   "tracks": [
    {"key": "read", "label": "Read a line", "intro": "Say what a line means, the unit of every symbol, and how many rows it stands for.", "items": ["r1", "r2", "r3"]},
@@ -132,7 +143,7 @@
     "checks": ["Units of every parameter", "The balance, hour by hour", "Outputs against what each plant must do", "Counting rows"],
     "answer": 2,
     "hints": ["Nothing breaks the balance; look at what each plant does.", "Nuclear should run flat at {cap} MW. Which line says so?", "Line (5), “nuclear runs flat”, now reads ≤: the model turns nuclear down to save ${cNuc}/MWh instead of spilling free wind."],
-    "right": "Right: = became ≤ in line (5). The {t0}:00 balance dual moves from ${d0} to ${d1}: one more MWh of demand now raises nuclear from {nuc0} to {nuc1} MW, at ${cNuc}.",
+    "right": "Right: = became ≤ in line (5), “nuclear runs flat”. The {t0}:00 balance dual moves from ${d0} to ${d1}: one more MWh of demand now raises nuclear from {nuc0} to {nuc1} MW, at ${cNuc}.",
     "lineWrong": "That line is as in the right model; find the one that lets nuclear drop below {cap} MW.",
     "noLine": "Tap the changed line first.",
     "bad": ["Every unit is as in the right model; the plan breaks a plant's rule, not a unit.", "The balance holds in every hour here.", "", "Same number of rows: only a sign changed."]

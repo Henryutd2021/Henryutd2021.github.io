@@ -3693,7 +3693,7 @@
  },
  "verification": {
   "term": "Verification",
-  "short": "Checking that a model does what its equations say, with tests such as units, the energy balance and hand-solved cases.",
+  "short": "Checking that a model's equations and code implement the intended model correctly, with tests such as units, the energy balance and hand-solved cases.",
   "lesson": "B3",
   "href": "b03-read-check-formulation.html"
  },
