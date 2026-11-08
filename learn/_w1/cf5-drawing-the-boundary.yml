@@ -28,6 +28,18 @@ glossary:
   - id: crystallization
     term: Crystallization (in an absorption chiller)
     def: "The salt solution in an absorption chiller turning to solid crystals when it gets too concentrated or too cold, which blocks the machine; the chiller must stay clear of that limit."
+  - id: part-load-efficiency
+    term: Part-load efficiency
+    def: "How well a machine converts energy when it runs below its full size; many chillers and turbines do worse at part load."
+  - id: co-optimize
+    term: Co-optimize
+    def: "To choose several decisions together in one model, so each is set with the others in view rather than one after another."
+  - id: heat-balance
+    term: Heat balance (steam-table)
+    def: "An account of the energy entering and leaving each part of a steam cycle, using tables of steam's properties at each pressure and temperature."
+  - id: benchmark-margin
+    term: Margin against a benchmark
+    def: "How much cheaper or dearer an option is than a benchmark, such as buying all power from the grid."
   - id: ancillary-services
     term: Ancillary services
     def: "Services besides energy that keep the grid steady, such as reserves and frequency regulation; grid operators buy them separately from energy."

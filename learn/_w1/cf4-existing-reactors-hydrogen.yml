@@ -21,6 +21,21 @@ glossary:
     def: "The output a running unit could still add, or the load it could still shed, which it can offer to the grid as a reserve."
   - id: discounted-cash-flow
     term: Discounted cash flow
-    def: "Valuing a project's future yearly cash flows in today's money, each discounted at a chosen rate: their sum is the net present value, while the internal rate of return (the rate that makes that sum zero) and the payback time are found from the same flows."
+    def: "Valuing a project's future yearly cash flows in today's money, each discounted at a chosen rate; their sum is the project's net present value."
+  - id: renewable-penetration
+    term: Renewable penetration
+    def: "The share of a grid's electricity that comes from wind, solar and other renewable sources."
+  - id: annualized-capital-cost
+    term: Annualized capital cost
+    def: "A building cost spread into equal yearly amounts over the equipment's life, with interest, so it can be set against a year's revenue."
+  - id: capacity-bound
+    term: Capacity bound
+    def: "The largest size a model is allowed to choose for a piece of equipment."
+  - id: baseload
+    term: Baseload operation
+    def: "Running a plant at steady full output around the clock, whatever the hour's price."
+  - id: capacity-payment
+    term: Capacity payment
+    def: "Money a plant earns for being available to run when needed, as in a capacity market, apart from the energy it sells."
 requests:
   - "Course plan row (CF4): add depth: D2 and model_mode: closed-form, as CF5-CF8 have."
