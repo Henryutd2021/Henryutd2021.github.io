@@ -189,10 +189,10 @@ body.page-learn.quarto-dark { --f2-tech: #7CA6EE; --f2-cost: #E2A445; --f2-env: 
 <div class="lx-scroll-x"><table class="lx-mini-table f2-fbt">
 <thead><tr><th scope="col">Lever</th><th scope="col">First wave</th><th scope="col">Later waves</th></tr></thead>
 <tbody>
-<tr><td>Gas price doubles</td><td>Wholesale price rises; gas heating costs more; the gas import bill rises</td><td>Plant mix shifts; CO₂ depends on what replaces gas; energy burden rises; investment shifts and dependence on imported gas falls</td></tr>
+<tr><td>Gas price doubles</td><td>Wholesale price and the gas import bill rise; the plant mix shifts; CO₂ depends on what replaces gas</td><td>Gas heating bills and the energy burden rise; investment shifts and dependence on imported gas falls</td></tr>
 <tr><td>A heat wave</td><td>Demand rises; lines carry less; spare capacity falls; heat-related health risk rises</td><td>Prices and CO₂ can rise; bills and burden can rise later; tight hours can encourage new capacity</td></tr>
-<tr><td>A carbon price</td><td>Gas plants can move ahead of coal plants; wholesale price rises</td><td>If gas replaces coal, CO₂ and local pollution fall; bills rise if the tariff passes the price on; the burden depends on the revenue; jobs shift</td></tr>
-<tr><td>A new data center</td><td>Demand rises; it needs new connections; spare capacity falls when it connects; jobs and tax base can rise; cooling water depends on the design</td><td>CO₂ depends on what serves it; who pays for upgrades depends on the tariff; new supply may follow</td></tr>
+<tr><td>A carbon price</td><td>Gas plants can move ahead of coal plants; wholesale price rises; if gas replaces coal, CO₂ and local air pollution fall</td><td>Bills rise if the tariff passes the price on; the burden depends on the revenue; jobs shift</td></tr>
+<tr><td>A new data center</td><td>Demand rises; it needs new connections; spare capacity falls when it connects; jobs and tax base can rise; cooling water depends on the design</td><td>From its first hours, CO₂ depends on which plants serve it; later, who pays for upgrades depends on the tariff, and new supply may follow</td></tr>
 </tbody>
 </table></div>
 <p class="lx-hint">With JavaScript on, you run these yourself: three tanks, two loops and four levers.</p>
@@ -247,10 +247,10 @@ Many slow, hard questions are questions about stocks.
 A stock is a state variable that carries over from one step to the next:
 
 $$
-S_{t+1} = S_t + \big(\mathit{in}_t - \mathit{out}_t\big)\,\Delta t, \qquad 0 \le S_t \le \bar{S}
+S_{t+1} = S_t + \big(\mathit{in}_t - \mathit{out}_t\big)\,\Delta t
 $$
 
-with $S_t$ the stock, $\mathit{in}_t$ and $\mathit{out}_t$ the flows, $\Delta t$ the step and $\bar{S}$ the ceiling. Flow × time must come out in the stock's unit:
+with $S_t$ the stock, $\mathit{in}_t$ and $\mathit{out}_t$ the flows and $\Delta t$ the step. A reservoir or a battery adds physical limits, $0 \le S_t \le \bar{S}$ with $\bar{S}$ its capacity; a carbon budget is a chosen limit that emissions can exceed. Flow × time must come out in the stock's unit:
 
 - **Reservoir:** change in GWh = (river in − release, in MW) × 168 hours ÷ 1,000, since 1 GWh = 1,000 MWh.
 - **Carbon:** change in Mt = emissions in Mt a year × 1 year.
@@ -324,7 +324,7 @@ A loop appears when a flow depends on a stock, such as sales that depend on the 
 <div class="lx-qq" data-id="heat" data-answer="a">
 <p class="lx-qtext">Why does a heat wave squeeze spare capacity from both sides?</p>
 <ul class="lx-choices"><li data-value="a">Demand rises while hot lines and some thermal plants deliver less</li><li data-value="b">Prices rise, so plants sell less</li><li data-value="c">Solar stops at noon</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Demand rises for cooling while hot lines sag and carry less and some thermal plants lose output: both sides of the balance move against the grid.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Demand rises for cooling while hot lines sag and carry less and some thermal plants, which make electricity from heat, lose output: both sides of the balance move against the grid.</p></details>
 </div>
 <div class="lx-qq" data-id="wave2" data-answer="b">
 <p class="lx-qtext">A 300 MW data center connects, and no new supply comes with it. When does spare capacity shrink?</p>

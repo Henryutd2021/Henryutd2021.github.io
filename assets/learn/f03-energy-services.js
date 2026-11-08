@@ -292,9 +292,10 @@
     var log = LX.store.get("f3-log", {}) || {};
     function keep(k, v) { log[k] = v; LX.store.set("f3-log", log); }
     var state = { car: !!log.car, heatPump: !!log.hp, temp: log.temp == null ? D.day.start : log.temp };
+    // the left column is "Bought" until the heat pump brings in free outdoor heat; then it is the energy coming in
     function sk(host, o) {
       return LX.Sankey(host, { label: "A year of energy in the Prairie Town home, in kWh", unit: "kWh", fmt: fmtK, height: 300, heightN: 340,
-        textHead: ["From", "To", "kWh in a year"], caption: o && o.caption, colNames: ["Bought", "Services", "Becomes"] });
+        textHead: ["From", "To", "kWh in a year"], caption: o && o.caption, colNames: [(o && o.first) || "Bought", "Services", "Becomes"] });
     }
     var steps = [
       { text: "People don't want energy itself: they want a warm room, a hot shower, a ride to school. Tap each [[energy-service|service]] in this Prairie Town home.",
@@ -318,9 +319,14 @@
         } },
       { text: D.predict.q + " Lock in a guess; the next step shows the year in kWh.",
         build: function (act, api) {
+          if (log.pred) {   // back on a prediction already locked: show it locked, not a fresh question with Next open
+            var lab = (D.predict.options.filter(function (op) { return op.value === log.pred; })[0] || {}).label || log.pred;
+            H("p", { class: "lx-predict-out f3-locked", html: "Locked in: <b>" + LX.esc(lab) + "</b>. The next step shows the answer." }, act);
+            api.done();
+            return;
+          }
           LX.Predict(act, { id: D.predict.id, answer: D.predict.answer, fresh: true, options: D.predict.options, lockText: "Locked in. The next step shows the answer.",
             onPick: function (p) { keep("pred", p); api.done(); } });
-          if (log.pred) api.done();
         } },
       { text: "Here is the home's year, from the carriers it buys (left) to the services they deliver (right). Tap a bar for its numbers, then add the family car.",
         build: function (act, api) {
@@ -339,21 +345,26 @@
       { text: "Not all the energy bought becomes useful heat or motion: a furnace loses some up its exhaust vent, and a car's engine warms the air. Guess first, then see the useful share.",
         build: function (act, api) {
           var s = null;
+          function answer(g) { return "Your guess: <b>" + D.guess.ticks[g] + "%</b>. " + LX.rich(say.guess(D, D.guess.ticks[g] === D.guess.answer)); }
+          if (log.guess != null) {   // back on a guess already locked: show it locked, with its answer, as it was left
+            H("p", { class: "lx-q", html: LX.rich(D.guess.q) }, act);
+            H("p", { class: "lx-predict-out f3-locked", html: answer(log.guess) }, act);
+            state.car = true; s = sk(act); s.set(spec(D, { car: true, view: "useful" })); api.done(); api.saw(say.useful(D));
+            return;
+          }
           LX.Guess(act, { id: D.guess.id, q: D.guess.q, ticks: D.guess.ticks.map(function (t) { return t + "%"; }), answer: D.guess.ticks.indexOf(D.guess.answer), start: 2,
             onLock: function (g, out) {
               keep("guess", g);
-              var right = D.guess.ticks[g] === D.guess.answer;
-              out.innerHTML = "<p>" + LX.rich(say.guess(D, right)) + "</p>";
+              out.innerHTML = "<p>" + answer(g) + "</p>";
               state.car = true; keep("car", true);
               s = sk(act); s.set(spec(D, { car: true, view: "useful" }));
               api.done();
               api.saw(say.useful(D));
             } });
-          if (log.guess != null) { s = sk(act); s.set(spec(D, { car: true, view: "useful" })); api.done(); }
         } },
-      { text: "Swap the furnace for a [[heat-pump|heat pump]]. It moves heat in from the outdoor air, so the same warm rooms need far less energy bought.",
+      { text: "Swap the furnace for a [[heat-pump|heat pump]], which moves heat in from outdoor air. Assume a seasonal [[coefficient-of-performance|COP]], heat out per unit of electricity, of " + seasonCOP(D).toFixed(1) + ", from DOE's Region V cold-climate rating, not Prairie Town's weather.",
         build: function (act, api) {
-          var seg = H("div", { class: "lx-seg f3-seg", role: "group", "aria-label": "How the home is heated" }, act), bs = {}, s = sk(act);
+          var seg = H("div", { class: "lx-seg f3-seg", role: "group", "aria-label": "How the home is heated" }, act), bs = {}, s = sk(act, { first: "Energy in" });
           [["furnace", "Gas furnace"], ["hp", "Heat pump"]].forEach(function (p) {
             var b = H("button", { type: "button", "aria-pressed": "false", text: p[1] }, seg); bs[p[0]] = b;
             b.addEventListener("click", function () { set(p[0] === "hp", true); });
@@ -426,9 +437,9 @@
     var c1 = H("div", { class: "lx-xcard lx-wide" }, host), h1 = H("header", { class: "lx-x-head" }, c1);
     H("h3", { text: "A year in one picture: " + (hp ? "with the heat pump" : "with the gas furnace") }, h1);
     var guide = H("ol", { class: "f3-guide" }, c1);
-    ["**Width is energy.** Each band's width is its kWh in a year.", "**Left: what the home buys.** The [[energy-carrier|carriers]], plus free heat from outdoor air with a heat pump.",
+    ["**Width is energy.** Each band's width is its kWh in a year.", hp ? "**Left: the energy coming in.** The [[energy-carrier|carriers]] the home buys, plus free heat from outdoor air." : "**Left: what the home buys.** The [[energy-carrier|carriers]].",
      "**Middle: the services.** What the energy is for.", "**Right: what it becomes.** [[useful-energy|Useful]] heat and motion, heat lost on the way, or appliances not split here."].forEach(function (t) { H("li", { html: LX.rich(t).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>") }, guide); });
-    var s = LX.Sankey(c1, { label: "The Prairie Town home's year, carriers to services to useful energy, in kWh", unit: "kWh", fmt: fmtK, height: 320, heightN: 360, textHead: ["From", "To", "kWh in a year"], colNames: ["Bought", "Services", "Becomes"] });
+    var s = LX.Sankey(c1, { label: "The Prairie Town home's year, carriers to services to useful energy, in kWh", unit: "kWh", fmt: fmtK, height: 320, heightN: 360, textHead: ["From", "To", "kWh in a year"], colNames: [hp ? "Energy in" : "Bought", "Services", "Becomes"] });
     s.set(spec(D, { car: true, heatPump: hp, view: "useful" }));
     H("p", { class: "lx-hint", html: LX.rich("Bought " + kwh(Tx.bought) + "; useful " + kwh(Tx.useful) + "; lost " + kwh(Tx.lost) + (hp ? "; from outdoor air " + kwh(Tx.air) : "") + ". Flows rounded to the nearest 100 kWh.") }, c1);
 

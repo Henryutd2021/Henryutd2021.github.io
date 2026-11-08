@@ -13,7 +13,7 @@ glossary:
     def: "The energy a home, business or vehicle buys and uses, as on its meters and receipts, such as kWh of electricity or gallons of gasoline."
   - id: useful-energy
     term: Useful energy
-    def: "The part of the energy bought that a device actually delivers as the wanted heat, light or motion, after its own losses."
+    def: "Energy a device delivers in the wanted form, such as heat, light or motion; a heat pump's delivered heat includes heat drawn from the outdoor air, not only the energy bought."
   - id: primary-energy
     term: Primary energy
     def: "Energy as found in nature before any conversion, such as the gas burned in a power plant to make the electricity a home later buys."

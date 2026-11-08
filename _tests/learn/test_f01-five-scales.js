@@ -44,7 +44,13 @@ const words = s => s.replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1").replace(/\*\*/g
   D.rounds.exchange.cards.forEach(c => ok(/^[A-Z][a-z ]+ → [a-z ]+: /.test(c.text), `exchange.${c.id}: names its sender and receiver ("${c.text}")`));
   D.scales.forEach(s => ok(typeof s.gloss === "string" && words(s.gloss) <= 35 && sentences(s.gloss) <= 2, `${s.id}: one gloss line under the zoom, within budget`));
   ok(/\[\[microgrid\|/.test(D.scales[1].gloss) && /\[\[islanding\|/.test(D.scales[1].gloss) && /\[\[feeder\|/.test(D.scales[1].gloss), "S1's zoom frame defines microgrid, islanding and feeder at first use");
-  ok(/\[\[local-optimum\|/.test(D.optimum) && /optimum/.test(JS.match(/function buildExplain[\s\S]*$/)[0]), "the live explain layer keeps a visible definition of a local optimum");
+  ok(/D\.optimum/.test(JS.match(/function buildExplain[\s\S]*$/)[0]) && /cheapest plan for one campus may not be the cheapest for everyone/.test(D.optimum), "the live explain layer states that one campus's cheapest plan need not be the system's");
+  ok(!/local[- ]optimum/i.test(JSON.stringify(D) + JS + QMD.replace(/<!--[\s\S]*?-->/g, "") + rd("learn/_w1/f01-five-scales.yml")), "no 'local optimum': in optimization the term means something else (best among nearby alternatives)");
+  ok(D.rounds.physics.title === "What these example models focus on" && !/must represent|model needs/.test(JSON.stringify(D.rounds) + (QMD.match(/<div class="lx-fallback">[\s\S]*?<\/table>/) || [""])[0]) && /usually focuses on/.test(JS) && /usually focuses on/.test(QMD), "the physics round describes what example models usually focus on, not what every model must represent");
+  ok(!/not the network|not individual feeders/.test(JSON.stringify(D.rounds) + QMD), "physics reasons are conditional, not categorical");
+  ok(/planners, utilities and regulators share decisions about new lines and connections/.test(D.rounds.what.cards[2].why) && !/Which plants run in its region, reserves, lines, connections/.test(QMD), "S2: operators run plants and reserves; new lines and connections are shared decisions");
+  ok(/after the campus disconnects, until its generator starts/.test(D.rounds.battery.cards[1].text) && !/export limit/.test(D.rounds.battery.cards[1].text), "the hospital battery card is an islanded question, without the connected export limit");
+  ok(!/turns in step/.test(rd("learn/_w1/f01-five-scales.yml")) && /shared electrical frequency/.test(rd("learn/_w1/f01-five-scales.yml")), "synchronous grid: a shared electrical frequency, not machines turning in step");
   ok(D.scales.map(s => s.power).join("|") === "W to MW|kW to MW|MW to GW|hundreds of MW|hundreds of GW", "power ranges as on lesson 1's scale strip");
   const L1 = rd("assets/learn/01-power-energy.js");
   ["W to MW", "kW to MW", "MW to GW", "hundreds of MW", "hundreds of GW"].forEach(r => ok(L1.indexOf('"' + r + '"') >= 0, `lesson 1 uses the same range "${r}"`));
@@ -127,15 +133,25 @@ const words = s => s.replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1").replace(/\*\*/g
   // step texts: about 35 words, no Markdown bold (step text is not Markdown)
   const steps = [...JS.matchAll(/\{ text: "((?:[^"\\]|\\.)*)"/g)].map(x => x[1]);
   ok(steps.length >= 6, `${steps.length} literal step texts`);
-  steps.forEach(t => { ok(words(t) <= 40 && sentences(t) <= 2, `step text within budget (two sentences, about 35 words): "${t.slice(0, 50)}…"`); ok(t.indexOf("**") < 0, "no ** in step text"); });
+  steps.forEach(t => { ok(words(t) <= 36 && sentences(t) <= 2, `step text within budget (two sentences, about 35 words): "${t.slice(0, 50)}…"`); ok(t.indexOf("**") < 0, "no ** in step text"); });
   ok(words(D.apply.q) <= 40 && sentences(D.apply.q) <= 2, "apply question within budget");
+  // first-use terms of the sorts are marked in the step text above each round, so a reader who sorts right still meets them
+  const stepOf = re => steps.find(t => re.test(t)) || "";
+  ok(/\[\[co-op\|/.test(stepOf(/^Who decides/)) && /\[\[tariff\|/.test(stepOf(/^Who decides/)), "who round: co-op and tariff marked before the sort");
+  ok(/\[\[reserves\|/.test(stepOf(/^What does each one decide/)), "what round: reserves marked before the sort");
+  ok(/\[\[state-of-charge\|/.test(stepOf(/^Models at each scale/)) && /\[\[inertia\|/.test(stepOf(/^Models at each scale/)), "physics round: state of charge and inertia marked before the sort");
+  ok(/Terms: a co-op is a utility owned by its members; reserves are spare capacity/.test(QMD.match(/<div class="lx-fallback">[\s\S]*?lx-hint/)[0]), "no-JS fallback defines co-op, reserves and inertia");
+  const dn = (QMD.match(/<p class="lx-datanote">[\s\S]*?<\/p>/) || [""])[0].replace(/<svg[\s\S]*?<\/svg>/, "").split(/<br>/).map(x => x.replace(/<[^>]+>/g, " "));
+  ok(dn.length >= 5 && dn.every(x => words(x) <= 20), `data note: ${dn.length} labelled source lines, each short`);
+  const myth = (QMD.match(/data-id="size"[\s\S]*?<details class="lx-answer"><summary>Answer<\/summary><p>([\s\S]*?)<\/p>/) || [])[1] || "";
+  ok(sentences(myth.replace(/^Myth\.\s*/, "")) <= 1 && words(myth) <= 35, `first myth answer: one sentence after the verdict (${words(myth)} words)`);
   // the assembled feedback, as the reader sees it after Check, for every score
   ["who", "what", "physics", "exchange", "battery"].forEach(k => { const n = D.rounds[k].cards.length; for (let r = 0; r <= n; r++) [null, "S2", "S0"].forEach(p => {
     const t = M.feedback(D, k, { right: r, total: n, placed: n }, p);
-    ok(words(t) <= 45 && sentences(t.replace(/^\*\*[^*]+\*\*[^.]*\.\s*/, "")) <= (k === "who" ? 3 : 2), `${k} feedback at ${r} of ${n}: within budget (${words(t)} words)`);
+    ok(words(t) <= 40 && sentences(t.replace(/^\*\*[^*]+\*\*[^.]*\.\s*/, "")) <= (k === "who" ? 1 : 2), `${k} feedback at ${r} of ${n}: within budget (${words(t)} words)`);
   }); });
-  ok(M.feedback(D, "who", { right: 5, total: 5, placed: 5 }, "S2").indexOf("Your prediction: right.") > 0 && M.feedback(D, "who", { right: 5, total: 5, placed: 5 }, "S0").indexOf("not quite") > 0, "who feedback names the reader's prediction");
-  const A3 = M.anchors({ "01_power_energy": P1, town_days: TD, town: TOWN }), zd = M.zoomDone(A3); ok(words(zd) <= 45 && sentences(zd) <= 2 && zd.indexOf(A3.homeText) > 0 && zd.indexOf(A3.usText) > 0, `zoom done: ${words(zd)} words, with the two anchors`);
+  ok(M.feedback(D, "who", { right: 5, total: 5, placed: 5 }, "S2").indexOf("Your prediction was right:") > 0 && M.feedback(D, "who", { right: 5, total: 5, placed: 5 }, "S0").indexOf("Not quite:") > 0 && /\*\* right\. The regional grid operator/.test(M.feedback(D, "who", { right: 5, total: 5, placed: 5 }, null)), "who feedback names the reader's prediction");
+  const A3 = M.anchors({ "01_power_energy": P1, town_days: TD, town: TOWN }), zd = M.zoomDone(A3); ok(words(zd) <= 30 && sentences(zd) <= 1 && zd.indexOf(A3.homeText) > 0 && zd.indexOf(A3.usText) > 0, `zoom done: ${words(zd)} words, with the two anchors`);
 }
 
 // ---------------- scope: deny-list, nuclear-plus-risk combination, data centers only as loads, links on the allow-list
