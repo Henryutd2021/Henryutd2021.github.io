@@ -54,7 +54,7 @@ ok(W.weeks[D.week.start - 1].start === "2025-04-07" && M.weekLabel(W, D.week.sta
 ok(M.weekLabel(W, W.weeks.findIndex(x => x.start === "2025-03-31")) === "31 March–6 April", "week: labels across a month boundary");
 ok(Math.round(W.week.gapMean * 100) === 4 && Math.round(W.week.gapMax * 100) === 9 && W.week.gapH === 7, "week: weekends 4% lower, up to 9% at 07:00");
 ok(has("Weekend hours ran 4% below weekdays on average in 2025, and up to 9% lower around 07:00"), "page: weekly numbers");
-// the week chart's day labels (review 2026-11-02, finding 4: the old rule produced none): seven, Monday to Sunday, at 12:00
+// the week chart's day labels (an earlier rule produced none): seven, Monday to Sunday, at 12:00
 W.weeks.forEach((x, k) => {
   const t = M.weekTicks(W, k);
   ok(t.length === 7 && t.map(z => z.label).join() === "Mon,Tue,Wed,Thu,Fri,Sat,Sun" && t.every(z => W.C.hour[x.idx[z.i]] === 12), `week ${k + 1}: seven day labels at 12:00`);
@@ -74,7 +74,7 @@ let prev = Infinity;
 for (let f = 50; f <= 100; f++) { const h = M.hoursAbove(W, W.peak * f / 100); ok(h <= prev, `ldc: hours above the line fall as the line rises (${f}%)`); prev = h; }
 const h90 = M.hoursAbove(W, 405), e90 = M.energyAbove(W, 405);
 ok(h90 === 180 && (h90 / W.n * 100).toFixed(1) === "2.1" && (e90 * 100).toFixed(2) === "0.12", "ldc: 180 hours above 405 MW, 2.1% of the year, 0.12% of the energy");
-// step 6's readout keeps "energy above the line" (0.12%) apart from "energy used in those hours" (3.08%) (finding 5)
+// step 6's readout keeps "energy above the line" (0.12%) apart from "energy used in those hours" (3.08%)
 {
   const r = M.lineReadout(W, 0.9);
   ok(r.thr === 405 && r.hrs === 180 && near(r.extraShare, e90) && (r.duringShare * 100).toFixed(2) === "3.08" && r.duringShare > 20 * r.extraShare, "readout: 0.12% above the line, 3.08% used in those hours");
@@ -97,7 +97,7 @@ ok(M.duck(W, 0).net.join() === W.duckDay.demand.join(), "duck: no solar, net dem
 const d0 = M.duck(W, 0), d200 = M.duck(W, D.solar.target);
 ok(Math.round(d200.ramp) === 114 && Math.round(d0.ramp) === 20 && D.solar.target === town.fleet.solar.mw, "duck: with lesson 0's 200 MW farm the 3-hour climb is 114 MW, against 20 MW without");
 ok(has("with 200 MW of solar, net demand's steepest three-hour climb after noon is 114 MW, against 20 MW without it"), "page: duck myth numbers");
-ok(d200.rampFrom >= 12 && d200.rampFrom <= 20 && /steepest three-hour climb after noon/.test(JS), "duck: the climb is searched from noon, and the page says so (finding 8)");
+ok(d200.rampFrom >= 12 && d200.rampFrom <= 20 && /steepest three-hour climb after noon/.test(JS), "duck: the climb is searched from noon, and the page says so");
 ok(M.duck(W, D.solar.max).min < 0 && M.duck(W, D.solar.target).neg === 0, "duck: the slider range reaches below zero; 200 MW does not");
 
 // ---------------- SPP and U.S. numbers on the page
@@ -108,28 +108,28 @@ ok(near(st.annual_demand_TWh * 1000 / 8760 / st.peak_demand_GW, W.loadFactor, 0.
 ok(has(">0.8%<") && st.share_of_net_generation.solar === 0.008 && has("SPP has little solar (0.8% of its 2025 generation)"), "page: SPP solar share 0.8%");
 ok(has(">759 GW<") && D.anchors.us_peak.value === 759180, "page: 759 GW");
 ok(st.demand_hours_flagged_as_implausible === 699 && has("For 699 hours of 2025 (about 8%)") && Math.round(699 / 8760 * 100) === 8, "page: 699 rebuilt hours, about 8%");
-ok(st.frozen_hours_filled.solar === 1377 && has("SPP's solar telemetry froze for 1,377 hours (about 16%)") && Math.round(1377 / 8760 * 100) === 16, "page: 1,377 filled solar hours, about 16% (finding 6)");
+ok(st.frozen_hours_filled.solar === 1377 && has("SPP's solar telemetry froze for 1,377 hours (about 16%)") && Math.round(1377 / 8760 * 100) === 16, "page: 1,377 filled solar hours, about 16%");
 Object.keys(D.anchors).forEach(k => ok(/^https:\/\/www\.eia\.gov\//.test(D.anchors[k].url) && D.anchors[k].as_of && QMD.indexOf(D.anchors[k].url) >= 0, `anchor ${k}: EIA URL, as-of date, cited on the page`));
 
-// ---------------- review fixes, 2026-11-02
+// ---------------- wording checks: removed claims, the solar slider, causes, the Modeler preview
 ["sits idle the other 98%", "Every curve is the real hourly demand", "which sets how much capacity", "\\max_t", "Planning models therefore run", "the most?</p>",
  "LEDs and fewer workdays lower demand", "buildings had soaked up heat all day"].forEach(t => ok((QMD + JS + fs.readFileSync(path.join(SITE, "learn/_w1/02-demand.yml"), "utf8")).indexOf(t) < 0, `review: "${t}" is gone`));
-ok(/Illustrative: the farm's output in SPP's top solar hour of 2025, not a nameplate rating/.test(JS) && has("it is not a nameplate rating"), "review: the solar slider's MW is an illustrative maximum (finding 13)");
-ok(/numbers are measured, the causes typical/.test(JS) && /A typical chain: the data show the demand, not its causes/.test(JS), "review: causes marked as typical (finding 9)");
-{ // the Modeler preview: one symbolic line at most, forward links to live lessons (finding 7)
+ok(/Illustrative: the farm's output in SPP's top solar hour of 2025, not a nameplate rating/.test(JS) && has("it is not a nameplate rating"), "review: the solar slider's MW is an illustrative maximum");
+ok(/numbers are measured, the causes typical/.test(JS) && /A typical chain: the data show the demand, not its causes/.test(JS), "review: causes marked as typical");
+{ // the Modeler preview: one symbolic line at most, forward links to live lessons
   const b0 = QMD.indexOf("Why models keep the hours in order"), box = QMD.slice(b0, QMD.indexOf("</details>", b0));
   ok((box.match(/\$\$/g) || []).length === 0 && ["09-storage.qmd", "11-solver.qmd", "13-capstone.qmd"].every(f => box.indexOf("(" + f + ")") >= 0), "review: Modeler preview in words, linking lessons 9, 11 and 13");
   const PATH = fs.readFileSync(path.join(SITE, "learn/path.yml"), "utf8");
   ["09-storage", "11-solver", "13-capstone"].forEach(id => { const i = PATH.indexOf("id: " + id); ok(i >= 0 && /status: active/.test(PATH.slice(i, PATH.indexOf("- kind:", i + 1))), `review: lesson ${id} is live`); });
 }
-{ // every glossary mark resolves (glossary.yml or a W1 sidecar)
+{ // every glossary mark resolves (glossary.yml or a lesson sidecar)
   const ids = new Set();
   [fs.readFileSync(path.join(SITE, "learn/glossary.yml"), "utf8")].concat(fs.readdirSync(path.join(SITE, "learn/_w1")).map(f => fs.readFileSync(path.join(SITE, "learn/_w1", f), "utf8")))
     .forEach(t => [...t.matchAll(/^\s*-?\s*id:\s*([a-z0-9-]+)\s*$/gm)].forEach(m => ids.add(m[1])));
   const used = [...QMD.matchAll(/term="([a-z0-9-]+)"/g), ...QMD.matchAll(/data-term="([a-z0-9-]+)"/g), ...JS.matchAll(/\[\[([a-z0-9-]+)\|/g)].map(m => m[1]);
   ok(used.length > 8, "glossary: marks found");
   used.forEach(id => ok(ids.has(id), `glossary: ${id} is defined`));
-  ["heat-pump", "balancing-authority", "electrification"].forEach(id => ok(used.indexOf(id) >= 0, `glossary: ${id} is marked (finding 10)`));
+  ["heat-pump", "balancing-authority", "electrification"].forEach(id => ok(used.indexOf(id) >= 0, `glossary: ${id} is marked`));
 }
 
 // ---------------- scope: links and words (curriculum section 20)

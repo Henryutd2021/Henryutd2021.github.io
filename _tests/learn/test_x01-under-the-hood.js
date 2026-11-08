@@ -4,8 +4,8 @@
 //     lesson's data file holds words only, and the script no value; each efficiency recomputed as 3,412 Btu ÷ heat rate
 //   - the eight components each have a discipline, two questions, the kinds of number models borrow (from the six
 //     kinds), a course number with a dated source and lessons; the sort's bins agree with its reasons
-//   - guard G-NUC, field by field: every string that names a reactor or nuclear term carries none of the risk terms of
-//     curriculum §20.4 (cost change, credit, threshold, siting, timing, order, buyer, data center, ...); no design or
+//   - the nuclear scope rule, field by field: every string that names a reactor or nuclear term carries none of the
+//     scope scan's risk terms (cost change, credit, threshold, siting, timing, order, buyer, data center, ...); no design or
 //     vendor name
 //   - the no-JS block, ideas, stop box, check, facts and sources equal what the model writes (--write)
 //   - scope: no "AI", links on the allow-list, books cited by name only
@@ -60,25 +60,25 @@ ok(near(N.core[0 + 1].eff, btu / I.F5.facts.heat_rate_btu_kwh.value) && /32\.7%/
 ok(N.blade[0].n === "59.3%" && near(16 / 27, 0.5926, 1e-4) && N.blade[1].n === "0.52", "the Betz limit (16/27 = 59.3%) and the best measured power coefficient, read from F4");
 ok(N.cell[0].n === "85%" && N.cell[1].n === "15 years" && I.C13.techs.battery.rte === 0.85, "the battery's round trip and life, read from lesson 13");
 ok(N.electrolyzer[0].n === "57 kWh/kg" && N.electrolyzer[1].n === "PEM 5%, alkaline 15%", "the electrolyzer's kWh per kg and minimum loads, read from A16");
-ok(/complete PEM electrolyzer system/.test(N.electrolyzer[0].what) && /about 57 kWh per kilogram/.test(N.electrolyzer[0].what), "the 57 kWh/kg is the whole electrolyzer system's, as DOE's Record 24005 states (X1 review)");
-ok(/sent into its utility-scale battery system comes back out/.test(N.cell[0].what) && /charging and discharging losses together/.test(N.cell[0].what) && /not one cell/.test(N.cell[0].what), "the 85% is a round trip of the whole battery system (X1 review)");
-ok(/average full-load tested heat rate/.test(N.combustor[0].what) && /at full load/.test(N.combustor[0].what) && /full-load/.test(I.F4.sources.eia_t82.where + " full-load"), "the 7,535 is EIA's average full-load tested heat rate, not a year's fuel use (X1 review)");
+ok(/complete PEM electrolyzer system/.test(N.electrolyzer[0].what) && /about 57 kWh per kilogram/.test(N.electrolyzer[0].what), "the 57 kWh/kg is the whole electrolyzer system's, as DOE's Record 24005 states");
+ok(/sent into its utility-scale battery system comes back out/.test(N.cell[0].what) && /charging and discharging losses together/.test(N.cell[0].what) && /not one cell/.test(N.cell[0].what), "the 85% is a round trip of the whole battery system");
+ok(/average full-load tested heat rate/.test(N.combustor[0].what) && /at full load/.test(N.combustor[0].what) && /full-load/.test(I.F4.sources.eia_t82.where + " full-load"), "the 7,535 is EIA's average full-load tested heat rate, not a year's fuel use");
 ok(N.combustor[1].n === "40 MW per hour" && /illustrative/.test(N.combustor[1].what), "Prairie Town's ramp limit, labelled illustrative");
 ok(N.core[0].n === "about 300 °C", "the outlet temperature of large water-cooled reactors, read from F5");
 
 // ---------------- the components, kinds and sort
 const KINDS = X.kinds.map(k => k.id);
 ok(X.components.length === 8 && KINDS.length === 7, "eight components, seven kinds");
-ok(/^How fast its output can change, in MW per hour\.$/.test(M.kind(X, "ramp").text) && /lowest output/.test(M.kind(X, "minload").text), "a ramp limit is a rate of change only; the minimum load is its own kind (X1 review)");
-ok(/how often it fails, how long each outage lasts, and how many years it serves/.test(M.kind(X, "reliability").text), "reliability and life: three separate numbers (X1 review)");
+ok(/^How fast its output can change, in MW per hour\.$/.test(M.kind(X, "ramp").text) && /lowest output/.test(M.kind(X, "minload").text), "a ramp limit is a rate of change only; the minimum load is its own kind");
+ok(/how often it fails, how long each outage lasts, and how many years it serves/.test(M.kind(X, "reliability").text), "reliability and life: three separate numbers");
 // every course number carries a kind its component borrows (or none, for what the device does), so the kinds step shows
-// only matching values, and says so when the course has none (X1 review)
+// only matching values, and says so when the course has none
 X.components.forEach(c => N[c.id].forEach(n => ok(n.kind === null || c.borrows.indexOf(n.kind) >= 0, c.id + ": " + n.n + " is of a kind the card lists (" + n.kind + ")")));
 KINDS.forEach(k => M.withKind(X, k).forEach(id => { const v = M.kindValues(I, id, k); ok(v.every(n => n.kind === k), id + " lit for " + k + ": only " + k + " values"); }));
 ok(M.kindValues(I, "inverter", "rating").length === 0 && M.NONE === "This course does not quantify this property here.", "the inverter's rating: not quantified here, said so");
 ok(M.withKind(X, "minload").join() === "combustor,electrolyzer" && M.kindValues(I, "electrolyzer", "minload")[0].n === "PEM 5%, alkaline 15%", "minimum loads: the combustor and the electrolyzer");
-ok(N.relay[0].kind === "rating" && /detects a \[\[fault\|fault\]\] and tells a breaker to open/.test(N.relay[0].what) && !/relays (clear|defend)/i.test(RAW + JS), "the relay finds a fault and tells a breaker to open; ratings are a separate thing models keep (X1 review)");
-ok(!/\b(ten|twenty|thirty|forty|fifty)\b/i.test(JSON.stringify(X.components)), "no spelled-out lifetimes on the cards (X1 review: the blade's twenty years had no source)");
+ok(N.relay[0].kind === "rating" && /detects a \[\[fault\|fault\]\] and tells a breaker to open/.test(N.relay[0].what) && !/relays (clear|defend)/i.test(RAW + JS), "the relay finds a fault and tells a breaker to open; ratings are a separate thing models keep");
+ok(!/\b(ten|twenty|thirty|forty|fifty)\b/i.test(JSON.stringify(X.components)), "no spelled-out lifetimes on the cards (the blade's twenty years had no source)");
 ["inverter", "relay", "blade", "combustor", "core", "electrolyzer", "cell", "control"].forEach(id => ok(M.comp(X, id), "the row's component: " + id));
 const live = c => { const all = [].concat(PATHJSON.starter || [], PATHJSON.more || [], PATHJSON.toolbox || []); return all.some(l => (/^\d+$/.test(c) ? l.starter === +c : l.code === c)); };
 X.components.forEach(c => {
@@ -96,7 +96,7 @@ ok(X.cyber.answer === "b" && /apply only to bulk electric system cyber systems/.
 ok(Object.values(X.cyber.feedback).every(f => /bulk electric system/.test(f)), "every cyber feedback states the rule");
 { const html = M.checkHTML(I), e = 100 * btu / 7535; ok(html.indexOf("About " + Math.round(e) + "%") > 0 && html.indexOf(M.fmtN(e / 100, 3)) > 0 && /data-answer="b"/.test(html), "the efficiency question: 3,412 ÷ 7,535 = 0.453, about 45%"); }
 
-// ---------------- guard G-NUC, field by field (curriculum §20.4)
+// ---------------- the nuclear scope rule, field by field (the scope scan's nuclear-plus-risk combination)
 const NUC = /nuclear|reactor|\bSMR\b|small modular/i;
 const RISK = /cost (trajector|decline|reduction|fall)|learning|commerciali|subsid|credit|threshold|break[- ]even|parity|siting|site selection|suitab|screen|deliver|timing|order|anchor|buyer|data[- ]cent/i;
 const fields = [];
@@ -106,7 +106,7 @@ fields.push(M.staticFallback(I), M.ideasHTML(I), M.checkHTML(I), M.factsHTML(I))
 M.STEPS.forEach(t => fields.push(t));
 // sentence level on every field that names a nuclear term
 let nucFields = 0;
-fields.forEach(f => S.plain(f).split(/(?<=[.?!;])\s+/).forEach(sent => { if (NUC.test(sent)) { nucFields++; if (RISK.test(sent)) ok(false, "G-NUC: a nuclear term with a risk term: " + sent.slice(0, 90)); } }));
+fields.forEach(f => S.plain(f).split(/(?<=[.?!;])\s+/).forEach(sent => { if (NUC.test(sent)) { nucFields++; if (RISK.test(sent)) ok(false, "nuclear scope: a nuclear term with a risk term: " + sent.slice(0, 90)); } }));
 ok(nucFields >= 3, "the scan saw the reactor fields (" + nucFields + " sentences)");
 { const core = JSON.stringify(M.comp(X, "core")) + JSON.stringify(N.core); ok(!RISK.test(core) && !/\$|cost|price|year of|vendor|AP1000|NuScale|BWRX|Xe-100|Natrium/i.test(core), "the reactor core card: physics, heat and materials only; no cost, timing or design names"); }
 ok(!/\bAI\b|artificial intelligence/.test(PAGE + RAW + JS + SIDE), "no 'AI'");
@@ -115,8 +115,8 @@ ok(!/data[- ]cent/i.test(PAGE + RAW + JS), "no data-center term");
 const hrefs = [...OWN.matchAll(/href="([^"]+)"/g)].map(m => m[1].replace(/&amp;/g, "&"));
 ok(hrefs.every(h => S.linkOK(h) || /^[0-9a-z-]+\.html(#[a-z-]+)?$/.test(h) || /^#/.test(h)), "links on the allow-list (" + hrefs.filter(h => !(S.linkOK(h) || /^[0-9a-z-]+\.html/.test(h) || /^#/.test(h))).join(", ") + ")");
 ok(S.problems(X.stop).length === 0, "the stop box has its parts: " + S.problems(X.stop).join("; "));
-ok(["ratings", "efficiencies", "ramp limits", "outlet temperatures", "failure rates"].every(t => X.stop.lede.indexOf(t) >= 0), "the stop box states the curriculum's boundary (§4.3): ratings, efficiencies, ramp limits, outlet temperatures and failure rates");
-// the no-JS block holds what the cards show: both questions, what models borrow, every number with its label (X1 review)
+ok(["ratings", "efficiencies", "ramp limits", "outlet temperatures", "failure rates"].every(t => X.stop.lede.indexOf(t) >= 0), "the stop box states the curriculum's boundary: ratings, efficiencies, ramp limits, outlet temperatures and failure rates");
+// the no-JS block holds what the cards show: both questions, what models borrow, every number with its label
 { const fb = M.staticFallback(I); X.components.forEach(c => { c.qs.concat([c.text]).forEach(q => ok(fb.indexOf(M.richS(q)) >= 0, c.id + ": the no-JS block has " + S.plain(q).slice(0, 40))); N[c.id].forEach(n => ok(fb.indexOf("<b>" + n.n + "</b> (" + n.label + ")") >= 0, c.id + ": the no-JS block names " + n.n + " as " + n.label)); });
   X.kinds.forEach(k => ok(fb.indexOf("<b>" + k.label + "</b>") >= 0, "the no-JS block lists the kind " + k.label)); ok(!/\[\[/.test(fb), "no raw glossary mark in the no-JS block"); }
 
@@ -128,11 +128,11 @@ const lines = [M.BOARD_SAW, M.SORT_SAW, M.KIND_SAW].concat(KINDS.map(k => M.kind
   [].concat.apply([], X.components.map(c => c.qs.concat([c.text]))), [].concat.apply([], Object.values(N).map(l => l.map(n => n.what))));
 lines.forEach(t => { ok(nWords(t) <= 40, "a reveal of " + nWords(t) + " words: " + plain(t).slice(0, 60)); ok(nSent(t) <= 3, "a reveal of " + nSent(t) + " sentences: " + plain(t).slice(0, 60)); });
 // the assembled card as it first shows (the discipline, one question, what models borrow) and each line under "More"
-// (X1 review: the whole reveal was 68 to 83 words)
+// (the whole reveal was 68 to 83 words)
 X.components.forEach(c => { const P = M.cardParts(I, c.id), shown = [P.head, P.ask, P.borrow].join(" ");
   ok(nWords(shown) <= 40, c.id + ": the card shows " + nWords(shown) + " words at first");
   [P.more.ask, P.more.read].concat(P.more.nums).forEach(t => ok(nWords(t) <= 40, c.id + ": a 'More' line of " + nWords(t) + " words")); });
-// the sort counts only when every card is placed (X1 review: an empty check unlocked Next)
+// the sort counts only when every card is placed (an empty check unlocked Next)
 ok(/if \(g\.placed < g\.total\) \{ api\.saw\(sortNote\(g\), true\); return; \}\s*api\.done\(\)/.test(JS), "the sort: Next waits until all eight cards are placed");
 ok(M.sortNote({ right: 0, placed: 0, total: 8 }) === "Place every card first: 8 still in the pool." && M.sortNote({ right: 7, placed: 8, total: 8 }) === "7 of 8 match.", "the sort's note: place every card first, then the score");
 const PROSE = OWN.replace(/^---[\s\S]*?\n---\n/, " ").replace(/<script[\s\S]*?<\/script>/g, " ").replace(/<style[\s\S]*?<\/style>/g, " ").replace(/<!-- x01-(sources|facts|fallback):start[\s\S]*?:end -->/g, " ").replace(/<!--[\s\S]*?-->/g, " ");

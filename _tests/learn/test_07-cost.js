@@ -146,7 +146,7 @@ Object.keys(D.techs).forEach(k => (D.techs[k].src || []).forEach(s => ok(SRC[s],
 Object.keys(SRC).forEach(s => ok(/^https:\/\/(www\.eia\.gov|atb\.nlr\.gov)\//.test(SRC[s].url) && SRC[s].asOf, `data: source ${s} has an allowed URL and an as-of date`));
 [...QMD.replace(/<!-- learn:(meta|footer):start[\s\S]*?learn:\1:end -->/g, "").matchAll(/href="(https?:[^"]+)"/g)].forEach(m => ok(/^https:\/\/(www\.eia\.gov|atb\.nlr\.gov|docs\.nlr\.gov|doi\.org)\//.test(m[1].replace(/&amp;/g, "&")), `page link ${m[1]} is on the allow-list`));
 
-// ---------------- the real-world box: the approved excerpt E3.14 (Henry, 2026-11-03; reports/learn/excerpts_for_approval.md),
+// ---------------- the real-world box: the approved excerpt E3.14 (approved wording),
 // word for word (glossary marks aside), with CF2's citation footer, and no other sentence about the study
 const E314 = "A higher hydrogen price makes each kilogram worth more, so the optimizer builds a larger electrolyzer to capture more surplus wind. The extra capacity runs fewer full-load hours, so the cost per kilogram, the levelized cost of hydrogen, goes up. Yet the added hydrogen revenue lowers the net cost of the whole system. The cost per kilogram and the system's cost move in opposite directions.";
 {
@@ -202,7 +202,7 @@ Object.keys(D.techs).forEach(k => { const t = D.techs[k].cfNote + " " + D.tornad
 ok(/illustrative bounds in 2025 dollars/.test(D.fuel.gasNote) && /illustrative bounds in 2025 dollars/.test(D.tornadoRanges.gasNote), "gas range: labelled illustrative 2025-dollar bounds (the 2020 and 2022 averages are in their own years' dollars)");
 Object.keys(D.techs).forEach(k => ok(D.techs[k].design, `${k}: the EIA design behind the inputs is named`));
 ok(/U\.S\. utility-scale solar photovoltaic generators in 2025/.test(D.techs.solar.cfNote) && /U\.S\. utility-scale wind and solar photovoltaic generators in 2025/.test(QMD) && !/photovoltaic plants/.test(QMD + JSON.stringify(D)),
-   "solar 24.0%: EIA Table 4.08.B's population, utility-scale generators (W3 shared fix 2; as A2 says it)");
+   "solar 24.0%: EIA Table 4.08.B's population, utility-scale generators (as A2 says it)");
 const all = (QMD + JS + JSON.stringify(D)).toLowerCase();
 ["learning curve", "learning rate", "foak", "noak", "first-of-a-kind", "subsidy-free", "break-even capital", "order book", "projects/", "research.html", "smr"]
   .forEach(w => ok(all.indexOf(w) < 0, `scope: no "${w}"`));

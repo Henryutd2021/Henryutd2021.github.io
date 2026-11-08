@@ -5,7 +5,7 @@
 //     ha per TWh a year, the gas stack from A10's EIA heat rate (7.535 x 52.91), F8's campus (240 MW x 8,760 h)
 //   - NREL's phases: solar's add to its total median (43); gas's add to 460.82 against a 486 median (said on the page);
 //     the brochure's 9 times and the fair 11 times; the consequential changes against not building the farm (−417, +43,
-//     +43: an existing wind farm's upkeep goes on, review 2026-11-06), with their arithmetic shown
+//     +43: an existing wind farm's upkeep goes on), with their arithmetic shown
 //   - the boundary: every contiguous boundary of every object, footprint, cooling and land rule: the total inside is the
 //     sum of its counted stages; stages not counted are listed and never added; gas land inside both stages is the
 //     whole total, one stage alone is a bound (over / under)
@@ -13,7 +13,7 @@
 //     no-JS blocks equal the model's (--write rewrites them)
 //   - scope: no nuclear term in the lesson's own files; data centers only as a load; links on allowed hosts; text budget
 //     (steps, page elements and every line the page assembles, for every input: 35 words and two sentences at most);
-//     glossary marks; the review's wording (units per kWh or MWh made or used, withdrawal, the drought, the illustrative
+//     glossary marks; the wording (units per kWh or MWh made or used, withdrawal, the drought, the illustrative
 //     land scaling, the stack check's date and load, the water boundary)
 //   - the page on a stub document: every step's action, the boundary's handles (keyboard) and tiles (tap)
 // Usage (from the site folder):  node _tests/learn/test_a11-lca-nexus.js [--write]
@@ -92,7 +92,7 @@ ok((U.freshWithdrawal / 1000).toFixed(1) === "59.9" && (U.consumptive / 1000).to
 // drought
 const dr = D.drought.summer;
 ok(100 - dr.median.hydro - dr.median.gas === 40 && 100 - dr.drought.hydro - dr.drought.gas === 42, "drought: other in-state sources 40% and 42%");
-// the review's wording (2026-11-06)
+// units and wording
 ok(M.unitLine("solar", "carbon") === "carbon in g CO₂e per kWh made (= kg per MWh)" && M.unitLine("dc", "water") === "water in gallons consumed per MWh used" && M.unitLine("gas", "land") === "land in m² held per MWh made in a year",
   "the header names each footprint's own denominator, made or used (no 'per MWh' over a g-per-kWh number)");
 ok(["solar", "gas", "dc"].every(k => !/per MWh/.test(D.objects[k].per)), "the objects' 'per' says per unit of electricity, not per MWh");
@@ -141,7 +141,8 @@ const OWN = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?<!-- learn:
 const NUC = /nuclear|reactor|\bSMR\b|small modular/i;
 ok(!NUC.test(OWN + JS + JSON.stringify(D) + SIDE), "no nuclear term in the lesson's own files");
 ok(!/\bAI\b|artificial intelligence/.test(OWN + JS + JSON.stringify(D)), "no AI wording");
-{ // guard G-DC: a data center is a load or a facility; no sentence ties it to the timing, buyers or commercialization of anything
+{ // data centers appear as loads only: a data center is a load or a facility; no sentence ties it to the timing, buyers or
+  // commercialization of anything
   const dc = (OWN + JS + JSON.stringify(D)).replace(/U\.S\./g, "US").match(/[^.;!?]*data cent[^.;!?]*/gi) || [];
   const RISK = /timing|buyer|commerciali|deliver|order book|anchor|pipeline of|siting|site selection|screen/i;
   ok(dc.length > 0 && dc.every(s => !RISK.test(s)) && dc.some(s => /is a load/.test(s)), "data centers appear only as a load: " + dc.filter(s => RISK.test(s)).join(" | ")); }

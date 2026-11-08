@@ -1,10 +1,10 @@
-// e3_harness.js — shared setup for the tests of engine E3 and its pages (SB3, M12, C3), wave W5, 2026-11-06. Not a test
-// itself (learn_qa.sh runs test_*.js only).
+// e3_harness.js — shared setup for the tests of engine E3 and its pages (SB3, M12, C3). Not a test itself (the test
+// runner runs test_*.js only).
 //   load()   the engine, its prepared data (prairie-city.json and e3-city-hub.json), the solver core with the vendored
 //            HiGHS, LX.ShareState's pure part; solveSync(model, opts) and solver (a Promise-returning wrapper for E3.solve)
 //   face(model, r, terms, sense)   the min or max of a linear expression over the optimal face (every plan whose cost is
-//            within $1 of the best): the uniqueness check of a reported number (W2 review finding 2)
-//   between, writeBlocks, norm, excerpts, register, portfolio: as in e1_harness.js (re-exported)
+//            within $1 of the best): the uniqueness check of a reported number
+//   between, writeBlocks, norm, excerpts, register: as in e1_harness.js (re-exported)
 "use strict";
 const fs = require("fs");
 const path = require("path");
@@ -36,7 +36,7 @@ function face(model, r, terms, sense, solveSync, slack) {
 }
 // ---------------------------------------------------------------- the full year (engine E3's full-year check)
 // yearCity(city): prairie-city.json with its eight days replaced by the 365 days of 2025, built by its fullYear rule
-// (the same rule as scripts/build_learn_prairie_city.py, which writes the rule's constants and sums; the tests check this
+// (the same rule as the Prairie City data build step, which writes the rule's constants and sums; the tests check this
 // recomputation against them): every local day's SPP demand, wind and solar from local midnight (town_year.json; wind and
 // solar per MW by LX.townProfile with EIA's monthly factors), temperatures by the daily cosine from the day's month's NOAA
 // normals (the design and heat-wave days take the teaching extremes), base = baseMWPerShape x demand, heat = UA x
@@ -127,4 +127,4 @@ function fullText(city, cfg, plans) {
     line: city.about.line, date: FULL_DATE, unservedPerMWh: cfg.fullYear.unservedPerMWh,
     plans: plans.map(e => { const x = Object.assign({}, e); delete x._R8; delete x._FY; return x; }) }) + "\n";
 }
-module.exports = { SITE, L, load, face, yearCity, yearDays, dayStart, dates2025, fullPlans, fullEntries, fullText, FULL_DATE, between: X1.between, writeBlocks: X1.writeBlocks, norm: X1.norm, excerpts: X1.excerpts, register: X1.register, portfolio: X1.portfolio };
+module.exports = { SITE, L, load, face, yearCity, yearDays, dayStart, dates2025, fullPlans, fullEntries, fullText, FULL_DATE, between: X1.between, writeBlocks: X1.writeBlocks, norm: X1.norm, excerpts: X1.excerpts, register: X1.register };

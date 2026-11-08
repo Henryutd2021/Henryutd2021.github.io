@@ -69,7 +69,7 @@ for (let R = G.reserve.min; R <= G.reserve.max; R += G.reserve.step) {
   if (st.ufls !== null) ok(st.peak.f > 60 && st.back !== null, `R=${R}: after the relays cut ${st.shedMW} MW the frequency overshoots, then AGC turns plants down`);
   ok(g.upMax <= R + 1e-9, `R=${R}: upward help never exceeds the reserve`);
 }
-// the reader's case is judged on the whole run, not the 30-second chart (review finding 1): inertia 30 GW·s, reserve
+// the reader's case is judged on the whole run, not the 30-second chart: inertia 30 GW·s, reserve
 // 40 MW is still above 59.3 Hz at 30 s but reaches it at 31.9 s, with or without AGC
 const late = M.story(G, 30, 40), late30 = sim({ inertia: 30, reserve: 40, gov: true, tEnd: G.secondsWindow });
 ok(late30.uflsAt === null && late30.end > G.uflsHz, `E=30 R=40: no shedding inside the 30-second chart (${late30.end.toFixed(3)} Hz at 30 s)`);
@@ -104,7 +104,7 @@ ok(G.govMWperHz === 1800 / (0.05 * 60), "Go deeper: 5% droop on 1,800 MW gives 6
 has("\\text{drop} = \\frac{\\Delta P}{K + D}", "the settling drop as a positive quantity (one sign convention)");
 has("about 8 s behind"); ok(G.govT === 8, "Modeler preview: governors about 8 s behind");
 has("at 59.3 Hz relays cut one block of 5% of load"); ok(G.uflsPct === 5 && G.uflsHz === 59.3, "Modeler preview: 5% of load at 59.3 Hz");
-ok(!/T_g|\\beta|K_b|\\operatorname\{clip\}/.test(QMD), "Modeler preview: no implementation equations (depth, review finding 3)");
+ok(!/T_g|\\beta|K_b|\\operatorname\{clip\}/.test(QMD), "Modeler preview: no implementation equations (depth)");
 has("[Lesson 10](10-write-it-down.qmd)"); has("[lesson 11](11-solver.qmd)");
 has("Plains Grid's 6–30 GW·s"); ok(G.inertia.min === 6 && G.inertia.max === 30, "Go deeper: the Plains Grid's inertia range 6-30 GW·s");
 has("20 GW·s (20,000 MW·s)");

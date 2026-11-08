@@ -1,9 +1,9 @@
-// test_components_w2_int.js — Node tests for the pieces promoted or fixed by the W2 integration itself (2026-11-03):
+// test_components_w2_int.js — Node tests for shared pieces of the studio and case-file pages:
 //   - stakeholders.js/.css (e-stakeholders): LX.Stakeholders (A22's role table, cards on phones) and LX.StakeholderMap
 //     (R9's rings of groups): pure parts, the views on a stub document, A22 and R9 using them with no copy left
 //   - forms.css: the case files' controls and comparison table (.cf-*), the Try-it box that wraps, and the theme colour of an
 //     allow-listed explainer on a Learn page; the three case-file drafts keep no page style and no theme-* body class
-//   - the header's practice badge in hours from 120 minutes (build_learn.py) on every page that has one
+//   - the header's practice badge in hours from 120 minutes (the course build step) on every page that has one
 //   - the Teaching card's lesson count equals the live lessons in data/path.json
 //   - two phone fixes found with every details box open at 375 px (planengine.css cards, deeper.css inline code)
 // Usage (from the site folder):  node _tests/learn/test_components_w2_int.js
@@ -30,7 +30,7 @@ ok(/^<table class="lx-stake-static"><thead><tr><th scope="col">Who<\/th><th scop
    st.indexOf('<th scope="row">Households (including renters)</th><td>Partly: comment at hearings</td><td>Yes</td>') > 0, "stakeholders: staticHTML writes a plain table for a no-JS fallback");
 const M = { rings: [{ ring: "Inside", items: [{ id: "a", label: "Co-authors", owed: "credit", also: ["The error"] }] }, { ring: "Around", items: [{ id: "b", label: "Renters", owed: "a say" }] }] };
 ok(JSON.stringify(SH.mapItems(M).map(x => [x.id, x.ring, x.k, x.also.length])) === JSON.stringify([["a", "Inside", 0, 1], ["b", "Around", 1, 0]]), "stakeholder map: every group with its ring, in order");
-// the map's no-JS table (shared fix 23; R9 uses it and keeps no table of its own)
+// the map's no-JS table (R9 uses it and keeps no table of its own)
 {
   const t = SH.mapStaticHTML(M), t2 = SH.mapStaticHTML(Object.assign({}, M, { staticTitle: "Who your study owes what", alsoHead: "In the dilemmas" }));
   const rows = (t.match(/<tr><th scope="row">/g) || []).length;
@@ -76,7 +76,7 @@ ok(bundleJS.indexOf("LX.Stakeholders = ") > 0 && bundleJS.indexOf("LX.Stakeholde
   ["\\.cf-ctl \\{", "\\.cf-ctl-l \\{", "\\.cf-row \\{", "\\.cf-selects \\{", "\\.cf-sel select \\{", "\\.cf-two \\{", "\\.cf-two td::before \\{ content: attr\\(data-l\\)",
    "\\.lx-case-try code \\{ white-space: normal; overflow-wrap: anywhere; \\}", "body\\.page-learn \\{ --t: var\\(--lx-accent\\); \\}", "\\.page-learn \\.explainer \\{ --t-ink: "].forEach(r =>
     ok(new RegExp(r).test(forms), "forms.css has " + r.replace(/\\/g, "")));
-  // the case files, live in learn/ or still drafts in learn/_drafts/ (CF2, CF6 and CF7 went live in W2)
+  // the case files, live in learn/ or still drafts in learn/_drafts/
   ["learn", "learn/_drafts"].filter(d => fs.existsSync(path.join(SITE, d))).forEach(d => fs.readdirSync(path.join(SITE, d)).filter(f => /^cf\d.*\.qmd$/.test(f)).forEach(f => {
     const q = rd(d + "/" + f);
     ok(!/<style>/.test(q) && !/theme-[a-z]+/.test(q.split("\n---")[0]), d + "/" + f + ": no page style and no theme-* body class (forms.css holds them)");
@@ -84,17 +84,17 @@ ok(bundleJS.indexOf("LX.Stakeholders = ") > 0 && bundleJS.indexOf("LX.Stakeholde
   ok(/<code>python run\.py --case toy<\/code>/.test(rd("learn/_template-case.qmd")), "case template: the Try-it example shows a command, which wraps");
 }
 
-// ---------------------------------------------------------------- phones with every details box open (375 px sweep, W2 integration)
+// ---------------------------------------------------------------- phones with every details box open (375 px sweep)
 {
   const pe = rd("assets/learn/components/planengine.css"), dp = rd("assets/learn/components/deeper.css");
   ok(/\.lx13-card>\*,\.lx13-chart>\.lx-textalt\{min-width:0;max-width:100%\}/.test(pe), "planengine.css: nothing in a card widens it (lessons 12 and 13's text versions scroll in their own box)");
   ok(/\.lx-deeper-body :not\(pre\) > code \{ white-space: normal; overflow-wrap: anywhere; \}/.test(dp), "deeper.css: a long inline command in Go deeper wraps (K8)");
   const cc = rd("assets/learn/components/cards.css");
   ok(/\.lx-stepcard > \*, \.lx-step-act > \* \{ min-width: 0; max-width: 100%; \}/.test(cc) && rd("assets/learn/learn.css").indexOf(".lx-stepcard > *, .lx-step-act > * { min-width: 0; max-width: 100%; }") >= 0,
-    "cards.css: a step card's children may shrink, so nothing in a step widens the card (shared fix 6, A22)");
+    "cards.css: a step card's children may shrink, so nothing in a step widens the card (A22)");
   const bc = rd("assets/learn/components/base.css");
   ok(/:where\(\.page-learn :not\(pre\)\) > code \{ background-color: var\(--lx-surface-2\); color: var\(--lx-ink\); \}/.test(bc),
-    "base.css: inline code takes the Learn tokens day and night, at zero specificity (shared fix 7: light boxes in the night theme)");
+    "base.css: inline code takes the Learn tokens day and night, at zero specificity (no light boxes in the night theme)");
   ok(!/r10-str code\{background/.test(rd("assets/learn/r10-question-studio.js")) && /\.page-learn \.lx-eq-det code \{ background: var\(--lx-surface\)/.test(rd("assets/learn/components/equation.css")),
     "R10 keeps no code override of its own; the equation card keeps its own (a lighter box than the shared one)");
 }
@@ -117,13 +117,13 @@ ok(bundleJS.indexOf("LX.Stakeholders = ") > 0 && bundleJS.indexOf("LX.Stakeholde
     if (lm) labs.push(l.id);
   });
   // every live page whose path.yml row has lab_minutes shows it in the badge, with or without a practice set (the badge
-  // pattern above reads both): M2 and M3 since W2, M4, M5 and M7 in W3, B2 and the capstones C0 and C1
+  // pattern above reads both): M2, M3, M4, M5 and M7, B2 and the capstones C0 and C1
   const withLab = all.filter(l => { const f = path.join(SITE, "learn", l.id + ".qmd"); return fs.existsSync(f) && /"labMinutes":\d+/.test(fs.readFileSync(f, "utf8")); }).map(l => l.id);
   ok(["m02-unit-commitment", "m03-capacity-expansion", "m04-storage-multienergy", "m05-microgrid-size-and-run", "m07-monte-carlo"].every(id => labs.includes(id)) && labs.join() === withLab.join(),
      `the lab time shows on every page with lab_minutes (${labs.join(", ")})`);
   ok(n >= 20, `practice badges checked on ${n} pages; 120 minutes and more read in hours`);
-  // "; more coming" only while path.json lists a lesson that is not live yet (build_learn.py's teaching block; since W7 every
-  // listed lesson is live)
+  // "; more coming" only while path.json lists a lesson that is not live yet (the course build step's teaching block; now
+  // every listed lesson is live)
   const listed = [].concat(P.starter, P.more, P.toolbox).length, more = all.length < listed ? "; more coming" : "";
   ok(rd("teaching.qmd").indexOf(all.length + " lessons live" + more + "]") > 0, `Teaching card: ${all.length} lessons live${more}, as in path.json`);
 }

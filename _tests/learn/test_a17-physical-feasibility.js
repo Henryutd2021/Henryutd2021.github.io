@@ -211,7 +211,7 @@ const has = (s, msg) => ok(T.indexOf(s) >= 0, "page states " + JSON.stringify(s)
   ok(Bd.volts[0] === Bd.nominalV * Bd.lo && Bd.volts[1] === Math.round(Bd.nominalV * Bd.hi), "band: 114 and 126 V = 0.95 and 1.05 of 120 V");
   has("The normal range of service voltage, ANSI C84.1 Range A: 114 to 126 V on a 120 V service.");
   has("Data-center load that dropped off at once, across 60 load points, after a normally cleared 230 kV fault in Loudoun County, Virginia, in July 2024.");
-  ok(A.real.loudoun.mw === 1500 && A.real.loudoun.points === 60 && A.real.loudoun.kV === 230 && A.real.ercotInertia.gws === 100, "real anchors = the data file (dossier row 19; ERCOT 100 GW·s)");
+  ok(A.real.loudoun.mw === 1500 && A.real.loudoun.points === 60 && A.real.loudoun.kV === 230 && A.real.ercotInertia.gws === 100, "real anchors = the data file (Loudoun County 2024; ERCOT 100 GW·s)");
   ok(PAGE.indexOf(A.band.url) >= 0 && PAGE.indexOf(A.real.loudoun.url) >= 0 && PAGE.indexOf(A.real.ercotInertia.url) >= 0 && PAGE.indexOf(A.real.gfm.url) >= 0 && PAGE.indexOf(A.real.pjm5.url) >= 0, "every real source in the data file is cited on the page");
   // the fallback's sentences come from the model (checked above as a block); spot-check its threshold numbers
   const FB = text(BLOCK());

@@ -11,10 +11,10 @@
 //     step down at noon at every bus, the 14:00 corner ($200 up, $80 down), the noon-only quiz (+1 MW limit at noon:
 //     $120, Ridge +3 MW and gas -3 MW, nothing else moves; the all-day change differs) and the reference data block
 //   - page text: chosen strings in learn/m01-dispatch-to-lmp.qmd (numbers and the corrected wordings) and the absence
-//     of the wordings the 2026-11-02 review found wrong; fixed numbers in the step cards' script text; the sidecar's
+//     of the wordings found wrong; fixed numbers in the step cards' script text; the sidecar's
 //     glossary definitions; the notebook's asserted numbers. The step cards' other sentences are built at run time from
 //     the solver's result, so they cannot drift; the rendered HTML and the page's interaction (stale-solve guard, Next
-//     lock) are not exercised here: check them in the browser (scripts/learn_screenshots.mjs).
+//     lock) are not exercised here: check them in the browser (the screenshot check).
 // Usage (from the site folder):  node _tests/learn/test_m01-dispatch-to-lmp.js
 "use strict";
 const fs = require("fs");
@@ -155,7 +155,7 @@ const has = (s, msg) => ok(PAGE.indexOf(s) >= 0, "page states " + JSON.stringify
   // ---------------- the page and the notebook state these numbers
   ["311 MWh × \\$80 | \\$24,880", "100 MWh × \\$80 | \\$8,000", "92 MWh × \\$40 | \\$3,680", "119 MWh × \\$0 | \\$0", "costs \\$200", "saves only \\$80", "134 MW",
    "$120 \\times 110$ MW", "($80 \\times 110 = \\$8{,}800$)", "\\$13,200 for the hour", "$13,200 at noon with the line at 110 MW"].forEach(s => has(s));
-  // the wordings the review corrected (2026-11-02): rent, the dual, the quiz, $0 offers, voltage, FTRs, MILP duals, RTO/ISO
+  // the corrected wordings: rent, the dual, the quiz, $0 offers, voltage, FTRs, MILP duals, RTO/ISO
   ["Congestion rent is what loads pay minus what generators are paid", "extra cost per MWh of a small change in that row's demand", "step up and the step down differ",
    "for the noon interval only", "2/3 − 1/3 = 1/3 MW", "3 MW of free Ridge power replace 3 MW of $40 gas", "the $80 matches no plant's offer",
    "holds voltage magnitudes fixed", "Many organized markets use congestion revenue to fund financial transmission rights",

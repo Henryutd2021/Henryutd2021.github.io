@@ -8,18 +8,18 @@
 //   - the stakeholder panel: every reaction true of its run and its stated rule, for every preset and the reference plan
 //   - the sensitivity: inputs moved to the ends of their ranges, the plan held fixed (re-solved where the LP depends on
 //     them); accounting-only inputs equal a re-solve; the park's gas price re-costs the run and its 2025 baseline; the
-//     joint cheaper and dearer cases equal fresh runs and bracket every one-at-a-time case (C3 review finding 6)
-//   - the evidence pack for the summary without JavaScript (C3 review finding 8): households, jobs, panel, sensitivity,
+//     joint cheaper and dearer cases equal fresh runs and bracket every one-at-a-time case
+//   - the evidence pack for the summary without JavaScript: households, jobs, panel, sensitivity,
 //     sites and the contracts, from fresh runs (the c3-evidence block)
 //   - the summary: one answer field per stakeholder, the "answered" check, a sources field, the rubric's own levels, and
-//     room for the reader's words inside the two pages (C3 review findings 5 and 6)
+//     room for the reader's words inside the two pages
 //   - the full-year check (data/e3-full-year.json, rebuilt by test_e3-full-year.js): a check for each preset and the
 //     reference plan, found by the plan link (the site's details ignored); the check's eight days are the reference
 //     plan's own run; the contract MWh higher on the year, as the words say; no full-year solve on the page
 //   - 2025's baseline carries no site's costs (only a plan with a solar farm pays for its site)
 //   - the hooks: A19's siting (no site changes a number until the map is wired) and A13's jobs (no number shown)
-//   - guard G-GIS: the only siting on the page is a solar farm; no nuclear term on the page, its script or the data; no
-//     AI wording
+//   - siting scope (solar, wind, transmission corridors and data centers only): the only siting on the page is a solar
+//     farm; no nuclear term on the page, its script or the data; no AI wording
 // --write: recomputes precomputed.c3 and c3ex and writes the marker blocks.
 // Usage (from the site folder):  node _tests/learn/test_c3-prairie-city-2040.js [--write]
 "use strict";
@@ -47,7 +47,7 @@ const RUN_DATE = "6 November 2026";
   const R1 = r1.results, b1 = PG.budget(R1, P);
   ok(b1.within, "the reference plan is within the budget (" + PG.mil(b1.upfront) + ")");
   ok(Math.abs(R1.base.acc.city.money - r0.results.acc.city.money) < 1 && Math.abs(R1.base.acc.upfrontTotal) < 1 && E3.sysOf(E3.baseState(withSite(ref)), P).siteAdj === null,
-    "2025's baseline carries no site's line, road or land: the reference plan is compared with the same 2025 as every plan (C3 review, full-year follow-up)");
+    "2025's baseline carries no site's line, road or land: the reference plan is compared with the same 2025 as every plan");
   const rows = (R, tag) => [[tag + ": up front, 2026 to 2040 (2025 dollars)", PG.mil(R.acc.upfrontTotal) + " of a " + PG.mil(cfg.c3.budget.def * 1e6) + " budget"],
     [tag + ": the city's yearly cost against 2025", PG.smil(R.delta.cityCost)], [tag + ": the city's CO₂ (location-based, operating)", E3.kilo(R.acc.city.co2) + " t a year"],
     [tag + ": busiest hour against the limit, core · suburbs · fringe", R.dist.map(d => E3.kilo(d.peak) + "/" + E3.kilo(d.limit)).join(" · ") + " MW"],
@@ -132,7 +132,7 @@ const RUN_DATE = "6 November 2026";
   ok(strong.indexOf(R.hp + "% of furnaces") >= 0 && strong.indexOf("retrofit " + R.ret + "%") >= 0 && strong.indexOf(R.ev + "% of cars") >= 0 && strong.indexOf(R.bat + " MW of substation batteries") >= 0 &&
     strong.indexOf(R.wind + " MW of wind") >= 0 && strong.indexOf(R.farm + " MW solar farm at site " + R.site) >= 0 && R.ihp === 100 && R.dh === 0 && R.ely === 0 && R.pv === 0, "the strong summary's levers are the reference plan's");
   // the strong summary answers every objection with the run's numbers, gives the site's reason, a sensitivity result and
-  // the jobs (C3 review finding 3); no instruction left in place of an answer
+  // the jobs; no instruction left in place of an answer
   ok(x.objectors.length >= 2 && x.objectors.every(k => strong.indexOf(PG.ANSWER[k](x)) >= 0) && !/a line each on what I would change/.test(strong) && !/jobs not yet estimated/.test(strong), "the strong summary answers each objector (" + x.objectors.join(", ") + ")");
   const sc = SM.costs.map(c => c.connect + c.road + c.land), ia = SM.top.map(t => t.id).indexOf(ref.site);
   ok(ia === 0 && sc[ia] === Math.min(...sc) && strong.indexOf("the best of A19's five blocks and the cheapest to connect (" + PG.mil(site1.connectUSD) + ")") >= 0, "site " + ref.site + ": the screen's best block and the cheapest to connect, as the summary says");
@@ -184,7 +184,7 @@ const RUN_DATE = "6 November 2026";
   // the summary: one answer box per stakeholder; the check wants four words or more from each who objects; the note's
   // results carry each reaction, objection and answer (the stakeholder response table)
   const F = PG.FIELDS;
-  ok(PG.PANEL.every(q => PG.ANS_HINT[q.key]) && F.some(f => f.key === "sources" && f.need) && !F.some(f => f.key === "panel"), "one answer box per stakeholder, and a sources field (C3 review findings 5 and 6)");
+  ok(PG.PANEL.every(q => PG.ANS_HINT[q.key]) && F.some(f => f.key === "sources" && f.need) && !F.some(f => f.key === "panel"), "one answer box per stakeholder, and a sources field");
   const w0 = {}; ok(!PG.answered(pn1, w0), "no answers: the check is open");
   x.objectors.forEach(k => { w0[k] = "I keep it, with a reason"; });
   ok(PG.answered(pn1, w0) && !PG.answered(pn1, Object.assign({}, w0, { [x.objectors[0]]: "No." })), "an answer from each who objects closes the check; a one-word answer does not");
@@ -204,7 +204,7 @@ const RUN_DATE = "6 November 2026";
   }
   // the rubric: C3's own words for uncertainty, integrity and communication; jobs and the site in the look-fors
   ok(["uncertainty", "integrity", "communication"].every(k => PG.RUBRIC.filter(c => c.id === k)[0].levels.proficient) && /joint/.test(PG.RUBRIC[1].levels.proficient) && /sources and licences/.test(PG.RUBRIC[3].levels.proficient) &&
-    /jobs/.test(PG.RUBRIC[0].look) && /site/.test(PG.RUBRIC[2].look), "the rubric's levels fit what the page lets the reader do (C3 review finding 6)");
+    /jobs/.test(PG.RUBRIC[0].look) && /site/.test(PG.RUBRIC[2].look), "the rubric's levels fit what the page lets the reader do");
 
   // ---------------- the hooks
   ok(SM.top.length === 5 && SM.top.map(t => t.id).join("") === "ABCDE" && S.fields.filter(f => f.id === "site")[0].values.join("") === "ABCDE", "HOOK(A19): A19's five best solar blocks are the plan's sites A to E");
@@ -226,16 +226,16 @@ const RUN_DATE = "6 November 2026";
   ok(near(jb.jobYearsNet, exp.buildJobYearsNet, 1e-9) && near(jb.jobYearsNet, jb.jobYears * (1 - JD.displacement.start / 100), 1e-6) && jb.jobYearsNet < jb.jobYears &&
     /less " \+ Math\.round\(c\.buildDisplacement \* 100\) \+ "% displacement \(net\)/.test(JS) && /work that would have happened anyway/.test(JS),
     "jobs: net building job-years by A13's buildJobYearsNet, less A13's displacement share as A13 applies it to building and running alike, with the assumption stated (" + Math.round(jb.jobYearsNet) + ")");
-  ok(near(jb.permDirect, (ref.wind + ref.farm) / 100 * JD.omPer100MW.start, 1e-9) && near(jb.permGross, jb.permDirect * JD.multiplier.start, 1e-9) && near(jb.permNet, jb.permGross * (1 - JD.displacement.start / 100), 1e-9), "jobs: ongoing direct, gross supported and net from the wind and solar farms' MW (C3 review finding 12)");
+  ok(near(jb.permDirect, (ref.wind + ref.farm) / 100 * JD.omPer100MW.start, 1e-9) && near(jb.permGross, jb.permDirect * JD.multiplier.start, 1e-9) && near(jb.permNet, jb.permGross * (1 - JD.displacement.start / 100), 1e-9), "jobs: ongoing direct, gross supported and net from the wind and solar farms' MW");
   ok(!/Permanent, at the wind and solar farms/.test(JS) && /Ongoing, supported by the wind and solar farms/.test(JS) && /Construction, 2026 to 2040 \(gross\) and net/.test(JS) && /" job-years gross \(about " \+ kilo\(jb\.perYear\) \+ " a year\) · " \+ kilo\(jb\.jobYearsNet\) \+ " net"/.test(JS), "jobs labelled: construction job-years gross and net, ongoing jobs supported by the farms");
   ok(/HOOK\(A19\)/.test(JS) && /HOOK\(A13\)/.test(JS) && PG.jobs(R1, null, JD) === null, "both hooks are marked; without A13's model no jobs number is shown");
   ok(!/a13-who-pays-and-benefits\.js|whopays\.js"/.test(PAGE) && /a13-fairness-jobs\.json/.test(PAGE), "A13's accounting layer comes in the bundle (components/whopays.js); the page loads its coefficients");
   ok(/<script src="\.\.\/assets\/learn\/learn\.js" defer><\/script>\s*<script src="\.\.\/assets\/learn\/c3-prairie-city-2040\.js"/.test(PAGE) && !/a19\.js"/.test(PAGE) && !/\.a19-map \{/.test(PAGE) && /a19-gis-siting\.json/.test(PAGE) && /cf_targets\.json/.test(PAGE), "A19's map comes in the bundle (components/siting.js and siting.css; no copied styles); the page loads A19's data");
 
-  // ---------------- guard G-GIS and the rest
+  // ---------------- siting scope and the rest
   const siting = (T.match(/\b(site|siting|sited)\b[^.]*\./gi) || []).join(" ");
   ok(!/wind farm site|transmission corridor|data[- ]center site/i.test(siting), "the only siting is a solar farm");
-  ok(!/nuclear|reactor|\bSMR\b|small modular/i.test(PAGE + JS), "no nuclear term (guard G-GIS)");
+  ok(!/nuclear|reactor|\bSMR\b|small modular/i.test(PAGE + JS), "no nuclear term (siting scope)");
   ok(!/\bAI\b|artificial intelligence|ChatGPT|Claude/.test(PAGE + JS), "no AI wording");
   ok(T.indexOf(city.about.line) >= 0, "the fictional line");
   ["brief", "plan", "note", "selfcheck", "sources"].forEach(id => ok(new RegExp("::: \\{#" + id + " \\.lx-sec\\}").test(PAGE), "section #" + id));

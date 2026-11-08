@@ -1,7 +1,7 @@
-// test_components_w2_toolbox.js — Node tests for the toolbox's two shared pieces, promoted at the W2 merge (2026-11-03):
+// test_components_w2_toolbox.js — Node tests for the toolbox's two shared pieces:
 //   numanswer.js (LX.NumAnswer: a number box with its unit and Check button; parse() and close()) and drill.js (LX.Drill:
-//   the seeded practice drill; rng() and series()), with their .css files. Before the promotion K1, K2, K3, K4, K5 and K8
-//   each carried a copy (numInput, rng, drill, drillView).
+//   the seeded practice drill; rng() and series()), with their .css files. They replace the copies K1, K2, K3, K4, K5 and
+//   K8 each carried before (numInput, rng, drill, drillView).
 //   - each file defines its LX.<Name> with a stub window.LX, exports its pure part to Node, uses --lx-* tokens only, and is
 //     in the generated bundle (learn.js, learn.css)
 //   - the pure parts: the parser on the inputs the pages accepted before (commas, $, %, minus signs, e-notation, × 10^n),
@@ -36,7 +36,7 @@ Object.keys(NAMES).forEach(f => {
   try { vm.runInNewContext(src, ctx); } catch (e) { ok(false, `${f}.js runs with a stub window.LX: ${e.message}`); return; }
   ok(typeof ctx.window.LX[NAMES[f]] === "function" && new RegExp("LX\\." + NAMES[f] + " = ").test(src), `${f}.js defines LX.${NAMES[f]}`);
   ok(Object.keys(ctx.module.exports).length > 0, `${f}.js exports its pure part to Node`);
-  ok(bundleJS.indexOf(src.trim().split("\n")[0]) >= 0 && bundleCSS.indexOf(css.trim().split("\n")[0]) >= 0, `${f}: in the generated bundle (run build_learn.py)`);
+  ok(bundleJS.indexOf(src.trim().split("\n")[0]) >= 0 && bundleCSS.indexOf(css.trim().split("\n")[0]) >= 0, `${f}: in the generated bundle (run the course build step)`);
 });
 ok(bundleJS.indexOf("/* numanswer.js") < bundleJS.indexOf("/* drill.js"), "bundle: numanswer.js loads before drill.js (the drill's number items use it)");
 
@@ -47,7 +47,7 @@ ok(P("450,000") === 450000 && P("0.45") === 0.45 && P(".5") === 0.5 && P("5.") =
 ok(near(P("6.96 × 10^9"), 6.96e9, 1) && near(P("6.96x10^9"), 6.96e9, 1) && near(P("6.96*10^9"), 6.96e9, 1) && near(P("2 × 10^-3"), 0.002, 1e-15), "parse: a × 10^n written three ways, negative exponents");
 ok(P("−3") === -3 && P("–2.5") === -2.5 && P("-0.25") === -0.25, "parse: minus, en dash and hyphen");
 ok(P("$78,600") === 78600 && P("$3.85") === 3.85 && P("33.8%") === 33.8 && P(" 145 ") === 145 && P("1 230") === 1230, "parse: dollars, percent and spaces dropped");
-// shared fix 4 (K1 review #3): superscript exponents, no left-over text, and only the box's own unit after the number
+// superscript exponents, no left-over text, and only the box's own unit after the number
 ok(near(P("6.96 × 10⁹"), 6.96e9, 1) && near(P("6.96×10⁹"), 6.96e9, 1) && near(P("2 × 10⁻³"), 0.002, 1e-15) && P("10⁹") === 1e9 && P("10^9") === 1e9 && near(P("1.9 × 10¹"), 19, 1e-12) && near(P("4.2 × 10¹⁵"), 4.2e15, 1),
   "parse: superscript exponents as the page prints them (6.96 × 10⁹ is 6.96e9, not 6.96), and a bare power of ten");
 ok(P("145 MW") === null && P("12.5kg") === null && P("3 apples") === null && P("1.2.3") === null && P("6.96 × 10") === null && P("abc") === null, "parse: left-over text is refused (null), not cut off as parseFloat would");
@@ -62,7 +62,7 @@ ok(NA.close(6.963, 6.957, 0.006) && !NA.close(6.95, 6.957, 0.006) && NA.close(1.
 
 // ---------------------------------------------------------------- Drill: pure
 const DR = require(L("components/drill.js"));
-// the generator every K page carried before the promotion (k01..k05, k08), kept here as the reference
+// the generator every K page carried before the shared drill (k01..k05, k08), kept here as the reference
 function oldRng(seed) { var x = seed >>> 0 || 1; return function () { x = (x * 1664525 + 1013904223) >>> 0; return x / 4294967296; }; }
 [0, 1, 7, 42, 99999, 100000, 4294967295].forEach(seed => {
   const a = DR.rng(seed), b = oldRng(seed); let same = true;
@@ -75,7 +75,7 @@ ok(JSON.stringify(DR.series(mk, 42, 25)) === JSON.stringify(DR.series(mk, 42, 25
 ok(DR.series(mk, 5, 4).map(i => i.k).join() === "0,1,2,3", "series: items are numbered from 0");
 const s0 = DR.newSeed(); ok(Number.isInteger(s0) && s0 >= 1 && s0 <= 100000, "newSeed: a seed from 1 to 100,000, as the pages drew it");
 
-// ---------------------------------------------------------------- per-seed sequences of every K page: as before the promotion
+// ---------------------------------------------------------------- per-seed sequences of every K page: as before the shared drill
 {
   const K = id => require(L(id + ".js"));
   const town = J("town.json"), year = J("town_year.json"), days = J("town_days.json"), D1 = J("01-power-energy.json"), fc = J("04-forecasts.json");
@@ -235,11 +235,11 @@ function drillEnv(opts) {
   const src = id => fs.readFileSync(L(id + ".js"), "utf8");
   ok(/empty: "Type a number first\."/.test(src("k01-units")) && /check: function \(v, it\) \{ return close\(v, it\.answer, it\.tol\); \}/.test(src("k01-units")) && /width: "8\.5em", widthPhone: "6\.5em"/.test(src("k01-units")), "K1: empty message, its own check, wide boxes (6.5em on phones)");
   ["k02-rates-efficiencies", "k03-discounting"].forEach(id => ok(/empty: "Type a number first\."/.test(src(id)) && /it\.unit === "\$" \? "dollars"/.test(src(id)), `${id}: empty message and "dollars"`));
-  ok(/focus: false, empty: "Type a number first\."/.test(src("k04-linear-equations")), "K4 (live since W1): focus stays on Next, as before; an empty box asks for a number, as in K1 to K3");
+  ok(/focus: false, empty: "Type a number first\."/.test(src("k04-linear-equations")), "K4: focus stays on Next, as before; an empty box asks for a number, as in K1 to K3");
   ok(/width: "7em"/.test(src("k05-probability-statistics")) && !/empty:/.test(src("k05-probability-statistics").slice(src("k05-probability-statistics").indexOf("function drillView"))), "K5: 7em boxes; an empty box does nothing, as before");
   ok(/focus: "answer", width: "8em", choicesClass: "k8-choices"/.test(src("k08-git-notebooks")) && /"dollars" : "checks"/.test(src("k08-git-notebooks")), "K8: focus on the new item's first control, 8em box, wrapping choices, units");
   ok(fs.readFileSync(path.join(SITE, "learn/k08-git-notebooks.qmd"), "utf8").indexOf('<div class="lx-card lx-drill"><div class="lx-x-head"><h3>Practice drill</h3></div>') >= 0, "K8: the no-JS drill card uses the shared class");
 }
 
-console.log(`components (W2 toolbox): ${checks - fails} of ${checks} checks passed`);
+console.log(`components (toolbox): ${checks - fails} of ${checks} checks passed`);
 process.exit(fails ? 1 : 0);

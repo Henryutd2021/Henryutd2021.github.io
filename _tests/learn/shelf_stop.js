@@ -1,17 +1,15 @@
-// shelf_stop.js — the side-topic shelf's "where we stop" box (curriculum v2 §16.2 e-stop: where the course stops, plus
-// a three-rung reading ladder; §4.4 says what each side topic includes and excludes), the writer shared by the tests of
-// X1 to X6 (builders learn-w7-a and learn-w6-x, 2026-11-07; one file since the W6 integration). Not a test itself (the
-// QA runs test_*.js only).
+// shelf_stop.js — the side-topic shelf's "where we stop" box (the explain layer's e-stop: where the course stops, plus
+// a three-rung reading ladder; the depth budget says what each side topic includes and excludes), the writer shared by
+// the tests of X1 to X6. Not a test itself (the test runner runs test_*.js only).
 //   const S = require("./shelf_stop.js");
 //   S.stopHTML(D.stop, "x05")  -> the box's static HTML (each test writes it between <!-- x05-stop:start --> markers)
 //   S.problems(D.stop)         -> [] when the box has its parts: a title, what the topic covers, what it leaves to
 //                                 specialists, and exactly three rungs, each with a source label and an "as of" date
-//   S.ALLOW, S.linkOK(url)     -> the allow-list used by the four tests (curriculum §20.3)
+//   S.ALLOW, S.linkOK(url)     -> the allow-list used by the four tests (the course's allowed destinations)
 //   S.plain, S.nWords, S.nSent -> the text-budget counters the six tests share (nSent reads "U.S.", "K.S.A.", "e.g.",
 //                                 "i.e.", "p.", "pp." and "No." as one word, not a sentence end)
 // The box is static HTML (it reads the same with and without JavaScript); its styles are the xs- rules in
-// assets/learn/components/explain.css (promoted from the six pages at the W6 integration; README "Promoted at the W6
-// integration").
+// assets/learn/components/explain.css (shared by the six pages; see the README's component list).
 "use strict";
 const ALLOW = /^https:\/\/([a-z0-9.-]+\.)?(eia\.gov|energy\.gov|ferc\.gov|nerc\.com|lbl\.gov|nrel\.gov|nlr\.gov|epa\.gov|usgs\.gov|bea\.gov|census\.gov|bls\.gov|noaa\.gov|irs\.gov|kcc\.ks\.gov|iea\.org|irena\.org|ipcc\.ch|ourworldindata\.org|openalex\.org|doi\.org|spp\.org)\//;
 function linkOK(u) { return u == null || ALLOW.test(u); }
@@ -47,7 +45,7 @@ function problems(stop) {
   });
   return out;
 }
-// text budget (the counting rules of the W5 tests)
+// text budget (the counting rules the step-card tests share)
 const plain = t => String(t).replace(/<[^>]+>/g, " ").replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1").replace(/\*\*/g, "").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/\s+/g, " ").trim();
 const nWords = t => plain(t).split(/\s+/).filter(w => /[A-Za-z0-9$]/.test(w)).length;
 const nSent = t => plain(t).replace(/U\.S\./g, "US").replace(/K\.S\.A\./g, "KSA").replace(/e\.g\./g, "eg").replace(/i\.e\./g, "ie").replace(/[0-9]\.[0-9]/g, "0").replace(/\bp\. /g, "p ").replace(/\bpp\. /g, "pp ").replace(/\bNo\. /g, "No ")

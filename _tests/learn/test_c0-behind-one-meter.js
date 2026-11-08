@@ -8,20 +8,20 @@
 //   - the sensitivity the note carries (every bar of the chart in numbers), and the note's checks: a full note passes
 //     every one and fits on a page; an empty one fails the reader's fields; a stale run is flagged; a farm's note keeps
 //     each result's boundary (CO₂, the wind-only comparison, what the cost per kg leaves out)
-//   - the review's fixes (2026-11-03): the farm's equipment-cost case at 125% equals a fresh solve; the brief, the
+//   - the brief and the bar: the farm's equipment-cost case at 125% equals a fresh solve; the brief, the
 //     rubric's note and the exemplars agree on the bar (the "Look for" lines); the owner's goal is stated; the Modeler
 //     task asks only for what the M4 notebook computes
-//   - Henry's research (curriculum §13): every excerpt sentence is an approved sentence of
-//     reports/learn/excerpts_for_approval.md (E3, E4, with the revisions after review), word for word, with an allowed
-//     data-source key; every other sentence that names a study, author or site is approved or listed below; the cited
-//     titles are those of inputs/publications.bib
+//   - the course author's research (the course's sourcing rule): every excerpt sentence is an approved sentence of the
+//     excerpt wording (E3, E4, with the revisions after review), word for word, with an allowed data-source key; every
+//     other sentence that names a study, author or site is approved or listed below; the cited titles are those of the
+//     author's publication list
 //   - links (learn pages, doi.org), no project page, no Research page, no nuclear terms, data centers nowhere, the text budget
 // Usage (from the site folder):  node _tests/learn/test_c0-behind-one-meter.js [--write]
 "use strict";
 const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
-const cp = require("child_process");
+const PRIV = require("./private_sources.js");
 const SITE = path.resolve(__dirname, "..", "..");
 const L = p => path.join(SITE, "assets/learn", p);
 const J = p => JSON.parse(fs.readFileSync(L("data/" + p), "utf8"));
@@ -64,7 +64,7 @@ const QPATH = path.join(SITE, "learn/c0-behind-one-meter.qmd");
   if (WRITE) { Object.keys(MARK).forEach(k => { const r = between(Q, MARK[k]); if (!r) throw new Error(MARK[k] + " markers missing"); Q = Q.slice(0, r.a) + BLOCKS[k] + "\n" + Q.slice(r.b); }); fs.writeFileSync(QPATH, Q); }
   Object.keys(MARK).forEach(k => { const r = between(Q, MARK[k]); ok(r && Q.slice(r.a, r.b) === BLOCKS[k] + "\n", `page block ${MARK[k]} equals the components' output (run --write)`); });
   ok(EX.validate(C.exemplars).length === 0, "exemplars: valid (" + EX.validate(C.exemplars).join("; ") + ")");
-  ok(C.rubric.competences.map(c => c.id).join() === "accounting,uncertainty,realism,communication" && C.rubric.competences.every(c => RB.COMPETENCES.some(x => x.id === c.id) && c.look), "rubric: C0's four competences (§7.9 template), each with a look-for line");
+  ok(C.rubric.competences.map(c => c.id).join() === "accounting,uncertainty,realism,communication" && C.rubric.competences.every(c => RB.COMPETENCES.some(x => x.id === c.id) && c.look), "rubric: C0's four competences (the capstone template), each with a look-for line");
 
   // ---------------- the exemplars' numbers are the engine's for the default plan
   const m = E0.fmt.money, R = r.results, M = R.money, row = k => sens.rows.find(x => x.key === k);
@@ -120,22 +120,17 @@ const QPATH = path.join(SITE, "learn/c0-behind-one-meter.qmd");
     const comm = C.rubric.competences.find(c => c.id === "communication");
     ok(/"Look for" line/.test(brief) && !/Proficient/.test(brief) && /Look for/.test(C.rubric.note) && !/six pages/.test(C.rubric.note) && /Look for/.test(C.rubric.lede) && C.exemplars.answers.every(a => /Look for/.test(a.level)) &&
        C.rubric.bar === "the bar for this note" && /^a one-page note with the plan link/.test(comm.levels.proficient),
-      "the bar is the 'Look for' lines in the brief, the rubric's lede and note and the exemplars; Communication's Proficient is C0's one-page note, in its own words (W3 shared fix 7)");
+      "the bar is the 'Look for' lines in the brief, the rubric's lede and note and the exemplars; Communication's Proficient is C0's one-page note, in its own words");
     ok(/owner's goal/.test(Q) && /owner wants/.test(C.exemplars.task) && /owner wants/.test(words.recommend) && /owner's goal/.test(C.note.fields[0].hint), "the owner's goal: in the brief, the task, the strong note and the field's hint");
     ok(/does any tested input change the recommendation/.test(C.note.fields.find(f => f.key === "change").hint) && !/how far/.test(JSON.stringify(C.note)), "the last field asks whether the tested ranges change the answer, not for an unbracketed threshold");
     const mod = (Q.match(/Go deeper · Modeler<\/span>[\s\S]*?<\/details>/) || [""])[0];
     ok(/weekly saving from adding the electrolyzer and tank/.test(mod) && /has no NPV/.test(mod) && !/notebook's NPV/.test(mod), "the Modeler task asks for what the M4 notebook computes (its weekly savings), not an NPV it has not");
   }
 
-  // ---------------- Henry's research: approved sentences only (curriculum §13)
+  // ---------------- the course author's research: approved sentences only (the sourcing rule)
   const SECTIONS = ["E3", "E4"];
   const norm = s => String(s).replace(/\[\[[a-z0-9-]+\|([^\]]+)\]\]/g, "$1").replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/&#x27;|&#39;/g, "'").replace(/\s+/g, " ").replace(/ ([.,;:?!)])/g, "$1").trim();
-  function portfolio() {
-    const c = [process.env.LEARN_PORTFOLIO, path.join(SITE, "..")];
-    try { c.push(path.resolve(SITE, cp.execSync("git rev-parse --git-common-dir", { cwd: SITE, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim(), "..", "..")); } catch (e) { /* not git */ }
-    return c.filter(Boolean).find(p => fs.existsSync(path.join(p, "reports/learn/excerpts_for_approval.md")));
-  }
-  const SNAPSHOT = {   // excerpts_for_approval.md, the rows C0 uses, 2026-11-03
+  const SNAPSHOT = {   // the approved wording, the rows C0 uses
     "E3.2": "As the hydrogen price rose, the optimizer built a larger electrolyzer to use more surplus wind.",
     "E3.3": "The larger unit ran at lower utilization, so each kilogram carried more capital and the levelized cost of hydrogen rose, while hydrogen revenue lowered total system cost.",
     "E4.1": "Among the cases studied, concentrated solar power with thermal storage running a high-temperature electrolyzer at variable power gave the lowest levelized cost of hydrogen; constant-power operation was the most expensive.",
@@ -151,13 +146,13 @@ const QPATH = path.join(SITE, "learn/c0-behind-one-meter.qmd");
     });
     return out;
   }
-  const RP = portfolio();
+  const RP = PRIV.path("excerpts");
   let APPROVED = SNAPSHOT;
   if (RP) {
-    const reg = register(fs.readFileSync(path.join(RP, "reports/learn/excerpts_for_approval.md"), "utf8"));
-    Object.keys(SNAPSHOT).forEach(k => ok(reg[k] === SNAPSHOT[k], `the register's ${k} equals this test's snapshot`));
+    const reg = register(fs.readFileSync(RP, "utf8"));
+    Object.keys(SNAPSHOT).forEach(k => ok(reg[k] === SNAPSHOT[k], `the approved wording's ${k} equals this test's snapshot`));
     APPROVED = reg;
-  } else console.log("note: excerpts_for_approval.md not found (set LEARN_PORTFOLIO); checked against the snapshot");
+  } else console.log("note: the approved excerpt wording is not available (set LEARN_SOURCES); checked against the snapshot");
   const UNITS = Object.values(APPROVED).map(norm);
   const approved = s => { s = norm(s); return s.length > 0 && UNITS.some(u => u === s || u.indexOf(s) === 0 && /^[.;:]? ?/.test(u.slice(s.length)) && /[.;:]$/.test(s) || u.indexOf(" " + s) > 0 && /[.;:] $/.test(u.slice(0, u.indexOf(" " + s) + 1)) && (u.endsWith(s) || /[.;:]$/.test(s))); };
   const OWN = Q.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?<!-- learn:\1:end -->/g, "").replace(/<!-- (?!c0-)[\s\S]*?-->/g, " ");
@@ -168,7 +163,7 @@ const QPATH = path.join(SITE, "learn/c0-behind-one-meter.qmd");
   quotes.forEach(q => ok(/^Approved excerpt of: Li et al\. \(\d{4}\), <a href="https:\/\/doi\.org\/[^"]+">(Journal of Mechanical Design|EEM 2023)<\/a>\.$/.test(q[3]), "excerpt footer: a provenance label with the DOI"));
   // every other text element that names a study, an author, a site or a method is approved or listed
   const RX = /\b(stud(y|y's|ies|ies')|paper|article|journal|Li et al|course author|excerpt|research|published|REopt|ERCOT|West Texas|253 MW|optimizer|configurations?|utilization|conference)\b/i;
-  // LISTED: what may name a study (or use a study word) without describing Henry's work, each with its reason
+  // LISTED: what may name a study (or use a study word) without describing the course author's work, each with its reason
   const LISTED = [/^Approved excerpt of: Li et al\. \(\d{4}\), (Journal of Mechanical Design|EEM 2023)\.$/,   // provenance label
     /^Li et al\. \(20\d\d\)\. .+\.$/,                                                                // citation (title checked below)
     /^Say which yardstick your note uses\. Case file CF2 takes the first case apart\.$/,                 // pointer to CF2
@@ -183,10 +178,10 @@ const QPATH = path.join(SITE, "learn/c0-behind-one-meter.qmd");
   ok(![...FM.matchAll(/^(title|subtitle|description): "(.*)"$/gm)].some(x => RX.test(x[2])), "front matter: names no study");
   ok(!RX.test(JSON.stringify(C).replace(/"about": "[^"]*"/, "")) , "the data file names no study");
   if (RP) {
-    const bib = fs.readFileSync(path.join(RP, "inputs/publications.bib"), "utf8"), titles = [...bib.matchAll(/^\s*title\s*=\s*\{(.*)\},?\s*$/gm)].map(x => x[1].replace(/[{}]/g, "").toLowerCase());
+    const bib = fs.readFileSync(PRIV.path("publications"), "utf8"), titles = [...bib.matchAll(/^\s*title\s*=\s*\{(.*)\},?\s*$/gm)].map(x => x[1].replace(/[{}]/g, "").toLowerCase());
     const cites = [...OWN.matchAll(/<li>Li et al\. \((\d{4})\)\. <a href="(https:\/\/doi\.org\/[^"]+)">([^<]+)<\/a>\./g)];
     ok(cites.length === 2, "two cited papers");
-    cites.forEach(c => ok(titles.indexOf(c[3].toLowerCase()) >= 0, "cited title as in publications.bib: " + c[3].slice(0, 50)));
+    cites.forEach(c => ok(titles.indexOf(c[3].toLowerCase()) >= 0, "cited title as in the publication list: " + c[3].slice(0, 50)));
   }
 
   // ---------------- links, scope, text

@@ -2,7 +2,7 @@
 // (assets/learn/data/n01-news-lens.json) and every number the page states.
 // Usage (from the site folder):  node _tests/learn/test_n01-news-lens.js
 //        node _tests/learn/test_n01-news-lens.js --write   first rewrites the page's no-JS checks block (between the
-//        fallback-checks markers) from staticChecks(); the stories' fallback comes from scripts/learn_n01_fallback.js
+//        fallback-checks markers) from staticChecks(); the stories' fallback comes from N1's fallback build step
 "use strict";
 const fs = require("fs");
 const path = require("path");
@@ -33,7 +33,7 @@ ok(D.lens.length === 7 && new Set(ids).size === 7, "lens: seven questions with u
 ok(D.lens.every((l, i) => l.n === i + 1 && l.ask && l.trap && /^var\(--lx-/.test(l.color)), "lens: numbered 1-7, each with a question, a trap and a token colour");
 const lensCovers = D.lens.map(l => (l.label + " " + l.sub).toLowerCase()).join(" ");
 ["scale", "time", "horizon", "physics", "units", "limits", "power or energy", "who pays", "boundary", "counterfactual", "uncertainty"].forEach(k =>
-  ok(lensCovers.indexOf(k) >= 0, `lens: covers "${k}" (the brief's tags: scale, units, time horizon, physics limits, capacity vs energy, who pays, boundary, counterfactual, uncertainty)`));
+  ok(lensCovers.indexOf(k) >= 0, `lens: covers "${k}" (the news lens's tags: scale, units, time horizon, physics limits, capacity vs energy, who pays, boundary, counterfactual, uncertainty)`));
 
 // ---------------- stories: tags, notes, sources, fallback text
 const ALLOWED = ["eia.gov", "energy.gov", "entsoe.eu"];
@@ -119,7 +119,7 @@ D.spotter.forEach(s => ok(words(s.fix) <= 40, `spotter ${s.id}: fix under 40 wor
 // ---------------- ladder
 D.ladder.items.forEach(it => ok(it.answer.every(a => a === "projection" || D.ladder.rungs.some(r => r.id === a)), `ladder ${it.id}: answers are rungs`));
 ok(M.ladderOK(D.ladder.items[0], "operating") && !M.ladderOK(D.ladder.items[0], "announced") && M.ladderOK(D.ladder.items[2], "projection"), "ladder: placements");
-ok(D.ladder.rungs.map(r => r.label).join(",") === "Announced,Funded,Permitted,Under construction,Operating,At design output", "ladder: the six rungs of curriculum §16");
+ok(D.ladder.rungs.map(r => r.label).join(",") === "Announced,Funded,Permitted,Under construction,Operating,At design output", "ladder: the six rungs of the news lens's ladder");
 
 // ---------------- the Steelman box's sensitivity scenarios, the explain fallback and the citation
 const SN = D.sensitivity;

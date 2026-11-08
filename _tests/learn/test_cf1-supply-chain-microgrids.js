@@ -5,16 +5,16 @@
 //     $40), on-site energy narrows the gap, and with nothing to sell each site sells little of what it makes
 //   - the toy's shapes: SPP's 2025 hourly wind and solar (town_year.json) scaled to each site's capacity factor
 //   - the three no-JS blocks (timeline, toy, boundary) and the myths equal what the components write (--write rewrites them)
-//   - research wording (curriculum §13, guard G-SRC): every sentence on the page, in the data file and in this lesson's
-//     script that describes the course author's studies is an approved sentence of reports/learn/excerpts_for_approval.md
+//   - research wording (the course's sourcing rule): every sentence on the page, in the data file and in this lesson's
+//     script that describes the course author's studies is an approved sentence of the excerpt wording
 //     (E8, without the dropped E8.11-E8.12), word for word; see "research wording" below
-//   - citations: the title of every Li et al. paper in the sources list is the title in inputs/publications.bib
+//   - citations: the title of every Li et al. paper in the sources list is the title in the author's publication list
 //   - text budget, links (doi.org, the allow-listed repository, EIA, learn pages only)
 // Usage (from the site folder):  node _tests/learn/test_cf1-supply-chain-microgrids.js [--write]
 "use strict";
 const fs = require("fs");
 const path = require("path");
-const cp = require("child_process");
+const PRIV = require("./private_sources.js");
 const ID = "cf1-supply-chain-microgrids";
 const SITE = path.resolve(__dirname, "..", "..");
 const L = p => path.join(SITE, "assets/learn", p);
@@ -93,34 +93,34 @@ ok(M.status(I, R, "sell40").length === 2 && M.status(I, R, "none").length === 1 
 // the page's comparison card and myths agree with the toy
 const PT = text(PAGE);
 ok(/the windy site, once each site can build wind and solar; selling spare energy can make this saving outweigh its higher site and shipping costs/.test(PT) && R.sell40.winner === 1 && R.sell0.winner === 0, "the comparison card: energy favours the windy site; selling makes it win overall");
-// the energy row's claim (review CF1 #1), tested on the energy subtotal itself, not on the winner
+// the energy row's claim, tested on the energy subtotal itself, not on the winner
 Object.keys(R).forEach(k => {
   const e = R[k].sites.map(M.energy);
   ok(R[k].st.onsite ? e[1] < e[0] - 1e5 : near(e[0], e[1], 1e-6), k + ": energy net of sales " + (R[k].st.onsite ? "is lower at the windy site" : "is the same at both sites (grid power only)") + " ($" + e.map(v => (v / 1e6).toFixed(3) + "M").join(" vs $") + ")");
 });
 ok(near(M.energy(R.sell0.sites[0]) / 1e6, 1.907, 0.001) && near(M.energy(R.sell0.sites[1]) / 1e6, 1.440, 0.001), "selling nothing: energy $1.907M (near) against $1.440M (windy); the site and shipping gap ($550k) still wins");
 ok(/It has no storage and no outages\./.test(PT) && !/battery|storage/i.test(JSON.stringify(I)), "the toy has no storage (and says so)");
-ok(/It assumes the grid takes every spare unit at the chosen price, with no connection limit or extra charge\./.test(PT) && R.sell40.sites[1].sold > 19000, "the toy's export assumption is stated (review CF1 #5): the windy site's $40 win rests on 19,576 MWh of sales");
-// imports are not only in dark hours (review CF1 #8)
+ok(/It assumes the grid takes every spare unit at the chosen price, with no connection limit or extra charge\./.test(PT) && R.sell40.sites[1].sold > 19000, "the toy's export assumption is stated: the windy site's $40 win rests on 19,576 MWh of sales");
+// imports are not only in dark hours
 { const w = R.sell40.sites[1], sh = SH.windy; let sunny = 0; for (let t = 0; t < 8760; t++) { const m = w.W * sh.wind[t] + w.P * sh.solar[t]; if (m < I.loadMW && sh.solar[t] > 0) sunny += I.loadMW - m; }
   ok(sunny > 100 && /fall short of the load/.test(staticMyths()) && !/calm, dark hours/.test(PAGE), "the windy site also buys in sunny hours (" + Math.round(sunny) + " MWh), so the myth does not say 'dark hours'"); }
-// the one-hour example adds up (review CF1 #4)
+// the one-hour example adds up
 ok(/a 3 MW load with 2 MW made on site buys 1 MW for that hour, which is 1 MWh; with 5 MW made, it sells 2 MWh/.test(PT) && I.loadMW === 3, "the one-hour example: 3 − 2 = 1 MW bought, 1 MWh; 5 − 3 = 2 MWh sold");
-// the selling-price buttons do nothing while there is no on-site energy (review CF1 #7)
+// the selling-price buttons do nothing while there is no on-site energy
 ok(/b\.addEventListener\("click", function \(\) \{ if \(!St\.onsite\) return;/.test(JS) && /aria-disabled", String\(!St\.onsite\)/.test(JS), "the selling-price buttons are guarded while aria-disabled");
-// the toy's results are a table in the no-JS version (review CF1 #3)
+// the toy's results are a table in the no-JS version
 ok(/<table class="lx-mini-table cf1-res">/.test(M.staticIdea(I, R)) && !/<li>/.test(M.staticIdea(I, R)), "the toy's settings are table rows, not long list items");
-// vocabulary (review CF1 #4): capacity factor, MW and MWh, deterministic equivalent marked; PV spelt out
+// vocabulary: capacity factor, MW and MWh, deterministic equivalent marked; PV spelt out
 ok(/data-term="capacity-factor"/.test(M.staticIdea(I, R)) && /data-term="megawatt"/.test(M.staticIdea(I, R)) && /data-term="megawatt-hour"/.test(M.staticIdea(I, R)) && /data-term="deterministic-equivalent">deterministic equivalent</.test(PAGE) && /solar photovoltaic \(PV\)/.test(PAGE),
   "capacity factor, MW, MWh and deterministic equivalent are glossary terms; PV is spelt out");
 const SIDE = fs.readFileSync(path.join(SITE, "learn/_w1/cf1-supply-chain-microgrids.yml"), "utf8");
-ok(/chosen probability, for example at least a 95% chance of meeting a week's demand/.test(SIDE) && !/95 of every 100 weeks/.test(SIDE), "the chance-constraint definition is a probability, not a frequency (review CF1 #2)");
-ok(/\[lesson 10\]\(10-write-it-down\.html\) introduces decisions, a goal and rules, and \[lesson 11\]\(11-solver\.html\) solves a mixed-integer program/.test(PAGE), "lesson 10 is not called a mixed-integer example (review CF1 #9)");
+ok(/chosen probability, for example at least a 95% chance of meeting a week's demand/.test(SIDE) && !/95 of every 100 weeks/.test(SIDE), "the chance-constraint definition is a probability, not a frequency");
+ok(/\[lesson 10\]\(10-write-it-down\.html\) introduces decisions, a goal and rules, and \[lesson 11\]\(11-solver\.html\) solves a mixed-integer program/.test(PAGE), "lesson 10 is not called a mixed-integer example");
 
 const OWN = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?<!-- learn:\1:end -->/g, "").replace(/<style>[\s\S]*?<\/style>/g, " ");
-// ---------------- research wording (curriculum §13, guard G-SRC)
+// ---------------- research wording (the sourcing rule)
 // Every sentence that describes the course author's studies (question, method, data, findings, limits, citation) is (a) an
-// approved sentence of reports/learn/excerpts_for_approval.md (the sections in CF.sections) or (b) a revision listed under
+// approved sentence of the excerpt wording (the sections in CF.sections) or (b) a revision listed under
 // "Revisions after review", word for word. A page sentence may be a clause of an approved row only where the row itself breaks
 // (": ", "; ", ". "), as in "Inside: ..." or a boundary list item. Where it looks:
 //   strict (every text element, unless listed in NOT_RESEARCH): the case parts, the excerpts and their notes, the
@@ -130,11 +130,10 @@ const OWN = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?<!-- learn:
 //     generated header's description and course-map line included), every string of the data file, every string literal
 //     of this lesson's script
 // NOT_RESEARCH lists what may name a study without describing it: part labels, provenance labels, citation labels and
-// general ideas that hold in the toy; each entry has its reason. The register is read from the ResearchPortfolio folder
-// (LEARN_PORTFOLIO, the site's parent, or the parent of the site repository's main worktree); without it the test uses
-// APPROVED_SNAPSHOT below, which it otherwise checks against the register.
+// general ideas that hold in the toy; each entry has its reason. The approved wording is read through
+// private_sources.js; without it the test uses APPROVED_SNAPSHOT below, which it otherwise checks against that wording.
 const CF = { prefix: "cf1", sections: ["E8"], excerpts: 4, question: "E8.1", papers: 2, dropped: ["E8.11", "E8.12"] };
-const APPROVED_SNAPSHOT = {   // excerpts_for_approval.md, E8 (approved 2026-11-03; E8.11-E8.12 dropped)
+const APPROVED_SNAPSHOT = {   // the approved wording, E8 (E8.11-E8.12 not used)
   "E8.1": "Where should a manufacturing supply chain place its facilities, and how much on-site wind, solar and storage should each facility install when facilities can trade energy with the grid?",
   "E8.2": "From the course author's research: in the modeled supply chains, each open factory or warehouse could run its own microgrid, with on-site wind, solar and storage, an energy balance every hour, and energy bought from and sold to the grid.",
   "E8.3": "When each facility can install its own wind, solar and storage and trade energy with the grid, a candidate site's renewable resource affects its operating cost.",
@@ -155,7 +154,7 @@ const APPROVED_SNAPSHOT = {   // excerpts_for_approval.md, E8 (approved 2026-11-
 const RX = /\b(stud(y|y's|ies|ies')|paper|article|journal|Li et al|course author|excerpt|research|published|supply chains?|factor(y|ies)|warehouses?|facilit(y|ies)|transactive|California|Arizona|Nevada|chance constraint|service level|stylized|synthetic|mixed-integer|SEGRE|Applied Mathematical Modelling|three-tier|two-tier|logistics)\b/i;
 const NOT_RESEARCH = [
   [/^\d · [A-Z][a-z ,]+$/, "part label"],
-  [/^Question type: prescriptive \(where should it build, and what should each site install\?\)\.$/, "course label (§11.2 question type)"],
+  [/^Question type: prescriptive \(where should it build, and what should each site install\?\)\.$/, "course label (the course's question types)"],
   [/^Approved excerpt of: Li et al\. \(2023\), Applied Mathematical Modelling\.$/, "provenance label"],
   [/^From the approved excerpt of Li et al\. \(2023\), Applied Mathematical Modelling\.$/, "provenance label"],
   [/^Every result about the studies is quoted from approved excerpts of the published papers named in the sources\.$/, "provenance label"],
@@ -180,12 +179,7 @@ const NOT_RESEARCH = [
 ];
 const norm = s => String(s).replace(/\[\[[a-z0-9-]+\|([^\]]+)\]\]/g, "$1").replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/&#x27;|&#39;/g, "'")
   .replace(/&quot;/g, '"').replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/\s+/g, " ").replace(/ ([.,;:?!)])/g, "$1").replace(/\( /g, "(").trim();
-function portfolio() {
-  const c = [process.env.LEARN_PORTFOLIO, path.join(SITE, "..")];
-  try { c.push(path.resolve(SITE, cp.execSync("git rev-parse --git-common-dir", { cwd: SITE, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim(), "..", "..")); } catch (e) { /* not a git checkout */ }
-  return c.filter(Boolean).find(p => fs.existsSync(path.join(p, "reports/learn/excerpts_for_approval.md")));
-}
-// {id: sentence} of the register's rows in SECTIONS, each revision applied (a revised row replaces the approved one)
+// {id: sentence} of the approved wording's rows in SECTIONS, each revision applied (a revised row replaces the approved one)
 function register(md) {
   const out = {}; let sec = null;
   const strip = t => norm(t.replace(/^(Timeline, [^:]+|Myth answer|Citations?): /, ""));
@@ -199,15 +193,15 @@ function register(md) {
   });
   return out;
 }
-const RP = portfolio();
+const RP = PRIV.path("excerpts");
 let APPROVED = APPROVED_SNAPSHOT;
 if (RP) {
-  const reg = register(fs.readFileSync(path.join(RP, "reports/learn/excerpts_for_approval.md"), "utf8"));
+  const reg = register(fs.readFileSync(RP, "utf8"));
   const same = (x, y) => Object.keys(x).length === Object.keys(y).length && Object.keys(x).every(k => x[k] === y[k]);
-  ok(same(reg, APPROVED_SNAPSHOT), "the approved-sentence snapshot in this test equals the register (" + CF.sections.join(", ") + ", revisions applied); differs at: " +
+  ok(same(reg, APPROVED_SNAPSHOT), "the approved-sentence snapshot in this test equals the approved wording (" + CF.sections.join(", ") + ", revisions applied); differs at: " +
     Object.keys(Object.assign({}, reg, APPROVED_SNAPSHOT)).filter(k => reg[k] !== APPROVED_SNAPSHOT[k]).join(", "));
   APPROVED = reg;
-} else console.log("note: reports/learn/excerpts_for_approval.md not found (set LEARN_PORTFOLIO); research wording checked against the snapshot in this test");
+} else console.log("note: the approved excerpt wording is not available (set LEARN_SOURCES); research wording checked against the snapshot in this test");
 const UNITS = Object.values(APPROVED).map(norm);
 function approved(seg) {
   const s = norm(seg);
@@ -242,7 +236,7 @@ const cut = (re, optional) => { const m = REST.match(re); ok(!!m || optional, "p
 strict("page, the case", elements(cut(/<div class="lx-case">[\s\S]*?\n<\/div>\n(?=<div class="lx-interactive")/)));
 strict("page, the case's data note", elements(cut(/<p class="lx-datanote"><span>Every result[\s\S]*?<\/p>/)));
 const SRC = cut(/<div class="lx-card lx-sources">[\s\S]*?<\/div>/);
-// a paper cited with its title and DOI is checked against publications.bib below; every other item is strict
+// a paper cited with its title and DOI is checked against the publication list below; every other item is strict
 const TITLED = /^<li>Li et al\. \((\d{4})\)\. <a href="(https:\/\/doi\.org\/[^"]+)">([^<]+)<\/a>\./;
 const SRC_LI = [...SRC.matchAll(/<li>[\s\S]*?<\/li>/g)].map(m => m[0]);
 strict("page, sources", SRC_LI.filter(li => !TITLED.test(li)).map(norm));
@@ -272,13 +266,13 @@ ok(sentences.join(" ") === ["E8.3", "E8.4", "E8.5", "E8.6"].map(k => norm(APPROV
 ok(norm((PAGE.match(/<p class="lx-case-q">([\s\S]*?)<\/p>/) || [])[1] || "") === APPROVED[CF.question], "the question is " + CF.question + ", word for word");
 const E87 = APPROVED["E8.7"].split(/(?<=\.) (?=Leaves out:)/);
 ok(E87.length === 2 && norm(PAGE).indexOf(norm("<li>" + E87[0] + "</li><li>" + E87[1] + "</li>")) >= 0, "E8.7 sits under the excerpt, word for word, as two lines (holds when; leaves out)");
-// citations: titles as in inputs/publications.bib
+// citations: titles as in the author's publication list
 if (RP) {
-  const bib = fs.readFileSync(path.join(RP, "inputs/publications.bib"), "utf8");
+  const bib = fs.readFileSync(PRIV.path("publications"), "utf8");
   const titles = [...bib.matchAll(/^\s*title\s*=\s*\{(.*)\},?\s*$/gm)].map(m => m[1].replace(/[{}]/g, "").replace(/\\textbf/g, "").toLowerCase());
   const cites = SRC_LI.map(li => li.match(TITLED)).filter(Boolean);
   ok(cites.length === CF.papers, CF.papers + " Li et al. paper(s) with a title in the sources list (" + cites.length + ")");
-  cites.forEach(c => ok(titles.indexOf(c[3].toLowerCase()) >= 0 && /^https:\/\/doi\.org\//.test(c[2]), "sources: '" + c[3].slice(0, 50) + "' is the title in publications.bib, with its DOI"));
+  cites.forEach(c => ok(titles.indexOf(c[3].toLowerCase()) >= 0 && /^https:\/\/doi\.org\//.test(c[2]), "sources: '" + c[3].slice(0, 50) + "' is the title in the publication list, with its DOI"));
 }
 
 // ---------------- links and sources
@@ -289,12 +283,12 @@ ok(hrefs2.every(h => /^https:\/\/doi\.org\/10\./.test(h) || h === "https://githu
 ok(!/projects\/|research\.html/.test(PAGE + RAW), "no project page and no Research page");
 ok(TL.validate(D.timeline.events).length === 0 && D.timeline.events.every(e => e.source && e.source.label), "every timeline event has a valid date and a source");
 ok(D.timeline.events.filter(e => /doi\.org/.test((e.source || {}).url || "")).every(e => hrefs2.indexOf(e.source.url) >= 0), "every study in the timeline is in the sources list");
-ok(!/JORS|Operational Research Society|01605682/.test(PAGE + RAW + JS), "the JORS paper is left out (Henry, 2026-11-03)");
+ok(!/JORS|Operational Research Society|01605682/.test(PAGE + RAW + JS), "the JORS paper is left out");
 const keys = [...PAGE.matchAll(/data-source="([^"]+)"/g)].map(m => m[1]);
 ok(keys.length === 1 && keys[0] === "excerpt:supply-chain-mg", "the excerpt uses CF1's approved source key");
 
 // ---------------- text budget: every text element of the page's own prose stays short (one idea, about 35 words),
-// the generated no-JS blocks included (review CF1 #3)
+// the generated no-JS blocks included
 const prose = elements(OWN2.replace(/<style>[\s\S]*?<\/style>/g, " ").replace(/<script[\s\S]*?<\/script>/g, " ").replace(/^---[\s\S]*?\n---\n/, " "));
 // approved sentences inside an element (a timeline step, an excerpt) do not count; the element's other words must stay short
 const own = s => UNITS.reduce((t, u) => t.split(u).join(" "), norm(s)).trim();

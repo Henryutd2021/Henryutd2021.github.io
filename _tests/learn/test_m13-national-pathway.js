@@ -10,7 +10,7 @@
 //     foresight; each of C4's shocks re-planned; the full-year verdicts from the library (with and without the
 //     peak-hour rule; the page's "240 hours"); the near-optimal ranges (precomputed into e4-pathways.json by --write and
 //     checked against fresh runs; 2050 solar at least a gigawatt wide, the plan shown inside each)
-//   - the reviews (2026-11-07): the budget's price by model year is dual x w / D (the engine's test also checks it against
+//   - the details: the budget's price by model year is dual x w / D (the engine's test also checks it against
 //     the gas row's dual), Hotelling's path shown apart; out-of-reach budgets have no dual and say so; the closest pathway;
 //     early retirement for one year, never summed; near-optimal choices are cohorts; the full-year criteria; the budget
 //     gap with A20 recomputed (build-rate and transmission limits x100; A20's electrification path in a copy of the
@@ -133,7 +133,7 @@ const QPATH = path.join(X.SITE, "learn/m13-national-pathway.qmd");
   ok(PAGE.indexOf(PL.about.line) >= 0 && JS.indexOf("P.line") >= 0, "the fictional line");
   ok(T.indexOf("twelve slices") >= 0 || /twelve \[\[time-slice/.test(JS), "twelve slices named");
   ok(!/firm[^.;\n]{0,50}nuclear|nuclear[^.;\n]{0,50}firm/i.test(T + JS) && !/reactor|\bSMR\b|small modular/i.test(PAGE + JS + NBT), "the firm option is never named nuclear; no reactor named (page, script, notebook)");
-  ok(!/learning curve|learning rate|first[- ]of[- ]a[- ]kind/i.test(PAGE + JS + NBT), "no learning curves (G-COST)");
+  ok(!/learning curve|learning rate|first[- ]of[- ]a[- ]kind/i.test(PAGE + JS + NBT), "no learning curves (costs are fixed ranges; none changes with deployment)");
   ok(/LX\.Flowchart\(/.test(JS) && /Qualified conclusions/.test(JS), "the explain layer has its flowchart: inputs, decisions, rules, solve, limits met?, hourly checks, qualified conclusions");
   ["$y_p$, $i$", "$c_f$", "$\\alpha_{g,s}$", "$\\lambda_\\ell$", "$x^{\\text{dis}}$"].forEach(sy => ok(PAGE.indexOf("| " + sy) >= 0, "the symbol table defines " + sy));
   ok(/\\frac\{A_g\}\{1000\}/.test(PAGE) && /x\^\{\\text\{dis\}\}_\{r,s,p\} - x\^\{\\text\{ch\}\}_\{r,s,p\}/.test(PAGE) && /u_\{r,s,p\} = L_\{r,p\}/.test(PAGE) && /links\} \+ \\text\{penalties\}/.test(PAGE), "the formulation: A_g / 1000 for $M, batteries and unserved energy in the balance, links, penalties and ties in the goal");

@@ -42,7 +42,7 @@ const rel = (a, b, r) => Math.abs(a - b) <= r * Math.max(1, Math.abs(b));
 const musd = v => "$" + (v / 1e6).toFixed(1) + "M", kt = v => Math.round(v / 1e3).toLocaleString("en-US") + " kt";
 const onPage = (s, what) => ok(page.includes(s), `page states ${what}: "${s}"`);
 const median = a => { const b = a.slice().sort((x, y) => x - y); return b[Math.floor(b.length / 2)]; };
-// one price year (W4 carry-over): the battery's source costs (2024 dollars) times BEA's GDP deflator ratio, to the cent
+// one price year: the battery's source costs (2024 dollars) times BEA's GDP deflator ratio, to the cent
 const priceFactor = (cfg, year) => cfg.deflator.index[String(cfg.priceYear)] / cfg.deflator.index[String(year)];
 const cents = v => Math.round(v * 100) / 100, usd2 = v => "$" + v.toFixed(2);
 function batteryInPriceYear(cfg) {
@@ -271,7 +271,7 @@ function batteryNote(cfg) {
   const strs = []; (function walk(o) { if (typeof o === "string") strs.push(o); else if (o && typeof o === "object") Object.values(o).forEach(walk); })(cfg);
   const bad = []; strs.forEach(s => s.split(/(?<=[.;:!?])\s+/).forEach(x => { if (NUC.test(x) && RISK.test(x.replace(/merit[- ]order|in order to/gi, ""))) bad.push(x); }));
   ok(!bad.length, "no data sentence pairs nuclear with a risk term: " + bad.join(" | "));
-  // one price year (W4 carry-over; shared fix 9 labelled the mix): the data note, the numbers to remember, the sources
+  // one price year (the mix labelled): the data note, the numbers to remember, the sources
   // and the boundary card, every number from the data (the deflator's ratio, the battery in 2025 dollars, rounded)
   onPage("<b>Price year:</b> " + cfg.priceYear + " dollars throughout; NREL's " + bs.dollarYear + " battery costs are converted with BEA's GDP implicit price deflator (×" + bc.f.toFixed(4) + ").", "one price year, with the deflator's ratio");
   ok(page.indexOf("Price years:") < 0 && page.indexOf("without conversion") < 0 && page.indexOf("battery costs in 2024 dollars") < 0, "no unconverted price-year mix left on the page");
@@ -283,7 +283,7 @@ function batteryNote(cfg) {
     ". Last revised 29 October 2026; accessed 5 November 2026.", "the deflator in the sources, with its values and dates");
   ok(JS.indexOf('"costs stay as entered, all in " + cfg.priceYear + " dollars (the battery\'s " + cfg.techs.battery.source.dollarYear + " costs converted with BEA\'s GDP price index), the same in every year;"') > 0 &&
      JS.indexOf("the battery in 2024 dollars") < 0, "the boundary card: all costs in the price year, the battery converted");
-  // the data file's `about`: constant costs and the reader-set nuclear capital cost are separate sentences (shared fix 8)
+  // the data file's `about`: constant costs and the reader-set nuclear capital cost are separate sentences
   const aboutS = cfg.about.split(/(?<=[.!?])\s+/);
   ok(aboutS.indexOf("Technology costs are constant for the whole year modelled (no change over time).") >= 0 && aboutS.indexOf("The reader can change two inputs: the gas price and the nuclear capital cost.") >= 0 &&
      !aboutS.some(x => NUC.test(x) && /constant|over time/i.test(x)), "about: constant costs and the reader's nuclear capital cost in separate sentences");

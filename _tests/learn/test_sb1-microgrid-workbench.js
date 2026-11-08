@@ -5,10 +5,10 @@
 //   - every number the page states: the brief (1,200 kW), the inputs table (each value from the data file), the outage
 //     descriptions (start, length, seed), against the data and the engine
 //   - the seeded test's words: never more than the ten outages support
-//   - the full-year check of the 12 average days (W3 review SB1 5): the sb1-year block holds four plans' grid bills on
+//   - the full-year check of the 12 average days: the sb1-year block holds four plans' grid bills on
 //     12 average days and over all 8,760 hours (X.fullYear), as the page states (the same for F7's campus, 4% to 7%
 //     higher for the large solar-and-battery plans)
-//   - the W3 review fixes in words: hypothetical outages, the cost's boundary, marginal prices, the glossary marks
+//   - the wording details: hypothetical outages, the cost's boundary, marginal prices, the glossary marks
 //   - the page frame: the sandbox form's sections, the scripts, the data-src, the engine in the bundle; the text names
 //     no price from the model; links only to live lessons and allowed sources (the scope scan checks the rest)
 // --write: recomputes `precomputed.sb1` in the data file and writes the three marker blocks.
@@ -98,13 +98,13 @@ function resultRows(E1, R) {
   ok(bundle.indexOf("/* engine-e1.js — LX.E1") >= 0 && bundle.indexOf("/* engine-e1.js") > bundle.indexOf("/* benchrun.js"), "engine E1 is in the bundle, after BenchRun");
   const js = fs.readFileSync(X.L("sb1-microgrid-workbench.js"), "utf8");
   ok(!/\bprices?\b/i.test(T.replace(/Marginal electricity prices \(the engine does not calculate them\)|Marginal prices|diesel price|retail price|average price|Prices each outage's diesel/gi, "")), "the page names no price from the model (only that it calculates none)");
-  ok(/does not calculate marginal electricity prices/.test(js) && /marginal prices of any kind from the model/.test(js), "the explain layer: the engine does not calculate marginal electricity prices (W3 review SB1 10)");
-  // ---------------- the W3 review fixes in words
-  ok(/test hypothetical outages on 2025 solar profiles/.test(PAGE) && !/real outages/.test(PAGE + js), "the subtitle: hypothetical outages, not real ones (SB1 14)");
-  ok(T.indexOf("not measured campus output") >= 0 && T.indexOf("The sun is real") < 0, "solar: a teaching profile, not measured campus output (SB1, C1 13)");
-  ["feeder", "tariff", "linear-program", "cost-of-capital", "mixed-integer-program"].forEach(id => ok(new RegExp('data-term="' + id + '"').test(PAGE), "glossary mark on the page: " + id + " (SB1 10)"));
-  ok(/\[\[linear-program\|linear program\]\]/.test(js) && /\[\[cost-of-capital\|/.test(fs.readFileSync(X.L("components/engine-e1.js"), "utf8")) && !/\[\[capital-recovery-factor\|cost of capital\]\]/.test(fs.readFileSync(X.L("components/engine-e1.js"), "utf8")), "cost of capital links its own term, not the capital recovery factor (SB1 10)");
-  ok(/tStop\.attach\(T\)/.test(js) && /busy: tStop\.busy/.test(js), "the ten-outage run box has a Stop button (SB1 9; the engine test drives the bench's)");
+  ok(/does not calculate marginal electricity prices/.test(js) && /marginal prices of any kind from the model/.test(js), "the explain layer: the engine does not calculate marginal electricity prices");
+  // ---------------- the wording details
+  ok(/test hypothetical outages on 2025 solar profiles/.test(PAGE) && !/real outages/.test(PAGE + js), "the subtitle: hypothetical outages, not real ones");
+  ok(T.indexOf("not measured campus output") >= 0 && T.indexOf("The sun is real") < 0, "solar: a teaching profile, not measured campus output");
+  ["feeder", "tariff", "linear-program", "cost-of-capital", "mixed-integer-program"].forEach(id => ok(new RegExp('data-term="' + id + '"').test(PAGE), "glossary mark on the page: " + id + ""));
+  ok(/\[\[linear-program\|linear program\]\]/.test(js) && /\[\[cost-of-capital\|/.test(fs.readFileSync(X.L("components/engine-e1.js"), "utf8")) && !/\[\[capital-recovery-factor\|cost of capital\]\]/.test(fs.readFileSync(X.L("components/engine-e1.js"), "utf8")), "cost of capital links its own term, not the capital recovery factor");
+  ok(/tStop\.attach\(T\)/.test(js) && /busy: tStop\.busy/.test(js), "the ten-outage run box has a Stop button (the engine test drives the bench's)");
   const desc = (PAGE.match(/^description: "([^"]+)"/m) || [])[1] || "";
   ok(desc.split(/\s+/).length <= 35, "the description is within the 35-word budget (" + desc.split(/\s+/).length + " words; SB1 11)");
   ok(!/shadow price|dual/i.test(T + js), "no shadow prices or duals on the page");

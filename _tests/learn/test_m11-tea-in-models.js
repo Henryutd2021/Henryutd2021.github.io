@@ -8,7 +8,7 @@
 //   - the LP: every default plan optimal; every hour's rules hold in the solved plan; the tier's cap holds; the reported
 //     annual equivalent equals minus the LP objective (hair costs and constants accounted for); NPV = annual x AF; the
 //     cash flows rebuilt year by year; the credit only in its years
-//   - ties (W2 finding 2): each reported size, kilograms and NPV is the same on the whole optimal face (minimized and
+//   - ties: each reported size, kilograms and NPV is the same on the whole optimal face (minimized and
 //     maximized with the objective held within $1 a year)
 //   - the full-year check: each default plan's size re-run on all 8,760 hours of 2025; the page states the largest gap
 //   - every number on the page (fallback, explain, Go deeper, myths, quiz, numbers to remember) against the reference
@@ -19,6 +19,7 @@
 const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
+const PRIV = require("./private_sources.js");
 const SITE = path.resolve(__dirname, "..", "..");
 const ID = "m11-tea-in-models";
 const L = p => path.join(SITE, "assets/learn", p);
@@ -285,7 +286,7 @@ const fm = M.fm, r1 = v => Math.round(v * 10) / 10, r3 = v => Math.round(v * 100
   onPage(REF.townRate.toFixed(3), "Prairie Town's grid rate");
   onPage("here, " + (5 - REF.defaults.solved) + " of 5 skipped", "LPs the bound skips at the defaults"); onPage("About " + (Math.round(REF.size.cols / 100) * 100).toLocaleString("en-US") + " columns and " + (Math.round(REF.size.rows / 100) * 100).toLocaleString("en-US") + " rows", "the LP's size");
   onPage("$" + d.wear.toFixed(2), "stack wear per MWh");
-  ok(!/break[- ]even/i.test(PAGE + (JS.match(/"[^"\n]*"/g) || []).join(" ") + NB), "no break-even wording on the page, in its strings or the notebook (G-POL)");
+  ok(!/break[- ]even/i.test(PAGE + (JS.match(/"[^"\n]*"/g) || []).join(" ") + NB), "no break-even wording on the page, in its strings or the notebook");
 
   // ---------------- scope and research wording
   const NUC = /nuclear|reactor|\bSMR\b|small modular/i;
@@ -301,7 +302,7 @@ const fm = M.fm, r1 = v => Math.round(v * 10) / 10, r3 = v => Math.round(v * 100
     const real = (PAGE.match(/<div class="lx-card lx-real">([\s\S]*?)<div class="lx-case-try">/) || [])[1] || "";
     [...real.matchAll(/<p class="lx-hint">([\s\S]*?)<\/p>/g)].forEach(p => ok(X.approved(RG, p[1]) || /^Case file |^Optional, about/.test(X.norm(p[1])), "Real-world hint is approved E3 wording or a label: " + X.norm(p[1]).slice(0, 60)));
     ok(!/\| E3\.(2|3|8|13) \|/.test(RG.md.split("## Revisions after review")[1] || ""), "no revision after review replaces E3.2, E3.3, E3.8 or E3.13");
-  } else console.log("note: excerpts_for_approval.md not found (set LEARN_PORTFOLIO); excerpts not checked against the register");
+  } else console.log("note: the approved excerpt wording is not available (set LEARN_SOURCES); excerpts not checked against it");
   ok(NB.includes(ID + ".json") && NB.includes("reference") && NB.includes("assert") && NB.includes("linprog"), "notebook: reads the reference block and asserts it with linprog");
   ["lcoh", "kg", "creditLev", "npv", "S"].forEach(f => ok(new RegExp('assert[^\\n]*\\[\\\\"' + f + '\\\\"\\][^\\n]*ref\\[\\\\"' + f + '\\\\"\\]').test(NB), "notebook asserts " + f + " against the reference block"));
   ok(/def periods\(K, o, service=/.test(NB) || /PERIODS_2028/.test(NB), "notebook task 4 gives the period structure (start, end, rule)");

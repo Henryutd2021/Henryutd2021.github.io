@@ -1,6 +1,5 @@
-// test_prairie_city.js — Node tests for Prairie City's shared data, assets/learn/data/prairie-city.json (wave W5, S3),
-// written by scripts/build_learn_prairie_city.py (ResearchPortfolio repository). Read by F9, F11, A13, A15, A18, SB3
-// (engine E3), M12, C3 and CK-A; pages read these numbers and never retype them.
+// test_prairie_city.js — Node tests for Prairie City's shared data, assets/learn/data/prairie-city.json (scale S3),
+// written by its data build step. Read by F9, F11, A13, A15, A18, SB3 (engine E3), M12, C3 and CK-A; pages read these numbers and never retype them.
 //   - internal consistency: shares sum to 1, day weights sum to 365, every array has 24 hours, the Sankey's every node
 //     balances, the carrier totals equal the balance table, burden = home energy spending / income per group, district
 //     sums equal the city's totals, the district-by-group table's rows and columns match
@@ -10,7 +9,7 @@
 //     lesson F3's curve), base load, EVs, the data-center campus, the industry, transport, prices, emission factors and the
 //     inventory; cross-file numbers read from f03, e0, e2, f08 and cf_targets, never retyped
 //   - scope: no nuclear term, no "SMR" acronym, no "AI"; hydrogen is "made in gas reformers"; every link on the allow-list
-//     (curriculum v2 §20.3); the README documents the data and the read-never-retype rule
+//     (the course's allowed destinations); the README documents the data and the read-never-retype rule
 // Usage (from the site folder):  node _tests/learn/test_prairie_city.js
 "use strict";
 const fs = require("fs");
@@ -33,7 +32,7 @@ const r = (x, n) => { const m = Math.pow(10, n); return Math.sign(x) * Math.floo
 // ---------------- the frame
 ok(D.about.line === "Prairie City is fictional; its numbers are illustrative.", "the fictional line, word for word");
 ok(D.dollarYear === 2025 && D.about.dollarYear === 2025, "2025 dollars");
-ok(/scripts\/build_learn_prairie_city\.py/.test(D.about.builtBy), "about names its builder");
+ok(/Prairie City data build step/.test(D.about.builtBy) && /test_prairie_city\.js/.test(D.about.builtBy), "about names its build step and its test");
 ok(RAW.length < 100 * 1024, "the file is under 100 KB (" + (RAW.length / 1024).toFixed(1) + " KB)");
 const DIST = D.districts.map(d => d.key);
 ok(JSON.stringify(DIST) === JSON.stringify(["core", "suburbs", "fringe"]), "three districts: dense core, suburbs, rural fringe");
@@ -63,12 +62,12 @@ ok(srcRefs.length > 15 && srcRefs.every(s => D.sources[s]), "every src names a s
     const h = new URL(u).hostname; ok(ALLOW.some(a => h === a || h.endsWith("." + a)), "link on the allow-list: " + u); });
 })(D);
 
-// ---------------- scope (curriculum v2 §20.4; guard G-DC)
+// ---------------- scope (the scope scan's deny-list; data centers appear as loads only)
 ok(!/nuclear|reactor|\bSMR\b|small modular/i.test(RAW), "no nuclear term and no 'SMR' acronym anywhere in the file");
 ok(!/\bAI\b|artificial intelligence/.test(RAW), "no 'AI'");
 ok(!/projects\/|research\.(html|qmd)|smr-dc/i.test(RAW), "no project page, no Research page");
 ok(/gas reformers/.test(D.industry.fertilizer.note) && /gas reformers/.test(D.flows.nodes.find(n => n.id === "h2").label), "hydrogen is 'made in gas reformers'");
-ok(/^A load only: its size, its shape over the day and the year, and its cooling\.$/.test(D.dataCenter.what) && DC_KEYS_OK(D.dataCenter), "the data-center campus is a load only: size, shape, cooling (guard G-DC)");
+ok(/^A load only: its size, its shape over the day and the year, and its cooling\.$/.test(D.dataCenter.what) && DC_KEYS_OK(D.dataCenter), "the data-center campus is a load only: size, shape, cooling");
 
 function DC_KEYS_OK(dc) {   // only size, shape, cooling and connection fields: no buyers, timing or technology
   return Object.keys(dc).every(k => ["what", "contractMW", "itMW", "itUtilization", "itDrawMW", "pue", "peakMW", "annualMWh", "averagePUE", "cooling",
@@ -288,7 +287,7 @@ ok(rel(D.inventory2025.sectors.datacenter, invEl("datacenter"), 1e-3), "inventor
 ok(rel(D.inventory2025.sectors.fertilizer, invEl("fertilizer") + invGas("fertilizer"), 1e-3), "inventory: fertilizer = electricity + gas (all carbon counted)");
 ok(rel(D.inventory2025.sectors.transport, invEl("transport") + TR.gasolineGal * E.kgCO2.gasolinePerGal / 1000 + (TR.buses.dieselGal + TR.trucksDieselGal) * E.kgCO2.dieselPerGal / 1000, 1e-3), "inventory: transport = EVs + gasoline + diesel");
 // rooftop solar used on site is not grid-supplied (GPC scope 2): its MWh come off homes' and businesses' electricity, in
-// proportion to their use (coordinator, 2026-11-06; engine E3 counts electricity bought, so the two agree)
+// proportion to their use (engine E3 counts electricity bought, so the two agree)
 const roofT = s => D.supply.rooftopMWh * B.sectors[s].el / (B.sectors.homes.el + B.sectors.commercial.el) * tPerMWh;
 ok(rel(D.inventory2025.sectors.homes, invEl("homes") - roofT("homes") + invGas("homes") + T.propaneGal * E.kgCO2.propanePerGal / 1000, 1e-3), "inventory: homes = grid electricity (less its rooftop share) + gas + propane");
 ok(rel(D.inventory2025.sectors.commercial, invEl("commercial") - roofT("commercial") + invGas("commercial"), 1e-3), "inventory: commercial = grid electricity (less its rooftop share) + gas");
@@ -299,7 +298,7 @@ ok(D.inventory2025.total === sum(Object.values(D.inventory2025.sectors)), "inven
 const README = fs.readFileSync(L("README.md"), "utf8");
 const sec = (README.split(/\n(?=## )/).find(s => /^## Prairie City data/.test(s)) || "");
 ok(sec.length > 0, "README has a 'Prairie City data' section");
-ok(/never retype/i.test(sec) && /build_learn_prairie_city\.py/.test(sec) && /test_prairie_city\.js/.test(sec), "README: read, never retype; the builder and the test named");
+ok(/never retype/i.test(sec) && /Prairie City data build step/.test(sec) && /test_prairie_city\.js/.test(sec), "README: read, never retype; the build step and the test named");
 ["F9", "A13", "A15", "A18", "SB3", "M12", "C3", "CK-A"].forEach(k => ok(new RegExp("\\b" + k + "\\b").test(sec), "README names reader " + k));
 Object.keys(D).forEach(k => ok(sec.includes("`" + k + "`"), "README documents the field `" + k + "`"));
 

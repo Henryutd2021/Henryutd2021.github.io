@@ -2,7 +2,7 @@
 // and learn/r03-system-and-method.qmd):
 //   - three briefs at three different scales, of three different question types; eight boundary cards each, in all three
 //     bins; exactly one "good" time step and horizon; a fit note for each of the nine method families
-//   - method pluralism (§11.2): the nine families of the curriculum's R3 row; every brief has at least two families that
+//   - method pluralism (method-neutral): the nine families of the curriculum's R3 row; every brief has at least two families that
 //     fit or help; the three example defences use three different families, and optimization is only one of them
 //   - each example defence is for a family that fits well, names a same-family alternative and another family, and has
 //     every part the reader's form asks for; the structure checks never pass an empty part and never ask for a word
@@ -11,7 +11,7 @@
 //   - the design card as fields (a defence with line breaks stays one value) and as text; the five scales are the question
 //     card's; the exemplars are well formed, the strong one reads the question as conditional planning and states a
 //     boundary, a limit and its mitigation (the rubric's Strong anchor for method fit, labelled as such)
-//   - review fixes of 2026-11-03: the boundary bins, the credits' assumption, the adequacy area, the islanding and pausing
+//   - the details: the boundary bins, the credits' assumption, the adequacy area, the islanding and pausing
 //     assumptions, family limits by variant, glossary marks at first use
 //   - the three no-JS blocks on the page equal the generated ones (write them with --write after a data edit)
 //   - text budget and the scope deny-list on the data, script and page
@@ -47,7 +47,7 @@ function ok(c, msg) { checks++; if (!c) { fails++; console.log("FAIL:", msg); } 
 // ---------------- briefs
 ok(M.check(D).length === 0, "data checks pass: " + M.check(D).join("; "));
 ok(D.briefs.length === 3 && new Set(D.briefs.map(b => b.scale)).size === 3 && new Set(D.briefs.map(b => b.type)).size === 3, "three briefs, three scales, three question types");
-ok(D.briefs.every(b => QC.TYPES.some(t => t.id === b.type)), "brief types are the five types of §11.2");
+ok(D.briefs.every(b => QC.TYPES.some(t => t.id === b.type)), "brief types are the course's five question types");
 ok(JSON.stringify(D.scales.map(s => s.id)) === JSON.stringify(QC.SCALES.map(s => s[0])), "the five scales are the question card's S0-S4");
 ok(D.briefs.every(b => b.scaleWhy.indexOf(b.scale + ":") === 0), "every scale note opens with the right scale");
 ok(D.briefs.every(b => b.boundary.every(c => c.why && c.text)), "every boundary card has a reason");
@@ -104,7 +104,7 @@ ok(/Scale and boundary: S4;/.test(good) && /left out/.test(good), "strong defenc
 ok(/standard tool/.test(weak) && !/Alternative/.test(weak), "weak defence: chosen by habit, no alternatives");
 ok(D.exemplars.lines === true && EX.plain(D.exemplars.answers[1]).split("\n").every(l => M.words(l) <= 35), "exemplars: one labelled part per line, each at most 35 words");
 ok(D.rubric.competences.map(c => c.id).join() === "framing,method" && D.rubric.competences.every(c => RB.COMPETENCES.some(x => x.id === c.id)), "rubric: framing and method fit, the course's ids");
-ok(/not a certificate/.test(D.rubric.note), "the narrow promise (§3.1)");
+ok(/not a certificate/.test(D.rubric.note), "the narrow promise (the course's promise)");
 
 // ---------------- page
 Object.keys(MARK).forEach(k => {
@@ -117,7 +117,7 @@ ok(/300 MW/.test(D.briefs.find(b => b.id === "flexload").question) && /the 300 M
 ok(/a time step and horizon/.test(PAGE.slice(PAGE.indexOf("<b>Done when:</b>"), PAGE.indexOf("<b>Done when:</b>") + 300)) && /R1 card/.test(D.rubric.competences[0].look), "done when: the time step and horizon too; the rest of Framing comes from the R1 card");
 ok(!("built_by" in D.meta), "the public data file carries no production note");
 
-// ---------------- review fixes (2026-11-03)
+// ---------------- the details, one by one
 ok(D.bins.map(b => b.label).join("|") === "Decided or computed|Fixed inputs|Left out" && /^in the study/.test(D.bins[1].sub) && /^outside/.test(D.bins[2].sub), "boundary bins: fixed inputs are inside the analysis, not 'from outside'");
 const BR = id => D.briefs.find(b => b.id === id), cardOf = (b, id) => b.boundary.find(c => c.id === id);
 ok(/Assumed to affect both groups alike/.test(cardOf(BR("rebate"), "b5").why) && !/removes them/.test(JSON.stringify(D)), "rebate: federal credits are assumed to affect both groups alike, not removed by the comparison");

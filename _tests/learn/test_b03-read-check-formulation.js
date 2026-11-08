@@ -138,7 +138,7 @@ const has = (s, msg) => ok(QMD.indexOf(s) >= 0, "page states " + (msg || JSON.st
     ok(near(S2.objective - S.objective, 80), `correct: +1 MWh at 18:00 adds $${S2.objective - S.objective}`);
     const inst3 = M.instance(town, year); inst3.d[17] += 1;
     ok(near(M.summarize(inst3, core.solveWith(highs, M.buildModel(inst3, null))).objective - S.objective, 0), "correct: +1 MWh at 17:00 adds $0 (spills less)");
-    // the signs are these inputs' signs, not a law (review 2026-11-02): two counterexamples with the same model
+    // the signs are these inputs' signs, not a law: two counterexamples with the same model
     { const a = M.instance(town, year); a.d[17] = 105; const b = M.instance(town, year); b.d[17] = 106;
       const Sa = M.summarize(a, core.solveWith(highs, M.buildModel(a, null))), Sb = M.summarize(b, core.solveWith(highs, M.buildModel(b, null)));
       ok(near(Sa.objective, 27900) && near(Sb.objective, 27760) && near(Sa.rows[0].dual, -140) && near(Sa.rows[0].nuc + Sa.rows[0].cc, 105), `counterexample: 17:00 demand of 105 MW (nuclear 100 + the plant's 5 MW floor): one more MWh saves $140, dual ${Sa.rows[0].dual}`); }

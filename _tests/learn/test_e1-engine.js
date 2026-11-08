@@ -1,5 +1,5 @@
 // test_e1-engine.js — Node tests for engine E1 (assets/learn/components/engine-e1.js, LX.E1) with the vendored HiGHS, the
-// solver core the pages run in a Web Worker (wave W3, 2026-11-03). What it checks:
+// solver core the pages run in a Web Worker. What it checks:
 //   - the data: the solar values are LX.townProfile's (monthlyCF) for the named 2025 hours, F7's method; the 20-22 January
 //     window; the tariff's flat-load average is EIA's 13.37¢; the loads total 1,200 kW; the seeded outages are fixed by
 //     their seed and fit their window
@@ -7,9 +7,9 @@
 //     and C1's schemas); a damaged link is refused
 //   - the models as built: hour-by-hour balances, the battery's charge, the fuel limit, whole sets and their 30%
 //     minimum in the check; the cost accounting (capital recovery, upkeep, bill) against the solver's objective
-//   - ties (W2 review finding 2): the totals the pages report (unserved kWh per load and priority, diesel, the bill)
+//   - ties: the totals the pages report (unserved kWh per load and priority, diesel, the bill)
 //     stay the same when the tie weights change; the hourly schedule is not claimed unique
-//   - no prices (§9.2): every MILP result has duals null and the engine never reads a dual
+//   - no prices from a MILP: every MILP result has duals null and the engine never reads a dual
 //   - sizing: optimal; the sized plan, rounded up, carries the must-stay-on loads in its check; rounding up never makes
 //     the check worse; an infeasible plan gets a hint
 //   - branch and bound on the sets: proven, with the same cost as HiGHS's MILP; a node whose LP fails (a time limit
@@ -19,12 +19,11 @@
 //     (HiGHS with a 1 ms limit) too; BenchRun.classify of each result offers Try again and never says optimal
 //   - the rolling horizon: a perfect forecast leaves the sized plan's must-stay-on loads served; yesterday's sun leaves
 //     them short; every real hour balances; the battery and the tank stay in bounds
-//   - the W3 review fixes (2026-11-03): normal-year unserved load reported and the saving not called one (SB1 1, C1 3);
-//     each outage's diesel priced on its own, outside the annual cost (SB1 8); end-of-hour labels across midnight and a
-//     month (SB1 13, M5 11); the outage weights as the page states them (SB1 7); realTime brings must-stay-on loads back
-//     before it charges (M5 1); the 12 average days against a full 8,760-hour year (SB1 5); the bench in a stub DOM:
-//     a sizing adopts its sizes onto the plan it was given and tells the other results (SB1 2), a change while it runs
-//     stops it and adopts nothing (SB1 3), and Stop cancels a run (SB1 9)
+//   - the details: normal-year unserved load reported and the saving not called one; each outage's diesel priced on its
+//     own, outside the annual cost; end-of-hour labels across midnight and a month; the outage weights as the page
+//     states them; realTime brings must-stay-on loads back before it charges; the 12 average days against a full
+//     8,760-hour year; the bench in a stub DOM: a sizing adopts its sizes onto the plan it was given and tells the other
+//     results, a change while it runs stops it and adopts nothing, and Stop cancels a run
 // Usage (from the site folder):  node _tests/learn/test_e1-engine.js
 "use strict";
 const fs = require("fs");
@@ -208,35 +207,35 @@ const SD = require("./stubdom.js");
   ok(rtOk, "rolling: every real hour balances, solar within the sun, sets within 30% to 100%, battery and tank within bounds");
   ok(near(E1.forecast(P, jan, 0, "persist")[10], cfg.sun.winter.kw[18 * 24 + 10]) && near(E1.forecast(P, jan, 24, "persist")[0], jan.sun[0]) && E1.forecast(P, jan, 0, "sunny").every(v => v <= 1), "forecasts: persistence uses the last full day; too sunny is capped at the panels' size");
 
-  // ---------------- the W3 review fixes
-  // end-of-hour labels (SB1 13, M5 11): the battery's charge after hour t is labelled t + 1, across midnight and a month
+  // ---------------- the details, one by one
+  // end-of-hour labels: the battery's charge after hour t is labelled t + 1, across midnight and a month
   ok(E1.hourEnd(jan, 0) === "20 Jan 01:00" && E1.hourEnd(jan, 23) === "21 Jan 00:00" && E1.hourEnd(jan, 71) === "23 Jan 00:00" && E1.hourEnd(P.scen.eve1, 7) === "21 Jan 00:00" &&
     E1.hourEnd({ first: "2025-01-01", start: 30 * 24 + 23 }, 0) === "1 Feb 00:00" && /\["Hour ending", "Battery charge", "Diesel left"\], rows: x\.hours\.map\(function \(h, i\) \{ return \[hourEnd\(x\.sc, h\.t\)/.test(SRC), "end-of-hour labels: 01:00 after the first hour, midnight and 31 January to 1 February roll over");
-  // normal-year unserved load (SB1 1, C1 3): no equipment and an 800 kW import limit
+  // normal-year unserved load: no equipment and an 800 kW import limit
   const shortPlan = Object.assign({}, def, { pv: 0, bat: 0, gen: 0, imp: 800, out: [] }), rsh = await E1.solve(shortPlan, P, { solver });
   const Rsh = rsh.results, nsh = E1.note(shortPlan, Rsh, P);
   ok(rsh.ok && Rsh.short && !Rsh.comparable && near(Rsh.year.unserved, 400 * 8760, 1) && nsh.results.some(r => r.label === "Unserved in a normal year on the grid" && r.value === "3,504,000 kWh") && !R7.short && R7.comparable,
     "a plan that leaves " + E1.kilo(Rsh.year.unserved) + " kWh unserved in a normal year is flagged, not comparable, and the note says so; F7's campus is comparable");
-  ok(/R\.comparable \? \["Saving on the grid-only bill"/.test(SRC) && /if \(R\.short\) H\("p", \{ class: "e1-short"/.test(SRC), "the bench shows the unserved kWh in place of a saving, and the results say why (SB1 1)");
-  // each outage's diesel, priced on its own (SB1 8, C1 6, M5 5)
+  ok(/R\.comparable \? \["Saving on the grid-only bill"/.test(SRC) && /if \(R\.short\) H\("p", \{ class: "e1-short"/.test(SRC), "the bench shows the unserved kWh in place of a saving, and the results say why");
+  // each outage's diesel, priced on its own
   const o0 = R7.outages[0], n7 = E1.note(f7, R7, P);
   ok(near(o0.fuelCost, o0.fuel * 3.66, 1e-9) && near(R7.total, R7.equipment.equipment + R7.year.bill, 1e-6) && E1.fuelMoney(o0.fuelCost) === "$2,470" &&
     n7.results[0].note === E1.costNote && /outage diesel not included/.test(E1.costNote) && n7.results.some(r => /gallons of diesel burned \(\$2,470 at \$3\.66 a gallon, not in the annual cost\)/.test(r.note || "")) &&
     n7.assumptions.some(a => /leaves out the diesel burned in an outage and refilling the tank; no outage frequency is assumed/.test(a)),
     "outage diesel: priced at $3.66 a gallon, shown per outage, kept out of the annual cost, and said so in the note");
-  // the outage weights, as the results state them (SB1 7)
+  // the outage weights, as the results state them
   ok(E1.PRIO_W.must / E1.PRIO_W.keep === 100 && E1.PRIO_W.keep / E1.PRIO_W.shed === 10 && E1.TIE.order === 0.005 && E1.TIE.time === 0.02 &&
     /a kWh of must stay on weighs 100 times one of keep if possible, which weighs 10 times one of shed first/.test(SRC) && /each step up the list \(hospital, water and heat, dorms, labs\) counts 0\.5% more and an earlier hour up to 2% more: a preference, not a strict order/.test(SRC) &&
     !/within one priority the list order decides/.test(SRC), "the results state the outage model's weights as built: 100 and 10 between priorities, 0.5% a step, up to 2% for earlier hours");
-  // realTime: spare power brings shed must-stay-on loads back before it charges the battery (M5 1)
+  // realTime: spare power brings shed must-stay-on loads back before it charges the battery
   const rt = E1.realTime(def, P, { u: 0, g: 0, x: [300, 0, 250, 550], sunReal: 1 }, { soc: 1000, fuel: 675 });
   ok(rt.hour.x[0] === 0 && near(rt.hour.c, 200, 1e-9) && rt.hour.x[2] === 250 && rt.hour.x[3] === 550, "realTime: 600 kW of sun, the plan shed the hospital: the hospital comes back first (0 kWh short), then 200 kW charge the battery");
-  // the 12 average days against a full 8,760-hour year (SB1 5): F7's campus the same, the sized plan 4% to 7% higher
+  // the 12 average days against a full 8,760-hour year: F7's campus the same, the sized plan 4% to 7% higher
   const fyF7 = X.fullYear(E1, P, def, solveSync), fyS = X.fullYear(E1, P, sz.results.plan, solveSync);
   const avF7 = E1.readYear(def, P, solveSync(E1.yearModel(def, P))).bill, avS = E1.readYear(sz.results.plan, P, solveSync(E1.yearModel(sz.results.plan, P))).bill;
   ok(fyF7.status === "optimal" && fyS.status === "optimal" && Math.abs(fyF7.bill / avF7 - 1) < 5e-4 && fyS.bill / avS - 1 >= 0.04 && fyS.bill / avS - 1 <= 0.07,
     "full year vs 12 average days: F7's campus " + E1.money(fyF7.bill) + " vs " + E1.money(avF7) + "; the sized plan " + E1.money(fyS.bill) + " vs " + E1.money(avS) + " (+" + ((fyS.bill / avS - 1) * 100).toFixed(1) + "%)");
-  // the bench in a stub DOM (SB1 2, 3, 9): solves wait until the test releases them, so a change can land mid-sizing
+  // the bench in a stub DOM: solves wait until the test releases them, so a change can land mid-sizing
   {
     const E = SD.env();
     if (!SD.El.prototype.insertBefore) SD.El.prototype.insertBefore = function (c, ref) { if (c.parentNode) c.parentNode.children = c.parentNode.children.filter(x => x !== c); c.parentNode = this; const i = ref ? this.children.indexOf(ref) : -1; if (i < 0) this.children.push(c); else this.children.splice(i, 0, c); this._html = null; return c; };
@@ -256,12 +255,12 @@ const SD = require("./stubdom.js");
       "Size it for me adopts the rounded sizes onto the plan it was given and tells the other results panels (onChange: " + told.length + "; SB1 2)");
     B.set({ pv: 600, bat: 2000, gen: 2 }); const before = told.length;
     B.size(); B.set({ pd: "must" });
-    ok(!B.run.running() && /Size it for me stopped: the plan changed while it ran/.test(B.run.status.textContent) && B.run.again.hidden && told.length === before + 1, "a change while the sizing runs stops it, hides Try again and says why (SB1 3)");
+    ok(!B.run.running() && /Size it for me stopped: the plan changed while it ran/.test(B.run.status.textContent) && B.run.again.hidden && told.length === before + 1, "a change while the sizing runs stops it, hides Try again and says why");
     await flush();
-    ok(B.plan().pv === 600 && B.plan().bat === 2000 && B.plan().pd === "must" && told.length === before + 1, "the stopped sizing adopts nothing: the reader's plan stays (SB1 3)");
+    ok(B.plan().pv === 600 && B.plan().bat === 2000 && B.plan().pd === "must" && told.length === before + 1, "the stopped sizing adopts nothing: the reader's plan stays");
     B.go(); ok(B.run.running() && !stopB.hidden, "a run shows Stop");
     stopB.click();
-    ok(!B.run.running() && stopB.hidden && B.run.status.textContent === "The run was stopped." && SD.active() === B.run.button, "Stop cancels the run, hides itself and gives the focus back to Run (SB1 9)");
+    ok(!B.run.running() && stopB.hidden && B.run.status.textContent === "The run was stopped." && SD.active() === B.run.button, "Stop cancels the run, hides itself and gives the focus back to Run");
     await flush();
   }
 

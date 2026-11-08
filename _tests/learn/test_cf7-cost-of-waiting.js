@@ -6,17 +6,17 @@
 //   - every number on the page (comparison table, assumptions, worked month, myth answers, Go deeper, numbers to
 //     remember) matches the model or the data file; the bars have a text version; the live status keeps one idea a line
 //   - the three no-JS blocks (timeline, toy, boundary) equal what the components write from the data (--write rewrites them)
-//   - scope (guard G-DC): data centers only as loads; no nuclear technology anywhere on the page, in the data or the script;
+//   - scope: data centers only as loads; no nuclear technology anywhere on the page, in the data or the script;
 //     no "AI"; delay economics only; the paper is "accepted", never "published"
-//   - research wording (curriculum §13, guard G-SRC): every sentence on the page, in the data file and in this lesson's
-//     script that describes the course author's study is an approved sentence of reports/learn/excerpts_for_approval.md
+//   - research wording (the course's sourcing rule): every sentence on the page, in the data file and in this lesson's
+//     script that describes the course author's study is an approved sentence of the excerpt wording
 //     (E7, with its "Revisions after review"), word for word; the citation is E7.14 (no title, DOI pending)
 //   - text budget of every text element, links
 // Usage (from the site folder):  node _tests/learn/test_cf7-cost-of-waiting.js [--write]
 "use strict";
 const fs = require("fs");
 const path = require("path");
-const cp = require("child_process");
+const PRIV = require("./private_sources.js");
 const ID = "cf7-cost-of-waiting";
 const SITE = path.resolve(__dirname, "..", "..");
 const L = p => path.join(SITE, "assets/learn", p);
@@ -102,14 +102,14 @@ D.facts.forEach(fc => {
 });
 ok(/on the order of \$0\.7 billion in present value/.test(T) && /about 176 TWh in 2023, about 4\.4%/.test(T), "facts agree with the excerpt and the timeline");
 
-// ---------------- scope: guard G-DC, no nuclear technology, no AI, approved sources only
+// ---------------- scope: data centers as loads only, no nuclear technology, no AI, approved sources only
 const ALL = PAGE + "\n" + RAW + "\n" + JS;
 ok(!/nuclear|reactor|\bSMR\b|small modular|fission|uranium/i.test(ALL), "no nuclear technology on the page, in the data or in the script");
 ok(!/\bAI\b|artificial intelligence/.test(ALL), "no 'AI' anywhere (the paper's published title is not quoted; see E7)");
 ok(!/data[- ]cent\w*[^.]{0,80}\b(supply|supplies|supplied|power plant|build|generat)/i.test(text(PAGE)), "data centers appear as loads, never as builders or buyers of supply");
 const keys = [...PAGE.matchAll(/data-source="([^"]+)"/g)].map(m => m[1]);
 ok(keys.length === 2 && keys.every(k => k === "excerpt:code"), "the only excerpt key is excerpt:code (findings, then limits)");
-// the page's own links (the generated header, next box and footer are build_learn.py's and checked by the scope scan)
+// the page's own links (the generated header, next box and footer are the course build step's and checked by the scope scan)
 const OWN = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?<!-- learn:\1:end -->/g, "");
 const hrefs = [...OWN.matchAll(/href="([^"]+)"/g)].map(m => m[1]);
 ok(hrefs.every(h => h === "https://github.com/Henryutd2021/code-delayed-energization" || /^https:\/\/www\.energy\.gov\//.test(h) || /^[0-9a-z-]+\.html$/.test(h) || /^#/.test(h)),
@@ -117,9 +117,9 @@ ok(hrefs.every(h => h === "https://github.com/Henryutd2021/code-delayed-energiza
 ok(!/projects\/|research\.html/.test(PAGE), "no project page and no Research page");
 ok(TL.validate(D.timeline.events).length === 0, "every timeline event has a valid date and a source");
 
-// ---------------- research wording (curriculum §13, guard G-SRC)
+// ---------------- research wording (the sourcing rule)
 // Every sentence that describes the course author's studies (question, method, data, findings, limits, citation) is (a) an
-// approved sentence of reports/learn/excerpts_for_approval.md (the sections in CF.sections) or (b) a revision listed under
+// approved sentence of the excerpt wording (the sections in CF.sections) or (b) a revision listed under
 // "Revisions after review", word for word. A page sentence may be a clause of an approved row only where the row itself breaks
 // (": ", "; ", ". "), as in "Inside: ..." or a boundary list item. Where it looks:
 //   strict (every text element, unless listed in NOT_RESEARCH): the case parts, the excerpts and their notes, the
@@ -129,11 +129,10 @@ ok(TL.validate(D.timeline.events).length === 0, "every timeline event has a vali
 //     generated header's description and course-map line included), every string of the data file, every string literal
 //     of this lesson's script
 // NOT_RESEARCH lists what may name a study without describing it: part labels, provenance labels, citation labels and
-// general ideas that hold in the toy; each entry has its reason. The register is read from the ResearchPortfolio folder
-// (LEARN_PORTFOLIO, the site's parent, or the parent of the site repository's main worktree); without it the test uses
-// APPROVED_SNAPSHOT below, which it otherwise checks against the register.
+// general ideas that hold in the toy; each entry has its reason. The approved wording is read through
+// private_sources.js; without it the test uses APPROVED_SNAPSHOT below, which it otherwise checks against that wording.
 const CF = { prefix: "cf7", sections: ["E7"], excerpts: 6, question: "E7.1", papers: 0 };
-const APPROVED_SNAPSHOT = {   // excerpts_for_approval.md, E7 with the revisions after review, 2026-11-03
+const APPROVED_SNAPSHOT = {   // the approved wording, E7 with the revisions after review
   "E7.1": "What does it cost when a large data center must wait for grid energization, and how does the delay affect the developer, electricity ratepayers and society?",
   "E7.2": "A late grid connection costs the developer lost margin and carrying costs; ratepayers face utility carrying and stranding costs; society bears external costs.",
   "E7.3": "The study keeps these present-value accounts separate.",
@@ -153,7 +152,7 @@ const APPROVED_SNAPSHOT = {   // excerpts_for_approval.md, E7 with the revisions
 const RX = /\b(stud(y|y's|ies)|paper|article|NAPS|Li et al|course author|excerpt|research|published|accepted|300 MW-IT|36-month|0\.7 billion|ledgers?|Latin hypercube|framework|exogenous|net-benefit test|staged (service|energization))\b/i;
 const NOT_RESEARCH = [
   [/^\d · [A-Z][a-z ,]+$/, "part label"],
-  [/^Question type: descriptive \(how much, and for whom\?\)\.$/, "course label (§11.2 question type)"],
+  [/^Question type: descriptive \(how much, and for whom\?\)\.$/, "course label (the course's question types)"],
   [/^(A large new load, such as a data center or a factory, is ready to run, but its grid service will not start for months\.|What does the wait cost, and who pays\?)$/, "the puzzle: a general idea; no study claim"],
   [/^Words first: energization is switching on grid service; the developer is the company building the facility; ratepayers are the utility's other customers\.$/, "general definitions"],
   [/^Approved excerpt of: Li et al\. \(2026\), accepted paper, 2026 North American Power Symposium \(NAPS\); DOI pending\.$/, "provenance label (E7.14's citation, short)"],
@@ -177,12 +176,7 @@ const NOT_RESEARCH = [
 ];
 const norm = s => String(s).replace(/\[\[[a-z0-9-]+\|([^\]]+)\]\]/g, "$1").replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/&#x27;|&#39;/g, "'")
   .replace(/&quot;/g, '"').replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/\s+/g, " ").replace(/ ([.,;:?!)])/g, "$1").replace(/\( /g, "(").trim();
-function portfolio() {
-  const c = [process.env.LEARN_PORTFOLIO, path.join(SITE, "..")];
-  try { c.push(path.resolve(SITE, cp.execSync("git rev-parse --git-common-dir", { cwd: SITE, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim(), "..", "..")); } catch (e) { /* not a git checkout */ }
-  return c.filter(Boolean).find(p => fs.existsSync(path.join(p, "reports/learn/excerpts_for_approval.md")));
-}
-// {id: sentence} of the register's rows in SECTIONS, each revision applied (a revised row replaces the approved one)
+// {id: sentence} of the approved wording's rows in SECTIONS, each revision applied (a revised row replaces the approved one)
 function register(md) {
   const out = {}; let sec = null;
   const strip = t => norm(t.replace(/^(Timeline, [^:]+|Myth answer|Citation): /, ""));
@@ -195,15 +189,15 @@ function register(md) {
   });
   return out;
 }
-const RP = portfolio();
+const RP = PRIV.path("excerpts");
 let APPROVED = APPROVED_SNAPSHOT;
 if (RP) {
-  const reg = register(fs.readFileSync(path.join(RP, "reports/learn/excerpts_for_approval.md"), "utf8"));
+  const reg = register(fs.readFileSync(RP, "utf8"));
   const same = (x, y) => Object.keys(x).length === Object.keys(y).length && Object.keys(x).every(k => x[k] === y[k]);
-  ok(same(reg, APPROVED_SNAPSHOT), "the approved-sentence snapshot in this test equals the register (" + CF.sections.join(", ") + ", revisions applied); differs at: " +
+  ok(same(reg, APPROVED_SNAPSHOT), "the approved-sentence snapshot in this test equals the approved wording (" + CF.sections.join(", ") + ", revisions applied); differs at: " +
     Object.keys(Object.assign({}, reg, APPROVED_SNAPSHOT)).filter(k => reg[k] !== APPROVED_SNAPSHOT[k]).join(", "));
   APPROVED = reg;
-} else console.log("note: reports/learn/excerpts_for_approval.md not found (set LEARN_PORTFOLIO); research wording checked against the snapshot in this test");
+} else console.log("note: the approved excerpt wording is not available (set LEARN_SOURCES); research wording checked against the snapshot in this test");
 const UNITS = Object.values(APPROVED).map(norm);
 function approved(seg) {
   const s = norm(seg);
@@ -239,7 +233,7 @@ strict("page, the case", elements(cut(/<div class="lx-case">[\s\S]*?\n<\/div>\n(
 strict("page, the case's data note", elements(cut(/<p class="lx-datanote"><span>Every result[\s\S]*?<\/p>/)));
 strict("page, explainer no-JS steps", elements(cut(/<ol class="ex-fallback[\s\S]*?<\/ol>/, true)));
 const SRC = cut(/<div class="lx-card lx-sources">[\s\S]*?<\/div>/);
-// a paper cited with its title and DOI is checked against publications.bib below; every other item is strict
+// a paper cited with its title and DOI is checked against the publication list below; every other item is strict
 const TITLED = /^<li>Li et al\. \((\d{4})\)\. <a href="(https:\/\/doi\.org\/[^"]+)">([^<]+)<\/a>\./;
 const SRC_LI = [...SRC.matchAll(/<li>[\s\S]*?<\/li>/g)].map(m => m[0]);
 strict("page, sources", SRC_LI.filter(li => !TITLED.test(li)).map(norm));
@@ -267,13 +261,13 @@ ok(bad.length === 0, "research wording: every sentence about the studies is appr
 const sentences = [...PAGE.matchAll(/<blockquote class="lx-excerpt"[^>]*>([\s\S]*?)<footer>/g)].flatMap(m => [...m[1].matchAll(/<p>([\s\S]*?)<\/p>/g)].map(x => norm(x[1])));
 ok(sentences.length === CF.excerpts && sentences.every(approved), CF.excerpts + " excerpt sentences, each approved (" + sentences.length + ")");
 ok(norm((PAGE.match(/<p class="lx-case-q">([\s\S]*?)<\/p>/) || [])[1] || "") === APPROVED[CF.question], "the question is " + CF.question + ", word for word");
-// citations: titles as in inputs/publications.bib
+// citations: titles as in the author's publication list
 if (RP) {
-  const bib = fs.readFileSync(path.join(RP, "inputs/publications.bib"), "utf8");
+  const bib = fs.readFileSync(PRIV.path("publications"), "utf8");
   const titles = [...bib.matchAll(/^\s*title\s*=\s*\{(.*)\},?\s*$/gm)].map(m => m[1].replace(/[{}]/g, "").replace(/\\textbf/g, "").toLowerCase());
   const cites = SRC_LI.map(li => li.match(TITLED)).filter(Boolean);
   ok(cites.length === CF.papers, CF.papers + " Li et al. paper(s) with a title in the sources list (" + cites.length + ")");
-  cites.forEach(c => ok(titles.indexOf(c[3].toLowerCase()) >= 0 && /^https:\/\/doi\.org\//.test(c[2]), "sources: '" + c[3].slice(0, 50) + "' is the title in publications.bib, with its DOI"));
+  cites.forEach(c => ok(titles.indexOf(c[3].toLowerCase()) >= 0 && /^https:\/\/doi\.org\//.test(c[2]), "sources: '" + c[3].slice(0, 50) + "' is the title in the publication list, with its DOI"));
 }
 
 // ---------------- text budget: every text element of the page's own prose stays short (one idea, about 35 words)

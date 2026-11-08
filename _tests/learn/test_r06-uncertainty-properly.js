@@ -10,9 +10,9 @@
 //     rounding step; the rank order of the inputs; the EVPI toy
 //   - the rewrite checks: the examples pass their own checks, an empty text passes none, the claim fails "no bare will";
 //     "about 9 in 10" and "about 8 in 10" in the examples are the runs' own shares
-//   - what the page says about its own assumptions (W4 review, 2026-11-05): the sampling rule (independent, equal odds) wherever
-//     it samples; illustrative ranges never given a data source; the flowchart samples only with odds; the plan counts a row
-//     only with the reader's own treatment; the checklist keeps scenario and bounded routes open
+//   - what the page says about its own assumptions: the sampling rule (independent, equal odds) wherever it samples;
+//     illustrative ranges never given a data source; the flowchart samples only with odds; the plan counts a row only
+//     with the reader's own treatment; the checklist keeps scenario and bounded routes open
 //   - the no-JS blocks equal the model's (--write rewrites them); text budget for every element, feedback and example line;
 //     links on allow-listed hosts; no out-of-scope words
 // Usage (from the site folder):  node _tests/learn/test_r06-uncertainty-properly.js [--write]
@@ -219,13 +219,13 @@ ok(/33 to 66%/.test(PAGE) && /42%/.test(PAGE), "sourced numbers on the page");
 ok(!/\[\[/.test(R.staticTask(D, M) + R.kindsHTML(D)), "no-JS blocks: glossary marks become term spans");
 ok(D.cards.every(c => R.staticTask(D, M).indexOf(R.rich(c.text).replace(/&amp;/g, "&amp;")) >= 0), "no-JS task: every card");
 ok(!/<dt>Which treatment\?<\/dt>/.test(PAGE) && PAGE.indexOf(R.flowHTML()) >= 0, "the flowchart's no-JS version is the generated question-action rows");
-// links, scope, Henry's research
+// links, scope, the course author's research
 const OWN = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?<!-- learn:\1:end -->/g, "");
 const urls = (OWN + JSON.stringify(D) + JS).match(/https?:\/\/[^\s"'<>)\\]+/g) || [];
 const allowed = /^https:\/\/([\w-]+\.)*(eia\.gov|doi\.org|ipcc\.ch)\//;
 ok(urls.every(u => allowed.test(u)), "every link on an allow-listed host: " + urls.filter(u => !allowed.test(u)).join(" "));
 ok(!/\bAI\b|artificial intelligence|nuclear|reactor|\bSMR\b|learning[- ](curve|rate)|data[- ]cent/i.test(JSON.stringify(D) + JS + OWN), "no deny-listed or out-of-scope words (and no data centers in this studio)");
-ok(!/Henryutd2021|CF7|cf7-|delay(ed)? energization|NAPS/i.test(JSON.stringify(D) + JS + OWN), "no Henry research: no repository, case file or paper of his");
+ok(!/Henryutd2021|CF7|cf7-|delay(ed)? energization|NAPS/i.test(JSON.stringify(D) + JS + OWN), "none of the course author's research: no repository, case file or paper");
 
 // ---------------- text budget
 const words = R.words;

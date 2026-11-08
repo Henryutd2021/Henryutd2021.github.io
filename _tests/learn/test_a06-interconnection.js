@@ -11,17 +11,17 @@
 //   - every number on the page (explain layer, Go deeper boxes, myths, quiz) and in the step cards' strings matches the
 //     model or the data file; the live lines are true and short for every input the controls allow
 //   - the four no-JS blocks equal what the model writes from the data (--write rewrites them)
-//   - scope (guards G-DC, G-SRC): data centers only as loads; no nuclear technology on the page, in the data or the script;
-//     no "AI"; links to learn pages, allowed domains and the allow-listed repository only; no project or Research page
-//   - research wording (curriculum §13): every sentence about the course author's study is an approved sentence of
-//     reports/learn/excerpts_for_approval.md (E7 with its revisions), word for word; the excerpt is E7.2, E7.3, E7.7, with
+//   - scope (data centers appear as loads only; the sourcing rule): no nuclear technology on the page, in the data or the
+//     script; no "AI"; links to learn pages, allowed domains and the allow-listed repository only; no project or Research page
+//   - research wording (the sourcing rule): every sentence about the course author's study is an approved sentence of
+//     the excerpt wording (E7 with its revisions), word for word; the excerpt is E7.2, E7.3, E7.7, with
 //     E7.8 under it and the citation E7.14 (no title, DOI pending)
 //   - text budget, sources with dates, the ladder's answers, path.yml
 // Usage (from the site folder):  node _tests/learn/test_a06-interconnection.js [--write]
 "use strict";
 const fs = require("fs");
 const path = require("path");
-const cp = require("child_process");
+const PRIV = require("./private_sources.js");
 const ID = "a06-interconnection";
 const SITE = path.resolve(__dirname, "..", "..");
 const L = p => path.join(SITE, "assets/learn", p);
@@ -185,7 +185,7 @@ const stepTexts = [...JS.matchAll(/\n      \{ text: "((?:[^"\\]|\\.)*)",\n      
 ok(stepTexts.length === 10, "ten step cards (" + stepTexts.length + ")");
 stepTexts.forEach(t => ok(t.split(" ").length <= 36 && nSent(t) <= 3, "step text of " + t.split(" ").length + " words, " + nSent(t) + " sentences: " + t.slice(0, 60)));
 
-// ---------------- the review's fixes (2026-11-05)
+// ---------------- wording checks over the slider's range
 for (let c = N.slider.min; c <= N.slider.max; c += N.slider.step) {
   const w0 = M.n1Words(N, c, false), w3 = M.n1Words(N, c, true);
   if (!(/Without new wires, up to 200 MW/.test(w0) && /With the third line, up to 550 MW/.test(w3) && !/Without new wires/.test(w3))) ok(false, "the N−1 verdict names the selected lines at " + c + " MW");
@@ -223,7 +223,7 @@ const rung = D.ladder.rungs.map(r => r.id).concat([D.ladder.off.id]);
 D.ladder.items.forEach(it => ok(it.answer.length && it.answer.every(a => rung.indexOf(a) >= 0) && it.note.split(" ").length <= 35, "ladder item '" + it.id + "': answers are rungs, note short"));
 ok(D.ladder.items.filter(it => it.id === "ercot")[0].note.indexOf("284.3 GW") >= 0 && D.ladder.items.filter(it => it.id === "ia")[0].text.indexOf("549 GW") >= 0, "ladder notes = the facts");
 
-// ---------------- scope: guards G-DC and G-SRC, no nuclear technology, no AI
+// ---------------- scope: data centers as loads only, the sourcing rule, no nuclear technology, no AI
 const ALL = PAGE + "\n" + RAW + "\n" + JS;
 ok(!/nuclear|reactor|\bSMR\b|small modular|fission|uranium/i.test(ALL), "no nuclear technology on the page, in the data or in the script");
 ok(!/\bAI\b|artificial intelligence/.test(ALL), "no 'AI' anywhere");
@@ -236,8 +236,8 @@ ok(hrefs.length > 5 && hrefs.every(h => ALLOWED.test(h) || /^[0-9a-z-]+\.html$/.
 ok(D.sources.concat(D.facts).every(x => !x.url || ALLOWED.test(x.url)), "data-file links: allowed domains only");
 ok(!/escholarship|aepohio|capitol\.texas/.test(ALL), "no links outside the allow-list");
 
-// ---------------- research wording (curriculum §13, guard G-SRC), as in CF7's and A4's tests
-const APPROVED_SNAPSHOT = {   // excerpts_for_approval.md, E7 with the revisions after review (2026-11-03)
+// ---------------- research wording (the sourcing rule), as in CF7's and A4's tests
+const APPROVED_SNAPSHOT = {   // the approved wording, E7 with its revisions
   "E7.1": "What does it cost when a large data center must wait for grid energization, and how does the delay affect the developer, electricity ratepayers and society?",
   "E7.2": "A late grid connection costs the developer lost margin and carrying costs; ratepayers face utility carrying and stranding costs; society bears external costs.",
   "E7.3": "The study keeps these present-value accounts separate.",
@@ -266,11 +266,6 @@ const NOT_RESEARCH = [
 ];
 const norm = s => String(s).replace(/\[\[[a-z0-9-]+\|([^\]]+)\]\]/g, "$1").replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/&#x27;|&#39;/g, "'")
   .replace(/&quot;/g, '"').replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/\s+/g, " ").replace(/ ([.,;:?!)])/g, "$1").replace(/\( /g, "(").trim();
-function portfolio() {
-  const c = [process.env.LEARN_PORTFOLIO, path.join(SITE, "..")];
-  try { c.push(path.resolve(SITE, cp.execSync("git rev-parse --git-common-dir", { cwd: SITE, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim(), "..", "..")); } catch (e) { /* not a git checkout */ }
-  return c.filter(Boolean).find(p => fs.existsSync(path.join(p, "reports/learn/excerpts_for_approval.md")));
-}
 function register(md) {
   const out = {}; let sec = null;
   const strip = t => norm(t.replace(/^(Timeline, [^:]+|Myth answer|Citation): /, ""));
@@ -283,14 +278,14 @@ function register(md) {
   });
   return out;
 }
-const RP = portfolio();
+const RP = PRIV.path("excerpts");
 let APPROVED = APPROVED_SNAPSHOT;
 if (RP) {
-  const reg = register(fs.readFileSync(path.join(RP, "reports/learn/excerpts_for_approval.md"), "utf8"));
+  const reg = register(fs.readFileSync(RP, "utf8"));
   const same = (x, y) => Object.keys(x).length === Object.keys(y).length && Object.keys(x).every(k => x[k] === y[k]);
-  ok(same(reg, APPROVED_SNAPSHOT), "the approved-sentence snapshot equals the register (E7, revisions applied); differs at: " + Object.keys(Object.assign({}, reg, APPROVED_SNAPSHOT)).filter(k => reg[k] !== APPROVED_SNAPSHOT[k]).join(", "));
+  ok(same(reg, APPROVED_SNAPSHOT), "the approved-sentence snapshot equals the approved wording (E7, revisions applied); differs at: " + Object.keys(Object.assign({}, reg, APPROVED_SNAPSHOT)).filter(k => reg[k] !== APPROVED_SNAPSHOT[k]).join(", "));
   APPROVED = reg;
-} else console.log("note: reports/learn/excerpts_for_approval.md not found (set LEARN_PORTFOLIO); research wording checked against the snapshot in this test");
+} else console.log("note: the approved excerpt wording is not available (set LEARN_SOURCES); research wording checked against the snapshot in this test");
 const UNITS = Object.values(APPROVED).map(norm);
 function approved(seg) {
   const s = norm(seg);

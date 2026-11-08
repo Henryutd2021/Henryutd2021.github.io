@@ -1,7 +1,8 @@
 // test_a20-national-scenarios.js — Node tests for lesson A20 (assets/learn/a20-national-scenarios.js, its data file and
 // learn/a20-national-scenarios.qmd):
 //   - the screening accounting from first principles: 2025 reproduces Prairieland's balance (CO2, electricity made,
-//     imports); the costs per MWh recomputed by hand; the sharing rule's ends; fixed costs the same in every year (G-COST)
+//     imports); the costs per MWh recomputed by hand; the sharing rule's ends; fixed costs the same in every year (costs are
+//     fixed ranges the learner sets; none changes with deployment)
 //   - the target-seeking solve: cumulative CO2 never rises with the carbon price (every demand case, fuel level, pace and
 //     cost level); at $300 every combination is saturated, so "not reachable on this page" is true for any price; the price
 //     found is the lowest whole dollar for every budget on the slider, with and without the two toggles
@@ -10,7 +11,7 @@
 //   - the page: the generated blocks equal the model's (--write rewrites them); every Prairieland number is read, never
 //     retyped; the fictional line; links on the allow-list; no nuclear term; no production wording in the shipped data
 //     file; text budget on every element, the practice set and the no-JS block included; the sidecar's terms
-//   - the cross-page note (W6 fix): this page's accounting meets Prairieland's default budget, and step 7 and the no-JS
+//   - the cross-page note: this page's accounting meets Prairieland's default budget, and step 7 and the no-JS
 //     block say why engine E4 (M13, SB4) does not; the reader's step 7 run is carried into step 8 and the explain layer
 // Usage (from the site folder):  node _tests/learn/test_a20-national-scenarios.js [--write]
 "use strict";
@@ -58,7 +59,7 @@ ok(near(Object.values(PL.carbon.accounting.linearWeights).reduce((a, b) => a + b
 // useful energy and electric shares match the balance
 M.prepare(PL, D) && Object.keys(P.sect).forEach(s => ok(near(P.sect[s].U, B.useful.bySector[s], 0.1), "useful energy of " + s));
 
-// ---------------- costs per MWh by hand; G-COST
+// ---------------- costs per MWh by hand; one fixed set of costs
 { const T = PL.costs.technologies, r = PL.periods.discount.def / 100, crf = n => r / (1 - Math.pow(1 + r, -n));
   const C = M.costs(P, X0, 0), lw = (1712 * 0 + T.wind.capex.def * crf(T.wind.life) + T.wind.fom) / (P.cfWind * 8.76) + T.wind.vom;
   ok(near(C.wind, lw) && near(C.firm, (T.firm.capex.def * crf(T.firm.life) + T.firm.fom) / (T.firm.availability * 8.76) + T.firm.vom), "full costs: wind and the firm plant by hand");
@@ -66,7 +67,7 @@ M.prepare(PL, D) && Object.keys(P.sect).forEach(s => ok(near(P.sect[s].U, B.usef
   ok(near(C.gas, (T.gasCC.capex.def * crf(T.gasCC.life) + T.gasCC.fom) / (D.rule.gasCF * 8.76) + T.gasCC.vom + 3.6 / T.gasCC.efficiency * (630 * PL.costs.fuels.gas.def + 420 * PL.costs.fuels.lng.def) / 1050), "new gas: capital, upkeep, fuel at the 2025 blend");
   ok(near(C.share, Math.max(0, Math.min(1, 0.5 + (C.gas - C.clean) / 40))), "the sharing rule at the defaults");
   // fixed costs: the same cost object serves every model year; levels stay inside Prairieland's ranges
-  ok(/var C = costs\(P, X, X\.price\), Y = \{\};\s*P\.years\.forEach\(function \(t\) \{ Y\[t\] = year\(P, X, t, C\); \}\);/.test(JS), "one set of costs for every year (G-COST)");
+  ok(/var C = costs\(P, X, X\.price\), Y = \{\};\s*P\.years\.forEach\(function \(t\) \{ Y\[t\] = year\(P, X, t, C\); \}\);/.test(JS), "one set of costs for every year (fixed costs, none changes with deployment)");
   D.scenarios.forEach(s => M.CLEAN_TECH.forEach(k => { const v = T[k].capex[s.costs[k]]; ok(v >= T[k].capex.lo && v <= T[k].capex.hi, s.key + ": " + k + " inside its range"); }));
   D.scenarios.forEach(s => ["gas", "lng"].forEach(k => ok(["lo", "def", "hi"].indexOf(s.fuel[k]) >= 0, s.key + ": fuel level " + k)));
   ok(T.firm.label === "Firm clean plant (generic)" && !/learning|first[- ]of|nth[- ]of|FOAK|NOAK/i.test(JS + RAW + OWN), "the generic firm option; no learning or first-of-a-kind wording");
@@ -155,11 +156,11 @@ const hrefs = [...OWN.matchAll(/href="([^"]+)"/g)].map(m => m[1].replace(/&amp;/
 const okHref = h => /^https:\/\/(www\.iea\.org|www\.eia\.gov|www\.ipcc\.ch|doi\.org)\//.test(h) || /^[0-9a-z-]+\.html(#[a-z-]+)?$/.test(h) || /^#/.test(h);
 ok(hrefs.every(okHref), "links: IEA, EIA, IPCC, doi.org and learn pages (" + hrefs.filter(h => !okHref(h)).join(", ") + ")");
 ok(Object.values(D.sources).every(s => /^https:\/\/(www\.iea\.org|www\.eia\.gov|doi\.org)\//.test(s.url)), "the data file's sources are allow-listed");
-ok(/a01-project-tea\.html/.test(OWN) && /13-capstone\.html/.test(OWN) && /m13-national-pathway\.html/.test(OWN) && /sb4-pathway-explorer\.html/.test(OWN) && !/\(upcoming\)/.test(OWN), "links back to A1 and lesson 13; M13 and SB4 linked now they are live (W6 integration)");
+ok(/a01-project-tea\.html/.test(OWN) && /13-capstone\.html/.test(OWN) && /m13-national-pathway\.html/.test(OWN) && /sb4-pathway-explorer\.html/.test(OWN) && !/\(upcoming\)/.test(OWN), "links back to A1 and lesson 13; M13 and SB4 linked now they are live");
 ok(/not a forecast/.test(JS) && /assigns none, so its results do not tell us which scenario is more likely/.test(PAGE) && /assigns none, so it cannot say which scenario is more likely/.test(JS) && !/no scenario here is more likely/i.test(JS + PAGE), "no scenario is called a forecast; no probabilities are assigned, so none is called more or less likely");
 ok(!/later date/.test(JS) && /within 2026–2050/.test(M.targetSaw(P, M.scenario(P, "budget", { budget: P.budget.lo }))), "an unreachable budget is met only by cuts within its years; changing them changes the question");
 
-// ---------------- the practice set balances (W4 finding 6, W5 finding 6)
+// ---------------- the practice set balances
 { const Pr = M.practice(P), num = s => Number(s.replace(/,/g, "")); ok((Pr.match(/<li>/g) || []).length === 6, "six worked exercises");
   const m1 = Pr.match(/(0\.\d\d) × ([\d.]+) \+ (0\.\d\d) × ([\d.]+) \+ (0\.\d\d) × ([\d.]+) \+ ([\d.]+) = \$([\d.]+) per MWh/);
   ok(m1 && near(num(m1[1]) * num(m1[2]) + num(m1[3]) * num(m1[4]) + num(m1[5]) * num(m1[6]) + num(m1[7]), num(m1[8]), 0.005), "exercise 1 balances as displayed");
@@ -171,15 +172,15 @@ ok(!/later date/.test(JS) && /within 2026–2050/.test(M.targetSaw(P, M.scenario
   ok(m4 && near(m4[1].split(" + ").reduce((s, t) => { const q = t.split(" × "); return s + num(q[0]) * num(q[1]); }, 0), num(m4[2]), 1), "exercise 4 balances as displayed");
   const m5 = Pr.match(/fuel adds ([\d.]+) − ([\d.]+) = \+([\d.]+) Mt; fuel first, ([\d.]+) − ([\d.]+) = \+([\d.]+) Mt\. Averaged over the two orders: \(([\d.]+) \+ ([\d.]+)\) ÷ 2 = ([\d.]+) Mt/);
   ok(m5 && near(num(m5[1]) - num(m5[2]), num(m5[3]), 0.05) && near(num(m5[4]) - num(m5[5]), num(m5[6]), 0.05) && near((num(m5[7]) + num(m5[8])) / 2, num(m5[9]), 0.005), "exercise 5 balances as displayed");
-  // the givens sit in tables (W6 finding: one short question per item, the numbers beside it)
+  // the givens sit in tables: one short question per item, the numbers beside it
   const items = [...Pr.matchAll(/<li><p><b>[^<]+<\/b> ([\s\S]*?)<\/p>([\s\S]*?)<details/g)];
   ok(items.length === 6 && items.slice(0, 5).every(x => /<table class="lx-mini-table a20-given">/.test(x[2])) && items.every(x => (x[1].match(/\?/g) || []).length === 1), "each exercise asks one question; the first five give their numbers in a table");
   // the givens tables show the numbers the answers use
   ok(/<th scope="row">Wind<\/th><td>\$[\d.]+ per MWh; weight 55%<\/td>/.test(Pr) && /Half-width, the cost gap at which all or none is clean<\/th><td>\$20 per MWh/.test(Pr) && /<th scope="row">2050<\/th><td>[\d.]+ Mt; weight 3<\/td>/.test(Pr), "the givens tables carry the costs, the half-width and the weights"); }
 
 const lines0 = [];   // lines checked against the text budget below
-// ---------------- the cross-page card: this page meets the default budget; E4 (M13, SB4) cannot (w6_fix_brief §1a, as
-// corrected by the coordinator on 2026-11-07): the cause is the timing of electrification, not build-rate or transmission
+// ---------------- the cross-page card: this page meets the default budget; E4 (M13, SB4) cannot: the cause is the
+// timing of electrification, not build-rate or transmission
 { const Rb = M.scenario(P, "budget"), n = M.gapNote(P), nh = M.gapNote(P, true), def = M.fmtN(PL.carbon.budget.def, 0) + " Mt";
   const E4 = JSON.parse(fs.readFileSync(L("data/e4-pathways.json"), "utf8")), fl = D.pathwayModel.floorMt, y = P.years[1];
   ok(Rb.target.ok && Rb.cum <= PL.carbon.budget.def, "this accounting meets Prairieland's default budget (" + def + ")");
@@ -216,7 +217,7 @@ stepTexts.forEach((t, i) => { const n = nWords(t); ok(n >= 18 && n <= 36, "step 
     .concat(Object.values(M.PREDICT.feedback), M.ruleNotes(P), M.budgetNotes(P));
   D.pairs.forEach(pr => OUTS.forEach(o => lines.push(M.aloneLine(P, pr.a, pr.b, o), M.aloneSaw(P, pr.a, pr.b, o), M.orderSaw(P, pr.a, pr.b, o), M.orderLine(P, pr.a, pr.b, o, "fwd"))));
   lines.forEach(t => { ok(nWords(t) <= 36, "a line of " + nWords(t) + " words: " + plain(t).slice(0, 60)); ok(nSent(t) <= 2, "a line of " + nSent(t) + " sentences: " + plain(t).slice(0, 60)); }); }
-// every element of the page, the no-JS block and the practice set included (W6 finding: they were left out)
+// every element of the page, the no-JS block and the practice set included
 const PROSE = OWN.replace(/<div class="lx-card lx-sources">[\s\S]*?<\/div>/, " ").replace(/^---[\s\S]*?\n---\n/, " ")
   .replace(/<script[\s\S]*?<\/script>/g, " ").replace(/<style[\s\S]*?<\/style>/g, " ").replace(/<!--[\s\S]*?-->/g, " ").replace(/^- (.*)$/gm, "<li>$1</li>");
 PROSE.replace(/^\|(.*)\|$/gm, (m, row) => "<tr>" + row.split("|").map(c => "<td>" + c + "</td>").join("") + "</tr>").split(/<\/?(?:p|li|dd|dt|td|th|summary|br|caption)\b[^>]*>/).map(plain).filter(x => /[A-Za-z]/.test(x) && !/^[:{]/.test(x)).forEach(x => {

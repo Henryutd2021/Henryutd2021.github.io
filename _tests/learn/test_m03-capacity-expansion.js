@@ -11,7 +11,7 @@
 //   - every number the page states: the fallback table, Go deeper, myths and quiz, the step cards' fixed text, the
 //     notebook's reference to the same data, the sidecar's glossary terms; scope of the data and script strings, and the
 //     stricter nuclear-and-cost sentence check over the page, steps, sidecar and notebook
-//   - the W2 review's points as fixed (2026-11-03): storage net changes, the spending boundary and the penalty it leaves
+//   - the details: storage net changes, the spending boundary and the penalty it leaves
 //     out, the quiz's reversed comparison, CO2 against the cap, the notebook's units and own-plan checks, domains, the
 //     symbol key and glossary marks, step text length, LOLE and its source, price years, labels
 //   - the page itself on a stub document (stubdom.js) with a solver that fails, then works: steps 3, 6, 8 and 9 show a
@@ -88,7 +88,7 @@ const r1 = (v, d) => Math.round(v * 10 ** d) / 10 ** d;
   const R = D.reference;
   ok(R && R.sets && R.full && R.storage, "the data file has a reference block (run with --write once)");
 
-  // ---------------- the promoted pieces: M3 calls the engine's link, readCheck and errors and the library's week strip
+  // ---------------- the shared pieces: M3 calls the engine's link, readCheck and errors and the library's week strip
   ok(M.link === TP.link && M.readCheck === TP.readCheck && M.errors === TP.errors && M.yearPeriods === TP.yearPeriods, "M3 lists the engine's link, readCheck, errors and yearPeriods (the same functions)");
   ok(!/function (link|readCheck|errors|yearPeriods|WeekStrip|repColor|repLetter)\(/.test(JS) && /LX\.WeekStrip\(/.test(JS) && !/m3-(strip|grid|cell|keys)/.test(JS), "M3 keeps no copy of them or of the strip and its styles");
 
@@ -99,7 +99,7 @@ const r1 = (v, d) => Math.round(v * 10 ** d) / 10 ** d;
   ok(near(mean(Y2.wind), T.targets.wind.cf, 1e-6) && near(mean(Y2.solar), T.targets.solar.cf, 1e-6), "2024 wind and solar at the same capacity factors (33.8%, 24.0%)");
   const peak24 = Math.max(...Y2.demand);
   ok(peak24 > Y.peak, `2024's peak at equal energy (${peak24.toFixed(1)} MW) is above 2025's 450 MW`);
-  ok(/build_learn_m03_weather_year\.py/.test(Y2raw.meta.built_by) && Y2raw.meta.files.length === 2 && /eia\.gov/.test(Y2raw.meta.source_url), "2024 data: builder script, two EIA-930 files with checksums, source URL");
+  ok(/weather-year data build step/.test(Y2raw.meta.built_by) && Y2raw.meta.files.length === 2 && /eia\.gov/.test(Y2raw.meta.source_url), "2024 data: its build step, two EIA-930 files with checksums, source URL");
   const C = S.C;
   ok(near(S.Cw.techs.be.fixed, 1000 * D.storage.energyCapex * (TP.crf(0.04, 15) + 0.04), 1e-6) && near(S.Cw.techs.bp.fixed, C.techs.bp.fixed, 1e-9), "what-if: only the storage energy cost changes");
 
@@ -238,7 +238,7 @@ const r1 = (v, d) => Math.round(v * 10 ** d) / 10 ** d;
   PAGE.split(/\n/).forEach(s => strs.push(s));
   const bad = []; strs.forEach(s => s.split(/(?<=[.;:!?])\s+/).forEach(x => { if (NUC.test(x) && RISK.test(x.replace(/merit[- ]order|in order to|orders? of magnitude/gi, ""))) bad.push(x.slice(0, 120)); }));
   ok(!bad.length, "no sentence pairs nuclear with a risk term: " + bad.join(" | "));
-  // the review's stricter check (finding 4): no prose sentence pairs a nuclear term with plain cost words, in the page
+  // a stricter check: no prose sentence pairs a nuclear term with plain cost words, in the page
   // (outside its generated blocks), the step strings, the sidecar and the notebook too
   const COSTW = /\bcosts?\b|\$|\bprices?\b|cheap|expensive|O&M|\bfuel\b|capital/i;
   const prose = [PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1:end -->/g, ""), SIDE,
@@ -246,7 +246,7 @@ const r1 = (v, d) => Math.round(v * 10 ** d) / 10 ** d;
   const strict = []; prose.forEach(s => s.split(/(?<=[.;:!?|])\s+|\n/).forEach(x => { if (NUC.test(x) && COSTW.test(x)) strict.push(x.slice(0, 120)); }));
   ok(!strict.length, "no prose sentence pairs nuclear with a cost word (page, steps, sidecar, notebook): " + strict.join(" | "));
 
-  // ---------------- the review's other points, as fixed (W2 fix, 2026-11-03)
+  // ---------------- other details
   const NBtext = JSON.parse(NB).cells.map(c => c.source.join("")).join("\n");
   // 1: linked and cyclic estimates are close, yet the linked battery moves energy between weeks (the page says so and shows it)
   const netL = M.netChanges(sol.linked, RWs), netC = M.netChanges(sol.cyclic, RWs), gapLC = (SR.cyclic.cost - SR.linked.cost) / SR.linked.cost;
@@ -284,7 +284,7 @@ const r1 = (v, d) => Math.round(v * 10 ** d) / 10 ** d;
   // 12: LOLE defined, with a dated primary source
   onPage("https://www.pjm.com/-/media/DotCom/documents/manuals/m20a.pdf", "the PJM Manual 20A link"); onPage("§1.2–1.3 (rev. 3, effective 24 June 2026)", "the LOLE source's sections and date");
   ok(!/one day of (outage|shortage) in ten years|one-day-in-ten-years/.test(PAGE + JS + SIDE + NBtext) && /id: lole\b/.test(SIDE), "no undefined one-day-in-ten shorthand; the sidecar defines LOLE");
-  // 13: one price year stated (W4 carry-over), with the deflator's ratio from lesson 13's data
+  // 13: one price year stated, with the deflator's ratio from lesson 13's data
   const batShare = (C.techs.bp.fixed * S7.wk7.plan.bp + C.techs.be.fixed * S7.wk7.plan.be) / S7.wk7.cost;
   ok(batShare < 0.01, `the battery is under 1% of the seven-week plan's yearly cost (${(batShare * 100).toFixed(2)}%)`);
   const PF = cfg.deflator.index[String(cfg.priceYear)] / cfg.deflator.index[String(cfg.techs.battery.source.dollarYear)];
@@ -293,7 +293,7 @@ const r1 = (v, d) => Math.round(v * 10 ** d) / 10 ** d;
   // 14, 15: labels
   ok(JS.includes('"2025 full-year-optimal plan, run on 2024"') && !JS.includes('"Full-year optimum, 2024"') && !JS.includes("Bigger LPs estimate better"), "step 9's label names the plan; the size caption no longer claims bigger is better");
 
-  // ---------------- the page on a stub document: solves that fail (finding 3)
+  // ---------------- the page on a stub document: solves that fail
   // The lesson's own page code runs against _tests/learn/stubdom.js with the real step cards, prediction, status line and
   // week strip, and a solver that first fails (a time limit) and then solves with the vendored HiGHS. Each step must say
   // so, clear its busy state, offer "Try again", keep what is solved, and work on the retry.

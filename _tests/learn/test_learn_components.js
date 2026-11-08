@@ -25,16 +25,16 @@ const depth = css.replace(/\/\*[\s\S]*?\*\//g, "").split("").reduce((d, ch) => d
 ok(depth === 0, "learn.css: braces balance");
 ["Scene", "Meters", "Slider", "DayChart", "Missions", "Stars", "Notes", "Coach", "StepCards", "Predict", "Guess", "ConceptMap", "Flowchart",
  "CompareTable", "CausalChain", "EnergyChain", "Metro", "metroLayout", "rich", "mount", "solver", "SolverStatus", "townProfile", "cfScale",
- // promoted at the W1 merge (2026-11-02)
+ // the shared chart, card and formulation components
  "demo", "demoState", "Plot", "PlotCard", "Scatter", "PriceChart", "HourPicker", "Tornado", "CostSplit", "SupplyStack", "Frontier", "Steelman",
  "Boundary", "Share", "copyText", "LPPlane", "lp2", "CardSort", "LinkedViews", "Toggle", "EquationCard", "FormulateBox", "Formulation",
  "Network", "Checklist", "EvidenceLadder", "PhraseTagger", "UnitChain", "EvidenceClock", "Checkpoint", "Sheet", "Practice",
- // added in wave W2 (2026-11-03)
+ // the studio and case-file components, the planning engine
  "Exemplars", "Rubric", "QuestionCard", "Timeline", "townPlan",
- // promoted at the W2 integration (2026-11-03)
+ // shared by two or more lessons: lesson links, the scale strip, stakeholders, the week strip, the toolbox's answer box and drill
  "lessonRef", "lessonRefHTML", "ScaleStrip", "Stakeholders", "StakeholderMap", "WeekStrip", "NumAnswer", "Drill"].forEach(n => ok(js.indexOf("LX." + n + " = ") >= 0, `bundle defines LX.${n}`));
 
-// ---------------- no lesson defines its own copy of a shared component (W1 merge)
+// ---------------- no lesson defines its own copy of a shared component
 const lessonJs = fs.readdirSync(L(".")).filter(f => /^[0-9a-z-]+\.js$/.test(f) && f !== "learn.js");
 const copies = /\bfunction (plot|LineChart|Scatter|StackChart|FrontierChart|Steelman|Boundary|JobSorter|Plane|EquationCard|Formulation|Network|PriceChart|HourPicker|Practice|Slider|Stakeholders|StakeholderMap|ScaleStrip|WeekStrip|readCheck|refHTML)\s*\(|W1F\.(LPPlot|Views|CardSort|Ctl|Toggle|EquationCard|FormulateBox)\s*=|LX\.Checklist\s*=/;
 lessonJs.forEach(f => {
@@ -44,11 +44,11 @@ lessonJs.forEach(f => {
   ok(!bad.length, `${f}: no lesson-local copy of a shared component${bad.length ? " (" + bad.join(", ") + ")" : ""}`);
 });
 
-// ---------------- the course map's layout: _tests/learn/test_metro_layout.js (map v2, every lesson a station)
+// ---------------- the course map's layout: _tests/learn/test_metro_layout.js (every lesson a station)
 const pathJson = JSON.parse(fs.readFileSync(L("data/path.json"), "utf8"));
-// off-path lessons: every live one has a page; every W1 module of curriculum v2 is on the map with its code
+// off-path lessons: every live one has a page; the first off-path modules (N1, CK-F, B1-B3, M1) are on the map with their codes
 (pathJson.more || []).filter(m => m.ready).forEach(m => ok(fs.existsSync(path.join(SITE, "learn", m.href.replace(/\.html$/, ".qmd"))), `path.json: ${m.code || m.title} page exists`));
-["N1", "CK-F", "B1", "B2", "B3", "M1"].forEach(c => ok(pathJson.more.some(m => m.code === c && m.id), `path.json: W1 module ${c} is listed with an id`));
+["N1", "CK-F", "B1", "B2", "B3", "M1"].forEach(c => ok(pathJson.more.some(m => m.code === c && m.id), `path.json: module ${c} is listed with an id`));
 ["K4", "K7"].forEach(c => ok(pathJson.toolbox.some(t => t.code === c && t.id), `path.json: toolbox ${c} is listed with an id`));
 const pathYml = fs.readFileSync(path.join(SITE, "learn/path.yml"), "utf8");
 ok(/id: 00-grid-operator[\s\S]*?status: active/.test(pathYml), "path.yml: lesson 0 stays active");

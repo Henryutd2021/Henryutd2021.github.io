@@ -3,21 +3,22 @@
 //   - the no-JS blocks: the plan's table (C1's schema defaults), the default plan's precomputed results (`precomputed.c1`
 //     in the data file, equal to a fresh run), the note's outline (LX.ReportNote.outlineHTML of the page's fields), the
 //     exemplars (LX.Exemplars.staticHTML) and the rubric (LX.Rubric.staticHTML)
-//   - the research text: every excerpt sentence is an approved register row, word for word (E8.2 and its E8.7 note,
+//   - the research text: every excerpt sentence is an approved row, word for word (E8.2 and its E8.7 note,
 //     E9.1-E9.3); E9 carries no citation and no link; E8's footer cites the AMM paper by DOI
 //   - the strong exemplar quotes the engine's numbers for the plan Size it for me gives from the defaults, and the
 //     owners' comparison; the owners' words follow from their numbers; the sensitivity line from the run
 //   - the brief: the decision, Hand in, From, Done when, the time (90 minutes as 35 + 35 + 20); the capstone's sections
-//   - the W3 review fixes: the brief's critical loads reported whatever their priorities (C1 2); each owner's row prices
-//     the rounded plan it shows (C1 4); no claim of heated dorms (C1 5); the cost's boundary and the storm's diesel in
-//     the note (C1 6); the strong note is a complete short note (C1 7); the rubric's communication line (C1 1); the
-//     notebook step names section 8 (C1 10); the no-JS route is a reading exercise with the sized plan's numbers (C1 12)
+//   - details: the brief's critical loads reported whatever their priorities; each owner's row prices the rounded plan
+//     it shows; no claim of heated dorms; the cost's boundary and the storm's diesel in the note; the strong note is a
+//     complete short note; the rubric's communication line; the notebook step names section 8; the no-JS route is a
+//     reading exercise with the sized plan's numbers
 // --write: recomputes `precomputed.c1` and writes the five marker blocks.
 // Usage (from the site folder):  node _tests/learn/test_c1-keep-the-campus-running.js [--write]
 "use strict";
 const fs = require("fs");
 const path = require("path");
 const X = require("./e1_harness.js");
+const PRIV = require("./private_sources.js");
 let checks = 0, fails = 0;
 function ok(c, msg) { checks++; if (!c) { fails++; console.log("FAIL:", msg); } }
 const QPATH = path.join(X.SITE, "learn/c1-keep-the-campus-running.qmd"), DPATH = X.L("data/e1-prairie-campus.json");
@@ -75,14 +76,14 @@ const APPROVED_SNAPSHOT = {
   Object.keys(BLOCKS).forEach(k => { const r = X.between(PAGE, k); ok(r && r.text === BLOCKS[k]() + "\n", k + " block is up to date (run with --write)"); });
   ok(!EX.validate(exo).length, "the exemplars are well formed");
 
-  // ---------------- the research text against the register
-  const RP = X.portfolio(); let APP = APPROVED_SNAPSHOT;
+  // ---------------- the research text against the approved wording
+  const RP = PRIV.path("excerpts"); let APP = APPROVED_SNAPSHOT;
   if (RP) {
-    const reg = X.register(fs.readFileSync(path.join(RP, "reports/learn/excerpts_for_approval.md"), "utf8"), ["E8", "E9"]);
+    const reg = X.register(fs.readFileSync(RP, "utf8"), ["E8", "E9"]);
     const diff = Object.keys(APPROVED_SNAPSHOT).filter(k => reg[k] !== X.norm(APPROVED_SNAPSHOT[k]));
-    ok(!diff.length, "the snapshot of E8.2, E8.7, E9.1-E9.3 equals the register; differs at: " + diff.join(", "));
+    ok(!diff.length, "the snapshot of E8.2, E8.7, E9.1-E9.3 equals the approved wording; differs at: " + diff.join(", "));
     APP = {}; Object.keys(APPROVED_SNAPSHOT).forEach(k => { APP[k] = reg[k]; });
-  } else console.log("note: the register was not found (set LEARN_PORTFOLIO); checked against the snapshot");
+  } else console.log("note: the approved excerpt wording is not available (set LEARN_SOURCES); checked against the snapshot");
   const ex = X.excerpts(PAGE), all = ex.flatMap(e => e.sentences.map(s => ({ s, src: e.source })));
   const want = { "excerpt:supply-chain-mg": ["E8.2", "E8.7"], "excerpt:campus-resilience-question": ["E9.1", "E9.2", "E9.3"] };
   Object.keys(want).forEach(src => {
@@ -129,7 +130,7 @@ const APPROVED_SNAPSHOT = {
   ["keeps electricity flowing to the county hospital, its water and heating plant and the dorms through a three-day winter storm, within the host feeder's limits", "Hand in:", "Done when:", "About 90 minutes: 35 to build and run the plan, 35 to write the note, 20 to check it."].forEach(s => ok(T.indexOf(s) >= 0, "brief: " + s));
   ok(T.indexOf("Assume that powering these loads keeps their heating equipment working: heat demand and indoor temperature are not modeled.") >= 0 && !/\bheated\b/.test(T + JS), "no claim that the model keeps anything heated; the assumption is stated (C1 5)");
   ok(/self-check reaches Proficient on every competence\./.test(T) && /one-page note with the plan link/.test(C.RUBRIC[3].levels.proficient) && C.RUBRIC_BAR === "the bar for this note" && !/full paper/.test(C.RUBRIC[3].look),
-    "Done when asks for Proficient everywhere; Communication's Proficient is C1's one-page note, in its own words (C1 1; W3 shared fix 7)");
+    "Done when asks for Proficient everywhere; Communication's Proficient is C1's one-page note, in its own words");
   ok(/section 8, “Your plan”: the cell that starts <code>MY = <\/code>/.test(PAGE), "the Modeler steps name the notebook's section 8 (C1 10)");
   ok(T.indexOf("the capstone becomes a reading exercise: write the note on the sized plan") >= 0, "the no-JS route: a reading exercise on the sized plan (C1 12)");
   ok(T.indexOf("not measured campus output") >= 0 && !/real (hourly )?sun|SPP's real/.test(T), "solar: a teaching profile, not real campus sun (C1 13)");

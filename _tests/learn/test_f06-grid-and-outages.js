@@ -73,7 +73,7 @@ const R = Object.fromEntries(rows.map(r => [r.year, r]));
   const L = D.losses, P = L.P_MW, Rw = L.R_ohm;
   const at = kv => M.loss(P, kv, Rw);
   // a balanced three-phase line: current in each wire I = P / (√3 V) with V between two wires; loss in the three wires 3 I² R,
-  // which equals the one-wire P² R / V², so the shares lost do not depend on the phase count (review F6 #4)
+  // which equals the one-wire P² R / V², so the shares lost do not depend on the phase count
   L.classes_kV.forEach(kv => { const x = at(kv); ok(near(x.I, P * 1e6 / (Math.sqrt(3) * kv * 1e3)) && near(x.lossMW, 3 * x.I * x.I * Rw / 1e6) && near(x.lossMW, Math.pow(P * 1e6 / (kv * 1e3), 2) * Rw / 1e6, 1e-9) && near(x.pct, 100 * x.lossMW / P), `${kv} kV: I = P/(√3 V) per wire, loss = 3 I²R = P²R/V²`); });
   ok(fmt(at(345).I) === "167" && fmt(at(69).I) === "837", `current in each wire: ${fmt(at(345).I)} A at 345 kV, ${fmt(at(69).I)} A at 69 kV (a one-wire I = P/V would give 290 A and 1,449 A)`);
   ok(/"Current in each wire"/.test(JS) && /a line of three wires \(three phases, as real lines have\)/.test(JS) && /I = P \/ \(√3 × V\)/.test(D.losses.about), "the readout says the current is per wire; the data note gives the three-phase formula");
@@ -160,7 +160,7 @@ const R = Object.fromEntries(rows.map(r => [r.year, r]));
   ok(/customer interruptions ÷ customers served, and a customer interrupted twice counts twice/.test(QMD) && /total customer interruptions divided by customers served, so a customer interrupted twice counts twice/.test(SIDE), "SAIFI's definition counts repeat interruptions (explain layer and glossary)");
 }
 
-// ---------------- model validation: the network's text version and its words (review F6 #5, #6, #9)
+// ---------------- model validation: the network's text version and its words
 {
   const S = Object.fromEntries(net.sections.map(s => [s.id, s]));
   const cases = [[], faults.map(f => f.id), ["XF"], ["GS", "NS"], ["GN"]].concat(net.sections.map(s => [s.id]));
@@ -199,7 +199,7 @@ const R = Object.fromEntries(rows.map(r => [r.year, r]));
     const want = "| " + lab + " | " + R[2024][k] + u + " | " + R[2025][k] + u + " |";
     ok(QMD.indexOf(want) >= 0, `Analyst table row: ${want}`);
   });
-  ok(/" columns: " \+ fmtN\(last\.saidi, 1\) \+ " minutes for all events, " \+ fmtN\(last\.saidi_nolos, 1\) \+ " with outages from lost high-voltage supply removed\. The two columns can cover different utilities, so the gap does not measure upstream failures\."/.test(JS), "step 8 reads the loss-of-supply numbers from the data and says the gap is not the upstream share (review F6 #3)");
+  ok(/" columns: " \+ fmtN\(last\.saidi, 1\) \+ " minutes for all events, " \+ fmtN\(last\.saidi_nolos, 1\) \+ " with outages from lost high-voltage supply removed\. The two columns can cover different utilities, so the gap does not measure upstream failures\."/.test(JS), "step 8 reads the loss-of-supply numbers from the data and says the gap is not the upstream share");
   ok(R[2020].saidi_nolos > R[2020].saidi, "2020: the loss-of-supply-removed column exceeds all events, so the two columns cover different groups (the Analyst box says so)");
   ok(/\*\*Loss of supply\.\*\* That column can cover a different group of utilities \(its 2020 value is above all events\)/.test(QMD), "the Analyst box warns about the loss-of-supply column");
   ok(!/\b8%|8 ?percent/.test(JS + QMD.replace(/<!--[\s\S]*?-->/g, "")), "no loss-of-supply share stated (the column's 2020 value exceeds all events: populations differ)");
@@ -240,11 +240,11 @@ const R = Object.fromEntries(rows.map(r => [r.year, r]));
 // ---------------- page structure, path.yml, glossary and the text budget
 {
   const fm = QMD.match(/^---\n([\s\S]*?)\n---/)[1];
-  const blk = PATH.slice(PATH.indexOf("id: f06-grid-and-outages"), PATH.indexOf("# ---------- wave W2 modules"));
+  const blk = PATH.slice(PATH.indexOf("id: f06-grid-and-outages"), PATH.indexOf("# ---------- Foundations and Analyst modules"));
   const sub = (blk.match(/subtitle: "([^"]+)"/) || [])[1];
   ok(sub && fm.indexOf('subtitle: "' + sub + '"') >= 0, "front-matter subtitle = path.yml subtitle");
-  ok(/code: F6/.test(blk) && /minutes: 20/.test(blk) && /practice_minutes: 10/.test(blk) && /status: active/.test(blk) && /after: \[3\]/.test(blk) && /next: F7/.test(blk), "path.yml: F6, 20 + 10 min, active, after lesson 3, next F7 (set at the W3 integration, as the sidecar asked)");
-  ok(!/add `next: F7`/.test(SIDE), "sidecar: its request for next: F7 is done (the line above) and gone from the build output (W5)");
+  ok(/code: F6/.test(blk) && /minutes: 20/.test(blk) && /practice_minutes: 10/.test(blk) && /status: active/.test(blk) && /after: \[3\]/.test(blk) && /next: F7/.test(blk), "path.yml: F6, 20 + 10 min, active, after lesson 3, next F7, as the sidecar asked");
+  ok(!/add `next: F7`/.test(SIDE), "sidecar: its request for next: F7 is done (the line above) and gone from the build output");
   ok(/data-learn="grid-outages"/.test(QMD) && /id="f6-explain"/.test(QMD) && /LX\.mount\("grid-outages"/.test(JS) && /getElementById\("f6-explain"\)/.test(JS), "mount points match");
   ok((QMD.match(/class="lx-qq"/g) || []).length === 9, "practice: three myths and six questions");
   // glossary marks: every id used is defined in glossary.yml or this sidecar
@@ -270,7 +270,7 @@ const R = Object.fromEntries(rows.map(r => [r.year, r]));
 }
 
 // ---------------- the page on a stub document: the storm's text version, step 7's question and every supporting element's
-// text budget, as the reader sees them (review F6 #6 and #8)
+// text budget, as the reader sees them
 {
   const vm = require("vm");
   const { env, load } = require("./stubdom.js");
@@ -360,7 +360,7 @@ const R = Object.fromEntries(rows.map(r => [r.year, r]));
   for (const h of own.matchAll(/href="([^"]+)"|\]\(([^)]+)\)|src="([^"]+)"/g)) { const u = (h[1] || h[2] || h[3]).replace(/&amp;/g, "&"); nl++; ok(ALLOW.test(u), `link on the allow-list: ${u}`); }
   ok(nl >= 25, `${nl} links checked`);
   ["03-balancing.html", "f01-five-scales.html", "m01-dispatch-to-lmp.html"].forEach(p => ok((own.indexOf('href="' + p + '"') >= 0 || own.indexOf("](" + p + ")") >= 0) && fs.existsSync(path.join(SITE, "learn", p.replace(/\.html$/, ".qmd"))), `links back to the live ${p}`));
-  ok(/\[A17\]\(a17-physical-feasibility\.qmd\)/.test(QMD) && /\[A9\]\(a09-hazards\.qmd\)/.test(QMD) && /href="a17-physical-feasibility\.html"/.test(QMD) && !/A(9|17),? \(?upcoming/.test(QMD), "A9 and A17 linked, now that they are live (W4 integration)");
+  ok(/\[A17\]\(a17-physical-feasibility\.qmd\)/.test(QMD) && /\[A9\]\(a09-hazards\.qmd\)/.test(QMD) && /href="a17-physical-feasibility\.html"/.test(QMD) && !/A(9|17),? \(?upcoming/.test(QMD), "A9 and A17 linked: they are live");
   ok(/LX\.lessonRefHTML\(P, 3\)/.test(JS) && /data\/path\.json/.test((QMD.match(/data-learn="grid-outages"[^>]*/) || [""])[0]), "the script links lesson 3 through path.json");
   ok(!/collaborat|Lambda|Henryutd2021/.test(visible), "no collaborator, workstation or repository names");
 }

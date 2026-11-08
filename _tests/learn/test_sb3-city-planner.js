@@ -66,12 +66,12 @@ function rowsOf(E3, R, tag) {
   has("$" + tie.wear + " per MWh out of a battery and $" + tie.storeWear.toFixed(2) + " per MWh out of the heat store");
   has("$" + tie.ev.toFixed(2) + " per MWh of managed charging");
   has("×2 and ×0.1"); ok(/\[2, 0\.1\]/.test(fs.readFileSync(path.join(X.SITE, "_tests/learn/test_e3-engine.js"), "utf8")), "the engine test runs the ties x2 and x0.1, as the page says");
-  has("under $30 a year in the engine's test"); ok(/gap < 30/.test(fs.readFileSync(path.join(X.SITE, "_tests/learn/test_e3-engine.js"), "utf8")), "the tie rule's economic price: under $30 a year, as the engine test checks (SB3 review finding 4)");
+  has("under $30 a year in the engine's test"); ok(/gap < 30/.test(fs.readFileSync(path.join(X.SITE, "_tests/learn/test_e3-engine.js"), "utf8")), "the tie rule's economic price: under $30 a year, as the engine test checks");
   // the review's other fixes, where the reader sees them
-  ok(/Siting with map layers is in the capstone <a href="c3-prairie-city-2040\.html">C3<\/a>/.test(PAGE), "the brief says where siting with map layers is (C3, on this engine; SB3 review finding 6, to the coordinator)");
-  ok(/assumed to exist already \(its fuel counts, not its construction\)/.test(JS) && /plugged in at home or work when needed/.test(JS), "beside the controls: the existing boiler and the managed-charging assumption (SB3 review findings 7, 8)");
-  ok(/"Hours a year at the limit"/.test(JS) && !/Hours it binds/.test(JS), "the substation table counts hours a year at the limit, weighted (SB3 review finding 3)");
-  ok(/eight representative days, weighted to 365: an estimate/.test(JS) && /representative-day estimates/.test(JS) && /synthetic weather/.test(JS) && !/people, homes and weather/.test(JS), "the boundary: representative-day estimates and synthetic weather (SB3 review finding 5)");
+  ok(/Siting with map layers is in the capstone <a href="c3-prairie-city-2040\.html">C3<\/a>/.test(PAGE), "the brief says where siting with map layers is (C3, on this engine)");
+  ok(/assumed to exist already \(its fuel counts, not its construction\)/.test(JS) && /plugged in at home or work when needed/.test(JS), "beside the controls: the existing boiler and the managed-charging assumption");
+  ok(/"Hours a year at the limit"/.test(JS) && !/Hours it binds/.test(JS), "the substation table counts hours a year at the limit, weighted");
+  ok(/eight representative days, weighted to 365: an estimate/.test(JS) && /representative-day estimates/.test(JS) && /synthetic weather/.test(JS) && !/people, homes and weather/.test(JS), "the boundary: representative-day estimates and synthetic weather");
   // ---------------- the full-year check
   const sbF = FY.plans.filter(e => e.page === "sb3"), FEB = FYc.designDays.filter(d => d !== city.days.find(x => x.design).date), up = V => V.dist.reduce((t, d) => t + d.upg, 0);
   ok(sbF.map(e => e.id).join() === E3.presets.map(p => p.id).join() && sbF.every(e => e.key === SS.encode(S, E3.withPreset(def, E3.presets.find(p => p.id === e.id)))), "a check for every preset, keyed by its plan link");
@@ -81,9 +81,9 @@ function rowsOf(E3, R, tag) {
   has("cost and CO₂ within 0.1%."); has("The tightest hours fall on 19 or 20 February, two other days the design day stands for; plans that buy upgrades need a little more room.");
   ok(/U\.fullCard\(res, E3\.fullFind\(FY, "sb3", S, R\.state, LX\.ShareState\)/.test(JS) && !/fullYear\s*\(/.test(JS) && /data\/e3-full-year\.json/.test(PAGE), "the card shows the check of the plan that ran (none for another plan); the page reads the data file and never solves the year");
   ok(E3.fullFind(FY, "sb3", S, def, SS) === sbF[0] && E3.fullFind(FY, "sb3", S, Object.assign({}, def, { pv: 10 }), SS) === null, "the default plan has its check; a plan off the presets has none");
-  ok(/data-term="substation"/.test(PAGE) && /data-term="electric-vehicle">electric cars \(EVs\)/.test(PAGE) && /linear program \(LP\)/.test(PAGE) && /data-term="energy-burden"/.test(PAGE) && /area median income \(AMI\)/.test(PAGE) && /\[\[linearized-feeder-limit\|/.test(JS), "terms glossed or expanded at first use (SB3 review finding 10)");
-  ok(/U\.keys\(c1, \[\["Read the lines"/.test(JS) && /\["The value"/.test(JS) && /\["Its assumptions"/.test(JS), "the chart and dual explanations split into labelled lines (SB3 review finding 11)");
-  ok(/energycodes|bto-cchp-tech-challenge-spec-102521\.pdf/.test(PAGE), "the DOE specification is in the sources, dated (SB3 review finding 9)");
+  ok(/data-term="substation"/.test(PAGE) && /data-term="electric-vehicle">electric cars \(EVs\)/.test(PAGE) && /linear program \(LP\)/.test(PAGE) && /data-term="energy-burden"/.test(PAGE) && /area median income \(AMI\)/.test(PAGE) && /\[\[linearized-feeder-limit\|/.test(JS), "terms glossed or expanded at first use");
+  ok(/U\.keys\(c1, \[\["Read the lines"/.test(JS) && /\["The value"/.test(JS) && /\["Its assumptions"/.test(JS), "the chart and dual explanations split into labelled lines");
+  ok(/energycodes|bto-cchp-tech-challenge-spec-102521\.pdf/.test(PAGE), "the DOE specification is in the sources, dated");
   has("paid yearly at 4% real over each item's life"); ok(cfg.finance.rate === 0.04, "4% real");
   has("eGRID's 2023 SPP North CO₂ rate"); ok(city.emissions.gridLbPerMWh.year === 2023, "eGRID 2023");
 
@@ -118,9 +118,9 @@ function rowsOf(E3, R, tag) {
   ok(/data-learn="sb3"/.test(PAGE) && /prairie-city\.json/.test(PAGE) && /e3-city-hub\.json/.test(PAGE) && /e3-full-year\.json/.test(PAGE), "the interactive loads prairie-city.json, e3-city-hub.json and e3-full-year.json");
   ok(/sb3-city-planner\.js/.test(PAGE) && /learn\.js/.test(PAGE), "scripts");
   const BUNDLE = fs.readFileSync(L("learn.js"), "utf8");
-  ok(BUNDLE.indexOf("window.LX.E3 = E3") >= 0, "engine E3 is in the bundle (scripts/build_learn.py's W5_ENGINES)");
+  ok(BUNDLE.indexOf("window.LX.E3 = E3") >= 0, "engine E3 is in the bundle (the build step's component order)");
   ok(/not from the LP|not an output of the LP/.test(JS + PAGE), "the household table is said not to come from the LP");
-  ok(!/nuclear|reactor|\bSMR\b|small modular/i.test(PAGE + JS), "no nuclear term on the page or in its script (guard G-DC)");
+  ok(!/nuclear|reactor|\bSMR\b|small modular/i.test(PAGE + JS), "no nuclear term on the page or in its script");
   ok(!/\bAI\b|artificial intelligence|ChatGPT|Claude/.test(PAGE + JS), "no AI wording");
 
   console.log((fails ? "FAILED " : "ok ") + (checks - fails) + "/" + checks + " checks (SB3)");

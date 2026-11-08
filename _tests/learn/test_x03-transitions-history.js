@@ -6,7 +6,7 @@
 //     coal between two censuses, the car and solar lines; no year is interpolated between published points
 //   - the timeline, the sort and the debate: dated, sourced, read from abstracts where they are papers
 //   - the no-JS block, ideas, stop box, check, facts and sources equal what the model writes (--write rewrites them)
-//   - scope (curriculum §4.4, §20): diffusion only, no cost curve of any technology, no forecast of future speed; no
+//   - scope (the depth budget and the course's scope rules): diffusion only, no cost curve of any technology, no forecast of future speed; no
 //     nuclear term, no "AI", links on the allow-list, no project or Research page
 //   - text budget of the step cards, reveals and the page's prose
 // Usage (from the site folder):  node _tests/learn/test_x03-transitions-history.js [--write]
@@ -140,8 +140,8 @@ ok(near(M.last(D, "solar")[1], 100 * 393343 / (4425029 + 93041), 1e-9), "2025's 
 
 // ---------------- the stop box
 ok(S.problems(D.stop).length === 0, "the stop box has its parts: " + S.problems(D.stop).join("; "));
-ok(/diffusion, a share over time/.test(D.stop.lede) && D.stop.leaves.some(t => /cost of any technology/.test(t)) && D.stop.leaves.some(t => /Forecasts/.test(t)), "the stop box states the curriculum's boundary (§4.4: diffusion only; no cost curves, no forecasts)");
-ok(/Energy and Civilization/.test(RAW) && /Energy Transitions: Global and National Perspectives/.test(RAW) && /ourworldindata\.org\/energy/.test(RAW), "the reading ladder is the curriculum's (§4.3 read next)");
+ok(/diffusion, a share over time/.test(D.stop.lede) && D.stop.leaves.some(t => /cost of any technology/.test(t)) && D.stop.leaves.some(t => /Forecasts/.test(t)), "the stop box states the curriculum's boundary (diffusion only; no cost curves, no forecasts)");
+ok(/Energy and Civilization/.test(RAW) && /Energy Transitions: Global and National Perspectives/.test(RAW) && /ourworldindata\.org\/energy/.test(RAW), "the reading ladder is the curriculum's (its read-next list)");
 // the stop box's and the timeline's parts are budgeted one by one above (each event: date, label, text, source) (its rungs carry a source line, so the page scan skips it)
 ok(/<!-- x03-stop:start/.test(PAGE) && PAGE.indexOf("x03-stop:start") > PAGE.indexOf('id="x03-explain"'), "the stop box closes the explain section");
 

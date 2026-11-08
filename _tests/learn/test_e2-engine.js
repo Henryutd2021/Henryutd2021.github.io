@@ -1,5 +1,5 @@
 // test_e2-engine.js — Node tests for engine E2 (assets/learn/components/engine-e2.js, LX.E2) with the vendored HiGHS, the
-// solver core the pages run in a Web Worker (wave W4, 2026-11-05). What it checks:
+// solver core the pages run in a Web Worker. What it checks:
 //   - the data: shapes from town_year.json (2025) and the 2024 year scaled to 2025's demand energy; wind and sun per MW
 //     from LX.townProfile at EIA's monthly capacity factors; the periods are what the pages say (the town_days.json days,
 //     the week with the highest average daily peak, one of the two calmest winter weeks); C2's representative days are the
@@ -9,15 +9,15 @@
 //   - the models as built: every hour balances in every zone; links within limits; units within pmin x n and pmax x n,
 //     reserve within rcap x n and the headroom; minimum up and down times across days; the dispatch LP's objective equals
 //     the MILP's; the production cost's parts add up; the battery's charge and its daily start and end
-//   - no prices from the MILP (§9.2): every MILP result has duals null; prices come only from the fixed LP
-//   - uniqueness (W2 review finding 2; brief §2 item 7): each shown price (zones and reserve) equals the cost slope when
+//   - no prices from the MILP: every MILP result has duals null; prices come only from the fixed LP
+//   - uniqueness: each shown price (zones and reserve) equals the cost slope when
 //     its row moves 0.001 MWh up and down (no corner); every number the pages show is the same with the tie weights
 //     x10 and x0.1; the commitment is the MILP's unique optimum (a second solve that must differ costs more)
-//   - who is short (SB2 and C2 review finding 2): a zone's unserved load is shared in proportion to load, the large
+//   - who is short: a zone's unserved load is shared in proportion to load, the large
 //     load's after its curtailment; its served energy never exceeds the zone's (both links at 0 MW, 600 MW at Town)
 //   - failure states: solve never rejects; a solver that throws, rejects, returns nothing or an error gives "error"; a
 //     stubbed time limit with a plan gives "time-limit", the plan, its gap and "not proven optimal"; a pricing LP that
-//     stops early gives no result and no prices, whatever the MILP did (SB2 finding 6); a real 1 ms limit never says
+//     stops early gives no result and no prices, whatever the MILP did; a real 1 ms limit never says
 //     optimal; BenchRun.classify offers Try again and never says optimal
 //   - adequacy: the max-flow deficit equals an LP max-flow on 300 seeded instances; Town's slack too; the seeded Monte
 //     Carlo repeats exactly; C2's reference numbers (today's grid within 0.1 days a year; the 300 MW load alone far above)
@@ -84,7 +84,7 @@ const near = (a, b, t) => Math.abs(a - b) <= (t == null ? 1e-6 : t);
     ok(!bad.length, S.key + ": 300 seeded random plans round-trip (" + bad.slice(0, 2).join(" ") + ")");
     ok(SS.decode(S, "#" + S.key + "-v1-p99").status === "bad", S.key + ": a damaged link is refused");
   });
-  ok(C2S.fields.filter(f => /^c/.test(f.id) && f.id !== "conn").every(f => { const r = cfg.c2.costs[f.id.slice(1)]; return f.min === r.lo && f.max === r.hi && f.def === r.def; }), "C2's cost ranges are fixed ranges the reader sets, from the data file (guard G-COST)");
+  ok(C2S.fields.filter(f => /^c/.test(f.id) && f.id !== "conn").every(f => { const r = cfg.c2.costs[f.id.slice(1)]; return f.min === r.lo && f.max === r.hi && f.def === r.def; }), "C2's cost ranges are fixed ranges the reader sets, from the data file; none changes with deployment");
 
   // ---------------- one run, checked hour by hour (the 300 MW load on the peak-demand week: unserved hours, congestion)
   const stHot = Object.assign({}, def, { per: "hot", ll: 400, llz: "T", flex: 20, bid: 300 });
@@ -147,11 +147,11 @@ const near = (a, b, t) => Math.abs(a - b) <= (t == null ? 1e-6 : t);
     ok(R.tot.llMWh <= R.served[zi] + 1e-6 && R.tot.llMWh + R.tot.llShed + R.tot.curtail <= sys.ll * R.hours + 1e-6, name + ": its served energy (" + E2.kilo(R.tot.llMWh) + " MWh) is within the zone's (" + E2.kilo(R.served[zi]) + " MWh), and served + unserved + curtailed = its request");
     return R;
   }
-  const Rcut = await shareCheck(Object.assign({}, def, { ll: 600, llz: "T", wt: 0, tm: 0 }), "both links at 0 MW, 600 MW at Town (the review's case)");
+  const Rcut = await shareCheck(Object.assign({}, def, { ll: 600, llz: "T", wt: 0, tm: 0 }), "both links at 0 MW, 600 MW at Town (a hard case)");
   ok(Rcut.tot.llShed > 1 && Rcut.tot.shedZ[P.zix.T] > Rcut.tot.llShed, "there the large load bears part of Town's shortfall, not all of it (" + E2.kilo(Rcut.tot.llShed) + " of " + E2.kilo(Rcut.tot.shedZ[P.zix.T]) + " MWh)");
   await shareCheck(stHot, "the peak-demand week, 400 MW, 20% flexible");
 
-  // ---------------- no prices from the MILP (§9.2)
+  // ---------------- no prices from the MILP: prices come from LPs only
   const m0 = E2.dayModel(P, E2.sysOf(def, P), "2025", P.periods.peak.day0, null), r0 = solveSync(m0, { gap: 1e-6 });
   ok(r0.kind === "milp" && r0.duals === null && r0.reducedCosts === null, "the commitment MILP returns no duals");
   const fx = E2.dayModel(P, E2.sysOf(def, P), "2025", P.periods.peak.day0, null, { fix: E2.commitment(P, E2.sysOf(def, P), r0) });

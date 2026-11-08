@@ -1,5 +1,5 @@
 // test_components_checkpoint_options.js — Node tests for the checkpoint runner's per-task options (components/checkpoint.js,
-// 2026-11-07, generalised from CK-R's task 1 first):
+// generalised from CK-R's task 1 first):
 //   - opensAfter: [task ids]: a task opens only once each named task is submitted; until then its card shows a notice in
 //     place of its question, answers, early button and worked solution, a "Go to task N" button, and its clock does not run
 //     and its tag, the results table and the copied summary call it "Opens after task 1" (no title, skill or lessons)

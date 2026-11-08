@@ -2,7 +2,7 @@
 // the stack and clearing identities (balance, marginal plant, uniform price, shadow price inside a block, the jump at a
 // block edge), the wind and below-zero cases, the line teaser, the numbers written in the page's markup (fallback table,
 // explain ideas, Go deeper, quiz answers), the gas presets against the slider's step, the word count of every text
-// element in the page body and of the lesson's longer JS strings, the scope rules (curriculum §20.4 verbatim), and a HiGHS
+// element in the page body and of the lesson's longer JS strings, the course's scope rules (deny-list verbatim), and a HiGHS
 // solve of the same LP. What it does not do: click through the rendered page (the screenshots cover that), or check the
 // EIA values against EIA: lesson 7's data file holds them with their sources, and this test checks agreement with it.
 // Usage (from the site folder):  node _tests/learn/test_08-merit-order.js

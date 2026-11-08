@@ -1,26 +1,25 @@
 // test_cf5-drawing-the-boundary.js — Node tests for case file CF5 (assets/learn/cf5-drawing-the-boundary.js, its data
-// file and the page, learn/cf5-drawing-the-boundary.qmd; live since 2026-11-07, when Henry approved E14):
+// file and the page, learn/cf5-drawing-the-boundary.qmd):
 //   - the toy (the course's own: a generic steam plant and one load, average power over one hour) recomputed from first
 //     principles: the electric chiller's use, the steam the absorption chiller takes and the turbine work it costs; the
 //     two consistent views equal the flow differences (turbine output, the site's net exchange with the grid), and the
-//     two "turbine loss ignored" views equal them with the loss added back (review #2); their verdicts, for every setting
-//     the sliders allow (W3 brief §2.5: feedback true for every input); the hot hour (its derating shown), the planned
-//     outage, the grid's import or export from the site's net (review #6); the myths' and worked answers' numbers
+//     two "turbine loss ignored" views equal them with the loss added back; their verdicts, for every setting
+//     the sliders allow (feedback true for every input); the hot hour (its derating shown), the planned
+//     outage, the grid's import or export from the site's net; the myths' and worked answers' numbers
 //   - the four no-JS blocks (timeline, toy, boundary, worked answers) equal what the components write from the data
 //     (--write rewrites them)
 //   - live: the page is learn/<id>.qmd and no draft is left in learn/_drafts/; path.yml status: active; path.json lists
 //     CF5 as live; its sidecar's glossary terms name CF5 in glossary.json
-//   - research wording (curriculum §13, guard G-SRC), as CF2's, CF3's and CF8's tests: every sentence about the study on
-//     the page, in the data file and in this script's strings is an APPROVED E14 sentence of
-//     reports/learn/excerpts_for_approval.md ("W5 sources", approved 2026-11-07), word for word, or a clause of one where
-//     the review's layout-only changes split it (a dd with data-e14 joins back to its row; E14.13, E14.14 and E14.20 at
-//     their own breaks); the approved set is E14.1-E14.15, E14.16b (the coordinator's wording, in place of E14.16),
-//     E14.17-E14.23 and E14.24 in its original wording; a snapshot of it in this test must equal the register; the
-//     register's status line says approved; E14.16 (capital costs) is not used; the excerpt's footer and the boundary
+//   - research wording (the course's sourcing rule), as CF2's, CF3's and CF8's tests: every sentence about the study on
+//     the page, in the data file and in this script's strings is an APPROVED E14 sentence of the excerpt wording, word
+//     for word, or a clause of one where a layout-only split breaks it (a dd with data-e14 joins back to its row; E14.13,
+//     E14.14 and E14.20 at their own breaks); the approved set is E14.1-E14.15, E14.16b (in place of E14.16),
+//     E14.17-E14.23 and E14.24 in its original wording; a snapshot of it in this test must equal the approved wording; its
+//     status line says approved; E14.16 (capital costs) is not used; the excerpt's footer and the boundary
 //     card's source line are E14.24 ("Approved excerpt of: ...", CF7's footer form) and the draft-period "Source: ..."
-//     line is gone; "approved" appears only in E14.24; each placement is where the register says (--places lists them)
-//   - scope (guards G-NUC, G-DC, G-SRC; framing C): no sentence pairs a nuclear term with a risk term of
-//     scripts/learn_curriculum/data.py (DENY_NUC, DENY_RISK); "reactor" only in E14.1, E14.7, E14.11 and E14.23 (and
+//     line is gone; "approved" appears only in E14.24; each placement is where the approved wording says (--places lists them)
+//   - scope (the nuclear scope rule, data centers as loads only, the sourcing rule; framing C): no sentence pairs a
+//     nuclear term with a risk term of the scope scan's word lists (DENY_NUC, DENY_RISK); "reactor" only in E14.1, E14.7, E14.11 and E14.23 (and
 //     "refueling" only in E14.9); no data-center wording of any kind, no design name, no "small modular"; no link to a
 //     project page, a repository or the preprint; the paper's title nowhere; no numbers to remember
 // Usage (from the site folder):  node _tests/learn/test_cf5-drawing-the-boundary.js [--write] [--places]
@@ -33,6 +32,7 @@ const L = p => path.join(SITE, "assets/learn", p);
 const M = require(L(ID + ".js"));
 const TL = require(L("components/timeline.js"));
 const X = require("./excerpt_check.js");
+const PRIV = require("./private_sources.js");
 const D = JSON.parse(fs.readFileSync(L("data/" + ID + ".json"), "utf8"));
 const JS = fs.readFileSync(L(ID + ".js"), "utf8");
 const QPATH = path.join(SITE, "learn", ID + ".qmd"), DRAFT = path.join(SITE, "learn/_drafts", ID + ".qmd");
@@ -70,7 +70,7 @@ ok(row && /\n  status: active\n/.test(row), "path.yml: CF5 is active (live)");
   ok(me && me.ready === true && me.href === ID + ".html" && me.id === ID, "path.json lists CF5 as live, linked to " + ID + ".html");
   const G = JSON.parse(fs.readFileSync(path.join(SITE, "assets/learn/data/glossary.json"), "utf8"));
   const side = fs.readFileSync(path.join(SITE, "learn/_w1", ID + ".yml"), "utf8"), ids = [...side.matchAll(/^  - id: ([a-z0-9-]+)$/gm)].map(m => m[1]);
-  ok(ids.length === 9 && !/^requests:/m.test(side), "the sidecar defines CF5's nine glossary terms (review #4) and has no open request: " + ids.join(", "));
+  ok(ids.length === 9 && !/^requests:/m.test(side), "the sidecar defines CF5's nine glossary terms and has no open request: " + ids.join(", "));
   ids.forEach(g => ok(G[g] && G[g].lesson === "CF5", "glossary.json has " + g + ", taught in CF5"));
   ids.forEach(g => ok(PAGE.includes('data-term="' + g + '"'), "the page marks " + g + " at its first use"));
   const marks = [...PAGE.matchAll(/data-term="([a-z0-9-]+)"/g)].map(m => m[1]).concat([...JSON.stringify(D).matchAll(/\[\[([a-z0-9-]+)\|/g)].map(m => m[1]));
@@ -88,7 +88,7 @@ const views = s => {
 const S0 = I.start, V0 = M.views(I, S0), F0 = views(S0), r1 = v => Math.round(Math.round(v * 1e6) / 1e6 * 10) / 10;
 ok(near(V0.avoided, 4) && near(V0.a.steam, 25) && near(V0.lost, 5) && near(F0.v["site-priced"], -1) && near(F0.v["plant-priced"], -5), "defaults: 4.0 MW for the electric chiller, 25.0 MW of steam heat, 5.0 MW of turbine work; −5.0 MW (plant only) and −1.0 MW (plant and load) with the steam priced");
 ok(M.VIEWS.map(x => x.id).join() === "plant-priced,site-priced,plant-free,site-free" && M.VIEWS.every(x => I.labels[x.id]), "four views, the two consistent ones first, each labelled");
-ok(/incomplete/.test(I.labels["plant-free"]) && /incomplete/.test(I.labels["site-free"]) && /deliberately incomplete/.test(I.steamModes.find(m => m.id === "free").label), "ignoring the turbine loss is labelled as deliberately incomplete, not as a boundary (review #2)");
+ok(/incomplete/.test(I.labels["plant-free"]) && /incomplete/.test(I.labels["site-free"]) && /deliberately incomplete/.test(I.steamModes.find(m => m.id === "free").label), "ignoring the turbine loss is labelled as deliberately incomplete, not as a boundary");
 let bad = 0, n = 0, signs = new Set();
 const range = o => { const a = []; for (let v = o.min; v <= o.max + 1e-9; v += o.step) a.push(Math.round(v * 1e6) / 1e6); return a; };
 const SL = {}; I.sliders.forEach(o => { SL[o.key] = range(o); });
@@ -96,7 +96,7 @@ I.hours.forEach(h => SL.cool.forEach(cool => SL.copA.forEach(copA => SL.w.forEac
   const s = { hour: h.id, load: S0.load, cool, copA, w, copE }, V = M.views(I, s), F = views(s); n++;
   if (!F) { if (V.possible || Object.values(V.v).some(x => x !== 0)) bad++; return; }
   Object.keys(F.v).forEach(k => { if (!near(V.v[k], F.v[k], 1e-9)) bad++; const vd = M.verdict(V.v[k]), r = r1(F.v[k]); if (vd !== (r > 0 ? "steam cooling looks better" : r < 0 ? "steam cooling looks worse" : "no difference shows")) bad++; });
-  // the consistent views are the flow differences; the incomplete ones add the turbine loss back (review #2)
+  // the consistent views are the flow differences; the incomplete ones add the turbine loss back
   if (!near(V.v["plant-priced"], V.a.turbine - V.e.turbine) || !near(V.v["site-priced"], V.a.siteNet - V.e.siteNet)) bad++;
   if (!near(V.v["plant-free"], V.v["plant-priced"] + F.lost) || !near(V.v["site-free"], V.v["site-priced"] + F.lost)) bad++;
   if (!near(V.a.turbine, I.plantMW - F.lost) || !near(V.e.chiller, F.avoided) || !near(V.e.siteNet, I.plantMW - S0.load - F.avoided) || !near(V.a.siteNet, I.plantMW - F.lost - S0.load)) bad++;
@@ -107,14 +107,14 @@ ok(signs.has(1) && signs.has(-1), "within the sliders' ranges the plant-and-load
 const OUT = M.views(I, Object.assign({}, S0, { hour: "out" })), HOT = M.views(I, Object.assign({}, S0, { hour: "hot" }));
 ok(OUT.possible === false && near(OUT.e.siteNet, -(S0.load + S0.cool / S0.copE)), "a planned outage: no steam, no switch; the grid supplies the load and the electric chiller");
 ok(near(HOT.a.copA, 0.6) && near(views(Object.assign({}, S0, { hour: "hot" })).v["site-priced"], HOT.v["site-priced"]), "a hot, humid hour derates the absorption chiller to 0.6");
-ok(M.grid(V0.e.siteNet) === "the site sends 56.0 MW to the grid" && M.grid(OUT.e.siteNet) === "the grid supplies 44.0 MW to the site", "the grid's export or import is read from the site's net exchange (review #6)");
+ok(M.grid(V0.e.siteNet) === "the site sends 56.0 MW to the grid" && M.grid(OUT.e.siteNet) === "the grid supplies 44.0 MW to the site", "the grid's export or import is read from the site's net exchange");
 const AS = M.assumptions(I).join(" ");
-ok(AS.includes("the turbine makes " + I.plantMW + " MW") && AS.includes("the load needs " + S0.load + " MW") && AS.includes("the same plant and load, using electric cooling") && AS.includes("25% less cooling per MW of steam") && /efficiency only; it has no capacity limit/.test(AS), "the assumptions are written from the data and name the reference, the derating and its limit (reviews #6, #7)");
-ok(/This hour: " \+ V\.a\.copA\.toFixed\(2\)/.test(JS) && /pct\(hr\.derate\) \+ " less in a hot, humid hour/.test(JS), "the live toy shows the hour's cooling per MW of steam beside its slider (review #7)");
-ok(/H\("caption", \{ class: "lx-hint", text: CAPTION \}/.test(JS) && /\+ means less electricity used or more sent to the grid; − means the opposite/.test(M.CAPTION), "the live table keeps its sign caption (review #10)");
-ok(/Average power during one hour, in MW; auxiliary electricity for pumps and fans is left out/.test(I.note) && !/Energy only/.test(PAGE + JSON.stringify(D)), "units: average power during one hour, auxiliaries left out (review #8)");
+ok(AS.includes("the turbine makes " + I.plantMW + " MW") && AS.includes("the load needs " + S0.load + " MW") && AS.includes("the same plant and load, using electric cooling") && AS.includes("25% less cooling per MW of steam") && /efficiency only; it has no capacity limit/.test(AS), "the assumptions are written from the data and name the reference, the derating and its limit");
+ok(/This hour: " \+ V\.a\.copA\.toFixed\(2\)/.test(JS) && /pct\(hr\.derate\) \+ " less in a hot, humid hour/.test(JS), "the live toy shows the hour's cooling per MW of steam beside its slider");
+ok(/H\("caption", \{ class: "lx-hint", text: CAPTION \}/.test(JS) && /\+ means less electricity used or more sent to the grid; − means the opposite/.test(M.CAPTION), "the live table keeps its sign caption");
+ok(/Average power during one hour, in MW; auxiliary electricity for pumps and fans is left out/.test(I.note) && !/Energy only/.test(PAGE + JSON.stringify(D)), "units: average power during one hour, auxiliaries left out");
 ok(PAGE.includes("20 MW of cooling takes 25.0 MW of steam heat, which costs the turbine 5.0 MW of electricity: more than the electric chiller's 4.0 MW") && PAGE.includes("(−5.0 MW in the toy) but not the electric chiller's 4.0 MW saved"), "the myths' numbers are the toy's defaults");
-{ // the worked answers (review #10): recomputed from first principles
+{ // the worked answers: recomputed from first principles
   const at = o => views(Object.assign({}, S0, o)), f = v => M.mw(v), A = at({ w: I.practice.w[0] }), B = at({ w: I.practice.w[1] }), Ht = at({ hour: "hot" });
   ok(I.practice.w.every(w => SL.w.some(x => near(x, w))), "the practice's two settings are on the slider");
   ok(f(A.v["site-priced"]) === "+0.5 MW" && f(B.v["site-priced"]) === "−3.5 MW" && f(Ht.v["site-priced"]) === "−2.7 MW" && f(A.v["plant-priced"]) === "−3.5 MW" && f(B.v["plant-priced"]) === "−7.5 MW", "practice: +0.5 MW at 0.14, −3.5 MW at 0.30, −2.7 MW in the hot hour (plant and load, steam priced)");
@@ -125,11 +125,10 @@ ok(PAGE.includes("20 MW of cooling takes 25.0 MW of steam heat, which costs the 
 ok(/Illustrative/.test(I.note) && /Illustrative/.test(AS) && /not the study's inputs or results/.test(I.note), "the toy says it is illustrative and not the study's");
 ok(!/\$|cost of|\bprices?\b|capital|credit/i.test(JSON.stringify(I).replace(/"labels"[\s\S]*$/, "")), "the toy has no money: average power only");
 
-// ---------------- research wording against the register (E14, approved by Henry on 2026-11-07)
-// The approved set (register, "W5 sources", status line of 2026-11-07): E14.1-E14.15; E14.16b, the coordinator's wording,
-// in place of the drafted E14.16 (capital costs); E14.17-E14.23; E14.24 in its original wording (the draft-period
-// revision of E14.24, "Source: ...", is not used). As CF3's test: the snapshot below must equal the register; without the
-// register the page is checked against the snapshot.
+// ---------------- research wording against the approved wording (E14)
+// The approved set (status line of 2026-11-07): E14.1-E14.15; E14.16b in place of the drafted E14.16 (capital costs);
+// E14.17-E14.23; E14.24 in its original wording (the draft-period revision of E14.24, "Source: ...", is not used). As
+// CF3's test: the snapshot below must equal the approved wording; without it the page is checked against the snapshot.
 const APPROVED_SNAPSHOT = {
   "E14.1": "Reactor steam can either drive the turbine or feed an absorption chiller that makes chilled water.",
   "E14.2": "Steam sent to the absorption chiller is steam the low-pressure turbine does not convert.",
@@ -160,25 +159,25 @@ const RX = /\b(stud(y|ies)|paper|Li et al|excerpt|ERCOT|optimizer|reactor|refuel
 const REG = X.register(["E14"]);   // the shared reader; its own parser reads only plain "| E14.n |" rows, so they are read here
 let APPROVED = APPROVED_SNAPSHOT, DRAFT_SOURCE = "Source: Li et al. (2026), accepted paper, Energy Conversion and Management; DOI pending.";
 if (REG) {
-  const md = REG.md, w5 = md.slice(md.indexOf("## W5 sources"), md.indexOf("\n## Later waves"));
+  const md = REG.md, w5 = PRIV.section(md, "### E14.");
   const st = w5.match(/\*\*Status \(2026-11-07\): ([^*]+)\*\*([^\n]*)/) || [];
   ok(st[1] === "approved as recommended" && /Approved: framing C; E14\.1–E14\.15, E14\.16b \(.*\), E14\.17–E14\.23, and E14\.24 in its original wording/.test(st[2] || ""),
-    "the register's status line says E14 is approved (2026-11-07): framing C; E14.1-E14.15, E14.16b, E14.17-E14.23, E14.24 in its original wording");
-  const reg = {}, e14 = w5.slice(w5.indexOf("### E14."), w5.indexOf("### Decisions for Henry (E14)"));
+    "the approved wording's status line says E14 is approved (2026-11-07): framing C; E14.1-E14.15, E14.16b, E14.17-E14.23, E14.24 in its original wording");
+  const reg = {}, e14 = PRIV.block(w5, "### E14.");
   e14.split("\n").forEach(line => { const m = line.match(/^\| (E14\.\d+)(?: \[N\]| \(optional\))? \| (.*?) \| /); if (m) reg[m[1]] = m[2].replace(/^(Timeline, [^:]+|Citations|Source): /, ""); });
-  ok(Object.keys(reg).length === 24, "the register has the 24 E14 rows, the [N] and optional ones included");
+  ok(Object.keys(reg).length === 24, "the approved wording has the 24 E14 rows, the [N] and optional ones included");
   const b16 = (w5.match(/Recommended wording \(E14\.16b\): "([^"]+)"/) || [])[1];
-  ok(!!b16, "E14.16b is in the coordinator's note");
+  ok(!!b16, "E14.16b's recommended wording is in the approved wording");
   delete reg["E14.16"]; reg["E14.16b"] = b16;
   ok(Object.keys(reg).length === Object.keys(APPROVED_SNAPSHOT).length && Object.keys(reg).every(k => reg[k] === APPROVED_SNAPSHOT[k]),
-    "the approved-sentence snapshot in this test equals the register; differs at: " + Object.keys(Object.assign({}, reg, APPROVED_SNAPSHOT)).filter(k => reg[k] !== APPROVED_SNAPSHOT[k]).join(", "));
+    "the approved-sentence snapshot in this test equals the approved wording; differs at: " + Object.keys(Object.assign({}, reg, APPROVED_SNAPSHOT)).filter(k => reg[k] !== APPROVED_SNAPSHOT[k]).join(", "));
   // the draft revision table: its E14.24 row replaced the drafted (now approved) wording with "Source: ..." for the draft
   const rv = w5.indexOf("### E14 draft revisions after review (2026-11-06)"), REV = {};
   if (rv > 0) w5.slice(rv).split("\n").forEach(line => { const m = line.match(/^\| (E14\.\d+) \| (.*?) \| (.*?) \| /); if (m) REV[m[1]] = { was: m[2], now: m[3] }; });
   ok(REV["E14.24"] && REV["E14.24"].was === reg["E14.24"] && /^Source: /.test(REV["E14.24"].now), "E14.24's draft revision ('Source: ...') replaced the drafted wording, which is the approved one");
   if (REV["E14.24"]) DRAFT_SOURCE = REV["E14.24"].now;
   APPROVED = reg;
-} else console.log("note: excerpts_for_approval.md not found (set LEARN_PORTFOLIO); E14 wording checked against the snapshot in this test");
+} else console.log("note: the approved excerpt wording is not available (set LEARN_SOURCES); E14 wording checked against the snapshot in this test");
 const RG = { units: Object.values(APPROVED).map(X.norm), raw: APPROVED };
 ok(!X.norm(PAGE).includes("capital cost of the plant") && !RG.raw["E14.16"], "E14.16's capital-cost wording is not approved and not on the page (E14.16b instead)");
 // every text element of the case, the data file's research text and the citation
@@ -186,7 +185,7 @@ const OWN = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1:en
 const caseHTML = (OWN.match(/<div class="lx-case">([\s\S]*?)<div class="lx-interactive" data-learn="cf5"/) || [])[1] || "";
 const LABELS = [/^\d · (The puzzle|The question in one sentence|Scale and boundary|Decisions, goal and rules, in words|Data and method|What came out, and where it holds)$/, /^So is the cooling free\?$/, /^The case's method question\.$/,
   /^Detail(How the hourly physics is modeled|Two design choices|Scenario runs and how results are reported)$/];
-// a sentence split into list items (review #5, layout only): "<dt>Label</dt><dd data-e14="E14.n">pieces</dd>" joins back
+// a sentence split into list items (layout only): "<dt>Label</dt><dd data-e14="E14.n">pieces</dd>" joins back
 const split = [...caseHTML.matchAll(/<dt>([^<]+)<\/dt><dd data-e14="(E14\.\d+)">([\s\S]*?)<\/dd>/g)];
 ok(split.map(m => m[2]).join() === "E14.4,E14.6,E14.7,E14.8,E14.9", "parts 3 and 4 are structured lists of E14.4, E14.6, E14.7, E14.8 and E14.9");
 split.forEach(m => ok(X.norm(m[1] + ": " + X.elements(m[3]).join(" ")) === X.norm(RG.raw[m[2]]), m[2] + " split into list items keeps every word in order"));
@@ -235,8 +234,8 @@ const said = VIS.filter(s => /approv/i.test(s));
 ok(said.length === 3 && said.every(s => X.norm(s) === X.norm(RG.raw["E14.24"])), "'approved' is said only by E14.24: the footer, the boundary card's source line and its no-JS text (" + said.length + "): " + said.join(" | ").slice(0, 160));
 ok(!VIS.some(s => /\bdrafts?\b|\bdrafted\b/i.test(s)), "no draft wording on the page, in the data or in the script's strings");
 ok(VIS.filter(s => /pending/i.test(s)).every(s => !/pending/i.test(X.norm(s).replace(/DOI pending/g, ""))), "'pending' only in 'DOI pending' (E14.23, E14.24 and the timeline's source)");
-ok(!/quoted from the excerpts/.test(PAGE), "no blanket claim that every sentence is quoted (review #3)");
-// the placements, in the register's order (--places prints them with file:line)
+ok(!/quoted from the excerpts/.test(PAGE), "no blanket claim that every sentence is quoted");
+// the placements, in the approved wording's order (--places prints them with file:line)
 { const lines = PAGE.split("\n"), rel = path.relative(SITE, QPATH), where = [];
   const find = (k, s) => { const t = X.norm(s).slice(0, 60); let i = lines.findIndex(l => X.norm(l).includes(t)); if (i < 0) i = lines.findIndex(l => l.includes('data-e14="' + k + '"')); return i >= 0 ? rel + ":" + (i + 1) : null; };
   Object.keys(RG.raw).forEach(k => {
@@ -250,14 +249,14 @@ ok(!/quoted from the excerpts/.test(PAGE), "no blanket claim that every sentence
   if (process.argv.includes("--places")) where.forEach(w => console.log(w[0].padEnd(8), w[1])); }
 
 // ---------------- scope (framing C)
-const RP = (() => { const c = [process.env.LEARN_PORTFOLIO, path.join(SITE, "..")]; try { c.push(path.resolve(SITE, require("child_process").execSync("git rev-parse --git-common-dir", { cwd: SITE, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim(), "..", "..")); } catch (e) { /* none */ } return c.filter(Boolean).find(p => fs.existsSync(path.join(p, "scripts/learn_curriculum/data.py"))); })();
+const RP = PRIV.path("scope_terms");
 let NUC = /nuclear|reactor|\bSMR\b|small modular/i, RISK = null;
 if (RP) {
-  const py = fs.readFileSync(path.join(RP, "scripts/learn_curriculum/data.py"), "utf8");
+  const py = fs.readFileSync(RP, "utf8");
   NUC = new RegExp(py.match(/DENY_NUC = r"([^"]+)"/)[1], "i");
   RISK = new RegExp((py.match(/DENY_RISK = \(([\s\S]*?)\)\n/)[1].match(/r"([^"]*)"/g) || []).map(s => s.slice(2, -1)).join(""), "i");
 }
-ok(RISK, "the scan's DENY_RISK read from scripts/learn_curriculum/data.py");
+ok(RISK, "the scope scan's DENY_RISK read from its word lists");
 const ALLTXT = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1:end -->/g, "") + "\n" + JSON.stringify(D) + "\n" + (JS.match(/"[^"\n]*"/g) || []).join("\n");
 const sentences = X.elements(PAGE.replace(/<!--[\s\S]*?-->/g, "")).concat(Object.values(D.idea.labels), D.timeline.events.map(e => e.label + ". " + e.text), D.boundary.holds, D.boundary.leaves, (JS.match(/"[^"\n]*"/g) || []))
   .map(X.norm).flatMap(s => s.split(/(?<=[.?!])\s+(?=[A-Z])/));
@@ -272,9 +271,9 @@ if (RG) {
 ok(!/data[- ]?cent|hyperscale|campus|colocat|small modular|\bSMR\b|BWRX|Hitachi|Houston|200 MWe|nuclear/i.test(ALLTXT.replace(/<!--[\s\S]*?-->/g, "")) && !/\bIT\b|\bGE\b/.test(ALLTXT.replace(/<!--[\s\S]*?-->/g, "")), "no data-center wording, design name, size, city or 'nuclear' anywhere in CF5 (page, data, script strings)");
 ok(!/projects\/|research\.html|github\.com|arxiv|2608\.10999|Boundary Analysis of Small Modular/i.test(PAGE.replace(/<!--[\s\S]*?-->/g, "") + JS + JSON.stringify(D)), "no link to a project page, a repository or the preprint; the paper's title is not shown");
 ok(!/Numbers to remember/.test(PAGE), "no numbers to remember");
-ok(!/break[- ]even|threshold|parity|competitiv|\bcredit\b/i.test(ALLTXT.replace(/<!--[\s\S]*?-->/g, "") + JSON.stringify(D) + (JS.match(/"[^"\n]*"/g) || []).join(" ")), "no break-even, threshold, parity, competitiveness or credit wording (G-NUC, G-POL)");
+ok(!/break[- ]even|threshold|parity|competitiv|\bcredit\b/i.test(ALLTXT.replace(/<!--[\s\S]*?-->/g, "") + JSON.stringify(D) + (JS.match(/"[^"\n]*"/g) || []).join(" ")), "no break-even, threshold, parity, competitiveness or credit wording (nuclear and credit scope)");
 ok(/LX\.lessonRefHTML\(P, "R7"\)/.test(JS) && /LX\.lessonRefHTML\(P, "M11"\)/.test(JS) && /path\.json/.test(PAGE), "R7 and M11 are linked with LX.lessonRef (path.json loaded)");
-{ // back links: the lessons CF5 serves (curriculum §13: R7, M11) name it through LX.lessonRefHTML, live with path.json
+{ // back links: the lessons CF5 serves (R7, M11) name it through LX.lessonRefHTML, live with path.json
   const core = require(L("components/core.js")), PJ = JSON.parse(fs.readFileSync(L("data/path.json"), "utf8"));
   ok(core.lessonRefHTML(PJ, "CF5") === '<a href="' + ID + '.html">CF5</a>', "with path.json, LX.lessonRefHTML links CF5 to its page");
   const r7 = fs.readFileSync(L("r07-cost-carbon-properly.js"), "utf8"), m11 = fs.readFileSync(L("m11-tea-in-models.js"), "utf8"), m11q = fs.readFileSync(path.join(SITE, "learn/m11-tea-in-models.qmd"), "utf8");

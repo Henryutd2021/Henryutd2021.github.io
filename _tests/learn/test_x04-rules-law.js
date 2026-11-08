@@ -92,13 +92,13 @@ D.facts.forEach(f => ok(SRC[f.src] && SRC[f.src].asOf, f.n + ": a dated source")
 ok(D.facts.some(f => f.n === String(step("nopr").comments)) && D.facts.some(f => f.n === D.quiz.days + " days"), "the 109 and 240-day facts equal the data");
 ok(/230 kV/.test(TXT("ks-siting")) && /5 miles/.test(TXT("ks-siting")) && /hearing within 90 days of the filing/.test(TXT("ks-siting")) && /180 days of the filing/.test(TXT("ks-siting")) && SRC["ks-siting"].url === null, "the Kansas siting law: 230 kV, 5 miles, a hearing within 90 days, a final order within 180, cited by name without a link");
 { const f = D.facts.filter(x => x.src === "ks-siting")[0], html = M.factsHTML(D);
-  ok(/hearing within 90 days of the filing and a final order within 180 days/.test(f.what) && html.indexOf("K.S.A. 66-1,177 and K.S.A. 66-1,178") > 0, "the siting fact: two deadlines, both statutory sections shown (X4 review)");
-  ok(html.indexOf("Undated, read 7 November 2026") > 0 && !/ · undated</.test(html), "the facts table keeps each source's access date (X4 review)"); }
+  ok(/hearing within 90 days of the filing and a final order within 180 days/.test(f.what) && html.indexOf("K.S.A. 66-1,177 and K.S.A. 66-1,178") > 0, "the siting fact: two deadlines, both statutory sections shown");
+  ok(html.indexOf("Undated, read 7 November 2026") > 0 && !/ · undated</.test(html), "the facts table keeps each source's access date"); }
 Object.keys(SRC).forEach(k => { ok(SRC[k].cite && Array.isArray(SRC[k].used) && SRC[k].used.length >= 1, k + ": a citation and the short claims it supports");
   SRC[k].used.forEach(u => ok(nWords(u) <= 30, k + ": a 'supports' line of " + nWords(u) + " words")); ok(nWords(SRC[k].cite) <= 30, k + ": a citation of " + nWords(SRC[k].cite) + " words"); });
 Object.keys(SRC).forEach(k => ok(/\d{4}/.test(SRC[k].asOf) && S.linkOK(SRC[k].url), k + ": dated, link on the allow-list or none"));
 
-// ---------------- the review's fixes (X4 review, 2026-11-07)
+// ---------------- the chain of authority (a law, then three tracks) and the selected milestones
 ok(D.chain.root && D.chain.tracks.length === 3 && /separate tracks and can overlap/.test(D.chain.note) && /authority/.test(D.chain.root.text), "a law, then three separate tracks that can overlap, not one sequence");
 D.chain.root.src.concat(...D.chain.tracks.map(t => t.src)).forEach(k => ok(SRC[k], "the tracks cite " + k));
 { const h = M.chainHTML(D); ok(D.chain.tracks.every(t => h.indexOf(t.title) > 0) && h.indexOf(D.chain.note) > 0 && M.staticFallback(D).indexOf(h) >= 0, "the tracks figure, also in the no-JS block"); }

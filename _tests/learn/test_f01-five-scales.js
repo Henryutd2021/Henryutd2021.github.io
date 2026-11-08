@@ -28,18 +28,19 @@ const words = s => s.replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1").replace(/\*\*/g
 // links). Model validation: a stated quantity is recomputed from its inputs (the home's average power, the town's peak
 // hour, the unit key) and the assembled feedback is read as the reader sees it.
 
-// ---------------- source consistency: the five scales (curriculum v2 §5.3) and the card rounds
+// ---------------- source consistency: the five scales (as the course defines a scale: decisions, authority, physics, inputs,
+// outputs) and the card rounds
 {
   ok(D.scales.map(s => s.id).join() === "S0,S1,S2,S3,S4" && M.SCALES.join() === "S0,S1,S2,S3,S4", "five scales, S0 to S4, in order");
   D.scales.forEach(s => ["name", "place", "setting", "power", "question", "who", "what", "physics", "inputs", "outputs"].forEach(k => ok(typeof s[k] === "string" && s[k].length > 2, `${s.id}.${k} present`)));
   ok(/data-center campus \(a large load\)/.test(D.scales[3].setting), "S3: the data-center campus appears only as a load");
-  ok(/running the regional grid is a different role/.test(D.scales[3].who) && /even when a city owns a utility/.test(D.rounds.who.cards[3].why), "S3: city planning and regional dispatch are different roles, even where a city owns a utility (review F1 #7)");
+  ok(/running the regional grid is a different role/.test(D.scales[3].who) && /even when a city owns a utility/.test(D.rounds.who.cards[3].why), "S3: city planning and regional dispatch are different roles, even where a city owns a utility");
   ok(!/not power plants or wholesale markets/.test(JSON.stringify(D)), "S3: no claim that a city never owns plants or trades in markets");
   const allText = JSON.stringify(D) + JS + QMD;
-  ok(!/never needs frequency|cannot do without/.test(allText), "physics: no claim that a home model never needs frequency (review F1 #1)");
-  ok(!/whole synchronous grid|a regional grid is one synchronous network/.test(allText), "S2: an operator runs its region, not a whole synchronous grid (review F1 #4)");
-  ok(!/(share|cover) the same land/.test(allText), "a city and a grid region overlap; they do not 'share the same land' (review F1 #6)");
-  ok(!/\b(ISO|RTO)\b/.test(JSON.stringify(D.rounds) + QMD.replace(/<!--[\s\S]*?-->/g, "")), "no unexpanded ISO or RTO in the cards or on the page (review F1 #8)");
+  ok(!/never needs frequency|cannot do without/.test(allText), "physics: no claim that a home model never needs frequency");
+  ok(!/whole synchronous grid|a regional grid is one synchronous network/.test(allText), "S2: an operator runs its region, not a whole synchronous grid");
+  ok(!/(share|cover) the same land/.test(allText), "a city and a grid region overlap; they do not 'share the same land'");
+  ok(!/\b(ISO|RTO)\b/.test(JSON.stringify(D.rounds) + QMD.replace(/<!--[\s\S]*?-->/g, "")), "no unexpanded ISO or RTO in the cards or on the page");
   D.rounds.exchange.cards.forEach(c => ok(/^[A-Z][a-z ]+ → [a-z ]+: /.test(c.text), `exchange.${c.id}: names its sender and receiver ("${c.text}")`));
   D.scales.forEach(s => ok(typeof s.gloss === "string" && words(s.gloss) <= 35 && sentences(s.gloss) <= 2, `${s.id}: one gloss line under the zoom, within budget`));
   ok(/\[\[microgrid\|/.test(D.scales[1].gloss) && /\[\[islanding\|/.test(D.scales[1].gloss) && /\[\[feeder\|/.test(D.scales[1].gloss), "S1's zoom frame defines microgrid, islanding and feeder at first use");
@@ -68,7 +69,7 @@ const words = s => s.replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1").replace(/\*\*/g
   ok(M.ladder(D, {}).S2.what === null, "ladder: unsorted cards show as not sorted");
   ok(D.predict.answer === "S2" && D.predict.options.length === 5 && D.apply.answer === "changes" && Object.keys(D.apply.feedback).length === 3, "predict and apply questions");
   // the apply question states that the old plan breaks the limit, and claims only what follows: operation must change,
-  // the equipment may (review F1 #2)
+  // the equipment may
   const ans = D.apply.options.find(o => o.value === "changes").label;
   ok(/below what that plan sends out/.test(D.apply.q) && /operation must change/.test(ans) && /may change/.test(ans) && /takes a new run/.test(D.apply.feedback.changes), "apply: the limit binds; operation must change, the cheapest equipment may");
   ok(/Modeler lesson \[\[lesson:m05-microgrid-size-and-run\|M5\]\] solves exactly this campus/.test(JS) && !/M5 \(upcoming\)/.test(JS) && D.lessons.S1.some(x => x.code === "M5" && x.note === "size and run a microgrid") && CORE.lessonRef(PJ, "M5").ready, "the campus question links M5, now live");
@@ -82,14 +83,14 @@ const words = s => s.replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1").replace(/\*\*/g
   ok(A.sppPeakGW === 54.4 && A.sppText === "54.4 GW" && TD.stats.peak_demand_GW === 54.4, "SPP 2025 peak 54.4 GW (EIA-930 statistics)");
   ok(A.usPeakMW === 759180 && A.usText === "759 GW" && /65864/.test(P1.anchors.us_peak.url), "Lower 48 record 759,180 MW = 759 GW (EIA)");
   ok(A.windMW === 150 && A.townPeakMW === 450, "Prairie Town: 150 MW wind farm, 450 MW scaling (illustrative, town.json)");
-  // 450 MW is the highest hour of the town's illustrative year (SPP's 2025 shape × the scaling), not lesson 0's day (review F1 #3)
+  // 450 MW is the highest hour of the town's illustrative year (SPP's 2025 shape × the scaling), not lesson 0's day
   const yearPeak = Math.max.apply(null, YEAR.demand) / 1000 * TOWN.scenarios.lesson0.demandPeakMW;
   ok(yearPeak === A.townPeakMW, `the town's highest hour of the year, recomputed from town_year.json: ${yearPeak} MW`);
   const L0 = TOWN.scenarios.lesson0, dayIdx = Math.round((Date.parse(L0.date + "T00:00:00Z") - Date.parse(YEAR.start_utc + "Z")) / 3600e3) + 1 - L0.utcOffsetHours;   // as grid-operator.js
   const dayPeak = Math.max.apply(null, YEAR.demand.slice(dayIdx, dayIdx + 24)) / 1000 * TOWN.scenarios.lesson0.demandPeakMW;
   ok(dayPeak < yearPeak - 50, `lesson 0's day peaks lower (${dayPeak.toFixed(0)} MW), so the page must say 'of the year'`);
   ok(/Prairie Town's highest hour of the year needs " \+ W\.townPeakMW/.test(JS) && /yearly peak: ' \+ W\.townPeakMW/.test(JS) && /450 MW is the highest hour of its illustrative year/.test(QMD), "page and zoom label 450 MW as the year's highest hour");
-  ok(!/draws about|average draw/.test(JS + QMD), "EIA's figure is electricity bought per residential customer, not a home's total draw (review F1 #11)");
+  ok(!/draws about|average draw/.test(JS + QMD), "EIA's figure is electricity bought per residential customer, not a home's total draw");
   // the unit key: each step is a factor of 1,000
   const UNITS = [["kW", 1e3, "W"], ["MW", 1e3, "kW"], ["GW", 1e3, "MW"]], key = D.scales[0].gloss.replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1");
   UNITS.forEach(u => { ok(key.indexOf("1 " + u[0] + " = " + u[1].toLocaleString("en-US") + " " + u[2]) >= 0, `unit key: 1 ${u[0]} = 1,000 ${u[2]} (zoom)`); ok(QMD.indexOf("1 " + u[0] + " = " + u[1].toLocaleString("en-US") + " " + u[2]) >= 0, `unit key: 1 ${u[0]} = 1,000 ${u[2]} (no-JS page)`); });
@@ -128,7 +129,7 @@ const words = s => s.replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1").replace(/\*\*/g
   ok(steps.length >= 6, `${steps.length} literal step texts`);
   steps.forEach(t => { ok(words(t) <= 40 && sentences(t) <= 2, `step text within budget (two sentences, about 35 words): "${t.slice(0, 50)}…"`); ok(t.indexOf("**") < 0, "no ** in step text"); });
   ok(words(D.apply.q) <= 40 && sentences(D.apply.q) <= 2, "apply question within budget");
-  // the assembled feedback, as the reader sees it after Check, for every score (review F1 #12)
+  // the assembled feedback, as the reader sees it after Check, for every score
   ["who", "what", "physics", "exchange", "battery"].forEach(k => { const n = D.rounds[k].cards.length; for (let r = 0; r <= n; r++) [null, "S2", "S0"].forEach(p => {
     const t = M.feedback(D, k, { right: r, total: n, placed: n }, p);
     ok(words(t) <= 45 && sentences(t.replace(/^\*\*[^*]+\*\*[^.]*\.\s*/, "")) <= (k === "who" ? 3 : 2), `${k} feedback at ${r} of ${n}: within budget (${words(t)} words)`);

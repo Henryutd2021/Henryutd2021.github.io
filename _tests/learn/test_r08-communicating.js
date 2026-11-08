@@ -6,7 +6,7 @@
 //     its P10–P90 by hour and the year's highest hour; when summer and winter days peak
 //   - each chart: one diagnosis that is right, one key fix, the misleading and fixed specs draw what the text says; in all
 //     eight fix combinations the title and caption describe what is drawn, and the chart counts as repaired only with its
-//     key fix and its title fix (W4 review, 2026-11-05); the highest-hour line is in the text version and the label
+//     key fix and its title fix; the highest-hour line is in the text version and the label
 //   - the writing steps: done only when every form check passes (a draft over 150 words, or without a range, is not)
 //   - the briefing says what its ranges mean, what varied, that outcomes outside them remain possible, how a constant
 //     60 MW load moves each figure, and why adding separate peaks cannot show the programme's effect
@@ -202,7 +202,7 @@ const urls = (OWN + JSON.stringify(D) + JS).match(/https?:\/\/[^\s"'<>)\\]+/g) |
 const allowed = /^https:\/\/([\w-]+\.)*(eia\.gov|doi\.org)\//;
 ok(urls.every(u => allowed.test(u)), "every link on an allow-listed host: " + urls.filter(u => !allowed.test(u)).join(" "));
 ok(!/\bAI\b|artificial intelligence|nuclear|reactor|\bSMR\b|learning[- ](curve|rate)|data[- ]cent/i.test(JSON.stringify(D) + JS + OWN), "no deny-listed or out-of-scope words");
-ok(!/Henryutd2021|CF7|cf7-|delay(ed)? energization|NAPS/i.test(JSON.stringify(D) + JS + OWN), "no Henry research");
+ok(!/Henryutd2021|CF7|cf7-|delay(ed)? energization|NAPS/i.test(JSON.stringify(D) + JS + OWN), "none of the course author's research");
 
 // ---------------- text budget
 const words = R.words;

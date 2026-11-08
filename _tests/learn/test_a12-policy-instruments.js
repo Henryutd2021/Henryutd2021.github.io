@@ -4,15 +4,15 @@
 //     investment credit never raise CO2 against no policy; the standard's share is met; transfers are recomputed from
 //     first principles (carbon payments = price x CO2; credits = credit x new clean MWh, or the credit's share of annual
 //     capital; certificates = certificate price x required clean MWh)
-//   - ties (W4 brief §2.7): at every slider setting, every number the page shows is the same for every best plan: each is
+//   - ties: at every slider setting, every number the page shows is the same for every best plan: each is
 //     minimized and maximized over the optimal face of the LP without the tie rule's hair costs, and both ends print the
 //     same as the page's value; the certificate price is unique (both one-sided changes of the cost agree)
 //   - claims: no battery is built at any slider setting (the page says so); the default settings cut CO2 by similar
 //     shares; a larger production credit costs more per tonne
 //   - the page's blocks (fallback, explain, check, rules) are written from the model (--write) and checked otherwise
-//   - guard G-POL: instruments act on wind, solar, storage and gas only; no nuclear term; no break-even or threshold search
+//   - credit and threshold scope: instruments act on wind, solar, storage and gas only; no nuclear term; no break-even or threshold search
 //     or wording; links only to allowed domains; text budget; the page on a stub document with a failing, then working, solver
-//   - review fixes (2026-11-05): a solve that ends after the reader left its step paints nothing; the investment credit's
+//   - state and wording: a solve that ends after the reader left its step paints nothing; the investment credit's
 //     yearly figure is an annual equivalent, with its cash up front (overnight capital x share, unique on the optimal face);
 //     certificate spending is illustrative, with its market assumption; no battery is built, said with the reason the LP
 //     gives; cost per tonne worked through; every line the page assembles, at every slider setting, within the budget
@@ -160,11 +160,11 @@ ${D.rules.map(r => { const src = x => `<p class="lx-hint">Source: ${x.url ? `<a 
   Object.keys(blocks).forEach(k => { const m = PAGE.match(blockRx(k)); ok(m && PAGE.includes(m[1] + blocks[k] + "\n<!-- " + k + ":end -->"), "the page's block " + k + " is written from the model (run --write)"); });
   Object.keys(reference.defaults).forEach(k => ok(JSON.stringify(D.reference.defaults[k]) === JSON.stringify(reference.defaults[k]), "reference block: " + k));
 
-  // ---------------- scope, guard G-POL, links, text
+  // ---------------- scope (credit and threshold exercises: wind, solar, storage and gas only), links, text
   const OWN = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1:end -->/g, "").replace(/<!--[\s\S]*?-->/g, "").replace(/^---[\s\S]*?\n---\n/, "");
   const ALLTXT = OWN + JS + JSON.stringify(D);
   ok(!/nuclear|reactor|\bSMR\b|small modular/i.test(ALLTXT), "no nuclear term in the lesson's own files");
-  ok(!/break[- ]?even|breaks even|threshold|zero[- ]credit|at which .* (pays|starts)/i.test(ALLTXT), "G-POL: no break-even or threshold search or wording");
+  ok(!/break[- ]?even|breaks even|threshold|zero[- ]credit|at which .* (pays|starts)/i.test(ALLTXT), "credit scope: no break-even or threshold search or wording");
   ok(!/data cent/i.test(ALLTXT) && !/\bAI\b/.test(ALLTXT), "no data centers, no AI wording");
   ok(D.instruments.map(x => x.id).join() === "tau,ptc,itc,ces" && /wind, solar and batteries/.test(D.instruments[2].unit) && /new wind and solar/.test(D.instruments[1].unit), "credits act on new wind, solar and batteries only");
   const hrefs = [...OWN.matchAll(/href="([^"]+)"/g)].map(m => m[1]).concat(D.rules.map(r => r.source.url).filter(Boolean));
@@ -183,7 +183,7 @@ ${D.rules.map(r => { const src = x => `<p class="lx-hint">Source: ${x.url ? `<a 
   ok(["heat-rate", "net-demand", "shadow-price"].every(id => PAGE.includes('data-term="' + id + '"') || PAGE.includes('term="' + id + '"')) && JS.includes("[[curtailment|curtailed]]") && JS.includes("Mt = million tonnes of CO₂; TWh = million MWh"), "course glossary terms marked (heat rates, net load, curtailed, shadow price); Mt and TWh spelled out");
   ok(/\*\*Symbols\.\*\* \$t\$: an hour of the six days; \$w_t\$: the days it stands for/.test(PAGE), "the Modeler box's symbols, with units");
   { const ca = D.rules.find(r => r.id === "ces"); ok(ca.where === "California" && /Senate Bill 100 \(2018\)/.test(ca.text) && /60% of retail electricity sales by 2030/.test(ca.text) && /California Public Utilities Commission/.test(ca.source.label) && /read 5 November 2026/.test(ca.source.asOf) && /16 states/.test(ca.context.text) && /lbl\.gov/.test(ca.context.source.url), "the standard's real rule: California's RPS (SB 100, 2018: 60% by 2030; CPUC page), the LBNL count as context"); }
-  ok(PAGE.indexOf("m06-carbon-in-models.js\" defer") < 0 && PAGE.indexOf("learn.js\" defer") > 0 && PAGE.indexOf("learn.js\" defer") < PAGE.indexOf("a12-policy-instruments.js\" defer"), "the shared planning LP comes with the bundle (components/plainsplan.js, W4 integration); the page loads no other lesson's script");
+  ok(PAGE.indexOf("m06-carbon-in-models.js\" defer") < 0 && PAGE.indexOf("learn.js\" defer") > 0 && PAGE.indexOf("learn.js\" defer") < PAGE.indexOf("a12-policy-instruments.js\" defer"), "the shared planning LP comes with the bundle (components/plainsplan.js); the page loads no other lesson's script");
   { const PY = fs.readFileSync(path.join(SITE, "learn/path.yml"), "utf8"), r = PY.slice(PY.indexOf("id: " + ID), PY.indexOf("id: " + ID) + 1600);
     ok(/status: active/.test(r.split("- kind:")[0]) && r.includes("after: [A1, 12]") && PAGE.includes('subtitle: "' + (r.match(/subtitle: "([^"]+)"/) || [])[1] + '"'), "path.yml: active, after A1 and lesson 12, subtitle equal to the page's"); }
 
@@ -221,7 +221,7 @@ ${D.rules.map(r => { const src = x => `<p class="lx-hint">Source: ${x.url ? `<a 
       ok(card().textContent.includes("EU Emissions Trading System") && card().textContent.includes(f.m(R["ces" + D.instruments[3].def].certPay)), "step 6: the ledger of all four and the real rules");
       ok(xp.textContent.includes("Four instruments, one plan"), "explain: the comparison table");
       ok(card().textContent.includes("California") && card().textContent.includes("16 states") && card().querySelectorAll(".a12-rules li").every(li => li.querySelectorAll("p").length >= 3), "step 6: each real rule as name, mechanism and source, the LBNL count as context");
-      // a solve that ends after the reader has left its step paints nothing (review finding 1): enter the production
+      // a solve that ends after the reader has left its step paints nothing: enter the production
       // credit at a new setting, go Back to step 1 before the solve ends, then let it end
       const ttl = () => live.querySelector("h3").textContent;
       demo.cards.go(2); for (let i = 0; i < 6; i++) await tick();

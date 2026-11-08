@@ -89,7 +89,7 @@ ok(S.snowball.fillers_citing_review.indexOf(D.fillers[0].doi) >= 0, "the closest
 const ref = M.refMarks(D), c = M.cross(D, ref);
 ok(c.yy.length === 0 && c.yn.join() === "p04,p06" && c.ny.join() === "p10,p11" && c.nn.length === 8, "storage × extremes: 0 both, 2 storage only, 2 extremes only, 8 neither");
 ok(M.emptyCells(c).join() === "yy", "the only empty cell is storage linked and extremes kept");
-// feedback from the selected cell and the counted coding (review R2 #2)
+// feedback from the selected cell and the counted coding
 ok(M.cellFeedback(D, c, "yy").empty && /reports both a storage link between periods and extreme periods/.test(M.cellFeedback(D, c, "yy").text), "course's coding: the empty cell's feedback names both");
 ok(!M.cellFeedback(D, c, "yn").empty && /Kotzur et al\. \(2018\); Tejada-Arango/.test(M.cellFeedback(D, c, "yn").text), "course's coding: a full cell lists its papers");
 { const m = JSON.parse(JSON.stringify(ref)); m.p04.extreme = true; m.p06.extreme = true;

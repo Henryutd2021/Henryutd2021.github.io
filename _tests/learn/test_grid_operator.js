@@ -178,7 +178,7 @@ const save = T.cost - opt.totals.cost, pct = 100 * save / T.cost;
      QMD.indexOf(`Planning saves \\$${fmtInt(save)}, about ${pct.toFixed(1)}%`) >= 0, "page: Modeler preview's rule-versus-plan rows and saving stated from the model");
   ok(QMD.indexOf(`At 21:00 demand is ${q.demand} MW. Nuclear makes ${q.nuclear} MW, wind ${q.wind} MW, and the sun is down`) >= 0 && q.solar === 0, "page: quiz 1 states hour 21's numbers");
   ok(QMD.indexOf(`${q.demand} − ${q.nuclear} − ${q.wind} = ${need21}`) >= 0 && QMD.indexOf(`data-answer="c"`) >= 0 && QMD.indexOf(`<li data-value="c">${need21} MW</li>`) >= 0, `page: quiz 1 answer is ${need21} MW`);
-  // the Modeler box is a preview (curriculum §4.6): words for decisions, goal and rules, one symbolic line, links to lessons 10 and 11
+  // the Modeler box is a preview, not a way past the depth budget: words for decisions, goal and rules, one symbolic line, links to lessons 10 and 11
   ok(QMD.indexOf(`${F.cc.cost}\\,p_\\mathrm{cc}(t) + ${F.peaker.cost}\\,p_\\mathrm{pk}(t)`) >= 0, "page: the preview's goal line uses the gas running costs");
   ok(QMD.indexOf(`at most ${F.cc.ramp} MW an hour, starting from ${G.startCC} MW at midnight`) >= 0, "page: the preview states the ramp limit and the start (initial condition)");
   ok(QMD.indexOf("\\begin{aligned}") < 0 && QMD.indexOf("(10-write-it-down.qmd)") >= 0 && QMD.indexOf("(11-solver.qmd)") >= 0, "page: no full formulation in lesson 0; it links lessons 10 and 11");
@@ -192,10 +192,10 @@ const save = T.cost - opt.totals.cost, pct = 100 * save / T.cost;
   void t1;
 }
 
-// ---------------- review fixes (W1 fix brief, 2026-11-02)
+// ---------------- the details, one by one
 {
   const JS = fs.readFileSync(path.join(SITE, "assets/learn/grid-operator.js"), "utf8");
-  // auto-finish continues from the reader's own last hour (the review's reproduction: 75/45 MW at 00:00, 35/80 MW at 01:00)
+  // auto-finish continues from the reader's own last hour (a reproduction: 75/45 MW at 00:00, 35/80 MW at 01:00)
   const mine = [{ cc: 75, pk: 45 }, { cc: 35, pk: 80 }], done = M.simulate(W, M.finishPlan(W, mine));
   ok(done.rampOK && done.totals.unserved === 0 && done.totals.hoursOff === 0, "auto-finish: from 75/45 and 35/80 MW every later hour is balanced and ramp-feasible");
   // the old button: the precomputed schedule's set-points, the combined-cycle clamped to its reach (the slider's range)

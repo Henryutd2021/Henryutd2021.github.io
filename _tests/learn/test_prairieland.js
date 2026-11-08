@@ -1,6 +1,6 @@
-// test_prairieland.js — Node tests for Prairieland's shared data, assets/learn/data/prairieland.json (wave W6, S4),
-// written by scripts/build_learn_prairieland.py (ResearchPortfolio repository). Read by F10, A20, A21, M13, SB4 (engine
-// E4) and C4; pages read these numbers and never retype them.
+// test_prairieland.js — Node tests for Prairieland's shared data, assets/learn/data/prairieland.json (scale S4),
+// written by its data build step. Read by F10, A20, A21, M13, SB4 (engine E4) and C4; pages read these numbers and
+// never retype them.
 //   - the card: shares sum to 1, primary energy 3.5 EJ, oil 80% imported, LNG 40% of gas, all coal from Ridge County,
 //     CO2 214.9 Mt recomputed from the IPCC factors
 //   - balances close: every Sankey node balances, the balance table equals the Sankey, regions add up to the nation
@@ -35,7 +35,7 @@ const SECT = ["industry", "buildings", "transport", "agriculture"];
 // ---------------- the frame
 ok(D.about.line === "Prairieland is fictional; its numbers are illustrative.", "the fictional line, word for word");
 ok(D.dollarYear === 2025 && D.about.dollarYear === 2025 && D.costs.dollarYear === 2025, "2025 dollars");
-ok(/scripts\/build_learn_prairieland\.py/.test(D.about.builtBy), "about names its builder");
+ok(/Prairieland data build step/.test(D.about.builtBy) && /test_prairieland\.js/.test(D.about.builtBy), "about names its build step and its test");
 ok(RAW.length < 100 * 1024, "the file is under 100 KB (" + (RAW.length / 1024).toFixed(1) + " KB)");
 ok(JSON.stringify(D.regions.map(r => r.key)) === JSON.stringify(RK), "five regions");
 
@@ -137,7 +137,7 @@ ok(D.ridgeCounty.region === "ridge" && near(D.ridgeCounty.coalMt, Math.round(700
 ok(D.ridgeCounty.workers === a13.ridgeCounty.prairielandWorkforce * a13.ridgeCounty.workforceShare, "Ridge County's workers = 3% of the workforce");
 ok(near(D.ridgeCounty.ridgeStationFuel2025PJ, ridgeSt.fuel2025PJ, 1e-9), "Ridge Station's fuel matches the fleet");
 
-// ---------------- costs: ranges inside their sources' ranges (G-COST)
+// ---------------- costs: fixed ranges inside their sources' ranges
 const TC = D.costs.technologies;
 Object.entries(TC).forEach(([k, t]) => {
   ok(t.capex.lo <= t.capex.def && t.capex.def <= t.capex.hi, k + ": default capital cost inside its range");
@@ -240,7 +240,7 @@ ok(near(sc.lostPJ, (I.oil.importPJ + 0.25 * I.lng.importPJ) * 8 * 7 / 365, 0.05)
 ok(JSON.stringify(D.demand.scenarios.map(s => s.key)) === JSON.stringify(["low", "central", "high"]) && D.demand.scenarios.every(s => SECT.every(k => typeof s.growth[k] === "number")), "three demand scenarios, every sector");
 ok(D.demand.electrification.transport.ratio === pc.transport.evEfficiency, "EV efficiency read from prairie-city.json");
 
-// ---------------- scope (curriculum v2 §20; G-COST, G-NUC, G-GIS)
+// ---------------- scope (the course's scope rules: fixed cost ranges, the nuclear scope, the siting examples)
 const strings = [];
 (function walk(x, k) {
   if (Array.isArray(x)) x.forEach(v => walk(v, k));
@@ -274,14 +274,14 @@ ok(!/https?:\/\//.test(JSON.stringify(Object.assign({}, D, { sources: null }))),
 
 // ---------------- the README section
 const README = fs.readFileSync(L("README.md"), "utf8");
-const sec = (README.split(/\n(?=## )/).find(s => /^## Prairieland data \(wave W6\)/.test(s)) || "");
-ok(sec.length > 0, "README has a 'Prairieland data (wave W6)' section");
-ok(/never retype/i.test(sec) && /build_learn_prairieland\.py/.test(sec) && /test_prairieland\.js/.test(sec), "README: read, never retype; the builder and the test named");
+const sec = (README.split(/\n(?=## )/).find(s => /^## Prairieland data\n/.test(s)) || "");
+ok(sec.length > 0, "README has its Prairieland data section");
+ok(/never retype/i.test(sec) && /Prairieland data build step/.test(sec) && /test_prairieland\.js/.test(sec), "README: read, never retype; the build step and the test named");
 ["F10", "A20", "A21", "M13", "SB4", "C4", "E4"].forEach(k => ok(new RegExp("\\b" + k + "\\b").test(sec), "README names reader " + k));
 Object.keys(D).forEach(k => ok(sec.includes("`" + k + "`"), "README documents the field `" + k + "`"));
 
 
-// public wording: no private guard codes, no builder or internal notes in the published data (W6 fix review, 2026-11-07)
+// public wording: no editorial guard codes, no build or internal notes in the published data
 {
   const raw = require("fs").readFileSync(require("path").join(__dirname, "../../assets/learn/data/prairieland.json"), "utf8");
   ok(!/\bG-(COST|NUC|DC|GIS|POL|SRC|FIN)\b/.test(raw), "no guard codes in the public data");

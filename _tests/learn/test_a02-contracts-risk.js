@@ -5,8 +5,8 @@
 // 2025 (statements one by one, a whitelist scan of the visible text, printed calculations recomputed). Every risk number
 // on the page is a named statistic (P10, median, P90, mean) of the simulated years. The whitelist scan is supplementary:
 // it shows every number is one the model makes, not that each statement is right (those are checked one by one). A
-// stub-document run checks that step 7's slider shows the offset the charts use after Back and Next (Codex review,
-// 2026-11-03), and that cards 3 to 5 never show a contract their picker does not offer.
+// stub-document run checks that step 7's slider shows the offset the charts use after Back and Next, and that cards 3
+// to 5 never show a contract their picker does not offer.
 // Usage (from the site folder):  node _tests/learn/test_a02-contracts-risk.js [--write]   (--write rewrites the no-JS table)
 "use strict";
 const fs = require("fs");
@@ -171,15 +171,16 @@ const S = sm.solar;
   const vis = QMD.replace(/<!--[\s\S]*?-->/g, "");
   ok(!/\bthe risk is \$|\brisk of \$|\bwill (earn|pay)\b/i.test(vis), "statistics: no risk number is stated as the outcome");
   ["a01-project-tea.html", "k05-probability-statistics.html", "07-cost.html"].forEach(h => ok(QMD.indexOf('href="' + h + '"') >= 0, "links " + h));
-  ok(!/href="[^"]*(projects\/|research\.)/i.test(QMD) && /href="m07-monte-carlo\.html">M7<\/a>/.test(QMD) && !/M7 \(upcoming\)/.test(QMD) && /href="x05-project-finance\.html">X5<\/a>/.test(QMD) && !/X5,? \(?upcoming/.test(QMD), "M7 (W3) and X5 (W7) linked now that they are live");
+  ok(!/href="[^"]*(projects\/|research\.)/i.test(QMD) && /href="m07-monte-carlo\.html">M7<\/a>/.test(QMD) && !/M7 \(upcoming\)/.test(QMD) && /href="x05-project-finance\.html">X5<\/a>/.test(QMD) && !/X5,? \(?upcoming/.test(QMD), "M7 and X5 linked now that they are live");
   ok(/68227\.pdf">Wind Energy Finance[\s\S]*pp\. 27–28/.test(QMD) && /Physical PPA<\/a> \(updated 10 July 2026\)/.test(QMD) && /Financial PPA<\/a> \(updated 14 July 2026\)/.test(QMD) && /pp\. 121–122/.test(QMD) && /p\. 5 \(Table 1 note\) and p\. 34/.test(QMD) && /From the abstract/.test(QMD), "sources: primary, with pages or dates; the Joule paper read from its abstract");
 }
 
-// ---------------- scope: generic contract names, solar and storage only (G-FIN), no companies, no data centers or nuclear
+// ---------------- scope: generic contract names, solar and storage only (contract examples use wind, solar, storage and gas
+// only; here solar and a battery), no companies, no data centers or nuclear
 {
   const body = QMD.replace(/<!-- learn:meta:start[\s\S]*?learn:meta:end -->/, "").replace(/<li>Schwabe[\s\S]*?<\/li>/, "");
   ok(!/nuclear|reactor|\bSMR\b|data cent|learning/i.test(body + JS.replace(/\/\/.*$/gm, "")), "scope: no nuclear, data centers or learning wording");
-  ok(!/\bwind\b|\bgas\b|coal|hydrogen/i.test(body.replace(/<li>(EPA|FERC|Kahrl|Millstein)[\s\S]*?<\/li>/g, "")) , "G-FIN: the contracts are for solar and a battery only (outside the source titles)");
+  ok(!/\bwind\b|\bgas\b|coal|hydrogen/i.test(body.replace(/<li>(EPA|FERC|Kahrl|Millstein)[\s\S]*?<\/li>/g, "")) , "contract scope: the contracts are for solar and a battery only (outside the source titles)");
   ok(!/\b(Inc|LLC|Corp|Ltd)\b|Google|Amazon|Microsoft|Meta\b|Apple|NextEra|Tesla|Fluence/.test(body + JS), "scope: no company names");
   ["fixed price", "as generated", "shaped", "hub"].forEach(t => ok(new RegExp(t, "i").test(body), "contract named generically: " + t));
 }

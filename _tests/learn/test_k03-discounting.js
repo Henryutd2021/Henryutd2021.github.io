@@ -117,7 +117,7 @@ const usd = K.usd, f4 = K.f4;
   ["07-cost.html", "12-trade-offs.html", "13-capstone.html"].forEach(h => ok(QMD.indexOf('href="' + h + '"') >= 0 || QMD.indexOf("](" + h + ")") >= 0, "links back to " + h));
   ok(/EMM_Assumptions\.pdf">EIA, AEO2026 assumptions, Table 3<\/a> \(2025 dollars, April 2026\)/.test(QMD) && /financial_cases_&amp;_methods">NLR, 2025 ATB<\/a> · September 2026/.test(QMD), "sources: EIA and NLR with their dates");
   ok(/\$100 and 7% are illustrative/.test(QMD), "the illustrative values are labelled");
-  ok(/\[M13\]\(m13-national-pathway\.html\)/.test(QMD) && !/M13, upcoming/.test(QMD) && /<a href="a01-project-tea\.html">A1<\/a> builds on it, and so does Modeler lesson <a href="m11-tea-in-models\.html">M11<\/a>/.test(QMD) && /\[M11\]\(m11-tea-in-models\.html\) puts/.test(QMD), "A1 (W3), M11 (W5) and M13 (W6) linked now that they are live");
+  ok(/\[M13\]\(m13-national-pathway\.html\)/.test(QMD) && !/M13, upcoming/.test(QMD) && /<a href="a01-project-tea\.html">A1<\/a> builds on it, and so does Modeler lesson <a href="m11-tea-in-models\.html">M11<\/a>/.test(QMD) && /\[M11\]\(m11-tea-in-models\.html\) puts/.test(QMD), "A1, M11 and M13 linked: they are live");
   ok(!/nuclear|reactor|\bSMR\b|learning|data cent/i.test(QMD.replace(/<!-- learn:meta:start[\s\S]*?learn:meta:end -->/, "")) && !/nuclear|reactor|learning|data cent/i.test(JS.replace(/\/\/.*$/gm, "")), "scope: no nuclear, no learning wording, no data centers");
 }
 
@@ -174,7 +174,7 @@ const usd = K.usd, f4 = K.f4;
   ok(a === b, "drill: a seed replays the same items");
 }
 
-// ---------------- every printed calculation reproduces from the operands it prints (Codex review 2026-11-03, point 3)
+// ---------------- every printed calculation reproduces from the operands it prints
 // A chain such as "$1,712 ÷ 17.292 = $99.01" is evaluated with the shown operands: "=" must round to the shown result at
 // its shown precision; "≈" marks a rounded operand and must agree within 0.5%. A side that starts or ends with a word or an
 // unknown ("today × 1.07^10 = $100", "= ? per kW") is not a calculation and is skipped; skips are listed and must match SKIP_OK.
@@ -241,10 +241,10 @@ function calcCheck(label, str, skips) {
   const bad = skips.filter(x => !SKIP_OK.some(re => re.test(x)));
   ok(bad.length === 0, "calc: only algebra lines and open questions are skipped; unexpected: " + JSON.stringify([...new Set(bad)].slice(0, 8)));
   // the old mismatches are gone (1 ÷ 17.29 = 0.05783, $1,712 ÷ 17.29 = $99.01, 0.0578 × $1,712 + $34.57 = $133.58)
-  ok(!/17\.29 = 0\.05783|1,712 ÷ 17\.29 =|0\.0578 × \$1,712 \+ \$34\.57 =/.test(QMD + JS), "calc: the three printed mismatches the review found are gone");
+  ok(!/17\.29 = 0\.05783|1,712 ÷ 17\.29 =|0\.0578 × \$1,712 \+ \$34\.57 =/.test(QMD + JS), "calc: the three printed mismatches found earlier are gone");
 }
 
-// ---------------- the other review fixes (Codex review 2026-11-03)
+// ---------------- other details
 {
   const T = K.texts(s);
   // 2: the planning equation carries the 1,000 kW per MW

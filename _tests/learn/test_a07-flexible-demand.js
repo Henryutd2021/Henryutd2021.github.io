@@ -8,10 +8,10 @@
 //   - the virtual power plant: energy that comes back = ret x energy cut; the value shared among kinds adds up to the
 //     town's saving; earnings; Feeder 7; the neighbours' trade (a pure transfer; the wires charge = A4's)
 //   - every number on the page (step sentences, Go deeper, myths, quiz, practice, no-JS block, numbers to remember)
-//   - research wording (curriculum §13, guard G-SRC): the excerpts are E6.4, E6.6 (excerpt:ghg) and E8.2, E8.4 with the
-//     note E8.7 (excerpt:supply-chain-mg) of reports/learn/excerpts_for_approval.md, word for word; no other sentence on
-//     the page, in the data or in the script describes the studies; the cited titles are those in inputs/publications.bib
-//   - state and wording (W3 review, 2026-11-03): step 3 compares the goals with the reader's kept settings; the shift line
+//   - research wording (the course's sourcing rule): the excerpts are the approved E6.4, E6.6 (excerpt:ghg) and E8.2,
+//     E8.4 with the note E8.7 (excerpt:supply-chain-mg), word for word; no other sentence on the page, in the data or in
+//     the script describes the studies; the cited titles are those of the author's publication list
+//   - state and wording: step 3 compares the goals with the reader's kept settings; the shift line
 //     says where moved use lands, from the dispatch; step 1's chart draws the hook's move; the explain chain and the
 //     earnings follow the restart setting; "10% extra energy", not "10% losses"; the plant-and-wire charge
 //   - scope: no nuclear terms, no "AI", links on the allow-list; text budget (words and sentences, every learner-facing
@@ -21,7 +21,7 @@
 const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
-const cp = require("child_process");
+const PRIV = require("./private_sources.js");
 const ID = "a07-flexible-demand";
 const SITE = path.resolve(__dirname, "..", "..");
 const L = p => path.join(SITE, "assets/learn", p);
@@ -166,12 +166,12 @@ const has = (s, msg) => ok(T_PAGE.indexOf(s) >= 0, msg + ": '" + s + "' on the p
   // ---------------- the page's sentences and numbers
   ok(M.hookReveal(W, D) === "None: the town still uses the same 10 MWh, at 14:00 instead of 20:00. Spare sun replaces the peaker, so the running cost falls $1,000 and the plants' CO₂ 5.5 t (metric tonnes).", "step 1 reveal");
   ok(M.shiftLine(W, D, { share: 0.05, goal: "cost" }) === "At 5%, 99 MWh move from gas hours into spare-sun hours: the running cost falls $5,995 and the plants' CO₂ falls 42.8 t. Energy saved: 0 MWh.", "step 2 line at 5%");
-  // step 1's chart (review A7 #3): once revealed, it draws the hook's move, and its readouts are the hook's
+  // step 1's chart: once revealed, it draws the hook's move, and its readouts are the hook's
   { const u = M.hookUse(W, D); ok(near(M.sum(u), M.sum(W.demand), 1e-9) && u[14] - W.demand[14] === 10 && W.demand[20] - u[20] === 10 && u.filter((x, t) => x !== W.demand[t]).length === 2, "the hook moves 10 MWh from 20:00 to 14:00 and nothing else");
     ok(/onPick: function \(\) \{ hookShown = true; paint\(\); pr\.reveal\(hookReveal\(W, D\)\)/.test(JS) && /part = "hook"; hookShown = false;/.test(JS) && /if \(hookShown\) \{ chip\("Moved", mwh\(H0\.q\)\); chip\("Energy saved", dmwh\(hk\.saved\)\); chip\("Running cost", dusd\(hk\.cost\)\); chip\("Plants' CO₂", dt\(hk\.co2\)\)/.test(JS),
       "step 1: the chart shows the move and its readouts only after the reveal, and nothing from the shift");
     ok(M.dusd(hk.cost) === "−$1,000" && M.dt(hk.co2) === "−5.5 t", "step 1's readouts: −$1,000 and −5.5 t, as the reveal says"); }
-  // where moved use lands, from the dispatch (review A7 #2): the cheapest goal only fills spare sun; the attributed goal
+  // where moved use lands, from the dispatch: the cheapest goal only fills spare sun; the attributed goal
   // also moves use into hours that still burn gas (12.15 MWh into 07:00 at 5%, the combined-cycle plant from 46 to 58.15 MW)
   { let bad = [];
     for (const share of shares) for (const loss of [false, true]) {
@@ -183,7 +183,7 @@ const has = (s, msg) => ok(T_PAGE.indexOf(s) >= 0, msg + ": '" + s + "' on the p
     ok(bad.length === 0, "the shift line names where use lands, as the dispatch has it, at every setting: " + bad.slice(0, 4).join("; "));
     ok(near(a5.up[7], 12.15, 1e-9) && near(a5.h[7].cc, 58.15, 1e-9) && W.h[7].cc === 46 && M.shiftLine(W, D, { share: 0.05, goal: "attr" }).indexOf("62 MWh of what arrives still needs gas") >= 0,
       "attributed goal at 5%: 12.15 MWh into 07:00 lifts the combined-cycle plant from 46 to 58.15 MW; 62 MWh land where gas runs"); }
-  // step 3 with the settings kept from step 4 (review A7 #1)
+  // step 3 with the settings kept from step 4
   { const L5 = M.goalLine(W, D, { share: 0.05, loss: true });
     ok(L5 === "The attributed goal moves 150 MWh, 60 MWh more, and books 20.8 t less attributed CO₂, against 16.7 t. The plants' CO₂ falls 37.3 t under it, against 39.5 t under the cheapest goal.",
       "step 3 with 10% extra energy kept: 150 against 90 MWh; plants' CO₂ 37.3 against 39.5 t (" + L5 + ")");
@@ -209,11 +209,11 @@ const has = (s, msg) => ok(T_PAGE.indexOf(s) >= 0, msg + ": '" + s + "' on the p
     "at $40 (a slider setting) a thermostat's owner loses $4 a year and a dairy earns $11,556"); }
   ok(/averages ten cooler, otherwise similar weekdays/.test(T_PAGE) && /Programs may adjust it/.test(T_PAGE) && /<span class="lx-term" data-term="baseline">baseline<\/span>, an estimate of what they would have used/.test(OWN),
     "the baseline quiz states its assumptions and defines baseline where it asks");
-  // earnings follow the restart setting (review A7 #5)
+  // earnings follow the restart setting
   { const Es = M.earnings(W, D, 30, null, true); ok(M.usd(Es.thermostat.owner) === "$7" && M.usd(Es.dairy.owner) === "$11,621" && M.usd(E30.thermostat.owner) === "$6", "staggered, a thermostat's owner earns $7 and a dairy $11,621 (at once: $6 and $11,566)");
     ok(/earnings\(W, D, S\.coord, null, S\.stagger\)/.test(JS) && (JS.match(/earnings\(W, D, S\.coord, null, S\.stagger\)/g) || []).length === 2 && /S\.stagger \? "a staggered restart" : "everyone back at once at 23:00"/.test(JS),
       "the earnings ledger and line use the reader's restart setting, and the caption names it"); }
-  // the explain chain, from the dispatch (review A7 #4)
+  // the explain chain, from the dispatch
   { const ks = D.vpp.devices.map(x => x.key); let bad = [];
     for (let m = 1; m < (1 << ks.length); m++) for (const st of [false, true]) {
       const k = {}; ks.forEach((x, i) => { if (m & (1 << i)) k[x] = true; });
@@ -236,7 +236,7 @@ const has = (s, msg) => ok(T_PAGE.indexOf(s) >= 0, msg + ": '" + s + "' on the p
   ok(/\["Other customers \(plants and wires\)", r\.others\], \["The plants: energy and CO₂", r\.plants, true\]\]/.test(JS) && /cells: \[x\[2\] \? "no change" : dusd\(x\[1\]\)\]/.test(JS) && !/indexOf\("plants"\)/.test(JS),
     "trade ledger: other customers show their −$16; only the plants' row says no change");
 
-  // ---------------- wording the W3 review corrected
+  // ---------------- wording: extra energy, the plant-and-wire charge, the trade's note, terms at first use
   { const code = JS.replace(/\/\/[^\n]*/g, " "), txt = T_PAGE + " " + RAW + " " + code;
     ok(!/10% loss|with losses|Losses:|"Losses\."/i.test(txt), "\"10% extra energy\" (1.1 MWh in per MWh moved), never \"10% losses\"");
     ok(!/wires charge|for the wires/.test(txt) && /plant-and-wire charge/.test(code), "the renter's 9.5¢ is a plant-and-wire charge, as in A4");
@@ -244,37 +244,32 @@ const has = (s, msg) => ok(T_PAGE.indexOf(s) >= 0, msg + ": '" + s + "' on the p
     ok(/\[\[feeder\|" \+ D\.feeder\.name \+ "\]\], a local distribution line/.test(JS) && /\[\[marginal-plant\|on the margin\]\]/.test(JS) && /CO₂ is in metric tonnes \(t\)/.test(OWN),
       "feeder, on the margin and t (metric tonnes) are explained at first use"); }
 
-  // ---------------- research wording (curriculum §13, guard G-SRC)
-  const SNAP = {   // excerpts_for_approval.md, 2026-11-03 (E6 approved W2; E8 approved W3)
+  // ---------------- research wording (the sourcing rule)
+  const SNAP = {   // the approved wording of E6 and E8
     "E6.4": "In the reported scenarios, reductions in attributed emissions were on the order of one to two percent of regional totals or less.",
     "E6.6": "Reductions are computed under average-emission-intensity accounting with perfect foresight; they are not estimates of the consequential (marginal) system response.",
     "E8.2": "From the course author's research: in the modeled supply chains, each open factory or warehouse could run its own microgrid, with on-site wind, solar and storage, an energy balance every hour, and energy bought from and sold to the grid.",
     "E8.4": "Because the transactive energy market brought a new revenue stream, locations with stronger renewables became competitive to establish facilities despite higher fixed and logistics cost.",
     "E8.7": "Holds when: stylized networks with synthetic distances and costs, candidate sites in California, Arizona and Nevada, and one year, planned week by week for products and hour by hour for energy. Leaves out: grid outages, which the studies do not model."
   };
-  function portfolio() {
-    const c = [process.env.LEARN_PORTFOLIO, path.join(SITE, "..")];
-    try { c.push(path.resolve(SITE, cp.execSync("git rev-parse --git-common-dir", { cwd: SITE, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim(), "..", "..")); } catch (e) { /* not a git checkout */ }
-    return c.filter(Boolean).find(p => fs.existsSync(path.join(p, "reports/learn/excerpts_for_approval.md")));
-  }
-  const RP = portfolio();
+  const RP = PRIV.path("excerpts");
   if (RP) {
-    const reg = fs.readFileSync(path.join(RP, "reports/learn/excerpts_for_approval.md"), "utf8"), revs = reg.slice(reg.indexOf("## Revisions after review"));
+    const reg = fs.readFileSync(RP, "utf8"), revs = reg.slice(reg.indexOf("## Revisions after review"));
     Object.keys(SNAP).forEach(id => {
       const row = reg.split("\n").find(l => l.indexOf("| " + id + " | ") === 0);
-      ok(row && row.split(" | ")[1] === SNAP[id], id + " in the register is the sentence this test checks");
+      ok(row && row.split(" | ")[1] === SNAP[id], id + " in the approved wording is the sentence this test checks");
       ok(revs.split("\n").every(l => l.indexOf("| " + id + " | ") !== 0), id + " has no revision after review");
     });
-    const st = reg.slice(reg.indexOf("## W3 sources"), reg.indexOf("## E8."));
-    ok(/approved as recommended/.test(st) && /E8\.1–E8\.10 and E8\.13–E8\.17/.test(st), "the register records E8.1–E8.10 and E8.13–E8.17 as approved (E8.2, E8.4, E8.7 among them)");
+    const e8 = reg.indexOf("## E8."), st = reg.slice(reg.lastIndexOf("\n## ", e8 - 2) + 1, e8);   // the section before E8: its status line
+    ok(/approved as recommended/.test(st) && /E8\.1–E8\.10 and E8\.13–E8\.17/.test(st), "the approved wording records E8.1–E8.10 and E8.13–E8.17 as approved (E8.2, E8.4, E8.7 among them)");
     ok(/E8\.2 \|[^\n]*\| F7 and A7, Real-world box/.test(reg) && /E8\.4 \|[^\n]*\| CF1 \*\*Excerpt\*\*; A7 and A14, Real-world box/.test(reg) && /E8\.7 \|[^\n]*under E8\.2–E8\.6 in every lesson that quotes them/.test(reg),
-      "the register places E8.2 and E8.4 in A7's real-world box and E8.7 under them");
-    const bib = fs.readFileSync(path.join(RP, "inputs/publications.bib"), "utf8");
+      "the approved wording places E8.2 and E8.4 in A7's real-world box and E8.7 under them");
+    const bib = fs.readFileSync(PRIV.path("publications"), "utf8");
     const titles = [...bib.matchAll(/^\s*title\s*=\s*\{(.*)\},?\s*$/gm)].map(m => m[1].replace(/[{}]/g, "").toLowerCase());
     const cites = [...OWN.matchAll(/<li>Li et al\. \((\d{4})\)\. <a href="(https:\/\/doi\.org\/[^"]+)">([^<]+)<\/a>\./g)];
     ok(cites.length === 2, "two Li et al. papers cited with titles (" + cites.length + ")");
-    cites.forEach(c => ok(titles.indexOf(c[3].toLowerCase()) >= 0, "sources: '" + c[3].slice(0, 50) + "' is the title in publications.bib"));
-  } else console.log("note: reports/learn/excerpts_for_approval.md not found (set LEARN_PORTFOLIO); excerpts checked against this test's snapshot");
+    cites.forEach(c => ok(titles.indexOf(c[3].toLowerCase()) >= 0, "sources: '" + c[3].slice(0, 50) + "' is the title in the publication list"));
+  } else console.log("note: the approved excerpt wording is not available (set LEARN_SOURCES); excerpts checked against this test's snapshot");
   const norm = s => s.replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/\s+/g, " ").trim();
   const bq = [...OWN.matchAll(/<blockquote class="lx-excerpt" data-source="([^"]+)">([\s\S]*?)<footer>([\s\S]*?)<\/footer><\/blockquote>/g)];
   ok(bq.length === 2 && bq[0][1] === "excerpt:ghg" && bq[1][1] === "excerpt:supply-chain-mg", "two excerpts: excerpt:ghg, then excerpt:supply-chain-mg");
@@ -320,7 +315,7 @@ const has = (s, msg) => ok(T_PAGE.indexOf(s) >= 0, msg + ": '" + s + "' on the p
   [false, true].forEach(st => M.chainLinks(W, D, all, st).links.forEach(l => LINES.push(l.text)));
   LINES.forEach(t => { if (nWords(t) > 42 || nSent(t) > 3) ok(false, "a line of " + nWords(t) + " words, " + nSent(t) + " sentences: " + t.slice(0, 70)); });
   ok(true, LINES.length + " step lines within 42 words and three sentences");
-  // every learner-facing element of the page, the no-JS blocks and the quoted excerpts included (review A7 #10)
+  // every learner-facing element of the page, the no-JS blocks and the quoted excerpts included
   const PROSE = OWN.replace(/^---[\s\S]*?\n---\n/, " ").replace(/<script[\s\S]*?<\/script>/g, " ").replace(/<style[\s\S]*?<\/style>/g, " ")
     .replace(/<!--[\s\S]*?-->/g, " ").replace(/^- (.*)$/gm, "<li>$1</li>").replace(/^\|(.*)\|$/gm, "<td>$1</td>");
   PROSE.split(/<\/?(?:p|li|dd|dt|td|th|summary|br|caption|footer)\b[^>]*>/).map(plain).filter(x => /[A-Za-z]/.test(x) && !/^[:{]/.test(x)).forEach(x => {

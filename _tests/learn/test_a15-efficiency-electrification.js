@@ -13,7 +13,8 @@
 //   - every feedback and reveal true over its whole input range (rate, rebound, carrier, every slider of every
 //     district, every charging rule, the network share and mode, the industry COP); every worked exercise balances
 //   - the no-JS blocks, ideas, myths, practice, facts and sources equal what the model writes (--write rewrites them)
-//   - scope: no nuclear term; the data-center campus only as a load on its own substation (G-DC); no "AI"; links on the
+//   - scope: no nuclear term; the data-center campus only as a load on its own substation (data centers appear as loads
+//     only); no "AI"; links on the
 //     allow-list; the fictional line on every interactive; text budget (one or two sentences) of the step cards, reveals,
 //     hints, the no-JS block, the practice and the page's prose
 // Usage (from the site folder):  node _tests/learn/test_a15-efficiency-electrification.js [--write]
@@ -296,7 +297,7 @@ ok(D.coldClimate.cop === 1.75 && /a COP of at least 1\.75 at 5 F/.test(D.sources
 // ---------------- scope, links, the fictional line
 const ALL = PAGE + "\n" + RAW + "\n" + JS + "\n" + SIDE;
 ok(!/nuclear|reactor|\bSMR\b|small modular|fission|uranium/i.test(ALL), "no nuclear term");
-{ // the campus appears once, as a load on its own substation (G-DC: its energy, shape and connection only)
+{ // the campus appears once, as a load on its own substation (a load only: its energy, shape and connection)
   const ALLT = (OWN + "\n" + RAW + "\n" + JS + "\n" + SIDE).replace(/datacenter/g, "").replace(/Alternative Fuels Data Center/g, "");
   const hits = [...ALLT.matchAll(/data[- ]cent\w*[^.;]{0,90}/gi)].map(m => m[0]);
   ok(hits.length >= 1 && hits.every(h => /^data-center campus( \(|,| \(" \+| on their own substations)/i.test(h) && !/supply|supplies|generat|power plant|buyer|order|timing|credit|siting/i.test(h)), "the data-center campus appears only as a load on its own substation (" + hits.length + " mentions)");
@@ -331,7 +332,7 @@ const PROSE = OWN.replace(/^---[\s\S]*?\n---\n/, " ").replace(/<script[\s\S]*?<\
 PROSE.split(/<\/?(?:p|li|dd|dt|td|th|summary|br|caption)\b[^>]*>/).map(plain).filter(x => /[A-Za-z]/.test(x) && !/^[:{]/.test(x)).forEach(x => {
   const n = nWords(x); ok(n <= 40, "text element of " + n + " words: " + x.slice(0, 70)); ok(nSent(x) <= 2, "text element of " + nSent(x) + " sentences: " + x.slice(0, 70)); });
 
-// ---------------- review fixes (2026-11-06)
+// ---------------- exercises, terms and wording
 ok(PR.every(p => Array.isArray(p.givens) && p.givens.length >= 2 && p.givens.every(g => g.length === 2) && nSent(p.q) === 1 && nWords(p.q) <= 20), "every exercise: its givens in a table, one short task sentence (review A15-7)");
 {
   // A15-2: the three districts are not the whole city

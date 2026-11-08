@@ -9,7 +9,7 @@
 //   - who decides what: every lever has a bin among the five actors, a reason and a source with a date in the data
 //     file; each reason says "typically" or names its source's fact; the roles table covers every actor and sector
 //   - the no-JS block, ideas, check, facts and sources equal what the model writes (--write rewrites them)
-//   - scope (guard G-DC): the data-center campus appears only as a load; no nuclear term; no "AI"; links on the
+//   - scope: the data-center campus appears only as a load; no nuclear term; no "AI"; links on the
 //     allow-list (a source not on it is cited by name, without a link); the fictional line on every interactive
 //   - text budget of the step cards, reveals and the page's prose
 // Usage (from the site folder):  node _tests/learn/test_f09-city-energy.js [--write]
@@ -91,7 +91,7 @@ ok(near(P.meters * P.lossShare, P.lost, 0.1), "the wires lose 5% of what the met
   ok(M.muniSaw(C, F, "rates") === F.muni.feedback.rates && F.muni.answer === "rates" && F.muni.options.every(o => F.muni.feedback[o.value]), "step 7: feedback for every choice");
 }
 
-// ---------------- review fixes (2026-11-06)
+// ---------------- the details, one by one
 {
   // F9-1: the useful-energy convention beside the first Sankey, the losses step, the no-JS table and the explain layer
   ok(/electricity delivered counts as useful; their own losses are not estimated, so a sector's loss share is not its efficiency/.test(M.CONV) && /useful energy[\s\S]*the energy delivered counts as useful \(a convention\)/i.test(C.flows.note), "the convention is the city data's own (flows.note), said in words");

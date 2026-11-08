@@ -9,7 +9,7 @@
 //     the cap only with an overshoot; Ridge Station's line as run); the full-year verdict is prairieland.json's rule
 //   - the library on the page: a plan is drawn from it only when its link (shock set aside) is a library entry's, and the
 //     page says "precomputed with this engine on <date>"
-//   - the reviews (2026-11-07): the penalty table; the default-plan near-tie check named as such; the budget gap with A20
+//   - the details: the penalty table; the default-plan near-tie check named as such; the budget gap with A20
 //     (the engine's sentences, its floor); the shock table is the engine's; a plan without the peak-hour rule is "not
 //     tested"; full-year checks follow the plan's key whether drawn from the library or solved live; units and terms
 //   - the page frame: the sandbox sections, scripts, data-src, the engine in the bundle; the fictional line; costs said to
@@ -99,9 +99,9 @@ const QPATH = path.join(X.SITE, "learn/sb4-pathway-explorer.qmd");
   ok(/data-learn="sb4" data-src="\.\.\/assets\/learn\/data\/prairieland\.json \.\.\/assets\/learn\/data\/e4-pathways\.json \.\.\/assets\/learn\/data\/e4-library\.json \.\.\/assets\/learn\/data\/path\.json"/.test(PAGE), "data-src: the nation, the engine's settings, the library, the course map");
   ok(/sb4-pathway-explorer\.js/.test(PAGE) && /learn\.js/.test(PAGE), "scripts");
   const BUNDLE = fs.readFileSync(L("learn.js"), "utf8");
-  ok(BUNDLE.indexOf("window.LX.E4 = E4") >= 0, "engine E4 is in the bundle (scripts/build_learn.py's W6_ENGINES, by request)");
+  ok(BUNDLE.indexOf("window.LX.E4 = E4") >= 0, "engine E4 is in the bundle (the build step's component order)");
   ok(!/firm[^.;\n]{0,50}nuclear|nuclear[^.;\n]{0,50}firm/i.test(T + JS) && !/reactor|\bSMR\b|small modular/i.test(PAGE + JS), "the generic firm option is never named nuclear; no reactor named");
-  ok(!/learning curve|learning rate|first[- ]of[- ]a[- ]kind/i.test(PAGE + JS), "no learning curves (G-COST)");
+  ok(!/learning curve|learning rate|first[- ]of[- ]a[- ]kind/i.test(PAGE + JS), "no learning curves (costs are fixed ranges; none changes with deployment)");
   ok(!/G-COST|G-NUC|G-GIS/.test(T + JS.replace(/\/\/.*$/gm, "")), "no editorial guard code on the page or in its strings");
   ok(!/\bAI\b|artificial intelligence|ChatGPT|Claude/.test(PAGE + JS), "no AI wording");
 

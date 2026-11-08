@@ -18,11 +18,11 @@
 //     numbers; the step text (35 words) and every result line (40 words) stay within two sentences; results sit in
 //     aria-live regions; step 9's scatter has a text version with its shape and a CSV of every run; step 10's rank bars
 //     are a plain list; the explain layer says it shows the reference case; the demo states run
-//   - scope (guard G-DC): data centers only as loads; no nuclear term, no "AI", no deny-listed term on the page, in the
+//   - scope: data centers only as loads; no nuclear term, no "AI", no deny-listed term on the page, in the
 //     data, the script, the sidecar or the notebook; links only to learn pages, doi.org and the allow-listed repository
-//   - research wording (curriculum §13, guard G-SRC): every sentence about the course author's study, on the page, in the
-//     data, in this lesson's script, in its path.yml entry and in the notebook, is an approved sentence of
-//     reports/learn/excerpts_for_approval.md (E7, with its revisions), word for word; the citation is E7.14
+//   - research wording (the sourcing rule): every sentence about the course author's study, on the page, in the data,
+//     in this lesson's script, in its path.yml entry and in the notebook, is an approved sentence of the excerpt wording
+//     (E7, with its revisions), word for word; the citation is E7.14
 //   - speed: the main study, its 20 repeats and step 10's re-ranking take well under the page's budget in Node
 // Usage (from the site folder):  node _tests/learn/test_m07-monte-carlo.js [--write]
 //   --write  rewrite the data file's reference block and the page's no-JS block first
@@ -30,7 +30,7 @@
 const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
-const cp = require("child_process");
+const PRIV = require("./private_sources.js");
 const ID = "m07-monte-carlo";
 const SITE = path.resolve(__dirname, "..", "..");
 const L = p => path.join(SITE, "assets/learn", p);
@@ -210,12 +210,12 @@ ok(sm.min >= 100e6 && sm.max < 250e6, "step 6's axis ($100M to $250M) holds ever
 D.waits.forEach(t => { const s = M.summary(M.study(D, { seed: D.seed, tau: t }).dev); ok(s.min >= 50e6 && s.max < 350e6, "step 8's axis ($50M to $350M) holds every run at " + t + " months"); });
 ok((D.budget.start - D.budget.min) % D.budget.step === 0 && (D.marginWidth.start - D.marginWidth.min) % D.marginWidth.step === 0, "start values sit on the sliders' steps");
 
-// ---------------- the lab notebook: the same data file, generator and checks (it is run by scripts/learn_nbtools.py)
+// ---------------- the lab notebook: the same data file, generator and checks (the notebook tools run it)
 {
-  ok(NB.length > 0, "the lab notebook exists (learn/notebooks/" + ID + ".ipynb; written by scripts/build_learn_m07_notebook.py)");
+  ok(NB.length > 0, "the lab notebook exists (learn/notebooks/" + ID + ".ipynb; written by its notebook build step)");
   const nb = NB ? JSON.parse(NB) : { cells: [] }, src = nb.cells.map(c => c.source.join("")).join("\n");
   ok(nb.cells.every(c => c.cell_type === "markdown" || (c.outputs.length === 0 && c.execution_count === null)), "the notebook is stored without outputs");
-  { const CORE = fs.readFileSync(L("components/core.js"), "utf8");   // the generator is shared (LX.mulberry32, core.js) since the W3 integration
+  { const CORE = fs.readFileSync(L("components/core.js"), "utf8");   // the generator is shared (LX.mulberry32, core.js)
     ok(/0x6D2B79F5/.test(src) && /0x6D2B79F5/.test(CORE) && /t \| 61/.test(src) && /t \| 61/.test(CORE) && /LX\.mulberry32/.test(JS), "the notebook ports the page's generator (mulberry32's constants, LX.mulberry32 in core.js)"); }
   ok(/m07-monte-carlo\.json/.test(src) && /REF\["firstRuns"\]/.test(src) && /REF\["flip"\]/.test(src) && /REF\["p90se"\]/.test(src) && /REF\["budget"\]/.test(src), "the notebook asserts the reference block: first runs, percentiles, errors, chances and step 10");
   ok(/about 45 minutes, plus 60 minutes of practice/.test(src) && /15 minutes[\s\S]*10 minutes[\s\S]*15 minutes[\s\S]*10 minutes[\s\S]*10 minutes/.test(src), "the notebook's times: a 45-minute lab and five practice tasks adding up to 60 minutes");
@@ -415,9 +415,9 @@ function finish() {
   process.exit(fails ? 1 : 0);
 }
 
-// ---------------- research wording (curriculum §13, guard G-SRC), as in CF7's test: every sentence about the course
-// author's study is an approved sentence of reports/learn/excerpts_for_approval.md (E7, with the revisions) or a clause of
-// one where the row itself breaks; NOT_RESEARCH lists what may name the study without describing it.
+// ---------------- research wording (the sourcing rule), as in CF7's test: every sentence about the course author's
+// study is an approved sentence of the excerpt wording (E7, with the revisions) or a clause of one where the row itself
+// breaks; NOT_RESEARCH lists what may name the study without describing it.
 function researchWording(entry) {
   const APPROVED_SNAPSHOT = {
     "E7.7": "The delay is treated as exogenous and parameters are illustrative; network feasibility is not modeled, and the social perspective is illustrated with a single bridge-power example.",
@@ -439,11 +439,6 @@ function researchWording(entry) {
   ];
   const norm = s => String(s).replace(/\[\[[a-z0-9-]+\|([^\]]+)\]\]/g, "$1").replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/&#x27;|&#39;/g, "'")
     .replace(/&quot;/g, '"').replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/\s+/g, " ").replace(/ ([.,;:?!)])/g, "$1").replace(/\( /g, "(").trim();
-  function portfolio() {
-    const c = [process.env.LEARN_PORTFOLIO, path.join(SITE, "..")];
-    try { c.push(path.resolve(SITE, cp.execSync("git rev-parse --git-common-dir", { cwd: SITE, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim(), "..", "..")); } catch (err) { /* not a git checkout */ }
-    return c.filter(Boolean).find(p => fs.existsSync(path.join(p, "reports/learn/excerpts_for_approval.md")));
-  }
   function register(md) {
     const out = {}; let sec = null;
     const strip = t => norm(t.replace(/^(Timeline, [^:]+|Myth answer|Citation): /, ""));
@@ -456,13 +451,13 @@ function researchWording(entry) {
     });
     return out;
   }
-  const RP = portfolio();
+  const RP = PRIV.path("excerpts");
   let UNITS = Object.values(APPROVED_SNAPSHOT).map(norm);
   if (RP) {
-    const reg = register(fs.readFileSync(path.join(RP, "reports/learn/excerpts_for_approval.md"), "utf8"));
-    ok(Object.keys(APPROVED_SNAPSHOT).every(k => reg[k] === APPROVED_SNAPSHOT[k]), "the snapshot of E7.7, E7.11 and E7.14 equals the register (revisions applied)");
+    const reg = register(fs.readFileSync(RP, "utf8"));
+    ok(Object.keys(APPROVED_SNAPSHOT).every(k => reg[k] === APPROVED_SNAPSHOT[k]), "the snapshot of E7.7, E7.11 and E7.14 equals the approved wording (revisions applied)");
     UNITS = Object.values(reg).map(norm);
-  } else console.log("note: reports/learn/excerpts_for_approval.md not found (set LEARN_PORTFOLIO); research wording checked against the snapshot");
+  } else console.log("note: the approved excerpt wording is not available (set LEARN_SOURCES); research wording checked against the snapshot");
   function approved(seg) {
     const s = norm(seg);
     return s.length > 0 && UNITS.some(u => {

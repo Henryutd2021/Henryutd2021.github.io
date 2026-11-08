@@ -8,12 +8,12 @@
 //     full 2025 re-solved on every run; every solve of a full year optimal)
 //   - who pays: the ledger adds up (the two parties together pay the energy, minus the rent, plus uplift and new costs);
 //     the allocation rules as the page states them; the cost range from the fixed ranges; the 26-day estimate's error
-//     against the full years carried into the page, the note and the exemplar (review finding 1); the battery's cost from
+//     against the full years carried into the page, the note and the exemplar; the battery's cost from
 //     NREL's 2024 figures, BEA's deflator and the 4% annuity
 //   - the adequacy words and the sensitivity line follow from their numbers; the strong exemplar quotes the engine
 //   - the research text: every excerpt sentence an approved E7 row, word for word, with CF7's footer and no title
-//   - scope: no nuclear term anywhere (guard G-DC); costs fixed ranges the reader sets, nothing that falls with
-//     deployment, no generic firm option and no timelines (guard G-COST); no AI wording; links to live lessons only
+//   - scope: no nuclear term anywhere (data centers appear as loads only); costs fixed ranges the reader sets, nothing
+//     that falls with deployment, no generic firm option and no timelines; no AI wording; links to live lessons only
 // --write: regenerates the precomputed library (data/e2-c2-library.json: all 128 plans, several minutes), the results and
 // the reference plan, and writes the marker blocks; with --full also today's grid for every reserve and the four plans on
 // every day of 2025 and 2024 (several more minutes); --keep-library writes the rest but keeps the library. --library:
@@ -23,6 +23,7 @@
 const fs = require("fs");
 const path = require("path");
 const X = require("./e2_harness.js");
+const PRIV = require("./private_sources.js");
 let checks = 0, fails = 0;
 function ok(c, msg) { checks++; if (!c) { fails++; console.log("FAIL:", msg); } }
 const near = (a, b, t) => Math.abs(a - b) <= (t == null ? 1e-6 : t);
@@ -85,7 +86,7 @@ const APPROVED_SNAPSHOT = {
   ok(GRID.length === 128 && JSON.stringify(grid) === '{"conn":[150,300],"flex":[0,20],"pk":[0,2,4,6],"bat":[0,100],"up":[0,300],"res":[150,250]}', "the grid: 2 × 2 × 4 × 2 × 2 × 2 = 128 plans, as the page states");
 
   // ---------------- the representative-day check: four plans on every day of 2025 and of 2024
-  // (each row keeps the ledger's sums too, so the who-pays ledger is checked against the full years: review finding 1)
+  // (each row keeps the ledger's sums too, so the who-pays ledger is checked against the full years)
   const PLANS = E2.c2presets.map(p => [p.label, Object.assign({}, def, p.state)]), R0 = await year(def);
   const pick = R => ({ prod: R.tot.prod, priceT: R.avgPrice[P.zix.T], uplift: R.tot.upliftAll, co2: R.tot.co2, shed: R.tot.shed, cong: R.tot.cong.TM,
     pay: sum(R.tot.pay), rent: R.tot.rent, served: sum(R.served), ll: R.tot.llMWh, llPay: R.tot.llPay });
@@ -194,26 +195,26 @@ const APPROVED_SNAPSHOT = {
   ok(sl.base.at === "300 MW" && sl.base.value === lt(refA.plan.lole) && sl.cases.length === 3 && /held fixed/.test(sl.held), "the sensitivity line: the plan's own connection and the three others, builds held fixed");
   const good = EX.plain(c2ex.exemplars.answers[1]);
   [C.mil(refL.ll.total), lt(refA.plan.lole), lt(refA.plan.ci[1]), lt(refA.today.lole), C.kilo(eR.weeks.shed) + " MWh unserved", C.kilo(eR.year.co2 / 1000) + " kt", "every day of 2025 gives " + C.mil(FR.ll.total) + " and " + C.mil(FR.delta)].forEach(s => ok(good.indexOf(s) >= 0, "the strong exemplar states " + s));
-  // the threshold (review finding 4): near 0.1 the figure keeps the digits that show its side, and the warning travels
+  // the threshold: near 0.1 the figure keeps the digits that show its side, and the warning travels
   ok(C.loleTxt(0.1002768, 0.1) === "0.1003" && C.loleTxt(0.0809, 0.1) === "0.08" && C.loleTxt(0.1, 0.1) === "0.10" && C.loleTxt(0.0996, 0.1) === "0.0996", "loss-of-load figures keep the digits that show their side of 0.1");
   ok(refA.plan.ci[1] > 0.1 ? /the point estimate meets the 0\.1 criterion, the interval crosses it/.test(good) && /The point estimate meets the criterion; the interval crosses it/.test(aw) && pre.rows.some(r => r[1].indexOf(lt(refA.plan.ci[1])) >= 0) : true,
     "the reference plan's interval (" + refA.plan.ci[1].toFixed(7) + ") crosses 0.1: the exemplar, the live words and the no-JS table say so");
-  // the 26-day estimate's error, carried (review finding 1): each checked plan's full 2025 lies inside its estimate plus
+  // the 26-day estimate's error, carried: each checked plan's full 2025 lies inside its estimate plus
   // the stated error; the reference plan's too; the page's notes state the range
   ok(K.rows.every(r => r.f25 >= r.est + K.err25.lo - 1e-6 && r.f25 <= r.est + K.err25.hi + 1e-6) && FR.delta >= refL.delta + K.err25.lo && FR.delta <= refL.delta + K.err25.hi,
     "every checked plan's and the reference plan's full-2025 change (" + C.mil(FR.delta) + ") lies within the estimate plus the stated error (" + C.sgn(K.err25.lo) + " to " + C.sgn(K.err25.hi) + ")");
   ok(K.err25.hi > 0 && K.rows.some(r => near(r.f25 - r.est, K.err25.hi, 1)) && JSON.stringify(C.ledgerCheck(D)) === JSON.stringify(K), "the page's ledger check (data file) is the test's: 2025's error " + C.sgn(K.err25.lo) + " to " + C.sgn(K.err25.hi) + ", 2024's " + C.sgn(K.err24.lo) + " to " + C.sgn(K.err24.hi));
   { const N = C.ledgerNotes(ref, refL, refCR, K, cfg).join(" ");
     ok(N.indexOf("every day of 2025 put other customers' change " + C.sgn(K.err25.lo) + " to " + C.sgn(K.err25.hi) + " from the 26-day estimate. For this plan, read it as " + C.sgn(refL.delta + K.err25.lo) + " to " + C.sgn(refL.delta + K.err25.hi)) >= 0 &&
-      /\*\*Billing rule:\*\*/.test(N) && /\*\*Shortfall rule:\*\* a zone's unserved load is shared by its customers in proportion to their load/.test(N), "the who-pays notes carry the estimate's error and state the billing and shortfall rules apart (review findings 1, 2 and 8)");
+      /\*\*Billing rule:\*\*/.test(N) && /\*\*Shortfall rule:\*\* a zone's unserved load is shared by its customers in proportion to their load/.test(N), "the who-pays notes carry the estimate's error and state the billing and shortfall rules apart");
     C.ledgerNotes(ref, refL, refCR, K, cfg).forEach(t => { const n = t.replace(/\[\[[a-z-]+\|([^\]]+)\]\]/g, "$1").replace(/\*\*/g, "").split(/\s+/).length; ok(n <= 36, "a who-pays note within the budget (" + n + " words): " + t.slice(0, 40)); }); }
   // the shortfall rule in the ledger: the default plan sheds at Town, and the large load carries its share
   ok(e0.year.ll < 300 * 8760 - 0.5 && near(L0.Ell, e0.year.ll, 1e-9) && R0.tot.llShed > 0.5 && near(R0.tot.llMWh + R0.tot.llShed, 300 * 8760, 1e-3), "the default plan: the large load's share of Town's shortfall (" + C.kilo(R0.tot.llShed) + " MWh a year) is not billed, and served + unserved = 300 MW × 8,760 h");
 
-  // ---------------- the research text against the register
-  const RP = X.portfolio(); let APP = APPROVED_SNAPSHOT;
-  if (RP) { const reg = X.register(fs.readFileSync(path.join(RP, "reports/learn/excerpts_for_approval.md"), "utf8"), ["E7"]); APP = {}; Object.keys(APPROVED_SNAPSHOT).forEach(k => { APP[k] = reg[k]; }); }
-  ok(Object.keys(APPROVED_SNAPSHOT).every(k => APP[k] === APPROVED_SNAPSHOT[k]), "the register's E7.2, E7.3, E7.5 and E7.6 equal this test's snapshot" + (RP ? "" : " (register not found; snapshot used)"));
+  // ---------------- the research text against the approved wording
+  const RP = PRIV.path("excerpts"); let APP = APPROVED_SNAPSHOT;
+  if (RP) { const reg = X.register(fs.readFileSync(RP, "utf8"), ["E7"]); APP = {}; Object.keys(APPROVED_SNAPSHOT).forEach(k => { APP[k] = reg[k]; }); }
+  ok(Object.keys(APPROVED_SNAPSHOT).every(k => APP[k] === APPROVED_SNAPSHOT[k]), "the approved E7.2, E7.3, E7.5 and E7.6 equal this test's snapshot" + (RP ? "" : " (approved wording not available; snapshot used)"));
   const exs = X.excerpts(PAGE);
   ok(exs.length === 1 && exs[0].source === "excerpt:code", "one excerpt, excerpt:code");
   ok(exs[0].sentences.join("|") === ["E7.2", "E7.3", "E7.5", "E7.6"].map(k => APP[k]).join("|"), "every excerpt sentence is an approved E7 row, word for word, in order (E7.4 left out)");
@@ -230,8 +231,8 @@ const APPROVED_SNAPSHOT = {
   ["brief", "plan", "note", "selfcheck", "sources"].forEach(id => ok(new RegExp("::: \\{#" + id + " \\.lx-sec\\}").test(PAGE), "section #" + id));
   ok(/data-learn="c2" data-src="\.\.\/assets\/learn\/data\/e2-plains-grid\.json \.\.\/assets\/learn\/data\/e2-c2-library\.json \.\.\/assets\/learn\/data\/town_year\.json \.\.\/assets\/learn\/data\/m03-capacity-expansion-2024\.json \.\.\/assets\/learn\/data\/cf_targets\.json \.\.\/assets\/learn\/data\/path\.json"/.test(PAGE), "data-src: the engine's data, the precomputed library, both weather years, the capacity factors");
   const JS = fs.readFileSync(X.L("c2-plains-grid-hard-year.js"), "utf8"), ENG = fs.readFileSync(X.L("components/engine-e2.js"), "utf8"), DATA = fs.readFileSync(DPATH, "utf8");
-  ok(!/\b(nuclear|reactor|SMR|small modular)\b/i.test(PAGE + JS + ENG + DATA), "no nuclear term on the page, in its script, the engine or the data (guard G-DC)");
-  ok(!/\blearning\b|cost (decline|reduction|fall)|cheaper as|falls? with (deploy|build)|firm clean|clean firm|timeline to|online by|in service by/i.test(PAGE + JS), "no cost that falls with deployment, no generic firm option, no technology timelines (guard G-COST)");
+  ok(!/\b(nuclear|reactor|SMR|small modular)\b/i.test(PAGE + JS + ENG + DATA), "no nuclear term on the page, in its script, the engine or the data (data centers as loads only)");
+  ok(!/\blearning\b|cost (decline|reduction|fall)|cheaper as|falls? with (deploy|build)|firm clean|clean firm|timeline to|online by|in service by/i.test(PAGE + JS), "no cost that falls with deployment, no generic firm option, no technology timelines");
   ok(S.fields.filter(f => /^c(pk|bat|up)$/.test(f.id)).length === 3 && /stays the same however much is built/.test(JS), "three costs, each a fixed range the reader sets, said to stay the same however much is built");
   ok(!/\bAI\b|artificial intelligence|Claude|ChatGPT|generated by/i.test(T + JS), "no AI wording");
   ok(/conditional on the commitment/.test(T + JS) && !/MILP price|price from the MILP|mixed-integer program's price/i.test(T + JS), "prices are conditional on the commitment; none from the MILP");
@@ -242,7 +243,7 @@ const APPROVED_SNAPSHOT = {
   ok(hrefs.every(h => live.has(h.replace(/#.*$/, ""))), "internal links go to live lessons only: " + hrefs.filter(h => !live.has(h.replace(/#.*$/, ""))).join(", "));
   ok(fs.existsSync(path.join(X.SITE, "learn/notebooks/m02-unit-commitment.ipynb")), "M2's notebook exists for the download link");
 
-  // ---------------- review fixes (2026-11-05)
+  // ---------------- costs, the price year, the adequacy check, the hand-in, terms, M2's notebook
   // the battery's cost from first principles: NREL's 2024 cost × BEA's deflator, a 15-year annuity at 4% plus 4% upkeep;
   // the default rounds it, the range is 0.75 to 1.5 times it (as the peaker's)
   { const c = cfg.c2, crf = (r, n) => r / (1 - Math.pow(1 + r, -n)), b = c.costs.bat, k = c.deflator["2025"] / c.deflator["2024"];
@@ -251,30 +252,30 @@ const APPROVED_SNAPSHOT = {
       "the battery's $" + yb.toFixed(2) + "/kW-yr and the peaker's $" + yp.toFixed(2) + "/kW-yr give the defaults and ranges ($178, $134 to $267; $74, $56 to $111)");
     ok(c.deflator["2024"] === 125.587 && c.deflator["2025"] === 128.893 && b.basis.indexOf("×" + k.toFixed(4) + " to 2025 by BEA's GDP deflator") >= 0 &&
       PAGE.indexOf("NIPA Table 1.1.9: Implicit Price Deflators for Gross Domestic Product</a>, line 1, annual (2017 = 100): 2024 125.587, 2025 128.893. Last revised 29 October 2026; accessed 5 November 2026.") >= 0 && !/Short-Term Energy Outlook/.test(PAGE + DATA),
-      "the price year: BEA's deflator, its values and dates on the page (as lesson 13), not the rolling STEO page (review finding 11)"); }
+      "the price year: BEA's deflator, its values and dates on the page (as lesson 13), not the rolling STEO page"); }
   ok(/PJM \(2026\)\. <a href="https:\/\/www\.pjm\.com\/-\/media\/DotCom\/documents\/manuals\/m20a\.pdf">Manual 20A: Resource Adequacy Analysis<\/a> \(PDF\), Rev\. 3, effective 24 June 2026, section 1\.3/.test(PAGE) && /The brief's criterion, 0\.1 days a year, is PJM's one day in ten years/.test(JS) && !/common criterion/.test(JS + PAGE),
     "the 0.1 criterion is the brief's choice, sourced to PJM Manual 20A section 1.3 (dated), not 'common'");
-  ok(T.indexOf("Here 2024 is only a second-weather-year robustness check: the adequacy check already draws on it.") >= 0 && !/weather it was not built for/.test(T), "2024 is called a robustness check, not held-out validation (review finding 10)");
+  ok(T.indexOf("Here 2024 is only a second-weather-year robustness check: the adequacy check already draws on it.") >= 0 && !/weather it was not built for/.test(T), "2024 is called a robustness check, not held-out validation");
   ok(/Reserve:<\/b> one region-wide total; the model does not check whether it can reach a zone after a disturbance/.test(PAGE) && /Reserves are pooled across the region: the model does not check whether they can reach a zone after a disturbance/.test(JS),
-    "the reserve's deliverability is a stated limit, on the page and in the note (review finding 3)");
-  ok(/Town's average price \(\$\/MWh\)/.test(PAGE), "the check table's price column carries its unit (review finding 12)");
-  // the hand-in: the notebook required, timed, and in the note; the chart downloaded and checked (review findings 5, 6)
+    "the reserve's deliverability is a stated limit, on the page and in the note");
+  ok(/Town's average price \(\$\/MWh\)/.test(PAGE), "the check table's price column carries its unit");
+  // the hand-in: the notebook required, timed, and in the note; the chart downloaded and checked
   ok(T.indexOf("Plus M2's notebook, about 45 minutes: run every cell. Its practice section is optional, about 90 minutes more.") >= 0 && /Part of the hand-in: M2's notebook, about 45 minutes/.test(PAGE) && !/Modeler version/.test(PAGE) &&
     C.FIELDS.some(f => f.key === "zones" && f.need) && /its sensitivity chart and a paragraph from M2's notebook/.test(T), "M2's notebook is part of the hand-in, timed (45 minutes; practice optional) and asked for in the note");
   ok(/id: "chart", label: "Sensitivity chart downloaded for this plan, to attach to the note"/.test(JS) && /Download the chart \(SVG\) for your note/.test(JS) && /The sensitivity chart attached/.test(JSON.stringify(C.RUBRIC)) && /the sensitivity chart: the recommendation first/.test(JSON.stringify(C.RUBRIC)),
     "the chart can be downloaded, the note checks it, and the rubric asks for it");
-  // terms at first use (review finding 7): the controls' hints and the who-pays rules mark them
+  // terms at first use: the controls' hints and the who-pays rules mark them
   ["demand-response", "peaker", "uprate", "reserves", "conditional-price", "congestion-rent", "uplift"].forEach(id => ok(new RegExp("\\[\\[" + id + "\\|").test(JS), "C2 marks the term at first use: " + id));
   const SIDE = fs.readFileSync(path.join(X.SITE, "learn/_w1/sb2-grid-room.yml"), "utf8");
   ok(/- id: uprate\n\s+term: Uprate/.test(SIDE), "the uprate term is in the glossary sidecar");
-  // M2's notebook, linked as part of the hand-in (review finding 9): the scope exception made explicit. Its one nuclear
-  // mention is M2's toy plant with a constant cost (the W1 decline rule); no cell pairs a nuclear term with a G-DC or
-  // G-COST risk term, and nothing in it names a data center
+  // M2's notebook, linked as part of the hand-in: the scope exception made explicit. Its one nuclear
+  // mention is M2's toy plant with a constant cost; no cell pairs a nuclear term with a risk term (data centers,
+  // falling costs, timing and similar), and nothing in it names a data center
   { const nb = JSON.parse(fs.readFileSync(path.join(X.SITE, "learn/notebooks/m02-unit-commitment.ipynb"), "utf8")).cells.map(c => [].concat(c.source).join(""));
     const NUC = /\b(nuclear|reactor|SMR|small modular)\b/i, RISK = /\b(data cent(er|re)s?|learning|cost (decline|reduction|trajectory)|commerciali[sz]|subsid|credit|threshold|siting|screening|delivery|timing|buyer)\b/i;
     const nucCells = nb.filter(c => NUC.test(c)), bad = nucCells.filter(c => RISK.test(c));
     ok(!bad.length && !nb.some(c => /data cent(er|re)/i.test(c)) && nucCells.every(c => /NUCLEAR = dict\(mw=100, cost=10\)|nuclear plant runs flat|nuc_|NUCLEAR\[/.test(c)),
-      "M2's notebook: " + nucCells.length + " cells name M2's constant-cost toy plant, none with a risk term or a data center (" + bad.length + " flagged); the rename is the coordinator's (M2's file)"); }
+      "M2's notebook: " + nucCells.length + " cells name M2's constant-cost toy plant, none with a risk term or a data center (" + bad.length + " flagged)"); }
   console.log(`test_c2-plains-grid-hard-year: ${checks - fails}/${checks} checks pass`);
   process.exit(fails ? 1 : 0);
 })();

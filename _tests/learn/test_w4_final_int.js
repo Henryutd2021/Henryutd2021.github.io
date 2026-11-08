@@ -1,7 +1,7 @@
-// test_w4_final_int.js — Node tests for the W4 final integration (2026-11-05), after the seven fix branches were merged:
+// test_w4_final_int.js — Node tests for the links between case files and lessons, and two shared details:
 //   - case-file links: CF3 (now live) from A16, M6 and A10; CF8 (now live) from M9, M10, lesson 4 and lesson 5; one line
 //     each, in the page's real-world card, naming the case file by its own title (no new claim about the studies)
-//   - F1's data: the S2 gloss in the wording CF3's review proposed (finding 7): a synchronous grid shares one AC frequency;
+//   - F1's data: the S2 gloss: a synchronous grid shares one AC frequency;
 //     synchronous generators turn in step, inverters connect the rest (it no longer says every generator turns in step)
 //   - the uq-mfgpr explainer tells its host page what it shows ("explainer-update"), so CF8's text version follows the
 //     slider (CF8's own test checks the table); the explainer's project page has no listener and stays as it was
@@ -37,13 +37,13 @@ Object.keys(LINKS).forEach(cf => {
   });
 });
 
-// ---------------------------------------------------------------- F1's S2 gloss (CF3 review, finding 7)
+// ---------------------------------------------------------------- F1's S2 gloss
 {
   const S2 = JSON.parse(rd("assets/learn/data/f01-five-scales.json")).scales.find(s => s.id === "S2");
   const plain = S2.gloss.replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1");
   ok(plain.startsWith("A synchronous grid shares one AC frequency. Synchronous generators rotate in step electrically; inverters connect other resources to that frequency"),
      "S2 gloss: the review's wording (a synchronous grid shares one AC frequency; synchronous generators turn in step; inverters connect the rest)");
-  ok(!/All the generators|turn in step/.test(plain) && /several operators can share the grid, each balancing its own region\.$/.test(plain), "S2 gloss: no longer says every generator turns in step; still says operators share the grid (F1 review #4)");
+  ok(!/All the generators|turn in step/.test(plain) && /several operators can share the grid, each balancing its own region\.$/.test(plain), "S2 gloss: no longer says every generator turns in step; still says operators share the grid");
   ok(/\[\[synchronous-grid\|/.test(S2.gloss) && /\[\[frequency\|/.test(S2.gloss) && /\[\[inverter\|/.test(S2.gloss), "S2 gloss: synchronous grid, frequency and inverter carry their glossary marks");
 }
 

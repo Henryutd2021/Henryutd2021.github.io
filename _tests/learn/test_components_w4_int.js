@@ -1,14 +1,13 @@
-// test_components_w4_int.js — Node tests for what the W4 integration (2026-11-05) promoted and fixed:
-//   - four components promoted from W4 lessons whose script a second page loaded (README, "Promoted at the W4
-//     integration"): adequacy.js (LX.A5: A5, A9), gp.js (LX.M9: M9, CF8), plainsplan.js (LX.plainsPlan: M6, A12) and
+// test_components_w4_int.js — Node tests for four shared lesson components and two shared fixes:
+//   - four components first written for one lesson whose script a second page loaded (see the README): adequacy.js (LX.A5: A5, A9), gp.js (LX.M9: M9, CF8), plainsplan.js (LX.plainsPlan: M6, A12) and
 //     scenario.js (LX.m08: M8, CF3). Each is in the bundle and names itself; each sets its LX name on a page and exports
 //     the same object in Node; each lesson script re-exports the very same functions plus only its own page parts; no
 //     page (live or draft) loads another lesson's script for them; a few numbers agree between the component and the
 //     lesson (the lessons' own tests check every number)
 //   - LX.SupplyStack and LX.Frontier tick steps (xStep, yStep): defaults unchanged, the options honoured
 //   - an explainer's segmented control (CF8's and the uq-mfgpr project page's "Curve + data" was cut at 1,024, 414 and
-//     375 px): since W5 the site's assets/explainers.css sizes each option to its label and wraps words at every width,
-//     and the W4 phone-only copy of the rule in forms.css is gone
+//     375 px): the site's assets/explainers.css sizes each option to its label and wraps words at every width, and the
+//     earlier phone-only copy of the rule in forms.css is gone
 // Usage (from the site folder):  node _tests/learn/test_components_w4_int.js
 "use strict";
 const fs = require("fs");
@@ -20,7 +19,7 @@ const rd = p => fs.readFileSync(L(p), "utf8");
 let checks = 0, fails = 0;
 function ok(c, msg) { checks++; if (!c) { fails++; console.log("FAIL:", msg); } }
 
-// ---------------------------------------------------------------- the four promotions
+// ---------------------------------------------------------------- the four shared components
 const bundleJS = rd("learn.js");
 const PROMO = [
   { file: "adequacy", lx: "A5", lesson: "a05-adequacy", own: ["drillItem", "blocksText", "mixText"], users: ["a05-adequacy", "a09-hazards"], from: "a05-adequacy.js",
@@ -38,7 +37,7 @@ for (const P of PROMO) {
   const src = rd("components/" + P.file + ".js");
   ok(src.startsWith("/* " + P.file + ".js — LX." + P.lx + ":"), P.file + ".js names itself and its LX name");
   const at = bundleJS.indexOf("window.LX." + P.lx + " = model");
-  ok(bundleJS.includes(src.trim().split("\n").slice(-3).join("\n")) && at > bundleJS.indexOf("LX.Sankey =") && at > bundleJS.indexOf("LX.E2 ="), P.file + ".js is in the bundle, after the W3 promotions and engine E2 (when present)");
+  ok(bundleJS.includes(src.trim().split("\n").slice(-3).join("\n")) && at > bundleJS.indexOf("LX.Sankey =") && at > bundleJS.indexOf("LX.E2 ="), P.file + ".js is in the bundle, after the ledger, the Sankey and engine E2 (when present)");
   ok(!/document\.|\bLX\.H\(|innerHTML/.test(src.replace(/\/\*[\s\S]*?\*\//, "")), P.file + ".js is pure (no DOM)");
   // Node: the component, and the lesson script re-exporting it
   const C = require(L("components/" + P.file + ".js")), M = require(L(P.lesson + ".js"));

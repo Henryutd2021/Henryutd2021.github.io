@@ -1,10 +1,9 @@
-// test_components_w3.js — Node tests for the sandbox and capstone forms added by the W3 infra branch (2026-11-03):
+// test_components_w3.js — Node tests for the pieces of the sandbox and capstone forms:
 //   sharestate.js (LX.ShareState, i-share), benchrun.js (LX.BenchRun), reportnote.js (LX.ReportNote), the form pieces in
 //   forms.css and the templates learn/_template-sandbox.qmd and learn/_template-capstone.qmd.
 //   - each file names itself and its component, uses --lx-* tokens only, exports its pure part and is in the bundle
-//   - the templates: header, the three marker pairs, a section for each step link of the form (against STEPS in
-//     scripts/build_learn.py when it is reachable: LEARN_BUILD=<path>, or ../scripts/build_learn.py from the site
-//     folder), the body class, the fallbacks' marker blocks
+//   - the templates: header, the three marker pairs, a section for each step link of the form (against STEPS in the
+//     course build step when it is available through private_sources.js), the body class, the fallbacks' marker blocks
 //   - the plan link: encode and decode round trip (fixed cases and 400 seeded random plans), only name-safe characters,
 //     every way a hash is refused (damaged, out of range, off the step, a part missing, unknown or twice, a bad choice,
 //     too long, the schema's own rule), newer and older versions, migration through two older versions, the messages,
@@ -23,6 +22,7 @@ const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
 const { env, buttons } = require("./stubdom.js");
+const PRIV = require("./private_sources.js");
 const SITE = path.resolve(__dirname, "..", "..");
 const L = p => path.join(SITE, "assets/learn", p);
 let checks = 0, fails = 0;
@@ -64,24 +64,24 @@ Object.keys(NAMES).forEach(f => {
   try { vm.runInNewContext(src, ctx); } catch (e) { ok(false, `${f}.js runs with a stub window.LX: ${e.message}`); return; }
   ok(typeof ctx.window.LX[NAMES[f]] === "function" && new RegExp("LX\\." + NAMES[f] + " = ").test(src), `${f}.js defines LX.${NAMES[f]}`);
   ok(Object.keys(ctx.module.exports).length > 0, `${f}.js exports its pure part to Node`);
-  ok(bundleJS.indexOf(src.trim().split("\n")[0]) >= 0 && bundleCSS.indexOf(css.trim().split("\n")[0]) >= 0, `${f}: in the generated bundle (run build_learn.py)`);
+  ok(bundleJS.indexOf(src.trim().split("\n")[0]) >= 0 && bundleCSS.indexOf(css.trim().split("\n")[0]) >= 0, `${f}: in the generated bundle (run the course build step)`);
 });
 ok(bundleJS.indexOf("/* share.js") < bundleJS.indexOf("/* sharestate.js"), "bundle: share.js (the copy) loads before sharestate.js");
 const forms = fs.readFileSync(L("components/forms.css"), "utf8");
 ["lx-sb-brief", "lx-cap-brief", "lx-sb-facts", "lx-sb", "lx-sb-controls", "lx-sb-group", "lx-sb-side", "lx-sb-presets", "lx-sb-results", "lx-sb-charts", "lx-sb-chart", "lx-sb-static"].forEach(c =>
   ok(new RegExp("\\." + c + "\\b").test(forms) && bundleCSS.indexOf("." + c) >= 0, `forms.css styles .${c} (used by the templates) and is bundled`));
-ok(!/overflow(-x|-y)?:\s*(hidden|auto|scroll)/.test(forms.slice(forms.indexOf("sandbox and capstone pages (W3)"))), "forms.css (W3 part): no overflow clipping (popovers and chart tips stay visible)");
+ok(!/overflow(-x|-y)?:\s*(hidden|auto|scroll)/.test(forms.slice(forms.indexOf("---------- sandbox and capstone pages"))), "forms.css (the sandbox and capstone part): no overflow clipping (popovers and chart tips stay visible)");
 let STEPS = { sandbox: ["brief", "bench", "results", "explain", "sources"], capstone: ["brief", "plan", "note", "selfcheck", "sources"] };
-const BUILD = process.env.LEARN_BUILD || path.resolve(SITE, "..", "scripts", "build_learn.py");
-if (fs.existsSync(BUILD)) {
+const BUILD = PRIV.path("build");
+if (BUILD) {
   const b = fs.readFileSync(BUILD, "utf8");
   ["sandbox", "capstone"].forEach(form => {
     const m = new RegExp('"' + form + '": \\[([^\\]]+)\\]').exec(b);
     const ids = m ? [...m[1].matchAll(/\("([\w-]+)", "[^"]+"\)/g)].map(x => x[1]) : null;
-    ok(ids && eq(ids, STEPS[form]), `build_learn.py STEPS.${form} = ${STEPS[form].join(", ")}`);
+    ok(ids && eq(ids, STEPS[form]), `the build step's STEPS.${form} = ${STEPS[form].join(", ")}`);
   });
-  ok(/"sandbox": "Sandbox"/.test(b) && /"capstone": "Capstone"/.test(b) && /"sandbox": "Simulation"/.test(b) && /"capstone": "Capstone project"/.test(b), "build_learn.py: header badges and schema.org types for both forms");
-} else console.log("note: build_learn.py not found (set LEARN_BUILD); the step ids are checked against this test's copy only");
+  ok(/"sandbox": "Sandbox"/.test(b) && /"capstone": "Capstone"/.test(b) && /"sandbox": "Simulation"/.test(b) && /"capstone": "Capstone project"/.test(b), "the build step: header badges and schema.org types for both forms");
+} else console.log("note: the course build step is not available (set LEARN_SOURCES); the step ids are checked against this test's copy only");
 [["_template-sandbox.qmd", "sandbox"], ["_template-capstone.qmd", "capstone"]].forEach(([t, form]) => {
   const s = fs.readFileSync(path.join(SITE, "learn", t), "utf8");
   ok(/^# TEMPLATE/m.test(s) && /<!-- learn:meta:start -->/.test(s) && /<!-- learn:next:start -->/.test(s) && /<!-- learn:footer:start -->/.test(s), `${t}: template header and the three marker pairs`);

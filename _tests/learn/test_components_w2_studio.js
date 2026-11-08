@@ -1,4 +1,4 @@
-// test_components_w2_studio.js — Node tests for the studio pieces promoted at the W2 integration (2026-11-03):
+// test_components_w2_studio.js — Node tests for the shared studio pieces:
 //   - LX.lessonRef and LX.lessonRefHTML (core.js): a lesson linked when data/path.json marks it live, named "upcoming"
 //     otherwise; R1, R3 and R10 use them and keep no copy
 //   - LX.ScaleStrip (scalestrip.js/.css, e-scale-strip): the pure part, and the view on a stub document in F1's use (power,
@@ -23,7 +23,7 @@ const rd = p => fs.readFileSync(path.join(SITE, p), "utf8");
 let checks = 0, fails = 0;
 function ok(c, msg) { checks++; if (!c) { fails++; console.log("FAIL:", msg); } }
 const P = JSON.parse(rd("assets/learn/data/path.json"));
-// since W7 every lesson path.json lists is live, so the "upcoming" side is checked on a copy with one made-up lesson
+// every lesson path.json lists is live now, so the "upcoming" side is checked on a copy with one made-up lesson
 // still to come (Z8; no such lesson exists)
 const PU = JSON.parse(JSON.stringify(P)); PU.more.push({ code: "Z8", id: "z8-still-to-come", title: "A lesson still to come", ready: false });
 const bundleJS = rd("assets/learn/learn.js"), bundleCSS = rd("assets/learn/learn.css");
@@ -89,10 +89,10 @@ const F1 = JSON.parse(rd("assets/learn/data/f01-five-scales.json")), R3 = JSON.p
   ok(!sr.hidden && sr.textContent === SS.tickSummary(F1.scales, ticks), "view (F1): the sorts summed up for screen readers");
   const les2 = lis[2].querySelector(".lx-ss-les"), links2 = les2.querySelectorAll("a");
   ok(links2.map(a => a.getAttribute("href")).join() === "00-grid-operator.html,03-balancing.html,08-merit-order.html,m01-dispatch-to-lmp.html,m02-unit-commitment.html,c2-plains-grid-hard-year.html" &&
-     !/upcoming/.test(les2.textContent), "view (F1): S2's lessons, M2 and C2 linked now that they are live (W4: C2 went live on learn-w4-g)");
+     !/upcoming/.test(les2.textContent), "view (F1): S2's lessons, M2 and C2 linked now that they are live");
   const les1 = lis[1].querySelector(".lx-ss-les");
   ok(les1.textContent === "Go further: F7, M5, C1" && les1.querySelectorAll("a").map(a => a.getAttribute("href")).join() === "f07-microgrids.html,m05-microgrid-size-and-run.html,c1-keep-the-campus-running.html",
-     "view (F1): S1 links F7, M5 and C1 now that all three are live (W3)");
+     "view (F1): S1 links F7, M5 and C1 now that all three are live");
   ok(!host.querySelector(".is-marked") && !host.querySelector(".lx-ss-line"), "view (F1): no mark, no step lines unless asked");
   ss.update({ ticks: { S0: { who: false } } });
   ok(host.querySelectorAll("ol.lx-ss-strip li").length === 5 && host.querySelectorAll(".lx-ss-tick.no").length === 1 && /S0 who elsewhere/.test(host.querySelector("p.lx-sr").textContent), "view: update() redraws with new ticks");
@@ -235,7 +235,7 @@ function rest() {
         ok(!codes.length, `${f}: no live lesson named as upcoming (${codes.join(", ")} in "…${win.slice(cut + 1).trim()} upcoming")`);
       }
     });
-    // while any listed lesson is still to come, the scan must see its mentions; since W7 none is, so none may remain
+    // while any listed lesson is still to come, the scan must see its mentions; now none is, so none may remain
     const anySoon = [].concat(P.starter, P.more, P.toolbox).some(l => l.code && !l.ready);
     ok(anySoon ? n >= 1 : n === 0, `${n} "upcoming" mentions checked on ${pages.length} pages (${anySoon ? "lessons still to come" : "every listed lesson live"})`);
     ok(/<a href="k08-git-notebooks\.html">K8<\/a> \(Git and reproducible notebooks\)/.test(rd("learn/r05-build-validate.qmd")) && /\[M5\]\(m05-microgrid-size-and-run\.html\), in the Modeler tier/.test(rd("learn/r05-build-validate.qmd")), "R5: K8 linked, M5 linked now that it is live");

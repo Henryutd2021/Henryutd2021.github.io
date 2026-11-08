@@ -8,9 +8,9 @@
 //   - the conclusion changes sign: the study saves, the audit costs more; cost per tonne for the agency and for the agency
 //     and the state together (the credit nets out as a transfer); the grid factor's three choices
 //   - the no-JS blocks equal the model's (--write rewrites them); every number written on the page against the model
-//   - research wording: the Real-world box quotes E6.4 and E6.6 (excerpt:ghg) word for word from the register; no other
+//   - research wording: the Real-world box quotes E6.4 and E6.6 (excerpt:ghg) word for word from the approved wording; no other
 //     sentence describes the course author's study; the fictional study is labelled fictional everywhere it appears
-//   - scope: no nuclear term and no data center in the lesson's own files (G-SRC: not the author's studies); links on
+//   - scope: no nuclear term and no data center in the lesson's own files (nothing like the author's studies); links on
 //     allowed hosts; text budget (steps and every assembled line, for every input); glossary marks; path.yml
 //   - the review of 2026-11-06: the two grid costs enter one by one; the waterfall follows the switches; CO2 is called
 //     attributed (average-factor accounting), never "avoided"; the study's inputs, fleet plan, units and two worked numbers
@@ -88,7 +88,7 @@ ok(dSave.boundary === 0 && dSave.baseline < 0 && dSave.grid < 0 && dSave.credit 
 const W = M.waterfall(D);
 ok(W.length === 5 && near(W[0].saving, S0.saving) && near(W[4].saving, A.saving) && near(W[3].saving, A.saving) && W.every((w, i) => i === 0 || w.saving <= W[i - 1].saving + 1e-9), "the waterfall: study, baseline, grid, credit, audited; every fix lowers the saving");
 ok(W.map(w => (w.saving / 1e6).toFixed(2)).join(",") === "1.15,0.32,-0.15,-0.65,-0.65" && W[1].saving > 0 && W[2].saving < 0, "after the baseline fix electric still saves $0.32 million; the grid costs turn it negative");
-// the waterfall follows the switches (review finding 4); the grid costs enter one by one (finding 5)
+// the waterfall follows the switches; the grid costs enter one by one
 { const noGrid = Object.assign(M.all(true), { grid: false }), Wn = M.waterfall(D, "us", noGrid);
   ok(Wn.length === 4 && Wn[3].id === "now" && Wn[3].label === "Now" && near(Wn[3].saving, M.run(D, noGrid).saving) && (Wn[3].saving / 1e6).toFixed(2) === "-0.18", "with the grid costs off the chart ends at the readout's −$0.18 million, labelled Now");
   ok(combos.every(f => { const w = M.waterfall(D, "us", f); return near(w[w.length - 1].saving, M.run(D, f).saving) && w.length === 2 + ["baseline", "grid", "credit"].filter(k => f[k]).length; }), "all 16 combinations: one bar per cost fix that is on, and the last bar equals the readout");
@@ -102,10 +102,10 @@ const gUS = M.run(D, M.all(true), "us"), gC = M.run(D, M.all(true), "clean"), gD
 ok(gC.co2.factor === 0.1 && gD.co2.factor === 0.7 && Math.round(gC.perTonne) === 220 && Math.round(gD.perTonne) === 622 && Math.round(gUS.perTonne) === 309 && gC.saving === gD.saving, "grid factor: 0.10 gives $220 per tonne, 0.70 gives $622; the cost does not move");
 // the lines
 ok(M.lineBoundary(D) === "**One boundary:** charging 3,168 MWh a year at 0.366 t per MWh is attributed 1,160 t. The CO₂ cut falls from 100% to 72%.", "the boundary line");
-// attributed, not avoided (review finding 2)
+// attributed, not avoided
 ok(M.verdict(A) === "Electric costs $0.65 million a year more and lowers attributed CO₂ by 2,101 t (64%): about $309 per attributed tonne." && !/avoided|\bcuts\b/.test(M.verdict(A) + M.verdict(S0)), "the conclusion says attributed CO₂, not avoided");
 ok(!/per tonne (of CO₂ )?avoided|CO₂ avoided|tonne avoided/i.test(JS.replace(/^[\s\S]*?\*\/\n/, "") + JSON.stringify(D.exemplars) + JSON.stringify(D.ladder) + M.staticTask(D) + M.whoHTML(D)), "no 'tonne avoided' on the page's own text");
-// the study's inputs, plan, units and worked numbers (findings 3, 7, 8)
+// the study's inputs, plan, units and worked numbers
 { const inp = M.inputsHTML(D), w = M.worked(D);
   ok(inp.includes("2.2 kWh, at the depot meter, charging losses included") && inp.includes("$1,000,000 + $60,000 charger") && inp.includes("$560,000") && inp.includes("3.5 mpg (the 2009 buses)") && inp.includes("$0.09 per kWh") && inp.includes("$3.60 per gallon") && inp.includes("$150,000 per bus"), "the inputs table shows the study's inputs, from the data");
   ok(M.fleetLine(D) === "Both fleets: 40 buses, 36,000 miles each a year, a 12-year life, a 3% real discount rate." && !/\{/.test(M.planText(D)) && M.planText(D).includes("40 new diesel buses replace them (4.5 mpg, $0.85 a mile"), "the fleet line and the plan extract, filled from the inputs");
@@ -113,7 +113,7 @@ ok(!/per tonne (of CO₂ )?avoided|CO₂ avoided|tonne avoided/i.test(JS.replace
   ok(/U\.S\. gallon/.test(D.units) && /kW-month/.test(D.units) && /metric tonne/.test(D.units) && inp.includes(M.esc(D.units)), "the units key: t, mpg (U.S. gallon), kW-month");
   ok(M.staticTask(D).includes(inp), "the no-JS task shows the same inputs");
   ok(M.boundarySpec(D).holds.some(x => /depot meter, charging losses included/.test(x)) && M.boundarySpec(D).leaves.some(x => /grid losses .*about 5%/.test(x)) && D.co2.tdLoss === 0.05 && /5%/.test(D.sources.losses.asOf), "the meter boundary and grid losses (EIA: about 5%) are stated"); }
-ok(!/and the reverse/.test(JSON.stringify(D.checklist)) && /same service, alternatives and years/.test(D.checklist.find(c => c.id === "boundary").text) && M.boundarySpec(D).holds.some(x => /operating energy/.test(x)) && M.boundarySpec(D).leaves.some(x => /embodied CO₂ is outside both/.test(x)), "the boundary rule matches the audit: same service, stated stages, embodied CO₂ out for both (finding 1)");
+ok(!/and the reverse/.test(JSON.stringify(D.checklist)) && /same service, alternatives and years/.test(D.checklist.find(c => c.id === "boundary").text) && M.boundarySpec(D).holds.some(x => /operating energy/.test(x)) && M.boundarySpec(D).leaves.some(x => /embodied CO₂ is outside both/.test(x)), "the boundary rule matches the audit: same service, stated stages, embodied CO₂ out for both");
 ok(M.lineBaseline(D).includes("320,000 gallons a year, not 411,429") && M.lineBaseline(D).includes("$0.83 million"), "the baseline line");
 ok(M.lineGrid(D).includes("$288,000 a year in demand charges") && M.lineGrid(D).includes("$1.80 million up front") && M.lineGrid(D).includes("$180,832 a year as an annual equivalent"), "the grid line: up front and annual apart");
 ok(M.lineCredit(D).includes("$6.00 million") && M.lineCredit(D).includes("$500,000 a year"), "the credit line");
@@ -127,7 +127,7 @@ ok(M.checksOf(D, strong).every(c => c.ok), "the strong note passes every writing
 ok(M.checksOf(D, weak).filter(c => c.ok).length <= 2, "the weak note fails most writing checks: " + M.checksOf(D, weak).filter(c => c.ok).map(c => c.id).join(","));
 ok(M.checksOf(D, "").every(c => !c.ok), "an empty note passes no check");
 ok(strong.includes("$0.65 million") && strong.includes("2,101 t") && strong.includes("64%") && strong.includes("$309") && strong.includes("1,160 t") && strong.includes("$1.80 million") && strong.includes("$288,000"), "the strong note's numbers are the model's");
-ok(/Evidence: .*illustrative assumptions.*fictional.*EIA's published/.test(strong) && /Leaves out: .*making the buses/.test(strong) && strong.includes("2.2 kWh per mile"), "the strong note gives each input's evidence status and what it leaves out (finding 6)");
+ok(/Evidence: .*illustrative assumptions.*fictional.*EIA's published/.test(strong) && /Leaves out: .*making the buses/.test(strong) && strong.includes("2.2 kWh per mile"), "the strong note gives each input's evidence status and what it leaves out");
 
 // ---------------- numbers on the page
 onPage("attributed about 1,160 t of CO₂ a year", "myth: charging's CO₂");
@@ -139,10 +139,10 @@ ok(/<\/blockquote>\n<p class="lx-hint"><b>Reading it\.<\/b> <span class="lx-term
 onPage("at 3% over 12 years, 0.1005", "the capital recovery factor");
 onPage("40 electric buses", "the task's fleet");
 
-// ---------------- research wording (curriculum §13, G-SRC)
+// ---------------- research wording: approved excerpts only
 const OWN = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?<!-- learn:\1:end -->/g, "");
 { const R = X.register(["E6"]);
-  if (!R) ok(false, "the excerpt register was not found");
+  if (!R) ok(false, "the approved excerpt wording was not found (set LEARN_SOURCES)");
   else {
     const qs = [...OWN.matchAll(/<blockquote class="lx-excerpt" data-source="([^"]+)">([\s\S]*?)<\/blockquote>/g)];
     ok(qs.length === 1 && qs[0][1] === "excerpt:ghg", "one excerpt, from excerpt:ghg");
@@ -154,7 +154,7 @@ ok(/fictional/i.test(D.study.authors) && /fictional/.test(PAGE.match(/<b>Fiction
 
 // ---------------- scope, links and text budget
 const NUC = /nuclear|reactor|\bSMR\b|small modular|data cent|hydrogen|electrolyz/i;
-ok(!NUC.test(OWN.replace(/<blockquote[\s\S]*?<\/blockquote>/g, "").replace(/<li>Li et al\.[\s\S]*?<\/li>/, "") + JS + JSON.stringify(D) + SIDE), "no nuclear technology, no data center and no hydrogen in the lesson's own files (G-SRC: nothing like the author's studies)");
+ok(!NUC.test(OWN.replace(/<blockquote[\s\S]*?<\/blockquote>/g, "").replace(/<li>Li et al\.[\s\S]*?<\/li>/, "") + JS + JSON.stringify(D) + SIDE), "no nuclear technology, no data center and no hydrogen in the lesson's own files (nothing like the author's studies)");
 ok(!/\bAI\b|artificial intelligence/.test(OWN + JS + JSON.stringify(D)), "no AI wording");
 const HOSTS = /^https:\/\/(www\.eia\.gov|doi\.org)\//;
 const hrefs = [...OWN.matchAll(/href="([^"]+)"/g)].map(m => m[1]);

@@ -12,7 +12,7 @@
 //   - words true for every input: each step's reveal over every exclusion set, setbacks from 100 to 1,500 m, weights
 //     (all of them 0 included: no ranking), within the text budget (about 35 words; the page's own prose: one or two
 //     sentences after a bold label or "Myth.")
-//   - W5 fixes (2026-11-06): weight shares count the very same block only (recounted independently); the grid layer as
+//   - details: weight shares count the very same block only (recounted independently); the grid layer as
 //     text (substations table, cell lines against an independent segment test); step 2's switch labels follow
 //     "Stricter rules"; step 4 says it keeps the default rules; a campus row that needs an upgrade is marked; practice
 //     arithmetic is evaluated as displayed; the mitigation cost in 2025 dollars
@@ -27,6 +27,7 @@
 const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
+const PRIV = require("./private_sources.js");
 const ID = "a19-gis-siting";
 const SITE = path.resolve(__dirname, "..", "..");
 const L = p => path.join(SITE, "assets/learn", p);
@@ -428,7 +429,7 @@ ok(hrefs.length > 8 && hrefs.every(h => ALLOW.test(h) || /^[0-9a-z-]+\.html$/.te
   if (REG) {
     ok(bq.length === 1 && bq[0][1] === "excerpt:code" && sent.join("|") === [REG.raw["E7.2"], REG.raw["E7.3"]].map(X.norm).join("|"), "one excerpt (excerpt:code): E7.2 and E7.3, word for word");
     ok(PAGE.indexOf('<p class="lx-hint">' + REG.raw["E7.8"] + "</p>") > 0, "E7.8 under the excerpt, word for word");
-  } else console.log("note: excerpts_for_approval.md not found (set LEARN_PORTFOLIO); excerpt wording not checked");
+  } else console.log("note: the approved excerpt wording is not available (set LEARN_SOURCES); excerpt wording not checked");
   ok(bq.length === 1 && bq[0][3] === "Approved excerpt of: Li et al. (2026), accepted paper, 2026 North American Power Symposium (NAPS); DOI pending.", "the excerpt's footer is CF7's citation");
   ok(!/Li et al|NAPS|accepted paper/.test(JS + MJS + RAW), "no research wording in the scripts or the data");
 }

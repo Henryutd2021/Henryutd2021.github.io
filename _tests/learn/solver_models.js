@@ -1,6 +1,6 @@
 // solver_models.js — model builders shared by the solver tests (test_solver.js) and the browser benchmark
-// (scripts/learn_solver_bench.mjs). Not a test itself. Each builder returns a model in the LX.solver format
-// (assets/learn/components/solver.js). Sizes follow the W1 benchmark set (curriculum v2 §18.3):
+// (the browser solver benchmark). Not a test itself. Each builder returns a model in the LX.solver format
+// (assets/learn/components/solver.js). Sizes follow the course's solver benchmark set:
 //   dispatch3()             3 generators, one hour: the textbook check that the demand dual equals the marginal cost
 //   dispatch24(town, days)  Prairie Town's five plants over a real day (24 h), ramp limits on the combined-cycle plant,
 //                           unserved energy at a high penalty
@@ -95,7 +95,7 @@ function uc24(town, days, which) {
   return { sense: "min", variables: vars, constraints: cons };
 }
 
-// The lesson instances of the W1 benchmark (curriculum v2 §18.3: T11, T13 and M1; plus B3's small solves), built by the
+// The lesson instances of the solver benchmark (T11, T13 and M1; plus B3's small solves), built by the
 // lessons' own pure models exactly as the pages build them:
 //   t11       lesson 11's day as one LP (lesson 0's day, ramp limits, unserved penalty; default settings)
 //   m1net     M1 part B: 24 hours on the three-bus DC network, Ridge-Town line limited to 110 MW (congested)
@@ -162,8 +162,8 @@ function lessonSet(site) {
     ["a22lim", "A22 limits LP, seven weeks", A22.limitModel(M13, C, null, RW, { co2: DA.limits.co2.start * 1e3, gas: DA.limits.gas.start / 100, fair: DA.limits.fair.start / 100, tariff: "graded" }, DD)],
   ].concat(e1Set(A, J));
 }
-// engine E1 (SB1, C1, M5; W3): the sizing MILP for the storm and for three outages, the year LP, and the outage check
-// MILP (whole sets, 30% minimum) for the sized plan and for F7's campus; absent on branches without the engine
+// engine E1 (SB1, C1, M5): the sizing MILP for the storm and for three outages, the year LP, and the outage check
+// MILP (whole sets, 30% minimum) for the sized plan and for F7's campus; skipped when the engine is absent
 function e1Set(A, J) {
   const fs = require("fs");
   if (!fs.existsSync(A("components/engine-e1.js")) || !fs.existsSync(A("data/e1-prairie-campus.json"))) return [];

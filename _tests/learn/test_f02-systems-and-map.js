@@ -51,11 +51,11 @@ const sentences = s => s.split(/(?<=[.!?])\s+/).filter(Boolean).length;
     if (r < 100) ok(x.firstSpill >= 0, `reservoir ${r} MW: below the window it spills`);
   });
   ok(/fed by a river averaging 101 MW/.test(QMD) && /Holding up to 350 GWh/.test(QMD) && /from 100 to 115 MW \(the slider moves in 5 MW steps\)/.test(QMD), "fallback: 350 GWh, 101 MW, 100 to 115 MW in 5 MW steps");
-  // the units of the stock balance (review F2 #1): one week at a net flow in MW changes the stock by net × 168 ÷ 1,000 GWh
+  // the units of the stock balance: one week at a net flow in MW changes the stock by net × 168 ÷ 1,000 GWh
   const x1 = M.simReservoir(RS, 100);
   ok(RS.hours === 168 && near(x1.stock[1] - x1.stock[0], (x1.inMW[0] - x1.outMW[0]) * 168 / 1000, 1e-6), `reservoir week 1: ${(x1.stock[1] - x1.stock[0]).toFixed(3)} GWh = (${x1.inMW[0].toFixed(1)} − ${x1.outMW[0]} MW) × 168 h ÷ 1,000`);
   ok(/× 168 hours ÷ 1,000, since 1 GWh = 1,000 MWh/.test(QMD) && RS.about.some(r => /× 168 ÷ 1,000/.test(r.t)), "page and data state the reservoir's MW-to-GWh conversion");
-  ok(!/\\tfrac\{dx\}\{dt\}|\\frac\{dx\}\{dt\}|time constant/.test(QMD), "the Modeler box keeps the discrete balance; no differential equations (review F2 #11)");
+  ok(!/\\tfrac\{dx\}\{dt\}|\\frac\{dx\}\{dt\}|time constant/.test(QMD), "the Modeler box keeps the discrete balance; no differential equations");
   ok(RS.capacity === 350 && RS.release.step === 5, "data: capacity 350 GWh, 5 MW steps");
 }
 
@@ -94,7 +94,7 @@ const sentences = s => s.split(/(?<=[.!?])\s+/).filter(Boolean).length;
     ok(r.won === (r.end <= C.budget + 1e-9), `carbon ${l}%/${n}: won means within the budget`);
   }));
   ok(C.e0 === 100 && C.budget === 1500, "data: 100 Mt in 2025, 1,500 Mt budget");
-  // the year the stock stops rising comes from the path, not the net-zero slider (review F2 #4)
+  // the year the stock stops rising comes from the path, not the net-zero slider
   const z = M.simCarbon(C, 0, C.nz.never);
   ok(z.zero === 2035 && z.end === 550 && z.won && /stops rising only in 2035/.test(M.carbonMessage(C, z, "rises")) && !/2075/.test(M.carbonMessage(C, z, "rises")), "0% by 2035, slider at 'never': zero in 2035, 550 Mt, and the message says 2035");
   ok(/never reach zero/.test(M.carbonMessage(C, h, "rises")) && !/never are/.test(JS), "halve and hold: 'on this path they never reach zero'");
@@ -106,7 +106,7 @@ const sentences = s => s.split(/(?<=[.!?])\s+/).filter(Boolean).length;
     if (!r.won) ok(msg.indexOf("from " + r.over) > 0 && (r.zero == null) === /never reach zero/.test(msg), `carbon ${l}%/${n}: over from ${r.over}, 'never' only if it never reaches zero`);
     ok(words(msg) <= 35 && sentences(msg) <= 2, `carbon ${l}%/${n}: message within budget`);
   }));
-  ok(C.about.some(r => /does not model how much of it stays in the air/.test(r.t)) && !/CO₂ in the air\./.test(QMD) && /Cumulative CO₂ emissions\./.test(QMD), "the counter is cumulative emissions, not atmospheric CO₂ (review F2 #12)");
+  ok(C.about.some(r => /does not model how much of it stays in the air/.test(r.t)) && !/CO₂ in the air\./.test(QMD) && /Cumulative CO₂ emissions\./.test(QMD), "the counter is cumulative emissions, not atmospheric CO₂");
   [RS, B, C].forEach(P => P.about.forEach(r => ok(words(r.t) <= 30 && sentences(r.t) <= 2 && r.k, `${P.label}: about row "${r.k}" within budget`)));
 }
 
@@ -137,9 +137,9 @@ const sentences = s => s.split(/(?<=[.!?])\s+/).filter(Boolean).length;
   ok(/should generally be less than 30%/.test(D.sources.sorrell_rebound.what) && /should generally be less than 30%/.test(QMD) && /2009, abstract/.test(QMD) && !/reviews put/i.test(QMD + JS), "Sorrell et al.: one review, 'should generally be less than 30%', marked 'abstract'");
   ok(/elite business school/.test(D.sources.bathtub.what) && /business-school students new to these ideas/.test(QMD) && !/well-educated adults/.test(QMD), "Booth Sweeney and Sterman: worded as the abstract");
   ok((QMD.match(/Abstract read/g) || []).length === 3, "three sources read from the abstract only, each marked");
-  // naming a loop opens only once every sign is right, so the verdict cannot contradict the reader's signs (review F2 #5)
+  // naming a loop opens only once every sign is right, so the verdict cannot contradict the reader's signs
   ok(/if \(!S0\.checked \|\| g\.right < g\.total\) \{/.test(JS), "loop naming waits for correct signs");
-  // a balancing loop opposes change; settling is one possible response (review F2 #3)
+  // a balancing loop opposes change; settling is one possible response
   ok(/overshoot/.test(SIDE.match(/id: balancing-loop[\s\S]*?def: "[^"]+"/)[0]) && !/pulled back toward a level/.test(QMD + JS + SIDE) && /without long delays/.test(JS), "balancing: opposes change; the settling sketch is labelled as one response without long delays");
 }
 
@@ -148,25 +148,25 @@ const sentences = s => s.split(/(?<=[.!?])\s+/).filter(Boolean).length;
   const nodes = new Set(R.nodes.map(n => n.id)), dims = new Set(R.dims.map(d => d.id));
   R.nodes.forEach(n => ok(dims.has(n.dim), `${n.id}: dimension ${n.dim}`));
   ok(R.levers.length === 4 && R.levers.every(l => l.waves.length === 3), "four levers, three waves each");
-  // no lever claims a closed loop; the gas chain is an adaptation chain (review F2 #2)
+  // no lever claims a closed loop; the gas chain is an adaptation chain
   ok(R.levers.every(l => l.loop == null) && /not a feedback loop/.test(R.levers[0].note) && !/balancing loop closes/.test(JSON.stringify(D)), "gas: an adaptation chain, not a closed loop");
-  // measurable labels; import spending apart from import dependence (review F2 #8)
+  // measurable labels; import spending apart from import dependence
   const lab = id => R.nodes.find(n => n.id === id).label;
   ok(lab("health") === "Heat-related health risk" && lab("local") === "Local pollution and water use" && lab("imports") === "Dependence on imported gas" && lab("impbill") === "Gas import bill" && R.nodes.find(n => n.id === "impbill").dim === "cost", "nodes: measurable labels");
   const gas = R.levers[0];
   ok(gas.waves[0].effects.some(e => e.node === "impbill" && e.dir === "up") && gas.waves[2].effects.some(e => e.node === "imports" && e.dir === "down") && !gas.waves[0].effects.some(e => e.node === "imports"), "gas: the import bill rises first; dependence falls later");
-  // every node defines itself in one or two short sentences (review F2 #9)
+  // every node defines itself in one or two short sentences
   R.nodes.forEach(n => ok(typeof n.def === "string" && words(n.def) <= 25 && sentences(n.def) <= 2, `${n.id}: a short definition`));
   ok(/\[\[wholesale-price\|/.test(JSON.stringify(R)) && /\[\[merit-order\|/.test(JSON.stringify(R)) && /\[\[energy-burden\|/.test(JSON.stringify(R)) && /\[\[scarcity-price\|/.test(JSON.stringify(R)) && /\[\[tariff\|/.test(JSON.stringify(R)), "map: wholesale price, merit order, energy burden, scarcity price and tariff marked");
   ok(/Gt = billion tonnes/.test(QMD) && /OECD \(mostly high-income\)/.test(QMD) && /term="net-zero"/.test(QMD) && /\[\[net-zero\|/.test(JS), "Gt, OECD and net zero explained at first use");
-  // spare capacity shrinks when the extra load arrives, in the same wave (review F2 #6)
+  // spare capacity shrinks when the extra load arrives, in the same wave
   ["heat", "dc"].forEach(id => { const lv = R.levers.find(l => l.id === id), w0 = lv.waves[0].effects.map(e => e.node); ok(w0.indexOf("margin") > w0.indexOf("dem") && w0.indexOf("dem") >= 0, `${id}: demand up and spare capacity down in the first wave`); });
   ok(/At once, as soon as the load connects<\/li>/.test(QMD) && /data-id="wave2" data-answer="b"/.test(QMD) && /<li data-value="b">At once/.test(QMD), "quiz: spare capacity shrinks at connection");
-  // conditional results carry their condition (review F2 #7)
+  // conditional results carry their condition
   const carb = R.levers.find(l => l.id === "carbon"), eff = (lv, n) => lv.waves.map(w => w.effects.find(e => e.node === n)).filter(Boolean)[0];
   ok(/^If /.test(eff(carb, "co2").why) && /^If /.test(eff(carb, "bill").why) && /^If /.test(eff(carb, "local").why) && /^if /.test(carb.predict.cond) && /pr2\.cond/.test(JS), "carbon price: CO₂, bills and pollution stated with their condition, and so is the verdict");
   ok(/can encourage/.test(eff(R.levers.find(l => l.id === "heat"), "build").why) && /can bring/.test(eff(R.levers.find(l => l.id === "heat"), "whp").why), "heat wave: investment and scarcity prices are possible, not certain");
-  // a node's details show only the waves the reader opened (review F2 #13)
+  // a node's details show only the waves the reader opened
   ok(M.nodeSoFar(R, "imports", { gas: 1 }).length === 0 && M.nodeSoFar(R, "imports", { gas: 3 })[0].dirs.join() === "down" && M.nodeSoFar(R, "co2", { gas: 1 }).length === 0 && M.nodeSoFar(R, "co2", {}).length === 0, "node details: only effects in opened waves");
   ok(/nodeSoFar\(R, id, st\.levers\)/.test(JS) && !/ripple\(lv, lv\.waves\.length - 1\)\.by\[id\]/.test(JS), "the view uses the opened waves for node details");
   R.levers.forEach(lv => {
@@ -194,7 +194,7 @@ const sentences = s => s.split(/(?<=[.!?])\s+/).filter(Boolean).length;
   ok(mixed.sort().join() === "carbon:burden,carbon:margin,dc:bill,dc:co2,dc:local,gas:co2", `"depends" cells: ${mixed.join(", ")}`);
   ok(/CO₂ depends on what replaces gas/.test(fb) && /the burden depends on the revenue/.test(fb) && /CO₂ depends on what serves it/.test(fb) && /cooling water depends on the design/.test(fb) && /who pays for upgrades depends on the tariff/.test(fb), "fallback table: the 'depends' cells");
   ok(/Each of four levers reaches technology, cost, emissions, people and security within three waves/.test(QMD), "fallback: four levers, five dimensions, three waves");
-  // G-DC: data centers only as a load
+  // data centers appear only as a load
   const dc = R.levers.find(l => l.id === "dc");
   ok(/300 MW data-center campus, an illustrative large load/.test(dc.about) && /illustrative 300 MW load/.test(QMD), "the data center is an illustrative 300 MW load");
 }

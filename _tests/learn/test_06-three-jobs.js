@@ -112,7 +112,7 @@ const pct = (x, d) => (x * 100).toFixed(d === undefined ? 1 : d) + "%";
   ok((QMD.split(D.sources.pjm_elcc.url).length - 1) === 3, "PJM PDF linked in the data note, the facts table and the sources");
 }
 
-// ---------------- every percentage the reader sees belongs to the technology it is written about (review finding 12)
+// ---------------- every percentage the reader sees belongs to the technology it is written about
 {
   const tech = JSON.parse(JSON.stringify(D.tech));
   tech.find(t => t.key === "battery").ratings = D.steelman.storageRatings;
@@ -143,19 +143,19 @@ const pct = (x, d) => (x * 100).toFixed(d === undefined ? 1 : d) + "%";
   }
   // capacity factor is average output over size, not time running; it does not rank cheapness
   const all = QMD + JS + JSON.stringify(D);
-  ok(!/ran (only )?\d+(\.\d+)?% of (the year|2025)|runs? (only )?\d+(\.\d+)?% of the year|how much of the year it runs/i.test(all), "no 'ran X% of the year' wording (finding 2)");
-  ok(!/ranks the energy job/.test(all), "capacity factor does not 'rank the energy job' (finding 3)");
-  ok(/below rated speed, output rises roughly with the cube/.test(T.wind.how), "wind: cube law only below rated speed (finding 4)");
-  ok(T.wind.jobs.flex === "partly" && T.solar.jobs.flex === "partly" && T.wind.flexSrc === "nrel_agc" && /headroom/.test(D.sources.nrel_agc.as_of), "wind and solar: flexibility 'partly', sourced (finding 5)");
-  ok(/technology class/.test(JS) && /single plant/.test(QMD) && JS.indexOf("Each dot is a plant") < 0, "class ratings, not single plants (finding 6)");
+  ok(!/ran (only )?\d+(\.\d+)?% of (the year|2025)|runs? (only )?\d+(\.\d+)?% of the year|how much of the year it runs/i.test(all), "no 'ran X% of the year' wording");
+  ok(!/ranks the energy job/.test(all), "capacity factor does not 'rank the energy job'");
+  ok(/below rated speed, output rises roughly with the cube/.test(T.wind.how), "wind: cube law only below rated speed");
+  ok(T.wind.jobs.flex === "partly" && T.solar.jobs.flex === "partly" && T.wind.flexSrc === "nrel_agc" && /headroom/.test(D.sources.nrel_agc.as_of), "wind and solar: flexibility 'partly', sourced");
+  ok(/technology class/.test(JS) && /single plant/.test(QMD) && JS.indexOf("Each dot is a plant") < 0, "class ratings, not single plants");
   const sc = D.tech.filter(t => t.cf != null && t.firm != null && t.key !== "hydro"), low = sc.filter(t => t.firm > 0.5).sort((a, b) => a.cf - b.cf)[0];
-  ok(low.key === "pk" && JS.indexOf("lowest capacity factor whose firm share is still above half") >= 0, "scatter question has one answer, the gas peaker (finding 7)");
-  ok(JS.indexOf("stress test") >= 0 && JS.indexOf("outlast batteries") < 0 && /stress case/.test(D.steelman.about), "the calm spell is a stress case, not a battery size (finding 8)");
+  ok(low.key === "pk" && JS.indexOf("lowest capacity factor whose firm share is still above half") >= 0, "scatter question has one answer, the gas peaker");
+  ok(JS.indexOf("stress test") >= 0 && JS.indexOf("outlast batteries") < 0 && /stress case/.test(D.steelman.about), "the calm spell is a stress case, not a battery size");
   const modeler = (QMD.match(/Go deeper · Modeler[\s\S]*?<\/details>/) || [""])[0];
-  ok((modeler.match(/\$\$/g) || []).length === 2 && !/p_\{g,t\}|R_g/.test(modeler) && /\*\*Decisions\.\*\*/.test(modeler) && /10-write-it-down\.qmd/.test(modeler), "Modeler box: a preview in words, one symbolic line, a link to lesson 10 (finding 9)");
-  ok(/4 hours at full power/.test(JS) && /4-hour battery runs at full power for four hours/.test(T.battery.how), "4-hour battery explained (finding 11)");
-  ok(/\[\[ramp-rate\|/.test(JSON.stringify(D.jobs)) && /data-term="ramp-rate"/.test(QMD), "ramp rate marked as a glossary term (finding 11)");
-  ok(/Regions reward these services differently/.test(QMD), "real-world card: regions reward the services differently (finding 13)");
+  ok((modeler.match(/\$\$/g) || []).length === 2 && !/p_\{g,t\}|R_g/.test(modeler) && /\*\*Decisions\.\*\*/.test(modeler) && /10-write-it-down\.qmd/.test(modeler), "Modeler box: a preview in words, one symbolic line, a link to lesson 10");
+  ok(/4 hours at full power/.test(JS) && /4-hour battery runs at full power for four hours/.test(T.battery.how), "4-hour battery explained");
+  ok(/\[\[ramp-rate\|/.test(JSON.stringify(D.jobs)) && /data-term="ramp-rate"/.test(QMD), "ramp rate marked as a glossary term");
+  ok(/Regions reward these services differently/.test(QMD), "real-world card: regions reward the services differently");
 }
 
 // ---------------- scope: deny-list, the nuclear-plus-risk combination (sentence level), links on the allow-list
@@ -170,8 +170,9 @@ const pct = (x, d) => (x * 100).toFixed(d === undefined ? 1 : d) + "%";
   const NUC = /nuclear|reactor|\bSMR\b|small modular/i;
   const RISK = /cost (trajector|decline|reduction|fall)|learning|commerciali|subsid|credit|threshold|break[- ]even|parity|siting|site selection|suitab|screen|deliver|timing|order|anchor|buyer|data[- ]cent/i;
   visible.split(/(?<=[.!?])\s+|\n+/).forEach(s => ok(!(NUC.test(s) && RISK.test(s)), `scope: nuclear term with a risk term in "${s.slice(0, 90)}"`));
-  // the lesson's own links (curriculum §20.3); the generated meta, next and footer blocks are build_learn.py's (its licence
-  // links are a documented scanner allowance) and learn_scope_scan.py checks the rendered page as a whole
+  // the lesson's own links (the course's allowed link destinations); the generated meta, next and footer blocks are the
+  // course build step's (its licence links are a documented allowance of the scope scan), and the scope scan checks the
+  // rendered page as a whole
   const own = QMD.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1:end -->/g, "");
   const ALLOW = /^(https:\/\/(www\.|docs\.)?(eia\.gov|energy\.gov|ferc\.gov|nerc\.com|nlr\.gov|nrel\.gov|pjm\.com|doi\.org)\/|#|\.\.\/assets\/|[0-9a-z-]+\.(qmd|html)(#[a-z0-9-]*)?$)/;
   let nl = 0;

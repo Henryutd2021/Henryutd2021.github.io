@@ -1,5 +1,5 @@
-// e4_harness.js — shared setup for the tests of engine E4 and its pages (SB4, M13, C4), wave W6, 2026-11-07. Not a test
-// itself (learn_qa.sh runs test_*.js only).
+// e4_harness.js — shared setup for the tests of engine E4 and its pages (SB4, M13, C4). Not a test itself (the test
+// runner runs test_*.js only).
 //   load()   the engine, its prepared data (prairieland.json and e4-pathways.json), the solver core with the vendored
 //            HiGHS, LX.ShareState's pure part; solveSync(model, opts) and solver (a Promise-returning wrapper for E4.solve)
 //   face(model, r, terms, sense, solveSync, slack)   the min or max of a linear expression over the optimal face (every

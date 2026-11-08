@@ -1,4 +1,4 @@
-// test_components_a.js — Node tests for the components promoted by W1 integration group A: plot.js (LX.Plot,
+// test_components_a.js — Node tests for the shared chart components plot.js (LX.Plot,
 // LX.PlotCard), scatter.js (LX.Scatter) and pricechart.js (LX.PriceChart, LX.HourPicker). Checks their pure helpers,
 // that each file defines its components when run with a stub window.LX, that the bundle holds them, and that no lesson
 // still carries the copies they replace (lessons 2, 3, 4, 6, M1, B2).
@@ -70,7 +70,7 @@ ok(bundle.indexOf("LX.Plot = ") < bundle.indexOf("LX.PriceChart = "), "bundle: p
 // ".lx-chip" already means a tappable chip (explain.css); the value chips are .lx-readout, so the two never clash
 ok(!/\.lx-chip\b/.test(read(L("components/plot.css"))), "plot.css: does not reuse .lx-chip");
 
-// ---------------- no lesson keeps a copy of what was promoted
+// ---------------- no lesson keeps a copy of what the shared components now do
 const js = id => read(L(id + ".js")), qmd = id => read(path.join(SITE, "learn", id + ".qmd"));
 ok(!/function plot\(/.test(js("03-balancing")) && !/function plot\(/.test(js("04-forecasts")), "lessons 3 and 4: no lesson-local plot()");
 ok(/LX\.PlotCard\(/.test(js("03-balancing")) && /LX\.PlotCard\(/.test(js("04-forecasts")), "lessons 3 and 4: the chart card is LX.PlotCard");
@@ -79,8 +79,8 @@ ok(!/function Scatter\(/.test(js("06-three-jobs")) && /LX\.Scatter\(/.test(js("0
 ok(/LX\.PriceChart\(/.test(js("m01-dispatch-to-lmp")) && /LX\.HourPicker\(/.test(js("m01-dispatch-to-lmp")) && !/createElementNS|S\("svg"/.test(js("m01-dispatch-to-lmp").slice(js("m01-dispatch-to-lmp").indexOf("function PriceChart"), js("m01-dispatch-to-lmp").indexOf("function HourPicker"))), "M1: the price chart and hour picker are LX.PriceChart and LX.HourPicker");
 ok(/LX\.Plot\(/.test(js("b02-python-data")) && !/S\("svg"/.test(js("b02-python-data")), "B2: its charts are drawn by LX.Plot");
 [["03-balancing", /\.w1-(stage|chips?|plot)\b/], ["04-forecasts", /\.w1-(stage|chips?|plot)\b/], ["02-demand", /\.t2-(cv|chart|ax|mk|num)\b(?!-)/], ["06-three-jobs", /\.lx6-(scatter|ax|axt|dl|dot)\b/]].forEach(([id, re]) =>
-  ok(!re.test(qmd(id)), `${id}.qmd: the promoted styles are gone from its style block`));
-ok(!/m1-chart|m1-hours/.test(js("m01-dispatch-to-lmp")) && !/b2-chart/.test(js("b02-python-data")), "M1 and B2: the promoted injected CSS is gone");
+  ok(!re.test(qmd(id)), `${id}.qmd: no lesson-local copy of the shared styles in its style block`));
+ok(!/m1-chart|m1-hours/.test(js("m01-dispatch-to-lmp")) && !/b2-chart/.test(js("b02-python-data")), "M1 and B2: no lesson-local copy of the shared chart CSS");
 [["02-demand", "02-demand"], ["03-balancing", "03-balancing"], ["04-forecasts", "04-forecasts"]].forEach(([id]) => ok(/LX\.demo\(root,/.test(js(id)), `${id}: registers its demo states (LX.demo)`));
 
 console.log(`${checks} checks, ${fails} failed`);

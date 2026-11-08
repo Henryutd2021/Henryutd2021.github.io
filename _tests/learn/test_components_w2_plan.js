@@ -1,5 +1,5 @@
-// test_components_w2_plan.js — Node tests for the planning pieces promoted from lesson M3 at the W2 integration
-// (2026-11-03): LX.townPlan.link, .yearPeriods, .readCheck and .errors (components/planengine.js) and LX.WeekStrip
+// test_components_w2_plan.js — Node tests for the shared planning pieces first written for lesson M3:
+// LX.townPlan.link, .yearPeriods, .readCheck and .errors (components/planengine.js) and LX.WeekStrip
 // (components/weekstrip.js, weekstrip.css).
 //   - files: exported for Node and in the browser, in the generated bundle (learn.js, learn.css), colours from --lx-*
 //     tokens only, and no copy left in M3
@@ -35,7 +35,7 @@ const C = TP.costs(cfg, {});
   const bundleJS = fs.readFileSync(L("learn.js"), "utf8"), bundleCSS = fs.readFileSync(L("learn.css"), "utf8");
   ok(src.indexOf("/* weekstrip.js — LX.WeekStrip") === 0 && css.indexOf("/* weekstrip.css — ") === 0, "weekstrip.js and .css: header comments name the files");
   ok(!/#[0-9a-fA-F]{3,6}\b|rgba?\(/.test(css.replace(/\/\*[\s\S]*?\*\//g, "")) && !/#[0-9a-fA-F]{6}\b|rgba?\(/.test(src), "weekstrip: colours from --lx-* tokens only");
-  ok(bundleJS.indexOf(src.trim().split("\n")[0]) >= 0 && bundleCSS.indexOf(css.trim().split("\n")[0]) >= 0, "weekstrip: in the generated bundle (run build_learn.py)");
+  ok(bundleJS.indexOf(src.trim().split("\n")[0]) >= 0 && bundleCSS.indexOf(css.trim().split("\n")[0]) >= 0, "weekstrip: in the generated bundle (run the course build step)");
   ok(bundleJS.indexOf(src.trim().split("\n")[0]) > bundleJS.indexOf(eng.trim().split("\n")[0]), "weekstrip loads after the planning engine in learn.js");
   ok(bundleJS.indexOf("link: link, yearPeriods: yearPeriods, readCheck: readCheck, errors: errors") > 0, "the bundled engine exports link, yearPeriods, readCheck and errors");
   ["link", "yearPeriods", "readCheck", "errors"].forEach(f => ok(typeof TP[f] === "function", `LX.townPlan.${f} is exported to Node`));

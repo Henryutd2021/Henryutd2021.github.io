@@ -1,5 +1,5 @@
 // test_path_scales.js — Node tests of the course's scale metadata (learn/path.yml `kind: scale` and each lesson's
-// `scales`, as built into assets/learn/data/path.json and every lesson page's data block; 2026-11-07):
+// `scales`, as built into assets/learn/data/path.json and every lesson page's data block):
 //   - five scales, S0 to S4 in order, with the names, short names and icons lesson F1 teaches; every icon exists
 //   - every lesson names at least one scale that exists, each once; a tier's checkpoint names none; the toolbox has none
 //   - each live lesson page's data block carries the same scales as path.json (the build is up to date; the build itself

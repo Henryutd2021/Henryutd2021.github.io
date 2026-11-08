@@ -17,9 +17,9 @@
 //     two sentences; results in aria-live regions; the demo states run
 //   - scope: no nuclear term, no "AI", no deny-listed term; links only to learn pages, the downloads, doi.org,
 //     gaussianprocess.org and the two allow-listed repositories; excerpt keys uq-mfgpr and wind-uq only
-//   - research wording (curriculum §13, guard G-SRC): every sentence about the course author's studies, on the page, in
-//     the data, the script, the path.yml entry and the notebook, is an approved sentence of
-//     reports/learn/excerpts_for_approval.md (E1, E12, E13), word for word; every E13 block ends with the acknowledgement
+//   - research wording (the sourcing rule): every sentence about the course author's studies, on the page, in the data,
+//     the script, the path.yml entry and the notebook, is an approved sentence of the excerpt wording (E1, E12, E13),
+//     word for word; every E13 block ends with the acknowledgement
 //   - speed: the step 3 grid search and the facts in Node
 // Usage (from the site folder):  node _tests/learn/test_m09-surrogates-uq.js [--write]
 //   --write  rewrite the data file's records, stored fits and reference block, and the page's no-JS block, first
@@ -32,6 +32,7 @@ const SITE = path.resolve(__dirname, "..", "..");
 const L = p => path.join(SITE, "assets/learn", p);
 const M = require(L(ID + ".js"));
 const X = require("./excerpt_check.js");
+const PRIV = require("./private_sources.js");
 const DPATH = L("data/" + ID + ".json"), QPATH = path.join(SITE, "learn", ID + ".qmd");
 const NBPATH = path.join(SITE, "learn/notebooks", ID + ".ipynb"), SIDE = path.join(SITE, "learn/_w1", ID + ".yml");
 const readOr = p => (fs.existsSync(p) ? fs.readFileSync(p, "utf8") : "");
@@ -156,11 +157,11 @@ has(pct(r[1].byRange[2].cov90, 0) + " against " + pct(r[0].byRange[2].cov90, 0),
 ok(Math.round(16 ** 3 / 3) === 1365 && Math.round(1000 ** 3 / 3 / 1e6) === 333 && TX.includes("about 1,400 for 16 records, about 330 million for 1,000"), "numbers to remember: n³/3 for 16 and 1,000 records");
 has("the page's grid has " + (D.grid.ell.length * D.grid.sf.length * D.grid.sn.length).toLocaleString("en-US") + " settings", "Go deeper: the grid's size");
 has("About 40 guided minutes in nine steps.", "the time line");
-has("outside the approximate 95% sampling range of ± 3 points for independent records, so sampling alone is unlikely to explain it.", "quiz 1: a sampling range, not a boundary of chance (review M9 #6)");
+has("outside the approximate 95% sampling range of ± 3 points for independent records, so sampling alone is unlikely to explain it.", "quiz 1: a sampling range, not a boundary of chance");
 has("Approximate 95% sampling range of the share of 400 independent new records inside a 90% band (two standard errors).", "numbers to remember: the sampling range");
-ok(!/beyond chance|chance alone|by chance|wide but honest|the most likely of/.test(TX + JS), "no 'beyond chance', 'wide but honest' or 'most likely settings' (review M9 #6, #7, #9)");
+ok(!/beyond chance|chance alone|by chance|wide but honest|the most likely of/.test(TX + JS), "no 'beyond chance', 'wide but honest' or 'most likely settings'");
 has("$H$ stacks $h$ at every record, one row each.", "Go deeper: H defined");
-ok(/\*\*Symbols\.\*\* \$v\$ wind speed/.test(PAGE), "Go deeper: a symbol key before the formulas (review M9 #4)");
+ok(/\*\*Symbols\.\*\* \$v\$ wind speed/.test(PAGE), "Go deeper: a symbol key before the formulas");
 has("64 to fit (seed 9, used in order) and 400 others to score (seed 2023)", "data note: counts and seeds");
 ok(/12% turbulence\) and 3% lower\./.test(TX) && /power scatter combines 15 kW of background noise with an approximate wind-error term, 0\.3 m\/s times the curve's slope/.test(TX) && T.ti === 0.12 && T.loss === 0.03 && T.powErr === 15 && T.windErr === 0.3, "data note: the toy's recipe");
 ok(/k = 2, c = 8 m\/s\) between 3 and 20 m\/s/.test(TX) && T.weibull.k === 2 && T.weibull.c === 8, "data note: the Weibull wind speeds");
@@ -185,7 +186,7 @@ const sliders = [];
                  setTimeout: f => { f(); return 0; }, clearTimeout: () => {}, Event: function (t) { this.type = t; } };
   const xp = E.LX.H("div", { id: "m9-explain" }, E.body);
   vm.runInNewContext(JS, mctx);
-  ok(E.LX.M9 && typeof E.LX.M9.fit === "function", "LX.M9 (components/gp.js, shared with CF8 since the W4 integration) is on the page");
+  ok(E.LX.M9 && typeof E.LX.M9.fit === "function", "LX.M9 (components/gp.js, shared with CF8) is on the page");
   const root = E.LX.H("div", { class: "lx-interactive", "data-learn": "m09" }, E.body), live = E.LX.H("div", { class: "lx-live" }, root);
   let threw = null;
   try { init(live, { m09_surrogates_uq: D }, root); } catch (err) { threw = err.stack; }
@@ -205,7 +206,7 @@ const sliders = [];
   cards.go(0); card().querySelectorAll(".lx-choice")[2].click();
   ok(!next().disabled && saw() === "Furthest below: 11–12 m/s, 239 kW on average. The real curve is a band, and its shape near rated speed differs from the maker's line.", "step 1 (" + saw() + ")"); sawBudget(1);
   ok(plotSpecs[plotSpecs.length - 1].lines.some(l => l.dots && l.pts.length === 400), "step 1: the chart shows the 400 records");
-  { // the text version of step 1: the records by 1 m/s bin, with count, mean power and mean gap below the maker's curve (review M9 #3)
+  { // the text version of step 1: the records by 1 m/s bin, with count, mean power and mean gap below the maker's curve
     const sp = plotSpecs[plotSpecs.length - 1], h = sp.text.head, rows = sp.text.rows, test = M.heldOut(D), G1 = M.gaps(T, test);
     const gi = h.indexOf("400 records: mean gap below the maker's curve"), ci = h.indexOf("400 records: count, mean power");
     ok(rows.length === 17 && gi > 0 && ci > 0 && rows.every((r, k) => r[0] === (3 + k) + "–" + (4 + k) + " m/s" && (G1[k].n ? r[gi] === kw(G1[k].gap) && r[ci].startsWith(G1[k].n + " · ") : r[ci] === "none")), "step 1: the text version gives every bin's record count, mean power and gap (the gaps of step 1)");
@@ -233,7 +234,7 @@ const sliders = [];
   // 6
   cards.go(5); card().querySelectorAll(".lx-seg button")[1].click();
   ok(!next().disabled && saw() === "Same 16 records: two sources cut the RMSE from 126 to 85 kW and the mean band width from 391 to 287 kW. Yet at 8–13 m/s, the steep part, its 90% band holds only 82% (one source: 88%).", "step 6 (" + saw() + ")"); sawBudget(6);
-  ok(/90% band holds, 8–13 m\/s \(131 records\)88%82%/.test(text(card().innerHTML)) && b[1].byRange[1].n === 131 && pct(b[1].byRange[1].cov90) === "81.7%" && pct(b[0].byRange[1].cov90) === "87.8%", "step 6: the table shows both fits' coverage at 8–13 m/s, 88% and 82% of 131 records (review M9 #2)");
+  ok(/90% band holds, 8–13 m\/s \(131 records\)88%82%/.test(text(card().innerHTML)) && b[1].byRange[1].n === 131 && pct(b[1].byRange[1].cov90) === "81.7%" && pct(b[0].byRange[1].cov90) === "87.8%", "step 6: the table shows both fits' coverage at 8–13 m/s, 88% and 82% of 131 records");
   ok(new RegExp("ρ = " + F.rho.toFixed(2) + " times the maker's curve, plus " + kw(F.two.beta[0])).test(text(card().innerHTML)), "step 6: rho and the shift");
   // 7
   cards.go(6); const sl7 = sliders[sliders.length - 1];
@@ -243,7 +244,7 @@ const sliders = [];
   cards.go(7); card().querySelectorAll(".lx-choice")[0].click();
   ok(!next().disabled && saw() === "Above 13 m/s the two-source band holds 58% of new records; the wider one-source band holds 100% in this example. Neither was validated beyond its last record: cheap data mislead where they are wrong and unchecked.", "step 8 (" + saw() + ")"); sawBudget(8);
   { const sp = plotSpecs[plotSpecs.length - 1], h = sp.text.head, r15 = sp.text.rows.find(x => x[0] === "15–16 m/s");
-    ok(h.includes("Field curve (hidden from the fits)") && h.includes("400 new records: count, mean power") && h.includes("16 records: mean gap below the maker's curve") && r15 && r15[h.indexOf("Field curve (hidden from the fits)")] === kw(M.field(T, 15.5, "reduce")), "step 8: the text version lists the hidden field curve and both sets of records by bin (review M9 #3)"); }
+    ok(h.includes("Field curve (hidden from the fits)") && h.includes("400 new records: count, mean power") && h.includes("16 records: mean gap below the maker's curve") && r15 && r15[h.indexOf("Field curve (hidden from the fits)")] === kw(M.field(T, 15.5, "reduce")), "step 8: the text version lists the hidden field curve and both sets of records by bin"); }
   ok(/the first 16 records stop at 11\.9 m\/s\./.test(stepText()), "step 8 text: where the records stop");
   { const a8 = M.fitStored(D, N0, false, "reduce"); ok(new RegExp("falls back toward its average, " + kw(a8.beta[0]).replace(",", ",") + ": close to this turbine by luck").test(text(card().innerHTML)) && a8.beta[0] > 900 && a8.beta[0] < 1000 && M.predict(a8, 20).m < 1200 && M.predict(M.fitStored(D, N0, false), 20).m < 1200 && M.field(T, 20) > 1900, "step 8: the one-source curve falls toward its average beyond the records in both cases (" + kw(a8.beta[0]) + ")"); }
   // 9
@@ -262,7 +263,7 @@ const sliders = [];
 
 function finish() {
   // ---------------- the lab notebook
-  ok(NB.length > 0, "the lab notebook exists (learn/notebooks/" + ID + ".ipynb; written by scripts/build_learn_m09_notebook.py)");
+  ok(NB.length > 0, "the lab notebook exists (learn/notebooks/" + ID + ".ipynb; written by its notebook build step)");
   if (NB) {
     const nb = JSON.parse(NB), src = nb.cells.map(c => c.source.join("")).join("\n");
     ok(nb.cells.every(c => c.cell_type === "markdown" || (c.outputs.length === 0 && c.execution_count === null)), "the notebook is stored without outputs");
@@ -295,11 +296,11 @@ function finish() {
   process.exit(fails ? 1 : 0);
 }
 
-// ---------------- research wording (curriculum §13, guard G-SRC)
+// ---------------- research wording: approved excerpts only
 function researchWording(entry) {
   const R = X.register(["E1", "E12", "E13"]);
-  if (!R) { console.log("note: reports/learn/excerpts_for_approval.md not found (set LEARN_PORTFOLIO); research wording not checked"); return; }
-  ok(R.ack, "the acknowledgement sentence is in the register (decision 7)");
+  if (!R) { console.log("note: the approved excerpt wording is not available (set LEARN_SOURCES); research wording not checked"); return; }
+  ok(R.ack, "the acknowledgement sentence is in the approved wording");
   const RX = /\b(the study|study's|paper|article|IDETC|Li et al|course author|excerpt|research project|SDWPF|SCADA|kernel density|nine test turbines|DOE|funding|plants? (with|without) (power )?measurements|held-out plants)\b/i;
   const NOT_RESEARCH = [
     [/^Where this came up in research$/, "heading"],

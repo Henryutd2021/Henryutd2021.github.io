@@ -6,11 +6,11 @@
 //     options SB3 and C3 need (use after the plan, other spending changes); jobs and tax recomputed by hand
 //   - every reveal and line is true over its whole input range (every cost, design, grouping, multiplier, MW, cost per kW,
 //     job-years per $M, jobs per 100 MW, displacement, tax rate and taxable share on the sliders); rounded values agree
-//   - Ridge County keeps the national-strategy dossier's anchors (20 million people, 3% of the workforce, coal 40% of the
-//     county's tax revenue) and carries its W6 note; Prairie City's numbers are read, never retyped
+//   - Ridge County keeps Prairieland's anchors (20 million people, 3% of the workforce, coal 40% of the county's tax
+//     revenue) and carries its note that SB4 and C4 reuse these numbers; Prairie City's numbers are read, never retyped
 //   - every number stated on the page matches the model; the no-JS block and the practice set equal what the model writes
 //     (--write rewrites them); every output is labelled a screening estimate with assumptions; both fictional lines appear
-//   - the jobs accounting after the review (2026-11-06): displacement comes off building and running alike, on one
+//   - the jobs accounting: displacement comes off building and running alike, on one
 //     timeline (building years 1-2, running years 3-20, the lost jobs in all 20); every output SB3, M12 and C3 read is
 //     unchanged against a frozen copy of the layer's first version; the mines' coal taxes are held fixed and the change
 //     if they ended is shown; the explain layer's words follow the reader's design and tax settings
@@ -123,7 +123,7 @@ ok(near(J0.horizon.net, 1.6 * ((4500 + 18 * 120) * 0.8 - 20 * 1150)), "the Model
     if (!near(o.horizon.newPerm, a.horizon.newPerm, 1e-9) || !near(o.horizon.net, a.horizon.net, 1e-9)) same = false;
   })))))));
   ok(same && n === 972, "API: every first-version output is unchanged (" + n + " cases); only horizon.newPerm and horizon.net moved, and the old ones return with buildDisplacement 0 and operatingYears 20"); }
-// C3's call (capstone C3, learn-w5-h): building from up-front spending at capexPerKW 1000 over 15 years, upkeep with capexPerKW 0
+// C3's call (capstone C3): building from up-front spending at capexPerKW 1000 over 15 years, upkeep with capexPerKW 0
 { const JD = D.jobs, cc = { staff: 0, mineJobs: 0, multiplier: JD.multiplier.start, localShare: JD.localShare, jobYearsPerM: JD.jobYearsPerM.start, displacement: JD.displacement.start / 100, horizonYears: JD.horizonYears, buildYears: 15 };
   const b = A13.jobs(Object.assign({}, cc, { newMW: 812.5, capexPerKW: 1000, omPer100MW: 0 })), o = A13.jobs(Object.assign({}, cc, { newMW: 900, capexPerKW: 0, omPer100MW: JD.omPer100MW.start }));
   ok(near(b.buildJobYears, 812.5 * 0.3 * 5 * 1.6) && near(b.buildJobsAvg, b.buildJobYears / 15) && near(o.newPermGross, 9 * 6 * 1.6) && near(o.newPermNet, 9 * 6 * 1.6 * 0.8) && near(b.buildJobYearsNet, b.buildJobYears * 0.8),
@@ -133,9 +133,9 @@ const T0 = A13.taxBase(M.taxInputs(D, S0));
 ok(T0.plantTaxM === 60 && near(T0.newTaxM, 30) && near(T0.changeM, -30) && T0.revenueBeforeM === 900 && near(T0.changeShare, -30 / 900), "tax at the defaults: $60M lost, $30M gained, −$30M of $900M");
 ok(near(T0.ifMinesCloseM, -30 - 300) && near(T0.ifMinesCloseShare, -330 / 900) && near(T0.coalShareAfter, 300 / 870), "tax: the mines' $300M held fixed (coal 34% after); if it ended too, −$330M (−36.7%)");
 ok(/mineCoalTaxM/.test(D.tax.mines) && /plant-property-tax comparison/.test(D.tax.mines) && /plant-property-tax comparison/.test(A13.ASSUME.tax.join(" ")), "the data and the layer say the mines' taxes are held fixed");
-// Ridge County's anchors (national-strategy dossier §8.0) and its W6 note
+// Ridge County's anchors (Prairieland's parameter card) and its note on reuse by SB4 and C4
 ok(RC.prairielandPeople === 20000000 && RC.workforceShare === 0.03 && near(T0.coalShareBefore, RC.coalTaxShare) && RC.coalTaxShare === 0.40, "Ridge County: 20 million people in Prairieland, 3% of its workforce, coal 40% of the county's tax revenue at the default rate");
-ok(/W6/.test(RC.note) && /SB4/.test(RC.note) && /C4/.test(RC.note) && /fictional/.test(RC.fiction), "Ridge County carries its W6 note and its fictional line");
+ok(/SB4/.test(RC.note) && /C4/.test(RC.note) && /fictional/.test(RC.fiction), "Ridge County carries its note on reuse by SB4 and C4, and its fictional line");
 
 // ---------------- every line, over its whole input range
 const SH = M.shortOf(PC);
@@ -264,7 +264,7 @@ const PROSE = OWN.replace(/<div class="lx-card lx-sources">[\s\S]*?<\/div>/, " "
 PROSE.split(/<\/?(?:p|li|dd|dt|td|th|summary|br|caption)\b[^>]*>/).map(plain).filter(x => /[A-Za-z]/.test(x) && !/^[:{]/.test(x)).forEach(x => {
   const n = nWords(x); ok(n <= 38, "text element of " + n + " words: " + x.slice(0, 70)); ok(nSent(x) <= 2, "text element of " + nSent(x) + " sentences: " + x.slice(0, 70)); });
 
-// ---------------- the practice set balances (W4 finding 6)
+// ---------------- the practice set balances
 { const P = M.practice(D, PC), a = M.split(D, PC, 24, "kwh"), f = M.split(D, PC, 24, "fixed");
   ok((P.match(/<li>/g) || []).length === 6, "six worked exercises");
   ok(P.indexOf("$24M ÷ " + M.fmtN(E) + " kWh = $" + M.fmtN(a.rate.perKWh, 4)) >= 0 && near(24e6 / E, a.rate.perKWh), "exercise 1 balances");

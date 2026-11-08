@@ -1,17 +1,16 @@
-// e1_harness.js — shared setup for the tests of engine E1 and its pages (SB1, C1, M5), wave W3, 2026-11-03. Not a test
-// itself (learn_qa.sh runs test_*.js only).
+// e1_harness.js — shared setup for the tests of engine E1 and its pages (SB1, C1, M5). Not a test itself (the test
+// runner runs test_*.js only).
 //   load()        the engine, its prepared data, the solver core with the vendored HiGHS, LX.ShareState's pure part
 //   blocks(page, names)   the text between <!-- name:start --> and <!-- name:end --> markers
 //   excerpts(page)        the approved-excerpt blockquotes: [{ source, sentences: [...], html }]
-//   register(md, secs)    { "E8.2": sentence, ... } for the register's sections (excerpts_for_approval.md), revisions applied
-//   portfolio(site)       the ResearchPortfolio folder (LEARN_PORTFOLIO, or the site's parent, or git's common dir)
-//   fullYear(E1, P, plan, solveSync)   the plan's grid-connected year as one LP over all 8,760 hours of 2025 (W3 review
-//                         SB1 5: the check of the 12 average days): { bill, status, unserved }
+//   register(md, secs)    { "E8.2": sentence, ... } for the named sections of the approved excerpt wording (md: its text,
+//                         from private_sources.js), revisions applied
+//   fullYear(E1, P, plan, solveSync)   the plan's grid-connected year as one LP over all 8,760 hours of 2025 (the check
+//                         of the 12 average days): { bill, status, unserved }
 "use strict";
 const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
-const cp = require("child_process");
 const SITE = path.resolve(__dirname, "..", "..");
 const L = p => path.join(SITE, "assets/learn", p);
 async function load() {
@@ -44,11 +43,6 @@ function excerpts(page) {
   return [...page.matchAll(/<blockquote class="lx-excerpt" data-source="([^"]+)">([\s\S]*?)<\/blockquote>/g)].map(m => ({
     source: m[1], html: m[2], sentences: [...m[2].replace(/<footer>[\s\S]*?<\/footer>/, "").matchAll(/<p>([\s\S]*?)<\/p>/g)].map(x => norm(x[1])),
     footer: (m[2].match(/<footer>([\s\S]*?)<\/footer>/) || [])[1] || null }));
-}
-function portfolio() {
-  const c = [process.env.LEARN_PORTFOLIO, path.join(SITE, "..")];
-  try { c.push(path.resolve(SITE, cp.execSync("git rev-parse --git-common-dir", { cwd: SITE, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim(), "..", "..")); } catch (e) { /* not a git checkout */ }
-  return c.filter(Boolean).find(p => fs.existsSync(path.join(p, "reports/learn/excerpts_for_approval.md")));
 }
 function register(md, secs) {
   const out = {}; let sec = null;
@@ -85,4 +79,4 @@ function fullYear(E1, P, st, solveSync) {
   for (let t = 0; t < N; t++) { bill += E1.rate(P, st, t % 24) / 100 * r.values["h" + t + "i"] - credit * r.values["h" + t + "e"]; unserved += r.values["h" + t + "x"]; }
   return { status: r.status, bill, unserved, hours: N };
 }
-module.exports = { SITE, L, load, between, writeBlocks, norm, excerpts, portfolio, register, fullYear };
+module.exports = { SITE, L, load, between, writeBlocks, norm, excerpts, register, fullYear };

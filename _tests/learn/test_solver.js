@@ -100,7 +100,7 @@ const near = (a, b, tol) => Math.abs(a - b) <= (tol === undefined ? 1e-6 : tol);
     ok(e.status === "error" && rx.test(e.message), `authoring error ${i + 1}: ${e.message}`);
   });
 
-  // ---------------- benchmark models (W1 set) and timings in Node on this machine
+  // ---------------- benchmark models (the solver benchmark set) and timings in Node on this machine
   const town = JSON.parse(fs.readFileSync(L("data/town.json"), "utf8")), days = JSON.parse(fs.readFileSync(L("data/town_days.json"), "utf8"));
   const set = [["24-hour dispatch LP", MODELS.dispatch24(town, days)], ["168-hour storage LP", MODELS.storage168(town, days)], ["24-hour unit commitment MILP", MODELS.uc24(town, days)]];
   const pct = (a, p) => a.slice().sort((x, y) => x - y)[Math.min(a.length - 1, Math.ceil(p * a.length) - 1)];

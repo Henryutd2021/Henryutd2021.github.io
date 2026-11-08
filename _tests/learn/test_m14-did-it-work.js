@@ -76,7 +76,7 @@ ok(F.hh.length === 400 && F.hh.every(h => h.y.length === 24) && E.nOn === 92 && 
   ok(flips > 20, "the size and noise terms of the rule matter: " + flips + " homes would decide otherwise on engagement alone");
 }
 ok(F.hh.every(h => h.tau <= 0) && F.hh.every(h => h.size >= 1 && h.size <= 3), "panel 1: every effect at or below zero; sizes 1 to 3 thousand sq ft");
-// physically possible peaks: every home-month above zero in the default panel and in every threat's panel (review #1)
+// physically possible peaks: every home-month above zero in the default panel and in every threat's panel
 {
   const lows = [null].concat(D.threats.map(x => x.key)).map(k => Math.min(...M.touPanel(T, k).flatMap(h => h.y)));
   ok(lows.every(v => v > 0.25) && Math.min(...lows).toFixed(2) === "0.27" && /lowest about 0\.27 kW/.test(T.level.note), "every home-month's evening peak is above zero in every panel (lowest " + Math.min(...lows).toFixed(3) + " kW, as the settings say)");
@@ -250,7 +250,7 @@ ok((TX.match(/[Ss]imulated/g) || []).length >= 6, "the page says 'simulated' thr
 })().catch(err => { ok(false, "the stub page test threw: " + (err && err.stack || err)); finish(); });
 
 function finish() {
-  ok(NB.length > 0, "the lab notebook exists (learn/notebooks/" + ID + ".ipynb; written by scripts/build_learn_m14_notebook.py)");
+  ok(NB.length > 0, "the lab notebook exists (learn/notebooks/" + ID + ".ipynb; written by its notebook build step)");
   if (NB) {
     const nb = JSON.parse(NB), src = nb.cells.map(c => c.source.join("")).join("\n");
     ok(nb.cells.every(c => c.cell_type === "markdown" || (c.outputs.length === 0 && c.execution_count === null)), "the notebook is stored without outputs");

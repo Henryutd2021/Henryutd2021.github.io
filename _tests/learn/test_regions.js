@@ -1,8 +1,8 @@
 // test_regions.js — Node tests for the regional profile cards (learn/regions.qmd, assets/learn/regions.js,
-// assets/learn/data/regions.json; curriculum v2 §15):
+// assets/learn/data/regions.json):
 //   - twelve cards, in the curriculum's order, each with the same six parts (system structure, institutions, main
 //     challenges, distinctive research questions, verified key numbers with a source each, the as-of date)
-//   - every key number of the ten survey cards is one of the curriculum's verified items (§15 table), word for word in its
+//   - every key number of the ten survey cards is one of the curriculum's verified items (copied below), word for word in its
 //     numbers; the Plains and Australia numbers each name a primary source read on 7 November 2026 (SPP, EIA; AEMO, the
 //     Clean Energy Regulator), and the source's own line holds every number the card quotes
 //   - every key number carries its data year; a surveyed figure without one is held back (the Gulf card) and not shown
@@ -11,7 +11,7 @@
 //     first use; one idea per bullet (at most one semicolon); the facts the reviews corrected (SPP's two
 //     interconnections, Okinawa, China's utilisation rate, Australia's operational demand)
 //   - Ember labelled a compiler of official statistics, in the sources and in every citation; links only to the course's
-//     allowed domains (curriculum §20.3, copied below; others "no link"); no editorial link rule on the page
+//     allowed domains (copied below; others "no link"); no editorial link rule on the page
 //   - no ranking words, no verdicts; each card's focus named as the card's, not the region's; no nuclear term in a string
 //     with a risk term; text budget per item; no duplicate id on the page; a link to a hidden card shows it first
 //   - the guide, tiles, cards, comparison and sources blocks equal what regions.js writes (--write rewrites them)
@@ -56,9 +56,9 @@ R.cards.forEach(c => {
   c.numbers.forEach(n => ok(M.plain(n.text).split(/\s+/).length <= 32, c.id + " number ≤ 32 words"));
 });
 
-// ---------------- numbers: the survey's verified items (curriculum §15), and the new primary sources
+// ---------------- numbers: the survey's verified items, and the new primary sources
 const nums = s => (s.match(/\d[\d,]*(?:\.\d+)?/g) || []).map(x => x.replace(/,/g, "")).filter(x => x !== "");
-const VERIFIED = {   // curriculum v2 §15, verified key numbers (the field-landscape survey, 2026-11-02)
+const VERIFIED = {   // the curriculum's verified key numbers (from the course's field survey)
   us: ["2,061", "1,312", "749", "17%", "19%", "4.4%", "176"], eu: ["47.5%", "90.1%", "10.7%", "30%", "29%", "23%", "5%"],
   china: ["317", "95%", "94%", "1,286", "1,285", "58%", "22%"], india: ["300.50", "54%", "552", "73%", "9.4%"],
   "japan-korea": ["67%", "10%", "9%", "60%", "7%"], nordics: ["161.8", "89.9%", "22.8", "88.1%", "79.7%", "54.3%"],
@@ -97,7 +97,7 @@ Object.keys(VERIFIED).forEach(id => {
   ok(g.held.items.every(n => PAGE.indexOf(n.text) < 0 && PAGE.indexOf(n.text.slice(0, 25)) < 0) && !/3\.5 times|4\.2 times/.test(PAGE + JSON.stringify(R.sources)), "Gulf: the held figures are on no page and in no source line");
 }
 
-// ---------------- numbers in the text parts: in the survey's row (field-landscape §4.1, read 2 November 2026) or a cited source line
+// ---------------- numbers in the text parts: in the field survey's row for the card, or a cited source line
 {
   const SURVEY = { us: ["7", "3", "2023"], eu: ["2022"], china: ["2025"], "japan-korea": ["50", "60"], nordics: ["2024"], ssa: ["2013"], latam: ["2025"] };   // the survey row's numbers (3,000 km and 90% dropped)
   R.cards.forEach(c => {
@@ -154,7 +154,7 @@ R.cards.forEach(c => Object.keys(R.scales).forEach(k => ok(M.revealFor(R, k, c.i
 
 // ---------------- sources and links
 Object.keys(R.sources).forEach(k => { const s = R.sources[k]; if (/ember/i.test(s.publisher)) ok(s.publisher === "Ember, a compiler of official statistics", k + ": Ember labelled as a compiler of official statistics"); });
-// the course's allowed external domains (curriculum v2 §20.3, copied; scripts/learn_scope_scan.py is the canonical judge)
+// the course's allowed external domains (copied; the scope scan is the canonical judge)
 const DOMAINS = ["eia.gov", "energy.gov", "ferc.gov", "nerc.com", "lbl.gov", "nrel.gov", "nlr.gov", "epa.gov", "usgs.gov", "bea.gov", "census.gov", "bls.gov", "noaa.gov", "weather.gov", "fema.gov", "dot.gov", "irs.gov", "energycodes.gov", "kcc.ks.gov",
   "iea.org", "irena.org", "ipcc.ch", "worldbank.org", "ec.europa.eu", "entsoe.eu", "ember-energy.org", "ourworldindata.org", "openalex.org", "iso.org", "ghgprotocol.org", "doi.org", "pjm.com", "spp.org", "ercot.com", "caiso.com", "misoenergy.org", "iso-ne.com", "nyiso.com",
   "stats.gov.cn", "nea.gov.cn", "mospi.gov.in", "epe.gov.br", "ssb.no", "cso.ie", "cer.gov.au", "aemo.com.au"];

@@ -52,7 +52,7 @@ ok(Q.length === 20, "twenty questions");
 ok(count(Q, q => q.bin === "research") === 10 && count(Q, q => q.bin === "vague") === 4 && count(Q, q => q.bin === "answered") === 3 && count(Q, q => q.bin === "nodata") === 3, "bins: 10 researchable, 4 too vague, 3 already answered, 3 not answerable with the data at hand");
 [1, 2].forEach(r => { const R = Q.filter(q => q.round === r); ok(R.length === 10 && D.bins.every(b => R.some(q => q.bin === b.id)), "round " + r + ": ten questions, every bin present"); });
 M.TYPE_IDS.forEach(t => ok(count(Q, q => q.type === t) === 2, "two researchable questions of type " + t));
-ok(JSON.stringify(M.TYPE_IDS) === JSON.stringify(QC.TYPES.map(t => t.id)), "the five types are the question card's (§11.2)");
+ok(JSON.stringify(M.TYPE_IDS) === JSON.stringify(QC.TYPES.map(t => t.id)), "the five types are the question card's");
 ok(Q.filter(q => q.bin === "research").every(q => q.typeWhy && q.typeWhy.toLowerCase().indexOf(q.type) === 0), "every type reason starts with its type");
 ok(Q.filter(q => q.bin === "nodata").every(q => /^Using /.test(q.text)), "every 'not answerable' question names the data at hand");
 ok(M.cards(D, "types").length === 10 && M.cards(D, "types").every(c => M.TYPE_IDS.indexOf(c.bin) >= 0), "the type sort has the ten researchable questions");
@@ -114,7 +114,7 @@ const good = EX.plain(D.exemplars.answers.find(a => a.key === "good"));
 ok(/left out/.test(good), "strong card says what its boundary leaves out");
 ok(D.exemplars.answers.map(a => a.level).join() === "Developing,Proficient", "levels: Developing and Proficient (the strong card does not claim Strong: it does not say why the question matters)");
 ok(D.rubric.competences.every(c => RB.COMPETENCES.some(x => x.id === c.id)) && D.rubric.competences.map(c => c.id).join() === "framing", "rubric: R1 builds framing, with the course's competence id");
-ok(/not a certificate/.test(D.rubric.note), "the narrow promise: a studio is practice, not a certificate (§3.1)");
+ok(/not a certificate/.test(D.rubric.note), "the narrow promise: a studio is practice, not a certificate");
 
 // ---------------- page blocks
 Object.keys(MARK).forEach(k => {

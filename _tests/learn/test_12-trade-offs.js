@@ -32,7 +32,7 @@ const page = fs.readFileSync(path.join(SITE, "learn/12-trade-offs.qmd"), "utf8")
 const JS = fs.readFileSync(L("12-trade-offs.js"), "utf8");
 let checks = 0, fails = 0;
 function ok(cond, msg) { checks++; if (!cond) { fails++; console.log("FAIL:", msg); } }
-// one price year (W4 carry-over): the data note, as lesson 13 and M3 state it, with the deflator's ratio from the data
+// one price year: the data note, as lesson 13 and M3 state it, with the deflator's ratio from the data
 const PF = cfg.deflator.index[String(cfg.priceYear)] / cfg.deflator.index[String(cfg.techs.battery.source.dollarYear)];
 ok(page.indexOf("<b>Price year:</b> " + cfg.priceYear + " dollars throughout; NREL's " + cfg.techs.battery.source.dollarYear + " battery costs are converted with BEA's GDP implicit price deflator (×" + PF.toFixed(4) + ").") > 0 &&
    page.indexOf("without conversion") < 0, "data note: one price year, with the deflator (as lesson 13 and M3)");

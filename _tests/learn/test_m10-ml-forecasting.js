@@ -14,7 +14,7 @@
 //     persistence error grows with the horizon and solar's falls back at 24 hours; both leaks beat every fair mix; the
 //     80% band over-covers November; pinball loss is lowest inside the tried widths, not at the widest; the worst days
 //   - scope: no nuclear term, no "AI", no deny-listed term; links: learn pages, downloads, doi.org, eia.gov, otexts.com
-//   - research wording (curriculum §13): every sentence about the course author's studies is approved (E1, E12)
+//   - research wording (the sourcing rule): every sentence about the course author's studies is approved (E1, E12)
 //   - speed: the facts in Node
 // Usage (from the site folder):  node _tests/learn/test_m10-ml-forecasting.js [--write]
 "use strict";
@@ -72,7 +72,7 @@ ok(P.train[P.train.length - 1].i < P.val[0].i && P.val[P.val.length - 1].i < P.t
   const S = P.train.concat(P.val, P.test);
   ok(S.every(x => x.yday >= 0 && x.wk >= 0 && x.yday <= x.issue && x.wk <= x.issue && x.issue >= 0), "every honest input (yesterday, last week, the latest actual) is known at the issue hour");
   ok(S.some(x => x.i - 1 > x.issue) && S.filter(x => x.h > 1).every(x => x.i - 1 > x.issue), "the hour before looks ahead for every hour after the first");
-  // same clock hour (review M10 #3): the day before and seven days before, by the stated rule
+  // same clock hour: the day before and seven days before, by the stated rule
   const dayBefore = (d, n) => new Date(Date.parse(d + "T00:00:00Z") - n * 864e5).toISOString().slice(0, 10);
   const odd = cal.filter(x => x.yday >= 0 && (cal[x.yday].he !== x.he || cal[x.yday].date !== dayBefore(x.date, 1)));
   ok(odd.length === 1 && odd[0].date === "2025-03-10" && odd[0].he === 3 && cal[odd[0].yday].he === 2, "same hour yesterday is the same clock hour the day before, except 10 March's hour ending 3 (none on 9 March: the hour before it, ending 2)");
@@ -129,16 +129,16 @@ has("About 40 guided minutes in nine steps.", "the time line");
 has("54,411 MW, so values are rounded to about 54 MW", "data note: the scale");
 has("9 March has 23 hours and 2 November 25.", "data note: the clock");
 { const st = JSON.parse(fs.readFileSync(L("data/town_days.json"), "utf8")).stats;
-  ok(st.demand_hours_flagged_as_implausible === 699 && st.missing_hours_filled.demand === 699 && TX.includes("699 of 2025's 8,760 demand hours were repaired from the day-ahead forecast scaled to actuals on both sides") && Y.demand.length === 8760, "data note: 699 of 8,760 demand hours repaired (town_days.json stats), using actuals on both sides (review M10 #2)"); }
-has("a demonstration on cleaned data, not an operational backtest.", "data note: retrospective cleaning, said (review M10 #2)");
-has("A clock hour that occurs twice (2 November) is read as the later one; a missing one (9 March), as the hour before it.", "data note: the same-hour rule (review M10 #3)");
-has("A forecast issued at 00:00 on 14 October for the hour ending 18:00 on 14 October. Which input is allowed?", "quiz 2: a dated issue time (review M10 #8)");
+  ok(st.demand_hours_flagged_as_implausible === 699 && st.missing_hours_filled.demand === 699 && TX.includes("699 of 2025's 8,760 demand hours were repaired from the day-ahead forecast scaled to actuals on both sides") && Y.demand.length === 8760, "data note: 699 of 8,760 demand hours repaired (town_days.json stats), using actuals on both sides"); }
+has("a demonstration on cleaned data, not an operational backtest.", "data note: retrospective cleaning, said");
+has("A clock hour that occurs twice (2 November) is read as the later one; a missing one (9 March), as the hour before it.", "data note: the same-hour rule");
+has("A forecast issued at 00:00 on 14 October for the hour ending 18:00 on 14 October. Which input is allowed?", "quiz 2: a dated issue time");
 has("Demand at 18:00 on 13 October: 24 hours before the target, and already known at 00:00 on 14 October.", "quiz 2: the answer");
-has("known at 00:00 for the day's first hour, unavailable for every later one. An unexpectedly good score is a reason to check for leakage.", "myth 2 (review M10 #15)");
-ok(2 + 0.6 * 40 + 0.3 * 38 === 37.4 && TX.includes("2 + 0.6 × 40 + 0.3 × 38 = 37.4") === false && /\$\\hat y_t = 2 \+ 0\.6 \\times 40 \+ 0\.3 \\times 38 = 37\.4\$ GW/.test(PAGE), "Go deeper: the worked weighted sum, 37.4 GW (review M10 #9)");
+has("known at 00:00 for the day's first hour, unavailable for every later one. An unexpectedly good score is a reason to check for leakage.", "myth 2");
+ok(2 + 0.6 * 40 + 0.3 * 38 === 37.4 && TX.includes("2 + 0.6 × 40 + 0.3 × 38 = 37.4") === false && /\$\\hat y_t = 2 \+ 0\.6 \\times 40 \+ 0\.3 \\times 38 = 37\.4\$ GW/.test(PAGE), "Go deeper: the worked weighted sum, 37.4 GW");
 ok(/a 100 MW miss above the forecast quantile costs 90 MW; the same miss below it costs 10 MW/.test(PAGE) && 0.9 * 100 === 90 && Math.round(0.1 * 100) === 10, "Go deeper: the pinball example at the 90th percentile");
 ok(/\*\*Symbols\.\*\* \$t\$ an hour/.test(PAGE), "Go deeper: a symbol key before the formulas");
-ok(!/midnight|tomorrow's average/.test(TX + JS.replace(/\/\/[^\n]*/g, "")), "the issue time is 00:00 everywhere on the page and in the script (review M10 #8)");
+ok(!/midnight|tomorrow's average/.test(TX + JS.replace(/\/\/[^\n]*/g, "")), "the issue time is 00:00 everywhere on the page and in the script");
 
 // ---------------- the page on a stub document
 (async () => {
@@ -176,7 +176,7 @@ ok(!/midnight|tomorrow's average/.test(TX + JS.replace(/\/\/[^\n]*/g, "")), "the
   cards.go(0); card().querySelectorAll(".lx-choice")[1].click();
   sawIs(1, "Train on 6,383 hours, choose on 744, test on 721. Hours are never shuffled across those lines: tomorrow must stay unseen.");
   { const sp = plotSpecs.find(x => x.text && x.text.head[0] === "Date"), dates = Object.keys(P.dayMean).sort();
-    ok(sp && sp.text.rows.length === 365 && sp.text.rows.every((r, k) => r[1] === mw(P.dayMean[dates[k]])) && sp.text.rows.filter(r => r[2] === "test").length === 30 && sp.text.rows.filter(r => r[2] === "choose").length === 31, "step 1: the text version lists every day's mean demand and its period (review M10 #7)"); }
+    ok(sp && sp.text.rows.length === 365 && sp.text.rows.every((r, k) => r[1] === mw(P.dayMean[dates[k]])) && sp.text.rows.filter(r => r[2] === "test").length === 30 && sp.text.rows.filter(r => r[2] === "choose").length === 31, "step 1: the text version lists every day's mean demand and its period"); }
   cards.go(1); card().querySelectorAll(".lx-seg button").forEach(x => x.click());
   sawIs(2, "Same hour yesterday misses by 1,126 MW (3.6%); the latest hour held flat by 3,186 MW. A learned model must beat 1,126 MW on October to earn its place.");
   cards.go(2); card().querySelectorAll(".lx-seg button").forEach(x => x.click());
@@ -204,12 +204,12 @@ ok(!/midnight|tomorrow's average/.test(TX + JS.replace(/\/\/[^\n]*/g, "")), "the
     ok(sp.bars.length === 168, "step 7: the band over the last November week (168 hours)");
     const lo = h.indexOf("Band, low"), hi = h.indexOf("Band, high"), io = h.indexOf("Inside the band?"), inside = rows.filter(r => r[io] === "yes").length;
     const wk = P.cal.filter(x => x.date >= D.weeks.test[0] && x.date <= D.weeks.test[1]), byHand = wk.filter(x => { const m = F.best.F.f(x); return P.d[x.i] >= m + F.Q[1] && P.d[x.i] <= m + F.Q[17]; }).length;
-    ok(lo > 0 && hi > 0 && io > 0 && rows.length === 168 && rows.every((r, k) => r[lo] === mw(F.best.F.f(wk[k]) + F.Q[1]) && r[hi] === mw(F.best.F.f(wk[k]) + F.Q[17])) && inside === byHand && sp.text.note === "Inside the band: " + byHand + " of these 168 hours.", "step 7: the text version gives both band edges and whether each hour is inside (" + byHand + " of 168; review M10 #7)"); }
+    ok(lo > 0 && hi > 0 && io > 0 && rows.length === 168 && rows.every((r, k) => r[lo] === mw(F.best.F.f(wk[k]) + F.Q[1]) && r[hi] === mw(F.best.F.f(wk[k]) + F.Q[17])) && inside === byHand && sp.text.note === "Inside the band: " + byHand + " of these 168 hours.", "step 7: the text version gives both band edges and whether each hour is inside (" + byHand + " of 168)"); }
   cards.go(7); const s8 = sliders[sliders.length - 1]; [0, 5, 1].forEach(i => s8._set(i));
   sawIs(8, "Coverage keeps rising: 98.6% at × 2. Pinball loss is lowest at × 0.75 (397.3 MW) and rises on both sides: it wants bands narrow and honest.");
   cards.go(8);
   { const sp = plotSpecs[plotSpecs.length - 1], k = F.daily.findIndex(x => x.date !== F.worst[0].date); sp.pick.onPick(k);
-    ok(next().disabled && /Not the worst day yet/.test(saw()), "step 9: another day does not complete the step (review M10 #14)"); }
+    ok(next().disabled && /Not the worst day yet/.test(saw()), "step 9: another day does not complete the step"); }
   demo.fn("step-9");
   sawIs(9, "The three worst days, Sunday 30 November, Monday 10 November, Thursday 27 November, hold 25% of November's error; the 27th is Thanksgiving Day. Report the bad days, not only the mean.");
   ok(/Sunday 30 November: 2,726 MW, the worst of 30 days\./.test(text(card().innerHTML)), "step 9: the readout of the worst day");
@@ -217,14 +217,14 @@ ok(!/midnight|tomorrow's average/.test(TX + JS.replace(/\/\/[^\n]*/g, "")), "the
   ["mid", "step-2", "step-4", "step-5", "step-8"].forEach(sname => { let q = null; try { q = demo.fn(sname); } catch (err) { q = null; } ok(q && q.view === sname, "demo state " + sname + " runs"); });
   const XT = text(xp.innerHTML);
   ok(/1,083 MW/.test(XT) && /981 MW/.test(XT), "explain: the flowchart's numbers (choose 1,083 MW, test 981 MW)");
-  ok(/M1/.test(XT) && /A3/.test(XT) && /this page builds no price model/.test(XT) && XT.includes("In a simple supply-stack model, the marginal plant sets the energy price") && XT.includes("Actual prices also reflect network limits, operating constraints and market rules"), "explain: the price card (a simple supply-stack model; network limits, operating constraints and market rules; review M10 #11) links M1 and A3");
-  ok(XT.includes("cleaned afterwards for the course (EIA-930): a demonstration, not an operational backtest") && XT.includes("data as known at 00:00: the cleaning used later actuals, and repaired hours are scored with the rest"), "explain: the boundary says the data were cleaned afterwards (review M10 #2)");
+  ok(/M1/.test(XT) && /A3/.test(XT) && /this page builds no price model/.test(XT) && XT.includes("In a simple supply-stack model, the marginal plant sets the energy price") && XT.includes("Actual prices also reflect network limits, operating constraints and market rules"), "explain: the price card (a simple supply-stack model; network limits, operating constraints and market rules) links M1 and A3");
+  ok(XT.includes("cleaned afterwards for the course (EIA-930): a demonstration, not an operational backtest") && XT.includes("data as known at 00:00: the cleaning used later actuals, and repaired hours are scored with the rest"), "explain: the boundary says the data were cleaned afterwards");
   ok(XT.includes("377 of 744 October hours at zero") && XT.includes("2.8% at 1 h, 18.3% at 24 h"), "explain: the targets table");
   finish();
 })().catch(err => { ok(false, "the stub page test threw: " + (err && err.stack || err)); finish(); });
 
 function finish() {
-  ok(NB.length > 0, "the lab notebook exists (learn/notebooks/" + ID + ".ipynb; written by scripts/build_learn_m10_notebook.py)");
+  ok(NB.length > 0, "the lab notebook exists (learn/notebooks/" + ID + ".ipynb; written by its notebook build step)");
   if (NB) {
     const nb = JSON.parse(NB), src = nb.cells.map(c => c.source.join("")).join("\n");
     ok(nb.cells.every(c => c.cell_type === "markdown" || (c.outputs.length === 0 && c.execution_count === null)), "the notebook is stored without outputs");
@@ -244,7 +244,7 @@ function finish() {
   const PY = fs.readFileSync(path.join(SITE, "learn/path.yml"), "utf8"), entry = PY.split(/\n- kind: /).find(x => new RegExp("\\n  id: " + ID + "\\n").test(x)) || "";
   ok(/\n  status: active\n/.test(entry) && /\n  minutes: 40\n/.test(entry) && /lab_minutes: 60/.test(entry) && /practice_minutes: 90/.test(entry) && /after: \[4, M7\]/.test(entry), "path.yml: active, 40 + 60 + 90 minutes, after lesson 4 and M7");
   const fm = k => ((PAGE.match(new RegExp("^" + k + ': "(.*)"$', "m")) || [])[1]), py = k => ((entry.match(new RegExp("\\n  " + k + ': "(.*)"')) || [])[1]);
-  ok(fm("title") === py("title") && fm("subtitle") === py("subtitle") && fm("title") === "Forecasting load, wind and solar with machine learning, and judging it honestly", "the page's title (prices dropped, coordinator 2026-11-05) and subtitle equal path.yml's");
+  ok(fm("title") === py("title") && fm("subtitle") === py("subtitle") && fm("title") === "Forecasting load, wind and solar with machine learning, and judging it honestly", "the page's title (no price model) and subtitle equal path.yml's");
   const GL = fs.readFileSync(path.join(SITE, "learn/glossary.yml"), "utf8") + "\n" + fs.readdirSync(path.join(SITE, "learn/_w1")).map(f => fs.readFileSync(path.join(SITE, "learn/_w1", f), "utf8")).join("\n");
   const marks = [...JS.matchAll(/\[\[([a-z0-9-]+)\|/g)].map(m => m[1]);
   ok(marks.length >= 8 && marks.every(m => new RegExp("id: " + m + "\\n").test(GL)), "every glossary mark has a definition: " + marks.filter(m => !new RegExp("id: " + m + "\\n").test(GL)).join(", "));
@@ -255,7 +255,7 @@ function finish() {
 }
 function researchWording(entry, OWN) {
   const R = X.register(["E1", "E12"]);
-  if (!R) { console.log("note: register not found; research wording not checked"); return; }
+  if (!R) { console.log("note: the approved excerpt wording is not available (set LEARN_SOURCES); research wording not checked"); return; }
   const RX = /\b(the study|study's|paper|article|IDETC|Li et al|course author|excerpt|nine-turbine|multi-fidelity regression)\b/i;
   const NOT = [[/^Where this came up in research$/, "heading"], [/^Approved excerpt of: Li et al\., ASME IDETC 2023\.$/, "provenance label"],
                [/^The same lesson as this page: say which score, on which held-out data\.$/, "the page's own link line"], [/^The method is in M9\.$/, "navigation"],

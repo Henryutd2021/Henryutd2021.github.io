@@ -5,15 +5,15 @@
 //     village, as the page states them; the village shares lesson F7's households, mill, sun and rule
 //   - every number on the page (fallbacks, myths, quiz, practice, Go deeper, facts, data notes) matches the model or data
 //   - the five no-JS blocks equal what the lesson's generators write (--write rewrites them)
-//   - research wording (curriculum §13, guard G-SRC): the Real-world box quotes approved excerpts E8.4, E8.6 and E8.7 of
-//     reports/learn/excerpts_for_approval.md word for word, and nothing else on the page, in the data file or in the script
+//   - research wording (the course's sourcing rule): the Real-world box quotes the approved excerpts E8.4, E8.6 and E8.7
+//     word for word, and nothing else on the page, in the data file or in the script
 //     describes the course author's work
 //   - links (allowed domains, learn pages, doi.org), the text budget, the owners' role tables against their sentences
 // Usage (from the site folder):  node _tests/learn/test_a14-microgrid-value.js [--write]
 "use strict";
 const fs = require("fs");
 const path = require("path");
-const cp = require("child_process");
+const PRIV = require("./private_sources.js");
 const ID = "a14-microgrid-value";
 const SITE = path.resolve(__dirname, "..", "..");
 const L = p => path.join(SITE, "assets/learn", p);
@@ -95,33 +95,33 @@ const own = { utility: "$104,476", coop: "$94,521", county: "$89,784", private: 
 D.owners.forEach(o => ok(M.usd(M.design(D, D.designs[2], Ho.perHour, { everyday: true, rate: o.rate }).annual) === own[o.key], "owner " + o.key + ": annual cost " + own[o.key]));
 ok(D.owners.every(o => near(M.design(D, D.designs[2], Ho.perHour, { everyday: true, rate: o.rate }).avoided, 70200, 1e-6)), "the outage cost avoided is the same for every owner");
 D.owners.forEach(o => ok(o.pays && o.gains && o.risk && o.everydayTo && o.gains.indexOf(o.everydayTo.replace(/^(all )?the (utility's |co-op's )?/, "").replace(/s$/, "")) >= 0, "owner " + o.key + ": the everyday savings go to a party its 'gains' sentence names"));
-// the bill savings are the campus's (review A14 #1): the bill payer gains them under every owner; the utility and the
+// the bill savings are the campus's: the bill payer gains them under every owner; the utility and the
 // co-op lose that revenue; no text calls the net a gain "for everyone"
 ok(D.owners.every(o => o.everydayTo === "the campus" && /the campus \((backup and )?a lower bill/i.test(o.gains)) && /utility no longer collects/.test(D.owners[0].gains) && /co-op no longer collects/.test(D.owners[1].gains), "every owner: the bill savings go to the campus; utility and co-op owners lose that revenue");
 ok(!/for everyone/i.test(JS.replace(/\/\/[^\n]*/g, "") + JSON.stringify(D) + PAGE), "no net is called a net 'for everyone'");
 ok(/revenue the utility no longer collects/.test(D.texts.billNote) && /only if the smaller peak also cuts the utility's own costs/.test(D.texts.billNote) && PAGE.indexOf(D.texts.billNote) >= 0 && (JS.match(/D\.texts\.billNote/g) || []).length >= 3,
   "the campus-view boundary is stated in the no-JS version, in step 6 and under the ledger");
-// value stacking is conditional (review A14 #2)
+// value stacking is conditional
 ok(/two-hour monthly peak, time to recharge before every outage, and no extra charging or wear costs/.test(D.texts.stackAssume) && JS.indexOf("D.texts.stackAssume") >= 0 && /if the battery is full when each outage starts/.test(M.stackFeedback(D)) &&
    /assumed full when each outage starts/.test(M.staticExplain(D)) && /the battery is assumed full when each outage starts/.test(PAGE), "stacking states its condition: the battery full at each outage");
-// the ownership idea matches the numbers (review A14 #3): the owner's rate moves the net
+// the ownership idea matches the numbers: the owner's rate moves the net
 ok(!/The net is the same/.test(M.staticExplain(D) + JS) && /each owner also borrows at its own rate, so the net changes too/.test(M.staticExplain(D)) && Math.abs(own2(2) - own2(3)) > 1000, "the explain says the owner's rate changes the net, as the model's owners show");
 function own2(i) { return M.design(D, D.designs[2], Ho.perHour, { everyday: true, rate: D.owners[i].rate }).net; }
-// the explain ledger follows the owner picked in step 7 (review A14 #4)
+// the explain ledger follows the owner picked in step 7
 ok(/if \(onOwner\) onOwner\(St\.owner\)/.test(JS) && /onOwner = ledger \? ledger\.setOwner : null/.test(JS) && /return \{ setOwner: setOwner \}/.test(JS), "step 7 redraws the explain ledger for the picked owner");
-// the battery's cost, worked out (review A14 #6)
+// the battery's cost, worked out
 const W = M.batteryWorked(D);
 ok(W.steps.length === 5 && W.steps[4][1] === M.usd(M.batteryHourCost(D)) + " a year" && W.steps[1][1] === "$120,000" && W.steps[2][1] === "$13,175 a year" && W.steps[3][1] === "$1,800 a year" && near(120000 * M.crf(0.07, 15) + 1800, M.batteryHourCost(D), 1e-6),
   "an hour of battery: 300 kWh × $400 = $120,000; × CRF 0.1098 = $13,175; upkeep $1,800; $14,975 a year");
 ok(W.fixed.some(r => /inverter/.test(r[0]) && r[1] === "$150,000") && PAGE.indexOf(M.workedTable(D)) >= 0 && /workedTable\(D\)/.test(JS), "the worked table, with the inverter, is in the no-JS version and in step 3");
-// the village is a toy, said on the page (review A14 #5)
+// the village is a toy, said on the page
 ok(/the same average day repeats all year; cloudy spells, seasons and battery power limits are left out/.test(D.texts.villageToy) && PAGE.indexOf(D.texts.villageToy) >= 0 && JS.indexOf("D.texts.villageToy") >= 0 && !/Cheapest panels|Cheapest battery/.test(JS) && /cheapest sizes for the repeated average day/.test(M.villageTable(D)),
   "the village's toy boundary and 'cheapest for the repeated day' are stated");
-// feedback texts stay short (review A14 #8)
+// feedback texts stay short
 [M.stackFeedback(D), M.villageFeedback(D)].concat(D.owners.map(o => M.ownerFeedback(D, o) + " Try another owner.")).forEach(t => { const w = text(t.replace(/\[\[[a-z0-9-]+\|([^\]]+)\]\]/g, "$1")).split(" ").length; ok(w <= 40, "feedback stays short (" + w + " words): " + t.slice(0, 50)); });
 D.texts.ledgerNotes.concat([D.texts.billNote, D.texts.stackAssume, D.texts.villageToy]).forEach(t => ok(t.split(" ").length <= 35, "a note stays short: " + t.slice(0, 40)));
 ok(/\$0\.31 per kWh for the households, \$0\.23 with the mill at midday, \$0\.20 with a cold store too\. In the evening the mill needs more battery: \$0\.28\./.test(M.villageFeedback(D)), "step 8's feedback: the four costs per kWh");
-// the household's price is the U.S. average, not its own tariff (review A14 #9)
+// the household's price is the U.S. average, not its own tariff
 ok(!/it pays/.test(JS.replace(/\/\/[^\n]*/g, "") + PAGE) && /the 2025 U\.S\. residential average of 17\.23¢ per kWh/.test(PAGE) && JS.indexOf("the 2025 U.S. residential average of ") >= 0, "17.23¢ is named the 2025 U.S. residential average");
 
 // ---------------- the village: lesson F7's households, mill, sun and rule
@@ -163,13 +163,13 @@ const cf1Live = /\n  status: active\n/.test(cf1) && fs.existsSync(path.join(SITE
 ok(cf1Live ? /<a href="cf1-supply-chain-microgrids\.html">case file CF1<\/a>/.test(PAGE) && !/upcoming/.test(T) : /case file CF1 \(upcoming\)/.test(T) && !/cf1-supply-chain-microgrids\.html/.test(PAGE),
   "CF1 is " + (cf1Live ? "live: the Real-world box links it" : "a draft: named, not linked"));
 
-// ---------------- research wording (curriculum §13, guard G-SRC)
-// Every sentence about the course author's work is an approved sentence of the register (sections E8 and E9), word for
+// ---------------- research wording (the sourcing rule)
+// Every sentence about the course author's work is an approved sentence of the excerpt wording (E8 and E9), word for
 // word, or a clause of one where the row itself breaks (": ", "; ", ". "). Strict zone: the Real-world box. Signalled
 // (an element that names the author's work, by RX): everything else on the page, every string of the data file, every
 // string literal of this script. NOT_RESEARCH lists the labels and general sentences that may sit beside the excerpts.
 const RG = { sections: ["E8"], used: ["E8.4", "E8.6", "E8.7"] };
-const APPROVED_SNAPSHOT = {   // the register's E8.4, E8.6 and E8.7 (approved 2026-11-03)
+const APPROVED_SNAPSHOT = {   // the approved wording's E8.4, E8.6 and E8.7 (approved 2026-11-03)
   "E8.4": "Because the transactive energy market brought a new revenue stream, locations with stronger renewables became competitive to establish facilities despite higher fixed and logistics cost.",
   "E8.6": "Contrary to intuition, energy storage systems, which balance intermittent power and uncertain load, had limited benefits for cost saving.",
   "E8.7": "Holds when: stylized networks with synthetic distances and costs, candidate sites in California, Arizona and Nevada, and one year, planned week by week for products and hour by hour for energy. Leaves out: grid outages, which the studies do not model."
@@ -179,19 +179,14 @@ const NOT_RESEARCH = [
   [/^Approved excerpt of: Li et al\. \(2023\), Applied Mathematical Modelling\.$/, "provenance label"],
   [/^In the real world$/, "heading"],
   [/^The full case: case file CF1( \(upcoming\))?\.$/, "pointer to the case file"],
-  [/^Beyond outages, on-site energy can also change where a business chooses to build:$/, "bridge to the excerpt: a general idea, no study claim (review A14 #7)"],
+  [/^Beyond outages, on-site energy can also change where a business chooses to build:$/, "bridge to the excerpt: a general idea, no study claim"],
   [/^In the 2025 survey of rural co-op members, 65% of businesses said a three-day outage would shut them down, and 16% would keep going on backup generation \(Berkeley Lab and partners, p\. 11\)\.$/, "a public survey, sourced, not the course author's work"],
-  [/^Li et al\. \(2023\)\. Facility and microgrid location-allocation for integrated supply chain and transactive energy operations\. Applied Mathematical Modelling 119, 119–136\.$/, "citation (checked against publications.bib below)"],
+  [/^Li et al\. \(2023\)\. Facility and microgrid location-allocation for integrated supply chain and transactive energy operations\. Applied Mathematical Modelling 119, 119–136\.$/, "citation (checked against the publication list below)"],
   [/^Berkeley Lab with NRECA and partners \(2026\)\. ICE Calculator 2 Initiative/, "citation (the survey report)"]
 ];
 const norm = s => String(s).replace(/\[\[[a-z0-9-]+\|([^\]]+)\]\]/g, "$1").replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/&#x27;|&#39;/g, "'")
   .replace(/&quot;/g, '"').replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/\s+/g, " ").replace(/ ([.,;:?!)])/g, "$1").replace(/\( /g, "(").trim();
-function portfolio() {
-  const c = [process.env.LEARN_PORTFOLIO, path.join(SITE, "..")];
-  try { c.push(path.resolve(SITE, cp.execSync("git rev-parse --git-common-dir", { cwd: SITE, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim(), "..", "..")); } catch (e) { /* not a git checkout */ }
-  return c.filter(Boolean).find(p => fs.existsSync(path.join(p, "reports/learn/excerpts_for_approval.md")));
-}
-// {id: sentence} of the register's rows in the sections, each revision applied (a revised row replaces the approved one)
+// {id: sentence} of the approved wording's rows in the sections, each revision applied (a revised row replaces the approved one)
 function register(md) {
   const out = {}; let sec = null;
   const strip = t => norm(t.replace(/^(Timeline, [^:]+|Myth answer|Citations?): /, ""));
@@ -204,15 +199,15 @@ function register(md) {
   });
   return out;
 }
-const RP = portfolio();
+const RP = PRIV.path("excerpts");
 let APPROVED = APPROVED_SNAPSHOT;
 if (RP) {
-  const MD = fs.readFileSync(path.join(RP, "reports/learn/excerpts_for_approval.md"), "utf8");
+  const MD = fs.readFileSync(RP, "utf8");
   const reg = register(MD);
-  ok(RG.used.every(k => reg[k] === APPROVED_SNAPSHOT[k]), "the approved-sentence snapshot in this test equals the register; differs at: " + RG.used.filter(k => reg[k] !== APPROVED_SNAPSHOT[k]).join(", "));
-  ok(/E8\.1–E8\.10 and E8\.13–E8\.17; E8\.11–E8\.12 dropped/.test(MD), "the register records E8 (without E8.11-E8.12) as approved");
+  ok(RG.used.every(k => reg[k] === APPROVED_SNAPSHOT[k]), "the approved-sentence snapshot in this test equals the approved wording; differs at: " + RG.used.filter(k => reg[k] !== APPROVED_SNAPSHOT[k]).join(", "));
+  ok(/E8\.1–E8\.10 and E8\.13–E8\.17; E8\.11–E8\.12 dropped/.test(MD), "the approved wording records E8 (without E8.11-E8.12) as approved");
   APPROVED = {}; Object.keys(reg).filter(k => k !== "E8.11" && k !== "E8.12").forEach(k => { APPROVED[k] = reg[k]; });
-} else console.log("note: reports/learn/excerpts_for_approval.md not found (set LEARN_PORTFOLIO); research wording checked against the snapshot in this test");
+} else console.log("note: the approved excerpt wording is not available (set LEARN_SOURCES); research wording checked against the snapshot in this test");
 const UNITS = Object.values(APPROVED).map(norm);
 function approved(seg) {
   const s = norm(seg);
@@ -267,19 +262,19 @@ ok(sents.length === 2 && sents[0] === norm(APPROVED["E8.4"]) && sents[1] === nor
 ok(/<footer>Approved excerpt of: Li et al\. \(2023\), <a href="https:\/\/doi\.org\/10\.1016\/j\.apm\.2023\.02\.014">Applied Mathematical Modelling<\/a>\.<\/footer>/.test(quotes[0][2]), "the excerpt's footer names the AMM paper with its DOI");
 const E87 = APPROVED_SNAPSHOT["E8.7"].split(/(?<=\.) (?=Leaves out:)/);
 ok(E87.length === 2 && norm(PAGE).indexOf(norm("<li>" + E87[0] + "</li><li>" + E87[1] + "</li>")) >= 0, "E8.7 sits under the excerpt, word for word, as two lines (holds when; leaves out)");
-ok(/data-term="transactive-energy">transactive energy<\/span>/.test(PAGE) && /data-term="logistics-cost">logistics cost<\/span>/.test(PAGE) && /data-term="stylized-network">stylized networks<\/span>/.test(PAGE), "the excerpt's jargon is marked for the glossary (review A14 #7)");
-// citations: titles as in inputs/publications.bib
+ok(/data-term="transactive-energy">transactive energy<\/span>/.test(PAGE) && /data-term="logistics-cost">logistics cost<\/span>/.test(PAGE) && /data-term="stylized-network">stylized networks<\/span>/.test(PAGE), "the excerpt's jargon is marked for the glossary");
+// citations: titles as in the author's publication list
 if (RP) {
-  const bib = fs.readFileSync(path.join(RP, "inputs/publications.bib"), "utf8");
+  const bib = fs.readFileSync(PRIV.path("publications"), "utf8");
   const titles = [...bib.matchAll(/^\s*title\s*=\s*\{(.*)\},?\s*$/gm)].map(m => m[1].replace(/[{}]/g, "").replace(/\\textbf/g, "").toLowerCase());
   const cites = SRC_LI.map(li => li.match(TITLED)).filter(Boolean);
   ok(cites.length === 1, "one Li et al. paper in the sources list");
-  cites.forEach(c => ok(titles.indexOf(c[3].toLowerCase()) >= 0, "sources: '" + c[3].slice(0, 50) + "' is the title in publications.bib"));
+  cites.forEach(c => ok(titles.indexOf(c[3].toLowerCase()) >= 0, "sources: '" + c[3].slice(0, 50) + "' is the title in the publication list"));
 }
 
 
 // ---------------- text budget: every text element of the page's own prose stays short (one idea, about 35 words),
-// the generated no-JS blocks and the facts table included (review A14 #8)
+// the generated no-JS blocks and the facts table included
 const prose = elements(OWN.replace(/<style>[\s\S]*?<\/style>/g, " ").replace(/<script[\s\S]*?<\/script>/g, " ").replace(/^---[\s\S]*?\n---\n/, " "));
 prose.forEach(s => { const w = s.split(" ").length; ok(w <= 40 || approved(s), "text element of " + w + " words (40 at most unless one approved sentence): " + s.slice(0, 70)); });
 const stepSrc = [...JS.matchAll(/\n      \{ text: ([\s\S]*?),\n        build:/g)].map(m => m[1]);

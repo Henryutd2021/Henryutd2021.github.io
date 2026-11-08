@@ -192,7 +192,7 @@ const has = (str, msg) => ok(QMD.indexOf(str) >= 0, "page states " + (msg || JSO
   const sub = (QMD.match(/^subtitle: "([^"]+)"/m) || [])[1], desc = (QMD.match(/^description: "([^"]+)"/m) || [])[1] || "";
   ok(PATHY.indexOf('subtitle: "' + sub + '"') >= 0, "path.yml: subtitle equals the page's");
   ok(desc.split(/\s+/).length <= 35, `budget: the description is ${desc.split(/\s+/).length} words (≤ 35)`);
-  ok(/<script src="\.\.\/assets\/learn\/learn\.js" defer><\/script>\n<script src="\.\.\/assets\/learn\/a09-hazards\.js" defer><\/script>/.test(QMD) && !/<script src="[^"]*a05-adequacy\.js"/.test(QMD), "page: A5's simulator comes with the bundle (components/adequacy.js, W4 integration); the page loads no other lesson's script");
+  ok(/<script src="\.\.\/assets\/learn\/learn\.js" defer><\/script>\n<script src="\.\.\/assets\/learn\/a09-hazards\.js" defer><\/script>/.test(QMD) && !/<script src="[^"]*a05-adequacy\.js"/.test(QMD), "page: A5's simulator comes with the bundle (components/adequacy.js); the page loads no other lesson's script");
   const body = QMD.replace(/<!-- learn:meta:start[\s\S]*?learn:meta:end -->/, "");
   ok(!/nuclear|reactor|\bSMR\b|data cent|learning/i.test(body + JS.replace(/\/\/.*$/gm, "") + JSON.stringify(H)), "scope: no nuclear, data-center or learning wording");
   ok(!/href="[^"]*(projects\/|research\.)/i.test(QMD) && /href="a05-adequacy\.html"/.test(QMD) && /href="f06-grid-and-outages\.html"/.test(QMD), "links: A5 and F6; no project or Research links");

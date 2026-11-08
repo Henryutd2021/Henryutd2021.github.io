@@ -10,7 +10,7 @@
 //     and the claim that no method leads every list, proved on the table
 //   - Ridge County read from A13's file, labelled fictional
 //   - the no-JS block, ideas, stop box, check, facts and sources equal what the model writes (--write rewrites them)
-//   - neutrality and scope (curriculum §4.4, §20): no forecast, no verdict, no advocacy; no nuclear term, no data
+//   - neutrality and scope (the depth budget and the course's scope rules): no forecast, no verdict, no advocacy; no nuclear term, no data
 //     centers, no "AI"; links on the allow-list; no project or Research page
 //   - text budget of the step cards, reveals, data strings and the page's prose
 // Usage (from the site folder):  node _tests/learn/test_x02-fossil-transition.js [--write]
@@ -158,8 +158,8 @@ ok(Object.values(D.sources).every(s => s.url && s.date && s.where && s.short && 
 const used = new Set([].concat(D.facts.map(f => f.src), [D.gen2025.src, D.primary2025.src, D.gasUse.src, D.oilUse.src, D.lng.src, D.retire.src, D.retire.src2026, D.mines.src, D.co2kwh.src, D.ccs.src, D.energyCo2.src, D.methane.src, D.gasNet.src, D.cdr.src, "eia-lng", "eia-pipelines"]));
 ok(Object.keys(D.sources).every(k => used.has(k)), "every source is used: " + Object.keys(D.sources).filter(k => !used.has(k)).join(", "));
 ok(S.problems(D.stop).length === 0, "the stop box has its parts: " + S.problems(D.stop).join("; "));
-ok(/no forecasts/.test(D.stop.lede) && D.stop.leaves.some(t => /Forecasts/.test(t)) && D.stop.leaves.some(t => /Engineering design/.test(t)) && D.stop.leaves.some(t => /Advocacy/.test(t)), "the stop box states the curriculum's boundary (§4.4: forecasts, engineering design, advocacy excluded)");
-ok(/ipcc\.ch\/report\/ar6\/wg3\/chapter\/chapter-12/.test(RAW) && /Global Energy Monitor/.test(RAW) && /eia\.gov\/energyexplained\/natural-gas/.test(RAW), "the reading ladder is the curriculum's (§4.3: IPCC chapters 6 and 12, EIA gas data, Global Energy Monitor)");
+ok(/no forecasts/.test(D.stop.lede) && D.stop.leaves.some(t => /Forecasts/.test(t)) && D.stop.leaves.some(t => /Engineering design/.test(t)) && D.stop.leaves.some(t => /Advocacy/.test(t)), "the stop box states the curriculum's boundary (forecasts, engineering design, advocacy excluded)");
+ok(/ipcc\.ch\/report\/ar6\/wg3\/chapter\/chapter-12/.test(RAW) && /Global Energy Monitor/.test(RAW) && /eia\.gov\/energyexplained\/natural-gas/.test(RAW), "the reading ladder is the curriculum's (IPCC chapters 6 and 12, EIA gas data, Global Energy Monitor)");
 
 // ---------------- neutrality and scope
 // the page's own words: the generated learn:* blocks repeat other lessons' descriptions (a prerequisite's "does" line,

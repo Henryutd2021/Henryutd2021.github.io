@@ -10,17 +10,17 @@
 //   - the research text: the Real-world box quotes E8.3, E8.5, E8.6, E8.10 and the E8.7 note word for word, with the AMM
 //     footer; the open code links the allow-listed repository
 //   - the notebook exists, names the engine's data file and asserts the numbers of this table
-//   - the W3 review fixes: the controller's rule stated (M5 1); forecast rows kept per plan (M5 2); the formulation's
-//     every constraint group, unit and domain (M5 3); the check names the rounded plan and its cost (M5 4); the storm's
-//     cost described as equipment and grid cost only (M5 5); the solar input as a teaching profile (M5 6); the
-//     notebook claims what it asserts and uses milp only (M5 7); glossary marks (M5 8); one comparison a line (M5 9);
-//     the tree keeps the reader's focus (M5 12)
+//   - the details: the controller's rule stated; forecast rows kept per plan; the formulation's every constraint group,
+//     unit and domain; the check names the rounded plan and its cost; the storm's cost described as equipment and grid
+//     cost only; the solar input as a teaching profile; the notebook claims what it asserts and uses milp only; glossary
+//     marks; one comparison a line; the tree keeps the reader's focus
 // --write: writes the m5-static block.
 // Usage (from the site folder):  node _tests/learn/test_m05-microgrid-size-and-run.js [--write]
 "use strict";
 const fs = require("fs");
 const path = require("path");
 const X = require("./e1_harness.js");
+const PRIV = require("./private_sources.js");
 let checks = 0, fails = 0;
 function ok(c, msg) { checks++; if (!c) { fails++; console.log("FAIL:", msg); } }
 const near = (a, b, t) => Math.abs(a - b) <= (t == null ? 1e-6 : t);
@@ -41,12 +41,12 @@ const APPROVED_SNAPSHOT = {
   const all = {}, words = [];
   const wordLists = [];
   for (const c of path5) { const z = await size(c); const w = M.caseWords(c, z, all); wordLists.push(w); words.push(w.join(" ")); all[M.caseKey(c)] = { c, sized: z }; }
-  ok(Array.isArray(wordLists[3]) && wordLists.every(w => w.every(x => x.split(/\s+/).length <= 35)), "step 5: each comparison is its own short result, at most 35 words (M5 9): " + wordLists.map(w => w.map(x => x.split(/\s+/).length).join("+")).join(", "));
+  ok(Array.isArray(wordLists[3]) && wordLists.every(w => w.every(x => x.split(/\s+/).length <= 35)), "step 5: each comparison is its own short result, at most 35 words: " + wordLists.map(w => w.map(x => x.split(/\s+/).length).join("+")).join(", "));
   ok(wordLists[0].length === 0 && /^Sized: [\d,]+ kW of solar, [\d,]+ kWh of battery, 2 sets, \$[\d,]+ a year/.test(M.sizedWords(all["open-flat-storm"].sized)), "step 5: the first case has nothing to compare; the summary names its sizes and cost");
   const A = all["open-flat-storm"].sized, B = all["x0-flat-storm"].sized, Cc = all["x0-tou-storm"].sized, Dn = all["x0-tou-none"].sized;
   ok(B.exact.pv < A.exact.pv - 100 && /solar goes from [\d,]+ to [\d,]+ kW, since midday sun the campus cannot use is wasted/.test(words[1]), "the export cap shrinks the solar (" + E1.kilo(A.exact.pv) + " → " + E1.kilo(B.exact.pv) + " kW): " + words[1]);
   ok(Cc.exact.bat > B.exact.bat + 500 && /the battery goes from [\d,]+ to [\d,]+ kWh/.test(words[2]), "time-of-use grows the battery (" + E1.kilo(B.exact.bat) + " → " + E1.kilo(Cc.exact.bat) + " kWh): " + words[2]);
-  ok(/adds \$[\d,]+ a year of equipment and grid cost \(storm diesel not included\): two solved plans, not a price/.test(words[3]) && words[3].indexOf(E1.money(Cc.total - Dn.total)) >= 0 && Cc.total > Dn.total, "the storm's cost, two solved plans, equipment and grid only (M5 5): " + words[3]);
+  ok(/adds \$[\d,]+ a year of equipment and grid cost \(storm diesel not included\): two solved plans, not a price/.test(words[3]) && words[3].indexOf(E1.money(Cc.total - Dn.total)) >= 0 && Cc.total > Dn.total, "the storm's cost, two solved plans, equipment and grid only: " + words[3]);
   ok(Dn.exact.gen === 0 && Cc.exact.gen >= 1 && A.exact.gen === 2, "sets: 2 on the flat tariff, " + Cc.exact.gen + " with time-of-use, none without the storm");
   // step 4: the tree
   const Tr = E1.bb.run(E1.sizeModel(M.planOf(path5[0]), P, [P.scen.jan3]), ["N"], m => solveSync(m));
@@ -96,19 +96,19 @@ const APPROVED_SNAPSHOT = {
 
   // ---------------- fixed numbers in the steps and on the page
   ok(/1,200 kW of loads/.test(JS) && P.total === 1200, "step 1: 1,200 kW");
-  // ---------------- the W3 review fixes
+  // ---------------- the details, one by one
   ok(M.CONTROLLER.length === 3 && /shed must-stay-on loads come back first, then the sets go down to their minimum, the battery charges, the other loads come back, and only then is solar curtailed/.test(M.CONTROLLER[2]) &&
-    /first the\s+\/\/ must-stay-on loads the plan shed come back|must-stay-on loads the plan shed come back \(the forecast/.test(fs.readFileSync(X.L("components/engine-e1.js"), "utf8")), "step 7 states the controller's rule, as the engine's realTime runs it (M5 1)");
-  ok(/With this controller, forecast error costs this plan/.test(rw), "the forecast loss is said to hold for this controller (M5 1): " + rw);
-  ok(M.planKey(plan) !== M.planKey(Object.assign({}, plan, { pv: plan.pv + 25 })) && /S0\.roll\[k\]\.plan !== pk\) delete S0\.roll\[k\]/.test(JS) && /x && x\.plan === pk/.test(JS) && /var plan = function \(\) \{ var c = currentPlan\(\)/.test(JS), "forecast rows are kept per plan and never compared across plans; step 7 runs step 6's plan (M5 2)");
-  ["\\Delta t = 1", "q_{m,-1} = q_{m,23}", "q_{-1} = B", "o_t \\le L^{\\text{other}}", "s_t \\le \\sigma_t S", "c_t, d_t \\le B/4", "0 \\le S \\le 4{,}000", "$F$ is not sized", "\\$/kWh (EIA's ¢ ÷ 100)", "::: {.lx-scroll-x .m5-symbols}"].forEach(f => ok(PAGE.indexOf(f) >= 0, "the formulation states " + f + " (M5 3, C1 11)"));
-  ok(/rounded up from the sizing's/.test(JS) && /"Rounded plan"/.test(JS) && /"Its annual cost", money\(R\.total\)/.test(JS), "step 6 names the rounded plan and its own annual cost (M5 4)");
-  ok(T.indexOf("the extra equipment-and-grid cost of carrying the hospital") >= 0 && T.indexOf("what carrying the hospital costs") < 0 && T.indexOf("Storm diesel and refilling the tank, in the annual cost") >= 0, "the storm's cost is equipment and grid only, said so (M5 5)");
-  ok(T.indexOf("Real:") < 0 && T.indexOf("illustrative campus output per kW of panels: SPP's observed 2025 hourly shape") >= 0 && T.indexOf("an assumed grid outage") >= 0, "solar as a teaching profile; the storm an assumed outage (M5 6)");
-  ok(!/linprog/.test(PAGE) && !/linprog/.test(fs.readFileSync(path.join(X.SITE, "learn/path.yml"), "utf8")) && T.indexOf("The rolling horizon's totals are printed beside the browser's, with each real hour's physics asserted.") >= 0, "the notebook's claims: milp only; what is asserted and what is printed (M5 7)");
-  ["transactive-energy", "chance-constraint", "service-level", "deterministic-equivalent", "cost-of-capital", "feeder"].forEach(id => ok(new RegExp('data-term="' + id + '"').test(PAGE + JS), "glossary mark: " + id + " (M5 8)"));
-  ok(/<details class="m5-more">/.test(PAGE), "the research box shows one sentence and its boundary; the other three are collapsed (M5 9)");
-  ok(/if \(had\) \{ var g = svgBox\.querySelector\('g\[data-id="' \+ id \+ '"\]'\); if \(g\) g\.focus\(\); \}/.test(JS), "the tree: focus returns to the picked node after the redraw (M5 12)");
+    /first the\s+\/\/ must-stay-on loads the plan shed come back|must-stay-on loads the plan shed come back \(the forecast/.test(fs.readFileSync(X.L("components/engine-e1.js"), "utf8")), "step 7 states the controller's rule, as the engine's realTime runs it");
+  ok(/With this controller, forecast error costs this plan/.test(rw), "the forecast loss is said to hold for this controller: " + rw);
+  ok(M.planKey(plan) !== M.planKey(Object.assign({}, plan, { pv: plan.pv + 25 })) && /S0\.roll\[k\]\.plan !== pk\) delete S0\.roll\[k\]/.test(JS) && /x && x\.plan === pk/.test(JS) && /var plan = function \(\) \{ var c = currentPlan\(\)/.test(JS), "forecast rows are kept per plan and never compared across plans; step 7 runs step 6's plan");
+  ["\\Delta t = 1", "q_{m,-1} = q_{m,23}", "q_{-1} = B", "o_t \\le L^{\\text{other}}", "s_t \\le \\sigma_t S", "c_t, d_t \\le B/4", "0 \\le S \\le 4{,}000", "$F$ is not sized", "\\$/kWh (EIA's ¢ ÷ 100)", "::: {.lx-scroll-x .m5-symbols}"].forEach(f => ok(PAGE.indexOf(f) >= 0, "the formulation states " + f + ""));
+  ok(/rounded up from the sizing's/.test(JS) && /"Rounded plan"/.test(JS) && /"Its annual cost", money\(R\.total\)/.test(JS), "step 6 names the rounded plan and its own annual cost");
+  ok(T.indexOf("the extra equipment-and-grid cost of carrying the hospital") >= 0 && T.indexOf("what carrying the hospital costs") < 0 && T.indexOf("Storm diesel and refilling the tank, in the annual cost") >= 0, "the storm's cost is equipment and grid only, said so");
+  ok(T.indexOf("Real:") < 0 && T.indexOf("illustrative campus output per kW of panels: SPP's observed 2025 hourly shape") >= 0 && T.indexOf("an assumed grid outage") >= 0, "solar as a teaching profile; the storm an assumed outage");
+  ok(!/linprog/.test(PAGE) && !/linprog/.test(fs.readFileSync(path.join(X.SITE, "learn/path.yml"), "utf8")) && T.indexOf("The rolling horizon's totals are printed beside the browser's, with each real hour's physics asserted.") >= 0, "the notebook's claims: milp only; what is asserted and what is printed");
+  ["transactive-energy", "chance-constraint", "service-level", "deterministic-equivalent", "cost-of-capital", "feeder"].forEach(id => ok(new RegExp('data-term="' + id + '"').test(PAGE + JS), "glossary mark: " + id + ""));
+  ok(/<details class="m5-more">/.test(PAGE), "the research box shows one sentence and its boundary; the other three are collapsed");
+  ok(/if \(had\) \{ var g = svgBox\.querySelector\('g\[data-id="' \+ id \+ '"\]'\); if \(g\) g\.focus\(\); \}/.test(JS), "the tree: focus returns to the picked node after the redraw");
   ok(/72 hours from 00:00 on 20 January 2025/.test(JS) && P.scen.jan3.hours === 72 && E1.when(P.scen.jan3, 0) === "20 Jan 00:00", "step 1: the storm's start and length");
   ok(/hospital \(300 kW\)/.test(JS) && /water and heating plant \(100 kW\)/.test(JS) && P.loads[0].kw === 300 && P.loads[1].kw === 100, "step 1: the must-stay-on loads");
   ok(/0\.07 gallons per kWh, at most the 675 gallons on site/.test(JS) && cfg.tech.gen.galPerKWh === 0.07 && M.BASE.fuel === 675, "step 2: fuel use and the tank");
@@ -122,12 +122,12 @@ const APPROVED_SNAPSHOT = {
   ok(/L\^\{\\text\{must\}\} \$ the must-stay-on load \(400 kW here\)|the must-stay-on load \(400 kW here\)/.test(T) && E1.kwOf(P, E1.classes(M.BASE, P).must) === 400, "Go deeper: 400 kW must stay on");
   ok(/\\\{0, 1, \\dots, 4\\\}/.test(PAGE) && cfg.limits.gen[1] === 4, "Go deeper: N from 0 to 4");
 
-  // ---------------- the research text against the register
-  const RP = X.portfolio(); let APP = APPROVED_SNAPSHOT;
+  // ---------------- the research text against the approved wording
+  const RP = PRIV.path("excerpts"); let APP = APPROVED_SNAPSHOT;
   if (RP) {
-    const reg = X.register(fs.readFileSync(path.join(RP, "reports/learn/excerpts_for_approval.md"), "utf8"), ["E8"]);
+    const reg = X.register(fs.readFileSync(RP, "utf8"), ["E8"]);
     const diff = Object.keys(APPROVED_SNAPSHOT).filter(k => reg[k] !== X.norm(APPROVED_SNAPSHOT[k]));
-    ok(!diff.length, "the snapshot equals the register; differs at: " + diff.join(", "));
+    ok(!diff.length, "the snapshot equals the approved wording; differs at: " + diff.join(", "));
     APP = {}; Object.keys(APPROVED_SNAPSHOT).forEach(k => { APP[k] = reg[k]; });
   }
   const ex = X.excerpts(PAGE);

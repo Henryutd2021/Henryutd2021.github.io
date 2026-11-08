@@ -46,7 +46,7 @@ const RUN_DATE = "6 November 2026";
   ref.runs.electrify.value = R.electrify.dist.map(d => +(d.value || 0).toFixed(2));
   ref.cap = PG.CHOOSE.capDef; ref.base = Math.round(R.today.acc.co2Hub);
   // the notebook's own plan (its last section, with district heat): its household result, so the notebook can check
-  // its district-heat billing against the browser's (M12 review finding 10)
+  // its district-heat billing against the browser's
   const MY = { hp: 70, ret: 40, dh: 30, dhp: 100, sto: 800, ev: 60, evm: "managed", pv: 100, bat: 20 }, rMy = await E3.solve(Object.assign({}, DEF, MY), P, { solver });
   ok(rMy.ok && rMy.results.hh.dhPrice > 0, "the notebook's plan runs, with district heat billed at its average cost");
   ref.my = { plan: MY, burdenLow: +rMy.results.hh.low.burden.toFixed(5), dhPrice: +rMy.results.hh.dhPrice.toFixed(2) };
@@ -117,28 +117,28 @@ const RUN_DATE = "6 November 2026";
   ok(/notebooks\/m12-city-model\.ipynb/.test(PAGE) && fs.existsSync(path.join(X.SITE, "learn/notebooks/m12-city-model.ipynb")), "the notebook link and file");
   const NB = fs.readFileSync(path.join(X.SITE, "learn/notebooks/m12-city-model.ipynb"), "utf8");
   ok(NB.indexOf('MY = dict(DEFAULT, hp=70, ret=40, dh=30, dhp=100, sto=800, ev=60, evm=\\"managed\\", pv=100, bat=20)') >= 0 && /REF\[\\"my\\"\]/.test(NB) && /city_planner_link/.test(NB), "the notebook's plan is the one in precomputed.m12.ref.my, checked against it; it prints the City Planner link");
-  ok(/weight against constraints/.test(NB) && /Now remove the day itself/.test(NB), "practice 1 separates a day's weight from its constraints (M12 review finding 2)");
+  ok(/weight against constraints/.test(NB) && /Now remove the day itself/.test(NB), "practice 1 separates a day's weight from its constraints");
   ok(/prairie-city\.json" download/.test(PAGE) && /e3-city-hub\.json" download/.test(PAGE), "both data files offered with the notebook");
   ok(PAGE.indexOf("<td>Each district's busiest hour</td><td class=\"n\">$" + cfg.tie.peak + " a year per MW</td>") >= 0 && PAGE.indexOf("together</td><td class=\"n\">$" + cfg.tie.cityPeak + " per MW</td>") >= 0 &&
-    T.indexOf("$" + cfg.tie.wear + " per MWh") >= 0 && T.indexOf("$" + cfg.tie.storeWear.toFixed(2) + " per MWh") >= 0 && T.indexOf("$" + cfg.tie.ev.toFixed(2) + " per MWh") >= 0, "the tie costs as a table, from the data (M12 review finding 8)");
+    T.indexOf("$" + cfg.tie.wear + " per MWh") >= 0 && T.indexOf("$" + cfg.tie.storeWear.toFixed(2) + " per MWh") >= 0 && T.indexOf("$" + cfg.tie.ev.toFixed(2) + " per MWh") >= 0, "the tie costs as a table, from the data");
   has("under $30 a year, in the engine's test");
   has("0.85");  ok(cfg.battery.rte === 0.85, "the battery's 85% in the formulation");
   ok(/q_\{dk,-1\} = q_\{dk,23\}/.test(PAGE), "storage cyclic within each day, as built");
   ok(/managed charging \(each day's charge in any hours of that day\)/.test(JS) && cfg.ev.minHours === 6, "managed charging as built");
   ["ev", "sto"].forEach(k => ok(JS.indexOf(k) >= 0, "uses " + k));
   ok(/accounting layer/.test(PAGE) && /not in the LP|never in the LP/.test(JS), "the household outputs are said to come from an accounting layer, not the LP");
-  // the review's fixes
+  // the details, one by one
   ok(/\[d = \\text\{core\}\]\\, pl_\{kh\}/.test(PAGE) && /hp_\{kh\} \+ boil_\{kh\} \+ so_\{kh\} - si_\{kh\}/.test(PAGE) && /sym\("pl"/.test(JS) && /tag: "heat network \(core\)"/.test(JS) && cfg.dh.plant.cop === 3 && cfg.dh.loss === 0.1,
-    "the balance carries the heat network's plant power, and the network has its own heat balance (M12 review finding 1)");
-  ["out", "in", "sig", "pl", "net"].forEach(k => ok(new RegExp("sym\\(\"" + k + "\"").test(JS) && new RegExp("(^|[\\s{,])\"?" + k + "\"?: \\{ name").test(JS), "equation card: " + k + " is a symbol with its words (M12 review finding 9)"));
-  // step 8 reads every row with the rule chosen in step 7 (M12 review finding 3)
+    "the balance carries the heat network's plant power, and the network has its own heat balance");
+  ["out", "in", "sig", "pl", "net"].forEach(k => ok(new RegExp("sym\\(\"" + k + "\"").test(JS) && new RegExp("(^|[\\s{,])\"?" + k + "\"?: \\{ name").test(JS), "equation card: " + k + " is a symbol with its words"));
+  // step 8 reads every row with the rule chosen in step 7
   const cr = PG.compareRows(runs, "low", (Rr, rule) => E3.summarize(Object.assign({}, Rr.state, { rule }), P, Rr.raw, Rr.base));
   ok(cr.every((r, i) => r.rule === "low" && near(r.cost, runs[i].R.delta.cost) && near(r.co2, runs[i].R.acc.co2Hub)) && cr.some((r, i) => Math.abs(r.burden - runs[i].R.hh.low.burden) > 1e-5), "the comparison uses step 7's rule for every row; cost and CO2 unchanged");
   ok(/Who adopts first, for every row's burden/.test(JS), "the comparison names the rule above the table");
-  ok(/fixed here at the defaults/.test(BLOCKS["m12-inputs"]()) && !/ranges you set/.test(PAGE) && /fixed here at their defaults/.test(PAGE), "the teaching costs: their defaults shown, and where they can be changed (M12 review finding 5)");
-  ok(/rounded up to the next 10 MW/.test(JS) && !/15% above/.test(JS + PAGE.replace(/<!-- m12-inputs:start[\s\S]*m12-inputs:end -->/, "")), "the limits: 2025 peak x 1.15, rounded up to the next 10 MW (M12 review finding 6)");
-  ok(/an illustrative curve, 144 ÷ \(45 − T\), through DOE's challenge target/.test(JS) && /resistance backup \(1\) assumed below −23 °C/.test(JS), "the COP: an illustrative curve anchored to DOE's target (M12 review finding 7)");
-  ok(/\[\[building-envelope\|envelope\]\]/.test(JS) && /\[\[retrofit\|/.test(JS) && /\[\[district-heating\|district heat\]\]/.test(JS) && /\[\[energy-burden\|/.test(JS) && /\[\[area-median-income\|/.test(JS), "terms marked at first use (M12 review finding 9)");
+  ok(/fixed here at the defaults/.test(BLOCKS["m12-inputs"]()) && !/ranges you set/.test(PAGE) && /fixed here at their defaults/.test(PAGE), "the teaching costs: their defaults shown, and where they can be changed");
+  ok(/rounded up to the next 10 MW/.test(JS) && !/15% above/.test(JS + PAGE.replace(/<!-- m12-inputs:start[\s\S]*m12-inputs:end -->/, "")), "the limits: 2025 peak x 1.15, rounded up to the next 10 MW");
+  ok(/an illustrative curve, 144 ÷ \(45 − T\), through DOE's challenge target/.test(JS) && /resistance backup \(1\) assumed below −23 °C/.test(JS), "the COP: an illustrative curve anchored to DOE's target");
+  ok(/\[\[building-envelope\|envelope\]\]/.test(JS) && /\[\[retrofit\|/.test(JS) && /\[\[district-heating\|district heat\]\]/.test(JS) && /\[\[energy-burden\|/.test(JS) && /\[\[area-median-income\|/.test(JS), "terms marked at first use");
   ok(!/nuclear|reactor|\bSMR\b|small modular/i.test(PAGE + JS), "no nuclear term");
   ok(!/\bAI\b|artificial intelligence|ChatGPT|Claude/.test(PAGE + JS), "no AI wording");
   console.log((fails ? "FAILED " : "ok ") + (checks - fails) + "/" + checks + " checks (M12)");

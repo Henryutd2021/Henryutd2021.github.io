@@ -1,7 +1,7 @@
-// test_metro_layout.js — Node tests of the course map's layout (metro.js LX.metroLayout; no browser needed; map v2,
-// 2026-11-03). For the real path.json and for synthetic courses (the W3 density: about 20 more entries; the whole
-// curriculum: about 120 stations; a fifth tier; a tier still to come), in the wide layout at three drawing widths and
-// in the narrow one at three:
+// test_metro_layout.js — Node tests of the course map's layout (metro.js LX.metroLayout; no browser needed). For the
+// real path.json and for synthetic courses (a denser course: about 20 more entries; the whole curriculum: about 120
+// stations; a fifth tier; a tier still to come), in the wide layout at three drawing widths and in the narrow one at
+// three:
 //   - every starter lesson is one route stop, every other lesson one station on its tier's line, the toolbox listed;
 //   - each tier line carries its stations in curriculum order (modules by number, then unnumbered, bridges, news lens,
 //     side topics, case files, sandboxes, checkpoint, capstones); in the wide layout every row reads left to right and
@@ -30,7 +30,7 @@ const EM = { label: [12.5, 0.57], code: [12, 0.6], tier: [12, 0.76], text: [12, 
 const est = (t, f) => String(t).length * EM[f][0] * EM[f][1];
 
 // ---------------- synthetic courses
-function w3(P0) {   // wave W3's entries (F3-F7, A1, A2, A4, A7, A8, A14, A16, M4, M5, M7 live, SB0, SB1, C0, C1, CF1, K6)
+function w3(P0) {   // a denser course: these entries live (F3-F7, A1, A2, A4, A7, A8, A14, A16, M4, M5, M7 live, SB0, SB1, C0, C1, CF1, K6)
   const P = clone(P0), live = (tier, code, title, form, tier2) => Object.assign({ tier, code, title, ready: true, href: code.toLowerCase() + ".html", scales: [], id: code.toLowerCase(), minutes: 25, form: form || "cards" }, tier2 ? { tier2 } : {});
   P.more = P.more.filter(m => !/^(Money over time|Techno-economic analysis of a project)/.test(m.title));
   [["foundations", "F3"], ["foundations", "F4"], ["foundations", "F5"], ["foundations", "F6"], ["foundations", "F7"],
@@ -44,7 +44,7 @@ function w3(P0) {   // wave W3's entries (F3-F7, A1, A2, A4, A7, A8, A14, A16, M
   P.toolbox.forEach(t => { if (t.code === "K6") Object.assign(t, { ready: true, id: "k06", href: "k06.html" }); });
   return P;
 }
-function full(P0) {   // every module, checkpoint, capstone, case file and sandbox code of curriculum v2
+function full(P0) {   // every module, checkpoint, capstone, case file and sandbox code of the curriculum
   const P = w3(P0), have = new Set(P.more.map(m => m.code));
   P.more = P.more.filter(m => m.code);
   const up = (tier, code) => { if (!have.has(code)) P.more.push({ tier, code, title: "Item " + code + ": a long question title that runs to two lines on a phone", ready: false, href: "index.html#" + tier, scales: [] }); };
@@ -149,12 +149,12 @@ function check(P, label, mode, W) {
   ok(!clash.length, `${tag}: labels clear of other stations${clash.length ? " (" + clash.slice(0, 4).join("; ") + ")" : ""}`);
   return Lo;
 }
-const courses = [["course", real], ["W3 density", w3(real)], ["whole curriculum", full(real)], ["five tiers", five], ["researcher later", soon], ["empty tier", empty]];
+const courses = [["course", real], ["denser course", w3(real)], ["whole curriculum", full(real)], ["five tiers", five], ["researcher later", soon], ["empty tier", empty]];
 courses.forEach(([label, P]) => {
   [1098, 951, 900].forEach(W => check(P, label, "h", W));
   [310, 450, 560].forEach(W => check(P, label, "v", W));
 });
-ok(layout(real, "h", { W: 1098 }).fits && layout(w3(real), "h", { W: 1098 }).fits && layout(full(real), "h", { W: 1098 }).fits, "the wide layout fits the course, W3 and the whole curriculum at 1098 px (a 1280 px window)");
+ok(layout(real, "h", { W: 1098 }).fits && layout(w3(real), "h", { W: 1098 }).fits && layout(full(real), "h", { W: 1098 }).fits, "the wide layout fits the course, the denser course and the whole curriculum at 1098 px (a 1280 px window)");
 // facts of the real course the map relies on
 ok(real.tiers.length === 4 && real.tiers.map(t => t.title).join() === "Foundations,Analyst,Modeler,Researcher", "course: four tiers, Researcher last");
 const R = layout(real, "h", { W: 1098 }).tiers[3], rmore = real.more.filter(m => m.tier === "researcher"), rlive = rmore.filter(m => m.ready).length;
@@ -167,7 +167,7 @@ ok(layout(five, "h", { W: 1098 }).H > layout(real, "h", { W: 1098 }).H, "five ti
  [{ form: "play" }, "lesson"], [{ code: "R6" }, "studio"], [{ code: "CK-A" }, "checkpoint"], [{ code: "CF4" }, "case"], [{ code: "SB2" }, "sandbox"], [{ code: "C3" }, "capstone"],
  [{ code: "CR" }, "capstone"], [{ code: "M6" }, "lesson"], [{}, "lesson"]].forEach(([m, k]) => ok(kindOf(m) === k, `kind of ${JSON.stringify(m)} is ${k}`));
 // the narrow layout's rows: names wrap to two lines at most, shortened with an ellipsis; a short name when there is one
-// since W7 every lesson path.json lists is live: one made-up lesson still to come (Z8, a long title) keeps the upcoming case
+// every lesson path.json lists is live now: one made-up lesson still to come (Z8, a long title) keeps the upcoming case
 const w3s = w3(real); w3s.more.push({ tier: "analyst", code: "Z8", title: "A made-up lesson still to come, with a question title as long as the real ones are", ready: false, href: "index.html#analyst", scales: [] });
 const V = layout(w3s, "v", { W: 310, open: allOpen(real) });
 ok(V.stops.every(s => s.lines.length <= 2) && V.own.every(o => o.lines.length <= 2) && V.own.some(o => !o.m.ready && o.lines.length === 2), "narrow: names wrap to two lines (upcoming ones too), shortened with an ellipsis");

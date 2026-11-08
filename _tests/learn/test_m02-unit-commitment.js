@@ -19,7 +19,7 @@
 //   - page text: chosen strings in learn/m02-unit-commitment.qmd (every number on the page), the sidecar's glossary
 //     entries, the notebook's asserted numbers. The step cards' sentences are built at run time from the solver's
 //     results, so they cannot drift; the page's interaction (stale-solve guards, Next locks, focus) is not exercised
-//     here: check it in the browser (scripts/learn_screenshots.mjs).
+//     here: check it in the browser (the screenshot check).
 // Usage (from the site folder):  node _tests/learn/test_m02-unit-commitment.js
 "use strict";
 const fs = require("fs");

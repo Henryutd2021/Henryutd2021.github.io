@@ -1,4 +1,4 @@
-// test_components_c.js — Node tests for the W1 components of promotion group C: lpplane.js (LX.LPPlane and the pure rule
+// test_components_c.js — Node tests for the shared components lpplane.js (LX.LPPlane and the pure rule
 // algebra LX.lp2), cardsort.js (LX.CardSort and its pure grade/score/reference), linkedviews.js (LX.LinkedViews) and
 // toggle.js (LX.Toggle).
 //   - each file defines its LX.<Name> when run with a stub window.LX, and the bundle holds it
@@ -169,7 +169,7 @@ function hour(o) {
     const half = {}; D10.cards.slice(0, 4).forEach(c => { half[c.id] = c.bin === "rule" ? "goal" : c.bin; });
     const h = CS.grade(D10.cards, half); ok(h.placed === 4 && h.right === D10.cards.slice(0, 4).filter(c => c.bin !== "rule").length, "grade: a half-done sort counts placed and right cards");
     ok(CS.grade(D10.cards, {}).placed === 0, "grade: an empty sort");
-    // any reference value other than "yes" and "partly" is a clear "off" cell (R2 uses "not stated"; shared fix 22 documents it)
+    // any reference value other than "yes" and "partly" is a clear "off" cell (R2 uses "not stated")
     const ns = [{ key: "p", ref: { a: "not stated", b: "yes", c: "partly" } }], nsr = CS.reference(ns, ["a", "b", "c"]);
     ok(nsr.p.a === false && nsr.p.b === true && CS.score({ p: { a: false, b: true } }, ns, ["a", "b", "c"]).agree === 2 && CS.score({ p: { a: true, b: true } }, ns, ["a", "b", "c"]).cells.p.a === "differ" &&
        CS.score({ p: {} }, ns, ["a", "b", "c"]).clear === 2, "score: \"not stated\" is a clear off cell, \"partly\" accepts either answer");

@@ -1,6 +1,5 @@
-// test_metro_browser.js — browser test of the course map (metro.js) in headless Chrome (wave W3, 2026-11-03; map v2:
-// every lesson a station). At desktop, tablet and phone sizes, and in two short windows (a laptop's, a phone held
-// sideways):
+// test_metro_browser.js — browser test of the course map (metro.js; every lesson a station) in headless Chrome. At
+// desktop, tablet and phone sizes, and in two short windows (a laptop's, a phone held sideways):
 //   Stations
 //     - narrow layout: each tier's upcoming lessons are folded into one button ("N coming soon", aria-expanded) that
 //       opens them in place and keeps focus; the test opens every fold (and closes and reopens one) before the rest;
@@ -24,10 +23,10 @@
 //   Also: the layout mode (wide from a 720 px drawing when the starter names fit: at 1280 and 1024 px windows; narrow
 //   below, drawn at most 560 px wide), the map bar's hint, that the map bar and legend fit, and no sideways scroll.
 //   With --site it also opens and closes the "All lessons as a list" box.
-// Page: by default a page built here around the worktree's own assets/learn/learn.js, learn.css and data/path.json, in a
+// Page: by default a page built here around the checkout's own assets/learn/learn.js, learn.css and data/path.json, in a
 //   frame like the site's (a sticky 65 px navbar, a 1120 px content column, 25.5 px gutters), so it needs no render;
 //   --site <folder> runs it on a rendered site's learn/index.html instead (e.g. --site _site after quarto render);
-//   --path <file> serves another path.json instead (e.g. a scratch copy at a later wave's density).
+//   --path <file> serves another path.json instead (e.g. a scratch copy of a denser course).
 // Needs Google Chrome (CHROME=/path/to/chrome overrides the macOS default) and Node 22 or later (WebSocket, fetch).
 // Usage (from the site folder):  node _tests/learn/test_metro_browser.js [--site _site] [--path file.json]
 //        [--sizes 1280x900,375x667] [--motion reduce|no-preference]   (default reduce: cards appear at once)
@@ -146,7 +145,7 @@ async function pageChecks(P) {
     ok(!card(), `${label}: Escape closes the card`);
     const want2 = opener();
     ok(!!want2 && document.activeElement === want2, `${label}: focus returns to the opener (now on ${document.activeElement ? document.activeElement.tagName + "." + (document.activeElement.getAttribute("class") || "") : "nothing"})`);
-    // a click outside the card closes it too (Henry, 2026-11-07); a click inside does not
+    // a click outside the card closes it too; a click inside does not
     if (want2) {
       key(want2, "Enter"); await settle();
       if (card()) {
@@ -366,6 +365,6 @@ async function pageChecks(P) {
     await send("Target.closeTarget", { targetId });
   }
   sock.close(); chrome.kill(); server.close();
-  console.log(`${checks} checks, ${fails} failed (${opt.site ? "rendered site " + opt.site : "test page from the worktree's assets"}${opt.path ? ", path.json from " + opt.path : ""})`);
+  console.log(`${checks} checks, ${fails} failed (${opt.site ? "rendered site " + opt.site : "test page from this checkout's assets"}${opt.path ? ", path.json from " + opt.path : ""})`);
   process.exit(fails ? 1 : 0);
 })();

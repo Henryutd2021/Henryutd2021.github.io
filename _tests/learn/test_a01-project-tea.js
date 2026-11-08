@@ -5,7 +5,7 @@
 // page states matches the model (statements one by one, a whitelist scan of the visible text, and every printed calculation
 // recomputed from its shown operands). The whitelist scan is supplementary: it shows that every number on the page is one
 // the model makes, not that each statement is right; the statements are checked one by one. The no-JS tables must equal
-// staticBlocks(). A stub-document run checks step 4's IRR bracket (Codex review, 2026-11-03).
+// staticBlocks(). A stub-document run checks step 4's IRR bracket.
 // Usage (from the site folder):  node _tests/learn/test_a01-project-tea.js [--write]   (--write rewrites the no-JS tables)
 "use strict";
 const fs = require("fs");
@@ -147,7 +147,7 @@ const { usd, musd, signed, pct } = A;
     ok(a && b > a.index && QMD.slice(a.index + a[0].length, b).trim() === B[BLOCKS[name]].trim(), `page: the ${name} table equals staticBlocks() (run with --write)`);
   });
   ["07-cost.html", "k03-discounting.html", "k07-spreadsheets.html", "a02-contracts-risk.html"].forEach(h => ok(QMD.indexOf('href="' + h + '"') >= 0, "links " + h));
-  ok(!/href="[^"]*(projects\/|research\.)/i.test(QMD) && /<a href="m11-tea-in-models\.html">M11<\/a> goes further into finance, and so does side shelf <a href="x05-project-finance\.html">X5<\/a>/.test(QMD) && /\[M11\]\(m11-tea-in-models\.html\) puts/.test(QMD) && /side shelf \[X5\]\(x05-project-finance\.html\)/.test(QMD) && !/X5,? \(?upcoming/.test(QMD), "X5 linked now that it is live (W7); M11 linked (W5); no project or Research links");
+  ok(!/href="[^"]*(projects\/|research\.)/i.test(QMD) && /<a href="m11-tea-in-models\.html">M11<\/a> goes further into finance, and so does side shelf <a href="x05-project-finance\.html">X5<\/a>/.test(QMD) && /\[M11\]\(m11-tea-in-models\.html\) puts/.test(QMD) && /side shelf \[X5\]\(x05-project-finance\.html\)/.test(QMD) && !/X5,? \(?upcoming/.test(QMD), "X5 and M11 linked now that they are live; no project or Research links");
   ok(/EMM_Assumptions\.pdf">EIA, AEO2026 assumptions, Table 3<\/a> \(2025 dollars, April 2026\)/.test(QMD) && /financial_cases_&amp;_methods">2025 ATB<\/a> \(NLR, September 2026\)/.test(QMD) && /5173\.pdf/.test(QMD) && /p\. 39[\s\S]*p\. 52[\s\S]*p\. 56[\s\S]*p\. 57/.test(QMD), "sources: EIA, NLR and the NREL manual with dates and pages");
   ok(/One price year: every dollar is a real 2025 dollar/.test(QMD) && /Illustrative: the loan and owner rates \(5%, 10%\), the 150 MW size and the \$50\/MWh price, fixed in 2025 dollars as a contract indexed to inflation would be/.test(QMD) && /Left out: taxes, tax credits, depreciation/.test(QMD), "data note: price year, illustrative inputs and the boundary are stated");
   ok(/fixed in real terms \(2025 dollars\)/.test(DA.priceNote) && /flat nominal price would lose purchasing power/.test(DA.priceNote) && /A price flat in nominal dollars buys less each year, so its real revenue falls/.test(QMD) && /as a contract indexed to inflation would be/.test(JS), "price: fixed in real terms, as an indexed contract; a flat nominal price falls in real terms (data, Go deeper, equation card)");
@@ -255,7 +255,7 @@ function calcCheck(label, str, skips) {
   ok(desc.split(/\s+/).length <= 35, `budget: the description is ${desc.split(/\s+/).length} words (≤ 35)`);
   ["internal-rate-of-return", "payback-period", "break-even-price", "inflation"].forEach(id => ok(new RegExp("id: " + id + "\\n").test(SIDE) && JS.indexOf("[[" + id + "|") >= 0, "glossary: " + id + " defined in the sidecar and marked"));
   [["nominal-rate", "k03-discounting"], ["capital-recovery-factor", "07-cost"]].forEach(([id, l]) => ok(new RegExp("id: " + id + "\\n").test(fs.readFileSync(path.join(SITE, "learn/_w1/" + l + ".yml"), "utf8")) && JS.indexOf("[[" + id + "|") >= 0, "glossary: " + id + " (defined in " + l + ") marked at its first use"));
-  ok(/\[\[nominal-rate\|nominal\]\]/.test(Q[2]) && /\[\[capital-recovery-factor\|capital recovery factor\]\] \(CRF\) " \+ cr\.toFixed\(4\)/.test(JS), "terms: 'nominal' marked in step 3; the drill spells out CRF and marks it (LX.Drill writes marks since the W3 shared fix)");
+  ok(/\[\[nominal-rate\|nominal\]\]/.test(Q[2]) && /\[\[capital-recovery-factor\|capital recovery factor\]\] \(CRF\) " \+ cr\.toFixed\(4\)/.test(JS), "terms: 'nominal' marked in step 3; the drill spells out CRF and marks it (LX.Drill writes the marks)");
   ok(/when electricity is its only revenue, with the same costs, output and discounting, it equals the plant's levelized cost\./.test(SIDE) && !/for one plant it equals/.test(SIDE), "glossary: break-even price equals the levelized cost only under stated conditions");
 }
 

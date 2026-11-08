@@ -11,7 +11,7 @@
 //   - sources: the burden lines are called conventions; estimates are called estimates; the toy is called illustrative;
 //     "Prairie City is fictional" appears with every Prairie City interactive; WHO is cited by name without a link
 //   - scope: no nuclear term, no "AI", no named people or companies blamed, links on the allow-list
-//   - after the review (2026-11-06): exposure is the toy's, counted from 10 km out; no claim about the nearest people;
+//   - the details: exposure is the toy's, counted from 10 km out; no claim about the nearest people;
 //     CO2 per MWh of fuel heat is not the finished service; the required questions read the page's displays (the
 //     arithmetic sits in an Analyst box); the leak chain shows its units; CO2e, GWP, AMI and the controls are explained
 //     where they first appear; a group's burden is its representative household's; the summaries and the explain layer

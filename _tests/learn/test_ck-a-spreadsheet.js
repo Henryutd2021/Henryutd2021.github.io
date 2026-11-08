@@ -1,6 +1,6 @@
 // test_ck-a-spreadsheet.js — Node tests for CK-A, the Analyst checkpoint (assets/learn/ck-a-spreadsheet.js, its data file,
 // the two workbooks and the page learn/ck-a-spreadsheet.qmd):
-//   - the model: the page's JS recomputes every worked number of the builder (scripts/build_learn_cka_sheet.py, Python);
+//   - the model: the page's JS recomputes every worked number of the checkpoint's data build step (Python);
 //     identities from first principles (the tariff gives EIA's average, the annuity factor is a sum of discount factors,
 //     the year-by-year cash flow equals the closed form, the parties add up to the resource view); cross-page inputs read
 //     from the course's data (e0.json: price index, rate, CO2 factor; A4: capacity cost)
@@ -21,6 +21,7 @@ const fs = require("fs");
 const path = require("path");
 const zlib = require("zlib");
 const vm = require("vm");
+const PRIV = require("./private_sources.js");
 const ID = "ck-a-spreadsheet";
 const SITE = path.resolve(__dirname, "..", "..");
 const L = p => path.join(SITE, "assets/learn", p);
@@ -48,9 +49,9 @@ if (process.argv.includes("--write")) {
 const PAGE = fs.readFileSync(QPATH, "utf8"), JS = fs.readFileSync(L(ID + ".js"), "utf8"), RAW = fs.readFileSync(DPATH, "utf8");
 Object.keys(BLOCKS).forEach(k => { const r = between(PAGE, k); ok(PAGE.slice(r.from, r.to) === BLOCKS[k]() + "\n", "block " + k + " is up to date (run with --write)"); });
 
-// ---------------- the model against the builder, and from first principles
+// ---------------- the model against the data build step's numbers, and from first principles
 const F = M.facts(D), b = F.base, r = F.res;
-Object.keys(D.worked).forEach(k => ok(rel(r[k], D.worked[k], 1e-6), "the page's model equals the builder's: " + k + " " + r[k] + " / " + D.worked[k]));
+Object.keys(D.worked).forEach(k => ok(rel(r[k], D.worked[k], 1e-6), "the page's model equals the data build step's: " + k + " " + r[k] + " / " + D.worked[k]));
 Object.keys(D.base).forEach(k => ok(rel(b[k], D.base[k], 1e-6), "derived input " + k));
 {
   const e0 = JSON.parse(fs.readFileSync(L("data/e0.json"), "utf8")), a04 = JSON.parse(fs.readFileSync(L("data/a04-retail-tariffs.json"), "utf8"));
@@ -160,7 +161,7 @@ ok(task("solar").units.filter(u => u[1] === null).length === 2, "the solar task 
   ok(M.level(D, own9).level === "Strong", "task 9's own early solution opens only its own answer (gateAll), not the full worked solution: no practice");
   const seen = st(7, 4, 4); ok(M.level(Object.assign({ solOpen: "2026-11-05T00:00:00Z" }, D), seen).level === "Practice (no level)" && M.level(Object.assign({ solOpen: "2026-11-06T10:00:00Z" }, D), seen).level === "Strong", "opened by an earlier attempt: practice; opened by submitting task 9: counts");
   const opened = st(7, 4, 4); opened.tasks.solar.solFirst = true; ok(M.level(D, opened).auto === 6, "a task opened before answering counts as not right");
-  // review #1: answers given after the full worked solution opened (with gateAll it opens only once all nine are
+  // answers given after the full worked solution opened (with gateAll it opens only once all nine are
   // answered, so this needs an earlier opening): each is late under the shared rule, and the attempt is practice
   const late = st(7, 4, 4); T.forEach(t => { late.tasks[t.id].at = t.id === "log" ? "2026-11-06T10:00:00.000Z" : "2026-11-06T10:05:00.000Z"; });
   const LL = M.level(Object.assign({ solOpen: "2026-11-06T10:00:00.000Z" }, D), late);
@@ -192,7 +193,7 @@ has("Answered late: an answer given after the worked workbook opened counts as p
 has("Opens once all nine tasks are answered.", "the lock box: gateAll");
 ok(!/task 9 last|submit task 9|Submit this task last/i.test(TX + JSON.stringify(D.tasks)), "no text still says task 9 opens the solution");
 ok(/gateAll: true, late: "practice"/.test(JS) && !/submitTask/.test(JS.slice(JS.indexOf("LX.Checkpoint(live"))), "the runner: gateAll and the shared late-answer rule, no submit task");
-// the conventions the answers depend on, stated before the tasks (reviews #2, #3, #4, #5)
+// the conventions the answers depend on, stated before the tasks
 { const BR = text(PAGE.slice(between(PAGE, "cka-brief").from, between(PAGE, "cka-brief").to));
   ok(BR.includes("End value: at year 25 the replacement battery has 5 of its 15 years left: count 5/15 of its cost as its residual value (straight line)") && rel(r.residual, b.repl * 5 / 15, 1e-12), "the brief states the straight-line residual value the answer uses (5/15 of the replacement)");
   ok(BR.includes("about 200 full cycles a year, each taking in 300 kWh from the school's supply and returning 90%; the 10% lost is bought at the energy charge") && rel(r.lossKWh, 200 * 300 * 0.1, 1e-12) && rel(r.sLoss, -r.lossKWh * r.energyCharge, 1e-12), "the brief defines the battery's energy basis: 300 kWh taken in per full cycle, 10% lost, bought at the energy charge (6,000 kWh)");
@@ -204,7 +205,7 @@ ok(/gateAll: true, late: "practice"/.test(JS) && !/submitTask/.test(JS.slice(JS.
 ok(task("tornado").options.find(o => o[0] === "c")[1].includes("with the energy charge re-set so the pre-project bill is unchanged") && /pre-project bill held/.test(F.sens.find(x => x.key === "demand").label), "the demand-charge swing is named as a rebalancing (pre-project bill held), before and after");
 ok(/Under the brief's rate-reset assumption, who pays it\?$/.test(task("transfer").prompt) && /^Under the same assumption/.test(task("shift").prompt) && /counting the brief's residual value/.test(task("npc").prompt), "tasks 5 to 7 say which given convention they rest on");
 ok(/the input that moves it most\)\.$/.test(task("log").prompt), "task 9 no longer asks to be submitted last (gateAll)");
-// units in the sensitivity (review #9)
+// units in the sensitivity
 { const SO = text(M.staticSolution(D));
   ok(SO.includes("$0.0894 to $0.134 per kWh") && SO.includes("$5 to $20 per kW-month") && SO.includes("$11,229 to $18,715 a year"), "the sensitivity table keeps its units");
   const tr = M.tornadoRows(D, F), pr = tr.find(x => /price/.test(x.label)), dm = tr.find(x => /Demand/.test(x.label));
@@ -217,8 +218,8 @@ ok(!between(PAGE, "cka-tasks") || !PAGE.slice(between(PAGE, "cka-tasks").from, b
 {
   const comp = RB.COMPETENCES, ids = M.RUBRIC.map(x => x.id);
   ok(ids.join() === "accounting,uncertainty,trust,realism" && M.RUBRIC.every(x => !x.levels && x.look), "rubric: accounting, uncertainty, trust and realism, with look lines and no reworded levels");
-  const cur = path.join(SITE, "..", "reports/learn/curriculum_v2.md"), CUR = process.env.LEARN_CURRICULUM || (fs.existsSync(cur) ? cur : null);
-  if (CUR && fs.existsSync(CUR)) { const c = fs.readFileSync(CUR, "utf8"); ok(ids.every(id => { const x = comp.find(y => y.id === id); return ["developing", "proficient", "strong"].every(l => c.includes(x[l])); }), "rubric words are curriculum §3.4's, word for word"); }
+  const CUR = PRIV.path("curriculum");
+  if (CUR && fs.existsSync(CUR)) { const c = fs.readFileSync(CUR, "utf8"); ok(ids.every(id => { const x = comp.find(y => y.id === id); return ["developing", "proficient", "strong"].every(l => c.includes(x[l])); }), "rubric words are the course rubric's, word for word"); }
 }
 
 // ---------------- the page on a stub document
@@ -280,7 +281,7 @@ function mountFresh() {
   return { E, live, answer, level };
 }
 function sleep(ms) { return new Promise(res => setTimeout(res, ms)); }
-// review #1, reproduced on the runner with gateAll: task 9 submitted first opens nothing; the other answers, given
+// the same case on the runner with gateAll: task 9 submitted first opens nothing; the other answers, given
 // before the solution opens, count; the ninth answer opens it
 async function reviewersSequence() {
   const P = mountFresh();
@@ -325,14 +326,14 @@ function finish() {
   ok(!/nuclear|reactor|\bSMR\b|small modular|fission|uranium/i.test(ALL), "no nuclear term (page, data, script, workbooks)");
   ok(!/\bAI\b|artificial intelligence/.test(ALL), "no 'AI' anywhere");
   ok(!/\bFOAK\b|\bNOAK\b|first[- ]of[- ]a[- ]kind|learning[- ](curve|rate)|order[- ]book|anchor[- ](customer|buyer)|subsidy[- ]free|break[- ]even capital|smr-dc|projects\/|research\.(html|qmd)/i.test(ALL), "no deny-listed term");
-  ok(!/break[- ]even/i.test(ALL), "no break-even search (G-POL spirit: no credit or threshold sweep)");
+  ok(!/break[- ]even/i.test(ALL), "no break-even search (no credit or threshold sweep)");
   const OKH = h => /^https:\/\/www\.eia\.gov\//.test(h) || /^https:\/\/atb\.nlr\.gov\//.test(h) || /^https:\/\/www\.irs\.gov\//.test(h) || /^(\.\.\/assets\/learn\/data\/[a-z0-9_-]+\.(json|xlsx)|[0-9a-z-]+\.html(#[a-z0-9-]+)?)$/.test(h);
   const OWN = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?<!-- learn:\1:end -->/g, "");
   const hrefs = [...OWN.matchAll(/href="([^"]+)"/g)].map(m => m[1]).concat([...ALL.replace(PAGE, OWN).matchAll(/https?:\/\/[^\s"'<>)\]]+/g)].map(m => m[0]).filter(h => !/schemas\.openxmlformats|purl\.org|www\.w3\.org/.test(h)));
   ok(hrefs.length > 5 && hrefs.every(OKH), "links: eia.gov, atb.nlr.gov, irs.gov, learn pages and downloads only: " + [...new Set(hrefs.filter(h => !OKH(h)))].join(" "));
   ok(!/data-source="excerpt:/.test(PAGE), "no excerpt of the course author's research");
   const PY = fs.readFileSync(path.join(SITE, "learn/path.yml"), "utf8"), entry = PY.split(/\n- kind: /).find(x => new RegExp("\\n  id: " + ID + "\\n").test(x)) || "";
-  ok(/\n  status: active\n/.test(entry) && /\n  minutes: 150\n/.test(entry) && /\n  form: checkpoint\n/.test(entry) && /after: \[A1, A4(, A13(, A15)?)?\]/.test(entry), "path.yml: active checkpoint, 150 minutes, after A1 and A4 (A13 since the W5 batch-1 merge, A15 at batch 2)");
+  ok(/\n  status: active\n/.test(entry) && /\n  minutes: 150\n/.test(entry) && /\n  form: checkpoint\n/.test(entry) && /after: \[A1, A4(, A13(, A15)?)?\]/.test(entry), "path.yml: active checkpoint, 150 minutes, after A1 and A4 (and A13, A15 when listed)");
   const fm = k => ((PAGE.match(new RegExp("^" + k + ': "(.*)"$', "m")) || [])[1]), py = k => ((entry.match(new RegExp("\\n  " + k + ': "(.*)"')) || [])[1]);
   ok(fm("title") === py("title") && fm("subtitle") === py("subtitle"), "the page's title and subtitle equal path.yml's");
   const GJ = JSON.parse(fs.readFileSync(L("data/glossary.json"), "utf8")), marks = [...(JS + RAW).matchAll(/\[\[([a-z0-9-]+)\|/g)].map(m => m[1]).concat([...PAGE.matchAll(/data-term="([a-z0-9-]+)"/g)].map(m => m[1]));

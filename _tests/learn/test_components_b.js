@@ -1,4 +1,4 @@
-// test_components_b.js — Node tests for the components promoted from lessons 6, 7, 8, 12 and 13 at the W1 merge (group B):
+// test_components_b.js — Node tests for the shared components first written for lessons 6, 7, 8, 12 and 13:
 //   tornado, costsplit, supplystack, frontier, steelman, boundary, share.
 //   Each component file defines its LX.<Name> when run with a stub window.LX, and the bundle holds it; the pure parts
 //   (tornado layout, cost split segments and text, supply-stack clearing and axes, frontier axis top and equal-score line,
@@ -65,7 +65,7 @@ M7.TECHS.forEach(k => {
 });
 ok(M7.lcoe(M7.inputs(D7, "wind")).fuel === 0 && CS.segments(PARTS, M7.lcoe(M7.inputs(D7, "wind")), 1).every(s => s.key !== "fuel"), "split: wind has no fuel segment");
 // the view on a stub document: a plain row (no onPick) is read from a hidden sentence, row.aria or the name, total and parts;
-// a button row keeps row.aria as its label (shared fix 19, after the CF7 review: plain rows used to drop row.aria)
+// a button row keeps row.aria as its label (plain rows used to drop row.aria)
 {
   const { env, load } = require("./stubdom.js");
   const E = env(); load("costsplit", E);
@@ -130,7 +130,7 @@ lessons.forEach(f => {
 });
 fs.readdirSync(path.join(SITE, "learn")).filter(f => /^(06|07|08|12|13)-.*\.qmd$/.test(f)).forEach(f => {
   const src = fs.readFileSync(path.join(SITE, "learn", f), "utf8");
-  ok(!/lx6-(?:steel|side)|lx13-bound/.test(src), `${f}: no promoted lesson-local CSS left`);
+  ok(!/lx6-(?:steel|side)|lx13-bound/.test(src), `${f}: no lesson-local copy of the shared CSS`);
 });
 ok(/LX\.Frontier\(/.test(fs.readFileSync(L("12-trade-offs.js"), "utf8")) && !/ui\.FrontierChart|FrontierChart:/.test(fs.readFileSync(L("12-trade-offs.js"), "utf8") + fs.readFileSync(L("13-capstone.js"), "utf8")), "lesson 12 draws with LX.Frontier; LX.townPlan.ui no longer carries a chart");
 

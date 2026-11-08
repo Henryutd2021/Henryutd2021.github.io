@@ -6,15 +6,15 @@
 //   - the village: the settled average day, the smallest designs the page states, the evening mill needing a bigger battery
 //   - every number on the page (fallbacks, myths, quiz, parts, facts, data note) matches the model or the data file
 //   - the five no-JS blocks equal what the lesson's generators write (--write rewrites them)
-//   - research wording (curriculum §13, guard G-SRC): every sentence of the Real-world box, and any element of the page,
-//     the data file or the script that names the course author's work, is an approved sentence of
-//     reports/learn/excerpts_for_approval.md (E8, E9), word for word
+//   - research wording (the sourcing rule): every sentence of the Real-world box, and any element of the page, the data
+//     file or the script that names the course author's work, is an approved sentence of the excerpt wording (E8, E9),
+//     word for word
 //   - links (allowed domains, learn pages, doi.org), the text budget
 // Usage (from the site folder):  node _tests/learn/test_f07-microgrids.js [--write]
 "use strict";
 const fs = require("fs");
 const path = require("path");
-const cp = require("child_process");
+const PRIV = require("./private_sources.js");
 const ID = "f07-microgrids";
 const SITE = path.resolve(__dirname, "..", "..");
 const L = p => path.join(SITE, "assets/learn", p);
@@ -87,12 +87,12 @@ ok(X.every(x => x.jan.lasts < x.jul.lasts), "January is shorter than July for bo
 // the seasons idea (explain) and the January step's words follow the runs: no "refill" where no run charges the battery
 const charges = r => r.rows.some(h => h.charge > 0.5);
 ok(!charges(X[0].jul) && !charges(X[0].jan) && !/refill|recharg/i.test(M.staticExplain(D)) && /weaker sun leaves more of the load to the generator and battery/.test(M.staticExplain(D)),
-  "650 kW: spare sun never charges the battery in either season, so the seasons idea names less sun for the load, not refilling (review F7 #3)");
+  "650 kW: spare sun never charges the battery in either season, so the seasons idea names less sun for the load, not refilling");
 ok(charges(X[1].jul) && !charges(X[1].jan) && /Only July had spare sun to recharge the battery/.test(M.winter(C, X[1].keep).line), "400 kW: July recharges, January does not, and the result line says so");
 ok(H.double > H.jul400 && H.double < 2 * H.jul400, "doubling the battery lengthens the island but does not double it (myth 3)");
 ok(X[0].jul.lasts < X[1].jul.lasts && X[0].jan.lasts < X[1].jan.lasts, "shedding the dorms lengthens the island");
 // every one of the 16 sets of loads: the rule of step 4 (both critical loads on, within the night's power), the January
-// step's answer and words (review F7 #1, #4), and more load never lasting longer
+// step's answer and words, and more load never lasting longer
 const every = [], subsets = [];
 for (let m = 0; m < 16; m++) { const k = {}; C.loads.forEach((l, i) => { k[l.key] = !!(m & (1 << i)); }); every.push(k); if (M.keepStatus(C, k) === "ok") subsets.push(k); }
 ok(M.criticalKeys(C).join() === "hospital,water", "the critical loads: the hospital and the water plant");
@@ -113,7 +113,7 @@ subsets.forEach(a => subsets.forEach(b => {
 }));
 ok(subsets.length === 2 && subsets.every(k => !k.labs) && subsets.some(k => k.dorms), "two sets pass step 4: the critical loads, with or without the dorms (the labs never fit with both): " + subsets.length);
 ok(subsets.every(k => { const w = M.winter(C, k); return w.answer === "short"; }), "every set that passes step 4 lasts less long in January");
-// the diagram's words (review F7 #6): connected is not supplied; solar only in sunshine; both sources run in an island
+// the diagram's words: connected is not supplied; solar only in sunshine; both sources run in an island
 const dstate = (keep, former) => ({ grid: false, sw: "open", former: former || "battery", keep: keep });
 const allOn = every[15];
 ok(M.partWords(C, dstate(allOn), "hospital") === "connected, but the island cannot carry every connected load" && !M.loadLit(C, dstate(allOn), "hospital"), "1,200 kW connected in an island: no load is drawn as supplied");
@@ -139,18 +139,18 @@ const hh = h => (h < 10 ? "0" : "") + h + ":00", span = a => hh(a[0]) + " to " +
 ok(span(V.mill.noon) === "10:00 to 14:00" && span(V.mill.evening) === "18:00 to 22:00" && JS.indexOf("runs from " + span(V.mill.noon)) >= 0 && JS.indexOf("grind from " + span(V.mill.evening)) >= 0 &&
    JS.indexOf('"10:00–14:00"') >= 0 && JS.indexOf('"18:00–22:00"') >= 0, "the mill's hours in the step texts and labels equal the data (10:00 to 14:00; 18:00 to 22:00)");
 ok(V.panels.start === 10 && M.minBattery(V, 10, "noon") === null, "the village starts short (10 kW of panels serves no hour plan): the reader must act");
-// step 8 asks about the smallest design (review F7 #5): the answer comes from the model, whatever the reader's sliders show
+// step 8 asks about the smallest design: the answer comes from the model, whatever the reader's sliders show
 const mv = M.millMove(V);
 ok(mv.answer === "battery" && mv.noon.kw === mv.evening.kw && mv.evening.kwh > mv.noon.kwh, "moving the mill to the evening grows the smallest design's battery only (" + mv.answer + ")");
 ok(/^Yes/.test(mv.feedback[mv.answer]) && Object.keys(mv.feedback).every(k => k === mv.answer || !/^Yes/.test(mv.feedback[k])) && Object.values(mv.feedback).every(t => t.split(" ").length <= 40), "step 8's feedback: yes only for the model's answer; each short");
 ok(M.panelChoices(V).some(p => M.batteryChoices(V).some(b => M.villageDay(V, p, b, "evening").ok && b > mv.evening.kwh)), "a reader's larger design may already serve the evening: so the question asks about the smallest design");
-// the village's flowchart trace follows the design (review F7 #2)
+// the village's flowchart trace follows the design
 const vt0 = M.villageTrace(V, 10, 20, "noon", true), vt1 = M.villageTrace(V, 20, 40, "noon", true), vt2 = M.villageTrace(V, null, null, null, false);
 ok(vt0.path[3] === "lasts" && /short in \d+ hours/.test(vt0.text) && vt1.path[3] === "ok" && /every hour of an average day served/.test(vt1.text) && vt2.path[3] === "ok" && /^The smallest design, 20 kW/.test(vt2.text),
   "the village trace: short designs end at 'lasts', serving ones at 'ok'; before the reader designs, the smallest design stands in");
 [vt0, vt1, vt2].forEach(t => ok(t.text.split(" ").length <= 40 && /stored energy only/.test(t.text), "the village trace states the toy's boundary and stays short"));
-ok(/only stored energy is tested, not cloudy days/.test(D.texts.villageToy) && JS.indexOf("D.texts.villageToy") >= 0 && /only stored energy is tested, not cloudy days/.test(T), "the village's toy boundary is on the page and in the step (review F7 #7)");
-// the explain layer is refreshed from the reader's state (review F7 #2)
+ok(/only stored energy is tested, not cloudy days/.test(D.texts.villageToy) && JS.indexOf("D.texts.villageToy") >= 0 && /only stored energy is tested, not cloudy days/.test(T), "the village's toy boundary is on the page and in the step");
+// the explain layer is refreshed from the reader's state
 ok(/function setKeep[\s\S]*?X\.refresh\(S0\)/.test(JS) && /S0\.vseen = true; if \(X\) X\.refresh\(S0\)/.test(JS) && /fc\.update\(traces\)/.test(JS), "kept loads and village changes refresh the explain layer");
 
 // ---------------- numbers on the page
@@ -172,19 +172,19 @@ const hrefs = [...OWN.matchAll(/href="([^"]+)"/g)].map(m => m[1]).concat([...OWN
 const OKH = /^(https:\/\/doi\.org\/10\.|https:\/\/www\.eia\.gov\/|https:\/\/www\.energy\.gov\/|https:\/\/www\.nerc\.com\/|https:\/\/www\.worldbank\.org\/|https:\/\/connectedcommunities\.lbl\.gov\/|[0-9a-z-]+\.html$|\.\.\/assets\/|#)/;
 ok(hrefs.length > 0 && hrefs.every(h => OKH.test(h)), "links: doi.org, EIA, DOE, NERC, the World Bank, Berkeley Lab and learn pages only: " + hrefs.filter(h => !OKH.test(h)).join(", "));
 ok(!/projects\/|research\.html/.test(PAGE + JSON.stringify(D)), "no project page and no Research page");
-// CF1's link follows its status in path.yml (review F7 #14): linked once live, named only while it is a draft
+// CF1's link follows its status in path.yml: linked once live, named only while it is a draft
 const PY = fs.readFileSync(path.join(SITE, "learn/path.yml"), "utf8"), cf1 = (PY.split(/\n- kind: /).find(e => /\n  id: cf1-supply-chain-microgrids\n/.test(e)) || "");
 const cf1Live = /\n  status: active\n/.test(cf1) && fs.existsSync(path.join(SITE, "learn/cf1-supply-chain-microgrids.qmd"));
 ok(cf1Live ? /<a href="cf1-supply-chain-microgrids\.html">case file CF1<\/a>/.test(PAGE) && !/upcoming/.test(T) : /case file CF1 \(upcoming\)/.test(T) && !/cf1-supply-chain-microgrids\.html/.test(PAGE),
   "CF1 is " + (cf1Live ? "live: the Real-world box links it" : "a draft: named, not linked"));
 
-// ---------------- research wording (curriculum §13, guard G-SRC)
-// Every sentence about the course author's work is an approved sentence of the register (sections E8 and E9), word for
+// ---------------- research wording: approved excerpts only
+// Every sentence about the course author's work is an approved sentence of the excerpt wording (sections E8 and E9), word for
 // word, or a clause of one where the row itself breaks (": ", "; ", ". "). Strict zone: the Real-world box. Signalled
 // (an element that names the author's work, by RX): everything else on the page, every string of the data file, every
 // string literal of this script. NOT_RESEARCH lists the labels and general sentences that may sit beside the excerpts.
 const RG = { sections: ["E8", "E9"], used: ["E8.2", "E8.7", "E9.1", "E9.2", "E9.3"] };
-const APPROVED_SNAPSHOT = {   // the register's E8.2, E8.7 and E9.1-E9.3 (approved 2026-11-03)
+const APPROVED_SNAPSHOT = {   // the approved wording of E8.2, E8.7 and E9.1-E9.3
   "E8.2": "From the course author's research: in the modeled supply chains, each open factory or warehouse could run its own microgrid, with on-site wind, solar and storage, an energy balance every hour, and energy bought from and sold to the grid.",
   "E8.7": "Holds when: stylized networks with synthetic distances and costs, candidate sites in California, Arizona and Nevada, and one year, planned week by week for products and hour by hour for energy. Leaves out: grid outages, which the studies do not model.",
   "E9.1": "In an industry internship, the course author worked on this question: how should solar PV, battery storage and backup generation be sized for an industrial campus to meet demand through grid outages?",
@@ -197,18 +197,13 @@ const NOT_RESEARCH = [
   [/^In the real world$/, "heading"],
   [/^The full case: case file CF1( \(upcoming\))?\.$/, "pointer to the case file"],
   [/^In Puerto Rico, a small microgrid that serves a community organization kept the power on for nine days during Hurricane Fiona, while other parts of the island were dark \(U\.S\. DOE, 8 November 2023\)\.$/, "a public case, sourced, not the course author's work"],
-  [/^Li et al\. \(2023\)\. Facility and microgrid location-allocation for integrated supply chain and transactive energy operations\. Applied Mathematical Modelling 119, 119–136\.$/, "citation (checked against publications.bib below)"],
-  [/^(The research text \(realWorld\)|Lesson F7 \(f07-microgrids\), 2026-11-03\.)/, "the data file's provenance note"],
+  [/^Li et al\. \(2023\)\. Facility and microgrid location-allocation for integrated supply chain and transactive energy operations\. Applied Mathematical Modelling 119, 119–136\.$/, "citation (checked against the publication list below)"],
+  [/^(The research text \(realWorld\)|Lesson F7 \(f07-microgrids\)\.)/, "the data file's provenance note"],
   [/^NERC \(2021\)\. White Paper: Grid Forming Controls \(PDF\), pp\. 8 and 11: grid-following and grid-forming inverters\. December 2021\.$/, "citation (NERC)"]
 ];
 const norm = s => String(s).replace(/\[\[[a-z0-9-]+\|([^\]]+)\]\]/g, "$1").replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/&#x27;|&#39;/g, "'")
   .replace(/&quot;/g, '"').replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/\s+/g, " ").replace(/ ([.,;:?!)])/g, "$1").replace(/\( /g, "(").trim();
-function portfolio() {
-  const c = [process.env.LEARN_PORTFOLIO, path.join(SITE, "..")];
-  try { c.push(path.resolve(SITE, cp.execSync("git rev-parse --git-common-dir", { cwd: SITE, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim(), "..", "..")); } catch (e) { /* not a git checkout */ }
-  return c.filter(Boolean).find(p => fs.existsSync(path.join(p, "reports/learn/excerpts_for_approval.md")));
-}
-// {id: sentence} of the register's rows in the sections, each revision applied (a revised row replaces the approved one)
+// {id: sentence} of the approved rows in the sections, each revision applied (a revised row replaces the approved one)
 function register(md) {
   const out = {}; let sec = null;
   const strip = t => norm(t.replace(/^(Timeline, [^:]+|Myth answer|Citations?): /, ""));
@@ -221,15 +216,15 @@ function register(md) {
   });
   return out;
 }
-const RP = portfolio();
+const RP = PRIV.path("excerpts");
 let APPROVED = APPROVED_SNAPSHOT;
 if (RP) {
-  const MD = fs.readFileSync(path.join(RP, "reports/learn/excerpts_for_approval.md"), "utf8");
+  const MD = fs.readFileSync(RP, "utf8");
   const reg = register(MD);
-  ok(RG.used.every(k => reg[k] === APPROVED_SNAPSHOT[k]), "the approved-sentence snapshot in this test equals the register; differs at: " + RG.used.filter(k => reg[k] !== APPROVED_SNAPSHOT[k]).join(", "));
-  ok(/E8\.1–E8\.10 and E8\.13–E8\.17; E8\.11–E8\.12 dropped/.test(MD) && /E9\.1–E9\.3 as drafted/.test(MD), "the register records E8 (without E8.11-E8.12) and E9 as approved");
+  ok(RG.used.every(k => reg[k] === APPROVED_SNAPSHOT[k]), "the approved-sentence snapshot in this test equals the approved wording; differs at: " + RG.used.filter(k => reg[k] !== APPROVED_SNAPSHOT[k]).join(", "));
+  ok(/E8\.1–E8\.10 and E8\.13–E8\.17; E8\.11–E8\.12 dropped/.test(MD) && /E9\.1–E9\.3 as drafted/.test(MD), "the approved wording records E8 (without E8.11-E8.12) and E9 as approved");
   APPROVED = {}; Object.keys(reg).filter(k => k !== "E8.11" && k !== "E8.12").forEach(k => { APPROVED[k] = reg[k]; });
-} else console.log("note: reports/learn/excerpts_for_approval.md not found (set LEARN_PORTFOLIO); research wording checked against the snapshot in this test");
+} else console.log("note: the approved excerpt wording is not available (set LEARN_SOURCES); research wording checked against the snapshot in this test");
 const UNITS = Object.values(APPROVED).map(norm);
 function approved(seg) {
   const s = norm(seg);
@@ -285,17 +280,17 @@ const e9 = quotes.find(q => q[1] === "excerpt:campus-resilience-question");
 ok(e9 && !/<footer|href=/.test(e9[2]), "the E9 excerpt has no citation and no link");
 const E87 = APPROVED_SNAPSHOT["E8.7"].split(/(?<=\.) (?=Leaves out:)/);
 ok(E87.length === 2 && norm(PAGE).indexOf(norm("<li>" + E87[0] + "</li><li>" + E87[1] + "</li>")) >= 0, "E8.7 sits under E8.2, word for word, as two lines (holds when; leaves out)");
-// citations: titles as in inputs/publications.bib
+// citations: titles as in the publication list
 if (RP) {
-  const bib = fs.readFileSync(path.join(RP, "inputs/publications.bib"), "utf8");
+  const bib = fs.readFileSync(PRIV.path("publications"), "utf8");
   const titles = [...bib.matchAll(/^\s*title\s*=\s*\{(.*)\},?\s*$/gm)].map(m => m[1].replace(/[{}]/g, "").replace(/\\textbf/g, "").toLowerCase());
   const cites = SRC_LI.map(li => li.match(TITLED)).filter(Boolean);
   ok(cites.length === 1, "one Li et al. paper in the sources list");
-  cites.forEach(c => ok(titles.indexOf(c[3].toLowerCase()) >= 0, "sources: '" + c[3].slice(0, 50) + "' is the title in publications.bib"));
+  cites.forEach(c => ok(titles.indexOf(c[3].toLowerCase()) >= 0, "sources: '" + c[3].slice(0, 50) + "' is the title in the publication list"));
 }
 
 // ---------------- text budget: every text element of the page's own prose stays short (one idea, about 35 words),
-// the generated no-JS blocks and the facts table included (review F7 #12)
+// the generated no-JS blocks and the facts table included
 const prose = elements(OWN.replace(/<style>[\s\S]*?<\/style>/g, " ").replace(/<script[\s\S]*?<\/script>/g, " ").replace(/^---[\s\S]*?\n---\n/, " "));
 prose.forEach(s => { const w = s.split(" ").length; ok(w <= 40 || approved(s), "text element of " + w + " words (40 at most unless one approved sentence): " + s.slice(0, 70)); });
 // the step texts and their seen-lines, as the script writes them: no more than about 45 words each

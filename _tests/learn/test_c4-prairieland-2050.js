@@ -12,7 +12,7 @@
 //     the Ridge region's wind and solar; gross and net kept apart; recomputed by hand
 //   - the words (says, the sensitivity line, the exemplars) true for every library plan, numbers as run
 //   - the brief's checks (two pages, the fields) and its assumptions say what is left out (equipment, the stand-in groups)
-//   - the reviews (2026-11-07): the assumptions follow the plan (the budget's counting, the peak-hour rule, the household
+//   - wording and checks: the assumptions follow the plan (the budget's counting, the peak-hour rule, the household
 //     share, the county assumption for new jobs, the full-year status); the strong exemplar meets its own rubric; the
 //     sensitivity one result a line; the shock table is the engine's, one sentence a shock; the notebook is part of the
 //     hand-in; the budget gap with A20; units and terms
@@ -132,7 +132,7 @@ const QPATH = path.join(X.SITE, "learn/c4-prairieland-2050.qmd");
   ok(/data-term="net-calorific-value"/.test(PAGE) && /data-term="primary-energy"/.test(PAGE) && /data-term="lng"/.test(PAGE) && /1 TWh = 3\.6 PJ/.test(T) && /the modelled cost change from tightening the budget by one tonne/.test(T), "units and terms explained at first use, the dual in plain words");
   ok(T.indexOf(PL.about.line) >= 0 && JS.indexOf("P.line") >= 0, "the fictional line");
   ok(!/firm[^.;\n]{0,50}nuclear|nuclear[^.;\n]{0,50}firm/i.test(T + JS) && !/reactor|\bSMR\b|small modular/i.test(PAGE + JS), "the firm option is never named nuclear; no reactor named");
-  ok(!/learning curve|learning rate|first[- ]of[- ]a[- ]kind/i.test(PAGE + JS), "no learning curves (G-COST)");
+  ok(!/learning curve|learning rate|first[- ]of[- ]a[- ]kind/i.test(PAGE + JS), "no learning curves (costs are fixed ranges; none changes with deployment)");
   ok(!/\bAI\b|artificial intelligence|ChatGPT|Claude/.test(PAGE + JS), "no AI wording");
 
   console.log((fails ? "FAILED " : "ok ") + (checks - fails) + "/" + checks + " checks (C4)");

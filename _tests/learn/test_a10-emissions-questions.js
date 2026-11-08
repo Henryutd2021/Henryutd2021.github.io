@@ -10,12 +10,12 @@
 //     load's MWh (energy balance); must-run: spill appears only below 800 MW of gas need; question 3 and 4 as the header
 //   - every number on the page (fallback, explain, myths, quiz) against the model; ties: the dispatch is cheapest first
 //     with distinct costs, so every number is unique (no LP)
-//   - review fixes (2026-11-05): the 300 MW step's overflow onto the peakers (hourly changes add to the short-run change;
+//   - wording and model checks: the 300 MW step's overflow onto the peakers (hourly changes add to the short-run change;
 //     next-MWh marginal factors miss it in 4 hours); the chart draws each step's scenario; claims under illustrative
 //     rules after the Scope 2 Guidance (2015), additionality and deliverability as assumptions, the grid-average proxy
 //     named; the heat-to-CO2 bridge; every line the page assembles, for every input, is 40 words and two sentences at most
-//   - research wording (curriculum §13): every excerpt sentence is approved (E6, E10) word for word in the register; no
-//     number from the txh2 paper; citation titles as in inputs/publications.bib
+//   - research wording (the course's sourcing rule): every excerpt sentence is approved wording (E6, E10), word for word;
+//     no number from the txh2 paper; citation titles as in the author's publication list
 //   - scope: no nuclear term in the lesson's own files; data centers only as a load; links only to allowed domains;
 //     text budget; glossary terms; the page on a stub document
 // Usage (from the site folder):  node _tests/learn/test_a10-emissions-questions.js
@@ -23,7 +23,7 @@
 const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
-const cp = require("child_process");
+const PRIV = require("./private_sources.js");
 const ID = "a10-emissions-questions";
 const SITE = path.resolve(__dirname, "..", "..");
 const L = p => path.join(SITE, "assets/learn", p);
@@ -127,12 +127,7 @@ ok(M.overflow(Q.dc.day0, Q.dc.inv.g, Q.dc.load) === 4 && M.overflow(Q.ez.day0, Q
 ok(A.mustRunMW === 800 && JS.includes("800 MW of combined-cycle plants stay on") && PAGE.includes("800 MW of combined-cycle plants running"), "the must-run rule's 800 MW is the data's");
 A.facts.forEach(f => { const i = PAGE.indexOf('<td class="n">' + f.n + "</td><td>" + f.what + "</td>"); ok(i >= 0 && PAGE.slice(i, i + 600).includes(f.url) && PAGE.slice(i, i + 600).includes(f.asof), "numbers to remember: " + f.n); });
 
-// ---------------- research wording (curriculum §13): approved sentences only
-function portfolio() {
-  const cands = [process.env.LEARN_PORTFOLIO, path.join(SITE, "..")];
-  try { cands.push(path.resolve(SITE, cp.execSync("git rev-parse --git-common-dir", { cwd: SITE, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim(), "..", "..")); } catch (e) { /* not a checkout */ }
-  return cands.filter(Boolean).find(p => fs.existsSync(path.join(p, "reports/learn/excerpts_for_approval.md")));
-}
+// ---------------- research wording (the sourcing rule): approved sentences only
 const norm = s => String(s).replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/\s+/g, " ").trim();
 const SNAP = {
   "E6.4": "In the reported scenarios, reductions in attributed emissions were on the order of one to two percent of regional totals or less.",
@@ -141,21 +136,21 @@ const SNAP = {
   "E10.3": "Industry then drew more hydrogen from gas reformers, and the round trip from power to hydrogen and back lost energy, so total emissions rose although gas-plant emissions fell.",
   "E10.4": "Inputs reflect 2022–2023 conditions; post-2023 federal hydrogen credit rules are not modeled."
 };
-const RP = portfolio();
+const RP = PRIV.path("excerpts");
 let APPROVED = SNAP;
 if (RP) {
-  const md = fs.readFileSync(path.join(RP, "reports/learn/excerpts_for_approval.md"), "utf8"), reg = {};
+  const md = fs.readFileSync(RP, "utf8"), reg = {};
   md.split("\n").forEach(line => { const m = line.match(/^\| (E(6|10)\.\d+) \| (.*) \|\s*$/); if (m && !reg[m[1]]) reg[m[1]] = norm(m[3].split(" | ")[0].replace(/^Timeline, [^:]+: /, "")); });
-  Object.keys(SNAP).forEach(k => ok(reg[k] === SNAP[k], `register ${k} equals the snapshot`));
+  Object.keys(SNAP).forEach(k => ok(reg[k] === SNAP[k], `approved ${k} equals the snapshot`));
   ok(!/\| E6\.(4|6) \|[^\n]*\| E6\.(4|6) \|/.test(md.split("## Revisions after review")[1] || ""), "no revision replaces E6.4 or E6.6");
-  ok(/E6 in A10, M6/.test(md) && /E10 in CF3, M8, A10, M6/.test(md), "the register records the new placements (E6 and E10 in A10)");
+  ok(/E6 in A10, M6/.test(md) && /E10 in CF3, M8, A10, M6/.test(md), "the approved wording records the new placements (E6 and E10 in A10)");
   APPROVED = reg;
-  const bib = fs.readFileSync(path.join(RP, "inputs/publications.bib"), "utf8").toLowerCase();
+  const bib = fs.readFileSync(PRIV.path("publications"), "utf8").toLowerCase();
   [...PAGE.matchAll(/<li>Li et al\. \(\d{4}\)\. <a href="(https:\/\/doi\.org\/[^"]+)">([^<]+)<\/a>/g)].forEach(m => {
     const entry = bib.split("\n@").find(e => e.includes("title={" + m[2].toLowerCase() + "}")) || "", doi = (entry.match(/doi\s*=\s*\{([^}]+)\}/) || [])[1];
-    ok(entry && (!doi || doi === m[1].replace("https://doi.org/", "").toLowerCase()), "citation title (and DOI) as in publications.bib: " + m[2].slice(0, 50));
+    ok(entry && (!doi || doi === m[1].replace("https://doi.org/", "").toLowerCase()), "citation title (and DOI) as in the publication list: " + m[2].slice(0, 50));
   });
-} else console.log("note: excerpts_for_approval.md not found (set LEARN_PORTFOLIO); checked against the snapshot");
+} else console.log("note: the approved excerpt wording is not available (set LEARN_SOURCES); checked against the snapshot");
 const UNITS = Object.values(APPROVED).map(norm);
 const approved = s => { s = norm(s); return s.length > 0 && UNITS.some(u => u === s || u.split(/(?<=[.?!])\s+/).indexOf(s) >= 0); };
 const quotes = [...PAGE.matchAll(/<blockquote class="lx-excerpt" data-source="([^"]+)">([\s\S]*?)<footer>/g)];

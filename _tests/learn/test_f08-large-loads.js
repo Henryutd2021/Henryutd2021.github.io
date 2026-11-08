@@ -9,16 +9,16 @@
 //     prediction and guess); every number stated on the page (myths, questions, Go deeper, ideas, numbers to remember)
 //     matches the model or the data file
 //   - the no-JS block equals what the model writes (--write rewrites it)
-//   - research wording (curriculum §13, guard G-SRC): the real-world box quotes E7.4 and E7.5 of
-//     reports/learn/excerpts_for_approval.md word for word, with CF7's footer; no other sentence describes the study
-//   - scope (guards G-DC, G-SRC): data centers only as loads; no nuclear term anywhere in the page, the data, the script or
+//   - research wording (the sourcing rule): the real-world box quotes E7.4 and E7.5 of the approved excerpt wording,
+//     word for word, with CF7's footer; no other sentence describes the study
+//   - scope: data centers only as loads; no nuclear term anywhere in the page, the data, the script or
 //     the sidecar; no "AI"; links on the allow-list; no project page, no Research page
 //   - text budget of the step cards, the reveals and the page's own prose
 // Usage (from the site folder):  node _tests/learn/test_f08-large-loads.js [--write]
 "use strict";
 const fs = require("fs");
 const path = require("path");
-const cp = require("child_process");
+const PRIV = require("./private_sources.js");
 const ID = "f08-large-loads";
 const SITE = path.resolve(__dirname, "..", "..");
 const L = p => path.join(SITE, "assets/learn", p);
@@ -157,7 +157,7 @@ ok(D.facts[4].n === M.fmtN(D.home_year.value) + " kWh", "the homes fact = the be
 ok(D.home_year.value === 10791 && /2022/.test(D.home_year.as_of), "EIA's 2022 average home (10,791 kWh), as lesson 1 uses");
 { const L1 = require(L("data/01-power-energy.json")); const hy = JSON.stringify(L1).match(/"home_year":\{"value":(\d+)/); ok(hy && +hy[1] === D.home_year.value, "the same benchmark as lesson 1"); }
 
-// ---------------- the review's wording fixes (2026-11-05)
+// ---------------- wording details
 ok(D.cooling.map(c => c.name).join() === "Evaporative heat rejection,Dry, air-cooled heat rejection" && /little operational water on site/.test(M.coolLine(D.cooling[1])) && /depending on the weather and the design/.test(M.coolLine(D.cooling[1])) && !/closed-loop cooling/i.test(PAGE + RAW + JS),
   "cooling compares evaporative with dry heat rejection; a closed loop is not called low-water");
 ok(/closed water loop inside the building can still send its heat out through an evaporative cooling tower/.test(M.WATER_HINTS[1]) && D.coolingSource.url === "https://www.energy.gov/cmei/femp/cooling-water-efficiency-opportunities-federal-data-centers" && OWN.indexOf(D.coolingSource.url) >= 0, "cooling: the DOE source is in the data file and the sources list");
@@ -167,29 +167,24 @@ ok(/label: "What-if: the campus's average draw"/.test(JS) && M.HOMES_WHATIF === 
 ok(!/homes' yearly use|homes use as much|homes' yearly electricity|yearly electricity use/.test(PAGE + JS) && /homes' yearly purchases/.test(JS) && /homes buy as much electricity in a year/.test(JS) && /each buying 10,791 kWh a year\) buy as much electricity in a year/.test(PAGE), "homes: always electricity bought (EIA counts purchases)");
 ok(!/screening/i.test(PAGE + RAW + JS.replace(/\/\/[^\n]*/g, "")) && /\$M means millions of dollars/.test(M.TAX_NOTE), "rough estimates, not 'screening'; $M explained");
 ok(/costs the developer on the order of \$0\.7 billion in <span class="lx-term" data-term="present-value">present value<\/span>\./.test(PAGE), "present value is a glossary term inside the excerpt (wording unchanged)");
-ok(!/Go deeper · Modeler/.test(PAGE) && (PAGE.match(/Go deeper · Analyst/g) || []).length === 3, "a Foundations lesson's deeper boxes are Analyst tier (curriculum §4.6)");
+ok(!/Go deeper · Modeler/.test(PAGE) && (PAGE.match(/Go deeper · Analyst/g) || []).length === 3, "a Foundations lesson's deeper boxes are Analyst tier (one tier up, a preview only)");
 
-// ---------------- research wording: E7.4 and E7.5, word for word (curriculum §13, guard G-SRC)
+// ---------------- research wording: E7.4 and E7.5, word for word (the sourcing rule)
 const E74 = "For a 300 MW-IT facility, a 36-month delay costs the developer on the order of $0.7 billion in present value.";
 const E75 = "Staged energization can recover a large share of that cost.";
 const CF7_FOOT = "Approved excerpt of: Li et al. (2026), accepted paper, 2026 North American Power Symposium (NAPS); DOI pending.";
 const CITE = "<li>Li et al. (2026). Accepted paper on the cost of delayed energization for large loads, 2026 North American Power Symposium (NAPS), presented October 2026; DOI pending.</li>";
-function portfolio() {
-  const c = [process.env.LEARN_PORTFOLIO, path.join(SITE, "..")];
-  try { c.push(path.resolve(SITE, cp.execSync("git rev-parse --git-common-dir", { cwd: SITE, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim(), "..", "..")); } catch (e) { /* not a git checkout */ }
-  return c.filter(Boolean).find(p => fs.existsSync(path.join(p, "reports/learn/excerpts_for_approval.md")));
-}
-const RP = portfolio();
+const RP = PRIV.path("excerpts");
 if (RP) {
-  const reg = fs.readFileSync(path.join(RP, "reports/learn/excerpts_for_approval.md"), "utf8"), rev = reg.slice(reg.indexOf("## Revisions after review"));
+  const reg = fs.readFileSync(RP, "utf8"), rev = reg.slice(reg.indexOf("## Revisions after review"));
   [["E7.4", E74], ["E7.5", E75]].forEach(([id, s]) => {
     const row = reg.split("\n").find(l => l.indexOf("| " + id + " |") === 0);
-    ok(row && row.split(" | ")[1] === s, id + " in the register is the sentence this test checks");
+    ok(row && row.split(" | ")[1] === s, id + " in the approved wording is the sentence this test checks");
     ok(rev.indexOf("| " + id + " |") < 0, id + " has no revision after review");
   });
   const r14 = reg.split("\n").find(l => l.indexOf("| E7.14 |") === 0);
   ok(r14 && "<li>" + r14.split(" | ")[1].replace(/^Citation: /, "") + "</li>" === CITE, "the citation is E7.14, word for word");
-} else console.log("note: reports/learn/excerpts_for_approval.md not found (set LEARN_PORTFOLIO); E7.4 and E7.5 checked against this test's copy");
+} else console.log("note: the approved excerpt wording is not available (set LEARN_SOURCES); E7.4 and E7.5 checked against this test's copy");
 {
   const real = (OWN.match(/<div class="lx-card lx-real">([\s\S]*?)<\/div>/) || ["", ""])[1];
   const bq = [...OWN.matchAll(/<blockquote class="lx-excerpt" data-source="([^"]+)">([\s\S]*?)<footer>([\s\S]*?)<\/footer><\/blockquote>/g)];
@@ -203,7 +198,7 @@ if (RP) {
   ok(OWN.indexOf(CITE) >= 0, "the sources list cites E7.14");
 }
 
-// ---------------- scope (guards G-DC and G-SRC)
+// ---------------- scope: data centers as loads only; approved research wording only
 const ALL = PAGE + "\n" + RAW + "\n" + JS + "\n" + SIDE;
 ok(!/nuclear|reactor|\bSMR\b|small modular|fission|uranium/i.test(ALL), "no nuclear term on the page, in the data, the script or the sidecar");
 ok(!/\bAI\b|artificial intelligence/.test(ALL), "no 'AI'");

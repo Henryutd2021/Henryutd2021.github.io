@@ -1,11 +1,11 @@
-// e2_harness.js — shared setup for the tests of engine E2 and its pages (SB2, C2), wave W4, 2026-11-05. Not a test itself
-// (learn_qa.sh runs test_*.js only).
+// e2_harness.js — shared setup for the tests of engine E2 and its pages (SB2, C2). Not a test itself (the test runner
+// runs test_*.js only).
 //   load()        the engine, its prepared data (2025 and 2024), the solver core with the vendored HiGHS, LX.ShareState's
 //                 pure part; solveSync(model, opts) and solver (a Promise-returning wrapper for E2.solve)
-//   between, writeBlocks, norm, excerpts, register, portfolio: as in e1_harness.js (re-exported)
+//   between, writeBlocks, norm, excerpts, register: as in e1_harness.js (re-exported)
 //   fullYear(E2, P, state, solveSync, year)   the plan's whole year, day by day in order (each day a MILP, then the
 //                 dispatch LP with the commitment fixed; the state of 23:00 carried), for the check of the representative
-//                 days (§9.3): { days, tot (summed), avgPrice, ... } as E2.summarize gives them; it throws unless every
+//                 days: { days, tot (summed), avgPrice, ... } as E2.summarize gives them; it throws unless every
 //                 commitment MILP and every pricing LP reports optimal
 "use strict";
 const fs = require("fs");
@@ -44,4 +44,4 @@ function fullYear(E2, P, st, solveSync, year) {
   }
   return E2.summarize(st, P, { task: "full", sys, days });
 }
-module.exports = { SITE, L, load, fullYear, between: X1.between, writeBlocks: X1.writeBlocks, norm: X1.norm, excerpts: X1.excerpts, register: X1.register, portfolio: X1.portfolio };
+module.exports = { SITE, L, load, fullYear, between: X1.between, writeBlocks: X1.writeBlocks, norm: X1.norm, excerpts: X1.excerpts, register: X1.register };

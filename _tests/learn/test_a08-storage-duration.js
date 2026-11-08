@@ -4,23 +4,23 @@
 //     shortfall for this fleet (as the data file says); the daily wind shares and shortfalls the page states
 //   - the LP for each store: optimal; balance and level rules hold; the store starts full and stays within its limits;
 //     unserved energy equals the reference block
-//   - ties (W3 brief §2.2): the tie rule changes no reported number (the least unserved energy is the same without it), and
+//   - ties: the tie rule changes no reported number (the least unserved energy is the same without it), and
 //     the schedule drawn is one of several best schedules (another tie rule gives a different schedule with the same
 //     unserved energy), as the page says
-//   - claims (§2.4): unserved energy never falls below the power floor (the MWh by which the gap tops firm output plus the
+//   - claims: unserved energy never falls below the power floor (the MWh by which the gap tops firm output plus the
 //     store's power), and for the week-long hydrogen store it equals that floor at every power on step 6's slider
 //   - costs: capital recovery, the cycle limit (the report's own 4.5-hour example), cost per MWh delivered at the page's
 //     defaults, fixed upkeep under a quarter of the capital where the report gives it
 //   - every number on the page (fallback, explain, Go deeper, myths, quiz, numbers to remember) against the model and data
-//   - the excerpt sentences against the approved register (E3, word for word, with the revisions after review)
+//   - the excerpt sentences against the approved wording (E3, word for word, with the revisions after review)
 //   - the page on a stub document with a solver that fails, then works: steps 5 and 6 show a message, clear their busy
 //     state, offer "Try again", keep what is solved and work on the retry
 // Usage (from the site folder):  node _tests/learn/test_a08-storage-duration.js [--write]
 "use strict";
 const fs = require("fs");
 const path = require("path");
+const PRIV = require("./private_sources.js");
 const vm = require("vm");
-const cp = require("child_process");
 const SITE = path.resolve(__dirname, "..", "..");
 const ID = "a08-storage-duration";
 const L = p => path.join(SITE, "assets/learn", p);
@@ -144,14 +144,14 @@ const fm = M.fm, r1 = v => Math.round(v * 10) / 10;
   onPage("\\$132 of capital, plus \\$24 of charging: \\$156 per MWh", "Go deeper: the battery's cost");
   onPage("so at most 86 cycles a year: \\$149 per MWh at best, \\$65 of it charging", "Go deeper: hydrogen's cost");
   onPage("($126, against $263 for pumped hydro and $385 for the battery).</p><p>At 250 cycles a year pumped hydro delivers the cheapest MWh, $71; hydrogen, capped at 86 cycles, $149 (DOE's 24-hour cost case).", "myth 3");
-  // the cost table names the store it costs (review 1): each row's duration is the costed duration, and the week's table
+  // the cost table names the store it costs: each row's duration is the costed duration, and the week's table
   // (1,000 MW stores, the hydrogen one 168 hours) carries no cost column
   { const cr = M.costRows(D);
     ok(cr.length === 3 && cr.every(r => { const it2 = C.items.find(i => i.id === r.key); return r.hours === it2.hours && r.note.startsWith("100 MW, " + it2.hours + " h") && r.cost.text === fm.usd(M.perMWh(it2, R.cyclesShown, R.priceShown, C.rate).total); }), "explain: the cost table's durations are the costed durations (hydrogen 24 h), with the costs the model gives");
     ok(cr.find(r => r.key === "hydrogen").hours === 24 && M.store(D, "hydrogen").hours === 168 && /The hydrogen case holds 24 hours, not a week\./.test(JS), "explain: the week's hydrogen store (168 h) and DOE's hydrogen cost case (24 h) are named apart");
     const weekTable = JS.slice(JS.indexOf('title: "Four stores, one calm week"'), JS.indexOf("var cr = costRows(D);"));
     ok(weekTable.length > 0 && !/cost|\$ per MWh/.test(weekTable.replace(/costRows/g, "")), "explain: the week's table has no cost column"); }
-  // the formula with its units (review 4): 1,000 x CRF x $/kW / (cycles x hours) reproduces the battery's $132
+  // the formula with its units: 1,000 x CRF x $/kW / (cycles x hours) reproduces the battery's $132
   ok(near(1000 * M.crf(0.04, 16) * 1540 / (250 * 4), c("battery").capital, 1e-9) && PAGE.includes("1,000 × 0.0858 × 1,540 ÷ (250 × 4) = \\$132") && PAGE.includes("= 1,000 × capital recovery × installed cost (\\$ per kW) ÷ (cycles a year × duration in hours)"), "Go deeper: the formula carries the 1,000 (kW to MW) and its units");
   onPage("(\\$28.19 and \\$23.90 per kW-year)", "fixed upkeep from the report"); onPage("at \\$5.82 per kWh", "the cavern cost");
   ok(it("psh").fom === 28.19 && it("hydrogen").fom === 23.90 && it("hydrogen").cavernPerKWh === 5.82, "the data file holds the report's upkeep and cavern costs");
@@ -178,24 +178,19 @@ const fm = M.fm, r1 = v => Math.round(v * 10) / 10;
   ok(!/refill only if wind returns/.test(JS) && JS.includes("They refill when supply tops demand, within their charging power and losses."), "causal chain: stores refill when supply tops demand");
   ok(!/earns its cost back only/.test(JS), "step 7 spreads a cost; it does not claim how a store earns");
 
-  // ---------------- the excerpt (curriculum §13): approved sentences, word for word
+  // ---------------- the excerpt (the course's sourcing rule): approved sentences, word for word
   const SNAP = {
     "E3.4": "Compared with wind and a battery alone, adding an electrolyzer reduced total system cost by about 7%, and using hydrogen as the storage medium for fuel cells reduced it by about 26%.",
     "E3.5": "Holds when: one planned West Texas wind farm, ERCOT prices, costs from 2020 to 2023. Leaves out: final federal hydrogen credit rules.",
     "E3.15": "Battery, hydrogen and hybrid storage were compared, each set to deliver the largest stabilized output in every hour at the lowest life-cycle cost."
   };
-  const reg = (() => {
-    const c = [process.env.LEARN_PORTFOLIO, path.join(SITE, "..")];
-    try { c.push(path.resolve(SITE, cp.execSync("git rev-parse --git-common-dir", { cwd: SITE, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim(), "..", "..")); } catch (e) { /* not a checkout */ }
-    const p = c.filter(Boolean).map(x => path.join(x, "reports/learn/excerpts_for_approval.md")).find(x => fs.existsSync(x));
-    return p ? fs.readFileSync(p, "utf8") : null;
-  })();
+  const reg = PRIV.read("excerpts");
   if (reg) {
     const rows = {}; let sec = null;
     reg.split("\n").forEach(line => { if (/^## /.test(line)) { const h = line.match(/^## (E\d+)\.|^## (Revisions after review)/); sec = h ? (h[1] || "REV") : null; return; }
       const m = line.match(/^\| (E3\.\d+) \| (.*) \|\s*$/); if (!m || !sec) return; const cells = m[2].split(" | "); if (sec === "REV") rows[m[1]] = cells[1]; else if (sec === "E3") rows[m[1]] = cells[0]; });
-    Object.keys(SNAP).forEach(k => ok(rows[k] === SNAP[k], `register ${k} equals the snapshot`));
-  } else console.log("note: excerpts_for_approval.md not found; checked against the snapshot");
+    Object.keys(SNAP).forEach(k => ok(rows[k] === SNAP[k], `approved wording ${k} equals the snapshot`));
+  } else console.log("note: the approved excerpt wording is not available (set LEARN_SOURCES); checked against the snapshot");
   const quoted = [...PAGE.matchAll(/<blockquote class="lx-excerpt" data-source="([^"]+)"><p>([\s\S]*?)<\/p><footer>/g)];
   ok(quoted.length === 1 && quoted[0][1] === "excerpt:wind-hydrogen" && quoted[0][2] === SNAP["E3.4"], "the excerpt is E3.4, word for word, under excerpt:wind-hydrogen");
   onPage(`<p class="lx-hint">${SNAP["E3.15"]}</p>`, "E3.15 under the excerpt"); onPage(`<p class="lx-hint">${SNAP["E3.5"]}</p>`, "E3.5 under the excerpt");

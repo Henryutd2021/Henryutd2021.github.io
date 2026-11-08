@@ -1,4 +1,4 @@
-// test_components_e.js — Node tests for the components promoted by W1 integration group E (2026-11-02):
+// test_components_e.js — Node tests for the shared components
 //   checklist.js (LX.Checklist), evidence.js (LX.EvidenceLadder), tagger.js (LX.PhraseTagger), unitchain.js
 //   (LX.UnitChain, LX.EvidenceClock), checkpoint.js (LX.Checkpoint) and sheet.js (LX.Sheet).
 //   - each file defines its LX.<Name> when run with a stub window.LX, and exports its pure part to Node
@@ -112,7 +112,7 @@ const src = f => fs.readFileSync(L(f), "utf8"), page = f => fs.readFileSync(path
 const n1 = src("n01-news-lens.js"), b2 = src("b02-python-data.js"), b3 = src("b03-read-check-formulation.js"), k7 = src("k07-spreadsheets.js"), ckf = src("ck-f-estimate.js");
 [n1, b2].forEach((s, i) => ok(!/LX\.Checklist\s*=/.test(s) && !/\.lx-checklist\{/.test(s) && /LX\.Checklist\(/.test(s), ["N1", "B2"][i] + ": calls LX.Checklist, defines no copy"));
 [b3, k7].forEach((s, i) => ok(!/b3-list/.test(s) && /LX\.Checklist\(/.test(s), ["B3", "K7"][i] + ": tick list is LX.Checklist"));
-ok(!/b3-list/.test(page("b03-read-check-formulation.qmd")) && !/b3-list|\.k7-grid|\.k7-sheet|\.k7-fx/.test(page("k07-spreadsheets.qmd")), "B3, K7 pages: the promoted CSS is gone");
+ok(!/b3-list/.test(page("b03-read-check-formulation.qmd")) && !/b3-list|\.k7-grid|\.k7-sheet|\.k7-fx/.test(page("k07-spreadsheets.qmd")), "B3, K7 pages: no lesson-local copy of the shared CSS");
 ok(/LX\.PhraseTagger\(/.test(n1) && /LX\.UnitChain\(/.test(n1) && /LX\.EvidenceClock\(/.test(n1) && /LX\.EvidenceLadder\(/.test(n1) &&
    !/function chainInto|n1-chain|n1-rungs|n1-cmp|n1-ph\b|function judge\(ph, tag\) \{\s*if/.test(n1), "N1: tagger, unit chain, clock and ladder are the shared ones");
 ok(/LX\.Sheet\(/.test(k7) && !/function tokenize|function parse\(|var FUN = /.test(k7), "K7: the sheet and engine are LX.Sheet");

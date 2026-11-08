@@ -89,7 +89,7 @@ has(`<td class="n">${Math.round(W.mae_pct_of_max[0])}% → ${Math.round(W.mae_pc
 has(`(${(W.max_wind_mw / 1000).toFixed(1)} GW)`);
 has(`\\frac{${C.under}}{${C.under} + ${C.over}} \\approx ${crit.toFixed(2)}`);
 ok(sp(BEST.r) === "+6.0%", "the cheapest slider setting on the page is +6.0%"); has("the cheapest available slider setting is " + sp(BEST.r));
-// review 2026-11-02 #10: the exact rule on the errors' own 0.1-point grid gives +5.9%; +6.0% is the slider's cheapest 0.5-point step
+// the exact rule on the errors' own 0.1-point grid gives +5.9%; +6.0% is the slider's cheapest 0.5-point step
 const FINE = M.bestMargin(fc, errs, M.marginGrid(0, 0.10, 0.001));
 ok(sp(FINE.r) === "+5.9%", "exact cheapest cushion (0.1-point grid) is +5.9%: " + sp(FINE.r));
 ok(M.marginCost(fc, 0.059, errs).total < M.marginCost(fc, 0.058, errs).total && M.marginCost(fc, 0.059, errs).total < M.marginCost(fc, 0.060, errs).total, "+5.9% is cheaper than its neighbours +5.8% and +6.0%");
@@ -104,7 +104,7 @@ ok(((1 + 1 + 3) / 3).toFixed(2) === "1.67", "quiz: MAE of 1, 1, 3 = 1.67"); has(
 ok(Math.round(100 * crit) === 97, "quiz: 300/(300+10) = 97%"); has("300 ÷ (300 + 10) ≈ 0.97");
 ok(T.label.long === "10 February 2025" && X.label.long === "4 February 2025", "page dates match the data");
 
-// ---------------- review fixes, 2026-11-02
+// ---------------- wording checks: the Analyst and Modeler boxes, forward pointers, claims
 const code = JS.replace(/\/\/.*$/gm, "");
 ok(!/59\.3/.test(code) && !/59\.3/.test(QMD), "#1: no unsupported 59.3 Hz threshold on the page or in the script");
 ok(/cannot restore balance/.test(code), "#1: the last-resort link says customers are cut only if response cannot restore balance");
@@ -123,7 +123,7 @@ ok((code.match(/Signed error, % of forecast/g) || []).length === 2, "#5: the too
 ok(/percentage of the forecast/.test(stepSrc[4]) && /in percent of actual/.test(stepSrc[3]), "#5: the band step names its denominator (forecast), MAPE names its own (actual)");
 has("MAPE divides each miss by the actual value", "#5: the Analyst box contrasts the two denominators");
 ok(!/newsvendor|pinball|P\(e \\le/i.test(QMD), "#7: the Modeler box is a preview without the newsvendor formulation or pinball loss");
-has("Lesson [M10](m10-ml-forecasting.qmd) builds forecasts", "#7: forward pointer to M10 (live since W4: a link)");
+has("Lesson [M10](m10-ml-forecasting.qmd) builds forecasts", "#7: forward pointer to M10 (live: a link)");
 ok(!/Wind is harder/.test(code) && /later lessons compare forecasting methods/.test(code), "#8: no unsupported 'wind is harder' claim");
 ok(/cause is unverified/.test(fc.meta.method) && !/rather than a measure of forecast skill/.test(fc.meta.method), "#9: the data file calls the May-December gap unverified");
 has("the cause is unverified", "#9: the data note calls the May-December gap unverified"); has("an editorial choice, pending validation");
@@ -141,7 +141,7 @@ DENY.forEach(rx => { ok(!rx.test(visible), "page: no " + rx); ok(!rx.test(JS.rep
   const u = h.slice(6, -1);
   ok(/^(https:\/\/(www\.)?(eia\.gov|otexts\.com|doi\.org|creativecommons\.org\/licenses|opensource\.org\/license)\/|#|\.\.\/assets\/|index\.html|0\d-[a-z-]+\.html|k0\d-[a-z-]+\.html|cf8-power-curves-from-scarce-data\.html|mailto:)/.test(u), "page: allowed link " + u);
 });
-// the approved research excerpt (E1, Henry 2026-11-03): word for word in the Real-world box, with its DOI, in no other lesson part
+// the approved research excerpt (E1): word for word in the Real-world box, with its DOI, in no other lesson part
 const E1 = "From the course author's research: a wind turbine's real power curve is a band, not a line. Adding the turbine's theoretical curve to about two hundred measurements can narrow that band, but whether it helps depends on how the fit is scored.";
 const ex = visible.match(/<blockquote class="lx-excerpt" data-source="excerpt:uq-mfgpr"><p>([\s\S]*?)<\/p><\/blockquote>/);
 ok(ex && ex[1].startsWith(E1) && /href="https:\/\/doi\.org\/10\.1115\/detc2023-114762"/.test(ex[1]), "page: the approved excerpt E1, word for word, with its DOI");

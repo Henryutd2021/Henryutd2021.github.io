@@ -1,5 +1,5 @@
 // test_e3-full-year.js — Node tests for engine E3's full-year check (assets/learn/components/engine-e3.js: fullYear,
-// fixedSys, fullView and the words; data/e3-full-year.json), 2026-11-07. What it checks:
+// fixedSys, fullView and the words; data/e3-full-year.json). What it checks:
 //   - the year: prairie-city.json's fullYear rule rebuilt here from town_year.json and cf_targets.json (_tests/learn/
 //     e3_harness.js yearCity) gives the builder's constants and sums: 365 days of 24 hours; the design and heat-wave days
 //     (the 3 days of December to February and the 10 of July and August with SPP's highest 2025 hourly demand, the named

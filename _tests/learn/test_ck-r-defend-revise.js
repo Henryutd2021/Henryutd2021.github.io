@@ -11,8 +11,8 @@
 //     the data's rule; the parts add up to 240 minutes
 //   - the page on a stub document with the real runner: gateAll (eleven answers leave it shut, the twelfth opens it), the
 //     lock's early opening makes the attempt practice, every task right in order gives Strong; task 1 first (the seven
-//     marked tasks shut until it is submitted, then open; task 1 read-only once submitted; Codex review #1)
-//   - after the Codex review (2026-11-07): the validation's rule worked from the intervals; the measurement check named as
+//     marked tasks shut until it is submitted, then open; task 1 read-only once submitted)
+//   - wording and checks: the validation's rule worked from the intervals; the measurement check named as
 //     such; the rerun's dependency stated; no written point demands a count of defects; prompts within the text budget;
 //     the copied summary keeps every text whole
 //   - scope: no nuclear term, no data-center term, no "AI", no deny-listed term; links to learn pages and doi.org only
@@ -21,6 +21,7 @@
 const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
+const PRIV = require("./private_sources.js");
 const ID = "ck-r-defend-revise";
 const SITE = path.resolve(__dirname, "..", "..");
 const L = p => path.join(SITE, "assets/learn", p);
@@ -65,10 +66,10 @@ ok(N.lo < N.revised && N.revised < N.hi && N.holdLo < N.holdout && N.holdout < N
   ok(/not proof the effects are equal/.test(notes) && /share farms/.test(notes) && /no interval for their gap/.test(notes), "the note: compatible is not equal; the estimates share farms");
   ok(/the 29 farms that joined in 2025, against the 42 that never joined/.test(good) && !/they agree/.test(good), "the 2025 check names its comparison group, and claims no agreement");
   ok(!/\bvalidated\b/.test(ALLTXT), "nothing claims the analysis was 'validated' by one consistent number"); }
-// the meter check is a measurement check on a matching boundary (Codex review #7)
+// the meter check is a measurement check on a matching boundary
 { const prof = D.worked.revision.answers[0], t = EXS.plain(prof), notes = EXS.marks(prof).map(m => m.note).join(" ");
   ok(/feeders that serve only pumps, same hours, after line losses/.test(t) && /of the measurements, not of the tariff's effect/.test(notes) && !/substation meter/.test(ALLTXT), "the meter check: pump-only feeders, line losses, and labelled a measurement check"); }
-// the results are assumed outputs, said where they are shown (Codex review #6)
+// the results are assumed outputs, said where they are shown
 ok(/assumed example outputs, not computed from data/.test(D.study.label) && /assumed example outputs/.test(D.worked.revision.note) && /assumed example outputs/.test(D.meta.note), "the study's results are labelled assumed example outputs");
 ok(N.lo > N.keep, "the whole interval is above the board's 1.5 kW: 'above 1.5 kW across the interval' holds");
 ok(N.first > N.revised, "the fairer comparison lowered the estimate (6.2 to 4.6), as the response says");
@@ -119,10 +120,10 @@ ok(task("rank").answer === "b" && task("competence").answer === "a" && task("res
   ok(/what answer would change a decision/.test(comp("framing").strong) && /limits of the chosen method stated and partly mitigated/.test(comp("method").strong) && /independent reproduction by someone else; validation on data not used to build the analysis/.test(comp("trust").strong), "the three Strong anchors the worked revision shows");
   const good = EXS.plain(D.worked.revision.answers[1]);
   ok(/would keep the tariff/.test(good) && /Limit: the later joiners' demand might still have moved differently\. Mitigated/.test(good) && /co-op engineer reran the clean clone/.test(good) && /not used to build the analysis/.test(good), "the Strong revision shows each of the three moves"); }
-// difference-in-differences without overstating selection (Codex review #5): levels may differ; the trend is what needs evidence
+// difference-in-differences without overstating selection: levels may differ; the trend is what needs evidence
 { const sol = task("rank").solution + " " + task("respond").solution;
   ok(/Different starting levels alone do no harm/.test(sol) && /matters more than equal starting levels/.test(sol) && /one possible comparison/.test(sol) && !/fairer comparison/.test(ALLTXT) && !/may differ before the tariff/.test(ALLTXT), "selection: different levels are fine; parallel trends needs evidence; later joiners are one possible comparison"); }
-// the rerun's order: the dependency that fixes it is stated (Codex review #4)
+// the rerun's order: the dependency that fixes it is stated
 // the cleaning rule decides, set before any result; matching the old number does not
 ok(D.worked.rerun.some(r => r[0] === "Cause" && /set that rule before any result/.test(r[1])) && D.worked.rerun.some(r => r[0] === "Fix" && /not agreement with the old number, decides/.test(r[1])) &&
   /a rule the data note set before any result/.test(task("report").solution), "the rerun's fix: an exclusion rule set before any result, not the old number, decides");
@@ -134,11 +135,11 @@ ok(/one or two sentences/.test(task("review").prompt) && /one or two sentences/.
 // every written text stays as submitted: a later edit, after the worked solution opened, cannot keep the first one's time
 ok(written.every(t => t.freeze === true), "all five written tasks are frozen once submitted");
 ok(/Each step needs the one before it/.test(task("steps").prompt) && /which runs in that environment/.test(task("steps").items.find(x => x[0] === "data")[1]) && /environment comes first/.test(task("steps").solution), "the order task states why the environment comes before the data");
-// no written point asks for manufactured defects (Codex review #9); the qualitative route and a result near zero (#8)
+// no written point asks for manufactured defects; the qualitative route and a result near zero
 ok(!written.some(t => t.points.some(p => /^At least (one|two)\b/.test(p))) && !D.criteria.some(c => c.levels.some(l => /^At least (one|two)\b|at least one change to the analysis/.test(l))), "no point or criterion demands a count of concerns, changes or moved levels");
 { const r = task("mine-rerun").points.join(" "); ok(/audit trail/.test(r) && /what would count as the same finding/.test(r) && /in the result's units when that value is zero or near it/.test(r) && /coding decisions documented/.test(r), "the rerun's points: a qualitative route, and an absolute difference near zero"); }
 ok(/tick it if you declined none/.test(task("mine-response").points[3]) && /if none could/.test(task("mine-revision").points[3]) && /if the reviewer found none/.test(task("mine-review").points[1]), "points that may not apply say how to tick them");
-// the text budget (Codex review #11): prompts at most 35 words; the number task's prompt and tolerance note at most 40
+// the text budget: prompts at most 35 words; the number task's prompt and tolerance note at most 40
 { const nw = t => t.replace(/\[\[[a-z0-9-]+\|([^\]]+)\]\]/g, "$1").split(/\s+/).filter(Boolean).length;
   ok(T.every(t => nw(t.prompt) <= 35), "every prompt is at most 35 words: " + T.filter(t => nw(t.prompt) > 35).map(t => t.id + " " + nw(t.prompt)).join(", "));
   ok(nw(task("gap").prompt + " " + task("gap").tolNote) <= 40, "the number task's prompt and tolerance note: " + nw(task("gap").prompt + " " + task("gap").tolNote) + " words");
@@ -176,7 +177,7 @@ ok(D.worked.revision.answers.map(a => a.level).join() === "Proficient,Strong" &&
   ok(/your review of the co-op proposal 4 of 4; your mock review 4 of 4; your response 4 of 4; your revision 4 of 4; your rerun 4 of 4\./.test(M.describe(D, M.level(D, st(7, 4)))), "the results sentence names each written task's points");
   ok(/yes \(the worked solution\)/.test(M.summary(Object.assign({ solOpen: "2026-11-07T10:00:00.000Z" }, D), late, {})), "the copied summary marks late answers");
   ok(/^Learn · CK-R results \(ck-r v1 \(7 Nov 2026\)\)\n/.test(M.summary(D, st(7, 4), { width: 375 })) && /\nYour text, your mock review:\n  text\n/.test(M.summary(D, st(7, 4), {})), "the copied summary's first line, and the reader's texts in it");
-  // every written text whole, its lines kept (Codex review #12)
+  // every written text whole, its lines kept
   const long = st(7, 4), body = ["Major 1 · Method fit: " + "word ".repeat(400).trim(), "", "Major 2 · Framing: whose peak?"].join("\n"); long.tasks["mine-review"].answer = body;
   const sm = M.summary(D, long, {});
   ok(sm.includes("  Major 1 · Method fit: " + "word ".repeat(400).trim() + "\n  \n  Major 2 · Framing: whose peak?") && body.length > 1500, "the copied summary keeps a " + body.length + "-character review whole, line by line");
@@ -202,7 +203,7 @@ has("The co-op, its farms and every number here are fictional: the results are a
 has("Task 1 first: the seven marked tasks open once your review is submitted. Each written task stays as you submit it.", "task 1 first, and written tasks kept as submitted, said before the tasks");
 has("submit it as task 1; the seven marked tasks (2–5, 9–11) open after it.", "part A names every task that waits for task 1");
 ok(T.map((t, i) => t.opensAfter ? i + 1 : 0).filter(Boolean).join() === "2,3,4,5,9,10,11", "the tasks that wait are 2 to 5 and 9 to 11");
-has("The level is not the table's: it comes from this rule.", "the level against the criterion table, said before the tasks (Codex review #3)");
+has("The level is not the table's: it comes from this rule.", "the level against the criterion table, said before the tasks");
 has("Not the table's Strong: this level needs no second person.", "the level against the criterion table, in the rubric section");
 ok(D.intro.some(x => /^Task 1 first: the seven marked tasks open once your review/.test(x)), "the runner's intro says task 1 comes first");
 // task 1 first through the shared runner's per-task options: the seven marked tasks wait for task 1, which is frozen once
@@ -219,7 +220,7 @@ ok(D.intro.some(x => /^Task 1 first: the seven marked tasks open once your revie
   const items = st.split("<li><p>").slice(1);
   ok(items.length === 12 && T.every((t, i) => !t.opensAfter || (items[i].indexOf(t.title) > items[i].indexOf('<details class="ckr-later">') && items[i].indexOf(t.skill) > items[i].indexOf('<details class="ckr-later">') && /^<b>Opens after task 1<\/b>/.test(items[i]))),
     "without JavaScript, each marked task shows 'Opens after task 1'; its title and skill are inside the fold"); }
-ok(/data-term="difference-in-differences"/.test(M.staticStudy(D)) && /data-term="time-of-use-tariff"/.test(M.staticStudy(D)) && ["clean-clone", "lock-file", "checksum", "confidence-interval"].every(k => PAGE.includes('data-term="' + k + '"')), "terms at first use: the study card's, and the tasks' words (Codex review #10)");
+ok(/data-term="difference-in-differences"/.test(M.staticStudy(D)) && /data-term="time-of-use-tariff"/.test(M.staticStudy(D)) && ["clean-clone", "lock-file", "checksum", "confidence-interval"].every(k => PAGE.includes('data-term="' + k + '"')), "terms at first use: the study card's, and the tasks' words");
 ok(/<b>Reproducibility:<\/b>/.test(PAGE) && /<b>Replicability:<\/b>/.test(PAGE), "the National Academies' two definitions in rows of their own");
 ok(OWN.includes('href="cr-your-own-study.html"'), "the page links the research capstone it defends");
 // the text budget beyond the prompts: every hint, data note and list item of the page's own text (the sources' citations
@@ -233,10 +234,10 @@ ok(OWN.includes('href="cr-your-own-study.html"'), "the page links the research c
 {
   const ids = D.rubric.map(x => x.id);
   ok(ids.join() === "framing,method,trust" && D.rubric.every(x => !x.levels && x.look), "rubric: framing, method fit and trustworthy analysis, with look lines and no reworded levels");
-  const cur = path.join(SITE, "..", "reports/learn/curriculum_v2.md"), CUR = process.env.LEARN_CURRICULUM || (fs.existsSync(cur) ? cur : null);
+  const CUR = PRIV.path("curriculum");
   if (CUR && fs.existsSync(CUR)) {
     const c = fs.readFileSync(CUR, "utf8");
-    ok(ids.every(id => { const x = RB.COMPETENCES.find(y => y.id === id); return ["developing", "proficient", "strong"].every(l => c.includes(x[l])); }), "rubric words are curriculum §3.4's, word for word");
+    ok(ids.every(id => { const x = RB.COMPETENCES.find(y => y.id === id); return ["developing", "proficient", "strong"].every(l => c.includes(x[l])); }), "rubric words are the course rubric's, word for word");
     ok(/\| CK-R \| Researcher \| Defend your CR question and method in a written mock review; answer the critique; revise; reproduce your main result from a clean clone and report any difference\. \| An annotated example of a review, a response and a revision, with what moved the study from Proficient to Strong\. \| 240 min \| R8, R9 \|/.test(c), "the curriculum's CK-R row is the one built here (task, solution, 240 min, R8 and R9)");
   }
 }
@@ -326,7 +327,7 @@ async function earlySequence() {
   ok(lv === "Level: Practice (no level)", "runner: opened early: practice: " + lv);
 }
 
-// task 1 first (Codex review #1): before task 1 is submitted, every marked task shows a notice and no answers; tasks 6, 7, 8
+// task 1 first: before task 1 is submitted, every marked task shows a notice and no answers; tasks 6, 7, 8
 // and 12 are open; once task 1 is submitted its text is read-only, and the marked tasks open
 async function firstSequence() {
   const P = mountFresh(), q = () => P.live.querySelector(".lx-ck-q").textContent;
@@ -371,7 +372,7 @@ function finish() {
   ok([...OWN.matchAll(/href="([0-9a-z-]+)\.html"/g)].every(m => all.some(l => l.id === m[1] && l.ready)), "every learn link reaches a live page");
   ok(!/data-source="excerpt:/.test(PAGE), "no excerpt of the course author's research");
   const PY = fs.readFileSync(path.join(SITE, "learn/path.yml"), "utf8"), entry = PY.split(/\n- kind: /).find(x => new RegExp("\\n  id: " + ID + "\\n").test(x)) || "";
-  ok(/\n  status: active\n/.test(entry) && /\n  minutes: 240\n/.test(entry) && /\n  form: checkpoint\n/.test(entry) && /\n  after: \[R8, R9\]/.test(entry) && /\n  tier: researcher\n/.test(entry), "path.yml: an active Researcher checkpoint, 240 minutes, after R8 and R9 (curriculum §3.3)");
+  ok(/\n  status: active\n/.test(entry) && /\n  minutes: 240\n/.test(entry) && /\n  form: checkpoint\n/.test(entry) && /\n  after: \[R8, R9\]/.test(entry) && /\n  tier: researcher\n/.test(entry), "path.yml: an active Researcher checkpoint, 240 minutes, after R8 and R9 (the tier checkpoint)");
   const fm = k => ((PAGE.match(new RegExp("^" + k + ': "(.*)"$', "m")) || [])[1]), py = k => ((entry.match(new RegExp("\\n  " + k + ': "(.*)"')) || [])[1]);
   ok(fm("title") === py("title") && fm("subtitle") === py("subtitle"), "the page's title and subtitle equal path.yml's");
   const GJ = JSON.parse(fs.readFileSync(L("data/glossary.json"), "utf8")), marks = [...(JS + RAW).matchAll(/\[\[([a-z0-9-]+)\|/g)].map(m => m[1]).concat([...PAGE.matchAll(/data-term="([a-z0-9-]+)"/g)].map(m => m[1]));

@@ -3,16 +3,16 @@
 //   - the hours: every track's stages sum to the curriculum's 20 to 40 hours (typical 30, path.yml's practice_minutes);
 //     the mock-review stage equals CK-R's minutes; the weeks at every pace are contiguous and end on the stated total
 //   - the stages cover the brief's eight (question, literature, method, data, build and validate, uncertainty, communicate,
-//     integrity) plus CK-R, each with live studios; the routes are curriculum §7.10's; the prerequisites path.yml's
+//     integrity) plus CK-R, each with live studios; the routes are the course plan's; the prerequisites path.yml's
 //   - method neutrality: R3's nine families (ids and labels read from R3's data file), three tracks with the same rubric,
 //     exemplar studies across the tracks; the plan's checks (alternatives from another family, a family that fits the
 //     track, an uncertainty treatment at Proficient, the card's scale) on every input that changes them
 //   - the plan link: a valid LX.ShareState schema, round trips, no free text; the proposal (LX.ReportNote): its table from
 //     the card and the plan, its checks, one page
 //   - the self-check: one well-formed pair of fragments per rubric competence; the whole rubric in the curriculum's words;
-//     the two statuses as curriculum §3.1 states them; the fragments' arithmetic
+//     the two statuses as the course plan states them; the fragments' arithmetic
 //   - the page on a stub document: the plan, the link, the stage ticks, the card from R10, the proposal, the switcher
-//   - after the Codex review (2026-11-07): the cost and CO₂ fragment's arithmetic; the scale pending until the card has
+//   - wording and checks: the cost and CO₂ fragment's arithmetic; the scale pending until the card has
 //     one, and checked in the proposal; a treatment that fits the family; a same-family alternative named as such;
 //     reproduction against replication; glossary marks; one short action per stage, its checks folded
 //   - scope: no nuclear term, no data-center term, no "AI", no deny-listed term; links to learn pages and doi.org only
@@ -21,6 +21,7 @@
 const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
+const PRIV = require("./private_sources.js");
 const ID = "cr-your-own-study";
 const SITE = path.resolve(__dirname, "..", "..");
 const L = p => path.join(SITE, "assets/learn", p);
@@ -92,33 +93,33 @@ has("About 20 to 40 hours of your own work, CK-R's four among them", "the brief'
 }
 {
   const want = { S0: ["M4", "C0"], S1: ["M5", "C1"], S2: ["M2", "C2"], S3: ["M12", "C3"], S4: ["M13", "C4"] };
-  ok(Object.keys(want).every(s => D.routes[s].lab === want[s][0] && D.routes[s].cap === want[s][1]), "the five routes are curriculum §7.10's");
+  ok(Object.keys(want).every(s => D.routes[s].lab === want[s][0] && D.routes[s].cap === want[s][1]), "the five routes are the course plan's");
   ok(Object.values(D.routes).every(r => byCode(r.lab) && byCode(r.cap)), "each route's lessons exist in path.yml");
   ok(!/href="[^"]*"/.test(M.staticRoutes(D)), "the static route table links nothing (its lessons go live at different times; the plan links them live)");
 }
-ok(/\n  after: \[R10, R2, R5, R6, R7, R8, R9, CK-M\]\n/.test(entry) && D.prereqs.join() === "R10,R2,R5,R6,R7,R8,R9,CK-M", "prerequisites: curriculum §7.9's, in path.yml and in the plan");
+ok(/\n  after: \[R10, R2, R5, R6, R7, R8, R9, CK-M\]\n/.test(entry) && D.prereqs.join() === "R10,R2,R5,R6,R7,R8,R9,CK-M", "prerequisites: the course plan's, in path.yml and in the plan");
 ok(/\n  next: CK-R\n/.test(entry) && /\n  form: capstone\n/.test(entry) && !/\n  sandbox:/.test(entry) && /\n  status: active\n/.test(entry) && /\n  tier: researcher\n/.test(entry), "path.yml: an active Researcher capstone without a sandbox, followed by CK-R");
-{ const cur = path.join(SITE, "..", "reports/learn/curriculum_v2.md");
-  if (fs.existsSync(cur)) { const c = fs.readFileSync(cur, "utf8");
+{ const cur = PRIV.path("curriculum");
+  if (cur) { const c = fs.readFileSync(cur, "utf8");
     ok(c.includes("| CR | Your own study: from a question to a report | ALL | Researcher | R10, R2, R5, R6, R7, R8, R9, CK-M; plus one route of track:S0, track:S1, track:S2, track:S3, track:S4 | 20–40 h |"), "the curriculum's CR row is the one built here");
-    ok(["| S0 Device and plant | M4; C0 |", "| S1 Microgrid and community | M5; C1 |", "| S2 Regional bulk grid | M2; C2 |", "| S3 City and region | M12; C3 |", "| S4 Nation | M13; C4 |"].every(r => c.includes(r)), "the routes' table in curriculum §7.10"); } }
+    ok(["| S0 Device and plant | M4; C0 |", "| S1 Microgrid and community | M5; C1 |", "| S2 Regional bulk grid | M2; C2 |", "| S3 City and region | M12; C3 |", "| S4 Nation | M13; C4 |"].every(r => c.includes(r)), "the routes' table in the course plan"); } }
 
 // ---------------- method neutrality
 ok(D.families.length === 9 && D.families.slice().sort().join() === R3.families.map(f => f.id).sort().join() && D.families.every(id => F[id] === R3.families.find(f => f.id === id).label), "R3's nine families, ids and labels read from R3's data file");
-ok(D.tracks.map(t => t.id).join() === "model,empirical,mixed", "three tracks: model-based, empirical, mixed (curriculum §11.2)");
+ok(D.tracks.map(t => t.id).join() === "model,empirical,mixed", "three tracks: model-based, empirical, mixed (method-neutral)");
 ok(new Set(D.tracks.flatMap(t => t.fits)).size >= 8, "the tracks' families together cover at least eight of the nine");
 { const st = Object.values(D.studies).join(" "); ok(/model-based/.test(st) && /empirical/.test(st) && /mixed/.test(st), "the exemplar studies span the three tracks");
   const opt = D.exemplars.filter(e => /linear program|optimization/i.test(EXS.plain(e.answers[1]))).length; ok(opt <= 2, "optimization is one family among several in the fragments (" + opt + " of 9 strong fragments name it)"); }
 has("Every track is judged on the same nine competences.", "the same rubric for every track");
-// reproduction against replication (Codex review #10; National Academies 2019)
+// reproduction against replication (National Academies 2019)
 { const e = M.track(D, "empirical");
   ok(/a reproduction or replication of a published result/.test(e.short) && /rerun with its own data and code \(a computational reproduction\), or tested on new data \(a replication\)/.test(e.builds) && !/data analysis, or replication of a published result"/.test(RAW), "the empirical track tells reproduction (same data and code) from replication (new data)");
   ok(/<b>Reproducibility:<\/b>/.test(PAGE) && /<b>Replicability:<\/b>/.test(PAGE), "the sources give both definitions"); }
-// glossary marks at first use, rendered (Codex review #8)
+// glossary marks at first use, rendered
 { const st = M.staticStages(D, P) + M.staticTracks(D, P) + M.staticExemplars(D);
   ["snowballing", "concept-matrix", "clean-clone", "feeder", "weatherization", "linear-program"].forEach(k => ok(st.includes('data-term="' + k + '"'), "a glossary mark for " + k + " in the page's static text"));
   ok(!/\[\[/.test(st), "no raw glossary mark in the static blocks"); }
-// one short action per stage; its evidence as a checklist of short items (Codex review #9)
+// one short action per stage; its evidence as a checklist of short items
 { const nw = t => t.replace(/\[\[[a-z0-9-]+\|([^\]]+)\]\]/g, "$1").split(/\s+/).filter(Boolean).length;
   ok(D.stages.every(s => nw(s.does) <= 20 && Array.isArray(s.done) && s.done.length >= 2 && s.done.every(x => nw(x) <= 14)), "every stage: an action of at most 20 words, two or more checks of at most 14: " + D.stages.filter(s => nw(s.does) > 20 || !s.done.every(x => nw(x) <= 14)).map(s => s.id).join(", "));
   ok(M.doneList(D.stages[0]) === '<ul class="cr-done-l"><li>Your card passes its eight checks.</li><li>You can say what answer would change your audience\'s decision.</li></ul>', "the checklist's markup");
@@ -138,17 +139,17 @@ has("Every track is judged on the same nine competences.", "the same rubric for 
   ok(SS.decode(S, "#cr-v1-t9-s1-f0-a34-u0-h6-r1-d0").status === "bad" && SS.decode(S, "#cr-v2-t0").status === "newer", "a damaged or newer link is refused");
   const C = (s, card) => M.planChecks(D, Object.assign({}, d, s), F, card || null);
   ok(C({}, "S1").every(c => c.ok), "the default plan, with a card at S1, passes its four checks");
-  ok(!C({})[3].ok && /has no scale yet: set it in the card below/.test(C({})[3].why), "a card without a scale: the scale check is to do, not in place (Codex review #5)");
+  ok(!C({})[3].ok && /has no scale yet: set it in the card below/.test(C({})[3].why), "a card without a scale: the scale check is to do, not in place");
   ok(!C({ alts: ["opt"] })[0].ok && /you have 1/.test(C({ alts: ["opt"] })[0].why), "one alternative: to do");
   ok(!C({ family: "sim", alts: ["sim"] })[0].ok && !C({ family: "sim", alts: ["sim", "opt"] }).some(c => c.id === "alts" && !c.ok), "one alternative is too few; two with one from another family are enough");
   ok(C({ family: "opt", alts: ["opt", "sim"] })[0].ok && !C({ family: "opt", alts: [] })[0].ok, "two alternatives, one from the same family and one from another: in place");
-  ok(M.altName(F, { family: "opt" }, "opt") === "Optimization (another method of the same family, named in the proposal)" && M.altName(F, { family: "opt" }, "sim") === "Simulation", "a same-family alternative is another method of that family, named in the proposal (Codex review #4)");
+  ok(M.altName(F, { family: "opt" }, "opt") === "Optimization (another method of the same family, named in the proposal)" && M.altName(F, { family: "opt" }, "sim") === "Simulation", "a same-family alternative is another method of that family, named in the proposal");
   ok(M.noteOf(D, Object.assign({}, d, { alts: ["opt", "sim"] }), {}, F, "").plan.find(r => r.label === "Method").value === "Optimization; alternatives: Optimization (another method of the same family, named in the proposal), Simulation", "the proposal says so too");
   ok(/name a same-family one exactly/.test(D.fields.find(f => f.key === "method").hint), "the proposal's method field asks for that method by name");
   ok(!C({ track: "empirical", family: "opt" })[1].ok && /unusual for an empirical study/.test(C({ track: "empirical", family: "opt" })[1].why), "optimization on the empirical track: to do, said why");
   ok(C({ track: "mixed", family: "qual", alts: ["stat", "abm"] })[1].ok, "qualitative methods fit the mixed track");
   ok(!C({ unc: "oat" })[2].ok && /Proficient level asks for scenarios or a global sensitivity analysis/.test(C({ unc: "oat" })[2].why), "one input at a time is below Proficient");
-  // a treatment counts only where it fits the method family (Codex review #6): every treatment against every family
+  // a treatment counts only where it fits the method family: every treatment against every family
   { const bad = []; D.uncertainty.filter(u => u.id !== "oat").forEach(u => D.families.forEach(f => { if (C({ unc: u.id, family: f })[2].ok !== u.fits.includes(f)) bad.push(u.id + "/" + f); }));
     ok(!bad.length && D.uncertainty.filter(u => u.ok).every(u => u.fits.length && u.fits.every(f => D.families.includes(f))), "each treatment fits its listed families and no others: " + bad.join(", ")); }
   ok(!C({ unc: "tri", family: "opt" })[2].ok && /Triangulation suits Qualitative methods and Mixed methods, not Optimization/.test(C({ unc: "tri", family: "opt" })[2].why), "triangulation on an optimization study: to do, said why");
@@ -167,7 +168,7 @@ has("Every track is judged on the same nine competences.", "the same rubric for 
   ok(c1.all && c1.total === 12, "a full proposal passes all twelve checks (" + c1.pass + " of " + c1.total + ")");
   ok(c0.pass === 3 && c0.items.filter(i => !i.ok).map(i => i.id).join() === "field-why,field-known,field-method,field-data,field-check,field-leaves,field-integrity,card,scale", "an empty proposal: the link, the alternatives and one page in place; the seven fields, the card and its scale to do");
   { const cm = RN.checks(M.noteOf(D, d, card, F, link), words, D.fields, M.proposalChecks());
-    ok(cm.pass === 11 && cm.items.filter(i => !i.ok).map(i => i.id).join() === "scale", "a full card at S3 in a plan at S1: the proposal's scale check fails, alone (Codex review #5)"); }
+    ok(cm.pass === 11 && cm.items.filter(i => !i.ok).map(i => i.id).join() === "scale", "a full card at S3 in a plan at S1: the proposal's scale check fails, alone"); }
   const t1 = RN.compose(n, words, D.fields, { format: "text", code: "CR", date: "2026-11-07" });
   ok(RN.countWords(t1) <= RN.PAGE_WORDS, "a proposal with every part written at its minimum fits one page (" + RN.countWords(t1) + " words)");
   ok(t1.includes("Question: " + card.question) && t1.includes("Scale route: S3 city and region: model lab M12, capstone C3") && t1.includes("Milestones: the one-page proposal by week 2; CK-R by week 4; the paper and the poster by week 5; the rubric sheet by week 5"), "the proposal's table: the card, the route and the milestones from the timeline");
@@ -192,28 +193,28 @@ ok(/note: "The link holds your choices only, not your words\."/.test(JS), "the p
 ok(M.msKey(D) === "Underlined: a stage that ends on a milestone (3, the one-page proposal; 7, CK-R; 8, the paper and the poster; 9, the rubric sheet).", "the strip's key names the milestones");
   const trust = EXS.plain(D.exemplars.find(e => e.comp === "trust").answers[1]);
   ok(trust.includes("2.81 MW, against the model's 2.76 MW: 1.8% low") && ((2.81 - 2.76) / 2.81 * 100).toFixed(1) === "1.8" && (2.81 - 2.76) / 2.81 < 0.05, "the log's validation: (2.81 − 2.76) ÷ 2.81 = 1.8%, inside 5%");
-  // the cost and CO₂ fragment (Codex review #1, #2): the saving is the bill's fall less the battery's annualized cost; the
+  // the cost and CO₂ fragment: the saving is the bill's fall less the battery's annualized cost; the
   // CO₂ from the energy bought and its hourly factors, the battery's losses included
   { const acc = EXS.plain(D.exemplars.find(e => e.comp === "accounting").answers[1]), accN = EXS.marks(D.exemplars.find(e => e.comp === "accounting").answers[1]).map(m => m.note).join(" ");
     const bill = 250000, ann = 160000, out = 1800, inn = 2000, fe = 0.50, fn = 0.39;
     ok(acc.includes("the co-op's power bill falls $250,000 a year; less the battery's annualized cost, $160,000, its yearly cost falls $90,000") && bill - ann === 90000 && !/power bill less the battery/.test(acc), "cost: $250,000 − $160,000 = $90,000, the bill's fall less the battery's yearly cost");
     ok(acc.includes("1,800 × 0.50 − 2,000 × 0.39 = 900 − 780 = 120 t") && Math.round(out * fe) === 900 && Math.round(inn * fn) === 780 && Math.round(out * fe - inn * fn) === 120 && out / inn === 0.9 && /10% losses/.test(accN) && /200 MWh lost would add CO₂ instead/.test(accN) && inn - out === 200, "CO₂: 1,800 × 0.50 − 2,000 × 0.39 = 120 t, with 10% (200 MWh) lost");
     ok(/120 t a year less, location-based with the grid's hourly average factors/.test(acc), "the CO₂ says which factors make it a saving"); }
-  // the other numbers are assumed for the example, and said so (Codex review #3)
+  // the other numbers are assumed for the example, and said so
   ok(/its numbers are assumed, not computed/.test(M.exOpts(D, 4).note) && TX.includes("Every number in the weak and strong fragments: assumed for the example, not computed."), "the fragments' numbers are labelled assumed, not computed");
-  ok(/we treat a heat wave hotter than any on record as a stress scenario, because we cannot defend a probability for it/.test(EXS.plain(D.exemplars.find(e => e.comp === "uncertainty").answers[1])), "deep uncertainty from the evidence, not the record alone (Codex review #7)");
+  ok(/we treat a heat wave hotter than any on record as a stress scenario, because we cannot defend a probability for it/.test(EXS.plain(D.exemplars.find(e => e.comp === "uncertainty").answers[1])), "deep uncertainty from the evidence, not the record alone");
   const pos = EXS.plain(D.exemplars.find(e => e.comp === "positioning").answers[1]);
   ok(/14 studies/.test(pos) && 14 >= 12 && /9 use billing data and 3 compare/.test(pos), "the gap's matrix holds 14 sources, more than the 12 Proficient asks for");
   const weakPos = EXS.marks(D.exemplars.find(e => e.comp === "positioning").answers[0])[0].note;
-  ok(/not evidence of a gap, or of novelty/.test(weakPos), "the weak gap's note: scarcity is not novelty (curriculum §11.3)");
+  ok(/not evidence of a gap, or of novelty/.test(weakPos), "the weak gap's note: scarcity is not novelty");
   ok(D.rubric.map(r => r.id).join() === RB.COMPETENCES.map(c => c.id).join() && D.rubric.every(r => r.look && !r.levels), "the rubric: all nine competences, look lines, no reworded levels");
-  const cur = path.join(SITE, "..", "reports/learn/curriculum_v2.md");
-  if (fs.existsSync(cur)) {
+  const cur = PRIV.path("curriculum");
+  if (cur) {
     const c = fs.readFileSync(cur, "utf8");
-    ok(RB.COMPETENCES.every(x => ["developing", "proficient", "strong"].every(l => c.includes(x[l]))), "rubric words are curriculum §3.4's, word for word");
-    ok(c.includes("| Completed Research Studio | the core path, the checkpoints CK-F, CK-A and CK-M, and a submitted CR with a self-assessment | the CR repository and report, the rubric sheet |"), "curriculum §3.1's first status");
+    ok(RB.COMPETENCES.every(x => ["developing", "proficient", "strong"].every(l => c.includes(x[l]))), "rubric words are the course rubric's, word for word");
+    ok(c.includes("| Completed Research Studio | the core path, the checkpoints CK-F, CK-A and CK-M, and a submitted CR with a self-assessment | the CR repository and report, the rubric sheet |"), "the course plan's first status");
   }
-  ok(D.statuses[0].requires === "The core path, the checkpoints CK-F, CK-A and CK-M, and a submitted CR with a self-assessment." && D.statuses[0].evidence === "The CR repository and report, the rubric sheet." && /Proficient or better on all nine rubric competences/.test(D.statuses[1].requires), "the statuses as curriculum §3.1 states them");
+  ok(D.statuses[0].requires === "The core path, the checkpoints CK-F, CK-A and CK-M, and a submitted CR with a self-assessment." && D.statuses[0].evidence === "The CR repository and report, the rubric sheet." && /Proficient or better on all nine rubric competences/.test(D.statuses[1].requires), "the statuses as the course plan states them");
   has("The course issues no certificate or badge.", "no certificate");
 }
 

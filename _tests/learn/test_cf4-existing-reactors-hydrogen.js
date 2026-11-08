@@ -1,29 +1,28 @@
 // test_cf4-existing-reactors-hydrogen.js — Node tests for case file CF4 (assets/learn/cf4-existing-reactors-hydrogen.js, its
-// data file and the page, learn/cf4-existing-reactors-hydrogen.qmd; live since 2026-11-07, when Henry approved E15):
+// data file and the page, learn/cf4-existing-reactors-hydrogen.qmd):
 //   - the toy (the course's own: a generic existing plant, one illustrative day, prices the reader sets and one fixed
 //     assumed hydrogen price) recomputed from first principles: in every hour the split between the grid, the
 //     electrolyzer and the reserve is the best one among every split on a 50 MW grid (ties sell), for every setting the
-//     controls allow (W3 brief §2.5); the day's money adds up as displayed (energy + hydrogen + reserves − the
+//     controls allow; the day's money adds up as displayed (energy + hydrogen + reserves − the
 //     electrolyzer's cost = net; net − selling all = the change; gain before cost never below zero); bounds hold
 //     (0 <= h <= E, 0 <= r <= h, g >= P − E >= 0); the myths' and the worked answers' numbers; the live stage on a stub
 //     document
 //   - the four no-JS blocks (timeline, toy, boundary, worked answers) equal what the components write from the data
 //     (--write rewrites them)
-//   - research wording (curriculum §13, guard G-SRC), as CF5's test: every sentence about the study on the page, in the
-//     data file and in this script is an APPROVED E15 sentence of reports/learn/excerpts_for_approval.md ("W6 sources",
-//     approved by Henry on 2026-11-07), word for word, with the rows of "E15 revisions after review (2026-11-07)" in place
-//     of the sentences they replace; a snapshot of that set in this test must equal the register (without the register
-//     the page is checked against the snapshot); the register's status line says approved; a sentence split into list
-//     items (an element with data-e15) joins back to its row word for word; each row sits where the register's "Where it
-//     would appear" column puts it (--places lists every placement with file:line); the replaced wordings and the
+//   - research wording (the course's sourcing rule), as CF5's test: every sentence about the study on the page, in the
+//     data file and in this script is an APPROVED E15 sentence of the excerpt wording, word for word, with the rows of
+//     "E15 revisions after review" in place of the sentences they replace; a snapshot of that set in this test must
+//     equal the approved wording (without it the page is checked against the snapshot); its status line says approved; a
+//     sentence split into list items (an element with data-e15) joins back to its row word for word; each row sits where
+//     the approved wording's "Where it would appear" column puts it (--places lists every placement with file:line); the replaced wordings and the
 //     alternatives (E15.7n, E15.20a, E15.22d, E15.31) are not used. Live: the excerpt's footer and the boundary card's
 //     source line are E15.30 ("Approved excerpt of: ...", CF7's and CF5's form), "approved" appears only there, and no
 //     draft wording is left; the page is learn/<id>.qmd and nowhere else; path.yml status active; path.json lists CF4;
 //     its glossary terms name CF4 (ancillary-services stays CF5's); the draft-period line ("Source: ...") is gone; A1, M11
 //     and A12 name CF4 through LX.lessonRefHTML
-//   - scope (guards G-NUC, G-POL, G-SRC; framing C): no sentence pairs a nuclear term with a risk term of
-//     scripts/learn_curriculum/data.py (DENY_NUC, DENY_RISK), nor with a cost word (cost, capital, sunk, upkeep, O&M,
-//     levelized: the stricter check of CF4 review #1); a nuclear term only in the E15 rows that the register
+//   - scope (the nuclear scope rule; credit exercises without nuclear; the sourcing rule; framing C): no sentence pairs a
+//     nuclear term with a risk term of the scope scan's word lists (DENY_NUC, DENY_RISK), nor with a cost word (cost,
+//     capital, sunk, upkeep, O&M, levelized: a stricter check); a nuclear term only in the E15 rows that the approved wording
 //     writes with one, the title and the earlier-lessons line; no credit name, no new-plant case, no "without policy
 //     support", none of the abstract's left-out figures, no market-data or PJM wording; the toy has no credit, no
 //     hydrogen-price slider, no nuclear term and no break-even, threshold or parity wording; links only to the paper's
@@ -40,6 +39,7 @@ const M = require(L(ID + ".js"));
 const TL = require(L("components/timeline.js"));
 const CORE = require(L("components/core.js"));
 const X = require("./excerpt_check.js");
+const PRIV = require("./private_sources.js");
 const D = JSON.parse(fs.readFileSync(L("data/" + ID + ".json"), "utf8"));
 const JS = fs.readFileSync(L(ID + ".js"), "utf8");
 // every copy of the page under learn/, in any folder: live, the one page is learn/<id>.qmd
@@ -77,7 +77,7 @@ Object.keys(BLOCKS).forEach(k => { const r = between(PAGE, k); ok(PAGE.slice(r.f
 // ---------------- path.yml, live state, glossary
 const PY = fs.readFileSync(path.join(SITE, "learn/path.yml"), "utf8"), row = PY.split(/\n- kind: /).find(e => new RegExp("\\n  id: " + ID + "\\n").test(e)) || "";
 ok(row && /\n  status: active\n/.test(row), "path.yml: CF4 is active (live)");
-ok(/\n  teaches: \["hydrogen at an existing plant", "reserves from an electrolyzer's headroom", "sunk costs", "price-taking", "reading a published dispatch and cash-flow study"\]\n/.test(row), "path.yml: teaches lists five items, each quoted (an apostrophe in an unquoted item would start a quote in build_learn.py's reader)");
+ok(/\n  teaches: \["hydrogen at an existing plant", "reserves from an electrolyzer's headroom", "sunk costs", "price-taking", "reading a published dispatch and cash-flow study"\]\n/.test(row), "path.yml: teaches lists five items, each quoted (an apostrophe in an unquoted item would start a quote in the course build step's reader)");
 ok(/\n  form: case/.test(row) && /\n  code: CF4/.test(row) && /\n  minutes: 10/.test(row) && /\n  after: \[7\]/.test(row) && row.includes('title: "' + TITLE + '"'), "path.yml: a case file of 10 minutes, code CF4, after lesson 7, the curriculum's title");
 ok(PAGE.includes('title: "' + TITLE + '"'), "the page's title is the curriculum's");
 {
@@ -94,8 +94,8 @@ ok(PAGE.includes('title: "' + TITLE + '"'), "the page's title is the curriculum'
   ids.forEach(g => ok(G[g] && G[g].lesson === "CF4" && G[g].href === ID + ".html", "glossary.json has " + g + ", taught in CF4"));
   ok(G["ancillary-services"] && G["ancillary-services"].lesson === "CF5", "glossary.json has ancillary-services, taught in CF5");
   ids.concat(["ancillary-services"]).forEach(g => ok(PAGE.includes('data-term="' + g + '"') || JSON.stringify(D).includes("[[" + g + "|"), "the page marks " + g));
-  // the metrics the review found unexplained are marked at their use (review #3)
-  ["net-present-value", "internal-rate-of-return", "payback-period", "dispatch", "ramp-rate", "flexibility"].forEach(g => ok(PAGE.includes('data-term="' + g + '"') && G[g], "the page marks " + g + " (review #3)"));
+  // the metrics the review found unexplained are marked at their use
+  ["net-present-value", "internal-rate-of-return", "payback-period", "dispatch", "ramp-rate", "flexibility"].forEach(g => ok(PAGE.includes('data-term="' + g + '"') && G[g], "the page marks " + g + ""));
   const marks = [...PAGE.matchAll(/data-term="([a-z0-9-]+)"/g)].map(m => m[1]).concat([...JSON.stringify(D).matchAll(/\[\[([a-z0-9-]+)\|/g)].map(m => m[1]), [...JS.matchAll(/\[\[([a-z0-9-]+)\|/g)].map(m => m[1]));
   ok(marks.every(g => G[g]), "every glossary mark on the page, in the data and in the script is defined: " + marks.filter(g => !G[g]).join(", "));
 }
@@ -104,7 +104,7 @@ ok(PAGE.includes('title: "' + TITLE + '"'), "the page's title is the curriculum'
 const P = I.plantMW, v = I.kgPerMWh * I.h2Price;
 const range = o => { const a = []; for (let x = o.min; x <= o.max + 1e-9; x += o.step) a.push(Math.round(x * 1e6) / 1e6); return a; };
 const SL = {}; I.sliders.forEach(o => { SL[o.key] = range(o); });
-ok(I.sliders.map(o => o.key).join() === "level,reserve,elz", "three sliders: the price level, the reserve price and the electrolyzer's size; no hydrogen-price and no credit slider (G-POL)");
+ok(I.sliders.map(o => o.key).join() === "level,reserve,elz", "three sliders: the price level, the reserve price and the electrolyzer's size; no hydrogen-price and no credit slider");
 ok(typeof I.h2Price === "number" && !/h2|hydrogen|credit/i.test(I.sliders.map(o => o.key + " " + o.label).join(" ")), "the hydrogen price is one fixed number in the data");
 ok(Math.max(...SL.elz) <= P, "the electrolyzer is never larger than the plant (g >= P − E >= 0)");
 let bad = 0, n = 0, signs = new Set(), ties = 0;
@@ -153,9 +153,9 @@ const AS = M.assumptions(I).map(X.norm).join(" ");
 ok(AS.includes("the plant makes 1,000 MW of electricity in every hour, in both cases") && AS.includes("its own capital is already spent (a sunk cost)") && AS.includes("25 kg of hydrogen") && AS.includes("(40 kWh per kg)") && 1000 / I.kgPerMWh === 40 && AS.includes("an assumed $2.00 per kg, fixed: $50 per MWh") && AS.includes("$400 per MW of electrolyzer per day, paid whether it runs or not") && /Reserves, simplified: one product, paid per MW held for an hour \(per MW-hour\), never called/.test(AS) && /Left out: the steam a high-temperature electrolyzer also takes; the electrolyzer's minimum load, start-ups, ramp limits and wear; hydrogen storage and a battery/.test(AS),
   "the assumptions are written from the data: the plant's own costs cancel, the hydrogen price is fixed, the electrolyzer's cost is an annual equivalent per day, reserves are simplified, what is left out");
 ok(/capital, as an annual equivalent, and its upkeep/i.test(AS), "up front against annual: the electrolyzer's daily cost is its capital as an annual equivalent plus upkeep");
-ok(/Electricity only: the electrolyzer makes 25 kg of hydrogen from each MWh of the plant's electricity it takes/.test(AS) && !/steam included/.test(AS + JS), "electricity only: every MW in the toy is electrical, and the steam a high-temperature electrolyzer also takes is left out (review #2)");
-ok(/Two different measures: the range of output to the grid over the day, from its lowest hour to its highest, and the reserve, the MW held for the grid in one hour\./.test(AS) && /chip\("Range of output to the grid"/.test(JS), "the range of output to the grid and the reserve held are named as two different measures (review #3)");
-{ // the picked hour's sums show the hour that turns MW into MWh, and add up as displayed (review #6)
+ok(/Electricity only: the electrolyzer makes 25 kg of hydrogen from each MWh of the plant's electricity it takes/.test(AS) && !/steam included/.test(AS + JS), "electricity only: every MW in the toy is electrical, and the steam a high-temperature electrolyzer also takes is left out");
+ok(/Two different measures: the range of output to the grid over the day, from its lowest hour to its highest, and the reserve, the MW held for the grid in one hour\./.test(AS) && /chip\("Range of output to the grid"/.test(JS), "the range of output to the grid and the reserve held are named as two different measures");
+{ // the picked hour's sums show the hour that turns MW into MWh, and add up as displayed
   let sb = 0;
   [M.at(I), M.at(I, { reserves: false }), M.at(I, { elz: 0 }), M.at(I, { level: 1.4 })].forEach(st => { const d = M.day(I, st); d.hours.forEach((x, t) => {
     const l = M.sceneLines(I, d, t);
@@ -164,19 +164,19 @@ ok(/Two different measures: the range of output to the grid over the day, from i
     if (x.r && l.res !== M.mw(x.r) + " × 1 h × " + M.per(d.q) + " per MW-hour = " + M.money(x.r * 1 * d.q)) sb++;
     if (!st.reserves && l.res !== "not offered") sb++;
   }); });
-  ok(sb === 0 && /var sl = sceneLines\(I, d, S\.hour\)/.test(JS), "the picked hour's sums: MW × 1 h = MWh, × the price; the reserve as MW × 1 h × $ per MW-hour (review #6)");
+  ok(sb === 0 && /var sl = sceneLines\(I, d, S\.hour\)/.test(JS), "the picked hour's sums: MW × 1 h = MWh, × the price; the reserve as MW × 1 h × $ per MW-hour");
 }
-ok(M.LEDGER.rows[4] === "Revenue less the electrolyzer's cost" && /The plant's own fuel and upkeep, the same in both columns, are left out, so neither total is the plant's profit\./.test(M.LEDGER_CAPTION) && !/Net for the day/.test(JS + PAGE), "the ledger's total is revenue less the electrolyzer's cost, not the plant's profit (review #9)");
-ok(D.scale.mark === "S4" && D.scale.markText === "Its reach: plants across a nation's markets. Its model works one plant at a time, as at S0.", "the scale mark says the case's reach is national and its model works at the plant scale (review #7)");
+ok(M.LEDGER.rows[4] === "Revenue less the electrolyzer's cost" && /The plant's own fuel and upkeep, the same in both columns, are left out, so neither total is the plant's profit\./.test(M.LEDGER_CAPTION) && !/Net for the day/.test(JS + PAGE), "the ledger's total is revenue less the electrolyzer's cost, not the plant's profit");
+ok(D.scale.mark === "S4" && D.scale.markText === "Its reach: plants across a nation's markets. Its model works one plant at a time, as at S0.", "the scale mark says the case's reach is national and its model works at the plant scale");
 // the myths: the toy's defaults
 ok(PAGE.includes("and the electrolyzer's own " + M.money(D0.cost) + " a day change."), "myth 1: the electrolyzer's daily cost at the defaults ($80,000)");
 ok(PAGE.includes("in the toy, " + M.mw(D0.s.elz) + " × " + D0.heldHours + " hours × " + M.per(D0.q) + " per MW-hour = " + M.money(D0.reserve) + ".") && D0.s.elz * D0.heldHours * D0.q === D0.reserve, "myth 2: 200 MW × 20 hours × $8 per MW-hour = $32,000, as displayed");
-{ // the worked answers (recomputed here): one row per setting, each from the defaults (reviews #4, #5)
+{ // the worked answers (recomputed here): one row per setting, each from the defaults
   const W = M.worked(I), at = o => M.day(I, M.at(I, o)), Pr = I.practice;
   ok(Pr.levels.every(x => SL.level.some(y => Math.abs(x - y) < 1e-9)) && Pr.elz.every(x => SL.elz.includes(x)) && Pr.hours.every(h => h >= 0 && h < 24), "the practice's settings are on the controls");
   const lo = at({ level: 0.6 }), hi = at({ level: 1.4 }), off = at({ reserves: false }), big = at({ elz: 400 }), z = at({ elz: 0 });
   ok(W.length === 7 && W.every(r => r.length === 3) && M.WORKED_HEAD.join("|") === "Setting, from the defaults|Result, against selling all the power|Why", "worked answers: seven rows of setting, result and why");
-  ok(W.every(r => r.join(" ").split(/\s+/).length <= 36), "each worked row is at most about 35 words (review #4): " + W.map(r => r.join(" ").split(/\s+/).length).join(", "));
+  ok(W.every(r => r.join(" ").split(/\s+/).length <= 36), "each worked row is at most about 35 words: " + W.map(r => r.join(" ").split(/\s+/).length).join(", "));
   ok(lo.runHours === 24 && lo.change === 91240 && lo.gross - lo.cost === lo.change && lo.priceMax === 54 && lo.priceMax < lo.value &&
      W[0].join(" | ") === "Price level ×0.6 | runs in all 24 hours; $91,240 better | The dearest hour pays $54 per MWh, less than the $58 a MWh earns as hydrogen and reserve. $171,240 gained before its cost, minus its $80,000.", "practice 1 at 0.6: all 24 hours (the dearest hour $54 < $58); $171,240 − $80,000 = $91,240");
   const dear = hi.hours.filter(x => !x.run);
@@ -193,17 +193,17 @@ ok(PAGE.includes("in the toy, " + M.mw(D0.s.elz) + " × " + D0.heldHours + " hou
   ok((qs.match(/<li>[^<]*\?<\/li>/g) || []).length === 4 && /Worked answers, each from the toy's defaults/.test(PAGE), "four practice questions, each with its worked rows on the page, with or without JavaScript");
   const st = I.start;
   ok(qs.includes("<p>" + M.startLine(I) + "</p>") && M.startLine(I) === "Start each one from the defaults: press Reset (price level ×1.0, reserve price $8 per MW-hour, electrolyzer 200 MW, reserves offered)." && st.level === 1 && st.reserve === 8 && st.elz === 200 && st.reserves === true,
-    "each practice question starts from the defaults, which the Reset button restores; the start line is written from the data (review #5)");
+    "each practice question starts from the defaults, which the Reset button restores; the start line is written from the data");
 }
 ok(/Illustrative/.test(I.note) && /not the study's inputs or results/.test(I.note) && /^Illustrative:/.test(M.assumptions(I)[0]), "the toy says it is illustrative and not the study's");
-{ // the toy has no credit, no nuclear term and no break-even search (G-POL, G-NUC)
+{ // the toy has no credit, no nuclear term and no break-even search (credit and nuclear scope)
   const toy = [JSON.stringify(I), BLOCKS["cf4-idea"](), BLOCKS["cf4-worked"](), JSSTR.join(" "),
     (PAGE.match(/<div class="lx-myths"[\s\S]*?<div class="lx-card lx-case-try">\n<p class="lx-eyebrow">With open code/) || [""])[0],
     (PAGE.match(/<summary><span class="k">Go deeper · Modeler<\/span>[\s\S]*?<\/details>/) || [""])[0]].join("\n");
   ok(!/credit|subsid|break[- ]?even|threshold|parity|nuclear|reactor|\bSMR\b|45[UVY]|48E/i.test(toy), "the toy, its answers, the myths, the practice and the Go deeper box name no credit, no nuclear term and no break-even, threshold or parity");
   ok(/The hydrogen price is fixed at one assumed value; every result here depends on it\./.test(JS), "the live toy says that every result depends on the fixed hydrogen price");
 }
-// the Go deeper box: the algebra shows every variable's bounds (W5 review #3)
+// the Go deeper box: the algebra shows every variable's bounds
 ok(/\$0 \\le h_t \\le E\$/.test(PAGE) && /\$0 \\le r_t \\le h_t\$/.test(PAGE) && /\$g_t \+ h_t = P\$/.test(PAGE) && /\$g_t \\ge P - E \\ge 0\$/.test(PAGE) && /on a tie the toy sells/.test(PAGE), "Go deeper: the bounds of g, h and r, and the tie rule");
 
 // ---------------- the live stage on a stub document
@@ -229,7 +229,7 @@ ok(/\$0 \\le h_t \\le E\$/.test(PAGE) && /\$0 \\le r_t \\le h_t\$/.test(PAGE) &&
     const d2 = M.day(I, M.at(I, { reserves: false }));
     ok(off.getAttribute("aria-pressed") === "true" && T().includes(M.changeLine(d2)) && T().includes("Reserves off") === false && T().includes("not offered"), "live: 'No reserves' repaints the day ($2,200 better) and the scene says reserves are not offered");
     const rs = [...live.querySelectorAll("button")].find(b => b.textContent === "Reset to the defaults");
-    ok(!!rs, "live: a Reset to the defaults button (review #5)");
+    ok(!!rs, "live: a Reset to the defaults button");
     if (rs) { rs.click(); ok(live.querySelectorAll(".lx-seg button")[0].getAttribute("aria-pressed") === "true" && T().includes(M.changeLine(D0)) && T().includes(M.sceneLines(I, D0, I.start.hour).grid), "live: Reset restores the defaults ($33,400 better; 13:00 picked)"); }
   }
   ok(/LX\.lessonRefHTML\(P, "A1"\)/.test(JS) && /LX\.lessonRefHTML\(P, "M11"\)/.test(JS) && /LX\.lessonRefHTML\(P, "A12"\)/.test(JS) && /data-learn="cf4-idea" data-src="[^"]*data\/path\.json/.test(PAGE), "A1, M11 and A12 are linked with LX.lessonRef (path.json loaded by the toy)");
@@ -244,10 +244,10 @@ ok(/\$0 \\le h_t \\le E\$/.test(PAGE) && /\$0 \\le r_t \\le h_t\$/.test(PAGE) &&
   });
 }
 
-// ---------------- research wording against the register (E15, approved by Henry on 2026-11-07)
-// The approved set (register, "W6 sources", status line of 2026-11-07): E15.1-E15.30 word for word, with the rows of
-// "E15 revisions after review (2026-11-07)" in place of the sentences they replace (E15.14, E15.16, E15.22, E15.29). As
-// CF5's test: the snapshot below must equal the register; without the register the page is checked against the snapshot.
+// ---------------- research wording against the approved wording (E15)
+// The approved set (status line of 2026-11-07): E15.1-E15.30 word for word, with the rows of "E15 revisions after review"
+// in place of the sentences they replace (E15.14, E15.16, E15.22, E15.29). As CF5's test: the snapshot below must equal
+// the approved wording; without it the page is checked against the snapshot.
 const APPROVED_SNAPSHOT = {
   "E15.1": "Nuclear power supplies reliable low-carbon electricity and high-temperature heat, but existing plants face growing pressure to operate more flexibly in markets with rising renewable penetration.",
   "E15.2": "A nuclear plant can do more than sell electricity around the clock. With high-temperature electrolysis, part of its electricity and steam can make hydrogen; with hydrogen storage and a battery, it can shift its output and offer ancillary services to the grid.",
@@ -285,23 +285,23 @@ const RX = /\b(stud(y|y's|ies)|paper|article|Li et al|excerpt|reactors?|nuclear|
 const REG = X.register(["E15"]);
 let EFF = APPROVED_SNAPSHOT, WHERE = {}, e15 = "";
 if (REG) {
-  const md = REG.md, w6 = md.slice(md.indexOf("## W6 sources"), md.indexOf("\n## ", md.indexOf("## W6 sources") + 5));
+  const md = REG.md, w6 = PRIV.section(md, "### E15.");
   const st = w6.match(/\*\*Status \(2026-11-07\): ([^*]+)\*\*([^\n]*)/) || [];
-  ok(st[1] === "approved as recommended" && /Approved: E15\.1–E15\.30 word for word under framing C/.test(st[2] || ""), "the register's status line says E15 is approved (2026-11-07): E15.1-E15.30 word for word under framing C");
+  ok(st[1] === "approved as recommended" && /Approved: E15\.1–E15\.30 word for word under framing C/.test(st[2] || ""), "the approved wording's status line says E15 is approved (2026-11-07): E15.1-E15.30 word for word under framing C");
   // rows marked "[N]" or "(optional)" are E15 rows too: the shared parser reads only "| E15.n |", so they are read here
-  e15 = w6.slice(w6.indexOf("### E15."), w6.indexOf("### Decisions for Henry (E15)"));
+  e15 = PRIV.block(w6, "### E15.");
   const reg = {};
   e15.split("\n").forEach(line => { const m = line.match(/^\| (E15\.\d+)(?: \[N\]| \(optional\))? \| (.*?) \| (.*?) \| /); if (m) { reg[m[1]] = m[2].replace(/^(Timeline, [^:]+|Citations|Source): /, ""); WHERE[m[1]] = m[3]; } });
-  ok(Object.keys(reg).length === 30 && Array.from({ length: 30 }, (x, i) => "E15." + (i + 1)).every(k => reg[k]), "the register's 30 E15 rows are read (the [N] and optional rows included)");
+  ok(Object.keys(reg).length === 30 && Array.from({ length: 30 }, (x, i) => "E15." + (i + 1)).every(k => reg[k]), "the approved wording's 30 E15 rows are read (the [N] and optional rows included)");
   // the revisions after review: each "Was" is the approved row, word for word; "Now" takes its place
   const rv = w6.indexOf("### E15 revisions after review (2026-11-07)"), REV = {};
-  ok(rv > 0 && /^\*\*Status \(2026-11-07\): accepted by Henry\*\*/m.test(w6.slice(rv)), "the register has the E15 revisions after review (2026-11-07), accepted by Henry");
+  ok(rv > 0 && /^\*\*Status \(2026-11-07\): accepted by [^*\n]+\*\*/m.test(w6.slice(rv)), "the approved wording has the E15 revisions after review (2026-11-07), accepted");
   if (rv > 0) w6.slice(rv).split("\n").forEach(line => { const m = line.match(/^\| (E15\.\d+) \| (.*?) \| (.*?) \| /); if (m) REV[m[1]] = { was: m[2].replace(/^(Timeline, [^:]+|Citations|Source): /, ""), now: m[3].replace(/^(Timeline, [^:]+|Citations|Source): /, "") }; });
   Object.keys(REV).forEach(k => { ok(REV[k].was === reg[k], k + ": the revision's 'Was' is the approved row"); REPLACED[k] = reg[k]; reg[k] = REV[k].now; });
   ok(Object.keys(reg).length === Object.keys(APPROVED_SNAPSHOT).length && Object.keys(reg).every(k => reg[k] === APPROVED_SNAPSHOT[k]),
-    "the approved-sentence snapshot in this test equals the register (revisions applied); differs at: " + Object.keys(Object.assign({}, reg, APPROVED_SNAPSHOT)).filter(k => reg[k] !== APPROVED_SNAPSHOT[k]).join(", "));
+    "the approved-sentence snapshot in this test equals the approved wording (revisions applied); differs at: " + Object.keys(Object.assign({}, reg, APPROVED_SNAPSHOT)).filter(k => reg[k] !== APPROVED_SNAPSHOT[k]).join(", "));
   EFF = reg;
-} else console.log("note: excerpts_for_approval.md not found (set LEARN_PORTFOLIO); E15 wording checked against the snapshot in this test");
+} else console.log("note: the approved excerpt wording is not available (set LEARN_SOURCES); E15 wording checked against the snapshot in this test");
 const RG = { units: Object.values(EFF).map(X.norm), raw: EFF };
 {
   const KEYS = Array.from({ length: 30 }, (x, i) => "E15." + (i + 1));
@@ -325,17 +325,17 @@ const RG = { units: Object.values(EFF).map(X.norm), raw: EFF };
     /^Detail(What the equipment can do, and the two cases|From one year to a lifetime|Sensitivity runs)$/, /^(The pressure|The option|The open question)$/];
   const segs = X.elements(caseHTML.replace(SPLIT, "")).map(X.norm).filter(Boolean);
   segs.forEach(sg => ok(LABELS.some(re => re.test(sg)) || X.approved(RG, sg), "case text is approved E15 wording or a label: " + sg.slice(0, 70)));
-  // each row where the register puts it
+  // each row where the approved wording puts it
   const inPart = (k, i) => X.norm(parts[i - 1].replace(SPLIT, (m0, dt, tag, key) => key === k ? "<p>" + X.norm(joined[k].join(" ")) + "</p>" : m0)).includes(X.norm(RG.raw[k]))
     || X.elements(parts[i - 1]).map(X.norm).join(" ").includes(X.norm(RG.raw[k]));
   const PART = { 1: ["E15.1", "E15.2", "E15.3"], 2: ["E15.4"], 3: ["E15.5", "E15.6", "E15.7"], 4: ["E15.8", "E15.9", "E15.10"], 5: ["E15.11", "E15.12", "E15.13", "E15.14", "E15.15", "E15.16", "E15.17", "E15.18", "E15.19"], 6: ["E15.20", "E15.21", "E15.22", "E15.23", "E15.24"] };
-  Object.keys(PART).forEach(i => PART[i].forEach(k => ok(new RegExp("^part " + i + "\\b").test(WHERE[k]) || (i === "1" && /^CF4 part 1/.test(WHERE[k])), k + ": the register puts it in part " + i + " (" + WHERE[k] + ")")));
+  Object.keys(PART).forEach(i => PART[i].forEach(k => ok(new RegExp("^part " + i + "\\b").test(WHERE[k]) || (i === "1" && /^CF4 part 1/.test(WHERE[k])), k + ": the approved wording puts it in part " + i + " (" + WHERE[k] + ")")));
   Object.keys(PART).forEach(i => PART[i].filter(k => !joined[k]).forEach(k => ok(inPart(k, +i), k + " is in part " + i)));
   { const p1 = X.elements(parts[0]).map(X.norm), p5 = X.elements(parts[4]).map(X.norm).filter(s => !/^Detail/.test(s) && !/^5 · /.test(s));
-    ok(p1.slice(1, 3).join("|") === "The pressure|" + X.norm(RG.raw["E15.1"]) && p1[p1.length - 3] === "The open question" && p1[p1.length - 2] === X.norm(RG.raw["E15.3"]) && X.norm(parts[0]).indexOf("The option") < X.norm(parts[0]).indexOf("A nuclear plant can do more") && X.norm(parts[0]).indexOf("A nuclear plant can do more") < X.norm(parts[0]).indexOf("Coupling nuclear reactors"), "part 1 in three labelled groups (review #4): E15.1 first, E15.2 after it, E15.3 last (before the plain question)");
-    ok((parts[0].match(/<div class="cf4-g">/g) || []).length === 3 && /<dl class="cf4-dgr"><div><dt>Decisions<\/dt>[\s\S]*<\/dd><\/div><div><dt>Goal<\/dt>[\s\S]*<\/dd><\/div><div><dt>Rules<\/dt>[\s\S]*<\/dd><\/div><\/dl>/.test(parts[3]), "parts 1 and 4: separate visual groups (the puzzle's three; decisions, goal and rules) (review #4)");
+    ok(p1.slice(1, 3).join("|") === "The pressure|" + X.norm(RG.raw["E15.1"]) && p1[p1.length - 3] === "The open question" && p1[p1.length - 2] === X.norm(RG.raw["E15.3"]) && X.norm(parts[0]).indexOf("The option") < X.norm(parts[0]).indexOf("A nuclear plant can do more") && X.norm(parts[0]).indexOf("A nuclear plant can do more") < X.norm(parts[0]).indexOf("Coupling nuclear reactors"), "part 1 in three labelled groups: E15.1 first, E15.2 after it, E15.3 last (before the plain question)");
+    ok((parts[0].match(/<div class="cf4-g">/g) || []).length === 3 && /<dl class="cf4-dgr"><div><dt>Decisions<\/dt>[\s\S]*<\/dd><\/div><div><dt>Goal<\/dt>[\s\S]*<\/dd><\/div><div><dt>Rules<\/dt>[\s\S]*<\/dd><\/div><\/dl>/.test(parts[3]), "parts 1 and 4: separate visual groups (the puzzle's three; decisions, goal and rules)");
     ok(p5[0] === X.norm(RG.raw["E15.11"]) && p5[p5.length - 1] === X.norm(RG.raw["E15.19"]), "part 5: E15.11 is the first line and E15.19 the last");
-    ok(p5.join(" ") === ["E15.11", "E15.12", "E15.13", "E15.14", "E15.15", "E15.16", "E15.17", "E15.18", "E15.19"].map(k => X.norm(RG.raw[k])).join(" "), "part 5: E15.11–E15.19 in the register's order (E15.14 as its two sentences)"); }
+    ok(p5.join(" ") === ["E15.11", "E15.12", "E15.13", "E15.14", "E15.15", "E15.16", "E15.17", "E15.18", "E15.19"].map(k => X.norm(RG.raw[k])).join(" "), "part 5: E15.11–E15.19 in the approved wording's order (E15.14 as its two sentences)"); }
   // part 6: E15.20–E15.23 the only excerpt, in order; its footer E15.30
   const q = [...PAGE.matchAll(/<blockquote class="lx-excerpt" data-source="([^"]+)">([\s\S]*?)<footer>([\s\S]*?)<\/footer><\/blockquote>/g)];
   ok(q.length === 1 && q[0][1] === "excerpt:npph2-existing" && X.elements(q[0][2]).map(X.norm).join("|") === ["E15.20", "E15.21", "E15.22", "E15.23"].map(k => X.norm(RG.raw[k])).join("|"), "part 6: E15.20–E15.23 are the only excerpt, one paragraph each, from excerpt:npph2-existing");
@@ -345,9 +345,9 @@ const RG = { units: Object.values(EFF).map(X.norm), raw: EFF };
   const tlRaw = k => (e15.match(new RegExp("^\\| " + k.replace(".", "\\.") + " \\| Timeline, ([^:]+): ", "m")) || [])[1];
   const E = D.timeline.events, fmtD = d => TL.fmt(TL.parse(d));
   ok(E.length === 2 && X.approved(RG, E[0].text) && X.norm(E[0].text) === X.norm(RG.raw["E15.26"]) && X.norm(E[1].text) === X.norm(RG.raw["E15.27"]), "the timeline's texts are E15.26 and E15.27, word for word");
-  ok(fmtD(E[0].date) === tlRaw("E15.26") && fmtD(E[1].date) === tlRaw("E15.27"), "the timeline's dates are the register's: " + fmtD(E[0].date) + ", " + fmtD(E[1].date));
+  ok(fmtD(E[0].date) === tlRaw("E15.26") && fmtD(E[1].date) === tlRaw("E15.27"), "the timeline's dates are the approved wording's: " + fmtD(E[0].date) + ", " + fmtD(E[1].date));
   ok(E[0].source.url === DOI && E[1].source.url === REPO && TL.validate(E).length === 0, "the timeline cites the DOI and the repository");
-  ok(/^The study in time$/.test(WHERE["E15.26"]) && /^The study in time$/.test(WHERE["E15.27"]), "the register puts E15.26 and E15.27 in the study in time");
+  ok(/^The study in time$/.test(WHERE["E15.26"]) && /^The study in time$/.test(WHERE["E15.27"]), "the approved wording puts E15.26 and E15.27 in the study in time");
   // the boundary card (E15.25), whole, in order; its source line E15.30's footer form
   [].concat(D.boundary.holds, D.boundary.leaves).forEach(t => ok(X.approved(RG, t), "boundary item is a clause of E15.25: " + t.slice(0, 50)));
   ok(X.norm("Where the result holds: " + D.boundary.holds.join(" ").replace(/\.$/, ".") + " It leaves out: " + D.boundary.leaves.join(" ")) === X.norm(RG.raw["E15.25"]), "the boundary card is E15.25, whole, in order");
@@ -360,11 +360,11 @@ const RG = { units: Object.values(EFF).map(X.norm), raw: EFF };
   ok(cmds.length === 5 && cmds[0] === "python examples/minimal.py" && cmds.slice(1).every(c => /^nuclear-h2 (synthetic|run) /.test(c)) && cmds.some(c => /--price-factor 1\.15/.test(c)) && cmds.some(c => /--as-mode dispatch/.test(c)) && cmds.filter(c => /^nuclear-h2 run /.test(c)).every(c => /--out-dir /.test(c)), "part 7: only the minimal example, synthetic inputs and run (energy prices 15% higher, or ancillary services in dispatch mode)");
   ok(!/lifecycle_tea|sensitivity\.py|case_matrix|nuclear-h2 tea|tea_sweep|--reoptimize|--scale-as/.test(PAGE + JS), "part 7: no lifecycle, sensitivity, tea or case-matrix tool, no credit option");
   ok(oc.includes('<a href="' + REPO + '">nuclear-hydrogen-integration</a>: open code · MIT licence.'), "part 7: the repository is linked as open code, with its licence, and nothing said about data in it");
-  // the citation (E15.29), split into its two sentences; the title as in inputs/publications.bib
+  // the citation (E15.29), split into its two sentences; the title as in the author's publication list
   const src = (OWN.match(/<div class="lx-card lx-sources">([\s\S]*?)<\/div>/) || [])[1] || "", li = X.elements(src).map(X.norm);
   ok(X.norm(li[1] + " " + li[2]) === X.norm(RG.raw["E15.29"]) && src.includes('<a href="' + DOI + '">') && src.includes('<a href="' + REPO + '">'), "sources: E15.29, word for word, with the DOI and the repository linked");
-  const bib = fs.readFileSync(path.join(X.portfolio(), "inputs/publications.bib"), "utf8");
-  ok(bib.includes("title   = {Rethinking the economics and flexibility of {U.S.} nuclear power through hydrogen integration and policy support}") && li[1].includes("Rethinking the economics and flexibility of U.S. nuclear power through hydrogen integration and policy support."), "the paper's title as in inputs/publications.bib");
+  const bib = fs.readFileSync(PRIV.path("publications"), "utf8");
+  ok(bib.includes("title   = {Rethinking the economics and flexibility of {U.S.} nuclear power through hydrogen integration and policy support}") && li[1].includes("Rethinking the economics and flexibility of U.S. nuclear power through hydrogen integration and policy support."), "the paper's title as in the publication list");
   // the description is E15.4
   const desc = (PAGE.match(/^description: "Case file CF4 of Energy Systems, Step by Step\. ([^"]+)"/m) || [])[1] || "";
   ok(desc && X.norm(desc) === X.norm(RG.raw["E15.4"]), "the description's sentence is E15.4");
@@ -417,14 +417,14 @@ const RG = { units: Object.values(EFF).map(X.norm), raw: EFF };
 }
 
 // ---------------- scope (framing C)
-const RP = X.portfolio();
+const RP = PRIV.path("scope_terms");
 let NUC = /nuclear|reactor|\bSMR\b|small modular/i, RISK = null, BENIGN = /merit[- ]order|orders? of magnitude|in order to/gi;
 if (RP) {
-  const py = fs.readFileSync(path.join(RP, "scripts/learn_curriculum/data.py"), "utf8");
+  const py = fs.readFileSync(RP, "utf8");
   NUC = new RegExp(py.match(/DENY_NUC = r"([^"]+)"/)[1], "i");
   RISK = new RegExp((py.match(/DENY_RISK = \(([\s\S]*?)\)\n/)[1].match(/r"([^"]*)"/g) || []).map(s => s.slice(2, -1)).join(""), "i");
 }
-ok(RISK, "the scan's DENY_RISK read from scripts/learn_curriculum/data.py");
+ok(RISK, "the scope scan's DENY_RISK read from its word lists");
 const SIDE = fs.readFileSync(path.join(SITE, "learn/_w1", ID + ".yml"), "utf8");
 const strings = o => typeof o === "string" ? [o] : Array.isArray(o) ? o.flatMap(strings) : o && typeof o === "object" ? Object.values(o).flatMap(strings) : [];
 const fm = (PAGE.match(/^---\n([\s\S]*?)\n---/) || ["", ""])[1].split("\n").map(l => (l.match(/^(?:title|subtitle|description): "(.*)"$/) || [])[1]).filter(Boolean);
@@ -437,11 +437,11 @@ const SENT = UNITS.flatMap(split);
 const both = SENT.filter(s => NUC.test(s) && RISK && RISK.test(s.replace(BENIGN, " ")));
 ok(both.length === 0, "no sentence pairs a nuclear term with a risk term (page, front matter, data, script strings, sidecar): " + both.join(" | ").slice(0, 240));
 ok(UNITS.filter(u => NUC.test(u) && RISK && RISK.test(u.replace(BENIGN, " "))).every(u => /<|^Holds when|^Assumed|^Inside|^Left out/.test(u) || split(u).length > 1 || u === row), "no single text element pairs them either (each element that names both is several sentences or a list)");
-// the stricter check of review #1: no nuclear term and a cost word in one sentence (the scan's cost terms are only cost
+// the stricter check: no nuclear term and a cost word in one sentence (the scan's cost terms are only cost
 // trajectories, so "an existing reactor's capital" next to "capital cost" passed it)
 const COST = /\bcosts?\b|capital|\bsunk\b|upkeep|O&M|levelized|LCO[EHS]/i;
 const nucCost = UNITS.filter(u => u !== row).flatMap(split).concat([...row.matchAll(/^  [a-z_]+: (.*)$/gm)].map(m => m[1])).filter(s => NUC.test(s) && COST.test(s));   // the path.yml row field by field
-ok(nucCost.length === 0, "no sentence pairs a nuclear term with a cost word (review #1): " + nucCost.join(" | ").slice(0, 240));
+ok(nucCost.length === 0, "no sentence pairs a nuclear term with a cost word: " + nucCost.join(" | ").slice(0, 240));
 ok(NUC.test("The study treats an existing reactor's capital as already spent (a sunk cost).") && COST.test("The study treats an existing reactor's capital as already spent (a sunk cost)."), "the cost check catches the wording the review found (a planted control)");
 if (RG) {
   const NK = ["E15.1", "E15.2", "E15.3", "E15.4", "E15.5", "E15.11", "E15.12", "E15.13", "E15.19", "E15.26", "E15.29"], NROWS = NK.map(k => X.norm(RG.raw[k]));
@@ -455,17 +455,17 @@ if (RG) {
   ok(withN.every(s => NROWS.some(u => u.includes(s)) || OTHER.some(o => X.norm(o).includes(s))), "a nuclear term only in those rows, the title and the earlier-lessons line: " + withN.filter(s => !NROWS.some(u => u.includes(s)) && !OTHER.some(o => X.norm(o).includes(s))).join(" | ").slice(0, 240));
 }
 const ALL = (PAGE.replace(/<!--[\s\S]*?-->/g, "") + "\n" + JSON.stringify(D) + "\n" + JSSTR.join("\n") + "\n" + SIDE + "\n" + row);
-ok(!/\b45[UVY]\b|\b48E\b|MACRS|greenfield|new[- ]plant|new[- ]build|Cases? [34]\b|subsidy|profitab|without (policy|subsid|credit)|PJM|Data Miner|market data/i.test(ALL), "no credit name, no new-plant case, no 'without policy support' or 'profitable', no PJM or market-data wording (G-POL, G-NUC, decision 12)");
+ok(!/\b45[UVY]\b|\b48E\b|MACRS|greenfield|new[- ]plant|new[- ]build|Cases? [34]\b|subsidy|profitab|without (policy|subsid|credit)|PJM|Data Miner|market data/i.test(ALL), "no credit name, no new-plant case, no 'without policy support' or 'profitable', no PJM or market-data wording (credit and nuclear scope)");
 ok(!/data[- ]?cent|hyperscale|\bcampus\b|colocat|small modular|\bSMR\b|\bAI\b|artificial intelligence/i.test(ALL), "no data-center or small-modular wording, no AI wording");
 const hrefs = [...PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1:end -->/g, "").matchAll(/(?:href|src)="([^"]+)"/g)].map(m => m[1]).concat([...PAGE.matchAll(/\]\(([^)]+)\)/g)].map(m => m[1]), strings(D).filter(s => /^https?:/.test(s)));
 const HOK = h => h === DOI || h === REPO || h === REPO + "#quick-start" || /^[0-9a-z-]+\.html$/.test(h) || /^\.\.\/assets\/learn\//.test(h);
 ok(hrefs.every(HOK), "links: the paper's DOI, the allow-listed repository (and its README's Quick start), learn pages and the lesson's own assets only: " + hrefs.filter(h => !HOK(h)).join(", "));
 { const oc2 = (PAGE.match(/<p class="lx-eyebrow">With open code<\/p>([\s\S]*?)<\/div>/) || [])[1] || "";
-  ok(oc2.includes('<a href="' + REPO + '#quick-start">Quick start</a>') && oc2.indexOf("Set it up first") < oc2.indexOf("<code>") && /Each run writes revenue_musd_per_yr\.csv and summary\.json into its --out-dir folder\. Compare the revenue tables, and grid_output_range_mw under "flexibility" in summary\.json/.test(X.norm(oc2)), "part 7: how to set up first (the README's Quick start), and which outputs to compare (review #12)"); }
+  ok(oc2.includes('<a href="' + REPO + '#quick-start">Quick start</a>') && oc2.indexOf("Set it up first") < oc2.indexOf("<code>") && /Each run writes revenue_musd_per_yr\.csv and summary\.json into its --out-dir folder\. Compare the revenue tables, and grid_output_range_mw under "flexibility" in summary\.json/.test(X.norm(oc2)), "part 7: how to set up first (the README's Quick start), and which outputs to compare"); }
 ok(!/projects\/|research\.(html|qmd)|npph2|arxiv|explainers\//i.test((PAGE.replace(/<!--[\s\S]*?-->/g, "") + JS + JSON.stringify(D)).replace(/data-source="excerpt:npph2-existing"/, "")), "no project page, no Research page, no explainer, no preprint");
 { const PJ = JSON.parse(fs.readFileSync(L("data/path.json"), "utf8")), live = new Set(), walk = o => { if (Array.isArray(o)) o.forEach(walk); else if (o && typeof o === "object") { if (o.href && o.ready === true) live.add(o.href); Object.values(o).forEach(walk); } };
   walk(PJ); hrefs.filter(h => /^[0-9a-z-]+\.html$/.test(h) && h !== "index.html").forEach(h => ok(live.has(h), "linked lesson is live: " + h)); }
-ok(!/Numbers to remember/.test(PAGE.replace(/<!--[\s\S]*?-->/g, "")), "no numbers to remember (decision 6)");
+ok(!/Numbers to remember/.test(PAGE.replace(/<!--[\s\S]*?-->/g, "")), "no numbers to remember");
 ok(/<script src="\.\.\/assets\/learn\/learn\.js" defer><\/script>\n<script src="\.\.\/assets\/learn\/cf4-existing-reactors-hydrogen\.js" defer>/.test(PAGE), "the page loads the bundle and its own script only");
 
 console.log(`test_${ID}: ${checks - fails}/${checks} checks passed`);

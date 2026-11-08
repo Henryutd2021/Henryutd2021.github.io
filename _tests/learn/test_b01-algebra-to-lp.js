@@ -123,7 +123,7 @@ if (process.argv.includes("--fallback")) { console.log(fallbackSVG()); process.e
     ok(B.compare(bat, { sense: "max", c: [-30, 120], rows: bm.filter(r => r.b !== 120 && !(r.key === "sellHours")).filter(r => !(r.a[0] === 0 && r.a[1] === 1 && r.b === 80)) }, bat.view).ok, "compare: battery without its two redundant power rules is the same model");
     ok(!B.compare(bat, { sense: "max", c: [-30, 120], rows: bm.map(r => r.b === 0 && r.a[0] === -0.9 ? { a: [0, 1], op: "<=", b: 0.9 } : r) }, bat.view).ok, "compare: d ≤ 0.9 instead of d ≤ 0.9c is caught");
     ok(B.compare(bat, { sense: "max", c: [-30, 120], rows: bm.map(r => r.a[0] === -0.9 ? { a: [0.9, -1], op: ">=", b: 0 } : r) }, bat.view).ok, "compare: 0.9c − d ≥ 0 is the losses rule too");
-    // the allowance is for rounding, not for changed requirements (review 2026-11-02)
+    // the allowance is for rounding, not for changed requirements
     const r8 = eq(base.map(r => r.b === 40 ? { a: r.a, op: r.op, b: 39.5 } : r)); ok(!r8.ok && r8.missing.some(m => m.key === "heat"), "compare: 39.5 MWh of heat instead of 40 is rejected");
     ok(!eq([{ a: [0.33, 0], op: "<=", b: 10 }].concat(base.filter(r => r.b !== 30))).ok, "compare: 0.33h ≤ 10 (1% off) is rejected; 0.333h passes above");
     const car = stories.carbon, cm = car.rows.map(r => ({ a: r.a.slice(), op: r.op, b: r.b }));

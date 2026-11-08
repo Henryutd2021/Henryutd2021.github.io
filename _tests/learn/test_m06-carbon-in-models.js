@@ -11,11 +11,11 @@
 //     and sun; claims are 0; certificates from existing wind change nothing (the annual rule is met by the existing
 //     fleet's wind); every shown number is unique; the full-year checks in Go deeper (annual energy, unmatched hours)
 //   - the page's blocks (fallback, explain, check, full year, reference block) are written from the model (--write)
-//   - research wording: every excerpt sentence is approved (E6, E10) word for word in the register (E11.10 left out by the
-//     coordinator's decision of 2026-11-05: nothing public says total demand stays constant); the repository
+//   - research wording: every excerpt sentence is approved (E6, E10) word for word in the approved wording (E11.10 left
+//     out: nothing public says total demand stays constant); the repository
 //     commands are the README's; scope; links; text budget; the notebook reads the same data and asserts the reference;
 //     the page on a stub document with a failing, then working, solver
-//   - review fixes (2026-11-05): the printed (rounded) dual does not tie, the unrounded one does; the full-year check
+//   - the details: the printed (rounded) dual does not tie, the unrounded one does; the full-year check
 //     reports only the unmatched energy (the optimum; which hours carry it can differ); the no-rule purchase is counted
 //     at average factors, not 0 t; the dual is the magnitude of the frontier's downward slope; the stage switches to the
 //     year with the data center in steps 5-7; the explain layer follows the reader's cap; a solve that ends after the
@@ -25,7 +25,7 @@
 const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
-const cp = require("child_process");
+const PRIV = require("./private_sources.js");
 const ID = "m06-carbon-in-models";
 const SITE = path.resolve(__dirname, "..", "..");
 const L = p => path.join(SITE, "assets/learn", p);
@@ -205,11 +205,6 @@ ${buyRow("New wind, sun and batteries, matched hour by hour", Hr, "0 t", `${mw(H
   ok(JSON.stringify(D.reference) === JSON.stringify(JSON.parse(JSON.stringify(ref))), "the reference block equals a fresh solve (run --write)");
 
   // ---------------- research wording, scope, links, text
-  function portfolio() {
-    const cands = [process.env.LEARN_PORTFOLIO, path.join(SITE, "..")];
-    try { cands.push(path.resolve(SITE, cp.execSync("git rev-parse --git-common-dir", { cwd: SITE, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim(), "..", "..")); } catch (e) { /* not a checkout */ }
-    return cands.filter(Boolean).find(p => fs.existsSync(path.join(p, "reports/learn/excerpts_for_approval.md")));
-  }
   const norm = s => String(s).replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/\s+/g, " ").trim();
   const SNAP = {
     "E6.6": "Reductions are computed under average-emission-intensity accounting with perfect foresight; they are not estimates of the consequential (marginal) system response.",
@@ -218,26 +213,26 @@ ${buyRow("New wind, sun and batteries, matched hour by hour", Hr, "0 t", `${mw(H
     "E10.3": "Industry then drew more hydrogen from gas reformers, and the round trip from power to hydrogen and back lost energy, so total emissions rose although gas-plant emissions fell.",
     "E10.4": "Inputs reflect 2022–2023 conditions; post-2023 federal hydrogen credit rules are not modeled."
   };
-  const RP = portfolio(); let APPROVED = SNAP;
+  const RP = PRIV.path("excerpts"); let APPROVED = SNAP;
   if (RP) {
-    const md = fs.readFileSync(path.join(RP, "reports/learn/excerpts_for_approval.md"), "utf8"), reg = {};
+    const md = fs.readFileSync(RP, "utf8"), reg = {};
     md.split("\n").forEach(line => { const m = line.match(/^\| (E(6|10|11)\.\d+)(?: \[N\])? \| (.*) \|\s*$/); if (m && !reg[m[1]]) reg[m[1]] = norm(m[3].split(" | ")[0]); });
-    Object.keys(SNAP).forEach(k => ok(reg[k] === SNAP[k], `register ${k} equals the snapshot`));
-    ok(/E10 in CF3, M8, A10, M6/.test(md) && /E6 in A10, M6/.test(md), "the register records the M6 placements (E6, E10)");
+    Object.keys(SNAP).forEach(k => ok(reg[k] === SNAP[k], `approved wording ${k} equals the snapshot`));
+    ok(/E10 in CF3, M8, A10, M6/.test(md) && /E6 in A10, M6/.test(md), "the approved wording records the M6 placements (E6, E10)");
     APPROVED = reg;
-    const bib = fs.readFileSync(path.join(RP, "inputs/publications.bib"), "utf8").toLowerCase();
+    const bib = fs.readFileSync(PRIV.path("publications"), "utf8").toLowerCase();
     [...PAGE.matchAll(/<li>Li et al\. \(\d{4}\)\. <a href="(https:\/\/doi\.org\/[^"]+)">([^<]+)<\/a>/g)].forEach(m => {
       const entry = bib.split("\n@").find(e => e.includes("title={" + m[2].toLowerCase() + "}")) || "", doi = (entry.match(/doi\s*=\s*\{([^}]+)\}/) || [])[1];
-      ok(entry && (!doi || doi === m[1].replace("https://doi.org/", "").toLowerCase()), "citation title (and DOI) as in publications.bib: " + m[2].slice(0, 50));
+      ok(entry && (!doi || doi === m[1].replace("https://doi.org/", "").toLowerCase()), "citation title (and DOI) as in the publication list: " + m[2].slice(0, 50));
     });
-  } else console.log("note: excerpts_for_approval.md not found (set LEARN_PORTFOLIO); checked against the snapshot");
+  } else console.log("note: the approved excerpt wording is not available (set LEARN_SOURCES); checked against the snapshot");
   const UNITS = Object.values(APPROVED).map(norm), approved = s => { s = norm(s); return s.length > 0 && UNITS.some(u => u === s || u.split(/(?<=[.?!])\s+/).indexOf(s) >= 0); };
   const quotes = [...PAGE.matchAll(/<blockquote class="lx-excerpt" data-source="([^"]+)">([\s\S]*?)<footer>/g)];
   ok(quotes.map(q => q[1]).join(",") === "excerpt:ghg,excerpt:txh2", "two excerpts: ghg and txh2");
   quotes.forEach(q => [...q[2].matchAll(/<p>([\s\S]*?)<\/p>/g)].forEach(p => ok(approved(p[1]), `${q[1]}: approved sentence: ${norm(p[1]).slice(0, 60)}`)));
   const paras = q => [...q[2].matchAll(/<p>([\s\S]*?)<\/p>/g)].map(p => norm(p[1])).join(" ");
   ok(paras(quotes[0]) === SNAP["E6.6"] && paras(quotes[1]) === [SNAP["E10.1"], SNAP["E10.2"], SNAP["E10.3"]].join(" "), "ghg: E6.6; txh2: E10.1, E10.2, E10.3, word for word");
-  ok(!/Modest load flexibility/.test(PAGE + JS), "E11.10 is not placed in M6 (coordinator, 2026-11-05)");
+  ok(!/Modest load flexibility/.test(PAGE + JS), "E11.10 is not placed in M6");
   ok(PAGE.includes(`<p class="lx-hint">${SNAP["E10.4"]}</p>`), "E10.4 under the txh2 excerpt");
   const OWN = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1:end -->/g, "").replace(/<!--[\s\S]*?-->/g, "").replace(/^---[\s\S]*?\n---\n/, "");
   const RX = /\b(stud(y|ies)|paper|Li et al|course author|excerpt|ERCOT|Texas|weather zones?|load regulation)\b/i;

@@ -68,7 +68,7 @@ const KEYS = ["nuclear", "wind", "solar"];
   ok(viaHelper.mw.every((x, i) => near(x, W.wind.out[i], 1e-9)) && viaHelper.monthly.length === 12, "townProfile(..., {monthlyCF: true}) gives the lesson's wind year");
   const again = M.profile(year, "wind", P, T.wind, D, CT.monthly.wind);
   ok(again.every((x, i) => near(x, W.wind.out[i], 1e-9)), "profile() is deterministic");
-  // night-time solar is zero in the data itself (scripts/build_learn_town_data.py); the lesson keeps zero hours at zero
+  // night-time solar is zero in the data itself (the town data build step); the lesson keeps zero hours at zero
   ok(year.solar.every((x, i) => x > 0 || W.solar.out[i] === 0), "solar: hours that are zero in town_year.json stay zero");
   ok(JS.indexOf("sunUp") < 0 && !D.solarClean, "no lesson-local night cleaning (the data build does it)");
   console.log(`year: nuclear ${int(W.nuclear.energy)} MWh (${pct(W.nuclear.cf)}), wind ${int(W.wind.energy)} MWh (${pct(W.wind.cf)}, best hour ${W.wind.max.toFixed(1)} MW), solar ${int(W.solar.energy)} MWh (${pct(W.solar.cf)})`);
@@ -131,7 +131,7 @@ const KEYS = ["nuclear", "wind", "solar"];
       else ok(f.ok === (v >= tb.cutIn && 2 * v > tb.ratedSpeed && 2 * v <= tb.cutOut), `rated ${v}: passes iff the double crosses the rated speed and stays below cut-out`);
     });
   }
-  ok(M.windFeedback("rated", 2, 4, tb).text.indexOf("eight times") < 0 && Math.round(M.power(4, tb)) === 111, "rated step from 2 m/s: 0 -> 111 kW, no 'eight times again' (review finding 2)");
+  ok(M.windFeedback("rated", 2, 4, tb).text.indexOf("eight times") < 0 && Math.round(M.power(4, tb)) === 111, "rated step from 2 m/s: 0 -> 111 kW, no 'eight times again'");
 }
 
 // ---------------- 1 MW in a year and the apply step
@@ -236,9 +236,9 @@ const KEYS = ["nuclear", "wind", "solar"];
   const vals = []; (function walk(o) { if (typeof o === "string") vals.push(o); else if (o && typeof o === "object") Object.values(o).forEach(walk); })(D);
   const sentences = [page.replace(/<[^>]+>/g, " ")].concat(lits, vals).join("\n").split(/(?<=[.!?])\s+|\n+/);
   sentences.forEach(s => ok(!(NUC.test(s) && RISK.test(s)), `scope: nuclear term with a risk term in "${s.slice(0, 90)}"`));
-  // the lesson's own links (curriculum §20.3). The generated meta, next and footer blocks are left out: build_learn.py writes
-  // them for every lesson (the footer's licence links are a documented scanner allowance, scripts/learn_scope_scan.py
-  // SCANNER_ALLOW), and learn_scope_scan.py checks the rendered page as a whole.
+  // the lesson's own links (the course's allowed link destinations). The generated meta, next and footer blocks are left
+  // out: the course build step writes them for every lesson (the footer's licence links are a documented allowance of the
+  // scope scan, SCANNER_ALLOW), and the scope scan checks the rendered page as a whole.
   const own = QMD.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1:end -->/g, "");
   const ALLOW = /^(https:\/\/(www\.|docs\.)?(eia\.gov|energy\.gov|ferc\.gov|nerc\.com|nrel\.gov|nlr\.gov|doi\.org)\/|https:\/\/github\.com\/Henryutd2021\/mfgpr-wind-power-curve|#|\.\.\/assets\/|[0-9a-z-]+\.(qmd|html)(#[a-z0-9-]*)?$)/;
   let nl = 0;

@@ -19,7 +19,7 @@
 //     stale results are dropped, Next is held until the newest result, results are announced in a live region
 // Usage (from the site folder):  node _tests/learn/test_a22-tradeoff-explorer.js [--write]
 //   --write  re-solve the nine plans on all 8,760 hours and store their measures ('m' in a22-tradeoff-explorer.json) first
-//            (W4 carry-over: lesson 13's battery costs moved to 2025 dollars)
+//            (lesson 13's battery costs in 2025 dollars)
 "use strict";
 const fs = require("fs");
 const path = require("path");

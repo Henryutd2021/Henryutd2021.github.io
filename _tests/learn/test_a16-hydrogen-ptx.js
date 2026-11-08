@@ -3,23 +3,23 @@
 //   - the chain: 1 MWh -> 17.5 kg -> 0.58 MWh held -> 0.35 MWh back
 //   - the hourly rules: energy balances (electrolyzer use = spare used + wind diverted + grid), part-load (never below the
 //     minimum load), curtailment never rises, the annual rule's matching holds at the page's 30 MW
-//   - claims (W3 brief §2.4): on spare wind utilization falls and the cost per kg rises with every size step (the myth);
-//     average utilization is energy / (size x 8,760), and the hours running and at full size are counted apart (review 1);
+//   - claims: on spare wind utilization falls and the cost per kg rises with every size step (the myth);
+//     average utilization is energy / (size x 8,760), and the hours running and at full size are counted apart;
 //     the owner may build none: at low prices every size loses money and none is chosen, otherwise the owner's best size
-//     is at least the cheapest-kg size (review 2); ties go to the smaller size (stated in the model), none on the slider
-//   - the tank: the least working storage for 2025, with its start fill shown (review 7)
-//   - the decision flowchart agrees with the use sorter: every bin has an end box (review 4)
+//     is at least the cheapest-kg size; ties go to the smaller size (stated in the model), none on the slider
+//   - the tank: the least working storage for 2025, with its start fill shown
+//   - the decision flowchart agrees with the use sorter: every bin has an end box
 //   - every number on the page (fallback, explain, myths, quiz, numbers to remember) against the model and the data
-//   - research wording (curriculum §13, guard G-SRC; CF2's pattern): every excerpt sentence and every sentence about the
-//     course author's studies is an approved sentence of reports/learn/excerpts_for_approval.md (E3, E4, E10, with the
-//     revisions after review), word for word; titles of cited papers as in inputs/publications.bib
+//   - research wording (the course's sourcing rule; CF2's pattern): every excerpt sentence and every sentence about the
+//     course author's studies is an approved sentence of the excerpt wording (E3, E4, E10, with the revisions after
+//     review), word for word; titles of cited papers as in the author's publication list
 //   - scope: no nuclear term, no data centers, links only to allowed domains
 // Usage (from the site folder):  node _tests/learn/test_a16-hydrogen-ptx.js
 "use strict";
 const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
-const cp = require("child_process");
+const PRIV = require("./private_sources.js");
 const ID = "a16-hydrogen-ptx";
 const SITE = path.resolve(__dirname, "..", "..");
 const L = p => path.join(SITE, "assets/learn", p);
@@ -58,7 +58,7 @@ const R30 = rules.map(r => M.run(Y, 30, r, "pem"));
 ok(R30[2].matched && R30[2].mwh <= R30[2].windMWh, `annual rule at 30 MW: the year's use (${fm.gwh(R30[2].mwh)}) is matched by the farm's wind (${fm.gwh(R30[2].windMWh)})`);
 const rowTxt = ["Spare wind only", "Wind matched hour by hour", "Grid power matched over the year"];
 R30.forEach((o, i) => onPage(`<tr><td>${rowTxt[i]}</td><td>${fm.pct(o.util)}</td><td>${o.hoursOn.toLocaleString("en-US")}</td><td>${fm.kg2(o.lcoh)}</td><td>${fm.co2(o.gridCO2)}</td></tr>`, "the fallback row " + rowTxt[i]));
-// average utilization is not time at full output (review 1)
+// average utilization is not time at full output
 R30.forEach(o => ok(near(o.util, o.mwh / (30 * 8760)) && near(o.eflh, o.mwh / 30) && o.hoursFull <= o.hoursOn, `${o.rule} at 30 MW: average utilization = MWh / (30 MW x 8,760 h); full-load hours ${Math.round(o.eflh)}; full-size hours ${o.hoursFull} <= hours running ${o.hoursOn}`));
 ok(R30[0].hoursFull / 8760 < R30[0].util / 4 && R30[0].hoursOn / 8760 > R30[0].util, "spare wind at 30 MW: full-size hours are far below the average utilization, hours running far above it");
 onPage(`On spare wind the unit runs in ${R30[0].hoursOn.toLocaleString("en-US")} hours but at full size in only ${R30[0].hoursFull}.`, "the fallback's utilization hint");
@@ -83,7 +83,7 @@ let nNone = 0;
      `${tech} at $${p.toFixed(2)}/kg: best for the owner ${b.none ? "none (every size loses money)" : b.net.X + " MW"}, cheapest kg ${b.lcoh.X} MW; the choice is unique (no tie within $1)`);
   if (b.none && tech === "pem") nNone++;
 } });
-ok(nNone >= 1 && M.best(Y, "spare", "pem", D.prices.min).none && near(M.net(M.run(Y, 5, "spare", "pem"), 2), -180970, 1), "at the lowest price on the slider every size loses money (5 MW: about -$181,000 a year) and the owner builds none (review 2)");
+ok(nNone >= 1 && M.best(Y, "spare", "pem", D.prices.min).none && near(M.net(M.run(Y, 5, "spare", "pem"), 2), -180970, 1), "at the lowest price on the slider every size loses money (5 MW: about -$181,000 a year) and the owner builds none");
 ok(M.lossPrice(Y, "pem", D) === 2.5 && !M.best(Y, "spare", "pem", 3).none, "PEM: at $2.50 or less every size loses money; at $3.00 the 5 MW unit earns (step 4's sentence)");
 ok(/at \$" \+ LOSS\.toFixed\(2\) \+ " or less every size loses money, so none is built/.test(JS) && /"0 \(none\)"/.test(JS), "step 4: the sentence reads the loss price from the model; the chart's text version lists 'none'");
 const b4 = M.best(Y, "spare", "pem", 4);
@@ -106,26 +106,26 @@ D.facts.forEach(f => { const row = PAGE.indexOf('<td class="n">' + f.n + "</td><
 ok(D.uses.cards.length === 8 && D.uses.cards.every(u => D.uses.bins.some(b => b.id === u.bin) && u.why.split(" ").length <= 25), "use sorter: eight cards, each in a bin with a short reason");
 ok(D.uses.cards.find(u => u.id === "cars").why.includes("about 60 miles per kg, made with 57 kWh: about 1 mile per kWh") && near(60 / 57, 1.05, 0.01), "cars: about 60 miles per kg at 57 kWh/kg is about 1 mile per kWh, input shown");
 ok(D.uses.sources.some(x => x.url === "https://afdc.energy.gov/files/u/publication/hydrogen_fuel_cell_electric_vehicles.pdf" && /60 miles/.test(x.label)) && PAGE.includes("https://afdc.energy.gov/files/u/publication/hydrogen_fuel_cell_electric_vehicles.pdf"), "the 60 miles per kg has its own source, the AFDC fuel cell vehicle fact sheet (January 2025)");
-ok(D.uses.sources.every(x => /^https:\/\//.test(x.url) && x.date) && /<a href=\\"" \+ LX\.esc\(s\.url\)/.test(JS) && /LX\.esc\(s\.date\)/.test(JS), "the sorter's sources render with links and dates (review 13)");
-// the no-JavaScript sorter table (review 12): every card, its bin and its reason
+ok(D.uses.sources.every(x => /^https:\/\//.test(x.url) && x.date) && /<a href=\\"" \+ LX\.esc\(s\.url\)/.test(JS) && /LX\.esc\(s\.date\)/.test(JS), "the sorter's sources render with links and dates");
+// the no-JavaScript sorter table: every card, its bin and its reason
 { const bin = id => D.uses.bins.find(b => b.id === id).label;
   D.uses.cards.forEach(u => onPage(`<tr><td>${u.text}</td><td>${bin(u.bin)}</td><td>${u.why}</td></tr>`, "the no-JS sorter row " + u.id)); }
-// the metadata counts the cards (review 14)
+// the metadata counts the cards
 { const PY = fs.readFileSync(path.join(SITE, "learn/path.yml"), "utf8"), row = PY.slice(PY.indexOf("id: a16-hydrogen-ptx"), PY.indexOf("id: a16-hydrogen-ptx") + 2000), W = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
   ok(row.includes(`sort ${W[D.uses.cards.length]} uses`) && PAGE.includes(`sort ${W[D.uses.cards.length]} uses`) && JS.includes(`Sort ${W[D.uses.cards.length]} uses`), `path.yml, the page's metadata and step 7 say ${W[D.uses.cards.length]} uses, as many as the sorter's cards`); }
-// the flowchart agrees with the sorter (review 4): feedstock -> hydrogen, else electricity only if it does the job, else compare
+// the flowchart agrees with the sorter: feedstock -> hydrogen, else electricity only if it does the job, else compare
 ok(/\["use", "direct", "no"\], \["direct", "elec", "yes"\], \["direct", "both", "not yet"\]/.test(JS) && /label: "Ocean shipping", path: \["wind", "ez", "store", "use", "direct", "both"\]/.test(JS) && D.uses.bins.map(b => b.id).join() === "feed,both,elec",
    "flowchart: a non-feedstock use goes to electricity only when electricity can do the job, else to a comparison, as the sorter's three bins");
-// the DOE comparison's boundary (review 3) and the controlled technology comparison (review 8)
+// the DOE comparison's boundary and the controlled technology comparison
 ok(!/full estimate|full analysis counts/.test(PAGE + JS) && PAGE.includes("Compression, storage and delivery are outside both.") && /compression, storage and delivery out/.test(PAGE) && /leaves out compression, storage, distribution and dispensing/.test(D.electrolyzer.doeBoundary),
    "DOE's $5-7/kg is named a production cost with upkeep and stack replacement, without compression, storage or delivery");
 ok(JS.includes("Only the minimum load changes here; capital cost and electricity use are held equal.") && E.minLoad.pem !== E.minLoad.alk, "step 3 says only the minimum load differs between PEM and alkaline");
-// matching and accounting kept apart (review 6); the capture example keeps its conditions (review 5)
+// matching and accounting kept apart; the capture example keeps its conditions
 ok(PAGE.includes("Matching sets which power may count. Separately, from 2030 DOE's 45VH2-GREET manual (December 2025) lets a producer opt to count its electricity's emissions hour by hour") && !/in place of annual accounting/.test(PAGE), "Go deeper: hourly emissions accounting from 2030 is an option, separate from matching");
 ok(PAGE.includes("could reach about 4.0, if it uses the average U.S. grid mix and upstream methane leaks stay at or below 1%"), "Go deeper: the 95% capture example keeps DOE's conditions");
 ok(/12 September 2025/.test(PAGE) && D.facts[0].asof.startsWith("published 12 September 2025"), "IEA: the publication date, 12 September 2025 (revised October 2025)");
 
-// ---------------- research wording (curriculum §13): approved sentences only
+// ---------------- research wording (the sourcing rule): approved sentences only
 const SNAP = {
   "E3.14": "A higher hydrogen price makes each kilogram worth more, so the optimizer builds a larger electrolyzer to capture more surplus wind. The extra capacity runs fewer full-load hours, so the cost per kilogram, the levelized cost of hydrogen, goes up. Yet the added hydrogen revenue lowers the net cost of the whole system. The cost per kilogram and the system's cost move in opposite directions.",
   "E4.1": "Among the cases studied, concentrated solar power with thermal storage running a high-temperature electrolyzer at variable power gave the lowest levelized cost of hydrogen; constant-power operation was the most expensive.",
@@ -134,30 +134,25 @@ const SNAP = {
   "E10.3": "Industry then drew more hydrogen from gas reformers, and the round trip from power to hydrogen and back lost energy, so total emissions rose although gas-plant emissions fell.",
   "E10.4": "Inputs reflect 2022–2023 conditions; post-2023 federal hydrogen credit rules are not modeled."
 };
-function portfolio() {
-  const cands = [process.env.LEARN_PORTFOLIO, path.join(SITE, "..")];
-  try { cands.push(path.resolve(SITE, cp.execSync("git rev-parse --git-common-dir", { cwd: SITE, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim(), "..", "..")); } catch (e) { /* not a checkout */ }
-  return cands.filter(Boolean).find(p => fs.existsSync(path.join(p, "reports/learn/excerpts_for_approval.md")));
-}
-const RP = portfolio();
+const RP = PRIV.path("excerpts");
 const norm = s => String(s).replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/\s+/g, " ").trim();
 let APPROVED = SNAP;
 if (RP) {
-  const md = fs.readFileSync(path.join(RP, "reports/learn/excerpts_for_approval.md"), "utf8"), reg = {}; let sec = null;
+  const md = fs.readFileSync(RP, "utf8"), reg = {}; let sec = null;
   md.split("\n").forEach(line => {
     if (/^## /.test(line)) { const h = line.match(/^## (E\d+)\.|^## (Revisions after review)/); sec = h ? (h[1] || "REV") : null; return; }
     const m = line.match(/^\| (E(\d+)\.\d+) \| (.*) \|\s*$/); if (!m || !sec || ["E3", "E4", "E10"].indexOf("E" + m[2]) < 0) return;
     const cells = m[3].split(" | "); if (sec === "REV") reg[m[1]] = norm(cells[1].replace(/^Timeline, [^:]+: /, "")); else if (sec === "E" + m[2]) reg[m[1]] = norm(cells[0].replace(/^Timeline, [^:]+: /, ""));
   });
-  Object.keys(SNAP).forEach(k => ok(reg[k] === SNAP[k], `register ${k} equals the snapshot`));
-  ok(/E10\.1–E10\.4/.test(md.split("## E8.")[0]), "the register records E10.1–E10.4 as approved");
+  Object.keys(SNAP).forEach(k => ok(reg[k] === SNAP[k], `approved ${k} equals the snapshot`));
+  ok(/E10\.1–E10\.4/.test(md.split("## E8.")[0]), "the approved wording records E10.1–E10.4 as approved");
   APPROVED = reg;
-  const bib = fs.readFileSync(path.join(RP, "inputs/publications.bib"), "utf8").toLowerCase();
+  const bib = fs.readFileSync(PRIV.path("publications"), "utf8").toLowerCase();
   [...PAGE.matchAll(/<li>Li et al\. \(\d{4}\)\. <a href="(https:\/\/doi\.org\/[^"]+)">([^<]+)<\/a>/g)].forEach(m => {
     const entry = bib.split("\n@").find(e => e.includes("title={" + m[2].toLowerCase() + "}")) || "", doi = (entry.match(/doi\s*=\s*\{([^}]+)\}/) || [])[1];
-    ok(entry && (!doi || doi === m[1].replace("https://doi.org/", "").toLowerCase()), "citation title (and DOI where the bib has one) as in publications.bib: " + m[2].slice(0, 50));
+    ok(entry && (!doi || doi === m[1].replace("https://doi.org/", "").toLowerCase()), "citation title (and DOI where the list has one) as in the publication list: " + m[2].slice(0, 50));
   });
-} else console.log("note: excerpts_for_approval.md not found (set LEARN_PORTFOLIO); checked against the snapshot");
+} else console.log("note: the approved excerpt wording is not available (set LEARN_SOURCES); checked against the snapshot");
 const UNITS = Object.values(APPROVED).map(norm);
 const approved = s => { s = norm(s); return s.length > 0 && UNITS.some(u => u === s || u.split(/(?<=[.?!])\s+/).indexOf(s) >= 0); };
 const quotes = [...PAGE.matchAll(/<blockquote class="lx-excerpt" data-source="([^"]+)">([\s\S]*?)<footer>/g)];
@@ -165,7 +160,7 @@ ok(quotes.length === 2 && quotes.map(q => q[1]).join(",") === "excerpt:txh2,exce
 quotes.forEach(q => [...q[2].matchAll(/<p>([\s\S]*?)<\/p>/g)].forEach(p => ok(approved(p[1]), `${q[1]}: approved sentence: ${norm(p[1]).slice(0, 60)}`)));
 ok(norm(quotes[0][2]).startsWith(SNAP["E10.2"]) && norm(quotes[0][2]).endsWith(SNAP["E10.3"]), "txh2: E10.2 then E10.3, word for word");
 onPage(`<p class="lx-hint">${SNAP["E10.4"]}</p>`, "E10.4 under the txh2 excerpt"); onPage(`<p class="lx-hint">${SNAP["E4.2"]}</p>`, "E4.2 under the solar excerpt");
-ok(/Approved excerpt of: Li et al\. \(2025\), <a href="https:\/\/doi\.org\/10\.1016\/j\.ijhydene\.2025\.02\.303">International Journal of Hydrogen Energy<\/a>\./.test(PAGE), "txh2 footer and DOI as the coordinator gave them");
+ok(/Approved excerpt of: Li et al\. \(2025\), <a href="https:\/\/doi\.org\/10\.1016\/j\.ijhydene\.2025\.02\.303">International Journal of Hydrogen Energy<\/a>\./.test(PAGE), "txh2 footer and DOI as approved");
 const exSteps = [...PAGE.matchAll(/<ol class="ex-fallback[^"]*">([\s\S]*?)<\/ol>/g)].flatMap(m => [...m[1].matchAll(/<li>([\s\S]*?)<\/li>/g)].map(x => x[1]));
 ok(exSteps.length === 4 && exSteps.every(approved), "the explainer's no-JS steps are E3.14, sentence by sentence");
 // any element that names a study, a paper, its author or method must be approved, or one of these labels
@@ -201,7 +196,7 @@ ok(!/txh2/.test(SIDE.split("requests:")[1] || "") || !/pending/i.test(SIDE), "si
 ["procurement-rule", "hourly-matching", "minimum-load", "full-load-hours", "pem-electrolyzer", "alkaline-electrolyzer", "lower-heating-value", "feedstock", "co2e", "well-to-gate", "additionality", "deliverability"].forEach(id => ok(new RegExp("id: " + id + "\\b").test(SIDE), "sidecar defines " + id));
 ["pem-electrolyzer", "alkaline-electrolyzer", "lower-heating-value", "feedstock", "co2e", "well-to-gate", "additionality", "deliverability", "full-load-hours"].forEach(id => ok(new RegExp("\\[\\[" + id + "\\||term=\"" + id + "\"|data-term=\"" + id + "\"").test(JS + PAGE), "the page marks " + id + " for the glossary"));
 
-// ---------------- the page on a stub document (review 9 and 2): no silent switch of type; the owner may build none
+// ---------------- the page on a stub document: no silent switch of type; the owner may build none
 {
   const { env, load } = require("./stubdom.js");
   const E = env();

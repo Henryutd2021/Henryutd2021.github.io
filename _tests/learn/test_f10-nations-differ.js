@@ -17,9 +17,9 @@
 //   - shares: every drawn source classed on its own (fossil, renewable, or neither; Norway's unsplit waste stays apart),
 //     recomputed here from the published rows; China's and India's coverage said beside every row and line
 //   - boundaries: the U.S. end-use note; country-specific sector names; useful energy named a what-if wherever it shows
-//   - scope (curriculum §20.4 and §20.3, copied below; scripts/learn_scope_scan.py is the canonical judge): the deny-list
+//   - scope (the course's scope rules, copied below; the scope scan is the canonical judge): the deny-list
 //     and the nuclear-plus-risk rule over every string the page loads (its data, the regional cards, the Prairieland
-//     strings it shows, the path entries it names) and its own text; links only to §20.3 domains (others "no link"); the
+//     strings it shows, the path entries it names) and its own text; links only to the allowed domains (others "no link"); the
 //     fictional line wherever Prairieland is drawn; the text budget of every note, line, preview, feedback and cell
 // Usage (from the site folder):  node _tests/learn/test_f10-nations-differ.js [--write]
 "use strict";
@@ -291,7 +291,7 @@ M.SECTORS.forEach(s => { const k = { industry: "industry", transport: "transport
 
 // ---------------- scope
 {
-  // curriculum v2 §20.4 (the canonical copy: scripts/learn_curriculum/data.py; learn_scope_scan.py runs it on the rendered site)
+  // the scope scan's deny-list and nuclear-plus-risk rule (copied; the scope scan runs the canonical copy on the rendered site)
   const NUC = /nuclear|reactor|\bSMR\b|small modular/i, RISK = /cost (trajector|decline|reduction|fall)|learning|commerciali|subsid|credit|threshold|break[- ]even|parity|siting|site selection|suitab|screen|deliver|timing|order|anchor|buyer|data[- ]cent/i;
   const DENY = [/\bFOAK\b/, /\bNOAK\b/i, /first[- ]of[- ]a[- ]kind/i, /nth[- ]of[- ]a[- ]kind/i, /learning[- ](curve|rate)/i, /order[- ]book/i, /anchor[- ](customer|buyer)/i, /subsidy[- ]free/i, /parity capital/i, /break[- ]even capital/i, /smr-dc/i, /smr-datacenter/i, /projects\//, /research\.(html|qmd)/, /\bAI\b/, /artificial intelligence/i];
   // every string the page loads: its own data, the regional cards, the Prairieland strings it shows, the path entries it names
@@ -300,7 +300,7 @@ M.SECTORS.forEach(s => { const k = { industry: "industry", transport: "transport
   const plUsed = [PL.about.line, PL.balance.useful.note, PL.balance.sankey, PL.regions.map(r => r.climate), M.PL_SRC.map(k => PL.sources[k])];
   const strs = []; (function walk(x) { if (typeof x === "string") strs.push(x); else if (x && typeof x === "object") Object.keys(x).forEach(k => walk(x[k])); })([D, R, plUsed, pathStrs]);
   ok(strs.length > 500 && pathStrs.length >= 5, "the scope scan covers " + strs.length + " strings, " + pathStrs.length + " of them path entries");
-  const denied = strs.concat([JS, OWN]).filter(s => DENY.some(rx => rx.test(s))); ok(!denied.length, "no deny-listed term (§20.4): " + denied.slice(0, 2).map(s => s.slice(0, 60)).join(" | "));
+  const denied = strs.concat([JS, OWN]).filter(s => DENY.some(rx => rx.test(s))); ok(!denied.length, "no deny-listed term: " + denied.slice(0, 2).map(s => s.slice(0, 60)).join(" | "));
   const bad = strs.filter(s => NUC.test(s) && RISK.test(s)); ok(!bad.length, "no data string pairs a nuclear term with a risk term: " + bad.slice(0, 2).join(" | "));
   const sentences = OWN.replace(/<[^>]+>/g, " ").split(/(?<=[.;:?])\s+/); const badS = sentences.filter(s => NUC.test(s) && RISK.test(s));
   ok(!badS.length, "no page sentence pairs a nuclear term with a risk term: " + badS.slice(0, 2).join(" | "));
@@ -308,7 +308,7 @@ M.SECTORS.forEach(s => { const k = { industry: "industry", transport: "transport
   ok(!all.filter(s => NUC.test(s) && RISK.test(s)).length, "no generated sentence pairs a nuclear term with a risk term");
   ok(!/\bAI\b|artificial intelligence|learning[- ](curve|rate)/i.test(RAW + JS + OWN), "no deny-listed term in the lesson's own files");
   ok(!/not on the course's link list|link list|allow-list/i.test(OWN.replace(/<!--[\s\S]*?-->/g, "")), "no editorial link rule shown on the page");
-  // curriculum v2 §20.3, the external domains (learn/ links are internal; the generated navbar and footer are outside the rule)
+  // the course's allowed external domains (learn/ links are internal; the generated navbar and footer are outside the rule)
   const DOMAINS = ["eia.gov", "energy.gov", "ferc.gov", "nerc.com", "lbl.gov", "nrel.gov", "nlr.gov", "epa.gov", "usgs.gov", "bea.gov", "census.gov", "bls.gov", "noaa.gov", "weather.gov", "fema.gov", "dot.gov", "irs.gov", "energycodes.gov", "kcc.ks.gov",
     "iea.org", "irena.org", "ipcc.ch", "worldbank.org", "ec.europa.eu", "entsoe.eu", "ember-energy.org", "ourworldindata.org", "openalex.org", "iso.org", "ghgprotocol.org", "doi.org", "pjm.com", "spp.org", "ercot.com", "caiso.com", "misoenergy.org", "iso-ne.com", "nyiso.com",
     "stats.gov.cn", "nea.gov.cn", "mospi.gov.in", "epe.gov.br", "ssb.no", "cso.ie", "cer.gov.au", "aemo.com.au", "enecho.meti.go.jp", "meti.go.jp"];

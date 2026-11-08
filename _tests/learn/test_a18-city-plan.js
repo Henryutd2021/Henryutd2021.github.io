@@ -7,7 +7,7 @@
 //     1 t; rooftop solar used on site comes off homes' and businesses' electricity, as prairie-city.json does), scope 3 =
 //     losses; every row and the totals add up; the page calls them CO2-only teaching subtotals, never BASIC or BASIC+
 //   - the baseline: A18's no-plan homes reproduce prairie-city.json's residential gas and heating electricity by district
-//     (same heat per home within a district, as its builder derives them); the target counts the grid's own change
+//     (same heat per home within a district, as its data build step derives them); the target counts the grid's own change
 //   - the programme: rebates are 40% of positive extra up-front costs only, charges never below zero (heat pumps with the
 //     air conditioner due: no rebate, no charge, no double minus sign)
 //   - interactions: furnaces and heat pumps compete (both = heat pumps alone), the joint plan is below the sum of the bars,
@@ -83,7 +83,7 @@ for (const ac of [false, true]) {
   const bill = el * 144.4 - gas * PC.prices.gasPerMMBtu.residential, t = gas * 0.05291 - el * W.grid23 * 1.05, R = M.evaluate(W, ["hp"], Object.assign({}, o0, { ac }));
   ok(near(R.t, t, 1e-6) && near(R.net, ann + keep + bill, 1e-3), "heat pumps by hand" + (ac ? ", air conditioner due" : "") + ": tonnes " + Math.round(t) + ", cost per tonne " + Math.round(R.per));
 }
-// the no-plan homes are prairie-city.json's homes: same heat per home within a district, as its builder derives the gas,
+// the no-plan homes are prairie-city.json's homes: same heat per home within a district, as its data build step derives the gas,
 // propane and heating electricity (district heat.share mixes homes with businesses, 80% of whose heat is gas)
 { const mm = PC.units.mwhPerMMBtu, R0 = M.evaluate(W, [], o0);
   W.D.forEach((d, i) => { const src = PC.districts[i], H = src.households; let hw = 0; Object.keys(src.dwellings).forEach(k => { hw += src.dwellings[k] * PC.dwellingTypes[k].hotWaterFactor; });
@@ -234,7 +234,7 @@ ok(!/a choice of the utility and the state regulator, not the city/.test(PAGE) &
   const els = O2.replace(/^- (.*)$/gm, "<li>$1</li>").split(/<\/?(?:p|li|dd|dt|td|th|summary|footer)\b[^>]*>/i).map(x => x.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim()).filter(x => /[A-Za-z]/.test(x));
   const long = els.filter(x => x.split(" ").length > 45);
   ok(long.length === 0, "every page element is 45 words or fewer: " + long.map(x => x.slice(0, 60) + " (" + x.split(" ").length + ")").join(" | ")); }
-// explain elements and data notes: one or two sentences each (w1_builder_brief §3), one idea per row
+// explain elements and data notes: one or two sentences each (the course's text budget), one idea per row
 { const plain = h => h.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
   const notes = [...PAGE.matchAll(/<p class="lx-datanote">[\s\S]*?<b>[^<]*<\/b>([\s\S]*?)<\/span><\/p>/g)].map(m => plain(m[1]));
   ok(notes.length === 4 && notes.every(t => sentences(t) <= 2 && words(t) <= 35), "four data notes, each two sentences and 35 words at most after its heading: " + notes.map(t => words(t) + "/" + sentences(t)).join(","));

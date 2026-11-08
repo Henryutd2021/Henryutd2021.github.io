@@ -4,8 +4,8 @@
 // rules on a grid, checks agree with LX.lp2), the drill's answers are right, and every number the page states matches the
 // model (statements one by one, a whitelist scan, printed calculations recomputed). The whitelist scan is supplementary:
 // it shows that every number on the page is one the model makes, not that each statement is right; the statements, the
-// explain layer's values (explainVals, in the ≤ form) and lesson 11's matrix in both forms are checked one by one (Codex
-// review, 2026-11-03). The no-JS table must equal staticBlocks().
+// explain layer's values (explainVals, in the ≤ form) and lesson 11's matrix in both forms are checked one by one.
+// The no-JS table must equal staticBlocks().
 // Usage (from the site folder):  node _tests/learn/test_k06-vectors-matrices.js [--write]   (--write rewrites the no-JS table)
 "use strict";
 const fs = require("fs");
@@ -126,7 +126,7 @@ const has = (str, msg) => ok(QMD.indexOf(str) >= 0, "page states " + (msg || JSO
   });
   ["10-write-it-down.html", "11-solver.html", "b01-algebra-to-lp.html", "k04-linear-equations.html", "m01-dispatch-to-lmp.html"].forEach(h => ok(QMD.indexOf('href="' + h + '"') >= 0 || QMD.indexOf("](" + h + ")") >= 0, "links " + h));
   ok(/LX\.lessonRefHTML\(data\.path, c\)/.test(JS) && /\[10, 11, "B1"\]/.test(JS) && /path\.json/.test(QMD), "step 7 links lessons 10, 11 and B1 through LX.lessonRefHTML");
-  ok(/\[M9\]\(m09-surrogates-uq\.html\)/.test(QMD) && !/M9, upcoming/.test(QMD), "M9 linked, now that it is live (W4 integration)");
+  ok(/\[M9\]\(m09-surrogates-uq\.html\)/.test(QMD) && !/M9, upcoming/.test(QMD), "M9 linked: it is live");
   ok(/doi\.org\/10\.1017\/9781108583664/.test(QMD) && /ergo-code\.github\.io\/HiGHS\/stable\//.test(QMD) && /EIA-930/.test(QMD) && /illustrative/.test(QMD), "sources: Boyd and Vandenberghe, HiGHS docs, EIA-930; illustrative values labelled");
   const body = QMD.replace(/<!-- learn:meta:start[\s\S]*?learn:meta:end -->/, "");
   ok(!/nuclear|reactor|\bSMR\b|data cent|learning/i.test(body) && !/nuclear|reactor|data cent|learning/i.test(JS.replace(/\/\/.*$/gm, "").replace(/f\.nuclear\.mw/g, "")), "scope: no nuclear wording, no data centers, no learning wording");

@@ -47,7 +47,7 @@ Object.keys(BLOCKS).forEach(k => { const r = between(PAGE, k); ok(PAGE.slice(r.f
 const OWN = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?<!-- learn:\1:end -->/g, "");
 
 // ---------------- methods and questions
-// the curriculum row's six methods; its "policy analysis" is named here as what the card does, document-based (X6 review)
+// the curriculum row's six methods; its "policy analysis" is named here as what the card does, document-based
 const ROW = ["Survey", "Interview", "Choice experiment", "Ethnography", "Document-based policy analysis", "Participatory mapping"];
 ok(D.methods.map(m => m.label).join() === ROW.join(), "the curriculum row's six methods, in its order");
 D.methods.forEach(m => ok(m.asks && m.data && m.gives && m.cannot && ["yes", "no", "partly"].indexOf(m.people) >= 0, m.id + ": asks, data, gives, cannot, and whether people take part"));
@@ -74,7 +74,7 @@ D.facts.forEach(f => ok(SRC[f.src], f.n + ": a source"));
 Object.keys(SRC).forEach(k => { ok(SRC[k].cite && SRC[k].used.length >= 1 && nWords(SRC[k].cite) <= 32, k + ": a citation of " + nWords(SRC[k].cite) + " words and the claims it supports");
   SRC[k].used.forEach(u => ok(nWords(u) <= 30, k + ": a 'supports' line of " + nWords(u) + " words")); });
 
-// ---------------- the review's fixes (X6 review, 2026-11-07)
+// ---------------- the sort: short definitions, and a match only when every question is placed
 { const B = M.bins(D); ok(B.length === 6 && B.every(b => b.label && b.sub && nWords(b.sub) <= 8), "every box of the sort carries a short definition of its method, so nothing is tested before it is explained"); }
 ok(/if \(g\.placed < g\.total\) \{ api\.saw\(matchLine\(g\), true\); return; \} act\.appendChild\(why\)/.test(JS), "the match counts only with every question placed, then shows every pairing's reason");
 { const r = M.reasonsHTML(D); ok(D.questions.every(q => r.indexOf(q.why) > 0), "every pairing's reason is shown after a full check, right or wrong"); }

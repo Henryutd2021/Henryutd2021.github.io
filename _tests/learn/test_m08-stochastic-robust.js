@@ -1,26 +1,26 @@
 // test_m08-stochastic-robust.js — Node tests for M8 (assets/learn/m08-stochastic-robust.js) with the vendored HiGHS.
 //   - the wind blocks: rebuilt from town_year.json and cf_targets.json (SPP 2025 shape scaled to 33.8%, method "scale"),
 //     sorted, cut at the stated edges and rounded: the data file's blocks
-//   - the closed form from first principles (W3 brief §2.3): surplus, the cost of a size in each branch, the critical
+//   - the closed form from first principles: surplus, the cost of a size in each branch, the critical
 //     hours; every LP (wait-and-see, expected-value, stochastic, worst case, least regret, a plan priced with its size
 //     fixed) equals the closed form
-//   - ties (W2 finding 2): every reported size is the only best size. Each cost is convex and piecewise linear in the size,
-//     so the proof is its exact one-sided slopes: negative just below the size, positive just above (review M8 #3); the
+//   - ties: every reported size is the only best size. Each cost is convex and piecewise linear in the size,
+//     so the proof is its exact one-sided slopes: negative just below the size, positive just above; the
 //     1 MW neighbour check (closed form and the LP re-solved with the size fixed) is kept as a second, weaker check; each
 //     branch's operation is unique given the size
 //   - the order WS <= RP <= EEV, VSS and EVPI >= 0; the worst-case plan is the low branch's plan because a branch's cost
 //     does not rise with more wind (checked on a grid); the robust plans do not use the chances; the least-regret plan
 //     equalises the low and high branches' regrets
 //   - every number on the page (no-JS block, data notes, step texts, explain fallback, Go deeper, myths, quiz, numbers
-//     to remember) against the model and the reference block; the excerpt sentences word for word against the register
+//     to remember) against the model and the reference block; the excerpt sentences word for word against the approved wording
 //   - the page on a stub document with a solver that fails, then works: every step's feedback within the text budget;
-//     step 10 with a slow solver (a second preset tap while one solves changes nothing; review M8 #1)
+//     step 10 with a slow solver (a second preset tap while one solves changes nothing)
 // Usage (from the site folder):  node _tests/learn/test_m08-stochastic-robust.js [--write]
 "use strict";
 const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
-const cp = require("child_process");
+const PRIV = require("./private_sources.js");
 const SITE = path.resolve(__dirname, "..", "..");
 const ID = "m08-stochastic-robust";
 const L = p => path.join(SITE, "assets/learn", p);
@@ -184,10 +184,10 @@ const text = s => s.replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/\\\$
   has(`WS ≤ RP ≤ EEV: here ${fm.m(R.wsExp)} ≤ ${fm.m(R.sp.exp)} ≤ ${fm.m(R.ev.exp)}.`, "Go deeper: the order of the costs");
   has(`31 columns and 30 rows; with $n$ branches it has $1 + 10n$ columns`, "Go deeper: the LP's size"); ok(M.build(D, M.scen(D).concat([{ id: "x4", p: 0, W: 4000 }])).variables.length === 41, "1 + 10n columns (four branches: 41)");
   has(`$80,000 ÷ $27 = 2,963 hours a year`, "Go deeper: the critical hours"); ok(Math.round(80000 / 27) === 2963, "80,000 ÷ 27 = 2,963");
-  has(`Just below its own best size, ${fm.int(R.ws.low.x)} MW (none built), ${fm.int(R.ws.mid.x)} MW (half) or ${fm.int(R.ws.high.x)} MW (all), an extra MW runs 3,000 hours; just above, 1,500.`, "Go deeper: each branch's count, local to its plan (review M8 #4)");
+  has(`Just below its own best size, ${fm.int(R.ws.low.x)} MW (none built), ${fm.int(R.ws.mid.x)} MW (half) or ${fm.int(R.ws.high.x)} MW (all), an extra MW runs 3,000 hours; just above, 1,500.`, "Go deeper: each branch's count, local to its plan");
   { let local = true; S.forEach(s => { const x = R.ws[s.id].x; if (hAbove(s.W, x, -1) !== 3000 || hAbove(s.W, x, 1) !== 1500) local = false; if (hAbove(s.W, 100, 1) === 3000) local = false; });
     ok(local, "the 3,000 and 1,500 hours hold just below and just above each branch's own plan, and not at 100 MW (5,000 or 8,760 hours there)"); }
-  ok(!/only the linear program finds it/.test(PAGE) && PT.includes("that needs a coupled model, here a linear program."), "Go deeper: a coupled model is needed, here an LP (review M8 #9)");
+  ok(!/only the linear program finds it/.test(PAGE) && PT.includes("that needs a coupled model, here a linear program."), "Go deeper: a coupled model is needed, here an LP");
   has(`an extra MW just below ${fm.int(R.sp.x)} MW runs ${fm.int(R.sp.below)} hours; just above, ${fm.int(R.sp.above)}.`, "Go deeper: the expected count");
   has(`Here the plan for ${fm.int(R.ev.W)} MW of wind expects ${fm.m(R.ev.own)} a year; priced in the three branches with their chances, it costs ${fm.m(R.ev.exp)}.`, "myth 1");
   has(`The worst-case plan has the lowest worst cost, ${fm.m(rw)}, but it costs ${fm.m(R.rob.exp - R.sp.exp)} a year more in expectation than the stochastic plan.`, "myth 2");
@@ -198,15 +198,15 @@ const text = s => s.replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/\\\$
   // data notes and step texts against the data file
   has("a fictional windy zone with 3,000 MW of wind and 4,000 MW planned; its lines take 1,000 MW", "data note: the zone");
   ok(D.wind.existingMW === 3000 && D.wind.plannedMW === 4000 && D.zone.lineMW === 1000, "the zone's numbers are the data file's");
-  has("Electrolyzer: it uses electricity to make hydrogen from water. $80,000 per MW a year; 18 kg of hydrogen per MWh; it runs only on surplus wind.", "data note: the electrolyzer, defined (review M8 #6)");
+  has("Electrolyzer: it uses electricity to make hydrogen from water. $80,000 per MW a year; 18 kg of hydrogen per MWh; it runs only on surplus wind.", "data note: the electrolyzer, defined");
   has("Hydrogen: industry takes 54,000 kg an hour; gas reformers, which make hydrogen from natural gas and steam, supply the rest at $1.50 per kg.", "data note: the hydrogen and the gas reformers, defined");
   ok(D.electrolyzer.costPerMWYear === 80000 && D.electrolyzer.kgPerMWh === 18 && D.hydrogen.demandKgPerHour === 54000 && D.hydrogen.reformerPerKg === 1.5, "the electrolyzer's numbers are the data file's");
   has("scaled to 33.8%, U.S. wind's 2025 capacity factor", "data note: the capacity factor"); ok(T.targets.wind.cf === 0.338 && T.targets.wind.year === 2025, "33.8% is cf_targets.json's 2025 wind value");
   ok(JS.includes("The windy zone has 3,000 MW of wind and 4,000 MW planned; its lines carry 1,000 MW, and an [[electrolyzer|electrolyzer]] could use the rest.") && JS.includes("plan for the average future, 5,000 MW of wind here") && M.meanW(S) === 5000, "step texts: the zone's numbers and the 5,000 MW mean");
   { const st = [...JS.matchAll(/\{ text: "([^"]+)",\s*\n\s*(?:build|free)/g)].map(m => m[1]);
-    ok(/\[\[electrolyzer\|electrolyzer\]\]/.test(st[0]) && /\[\[gas-reformer\|gas reformers\]\]/.test(st[1]) && !/\[\[(electrolyzer|gas-reformer)\|/.test(st.slice(2).join(" ")), "steps 1 and 2 mark the electrolyzer and the gas reformers at first use (review M8 #6)"); }
+    ok(/\[\[electrolyzer\|electrolyzer\]\]/.test(st[0]) && /\[\[gas-reformer\|gas reformers\]\]/.test(st[1]) && !/\[\[(electrolyzer|gas-reformer)\|/.test(st.slice(2).join(" ")), "steps 1 and 2 mark the electrolyzer and the gas reformers at first use"); }
   ok(JS.includes('"$" + fm.int(D.electrolyzer.costPerMWYear)') && JS.includes("its $80,000 a year") && D.electrolyzer.costPerMWYear === 80000, "step 5's $80,000 is the data file's");
-  // step 2's verdict on the reader's size: true on every step of the slider (W3 brief §2.5)
+  // step 2's verdict on the reader's size: true on every step of the slider
   { let good = true;
     for (let x = 0; x <= D.chart.xMax; x += D.chart.step) {
       const c = S.map(s => cost0(s.W, x)), w = M.lockWords(D, S, x);
@@ -215,12 +215,12 @@ const text = s => s.replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/\\\$
       if (w.split(" ").length > 40) good = false;
     }
     ok(good, "step 2's verdict is true for every size on the slider: the none-built branch costs most, the all-built least (all equal at 0 MW)"); }
-  ok(/a size costs no more when more wind is built, so that branch is its worst\./.test(JS) && /"Expected, above the stochastic plan"/.test(JS), "step 8's reason is the monotonicity the test proves above; the cost comparison is a figure of its own (review M8 #5)");
-  // the comparison table's lede is true: the plan for the average loses to the stochastic plan on all three yardsticks (review CF3 #6)
+  ok(/a size costs no more when more wind is built, so that branch is its worst\./.test(JS) && /"Expected, above the stochastic plan"/.test(JS), "step 8's reason is the monotonicity the test proves above; the cost comparison is a figure of its own");
+  // the comparison table's lede is true: the plan for the average loses to the stochastic plan on all three yardsticks
   { const yard = k => { const p = R[k]; return { exp: p.exp, worst: Math.max(...S.map(s => p.per[s.id])), regret: Math.max(...S.map(s => p.per[s.id] - wsC[s.id])) }; }, a = yard("ev"), b = yard("sp");
     ok(a.exp > b.exp && a.worst > b.worst && a.regret > b.regret && /here the plan for the average does worse than the stochastic plan on all three measures shown/.test(JS) && !/Each plan is best by its own yardstick/.test(JS),
       `the table's lede: the plan for the average is worse on expected (${fm.m(a.exp)} > ${fm.m(b.exp)}), worst (${fm.m(a.worst)} > ${fm.m(b.worst)}) and largest regret (${fm.m(a.regret)} > ${fm.m(b.regret)})`); }
-  ok(/"Annual cost against the electrolyzer's size, chances " \+ chancesText\(S\)/.test(JS) && /Table only: the chart below keeps the chances/.test(JS) && M.scen(D).map(s => s.p).join() === "0.25,0.5,0.25", "the chart names its chances (25%, 50% and 25%); step 10's table says the chart keeps them (review M8 #8)");
+  ok(/"Annual cost against the electrolyzer's size, chances " \+ chancesText\(S\)/.test(JS) && /Table only: the chart below keeps the chances/.test(JS) && M.scen(D).map(s => s.p).join() === "0.25,0.5,0.25", "the chart names its chances (25%, 50% and 25%); step 10's table says the chart keeps them");
   // the explain fallback's other numbers
   has(`Stochastic program</dt>`.replace(/<[^>]+>/g, ""), "explain fallback");
   // step texts: one or two sentences, 40 words at most (text budget)
@@ -248,34 +248,30 @@ const text = s => s.replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/\\\$
   // the lessons the page links are live
   const PATHJ = J("path.json"), live = new Set(), walk = o => { if (Array.isArray(o)) o.forEach(walk); else if (o && typeof o === "object") { if (o.href && o.ready === true) live.add(o.href); Object.values(o).forEach(walk); } }; walk(PATHJ);
   hrefs.filter(h => /^[0-9a-z-]+\.html$/.test(h) && h !== "index.html").forEach(h => ok(live.has(h), "linked lesson is live: " + h));
-  ok(/The whole case: <a href="cf3-hydrogen-under-uncertainty\.html">CF3<\/a>, where hydrogen should go when nobody knows how much wind will be built\./.test(PAGE) && !/CF3 \(upcoming\)/.test(PAGE), "the Real-world box links CF3 (live since the W4 fixes)");
+  ok(/The whole case: <a href="cf3-hydrogen-under-uncertainty\.html">CF3<\/a>, where hydrogen should go when nobody knows how much wind will be built\./.test(PAGE) && !/CF3 \(upcoming\)/.test(PAGE), "the Real-world box links CF3, a live case file");
   if (NB) {
     ok(NB.includes(ID + ".json") && NB.includes("reference") && NB.includes("assert") && NB.includes("linprog"), "notebook: reads the reference block and asserts it with linprog");
     ok(NB.includes("town_year.json") && NB.includes("cf_targets.json"), "notebook: rebuilds the wind blocks from the 2025 shape");
   } else ok(false, "the notebook exists (learn/notebooks/" + ID + ".ipynb)");
 
-  // ---------------- the excerpt: approved sentences, word for word (register, E10 and E11)
+  // ---------------- the excerpt: approved sentences, word for word (E10 and E11)
   const norm = s => String(s).replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/\s+/g, " ").trim();
-  function portfolio() {
-    const cands = [process.env.LEARN_PORTFOLIO, path.join(SITE, "..")];
-    try { cands.push(path.resolve(SITE, cp.execSync("git rev-parse --git-common-dir", { cwd: SITE, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim(), "..", "..")); } catch (e) { /* not a git checkout */ }
-    return cands.filter(Boolean).find(p => fs.existsSync(path.join(p, "reports/learn/excerpts_for_approval.md")));
-  }
-  const SNAP = {   // excerpts_for_approval.md, approved: E10 (2026-11-03), E11 (2026-11-05)
+  const SNAP = {   // the approved wording of E10 and E11
     "E10.1": "A two-stage stochastic linear program sized electrolyzers, hydrogen tanks and fuel cells once in each of ERCOT's eight weather zones, with hydrogen pipelines between neighbouring zones, then scheduled the system hour by hour over a full year in nine scenarios: three completion rates of planned renewable capacity by three electricity-demand levels.",
     "E10.4": "Inputs reflect 2022–2023 conditions; post-2023 federal hydrogen credit rules are not modeled.",
     "E11.6": "Hydrogen equipment is sized once, then operated hour by hour in nine scenarios; the sizes minimize expected cost over all nine scenarios instead of fitting a single forecast.",
     "E11.7": "The completion rate of planned renewable capacity was 0% (probability 0.1), 30% (0.7) or 80% (0.2); electricity demand was ERCOT's 2030 projection (0.5), 2% lower (0.2) or 2% higher (0.3)."
   };
-  const RP = portfolio();
+  const RP = PRIV.path("excerpts");
   let APP = SNAP;
   if (RP) {
-    const md = fs.readFileSync(path.join(RP, "reports/learn/excerpts_for_approval.md"), "utf8"), reg = {};
+    const md = fs.readFileSync(RP, "utf8"), reg = {};
     md.split("\n").forEach(line => { const m = line.match(/^\| (E1[01]\.\d+)(?: \[N\])? \| (.*?) \|/); if (m) reg[m[1]] = norm(m[2]); });
-    ok(Object.keys(SNAP).every(k => reg[k] === SNAP[k]), "the snapshot in this test equals the register's rows: " + Object.keys(SNAP).filter(k => reg[k] !== SNAP[k]).join(", "));
-    ok(/W4 sources[\s\S]*?approved/i.test(md.slice(md.indexOf("## W4 sources"), md.indexOf("## W4 sources") + 1500)), "the register marks the W4 sources approved");
+    ok(Object.keys(SNAP).every(k => reg[k] === SNAP[k]), "the snapshot in this test equals the approved rows: " + Object.keys(SNAP).filter(k => reg[k] !== SNAP[k]).join(", "));
+    const w = md.lastIndexOf("\n## ", md.indexOf("### E11")) + 1;   // the section that holds E11
+    ok(/approved/i.test(md.slice(w, w + 1500)), "the approved wording marks E11's section approved");
     APP = reg;
-  } else console.log("note: the register was not found (set LEARN_PORTFOLIO); excerpts checked against the snapshot in this test");
+  } else console.log("note: the approved excerpt wording is not available (set LEARN_SOURCES); excerpts checked against the snapshot in this test");
   const q = [...PAGE.matchAll(/<blockquote class="lx-excerpt" data-source="([^"]+)">([\s\S]*?)<footer>([\s\S]*?)<\/footer><\/blockquote>/g)];
   ok(q.length === 1 && q[0][1] === "excerpt:txh2", "one excerpt, from excerpt:txh2");
   const sents = q.length ? [...q[0][2].matchAll(/<p>([\s\S]*?)<\/p>/g)].map(m => norm(m[1])) : [];
@@ -315,7 +311,7 @@ const text = s => s.replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/\\\$
     ok(E2.LX.m08 && typeof E2.LX.m08.cost === "function", "the page exports its closed form as LX.m08 (CF3 reads it)");
     const flush = () => new Promise(r => setImmediate(r));
     const card = () => demo.cards.el, btns = re => card().querySelectorAll("button").filter(b => re.test(b.textContent)), next = () => btns(/Next/)[0], failBox = () => card().querySelector(".m8-fail");
-    // every step's feedback (api.saw), read as shown: one or two ideas, 40 words at most (review M8 #5)
+    // every step's feedback (api.saw), read as shown: one or two ideas, 40 words at most
     const sawn = {}, saw = n => { const el = card().querySelector(".lx-saw"); if (el) sawn[n] = el.textContent.replace(/\s+/g, " ").trim(); };
     try {
       // step 1: the tree, all three branches

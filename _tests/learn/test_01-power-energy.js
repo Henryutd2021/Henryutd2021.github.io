@@ -46,7 +46,7 @@ for (let trial = 0; trial < 400; trial++) {
   ok(near(a.wh, 250, 1e-9) && a.log.length === 1 && near(a.t, 10, 1e-9), "board: 12 animation slices = one 10-minute run");
 }
 
-// ---------------- the bathtub (review 2026-11-02, point 11): it never shrinks during an experiment; growth is announced
+// ---------------- the bathtub: it never shrinks during an experiment; growth is announced
 {
   let cap = M.KWH_STEPS[0], m = M.newMeter(), lastFill = 0, grew = 0;
   const on = { ev: true, hairdryer: true };
@@ -149,19 +149,19 @@ ok(has(">759 GW<") && A.us_peak.value === 759180, "page: 759 GW record");
 ok(has(">33.8%<") && A.wind_cf.value === 0.338 && has("U.S. wind ran at 33.8% of its capacity in 2025"), "page: wind capacity factor 33.8%");
 ok(has("a 40 W bulb used for five hours uses 200 Wh, or 0.2 kWh") && A.bulb_example.watts * A.bulb_example.hours === 200, "page: EIA bulb example");
 
-// ---------------- review fixes in words (2026-11-02)
-ok(!/it only adds up/.test(JS) && /running total of energy used/.test(JS) && /Stored energy, as in a battery, can fall/.test(JS), "running total: the energy meter never falls; stored energy can (point 5)");
-ok(has("Leaving it out makes these energy-based terms four times too large") && !has("every energy, cost and emission total") && !has("C = \\sum"), "Modeler preview: energy-based terms only; no undefined C or c (point 9)");
+// ---------------- wording checks: energy meter, Modeler preview, units, depth, focus
+ok(!/it only adds up/.test(JS) && /running total of energy used/.test(JS) && /Stored energy, as in a battery, can fall/.test(JS), "running total: the energy meter never falls; stored energy can");
+ok(has("Leaving it out makes these energy-based terms four times too large") && !has("every energy, cost and emission total") && !has("C = \\sum"), "Modeler preview: energy-based terms only; no undefined C or c");
 ok((QMD.match(/\$\$/g) || []).length === 4, "Go deeper: two display equations in all (one per box), the Modeler box a one-line preview");
 ok(has("[Lesson 10](10-write-it-down.qmd)") && has("[lesson 9](09-storage.qmd)") && /05-capacity-factor\.html/.test(JS), "forward links: lessons 5, 9 and 10 (live)");
-ok(/\[\[log-scale\|log scale\]\]/.test(JS) && /unitKey\(act\)/.test(JS) && /\[\[kilowatt\|kW\]\]/.test(JS), "units: unit key with the power and energy ladders; log scale glossed (point 7)");
-ok(/Stretch, optional: a \[\[fermi-estimate/.test(JS) && /Stretch, optional: claims often say/.test(JS) && (JS.match(/free: true/g) || []).length === 2, "depth: the national estimate and the wind claim are optional stretch steps (point 8)");
-ok(/if \(moveFocus\) qp\.focus\(\)/.test(JS) && /tabindex: "-1"/.test(JS), "ladder: focus moves to the next question (point 13)");
-ok(/homes whose yearly purchases it matches/.test(JS) && /illustrative equivalent/.test(JS) && has("illustrative equivalent"), "wind: purchases benchmark, an illustrative equivalent (point 12)");
+ok(/\[\[log-scale\|log scale\]\]/.test(JS) && /unitKey\(act\)/.test(JS) && /\[\[kilowatt\|kW\]\]/.test(JS), "units: unit key with the power and energy ladders; log scale glossed");
+ok(/Stretch, optional: a \[\[fermi-estimate/.test(JS) && /Stretch, optional: claims often say/.test(JS) && (JS.match(/free: true/g) || []).length === 2, "depth: the national estimate and the wind claim are optional stretch steps");
+ok(/if \(moveFocus\) qp\.focus\(\)/.test(JS) && /tabindex: "-1"/.test(JS), "ladder: focus moves to the next question");
+ok(/homes whose yearly purchases it matches/.test(JS) && /illustrative equivalent/.test(JS) && has("illustrative equivalent"), "wind: purchases benchmark, an illustrative equivalent");
 Object.keys(A).forEach(k => ok(/^https:\/\/www\.(eia|epa)\.gov\//.test(A[k].url) && A[k].as_of && QMD.indexOf(A[k].url.replace(/&/g, "&amp;")) >= 0, `anchor ${k}: allow-listed URL, an as-of date, and cited on the page`));
 
 // ---------------- scope: links and words (curriculum section 20)
-// the generated header, next box and footer (scripts/build_learn.py) are checked by the coordinator's scans; here: my own text
+// the generated header, next box and footer (the course build step) are checked by the course-wide scans; here: the lesson's own text
 const OWN = QMD.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1:end -->/g, "");
 const hrefs = [...OWN.matchAll(/href="([^"]+)"/g)].map(m => m[1]).concat([...OWN.matchAll(/\]\(([^)]+)\)/g)].map(m => m[1]));
 const ALLOW = /^(https:\/\/(www\.)?(eia\.gov|epa\.gov|energy\.gov|nrel\.gov|ferc\.gov|nerc\.com)\/|[0-9a-z-]+\.qmd(#[a-z0-9-]+)?$|k0\d-[a-z-]+\.html$|#)/;   // learn pages as .qmd; toolbox refreshers as .html

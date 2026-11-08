@@ -180,7 +180,7 @@ const sum = a => a.reduce((x, y) => x + y, 0);
     const kinkRow = h => `| ${String(h).padStart(2, "0")}:00 | \\$${oneSided[h][0]} | \\$${oneSided[h][1]} | \\$${B.duals[h]} |`;
     ok(Q.includes(kinkRow(h1)) && Q.includes(kinkRow(h2)), `page: the kink table rows for ${h1}:00 (${o1}, reports ${B.duals[h1]}) and ${h2}:00 (${o2}, reports ${B.duals[h2]}) as computed`);
     ok(Q.includes("(\\$" + 3 * f.cc.cost + ")") && Q.includes("(−\\$" + f.peaker.cost + ")") && near(3 * f.cc.cost - f.peaker.cost, o2[1]), `page: the 09:00 saving is 3 × $40 − $100 = $${o2[1]}`);
-    // curtailment is wind and solar, never "sun" alone; the MILP wording follows curriculum §9.2
+    // curtailment is wind and solar, never "sun" alone; the MILP wording follows the course rule: prices come from LPs, never from MILPs
     const JS = fs.readFileSync(L("11-solver.js"), "utf8");
     [["page", Q], ["js", JS]].forEach(([k, txt]) => ok(!/spill(ed|s|ing)? (sun|solar)|of sun|sun is spilled|Spilled sun/i.test(txt), `${k}: curtailment is named as wind and solar, never spilled sun`));
     ok(!/no (single )?slope/i.test(Q + JS) && /conditional on that commitment/.test(Q) && /returns no (ordinary )?(LP )?shadow prices/.test(Q), "page: a mixed-integer solve returns no shadow prices; prices conditional on the commitment");

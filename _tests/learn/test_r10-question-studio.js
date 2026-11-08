@@ -1,19 +1,19 @@
 // test_r10-question-studio.js — Node tests for research studio R10, the question studio (assets/learn/r10-question-studio.js,
 // its data file and learn/r10-question-studio.qmd):
-//   - the pickers are exactly curriculum v2 §11.3's lists (scale, the ten threads, the 23 system elements, the 8 levers, the
-//     16 stakeholders, the 12 twists), in order; checked against the curriculum itself when it is reachable
-//     (LEARN_CURRICULUM=<path>, or ../reports/learn/curriculum_v2.md from the site folder), else against the copy below
-//   - blocked combinations (§11.3, §20): no picker text, phrase, search term or draft template names nuclear technology, so
+//   - the pickers are exactly the course plan's question-studio lists (scale, the ten threads, the 23 system elements, the 8 levers, the
+//     16 stakeholders, the 12 twists), in order; checked against the course plan itself when it is available through
+//     private_sources.js, else against the copy below
+//   - blocked combinations (the course's scope rules): no picker text, phrase, search term or draft template names nuclear technology, so
 //     no combination can meet the nuclear-plus-risk rule; every draft built from every value of every slot, and a seeded
-//     random sample of 200,000 full combinations in all five types, passes the §20.4 deny-list; data centers enter every
+//     random sample of 200,000 full combinations in all five types, passes the scope scan's deny-list; data centers enter every
 //     draft as a load
-//   - no originality judgement: no data string calls anything new, hot, a gap or untouched; the crowding counts are §11.3's
-//     table, shown as context with their caveat
+//   - no originality judgement: no data string calls anything new, hot, a gap or untouched; the crowding counts are the course
+//     plan's table, shown as context with their caveat
 //   - search strings: at most five Boolean operators for every element, dimension, stakeholder and twist or lever; the
 //     OpenAlex link form; the road-less-travelled weights favour smaller clusters and never exclude an element
 //   - the card's automatic fields keep the learner's edits and follow the picks only where the automatic value changed;
 //     the audience is filled only for a prescriptive draft; realism states with the learner's evidence; the copied summary
-//   - the seven example cards are §11.3's, word for word; each loads a fresh card with its own question-matched audience,
+//   - the seven example cards are the course plan's, word for word; each loads a fresh card with its own question-matched audience,
 //     metric and units, every required part, and three search strings
 //   - the page never claims the checks establish rigour; the search links are labelled live; no production notes or guard
 //     assertions in the public data file
@@ -23,6 +23,7 @@
 "use strict";
 const fs = require("fs");
 const path = require("path");
+const PRIV = require("./private_sources.js");
 const SITE = path.resolve(__dirname, "..", "..");
 const L = p => path.join(SITE, "assets/learn", p);
 const M = require(L("r10-question-studio.js"));
@@ -51,7 +52,7 @@ let checks = 0, fails = 0;
 function ok(c, msg) { checks++; if (!c) { fails++; console.log("FAIL:", msg); } }
 const labels = k => D.pickers[k].map(x => x.label);
 
-// ---------------- the pickers, exactly §11.3 (a copy; compared with the curriculum below when it is reachable)
+// ---------------- the pickers, exactly as the course plan lists them (a copy; compared with the plan below when it is available)
 const REF = {
   scale: ["S0 device and plant", "S1 microgrid and community", "S2 regional grid", "S3 city and region", "S4 nation"],
   element: ["rooftop solar", "heat pumps", "EV fleets and school buses", "irrigation pumps", "cold chains", "district heating", "industrial process heat", "data centers", "wind farms", "utility solar", "batteries", "long-duration storage", "hydrogen", "transmission lines", "distribution feeders", "gas networks", "geothermal", "hydro", "mini-grids", "water treatment and desalination", "agrivoltaics", "building retrofits", "demand-response programmes"],
@@ -60,10 +61,10 @@ const REF = {
   twist: ["a week-long cold snap", "a drought", "a heat wave", "a fuel-price spike", "a one-mineral supply disruption", "a policy reversal", "a cyber incident", "population decline", "rapid load growth", "a wildfire season", "a new tariff design", "a doubled interconnection queue"],
   dimension: ["Physics and technology", "Operations", "Planning and optimization", "Economics and markets", "Techno-economic analysis", "LCA and environment", "Policy and regulation", "Society and livelihoods", "Security, resilience and national strategy", "Research methods"]
 };
-Object.keys(REF).forEach(k => ok(JSON.stringify(labels(k)) === JSON.stringify(REF[k]), "picker " + k + " is §11.3's list, in order (" + labels(k).length + ")"));
-const CUR = process.env.LEARN_CURRICULUM || path.resolve(SITE, "..", "reports", "learn", "curriculum_v2.md");
+Object.keys(REF).forEach(k => ok(JSON.stringify(labels(k)) === JSON.stringify(REF[k]), "picker " + k + " is the course plan's list, in order (" + labels(k).length + ")"));
+const CUR = PRIV.path("curriculum");
 const EXAMPLES_REF = {};
-if (fs.existsSync(CUR)) {
+if (CUR) {
   const c = fs.readFileSync(CUR, "utf8"), sec = c.slice(c.indexOf("### 11.3 The question studio"), c.indexOf("## 12. The news lens"));
   const row = name => (sec.match(new RegExp("\\| " + name + " \\| (.+) \\|")) || [])[1] || "";
   const split = s => s.replace(/\*\*/g, "").split(" · ").map(x => x.trim());
@@ -81,17 +82,17 @@ if (fs.existsSync(CUR)) {
     "curriculum: the 29 crowding counts, names and RGIs, in order");
   [...sec.matchAll(/^\| (\d) \| (.+?) \| (\w+(?:, [^|]+?)?) \| (.+) \|$/gm)].forEach(m => { EXAMPLES_REF[m[1]] = { combo: m[2], type: m[3], question: m[4] }; });
   ok(Object.keys(EXAMPLES_REF).length === 7, "curriculum: seven example cards found");
-} else console.log("note: curriculum_v2.md not found (set LEARN_CURRICULUM); the lists were checked against the copy in this test only");
+} else console.log("note: the course plan is not available (set LEARN_SOURCES); the lists were checked against the copy in this test only");
 D.examples.forEach((e, i) => {
   const r = EXAMPLES_REF[String(i + 1)];
-  if (r) ok(r.combo === e.combo && r.type === M.typeLabel(e) && r.question === e.question, "example " + (i + 1) + " is §11.3's card, word for word");
+  if (r) ok(r.combo === e.combo && r.type === M.typeLabel(e) && r.question === e.question, "example " + (i + 1) + " is the course plan's card, word for word");
   ok(["descriptive", "explanatory", "predictive", "prescriptive", "evaluative"].indexOf(e.type) >= 0 && M.typeLabel(e).indexOf(e.type) === 0, "example " + (i + 1) + ": its card takes one of the five types (" + e.type + "), which its table label starts with");
   Object.keys(e.picks).forEach(k => ok(!!M.item(D, k, e.picks[k]), "example " + e.id + ": pick " + k + " exists"));
 });
 ok(M.typeLabel(M.example(D, "e5")) === "predictive, with a prescriptive follow-up" && M.example(D, "e5").type === "predictive", "example 5: predictive, with a prescriptive follow-up (R3 reads its second half as conditional planning); its card stays predictive");
 ok(M.check(D).length === 0, "data checks pass: " + M.check(D).join("; "));
 const dc = M.item(D, "element", "datacenters");
-ok(dc.note === "as a load" && /load/.test(dc.phrase), "data centers: labelled and phrased as a load (G-DC)");
+ok(dc.note === "as a load" && /load/.test(dc.phrase), "data centers: labelled and phrased as a load");
 
 // ---------------- blocked combinations: every slot, every type, and a sample of full combinations
 const DENY = [/\bFOAK\b/i, /\bNOAK\b/i, /first[- ]of[- ]a[- ]kind/i, /nth[- ]of[- ]a[- ]kind/i, /learning[- ](curve|rate)/i, /order[- ]book/i, /anchor[- ](customer|buyer)/i,
@@ -100,7 +101,7 @@ const NUC = /nuclear|reactor|\bSMR\b|small modular/i;
 const allStrings = [];
 (function walk(v) { if (typeof v === "string") allStrings.push(v); else if (v && typeof v === "object") Object.values(v).forEach(walk); })(D);
 ok(allStrings.every(s => !NUC.test(s)), "no string in the data names nuclear technology, so no draft or search can meet the nuclear-plus-risk rule");
-ok(allStrings.every(s => DENY.every(re => !re.test(s))), "no string in the data matches the §20.4 deny-list");
+ok(allStrings.every(s => DENY.every(re => !re.test(s))), "no string in the data matches the scope scan's deny-list");
 const TYPES = QC.TYPES.map(t => t.id), base = { scale: "S3", dimension: "SOC", element: "heatpumps", lever: "tech", stakeholder: "renters", twist: "heatwave" };
 let nDraft = 0, bad = [];
 function test(p, t) {
@@ -121,7 +122,7 @@ ok(D.drafts.evaluative.indexOf("compared with […]") > 0 && D.drafts.prescripti
 
 // ---------------- no originality judgement; crowding as context
 ok(allStrings.every(s => !/\bnovel|\bhot (topic|spot|area|question)s?\b|untouched|\bgaps?\b|nobody has/i.test(s)), "no data string calls anything novel, a hot topic, untouched or a gap");
-ok(/no originality judgement/i.test(D.meta.note) && D.crowding.caveats.some(c => /^Few papers is no evidence that a question is new, important or feasible\.$/.test(c)) && D.crowding.caveats.every(c => M.rich(c) && c.split(/\s+/).length <= 15), "the crowding caveat (§11.3), as short separate statements");
+ok(/no originality judgement/i.test(D.meta.note) && D.crowding.caveats.some(c => /^Few papers is no evidence that a question is new, important or feasible\.$/.test(c)) && D.crowding.caveats.every(c => M.rich(c) && c.split(/\s+/).length <= 15), "the crowding caveat, as short separate statements");
 ok(D.crowding.caveats.every(c => BLOCKS.crowding.indexOf("<li>" + c + "</li>") >= 0) && /D\.crowding\.caveats\.forEach/.test(JS), "the caveats: one element each, on the page and in the studio");
 ok(/The studio makes no originality judgement/.test(PAGE) && /no originality judgement/.test(JS), "page and studio both say they make no originality judgement");
 const cr = M.crowd(D, base);
@@ -163,7 +164,7 @@ ok(r4.card.question !== c4.question, "card: ... while the question, which names 
 const R = M.realism(D, { data: 0, physics: 1, institutions: 2 }, { data: "Hourly load, CC BY, 2025" });
 ok(R.map(r => r.state).join() === "pass,warn,block,," && M.realismCount(R).open === 2 && R[2].text === D.realism[2].block && R[0].evidence === "Hourly load, CC BY, 2025", "realism: pass, warn, block, two open, and the evidence kept");
 ok(D.realism.every(r => r.evidence && r.evidence.split(/\s+/).length <= 8) && /below/.test(D.realism[0].pass) && /below/.test(D.realism[2].pass) && !/on the card/.test(D.realism[0].pass + D.realism[2].pass), "realism: every check has a place for its evidence, and the pass notes point to it");
-ok(D.realism.length === 5 && D.realism.map(r => r.label).join() === "Data exist,Physics sanity,Institutions,Scope fits the time,People and ethics", "realism: the five checks of §11.3");
+ok(D.realism.length === 5 && D.realism.map(r => r.label).join() === "Data exist,Physics sanity,Institutions,Scope fits the time,People and ethics", "realism: the course plan's five checks");
 ok(D.realism.every(r => r.fix.every(c => typeof c === "number" || /^[A-Z]+\d*$/.test(c))), "realism: every fix names a lesson by number or code");
 // the fix links follow path.json's live status (read here, not assumed): every code a realism fix names, plus one upcoming
 // module. The studio links through LX.lessonRef and LX.lessonRefHTML (components/core.js) and keeps no copy of them.
@@ -171,7 +172,7 @@ const PALL = [].concat(P.starter || [], P.more || [], P.toolbox || []);
 const pentry = c => PALL.filter(l => (typeof c === "number" ? l.starter === c : l.code === c))[0];
 const fixCodes = [...new Set([].concat(...D.realism.map(r => r.fix)))];
 ok(fixCodes.every(c => CORE.lessonRef(P, c).ready === !!(pentry(c) || {}).ready), "fix links: lessonRef() reads the live status of every code a realism fix names, from path.json (" + fixCodes.join(", ") + "; live: " + fixCodes.filter(c => CORE.lessonRef(P, c).ready).join(", ") + ")");
-// since W7 every lesson path.json lists is live: a copy with one made-up module still to come (Z8) keeps that case checked
+// every lesson path.json lists is live now: a copy with one made-up module still to come (Z8) keeps that case checked
 const PZ = Object.assign({}, P, { more: (P.more || []).concat([{ code: "Z8", title: "A module still to come", ready: false }]) });
 const upc = [].concat(PZ.starter || [], PZ.more, PZ.toolbox || []).filter(l => l.code && !l.ready)[0], liveR = PALL.filter(l => l.code && l.ready && l.href)[0];
 ok(upc && CORE.lessonRefHTML(PZ, upc.code) === upc.code + " (upcoming)", "fix links: an upcoming module (" + (upc && upc.code) + ") is named, not linked");
@@ -229,7 +230,7 @@ ok(stepTexts.every(t => sentences(t) <= 2), "every step card is at most two sent
 const sawTexts = [...JS.matchAll(/api\.saw\("([^"]+)"/g)].map(m => m[1]).concat([D.search.live, D.search.note + " Link format checked on 3 November 2026; this page sends no request itself."]);
 ok(sawTexts.length >= 6 && sawTexts.every(t => words(t) <= 35 && sentences(t) <= 2), "studio feedback and notes: at most 35 words and two sentences each");
 // every text element the page shows, with JavaScript off: at most 35 words and two sentences; an answer written as a card
-// is checked line by line; references and the option lists of the pickers (§11.3, word for word) are left out
+// is checked line by line; references and the option lists of the pickers (the course plan's, word for word) are left out
 const VIS = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?<!-- learn:\1:end -->/g, "").replace(/<!--[\s\S]*?-->/g, "").replace(/<div class="lx-card lx-sources">[\s\S]*?<\/div>/, "");
 const long = [];
 for (const m of VIS.matchAll(/<(li|p|td|th|caption|summary|dd)\b([^>]*)>((?:(?!<\/?\1\b)[\s\S])*?)<\/\1>/g)) {

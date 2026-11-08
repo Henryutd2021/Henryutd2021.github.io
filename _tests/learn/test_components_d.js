@@ -1,4 +1,4 @@
-// test_components_d.js — Node tests for the W1 components promoted by group D: LX.EquationCard (equation.js),
+// test_components_d.js — Node tests for the shared components LX.EquationCard (equation.js),
 // LX.FormulateBox (formulate.js), LX.Formulation (formulation.js) and LX.Network (network.js).
 //   - each file defines its LX.<Name> = when run with a stub window.LX, and sits in the bundle;
 //   - the pure parts: Formulation's rule filter and symbol choice, Network's line width, label placement, price format and

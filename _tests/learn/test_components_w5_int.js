@@ -1,17 +1,18 @@
-// test_components_w5_int.js — Node tests for what the W5 integration (2026-11-06, batch 1) promoted and wired:
-//   - three components promoted from W5 lessons that a second page uses (README, "Promoted at the W5 integration"):
+// test_components_w5_int.js — Node tests for three shared lesson components, path.yml wiring and two checkpoint and
+// predict options:
+//   - three components first written for one lesson that a second page uses (see the README):
 //     lifebox.js + lifebox.css (LX.LifeBox, i-boundary, from A11's life-cycle box), siting.js + siting.css (LX.A19 and
 //     LX.SiteMap, from A19's a19.js; capstone C3 sites a solar farm on it) and whopays.js (LX.A13, from A13's
-//     a13-who-pays-and-benefits.js; SB3, M12, C3 and engine E3). Each is in the bundle after the W4 promotions and names
+//     a13-who-pays-and-benefits.js; SB3, M12, C3 and engine E3). Each is in the bundle after the four shared lesson components and names
 //     itself; each sets its LX name on a page and exports its pure part in Node; the old files are gone and no page loads
 //     them; the lesson scripts read the components and keep no copy; the map's styles left A19's page for siting.css
 //   - LX.LifeBox's rules (tap, keys, drag) and the box on a stub document (stages, classes, slider attributes, presets)
-//   - the batch-1 path.yml wiring (A11 after F11, A19 after A11, CK-A after A13, R6 next R7) and scope-2 for a city
-//   - checkpoint.js (final integration, from CK-A's review): the gateAll option (the page's worked solution opens only once
+//   - the path.yml wiring (A11 after F11, A19 after A11, CK-A after A13, R6 next R7) and scope-2 for a city
+//   - checkpoint.js (from CK-A): the gateAll option (the page's worked solution opens only once
 //     every task is answered, in any order; early openings recorded on the attempt) and the shared late-answer rule (late
 //     "practice": an answer given after the solution opened counts as practice, not as right; said in the intro), pure
 //     and on a stub runner; CK-F keeps its rule (neither option)
-//   - predict.js (final integration, from the A13 review): with title: false the choices are named by q as plain text
+//   - predict.js (from A13): with title: false the choices are named by q as plain text
 // Usage (from the site folder):  node _tests/learn/test_components_w5_int.js
 "use strict";
 const fs = require("fs");
@@ -24,7 +25,7 @@ const page = id => fs.readFileSync(path.join(SITE, "learn", id + ".qmd"), "utf8"
 let checks = 0, fails = 0;
 function ok(c, msg) { checks++; if (!c) { fails++; console.log("FAIL:", msg); } }
 
-// ---------------------------------------------------------------- the three promotions
+// ---------------------------------------------------------------- the three shared components
 const bundleJS = rd("learn.js"), bundleCSS = rd("learn.css");
 const PROMO = [
   { file: "lifebox", lx: "LifeBox", old: null, css: true, users: ["a11-lca-nexus"], keys: ["tap", "key", "drag"] },
@@ -38,7 +39,7 @@ for (const P of PROMO) {
   const src = rd("components/" + P.file + ".js");
   ok(src.startsWith("/* " + P.file + ".js — LX." + P.lx + ":"), P.file + ".js names itself and its LX name");
   const tail = src.trim().split("\n").slice(-3).join("\n"), at = bundleJS.indexOf(tail);
-  ok(at > 0 && at > w4end && w4end > 0, P.file + ".js is in the bundle, after the W4 promotions");
+  ok(at > 0 && at > w4end && w4end > 0, P.file + ".js is in the bundle, after the four shared lesson components");
   if (P.css) {
     const css = rd("components/" + P.file + ".css"), last = css.trim().split("\n").slice(-2).join("\n");
     ok(bundleCSS.includes(last) && bundleCSS.indexOf(last) > bundleCSS.indexOf(".lx-seg {"), P.file + ".css is in learn.css, after the shared controls");
@@ -116,7 +117,7 @@ for (const P of PROMO) {
   box.tiles[1].click(); ok(St.L === 0 && seen.length === 2, "a tap on a middle stage changes nothing");
 }
 
-// ---------------------------------------------------------------- Sankey badges on phones (sankey.css; batch 2, from F9)
+// ---------------------------------------------------------------- Sankey badges on phones (sankey.css, from F9)
 {
   const css = rd("components/sankey.css"), rule = (css.match(/^\.lx-sk circle\.badge \{([^}]*)\}/m) || [, ""])[1];
   ok(/display: inline;/.test(rule) && bundleCSS.includes(".lx-sk circle.badge { display: inline;"), "sankey.css shows the badge discs (Bootstrap's .badge:empty would hide them), in learn.css too");
@@ -124,7 +125,7 @@ for (const P of PROMO) {
   ok(pages.length === 0, "no page keeps its own copy of the badge rule: " + pages.join(" "));
 }
 
-// ---------------------------------------------------------------- the batch-1 wiring
+// ---------------------------------------------------------------- the path.yml wiring
 {
   const PY = fs.readFileSync(path.join(SITE, "learn/path.yml"), "utf8");
   const row = id => { const i = PY.indexOf("  id: " + id + "\n"); return i < 0 ? "" : PY.slice(i, PY.indexOf("\n- ", i)); };

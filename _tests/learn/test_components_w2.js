@@ -1,12 +1,11 @@
-// test_components_w2.js — Node tests for the studio and case-file components added by the W2 infra branch (2026-11-03):
+// test_components_w2.js — Node tests for the studio and case-file components:
 //   exemplars.js (LX.Exemplars), rubric.js (LX.Rubric), questioncard.js (LX.QuestionCard), timeline.js (LX.Timeline),
-//   the page pieces of the two forms (forms.css), and lesson 13's planning engine promoted to planengine.js/.css.
+//   the page pieces of the two forms (forms.css), and lesson 13's planning engine, shared as planengine.js/.css.
 //   - each file defines its LX.<Name> with a stub window.LX, exports its pure part to Node, uses --lx-* tokens only, and is
 //     in the generated bundle (learn.js, learn.css)
-//   - the pure parts: exemplar marks, plain text, checks and the no-JS version; the rubric's words (against curriculum v2
-//     §3.4 when the curriculum is reachable: LEARN_CURRICULUM=<path>, or ../reports/learn/curriculum_v2.md from the site
-//     folder), counts and summary; the question card's checks, text and link round trip; timeline dates, gaps, order
-//     and checks
+//   - the pure parts: exemplar marks, plain text, checks and the no-JS version; the rubric's words (against the course
+//     plan's rubric when it is available through private_sources.js), counts and summary; the question card's checks,
+//     text and link round trip; timeline dates, gaps, order and checks
 //   - the views on a stub document (_tests/learn/stubdom.js): keyboard and click reveal, aria state, live regions,
 //     browser storage, copy boxes, links
 //   - the planning engine: exported for Node and as LX.townPlan (with its page kit), the same object from 13-capstone.js,
@@ -17,6 +16,7 @@ const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
 const { env, load, buttons } = require("./stubdom.js");
+const PRIV = require("./private_sources.js");
 const SITE = path.resolve(__dirname, "..", "..");
 const L = p => path.join(SITE, "assets/learn", p);
 let checks = 0, fails = 0;
@@ -35,7 +35,7 @@ Object.keys(NAMES).forEach(f => {
   try { vm.runInNewContext(src, ctx); } catch (e) { ok(false, `${f}.js runs with a stub window.LX: ${e.message}`); return; }
   ok(typeof ctx.window.LX[NAMES[f]] === "function" && new RegExp("LX\\." + NAMES[f] + " = ").test(src), `${f}.js defines LX.${NAMES[f]}`);
   ok(Object.keys(ctx.module.exports).length > 0, `${f}.js exports its pure part to Node`);
-  ok(bundleJS.indexOf(src.trim().split("\n")[0]) >= 0 && bundleCSS.indexOf(css.trim().split("\n")[0]) >= 0, `${f}: in the generated bundle (run build_learn.py)`);
+  ok(bundleJS.indexOf(src.trim().split("\n")[0]) >= 0 && bundleCSS.indexOf(css.trim().split("\n")[0]) >= 0, `${f}: in the generated bundle (run the course build step)`);
 });
 const forms = fs.readFileSync(L("components/forms.css"), "utf8");
 ok(forms.split("\n")[0].indexOf("/* forms.css — ") === 0 && !/#[0-9a-fA-F]{3,6}\b|rgba?\(/.test(forms.replace(/\/\*[\s\S]*?\*\//g, "")) && bundleCSS.indexOf(".lx-case-part") >= 0,
@@ -114,20 +114,20 @@ ok(EX.staticHTML({ answers: [{ key: "weak", label: "<b>", parts: [{ text: "a<b",
   ok(threw, "exemplars view: a malformed spec throws with the reason");
 })();
 
-// ---------------------------------------------------------------- rubric: pure, and the words of curriculum v2 §3.4
+// ---------------------------------------------------------------- rubric: pure, and the words of the course rubric
 const RB = require(L("components/rubric.js"));
 ok(RB.LEVELS.map(l => l.label).join() === "Not yet,Developing,Proficient,Strong" && RB.LEVELS.filter(l => l.bar).map(l => l.id).join() === "proficient", "rubric: four levels, Proficient is the bar");
 ok(RB.COMPETENCES.map(c => c.id).join() === "framing,positioning,method,trust,uncertainty,accounting,realism,communication,integrity", "rubric: the nine competences in the curriculum's order");
-const cur = process.env.LEARN_CURRICULUM || path.resolve(SITE, "..", "reports", "learn", "curriculum_v2.md");
-if (fs.existsSync(cur)) {
+const cur = PRIV.path("curriculum");
+if (cur) {
   const md = fs.readFileSync(cur, "utf8"), sec = md.slice(md.indexOf("### 3.4 The rubric"), md.indexOf("## 4. Lines and depth"));
   const rows = sec.split("\n").filter(l => /^\| [A-Z]/.test(l) && !/^\| Competence/.test(l)).map(l => l.split("|").slice(1, -1).map(x => x.trim()));
-  ok(rows.length === 9, "rubric: §3.4 has nine competence rows");
+  ok(rows.length === 9, "rubric: the course rubric has nine competence rows");
   rows.forEach((r, i) => {
     const C = RB.COMPETENCES[i];
-    ok(C && C.label === r[0] && C.developing === r[1] && C.proficient === r[2] && C.strong === r[3] && C.builtIn === r[4], `rubric: ${r[0]} word for word as in §3.4`);
+    ok(C && C.label === r[0] && C.developing === r[1] && C.proficient === r[2] && C.strong === r[3] && C.builtIn === r[4], `rubric: ${r[0]} word for word as in the course rubric`);
   });
-} else console.log("note: curriculum_v2.md not found (set LEARN_CURRICULUM); the rubric's words were not compared");
+} else console.log("note: the course plan is not available (set LEARN_SOURCES); the rubric's words were not compared");
 const fr = RB.competence({ id: "framing", look: "Your card's eight checks." });
 ok(fr.text.developing === "Question vague or untyped; no audience or counterfactual." && fr.text["not-yet"] === "Developing is not reached yet." && fr.look === "Your card's eight checks.", "rubric: descriptions as sentences, Not yet, and the look line");
 let bad = false; try { RB.competence("novelty"); } catch (e) { bad = /unknown competence "novelty"/.test(e.message); }
@@ -173,18 +173,18 @@ ok(rbh.indexOf("<th scope=\"col\">Proficient (the bar)</th>") >= 0 && rbh.indexO
 // ---------------------------------------------------------------- question card
 async function questioncard() {
   const QC = require(L("components/questioncard.js"));
-  ok(QC.TYPES.map(t => t.id).join() === "descriptive,explanatory,evaluative,predictive,prescriptive" && QC.TYPES[4].template === "What should [decision-maker] do about … to achieve …, compared with …?", "question card: the five types and templates of §11.2");
+  ok(QC.TYPES.map(t => t.id).join() === "descriptive,explanatory,evaluative,predictive,prescriptive" && QC.TYPES[4].template === "What should [decision-maker] do about … to achieve …, compared with …?", "question card: the course's five question types and templates");
   ok(QC.SCALES.map(s => s[0]).join() === "S0,S1,S2,S3,S4" && QC.CHECKS.length === 8, "question card: five scales, eight checks");
   const full = { type: "evaluative", question: "Did a rural co-op's community-solar programme lower renters' energy burden more than bill credits of the same cost would have?",
     audience: "the co-op's board", metric: "renters' energy burden", units: "% of household income", counterfactual: "bill credits of the same cost",
     scale: "S1", boundary: "the co-op's service area, 2019-2025; owners excluded", wrong: "burden fell no more for participants than for matched non-participants",
     uncertainty: "how well the matched households stand in for participants" };
   const c0 = QC.check({}), cf = QC.check(full);
-  ok(c0.pass === 0 && c0.total === 8 && cf.all && cf.pass === 8, "question card: an empty card passes nothing; the §11.3 example passes all eight");
+  ok(c0.pass === 0 && c0.total === 8 && cf.all && cf.pass === 8, "question card: an empty card passes nothing; the question studio's example passes all eight");
   const noUnits = QC.check(Object.assign({}, full, { units: " " }));
   ok(!noUnits.items[3].ok && noUnits.items[3].why === "Give the metric's units." && noUnits.pass === 7, "question card: a metric without units warns about the units");
   ok(!QC.check(Object.assign({}, full, { question: "Community solar and renters." })).items[0].ok && !QC.check(Object.assign({}, full, { question: "Why?" })).items[0].ok, "question card: a question needs a question mark and a few words");
-  // shared fix 5 (R10 review #2): a draft that still holds a bracketed placeholder is not a written question
+  // a draft that still holds a bracketed placeholder is not a written question
   const br = QC.check(Object.assign({}, full, { question: "Did community solar lower the energy burden for renters, compared with […]?" }));
   ok(!br.items[0].ok && br.items[0].why === "Replace the parts in brackets, such as […], with your own words." && br.pass === 7, "question card: a draft with […] fails the question check, and says why");
   ok(!QC.check(Object.assign({}, full, { question: "What should [decision-maker] do about heat pumps in the city?" })).items[0].ok, "question card: any bracketed placeholder fails, such as [decision-maker]");

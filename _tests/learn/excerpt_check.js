@@ -1,34 +1,28 @@
-// excerpt_check.js — research wording against the register (curriculum v2 §13, guard G-SRC), shared by the W4 tests of
-// M9, M10 and CF8 (builder learn-w4-e, 2026-11-05). Not a test itself (the QA runs test_*.js only). The same rule as
-// CF2's and M7's tests: every sentence about the course author's studies is an approved sentence of
-// reports/learn/excerpts_for_approval.md, word for word, or a clause of one where the page breaks it; a short list of
-// provenance labels (NOT_RESEARCH, given by each test) may name a study without describing it.
+// excerpt_check.js — research wording against the approved excerpts (the course's sourcing rule), shared by the tests
+// of M9, M10 and CF8. Not a test itself (the test runner runs test_*.js only). The same rule as CF2's and M7's tests:
+// every sentence about the course author's studies is an approved sentence of the excerpt wording, word for word, or a
+// clause of one where the page breaks it; a short list of provenance labels (NOT_RESEARCH, given by each test) may
+// name a study without describing it.
 //   const X = require("./excerpt_check.js");
 //   const R = X.register(["E1", "E12", "E13"]);   // { units: [...normalized sentences], raw: {E12.5: "..."}, ack, found }
 //   X.approved(R, segment) -> bool;  X.elements(html) -> text segments;  X.norm(s)
-// Register rows: "| E12.5 | sentence | where | source |" in the sections "## E1." and "### E12." / "### E13."; E1 is the
-// blockquote under "## E1."; the prefixes "Timeline, <date>: ", "Citations: " and "Source: " are labels, not wording.
-// The acknowledgement sentence of E13 (decision 7, option c) is matched against the register's own text.
+// The wording's rows: "| E12.5 | sentence | where | source |" in the sections "## E1." and "### E12." / "### E13."; E1 is
+// the blockquote under "## E1."; the prefixes "Timeline, <date>: ", "Citations: " and "Source: " are labels, not wording.
+// The acknowledgement sentence of E13 is matched against the approved text itself.
+// The wording is read through private_sources.js ("excerpts"); register() gives null when it is not available.
 "use strict";
 const fs = require("fs");
-const path = require("path");
-const cp = require("child_process");
-const SITE = path.resolve(__dirname, "..", "..");
+const PRIV = require("./private_sources.js");
 const ACK = "This work was developed based upon funding from the Alliance for Sustainable Energy, LLC, Managing and Operating Contractor for the National Renewable Energy Laboratory for the U.S. Department of Energy.";
 function norm(s) {
   return String(s).replace(/\[\[[a-z0-9:-]+\|([^\]]+)\]\]/g, "$1").replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/&#x27;|&#39;/g, "'")
     .replace(/&quot;/g, '"').replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/\\\$/g, "$").replace(/\s+/g, " ").replace(/ ([.,;:?!)])/g, "$1").replace(/\( /g, "(").trim();
 }
-function portfolio() {
-  const c = [process.env.LEARN_PORTFOLIO, path.join(SITE, "..")];
-  try { c.push(path.resolve(SITE, cp.execSync("git rev-parse --git-common-dir", { cwd: SITE, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim(), "..", "..")); } catch (err) { /* not a git checkout */ }
-  return c.filter(Boolean).find(p => fs.existsSync(path.join(p, "reports/learn/excerpts_for_approval.md")));
-}
-// the approved units of the named sources; null when the register is not found (the caller says so)
+// the approved units of the named sources; null when the approved wording is not available (the caller says so)
 function register(keys) {
-  const RP = portfolio();
+  const RP = PRIV.path("excerpts");
   if (!RP) return null;
-  const md = fs.readFileSync(path.join(RP, "reports/learn/excerpts_for_approval.md"), "utf8"), raw = {};
+  const md = fs.readFileSync(RP, "utf8"), raw = {};
   let sec = null;
   const strip = t => t.replace(/^(Timeline, [^:]+|Citations|Source): /, "");
   md.split("\n").forEach(line => {
@@ -66,7 +60,7 @@ const sentencesOf = s => norm(s).split(/(?<=[.?!])\s+(?=[A-Z“"])/);
 function offending(R, notResearch, seg) {
   const listed = x => notResearch.some(r => r[0].test(norm(x)));
   if (approved(R, seg) || listed(seg)) return null;
-  // a "Label: sentence" row, as the register writes some (Inputs:, Targets:, Try it yourself:) is checked whole above
+  // a "Label: sentence" row, as the approved wording has some (Inputs:, Targets:, Try it yourself:) is checked whole above
   return sentencesOf(seg).find(x => !approved(R, x) && !listed(x)) || null;
 }
-module.exports = { ACK, norm, register, approved, elements, offending, sentencesOf, portfolio };
+module.exports = { ACK, norm, register, approved, elements, offending, sentencesOf };

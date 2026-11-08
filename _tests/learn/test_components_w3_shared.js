@@ -1,4 +1,4 @@
-// test_components_w3_shared.js — Node tests for the W3 shared fixes (reports/learn/w3_shared_fixes.md, 2026-11-03):
+// test_components_w3_shared.js — Node tests for shared fixes to components and pages, numbered:
 //   1 LX.Drill writes its question and its hint through LX.rich, so drill items carry glossary marks (A1's CRF); text
 //     is never read as HTML
 //   2 (lesson 7's own test: the EIA population of the solar capacity factor)
@@ -11,7 +11,7 @@
 //     CF1's selling-price buttons are while on-site energy is off
 //   7 LX.Rubric takes a per-capstone bar label (bar) and per-competence level words (levels); C0 and C1 use them for
 //     Communication (a one-page note, not the final project's six-page paper); C1's "Done when" asks for Proficient on
-//     every competence; W2's studios keep the course's words and "Proficient (the bar)"
+//     every competence; the research studios keep the course's words and "Proficient (the bar)"
 // Usage (from the site folder):  node _tests/learn/test_components_w3_shared.js
 "use strict";
 const fs = require("fs");
@@ -78,7 +78,7 @@ function ok(c, msg) { checks++; if (!c) { fails++; console.log("FAIL:", msg); } 
     ok(/Analyst lesson \[\[lesson:a04-retail-tariffs\|A4\]\] covers large-load tariffs\./.test(notes) && /Analyst lesson \[\[lesson:a02-contracts-risk\|A2\]\] covers contracts and risk\./.test(notes), "N1: the two 'left unanswered' notes link A4 and A2");
     const n1q = fs.readFileSync(path.join(SITE, "learn/n01-news-lens.qmd"), "utf8");
     ok(n1q.indexOf('Analyst lesson <a href="a04-retail-tariffs.html">A4</a> covers large-load tariffs.') > 0 && n1q.indexOf('Analyst lesson <a href="a02-contracts-risk.html">A2</a> covers contracts and risk.') > 0 && n1q.indexOf("[[lesson:") < 0,
-       "N1's no-JS fallback writes the two links (scripts/learn_n01_fallback.js)");
+       "N1's no-JS fallback writes the two links (its fallback build step)");
     ok(JSON.stringify(f2).indexOf("under the tariff: Analyst lesson [[lesson:a04-retail-tariffs|A4]].") > 0, "F2: the bills effect links A4");
     ok(rd("k05-probability-statistics.js").indexOf("as Modeler lesson [[lesson:m07-monte-carlo|M7]] runs.") > 0, "K5: the sampling feedback links M7");
     ok(rd("f01-five-scales.js").indexOf('"Modeler lesson [[lesson:m05-microgrid-size-and-run|M5]] solves exactly this campus."') > 0, "F1: the campus reveal links M5");
@@ -126,7 +126,7 @@ function ok(c, msg) { checks++; if (!c) { fails++; console.log("FAIL:", msg); } 
     const vs = rb.summary().split("\n");
     ok(vs[0] === "Learn · C1 self-check (rubric v1 (curriculum v2 §3.4); Communication in C1's own words)" && vs[1] === "Communication: Proficient — A one-page note with its plan link." && vs[2] === "1 of 1 at Proficient or above: the bar for this note, on these competences.",
        "rubric view: the copied summary keeps the own words and the bar (" + vs.slice(0, 3).join(" | ") + ")");
-    // C0 and C1 use them; W2's studios do not
+    // C0 and C1 use them; the research studios do not
     const c0 = JSON.parse(rd("data/c0-behind-one-meter.json")).rubric, c1 = require(L("c1-keep-the-campus-running.js"));
     const comm = r => (r.competences || r).find(c => c.id === "communication");
     ok(c0.bar === "the bar for this note" && /one-page note/.test(comm(c0).levels.proficient) && !/six pages|final project/.test(c0.lede + c0.note), "C0: its bar label and Communication's one-page words; no six-page caveat left");
@@ -137,7 +137,7 @@ function ok(c, msg) { checks++; if (!c) { fails++; console.log("FAIL:", msg); } 
     const call = f => (rd(f).split("\n").find(l => /LX\.Rubric\(/.test(l)) || "");
     ok(/bar: C\.rubric\.bar \}\);$/.test(call("c0-behind-one-meter.js")) && /bar: page\.RUBRIC_BAR \}\);$/.test(call("c1-keep-the-campus-running.js")), "C0 and C1 pass their bar label to LX.Rubric");
     const studios = fs.readdirSync(path.join(SITE, "learn")).filter(f => /^(r\d\d|ck-m)-.*\.qmd$/.test(f));
-    ok(studios.length >= 8 && studios.every(f => { const t = fs.readFileSync(path.join(SITE, "learn", f), "utf8"); return t.indexOf("lx-rb-static") < 0 || t.indexOf("<th scope=\"col\">Proficient (the bar)</th>") > 0; }), `W2 studios keep "Proficient (the bar)" (${studios.length} pages)`);
+    ok(studios.length >= 8 && studios.every(f => { const t = fs.readFileSync(path.join(SITE, "learn", f), "utf8"); return t.indexOf("lx-rb-static") < 0 || t.indexOf("<th scope=\"col\">Proficient (the bar)</th>") > 0; }), `the studios keep "Proficient (the bar)" (${studios.length} pages)`);
   }
 
   console.log(fails ? `FAILED ${fails} of ${checks} checks (test_components_w3_shared)` : `ok ${checks}/${checks} checks (test_components_w3_shared)`);

@@ -4,11 +4,11 @@
 //     Prairieland's own figures; each HHI against Prairieland's; a cap keeps shares summing to 1, none above the cap
 //   - the stress tests by hand at the defaults and over every lever: the price spike's money (abroad and at home), the
 //     closure against the shock's lost PJ, the restriction's scarcest mineral, the fire with a second site; every line and
-//     "saw" true over the levers' whole ranges; combined shocks: a restriction and a fire counted month by month (W6 fix):
+//     "saw" true over the levers' whole ranges; combined shocks: a restriction and a fire counted month by month:
 //     with no fire inside it the monthly count equals the restriction's closed form, and together the loss lies between
 //     the larger single loss and the two added, and depends on when the fire comes
 //   - the lever sort agrees with the model where the model can show it (each "yes" lever improves its shock)
-//   - the excerpt: E8.3 word for word against the register, E8.7 under it, the AMM citation; no other research wording
+//   - the excerpt: E8.3 word for word against the approved wording, E8.7 under it, the AMM citation; no other research wording
 //   - the page: generated blocks up to date (--write rewrites them); no Prairieland number retyped; the fictional line;
 //     links on the allow-list; no nuclear term; text budget; the sidecar's terms
 // Usage (from the site folder):  node _tests/learn/test_a21-security-minerals.js [--write]
@@ -91,7 +91,7 @@ const I = PL.imports, S0 = M.defaults(PL, D);
   ok(near(f.lost, sh.months / 12 * Fb.output2025GWh) && near(f.jobYears, Fb.jobs * sh.months / 12), "fire: 6.0 GWh and 1,250 job-years with no second site");
   let good = true; range(D.levers.split).forEach(s => { const x = M.fire(PL, Object.assign({}, S0, { split: s })); if (!near(x.lost, sh.months / 12 * Math.max(0, Fb.output2025GWh - Fb.capacityGWh * s / 100)) || (x.lost <= 1e-9) !== /covers the whole loss/.test(M.fireSaw(PL, Object.assign({}, S0, { split: s })))) good = false; });
   ok(good, "fire: the second site runs up to its capacity; the 'saw' is true for every split"); }
-// combined shocks, month by month (W6 review, high): the restriction alone, the fire's timing, the bounds
+// combined shocks, month by month: the restriction alone, the fire's timing, the bounds
 { const AT = D.fireTiming.map(x => x.key), sh = M.shockOf(PL, "mineralBan").params, fm = M.shockOf(PL, "factoryFire").params.months, Fb = PL.factories.battery;
   ok(AT.join() === "start,middle,end" && M.fireStart(PL, "start") === 0 && M.fireStart(PL, "end") === sh.years * 12 - fm && M.fireStart(PL, "middle") > 0 && M.fireStart(PL, "middle") < M.fireStart(PL, "end"), "the fire starts at month 0, in the middle, or in the restriction's last months");
   let alone = true, bounds = true, n = 0;
@@ -128,9 +128,9 @@ const I = PL.imports, S0 = M.defaults(PL, D);
   ok(it("less").ref.spike === "yes" && it("less").ref.closure === "yes" && M.spike(PL, 10).abroad < M.spike(PL, 0).abroad && M.closure(PL, D, Object.assign({}, S0, { weeks: 12, restraint: 10 })).gap < M.closure(PL, D, Object.assign({}, S0, { weeks: 12 })).gap, "using less helps against a price spike and a closure");
   ok(D.sort.items.every(x => D.sort.bins.every(b => ["yes", "no", "partly"].indexOf(x.ref[b.key]) >= 0 && x.why[b.key])), "every cell has a reference and a reason"); }
 
-// ---------------- the excerpt (excerpt:supply-chain-mg; register E8.3 and E8.7)
+// ---------------- the excerpt (excerpt:supply-chain-mg; approved E8.3 and E8.7)
 const R = X.register(["E8"]);
-ok(R && R.raw["E8.3"] && R.raw["E8.7"], "the register is found with E8.3 and E8.7");
+ok(R && R.raw["E8.3"] && R.raw["E8.7"], "the approved wording is found with E8.3 and E8.7");
 const quotes = [...OWN.matchAll(/<blockquote class="lx-excerpt" data-source="([^"]+)">([\s\S]*?)<\/blockquote>/g)];
 ok(quotes.length === 1 && quotes[0][1] === "excerpt:supply-chain-mg", "one excerpt block, keyed excerpt:supply-chain-mg");
 if (R && quotes.length) {
@@ -156,7 +156,7 @@ const hrefs = [...OWN.matchAll(/href="([^"]+)"/g)].map(m => m[1].replace(/&amp;/
 const okHref = h => /^https:\/\/(www\.iea\.org|www\.eia\.gov|ec\.europa\.eu|single-market-economy\.ec\.europa\.eu|www\.usgs\.gov|doi\.org)\//.test(h) || /^[0-9a-z-]+\.html(#[a-z-]+)?$/.test(h) || /^#/.test(h);
 ok(hrefs.every(okHref), "links: IEA, EIA, the European Commission, USGS, doi.org and learn pages (" + hrefs.filter(h => !okHref(h)).join(", ") + ")");
 ok(Object.values(D.sources).every(s => s.url === "no link" || okHref(s.url)), "the data file's sources are allow-listed or cited without a link");
-ok(/f10-nations-differ\.html/.test(OWN) && /m13-national-pathway\.html/.test(OWN) && /c4-prairieland-2050\.html/.test(OWN) && !/\(upcoming\)/.test(OWN) && /cf1-supply-chain-microgrids\.html/.test(OWN), "F10, M13 and C4 linked now they are live (W6 integration); CF1 linked");
+ok(/f10-nations-differ\.html/.test(OWN) && /m13-national-pathway\.html/.test(OWN) && /c4-prairieland-2050\.html/.test(OWN) && !/\(upcoming\)/.test(OWN) && /cf1-supply-chain-microgrids\.html/.test(OWN), "F10, M13 and C4 linked now they are live; CF1 linked");
 
 // ---------------- the practice set balances as displayed
 { const P = M.practice(PL, D), num = s => Number(s.replace(/,/g, "")); ok((P.match(/<li>/g) || []).length === 6, "six worked exercises");
@@ -166,7 +166,7 @@ ok(/f10-nations-differ\.html/.test(OWN) && /m13-national-pathway\.html/.test(OWN
   const m4 = P.match(/Lost: ([\d,]+) × 63 ÷ 365 = ([\d.]+) PJ; stocks: ([\d,]+) × (\d+) ÷ 365 = ([\d.]+) PJ; short by ([\d.]+) PJ/); ok(m4 && near(num(m4[1]) * 63 / 365, num(m4[2]), 0.05) && near(num(m4[3]) * num(m4[4]) / 365, num(m4[5]), 0.05) && near(num(m4[2]) - num(m4[5]), num(m4[6]), 0.05), "exercise 4 balances as displayed");
   const m5 = P.match(/(\d+)% \+ (\d+)% × (\d+)% = ([\d.]+)% a year; \((\d) × ([\d.]+) \+ (\d+)\/365\) ÷ (\d) = ([\d.]+)/); ok(m5 && near(num(m5[1]) + num(m5[2]) * num(m5[3]) / 100, num(m5[4]), 0.05) && near((num(m5[5]) * num(m5[6]) + num(m5[7]) / 365) / num(m5[8]), num(m5[9]), 0.0006), "exercise 5 balances");
   const m6 = P.match(/(\d+)\/12 × \((\d+) − (\d+) × 0\.3\) = ([\d.]+) GWh, against (\d+)\/12 × (\d+) = ([\d.]+) GWh with one site/); ok(m6 && near(num(m6[1]) / 12 * (num(m6[2]) - num(m6[3]) * 0.3), num(m6[4]), 0.05) && near(num(m6[5]) / 12 * num(m6[6]), num(m6[7]), 0.05), "exercise 6 balances");
-  // one short question per item, its numbers in a table beside it (W6 finding)
+  // one short question per item, its numbers in a table beside it
   const items = [...P.matchAll(/<li><p><b>[^<]+<\/b> ([\s\S]*?)<\/p>([\s\S]*?)<details/g)];
   ok(items.length === 6 && items.every(x => /<table class="lx-mini-table a21-given">/.test(x[2]) && (x[1].match(/\?/g) || []).length === 1), "each exercise asks one question, with its numbers in a table");
   ok(/<th scope="row">Crude oil imports<\/th><td>[\d,]+ PJ a year, all through the strait/.test(P) && /1 PJ is a million GJ/.test(P), "the givens carry the volumes and the PJ-to-GJ conversion"); }
@@ -189,7 +189,7 @@ stepTexts.forEach((t, i) => { const n = nWords(t); ok(n >= 18 && n <= 36, "step 
   lines.forEach(t => { ok(nWords(t) <= 40, "a line of " + nWords(t) + " words: " + plain(t).slice(0, 60)); ok(nSent(t) <= 2, "a line of " + nSent(t) + " sentences: " + plain(t).slice(0, 60)); }); }
 // every step's notes are on the page through notes(act, key); the assumptions behind each stress test are listed there
 ok(["dep", "strait", "hhi", "spike", "closure", "ban", "fire", "board"].every(k => new RegExp("notes\\(act, \"" + k + "\"\\)").test(JS)) && M.notesFor(PL, D, "board").indexOf(D.assume.overlap) >= 0 && M.notesFor(PL, D, "spike").indexOf(D.assume.spikeStocks) >= 0, "each step lists its notes, one idea per line; the combined count and the stocks caveat among them");
-// every element of the page, the no-JS block and the practice set included (W6 finding: they were left out); the
+// every element of the page, the no-JS block and the practice set included; the
 // approved excerpt and its two approved lines are word for word and checked above
 const PROSE = OWN.replace(/<div class="lx-card lx-sources">[\s\S]*?<\/div>/, " ").replace(/<blockquote[\s\S]*?<\/blockquote>/, " ").replace(/<ul class="lx-hint a21-holds">[\s\S]*?<\/ul>/, " ").replace(/^---[\s\S]*?\n---\n/, " ")
   .replace(/<script[\s\S]*?<\/script>/g, " ").replace(/<style[\s\S]*?<\/style>/g, " ").replace(/<!--[\s\S]*?-->/g, " ").replace(/^- (.*)$/gm, "<li>$1</li>");
@@ -201,9 +201,10 @@ ok(/aria-live/.test(JS) && /LX\.store\.(get|set)\("a21"/.test(JS), "live regions
 ok((JS.match(/LX\.demo\(/g) || []).length === 1 && (JS.match(/demo\[\d\] = function/g) || []).length === 10, "a demo hook for each of the ten steps");
 ok(/id: hhi\b/.test(SIDE) && /\[\[hhi\||term="hhi"/.test(JS + PAGE), "the sidecar defines and the page marks hhi");
 ["gdp", "petajoule"].forEach(id => ok(new RegExp("id: " + id + "\\b").test(SIDE) && new RegExp("\\[\\[" + id + "\\|").test(JS), "the sidecar defines and the page marks " + id));
-["lng", "primary-energy", "substitution-method", "job-year", "transfer-payment", "shadow-price"].forEach(id => ok(new RegExp("\\[\\[" + id + "\\||term=\"" + id + "\"").test(JS + PAGE), "the page marks " + id + " (W6 finding: terms at first use)"));
+["lng", "primary-energy", "substitution-method", "job-year", "transfer-payment", "shadow-price"].forEach(id => ok(new RegExp("\\[\\[" + id + "\\||term=\"" + id + "\"").test(JS + PAGE), "the page marks " + id + " (terms at first use)"));
 
-// ---------------- W6 review fixes, one check each
+// ---------------- wording and data checks, one each: gas storage, supply groups, the HHI reading, inputs, the explain
+// layer, the refiner label, the shadow price
 { const sp = M.spikeSaw(PL, 0), my = M.myths(PL, D);
   ok(!/do not help|only using less gas helps/.test(sp + my + JS) && /cushions? .*while it lasts/.test(my) && /stored gas can cushion purchases while it lasts/.test(D.assume.spikeStocks) && D.sort.items.find(x => x.key === "stocks").ref.spike === "partly", "stocks against a price spike: partly, in the step, the myth and the sort alike");
   ok(/supply groups/.test(M.hhiSaw(PL, D, 90)) && /upper bound/.test(M.hhiSaw(PL, D, 90)) && /upper bound/.test(PAGE) && !/four refiners/.test(PAGE + JS), "the four suppliers are supply groups; the HHI shown is an upper bound");
@@ -212,7 +213,7 @@ ok(/id: hhi\b/.test(SIDE) && /\[\[hhi\||term="hhi"/.test(JS + PAGE), "the sideca
   ok(/function paintExplain\(\)/.test(JS) && /setTimeout\(paintExplain/.test(JS) && /ban\(PL, S\)/.test(JS) && /with your levers/.test(JS) && /with 2025's settings/.test(JS), "the explain layer is drawn from the reader's levers and says whose numbers they are");
   ok(/IEA report of 2025 \(latest year available for each mineral; years vary\)/.test(M.facts(PL, D)) && !/Leading refiner of strategic minerals, 2025</.test(M.facts(PL, D)), "the IEA minerals figure is labelled by its report year, its observation years varying");
   ok(!/its dual value prices/.test(PAGE) && /not the value of security/.test(PAGE), "a shadow price is a modelled cost change, not the value of security"); }
-// import-dependence: one definition for the course, in F10's sidecar since the W6 integration (F10 teaches it first)
+// import-dependence: one definition for the course, in F10's sidecar (F10 teaches it first)
 const F10SIDE = fs.readFileSync(path.join(SITE, "learn/_w1/f10-nations-differ.yml"), "utf8");
 ok(/id: import-dependence\b/.test(F10SIDE) && !/id: import-dependence\b/.test(SIDE) && /\[\[import-dependence\||term="import-dependence"/.test(JS + PAGE), "F10's sidecar defines import-dependence (one definition); the page marks it");
 

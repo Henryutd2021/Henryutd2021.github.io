@@ -6,11 +6,11 @@
 //   - every number on the page (step sentences, Go deeper, myths, the quick question, practice, the no-JS blocks,
 //     numbers to remember) matches the model or the data file
 //   - the two no-JS blocks (fallback, practice) equal what the model writes (--write rewrites them)
-//   - research wording (curriculum §13, guard G-SRC): the real-world box quotes E7.6 of
-//     reports/learn/excerpts_for_approval.md word for word, with CF7's footer; no other sentence describes the study
-//   - state (W3 review, 2026-11-03): steps 2-4 show the start whatever the reader chose later (revisiting step 3 or 4 keeps
-//     the answer and says so); step 8's lines and steps 5-6's reveals follow the reader's state, as the ledger does
-//   - wording (W3 review): "the model's cost of serving ... falls", never "saves"; recovery from other customers is an
+//   - research wording (the course's sourcing rule): the real-world box quotes the approved excerpt E7.6 word for word,
+//     with CF7's footer; no other sentence describes the study
+//   - state: steps 2-4 show the start whatever the reader chose later (revisiting step 3 or 4 keeps the answer and says
+//     so); step 8's lines and steps 5-6's reveals follow the reader's state, as the ledger does
+//   - wording: "the model's cost of serving ... falls", never "saves"; recovery from other customers is an
 //     assumption; the real-time adder is a plant-and-wire charge; the large load's share is its highest hourly demand;
 //     the meter statistic is dated December 2023
 //   - scope: data centers only as loads; no nuclear terms anywhere in the page, the data or the script; no "AI"; links on
@@ -19,7 +19,7 @@
 "use strict";
 const fs = require("fs");
 const path = require("path");
-const cp = require("child_process");
+const PRIV = require("./private_sources.js");
 const ID = "a04-retail-tariffs";
 const SITE = path.resolve(__dirname, "..", "..");
 const L = p => path.join(SITE, "assets/learn", p);
@@ -137,7 +137,7 @@ ok(M.touReveal(D, W, T, { ev: "night", scarce: true }) === "Charging at 01:00 cu
   "step 5 reveal with the scarcity week on (revisited)");
 ok(M.demandReveal(D, W, T, { batch: "night", scarce: true }) === S.demand, "step 6 reveal is the same with the scarcity week on (the batch's hours are not scarce)");
 
-// ---------------- revisiting steps 2-4: they show the start, whatever the reader chose later (review A4 #1)
+// ---------------- revisiting steps 2-4: they show the start, whatever the reader chose later
 const STATES = [];
 ["evening", "night"].forEach(ev => ["day", "night"].forEach(batch => [false, true].forEach(scarce => STATES.push({ ev, batch, scarce }))));
 STATES.forEach(st => {
@@ -156,7 +156,7 @@ ok(/pin = true; stage\.hidden = false; var seen/.test(JS) && /pin = true; stage\
   "steps 2, 3 and 4 pin the start; no other step does");
 ok(/costStep\(D, W, T, S\)/.test(JS) && /flatStep\(D, W, T, S\)/.test(JS), "steps 3 and 4 take their answer from costStep and flatStep");
 
-// ---------------- step 8 in the reader's state, the same as the ledger beside it (review A4 #2)
+// ---------------- step 8 in the reader's state, the same as the ledger beside it
 STATES.forEach(st => {
   const E = M.evaluate(D, W, T, st), tag = JSON.stringify(st), b = M.busiest(E.solarev.net);
   const ch = M.change(D, W, T, "solarev", { ev: "evening", batch: st.batch, scarce: st.scarce }, { ev: "night", batch: st.batch, scarce: st.scarce });
@@ -210,7 +210,7 @@ ok(/in December 2023 \(128\.4 of 167\.2 million\)/.test(D.facts[1].what) && D.fa
   "the meter statistic is dated December 2023 (FERC 2025 Assessment, Table 2-1), not 2024");
 ok(/Time-of-use needs use split by price period; real-time pricing needs hourly readings\./.test(D.facts[1].what), "time-of-use needs use by price period, not hourly records");
 
-// ---------------- wording that the W3 review corrected
+// ---------------- wording: costs of service, recovery, the real-time adder, the large load
 const ALLTXT = T_PAGE + " " + RAW + " " + JS.replace(/\/\/[^\n]*/g, "");
 ok(!/saves the utility|it saves the utility|costs \$[\d,]+ less|really save|what does the utility save/i.test(ALLTXT), "no allocated cost presented as a saving (\"the model's cost of serving ... falls\")");
 ok(JS.indexOf('H("p", { class: "lx-hint", text: ALLOC }, act)') >= 0 && /may avoid future upgrades, which this model does not compute/.test(M.ALLOC), "step 5 says what the cost of serving is, and what the model does not compute");
@@ -221,21 +221,16 @@ ok(/Assumed here: whatever the data center does not pay/.test(JS), "the large lo
 ok(/\[\[tariff\|tariff\]\]/.test(JS) && /\[\[customer-class\|class\]\]/.test(JS) && /tightest hour \(most gas needed\)/.test(JS) && !/Power Pool shapes/.test(JS), "tariff, class and the tightest hour are defined at first use; no unexplained 'shapes'");
 { const side = fs.readFileSync(path.join(SITE, "learn/_w1/" + ID + ".yml"), "utf8"); ok(/id: customer-class/.test(side), "the sidecar defines customer-class for the glossary"); }
 
-// ---------------- research wording: E7.6, word for word (curriculum §13, guard G-SRC)
+// ---------------- research wording: E7.6, word for word (the sourcing rule)
 const E76 = "Ratepayer exposure depends strongly on large-load tariff design.";
 const CF7_FOOT = "Approved excerpt of: Li et al. (2026), accepted paper, 2026 North American Power Symposium (NAPS); DOI pending.";
-function portfolio() {
-  const c = [process.env.LEARN_PORTFOLIO, path.join(SITE, "..")];
-  try { c.push(path.resolve(SITE, cp.execSync("git rev-parse --git-common-dir", { cwd: SITE, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim(), "..", "..")); } catch (e) { /* not a git checkout */ }
-  return c.filter(Boolean).find(p => fs.existsSync(path.join(p, "reports/learn/excerpts_for_approval.md")));
-}
-const RP = portfolio();
+const RP = PRIV.path("excerpts");
 if (RP) {
-  const reg = fs.readFileSync(path.join(RP, "reports/learn/excerpts_for_approval.md"), "utf8");
+  const reg = fs.readFileSync(RP, "utf8");
   const row = reg.split("\n").find(l => /^\| E7\.6 \|/.test(l));
-  ok(row && row.split(" | ")[1] === E76, "E7.6 in the register is the sentence this test checks");
+  ok(row && row.split(" | ")[1] === E76, "E7.6 in the approved wording is the sentence this test checks");
   ok(!/^\| E7\.6 \|/m.test(reg.slice(reg.indexOf("## Revisions after review"))), "E7.6 has no revision after review");
-} else console.log("note: reports/learn/excerpts_for_approval.md not found (set LEARN_PORTFOLIO); E7.6 checked against this test's copy");
+} else console.log("note: the approved excerpt wording is not available (set LEARN_SOURCES); E7.6 checked against this test's copy");
 {
   const real = (OWN.match(/<div class="lx-card lx-real">([\s\S]*?)<\/div>/) || ["", ""])[1];
   const bq = [...OWN.matchAll(/<blockquote class="lx-excerpt" data-source="([^"]+)">([\s\S]*?)<footer>([\s\S]*?)<\/footer><\/blockquote>/g)];
@@ -273,7 +268,7 @@ const lines = [M.costReveal(D, W, E0), M.flatReveal(D, T, E0), M.scarcityReveal(
   .concat([].concat(...STATES.map(st => D.tariffs.map(x => M.pickLine(D, W, T, x.key, st))))).concat(D.customers.map(c => M.summary(D, W, E0, c.key)))
   .concat([M.startNote({ scarce: true })]).concat([25, 50, 75, 100].map(u => [0, 50, 80, 100].map(m => M.largeLine(D.large, u, m))).flat());
 lines.forEach(t => { ok(nWords(t) <= 42, "a reveal of " + nWords(t) + " words: " + t.slice(0, 60)); ok(nSent(t) <= 3, "a reveal of " + nSent(t) + " sentences: " + t.slice(0, 60)); });
-// the page's own prose, the no-JS blocks included (review A4 #13): paragraphs, list items, definitions, table cells, captions
+// the page's own prose, the no-JS blocks included: paragraphs, list items, definitions, table cells, captions
 const PROSE = OWN.replace(/^---[\s\S]*?\n---\n/, " ").replace(/<script[\s\S]*?<\/script>/g, " ").replace(/<style[\s\S]*?<\/style>/g, " ")
   .replace(/<!--[\s\S]*?-->/g, " ").replace(/^- (.*)$/gm, "<li>$1</li>").replace(/^\|(.*)\|$/gm, "<td>$1</td>");
 PROSE.split(/<\/?(?:p|li|dd|dt|td|th|summary|blockquote|br|caption)\b[^>]*>/).map(plain).filter(x => /[A-Za-z]/.test(x) && !/^[:{]/.test(x)).forEach(x => {

@@ -1,6 +1,5 @@
-// test_components_shared.js — Node tests for the shared-component fixes collected after the W1 per-lesson reviews
-// (2026-11-02; reports/learn/w1_shared_fixes.md), run on a small stub document:
-//   - checkpoint.js (LX.Checkpoint): its W2 options (describe, submitTask, onAnswer, numeric check with any unit,
+// test_components_shared.js — Node tests for behaviour of the shared components, run on a small stub document:
+//   - checkpoint.js (LX.Checkpoint): its runner options (describe, submitTask, onAnswer, numeric check with any unit,
 //     destroy) on a CK-M-like checkpoint; the estimate task's early "Show the worked solution now" opens the page's worked
 //     solution as well; "Start again" shuts it again; a range needs a high above its low (pure check and view: one
 //     number is not submitted, and says why); solutions, points and choice feedback take [[glossary|marks]]
@@ -8,7 +7,7 @@
 //   - cards.js (LX.StepCards): api.busy(on) holds Next shut while a solve runs (and marks the card aria-busy); a late call
 //     from a card no longer shown changes nothing; M1 step 8 uses it instead of reaching into the card's buttons; Next
 //     past the last card (a script's click on the hidden button, as a demo hook run twice does) and Back on the first card
-//     do nothing (W4 carry-over: they threw before)
+//     do nothing (they used to throw)
 //   - unitchain.js/.css (LX.UnitChain) is .lx-uchain, so a page with a causal chain (.lx-chain, chains.css) keeps both
 //     layouts (the bundle's rules cascaded onto stub elements)
 //   - flowchart.js (LX.Flowchart): update(traces) changes the traces without redrawing; lesson 3 uses it
@@ -191,7 +190,7 @@ ok(CP.checkEstimate(est, 439, 440, "MWh per year").ordered && CP.checkEstimate(e
      "checkpoint view: a range is recorded, opens the worked solution and the four-criterion rating");
 })();
 
-// ---------------------------------------------------------------- checkpoint: the runner's options (W2 integration, for CK-M)
+// ---------------------------------------------------------------- checkpoint: the runner's options (as CK-M uses them)
 // describe (the results sentence), submitTask (the final open-short task opens the page's solution), onAnswer, the numeric
 // check with any unit (answer.value), destroy() (clock, listeners and markup gone; the attempt saved)
 (function () {
@@ -239,7 +238,7 @@ ok(CP.checkEstimate(est, 439, 440, "MWh per year").ordered && CP.checkEstimate(e
   cp2.destroy();
 })();
 
-// ---------------------------------------------------------------- checkpoint: shared fix 14 (after the CK-M review)
+// ---------------------------------------------------------------- checkpoint: tolerance notes, openFirst, solution openings
 // the tolerance under a number task's field; the openFirst option of the level rule; the worked solution's opening
 // recorded per runner (kept across Start again), with the submit task's answer time
 (function () {
@@ -468,5 +467,5 @@ ok(/\.lx-sources ul, \.lx-real ol \{ margin: 6px 0 0; padding-left: 1\.1rem;/.te
    /\.lx-real p:not\(\.lx-eyebrow\), \.lx-sources ul, \.lx-real ol \{ font-size: 14\.5px;/.test(baseCss), "base.css: a list in an In-the-real-world card is styled as the sources list");
 ok(!/<ol style=/.test(lx8) && /<div class="lx-card lx-real">[\s\S]*?<ol>/.test(lx8), "lesson 8: its real-world list has no inline style");
 
-console.log(`components (shared fixes): ${checks - fails} of ${checks} checks passed`);
+console.log(`components (shared): ${checks - fails} of ${checks} checks passed`);
 process.exit(fails ? 1 : 0);

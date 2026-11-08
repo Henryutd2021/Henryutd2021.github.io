@@ -4,7 +4,8 @@
 //   - every auto-marked answer follows from its sourced inputs (cf_targets.json for capacity factors; EIA home use)
 //   - the checks (choice, order, number with units, estimate) and the level rule, on made-up attempts
 //   - the worked solution's numbers (two routes, homes, share of the town, daily energy) as printed on the page
-//   - the copied summary carries the W1 measures (first try, tries, time to first answer, solution opened first)
+//   - the copied summary carries the course's checkpoint measures (first try, tries, time to first answer, solution opened
+//     first)
 //   - the no-JS version of the nine tasks on the page equals staticTasks() (write it with --write after a data edit)
 //   - the always-visible rubric gives no numbers from the answer; task texts stay within the text budget
 // Usage (from the site folder):  node _tests/learn/test_ck-f-estimate.js [--write]

@@ -1,5 +1,5 @@
-// stubdom.js — a small stub document for Node tests of Learn components (W2, 2026-11-03). Not a test itself (the QA
-// runs test_*.js only). It grew out of the stub in test_components_shared.js, with text nodes, checkboxes and radios.
+// stubdom.js — a small stub document for Node tests of Learn components. Not a test itself (the test runner runs
+// test_*.js only). It grew out of the stub in test_components_shared.js, with text nodes, checkboxes and radios.
 //   const { env, load, buttons } = require("./stubdom.js");
 //   const E = env();                         // { LX, document, window, body, store, location }
 //   load("exemplars", E);                    // runs assets/learn/components/exemplars.js against the stub; returns its exports
@@ -95,10 +95,10 @@ function env(opt) {
   LX.S = LX.H;
   let uid = 0; LX.uid = p => (p || "lx") + "-" + (++uid);
   LX.esc = escH;
-  LX.rich = require(path.join(SITE, "assets/learn/components/core.js")).rich;   // core.js's own (W3: lesson links too)
+  LX.rich = require(path.join(SITE, "assets/learn/components/core.js")).rich;   // core.js's own (lesson links too)
   LX.icon = name => "<svg data-icon=\"" + name + "\"></svg>"; LX.emit = () => {}; LX.on = () => {}; LX.reduced = () => true; LX.onTheme = () => {};
   LX.clamp = (x, a, b) => Math.max(a, Math.min(b, x));
-  LX.mulberry32 = require(path.join(SITE, "assets/learn/components/core.js")).mulberry32;   // as core.js (W3: M7, engine E1)
+  LX.mulberry32 = require(path.join(SITE, "assets/learn/components/core.js")).mulberry32;   // as core.js (M7, engine E1)
   LX.store = { get: (k, d) => (k in store ? JSON.parse(store[k]) : d), set: (k, v) => { store[k] = JSON.stringify(v); } };
   LX.progress = { done() {} };
   LX.copyText = () => Promise.resolve(false);

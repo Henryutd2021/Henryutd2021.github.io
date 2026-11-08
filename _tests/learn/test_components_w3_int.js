@@ -1,4 +1,4 @@
-// test_components_w3_int.js — Node tests for what the W3 integration (2026-11-03) promoted and fixed:
+// test_components_w3_int.js — Node tests for the shared ledger, solve-step, random-number and Sankey pieces:
 //   - LX.Ledger (components/ledger.js, ledger.css; from A4, A7, A14): caption, header row, row headers with their second
 //     line, each cell labelled by its column for the phone layout, cell classes, a total row, text never read as HTML;
 //     the three pages call it and keep no copy of the table code or its CSS
@@ -10,7 +10,7 @@
 //   - LX.Sankey (components/sankey.js, sankey.css; from F3, whose script F4 loaded for it): the pure layout on a small
 //     spec, F3's model keeps it as .sankey, F3 keeps no copy, F4 no longer loads F3's script
 //   - the bundle: both components listed after the engines, each file names itself, tokens only
-//   - contrast (W3 layout audit): LX.BenchRun dims only graphics while stale or busy; LX.ReportNote's small headings
+//   - contrast: LX.BenchRun dims only graphics while stale or busy; LX.ReportNote's small headings
 //     use --lx-ink-2
 // Usage (from the site folder):  node _tests/learn/test_components_w3_int.js
 "use strict";
@@ -35,7 +35,7 @@ const code = s => s.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:"'])\/\/.*$/
     ok(bundleJS.indexOf(js.trim()) > 0 && bundleCSS.indexOf(css.trim()) > 0, `${n}: in learn.js and learn.css as written`);
   });
   const head = bundleJS.split("\n")[0];
-  ok(/engine-e1, ledger, solvestep, sankey(, engine-e2)?(, adequacy, gp, plainsplan, scenario)?(, lifebox, siting, whopays)?(, engine-e3)?(, engine-e4)?\)/.test(head), "bundle order: ledger, solvestep and sankey after the W3 engines (W4's engine-e2, then the W4 promotions, then the W5 promotions and engine E3, then W6's engine E4, may follow) (" + head.slice(-60) + ")");
+  ok(/engine-e1, ledger, solvestep, sankey(, engine-e2)?(, adequacy, gp, plainsplan, scenario)?(, lifebox, siting, whopays)?(, engine-e3)?(, engine-e4)?\)/.test(head), "bundle order: ledger, solvestep and sankey after engines E0 and E1 (engine-e2, the next shared components, engine E3 and engine E4 may follow) (" + head.slice(-60) + ")");
 
   // ---------------------------------------------------------------- LX.Ledger
   {
@@ -118,7 +118,7 @@ const code = s => s.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:"'])\/\/.*$/
   // ---------------------------------------------------------------- LX.mulberry32
   {
     const CORE = require(L("components/core.js"));
-    function old(seed) {   // the copy M7 and engine E1 each had before the W3 integration
+    function old(seed) {   // the copy M7 and engine E1 each had before the shared one
       let a = seed >>> 0;
       return function () { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
     }
@@ -146,7 +146,7 @@ const code = s => s.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:"'])\/\/.*$/
     ok(f4q.indexOf("f03-energy-services.js") < 0 && /LX\.Sankey\(/.test(rd("f04-power-plants.js")), "F4 draws LX.Sankey from the bundle and no longer loads F3's script");
   }
 
-  // ---------------------------------------------------------------- contrast (W3 layout audit)
+  // ---------------------------------------------------------------- contrast
   {
     const br = code(rd("components/benchrun.css")), rn = code(rd("components/reportnote.css"));
     const G = ":is(path, rect, circle, ellipse, line, polyline, polygon, image, use)";
