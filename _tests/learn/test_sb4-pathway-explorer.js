@@ -7,8 +7,11 @@
 //   - the run's words (says), for every library entry and each of its shocks: true and never more than the run shows (the
 //     budget "binds" only when the cumulative CO2 is at the budget; "out of reach" only with an overshoot; imports above
 //     the cap only with an overshoot; Ridge Station's line as run); the full-year verdict is prairieland.json's rule
-//   - the library on the page: a plan is drawn from it only when its link (shock set aside) is a library entry's, and the
-//     page says "precomputed with this engine on <date>"
+//   - the library on the page: only the first view is drawn from it (when the plan on load is a library entry's, shock set
+//     aside), labelled "precomputed with this engine on <date>"; every run the reader starts solves live; the full-year
+//     checks stay precomputed
+//   - the cost: its parts (the existing wind, solar and batteries' upkeep a row of its own), the boundary with what is
+//     left out, the retirement convention, and the dated correction line against the library
 //   - the details: the penalty table; the default-plan near-tie check named as such; the budget gap with A20
 //     (the engine's sentences, its floor); the shock table is the engine's; a plan without the peak-hour rule is "not
 //     tested"; full-year checks follow the plan's key whether drawn from the library or solved live; units and terms
@@ -25,7 +28,7 @@ function ok(c, msg) { checks++; if (!c) { fails++; console.log("FAIL:", msg); } 
 const QPATH = path.join(X.SITE, "learn/sb4-pathway-explorer.qmd");
 
 (async () => {
-  const { E4, PL, cfg, P, SS, S, L } = await X.load();
+  const { E4, PL, cfg, P, SS, S, L, solver } = await X.load();
   const PG = require(L("sb4-pathway-explorer.js"));
   const LIB = JSON.parse(fs.readFileSync(L("data/e4-library.json"), "utf8")), def = SS.defaults(S);
   const e0 = PG.libEntry(LIB, SS, S, def);
@@ -76,10 +79,27 @@ const QPATH = path.join(X.SITE, "learn/sb4-pathway-explorer.qmd");
   }
   ok(/survives if it holds in both years: all demand served, CO2 within 10%/.test(PL.timeSlices.fullYearCheck.survives), "the page's verdict follows prairieland.json's survives rule");
 
+  // ---------------- what "out of reach" proves: only the budget missed, no plan within the cap emits less; both missed,
+  // the least combined overshoot (weighed as their penalties), never "emits less" (a cap of 10% and 2,600 Mt misses both)
+  {
+    const both = Object.assign({}, def, { cap: 10, bud: 2600 }), Vb = E4.view((await E4.solve(both, P, { solver, timeLimit: 120 })).results.plan, P), sb = PG.says(Vb, null, P).map(x => x.text).join(" ");
+    ok(Vb.over > 0.5 && Vb.capOver.some(x => x > 0.5) && /least combined overshoot \(a tonne over the budget weighed as 10 GJ over the cap\)/.test(sb) && !/emits less|imports less/.test(sb), "both limits missed (cap 10%, 2,600 Mt): the words say least combined overshoot, never 'emits less' (" + Vb.cum + " Mt)");
+    const e = LIB.plans.find(x => x.view.over > 0.5 && x.view.capOver.every(c => c < 0.5));
+    ok(!e || /No pathway within these levers and the import cap emits less/.test(PG.says(e.view, null, P)[0].text), "only the budget missed: no plan within the levers and the import cap emits less" + (e ? " (" + e.preset + "/" + e.foresight + ")" : ""));
+  }
+
   // ---------------- the library on the page
   ok(PG.libEntry(LIB, SS, S, Object.assign({}, def, { sh: "drought" })) === e0, "a shock does not change which library entry a plan is (its re-plan is in the entry)");
   ok(PG.libEntry(LIB, SS, S, Object.assign({}, def, { cw: def.cw + 1 })) === null, "a plan off the library is solved live");
-  ok(/From the library: precomputed with this engine on " \+ LIB\.date/.test(JS) && /Solve it live/.test(JS), "the page labels library results with the library's date and offers a live run");
+  ok(/The first view, precomputed with this engine on " \+ LIB\.date/.test(JS) && /useLib = e && first && !stub; first = false;/.test(JS) && /started = true; first = true; run\.run\(plan\)/.test(JS) && !/Solve it live|forceLive/.test(JS),
+    "only the first view comes from the library (labelled with its date); every run the reader starts, a preset included, solves live: no 'Solve it live' detour");
+  has("the first view and the presets' full-year checks (about a minute of solving each) come from a library made with this engine; every run you start solves in your browser.");
+  // the cost: parts, boundary, the existing fleet, the correction
+  ok(/\["Fixed O&M of the existing wind, solar and batteries", bn\(pv\.upkeep\), bn\(V\.yearly\[4\]\.upkeep\)\]/.test(JS) && /The data give none for existing hydro and the steady plants, so their upkeep is left out/.test(JS), "the cost table has the existing fleet's upkeep as a part, and the key says what is left out");
+  const pvs = e0.view.pv; ok(Math.abs(pvs.capital + pvs.transmission + pvs.fom + pvs.upkeep + pvs.vom + pvs.fuel - pvs.total) <= 3, "the cost table's parts add up to the total ($" + pvs.total + "M)");
+  has("Also left out: the upkeep of the existing hydro and steady plants (the data give no figure; the same in every pathway).");
+  ok(/an existing plant leaves in the five-year period that contains its retirement year, a conservative simplification/.test(JS), "the retirement convention, stated where the page describes the fleet");
+  const corr = X.correction(E4, LIB, PL); has(corr.text, "the dated correction, from the library"); ok(E4.bn(corr.was) === "$401.6 billion" && E4.bn(corr.now) === "$410.7 billion", "the correction's numbers: " + E4.bn(corr.was) + " before, " + E4.bn(corr.now) + " now");
   ok(/full: e \? e\.full : null/.test(JS) && /Full-year validation unavailable for this plan/.test(JS) && /Load the default plan \(validated\)/.test(JS), "a live run of a library plan keeps its full-year checks; any other plan says the validation is unavailable and offers the validated default");
   ok(/E4\.doneWords\(st, e\.view\)/.test(JS) && !/words: \{ ok:/.test(JS), "the status line is the engine's, by foresight (no fixed 'cheapest pathway' for decade by decade)");
 

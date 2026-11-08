@@ -8,8 +8,11 @@
 //     the cost too; an out-of-reach budget's dual is the penalty); the straight line to zero out of reach at the most
 //     electrification (the prediction's answer) and the fuel left in 2050; decade by decade costs more than perfect
 //     foresight; each of C4's shocks re-planned; the full-year verdicts from the library (with and without the
-//     peak-hour rule; the page's "240 hours"); the near-optimal ranges (precomputed into e4-pathways.json by --write and
-//     checked against fresh runs; 2050 solar at least a gigawatt wide, the plan shown inside each)
+//     peak-hour rule; the page's "240 hours"); the near-optimal ranges, solved live in one click (E4.nearRanges: the
+//     plan's LP once, two LPs a choice; the same numbers as one nearRange per choice; 2050 solar at least a gigawatt wide,
+//     the plan shown inside each)
+//   - the cost: the static table's boundary, the reported cost's existing-fleet upkeep, the gas rule and the retirement
+//     convention in words, the dated correction line against the library
 //   - the details: the budget's price by model year is dual x w / D (the engine's test also checks it against
 //     the gas row's dual), Hotelling's path shown apart; out-of-reach budgets have no dual and say so; the closest pathway;
 //     early retirement for one year, never summed; near-optimal choices are cohorts; the full-year criteria; the budget
@@ -17,7 +20,7 @@
 //     engine); the flowchart; every displayed symbol defined; no editorial guard code
 //   - the page frame: sections, scripts, data-src, the notebook and its downloads, the fictional line; no reactor named,
 //     the firm option never called nuclear; no AI wording
-// --write: writes the marker blocks and precomputed.m13near in e4-pathways.json.
+// --write: writes the marker blocks.
 // Usage (from the site folder):  node _tests/learn/test_m13-national-pathway.js [--write]
 "use strict";
 const fs = require("fs");
@@ -39,7 +42,7 @@ const QPATH = path.join(X.SITE, "learn/m13-national-pathway.qmd");
     return [label, PG.bn(V.pv.total), PG.kilo(V.cum) + " of " + PG.kilo(V.budget) + " Mt", PG.pct(Math.max(...V.imp)), bad ? bad + " of 4 checks fail (" + why + ")" : "all 4 checks survive"]; };
   const STATIC = () => E4.tableHTML(["Pathway", "Cost to 2050 (present value)", "CO₂ 2026–2050", "Imports, highest year", "Full years of hours (2030, 2050; 2025 and 2024 weather)"],
     [row("Central, perfect foresight", lib("central", "perfect")), row("Central, decade by decade", lib("central", "myopic")), row("Deep cuts (3,000 Mt), perfect foresight", lib("deep", "perfect")), row("Central without the peak-hour rule", lib("central-norule", "perfect"))], "m13-table") +
-    '<p class="lx-hint">Precomputed with this engine on ' + LIB.date + ". Cost: the supply side and every fuel bought, 2026–2050 in 2025 dollars; end-use equipment left out.</p>";
+    '<p class="lx-hint">Precomputed with this engine on ' + LIB.date + ". Cost: the supply side and every fuel bought, 2026–2050 in 2025 dollars, with the existing wind, solar and batteries' upkeep; end-use equipment left out.</p>";
   const BLOCKS = { "m13-static": STATIC, "m13-inputs": () => E4.inputsHTML(P) };
   if (process.argv.includes("--write")) { const b = {}; Object.keys(BLOCKS).forEach(k => { b[k] = BLOCKS[k](); }); X.writeBlocks(QPATH, b); console.log("wrote the m13 blocks"); }
   const PAGE = fs.readFileSync(QPATH, "utf8"), T = X.norm(PAGE), JS = fs.readFileSync(L("m13-national-pathway.js"), "utf8");
@@ -109,18 +112,20 @@ const QPATH = path.join(X.SITE, "learn/m13-national-pathway.qmd");
   const maxH = Math.max(...n.full.map(c => c.unservedHours));
   ok(/all four checks pass both tests/.test(w10) === e.full.every(c => c.unservedMWh < 0.5 && Math.abs(c.gap) <= 0.1) && w10.indexOf("up to " + PG.kilo(maxH) + " hours") >= 0, "step 10: the full-year verdicts as the library has them");
   ok(T.indexOf("unserved for up to " + maxH + " hours in 2024's weather") >= 0 && n.full.find(c => c.unservedHours === maxH).weather === "2024", "the check card's 240 hours is the library's (" + maxH + ", in 2024's weather)");
-  // step 11's near-optimal ranges: precomputed (six LPs, too slow for a phone click), written by --write into
-  // e4-pathways.json precomputed.m13near and checked against fresh runs
-  const NRw = { date: LIB.date, share: 1e-6, plan: "central", items: {} };
-  for (const k of Object.keys(PG.NEAR)) { const n = PG.NEAR[k], r = await E4.nearRange(P, def, E4.builtTerms(P, n.t, n.q), 1e-6, { solver });
-    ok(r.ok, "near-optimal " + k + ": optimal"); NRw.items[k] = { lo: E4.rd(r.lo, 1), hi: E4.rd(r.hi, 1), at: E4.rd(r.at, 1), slack: E4.rd(r.slack, 3), objective: E4.rd(r.objective, 1) }; }
-  if (process.argv.includes("--write")) { const d = J("e4-pathways.json"); d.precomputed = Object.assign({}, d.precomputed, { m13near: NRw }); fs.writeFileSync(L("data/e4-pathways.json"), JSON.stringify(d, null, 1) + "\n"); console.log("wrote precomputed.m13near"); }
-  const NR = J("e4-pathways.json").precomputed.m13near;
-  ok(JSON.stringify(NR) === JSON.stringify(NRw), "the precomputed near-optimal ranges equal fresh runs (--write after a change)");
-  const ns = NR.items.solar;
-  ok(ns.lo <= ns.at + 0.1 && ns.at <= ns.hi + 0.1 && ns.hi - ns.lo >= 1000, "step 11: within a millionth of the cost, 2050 solar runs from " + (ns.lo / 1000).toFixed(2) + " to " + (ns.hi / 1000).toFixed(2) + " GW (at least a gigawatt wide; the plan shown " + (ns.at / 1000).toFixed(2) + ")");
-  ok(PG.nearWords(ns, PG.NEAR.solar.label).indexOf(PG.fix(ns.lo / 1000, 2) + " to " + PG.fix(ns.hi / 1000, 2) + " GW of new solar in 2046–2050") >= 0 && /with this engine on " \+ NR\.date/.test(JS), "step 11's words as precomputed, labelled with the date and as one build cohort (2046–2050), not the solar open in 2050");
-  ok(Object.keys(NR.items).every(k => NR.items[k].lo <= NR.items[k].at + 0.1 && NR.items[k].at <= NR.items[k].hi + 0.1), "every range holds the plan shown");
+  // step 11's near-optimal ranges, solved live in one click: the plan's LP, the same LP without the tie rule (the least
+  // economic cost), then two LPs a choice over the plans whose economic cost is within a millionth of the least; the same
+  // LPs, and so the same numbers, as one nearRange per choice
+  const list = Object.keys(PG.NEAR).map(k => [k, E4.builtTerms(P, PG.NEAR[k].t, PG.NEAR[k].q)]), NRL = await E4.nearRanges(P, def, list, 1e-6, { solver });
+  ok(NRL.ok && NRL.solves === 8, "step 11: one click solves eight LPs (the plan, its least cost without the tie rule, then the least and the most of three choices)");
+  for (const [k, t] of list) { const r1 = await E4.nearRange(P, def, t, 1e-6, { solver }); const a = NRL.items[k];
+    ok(r1.ok && a && Math.abs(r1.lo - a.lo) < 1e-6 && Math.abs(r1.hi - a.hi) < 1e-6 && Math.abs(r1.at - a.at) < 1e-6 && r1.slack === a.slack, "near-optimal " + k + ": the shared run equals nearRange (" + (a.lo / 1000).toFixed(2) + " to " + (a.hi / 1000).toFixed(2) + " GW)"); }
+  const Vc = lib("central", "perfect").view, ns = NRL.items.solar;
+  ok(ns.objective <= Vc.pv.total + 0.5 && Vc.pv.total - ns.objective < 1 && Math.abs(ns.slack - 1e-6 * ns.objective) < 1e-9, "the least cost is the economic cost the page reports, without the tie rule, with the existing fleet's upkeep ($" + ns.objective.toFixed(3) + "M; the plan shown $" + Vc.pv.total + "M)");
+  ok(Object.keys(NRL.items).every(k => { const x = NRL.items[k]; return x.costLo <= x.objective + x.slack + 1e-6 && x.costHi <= x.objective + x.slack + 1e-6 && x.costAt <= x.objective + x.slack + 1e-6; }),
+    "every endpoint plan, and the plan shown, costs at most a millionth more than the least economic cost (solar's ends: +$" + (ns.costLo - ns.objective).toFixed(3) + "M and +$" + (ns.costHi - ns.objective).toFixed(3) + "M; allowance $" + ns.slack.toFixed(3) + "M)");
+  ok(ns.lo <= ns.at + 0.1 && ns.at <= ns.hi + 0.1 && ns.hi - ns.lo >= 1000, "step 11: within a millionth of the cost, new solar in 2046–2050 runs from " + (ns.lo / 1000).toFixed(2) + " to " + (ns.hi / 1000).toFixed(2) + " GW (at least a gigawatt wide; the plan shown " + (ns.at / 1000).toFixed(2) + ")");
+  ok(PG.nearWords(ns, PG.NEAR.solar.label).indexOf(PG.fix(ns.lo / 1000, 2) + " to " + PG.fix(ns.hi / 1000, 2) + " GW of new solar in 2046–2050") >= 0 && /E4\.nearRanges\(P, st, list, 1e-6/.test(JS) && !/m13near|too slow for a phone click/.test(JS) && !("precomputed" in cfg && cfg.precomputed && cfg.precomputed.m13near), "step 11 runs live (E4.nearRanges), labelled as one build cohort (2046–2050); no precomputed ranges left");
+  ok(Object.keys(NRL.items).every(k => NRL.items[k].lo <= NRL.items[k].at + 0.1 && NRL.items[k].at <= NRL.items[k].hi + 0.1), "every range holds the plan shown");
 
   // ---------------- the page frame
   ["steps", "explain", "check", "sources"].forEach(id => ok(new RegExp("::: \\{#" + id + " \\.lx-sec\\}").test(PAGE), "section #" + id));
@@ -140,6 +145,11 @@ const QPATH = path.join(X.SITE, "learn/m13-national-pathway.qmd");
   ok(/Busbar load: the electricity/.test(JS) && /\[\[capital-recovery-factor\|/.test(JS) && /operation and maintenance \(O&M\)/.test(JS) && /liquefied natural gas/.test(JS) && /Hotelling's rule/.test(JS), "busbar, the capital recovery factor, O&M, LNG and Hotelling's rule are defined where they appear");
   ok(!/G-COST|G-NUC|G-GIS/.test(T + JS.replace(/\/\/.*$/gm, "")), "no editorial guard code on the page or in its strings");
   ok(!/\bAI\b|artificial intelligence|ChatGPT|Claude/.test(PAGE + JS + NBT), "no AI wording");
+  // the cost, the gas rule and the fleet, in words; the dated correction
+  ok(PAGE.indexOf("The reported cost adds the existing wind, solar and batteries' fixed O&M, a constant that moves no decision.") >= 0 && T.indexOf("Also left out: the upkeep of the existing hydro and steady plants (the data give no figure; the same in every pathway).") >= 0, "the reported cost's existing-fleet upkeep, and what is left out");
+  ok(!/domestic first/.test(PAGE + JS + NBT) && T.indexOf("fuels bought at least cost") >= 0 && T.indexOf("The LP buys domestic gas and LNG in the least-cost mix within the import cap, so under a tight budget LNG can win: the national inventory counts the gas burned in domestic fields, not LNG's upstream emissions abroad.") >= 0, "one gas rule in words: least cost within the cap, and why LNG can win under a tight budget; no 'domestic first'");
+  ok(T.indexOf("so it leaves in the five-year period that contains that year: a conservative simplification.") >= 0 && /conservative simplification/.test(NBT), "the retirement convention, on the page and in the notebook");
+  const corr = X.correction(E4, LIB, PL); ok(T.indexOf(corr.text) >= 0, "the dated correction line, from the library: " + corr.text);
 
   console.log((fails ? "FAILED " : "ok ") + (checks - fails) + "/" + checks + " checks (M13)");
   process.exit(fails ? 1 : 0);

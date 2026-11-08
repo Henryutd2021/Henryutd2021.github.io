@@ -1496,7 +1496,7 @@
     "battery": 0
    }
   },
-  "note": "Set for teaching: units, sizes, years built, efficiencies (net calorific values) and the 2025 capacity factors of the fuel plants (coal 62%, combined cycle 38%, turbines 8%, oil 5%). Derived: nuclear output from the card's 5% of primary energy (heat x 0.33), hydro from the card's 10% less wind and solar, wind and solar from each region's capacity factor. A unit retires at the end of its retire year (built + life unless set). Ridge Station's 2,400 MW is A13's."
+  "note": "Set for teaching: units, sizes, years built, efficiencies (net calorific values) and the 2025 capacity factors of the fuel plants (coal 62%, combined cycle 38%, turbines 8%, oil 5%). Derived: nuclear output from the card's 5% of primary energy (heat x 0.33), hydro from the card's 10% less wind and solar, wind and solar from each region's capacity factor. A unit's retire year is its last year in service (built + life unless set); capacityByYearMW counts it only in the model years before that year, a conservative simplification (periods.retirement). Ridge Station's 2,400 MW is A13's."
  },
  "transmission": {
   "links": [
@@ -1639,7 +1639,7 @@
     }
    },
    "leadingShareAverage": 0.6875,
-   "hhiMethod": "Herfindahl-Hirschman index: the sum of each supplier's squared percentage share (0 to 10,000); above 1,800 counts as highly concentrated under the 2023 U.S. Merger Guidelines (DOJ and FTC; 2,500 under the 2010 guidelines). 'Other refiners' is one group, counted as a single supplier, so the index is a lower bound.",
+   "hhiMethod": "Herfindahl-Hirschman index: the sum of each supplier's squared percentage share (0 to 10,000); above 1,800 counts as highly concentrated under the 2023 U.S. Merger Guidelines (DOJ and FTC; 2,500 under the 2010 guidelines). 'Other refiners' is one group, counted as a single supplier, so the index is an upper bound (split among several refiners, the group would add less).",
    "set": "teaching: shares and tonnes per GWh (a mixed fleet of battery chemistries; real intensities vary by chemistry); the leading refiner's average share is set near the IEA's figure for 2025 (about 70%)",
    "src": [
     "iea-gcmo-2025"
@@ -1954,7 +1954,7 @@
   "horizonEnd": 2050,
   "note": "Model years 2030, 2035, 2040, 2045 and 2050, each standing for five years; 2025 is the observed base year. The same 12 time slices (weather of 2025) are used in every period; demand scales them.",
   "residualValue": "Assets whose lives run past 2050 keep a residual value: E4 charges each plant's yearly capital payments (annuities at the discount rate over its life) only for the years up to 2050, so a plant built in the 2045 model year (2041-2045) pays for 2041-2050 only.",
-  "retirement": "Each existing unit retires at the end of its `retire` year (fleet.units); E4 may retire coal and gas earlier, saving their fixed O&M; existing plants' capital is sunk.",
+  "retirement": "Each existing unit's `retire` year (fleet.units) is its last year in service. The model years count a unit only before that year (capacityByYearMW), so it leaves the plan in the five-year period that contains its retire year: a conservative simplification, with up to five years less of each retiring plant than the calendar gives (Plains Station, in service to the end of 2030, is out of 2026-2030). E4 may retire coal and gas earlier, saving their fixed O&M; existing plants' capital is sunk.",
   "discount": {
    "def": 5,
    "lo": 2,

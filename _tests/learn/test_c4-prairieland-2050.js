@@ -95,7 +95,10 @@ const QPATH = path.join(X.SITE, "learn/c4-prairieland-2050.qmd");
     E4.tableHTML(["Shock (model year)", "Cost to 2050, against the plan", "CO₂ 2026–2050", "Imports that year", "Peak-hour rule that year", "Not served that year"], PG.shockRows(e0.view, e0.shocks), "c4-shocks") +
     E4.tableHTML(["Screening (A13's accounting layer)", "Value"], [["Households' change in 2050 at " + def.hs + "% (against the 2025-policies pathway; equipment left out)", (af.perHH >= 0 ? "+$" : "−$") + PG.kilo(Math.abs(af.perHH)) + " a household a year"],
       ["Ridge County: jobs lost (Ridge Station and the mines, × " + PG.fix(def.jm, 1) + ")", PG.kilo(jb.j.lostTotal)], ["Ridge County: new ongoing jobs, gross and net of " + def.jd + "% displacement (if all the Ridge region's new wind and solar is in the county)", PG.kilo(jb.j.newPermGross) + " and " + PG.kilo(jb.j.newPermNet)],
-      ["Ridge County: construction job-years, gross and net", PG.kilo(jb.j.buildJobYears) + " and " + PG.kilo(jb.j.buildJobYearsNet)]], "c4-screen");
+      ["Ridge County: construction job-years, gross and net", PG.kilo(jb.j.buildJobYears) + " and " + PG.kilo(jb.j.buildJobYearsNet)]], "c4-screen") +
+    // for a brief written without JavaScript: what each shock changes, and the default pathway's assumptions (as the live note has them)
+    E4.tableHTML(["Shock", "When, in the model", "What changes", "What the re-plan keeps"], E4.shockTable(P), "c4-shockwhat e4-wrap") +
+    '<p class="lx-eyebrow">The default pathway\'s assumptions, for the brief</p><ul class="c4-assume">' + PG.assumptions(def, af, jb, e0.view, e0.full, E4).map(x => "<li>" + E4.esc(x) + "</li>").join("") + "</ul>";
   const BLOCKS = { "c4-plan": () => SS.staticHTML(S, def), "c4-results": fbRes, "c4-note": () => RN.outlineHTML(PG.FIELDS), "c4-exemplars": () => EX.staticHTML(exd), "c4-rubric": () => RB.staticHTML(PG.RUBRIC, { bar: PG.RUBRIC_BAR }), "c4-inputs": () => E4.inputsHTML(P) };
   if (process.argv.includes("--write")) { const b = {}; Object.keys(BLOCKS).forEach(k => { b[k] = BLOCKS[k](); }); X.writeBlocks(QPATH, b); console.log("wrote the c4 blocks"); }
   const PAGE = fs.readFileSync(QPATH, "utf8"), T = X.norm(PAGE), JS = fs.readFileSync(L("c4-prairieland-2050.js"), "utf8");
@@ -118,6 +121,21 @@ const QPATH = path.join(X.SITE, "learn/c4-prairieland-2050.qmd");
   const nr = LIB.plans.find(x => x.preset === "central-norule");
   ok(/not tested, the peak-hour rule is off/.test(PG.sensLine(nr.view, nr.shocks)), "the sensitivity line of a plan without the rule: peak hours not tested");
   ok(RB.COMPETENCES && PG.RUBRIC.every(c => RB.COMPETENCES.some(x => x.id === c.id)), "the rubric's competences are the course's");
+  // the cost boundary and the fleet in the brief's assumptions; the flow; the dated correction
+  ok(as.some(x => /existing wind, solar and batteries' fixed O&M while they are open; the data give none for existing hydro and the steady plants, so their upkeep is left out/.test(x)) && as.some(x => /leaves the plan in the five-year period that contains its retirement year: a conservative simplification/.test(x)), "the assumptions state the cost's existing-fleet upkeep and what is left out, and the retirement convention");
+  const CJS = fs.readFileSync(L("c4-prairieland-2050.js"), "utf8"), CT = X.norm(fs.readFileSync(path.join(X.SITE, "learn/c4-prairieland-2050.qmd"), "utf8"));
+  ok(/lib1 = first && !stub; first = false;/.test(CJS) && /started = true; first = true; run\.run\(plan\)/.test(CJS) && !/Solve it live|forceLive/.test(CJS) && /The first view, precomputed with this engine on " \+ LIB\.date/.test(CJS),
+    "only the first view comes from the library; every run the reader starts (the plan, four re-plans and the reference) solves live");
+  ok(CT.indexOf("the first view and the presets' full-year checks (about a minute of solving each) come from a library made with this engine; every run you start solves in your browser.") >= 0 && CT.indexOf("Also left out: the upkeep of the existing hydro and steady plants (the data give no figure; the same in every pathway).") >= 0, "the data note says what is precomputed and what the cost leaves out");
+  const corr = X.correction(E4, LIB, PL); ok(CT.indexOf(corr.text) >= 0, "the dated correction line, from the library");
+  ok(LIB.plans.every(e => Object.keys(e.shocks).every(k => Number.isInteger(e.shocks[k].dPV))), "shock cost differences are whole $M, from unrounded totals");
+  // the two-page check counts the learner's writing only: a brief as long as the strong exemplar passes; 1,200 words fail
+  const exText = exd.answers.find(a => a.key === "good").parts.map(x => typeof x === "string" ? x : x.text).join(""), w1 = {}; PG.FIELDS.forEach((f, i) => { w1[f.key] = i ? "" : exText; });
+  const big = {}; PG.FIELDS.forEach(f => { big[f.key] = Array(201).join("word "); });
+  ok(PG.ownWords(w1, RN.countWords) === RN.countWords(exText) && PG.ownWords(w1, RN.countWords) <= PG.TWO_PAGES && PG.ownWords(big, RN.countWords) > PG.TWO_PAGES && /PG\.ownWords|ownWords\(words, LX\.ReportNote\.countWords\) <= TWO_PAGES/.test(CJS) && /the tables and assumptions the page adds are not counted/.test(CJS),
+    "the two-page check counts the learner's own words (the strong exemplar's " + RN.countWords(exText) + " pass; six fields of 200 words fail), not the tables the page adds");
+  ok(/the demand surprise lasts from 2031 to 2050/.test(CJS) && !/each shock lasts five years/.test(CJS), "shock durations: three last one period, the demand surprise 2031-2050");
+  ok(CT.indexOf("What the re-plan keeps") >= 0 && CT.indexOf("The default pathway's assumptions, for the brief") >= 0, "the no-JS fallback carries the shock table and the default assumptions");
 
   // ---------------- the page frame
   ["brief", "plan", "note", "selfcheck", "sources"].forEach(id => ok(new RegExp("::: \\{#" + id + " \\.lx-sec\\}").test(PAGE), "section #" + id));
