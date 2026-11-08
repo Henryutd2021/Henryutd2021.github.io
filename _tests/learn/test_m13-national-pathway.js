@@ -68,6 +68,7 @@ const QPATH = path.join(X.SITE, "learn/m13-national-pathway.qmd");
     ok(/V\.carbonPrice/.test(JS) && /Hotelling's rule in a model of every year/.test(JS) && /\[\[capital-recovery-factor\|/.test(JS) && !/× \(1 \+ rate\)\^\(t − 2025\)\. Move/.test(JS), "step 6 shows the LP's price and Hotelling's path apart; the step text no longer states the endpoint formula");
   }
 
+  const NBT0 = fs.readFileSync(path.join(X.SITE, "learn/notebooks/m13-national-pathway.ipynb"), "utf8");
   // ---------------- the steps' runs and words
   const run = async st => { const r = await E4.solve(st, P, { solver }); ok(r.ok, JSON.stringify(st).slice(0, 50) + "…: optimal"); return r; };
   const r5 = await run(def), V = E4.view(r5.results.plan, P), w5 = PG.runWords(V);
@@ -80,7 +81,7 @@ const QPATH = path.join(X.SITE, "learn/m13-national-pathway.qmd");
     "step 6: the slider's 2,600 Mt at central electrification is out of reach (closest " + sweep[2].cum + " Mt): no dual, and the words, the readout and the A20 note say so");
   const DEEP = E4.withPreset(def, cfg.presets.find(p => p.id === "deep")), LINE = PL.carbon.budget.presets.find(x => x.key === "line2050");
   ok(DEEP.eb === P.elRange.buildings.hi && DEEP.et === P.elRange.transport.hi && DEEP.ei === P.elRange.industry.hi, "step 7 uses the most electrification the data allows");
-  const st7 = Object.assign({}, DEEP, { bud: LINE.mt }), V7 = E4.view((await run(st7)).results.plan, P), S7 = E4.sysOf(st7, P), w7 = PG.deepWords(V7, S7, LINE.mt);
+  const st7 = Object.assign({}, DEEP, { bud: LINE.mt }), V7 = E4.view((await run(st7)).results.plan, P), S7 = E4.sysOf(st7, P), w7 = PG.deepWords(V7, LINE.mt);
   ok(V7.over > 0.5 && w7.indexOf(PG.kilo(V7.over) + " Mt over") >= 0 && w7.indexOf("no pathway emits less than " + PG.kilo(V7.cum) + " Mt") >= 0, "step 7: the straight line to zero (" + LINE.mt + " Mt) is out of reach by " + V7.over + " Mt: the prediction's answer is no");
   // the budget gap with A20 (E4.GAP, shown on SB4, M13 and C4): the floor about 2,700 Mt; the build-rate and transmission
   // limits lifted a hundredfold move it by about 5 Mt; A20's electrification path inside a copy of the engine lowers it to
@@ -97,7 +98,10 @@ const QPATH = path.join(X.SITE, "learn/m13-national-pathway.qmd");
     ok(SRC.indexOf(pat) >= 0 && Math.round(f0 / 100) * 100 === 2700 && f0 - f1 >= 2 && f0 - f1 <= 8 && Math.round(f2 / 100) * 100 === 2400 && VA.over === 0 && /about 5 Mt/.test(E4.GAP[2]) && /about 2,400 Mt/.test(E4.GAP[2]),
       "the gap with A20: the floor " + f0 + " Mt; limits x100: " + f1 + " Mt (" + (f0 - f1) + " Mt lower); A20's electrification path inside the engine: " + f2 + " Mt, and 2,600 Mt met ($" + (VA.pv.total / 1000).toFixed(1) + " bn)");
   }
-  const rem = PG.remains(S7); ok(w7.indexOf(PG.kilo(rem.oil) + " PJ of oil products") >= 0 && rem.oil > 300 && rem.gas > 100, "step 7: the fuel left in 2050 as the engine's demand has it (" + PG.kilo(rem.oil) + " PJ oil, " + PG.kilo(rem.gas) + " PJ gas, " + PG.kilo(rem.coal) + " PJ coal)");
+  const rem = PG.remains(S7), rr = PG.remainRows(S7);
+  ok(rr[0][1] === PG.kilo(rem.oil) && rr[1][1] === PG.kilo(rem.gas) && rr[2][1] === PG.kilo(rem.coal) && rem.oil > 300 && rem.gas > 100 && /remainRows\(Sx\)/.test(JS), "step 7: the fuel left in 2050 as the engine's demand has it, in its own table (" + PG.kilo(rem.oil) + " PJ oil, " + PG.kilo(rem.gas) + " PJ gas, " + PG.kilo(rem.coal) + " PJ coal)");
+  ok(!/PJ/.test(w7) && w7.indexOf(PG.kilo(LINE.mt) + " Mt budget") >= 0 && !/straight line to zero|Run the straight line/.test(JS) && /Only the total", "the budget caps CO₂ summed over 2026–2050; no year, not even 2050, has to follow the line or reach zero/.test(JS),
+    "step 7's words: the floor and the overshoot against a budget (the fuels in the table); the budget caps only the total, never a yearly path or the 2050 level");
   ok(/answer: "no"/.test(JS), "the prediction's answer is no");
   const Vm = E4.view((await run(Object.assign({}, def, { fs: "myopic" }))).results.plan, P), w8 = PG.foresightWords(V, Vm);
   ok(Vm.pv.total > V.pv.total && w8.indexOf(PG.bn(Vm.pv.total - V.pv.total) + " more") >= 0, "step 8: decade by decade costs more (" + PG.bn(Vm.pv.total - V.pv.total) + ")");
@@ -106,10 +110,18 @@ const QPATH = path.join(X.SITE, "learn/m13-national-pathway.qmd");
   for (const k of E4.c4Shocks(P)) {
     const r = await run(Object.assign({}, def, { sh: k })), Xs = E4.shockView(r.results.shock, V, P), w = PG.shockWords(Xs, V);
     ok(w.indexOf(PG.bn(Math.abs(Xs.dPV))) >= 0 && (Xs.over > 0.5 ? /over the budget/.test(w) : /still within the budget/.test(w)) && JSON.stringify(Xs) === JSON.stringify(lib("central", "perfect").shocks[k]), "step 9, " + k + ": the words as run, equal to the library's");
+    const yi = V.Y.indexOf(Xs.year);
+    ok(Xs.reserveShort[yi] > 0.5 ? w.indexOf(PG.kilo(Xs.reserveShort[yi]) + " MW short of the peak-hour rule (load + 10%) at its worse stress hour") >= 0 && Xs.rule === 0.1 : !/short of/.test(w), "step 9, " + k + ": a stress-hour shortfall is named against the rule's load + 10%, not as unserved demand (" + Xs.reserveShort[yi] + " MW)");
   }
   const e = lib("central", "perfect"), n = lib("central-norule", "perfect"), w10 = PG.fullWords(e, n, E4);
   ok(/two tests: all demand served, and the year's CO₂ within 10% of the slices' \(a tolerance set for teaching\)/.test(JS) && /not the cumulative budget, not adequacy/.test(JS) && E4.FULL_TOL === 0.1, "step 10 names both pass criteria, the 10% as a teaching choice, and what the check does not test");
   const maxH = Math.max(...n.full.map(c => c.unservedHours));
+  ok(/A separately optimized central pathway, with the peak-hour rule off/.test(JS) && !/The same plan without the rule/.test(JS) && JSON.stringify(n.view.built) !== JSON.stringify(e.view.built), "step 10: the table without the rule is labelled as its own optimized pathway (its builds differ from the central plan's)");
+  // the data's survival rule names exactly the two criteria fullVerdict tests (no ranking of plans)
+  const surv = PL.timeSlices.fullYearCheck.survives;
+  ok(/all demand served, CO2 within 10% of the slice estimate, in every check\./.test(surv) && !/ranking/.test(surv) && E4.fullVerdict({ unservedMWh: 0, unservedHours: 0, gap: 0.099 }).ok && !E4.fullVerdict({ unservedMWh: 0, unservedHours: 0, gap: 0.101 }).ok && !E4.fullVerdict({ unservedMWh: 1, unservedHours: 1, gap: 0 }).ok,
+    "the data's survival rule names the two tests fullVerdict applies, served demand and CO₂ within 10%, and nothing else");
+  ok(!/kept whole|correlation survives/.test(JSON.stringify(PL.timeSlices) + PL.about.method) && /hourly sequence is not kept/.test(PL.timeSlices.chronology.extremes) && /hourly sequence is not kept/.test(NBT0), "the slices' description: the extreme periods get their own day and night averages; their hourly sequence is not kept (data and notebook)");
   ok(/all four checks pass both tests/.test(w10) === e.full.every(c => c.unservedMWh < 0.5 && Math.abs(c.gap) <= 0.1) && w10.indexOf("up to " + PG.kilo(maxH) + " hours") >= 0, "step 10: the full-year verdicts as the library has them");
   ok(T.indexOf("unserved for up to " + maxH + " hours in 2024's weather") >= 0 && n.full.find(c => c.unservedHours === maxH).weather === "2024", "the check card's 240 hours is the library's (" + maxH + ", in 2024's weather)");
   // step 11's near-optimal ranges, solved live in one click: the plan's LP, the same LP without the tie rule (the least
@@ -135,6 +147,9 @@ const QPATH = path.join(X.SITE, "learn/m13-national-pathway.qmd");
   ok(fs.existsSync(NB) && /href="notebooks\/m13-national-pathway\.ipynb" download/.test(PAGE) && /e4-library\.json" download/.test(PAGE) && /prairieland\.json" download/.test(PAGE) && /e4-pathways\.json" download/.test(PAGE), "the notebook and its three data files are offered for download");
   const NBT = fs.existsSync(NB) ? fs.readFileSync(NB, "utf8") : "";
   ok(/assert/.test(NBT) && /e4-library\.json/.test(NBT) && /Prairieland is fictional/.test(NBT), "the notebook asserts the browser's numbers from the library and carries the fictional line");
+  ok(/divided by 0\.94 \(grid losses are 6% of what enters the grid\)/.test(NBT) && /Y\[p\] − Y\[q\] < its life/.test(NBT) && /final oil products ÷ 0\.945, the refinery's yield/.test(NBT) && !/plus 6% grid losses|refinery input ÷|p − q < its life/.test(NBT),
+    "the notebook's words match its equations: load ÷ 0.94, vintages by calendar years, crude = final oil products ÷ the refinery's yield");
+  ok(/short = SUR\[\\"reserveShort\\"\]\[sp\]/.test(NBT) && /does not show that peak demand goes unserved/.test(NBT) && !/cannot meet the larger peak/.test(NBT), "the notebook computes the demand surprise's stress-hour shortfall from its own solution and reads it as a missed 10% margin");
   ok(PAGE.indexOf(PL.about.line) >= 0 && JS.indexOf("P.line") >= 0, "the fictional line");
   ok(T.indexOf("twelve slices") >= 0 || /twelve \[\[time-slice/.test(JS), "twelve slices named");
   ok(!/firm[^.;\n]{0,50}nuclear|nuclear[^.;\n]{0,50}firm/i.test(T + JS) && !/reactor|\bSMR\b|small modular/i.test(PAGE + JS + NBT), "the firm option is never named nuclear; no reactor named (page, script, notebook)");
@@ -142,6 +157,12 @@ const QPATH = path.join(X.SITE, "learn/m13-national-pathway.qmd");
   ok(/LX\.Flowchart\(/.test(JS) && /Qualified conclusions/.test(JS), "the explain layer has its flowchart: inputs, decisions, rules, solve, limits met?, hourly checks, qualified conclusions");
   ["$y_p$, $i$", "$c_f$", "$\\alpha_{g,s}$", "$\\lambda_\\ell$", "$x^{\\text{dis}}$"].forEach(sy => ok(PAGE.indexOf("| " + sy) >= 0, "the symbol table defines " + sy));
   ok(/\\frac\{A_g\}\{1000\}/.test(PAGE) && /x\^\{\\text\{dis\}\}_\{r,s,p\} - x\^\{\\text\{ch\}\}_\{r,s,p\}/.test(PAGE) && /u_\{r,s,p\} = L_\{r,p\}/.test(PAGE) && /links\} \+ \\text\{penalties\}/.test(PAGE), "the formulation: A_g / 1000 for $M, batteries and unserved energy in the balance, links, penalties and ties in the goal");
+  ok(/y<\/var><sub><var>p<\/var><\/sub> − <var>y<\/var><sub><var>q<\/var><\/sub> &lt; life<sub><var>g<\/var><\/sub>/.test(JS) && !/≤ 2050<\/sub>/.test(JS), "the equation card's goal charges a plant only in the model years within its life, as the engine and the page's equation");
+  ok(/V\.fuel\.map\(function \(f\) \{ return kilo\(f\.crudeImp \+ f\.lng\); \}\)\.join\(", "\) \+ " PJ a year/.test(JS) && lib("central", "perfect").view.fuel.every((f, p) => Math.abs((f.crudeImp + f.lng) / lib("central", "perfect").view.primary[p] - lib("central", "perfect").view.imp[p]) < 0.001), "the imports symbol shows PJ a year, its unit; the share of primary energy apart (and the two agree)");
+  ok(/\[\[lng\|liquefied natural gas \(LNG\)\]\] arrive through one strait/.test(JS) && /"Generic firm clean plant", "low-emission output that can be counted on whatever the weather/.test(JS) && /\[\[tie-rule\|tie rule\]\] \(tiny extra costs that pick one plan among equally cheap ones\)/.test(JS),
+    "first uses: LNG in step 1 (before the map's label), the generic firm clean plant beside its selector, the tie rule in step 11");
+  ok(/Short of the rule", "the peak-hour rule asks for each region's " \+ ruleNeed/.test(JS) && PG.ruleNeed(0.1) === "load + 10%" && PG.ruleNeed(0) === "the load itself", "step 9 says what a stress-hour shortfall measures");
+  ok(/epa_07_04\.html/.test(PAGE) && /93281\.pdf/.test(PAGE) && /NIPA Table 1\.1\.9/.test(PAGE) && /NIPA Table 1\.1\.9/.test(PL.sources["nrel-battery-2025"].where), "the sources list links EIA's Table 7.4, NREL's battery update and BEA's deflator series (named in the data too)");
   ok(/Busbar load: the electricity/.test(JS) && /\[\[capital-recovery-factor\|/.test(JS) && /operation and maintenance \(O&M\)/.test(JS) && /liquefied natural gas/.test(JS) && /Hotelling's rule/.test(JS), "busbar, the capital recovery factor, O&M, LNG and Hotelling's rule are defined where they appear");
   ok(!/G-COST|G-NUC|G-GIS/.test(T + JS.replace(/\/\/.*$/gm, "")), "no editorial guard code on the page or in its strings");
   ok(!/\bAI\b|artificial intelligence|ChatGPT|Claude/.test(PAGE + JS + NBT), "no AI wording");

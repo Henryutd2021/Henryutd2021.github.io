@@ -54,7 +54,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <li><b>Also left out:</b> the upkeep of the existing hydro and steady plants (the data give no figure; the same in every pathway).</li>
 <li><b>Solver:</b> <a href="https://ergo-code.github.io/HiGHS/dev/">HiGHS</a> (open source), loaded on your first run (about 3.5 MB, once). The full-year checks come from a library precomputed with this engine.</li>
 <li><b>Against lesson A20:</b> no pathway here gets below about 2,700 Mt (straight-line counting, central demand). <a href="a20-national-scenarios.html">A20</a> meets 2,600 Mt because its fastest path electrifies buildings and industry years sooner (step 7).</li>
-<li><b>Corrected 7 Nov 2026:</b> costs now include the existing wind, solar and batteries' fixed O&amp;M, the same in every pathway at one discount rate ($9.1 billion at 5%; central: $410.7 billion, was $401.6 billion). The full-year check buys gas in the slice run's own mix.</li>
+<li><details class="m13-corr"><summary><b>Corrected 7 Nov 2026:</b></summary> costs now include the existing wind, solar and batteries' fixed O&amp;M, the same in every pathway at one discount rate ($9.1 billion at 5%; central: $410.7 billion, was $401.6 billion). The full-year check buys gas in the slice run's own mix.</details></li>
 </ul></div>
 <div class="lx-card lx-notebook m13-nb">
 <p class="lx-eyebrow">Build it in Python · notebook lab, about 60 minutes, then 120 minutes of practice</p>
@@ -75,6 +75,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 .page-learn .m13-note ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 2px; }
 .page-learn .m13-note li { margin: 0; }
 .m13-note b { font-weight: 600; color: var(--lx-ink-2); }
+.m13-corr summary { cursor: pointer; }
 .m13-res { display: grid; gap: 10px; min-width: 0; margin-top: 8px; }
 .m13-res > * { min-width: 0; }
 .m13-res .lx-xcard, .m13-map.lx-xcard { grid-template-columns: minmax(0, 1fr); }
@@ -144,7 +145,7 @@ $$\min \sum_p D_p \Big(\sum_f c_f f_p + \text{O\&M}_p\Big) + \sum_{r,g,q} \frac{
 
 Units: fuel $f_p$ in PJ times $c_f$ in \$ per GJ is \$M (1 PJ is a million GJ); $A_g$ in \$ per kW-year times MW, divided by 1,000, is \$M a year.
 
-The reported cost leaves out penalties and the tie rule. The reported cost adds the existing wind, solar and batteries' fixed O&M, a constant that moves no decision.
+The reported cost leaves out penalties and the tie rule (tiny costs that pick one plan among equally cheap ones). The reported cost adds the existing wind, solar and batteries' fixed O&M, a constant that moves no decision.
 
 $$\sum_g x_{g,r,s,p} + x^{\text{dis}}_{r,s,p} - x^{\text{ch}}_{r,s,p} + \sum_{\ell \to r} (1 - \lambda_\ell)\, x_{\ell,s,p} - \sum_{r \to \ell} x_{\ell,s,p} + u_{r,s,p} = L_{r,p}\, d_s$$
 
@@ -240,6 +241,9 @@ $$\sum_p w_p\, \text{CO}_2(f_p) + w_{2025}\cdot 214.9 \le B \qquad \text{imports
 <li>Trutnevyte, E. (2016). <a href="https://doi.org/10.1016/j.energy.2016.03.038">Does cost optimization approximate the real-world energy transition?</a> Energy, 106, 182–193.</li>
 <li>U.S. Energy Information Administration (April 2026). <a href="https://www.eia.gov/outlooks/aeo/assumptions/pdf/EMM_Assumptions.pdf">Assumptions to the Annual Energy Outlook 2026: Electricity Market Module</a>, Tables 3 and 4 (read 7 Nov 2026).</li>
 <li>Intergovernmental Panel on Climate Change (2006). <a href="https://www.ipcc.ch/report/2006-ipcc-guidelines-for-national-greenhouse-gas-inventories/">2006 IPCC Guidelines for National Greenhouse Gas Inventories, Volume 2: Energy</a>, chapters 1 and 2.</li>
+<li>U.S. Energy Information Administration. <a href="https://www.eia.gov/electricity/annual/html/epa_07_04.html">Electric Power Annual, Table 7.4: weighted average cost of fossil fuels for the electric power industry, 2015 through 2025</a> (2025: gas $3.85, coal $2.42 per MMBtu; final 2025 data, checked 5 Nov 2026).</li>
+<li>Cole, W., Ramasamy, V. and Turan, M. (2025). <a href="https://docs.nlr.gov/docs/fy25osti/93281.pdf">Cost Projections for Utility-Scale Battery Storage: 2025 Update</a> (PDF). NREL/TP-6A40-93281, June 2025. Only its 2024 cost, as the low end of the battery range.</li>
+<li>U.S. Bureau of Economic Analysis. <a href="https://apps.bea.gov/iTable/?reqid=19&amp;step=3&amp;isuri=1&amp;1921=survey&amp;1903=13&amp;1904=2022&amp;1905=2026&amp;1906=a&amp;1911=0">NIPA Table 1.1.9: Implicit Price Deflators for Gross Domestic Product</a>, line 1, annual (2017 = 100): 2024 125.587, 2025 128.893, the battery cost's conversion to 2025 dollars (last revised 29 October 2026; accessed 5 November 2026).</li>
 <li>U.S. Energy Information Administration. <a href="https://www.eia.gov/electricity/gridmonitor/">Hourly Electric Grid Monitor (Form EIA-930)</a>, Southwest Power Pool, 2025 and 2024.</li>
 <li>HiGHS. <a href="https://ergo-code.github.io/HiGHS/dev/">Documentation</a> of the open-source solver in your browser and in the notebook (through SciPy's <code>linprog</code>).</li>
 </ul>
