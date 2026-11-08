@@ -340,12 +340,16 @@ const r1 = (v, d) => Math.round(v * 10 ** d) / 10 ** d;
     await failsThenWorks(3, "step 3", () => btn(/Solve on 4 typical weeks/).click(), () => true, 1, () => {
       ok(btn(/Solve on 4 typical weeks/).disabled === false && card().querySelectorAll(".m3-kpi").length === 3, "step 3: the button works again and the result shows");
     });
-    // step 6: only the 8-week plan fails (6,795 columns); the others are kept, so the retry solves its plan and its check
-    const cols8 = R.sets.typ8.cols;
-    await failsThenWorks(6, "step 6", () => card().querySelectorAll(".lx-choice")[1].click(), m => m.variables.length === cols8, 2, () => {
+    // step 6: only the 8-week plan fails (6,795 columns); the others are kept, so the retry solves its plan and its check.
+    // Every set is solved here, the 8 + 3 and 12 + 3 weeks too (no stored row)
+    const cols8 = R.sets.typ8.cols, cols11 = R.sets.wk11.cols, cols15 = R.sets.wk15.cols, sizes = [];
+    await failsThenWorks(6, "step 6", () => card().querySelectorAll(".lx-choice")[1].click(), m => { sizes.push(m.variables.length); return m.variables.length === cols8; }, 2, () => {
       ok(card().querySelectorAll(".m3-tbl tbody tr").length === 5, "step 6: the five sets' table after the retry");
+      ok(card().querySelectorAll(".m3-tbl tr.pre").length === 0 && !/precomputed/i.test(card().textContent), "step 6: no precomputed row: every set's plan and check solved on the page");
     });
-    await failsThenWorks(8, "step 8", () => card().querySelectorAll(".lx-choice")[2].click(), () => true, 3, () => {
+    ok(sizes.includes(cols11) && sizes.includes(cols15), "step 6: the 8 + 3 and 12 + 3 week plans are solved live (" + cols11 + " and " + cols15 + " columns)");
+    // step 8: three plan LPs and each plan's full-year run, all solved here (six solves)
+    await failsThenWorks(8, "step 8", () => card().querySelectorAll(".lx-choice")[2].click(), () => true, 6, () => {
       const t = card().textContent;
       ok(/Largest net change of the battery over one representative week: linked [\d,]+ MWh, cyclic 0 MWh, no link [\d,]+ MWh\./.test(t), "step 8: the net-change line");
       ok(t.includes("differ by less than 0.1%, though the linked battery still moves energy between weeks: up to " + fm.mwh(M.largest(netL))), "step 8: the result sentence, with the linked net change");

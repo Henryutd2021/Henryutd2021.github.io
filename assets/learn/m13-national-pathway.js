@@ -76,6 +76,8 @@
     return "Plans within a millionth of the least cost ($" + fix(r.slack, 1) + " million of $" + fix(r.objective / 1000, 0) + " billion) build " + fix(r.lo / 1000, 2) + " to " + fix(r.hi / 1000, 2) + " GW of " + label + "; the plan shown, " + fix(r.at / 1000, 2) + " GW.";
   }
   // near-optimal choices: one build cohort each (what is built in that model year's five years), not the capacity open
+  // the near-optimal click's usual time, seconds: the solver bench at 6x CPU slowdown (a phone stand-in), 8 November 2026
+  var NEAR_USUAL = 7;
   var NEAR = { solar: { t: "solar", q: 4, label: "new solar in 2046–2050" }, gasCC: { t: "gasCC", q: 4, label: "new gas combined cycle in 2046–2050" }, wind: { t: "wind", q: 3, label: "new wind in 2041–2045" } };
   var page = { TECH: TECH, NEAR: NEAR, vintage: vintage, vintageWords: vintageWords, carbonPath: carbonPath, hotelling: hotelling, runWords: runWords, sweepWords: sweepWords, dualText: dualText, remains: remains, deepWords: deepWords,
     foresightWords: foresightWords, shockWords: shockWords, fullWords: fullWords, nearWords: nearWords, kilo: kilo, fix: fix, pct: pct, bn: bn };
@@ -93,9 +95,9 @@
     function solver() { if (!stub) return null; stub = null; return function () { return Promise.resolve({ status: "error", ok: false, message: "solver stopped (demo)" }); }; }
     function kpi(host, label, value, tone) { var d = H("div", { class: "lx-readout " + (tone || "") }, host); H("span", { text: label }, d); H("b", { text: value }, d); }
     H("p", { class: "lx-hint e4-line", text: P.line }, live);
-    function runBox(act, api, label, state, solve, render) {
+    function runBox(act, api, label, state, solve, render, progress) {
       var kp = H("div", { class: "lx-readouts" }), res = H("div", { class: "m13-res" }), stale = H("p", null);
-      var run = LX.BenchRun(act, { label: label, busy: api.busy, results: [kp, res], stale: stale, state: state, solve: solve, render: function (R, st) { kp.innerHTML = ""; res.innerHTML = ""; render(R, st, kp, res); } });
+      var run = LX.BenchRun(act, { label: label, busy: api.busy, results: [kp, res], stale: stale, state: state, solve: solve, progress: progress, render: function (R, st) { kp.innerHTML = ""; res.innerHTML = ""; render(R, st, kp, res); } });
       act.appendChild(stale); act.appendChild(kp); act.appendChild(res);
       return run;
     }
@@ -237,7 +239,8 @@
         build: function (act, api) {
           var list = Object.keys(NEAR).map(function (k) { return [k, E4.builtTerms(P, NEAR[k].t, NEAR[k].q)]; });
           var near = function (st, ctx) {
-            return E4.nearRanges(P, st, list, 1e-6, { signal: ctx.signal, solver: solver() }).then(function (r) {
+            // the progress line counts the LPs (after LP k, LP k + 1 runs)
+            return E4.nearRanges(P, st, list, 1e-6, { signal: ctx.signal, solver: solver(), onSolve: function (k, n) { if (k < n) ctx.step(k + 1, n); } }).then(function (r) {
               return r.ok ? { status: "optimal", ok: true, kind: "lp", message: "Done: the central plan's LP, its least cost without the tie rule, then the least and the most of each choice over the plans within a millionth of that cost (" + r.solves + " LPs, each optimal).", results: r }
                 : { status: r.status, ok: false, kind: "lp", message: E4.WORDS[r.status] || r.message };
             });
@@ -246,7 +249,7 @@
             U.table(res, ["Choice", "Least", "The plan shown", "Most"], Object.keys(NEAR).map(function (k) { var x = r.items[k]; return [NEAR[k].label, fix(x.lo / 1000, 2) + " GW", fix(x.at / 1000, 2) + " GW", fix(x.hi / 1000, 2) + " GW"]; }), "m13-near");
             S0.near = r;
             api.done(); api.saw(nearWords(r.items.solar, NEAR.solar.label) + " Report what every near-optimal plan shares, or say which one you show.");
-          });
+          }, { unit: "LP", usual: NEAR_USUAL });
           U.keys(act, [["One click", "eight LPs: the central plan, its least cost without the tie rule, then the least and the most of each of three choices."], ["Cost", "the economic cost the page reports, without the tie rule's small costs."], ["Report", "what every near-optimal plan shares, or say which one you show; the notebook's practice task 4 runs it."]]);
         } }];
     var cards = LX.StepCards(live, { steps: steps });

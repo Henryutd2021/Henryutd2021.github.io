@@ -19,7 +19,7 @@
   function mil(v) { var r = Math.round(v / 1e5) / 10; if (r === 0) r = 0; return (r < 0 ? "−$" : "$") + Math.abs(r).toFixed(1) + "M"; }
   function price(v) { var r = Math.round(v); return (r < 0 ? "−$" : "$") + Math.abs(r).toLocaleString("en-US"); }
   var SWEEP = [0, 100, 200, 300];
-  var LIB_LIMIT = 120;   // s per solve when the library is built (the page's live solves: 3 s, then 10 s)
+  var LIB_LIMIT = 120;   // s per solve when the library is built (the page's live solves: 10 s, then 30 s)
   function r0(v) { return Math.round(v); }
   function r1(v) { return Math.round(v * 10) / 10; }
   function r2(v) { return Math.round(v * 100) / 100; }
@@ -253,7 +253,8 @@
         text: { head: ["Hour", "Prairie Town, $/MWh"], rows: v.map(function (x, i) { return [E2.dayLabel(dayList[12 + Math.floor(i / 24)].day) + " " + E2.hh(i % 24), price(x)]; }) } });
     }
 
-    // ---- one day, solved live (within the phone budget; a day that stops early can show its precomputed result)
+    // ---- one day, solved live (10 s a solve, 30 s on Try again; a day that still stops at its limit is drawn as not
+    // proven optimal, beside the library's run of that day)
     var dc = H("div", { class: "lx-xcard c2-day" }, rh);
     H("h3", { text: "Solve one day live" }, dc);
     H("p", { class: "lx-hint", html: LX.rich("Your browser commits the plants for one day with the [[mixed-integer-program|mixed-integer program]], then prices it with the dispatch [[linear-program|linear program]]: the same model the library used. A day of a hard week starts as the week's first day does.") }, dc);
@@ -263,20 +264,19 @@
     var sel = H("select", { class: "c2-sel" }, pick);
     opts.forEach(function (o) { H("option", { value: String(o.i), text: o.label }, sel); });
     sel.value = String(opts.filter(function (o) { return dayList[o.i].period === "hot"; })[0].i);
-    var dRow = H("div", null, dc), dStale = H("p", null, dc), dRes = H("div", { class: "c2-dayres" }, dc), dStop = U.stopper(), fbBox = H("div", { class: "c2-dayfb" }, dc);
+    var dRow = H("div", null, dc), dStale = H("p", null, dc), dRes = H("div", { class: "c2-dayres" }, dc), dStop = U.stopper();
     function dayIdx() { return +sel.value; }
     var DY = LX.BenchRun(dRow, { label: "Solve this day live", state: function () { return plan; }, partial: true, results: [dRes], stale: dStale, busy: dStop.busy,
       solve: function (st, ctx) { var d = dayList[dayIdx()]; return E2.solve(st, P, { task: "day", only: { y: d.y, day: d.day }, signal: ctx.signal, attempt: ctx.attempt, solver: stubSolver() }); },
-      render: function (R, st, r) { drawDay(R, r); },
-      onDone: function (r) { offer(r); } });
+      render: function (R, st, r) { drawDay(R, r); } });
     dStop.attach(DY);
-    sel.addEventListener("change", function () { DY.changed(plan); fbBox.innerHTML = ""; });
+    sel.addEventListener("change", function () { DY.changed(plan); });
     function stubSolver() { if (!stub) return null; var k = stub; stub = null; return function (m, o) {
       if (k === "fail") return Promise.resolve({ status: "error", ok: false, message: "solver stopped (demo)" });
       return LX.solver.solve(m, o).then(function (r) { if (r.values && m.variables.some(function (v) { return v.type === "integer"; })) { r.status = "time-limit"; r.ok = false; r.mipGap = 0.0123; } return r; }); }; }
     function libDay() { var e = entry(plan); return e ? e.days[dayIdx()] : null; }
     function drawDay(R, r) {
-      dRes.innerHTML = ""; fbBox.innerHTML = "";
+      dRes.innerHTML = "";
       var T = R.tot, ld = libDay(), same = ld && r.ok && Math.abs(ld[2] - Math.round(T.prod)) <= 1;
       H("p", { class: "e2-say", html: "<b>" + LX.esc(E2.dayLong(R.days[0].day)) + ":</b> production cost " + LX.esc(U.moneyK(T.prod)) + ", " + kilo(T.shed) + " MWh unserved, Town's highest price " + price(R.maxPrice[P.zix.T]) + "/MWh." +
         (ld ? " " + LX.esc(same ? "The same as the library's run of this day." : "The library's run of this day: " + U.moneyK(ld[2]) + ", " + kilo(ld[3]) + " MWh unserved (" + (ld[0] === "optimal" ? "optimal" : "not proven optimal") + ").") : "") }, dRes);
@@ -286,19 +286,6 @@
       U.priceChart(H("div", { class: "lx-sb-chart" }, dRes), P, R);
       U.commitTable(H("div", null, dRes), P, R, 0);
     }
-    // a live day that stopped early or failed: offer the library's result for that day
-    function offer(r) {
-      fbBox.innerHTML = "";
-      if (!r || r.ok || r.status === "superseded" || r.status === "cancelled") return;
-      var ld = libDay(); if (!ld) return;
-      var b = H("button", { class: "lx-btn ghost small", type: "button", text: "Show the precomputed result for this day" }, fbBox);
-      b.addEventListener("click", function () {
-        fbBox.innerHTML = "";
-        H("p", { class: "e2-say", html: "<b>Precomputed with this engine on " + LX.esc(LIB.date) + " (at most " + LIB.timeLimit + " s a solve):</b> " + LX.esc(E2.dayLong(dayList[dayIdx()].day) + ": production cost " + U.moneyK(ld[2]) + ", " + kilo(ld[3]) + " MWh unserved, Town's highest price " + price(ld[4]) + "/MWh; " +
-          (ld[0] === "optimal" ? "reported optimal." : "not proven optimal (gap " + ((ld[1] || 0) * 100).toFixed(2) + "%).")) }, fbBox);
-      });
-    }
-
     // ---- adequacy, with the sensitivity: the plan held fixed as the connected load grows (today's grid precomputed)
     var ac = H("div", { class: "lx-xcard c2-adeq" }, rh);
     H("h3", { text: "Check adequacy: enough supply in nearly every hour?" }, ac);

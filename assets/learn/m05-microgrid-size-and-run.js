@@ -290,7 +290,7 @@
           LX.BenchRun(act, { label: "Run the storm on this forecast", busy: api.busy, results: [tb], state: plan,
             solve: function (st, ctx) {
               var stats = [];
-              return E1.roll(st, P, P.scen.jan3, st.fc, function (m, t0) { return LX.solver.solve(m, { timeLimit: ctx.attempt > 1 ? 10 : 3, gap: 1e-6, signal: ctx.signal, label: "m5-roll" }).then(function (r) { stats.push(r.status); return r; }); },
+              return E1.roll(st, P, P.scen.jan3, st.fc, function (m, t0) { return LX.solver.solve(m, { timeLimit: ctx.attempt > 1 ? 30 : 10, gap: 1e-6, signal: ctx.signal, label: "m5-roll" }).then(function (r) { stats.push(r.status); return r; }); },
                 { onStep: function (t0, Hh) { prog.textContent = "Re-planning at " + E1.when(P.scen.jan3, t0) + " (" + (t0 / 6 + 1) + " of " + Hh / 6 + ")…"; } })
                 .then(function (out) {
                   prog.textContent = "";

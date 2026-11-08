@@ -36,6 +36,8 @@
   var LX = window.LX, KEYS = model.KEYS, U = model.ui;
   // ================================================================ the page (component library: window.LX)
   var H = LX.H, S = LX.S, LESSON = "13-capstone";
+  // the frontier click's usual time, seconds: 14 LPs at 6x CPU slowdown, a phone stand-in (solver bench, 8 November 2026)
+  var FRONT_USUAL = 21;
   var TECH = U.TECH, fm = U.fm, Num = U.Num, TextTable = U.TextTable, css = U.css;
   function copy(o) { var r = {}; for (var k in o) r[k] = o[k]; return r; }
 
@@ -178,6 +180,8 @@
       frontierLabel: "Frontier: cheapest plans at solved caps, joined by straight lines" });
     var frNote = H("p", { class: "lx13-sub", hidden: true }, c2);
     var frBtn = H("button", { class: "lx-link", type: "button", hidden: true, text: "Solve the frontier again for these costs" }, c2);
+    // one LP per cap, in turn; the progress line counts the caps
+    var frProg = LX.SolveProgress(c2, { unit: "cap", usual: FRONT_USUAL });
 
     var ph = H("div", { class: "lx13-head" }, panel); H("h3", { text: "What to build" }, ph);
     var resetBtn = H("button", { class: "lx-link", type: "button", text: "Back to lesson 0's plants" }, ph);
@@ -262,13 +266,14 @@
     }
     frBtn.addEventListener("click", function () {
       var caps = cfg.frontier.caps, pts = [], i = 0, key = S_.sc.gas + "|" + S_.sc.nucCapex;
-      frBtn.hidden = true; frNote.textContent = "Solving…";
+      frBtn.hidden = true; frNote.textContent = "Solving the frontier for these costs…"; frProg.start({ steps: caps.length });
       (function next() {
-        if (key !== S_.sc.gas + "|" + S_.sc.nucCapex) return;
-        if (i >= caps.length) { S_.frontier = pts; S_.frontierLive = true; frNote.textContent = "Frontier solved for gas at $" + S_.sc.gas.toFixed(2) + "/MMBtu and nuclear at $" + Math.round(S_.sc.nucCapex).toLocaleString("en-US") + "/kW."; render(); return; }
+        if (key !== S_.sc.gas + "|" + S_.sc.nucCapex) { frProg.stop(); return; }
+        frProg.step(i + 1, caps.length);
+        if (i >= caps.length) { frProg.stop(); S_.frontier = pts; S_.frontierLive = true; frNote.textContent = "Frontier solved for gas at $" + S_.sc.gas.toFixed(2) + "/MMBtu and nuclear at $" + Math.round(S_.sc.nucCapex).toLocaleString("en-US") + "/kW."; render(); return; }
         var cap = caps[i++], o = cap == null ? {} : { cap: cap * 1e3 };
         LX.solver.solve(model.weekModel(S_.C, RW, o), { label: "t13-frontier", timeLimit: 10 }).then(function (r) {
-          if (r.ok) { var s = model.summarize(S_.C, per, r, o); pts.push({ cap: cap, cost: s.cost, co2: s.co2, dual: s.capDual, plan: s.plan }); S_.frontier = pts.slice(); frNote.textContent = "Solving… " + i + " of " + caps.length; drawFrontier(); }
+          if (r.ok) { var s = model.summarize(S_.C, per, r, o); pts.push({ cap: cap, cost: s.cost, co2: s.co2, dual: s.capDual, plan: s.plan }); S_.frontier = pts.slice(); drawFrontier(); }
           next();
         });
       })();

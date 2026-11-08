@@ -339,7 +339,7 @@
       var key = bug || "ok";
       if (solved[key]) return Promise.resolve(solved[key]);
       if (!LX.solver) return Promise.resolve({ ok: false, status: "unavailable" });
-      return LX.solver.solve(buildModel(inst, bug), { timeLimit: 3, key: "b3-" + key }).then(function (r) { var sm = summarize(inst, r); sm.ms = r.ms; solved[key] = sm; return sm; });
+      return LX.solver.solve(buildModel(inst, bug), { timeLimit: 10, key: "b3-" + key }).then(function (r) { var sm = summarize(inst, r); sm.ms = r.ms; solved[key] = sm; return sm; });
     }
     var col19 = T.indexOf(19), sumCol = G.reduce(function (a, g) { return a + ref.p[g][col19]; }, 0), sumRow = ref.p.cc.reduce(function (a, v) { return a + v; }, 0);
 
@@ -662,7 +662,7 @@
       var i = practiceInst(town, year, J, key), status = LX.SolverStatus ? LX.SolverStatus(stHost) : null, note = H("p", { class: "b3-note" }, stHost);
       if (!LX.solver) { note.textContent = "The solver could not load here; this is the precomputed answer."; return Promise.resolve(sol[key]); }
       if (status) status.set("solving");
-      return LX.solver.solve(buildModel(i, PRACTICE_RUN[key].bug), { timeLimit: 3, key: "b3p-" + key }).then(function (r) {
+      return LX.solver.solve(buildModel(i, PRACTICE_RUN[key].bug), { timeLimit: 10, key: "b3p-" + key }).then(function (r) {
         if (status) status.set(r);
         if (!r || !r.ok) { note.textContent = "The solver did not finish here; this is the precomputed answer."; return sol[key]; }
         var S = summarize(i, r); live[key] = S; return S;

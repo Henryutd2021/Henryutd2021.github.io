@@ -63,13 +63,15 @@
           solve: function (st, ctx) {
             var l = B.run.last();
             if (!l) return Promise.resolve({ status: "error", ok: false, message: "Run the year first." });
-            return E0.sensitivity(l.state, P, l.r, { signal: ctx.signal, timeLimit: ctx.attempt > 1 ? 30 : 10 }).then(function (x) {
+            // inputs that change the operation re-run the whole year twice (14.6 s at 6x for the farm with everything,
+            // solver bench 2026-11-08): the progress line counts the inputs
+            return E0.sensitivity(l.state, P, l.r, { signal: ctx.signal, timeLimit: ctx.attempt > 1 ? 30 : 10, progress: function (i, n) { if (i < n) ctx.step(i + 1, n); } }).then(function (x) {
               return x ? { status: "optimal", ok: true, results: x } : { status: "error", ok: false, message: "A run of the sensitivity did not finish." };
             });
           },
           render: function (x, st) { sens = x; sensKey = key(st); drawSens(st); },
           onDone: function () { if (rn) rn.refresh(); },
-          results: [chart], busy: null,
+          results: [chart], busy: null, progress: { unit: "input" },
           words: { ok: "Done: each bar is the NPV with one input at its low or high value, the equipment held fixed." } });
       }
       if (sens && sensKey !== key(s)) { sens = null; sensKey = null; }
