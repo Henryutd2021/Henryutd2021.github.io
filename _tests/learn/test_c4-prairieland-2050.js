@@ -87,7 +87,7 @@ const QPATH = path.join(X.SITE, "learn/c4-prairieland-2050.qmd");
   const strong = EX.plain(exd.answers[1]);
   ok(exOk && s0.preset === "secure" && s0.foresight === "perfect" && strong.indexOf(PG.bn(e0.view.pv.total)) >= 0 && PG.sensLines(e0.view, e0.shocks).every(x => strong.indexOf(x.replace(/\.$/, "")) >= 0), "the strong exemplar quotes the default plan's run (cost, the shocks' four lines)");
   // its evidence is real: the default plan's link (it decodes to the default plan) and the line M13's notebook prints for it
-  ok(strong.indexOf(link0) >= 0 && SS.decode(S, link0.split("#")[1]).status === "ok" && SS.same(S, SS.decode(S, link0.split("#")[1]).state, def) && PG.LINK_BASE === "https://henryutd2021.github.io/learn/c4-prairieland-2050.html#" &&
+  ok(strong.indexOf(link0) >= 0 && SS.decode(S, link0.split("#")[1]).status === "ok" && SS.same(S, SS.decode(S, link0.split("#")[1]).state, def) && PG.LINK_BASE === "c4-prairieland-2050.html#" &&
     strong.indexOf("\u201c" + PG.nbLine(e0.view) + "\u201d") >= 0 && PG.nbLine(e0.view) === "cost to 2050 $410.7 billion (present value); CO2 2026-2050 3,600 Mt",
     "the strong exemplar's evidence: the default plan's link and the notebook's printed line (" + PG.nbLine(e0.view) + ")");
   ok(strong.indexOf(PG.fix(e0.view.built.firm.reduce((a, b) => a + b, 0), 1) + " GW of the generic firm option") >= 0 && strong.indexOf(PG.fix(e0.view.built.battery.reduce((a, b) => a + b, 0), 1) + " GW of batteries") >= 0 &&

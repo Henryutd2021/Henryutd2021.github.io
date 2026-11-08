@@ -136,7 +136,7 @@
     { key: "notebook", label: "M13's notebook on your pathway", hint: "Paste the lines its section 8 printed for your plan (cost, CO₂, imports, what it builds) and say whether they match the page.", rows: 3, need: true, min: 8 },
     { key: "sources", label: "Sources and credit", hint: "One or two sentences: the data behind your numbers (EIA, IPCC, SPP through EIA-930; the course's teaching settings) and any conflict of interest.", rows: 2, need: true, min: 8 }];
   var TWO_PAGES = 1100;
-  var LINK_BASE = "https://henryutd2021.github.io/learn/c4-prairieland-2050.html#";   // the page's address, for the exemplar's plan link
+  var LINK_BASE = "c4-prairieland-2050.html#";   // this page, for the exemplar's plan link (relative, as the course's links are)
   // the two-page check counts the learner's own writing (the brief's fields); the plan, results, assumptions and limits
   // the page adds are not counted (about 1,000 words on their own)
   function ownWords(words, countWords) { var t = 0; FIELDS.forEach(function (f) { t += countWords((words || {})[f.key] || ""); }); return t; }
