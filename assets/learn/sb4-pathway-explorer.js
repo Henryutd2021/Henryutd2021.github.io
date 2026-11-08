@@ -31,7 +31,12 @@
   var WN = ["2030–2035", "2040–2045", "2050"];
   function says(V, X, P) {
     var out = [], Y = V.Y, last = Y.length - 1, miss = (V.windowReach || []).map(function (ok, i) { return ok ? -1 : i; }).filter(function (i) { return i >= 0; });
-    if (V.over > 0.5) out.push({ kind: "bad", text: "**The budget is out of reach: the closest pathway emits " + kilo(V.cum) + " Mt against " + kilo(V.budget) + " Mt.** No pathway within these levers emits less; this is the cheapest of the closest." });
+    // what the limits-first runs prove: with only the budget missed, no plan within the cap emits less; with both missed,
+    // the run minimises the two overshoots weighed as their penalties (a tonne against GJ), never each one alone
+    var both = V.over > 0.5 && sum(V.capOver) > 0.5, tGJ = P.cfg.penalties.budgetPerT / P.cfg.penalties.importPerGJ, given = V.carbonValue.length > 1 ? ", given each window's earlier decisions" : "";
+    if (V.over > 0.5) out.push({ kind: "bad", text: "**The budget is out of reach: the closest pathway emits " + kilo(V.cum) + " Mt against " + kilo(V.budget) + " Mt.** " + (both
+      ? "The import cap is missed too, so the run finds the least combined overshoot (a tonne over the budget weighed as " + kilo(tGJ) + " GJ over the cap), then the cheapest such plan" + given + "."
+      : "No pathway within these levers and the import cap emits less" + given + "; this is the cheapest of the closest.") });
     else if (V.carbonValue.length > 1) {   // decade by decade: each window had its share of the budget left
       var wb = V.carbonValue.map(function (x, i) { return x != null && x > 0.05 ? i : -1; }).filter(function (i) { return i >= 0; });
       out.push({ kind: miss.length ? "warn" : "good", text: "**CO₂ 2026–2050: " + kilo(V.cum) + " Mt" + (V.cum < V.budget - 0.5 ? ", " + kilo(V.budget - V.cum) + " Mt below the budget." : ", at the budget.") + "** Decade by decade, each window had its share of what was left; " +
@@ -40,7 +45,7 @@
     else if (V.carbonValue[0] == null) out.push({ kind: "warn", text: "**CO₂ 2026–2050: " + kilo(V.cum) + " Mt, within the " + kilo(V.budget) + " Mt budget.** The import cap is out of reach, so the budget's dual is not a marginal value here." });
     else out.push({ kind: "good", text: "**CO₂ 2026–2050: " + kilo(V.cum) + " Mt, within the " + kilo(V.budget) + " Mt budget.** " + (V.carbonValue[0] > 0.05 ? "The budget binds: one more tonne allowed would save about $" + fix(V.carbonValue[0], 0) + " (present value in 2025; the LP's dual)." : "The budget does not bind: the cheapest pathway stays below it anyway.") });
     var mi = Math.max.apply(null, V.imp), yi = Y[V.imp.indexOf(mi)];
-    if (sum(V.capOver) > 0.5) out.push({ kind: "bad", text: "**Imports above the cap:** " + pct(mi) + " of primary energy in " + yi + " against " + pct(V.cap) + ". No pathway within these levers imports less: oil for vehicles and farms is fixed by your electrification." });
+    if (sum(V.capOver) > 0.5) out.push({ kind: "bad", text: "**Imports above the cap:** " + pct(mi) + " of primary energy in " + yi + " against " + pct(V.cap) + ". " + (both ? "With the budget missed too, the run weighs both overshoots (above)." : "No pathway within these levers and the budget imports less" + given + ": oil for vehicles and farms is fixed by your electrification.") });
     else out.push({ kind: "", text: "**Imports at most " + pct(mi) + " of primary energy (" + yi + "),** within the " + pct(V.cap) + " cap; 2025: " + pct(P.imports.dependence.share) + "." });
     var g = V.built, gw = function (t) { return sum(g[t]); };
     out.push({ kind: "", text: "**Built 2026–2050:** wind " + fix(gw("wind"), 1) + " GW, solar " + fix(gw("solar"), 1) + " GW, gas " + fix(gw("gasCC") + gw("gasCT"), 1) + " GW, batteries " + fix(gw("battery"), 1) + " GW, the generic firm clean option " + fix(gw("firm"), 1) + " GW; new links " + fix(sum(V.txAdd), 1) + " GW." });
@@ -70,7 +75,7 @@
   }
   var page = { libKey: libKey, libEntry: libEntry, says: says, fullRows: fullRows, kilo: kilo, fix: fix, pct: pct, bn: bn, max: max,
     GROUPS: [{ title: "Demand and electrification", fields: ["dem", "eb", "et", "ei"], color: "var(--lx-demand)", hint: "Electricity's share of each sector's [[useful-energy|useful energy]] in 2050; it rises in a straight line from 2025's. The engine does not choose it: end-use equipment costs are left out." },
-      { title: "The limits you set", fields: ["bud", "acc", "cap", "rm"], color: "var(--lx-bad)", hint: "A [[carbon-budget|cumulative carbon budget]] for 2026–2050, an import cap in every model year, and a rule for the peak hours.", gap: true },
+      { title: "The limits you set", fields: ["bud", "acc", "cap", "rm"], color: "var(--lx-bad)", hint: "A [[carbon-budget|cumulative carbon budget]] for 2026–2050, an import cap in every model year, and a peak-hour rule: at two hard hours of 2025's weather, available capacity must cover each region's load plus the margin you pick.", gap: true },
       { title: "What the model may do", fields: ["fs", "fm", "tx", "rt"], color: "var(--lx-accent)", hint: "[[perfect-foresight|Perfect foresight]] plans 2030–2050 at once; decade by decade sees only two model years at a time." },
       { title: "A shock", fields: ["sh"], color: "var(--lx-warn)", hint: "An operating shock meets the plants already built; the mineral restriction meets the batteries not yet bought. Open the table for each shock's numbers.", shocks: true },
       { title: "Costs you set (2025 dollars)", fold: "Costs and fuel prices you set (open to change them)", fields: ["cw", "cs", "cb", "cc", "ct", "cf", "cx"], color: "var(--lx-ink-2)", hint: "Each a fixed range from prairieland.json, the same in every period: no cost changes with how much is built." },
@@ -103,7 +108,8 @@
       if (g.gap) o.extra = function (fs) { E4.GAP.slice(0, 2).forEach(function (t) { H("p", { class: "lx-hint e4-ghint", html: LX.rich(t) }, fs); }); };
       if (g.shocks) o.extra = function (fs) { var d = H("details", { class: "e4-fold" }, fs); H("summary", { text: "What each shock changes, in numbers" }, d);
         U.table(d, ["Shock", "When, in the model", "What changes", "What the re-plan keeps"], E4.shockTable(P), "sb4-shocks e4-wrap");
-        H("p", { class: "lx-hint", text: "A model year stands for five years, so a shock lasts five years here, longer than its story (the restriction's two years). The story's other effects (the factory's stocks and recycling) are lesson A21's, not modelled here." }, d); };
+        H("p", { class: "lx-hint", text: "A model year stands for five years: the gas-price spike, the drought and the mineral restriction each last one period here, longer than their stories (the restriction's two years); the demand surprise lasts from 2031 to 2050." }, d);
+        H("p", { class: "lx-hint", text: "The story's other effects (the factory's stocks and recycling) are lesson A21's, not modelled here." }, d); };
       return o;
     });
     var C = U.controls(ctr, S, plan, groups, change, hints);
@@ -135,6 +141,7 @@
     side.appendChild(ro);
     side.insertBefore(ss.status, pre);
     side.appendChild(src);
+    side.insertBefore(H("p", { class: "lx-hint e4-prehint", text: "A preset changes only the choices it names; your other settings stay." }), pre.nextSibling);
     side.appendChild(ss.el);
     function change(p) { plan = p; C.set(plan); ss.set(plan); run.changed(plan); }
 
@@ -154,7 +161,7 @@
       map = U.Map(c1, P); map.set(V);
       U.keys(c1, [["Each disc", "the region's electricity in that year by source; below it, the LP's [[marginal-cost|marginal cost]] of one more MWh there, averaged over the slices by load."],
         ["Each link", "its transfer limit, existing plus what the plan adds; amber when it is full for more than 2,000 hours of the slices."],
-        ["Ties", "where two regions or routes cost the same, the map shows the one the [[tie-rule|tie rule]] picks; national totals do not depend on it."]]);
+        ["Ties", "where two regions or routes cost the same or almost, the map shows the one the [[tie-rule|tie rule]] picks; its small costs can move national totals slightly, so read near-equal plans as one family."]]);
       var c2 = H("div", { class: "lx-xcard lx-sb-chart" }, res); H("h3", { text: "What is open and what runs" }, c2);
       U.MixChart(c2, P).set(V);
       U.keys(c2, [["Vintages", "each plant's [[vintage|vintage]] counts in a model year only while its life covers it."],
@@ -194,7 +201,7 @@
       var c7 = H("div", { class: "lx-xcard lx-sb-chart" }, res); H("h3", { text: "Slices against full years of hours" + (X ? " (the plan without the shock)" : "") }, c7);
       if (R.full) {
         U.table(c7, ["Check", "Not served", "CO₂ of the year", "Wind and solar spilled", "Verdict"], page.fullRows(R.full, E4), "sb4-full e4-wrap");
-        U.keys(c7, [["The check", "this plan's capacities in 2030 and 2050, run hour by hour over 2025's weather and over 2024's (an independent year), week by week."],
+        U.keys(c7, [["The check", "this plan's capacities in 2030 and 2050, run hour by hour over 2025's weather and over 2024's (an independent year), week by week; each week's batteries end as they start."],
           ["Survives", "all demand served and the year's CO₂ within 10% of the slices' estimate: a tolerance set for teaching. It tests two years' dispatch, not the cumulative budget or adequacy."], ["From the library", "precomputed with this engine on " + LIB.date + ": about a minute of solving, too slow to run on a click."]]);
       } else {
         H("p", { class: "lx-hint", html: LX.rich("**Full-year validation unavailable for this plan.** It is precomputed only for the presets with every other setting at its default (about a minute of solving each). [[lesson:m13-national-pathway|M13]] explains the check.").replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>") }, c7);

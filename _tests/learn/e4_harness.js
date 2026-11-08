@@ -76,10 +76,11 @@ function libText(plans) {
 }
 // the dated correction line of SB4, M13 and C4 (7 Nov 2026), from the library: the existing fleet's upkeep is the same in
 // every entry; the central pathway's cost with it and without it (the cost before the correction)
-function correction(E4, LIB) {
+// (every library entry has the default discount rate, so one upkeep; another rate gives another, the same for every pathway)
+function correction(E4, LIB, PL) {
   const ups = LIB.plans.map(e => e.view.pv.upkeep), V = LIB.plans.find(e => e.preset === "central" && e.foresight === "perfect").view;
   if (ups.some(u => u !== ups[0])) throw new Error("correction: the upkeep differs between entries");
-  return { text: "Corrected 7 Nov 2026: costs now include the existing wind, solar and batteries' fixed O&M, " + E4.bn(ups[0]) + " in every pathway (central: " + E4.bn(V.pv.total) + ", was " + E4.bn(V.pv.total - V.pv.upkeep) +
-    "; differences unchanged). The full-year check buys gas in the slice run's own mix.", upkeep: ups[0], now: V.pv.total, was: V.pv.total - V.pv.upkeep };
+  return { text: "Corrected 7 Nov 2026: costs now include the existing wind, solar and batteries' fixed O&M, the same in every pathway at one discount rate (" + E4.bn(ups[0]) + " at " + PL.periods.discount.def + "%; central: " + E4.bn(V.pv.total) + ", was " + E4.bn(V.pv.total - V.pv.upkeep) +
+    "). The full-year check buys gas in the slice run's own mix.", upkeep: ups[0], now: V.pv.total, was: V.pv.total - V.pv.upkeep };
 }
 module.exports = { SITE, L, LIB_DATE, load, face, grid, libEntry, libText, fullOf, correction, between: X1.between, writeBlocks: X1.writeBlocks, norm: X1.norm };

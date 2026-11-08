@@ -112,14 +112,17 @@ const QPATH = path.join(X.SITE, "learn/m13-national-pathway.qmd");
   const maxH = Math.max(...n.full.map(c => c.unservedHours));
   ok(/all four checks pass both tests/.test(w10) === e.full.every(c => c.unservedMWh < 0.5 && Math.abs(c.gap) <= 0.1) && w10.indexOf("up to " + PG.kilo(maxH) + " hours") >= 0, "step 10: the full-year verdicts as the library has them");
   ok(T.indexOf("unserved for up to " + maxH + " hours in 2024's weather") >= 0 && n.full.find(c => c.unservedHours === maxH).weather === "2024", "the check card's 240 hours is the library's (" + maxH + ", in 2024's weather)");
-  // step 11's near-optimal ranges, solved live in one click: the plan's LP once, then two LPs a choice; the same LPs, and
-  // so the same numbers, as one nearRange per choice
+  // step 11's near-optimal ranges, solved live in one click: the plan's LP, the same LP without the tie rule (the least
+  // economic cost), then two LPs a choice over the plans whose economic cost is within a millionth of the least; the same
+  // LPs, and so the same numbers, as one nearRange per choice
   const list = Object.keys(PG.NEAR).map(k => [k, E4.builtTerms(P, PG.NEAR[k].t, PG.NEAR[k].q)]), NRL = await E4.nearRanges(P, def, list, 1e-6, { solver });
-  ok(NRL.ok && NRL.solves === 7, "step 11: one click solves seven LPs (the plan, then the least and the most of three choices)");
+  ok(NRL.ok && NRL.solves === 8, "step 11: one click solves eight LPs (the plan, its least cost without the tie rule, then the least and the most of three choices)");
   for (const [k, t] of list) { const r1 = await E4.nearRange(P, def, t, 1e-6, { solver }); const a = NRL.items[k];
     ok(r1.ok && a && Math.abs(r1.lo - a.lo) < 1e-6 && Math.abs(r1.hi - a.hi) < 1e-6 && Math.abs(r1.at - a.at) < 1e-6 && r1.slack === a.slack, "near-optimal " + k + ": the shared run equals nearRange (" + (a.lo / 1000).toFixed(2) + " to " + (a.hi / 1000).toFixed(2) + " GW)"); }
   const Vc = lib("central", "perfect").view, ns = NRL.items.solar;
-  ok(Math.abs(ns.objective - (Vc.pv.total + 0)) < 400 && Math.abs(ns.slack - 1e-6 * ns.objective) < 1e-9, "the 'least cost' of the millionth is the reported cost's basis, with the existing fleet's upkeep ($" + (ns.objective / 1000).toFixed(1) + " bn; the page's $" + (Vc.pv.total / 1000).toFixed(1) + " bn plus the tie rule)");
+  ok(ns.objective <= Vc.pv.total + 0.5 && Vc.pv.total - ns.objective < 1 && Math.abs(ns.slack - 1e-6 * ns.objective) < 1e-9, "the least cost is the economic cost the page reports, without the tie rule, with the existing fleet's upkeep ($" + ns.objective.toFixed(3) + "M; the plan shown $" + Vc.pv.total + "M)");
+  ok(Object.keys(NRL.items).every(k => { const x = NRL.items[k]; return x.costLo <= x.objective + x.slack + 1e-6 && x.costHi <= x.objective + x.slack + 1e-6 && x.costAt <= x.objective + x.slack + 1e-6; }),
+    "every endpoint plan, and the plan shown, costs at most a millionth more than the least economic cost (solar's ends: +$" + (ns.costLo - ns.objective).toFixed(3) + "M and +$" + (ns.costHi - ns.objective).toFixed(3) + "M; allowance $" + ns.slack.toFixed(3) + "M)");
   ok(ns.lo <= ns.at + 0.1 && ns.at <= ns.hi + 0.1 && ns.hi - ns.lo >= 1000, "step 11: within a millionth of the cost, new solar in 2046–2050 runs from " + (ns.lo / 1000).toFixed(2) + " to " + (ns.hi / 1000).toFixed(2) + " GW (at least a gigawatt wide; the plan shown " + (ns.at / 1000).toFixed(2) + ")");
   ok(PG.nearWords(ns, PG.NEAR.solar.label).indexOf(PG.fix(ns.lo / 1000, 2) + " to " + PG.fix(ns.hi / 1000, 2) + " GW of new solar in 2046–2050") >= 0 && /E4\.nearRanges\(P, st, list, 1e-6/.test(JS) && !/m13near|too slow for a phone click/.test(JS) && !("precomputed" in cfg && cfg.precomputed && cfg.precomputed.m13near), "step 11 runs live (E4.nearRanges), labelled as one build cohort (2046–2050); no precomputed ranges left");
   ok(Object.keys(NRL.items).every(k => NRL.items[k].lo <= NRL.items[k].at + 0.1 && NRL.items[k].at <= NRL.items[k].hi + 0.1), "every range holds the plan shown");
@@ -143,10 +146,10 @@ const QPATH = path.join(X.SITE, "learn/m13-national-pathway.qmd");
   ok(!/G-COST|G-NUC|G-GIS/.test(T + JS.replace(/\/\/.*$/gm, "")), "no editorial guard code on the page or in its strings");
   ok(!/\bAI\b|artificial intelligence|ChatGPT|Claude/.test(PAGE + JS + NBT), "no AI wording");
   // the cost, the gas rule and the fleet, in words; the dated correction
-  ok(PAGE.indexOf("The reported cost adds the existing wind, solar and batteries' fixed O&M, a constant that moves no decision.") >= 0 && T.indexOf("Also the upkeep of the existing hydro and steady plants: the data give no figure, and it is the same in every pathway.") >= 0, "the reported cost's existing-fleet upkeep, and what is left out");
+  ok(PAGE.indexOf("The reported cost adds the existing wind, solar and batteries' fixed O&M, a constant that moves no decision.") >= 0 && T.indexOf("Also left out: the upkeep of the existing hydro and steady plants (the data give no figure; the same in every pathway).") >= 0, "the reported cost's existing-fleet upkeep, and what is left out");
   ok(!/domestic first/.test(PAGE + JS + NBT) && T.indexOf("fuels bought at least cost") >= 0 && T.indexOf("The LP buys domestic gas and LNG in the least-cost mix within the import cap, so under a tight budget LNG can win: the national inventory counts the gas burned in domestic fields, not LNG's upstream emissions abroad.") >= 0, "one gas rule in words: least cost within the cap, and why LNG can win under a tight budget; no 'domestic first'");
   ok(T.indexOf("so it leaves in the five-year period that contains that year: a conservative simplification.") >= 0 && /conservative simplification/.test(NBT), "the retirement convention, on the page and in the notebook");
-  const corr = X.correction(E4, LIB); ok(T.indexOf(corr.text) >= 0, "the dated correction line, from the library: " + corr.text);
+  const corr = X.correction(E4, LIB, PL); ok(T.indexOf(corr.text) >= 0, "the dated correction line, from the library: " + corr.text);
 
   console.log((fails ? "FAILED " : "ok ") + (checks - fails) + "/" + checks + " checks (M13)");
   process.exit(fails ? 1 : 0);

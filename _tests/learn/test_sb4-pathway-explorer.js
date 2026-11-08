@@ -28,7 +28,7 @@ function ok(c, msg) { checks++; if (!c) { fails++; console.log("FAIL:", msg); } 
 const QPATH = path.join(X.SITE, "learn/sb4-pathway-explorer.qmd");
 
 (async () => {
-  const { E4, PL, cfg, P, SS, S, L } = await X.load();
+  const { E4, PL, cfg, P, SS, S, L, solver } = await X.load();
   const PG = require(L("sb4-pathway-explorer.js"));
   const LIB = JSON.parse(fs.readFileSync(L("data/e4-library.json"), "utf8")), def = SS.defaults(S);
   const e0 = PG.libEntry(LIB, SS, S, def);
@@ -79,6 +79,15 @@ const QPATH = path.join(X.SITE, "learn/sb4-pathway-explorer.qmd");
   }
   ok(/survives if it holds in both years: all demand served, CO2 within 10%/.test(PL.timeSlices.fullYearCheck.survives), "the page's verdict follows prairieland.json's survives rule");
 
+  // ---------------- what "out of reach" proves: only the budget missed, no plan within the cap emits less; both missed,
+  // the least combined overshoot (weighed as their penalties), never "emits less" (a cap of 10% and 2,600 Mt misses both)
+  {
+    const both = Object.assign({}, def, { cap: 10, bud: 2600 }), Vb = E4.view((await E4.solve(both, P, { solver, timeLimit: 120 })).results.plan, P), sb = PG.says(Vb, null, P).map(x => x.text).join(" ");
+    ok(Vb.over > 0.5 && Vb.capOver.some(x => x > 0.5) && /least combined overshoot \(a tonne over the budget weighed as 10 GJ over the cap\)/.test(sb) && !/emits less|imports less/.test(sb), "both limits missed (cap 10%, 2,600 Mt): the words say least combined overshoot, never 'emits less' (" + Vb.cum + " Mt)");
+    const e = LIB.plans.find(x => x.view.over > 0.5 && x.view.capOver.every(c => c < 0.5));
+    ok(!e || /No pathway within these levers and the import cap emits less/.test(PG.says(e.view, null, P)[0].text), "only the budget missed: no plan within the levers and the import cap emits less" + (e ? " (" + e.preset + "/" + e.foresight + ")" : ""));
+  }
+
   // ---------------- the library on the page
   ok(PG.libEntry(LIB, SS, S, Object.assign({}, def, { sh: "drought" })) === e0, "a shock does not change which library entry a plan is (its re-plan is in the entry)");
   ok(PG.libEntry(LIB, SS, S, Object.assign({}, def, { cw: def.cw + 1 })) === null, "a plan off the library is solved live");
@@ -88,9 +97,9 @@ const QPATH = path.join(X.SITE, "learn/sb4-pathway-explorer.qmd");
   // the cost: parts, boundary, the existing fleet, the correction
   ok(/\["Fixed O&M of the existing wind, solar and batteries", bn\(pv\.upkeep\), bn\(V\.yearly\[4\]\.upkeep\)\]/.test(JS) && /The data give none for existing hydro and the steady plants, so their upkeep is left out/.test(JS), "the cost table has the existing fleet's upkeep as a part, and the key says what is left out");
   const pvs = e0.view.pv; ok(Math.abs(pvs.capital + pvs.transmission + pvs.fom + pvs.upkeep + pvs.vom + pvs.fuel - pvs.total) <= 3, "the cost table's parts add up to the total ($" + pvs.total + "M)");
-  has("Also the upkeep of the existing hydro and steady plants: the data give no figure, and it is the same in every pathway.");
+  has("Also left out: the upkeep of the existing hydro and steady plants (the data give no figure; the same in every pathway).");
   ok(/an existing plant leaves in the five-year period that contains its retirement year, a conservative simplification/.test(JS), "the retirement convention, stated where the page describes the fleet");
-  const corr = X.correction(E4, LIB); has(corr.text, "the dated correction, from the library"); ok(E4.bn(corr.was) === "$401.6 billion" && E4.bn(corr.now) === "$410.7 billion", "the correction's numbers: " + E4.bn(corr.was) + " before, " + E4.bn(corr.now) + " now");
+  const corr = X.correction(E4, LIB, PL); has(corr.text, "the dated correction, from the library"); ok(E4.bn(corr.was) === "$401.6 billion" && E4.bn(corr.now) === "$410.7 billion", "the correction's numbers: " + E4.bn(corr.was) + " before, " + E4.bn(corr.now) + " now");
   ok(/full: e \? e\.full : null/.test(JS) && /Full-year validation unavailable for this plan/.test(JS) && /Load the default plan \(validated\)/.test(JS), "a live run of a library plan keeps its full-year checks; any other plan says the validation is unavailable and offers the validated default");
   ok(/E4\.doneWords\(st, e\.view\)/.test(JS) && !/words: \{ ok:/.test(JS), "the status line is the engine's, by foresight (no fixed 'cheapest pathway' for decade by decade)");
 

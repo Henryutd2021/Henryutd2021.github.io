@@ -1056,38 +1056,50 @@
   }
   // the new capacity of one technology built in one model year, nationally, as terms
   function builtTerms(P, t, q) { var o = {}; if (t === "firm") o["n_firm" + q] = 1; else P.R.forEach(function (R, r) { o["n_" + r + t + q] = 1; }); return o; }
-  // plans within a share of the best cost: the lowest and highest of an expression (two more LPs); Promise of { lo, hi }.
-  // The best cost is the LP's goal plus the existing fleet's upkeep (a constant outside the LP), so "a millionth of the
-  // least cost" is of the cost the pages report (objective: that sum)
+  // plans within a share of the least cost: the lowest and highest of an expression; Promise of { lo, hi, at, ... }.
+  // "Cost" here is the economic cost: the LP's goal without the tie rule (whose small costs only pick among equal plans),
+  // plus the existing fleet's upkeep (a constant outside the LP), so "a millionth of the least cost" is of the cost the
+  // pages report (objective: that least cost)
   function nearRange(P, state, terms, share, o) {
     return nearRanges(P, state, [["x", terms]], share, o).then(function (r) {
-      if (!r.ok) return r; var x = r.items.x; return { status: "optimal", ok: true, lo: x.lo, hi: x.hi, at: x.at, slack: x.slack, objective: x.objective };
+      if (!r.ok) return r; var x = r.items.x; return { status: "optimal", ok: true, lo: x.lo, hi: x.hi, at: x.at, slack: x.slack, objective: x.objective, costLo: x.costLo, costHi: x.costHi };
     });
   }
-  // several expressions over one solved plan: the plan's LP once, then its min and max LPs for each (list: [[key, terms]],
-  // in order; 1 + 2 x n LPs, each the same LP nearRange would solve). Promise of { status, ok, items: { key: { lo, hi, at,
-  // slack, objective } }, solves }; o.onSolve(k, n) after each LP
+  // the LP without the tie rule's costs (penalties kept): its optimum is the least economic cost
+  function econModel(m) {
+    var tc = m.meta.tieC;
+    return { sense: "min", variables: m.variables.map(function (v) { return { name: v.name, lb: v.lb, ub: v.ub, cost: v.cost - (tc[v.name] || 0) }; }), constraints: m.constraints, meta: m.meta };
+  }
+  // several expressions over one plan: the plan's LP (the plan shown, with the tie rule), the same LP without the tie
+  // rule (the least economic cost), then the min and max LPs of each expression over every plan whose economic cost is
+  // within share x (least cost + upkeep) of the least (list: [[key, terms]], in order; 2 + 2 x n LPs). Promise of
+  // { status, ok, items: { key: { lo, hi, at, slack, objective, costLo, costHi } }, solves }; o.onSolve(k, n) after each LP
   function nearRanges(P, state, list, share, o) {
     o = o || {};
-    var sol = solverOf(o), S = sysOf(state, P), m = build(P, S), tl = o.timeLimit || P.cfg.solver.timeLimit, up = upkeepPV(P, S), n = 1 + 2 * list.length, k = 0;
+    var sol = solverOf(o), S = sysOf(state, P), m = build(P, S), m0 = econModel(m), tl = o.timeLimit || P.cfg.solver.timeLimit, up = upkeepPV(P, S), n = 2 + 2 * list.length, k = 0;
     var one = function (mm) { return new Promise(function (res) { res(sol(mm, { timeLimit: tl, signal: o.signal })); }).then(function (x) { k++; if (o.onSolve) o.onSolve(k, n); return x; }); };
+    var econ = function (x) { var t = 0; m0.variables.forEach(function (v) { if (v.cost) t += (x[v.name] || 0) * v.cost; }); return t; };
+    var bad = function (x) { return { status: x.status, ok: false, message: x.message }; };
     return one(m).then(function (r) {
-      if (r.status !== "optimal") return { status: r.status, ok: false, message: r.message };
-      var slack = Math.abs(r.objective + up) * share, items = {};
-      var step = function (i) {
-        if (i >= list.length) return { status: "optimal", ok: true, items: items, solves: n };
-        var key = list[i][0], terms = list[i][1];
-        return one(faceModel(m, r, terms, "min", slack)).then(function (a) {
-          if (a.status !== "optimal") return { status: a.status, ok: false, message: a.message };
-          return one(faceModel(m, r, terms, "max", slack)).then(function (b) {
-            if (b.status !== "optimal") return { status: b.status, ok: false, message: b.message };
-            var at = 0; for (var t in terms) at += (r.values[t] || 0) * terms[t];
-            items[key] = { lo: a.objective, hi: b.objective, at: at, slack: slack, objective: r.objective + up };
-            return step(i + 1);
+      if (r.status !== "optimal") return bad(r);
+      return one(m0).then(function (r0) {
+        if (r0.status !== "optimal") return bad(r0);
+        var slack = Math.abs(r0.objective + up) * share, items = {};
+        var step = function (i) {
+          if (i >= list.length) return { status: "optimal", ok: true, items: items, solves: n };
+          var key = list[i][0], terms = list[i][1];
+          return one(faceModel(m0, r0, terms, "min", slack)).then(function (a) {
+            if (a.status !== "optimal") return bad(a);
+            return one(faceModel(m0, r0, terms, "max", slack)).then(function (b) {
+              if (b.status !== "optimal") return bad(b);
+              var at = 0; for (var t in terms) at += (r.values[t] || 0) * terms[t];
+              items[key] = { lo: a.objective, hi: b.objective, at: at, slack: slack, objective: r0.objective + up, costLo: econ(a.values) + up, costHi: econ(b.values) + up, costAt: econ(r.values) + up };
+              return step(i + 1);
+            });
           });
-        });
-      };
-      return step(0);
+        };
+        return step(0);
+      });
     }).then(null, function (e) { return { status: "error", ok: false, message: String(e && e.message || e) }; });
   }
 
@@ -1143,7 +1155,7 @@
   }
 
   var E4 = { REG: REG, NEW: NEW, FOSSIL: FOSSIL, prepare: prepare, schema: schema, defaults: defaults, withPreset: withPreset, sysOf: sysOf, build: build, crf: crf, dsum: dsum,
-    hourly: hourly, stressHours: stressHours, fullYear: fullYear, seasonOfDay: seasonOfDay, newCap: newCap, read: read, capNow: capNow, merge: merge, fixedOf: fixedOf, money: money, windowsOf: windowsOf, runWindows: runWindows, planRun: planRun, shockRun: shockRun, solve: solve, shockTest: shockTest, c4Shocks: c4Shocks, presetsOf: presetsOf, summarize: summarize, faceModel: faceModel, builtTerms: builtTerms, nearRange: nearRange, nearRanges: nearRanges, resultRows: resultRows, fallbackHTML: fallbackHTML, inputsHTML: inputsHTML, tableHTML: tableHTML, planRows: planRows, esc: esc, view: view, shockView: shockView, stressMargins: stressMargins, TECHS: TECHS, rd: rd, WORDS: WORDS,
+    hourly: hourly, stressHours: stressHours, fullYear: fullYear, seasonOfDay: seasonOfDay, newCap: newCap, read: read, capNow: capNow, merge: merge, fixedOf: fixedOf, money: money, windowsOf: windowsOf, runWindows: runWindows, planRun: planRun, shockRun: shockRun, solve: solve, shockTest: shockTest, c4Shocks: c4Shocks, presetsOf: presetsOf, summarize: summarize, faceModel: faceModel, builtTerms: builtTerms, nearRange: nearRange, nearRanges: nearRanges, econModel: econModel, resultRows: resultRows, fallbackHTML: fallbackHTML, inputsHTML: inputsHTML, tableHTML: tableHTML, planRows: planRows, esc: esc, view: view, shockView: shockView, stressMargins: stressMargins, TECHS: TECHS, rd: rd, WORDS: WORDS,
     GAP: GAP, UPKEEP: UPKEEP, upkeepYear: upkeepYear, upkeepPV: upkeepPV, procure: procure, co2Of: co2Of, solveWindow: solveWindow, LIM_TOL: LIM_TOL, keptThrough: keptThrough, doneWords: doneWords, fullVerdict: fullVerdict, FULL_TOL: FULL_TOL, shockTable: shockTable, cvText: cvText,
     kilo: kilo, fix: fix, pct: pct, bn: bn, copy: copy, sum: sum, PJ_PER_MWH: PJ_PER_MWH, MWH_PER_PJ: MWH_PER_PJ };
   if (typeof module !== "undefined" && module.exports) module.exports = E4;
