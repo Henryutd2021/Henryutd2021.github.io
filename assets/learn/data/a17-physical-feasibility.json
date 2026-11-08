@@ -64,13 +64,13 @@
   "real": {
     "loudoun": {
       "mw": 1500, "points": 60, "subs": 25, "kV": 230, "when": "July 2024", "place": "Loudoun County, Virginia",
-      "source": "NERC slides on large-load integration, posted by FERC (regional-grid dossier row 19, verified 2 November 2026)",
+      "source": "NERC slides on large-load integration, posted by FERC (verified 2 November 2026)",
       "url": "https://www.ferc.gov/sites/default/files/2025-04/Presentation%20NERC%20Seeks%20to%20Address%20Reliability%20Impacts%20from%C2%A0Large%20Load%20Integration_1.pdf",
       "asOf": "posted 17 April 2025; event of July 2024"
     },
     "ercotInertia": {
       "gws": 100,
-      "source": "ERCOT, Ancillary Services Study, final white paper (regional-grid dossier, verified 2 November 2026)",
+      "source": "ERCOT, Ancillary Services Study, final white paper (verified 2 November 2026)",
       "url": "https://www.ercot.com/files/docs/2024/10/07/ERCOT-Ancillary-Services-Study-Final-White-Paper.pdf",
       "asOf": "7 October 2024"
     },
@@ -90,7 +90,7 @@
       "asOf": "updated July 2025; read 5 November 2026"
     },
     "pjm5": {
-      "source": "PJM, energy market practices for intermittent resources (regional-grid dossier, verified 2 November 2026)",
+      "source": "PJM, energy market practices for intermittent resources (verified 2 November 2026)",
       "url": "https://www.pjm.com/-/media/DotCom/committees-groups/committees/oc/2022/20220222-special/20220222-item-06-energy-market-practices-for-intermittant-resources.ashx",
       "asOf": "22 February 2022"
     }

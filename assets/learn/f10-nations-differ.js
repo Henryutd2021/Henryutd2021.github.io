@@ -443,7 +443,7 @@
       sp.links.map(function (l) { return "<tr><td>" + esc(lab[l.from]) + "</td><td>" + esc(lab[l.to]) + "</td><td>" + fmtN(l.value, l.value % 1 ? 1 : 0) + "</td></tr>"; }).join("") +
       "</tbody></table></div><p class=\"lx-hint\">" + esc(PL.about.line) + " " + esc(sp.note) + " With JavaScript on, these flows are drawn as a six-column Sankey.</p>";
   }
-  var PL_SRC = ["dossier-card", "iea-faq", "owid-primary"];
+  var PL_SRC = ["parameter-card", "iea-faq", "owid-primary"];
   function srcItem(s) {
     var t = s.url && s.url !== "no link" ? "<a href=\"" + esc(s.url) + "\">" + esc(s.title) + "</a>" : esc(s.title) + " (no link)";
     if (s.also && s.also.length) t += " (also " + s.also.map(function (a) { return "<a href=\"" + esc(a.url) + "\">" + esc(a.label) + "</a>"; }).join(", ") + ")";   // one source in several files

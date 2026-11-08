@@ -151,7 +151,7 @@ $$
 - **The exact rule.** Each hour the electrolyzer is on, between 15% and 100% of its size, or off: $3\,z_t \le \mathit{ez}_t \le 20\,z_t$ with $z_t \in \{0, 1\}$, a [mixed-integer program]{.lx-term term="mixed-integer-program"} ([M2](m02-unit-commitment.html)).
 - **Two LP stand-ins.** Drop the binary and allow any load (a relaxation, never dearer), or force $z_t = 1$ (always on, never cheaper).
 - **This winter week:** relaxed −\$178.6k, exact −\$178.6k, forced on −\$172.7k. The exact cost lies between the two, as it must.
-- **No prices from the MILP.** Its duals do not exist in the ordinary sense (§9.2); prices come from an LP with the on/off choices fixed.
+- **No prices from the MILP.** Its duals do not exist in the ordinary sense; prices come from an LP with the on/off choices fixed.
 
 ```{=html}
 </div>

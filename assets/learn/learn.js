@@ -6749,12 +6749,12 @@
    (Tab to the group, arrow keys move, Space picks); each radio's label carries its level and the anchored description,
    so the ladder is the control. The result line (aria-live) counts competences at Proficient or above. "Copy my
    self-check" copies the summary (LX.copyText: the clipboard, else select-and-copy from the visible box below it).
-   Keep VERSION fixed once testers send summaries; change it when the rubric's words change.
+   VERSION names the rubric in the summary's first line.
    Node: module.exports = { VERSION, LEVELS, COMPETENCES, competence, count, summary, staticHTML, resultText } (pure). */
 (function () {
   "use strict";
   // ---------------------------------------------------------------- the rubric (the course rubric, word for word)
-  var VERSION = "rubric v1 (curriculum v2 §3.4)";
+  var VERSION = "the course rubric";
   var LEVELS = [
     { id: "not-yet", label: "Not yet" },
     { id: "developing", label: "Developing" },

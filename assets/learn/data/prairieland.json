@@ -62,7 +62,7 @@
   },
   "set": "card: people, GDP, primary energy and its shares, the import shares, the CO2 total; teaching: the split of renewables, the workforce (A13's), everything derived below",
   "src": [
-   "dossier-card"
+   "parameter-card"
   ]
  },
  "regions": [
@@ -2601,7 +2601,7 @@
   "ipcc-2006": {
    "title": "2006 IPCC Guidelines for National Greenhouse Gas Inventories, Volume 2: Energy, chapters 1 and 2",
    "publisher": "Intergovernmental Panel on Climate Change",
-   "date": "2006; read 2 Nov 2026 for the course dossier",
+   "date": "2006; read 2 Nov 2026",
    "url": "https://www.ipcc.ch/report/2006-ipcc-guidelines-for-national-greenhouse-gas-inventories/",
    "where": "default CO2 factors on net calorific values: crude oil 73.3, natural gas 56.1, other bituminous coal 94.6 t per TJ; other bituminous coal 25.8 TJ per Gg"
   },
@@ -2622,56 +2622,56 @@
   "iea-gcmo-2025": {
    "title": "Global Critical Minerals Outlook 2025, executive summary",
    "publisher": "International Energy Agency",
-   "date": "2025; read 2 Nov 2026 for the course dossier",
+   "date": "2025; read 2 Nov 2026",
    "url": "https://www.iea.org/reports/global-critical-minerals-outlook-2025/executive-summary",
    "where": "one country is the leading refiner for 19 of 20 strategic minerals, with an average share of about 70%"
   },
   "iea-stocks": {
    "title": "Oil stocks of IEA countries",
    "publisher": "International Energy Agency",
-   "date": "read 2 Nov 2026 for the course dossier",
+   "date": "read 2 Nov 2026",
    "url": "https://www.iea.org/data-and-statistics/data-tools/oil-stocks-of-iea-countries",
    "where": "IEA members that are net importers of oil must hold stocks of at least 90 days of their net imports"
   },
   "iea-ger-2026": {
    "title": "Global Energy Review 2026: CO2 emissions",
    "publisher": "International Energy Agency",
-   "date": "20 Apr 2026; read 2 Nov 2026 for the course dossier",
+   "date": "20 Apr 2026; read 2 Nov 2026",
    "url": "https://www.iea.org/reports/global-energy-review-2026/co2-emissions",
    "where": "global energy-related CO2 about 38 Gt in 2025"
   },
   "forster-2026": {
    "title": "Forster et al. 2026, Indicators of Global Climate Change 2025, Earth System Science Data, section 9 and Table 8",
    "publisher": "Earth System Science Data (Copernicus)",
-   "date": "11 Jun 2026; read 2 Nov 2026 for the course dossier",
+   "date": "11 Jun 2026; read 2 Nov 2026",
    "url": "no link",
    "where": "remaining CO2 budget for a 50% chance of 1.5 C: about 130 Gt from the start of 2026 (a peer-reviewed update, not a new IPCC assessment)"
   },
   "eia-aeo2026": {
    "title": "Annual Energy Outlook 2026",
    "publisher": "U.S. Energy Information Administration",
-   "date": "8 Apr 2026; read 2 Nov 2026 for the course dossier",
+   "date": "8 Apr 2026; read 2 Nov 2026",
    "url": "https://www.eia.gov/outlooks/aeo/",
    "where": "modelled U.S. electricity use grows 0.9% to 1.6% a year to 2050 across the cases"
   },
   "eia-mer-13": {
    "title": "Monthly Energy Review, Table 1.3: primary energy consumption by source",
    "publisher": "U.S. Energy Information Administration",
-   "date": "October 2026 edition; read 2 Nov 2026 for the course dossier",
+   "date": "October 2026 edition; read 2 Nov 2026",
    "url": "https://www.eia.gov/totalenergy/data/browser/?tbl=T01.03",
    "where": "2025: 96.5 quads; petroleum 37%, natural gas 36%, coal 9%, renewables 9%, nuclear 8.5% (rounded)"
   },
   "eurostat-id": {
    "title": "Energy import dependency by products (nrg_ind_id)",
    "publisher": "Eurostat",
-   "date": "updated 16 Jul 2026; read 2 Nov 2026 for the course dossier",
+   "date": "updated 16 Jul 2026; read 2 Nov 2026",
    "url": "https://ec.europa.eu/eurostat/databrowser/view/nrg_ind_id/default/table",
    "where": "EU 2024: 57.3%; gas 85.0%, oil 96.6%, solid fossil fuels 34.2%"
   },
   "eia-steo-security": {
    "title": "Short-Term Energy Outlook, energy security supplement, tables 1, 2 and 4",
    "publisher": "U.S. Energy Information Administration",
-   "date": "12 Aug 2026; read 2 Nov 2026 for the course dossier",
+   "date": "12 Aug 2026; read 2 Nov 2026",
    "url": "https://www.eia.gov/outlooks/steo/report/energysecurity/article.php",
    "where": "oil flows through the Strait of Hormuz 21.6 million barrels a day in the fourth quarter of 2025 (about 21% of world supply)"
   },
@@ -2689,8 +2689,8 @@
    "url": "https://www.ncei.noaa.gov/products/us-climate-normals",
    "where": "heating degree days 4,413.6 and cooling degree days 1,773.6 (base 65 F): Capital Valley's climate, in C-days"
   },
-  "dossier-card": {
-   "title": "Prairieland parameter card (the course's national-strategy dossier, section 8.0)",
+  "parameter-card": {
+   "title": "Prairieland parameter card (compiled for this course from the sources listed)",
    "publisher": "Learn (this course)",
    "date": "fact-checked 2 Nov 2026",
    "url": "no link",

@@ -110,8 +110,8 @@ function ok(c, msg) { checks++; if (!c) { fails++; console.log("FAIL:", msg); } 
     ok(sh.indexOf('<th scope="col">Proficient (the bar for this note)</th>') > 0 && sh.indexOf("A one-page note with its plan link.") > 0 && sh.indexOf("Six-page paper") < 0, "rubric: the static table takes the bar label and the own words");
     ok(RB.staticHTML(["accounting"]).indexOf('<th scope="col">Proficient (the bar)</th>') > 0 && RB.staticHTML(["accounting"]) === RB.staticHTML(["accounting"], {}), "rubric: without options, the static table is unchanged");
     const sm = RB.summary([own], { communication: "proficient" }, { code: "C1" }).split("\n");
-    ok(sm[0] === "Learn · C1 self-check (rubric v1 (curriculum v2 §3.4); Communication in C1's own words)" && sm[1] === "Communication: Proficient — A one-page note with its plan link.", "rubric: the summary says which competences use the capstone's own words (" + sm[0] + ")");
-    ok(RB.summary(["framing"], {}, { code: "R1" }).split("\n")[0] === "Learn · R1 self-check (rubric v1 (curriculum v2 §3.4))", "rubric: a studio's summary line is unchanged");
+    ok(sm[0] === "Learn · C1 self-check (the course rubric; Communication in C1's own words)" && sm[1] === "Communication: Proficient — A one-page note with its plan link.", "rubric: the summary says which competences use the capstone's own words (" + sm[0] + ")");
+    ok(RB.summary(["framing"], {}, { code: "R1" }).split("\n")[0] === "Learn · R1 self-check (the course rubric)", "rubric: a studio's summary line is unchanged");
     ok(RB.resultText({ rated: 2, atBar: 2, total: 2, all: true }, "the bar for this note") === "2 of 2 at Proficient or above: the bar for this note, on these competences." &&
        RB.resultText({ rated: 2, atBar: 1, total: 2, all: false }, "the bar for this note") === "1 of 2 at Proficient or above; Proficient on every competence is the bar for this note." &&
        RB.resultText({ rated: 1, atBar: 1, total: 1, all: true }) === "1 of 1 at Proficient or above: the bar for the readiness claim, on these competences.", "rubric: the result line names the bar it was given; the default is unchanged");
@@ -124,7 +124,7 @@ function ok(c, msg) { checks++; if (!c) { fails++; console.log("FAIL:", msg); } 
     rb.set("communication", "proficient");
     ok(host.querySelector(".lx-rb-result").textContent === "1 of 1 at Proficient or above: the bar for this note, on these competences.", "rubric view: the result line names this bar");
     const vs = rb.summary().split("\n");
-    ok(vs[0] === "Learn · C1 self-check (rubric v1 (curriculum v2 §3.4); Communication in C1's own words)" && vs[1] === "Communication: Proficient — A one-page note with its plan link." && vs[2] === "1 of 1 at Proficient or above: the bar for this note, on these competences.",
+    ok(vs[0] === "Learn · C1 self-check (the course rubric; Communication in C1's own words)" && vs[1] === "Communication: Proficient — A one-page note with its plan link." && vs[2] === "1 of 1 at Proficient or above: the bar for this note, on these competences.",
        "rubric view: the copied summary keeps the own words and the bar (" + vs.slice(0, 3).join(" | ") + ")");
     // C0 and C1 use them; the research studios do not
     const c0 = JSON.parse(rd("data/c0-behind-one-meter.json")).rubric, c1 = require(L("c1-keep-the-campus-running.js"));

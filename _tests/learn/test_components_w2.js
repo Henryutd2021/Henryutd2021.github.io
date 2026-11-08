@@ -135,7 +135,7 @@ ok(bad, "rubric: an unknown competence throws");
 const n1 = RB.count(["framing", "method", "trust"], { framing: "strong", method: "proficient", trust: "developing" });
 ok(n1.rated === 3 && n1.atBar === 2 && !n1.all && RB.count(["framing"], { framing: "proficient" }).all && RB.count(["framing"], {}).rated === 0, "rubric: count of rated and at-the-bar competences");
 const sum = RB.summary(["framing", "method"], { framing: "proficient" }, { code: "R1" });
-ok(sum === "Learn · R1 self-check (rubric v1 (curriculum v2 §3.4))\nFraming: Proficient — Typed question with audience or decision-maker, metric with units, counterfactual, scale and boundary; one falsification statement.\nMethod fit: not rated\n1 of 2 at Proficient or above; Proficient on every competence is the bar.", "rubric: the copied summary");
+ok(sum === "Learn · R1 self-check (the course rubric)\nFraming: Proficient — Typed question with audience or decision-maker, metric with units, counterfactual, scale and boundary; one falsification statement.\nMethod fit: not rated\n1 of 2 at Proficient or above; Proficient on every competence is the bar.", "rubric: the copied summary");
 ok(RB.summary(["framing"], { framing: "strong" }).split("\n")[2] === "1 of 1 at Proficient or above: the bar for the readiness claim, on these competences.", "rubric: the summary when every competence reaches the bar");
 const rbh = RB.staticHTML([{ id: "positioning", look: "At least <12> sources." }]);
 ok(rbh.indexOf("<th scope=\"col\">Proficient (the bar)</th>") >= 0 && rbh.indexOf("Concept matrix of at least 12 sources; a stated gap with evidence.") >= 0 && rbh.indexOf("At least &lt;12&gt; sources.") >= 0 && rbh.indexOf('data-l="Strong"') >= 0, "rubric: staticHTML table with the bar, the words, an escaped look line and labelled cells");
@@ -160,7 +160,7 @@ ok(rbh.indexOf("<th scope=\"col\">Proficient (the bar)</th>") >= 0 && rbh.indexO
   ok(fss[1].querySelectorAll("input")[2].checked && rb.picks().method === "proficient" && /2 of 2 .*the bar for the readiness claim/.test(res.textContent) && changes.length === 1, "rubric view: set() picks without onChange");
   buttons(host, /Copy my self-check/)[0].click(); await tick();
   const box = host.querySelector(".lx-rb-copy"), area = box.querySelector("textarea");
-  ok(!box.hidden && area.value.split("\n")[0] === "Learn · R3 self-check (rubric v1 (curriculum v2 §3.4))" && /^Rated on \d{4}-\d{2}-\d{2}$/.test(area.value.split("\n").pop()), "rubric view: Copy shows the summary with the date");
+  ok(!box.hidden && area.value.split("\n")[0] === "Learn · R3 self-check (the course rubric)" && /^Rated on \d{4}-\d{2}-\d{2}$/.test(area.value.split("\n").pop()), "rubric view: Copy shows the summary with the date");
   ok(box.querySelector("p").textContent === "Select the text and copy it.", "rubric view: without a clipboard it says to select and copy");
   buttons(host, /Clear my ratings/)[0].click();
   ok(rb.picks().framing === null && res.textContent === "Pick a level for each competence." && box.hidden && r0.every(i => !i.checked), "rubric view: Clear");
