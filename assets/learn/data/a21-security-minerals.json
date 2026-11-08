@@ -80,6 +80,7 @@
     "ban": "During the restriction, the other supply groups deliver only their usual shares and recycled material is domestic; nothing else is bought.",
     "fire": "The fire stops the main site; a second site, if any, can run up to its full capacity.",
     "jobs": "Jobs at each site in proportion to its capacity; job-years before any work elsewhere.",
+    "parallel": "The rows are separate stress tests: a cut in gas use lowers the LNG bill in a price spike, but not the LNG a closure stops.",
     "overlap": "Combined, month by month: the factory makes what its scarcest mineral and its open sites allow, up to its 2025 output; minerals that arrive while it is shut wait in stock.",
     "overlapCount": "Cells made after the restriction ends are not counted; the fire's timing matters only when the restriction is on too.",
     "set": "teaching: every assumption in this block"
@@ -203,7 +204,7 @@
         "why": {
           "spike": "Every unit not bought avoids the higher price.",
           "closure": "Less oil to replace while the strait is closed.",
-          "ban": "Electrifying more needs more batteries, not fewer minerals.",
+          "ban": "On this page, using less changes gas and oil use only; the factory's mineral need stays the same.",
           "fire": "It does not make cells."
         }
       }

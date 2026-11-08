@@ -1531,7 +1531,7 @@
  },
  "gross-calorific-value": {
   "term": "Gross calorific value",
-  "short": "The heat a fuel gives when burned, counting the heat won back by condensing the water vapour it forms; it is a little higher than the net value, which the IEA and Eurostat use.",
+  "short": "The heat a fuel gives when burned, counting the heat won back by condensing the water vapor it forms; it is a little higher than the net value, which the IEA and Eurostat use.",
   "lesson": "F10",
   "href": "f10-nations-differ.html"
  },
@@ -1675,7 +1675,7 @@
  },
  "implied-carbon-price": {
   "term": "Implied carbon price",
-  "short": "A carbon price found so that a plan just meets an emissions limit, not set in advance: on a page that tries prices, the lowest that meets it; in a least-cost model, the limit's shadow price.",
+  "short": "A carbon price found, not set in advance, so that a plan just meets an emissions limit: on a page that tries prices, the lowest that meets it; in a least-cost linear program, the limit's shadow price, the cost saved per tonne by a small relaxation.",
   "lesson": "A20",
   "href": "a20-national-scenarios.html"
  },
@@ -2053,7 +2053,7 @@
  },
  "market-coupling": {
   "term": "Market coupling",
-  "short": "Joining neighbouring power markets so that one calculation sets their prices and the flows between them, sending power toward higher prices until the links are full.",
+  "short": "Joining neighboring power markets so that one calculation sets their prices and the flows between them, sending power toward higher prices until the links are full.",
   "lesson": "F10",
   "href": "f10-nations-differ.html"
  },
@@ -2741,6 +2741,12 @@
   "lesson": "F9",
   "href": "f09-city-energy.html"
  },
+ "quad": {
+  "term": "Quad",
+  "short": "A quadrillion (10^15) British thermal units, about 1.055 exajoules; the unit of national energy statistics in the United States.",
+  "lesson": "F10",
+  "href": "f10-nations-differ.html"
+ },
  "quartile": {
   "term": "Quartile",
   "short": "The values that cut a sorted set into four equal parts: 25% of values lie below the first, 50% below the second (the median), 75% below the third.",
@@ -2854,6 +2860,12 @@
   "short": "A decision made after the uncertainty resolves, such as how hard to run a plant in each branch; it can differ from branch to branch.",
   "lesson": "M8",
   "href": "m08-stochastic-robust.html"
+ },
+ "refining": {
+  "term": "Refining (of minerals)",
+  "short": "Processing mined ore or concentrate into the pure chemicals and materials a factory can use, such as battery-grade lithium chemicals or graphite.",
+  "lesson": "A21",
+  "href": "a21-security-minerals.html"
  },
  "refuelling-outage": {
   "term": "Refuelling outage",
@@ -3503,6 +3515,18 @@
   "short": "A contract in which the buyer pays the owner of a plant a fixed fee for the right to run it, and keeps what it earns.",
   "lesson": "A2",
   "href": "a02-contracts-risk.html"
+ },
+ "coal-equivalent": {
+  "term": "Ton of coal equivalent (tce)",
+  "short": "An energy unit equal to the heat in one metric ton of standard coal, fixed by convention at 29.3076 GJ; China's energy statistics count in it.",
+  "lesson": "F10",
+  "href": "f10-nations-differ.html"
+ },
+ "oil-equivalent": {
+  "term": "Ton of oil equivalent (toe)",
+  "short": "An energy unit equal to the heat in one metric ton of crude oil, fixed by convention at 41.868 GJ; ktoe is a thousand of them, Mtoe (Brazil's Mtep) a million.",
+  "lesson": "F10",
+  "href": "f10-nations-differ.html"
  },
  "tornado-chart": {
   "term": "Tornado chart",

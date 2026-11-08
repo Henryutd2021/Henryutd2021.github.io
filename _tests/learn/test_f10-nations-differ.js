@@ -16,11 +16,17 @@
 //     number in the facts table is recomputed
 //   - shares: every drawn source classed on its own (fossil, renewable, or neither; Norway's unsplit waste stays apart),
 //     recomputed here from the published rows; China's and India's coverage said beside every row and line
-//   - boundaries: the U.S. end-use note; country-specific sector names; useful energy named a what-if wherever it shows
+//   - boundaries: the U.S. end-use note; U.S. non-combustion use taken from the sectors EIA assigns it to (industry, and
+//     transport's lubricants, MER Tables 1.13b and 3.8c); country-specific sector names; useful energy named a what-if
+//     wherever it shows, with the sector efficiencies and one worked multiplication beside it
+//   - step 4 shows the predicted metric (the renewable share) first; the nuclear, hydro, wind and solar grouping second,
+//     named and told apart; coverage caveats are their own element beside each step line
+//   - the no-JS block carries every lens (imports, resources, climate, institutions); dated sources for the institutions
+//     lens; units, heat rate and LNG explained where they appear
 //   - scope (the course's scope rules, copied below; the scope scan is the canonical judge): the deny-list
 //     and the nuclear-plus-risk rule over every string the page loads (its data, the regional cards, the Prairieland
 //     strings it shows, the path entries it names) and its own text; links only to the allowed domains (others "no link"); the
-//     fictional line wherever Prairieland is drawn; the text budget of every note, line, preview, feedback and cell
+//     fictional line wherever Prairieland is drawn; the text budget (35 words) of every note, line, preview, feedback and cell
 // Usage (from the site folder):  node _tests/learn/test_f10-nations-differ.js [--write]
 "use strict";
 const fs = require("fs");
@@ -74,6 +80,15 @@ const C = k => D.countries.filter(c => c.key === k)[0];
   ok(us.primary.solar > us.twh.solar * 3412e-6, "US: solar's primary value holds its electricity (with small-scale) and a little solar heat");
   const eff = us.twh.nuclear * 3412e-6 / us.primary.nuclear; ok(eff > 0.32 && eff < 0.34, "US: nuclear at its plants' heat rate, an efficiency of " + (100 * eff).toFixed(1) + "%");
   const P = M.pubOf(us); ok(near(P.residential + P.commercial + P.industrial + P.transportation, 76.788223, 1e-6), "US: end-use sectors add to 76.788 quads");
+  // MER October 2026: Table 1.13b non-combustion use 6.540 quads in 2025, all industrial except some lubricants used in
+  // transportation (its note); Note 3: all lubricants are non-combustion; Table 3.8c: transportation lubricants 104 trillion Btu
+  // (Table 3.8b: industrial lubricants 95; together Table 1.13b's 0.200)
+  ok(near(P.nonfuel, 6.540, 0.0005) && P.lubTransport === 0.104 && near(0.104 + 0.095, 0.200, 0.0015), "US: non-combustion use 6.540 quads; transport's lubricants 0.104 (Tables 1.13b, 3.8c and 3.8b agree)");
+  ok(JSON.stringify(us.final.industry) === JSON.stringify(["industrial", "-nonfuel", "lubTransport"]) && JSON.stringify(us.final.transport) === JSON.stringify(["transportation", "-lubTransport"]), "US: non-combustion use taken from industry, except transport's lubricants, taken from transport");
+  const usN = M.nation(D, us);
+  ok(near(usN.final.industry, (P.industrial - (P.nonfuel - 0.104)) * 1055.06, 1e-6) && near(usN.final.transport, (P.transportation - 0.104) * 1055.06, 1e-6), "US: industry " + (usN.final.industry / 1000).toFixed(2) + " EJ, transport " + (usN.final.transport / 1000).toFixed(2) + " EJ after the split");
+  ok(near(usN.finalTotal, (76.788223 - P.nonfuel) * 1055.06, 1e-6) && near(usN.nonEnergy, P.nonfuel * 1055.06, 1e-9), "US: the split moves energy between sectors only: final and non-energy totals unchanged");
+  ok(/0\.104 quads of lubricants taken from transport \(Table 3\.8c\), the rest from industry \(Table 1\.13b\)/.test(us.prov.adjust) && /3\.8c \(transportation-sector petroleum, with lubricants\)/.test(D.sources["eia-mer"].title) && /non-combustion use 6\.540 quads, all industrial except the transportation sector's lubricants, 0\.104/.test(D.sources["eia-mer"].where) && /Tables 1\.13b and 3\.8c on 8 November 2026/.test(D.sources["eia-mer"].date), "US: the split said in the provenance and the source note, with its tables and access date");
   ok(near(P.residential + P.commercial + P.industrial + P.transportation + 19.672147, us.total, 0.01), "US: end use plus electrical system losses (19.672 quads, Tables 2.2 to 2.5) is the primary total");
   const eu = C("eu"), el = sum(Object.values(eu.primary)), euOther = eu.total - el;
   ok(near(eu.primary.geoheat, 278962.497 + 800099.994 + 1684.076, 1e-6), "EU: geothermal, ambient heat and tide (TJ, nrg_bal_c) drawn as one renewable source");
@@ -152,9 +167,9 @@ L.forEach(N => {
   ok(near(N.published, c.total / 1000, 1e-9) && near(P.total, N.published - back, 1e-5) && near(P.total, 16897.2, 0.1), "Japan: METI's 17,461 PJ becomes " + P.total.toFixed(1) + " PJ by physical content");
   ok(near(N.pubRenewable, 2101617.303 / 17461344.373, 1e-6) && near(P.renewable, 0.0776, 0.0005) && near(P.fossil, 0.8281, 0.0005), "Japan: renewables 12.0% as METI counts them, 7.8% by physical content; fossil fuels 83%");
   ok(near(M.primaryAs(D, N, "de").v.geo, pe.gwh.geo * 3.6 / 1000, 1e-9) && near(M.primaryAs(D, N, "sub").v.geo, pe.gwh.geo * 3.6 / 1000 / 0.4, 1e-9), "Japan's geothermal: its electricity by direct equivalent, ÷ 0.40 by substitution");
-  const jl = M.japanLine(D, L);
-  ok(jl.indexOf(M.fmtN(pe.mjPerKWh, 2) + " MJ") > 0 && jl.indexOf(M.pct(3.6 / pe.mjPerKWh, 1)) > 0 && jl.indexOf(M.ej(P.total) + ", not " + M.ejNum(N.published)) > 0 && jl.indexOf(M.pct(P.renewable, 1) + ", not " + M.pct(N.pubRenewable, 1)) > 0, "Japan's official convention shown beside the conversion: " + jl.slice(0, 60));
-  ok(/text: japanLine\(D, L\)/.test(JS) && M.staticFallback(D, L, E).indexOf("<li><b>Japan.</b> " + jl) > 0 && M.substHTML(D, L).indexOf("Japan's balance</b> is a substitution at 8.49 MJ per kWh") > 0, "the Japan line in step 4, the no-JS block and the substitution box");
+  const jr = M.japanRule(D, L), js = M.japanResult(D, L);
+  ok(jr.indexOf(M.fmtN(pe.mjPerKWh, 2) + " MJ") > 0 && jr.indexOf(M.pct(3.6 / pe.mjPerKWh, 1)) > 0 && js.indexOf(M.ej(P.total) + ", not METI's " + M.ej(N.published)) > 0 && js.indexOf(M.pct(P.renewable, 1) + ", not " + M.pct(N.pubRenewable, 1)) > 0, "Japan's official convention and the conversion, as two elements: " + jr.slice(0, 40) + " | " + js.slice(0, 40));
+  ok(/text: japanRule\(D, L\)/.test(JS) && /text: japanResult\(D, L\)/.test(JS) && M.staticFallback(D, L, E).indexOf("<li><b>Japan.</b> " + jr + "</li><li><b>Japan, converted.</b> " + js + "</li>") > 0 && M.substHTML(D, L).indexOf("Japan's balance</b> is a substitution at 8.49 MJ per kWh") > 0, "the Japan rule and result in step 4, the no-JS block, and the substitution box");
   ok(M.primaryTag(N) === " (converted)" && M.primaryTag(byKey("cn")) === " (estimate)" && M.primaryTag(byKey("pl")) === "" && M.staticFallback(D, L, E).indexOf(M.ej(P.total) + " (converted)") > 0, "Japan's total labelled as the page's conversion; China's as its estimate");
   ok(c.year === "fiscal year 2024 (April 2024 to March 2025)" && M.viewLine(D, N).indexOf(c.year) > 0, "Japan: the fiscal year labelled, April to March");
 }
@@ -229,16 +244,18 @@ M.SECTORS.forEach(s => { const k = { industry: "industry", transport: "transport
   Object.keys(cov).forEach(k => {
     const N = byKey(k);
     ok(N.coverage && N.coverage.indexOf(cov[k]) >= 0, k + ": coverage named");
-    ok(M.viewLine(D, N).indexOf(N.coverage) > 0 && M.convLine(D, N, "pec").indexOf(N.coverage) > 0 && (N.noFinal || M.accountLine(D, N, E).indexOf(N.coverage) > 0), k + ": coverage beside the step lines");
+    ok(M.covNote(N) === "**Coverage, " + M.nameOf(N) + ":** " + N.coverage + "." && [M.viewLine(D, N), M.convLine(D, N, "pec"), N.noFinal ? "" : M.accountLine(D, N, E)].every(s => s.indexOf(N.coverage) < 0), k + ": coverage its own element, not inside the step lines");
     ok(M.staticFallback(D, L, E).indexOf(N.coverage.charAt(0).toUpperCase() + N.coverage.slice(1)) > 0, k + ": coverage beside its no-JS rows");
   });
   {   // Japan's coverage carries a glossary mark: drawn as a term in the no-JS rows and the convention table, never as raw markup
     const N = byKey("jp"), fb = M.staticFallback(D, L, E);
     ok(/converted from METI's counting of electricity/.test(N.coverage) && /gross-calorific-value\|gross calorific value/.test(N.coverage) && /waste and recovered heat counted/.test(N.coverage), "jp: coverage named (conversion, gross calorific value, waste and recovered heat)");
-    ok([M.viewLine(D, N), M.convLine(D, N, "pec"), M.accountLine(D, N, E)].every(s => s.indexOf(N.coverage) > 0), "jp: coverage beside the step lines");
+    ok((JS.match(/setCov\(cov, N\)/g) || []).length === 3 && /ln\.innerHTML = bold\(viewLine\(D, N\)\); setCov\(cov, N\)/.test(JS) && /ln\.innerHTML = bold\(accountLine\(D, N, E\)\); setCov\(cov, N\)/.test(JS) && /ln\.innerHTML = bold\(convLine\(D, N, last\.conv\)\); setCov\(cov, N\)/.test(JS), "coverage shown beside the step 2, 3 and 4 lines, as its own element");
+    ok(L.filter(n => !n.coverage).every(n => M.covNote(n) === ""), "no coverage element for a country without a caveat");
     ok(fb.indexOf("<small>Converted from METI's counting of electricity; fuels at <span class=\"lx-term\" data-term=\"gross-calorific-value\">gross calorific value</span>; waste and recovered heat counted</small>") > 0 && !/\[\[/.test(fb), "jp: coverage beside its no-JS rows, the term marked");
-    ok(/LX\.rich\(covTag\(byKey\(L, r\.key\)\)\)/.test(JS) && /richStatic\(N\.coverage/.test(JS), "coverage rendered with its marks in the convention table and the no-JS rows");
-    ok(/Japan's counts waste and recovered heat as a source/.test(M.COMPARE_NOTE), "the comparison note names Japan's coverage");
+    const ct = M.convTableHTML(D, L, "pec", "renewable");
+    ok(ct.indexOf("<small>Converted from METI's counting of electricity; fuels at <span class=\"lx-term\" data-term=\"gross-calorific-value\">gross calorific value</span>") > 0 && !/\[\[/.test(ct) && /richStatic\(N\.coverage/.test(JS) && /convTableHTML\(D, L, cv, "renewable", LX\.rich\)/.test(JS), "coverage rendered with its marks in the convention tables and the no-JS rows");
+    ok(/Japan's counts waste and recovered heat/.test(M.COMPARE_NOTE), "the comparison note names Japan's coverage");
   }
   ok(M.checkHTML(D, L, E).indexOf("of the sources its balance covers (" + byKey("in").coverage + ")") > 0, "India's quiz answer: share of the sources covered");
   ok(!/ranked: true|By fossil share/.test(JS) && /Listed in the course's order, not ranked/.test(M.COMPARE_NOTE), "no ranking of countries in the comparison table");
@@ -261,16 +278,64 @@ M.SECTORS.forEach(s => { const k = { industry: "industry", transport: "transport
   ok(D.units.mtep.note === "1 tep = 10⁷ kcal = 41.868 GJ" && near(1e7 * 4186.8 / 1e9, 41.868, 1e-9), "1 tep = 10⁷ kcal = 41.868 GJ (1 kcal = 4,186.8 J)");
   // step 4 starts on the predicted country, with a country switch
   ok(M.convStartKey(D) === D.mystery.key && /last\.key = convStartKey\(D\)/.test(JS) && /seg\(res, "Country for the line below"/.test(JS), "step 4: the reveal starts on Norway, and the reader can switch country");
+  {   // the table beside the prediction shows the predicted metric; the four-source grouping comes second, named
+    const na = M.primaryAs(D, no, "pec"), nb = M.primaryAs(D, no, "sub"), t1 = M.convTableHTML(D, L, "sub", "renewable"), t2 = M.convTableHTML(D, L, "sub", "elec");
+    const row = (t, name) => (t.match(new RegExp("<tr><th scope=\"row\">" + name + "[^]*?</tr>")) || [""])[0];
+    ok(row(t1, "Norway").indexOf("<td>" + M.pct(na.renewable) + "</td>") > 0 && row(t1, "Norway").indexOf("<td class=\"on\">" + M.pct(nb.renewable) + "</td>") > 0 && M.convQ(D, L).feedback.rises.indexOf(M.pct(na.renewable) + " by physical energy content and " + M.pct(nb.renewable)) > 0, "step 4: the first table shows Norway's renewable share, " + M.pct(na.renewable) + " → " + M.pct(nb.renewable) + ", as the prediction's feedback does");
+    ok(row(t2, "Norway").indexOf("<td>" + M.pct(na.elec) + "</td>") > 0 && /share you predicted/.test(t1) && /four sources the conventions count differently/.test(t2), "step 4: the second table, nuclear, hydro, wind and solar (" + M.pct(na.elec) + "), captioned apart");
+    const en = M.elecNote(D, L); ok(en.indexOf("leaves out bioenergy") > 0 && en.indexOf(M.pct(na.elec) + " there, " + M.pct(na.renewable) + " above") > 0, "step 4: the note between the tables says why Norway reads " + M.pct(na.elec) + " there");
+    ok(JS.indexOf('tbHost.innerHTML = convTableHTML(D, L, cv, "renewable", LX.rich)') > 0 && JS.indexOf('text: elecNote(D, L)') > JS.indexOf("var tbHost = ") && JS.indexOf("var tbHost2 = ") > JS.indexOf("text: elecNote(D, L)"), "step 4: renewable table, then the note, then the four-source table");
+    const cl = M.convLine(D, no, "sub"); ok(cl.indexOf("renewables " + M.pct(nb.renewable)) > 0 && cl.indexOf("nuclear, hydro, wind and solar " + M.pct(nb.elec)) > 0, "step 4's line names both shares");
+    ok(D.conventions.every(c => M.convUsers(c) === (c.who ? "Used by " + c.who + "." : c.note)) && /who\.textContent = C\.text; whoBy\.textContent = convUsers\(C\)/.test(JS), "step 4: a convention's rule and its users as two elements");
+  }
+  // step 3: primary energy defined without implying imports
+  ok(!/Primary energy\]\] enters/.test(M.STEPS[2]) && /home-grown or imported, before conversion/.test(M.STEPS[2]), "step 3: primary energy is energy as found in nature, home-grown or imported");
+  {   // the useful view: the efficiencies applied and one multiplication, in step 3 and the no-JS block
+    const ur = M.usefulRows(D, us, E), ut = M.usefulTableHTML(D, us, E), wl = M.workedLine(D, us, E), U = M.useful(us, E);
+    ok(ur.every(r => near(r.eff, E[r.s], 1e-12) && near(r.useful, r.final * E[r.s], 1e-9)) && near(sum(ur.map(r => r.useful)), U.total, 1e-9), "useful table: each sector's final × Prairieland's efficiency is its useful energy");
+    ok(["85.5%", "30.7%", "89.8%"].every(x => ut.indexOf("<td>" + x + "</td>") > 0) && ut.indexOf("<td>" + M.ej(U.total) + "</td>") > 0 && /How the what-if is computed for the United States/.test(ut), "useful table: the U.S. at industry 85.5%, transport 30.7%, buildings 89.8%; total " + M.ej(U.total));
+    const tr = ur.filter(r => r.s === "transport")[0]; ok(wl.indexOf(M.ej(tr.final) + " × " + M.pct(tr.eff, 1) + " ≈ " + M.ej(tr.useful)) > 0 && /a what-if/.test(wl), "worked example: " + wl.replace(/\*\*/g, ""));
+    ok(near(M.effs(PL).other, PL.balance.useful.bySector.agriculture / sum(Object.values(PL.balance.final.agriculture)), 1e-12) && M.pct(E.other, 1) === "47.8%", "the farms efficiency, 47.8%, is Prairieland's own");
+    ok(M.usefulTableHTML(D, byKey("pl"), E).indexOf("Prairieland's own useful energy") > 0 && !/what-if/.test(M.workedLine(D, byKey("pl"), E)) && M.usefulTableHTML(D, byKey("cn"), E) === "", "useful table: Prairieland's own, not a what-if; none for China");
+    const fbu = M.staticFallback(D, L, E); ok(fbu.indexOf(ut) > 0 && fbu.indexOf(M.richStatic(wl)) > 0 && fbu.indexOf(M.EFF_NOTE) > 0 && /illustrative averages, not measurements/.test(M.EFF_NOTE), "no-JS: the efficiencies, the table and the worked example");
+    ok(/how\.innerHTML = spec && last\.view === "useful" \? "<div class=\\"lx-scroll-x\\">" \+ usefulTableHTML\(D, N, E\)/.test(JS) && /bold\(workedLine\(D, N, E\)\)/.test(JS) && /LX\.esc\(EFF_NOTE\)/.test(JS), "step 3: the useful view shows the table, the worked example and the efficiencies' note");
+    // Prairieland's useful note is the page's own, its numbers read from Prairieland's file; no attribution the page cannot date
+    const ef = PL.balance.useful.efficiency, pn = M.plUsefulNote(PL);
+    ok(pn.indexOf("engines " + M.pct(ef.transport.oil)) > 0 && pn.indexOf("EVs " + M.pct(ef.transport.el)) > 0 && pn.indexOf("75% to 80%") > 0 && /set for teaching/.test(pn) && !/DOE|\.json/.test(pn), "Prairieland's useful note: " + pn.slice(0, 70));
+    ok(/N\.PL \? plUsefulNote\(N\.PL\)/.test(JS) && !/balance\.useful\.note/.test(JS), "step 3 shows the page's own Prairieland note, not the shared file's");
+  }
   // step 6: Ember keeps its label as a compiler; system and number are separate short elements
   L.filter(N => M.cardOf(R, N.card)).forEach(N => {
     const cp = M.cardPreview(R, N), s = R.sources[M.cardOf(R, N.card).numbers[0].src];
     ok(!/ember/i.test(s.publisher) || cp.cite.indexOf("Ember, a compiler of official statistics") === 0, N.key + ": Ember named as a compiler in the preview");
-    ok(cp.system.replace(/\[\[[^|]+\|([^\]]+)\]\]/g, "$1").split(/\s+/).length <= 35 && (cp.number + " " + cp.cite).replace(/\[\[[^|]+\|([^\]]+)\]\]/g, "$1").split(/\s+/).length <= 40, N.key + ": preview parts within the budget");
+    ok(cp.system.replace(/\[\[[^|]+\|([^\]]+)\]\]/g, "$1").split(/\s+/).length <= 35 && ("One key number: " + cp.number).replace(/\[\[[^|]+\|([^\]]+)\]\]/g, "$1").split(/\s+/).length <= 35, N.key + ": preview parts within the budget");
   });
+  ok(/html: "One key number: " \+ LX\.rich\(cp\.number\) \}/.test(JS) && /text: "Source: " \+ cp\.cite/.test(JS), "step 6: the key number and its source as two elements");
   // the no-JS block holds a worked flow table and the primary, final and useful table
   const fb = M.staticFallback(D, L, E), ws = M.primarySpec(D, byKey(M.FLOW_KEY), "pec");
   ok(fb.indexOf("One balance, flow by flow") > 0 && ws.links.every(l => fb.indexOf("<td>" + M.ejNum(l.value) + "</td></tr>") > 0), "no-JS: the U.S. flows, every one");
   ok(fb.indexOf("Primary, final and useful energy") > 0 && L.filter(N => !N.noFinal).every(N => fb.indexOf(M.ej(M.useful(N, E).total)) > 0) && fb.indexOf(M.USEFUL_NOTE) > 0, "no-JS: primary, final and useful for each country, with the what-if note");
+  {   // the no-JS block holds every lens, as the live table does
+    const fbl = M.staticFallback(D, L, E);
+    ok(fbl.indexOf("Three more lenses: resources, climate and institutions") > 0 && L.every(N => M.FALLBACK_LENSES.every(k => fbl.indexOf("<td data-l=\"" + D.lenses.filter(l => l.key === k)[0].label + "\">" + M.richStatic(M.lensCell(D, N, k)) + "</td>") > 0)) && !/\[\[/.test(fbl), "no-JS: resources, climate and institutions for all " + L.length + " (imports in the first table)");
+    ok(M.climateText(byKey("cn")) === "not shown: its final energy is not on the others' basis" && !/see step 3/.test(RAW + JS), "China's climate cell reads without the steps");
+  }
+  {   // the institutions lens: the EU's unbundling as the Commission states it; Norway's dated market change from its operator
+    const eu = C("eu"), no2 = C("no"), ec = D.sources["ec-unbundling"], st = D.sources["statnett-fbmc"];
+    ok(!/Separate companies make, carry and sell/.test(RAW) && /Grid operation is kept apart from power generation and sales/.test(eu.institutions) && /independently run subsidiaries/.test(eu.institutions) && eu.src.indexOf("ec-unbundling") >= 0, "EU: unbundling separates grid operation from generation and sales, by company or independent subsidiary");
+    ok(/separates the operation of transmission networks from supply and generation/.test(ec.where) && /independent transmission system operator, a subsidiary/.test(ec.where) && /read 8 November 2026/.test(ec.date) && /^https:\/\/energy\.ec\.europa\.eu\//.test(ec.url), "EU: the European Commission's unbundling page, read 8 November 2026");
+    ok(/since October 2024 the Nordic day-ahead market uses/.test(no2.institutions) && !/Nord Pool's/.test(no2.institutions) && no2.src.indexOf("statnett-fbmc") >= 0 && /went live on 29 October 2024/.test(st.where) && /^1 November 2024; read 8 November 2026$/.test(st.date) && /^Statnett/.test(st.publisher), "Norway: the October 2024 change dated by its operator, Statnett (1 November 2024)");
+    ok(D.countries.every(c => c.src.every(k => D.sources[k])), "every country's sources are in the source list");
+    const sh = M.sourcesHTML(D, PL), cut = sh.indexOf("The institutions lens, beyond the regional cards:");
+    ok(cut > 0 && ["ec-unbundling", "statnett-fbmc"].every(k => sh.indexOf(D.sources[k].title) > cut) && sh.indexOf(D.sources["eia-mer"].title) < cut, "sources: the lens sources listed apart from the seven balances");
+  }
+  {   // units, heat rate and LNG explained where they show
+    const nh = M.notesHTML(D), uk = Object.keys(D.units).filter(u => D.units[u].key);
+    ok(nh.indexOf("<p class=\"lx-eyebrow\">Units as published</p>") === 0 && uk.length === 6 && uk.every(u => nh.indexOf(M.richStatic(D.units[u].key)) > 0), "the provenance box opens with a key to the six published units");
+    ok(D.units.quad.key.indexOf("1 quad = 1.05506 EJ") > 0 && D.units.ktoe.key.indexOf("1 toe = 41.868 GJ") > 0 && D.units.mtep.key.indexOf("41.868 GJ") > 0 && D.units.tce4.key.indexOf("29.3076 GJ") > 0 && D.units.twh.key.indexOf("3.6 PJ") > 0, "the units key agrees with the conversion factors");
+    ok(/\[\[quad\|quads\]\]/.test(C("us").prov.published) && /\[\[heat-rate\|heat rate\]\]/.test(C("us").prov.method) && /\[\[oil-equivalent\|ktoe\]\]/.test(C("in").prov.published) && /\[\[oil-equivalent\|Mtep\]\]/.test(C("br").prov.published) && !/\[\[/.test(nh), "quads, heat rate, ktoe and Mtep marked where they first show; marks rendered");
+    ok(/data-term="heat-rate">heat rate<\/span> \(the U\.S\.\)/.test(M.substHTML(D, L)) && M.plFullHTML(PL).indexOf(M.richStatic(M.LNG_NOTE)) > 0 && /LX\.rich\(LNG_NOTE\)/.test(JS), "heat rate marked in the substitution box; LNG explained under Prairieland's full balance");
+  }
   // provenance: one field per cell; its numbers agree with the data
   D.countries.forEach(c => ok(M.PROV_COLS.every(p => c.prov[p[0]] && c.prov[p[0]].split(/\s+/).length <= 35), c.key + ": provenance in four short fields"));
   ok(C("us").prov.published.indexOf(M.fmtN(C("us").total, 1)) === 0 && C("us").prov.adjust.indexOf(M.fmtN(C("us").pub.nonfuel, 1) + " quads") > 0, "US provenance: 96.5 and 6.5 quads");
@@ -297,7 +362,7 @@ M.SECTORS.forEach(s => { const k = { industry: "industry", transport: "transport
   // every string the page loads: its own data, the regional cards, the Prairieland strings it shows, the path entries it names
   const PATHJ = require(L_("data/path.json")), named = new Set(["A20", "A21", "M13", "X3", "X2", "F4", "F3"]);
   const pathStrs = []; (function walk(x) { if (x && typeof x === "object") { if (named.has(x.code) || named.has(x.id)) pathStrs.push(x); Object.keys(x).forEach(k => walk(x[k])); } })(PATHJ);
-  const plUsed = [PL.about.line, PL.balance.useful.note, PL.balance.sankey, PL.regions.map(r => r.climate), M.PL_SRC.map(k => PL.sources[k])];
+  const plUsed = [PL.about.line, PL.balance.sankey, PL.regions.map(r => r.climate), M.PL_SRC.map(k => PL.sources[k])];
   const strs = []; (function walk(x) { if (typeof x === "string") strs.push(x); else if (x && typeof x === "object") Object.keys(x).forEach(k => walk(x[k])); })([D, R, plUsed, pathStrs]);
   ok(strs.length > 500 && pathStrs.length >= 5, "the scope scan covers " + strs.length + " strings, " + pathStrs.length + " of them path entries");
   const denied = strs.concat([JS, OWN]).filter(s => DENY.some(rx => rx.test(s))); ok(!denied.length, "no deny-listed term: " + denied.slice(0, 2).map(s => s.slice(0, 60)).join(" | "));
@@ -329,20 +394,33 @@ M.SECTORS.forEach(s => { const k = { industry: "industry", transport: "transport
 }
 
 // ---------------- text budget
-M.STEPS.forEach((t, i) => { const w = t.replace(/\[\[[^|]+\|([^\]]+)\]\]/g, "$1").split(/\s+/).length; ok(w <= 40, "step " + (i + 1) + " text " + w + " words (≤ 40)"); });
+M.STEPS.forEach((t, i) => { const w = t.replace(/\[\[[^|]+\|([^\]]+)\]\]/g, "$1").split(/\s+/).length; ok(w <= 35, "step " + (i + 1) + " text " + w + " words (≤ 35)"); });
 {
   const words = t => t.replace(/\[\[[^|]+\|([^\]]+)\]\]/g, "$1").replace(/\*\*/g, "").replace(/<[^>]+>/g, " ").trim().split(/\s+/).length;
   const Q = M.mysteryQ(D, L), cq = M.convQ(D, L);
-  const shown = [M.LENS_SAW, M.CONV_SAW, M.CARD_SAW, M.USEFUL_NOTE, M.BEFORE_NOTE, M.FINAL_NOTE, M.COMPARE_NOTE, M.largestSaw(D, L), M.accountSaw(D, L, E), M.chinaLine(D, L), M.japanLine(D, L), M.convSwitchLine(D, L)]
-    .concat(D.subEffNotes, D.lenses.map(l => l.text), D.conventions.map(c => c.text + (c.who ? " Used by " + c.who + "." : " " + c.note)))
+  const shown = [M.LENS_SAW, M.CONV_SAW, M.CARD_SAW, M.USEFUL_NOTE, M.BEFORE_NOTE, M.FINAL_NOTE, M.COMPARE_NOTE, M.EFF_NOTE, M.LNG_NOTE, M.largestSaw(D, L), M.accountSaw(D, L, E), M.chinaLine(D, L), M.japanRule(D, L), M.japanResult(D, L), M.convSwitchLine(D, L), M.elecNote(D, L), M.plUsefulNote(PL), M.CONV_CAPTION.renewable, M.CONV_CAPTION.elec]
+    .concat(D.subEffNotes, D.lenses.map(l => l.text), D.conventions.map(c => c.text), D.conventions.map(M.convUsers), Object.values(D.units).map(u => u.key || ""), L.map(N => M.covNote(N)), L.map(N => M.workedLine(D, N, E)))
+    .concat([].concat(...D.countries.map(c => M.PROV_COLS.map(p => c.prov[p[0]]))), [].concat(...L.filter(N => M.cardOf(R, N.card)).map(N => { const cp = M.cardPreview(R, N); return [cp.system, "One key number: " + cp.number]; })))
     .concat(Object.values(Q.feedback), Object.values(cq.feedback))
     .concat(L.map(N => M.viewLine(D, N)), L.map(N => M.accountLine(D, N, E)), L.map(N => N.finalNote || ""), [].concat(...D.conventions.map(cv => L.map(N => M.convLine(D, N, cv.key)))))
     .concat([].concat(...L.map(N => ["imports", "resources", "climate", "institutions"].map(k => M.lensCell(D, N, k)))))
     .filter(Boolean);
-  shown.forEach(t => ok(words(t) <= 40, "≤ 40 words (" + words(t) + "): " + t.slice(0, 50)));
+  shown.forEach(t => ok(words(t) <= 35, "≤ 35 words (" + words(t) + "): " + t.slice(0, 50)));
   ok(D.subEffNotes.length === 3 && D.subEffNotes[1].indexOf(M.pct(D.subEff)) > 0, "the substitution note as rule, assumption and exception; 40% as the data's");
-  const ans = M.checkHTML(D, L, E).match(/<p>[^<]*<\/p>/g) || []; ans.forEach(a => ok(words(a) <= 40, "answer ≤ 40 words: " + a.slice(3, 50)));
+  const ans = M.checkHTML(D, L, E).match(/<p>[^<]*<\/p>/g) || []; ans.forEach(a => ok(words(a) <= 35, "answer ≤ 35 words: " + a.slice(3, 50)));
   ok(words(D.sources["meti-balance"].where) <= 45 && M.substHTML(D, L).match(/<li>.*?<\/li>/g).every(li => words(li) <= 40), "Japan's source entry and each line of the substitution box within the budget");
+}
+
+// ---------------- every glossary mark the page shows has an entry (the course build writes glossary.json)
+{
+  const G = require(L_("data/glossary.json")), ids = new Set();
+  const text = [PAGE, RAW, JS].join(" ");
+  (text.match(/data-term=\\?"([a-z0-9-]+)\\?"/g) || []).forEach(m => ids.add(m.replace(/^data-term=\\?"|\\?"$/g, "")));
+  (text.match(/\[\[([a-z0-9-]+)\|/g) || []).forEach(m => ids.add(m.slice(2, -1)));
+  ids.delete("lesson");
+  const missing = [...ids].filter(i => !G[i]);
+  ok(ids.size > 20 && !missing.length, "every glossary mark (" + ids.size + ") has an entry: " + missing.join(", "));
+  ok(["quad", "oil-equivalent", "coal-equivalent", "heat-rate", "lng", "btu"].every(i => ids.has(i)), "the units, heat rate and LNG are marked");
 }
 
 console.log((fails ? "FAILED " : "ok ") + (checks - fails) + "/" + checks + " checks (" + ID + ")");

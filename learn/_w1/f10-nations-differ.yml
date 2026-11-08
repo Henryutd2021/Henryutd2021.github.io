@@ -29,7 +29,7 @@ glossary:
     def: "An area of a power market in which every seller and buyer gets the same wholesale price for each trading period, as in Europe's markets."
   - id: market-coupling
     term: Market coupling
-    def: "Joining neighbouring power markets so that one calculation sets their prices and the flows between them, sending power toward higher prices until the links are full."
+    def: "Joining neighboring power markets so that one calculation sets their prices and the flows between them, sending power toward higher prices until the links are full."
   - id: flow-based-coupling
     term: Flow-based market coupling
     def: "A form of market coupling that limits trades by how much power would flow on each critical line of the grid, rather than by a fixed amount per border."
@@ -38,7 +38,16 @@ glossary:
     def: "A transmission link that carries power as direct current, used for long undersea cables and to join grids that do not run in step."
   - id: gross-calorific-value
     term: Gross calorific value
-    def: "The heat a fuel gives when burned, counting the heat won back by condensing the water vapour it forms; it is a little higher than the net value, which the IEA and Eurostat use."
+    def: "The heat a fuel gives when burned, counting the heat won back by condensing the water vapor it forms; it is a little higher than the net value, which the IEA and Eurostat use."
+  - id: quad
+    term: Quad
+    def: "A quadrillion (10^15) British thermal units, about 1.055 exajoules; the unit of national energy statistics in the United States."
+  - id: oil-equivalent
+    term: Ton of oil equivalent (toe)
+    def: "An energy unit equal to the heat in one metric ton of crude oil, fixed by convention at 41.868 GJ; ktoe is a thousand of them, Mtoe (Brazil's Mtep) a million."
+  - id: coal-equivalent
+    term: Ton of coal equivalent (tce)
+    def: "An energy unit equal to the heat in one metric ton of standard coal, fixed by convention at 29.3076 GJ; China's energy statistics count in it."
   - id: heating-degree-days
     term: Heating degree days
     def: "A measure of how cold a year was: for each day, the degrees by which its average temperature fell below a base such as 18 °C, added over the year."

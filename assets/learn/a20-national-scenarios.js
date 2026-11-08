@@ -22,15 +22,16 @@
 //     discount rate; capital costs are fixed values inside Prairieland's ranges, the same in every year (no cost changes with how much is built)
 //   fuels: crude = oil products / (1 - refinery losses) + oil burned in plants; gas = (final + plants) / (1 - own use);
 //     coal = (final + plants) x 2025's ratio of coal mined to coal used; imports = use above 2025's domestic output
+//     (domestic supply meets demand up to its 2025 output; below it, domestic production falls: no exports)
 //   CO2 = fuels x IPCC 2006 factors (net calorific values); cumulative 2026-2050 = Prairieland's linear weights x model years
 //   target-seeking: the lowest whole-dollar carbon price from $0 to $300 a tonne that keeps the cumulative CO2 within the
 //     budget (bisection; cumulative CO2 never rises with the price, tested); none when even $300 does not. It is the
 //     lowest tested price under the sharing rule, not a constraint's dual value (there is no optimization here)
-//   why engine E4 (M13, SB4) cannot reach Prairieland's default budget, which this accounting meets (step 7's card and the
-//     no-JS block): the timing of electrification. Here each sector electrifies early and fast, up to the most a period
-//     allows; E4 raises each sector's share in a straight line to its 2050 value, so more fuel burns on the way. (Not
-//     build-rate or transmission limits: the SB4/M13/C4 group found that raising those 100 times moves E4's floor by
-//     1 to 5 Mt, and that with this page's path inside E4 the floor falls below the budget.)
+//   why engine E4 (M13, SB4) does not reach Prairieland's default budget, which this accounting meets (step 7's
+//     collapsed card and the no-JS block): E4's floor (its least cumulative CO2 at central demand and the most
+//     electrification) is about 2,700 Mt, recomputed by this page's test; E4 raises each sector's share in a straight line
+//     to its 2050 value, while here each sector electrifies early, up to the most a period allows. M13 reports that with
+//     this page's path inside E4 the floor falls to about 2,400 Mt: a reported comparison, not a cause isolated here.
 //   gap tracing: swap a group of assumptions (demand, fuel prices, policy, technology costs) from scenario B into A; alone
 //     (one at a time), in an order (a waterfall), or averaged over all 24 orders (each group's average contribution)
 // Every number on the page comes from this model or the two data files; _tests/learn/test_a20-national-scenarios.js checks
@@ -77,6 +78,9 @@
     CLEAN_TECH.forEach(function (k) { X.capex[k] = C.technologies[k].capex[sc.costs[k]]; });
     return X;
   }
+  // a slider step for a fuel range that keeps its default on the slider's grid (the data's step, halved until it does),
+  // so step 4 shows the price it computes with
+  function gridStep(r) { var st = r.step; while (Math.abs(Math.round((r.def - r.lo) / st) * st - (r.def - r.lo)) > 1e-9 && st > 1e-6) st /= 2; return st; }
   function blend(P, X) { return (P.gasDom * X.gas + P.gasLNG * X.lng) / (P.gasDom + P.gasLNG); }
   // full costs per MWh of the clean mix and of a new gas combined cycle at a carbon price; the clean share of new power
   function costs(P, X, price) {
@@ -309,19 +313,22 @@
   function targetSaw(P, R) {
     var t = R.target;
     if (!t.ok) return "Meeting it within 2026–2050 needs cuts this page leaves out: earlier closures, efficiency beyond the demand case, other fuels or removals. A larger budget or other years would change the question.";
-    if (t.price === 0) return "This budget needs no carbon price: the scenario's other settings already meet it. In a target-seeking scenario the target is fixed and the policy is found.";
+    if (t.price === 0) return "This budget needs no carbon price: the scenario's other settings already meet it. Here the target is fixed and the carbon price is found.";
     return "The target is fixed and the price is found: change the fuel prices or the pace, and the price moves while the CO₂ stays within the budget.";
   }
-  // the cross-page card (step 7) and its no-JS line: why engine E4 (M13, SB4) cannot reach the budget this page meets.
-  // E4's floor is read from this lesson's data (pathwayModel.floorMt), which the test ties to E4's own data file.
-  // html: true writes plain links for the no-JS block, otherwise lesson marks for LX.rich
+  // the cross-page card (step 7, collapsed) and its no-JS line: why engine E4 (M13, SB4) does not reach the budget this
+  // page meets. E4's floor is read from this lesson's data (pathwayModel.floorMt), which the test recomputes with E4;
+  // the floor with this page's path (withThisPathMt) is M13's reported comparison, which the test ties to E4's own words.
+  // html: true writes plain links for the no-JS block, otherwise lesson and glossary marks for LX.rich
   function gapNote(P, html) {
-    var B = scenario(P, "budget"), y = P.years[1], e = B.Y[y].elShare, bud = fmtN(budgetOf(P, scOf(P, "budget")), 0) + " Mt", fl = "about " + fmtN(P.D.pathwayModel.floorMt, 0) + " Mt";
+    var B = scenario(P, "budget"), y = P.years[1], e = B.Y[y].elShare, bud = fmtN(budgetOf(P, scOf(P, "budget")), 0) + " Mt", PM = P.D.pathwayModel;
+    var fl = "about " + fmtN(PM.floorMt, 0) + " Mt", wp = "about " + fmtN(PM.withThisPathMt, 0) + " Mt";
     var m13 = html ? "<a href=\"m13-national-pathway.html\">M13</a>" : "[[lesson:m13-national-pathway|M13]]", sb4 = html ? "<a href=\"sb4-pathway-explorer.html\">SB4</a>" : "[[lesson:sb4-pathway-explorer|SB4]]";
     return { head: "Why the pathway model disagrees",
-      here: "The Budget pathway electrifies early and fast: by " + y + ", buildings reach " + pct(e.buildings) + " and industry " + pct(e.industry) + " of their useful energy.",
-      there: "The pathway model of " + m13 + " and " + sb4 + " raises each sector's share in a straight line to 2050, so more fuel burns on the way: its floor is " + fl + ", above the " + bud + " budget.",
-      lineHead: "Why " + m13 + " disagrees.", line: "It raises electrification in a straight line to 2050, not early as here, so it burns more fuel and cannot reach " + bud + " (" + fl + " at best)." };
+      here: "The Budget pathway electrifies early and fast: by " + y + ", buildings reach " + pct(e.buildings) + " and industry " + pct(e.industry) + " of their " + (html ? "useful energy" : "[[useful-energy|useful energy]]") + ".",
+      there: "The pathway model of " + m13 + " and " + sb4 + " raises each sector's share in a straight line to 2050; at best its CO₂ for 2026–2050 is " + fl + ", above the " + bud + " budget.",
+      path: m13 + " reports that with this page's electrification path in its place, that model's best falls to " + wp + ", below the budget. The two models also differ in other ways.",
+      lineHead: "Why " + m13 + " disagrees.", line: "Its least CO₂ for 2026–2050 is " + fl + ", above the " + bud + " budget; M13 reports " + wp + " when this page's earlier electrification replaces its straight line." };
   }
   // reference budgets: Prairieland's presets, listed (the slider has no preset buttons)
   function refBudgets(P) {
@@ -332,27 +339,40 @@
     var W = P.D.rule.halfWidth;
     return ["The clean mix is wind, solar, batteries and a generic [[firm-output|firm]] clean plant (steady output, no CO₂ in operation); new gas is a [[combined-cycle|combined cycle]].",
       "The rule's half-width, $" + W + " per MWh, is the cost gap at which all or none of new power is clean; the rule is set for teaching.",
-      "Costs are fixed values from fixed ranges, the same in every year; none changes with how much is built.", P.PL.about.line];
+      "Costs are per [[megawatt-hour|MWh]] made, from fixed values in fixed ranges, the same in every year; none changes with how much is built.", P.PL.about.line];
   }
   function budgetNotes(P) { return [refBudgets(P), P.PL.about.line]; }
   // the first words a reader needs in step 2
-  var TERMS = "[[lng|LNG]] is liquefied natural gas, shipped in; [[electrification|electrification]] switches heating, driving and industry from fuel to electricity.";
+  var TERMS = "[[lng|LNG]] is liquefied natural gas, shipped in; a [[carbon-price|carbon price]] charges each tonne of CO₂ emitted; [[electrification|electrification]] switches heating, driving and industry from fuel to electricity.";
+  // the units, each where it first appears: Mt in step 1, GJ in step 2's table, TWh and PJ in step 5; all four in the no-JS block
+  var UNITS = {
+    mt: "Mt is a million tonnes; the chart counts the CO₂ from the fuel Prairieland burns each year.",
+    gj: "Gas and LNG in $ per GJ, a gigajoule (a billion joules); clean plants' capital costs as a level of Prairieland's ranges.",
+    energy: "Electricity is counted in [[terawatt-hour|TWh]] and fuels in [[petajoule|PJ]]; both measure energy, and 1 TWh = 3.6 PJ.",
+    all: "Units: Mt is a million tonnes of CO₂; TWh and PJ measure energy (1 TWh = 3.6 PJ); fuel prices are in $ per GJ (1 PJ = a million GJ). LNG is liquefied natural gas, shipped in."
+  };
   function readSaw(P) {
     var A = scenario(P, "current"), B = scenario(P, "budget"), d = differs(P, "current", "budget");
-    return "Current policies and the Budget pathway differ only in " + d.map(function (g) { return grp(P, g).label.toLowerCase(); }).join(" and ") + ": " + outFmt(P, "co2", A.out.co2) + " against " + outFmt(P, "co2", B.out.co2) + " in 2050, and the Budget pathway's policy was chosen to meet its goal.";
+    return "Current policies and the Budget pathway differ only in " + d.map(function (g) { return grp(P, g).label.toLowerCase(); }).join(" and ") + ": " + outFmt(P, "co2", A.out.co2) + " against " + outFmt(P, "co2", B.out.co2) + " in 2050, and the Budget pathway's carbon price was found to meet its goal.";
   }
   // the no-JS block and the practice set (written by the test's --write)
   function rowsTable(P) {
     return P.D.scenarios.map(function (s) { var R = scenario(P, s.key), w = setWords(P, R); return { s: s, R: R, w: w }; });
   }
+  // the no-JS block: the units, the four groups of assumptions in one table, the results in another, then the ideas
   function staticFallback(P) {
-    var line = P.PL.about.line, T = rowsTable(P);
-    return "<p class=\"lx-eyebrow\">The idea in one table: four scenarios for Prairieland, one accounting</p>" +
-      "<div class=\"lx-scroll-x\"><table class=\"lx-mini-table a20-fbt\"><caption class=\"lx-hint\">" + line + " Results for 2050 and for 2026–2050.</caption>" +
-      "<thead><tr><th scope=\"col\">Scenario</th><th scope=\"col\">Kind</th><th scope=\"col\">Demand</th><th scope=\"col\">Policy</th><th scope=\"col\">CO₂ in 2050</th><th scope=\"col\">CO₂ 2026–2050</th><th scope=\"col\">Electricity made, 2050</th><th scope=\"col\">Oil and LNG imports, 2050</th></tr></thead><tbody>" +
-      T.map(function (x) { return "<tr><td>" + x.s.name + "</td><td>" + kindWord(x.s) + "</td><td>" + x.w.demand + "</td><td>" + x.w.policy + "</td><td>" + outFmt(P, "co2", x.R.out.co2) + "</td><td>" + fmtN(x.R.cum, 0) + " Mt</td><td>" + outFmt(P, "el", x.R.out.el) + "</td><td>" + outFmt(P, "imp", x.R.out.imp) + "</td></tr>"; }).join("") +
+    var line = P.PL.about.line, T = rowsTable(P), th = function (t) { return "<th scope=\"col\">" + t + "</th>"; };
+    return "<p class=\"lx-eyebrow\">The idea in two tables: four scenarios for Prairieland, one accounting</p>" +
+      "<p class=\"lx-hint\">" + UNITS.all + "</p>" +
+      "<div class=\"lx-scroll-x\"><table class=\"lx-mini-table a20-fbt\"><caption class=\"lx-hint\">The assumptions, in four groups. " + line + "</caption>" +
+      "<thead><tr>" + th("Scenario") + th("Kind") + P.D.groups.map(function (g) { return th(g.label); }).join("") + "</tr></thead><tbody>" +
+      T.map(function (x) { return "<tr><td>" + x.s.name + "</td><td>" + kindWord(x.s) + "</td>" + GROUPS.map(function (g) { return "<td>" + x.w[g] + "</td>"; }).join("") + "</tr>"; }).join("") +
       "</tbody></table></div>" +
-      "<ul><li><b>Two kinds.</b> Exploratory scenarios start from assumptions and ask what happens; a target-seeking one starts from a goal (the " + fmtN(budgetOf(P, scOf(P, "budget")), 0) + " Mt budget) and finds the policy that meets it.</li>" +
+      "<div class=\"lx-scroll-x\"><table class=\"lx-mini-table a20-fbt\"><caption class=\"lx-hint\">The results, for 2050 and for 2026–2050.</caption>" +
+      "<thead><tr>" + th("Scenario") + th("CO₂ in 2050") + th("CO₂ 2026–2050") + th("Electricity made, 2050") + th("Oil and LNG imports, 2050") + "</tr></thead><tbody>" +
+      T.map(function (x) { return "<tr><td>" + x.s.name + "</td><td>" + outFmt(P, "co2", x.R.out.co2) + "</td><td>" + fmtN(x.R.cum, 0) + " Mt</td><td>" + outFmt(P, "el", x.R.out.el) + "</td><td>" + outFmt(P, "imp", x.R.out.imp) + "</td></tr>"; }).join("") +
+      "</tbody></table></div>" +
+      "<ul><li><b>Two kinds.</b> Exploratory scenarios start from assumptions and ask what happens; a target-seeking one starts from a goal (the " + fmtN(budgetOf(P, scOf(P, "budget")), 0) + " Mt budget), keeps its other assumptions and finds the carbon price that meets it.</li>" +
       "<li><b>Gaps have causes.</b> From Announced plans to Gas boom, CO₂ in 2050 moves " + outSigned(P, "co2", waterfall(P, "announced", "gasboom", "co2", GROUPS).gap) + "; " + orderLine(P, "announced", "gasboom", "co2", "avg").replace("Averaged over all 24 orders: ", "averaged over all 24 orders of swapping: ") + "</li>" +
       "<li><b>Order matters.</b> Swapped one at a time, in a different order, the same groups get different shares of one total.</li>" +
       "<li><b>" + gapNote(P, true).lineHead + "</b> " + gapNote(P, true).line + "</li></ul>" +
@@ -403,7 +423,7 @@
       ["The spread is information", "Prairieland's four end 2050 between " + outFmt(P, "co2", sp.lo) + " and " + outFmt(P, "co2", sp.hi) + " of CO₂; none of them is a forecast."],
       ["Gaps have causes", "From Announced plans to Gas boom, the four groups alone add up to " + outSigned(P, "co2", al.sum) + " against a real gap of " + outSigned(P, "co2", al.gap) + "."],
       ["Order matters", "Swapping " + grp(P, g).label.toLowerCase() + " adds " + outSigned(P, "co2", av.lo[g]) + " to " + outSigned(P, "co2", av.hi[g]) + ", depending on the order; its average over the " + av.orders + " orders is " + outSigned(P, "co2", av.avg[g]) + "."],
-      ["The policy is an output", "The Budget pathway's " + fmtN(B.target.budget, 0) + " Mt budget is fixed; its carbon price, " + usdT(B.target.price) + ", is found."]
+      ["The carbon price is an output", "The Budget pathway fixes its " + fmtN(B.target.budget, 0) + " Mt budget and assumes the fastest electrification allowed; the page then searches for the lowest carbon price that meets the budget: " + usdT(B.target.price) + "."]
     ];
     return "<dl class=\"lx-ideas\">" + items.map(function (x) { return "<dt>" + x[0] + "</dt><dd>" + x[1] + "</dd>"; }).join("") + "</dl>";
   }
@@ -427,7 +447,7 @@
     fmtN: fmtN, signed: signed, pct: pct, usdMWh: usdMWh, usdT: usdT, outFmt: outFmt, outSigned: outSigned, grp: grp, kindWord: kindWord, setWords: setWords, setShort: setShort, spread: spread,
     PREDICT: PREDICT, niceStep: niceStep, sceneSaw: sceneSaw, ruleLine: ruleLine, ruleSaw: ruleSaw, aloneLine: aloneLine, aloneSaw: aloneSaw, orderLine: orderLine, orderSaw: orderSaw,
     targetLine: targetLine, targetSaw: targetSaw, readSaw: readSaw, rowsTable: rowsTable, staticFallback: staticFallback, practice: practice, ideas: ideas, myths: myths, paceOf: paceOf,
-    budgetInputs: budgetInputs, mine: mine, gapNote: gapNote, refBudgets: refBudgets, ruleNotes: ruleNotes, budgetNotes: budgetNotes, TERMS: TERMS, givensHTML: givensHTML };
+    budgetInputs: budgetInputs, mine: mine, gapNote: gapNote, refBudgets: refBudgets, ruleNotes: ruleNotes, budgetNotes: budgetNotes, TERMS: TERMS, UNITS: UNITS, givensHTML: givensHTML, gridStep: gridStep };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -500,6 +520,7 @@
           var Pl = LX.Plot(H("div", null, act), { text: "Text version of the chart", legend: true });
           co2Chart(Pl, list);
           H("p", { class: "lx-hint", text: LINE + " A screening accounting, not a forecast." }, act);
+          H("p", { class: "lx-hint", html: bold(UNITS.mt) }, act);
           var pr = LX.Predict(act, { id: "a20-why", q: PREDICT.q, answer: PREDICT.answer, options: PREDICT.options, feedback: PREDICT.feedback, onPick: function () { show(); } });
           function show() { pr.reveal(); api.done(); api.saw(sceneSaw(P)); }
           if (pr.picked()) show();
@@ -510,7 +531,7 @@
           var card, paint = seg(act, "Scenario", D.scenarios.map(function (s) { return [s.key, s.short]; }), S.pick, function (k) { pick(k); });
           card = H("div", { class: "a20-card", "aria-live": "polite" }, act);
           H("p", { class: "lx-hint", html: bold(TERMS) }, act);
-          LX.Ledger(H("div", null, act), { caption: "Gas and LNG in $ per GJ; clean plants' capital costs as a level of Prairieland's ranges. " + LINE, columns: ["Scenario", "Demand", "Gas · LNG", "Policy", "Clean plants", "CO₂ 2050", "CO₂ 2026–2050"],
+          LX.Ledger(H("div", null, act), { caption: UNITS.gj + " " + LINE, columns: ["Scenario", "Demand", "Gas · LNG", "Policy", "Clean plants", "CO₂ 2050", "CO₂ 2026–2050"],
             rows: rowsTable(P).map(function (x) { var w = setShort(P, x.R); return { head: x.s.name, sub: kindWord(x.s), cells: [w.demand, w.fuel, w.policy, w.costs, outFmt(P, "co2", x.R.out.co2), fmtN(x.R.cum, 0) + " Mt"] }; }), cls: "a20-led" });
           function pick(k) {
             S.pick = k; var R = scenario(P, k), s = R.sc; card.innerHTML = "";
@@ -536,8 +557,8 @@
           var ro = H("div", { class: "lx-readouts", "aria-live": "polite" }, act), line = H("p", { class: "lx-step-line", "aria-live": "polite" }, act);
           function cur() { var x = JSON.parse(JSON.stringify(X)); x.gas = S.rule.gas; x.lng = S.rule.lng; x.price = S.rule.price; CLEAN_TECH.forEach(function (k) { x.capex[k] = PL.costs.technologies[k].capex[S.rule.level]; }); return x; }
           function paint() { var x = cur(), C = costs(P, x, x.price); chips(ro, [["Clean mix", usdMWh(C.clean)], ["New gas", usdMWh(C.gas)], ["Clean share of new power", pct(C.share), C.share >= 0.5 ? "good" : "bad"]]); line.innerHTML = bold(ruleLine(P, x)); api.done(); api.saw(ruleSaw(P, x)); }
-          var g = LX.Slider(act, { label: "Domestic gas", color: "var(--lx-cc)", min: F.gas.lo, max: F.gas.hi, step: F.gas.step, value: S.rule.gas, fmt: function (v) { return "$" + fmtN(v, 2) + " per GJ"; }, onChange: function (v) { S.rule.gas = v; paint(); } });
-          LX.Slider(act, { label: "LNG", color: "var(--lx-cc)", min: F.lng.lo, max: F.lng.hi, step: F.lng.step, value: S.rule.lng, fmt: function (v) { return "$" + fmtN(v, 2) + " per GJ"; }, onChange: function (v) { S.rule.lng = v; paint(); } });
+          var g = LX.Slider(act, { label: "Domestic gas", color: "var(--lx-cc)", min: F.gas.lo, max: F.gas.hi, step: gridStep(F.gas), value: S.rule.gas, fmt: function (v) { return "$" + fmtN(v, 2) + " per GJ"; }, onChange: function (v) { S.rule.gas = v; paint(); } });
+          LX.Slider(act, { label: "LNG", color: "var(--lx-cc)", min: F.lng.lo, max: F.lng.hi, step: gridStep(F.lng), value: S.rule.lng, fmt: function (v) { return "$" + fmtN(v, 2) + " per GJ"; }, onChange: function (v) { S.rule.lng = v; paint(); } });
           LX.Slider(act, { label: "Carbon price (illustrative)", color: "var(--lx-tier-5)", min: 0, max: D.rule.priceMax, step: 5, value: S.rule.price, fmt: usdT, onChange: function (v) { S.rule.price = v; paint(); } });
           seg(act, "Wind, solar, battery and firm-plant capital costs (fixed values in Prairieland's ranges)", [["lo", "Low end"], ["def", "Default"], ["hi", "High end"]], S.rule.level, function (k) { S.rule.level = k; paint(); });
           notes(act, ruleNotes(P));
@@ -556,6 +577,7 @@
           }
           var pp = seg(ctl, "From → to", pairItems, String(S.pair), function (k) { S.pair = +k; paint(); });
           seg(ctl, "Result", outItems, S.out, function (k) { S.out = k; paint(); });
+          H("p", { class: "lx-hint", html: bold(UNITS.energy) }, ctl);
           paint();
           demo[4] = function () { S.pair = 0; pp("0"); paint(); };
         } },
@@ -597,9 +619,10 @@
           var tg = H("div", { class: "lx-toggles", role: "group", "aria-label": "Change the assumptions" }, act);
           LX.Toggle(tg, { label: "Gas boom's cheap gas and LNG", on: S.cheap, onChange: function (on) { S.cheap = on; paint(); } });
           LX.Toggle(tg, { label: "Electrification as announced, not the fastest", on: S.pace !== "fast", onChange: function (on) { S.pace = on ? "stated" : "fast"; paint(); } });
-          var gc = H("div", { class: "a20-card a20-gap" }, act), gn = gapNote(P);
-          H("p", { class: "lx-eyebrow", text: gn.head }, gc); H("p", { html: bold(gn.here) }, gc); H("p", { html: bold(gn.there) }, gc);
           notes(act, budgetNotes(P));
+          // the comparison with the pathway model, collapsed: one idea per paragraph
+          var gc = H("details", { class: "lx-textalt a20-gap" }, act), gn = gapNote(P);
+          H("summary", { text: gn.head }, gc); H("p", { html: bold(gn.here) }, gc); H("p", { html: bold(gn.there) }, gc); H("p", { html: bold(gn.path) }, gc);
           paint();
           demo[6] = function () { sl.set(P.budget.def - 300, true); };
         } },
@@ -612,7 +635,7 @@
             columns: ["", A.sc.name, B.sc.name].concat(Y ? ["Your step 7 run"] : []),
             rows: [{ head: "Question", cells: cell(function (R) { return R.sc.question; }) }, { head: "Kind", cells: cell(function (R) { return kindWord(R.sc); }) },
                    { head: "Budget", cells: cell(function (R) { return R.target ? fmtN(R.target.budget, 0) + " Mt" : "none"; }) },
-                   { head: "Policy", sub: "set by the authors, or found", cells: cell(function (R) { return setWords(P, R).policy; }) },
+                   { head: "Policy", sub: "set by the authors, or its carbon price found", cells: cell(function (R) { return setWords(P, R).policy; }) },
                    { head: "CO₂ in 2050", cells: cell(function (R) { return outFmt(P, "co2", R.out.co2); }) },
                    { head: "CO₂ 2026–2050", cells: cell(function (R) { return fmtN(R.target && !R.target.ok ? R.target.floor : R.cum, 0) + " Mt"; }) }], cls: "a20-led" });
           api.done(); api.saw(readSaw(P));
@@ -654,8 +677,8 @@
         traces: [{ label: "Announced → Gas boom", path: ["q", "bd", "one", "ord", "rep"], text: orderLine(P, "announced", "gasboom", "co2", "avg") },
                  { label: "Current → Budget", path: ["q", "lev", "bd", "one", "ord", "rep"], text: readSaw(P) }], sel: 0 });
       LX.Boundary(H("div", { class: "lx-xcard" }, xhost), { title: "Where these scenarios hold",
-        holds: ["Prairieland, a fictional nation, in 2025 dollars, with its own data;", "existing plants run as in 2025 until they retire, unless a carbon price closes them;", "new power shared by full costs per MWh, with fixed costs the same in every year;", "domestic oil and gas output held at 2025's levels."],
-        leaves: ["Hourly balance, storage timing, transmission and adequacy: the pathway model of [[lesson:m13-national-pathway|M13]] has them;", "end-use equipment costs, behaviour and prices that respond to demand;", "methane and other gases, and removals;", "probabilities: this lesson assigns none, so it cannot say which scenario is more likely."],
+        holds: ["Prairieland, a fictional nation, in 2025 dollars, with its own data;", "existing plants run as in 2025 until they retire, unless a carbon price closes them;", "new power shared by full costs per MWh, with fixed costs the same in every year;", "domestic oil and gas meeting demand up to their 2025 output, imports beyond it, no exports."],
+        leaves: ["Balance over [[time-slice|time slices]], storage, transmission between regions and hourly checks of selected years: the pathway model of [[lesson:m13-national-pathway|M13]] adds them;", "adequacy judged over many weather years and plant outages: lesson [[lesson:a05-adequacy|A5]];", "end-use equipment costs, behaviour and prices that respond to demand;", "methane and other gases, and removals;", "probabilities: this lesson assigns none, so it cannot say which scenario is more likely."],
         source: "Accounting: this page's screening model. Data: Prairieland (course data); costs from EIA's AEO2026 assumptions." });
     }
     paintExplain();
