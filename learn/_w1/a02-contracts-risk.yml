@@ -13,7 +13,7 @@ glossary:
     def: "The risk that the price where a plant sells differs from the price at which its contract settles, such as its node against a trading hub."
   - id: capture-ratio
     term: Capture ratio
-    def: "The average price a plant earns per megawatt-hour it produces, divided by the average market price across all hours: hours with more output count more."
+    def: "A market price averaged over the hours a plant produces, weighted by its output, divided by that price's average over all hours."
   - id: pricing-node
     term: Pricing node
     def: "A point on the grid, such as a power plant's connection, where the market sets its own price."

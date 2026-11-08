@@ -133,7 +133,13 @@ const S = sm.solar;
   has("Tolled at $5.17 per kW a month, the battery pays its owner a fixed $3.10M a year, and its margin ($1.9M to $4.5M) moves to the buyer.");
   const z = sm.at("hub", "none", 5), a0 = sm.at("hub", "none", 0), zb = sm.at("block", "none", 5), a0b = sm.at("block", "none", 0);
   ok(musd(z.sR.mean - a0.sR.mean, 2) === "$1.05M" && musd(zb.sR.mean - a0b.sR.mean, 2) === "$1.05M" && near(zb.sR.mean - a0b.sR.mean, 5 * P0.L, 1e-3) && near(zb.sY.mean - a0b.sY.mean, 5 * P0.L, 1e-3) && near(z.sY.mean - a0.sY.mean, z.sR.mean - a0.sR.mean, 1e-3), "price: +$5 moves $1.05M a year from the buyer to the seller (block: exactly L × $5; hub: this seed's output)");
-  has("A price $5.00 above fair moves $1.05M a year from the buyer to the seller; who carries which risk stays the same.");
+  has("A price $5.00 above fair moves $1.05M a year from the buyer to the seller on average (every year under the flat block); who carries which risk stays the same.");
+  {
+    // the hub contract's transfer is $5 × that year's output, so it varies; the block's is $5 × the flat block, every year
+    const zh = sm.at("hub", "none", 5), ah = sm.at("hub", "none", 0), zb2 = sm.at("block", "none", 5), ab2 = sm.at("block", "none", 0);
+    const dh = zh.R.map((v, i) => v - ah.R[i]), db = zb2.R.map((v, i) => v - ab2.R[i]);
+    ok(Math.max.apply(null, dh) - Math.min.apply(null, dh) > 1e5 && db.every(v => near(v, 5 * P0.L, 1e-3)), "price: +$5 moves a varying amount under the hub contract (an average), a fixed $1.05M under the block");
+  }
   has("over the 200 years the solar farm averaged $5.92M a year with no contract and $6.01M settled at the hub");
   ok(musd(S.merchant.sR.mean, 2) === "$5.92M" && musd(S.hub.sR.mean, 2) === "$6.01M", "myth: the two averages");
   has("its sales still run from $5.3M to $6.7M (P10 to P90)"); has("the buyer pays $7.59M every year");
@@ -153,7 +159,7 @@ const S = sm.solar;
     ok(a && b > a.index && QMD.slice(a.index + a[0].length, b).trim() === B[BLOCKS[name]].trim(), `page: the ${name} table equals staticBlocks() (run with --write)`);
   });
   // the seed is shown, and every spread is named as a statistic of the simulated years
-  ok(/seed 2025/.test(QMD) && /"Seed " \+ ST\.seed \+ " · " \+ DA\.sim\.years \+ " price years"/.test(JS) && /"New seed"/.test(JS), "seed: shown on the page and in the interactive, with New seed");
+  ok(/seed 2025/.test(QMD) && /"Seed " \+ ST\.seed \+ " · " \+ DA\.sim\.years \+ " price years · the same seed always gives the same years"/.test(JS) && /"Draw another " \+ DA\.sim\.years \+ " years"/.test(JS) && !/"New seed"/.test(JS), "seed: shown on the page and in the interactive, with a button that draws another 200 years and says what a seed is");
   ok(/P10 and P90 are statistics of the 200 simulated years/.test(QMD) && /not the worst or best case/.test(QMD) && /not a forecast/.test(QMD), "statistics: P10 and P90 are named as statistics of the simulation, not forecasts or extremes");
   ok(/the drivers are drawn independently from a seeded generator \(seed 2025 here\)/.test(QMD) && /five drivers' spreads are illustrative/.test(QMD), "data note: the drivers are labelled illustrative and independent on the page");
   // cash settlement, not delivery (EPA, Financial PPA)
@@ -162,7 +168,7 @@ const S = sm.solar;
   // utility-scale (EIA Table 4.08.B covers utility-scale generators)
   ok(/U\.S\. utility-scale solar photovoltaic generators in 2025/.test(QMD) && /U\.S\. utility-scale solar PV generators, 2025; October 2026/.test(QMD) && !/U\.S\. solar photovoltaic plants/.test(QMD) && /U\.S\. utility-scale solar PV, 2025/.test(JS), "source: 24.0% is U.S. utility-scale solar PV");
   // capture ratio and basis are output-weighted
-  ok(/hours with more output count more/.test(SIDE) && /each hour weighted by its output/.test(DA.sim.capture.note) && /weighted by the solar farm's output/.test(DA.sim.basis.note), "capture ratio and basis: weighted by output (glossary, data)");
+  ok(/weighted by its output/.test(SIDE) && /each hour weighted by its output/.test(DA.sim.capture.note) && /weighted by the solar farm's output/.test(DA.sim.basis.note), "capture ratio and basis: weighted by output (glossary, data)");
   // every element of the no-JS fallback, the data note and Go deeper holds one idea within the budget (about 35 words)
   const elems = [].concat((QMD.match(/<li>[\s\S]*?<\/li>/g) || []).filter(t => !/data-value=/.test(t) && !/<li>(Schwabe|EPA|FERC|Kahrl|Millstein|Where this goes)/.test(t)), QMD.match(/^- \*\*[\s\S]*?$/gm) || []);
   const words = t => t.replace(/<[^>]+>/g, " ").replace(/\*\*/g, "").split(/\s+/).filter(Boolean).length;
@@ -204,7 +210,17 @@ const S = sm.solar;
 function normCalc(str) { let t = String(str).replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1").replace(/[−–]/g, "-").replace(/\$/g, ""); while (/(\d),(\d{3})/.test(t)) t = t.replace(/(\d),(\d{3})/g, "$1$2"); return t; }
 function evalSide(side) { const e = side.replace(/×/g, "*").replace(/÷/g, "/"); if (!/^[\d.\s()+\-*/]+$/.test(e)) return null; try { const v = Function('"use strict"; return (' + e + ");")(); return isFinite(v) ? v : null; } catch (err) { return null; } }
 {
-  const msgs = { year: T.year(sm.years[0], 1), run: T.run, node: T.node, hub: T.hub, block: T.block, toll: T.toll, price0: T.price("hub", 0), price5: T.price("hub", 5), priceM: T.price("block", -5), strike: T.strike("hub", 5) };
+  const msgs = { year: T.year(sm.years[0], 1), run: T.run, node: T.node, hub: T.hub, block: T.block, toll: T.toll, own: T.own, price0: T.price("hub", 0), price5: T.price("hub", 5), priceM: T.price("block", -5), strike: T.strike("hub", 5) };
+  // price year 1: the plant earns the hub's solar-hours price plus the basis, not the capture ratio times the hub price
+  {
+    const y = sm.years[0], o = M.year(P0, y, "merchant", "none");
+    ok(near(o.solar, o.E * (y.c * y.P + y.b), 1e-6) && T.year(y, 1) === "Price year 1: the hub averaged $68.14/MWh and output was " + M.pct(y.v) + " of typical. With no contract the solar farm sold " + musd(o.solar) + ", earning the hub's solar-hours price plus the basis." && !/fetched/.test(JS), "messages: price year 1 says the plant earns the hub's solar-hours price plus the basis");
+    ok(/def: "A market price averaged over the hours a plant produces, weighted by its output, divided by that price's average over all hours\."/.test(SIDE) && /the plant sells at the hub's solar-hours price plus the basis/.test(QMD), "glossary and drivers table: capture ratio is a price ratio; the drivers table says the plant's price adds the basis");
+    // every definition in the sidecar is one short idea
+    const defs = [...SIDE.matchAll(/def: "([^"]+)"/g)].map(m => m[1]);
+    ok(defs.length >= 7 && defs.every(d => d.split(/\s+/).length <= 36), "glossary: every definition in the sidecar is 36 words or fewer");
+    ok(T.own === "Run by its owner again, the battery's margin, " + M.mrange(sm.batM) + " over these years, swings the seller's result; the buyer's bill carries only the solar contract.", "messages: the battery switched back to its owner says so");
+  }
   Object.keys(msgs).forEach(k => { const w = msgs[k].replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1").split(/\s+/).filter(Boolean).length; ok(w <= 36, `budget: message ${k} is ${w} words (≤ 36)`); });
   ok(/^\$5\.00 above the fair price: the seller averages \$1\.05M a year more and the buyer pays \$1\.05M more\./.test(T.price("hub", 5)) && /less/.test(T.price("block", -5)), "messages: the price message says who gains, both ways");
   const plain = t => t.replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1"), sentences = t => (plain(t).match(/[.!?](?=\s+[A-Z(]|$)/g) || []).length;
@@ -216,7 +232,7 @@ function evalSide(side) { const e = side.replace(/×/g, "*").replace(/÷/g, "/")
   ok(KEY.length === 4 && KEY[0] === "Output: a share of a typical year, 100 MW × 8,760 h × 24.0% = 210,240 MWh." && 100 * 8760 * 0.24 === 210240 && /\[\[pricing-node\|Node\]\]: the price at the plant's own point on the grid\. Hub: a regional reference price\. Basis: node minus hub\./.test(KEY[1]) && /\[\[battery-margin\|Battery margin\]\]: what the battery earns per MWh after paying for its charging and losses\./.test(KEY[3]) && KEY.every(t => plain(t).split(/\s+/).length <= 25), "step 1: a key names node, hub, basis, shape and battery margin, and shows 100 × 8,760 × 24.0% = 210,240 MWh");
   // the contracts show their strikes; step 7 shows the strike the offset gives
   ok(M.named("node", F) === "Fixed price, settled at the node · $28.69/MWh" && M.named("hub", F) === "Fixed price, settled at the hub · $30.69/MWh" && M.named("block", F) === "Fixed price, shaped: a flat block · $36.11/MWh" && M.named("merchant", F) === "No contract" && /text: named\(k, sm\.F\)/.test(JS), "picker: each contract shows its strike");
-  ok(T.strike("hub", 5) === "Strike: $35.69/MWh (fair $30.69 + $5.00)." && T.strike("block", -5) === "Strike: $31.11/MWh (fair $36.11 − $5.00)." && T.strike("node", 0) === "Strike: $28.69/MWh, the fair price.", "step 7: the strike line");
+  ok(T.strike("hub", 5) === "Contract price: $35.69/MWh (fair $30.69 + $5.00)." && T.strike("block", -5) === "Contract price: $31.11/MWh (fair $36.11 − $5.00)." && T.strike("node", 0) === "Contract price: $28.69/MWh, the fair price.", "step 7: the contract price line");
   // the worked examples recompute from the operands they show
   const W = M.worked(sm), wk = k => W.filter(r => r.key === k)[0];
   ok(wk("settle").calc === "210,089 MWh × ($30.69 − $54.47) ≈ −$5.00M: the seller pays the buyer" && (210089 * (30.69 - 54.47) / 1e6).toFixed(2) === "-5.00", "worked: the settlement of price year 1");
@@ -245,13 +261,18 @@ function evalSide(side) { const e = side.replace(/×/g, "*").replace(/÷/g, "/")
   ok(Object.keys(counts).length === 6 && calc > 300, "drill: six kinds, and the worked answers' arithmetic checked (" + calc + ")");
   // the who items agree with the exposure table
   const ex = (c, b) => M.exposure(P0, DA, c, b, sm.years);
+  {
+    // the block's signed settlement, L × (contract price − hub): it falls as the hub rises, so the seller pays the buyer more
+    const y = Object.assign({}, sm.years[0]), lo = M.year(P0, y, "block", "none", F.block).settle; y.P += 10;
+    ok(M.year(P0, y, "block", "none", F.block).settle < lo && /when the hub price rises, the seller pays the buyer more on the block/.test(JS) && !/settlement on the block grows/.test(JS), "drill: the block's settlement falls as the hub rises; the worked answer says the seller pays more");
+  }
   ok(ex("node", "none").b.buyer && ex("hub", "none").b.seller && ex("hub", "none").P.buyer && ex("node", "none").v.seller && ex("node", "none").v.buyer && ex("block", "none").c.seller && ex("block", "none").P.seller && ex("merchant", "toll").s.buyer, "drill: the who items' answers agree with exposure()");
 }
 
 // ---------------- the interactive: actions, live regions, demo, path.yml
 {
   ok(/btn\.addEventListener\("click", function \(\) \{ k\+\+;[^\n]*show\(\); \}\)/.test(JS) && /api\.done\(\); api\.saw\(T\.year\(y, k\)\)/.test(JS), "step 1: a draw opens Next");
-  ok(/seedRow\(host\); pair\(host, "none"\); api\.done\(\); api\.saw\(T\.run\)/.test(JS) && /function say\(k\) \{ if \(k === target\) api\.done\(\)/.test(JS) && /if \(on\) \{ api\.done\(\); api\.saw\(T\.toll\); \}/.test(JS) && /if \(user && ST\.off !== 0\) api\.done\(\)/.test(JS), "steps: each card's action is checked before Next opens");
+  ok(/seedRow\(host\); pair\(host, "none"\); api\.done\(\); api\.saw\(T\.run\)/.test(JS) && /function say\(k\) \{ if \(k === target\) api\.done\(\)/.test(JS) && /if \(on\) \{ api\.done\(\); api\.saw\(T\.toll\); \} else api\.saw\(T\.own\);/.test(JS) && /if \(user && ST\.off !== 0\) api\.done\(\)/.test(JS), "steps: each card's action is checked before Next opens");
   ok(/"aria-live": "polite"/.test(JS) && /class: "a2-seed-l", "aria-live": "polite"/.test(JS), "steps: readouts and the seed line are live regions");
   ok(/LX\.demo\(root,/.test(JS) && /state === "mid" \? 1/.test(JS) && /autos\[6\]/.test(JS) && /autos\[idx\]/.test(JS), "demo: mid, step-N and done");
   ok(/redraws\.length = 0; return b0\(act, api\)/.test(JS), "seed: a card's redraw hooks are dropped when another card is built");
@@ -285,15 +306,29 @@ function evalSide(side) { const e = side.replace(/×/g, "*").replace(/÷/g, "/")
     const saw = () => (card().querySelector(".lx-saw") || { textContent: "" }).textContent, input = () => card().querySelector("input");
     demo.cards.go(0);
     ok(card().querySelectorAll(".a2-key li").length === 4 && /Node: the price at the plant's own point on the grid/.test(card().textContent), "stub: step 1 shows the drivers' key");
+    // step 1 shows output, the hub price and sales; shape, basis and battery margin wait in a closed box
+    const more = card().querySelector("details.a2-more");
+    ok(more && !more.open && more.querySelectorAll(".lx-readout").length === 3 && more.querySelectorAll(".a2-key li").length === 3 && card().querySelectorAll(".lx-readout").length === 6, "stub: step 1 opens with three readouts; the other three drivers are in a closed box");
+    btn(/^Draw a price year/).click();
+    ok(/earning the hub's solar-hours price plus the basis/.test(saw()) && /\$68\.14\/MWh/.test(card().textContent), "stub: step 1's first draw");
+    demo.cards.go(1);
+    ok(/The buyer uses 24 MW in every hour, 210,240 MWh a year, the solar farm's typical output, and buys it at the hub\./.test(card().textContent) && 210240 / 8760 === 24, "stub: step 2 says what the buyer uses before its first chart");
+    // step 6: the toll switched on, then off: the message follows
+    demo.cards.go(5);
+    const tollBtn = btn(/^Battery tolled to the buyer/);
+    tollBtn.click();
+    ok(/Tolled, the battery pays its owner a fixed \$3\.10M/.test(saw()), "stub: step 6 tolled");
+    tollBtn.click();
+    ok(/Run by its owner again/.test(saw()) && !/fixed \$3\.10M/.test(saw()), "stub: step 6 switched back to the owner no longer says the owner gets a fixed fee: " + saw());
     demo.cards.go(4); btn(/^Fixed price, shaped: a flat block/).click();
     demo.cards.go(2);
     const pressed = card().querySelectorAll("button").filter(b => b.getAttribute("aria-pressed") === "true").map(b => b.textContent);
     ok(pressed.length === 1 && pressed[0] === "No contract", "stub: back on step 3, a flat block picked on step 5 is not shown; the picker and charts start from no contract (" + pressed.join("|") + ")");
     demo.cards.go(6);
-    ok(/Fixed price, settled at the hub · \$30\.69\/MWh/.test(card().textContent) && /Strike: \$30\.69\/MWh, the fair price\./.test(card().textContent), "stub: step 7 shows the strikes and the strike line");
+    ok(/Fixed price, settled at the hub · \$30\.69\/MWh/.test(card().textContent) && /Contract price: \$30\.69\/MWh, the fair price\./.test(card().textContent), "stub: step 7 shows the contract prices and the contract price line");
     const up = btn(/^Raise Price minus the fair price/);
     for (let i = 0; i < 10; i++) up.click();
-    ok(input().value === "5" && /\$5\.00 above the fair price: the seller averages \$1\.05M a year more/.test(saw()) && /Strike: \$35\.69\/MWh/.test(card().textContent), "stub: +$5.00 moves $1.05M and shows the strike $35.69");
+    ok(input().value === "5" && /\$5\.00 above the fair price: the seller averages \$1\.05M a year more/.test(saw()) && /Contract price: \$35\.69\/MWh/.test(card().textContent), "stub: +$5.00 moves $1.05M and shows the contract price $35.69");
     btn(/^Back$/).click(); demo.cards.go(6);   // Back, then forward again: the card is built anew
     ok(input().value === "5" && /\+\$5\.00\/MWh/.test(card().querySelector("output").textContent) && /\$5\.00 above the fair price/.test(saw()), "stub: after Back and Next the slider still shows +$5.00, as the charts and message do (" + input().value + ")");
   } catch (e) { ok(false, "stub: the page test threw: " + (e && e.stack || e)); }

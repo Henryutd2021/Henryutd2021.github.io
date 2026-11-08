@@ -29,10 +29,11 @@
                   demand leaves the balance (M_t uses connected demand, demand_t x (1 - share_t): supply need not serve
                   customers who are disconnected), and its yearly mean energy, sum(share_t x demand_t), is S.tally
      evaluate(S, add, detail)  the simulated years with resources added: add = {C perfect MW, wind MW, solar MW, sP and sE
-         a battery's MW and MWh, eta, dr MW and drH hours a day, ct 0 or 1 blocks of extra peakers}. Each hour: x = M + C +
-         wind x w_t + solar x s_t + extra peakers; if x >= 0 the battery charges min(P, x) x eta; if x < 0 the battery
-         discharges min(P, -x, stored), then demand response cuts min(dr, rest) if the day has used fewer than drH hours;
-         what is left is unserved. A day with any unserved hour is a loss-of-load day.
+         a battery's MW and MWh, eta, dr MW and drH hours a day, ct 0 or 1 blocks of extra peakers}. detail adds byMonth,
+         byHour, events, and sun and falling (unserved hours with solar output above zero; with it below the hour before).
+         Each hour: x = M + C + wind x w_t + solar x s_t + extra peakers; if x >= 0 the battery charges min(P, x) x eta;
+         if x < 0 the battery discharges min(P, -x, stored), then demand response cuts min(dr, rest) if the day has used
+         fewer than drH hours; what is left is unserved. A day with any unserved hour is a loss-of-load day.
            LOLE = loss-of-load days / N (days a year); LOLH = unserved hours / N; EUE = unserved MWh / N.
      efc(S, base, add)  equivalent firm capacity: the smallest perfect MW C that gives base + C an EUE no higher than
          base + add's (bisection on [0, the block's MW]: halve the range 18 times, to 0.002 MW). EUE falls continuously
@@ -132,6 +133,7 @@
     var SRC = S.SRC, C = add.C || 0, aw = add.wind || 0, as = add.solar || 0, P = add.sP || 0, E = add.sE || 0, eta = add.eta || 0.85;
     var dr = add.dr || 0, drH = add.drH || 4, act = add.ct || 0, ww = S.windW;
     var days = 0, lolh = 0, eue = 0, per = new Int32Array(S.N), byMonth = detail ? new Float64Array(12) : null, byHour = detail ? new Float64Array(24) : null, events = detail ? [] : null;
+    var sun = 0, falling = 0;   // detail: unserved hours with the sun still up, and with solar output lower than the hour before
     var mStart = [], s0 = 0; MD.forEach(function (d) { mStart.push(s0); s0 += d; });
     for (var n = 0; n < S.N; n++) {
       var Y = S.years[n], e = E, prev = -1, day = -1, dayLOL = false, drUsed = 0, cnt = 0, run = 0, last = -2, depth = 0;
@@ -150,6 +152,8 @@
           if (detail) {
             var mo = 11; while (mStart[mo] > d) mo--;
             byMonth[mo]++; byHour[t % 24]++;
+            var sh = SRC[y].s[h], sp = h > 0 ? SRC[y].s[h - 1] : sh;
+            if (sh > 0) sun++; if (sh < sp) falling++;
             if (t === last + 1) { run++; depth = Math.max(depth, -x); } else { if (run) events.push({ hours: run, depth: depth }); run = 1; depth = -x; }
             last = t;
           }
@@ -160,7 +164,7 @@
       per[n] = cnt; days += cnt;
     }
     var out = { days: days, lole: days / S.N, lolh: lolh / S.N, eue: eue / S.N, per: per, hours: lolh };
-    if (detail) { out.byMonth = byMonth; out.byHour = byHour; out.events = events; }
+    if (detail) { out.byMonth = byMonth; out.byHour = byHour; out.events = events; out.sun = sun; out.falling = falling; }
     return out;
   }
   // the Monte Carlo error of LOLE: the standard error of the mean of the yearly counts

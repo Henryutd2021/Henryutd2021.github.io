@@ -222,12 +222,15 @@
       "<li><b>Study 1.</b> " + esc(roundWords(C, run.rounds[0]).replace(/^Study 1: /, "")) + "</li>" +
       "<li><b>Study 2, a restudy.</b> " + esc(roundWords(C, run.rounds[1]).replace(/^Study 2: /, "")) + "</li>" +
       "<li><b>In all.</b> " + esc(runWords(C, run)) + "</li>" +
-      "<li><b>Order 2023's readiness rule.</b> A request without site control cannot enter: " + esc(runWords(C, cluster(C, { readiness: true }))) + "</li>" +
-      "<li><b>The data center.</b> Two " + N.lineMW + " MW lines feed the east substation, whose own peak is " + N.eastMW + " MW. With one line out, the other carries it all, so only " + nn.maxNew + " MW of the " + N.campusMW + " MW campus fits before a third line.</li>" +
-      "<li><b>Texas.</b> ERCOT's list of large loads seeking to connect totals " + fmtN(E.requestsGW, 1) + " GW, against a record demand near " + fmtN(E.peakMW / 1000, 1) + " GW; at $" + fmtN(E.securityPerMW) + " per MW, the " + N.campusMW + " MW campus would post " + musd(security(N.campusMW, E.securityPerMW)) + " of security.</li>" +
+      "<li><b>Order 2023's readiness rule.</b> Normally, a request without site control cannot enter: " + esc(runWords(C, cluster(C, { readiness: true }))) + "</li>" +
+      "<li><b>The data center.</b> Two " + N.lineMW + " MW lines feed the east substation (own peak " + N.eastMW + " MW). With one out, the other carries it all: only " + nn.maxNew + " MW of the " + N.campusMW + " MW campus fits before a third line.</li>" +
+      "<li><b>Texas.</b> ERCOT's large-load requests total " + fmtN(E.requestsGW, 1) + " GW, against a record demand near " + fmtN(E.peakMW / 1000, 1) + " GW. At $" + fmtN(E.securityPerMW) + " per MW in its first batch study, the " + N.campusMW + " MW campus would hold " + musd(security(N.campusMW, E.securityPerMW)) + " of security in all.</li>" +
       "<li><b>The money.</b> Case file CF7's toy: a " + I7.loadMW + " MW load and invented round numbers. In present value, a " + T.startWait + "-month wait costs the developer " + musd(L.developer) + ", other customers " + musd(L.ratepayers) + " and society " + musd(L.society) + ".</li>" +
       "<li><b>Staged service.</b> Half the load served at month " + T.staged.at + ": the developer's cost falls to " + musd(S.developer) + ".</li>" +
-      "<li><b>A faster connection.</b> " + T.shorter + " months sooner is worth up to " + musd(av.saves) + " to the developer.</li></ul>";
+      "<li><b>A faster connection.</b> " + T.shorter + " months sooner is worth up to " + musd(av.saves) + " to the developer.</li></ul>" +
+      "<details class=\"lx-textalt\"><summary>The money worked out, with the toy's inputs (case file CF7)</summary><ol>" + workedMonth(I7, T.startWait).map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("") + "</ol>" +
+      "<div class=\"lx-scroll-x\"><table class=\"lx-mini-table a6-fbt\"><caption class=\"lx-hint\">Case file CF7's inputs, invented round numbers.</caption><thead><tr><th scope=\"col\">Input</th><th scope=\"col\">Value</th></tr></thead><tbody>" +
+      I7.assumptions.map(function (a) { return "<tr><td>" + esc(a[0]) + "</td><td>" + esc(a[1]) + "</td></tr>"; }).join("") + "</tbody></table></div></details>";
     return out;
   }
   function staticPractice(D, I7) {
@@ -235,25 +238,26 @@
     var N = D.n1, alt = n1({ lineMW: 400, lines: 2, eastMW: N.eastMW }, 0, false), E = D.ercot, T = D.toy;
     var L = ledgers(I7, T.startWait, 0, false), av = avoided(I7, T.startWait, T.shorter, 0, false, null), A = annuity(I7, T.startWait);
     var items = [
-      ["Split an upgrade by impact.", "A $" + fmtN(C.upgradeUSD / 1e6) + "M upgrade is needed. Four requests put " + C.projects.map(function (p) { return fmtN(p.mw * p.dfax) + " MW"; }).join(", ") + " of flow on the line. What does the " + P.W.mw + " MW wind farm, with " + fmtN(P.W.mw * P.W.dfax) + " MW of flow, pay?",
+      ["Split an upgrade by impact.", "A $" + fmtN(C.upgradeUSD / 1e6) + "M upgrade is needed, and four requests put " + C.projects.map(function (p) { return fmtN(p.mw * p.dfax) + " MW"; }).join(", ").replace(/, ([^,]*)$/, " and $1") + " of flow on the line. What does the " + P.W.mw + " MW wind farm, with " + fmtN(P.W.mw * P.W.dfax) + " MW of flow, pay?",
         "$" + fmtN(C.upgradeUSD / 1e6) + "M × " + fmtN(P.W.mw * P.W.dfax) + " ÷ " + fmtN(r1.flow) + " = " + musd(r1.rows[0].share) + ", or " + perkw(r1.rows[0].perKW) + " for its " + P.W.mw + " MW."],
       ["After a withdrawal.", "The " + P.X.mw + " MW placeholder, which puts " + fmtN(P.X.mw * P.X.dfax) + " MW of flow on the line, withdraws. Recompute the wind farm's share.",
         "$" + fmtN(C.upgradeUSD / 1e6) + "M × " + fmtN(P.W.mw * P.W.dfax) + " ÷ " + fmtN(r2.flow) + " = " + musd(W.share) + ", or " + perkw(W.perKW) + ": up " + perkw(W.perKW - r1.rows[0].perKW) + ", and " + C.studyDays + " more days of study."],
       ["N−1 with stronger lines.", "Two 400 MW lines feed a substation whose own peak is " + N.eastMW + " MW. How much new load fits before an upgrade?",
         "With one line out, the other must carry everything: 400 − " + N.eastMW + " = " + alt.maxNew + " MW."],
-      ["Security in Texas.", "At $" + fmtN(E.securityPerMW) + " per MW, what security does a 120 MW load post for ERCOT's batch study?",
+      ["Security in Texas.", "At $" + fmtN(E.securityPerMW) + " per MW, what total security does a 120 MW load hold in ERCOT's first batch study?",
         "120 × $" + fmtN(E.securityPerMW) + " = " + musd(security(120, E.securityPerMW)) + "."],
       ["Present value of a wait.", "In CF7's toy, lost margin is $" + fmtN(I7.marginPerMWMonth * I7.loadMW / 1e6, 1) + "M a month, discounted at 8% a year, month by month. What is " + T.startWait + " months of it worth today?",
         "$" + fmtN(I7.marginPerMWMonth * I7.loadMW / 1e6, 1) + "M × " + A.toFixed(2) + " = " + musd(L.dev.margin) + " (the annuity factor for " + T.startWait + " months)."],
       ["What a faster queue is worth.", "Cut the wait from " + T.startWait + " to " + (T.startWait - T.shorter) + " months. What is the most the developer should pay for that?",
         "Its cost falls from " + musd(av.from) + " to " + musd(av.to) + ": up to " + musd(av.saves) + ", before other risks or costs."],
       ["Read a claim critically.", "A headline says: “Texas needs 475 GW more power.” Name three questions you would ask.",
-        "Are these requests or signed loads? How many are duplicates or placeholders? By which year, and against a peak of about " + fmtN(E.peakMW / 1000, 1) + " GW?"],
+        "Are these requests or signed loads, and how many are duplicates or placeholders? By which year, and against a peak of about " + fmtN(E.peakMW / 1000, 1) + " GW?"],
       ["Match the reform.", "A cluster keeps losing placeholder requests after each study. Which Order 2023 rule aims at that?",
         "Site control and study deposits at the request (readiness), backed by withdrawal penalties."]
     ];
     return "<p class=\"lx-eyebrow\">Practice · about 30 minutes on your own</p><ol class=\"lx-fb-practice\">" + items.map(function (x) {
-      return "<li><p><b>" + esc(x[0]) + "</b> " + esc(x[1]) + "</p><details class=\"lx-answer\"><summary>Answer</summary><p>" + esc(x[2]) + "</p></details></li>";
+      // the exercise's name on its own line, then what is given and the question (two sentences at most)
+      return "<li><p><b>" + esc(x[0]) + "</b></p><p>" + esc(x[1]) + "</p><details class=\"lx-answer\"><summary>Answer</summary><p>" + esc(x[2]) + "</p></details></li>";
     }).join("") + "</ol>";
   }
 
@@ -306,7 +310,7 @@
       function paint(user) {
         var t = D.walk.tracks[track], st = t.stages[sel]; seen[t.key + sel] = true;
         tb.forEach(function (b, k) { b.setAttribute("aria-pressed", String(k === track)); });
-        note.textContent = t.note;
+        note.innerHTML = LX.rich(t.note);
         rail.innerHTML = "";
         t.stages.forEach(function (s, k) {
           var b = H("button", { type: "button", class: "a6w-stop" + (seen[t.key + k] ? " seen" : ""), "aria-pressed": String(k === sel), "aria-label": "Step " + (k + 1) + ": " + s.name }, rail);
@@ -333,7 +337,7 @@
     // ---- ClusterBoard: the cluster's studies, round by round (lesson-local)
     function ClusterBoard(host, o) {
       var w = H("div", { class: "a6c" }, host), shown = o.progressive ? 0 : 99;
-      var head = H("p", { class: "lx-hint", text: "Upgrade: " + C.upgrade + ", " + musd(C.upgradeUSD) + ". Line headroom before it: " + C.headroomMW + " MW. Each study takes " + C.studyDays + " days." }, w);
+      var head = H("p", { class: "lx-hint", html: LX.rich("Upgrade: " + C.upgrade + ", " + musd(C.upgradeUSD) + ". Line [[headroom|headroom]] (spare capacity) before it: " + C.headroomMW + " MW. Each study takes " + C.studyDays + " days.") }, w);
       var ro = H("div", { class: "lx-readouts", "aria-live": "polite" }, w);
       var tables = H("div", { class: "a6c-rounds" }, w);
       var foot = H("div", { class: "a6c-foot" }, w);
@@ -463,14 +467,14 @@
         build: function (act, api) {
           var q = QueueWalk(act, { extra: function (track, key) {
               var run = cluster(C), Wf = run.final.W;
-              if (track === "gen" && key === "agr" && Wf) return "The wind farm's share is " + musd(Wf.share) + ", so it posts " + musd(0.2 * Wf.share) + ".";
-              if (track === "load" && key === "req") return "For 300 MW, that would be " + musd(security(N.campusMW, E.securityPerMW)) + ".";
+              if (track === "gen" && key === "agr" && Wf) return "The wind farm's share is " + musd(Wf.share) + ": its deposits must total " + musd(0.2 * Wf.share) + ". With 10% held since the facilities study, it adds " + musd(0.1 * Wf.share) + ".";
+              if (track === "load" && key === "req") return "For 300 MW, that is " + musd(security(N.campusMW, E.securityPerMW)) + " of security in all.";
               if (track === "load" && key === "stage") return "Two " + N.lineMW + " MW lines, a " + N.eastMW + " MW east side: step 7.";
               return null; },
             onSeen: function (done) { if (done[0] && done[1]) { api.done(); api.saw("A generator's path has a shared study and shared costs; a large load's path runs through its utility, its tariff and the wires near it."); } } });
           hooks.walk = q;
         } },
-      { text: "Four generator requests reached the window together, so one [[cluster-study|cluster study]] covers them. Their added flow overloads one line. Run the study and watch who stays.",
+      { text: "Four generator requests reached the window together, so one [[cluster-study|cluster study]] covers them; their added flow overloads one line. Run the study and watch who stays.",
         build: function (act, api) {
           S.forced = null; S.ready = false;
           var b = ClusterBoard(act, { progressive: true, onRound: function (n, run) {
@@ -502,14 +506,14 @@
           LX.CardSort(act, {
             bins: [{ id: "spec", label: "Placeholder requests crowd the queue" }, { id: "serial", label: "One request at a time is slow" },
                    { id: "late", label: "Studies run late" }, { id: "shift", label: "A withdrawal shifts cost and time onto others" }],
-            cards: [{ id: "site", text: "Control of 90% of the site, and a deposit by MW, at the request", bin: "spec", why: "A request without land or money behind it cannot enter." },
+            cards: [{ id: "site", text: "Control of 90% of the site, and a deposit by MW, at the request", bin: "spec", why: "Normally a request without land and money behind it cannot enter; a deposit can stand in for land only where regulations block it." },
                     { id: "cluster", text: "Cluster studies: every request in a window studied together, 150 days", bin: "serial", why: "One study for the group replaces a chain of single studies." },
                     { id: "pen", text: "Penalties on the transmission provider when a study runs late, after a grace period, with caps and exceptions", bin: "late", why: "After a 10-business-day grace period, $1,000 a business day for a late cluster study, capped at the study deposits." },
                     { id: "wd", text: "Withdrawal penalties that grow the later a project leaves", bin: "shift", why: "Leaving late costs the leaver, not only those who stay." },
-                    { id: "ia", text: "A deposit of 20% of the upgrade costs at the agreement", bin: "spec", why: "Money at stake before construction filters out projects that are not ready." }],
+                    { id: "ia", text: "Deposits that reach 20% of the upgrade costs by the agreement", bin: "spec", why: "Money at stake before construction filters out projects that are not ready; earlier deposits count toward the 20%." }],
             onCheck: function (g) { api.done(); api.saw("Order 2023's pro forma rules, as MISO summarised them in August 2023; grid operators adapt them in their own rules."); } });
         } },
-      { text: "Turn on Order 2023's readiness rule: a request must control its site to enter. The placeholder has no site. What changes in the cluster?",
+      { text: "Turn on Order 2023's readiness rule: a request must normally control its site to enter, and the placeholder has none. What changes in the cluster?",
         build: function (act, api) {
           S.forced = null;
           var tg = LX.Toggle(H("div", { class: "lx-toggles", role: "group", "aria-label": "Rules" }, act), { label: "Readiness rule: site control at the request", on: S.ready,
@@ -518,7 +522,7 @@
           if (S.ready) api.done();
           hooks.ready = function () { if (!S.ready) tg.el.click(); };
         } },
-      { text: "Now the campus. Two 350 MW lines feed the east substation, whose own peak is 150 MW. How much of the 300 MW fits before new wires?",
+      { text: "Now the campus: two 350 MW lines feed the east substation, whose own peak is 150 MW. How much of the 300 MW fits before new wires?",
         build: function (act, api) {
           var nn = n1(N, N.campusMW, false), view = null, more = null;
           var p = LX.Predict(act, { id: "a6-n1", answer: String(nn.maxNew),
@@ -535,14 +539,14 @@
           if (p.picked()) show();
           hooks.n1 = function (v, third) { if (!p.picked()) { var b = act.querySelectorAll(".lx-choice")[1]; if (b) b.click(); } if (view) view.set(v, third); };
         } },
-      { text: "Large loads have their own process. In Texas, ERCOT's first batch study asks each large load for $50,000 of security per MW. What would the 300 MW campus post?",
+      { text: "Large loads have their own process: in Texas, a large load in ERCOT's first batch study holds $50,000 of [[financial-security|security]] per MW. What total security would the 300 MW campus hold?",
         build: function (act, api) {
           var want = security(N.campusMW, E.securityPerMW) / 1e6;
           var na = LX.NumAnswer(act, { label: "Security for 300 MW", unit: "$ million", accept: ["million", "M", "$M"], onCheck: function (v, input) {
             if (v == null) return;
             var ok = Math.abs(v - want) < 1e-9; input.classList.toggle("right", ok); input.classList.toggle("wrong", !ok);
             if (ok) { api.done(); api.saw("**$" + want + " million.** ERCOT's list of large loads seeking to connect totals " + fmtN(E.requestsGW, 1) + " GW, about " + fmtN(E.requestsGW / (E.peakMW / 1000), 1) + " times its record demand; " + fmtN(E.noStudyGW, 1) + " GW had no studies submitted, " + fmtN(E.energizedGW, 1) + " GW were energized."); }
-            else api.saw("Not yet: 300 MW × $" + fmtN(E.securityPerMW) + " per MW, in millions of dollars.", true);
+            else api.saw("Not yet: 300 MW × $" + fmtN(E.securityPerMW) + " per MW, the total in millions of dollars.", true);
           } });
           H("p", { class: "lx-hint", html: LX.rich("ERCOT, slides to the Texas Senate, 29 July 2026; requests as of June 2026. In October 2025 the Secretary of Energy also asked FERC to start a rulemaking on connecting large loads to the interstate transmission system.") }, act);
           hooks.sec = function () { na.input.value = String(want); na.go(); };
@@ -570,25 +574,28 @@
       xhost.innerHTML = ""; xhost.classList.add("is-live");
       var run = cluster(C), Wf = run.final.W, nn = n1(N, N.campusMW, false), small = { c: 150 };
       LX.Flowchart(H("div", { class: "lx-xcard" }, xhost), {
-        title: "A generator cluster: the questions in order", lede: "Trace a request. Projects whose share is too high leave the queue; the rest go back to be restudied.",
+        title: "A generator cluster: the questions in order", lede: "The page's original cluster, whatever you chose above: no withdrawal of yours, no readiness rule. Projects whose share is too high leave; the others are restudied.",
         nodes: { req: { t: "Requests filed", tN: ["Requests", "filed"], s: "site control, deposit", sN: "site, deposit" },
                  study: { t: "Study: overload found?", tN: ["Overload", "found?"], k: "q" },
                  up: { t: "Upgrades and shares", tN: ["Upgrades", "and shares"], s: "by impact on the line", sN: "by impact" },
                  dear: { t: "Any share too high?", tN: ["A share", "too high?"], k: "q" },
-                 wd: { t: "Those projects leave", tN: ["Those", "projects leave"], s: "they exit the queue", sN: "exit the queue" },
+                 wd: { t: "Those projects leave", tN: ["Those", "projects leave"], s: "the too-dear ones exit", sN: "too-dear ones exit", k: "end" },
                  rest: { t: "The rest: restudy", tN: ["The rest:", "restudy"], s: C.studyDays + " more days", sN: C.studyDays + " more days" },
                  agr: { t: "Agreement and security", tN: ["Agreement", "and security"] },
                  on: { t: "Built, then operating", tN: ["Built, then", "operating"], k: "end" } },
         cols: 3, colsN: 2,
-        at: { req: [0, 0], study: [0, 1], up: [1, 1], dear: [1, 2], wd: [2, 2], rest: [2, 1], agr: [0, 3], on: [0, 4] },
+        at: { req: [0, 0], study: [0, 1], up: [1, 1], dear: [1, 2], wd: [2, 3], rest: [2, 1], agr: [0, 3], on: [0, 4] },
         atN: { req: [0, 0], study: [0, 1], up: [1, 1], dear: [1, 2], wd: [1, 3], rest: [1, 4], agr: [0, 4], on: [0, 5] },
-        edges: [["req", "study"], ["study", "up", "yes"], ["study", "agr", "no", { v: true }], ["up", "dear"], ["dear", "wd", "yes"], ["dear", "agr", "no"],
-                ["wd", "rest"], ["rest", "study", "back to study", { d: "M570 100 V78 H200 V103", l: [385, 72], dN: "M323 402 H350 V80 H130 V111", lN: [240, 75] }], ["agr", "on"]],
-        traces: [{ label: "Wind farm", path: ["req", "study", "up", "dear", "wd", "rest", "study", "up", "dear", "agr", "on"], text: "In study 1 the placeholder's share was too high and it left; the wind farm was restudied, and its share rose to " + perkw(Wf.perKW) + ", still under the " + perkw(PJ.W.limitPerKW) + " it would pay." },
+        // the too-dear projects leave (their path ends); the others go on to the restudy (narrow: around the leavers' box)
+        edges: [["req", "study"], ["study", "up", "yes"], ["study", "agr", "no", { v: true }], ["up", "dear"], ["dear", "wd", "yes", { v: true }], ["dear", "agr", "no"],
+                ["dear", "rest", "the rest", { dN: "M330 218 H352 V370 H300 V378", lN: [326, 210] }],
+                ["rest", "study", "back to study", { d: "M570 100 V78 H200 V103", l: [385, 72], dN: "M323 402 H360 V80 H130 V111", lN: [240, 75] }], ["agr", "on"]],
+        // the wind farm stays: its trace goes from the question straight to the restudy, never through "leave"
+        traces: [{ label: "Wind farm", path: ["req", "study", "up", "dear", "rest", "study", "up", "dear", "agr", "on"], text: "In study 1 the placeholder's share was too high and it left; the wind farm stayed and was restudied, and its share rose to " + perkw(Wf.perKW) + ", still under the " + perkw(PJ.W.limitPerKW) + " it would pay." },
                  { label: "Placeholder", path: ["req", "study", "up", "dear", "wd"], text: "Its share, " + perkw(run.rounds[0].rows.filter(function (x) { return x.id === "X"; })[0].perKW) + ", was above the " + perkw(PJ.X.limitPerKW) + " it would pay: it left the queue after study 1." }],
         sel: 0 });
       LX.Flowchart(H("div", { class: "lx-xcard" }, xhost), {
-        title: "A large load: its utility's process", lede: "Steps differ by utility and state; Order 2023's generator rules do not apply.",
+        title: "A large load: its utility's process", lede: "The page's original " + N.campusMW + " MW campus, whatever the slider shows. Steps differ by utility and state; Order 2023's generator rules do not apply.",
         nodes: { lreq: { t: "Request for service", tN: ["Request for", "service"], s: "to the utility", sN: "to the utility" },
                  lfit: { t: "Fits, one line out?", tN: ["Fits, one", "line out?"], k: "q" },
                  lcon: { t: "Service contract", tN: ["Service", "contract"], s: "minimum bill, collateral", sN: "bill, collateral" },

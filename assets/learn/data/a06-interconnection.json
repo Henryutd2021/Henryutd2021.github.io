@@ -7,7 +7,7 @@
   },
   "walk": {
     "tracks": [
-      { "key": "gen", "name": "Ridge wind farm, 200 MW", "short": "Wind farm", "note": "A generator: the federal pro forma rules of Order 2023 (grid operators adapt them).",
+      { "key": "gen", "name": "Ridge wind farm, 200 MW", "short": "Wind farm", "note": "A generator: [[ferc|FERC]]'s Order 2023 sets [[pro-forma|pro forma]] rules, a standard template that grid operators adapt.",
         "stages": [
           { "key": "req", "name": "Request", "who": "The developer", "time": "45-day window",
             "what": "Files an [[interconnection-request|interconnection request]] in a 45-day window, with a study deposit based on its MW and [[site-control|control]] of 90% of its site." },
@@ -16,9 +16,9 @@
           { "key": "share", "name": "Upgrades and shares", "who": "The transmission provider", "time": "part of the study",
             "what": "Names the [[network-upgrade|network upgrades]] and splits their cost by each project's impact on the overloaded line." },
           { "key": "wd", "name": "Restudy", "who": "Every developer in the cluster", "time": "a restudy each time",
-            "what": "Projects whose share is too high withdraw; the rest are restudied and their shares change." },
+            "what": "Projects whose share is too high withdraw. A withdrawal can trigger a restudy of the rest, and in this toy it always does: their shares change." },
           { "key": "agr", "name": "Agreement", "who": "Developer and provider", "time": "varies",
-            "what": "Signs the [[interconnection-agreement|interconnection agreement]] and posts a deposit of 20% of its network upgrade costs." },
+            "what": "Signs the [[interconnection-agreement|interconnection agreement]]; its deposits must then total 20% of its network upgrade costs, earlier readiness deposits included." },
           { "key": "build", "name": "Building", "who": "Developer and utility", "time": "varies",
             "what": "Builds the plant while the utility builds the upgrades; permits, equipment and crews set the pace." },
           { "key": "on", "name": "Operation", "who": "The grid operator", "time": "",
@@ -27,7 +27,7 @@
       { "key": "load", "name": "Data center campus, 300 MW", "short": "Data center", "note": "A large load: rules differ by utility and state; Prairie Town's steps are illustrative.",
         "stages": [
           { "key": "req", "name": "Request", "who": "The developer", "time": "",
-            "what": "Asks the utility for 300 MW of service. In ERCOT's 2026 batch study, a large load posts $50,000 per MW of security." },
+            "what": "Asks the utility for 300 MW of service. In [[ercot|ERCOT]]'s 2026 Batch Zero study, a large load holds [[financial-security|financial security]] of $50,000 per MW." },
           { "key": "study", "name": "Load study", "who": "The utility", "time": "",
             "what": "Can the network carry 300 MW with any one line out ([[n-minus-one|N−1]])? Voltage and stability are checked too." },
           { "key": "share", "name": "Upgrades and who pays", "who": "Utility and state regulator", "time": "",
@@ -71,7 +71,7 @@
     { "n": "1,312 GW + 749 GW", "what": "Generation and storage actively seeking interconnection in the U.S. at the end of 2025, in about 8,200 projects.", "source": "Berkeley Lab, Queued Up: 2026 Edition", "url": "https://eta-publications.lbl.gov/publications/queued-2026-edition-characteristics", "asof": "May 2026; data through 2025" },
     { "n": "150 days", "what": "Length of a cluster study in FERC Order 2023's pro forma rules (issued 28 July 2023), after a 45-day request window and a 60-day customer engagement window; facilities and affected-system studies come on top, and restudies follow withdrawals.", "source": "MISO, FERC Order No. 2023: An Initial Review, slides 3 and 5", "url": "https://cdn.misoenergy.org/20230808%20IPWG%20Item%2004%20Review%20of%20FERC%20Order%202023629802.pdf", "asof": "8 August 2023" },
     { "n": "474.7 GW", "what": "Large loads seeking to connect in ERCOT, with requested dates through 2033, about 90% of them data centers; ERCOT's highest demand so far is about 91.1 GW.", "source": "ERCOT to the Texas Senate, slide 6; ERCOT demand records", "url": "https://www.ercot.com/files/docs/2026/07/29/ERCOT-Senate-July-29-Panel-1-Assessing-The-Grid.pdf", "asof": "requests as of June 2026; peak 91,134 MW on 22 July 2026, preliminary" },
-    { "n": "$50,000 per MW", "what": "Financial security a large load posts in ERCOT's first batch study, which is to give each project MW allocations year by year for 2028–2032.", "source": "ERCOT to the Texas Senate, slides 3–5", "url": "https://www.ercot.com/files/docs/2026/07/29/ERCOT-Senate-July-29-Panel-1-Assessing-The-Grid.pdf", "asof": "29 July 2026" }
+    { "n": "$50,000 per MW", "what": "Financial security per MW for a large load in ERCOT's first batch study (Batch Zero), which is to give each project MW allocations year by year for 2028–2032.", "source": "ERCOT to the Texas Senate, slides 3–5", "url": "https://www.ercot.com/files/docs/2026/07/29/ERCOT-Senate-July-29-Panel-1-Assessing-The-Grid.pdf", "asof": "29 July 2026" }
   ],
   "ladder": {
     "rungs": [
@@ -83,17 +83,18 @@
     ],
     "off": { "id": "projection", "label": "A forecast is not on the ladder" },
     "items": [
-      { "id": "ercot", "text": "ERCOT's list of large loads seeking to connect totals 474.7 GW.", "answer": ["requested"], "note": "Mostly requests: 284.3 GW had no studies submitted and 5.9 GW were energized (ERCOT, June 2026)." },
-      { "id": "lbnl", "text": "About 2,061 GW of generation and storage sat in U.S. queues at the end of 2025.", "answer": ["requested", "studied"], "note": "Queued projects, studied or not yet: the queue is not a forecast. Berkeley Lab counts 1,312 GW plus 749 GW." },
+      { "id": "ercot", "text": "Every load on ERCOT's 474.7 GW list of large loads seeking to connect has at least filed a request.", "answer": ["requested"], "note": "At least requested: the list mixes stages, with 284.3 GW not yet studied and 5.9 GW already energized (ERCOT, June 2026)." },
+      { "id": "lbnl", "text": "Every project in the 2,061 GW of generation and storage in U.S. queues at the end of 2025 had at least filed a request.", "answer": ["requested"], "note": "At least requested: the queue mixes stages, 549 GW of it with a draft or signed agreement (Berkeley Lab: 1,312 GW plus 749 GW). The queue is not a forecast." },
       { "id": "ia", "text": "About 549 GW had a draft or signed interconnection agreement but was not yet operating.", "answer": ["studied", "agreement"], "note": "A draft agreement follows the studies; a signed one adds security. Neither is a plant that runs (Berkeley Lab, end of 2025)." },
       { "id": "campus", "text": "The campus signs a contract with a minimum bill and posts collateral.", "answer": ["agreement"], "note": "Signed and secured, but nothing is built yet." },
-      { "id": "fcst", "text": "A utility says it expects 3 GW of new data centers by 2030 (an invented example).", "answer": ["projection"], "note": "An expectation of loads that are not on the ladder yet; ask how many have signed anything." }
+      { "id": "fcst", "text": "A utility says it expects 3 GW of new data centers by 2030 (an invented example).", "answer": ["projection"], "note": "A forecast is not a stage: it may count loads on any rung, or on none yet. Ask how many have signed anything." }
     ]
   },
   "sources": [
     {"text": "Rand, J., Cheyette, A., Talley, C., Zhang, S., Gorman, W., Wiser, R. H., Seel, J., Jeong, S. and Kahrl, F. (May 2026). Queued Up: 2026 Edition, Characteristics of Power Plants Seeking Transmission Interconnection As of the End of 2025. Berkeley Lab.", "url": "https://eta-publications.lbl.gov/publications/queued-2026-edition-characteristics", "label": "Publication page"},
+    {"text": "FERC. Pro forma Large Generator Interconnection Procedures (LGIP), as revised by Order No. 2023 (PDF, updated 20 August 2024): site control and the deposit in its place where regulations block it, section 3.4.2; restudies after withdrawals, section 7.5; readiness deposits, sections 7.5 and 8.1; deposits at the agreement, section 11.3.", "url": "https://www.ferc.gov/sites/default/files/2024-08/LGIP.pdf", "label": "Procedures"},
     {"text": "MISO (8 August 2023). FERC Order No. 2023: An Initial Review (PDF). Issue date and citation, slide 3; the 45-day request window, the 60-day customer engagement window and the 150-day pro forma cluster study, slide 5; network upgrade costs by proportional impact, slide 6; site control, deposits and withdrawal penalties, slide 7; penalties for late studies, with their cap, grace period and exceptions, slide 8.", "url": "https://cdn.misoenergy.org/20230808%20IPWG%20Item%2004%20Review%20of%20FERC%20Order%202023629802.pdf", "label": "Slides"},
-    {"text": "ERCOT (29 July 2026). ERCOT Update, Senate Committee on Business and Commerce (PDF). Batch study outputs, slide 3; milestones, slides 4–5; large-load requests, slide 6.", "url": "https://www.ercot.com/files/docs/2026/07/29/ERCOT-Senate-July-29-Panel-1-Assessing-The-Grid.pdf", "label": "Slides"},
+    {"text": "ERCOT (29 July 2026). ERCOT Update, Senate Committee on Business and Commerce (PDF). Batch study outputs, slide 3; milestones, slides 4–5 (Batch Zero: financial security brought to $50,000 per MW, slide 5); large-load requests, slide 6.", "url": "https://www.ercot.com/files/docs/2026/07/29/ERCOT-Senate-July-29-Panel-1-Assessing-The-Grid.pdf", "label": "Slides"},
     {"text": "ERCOT. 2026 all-time and monthly demand records (updated 21 August 2026; values preliminary).", "url": "https://www.ercot.com/static-assets/data/news/content/a-peak-demand/2026/all-time-records.htm", "label": "Records page"},
     {"text": "U.S. Secretary of Energy (2025). Letter to the Federal Energy Regulatory Commission on the interconnection of large loads (PDF). 23 October 2025.", "url": "https://www.energy.gov/sites/default/files/2025-10/403%20Large%20Loads%20Letter.pdf", "label": "Letter"},
     {"text": "Li et al. (2026). Accepted paper on the cost of delayed energization for large loads, 2026 North American Power Symposium (NAPS), presented October 2026; DOI pending.", "url": "", "label": ""},

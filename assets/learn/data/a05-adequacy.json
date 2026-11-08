@@ -71,7 +71,7 @@
         "id": "battery",
         "label": "4-hour battery",
         "short": "Battery",
-        "detail": "500 MW, 2,000 MWh, 85% round trip",
+        "detail": "500 MW, 2,000 MWh, [[round-trip-efficiency|85% round-trip efficiency]] (it returns 85% of the energy that charged it)",
         "color": "var(--lx-bat)"
       },
       {
@@ -162,6 +162,7 @@
     "ZERO_NOTE": "No shortfall is left in the 500 years, so the rating is the smallest perfect MW that also leaves none: a limit of the sample, not proof of zero risk.",
     "SE_NOTE": "± two [[standard-error|standard errors]] of the average over 500 years ([[monte-carlo-error|Monte Carlo error]]), given these inputs. It leaves out uncertainty in the weather history and the model's assumptions.",
     "SEED_NOTE": "The [[random-seed|seed]] numbers the random draws so a run can be repeated; another seed draws other years with the same assumptions.",
+    "RULES_NOTE": "Simple operating rules, not optimized: the battery starts each year full, charges from any surplus and discharges only in a shortfall; demand response covers a day's first 4 shortfall hours. Better timing could rate both higher.",
     "SCREEN_NOTE": "A deliberately crude screen: every MW counts at nameplate, and 500 MW of demand response counts as 500 MW of supply against the gross 4,000 MW peak.",
     "PJM_SAW": "A rating belongs to one grid, one mix and one model. **Correlated outages, such as a cold snap knocking out many units at once, can lower a peaker's rating; Analyst lesson [[lesson:a09-hazards|A9]] brings such hazards in.**",
     "PJM_Q": {

@@ -9,7 +9,7 @@
 //                                             and the sources for the contract types
 // One price year: every dollar is a real 2025 dollar. A "price year" is one simulated year of market conditions.
 // Every contract is settled in cash (a financial PPA): the buyer buys its power at the hub, and the contract pays the
-// difference between the strike and a floating price. No hour-by-hour delivery is modelled.
+// difference between the contract price (the strike) and a floating price. No hour-by-hour delivery is modelled.
 //
 // Model (simulation; yearly totals, no solver):
 //   each price year draws five independent drivers from the seeded generator (LX.Drill.rng, a linear congruential
@@ -164,13 +164,14 @@
     return {
       year: function (y, k) {
         var o = year(P0, y, "merchant", "merchant", null, F.toll);
-        return "Price year " + k + ": the hub averaged " + usd(y.P) + "/MWh; per MWh, solar output fetched " + pct(y.c) + " of it (the [[capture-ratio|capture ratio]]); output was " + pct(y.v) + " of typical. With no contract the solar farm sold " + musd(o.solar) + ".";
+        return "Price year " + k + ": the hub averaged " + usd(y.P) + "/MWh and output was " + pct(y.v) + " of typical. With no contract the solar farm sold " + musd(o.solar) + ", earning the hub's solar-hours price plus the basis.";
       },
       run: "Over 200 price years, the solar farm's sales ran from " + musd(m.sR.p10) + " ([[percentile|P10]]) to " + musd(m.sR.p90) + " (P90) a year, and the buyer's bill from " + musd(m.sY.p10) + " to " + musd(m.sY.p90) + ". One year in ten fell below each P10.",
       node: "Settled at the node, the seller keeps only output risk: " + mrange(n.sR) + ". The buyer carries price, shape and basis, and shares output risk, as the settled MWh follow output: " + mrange(n.sY) + ".",
       hub: "Settled at the hub, the basis moves back to the seller, whose range widens to " + mrange(h.sR) + ". The buyer's narrows to " + mrange(h.sY) + ".",
       block: "With a flat block, settled in cash, the buyer's bill is fixed at " + musd(b.sY.p50, 2) + ". The seller settles the block's hours its panels miss too, so it carries the shape: " + mrange(b.sR) + ".",
       toll: "Tolled, the battery pays its owner a fixed " + musd(sm.tollY, 2) + " a year. Its margin, " + mrange(sm.batM) + " over these years, now swings the buyer's bill instead.",
+      own: "Run by its owner again, the battery's margin, " + mrange(sm.batM) + " over these years, swings the seller's result; the buyer's bill carries only the solar contract.",
       price: function (c, off) {
         var a = sm.at(c, "none", 0), z = sm.at(c, "none", off), d = z.sR.mean - a.sR.mean, e = z.sY.mean - a.sY.mean;
         if (off === 0) return "At the fair price the seller averages " + musd(a.sR.mean, 2) + " a year and the buyer pays " + musd(a.sY.mean, 2) + ".";
@@ -178,7 +179,7 @@
       },
       strike: function (c, off) {
         var k = F[c] + off;
-        return "Strike: " + usd(k) + "/MWh" + (off === 0 ? ", the fair price." : " (fair " + usd(F[c]) + " " + (off > 0 ? "+" : "−") + " " + usd(Math.abs(off)) + ").");
+        return "Contract price: " + usd(k) + "/MWh" + (off === 0 ? ", the fair price." : " (fair " + usd(F[c]) + " " + (off > 0 ? "+" : "−") + " " + usd(Math.abs(off)) + ").");
       },
       per1: per1
     };
@@ -208,7 +209,7 @@
     var F = sm.F, P0 = sm.P0, y = sm.years[0], E = Math.round(y.v * P0.E0), w = +(y.c * y.P).toFixed(2), K = +F.hub.toFixed(2);
     var ex = { c: +sm.exp.c.toFixed(2), P: +sm.exp.P.toFixed(2), b: +sm.exp.b.toFixed(2), s: +sm.exp.s.toFixed(2) }, X = E * (K - w);
     return [
-      { key: "settle", name: "Settlement, price year 1, at the hub", rule: "Output × (strike − hub price per solar MWh)",
+      { key: "settle", name: "Settlement, price year 1, at the hub", rule: "Output × (contract price − hub price per solar MWh)",
         calc: num(E) + " MWh × (" + usd(K) + " − " + usd(w) + ") ≈ " + musd(X, 2) + ": " + (X < 0 ? "the seller pays the buyer" : "the buyer pays the seller"), v: X, ops: [E, K, w] },
       { key: "node", name: "Fair price, settled at the node", rule: "Expected capture × expected hub price + expected basis",
         calc: ex.c + " × " + usd(ex.P) + (ex.b < 0 ? " − " : " + ") + usd(Math.abs(ex.b)) + " = " + usd(ex.c * ex.P + ex.b) + "/MWh", v: ex.c * ex.P + ex.b },
@@ -243,7 +244,7 @@
                    ["hub", "price level", 1, "The seller gets the fixed price whatever the hub does; the buyer's bill moves with the hub."],
                    ["node", "output", 2, "As generated, the seller is paid only for what it makes, and the settled MWh follow output: a poor solar year moves the buyer's bill too."],
                    ["block", "shape", 0, "The block settles every hour, whatever the panels make: the seller carries the shape."],
-                   ["block", "price level", 0, "The buyer's bill is fixed; the seller's settlement on the block grows when the hub is high."],
+                   ["block", "price level", 0, "The buyer's bill is fixed; when the hub price rises, the seller pays the buyer more on the block."],
                    ["toll", "battery margin", 1, "Under a toll the buyer runs the battery and keeps its margin, for a fixed fee."]];
       var cs = pick(cases), names = { node: "a fixed price settled at the node", hub: "a fixed price settled at the hub", block: "a flat block at a fixed price", toll: "a battery toll" };
       return { kind: kind, q: "Under " + names[cs[0]] + ", who carries the " + cs[1] + " risk?", choices: ["The seller", "The buyer", "Both"], answer: cs[2], why: cs[3], contract: cs[0], risk: cs[1] };
@@ -343,8 +344,9 @@
     // the seed row: the seed in words, a new seed, and back to the page's seed
     function seedRow(host) {
       var row = H("div", { class: "a2-seed" }, host), lab = H("span", { class: "a2-seed-l", "aria-live": "polite" }, row);
-      var nb = H("button", { type: "button", class: "lx-btn ghost small", text: "New seed" }, row), back = H("button", { type: "button", class: "lx-btn ghost small", text: "Seed " + DA.sim.seed }, row);
-      function paint() { lab.textContent = "Seed " + ST.seed + " · " + DA.sim.years + " price years"; back.hidden = ST.seed === DA.sim.seed; }
+      var nb = H("button", { type: "button", class: "lx-btn ghost small", text: "Draw another " + DA.sim.years + " years" }, row), back = H("button", { type: "button", class: "lx-btn ghost small", text: "Back to seed " + DA.sim.seed }, row);
+      // the seed is the number that fixes the draws: the same seed always gives the same years
+      function paint() { lab.textContent = "Seed " + ST.seed + " · " + DA.sim.years + " price years · the same seed always gives the same years"; back.hidden = ST.seed === DA.sim.seed; }
       nb.addEventListener("click", function () { reseed((ST.seed * 7919 + 104729) % 100000 + 1); });
       back.addEventListener("click", function () { reseed(DA.sim.seed); });
       redraws.push(paint); paint();
@@ -378,13 +380,19 @@
       text: Q[0],
       build: function (act, api) {
         var k = 0, btn = H("button", { type: "button", class: "lx-btn small", text: "Draw a price year" }, act);
-        var ro = readouts(act, [["P", "Hub price, yearly average"], ["c", "Shape (capture ratio)"], ["v", "Output, share of a typical year"], ["b", "Basis, node − hub"], ["s", "Battery margin"], ["R", "Solar sales, no contract"]]);
-        // what each driver is, one line each, before the first draw (the terms carry glossary popups)
-        var kl = H("ul", { class: "a2-key", "aria-label": "What the five drivers are" }, act);
-        key(P0).forEach(function (t) { H("li", { html: LX.rich(t) }, kl); });
+        // first the two drivers the sales follow most, output and the hub price; the other three (shape, basis, battery
+        // margin) wait in a box that the contract cards need later (each term carries a glossary popup)
+        var ro = readouts(act, [["P", "Hub price, yearly average"], ["v", "Output, share of a typical year"], ["R", "Solar sales, no contract"]]), K = key(P0);
+        var kl = H("ul", { class: "a2-key", "aria-label": "What output is" }, act);
+        H("li", { html: LX.rich(K[0]) }, kl);
+        var more = H("details", { class: "lx-textalt a2-more" }, act);
+        H("summary", { text: "The other three drivers: shape, basis and battery margin" }, more);
+        var ro2 = readouts(more, [["c", "Shape (capture ratio)"], ["b", "Basis, node − hub"], ["s", "Battery margin"]]);
+        var kl2 = H("ul", { class: "a2-key", "aria-label": "What the other drivers are" }, more);
+        K.slice(1).forEach(function (t) { H("li", { html: LX.rich(t) }, kl2); });
         function show() {
           var y = sm.years[(k - 1) % sm.years.length], o = year(P0, y, "merchant", "merchant", null, sm.F.toll);
-          ro.P.textContent = usd(y.P) + "/MWh"; ro.c.textContent = pct(y.c); ro.v.textContent = pct(y.v); ro.b.textContent = (y.b < 0 ? "−$" : "+$") + Math.abs(y.b).toFixed(2) + "/MWh"; ro.s.textContent = usd(y.s) + "/MWh"; ro.R.textContent = musd(o.solar);
+          ro.P.textContent = usd(y.P) + "/MWh"; ro2.c.textContent = pct(y.c); ro.v.textContent = pct(y.v); ro2.b.textContent = (y.b < 0 ? "−$" : "+$") + Math.abs(y.b).toFixed(2) + "/MWh"; ro2.s.textContent = usd(y.s) + "/MWh"; ro.R.textContent = musd(o.solar);
           api.done(); api.saw(T.year(y, k));
         }
         btn.addEventListener("click", function () { k++; btn.textContent = "Draw the next price year"; show(); });
@@ -396,6 +404,7 @@
     steps.push({
       text: Q[1],
       build: function (act, api) {
+        H("p", { class: "lx-hint a2-buyer", text: "The buyer uses " + num(P0.L / HOURS) + " MW in every hour, " + mwh(P0.L) + " MWh a year, the solar farm's typical output, and buys it at the hub." }, act);
         var btn = H("button", { type: "button", class: "lx-btn small", text: "Run " + DA.sim.years + " price years" }, act), host = H("div", null, act), ran = false;
         btn.addEventListener("click", function () {
           if (ran) return; ran = true; btn.hidden = true; ST.contract = "merchant";
@@ -436,9 +445,9 @@
         var own = ST.contract !== "merchant";
         if (!own) ST.contract = "hub";
         H("p", { class: "lx-hint", text: "Solar contract: " + NAMES[ST.contract].toLowerCase() + (own ? " (your last pick)." : ".") }, act);
-        var tg = LX.Toggle(H("div", { class: "lx-toggles", role: "group", "aria-label": "Battery" }, act), { label: "Battery tolled to the buyer at " + usd(sm.F.toll / 12) + " per kW a month", on: ST.battery === "toll", onChange: function (on) { ST.battery = on ? "toll" : "merchant"; pr.draw(); if (on) { api.done(); api.saw(T.toll); } } });
-        var pr = pair(act, function () { return ST.battery; });
-        redraws.push(function () { if (ST.battery === "toll") api.saw(T.toll); });
+        var tg = LX.Toggle(H("div", { class: "lx-toggles", role: "group", "aria-label": "Battery" }, act), { label: "Battery tolled to the buyer at " + usd(sm.F.toll / 12) + " per kW a month", on: ST.battery === "toll", onChange: function (on) { ST.battery = on ? "toll" : "merchant"; switched = true; pr.draw(); if (on) { api.done(); api.saw(T.toll); } else api.saw(T.own); } });
+        var pr = pair(act, function () { return ST.battery; }), switched = false;
+        redraws.push(function () { if (ST.battery === "toll") api.saw(T.toll); else if (switched) api.saw(T.own); });
         if (ST.battery === "toll") { api.done(); api.saw(T.toll); }
         autos[5] = function () { if (!tg.val()) tg.el.click(); };
       }

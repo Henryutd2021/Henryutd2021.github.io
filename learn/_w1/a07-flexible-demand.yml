@@ -4,6 +4,9 @@
 id: a07-flexible-demand
 lesson: A7
 glossary:
+  - id: consequential-emissions
+    term: Consequential emissions
+    def: "The change in what power plants actually emit because of a decision, as the grid re-dispatches; it is counted with marginal, not average, emission factors."
   - id: virtual-power-plant
     term: Virtual power plant
     def: "Many small devices, such as batteries, thermostats and chargers, controlled together and offered to the grid as one resource."

@@ -40,16 +40,16 @@ function staticTable() {
   const row = k => `<tr><td>${NAMES[k]}</td><td>${usd0(X.fixed[k])}</td><td>${usd0(EO.perKW[k])}</td><td>${usd0(CM.perKW[k] + CM.capPrice * D.designs.ratings[k])}</td></tr>`;
   return [`<table class="a3-static" aria-label="Each new plant's margin after running costs per kW a year against its fixed cost, with 1,200 MW of solar and 700 MW of peakers">`,
     `<thead><tr><th scope="col">New plant</th><th scope="col">Fixed cost ($/kW a year)</th><th scope="col">Margin after running costs, energy-only</th><th scope="col">Margin with the payment, simplified capacity market</th></tr></thead>`,
-    `<tbody>`, ...["wind", "solar", "cc", "ct"].map(row), `<tr><td>Consumers pay ($/MWh)</td><td>–</td><td>${usd(EO.consumer)}</td><td>${usd(CM.consumer)}</td></tr>`, `</tbody></table>`].join("\n");
+    `<tbody>`, ...["wind", "solar", "cc", "ct"].map(row), `<tr><td>Wholesale payments ($ per MWh demanded)</td><td>–</td><td>${usd(EO.consumer)}</td><td>${usd(CM.consumer)}</td></tr>`, `</tbody></table>`].join("\n");
 }
-// the five arrangements for readers without JavaScript: where, how capacity is paid for, dated sources
+// the five arrangements for readers without JavaScript: where, how capacity is paid for, the dated facts, the sources
 const escH = t => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 const richH = t => escH(t).replace(/\[\[([a-z0-9-]+)\|([^\]]+)\]\]/g, '<span class="lx-term" data-term="$1">$2</span>');
 function worldTable() {
   const src = x => x.url ? `<a href="${x.url}">${escH(x.label)}</a>` : escH(x.label);
   return [`<table class="a3-static a3-world" aria-label="Five arrangements around the world: how each pays for enough capacity, with dated sources">`,
-    `<thead><tr><th scope="col">Where</th><th scope="col">How capacity is paid for</th><th scope="col">Sources</th></tr></thead>`, `<tbody>`,
-    ...D.world.map(w => `<tr><td>${escH(w.label)}</td><td>${richH(w.how)} ${richH(w.facts)}</td><td>${w.sources.map(src).join("; ")}</td></tr>`), `</tbody></table>`].join("\n");
+    `<thead><tr><th scope="col">Where</th><th scope="col">How capacity is paid for</th><th scope="col">Dated facts</th><th scope="col">Sources</th></tr></thead>`, `<tbody>`,
+    ...D.world.map(w => `<tr><td>${escH(w.label)}</td><td>${richH(w.how)}</td><td>${richH(w.facts)}</td><td>${w.sources.map(src).join("; ")}</td></tr>`), `</tbody></table>`].join("\n");
 }
 const BLOCK = /(<!-- a3-table:start[^>]*-->\n)([\s\S]*?)(<!-- a3-table:end -->)/, WBLOCK = /(<!-- a3-world:start[^>]*-->\n)([\s\S]*?)(<!-- a3-world:end -->)/;
 if (process.argv.includes("--write")) {
@@ -150,29 +150,45 @@ const has = (str, msg) => ok(QMD.indexOf(str) >= 0, "page states " + (msg || JSO
   has("From 1,200 to 2,800 MW of solar, solar's capture price falls from $33.16 to $7.38 per MWh.");
   has("Energy-only, a new peaker falls $25 per kW a year short of its fixed cost; at 600 MW of peakers a new one pays, and the year has 2 hours short.");
   has("Existing peakers cover their upkeep up to 900 MW, so from 700 to 900 MW none is built and none retires: simplified thresholds.");
-  has("With the simplified capacity market, its price set to fill a new peaker's gap, the capacity price is $191/MW-day; consumers pay $40.79/MWh against $39.89 energy-only (table below).");
-  has("in 111 hours of the year"); has("Here its capture price is 93% of the average at 1,200 MW and 32% at 2,800 MW. In CAISO in 2023 solar's value factor, a broader measure with capacity value, was 38%.");
-  has("with 700 MW of peakers here, consumers pay $39.89/MWh energy-only and $40.79/MWh with the simplified capacity market.");
-  ok(/value factor was 38%/.test(D.solarValue.what) && /counts energy and capacity value against a flat 24-hour block's; this lesson's capture ratio counts energy only/.test(D.solarValue.measure) && /energy plus capacity value, over a flat block's/.test(QMD) && !/its output-weighted price over the average price/.test(JSON.stringify(D)), "solar value: LBNL's 38% is a value factor with capacity value (slide 50), kept apart from the energy-only capture ratio");
+  has("With the simplified capacity market, its price set to fill a new peaker's gap, the capacity price is $191/MW-day; wholesale payments are $40.79 per MWh demanded against $39.89 energy-only (table below).");
+  // what the wholesale payments count: energy and capacity over all demand; the credit and network charges outside
+  ok(near(EO.creditPerMWh, 25 * (() => { let q = 0; for (let t = 0; t < 8760; t++) { const h = M.hour(D, X, t, { solar: S0, ct: C0, design: "eo" }); q += h.Wd + h.Sd; } return q; })() / EO.demand, 1e-9) && usd(EO.creditPerMWh) === "$12.97", "wholesale payments: the $25 credit adds $12.97 per MWh demanded, outside them");
+  has(M.payNote(EO)); ok(M.payNote(EO) === "Wholesale payments: energy and capacity payments over all demand, served or not. Left out: the $25 production credit, $12.97 per MWh demanded here, paid by taxpayers, and network charges." && /H\("p", \{ class: "a3-note", text: payNote\(base\("eo"\)\) \}, act\)/.test(JS) && /kpi\(k, "Wholesale payments per MWh demanded", usd\(r\.consumer\)\)/.test(JS) && !/Consumers pay/.test(JS + QMD), "wholesale payments: labelled per MWh demanded, with what they leave out, on the page and in step 6");
+  has("in 111 hours of the year"); has("<p>Myth, once solar is common: here its capture price is 93% of the average at 1,200 MW and 32% at 2,800 MW.</p><p class=\"lx-hint\">A real measure: in CAISO in 2023, solar's value factor, a broader measure with capacity value, was 38% (LBNL; Numbers to remember).</p>");
+  has("with 700 MW of peakers here, wholesale payments are $39.89 per MWh demanded energy-only and $40.79 with the simplified capacity market.");
+  ok(/value factor was 38%/.test(D.solarValue.what) && /compares solar's energy and capacity value with a flat block's, the same power in every hour; this lesson's capture ratio counts energy only/.test(D.solarValue.measure) && /energy plus capacity value, over a flat block's/.test(QMD) && !/its output-weighted price over the average price/.test(JSON.stringify(D)), "solar value: LBNL's 38% is a value factor with capacity value (slide 50), kept apart from the energy-only capture ratio");
   has("39.37 + (5,000 − 39.37) × (1 − 401 ÷ 600)² = 39.37 + 4,960.63 × 0.110 ≈ $585 per MWh. Step 1 shows $586.76: its spare is 400.7 MW before rounding.");
   has("69.59 × 1,000 ÷ 365 = 190.66, about $191 per MW-day");
   ok(/data-id="adder" data-answer="c"[\s\S]{0,500}<li data-value="c">About \$585<\/li>/.test(QMD) && /data-id="mwday" data-answer="b"[\s\S]{0,400}<li data-value="b">About \$191<\/li>/.test(QMD), "quiz: answers point at the right options");
   ok(/data-id="negative" data-answer="myth"/.test(QMD) && /data-id="average" data-answer="myth"/.test(QMD) && /data-id="free" data-answer="myth"/.test(QMD) && /data-id="cap" data-answer="fact"/.test(QMD), "myths: three myths, one fact");
 }
 
+const WJ0 = () => JSON.stringify(D.world);
 // ---------------- the world: sources on the allow-list, neutral wording, a sort with one answer each
 {
   const hosts = ["ferc.gov", "pjm.com", "misoenergy.org", "ercot.com", "ec.europa.eu", "ember-energy.org", "lbl.gov", "eia.gov"];
   const all = D.world.reduce((a, w) => a.concat(w.sources), []).concat([D.solarValue.source]), linked = all.filter(s => s.url), unlinked = all.filter(s => !s.url);
   ok(D.world.length === 5 && linked.every(s => hosts.some(h => new URL(s.url).hostname === h || new URL(s.url).hostname.endsWith("." + h))), "world: five arrangements, every linked source on the allow-list (" + linked.length + ")");
   ok(unlinked.length === 2 && unlinked.every(s => /\b(19|20)\d\d\)?/.test(s.label)) && /^NDRC, /.test(unlinked[0].label + "") === false ? true : unlinked.some(s => /^NDRC, .*30 January 2026/.test(s.label)) && unlinked.some(s => /^Regulation \(EU\) 2024\/1747, Article 19d/.test(s.label)), "world: two primary sources named without a link (NDRC, 30 January 2026; Regulation (EU) 2024/1747), until their domains are allow-listed");
-  ok(new Set(D.world.map(w => w.how)).size === 5 && D.world.every(w => w.how.split(/\s+/).length <= 36 && w.facts.split(/\s+/).length <= 40), "world: five distinct sorting cards of 36 words or fewer; facts of 40 or fewer");
+  ok(new Set(D.world.map(w => w.how)).size === 5 && D.world.every(w => w.how.split(/\s+/).length <= 36 && w.facts.split(/\s+/).length <= 36), "world: five distinct sorting cards of 36 words or fewer; facts of 36 or fewer, in their own column");
+  // ERCOT's caps as of January 2026: $5,000 day-ahead (also its value of lost load), $2,000 real-time; the lesson's
+  // $5,000 cap on the clearing price is labelled a teaching assumption
+  const ER = D.world.filter(w => w.id === "ercot")[0];
+  ok(/Offer caps \(January 2026\): \$5,000\/MWh day-ahead, \$2,000 in real time; once peakers' yearly net margin passes a threshold, the day-ahead cap also drops to \$2,000\./.test(ER.facts) && !/offers are capped at \$5,000\/MWh\./.test(ER.how) && /high day-ahead offer cap/.test(D.designs.eo.capNote) && ER.sources.some(x => /2026_01-Day-Ahead-Market-Operations\.pdf$/.test(x.url) && /slide 8/.test(x.label)) && /teaching assumption/.test(D.designs.eo.capNote) && /real-time offer cap is \$2,000/.test(D.designs.eo.capNote), "world: ERCOT's day-ahead and real-time offer caps, dated and sourced; the lesson's cap a teaching assumption");
+  has("The $5,000/MWh cap is ERCOT's high day-ahead offer cap and value of lost load; real-time offers are capped at $2,000 (January 2026). Here $5,000 caps the clearing price, a teaching simplification.");
+  has("ERCOT's high day-ahead and its real-time offer caps; $5,000 is also its value of lost load. The cap was $9,000 until 1 January 2022.");
+  ok(/qualifying reliable capacity is gradually to be paid under one rule/.test(D.world.filter(w => w.id === "china")[0].facts) && !/all reliable capacity/.test(JSON.stringify(D.world)), "world: China's single payment is for qualifying capacity, introduced gradually");
+  ok(!/system-wide offer cap since 1 January 2022/.test(QMD + JSON.stringify(D)), "world: no page text calls $5,000 ERCOT's one offer cap");
+  // the EU rule: generally two-way contracts for difference or equivalent schemes, with exceptions
+  ok(/is generally a two-way contract for difference \(top-ups below an agreed price, paybacks above\) or an equivalent scheme, with stated exceptions/.test(WJ0()) && !/must be two-way contracts/.test(WJ0()), "world: the EU rule says 'generally', names equivalent schemes and the exceptions");
+  ok(D.world.filter(w => w.id === "vertical")[0].label === "U.S. regions without a regional transmission organization (RTO)", "world: RTO spelled out in its sorting bin");
   const WJ = JSON.stringify(D.world);
-  ok(/16 July 2024/.test(WJ) && /from 17 July 2027, new direct price support/.test(WJ) && /5 December 2025/.test(WJ) && /coal's since 2024; a January 2026 notice revised them/.test(WJ) && /\$269\.92\/MW-day for most of its region in 2025\/26 \(two zones cleared higher, at their caps\) and \$325, at the cap, for its entire region in 2028\/29/.test(WJ) && /The NDRC/.test(WJ) && !/widened to gas/.test(WJ), "world: dated facts (EU in force 16 July 2024, CfDs from 17 July 2027; ERCOT 5 December 2025; China's 2026 notice revised its mechanisms, the NDRC named; PJM $269.92 for most of its region, $325 for all of it)");
+  ok(/16 July 2024/.test(WJ) && /From 17 July 2027, new direct price support/.test(WJ) && /5 December 2025/.test(WJ) && /coal's since 2024; a January 2026 notice revised them/.test(WJ) && /\$269\.92\/MW-day for most of its region in 2025\/26 \(two zones cleared higher, at their caps\) and \$325, at the cap, for its entire region in 2028\/29/.test(WJ) && /The NDRC/.test(WJ) && !/widened to gas/.test(WJ), "world: dated facts (EU in force 16 July 2024, CfDs from 17 July 2027; ERCOT 5 December 2025; China's 2026 notice revised its mechanisms, the NDRC named; PJM $269.92 for most of its region, $325 for all of it)");
   const wm2 = QMD.match(WBLOCK); ok(wm2 && wm2[2].trim() === worldTable().trim() && /<td>The European Union<\/td>/.test(worldTable()), "page: the no-JS page lists the five arrangements with their sources (run --write)");
   const vis = QMD.replace(/<!--[\s\S]*?-->/g, "") + JS.replace(/\/\/.*$/gm, "") + JSON.stringify(D);
   ok(!/\b(best|better|superior|worse|should adopt|the right design)\b/i.test(vis), "neutral: no design is called best or better");
   ok(/takes no side/.test(JS) && /For energy-only/.test(JS) && /For a capacity market/.test(JS), "neutral: the Steelman card gives each design its strongest case");
+  ok(/Investors choose what to build from expected revenues; no central auction buys a capacity requirement years ahead\./.test(JS) && !/No planner has to forecast demand/.test(JS), "steelman: energy-only still forecasts demand; it has no central capacity auction");
 }
 
 // ---------------- texts and budgets
@@ -187,7 +203,8 @@ const has = (str, msg) => ok(QMD.indexOf(str) >= 0, "page states " + (msg || JSO
     "155 scarcity hours reach up to $4,665/MWh, while 111 hours go [[negative-price|negative]]. The average, $35.79, hides both ends.",
     "A peaker lives on a few scarcity hours; wind and solar on many ordinary ones, plus the credit. **A new plant's shortfall is [[missing-money|missing money]] only if the grid needs that plant to stay reliable.**",
     M.thresholdText(RP, STAY, G.peakers),
-    "With 700 MW of peakers, consumers pay $39.89/MWh energy-only and $40.79/MWh with the simplified capacity market at $191/MW-day. **The same fleet, paid in different hours and by different rules.**",
+    "With 700 MW of peakers, wholesale payments are $39.89 per MWh demanded energy-only and $40.79 with the simplified capacity market at $191/MW-day. **The same fleet, paid by different rules.**",
+    M.payNote(EO), M.solarAtText(SOL[0]), M.solarAtText(SOL[1]), D.world.map(w => w.facts).join(" ").split(/(?<=\.) (?=[A-Z])/)[0],
     ...D.designs.curveNotes, ...D.designs.cmNotes, G.creditNote, D.solarValue.what, D.solarValue.measure, ...D.world.map(w => w.how), "Market here: 1,200 MW of solar (the default; step 3's slider stays in step 3) and 700 MW of peakers."];
   msgs.forEach((t, i) => ok(words(t) <= 36, `message or displayed note ${i + 1}: ${words(t)} words (≤ 36)`));
   ok(!/D\.designs\.curve\b|ratingsNote/.test(JS) && D.designs.curveNotes.length === 3 && D.designs.cmNotes.length === 3, "notes: one idea per displayed note (the scarcity curve and the capacity market each in three)");
@@ -211,7 +228,7 @@ const has = (str, msg) => ok(QMD.indexOf(str) >= 0, "page states " + (msg || JSO
   const allowed = new Set(), add = v => allowed.add(String(v));
   staticTable().replace(/<[^>]+>/g, " ").match(/\d[\d,]*(?:\.\d+)?/g).forEach(add);
   worldTable().replace(/<[^>]+>/g, " ").replace(/https?:\/\/\S+/g, " ").match(/\d[\d,]*(?:\.\d+)?/g).forEach(add);
-  ["3,000", "1,200", "700", "25.00", "401", "586.76", "35.79", "111", "155", "2,800", "33.16", "7.38", "26", "600", "2", "191", "40.79", "39.89", "25", "1,000", "930", "2025", "7", "4", "30", "5,000", "1", "2022", "2014", "5", "2023", "93", "32", "38", "325", "2028", "29", "6,831", "10", "39.37", "585", "0.110", "4,960.63", "400.7", "69.59", "190.66", "365", "1,000", "9,000", "2021", "2026", "269.92", "2025", "26", "27", "47", "50", "16", "2024", "0.93", "60", "66", "72", "63", "18", "17", "14", "12", "3", "1.3", "15", "8", "0.19", "25,400", "190.66", "110525", "04", "24", "5.1", "2029", "21", "900", "1747", "19", "2027", "1,690"].forEach(add);
+  ["3,000", "1,200", "700", "25.00", "401", "586.76", "35.79", "111", "155", "2,800", "33.16", "7.38", "26", "600", "2", "191", "40.79", "39.89", "25", "1,000", "930", "2025", "7", "4", "30", "5,000", "1", "2022", "2014", "5", "2023", "93", "32", "38", "325", "2028", "29", "6,831", "10", "39.37", "585", "0.110", "4,960.63", "400.7", "69.59", "190.66", "365", "1,000", "9,000", "2021", "2026", "269.92", "2025", "26", "27", "47", "50", "16", "2024", "0.93", "60", "66", "72", "63", "18", "17", "14", "12", "3", "1.3", "15", "8", "0.19", "25,400", "190.66", "110525", "04", "24", "5.1", "2029", "21", "900", "1747", "19", "2027", "1,690", "2,000", "12.97"].forEach(add);
   const found = (body.match(/\d[\d,]*(?:\.\d+)?/g) || []).map(t => t.replace(/[.,]$/, ""));
   const unknown = [...new Set(found.filter(t => !allowed.has(t)))];
   ok(unknown.length === 0, "unexpected-number check: no number on the page is outside the model's, the sources' and the structural counts; unknown: " + unknown.join(" "));
@@ -256,6 +273,12 @@ const has = (str, msg) => ok(QMD.indexOf(str) >= 0, "page states " + (msg || JSO
     demo.cards.go(2); const raise = () => card().querySelectorAll("button").filter(b => /^Raise Solar on the Plains market/.test(b.getAttribute("aria-label") || ""))[0];
     for (let i = 0; i < 4; i++) raise().click();
     ok(/^From 1,200 to 2,800 MW of solar/.test(saw()) && /The next steps go back to the default 1,200 MW of solar/.test(card().textContent), "stub: step 3 at 2,800 MW, and it says the next steps use the default: " + saw().slice(0, 50));
+    // lowered again after the target, the message describes what the slider now shows
+    const lower = () => card().querySelectorAll("button").filter(b => /^Lower Solar on the Plains market/.test(b.getAttribute("aria-label") || ""))[0];
+    for (let i = 0; i < 7; i++) lower().click();
+    ok(/^With no solar there is no capture price/.test(saw()) && !/\$7\.38/.test(saw()) && /Capture ratio \(capture price ÷ average\)/.test(card().textContent), "stub: step 3 lowered to 0 MW no longer reports 2,800 MW's numbers: " + saw().slice(0, 60));
+    for (let i = 0; i < 7; i++) raise().click();
+    ok(/^From 1,200 to 2,800 MW of solar/.test(saw()), "stub: step 3 back at 2,800 MW");
     demo.cards.go(3);
     ok(/Market here: 1,200 MW of solar \(the default; step 3's slider stays in step 3\) and 700 MW of peakers/.test(card().textContent), "stub: step 4 says which market it shows");
     demo.cards.go(2);
@@ -266,7 +289,7 @@ const has = (str, msg) => ok(QMD.indexOf(str) >= 0, "page states " + (msg || JSO
     if (up) up.click();
     ok(/^New peakers pay at 600 MW, not at 700; existing ones cover their upkeep up to 900 MW/.test(saw()) && /per kW-yr/.test(card().textContent) && /An existing peaker \(upkeep only\)/.test(card().textContent), "stub: step 5: " + saw().slice(0, 80));
     demo.cards.go(5); btns(/^Energy-only with scarcity pricing$/)[0].click(); btns(/^Capacity market \(simplified\)$/)[0].click();
-    ok(/consumers pay \$\d+\.\d\d\/MWh energy-only and \$\d+\.\d\d\/MWh with the simplified capacity market at \$\d+\/MW-day/.test(saw()) && /breaks even by construction/.test(card().textContent), "stub: step 6: " + saw().slice(0, 100));
+    ok(/wholesale payments are \$\d+\.\d\d per MWh demanded energy-only and \$\d+\.\d\d with the simplified capacity market at \$\d+\/MW-day/.test(saw()) && /breaks even by construction/.test(card().textContent) && /Left out: the \$25 production credit/.test(card().textContent), "stub: step 6: " + saw().slice(0, 100));
     demo.cards.go(6); btns(/reserves are thinner/)[0].click();
     ok(/A capacity price is set by a demand curve/.test(saw()) && /6,831 MW/.test(card().textContent), "stub: step 7");
   } catch (e) { ok(false, "stub: the page test threw: " + (e && e.stack || e)); }

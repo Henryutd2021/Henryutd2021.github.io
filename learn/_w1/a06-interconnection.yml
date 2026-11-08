@@ -23,4 +23,13 @@ glossary:
   - id: distribution-factor
     term: Distribution factor
     def: "The share of a project's output that would flow on a given line, used to split the cost of upgrading that line."
+  - id: pro-forma
+    term: Pro forma rules
+    def: "A standard template of procedures, such as FERC's for connecting generators, that each grid operator adopts with its own changes."
+  - id: headroom
+    term: Headroom
+    def: "The spare capacity a line or other piece of equipment has left before it reaches its limit."
+  - id: financial-security
+    term: Financial security
+    def: "Money, or a guarantee such as a letter of credit, that a customer pledges so that the utility or grid operator is covered if the customer backs out or does not pay."
 requests: []

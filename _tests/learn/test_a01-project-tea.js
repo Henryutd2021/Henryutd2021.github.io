@@ -125,11 +125,18 @@ const { usd, musd, signed, pct } = A;
   has("The NPV crosses zero at a price of $45.11/MWh, lesson 7's levelized cost of the same farm.");
   has("the capacity factor moves the NPV most ($204.5M), then the discount rate ($170.0M) and the price ($153.6M)");
   has("+$37.5M for the farm at 4%"); has("5.17% for the farm"); has("year 16, or year 24 discounted"); has("$45.11/MWh, the farm's LCOE");
-  has("A 20 MW farm at a 43% capacity factor returns 8.12% but adds $18.9M; the 150 MW farm returns 5.17% and adds $37.5M.");
+  has("a 20 MW farm at a 43% capacity factor returns 8.12% but adds $18.9M; the 150 MW farm returns 5.17% and adds $37.5M.");
   has("With a 20-year life the farm still pays back in year 16, yet its NPV is −$25.5M");
-  has("Year 0 is −$256.8M. The NPV is one sum of all years at today's value, +$37.5M at 4%.");
+  has("Year 0 is −$256.8M; the NPV is one sum of all years at today's value, +$37.5M at 4%.");
   has("<li data-value=\"b\">No: its NPV is −$45.6M</li>"); has("at 7% the NPV is −$45.6M, because 7% is above the farm's 5.17% IRR");
-  has("15.09 years: 256.8 ÷ 17.02 = 15.09, so the running sum first reaches zero in year 16.");
+  // the payback question gives the net cash to the cent ($17.02M) and asks for the year-end convention the model uses
+  has("The farm costs $256.8M and nets $17.02M at the end of each year. In which year does its running sum of cash first reach zero, not discounted?");
+  has("Year 16: 256.8 ÷ 17.02 = 15.09, so after 15 years the running sum is still −$1.5M; year 16's cash brings it to +$15.5M.");
+  {
+    const F = A.flows(p);
+    ok(musd(s.net, 2) === "$17.02M" && (256.8 / 17.02).toFixed(2) === s.pb.years.toFixed(2) && Math.ceil(256.8 / 17.02) === s.pb.simple && musd(F[15].cum) === "−$1.5M" && musd(F[16].cum) === "$15.5M", "quiz: payback from the question's own inputs is year 16 (15.09 years; −$1.5M after year 15, +$15.5M after year 16)");
+    ok(Math.ceil(256.8 / 30) === 9 && Math.ceil(256.8 / 22.2) === 12 && Math.floor(256.8 / 17.02) === 15, "quiz: the distractors are named slips (÷ the life, ÷ sales without upkeep, rounding down)");
+  }
   has("1 MW of wind costs \\$133,575 a year, and $133{,}575 \\div (0.338 \\times 8{,}760) = 45.11$", "the $133,575 convention in Go deeper");
   has("$133,575 a year per MW ÷ 2,960.88 MWh per MW");
   has("<code>=NPV(4%, B3:B32) + B2</code> gives 37.53"); has("<code>=IRR(B2:B32)</code> gives 5.17%");
@@ -140,7 +147,7 @@ const { usd, musd, signed, pct } = A;
   has("Cash: −256.8 in B2 (year 0), then 22.2066 − 5.1855 in B3 to B32 (years 1 to 30).");
   ok((256.8 * 1).toFixed(1) === musd(s.C).replace(/[$M]/g, "") && 32 - 2 === p.life, "spreadsheet task: rows 2 to 32 hold years 0 to 30");
   has("+$37.5M is the NPV at 4%; simple payback does not depend on the rate.");
-  ok(/data-id="seven" data-answer="b"/.test(QMD) && /data-id="spb" data-answer="c"[\s\S]{0,300}<li data-value="c">15\.09 years<\/li>/.test(QMD), "quiz: answers point at the right options");
+  ok(/data-id="seven" data-answer="b"/.test(QMD) && /data-id="spb" data-answer="d"[\s\S]{0,400}<li data-value="d">Year 16<\/li>/.test(QMD), "quiz: answers point at the right options");
   ok(/data-id="above" data-answer="fact"/.test(QMD) && /data-id="irr" data-answer="myth"/.test(QMD) && /data-id="payback" data-answer="myth"/.test(QMD) && /data-id="yearly" data-answer="myth"/.test(QMD), "myths: three myths and one fact");
   Object.keys(BLOCKS).forEach(name => {
     const [ra, end] = blockRe(name), a = QMD.match(ra), b = QMD.indexOf(end);
@@ -149,7 +156,7 @@ const { usd, musd, signed, pct } = A;
   ["07-cost.html", "k03-discounting.html", "k07-spreadsheets.html", "a02-contracts-risk.html"].forEach(h => ok(QMD.indexOf('href="' + h + '"') >= 0, "links " + h));
   ok(!/href="[^"]*(projects\/|research\.)/i.test(QMD) && /<a href="m11-tea-in-models\.html">M11<\/a> goes further into finance, and so does side shelf <a href="x05-project-finance\.html">X5<\/a>/.test(QMD) && /\[M11\]\(m11-tea-in-models\.html\) puts/.test(QMD) && /side shelf \[X5\]\(x05-project-finance\.html\)/.test(QMD) && !/X5,? \(?upcoming/.test(QMD), "X5 and M11 linked now that they are live; no project or Research links");
   ok(/EMM_Assumptions\.pdf">EIA, AEO2026 assumptions, Table 3<\/a> \(2025 dollars, April 2026\)/.test(QMD) && /financial_cases_&amp;_methods">2025 ATB<\/a> \(NLR, September 2026\)/.test(QMD) && /5173\.pdf/.test(QMD) && /p\. 39[\s\S]*p\. 52[\s\S]*p\. 56[\s\S]*p\. 57/.test(QMD), "sources: EIA, NLR and the NREL manual with dates and pages");
-  ok(/One price year: every dollar is a real 2025 dollar/.test(QMD) && /Illustrative: the loan and owner rates \(5%, 10%\), the 150 MW size and the \$50\/MWh price, fixed in 2025 dollars as a contract indexed to inflation would be/.test(QMD) && /Left out: taxes, tax credits, depreciation/.test(QMD), "data note: price year, illustrative inputs and the boundary are stated");
+  ok(/One price year: every dollar is a real 2025 dollar, so the discount rate is real/.test(QMD) && /Step 3 converts its nominal loan and owner rates with 2\.5% inflation\./.test(QMD) && /owners at 10% \(nominal, held fixed\), inflation 2\.5%\./.test(QMD) && !/every rate is a real rate/.test(QMD + DA.about) && /Illustrative: the loan and owner rates \(5%, 10%\), the 150 MW size and the \$50\/MWh price, fixed in 2025 dollars as a contract indexed to inflation would be/.test(QMD) && /Left out: taxes, tax credits, depreciation/.test(QMD), "data note: price year, illustrative inputs and the boundary are stated");
   ok(/fixed in real terms \(2025 dollars\)/.test(DA.priceNote) && /flat nominal price would lose purchasing power/.test(DA.priceNote) && /A price flat in nominal dollars buys less each year, so its real revenue falls/.test(QMD) && /as a contract indexed to inflation would be/.test(JS), "price: fixed in real terms, as an indexed contract; a flat nominal price falls in real terms (data, Go deeper, equation card)");
   ok(/the real WACC may fall less than the slider shows, or not at all\./.test(QMD) && !/The WACC falls less than the slider shows/.test(QMD), "financing: Go deeper does not claim the WACC falls");
   // every element of the no-JS fallback, the data note and Go deeper holds one idea within the budget (about 35 words)
@@ -172,14 +179,13 @@ const { usd, musd, signed, pct } = A;
   s.tor.rows.forEach(r => m(r.swing));
   B.cash.match(/\d[\d,]*\.\d/g).forEach(add);
   [s.irr, s.irrSmall, s.w60.real].forEach(v => add(v.toFixed(2))); add(s.be.toFixed(2)); add(s.pb.years.toFixed(2)); add(s.w60.nominal.toFixed(1));
-  ["133,575", "2,960.88", "8,760", "0.338", "1,712", "34.57", "33.8", "22.2066", "5.1855", "20.0348", "37.53", "45.11", "17.02", "256.8", "12.00", "8.56", "30.00", "4.08", "40", "32"].forEach(add);
+  ["133,575", "2,960.88", "8,760", "0.338", "1,712", "34.57", "33.8", "22.2066", "5.1855", "20.0348", "37.53", "45.11", "17.02", "256.8", "1.5", "9", "15", "4.08", "40", "32"].forEach(add);
   [0, 1, 2, 3, 4, 5, 7, 10, 11, 12, 13, 16, 20, 24, 25, 30, 31, 39, 43, 45, 50, 52, 56, 57, 60, 70, 80, 150, 462, 1995, 2025, 2026, 5173, "2.5", "1.0", "6.0"].forEach(add);
   const found = (body.match(/\d[\d,]*(?:\.\d+)?/g) || []).map(t => t.replace(/[.,]$/, ""));
   const unknown = [...new Set(found.filter(t => !allowed.has(t)))];
   ok(unknown.length === 0, "every number on the page is from the model or a structural count; unknown: " + unknown.join(" "));
   ok(found.length > 120, `the scan saw the page's numbers (${found.length})`);
-  // the quiz's distractors are honest numbers: 8.56 = 256.8 ÷ 30 (the life, a slip), 12.00 = 256.8 ÷ 21.4 (rounded, a slip)
-  ok((256.8 / 30).toFixed(2) === "8.56", "quiz: 8.56 years is the outlay ÷ the life, a named slip");
+
 }
 
 // ---------------- every printed calculation reproduces from its shown operands (as K3's test)
@@ -235,22 +241,27 @@ function calcCheck(label, str, skips) {
 
 // ---------------- the step texts and messages: budget, terms, honesty
 {
-  const msgs = { build: T.build, disc: T.disc, waccSaw: T.waccSaw, irr: T.irr, irrDown: T.irrDown, irrUp: T.irrUp, restart: T.restart, pay: T.pay, be: T.be, tor: T.tor("cf"), wacc: T.wacc(60) + " " + T.waccSaw };
-  Object.keys(msgs).forEach(k => { const w = msgs[k].replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1").split(/\s+/).filter(Boolean).length; ok(w <= 36, `budget: message ${k} is ${w} words (≤ 36)`); });
+  const msgs = { build: T.build, buildPart: T.buildPart, disc: T.disc, waccSaw: T.waccSaw, irr: T.irr, irrDown: T.irrDown, irrUp: T.irrUp, restart: T.restart, pay: T.pay, payBack: T.payBack, be: T.be, tor: T.tor("cf"), torWrong: T.tor("price"), wacc: T.wacc(60) + " " + T.waccSaw };
   const Q = A.prompts(s, D7), plain = t => t.replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1");
   const sentences = t => (plain(t).match(/[.!?](?=\s+[A-Z(]|$)/g) || []).length;
+  // every message the cards show is one or two sentences within the budget, as the prompts are
+  Object.keys(msgs).forEach(k => { const w = plain(msgs[k]).split(/\s+/).filter(Boolean).length; ok(w <= 36 && sentences(msgs[k]) <= 2, `budget: message ${k} is ${w} words, ${sentences(msgs[k])} sentences (≤ 36, ≤ 2)`); });
+  // and so is every answer of the myths and questions
+  (QMD.match(/<details class="lx-answer"><summary>Answer<\/summary><p>[\s\S]*?<\/p>/g) || []).forEach((a, i) => { const t = a.replace(/<[^>]+>/g, " ").replace(/^\s*Answer\s*/, ""); ok(sentences(t) <= 2 && t.split(/\s+/).filter(Boolean).length <= 36, `budget: answer ${i + 1} is two sentences or fewer within the budget: ${t.slice(0, 50)}`); });
   ok(Q.length === 7 && [0, 1, 2, 3, 4, 5, 6].every(i => JS.indexOf("text: Q[" + i + "]") >= 0), "steps: seven cards, each prompt from prompts()");
   Q.forEach((q, i) => { const w = plain(q).split(/\s+/).length; ok(sentences(q) <= 2 && w <= 35, `prompt ${i + 1}: ${sentences(q)} sentences, ${w} words (≤ 2, ≤ 35)`); });
-  ok(T.irr === "Between 5.1% (NPV +$1.9M) and 5.2% (−$1.0M) the NPV changes sign. The [[internal-rate-of-return|internal rate of return]] lies between: 5.17%. It is above 4%, so the NPV at 4% is positive.", "messages: the IRR bracket message");
+  ok(T.irr === "Between 5.1% (NPV +$1.9M) and 5.2% (−$1.0M) the NPV changes sign: the [[internal-rate-of-return|internal rate of return]] lies between, at 5.17%. It is above 4%, so the NPV at 4% is positive.", "messages: the IRR bracket message");
+  ok(T.build === "Year 0 spends $256.8M. Years 1 to 30 each sell $22.2M and spend $5.2M on upkeep, $17.0M net: $510.6M together, before the outlay is taken off." && near(s.sum, s.net * 30, 1e-6), "messages: the $510.6M is years 1 to 30 before the outlay, not the project's whole net");
+  ok(T.payBack === "Back to 30 years: the NPV is +$37.5M again and payback is still year 16, the same for both lives; only the NPV counts years 21 to 30.", "messages: switching back to 30 years says so");
   ok(/Find the two neighbouring settings where it changes sign/.test(Q[3]), "step 4: asks for the two settings around the IRR, not for zero itself");
-  ok(T.waccSaw === "Rates held fixed, more loans lower the WACC and raise the NPV. Real financing shifts risk and required returns, so this slider cannot pick the best loan share." && !/decide the answer/.test(JS), "messages: the loan-share message says what the slider cannot show");
+  ok(T.waccSaw === "Rates held fixed, more loans lower the WACC and raise the NPV; real financing shifts risk and required returns, so this slider cannot pick the best loan share." && !/decide the answer/.test(JS), "messages: the loan-share message says what the slider cannot show");
   ok(T.restart === "Starting again from the default farm: $50/MWh, 4% real, 30 years." && (JS.match(/^        restart\(act\);$/gm) || []).length === 4, "steps 4 to 7 each say they start again from the default farm");
   ok(/lede: "Tap a symbol: its meaning, unit and value\. NPV, IRR and p follow your last price in step 6; the rest are the default farm's\."/.test(JS) && /title: "The default farm's life, year by year"/.test(JS) && /title: "Five yardsticks for the default farm"/.test(JS), "explain: the reader's price and the default farm are told apart");
   ok(T.wacc(60) === "60% loans: 7.0% nominal, 4.39% real; NPV +$24.1M." && T.wacc(40) === "40% loans: 8.0% nominal, 5.37% real; NPV −$5.7M.", "messages: the WACC line at 60% and 40%");
-  ok(/Right\. Capacity factor moves the NPV most \(\$204\.5M across its range\), then discount rate \(\$170\.0M\)/.test(T.tor("cf")) && !/^Right/.test(T.tor("price")), "messages: the tornado names the top two and says Right only for the right guess");
+  ok(/^Right: capacity factor moves the NPV most \(\$204\.5M across its range\), then discount rate \(\$170\.0M\)/.test(T.tor("cf")) && /^Capacity factor moves/.test(T.tor("price")), "messages: the tornado names the top two and says Right only for the right guess");
   ok(/would not earn its 4%/.test(T.be) && /lesson 7's LCOE/.test(T.be), "messages: the break-even message ties to lesson 7 and says what negative means");
   ok(/Both rates stay fixed here, a simplification/.test(JS) && /owners ask more/.test(QMD), "honesty: the fixed-rate simplification of step 3 is stated (step and Go deeper)");
-  ok(/Other ranges could change the order/.test(T.tor("cf")) && /Ranges: sale price illustrative; the others are lesson 7's/.test(JS), "honesty: the tornado's ranking depends on the chosen ranges");
+  ok(/other ranges could change the order/.test(T.tor("cf")) && /Ranges: sale price illustrative; the others are lesson 7's/.test(JS), "honesty: the tornado's ranking depends on the chosen ranges");
   const desc = (QMD.match(/^description: "([^"]+)"/m) || [])[1] || "";
   ok(desc.split(/\s+/).length <= 35, `budget: the description is ${desc.split(/\s+/).length} words (≤ 35)`);
   ["internal-rate-of-return", "payback-period", "break-even-price", "inflation"].forEach(id => ok(new RegExp("id: " + id + "\\n").test(SIDE) && JS.indexOf("[[" + id + "|") >= 0, "glossary: " + id + " defined in the sidecar and marked"));
@@ -261,9 +272,10 @@ function calcCheck(label, str, skips) {
 
 // ---------------- the interactive: the actions Next waits for, live regions, the demo hook, path.yml
 {
-  ok(/if \(on\.build && on\.sales && on\.upkeep\) \{ api\.done\(\)/.test(JS) && /if \(shown\) \{ api\.done\(\)/.test(JS) && /if \(moved\) \{ api\.done\(\)/.test(JS) && /if \(!reached && seen\.lo && seen\.hi\) \{ reached = true; api\.done\(\)/.test(JS) && /if \(tg\.val\(\)\) \{ api\.done\(\)/.test(JS) && /if \(!crossed && v < 0\)/.test(JS) && /onPick: function \(g\) \{ if \(!drawn\) \{ drawn = true; draw\(\); \} pr\.reveal\(\); api\.done\(\)/.test(JS), "steps: each card's action is checked before Next opens");
+  ok(/if \(on\.build && on\.sales && on\.upkeep\) \{ built = true; api\.done\(\)/.test(JS) && /if \(shown\) \{ api\.done\(\)/.test(JS) && /if \(moved\) \{ api\.done\(\)/.test(JS) && /if \(!reached && seen\.lo && seen\.hi\) \{ reached = true; api\.done\(\)/.test(JS) && /if \(tg\.val\(\)\) \{ api\.done\(\)/.test(JS) && /if \(!crossed && v < 0\)/.test(JS) && /onPick: function \(g\) \{ if \(!drawn\) \{ drawn = true; draw\(\); \} pr\.reveal\(\); api\.done\(\)/.test(JS), "steps: each card's action is checked before Next opens");
   ok((JS.match(/"aria-live": "polite"/g) || []).length >= 1 && /function readouts\(host, labels, cls\) \{\s*var box = H\("div", \{ class: "lx-readouts" \+ \(cls \? " " \+ cls : ""\), "aria-live": "polite" \}/.test(JS), "steps: readouts are a live region");
   ok(/LX\.demo\(root,/.test(JS) && /state === "mid" \? 1/.test(JS) && /autos\[6\]/.test(JS), "demo: mid, step-N and done states");
+  ok(/code: function \(\) \{ var q = own\(\) \|\| p; return "p = " \+ q\.price; \}/.test(JS), "explain: the code line for p shows the reader's last price, as the card's lede says");
   ok(/LX\.EquationCard\(/.test(JS) && /LX\.Timeline\(/.test(JS) && /LX\.CompareTable\(/.test(JS) && /LX\.Tornado\(/.test(JS) && /LX\.Drill\(host, \{/.test(JS), "components: equation card, timeline, comparison table, tornado and drill");
   ok(/id: a01-project-tea\n  code: A1\n  tier: analyst\n  form: cards\n  icon: coin\n  status: active/.test(PATHY) && /after: \[7, K3\]\n  next: A2/.test(PATHY) && /practice_minutes: 45/.test(PATHY), "path.yml: A1 is active, after lesson 7 and K3, next A2, 30 + 45 minutes");
   const sub = (QMD.match(/^subtitle: "([^"]+)"/m) || [])[1];
@@ -321,6 +333,18 @@ function calcCheck(label, str, skips) {
     down.click();                                  // 5.1
     ok(!next().disabled && /Between 5\.1% \(NPV \+\$1\.9M\) and 5\.2% \(−\$1\.0M\)/.test(saw()), "stub: standing on 5.2% and 5.1% opens Next and names the bracket: " + saw());
     [4, 5, 6].forEach(k => { demo.cards.go(k); ok(/Starting again from the default farm/.test(card().textContent), "stub: step " + (k + 1) + " says it starts again from the default farm"); });
+    // reversing a control replaces the message: step 5's life switch on, then off; step 1's cash flows added, then one removed
+    demo.cards.go(4);
+    const life = btn(/20-year life/);
+    life.click();
+    ok(/falls from \+\$37\.5M to −\$25\.5M/.test(saw()), "stub: step 5 with a 20-year life says the NPV falls to −$25.5M");
+    life.click();
+    ok(/Back to 30 years: the NPV is \+\$37\.5M again/.test(saw()) && !/falls/.test(saw()) && /\+\$37\.5M/.test(card().textContent), "stub: step 5 switched back to 30 years no longer says the NPV falls: " + saw());
+    demo.cards.go(0);
+    ["Add the building cost", "Add the sales", "Add the upkeep"].forEach(t => btn(new RegExp("^" + t)).click());
+    ok(/\$510\.6M together, before the outlay/.test(saw()), "stub: step 1 with all three cash flows sums years 1 to 30 before the outlay");
+    btn(/^Add the upkeep/).click();
+    ok(/Add all three cash flows/.test(saw()) && !/\$17\.0M net/.test(saw()) && !next().disabled, "stub: step 1 with the upkeep removed asks for all three again, and Next stays open: " + saw());
   } catch (e) { ok(false, "stub: the page test threw: " + (e && e.stack || e)); }
 }
 

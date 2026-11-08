@@ -200,6 +200,8 @@
   function span(t) { return hm(t) + "–" + hm((t + 1) % 24 === 0 ? 24 : t + 1); }
 
   function pct(s) { return Math.round(s * 100) + "%"; }
+  // the plant on the margin in a dispatched hour: the peaker if it runs, else the combined-cycle plant, else spare sun
+  function marginal(h) { return h.pk > EPS ? "peaker" : h.cc > EPS ? "combined-cycle" : "spare sun"; }
   function tAbs(v) { return (Math.round(Math.abs(v) * 10) / 10).toFixed(1) + " t"; }
   function falls(v, f) { var r = Math.round(v * 10) / 10; return r < 0 ? "falls " + f(-v) : r > 0 ? "rises " + f(v) : "stays the same"; }
   // glossary marks (double brackets: glossary id, a bar, the words) -> a term span (static HTML) or the words alone (text)
@@ -226,7 +228,7 @@
   function shiftLine(W, D, o) {
     var r = shift(W, D, o), ld = landing(W, r);
     if (r.moved < EPS) return o.share > 0 && o.goal === "cost" && o.user > 0 ? "At $" + o.user + " a MWh for users, no move saves the town more than it costs them." : "With no flexible use, nothing moves.";
-    var where = ld.gas < 0.5 ? " move from gas hours into spare-sun hours: the" : (o.goal === "attr" ? " move to hours with a lower average factor; " : " move to cheaper hours; ") + mwh(ld.gas) + " of what arrives still needs gas. The";
+    var where = ld.gas < 0.5 ? " move from gas hours into spare-sun hours: the" : (o.goal === "attr" ? " move to hours with a lower average factor, " : " move to cheaper hours, ") + mwh(ld.gas) + " into hours that need gas: the";
     return "At " + pct(o.share) + ", " + mwh(r.moved) + where + " running cost " + falls(r.cost, usd) + " and the plants' CO₂ " + falls(r.co2, tAbs) + ". Energy saved: " + dmwh(r.saved) + ".";
   }
   // step 3: both goals with the reader's settings (share, extra energy, users' cost); the users' cost applies to the
@@ -237,8 +239,8 @@
     var c = shift(W, D, { share: o.share, goal: "cost", loss: o.loss, user: o.user }), a = shift(W, D, { share: o.share, goal: "attr", loss: o.loss });
     var dm = Math.round(a.moved) - Math.round(c.moved), more = dm === 0 ? "as much as the cheapest goal" : mwh(Math.abs(dm)) + (dm > 0 ? " more" : " less");   // from the shown numbers
     var same = Math.round(a.co2 * 10) === Math.round(c.co2 * 10);
-    return "The attributed goal moves " + mwh(a.moved) + ", " + more + ", and books " + tAbs(a.attr) + " less attributed CO₂, against " + tAbs(c.attr) + ". " +
-      (same ? "The plants emit the same " + tAbs(c.co2) + " less: the extra moves swap hours with the same plant [[marginal-plant|on the margin]]."
+    return "The attributed goal moves " + mwh(a.moved) + ", " + more + ", booking " + tAbs(a.attr) + " less attributed CO₂ against " + tAbs(c.attr) + ". " +
+      (same ? "The plants emit the same " + tAbs(c.co2) + " less: the extra moves keep the same plant [[marginal-plant|on the margin]]."
         : "The plants' CO₂ falls " + tAbs(a.co2) + " under it, against " + tAbs(c.co2) + " under the cheapest goal.");
   }
   // the settings kept from step 4, shown where steps 2 and 3 use them ("" when there are none)
@@ -303,7 +305,7 @@
     var f0 = feeder(W, D, false), tr = trade(A4, W, wires, 0.05, false), r20 = move(W, 20, 3, 10);
     var items = [
       ["Shifted or saved?", "A program moves " + H0.q + " MWh from " + hm(20) + " to " + hm(3) + ", when the combined-cycle plant is on the margin. What does the town save in energy, money and CO₂?",
-       "Energy: none. Money: " + usd(-r20.cost) + " (the peaker's $100 for the combined-cycle plant's $40, per MWh). CO₂: " + tAbs(r20.co2) + " (0.55 − 0.37 t per MWh)."],
+       "Energy: none; money: " + usd(-r20.cost) + " (the peaker's $100 for the combined-cycle plant's $40, per MWh); CO₂: " + tAbs(r20.co2) + " (0.55 − 0.37 t per MWh)."],
       ["Extra energy.", "With 10% extra energy needed, the 5% cheapest shift moves " + mwh(s5l.moved) + ". How much more energy does the town use, and why does it still save money?",
        mwh(-s5l.saved) + " more (" + mwh(s5l.added) + " in for " + mwh(s5l.moved) + " out). Each MWh leaves a $40 or $100 hour and arrives in a $0 one, so the running cost still falls " + usd(-s5l.cost) + "."],
       ["The thermostat's year.", "One thermostat cuts " + th.kw + " kW and " + pct(th.avail) + " of homes take part. At $" + D.vpp.capacityValue + " per kW a year for being ready, what is that part of its value?",
@@ -316,7 +318,8 @@
        "The seller " + usd(tr.seller) + ", the buyer " + usd(tr.buyer) + "; other customers pay the " + usd(-tr.others) + " of plant-and-wire charge the trade skips. The kWh and the plants do not change."]
     ];
     return "<p class=\"lx-eyebrow\">Practice · about 30 minutes on your own</p><ol class=\"lx-fb-practice\">" + items.map(function (it) {
-      return "<li><p><b>" + it[0] + "</b> " + it[1] + "</p><details class=\"lx-answer\"><summary>Answer</summary><p>" + it[2] + "</p></details></li>";
+      // the exercise's name on its own line, then what is given and the question (two sentences at most)
+      return "<li><p><b>" + it[0] + "</b></p><p>" + it[1] + "</p><details class=\"lx-answer\"><summary>Answer</summary><p>" + it[2] + "</p></details></li>";
     }).join("") + "</ol>";
   }
   // the no-JS version: the four parts at their starting settings
@@ -333,7 +336,7 @@
 
   var model = { HOURS: HOURS, prepare: prepare, hour: hour, pieces: pieces, shift: shift, move: move, profiles: profiles, vpp: vpp, earnings: earnings,
                 allKinds: allKinds, feeder: feeder, tradeKWh: tradeKWh, trade: trade, sum: sum,
-                usd: usd, dusd: dusd, mwh: mwh, dmwh: dmwh, dt: dt, mw: mw, mw2: mw2, cents: cents, hm: hm, span: span, pct: pct,
+                usd: usd, dusd: dusd, mwh: mwh, dmwh: dmwh, dt: dt, mw: mw, mw2: mw2, cents: cents, hm: hm, span: span, pct: pct, marginal: marginal,
                 hookReveal: hookReveal, hookUse: hookUse, landing: landing, shiftLine: shiftLine, goalLine: goalLine, settingsNote: settingsNote, costsLine: costsLine, vppLine: vppLine, earnLine: earnLine,
                 ownerWords: ownerWords, chainLinks: chainLinks, tAbs: tAbs, rich: rich, bare: bare,
                 feederLine: feederLine, tradeLine: tradeLine, staticPractice: staticPractice, staticFallback: staticFallback };
@@ -376,8 +379,11 @@
     function spans() {
       var sp = [], pk = [];
       W.key.forEach(function (k, t) { if (k === "spill") sp.push(t); if (k === "pk") pk.push(t); });
+      // the shading is the day as dispatched before any change (the legend says so); the text versions give the margin
+      // after it too
       return [{ x0: sp[0], x1: sp[sp.length - 1] + 1, color: "var(--lx-solar)", op: 0.13, label: "Spare sun" }, { x0: pk[0], x1: pk[pk.length - 1] + 1, color: "var(--lx-pk)", op: 0.13, label: "Peaker" }];
     }
+    var SHADE = { label: "Shading: spare-sun and peaker hours before any change", color: "var(--lx-solar)" };
     function paint() {
       chips.innerHTML = "";
       if (part === "hook") {
@@ -387,9 +393,9 @@
         if (hookShown) { chip("Moved", mwh(H0.q)); chip("Energy saved", dmwh(hk.saved)); chip("Running cost", dusd(hk.cost)); chip("Plants' CO₂", dt(hk.co2)); }
         P.render({ x: X, y: { min: 180, max: 360, step: 30, fmt: function (v) { return String(v); }, unit: "MW" }, height: 240, heightN: 210, spans: spans(),
           lines: [{ values: W.demand, step: 1, color: "var(--lx-ink-3)", width: 2, dash: "5 4" }].concat(hookShown ? [{ values: use, step: 1, color: "var(--lx-dr)", width: 2.6 }] : []),
-          legend: [{ label: "Use as it was", color: "var(--lx-ink-3)", dash: "5 4" }].concat(hookShown ? [{ label: "Use with " + H0.q + " MWh moved", color: "var(--lx-dr)" }] : []),
+          legend: [{ label: "Use as it was", color: "var(--lx-ink-3)", dash: "5 4" }].concat(hookShown ? [{ label: "Use with " + H0.q + " MWh moved", color: "var(--lx-dr)" }] : []).concat([SHADE]),
           aria: "Prairie Town's use on " + W.dateLabel + (hookShown ? ", before and after moving " + H0.q + " MWh from " + hm(H0.from) + " to " + hm(H0.to) + "." : ", hour by hour."),
-          text: { head: ["Hour", "Use before, MW", "Use after, MW", "On the margin"], rows: W.demand.map(function (d, t) { return [span(t), String(d), String(use[t]), W.key[t] === "spill" ? "spare sun" : W.key[t] === "cc" ? "combined-cycle" : "peaker"]; }) } });
+          text: { head: ["Hour", "Use before, MW", "Use after, MW", "On the margin before", "On the margin after"], rows: W.demand.map(function (d, t) { return [span(t), String(d), String(use[t]), marginal(W.h[t]), marginal(hour(W.plants, W.gap[t] + use[t] - d))]; }) } });
         status.textContent = hookShown ? hookReveal(W, D) : "Prairie Town's use on " + W.dateLabel + ", hour by hour.";
       } else if (part === "shift") {
         var r = shift(W, D, S);
@@ -400,22 +406,23 @@
         if (S.user) chip("Users' cost", usd(r.user));
         P.render({ x: X, y: { min: 180, max: 360, step: 30, fmt: function (v) { return String(v); }, unit: "MW" }, height: 240, heightN: 210, spans: spans(),
           lines: [{ values: W.demand, step: 1, color: "var(--lx-ink-3)", width: 2, dash: "5 4" }, { values: r.use, step: 1, color: "var(--lx-dr)", width: 2.6 }],
-          legend: [{ label: "Use as it was", color: "var(--lx-ink-3)", dash: "5 4" }, { label: "Use after the shift", color: "var(--lx-dr)" }],
+          legend: [{ label: "Use as it was", color: "var(--lx-ink-3)", dash: "5 4" }, { label: "Use after the shift", color: "var(--lx-dr)" }, SHADE],
           aria: "Prairie Town's use on " + W.dateLabel + ", before and after the shift: " + mwh(r.moved) + " moved.",
-          text: { head: ["Hour", "Use before, MW", "Use after, MW", "On the margin"], rows: W.demand.map(function (d, t) { return [span(t), String(d), (Math.round(r.use[t] * 10) / 10).toFixed(1), W.key[t] === "spill" ? "spare sun" : W.key[t] === "cc" ? "combined-cycle" : "peaker"]; }) } });
+          text: { head: ["Hour", "Use before, MW", "Use after, MW", "On the margin before", "On the margin after"], rows: W.demand.map(function (d, t) { return [span(t), String(d), (Math.round(r.use[t] * 10) / 10).toFixed(1), marginal(W.h[t]), marginal(r.h[t])]; }) } });
         status.textContent = bare(shiftLine(W, D, S));
-      } else if (part === "vpp") {
-        var v = vpp(W, D, S.kinds, S.stagger);
+      } else if (part === "vpp" || part === "earn") {
+        // step 6 ("earn") prices all four kinds together, so its chart shows the same pool as its ledger
+        var pool = part === "earn" ? allKinds(D) : S.kinds, v = vpp(W, D, pool, S.stagger);
         title.textContent = "Prairie Town's gas plants, " + W.dateLabel + " · a pool of " + mw(v.mw);
         chip("Pool", mw(v.mw)); chip("Peaker", dmwh(v.peakerMWh)); chip("Use that comes back", mwh(v.backMWh)); chip("Running cost that day", dusd(v.cost)); chip("Plants' CO₂", dt(v.co2));
         var g0 = W.h.map(function (x) { return x.cc + x.pk; }), g1 = v.h.map(function (x) { return x.cc + x.pk; });
         P.render({ x: X, y: { min: 0, max: 200, step: 50, fmt: function (v) { return String(v); }, unit: "MW" }, height: 240, heightN: 210, spans: spans(),
           refs: [{ y: W.plants.cc.mw, label: "Combined-cycle full", labelN: "150 MW", dash: "4 3", labelColor: "var(--lx-ink-2)" }],   // ink-2: the label sits on the shaded area
           lines: [{ values: g0, step: 1, color: "var(--lx-ink-3)", width: 2, dash: "5 4" }, { values: g1, step: 1, color: "var(--lx-pk)", width: 2.6, area: 0.12 }],
-          legend: [{ label: "Gas output without the pool", color: "var(--lx-ink-3)", dash: "5 4" }, { label: "With the pool", color: "var(--lx-pk)" }],
+          legend: [{ label: "Gas output without the pool", color: "var(--lx-ink-3)", dash: "5 4" }, { label: "With the pool", color: "var(--lx-pk)" }, SHADE],
           aria: "Gas output on " + W.dateLabel + " with and without the pool; above 150 MW the peaker runs.",
           text: { head: ["Hour", "Gas without, MW", "Gas with, MW", "Pool cut, MW", "Use coming back, MW"], rows: g0.map(function (x, t) { return [span(t), String(x), (Math.round(g1[t] * 10) / 10).toFixed(1), v.cut[t].toFixed(2), v.back[t].toFixed(2)]; }) } });
-        status.textContent = vppLine(W, D, S.kinds, S.stagger);
+        status.textContent = vppLine(W, D, pool, S.stagger);
       } else if (part === "feeder") {
         var f = feeder(W, D, S.stagger), F = D.feeder;
         title.textContent = F.name + " · " + F.homes.toLocaleString("en-US") + " homes · " + (S.stagger ? "staggered restart" : "everyone back at once");
@@ -453,7 +460,7 @@
             feedback: { none: "Moved, not saved.", ten: "Not saved: moved.", some: "No: the same MWh are still used." },
             onPick: function () { hookShown = true; paint(); pr.reveal(hookReveal(W, D)); api.done(); } });
         } },
-      { text: "Now let part of every hour's use move within the day, up to a [[flexibility|flexible]] share of that hour's demand. The town moves use from its dearest hours to its cheapest. Raise the share.",
+      { text: "Now let part of every hour's use move within the day, up to a [[flexibility|flexible]] share of that hour's demand; the town moves use from its dearest hours to its cheapest. Raise the share.",
         build: function (act, api) {
           part = "shift"; S.goal = "cost"; showStage(true); paint();
           var sl = LX.Slider(H("div", null, act), { label: "Flexible share of each hour's use", color: "var(--lx-dr)", min: 0, max: 10, step: 1, value: Math.round(S.share * 100),
@@ -471,7 +478,7 @@
           if (settingsNote(S)) H("p", { class: "lx-hint", text: settingsNote(S) }, act);
           H("p", { class: "lx-hint", text: "Ties: use leaves the hour with the most gas running and goes to the hour with the least." }, act);
         } },
-      { text: "Shifting is not free. Pre-cooling a home takes extra energy, and people want paying for the bother. Turn on the extra energy and set a cost to users per MWh moved: what still pays?",
+      { text: "Shifting is not free: pre-cooling a home takes extra energy, and people want paying for the bother. Turn on the extra energy and set a cost to users per MWh moved: what still pays?",
         build: function (act, api) {
           part = "shift"; S.goal = "cost"; showStage(true); if (!S.share) S.share = D.shift.try / 100; keep(); paint();
           var tg = LX.Toggle(H("div", { class: "cf-ctl" }, act), { label: "10% extra energy: each MWh moved needs 1.1 MWh at its new hour", on: S.loss, onChange: function (on) { S.loss = on; keep(); paint(); api.saw(costsLine(W, D, S)); api.done(); } });
@@ -493,11 +500,10 @@
           var ul = H("ul", null, det); D.vpp.devices.forEach(function (x) { H("li", { html: "<b>" + x.name + ":</b> " + LX.esc(x.note) }, ul); });
           if (D.vpp.devices.filter(function (d) { return S.kinds[d.key]; }).length >= 2) { api.done(); api.saw(vppLine(W, D, S.kinds, S.stagger)); }
         } },
-      { text: "The pool earns money for being ready and for what it saves the town. Some goes out again, to the aggregator and as a [[coordination-cost|coordination cost]] per device. What does each owner earn?",
+      { text: "The pool earns money for being ready and for what it saves the town; some goes out again, to the aggregator and as a [[coordination-cost|coordination cost]] per device. What does each owner earn?",
         build: function (act, api) {
-          part = "vpp"; showStage(true);
-          if (D.vpp.devices.filter(function (d) { return S.kinds[d.key]; }).length < 2) { D.vpp.devices.forEach(function (d) { S.kinds[d.key] = true; }); keep(); }
-          paint();
+          part = "earn"; showStage(true); paint();
+          H("p", { class: "lx-hint", text: "Here all four kinds are in the pool, whatever you enrolled in step 5, so every owner's year is priced on the same pool." }, act);
           var io = H("ul", { class: "a7-inout" }, act);
           H("li", { html: "<b>In:</b> $" + D.vpp.capacityValue + " per kW a year for being ready, plus the running cost saved on " + D.vpp.days + " event days a year." }, io);
           H("li", { html: "<b>Out:</b> the aggregator's " + pct(D.vpp.aggregatorShare) + ", then the coordination cost per device or farm." }, io);
@@ -508,14 +514,14 @@
           draw(); act.appendChild(host);
           void sl;
         } },
-      { text: "[[feeder|" + D.feeder.name + "]], a local distribution line, serves " + D.feeder.homes.toLocaleString("en-US") + " homes, with " + D.feeder.enrolled.thermostat + " enrolled thermostats and " + D.feeder.enrolled.ev + " EV chargers. At " + hm(D.vpp.event[1]) + " the skipped use comes back. Release everyone at once, or stagger the restart?",
+      { text: "[[feeder|" + D.feeder.name + "]], a local distribution line, serves " + D.feeder.homes.toLocaleString("en-US") + " homes, with " + D.feeder.enrolled.thermostat + " enrolled thermostats and " + D.feeder.enrolled.ev + " EV chargers, and at " + hm(D.vpp.event[1]) + " the skipped use comes back. Release everyone at once, or stagger the restart?",
         build: function (act, api) {
           part = "feeder"; showStage(true); paint();
           seg(act, "a7-st-l", "After the event", [["once", "All at once"], ["stagger", "Staggered over six hours"]], S.stagger ? "stagger" : "once", function (k) {
             S.stagger = k === "stagger"; keep(); paint(); api.saw(feederLine(W, D, S.stagger)); if (S.stagger) api.done(); });
           if (S.stagger) { api.done(); api.saw(feederLine(W, D, true)); }
         } },
-      { text: "Neighbours can trade too. Under [[net-billing|net billing]] the solar home's midday kWh earn $0 today, the hour's running cost; the renter next door pays " + cents(wires) + " a kWh for plants and wires. Set a local price.",
+      { text: "Neighbours can trade too: under [[net-billing|net billing]] the solar home's midday kWh earn $0, the hour's running cost, while the renter next door pays " + cents(wires) + " a kWh for plants and wires. Set a local price.",
         build: function (act, api) {
           part = "trade"; showStage(false);
           var host = H("div", null, act);
@@ -526,7 +532,7 @@
           draw(); act.appendChild(host);
           void sl; void tg;
         } },
-      { text: "In words: flexible demand mostly moves energy in time; it saves little. It acts like a power plant when enough devices answer, their coordination is paid for, and the wires can carry their return.",
+      { text: "In this example, most response shifts energy in time; other programs can cut use for good. Demand acts like a power plant when enough devices answer, coordination is paid for and the wires carry the return.",
         free: true,
         build: function (act) {
           part = "vpp"; showStage(false);
@@ -583,7 +589,7 @@
         traces: [{ label: "A battery", path: ["enrol", "fc", "bid", "call", "act", "meas", "pay"], text: "It discharges 3.6 kW for three hours, and the meter shows it against the home's usual evening." },
                  { label: "A quiet evening", path: ["enrol", "fc", "bid", "call", "wait"], text: "The grid has enough: the pool is paid for being ready, not for energy." }] });
       LX.Boundary(H("div", { class: "lx-xcard" }, xhost), { title: "Where this toy holds",
-        holds: ["one real-shaped day, repeated: the small hours stand for the next night;", "the plants run cheapest first, with no ramp limits;", "every device answers as forecast, and the counts and values are illustrative."],
+        holds: ["one real-shaped day, repeated: the small hours stand for the next night;", "the plants run cheapest first, with no ramp limits;", "batteries are lossless and refill from the next day's otherwise spilled sun, at no cost and no CO₂;", "every device answers as forecast, and the counts and values are illustrative."],
         leaves: ["forecast errors and owners who opt out at the last minute;", "how a baseline is estimated, and its errors;", "the other feeders, and the wires' own losses."],
         source: "Prairie Town is fictional; its day follows real Southwest Power Pool hourly patterns (EIA-930)." });
     }

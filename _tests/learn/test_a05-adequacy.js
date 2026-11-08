@@ -42,7 +42,9 @@ const reference = {
   repeats: { n: REP.length, solarUp: REP.filter(r => r.mix.solarWithBattery > r.mix.solar).length, batteryUp: REP.filter(r => r.mix.batteryWithSolar > r.mix.battery).length }
 };
 function staticTable() {
-  const rows = D.adds.options.map(o => { const x = ST.single[o.id]; return `<tr><td>${o.label}</td><td>${o.detail}</td><td>${d3(x.lole)}</td><td>${int(x.mw)} MW</td><td>${pct(x.share)}</td></tr>`; });
+  // a glossary mark in a detail becomes the page's term span, as LX.rich writes it
+  const richH = t => t.replace(/\[\[([a-z0-9-]+)\|([^\]]+)\]\]/g, '<span class="lx-term" data-term="$1">$2</span>');
+  const rows = D.adds.options.map(o => { const x = ST.single[o.id]; return `<tr><td>${o.label}</td><td>${richH(o.detail)}</td><td>${d3(x.lole)}</td><td>${int(x.mw)} MW</td><td>${pct(x.share)}</td></tr>`; });
   return [`<table class="a5-static" aria-label="Each 500 MW added to the Plains Grid: LOLE and accreditation, 500 simulated years, seed 2025">`,
     `<thead><tr><th scope="col">500 MW of</th><th scope="col">What it is</th><th scope="col">LOLE (days a year)</th><th scope="col">Firm MW at equal unserved energy</th><th scope="col">Accreditation</th></tr></thead>`,
     `<tbody>`, `<tr><td>Nothing added</td><td>–</td><td>${d3(B0.lole)}</td><td>–</td><td>–</td></tr>`, ...rows, `</tbody></table>`].join("\n");
@@ -193,13 +195,24 @@ function brute(full, add, Sy) {
     "LOLE 0.228 days a year, above the 1-in-10 criterion of 0.1. In 410 of 500 years nothing went short; the [[expected-unserved-energy|unserved energy]] averages 108 MWh a year.",
     "81% of the 349 shortfall hours fall in June to September, most often in the hour starting 19:00; December to February hold most of the rest.",
     "Peakers 89%, battery 55%, demand response 26%, wind 16%, solar 15%. Demand response removes many short days but less energy: long evenings outlast its 4 hours."];
-  msgs.push(D.texts.ZERO_NOTE, D.texts.SE_NOTE, D.texts.SEED_NOTE, D.texts.SCREEN_NOTE, D.texts.PJM_SAW, D.texts.PJM_Q.weather, D.texts.PJM_Q.metric, D.texts.PJM_Q.same, ...D.adds.options.map(o => o.label + ": " + o.detail + "."));
+  msgs.push(D.texts.ZERO_NOTE, D.texts.SE_NOTE, D.texts.SEED_NOTE, D.texts.SCREEN_NOTE, D.texts.RULES_NOTE, D.texts.PJM_SAW, D.texts.PJM_Q.weather, D.texts.PJM_Q.metric, D.texts.PJM_Q.same, ...D.adds.options.map(o => o.label + ": " + o.detail + "."));
   msgs.forEach((t, i) => ok(words(t) <= 36, `message or note ${i + 1}: ${words(t)} words (≤ 36)`));
   ok(!/\.join\("\. "\)/.test(JS) && /a5-opts/.test(JS), "step 4: one line per resource, not one long paragraph");
   ok(/one possible contributor/.test(D.texts.PJM_Q.weather) && /both rate by expected unserved energy/.test(D.texts.PJM_Q.metric) && /can lower a peaker's rating/.test(D.texts.PJM_SAW) && !/lower the peakers' rating;/.test(JS), "step 8: the PJM gap is not pinned on one cause; the question asks which assumption differs");
   ok(JS.indexOf('"Most simulated years have no shortfall day, and a few have several. **Adequacy is about the rare bad year, so one year shows little.**"') >= 0 && JS.indexOf('the [[expected-unserved-energy|unserved energy]] averages " + int(b.eue) + " MWh a year."') >= 0, "texts: the checked messages are the page's");
   ["capacity-accreditation", "equivalent-firm-capacity", "forced-outage-rate", "lolh", "resampled-weather"].forEach(id => ok(new RegExp("id: " + id + "\\n").test(SIDE) && JS.indexOf("[[" + id + "|") >= 0, "glossary: " + id + " defined in the sidecar and marked"));
   ["lole", "expected-unserved-energy", "reserve-margin", "monte-carlo-error", "standard-error", "random-seed"].forEach(id => ok((JS + JSON.stringify(D.texts)).indexOf("[[" + id + "|") >= 0, "glossary: " + id + " marked"));
+}
+
+// ---------------- shortfalls and the sun; the operating rules; the error that only LOLE carries
+{
+  const b = ST.base;
+  ok(b.hours === 349 && b.sun === 253 && b.falling === 252 && b.falling / b.hours > 0.7 && b.sun < b.hours, "the sun: in 253 of the 349 shortfall hours solar still produces, and in 252 its output is falling: shortfalls cluster as it falls, not only after sunset");
+  ok(/shortfalls cluster in summer evenings, when solar output is falling/.test(QMD) && !/after sunset/.test(QMD + JS) && /most shortfalls come as solar output falls in the evening/.test(JS), "the sun: the myth and the feedback say what the simulation shows");
+  ok(/the battery starts each year full, charges from any surplus and discharges only in a shortfall; demand response covers a day's first 4 shortfall hours\. Better timing could rate both higher\./.test(D.texts.RULES_NOTE) && QMD.indexOf(D.texts.RULES_NOTE) >= 0 && /text: TX\.RULES_NOTE/.test(JS) && D.adds.dr.hoursPerDay === 4, "operating rules: stated on the page and beside the ratings");
+  ok(/s: "LOLE ± sampling error", sN: "LOLE ± error"/.test(JS) && !/with their error/.test(JS), "explain: only LOLE is shown with its sampling error");
+  ok(/\[\[round-trip-efficiency\|85% round-trip efficiency\]\] \(it returns 85% of the energy that charged it\)/.test(JSON.stringify(D.adds.options)) && D.adds.battery.eta === 0.85 && /data-term="round-trip-efficiency">85% round-trip efficiency/.test(QMD) && /html: LX\.rich\(o\.label \+ ": " \+ o\.detail/.test(JS), "terms: the battery's 85% is a marked, explained round-trip efficiency");
+  ok(/var lo = Math\.min\(-1000, Math\.floor\(/.test(JS) && /hi = Math\.max\(1000, Math\.ceil\(/.test(JS) && !/y: \{ min: -1000, max: 3000/.test(JS), "step 1: the year chart's axis holds every value");
 }
 
 // ---------------- the page at seed 2025: statements one by one
@@ -302,15 +315,18 @@ function brute(full, add, Sy) {
     const card = () => demo.cards.el, saw = () => { const a = card().querySelectorAll(".lx-saw"); return a.length ? a[a.length - 1].textContent : ""; };
     const btns = re => card().querySelectorAll("button").filter(b => re.test(b.getAttribute("aria-label") || b.textContent));
     demo.cards.go(0); const roll = btns(/Roll a year/)[0]; roll.click();
+    // the year's text version lists all 365 days, and the axis holds the highest and lowest values
+    { const tb = card().querySelectorAll("table")[0], n = tb ? tb.querySelectorAll("tbody tr").length : 0; ok(n === 365, "stub: step 1's text version lists every day of the year (" + n + " rows)"); }
     ok(/1 of 3 years rolled/.test(card().textContent) && !/Most simulated years/.test(saw()), "stub: step 1 counts the rolls: 1 of 3");
     roll.click(); roll.click();
     ok(/Most simulated years have no shortfall day/.test(saw()) && /Simulated year\s*3/.test(card().textContent) && /3 of 3 years rolled/.test(card().textContent), "stub: step 1 rolls three years: " + card().textContent.slice(0, 200));
     demo.cards.go(1); btns(/Run 500 years/)[0].click();
+    { const more = card().querySelector("details.a5-more"); ok(more && !more.open && /114 shortfall days ÷ 500 years = 0\.228 days a year/.test(card().textContent) && /Shortfall hours/.test(more.textContent) && /numbers the random draws/.test(more.textContent), "stub: step 2 shows the count and the division first; hours, energy, the ± and the seed in a closed box"); }
     ok(/LOLE 0\.228 days a year, above the 1-in-10 criterion of 0\.1\. In 410 of 500 years nothing went short/.test(saw()) && /Seed 2025 · 500 years/.test(card().textContent) && /standard errors of the average over 500 years/.test(card().textContent) && /numbers the random draws/.test(card().textContent), "stub: step 2 runs 500 years at seed 2025, with what the ± and the seed mean: " + saw().slice(0, 80));
     demo.cards.go(2); btns(/Summer evenings/)[0].click();
     ok(/^81% of the 349 shortfall hours fall in June to September, most often in the hour starting 19:00/.test(saw()), "stub: step 3: " + saw().slice(0, 80));
     demo.cards.go(3); ["Gas peakers", "Wind farm", "Solar farm"].forEach(l => btns(new RegExp("^" + l + "$"))[0].click());
-    ok(/LOLE runs from 0\.012 to 0\.200/.test(saw()) && /12\.5% added each time/.test(saw()) && card().querySelectorAll(".a5-opts li").length === 5 && /deliberately crude screen/.test(card().textContent), "stub: step 4: " + saw().slice(0, 90));
+    ok(/LOLE runs from 0\.012 to 0\.200/.test(saw()) && /The same 12\.5 percentage points added each time/.test(saw()) && !/12\.5% added/.test(saw()) && card().querySelectorAll(".a5-opts li").length === 5 && /deliberately crude screen/.test(card().textContent), "stub: step 4: " + saw().slice(0, 90));
     demo.cards.go(4); btns(/Rate all five/)[0].click();
     ok(/^Peakers 89%, battery 55%, demand response 26%, wind 16%, solar 15%\. Demand response removes many short days/.test(saw()), "stub: step 5: " + saw().slice(0, 90));
     demo.cards.go(5); btns(/^Solar farm$/)[0].click();

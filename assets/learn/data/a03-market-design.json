@@ -57,7 +57,7 @@
       "label": "Energy-only with scarcity pricing",
       "short": "Energy-only",
       "cap": 5000,
-      "capNote": "ERCOT's system-wide offer cap since 1 January 2022"
+      "capNote": "a teaching assumption that caps the clearing price: $5,000/MWh is ERCOT's high day-ahead offer cap and value of lost load; its real-time offer cap is $2,000/MWh (January 2026)"
     },
     "cm": {
       "label": "Capacity market (simplified)",
@@ -138,12 +138,16 @@
       "id": "ercot",
       "label": "Texas (ERCOT)",
       "who": "ERCOT, the one RTO that FERC does not regulate",
-      "how": "An energy market with no capacity market; offers are capped at $5,000/MWh. A reserve demand curve added a scarcity adder from 2014; since 5 December 2025, energy and reserves are priced together.",
-      "facts": "The offer cap fell from $9,000 to $5,000 per MWh on 1 January 2022.",
+      "how": "An energy market with no capacity market. A reserve demand curve added a scarcity adder from 2014; since 5 December 2025, energy and reserves are priced together.",
+      "facts": "Offer caps (January 2026): $5,000/MWh day-ahead, $2,000 in real time; once peakers' yearly net margin passes a threshold, the day-ahead cap also drops to $2,000. The cap was $9,000 until 2022.",
       "sources": [
         {
           "label": "ERCOT, 2024 Biennial Report on the ORDC (1 November 2024), pp. 1 and 7–10",
           "url": "https://www.ercot.com/files/docs/2024/10/31/2024-biennial-ercot-report-on-the-ordc-20241031.pdf"
+        },
+        {
+          "label": "ERCOT, Day-Ahead Market Operations, training slides (January 2026), slide 8: offer caps",
+          "url": "https://www.ercot.com/files/docs/2025/08/22/2026_01-Day-Ahead-Market-Operations.pdf"
         },
         {
           "label": "ERCOT market notice M-F110525-04 (5 December 2025): real-time co-optimization live",
@@ -161,7 +165,7 @@
     },
     {
       "id": "vertical",
-      "label": "U.S. regions without a regional market (RTO)",
+      "label": "U.S. regions without a regional transmission organization (RTO)",
       "who": "Vertically integrated utilities in much of the Southeast and the West outside California",
       "how": "Utilities, frequently vertically integrated, own and run plants and wires and plan their supply with their state regulators.",
       "facts": "About two-thirds of the U.S. population is served by markets that [[rto|RTOs]] run; much of the rest by these utilities.",
@@ -177,14 +181,14 @@
       "label": "The European Union",
       "who": "Member states' markets under EU rules",
       "how": "Energy markets set the wholesale price; a country may add a capacity mechanism, approved as state aid.",
-      "facts": "The 2024 reform entered into force on 16 July 2024; from 17 July 2027, new direct price support for wind, solar and some other plants must be two-way contracts for difference: top-ups below an agreed price, paybacks above.",
+      "facts": "From 17 July 2027, new direct price support for wind, solar and some other plants is generally a two-way contract for difference (top-ups below an agreed price, paybacks above) or an equivalent scheme, with stated exceptions.",
       "sources": [
         {
           "label": "European Commission, Electricity market design (page accessed 5 November 2026)",
           "url": "https://energy.ec.europa.eu/topics/markets-and-consumers/electricity-market-design_en"
         },
         {
-          "label": "Regulation (EU) 2024/1747, Article 19d, adopted 13 June 2024 (Official Journal, 26 June 2024): two-way contracts for difference from 17 July 2027",
+          "label": "Regulation (EU) 2024/1747, Article 19d, adopted 13 June 2024 (Official Journal, 26 June 2024; in force 16 July 2024): two-way contracts for difference or equivalent schemes from 17 July 2027",
           "url": ""
         },
         {
@@ -202,7 +206,7 @@
       "label": "China",
       "who": "The NDRC, China's national planning and price regulator, and the provinces",
       "how": "Capacity payments set nationally, technology by technology, coal's since 2024; a January 2026 notice revised them and set a national framework for grid-side storage.",
-      "facts": "Coal's payment covered 30% of a set fixed cost in most provinces in 2024–25 and at least 50% from 2026. Once a province's spot market runs continuously, one payment for reliable capacity is to replace payments by technology.",
+      "facts": "Coal was paid 30% of a set fixed cost in most provinces in 2024–25, at least 50% from 2026. Where a spot market runs continuously, qualifying reliable capacity is gradually to be paid under one rule.",
       "sources": [
         {
           "label": "NDRC, questions and answers with NDRC and National Energy Administration officials on the notice improving the generation-side capacity price mechanism (30 January 2026)",
@@ -222,7 +226,7 @@
       "label": "LBNL, Utility-Scale Solar, 2024 Edition (October 2024), slides 47 and 50",
       "url": "https://eta-publications.lbl.gov/sites/default/files/2024-10/utility_scale_solar_2024_edition_slides.pdf"
     },
-    "measure": "A value factor counts energy and capacity value against a flat 24-hour block's; this lesson's capture ratio counts energy only."
+    "measure": "A value factor compares solar's energy and capacity value with a flat block's, the same power in every hour; this lesson's capture ratio counts energy only."
   },
   "reference": {
     "about": "Results of the lesson's market model at the defaults (1,200 MW of solar, 700 MW of peakers): the year under each design, a noon and an evening hour, and the energy-only resting point.",

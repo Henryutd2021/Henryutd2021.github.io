@@ -72,7 +72,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <tr><td>Gas peakers</td><td>5 units of 100 MW, each out 7% of the time</td><td>0.012</td><td>447 MW</td><td>89%</td></tr>
 <tr><td>Wind farm</td><td>500 MW, the same shape as the grid's wind</td><td>0.160</td><td>79 MW</td><td>16%</td></tr>
 <tr><td>Solar farm</td><td>500 MW, the same shape as the grid's solar</td><td>0.200</td><td>75 MW</td><td>15%</td></tr>
-<tr><td>4-hour battery</td><td>500 MW, 2,000 MWh, 85% round trip</td><td>0.014</td><td>276 MW</td><td>55%</td></tr>
+<tr><td>4-hour battery</td><td>500 MW, 2,000 MWh, <span class="lx-term" data-term="round-trip-efficiency">85% round-trip efficiency</span> (it returns 85% of the energy that charged it)</td><td>0.014</td><td>276 MW</td><td>55%</td></tr>
 <tr><td>Demand response</td><td>500 MW of load that can be cut, at most 4 hours a day</td><td>0.048</td><td>132 MW</td><td>26%</td></tr>
 </tbody></table>
 <!-- a5-table:end -->
@@ -85,6 +85,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <li>Weather is resampled, not observed: each week of a simulated year is a real week of 2024 or 2025, shifted by up to a week. The extremes are days that happened then.</li>
 <li>Real shapes: demand, wind and sun of the Southwest Power Pool (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>, 2024 and 2025); wind and solar scaled to EIA's 2025 monthly <span class="lx-term" data-term="capacity-factor">capacity factors</span>, as in <a href="m03-capacity-expansion.html">M3</a>.</li>
 <li>Units fail independently of each other and of the weather. Planned maintenance, the network and imports are left out.</li>
+<li>Simple operating rules, not optimized: the battery starts each year full, charges from any surplus and discharges only in a shortfall; demand response covers a day's first 4 shortfall hours. Better timing could rate both higher.</li>
 <li>A simulated year is not a forecast; LOLE, LOLH and EUE are averages over the 500 years. LOLE is shown with its Monte Carlo error, which leaves out uncertainty in the weather history and the assumptions.</li>
 </ul></div>
 <p class="lx-hint" style="margin-top:10px">Need a refresher? <a href="03-balancing.html">Lesson 3</a> (reserves), <a href="06-three-jobs.html">lesson 6</a> (firm capacity) and toolbox <a href="k05-probability-statistics.html">K5</a> (Monte Carlo and standard error).</p>
@@ -167,7 +168,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-qq" data-id="nameplate" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “500 MW of solar adds as much reliability as 500 MW of peakers.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. In this grid the peakers rate 89% of their 500 MW and solar 15%: shortfalls come after sunset.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. In this grid the peakers rate 89% of their 500 MW and solar 15%: shortfalls cluster in summer evenings, when solar output is falling.</p></details>
 </div>
 <div class="lx-qq" data-id="fixed" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “A resource's accreditation is a fixed property of its technology.”</p>

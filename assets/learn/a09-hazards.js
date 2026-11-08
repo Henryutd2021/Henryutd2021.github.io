@@ -84,18 +84,39 @@
   function pairText(H, a, b, c) {
     var la = hazard(H, a).label, lb = hazard(H, b).label.toLowerCase(), at = overlap(H, a, b), both = la + " and " + lb + (at ? " together" : " in the same year");
     if (c.ratio == null || c.sum <= 0) return both + ": " + int(c.both) + " MWh a year more unserved energy than with neither.";
-    if (!at) return both + " add " + int(c.both) + " MWh a year, against " + int(c.sum) + " MWh for the two alone: they strike months apart" + (Math.abs(c.ratio - 1) <= 0.05 ? ", so their harms simply add." : ".");
-    if (c.ratio > 1.05) return both + " add " + int(c.both) + " MWh a year of unserved energy, " + times(c.ratio) + " times the " + int(c.sum) + " MWh of the two alone. **Together they bite deeper than the sum.**";
-    if (c.ratio < 0.95) return both + " add " + int(c.both) + " MWh a year, less than the " + int(c.sum) + " MWh of the two alone: they hit different hours or the same scarce ones.";
-    return both + " add " + int(c.both) + " MWh a year, about the " + int(c.sum) + " MWh of the two alone.";
+    if (!at) return both + " add " + int(c.both) + " MWh a year, against " + int(c.sum) + " MWh the two add alone: they strike months apart" + (Math.abs(c.ratio - 1) <= 0.05 ? ", so their harms simply add." : ".");
+    if (c.ratio > 1.05) return both + " add " + int(c.both) + " MWh a year of unserved energy, " + times(c.ratio) + " times the " + int(c.sum) + " MWh the two add alone. **Together they bite deeper than the sum.**";
+    if (c.ratio < 0.95) return both + " add " + int(c.both) + " MWh a year, less than the " + int(c.sum) + " MWh the two add alone: they hit different hours or the same scarce ones.";
+    return both + " add " + int(c.both) + " MWh a year, about the " + int(c.sum) + " MWh the two add alone.";
   }
-  var CLOSING = "Planners now test grids against correlated hazards, require cold-weather plans and harden lines. **Some defences target one hazard; storage and flexible demand help in several, but cannot restore switched-off lines.**";
+  var CLOSING = "Planners now test grids against correlated hazards, require cold-weather plans and harden lines. **Some defences target one hazard; storage and demand response help in several, but cannot restore switched-off lines.**";
+  // step 3, for the hazards the reader tried (in the data's order): each year's unserved energy against none, and the
+  // energy that shutoffs switch off directly when the wildfire year is among them
+  function triedText(H, base, runs, ids) {
+    var list = H.hazards.filter(function (hz) { return ids.indexOf(hz.id) >= 0; }).map(function (hz) { return hz.label.toLowerCase() + " " + int(runs[hz.id].eue); });
+    var t = "Unserved energy, against " + int(base.eue) + " MWh a year with no hazard: " + (list.length > 1 ? list.slice(0, -1).join(", ") + " and " + list[list.length - 1] : list[0]) + " MWh.";
+    if (ids.indexOf("fire") >= 0) t += " The shutoffs also switch off " + int(runs.fire.shut) + " MWh of customers' power directly.";
+    return t;
+  }
   function defenceText(H, before, after, defs) {
     var best = null;
     H.hazards.forEach(function (hz) { var cut = before[hz.id].eue - after[hz.id].eue; if (!best || cut > best.cut) best = { id: hz.id, cut: cut }; });
     var c = cost(H, defs), hz = hazard(H, best.id);
     return "For " + money(c) + " a year: in the " + hz.label.toLowerCase() + " year, unserved energy falls from " + int(before[best.id].eue) + " to " + int(after[best.id].eue) + " MWh, the largest cut. " +
       (after[best.id].eue > 0.5 ? "**Some risk remains: defences narrow it, they do not remove it.**" : "**No shortfall is left in that year, at this price.**");
+  }
+  // the no-JS version of what the cards show besides the results: each hazard, each defence and the preparation steps,
+  // from the same data (written into the page by the test's --write)
+  var MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  function dateWords(d) { var p = d.split("-"); return (p[2] ? +p[2] + " " : "") + (p[1] ? MONTH_NAMES[+p[1] - 1] + " " : "") + p[0]; }
+  function escH(t) { return String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+  function staticMore(H) {
+    var hz = H.hazards.map(function (h) { return "<tr><td>" + escH(h.label) + "</td><td>" + escH(h.when) + "</td><td>" + escH(h.what) + "</td></tr>"; }).join("\n");
+    var df = H.defences.map(function (d) { return "<tr><td>" + escH(d.label) + "</td><td>" + money(d.cost) + "</td><td>" + escH(d.what) + "</td></tr>"; }).join("\n");
+    var pr = H.prepare.map(function (e) { return "<li><b>" + dateWords(e.date) + ", " + escH(e.label) + ":</b> " + escH(e.text) + " (<a href=\"" + escH(e.source.url) + "\">" + escH(e.source.label) + "</a>)</li>"; }).join("\n");
+    return '<table class="a9-static a9-words" aria-label="The four hazards as this lesson models them (illustrative)">\n<thead><tr><th scope="col">Hazard</th><th scope="col">When</th><th scope="col">What it does here</th></tr></thead>\n<tbody>\n' + hz + "\n</tbody></table>\n" +
+      '<table class="a9-static a9-words" aria-label="The five defences, with illustrative yearly costs in millions of 2025 dollars">\n<thead><tr><th scope="col">Defence</th><th scope="col">Yearly cost</th><th scope="col">What it does here</th></tr></thead>\n<tbody>\n' + df + "\n</tbody></table>\n" +
+      '<p class="lx-hint">How planners prepared after Uri and Elliott:</p>\n<ol class="a9-prep">\n' + pr + "\n</ol>";
   }
   // practice drill items (two kinds, seeded; the test recomputes every answer)
   function drillItem(k, r) {
@@ -107,11 +128,11 @@
     }
     var base = 50 + 10 * Math.floor(r() * 10), a = base + 50 * (1 + Math.floor(r() * 8)), b = base + 50 * (1 + Math.floor(r() * 8)), ab = a + b - base + 50 * Math.floor(r() * 12);
     var sum = (a - base) + (b - base), ratio = Math.round(((ab - base) / sum) * 10) / 10;
-    return { kind: "ratio", q: "Unserved energy: " + base + " MWh with no hazard, " + a + " with hazard A, " + b + " with hazard B, " + int(ab) + " with both. Subtract the no-hazard value from each: the increase with both is how many times the sum of the two separate increases?", answer: ratio, tol: 0.06, unit: "times",
+    return { kind: "ratio", q: "Unserved energy, MWh a year: no hazard " + base + ", hazard A " + a + ", hazard B " + b + ", both " + int(ab) + ". How many times the two separate increases, summed, is the increase with both?", answer: ratio, tol: 0.06, unit: "times",
              why: "(" + int(ab) + " − " + base + ") ÷ ((" + a + " − " + base + ") + (" + b + " − " + base + ")) = " + ratio.toFixed(1) + "." };
   }
   var model = { T: T, dayOf: dayOf, drillItem: drillItem, hazard: hazard, defence: defence, keep: keep, mods: mods, addsOf: addsOf, cost: cost, run: run, sweep: sweep, compound: compound, overlap: overlap,
-                pairText: pairText, pairLabel: pairLabel, packageText: packageText, defenceText: defenceText, CLOSING: CLOSING, fm: { int: int, d3: d3, times: times, money: money } };
+                pairText: pairText, pairLabel: pairLabel, packageText: packageText, defenceText: defenceText, triedText: triedText, staticMore: staticMore, CLOSING: CLOSING, fm: { int: int, d3: d3, times: times, money: money } };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX || !window.LX.H) return;
 
@@ -146,7 +167,10 @@
   }
   function facts(host, list, src) {
     var ul = H_("ul", { class: "a9-facts" }, host);
-    list.forEach(function (f) { var li = H_("li", null, ul); H_("b", { text: f.n }, li); H_("span", { html: LX.rich(f.what) }, li); });
+    list.forEach(function (f) {
+      var li = H_("li", null, ul); H_("b", { text: f.n }, li); H_("span", { html: LX.rich(f.what) }, li);
+      if (f.source) H_("span", { class: "a9-note", html: " (<a href=\"" + LX.esc(f.source.url) + "\">" + LX.esc(f.source.label) + "</a>)" }, li);
+    });
     if (src) H_("p", { class: "a9-note", html: "Source: <a href=\"" + LX.esc(src.url) + "\">" + LX.esc(src.label) + "</a>." }, host);
   }
   function chip(hz) { return { html: "<i style='--c:" + hz.color + "'></i>" + LX.esc(hz.label) }; }
@@ -197,8 +221,8 @@
               if (ev) { H_("p", { class: "a9-note", html: "<b>Real case: " + LX.esc(ev.label) + ".</b>" }, out); facts(out, ev.facts.slice(0, 1), ev.source); } }
             if (Object.keys(tried).length >= 2) {
               api.done(); remember("tried", Object.keys(tried));
-              var c = get(["cold"]), f = get(["fire"]);
-              api.saw("A cold snap year: " + int(c.eue) + " MWh unserved against " + int(b.eue) + " without. Shutoffs add " + int(f.eue - b.eue) + " MWh of shortfall, and switch off " + int(f.shut) + " MWh of customers' power directly.");
+              var runs = {}; Object.keys(tried).forEach(function (id) { runs[id] = get([id]); });
+              api.saw(triedText(H, b, runs, Object.keys(tried)));
             }
           }
           H.hazards.forEach(function (hz) {
