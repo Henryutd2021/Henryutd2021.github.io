@@ -265,7 +265,7 @@
       ".m1-anno ol{margin:0;padding-left:1.3rem;display:grid;gap:8px;font-size:15px}",
       ".m1-anno ol b{font-family:var(--lx-f-display);font-weight:500}",
       ".m1-tag{font-size:12.5px;color:var(--lx-ink-3)}",
-      ".m1-hours{margin:0;padding-left:1.1rem;display:grid;gap:4px;font-size:15px}.m1-hours b{font-family:var(--lx-f-display);font-weight:500}",
+      ".m1-why{margin:0;padding-left:1.1rem;display:grid;gap:4px;font-size:15px}.m1-why b{font-family:var(--lx-f-display);font-weight:500}",
       ".m1-note{margin:0;font-size:15px;max-width:60ch}"
     ].join("\n") }, document.head);
   }
@@ -473,7 +473,7 @@
               check();
             } });
           rl = retryLine(act); rcp = Recipe(act);
-          why = E("ul", { class: "m1-hours", hidden: true, "aria-label": "The two hours the ramp rule links" }, act);
+          why = E("ul", { class: "m1-why", hidden: true, "aria-label": "The two hours the ramp rule links" }, act);
         } },
       // 5 relax the ramp
       { text: "Switch the ramp rule off and solve again. Compare the day's cost and its prices with the plan you had.",
