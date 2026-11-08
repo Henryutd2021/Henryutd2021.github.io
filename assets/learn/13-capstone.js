@@ -148,6 +148,9 @@
       S_.C = model.costs(cfg, S_.sc);
     }
     function isDefault() { return Math.abs(S_.sc.gas - DEF.gas) < 1e-9 && Math.abs(S_.sc.nucCapex - DEF.nucCapex) < 1e-9; }
+    // a plan and the costs it is run with, as one key (the share link's code with the scenario): the stored full-year
+    // check names the plan it checked, and the concept map quotes it only while the reader's plan is that plan
+    function planKey(plan, sc) { return model.encodePlan(plan, sc); }
 
     // ---- missions, the stage, the panel
     var ms = LX.Missions(live, [
@@ -200,14 +203,15 @@
       if (k === "wind") return fm.k(T.wind.fixed) + " per MW-year; makes " + fm.pct(Y.windCF) + " of its size on average.";
       if (k === "solar") return fm.k(T.solar.fixed) + " per MW-year; makes " + fm.pct(Y.solarCF) + " of its size on average.";
       if (k === "nuc") return fm.k(T.nuc.fixedTotal) + " per MW-year with fuel; modelled as a constant " + fm.pct(t.nuc.avail) + " of its size every hour (a simplification).";
-      if (k === "cc") return fm.k(T.cc.fixed) + " per MW-year + $" + T.cc.run.toFixed(0) + "/MWh to run; " + T.cc.co2.toFixed(2) + " t CO₂/MWh.";
-      if (k === "pk") return fm.k(T.pk.fixed) + " per MW-year + $" + T.pk.run.toFixed(0) + "/MWh to run; " + T.pk.co2.toFixed(2) + " t CO₂/MWh.";
+      if (k === "cc") return "A [[combined-cycle|combined-cycle]] plant (CC): " + fm.k(T.cc.fixed) + " per MW-year + $" + T.cc.run.toFixed(0) + "/MWh to run; " + T.cc.co2.toFixed(2) + " t CO₂/MWh.";
+      if (k === "pk") return "A [[peaker|peaker]]: " + fm.k(T.pk.fixed) + " per MW-year + $" + T.pk.run.toFixed(0) + "/MWh to run; " + T.pk.co2.toFixed(2) + " t CO₂/MWh.";
       if (k === "bp") return fm.k(T.bp.fixed) + " per MW-year: how fast it charges or discharges.";
-      return fm.k(T.be.fixed) + " per MWh-year: how much it holds; " + Math.round(cfg.techs.battery.rte * 100) + "% round trip.";
+      var rt = Math.round(cfg.techs.battery.rte * 100);
+      return fm.k(T.be.fixed) + " per MWh-year: how much it holds. " + rt + "% [[round-trip-efficiency|round trip]]: " + rt + " MWh back for every 100 MWh charged.";
     }
     var tal = H("div", { class: "lx-tallies lx13-tallies" }, panel);
     function tally(label) { var d = H("div", { class: "lx-tally" }, tal); H("span", { text: label }, d); return { box: d, b: H("b", { text: "…" }, d) }; }
-    var tCost = tally("Cost a year"), tCo2 = tally("CO₂ a year"), tUns = tally("Unserved energy"), tSpill = tally("Spilled energy");
+    var tCost = tally("Cost a year"), tCo2 = tally("CO₂ a year"), tUns = tally("Unserved energy"), tSpill = tally("Spilled, share of wind, solar and nuclear");
 
     var ob = H("div", { class: "lx13-box" }, panel);
     H("p", { class: "lx-eyebrow", text: "Ask the optimizer" }, ob);
@@ -374,7 +378,7 @@
     }
     function store() {
       var s = S_.sum;
-      LX.store.set("t13-log", { cost: s.cost, co2: s.co2, unserved: s.unserved, spilled: s.spilledShare, plan: S_.plan, gap: gapNow(), short: S_.short, bat: S_.bat });
+      LX.store.set("t13-log", { cost: s.cost, co2: s.co2, unserved: s.unserved, spilled: s.spilledShare, plan: S_.plan, key: planKey(S_.plan, S_.sc), gap: gapNow(), short: S_.short, bat: S_.bat });
       LX.emit("t13-run");
     }
 
@@ -385,7 +389,7 @@
       S_.pred = LX.Predict(q, { id: "t13-start", fresh: true, q: "Lesson 0's five plants must now serve a whole year, with a peak of " + Math.round(Y.peak) + " MW. Will every light stay on?",
         options: [{ value: "yes", label: "Yes, all year" }, { value: "no", label: "No, some hours go dark" }], answer: "no",
         feedback: { yes: "Not quite.", no: "Right." }, lockText: "Locked in.",
-        onPick: function () { S_.picked = true; setTimeout(function () { if (!S_.done && S_.tourWait) tour.start(0); }, 900); var go = function () { var s = S_.sum; S_.pred.reveal(s.unserved >= 0.5 ? "Run on the seven weeks, the year leaves " + fm.mwh(s.unserved) + " unserved. Gas and nuclear give at most " + Math.round(S_.plan.cc + S_.plan.pk + S_.plan.nuc * cfg.techs.nuc.avail) + " MW; on some hot, still evenings wind and sun cannot cover the rest." : "Every modelled hour is served."); };
+        onPick: function () { S_.picked = true; setTimeout(function () { if (!S_.done && S_.tourWait) tour.start(0); }, 900); var go = function () { var s = S_.sum; S_.pred.reveal(s.unserved >= 0.5 ? "Run on the seven weeks, the year leaves " + fm.mwh(s.unserved) + " unserved. Gas and nuclear give at most " + Math.round(S_.plan.cc + S_.plan.pk + S_.plan.nuc * cfg.techs.nuc.avail) + " MW; in some hours wind and sun cannot cover the rest." : "Every modelled hour is served."); };
           if (S_.sum) go(); else LX.on("t13-run", function once() { if (S_.pred) { go(); S_.pred = null; } }); } });
     }
 
@@ -424,17 +428,17 @@
       S_.fullCheck = function () { fbtn.click(); };
       fbtn.addEventListener("click", function () {
         fbtn.disabled = true; fout.textContent = "Solving the full year…";
-        var plan = copy(S_.plan), C = S_.C, fy = [{ demand: Y.demand, wind: Y.wind, solar: Y.solar, weight: 1 }];
+        var plan = copy(S_.plan), C = S_.C, key = planKey(plan, S_.sc), fy = [{ demand: Y.demand, wind: Y.wind, solar: Y.solar, weight: 1 }];
         LX.solver.solve(model.fullYearModel(C, Y, { plan: plan }), { key: "t13-full", label: "t13-full", timeLimit: 30 }).then(function (r) {
           fbtn.disabled = false; fout.innerHTML = "";
           if (!r.ok) { fout.textContent = LX.solver.describe(r); return; }
           var f = model.summarize(C, fy, r, { plan: plan }), v = model.fullVerdict(s, f, target); S_.full = f;
           var hrsShort = Object.keys(r.values).filter(function (k) { return k.charAt(0) === "u" && r.values[k] > 0.05; }).length;
-          LX.store.set("t13-full", { cost: f.cost, co2: f.co2, unserved: f.unserved, spilled: f.spilledShare, wcost: s.cost, wco2: s.co2, wun: s.unserved, held: v.held });
+          LX.store.set("t13-full", { key: key, cost: f.cost, co2: f.co2, unserved: f.unserved, spilled: f.spilledShare, wcost: s.cost, wco2: s.co2, wun: s.unserved, held: v.held });
           var t = H("table", { class: "lx13-cmp" }, fout), hr = H("tr", null, H("thead", null, t));
           ["", "Seven weeks", "All 8,760 hours"].forEach(function (x) { H("th", { scope: "col", text: x }, hr); });
           var b = H("tbody", null, t);
-          [["Cost a year", fm.musd(s.cost), fm.musd(f.cost)], ["CO₂ a year", fm.kt(s.co2), fm.kt(f.co2)], ["Unserved", fm.mwh(s.unserved), fm.mwh(f.unserved)], ["Spilled", fm.pct(s.spilledShare), fm.pct(f.spilledShare)]]
+          [["Cost a year", fm.musd(s.cost), fm.musd(f.cost)], ["CO₂ a year", fm.kt(s.co2), fm.kt(f.co2)], ["Unserved", fm.mwh(s.unserved), fm.mwh(f.unserved)], ["Spilled, share of wind, solar and nuclear", fm.pct(s.spilledShare), fm.pct(f.spilledShare)]]
             .forEach(function (row) { var tr = H("tr", null, b); row.forEach(function (x) { H("td", { text: x }, tr); }); });
           // the verdict, judged again on the full year: demand served, and CO2 against the target
           var ul = H("ul", { class: "lx13-verdict" }, fout);
@@ -443,7 +447,7 @@
           vline(v.co2ok, "CO₂: <b>" + fm.kt(f.co2) + "</b> against the " + G.co2Target + " kt target" + (v.co2ok ? ", under it." : ": " + fm.kt(v.over) + " (" + fm.pct(v.overShare, 1) + ") over."));
           var why = !v.co2ok && !v.served ? "some hours go short and gas runs more than they predicted." : !v.co2ok ? "gas runs more than they predicted." : "some hours go short.";
           H("p", { class: "lx13-sub", text: "Solved in " + Math.max(1, Math.round(r.ms.roundTrip)) + " ms. " + (v.held ? "The seven-week verdict holds for this plan on the full year." :
-            !v.changed ? "The full year confirms what the seven weeks showed." : "The full year changes the verdict: seven weeks cannot show every still, hot evening, so " + why) }, fout);
+            !v.changed ? "The full year confirms what the seven weeks showed." : "The full year changes the verdict: seven weeks cannot show every hard hour of the year, so " + why) }, fout);
           hTitle.textContent = "On the full year, your plan " + (v.served ? "serves every hour" : "leaves " + fm.mwh(f.unserved) + " unserved") + " and emits " + fm.kt(f.co2) + (v.co2ok ? ", under the target." : ", over the " + G.co2Target + " kt target.");
           ms.set("lights", { frac: v.served ? 1 : Math.max(0.05, 1 - f.unservedShare * 200), text: v.served ? "Full year: every hour served" : "Full year: " + fm.mwh(f.unserved) + " unserved", fail: !v.served, won: v.served });
           ms.set("co2", { frac: f.co2 / target, text: "Full year: " + fm.kt(f.co2), fail: !v.co2ok, won: v.co2ok });
@@ -530,8 +534,8 @@
         if (id === "cost") return "Your plan: " + fm.musd(L.cost) + " a year.";
         if (id === "co2") return "Your plan: " + fm.kt(L.co2) + " a year.";
         if (id === "front") return L.gap != null ? "Your plan: " + fm.pct(Math.max(0, L.gap), 1) + " above the frontier." : null;
-        if (id === "short") return "Your plan: " + fm.mwh(L.unserved) + " unserved, " + fm.pct(L.spilled) + " spilled.";
-        if (id === "weeks") { var F = LX.store.get("t13-full", null); return F ? "Your full-year check: " + fm.musd(F.cost) + " and " + fm.kt(F.co2) + " on all 8,760 hours, against " + fm.musd(F.wcost) + " and " + fm.kt(F.wco2) + " on seven weeks." : null; }
+        if (id === "short") return "Your plan: " + fm.mwh(L.unserved) + " unserved; " + fm.pct(L.spilled) + " of its wind, solar and nuclear output spilled.";
+        if (id === "weeks") { var F = LX.store.get("t13-full", null); return F && F.key && F.key === L.key ? "Your plan's full-year check: " + fm.musd(F.cost) + " and " + fm.kt(F.co2) + " on all 8,760 hours, against " + fm.musd(F.wcost) + " and " + fm.kt(F.wco2) + " on seven weeks." : null; }
         return null;
       }
     });
@@ -540,7 +544,7 @@
       title: "Where this answer holds",
       lede: "A model's plan is only as good as what it includes. This one is built to teach; read its answers with these limits.",
       holds: [
-        "the weather of 2025 is a fair guide: one year of real Southwest Power Pool shapes, scaled to the town;",
+        "2025 is a fair guide: one year of Southwest Power Pool demand, wind and solar profiles, scaled to the town;",
         "costs stay as entered, all in " + cfg.priceYear + " dollars (the battery's " + cfg.techs.battery.source.dollarYear + " costs converted with BEA's GDP price index), the same in every year;",
         "the town is an island: no imports, no transmission limits inside it;",
         "nuclear output is a constant " + Math.round(cfg.techs.nuc.avail * 1000) / 10 + "% of its size every hour: a fleet's yearly average, which cannot show reliability;",

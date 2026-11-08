@@ -899,7 +899,7 @@
    "total": 14,
    "code": null,
    "title": "What should Prairie Town build? Plan its power system",
-   "subtitle": "Choose what to build, run a year of real weather, and ask the optimizer",
+   "subtitle": "Choose what to build, run it on 2025's hourly demand, wind and sun, and ask the optimizer",
    "short": "Capstone: plan the town",
    "tier": "modeler",
    "tier2": "analyst",
