@@ -56,11 +56,11 @@ const APPROVED_SNAPSHOT = {
     ["CO₂ from grid electricity in a normal year", E1.kilo(R0.year.co2) + " t"],
     ["The plan Size it for me gives from the default", E1.kilo(RS.plan.pv) + " kW of solar · " + E1.kilo(RS.plan.bat) + " kWh battery · " + RS.plan.gen + " sets · " + E1.kilo(RS.plan.fuel) + " gallons: " + E1.money(RS.total) + " a year, community-owned"],
     ["That plan in the storm, and on a fourth day", E1.kilo(C.crit(RS.outages[0])) + " kWh of critical load unserved (" + E1.kilo(RS.outages[0].fuel) + " gal of diesel, " + E1.fuelMoney(RS.outages[0].fuelCost) + "); " + E1.kilo(Ls.filter(x => x.days === 4)[0].crit) + " kWh if the storm lasts 4 days"],
-    ["That plan, paid by each owner (each owner's cheapest, rounded up)", cfg.owners.map(o => o.label.replace("-owned", "") + " " + E1.money(payS(o.key))).join(" · ")]];
+    ["That plan, paid by each owner (each owner's sizing, rounded up, gives it too)", cfg.owners.map(o => o.label.replace("-owned", "") + " " + E1.money(payS(o.key))).join(" · ")]];
   const pre = { head: "Results for the default plan (F7's campus as built) and the sized plan", rows: rows0, note: "Precomputed with HiGHS on 3 November 2026. Without JavaScript, write the note on the sized plan from these numbers, naming the plan in words in place of a link; with JavaScript on, you run your own plan, compare the owners and size it with the solver." };
   const exo = C.exemplars(RS, payS, cfg.fuel.price);
   const BLOCKS = {
-    "c1-plan": () => SS.staticHTML(S, def),
+    "c1-plan": () => SS.staticHTML(C.staticSchema(S), def),
     "c1-results": () => E1.fallback({ cfg: Object.assign({}, cfg, { precomputed: Object.assign({}, cfg.precomputed, { c1: pre }) }) }, "c1"),
     "c1-note": () => RN.outlineHTML(C.FIELDS),
     "c1-exemplars": () => EX.staticHTML(exo),
@@ -101,7 +101,7 @@ const APPROVED_SNAPSHOT = {
   [E1.kilo(R.plan.pv) + " kW of solar", E1.kilo(R.plan.bat) + " kWh battery", E1.money(R.total) + " a year, community-owned, 2025 dollars: equipment, upkeep and the normal-year grid bill",
     E1.money(R.saving) + " below the grid-only bill", "powered for all 72 hours of the storm (" + E1.kilo(C.crit(R.outages[0])) + " kWh short)", "0 kWh short for a storm of 1 to 3 days, but " + E1.kilo(d4.crit) + " kWh on a fourth day, the plan held fixed",
     "The storm's " + E1.kilo(R.outages[0].fuel) + " gallons of diesel (" + E1.fuelMoney(R.outages[0].fuel * cfg.fuel.price) + ") are extra", (R.outages[0].co2 / 1000).toFixed(1) + " t of CO₂ from the storm's diesel; " + E1.kilo(R.year.co2) + " t from a normal year's grid electricity",
-    "A co-op would pay " + E1.money(pc) + " a year for the same plan, a utility " + E1.money(pu), "worth " + E1.money(R.total - pc) + " a year more than a co-op here"].forEach(s =>
+    "A co-op would pay " + E1.money(pc) + " a year for the same plan, a utility " + E1.money(pu), "Community ownership costs " + E1.money(R.total - pc) + " a year more than a co-op"].forEach(s =>
     ok(good.indexOf(s) >= 0, "the strong note quotes the engine: " + s));
   ["Recommendation:", "Cost:", "Sensitivity:", "Emissions:", "Assumptions:", "Owner:", "Limits:"].forEach(f => ok(good.indexOf(f) >= 0, "the strong note is a complete short note: " + f + " (C1 7)"));
   ok(exo.lines === true && good.split("\n").every(l => l.split(/\s+/).length <= 50), "the strong note: one field a line, each short (C1 9): " + good.split("\n").map(l => l.split(/\s+/).length).join(", ") + " words");
@@ -115,7 +115,7 @@ const APPROVED_SNAPSHOT = {
   owners.forEach(x => ok(Math.abs(x.total - (x.R.equipment.equipment + x.R.year.bill)) < 1e-6 && Math.abs(x.total - payS(x.owner.key)) < 0.5 && x.total > x.sized.total && x.crit < 0.5,
     x.owner.key + ": the row's cost is its rounded plan's (" + E1.money(x.total) + ", the exact sizing " + E1.money(x.sized.total) + "), which serves the brief"));
   const ow = C.ownersWords(owners);
-  ok(/same sizes here/.test(ow) === same && ow.indexOf("Co-op-owned costs least, " + E1.money(co.total)) >= 0 && co.total < cm.total && ut.total > co.total, "owners' words follow from their numbers: " + ow);
+  ok(/same sizes here/.test(ow) === same && ow.indexOf("co-op-owned costs least, " + E1.money(co.total)) >= 0 && co.total < cm.total && ut.total > co.total, "owners' words follow from their numbers: " + ow);
   const sl = RN.sensitivityLine(C.sensitivity(R));
   ok(/^Unserved critical load \(hospital, water and heat, dorms\) is 0 kWh with the storm's length at 3 days \(this plan\), 0 kWh at 1 day, 0 kWh at 2 days and [\d,]+ kWh at 4 days, with the plan held fixed\.$/.test(sl), "the sensitivity line: " + sl);
   // C1 2: relabelling the critical loads cannot hide their shortfall
@@ -139,6 +139,17 @@ const APPROVED_SNAPSHOT = {
   ok(T.indexOf("650 kW") >= 0 && P.loads.slice(0, 3).reduce((a, l) => a + l.kw, 0) === 650, "650 kW must stay on to start: hospital, water and heat, dorms");
   ok(/notebooks\/m05-microgrid-size-and-run\.ipynb/.test(PAGE) && fs.existsSync(path.join(X.SITE, "learn/notebooks/m05-microgrid-size-and-run.ipynb")), "the Modeler version links the M5 notebook, which exists");
   ok(C.RUBRIC.map(r => r.id).join() === "accounting,uncertainty,realism,communication", "rubric: accounting, uncertainty, realism, communication (README: C0 and C1)");
+  // review: the bar matches the task. Uncertainty and Realism have C1's own level words, which the strong note meets
+  { const lv = id => C.RUBRIC.find(r => r.id === id).levels || {};
+    ok(["uncertainty", "realism"].every(id => lv(id).developing && lv(id).proficient && lv(id).strong) && !/announced projects|classified/.test(JSON.stringify(C.RUBRIC)) && /storms of 1, 2 and 4 days, the plan held fixed/.test(lv("uncertainty").proficient) && /heating assumption/.test(lv("realism").proficient),
+      "rubric: Uncertainty and Realism in C1's own words (the storm-length sensitivity; what the plan leaves out and the heating assumption)");
+    ok(/0 kWh short for a storm of 1 to 3 days, but/.test(good) && /powering the loads keeps their heating working, as heat is not modeled/.test(good) && /fuel deliveries are left out/.test(good), "the strong note meets C1's Proficient words: the storm lengths, the heating assumption and what the plan leaves out"); }
+  // the note every reader copies carries the brief's heating qualification; the owner's premium has a stated reason;
+  // the owners' words and table call the rounded plans candidates, not the cheapest
+  ok(/n\.assumptions = n\.assumptions\.concat\(\[HEAT\]\)/.test(JS) && /heat demand and indoor temperature are not modeled/.test(C.HEAT) && !/\bheated\b/.test(C.HEAT), "every C1 note carries the heating qualification");
+  ok(/set outage priorities themselves, a control I assume the board values above that/.test(good), "the owner line names the benefit that the premium buys, as an assumption");
+  ok(!/cheapest plan|cheapest, rounded/.test(JS.replace(/\/\/[^\n]*/g, "") + PAGE) && /Sizing candidate for the storm, rounded up/.test(JS) && /Of these candidates, /.test(ow), "the owners' comparison calls rounded plans candidates, never the cheapest");
+  ok(!/Outages to plan for/.test(X.between(PAGE, "c1-plan").text) && /The outage is fixed: the three-day winter storm/.test(PAGE), "the no-JS plan table lists only C1's own controls; the fixed storm is said beside it");
   console.log(`test_c1-keep-the-campus-running: ${checks - fails}/${checks} checks pass`);
   process.exit(fails ? 1 : 0);
 })();

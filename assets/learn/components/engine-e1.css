@@ -51,6 +51,7 @@
 .lx-sb-group > .lx-seg { justify-self: start; }
 .e1-allowl, .e1-segl { font-family: var(--lx-f-display); font-size: 13.5px; color: var(--lx-ink-2); }
 .e1-sizehint { margin: 0 !important; font-size: 13.5px; }
+.e1-allowh { flex-basis: 100%; margin: 0 !important; }   /* under the toggles: the sizes replace the reader's (SB1) */
 .e1-ro .lx-readout { flex: 1 1 140px; }
 
 /* ---------- results */

@@ -23,7 +23,9 @@
       when the import limit is below 1,200 kW and the plan cannot make up the rest; the page then says so, shows the
       kWh and does not compare the cost with the grid-only bill). The generator runs only in
       outages (illustrative rule). The 12 average days smooth the weather: the test checks four plans against a
-      chronological 8,760-hour year (F7's campus: the same bill; larger solar-and-battery plans: a bill 4% to 7% higher).
+      chronological 8,760-hour year (F7's campus: the same bill; the three larger solar-and-battery plans: a bill 4% to 7%
+      higher) and one extreme plan (4,000 kW, 8,000 kWh, no exports: about 12% higher), so the pages say other plans can
+      differ more.
       Then one MILP per outage scenario (islanded; the battery and the tank start full): s + d + g - c = loads served;
       g <= 200 u, g >= 60 u (a set that is on runs at 30% or more), u = sets on, a whole number from 0 to gen;
       fuel: sum 0.07 g <= the gallons on site; each load may be partly served. The objective is a priority order, not
@@ -143,7 +145,7 @@
         { id: "imp", short: "im", type: "int", min: C.imp[0], max: C.imp[1], step: C.imp[2], def: D.imp, label: "Feeder import limit", unit: "kW" },
         { id: "tar", short: "t", type: "enum", values: ["tou", "flat"], names: { tou: "Time-of-use", flat: "Flat" }, def: D.tar, label: "Tariff" },
         { id: "own", short: "w", type: "enum", values: ["utility", "coop", "community"], names: { utility: "Utility-owned", coop: "Co-op-owned", community: "Community-owned" }, def: D.own, label: "Owner" },
-        { id: "allow", short: "al", type: "set", values: ["pv", "bat", "gen"], names: { pv: "solar", bat: "battery", gen: "generator sets" }, def: D.allow, label: "Size it may build" }]
+        { id: "allow", short: "al", type: "set", values: ["pv", "bat", "gen"], names: { pv: "solar", bat: "battery", gen: "generator sets" }, def: D.allow, label: "Size it for me may build" }]
     };
   }
   var schema = makeSchema();
@@ -462,8 +464,8 @@
         "The model knows the coming sun (perfect foresight); the sun is a teaching profile from SPP's 2025 hourly solar, not measured campus output"],
       sensitivity: null,
       limits: ["It checks only the outages chosen: a different start, a longer storm or a broken set can turn out worse",
-        "Its year is 12 average days: for the larger solar-and-battery plans checked over a full 8,760-hour year, the grid bill came out about 4% to 7% higher",
-        "It leaves out the network inside the campus, the generator's part-load fuel use and battery wear"]
+        "Its year is 12 average days: for the larger solar-and-battery plans checked over a full 8,760-hour year, the grid bill came out about 4% to 7% higher; other plans can differ more",
+        "It leaves out the network inside the campus, how a generator's fuel use changes below full output, and battery wear"]
     };
   }
   // the no-JS tables of the default plan's precomputed run (written into the data by the test's --write mode)
@@ -803,14 +805,15 @@
     sl("fuel", "Diesel on site", COL.gen, 25, function (v) { return kilo(v) + " gal"; });
     if (!(o.hide && o.hide.allow)) {
       var al = H("div", { class: "e1-allow" }, g1);
-      H("span", { class: "e1-allowl", text: "Size it may build:" }, al);
-      var tg = H("div", { class: "lx-toggles", role: "group", "aria-label": "What Size it may build" }, al);
+      H("span", { class: "e1-allowl", text: "Size it for me may build:" }, al);
+      var tg = H("div", { class: "lx-toggles", role: "group", "aria-label": "What Size it for me may build" }, al);
       ctl.allow = {};
       [["pv", "Solar"], ["bat", "Battery"], ["gen", "Generator sets"]].forEach(function (x) {
         ctl.allow[x[0]] = LX.Toggle(tg, { label: x[1], on: plan.allow.indexOf(x[0]) >= 0, onChange: function (on) {
           var p = copy(plan), a = p.allow.filter(function (y) { return y !== x[0]; }); if (on) a.push(x[0]);
           p.allow = ["pv", "bat", "gen"].filter(function (y) { return a.indexOf(y) >= 0; }); change(p); } });
       });
+      H("p", { class: "lx-ctl-hint e1-allowh", text: "Its sizes replace yours; a technology switched off here is sized to zero." }, al);
     }
     if (!(o.hide && o.hide.out)) {
       var g2 = fieldset(ctr, "Outages to plan for", "Hypothetical: the grid assumed down during a stretch of 2025 sun; the battery and the tank start full.");
@@ -863,7 +866,8 @@
     var sizeB = H("button", { class: "lx-btn ghost small", type: "button", text: "Size it for me" }, run.button.parentNode);
     sizeB.addEventListener("click", function () { if (run.running()) return; task = "size"; run.run(plan); });
     run.button.parentNode.addEventListener("click", function (e) { if (e.target === run.button || run.button.contains(e.target)) task = "run"; }, true);
-    H("p", { class: "lx-hint e1-sizehint", html: "<b>Size it for me</b> " + LX.rich("asks the [[mixed-integer-program|mixed-integer program]] for the cheapest sizes that keep every must-stay-on load on through the chosen outages, rounds them up to the bench's steps and runs them: a safe plan, not proven the cheapest on the steps.") }, side);
+    H("p", { class: "lx-hint e1-sizehint", html: "<b>Size it for me</b> " + LX.rich("asks the [[mixed-integer-program|mixed-integer program]] for the cheapest sizes that keep every must-stay-on load on through the chosen outages. They replace your sizes.") }, side);
+    H("p", { class: "lx-hint e1-sizehint", text: "Rounded up to the bench's steps and then run: a safe plan, not proven the cheapest on the steps." }, side);
     side.appendChild(ro);
     side.insertBefore(ss.status, pre);
     side.appendChild(ss.el);
@@ -940,7 +944,7 @@
     // the cost's boundary, one idea a line (SB1 5, 8 and 10)
     var cn = H("ul", { class: "lx-hint e1-cost-notes" }, c1);
     ["**Equipment**: paid over its life at the " + R.owner.label.toLowerCase().replace("-owned", "") + " owner's " + Math.round(R.rate * 100) + "% real [[cost-of-capital|cost of capital]] (through the [[capital-recovery-factor|capital recovery factor]]), plus upkeep.",
-      "**Grid bill**: estimated on 12 average days; for the larger solar-and-battery plans checked over a full 8,760-hour year, it came out about 4% to 7% higher.",
+      "**Grid bill**: estimated on 12 average days; for the larger solar-and-battery plans checked over a full 8,760-hour year, it came out about 4% to 7% higher; other plans can differ more.",
       "**Not included**: the diesel burned in outages (its cost is under each outage). 2025 dollars, illustrative.",
       "**Grid electricity**: " + kilo(R.year.imports / 1000) + " MWh bought, " + kilo(R.year.exports / 1000) + " MWh exported, " + kilo(R.year.co2) + " t CO₂ (U.S. [[average-emission-factor|average factor]], [[operating-emissions|operating only]])."]
       .forEach(function (t) { H("li", { html: LX.rich(t).replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>") }, cn); });
@@ -967,7 +971,8 @@
       var on = H("ul", { class: "lx-hint e1-cost-notes" }, c2);
       ["Per outage only: the stretches the plan was run on, not a reliability figure. Diesel at $" + P.cfg.fuel.price.toFixed(2) + " a gallon, not in the annual cost.",
         "Who goes short: a kWh of must stay on weighs 100 times one of keep if possible, which weighs 10 times one of shed first.",
-        "Within a priority, each step up the list (hospital, water and heat, dorms, labs) counts 0.5% more and an earlier hour up to 2% more: a preference, not a strict order."]
+        "Within a priority, each step up the list (hospital, water and heat, dorms, labs) counts 0.5% more and an earlier hour up to 2% more: a preference, not a strict order.",
+        "Smaller weights still prefer less diesel and less battery cycling; other hourly schedules with the same totals can remain."]
         .forEach(function (t) { H("li", { text: t }, on); });
       chartHost = H("div", { class: "lx-xcard lx-sb-chart e1-hourcard" }, host);
       draw();

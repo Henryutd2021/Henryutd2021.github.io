@@ -2206,7 +2206,7 @@
      "0 kWh of critical load unserved (675 gal of diesel, $2,470); 4,508 kWh if the storm lasts 4 days"
     ],
     [
-     "That plan, paid by each owner (each owner's cheapest, rounded up)",
+     "That plan, paid by each owner (each owner's sizing, rounded up, gives it too)",
      "Utility $1,240,076 · Co-op $1,124,657 · Community $1,181,114"
     ]
    ],
