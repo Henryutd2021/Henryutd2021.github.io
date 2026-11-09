@@ -48,7 +48,7 @@
   "cards": [
     { "id": "growth", "bin": "parameter", "text": "How fast demand grows each year, apart from cars (0.4 to 1.6%)", "why": "A number inside the model. Its range here is illustrative; a real study would set it from meter records. Give it a range, and odds if you can defend them." },
     { "id": "kwh", "bin": "parameter", "text": "How much energy one electric car draws on an average day (7 to 13 kWh)", "why": "Another number inside the model. The range here is illustrative; a real study would need driving surveys or charger meter data to set it." },
-    { "id": "heat", "bin": "parameter", "text": "How hot the hottest afternoon of 2035 turns out to be", "why": "Year-to-year weather is variability no study can know in advance. A real study takes its range from past years; the ±4% here is illustrative." },
+    { "id": "heat", "bin": "parameter", "text": "How much 2035's weather raises or lowers demand (a multiplier, 0.96 to 1.04)", "why": "Weather varies year to year; no study knows it in advance. Here it is an illustrative multiplier on background demand; demand is not computed from temperature." },
     { "id": "coincide", "bin": "structural", "text": "Whether car charging adds to the town's peak hour, or mostly to later hours", "why": "The form of the model: adding peaks assumes they come in the same hour; adding hour by hour does not. Run both forms." },
     { "id": "shape", "bin": "structural", "text": "Using 2025's hourly pattern of demand for every year to 2035", "why": "A choice of structure (one year's pattern stands for all). Test it with another year's pattern, or state it as a limit." },
     { "id": "home", "bin": "structural", "text": "Counting only cars charged at home, none charged at work", "why": "What a model leaves out is part of its structure. State it, and test a version with workplace charging." },
@@ -56,7 +56,7 @@
     { "id": "code", "bin": "scenario", "text": "Whether the state requires all-electric new homes after 2028", "why": "An outside policy path with two or three clear versions: a scenario, run one by one." },
     { "id": "newload", "bin": "deep", "text": "Whether a large new customer, such as a factory, asks to connect, and when", "why": "Here no one can agree on its size, its arrival or any odds. Show it as a separate what-if, and plan to adapt." },
     { "id": "fleets", "bin": "deep", "text": "How travel changes if shared self-driving fleets arrive", "why": "Experts disagree on whether, when and how it changes charging: the outcomes themselves are unknown." },
-    { "id": "programme", "bin": "choice", "text": "Whether the utility funds a managed-charging programme", "why": "A decision the study should inform. Run the study with and without it and compare; sampling it would hide the comparison." },
+    { "id": "programme", "bin": "choice", "text": "Whether the utility funds a managed-charging programme (one that shifts car charging to quieter hours)", "why": "A decision the study should inform. Run the study with and without it and compare; sampling it would hide the comparison." },
     { "id": "margin", "bin": "choice", "text": "How large a safety margin the utility plans above its forecast", "why": "A value judgement about risk. Show the range, and say what each margin implies; never average over margins." }
   ],
   "treatments": [
@@ -67,12 +67,12 @@
     ] },
     { "id": "t-coincide", "card": "coincide", "options": [
       { "id": "a", "verdict": "bad", "text": "Widen the growth range until the band covers both model forms.", "why": "It hides a question about the model inside a parameter, and the band then answers neither." },
-      { "id": "b", "verdict": "good", "text": "Run both model forms and report the gap between them.", "why": "Sampling cannot reveal a structural choice; comparing forms can, and the gap tells readers how much the choice matters." },
+      { "id": "b", "verdict": "good", "text": "Run both model forms and report the gap between them.", "why": "These runs vary numbers inside one model form, so the form is compared, not sampled: the gap tells readers how much the choice matters." },
       { "id": "c", "verdict": "ok", "text": "Use whichever form gives the higher peak, to be safe.", "why": "Sometimes wise for a planner, but say so: readers would take a cautious bound for your best estimate." }
     ] },
     { "id": "t-cars", "card": "cars", "options": [
       { "id": "a", "verdict": "bad", "text": "Average the three and report the mean.", "why": "The average of three stories is a future nobody described, and it hides the spread between them." },
-      { "id": "b", "verdict": "ok", "text": "Call the central one the forecast, and the other two the extremes.", "why": "Fine if you can say why the central one is more likely; otherwise readers take a storyline for a prediction." },
+      { "id": "b", "verdict": "ok", "text": "Call the central one the forecast, and the other two the extremes.", "why": "Naming a central case is fine, but not as a forecast: the town gives no odds, and slow and fast are illustrative cases, not bounds on what could happen." },
       { "id": "c", "verdict": "good", "text": "Run each one and show them side by side, with no odds attached.", "why": "Each storyline keeps its own band, and readers can see which assumptions drive the difference." }
     ] },
     { "id": "t-newload", "card": "newload", "options": [
@@ -95,7 +95,7 @@
     "examples": {
       "about": "Each example is a list of sentences, each labelled with the job it does; the checks read them joined.",
       "paper": [
-        { "k": "What varied", "v": "We drew growth (0.4–1.6% a year), a car's daily energy (7–13 kWh) and the year's weather (±4%) independently, with equal odds across each range, in 1,000 runs." },
+        { "k": "What varied", "v": "We drew growth (0.4–1.6% a year), a car's daily energy (7–13 kWh) and a weather multiplier on background demand (0.96–1.04) independently, with equal odds across each range, in 1,000 runs." },
         { "k": "The range", "v": "Under central car uptake the 2035 peak is {c10}–{c90} MW (P10–P90 of the runs); under fast uptake, {f10}–{f90} MW." },
         { "k": "Model form", "v": "Demand is added hour by hour on 2025's pattern; adding the two peaks instead raises the central median by {gap} MW." }
       ],
@@ -144,7 +144,7 @@
         "."
       ] },
       { "key": "good", "label": "Strong answer", "level": "Proficient", "parts": [
-        "Varied: ", { "text": "growth (0.4–1.6% a year), a car's daily energy (7–13 kWh) and the year's weather (±4%), drawn independently with equal odds across each range, in 1,000 runs (seed 6)", "note": "Parameters named, with their ranges and the sampling assumption: independent draws, equal odds across each range." },
+        "Varied: ", { "text": "growth (0.4–1.6% a year), a car's daily energy (7–13 kWh) and a weather multiplier on background demand (0.96–1.04), drawn independently with equal odds across each range, in 1,000 runs (seed 6)", "note": "Parameters named, with their ranges and the sampling assumption: independent draws, equal odds across each range." },
         ".\nScenarios: ", { "text": "slow, central and fast car uptake, with no odds attached", "note": "Scenarios kept apart, with no invented probabilities." },
         ".\nModel form: ", { "text": "demand added hour by hour on 2025's pattern; adding peaks instead raises the central median by {gap} MW", "note": "The structural choice stated, with what the other form changes." },
         ".\nResult: ", { "text": "{c10}–{c90} MW (P10–P90) under central uptake, {f10}–{f90} MW under fast uptake", "note": "Results as ranges, labelled as the central 80% of the modelled runs." },
@@ -162,7 +162,7 @@
     "note": "Both paragraphs are illustrative, about the fictional study on this page; their numbers come from the page's model."
   },
   "kindsTable": [
-    { "kind": "Parameter", "what": "A number in the model that data or judgement can bound.", "here": "Growth, a car's daily energy, the year's weather.", "treat": "With odds you can defend, sample together and rank the inputs; with bounds only, compare low and high cases.", "say": "P10–P90 of the runs, or the bounded cases, with the ranges, odds and their sources." },
+    { "kind": "Parameter", "what": "A number in the model that data or judgement can bound.", "here": "Growth, a car's daily energy, a weather multiplier on demand.", "treat": "With odds you can defend, sample together and rank the inputs; with bounds only, compare low and high cases.", "say": "P10–P90 of the runs, or the bounded cases, with the ranges, odds and their sources." },
     { "kind": "Structural", "what": "How the model is built, and what it leaves out.", "here": "Peaks added or hours added; one year's pattern; home charging only.", "treat": "Run an alternative form, or benchmark against another model.", "say": "The choice made, and the gap to the alternative." },
     { "kind": "Scenario", "what": "An outside future with a few coherent versions.", "here": "Slow, central or fast car uptake; a building code.", "treat": "Run each storyline separately.", "say": "Side by side, with no odds unless you can defend them." },
     { "kind": "Deep", "what": "No agreed outcomes, odds or model.", "here": "A large new customer; self-driving fleets.", "treat": "Test plans across many futures; set signposts and triggers.", "say": "A what-if beside the result, and the signal that would change the advice." },

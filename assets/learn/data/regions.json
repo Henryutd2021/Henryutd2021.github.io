@@ -142,7 +142,7 @@
         "flexibility"
       ],
       "structure": [
-        "[[unbundling|Unbundled]]: separate companies make, carry and sell power.",
+        "[[unbundling|Unbundled]]: grid operation is kept apart from generation and sales, through separate companies or independently run subsidiaries.",
         "Each [[bidding-zone|price zone]] has its own price; [[market-coupling|coupled markets]] link the zones a day ahead and within the day.",
         "Dense interconnection between countries.",
         "Nuclear power, led by France, with wind and fast-growing solar.",
@@ -329,7 +329,7 @@
       ],
       "structure": [
         "Nord Pool [[bidding-zone|bidding zones]]: each zone has its own price.",
-        "Since October 2024 [[flow-based-coupling|flow-based coupling]] limits trades by the flow on each line.",
+        "Since October 2024 the Nordic day-ahead market uses [[flow-based-coupling|flow-based coupling]], which limits trades by the flow on each line.",
         "Dense [[hvdc|HVDC]] links.",
         "Hydro in Norway and Sweden, wind in Denmark; Sweden and Finland also run nuclear plants.",
         "New industrial, hydrogen and data-center loads; [[district-heating|district heating]] in many cities."
@@ -347,7 +347,7 @@
       ],
       "questions": [
         "How has flow-based coupling changed price spreads?",
-        "How should the value of stored water be modelled as wind grows?",
+        "How should the value of stored water be modeled as wind grows?",
         "What flexibility can district heating give?"
       ],
       "numbers": [
@@ -387,7 +387,7 @@
       "challenges": [
         "The value of oil burned for power that could be sold.",
         "Summer peaks driven by cooling.",
-        "Subsidised tariffs, and power and water plants that run together."
+        "Subsidized tariffs, and power and water plants that run together."
       ],
       "questions": [
         "How should power and water be planned together with solar and storage?",
@@ -424,7 +424,7 @@
       ],
       "structure": [
         "Mostly [[vertically-integrated-utility|vertically integrated]] state utilities; Nigeria unbundled in 2013, and South Africa's Eskom is unbundling.",
-        "Thin regional power pools, groups of neighbouring countries that trade power: Southern (SAPP), West (WAPP), Eastern (EAPP) and Central African (CAPP).",
+        "Thin regional power pools, groups of neighboring countries that trade power: Southern (SAPP), West (WAPP), Eastern (EAPP) and Central African (CAPP).",
         "Hydro in many countries, coal in South Africa; diesel and off-grid solar where the grid does not reach."
       ],
       "institutions": [
@@ -466,7 +466,7 @@
       ],
       "structure": [
         "Brazil: a hydro-dominated national grid (the SIN, its National Interconnected System), cost-based dispatch, auctions plus a free market.",
-        "Chile: liberalised, with cost-based dispatch on one long north-south grid.",
+        "Chile: liberalized, with cost-based dispatch on one long north-south grid.",
         "Mexico: the state utility CFE (Federal Electricity Commission) dominates after the 2025 reform."
       ],
       "institutions": [
@@ -519,8 +519,8 @@
       ],
       "institutions": [
         "Hawaii's Public Utilities Commission and State Energy Office.",
-        "CARICOM's Energy Unit and CCREEE, the Caribbean's centre for renewable energy and efficiency.",
-        "The Pacific Community, its centre PCREEE and the Pacific Power Association.",
+        "CARICOM's Energy Unit and CCREEE, the Caribbean's center for renewable energy and efficiency.",
+        "The Pacific Community, its center PCREEE and the Pacific Power Association.",
         "IRENA's SIDS Lighthouses initiative, for small island developing states."
       ],
       "challenges": [
@@ -636,6 +636,13 @@
       "url": "https://ember-energy.org/latest-insights/european-electricity-review-2026/",
       "where": "wind and solar 30% of EU electricity in 2025, fossil 29%"
     },
+    "ec-unbundling": {
+      "title": "Governance of the internal energy market",
+      "publisher": "European Commission, Directorate-General for Energy",
+      "date": "no date shown; read 8 November 2026",
+      "url": "https://energy.ec.europa.eu/topics/markets-and-consumers/governance-internal-energy-market_en",
+      "where": "unbundling separates energy supply and generation from the operation of transmission networks, in one of three ways: ownership unbundling, an independent system operator, or an independent transmission system operator (a subsidiary that takes all important decisions independently of its parent company)"
+    },
     "cso-dc": {
       "title": "Data Centres Metered Electricity Consumption 2025, key findings",
       "publisher": "Central Statistics Office, Ireland",
@@ -648,7 +655,7 @@
       "publisher": "National Energy Administration of China",
       "date": "12 February 2026",
       "url": "https://www.nea.gov.cn/20260212/742b8c6a078347b0b39de676c05c5d58/c.html",
-      "where": "317 GW of solar added in 2025; utilisation rate (利用率: the share of available output used rather than curtailed) 95% solar, 94% wind"
+      "where": "317 GW of solar added in 2025; utilization rate (利用率: the share of available output used rather than curtailed) 95% solar, 94% wind"
     },
     "nea-sep": {
       "title": "Power industry statistics, January to July 2026",
@@ -705,6 +712,13 @@
       "date": "May 2026",
       "url": "https://www.ssb.no/energi-og-industri/energi/statistikk/elektrisitet/artikler/hoyeste-stromproduksjon-noensinne-05052026",
       "where": "2025: 161.8 TWh, hydro 89.9%, record net export 22.8 TWh"
+    },
+    "statnett-fbmc": {
+      "title": "Successful go-live of the Nordic Flow-based Market Coupling project",
+      "publisher": "Statnett, Norway's transmission system operator",
+      "date": "1 November 2024; read 8 November 2026",
+      "url": "no link",
+      "where": "the day-ahead Nordic flow-based market coupling went live on 29 October 2024, the first trading day for delivery on 30 October 2024"
     },
     "ember-saudi": {
       "title": "Saudi Arabia: country profile",
@@ -856,9 +870,19 @@
         "spp-som"
       ]
     },
+    "eu": {
+      "structure": [
+        "ec-unbundling"
+      ]
+    },
     "japan-korea": {
       "structure": [
         "occto"
+      ]
+    },
+    "nordics": {
+      "structure": [
+        "statnett-fbmc"
       ]
     },
     "australia": {

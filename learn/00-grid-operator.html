@@ -456,11 +456,11 @@ window.Quarto = {
 <th data-quarto-table-cell-role="th" scope="col">Hour</th>
 <th data-quarto-table-cell-role="th" scope="col">Demand</th>
 <th data-quarto-table-cell-role="th" scope="col">Nuclear</th>
-<th data-quarto-table-cell-role="th" scope="col">Wind</th>
-<th data-quarto-table-cell-role="th" scope="col">Solar</th>
-<th data-quarto-table-cell-role="th" scope="col">Gas CC</th>
-<th data-quarto-table-cell-role="th" scope="col">Peaker</th>
-<th data-quarto-table-cell-role="th" scope="col">Spilled</th>
+<th data-quarto-table-cell-role="th" scope="col">Wind used</th>
+<th data-quarto-table-cell-role="th" scope="col">Solar used</th>
+<th data-quarto-table-cell-role="th" scope="col">Gas combined-cycle</th>
+<th data-quarto-table-cell-role="th" scope="col">Gas peaker</th>
+<th data-quarto-table-cell-role="th" scope="col">Wind and solar spilled</th>
 </tr>
 </thead>
 <tbody>
@@ -711,7 +711,7 @@ window.Quarto = {
 <p class="lx-hint">With JavaScript on, you run this day yourself: set two gas plants, hour by hour, so that supply equals demand.</p>
 </div>
 </div>
-<p class="lx-datanote"><svg class="lx-ic" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5M12 8v.2"></path></svg><span>Demand, wind and solar follow the real hourly shapes of 3 September 2025 on the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), scaled to the town. Prairie Town, its plants, prices and CO₂ rates are illustrative; CO₂ counts fuel burned at the plants only.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5M12 8v.2"></path></svg><span><b>Data:</b> real hourly shapes of demand, wind and solar from the Southwest Power Pool grid on 3 September 2025 (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), scaled to the town.<br><b>Model:</b> Prairie Town, its plants, prices and CO₂ rates are illustrative; CO₂ counts fuel burned at the plants only.</span></p>
 </div>
 <div id="explain" class="lx-sec">
 <section id="what-you-just-did-as-diagrams" class="level2 lx-sec-h">
@@ -733,8 +733,8 @@ window.Quarto = {
 <details class="lx-deeper">
 <summary><span class="k">Go deeper · Analyst</span>The balance, energy and cost as equations</summary>
 <div class="lx-deeper-body">
-<p>For every hour <span class="math inline">\(t\)</span>, with <span class="math inline">\(p_g(t)\)</span> the output of plant <span class="math inline">\(g\)</span> in MW, <span class="math inline">\(u(t)\)</span> the <span class="lx-term" data-term="unserved-energy">unserved</span> demand, <span class="math inline">\(s(t)\)</span> the <span class="lx-term" data-term="curtailment">spilled</span> power and <span class="math inline">\(d(t)\)</span> the demand:</p>
-<p><span class="math display">\[\sum_g p_g(t) + u(t) - s(t) = d(t).\]</span></p>
+<p>For every hour <span class="math inline">\(t\)</span>: <span class="math inline">\(p_g(t)\)</span> is what plant <span class="math inline">\(g\)</span> actually makes, in MW (wind and solar make at most what the weather allows; the rest is <span class="lx-term" data-term="curtailment">spilled</span>); <span class="math inline">\(u(t)\)</span> is <span class="lx-term" data-term="unserved-energy">unserved</span> demand, <span class="math inline">\(o(t)\)</span> any power made beyond demand, and <span class="math inline">\(d(t)\)</span> the demand:</p>
+<p><span class="math display">\[\sum_g p_g(t) + u(t) - o(t) = d(t).\]</span></p>
 <p>Energy, cost and CO₂ are sums over the hours, with <span class="math inline">\(\Delta t = 1\)</span> hour, a running cost <span class="math inline">\(c_g\)</span> in $/MWh and an operating emission rate <span class="math inline">\(e_g\)</span> in t/MWh (t = metric tonnes):</p>
 <p><span class="math display">\[E_g = \sum_t p_g(t)\,\Delta t, \qquad C = \sum_t \sum_g c_g\,p_g(t)\,\Delta t, \qquad \mathrm{CO_2} = \sum_t \sum_g e_g\,p_g(t)\,\Delta t.\]</span></p>
 <p>Check it on the cheapest-first rule’s day:</p>
@@ -749,7 +749,7 @@ window.Quarto = {
 <summary><span class="k">Go deeper · Modeler</span>Preview: the operator's day as an optimization problem</summary>
 <div class="lx-deeper-body">
 <dl class="lx-ideas">
-<dt>Decisions</dt><dd>Each gas plant's output, every hour: 48 numbers.</dd>
+<dt>Decisions</dt><dd>Each hour: each gas plant's output, and how much surplus wind and solar to <span class="lx-term" data-term="curtailment">spill</span>.</dd>
 <dt>Goal</dt><dd>The lowest gas running cost for the day. The flat nuclear output costs the same in every plan, so the goal leaves it out.</dd>
 <dt>Rules</dt><dd>Supply equals demand each hour; each plant stays within its size; the combined-cycle changes by at most 40 MW an hour, starting from 115 MW at midnight.</dd>
 </dl>
@@ -780,7 +780,7 @@ window.Quarto = {
 </tr>
 </tbody>
 </table>
-<p>Planning saves $400, about 0.4%, by warming the combined-cycle plant up before the solar dip and the sunset.</p>
+<p>Planning saves $400, about 0.4%: it raises the combined-cycle plant’s output earlier, before the solar dip and the sunset, and accepts spilling 20 MWh more wind and solar.</p>
 <p>Every rule and the goal add up outputs times fixed numbers, so this is a <span class="lx-term" data-term="linear-program">linear program</span>. <a href="../learn/10-write-it-down.html">Lesson 10</a> writes it down step by step; <a href="../learn/11-solver.html">lesson 11</a> hands it to a solver.</p>
 </div>
 </details>
@@ -788,7 +788,7 @@ window.Quarto = {
 <summary><span class="k">Go deeper</span>What the game leaves out</summary>
 <div class="lx-deeper-body">
 <ul>
-<li>Prairie Town is an island: it cannot buy power from its neighbours.</li>
+<li>Prairie Town is an island: it cannot buy power from its neighbors.</li>
 <li>The forecast is perfect; real operators plan with forecasts that miss (lesson 4).</li>
 <li>The game moves in one-hour steps; real grids balance second by second (lesson 3).</li>
 <li>Nothing breaks: plants never fail, and power lines never fill up.</li>
@@ -815,9 +815,9 @@ window.Quarto = {
 <details class="lx-answer"><summary>Answer</summary><p>Fact. Extra power speeds up the spinning generators, so the <span class="lx-term" data-term="frequency">frequency</span> climbs above 60 Hz.</p></details>
 </div>
 <div class="lx-qq" data-id="wind" data-answer="myth">
-<p class="lx-qtext">Myth or fact? “A wind farm can be told to make more power when demand rises.”</p>
+<p class="lx-qtext">Myth or fact? “A wind farm can always make more power when demand rises.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. A wind farm can be turned down, but not up beyond what the wind allows: that is what <span class="lx-term" data-term="variable-renewables">variable</span> means.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. It can give back output it was told to turn down, but never more than the wind allows: that is what <span class="lx-term" data-term="variable-renewables">variable</span> means.</p></details>
 </div>
 </div>
 
@@ -863,12 +863,12 @@ window.Quarto = {
 </tr>
 <tr class="odd">
 <td class="n">759 GW</td>
-<td>Record peak demand of the Lower 48 states, set on 29 July 2025 (preliminary).</td>
+<td>Record peak demand of the Lower 48 states, set on 29 July 2025 (preliminary). A <span class="lx-term" data-term="gigawatt">GW</span> is 1,000 MW.</td>
 <td class="s"><a href="https://www.eia.gov/todayinenergy/detail.php?id=65864">EIA, Today in Energy</a> · as of August 2025</td>
 </tr>
 <tr class="even">
 <td class="n">4.20 trillion kWh</td>
-<td>U.S. electricity use in 2025, the highest on record.</td>
+<td>U.S. electricity use in 2025, the highest on record. A <span class="lx-term" data-term="kilowatt-hour">kWh</span> is 1/1,000 of an MWh.</td>
 <td class="s"><a href="https://www.eia.gov/energyexplained/electricity/use-of-electricity.php">EIA, Energy Explained</a> · data for 2025</td>
 </tr>
 <tr class="odd">
@@ -891,7 +891,7 @@ window.Quarto = {
 
 <div class="lx-card lx-real">
 <p class="lx-eyebrow">In the real world</p>
-<p><b>CO₂ per MWh.</b> Each hour's <span class="lx-term" data-term="carbon-intensity">CO₂ per MWh</span> depends on the mix. Under the cheapest-first rule, gas output peaks at 19:00, but CO₂ per MWh peaks at 00:00: gas is a bigger share of a smaller demand.</p>
+<p><b><span class="lx-term" data-term="carbon-intensity">CO₂ per MWh</span></b> depends on each hour's mix. Under the cheapest-first rule, gas output peaks at 19:00, but CO₂ per MWh peaks at 00:00: gas is a bigger share of a smaller demand.</p>
 <p><b>Real data.</b> U.S. grids report hourly demand and generation by fuel in EIA's <a href="https://www.eia.gov/electricity/gridmonitor/">Hourly Electric Grid Monitor</a>.</p>
 <p><b>Open code.</b> My <a href="https://github.com/Henryutd2021/ghg-load-regulation">open framework for carbon-aware electricity use</a> builds on those data.</p>
 <p class="lx-hint">Case file <a href="cf6-shifting-load-to-clean-hours.html">CF6</a> (average and marginal emission factors, and when moving electricity use to cleaner hours lowers CO₂).</p>

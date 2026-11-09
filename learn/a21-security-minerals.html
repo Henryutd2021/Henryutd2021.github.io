@@ -466,14 +466,14 @@ window.Quarto = {
 </thead>
 <tbody>
 <tr class="odd">
-<td>LNG price spike</td>
+<td>Price spike for LNG (liquefied natural gas)</td>
 <td>Prices</td>
 <td>$8.40 billion more paid abroad in a year; $1.28 billion moved at home</td>
 </tr>
 <tr class="even">
 <td>Strait closed 8 weeks</td>
 <td>A route</td>
-<td>150.4 PJ of crude lost; 60 days of stocks (161.1 PJ) cover it</td>
+<td>150.4 PJ (petajoules) of crude lost; 60 days of stocks (161.1 PJ) cover it</td>
 </tr>
 <tr class="odd">
 <td>Mineral export restriction</td>
@@ -483,11 +483,11 @@ window.Quarto = {
 <tr class="even">
 <td>Factory fire</td>
 <td>A site</td>
-<td>6.0 GWh of cells lost in 6 months</td>
+<td>6.0 GWh (gigawatt-hours of storage) of cells lost in 6 months</td>
 </tr>
 </tbody>
 </table>
-</div><ul><li><b>Import dependence.</b> 1,400 ÷ 3,500 PJ = 40.0%; 31.0% of primary energy passes one strait.</li><li><b>Concentration.</b> Refining HHI from 3,150 to 8,138 (0 to 10,000).</li></ul><p class="lx-hint">With JavaScript on, you test stockpiles, diversification, recycling and a second factory site yourself.</p>
+</div><ul><li><b>Import dependence.</b> Net imports ÷ primary energy: 1,400 ÷ 3,500 PJ = 40.0%; 31.0% of primary energy passes one strait.</li><li><b>Concentration.</b> The Herfindahl-Hirschman index (HHI) of refining, the step that makes mined minerals battery-grade, runs from 3,150 to 8,138; it sums each supplier's squared percentage share, up to 10,000.</li></ul><p class="lx-hint">With JavaScript on, you test stockpiles, diversification, recycling and a second factory site yourself.</p>
 
 </div>
 </div>
@@ -512,6 +512,7 @@ window.Quarto = {
 <div class="lx-deeper-body">
 <p><span class="math display">\[\text{import dependence} = \frac{\text{net imports}}{\text{gross available energy}}, \qquad \mathrm{HHI} = \sum_i (100\, s_i)^2\]</span></p>
 <ul>
+<li><strong>Gross available energy.</strong> Eurostat’s denominator: all the energy supplied in a country, including fuel sold there for international ships and flights; Prairieland makes no such sales, so its gross available energy is its primary energy.</li>
 <li><strong>Symbols.</strong> <span class="math inline">\(s_i\)</span> is supplier <span class="math inline">\(i\)</span>’s share of a supply, from 0 to 1; the HHI runs from near 0 (many small suppliers) to 10,000 (one).</li>
 <li><strong>Equal shares.</strong> With <span class="math inline">\(n\)</span> equal suppliers the HHI is <span class="math inline">\(10{,}000/n\)</span>; four suppliers can never bring it below 2,500.</li>
 <li><strong>Supply groups.</strong> Prairieland lists four supply groups, the last grouping other refiners; counting those firms one by one would lower the index, so the HHI shown is an upper bound.</li>
@@ -537,7 +538,7 @@ window.Quarto = {
 <ul>
 <li>How prices, demand and trade respond during a shock, beyond the levers you set.</li>
 <li>Shipping, insurance and the cost of holding and refreshing stocks.</li>
-<li>Mining, refining and trade law, and any judgement of a country's policies.</li>
+<li>Mining, refining and trade law, and any judgment of a country's policies.</li>
 <li>Cybersecurity and the physical security of grids and plants.</li>
 <li>The odds of any shock: these are stress tests, not forecasts.</li>
 </ul>

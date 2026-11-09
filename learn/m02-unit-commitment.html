@@ -473,7 +473,7 @@ ul.task-list li input[type="checkbox"] {
 <p>The same model with <code>scipy.optimize.milp</code> and <code>linprog(method="highs")</code>; the notebook grows the same tree, and <code>assert</code> cells check every browser number.</p>
 <ol class="m2-nb-steps">
 <li>Download the notebook; the data are inside it.</li>
-<li>Upload it to Google Colab (<em>File → Upload notebook</em>), or open it locally with Python 3, NumPy and SciPy 1.9 or later.</li>
+<li>Upload it to Google Colab (<em>File → Upload notebook</em>), or open it locally in JupyterLab or VS Code (with its Jupyter extension), with Python 3.9 or later, NumPy and SciPy 1.9 or later.</li>
 <li>Run all cells, then try the practice questions at the end.</li>
 </ol>
 <p class="m2-dl"><a class="lx-btn small" href="notebooks/m02-unit-commitment.ipynb" download="">Notebook (.ipynb)</a> <a class="lx-btn small ghost" href="../assets/learn/data/m02-unit-commitment.json" download="">Lesson data (JSON)</a></p>
@@ -550,14 +550,19 @@ ul.task-list li input[type="checkbox"] {
 </tbody>
 </table>
 <p>The root gap was $4,225, or 2.4% of the best plan. A tighter formulation (other ways to write minimum run times, start-ups and ramps) can raise the relaxation’s bound and may shrink the search, though a tree’s size also depends on the solver’s choices; <a href="https://doi.org/10.1287/ijoc.2019.0944">Knueven, Ostrowski and Watson (2020)</a> compare many.</p>
-<p>HiGHS adds presolve, cutting planes and heuristics to the same search. By default it stops once the gap is below 0.01% (<code>mip_rel_gap = 0.0001</code>, <a href="https://ergo-code.github.io/HiGHS/dev/options/definitions/">HiGHS options</a>); here it reached 0%.</p>
+<p>HiGHS adds three things to the same search: presolve (simplifying the model before it starts), cutting planes (extra rows that remove fractional answers no plan with whole switches can reach) and heuristics (quick searches for workable whole-switch plans). By default it stops once the gap is below 0.01% (<code>mip_rel_gap = 0.0001</code>, <a href="https://ergo-code.github.io/HiGHS/dev/options/definitions/">HiGHS options</a>); here it reached 0%.</p>
 </div>
 </details>
 <details class="lx-deeper">
 <summary><span class="k">Go deeper · Modeler</span>Prices when plants switch on and off</summary>
 <div class="lx-deeper-body">
-<p>A dual is the slope of the best cost as one right-hand side changes. In a linear program that slope never falls as demand grows. With switches it can:</p>
+<p>Away from a corner, a balance dual is the local slope of the best cost as that hour’s demand changes, with everything else fixed; at a corner, more demand and less demand have different marginal costs. In a linear program the slope never falls as demand grows. With switches it can:</p>
 <table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
 <thead>
 <tr class="header">
 <th>MWh added at 23:00</th>
@@ -579,11 +584,16 @@ ul.task-list li input[type="checkbox"] {
 <tr class="odd">
 <td>above about 5.7</td>
 <td>$40/MWh</td>
-<td>the peaker, kept on at 30 MW</td>
+<td>the combined-cycle plant again; the peaker stays on at its 30 MW minimum</td>
 </tr>
 </tbody>
 </table>
-<p>Keeping the peaker on at 23:00 costs $2,100 ($300 no-load, and 30 MWh at $100/MWh instead of $40/MWh), plus $40/MWh for each MWh added. Above about 5.7 MWh that is cheaper than unserved energy. The cost has no jump here, because demand may go unserved; its slope falls instead.</p>
+<ul>
+<li><strong>Keeping the peaker on at 23:00</strong> costs $2,100: $300 no-load, and 30 MWh at $100/MWh instead of $40/MWh.</li>
+<li><strong>Then</strong> each MWh added costs $40/MWh, made by the combined-cycle plant.</li>
+<li><strong>The crossover:</strong> above about 5.7 MWh, keeping the peaker on is cheaper than leaving demand unserved at $3,000/MWh.</li>
+<li><strong>No jump:</strong> demand may go unserved, so the cost stays continuous; its slope falls instead.</li>
+</ul>
 <p>HiGHS returns no duals for the mixed-integer solve. Fixing the switches gives LP prices again, conditional on that commitment: $40/MWh at 23:00, the slope of the first 5 MWh only.</p>
 <p>Fixing the switches and reading the LP’s duals is the starting point of <a href="https://doi.org/10.1016/j.ejor.2003.12.011">O’Neill, Sotkiewicz, Hobbs, Rothkopf and Stewart (2005)</a>, who also price the fixed decisions themselves. FERC describes uplift payments as “the portion of the cost of reliably serving load that is not included in market prices” (<a href="https://www.ferc.gov/sites/default/files/2020-06/Order-844.pdf">Order No.&nbsp;844</a>, P 7, 2018).</p>
 <table class="caption-top table">

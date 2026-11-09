@@ -51,8 +51,8 @@
    ]
   },
   {
-   "id": "even",
-   "label": "Even",
+   "id": "baseline",
+   "label": "Baseline",
    "p": [
     0.25,
     0.5,
@@ -192,7 +192,7 @@
     },
     "vss": 5548200
    },
-   "even": {
+   "baseline": {
     "sp": 845,
     "ev": {
      "W": 5000,

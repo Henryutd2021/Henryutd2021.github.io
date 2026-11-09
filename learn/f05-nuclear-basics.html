@@ -422,7 +422,7 @@ window.Quarto = {
 
 
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "name": "How does a nuclear reactor make electricity, and heat? Steady a chain reaction with control rods and a moderator, then follow the heat from fuel to steam", "description": "F5 of Energy Systems, Step by Step: fire a neutron, hold a chain reaction steady with control rods and a moderator, follow the heat from fuel to steam in the two U.S. plant types, and compare designs by size, outlet temperature and uses.", "learningResourceType": "Interactive lesson", "educationalLevel": "Beginner", "timeRequired": "PT20M", "inLanguage": "en", "isAccessibleForFree": true, "teaches": ["fission and the chain reaction", "moderators and control rods", "from fuel to steam", "designs by size and outlet temperature", "spent fuel and safety systems"], "license": "https://creativecommons.org/licenses/by/4.0/", "author": {"@type": "Person", "name": "Honglin Li", "url": "https://henryutd2021.github.io/"}, "url": "https://henryutd2021.github.io/learn/f05-nuclear-basics.html", "isPartOf": {"@type": "Course", "name": "Energy Systems, Step by Step", "url": "https://henryutd2021.github.io/learn/"}}</script>
-<script type="application/json" class="lx-lesson-data">{"id":"f05-nuclear-basics","starter":null,"total":14,"code":"F5","title":"How does a nuclear reactor make electricity, and heat?","subtitle":"Steady a chain reaction with control rods and a moderator, then follow the heat from fuel to steam","short":"Nuclear basics","tier":"foundations","tier2":null,"tierLabel":"Foundations · L1","level":"L1","slot":1,"slot2":null,"minutes":15,"does":"A chain-reaction toy with control rods and a moderator, a plant from fuel to steam, designs compared by size, outlet temperature and uses, and myth-or-fact cards on spent fuel and safety systems.","outcome":"Explain how a reactor keeps its chain reaction steady, how its heat becomes electricity, and why outlet temperature limits which heat uses a design could serve.","icon":"atom","form":"cards","scales":["S0"],"teaches":["fission and the chain reaction","moderators and control rods","from fuel to steam","designs by size and outlet temperature","spent fuel and safety systems"],"lab":null,"href":"f05-nuclear-basics.html","ready":true,"after":[{"id":"f04-power-plants","code":"F4","title":"How do power plants turn heat, water, wind and sunlight into electricity?","short":"Power plants","does":"Cutaways of gas, steam, hydro, geothermal, wind and solar plants; 100 units of energy followed to the wire and to waste heat; three real days of output on a solar farm; reservoir and ramp limits.","href":"f04-power-plants.html","ready":true}],"prev":null,"next":{"id":"f06-grid-and-outages","code":"F6","title":"How does power reach your plug, and why does it sometimes fail?","short":"Grid and outages","does":"Power followed from plant to lamp through each voltage step; then a storm: tap the failed parts, see which homes go dark, and why many outages start on local wires.","href":"f06-grid-and-outages.html","ready":true},"practice":5}</script>
+<script type="application/json" class="lx-lesson-data">{"id":"f05-nuclear-basics","starter":null,"total":14,"code":"F5","title":"How does a nuclear reactor make electricity, and heat?","subtitle":"Steady a chain reaction with control rods and a moderator, then follow the heat from fuel to steam","short":"Nuclear basics","tier":"foundations","tier2":null,"tierLabel":"Foundations · L1","level":"L1","slot":1,"slot2":null,"minutes":15,"does":"A chain-reaction toy with control rods and a moderator, a plant from fuel to steam, designs compared by size, outlet temperature and uses, and myth-or-fact cards on spent fuel and safety systems.","outcome":"Explain how a reactor keeps its chain reaction steady, how its heat becomes electricity, and why outlet temperature limits which heat uses a design could serve.","icon":"atom","form":"cards","scales":["S0"],"teaches":["fission and the chain reaction","moderators and control rods","from fuel to steam","designs by size and outlet temperature","spent fuel and safety systems"],"lab":null,"href":"f05-nuclear-basics.html","ready":true,"after":[{"id":"f04-power-plants","code":"F4","title":"How do power plants turn heat, water, wind and sunlight into electricity?","short":"Power plants","does":"Cutaways of gas, steam, hydro, geothermal, wind and solar plants; 100 units of energy followed to the wire and to waste heat; three real days of regional solar output, scaled to a fictional farm; reservoir and ramp limits.","href":"f04-power-plants.html","ready":true}],"prev":null,"next":{"id":"f06-grid-and-outages","code":"F6","title":"How does power reach your plug, and why does it sometimes fail?","short":"Grid and outages","does":"Power followed from plant to lamp through each voltage step; then a storm: tap the failed parts, see which homes go dark, and why many outages start on local wires.","href":"f06-grid-and-outages.html","ready":true},"practice":5}</script>
 <div class="lx-head" data-lesson-id="f05-nuclear-basics" data-total="14" data-tier="foundations" data-level="L1" data-minutes="15" data-form="cards" data-next-href="f06-grid-and-outages.html">
 <div>
 <nav class="lx-crumbs" aria-label="Breadcrumb"><ol><li><a href="index.html">Learn</a></li><li aria-current="page">F5</li></ol></nav>
@@ -555,7 +555,7 @@ button.f5-lad-row[aria-pressed="true"] { border-color: var(--lx-accent); box-sha
 @media (prefers-reduced-motion: reduce) { .f5-fission-svg * { transition: none; } }
 </style>
 <div id="steps" class="lx-sec">
-<div class="lx-interactive lx-cards" data-learn="nuclear-basics" data-src="../assets/learn/data/f05-nuclear-basics.json ../assets/learn/data/town.json">
+<div class="lx-interactive lx-cards" data-learn="nuclear-basics" data-src="../assets/learn/data/f05-nuclear-basics.json">
 <div class="lx-fallback">
 <p class="lx-eyebrow">The idea in one table: hold the chain reaction steady (an illustrative toy)</p>
 <div class="lx-scroll-x">
@@ -648,7 +648,7 @@ button.f5-lad-row[aria-pressed="true"] { border-color: var(--lx-accent); box-sha
 <tr class="odd">
 <td>Microreactor</td>
 <td>1 to 20 MWt</td>
-<td>gas, liquid metal, molten salt or heat pipes</td>
+<td>gas, liquid metal, molten salt, or a fluid inside heat pipes</td>
 <td>depends on the coolant</td>
 <td>heat used directly, or electricity</td>
 </tr>
@@ -661,7 +661,7 @@ button.f5-lad-row[aria-pressed="true"] { border-color: var(--lx-accent); box-sha
 </tr>
 <tr class="odd">
 <td>High-temperature gas-cooled</td>
-<td>up to 600 MWt each</td>
+<td>up to 600 MWt per module, for passive cooling</td>
 <td>helium</td>
 <td>700 to 950 °C</td>
 <td>electricity; industrial heat at 650 to 950 °C, hydrogen production among it</td>
@@ -677,11 +677,13 @@ button.f5-lad-row[aria-pressed="true"] { border-color: var(--lx-accent); box-sha
 </table>
 </div>
 <p>A design's outlet temperature can overlap a heat use's band, but overlap is not capability: heat flows only from hotter to cooler, through heat exchangers, and the chosen design decides.</p>
+<p><b>After shutdown:</b> the control rods stop the chain reaction, but the fission products keep giving off decay heat, so cooling must go on.</p>
 <p class="lx-hint">With JavaScript on, you work through this step by step: fire a neutron, steady a chain reaction, open a plant, sort its parts, guess its heat and line designs up against heat uses.</p>
 </div>
 </div>
 <p class="lx-datanote"><svg class="lx-ic" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5M12 8v.2"></path></svg><span><b>Illustrative.</b> The chain-reaction toy (its k values and generations are chosen to show the idea, not taken from a real core) and Prairie Town's 100 MW plant.</span></p>
-<p class="lx-datanote"><svg class="lx-ic" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5M12 8v.2"></path></svg><span><b>Real numbers.</b> Pressures, temperatures, sizes and heat uses: U.S. Department of Energy, <a href="https://www.energy.gov/sites/prod/files/2016/01/f28/QTR2015-4M-Light-Water-Reactors.pdf">Quadrennial Technology Review 2015</a> and its companion assessments (2015). Efficiency: EIA's 2025 <a href="https://www.eia.gov/electricity/annual/html/epa_08_01.html">tested heat rate for nuclear units</a>, 10,443 <span class="lx-term" data-term="btu">Btu</span> (British thermal units, a unit of heat) per kWh, against 3,412 Btu in a kWh. All read 3 November 2026.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5M12 8v.2"></path></svg><span><b>Real numbers, designs.</b> Pressures, temperatures, sizes and heat uses: U.S. Department of Energy, <a href="https://www.energy.gov/sites/prod/files/2016/01/f28/QTR2015-4M-Light-Water-Reactors.pdf">Quadrennial Technology Review 2015</a> and its companion assessments (2015), read 3 November 2026.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5M12 8v.2"></path></svg><span><b>Real numbers, efficiency.</b> EIA's 2025 <a href="https://www.eia.gov/electricity/annual/html/epa_08_01.html">tested heat rate for nuclear units</a>, 10,443 <span class="lx-term" data-term="btu">Btu</span> (British thermal units, a unit of heat) per kWh, against 3,412 Btu in a kWh; read 3 November 2026.</span></p>
 <p class="lx-hint" style="margin-top:10px">Need a refresher? <a href="f04-power-plants.html">F4</a> (how heat turns into electricity) and <a href="05-capacity-factor.html">lesson 5</a> (why 1 MW is not always 1 MW).</p>
 </div>
 <div id="explain" class="lx-sec">
@@ -695,6 +697,7 @@ button.f5-lad-row[aria-pressed="true"] { border-color: var(--lx-accent); box-sha
 <dt>A steady chain</dt><dd>Control rods absorb neutrons and a moderator slows them; a reactor is held so each split leads to exactly one more (critical, k = 1).</dd>
 <dt>Fuel to steam</dt><dd>A pressurized-water plant keeps its core water liquid at about 15 MPa and boils a second loop; a boiling-water plant boils in the vessel at about 7 MPa.</dd>
 <dt>A heat source first</dt><dd>At the 32.7% efficiency implied by EIA's 2025 tested heat rate, Prairie Town's 100 MW plant makes about 306 MW of heat; about 206 MW is rejected heat and losses, mostly through the condenser.</dd>
+<dt>After shutdown</dt><dd>Stopping the chain reaction does not stop decay heat from the fission products, so cooling must go on.</dd>
 <dt>Temperature limits the uses</dt><dd>Water-cooled designs reach about 300 °C; high-temperature designs reach 700 to 950 °C, which overlaps the 650 to 950 °C band many industrial processes need. Overlap is not capability: the design and its heat exchangers decide.</dd>
 </dl>
 </div>
@@ -713,54 +716,10 @@ button.f5-lad-row[aria-pressed="true"] { border-color: var(--lx-accent); box-sha
 </div>
 </details>
 <details class="lx-deeper">
-<summary><span class="k">Go deeper · Modeler</span>The toy as an equation, and a plant as a model sees it</summary>
+<summary><span class="k">Go deeper · Modeler</span>How the toy works, and a plant as a model sees it</summary>
 <div class="lx-deeper-body">
-<p><strong>The toy.</strong> Neutrons in generation <span class="math inline">\(g+1\)</span>: <span class="math inline">\(N_{g+1} = k\,N_g\)</span>, with</p>
-<p><span class="math display">\[
-k = \big(k_\text{min} + (k_\text{max} - k_\text{min})\,m\big)\,(1 - a\,r).
-\]</span></p>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 33%">
-<col style="width: 33%">
-<col style="width: 33%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Symbol</th>
-<th>Meaning</th>
-<th>In the toy</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><span class="math inline">\(k\)</span></td>
-<td>multiplication factor: new splits per split, no unit</td>
-<td>0.25 to 1.25</td>
-</tr>
-<tr class="even">
-<td><span class="math inline">\(m\)</span></td>
-<td>share of the moderator left, from 0 to 1</td>
-<td>the moderator slider</td>
-</tr>
-<tr class="odd">
-<td><span class="math inline">\(r\)</span></td>
-<td>share of the control rods pushed in, from 0 to 1</td>
-<td>the rods slider</td>
-</tr>
-<tr class="even">
-<td><span class="math inline">\(k_\text{min}\)</span>, <span class="math inline">\(k_\text{max}\)</span></td>
-<td><span class="math inline">\(k\)</span> with no moderator and with all of it, rods out</td>
-<td>0.5 and 1.25</td>
-</tr>
-<tr class="odd">
-<td><span class="math inline">\(a\)</span></td>
-<td>share of the neutrons the rods absorb when fully in</td>
-<td>0.5</td>
-</tr>
-</tbody>
-</table>
-<p>Steady means exactly <span class="math inline">\(k = 1\)</span>: here only at <span class="math inline">\(m = 1\)</span>, <span class="math inline">\(r = 0.4\)</span> (rods 30%, moderator 90% gives <span class="math inline">\(k = 0.999\)</span>, a slow decline). Real cores are modelled with neutron transport and kinetics, a field of its own (side topic <a href="x01-under-the-hood.html">X1</a>).</p>
+<p><strong>The toy.</strong> Each generation holds <span class="math inline">\(k\)</span> times the neutrons of the one before. Pushing the rods in lowers <span class="math inline">\(k\)</span>, and so does draining the moderator; the toy’s values show the idea and are not taken from a real core.</p>
+<p>Steady means exactly <span class="math inline">\(k = 1\)</span>: here only with the moderator full and the rods 40% in (rods 30%, moderator 90% gives <span class="math inline">\(k = 0.999\)</span>, a slow decline). Real cores are modeled with neutron transport and kinetics, a field of its own (side topic <a href="x01-under-the-hood.html">X1</a>).</p>
 <p><strong>A plant in a system model.</strong> Grid models such as <a href="../learn/06-three-jobs.html">lesson 6</a>, <a href="../learn/m02-unit-commitment.html">M2</a> and <a href="../learn/13-capstone.html">lesson 13</a> take a plant as a few numbers: its size in MW, its <span class="lx-term" data-term="heat-rate">heat rate</span> or efficiency, its <span class="lx-term" data-term="capacity-factor">capacity factor</span> and its <span class="lx-term" data-term="refuelling-outage">refuelling outages</span>. The U.S. fleet’s capacity factor was 91.1% in 2025 (EIA, Table 6.07.B; <a href="../learn/05-capacity-factor.html">lesson 5</a>).</p>
 </div>
 </details>
@@ -798,7 +757,7 @@ k = \big(k_\text{min} + (k_\text{max} - k_\text{min})\,m\big)\,(1 - a\,r).
 <div class="lx-qq" data-id="energyleft" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “Fuel taken out after five years has used up nearly all of its energy.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. More than 90% of its potential energy is still there (DOE, 2022). It can be recycled into new fuel; France does this, and the United States does not today.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. More than 90% of its potential energy is still there (DOE, 2022). Recycling can turn part of the used fuel into new fuel; as of 2022, France recycles and the United States does not.</p></details>
 </div>
 <div class="lx-qq" data-id="boil" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “In a pressurized-water plant, the water in the core boils.”</p>
@@ -888,7 +847,7 @@ k = \big(k_\text{min} + (k_\text{max} - k_\text{min})\,m\big)\,(1 - a\,r).
 <p class="lx-eyebrow">In the real world</p>
 <ol>
 <li><b>Two types:</b> every U.S. power plant of this kind is water-cooled; more than 65% are pressurized-water and roughly a third boiling-water plants (DOE, 2025).</li>
-<li><b>Fuel:</b> pellets are stacked in rods about 1 cm wide; more than 200 rods make an assembly, and a couple hundred assemblies make a core (EIA; DOE).</li>
+<li><b>Fuel:</b> pellets are stacked in sealed rods about 1 cm wide, bundled into assemblies; how many rods and assemblies a core holds depends on its design and power (EIA; DOE).</li>
 <li><b>Heat beyond electricity:</b> some water-cooled plants already supply district heat or desalinated water (DOE, 2015).</li>
 </ol>
 </div>

@@ -31,16 +31,16 @@
     {"id": "sd3", "label": "Flag demand more than 3 standard deviations below the mean", "log": "Demand more than 3 standard deviations below the mean (under {limit} MW) flagged as implausible (provisional: to check against the operator's records).", "verdict": "good",
      "note": "A different rule finds the same single hour. Two rules agreeing makes the flag more convincing, not proven."},
     {"id": "keep", "label": "Keep every value", "log": "No spike rule: every demand value kept.", "verdict": "bad",
-     "note": "The one bad hour becomes the year's lowest demand, and any study of minimum load inherits it."}
+     "note": "The one suspect hour becomes the year's lowest demand, and any study of minimum load inherits it."}
    ]},
   "frozen": {"label": "Frozen-reading rule", "q": "How many identical readings in a row make a suspected stuck feed?",
    "options": [
     {"id": 3, "label": "3 hours (the course's rule)", "log": "Runs of 3 or more identical non-zero readings flagged as suspected frozen telemetry.", "verdict": "good", "note": "The course's data build uses 3; your counts now match it. That shows consistency with the build, not that every flag is right."},
     {"id": 2, "label": "2 hours", "log": "Runs of 2 or more identical non-zero readings flagged as suspected frozen telemetry.", "verdict": "ok", "note": "Catches more, but a healthy feed can repeat a value for two hours by chance: more false alarms."},
-    {"id": 4, "label": "4 hours", "log": "Runs of 4 or more identical non-zero readings flagged as suspected frozen telemetry.", "verdict": "ok", "note": "Fewer false alarms; a few short freezes slip through."},
-    {"id": 6, "label": "6 hours", "log": "Runs of 6 or more identical non-zero readings flagged as suspected frozen telemetry.", "verdict": "ok", "note": "Fewer false alarms; more short freezes slip through."},
-    {"id": 12, "label": "12 hours", "log": "Runs of 12 or more identical non-zero readings flagged as suspected frozen telemetry.", "verdict": "bad", "note": "Freezes shorter than 12 hours slip through."},
-    {"id": 24, "label": "24 hours", "log": "Runs of 24 or more identical non-zero readings flagged as suspected frozen telemetry.", "verdict": "bad", "note": "Freezes shorter than 24 hours slip through."},
+    {"id": 4, "label": "4 hours", "log": "Runs of 4 or more identical non-zero readings flagged as suspected frozen telemetry.", "verdict": "ok", "note": "Fewer false alarms; short repeated runs remain unflagged."},
+    {"id": 6, "label": "6 hours", "log": "Runs of 6 or more identical non-zero readings flagged as suspected frozen telemetry.", "verdict": "ok", "note": "Fewer false alarms; more short repeated runs remain unflagged."},
+    {"id": 12, "label": "12 hours", "log": "Runs of 12 or more identical non-zero readings flagged as suspected frozen telemetry.", "verdict": "ok", "note": "A trade-off, not a verdict: runs shorter than 12 hours stay unflagged, so fewer false alarms and more missed freezes. Say why in your note."},
+    {"id": 24, "label": "24 hours", "log": "Runs of 24 or more identical non-zero readings flagged as suspected frozen telemetry.", "verdict": "ok", "note": "Fewest false alarms, most missed freezes: runs shorter than 24 hours stay unflagged. Say why in your note."},
     {"id": 0, "label": "Off", "log": "No frozen-reading rule.", "verdict": "bad", "note": "Every stuck reading counts as real, including the December week."}
    ]},
   "fill": {"label": "Fill method", "q": "What happens to the flagged hours?",
@@ -61,11 +61,11 @@
    {"id": "check", "label": "Check each item", "sub": "or read the agreement", "color": "var(--lx-ink-3)"}
   ],
   "cards": [
-   {"id": "eia", "text": "EIA-930 hourly grid data (this studio's file)", "bin": "pd", "why": "A U.S. government work; EIA asks for an acknowledgment with the date."},
+   {"id": "eia", "text": "EIA-930 hourly grid data, as EIA publishes it", "bin": "pd", "why": "A U.S. government work: acknowledge EIA, with the date. This studio's extract of it is shared under CC BY 4.0: credit the course too."},
    {"id": "uswtdb", "text": "U.S. Wind Turbine Database (turbine locations)", "bin": "pd", "why": "Public domain; the USGS asks for an acknowledgment line."},
    {"id": "ember", "text": "Ember monthly electricity data", "bin": "by", "why": "CC BY 4.0: credit Ember."},
    {"id": "atb", "text": "NLR Annual Technology Baseline, 2024 release", "bin": "by", "why": "The 2024 release is CC BY 4.0; check each year's release."},
-   {"id": "osm", "text": "OpenStreetMap roads and power lines", "bin": "sa", "why": "ODbL: credit OpenStreetMap and its contributors. A database built from it and shared publicly stays under ODbL; a map made from it carries the credit, and may oblige you to offer the changed data."},
+   {"id": "osm", "text": "OpenStreetMap roads and power lines", "bin": "sa", "why": "ODbL: credit OpenStreetMap and its contributors. A database built from it and shared stays under ODbL. A public map made from it carries the credit; if it uses changed data, offer that data."},
    {"id": "iea", "text": "IEA World Energy Outlook 2025 free dataset", "bin": "sa", "why": "CC BY-NC-SA 4.0 IGO: credit, no commercial use, share alike."},
    {"id": "entsoe", "text": "ENTSO-E Transparency Platform", "bin": "check", "why": "Open data policy since 2019, but check the terms of each item."},
    {"id": "meter", "text": "A co-op's meter data, shared by a co-author", "bin": "check", "why": "Governed by the data agreement, not an open licence: read it before you share anything (R9)."}
@@ -73,17 +73,19 @@
  },
  "spatial": {
   "context": "Your study adds wind-turbine locations from the U.S. Wind Turbine Database for Prairie Town's county (illustrative). The file stores latitude and longitude in degrees ([[epsg-code|EPSG:4326]]).",
+  "systems": "The projected options: [[utm|UTM]] zones keep distances close to true locally; [[web-mercator|Web Mercator]] is for showing web maps; [[equal-area-projection|equal-area Albers]] keeps areas true across the contiguous U.S.",
   "questions": [
    {"id": "buffer", "q": "Which coordinate system for 1 km setback buffers (the zone within 1 km of each turbine)?", "answer": "utm",
     "options": [["deg", "Keep EPSG:4326 (degrees)"], ["web", "Web Mercator (EPSG:3857)"], ["alb", "Equal-area Albers (EPSG:5070)"], ["utm", "The local UTM zone (metres)"]],
     "why": {"deg": "A degree is not a fixed distance: a buffer in degrees is not 1 km.", "web": "[[web-mercator|Web Mercator]] is for showing maps; it stretches distances.", "alb": "Equal-area keeps areas, not distances.", "utm": "Right: a local projected system in metres, such as the county's [[utm|UTM]] zone, keeps distances close to true."}},
-   {"id": "area", "q": "And for the buildable area in square kilometres?", "answer": "alb",
+   {"id": "area", "q": "And for the area the 1 km buffers cover, in square kilometres?", "answer": "alb",
     "options": [["deg", "Keep EPSG:4326 (degrees)"], ["web", "Web Mercator (EPSG:3857)"], ["alb", "Equal-area Albers (EPSG:5070)"], ["utm", "The local UTM zone (metres)"]],
     "why": {"deg": "Degrees are not equal-area units.", "web": "Web Mercator inflates areas away from the equator.", "alb": "Right: an equal-area system for the contiguous United States keeps areas true.", "utm": "Close for one county, but the safe rule for areas is an equal-area system."}}
   ],
   "names": {"deg": "EPSG:4326 (degrees)", "web": "Web Mercator (EPSG:3857)", "alb": "equal-area Albers (EPSG:5070)", "utm": "the local UTM zone (metres)"},
   "log": "Spatial layer (proposed, not yet processed): U.S. Wind Turbine Database v9.1 (public domain; acknowledgment kept). Coordinate systems chosen: {buffer} for the 1 km buffers; {area} for areas. Input file, outputs and counts to log when you run it."
  },
+ "input": {"name": "b02-python-data.json", "sha256": "54fb03b9ad5bc2100c841aff72209e61456328fd847315877f4e0c720eb66b95", "code": "r04-data.ipynb, the R4 starter notebook, edition of 8 November 2026"},
  "note_fields": [
   {"id": "limits", "label": "Known limits", "hint": "For example: filled hours borrow other days' weather; solar still fails the night check; the spike rule cannot catch a plausible wrong value."},
   {"id": "rerun", "label": "How to rerun", "hint": "The notebook or script, its settings and the expected four numbers."}

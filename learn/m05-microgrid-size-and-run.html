@@ -504,7 +504,7 @@ window.Quarto = {
 <div class="lx-datanote m5-note"><svg class="lx-ic" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5M12 8v.2"></path></svg><ul>
 <li><b>Illustrative:</b> Prairie Campus and its flat loads (from <a href="sb1-microgrid-workbench.html">the Workbench</a> and <a href="f07-microgrids.html">F7</a>), equipment costs, fuel use, the export credit and the owner's 5% cost of capital, in 2025 dollars.</li>
 <li><b>Solar:</b> illustrative campus output per kW of panels: SPP's observed 2025 hourly shape (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>, accessed 2 Nov 2026), scaled to EIA's monthly capacity factors (<a href="https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_b">Table 6.07.B</a>, issue of 23 Oct 2026).</li>
-<li><b>Tariff:</b> EIA's 2025 U.S. commercial average, 13.37¢/kWh.</li>
+<li><b>Tariff:</b> teaching tariffs set to EIA's 2025 U.S. commercial average, 13.37¢/kWh (<a href="https://www.eia.gov/electricity/annual/html/epa_02_04.html">Electric Power Annual, Table 2.4</a>, accessed 3 Nov 2026); the time-of-use pattern is illustrative.</li>
 <li><b>The storm:</b> an assumed grid outage for the 72 hours from 00:00 on 20 January 2025; the battery and the 675-gallon tank start full.</li>
 <li><b>Solver:</b> <a href="https://ergo-code.github.io/HiGHS/dev/">HiGHS</a> (open source), loaded on your first solve (about 3.5 MB, once).</li>
 </ul></div>
@@ -641,7 +641,7 @@ td.m5-bad { color: var(--lx-bad); }
 </tr>
 <tr class="even">
 <td><span class="math inline">\(a_S, a_B, a_N\)</span></td>
-<td>each item’s cost a year: capital <span class="math inline">\(\times\)</span> the capital recovery factor at the owner’s real rate, plus upkeep</td>
+<td>each item’s cost a year: its capital repaid in equal yearly payments over its life, with interest at the owner’s real rate (capital <span class="math inline">\(\times\)</span> the <span class="lx-term" data-term="capital-recovery-factor">capital recovery factor</span>), plus upkeep</td>
 <td>$ per kW, kWh, set</td>
 <td>given</td>
 </tr>
@@ -694,9 +694,37 @@ td.m5-bad { color: var(--lx-bad); }
 <ul class="m5-gaps">
 <li>The sizing stops only within 0.0001% of the best bound (<a href="https://ergo-code.github.io/HiGHS/dev/options/definitions/">HiGHS options</a>, <code>mip_rel_gap</code>), so plans a few dollars apart are not passed off as one.</li>
 <li>The check's hourly schedule is not unique: the battery can often cover an hour now or later at the same total.</li>
-<li>So its objective adds stated weights, not a strict order: unserved kWh weigh 1,000, 10 and 1 by priority; 0.5% more a step up the list; up to 2% more for earlier hours, which can outweigh the list; then fuel and battery use.</li>
+<li>So its objective adds stated weights, not a strict order (the table below).</li>
 <li>The page reports only totals those weights fix. A run stopped by its time limit shows its gap and says it is not proven.</li>
 </ul>
+<div class="lx-scroll-x">
+<table class="lx-facts m5-ties caption-top table">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">Weight</th>
+<th data-quarto-table-cell-role="th" scope="col">On</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td class="n">1,000 · 10 · 1</td>
+<td>each unserved kWh: must stay on, keep if possible, shed first</td>
+</tr>
+<tr class="even">
+<td class="n">+0.5% a step</td>
+<td>each step up the list, within a priority</td>
+</tr>
+<tr class="odd">
+<td class="n">up to +2%</td>
+<td>earlier hours; this can outweigh the list</td>
+</tr>
+<tr class="even">
+<td class="n">small</td>
+<td>fuel burned and battery use</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 </details>
 <details class="lx-deeper">
@@ -707,7 +735,7 @@ td.m5-bad { color: var(--lx-bad); }
 <li>Storm diesel and refilling the tank, in the annual cost: an outage's fuel is reported on its own, with no outage frequency assumed.</li>
 <li>The campus's wiring and protection, voltage and frequency inside the island (lesson <a href="f07-microgrids.html">F7</a> shows who forms the island).</li>
 <li>Part-load fuel use (a lightly loaded set burns more per kWh), start-up limits and a set that fails to start.</li>
-<li>Battery wear, fuel deliveries during the storm, and how often outages happen; and a full chronological year: the 12 average days can put a large solar-and-battery plan's bill up to 7% low (the <a href="sb1-microgrid-workbench.html">Workbench</a> shows the check).</li>
+<li>Battery wear, fuel deliveries during the storm, and how often outages happen; and a full chronological year: for the larger plans checked in the <a href="sb1-microgrid-workbench.html">Workbench</a>, full-year grid bills came out about 4% to 7% higher than the 12 average days' estimates.</li>
 <li>Loads that change through the day: every load is flat here.</li>
 </ul>
 <p>Modeler's note: <a href="m07-monte-carlo.html">M7</a> samples uncertain inputs with Monte Carlo, and <a href="m08-stochastic-robust.html">M8</a> decides before the uncertainty resolves.</p>

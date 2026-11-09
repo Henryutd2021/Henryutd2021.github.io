@@ -1,5 +1,5 @@
 {
- "about": "Lesson A4 (a04-retail-tariffs). Prairie Town is fictional: its customers, their hourly use, the utility's unit costs, the four tariffs and the large load are illustrative. The day's prices come from the town's own dispatch on 9 June 2025 (real Southwest Power Pool shapes from EIA-930 in town_year.json, scaled as lesson 9 does: demand = shape x 450 MW, wind = shape x 150 MW, sun = shape x 200 MW, whole MW; the town's 100 MW always-on plant runs flat; then wind and sun, the combined-cycle plant at $40/MWh, the peaker at $100/MWh). The rooftop array follows the same real solar shape. A month is 30 days like this one. Every number on the page is checked by _tests/learn/test_a04-retail-tariffs.js.",
+ "about": "Lesson A4 (a04-retail-tariffs). Prairie Town is fictional: its customers, their hourly use, the utility's unit costs, the four tariffs and the large load are illustrative. The day's prices come from the town's own dispatch on 9 June 2025 (real Southwest Power Pool shapes from EIA-930 in town_year.json, scaled as lesson 9 does: demand = shape x 450 MW, wind = shape x 150 MW, sun = shape x 200 MW, whole MW; the town's 100 MW always-on plant runs flat; then wind and sun, the combined-cycle plant at $40/MWh, the peaker at $100/MWh). The rooftop array follows the same real solar shape. A month is 30 days like this one.",
  "built": "2026-11-03",
  "day": {
   "date": "2025-06-09",
@@ -21,11 +21,11 @@
   },
   {
    "key": "solarev",
-   "name": "Home with rooftop solar and an EV",
+   "name": "Home with rooftop solar and an electric vehicle (EV)",
    "short": "Solar + EV home",
    "cls": "home",
    "color": "var(--lx-solar)",
-   "note": "A larger house with central air, a 4 kW rooftop array and a 7 kW car charger.",
+   "note": "A larger house with central air, a 4 kW rooftop array and a 7 kW charger for its electric vehicle (EV).",
    "kw": [0.9, 0.8, 0.8, 0.8, 0.8, 0.9, 1.1, 1.3, 1.0, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.7, 2.0, 2.4, 2.6, 2.6, 2.5, 2.2, 1.8, 1.3],
    "solarKW": 4,
    "ev": { "kw": 7, "hours": 2, "start": { "evening": 19, "night": 1 }, "label": { "evening": "on arrival, 19:00", "night": "on a timer, 01:00" } }

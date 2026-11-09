@@ -95,7 +95,8 @@
   "level": 90,
   "binsTitle": "How the capacity factor is averaged (the maker's curve)",
   "how": "Capacity factor = the sum, over wind speeds, of share of the year's hours × power, divided by the 2,000 kW rating. Every curve on this page is averaged the same way.",
-  "mix": "The wind-speed mix is an illustrative Weibull (k = 2, c = 8 m/s), the same for every curve; output below 3 m/s and above 20 m/s ({above} of hours) counts as zero.",
+  "mix": "The wind-speed mix, the share of the year's hours at each speed, is an illustrative [[weibull|Weibull distribution]]: shape k = 2 (no unit), scale c = 8 m/s, the same for every curve.",
+  "zero": "Output below 3 m/s and above 20 m/s ({above} of hours) counts as zero.",
   "binsCaption": "Rounded; the total is summed in 0.1 m/s steps before rounding",
   "bins": [
    3,
@@ -112,6 +113,7 @@
   "summary": "Text version of the explainer: its synthetic turbine at the slider's start, 5 measured points",
   "liveSummary": "Text version of the explainer: its synthetic turbine at the slider's setting",
   "note": "From the explainer's own synthetic data: estimates and 95% bands of the curve at each region's centre, in kW.",
+  "limits": "These statistical bands do not know that power has limits: they can reach below zero or above the rating, as at 0–5 m/s.",
   "start": 5,
   "regions": [
    [

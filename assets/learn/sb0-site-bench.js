@@ -3,7 +3,8 @@
 // The page is a thin layer over engine E0 (assets/learn/components/engine-e0.js, LX.E0, in the bundle): the bench (its
 // controls, presets, run box, sizing run and plan link) is LX.E0.ui.bench; every number comes from LX.E0.solve and
 // LX.E0.summarize. This file adds the explain layer (the rules in words, where the answers hold, the check on one
-// full-year LP) from data/sb0-site-bench.json and e0.json's reference block, and the demo states for screenshots.
+// full-year LP, "Size it for me" run on the year) from data/sb0-site-bench.json and e0.json's reference block, and the
+// demo states for screenshots.
 // Data: e0.json (the engine's inputs and sources), town_year.json (SPP 2025 shapes, EIA-930), cf_targets.json (EIA 2025
 // capacity factors), sb0-site-bench.json (the explain words), path.json (links to other lessons).
 // The no-JS blocks (the bench's controls, the default plan's results, the explain layer, the inputs and the sources)
@@ -19,7 +20,8 @@
     return '<dl class="lx-ideas">' + X.rules.items.map(function (i) { return "<dt>" + esc(i.k) + "</dt><dd>" + rich(i.v) + "</dd>"; }).join("") +
       "<dt>It holds when</dt><dd><ul>" + X.bound.holds.map(function (t) { return "<li>" + rich(t) + "</li>"; }).join("") + "</ul></dd>" +
       "<dt>It leaves out</dt><dd><ul>" + X.bound.leaves.map(function (t) { return "<li>" + rich(t) + "</li>"; }).join("") + "</ul></dd></dl>" +
-      '<p class="lx-eyebrow">' + esc(X.check.title) + "</p><p class=\"lx-hint\">" + esc(X.check.lede) + "</p>" + E0.checkHTML(D.reference && D.reference.check);
+      '<p class="lx-eyebrow">' + esc(X.check.title) + "</p><p class=\"lx-hint\">" + esc(X.check.lede) + "</p>" + E0.checkHTML(D.reference && D.reference.check) +
+      '<p class="lx-eyebrow">' + esc(X.sizing.title) + "</p><p class=\"lx-hint\">" + esc(X.sizing.lede) + "</p>" + E0.sizingHTML(D.reference && D.reference.sizing);
   }
   // every generated block of the page: { bench, results, explain, inputs, sources }
   function staticBlocks(D, X, P, E0, SS) {
@@ -46,6 +48,9 @@
     var cc = H("div", { class: "lx-xcard" }, x), chd = H("header", { class: "lx-x-head" }, cc); H("h3", { text: X.check.title }, chd);
     H("p", { class: "lx-hint", text: X.check.lede }, cc);
     H("div", { class: "lx-scroll-x", html: E0.checkHTML(D.reference && D.reference.check) }, cc);
+    var zc = H("div", { class: "lx-xcard" }, x), zhd = H("header", { class: "lx-x-head" }, zc); H("h3", { text: X.sizing.title }, zhd);
+    H("p", { class: "lx-hint", text: X.sizing.lede }, zc);
+    H("div", { class: "lx-scroll-x", html: E0.sizingHTML(D.reference && D.reference.sizing) }, zc);
     var first = B.run.run(B.plan());   // the plan from the link, or the default plan
     // demo states (core.js LX.demo): "mid" = the ridge wind farm with a 50 MW electrolyzer, run; "done" = the first run
     LX.demo(root, function (state) {

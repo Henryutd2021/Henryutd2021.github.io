@@ -5,7 +5,7 @@
 // the dorms start as must stay on (the brief: power to the hospital, its water and heating plant and the dorms), and
 // every run also checks the same plan, held fixed, on the storm cut to one or two days or stretched to four (the
 // sensitivity). Whatever priorities the reader sets, the page reports the brief's three critical loads.
-// A second run box sizes the cheapest plan for each of the three owners and runs each rounded plan, so the sizes and
+// A second run box sizes a plan for each of the three owners and runs each rounded plan (a candidate), so the sizes and
 // the cost shown belong together (C1 4). The note is LX.ReportNote; the self-check LX.Exemplars and LX.Rubric. The
 // exemplars quote the engine's numbers for the plan that "Size it for me" gives from the defaults, checked by
 // _tests/learn/test_c1-keep-the-campus-running.js. Nothing is saved or sent: the reader copies the note and the link.
@@ -32,13 +32,18 @@
       base: { at: "3 days", value: kilo(base.crit) + " kWh" }, cases: L.filter(function (x) { return x.days !== 3; }).map(function (x) { return { at: x.days === 1 ? "1 day" : x.days + " days", value: kilo(x.crit) + " kWh" }; }) };
   }
   // what the owner comparison says, from its numbers (never more than they show); rows: [{ owner, plan (each owner's
-  // sizing rounded up to the bench's steps), total (that rounded plan's annual cost, from its own run), crit }]
+  // sizing rounded up to the bench's steps: a candidate, not proven the cheapest on the steps), total (that rounded
+  // plan's annual cost, from its own run), crit }]
   function ownersWords(rows) {
     var same = rows.every(function (r) { return r.plan.pv === rows[0].plan.pv && r.plan.bat === rows[0].plan.bat && r.plan.gen === rows[0].plan.gen; });
     var lo = rows.reduce(function (a, b) { return a.total <= b.total ? a : b; }), hi = rows.reduce(function (a, b) { return a.total >= b.total ? a : b; });
-    return (same ? "Each owner's cheapest plan has the same sizes here: between 4% and 6%, the cost of capital moves the cost, not the plan. " : "The cheapest plan differs by owner: cheaper capital buys more equipment that saves on the bill. ") +
-      lo.owner.label + " costs least, " + money(lo.total) + " a year; " + hi.owner.label.toLowerCase() + " most, " + money(hi.total) + ".";
+    return (same ? "Each owner's sizing, rounded up, gives the same sizes here: between 4% and 6%, the cost of capital moves the cost, not the plan. " : "Each owner's sizing, rounded up, gives other sizes: cheaper capital buys more equipment that saves on the bill. ") +
+      "Of these candidates, " + lo.owner.label.toLowerCase() + " costs least, " + money(lo.total) + " a year; " + hi.owner.label.toLowerCase() + " most, " + money(hi.total) + ".";
   }
+  // the heating qualification of the brief, carried by every note
+  var HEAT = "Powering the hospital, the water and heating plant and the dorms is assumed to keep their heating equipment working; heat demand and indoor temperature are not modeled";
+  // the plan's no-JS table: C1 fixes the outage (the storm and its lengths), so the outage choice is not listed
+  function staticSchema(S) { var o = {}, k; for (k in S) o[k] = S[k]; o.fields = S.fields.filter(function (f) { return f.id !== "out"; }); return o; }
   // the two exemplar notes (illustrative); the strong one is a complete short note, one field a line,
   // quoting the run of the plan "Size it for me" gives from the defaults (R) and that plan's cost for the other owners.
   // paidBy(key): the annual cost of this same plan (R.plan, R's bill) with owner key's cost of capital. The test checks
@@ -52,22 +57,29 @@
           { text: "It will pay for itself", note: "No number, no boundary, no dollar year: pays against what, over what time?" }, ", and ", { text: "the campus will be resilient", note: "Resilient against which outage? Say the scenario and what the plan cannot survive." }, "."] },
         { key: "good", label: "Strong note", level: "Proficient", parts: [
           "Recommendation: build ", { text: kilo(p.pv) + " kW of solar, a " + kilo(p.bat) + " kWh battery and " + p.gen + " generator sets with " + kilo(p.fuel) + " gallons of diesel", note: "Sizes with units, and the fuel that limits the sets." },
-          ". It keeps " + CRIT + " powered for all 72 hours of the storm (" + kilo(crit(st)) + " kWh short).\n",
+          ".\nThe brief: it keeps " + CRIT + " powered for all 72 hours of the storm (" + kilo(crit(st)) + " kWh short).\n",
           "Cost: ", { text: money(R.total) + " a year, community-owned, 2025 dollars: equipment, upkeep and the normal-year grid bill", note: "The cost with its boundary and dollar year (illustrative costs)." },
           ", " + money(R.saving) + " below the grid-only bill. ", { text: "The storm's " + kilo(st.fuel) + " gallons of diesel (" + money(Math.round(st.fuel * fuelPrice / 10) * 10) + ") are extra", note: "Storm fuel stated on its own: adding it to an annual cost would need an outage frequency." }, ".\n",
           "Sensitivity: ", { text: (worst3 < 0.5 ? "0 kWh short for a storm of 1 to 3 days, " : kilo(worst3) + " kWh short at most for 1 to 3 days, ") + "but " + kilo(d4.crit) + " kWh on a fourth day, the plan held fixed", note: "The sensitivity, with the plan held fixed: the plan's limit, said plainly." }, ".\n",
           "Emissions: ", { text: (st.co2 / 1000).toFixed(1) + " t of CO₂ from the storm's diesel; " + kilo(R.year.co2) + " t from a normal year's grid electricity (U.S. average, operating only)", note: "Emissions with their boundary: operating CO₂, average factor." }, ".\n",
-          "Assumptions: ", { text: "a full battery and tank when the storm starts, the coming sun known, flat loads", note: "The assumptions that flatter the plan, named." }, ".\n",
-          "Owner: community. ", { text: "A co-op would pay " + money(co) + " a year for the same plan, a utility " + money(ut) + "; community owners decide by their own rules and share the cost, worth " + money(R.total - co) + " a year more than a co-op here", note: "Who pays and who decides, and why this owner over a cheaper one: a reasoned choice, not the cheapest by default." }, ".\n",
-          "Limits: ", { text: "one storm tested; a set that fails to start, part-load fuel use and fuel deliveries are left out", note: "What the analysis leaves out, so the board does not over-read it." }, "."] }],
+          "Assumptions: ", { text: "a full battery and tank when the storm starts, the coming sun known, flat loads; powering the loads keeps their heating working, as heat is not modeled", note: "The assumptions that flatter the plan, named, with the brief's heating qualification." }, ".\n",
+          "Owner: community. ", { text: "A co-op would pay " + money(co) + " a year for the same plan, a utility " + money(ut), note: "Who pays, from the same plan's numbers for each owner." }, ".\n",
+          "Why community: ", { text: "it costs " + money(R.total - co) + " a year more than a co-op, and lets the campus and its neighbours set outage priorities themselves, a control I assume the board values above that", note: "Who decides, and the assumed benefit that justifies the premium: a reasoned choice, not the cheapest by default." }, ".\n",
+          "Limits: ", { text: "one storm tested; a set that fails to start, how fuel use changes below full output and fuel deliveries are left out", note: "What the analysis leaves out, so the board does not over-read it." }, "."] }],
       note: "Both notes are illustrative. The strong one quotes this page's numbers for the plan Size it for me gives from the defaults; another plan or owner is just as strong when its evidence and trade-offs support it." };
   }
   // the annual cost of plan R.plan paid by owner key: its equipment at that owner's rate plus the same bill
   function paidBy(E1, P, R) { return function (key) { return E1.costs({ own: key, fuel: R.plan.fuel }, P, R.plan).annual.equipment + R.year.bill; }; }
-  var page = { DAYS: DAYS, CRIT: CRIT, crit: crit, paidBy: paidBy, scenarios: scenarios, lengthsOf: lengthsOf, sensitivity: sensitivity, ownersWords: ownersWords, exemplars: exemplars, money: money, kilo: kilo,
+  var page = { DAYS: DAYS, CRIT: CRIT, HEAT: HEAT, staticSchema: staticSchema, crit: crit, paidBy: paidBy, scenarios: scenarios, lengthsOf: lengthsOf, sensitivity: sensitivity, ownersWords: ownersWords, exemplars: exemplars, money: money, kilo: kilo,
     RUBRIC: [{ id: "accounting", look: "The annual cost and the storm's unserved load and diesel CO₂, each with its boundary; who pays named." },
-      { id: "uncertainty", look: "The sensitivity line: what a shorter or longer storm does to the plan held fixed." },
-      { id: "realism", look: "What the plan leaves out: fuel deliveries, a set that fails to start, part-load fuel use." },
+      { id: "uncertainty", look: "The sensitivity line: what a shorter or longer storm does to the plan held fixed.",
+        levels: { developing: "single numbers, or a storm length changed without the plan held fixed",
+          proficient: "the sensitivity line: the unserved critical load for storms of 1, 2 and 4 days, the plan held fixed",
+          strong: "also names the storm length at which the plan first falls short, and what would buy that margin" } },
+      { id: "realism", look: "What the plan leaves out: fuel deliveries, a set that fails to start, how fuel use changes below full output.",
+        levels: { developing: "assumes fuel arrives, every set starts, or the storm is the only outage that matters",
+          proficient: "what the plan leaves out (fuel deliveries, a set that fails to start, fuel use below full output) and the brief's heating assumption",
+          strong: "also checks one key input against its source, or a second source" } },
       { id: "communication", look: "A page the campus's owner can act on: the recommendation first, then the numbers that back it.",
         levels: { proficient: "a one-page note with the plan link: the recommendation first, then the evidence (the annual cost, the storm's unserved load and diesel CO₂), the storm-length sensitivity and the plan's limits" } }],
     RUBRIC_BAR: "the bar for this note",
@@ -119,7 +131,7 @@
       H("p", { class: "lx-hint", text: "One storm, four lengths: a test of this plan's margin, not a forecast of how long storms last." }, host);
     }
 
-    // ---- the three owners: the cheapest plan for each (a run box of its own) and this plan as each would pay for it
+    // ---- the three owners: each one's sizing candidate (a run box of its own) and this plan as each would pay for it
     var oc = H("div", { class: "lx-xcard c1-owners" }, rh);
     H("h3", { text: "Compare the three owners" }, oc);
     H("p", { class: "lx-hint", html: LX.rich("Each owner pays for the equipment at its own illustrative real [[cost-of-capital|cost of capital]]: utility 6%, co-op 4%, community 5%. The bill and the storm are the same.") }, oc);
@@ -150,7 +162,7 @@
       oRes.innerHTML = "";
       H("p", { class: "c1-ow-sum", html: "<b>" + LX.esc(ownersWords(rows)) + "</b>" }, oRes);
       var sx = H("div", { class: "lx-scroll-x" }, oRes), tb = H("table", { class: "lx-facts" }, sx), hr = H("tr", null, H("thead", null, tb));
-      ["Owner", "Cost of capital", "Cheapest plan for the storm, rounded up", "Its annual cost", "Your plan, paid by this owner", "Who pays", "Who decides"].forEach(function (x) { H("th", { scope: "col", text: x }, hr); });
+      ["Owner", "Cost of capital", "Sizing candidate for the storm, rounded up", "That candidate's annual cost", "Your plan, paid by this owner", "Who pays", "Who decides"].forEach(function (x) { H("th", { scope: "col", text: x }, hr); });
       var bd = H("tbody", null, tb);
       rows.forEach(function (x) {
         var tr = H("tr", null, bd), z = x.plan;
@@ -161,7 +173,8 @@
         H("td", { class: "n", text: mine }, tr); H("td", { text: x.owner.pays }, tr); H("td", { text: x.owner.decides }, tr);
       });
       E1.ui.label(tb);
-      H("p", { class: "lx-hint", text: "Each owner's sizing is rounded up to the bench's steps and run with whole sets; its annual cost is that rounded plan's. “Your plan” is the last one you ran, with its bill. Illustrative costs, 2025 dollars; outage diesel not included." }, oRes);
+      H("p", { class: "lx-hint", text: "Each owner's sizing is rounded up to the bench's steps and run with whole sets: a candidate, not proven the cheapest on the steps. Its annual cost is that rounded plan's." }, oRes);
+      H("p", { class: "lx-hint", text: "“Your plan” is the last one you ran, with its bill. Illustrative costs, 2025 dollars; outage diesel not included." }, oRes);
     }
 
     // ---- the note
@@ -183,7 +196,8 @@
           .concat([{ label: "Unserved critical load in the storm", value: kilo(crit(main)) + " kWh", note: "hospital " + kilo(main.perLoad[0]) + ", water and heat " + kilo(main.perLoad[1]) + ", dorms " + kilo(main.perLoad[2]) + " kWh, whatever their priorities" },
           { label: "Diesel in the storm", value: kilo(main.fuel) + " gallons", note: E1.fuelMoney(main.fuelCost) + " at $" + R.fuelPrice.toFixed(2) + " a gallon, not in the annual cost; " + (main.co2 / 1000).toFixed(1) + " t of CO₂" },
           { label: "CO₂ from grid electricity in a normal year", value: kilo(R.year.co2) + " t", note: "U.S. average CO₂ per kWh, from operation only" }]);
-        if (owners && LX.ShareState.same(S, owners.plan, st)) n.results.push({ label: "Annual cost of each owner's cheapest plan, rounded up", value: owners.rows.map(function (x) { return x.owner.label.replace("-owned", "") + " " + money(x.total); }).join(" · ") });
+        if (owners && LX.ShareState.same(S, owners.plan, st)) n.results.push({ label: "Annual cost of each owner's sizing candidate, rounded up", value: owners.rows.map(function (x) { return x.owner.label.replace("-owned", "") + " " + money(x.total); }).join(" · ") });
+        n.assumptions = n.assumptions.concat([HEAT]);
         n.sensitivity = sensitivity(R);
         return n;
       } });

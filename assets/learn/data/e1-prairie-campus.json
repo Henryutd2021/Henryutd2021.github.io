@@ -3,7 +3,7 @@
  "dataset": {
   "creator": "Honglin Li",
   "date": "2026-11-07",
-  "status": "Illustrative: Prairie Campus, its hospital, the equipment costs and the owners are fictional; the solar shapes, the tariff level, the diesel price and the CO2 factors are EIA's 2025 data.",
+  "status": "Illustrative: Prairie Campus, its hospital, the equipment costs and the owners are fictional; the solar shapes, the tariff level and the diesel price are EIA's 2025 data; the grid's CO2 factor is EIA's U.S. average for 2023, and the diesel CO2 coefficient comes from EIA's release of 18 September 2024.",
   "source": "Prepared for engine E1 from lesson F7's campus and the cited EIA sources; the reference results are solved with HiGHS.",
   "license": "CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/), Honglin Li. Values taken from the sources listed in this file keep their publishers' terms; EIA data are U.S. government works in the public domain."
  },
@@ -2206,7 +2206,7 @@
      "0 kWh of critical load unserved (675 gal of diesel, $2,470); 4,508 kWh if the storm lasts 4 days"
     ],
     [
-     "That plan, paid by each owner (each owner's cheapest, rounded up)",
+     "That plan, paid by each owner (each owner's sizing, rounded up, gives it too)",
      "Utility $1,240,076 · Co-op $1,124,657 · Community $1,181,114"
     ]
    ],

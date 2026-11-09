@@ -6,9 +6,9 @@
 //   - the same town, costs and year (13-capstone.json, town_year.json, cf_targets.json);
 //   - more choices of representative weeks (selectWeeks' perSeason and extremes options): 4, 7, 8, 11 or 15 weeks;
 //   - three treatments of the battery's state between weeks (TP.link()): "linked" (the engine's own: a calendar chain of 52
-//     start levels, after Kotzur et al. 2018), "cyclic" (each representative week ends where it starts, so no energy
-//     moves between weeks) and "free" (no rule between weeks: each week may start at any level, so stored energy can
-//     appear from nothing);
+//     start levels, after Kotzur et al. 2018), "cyclic" (no chain; each representative week ends where it starts, from a
+//     level of its own, so no energy moves between weeks) and "free" (no rule between weeks: each week may start at any
+//     level, so stored energy can appear from nothing);
 //   - validation: the chosen plan re-dispatched hour by hour on all 8,760 hours of 2025 (fullYearModel with the plan
 //     fixed) and on a second weather year, 2024 (data/m03-capacity-expansion-2024.json: SPP's 2024 shapes, scaled to the
 //     same yearly demand energy and the same wind and solar capacity factors as 2025, so only the hourly pattern differs);
@@ -59,8 +59,8 @@
   function setOf(D, id) { return D.sets.filter(function (s) { return s.id === id; })[0]; }
 
   // ---------------------------------------------------------------- the battery between weeks
-  // TP.link(m, RW, mode) (planengine.js): "linked" (the engine's own calendar chain),
-  // "cyclic" (each representative week ends where it starts) or "free" (no rule between weeks)
+  // TP.link(m, RW, mode) (planengine.js): "linked" (the engine's own calendar chain), "cyclic" (no chain; each
+  // representative week ends where it starts, from a level of its own) or "free" (no rule between weeks)
   // the planning LP on representative weeks: o = {cap (t CO2 a year), mode}
   function planModel(C, RW, o) { return TP.link(TP.weekModel(C, RW, { cap: o.cap }), RW, o.mode); }
   // the checks: a fixed plan run hour by hour on a whole year. Unserved demand is allowed at the penalty, which the
@@ -152,7 +152,8 @@
       ".m3-key var{font-family:var(--lx-f-body);font-style:italic}.m3-key b,.m3-info b{color:var(--lx-ink);font-weight:600}",
       ".m3-rules{margin:0;display:grid;grid-template-columns:max-content minmax(0,1fr);gap:4px 12px;font-size:15px}",
       ".m3-rules dt{font-weight:600;color:var(--lx-ink)}.m3-rules dd{margin:0;color:var(--lx-ink-2)}",
-      "@media (max-width:560px){.m3-tbl table{font-size:13px}.m3-tbl th,.m3-tbl td{white-space:normal;padding:4px 3px}.m3-tbl .ph{display:none}}"
+      ".m3-tbl small.po{display:none;font-size:12px;color:var(--lx-ink-3)}",
+      "@media (max-width:560px){.m3-tbl table{font-size:13px}.m3-tbl th,.m3-tbl td{white-space:normal;padding:4px 3px}.m3-tbl .ph{display:none}.m3-tbl small.po{display:block}}"
     ].join("\n") }, document.head);
   }
   function kpi(host, label, value, bad) { var k = H("div", { class: "m3-kpi" + (bad ? " bad" : "") }, host); H("small", { text: label }, k); H("b", { text: value }, k); return k; }
@@ -183,7 +184,7 @@
   // ---------------------------------------------------------------- the lesson
   // the usual time of the two longest steps, seconds, at 6x CPU slowdown (a phone stand-in; solver bench, 8 November 2026):
   // step 6 solves three plans and their full-year runs, step 8 the three storage rules' plans and their full-year runs
-  var STEP6_USUAL = 19, STEP8_USUAL = 13;
+  var STEP6_USUAL = 19, STEP8_USUAL = 14;
   LX.mount(LESSON, function (live, data, root) {
     css(); root.classList.add("m3-lab");
     var cfg = data["13_capstone"], D = data.m03_capacity_expansion, R = D.reference;
@@ -415,11 +416,13 @@
           function show() {
             tb.innerHTML = "";
             table(tb, ["Rule between weeks", "~Battery MW / MWh", "Estimate", "Full year: CO₂", "Full year: unserved"], D.storage.modes.map(function (m) {
-              var o = out[m]; return { cells: [NAMES[m], batText(o.est.plan), fm.musd(o.est.cost), { text: fm.kt(o.full.co2), cls: o.full.co2 > cap + 0.5 ? "bad" : "ok" }, { text: o.full.unserved < 0.5 ? "0" : fm.mwh(o.full.unserved), cls: o.full.unserved < 0.5 ? "ok" : "bad" }] };
+              var o = out[m]; return { cells: [{ html: LX.esc(NAMES[m]) + "<small class='po'>Battery " + LX.esc(batText(o.est.plan)) + " MW / MWh</small>" }, batText(o.est.plan), fm.musd(o.est.cost), { text: fm.kt(o.full.co2), cls: o.full.co2 > cap + 0.5 ? "bad" : "ok" }, { text: o.full.unserved < 0.5 ? "0" : fm.mwh(o.full.unserved), cls: o.full.unserved < 0.5 ? "ok" : "bad" }] };
             }), "Three rules for the battery between weeks, at the illustrative what-if storage cost");
-            // the battery column is hidden on phones (the result line names the no-link battery); the mechanism:
-            // what each rule lets the battery carry from one week to the next
+            // on phones the battery column is hidden and each rule's sizes show under its name; then the mechanism:
+            // what each rule lets the battery carry from one week to the next, and how close linked and cyclic come
             H("p", { class: "m3-note", text: "Largest net change of the battery over one representative week: " + D.storage.modes.map(function (m) { return NAMES[m].toLowerCase() + " " + fm.mwh(largest(out[m].net)); }).join(", ") + "." }, tb);
+            var L = out.linked, gap = Math.abs(out.cyclic.est.cost - L.est.cost) / L.est.cost, moved = largest(L.net);
+            H("p", { class: "m3-note", text: "Linked and cyclic estimates differ by " + (gap < 0.001 ? "less than 0.1%" : fm.pct(gap)) + (moved > 0.5 ? ", though the linked battery still moves energy between weeks: up to " + fm.mwh(moved) + " over one representative week." : "; here the linked battery moves almost nothing between weeks.") }, tb);
           }
           // the three planning LPs and each plan's full-year run, solved here (six solves). Results already solved are
           // kept for a retry.
@@ -453,9 +456,8 @@
             failed: function () { return D.storage.modes.every(function (m) { return out[m]; }) ? null : fail || { status: "error", ok: false, message: "no result" }; },
             show: function () {
               st.set(out.free.r); show(); api.done();
-              var L = out.linked, F = out.free, Cy = out.cyclic, gap = (Cy.est.cost - L.est.cost) / L.est.cost, moved = largest(L.net);
-              api.saw("In this illustrative what-if, no link builds " + fm.mwh(F.est.plan.be) + " of battery and looks " + fm.musd(L.est.cost - F.est.cost) + " cheaper, yet emits " + fm.kt(F.full.co2) + " on the full year: each week could start charged, for free. " +
-                "Linked and cyclic estimates differ by " + (gap < 0.001 ? "less than 0.1%" : fm.pct(gap)) + (moved > 0.5 ? ", though the linked battery still moves energy between weeks: up to " + fm.mwh(moved) + " over one representative week." : "; here the linked battery moves almost nothing between weeks."));
+              var L = out.linked, F = out.free;
+              api.saw("In this illustrative what-if, no link builds " + fm.mwh(F.est.plan.be) + " of battery and looks " + fm.musd(L.est.cost - F.est.cost) + " cheaper. On the full year it emits " + fm.kt(F.full.co2) + ": each week could start charged, for free.");
             } });
         } },
       // 9 another weather year

@@ -587,7 +587,7 @@ window.Quarto = {
 </div>
 <div class="lx-datanote"><svg class="lx-ic" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5M12 8v.2"></path></svg><ul>
 <li>Dispatch: the 145 MW follows the real hourly shapes of 3 September 2025 on the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), scaled as in <a href="00-grid-operator.html">lesson 0</a>.</li>
-<li>Planning: 2.1 and 3.0 GWh per MW-year are U.S. 2025 capacity factors, solar 24.0% and wind 33.8% (<a href="https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_b">EIA, Electric Power Monthly, Table 6.07.B</a>), rounded.</li>
+<li>Planning: annual yields of about 2.1 and 3.0 GWh per MW follow from the U.S. 2025 capacity factors, solar 24.0% and wind 33.8% (<a href="https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_b">EIA, Electric Power Monthly, Table 6.07.B</a>).</li>
 <li>All prices, costs, sizes and limits are illustrative.</li>
 <li>Solver: HiGHS 1.15, running in your browser.</li>
 </ul></div>
@@ -601,7 +601,7 @@ window.Quarto = {
 <dl class="lx-ideas">
 <dt>Formulate it</dt><dd>Every story becomes decisions (letters), a goal (a sum to minimize or maximize) and rules (inequalities).</dd>
 <dt>Feasible region</dt><dd>The plans that keep every rule; with two decisions it is a shape on a plane.</dd>
-<dt>Best corner</dt><dd>When a linear program has a best plan, one sits at a corner of the region.</dd>
+<dt>Best corner</dt><dd>When a region with corners, like every region here, has a best plan, at least one best plan is a corner. Sometimes a whole edge ties.</dd>
 <dt>Signs matter</dt><dd>≤ where the story says ≥ lets the model skip its job, and the answer still looks optimal.</dd>
 <dt>A x ≤ b</dt><dd>One common solver form: the costs c, a rule table A and limits b, with every rule written as ≤. x + y ≥ 145 enters as −x − y ≤ −145.</dd>
 </dl>
@@ -621,9 +621,9 @@ window.Quarto = {
 </div>
 </details>
 <details class="lx-deeper">
-<summary><span class="k">Go deeper · Modeler</span>The same model in a modelling language</summary>
+<summary><span class="k">Go deeper · Modeler</span>The same model in a modeling language</summary>
 <div class="lx-deeper-body">
-<p>Modelling languages let you write rules as algebra instead of arrays; they build <span class="math inline">\(A\)</span>, <span class="math inline">\(b\)</span> and <span class="math inline">\(c\)</span> for the solver. The dispatch model in <a href="https://jump.dev/">JuMP</a> (Julia), with <a href="https://ergo-code.github.io/HiGHS/">HiGHS</a> as the solver:</p>
+<p>Modeling languages let you write rules as algebra instead of arrays; they build <span class="math inline">\(A\)</span>, <span class="math inline">\(b\)</span> and <span class="math inline">\(c\)</span> for the solver. The dispatch model in <a href="https://jump.dev/">JuMP</a> (Julia), with <a href="https://ergo-code.github.io/HiGHS/">HiGHS</a> as the solver:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">JuMP</span>, <span class="bu">HiGHS</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> <span class="fu">Model</span>(HiGHS.Optimizer)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="pp">@variable</span>(m, <span class="fl">0</span> <span class="op">&lt;=</span> x <span class="op">&lt;=</span> <span class="fl">150</span>)          <span class="co"># combined-cycle, MW</span></span>
@@ -633,7 +633,10 @@ window.Quarto = {
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="pp">@objective</span>(m, Min, <span class="fl">40</span>x <span class="op">+</span> <span class="fl">100</span>y)       <span class="co"># $ for the hour</span></span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">optimize!</span>(m)</span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">value</span>(x), <span class="fu">value</span>(y)                   <span class="co"># (130.0, 15.0)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>In Python, <a href="https://www.pyomo.org/">Pyomo</a> and linopy (the layer under <a href="https://docs.pypsa.org/">PyPSA</a>) play the same role. Bridge B3 reads formulations written this way for many hours and plants at once, and the Modeler lesson M1 builds one for a whole day.</p>
+<ul>
+<li><strong>In Python.</strong> <a href="https://www.pyomo.org/">Pyomo</a> and linopy (the layer under <a href="https://docs.pypsa.org/">PyPSA</a>) play the same role.</li>
+<li><strong>Next.</strong> Bridge B3 reads formulations written this way for many hours and plants at once; the Modeler lesson M1 builds one for a whole day.</li>
+</ul>
 </div>
 </details>
 <details class="lx-deeper">
@@ -662,9 +665,9 @@ window.Quarto = {
 <details class="lx-answer"><summary>Answer</summary><p>Myth. With a strict &lt; there may be no best plan: 129.9, 129.99 and so on are each better than the last. Linear programs use ≤, ≥ and =, never a strict &lt; or &gt;.</p></details>
 </div>
 <div class="lx-qq" data-id="corner" data-answer="fact">
-<p class="lx-qtext">Myth or fact? “If a linear program has a best plan, one of its corners is a best plan.”</p>
+<p class="lx-qtext">Myth or fact? “If a linear program has a best plan and its region has a corner, some corner is a best plan.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Fact, for regions with corners, as here. When two corners tie, every plan on the edge between them is best as well.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Fact. Every region in this lesson has a corner, because x ≥ 0 and y ≥ 0. When two corners tie, every plan on the edge between them is best as well.</p></details>
 </div>
 <div class="lx-qq" data-id="zero" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “If the solver says ‘optimal’, the model is right.”</p>
@@ -738,7 +741,7 @@ window.Quarto = {
 <li>EIA. <a href="https://www.eia.gov/electricity/gridmonitor/">Hourly Electric Grid Monitor</a> (Form EIA-930): the Southwest Power Pool data behind Prairie Town's day, 2025.</li>
 <li>EIA. <a href="https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_b">Electric Power Monthly, Table 6.07.B</a>: capacity factors of non-fossil generators.</li>
 <li>Huangfu, Q., Hall, J. A. J. (2018). <a href="https://doi.org/10.1007/s12532-017-0130-5">Parallelizing the dual revised simplex method</a>. Mathematical Programming Computation 10: the paper behind the HiGHS solver.</li>
-<li><a href="https://ergo-code.github.io/HiGHS/">HiGHS documentation</a>, and the modelling languages <a href="https://jump.dev/">JuMP</a> and <a href="https://www.pyomo.org/">Pyomo</a>.</li>
+<li><a href="https://ergo-code.github.io/HiGHS/">HiGHS documentation</a>, and the modeling languages <a href="https://jump.dev/">JuMP</a> and <a href="https://www.pyomo.org/">Pyomo</a>.</li>
 <li>Need a refresher first? Toolbox <a href="k04-linear-equations.html">K4, linear equations and inequalities</a>.</li>
 </ul>
 </div>

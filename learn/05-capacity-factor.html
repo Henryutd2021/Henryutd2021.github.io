@@ -676,8 +676,13 @@ window.Quarto = {
 <details class="lx-deeper">
 <summary><span class="k">Go deeper · Modeler</span>The power curve, from physics to measurements</summary>
 <div class="lx-deeper-body">
-<p><strong>Power in the wind.</strong> Through a rotor, the wind carries <span class="math inline">\(P_\text{wind} = \tfrac{1}{2}\rho A v^3\)</span>.</p>
+<p><strong>Power in the wind.</strong> Through a rotor, the wind carries <span class="math inline">\(P_\text{wind} = \tfrac{1}{2}\rho A v^3\)</span>. With the units below this gives watts; divide by 1,000 for kilowatts.</p>
 <table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
 <thead>
 <tr class="header">
 <th>Symbol</th>
@@ -703,12 +708,13 @@ window.Quarto = {
 </tr>
 <tr class="even">
 <td><span class="math inline">\(P_\text{wind}\)</span></td>
-<td>power in the wind, kW</td>
-<td>8,313 kW</td>
+<td>power in the wind, W</td>
+<td>about 8,313,000 W, or 8,313 kW</td>
 </tr>
 </tbody>
 </table>
-<p><strong>What the turbine captures.</strong> It makes 3,000 kW at 12 m/s, so its <span class="lx-term" data-term="power-coefficient">power coefficient</span> is <span class="math inline">\(C_p = 3{,}000 / 8{,}313 = 0.36\)</span>. No rotor can capture more than <span class="math inline">\(16/27 \approx 0.593\)</span> of the wind’s power: the Betz limit.</p>
+<p><strong>What the turbine captures.</strong> It makes 3,000 kW at 12 m/s, so its <span class="lx-term" data-term="power-coefficient">power coefficient</span> is <span class="math inline">\(C_p = 3{,}000 / 8{,}313 = 0.36\)</span>.</p>
+<p><strong>The Betz limit.</strong> No rotor can capture more than <span class="math inline">\(16/27 \approx 0.593\)</span> of the wind’s power.</p>
 <p><strong>The lesson’s clean <span class="lx-term" data-term="power-curve">power curve</span></strong>, output <span class="math inline">\(P\)</span> in kW at wind speed <span class="math inline">\(v\)</span> in m/s:</p>
 <p><span class="math display">\[
 P(v) = \begin{cases}
@@ -718,6 +724,7 @@ P(v) = \begin{cases}
 \end{cases}
 \]</span></p>
 <p><strong>A measured curve.</strong> Real 10-minute averages scatter around a curve: gusts, air density and the turbine’s own controls move each one.</p>
+<p>Each point below averages the records with similar wind speeds (a 0.5 m/s bin). The spread is one <span class="lx-term" data-term="standard-deviation">standard deviation</span> of those records: how much they vary, not an error bar on the average.</p>
 <p>The chart shows a 1.5 MW research turbine that NREL tested in 2011, beside a clean curve built the same way for it: the cube law at its best <span class="math inline">\(C_p\)</span>, 0.52, capped at 1,500 kW.</p>
 <div id="t5-measured" class="lx5-measured">
 
@@ -727,7 +734,7 @@ P(v) = \begin{cases}
 <tr class="header">
 <th data-quarto-table-cell-role="th" scope="col">Wind speed, m/s</th>
 <th data-quarto-table-cell-role="th" scope="col">Measured average, kW</th>
-<th data-quarto-table-cell-role="th" scope="col">Spread (±1 SD), kW</th>
+<th data-quarto-table-cell-role="th" scope="col">Spread (±1 standard deviation), kW</th>
 <th data-quarto-table-cell-role="th" scope="col">Clean curve, kW</th>
 </tr>
 </thead>
@@ -809,7 +816,7 @@ P(v) = \begin{cases}
 <div class="lx-qq" data-id="full" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “A 100 MW wind farm makes 100 MW most of the time.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. In 2025, U.S. wind farms made 33.8% of what they would have made at full size, and the cube law makes their output swing with every change in the wind.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. In 2025, U.S. wind farms made 33.8% of what they would have made at full size; below rated speed, their output rises and falls roughly with the cube of the wind speed.</p></details>
 </div>
 <div class="lx-qq" data-id="broken" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “A solar farm with a 24.0% capacity factor is broken three-quarters of the time.”</p>
@@ -819,7 +826,8 @@ P(v) = \begin{cases}
 <div class="lx-qq" data-id="double" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “Doubling the wind speed doubles a turbine's output.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. On this lesson's turbine it gives eight times the output (2 × 2 × 2), but only while both speeds lie between cut-in (3 m/s) and rated (12 m/s); then output holds at rated power until cut-out (25 m/s).</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. On this lesson's turbine it depends on the speeds:</p>
+<ul><li>Both from 3 to 12 m/s: eight times the output (2 × 2 × 2).</li><li>From 12 to 25 m/s: output holds at rated power.</li><li>Above 25 m/s: the turbine shuts down.</li></ul></details>
 </div>
 </div>
 

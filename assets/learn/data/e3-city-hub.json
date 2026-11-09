@@ -122,7 +122,7 @@
   "life": 15,
   "hours": 4,
   "rte": 0.85,
-  "note": "Neighbourhood batteries at the substations, 4 hours: NREL's 2024 cost ($372 per kW plus $241 per kWh, 2024 dollars, x 1.0263 to 2025 dollars with BEA's deflator, as capstone C2 does), 4% of it a year of upkeep, 15 years; 85% of a charge comes back (the loss is taken on charging).",
+  "note": "Neighborhood batteries at the substations, 4 hours: NREL's 2024 cost ($372 per kW plus $241 per kWh, 2024 dollars, x 1.0263 to 2025 dollars with BEA's deflator, as capstone C2 does), 4% of it a year of upkeep, 15 years; 85% of a charge comes back (the loss is taken on charging).",
   "via": "e2-plains-grid.json c2.costs.bat; e0.json farm.battery.rte",
   "src": [
    "nrel-battery-2025",
@@ -210,7 +210,7 @@
    "set": "teaching",
    "note": "Set for teaching: the range C3's sensitivity test moves the industrial park's gas price over (prairie-city.json prices.gasPerMcf.industrial, itself set for teaching from EIA's Kansas citygate price); not a forecast."
   },
-  "note": "C3 plans Prairie City for 2040 with 2025's people, homes and prices and the course's synthetic weather: only the plan changes. The industrial park and the data-center campus take power at their own substations (no limit modelled); the park's new loads are flat all year."
+  "note": "C3 plans Prairie City for 2040 with 2025's people, homes and prices and the course's synthetic weather: only the plan changes. The industrial park and the data-center campus take power at their own substations (no limit modeled); the park's new loads are flat all year."
  },
  "fullYear": {
   "unservedPerMWh": 10000,
@@ -318,7 +318,7 @@
    "note": "Precomputed with HiGHS on 6 November 2026: the hub as a linear program over eight representative days. $M: millions of 2025 dollars; t: metric tonnes of CO₂. Prairie City is fictional; its numbers are illustrative. With JavaScript on, the bench runs your own plan."
   },
   "m12": {
-   "table": "<div class=\"lx-scroll-x\"><table class=\"lx-facts m12-table\"><thead><tr><th scope=\"col\">Plan</th><th scope=\"col\">Yearly cost against 2025</th><th scope=\"col\">CO₂ of the districts (a year)</th><th scope=\"col\">Substation upgrades</th><th scope=\"col\">Burden, homes below 80% of area median income (AMI; screening)</th></tr></thead><tbody><tr><td>2025 as it is</td><td class=\"n\">$0.0M</td><td class=\"n\">1,921,977 t</td><td class=\"n\">0 MW</td><td class=\"n\">6.1%</td></tr><tr><td>Electrify heat and cars</td><td class=\"n\">−$65.8M</td><td class=\"n\">1,527,234 t</td><td class=\"n\">91 MW</td><td class=\"n\">5.4%</td></tr><tr><td>Electrify, managed charging, 40 MW of batteries</td><td class=\"n\">−$60.5M</td><td class=\"n\">1,527,266 t</td><td class=\"n\">48 MW</td><td class=\"n\">5.5%</td></tr><tr><td>The LP's choice, CO₂ ≤ 80% of 2025</td><td class=\"n\">−$86.2M</td><td class=\"n\">1,537,582 t</td><td class=\"n\">5 MW</td><td class=\"n\">5.1%</td></tr></tbody></table></div><p class=\"lx-hint\">Precomputed with HiGHS on 6 November 2026. Cost includes the cars' fuel and charging, not their prices; equipment and upgrades as yearly payments.</p>",
+   "table": "<div class=\"lx-scroll-x\"><table class=\"lx-facts m12-table\"><thead><tr><th scope=\"col\">Plan</th><th scope=\"col\">Yearly cost against 2025</th><th scope=\"col\">CO₂ of the districts (a year)</th><th scope=\"col\">Substation upgrades</th><th scope=\"col\">Burden, homes below 80% of area median income (AMI; screening)</th></tr></thead><tbody><tr><td>2025 as it is</td><td class=\"n\">$0.0M</td><td class=\"n\">1,921,977 t</td><td class=\"n\">0 MW</td><td class=\"n\">6.1%</td></tr><tr><td>Electrify heat and cars</td><td class=\"n\">−$65.8M</td><td class=\"n\">1,527,234 t</td><td class=\"n\">91 MW</td><td class=\"n\">5.4%</td></tr><tr><td>Electrify, managed charging, 40 MW of batteries</td><td class=\"n\">−$60.5M</td><td class=\"n\">1,527,266 t</td><td class=\"n\">48 MW</td><td class=\"n\">5.5%</td></tr><tr><td>The LP's choice, CO₂ ≤ 80% of 2025</td><td class=\"n\">−$86.2M</td><td class=\"n\">1,537,582 t</td><td class=\"n\">5 MW</td><td class=\"n\">5.1%</td></tr></tbody></table></div><p class=\"lx-hint\">Precomputed with HiGHS on 6 November 2026. Cost includes the cars' fuel and charging, not their prices; equipment and upgrades as yearly payments.</p><div class=\"lx-scroll-x\"><table class=\"lx-facts m12-table\"><thead><tr><th scope=\"col\">The duals the lesson reads (precomputed)</th><th scope=\"col\">Value</th><th scope=\"col\">What it says</th></tr></thead><tbody><tr><td>A substation's limit, its dual summed over the year (electrified; every district)</td><td class=\"n\">$40,419 per MW a year</td><td class=\"s\">one more MW of room saves an upgrade's yearly cost</td></tr><tr><td>The CO₂ cap at 80% of 2025 (the LP choosing)</td><td class=\"n\">$191 per t</td><td class=\"s\">what cutting the last tonne costs, under this model's assumptions</td></tr></tbody></table></div>",
    "ref": {
     "runs": {
      "today": {
@@ -525,8 +525,8 @@
       ".\n",
       "Budget and cost: ",
       {
-       "text": "$1,227.9M up front against $1,500.0M; the city's yearly cost −$28.9M against 2025 (energy bills plus equipment as yearly payments, 2025 dollars)",
-       "note": "Up front and yearly kept apart, on one boundary."
+       "text": "$1,227.9M up front against $1,500.0M, energy equipment and the grid only (the cars households buy are outside it); the city's yearly cost −$28.9M against 2025 (energy bills plus equipment as yearly payments, 2025 dollars)",
+       "note": "Up front and yearly kept apart, each with its boundary."
       },
       ".\n",
       "CO₂ and the grid: ",
@@ -559,15 +559,21 @@
        "note": "A range, what was held fixed, the input that matters most, what kind of number each input is, and the table."
       },
       ".\n",
-      "Panel: ",
+      "Full-year check: ",
       {
-       "text": "to the electric utility (26 MW of upgrades): I keep them, the cheapest way to meet the suburbs' busiest hour on the eight days (its dual equals the upgrade's yearly cost), and add the 5.7 MW the full-year check finds short, about $0.2M a year",
-       "note": "A reason to keep the upgrades, from the LP's dual, and what the full-year check adds."
+       "text": "on all 8,760 hours this plan's upgrades fall 5.7 MW short, on 19 Feb and 20 Feb; I would add them, about $4.6M more up front and $0.2M a year (a remedy, not rerun on the bench)",
+       "note": "What the check found, the remedy priced, and that it was not rerun."
       },
       ".\n",
       "Panel: ",
       {
-       "text": "to the climate group (12% cut): the city's wind and solar do not lower the location-based CO₂; deeper cuts need more heat pumps and retrofits, with $272.1M of the budget left",
+       "text": "to the electric utility (26 MW of upgrades): I keep them, the cheapest way to meet the suburbs' busiest hour on the eight days (its dual equals the upgrade's yearly cost)",
+       "note": "A reason to keep the upgrades, from the LP's dual."
+      },
+      ".\n",
+      "Panel: ",
+      {
+       "text": "to the climate group (12% cut): the city's wind and solar do not lower the location-based CO₂; deeper cuts need more heat pumps and retrofits, with $272.1M of the budget left ($267.6M after the full-year remedy)",
        "note": "The boundary held, and what would cut deeper, with the budget left."
       },
       ".\n",
@@ -591,8 +597,8 @@
       ".\n",
       "Limits: ",
       {
-       "text": "2025's people and prices held to 2040, one substation per district, eight representative days of synthetic weather (on all 8,760 hours the upgrades fall 5.7 MW short, on 19 Feb and 20 Feb), the household rule an assumption, the map's layers simulated",
-       "note": "What the plan leaves out, and what the full-year check found, so the council does not over-read it."
+       "text": "2025's people and prices held to 2040, one substation per district, eight representative days of synthetic weather (one year of hours checked), car prices not counted, the household rule an assumption, the map's layers simulated",
+       "note": "What the plan leaves out, so the council does not over-read it."
       },
       "."
      ]

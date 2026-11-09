@@ -473,7 +473,8 @@ button.k6-row.bad .ck { color: var(--lx-bad); font-weight: 600; }
 <li>A x is every row's dot product with x: (145, 100, 45, 61.75), one number per rule.</li>
 <li>Multiplying the cover row by −1 turns x₁ + x₂ ≥ 145 into −x₁ − x₂ ≤ −145, so every row reads ≤.</li>
 <li>A x ≤ b checks all four rules at once: (130, 100) supplies at least the 145 MW and fits both plants, but emits 103.1 t, so only the CO₂ row fails.</li>
-<li>A is 4 × 2 here. Lesson 11's day, as its solver stores it, is 72 rows × 96 columns, 24 of the rows equalities; only 190 of its 6,912 entries are not zero.</li>
+<li>A is 4 × 2 here. Lesson 11's day has 4 decisions in each of 24 hours, so 96 columns.</li>
+<li>As lesson 11's <span class="lx-term" data-term="solver">solver</span> stores that day, it has 72 rows, 24 of them equalities; only 190 of its 6,912 entries are not zero.</li>
 </ol>
 <div class="k6-tables">
 
@@ -533,7 +534,7 @@ button.k6-row.bad .ck { color: var(--lx-bad); font-weight: 600; }
 <div class="lx-datanote"><svg class="lx-ic" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5M12 8v.2"></path></svg><ul>
 <li>The hour is <a href="10-write-it-down.html">lesson 10</a>'s: 19:00 on lesson 0's day, 3 September 2025, when gas must supply 145 MW (Southwest Power Pool shapes, <a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>, scaled to Prairie Town).</li>
 <li>Prairie Town is fictional: its plants' sizes, running costs ($40 and $100 per MWh, 2025 dollars), CO₂ rates (0.37 and 0.55 t per MWh, t = metric tonnes) and the 100 t cap are illustrative.</li>
-<li>A toy model, as lesson 10's chart: the cover rule asks for at least 145 MW. Extra gas would be spilled as wind and sun, at most 86 MW at 19:00, a limit left out here.</li>
+<li>A toy model, as in lesson 10: the cover rule asks for at least 145 MW. Extra gas means <span class="lx-term" data-term="curtailment">curtailing</span> as much wind and sun, at most 86 MW at 19:00, a limit left out here.</li>
 <li>Outputs cannot be negative, x₁ ≥ 0 and x₂ ≥ 0: the sliders stop at 0, so the four rows are the rules left to check.</li>
 <li>Lessons 10 and B1 call the two outputs x and y; here they are x₁ and x₂, the entries of the plan vector x.</li>
 </ul></div>

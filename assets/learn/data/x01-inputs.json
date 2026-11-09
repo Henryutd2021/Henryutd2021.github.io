@@ -1,0 +1,109 @@
+{
+ "about": "The inputs side topic X1 reads, taken from f04-power-plants.json, f05-nuclear-basics.json, 13-capstone.json, a16-hydrogen-ptx.json and town.json (only the fields it uses). Those files hold the sources and dates.",
+ "F4": {
+  "plants": [
+   {
+    "key": "cc",
+    "heatRate": 7535
+   }
+  ],
+  "facts": {
+   "betz": {
+    "value": 59.3
+   },
+   "cpBest": {
+    "value": 0.52
+   }
+  },
+  "sources": {
+   "eia_pv": {
+    "publisher": "U.S. Energy Information Administration",
+    "title": "Solar explained: Photovoltaics and electricity",
+    "url": "https://www.eia.gov/energyexplained/solar/photovoltaics-and-electricity.php",
+    "as_of": "read 3 November 2026"
+   },
+   "nrel_dl15": {
+    "publisher": "National Renewable Energy Laboratory",
+    "title": "Power Performance Test Report for the U.S. Department of Energy 1.5-Megawatt Wind Turbine (NREL/TP-5000-63684)",
+    "url": "https://docs.nlr.gov/docs/fy15osti/63684.pdf",
+    "as_of": "2015; test February to June 2011"
+   },
+   "eia_t82": {
+    "publisher": "U.S. Energy Information Administration",
+    "title": "Electric Power Annual, Table 8.2: Average Tested Heat Rates by Prime Mover and Energy Source, 2015-2025",
+    "url": "https://www.eia.gov/electricity/annual/html/epa_08_02.html",
+    "as_of": "2025 data"
+   }
+  }
+ },
+ "F5": {
+  "facts": {
+   "btu_per_kwh": {
+    "value": 3412
+   },
+   "heat_rate_btu_kwh": {
+    "value": 10443,
+    "year": 2025
+   },
+   "lwr_outlet_c": {
+    "text": "about 300 °C"
+   }
+  },
+  "sources": {
+   "qtr_lwr": {
+    "publisher": "U.S. Department of Energy",
+    "title": "Quadrennial Technology Review 2015, Technology Assessment 4.M: Light Water Reactors",
+    "url": "https://www.energy.gov/sites/prod/files/2016/01/f28/QTR2015-4M-Light-Water-Reactors.pdf",
+    "as_of": "2015"
+   },
+   "eia_heatrate": {
+    "publisher": "U.S. Energy Information Administration",
+    "title": "Electric Power Annual, Table 8.1: Average Operating Heat Rate for Selected Energy Sources, 2015 through 2025",
+    "url": "https://www.eia.gov/electricity/annual/html/epa_08_01.html",
+    "as_of": "2025 data, read 3 November 2026"
+   }
+  }
+ },
+ "C13": {
+  "techs": {
+   "battery": {
+    "rte": 0.85,
+    "life": 15
+   }
+  },
+  "sources": {
+   "nrel-battery-2025": {
+    "text": "Cole, Ramasamy and Turan, Cost Projections for Utility-Scale Battery Storage: 2025 Update, NREL/TP-6A40-93281 (2024 costs, section 2 and Figure 2; O&M, life and efficiency, section 3); the cost basis of the 2025 ATB's battery page",
+    "url": "https://docs.nlr.gov/docs/fy25osti/93281.pdf",
+    "asOf": "June 2025"
+   }
+  }
+ },
+ "A16": {
+  "electrolyzer": {
+   "kWhPerKg": 57,
+   "minLoad": {
+    "pem": 0.05,
+    "alk": 0.15
+   },
+   "source": {
+    "label": "DOE Hydrogen Program Record 24005, Clean Hydrogen Production Cost Scenarios with PEM Electrolyzer Technology, Table 1 and p. 1 (2022 dollars)",
+    "url": "https://www.hydrogen.energy.gov/docs/hydrogenprogramlibraries/pdfs/24005-clean-hydrogen-production-cost-pem-electrolyzer.pdf",
+    "as_of": "2024-05-20"
+   },
+   "loadSource": {
+    "label": "IRENA, Green Hydrogen Cost Reduction (2020), Table 6: load range of PEM 5%–120%, of alkaline 15%–100%",
+    "url": "https://www.irena.org/-/media/Files/IRENA/Agency/Publication/2020/Dec/IRENA_Green_hydrogen_cost_2020.pdf",
+    "as_of": "2020-12"
+   }
+  }
+ },
+ "T": {
+  "fleet": {
+   "cc": {
+    "label": "Gas combined-cycle plant",
+    "ramp": 40
+   }
+  }
+ }
+}

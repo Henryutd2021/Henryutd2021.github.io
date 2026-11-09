@@ -147,7 +147,7 @@
         return t;
       }, tipStep: 0.5,
       aria: o.aria || "Power against wind speed.",
-      text: { head: rows.head, rows: rows.rows, note: "Records are counted within each 1 m/s bin; curves and bands are read at the bin's centre." }
+      text: { head: rows.head, rows: rows.rows, note: "Records are counted within each 1 m/s bin; curves and bands are read at the bin's center." }
     };
   }
   function binText(T, o) {
@@ -190,7 +190,7 @@
         var host = H("div", null, act);
         var pr = LX.Predict(act, { id: "m9-gap", q: "Your pick:", answer: "knee", fresh: true, title: false,
           options: D.guess.map(function (g) { return { value: g.value, label: g.label }; }),
-          feedback: { knee: "Gusts inside each ten minutes smooth the curve's sharp corner at rated speed, 11.5 m/s." },
+          feedback: { knee: "Gusts inside each ten minutes smooth the curve's sharp corner at [[rated-speed|rated speed]], 11.5 m/s, where the maker's curve first reaches full power." },
           onPick: function (v) { keep("gap", v); draw(); pr.reveal(); } });
         act.appendChild(host);
         function draw() {
@@ -209,7 +209,7 @@
       build: function (act, api) {
         var seen = {}, P, out;
         seg(row(act), D.steps2.map(function (n) { return n + " records"; }), -1, function (i) { show(D.steps2[i]); }, "Records used");
-        H("p", { class: "lx-hint", text: "Settings fixed for now: length-scale " + ms(D.fixed.ell) + ", signal size " + kw(D.fixed.sf) + " (how far the curve may swing from its average), noise " + kw(D.fixed.sn) + ". Step 3 lets the records choose." }, act);
+        H("p", { class: "lx-hint", html: LX.rich("Settings fixed for now: [[length-scale|length-scale]] " + ms(D.fixed.ell) + " (how far one record's pull reaches), signal size " + kw(D.fixed.sf) + " (how far the curve may swing from its average), noise " + kw(D.fixed.sn) + ". Step 3 lets the records choose.") }, act);
         P = LX.Plot(act, { text: "Text version of the chart" }); out = readout(act);
         function show(n) {
           seen[n] = 1;
@@ -259,7 +259,7 @@
 
     // ---- 4 training records flatter: score on 400 held-out records
     steps.push({
-      text: "A fit always looks good on its own records, so score it on 400 records it never saw, [[held-out-data|held-out]] data, as [[rmse|RMSE]]. Try a very short and a very long length-scale too.",
+      text: "A flexible fit can look especially good on its own records, so score it on 400 records it never saw, [[held-out-data|held-out]] data, as [[rmse|RMSE]]. Try a very short and a very long length-scale too.",
       build: function (act, api) {
         var recs = campaign(D, N0), ML = stored(D, null, false, N0), E = D.extremes, seen = {}, tb = H("div", null, act), out = readout(act);
         var cases = [{ key: "ml", label: "Records' choice", hp: ML }, { key: "short", label: "Very short: " + ms(E.short.ell) + ", noise " + kw(E.short.sn), hp: { ell: E.short.ell, sf: ML.sf, sn: E.short.sn } },
@@ -336,7 +336,7 @@
           keep("n", n);
           if (user && idx === SW.length - 1) {
             var f0 = lab.sc(SW[0], false).rmse - lab.sc(SW[0], true).rmse;
-            api.done(); api.saw("At " + SW[0] + " records two sources are " + kw(f0) + " closer; at " + n + ", " + kw(a.rmse - b.rmse) + ". Once records cover the speeds that matter, the cheap curve adds little.");
+            api.done(); api.saw("At " + SW[0] + " records two sources are " + kw(f0) + " closer; at " + n + ", " + kw(a.rmse - b.rmse) + ". In this example, the cheap curve's added benefit shrinks as records cover more wind speeds.");
           } else if (user) api.saw("Keep adding records.", true);
         }
         draw(false);
@@ -377,12 +377,13 @@
         var SC = [{ k: "rmse", label: "RMSE", f: function (s) { return kw(s.rmse); } }, { k: "cov", label: "90% band holds", f: function (s) { return pct(s.cov[90]); } },
                   { k: "pb", label: "Pinball loss", f: function (s) { return (Math.round(s.pinball * 10) / 10).toFixed(1) + " kW"; } }, { k: "hi", label: "Holds at 13–20 m/s", f: function (s) { return pct(s.byRange[2].cov90, 0); } }];
         seg(row(act), SC.map(function (s) { return s.label; }), -1, function (i) { draw(i); }, "Score");
+        H("p", { class: "lx-hint", html: LX.rich("[[pinball-loss|Pinball loss]] scores the band's percentiles: a 90th-percentile forecast should sit above about 90% of outcomes, and each miss costs by how far it misses, weighted by side. Lower is better.") }, act);
         act.appendChild(tb); act.appendChild(out);
         function draw(i) {
           table(tb, ["Load-reducing case, " + N0 + " records", "One source", "Two sources"], SC.map(function (s) { return [s.label, s.f(sa), s.f(sb)]; }), "m9-scores");
           var c = SC[i];
           out.innerHTML = c.label + ": one source <b>" + c.f(sa) + "</b>, two sources <b>" + c.f(sb) + "</b>.";
-          if (c.k === "pb") { api.done(); api.saw("Averaged over all 400 records, [[pinball-loss|pinball loss]] rates them about equal; only " + sa.byRange[2].n + " records lie above 13 m/s, where the two-source band fails. Score where the decision needs it, not only on average."); }
+          if (c.k === "pb") { api.done(); api.saw("Averaged over all 400 records, pinball loss rates them about equal; only " + sa.byRange[2].n + " records lie above 13 m/s, where the two-source band fails. Score where the decision needs it, not only on average."); }
           else api.saw(c.k === "hi" ? "This one shows the failure. Find the one that hides it." : "Not equal on this score.", true);
         }
         out.textContent = "Pick a score.";
@@ -418,7 +419,7 @@
     var T = D.turbine, N0 = D.n0, a = lab.fit(N0, false), recs = campaign(D, N0), last = Math.max.apply(null, recs.map(function (r) { return r[0]; }));
     var near = recs.slice().sort(function (p, q) { return Math.abs(p[0] - 8) - Math.abs(q[0] - 8); })[0], q8 = predict(a, near[0]), q16 = predict(a, 16), w = widest(a, T);
     var card = H("div", { class: "lx-xcard" }, x);
-    H("header", { class: "lx-x-head", html: "<h3>A Gaussian process fit, labelled</h3>" }, card);
+    H("header", { class: "lx-x-head", html: "<h3>A Gaussian process fit, labeled</h3>" }, card);
     H("p", { class: "lx-hint", text: "Reference case, whatever you set above: the first " + N0 + " records and the settings they chose (step 3)." }, card);
     var P = LX.Plot(card, { text: "Text version of the chart" }), spec = fitSpec(T, { fits: [{ F: a, color: COL.one, label: "Gaussian process" }], maker: true, recs: [{ r: recs, color: COL.rec, label: N0 + " records" }], aria: "An annotated Gaussian process fit." });
     spec.marks = [{ x: near[0], y: near[1], n: "1", kind: "dot" }, { x: 6, y: predict(a, 6).m, n: "2", kind: "dot" }, { x: near[0], y: q8.m + Z90 * q8.sd, n: "3", kind: "dot" },

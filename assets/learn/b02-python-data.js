@@ -128,9 +128,10 @@
   function sortedDesc(a) { return a.slice().sort(function (x, y) { return y - x; }); }
   function hoursAbove(a, level) { return a.filter(function (v) { return v > level; }).length; }
   function capacityFactor(mw, size) { return mw.reduce(function (s, v) { return s + v; }, 0) / (size * mw.length); }
-  // the five asserts of the last step, on any file with demand, wind and solar columns
+  // the six asserts of the last step, on any file with demand, wind and solar columns
   var ASSERTS = [
     { id: "rows", code: 'assert len(df) == 8760, "expected 8,760 rows"' },
+    { id: "stamps", code: 'assert df.index.is_unique and (df.index.to_series().diff().dropna() == pd.Timedelta(hours=1)).all(), "time stamps not one hour apart"' },
     { id: "gaps", code: 'assert df.notna().all().all(), "missing values"' },
     { id: "spike", code: 'assert df["demand"].min() > 0.5 * df["demand"].median(), "a demand spike"' },
     { id: "repeat", code: 'assert longest_repeat(df).max() < 6, "a sensor stuck for 6+ hours"' },
@@ -139,9 +140,11 @@
   function checks(F) {
     var c = F.cols, d = describe(c.demand), lr = Math.max(longestRun(c.demand), longestRun(c.wind), longestRun(c.solar)), nb = nightBad(F, c.solar).length;
     var gaps = ["demand", "wind", "solar"].reduce(function (s, k) { var m = 0; for (var i = 0; i < F.n; i++) if (c[k][i] == null || !isFinite(c[k][i])) m++; return s + m; }, 0);
-    var rowsOK = F.lens ? F.lens.every(function (l) { return l === 8760; }) : F.n === 8760;
+    var rowsOK = F.lens ? F.lens.every(function (l) { return l === 8760; }) : F.n === 8760, steps = 0;
+    for (var i = 1; i < F.n; i++) if (ending(F, i) - ending(F, i - 1) !== HOUR) steps++;   // this file's stamps come from one start time
     return [
       { id: "rows", ok: rowsOK, detail: rowsOK ? "8,760 rows" : "rows per column: " + (F.lens || [F.n]).join(", ") },
+      { id: "stamps", ok: steps === 0, detail: steps ? steps + " gaps" : "one hour apart" },
       { id: "gaps", ok: gaps === 0, detail: gaps + " missing" },
       { id: "spike", ok: d.min > SPIKE_FRAC * d.q50, detail: "min " + Math.round(d.min).toLocaleString("en-US") + " vs half the median " + Math.round(SPIKE_FRAC * d.q50).toLocaleString("en-US") },
       { id: "repeat", ok: lr < MAX_REPEAT, detail: "longest repeat " + lr + " h" },
@@ -431,7 +434,7 @@
           if (done.raw && done.clean) {
             api.done();
             if (nbC.length) api.saw("In those weeks raw solar barely changed between day and night and never repeated exactly, so no repeat rule saw it. Combine range, repeat and physics checks.");
-            else api.saw("Late-winter raw solar barely changed between day and night and never repeated exactly, so no repeat rule saw it. The cleaned file passes by construction, since its build zeroes night hours: no single check proves a file right.");
+            else api.saw("Late-winter raw solar barely changed between day and night and never repeated exactly, so no repeat rule caught it: combine range, repeat and physics checks.");
           }
         }
         bR.addEventListener("click", function () { show("raw"); }); bC.addEventListener("click", function () { show("clean"); });
@@ -469,17 +472,26 @@
     var cfW = capacityFactor(P.wind, P.sizes.wind), cfS = capacityFactor(P.solar, P.sizes.solar), h90 = hoursAbove(P.demand, 0.9 * P.sizes.demand), h95 = hoursAbove(P.demand, 0.95 * P.sizes.demand);
     steps.push({ text: "Sort a year of hours from highest to lowest: a [[duration-curve|duration curve]]. It shows how many hours a level is reached, and the capacity factor as an area.",
       build: function (act, api) {
-        var col = "demand", sorted = false;
-        var sg = seg(act, "Series", [["demand", "Demand"], ["wind", "Wind farm"], ["solar", "Solar farm"]], function (k) { col = k; draw(); });
+        var col = "demand", sorted = false, wasSorted = false;
+        var sg = seg(act, "Series", [["demand", "Demand"], ["wind", "Wind farm"], ["solar", "Solar farm"]], function (k) { col = k; draw(); feedback(); });
         var tg = H("button", { class: "lx-btn small", type: "button", "aria-pressed": "false", text: "Sort the hours" }, act);
         var host = H("div", null, act), res = H("div", { class: "b2-res", "aria-live": "polite" }, act);
-        tg.addEventListener("click", function () { sorted = !sorted; tg.setAttribute("aria-pressed", sorted ? "true" : "false"); tg.textContent = sorted ? "Back to calendar order" : "Sort the hours"; draw(); if (sorted) { api.done(); api.saw("Demand is above 90% of its peak for only " + h90 + " of 8,760 hours, yet the system must be ready for them. For the farms, the shaded share is the capacity factor: wind " + pct1(cfW) + ", solar " + pct1(cfS) + "."); } });
+        tg.addEventListener("click", function () { sorted = !sorted; wasSorted = true; tg.setAttribute("aria-pressed", sorted ? "true" : "false"); tg.textContent = sorted ? "Back to calendar order" : "Sort the hours"; draw(); feedback(); });
+        // feedback once the sorted curve is on screen: demand first, then a farm with its shaded area (the step is done there)
+        function feedback() {
+          if (!sorted) { if (wasSorted) api.saw("Calendar order again: January to December, no shaded area. Sort the hours to read the duration curve."); return; }
+          if (col === "demand") { api.saw("Demand is above 90% of its peak for only " + h90 + " of 8,760 hours, yet the system must be ready for them. Now choose a farm."); return; }
+          api.done(); api.saw("The shaded area is the farm's energy as a share of running flat out all year: its capacity factor, wind " + pct1(cfW) + ", solar " + pct1(cfS) + ".");
+        }
         function draw() {
           var size = P.sizes[col], v = sorted ? sortedDesc(P[col]) : P[col];
           host.innerHTML = "";
           var sv = sortedDesc(P[col]), ranks = [1, 100, 500, 1000, 2000, 4380, 6000, 8000, 8760];
+          // the text version follows the chart: sorted levels for the duration curve, each month's average in calendar order
+          var alt = sorted ? "<p>" + COLS[col].label + " of Prairie Town, MW: the level reached in at least this many hours of 2025.</p>" + htable(["Hours", "MW"], ranks.map(function (r) { return [int(r), int(sv[r - 1])]; }))
+                           : "<p>" + COLS[col].label + " of Prairie Town in calendar order: each month's average, MW.</p>" + htable(["Month", "MW"], resample(C, P[col], "month", "mean").map(function (x, i) { return [MONTHS[i], int(x.value)]; }));
           chart(host, { n: v.length, yMax: nice(size).max, yStep: nice(size).step, series: [{ values: v, color: COLS[col].color, area: col !== "demand" && sorted, width: sorted ? 2 : 0.6 }],
-            alt: "<p>" + COLS[col].label + " of Prairie Town, MW: the level reached in at least this many hours of 2025.</p>" + htable(["Hours", "MW"], ranks.map(function (r) { return [int(r), int(sv[r - 1])]; })),
+            alt: alt,
             ticks: sorted ? function (W) { return W < 480 ? [[0, "1", "start"], [4380, "4,380"], [8759, "8,760 h", "end"]] : [[0, "1", "start"], [2190, "2,190"], [4380, "4,380"], [6570, "6,570"], [8759, "8,760 h", "end"]]; } : ticksH,
             level: col === "demand" ? 0.9 * size : null, levelLabel: col === "demand" ? "90% of peak" : null,
             title: (sorted ? "Hours sorted from highest to lowest" : "Calendar order") + " (MW)", label: COLS[col].label + " of Prairie Town, " + (sorted ? "as a duration curve." : "in calendar order.") });
@@ -494,7 +506,7 @@
 
     // 9 asserts
     var kR = checks(R), kC = checks(C);
-    steps.push({ text: "Turn each check into an [[assert|assert]], so a bad file stops the notebook with a message instead of slipping into your results. Run the five asserts on both files.",
+    steps.push({ text: "Turn each check into an [[assert|assert]], so a bad file stops the notebook with a message instead of slipping into your results. Run the six asserts on both files.",
       build: function (act, api) {
         var row = H("div", { class: "b2-pills" }, act), ran = {};
         var bR = H("button", { class: "lx-btn small ghost", type: "button", text: "Run on the raw file" }, row), bC = H("button", { class: "lx-btn small ghost", type: "button", text: "Run on the cleaned file" }, row);
@@ -508,12 +520,12 @@
           (which === "raw" ? kR : kC).forEach(function (r, i) { var c = cells[i][which === "raw" ? 0 : 1]; c.className = r.ok ? "b2-ok" : "b2-bad"; c.textContent = (which === "raw" ? "raw: " : "cleaned: ") + (r.ok ? "pass" : "FAIL") + " · " + r.detail; });
           if (ran.raw && ran.clean) {
             var fR = kR.filter(function (r) { return !r.ok; }).length, fC = kC.filter(function (r) { return !r.ok; }).length;
-            api.done(); api.saw("The raw file fails " + fR + " of 5; the cleaned file " + (fC ? "fails " + fC + ", the night check" : "passes all five") + ". A failing assert is doing its job: it stops the run until someone decides what to do.");
+            api.done(); api.saw("The raw file fails " + fR + " of " + ASSERTS.length + "; the cleaned file " + (fC ? "fails " + fC + ", the night check" : "passes all " + ASSERTS.length) + ". A failing assert is doing its job: it stops the run until someone decides what to do.");
           }
         }
         bR.addEventListener("click", function () { run("raw"); }); bC.addEventListener("click", function () { run("clean"); });
         code(act, ["# the helpers longest_repeat and bad_night are defined in the notebook", "# an assert is silent when true and stops with its message when false",
-          "# len(df) only counts rows: missing or repeated time stamps need a check of their own"]);
+          "# this file's stamps are built from one start time, so they pass by construction;", "# a file with its own time column needs that column checked before it becomes the index"]);
       } });
 
     LX.StepCards(live, { id: "b2-steps", steps: steps });
@@ -558,7 +570,7 @@
         { id: "repeat", label: "Repeats", text: "Runs of the same non-zero value: a sign of a stuck sensor or feed.", note: "repeats(df[col]).sum()" },
         { id: "physics", label: "Physics", text: "Sun at night, negative demand, output above [[capacity|capacity]].", note: "bad_night(df).sum()" },
         { id: "gaps", label: "Gaps and fills", text: "Count missing values, and record how each was filled.", note: "df.isna().sum()" },
-        { id: "source", label: "Provenance", text: "Source, file names, download date, checksums and licence.", note: "" }
+        { id: "source", label: "Provenance", text: "Source, file names, download date, checksums and license.", note: "" }
       ] });
   }
 
@@ -572,7 +584,7 @@
       var q = function (sel, i) { return card.querySelectorAll(sel)[i || 0]; }, click = function (el) { if (el) el.click(); };
       var acts = [function () { click(q(".lx-step-act .lx-btn")); }, function () { click(q(".b2-cell", 9)); }, function () { click(q(".lx-seg button", 2)); },
         function () { click(q(".lx-ctl-row button", 1)); }, function () { click(q(".lx-step-act > .lx-btn")); }, function () { click(q(".b2-pills .lx-btn", 0)); click(q(".b2-pills .lx-btn", 1)); },
-        function () { click(q(".lx-seg button", 1)); click(q(".lx-seg button", 2)); }, function () { click(q(".lx-step-act > .lx-btn")); }, function () { click(q(".b2-pills .lx-btn", 0)); click(q(".b2-pills .lx-btn", 1)); }];
+        function () { click(q(".lx-seg button", 1)); click(q(".lx-seg button", 2)); }, function () { click(q(".lx-step-act > .lx-btn")); click(q(".lx-seg button", 1)); }, function () { click(q(".b2-pills .lx-btn", 0)); click(q(".b2-pills .lx-btn", 1)); }];
       for (var k = 0; k < upto && k < acts.length; k++) { acts[k](); if (k < upto - 1) click(q(".lx-step-foot .lx-btn:not(.ghost)")); }
       return { view: "step " + Math.min(upto, acts.length) };
     });

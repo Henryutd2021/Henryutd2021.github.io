@@ -110,7 +110,8 @@
       U.table(c2, ["District", "Busiest hour", "Limit", "Upgrade bought", "Marginal value of room ($ per MW a year)", "Hours a year at the limit"], R.dist.map(function (d) {
         return [d.label, kilo(d.peak) + " MW", kilo(d.limit) + " MW", kilo(d.upg) + " MW", d.value == null ? "–" : "$" + kilo(d.value), kilo(d.bindHours)];
       }), "sb3-val");
-      U.keys(c2, [["The value", "the substation row's [[shadow-price|dual]], summed over the year: what a little more room saves, per MW. A whole MW can save less, once the upgrade it replaces is gone."],
+      U.keys(c2, [["The value", "the substation row's [[shadow-price|dual]], summed over the year: what a little more room is worth per MW in the LP's objective. A whole MW can be worth less, once the upgrade it replaces is gone."],
+        ["The tie costs", "the objective includes the [[tie-rule|tie rule]]'s small costs, so where a limit binds without an upgrade the reported cost saves slightly more (about $9 per MW a year on the presets)."],
         ["Its assumptions", "this plan, 2025's prices and the eight days: a marginal value, not a market price."],
         ["With an upgrade", "it equals the upgrade's yearly cost per MW."],
         ["Hours at the limit", "representative hours with the flow at the limit (plus any upgrade), each counted for the days its day stands for."]]);

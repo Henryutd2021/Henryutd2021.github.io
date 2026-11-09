@@ -493,7 +493,7 @@ ul.task-list li input[type="checkbox"] {
 <div class="lx-datanote sb2-note"><svg class="lx-ic" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5M12 8v.2"></path></svg><ul>
 <li><b>Illustrative:</b> the Plains Grid, its zones, plants, links, the $5,000/MWh penalty for unserved load and the $1,000/MWh for reserve short; 2025 dollars.</li>
 <li><b>Based on SPP 2025:</b> hourly demand, wind and sun follow the Southwest Power Pool's 2025 shapes (EIA-930), scaled to each zone; all three zones share that one weather.</li>
-<li><b>EIA:</b> fuel prices, capacity factors and CO₂ coefficients (sources below).</li>
+<li><b>EIA:</b> fuel prices and CO₂ coefficients; 2025 U.S. utility-scale wind and solar capacity factors, which rescale SPP's hourly timing (national figures, not SPP's own; sources below).</li>
 </ul></div>
 <style>/* lesson-local */
 .page-learn .sb2-note ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 2px; }
@@ -531,7 +531,7 @@ ul.task-list li input[type="checkbox"] {
 <td class="n">$1,676,000</td>
 </tr>
 <tr class="even">
-<td>Today's grid: average price, Wind Ridge · Prairie Town · Metro (conditional on the commitment)</td>
+<td>Today's grid: average price per MWh served, Wind Ridge · Prairie Town · Metro (energy payments over the MWh used, so busy hours weigh more; conditional on the commitment)</td>
 <td class="n">$27 · $27 · $29 /MWh</td>
 </tr>
 <tr class="odd">
@@ -543,8 +543,8 @@ ul.task-list li input[type="checkbox"] {
 <td class="n">0 · 2 of 24</td>
 </tr>
 <tr class="odd">
-<td>Today's grid: unserved · reserve short</td>
-<td class="n">0 MWh · 0 MWh</td>
+<td>Today's grid: unserved · reserve short (missing reserve MW added up hour by hour)</td>
+<td class="n">0 MWh · 0 MW·h</td>
 </tr>
 <tr class="even">
 <td>Today's grid: uplift (make-whole payments)</td>
@@ -555,7 +555,7 @@ ul.task-list li input[type="checkbox"] {
 <td class="n">$1,895,000</td>
 </tr>
 <tr class="even">
-<td>With the 300 MW load: average price, Wind Ridge · Prairie Town · Metro (conditional on the commitment)</td>
+<td>With the 300 MW load: average price per MWh served, Wind Ridge · Prairie Town · Metro (energy payments over the MWh used, so busy hours weigh more; conditional on the commitment)</td>
 <td class="n">$32 · $32 · $32 /MWh</td>
 </tr>
 <tr class="odd">
@@ -567,8 +567,8 @@ ul.task-list li input[type="checkbox"] {
 <td class="n">0 · 4 of 24</td>
 </tr>
 <tr class="odd">
-<td>With the 300 MW load: unserved · reserve short</td>
-<td class="n">0 MWh · 0 MWh</td>
+<td>With the 300 MW load: unserved · reserve short (missing reserve MW added up hour by hour)</td>
+<td class="n">0 MWh · 0 MW·h</td>
 </tr>
 <tr class="even">
 <td>With the 300 MW load: uplift (make-whole payments)</td>
@@ -576,7 +576,7 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 </tbody>
 </table>
-<p class="lx-hint">Precomputed with HiGHS on 5 November 2026: each day a mixed-integer program commits the plants, then the dispatch linear program with that commitment fixed gives the prices. With JavaScript on, the bench runs your own plan.</p>
+<p class="lx-hint">Precomputed with HiGHS on 5 November 2026: a mixed-integer program commits the plants each day; the dispatch linear program, with that commitment fixed, gives the prices. With JavaScript on, the bench runs your own plan.</p>
 
 </div>
 </div>
@@ -599,7 +599,12 @@ ul.task-list li input[type="checkbox"] {
 <details class="lx-deeper">
 <summary><span class="k">Go deeper · Modeler</span>The models behind the bench</summary>
 <div class="lx-deeper-body">
-<p><a href="m02-unit-commitment.html">M2</a> writes unit commitment down and grows its branch-and-bound tree; <a href="m01-dispatch-to-lmp.html">M1</a> reads prices from a dispatch linear program and adds the network. M2’s notebook rebuilds the commitment and the conditional prices in Python. The capstone <a href="c2-plains-grid-hard-year.html">C2</a> runs this engine over a year and checks adequacy.</p>
+<ul>
+<li><a href="m02-unit-commitment.html">M2</a> writes unit commitment down and grows its branch-and-bound tree.</li>
+<li><a href="m01-dispatch-to-lmp.html">M1</a> reads prices from a dispatch linear program and adds the network.</li>
+<li>M2’s notebook rebuilds the commitment and the conditional prices in Python.</li>
+<li>The capstone <a href="c2-plains-grid-hard-year.html">C2</a> runs this engine over a year and checks adequacy.</li>
+</ul>
 </div>
 </details>
 <details class="lx-deeper">
@@ -650,7 +655,8 @@ ul.task-list li input[type="checkbox"] {
 <li>Reserve: carried first by the unit groups listed first.</li>
 </ul>
 <p>The engine's test runs seven benchmark plans again with the tie weights ×10 and ×0.1: every number shown stays the same.</p>
-<p>In those runs, each price equals the cost slope when its zone's load moves 0.001 MWh up and when it moves down: no price sits on a corner. Your own plans are not checked this way.</p>
+<p>In those runs, each price equals the cost slope when its zone's load moves 0.001 MWh up and when it moves down: no price sits on a corner.</p>
+<p>Your own plans are not checked this way.</p>
 </div>
 </details>
 </div>
@@ -691,7 +697,7 @@ ul.task-list li input[type="checkbox"] {
 <tr class="even">
 <td>Output per MW: wind · solar</td>
 <td class="n">33.8% · 24.0% a year</td>
-<td class="s">SPP's 2025 shapes scaled to EIA's 2025 monthly capacity factors: <a href="https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_b">EPM Table 6.07.B</a>, issue of 23 Oct 2026</td>
+<td class="s">SPP's 2025 hourly timing, rescaled to EIA's 2025 U.S. utility-scale monthly capacity factors (national, not SPP's own): <a href="https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_b">EPM Table 6.07.B</a>, issue of 23 Oct 2026</td>
 </tr>
 <tr class="odd">
 <td>Link limits: Ridge–Town · Town–Metro</td>
@@ -706,7 +712,7 @@ ul.task-list li input[type="checkbox"] {
 <tr class="odd">
 <td>Heat rates</td>
 <td class="n">6.4 to 11.2 MMBtu/MWh</td>
-<td class="s">Illustrative, around EIA's 2025 averages (coal 10.65, gas 7.78 MMBtu/MWh): <a href="https://www.eia.gov/electricity/annual/html/epa_08_01.html">Electric Power Annual, Table 8.1</a> · 2025 data; checked 5 Nov 2026</td>
+<td class="s">Fuel heat burned per MWh made (the <span class="lx-term" data-term="heat-rate">heat rate</span>). Illustrative, around EIA's 2025 averages (coal 10.65, gas 7.78 MMBtu/MWh): <a href="https://www.eia.gov/electricity/annual/html/epa_08_01.html">Electric Power Annual, Table 8.1</a> · 2025 data; checked 5 Nov 2026</td>
 </tr>
 <tr class="even">
 <td>CO₂: gas · subbituminous coal</td>
@@ -804,7 +810,7 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 </tbody>
 </table>
-</div><p class="lx-hint">Running cost = heat rate × fuel price + variable upkeep; no-load cost = the heat burned each hour a unit is on × fuel price. Peakers start within minutes and have no minimum output, so the model gives them no on/off decision.</p></div></details>
+</div><ul class="lx-hint e2-unit-notes"><li>Running cost = heat rate × fuel price + variable upkeep.</li><li>No-load cost = the heat burned each hour a unit is on × fuel price.</li><li>Peakers start within minutes and have no minimum output, so the model gives them no on/off decision.</li><li>A <span class="lx-term" data-term="combined-cycle">combined cycle</span> uses a gas turbine's hot exhaust to make more electricity in a steam turbine.</li></ul></div></details>
 
 </div>
 <div class="lx-stack">

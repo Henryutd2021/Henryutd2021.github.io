@@ -394,7 +394,7 @@ ul.task-list li input[type="checkbox"] {
 
 
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "name": "Pathway Explorer Plan Prairieland's five regions to 2050 within a carbon budget and an import cap, run the pathway as one linear program, and test it against shocks and full years of hours", "description": "Sandbox SB4 of Energy Systems, Step by Step: plan a fictional nation's electricity and fuels to 2050, run its five regions as one linear program within a cumulative carbon budget and an import cap, and test the pathway against shocks, decade-by-decade decisions and full years of hours.", "learningResourceType": "Simulation", "educationalLevel": "Advanced", "timeRequired": "PT30M", "inLanguage": "en", "isAccessibleForFree": true, "teaches": ["national pathway model", "cumulative carbon budget", "import-share cap", "perfect and myopic foresight", "shocks and re-planning", "representative slices against full years"], "license": "https://creativecommons.org/licenses/by/4.0/", "author": {"@type": "Person", "name": "Honglin Li", "url": "https://henryutd2021.github.io/"}, "url": "https://henryutd2021.github.io/learn/sb4-pathway-explorer.html", "isPartOf": {"@type": "Course", "name": "Energy Systems, Step by Step", "url": "https://henryutd2021.github.io/learn/"}}</script>
-<script type="application/json" class="lx-lesson-data">{"id":"sb4-pathway-explorer","starter":null,"total":14,"code":"SB4","title":"Pathway Explorer","subtitle":"Plan Prairieland's five regions to 2050 within a carbon budget and an import cap, run the pathway as one linear program, and test it against shocks and full years of hours","short":"Pathway Explorer","tier":"modeler","tier2":null,"tierLabel":"Modeler · L3","level":"L3","slot":3,"slot2":null,"minutes":30,"does":"Five regions to 2050 with vintages, transmission, a cumulative carbon budget, an import cap, a peak-hour rule, security indicators and shocks, as one linear program on twelve time slices; perfect foresight or decade by decade; a labelled precomputed library for phones and for the full-year checks.","outcome":"Run a national pathway model, read what its budget and cap cost and what their duals say, and tell which results survive a shock, myopic decisions and a full year of hours.","icon":"map","form":"sandbox","scales":["S4"],"teaches":["national pathway model","cumulative carbon budget","import-share cap","perfect and myopic foresight","shocks and re-planning","representative slices against full years"],"lab":null,"href":"sb4-pathway-explorer.html","ready":true,"after":[{"id":"m03-capacity-expansion","code":"M3","title":"What should be built? Capacity expansion with representative periods, validated","short":"Capacity expansion, validated","does":"Co-optimize what to build and how to run it on weighted representative weeks, with the battery linked across them and the extreme weeks kept; then re-run the plan on every hour of 2025 and of 2024 and see which conclusions survive.","href":"m03-capacity-expansion.html","ready":true}],"prev":null,"next":null}</script>
+<script type="application/json" class="lx-lesson-data">{"id":"sb4-pathway-explorer","starter":null,"total":14,"code":"SB4","title":"Pathway Explorer","subtitle":"Plan Prairieland's five regions to 2050 within a carbon budget and an import cap, run the pathway as one linear program, and test it against shocks and full years of hours","short":"Pathway Explorer","tier":"modeler","tier2":null,"tierLabel":"Modeler · L3","level":"L3","slot":3,"slot2":null,"minutes":30,"does":"Five regions to 2050 with vintages, transmission, a cumulative carbon budget, an import cap, a peak-hour rule, security indicators and shocks, as one linear program on twelve time slices; perfect foresight or decade by decade; a labeled precomputed library for phones and for the full-year checks.","outcome":"Run a national pathway model, read what its budget and cap cost and what their duals say, and tell which results survive a shock, myopic decisions and a full year of hours.","icon":"map","form":"sandbox","scales":["S4"],"teaches":["national pathway model","cumulative carbon budget","import-share cap","perfect and myopic foresight","shocks and re-planning","representative slices against full years"],"lab":null,"href":"sb4-pathway-explorer.html","ready":true,"after":[{"id":"m03-capacity-expansion","code":"M3","title":"What should be built? Capacity expansion with representative periods, validated","short":"Capacity expansion, validated","does":"Co-optimize what to build and how to run it on weighted representative weeks, with the battery linked across them and the extreme weeks kept; then re-run the plan on every hour of 2025 and of 2024 and see which conclusions survive.","href":"m03-capacity-expansion.html","ready":true}],"prev":null,"next":null}</script>
 <div class="lx-head" data-lesson-id="sb4-pathway-explorer" data-total="14" data-tier="modeler" data-level="L3" data-minutes="30" data-form="sandbox">
 <div>
 <nav class="lx-crumbs" aria-label="Breadcrumb"><ol><li><a href="index.html">Learn</a></li><li aria-current="page">SB4</li></ol></nav>
@@ -418,7 +418,8 @@ ul.task-list li input[type="checkbox"] {
 <div><dt>The engine works out</dt><dd>One <span class="lx-term" data-term="linear-program">linear program (LP)</span> picks what to build, run and retire in each region for 2030, 2035, 2040, 2045 and 2050 at the least <span class="lx-term" data-term="present-value">present value</span> of cost, on twelve <span class="lx-term" data-term="time-slice">time slices</span> of 2025's weather.</dd></div>
 <div><dt>It leaves out</dt><dd>Power-flow physics, outages, end-use equipment costs, fuels other than electricity for the oil that remains, and who decides: a teaching model, not a forecast.</dd></div>
 <div><dt>Units</dt><dd>Power in MW and GW; energy in TWh and PJ (1 TWh = 3.6 PJ); CO₂ in Mt, million tonnes. Fuel prices per GJ on <span class="lx-term" data-term="net-calorific-value">net calorific values</span>.</dd></div>
-<div><dt>Short forms</dt><dd>O&amp;M: operation and maintenance. <span class="lx-term" data-term="lng">LNG</span>: liquefied natural gas, imported by ship. t per TJ: tonnes of CO₂ per terajoule of fuel.</dd></div>
+<div><dt>Short forms</dt><dd>O&amp;M: operation and maintenance. <span class="lx-term" data-term="lng">LNG</span>: liquefied natural gas, imported by ship. t per TJ: tonnes of CO₂ per terajoule of fuel. <span class="lx-term" data-term="mmbtu">MMBtu</span>: a million British thermal units, 1.055 GJ.</dd></div>
+<div><dt>Terms</dt><dd><span class="lx-term" data-term="primary-energy">Primary energy</span>: energy as found, before conversion. <span class="lx-term" data-term="firm-capacity">Firm clean</span>: the generic plant that runs steadily, within its availability, with no CO₂. A <span class="lx-term" data-term="combined-cycle">gas combined cycle</span> reuses its turbine's exhaust heat.</dd></div>
 </dl>
 <p class="lx-hint">Open-ended: start from a preset, change one thing at a time, and copy the plan link to keep a plan. Prairieland is fictional; its numbers are illustrative.</p>
 </div>
@@ -579,7 +580,8 @@ ul.task-list li input[type="checkbox"] {
 <li><b>Also left out:</b> the upkeep of the existing hydro and steady plants (the data give no figure; the same in every pathway).</li>
 <li><b>Precomputed:</b> the first view and the presets' full-year checks (about a minute of solving each) come from a library made with this engine; every run you start solves in your browser.</li>
 <li><b>Against lesson A20:</b> no pathway here gets below about 2,700 Mt (straight-line counting, central demand). <a href="a20-national-scenarios.html">A20</a> meets 2,600 Mt because its fastest path electrifies buildings and industry years sooner.</li>
-<li><b>Corrected 7 Nov 2026:</b> costs now include the existing wind, solar and batteries' fixed O&amp;M, the same in every pathway at one discount rate ($9.1 billion at 5%; central: $410.7 billion, was $401.6 billion). The full-year check buys gas in the slice run's own mix.</li>
+<li><details class="e4-corr"><summary><b>Corrected 8 Nov 2026:</b></summary> <span>the import cap's base now leaves out what batteries and links lose, so electricity lost there no longer helps meet it. Security first: $438.2 billion, was $520.4 billion.</span> <span>A run that misses a limit shows no electricity prices; the scarce-wind week's battery energy is paid back on winter days.</span></details></li>
+<li><details class="e4-corr"><summary><b>Corrected 7 Nov 2026:</b></summary> <span>costs now include the existing wind, solar and batteries' fixed O&amp;M, the same in every pathway at one discount rate ($9.1 billion at 5%; central: $410.7 billion, was $401.6 billion). The full-year check buys gas in the slice run's own mix.</span></details></li>
 </ul></div>
 <style>/* lesson-local */
 .page-learn .sb4-note ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 2px; }
@@ -591,6 +593,8 @@ ul.task-list li input[type="checkbox"] {
 .sb4-res h3 { margin: 0 0 6px; font-size: 16px; }
 .sb4-rules { margin: .4rem 0 0; padding-left: 1.2rem; display: grid; gap: 2px; }
 .lx-facts.sb4-pen { margin: .3rem 0 .6rem; }
+.page-learn .sb4-note details { margin: 0; } .page-learn .sb4-note summary { cursor: pointer; padding: 3px 0; min-height: 24px; }
+.page-learn .sb4-note li + li > details.e4-corr { margin-top: 4px; }
 </style>
 </div>
 <div id="results" class="lx-sec">
@@ -647,7 +651,7 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 </tbody>
 </table>
-</div><p class="lx-hint">Precomputed with this engine on 7 November 2026: one linear program over 2030–2050 on twelve time slices. Prairieland is fictional; its numbers are illustrative. With JavaScript on, the bench runs your own plan.</p>
+</div><p class="lx-hint">Precomputed with this engine on 8 November 2026: one linear program over 2030–2050 on twelve time slices. Prairieland is fictional; its numbers are illustrative. With JavaScript on, the bench runs your own plan.</p>
 
 </div>
 </div>
@@ -722,7 +726,8 @@ ul.task-list li input[type="checkbox"] {
 </div>
 <p>The budget and the cap are limits, not prices. A run that misses either is solved twice more: first for the least overshoot, serving no less demand; then for the least cost at that overshoot.</p>
 <p>So "out of reach" means no plan within your levers meets the limit; the run shown is the closest.</p>
-<p>A check on the default plan: plans within $1,000 of its best cost build the same national wind, solar, gas and firm capacity in 2030, 2040 and 2050, within 10 MW (the engine's test). That covers those totals only, not regions or links.</p>
+<p>A check on the default plan: every plan within $1,000 of its best cost builds the same national wind, solar, gas and firm capacity in 2030, 2040 and 2050, within 10 MW.</p>
+<p>That covers those national totals only, not regions or links.</p>
 <p>The tie rule picks one answer; it does not make it the only one. Within a millionth of the cost, 2046–2050's new solar can move by a gigawatt or more (<a href="m13-national-pathway.html">M13</a>, step 11).</p>
 </div>
 </details>
@@ -820,8 +825,8 @@ ul.task-list li input[type="checkbox"] {
 <td class="n">IPCC 2006 Guidelines, Volume 2, net calorific values</td>
 </tr>
 <tr class="odd">
-<td>Build limits, a region a period</td>
-<td class="n">wind 6, solar 8, batteries 6, gas 4 + 4, firm 2 GW</td>
+<td>Build limits, a period</td>
+<td class="n">each region: wind 6, solar 8, batteries 6, gas 4 + 4 GW; the generic firm option 10 GW for the nation (2 GW × 5 regions), with no location: its output is shared by each region's demand</td>
 <td class="n">fixed</td>
 <td class="n">set for teaching: one generic rule, no technology's own timeline</td>
 </tr>
@@ -855,7 +860,8 @@ ul.task-list li input[type="checkbox"] {
 <ul>
 <li>U.S. Energy Information Administration (April 2026). <a href="https://www.eia.gov/outlooks/aeo/assumptions/pdf/EMM_Assumptions.pdf">Assumptions to the Annual Energy Outlook 2026: Electricity Market Module</a>, Tables 3 and 4 (read 7 Nov 2026).</li>
 <li>U.S. Energy Information Administration. <a href="https://www.eia.gov/electricity/annual/html/epa_07_04.html">Electric Power Annual, Table 7.4: weighted average cost of fossil fuels for the electric power industry, 2015 through 2025</a> (2025: gas $3.85, coal $2.42 per MMBtu; read 7 Nov 2026).</li>
-<li>Cole, W., Ramasamy, V. and Turan, M. (2025). <a href="https://docs.nlr.gov/docs/fy25osti/93281.pdf">Cost Projections for Utility-Scale Battery Storage: 2025 Update</a> (PDF). NREL/TP-6A40-93281. Only its 2024 cost, in 2025 dollars, as the low end of the battery range.</li>
+<li>Cole, W., Ramasamy, V. and Turan, M. (2025). <a href="https://docs.nlr.gov/docs/fy25osti/93281.pdf">Cost Projections for Utility-Scale Battery Storage: 2025 Update</a> (PDF). NREL/TP-6A40-93281, June 2025. Only its 2024 cost, $372 per kW plus $241 per kWh in 2024 dollars ($1,336/kW for four hours; $1,371/kW in 2025 dollars), as the low end of the battery range.</li>
+<li>U.S. Bureau of Economic Analysis. <a href="https://apps.bea.gov/iTable/?reqid=19&amp;step=3&amp;isuri=1&amp;1921=survey&amp;1903=13&amp;1904=2022&amp;1905=2026&amp;1906=a&amp;1911=0">NIPA Table 1.1.9: Implicit Price Deflators for Gross Domestic Product</a>, line 1, annual (2017 = 100): 2024 125.587, 2025 128.893, the battery cost's conversion to 2025 dollars (last revised 29 October 2026; accessed 5 November 2026).</li>
 <li>Intergovernmental Panel on Climate Change (2006). <a href="https://www.ipcc.ch/report/2006-ipcc-guidelines-for-national-greenhouse-gas-inventories/">2006 IPCC Guidelines for National Greenhouse Gas Inventories, Volume 2: Energy</a>, chapters 1 and 2.</li>
 <li>U.S. Energy Information Administration. <a href="https://www.eia.gov/electricity/gridmonitor/">Hourly Electric Grid Monitor (Form EIA-930)</a>, Southwest Power Pool, 2025 and 2024 (accessed 2 and 3 Nov 2026).</li>
 <li>International Energy Agency. <a href="https://www.iea.org/statistics-questionnaires-faq">Statistics questionnaires FAQ</a>: the physical energy content method (read 7 Nov 2026).</li>

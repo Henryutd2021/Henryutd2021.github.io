@@ -115,12 +115,12 @@
     var r = M.run("solar", solarOver(M.D, st)), s = r.top[0], k = r.costs[0];
     if (r.top.noWeights) return NOWEIGHTS;
     if (!s) return "No block has room with these rules.";
-    return "Site **A** scores **" + sc(s.score) + "** of 100, " + A19.place(r.R, s.i, s.j, s.k) + " of the centre: " + musd(k.upfront) + " up front and " + gwh(k.mwh) + " a year. A score ranks sites; it is not a cost.";
+    return "Site **A** scores **" + sc(s.score) + "** of 100, " + A19.place(r.R, s.i, s.j, s.k) + " of the center: " + musd(k.upfront) + " up front and " + gwh(k.mwh) + " a year. A score ranks sites; it is not a cost.";
   }
   function s4Saw(M) {
     var D = M.D, dev = M.run("solar", { weights: presetW(D, "solar", "developer") }).top[0], nb = M.run("solar", { weights: presetW(D, "solar", "neighbours") }).top[0];
     var sh = M.shares("solar"), r0 = M.run("solar");
-    return "A developer's best site is " + A19.place(M.R, dev.i, dev.j, dev.k) + "; neighbours' is " + A19.place(M.R, nb.i, nb.j, nb.k) + ". Of " + sh.draws + " random weightings, default site A is the winning block in **" + pct(sh.wins.A / sh.draws) + "**; other blocks win " + pct(sh.other / sh.draws) + ".";
+    return "A developer's best site is " + A19.place(M.R, dev.i, dev.j, dev.k) + "; neighbors' is " + A19.place(M.R, nb.i, nb.j, nb.k) + ". Of " + sh.draws + " random weightings, default site A is the winning block in **" + pct(sh.wins.A / sh.draws) + "**; other blocks win " + pct(sh.other / sh.draws) + ".";
   }
   function sharesNote(M) {
     var sh = M.shares("solar");
@@ -181,7 +181,7 @@
     [["solar", "Solar farm, " + T.solar.mw + " MW: the five best 2 km × 2 km blocks"], ["wind", "Wind farm, " + T.wind.mw + " MW: the five best 7 km × 7 km blocks"], ["dc", "Data-center campus, " + T.dc.mw + " MW: the five best 1 km cells, at least 2 km apart"]].forEach(function (t) {
       var rows = rowsFor(M, t[0]), r = M.run(t[0]);
       out.push('<p class="a19-fb-h"><b>' + t[1] + "</b>. Land left after exclusions: " + km2(r.X.areaKm2) + ".</p>");
-      var head = ["Site", "Where (from the centre)", "Score", "Up front", "Substation", t[0] === "dc" ? "Water main" : "Energy a year"];
+      var head = ["Site", "Where (from the center)", "Score", "Up front", "Substation", t[0] === "dc" ? "Water main" : "Energy a year"];
       out.push('<div class="lx-scroll-x"><table class="lx-facts a19-fb"><thead><tr>' + head.map(function (h) { return '<th scope="col">' + h + "</th>"; }).join("") + "</tr></thead><tbody>" +
         rows.map(function (x) { return '<tr><th scope="row">' + x.id + "</th><td>" + x.where + "</td><td>" + x.score + "</td><td>" + x.upfront + "</td><td>" + x.sub + "</td><td>" + (t[0] === "dc" ? x.water : x.energy) + "</td></tr>"; }).join("") + "</tbody></table></div>");
     });
@@ -198,7 +198,7 @@
       { key: "exclude", name: "Exclude or weight?", here: f && a ? "Forbidding protected land adds " + musd(f.route.cost - a.route.cost) + " to the line; priced at " + mitWords(D) + ", it would cut through." : "No path in one of the two cases.", study: "Exclude only what a rule forbids; weight what people trade off, and say which is which." },
       { key: "res", name: "Resolution", here: "1 km cells leave " + km2(L.fine.X.areaKm2) + " for solar; 2 km cells, " + km2(L.coarse.X.areaKm2) + ". Setbacks are smaller than a cell.", study: "Use cells finer than the rules: NREL's supply curves work at 90 m." },
       { key: "vintage", name: "Data vintage", here: L.nNewer + " homes built since " + D.homes.vintage + " are missing from the dated layer" + (L.A && !L.stillHas ? "; one costs site A its room" : "") + ".", study: "Date every layer; check the leading sites on newer imagery and on the ground." },
-      { key: "who", name: "Who was asked", here: "A developer's and the neighbours' weights pick different sites; nobody in this map was asked.", study: "Set criteria and weights with the people affected, and record whose they are." }
+      { key: "who", name: "Who was asked", here: "A developer's and the neighbors' weights pick different sites; nobody in this map was asked.", study: "Set criteria and weights with the people affected, and record whose they are." }
     ];
   }
 
@@ -230,13 +230,13 @@
   // the top-sites table: the map's text version (cf-two: labelled lines on phones); a row's button highlights its site
   function SitesTable(host, onSel) {
     var box = H("div", { class: "a19-sites-box" }, host), cap = H("p", { class: "a19-tcap" }, box);
-    var tbl = H("table", { class: "a19-tbl" }, H("div", { class: "lx-scroll-x" }, box)), note = H("p", { class: "a19-tnote" }, box), sel = null;
+    var tbl = H("table", { class: "a19-tbl" }, H("div", { class: "lx-scroll-x" }, box)), note = H("p", { class: "a19-tnote" }, box), sel = null, btns = {};
     function set(rows, opts) {
       opts = opts || {};
-      cap.textContent = opts.caption || "The five best sites, the map's text version (km from the city centre)";
+      cap.textContent = opts.caption || "The five best sites, the map's text version (km from the city center)";
       note.textContent = opts.note || "Up front: the site's own costs in 2025 dollars (the new line, an access road" + (opts.lastKey === "water" ? ", land and a water main); the campus itself" : " and land); the plant itself") + " costs the same anywhere and is left out.";
       var head = ["Site", "Where", "Score", "Up front", "Grid", opts.last || "Energy a year"];
-      tbl.innerHTML = "";
+      tbl.innerHTML = ""; btns = {};
       var th = H("thead", null, tbl), tr = H("tr", null, th);
       head.forEach(function (h) { H("th", { scope: "col", text: h }, tr); });
       var tb = H("tbody", null, tbl);
@@ -244,7 +244,8 @@
       rows.forEach(function (r) {
         var row = H("tr", { class: r.id === sel ? "on" : "" }, tb), h = H("th", { scope: "row" }, row);
         var b = H("button", { type: "button", class: "a19-pick", "aria-pressed": r.id === sel ? "true" : "false", "aria-label": "Show site " + r.id + " on the map", text: r.id }, h);
-        b.addEventListener("click", function () { sel = sel === r.id ? null : r.id; onSel(sel); set(rows, opts); var nb = tbl.querySelector('button[aria-label="Show site ' + r.id + ' on the map"]'); if (nb) nb.focus(); });
+        btns[r.id] = b;
+        b.addEventListener("click", function () { sel = sel === r.id ? null : r.id; onSel(sel); set(rows, opts); if (btns[r.id]) btns[r.id].focus(); });
         [r.where, r.score, r.upfront, r.subId + (r.upgrade ? ", needs an upgrade" : ""), opts.lastKey ? r[opts.lastKey] : r.energy].forEach(function (c, i) { H("td", { class: i === 1 || i === 2 ? "n" : null, text: c == null ? "–" : c }, row); });
       });
     }
@@ -286,7 +287,7 @@
           act.lxSet = function (k) { show(k); };
         } },
       // 2 exclusions
-      { text: "A solar farm cannot go everywhere. [[exclusion-layer|Exclusion layers]] remove land outright: protected land, [[flood-zone|flood zones]], steep slopes and a setback from homes. Switch them and watch the land left.",
+      { text: "A solar farm cannot go everywhere. [[exclusion-layer|Exclusion layers]] remove land outright: protected land, [[flood-zone|flood zones]], steep slopes and a [[setback|setback]] from homes. Switch them and watch the land left.",
         build: function (act, api) {
           var map = mapIn(act, "Map of the solar farm's exclusions: hatched cells are excluded, shaded ones lose land to setbacks"), s = st(), moved = !!log.exMoved;
           var tg = H("div", { class: "lx-toggles a19-ctl", role: "group", "aria-label": "Exclusions for the solar farm" }, act), ts = {};
@@ -442,14 +443,16 @@
           }
           var ro = H("div", { class: "lx-readouts", "aria-live": "polite" }, act);
           H("p", { class: "lx-hint", text: TX.limits }, act);
-          var tbl = SitesTable(act, function () {});
+          // a row's button highlights its site on the current map (the cells and homes layer in force); a switch clears it
+          var shown = null, tbl = SitesTable(act, function (id) { if (shown) drawRun(map, shown.r, { homes: newer, ghost: shown.ghost, sel: id }); });
           function paint() {
             keep("lim", seen);
             var over = Object.assign({ exclusions: s.ex }, strictOver(D, "solar", s.strict));
             var r = M.run("solar", over, coarse ? { coarse: true } : newer ? { newer: true } : {}), A0 = M.run("solar", over).top[0], f = coarse ? 2 : 1;
             var ghost = (coarse || newer) && A0 ? { i: A0.i / f, j: A0.j / f, k: A0.k / f, label: "was A", key: "Site A before the change (dashed)" } : null;
+            shown = { r: r, ghost: ghost }; tbl.sel(null);
             drawRun(map, r, { homes: newer, ghost: ghost });
-            tbl.set(tableRows(r), { caption: coarse ? "The five best sites on 2 km cells (km from the city centre)" : "The five best sites (km from the city centre)", note: coarse ? "Costs need the 1 km cost surface, so this table leaves them out." : null });
+            tbl.set(tableRows(r), { caption: coarse ? "The five best sites on 2 km cells (km from the city center)" : "The five best sites (km from the city center)", note: coarse ? "Costs need the 1 km cost surface, so this table leaves them out." : null });
             readouts(ro, [["Cells", coarse ? "2 km" : "1 km"], ["Homes layer", newer ? M.D.homes.newer.year : String(D.homes.vintage)], ["Land left", km2(r.X.areaKm2)]]);
             if (seen.coarse && seen.newer) { api.done(); api.saw(s8Saw(M, s.ex, s.strict)); }
           }
@@ -500,7 +503,7 @@
         atN: { layers: [0, 0], excl: [1, 0], score: [1, 1], sites: [0, 1], cost: [0, 2], ask: [0, 3], back: [1, 3], field: [0, 4] },
         edges: [["layers", "excl"], ["excl", "score"], ["score", "sites"], ["sites", "cost"], ["cost", "ask"], ["ask", "field", "yes"], ["ask", "back", "no"]],
         traces: [{ label: "Your solar run", path: ["layers", "excl", "score", "sites", "cost"], text: top ? "Your rules leave " + km2(r.X.areaKm2) + "; your weights rank site A " + A19.place(M.R, top.i, top.j, top.k) + " first, at " + sc(top.score) + ": " + musd(k0.upfront) + " up front, " + gwh(k0.mwh) + " a year." : r.top.noWeights ? "Your rules leave " + km2(r.X.areaKm2) + "; your weights are all 0, so no site is ranked." : "No block has room with your rules." },
-                 { label: "When people disagree", path: ["sites", "cost", "ask", "back"], text: "Neighbours' weights pick another site: the screen goes back to its weights, not to a new map." }]
+                 { label: "When people disagree", path: ["sites", "cost", "ask", "back"], text: "Neighbors' weights pick another site: the screen goes back to its weights, not to a new map." }]
       });
       var c2 = H("div", { class: "lx-xcard" }, host);
       LX.CompareTable(c2, { title: "Five limits of a suitability map", text: true,

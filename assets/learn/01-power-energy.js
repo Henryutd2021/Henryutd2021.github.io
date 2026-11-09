@@ -51,7 +51,8 @@
     return num(v, d) + " " + RUNGS[r];
   }
   function fmtKW(w) { return num(w / 1000, w >= 10000 ? 1 : 2) + " kW"; }
-  function fmtKWh(wh) { return num(wh / 1000, wh >= 10000 ? 1 : 2) + " kWh"; }
+  // below 10 Wh the meter shows Wh, so a small positive amount never reads as 0.00 kWh
+  function fmtKWh(wh) { return wh > 0 && wh < 10 ? num(wh, wh < 1 ? 2 : 1) + " Wh" : num(wh / 1000, wh >= 10000 ? 1 : 2) + " kWh"; }
   function fmtW(w) { return w >= 1000 ? num(w / 1000, w % 1000 ? 1 : 0) + " kW" : num(w, 0) + " W"; }
   function fmtDur(min) {
     var h = Math.floor(min / 60 + 1e-9), m = Math.round(min - 60 * h), s = Math.round((min - Math.floor(min)) * 60);
@@ -161,7 +162,7 @@
 
   // ---- the appliance board: toggles, two meters, the clock, a power-over-time and energy-over-time chart
   function Board(W) {
-    var el = H("div", { class: "t1-board" }), on = {}, m = newMeter(), listeners = [], busy = false, cap = KWH_STEPS[0];
+    var el = H("div", { class: "t1-board" }), on = {}, m = newMeter(), listeners = [], busy = false, cap = KWH_STEPS[0], gen = 0;
     var devBox = H("div", { class: "t1-devs", role: "group", "aria-label": "Appliances: switch each on or off" }, el), btn = {};
     W.devs.forEach(function (d) {
       var b = H("button", { class: "t1-dev", type: "button", "aria-pressed": "false" }, devBox);
@@ -189,22 +190,26 @@
     var rs = H("button", { class: "lx-link", type: "button", text: "Reset the meter" }, ctl);
     r10.addEventListener("click", function () { go(10); });
     r60.addEventListener("click", function () { go(60); });
-    rs.addEventListener("click", function () { m = newMeter(); cap = KWH_STEPS[0]; paint(); fire(); });
+    rs.addEventListener("click", function () { stop(); m = newMeter(); cap = KWH_STEPS[0]; paint(); fire(); });
     var by = H("div", { class: "t1-by", "aria-live": "polite" }, el);
     var chart = H("div", { class: "t1-chart" }, el);
     var alt = H("details", { class: "lx-textalt" }, el); H("summary", { text: "Text version of the chart" }, alt);
     var altBox = H("div", null, alt);
 
+    // during a compressed run the clock and the appliance switches are locked; Reset cancels the run (gen counts runs)
+    function lock(on_) { busy = on_; r10.disabled = r60.disabled = on_; Object.keys(btn).forEach(function (k) { btn[k].disabled = on_; }); }
+    function stop() { gen++; if (busy) lock(false); }
     function go(minutes) {
       if (busy) return;
       var p = power(W.devs, on);
       if (LX.reduced() || p === 0) { m = run(m, W.devs, on, minutes); paint(); fire(); return; }
       // a short count-up: the meter runs in small slices so the tub fills and the chart grows
-      busy = true; r10.disabled = r60.disabled = true;
-      var done = 0, slices = 12, step = minutes / slices;
+      lock(true);
+      var done = 0, slices = 12, step = minutes / slices, my = ++gen;
       (function tick() {
+        if (my !== gen) return;   // reset while running: drop the rest of this run
         m = run(m, W.devs, on, step); done++; paint();
-        if (done < slices) setTimeout(tick, 45); else { busy = false; r10.disabled = r60.disabled = false; paint(); fire(); }
+        if (done < slices) setTimeout(tick, 45); else { lock(false); paint(); fire(); }
       })();
     }
     function paint() {
@@ -286,8 +291,8 @@
     paint();
     return {
       el: el, state: state, listen: function (f) { listeners = f ? [f] : []; },
-      reset: function () { m = newMeter(); cap = KWH_STEPS[0]; paint(); },
-      only: function (ids, f) { on = {}; (ids || []).forEach(function (k) { on[k] = true; }); paint(); if (f) fire(); },
+      reset: function () { stop(); m = newMeter(); cap = KWH_STEPS[0]; paint(); },
+      only: function (ids, f) { stop(); on = {}; (ids || []).forEach(function (k) { on[k] = true; }); paint(); if (f) fire(); },
       run: function (min) { m = run(m, W.devs, on, min); paint(); fire(); }
     };
   }
@@ -346,8 +351,8 @@
     function keep(k, v) { P[k] = v; LX.store.set("t1-log", P); LX.emit("t1-log", P); }
     board.listen(null);
     var steps = [
-      { text: "Two jobs, one question. A " + pa.label.toLowerCase() + " runs at " + num(pa.watts, 0) + " W for " + W.predict.a.minutes + " minutes. A " +
-              pb.label.toLowerCase() + " runs at " + pb.watts + " W for " + W.predict.b.minutes / 60 + " hours. Which uses more [[energy|energy]]?",
+      { text: "Two jobs: a " + pa.label.toLowerCase() + " at " + num(pa.watts, 0) + " W for " + W.predict.a.minutes + " minutes, and a " +
+              pb.label.toLowerCase() + " at " + pb.watts + " W for " + W.predict.b.minutes / 60 + " hours. Which uses more [[energy|energy]]?",
         build: function (act, api) {
           LX.Predict(act, { id: "t1-two-jobs", options: [{ value: "a", label: "The " + pa.label.toLowerCase() }, { value: "b", label: "The " + pb.label.toLowerCase() }, { value: "same", label: "The same" }],
             lockText: "Locked in. You will test it on the appliance board in step 4.", onPick: function (v) { guess = v; api.done(); } });
@@ -414,7 +419,7 @@
             });
           });
         } },
-      { text: "Energy comes in sizes 1,000 times apart. Put each item on its rung of the ladder, from charging a phone once to the whole country's year.",
+      { text: "Energy comes in sizes 1,000 times apart. Guess each item's rung: the largest unit that keeps its amount at 1 or more, from a phone charge to the country's year.",
         build: function (act, api) {
           board.listen(null);
           if (!ladder) ladder = Ladder(W);

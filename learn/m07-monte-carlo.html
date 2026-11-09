@@ -514,7 +514,7 @@ window.Quarto = {
 <li>Monte Carlo error over 20 seeds: P90 $200.1M ± $1.3M (two standard errors) with 1,000 runs, ± $4.7M with 100.</li>
 <li>A chance under these inputs: above $200M, 0.0% of runs at 12 months, 10.1% at 24 and 92.9% at 36.</li>
 <li>Spearman's rank correlation with the developer's cost: margin 0.86 (rank 1); then capital 0.38 and discount rate 0.31 (tied, rank 2–3); with other customers' cost: upgrades 0.81 (rank 1); then never arrives 0.54 (rank 2).</li>
-<li>Narrow the margin's range to ± $5,000: capital 0.64 and discount rate 0.59 (tied, rank 1–2), and the margin (0.47) ranks 3.</li>
+<li>Narrow the margin's range to ± $6,000: capital 0.61 (rank 1–2) and discount rate 0.56 (rank 1–3) tie for first, and the margin (0.54) ranks 2–3.</li>
 </ol>
 <p class="lx-eyebrow">The summaries on this page</p>
 <div class="lx-scroll-x">
@@ -700,7 +700,7 @@ window.Quarto = {
 <p class="lx-hint" style="margin-top:.6rem">About 35 guided minutes in ten steps. Every run is computed in your browser; nothing is sent anywhere.</p>
 <div class="lx-card lx-notebook m7-nb">
 <p class="lx-eyebrow">Build it in Python · notebook lab, about 45 minutes, then 60 minutes of practice</p>
-<p>The same toy and the same seeded Latin hypercube in NumPy: <code>assert</code> cells check your runs against the page, then SciPy's own Latin hypercube, Spearman's ρ and variance shares (Sobol indices) take over.</p>
+<p>The same toy and the same seeded Latin hypercube in NumPy: <code>assert</code> cells check your runs against the page, then SciPy's own Latin hypercube and Spearman's ρ take over. An optional extension estimates variance shares (Sobol indices).</p>
 <ol class="m7-nb-steps">
 <li>Download the notebook and the lesson data into one folder (in Colab, upload the data with the folder icon).</li>
 <li>Open it in Google Colab (<em>File → Upload notebook</em>) or locally with Python 3, NumPy and SciPy 1.9 or later.</li>
@@ -732,13 +732,15 @@ window.Quarto = {
 <ul>
 <li><strong>The toy.</strong> With <span class="math inline">\(i = (1+r)^{1/12} - 1\)</span> and <span class="math inline">\(A = \frac{1 - (1+i)^{-\tau}}{i}\)</span>, the developer’s cost is <span class="math inline">\(D = (m P + K i)\,A\)</span> and other customers’ is <span class="math inline">\(R = U i A + \min(0.5,\, h\tau)\, U (1+i)^{-\tau}\)</span>.</li>
 <li><strong>Symbols.</strong> <span class="math inline">\(m\)</span> margin ($ per MW a month), <span class="math inline">\(P\)</span> = 100 MW, <span class="math inline">\(K\)</span> idle capital ($), <span class="math inline">\(r\)</span> yearly discount rate, <span class="math inline">\(U\)</span> upgrade cost ($), <span class="math inline">\(\tau\)</span> the wait (months).</li>
-<li><strong>The never-arrives chance.</strong> <span class="math inline">\(h\)</span> is in percentage points added a month, not compounded: <span class="math inline">\(h\tau\)</span> = 24 × 0.5 points = 12%, capped at 50%.</li>
+<li><strong>The never-arrives chance.</strong> Added each month, not compounded: <span class="math inline">\(h\tau\)</span> = 24 × 0.5 points = 12%, capped at 50%.</li>
+<li><strong>Its unit in the formula.</strong> <span class="math inline">\(h\)</span> enters as a fraction: <span class="math inline">\(h\)</span> = 0.005 a month (0.5 percentage points), so <span class="math inline">\(h\tau\)</span> = 0.12 and the cap is 0.5.</li>
 <li><strong>Latin hypercube.</strong> Run <span class="math inline">\(a\)</span>’s draw of input <span class="math inline">\(j\)</span> is <span class="math inline">\(u_{a,j} = (\pi_j(a) + \xi_{a,j})/N\)</span>, with <span class="math inline">\(\pi_j\)</span> a random ordering of <span class="math inline">\(0, \dots, N-1\)</span> and <span class="math inline">\(\xi\)</span> uniform on <span class="math inline">\([0, 1)\)</span>; the value is <span class="math inline">\(\text{lo} + u\,(\text{hi} - \text{lo})\)</span>.</li>
 <li><strong>Spearman’s ρ.</strong> The correlation of the ranks; with no ties, <span class="math inline">\(\rho = 1 - \frac{6 \sum_a d_a^2}{N (N^2 - 1)}\)</span>, where <span class="math inline">\(d_a\)</span> is run <span class="math inline">\(a\)</span>’s rank of the input minus its rank of the cost.</li>
 <li><strong>Monte Carlo error.</strong> The standard error of an estimate is the standard deviation of that estimate over 20 repeats with other seeds; 20 repeats make the error itself rough, about ± 16%.</li>
 <li><strong>What the hypercube buys.</strong> Over 20 seeds, the mean cost of 1,000 runs scatters by $0.03M with a Latin hypercube and $0.80M with plain random draws (one standard error); the P90, by $0.65M and $0.80M.</li>
 <li><strong>A share’s error.</strong> For plain random draws, K5’s <span class="math inline">\(\sqrt{p(1-p)/N}\)</span> gives 0.95 points for the 10.1% above $200M; the Latin hypercube repeats scatter by 0.52 points.</li>
-<li><strong>Near a corner.</strong> With continuous inputs, an exact corner has zero chance. Near one (the margin, capital and discount rate all in the same outer tenth of their ranges) has 0.1³ = 0.1% per corner, so 1,000 runs expect 2; seed 7 has 2, both at the high-cost end.</li>
+<li><strong>An exact corner.</strong> With continuous inputs, an exact corner has zero chance.</li>
+<li><strong>Near a corner.</strong> The margin, capital and discount rate all in the same outer tenth of their ranges: 0.1³ = 0.1% per corner, so 1,000 runs expect 2. Seed 7 has 2, both at the high-cost end.</li>
 </ul>
 </div>
 </details>
@@ -747,7 +749,7 @@ window.Quarto = {
 <div class="lx-deeper-body">
 <ul>
 <li><strong>Monotone effects only.</strong> ρ reads how consistently the cost rises or falls with an input. An input that matters only through another (an interaction) or pushes the cost up and then down can show ρ near 0.</li>
-<li><strong>Variance shares.</strong> Sobol indices split the variance of the cost among the inputs and their interactions; with <span class="math inline">\(k\)</span> inputs they need about <span class="math inline">\(N(k+2)\)</span> runs. The lab estimates them for this toy.</li>
+<li><strong>Variance shares.</strong> Sobol indices split the variance of the cost among the inputs and their interactions; with <span class="math inline">\(k\)</span> inputs they need about <span class="math inline">\(N(k+2)\)</span> runs. The lab’s optional extension estimates them for this toy.</li>
 <li><strong>Inputs that move together.</strong> Draw them with a stated rank correlation (Iman and Conover’s method; the lab’s practice task 3 uses a simplified two-input version), or sample whole records from data, as <a href="k05-probability-statistics.html">K5</a> suggests.</li>
 <li><strong>Slow models.</strong> When 1,000 runs take too long, a fast stand-in fitted to a few runs does the sampling (<a href="../learn/m09-surrogates-uq.html">M9</a>); deciding before the uncertainty resolves is <a href="../learn/m08-stochastic-robust.html">M8</a>.</li>
 </ul>
@@ -773,7 +775,7 @@ window.Quarto = {
 <div class="lx-qq" data-id="rank" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “The input with the largest rank correlation matters most in the real world.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. ρ ranks inputs within the ranges you assumed: narrow the margin's to ± $5,000 and it drops from first to third.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. ρ ranks inputs within the ranges you assumed: narrow the margin's to ± $6,000 and capital ranks clearly above it.</p></details>
 </div>
 </div>
 
@@ -795,7 +797,7 @@ window.Quarto = {
 <ul>
 <li>Clone and install the repository (its README's quick start), then write the illustrative files: <code>code-delay example my_scenario.json --grid grid.json --ranges ranges.json</code>.</li>
 <li>Run <code>code-delay lhs my_scenario.json ranges.json --samples 500 --seed 1 --out-dir outputs/lhs</code>; open <code>rank_correlations.csv</code>.</li>
-<li>Rerun with <code>--seed 2</code>. Do any two inputs swap places? Then treat them as tied, as step 9 does.</li>
+<li>Rerun with <code>--seed 2</code>. Do any two inputs swap places? A swap warns that their order may be unstable; step 9's rule settles it from 20 seeds.</li>
 </ul>
 <p><a href="https://github.com/Henryutd2021/code-delayed-energization">code-delayed-energization</a>: public example repository · MIT licence · illustrative inputs.</p>
 </div>

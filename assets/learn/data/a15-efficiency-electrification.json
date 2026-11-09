@@ -120,6 +120,7 @@
     {
       "key": "condensing",
       "label": "Condensing gas furnaces (99%) at replacement",
+      "term": "condensing-furnace",
       "short": "Condensing furnaces",
       "carrier": "gas",
       "price": "residential",
@@ -257,7 +258,7 @@
     "hpMaxC2024": 175,
     "boilerEff": 0.98,
     "ovenEff": 0.98,
-    "note": "This exercise takes 165 C as the heat pumps' reach: LBNL's 2022 report finds heat-sink temperatures up to 165 C commercially available at scale, and DOE's January 2024 tip sheet says heat pumps deliver up to about 175 C (hpMaxC2024); either way, part of the steam band is within reach and most of it is not. Their COP ranges from 1.6 to 5.8 at temperature lifts (delivery minus source temperature) of 130 to 40 K (LBNL, 2022); DOE's tip sheet works an example from 40 to 100 C at a COP of about 2.92. Electric boilers 98% (EIA). Electric ovens and furnaces are taken as 98% too (illustrative). Every band is assumed fully electrified, a ceiling, not a forecast.",
+    "note": "This exercise takes 165 C as the heat pumps' reach: LBNL's 2022 report finds heat-sink temperatures up to 165 C commercially available at scale, and DOE's January 2024 tip sheet says heat pumps deliver up to about 175 C (hpMaxC2024); either way, the steam band (100 to 400 C) crosses that reach, and the data give only the band's total, so the lesson assigns the whole band to electric boilers for simplicity. Their COP ranges from 1.6 to 5.8 at temperature lifts (delivery minus source temperature) of 130 to 40 K (LBNL, 2022); DOE's tip sheet works an example from 40 to 100 C at a COP of about 2.92. Electric boilers 98% (EIA). Electric ovens and furnaces are taken as 98% too (illustrative). Every band is assumed fully electrified, a ceiling, not a forecast.",
     "src": [
       "lbnl-ihp-2022",
       "doe-iac-tip2",
@@ -268,8 +269,8 @@
     "cop": 1.75,
     "atF": 5,
     "atC": -15,
-    "note": "ENERGY STAR's cold-climate criteria for air-source heat pumps, as EIA's equipment study lists them: a COP of at least 1.75 at 5 F.",
-    "src": "eia-equip-2023-a"
+    "note": "ENERGY STAR's cold-climate criteria for air-source heat pumps: a COP of at least 1.75 at 5 F, and at 5 F at least 70% of the heating capacity at 47 F (read on ENERGY STAR's key product criteria page; EIA's equipment study lists the COP too).",
+    "src": "energystar-cchp"
   },
   "facts": [
     {
@@ -295,13 +296,20 @@
     },
     {
       "n": "COP 1.75 at 5 F",
-      "what": "The least heating COP at 5 F (-15 C) for ENERGY STAR's cold-climate criteria, as EIA's equipment study lists them.",
+      "what": "The least heating COP at 5 F (-15 C) in ENERGY STAR's cold-climate criteria for air-source heat pumps (key product criteria, read 8 November 2026), as EIA's equipment study also lists it.",
       "source": "EIA, Updated Buildings Sector Appliance and Equipment Costs and Efficiencies, Appendix A, p. 40",
       "url": "https://www.eia.gov/analysis/studies/buildings/equipcosts/",
       "asof": "March 2023"
     }
   ],
   "sources": {
+    "energystar-cchp": {
+      "title": "Air Source Heat Pumps: Key Product Criteria (cold climate)",
+      "publisher": "ENERGY STAR (U.S. Environmental Protection Agency and Department of Energy)",
+      "date": "read 8 November 2026",
+      "url": "no link",
+      "where": "cold climate: a COP of at least 1.75 at 5 F (Appendix M1 H42 test), and heating capacity at 5 F at least 70% of that at 47 F"
+    },
     "eia-equip-2023-a": {
       "title": "Updated Buildings Sector Appliance and Equipment Costs and Efficiencies, Appendix A (reference case)",
       "publisher": "U.S. Energy Information Administration (prepared by Guidehouse and Leidos)",

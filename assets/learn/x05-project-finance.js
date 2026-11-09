@@ -92,6 +92,7 @@
   // ---------------------------------------------------------------- formats
   function fmtN(v, d) { return Number(v).toLocaleString("en-US", { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 }); }
   function M(v) { return "$" + fmtN(v / 1e6, 1) + "M"; }
+  function M3(v) { return "$" + fmtN(v / 1e6, 3) + "M"; }   // to the nearest $1,000
   function pct(x, d) { return fmtN(100 * x, d || 0) + "%"; }
   function x2(v) { return fmtN(v, 2); }
   function usd(v, d) { return "$" + fmtN(v, d || 0); }
@@ -100,9 +101,9 @@
   function steps(P, L) {
     return [
       "Prairie Town's " + P.windMW + " MW wind farm and a " + P.batMW + " MW, " + P.batH + "-hour battery cost about $" + fmtN(P.capex / 1e6) + " million to build, in 2025 dollars. Who usually puts in most of that money?",
-      "That money comes in layers, a [[capital-stack|capital stack]], each paid back in a set order. Tap all four layers to see who provides it, what it gets and when it is paid.",
+      "That money comes in layers, a [[capital-stack|capital stack]]: lenders and investors are repaid in a set order; a grant is not repaid. Tap each of the four layers to see who provides it.",
       "Lenders size the loan from the [[cash-flow-available-for-debt-service|cash available for debt service]]: revenue minus operating costs. Slide the loan; find the largest one whose [[debt-service-coverage-ratio|coverage ratio]] stays at " + x2(L.dscrContract) + " or above.",
-      "Now sell less of the output under contract: on average the project earns the same, but the lender counts market cash at a stricter " + x2(L.dscrMerchant) + ". Slide the share, then switch on a bad year.",
+      "Now sell less output under contract: the project earns the same on average, but the lender asks a stricter " + x2(L.dscrMerchant) + " from market cash. Slide the share to " + pct(LOW) + " or less, then switch on a bad year.",
       "Fill the rest of the stack with [[tax-equity|tax equity]] and a grant, if the project can get them. Watch the [[sponsor-equity|sponsor's]] own share shrink.",
       "A bad year arrives and cash falls short of what everyone expected. Who loses money first?"
     ];
@@ -115,7 +116,7 @@
     } };
   function costChain(P) {
     return [{ v: fmtN(P.windMW * 1000) + " kW × $" + fmtN(P.wCapex) + "/kW", u: "the wind farm" }, { op: "=" }, { v: M(P.capexWind), u: "wind farm" }, { op: "+" },
-            { v: M(P.capexBat), u: "battery: " + fmtN(P.batMW * 1000) + " kW × $" + fmtN(P.bPow, 2) + " + " + fmtN(P.batMWh * 1000) + " kWh × $" + fmtN(P.bEn, 2) }, { op: "=" },
+            { v: M(P.capexBat), u: "battery: " + fmtN(P.batMW * 1000) + " kW × $" + fmtN(P.bPow, 2) + "/kW + " + fmtN(P.batMWh * 1000) + " kWh × $" + fmtN(P.bEn, 2) + "/kWh" }, { op: "=" },
             { v: M(P.capex), u: "to build, 2025 dollars", out: true }];
   }
   function costSaw(P) { return "The money: " + M(P.capexWind) + " for the wind farm and " + M(P.capexBat) + " for the battery, " + M(P.capex) + " in all (building costs from lessons 7 and 13)."; }
@@ -124,6 +125,7 @@
     return "<b>" + esc(l.label) + "</b><dl class=\"x5-dl\"><dt>Who</dt><dd>" + esc(l.who) + "</dd><dt>Gets</dt><dd>" + esc(l.gets) + "</dd><dt>Paid</dt><dd>" + esc(l.paid) + "</dd></dl>";
   }
   var LAYER_SAW = "Order of payment in this example: operating costs, then the loan, then tax equity, then the sponsor. A grant is never paid back.";
+  var LOW = 0.5;   // step 4 asks for a contracted share of 50% or less before it counts as done
   // where a typical year's cash comes from (the battery's earnings are already net of its charging costs)
   function ledgerRows(P) {
     return [["Wind sales", fmtN(P.windMWh) + " MWh × $" + fmtN(P.price) + "/MWh", P.windRev], ["Battery earnings after charging", fmtN(P.discharged) + " MWh discharged × $" + fmtN(P.margin, 2) + "/MWh margin", P.batRev],
@@ -134,7 +136,8 @@
   }
   function cashLine(P, L, loanM) {
     var pay = payment(L, loanM * 1e6), d = dscr(P.cf, loanM * 1e6, L);
-    return isFinite(d) ? "DSCR = " + M(P.cf) + " ÷ " + M(pay) + " = **" + fmtN(d, 3) + "**" : "DSCR: no loan, no payment to cover.";
+    // the amounts are rounded to $1,000 and the ratio comes from the unrounded ones, hence "≈"
+    return isFinite(d) ? "DSCR = " + M3(P.cf) + " ÷ " + M3(pay) + " ≈ **" + fmtN(d, 3) + "**" : "DSCR: no loan, no payment to cover.";
   }
   function loanVerdict(P, L, loanM) {
     var d = dscr(P.cf, loanM * 1e6, L);
@@ -149,6 +152,8 @@
     var D = debtMax(P, L, s), B = X.bad;
     return "At " + pct(s) + " contracted the lender offers **" + M(D) + "** (" + pct(D / P.capex) + " of the cost); in a bad year the cash covers its payment " + x2(dscr(yearCF(P, s, B), D, L)) + " times.";
   }
+  // the toy lender's rule for a part-contracted project: a loan on each share of the cash at its own coverage, added
+  function ruleLine(L) { return "The toy lender sizes one loan on the contracted share of the cash, at " + x2(L.dscrContract) + ", and one on the market share, at " + x2(L.dscrMerchant) + ", then adds them; both ratios are illustrative."; }
   function contractSaw(P, L, X) {
     var B = X.bad, D1 = debtMax(P, L, 1), D0 = debtMax(P, L, 0);
     return "Fully contracted: " + M(D1) + " of debt, and a bad year still covers the payment " + x2(dscr(yearCF(P, 1, B), D1, L)) + " times. Fully merchant: " + M(D0) + ", and a bad year covers it only " + x2(dscr(yearCF(P, 0, B), D0, L)) + " times.";
@@ -166,7 +171,8 @@
   // ---------------------------------------------------------------- the no-JS block, ideas, check, facts and sources
   function esc(t) { return String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
   var SHARES = [1, 0.5, 0];
-  var ORDER = ["sponsor", "te", "debt", "grant"];   // the stack's layers, top to bottom on screen
+  var REPAID = ["sponsor", "te", "debt"];   // the repaid layers, top to bottom on screen (paid last to paid first)
+  var ORDER = REPAID.concat(["grant"]);      // and the grant, drawn apart below them
   // every layer keeps a minimum height so its label fits, so a scaled stack is not exactly to scale
   var SCALED_CAP = "Heights approximate (each layer keeps a minimum height); read the percentages for exact shares.";
   // the explain layer's opening line: the reader's own settings (refreshed whenever they change)
@@ -174,13 +180,14 @@
   function staticFallback(P, L, X) {
     return "<p class=\"lx-eyebrow\">One wind and storage project, one typical year, 2025 dollars (illustrative)</p>" +
       "<p>" + P.windMW + " MW of wind and a " + P.batMW + " MW, " + P.batH + "-hour battery cost " + M(P.capex) + " to build. A typical year's cash:</p>" + ledgerHTML(P) +
-      "<p class=\"lx-eyebrow\">The four layers of the capital stack, in the order they are paid</p><ul class=\"x5-fbl\">" +
+      "<p class=\"lx-eyebrow\">The capital stack: three layers in the order they are repaid, then a grant, which is not</p><ul class=\"x5-fbl\">" +
       ["debt", "te", "sponsor", "grant"].map(function (k) { var l = X.layers.filter(function (y) { return y.key === k; })[0]; return "<li><b>" + esc(l.label) + "</b><ul><li>Who: " + esc(l.who) + "</li><li>Gets: " + esc(l.gets) + "</li><li>Paid: " + esc(l.paid) + "</li></ul></li>"; }).join("") +
       "</ul><p class=\"lx-hint\">" + esc(X.structure) + "</p>" +
       "<div class=\"lx-scroll-x\"><table class=\"lx-mini-table x5-fbt\"><thead><tr><th scope=\"col\">Sold under contract</th><th scope=\"col\">Largest loan</th><th scope=\"col\">Share of the cost</th><th scope=\"col\">Sponsor's share with no tax equity or grant</th><th scope=\"col\">Bad-year coverage</th></tr></thead><tbody>" +
       SHARES.map(function (s) { var D = debtMax(P, L, s); return "<tr><td>" + pct(s) + "</td><td>" + M(D) + "</td><td>" + pct(D / P.capex) + "</td><td>" + pct(1 - D / P.capex) + "</td><td>" + x2(dscr(yearCF(P, s, X.bad), D, L)) + "</td></tr>"; }).join("") +
       "</tbody></table></div>" +
-      "<p class=\"lx-hint\">The lender asks " + x2(L.dscrContract) + " times the payment from contracted cash and " + x2(L.dscrMerchant) + " from market cash; loan at " + fmtN(L.rate, 1) + "% over " + L.term + " years, no inflation. Bad year: 10% less wind and market prices 40% lower. Illustrative settings.</p>" +
+      "<p class=\"lx-hint\">" + esc(ruleLine(L)) + "</p>" +
+      "<p class=\"lx-hint\">Loan at " + fmtN(L.rate, 1) + "% over " + L.term + " years, no inflation. " + esc(X.bad.note.split(". ")[0]) + ".</p>" +
       "<p class=\"lx-hint\">With JavaScript on, you build the stack step by step: tap its layers, size the loan, sell less under contract, add tax equity and a grant, and see who loses first in a bad year.</p>";
   }
   function ideasHTML(P, L, X) {
@@ -190,12 +197,12 @@
       "<dt>Order of payment</dt><dd>With project-level debt, as here, cash pays operating costs, then the loan, then tax equity, then the sponsor; the sponsor is paid last and loses first.</dd>" +
       "<dt>Coverage</dt><dd>A lender sizes the loan so the cash available for debt service covers each payment by a margin, the debt-service coverage ratio.</dd>" +
       "<dt>Why contracts matter</dt><dd>With the same expected revenue, this project supports " + M(D1) + " of debt fully contracted and " + M(D0) + " fully merchant.</dd>" +
-      "<dt>Illustrative</dt><dd>One typical year in 2025 dollars with no inflation, settings inside the dated ranges of NREL's 2025 ATB; no taxes, flips or reserves.</dd></dl>";
+      "<dt>Illustrative</dt><dd>One typical year in 2025 dollars with no inflation; the lender's coverage ratios are the toy's own; no taxes, tax-equity terms or reserve accounts.</dd></dl>";
   }
   function checkHTML(P, L) {
     var pay = payment(L, debtMax(P, L, 1)), d = P.cf / pay;
     return "<div class=\"lx-myths\" data-quiz=\"x05-myth\">" +
-      "<div class=\"lx-qq\" data-id=\"debtcost\" data-answer=\"myth\"><p class=\"lx-qtext\">Myth or fact? “Debt is the most expensive money in a project's capital stack.”</p><ul class=\"lx-choices\"><li data-value=\"myth\">Myth</li><li data-value=\"fact\">Fact</li></ul><details class=\"lx-answer\"><summary>Answer</summary><p>Myth. Debt is paid first and protected by the project's assets pledged as security, so it asks the lowest return: the 2025 ATB assumes " + fmtN(L.rate, 1) + "% for term debt and more for equity.</p></details></div>" +
+      "<div class=\"lx-qq\" data-id=\"debtcost\" data-answer=\"myth\"><p class=\"lx-qtext\">Myth or fact? “Debt is the most expensive money in a project's capital stack.”</p><ul class=\"lx-choices\"><li data-value=\"myth\">Myth</li><li data-value=\"fact\">Fact</li></ul><details class=\"lx-answer\"><summary>Answer</summary><p>Myth. Debt is paid first and protected by the project's assets pledged as security, so it asks a lower return than equity: the 2025 ATB assumes " + fmtN(L.rate, 1) + "% for term debt and more for equity.</p></details></div>" +
       "</div><div class=\"lx-quiz\" data-quiz=\"x05\">" +
       "<div class=\"lx-qq\" data-id=\"dscr\" data-answer=\"b\"><p class=\"lx-qtext\">A project's cash available for debt service is " + M(P.cf) + " a year and its loan payment is " + M(pay) + ". What is its debt-service coverage ratio?</p><ul class=\"lx-choices\"><li data-value=\"a\">About " + x2(pay / P.cf) + "</li><li data-value=\"b\">About " + x2(d) + "</li><li data-value=\"c\">About " + x2(d + 1) + "</li></ul><details class=\"lx-answer\"><summary>Answer</summary><p>" + M(P.cf) + " ÷ " + M(pay) + " = " + x2(d) + ": the cash covers the payment " + x2(d) + " times. The ratio is cash over payment, not payment over cash (" + x2(pay / P.cf) + ").</p></details></div>" +
       "</div>";
@@ -204,14 +211,16 @@
   // for how a rate and a term turn a payment into a loan); every shown number follows from the ones shown before it
   function sizing(P, L) {
     var cfM = Math.round(P.cf / 1e3) / 1e3, payC = Math.round(cfM / L.dscrContract * 1e3) / 1e3, payM = Math.round(cfM / L.dscrMerchant * 1e3) / 1e3;
-    return { cfM: cfM, payC: payC, payM: payM, c: Math.round(payC / payRate(L) * 100) / 100, m: Math.round(payM / payRate(L) * 100) / 100 };
+    var c = Math.round(payC / payRate(L) * 100) / 100, m = Math.round(payM / payRate(L) * 100) / 100;
+    return { cfM: cfM, payC: payC, payM: payM, c: c, m: m, half: Math.round((c + m) / 2 * 100) / 100 };
   }
   function deeperHTML(P, L) {
     var z = sizing(P, L);
     return "<p>The lender's rule in words: the yearly loan payment may be at most the cash available for debt service divided by the coverage it asks.</p>" +
-      "<p class=\"x5-eq\">largest payment = CFADS ÷ DSCR</p>" +
+      "<p class=\"x5-eq\">largest payment = <span class=\"lx-term\" data-term=\"cash-flow-available-for-debt-service\">CFADS</span> ÷ <span class=\"lx-term\" data-term=\"debt-service-coverage-ratio\">DSCR</span></p>" +
       "<ul><li><b>Fully contracted:</b> $" + fmtN(z.cfM, 3) + "M ÷ " + x2(L.dscrContract) + " = $" + fmtN(z.payC, 3) + "M a year; at " + fmtN(L.rate, 1) + "% over " + L.term + " years that payment repays a loan of $" + fmtN(z.c, 2) + "M.</li>" +
       "<li><b>Fully merchant:</b> $" + fmtN(z.cfM, 3) + "M ÷ " + x2(L.dscrMerchant) + " = $" + fmtN(z.payM, 3) + "M a year, which repays $" + fmtN(z.m, 2) + "M.</li>" +
+      "<li><b>In between:</b> each share of the cash carries its own loan; at 50% contracted, half of each: ($" + fmtN(z.c, 2) + "M + $" + fmtN(z.m, 2) + "M) ÷ 2 = $" + fmtN(z.half, 2) + "M.</li>" +
       "<li><b>From a payment to a loan:</b> lesson <a href=\"a01-project-tea.html\">A1</a> shows how a rate and a term turn a yearly amount into an amount today.</li></ul>";
   }
   function factsHTML(X) {
@@ -236,8 +245,8 @@
 
   var model = { inputs: inputs, projectInputs: projectInputs, PROJ: PROJ, ledgerRows: ledgerRows, ledgerHTML: ledgerHTML, explainLede: explainLede, SCALED_CAP: SCALED_CAP, project: project, payRate: payRate, payment: payment, debtMax: debtMax, yearCF: yearCF, dscr: dscr, largestLoanM: largestLoanM, stack: stack, deflate: deflate,
     steps: steps, Q1: Q1, costChain: costChain, costSaw: costSaw, layerHTML: layerHTML, LAYER_SAW: LAYER_SAW, cashLine: cashLine, loanVerdict: loanVerdict, loanSaw: loanSaw,
-    contractLine: contractLine, contractSaw: contractSaw, stackSaw: stackSaw, badLine: badLine, staticFallback: staticFallback, ideasHTML: ideasHTML, checkHTML: checkHTML, sizing: sizing, deeperHTML: deeperHTML,
-    factsHTML: factsHTML, sourcesHTML: sourcesHTML, BORROWED: BORROWED, SHARES: SHARES, fmtN: fmtN, M: M, pct: pct, x2: x2 };
+    contractLine: contractLine, ruleLine: ruleLine, LOW: LOW, M3: M3, contractSaw: contractSaw, stackSaw: stackSaw, badLine: badLine, staticFallback: staticFallback, ideasHTML: ideasHTML, checkHTML: checkHTML, sizing: sizing, deeperHTML: deeperHTML,
+    factsHTML: factsHTML, sourcesHTML: sourcesHTML, BORROWED: BORROWED, SHARES: SHARES, REPAID: REPAID, ORDER: ORDER, fmtN: fmtN, M: M, pct: pct, x2: x2 };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -249,20 +258,25 @@
     labels.forEach(function (l) { var d = H("div", { class: "lx-readout" }, box); H("span", { text: l[1] }, d); out[l[0]] = H("b", null, d); });
     return out;
   }
-  // the capital stack: layers bottom to top (grant, debt, tax equity, sponsor), each a button; scaled or schematic
+  // the capital stack: the repaid layers bottom to top (debt, tax equity, sponsor) in one column, beside the order of
+  // repayment, and the grant in a row of its own below (paid in at the start, outside that order); each a button in
+  // step 2; scaled or schematic
   function StackBar(host, X, o) {
-    var wrap = H("div", { class: "x5-stack" + (o.scaled ? " scaled" : "") }, host), btn = {};
+    var wrap = H("div", { class: "x5-stack" + (o.scaled ? " scaled" : ""), role: o.onPick ? "group" : null, "aria-label": o.label }, host), btn = {};
     H("p", { class: "x5-stack-cap", text: o.caption }, wrap);
-    var col = H("div", { class: "x5-stack-col", role: o.onPick ? "group" : null, "aria-label": o.label }, wrap);
-    ORDER.forEach(function (k) {
+    var col = H("div", { class: "x5-stack-col" }, wrap);
+    function layer(k, parent) {
       var l = X.layers.filter(function (y) { return y.key === k; })[0];
-      var b = H(o.onPick ? "button" : "div", o.onPick ? { type: "button", class: "x5-layer", "data-k": k, "aria-pressed": "false", style: "--c:" + l.color } : { class: "x5-layer", "data-k": k, style: "--c:" + l.color }, col);
+      var b = H(o.onPick ? "button" : "div", o.onPick ? { type: "button", class: "x5-layer", "data-k": k, "aria-pressed": "false", style: "--c:" + l.color } : { class: "x5-layer", "data-k": k, style: "--c:" + l.color }, parent);
       H("span", { class: "nm", text: l.label }, b); H("span", { class: "v" }, b);
       if (o.onPick) b.addEventListener("click", function () { o.onPick(k); });
       btn[k] = b;
-    });
+    }
+    REPAID.forEach(function (k) { layer(k, col); });
     var side = H("div", { class: "x5-stack-side", "aria-hidden": "true" }, wrap);
-    H("span", { text: "Paid last, most risk" }, side); H("span", { text: "Paid first, least risk" }, side);
+    H("span", { text: "Repaid last, most risk" }, side); H("span", { text: "Repaid first, least risk" }, side);
+    var grow = H("div", { class: "x5-grant-row" }, wrap); layer("grant", grow);
+    var gside = H("div", { class: "x5-stack-side x5-gside", "aria-hidden": "true" }, wrap); H("span", { text: "Paid in at the start, never repaid" }, gside);
     function set(S) {   // S: { key: [amount, share] } or null (schematic)
       ORDER.forEach(function (k) {
         var b = btn[k], v = b.querySelector(".v");
@@ -271,6 +285,7 @@
         b.style.flexGrow = String(Math.max(sh, 0) * 100); b.hidden = sh <= 1e-9;
         v.textContent = M(S[k][0]) + " · " + pct(sh);
       });
+      grow.hidden = btn.grant.hidden; gside.hidden = btn.grant.hidden;
     }
     function mark(k) { ORDER.forEach(function (j) { btn[j].setAttribute("aria-pressed", String(j === k)); btn[j].classList.toggle("on", j === k); }); }
     set(null);
@@ -308,7 +323,7 @@
           var eq = H("p", { class: "lx-step-line x5-eq", "aria-live": "polite" }, act), verdict = H("p", { class: "lx-hint", "aria-live": "polite" }, act);
           var target = largestLoanM(P, L), moved = false;
           var sl = LX.Slider(act, { label: "Loan", color: "var(--lx-wind)", min: X.loan.range[0], max: X.loan.range[1], step: X.loan.step, value: 60, fmt: function (v) { return "$" + v + "M"; }, onChange: function () { moved = true; draw(); } });
-          H("p", { class: "lx-hint", text: "Fully contracted here; a level payment at " + fmtN(L.rate, 1) + "% over " + L.term + " years, with one typical year in 2025 dollars standing for every year and no inflation, so the ATB's nominal rate is used as it is (simplified)." }, act);
+          H("p", { class: "lx-hint", text: "Fully contracted here. The loan is repaid in equal yearly payments at " + fmtN(L.rate, 1) + "% over " + L.term + " years." }, act);
           H("p", { class: "lx-hint", text: L.dscrNote }, act);
           var show = H("button", { type: "button", class: "lx-btn small", text: "Show me the largest loan" }, act);
           show.addEventListener("click", function () { sl.set(target, true); });
@@ -325,10 +340,10 @@
           var line = H("p", { class: "lx-step-line", "aria-live": "polite" }, act), low = false, tried = false;
           var sl = LX.Slider(act, { label: "Sold under contract", color: "var(--lx-tier-2)", min: X.contract.range[0], max: X.contract.range[1], step: X.contract.step, value: Math.round(st.s * 100), fmt: function (v) { return v + "%"; }, onChange: function () { draw(); } });
           var tg = LX.Toggle(H("div", { class: "lx-toggles", role: "group", "aria-label": "The year" }, act), { label: "A bad year", on: false, onChange: function () { tried = tried || tg.val(); draw(); } });
-          H("p", { class: "lx-hint", html: LX.rich(X.contract.note) }, act); H("p", { class: "lx-hint", text: X.bad.note }, act);
+          H("p", { class: "lx-hint", html: LX.rich(X.contract.note) }, act); H("p", { class: "lx-hint", text: ruleLine(L) }, act); H("p", { class: "lx-hint", text: X.bad.note }, act);
           function draw() {
             var s = sl.val() / 100, D = debtMax(P, L, s), cf = yearCF(P, s, tg.val() ? X.bad : null);
-            st.s = s; low = low || s <= 0.5;
+            st.s = s; low = low || s <= LOW + 1e-9;
             ro.loan.textContent = M(D); ro.spon.textContent = pct(1 - D / P.capex);
             ro.bad.textContent = x2(dscr(yearCF(P, s, X.bad), D, L));
             line.innerHTML = bold(contractLine(P, L, s, X)) + (tg.val() ? " This year: " + M(cf) + " of cash against a " + M(payment(L, D)) + " payment." : "");
@@ -382,16 +397,16 @@
       var ol = H("ol", { class: "x5-notes" }, c1);
       [["Senior debt, " + M(D), "project-level debt, sized so typical-year cash covers each payment by the lender's margin; paid first, after operating costs."],
        ["Tax equity, " + M(S.te), "only where tax credits apply; takes most tax benefits and some cash, ahead of the sponsor."],
-       ["Grant, " + M(S.grant), "public money under a program's rules; never repaid."],
-       ["Sponsor equity, " + M(S.sponsor), "what is left to find; paid last, so it carries the most risk."]].forEach(function (n) { H("li", { html: "<b>" + LX.esc(n[0]) + ":</b> " + LX.esc(n[1]) }, ol); });
+       ["Sponsor equity, " + M(S.sponsor), "what is left to find; paid last, so it carries the most risk."],
+       ["Grant, " + M(S.grant), "public money under a program's rules, paid in at the start; outside the order of repayment, never repaid."]].forEach(function (n) { H("li", { html: "<b>" + LX.esc(n[0]) + ":</b> " + LX.esc(n[1]) }, ol); });
       LX.EnergyChain(H("div", { class: "lx-xcard" }, xhost), { title: "Where a typical year's cash goes", aside: "Your stack, 2025 dollars", lede: "Each layer is paid from what the one before it leaves.",
         stops: [{ icon: "coin", title: "Sales and earnings", text: "wind sales + battery earnings after charging", value: M(P.rev) },
                 { icon: "plant", title: "Remaining operating costs", text: "fixed upkeep, paid first", value: "− " + M(P.opex) },
                 { icon: "lock", title: "Loan payment", text: "coverage " + x2(dscr(P.cf, D, L)), value: "− " + M(pay) },
                 { icon: "check", title: "Left for the owners", text: "tax equity, then sponsor", value: M(P.cf - pay) }] });
       LX.Boundary(H("div", { class: "lx-xcard" }, xhost), { title: "Where this stack holds",
-        holds: ["project-level debt, paid before either equity investor;", "one typical year stands for every year of the loan, in 2025 dollars with no inflation, so the ATB's nominal " + fmtN(L.rate, 1) + "% serves as the toy's rate;", "contracted and market sales earn the same on average;", "the lender's coverage ratios are illustrative values inside the 2025 ATB's range."],
-        leaves: ["taxes, depreciation, inflation and the tax-equity flip;", "other deal structures, such as a loan to the sponsor alone;", "construction loans, reserve accounts and loan fees;", "P50 and P99 energy cases and the battery's replacement."],
+        holds: ["project-level debt, paid before either equity investor;", "one typical year stands for every year of the loan, in 2025 dollars with no inflation, so the ATB's nominal rate is used as it is: " + fmtN(L.rate, 1) + "%;", "contracted and market sales earn the same on average;", "the lender sizes a loan on each share of the cash and adds them; its two coverage ratios are illustrative (the ATB's differ by technology, not by contract)."],
+        leaves: ["taxes, depreciation, inflation and the terms of a tax-equity partnership;", "other deal structures, such as a loan to the sponsor alone;", "construction loans, reserve accounts and loan fees;", "lenders' low-wind cases, sized to be beaten in most years, and the battery's replacement."],
         source: "Costs: lessons 7 and 13 (EIA, NREL); battery and price: lessons A2 and A1 (illustrative); finance ranges: NREL ATB 2025 and NREL (2017)." });
       var nx = H("div", { class: "lx-xcard" }, xhost);
       H("h3", { text: "Where this connects" }, nx);

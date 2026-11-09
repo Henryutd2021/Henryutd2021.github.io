@@ -878,8 +878,12 @@
 /* daychart.js — LX.DayChart: hourly stacked bars (one colour per plant) with demand as a dashed step line.
    const c = LX.DayChart(host, { series: [{key: "nuclear", label: "Nuclear", color: "var(--lx-nuc)"}, ...],
                                  demand: [24 numbers], rows: function () { return [{nuclear: 100, ..., unserved: 0}, ...]; },
-                                 yMax: 400, label: "what the chart shows" });
-   c.render()  draws (call after the host becomes visible); hover or tap shows the hour; a "Text version" table follows. */
+                                 yMax: 400, unit: "MW", pending: "not played yet", label: "what the chart shows" });
+   c.render()  draws (call after the host becomes visible); hover or tap shows the hour; a "Text version" table follows,
+   with one row for every hour of demand (an hour with no row yet shows demand and the `pending` words, default
+   "not played yet"; the readout says the same) and a "Short" column when
+   any hour is short. yMax is the smallest top of the scale: it grows (in steps of 100) when demand or a stacked bar
+   would rise above it, so no bar is cut off. The unit names the vertical scale and the table's caption. */
 (function () {
   "use strict";
   var LX = window.LX, H = LX.H, S = LX.S, clamp = LX.clamp;
@@ -891,14 +895,19 @@
     var dl = H("span", null, legend); H("i", { class: "line" }, dl); H("span", { text: "Demand" }, dl);
     var alt = H("details", { class: "lx-textalt" }, host);
     H("summary", { text: "Text version" }, alt);
-    var svg = null, n = o.demand.length;
+    var svg = null, n = o.demand.length, pendingText = o.pending || "not played yet";
     function render() {
-      var rows = o.rows(), W = Math.max(280, w.clientWidth || 600), Hh = W < 480 ? 190 : 220, ymax = o.yMax || 400;
-      var m = { l: 40, r: 8, t: 10, b: 24 }, iw = W - m.l - m.r, ih = Hh - m.t - m.b;
+      var rows = o.rows(), W = Math.max(280, w.clientWidth || 600), Hh = W < 480 ? 190 : 220, unit = o.unit || "MW";
+      var top = Math.max.apply(null, o.demand.concat(rows.map(function (r) {
+        return o.series.reduce(function (a, s) { return a + (r[s.key] || 0); }, 0) + Math.max(0, r.unserved || 0);
+      })));
+      var ymax = Math.max(o.yMax || 400, Math.ceil(top / 100) * 100);
+      var m = { l: 40, r: 8, t: 22, b: 24 }, iw = W - m.l - m.r, ih = Hh - m.t - m.b;
       if (svg) svg.remove();
       svg = S("svg", { viewBox: "0 0 " + W + " " + Hh, width: W, height: Hh, role: "img", "aria-label": o.label || "Hourly output by plant, with demand." });
       w.insertBefore(svg, tip);
       var y = function (v) { return m.t + ih - v / ymax * ih; }, bw = iw / n;
+      S("text", { x: m.l - 6, y: 11, "text-anchor": "end", "font-size": 11, "font-family": "var(--lx-f-mono)", fill: "var(--lx-ink-3)" }, svg).textContent = unit;
       for (var v = 0; v <= ymax; v += ymax / 4) {
         S("path", { d: "M" + m.l + " " + y(v) + " H" + (W - m.r), stroke: "var(--lx-line)", "stroke-width": 1 }, svg);
         S("text", { x: m.l - 6, y: y(v) + 4, "text-anchor": "end", "font-size": 11, "font-family": "var(--lx-f-mono)", fill: "var(--lx-ink-3)" }, svg).textContent = v;
@@ -920,9 +929,9 @@
       var hit = S("rect", { x: m.l, y: m.t, width: iw, height: ih, fill: "transparent" }, svg);
       function show(ev) {
         var rr = svg.getBoundingClientRect(), t = clamp(Math.floor(((ev.clientX - rr.left) / rr.width * W - m.l) / bw), 0, n - 1), row = rows[t];
-        var html = "<div><b>" + LX.fmt.hh(t) + "</b><span>demand <b>" + Math.round(o.demand[t]) + "</b></span></div>";
+        var html = "<div><b>" + LX.fmt.hh(t) + "</b><span>demand <b>" + Math.round(o.demand[t]) + "</b> " + unit + "</span></div>";
         if (row) o.series.slice().reverse().forEach(function (s) { html += "<div><span>" + s.label + "</span><b>" + Math.round(row[s.key] || 0) + "</b></div>"; });
-        else html += "<div><span>Not played yet</span></div>";
+        else html += "<div><span>" + LX.esc(pendingText.charAt(0).toUpperCase() + pendingText.slice(1)) + "</span></div>";
         if (row && row.unserved > 0) html += '<div><span class="bad">Short</span><b>' + Math.round(row.unserved) + "</b></div>";
         tip.innerHTML = html; tip.hidden = false;
         var px = (m.l + (t + 0.5) * bw) / W * rr.width;
@@ -930,14 +939,19 @@
       }
       hit.addEventListener("pointermove", show); hit.addEventListener("pointerdown", show);
       hit.addEventListener("pointerleave", function () { tip.hidden = true; });
-      // text version: one row per hour played
+      // text version: one row for every hour of demand, so the whole day's demand is readable before it is played
       alt.querySelectorAll(".lx-scroll-x").forEach(function (t) { t.remove(); });
-      var tb = H("table", { class: "lx-mini-table" }, H("div", { class: "lx-scroll-x" }, alt)), hd = H("tr", null, H("thead", null, tb));
-      ["Hour", "Demand"].concat(o.series.map(function (s) { return s.label; })).forEach(function (t) { H("th", { text: t, scope: "col" }, hd); });
+      var short = rows.some(function (r) { return r && r.unserved > 0; }), pending = rows.length < n;
+      var tb = H("table", { class: "lx-mini-table" }, H("div", { class: "lx-scroll-x" }, alt));
+      H("caption", { text: "Average power in each hour, " + unit + "." + (pending ? " Hours " + pendingText + " show demand only." : "") }, tb);
+      var hd = H("tr", null, H("thead", null, tb));
+      ["Hour", "Demand"].concat(o.series.map(function (s) { return s.label; }), short ? ["Short"] : []).forEach(function (t) { H("th", { text: t, scope: "col" }, hd); });
       var body = H("tbody", null, tb);
-      rows.forEach(function (r, t) {
-        var tr = H("tr", null, body); H("td", { text: LX.fmt.hh(t) }, tr); H("td", { text: Math.round(o.demand[t]) }, tr);
+      o.demand.forEach(function (dv, t) {
+        var r = rows[t], tr = H("tr", null, body); H("th", { text: LX.fmt.hh(t), scope: "row" }, tr); H("td", { text: Math.round(dv) }, tr);
+        if (!r) { H("td", { text: pendingText, colspan: o.series.length + (short ? 1 : 0), style: "text-align:left" }, tr); return; }
         o.series.forEach(function (s) { H("td", { text: Math.round(r[s.key] || 0) }, tr); });
+        if (short) H("td", { text: Math.round(Math.max(0, r.unserved || 0)) }, tr);
       });
     }
     if (window.ResizeObserver) new ResizeObserver(function () { if (LX.visible(w)) render(); }).observe(w);
@@ -5636,7 +5650,9 @@
              "open-short"  points: [the sentences a full answer makes]; after submitting, the reader ticks the points made
              "estimate"    units (as numeric), range: [lo, hi] MWh a year, show: [lo, hi] as printed; low, high (above the low), unit and
                            three short texts (inputs and steps, the main uncertainty, a check); then a self-rating per rubric
-                           criterion. The worked-solution section of the page opens on submit.
+                           criterion. The worked-solution section of the page opens on submit. Where the range sits against
+                           the worked one is shown as a neutral comparison, not a mark (the rubric judges the reasoning);
+                           the record's `first` is true for a valid estimate (energy units, a high above the low)
      per task (any kind; a task without them behaves as before)
              opensAfter    [task ids]: the task opens only once each named task is submitted (a first answer recorded, or
                            a written task submitted). Until then its card shows, in place of its question, answers, early
@@ -5649,8 +5665,14 @@
                            fixed unit, choices and order buttons disabled); a line in place of the submit button says so
                            (freezeNote, else a default), describes the kept controls and takes focus after the submission.
                            A written task's points and the estimate's self-ratings can still be ticked. Feedback on a wrong
-                           first answer then points to the worked solution, not to a retry; an empty or non-positive
-                           number is not kept
+                           first answer then points to the worked solution, not to a retry. Written tasks (open-short,
+                           estimate) take it so that the first submission is the one assessed
+             solAfter      [task ids]: the task's worked solution, and a written task's points to tick, open only once each
+                           named task is submitted too: for a task whose solution names another task's answer (CK-A: the
+                           main result's solution names the up-front cost). Until then a notice stands in their place and
+                           the early button is not offered. solWaits(D, st, task) names the tasks still waited for; a
+                           page's test checks with solLeaks(D) that no solution names an answer it does not wait for
+   An empty or non-positive number is never recorded as an answer (every number task asks for a positive value).
    Options:
      key         LX.store key of the attempt; an attempt stored under another data.version starts afresh. Keep it fixed
                  once readers use a checkpoint (CK-F: "ckf-v1"), so their summaries stay comparable.
@@ -5669,7 +5691,9 @@
      tolerance   false hides the line under a number task's answer field that states its tolerance (default: shown, from
                  the task's tolNote, else "Within 1% of the right value counts as right." from answer.tol)
      openFirst   "not-right": in the shared level rule, a task whose worked solution was opened before its first answer
-                 counts as not right (independent work only; data.rule.openFirst sets it too); default "counts" (CK-F)
+                 counts as not right (independent work only; data.rule.openFirst sets it too): an auto-marked task as
+                 not right, a written task with no points, the estimate with no self-ratings (writtenCounts below);
+                 default "counts"
      level, summary  replace the pure level rule or the summary text (same arguments)
      describe    function (D, L): the results view's sentence under the level (L = the level rule's result); default
                  describe(), which names CK-F's parts (auto-marked tasks, the estimate's lowest self-rating, the explanation)
@@ -5715,11 +5739,11 @@
    order task's ↑ ↓ buttons keep focus on the moved item. The results table becomes labelled lines on phones.
    Text version: LX.Checkpoint.lineChart adds a table of the hourly values.
    Pure (Node: module.exports): task, checkChoice, checkOrder, checkNumeric (either answer form), checkMWh, checkValue,
-   checkEstimate, level(D, st, {openFirst, late, solOpen}), firstRight(record, openFirst), lateAnswer(record, solOpen),
-   allAnswered(D, st), lastAnswerAt(D, st), lateRule({gateAll, n}), tolText(task), describe, summary, fmtMs, firstWord;
-   for the per-task options: submitted(record), waitsFor(D, st, task), outOfOrder(D, st), taskList(D, ids),
-   waitText(D, task, ids), shownTitle(D, st, task), openProblems(D) (unknown or circular opensAfter names; a page's test
-   should find none).
+   checkEstimate, level(D, st, {openFirst, late, solOpen}), firstRight(record, openFirst), writtenCounts(record,
+   openFirst), lateAnswer(record, solOpen), allAnswered(D, st), lastAnswerAt(D, st), lateRule({gateAll, n}), tolText(task),
+   describe, summary, fmtMs, firstWord; for the per-task options: submitted(record), waitsFor(D, st, task),
+   solWaits(D, st, task), solLeaks(D), outOfOrder(D, st), taskList(D, ids), waitText(D, task, ids), shownTitle(D, st,
+   task), openProblems(D) (unknown or circular opensAfter or solAfter names; a page's test should find none).
    level and summary find the explanation and the estimate as the first "open-short" and the first "estimate" task. */
 (function () {
   "use strict";
@@ -5755,7 +5779,9 @@
       msg: rel <= a.tol ? a.show.charAt(0).toUpperCase() + a.show.slice(1) + "." : v > a.value * 1.5 ? "Too high. Recheck your model and its units." : v < a.value / 1.5 ? "Too low. Recheck your model and its units." : "Close, but outside the tolerance (" + Math.round(a.tol * 1000) / 10 + "%). Recheck your numbers." };
   }
   // the estimate: units, order, and how the range sits against the worked solution's range (MWh a year). A range needs
-  // a high above its low: one number (low = high) shows no uncertainty, which the rubric marks Not yet.
+  // a high above its low: one number (low = high) shows no uncertainty, which the rubric marks Not yet. Where the range
+  // sits is a comparison, not a mark: another range is fine when its inputs are stated and defensible (the rubric)
+  var NOT_A_MARK = " That is a comparison, not a mark: a different range can be right if its inputs are stated and defensible. Compare them with its two routes.";
   function checkEstimate(t, low, high, unit) {
     var f = unitFactor(t, unit), out = { unitsOk: f > 0, ordered: low > 0 && high > low };
     if (f === null) out.unitMsg = unit + " is a unit of power. Electricity used over a year is energy: kWh, MWh or GWh per year.";
@@ -5765,8 +5791,8 @@
       var lo = low * f, hi = high * f, R = t.range;
       out.lo = lo; out.hi = hi; out.overlaps = lo <= R[1] && hi >= R[0]; out.width = lo > 0 ? hi / lo : Infinity;
       if (out.overlaps) out.rangeMsg = "Your range overlaps the worked solution's (about " + t.show[0] + " to " + t.show[1] + " MWh a year).";
-      else if (hi < R[0]) out.rangeMsg = "Your range lies below the worked solution's, by about " + Math.round(R[0] / hi) + " times at its closest. Compare your inputs with its two routes.";
-      else out.rangeMsg = "Your range lies above the worked solution's, by about " + Math.round(lo / R[1]) + " times at its closest. Compare your inputs with its two routes.";
+      else if (hi < R[0]) out.rangeMsg = "Your range lies below the worked solution's, by about " + Math.round(R[0] / hi) + " times at its closest." + NOT_A_MARK;
+      else out.rangeMsg = "Your range lies above the worked solution's, by about " + Math.round(lo / R[1]) + " times at its closest." + NOT_A_MARK;
       if (out.width > 10) out.rangeMsg += " Your high is more than ten times your low: narrow it with a stated input.";
     } else if (!out.ordered) out.rangeMsg = low > 0 && high === low
       ? "Your low and high are the same number, so they show no range. Give a high above your low that brackets your uncertainty."
@@ -5784,6 +5810,9 @@
   // a task's first answer counts as right; with openFirst "not-right" (independent work), not when its worked solution
   // was opened before that answer (solFirst). Default "counts": CK-F's published rule.
   function firstRight(r, openFirst) { return !!(r && r.first === true && !(openFirst === "not-right" && r.solFirst)); }
+  // a written task (open-short, estimate) counts: its points or self-ratings, unless openFirst is "not-right" and its
+  // worked solution was opened before it was submitted
+  function writtenCounts(r, openFirst) { return !!r && !(openFirst === "not-right" && r.solFirst); }
   // the shared late-answer rule (option late "practice"): a task first answered after the page's worked solution opened
   // (solOpen, ISO time) is practice. The answer that opened it is not late: the runner records the opening at that
   // answer's own `at`. ISO strings from toISOString compare in time order.
@@ -5799,6 +5828,39 @@
   function waitsFor(D, st, t) {
     var need = (t && t.opensAfter) || [];
     return D.tasks.filter(function (x) { return need.indexOf(x.id) >= 0 && !submitted(st.tasks[x.id]); }).map(function (x) { return x.id; });
+  }
+  // the tasks a task's worked solution still waits for (its solAfter ids not yet submitted), in task order
+  function solWaits(D, st, t) {
+    var need = (t && t.solAfter) || [];
+    return D.tasks.filter(function (x) { return need.indexOf(x.id) >= 0 && x.id !== t.id && !submitted(st.tasks[x.id]); }).map(function (x) { return x.id; });
+  }
+  // the numbers a task's answer is given as (a number task's value, in its own unit; CK-F's in MWh and GWh)
+  function numsIn(s) { return (String(s).match(/\d[\d,]*(?:\.\d+)?/g) || []).map(function (x) { return parseFloat(x.replace(/,/g, "")); }); }
+  function answerNums(t) {
+    if (t.kind !== "numeric" || !t.answer) return [];
+    var a = t.answer, out = [];
+    if (a.value != null) out.push(Math.abs(a.value));
+    if (a.mwh != null) out.push(a.mwh, a.mwh / 1000);
+    return out.filter(function (v) { return v >= 10; });   // its value (0.5% covers the rounded forms); small numbers match by chance
+  }
+  // the texts a task shows after its answer (its worked solution, its points, its choices' feedback)
+  function afterText(t) {
+    var w = t.why || {}; return [t.solution || ""].concat(t.points || [], Object.keys(w).map(function (k) { return w[k]; })).join(" ");
+  }
+  // solution leaks: a task whose after-answer texts name another number task's answer (within 0.5%) that its solAfter
+  // does not list: [{task, names, value}]. A page's test should find none (or only the ones it lists as coincidences)
+  function solLeaks(D) {
+    var out = [];
+    D.tasks.forEach(function (u) {
+      // a choice's feedback shows with its answer, whatever solAfter says, so it is checked against every other task
+      var n = numsIn(afterText(u)), nw = numsIn(Object.keys(u.why || {}).map(function (k) { return u.why[k]; }).join(" ")), wait = u.solAfter || [];
+      D.tasks.forEach(function (t) {
+        if (t === u) return;
+        var held = wait.indexOf(t.id) >= 0, m = held ? nw : n;
+        answerNums(t).forEach(function (a) { if (m.some(function (x) { return Math.abs(x - a) <= a * 0.005; })) out.push({ task: u.id, names: t.id, value: a }); });
+      });
+    });
+    return out;
   }
   // the tasks named in another task's opensAfter that were submitted after that task's first answer, in task order
   // (the runner keeps a waiting task shut, so only an attempt stored elsewhere shows one)
@@ -5832,6 +5894,10 @@
       (t.opensAfter || []).forEach(function (id) {
         if (id === t.id) out.push(t.id + " waits for itself");
         else if (ids.indexOf(id) < 0) out.push(t.id + " waits for an unknown task " + id);
+      });
+      (t.solAfter || []).forEach(function (id) {   // no circle is possible: a submission never waits for a solution
+        if (id === t.id) out.push(t.id + "'s solution waits for itself");
+        else if (ids.indexOf(id) < 0) out.push(t.id + "'s solution waits for an unknown task " + id);
       });
     });
     var state = {};
@@ -5870,17 +5936,20 @@
     var k = autoIds.filter(function (id) { return firstRight(st.tasks[id], of) && !isLate(id); }).length;
     var early = autoIds.filter(function (id) { return st.tasks[id] && st.tasks[id].solFirst; }).length;
     var exT = ofKind(D, "open-short"), esT = ofKind(D, "estimate");
-    var ex = (exT && st.tasks[exT.id]) || {}, es = (esT && st.tasks[esT.id]) || {}, rt = (esT && isLate(esT.id)) ? {} : es.rating || {};
+    var ex = (exT && st.tasks[exT.id]) || {}, es = (esT && st.tasks[esT.id]) || {};
+    var exOpen = !!(exT && ex.solFirst && !writtenCounts(ex, of)), esOpen = !!(esT && es.solFirst && !writtenCounts(es, of));   // opened first: not counted
+    var rt = (esT && isLate(esT.id)) || esOpen ? {} : es.rating || {};
     var crit = R.criteria.map(function (c) { return rt[c] != null ? R.levels.indexOf(rt[c]) : -1; });
     var estMin = Math.min.apply(null, crit), estStrong = crit.filter(function (x) { return x === 3; }).length;
-    var pts = ex.points || [], explainOk = pts.length > 0 && pts.length === (exT && exT.points ? exT.points.length : 2) && pts.every(Boolean) && !(exT && isLate(exT.id));
+    var pts = ex.points || [], explainOk = pts.length > 0 && pts.length === (exT && exT.points ? exT.points.length : 2) && pts.every(Boolean) && !(exT && isLate(exT.id)) && !exOpen;
     var lateIds = lateOn ? D.tasks.filter(function (t) { return isLate(t.id); }).map(function (t) { return t.id; }) : [];
-    var complete = autoIds.every(function (id) { return st.tasks[id] && st.tasks[id].first != null; }) && estMin >= 0 && ex.points != null;
+    var complete = autoIds.every(function (id) { return st.tasks[id] && st.tasks[id].first != null; }) && (esOpen ? !!es.answer : estMin >= 0) && ex.points != null;
     var lv = R.levels[0];
     if (k >= R.autoStrong && estMin >= 2 && estStrong >= 2 && explainOk) lv = R.levels[3];
     else if (k >= R.autoProficient && estMin >= 2 && explainOk) lv = R.levels[2];
     else if (k >= (R.autoDeveloping != null ? R.autoDeveloping : 3) && estMin >= 1) lv = R.levels[1];
-    return { level: lv, auto: k, autoOf: autoIds.length, estMin: estMin, explainOk: explainOk, complete: complete, early: early, openFirst: of, late: lateIds.length, lateIds: lateIds };
+    return { level: lv, auto: k, autoOf: autoIds.length, estMin: estMin, explainOk: explainOk, complete: complete, early: early, openFirst: of, late: lateIds.length, lateIds: lateIds,
+      explainOpened: exOpen, estimateOpened: esOpen };
   }
   // the late tasks in words, for a results sentence ("" when none)
   function lateText(L) {
@@ -5888,8 +5957,9 @@
   }
   // the results view's sentence under the level (CK-F's parts; a checkpoint with another rule passes its own describe)
   function describe(D, L) {
-    return "Auto-marked tasks right on the first try: " + L.auto + " of " + L.autoOf + (L.openFirst === "not-right" && L.early ? " (" + L.early + " with the solution opened first, counted as not right)" : "") + ". Estimate: lowest self-rating " + (L.estMin >= 0 ? D.rule.levels[L.estMin] : "not rated yet") +
-      ". Explanation: " + (L.explainOk ? "both points." : "not both points ticked.") + lateText(L) + (L.complete ? "" : " Some tasks are not finished; the level counts them as not right.");
+    return "Auto-marked tasks right on the first try: " + L.auto + " of " + L.autoOf + (L.openFirst === "not-right" && L.early ? " (" + L.early + " with the solution opened first, counted as not right)" : "") +
+      ". Estimate: " + (L.estimateOpened ? "worked solution opened before submitting, so its self-ratings do not count" : "lowest self-rating " + (L.estMin >= 0 ? D.rule.levels[L.estMin] : "not rated yet")) +
+      ". Explanation: " + (L.explainOpened ? "worked solution opened before answering, so no points." : L.explainOk ? "both points." : "not both points ticked.") + lateText(L) + (L.complete ? "" : " Some tasks are not finished; the level counts them as not right.");
   }
   function fmtMs(ms) {
     if (ms == null) return "–";
@@ -5923,21 +5993,21 @@
     if (es && es.answer) {
       var a = es.answer;
       lines.push("");
-      lines.push("Estimate: " + a.low + " to " + a.high + " " + a.unit + (es.check ? " · " + (es.check.overlaps ? "overlaps" : "does not overlap") + " the worked range" : ""));
+      lines.push("Estimate: " + a.low + " to " + a.high + " " + a.unit + (es.check ? " · " + (es.check.overlaps ? "overlaps" : "does not overlap") + " the worked range (a comparison, not a mark)" : ""));
       if (es.rating) lines.push("Self-rating: " + D.rule.criteria.map(function (c) { return c + " " + (es.rating[c] || "not rated"); }).join(", "));
-      ["reasoning", "uncertainty", "check"].forEach(function (k) { if (a[k]) lines.push("Your " + k + ": " + String(a[k]).replace(/\s+/g, " ").slice(0, 600)); });
+      ["reasoning", "uncertainty", "check"].forEach(function (k) { if (a[k]) lines.push("Your " + k + ": " + String(a[k]).replace(/\s+/g, " ")); });   // in full: nothing is cut
     }
     var exT = ofKind(D, "open-short"), ex = exT && st.tasks[exT.id];
-    if (ex && ex.answer) lines.push("Your explanation (task " + (D.tasks.indexOf(exT) + 1) + "): " + String(ex.answer).replace(/\s+/g, " ").slice(0, 400));
+    if (ex && ex.answer) lines.push("Your explanation (task " + (D.tasks.indexOf(exT) + 1) + "): " + String(ex.answer).replace(/\s+/g, " "));
     lines.push("");
     lines.push("Screen width " + (env.width || "?") + " px. Kept in this browser only; copied by you.");
     return lines.join("\n");
   }
 
   var pure = { task: task, checkChoice: checkChoice, checkOrder: checkOrder, checkNumeric: checkNumeric, checkMWh: checkMWh, checkValue: checkValue,
-    checkEstimate: checkEstimate, level: level, firstRight: firstRight, lateAnswer: lateAnswer, allAnswered: allAnswered, lastAnswerAt: lastAnswerAt, lateRule: lateRule, lateText: lateText,
+    checkEstimate: checkEstimate, level: level, firstRight: firstRight, writtenCounts: writtenCounts, lateAnswer: lateAnswer, allAnswered: allAnswered, lastAnswerAt: lastAnswerAt, lateRule: lateRule, lateText: lateText,
     tolText: tolText, describe: describe, summary: summary, fmtMs: fmtMs, firstWord: firstWord,
-    submitted: submitted, waitsFor: waitsFor, outOfOrder: outOfOrder, taskList: taskList, waitText: waitText, openProblems: openProblems, shownTitle: shownTitle };
+    submitted: submitted, waitsFor: waitsFor, solWaits: solWaits, solLeaks: solLeaks, outOfOrder: outOfOrder, taskList: taskList, waitText: waitText, openProblems: openProblems, shownTitle: shownTitle };
   if (typeof module !== "undefined" && module.exports) module.exports = pure;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -6081,14 +6151,22 @@
     // an open task: its answer controls, the feedback line, its worked solution and the early button
     function open(t, c, r) {
       var body = E("div", { class: "lx-ck-body" }, c), fb = E("div", { "aria-live": "polite" }, c);
-      var sol = E("details", { class: "lx-ck-sol", hidden: r.first == null && !r.solFirst }, c);
+      var sw = solWaits(D, st, t);   // solAfter: the solution names another task's answer, so it waits for that task too
+      var sol = E("details", { class: "lx-ck-sol", hidden: sw.length > 0 || (r.first == null && !r.solFirst) }, c);
       E("summary", { text: "Worked solution" }, sol);
-      solution(t, sol);
-      var earlyBtn = E("button", { type: "button", class: "lx-link", text: "Show the worked solution now (recorded as opened before answering)", hidden: r.first != null || r.solFirst,
+      if (!sw.length) solution(t, sol);
+      var swNote = sw.length ? E("p", { class: "lx-hint lx-ck-solwait", text: solWaitText(t, sw) }, c) : null;   // said before answering too: it is why no early button shows
+      var earlyBtn = E("button", { type: "button", class: "lx-link", text: "Show the worked solution now (recorded as opened before answering)", hidden: sw.length > 0 || r.first != null || r.solFirst,
         onclick: function () { var rr = rec(t.id); rr.solFirst = true; save(); sol.hidden = false; sol.open = true; earlyBtn.hidden = true;
           if (t === gateT && !o.gateAll) openSolution(); if (o.onAnswer) o.onAnswer(t.id, rr, st); } }, c);
-      function unlock() { sol.hidden = false; earlyBtn.hidden = true; }
-      ({ "choice": choice, "order": order, "numeric": numeric, "open-short": openShort, "estimate": estimate })[t.kind](t, body, fb, unlock);
+      function unlock() { if (sw.length) return; sol.hidden = false; earlyBtn.hidden = true; }
+      ({ "choice": choice, "order": order, "numeric": numeric, "open-short": openShort, "estimate": estimate })[t.kind](t, body, fb, unlock, sw);
+    }
+    // the line in place of a waiting worked solution (solAfter): which tasks it waits for, and why
+    function solWaitText(t, sw) {
+      var w = taskList(D, sw), many = sw.length > 1;
+      return "This worked solution" + (t.kind === "open-short" ? " and the points to tick" : "") + " name" + (t.kind === "open-short" ? "" : "s") + " the answer" + (many ? "s" : "") + " to " + w +
+        ", so " + (t.kind === "open-short" ? "they open" : "it opens") + " once " + (many ? "those are" : "that is") + " submitted. Come back to this task then.";
     }
     // a task that waits for others (opensAfter): a notice and a way to the first task it waits for, nothing to answer
     function waitNoteOf(t, wait) {
@@ -6107,7 +6185,8 @@
     // button that had focus is gone or disabled
     function kept(t, btn, host, els, move) {
       var where = btn ? btn.parentNode : host, p = where ? where.querySelector(".lx-ck-kept") : null;
-      if (!p && where) p = E("p", { class: "lx-hint lx-ck-kept", id: LX.uid("ck-kept"), tabindex: "-1", text: t.freezeNote || (t.kind === "open-short" ? "Submitted: your text stays as you wrote it. Tick the points it makes below."
+      if (!p && where) p = E("p", { class: "lx-hint lx-ck-kept", id: LX.uid("ck-kept"), tabindex: "-1", text: t.freezeNote || (t.kind === "open-short" ? "Submitted: your text stays as you wrote it. " +
+          (solWaits(D, st, t).length ? "Its points to tick open once the tasks they name are answered." : "Tick the points it makes below.")
         : t.kind === "estimate" ? "Submitted: your estimate stays as you gave it. Rate it below." : "Submitted: your answer stays as you gave it.") }, where);
       if (btn) btn.remove();
       if (!p) return;
@@ -6119,7 +6198,10 @@
     }
     function readOnly(els) { els.forEach(function (el) { if (el) { el.setAttribute("readonly", ""); el.readOnly = true; } }); }
     // the line after a wrong first answer: a retry, or for a frozen task the worked solution
-    function retry(t) { return t.freeze ? " The worked solution is below." : " Try again, or open the worked solution."; }
+    function retry(t) {
+      if (solWaits(D, st, t).length) return t.freeze ? " Its worked solution opens later (below)." : " Try again.";   // solAfter: not open yet
+      return t.freeze ? " The worked solution is below." : " Try again, or open the worked solution.";
+    }
     function feedback(fb, ok, html) { fb.innerHTML = ""; E("div", { class: "lx-saw" + (ok ? "" : " no"), html: LX.icon(ok ? "check" : "question") + "<div><b>" + (ok ? "Right." : "Not quite.") + "</b> " + html + "</div>" }, fb); }
     function solution(t, sol) {
       if (t.kind === "estimate") { E("p", { html: o.estimateNote || "The worked solution and the marking guide are in the <a href=\"#solution\">Worked solution</a> section below; it opens when you submit." }, sol); return; }
@@ -6205,7 +6287,7 @@
       var row = E("div", { class: "lx-ck-row" }, body);
       var chk = E("button", { type: "button", class: "lx-btn small", text: "Check", onclick: function () {
         if (!sel.value) { feedback(fb, false, "Choose a unit first."); return; }
-        if (t.freeze && !(parseFloat(inp.value) > 0)) { feedback(fb, false, "Enter a positive number."); return; }   // not kept as an answer
+        if (!(parseFloat(inp.value) > 0)) { feedback(fb, false, "Enter a positive number."); return; }   // not recorded: an empty field is not an answer
         var res = cNum(t, parseFloat(inp.value), sel.value);
         answered(t.id, res.right, { value: parseFloat(inp.value), unit: sel.value });
         feedback(fb, res.right, LX.esc(res.msg) + (res.right ? "" : retry(t)));
@@ -6215,8 +6297,8 @@
       function fix(move) { readOnly([inp]); sel.disabled = true; kept(t, chk, null, [inp, sel], move); }
       if (frozen(t)) fix();
     }
-    function openShort(t, body, fb, unlock) {
-      var r = rec(t.id), id = LX.uid("ck");
+    function openShort(t, body, fb, unlock, sw) {
+      var r = rec(t.id), id = LX.uid("ck"), waiting = !!(sw && sw.length);   // solAfter: the points name other answers too
       if (frozen(t)) keepDraft(t.id, null);
       var dr = frozen(t) ? null : draftOf(t.id);
       E("label", { for: id, class: "lx-sr", text: "Your explanation" }, body);
@@ -6227,9 +6309,9 @@
         var same = ta.value.trim() === String(rec(t.id).answer || "");   // the submitted text, or nothing yet: no draft
         keepDraft(t.id, same ? null : { text: ta.value }); dl.textContent = same ? "" : DRAFT_NOTE;
       });
-      var row = E("div", { class: "lx-ck-row" }, body), self = E("div", { hidden: r.points == null }, body);
+      var row = E("div", { class: "lx-ck-row" }, body), self = E("div", { hidden: r.points == null || waiting }, body);
       E("p", { class: "lx-hint", text: "Compare with the worked solution, then tick each point your answer makes." }, self);
-      var ul = E("ul", { class: "lx-ck-points" }, self), boxes = t.points.map(function (p, k) {
+      var ul = E("ul", { class: "lx-ck-points" }, self), boxes = (waiting ? [] : t.points).map(function (p, k) {
         var lab = E("label", null, E("li", null, ul)), cb = E("input", { type: "checkbox" }, lab); cb.checked = !!(r.points && r.points[k]);
         E("span", { html: LX.rich(p) }, lab);
         cb.addEventListener("change", function () { var rr = rec(t.id); rr.points = boxes.map(function (b) { return b.checked; }); rr.first = rr.points.every(Boolean); save(); });
@@ -6238,8 +6320,8 @@
       var sub = E("button", { type: "button", class: "lx-btn small", text: "Submit my explanation", onclick: function () {
         if (!ta.value.trim()) { feedback(fb, false, "Write a sentence or two first."); return; }
         var rr = answered(t.id, false, ta.value.trim()); rr.points = rr.points || t.points.map(function () { return false; }); rr.first = rr.points.every(Boolean); save();
-        self.hidden = false; unlock(); fb.innerHTML = "";
-        E("div", { class: "lx-saw", html: LX.icon("check") + "<div><b>Submitted.</b> Open the worked solution below and tick the points you made.</div>" }, fb);
+        self.hidden = waiting; unlock(); fb.innerHTML = "";
+        E("div", { class: "lx-saw", html: LX.icon("check") + "<div><b>Submitted.</b> " + (waiting ? "Its worked solution and points open later (below)." : "Open the worked solution below and tick the points you made.") + "</div>" }, fb);
         if (frozen(t)) fix(true);
       } }, row);
       function fix(move) { readOnly([ta]); kept(t, sub, null, [ta], move); }
@@ -6278,10 +6360,10 @@
         var chk = cEst(t, lo, hi, sel.value);
         // a range needs its high above its low: say why and wait (not recorded as an answer, like an empty field)
         if (!chk.ordered) { fb.innerHTML = ""; E("div", { class: "lx-saw no", html: LX.icon("question") + "<div><b>Range.</b> " + LX.esc(chk.rangeMsg) + "</div>" }, fb); return; }
-        var er = answered(t.id, chk.unitsOk && chk.ordered && !!chk.overlaps, ans, { check: chk });
+        var er = answered(t.id, chk.unitsOk && chk.ordered, ans, { check: chk });   // a valid estimate; where it sits is a comparison, not a mark
         fb.innerHTML = "";
         E("div", { class: "lx-saw" + (chk.unitsOk ? "" : " no"), html: LX.icon(chk.unitsOk ? "check" : "question") + "<div><b>Units.</b> " + LX.esc(chk.unitMsg) + "</div>" }, fb);
-        if (chk.rangeMsg) E("div", { class: "lx-saw" + (chk.overlaps ? "" : " no"), html: LX.icon(chk.overlaps ? "check" : "question") + "<div><b>Range.</b> " + LX.esc(chk.rangeMsg) + "</div>" }, fb);
+        if (chk.rangeMsg) E("div", { class: "lx-saw" + (chk.overlaps ? "" : " info"), html: LX.icon(chk.overlaps ? "check" : "chart") + "<div><b>Range.</b> " + LX.esc(chk.rangeMsg) + "</div>" }, fb);   // neutral when apart
         if (!o.gateAll) openSolution(er.at); rate(out);
         if (frozen(t)) fix(true);
       } }, row);
@@ -6629,6 +6711,7 @@
 /* practice.js — LX.Practice: faded practice sets with staged hints and an automatic check (bridges B1 and B3; styles and
    the small exercise pieces in practice.css).
    LX.Practice(host, { id, title, lede, foot, blank, tracks: [{ label, intro, items: [{ key, kind, minutes, title, build }] }] })
+     foot    a closing note: a string, or short labelled notes [[label, text], ...] (one list item each)
      id      LX.store key: which exercises are done, in this browser only
      blank   the reason shown when Check is pressed with an empty answer
      tracks  sets of exercises that fade from a worked example to a blank page; kind "worked" | "partly" | "scratch";
@@ -6664,7 +6747,8 @@
     var tg = seg(H("div", { class: "lx-fp-bar" }, card), o.tracks.map(function (t) { return t.label; }), 0, function (i) { go(i, null, true); }, "Choose a practice set");
     var intro = H("p", { class: "lx-fp-intro" }, card), fade = H("ol", { class: "lx-fp-fade", "aria-label": "Exercises in this set" }, card);
     var ex = H("section", { class: "lx-fp-ex", "aria-live": "off" }, card);
-    if (o.foot) H("p", { class: "lx-fp-foot", html: LX.rich(o.foot) }, card);
+    if (Array.isArray(o.foot)) { var fl = H("ul", { class: "lx-fp-foot lx-fp-notes" }, card); o.foot.forEach(function (n) { H("li", { html: "<b>" + LX.esc(n[0]) + ":</b> " + LX.rich(n[1]) }, fl); }); }
+    else if (o.foot) H("p", { class: "lx-fp-foot", html: LX.rich(o.foot) }, card);
     var items = []; o.tracks.forEach(function (t) { items = items.concat(t.items); });
     var total = items.reduce(function (s, it) { return s + it.minutes; }, 0), T = 0, I = 0, cur = null;
     function tally() { cnt.textContent = items.filter(function (it) { return done[it.key]; }).length + " of " + items.length + " done · about " + total + " min"; }
@@ -7176,7 +7260,10 @@
      onChange: function (values, checks) {} });
    Returns { el, get(), set(values), text(), checks() }.
    Fields: native, labelled controls with a one-line hint; the type is a set of five radio buttons (the course's question types) that shows the
-   chosen type's template and typical methods (one method family among several). Checks: eight lines (the question
+   chosen type's template and typical methods (one method family among several), the method names with their glossary
+   help (TYPES[i].marked: the same list as `methods`, with glossary marks; `methods` stays plain for the copied text and
+   for pages that mark it themselves). The hints of "Compared with" and "I would be wrong if" say what a descriptive
+   question puts there (a reference; an expectation or a check), as it tests no causal claim. Checks: eight lines (the question
    written, with no bracketed placeholder such as "[…]" left from a draft, then the seven parts that the question
    studio's rigour checks need), each "filled in" or "to do" in words and with an icon, never colour alone. The head counts "N of 8
    parts filled in": the checks see only whether a part is there, not how rigorous it is (the rubric does that); they
@@ -7185,11 +7272,16 @@
 (function () {
   "use strict";
   var TYPES = [
-    { id: "descriptive", label: "Descriptive", template: "How much / how often / where …?", methods: "data analysis, accounting, GIS" },
-    { id: "explanatory", label: "Explanatory", template: "Why did … happen?", methods: "statistics, econometrics, case studies, simulation" },
-    { id: "evaluative", label: "Evaluative", template: "Did … achieve …, compared with …?", methods: "difference-in-differences, matched comparisons, ex-post review" },
-    { id: "predictive", label: "Predictive", template: "What will … be, with what uncertainty?", methods: "forecasting, scenarios, Monte Carlo" },
-    { id: "prescriptive", label: "Prescriptive", template: "What should [decision-maker] do about … to achieve …, compared with …?", methods: "optimization, decision analysis, MCDA" }
+    { id: "descriptive", label: "Descriptive", template: "How much / how often / where …?", methods: "data analysis, accounting, GIS",
+      marked: "data analysis, accounting, [[gis|GIS]]" },
+    { id: "explanatory", label: "Explanatory", template: "Why did … happen?", methods: "statistics, econometrics, case studies, simulation",
+      marked: "statistics, [[econometrics|econometrics]], case studies, simulation" },
+    { id: "evaluative", label: "Evaluative", template: "Did … achieve …, compared with …?", methods: "difference-in-differences, matched comparisons, ex-post review",
+      marked: "[[difference-in-differences|difference-in-differences]], [[matched-comparison|matched comparisons]], [[ex-post-review|ex-post review]]" },
+    { id: "predictive", label: "Predictive", template: "What will … be, with what uncertainty?", methods: "forecasting, scenarios, Monte Carlo",
+      marked: "forecasting, [[scenario|scenarios]], [[monte-carlo|Monte Carlo]]" },
+    { id: "prescriptive", label: "Prescriptive", template: "What should [decision-maker] do about … to achieve …, compared with …?", methods: "optimization, decision analysis, MCDA",
+      marked: "[[optimization|optimization]], [[decision-analysis|decision analysis]], [[mcda|MCDA]] (multi-criteria decision analysis)" }
   ];
   var SCALES = [["S0", "device and plant"], ["S1", "microgrid and community"], ["S2", "regional grid"], ["S3", "city and region"], ["S4", "nation"]];
   // the card's fields, in order; `short` names the field in links (the #q- hash) and `max` caps its length there
@@ -7199,10 +7291,10 @@
     { key: "audience", short: "a", label: "Audience or decision-maker", hint: "Who would use the answer, and who it affects: a co-op board, a regulator or a city council; low-income renters, farmers…" },
     { key: "metric", short: "m", label: "Metric", hint: "What you would measure or compute." },
     { key: "units", short: "u", label: "Units", hint: "MWh, $/MWh, t CO₂ a year, hours without heat…" },
-    { key: "counterfactual", short: "c", label: "Compared with (the counterfactual)", hint: "What happens otherwise: the baseline you compare against." },
+    { key: "counterfactual", short: "c", label: "Compared with (the counterfactual)", hint: "What happens otherwise: the baseline you compare against. A descriptive question names a reference instead: another year, place or threshold." },
     { key: "scale", short: "s", label: "Scale" },
     { key: "boundary", short: "b", label: "Boundary", hint: "What is inside the study, and what is left out." },
-    { key: "wrong", short: "w", label: "I would be wrong if…", hint: "A result that would show your expectation false." },
+    { key: "wrong", short: "w", label: "I would be wrong if…", hint: "A result that would show your expectation false. For a descriptive question: the expectation you state before counting, or a check on the count." },
     { key: "uncertainty", short: "x", label: "The uncertainty that matters most", hint: "The input or assumption that could change the answer most." }
   ];
   var MAX = 600;
@@ -7412,7 +7504,7 @@
     function paintType() {
       var t = typeOf(v.type);
       TYPES.forEach(function (x) { tin[x.id].input.checked = x.id === v.type; tin[x.id].label.classList.toggle("on", x.id === v.type); });
-      tinfo.innerHTML = t ? "<b>Template:</b> " + LX.esc(t.template) + " <span>Typical methods: " + LX.esc(t.methods) + ".</span>"
+      tinfo.innerHTML = t ? "<b>Template:</b> " + LX.esc(t.template) + " <span>Typical methods: " + LX.rich(t.marked || t.methods) + ".</span>"
         : "Five types, each with its own template and typical methods.";
     }
     function paintChecks() {
@@ -7680,7 +7772,7 @@
   //   peak    the week with the year's highest hourly demand
   //   netpeak the week with the highest hourly net load (demand minus the output of reference wind and solar farms)
   //   calm    the week with the least wind energy
-  //   winter  the winter week with the highest hourly net load (a cold, still spell)
+  //   winter  the winter week with the highest hourly net load (chosen after the other extremes)
   // then one medoid week per season among the other weeks of that season (the week closest, hour by hour, to all the
   // others), scaled so that the season's demand, wind and solar energy are kept.
   function selectWeeks(Y, opts) {
@@ -7832,9 +7924,11 @@
           } else if (!plan) {
             var e = {}; e["s" + id] = 1; e.K_be = -1; cons.push({ name: "E" + id, terms: e, le: 0 });
           }
-          if (!plan) {   // charge + discharge <= battery MW (one row: charging and discharging at once never pays)
-            var c1 = {}; c1["c" + id] = 1; c1["d" + id] = 1; c1.K_bp = -1; cons.push({ name: "P" + id, terms: c1, le: 0 });
-          }
+          // charge + discharge <= battery MW, for the optimizer and for a fixed plan alike (one row: charging and
+          // discharging at once never pays, so the row changes no cost; it keeps every solution physical)
+          var c1 = {}; c1["c" + id] = 1; c1["d" + id] = 1;
+          if (plan) cons.push({ name: "P" + id, terms: c1, le: plan.bp });
+          else { c1.K_bp = -1; cons.push({ name: "P" + id, terms: c1, le: 0 }); }
         }
         if (!plan) {
           var g = {}; g["g" + id] = 1; g.K_cc = -1; cons.push({ name: "Gc" + id, terms: g, le: 0 });
@@ -7993,20 +8087,19 @@
   // the full-year check and its error measures (first written for lesson M3)
   // link(m, RW, mode): a model from weekModel() (the linked chain) with another rule for the battery between weeks:
   //   "linked" (or none)  the model as it is: one calendar chain of 52 start levels (Kotzur et al. 2018)
-  //   "cyclic"            each representative week ends where it starts (s<p>_167 = 0), so no energy moves between weeks
+  //   "cyclic"            the 52 chain rows are dropped and each representative week ends where it starts
+  //                       (s<p>_167 = 0): every week starts at a level of its own, so no energy moves between weeks
   //   "free"              no rule between weeks: the 52 chain rows are dropped, so each week may start at any level and
   //                       stored energy can appear from nothing
   // Variable names are build()'s: s<p>_<h> is the level in representative week p after hour h, relative to the week's
   // start; W<i> the level at the start of calendar week i; constraint W<i> is the chain W<i+1> = W<i> + s<rep(i)>_167.
+  // Without the chain, the rows Wl<i> and Wh<i> (0 <= W<i> + lowest swing, W<i> + highest swing <= MWh) still hold, each
+  // with a start level W<i> of its own.
   function link(m, RW, mode) {
     if (!mode || mode === "linked") return m;
     if (mode !== "cyclic" && mode !== "free") throw new Error("link: mode must be linked, cyclic or free");
-    var cons = m.constraints;
-    if (mode === "free") cons = cons.filter(function (c) { return !/^W\d+$/.test(c.name); });
-    else {
-      cons = cons.slice();
-      RW.reps.forEach(function (r, p) { var t = {}; t["s" + p + "_" + (HPW - 1)] = 1; cons.push({ name: "cyc" + p, terms: t, eq: 0 }); });
-    }
+    var cons = m.constraints.filter(function (c) { return !/^W\d+$/.test(c.name); });
+    if (mode === "cyclic") RW.reps.forEach(function (r, p) { var t = {}; t["s" + p + "_" + (HPW - 1)] = 1; cons.push({ name: "cyc" + p, terms: t, eq: 0 }); });
     return { sense: m.sense, variables: m.variables, constraints: cons };
   }
   // the whole year as one period, as fullYearModel() builds it (for summarize() of a full-year run)
@@ -8513,8 +8606,8 @@
      // -> { el, draw }
 
    - Colours. A typical week takes its season's colour (winter, spring, summer, fall); a season's second and third
-     typical weeks are mixed toward the ink colour. Extreme weeks (peak demand, peak net load, least wind, cold still
-     winter) have their own colours and an outline. All colours are --lx-* tokens, so day and night both work.
+     typical weeks are mixed toward the ink colour. Extreme weeks (peak demand, peak net load, least wind, winter
+     net-load peak) have their own colours and an outline. All colours are --lx-* tokens, so day and night both work.
    - Letters. W, Sp, Su, F (numbered when a season has several typical weeks), P, N, C, X: the colour is never the only cue.
    - Text. The grid is role="img" with a sentence that lists every representative week and how many weeks it stands for
      (and how many weeks are short); the key repeats the letters; "Text version" holds a table of all 52 weeks (the week's
@@ -8533,7 +8626,7 @@
   var XCOL = { peak: "var(--lx-bad)", netpeak: "var(--lx-tier-4)", calm: "var(--lx-ink-3)", winter: "var(--lx-tier-2)" };
   var XLET = { peak: "P", netpeak: "N", calm: "C", winter: "X" };
   var SLET = { winter: "W", spring: "Sp", summer: "Su", fall: "F" };
-  var NAMES = { season: "Typical", peak: "Peak demand", netpeak: "Peak net load", calm: "Least wind", winter: "Cold, still winter" };
+  var NAMES = { season: "Typical", peak: "Peak demand", netpeak: "Peak net load", calm: "Least wind", winter: "Winter net-load peak" };
   var SHORT = 0.05;   // MWh: a calendar week counts as short above this
 
   // ---------------------------------------------------------------- pure helpers
@@ -9130,6 +9223,9 @@
      assumptions  ["All money in 2025 dollars.", ...]                          one sentence each
      sensitivity  { metric: "Net present value", input: "the battery price", held: "the plan held fixed",
                     base: { at: "$400/kWh", value: "$4,210" }, cases: [{ at: "$300/kWh", value: "$5,000" }, ...] }
+                  or several inputs, each at a low and a high case (a one-at-a-time sensitivity: one table row per input,
+                  its two cases in it, in every format): { metric: "NPV", base: { value: "−$17,813" }, held: "the equipment held fixed",
+                    rows: [{ label: "Equipment cost", lo: { at: "75% of sourced", value: "−$10,237" }, hi: { at: ..., value: ... } }] }
                   or one sentence (a string)
      limits       ["It leaves out ...", ...]
      footer       optional; default: a teaching model with illustrative assumptions, not advice for a real site
@@ -9153,9 +9249,11 @@
   function joinAnd(a) { return a.length < 2 ? a.join("") : a.slice(0, -1).join(", ") + " and " + a[a.length - 1]; }
   // "Net present value is $4,210 with the battery price at $400/kWh (this plan), $5,000 at $300/kWh and $3,100 at
   // $500/kWh, with the plan held fixed."
+  function multi(s) { return !!(s && typeof s === "object" && s.metric && s.base && list(s.rows).length); }
   function sensitivityLine(s) {
     if (!s) return "";
     if (typeof s === "string") return sentence(s);
+    if (multi(s)) return sentence(s.metric + " " + s.base.value + " at this plan; each row moves one input" + (s.held ? ", " + s.held : ""));
     if (!s.metric || !s.base || !list(s.cases).length) return "";
     var parts = [s.base.value + " with " + s.input + " at " + s.base.at + " (this plan)"].concat(s.cases.map(function (c) { return c.value + " at " + c.at; }));
     return sentence(s.metric + " is " + joinAnd(parts) + (s.held ? ", with " + s.held : ""));
@@ -9184,9 +9282,10 @@
     if (list(n.results).length) out.push({ h: "Results", table: { head: ["Result", "Value"], rows: n.results.map(function (r) { return [r.label, r.value + (r.note ? " (" + r.note + ")" : "")]; }) } });
     out.push({ h: "Assumptions", list: list(n.assumptions).map(sentence), none: "(none stated)" });
     var sl = sensitivityLine(n.sensitivity), s = n.sensitivity;
-    var st = s && typeof s === "object" && s.base && list(s.cases).length ? { head: [s.inputLabel || oneLine(s.input).replace(/^the /, ""), s.metric],
+    var st = multi(s) ? { head: ["Input", s.metric + ", low case; high case"], rows: s.rows.map(function (r) { return [r.label, r.lo.value + " at " + r.lo.at + "; " + r.hi.value + " at " + r.hi.at]; }) }
+      : s && typeof s === "object" && s.base && list(s.cases).length ? { head: [s.inputLabel || oneLine(s.input).replace(/^the /, ""), s.metric],
       rows: [[s.base.at + " (this plan)", s.base.value]].concat(s.cases.map(function (c) { return [c.at, c.value]; })) } : null;
-    out.push({ h: "Sensitivity", para: sl || "(no sensitivity line yet)", empty: !sl, table: st, tableMdOnly: true });
+    out.push({ h: "Sensitivity", para: sl || "(no sensitivity line yet)", empty: !sl, table: st, tableMdOnly: !multi(s) });
     fields.filter(function (f) { return f.at !== "top"; }).forEach(field);
     if (list(n.limits).length) out.push({ h: "Limits of this analysis", list: list(n.limits).map(sentence) });
     out.push({ foot: n.footer || FOOTER });
@@ -9389,8 +9488,10 @@
                 Every plan is feasible (the grid balances the home; spilled wind balances the farm).
      time       representative weeks (weeks(): one medoid week per season, scaled to keep the season's energy, plus
                 extreme weeks kept as they are; each stands for its weeks, and the 24 hours of 31 December are spread
-                over the weights). Storage ends each week where it started (no storage between weeks). opts.full builds
-                the same LP on all 8,760 hours with storage cyclic over the year: the check used by the tests.
+                over the weights). Batteries and the tank are half full (e0.json weeks.boundary) at the start and the
+                end of every period, so the 52 calendar weeks and 31 December join into one schedule for the year and
+                nothing is stored from one week to the next. opts.full builds the same LP on all 8,760 hours with storage
+                cyclic over the year at a level of its own: the check used by the tests (it can only do as well or better).
      tie rule   a wear charge (e0.json tie: $0.0002/kWh home, $0.02/MWh farm) on battery charge and discharge, and on the
                 farm a hair's preference (TIME, one part in a million at most) for selling power and hydrogen earlier in the
                 week; both are left out of every reported number (read() prices the flows itself). Hour-by-hour schedules
@@ -9655,11 +9756,21 @@
     for (var h = 0; h < p.n; h++) out.push({ wind: p.series.wind[h], price: sell[p.h0 + h] });
     return out;
   }
+  // a store's level at the end of a period's last hour, pinned at the boundary share of its size (the first hour starts
+  // from that level too, through the cyclic row): fixed sizes pin the variable, sized ones add a row with the size
+  function pin(V, R, name, sizeVar, cap, share, rn) {
+    if (sizeVar) { var t = {}; t[name] = 1; t[sizeVar] = -share; R.push({ name: rn, terms: t, eq: 0 }); return; }
+    for (var i = V.length - 1; i >= 0; i--) if (V[i].name === name) { V[i].lb = share * cap; V[i].ub = share * cap; return; }
+    throw new Error("E0.build: no variable " + name);
+  }
   // the LP of a plan over a list of periods (opts.periods, or opts.mode: "week" all 52, "reps", "year"); opts.size: the
-  // sizes are decisions too. Variable names carry the period's index k and the hour h ("i3_17").
+  // sizes are decisions too. Variable names carry the period's index k and the hour h ("i3_17"). Every period but the
+  // whole year starts and ends with its stores at the boundary share of their size (D.weeks.boundary).
   function build(P, s, opts) {
     opts = opts || {};
     var D = P.D, Z = sizes(s), C = costs(D, s), size = !!opts.size, ps = opts.periods || periods(P, s, opts.mode || (size ? "reps" : "week")), V = [], R = [];
+    var share = D.weeks.boundary;
+    if (!(share >= 0 && share <= 1)) throw new Error("E0.build: e0.json weeks.boundary must be a share between 0 and 1");
     if (s.site === "home") {
       var tie = D.tie.home, xc = s.xc / 100, rte = D.home.battery.rte, bat = size || Z.hb > 0, u = SC.home;
       if (size) V.push({ name: "PV", ub: field("pv").max, cost: C.pv.eac * u }, { name: "HB", ub: field("hb").max, cost: C.hb.eac * u });
@@ -9685,6 +9796,7 @@
           if (size) { bal.PV = x.pv; R.push({ name: "b" + id, terms: bal, eq: x.need }); var xr = {}; xr["x" + id] = 1; xr.PV = -x.pv; R.push({ name: "xp" + id, terms: xr, le: 0 }); }
           else R.push({ name: "b" + id, terms: bal, eq: x.need - x.pv * Z.pv });
         });
+        if (bat && p.kind !== "year") pin(V, R, "s" + k + "_" + (p.n - 1), size ? "HB" : null, Z.hb, share, "sb" + k);
       });
     } else {
       var ft = D.tie.farm, frte = D.farm.battery.rte, tpm = 1 / D.farm.electrolyzer.kWhPerKg, h2p = s.h2, f = SC.farm;   // tpm: t of hydrogen per MWh
@@ -9720,6 +9832,10 @@
           }
           R.push({ name: "b" + id, terms: bal, le: x.wind * Z.wind });
         });
+        if (p.kind !== "year") {
+          if (fbat) pin(V, R, "s" + k + "_" + (p.n - 1), size ? "FB" : null, Z.fb, share, "sb" + k);
+          if (tank) pin(V, R, "k" + k + "_" + (p.n - 1), size ? "TK" : null, Z.tank / 1000, share, "kb" + k);
+        }
       });
     }
     return { sense: "min", variables: V, constraints: R };
@@ -9897,11 +10013,11 @@
         payback: cfP.payback, cash: cfP.rows, items: it, horizon: N, lcoh: lcoh, extraCapex: extra.reduce(function (a, x) { return a + x.capex; }, 0) };
       out.co2 = { avoided: T.co2Avoided };
       out.readouts = [
-        { key: "npv", label: "Net present value, " + N + " years", value: money(cfP.npv), note: "the whole plant, at " + num(s.rate, 1) + "% real" },
+        { key: "npv", label: "Net present value, " + N + " years", value: money(cfP.npv), note: "the whole plant, at " + num(s.rate, 1) + "% real; grid line not costed" },
         { key: "added", label: "What the extra equipment adds", value: money(cfP.npv - cfA.npv), note: "against the same wind farm alone (" + money(cfA.npv) + ")" },
         { key: "revenue", label: "Net revenue a year", value: money(T.revenue), note: "power " + money(T.sales) + (T.h2 > 0 ? ", hydrogen " + money(T.h2Rev) + ", less stack wear" : "") },
-        { key: "spill", label: "Wind spilled", value: pct(T.spillShare, 1), note: "alone: " + pct(T.aloneSpillShare, 1) + "; the line is full " + num(T.lineHours || 0) + " h a year" + sched },
-        { key: "h2", label: "Hydrogen sold a year", value: num(T.h2 / 1000) + " t", note: T.h2 > 0 ? "the buyer's full take in " + num(T.fullTake || 0) + " h" + sched : "no electrolyzer" },
+        { key: "spill", label: "Wind spilled", value: pct(T.spillShare, 1), note: "unused; alone: " + pct(T.aloneSpillShare, 1) + "; the line is full " + num(T.lineHours || 0) + " h a year" + sched },
+        { key: "h2", label: "Hydrogen sold a year", value: num(T.h2 / 1000) + " t", note: T.h2 > 0 ? "the buyer's full take in " + num(T.fullTake || 0) + " h" + sched : Z.el > 0 ? "no hydrogen sold under this plan" : "no electrolyzer" },
         { key: "co2", label: "Potential CO₂ avoided, a year", value: T.h2 > 0 ? num(T.co2Avoided) + " t" : "–",
           note: T.h2 > 0 ? "if this hydrogen replaces hydrogen made from gas; leaves out the grid power these MWh no longer replace" : "no hydrogen; running the farm emits no CO₂" },
         { key: "lcoh", label: "Cost per kg of hydrogen", value: lcoh === null ? "–" : "$" + num(lcoh, 2), note: lcoh === null ? "no hydrogen" : "electrolyzer, tank and wear only; the wind is counted as free" }];
@@ -9922,9 +10038,16 @@
     for (k in z) { var f = field(k); o[k] = Math.min(f.max, Math.max(f.min, Math.round(z[k] / STEP[k]) * STEP[k])); o[k] = +o[k].toFixed(2); }
     return o;
   }
+  // "Size it for me" in words: a suggestion from the representative weeks, rounded, then run on the year (the bench's
+  // check table shows a case where a step either side does better on the year)
+  function sizeWords(site, n) {
+    return "Or let the engine suggest " + (site === "home" ? "solar and battery" : "battery, electrolyzer and tank") + " sizes: least yearly cost on " + n +
+      " [[representative-period|representative weeks]], rounded to the controls' steps. The year then runs them; a step either side can do better.";
+  }
+  var SIZED = "Suggested: the sizes with the least yearly cost on the representative weeks, rounded to the controls' steps, are on the controls, and the year is running with them.";
   var HINT = "Every plan on this bench should be feasible (the grid or spilled wind balances each hour), so this is a fault in the bench: reload the page or change one control and run again.";
-  // a run. Default: the 52 calendar weeks of 2025, one small LP each, solved one after another (storage starts and ends
-  // each week at the same level); o.full: one LP on all 8,760 hours with storage cyclic over the year (the check);
+  // a run. Default: the 52 calendar weeks of 2025, one small LP each, solved one after another (storage half full at the
+  // start and end of each week, so the weeks join); o.full: one LP on all 8,760 hours with storage cyclic over the year (the check);
   // o.mode "reps": the representative weeks; o.size: sizing on the representative weeks (results.sizes, .snapped).
   // Never rejects: { status, ok, message, hint, results, raw, kind, ms }; ok only when every model is optimal.
   function fail(status, message) { return { status: status, ok: false, message: message, hint: status === "infeasible" ? HINT : null, results: null }; }
@@ -10039,12 +10162,20 @@
     if (!sens || !sens.rows || !sens.rows.length) return null;
     var rows = sens.rows.slice().sort(function (a, b) { return Math.abs(b.atHi - b.atLo) - Math.abs(a.atHi - a.atLo); });
     var parts = rows.map(function (r) { return r.label + " at " + r.loText + ": " + money(r.atLo) + "; at " + r.hiText + ": " + money(r.atHi); });
-    var NAME = { cost: "the equipment cost (stack wear)", xc: "the export credit", h2: "the hydrogen price", line: "the line limit" };
+    var NAME = { cost: "the equipment cost (stack wear)", xc: "the export credit", h2: "the hydrogen price", line: "the line limit" }, SHORT = { cost: "stack wear", xc: "export credit", h2: "hydrogen price", line: "line limit" };
     var rerun = rows.filter(function (r) { return r.rerun; }).map(function (r) { return NAME[r.key] || r.label.toLowerCase(); });
     var lim = rows.some(function (r) { return r.limit; });
     var held = "The equipment is held fixed." + (rerun.length ? " Re-run over 52 weeks and 31 December: " + joinAnd(rerun) + "." : "");
     return { line: "The NPV is " + money(sens.base) + " at this plan. " + parts.join(". ") + ". " + held + (lim ? " The line's cases change the connection limit; its cost is not counted." : ""),
-      note: "Green: above your NPV; red: below. " + held, widest: rows[0] };
+      note: "Green: above your NPV; red: below. " + held, widest: rows[0], rows: rows,
+      held: "the equipment held fixed" + (rerun.length ? "; re-run hour by hour: " + joinAnd(rows.filter(function (r) { return r.rerun; }).map(function (r) { return SHORT[r.key] || r.label.toLowerCase(); })) : "") };
+  }
+  // the same, as a one-page note's sensitivity (LX.ReportNote: one table row per case, then one short line)
+  function sensNote(s, sens) {
+    var w = sensWords(s, sens);
+    if (!w) return null;
+    return { metric: "NPV", base: { value: money(sens.base) }, held: w.held,
+      rows: w.rows.map(function (r) { return { label: r.label, lo: { at: r.loText, value: money(r.atLo) }, hi: { at: r.hiText, value: money(r.atHi) } }; }) };
   }
 
   // ---------------------------------------------------------------- words: the plan, the note, the no-JS tables
@@ -10089,10 +10220,11 @@
           : "The wind follows SPP's 2025 hourly pattern, reshaped month by month to EIA's 2025 capacity factors (" + pct(res.cf.wind, 1) + " for the year); the prices are illustrative.",
         home ? "CO₂ counts operating emissions only: bought power at Kansas's 2024 average factor, and gas burned; power sent back is a separate credit."
           : "CO₂ avoided is a potential saving: it assumes each kg of hydrogen replaces one made from natural gas.",
-        "Equipment costs are " + s.cost + "% of the sourced values, with no tax credits or incentives."],
+        home ? null : "The grid line is an assumed limit; building or upgrading it is not costed.",
+        "Equipment costs are " + s.cost + "% of the sourced values, with no tax credits or incentives."].filter(Boolean),
       sensitivity: null,
       limits: [
-        "Storage starts and ends each week at the same level, so nothing is stored from one week to the next.",
+        "Storage is half full at each week's start and end, so nothing is stored from one week to the next.",
         home ? "The grid is always there: outages and backup power are outside this bench." : "The farm only sells: it cannot buy power for the electrolyzer or the battery.",
         home ? "One average CO₂ factor for every hour: timing does not change the CO₂ here (case file CF6)." : "One buyer takes the hydrogen at one price; storage beyond the tank and delivery are outside the bench."]
     };
@@ -10125,18 +10257,22 @@
       ["Discount rate", num(D.finance.rate) + "% real (you can change it)", ["atb2025-fin"]],
       ["Home: household use", num(H.use.kWh) + " kWh a year, the town's 2025 demand shape (illustrative)", ["eia-930"]],
       ["Home: heating need", num(H.heat.kWh) + " kWh of heat a year, from a smooth made-up temperature (illustrative)", []],
-      ["Home: rooftop solar", "$" + num(H.pv.capex) + "/kW in 2022 dollars = " + d(H.pv.capex, H.pv.capexYear) + "/kW; " + H.pv.life + " years; upkeep $" + H.pv.fom + "/kW a year (illustrative). Output: SPP's 2025 hourly solar pattern, scaled month by month to EIA's 2025 capacity factors and to a " + pct(P.home.pvCF, 1) + " year", ["eia-aeo2026-rdm", "eia-dg-2024", "eia-epm-cf"]],
+      ["Home: rooftop solar, cost", "$" + num(H.pv.capex) + "/kW in 2022 dollars = " + d(H.pv.capex, H.pv.capexYear) + "/kW; " + H.pv.life + " years; upkeep $" + H.pv.fom + "/kW a year (illustrative)", ["eia-aeo2026-rdm", "eia-dg-2024"]],
+      ["Home: rooftop solar, output", "SPP's 2025 hourly solar pattern, scaled month by month to EIA's 2025 capacity factors and to a " + pct(P.home.pvCF, 1) + " year", ["eia-epm-cf"]],
       ["Home: battery", "$" + num(H.battery.capex) + "/kWh (illustrative); 2.5 hours; " + pct(H.battery.rte) + " round trip; " + H.battery.life + " years; upkeep " + pct(H.battery.fomShare) + " a year", ["atb2025-resbat"]],
-      ["Home: heat pumps", "standard: about " + num(P.home.cop.standard, 1) + " kWh of heat for each kWh of electricity over a season (HSPF " + H.hp.standard.hspf + ", the heating seasonal performance factor), $" + num(H.hp.standard.capex) + " in 2022 dollars = " + d(H.hp.standard.capex, 2022) +
-        "; high efficiency: about " + num(P.home.cop.high, 1) + " (HSPF " + H.hp.high.hspf + "), $" + num(H.hp.high.capex) + " = " + d(H.hp.high.capex, 2022) + ". HSPF ÷ 3.412 = the season's heat over electricity", ["eia-aeo2026-rdm"]],
+      ["Home: heat pumps, cost", "standard $" + num(H.hp.standard.capex) + " in 2022 dollars = " + d(H.hp.standard.capex, 2022) + "; high efficiency $" + num(H.hp.high.capex) + " = " + d(H.hp.high.capex, 2022), ["eia-aeo2026-rdm"]],
+      ["Home: heat pumps, performance", "about " + num(P.home.cop.standard, 1) + " kWh of heat for each kWh of electricity over a season (standard, HSPF " + H.hp.standard.hspf + "); about " + num(P.home.cop.high, 1) + " (high efficiency, HSPF " + H.hp.high.hspf + ")", ["eia-aeo2026-rdm"]],
+      ["Home: heat pumps, HSPF", "the heating seasonal performance factor, in Btu of heat per Wh of electricity; HSPF ÷ 3.412 = the season's heat over its electricity", []],
       ["Home: gas furnace and gas", pct(H.gas.afue) + " efficient; $" + num(H.gas.pricePerMcf, 2) + " per thousand cubic feet = $" + num(gasMM, 2) + " per MMBtu (a million British thermal units, about 293 kWh of heat); " + H.gas.co2PerMMBtu + " kg CO₂ per MMBtu burned", ["eia-ng-ks", "eia-btu", "eia-co2"]],
       ["Home: tariffs", num(H.tariff.flat * 100) + "¢/kWh flat; time-of-use " + num(P.home.touOff * 100, 2) + "¢ and " + num(P.home.touPeak * 100, 2) + "¢ (16:00–21:00), illustrative", ["eia-epm-5-6-b"]],
       ["Home: export credit", "what the utility pays for each kWh the panels send to the grid (net billing): " + num(H["export"].def) + "¢ by default, 0 to 8¢ on the bench (illustrative)", []],
       ["Home: grid CO₂", num(H.grid.lbPerMWh) + " lb/MWh = " + num(ef, 3) + " kg CO₂/kWh (Kansas, 2024)", ["eia-ks-profile"]],
-      ["Farm: wind", "$" + num(F.wind.capex) + "/kW and $" + num(F.wind.fom, 2) + "/kW a year (2025 dollars); " + F.wind.life + " years: $" + num(C.wind.eac) + " a year per MW at " + D.finance.rate + "%. Output: SPP's 2025 hourly wind pattern, reshaped month by month to EIA's 2025 capacity factors and to a " + pct(P.farm.windCF, 1) + " year, the best hours at full size", ["eia-aeo2026-emm", "eia-epm-cf"]],
+      ["Farm: wind, cost", "$" + num(F.wind.capex) + "/kW and $" + num(F.wind.fom, 2) + "/kW a year (2025 dollars); " + F.wind.life + " years: $" + num(C.wind.eac) + " a year per MW at " + D.finance.rate + "%", ["eia-aeo2026-emm"]],
+      ["Farm: wind, output", "SPP's 2025 hourly wind pattern, reshaped month by month to EIA's 2025 capacity factors and to a " + pct(P.farm.windCF, 1) + " year, the best hours at full size", ["eia-epm-cf"]],
+      ["Farm: line to the grid", "an assumed available connection limit, set on the bench; building or upgrading it is not costed", []],
       ["Farm: battery", "$" + num(F.battery.capexPerkW) + "/kW for 4 hours = $" + num(F.battery.capexPerkW / 4, 2) + "/kWh; $" + num(F.battery.fomPerkW, 2) + "/kW a year; " + pct(F.battery.rte) + " round trip; " + F.battery.life + " years", ["eia-aeo2026-emm", "nrel-battery-2025"]],
-      ["Farm: electrolyzer", "$" + num(F.electrolyzer.capex) + "/kW in 2022 dollars = " + d(F.electrolyzer.capex, F.electrolyzer.capexYear) + "/kW; upkeep " + pct(F.electrolyzer.fomShare) + " a year; " + F.electrolyzer.kWhPerKg + " kWh/kg. Stack wear $" + num(C.elWear, 2) +
-        "/MWh used: an illustrative allowance per MWh, based on DOE's stack replacement (" + pct(F.electrolyzer.stackShare) + " of the cost after " + num(F.electrolyzer.stackHours) + " operating hours) as if every hour ran at full power", ["doe-h2-24005"]],
+      ["Farm: electrolyzer, cost", "$" + num(F.electrolyzer.capex) + "/kW in 2022 dollars = " + d(F.electrolyzer.capex, F.electrolyzer.capexYear) + "/kW; upkeep " + pct(F.electrolyzer.fomShare) + " a year; " + F.electrolyzer.kWhPerKg + " kWh/kg", ["doe-h2-24005"]],
+      ["Farm: electrolyzer, stack wear", "$" + num(C.elWear, 2) + "/MWh used, an illustrative allowance: DOE's stack replacement (" + pct(F.electrolyzer.stackShare) + " of the cost after " + num(F.electrolyzer.stackHours) + " operating hours), as if every hour ran at full power", ["doe-h2-24005"]],
       ["Farm: hydrogen tank", "$" + num(F.tank.capexPerKg) + " per kg held (illustrative); " + F.tank.life + " years", []],
       ["Farm: prices", "power $" + F.sale.flat + "/MWh fixed, or $" + F.sale.tou.off + " and $" + F.sale.tou.peak + "/MWh (16:00–21:00); hydrogen $" + num(F.h2.def, 2) + "/kg by default (all illustrative)", []],
       ["Farm: potential CO₂ avoided", num(F.h2.gasMMBtuPerKg, 2) + " MMBtu of gas per kg of hydrogen made from natural gas × " + F.h2.co2PerMMBtu + " kg CO₂ per MMBtu = " + num(F.h2.gasMMBtuPerKg * F.h2.co2PerMMBtu, 2) + " kg CO₂ per kg, if the farm's hydrogen replaces it", ["eia-aeo2026-hmm", "eia-co2"]]];
@@ -10161,6 +10297,21 @@
       (check.date ? '<p class="lx-hint">Solved on ' + esc(check.date) + ' with HiGHS by the bench\'s test.</p>' : "");
   }
 
+  // "Size it for me" checked on the year (D.reference.sizing, written by the test): for each case, the suggested sizes, the
+  // NPV of a run of the year with them, and the best plan one control step either side of them, run the same way
+  function sizingRows(check) {
+    return (check && check.rows || []).map(function (r) {
+      var z = Object.keys(r.sizes).filter(function (k) { return r.sizes[k] > 0; }).map(function (k) { return field(k).label + " " + fmtField(field(k), r.sizes[k]); });
+      return [r.label, z.length ? z.join(", ") : "nothing", money(r.npv), r.best ? field(r.best.key).label + " " + fmtField(field(r.best.key), r.best.value) + ": NPV " + (r.best.npv - r.npv >= 0 ? "+" : "−") + money(Math.abs(r.best.npv - r.npv)) : "none better"];
+    });
+  }
+  function sizingHTML(check) {
+    if (!check) return "";
+    return '<table class="lx-facts"><thead><tr><th scope="col">Case</th><th scope="col">Suggested on the representative weeks</th><th scope="col">NPV, the year run with them</th><th scope="col">Best of one step either side, on the year</th></tr></thead><tbody>' +
+      sizingRows(check).map(function (r) { return "<tr><td>" + esc(r[0]) + "</td><td>" + esc(r[1]) + '</td><td class="n">' + esc(r[2]) + "</td><td>" + esc(r[3]) + "</td></tr>"; }).join("") + "</tbody></table>" +
+      (check.date ? '<p class="lx-hint">Solved on ' + esc(check.date) + " with HiGHS by the bench's test.</p>" : "");
+  }
+
   // every sentence the results draw for a run (the page's text budget is checked on these by the test): the week strip's
   // key, the week chart's note and schedule line, the cash flow's keys
   function captions(s, res) {
@@ -10180,8 +10331,9 @@
   var api = { HOURS: HOURS, HPW: HPW, WEEKS: WEEKS, SITES: SITES, schema: schema, schemaFor: schemaFor, presets: presets, defaults: defaults, withPreset: withPreset,
     field: field, crf: crf, usd: usd, costs: costs, temperature: temperature, prepare: prepare, weeks: weeks, periods: periods, build: build,
     read: read, start: start, add: add, finish: finish, summarize: summarize, cashflow: cashflow, items: items, solve: solve, snap: snap, sensitivity: sensitivity, sensRows: sensRows,
-    recost: recost, sensWords: sensWords, split: split, stores: stores, captions: captions, SCHED: SCHED, HINT: HINT, fmt: { money: money, num: num, pct: pct, field: fmtField }, note: note, heading: heading, planRows: planRows,
-    resultsHTML: resultsHTML, fallback: fallback, inputRows: inputRows, inputsHTML: inputsHTML, sourcesHTML: sourcesHTML, checkRows: checkRows, checkHTML: checkHTML };
+    recost: recost, sensWords: sensWords, sensNote: sensNote, split: split, stores: stores, captions: captions, SCHED: SCHED, HINT: HINT, sizeWords: sizeWords, SIZED: SIZED, fmt: { money: money, num: num, pct: pct, field: fmtField }, note: note, heading: heading, planRows: planRows,
+    resultsHTML: resultsHTML, fallback: fallback, inputRows: inputRows, inputsHTML: inputsHTML, sourcesHTML: sourcesHTML, checkRows: checkRows, checkHTML: checkHTML,
+    sizingRows: sizingRows, sizingHTML: sizingHTML };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   if (typeof window === "undefined" || !window.LX) return;
   window.LX.E0 = api;
@@ -10202,7 +10354,7 @@
     if (f.id === "hb") return function (lo, hi, mx, v) { return v > 0 ? "Charges and discharges at up to " + num(v / 2.5, 1) + " kW (2.5 hours)." : "No battery."; };
     if (f.id === "wind") return function (lo, hi, mx, v) { return "Makes about " + num(v * P.farm.windCF * HOURS) + " MWh a year."; };
     if (f.id === "fb") return function (lo, hi, mx, v) { return v > 0 ? "Up to " + num(v / 4) + " MW in or out (4 hours)." : "No battery."; };
-    if (f.id === "el") return function (lo, hi, mx, v) { return v > 0 ? "Makes up to " + num(v * 1000 / D.farm.electrolyzer.kWhPerKg) + " kg of hydrogen an hour." : "No electrolyzer."; };
+    if (f.id === "el") return function (lo, hi, mx, v) { return (v > 0 ? "Makes up to " + num(v * 1000 / D.farm.electrolyzer.kWhPerKg) + " kg of hydrogen an hour." : "No electrolyzer.") + " Stack wear: an allowance per MWh for replacing its cells."; };
     if (f.id === "tank") return function (lo, hi, mx, v) { return v > 0 ? "Holds " + num(v * 1000) + " kg of hydrogen." : "No tank: hydrogen is sold as it is made."; };
     if (f.id === "line") return function () { return "Sell only: the farm cannot buy power."; };
     if (f.id === "xc") return function () { return "What the utility pays for each kWh the panels send to the grid ([[net-billing|net billing]])."; };
@@ -10247,6 +10399,10 @@
     var next = H("button", { type: "button", class: "lx-btn ghost small", text: "Week after →" }, wkNav);
     var schedP = H("p", { class: "lx-hint e0-sched", hidden: true }, wkCard);
     var plot = LX.Plot(wkCard, { text: "Text version: this week, day by day", legend: true });
+    // the same week hour by hour, with what the site needs from outside and when it meets a limit (built when opened)
+    var hourAlt = H("details", { class: "lx-textalt e0-hours" }, wkCard); H("summary", { text: "Text version: this week, hour by hour" }, hourAlt);
+    var hourBody = H("div", { class: "lx-scroll-x" }, hourAlt);
+    hourAlt.addEventListener("toggle", function () { if (hourAlt.open && last) drawHours(last.res, last.s); });
     var cfCard = H("div", { class: "lx-xcard lx-sb-chart" }, charts);
     var cfHead = H("header", { class: "lx-x-head" }, cfCard); H("h3", { text: "Cash flow, year by year" }, cfHead);
     var cfLede = H("ul", { class: "e0-keys" }, cfCard);
@@ -10319,6 +10475,25 @@
           : ["Day", "Wind, MWh", "Sold, MWh", "Electrolyzer, MWh", "Into the battery, MWh", "From the battery, MWh", "Spilled, MWh", "Hydrogen sold, t"], rows: rows,
         note: cap.week };
       plot.render(spec);
+      if (hourAlt.open) drawHours(res, s); else hourBody.innerHTML = "";
+    }
+    function drawHours(res, s) {
+      var ps = res.periods.filter(function (p) { return p.kind === "week"; }), p = ps[sel[s.site]], S = p.series, home = s.site === "home", Z = res.sized, rows = [];
+      for (var k = 0; k < HPW; k++) {
+        var hh = k % 24, t = dayLabel(p.start, Math.floor(k / 24)) + ", " + (hh < 10 ? "0" : "") + hh + ":00";
+        if (home) rows.push([t, num(S.need[k], 2), num(S.pv[k], 2), num(S.imp[k], 2), S.imp[k] > 1e-3 ? "yes" : "no", num(S.ch[k], 2), num(S.dis[k], 2), num(S.exp[k], 2)]);
+        else {
+          var at = [];
+          if (Z.line > 0 && S.sell[k] >= Z.line - 1e-6) at.push("line full");
+          if (Z.take > 0 && Z.el > 0 && S.h2[k] >= Z.take - 1e-6) at.push("buyer's full take");
+          rows.push([t, num(S.wind[k]), num(S.sell[k]), num(S.el[k]), num(S.ch[k]), num(S.dis[k]), num(S.spill[k]), num(S.h2[k]), at.length ? at.join("; ") : "no"]);
+        }
+      }
+      var head = home ? ["Hour", "Use, kWh", "Solar, kWh", "Bought, kWh", "Needs the grid", "Into the battery, kWh", "From the battery, kWh", "Sent back, kWh"]
+        : ["Hour", "Wind, MW", "Sold, MW (line " + num(Z.line) + " MW)", "Electrolyzer, MW", "Into the battery, MW", "From the battery, MW", "Spilled, MW", "Hydrogen sold, kg (buyer at most " + num(Z.take) + " kg/h)", "At a limit"];
+      hourBody.innerHTML = "<table class='lx-facts'><caption class='lx-sr'>" + LX.esc(wkName.textContent) + ", hour by hour</caption><thead><tr>" + head.map(function (x) { return "<th scope='col'>" + LX.esc(x) + "</th>"; }).join("") + "</tr></thead><tbody>" +
+        rows.map(function (r) { return "<tr>" + r.map(function (c, i) { return i ? "<td class='n'>" + LX.esc(c) + "</td>" : "<th scope='row'>" + LX.esc(c) + "</th>"; }).join("") + "</tr>"; }).join("") + "</tbody></table>" +
+        (stores(s) ? "<p class='lx-hint'>" + LX.esc(SCHED.charAt(0).toUpperCase() + SCHED.slice(1)) + ".</p>" : "");
     }
     function niceTop(v) { var e = Math.pow(10, Math.floor(Math.log10(v))), m = v / e; return (m <= 1 ? 1 : m <= 2 ? 2 : m <= 2.5 ? 2.5 : m <= 5 ? 5 : 10) * e; }
     // an axis from mn to mx (mn <= 0 <= mx) with gridlines every step, 0 among them
@@ -10390,8 +10565,7 @@
     var shownSite = null;
     function showSite() {
       groupEls.forEach(function (g) { g.el.hidden = !!g.site && g.site !== plan.site; });
-      if (sizeHint) sizeHint.textContent = "Or let the engine choose the " + (plan.site === "home" ? "solar and battery" : "battery, electrolyzer and tank") + " sizes with the least yearly cost, on " +
-        P[plan.site].weeks.reps.length + " representative weeks; your other choices stay.";
+      if (sizeHint) sizeHint.innerHTML = LX.rich(sizeWords(plan.site, P[plan.site].weeks.reps.length));
       if (shownSite === plan.site) return;
       shownSite = plan.site;
       presetBox.innerHTML = "";
@@ -10412,7 +10586,7 @@
       solve: function (st, ctx) { return solve(st, P, { signal: ctx.signal, timeLimit: ctx.attempt > 1 ? 30 : 10 }); },
       render: function (r, st, full) { res.draw(r, st); chips(r); if (o.onRun) o.onRun(r, st, full); },
       results: [res.el, roBox], stale: staleP, busy: o.api && o.api.busy, onDone: function (r, st) { if (o.onDone) o.onDone(r, st); },
-      words: { ok: "Done: the cheapest way to run this plan through every hour of 2025, as 52 weeks and 31 December (the solver reports each one optimal)." } });
+      words: { ok: "Done: the cheapest way to run this plan through every hour of 2025, as 52 weeks and 31 December, storage half full where they meet (the solver reports each one optimal)." } });
     var sizer = null;
     if (sizeBox) {
       var sizeHint = H("p", { class: "lx-hint" }, sizeBox);
@@ -10429,7 +10603,7 @@
           var sn = r.snapped; SIZE_KEYS[st.site].forEach(function (k) { plan[k] = sn[k]; }); refill(); changed(); setTimeout(function () { run.run(plan); }, 0);
         },
         busy: o.api && o.api.busy,
-        words: { ok: "Sized: the engine's least-cost sizes, rounded to the controls' steps, are on the controls, and the year is running with them.",
+        words: { ok: SIZED,
           cancelled: "Sizing stopped: the plan on the controls changed. Press Size it for me to size the plan you see." } });
     }
     function changed() { if (sizer && sizer.running()) sizer.cancel(); ss.set(plan); run.changed(plan); if (o.onChange) o.onChange(plan); }
@@ -10467,7 +10641,9 @@
       when the import limit is below 1,200 kW and the plan cannot make up the rest; the page then says so, shows the
       kWh and does not compare the cost with the grid-only bill). The generator runs only in
       outages (illustrative rule). The 12 average days smooth the weather: the test checks four plans against a
-      chronological 8,760-hour year (F7's campus: the same bill; larger solar-and-battery plans: a bill 4% to 7% higher).
+      chronological 8,760-hour year (F7's campus: the same bill; the three larger solar-and-battery plans: a bill 4% to 7%
+      higher) and one extreme plan (4,000 kW, 8,000 kWh, no exports: about 12% higher), so the pages say other plans can
+      differ more.
       Then one MILP per outage scenario (islanded; the battery and the tank start full): s + d + g - c = loads served;
       g <= 200 u, g >= 60 u (a set that is on runs at 30% or more), u = sets on, a whole number from 0 to gen;
       fuel: sum 0.07 g <= the gallons on site; each load may be partly served. The objective is a priority order, not
@@ -10587,7 +10763,7 @@
         { id: "imp", short: "im", type: "int", min: C.imp[0], max: C.imp[1], step: C.imp[2], def: D.imp, label: "Feeder import limit", unit: "kW" },
         { id: "tar", short: "t", type: "enum", values: ["tou", "flat"], names: { tou: "Time-of-use", flat: "Flat" }, def: D.tar, label: "Tariff" },
         { id: "own", short: "w", type: "enum", values: ["utility", "coop", "community"], names: { utility: "Utility-owned", coop: "Co-op-owned", community: "Community-owned" }, def: D.own, label: "Owner" },
-        { id: "allow", short: "al", type: "set", values: ["pv", "bat", "gen"], names: { pv: "solar", bat: "battery", gen: "generator sets" }, def: D.allow, label: "Size it may build" }]
+        { id: "allow", short: "al", type: "set", values: ["pv", "bat", "gen"], names: { pv: "solar", bat: "battery", gen: "generator sets" }, def: D.allow, label: "Size it for me may build" }]
     };
   }
   var schema = makeSchema();
@@ -10906,8 +11082,8 @@
         "The model knows the coming sun (perfect foresight); the sun is a teaching profile from SPP's 2025 hourly solar, not measured campus output"],
       sensitivity: null,
       limits: ["It checks only the outages chosen: a different start, a longer storm or a broken set can turn out worse",
-        "Its year is 12 average days: over a full 8,760-hour year, a large solar-and-battery plan's grid bill comes out up to 7% higher",
-        "It leaves out the network inside the campus, the generator's part-load fuel use and battery wear"]
+        "Its year is 12 average days: for the larger solar-and-battery plans checked over a full 8,760-hour year, the grid bill came out about 4% to 7% higher; other plans can differ more",
+        "It leaves out the network inside the campus, how a generator's fuel use changes below full output, and battery wear"]
     };
   }
   // the no-JS tables of the default plan's precomputed run (written into the data by the test's --write mode)
@@ -11247,14 +11423,15 @@
     sl("fuel", "Diesel on site", COL.gen, 25, function (v) { return kilo(v) + " gal"; });
     if (!(o.hide && o.hide.allow)) {
       var al = H("div", { class: "e1-allow" }, g1);
-      H("span", { class: "e1-allowl", text: "Size it may build:" }, al);
-      var tg = H("div", { class: "lx-toggles", role: "group", "aria-label": "What Size it may build" }, al);
+      H("span", { class: "e1-allowl", text: "Size it for me may build:" }, al);
+      var tg = H("div", { class: "lx-toggles", role: "group", "aria-label": "What Size it for me may build" }, al);
       ctl.allow = {};
       [["pv", "Solar"], ["bat", "Battery"], ["gen", "Generator sets"]].forEach(function (x) {
         ctl.allow[x[0]] = LX.Toggle(tg, { label: x[1], on: plan.allow.indexOf(x[0]) >= 0, onChange: function (on) {
           var p = copy(plan), a = p.allow.filter(function (y) { return y !== x[0]; }); if (on) a.push(x[0]);
           p.allow = ["pv", "bat", "gen"].filter(function (y) { return a.indexOf(y) >= 0; }); change(p); } });
       });
+      H("p", { class: "lx-ctl-hint e1-allowh", text: "Its sizes replace yours; a technology switched off here is sized to zero." }, al);
     }
     if (!(o.hide && o.hide.out)) {
       var g2 = fieldset(ctr, "Outages to plan for", "Hypothetical: the grid assumed down during a stretch of 2025 sun; the battery and the tank start full.");
@@ -11307,7 +11484,8 @@
     var sizeB = H("button", { class: "lx-btn ghost small", type: "button", text: "Size it for me" }, run.button.parentNode);
     sizeB.addEventListener("click", function () { if (run.running()) return; task = "size"; run.run(plan); });
     run.button.parentNode.addEventListener("click", function (e) { if (e.target === run.button || run.button.contains(e.target)) task = "run"; }, true);
-    H("p", { class: "lx-hint e1-sizehint", html: "<b>Size it for me</b> " + LX.rich("asks the [[mixed-integer-program|mixed-integer program]] for the cheapest sizes that keep every must-stay-on load on through the chosen outages, rounds them up to the bench's steps and runs them: a safe plan, not proven the cheapest on the steps.") }, side);
+    H("p", { class: "lx-hint e1-sizehint", html: "<b>Size it for me</b> " + LX.rich("asks the [[mixed-integer-program|mixed-integer program]] for the cheapest sizes that keep every must-stay-on load on through the chosen outages. They replace your sizes.") }, side);
+    H("p", { class: "lx-hint e1-sizehint", text: "Rounded up to the bench's steps and then run: a safe plan, not proven the cheapest on the steps." }, side);
     side.appendChild(ro);
     side.insertBefore(ss.status, pre);
     side.appendChild(ss.el);
@@ -11384,7 +11562,7 @@
     // the cost's boundary, one idea a line (SB1 5, 8 and 10)
     var cn = H("ul", { class: "lx-hint e1-cost-notes" }, c1);
     ["**Equipment**: paid over its life at the " + R.owner.label.toLowerCase().replace("-owned", "") + " owner's " + Math.round(R.rate * 100) + "% real [[cost-of-capital|cost of capital]] (through the [[capital-recovery-factor|capital recovery factor]]), plus upkeep.",
-      "**Grid bill**: estimated on 12 average days; a full 8,760-hour year comes out up to 7% higher for large solar-and-battery plans.",
+      "**Grid bill**: estimated on 12 average days; for the larger solar-and-battery plans checked over a full 8,760-hour year, it came out about 4% to 7% higher; other plans can differ more.",
       "**Not included**: the diesel burned in outages (its cost is under each outage). 2025 dollars, illustrative.",
       "**Grid electricity**: " + kilo(R.year.imports / 1000) + " MWh bought, " + kilo(R.year.exports / 1000) + " MWh exported, " + kilo(R.year.co2) + " t CO₂ (U.S. [[average-emission-factor|average factor]], [[operating-emissions|operating only]])."]
       .forEach(function (t) { H("li", { html: LX.rich(t).replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>") }, cn); });
@@ -11411,7 +11589,8 @@
       var on = H("ul", { class: "lx-hint e1-cost-notes" }, c2);
       ["Per outage only: the stretches the plan was run on, not a reliability figure. Diesel at $" + P.cfg.fuel.price.toFixed(2) + " a gallon, not in the annual cost.",
         "Who goes short: a kWh of must stay on weighs 100 times one of keep if possible, which weighs 10 times one of shed first.",
-        "Within a priority, each step up the list (hospital, water and heat, dorms, labs) counts 0.5% more and an earlier hour up to 2% more: a preference, not a strict order."]
+        "Within a priority, each step up the list (hospital, water and heat, dorms, labs) counts 0.5% more and an earlier hour up to 2% more: a preference, not a strict order.",
+        "Smaller weights still prefer less diesel and less battery cycling; other hourly schedules with the same totals can remain."]
         .forEach(function (t) { H("li", { text: t }, on); });
       chartHost = H("div", { class: "lx-xcard lx-sb-chart e1-hourcard" }, host);
       draw();
@@ -11961,7 +12140,7 @@
       { id: "bat", short: "s", type: "int", min: 0, max: 100, step: 100, def: 0, label: "Battery at Prairie Town (4 hours)", unit: "MW" },
       { id: "up", short: "u", type: "int", min: 0, max: 300, step: 300, def: 0, label: "Town–Metro uprate", unit: "MW" },
       { id: "res", short: "r", type: "int", min: 150, max: 250, step: 100, def: 250, label: "Operating reserve required", unit: "MW" },
-      { id: "share", short: "h", type: "int", min: 0, max: 100, step: 10, def: 0, label: "Share of new costs the large load pays", unit: "%" }];
+      { id: "share", short: "h", type: "int", min: 0, max: 100, step: 10, def: 0, label: "Direct share of new fixed costs (large load)", unit: "%" }];
     ["pk", "bat", "up"].forEach(function (k) {
       var r = R[k];
       f.push({ id: "c" + k, short: "c" + k, type: "int", min: r.lo, max: r.hi, step: r.step, def: r.def, label: r.label, unit: r.unit });
@@ -12407,10 +12586,10 @@
       ["Peak load: Ridge · Town · Metro", zl("peak") + " MW", "Illustrative; each hour follows SPP's 2025 demand shape (" + linkA(S.eia930, "EIA-930") + ", accessed " + S.eia930.asOf + ")"],
       ["Wind built: Ridge · Town · Metro", zl("wind") + " MW", "Illustrative"],
       ["Solar built: Ridge · Town · Metro", zl("solar") + " MW", "Illustrative"],
-      ["Output per MW: wind · solar", (P.cfg.cf.wind * 100).toFixed(1) + "% · " + (P.cfg.cf.solar * 100).toFixed(1) + "% a year", "SPP's 2025 shapes scaled to EIA's 2025 monthly capacity factors: " + linkA(S.epm607, "EPM Table 6.07.B") + ", " + S.epm607.asOf],
+      ["Output per MW: wind · solar", (P.cfg.cf.wind * 100).toFixed(1) + "% · " + (P.cfg.cf.solar * 100).toFixed(1) + "% a year", "SPP's 2025 hourly timing, rescaled to EIA's 2025 U.S. utility-scale monthly capacity factors (national, not SPP's own): " + linkA(S.epm607, "EPM Table 6.07.B") + ", " + S.epm607.asOf],
       ["Link limits: Ridge–Town · Town–Metro", P.links.map(function (l) { return kilo(l.cap); }).join(" · ") + " MW", "Illustrative"],
       ["Fuel: gas · coal", "$" + c.fuels.gas.price.toFixed(2) + " · $" + c.fuels.coal.price.toFixed(2) + "/MMBtu", "Average cost to the electric power industry, 2025: " + linkA(S.epa74, "EIA, Electric Power Annual, Table 7.4") + " · " + S.epa74.asOf + ". One <span class=\"lx-term\" data-term=\"mmbtu\">MMBtu</span> is a million British thermal units of fuel heat"],
-      ["Heat rates", "6.4 to 11.2 MMBtu/MWh", "Illustrative, around EIA's 2025 averages (coal 10.65, gas 7.78 MMBtu/MWh): " + linkA(S.epa81, "Electric Power Annual, Table 8.1") + " · " + S.epa81.asOf],
+      ["Heat rates", "6.4 to 11.2 MMBtu/MWh", "Fuel heat burned per MWh made (the <span class=\"lx-term\" data-term=\"heat-rate\">heat rate</span>). Illustrative, around EIA's 2025 averages (coal 10.65, gas 7.78 MMBtu/MWh): " + linkA(S.epa81, "Electric Power Annual, Table 8.1") + " · " + S.epa81.asOf],
       ["CO₂: gas · subbituminous coal", c.fuels.gas.co2.toFixed(2) + " · " + c.fuels.coal.co2.toFixed(2) + " kg/MMBtu", linkA(S.co2, "EIA, Carbon Dioxide Emissions Coefficients") + " · " + S.co2.asOf],
       ["Unserved load · reserve short", "$" + kilo(c.voll) + " · $" + kilo(c.reserveShort) + "/MWh", "Illustrative penalties in the objective, not costs anyone pays"]];
     var h = "<div class=\"lx-scroll-x\"><table class=\"lx-facts e2-inputs\"><thead><tr><th scope=\"col\">Input</th><th scope=\"col\">Value</th><th scope=\"col\">Source</th></tr></thead><tbody>" +
@@ -12422,7 +12601,9 @@
     h += "<details class=\"lx-deeper e2-units\"><summary><span class=\"k\">The plants</span>Each unit group's data (illustrative)</summary><div class=\"lx-deeper-body\"><div class=\"lx-scroll-x\"><table class=\"lx-facts\"><thead><tr>" +
       head.map(function (x) { return "<th scope=\"col\">" + escH(x) + "</th>"; }).join("") + "</tr></thead><tbody>" +
       urows.map(function (r) { return "<tr>" + r.map(function (x, i) { return i ? "<td class=\"n\" data-l=\"" + escH(head[i]) + "\">" + escH(x) + "</td>" : "<th scope=\"row\">" + escH(x) + "</th>"; }).join("") + "</tr>"; }).join("") +
-      "</tbody></table></div><p class=\"lx-hint\">Running cost = heat rate × fuel price + variable upkeep; no-load cost = the heat burned each hour a unit is on × fuel price. Peakers start within minutes and have no minimum output, so the model gives them no on/off decision.</p></div></details>";
+      "</tbody></table></div><ul class=\"lx-hint e2-unit-notes\"><li>Running cost = heat rate × fuel price + variable upkeep.</li><li>No-load cost = the heat burned each hour a unit is on × fuel price.</li>" +
+      "<li>Peakers start within minutes and have no minimum output, so the model gives them no on/off decision.</li>" +
+      "<li>A <span class=\"lx-term\" data-term=\"combined-cycle\">combined cycle</span> uses a gas turbine's hot exhaust to make more electricity in a steam turbine.</li></ul></div></details>";
     return h;
   }
 
@@ -12679,10 +12860,11 @@
                   demand leaves the balance (M_t uses connected demand, demand_t x (1 - share_t): supply need not serve
                   customers who are disconnected), and its yearly mean energy, sum(share_t x demand_t), is S.tally
      evaluate(S, add, detail)  the simulated years with resources added: add = {C perfect MW, wind MW, solar MW, sP and sE
-         a battery's MW and MWh, eta, dr MW and drH hours a day, ct 0 or 1 blocks of extra peakers}. Each hour: x = M + C +
-         wind x w_t + solar x s_t + extra peakers; if x >= 0 the battery charges min(P, x) x eta; if x < 0 the battery
-         discharges min(P, -x, stored), then demand response cuts min(dr, rest) if the day has used fewer than drH hours;
-         what is left is unserved. A day with any unserved hour is a loss-of-load day.
+         a battery's MW and MWh, eta, dr MW and drH hours a day, ct 0 or 1 blocks of extra peakers}. detail adds byMonth,
+         byHour, events, and sun and falling (unserved hours with solar output above zero; with it below the hour before).
+         Each hour: x = M + C + wind x w_t + solar x s_t + extra peakers; if x >= 0 the battery charges min(P, x) x eta;
+         if x < 0 the battery discharges min(P, -x, stored), then demand response cuts min(dr, rest) if the day has used
+         fewer than drH hours; what is left is unserved. A day with any unserved hour is a loss-of-load day.
            LOLE = loss-of-load days / N (days a year); LOLH = unserved hours / N; EUE = unserved MWh / N.
      efc(S, base, add)  equivalent firm capacity: the smallest perfect MW C that gives base + C an EUE no higher than
          base + add's (bisection on [0, the block's MW]: halve the range 18 times, to 0.002 MW). EUE falls continuously
@@ -12782,6 +12964,7 @@
     var SRC = S.SRC, C = add.C || 0, aw = add.wind || 0, as = add.solar || 0, P = add.sP || 0, E = add.sE || 0, eta = add.eta || 0.85;
     var dr = add.dr || 0, drH = add.drH || 4, act = add.ct || 0, ww = S.windW;
     var days = 0, lolh = 0, eue = 0, per = new Int32Array(S.N), byMonth = detail ? new Float64Array(12) : null, byHour = detail ? new Float64Array(24) : null, events = detail ? [] : null;
+    var sun = 0, falling = 0;   // detail: unserved hours with the sun still up, and with solar output lower than the hour before
     var mStart = [], s0 = 0; MD.forEach(function (d) { mStart.push(s0); s0 += d; });
     for (var n = 0; n < S.N; n++) {
       var Y = S.years[n], e = E, prev = -1, day = -1, dayLOL = false, drUsed = 0, cnt = 0, run = 0, last = -2, depth = 0;
@@ -12800,6 +12983,8 @@
           if (detail) {
             var mo = 11; while (mStart[mo] > d) mo--;
             byMonth[mo]++; byHour[t % 24]++;
+            var sh = SRC[y].s[h], sp = h > 0 ? SRC[y].s[h - 1] : sh;
+            if (sh > 0) sun++; if (sh < sp) falling++;
             if (t === last + 1) { run++; depth = Math.max(depth, -x); } else { if (run) events.push({ hours: run, depth: depth }); run = 1; depth = -x; }
             last = t;
           }
@@ -12810,7 +12995,7 @@
       per[n] = cnt; days += cnt;
     }
     var out = { days: days, lole: days / S.N, lolh: lolh / S.N, eue: eue / S.N, per: per, hours: lolh };
-    if (detail) { out.byMonth = byMonth; out.byHour = byHour; out.events = events; }
+    if (detail) { out.byMonth = byMonth; out.byHour = byHour; out.events = events; out.sun = sun; out.falling = falling; }
     return out;
   }
   // the Monte Carlo error of LOLE: the standard error of the mean of the yearly counts
@@ -13908,7 +14093,7 @@
       tot += buildable[n];
     }
     if (!frac) { frac = new Float64Array(N); frac.fill(1); }
-    return { reason: reason, frac: frac, buildable: buildable, areaKm2: tot, share: tot / (N * R.area) };
+    return { reason: reason, frac: frac, buildable: buildable, areaKm2: tot, share: tot / (N * R.area), setback: !!E.setback, setbackM: c.setbackM };
   }
   function needMW(D, type, c) { return c && c.anySub ? 0 : D.types[type].mw; }
   function criteria(R, D, type, c) {
@@ -14190,7 +14375,20 @@
   function place(R, i, j, k) {
     var C = R.D.city, x = (i + k / 2) * R.cellKm, y = (j + k / 2) * R.cellKm, dx = Math.round(x - C.cx), dy = Math.round(y - C.cy);
     var ew = dx === 0 ? "" : Math.abs(dx) + " km " + (dx < 0 ? "W" : "E"), ns = dy === 0 ? "" : Math.abs(dy) + " km " + (dy < 0 ? "N" : "S");
-    return (ew && ns ? ew + ", " + ns : ew || ns || "at the centre");
+    return (ew && ns ? ew + ", " + ns : ew || ns || "at the center");
+  }
+  // the homes in a cell (the newer ones apart) and the distance from its centre to the nearest home or built-up land:
+  // the homes layer's text version, cell by cell (a home's dot is drawn on the map only)
+  function homesIn(R, n) {
+    var k = R.cellKm, i = n % R.W, j = (n - i) / R.W, all = 0, nw = 0;
+    (R.homes || []).forEach(function (h) { if (Math.floor(h.x / k) === i && Math.floor(h.y / k) === j) { all++; if (h.newer) nw++; } });
+    return { all: all, newer: nw };
+  }
+  function homeWords(R, n) {
+    var c = homesIn(R, n), d = R.dHome[n], out = [];
+    out.push(c.all === 0 ? "no homes" : c.all + (c.all === 1 ? " home" : " homes") + (c.newer ? " (" + c.newer + " built since " + R.D.homes.vintage + ")" : ""));
+    if (!R.built[n] && !R.water[n]) out.push("nearest home or built-up land " + (d >= 3 ? "3 km or more" : d < 1 ? Math.round(d * 100) * 10 + " m" : d.toFixed(1) + " km") + " from its center");
+    return out;
   }
   function cellText(R, n) {
     var i = n % R.W, j = (n - i) / R.W, bits = [];
@@ -14200,11 +14398,11 @@
     bits.push("wind " + R.wind[n].toFixed(1) + " m/s");
     bits.push("sun " + R.sun[n].toFixed(2) + " kWh/m² a day");
     bits.push("land $" + Math.round(R.land[n] / 100) * 100 + " an acre");
-    return "Cell " + place(R, i, j, 1) + " of the centre: " + bits.concat(gridWords(R, n)).join(", ") + ".";
+    return "Cell " + place(R, i, j, 1) + " of the center: " + bits.concat(homeWords(R, n), gridWords(R, n)).join(", ") + ".";
   }
 
   var A19 = { build: build, coarsen: coarsen, cfg: cfg, exclude: exclude, criteria: criteria, suitability: suitability, need: need, blocks: blocks,
-    blockScore: blockScore, sites: sites, surface: surface, paths: paths, route: route, cost: cost, shares: shares, place: place, cellText: cellText,
+    blockScore: blockScore, sites: sites, surface: surface, paths: paths, route: route, cost: cost, shares: shares, place: place, cellText: cellText, homesIn: homesIn, homeWords: homeWords,
     gridAt: gridAt, gridRows: gridRows, gridWords: gridWords,
     REASONS: REASONS, riverY: riverY, floodHalf: floodHalf, ridgeX: ridgeX, roadDist: roadDist, subDist: subDist, noise: noise, fbm: fbm, lattice: lattice,
     ACRES_PER_KM2: ACRES_PER_KM2, KM_PER_MILE: KM_PER_MILE, overlap: overlap, connCell: connCell, needMW: needMW, usd: usd, withCity: withCity };
@@ -14248,7 +14446,7 @@
     // but closed when a step asks for it with grid: true)
     var gbox = H("details", { class: "a19-gbox" }, wrap);
     (function gridTable() {
-      H("summary", { class: "a19-gcap", text: "Substations and lines, the grid layer as text (km from the city centre)" }, gbox);
+      H("summary", { class: "a19-gcap", text: "Substations and lines, the grid layer as text (km from the city center)" }, gbox);
       var t = H("table", { class: "a19-gtbl" }, H("div", { class: "lx-scroll-x" }, gbox)), tr = H("tr", null, H("thead", null, t)), tb = H("tbody", null, t);
       ["Substation", "Where", "Spare capacity", "Lines to"].forEach(function (h) { H("th", { scope: "col", text: h }, tr); });
       A19.gridRows(R0).forEach(function (g) {
@@ -14306,7 +14504,7 @@
       base: { kind: "cat", items: [["a19-c-built", "Built-up land"], ["a19-c-ind", "Industrial park"], ["a19-c-water", "River"], ["a19-c-farm", "Farmland"]] },
       protected: { kind: "cat", items: [["a19-c-prot", "Protected land"], ["a19-c-farm", "Other land"]] },
       flood: { kind: "cat", items: [["a19-c-flood", "Flood zone"], ["a19-c-water", "River"]] },
-      homes: { kind: "cat", items: [["a19-c-home", "Home (dot)"], ["a19-c-built", "Built-up land"]] },
+      homes: { kind: "cat", items: [["a19-c-built", "Built-up land"]] },
       grid: { kind: "cat", items: [["a19-c-sub", "Substation"], ["a19-c-line", "Power line"]] },
       roads: { kind: "cat", items: [["a19-c-road", "Paved road"]] },
       slope: { kind: "ramp", cls: "a19-r-slope", lo: "0%", hi: "15% or more", what: "Slope" },
@@ -14339,6 +14537,12 @@
         });
         var cutAny = false; for (n = 0; n < st.X.frac.length; n++) if (!st.X.reason[n] && st.X.frac[n] < 1) { cutAny = true; break; }
         if (cutAny) { var sc = H("span", { class: "a19-key" }, legend); H("i", { class: "a19-sw a19-c-cutk", "aria-hidden": "true" }, sc); H("span", { text: "Part lost to setbacks" }, sc); }
+      }
+      // the homes layer in words: how many dots the map draws (the newer ones apart)
+      if (layer === "homes" || layer === "base" || st.homes) {
+        var hs = Rx.homes || R0.homes, nn = hs.filter(function (h) { return h.newer; }).length, hk = H("span", { class: "a19-key" }, legend);
+        H("i", { class: "a19-sw a19-c-home", "aria-hidden": "true" }, hk);
+        H("span", { text: "Homes (dots): " + (hs.length - nn).toLocaleString("en-US") + " in the " + D.homes.vintage + " layer" + (nn ? ", " + nn + " built since (larger dots)" : "") }, hk);
       }
       if (st.sites && st.sites.length) { var sk = H("span", { class: "a19-key" }, legend); H("i", { class: "a19-sw a19-c-site", "aria-hidden": "true" }, sk); H("span", { text: st.sitesKey || "Top sites, A best" }, sk); }
       if (st.ghost) { var gk = H("span", { class: "a19-key" }, legend); H("i", { class: "a19-sw a19-c-ghost", "aria-hidden": "true" }, gk); H("span", { text: st.ghost.key }, gk); }
@@ -14424,14 +14628,15 @@
       var v = R.cellKm * VB, i = n % R.W, j = (n - i) / R.W;
       cur.setAttribute("x", i * v); cur.setAttribute("y", j * v); cur.setAttribute("width", v); cur.setAttribute("height", v); cur.setAttribute("visibility", "visible");
       var extra = "";
-      if (st.X) { var rs = st.X.reason[n]; extra = rs ? " Excluded: " + A19.REASONS[rs] + "." : st.X.frac[n] < 1 ? " " + Math.round(100 * (1 - st.X.frac[n])) + "% of it inside home setbacks." : " Open for this site."; }
+      // the share inside setbacks is estimated from sample points 250 m apart: a narrow setback can fall between them
+      if (st.X) { var rs = st.X.reason[n]; extra = rs ? " Excluded: " + A19.REASONS[rs] + "." : st.X.frac[n] < 1 ? " About " + Math.round(100 * (1 - st.X.frac[n])) + "% of it inside home setbacks (estimated from points 250 m apart)." : st.X.setback && homesIn(R, n).all ? " Open for this site: none of its sample points (250 m apart) is within " + st.X.setbackM + " m of a home, though a setback can lie between them." : " Open for this site."; }
       if (st.suit && !isNaN(st.suit[n]) && !(st.X && st.X.reason[n])) extra += " Suitability " + Math.round(100 * st.suit[n]) + ".";
       live.textContent = (R.fine ? cellTextCoarse(R, n) : cellText(R, n)) + extra;
       if (o.onCell) o.onCell(n);
     }
     function cellTextCoarse(Rc, n) {
       var i = n % Rc.W, j = (n - i) / Rc.W;
-      return "Cell (2 km) " + place(Rc, i, j, 1) + " of the centre: " + ["slope " + Rc.slope[n].toFixed(1) + "% on average", "sun " + Rc.sun[n].toFixed(2) + " kWh/m² a day", "land $" + Math.round(Rc.land[n] / 100) * 100 + " an acre"].concat(A19.gridWords(Rc, n)).join(", ") + ".";
+      return "Cell (2 km) " + place(Rc, i, j, 1) + " of the center: " + ["slope " + Rc.slope[n].toFixed(1) + "% on average", "sun " + Rc.sun[n].toFixed(2) + " kWh/m² a day", "land $" + Math.round(Rc.land[n] / 100) * 100 + " an acre"].concat(A19.homeWords(Rc, n), A19.gridWords(Rc, n)).join(", ") + ".";
     }
     fig.addEventListener("keydown", function (e) {
       var d = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[e.key];
@@ -15286,8 +15491,8 @@
     var h = R && R.hh; if (!h) return [];
     return ["Who adopts first: " + RULE_WORDS[h.rule] + "; each group is its average household, changing by its district's average scaled by its use.",
       "Households pay " + millions(h.costAll) + " a year of the substation upgrades and batteries, " + REC_WORDS[h.design] + (h.evCost > 0.5 && h.design !== "kwh" ? " (the added charging's share per kWh)" : "") + "; the rest of the plan's cost is not in their bills.",
-      "Burden is home energy bills ÷ income (DOE LEAD): equipment households buy is left out, and the charging the plan adds counts as transport, with motor fuel." +
-        (h.dhPrice > 0 ? " District heat is billed at its average cost, $" + kilo(h.dhPrice) + " per MWh of heat." : "")].concat(
+      "Burden is home energy bills ÷ income (DOE LEAD): equipment households buy is left out, and the charging the plan adds counts as transport, with motor fuel."].concat(
+      h.dhPrice > 0 ? ["District heat is billed at its average cost, $" + kilo(h.dhPrice) + " per MWh of heat."] : [],
       h.settled && h.settled.el + h.settled.gas + h.settled.prop > 0.5 ? ["A group cannot cut more than it uses: " + kilo(h.settled.el + h.settled.gas + h.settled.prop) + " MWh of the cut passed to the next groups in the rule's order."] : []);
   }
   // LX.A13 (lesson A13's accounting layer, components/whopays.js): in the learn.js bundle on a page; Node requires it
@@ -15489,7 +15694,7 @@
     var ua = 1 - FYc.degreeHoursDays / FYc.degreeHours;   // the year's heat-loss rate against the eight days' (same heat need)
     out.push(["The check", "the plan as the eight days decided it (shares, sizes, substation upgrades), run on every hour of 2025 with the same model. Precomputed on " + date + ": too large for a click."]);
     out.push(["Two runs", "cost, CO₂ and unserved energy keep the eight days' upgrades; the busiest hours and upgrades come from a second run with the upgrades sized on the year."]);
-    out.push(["What holds", "total yearly cost and CO₂, within " + (gap < 0.001 ? "0.1%" : "about " + pct(gap, 1)) + ": like the days, the year is scaled to the city's annual base and heat energy (its heat-loss rate " + pct(ua, 1) + " lower)."]);
+    out.push(["What holds", "total yearly cost and CO₂, within " + (gap < 0.001 ? "0.1%" : "about " + pct(gap, 1)) + ", partly by construction: the year, like the days, is scaled to the city's annual base and heat energy (its heat-loss rate " + pct(ua, 1) + " lower), so this tests the hours' timing, not the totals."]);
     var cost = extra * e.upYearly;
     out.push(["Three cold days", "the design day stands for 3 days: in the year, " + dateList(FYc.designDays) + ", equally cold. Only their base load (SPP's demand) differs, and February's is higher in the hours that matter."]);
     out.push(["The grid", Y.unserved >= 0.5 ? "the eight days' upgrades leave " + kilo(Y.unserved) + " MWh unserved on " + dateList(Y.shortDays.map(function (x) { return x.day; })) + " (load the model's substations cannot carry). Sized on the year, the plan buys " + (extra).toFixed(1) + " MW more, about " + (cost < 1e5 ? money(Math.round(cost / 1000) * 1000) : millions(cost)) + " a year."
@@ -15534,7 +15739,7 @@
       { label: "Substation upgrades", value: kilo(sum(R.dist.map(function (d) { return d.upg; }))) + " MW", note: "the model buys only what the busiest hour needs" },
       { label: "Energy burden, homes below 80% of area median income", value: R.hh.clamped ? "not shown" : pct(R.hh.low.burden, 1) + " (2025: " + pct(R.hh.low.burden0, 1) + ")",
         note: R.hh.clamped ? CLAMPED : "screening estimate, not from the LP" }];
-    if (c3) res.splice(1, 0, { label: "Up-front spending, 2026 to 2040", value: millions(A.upfrontTotal, 0), note: "against a budget of " + millions(P.cfg.c3.budget.def * 1e6, 0) });
+    if (c3) res.splice(1, 0, { label: "Up-front spending, 2026 to 2040", value: millions(A.upfrontTotal, 0), note: "against a budget of " + millions(P.cfg.c3.budget.def * 1e6, 0) + "; equipment and grid only" });
     if (c3 && A.contract && A.contract.mwh > 0) res.splice(3, 0, { label: "Wind and solar output the city used", value: kilo(A.contract.mwh / 1000) + " GWh a year",
       note: "not deducted from the location-based CO₂; an illustrative grid-average comparison: ≈ " + kilo(A.contract.t) + " t" });
     return { heading: o.heading || (c3 ? "Prairie City 2040: the energy plan" : "Prairie City: a plan for the three districts"),
@@ -15543,7 +15748,7 @@
       assumptions: assumptions(state, R, P),
       limits: ["Bills, burden and jobs are screening estimates, not predictions: an accounting layer gives them, not the energy model.",
         "Storage is cyclic within each day: no heat or charge carried between representative days.",
-        "No power-flow physics inside a district, no outages, no change in population or prices to 2040."] };
+        "Not modeled: power flow inside a district, outages, growth to 2040, car and charger prices, and heat-pump sizes (each assumed big enough)."] };
   }
   // the run's assumptions, one sentence each: the model's, then the plan's own (managed charging, the boiler, the
   // city's wind and solar), then the household table's (hhAssume)
@@ -15552,7 +15757,7 @@
       "Eight representative days stand for the year, the design and peak days kept; full-year checks cover the presets.",
       "One substation per district (a teaching simplification), its limit a ceiling on each hour's flow.",
       "CO₂ location-based: eGRID's 2023 SPP North rate plus 5% losses; fuels at EIA's coefficients."];
-    if (state.evm === "managed") out.push("Managed cars are plugged in at home or work when needed; a day's charge takes 6 hours or more.");
+    if (state.evm === "managed") out.push("Managed cars are plugged in when needed; a day's charge takes 6 hours or more.");
     if (state.dh > 0) out.push("The heat network's gas boiler exists already: its fuel counts, not its construction.");
     if (c3 && (state.wind > 0 || state.farm > 0)) out.push("The city owns its wind and solar farms; a MWh of theirs it uses is worth $" + kilo(state.av) + " (set for teaching).");
     return out.concat(hhAssume(R));
@@ -15653,7 +15858,21 @@
         }
       });
     });
-    return { ctl: ctl, set: function (p) { plan = p; for (var k in ctl) ctl[k].set(p[k]); } };
+    // the heat network's plant and store work only with a share of the core on the network: at 0% they are switched off
+    // (the engine treats them as 0), and a line in the group says why
+    var dhNote = null;
+    if (ctl.dh && ctl.dhp && ctl.sto) {
+      var fsDh = ctl.dh.el && ctl.dh.el.parentNode;
+      while (fsDh && fsDh.tagName && String(fsDh.tagName).toLowerCase() !== "fieldset") fsDh = fsDh.parentNode;
+      dhNote = H("p", { class: "lx-hint e3-dh-off", text: "With 0% of the core on the network, its heat pump and heat store do nothing: set a share first.", hidden: true }, fsDh || host);
+    }
+    function deps(p) {
+      if (!dhNote) return;
+      var off = !(p.dh > 0);
+      ctl.dhp.disable(off); ctl.sto.disable(off); dhNote.hidden = !off;
+    }
+    deps(plan);
+    return { ctl: ctl, set: function (p) { plan = p; for (var k in ctl) ctl[k].set(p[k]); deps(p); } };
   }
   function stopper() {
     var b = null, run = null;
@@ -15727,7 +15946,7 @@
     var M = R.acc.money, M0 = R.base ? R.base.acc.money : M, c3 = R.sys.c3;
     var eq = function (A) { var m = A.money; return m.hp + m.ret + m.net + m.plant + m.store + m.pv + m.bat; };
     var rows = [["Buildings' energy: electricity, gas, propane, the network's boiler", M0.buildings, M.buildings],
-      ["Cars' fuel and charging (vehicle prices not counted)", M0.cars, M.cars],
+      ["Cars' fuel and charging (car and charger prices not counted)", M0.cars, M.cars],
       ["Equipment, as yearly payments", eq(R.base ? R.base.acc : R.acc), eq(R.acc)],
       ["Substation upgrades, as yearly payments", M0.up, M.up]];
     if (c3) {
@@ -15813,8 +16032,10 @@
                                      clean option (national, no location): within the generic limits per region and period,
                                      wind and solar within each region's most; a plant runs in its model year and the later
                                      ones its life covers (vintages)
-     batteries: cyclic within each representative day (state at 08:00 and 20:00 within 0 and 4 h x power); in the
-                                     scarce-wind week the store may enter full and runs down over the seven days
+     batteries: outside winter, cyclic within each representative day (state at 08:00 and 20:00 within 0 and 4 h x power); in the
+                                     scarce-wind week the store may enter full and run down over the seven days; winter
+                                     runs in order (its 83 days, then the week, cyclic over the season), so winter's days
+                                     pay the week back (energy in x 85% = energy out) and the level stays within the store
      links: flows each way within the link's limit (existing + additions), 1% lost per 100 km
      fuels (national, each year): crude = refinery input + oil plants (domestic crude, up to 2025's output, then imports);
                                      gas = final + plants, delivered by domestic fields (up to 2025's output; 5% of it
@@ -15823,7 +16044,10 @@
                                      County; final fuel use fixed by the plan's demand and electrification
      CO2 (Mt a year) = fuels burned x IPCC factors; cumulative 2026-2050 = sum_p w_p CO2_p + w_2025 x 214.9 <= budget
                                      (+ an overshoot, see "limits first"); w linear (2, 5, 5, 5, 5, 3) or step (0, 5, 5, 5, 5, 5)
-     imports (crude imports + LNG) <= cap x primary energy, each year (+ an overshoot, see "limits first")
+     imports (crude imports + LNG) <= cap x (primary energy - what batteries and links lose), each year (+ an overshoot,
+                                     see "limits first"): electricity lost in batteries and links does not count toward the
+                                     cap's base (the cheapest waste loops); burning more fuel still raises primary energy, as
+                                     in the statistic itself
      the stress hours (peak-hour rule): plants at their availability (the summer hour with a drought's derating), wind and
                                      solar at that hour, batteries at full power, the firm option's share, the links
      goal: min the present value in 2025 of new plants' and links' yearly payments for the years they serve up to 2050
@@ -15842,7 +16066,9 @@
    serving demand comes first), then the least cost at that overshoot. Overshoot 0: the limits hold (e.g. a 2,800 Mt
    budget); above 0: they are out of reach, the run is the closest plan, and their duals are not marginal values (null).
    Foresight: perfect (one LP over 2030-2050) or decade by decade (myopic: 2030-2035 seeing only them, their builds fixed;
-   then 2040-2045; then 2050; each window gets the remaining budget in proportion to its weights).
+   then 2040-2045; then 2050; each window gets the remaining budget in proportion to its weights). A window that misses a
+   limit has no marginal values at all: no budget or cap dual, no electricity prices, no fuel values (its full-year check
+   prices fuels as the LP bought them).
    Shocks (C4, SB4): the plan's builds and retirements up to and including the shock's model year stay as planned; that
    year runs with what was built; later years re-plan knowing the shock. A price shock on new plants (the mineral export
    restriction, e4-pathways.json levers.shockRule "before") arrives before the shock year's plants are bought: decisions
@@ -15904,6 +16130,9 @@
       var stem = s.key.replace(/_day$/, ""), n = P.S.filter(function (x) { return x.key === stem + "_night"; })[0];
       P.days.push({ key: stem, d: s.i, n: n.i, days: s.days, week: stem === "lowwind" });
     });
+    // the representative day of the week's season (winter): it pays back what the scarce-wind week's store draws
+    var wk0 = P.days.filter(function (d) { return d.week; })[0];
+    P.refill = wk0 ? P.days.filter(function (d) { return !d.week && !P.S[d.d].extreme && P.S[d.d].season === P.S[wk0.d].season; })[0] || null : null;
     P.hours = sum(P.S.map(function (s) { return s.h; }));
     // existing units: fossil unit by unit; nuclear, hydro, wind, solar and batteries by region
     var U = PL.fleet.units, av = cfg.existing.availability;
@@ -16121,11 +16350,11 @@
       for (var q = 0; q <= p; q++) if (online(q, p, life)) { if (typeof list[q] === "string") terms.push([list[q], 1]); else c += list[q]; }
       return [terms, c];
     }
-    var fuelTerms = [], CO2 = {}, PRIM = {}, IMP = {};
+    var fuelTerms = [], CO2 = {}, PRIM = {}, IMP = {}, LOSS = {};
     only.forEach(function (p) {
       var y = S.Y[p], D = S.D[p], pr = S.price[p], tg = "_" + p, sh = S.share[p];
       var bal = P.R.map(function () { return P.S.map(function () { return []; }); });
-      var oilF = [], gasF = [], coalF = [], nucE = [], renE = [];
+      var oilF = [], gasF = [], coalF = [], nucE = [], renE = [], lossE = [];
       // existing fossil units
       P.units.forEach(function (u) {
         var k = kv[u.j][p]; if (k === 0) return;
@@ -16190,21 +16419,36 @@
             bal[r][s.i].push([dis[s.i], 1], [ch[s.i], -1]);
           });
           var E = function (extra, c) { return extra.concat(bt.map(function (x) { return [x[0], -hrs]; })); };   // terms - 4 x P
+          // a day's net change of the store (MWh): its day and night charging x 85% less what they give back
+          var delta = function (d) { var hd = P.S[d.d].h / P.S[d.d].days, hn = P.S[d.n].h / P.S[d.n].days; return [[ch[d.d], hd * eta], [dis[d.d], -hd], [ch[d.n], hn * eta], [dis[d.n], -hn]]; };
+          var times = function (T, k) { return T.map(function (x) { return [x[0], x[1] * k]; }); };
           P.days.forEach(function (d) {
-            var s0 = v("bs_" + r + "_" + d.key + tg, 0, Infinity, 0), hd = P.S[d.d].h / P.S[d.d].days, hn = P.S[d.n].h / P.S[d.n].days;   // 12 h
+            var s0 = v("bs_" + r + "_" + d.key + tg, 0, Infinity, 0), hd = P.S[d.d].h / P.S[d.d].days;   // 12 h
             var dayEnd = [[s0, 1], [ch[d.d], hd * eta], [dis[d.d], -hd]];
             row("b0_" + r + "_" + d.key + tg, E([[s0, 1]]), null, hrs * b0);
             row("b1_" + r + "_" + d.key + tg, dayEnd, 0, null);
             row("b2_" + r + "_" + d.key + tg, E(dayEnd), null, hrs * b0);
-            if (!d.week) row("bz_" + r + "_" + d.key + tg, [[ch[d.d], hd * eta], [dis[d.d], -hd], [ch[d.n], hn * eta], [dis[d.n], -hn]], 0, 0);
-            else {
-              var N = d.days, delta = [[ch[d.d], hd * eta], [dis[d.d], -hd], [ch[d.n], hn * eta], [dis[d.n], -hn]];
-              var times = function (k) { return delta.map(function (x) { return [x[0], x[1] * k]; }); };
-              var endW = [[s0, 1]].concat(times(N)), lastDay = [[s0, 1]].concat(times(N - 1)).concat([[ch[d.d], hd * eta], [dis[d.d], -hd]]);
+            if (d.week) {
+              // the scarce-wind week: the store may enter it full and run down over its seven days
+              var N = d.days, endW = [[s0, 1]].concat(times(delta(d), N)), lastDay = [[s0, 1]].concat(times(delta(d), N - 1)).concat([[ch[d.d], hd * eta], [dis[d.d], -hd]]);
               row("bw0_" + r + tg, endW, 0, null); row("bw1_" + r + tg, E(endW), null, hrs * b0);
               row("bw2_" + r + tg, lastDay, 0, null); row("bw3_" + r + tg, E(lastDay), null, hrs * b0);
-            }
+            } else if (d === P.refill) {
+              // winter in order: its K representative days, then the scarce-wind week, and back (cyclic over the season).
+              // The store starts winter at s0 and changes by delta each day; the week starts where the last winter day
+              // ends and must end where winter began, so the winter days pay back what the week draws (energy in x 85% =
+              // energy out). The level is linear in the day, so the first and the last winter day bound every one
+              var wk = P.days.filter(function (x) { return x.week; })[0], K = d.days, sw = "bs_" + r + "_" + wk.key + tg;
+              var at = function (k) { return [[s0, 1]].concat(times(delta(d), k)); };            // the level at the start of day k
+              var lastStart = at(K - 1), lastNoon = lastStart.concat([[ch[d.d], hd * eta], [dis[d.d], -hd]]);
+              row("b3_" + r + "_" + d.key + tg, lastStart, 0, null); row("b4_" + r + "_" + d.key + tg, E(lastStart), null, hrs * b0);
+              row("b5_" + r + "_" + d.key + tg, lastNoon, 0, null); row("b6_" + r + "_" + d.key + tg, E(lastNoon), null, hrs * b0);
+              row("bk_" + r + "_" + d.key + tg, [[sw, 1]].concat(times(at(K), -1)), 0, 0);                   // the week starts where winter's days end
+              row("bz_" + r + "_" + d.key + tg, [[sw, 1]].concat(times(delta(wk), wk.days), [[s0, -1]]), 0, 0);   // and ends where winter began
+            } else row("bz_" + r + "_" + d.key + tg, delta(d), 0, 0);
           });
+          // what the batteries lose (MWh in - MWh out, as PJ): left out of the import cap's primary energy (below)
+          P.S.forEach(function (s) { lossE.push([ch[s.i], s.h * PJ_PER_MWH], [dis[s.i], -s.h * PJ_PER_MWH]); });
         }
         // unserved energy
         P.S.forEach(function (s) { var u = v("us_" + r + "_" + s.i + tg, 0, Infinity, pen.unservedPerMWh * s.h * D / 1e6, "penalty"); bal[r][s.i].push([u, 1]); });
@@ -16226,6 +16470,7 @@
           var fw = v("fw_" + l.i + "_" + s.i + tg, 0, Infinity, c, null, c), bw = v("fb_" + l.i + "_" + s.i + tg, 0, Infinity, c, null, c);
           row("cl_" + l.i + "_" + s.i + tg, [[fw, 1], [bw, 1]].concat(cap[0].map(function (x) { return [x[0], -1]; })), null, c0);
           bal[l.a][s.i].push([fw, -1], [bw, 1 - l.loss]); bal[l.b][s.i].push([fw, 1 - l.loss], [bw, -1]);
+          lossE.push([fw, l.loss * s.h * PJ_PER_MWH], [bw, l.loss * s.h * PJ_PER_MWH]);   // what the link loses (PJ)
         });
       });
       // the peak-hour reserve rule: at each stress hour of 2025's weather (e4-pathways.json stress), every region's load x
@@ -16265,10 +16510,15 @@
       row("cl" + tg, [[qc, 1 - P.coalOwn]].concat(coalF.map(function (x) { return [x[0], -x[1]]; })), F.coal, F.coal);
       CO2[p] = [[cd, P.f.oil / 1000], [ci, P.f.oil / 1000], [gd, P.f.gas / 1000], [gl, P.f.gas / 1000], [qc, P.f.coal / 1000]];
       PRIM[p] = [[cd, 1], [ci, 1], [gd, 1], [gl, 1], [qc, 1]].concat(nucE, renE);
-      IMP[p] = [[ci, 1], [gl, 1]];
-      // the import cap: imports - cap x primary - over <= 0
+      IMP[p] = [[ci, 1], [gl, 1]]; LOSS[p] = lossE;
+      // the import cap: imports - cap x (primary - what batteries and links lose) - over <= 0. Losses count in primary
+      // energy (the generation that covers them does), but not in the cap's base: else losing electricity on purpose
+      // (a battery charging and discharging at once, a link carrying power both ways) would help meet the cap. Extra fuel
+      // or nuclear output into such a loss still adds its conversion loss to the base: it costs fuel or runs a plant
+      // harder, and the tests find no such loop in the presets' or a binding cap's solutions
       var oi = v("oimp" + tg, 0, o.noPenalty ? 0 : Infinity, pen.importPerGJ, "penalty");
       var t = {}; IMP[p].forEach(function (x) { t[x[0]] = (t[x[0]] || 0) + x[1]; }); PRIM[p].forEach(function (x) { t[x[0]] = (t[x[0]] || 0) - S.cap * x[1]; });
+      LOSS[p].forEach(function (x) { t[x[0]] = (t[x[0]] || 0) + S.cap * x[1]; });
       t[oi] = (t[oi] || 0) - 1;
       row("imp" + tg, Object.keys(t).map(function (k) { return [k, t[k]]; }), null, 0);
     });
@@ -16288,7 +16538,7 @@
     row("budget", bt, null, left);
     var m = { sense: "min", variables: V, constraints: C };
     if (o.objective) { var obj = o.objective(CO2, S); V.forEach(function (x) { x.cost = 0; }); m.objective = { terms: obj }; }
-    m.meta = { only: only.slice(), CO2: CO2, PRIM: PRIM, IMP: IMP, left: left, cat: cat, tieC: tieC };
+    m.meta = { only: only.slice(), CO2: CO2, PRIM: PRIM, IMP: IMP, LOSS: LOSS, left: left, cat: cat, tieC: tieC };
     return m;
   }
 
@@ -16389,13 +16639,21 @@
       q.fuel = { crudeDom: val("cdom" + tg), crudeImp: val("cimp" + tg), gasDom: val("gdom" + tg), lng: val("lng" + tg), coal: val("coal" + tg) };
       var lin = function (T) { return T.reduce(function (a, t) { return a + val(t[0]) * t[1]; }, 0); };
       q.co2 = lin(m.meta.CO2[p]); q.primary = lin(m.meta.PRIM[p]); q.imports = lin(m.meta.IMP[p]); q.importShare = q.imports / q.primary;
-      q.fuelValue = { oil: (duals["oil" + tg] || 0) / D, gas: (duals["gas" + tg] || 0) / D, coal: (duals["cl" + tg] || 0) / D };   // $/GJ that year, carbon value included
+      q.lossPJ = lin(m.meta.LOSS[p] || []);                       // what batteries and links lose (left out of the cap's base)
+      // a window that missed a limit is solved pinned at its least overshoot: its duals are not marginal values of the plan
+      // asked for (they can reach a million dollars a MWh), so it has no electricity prices and no fuel values; its
+      // full-year check prices fuels at what the LP paid (fuelAt "price", no carbon value)
+      q.dualsOk = r.reach !== false;
+      var pr0 = S.price[p], dg = q.fuel.gasDom * (1 - P.gasOwn), gasPaid = dg + q.fuel.lng > 0 ? (q.fuel.gasDom * pr0.gas + q.fuel.lng * pr0.lng) / (dg + q.fuel.lng) : pr0.gas;
+      q.fuelValue = q.dualsOk ? { oil: (duals["oil" + tg] || 0) / D, gas: (duals["gas" + tg] || 0) / D, coal: (duals["cl" + tg] || 0) / D }   // $/GJ that year, carbon value included
+        : { oil: pr0.oil, gas: gasPaid, coal: pr0.coal / (1 - P.coalOwn) };                                                       // $/GJ delivered, as bought
       q.importOver = val("oimp" + tg); q.importDual = duals["imp" + tg] ? -duals["imp" + tg] / D : 0;   // $ per GJ a year, in that year
       q.price = P.R.map(function (R, rr) {                       // load-weighted marginal cost of electricity ($/MWh, that year's dollars)
+        if (!q.dualsOk) return null;
         var a = 0, b = 0; P.S.forEach(function (s) { var L = S.loadMW[p][rr] * s.demand * s.h, d = duals["bal_" + rr + "_" + s.i + tg]; if (d == null) return; a += L * d * 1e6 / (s.h * D); b += L; });
         return b ? a / b : null;
       });
-      q.slicePrice = P.R.map(function (R, rr) { return P.S.map(function (s) { var d = duals["bal_" + rr + "_" + s.i + tg]; return d == null ? null : d * 1e6 / (s.h * D); }); });
+      q.slicePrice = P.R.map(function (R, rr) { return P.S.map(function (s) { var d = duals["bal_" + rr + "_" + s.i + tg]; return d == null || !q.dualsOk ? null : d * 1e6 / (s.h * D); }); });
       q.linkAt = P.links.map(function (l) {                      // hours a year the link runs at its limit (slice hours)
         var cap = l.mw; for (var qq = 0; qq <= p; qq++) cap += raw.a[l.i][qq];
         var h = 0; P.S.forEach(function (s) { if (val("fw_" + l.i + "_" + s.i + tg) + val("fb_" + l.i + "_" + s.i + tg) >= cap - 0.5 && cap > 0) h += s.h; }); return h;
@@ -16574,12 +16832,12 @@
   function presetsOf(P) { return P.cfg.presets; }
   // the budget gap with lesson A20 (A20 states the other side): A20's closed-form
   // accounting meets 2,600 Mt, this LP's floor is about 2,700 Mt (most electrification, central demand, straight-line
-  // counting: 2,673 Mt). Tested: lifting the build-rate and transmission limits a hundredfold moves the floor by about 5 Mt;
+  // counting: 2,674.9 Mt). Tested: lifting the build-rate and transmission limits a hundredfold moves the floor by about 1 Mt (0.9 Mt);
   // A20's electrification path inside a copy of this engine lowers it to about 2,414 Mt (test_m13-national-pathway.js).
   // [the floor, the reason, what it is not]; [[lesson:...]] marks for LX.rich
   var GAP = ["Counted with straight lines between model years, no pathway here gets below about 2,700 Mt at central demand, even at the most electrification.",
     "[[lesson:a20-national-scenarios|A20]]'s simpler accounting meets 2,600 Mt: its fastest path electrifies buildings and industry years sooner (15 points a period from 2025), while here each share rises in a straight line to 2050.",
-    "Not the build limits: lifting this engine's build-rate and transmission limits a hundredfold lowers its floor by about 5 Mt; A20's electrification path inside it lowers the floor to about 2,400 Mt."];
+    "Not the build limits: lifting this engine's build-rate and transmission limits a hundredfold lowers its floor by about 1 Mt; A20's electrification path inside it lowers the floor to about 2,400 Mt."];
   // the run's status line, by foresight (decade by decade solves each window to optimality, which does
   // not make the combined pathway the cheapest over 2026-2050); V: a view, or { reach } from a run
   var WIN_NAMES = ["2030–2035", "2040–2045", "2050"];
@@ -16597,12 +16855,16 @@
   // a full-year check's verdict (prairieland.json timeSlices.fullYearCheck.survives, a teaching rule): survives when all
   // demand is served and the year's CO2 is within 10% of the slices' estimate; why, in words. It checks the dispatch of one
   // model year, not the cumulative budget and not adequacy
+  // A year whose window missed a limit (fuelAt "price") has no marginal values: its check buys fuels at their prices, with
+  // no carbon value and no import cap, so its CO2 is not comparable with the slices' and only demand served is tested
   var FULL_TOL = 0.1;
   function fullVerdict(c) {
-    var served = c.unservedMWh < 0.5, near = Math.abs(c.gap) <= FULL_TOL, why = [];
+    var priced = c.fuelAt === "price", served = c.unservedMWh < 0.5, near = priced ? null : Math.abs(c.gap) <= FULL_TOL, why = [];
     if (!served) why.push(kilo(c.unservedHours) + " h unserved");
-    if (!near) why.push("CO₂ " + (c.gap >= 0 ? "+" : "") + pct(c.gap, 1) + " against the slices");
-    return { ok: served && near, served: served, near: near, text: served && near ? "survives" : "does not survive (" + why.join("; ") + ")" };
+    if (near === false) why.push("CO₂ " + (c.gap >= 0 ? "+" : "") + pct(c.gap, 1) + " against the slices");
+    var ok = served && near !== false;
+    return { ok: ok, served: served, near: near, compared: !priced,
+      text: (ok ? "survives" : "does not survive (" + why.join("; ") + ")") + (priced ? (ok ? " on demand served; CO₂ not compared (the run missed a limit)" : "; CO₂ not compared") : "") };
   }
   // the four shocks (and the two A21 keeps for itself) as the engine runs them: one row each, with the model year it hits,
   // what changes, and what the re-plan keeps (magnitudes and durations, modelled effects apart from the story)
@@ -16625,7 +16887,7 @@
   // 52 weeks of 168 hours and 31 December, one LP each, batteries cyclic within each week, hydro's energy fixed day by day
   // (its season's factor), the links' limits, unserved energy at the penalty; fuels at the slice run's marginal values for
   // that year (fuel plus the carbon budget's value: the fuel rows' duals), so the check runs the same economics hour by
-  // hour. CO2 of the year: the plants' fuel plus the fixed final fuels, with gas bought in the slice run's own mix of
+  // hour; a year whose window missed a limit has no marginal values, so its fuels are priced as the LP bought them. CO2 of the year: the plants' fuel plus the fixed final fuels, with gas bought in the slice run's own mix of
   // domestic gas and LNG for that model year (procure): the same delivered gas gives the LP's procurement and CO2.
   var MONTH0 = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365];
   function seasonOfDay(d) { var m = 0; while (d >= MONTH0[m + 1]) m++; return m === 11 || m < 2 ? "winter" : m < 5 ? "spring" : m < 8 ? "summer" : "autumn"; }
@@ -16702,6 +16964,7 @@
       t.gasDom = g.gasDom; t.lng = g.lng;
       t.co2 = co2Of(P, crude, g, coal); t.co2Slices = q.co2; t.co2Gap = t.co2 / q.co2 - 1;
       t.coalOverMine = coal > P.coalMax + 1e-6;
+      t.fuelAt = q.dualsOk === false ? "price" : "value";   // fuels at the slice run's marginal values, or as bought
       t.year = y; t.p = p;
       return t;
     });
@@ -16777,13 +17040,22 @@
     var Y = R.Y, o = { Y: Y.slice() };
     o.pv = {}; for (var k in R.pv) o.pv[k] = rd(R.pv[k], 0);
     o.yearly = R.money.yearly.map(function (q) { var x = {}; for (var k2 in q) x[k2] = rd(q[k2], 0); return x; });
-    o.budget = R.S.budget; o.cum = rd(R.cum, 0); o.over = rd(R.over, 0); o.w = R.S.w.slice(); o.w0 = R.S.w0;
+    // a flag for each limit, unrounded: a run 0.4 Mt over its budget is over, though it rounds to the budget (the flags
+    // follow the LP's overshoot variables, at the engine's tolerance: 50 t, 0.001 PJ); cum1 and over1 to 0.1 Mt for such a run
+    o.budget = R.S.budget; o.cum = rd(R.cum, 0); o.over = rd(R.over, 0); o.cum1 = rd(R.cum, 1); o.over1 = rd(R.over, 1); o.w = R.S.w.slice(); o.w0 = R.S.w0;
+    o.missBudget = R.over > 5e-5; o.missCap = R.capOver.map(function (v) { return v > 1e-3; });
     o.co2 = R.co2.map(function (v) { return rd(v, 1); });
     o.imp = R.importShare.map(function (v) { return rd(v, 3); }); o.cap = R.S.cap; o.capOver = R.capOver.map(function (v) { return rd(v, 1); });
+    // the cap's own measure: imports / (primary energy - what batteries and links lose); imp is the statistic (imports /
+    // primary energy), at most the cap whenever the cap is met, and a tenth of a point or so below this measure
+    o.impCap = Y.map(function (y, p) { var q = R.raw.per[p]; return rd(q.imports / (q.primary - (q.lossPJ || 0)), 4); });
+    o.lossPJ = Y.map(function (y, p) { return rd(R.raw.per[p].lossPJ || 0, 1); });   // what batteries and links lose, PJ a year
     o.clean = R.clean.map(function (v) { return rd(v, 3); });
     o.unserved = R.unservedTWh.map(function (v) { return rd(v, 2); }); o.curtail = R.curtailTWh.map(function (v) { return rd(v, 1); });
     o.capGW = R.cap.map(function (c) { var x = {}; TECHS.forEach(function (t) { x[t] = rd(c[t] / 1000, 2); }); return x; });
     o.genTWh = R.gen.map(function (g) { var x = {}; TECHS.forEach(function (t) { x[t] = rd(g[t], 1); }); return x; });
+    // batteries store, they make nothing: what they take in each year (TWh; genTWh.battery is what they give back)
+    o.batIn = Y.map(function (y, p) { return rd(R.raw.per[p].batteryIn / 1e6, 1); });
     o.genR = Y.map(function (y, p) { return R.raw.per[p].genR.map(function (g) { var x = {}; TECHS.forEach(function (t) { if (g[t]) x[t] = rd(g[t] / 1e6, 1); }); return x; }); });
     o.built = {}; for (var t in R.built) o.built[t] = R.built[t].map(function (v) { return rd(v / 1000, 2); });
     o.builtR = R.builtR.map(function (b) { var x = {}; for (var t2 in b) x[t2] = rd(b[t2] / 1000, 2); return x; });
@@ -16812,7 +17084,7 @@
   // a shock's view: what changes against the plan
   function shockView(Q, V0, P) {
     var v = view(Q, P);
-    return { key: Q.key, year: Q.year, label: Q.label, pv: v.pv.total, dPV: rd(Q.dPV != null ? Q.dPV : v.pv.total - V0.pv.total, 0), cum: v.cum, over: v.over, co2: v.co2, imp: v.imp, capOver: v.capOver, unserved: v.unserved,
+    return { key: Q.key, year: Q.year, label: Q.label, pv: v.pv.total, dPV: rd(Q.dPV != null ? Q.dPV : v.pv.total - V0.pv.total, 0), cum: v.cum, over: v.over, cum1: v.cum1, over1: v.over1, missBudget: v.missBudget, missCap: v.missCap, co2: v.co2, imp: v.imp, capOver: v.capOver, unserved: v.unserved,
       carbonValue: v.carbonValue, reserveShort: v.reserve.map(function (x) { return x.shortMW; }), clean: v.clean, rule: v.rule, reach: v.reach, keptThrough: Q.keptThrough == null ? null : V0.Y[Q.keptThrough] || null };
   }
   // the reserve rule's spare at the tighter stress hour, nation-wide, each model year (from the plan's capacities, with the
@@ -16904,11 +17176,17 @@
     return '<div class="lx-scroll-x"><table class="lx-facts' + (cls ? " " + cls : "") + '"><thead><tr>' + head.map(function (h) { return '<th scope="col">' + esc(h) + "</th>"; }).join("") +
       "</tr></thead><tbody>" + rows.map(function (r) { return "<tr>" + r.map(function (c, i) { return i ? '<td class="n">' + esc(c) + "</td>" : "<td>" + esc(c) + "</td>"; }).join("") + "</tr>"; }).join("") + "</tbody></table></div>";
   }
+  // the budget's words: the cumulative CO2 to 0.1 Mt when a run misses the budget by less than 10 Mt (it would round
+  // to the budget), and the overshoot ("under 0.1 Mt" when it rounds to 0.0); missBudget is the LP's flag, never a rounding
+  function missB(V) { return V.missBudget != null ? V.missBudget : V.over > 0.5; }
+  function cumText(V) { return missB(V) && V.over1 != null && V.over1 < 10 ? fix(V.cum1, 1) : kilo(V.cum); }
+  function overText(V) { var o = V.over1 != null ? V.over1 : V.over; return o >= 0.05 ? (o < 10 ? fix(o, 1) : kilo(V.over)) + " Mt" : "under 0.1 Mt"; }
+  function missCapAny(V) { return V.missCap ? V.missCap.some(Boolean) : sum(V.capOver) > 0.5; }
   // a view's main results as rows [label, value]
   function resultRows(V, P) {
     var L = V.Y.length - 1, b = function (t) { return fix(sum(V.built[t]), 1) + " GW"; };
     return [["Cost 2026–2050, present value in 2025 (2025 dollars; supply side and every fuel bought)", bn(V.pv.total)],
-      ["CO₂ 2026–2050 against the budget", kilo(V.cum) + " of " + kilo(V.budget) + " Mt" + (V.over > 0.5 ? " (" + kilo(V.over) + " Mt over)" : "")],
+      ["CO₂ 2026–2050 against the budget", cumText(V) + " of " + kilo(V.budget) + " Mt" + (missB(V) ? " (" + overText(V) + " over)" : "")],
       ["CO₂ a year, " + V.Y.join(", "), V.co2.map(function (x) { return fix(x, 0); }).join(", ") + " Mt"],
       ["Imports, share of primary energy, " + V.Y.join(", "), V.imp.map(function (x) { return pct(x); }).join(", ") + " (cap " + pct(V.cap) + ")"],
       ["Clean share of electricity, 2030 and 2050", pct(V.clean[0]) + " and " + pct(V.clean[L])],
@@ -16917,6 +17195,9 @@
       ["The budget's marginal value (the LP's dual: what one more tonne allowed would save)", V.carbonValue.map(cvText).join(", ") + (V.carbonValue.some(function (x) { return x != null; }) ? " a tonne, present value in 2025" : "")],
       ["Ridge Station (2,400 MW of coal)", V.ridge.closeP === null ? "open to 2050" : "closed by " + V.Y[V.ridge.closeP]]];
   }
+  // what passes the strait, from prairieland.json imports (all crude, a quarter of LNG)
+  function straitText(P) { var o = P.imports.oil.throughStraitShare, g = P.imports.lng.throughStraitShare, w = function (x) { return x >= 1 ? "all" : pct(x); };
+    return w(o) + " imported crude and " + w(g) + " of LNG through the strait"; }
   // a budget's marginal value as text: none when the budget (or the window's share) is out of reach
   function cvText(x) { return x == null ? "none (out of reach)" : "$" + fix(x, 0); }
   function fallbackHTML(V, P, o) {
@@ -16936,7 +17217,7 @@
       ["Domestic gas", gj(F.gas.def) + " (EIA, 2025: $" + fix(F.gas.anchor.usdPerMMBtu, 2) + " per MMBtu, on net calorific values)", rg(F.gas, gj), "EIA Electric Power Annual, Table 7.4"], ["LNG imports", gj(F.lng.def) + " (set for teaching)", rg(F.lng, gj), "set for teaching"],
       ["Coal (Ridge County)", gj(F.coal.def) + " (EIA, 2025: $" + fix(F.coal.anchor.usdPerMMBtu, 2) + " per MMBtu, on net calorific values)", rg(F.coal, gj), "EIA Electric Power Annual, Table 7.4"], ["Crude oil", gj(F.oil.def) + " (set for teaching: about $70 a barrel)", rg(F.oil, gj), "set for teaching"],
       ["CO₂ factors: crude oil, gas, coal", P.f.oil + ", " + P.f.gas + ", " + P.f.coal + " t per TJ", "fixed", "IPCC 2006 Guidelines, Volume 2, net calorific values"],
-      ["Build limits, a region a period", "wind " + P.lim.gwPerRegionPerPeriod.wind + ", solar " + P.lim.gwPerRegionPerPeriod.solar + ", batteries " + P.lim.gwPerRegionPerPeriod.battery + ", gas " + P.lim.gwPerRegionPerPeriod.gasCC + " + " + P.lim.gwPerRegionPerPeriod.gasCT + ", firm " + P.lim.gwPerRegionPerPeriod.firm + " GW", "fixed", "set for teaching: one generic rule, no technology's own timeline"],
+      ["Build limits, a period", "each region: wind " + P.lim.gwPerRegionPerPeriod.wind + ", solar " + P.lim.gwPerRegionPerPeriod.solar + ", batteries " + P.lim.gwPerRegionPerPeriod.battery + ", gas " + P.lim.gwPerRegionPerPeriod.gasCC + " + " + P.lim.gwPerRegionPerPeriod.gasCT + " GW; the generic firm option " + fix(P.lim.gwPerRegionPerPeriod.firm * P.R.length, 0) + " GW for the nation (" + P.lim.gwPerRegionPerPeriod.firm + " GW × " + P.R.length + " regions), with no location: its output is shared by each region's demand", "fixed", "set for teaching: one generic rule, no technology's own timeline"],
       ["Discount rate (real)", P.PL.periods.discount.def + "% (set for teaching)", rg(P.PL.periods.discount, function (v) { return v + "%"; }), "set for teaching"],
       ["Hourly shapes", "SPP's 2025 grid (slices); 2024 for the independent year", "fixed", "EIA Hourly Electric Grid Monitor (Form EIA-930)"]];
     return tableHTML(["Input (2025 dollars)", "Default", "Range you can set (set for teaching)", "Source, and the source's own range"], rows, "e4-inputs");
@@ -16952,6 +17233,7 @@
   var E4 = { REG: REG, NEW: NEW, FOSSIL: FOSSIL, prepare: prepare, schema: schema, defaults: defaults, withPreset: withPreset, sysOf: sysOf, build: build, crf: crf, dsum: dsum,
     hourly: hourly, stressHours: stressHours, fullYear: fullYear, seasonOfDay: seasonOfDay, newCap: newCap, read: read, capNow: capNow, merge: merge, fixedOf: fixedOf, money: money, windowsOf: windowsOf, runWindows: runWindows, planRun: planRun, shockRun: shockRun, solve: solve, shockTest: shockTest, c4Shocks: c4Shocks, presetsOf: presetsOf, summarize: summarize, faceModel: faceModel, builtTerms: builtTerms, nearRange: nearRange, nearRanges: nearRanges, econModel: econModel, resultRows: resultRows, fallbackHTML: fallbackHTML, inputsHTML: inputsHTML, tableHTML: tableHTML, planRows: planRows, esc: esc, view: view, shockView: shockView, stressMargins: stressMargins, TECHS: TECHS, rd: rd, WORDS: WORDS,
     GAP: GAP, UPKEEP: UPKEEP, upkeepYear: upkeepYear, upkeepPV: upkeepPV, procure: procure, co2Of: co2Of, solveWindow: solveWindow, LIM_TOL: LIM_TOL, keptThrough: keptThrough, doneWords: doneWords, fullVerdict: fullVerdict, FULL_TOL: FULL_TOL, shockTable: shockTable, cvText: cvText,
+    cumText: cumText, overText: overText, missB: missB, missCapAny: missCapAny, straitText: straitText,
     kilo: kilo, fix: fix, pct: pct, bn: bn, copy: copy, sum: sum, PJ_PER_MWH: PJ_PER_MWH, MWH_PER_PJ: MWH_PER_PJ };
   if (typeof module !== "undefined" && module.exports) module.exports = E4;
   if (typeof window === "undefined" || !window.LX) return;
@@ -17041,12 +17323,14 @@
       if (!V) return;
       var NS = "http://www.w3.org/2000/svg", y = P.Y[p];
       var svg = document.createElementNS(NS, "svg"); svg.setAttribute("viewBox", "0 0 640 470"); svg.setAttribute("class", "e4-svg"); svg.setAttribute("role", "img");
-      svg.setAttribute("aria-label", "Prairieland's five regions and seven links in " + y + ": each region's mix of electricity and the transfer limit of each link (details in the text version).");
+      svg.setAttribute("aria-label", "Prairieland's five regions and seven links in " + y + ": each region's mix of electricity and the transfer limit of each link; " + straitText(P) + " (details in the text version).");
       var mk = function (tag, at, par) { var e = document.createElementNS(NS, tag); for (var k in at) e.setAttribute(k, at[k]); (par || svg).appendChild(e); return e; };
       // sea and the strait
       mk("path", { d: "M0 448 Q160 432 320 446 T640 436 L640 470 L0 470 Z", class: "e4-sea" });
       var st = mk("g", { class: "e4-strait" }); mk("path", { d: "M628 462 L520 446 L352 386", class: "e4-route" }, st);
-      var tx = mk("text", { x: 632, y: 430, "text-anchor": "end", class: "e4-mlab small e4-halo" }, st); tx.textContent = "oil and LNG through the strait";
+      // in two short lines at the map's right edge, clear of Coast's labels (the text version has it in one sentence)
+      var sl = straitText(P).split(" and "), tx = mk("text", { x: 632, y: 416, "text-anchor": "end", class: "e4-mlab small e4-halo" }, st); tx.textContent = sl[0] + " and";
+      var tx2 = mk("text", { x: 632, y: 430, "text-anchor": "end", class: "e4-mlab small e4-halo" }, st); tx2.textContent = sl.slice(1).join(" and ");
       // links
       P.links.forEach(function (l, i) {
         var a = POS[P.R[l.a].key], b = POS[P.R[l.b].key], gw = V.linkGW[p][i], at = V.linkAt[p][i];
@@ -17065,7 +17349,7 @@
           a0 = a1;
         });
         var t1 = mk("text", { x: c[0], y: c[1] + rad + 22, "text-anchor": "middle", class: "e4-mlab e4-halo" }); t1.textContent = R.name;
-        var pr = V.price[p][r], t2 = mk("text", { x: c[0], y: c[1] + rad + 38, "text-anchor": "middle", class: "e4-mlab small e4-halo" }); t2.textContent = pr == null ? "" : "about $" + Math.round(pr) + "/MWh";
+        var pr = V.price[p][r], t2 = mk("text", { x: c[0], y: c[1] + rad + 38, "text-anchor": "middle", class: "e4-mlab small e4-halo" }); t2.textContent = pr == null ? "marginal cost unavailable" : "about $" + Math.round(pr) + "/MWh";
       });
       var rc = POS.ridge, rcm = mk("g", { class: "e4-rc" }); mk("rect", { x: rc[0] - 62, y: rc[1] - 70, width: 124, height: 20, rx: 10, class: "e4-rc-box" }, rcm);
       var t3 = mk("text", { x: rc[0], y: rc[1] - 56, "text-anchor": "middle", class: "e4-mlab small" }, rcm); t3.textContent = "Ridge County: coal";
@@ -17075,13 +17359,16 @@
       // every wedge of every disc (not only the largest source)
       table(altBody, ["Region, " + y, "Electricity made", "By source (TWh, share)", "Marginal cost (LP)"], P.R.map(function (R, r) { var g = mixOf(V, P, r, p), t = sum(g.map(function (x) { return x[1]; }));
         var mix = g.filter(function (x) { return x[1] > 0; }).sort(function (u, w) { return w[1] - u[1]; }).map(function (x) { return NAME[x[0]] + " " + fix(x[1], 1) + " (" + pct(x[1] / t) + ")"; }).join("; ");
-        return [R.name, fix(t, 1) + " TWh", mix || "none", V.price[p][r] == null ? "–" : "about $" + Math.round(V.price[p][r]) + "/MWh"]; }), "e4-wrap");
+        return [R.name, fix(t, 1) + " TWh", mix || "none", V.price[p][r] == null ? "unavailable: a limit out of reach, so no marginal values" : "about $" + Math.round(V.price[p][r]) + "/MWh"]; }), "e4-wrap");
+      H("p", { class: "lx-hint", text: "Batteries store electricity and make none, so they are not a source here. The strait: " + straitText(P) + "." }, altBody);
       table(altBody, ["Link, " + y, "Transfer limit", "Hours a year at the limit (slices)"], P.links.map(function (l, i) { return [P.R[l.a].short + " – " + P.R[l.b].short, fix(V.linkGW[p][i], 1) + " GW", kilo(V.linkAt[p][i])]; }));
     }
     return { el: el, set: function (v, pp) { V = v; if (pp != null) { p = pp; yp.set(p); } draw(); } };
   }
-  // a region's generation by technology in model year p (TWh): from the view's genR when present, else the nation's mix
-  function mixOf(V, P, r, p) { var g = V.genR ? V.genR[p][r] : null; return TECHS.map(function (t) { return [t, g ? (g[t] || 0) : 0]; }); }
+  // a region's generation by source in model year p (TWh), from the view's genR; batteries are storage, not a source (what
+  // they give back was made by the sources that charged them), so they are left out
+  var SOURCES = TECHS.filter(function (t) { return t !== "battery"; });
+  function mixOf(V, P, r, p) { var g = V.genR ? V.genR[p][r] : null; return SOURCES.map(function (t) { return [t, g ? (g[t] || 0) : 0]; }); }
 
   // capacity (GW) or generation (TWh) by technology, stacked, the five model years
   function MixChart(host, P, o) {
@@ -17093,13 +17380,16 @@
     TECHS.forEach(function (t) { var i = H("span", { class: "e4-key" }, leg); H("i", { style: "background:" + COL[t] }, i); H("span", { text: NAME[t] }, i); });
     function draw() {
       if (!V) return;
-      var src = mode === "cap" ? V.capGW : V.genTWh, bars = [], top = 0;
-      src.forEach(function (c, p) { var y0 = 0; TECHS.forEach(function (t) { var v = c[t] || 0; if (v > 0) { bars.push({ x0: p + 0.18, x1: p + 0.82, y0: y0, y1: y0 + v, color: COL[t], op: 0.95 }); y0 += v; } }); top = Math.max(top, y0); });
+      // electricity: the sources only (batteries give back what others made); capacity: every technology
+      var src = mode === "cap" ? V.capGW : V.genTWh, ts = mode === "cap" ? TECHS : SOURCES, bars = [], top = 0;
+      src.forEach(function (c, p) { var y0 = 0; ts.forEach(function (t) { var v = c[t] || 0; if (v > 0) { bars.push({ x0: p + 0.18, x1: p + 0.82, y0: y0, y1: y0 + v, color: COL[t], op: 0.95 }); y0 += v; } }); top = Math.max(top, y0); });
+      var rows = ts.map(function (t) { return [NAME[t]].concat(src.map(function (c) { return fix(c[t] || 0, 1); })); });
+      if (mode !== "cap" && V.batIn) rows.push(["Batteries (storage): taken in"].concat(V.batIn.map(function (x) { return fix(x, 1); })), ["Batteries (storage): given back"].concat(V.genTWh.map(function (c) { return fix(c.battery || 0, 1); })));
       var step = mode === "cap" ? (top > 160 ? 50 : 25) : (top > 400 ? 100 : 50), ymax = Math.ceil(top / step) * step;
       pl.render({ x: { min: 0, max: P.Y.length, ticks: P.Y.map(function (y, i) { return [i + 0.5, String(y)]; }) },
         y: { min: 0, max: ymax, step: step, fmt: function (v) { return kilo(v); }, unit: mode === "cap" ? "GW" : "TWh" }, bars: bars, height: 260, heightN: 240,
-        aria: (mode === "cap" ? "Capacity open" : "Electricity made") + " by technology in each model year, stacked.",
-        text: { head: ["Technology"].concat(P.Y.map(String)), rows: TECHS.map(function (t) { return [NAME[t]].concat(src.map(function (c) { return fix(c[t] || 0, 1); })); }) } }, true);
+        aria: (mode === "cap" ? "Capacity open by technology" : "Electricity made by source (batteries, which store and make none, left out)") + " in each model year, stacked.",
+        text: { head: [mode === "cap" ? "Technology" : "Source"].concat(P.Y.map(String)), rows: rows } }, true);
     }
     return { el: el, set: function (v) { V = v; draw(); }, mode: function (m) { mode = m; sg.set(m); draw(); } };
   }
@@ -17110,7 +17400,8 @@
       var xs = [2025].concat(V.Y), base = P.carbon.base2025Mt, line = [base].concat(V.co2), lines = [{ pts: xs.map(function (x, i) { return [x, line[i]]; }), color: "var(--lx-cc)", width: 2.5, dots: true }];
       if (other) lines.push({ pts: xs.map(function (x, i) { return [x, i ? other.co2[i - 1] : base]; }), color: "var(--lx-ink-2)", dash: "5 4", width: 2 });
       var head = ["Year", "Plan"]; if (other) head.push(otherLabel || "Compared");
-      pl.render({ x: { min: 2025, max: 2050, ticks: xs.map(function (x) { return [x, String(x)]; }) }, y: { min: 0, max: 250, step: 50, fmt: function (v) { return kilo(v); }, unit: "Mt CO₂ a year" },
+      var top = Math.max.apply(null, line.concat(other ? other.co2 : [])), ymax = Math.max(250, Math.ceil(top / 50) * 50);   // never clips a run
+      pl.render({ x: { min: 2025, max: 2050, ticks: xs.map(function (x) { return [x, String(x)]; }) }, y: { min: 0, max: ymax, step: 50, fmt: function (v) { return kilo(v); }, unit: "Mt CO₂ a year" },
         lines: lines, legend: other ? [{ label: "Plan", color: "var(--lx-cc)" }, { label: otherLabel || "Compared", color: "var(--lx-ink-2)", dash: "5 4" }] : null, height: 230, heightN: 220,
         aria: "CO₂ a year from 2025 to 2050 (model years).", text: { head: head, rows: xs.map(function (x, i) { var r = [String(x), fix(line[i], 1) + " Mt"]; if (other) r.push(fix(i ? other.co2[i - 1] : base, 1) + " Mt"); return r; }) } }, true);
     } };
@@ -17122,7 +17413,8 @@
       var xs = [2025].concat(V.Y), d0 = P.imports.dependence.share, line = [d0].concat(V.imp);
       var lines = [{ pts: xs.map(function (x, i) { return [x, 100 * line[i]]; }), color: "var(--lx-accent)", width: 2.5, dots: true }];
       if (other) lines.push({ pts: xs.map(function (x, i) { return [x, 100 * (i ? other.imp[i - 1] : d0)]; }), color: "var(--lx-ink-2)", dash: "5 4", width: 2 });
-      pl.render({ x: { min: 2025, max: 2050, ticks: xs.map(function (x) { return [x, String(x)]; }) }, y: { min: 0, max: 60, step: 10, fmt: function (v) { return v + "%"; }, unit: "imports, % of primary energy" },
+      var top = 100 * Math.max.apply(null, line.concat(other ? other.imp : []).concat([V.cap])), ymax = Math.max(60, Math.ceil(top / 10) * 10);   // never clips a run
+      pl.render({ x: { min: 2025, max: 2050, ticks: xs.map(function (x) { return [x, String(x)]; }) }, y: { min: 0, max: ymax, step: 10, fmt: function (v) { return v + "%"; }, unit: "imports, % of primary energy" },
         lines: lines, refs: [{ y: 100 * V.cap, label: "Cap " + pct(V.cap), dash: "5 4" }], height: 220, heightN: 210, legend: other ? [{ label: "Plan", color: "var(--lx-accent)" }, { label: otherLabel || "Compared", color: "var(--lx-ink-2)", dash: "5 4" }] : null,
         aria: "Imports as a share of primary energy, 2025 to 2050, against the cap.",
         text: { head: ["Year", "Plan"].concat(other ? [otherLabel || "Compared"] : []), rows: xs.map(function (x, i) { var r = [String(x), pct(line[i], 1)]; if (other) r.push(pct(i ? other.imp[i - 1] : d0, 1)); return r; }) } }, true);
@@ -17130,16 +17422,16 @@
   }
   // the readouts beside the bench: [label, value, tone]
   // the readouts; an absent rule is "not tested", never "served", and a shortfall is the worst model
-  // year's at its worse stress hour
+  // year's at its worse stress hour, against the rule (load + its margin), not unserved demand
   function ruleOn(V) { return !("rule" in V) || V.rule !== null; }
   function readouts(V) {
     var maxImp = Math.max.apply(null, V.imp), un = sum(V.unserved), short = Math.max.apply(null, V.reserve.map(function (x) { return x.shortMW; }).concat([0]));
     return [["Cost to 2050 (present value)", bn(V.pv.total), ""],
-      ["CO₂ 2026–2050", kilo(V.cum) + " of " + kilo(V.budget) + " Mt", V.over > 0.5 ? "bad" : "good"],
-      ["Imports, highest year", pct(maxImp) + " (cap " + pct(V.cap) + ")", maxImp > V.cap + 0.0005 ? "bad" : "good"],
+      ["CO₂ 2026–2050", cumText(V) + " of " + kilo(V.budget) + " Mt", missB(V) ? "bad" : "good"],
+      ["Imports, highest year", pct(maxImp) + " (cap " + pct(V.cap) + ")", missCapAny(V) || maxImp > V.cap + 0.0005 ? "bad" : "good"],
       ["Clean electricity, 2050", pct(V.clean[V.clean.length - 1]), ""],
       un > 0.005 ? ["Electricity not served in the slices", fix(un, 2) + " TWh", "bad"] : !ruleOn(V) ? ["Slices served; stress hours", "not tested (rule off)", "warn"]
-        : short > 0.5 ? ["Short at a stress hour (worst year)", kilo(short) + " MW", "warn"] : ["Every slice and stress hour served", "yes", "good"]];
+        : short > 0.5 ? ["Short of the peak-hour rule (worst year)", kilo(short) + " MW", "warn"] : ["Every slice and stress hour served", "yes", "good"]];
   }
   E4.ui = { COL: COL, NAME: NAME, POS: POS, fmtOf: fmtOf, seg: seg, controls: controls, stopper: stopper, table: table, keys: keys, yearPick: yearPick, Map: Map, MixChart: MixChart,
     Co2Chart: Co2Chart, ImportChart: ImportChart, readouts: readouts, mixOf: mixOf, ruleOn: ruleOn };

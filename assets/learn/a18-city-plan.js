@@ -23,8 +23,8 @@
 //   peak        each district's load in every hour of the eight representative days: base x (1 - savings share) +
 //               space heat x (resistance share + heat-pump share / COP(T)) + EV charging - new rooftop output; against
 //               its substation limit (one substation per district: a teaching simplification)
-//   groups      who gets the home measures' savings and who pays the programme's rebates, by household group: the
-//               programme pays 40% of each home measure's extra up-front cost where that is positive (a measure that
+//   groups      who gets the home measures' savings and who pays the program's rebates, by household group: the
+//               program pays 40% of each home measure's extra up-front cost where that is positive (a measure that
 //               costs less than the usual replacement gets none), recovered on all homes' bills over the item's life
 // Every number on the page is checked by _tests/learn/test_a18-city-plan.js.
 (function () {
@@ -130,7 +130,7 @@
     R.per = R.t > 0 ? R.net / R.t : null;
     R.homeCost = sum(IDS.filter(function (k) { return HOME[k]; }).map(function (k) { return R.ann[k] + R.keep[k]; }));
     R.homeUnits = sum(IDS.filter(function (k) { return HOME[k]; }).map(function (k) { return R.units[k]; }));
-    // the programme's rebates: 40% of each home measure's extra up-front cost where it is positive, as an annual
+    // the program's rebates: 40% of each home measure's extra up-front cost where it is positive, as an annual
     // equivalent over the item's life (what all homes' bills recover)
     var life = { hpwh: wh.life, furnace: fu.life, weather: we.life, solar: W.E0.home.pv.life, hp: hp.life };
     R.reb = {}; IDS.filter(function (k) { return HOME[k]; }).forEach(function (k) { R.reb[k] = W.A.programme.share * Math.max(0, R.up[k]) * crf(r, life[k]); });
@@ -202,7 +202,7 @@
     });
     return out;
   }
-  // who gets the home measures' savings and who pays the programme's share, by household group (annual, $)
+  // who gets the home measures' savings and who pays the program's share, by household group (annual, $)
   function groups(W, R, key) {
     var PC = W.PC, G = PC.groups, w = W.A.participation[key].w;
     var save = -R.billHome, cost = R.homeCost, prog = R.rebate, partNet = save - cost + prog;   // prog: rebates, never below zero
@@ -232,8 +232,8 @@
   function words(s) { return String(s).replace(/\[\[[^|\]]*\|([^\]]*)\]\]/g, "$1").replace(/\*\*/g, "").trim().split(/\s+/).length; }
   function name(W, id) { return W.M[id].short; }
   function lineInventory(I) {
-    return "Scope 1, burned in the city: " + fm.kt(I.tot.s1) + "; scope 2, electricity from the grid (not rooftop solar used on site): " + fm.kt(I.tot.s2) +
-      "; scope 3, losses on the wires: " + fm.kt(I.tot.s3) + ". 1 kt is 1,000 t.";
+    return "Scope 1 (burned in the city) " + fm.kt(I.tot.s1) + "; scope 2 (grid electricity, not rooftop solar) " + fm.kt(I.tot.s2) +
+      "; scope 3 (wire losses) " + fm.kt(I.tot.s3) + "; 1 kt is 1,000 t.";
   }
   function targetT(W, pct) { return W.PC.inventory2025.total * pct / 100; }
   function lineTarget(W, pct, all) {
@@ -252,9 +252,11 @@
     return s + "It is " + fm.t(need - R.total) + " short of the target" + (n === IDS.length ? ": the rest lies outside this curve (transport, industry, the grid's rate)." : ".");
   }
   function lineBudget(R, budgetM) {
-    if (!Object.keys(R.on).length) return "No bars yet, so the plan needs no money up front.";
-    var b = budgetM * 1e6, up = R.upfront, s = up >= 0 ? "Up front the plan needs " + fm.musd(up) + ", one-time. " : "Up front the plan costs " + fm.musd(-up) + " less than the usual replacements. ";
-    s += up <= b ? "That fits your " + fm.musd(b) + " budget. " : "Your " + fm.musd(b) + " budget is " + fm.musd(up - b) + " short. ";
+    if (!Object.keys(R.on).length) return "No bars yet, so the plan needs no extra investment.";
+    // one sentence for the money up front (extra investment above the usual replacements, 2026 to 2035) and the budget
+    var b = budgetM * 1e6, up = R.upfront;
+    var s = (up >= 0 ? "From 2026 to 2035 the plan needs " + fm.musd(up) + " above the usual replacements" : "From 2026 to 2035 the plan costs " + fm.musd(-up) + " less than the usual replacements") +
+      (up <= b ? ", which fits your " + fm.musd(b) + " budget. " : "; your " + fm.musd(b) + " budget is " + fm.musd(up - b) + " short. ");
     if (Math.abs(R.net) < 5e4) return s + "Net of energy saved, it costs about nothing a year.";
     return s + "Net of energy saved, it " + (R.net < 0 ? "gains " + fm.musd(-R.net) : "costs " + fm.musd(R.net)) + " a year (an annual equivalent).";
   }
@@ -268,8 +270,8 @@
     if (!(R.homeUnits > 0)) return "The plan has no home measures yet, so no household gains or pays through it.";
     var lo = Math.min.apply(null, G.map(function (g) { return g.charge; })), hi = Math.max.apply(null, G.map(function (g) { return g.charge; }));
     var s = "Households at 100% of the area median income or more take " + fm.pct(G[4].share, 0) + " of the home measures; the 0-30% group takes " + fm.pct(G[0].share, 0) + ". ";
-    if (!(R.rebate > 0)) return s + "They cost less up front than the usual replacements, so the programme pays no rebate and nobody pays for one.";
-    return s + "A home that takes none pays " + fm.usd(lo) + " to " + fm.usd(hi) + " a year for the programme's rebates.";
+    if (!(R.rebate > 0)) return s + "They cost less up front than the usual replacements, so the program pays no rebate and charges nobody.";
+    return s + "A home that takes none pays " + fm.usd(lo) + " to " + fm.usd(hi) + " a year for the program's rebates.";
   }
   function lineOrder(W, o) {
     var B = bars(W, o), ids = B.map(function (b) { return b.id; }), io = inOrder(W, ids, o), all = evaluate(W, IDS, o);
@@ -283,8 +285,8 @@
   function orderText(W, B) { return B.map(function (b, i) { return (i + 1) + " " + b.m.short.toLowerCase(); }).join(", "); }
   function lineBaseline(W, o) {
     var B = bars(W, o), g = evaluate(W, [], o).gridCut;
-    var s = "At " + o.grid.toFixed(3) + " t per MWh" + (o.ac ? ", air conditioner due," : "") + " the order is " + orderText(W, B) + ". ";
-    return s + (g > 0.5 ? "The grid alone cuts " + fm.t(g) + " a year (scopes 2 and 3), which counts toward the target." : "At 2023's rate the grid cuts nothing by itself.");
+    var s = "At " + o.grid.toFixed(3) + " t per MWh, the order is " + orderText(W, B) + ". ";
+    return s + (g > 0.5 ? "The grid alone cuts " + fm.t(g) + " a year, which counts toward the target." : "At 2023's rate the grid cuts nothing by itself.");
   }
   function lineStatic(W, o) {
     var B = bars(W, o), lo = B[0], hi = B[B.length - 1];
@@ -303,7 +305,7 @@
     var miss = [R.total < targetT(W, S.target) ? "misses the target" : null, R.upfront > S.budget * 1e6 ? "needs more than the budget" : null, over ? "puts a substation over its limit" : null].filter(Boolean);
     if (!miss.length) return { pass: true, n: n, text: "It meets the target, the budget and every substation limit. Who gains and who pays (test 3) is not pass or fail: the council weighs it before adopting." };
     var last = miss.pop();
-    return { pass: false, n: n, text: "It " + (miss.length ? miss.join(", ") + " and " : "") + last + ": revise the measures or their order, and screen again." };
+    return { pass: false, n: n, text: "It " + (miss.length ? miss.join(", ") + " and " : "") + last + ": revise the measures and screen again." };
   }
   // every reported total of a plan, for the comparison table (each measure alone)
   function table(W, o) {
@@ -362,7 +364,7 @@
       invSplit = LX.CostSplit(invHost, { parts: parts, fmt: function (v) { return fm.kt(v); },
         rows: I.rows.slice().sort(function (a, b) { return b.total - a.total; }).map(function (r) { return { key: r.key, label: SHORT[r.key], color: "var(--lx-ink-3)", total: r.total,
           values: S.sorted ? { s1: r.s1, s2: r.s2, s3: r.s3 } : { all: r.total } }; }) });
-      H("p", { class: "lx-hint", text: "Prairie City's 2025 CO₂ by sector in kt (1 kt = 1,000 t), location-based, operating only: " + fm.t(I.tot.total) + " in all. A teaching inventory: CO₂ only, no waste." }, invHost);
+      H("p", { class: "lx-hint", html: LX.rich("Prairie City's 2025 CO₂ by sector in kt (1 kt = 1,000 t), [[location-based|location-based]], operating only: " + fm.t(I.tot.total) + " in all. A teaching inventory: CO₂ only, no waste.") }, invHost);
     }
     function yAxis(list) {
       var lo = Math.min.apply(null, list.map(function (b) { return b.per == null ? 0 : b.per; }).concat([-100])), hi = Math.max.apply(null, list.map(function (b) { return b.per == null ? 0 : b.per; }).concat([100]));
@@ -395,7 +397,7 @@
       else {
         chip("Target", fm.t(need) + " a year"); chip("Your measures cut", fm.t(r.t), r.total >= need && planIds(S).length ? "good" : null);
         if (r.gridCut > 0.5) { chip("The grid's own change", fm.t(r.gridCut)); chip("Cut from 2025", fm.t(r.total), r.total >= need ? "good" : null); }
-        chip("Net cost a year", fm.musd(r.net), Math.abs(r.net) < 5e4 ? null : r.net > 0 ? "bad" : "good"); chip("Up front, one-time", fm.musd(r.upfront));
+        chip("Net cost a year", fm.musd(r.net), Math.abs(r.net) < 5e4 ? null : r.net > 0 ? "bad" : "good"); chip("Up front, above usual replacements", fm.musd(r.upfront));
       }
       invHost.hidden = !inv; maccHost.hidden = inv;
       if (inv) drawInventory(); else drawCurve();
@@ -436,7 +438,7 @@
       return G;
     }
     var steps = [
-      { text: "A plan starts with an [[emissions-inventory|inventory]]. Sort eight activities into the scopes of the [[gpc|GPC]], the standard for city inventories: burned in the city ([[scope-1|scope 1]]), grid electricity used in it ([[scope-2|scope 2]]), or caused outside it ([[scope-3|scope 3]]).",
+      { text: "First, an [[emissions-inventory|inventory]]. Sort eight activities into the scopes of the [[gpc|GPC]]: burned in the city ([[scope-1|scope 1]]), grid electricity used in it ([[scope-2|scope 2]]), or caused outside it ([[scope-3|scope 3]]).",
         build: function (act, api) {
           onPlan = null; S.part = "inv"; S.order = false; paint();
           H("p", { class: "lx-hint", text: "GPC: the Global Protocol for Community-Scale Greenhouse Gas Emission Inventories (WRI, C40 Cities and ICLEI, 2014)." }, act);
@@ -444,7 +446,7 @@
             cards: A.scopeSort.cards, onCheck: function (g) { if (g.placed === g.total) { S.sorted = true; keep(); paint(); api.done(); api.saw("You placed " + g.right + " of " + g.total + " as the GPC does. " + lineInventory(I)); } } });
           if (S.sorted) { api.done(); api.saw(lineInventory(I)); }
         } },
-      { text: "Next, a target: the share of 2025's emissions to cut by 2035. A city council adopts it, and the inventory is the yardstick. Set it.",
+      { text: "Next, a target: the share of 2025's emissions to cut by 2035, adopted by the city council and measured against the inventory. Set it.",
         build: function (act, api) {
           onPlan = null; S.part = "target"; S.order = false; paint();
           var all = evaluate(W, IDS, O());
@@ -453,7 +455,7 @@
           var b = H("button", { type: "button", class: "lx-btn small", text: "Keep " + S.target + "%" }, act);
           b.addEventListener("click", function () { api.saw(lineTarget(W, S.target, all)); api.done(); });
         } },
-      { text: "Each bar is a measure on a [[marginal-abatement-cost-curve|marginal abatement cost curve]]: width, tonnes avoided a year by 2035; height, [[abatement-cost|cost per tonne]]. Below zero it saves more than it costs. Switch bars on to reach the target.",
+      { text: "Each bar on this [[marginal-abatement-cost-curve|marginal abatement cost curve]] is a measure: width, tonnes avoided a year by 2035; height, [[abatement-cost|cost per tonne]], below zero when it saves money. Switch bars on to reach the target.",
         build: function (act, api) {
           S.part = "plan"; S.order = false; paint();
           var b = H("button", { type: "button", class: "lx-btn small", text: "Cheapest first" }, act);
@@ -462,11 +464,12 @@
           onPlan = check; b.addEventListener("click", cheapest);
           if (planIds(S).length) check();
         } },
-      { text: "Test 1, money up front. A bar's height is a yearly average over the equipment's life, yet the plan needs cash at the start. Set the budget available and compare.",
+      { text: "Test 1, money up front: a bar's height divides net yearly cost by tonnes, but the budget checks the extra investment above usual replacements, 2026 to 2035. Set the budget and compare.",
         build: function (act, api) {
           S.part = "budget"; S.order = false; paint();
-          LX.Slider(act, { label: "Budget up front, 2026 to 2035", min: A.budget.min, max: A.budget.max, step: A.budget.step, value: S.budget, fmt: function (v) { return "$" + v + "M"; },
+          LX.Slider(act, { label: "Budget for extra investment, 2026 to 2035", min: A.budget.min, max: A.budget.max, step: A.budget.step, value: S.budget, fmt: function (v) { return "$" + v + "M"; },
             onChange: function (v) { S.budget = v; keep(); api.saw(lineBudget(R(), v)); api.done(); } });
+          H("p", { class: "lx-hint", text: "Up front counts only the extra above the furnaces and water heaters owners would replace anyway; they pay for those as usual." }, act);
           onPlan = function () { api.saw(lineBudget(R(), S.budget)); };
           var b = H("button", { type: "button", class: "lx-btn small", text: "Compare" }, act);
           b.addEventListener("click", function () { api.saw(lineBudget(R(), S.budget)); api.done(); });
@@ -478,7 +481,7 @@
           function run() { var P = ledgerPeak(host); api.saw(linePeak(P)); api.done(); }
           b.addEventListener("click", run); onPlan = function () { if (host.firstChild) { var P = ledgerPeak(host); api.saw(linePeak(P)); } };
         } },
-      { text: "Test 3, who benefits. Homes that take a measure keep its savings; a programme paying 40% of the extra cost up front recovers it on every home's bill. Compare two ways homes take part.",
+      { text: "Test 3, who benefits: homes that take a measure keep its savings, and a program paying 40% of the extra cost up front recovers it on every home's bill. Compare two ways homes take part.",
         build: function (act, api) {
           S.part = "who"; S.order = false; paint();
           var host = H("div", null, act), ref = H("p", { class: "lx-hint" }, act);
@@ -489,12 +492,13 @@
           onPlan = function () { var G = ledgerGroups(host); api.saw(lineGroups(W, G, R())); };
           ledgerGroups(host);
         } },
-      { text: "Where the curve misleads, 1: each bar was priced alone. Show them in order, so each bar gives only what it adds to the bars before it. A heat pump in a weatherized home saves less.",
+      { text: "Where the curve misleads, 1: each bar was priced alone. Count the bars in order, each credited only with what it adds after those before it: a heat pump in a weatherized home saves less.",
         build: function (act, api) {
           onPlan = null; S.part = "order"; paint();
           LX.Toggle(H("div", { class: "lx-toggles", role: "group", "aria-label": "How the bars are counted" }, act), { label: "Bars in order", on: S.order,
             onChange: function (on) { S.order = on; paint(); api.saw(lineOrder(W, O())); api.done(); } });
-          H("p", { class: "lx-hint", text: "Lock-in: a furnace bought in 2026 lasts " + W.M.furnace.life + " years on average, past 2045; a home that buys one is out of the heat-pump bar until then." }, act);
+          H("p", { class: "lx-hint", text: "The order changes each bar's credit, not the plan's total: the model does not simulate when things are installed." }, act);
+          H("p", { class: "lx-hint", text: "Lock-in, not modeled here: a furnace bought in 2026 lasts " + W.M.furnace.life + " years on average, past 2045; a home that buys one is out of the heat-pump bar until then." }, act);
           if (S.order) { api.done(); api.saw(lineOrder(W, O())); }
         } },
       { text: "Where it misleads, 2: the [[counterfactual|baseline]], what would happen anyway. The grid's CO₂ per MWh in 2035 changes the tonnes; whether the old air conditioner is due too changes the heat pump's cost.",
@@ -514,7 +518,7 @@
           seg(act, "a18-sol-l", "Rooftop solar cost", A.options.solar.map(function (g) { return [g.key, g.label]; }), S.solar, function (k) { S.solar = k; keep(); paint(); say(); });
           H("p", { class: "lx-hint", text: A.options.gasNote }, act);
         } },
-      { text: "Where it misleads, 4: bars below zero rarely happen by themselves. Sort what a bar's cost counts and what it leaves out; programmes and rules exist for the gap.",
+      { text: "Where it misleads, 4: bars below zero rarely happen by themselves. Sort what a bar's cost counts and what it leaves out; programs and rules exist for the gap.",
         build: function (act, api) {
           onPlan = null; S.part = "barrier"; S.order = false; paint();
           LX.CardSort(act, { bins: A.barrierSort.bins.map(function (b, i) { return { id: b.id, label: b.label, sub: b.sub, color: ["var(--lx-good)", "var(--lx-bad)"][i] }; }),
@@ -553,13 +557,13 @@
       LX.CompareTable(H("div", { class: "lx-xcard" }, xhost), {
         title: "The curve and the tests, measure by measure", text: true,
         caption: "Each measure alone, with your settings. Peak: the change in the suburbs' highest hour. Who decides: typical U.S. practice.",
-        columns: [{ key: "name", label: "Measure", main: true }, { key: "per", label: "Cost per tonne" }, { key: "t", label: "Tonnes a year" }, { key: "up", label: "Up front" }, { key: "pk", label: "Suburbs' peak" }, { key: "who", label: "Who decides" }],
+        columns: [{ key: "name", label: "Measure", main: true }, { key: "per", label: "Cost per tonne" }, { key: "t", label: "Tonnes a year" }, { key: "up", label: "Extra up front" }, { key: "pk", label: "Suburbs' peak" }, { key: "who", label: "Who decides" }],
         rows: T.map(function (x) { return { key: x.id, color: x.m.color, name: x.m.n + " " + x.m.label, per: fm.per(x.per), t: fm.t(x.t), up: fm.musd(x.up),
           pk: (x.dPeak > 0.05 ? "+" : x.dPeak < -0.05 ? "−" : "") + fm.mw(Math.abs(x.dPeak)), who: x.m.whoText }; }) });
       LX.Boundary(H("div", { class: "lx-xcard" }, xhost), { title: "Where this curve holds",
         holds: ["Prairie City, a fictional city, with 2025 prices and costs in 2025 dollars;", "2035 without a plan: 2025's energy use, at the 2035 grid's rate;", "ten years, each measure at its stated potential, equipment replaced only when it wears out;",
           "CO₂ at each fuel's coefficient and the grid's average rate (location-based), with 5% lost on the wires;", "costs spread over each item's life at a 4% real rate, energy at retail prices."],
-        leaves: ["transport, the industrial park and the grid's own plan: no bar here;", "rebound, comfort, health and soft costs;", "how lower sales move rates for everyone: " + refRich("A13") + ";", "the cost of a bigger substation."],
+        leaves: ["transport, the industrial park and the grid's own plan: no bar here;", "[[rebound-effect|rebound]], comfort, health, and the time and hassle of taking part;", "how lower sales move rates for everyone: " + refRich("A13") + ";", "the cost of a bigger substation."],
         source: "Costs: EIA (2022 dollars), LBNL (2012), ORNL (2008), in 2025 dollars with BEA's deflator. Prairie City is fictional; its numbers are illustrative." });
     }
 

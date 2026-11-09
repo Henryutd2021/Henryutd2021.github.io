@@ -2,7 +2,7 @@
  "about": "Capstone C0, Behind one meter: the note's fields, the exemplars and the rubric's look-for lines. The plan runs on engine E0, the Site Bench's engine (its data: e0.json). The exemplars are illustrative notes about the default plan (the Prairie Town home with 6 kW of rooftop solar); every number in them is the engine's, checked against a fresh run.",
  "note": {
   "title": "Your one-page note",
-  "lede": "Write three short parts in your own words; the plan, its results, the assumptions, the sensitivity (every bar of the chart, in numbers) and the limits fill in from your last run.",
+  "lede": "Write three short parts in your own words; the plan, its results, the assumptions, the sensitivity (a row of numbers for each bar of the chart) and the limits fill in from your last run.",
   "fields": [
    { "key": "recommend", "label": "Recommendation", "hint": "Two sentences: the owner's goal, what this site should install or not, and the number that decides it.", "rows": 3, "need": true, "at": "top", "min": 12 },
    { "key": "alone", "label": "What the site cannot do alone", "hint": "One or two sentences: what it still needs from the grid or a buyer, and when.", "rows": 2, "need": true, "min": 8 },
@@ -19,7 +19,7 @@
      "parts": ["Recommendation: Install 6 kW of solar. ", { "n": 1, "text": "It saves $800 a year.", "note": "A saving without its cost: the panels cost $28,430 up front, and the [[net-present-value|NPV]] over 25 years is −$17,813." },
        "\nCO₂: ", { "n": 2, "text": "Solar is clean, so the home goes green.", "note": "No number and no boundary: bought power and gas fall from 5.9 t to 4.6 t a year (3.1 t net of the power it exports), at one average grid factor." },
        "\nAlone: ", { "n": 3, "text": "With a battery it could leave the grid.", "note": "A claim the bench never tested: the home still buys from the grid in 5,240 hours a year." }] },
-   { "key": "good", "label": "Strong note", "level": "meets every Look for line",
+   { "key": "good", "label": "Strong note", "level": "the three parts you write; with the bench's parts, every Look for line is met",
      "parts": ["Recommendation: ", { "n": 1, "text": "The owner wants panels that pay for themselves, so do not buy 6 kW of solar at the sourced costs: NPV −$17,813 over 25 years at 4% real", "note": "The owner's goal first, then the decision and the number that decides it, with its horizon and rate." },
        ", though it saves $800 a year.\nCO₂: ", { "n": 2, "text": "Bought power and gas fall from 5.9 t to 4.6 t a year (Kansas's average grid factor); 3.1 t net of the power it exports.", "note": "CO₂ with its size and its boundary, and the credit for exported power kept apart." },
        "\nAlone: ", { "n": 3, "text": "The home still needs the grid in 5,240 hours a year, every night.", "note": "What the site cannot do alone, in the bench's own numbers." },
@@ -35,14 +35,25 @@
  },
  "rubric": {
   "title": "Rate your note against the course rubric",
-  "lede": "Pick the level your note reaches on each competence. The level words are the course's, except Communication's Proficient, written for this one-page note; each \"Look for\" line is what the note needs.",
+  "lede": "Pick the level your note reaches on each competence. The course's four competences, in level words written for this one-page note: Proficient is each \"Look for\" line, the bar for this note.",
   "bar": "the bar for this note",
   "competences": [
-   { "id": "accounting", "look": "NPV and CO₂ for the same plan, against the same site with nothing new, in one dollar year, with the CO₂ boundary said." },
-   { "id": "uncertainty", "look": "Every bar of the sensitivity chart in the note, the equipment held fixed, and whether any tested input changes the answer." },
-   { "id": "realism", "look": "What the site still needs from outside (the grid, a buyer) and what the bench leaves out (outages, storage across weeks)." },
+   { "id": "accounting", "look": "NPV and CO₂ for the same plan in one dollar year, each with its boundary: the home against itself with nothing new; the farm whole and against its wind alone, its CO₂ a potential saving.",
+     "levels": { "developing": "a saving without its cost, or CO₂ without its size or boundary",
+       "proficient": "NPV and CO₂ for the same plan in one dollar year, each with its boundary (the home against itself with nothing new; the farm whole and against its wind alone)",
+       "strong": "also names who pays and who gains: the owner, the grid's other customers or the hydrogen buyer" } },
+   { "id": "uncertainty", "look": "Every bar of the sensitivity chart in the note, the equipment held fixed, and whether any tested input changes the answer.",
+     "levels": { "developing": "single numbers, or a sensitivity without its cases",
+       "proficient": "every bar of the sensitivity chart in numbers, the equipment held fixed, and whether any tested input changes the answer",
+       "strong": "also names the input that comes closest to changing the answer, and how far it would have to move" } },
+   { "id": "realism", "look": "What the site still needs from outside (the grid, a buyer) and what the bench leaves out (outages, storage across weeks).",
+     "levels": { "developing": "assumes the site can do without the grid or a buyer",
+       "proficient": "what the site still needs from outside, and when, and what the bench leaves out (outages, storage across weeks)",
+       "strong": "also checks one key input against its source, or a second source" } },
    { "id": "communication", "look": "A page an owner can act on: the recommendation first, then the numbers that back it.",
-     "levels": { "proficient": "a one-page note with the plan link: the recommendation first, then its NPV, its CO₂, the sensitivity chart and what the site cannot do alone" } }
+     "levels": { "developing": "numbers without a recommendation, or a recommendation without its numbers",
+       "proficient": "a one-page note with the plan link: the recommendation first, then its NPV, its CO₂, the sensitivity chart's bars in numbers and what the site cannot do alone",
+       "strong": "an owner could act on it without misreading: any trade-off in numbers, the limits in plain words" } }
   ],
   "note": "The bar for this capstone: every \"Look for\" line in your note."
  },
@@ -50,5 +61,5 @@
   "title": "Test the plan: what moves its NPV?",
   "lede": "Each bar swings one input; the equipment stays as you set it. A case that changes how the site runs is run again through every hour of 2025, as 52 weeks and 31 December."
  },
- "reference": {"about":"The default plan's sensitivity, shown when JavaScript is off, solved with engine E0 and HiGHS.","date":"2026-11-05","sens":{"base":-17813.125192874868,"rows":[{"key":"cost","label":"Equipment cost","loText":"75% of sourced","hiText":"125% of sourced","atLo":-10236.872198555666,"atHi":-25389.378187194045,"rerun":false,"limit":false,"why":null},{"key":"rate","label":"Discount rate (real)","loText":"2.0%","hiText":"7.0%","atLo":-15161.631912865387,"atHi":-20510.235411396825,"rerun":false,"limit":false,"why":null},{"key":"xc","label":"Export credit","loText":"0.0¢/kWh","hiText":"8.0¢/kWh","atLo":-20909.097798352108,"atHi":-14717.152587397595,"rerun":true,"limit":false,"why":null}]}}
+ "reference": {"about":"The default plan's sensitivity, shown when JavaScript is off, solved with engine E0 and HiGHS.","date":"2026-11-08","sens":{"base":-17813.125192874868,"rows":[{"key":"cost","label":"Equipment cost","loText":"75% of sourced","hiText":"125% of sourced","atLo":-10236.872198555666,"atHi":-25389.378187194045,"rerun":false,"limit":false,"why":null},{"key":"rate","label":"Discount rate (real)","loText":"2.0%","hiText":"7.0%","atLo":-15161.631912865387,"atHi":-20510.235411396825,"rerun":false,"limit":false,"why":null},{"key":"xc","label":"Export credit","loText":"0.0¢/kWh","hiText":"8.0¢/kWh","atLo":-20909.097798352108,"atHi":-14717.152587397595,"rerun":true,"limit":false,"why":null}]}}
 }

@@ -95,16 +95,16 @@
       if (id === "itc") chip("Credit up front", fmt.m(R.itcUpfront));
       mix.set([rowOf("base", "No policy", base)].concat(id ? [rowOf("with", "With the " + I[id].short, R)] : []));
       mixText.innerHTML = LX.rich("The year's electricity by source; demand is " + fmt.twh(Y.demandMWh) + ". Wind and sun [[curtailment|curtailed]]: " + fmt.twh(R.curtailed) + ".");
-      status.textContent = "Resource cost: new plants' capital and upkeep plus the gas burned, a year in 2025 dollars; payments between groups are left out.";
+      status.textContent = "Resource cost: new plants' capital and fixed upkeep, plus gas fuel and the gas plants' variable upkeep, a year in 2025 dollars; payments between groups are left out.";
       buildExplain();
     }
 
     // ---------- step cards
     function solveLine(id) {
       if (!base || !shown || shown.id !== id) return "";
-      var R = shown.R, c = compare(base, R);
-      return "**At " + fmt.val(I[id], shown.v) + ":** CO₂ " + fmt.mt(R.co2) + ", a " + fmt.pct(c.cutPct) + " cut; resource cost " + fmt.dm(c.dRes) +
-        (c.perT != null ? "; per tonne avoided, " + fmt.dm(c.dRes).replace("+", "") + " ÷ " + fmt.mt(c.cut) + " = " + fmt.pt(c.perT) : "") + ". " + moneyLine(id, R);
+      var R = shown.R, c = compare(base, R), head = "**At " + fmt.val(I[id], shown.v) + ":** ";   // CO2, the cut and the cost change are in the readouts
+      if (c.perT == null) return head + "CO₂ stays at " + fmt.mt(R.co2) + ", as with no policy. " + moneyLine(id, R);
+      return head + "a " + fmt.pct(c.cutPct) + " cut; per tonne avoided, " + fmt.dm(c.dRes).replace("+", "") + " ÷ " + fmt.mt(c.cut) + " = " + fmt.pt(c.perT) + ". " + moneyLine(id, R);
     }
     function instrumentStep(id, text) {
       var x = I[id];
@@ -124,6 +124,7 @@
         }
         LX.Slider(H("div", null, act), { label: x.label + " (" + x.unit + ")", color: x.color, min: x.min, max: x.max, step: x.step, value: S[id],
           fmt: function (v) { return fmt.val(x, v); }, onChange: function (v) { S[id] = v; keep(); go(); } });
+        if (x.intro) H("p", { class: "lx-hint", html: LX.rich(x.intro) }, act);
         H("p", { class: "lx-hint", text: x.side }, act);
         go();
       } };
@@ -152,7 +153,7 @@
               var first = base ? Promise.resolve(null) : solve({}, "a12-base").then(function (R) { if (!R.ok) return R.r; base = R; return null; });
               return D.instruments.reduce(function (p, x) { return p.then(function (bad) { return bad || solve(opts(x.id, S[x.id]), "a12-all-" + x.id).then(function (R) { return R.ok ? null : R.r; }); }); }, first);
             },
-            show: function () { st.set(""); if (g !== stepGen) return; paint(); host.innerHTML = ""; ledger(host); rules(host); api.saw("**Same grid, four instruments:** compare each cut with its change in resource cost, and see who pays. A real rule of each kind follows."); api.done(); } });
+            show: function () { st.set(""); if (g !== stepGen) return; paint(); host.innerHTML = ""; ledger(host); api.saw("**Same grid, four instruments:** compare each cut with its change in resource cost, and see who pays first. A real rule of each kind is in Sources, below."); api.done(); } });
           b.addEventListener("click", go); go();
           if (PJ && LX.lessonRefHTML) H("p", { class: "lx-hint", html: "Case file " + LX.lessonRefHTML(PJ, "CF4") + " (hydrogen at existing plants) practises reading which assumptions, a policy among them, a published result rests on." }, act);
         } }
@@ -162,23 +163,12 @@
     function results() { return D.instruments.map(function (x) { return { x: x, R: cache[JSON.stringify(opts(x.id, S[x.id]))] }; }); }
     function ledger(host) {
       LX.Ledger(host, { cls: "a12-led", caption: "One instrument at a time, each against no policy (CO₂ " + fmt.mt(base.co2) + ", resource cost " + fmt.m(base.resource) + " a year).",
-        columns: ["Instrument", "CO₂ cut", "Resource cost", "Per tonne avoided", "Money that changes hands, a year", "Paid by"],
+        columns: ["Instrument", "CO₂ cut", "Change in resource cost", "Per tonne avoided", "Money that changes hands, a year", "Paid directly by (assumed)"],
         rows: results().filter(function (z) { return z.R; }).map(function (z) {
           var c = compare(base, z.R);
           return { head: z.x.label + ", " + fmt.val(z.x, S[z.x.id]), sub: z.x.side, cells: [fmt.pct(c.cutPct), fmt.dm(c.dRes), fmt.pt(c.perT), moneyCell(z.x.id, z.R), z.x.payer] };
         }) });
-      H("p", { class: "lx-hint", text: "Per tonne avoided = the change in resource cost ÷ the CO₂ avoided, both against no policy; transfers are left out." }, host);
-    }
-    // one rule of each kind, as the page's static block: name, what it does, its source, each its own element
-    function srcHTML(x) { return "Source: " + (x.url ? '<a href="' + LX.esc(x.url) + '">' + LX.esc(x.label) + "</a>" : LX.esc(x.label)) + ", " + LX.esc(x.asOf) + "."; }
-    function rules(host) {
-      var ul = H("ul", { class: "a12-rules" }, host);
-      D.rules.forEach(function (r) {
-        var li = H("li", null, ul);
-        H("p", { html: "<b>" + LX.esc(r.kind) + " · " + LX.esc(r.where) + ".</b> " + LX.esc(r.name) + "." }, li);
-        H("p", { text: r.text }, li); H("p", { class: "lx-hint", html: srcHTML(r.source) }, li);
-        if (r.context) { H("p", { text: r.context.text }, li); H("p", { class: "lx-hint", html: srcHTML(r.context.source) }, li); }
-      });
+      H("p", { class: "lx-hint", text: "Per tonne avoided = the change in resource cost ÷ the CO₂ avoided, both against no policy; transfers are left out. Who bears the payments in the end is not modeled." }, host);
     }
 
     // ---------- the explain layer, with the reader's numbers when solved, else the reference block
@@ -192,15 +182,16 @@
           cut: c ? fmt.pct(c.cutPct) : ref.cut, per: c ? fmt.pt(c.perT) : ref.per, pays: x.pays, side: x.side };
       });
       LX.CompareTable(H("div", { class: "lx-xcard" }, xhost), { title: "Four instruments, one plan", text: true,
-        caption: "Each alone, against no policy. Your settings once solved; until then the defaults.",
-        columns: [{ key: "name", label: "Instrument", main: true }, { key: "cut", label: "CO₂ cut" }, { key: "per", label: "Per tonne avoided" }, { key: "pays", label: "Who pays" }, { key: "side", label: "Side effect" }],
+        caption: "Each alone, against no policy. Your settings once solved; until then the defaults. Payers are the direct, assumed ones; final burdens are not modeled.",
+        columns: [{ key: "name", label: "Instrument", main: true }, { key: "cut", label: "CO₂ cut" }, { key: "per", label: "Per tonne avoided" }, { key: "pays", label: "Direct payer (assumed)" }, { key: "side", label: "Side effect" }],
         rows: rows });
+      var Rt = base && cache[JSON.stringify(opts("tau", S.tau))], idle = Rt && Rt.Wn + Rt.Sn + Rt.Bn < 0.5;   // the reader's carbon price builds nothing
       LX.CausalChain(H("div", { class: "lx-xcard" }, xhost), { title: "How a carbon price works through the plan",
         links: [{ title: "A price per tonne", text: "Each gas MWh costs more: 0.40 t at the combined-cycle plants, 0.58 t at the peakers." },
                 { title: "Wind is worth more", text: "Each MWh of new wind now saves gas fuel and the carbon payment." },
-                { title: "The plan changes", text: "The planner builds wind until one more MW saves less than it costs." },
-                { title: "CO₂ falls", text: "Less gas burns; the plants still pay the price on what they emit." }],
-        note: "A credit pushes on the same lever from the other side: it lowers wind's cost, and taxpayers pay." });
+                { title: "The plan can change", text: "Once those savings beat new wind's cost, the planner builds it until one more MW saves less than it costs." },
+                { title: "CO₂ can fall", text: "If wind is built, less gas burns; the plants still pay the price on what they emit." }],
+        note: (idle ? "At your " + fmt.val(I.tau, S.tau) + ", the savings do not beat the cost: nothing is built and only the payments change. " : "") + "A credit pushes on the same lever from the other side: it lowers wind's cost, and taxpayers pay." });
       LX.Boundary(H("div", { class: "lx-xcard" }, xhost), { title: "Where these answers hold",
         holds: ["one year estimated from six real days of 2025, two of them extreme;", "the planner minimizes cost with perfect foresight; existing gas plants stay;", "costs from EIA and NREL in 2025 dollars, at 4% real."],
         leaves: ["demand that answers to prices: demand is fixed here;", "how the money is raised or spent, and who bears it in the end;", "lines inside the grid, imports, and the build-out's timing."],

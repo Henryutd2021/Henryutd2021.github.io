@@ -1,5 +1,5 @@
 {
-  "about": "Lesson F10's own inputs: seven real energy balances (the United States, the European Union, China, India, Japan, Brazil and Norway), each as its national statistics publisher or the EU's statistics office published it, one data year per country, with the rows used, the units and the conversions; the accounting conventions; the four lenses; the regional card each country opens; the numbers to remember. Every value here was read on the cited page or table between 2 and 7 November 2026. Prairieland's numbers are read from prairieland.json at run time, never copied here.",
+  "about": "Lesson F10's own inputs: seven real energy balances (the United States, the European Union, China, India, Japan, Brazil and Norway), each as its national statistics publisher or the EU's statistics office published it, one data year per country, with the rows used, the units and the conversions; the accounting conventions; the four lenses; the regional card each country opens; the numbers to remember. Every value here was read on the cited page or table between 2 and 8 November 2026. Prairieland's numbers are read from prairieland.json at run time, never copied here.",
   "pjPerTWh": 3.6,
   "nuclearHeatEff": 0.33,
   "geoHeatEff": 0.1,
@@ -14,7 +14,8 @@
       "label": "quadrillion Btu (quads)",
       "pj": 1055.06,
       "src": "un-ires",
-      "note": "1 quad = 1.05506 EJ"
+      "note": "1 quad = 1.05506 EJ",
+      "key": "[[quad|Quad]]: a quadrillion (10^15) [[btu|Btu]]; 1 quad = 1.05506 EJ. Used by the United States."
     },
     "pj": {
       "label": "PJ",
@@ -24,30 +25,35 @@
     "tj": {
       "label": "TJ",
       "pj": 0.001,
-      "src": null
+      "src": null,
+      "key": "TJ: a terajoule, a thousandth of a PJ. Used by the EU and Japan."
     },
     "tce4": {
       "label": "10,000 t of coal equivalent",
       "pj": 0.293076,
       "src": "un-ires",
-      "note": "1 t of coal equivalent = 29.3076 GJ"
+      "note": "1 t of coal equivalent = 29.3076 GJ",
+      "key": "[[coal-equivalent|tce]]: a metric ton of coal equivalent, 29.3076 GJ. China counts in units of 10,000 tce."
     },
     "ktoe": {
       "label": "thousand t of oil equivalent (ktoe)",
       "pj": 0.041868,
       "src": "un-ires",
-      "note": "1 t of oil equivalent = 41.868 GJ"
+      "note": "1 t of oil equivalent = 41.868 GJ",
+      "key": "[[oil-equivalent|ktoe]]: a thousand metric tons of oil equivalent; 1 toe = 41.868 GJ. Used by India."
     },
     "mtep": {
       "label": "million t of oil equivalent (Mtep; Brazil's tep is 10⁷ kcal)",
       "pj": 41.868,
       "src": "epe-manual",
-      "note": "1 tep = 10⁷ kcal = 41.868 GJ"
+      "note": "1 tep = 10⁷ kcal = 41.868 GJ",
+      "key": "[[oil-equivalent|Mtep]]: a million tep, Brazil's ton of oil equivalent, 10⁷ kcal = 41.868 GJ."
     },
     "twh": {
       "label": "TWh",
       "pj": 3.6,
-      "src": null
+      "src": null,
+      "key": "TWh: a terawatt-hour, 3.6 PJ. Used by Norway."
     }
   },
   "nodes": {
@@ -204,10 +210,12 @@
       "final": {
         "industry": [
           "industrial",
-          "-nonfuel"
+          "-nonfuel",
+          "lubTransport"
         ],
         "transport": [
-          "transportation"
+          "transportation",
+          "-lubTransport"
         ],
         "buildings": [
           "residential",
@@ -230,14 +238,15 @@
         "industrial": 26.652167,
         "transportation": 28.290759,
         "nonfuel": 6.53951,
+        "lubTransport": 0.104,
         "production": 107.16283,
         "netImports": -11.099192
       },
       "prov": {
-        "published": "96.5 quads of primary energy consumption (Table 1.3).",
-        "method": "Nuclear at its plants' average heat rate; hydro, wind, solar and geothermal electricity at 3,412 Btu per kWh since September 2023, close to physical energy content.",
+        "published": "96.5 [[quad|quads]] of primary energy consumption (Table 1.3).",
+        "method": "Nuclear at its plants' average [[heat-rate|heat rate]]; hydro, wind, solar and geothermal electricity at 3,412 Btu per kWh since September 2023, close to physical energy content.",
         "coverage": "Final energy is EIA's end-use energy (Tables 2.2 to 2.5); it keeps gas lease and plant fuel in industry and pipeline fuel in transport (Table 4.3). Farms sit inside industry.",
-        "adjust": "Non-fuel use (6.5 quads) shown apart as non-energy use; geothermal (0.117 quads) drawn as its own source; solar includes small-scale solar (Table 10.6)."
+        "adjust": "Non-combustion use (6.5 quads) shown apart as non-energy use: 0.104 quads of lubricants taken from transport (Table 3.8c), the rest from industry (Table 1.13b). Geothermal (0.117 quads) drawn apart; solar includes small-scale solar (Table 10.6)."
       },
       "convention": "pec",
       "importDep": {
@@ -344,11 +353,12 @@
         "split": "renewables 48.1%, nuclear heat 28.2%, oil 3.3% and natural gas 5.1% of that production"
       },
       "resources": "",
-      "institutions": "Separate companies make, carry and sell power ([[unbundling|unbundled]]). Each [[bidding-zone|price zone]] has its own price; [[market-coupling|coupled markets]] link the zones a day ahead and within the day.",
+      "institutions": "Grid operation is kept apart from power generation and sales ([[unbundling|unbundling]]): separate companies or independently run subsidiaries. Each [[bidding-zone|price zone]] has its own price; [[market-coupling|coupled markets]] link the zones day-ahead and within the day.",
       "src": [
         "eurostat-overview",
         "eurostat-balance",
-        "eurostat-method"
+        "eurostat-method",
+        "ec-unbundling"
       ],
       "resFacts": [],
       "the": true
@@ -475,7 +485,7 @@
         "coalProduction": 413585
       },
       "prov": {
-        "published": "903,158 ktoe (37,813 PJ) of total primary energy supply.",
+        "published": "903,158 [[oil-equivalent|ktoe]] (37,813 PJ) of total primary energy supply.",
         "method": "Hydro, wind and solar at their electricity (1 GWh = 0.086 ktoe); nuclear at its electricity ÷ 0.33.",
         "coverage": "No row for firewood or other traditional biomass: every share here is of the sources the balance covers.",
         "adjust": "Coal includes lignite; oil is crude oil less net exports of products. Wind, solar and other renewable power includes bio-power and small hydro. 'Other' final use is farms and non-specified uses."
@@ -611,7 +621,7 @@
         "split": "electricity from nuclear and renewables counted at METI's 8.49 MJ per kWh"
       },
       "resources": "Little coal, oil or gas of its own.",
-      "institutions": "Ten utility areas, nine of them linked; the east runs at 50 Hz and the west at 60 Hz ([[frequency|grid frequency]]), joined by small converter links. Customers choose their supplier; there is a power exchange (JEPX) and a [[capacity-market|capacity market]].",
+      "institutions": "Ten utility areas, nine linked; the east at 50 Hz, the west at 60 Hz ([[frequency|grid frequency]]), joined by small converter links. Customers choose their supplier, with a power exchange (JEPX) and a [[capacity-market|capacity market]].",
       "src": [
         "meti-balance"
       ],
@@ -705,7 +715,7 @@
         "totalGWh": 775896
       },
       "prov": {
-        "published": "328.5 Mtep of domestic energy supply (Oferta Interna de Energia).",
+        "published": "328.5 [[oil-equivalent|Mtep]] of domestic energy supply (Oferta Interna de Energia).",
         "method": "Hydro, wind and solar at their electricity (1 kWh = 860 kcal); nuclear at its electricity ÷ 0.33.",
         "coverage": "Bioenergy: sugarcane products 52.0, firewood and charcoal 27.1, black liquor and other renewables 29.2 Mtep. Hydro includes imported electricity; solar includes solar heat.",
         "adjust": "The energy sector's own use, inside BEN's final consumption, moved before the meter, as the others count it. Services, farms and the energy sector split by their published shares."
@@ -715,7 +725,7 @@
       "importDepNote": "not on the pages read",
       "production": null,
       "resources": "Rivers and sugarcane.",
-      "institutions": "One national grid, mostly hydro; plants run in order of their modelled costs; power is bought at auctions or traded in a free market.",
+      "institutions": "One national grid, mostly hydro; plants run in order of their modeled costs; power is bought at auctions or traded in a free market.",
       "src": [
         "epe-ben",
         "epe-manual"
@@ -828,10 +838,11 @@
         "fossil": "oilGasProduction"
       },
       "resources": "Oil and gas, mostly for export; rivers for its own electricity.",
-      "institutions": "Nord Pool's [[bidding-zone|price zones]]; since October 2024 [[flow-based-coupling|flow-based coupling]] limits trades by the flow on each line; hydro, and dense [[hvdc|HVDC]] links.",
+      "institutions": "Several [[bidding-zone|price zones]]; since October 2024 the Nordic day-ahead market uses [[flow-based-coupling|flow-based coupling]], which limits trades by the flow on each line. Mostly hydro, with dense [[hvdc|HVDC]] links abroad.",
       "src": [
         "ssb-balance",
-        "ssb-electricity"
+        "ssb-electricity",
+        "statnett-fbmc"
       ],
       "resFacts": [
         {
@@ -979,11 +990,11 @@
   ],
   "sources": {
     "eia-mer": {
-      "title": "Monthly Energy Review, October 2026: Tables 1.1 (production and net imports), 1.3 (primary energy consumption by source), 1.13b (non-combustion use), 2.2 to 2.5 (end-use energy by sector), 4.3 (natural gas consumption by sector), 7.2a (net generation) and 10.6 (solar, with small-scale)",
+      "title": "Monthly Energy Review, October 2026: Tables 1.1 (production and net imports), 1.3 (primary energy consumption by source), 1.13b (non-combustion use), 2.2 to 2.5 (end-use energy by sector), 3.8c (transportation-sector petroleum, with lubricants), 4.3 (natural gas consumption by sector), 7.2a (net generation) and 10.6 (solar, with small-scale)",
       "publisher": "U.S. Energy Information Administration",
-      "date": "released 29 October 2026; annual 2025 rows read 7 November 2026",
+      "date": "released 29 October 2026; annual 2025 rows read 7 November 2026, Tables 1.13b and 3.8c on 8 November 2026",
       "url": "https://www.eia.gov/totalenergy/data/monthly/",
-      "where": "2025: primary energy consumption 96.465716 quads, geothermal 0.117; production 107.16283; net imports −11.099192; end use without electrical system losses: residential 11.907, commercial 9.938, industrial 26.652, transportation 28.291 quads; Table 4.3 counts natural gas lease and plant fuel in the industrial sector and pipeline fuel in transportation"
+      "where": "2025: primary energy consumption 96.465716 quads, geothermal 0.117; production 107.16283; net imports −11.099192; end use without electrical system losses: residential 11.907, commercial 9.938, industrial 26.652, transportation 28.291 quads; non-combustion use 6.540 quads, all industrial except the transportation sector's lubricants, 0.104 (Table 3.8c; EIA counts all lubricants as non-combustion use, section 1, Note 3); Table 4.3 counts natural gas lease and plant fuel in the industrial sector and pipeline fuel in transportation"
     },
     "eia-method": {
       "title": "Change to the primary energy of noncombustible renewables",
@@ -1090,6 +1101,22 @@
       "date": "updated 19 October 2026; read 7 November 2026",
       "url": "https://www.ssb.no/elektrisitet",
       "where": "2025, GWh: production 161,793 (hydro 145,476, wind 13,899, solar 348, thermal 2,070)"
+    },
+    "ec-unbundling": {
+      "title": "Governance of the internal energy market",
+      "publisher": "European Commission, Directorate-General for Energy",
+      "date": "no date shown; read 8 November 2026",
+      "url": "https://energy.ec.europa.eu/topics/markets-and-consumers/governance-internal-energy-market_en",
+      "where": "unbundling separates the operation of transmission networks from supply and generation, in one of three ways: ownership unbundling, an independent system operator, or an independent transmission system operator, a subsidiary that takes all important decisions independently of its parent company",
+      "group": "lens"
+    },
+    "statnett-fbmc": {
+      "title": "Successful go-live of the Nordic Flow-based Market Coupling project",
+      "publisher": "Statnett, Norway's transmission system operator",
+      "date": "1 November 2024; read 8 November 2026",
+      "url": "no link",
+      "where": "the day-ahead Nordic flow-based market coupling went live on 29 October 2024, the first trading day for delivery on 30 October 2024",
+      "group": "lens"
     },
     "un-ires": {
       "title": "International Recommendations for Energy Statistics (IRES)",

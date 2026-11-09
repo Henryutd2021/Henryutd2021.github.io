@@ -478,7 +478,7 @@ window.Quarto = {
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th" scope="col">Site</th>
-<th data-quarto-table-cell-role="th" scope="col">Where (from the centre)</th>
+<th data-quarto-table-cell-role="th" scope="col">Where (from the center)</th>
 <th data-quarto-table-cell-role="th" scope="col">Score</th>
 <th data-quarto-table-cell-role="th" scope="col">Up front</th>
 <th data-quarto-table-cell-role="th" scope="col">Substation</th>
@@ -535,7 +535,7 @@ window.Quarto = {
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th" scope="col">Site</th>
-<th data-quarto-table-cell-role="th" scope="col">Where (from the centre)</th>
+<th data-quarto-table-cell-role="th" scope="col">Where (from the center)</th>
 <th data-quarto-table-cell-role="th" scope="col">Score</th>
 <th data-quarto-table-cell-role="th" scope="col">Up front</th>
 <th data-quarto-table-cell-role="th" scope="col">Substation</th>
@@ -592,7 +592,7 @@ window.Quarto = {
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th" scope="col">Site</th>
-<th data-quarto-table-cell-role="th" scope="col">Where (from the centre)</th>
+<th data-quarto-table-cell-role="th" scope="col">Where (from the center)</th>
 <th data-quarto-table-cell-role="th" scope="col">Score</th>
 <th data-quarto-table-cell-role="th" scope="col">Up front</th>
 <th data-quarto-table-cell-role="th" scope="col">Substation</th>
@@ -653,7 +653,7 @@ window.Quarto = {
 <li><b>Fictional:</b> Prairie City is fictional; its numbers are illustrative. Every layer is generated from a seed and a stated recipe; nothing was downloaded.</li>
 <li><b>Sourced:</b> tracking solar arrays take 4.2 acres per MW of panels (DC); 2019's tracking plants had 1.29 MW of panels per MW of <span class="lx-term" data-term="inverter">inverters</span> (AC, the grid side) (<a href="https://emp.lbl.gov/sites/default/files/emp-files/land_requirements_for_utility-scale_pv.pdf">LBNL</a>, slides 13 and 8).</li>
 <li><b>Sourced:</b> wind farms spread over 34.5 ha per MW, where 1 ha = 10,000 m², about 2.5 acres (<a href="https://docs.nlr.gov/docs/fy09osti/45834.pdf">NREL, 2009</a>, Table 1).</li>
-<li><b>Sourced:</b> setbacks, slope rules and the line's cost per mile come from <a href="https://docs.nlr.gov/docs/fy25osti/91900.pdf">NREL's 2024 supply curves</a> (Tables 7, 9, 11 and 12), in 2022 dollars, shown in 2025 dollars with <a href="https://apps.bea.gov/iTable/?reqid=19&amp;step=3&amp;isuri=1&amp;1921=survey&amp;1903=13&amp;1904=2022&amp;1905=2026&amp;1906=a&amp;1911=0">BEA's GDP deflator</a>.</li>
+<li><b>Sourced:</b> setbacks, slope rules and the line's cost per mile: <a href="https://docs.nlr.gov/docs/fy25osti/91900.pdf">NREL's 2024 supply curves</a> (Tables 7, 9, 11 and 12), 2022 dollars, converted to 2025 dollars with the <span class="lx-term" data-term="gdp-deflator">GDP deflator</span>, a price index (<a href="https://apps.bea.gov/iTable/?reqid=19&amp;step=3&amp;isuri=1&amp;1921=survey&amp;1903=13&amp;1904=2022&amp;1905=2026&amp;1906=a&amp;1911=0">BEA</a>).</li>
 <li><b>Shared city data:</b> the data-center campus's 150 MW contract comes from Prairie City's data, as on the course's other city pages.</li>
 <li><b>Set for teaching:</b> the four transmission substations S1–S4 and their spare capacity, land prices, access roads, water mains, block sizes and the capacity-factor rules.</li>
 </ul></div>
@@ -728,11 +728,11 @@ window.Quarto = {
 </table>
 <ul>
 <li><strong>Scores.</strong> <span class="math inline">\(d\)</span> is a distance in km and <span class="math inline">\(d_0\)</span>, <span class="math inline">\(d_1\)</span> the ramp’s ends; <span class="math inline">\(w_k\)</span> is a weight and <span class="math inline">\(s_k\)</span> a score from 0 to 1.</li>
-<li><strong>Blocks.</strong> <span class="math inline">\(a_c\)</span> is a cell’s area in km² and <span class="math inline">\(f_c\)</span> its share outside setbacks, checked at 16 points.</li>
+<li><strong>Blocks.</strong> <span class="math inline">\(a_c\)</span> is a cell’s area in km² and <span class="math inline">\(f_c\)</span> its share outside setbacks, estimated from 16 points 250 m apart: a narrow setback can fall between them.</li>
 <li><strong>Lines.</strong> <span class="math inline">\(c_u\)</span> and <span class="math inline">\(c_v\)</span> are two neighbouring cells’ costs per km; the step <span class="math inline">\(\ell\)</span> is 1 km, or <span class="math inline">\(\sqrt{2}\)</span> km on a diagonal.</li>
 <li><strong>Resources</strong> are rescaled from the region’s lowest (0) to its highest (1); land price falls from 1 at $2,500 an acre to 0 at $15,000.</li>
 <li><strong>The line’s cost per km</strong> is NREL’s $1,615,100 a mile (2022 dollars) × 128.893 / 118.026 (BEA’s GDP deflator, to 2025 dollars) ÷ 1.609344 km a mile.</li>
-<li><strong>Ties.</strong> Equal scores go to the more northern, then the more western block. Equal-cost paths may differ in their steps but share their length and cost; the page draws the first found.</li>
+<li><strong>Ties.</strong> Equal scores go to the more northern, then the more western block. Equal-cost paths can differ in their steps and length; the page draws the first found.</li>
 </ul>
 </div>
 </details>
@@ -794,7 +794,7 @@ window.Quarto = {
 <div class="lx-qq" data-id="res" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “A map of 1 km cells can check a 220 m setback.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. A setback is smaller than a cell: this map checks 16 points in each cell, and NREL's supply curves check setbacks on 90 m cells.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. A setback is smaller than a cell: this map estimates it from 16 points 250 m apart, and NREL's supply curves check setbacks on 90 m cells.</p></details>
 </div>
 </div>
 
@@ -821,7 +821,7 @@ window.Quarto = {
 <th data-quarto-table-cell-role="th" scope="col">Criterion</th>
 <th data-quarto-table-cell-role="th" scope="col">Score, 0 to 1</th>
 <th data-quarto-table-cell-role="th" scope="col">Weight</th>
-<th data-quarto-table-cell-role="th" scope="col">Neighbours' weight</th>
+<th data-quarto-table-cell-role="th" scope="col">Neighbors' weight</th>
 </tr>
 </thead>
 <tbody>
@@ -858,12 +858,12 @@ window.Quarto = {
 </tbody>
 </table>
 </div><details class="lx-answer"><summary>Answer</summary><p>(0.6 × 20 + 0.9 × 35 + 1.0 × 15 + 0.4 × 20 + 0.5 × 10) ÷ 100 = 0.715, or 71.5 out of 100.</p></details></li>
-<li><p><b>Other weights.</b> Score the same cell with the neighbours' weights, the table's last column.</p><details class="lx-answer"><summary>Answer</summary><p>(0.6 × 10 + 0.9 × 10 + 1.0 × 5 + 0.4 × 5 + 0.5 × 70) ÷ 100 = 0.57, or 57 out of 100: lower, because this cell is close to homes.</p></details></li>
+<li><p><b>Other weights.</b> Score the same cell with the neighbors' weights, the table's last column.</p><details class="lx-answer"><summary>Answer</summary><p>(0.6 × 10 + 0.9 × 10 + 1.0 × 5 + 0.4 × 5 + 0.5 × 70) ÷ 100 = 0.57, or 57 out of 100: lower, because this cell is close to homes.</p></details></li>
 <li><p><b>Land for solar.</b> A 200 MW (AC) farm has 1.3 MW of panels per MW of inverters. At LBNL's 4.2 acres per MW of panels, how much land do the arrays need?</p><details class="lx-answer"><summary>Answer</summary><p>200 × 1.3 × 4.2 = 1,092 acres, about 4.42 km²; the whole site is larger (roads, fences, setbacks).</p></details></li>
 <li><p><b>Land for wind.</b> A 100 MW wind farm takes NREL's average 34.5 ha per MW. How large is it, and how much do turbines, roads and substations occupy for good, at 0.3 ha per MW?</p><details class="lx-answer"><summary>Answer</summary><p>3,450 ha (34.5 km²) in all; 30 ha for good, under 1%: farming goes on between the turbines.</p></details></li>
 <li><p><b>Setbacks.</b> 40 farmsteads, none within 800 m of another. How much land does a 400 m setback remove, and how much a 220 m one?</p><details class="lx-answer"><summary>Answer</summary><p>40 × π × 0.4² ≈ 20.1 km² against 40 × π × 0.22² ≈ 6.1 km²: the area grows with the square of the setback.</p></details></li>
 <li><p><b>A line's cost.</b> A 12 km route crosses 8 km of farmland and 4 km of flood zone (× 1.8). Price it in 2025 dollars: NREL's $1,615,100 a mile (2022), deflator 128.893 ÷ 118.026.</p><details class="lx-answer"><summary>Answer</summary><p>$1,615,100 × 128.893 ÷ 118.026 ÷ 1.609344 ≈ $1,095,979 a km; × (8 + 4 × 1.8) ≈ $16.7 million in 2025 dollars.</p></details></li>
-<li><p><b>A least-cost path by hand.</b> Each step goes to a side-by-side cell and costs the two cells' average (costs per km below). What is the cheapest path from top left to bottom right?</p>
+<li><p><b>A least-cost path by hand.</b> Each 1 km step to a side-by-side cell costs the two cells' average ($ million per km, below). Which path from top left to bottom right is cheapest?</p>
 <div class="lx-scroll-x">
 <table class="lx-facts a19-pr caption-top table" data-practice="grid">
 <thead>
@@ -895,7 +895,7 @@ window.Quarto = {
 </tr>
 </tbody>
 </table>
-</div><details class="lx-answer"><summary>Answer</summary><p>Down the left column, then along the bottom row: 1 + 1.5 + 1.5 + 1 = 5. Along the top row and down the right column costs 7.</p></details></li>
+</div><details class="lx-answer"><summary>Answer</summary><p>Down the left column, then along the bottom row: 1 + 1.5 + 1.5 + 1 = $5 million. Along the top row and down the right column costs $7 million.</p></details></li>
 <li><p><b>Read a claim critically.</b> A report says: “Our map shows the best solar site in the county.” What four questions would you ask?</p><details class="lx-answer"><summary>Answer</summary><p>Whose weights, and would other weights pick another site; which land was excluded, by what rule; how fine and how recent the layers are; who was asked, and what a visit found.</p></details></li>
 </ol>
 </div>

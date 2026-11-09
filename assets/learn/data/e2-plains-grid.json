@@ -410,7 +410,7 @@
      "$1,676,000"
     ],
     [
-     "Today's grid: average price, Wind Ridge · Prairie Town · Metro (conditional on the commitment)",
+     "Today's grid: average price per MWh served, Wind Ridge · Prairie Town · Metro (energy payments over the MWh used, so busy hours weigh more; conditional on the commitment)",
      "$27 · $27 · $29 /MWh"
     ],
     [
@@ -422,8 +422,8 @@
      "0 · 2 of 24"
     ],
     [
-     "Today's grid: unserved · reserve short",
-     "0 MWh · 0 MWh"
+     "Today's grid: unserved · reserve short (missing reserve MW added up hour by hour)",
+     "0 MWh · 0 MW·h"
     ],
     [
      "Today's grid: uplift (make-whole payments)",
@@ -434,7 +434,7 @@
      "$1,895,000"
     ],
     [
-     "With the 300 MW load: average price, Wind Ridge · Prairie Town · Metro (conditional on the commitment)",
+     "With the 300 MW load: average price per MWh served, Wind Ridge · Prairie Town · Metro (energy payments over the MWh used, so busy hours weigh more; conditional on the commitment)",
      "$32 · $32 · $32 /MWh"
     ],
     [
@@ -446,22 +446,22 @@
      "0 · 4 of 24"
     ],
     [
-     "With the 300 MW load: unserved · reserve short",
-     "0 MWh · 0 MWh"
+     "With the 300 MW load: unserved · reserve short (missing reserve MW added up hour by hour)",
+     "0 MWh · 0 MW·h"
     ],
     [
      "With the 300 MW load: uplift (make-whole payments)",
      "$0"
     ]
    ],
-   "note": "Precomputed with HiGHS on 5 November 2026: each day a mixed-integer program commits the plants, then the dispatch linear program with that commitment fixed gives the prices. With JavaScript on, the bench runs your own plan."
+   "note": "Precomputed with HiGHS on 5 November 2026: a mixed-integer program commits the plants each day; the dispatch linear program, with that commitment fixed, gives the prices. With JavaScript on, the bench runs your own plan."
   },
   "c2": {
    "head": "Results: the default plan (all 300 MW, nothing built), then the reference plan",
    "rows": [
     [
      "Default: the plan",
-     "300 MW connected · 0 new peakers · 0 MW uprate · 0% of new costs paid by the large load"
+     "300 MW connected · 0 new peakers · 0 MW uprate · 0% of new fixed costs paid directly by the large load"
     ],
     [
      "Default: production cost, a year (2025 dollars)",
@@ -485,7 +485,7 @@
     ],
     [
      "Reference: the plan",
-     "300 MW connected · 6 new peakers · 300 MW uprate · 50% of new costs paid by the large load"
+     "300 MW connected · 6 new peakers · 300 MW uprate · 50% of new fixed costs paid directly by the large load"
     ],
     [
      "Reference: production cost, a year (2025 dollars)",
@@ -735,6 +735,7 @@
     "task": "Recommend how much of the 300 MW connects this year, what to build so the grid stays adequate, and who pays.",
     "id": "c2-ex",
     "lines": true,
+    "lede": "The strong note in excerpts: a full note also carries the plan link, the downloaded chart and the paragraph from M2's notebook.",
     "answers": [
      {
       "key": "weak",
@@ -766,7 +767,7 @@
      },
      {
       "key": "good",
-      "label": "Strong note",
+      "label": "Strong note (excerpts)",
       "level": "Proficient",
       "parts": [
        "Recommendation: connect ",
@@ -781,7 +782,7 @@
         "note": "The criterion's measure, its Monte Carlo interval with the warning it carries, and two baselines."
        },
        ".\n",
-       "Sensitivity (chart attached): ",
+       "Sensitivity (its chart goes with the note): ",
        {
         "text": "with these builds held fixed, 0.01 days at 0 MW, 0.02 days at 100 MW, 0.04 days at 200 MW, 0.08 days at 300 MW connected",
         "note": "One input moved, the plan held fixed: where the margin runs out."

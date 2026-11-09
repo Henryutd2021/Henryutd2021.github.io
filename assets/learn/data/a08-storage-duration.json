@@ -155,9 +155,9 @@
    },
    {
     "id": "metal",
-    "text": "Iron-air battery (metal-anode), 100 hours",
+    "text": "Iron-air battery, 100 hours",
     "bin": "multi",
-    "why": "Iron rusts as it discharges and is restored as it charges. DOE gives metal-anode batteries 50 to 200 hours; 100 hours is multi-day."
+    "why": "Iron rusts as it discharges and is restored as it charges. DOE gives metal-anode batteries, iron-air among them, 50 to 200 hours: multi-day."
    },
    {
     "id": "h2",

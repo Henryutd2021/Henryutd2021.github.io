@@ -32,7 +32,8 @@
       { "key": "alvarez", "pct": 2.3, "label": "Alvarez et al. (2018), Science", "doi": "https://doi.org/10.1126/science.aar7204",
         "what": "U.S. oil and gas supply chain, 2015: 13 ± 2 teragrams of methane a year, equivalent to 2.3% of gross U.S. gas production, about 60% above the EPA inventory's estimate (abstract)" },
       { "key": "sherwin", "lo": 0.75, "hi": 9.63, "label": "Sherwin et al. (2024), Nature", "doi": "https://doi.org/10.1038/s41586-024-07117-5",
-        "what": "six U.S. oil and gas regions measured from aircraft: total emissions from 0.75% to 9.63% of natural gas production, by region (abstract)" }
+        "what": "six U.S. oil and gas regions measured from aircraft: total emissions from 0.75% to 9.63% of natural gas production, by region (abstract); 15 aerial campaigns from 2016 to 2021, the 0.75% in Pennsylvania (2021), the 9.63% in the New Mexico Permian (2018-2020) (p. 329 and Fig. 2); historical survey estimates, each for its campaign's period",
+        "campaigns": "2016-2021" }
     ],
     "pureNote": "The leaked gas is counted as pure methane; pipeline gas is mostly methane (AP-42 section 1.4: generally above 85 percent)."
   },

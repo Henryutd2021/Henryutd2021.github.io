@@ -354,11 +354,11 @@
       },
       {
         "id": "e2",
-        "text": "The utility approved the depot's new service connection.",
+        "text": "Every permit the depot's new service connection needs has been issued.",
         "answer": [
           "permitted"
         ],
-        "note": "Permitted: approved, not yet built; its cost estimate is still an estimate."
+        "note": "Permitted: the authorities have said yes, but nothing is built yet; its cost estimate is still an estimate."
       },
       {
         "id": "e3",
@@ -370,11 +370,11 @@
       },
       {
         "id": "e4",
-        "text": "Over a full year the ten buses used their expected energy per mile, winter included.",
+        "text": "For a full year, winter included, the ten buses ran their planned routes within their energy target.",
         "answer": [
           "design"
         ],
-        "note": "At design output: the 2.2 kWh per mile now rests on measured service, not a brochure."
+        "note": "At design output: planned service at a measured 2.2 kWh per mile."
       },
       {
         "id": "e5",
@@ -421,7 +421,7 @@
     {
       "id": "question",
       "label": "The emissions question",
-      "text": "Average or marginal factor, and why: whose share, or what changes."
+      "text": "[[average-emission-factor|Average]] or [[marginal-emission-factor|marginal]] factor, and why: whose share of the grid's CO₂, or what a change in demand changes."
     },
     {
       "id": "grid",

@@ -545,9 +545,9 @@ window.Quarto = {
 </div>
 <div class="lx-datanote m8-dn"><svg class="lx-ic" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5M12 8v.2"></path></svg><ul>
 <li><b>Toy:</b> a fictional windy zone with 3,000 MW of wind and 4,000 MW planned; its lines take 1,000 MW. Chances, costs and demand are illustrative round numbers in 2025 dollars.</li>
-<li><b>Wind blocks:</b> the 8,760 hours of 2025 sorted by output and cut into five blocks: SPP's hourly wind shape (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>) scaled to 33.8%, U.S. wind's 2025 capacity factor (<a href="https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_b">EIA, Table 6.07.B</a>).</li>
-<li><b>Electrolyzer:</b> it uses electricity to make hydrogen from water. $80,000 per MW a year; 18 kg of hydrogen per MWh; it runs only on surplus wind.</li>
-<li><b>Hydrogen:</b> industry takes 54,000 kg an hour; gas reformers, which make hydrogen from natural gas and steam, supply the rest at $1.50 per kg.</li>
+<li><b>Wind blocks:</b> the 8,760 hours of 2025 sorted by output and cut into five blocks: SPP's hourly wind shape (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>) scaled to 33.8%, U.S. wind's 2025 <span class="lx-term" data-term="capacity-factor">capacity factor</span> (<a href="https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_b">EIA, Table 6.07.B</a>).</li>
+<li><b>Electrolyzer:</b> it uses electricity to make hydrogen from water. $80,000 per MW a year; 18 kg of hydrogen per MWh; it runs only on surplus wind, which would otherwise be curtailed and costs it nothing.</li>
+<li><b>Hydrogen:</b> industry takes 54,000 kg an hour; gas reformers, which make hydrogen from natural gas and steam, supply the rest at $1.50 per kg, with no limit.</li>
 </ul></div>
 <p class="lx-hint" style="margin-top:.6rem">About 45 guided minutes in eleven steps. Solver: <a href="https://ergo-code.github.io/HiGHS/">HiGHS</a> (open source), loaded on your first solve (about 3.5 MB, once).</p>
 <div class="lx-card lx-notebook m8-nb">
@@ -555,7 +555,7 @@ window.Quarto = {
 <p>The same two-stage program in <code>scipy.optimize.linprog(method="highs")</code>: <code>assert</code> cells check your plans, the value of the stochastic solution and the value of perfect information against the page, then you grow the tree to nine branches.</p>
 <ol class="m8-nb-steps">
 <li>Download the notebook and the data files into one folder (in Colab, upload the data with the folder icon).</li>
-<li>Open it in Google Colab (<em>File → Upload notebook</em>) or locally with Python 3, NumPy and SciPy 1.9 or later.</li>
+<li>Open it in Google Colab (<em>File → Upload notebook</em>), or locally in JupyterLab or VS Code with Python 3.9 or later, NumPy and SciPy 1.9 or later, started in that folder.</li>
 <li>Run all cells (a few seconds), then try the practice tasks at the end.</li>
 </ol>
 <p class="m8-dl"><a class="lx-btn small" href="notebooks/m08-stochastic-robust.ipynb" download="">Notebook (.ipynb)</a> <a class="lx-btn small ghost" href="../assets/learn/data/m08-stochastic-robust.json" download="">Lesson data</a> <a class="lx-btn small ghost" href="../assets/learn/data/town_year.json" download="">Year 2025</a> <a class="lx-btn small ghost" href="../assets/learn/data/cf_targets.json" download="">Capacity factors</a></p>
@@ -568,7 +568,7 @@ window.Quarto = {
 <div id="m8-explain" class="lx-xgrid">
 <div class="lx-fallback">
 <dl class="lx-ideas">
-<dt>Here and now, then recourse</dt><dd>The size is chosen before the build-out is known; the operation in each branch is chosen after.</dd>
+<dt>Here and now, then <span class="lx-term" data-term="recourse">recourse</span></dt><dd>The size is chosen before the build-out is known; the operation in each branch is chosen after.</dd>
 <dt>Wait and see</dt><dd>Each branch's own best plan: 380, 1,300 or 2,220 MW. No single plan is best in every branch.</dd>
 <dt>Plan for the average</dt><dd>1,300 MW, sized for 5,000 MW of wind; it expects $662.63M a year but costs $673.72M over the branches.</dd>
 <dt>Stochastic program</dt><dd>845 MW, the lowest expected cost: $671.10M a year.</dd>
@@ -644,7 +644,7 @@ e_{s,b} &amp;\le x &amp;&amp; \text{(the size links the stages)}\\
 <ul>
 <li><strong>Size.</strong> 31 columns and 30 rows; with <span class="math inline">\(n\)</span> branches it has <span class="math inline">\(1 + 10n\)</span> columns, so it grows with every branch you add.</li>
 <li><strong>The order of the costs.</strong> WS ≤ RP ≤ EEV: here $653.54M ≤ $671.10M ≤ $673.72M. So EVPI = RP − WS and VSS = EEV − RP are both zero or more (<a href="https://doi.org/10.1007/978-1-4614-0237-4">Birge and Louveaux, ch.&nbsp;4</a>).</li>
-<li><strong>Robust plans.</strong> Add a free variable <span class="math inline">\(z\)</span> and minimise it, with <span class="math inline">\(z \ge \text{cost}_s(x)\)</span> in every branch (worst case), or <span class="math inline">\(z \ge \text{cost}_s(x) - \text{WS}_s\)</span> (least regret). Neither row uses <span class="math inline">\(p_s\)</span>.</li>
+<li><strong>Robust plans.</strong> Add a free variable <span class="math inline">\(z\)</span> and minimize it, with <span class="math inline">\(z \ge \text{cost}_s(x)\)</span> in every branch (worst case), or <span class="math inline">\(z \ge \text{cost}_s(x) - \text{WS}_s\)</span> (least regret). Neither row uses <span class="math inline">\(p_s\)</span>.</li>
 </ul>
 </div>
 </details>
@@ -652,7 +652,7 @@ e_{s,b} &amp;\le x &amp;&amp; \text{(the size links the stages)}\\
 <summary><span class="k">Go deeper · Modeler</span>Why 845 MW: the critical-hours rule</summary>
 <div class="lx-deeper-body">
 <ul>
-<li><strong>One more MW.</strong> It costs $80,000 a year and saves $1.50 × 18 = $27 for every hour it runs on surplus. It pays while it runs more than $80,000 ÷ $27 = 2,963 hours a year.</li>
+<li><strong>One more MW.</strong> It costs $80,000 a year and saves $1.50 × 18 = $27 each hour it runs on free surplus. It pays while it runs more than $80,000 ÷ $27 = 2,963 hours a year.</li>
 <li><strong>In each branch.</strong> Just below its own best size, 380 MW (none built), 1,300 MW (half) or 2,220 MW (all), an extra MW runs 3,000 hours; just above, 1,500. Each wait-and-see plan sits where its count falls below 2,963.</li>
 <li><strong>Over the branches.</strong> Weighted by the chances, an extra MW just below 845 MW runs 3,750 hours; just above, 2,750. The stochastic plan sits where the expected count crosses 2,963.</li>
 <li><strong>When the rule stops.</strong> With one size, no storage and one zone, it finds the plan by hand. A tank, several zones or pipelines couple the blocks and sizes; that needs a coupled model, here a linear program.</li>
@@ -667,7 +667,8 @@ e_{s,b} &amp;\le x &amp;&amp; \text{(the size links the stages)}\\
 <li>Later decisions: here the size is chosen once. A multi-stage program lets the planner build more after part of the uncertainty resolves.</li>
 <li>Where the branches come from: three hand-picked branches with judged chances. More branches drawn by sampling bring sampling error, as in <a href="m07-monte-carlo.html">M7</a>.</li>
 <li>Time: five blocks of a duration curve, so no storage and no hour-to-hour links. Representative periods with storage are <a href="m03-capacity-expansion.html">M3</a>'s subject.</li>
-<li>Space: one zone, no pipelines, steady hydrogen demand and a fixed price for reformer hydrogen.</li>
+<li>Space: one zone, no pipelines, steady hydrogen demand, and reformer hydrogen without limit at a fixed price.</li>
+<li>Other costs: the wind and the lines are the same whatever the electrolyzer's size, so they are left out; surplus wind is taken at no charge.</li>
 </ul>
 </div>
 </details>

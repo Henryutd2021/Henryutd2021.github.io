@@ -255,6 +255,9 @@
     var per = function (o) { return G.map(function (g) { return g + " " + o[g].toLocaleString("en-US"); }).join(", "); };
     return [
       { sym: "nuc, wind, solar, cc, pk", name: "the plants in G: nuclear, wind farm, solar farm, combined-cycle gas plant, peaker", unit: "", value: "" },
+      { sym: "<i>g</i> ∈ <i>G</i>, <i>t</i> ∈ <i>T</i>", name: "read aloud: plant g belongs to the set of plants G; hour t belongs to the set of hours T", unit: "", value: "" },
+      { sym: "<i>p<sub>g,t</sub></i>", name: "output of plant g in hour t, at least 0: a variable, chosen by the solver", unit: "MW", value: "chosen" },
+      { sym: "<i>u<sub>t</sub></i>", name: "demand left unserved in hour t, at least 0: a variable, charged V a MWh", unit: "MW", value: "chosen" },
       { sym: "<i>d<sub>t</sub></i>", name: "demand in hour t", unit: "MW", value: hrs(inst.d) },
       { sym: "<i>a</i><sub>wind,<i>t</i></sub>", name: "wind the weather allows", unit: "MW", value: hrs(inst.a.wind) },
       { sym: "<i>a</i><sub>solar,<i>t</i></sub>", name: "sun the weather allows", unit: "MW", value: hrs(inst.a.solar) },
@@ -323,12 +326,13 @@
     };
   }
 
-  // the published-style formulation, line by line: LX.Formulation (components/formulation.js) with one view, the symbols;
-  // lines are buttons when o.onPick is given, and o.lines replaces some lines (a suspect model)
+  // the published-style formulation, line by line: LX.Formulation (components/formulation.js), its symbols with the
+  // notation key, and the same lines in words; in a bug hunt (o.onPick: the lines are buttons, o.lines replaces some lines,
+  // a suspect model) the symbols only. Tags: data, goal, (1) to (5), the same as the page without JavaScript
   var LINES = ["par", "obj", "bal", "size", "wx", "ramp", "must"];
   function readLines(host, J, o) {
-    return LX.Formulation(host, { views: ["symbols"], aria: o.aria, onPick: o.onPick, rules: LINES.map(function (k, i) {
-      return { id: k, name: J.lineNames[k], tag: k === "par" ? "data" : k === "obj" ? "goal" : "(" + (i - 1) + ")", sym: (o.lines && o.lines[k]) || J.lines[k] };
+    return LX.Formulation(host, { views: o.onPick ? ["symbols"] : ["symbols", "words"], legend: o.onPick ? null : J.legend, aria: o.aria, onPick: o.onPick, rules: LINES.map(function (k) {
+      return { id: k, name: J.lineNames[k], tag: J.lineTags[k], sym: (o.lines && o.lines[k]) || J.lines[k], words: J.lineWords[k] };
     }) });
   }
 
@@ -374,15 +378,16 @@
 
     // 3 sums are columns and rows
     steps.push({
-      text: "Σ over g adds down a column: every plant, one hour. Σ over t adds along a row: one plant, every hour. Tap the column for Σg p(g,19), then the row for Σt p(cc,t).",
+      text: "Σ over g adds down a column: every plant, one hour. Tap the column for Σg p(g,19).",
       build: function (act, api) {
-        var got = {}, out = H("div", { "aria-live": "polite" }, act), out2 = H("div", { "aria-live": "polite" }, act);
+        var got = {}, out = H("div", { "aria-live": "polite" }, act), next = H("p", { class: "lx-qtext", "aria-live": "polite" }, act), out2 = H("div", { "aria-live": "polite" }, act);
         var gr = Grid(act, inst, ref, {
           onCol: function (t, k) {
             gr.head(null, t); gr.mark(function (g, tt) { return tt === t; });
             var parts = G.map(function (g) { return ref.p[g][k]; }), sum = parts.reduce(function (a, v) { return a + v; }, 0);
             saw(out, t === 19, "Σ<sub>g</sub> <i>p</i><sub>g," + t + "</sub> = " + parts.join(" + ") + " = <b>" + sum + " MW</b>" + (t === 19 ? ", the demand at 19:00: this sum is the balance rule." : ". That is hour " + t + ":00; tap 19:00."));
-            if (t === 19) got.col = 1; done();
+            if (t === 19) { got.col = 1; if (!got.row) next.textContent = "Next, Σ over t adds along a row: one plant, every hour. Tap the row for Σt p(cc,t)."; }
+            done();
           },
           onRow: function (g) {
             gr.head(g, null); gr.mark(function (gg) { return gg === g; });
@@ -510,8 +515,8 @@
           var d = (refSum && refSum.rows.map(function (x) { return x.dual; })) || ref.balanceDuals;
           saw(out, right, (right ? "Right. " : "Not here. ") + "Balance duals: " + T.map(function (t, k) { return t + ":00 $" + Math.round(d[k]); }).join(", ") + " per MWh, all ≥ 0 for these inputs.");
           var why = H("ul", { class: "b3-why" }, out);
-          H("li", { text: "Why ≥ 0 here: nothing in this plan is forced to run above what demand needs, so extra demand adds cost, or none where spilled wind and sun cover it." }, why);
-          H("li", { text: "If output were forced above demand (nuclear held flat, a plant unable to ramp down), more demand could save money: a negative dual." }, why);
+          H("li", { text: "Why ≥ 0 here: no hour sits at the least output that nuclear and the ramp allow, so extra demand adds cost, or none where spilled wind and sun cover it." }, why);
+          H("li", { text: "Extra demand can lower the cost across linked hours: cut 17:00 demand to 105 MW, the least nuclear and the ramp allow, and one more MWh lets the combined-cycle plant run higher later, in place of the peaker: a dual of −$140." }, why);
           H("li", { text: "Upper limits, such as the weather limits and the ramp's climb, have duals ≤ 0: loosening a cap never raises the cheapest cost." }, why);
           fin();
         }
@@ -523,7 +528,7 @@
 
     // 8 verification or validation
     steps.push({
-      text: "[[verification|Verification]] asks whether the model does what its equations say. [[validation|Validation]] asks whether it is right enough for the question. Sort six checks.",
+      text: "[[verification|Verification]] asks whether the equations and code implement the intended model correctly. [[validation|Validation]] asks whether that model is right enough for the question. Sort six checks.",
       build: function (act, api) {
         var right = {}, list = H("div", { class: "b3-vv" }, act);
         J.vv.forEach(function (v, i) {

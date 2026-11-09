@@ -202,7 +202,7 @@
           });
         } },
       // 5 the stochastic program
-      { text: "The [[two-stage-stochastic-program|two-stage stochastic program]] chooses one size and each branch's operation together, weighting each branch's cost by its chance. Solve it.",
+      { text: "The [[two-stage-stochastic-program|two-stage stochastic program]] chooses one size and each branch's operation, its [[recourse|recourse]], together, weighting each branch's cost by its chance. Solve it.",
         build: function (act, api) {
           solveRow(act, api, "Solve the stochastic program", function () { return jobSP(); }, function (out) {
             out.innerHTML = ""; var p = St.sp, k = H("div", { class: "m8-kpis" }, out), m = build(D, S);
@@ -265,8 +265,8 @@
             api.done(); api.saw("It builds " + fm.mw(p.x) + ": there the regret of too much electrolyzer, if none of the planned wind is built, equals the regret of too little, if all of it is: " + fm.m(rg[0]) + " a year each.");
           });
         } },
-      // 10 the chances are a judgement
-      { text: "The chances are a judgement. Re-solve with a pessimistic or an optimistic tree: which plans move, and which stay?",
+      // 10 the chances are a judgment
+      { text: "The chances are a judgment. Re-solve with a pessimistic or an optimistic tree: which plans move, and which stay?",
         build: function (act, api) {
           // one preset solves at a time: its buttons are off until the run ends, and each run keeps its own preset (id), so
           // a quick second tap cannot mix two presets' results
@@ -357,7 +357,7 @@
       title: "The two-stage program, symbol by symbol", lede: "Tap a symbol: what it means, its unit and its value in this lesson.", dense: true, label: "The extensive form of the stochastic program; each symbol is a button",
       fields: [{ key: "you", label: "In this lesson" }, { key: "code", label: "In code", code: true }],
       rows: [
-        { html: "min " + sym("c", "<var>c</var>") + " " + sym("x", "<var>x</var>") + " + Σ<sub><var>s</var></sub> " + sym("p", "<var>p</var><sub><var>s</var></sub>") + " Σ<sub><var>b</var></sub> " + sym("h", "<var>h</var><sub><var>b</var></sub>") + " " + sym("cr", "<var>c</var><sub>r</sub>") + " " + sym("r", "<var>r</var><sub><var>s,b</var></sub>"), tag: "goal: expected cost", say: "Minimise the electrolyzer's yearly cost plus the chance-weighted cost of reformer hydrogen in every branch and block." },
+        { html: "min " + sym("c", "<var>c</var>") + " " + sym("x", "<var>x</var>") + " + Σ<sub><var>s</var></sub> " + sym("p", "<var>p</var><sub><var>s</var></sub>") + " Σ<sub><var>b</var></sub> " + sym("h", "<var>h</var><sub><var>b</var></sub>") + " " + sym("cr", "<var>c</var><sub>r</sub>") + " " + sym("r", "<var>r</var><sub><var>s,b</var></sub>"), tag: "goal: expected cost", say: "Minimize the electrolyzer's yearly cost plus the chance-weighted cost of reformer hydrogen in every branch and block." },
         { html: sym("k", "<var>k</var>") + " " + sym("e", "<var>e</var><sub><var>s,b</var></sub>") + " + <var>r</var><sub><var>s,b</var></sub> = " + sym("Dh", "<var>H</var>"), tag: "hydrogen", say: "Hydrogen from the electrolyzer plus hydrogen from reformers meets industry's demand, in every branch and block." },
         { html: "<var>e</var><sub><var>s,b</var></sub> ≤ <var>x</var>, &nbsp; 0 ≤ <var>e</var><sub><var>s,b</var></sub> ≤ " + sym("sig", "<var>σ</var><sub><var>s,b</var></sub>"), tag: "limits", say: "The electrolyzer runs no faster than its size, and only on surplus wind." },
         { html: "<var>σ</var><sub><var>s,b</var></sub> = max(0, " + sym("W", "<var>W</var><sub><var>s</var></sub>") + " " + sym("f", "<var>f</var><sub><var>b</var></sub>") + " − " + sym("A", "<var>A</var>") + ")", tag: "surplus (given)", say: "Surplus wind is the branch's wind output in the block above what the lines take." },
@@ -366,7 +366,7 @@
       symbols: {
         x: { name: "x", label: "x, the electrolyzer's size", unit: "MW", words: "The here-and-now decision: one size for every branch.", you: "Stochastic program: " + fm.mw(R.sp.x) + ".", code: '"x"' },
         c: { name: "c", label: "c, the size's yearly cost", unit: "$ per MW a year", words: "Annualized capital and fixed upkeep (illustrative).", you: "$" + fm.int(D.electrolyzer.costPerMWYear) + " per MW a year.", code: "D.electrolyzer.costPerMWYear" },
-        p: { name: "p_s", label: "p s, the branch's chance", unit: "share", words: "The planner's judgement of how likely each build-out is; the chances add up to 1.", you: S.map(function (s) { return s.short + " " + fm.pct(s.p); }).join(", ") + ".", code: "s.p" },
+        p: { name: "p_s", label: "p s, the branch's chance", unit: "share", words: "The planner's judgment of how likely each build-out is; the chances add up to 1.", you: S.map(function (s) { return s.short + " " + fm.pct(s.p); }).join(", ") + ".", code: "s.p" },
         h: { name: "h_b", label: "h b, the block's hours", unit: "hours a year", words: "How many hours of the year the wind block stands for (a weight).", you: D.blocks.hours.map(fm.int).join(", ") + ": 8,760 in all.", code: "D.blocks.hours[b]" },
         cr: { name: "c_r", label: "c r, reformer hydrogen's price", unit: "$ per kg", words: "Hydrogen from gas reformers, the fallback supply (illustrative).", you: "$" + D.hydrogen.reformerPerKg.toFixed(2) + " per kg.", code: "D.hydrogen.reformerPerKg" },
         r: { name: "r_s,b", label: "r s b, hydrogen from reformers", unit: "kg an hour", words: "A recourse decision: chosen after the branch is known.", you: "Whatever the electrolyzer does not make.", code: '"r_" + s.id + "_" + b' },

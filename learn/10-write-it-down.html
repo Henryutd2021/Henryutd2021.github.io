@@ -542,7 +542,7 @@ window.Quarto = {
 <summary><span class="k">Go deeper</span>What one hour leaves out</summary>
 <div class="lx-deeper-body">
 <ul>
-<li>The ramp limit: it couples neighbouring hours. This chart leaves out the previous hour's output; <a href="11-solver.html">lesson 11</a> solves all 24 hours together.</li>
+<li>The ramp limit: it couples neighboring hours. This chart leaves out the previous hour's output; <a href="11-solver.html">lesson 11</a> solves all 24 hours together.</li>
 <li>Extra gas above 145 MW would be spilled as wind and sun; at 19:00 only 86 MW of them can be, a limit the chart leaves out.</li>
 <li>Real costs are rarely exactly equal, but near-ties are common: then small data changes swing the plan between the tied plants.</li>
 </ul>
@@ -558,7 +558,7 @@ window.Quarto = {
 <div class="lx-qq" data-id="two" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “If two different plans are both best, there are exactly two best plans.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. Every plan on the line between them is just as good: any split between two plants with equal costs is best.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. Every plan on the straight segment between them also meets every rule and costs the same, so infinitely many plans tie.</p></details>
 </div>
 <div class="lx-qq" data-id="dem" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “Demand is one of the decisions in a dispatch model.”</p>
@@ -614,7 +614,7 @@ window.Quarto = {
 </tr>
 <tr class="even">
 <td class="n">4 outcomes</td>
-<td>One best corner, a tie, infeasible or unbounded: every linear program ends in one of them.</td>
+<td>One best corner, a tie, infeasible or unbounded: every linear program has one of them. A solver can also stop early, before it knows which.</td>
 <td class="s">This lesson</td>
 </tr>
 <tr class="odd">
@@ -642,14 +642,14 @@ window.Quarto = {
 <div class="lx-card lx-real">
 <p class="lx-eyebrow">In the real world</p>
 <p>Grid operators' dispatch models have the same four parts, with many more decisions: every plant, every line, every interval.</p>
-<p>Open modelling tools such as <a href="https://docs.pypsa.org/">PyPSA</a> and <a href="https://jump.dev/">JuMP</a> write them in code.</p>
+<p>Open modeling tools such as <a href="https://docs.pypsa.org/">PyPSA</a> and <a href="https://jump.dev/">JuMP</a> write them in code.</p>
 </div>
 <div class="lx-card lx-sources">
 <p class="lx-eyebrow">Sources and further reading</p>
 <ul>
 <li>EIA. <a href="https://www.eia.gov/electricity/gridmonitor/">Hourly Electric Grid Monitor</a> (Form EIA-930): the Southwest Power Pool data behind Prairie Town's day.</li>
 <li>HiGHS. <a href="https://ergo-code.github.io/HiGHS/dev/">Documentation</a>: the open-source solver that lesson 11 runs in your browser.</li>
-<li>JuMP. <a href="https://jump.dev/">Modelling language for mathematical optimization</a> in Julia.</li>
+<li>JuMP. <a href="https://jump.dev/">Modeling language for mathematical optimization</a> in Julia.</li>
 <li>Earlier lessons: <a href="00-grid-operator.html">lesson 0</a> (the day you ran by hand), <a href="08-merit-order.html">lesson 8</a> (the merit order as an optimization).</li>
 </ul>
 </div>

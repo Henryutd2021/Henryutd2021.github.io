@@ -295,14 +295,14 @@
             onPick: function (p) { pred = p; keep("pred", p); api.done(); } });
           if (pred) api.done();
         } },
-      { text: "Here is every hour of a year for each plant: one column per day, midnight at the top. Darker means closer to full size. Look at all three plants.",
+      { text: "Here is every hour of a year for each plant: one column per day, midnight at the top, darker closer to full size. Look at all three plants.",
         build: function (act, api) {
           var top = H("div", null, act), map = H("div", null, act), note = H("p", { class: "lx-hint" }, act), stat = H("div", { class: "lx5-stats", "aria-live": "polite" }, act);
           var fb = FillBar(act), mb = H("div", { class: "lx5-mwrap" }, act);
           var ym = YearMap(map, W, D);
           var tabs = seg(top, KEYS.map(function (k) { return { value: k, label: TECH[k].label, color: TECH[k].col }; }), "Plant, 100 MW each", function (k) {
             seen[k] = true; ym.show(k); note.innerHTML = LX.rich(NOTES[k](W[k]));
-            stat.innerHTML = "<div><span>Energy in the year</span><b>" + F.int(W[k].energy) + " MWh</b></div><div><span>Capacity factor</span><b>" + pct(W[k].cf) +
+            stat.innerHTML = "<div><span>Energy in the year</span><b>" + F.int(W[k].energy) + " MWh</b></div><div><span><span class=\"lx-term\" data-term=\"capacity-factor\">Capacity factor</span></span><b>" + pct(W[k].cf) +
               "</b></div><div><span>Best hour</span><b>" + Math.round(W[k].max) + " MW</b></div>";
             fb.set(W[k].cf, TECH[k].col, "Made " + F.int(W[k].energy) + " of the " + F.int(P * HOURS) + " MWh it could make at full size every hour: " + pct(W[k].cf) + ".");
             mb.innerHTML = ""; monthBars(mb, W[k].monthly, TECH[k].col, TECH[k].label + ": capacity factor by month, January to December.");
@@ -351,11 +351,11 @@
             keep("cfPick", v); api.saw(why[v], v !== "cf"); if (v === "cf") api.done();
           });
         } },
-      { text: "Why does wind output swing so much? Between the [[cut-in-speed|cut-in]] and rated speeds, a turbine's output grows with the [[cube-law|cube of the wind speed]]. Set a speed between 3 and 6 m/s, then double it.",
+      { text: "Wind's power grows with the [[cube-law|cube of its speed]]; this lesson's simple turbine follows it from [[cut-in-speed|cut-in]] up to rated speed (full output). Set a speed between 3 and 6 m/s, then double it.",
         build: function (act, api) { return windStep(act, api, "cube"); } },
       { text: "Now start at 8 m/s and double again. Watch what the turbine does above its [[rated-speed|rated speed]] of " + tb.ratedSpeed + " m/s.",
         build: function (act, api) { return windStep(act, api, "rated"); } },
-      { text: "How many MWh does 1 MW make in a year? Running at full size all 8,760 hours of 2025, it would make 8,760 MWh. Tap each plant to see what 1 MW really makes.",
+      { text: "At full size for all 8,760 hours of 2025, 1 MW would make 8,760 MWh in the year. Tap each plant to see what 1 MW really makes.",
         build: function (act, api) {
           var top = H("div", null, act), out = H("div", { class: "lx5-permw", "aria-live": "polite" }, act), bars = H("div", { class: "lx5-pbars" }, act);
           function row(label, v, col, sel) {
@@ -485,8 +485,8 @@
       bars: rows.map(function (r) { return { x0: r.v - 0.07, x1: r.v + 0.07, y0: r.kw - r.sd, y1: r.kw + r.sd, color: C, op: 0.35 }; }),
       lines: [{ pts: clean, color: "var(--lx-ink-3)", width: 2, dash: "6 4" },
               { pts: rows.map(function (r) { return [r.v, r.kw]; }), color: C, width: 1.6, dots: true }],
-      legend: [{ label: "Measured: average of each 0.5 m/s bin", color: C },
-               { label: "Bar: spread of the 10-minute averages (one standard deviation)", color: "color-mix(in srgb, var(--lx-wind) 40%, transparent)" },
+      legend: [{ label: "Measured: average of the records in each 0.5 m/s speed group (bin)", color: C },
+               { label: "Bar: how much those records vary (one standard deviation), not an error bar on the average", color: "color-mix(in srgb, var(--lx-wind) 40%, transparent)" },
                { label: "Clean curve: cube law at Cp " + M.cpBest + ", capped at " + F.int(M.ratedKW) + " kW", color: "var(--lx-ink-3)", dash: true }],
       tip: function (x) {
         if (x < 0.75) return null;
@@ -496,7 +496,7 @@
       tipStep: 0.5,
       aria: "Measured power curve of a " + F.int(M.ratedKW) + " kW research turbine. From about 6 to 8 m/s the bin averages follow the clean cube-law curve; above that they bend over " +
         "gradually and reach full power near " + M.ratedSpeed + " m/s, where the clean curve turns a sharp corner near 10 m/s. Bars show the spread of the 10-minute averages.",
-      text: { head: ["Wind speed, m/s", "Measured average, kW", "Spread (±1 SD), kW", "10-minute averages", "Clean curve, kW"],
+      text: { head: ["Wind speed, m/s", "Measured average, kW", "Spread (±1 standard deviation), kW", "10-minute averages", "Clean curve, kW"],
               rows: rows.map(function (r) { return [r.v.toFixed(2), F.int(r.kw), F.int(r.sd), r.n, F.int(r.clean)]; }),
               note: "Bins below 3 m/s are slightly negative: the idle turbine draws about 5 kW for its controls." }
     }, true);

@@ -122,19 +122,25 @@
   }
   // inputs ordered by |rho|, largest first (stable)
   function order(rh, ins) { return ins.map(function (q, i) { return { key: q.key, rho: rh[q.key], i: i }; }).sort(function (a, b) { return Math.abs(b.rho) - Math.abs(a.rho) || a.i - b.i; }); }
-  // the tie rule, stated in advance: inputs are ranked by |rho|; the next input joins the same rank when its gap to the
-  // input before it is within two standard errors of that gap (the 20 repeats); every group is a rank ("1", "2-3", ...)
+  // the tie rule, stated in advance: inputs are ordered by |rho|; one input ranks clearly above another when its |rho|
+  // exceeds the other's by more than two standard errors of that gap (from the 20 repeats). Every pair is tested, so a rank
+  // is a range: from 1 + the number of inputs clearly above it to the number of inputs not clearly below it ("1", "2–3",
+  // ...); a range wider than one place means tied. groups: neighbours in the order with the same range; first: the inputs
+  // that nothing ranks clearly above (several of them = tied first)
   function rankGroups(rh, reps, out, ins) {
-    var ord = order(rh, ins), groups = [[ord[0]]];
-    for (var i = 1; i < ord.length; i++) {
-      var a = ord[i - 1].key, b = ord[i].key;
+    var ord = order(rh, ins), n = ord.length;
+    function clear(a, b) {
       var gap = Math.abs(rh[a]) - Math.abs(rh[b]), e = se(reps, function (r) { return Math.abs(r.rho[out][a]) - Math.abs(r.rho[out][b]); });
-      ord[i].gap = gap; ord[i].gapSE = e;
-      if (gap <= 2 * e) groups[groups.length - 1].push(ord[i]); else groups.push([ord[i]]);
+      return gap > 2 * e;
     }
-    var pos = 1;
-    groups.forEach(function (g) { var lab = g.length > 1 ? pos + "–" + (pos + g.length - 1) : String(pos); g.forEach(function (r) { r.rank = lab; r.tied = g.length > 1; }); pos += g.length; });
-    return { order: ord, groups: groups };
+    ord.forEach(function (x, i) {
+      var above = 0, below = 0;
+      ord.forEach(function (y, j) { if (j < i && clear(y.key, x.key)) above++; if (j > i && clear(x.key, y.key)) below++; });
+      x.lo = 1 + above; x.hi = n - below; x.rank = x.lo === x.hi ? String(x.lo) : x.lo + "–" + x.hi; x.tied = x.lo !== x.hi;
+    });
+    var groups = [];
+    ord.forEach(function (x, i) { if (i && ord[i - 1].rank === x.rank) groups[groups.length - 1].push(x); else groups.push([x]); });
+    return { order: ord, groups: groups, first: ord.filter(function (x) { return x.lo === 1; }), clear: clear };
   }
   // one at a time: each input at its low and its high end, the others at base
   function tornado(D, tau, out) {
@@ -282,15 +288,15 @@
     var e = {}; ins.forEach(function (q) { e[q.key] = se(reps, function (r) { return r.rho.dev[q.key]; }); });
     var best = G.order.filter(function (r) { return r.key !== "margin"; })[0];
     var mrank = G.order.filter(function (r) { return r.key === "margin"; })[0].rank;
-    return { half: half, rho: rh, se: e, order: G.order, groups: G.groups, top: G.order[0].key, best: best.key, marginRank: mrank };
+    return { half: half, rho: rh, se: e, order: G.order, groups: G.groups, first: G.first, top: G.order[0].key, best: best.key, marginRank: mrank };
   }
   // the widest half-width at which the margin is no longer alone in first place, and the widest at which, by the tie rule,
-  // another input ranks clearly above it (step 10's goal)
+  // another input ranks clearly above it, so the margin is not even tied first (step 10's goal)
   function narrowing(D) {
     var W = D.marginWidth, rows = [];
     for (var h = W.max; h >= W.min; h -= W.step) rows.push(narrowAt(D, h));
-    var first = function (r) { return r.groups[0].length === 1 && r.groups[0][0].key === "margin"; };
-    return { rows: rows, tie: rows.filter(function (r) { return !first(r); })[0] || null, flip: rows.filter(function (r) { return r.groups[0].every(function (x) { return x.key !== "margin"; }); })[0] || null };
+    var alone = function (r) { return r.first.length === 1 && r.first[0].key === "margin"; };
+    return { rows: rows, tie: rows.filter(function (r) { return !alone(r); })[0] || null, flip: rows.filter(function (r) { return r.first.every(function (x) { return x.key !== "margin"; }); })[0] || null };
   }
 
   // ---------------------------------------------------------------- the reference block (the test's --write; the lab asserts it)
@@ -330,7 +336,8 @@
   function staticFallback(D) {
     var F = facts(D), main = study(D, { seed: D.seed }), H = staticHist(D, F, main), T = D.wait, tor = F.tornado.dev, c = F.corners.dev, e = F.err;
     var G = F.groups, fl = F.narrow.flip, name = function (k) { return D.inputs.filter(function (q) { return q.key === k; })[0].short.toLowerCase(); };
-    var grp = function (g) { return g.map(function (r) { return name(r.key) + " " + r2(r.rho); }).join(" and ") + (g.length > 1 ? " (tied, rank " + g[0].rank + ")" : " (rank " + g[0].rank + ")"); };
+    var grp = function (g) { return g.map(function (r) { return name(r.key) + " " + r2(r.rho); }).join(" and ") + (g.length > 1 || g[0].tied ? " (tied, rank " + g[0].rank + ")" : " (rank " + g[0].rank + ")"); };
+    var firsts = function (f) { return f.map(function (r) { return name(r.key) + " " + r2(r.rho) + " (rank " + r.rank + ")"; }).join(" and ") + (f.length > 1 ? " tie for first" : " is first"); };
     var swing = tor.rows.slice().sort(function (a, b) { return Math.abs(b.atHi - b.atLo) - Math.abs(a.atHi - a.atLo); });
     var bw = F.budget.wait, Bs = "$" + D.budget.start + "M";
     var li = [
@@ -344,7 +351,7 @@
       "Monte Carlo error over 20 seeds: P90 " + musd(F.main.dev.p90) + " " + pm(2 * e.p90["1000lhs"].se) + " (two standard errors) with 1,000 runs, " + pm(2 * e.p90["100lhs"].se) + " with 100.",
       "A chance under these inputs: above " + Bs + ", " + shr(bw[12].share) + " of runs at 12 months, " + shr(bw[24].share) + " at 24 and " + shr(bw[36].share) + " at 36.",
       "Spearman's rank correlation with the developer's cost: " + G.dev.groups.slice(0, 2).map(grp).join("; then ") + "; with other customers' cost: " + G.rate.groups.slice(0, 2).map(grp).join("; then ") + ".",
-      fl ? "Narrow the margin's range to ± $" + int(fl.half) + ": " + grp(fl.groups[0]) + ", and the margin (" + r2(fl.rho.margin) + ") ranks " + fl.marginRank + "." : "Narrowing the margin's range does not change the top input."
+      fl ? "Narrow the margin's range to ± $" + int(fl.half) + ": " + firsts(fl.first) + ", and the margin (" + r2(fl.rho.margin) + ") ranks " + fl.marginRank + "." : "Narrowing the margin's range does not change the top input."
     ];
     var rows = [["Runs", "1,000 (Latin hypercube, seed " + D.seed + ")"], ["Median", musd(F.main.dev.p50)], ["P10 and P90", musd(F.main.dev.p10) + " and " + musd(F.main.dev.p90)],
                 ["P90, Monte Carlo error", pm(2 * e.p90["1000lhs"].se) + " (2 standard errors, 20 seeds)"], ["Share above " + Bs + ", " + T + " months", shr(bw[T].share) + " ± " + pts(2 * bw[T].se) + " (2 standard errors)"],
@@ -587,6 +594,7 @@
         seg(ctl, ["Plain random", "Latin hypercube"], -1, function (i) { method = i ? "lhs" : "random"; seen[method] = 1; draw(); }, "Sampling method");
         var nb = H("button", { type: "button", class: "lx-btn small ghost", text: "New seed" }, ctl), sl = H("span", { class: "m7-seed", text: "Seed " + sd0 }, ctl);
         nb.addEventListener("click", function () { sd0++; sl.textContent = "Seed " + sd0; draw(); });
+        H("p", { class: "lx-hint", html: LX.rich("A [[random-seed|seed]] fixes the random draws: the same seed repeats them, a new seed gives new ones.") }, act);
         var P = LX.Plot(act, { text: "Text version of the chart" }), out = readout(act);
         function draw() {
           if (!method) { out.textContent = "Pick a method."; P.render({ x: { min: 0, max: 1, ticks: [] }, y: { min: 0, max: 1, ticks: [] }, height: 60, heightN: 60, aria: "Empty until a method is picked.", text: { head: ["Run"], rows: [] } }); return; }
@@ -628,10 +636,10 @@
         note: "Shaded: P10 " + money(sm.p10) + " to P90 " + money(sm.p90) + ". Median " + money(sm.p50) + ". Corners " + money(cor.lo) + " and " + money(cor.hi) + "." }, extra || {}));
     }
     steps.push({
-      text: "Now run the model 1,000 times on a Latin hypercube, [[random-seed|seed]] " + D.seed + ": each run draws all five inputs and gives one present value. Read the [[histogram|histogram]], not one number.",
+      text: "Now run the model 1,000 times on a Latin hypercube, seed " + D.seed + ": each run draws all five inputs and gives one present value. Read the [[histogram|histogram]], not one number.",
       build: function (act, api) {
         var r = row(act), b = H("button", { type: "button", class: "lx-btn small", text: "Run 1,000 times" }, r);
-        var P = LX.Plot(act, { text: "Text version of the chart" }), out = readout(act);
+        var P = LX.Plot(act, { text: "Text version of the chart" }), out = readout(act), outN = readout(act);
         P.render({ x: { min: 100, max: 250, ticks: [[100, "$100M", "start"], [150, "$150M"], [200, "$200M"], [250, "$250M", "end"]] }, y: { min: 0, max: 100, step: 20, fmt: function (n) { return String(n); }, unit: "runs" }, height: 230, heightN: 200, aria: "Empty histogram: press Run.", text: { head: ["Cost, from", "up to", "Runs"], rows: [] } });
         b.addEventListener("click", function () {
           var st = M0(), sm = summary(st.dev), g = own.guess || LX.progress.guess("m7-p90"), N = nearCorner(st, "dev", D.near);
@@ -639,10 +647,11 @@
           var gl = D.guess.filter(function (x) { return x.value === g; })[0], right = gl && Math.abs(+g * 1e6 - sm.p90) === Math.min.apply(null, D.guess.map(function (x) { return Math.abs(+x.value * 1e6 - sm.p90); }));
           out.innerHTML = "Median <b>" + money(sm.p50) + "</b> · 80% of runs from <b>" + money(sm.p10) + "</b> to <b>" + money(sm.p90) + "</b> · runs from " + money(sm.min) + " to " + money(sm.max) + "." +
                           (gl ? (right ? " Your guess, about $" + g + "M, was the closest." : " You guessed about $" + g + "M.") : "");
+          // an exact corner has zero chance under continuous inputs: count runs in a stated neighbourhood instead (its own line)
+          outN.textContent = nearText(N) + ".";
           keep("run", true);
           api.done();
-          // an exact corner has zero chance under continuous inputs: count runs in a stated neighbourhood instead
-          api.saw("P90, the 90th [[percentile|percentile]], is **" + money(sm.p90) + "**: 9 runs in 10 cost less. " + nearText(N) + ".");
+          api.saw("P90, the 90th [[percentile|percentile]], is **" + money(sm.p90) + "**: 9 runs in 10 cost less.");
         });
       }
     });
@@ -722,8 +731,8 @@
     // the text version of the scatter: its shape in one sentence, then the runs in ten slices of the input's range
     function cloudSentence(st, key, out) {
       var c = cloud(st, key, out), nm = NOUN[key], acc = COST[out].charAt(0).toUpperCase() + COST[out].slice(1);
-      if (c.trend === "flat") return "Flat: " + COST[out] + " does not depend on " + nm + ", so the median run stays between " + money(c.medLo) + " and " + money(c.medHi) + " in every tenth of its range.";
-      return acc + " " + (c.trend === "weak" ? "barely moves" : c.trend) + " with " + nm + ": the median run goes from " + money(c.slices[0].p50) + " in the lowest tenth of its range to " + money(c.slices[c.slices.length - 1].p50) + " in the highest; within a tenth, the middle 80% of runs spans about " + money(c.width) + ".";
+      if (c.trend === "flat") return "Flat: " + COST[out] + " does not depend on " + nm + ".";
+      return acc + " " + (c.trend === "weak" ? "barely moves" : c.trend) + " with " + nm + ".";
     }
     function cloudHTML(st, key, out) {
       var c = cloud(st, key, out), q = byKey(key), esc = LX.esc;
@@ -739,7 +748,7 @@
         var ctl = row(act); seg(ctl, ["The developer", "Other customers"], -1, function (i) { out = i ? "rate" : "dev"; seen[out] = 1; draw(true); }, "Account");
         var status = readout(act);
         var bars = RhoBars(act, { inputs: D.inputs, onPick: function (k) { pick = k; drawCloud(); } });
-        H("p", { class: "lx-hint", text: "Whiskers: ± 2 standard errors over 20 seeds. Tie rule: two inputs share a rank when their gap is within two standard errors of that gap." }, act);
+        H("p", { class: "lx-hint", text: "Whiskers: ± 2 standard errors over 20 seeds. Tie rule: an input ranks clearly above another when their gap exceeds two standard errors of that gap. A rank such as 2–3 means not clearly ordered." }, act);
         var P = LX.Plot(act, { text: "Text version of the chart" }), res = readout(act);
         var csv = csvRuns(st), W = window, dl = H("p", { class: "m7-dl" }, act);
         H("a", { class: "lx-btn small ghost", download: "m7-runs-seed" + D.seed + "-" + T + "-months.csv", text: "Download the 1,000 runs (CSV)",
@@ -748,7 +757,7 @@
         function draw(user) {
           var reps = lab.reps(D.runs, T), rh = rhos(st, out), G = rankGroups(rh, reps, out, D.inputs);
           bars.set({ rho: rh, se: seOf(reps, out, D.inputs), ranks: ranksOf(G) }); bars.pick(pick); drawCloud();
-          res.innerHTML = ACCN[out] + ": " + G.groups.slice(0, 2).map(function (g) { return g.map(function (x) { return short(x.key).toLowerCase() + " " + r2(x.rho); }).join(" and ") + (g.length > 1 ? " (tied, rank " + g[0].rank + ")" : " (rank " + g[0].rank + ")"); }).join("; then ") + ".";
+          res.innerHTML = ACCN[out] + ": " + G.groups.slice(0, 2).map(function (g) { return g.map(function (x) { return short(x.key).toLowerCase() + " " + r2(x.rho); }).join(" and ") + (g.length > 1 || g[0].tied ? " (tied, rank " + g[0].rank + ")" : " (rank " + g[0].rank + ")"); }).join("; then ") + ".";
           if (seen.dev && seen.rate) {
             var Gd = rankGroups(rhos(st, "dev"), reps, "dev", D.inputs), Gr = rankGroups(rhos(st, "rate"), reps, "rate", D.inputs), w = function (x) { return short(x.key).toLowerCase() + " (" + r2(x.rho) + ")"; };
             api.done(); api.saw("Developer: " + w(Gd.groups[0][0]) + " first; " + Gd.groups[1].map(w).join(" and ") + " tied next. Other customers: " + w(Gr.groups[0][0]) + ", then " + w(Gr.groups[1][0]) + ", so influence depends on the output.");
@@ -768,7 +777,7 @@
         var bars = RhoBars(act, { inputs: D.inputs, aria: "Rank correlation of each input with the developer's cost" }), res = readout(act), timer = null;
         function later() { clearTimeout(timer); timer = setTimeout(function () { draw(true); }, 60); }
         function draw(user) {
-          var h = sl.val(), N = lab.narrow(h), first = N.groups[0];
+          var h = sl.val(), N = lab.narrow(h), first = N.first;
           bars.set({ rho: N.rho, se: N.se, ranks: ranksOf(N) });
           var fw = first.map(function (x) { return short(x.key).toLowerCase() + " " + r2(x.rho); }).join(" and ");
           res.innerHTML = "± $" + int(h) + ": " + (first.length > 1 ? "tied first: <b>" + fw + "</b>" : "first: <b>" + fw + "</b>") + (first.some(function (x) { return x.key === "margin"; }) ? "." : "; the margin (" + r2(N.rho.margin) + ") ranks " + N.marginRank + ".");
@@ -809,7 +818,7 @@
       if (n === 7) { lab.reps(100, T); lab.reps(D.runs, T); [0, 1].forEach(function (i) { clickIn(".lx-step-act .m7-row .lx-btn", i); }); }
       if (n === 8) [0, 1, 2].forEach(function (i) { clickIn(".lx-step-act .lx-seg button", i); });
       if (n === 9) [1, 0].forEach(function (i) { clickIn(".lx-step-act .lx-seg button", i); });
-      if (n === 10 && S10) { var W = D.marginWidth; for (var h = W.max - W.step; h >= W.min; h -= W.step) { S10.set(h, true); if (lab.narrow(h).groups[0].every(function (x) { return x.key !== "margin"; })) break; } }
+      if (n === 10 && S10) { var W = D.marginWidth; for (var h = W.max - W.step; h >= W.min; h -= W.step) { S10.set(h, true); if (lab.narrow(h).first.every(function (x) { return x.key !== "margin"; })) break; } }
       return { view: state };
     }, cards);
     explain(D, lab);

@@ -187,8 +187,8 @@
     var chips = H("div", { class: "w9-chips", "aria-live": "polite" }, stage);
     var tiles = H("div", { class: "w9-tiles", role: "group", "aria-label": "The day's 24 hours: price and the battery's action" }, stage);
     var lg = H("div", { class: "w9-legend", "aria-hidden": "true" }, stage);
-    [["One more MWh costs, $: 0 (sun spilled)", COL.spill], [f.cc.cost + " (combined-cycle)", COL.cc], [f.peaker.cost + " (peaker)", COL.pk]].forEach(function (x) { var s = H("span", null, lg); H("i", { style: "--c:" + x[1] }, s); H("span", { text: x[0] }, s); });
-    H("span", { text: "Each tile is the hour that starts at its label." }, lg);
+    [["Without the battery, one more MWh costs, $: 0 (sun spilled)", COL.spill], [f.cc.cost + " (combined-cycle)", COL.cc], [f.peaker.cost + " (peaker)", COL.pk]].forEach(function (x) { var s = H("span", null, lg); H("i", { style: "--c:" + x[1] }, s); H("span", { text: x[0] }, s); });
+    H("span", { text: "Each tile is the hour that starts at its label. Savings re-run the plants with the battery." }, lg);
     var socBox = H("div", { class: "w9-soc" }, stage);
     var lg2 = H("div", { class: "w9-legend", "aria-hidden": "true" }, stage);
     var alt = H("details", { class: "lx-textalt" }, stage); H("summary", { text: "Text version of the day" }, alt); var altBody = H("div", { class: "lx-scroll-x" }, alt);
@@ -232,7 +232,7 @@
         if (a < 0) b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 4v14M6 12l6 6 6-6"/></svg>';
         if (a > 0) b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 20V6M6 12l6-6 6 6"/></svg>';
         b.disabled = mode === "off";
-        b.setAttribute("aria-label", hm(t) + " to " + hm(t + 1) + ": one more MWh costs $" + W.price[t] + " (" + WHY[W.marginal[t]] + (W.marginal[t] === "spill" ? ", " + Math.round(-W.gap[t]) + " MW" : "") + "). " +
+        b.setAttribute("aria-label", hm(t) + " to " + hm(t + 1) + ": without the battery, one more MWh costs $" + W.price[t] + " (" + WHY[W.marginal[t]] + (W.marginal[t] === "spill" ? ", " + Math.round(-W.gap[t]) + " MW" : "") + "). " +
           (mode === "look" ? "Press for details." : "Your battery: " + (a < 0 ? "charging " + f1(r.ch) + " MW" : a > 0 ? "discharging " + f1(r.dis) + " MW" : "idle") + ". Press to change your schedule."));
       });
       chips.innerHTML = "";
@@ -251,7 +251,7 @@
       // text version
       altBody.innerHTML = "";
       var tb = H("table", { class: "lx-mini-table" }, altBody), tr = H("tr", null, H("thead", null, tb));
-      ["Hour", "Demand, MW", "Wind, MW", "Sun, MW", "Price, $/MWh", "Your battery, MW", "Your stored, MWh"].concat(best ? ["Best: charge, MW", "Best: discharge, MW", "Best: stored, MWh"] : []).forEach(function (x) { H("th", { scope: "col", text: x }, tr); });
+      ["Hour", "Demand, MW", "Wind, MW", "Sun, MW", "One more MWh without the battery, $", "Your battery, MW", "Your stored, MWh"].concat(best ? ["Best: charge, MW", "Best: discharge, MW", "Best: stored, MWh"] : []).forEach(function (x) { H("th", { scope: "col", text: x }, tr); });
       var bd = H("tbody", null, tb);
       you.hours.forEach(function (r, t) {
         var row = H("tr", null, bd);
@@ -267,9 +267,11 @@
       var b = { P: B.P, E: E, eta: B.eta }, key = String(E);
       if (bestBy[key]) return Promise.resolve(bestBy[key]);
       return LX.solver.solve(buildLP(W, b, V), { timeLimit: 5, key: "w9-" + key, label: "w9" }).then(function (r) {
-        var o = parseLP(W, b, r, V);
-        if (!o && r.status === "error") { var P = D.precomputed[key]; if (P) { o = { save: P.save, ch: P.ch || [], dis: P.dis || [], soc: P.soc || [], in: P.in, out: P.out, fromSpill: P.fromSpill, fromGas: P.fromGas, precomputed: true }; } }
-        if (o) { o.status = r.status; o.ms = r.ms; bestBy[key] = o; }
+        // "best" needs a proven optimum: any other status (an error, or a stop at the time limit with a plan that may not
+        // be the best) falls back to the precomputed optimum, which the tests check against a fresh solve
+        var o = r && r.status === "optimal" ? parseLP(W, b, r, V) : null;
+        if (!o) { var P = D.precomputed[key]; if (P) { o = { save: P.save, ch: P.ch || [], dis: P.dis || [], soc: P.soc || [], in: P.in, out: P.out, fromSpill: P.fromSpill, fromGas: P.fromGas, precomputed: true }; } }
+        if (o) { o.status = r ? r.status : "error"; o.ms = r && r.ms; bestBy[key] = o; }
         return o;
       });
     }
@@ -280,7 +282,7 @@
         build: function (act, api) {
           mode = "look"; hook = null; stage.hidden = true;
           var hq = hoursQuiz(B);
-          var pr = LX.Predict(act, { id: "w9-hours", q: "", title: false, fresh: true, options: hq.options, answer: hq.answer, feedback: hq.feedback,
+          var pr = LX.Predict(act, { id: "w9-hours", q: "Flat out, how long can it discharge?", title: false, fresh: true, options: hq.options, answer: hq.answer, feedback: hq.feedback,
             onPick: function () { pr.reveal("That ratio is the battery's duration: a " + (B.E / B.P) + "-hour battery."); api.done(); } });
         } },
       { text: "Batteries lose some energy as heat. This one returns " + Math.round(B.eta * 100) + "% of what goes in: its [[round-trip-efficiency|round-trip efficiency]]. Charge it for one hour at full power.",
@@ -299,12 +301,12 @@
         } },
       { text: "Here is " + W.dateLabel + " (real Southwest Power Pool shapes, scaled to the town). Each hour shows what one more MWh costs: the last plant needed, as in lesson 8. When should the battery charge?",
         build: function (act, api) {
-          mode = "look"; stage.hidden = false; hook = function (e) { if (e.look != null) sawB(api, hm(e.look) + " to " + hm(e.look + 1) + ": one more MWh costs **$" + W.price[e.look] + "** because " + WHY[W.marginal[e.look]] + (W.marginal[e.look] === "spill" ? " (" + (-W.gap[e.look]) + " MW)." : ".")); };
+          mode = "look"; stage.hidden = false; hook = function (e) { if (e.look != null) sawB(api, hm(e.look) + " to " + hm(e.look + 1) + ": without the battery, one more MWh costs **$" + W.price[e.look] + "** because " + WHY[W.marginal[e.look]] + (W.marginal[e.look] === "spill" ? " (" + (-W.gap[e.look]) + " MW)." : ".")); };
           paint();
           var win = windows(W);
-          var pr = LX.Predict(act, { id: "w9-when", q: "", title: false, fresh: true,
+          var pr = LX.Predict(act, { id: "w9-when", q: "When should the battery charge?", title: false, fresh: true,
             options: [{ value: "night", label: "Overnight (" + win.label(win.night) + ")" }, { value: "mid", label: "Midday (" + win.label(win.mid) + ")" }, { value: "eve", label: "Evening (" + win.label(win.eve) + ")" }], answer: "mid",
-            feedback: { mid: "Midday: the sun gives more than the town needs. Storing that spare sun costs $0; charging faster than the sun spills takes gas at $" + f.cc.cost + ".", night: "At night the combined-cycle makes every extra MWh, at $" + f.cc.cost + ". Midday sun that would be spilled costs $0.", eve: "The evening is when the battery should give power back: the peaker is running." },
+            feedback: { mid: "Midday: sun, wind and the flat nuclear plant together make more than the town needs. Storing that spare sun costs $0; charging faster than the sun spills takes gas at $" + f.cc.cost + ".", night: "At night the combined-cycle makes every extra MWh, at $" + f.cc.cost + ". Midday sun that would be spilled costs $0.", eve: "The evening is when the battery should give power back: the peaker is running." },
             onPick: function () { pr.reveal("Tap any hour on the strip to see why its price is what it is."); api.done(); } });
         } },
       { text: "Your turn. Tap an hour to cycle Charge, Discharge, Idle; each runs at the full " + B.P + " MW. The battery starts empty. Make the town's day as cheap as you can.",
@@ -318,7 +320,7 @@
             if (!T.in) { sawB(api, "Charge first: tap a midday hour once."); return; }
             if (!T.out) { sawB(api, "Stored " + f1(T.in * B.eta) + " MWh. Now tap an evening hour twice to discharge."); return; }
             var gas = you.hours.filter(function (r) { return r.fromGas > 0.5 && W.marginal[r.t] === "spill"; })[0];
-            sawB(api, "Your schedule saves the town **" + usd(T.save) + "**." + (gas ? " At " + hh(gas.t) + " only " + (-W.gap[gas.t]) + " MW of sun is spilled, so charging " + B.P + " MW takes " + f1(gas.fromGas) + " MW from gas." : T.fromGas > 0.5 ? " Some charging came from gas at $" + f.cc.cost + "/MWh." : ""), T.save <= 0);
+            sawB(api, "Your schedule saves the town **" + usd(T.save) + "**." + (gas ? " At " + hh(gas.t) + " only " + (-W.gap[gas.t]) + " MW of sun is spilled, so charging " + f1(gas.ch) + " MW" + (gas.ch < B.P - 0.05 ? " (slower: the battery is nearly full)" : "") + " takes " + f1(gas.fromGas) + " MW from gas." : T.fromGas > 0.5 ? " Some charging came from gas at $" + f.cc.cost + "/MWh." : ""), T.save <= 0);
           };
           paint();
         } },
@@ -338,7 +340,7 @@
             b.disabled = true; stl.set(LX.solver.mode ? "solving" : "loading");
             solveBest(B.E).then(function (o) {
               b.disabled = false; if (!o) { stl.set({ status: "error" }); return; }
-              stl.set(o.precomputed ? "" : o); if (o.precomputed) stl.el.textContent = "The solver could not load here; showing the precomputed best schedule.";
+              stl.set(o.precomputed ? "" : o); if (o.precomputed) stl.el.textContent = (o.status === "error" ? "The solver could not load here" : "The solver stopped before proving the best plan") + "; showing the precomputed best schedule.";
               best = o; paint(); api.done(); compare();
             });
           });
@@ -346,8 +348,10 @@
         } },
       { text: "Is a longer battery always better? Keep " + B.P + " MW and try " + D.durations.join(", ") + " hours of storage. The solver re-plans the day for each.",
         build: function (act, api) {
-          mode = "best"; hook = null; stage.hidden = false;
-          var row = H("div", { class: "lx-step-foot", style: "justify-content:flex-start;flex-wrap:wrap" }, act), tried = {}, box = H("div", { class: "w9-sizes" }, act);
+          mode = "best"; hook = null; stage.hidden = true;   // the day above shows the 100 MWh battery; each bar here is a battery of its own
+          var row = H("div", { class: "lx-step-foot", style: "justify-content:flex-start;flex-wrap:wrap" }, act), tried = {};
+          H("p", { class: "lx-hint", text: "Each bar is a separate " + B.P + " MW battery, solved for its own best schedule on " + W.dateLabel + "." }, act);
+          var box = H("div", { class: "w9-sizes" }, act);
           D.durations.forEach(function (h) {
             var b = H("button", { type: "button", class: "lx-btn ghost small", text: h + " h" }, row);
             b.addEventListener("click", function () {
@@ -450,7 +454,7 @@
     var sp = W.gap.filter(function (x) { return x < 0; }).reduce(function (a, x) { return a - x; }, 0), pkMWh = W.gap.reduce(function (a, x) { return a + Math.max(0, Math.min(f.peaker.mw, x - f.cc.mw)); }, 0);
     LX.CausalChain(H("div", { class: "lx-xcard" }, host), {
       title: "Cause and effect: moving midday sun into the evening",
-      links: [{ title: "Sun floods the town at midday", text: "More than the town needs.", value: sp + " MWh spilled" },
+      links: [{ title: "Spare sun at midday", text: "Sun, wind and the flat plant exceed demand.", value: sp + " MWh spilled" },
               { title: "The battery soaks it up", text: "At part power, matching the spill.", value: f1(best.fromSpill) + " MWh in" },
               { title: "Heat takes its share", text: Math.round((1 - B.eta) * 100) + "% of what goes in.", value: f1(best.fromSpill * (1 - B.eta)) + " MWh lost" },
               { title: "Sunset, demand still high", text: "The peaker would run.", value: pkMWh + " MWh of peaker" },

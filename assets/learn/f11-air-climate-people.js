@@ -25,9 +25,10 @@
 //                 plants (2019 dollars, 2% discount rate): an estimate, PM2.5-related harm only
 //   burden        Prairie City's household groups (prairie-city.json): burden = home energy spending / income; a reader's
 //                 income falls in the group whose band holds it (lower edge in, upper edge out) and takes that group's
-//                 average spending (a representative household: the group's average spending / its average income, not
-//                 an average of households' own burdens; spending jumps at a group's edge); the 6% and 10% lines are
-//                 conventions (ACEEE; DOE's LEAD tool calls 6% or more high)
+//                 average spending (a what-if household, so spending jumps at a group's edge); a group's own burden is
+//                 its representative household's: the group's average spending / its average income, not an average
+//                 of households' own burdens; the 6% and 10% lines are conventions (ACEEE; DOE's LEAD tool calls 6% or
+//                 more high)
 // Every number on the page comes from this model or from the data files; _tests/learn/test_f11-air-climate-people.js
 // checks them.
 //
@@ -113,7 +114,7 @@
   function mostSaw(D) {
     var T = tonnes(D);
     return "Per tonne: " + T.slice().sort(function (a, b) { return b.co2T - a.co2T; }).map(function (t) { return t.name.toLowerCase().replace("natural ", "") + " **" + fmtN(t.co2T, 2) + " t**"; }).join(", ") +
-      " of CO₂. Each tonne of carbon burned makes " + fmtN(D.carbon.co2PerC, 2) + " t of CO₂.";
+      " of CO₂. Each tonne of carbon burned makes " + fmtN(D.carbon.co2PerC, 2) + " t of CO₂: oxygen from the air adds the mass.";
   }
   function heatSaw(D) {
     var T = tonnes(D), c = T.filter(function (t) { return t.key === "coal"; })[0], g = T.filter(function (t) { return t.key === "gas"; })[0], o = T.filter(function (t) { return t.key === "oil"; })[0];
@@ -131,7 +132,9 @@
             { op: "× " + fmtN(D.methane.gwp100, 1) + " kg CO₂e per kg =" }, { v: "about " + fmtN(kg * D.methane.gwp100) + " kg", u: "CO₂e" },
             { op: "=" }, { v: fmtN(m.co2eT, 2) + " t", u: "CO₂e over 100 years", out: true }];
   }
-  var LEAK_NOTE = "Measured U.S. leaks: about 2.3% of gas production in 2015 (Alvarez et al., 2018), and from 0.75% to 9.63% across six regions (Sherwin et al., 2024).";
+  var LEAK_NOTE = "Measured U.S. leaks: about 2.3% of gas production in 2015 (Alvarez et al., 2018); 0.75% to 9.63% in six regions' aerial surveys, 2016 to 2021 (Sherwin et al., 2024).";
+  // the model counts the leaked gas as pure methane; the page says so beside the slider
+  var PURE_NOTE = "This step counts the leaked gas as pure methane; pipeline gas is mostly methane.";
   function pollLine(D, key, controls) {
     var p = pollutants(D, key, controls), f = fuel(D, key);
     return f.name + (controls ? ", with controls: " : ", before controls: ") + fmtN(p.so2, p.so2 < 1 ? 2 : 1) + " kg of SO₂, " + fmtN(p.nox, 1) + " kg of NOx and " +
@@ -166,15 +169,15 @@
   function healthSaw(D, key) {
     key = key || "coal";
     var a = health(D, pollutants(D, key, false)), b = health(D, pollutants(D, key, true));
-    return "For a tonne of " + fuel(D, key).name.toLowerCase() + ", controls cut EPA's estimate of the harm from about " + money(Math.round(a.total / 10) * 10) + " to about " + money(Math.round(b.total / 10) * 10) + ". WHO counts " + fmtN(D.who.deathsM, 1) + " million early deaths from outdoor air pollution in " + D.who.deathsYear + ".";
+    return "For a tonne of " + fuel(D, key).name.toLowerCase() + ", controls cut EPA's estimate of the harm from about " + money(Math.round(a.total / 10) * 10) + " to about " + money(Math.round(b.total / 10) * 10) + ", in 2019 dollars.";
   }
   function burdenLine(D, G, income) {
     var r = burdenAt(G, income), v = verdict(D, r.burden), shown = pct(r.burden, 1);
     var word = { severe: "above the 10% line ACEEE calls severe", high: "above the 6% line ACEEE calls high", lead: "at the 6% DOE's LEAD tool calls high", below: "below the 6% line" }[v];
-    return "Income " + money(income) + " a year, home energy " + money(r.spend) + ": a burden of **" + shown + "**, " + word + ".";
+    return "Income " + money(income) + " a year, home energy " + money(r.spend) + " (its group's average): a burden of **" + shown + "**, " + word + ".";
   }
-  // the slider visits each group's representative household: spending is the group's average, so it jumps at a group's
-  // edge (the test finds the edge where the burden rises with income)
+  // the slider's what-if household pays its income group's average spending, so spending jumps at a group's edge (the
+  // test finds the edge where the burden rises with income)
   function burdenNote(G) {
     return "Spending is the income group's average, so it jumps at each group's edge (just above " + money(G[0].hi) + " the burden rises); real bills vary within a group.";
   }
@@ -206,7 +209,7 @@
       { head: "Air pollutants", set: nm + ", " + ctl, out: fmtN(p.so2, p.so2 < 1 ? 2 : 1) + " kg SO₂, " + fmtN(p.nox, 1) + " kg NOx, " + fmtN(p.pm25, 2) + " kg fine particles a tonne" },
       { head: "Health harm (EPA estimate)", set: nm + ", " + ctl, out: "about " + money(Math.round(h.total / 10) * 10) + " a tonne" },
       { head: "Distance from the plant", set: fmtN(S.r) + " km", out: (S.r === D.spread.r0km ? "the reference dose" : pct(perPerson(D, S.r), perPerson(D, S.r) < 0.01 ? 2 : 1) + " of the dose at " + D.spread.r0km + " km") + "; " + pct(within(D, S.r)) + " of the exposure beyond " + D.spread.r0km + " km is closer" },
-      { head: "Energy burden", set: money(S.income) + " a year", out: pct(b.burden, 1) + " (representative household, " + b.group.label + ")" }];
+      { head: "Energy burden", set: money(S.income) + " a year", out: pct(b.burden, 1) + " (what-if household; bill: the average of the group at " + b.group.label + ")" }];
   }
 
   // the no-JS version (the test writes it into the page between the f11-fallback markers)
@@ -220,9 +223,12 @@
     var m = methane(D, D.methane.leak.start);
     var grp = G.map(function (g) { return "<tr><td>" + g.label + "</td><td>" + money(g.income) + "</td><td>" + money(g.spend) + "</td><td>" + pct(g.burden, 1) + "</td></tr>"; }).join("");
     return "<p class=\"lx-eyebrow\">The idea in two tables: one tonne burned, and who carries the bills</p>" +
+      "<ul class=\"f11-legend\"><li><b>Units.</b> A tonne is 1,000 kg; EPA's dollar values are per short ton, the U.S. ton of 907 kg.</li>" +
+      "<li><b>Pollutants.</b> SO₂ is sulfur dioxide, NOx nitrogen oxides, and fine particles (PM2.5) are particles small enough to reach deep into the lungs.</li>" +
+      "<li><b>CO₂e.</b> CO₂-equivalent counts another gas as the CO₂ that would warm the climate as much over 100 years; that ratio is the gas's GWP (global warming potential).</li></ul>" +
       "<div class=\"lx-scroll-x\"><table class=\"lx-mini-table f11-fbt\"><caption class=\"lx-hint\">One tonne burned in a large boiler, before → after the controls AP-42 describes (illustrative coal and oil; EPA factors).</caption>" +
       "<thead><tr><th scope=\"col\">Fuel</th><th scope=\"col\">CO₂</th><th scope=\"col\">CO₂ per MWh of heat</th><th scope=\"col\">SO₂</th><th scope=\"col\">NOx</th><th scope=\"col\">Fine particles</th><th scope=\"col\">Health harm (EPA estimate)</th></tr></thead><tbody>" + rows + "</tbody></table></div>" +
-      "<ul><li><b>Methane.</b> If " + fmtN(D.methane.leak.start, 1) + "% of the gas leaks before it is burned, a tonne of gas adds " + fmtN(m.ch4Kg, 1) + " kg of methane, about " + fmtN(m.co2eT, 2) + " t of CO₂e over 100 years (GWP " + fmtN(D.methane.gwp100, 1) + ").</li>" +
+      "<ul><li><b>Methane.</b> If " + fmtN(D.methane.leak.start, 1) + "% of the gas leaks before it is burned, a tonne of gas adds " + fmtN(m.ch4Kg, 1) + " kg of methane (counted as pure methane), about " + fmtN(m.co2eT, 2) + " t of CO₂e over 100 years.</li>" +
       "<li><b>Where it goes.</b> In the lesson's spreading toy (illustrative), each person 300 km away breathes " + pct(perPerson(D, 300), 1) + " of the dose at 10 km, yet " + pct(1 - within(D, 100)) + " of the toy's exposure beyond 10 km happens more than 100 km away.</li>" +
       "<li><b>Health.</b> Dollar values are EPA's 2025 benefit-per-ton estimates for power plants (2019 dollars): " + money(D.bpt.egu.so2) + " per short ton of SO₂, " + money(D.bpt.egu.nox) + " of NOx, " + money(D.bpt.egu.pm25) + " of fine particles.</li></ul>" +
       "<div class=\"lx-scroll-x\"><table class=\"lx-mini-table f11-fbt\"><caption class=\"lx-hint\">" + FICTION + " Burden = home energy spending ÷ income for each group's representative household (its average spending ÷ its average income).</caption>" +
@@ -232,7 +238,7 @@
 
   var model = { fuel: fuel, tonne: tonne, tonnes: tonnes, methane: methane, pollutants: pollutants, health: health, perPerson: perPerson, within: within,
     groups: groups, groupOf: groupOf, burdenAt: burdenAt, verdict: verdict, above: above, fuelOpts: fuelOpts,
-    MOST: MOST, mostSaw: mostSaw, heatSaw: heatSaw, leakLine: leakLine, leakChain: leakChain, LEAK_NOTE: LEAK_NOTE, pollLine: pollLine, pollSaw: pollSaw,
+    MOST: MOST, mostSaw: mostSaw, heatSaw: heatSaw, leakLine: leakLine, leakChain: leakChain, LEAK_NOTE: LEAK_NOTE, PURE_NOTE: PURE_NOTE, pollLine: pollLine, pollSaw: pollSaw,
     spreadLine: spreadLine, spreadSaw: spreadSaw, healthLine: healthLine, woodLine: woodLine, healthSaw: healthSaw, burdenLine: burdenLine,
     burdenNote: burdenNote, REP_NOTE: REP_NOTE, EXPOSURE_NOTE: EXPOSURE_NOTE, LINES_NOTE: LINES_NOTE, HOWMANY: HOWMANY, groupsSaw: groupsSaw, FICTION: FICTION,
     experimentRows: experimentRows, staticFallback: staticFallback, fmtN: fmtN, pct: pct, money: money };
@@ -324,6 +330,7 @@
           var bx = H("div", null, res), line = H("p", { class: "lx-step-line", "aria-live": "polite" }, res);
           var sl = LX.Slider(act, { label: "Share of the gas that leaks", color: "var(--lx-cc)", min: M.min, max: M.max, step: M.step, value: S.leak,
             fmt: function (v) { return fmtN(v, 1) + "%"; }, onChange: function (v) { S.leak = v; keep(); paint(); api.done(); } });
+          H("p", { class: "lx-hint", text: PURE_NOTE }, act);
           H("p", { class: "lx-hint", text: LEAK_NOTE }, act);
           H("p", { class: "lx-hint", html: LX.rich("[[global-warming-potential|GWP]] " + fmtN(D.methane.gwp100, 1) + ": over 100 years a tonne of fossil methane warms the climate as much as " + fmtN(D.methane.gwp100, 1) + " t of CO₂ (IPCC AR6, via the GHG Protocol).") }, act);
           H("p", { class: "lx-hint", text: "Coal mines and oil wells leak methane too; this step leaves them out." }, act);
@@ -400,10 +407,10 @@
           paint();
           demo[5] = function () { if (!tg.val()) tg.el.click(); };
         } },
-      { text: "[[energy-burden|Energy burden]] is home energy spending divided by income. Slide the income to visit Prairie City's representative households, one per income group, and read each burden against the 6% and 10% lines.",
+      { text: "[[energy-burden|Energy burden]] is home energy spending divided by income. Slide a what-if household's income: it pays its income group's average home energy bill, and you read its burden against the 6% and 10% lines.",
         build: function (act, api) {
           var B = D.burden.income, ro = H("div", { class: "lx-readouts", "aria-live": "polite" }, act), line = H("p", { class: "lx-step-line", "aria-live": "polite" }, act);
-          var sl = LX.Slider(act, { label: "Household income a year", color: "var(--lx-tier-4)", min: B.min, max: B.max, step: B.step, value: S.income,
+          var sl = LX.Slider(act, { label: "What-if household's income a year", color: "var(--lx-tier-4)", min: B.min, max: B.max, step: B.step, value: S.income,
             fmt: function (v) { return money(v); }, onChange: function (v) { S.income = v; keep(); paint(); api.done(); } });
           H("p", { class: "lx-hint", text: burdenNote(G) + " " + FICTION }, act);
           H("p", { class: "lx-hint", text: LINES_NOTE }, act);
@@ -463,15 +470,25 @@
       xhost.innerHTML = ""; xhost.classList.add("is-live");
       mineHost = H("div", { class: "lx-xcard" }, xhost); paintMine();
       var T = tonnes(D), m = methane(D, D.methane.leak.start), cu = pollutants(D, "coal", false), hc = health(D, cu);
+      // three separate paths: carbon to climate, pollutants to health, spending and income to burden (none causes the next)
       LX.CausalChain(H("div", { class: "lx-xcard" }, xhost), {
-        title: "A fixed reference example: one tonne of coal, no controls",
+        title: "Path 1, climate: a fixed reference example, one tonne of coal",
         links: [{ title: "Carbon burns", text: "Every tonne of carbon makes 3.67 t of CO₂, whatever the plant.", value: fmtN(T[0].co2T, 2) + " t CO₂" },
-                { title: "CO₂ stays", text: "It adds to the stock that sets warming; no smokestack filter removes it here.", value: "the same with controls" },
-                { title: "Sulfur and ash", text: "They leave as SO₂ and fine particles unless controls catch them.", value: fmtN(cu.so2) + " kg SO₂ before controls" },
+                { title: "CO₂ stays", text: "It adds to the stock of CO₂ in the air; no control on this page removes it.", value: "the same with controls" },
+                { title: "The climate warms", text: "That stock sets warming, so people in later decades bear it too." }],
+        note: "The same example whatever you set above: illustrative coal with 2% sulfur and 10% ash." });
+      LX.CausalChain(H("div", { class: "lx-xcard" }, xhost), {
+        title: "Path 2, air and health: the same tonne, no controls",
+        links: [{ title: "Sulfur and ash", text: "Burning turns the sulfur into SO₂ and sends some fine particles up the stack; some ash stays in the boiler.", value: fmtN(cu.so2) + " kg SO₂, " + fmtN(cu.pm25, 1) + " kg fine particles" },
                 { title: "Air downwind", text: "Particles spread for hundreds of km; beyond 10 km each person gets less the farther out, but many people get some.", value: pct(1 - within(D, 100)) + " of the toy's exposure past 100 km" },
-                { title: "Health", text: "EPA turns expected early deaths and illness into dollars: an estimate.", value: "about " + money(Math.round(hc.total / 10) * 10) + " a tonne" },
-                { title: "Bills", text: "Fuel and plant costs reach homes as bills; the poorest groups pay the largest share of income.", value: pct(G[0].burden, 1) + " for the lowest group" }],
-        note: "The same example whatever you set above: illustrative coal with 2% sulfur and 10% ash, no controls; EPA's 2025 power-plant values. Prairie City is fictional." });
+                { title: "Health", text: "EPA turns expected early deaths and illness into dollars: an estimate.", value: "about " + money(Math.round(hc.total / 10) * 10) + " a tonne" }],
+        note: "Controls in the exhaust catch much of the SO₂ and particles (step 4). EPA's 2025 power-plant values." });
+      LX.CausalChain(H("div", { class: "lx-xcard" }, xhost), {
+        title: "Path 3, bills: Prairie City's lowest-income group",
+        links: [{ title: "Home energy bills", text: "Fuel and plant costs reach homes as bills.", value: money(G[0].spend) + " a year" },
+                { title: "Income", text: "The group's average income sets what that bill weighs.", value: money(G[0].income) + " a year" },
+                { title: "Energy burden", text: "Spending divided by income: the poorest groups pay the largest share.", value: pct(G[0].burden, 1) }],
+        note: FICTION + " The tonne of coal above does not set these bills." });
       LX.CompareTable(H("div", { class: "lx-xcard" }, xhost), {
         title: "Reference: three fuels, one tonne each", text: true,
         columns: [{ key: "name", label: "Fuel", main: true }, { key: "co2", label: "CO₂" }, { key: "heat", label: "CO₂ per MWh of heat" }, { key: "so2", label: "SO₂, before → with controls" }, { key: "pm", label: "Fine particles" }, { key: "extra", label: "Also" }],

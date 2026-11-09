@@ -10,6 +10,8 @@
 //     by fuel: imports / that fuel's primary energy; through the strait: (oil imports x share + LNG x share) / primary
 //   concentration: HHI = sum of (100 x share)^2, 0 to 10,000; a cap on any one refiner moves the excess to the others in
 //     proportion to their shares (repeated until no share is above the cap)
+//   one-country benchmark (the EU's 65%): the largest single country's share of the factory's whole need = (1 - recycled)
+//     x its share of the bought supply; "Other refiners" is a group, not a country, and is left out (the HHI is unchanged)
 //   LNG price spike (a year): extra paid abroad = LNG bought x LNG price x (multiplier - 1); extra at home = domestic gas x
 //     gas price x (multiplier - 1), a transfer from gas users to domestic producers; a cut in gas use comes off LNG first
 //   strait closure: oil lost = oil imports x through-strait share x days / 365; stocks = days of net imports x imports / 365;
@@ -25,6 +27,9 @@
 //     scarcest mineral and its open sites allow, up to its 2025 output; minerals that arrive while the main site is shut
 //     wait in stock; cells made after the restriction ends are not counted. The combined loss depends on when the fire
 //     comes (start, middle, last months): never below the larger single loss, never above the two added (tested)
+//     The board's other rows are separate stress tests: the gas cut changes the spike's LNG bill, not the closure's LNG lost.
+//   explain layer: the concept map and the restriction's cause-and-effect chain from the reader's levers (explainMap,
+//     explainChain: the stopped country's current share, a chain with or without a shortage, every tied mineral named)
 // Every number on the page comes from this model or the two data files; _tests/learn/test_a21-security-minerals.js checks
 // them over every input.
 //
@@ -69,6 +74,17 @@
     return Object.keys(M.items).map(function (k) {
       var it = M.items[k], sh = cap == null ? it.shares.slice() : capShares(it.shares, cap / 100);
       return { key: k, label: it.label, shares: sh, hhi: hhi(sh), lead: Math.max.apply(null, sh), leadIdx: sh.indexOf(Math.max.apply(null, sh)), t: PL.factories.battery.mineralsT[k], tPerGWh: it.tPerGWh };
+    });
+  }
+  // the one-country benchmark (the EU's 65%): each single country's share of the factory's whole need, so recycling at
+  // home is in the denominator: share of the need = (1 - r) x its share of the bought supply. The HHI above stays over
+  // the bought supply. The last supply group ("Other refiners") groups several firms, not one country: it is left out.
+  function benchmark(PL, D, cap, recycled) {
+    var r = (recycled == null ? 100 * PL.factories.battery.recycledShare : recycled) / 100, n = PL.imports.minerals.suppliers.length;
+    return minerals(PL, cap).map(function (m) {
+      var top = 0; for (var i = 1; i < n - 1; i++) if (m.shares[i] > m.shares[top]) top = i;
+      var share = (1 - r) * m.shares[top];
+      return { key: m.key, label: m.label, top: top, share: share, over: share > D.thresholds.oneCountry + 1e-9 };
     });
   }
   function spike(PL, cut) {
@@ -160,14 +176,21 @@
     var d = dependence(PL), I = PL.imports;
     return fmtN(I.oil.importPJ * I.oil.throughStraitShare, 0) + " PJ of crude and " + fmtN(I.lng.importPJ * I.lng.throughStraitShare, 0) + " PJ of LNG pass one strait: " + fmtN(d.straitPJ, 0) + " ÷ " + fmtN(d.primary, 0) + " = **" + pct(d.strait, 1) + "** of primary energy on one route.";
   }
-  function hhiLine(PL, D, cap) {
-    var M = minerals(PL, cap), hi = M.filter(function (m) { return m.hhi > D.thresholds.hhiHigh; }).length, over = M.filter(function (m) { return m.lead > D.thresholds.oneCountry + 1e-9; }).length;
-    return "With no refiner above " + fmtN(cap) + "%: HHI from **" + fmtN(Math.min.apply(null, M.map(function (m) { return m.hhi; }))) + "** to **" + fmtN(Math.max.apply(null, M.map(function (m) { return m.hhi; }))) + "**; " + hi + " of " + M.length + " above " + fmtN(D.thresholds.hhiHigh) + ", " + over + " with one refiner above " + pct(D.thresholds.oneCountry) + ".";
+  // the HHI over the bought supply; the one-country count over the factory's whole need (recycled = the lever, in %)
+  function hhiLine(PL, D, cap, recycled) {
+    var M = minerals(PL, cap), r = recycled == null ? 100 * PL.factories.battery.recycledShare : recycled, hi = M.filter(function (m) { return m.hhi > D.thresholds.hhiHigh; }).length;
+    var over = benchmark(PL, D, cap, r).filter(function (x) { return x.over; }).length;
+    return "With no supply group above " + fmtN(cap) + "%: HHI from **" + fmtN(Math.min.apply(null, M.map(function (m) { return m.hhi; }))) + "** to **" + fmtN(Math.max.apply(null, M.map(function (m) { return m.hhi; }))) + "**; " + hi + " of " + M.length + " above " + fmtN(D.thresholds.hhiHigh) +
+      (over ? ". In " + over + " of " + M.length + ", one country supplies" : ". For no mineral does one country supply") + " over " + pct(D.thresholds.oneCountry) + " of the factory's need" + (r > 0 ? ", counting the " + fmtN(r) + "% recycled at home." : ", with nothing recycled at home.");
   }
-  // the suppliers are supply groups: the last ("Other refiners") groups several, so the HHI shown is an upper bound
+  // one idea: squaring; the grouped-data caveat is a note of its own (groupNote), the floor of 10,000 / n is under Go deeper
   function hhiSaw(PL, D, cap) {
-    var n = PL.imports.minerals.suppliers.length, floor = 10000 / n;
-    return "Shares are squared, so capping the largest cuts the HHI fastest; " + n + " supply groups cannot go below " + fmtN(floor) + (floor > D.thresholds.hhiHigh ? ", above the " + fmtN(D.thresholds.hhiHigh) + " line" : "") + ". Splitting “" + refiner(PL, n - 1).toLowerCase() + "” into its firms would lower it: the HHI shown is an upper bound.";
+    return "Shares are squared, so capping the largest supply group cuts the HHI fastest.";
+  }
+  // the suppliers are supply groups: the last ("Other refiners") groups several firms, so the HHI shown is an upper bound
+  function groupNote(PL, D) {
+    var n = PL.imports.minerals.suppliers.length;
+    return "“" + refiner(PL, n - 1) + "” groups several firms, so the HHI shown is an upper bound (split into its firms, it would fall), and the " + pct(D.thresholds.oneCountry) + " count leaves the group out.";
   }
   function spikeLine(PL, cut) {
     var s = spike(PL, cut);
@@ -177,6 +200,18 @@
     var s = spike(PL, cut);
     if (s.lng <= 1e-9) return "With gas use cut this far, no LNG is bought: only the domestic price rise remains, a transfer from gas users to producers inside Prairieland.";
     return "Whose number: the " + bn(s.abroad) + " leaves the country; the " + bn(s.home) + " is a [[transfer-payment|transfer]] from gas users to domestic producers.";
+  }
+  // a volume to one decimal only when it has one (a cut in 5% steps leaves halves of a PJ)
+  function vol(v) { return fmtN(v, Math.abs(v - Math.round(v)) > 1e-9 ? 1 : 0); }
+  // step 5's inputs beside the result (rows: what, PJ this year, $ per GJ, the price multiplier) and one worked line
+  function spikeInputs(PL, cut) {
+    var s = spike(PL, cut);
+    var x = function (v) { return fmtN(v, v % 1 ? 1 : 0) + "×"; };
+    return [["LNG bought", vol(s.lng), "$" + fmtN(s.lngPrice, 2), x(s.lngX)], ["Domestic gas", vol(s.dom), "$" + fmtN(s.gasPrice, 2), x(s.gasX)]];
+  }
+  function spikeWork(PL, cut) {
+    var s = spike(PL, cut), part = function (v, p, x) { return vol(v) + " PJ × $" + fmtN(p, 2) + " × (" + fmtN(x, x % 1 ? 1 : 0) + " − 1) = $" + fmtN(v * p * (x - 1)) + " million"; };
+    return "Abroad: " + part(s.lng, s.lngPrice, s.lngX) + ". At home: " + part(s.dom, s.gasPrice, s.gasX) + ".";
   }
   function closureLine(PL, D, o) {
     var c = closure(PL, D, o);
@@ -206,6 +241,18 @@
     if (f.lost <= 1e-9) return "A second site with this much capacity covers the whole loss: spare capacity in a second place is what makes a factory resilient.";
     return "Making cells at home trades cell imports for mineral imports and adds a single-site risk; a second site with spare capacity spreads it.";
   }
+  // step 8's inputs beside the result (rows: what, value) and one worked line for the cells and the job-years
+  function fireInputs(PL, o) {
+    var Fb = PL.factories.battery, f = fire(PL, o);
+    return [["Output in 2025", fmtN(Fb.output2025GWh) + " GWh of cells a year"], ["Capacity", fmtN(Fb.capacityGWh) + " GWh a year"], ["Jobs at the factory", fmtN(Fb.jobs)],
+      ["Fire", "stops the main site for " + f.months + " months"], ["Second site", pct(o.split / 100) + " of the capacity"]];
+  }
+  function fireWork(PL, o) {
+    var Fb = PL.factories.battery, f = fire(PL, o), s = o.split / 100, m = f.months + "/12", sd = fmtN(s, 1);
+    var cells = s > 0 ? m + " × " + (Fb.output2025GWh - Fb.capacityGWh * s < 0 ? "max(0, " : "(") + fmtN(Fb.output2025GWh) + " − " + fmtN(Fb.capacityGWh) + " × " + sd + ")" : m + " × " + fmtN(Fb.output2025GWh);
+    var work = s > 0 ? fmtN(Fb.jobs) + " × (1 − " + sd + ") × " + m : fmtN(Fb.jobs) + " × " + m;
+    return "Cells: " + cells + " = " + gwh(f.lost) + ". Work: " + work + " = " + fmtN(f.jobYears, 0) + " job-years.";
+  }
   function boardLine(PL, D, on, S, at) {
     var b = board(PL, D, on, S, at), n = Object.keys(on).filter(function (k) { return on[k]; }).length;
     if (!n) return "Switch on one or more shocks.";
@@ -222,16 +269,16 @@
   function notesFor(PL, D, k) {
     var Fb = PL.factories.battery, A = D.assume, T = D.thresholds, LINE = PL.about.line;
     return {
-      dep: ["Eurostat divides net imports by gross available energy; with no exports or bunkers, Prairieland's is its primary energy.",
+      dep: ["Eurostat divides by gross available energy: all the energy supplied in a country, including fuel sold there for international ships and flights. Prairieland has no such sales, so its gross available energy is its primary energy.",
         "The [[substitution-method|substitution method]] counts electricity from non-fossil plants as the fuel a fossil plant would burn for it, so primary energy grows and the share falls.", LINE],
       strait: ["Round to one decimal.", LINE],
-      hhi: [T.hhiWhat, T.oneCountryWhat],
+      hhi: [T.hhiWhat, T.oneCountryWhat, groupNote(PL, D)],
       spike: [A.spike, A.spikeStocks, "Volumes are in PJ and prices in $ per GJ: 1 PJ is a million GJ, so PJ × $ per GJ gives $ million.", LINE],
       closure: [A.closure, A.gasStorageWhat, LINE],
       ban: [A.ban, "Cells are counted in GWh of storage they hold (" + fmtN(Fb.output2025GWh) + " GWh made in 2025), not in GWh of electricity; graphite forms a cell's anode, its negative electrode.",
         "New grid batteries bought during the restriction cost " + fmtN(shockOf(PL, "mineralBan").params.batteryCapexX, 1) + " times as much.", LINE],
       fire: [A.fire, A.jobs, LINE],
-      board: [A.overlap, A.overlapCount]
+      board: [A.parallel, A.overlap, A.overlapCount]
     }[k];
   }
   // step 3's inputs: the numbers the question needs, beside it (rows: what, PJ a year, share through the strait)
@@ -245,12 +292,12 @@
     return "<p class=\"lx-eyebrow\">The idea in one table: four ways Prairieland's supply can fail</p>" +
       "<div class=\"lx-scroll-x\"><table class=\"lx-mini-table a21-fbt\"><caption class=\"lx-hint\">" + PL.about.line + " With 2025's settings.</caption>" +
       "<thead><tr><th scope=\"col\">Shock</th><th scope=\"col\">What it hits</th><th scope=\"col\">Result</th></tr></thead><tbody>" +
-      "<tr><td>LNG price spike</td><td>Prices</td><td>" + bn(sp.abroad) + " more paid abroad in a year; " + bn(sp.home) + " moved at home</td></tr>" +
-      "<tr><td>Strait closed " + S.weeks + " weeks</td><td>A route</td><td>" + pj(cl.oilLost) + " of crude lost; " + S.stockDays + " days of stocks (" + pj(cl.stocks) + ") " + (cl.covered ? "cover it" : "fall " + pj(cl.gap) + " short") + "</td></tr>" +
-      "<tr><td>Mineral export restriction</td><td>A supplier</td><td>the factory makes " + pct(b.q) + " of its output for " + b.years + " years; the first to run short is " + b.bind.label.toLowerCase() + "</td></tr>" +
-      "<tr><td>Factory fire</td><td>A site</td><td>" + gwh(f.lost) + " of cells lost in " + f.months + " months</td></tr></tbody></table></div>" +
-      "<ul><li><b>Import dependence.</b> " + fmtN(d.net, 0) + " ÷ " + fmtN(d.primary, 0) + " PJ = " + pct(d.total, 1) + "; " + pct(d.strait, 1) + " of primary energy passes one strait.</li>" +
-      "<li><b>Concentration.</b> Refining HHI from " + fmtN(Math.min.apply(null, M.map(function (m) { return m.hhi; }))) + " to " + fmtN(Math.max.apply(null, M.map(function (m) { return m.hhi; }))) + " (0 to 10,000).</li></ul>" +
+      "<tr><td>Price spike for LNG (liquefied natural gas)</td><td>Prices</td><td>" + bn(sp.abroad) + " more paid abroad in a year; " + bn(sp.home) + " moved at home</td></tr>" +
+      "<tr><td>Strait closed " + S.weeks + " weeks</td><td>A route</td><td>" + pj(cl.oilLost).replace(/ PJ$/, " PJ (petajoules)") + " of crude lost; " + S.stockDays + " days of stocks (" + pj(cl.stocks) + ") " + (cl.covered ? "cover it" : "fall " + pj(cl.gap) + " short") + "</td></tr>" +
+      "<tr><td>Mineral export restriction</td><td>A supplier</td><td>the factory makes " + pct(b.q) + " of its output for " + b.years + " years; " + (b.q >= 1 ? "no mineral runs short" : b.binds.length > 1 ? b.bindWords + " run short together" : "the first to run short is " + b.bindWords) + "</td></tr>" +
+      "<tr><td>Factory fire</td><td>A site</td><td>" + gwh(f.lost).replace(/ GWh$/, " GWh (gigawatt-hours of storage)") + " of cells lost in " + f.months + " months</td></tr></tbody></table></div>" +
+      "<ul><li><b>Import dependence.</b> Net imports ÷ primary energy: " + fmtN(d.net, 0) + " ÷ " + fmtN(d.primary, 0) + " PJ = " + pct(d.total, 1) + "; " + pct(d.strait, 1) + " of primary energy passes one strait.</li>" +
+      "<li><b>Concentration.</b> The Herfindahl-Hirschman index (HHI) of refining, the step that makes mined minerals battery-grade, runs from " + fmtN(Math.min.apply(null, M.map(function (m) { return m.hhi; }))) + " to " + fmtN(Math.max.apply(null, M.map(function (m) { return m.hhi; }))) + "; it sums each supplier's squared percentage share, up to 10,000.</li></ul>" +
       "<p class=\"lx-hint\">With JavaScript on, you test stockpiles, diversification, recycling and a second factory site yourself.</p>";
   }
   function ideas(PL, D) {
@@ -321,11 +368,57 @@
   // a practice item's givens as a two-column table
   function givensHTML(g) { return "<table class=\"lx-mini-table a21-given\"><tbody>" + g.map(function (r) { return "<tr><th scope=\"row\">" + r[0] + "</th><td>" + r[1] + "</td></tr>"; }).join("") + "</tbody></table>"; }
 
+  // the explain layer's content, from the reader's levers S (whose = "with your levers" or "with 2025's settings")
+  function cap1(t) { return t.charAt(0).toUpperCase() + t.slice(1); }
+  // the concept map: risks, their measures, the levers; every link carries its relationship (read in the text version)
+  function explainMap(PL, D, S, whose) {
+    var d = dependence(PL), b = ban(PL, S), sp = spike(PL, S.gasCut), f = fire(PL, S);
+    return { title: "What energy security is made of", lede: "Four parts, each with its own measure and its own levers; the step numbers are " + whose + ".",
+      groups: { risk: ["What can fail", "var(--lx-bad)"], meas: ["How it is measured", "var(--lx-tier-2)"], lev: ["What helps", "var(--lx-good)"] },
+      nodes: [{ id: "price", g: "risk", label: "Prices", text: "World prices move for everyone who buys.", game: "Step 5: " + bn(sp.abroad) + " more abroad.", at: [0, 0], atN: [0, 0] },
+              { id: "route", g: "risk", label: "Routes", text: "One strait, one terminal, one line.", game: "Step 3: " + pct(d.strait, 1) + " of primary energy.", at: [0, 1], atN: [0, 1] },
+              { id: "sup", g: "risk", label: "Suppliers", text: "One refiner for most of a mineral.", game: "Step 7: output " + pct(b.q) + ".", at: [0, 2], atN: [0, 2] },
+              { id: "site", g: "risk", label: "Sites", text: "One factory, one mine, one county.", game: "Step 8: " + gwh(f.lost) + " of cells lost.", at: [0, 3], atN: [0, 3] },
+              { id: "dep", g: "meas", label: "Import dependence", text: "Net imports ÷ primary energy.", at: [1, 0], atN: [1, 0] },
+              { id: "hhi", g: "meas", label: "HHI", text: "Sum of squared shares.", at: [1, 2], atN: [1, 2] },
+              { id: "days", g: "meas", label: "Days of stocks", text: "Days of net imports.", at: [1, 1], atN: [1, 1] },
+              { id: "less", g: "lev", label: "Use less", text: "Efficiency and electrification.", at: [2, 0], atN: [2, 0] },
+              { id: "stock", g: "lev", label: "Stockpiles", text: "Oil, gas and minerals.", at: [2, 1], atN: [2, 1] },
+              { id: "div", g: "lev", label: "Diversify, recycle", text: "More suppliers, and recycling at home.", at: [2, 2], atN: [2, 2] },
+              { id: "two", g: "lev", label: "A second site", text: "Spare capacity elsewhere.", at: [2, 3], atN: [2, 3] }],
+      edges: [["price", "dep", "hurt more with"], ["route", "days", "bridged by"], ["sup", "hhi", "measured by"], ["dep", "less", "lowered by"], ["days", "stock", "raised by"],
+              ["hhi", "div", "offset by"], ["site", "two", "backed up by"]],
+      cols: 3, rows: 4, colsN: 3, rowsN: 4 };
+  }
+  // the restriction's cause and effect, from the reader's levers: the stopped country's share as it now stands (after any
+  // cap), every tied scarcest mineral named, and the no-shortage case told as such
+  function explainChain(PL, D, S, whose) {
+    var b = ban(PL, S), R = shockOf(PL, "mineralBan").params.supplier, avg = b.rows.reduce(function (s, x) { return s + x.sR; }, 0) / b.rows.length;
+    var first = { title: refiner(PL, R) + " stops exporting", text: "For " + b.years + " years, as set for teaching.", value: pct(avg) + " of the minerals, on average" };
+    var capex = fmtN(b.capexX, 1) + "× their cost";
+    if (b.q >= 1) {
+      var minA = Math.min.apply(null, b.rows.map(function (x) { return x.a; })), low = b.rows.filter(function (x) { return x.a <= minA + 1e-12; });
+      return { title: "Cause and effect: a mineral export restriction, " + whose,
+        links: [first,
+          { title: "No mineral runs short", text: "Others, recycling and stocks cover even the least supplied: " + list(low.map(function (x) { return x.label.toLowerCase(); })) + ".", value: pct(minA) + " a year, plus stocks" },
+          { title: "The factory keeps its output", text: "Every mineral covers the need until the restriction ends.", value: gwh(b.made) + " of " + gwh(b.output) },
+          { title: "No cells go unmade", text: "New grid batteries still cost more during the restriction.", value: capex }],
+        note: "With these levers, diversifying, recycling and stocks keep concentration upstream from becoming a shortage downstream." };
+    }
+    return { title: "Cause and effect: a mineral export restriction, " + whose,
+      links: [first,
+        { title: cap1(b.bindWords) + (b.binds.length > 1 ? " run short together" : " runs short first"), text: "Others and recycling cover only part of " + (b.binds.length > 1 ? "each" : "it") + ".", value: pct(b.bind.a) + " a year, plus stocks" },
+        { title: "The factory slows", text: "The scarcest input sets the output.", value: gwh(b.made) + " of " + gwh(b.output) },
+        { title: "Cells are imported or go unmade", text: gwh(b.lost) + " of cells; new grid batteries also cost more during the restriction.", value: capex }],
+      note: "Concentration upstream becomes a shortage downstream: the factory moved the risk from cells to minerals." };
+  }
+
   var model = { KEY: KEY, shockOf: shockOf, lever: lever, defaults: defaults, dependence: dependence, hhi: hhi, capShares: capShares, minerals: minerals, spike: spike, closure: closure,
     ban: ban, fire: fire, fireStart: fireStart, together: together, board: board, fmtN: fmtN, pct: pct, pj: pj, bn: bn, gwh: gwh, refiner: refiner, PREDICT: PREDICT, depLine: depLine, depSaw: depSaw, straitAnswer: straitAnswer,
     straitSaw: straitSaw, hhiLine: hhiLine, hhiSaw: hhiSaw, spikeLine: spikeLine, spikeSaw: spikeSaw, closureLine: closureLine, closureSaw: closureSaw, banLine: banLine, banSaw: banSaw,
     fireLine: fireLine, fireSaw: fireSaw, atWords: atWords, boardLine: boardLine, boardSaw: boardSaw, staticFallback: staticFallback, ideas: ideas, myths: myths, practice: practice, r1: r1, facts: facts, real: real,
-    notesFor: notesFor, straitInputs: straitInputs, givensHTML: givensHTML };
+    notesFor: notesFor, straitInputs: straitInputs, givensHTML: givensHTML, benchmark: benchmark, groupNote: groupNote, spikeInputs: spikeInputs, spikeWork: spikeWork,
+    fireInputs: fireInputs, fireWork: fireWork, explainMap: explainMap, explainChain: explainChain };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -368,7 +461,7 @@
         r.parts.forEach(function (p) { if (p[0] > 0) H("i", { style: "width:" + (100 * p[0] / tot).toFixed(2) + "%;background:" + p[2], title: p[1].replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1") }, bar); });
         H("span", { class: "lx-hint", html: LX.rich(r.parts.filter(function (p) { return p[0] > 0; }).map(function (p) { return p[1] + " " + (r.unit === "PJ" ? fmtN(p[0], 0) + " PJ" : pct(p[0])); }).join("; ")) }, row);
       });
-      H("p", { class: "lx-hint", html: bold(LINE + " Crude, gas and coal in [[petajoule|PJ]] a year (2025); minerals as shares of the battery factory's refined supply.") }, host);
+      H("p", { class: "lx-hint", html: bold(LINE + " Crude, gas and coal in [[petajoule|PJ]] a year (2025); minerals as shares of the battery factory's [[refining|refined]] supply.") }, host);
       void M;
     }
 
@@ -414,7 +507,7 @@
             var M = minerals(PL, S.cap); tb.innerHTML = "";
             LX.Ledger(tb, { caption: "Refining shares by supply group and HHI (0 to 10,000), none above " + fmtN(S.cap) + "%. " + LINE, columns: ["Mineral"].concat(sup.map(function (s, i) { return refiner(PL, i); })).concat(["HHI"]),
               rows: M.map(function (m) { return { head: m.label, cells: m.shares.map(function (x) { return pct(x, 1); }).concat([{ text: fmtN(m.hhi), cls: m.hhi > D.thresholds.hhiHigh ? "up" : "" }]) }; }), cls: "a21-led" });
-            line.innerHTML = bold(hhiLine(PL, D, S.cap)); api.done(); api.saw(hhiSaw(PL, D, S.cap));
+            line.innerHTML = bold(hhiLine(PL, D, S.cap, S.recycled)); api.done(); api.saw(hhiSaw(PL, D, S.cap));
           }
           var sl = slider(act, "cap", "No supply group above (diversification, set beforehand)", function (v) { return fmtN(v) + "%"; }, "var(--lx-tier-2)", paint);
           notes(act, "hhi");
@@ -423,8 +516,15 @@
         } },
       { text: "Stress test one: LNG costs three times as much for a year, and domestic gas half as much again. Cut gas use and see where the money goes.",
         build: function (act, api) {
-          var ro = H("div", { class: "lx-readouts", "aria-live": "polite" }, act), line = H("p", { class: "lx-step-line", "aria-live": "polite" }, act);
-          function paint() { var s = spike(PL, S.gasCut); chips(ro, [["Paid abroad, extra", bn(s.abroad), "bad"], ["Moved at home (a transfer)", bn(s.home)], ["Share of GDP", pct(s.gdp, 2)]]); line.innerHTML = bold(spikeLine(PL, S.gasCut)); api.done(); api.saw(spikeSaw(PL, S.gasCut)); }
+          var ro = H("div", { class: "lx-readouts", "aria-live": "polite" }, act), tb = H("div", null, act), work = H("p", { class: "lx-hint" }, act), line = H("p", { class: "lx-step-line", "aria-live": "polite" }, act);
+          function paint() {
+            var s = spike(PL, S.gasCut); chips(ro, [["Paid abroad, extra", bn(s.abroad), "bad"], ["Moved at home (a transfer)", bn(s.home)], ["Share of GDP", pct(s.gdp, 2)]]);
+            // the inputs beside the result, then the multiplication with units
+            tb.innerHTML = ""; LX.Ledger(tb, { caption: "What the numbers use, with your cut in gas use. " + LINE, columns: ["", "PJ this year", "$ per GJ", "Price multiplied by"],
+              rows: spikeInputs(PL, S.gasCut).map(function (r) { return { head: r[0], cells: r.slice(1) }; }), cls: "a21-led" });
+            work.textContent = spikeWork(PL, S.gasCut);
+            line.innerHTML = bold(spikeLine(PL, S.gasCut)); api.done(); api.saw(spikeSaw(PL, S.gasCut));
+          }
           var sl = slider(act, "gasCut", "Gas use cut this year (efficiency, electrification)", function (v) { return fmtN(v) + "%"; }, "var(--lx-wind)", paint);
           notes(act, "spike");
           paint();
@@ -459,14 +559,21 @@
         } },
       { text: "Stress test four: a fire stops the cell factory for six months. Making cells at home is itself a security choice: put some capacity at a second site.",
         build: function (act, api) {
-          var ro = H("div", { class: "lx-readouts", "aria-live": "polite" }, act), line = H("p", { class: "lx-step-line", "aria-live": "polite" }, act);
-          function paint() { var f = fire(PL, S); chips(ro, [["Cells lost", gwh(f.lost), f.lost > 0 ? "bad" : "good"], ["Imported at", "+" + pct(f.premium)], ["Job-years with no work", fmtN(f.jobYears, 0)]]); line.innerHTML = bold(fireLine(PL, S)); api.done(); api.saw(fireSaw(PL, S)); }
+          var ro = H("div", { class: "lx-readouts", "aria-live": "polite" }, act), tb = H("div", null, act), work = H("p", { class: "lx-hint" }, act), line = H("p", { class: "lx-step-line", "aria-live": "polite" }, act);
+          function paint() {
+            var f = fire(PL, S); chips(ro, [["Cells lost", gwh(f.lost), f.lost > 0 ? "bad" : "good"], ["Imported at", "+" + pct(f.premium)], ["Job-years with no work", fmtN(f.jobYears, 0)]]);
+            // the inputs beside the result, then the multiplication with units
+            tb.innerHTML = ""; LX.Ledger(tb, { caption: "What the numbers use. " + LINE, columns: ["", "Value"],
+              rows: fireInputs(PL, S).map(function (r) { return { head: r[0], cells: [r[1]] }; }), cls: "a21-led" });
+            work.textContent = fireWork(PL, S);
+            line.innerHTML = bold(fireLine(PL, S)); api.done(); api.saw(fireSaw(PL, S));
+          }
           var sl = slider(act, "split", "Cell-making capacity at a second site", function (v) { return v + "%"; }, "var(--lx-bat)", paint);
           notes(act, "fire");
           paint();
           demo[7] = function () { sl.set(30, true); };
         } },
-      { text: "Now combine them. Switch shocks on together, with your levers or with 2025's settings, and read what fails: a price, a route, a supplier or a site.",
+      { text: "Now switch shocks on together, with your levers or with 2025's settings. Each row is a separate stress test; only the cells row counts two shocks together, the restriction and the fire.",
         build: function (act, api) {
           var tg = H("div", { class: "lx-toggles", role: "group", "aria-label": "Shocks" }, act), tb = H("div", null, act), line = H("p", { class: "lx-step-line", "aria-live": "polite" }, act), T = {};
           [["spike", "LNG price spike"], ["closure", "Strait closed"], ["ban", "Mineral export restriction"], ["fire", "Factory fire"]].forEach(function (x) { T[x[0]] = LX.Toggle(tg, { label: x[1], on: ON[x[0]], onChange: function (on) { ON[x[0]] = on; paint(); } }); });
@@ -508,33 +615,15 @@
       if (!xhost) return;
       xhost.innerHTML = ""; xhost.classList.add("is-live");
       var D0 = defaults(PL, D), own = Object.keys(D0).some(function (k) { return S[k] !== D0[k]; }), whose = own ? "with your levers" : "with 2025's settings";
-      var d = dependence(PL), b0 = ban(PL, S), sp0 = spike(PL, S.gasCut), f0 = fire(PL, S);
-      LX.ConceptMap(H("div", { class: "lx-xcard" }, xhost), { title: "What energy security is made of", lede: "Four parts, each with its own measure and its own levers; the step numbers are " + whose + ".",
-        groups: { risk: ["What can fail", "var(--lx-bad)"], meas: ["How it is measured", "var(--lx-tier-2)"], lev: ["What helps", "var(--lx-good)"] },
-        nodes: [{ id: "price", g: "risk", label: "Prices", text: "World prices move for everyone who buys.", game: "Step 5: " + bn(sp0.abroad) + " more abroad.", at: [0, 0], atN: [0, 0] },
-                { id: "route", g: "risk", label: "Routes", text: "One strait, one terminal, one line.", game: "Step 3: " + pct(d.strait, 1) + " of primary energy.", at: [0, 1], atN: [0, 1] },
-                { id: "sup", g: "risk", label: "Suppliers", text: "One refiner for most of a mineral.", game: "Step 7: output " + pct(b0.q) + ".", at: [0, 2], atN: [0, 2] },
-                { id: "site", g: "risk", label: "Sites", text: "One factory, one mine, one county.", game: "Step 8: " + gwh(f0.lost) + " of cells lost.", at: [0, 3], atN: [0, 3] },
-                { id: "dep", g: "meas", label: "Import dependence", text: "Net imports ÷ primary energy.", at: [1, 0], atN: [1, 0] },
-                { id: "hhi", g: "meas", label: "HHI", text: "Sum of squared shares.", at: [1, 2], atN: [1, 2] },
-                { id: "days", g: "meas", label: "Days of stocks", text: "Days of net imports.", at: [1, 1], atN: [1, 1] },
-                { id: "less", g: "lev", label: "Use less", text: "Efficiency and electrification.", at: [2, 0], atN: [2, 0] },
-                { id: "stock", g: "lev", label: "Stockpiles", text: "Oil, gas and minerals.", at: [2, 1], atN: [2, 1] },
-                { id: "div", g: "lev", label: "Diversify, recycle", text: "More suppliers, and recycling at home.", at: [2, 2], atN: [2, 2] },
-                { id: "two", g: "lev", label: "A second site", text: "Spare capacity elsewhere.", at: [2, 3], atN: [2, 3] }],
-        edges: [["price", "dep"], ["route", "days"], ["sup", "hhi"], ["dep", "less"], ["days", "stock"], ["hhi", "div"], ["site", "two"]], cols: 3, rows: 4, colsN: 3, rowsN: 4 });
+      // the concept map and the chain, from the reader's levers (pure; the test checks both)
+      LX.ConceptMap(H("div", { class: "lx-xcard" }, xhost), explainMap(PL, D, S, whose));
       LX.CompareTable(H("div", { class: "lx-xcard" }, xhost), { title: "Which lever helps against which shock", text: true, caption: "From the stress tests on this page; “partly” where it helps only in part.",
         columns: [{ key: "name", label: "Lever", main: true }].concat(D.sort.bins.map(function (b) { return { key: b.key, label: b.label }; })),
         rows: D.sort.items.map(function (it) { var r = { key: it.key, color: it.color, name: it.label }; D.sort.bins.forEach(function (b) { r[b.key] = it.ref[b.key]; }); return r; }) });
-      LX.CausalChain(H("div", { class: "lx-xcard" }, xhost), { title: "Cause and effect: a mineral export restriction, " + whose,
-        links: [{ title: refiner(PL, 0) + " stops exporting", text: "For " + b0.years + " years, as set for teaching.", value: pct(PL.imports.minerals.leadingShareAverage) + " of the minerals, on average" },
-                { title: b0.bind.label + " runs short first", text: "Others and recycling cover only part of it.", value: pct(b0.bind.a) + " a year, plus stocks" },
-                { title: "The factory slows", text: "The scarcest input sets the output.", value: gwh(b0.made) + " of " + gwh(b0.output) },
-                { title: "Cells are imported or go unmade", text: "And new grid batteries cost more that year.", value: fmtN(b0.capexX, 1) + "× their cost" }],
-        note: "Concentration upstream becomes a shortage downstream: the factory moved the risk from cells to minerals." });
+      LX.CausalChain(H("div", { class: "lx-xcard" }, xhost), explainChain(PL, D, S, whose));
       LX.Boundary(H("div", { class: "lx-xcard" }, xhost), { title: "Where these stress tests hold",
         holds: ["Prairieland, a fictional nation, with 2025's volumes and prices;", "each shock alone, or a restriction and a fire combined month by month, with fixed volumes;", "other suppliers ship only their usual shares during a restriction;", "money in 2025 dollars, counted where it is paid."],
-        leaves: ["How prices and demand respond during a shock;", "shipping, insurance and the cost of holding stocks;", "trade law, diplomacy and any judgement of a country;", "the odds of any shock: these are stress tests, not forecasts."],
+        leaves: ["How prices and demand respond during a shock;", "shipping, insurance and the cost of holding stocks;", "trade law, diplomacy and any judgment of a country;", "the odds of any shock: these are stress tests, not forecasts."],
         source: "Model: this page's closed-form stress tests. Data: Prairieland (course data)." });
     }
     paintExplain();

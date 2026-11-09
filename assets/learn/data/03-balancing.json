@@ -32,9 +32,9 @@
   "url": "https://www.nerc.com/globalassets/who-we-are/standing-committees/rstc/rs/reference_document_nerc_balancing_and_frequency_control.pdf",
   "asOf": "11 May 2021",
   "rows": [
-   { "key": "inertia", "name": "Inertial response", "time": "0–12 s", "from": "Stored spin of every synchronous machine", "who": "Physics, no control" },
+   { "key": "inertia", "name": "Inertial response", "time": "0–12 s", "from": "Stored spin of the machines turning in step with the grid", "who": "Physics, no control" },
    { "key": "primary", "name": "Primary response", "time": "10–60 s", "from": "Governors on plants holding reserve; motors slowing", "who": "Automatic, at each plant" },
-   { "key": "secondary", "name": "Secondary response (AGC)", "time": "1–10 min", "from": "Reserve plants raised by the control centre's computers", "who": "Automatic, grid operator" },
+   { "key": "secondary", "name": "Secondary response (AGC)", "time": "1–10 min", "from": "Reserve plants raised by the control center's computers", "who": "Automatic, grid operator" },
    { "key": "tertiary", "name": "Tertiary response", "time": "10 min to hours", "from": "Plants started or re-dispatched to rebuild reserves", "who": "Grid operator, by hand" }
   ]
  },
@@ -50,7 +50,7 @@
   "source": "FERC, NERC and Regional Entity Staff (2021), The February 2021 Cold Weather Outages in Texas and the South Central United States, printed pp. 135–138 (ERCOT chronology, 15 February 2021; about 276 MW tripped by under-frequency relays at 1:54 a.m., p. 137); p. 9 (20,000 MW); EIA (2022) for customers",
   "url": "https://www.ferc.gov/sites/default/files/2021-11/Cold%20Weather%20Report_%20November%202021.pdf",
   "eia_url": "https://www.eia.gov/todayinenergy/detail.php?id=54639",
-  "note": "Points are the frequency readings the report's chronology gives, minute by minute; the measured trace moves between them. At 1:51 and 2:02 a.m. the report gives only a threshold crossing (below 59.4 Hz, above 60.0 Hz), not a reading.",
+  "note": "Points are the frequency readings the report's chronology gives at selected times, up to 21 minutes apart; the line only joins them, and the measured frequency moved in between. At 1:51 and 2:02 a.m. the report gives only a threshold crossing (below 59.4 Hz, above 60.0 Hz), not a reading.",
   "points": [
    ["1:18", 59.932], ["1:20", 59.944], ["1:26", 60.001], ["1:35", 59.978], ["1:44", 59.817], ["1:49", 59.504],
    ["1:50", 59.496], ["1:54", 59.304], ["1:55", 59.401], ["1:57", 59.689], ["2:09", 60.094], ["2:30", 60.062]

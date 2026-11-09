@@ -439,6 +439,7 @@ window.Quarto = {
 <style>
 /* LimitGauge (i-gauge): a value on a track, the allowed band shaded */
 .a17-box { display: grid; gap: 10px; min-width: 0; }
+.page-learn .a17-note ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 3px; } .page-learn .a17-note li { margin: 0; }
 .a17g { display: grid; gap: 2px; padding: 8px 12px 4px; border: 1px solid var(--lx-line); border-radius: 12px; background: var(--lx-surface); min-width: 0; }
 .a17g-h { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; }
 .a17g-l { font-family: var(--lx-f-display); font-size: 13px; color: var(--lx-ink-2); }
@@ -534,7 +535,12 @@ window.Quarto = {
 <p class="lx-hint">With JavaScript on, you work through each check yourself: a slider for each limit, a gauge that shows when it binds, then a sort of which check would catch it.</p>
 </div>
 </div>
-<p class="lx-datanote"><svg class="lx-ic" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5M12 8v.2"></path></svg><span><b>Illustrative:</b> the line's voltage and rating, the feeder's length, ohms, set point and loads, the plant's ramp limit, the inverters' assumed responses and the Plains Grid are invented.<br><b>From earlier lessons:</b> M1's 12:00 plan and its day, <a href="m01-dispatch-to-lmp.html">M1</a> (3 September 2025, Southwest Power Pool shapes from <a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>, accessed 2 November 2026), and lesson 3's Plains Grid, <a href="03-balancing.html">lesson 3</a>.<br><b>Real:</b> the voltage band, ANSI C84.1 Range A as tabulated by <a href="https://docs.nlr.gov/docs/fy21osti/77156.pdf">NREL (2021), Table 1, p. 4</a> (PDF).<br><b>First estimates:</b> closed-form formulas, not a power-flow solution; within 0.01 per unit of a voltage limit, the gauges leave the verdict to an AC check (Go deeper).</span></p>
+<div class="lx-datanote a17-note"><svg class="lx-ic" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5M12 8v.2"></path></svg><ul>
+<li><b>Illustrative:</b> the line's voltage and rating, the feeder's length, ohms, set point and loads, the plant's ramp limit, the inverters' assumed responses and the Plains Grid are invented.</li>
+<li><b>From earlier lessons:</b> M1's 12:00 plan and its day, <a href="m01-dispatch-to-lmp.html">M1</a> (3 September 2025, Southwest Power Pool shapes from <a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>, accessed 2 November 2026), and <a href="03-balancing.html">lesson 3</a>'s Plains Grid.</li>
+<li><b>Real:</b> the voltage band, ANSI C84.1 Range A as tabulated by <a href="https://docs.nlr.gov/docs/fy21osti/77156.pdf">NREL (2021), Table 1, p. 4</a> (PDF).</li>
+<li><b>First estimates:</b> closed-form formulas, not a power-flow solution. Within 0.01 per unit of a voltage limit, the gauges leave the verdict to an <span class="lx-term" data-term="ac-power-flow">AC check</span>, which steps 3 to 5 can run.</li>
+</ul></div>
 <p class="lx-hint" style="margin-top:.6rem">About 30 guided minutes. Practice, about 20 more: the practice set under Check.</p>
 <p class="lx-hint">Need a refresher? <a href="f06-grid-and-outages.html">F6</a> follows power through each voltage step; <a href="03-balancing.html">lesson 3</a> keeps frequency at 60 Hz.</p>
 </div>
@@ -585,7 +591,7 @@ window.Quarto = {
 <tr class="odd">
 <td>Voltage at the far end</td>
 <td><span class="math inline">\(V_\text{end} = V_\text{sub} - (R P + X Q) \div V_\text{nom}^2\)</span></td>
-<td>1.03 − (2.0 × 4.0 + 3.2 × 1.31) ÷ 155.5 = 0.951 per unit</td>
+<td>1.03 − (2.0 × 4.0 + 3.2 × 1.315) ÷ 155.5 = 0.951 per unit</td>
 </tr>
 <tr class="even">
 <td>Hosting capacity</td>
@@ -653,7 +659,7 @@ window.Quarto = {
 <div class="lx-qq" data-id="spin" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “Batteries cannot help in the first second after a trip, because nothing in them spins.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. A grid-forming inverter can respond from the first instant. In the sketch, a battery assumed to give its 50 MW at once halves the starting fall after a 100 MW trip.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth: a grid-forming inverter can respond from the first instant. In the sketch, a battery assumed to give its 50 MW at once halves the starting fall after a 100 MW trip.</p></details>
 </div>
 <div class="lx-qq" data-id="hourly" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “A plan that balances every hour can always be run.”</p>
@@ -679,10 +685,10 @@ window.Quarto = {
 <ol class="lx-fb-practice">
 <li><p><b>Heating.</b> A 230 kV line rated 320 MVA carries 300 MW and 100 Mvar. Is it within its rating, and what current flows in each wire?</p><details class="lx-answer"><summary>Answer</summary><p>Within, barely: √(300² + 100²) = 316.2 MVA, 99% of its rating; 316.2 MVA ÷ (√3 × 230 kV) = 794 A.</p></details></li>
 <li><p><b>Power factor.</b> What is the Ridge–Town line's power factor at 110 MW and 50 Mvar?</p><details class="lx-answer"><summary>Answer</summary><p>110 ÷ 120.8 = 0.91.</p></details></li>
-<li><p><b>A shorter feeder.</b> 12.47 kV, 1.5 Ω and 2.4 Ω (resistance, reactance); far end 3 MW at a power factor of 0.95; substation 1.02 per unit. Is the far end in the band, by a first estimate?</p><details class="lx-answer"><summary>Answer</summary><p>Yes: Q = 0.99 Mvar, and 1.02 − (1.5 × 3 + 2.4 × 0.99) ÷ 155.5 = 0.976 per unit.</p></details></li>
+<li><p><b>A shorter feeder.</b> 12.47 kV, 1.5 Ω and 2.4 Ω (resistance, reactance); far end 3 MW at a power factor of 0.95; substation 1.02 per unit. Is the far end in the band, by a first estimate?</p><details class="lx-answer"><summary>Answer</summary><p>Yes. The load draws Q = P × √(1 ÷ PF² − 1) = 3 × 0.329 = 0.99 Mvar; then 1.02 − (1.5 × 3 + 2.4 × 0.99) ÷ 155.5 = 0.976 per unit.</p></details></li>
 <li><p><b>A longer feeder.</b> Double the lesson's feeder to 16 km (4.0 Ω and 6.4 Ω), same noon load and set point. What is its hosting capacity at a power factor of 1?</p><details class="lx-answer"><summary>Answer</summary><p>About 2.3 MW: (4.0 × 1.0 + 6.4 × 0.33 + 0.02 × 155.5) ÷ 4.0, less than the 3.1 MW of the 8 km feeder.</p></details></li>
 <li><p><b>A bigger trip.</b> A 200 MW plant trips on a grid with 10 GW·s of stored rotational energy. How fast does frequency start to fall?</p><details class="lx-answer"><summary>Answer</summary><p>60 × 200 ÷ (2 × 10,000) = 0.6 Hz per second.</p></details></li>
-<li><p><b>A ramp.</b> Within an hour, the gas plants must go from 100 to 210 MW. The combined-cycle plant is at 100 MW (150 at most, 40 MW an hour); the 100 MW peaker is off but fast. Can they follow?</p><details class="lx-answer"><summary>Answer</summary><p>Yes, if the peaker starts: the combined-cycle plant climbs 40 MW, to 140 MW, and the peaker gives the other 70 MW.</p></details></li>
+<li><p><b>A ramp.</b> Demand climbs steadily for an hour, from 100 to 210 MW of gas. The combined-cycle plant, at 100 MW, climbs 40 MW an hour; the 100 MW peaker starts at once, climbing 100 MW an hour: can they?</p><details class="lx-answer"><summary>Answer</summary><p>Yes: by the hour's end the combined-cycle plant is at 140 MW and the peaker gives 70 MW. In between, the peaker covers what the slower climb cannot, within its 100 MW an hour.</p></details></li>
 <li><p><b>Read a claim critically.</b> A report says: “Our plan is feasible: it meets demand in every hour of the year.” What four checks would you ask about?</p><details class="lx-answer"><summary>Answer</summary><p>Lines with reactive power counted; feeder voltages where rooftop solar grows; ramps at the plan's time step and below it; the first seconds after the largest trip.</p></details></li>
 </ol>
 </div>

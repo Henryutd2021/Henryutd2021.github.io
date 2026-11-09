@@ -276,19 +276,23 @@
           ensureLoad(); S.part = "long"; S.mr = false; keep(); paint();
           seg(act, "a10-build-l", "Built in response", BUILD, S.build, function (k) { S.build = k; keep(); paint(); api.saw(lineLong(Q())); if (k !== "none") api.done(); });
           if (S.build !== "none") { api.done(); api.saw(lineLong(Q())); }
+          H("p", { class: "lx-hint", text: "Pick the gas plant or new wind to go on: “Nothing new” repeats the short run." }, act);
           H("p", { class: "lx-hint", text: "New wind is sized to make the load's yearly energy at 33.8%, the U.S. fleet's 2025 capacity factor." }, act);
         } },
       { text: "Question 4, the claim: what may the buyer report under an illustrative [[procurement-rule|procurement rule]]? Here the plants change only when we assume the purchase is [[additionality|additional]] and [[deliverability|deliverable]] to this grid.",
         build: function (act, api) {
           ensureLoad(); S.part = "claim"; S.mr = false; keep(); paint();
+          H("p", { class: "lx-hint", html: LX.rich(A.claimRules.certificate) }, act);
           var sel = H("div", { class: "cf-ctl" }, act); H("label", { for: "a10-buy", class: "cf-ctl-l", text: "The purchase" }, sel);
           var s = H("select", { id: "a10-buy" }, sel);
           A.procure.forEach(function (p) { H("option", { value: p.id, text: p.label }, s); });
           s.value = S.buy;
-          var R = A.claimRules, rl = H("ul", { class: "a10-rules" }, act);
-          [R.label + ".", R.assume, R.proxy].forEach(function (t) { H("li", { class: "lx-hint", text: t }, rl); });
-          var host = H("div", null, act);
-          function draw() { host.innerHTML = ""; claimTable(host); }
+          var note = H("p", { class: "lx-hint" }, act);
+          function draw() { note.textContent = A.procure.filter(function (x) { return x.id === S.buy; })[0].note; }
+          H("p", { class: "lx-hint", text: "Pick a purchase to go on: “No purchase” is question 1 again. Explain, below, compares all five." }, act);
+          var R = A.claimRules, det = H("details", { class: "lx-textalt" }, act); H("summary", { text: "The reporting rules assumed" }, det);
+          var rl = H("ul", { class: "a10-rules" }, det);
+          [R.label + ".", R.assume, R.proxy].forEach(function (t) { H("li", { class: "lx-hint", html: LX.rich(t) }, rl); });
           s.addEventListener("change", function () { S.buy = s.value; keep(); paint(); draw(); api.saw(lineClaim(Q())); if (S.buy !== "location") api.done(); });
           draw(); if (S.buy !== "location") { api.done(); api.saw(lineClaim(Q())); }
         } },
@@ -301,8 +305,7 @@
     ];
     var cards = LX.StepCards(live, { steps: steps });
 
-    function claimTable(host) {
-      var q = Q();
+    function claimTable(host, q) {
       LX.Ledger(host, { cls: "a10-led", caption: "The " + name(q.key) + " on " + W.dateLabel + "; claims under the illustrative rules; the plants' change is against the day without the load.",
         columns: ["Purchase", "May claim (illustrative)", "The plants emit"],
         rows: A.procure.map(function (p) { return { head: p.label, sub: p.note, cells: [fm.t(q.claims[p.id]), fm.dt(q.plants[p.id])] }; }) });
@@ -324,6 +327,9 @@
           { key: "long", color: "var(--lx-tier-3)", name: "3 · What changes over years?", how: "What gets built in response", you: fm.dt(q.long[S.build]) + " (" + BUILD.filter(function (b) { return b[0] === S.build; })[0][1].toLowerCase() + ")", miss: "Skipped" },
           { key: "claim", color: "var(--lx-dr)", name: "4 · What may be claimed?", how: "A reporting rule; additionality and deliverability assumed or not", you: fm.t(q.claims[S.buy]), miss: "Read as the emissions caused" }
         ] });
+      var lc = H("div", { class: "lx-xcard" }, xhost), lh = H("header", { class: "lx-x-head" }, lc);
+      H("h3", { text: "Five purchases, one load" }, lh); H("span", { class: "lx-hint", text: "Question 4 against the plants" }, lh);
+      claimTable(lc, q);
       LX.Boundary(H("div", { class: "lx-xcard" }, xhost), { title: "Where these answers hold",
         holds: ["one illustrative day on a fictional grid, on real 2025 hourly shapes;", "plants run cheapest first, with no ramp limits or start-ups;", "CO₂ at the stack, from EIA's full-load heat rates (held at every output) and coefficient for gas;", "claims under illustrative rules, not a ruling on any real report."],
         leaves: ["a year: one windy November day stands for nothing else;", "imports, exports and lines inside the grid;", "life-cycle emissions: building plants, and gas leaks upstream."],

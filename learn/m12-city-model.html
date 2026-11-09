@@ -422,7 +422,7 @@ window.Quarto = {
 
 
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "name": "Model a city's energy system: an energy hub with grid limits and screening fairness outputs Write Prairie City's energy hub as a linear program with a ceiling on each substation, read its duals, let it choose under a CO2 cap, and keep the household estimates apart", "description": "Modeler lesson M12 of Energy Systems, Step by Step: a fictional city's heat pumps, retrofits, district heat, car charging, rooftop solar and batteries in one linear program with a limit on each district's substation; the limits' and a CO2 cap's duals; bills by household group as screening estimates from an accounting layer.", "learningResourceType": "Interactive lesson", "educationalLevel": "Advanced", "timeRequired": "PT225M", "inLanguage": "en", "isAccessibleForFree": true, "teaches": ["energy hub as a linear program", "building stock as shares", "linearized feeder limits", "duals of grid room and of a CO2 cap", "representative days", "screening household outputs"], "license": "https://creativecommons.org/licenses/by/4.0/", "author": {"@type": "Person", "name": "Honglin Li", "url": "https://henryutd2021.github.io/"}, "url": "https://henryutd2021.github.io/learn/m12-city-model.html", "isPartOf": {"@type": "Course", "name": "Energy Systems, Step by Step", "url": "https://henryutd2021.github.io/learn/"}}</script>
-<script type="application/json" class="lx-lesson-data">{"id":"m12-city-model","starter":null,"total":14,"code":"M12","title":"Model a city's energy system: an energy hub with grid limits and screening fairness outputs","subtitle":"Write Prairie City's energy hub as a linear program with a ceiling on each substation, read its duals, let it choose under a CO2 cap, and keep the household estimates apart","short":"A city's energy hub","tier":"modeler","tier2":null,"tierLabel":"Modeler · L3","level":"L3","slot":3,"slot2":null,"minutes":45,"does":"Optimize heat pumps, efficiency, district heat, thermal storage, EV charging and rooftop solar for Prairie City under linearized feeder limits; report bills by household group beside cost and emissions, as screening estimates with stated assumptions.","outcome":"Formulate a city energy hub as a linear program with linearized feeder limits and building shares as decisions, read its substation and cap duals as marginal values, and report screening household outputs with their assumptions apart from the model.","icon":"city","form":"cards","scales":["S3"],"teaches":["energy hub as a linear program","building stock as shares","linearized feeder limits","duals of grid room and of a CO2 cap","representative days","screening household outputs"],"lab":"a SciPy/HiGHS notebook that rebuilds engine E3's hub and asserts the browser's numbers, about 60 minutes, then 120 minutes of practice.","href":"m12-city-model.html","ready":true,"after":[{"id":"m04-storage-multienergy","code":"M4","title":"Storage and coupled carriers: modelling power, hydrogen and heat together","short":"Storage and coupled carriers","does":"Write one LP for a wind plant with a grid limit: add a battery's state of charge, an electrolyzer with a part-load limit, a hydrogen tank with a minimum level and a heat store behind a heat-network limit; compare configurations and weeks to see where coupling earns value and where it does not; read each carrier's marginal value.","href":"m04-storage-multienergy.html","ready":true},{"id":"a15-efficiency-electrification","code":"A15","title":"How much can efficiency and electrification change demand? Buildings, heat, transport and industry","short":"Efficiency and electrification","does":"Build a cost-of-saved-energy curve for Prairie City's buildings (water heaters, heat pumps, envelopes, LED tubes, condensing furnaces) with a rebound check; electrify heat and cars district by district on the cold design day against each substation; try three charging rules and a heat network with a store; sort the industrial park's heat by temperature.","href":"a15-efficiency-electrification.html","ready":true},{"id":"a13-fairness-jobs","code":"A13","title":"Who pays and who benefits? Energy burden, fairness and jobs","short":"Who pays, who benefits","does":"Recover a Prairie City plan's yearly cost per kWh, by a fixed charge and by income and read each group's energy burden; see that the money moved adds up to zero; regroup the households; then count the jobs and tax base Ridge County loses when its coal plant retires and what wind and solar farms bring, with every coefficient set by you.","href":"a13-fairness-jobs.html","ready":true}],"prev":null,"next":null,"practice":120,"labMinutes":60}</script>
+<script type="application/json" class="lx-lesson-data">{"id":"m12-city-model","starter":null,"total":14,"code":"M12","title":"Model a city's energy system: an energy hub with grid limits and screening fairness outputs","subtitle":"Write Prairie City's energy hub as a linear program with a ceiling on each substation, read its duals, let it choose under a CO2 cap, and keep the household estimates apart","short":"A city's energy hub","tier":"modeler","tier2":null,"tierLabel":"Modeler · L3","level":"L3","slot":3,"slot2":null,"minutes":45,"does":"Optimize heat pumps, efficiency, district heat, thermal storage, EV charging and rooftop solar for Prairie City under linearized feeder limits; report bills by household group beside cost and emissions, as screening estimates with stated assumptions.","outcome":"Formulate a city energy hub as a linear program with linearized feeder limits and building shares as decisions, read its substation and cap duals as marginal values, and report screening household outputs with their assumptions apart from the model.","icon":"city","form":"cards","scales":["S3"],"teaches":["energy hub as a linear program","building stock as shares","linearized feeder limits","duals of grid room and of a CO2 cap","representative days","screening household outputs"],"lab":"a SciPy/HiGHS notebook that rebuilds engine E3's hub and asserts the browser's numbers, about 60 minutes, then 120 minutes of practice.","href":"m12-city-model.html","ready":true,"after":[{"id":"m04-storage-multienergy","code":"M4","title":"Storage and coupled carriers: modeling power, hydrogen and heat together","short":"Storage and coupled carriers","does":"Write one LP for a wind plant with a grid limit: add a battery's state of charge, an electrolyzer with a part-load limit, a hydrogen tank with a minimum level and a heat store behind a heat-network limit; compare configurations and weeks to see where coupling earns value and where it does not; read each carrier's marginal value.","href":"m04-storage-multienergy.html","ready":true},{"id":"a15-efficiency-electrification","code":"A15","title":"How much can efficiency and electrification change demand? Buildings, heat, transport and industry","short":"Efficiency and electrification","does":"Build a cost-of-saved-energy curve for Prairie City's buildings (water heaters, heat pumps, envelopes, LED tubes, condensing furnaces) with a rebound check; electrify heat and cars district by district on the cold design day against each substation; try three charging rules and a heat network with a store; sort the industrial park's heat by temperature.","href":"a15-efficiency-electrification.html","ready":true},{"id":"a13-fairness-jobs","code":"A13","title":"Who pays and who benefits? Energy burden, fairness and jobs","short":"Who pays, who benefits","does":"Recover a Prairie City plan's yearly cost per kWh, by a fixed charge and by income and read each group's energy burden; see that the money moved adds up to zero; regroup the households; then count the jobs and tax base Ridge County loses when its coal plant retires and what wind and solar farms bring, with every coefficient set by you.","href":"a13-fairness-jobs.html","ready":true}],"prev":null,"next":null,"practice":120,"labMinutes":60}</script>
 <div class="lx-head" data-lesson-id="m12-city-model" data-total="14" data-tier="modeler" data-level="L3" data-minutes="45" data-form="cards">
 <div>
 <nav class="lx-crumbs" aria-label="Breadcrumb"><ol><li><a href="index.html">Learn</a></li><li aria-current="page">M12</li></ol></nav>
@@ -483,15 +483,39 @@ window.Quarto = {
 </tr>
 </tbody>
 </table>
-</div><p class="lx-hint">Precomputed with HiGHS on 6 November 2026. Cost includes the cars' fuel and charging, not their prices; equipment and upgrades as yearly payments.</p>
+</div><p class="lx-hint">Precomputed with HiGHS on 6 November 2026. Cost includes the cars' fuel and charging, not their prices; equipment and upgrades as yearly payments.</p><div class="lx-scroll-x">
+<table class="lx-facts m12-table caption-top table">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">The duals the lesson reads (precomputed)</th>
+<th data-quarto-table-cell-role="th" scope="col">Value</th>
+<th data-quarto-table-cell-role="th" scope="col">What it says</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>A substation's limit, its dual summed over the year (electrified; every district)</td>
+<td class="n">$40,419 per MW a year</td>
+<td class="s">one more MW of room saves an upgrade's yearly cost</td>
+</tr>
+<tr class="even">
+<td>The CO₂ cap at 80% of 2025 (the LP choosing)</td>
+<td class="n">$191 per t</td>
+<td class="s">what cutting the last tonne costs, under this model's assumptions</td>
+</tr>
+</tbody>
+</table>
+</div>
 
 <p class="lx-hint">With JavaScript on, you run each plan with a real solver in your browser, read the substations' duals, let the LP choose under a CO₂ cap, and change who adopts first in the household table. Prairie City is fictional; its numbers are illustrative.</p>
 </div>
 </div>
 <div class="lx-datanote m12-note"><svg class="lx-ic" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5M12 8v.2"></path></svg><ul>
 <li><b>Illustrative:</b> Prairie City, its three districts, one substation each and its household groups (prairie-city.json); retrofit, district-heat and upgrade costs are set for teaching, fixed here at their defaults (the inputs table lists them; the <a href="sb3-city-planner.html">City Planner</a> changes them).</li>
-<li><b>Based on public data:</b> Kansas's 2025 prices (EIA), Wichita's weather normals (NOAA), the Southwest Power Pool's (SPP's) 2025 hourly shapes (EIA-930), eGRID's 2023 SPP North CO₂ rate (EPA), DOE LEAD's income bands; heat pumps and rooftop solar from EIA, batteries from NREL, 2025 dollars.</li>
-<li><b>Time:</b> eight representative days of 2025, weighted to 365 days; a cold design day and the summer peak day kept. Weather: NOAA's normals on SPP's 2025 days (synthetic). The full-year check, below the steps, runs the four plans on every hour of 2025.</li>
+<li><b>Based on public data:</b> Kansas's 2025 prices (EIA), Wichita's weather normals (NOAA), the Southwest Power Pool's (SPP's) 2025 hourly shapes (EIA-930), eGRID's 2023 SPP North CO₂ rate (EPA), DOE LEAD's income bands.</li>
+<li><b>Costs:</b> heat pumps and rooftop solar from EIA, batteries from NREL, 2025 dollars.</li>
+<li><b>Time:</b> eight representative days of 2025, weighted to 365 days; a cold design day and the summer peak day kept.</li>
+<li><b>Weather:</b> NOAA's normals on SPP's 2025 days (synthetic). The full-year check, below the steps, runs the four plans on every hour of 2025.</li>
 <li><b>Solver:</b> <a href="https://ergo-code.github.io/HiGHS/dev/">HiGHS</a> (open source), loaded on your first run (about 3.5 MB, once).</li>
 </ul></div>
 <div class="lx-card lx-notebook m12-nb">
@@ -522,7 +546,7 @@ window.Quarto = {
 .m12-symbols th, .m12-symbols td { text-align: left; vertical-align: top; padding: 6px 8px; border-bottom: 1px solid var(--lx-line); }
 .m12-symbols th { font-family: var(--lx-f-display); font-size: 12.5px; font-weight: 600; color: var(--lx-ink-2); border-bottom: 2px solid var(--lx-line-2); }
 .m12-rules { margin: .4rem 0 0; padding-left: 1.2rem; display: grid; gap: 2px; }
-.lx-facts.m12-ties td.n, .lx-facts.m12-lin td.n { white-space: normal; text-align: left; }   /* words, not numbers: they wrap on phones */
+.lx-facts.m12-ties td.n, .lx-facts.m12-lin td.n, .lx-facts.m12-idx td.n { white-space: normal; text-align: left; }   /* words, not numbers: they wrap on phones */
 </style>
 </div>
 <div id="explain" class="lx-sec">
@@ -538,6 +562,7 @@ window.Quarto = {
 <dt>The cap's dual</dt><dd>When the LP chooses under a CO₂ cap, the cap's dual is the cost of the last tonne cut, under this model's assumptions.</dd>
 <dt>Kept apart</dt><dd>Bills and energy burden by household group come from an accounting layer after the LP, with a stated rule for who adopts first.</dd>
 <dt>The full-year check</dt><dd>The four plans, run again on every hour of 2025 with what the eight days decided kept: total cost and CO₂ hold; the upgrades the eight days buy fall a little short on 19 or 20 February.</dd>
+<dt>What it tests</dt><dd>The year is scaled, like the days, to the same annual heat and base energy, so cost and CO₂ hold partly by construction: it checks the hours' timing.</dd>
 </dl>
 
 <div class="lx-scroll-x">
@@ -582,7 +607,7 @@ window.Quarto = {
 </tr>
 </tbody>
 </table>
-</div><p class="lx-hint">Precomputed with HiGHS on 7 November 2026: each plan run again on all 8,760 hours of 2025, with what its eight days decided kept. On the year, step 6's plan is 184 t over the CO₂ cap it was chosen under.</p>
+</div><p class="lx-hint">Precomputed with HiGHS on 7 November 2026: each plan run again on all 8,760 hours of 2025, with what its eight days decided kept. On the year, step 6's plan is 184 t over the CO₂ cap it was chosen under. The upgrades column comes from a second run that sizes them on the year.</p>
 
 </div>
 </div>
@@ -697,7 +722,7 @@ window.Quarto = {
 <details class="lx-deeper">
 <summary><span class="k">Go deeper · Modeler</span>When two answers cost the same: the tie rule</summary>
 <div class="lx-deeper-body">
-<p>With one price all day, many schedules tie. Small stated costs, left out of every reported number, pick one:</p>
+<p>With one price all day, many schedules tie. Small stated costs pick one; they are left out of every reported cost total, though the duals include them:</p>
 <div class="lx-scroll-x">
 <table class="lx-facts m12-ties caption-top table">
 <thead>
@@ -731,10 +756,11 @@ window.Quarto = {
 </table>
 </div>
 <ul class="m12-rules">
-<li>The LP minimises the cost plus these small costs: on a few plans it pays under $30 a year, in the engine's test, to keep a busiest hour that is under its limit lower.</li>
-<li>The engine's test finds the lowest and highest value of each busiest hour, each upgrade and the energy bought over every plan within $1 of the best cost: they agree.</li>
+<li>The LP minimizes the cost plus these small costs: on a few plans it pays under $30 a year, in the engine's test, to keep a busiest hour that is under its limit lower.</li>
+<li>The engine's test finds the lowest and highest value of each busiest hour, each upgrade and the energy bought over every plan within $1 of the best cost: they agree within its tolerances (0.5 MW, 0.05 MW and 5 MWh).</li>
 <li>The tie costs also enter the balance duals, by a few dollars at most on the busiest hours: read them as "about".</li>
-<li>The substation duals summed over the year are checked as cost slopes: the cost moves by the same amount when the limit moves 0.1 MW up or down.</li>
+<li>The substation duals summed over the year are checked as slopes of the LP's objective, cost plus the tie costs: it moves by the same amount when the limit moves 0.1 MW up or down.</li>
+<li>The reported cost leaves the tie costs out: where a limit binds without an upgrade, it saves about $9 per MW a year more than the dual.</li>
 </ul>
 </div>
 </details>
@@ -745,6 +771,7 @@ window.Quarto = {
 <li>One ceiling per substation stands for a whole distribution network; real planning checks each feeder's power flow and voltage (<a href="a17-physical-feasibility.html">A17</a>).</li>
 <li>Each day ends with the stored energy it started with, a level the LP picks day by day, on the eight days and in the full-year check: no heat or charge carried between days.</li>
 <li>The full-year check uses the same synthetic weather rule: it tests the choice of days, not another weather year.</li>
+<li>The base load follows the whole regional grid's 2025 shape, which keeps some of its winter electric heating: winter peaks and upgrades are illustrative.</li>
 <li>Many plans cost nearly the same; methods that map near-optimal plans show the choice is wider than one optimum.</li>
 </ul>
 </div>

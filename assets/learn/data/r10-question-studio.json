@@ -6,7 +6,7 @@
     "note": "Draft questions, example cards and exemplars are illustrative. The studio makes no originality judgement: the counts are context only.",
     "license": "CC BY 4.0"
   },
-  "dataset": { "creator": "Honglin Li", "date": "2026-11-03", "status": "Illustrative: the draft questions, example cards and exemplars are invented for teaching; the crowding counts are dated OpenAlex search counts, for context only.", "source": "Written by hand for research studio R10; the crowding counts come from OpenAlex keyword searches (dated in crowding.source).", "license": "This file: CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/), Honglin Li. OpenAlex data are CC0." },
+  "dataset": { "creator": "Honglin Li", "date": "2026-11-03", "status": "Illustrative: the draft questions, example cards and exemplars are invented for teaching; the crowding counts are dated OpenAlex search counts, for context only.", "source": "Illustrative teaching examples for research studio R10; the crowding counts come from dated OpenAlex keyword searches (crowding.source), and the literature step searches a dated OpenAlex snapshot (r10-question-studio-openalex.json).", "license": "This file: CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/), Honglin Li. OpenAlex data are CC0." },
   "pickers": {
     "scale": [
       { "id": "S0", "label": "S0 device and plant", "phrase": "a single device or plant" },
@@ -32,23 +32,23 @@
       { "id": "heatpumps", "label": "heat pumps", "phrase": "heat pumps", "terms": ["\"heat pump\"", "\"heat pumps\""], "cluster": "C34" },
       { "id": "ev", "label": "EV fleets and school buses", "phrase": "EV fleets and school buses", "terms": ["\"electric bus\"", "\"electric vehicle fleet\""], "cluster": "C21" },
       { "id": "irrigation", "label": "irrigation pumps", "phrase": "irrigation pumps", "terms": ["\"irrigation pumping\"", "\"irrigation pump\""] },
-      { "id": "coldchain", "label": "cold chains", "phrase": "cold chains", "terms": ["\"cold chain\"", "\"cold storage\""] },
-      { "id": "districtheat", "label": "district heating", "phrase": "district heating", "terms": ["\"district heating\""], "cluster": "C25" },
-      { "id": "procheat", "label": "industrial process heat", "phrase": "industrial process heat", "terms": ["\"process heat\"", "\"industrial heat\""] },
+      { "id": "coldchain", "label": "cold chains", "def": "refrigerated storage and transport of food and medicine", "phrase": "cold chains", "terms": ["\"cold chain\"", "\"cold storage\""] },
+      { "id": "districtheat", "label": "district heating", "def": "hot water piped from central plants to many buildings", "phrase": "district heating", "terms": ["\"district heating\""], "cluster": "C25" },
+      { "id": "procheat", "label": "industrial process heat", "def": "heat that factories use to make their products", "phrase": "industrial process heat", "terms": ["\"process heat\"", "\"industrial heat\""] },
       { "id": "datacenters", "label": "data centers", "note": "as a load", "phrase": "data-center loads", "terms": ["\"data center\"", "\"data centre\""], "cluster": "C13" },
       { "id": "wind", "label": "wind farms", "phrase": "wind farms", "terms": ["\"wind farm\"", "\"wind power\""] },
       { "id": "utilitysolar", "label": "utility solar", "phrase": "utility-scale solar", "terms": ["\"utility-scale solar\"", "\"solar farm\""] },
       { "id": "batteries", "label": "batteries", "phrase": "batteries", "terms": ["\"battery storage\"", "\"battery energy storage\""], "cluster": "C08" },
-      { "id": "lds", "label": "long-duration storage", "phrase": "long-duration storage", "terms": ["\"long-duration storage\"", "\"long-duration energy storage\""], "cluster": "C08" },
+      { "id": "lds", "label": "long-duration storage", "def": "storage that can discharge for ten hours or more", "phrase": "long-duration storage", "terms": ["\"long-duration storage\"", "\"long-duration energy storage\""], "cluster": "C08" },
       { "id": "hydrogen", "label": "hydrogen", "phrase": "hydrogen", "terms": ["hydrogen"], "cluster": "C09" },
       { "id": "transmission", "label": "transmission lines", "phrase": "transmission lines", "terms": ["\"transmission line\"", "\"transmission expansion\""], "cluster": "C01" },
       { "id": "feeders", "label": "distribution feeders", "phrase": "distribution feeders", "terms": ["\"distribution feeder\"", "\"distribution network\""], "cluster": "C06" },
       { "id": "gas", "label": "gas networks", "phrase": "gas networks", "terms": ["\"gas network\"", "\"gas distribution\""] },
       { "id": "geothermal", "label": "geothermal", "phrase": "geothermal plants", "terms": ["geothermal"] },
       { "id": "hydro", "label": "hydro", "phrase": "hydro plants", "terms": ["hydropower", "hydroelectric"] },
-      { "id": "minigrids", "label": "mini-grids", "phrase": "mini-grids", "terms": ["\"mini-grid\"", "minigrid"], "cluster": "C24" },
+      { "id": "minigrids", "label": "mini-grids", "def": "small local grids, often serving villages off the main grid", "phrase": "mini-grids", "terms": ["\"mini-grid\"", "minigrid"], "cluster": "C24" },
       { "id": "water", "label": "water treatment and desalination", "phrase": "water treatment and desalination plants", "terms": ["desalination", "\"water treatment\""], "cluster": "C27" },
-      { "id": "agrivoltaics", "label": "agrivoltaics", "phrase": "agrivoltaics", "terms": ["agrivoltaic", "agrivoltaics"] },
+      { "id": "agrivoltaics", "label": "agrivoltaics", "def": "solar panels built over working farmland", "phrase": "agrivoltaics", "terms": ["agrivoltaic", "agrivoltaics"] },
       { "id": "retrofits", "label": "building retrofits", "phrase": "building retrofits", "terms": ["\"building retrofit\"", "\"energy retrofit\""] },
       { "id": "dr", "label": "demand-response programmes", "phrase": "demand-response programmes", "terms": ["\"demand response\""], "cluster": "C04" }
     ],
@@ -58,9 +58,9 @@
       { "id": "market", "label": "market or tariff design", "phrase": "a new market or tariff design", "terms": ["tariff", "\"market design\""] },
       { "id": "policy", "label": "policy", "phrase": "a policy change", "terms": ["policy", "incentive"] },
       { "id": "sufficiency", "label": "sufficiency (using less)", "phrase": "using less (sufficiency)", "terms": ["sufficiency", "\"demand reduction\""] },
-      { "id": "maintenance", "label": "maintenance and asset life", "phrase": "a change in maintenance or asset life", "terms": ["maintenance", "\"asset management\""] },
+      { "id": "maintenance", "label": "maintenance and asset life", "phrase": "maintenance or asset-life changes", "terms": ["maintenance", "\"asset management\""] },
       { "id": "avoided", "label": "avoided demand", "phrase": "avoided demand", "terms": ["\"energy efficiency\"", "\"avoided demand\""] },
-      { "id": "governance", "label": "governance and ownership", "phrase": "a change in governance or ownership", "terms": ["ownership", "governance"] }
+      { "id": "governance", "label": "governance and ownership", "phrase": "governance or ownership changes", "terms": ["ownership", "governance"] }
     ],
     "stakeholder": [
       { "id": "renters", "label": "low-income renters", "terms": ["renters", "\"low-income\""] },
@@ -96,14 +96,14 @@
     ]
   },
   "terms": "[[energy-burden|energy burden]] · [[customer-hours|customer-hours]] · [[net-present-value|net present value]] · [[techno-economic-analysis|techno-economic analysis]] · [[life-cycle-assessment|LCA]] (life cycle assessment)",
-  "methodTerms": { "GIS": "gis", "econometrics": "econometrics", "difference-in-differences": "difference-in-differences", "Monte Carlo": "monte-carlo", "MCDA": "mcda", "decision analysis": "decision-analysis", "optimization": "optimization" },
+  "methodTerms": { "GIS": "gis", "econometrics": "econometrics", "difference-in-differences": "difference-in-differences", "Monte Carlo": "monte-carlo", "MCDA": "mcda", "decision analysis": "decision-analysis", "optimization": "optimization", "matched comparisons": "matched-comparison", "ex-post review": "ex-post-review" },
   "pickerLabels": { "scale": "Scale", "dimension": "Dimension", "element": "System element", "lever": "Lever", "stakeholder": "Stakeholder", "twist": "Twist (optional)" },
   "drafts": {
-    "descriptive": "How much does {metric} vary among {stakeholder} with {element} in {scale}{twist}?",
-    "explanatory": "Why did {metric} change for {stakeholder} after {lever} for {element} in {scale}{twist}?",
-    "evaluative": "Did {lever} for {element} lead to {goal} for {stakeholder} in {scale}{twist}, compared with […]?",
-    "predictive": "What will {metric} be for {stakeholder} with {lever} for {element} in {scale}{twist}, and with what uncertainty?",
-    "prescriptive": "What should {stakeholder} do about {element} in {scale}, through {lever}, to achieve {goal}{twist}, compared with […]?"
+    "descriptive": "How much does {metric} vary among {stakeholder} with {element}{twist}?",
+    "explanatory": "Why did {metric} change for {stakeholder} after {lever} for {element}{twist}?",
+    "evaluative": "Did {lever} for {element} lead to {goal} for {stakeholder}{twist}, compared with […]?",
+    "predictive": "What will {metric} be for {stakeholder} with {lever} for {element}{twist}, with what uncertainty?",
+    "prescriptive": "What should {stakeholder} do about {element}, through {lever}, for {goal}{twist}, compared with […]?"
   },
   "realism": [
     { "id": "data", "label": "Data exist",
@@ -189,12 +189,13 @@
       "Many papers is no evidence that it is done."
     ]
   },
+  "litPicks": { "scale": "S3", "dimension": "SOC", "element": "rooftop", "lever": "market", "stakeholder": "councils" },
   "search": {
     "url": "https://openalex.org/works?search=",
     "checked": "3 November 2026",
     "note": "OpenAlex accepts AND, OR, quotation marks and brackets; other databases need small changes to the same string.",
-    "live": "Each link opens OpenAlex's current results in a new tab. They change as papers are added, so note the date you search.",
-    "noreq": "This page sends no request itself."
+    "live": "Optional: a rerun link opens OpenAlex's current results in a new tab. They change as papers are added, so they differ from the snapshot; note the date you search.",
+    "noreq": "The page itself asks OpenAlex nothing: it searches the dated snapshot."
   },
   "examples": [
     { "id": "e1", "combo": "S1 · society · community solar · low-income renters", "type": "evaluative",
@@ -270,7 +271,7 @@
         ] },
       { "key": "good", "label": "Strong answer", "level": "Proficient on framing and realism",
         "parts": [
-          "Question: During a week-long heat wave, how many hours above the city's indoor-heat safety threshold would Prairie City's low-income renters avoid if landlords installed heat pumps instead of window air conditioners?\nType: predictive\nAudience: ",
+          "Question: During a week-long heat wave, how many hours above the city's indoor-heat threshold would Prairie City's low-income renters avoid if landlords installed heat pumps instead of window air conditioners?\nType: predictive\nAudience: ",
           { "text": "the city's housing office, which sets rental standards", "note": "A user and the use: the office sets the standards the answer informs. Landlords control the installation; that is a separate line." },
           "\nMetric: ",
           { "text": "hours above the indoor-heat threshold, per household per heat wave", "note": "A metric with units, from indoor sensors or a building model." },
@@ -282,8 +283,14 @@
           { "text": "heat-pump homes saw no fewer hot hours than homes with window units", "note": "A result that would show the expectation false." },
           "\nMain uncertainty: ",
           { "text": "whether renters can afford to run the cooling during the heat wave", "note": "The uncertainty that could change the answer most, and it comes from the spin's society dimension." },
-          "\nRealism: ",
-          { "text": "data warn (few homes have indoor sensors); physics pass; rules pass (the city's 2026 rental code); time pass; people warn (consent for sensors in homes)", "note": "The five realism checks answered, with the evidence or the reason for each warning." },
+          "\nThreshold: ",
+          { "text": "27 °C indoors, the limit in Prairie City's 2026 rental code (fictional)", "note": "A defined cutoff: the city's own rule, not a universal health standard." },
+          "\nRealism, data: ",
+          { "text": "warn: the city's sensor panel (illustrative) covers 40 renter homes, too few to split by building type", "note": "A named dataset, and why it warns." },
+          "\nRealism, physics: ",
+          { "text": "pass: both options are sized at about 3 kW of cooling per flat, so hot hours differ by how they run, not by size", "note": "One worked check that the comparison is like for like." },
+          "\nRealism, rules, time and people: ",
+          { "text": "rules pass (the rental code allows either unit); time pass (one summer of data); people warn (sensors in homes need each household's consent)", "note": "The other three checks, each with its evidence or the reason for its warning." },
           "\nClosest papers: ",
           { "text": "three found, each differing (owner-occupied homes; a cooler city; cooling bills, not hot hours)", "note": "How the card differs from each closest paper. The line shows the form of the notes; the papers come from your own searches." }
         ] }
@@ -296,7 +303,7 @@
       { "label": "Falsification", "weak": "None", "good": "A result that would show it wrong" },
       { "label": "Realism and papers", "weak": "Not done", "good": "Five checks; how it differs from three papers" }
     ],
-    "note": "Both cards are illustrative, and the threshold is the city's own. Neither says whether the question is new: that is for reading the closest papers."
+    "note": "Both cards are illustrative; the threshold, the code and the sensor panel are the fictional city's own. Neither says whether the question is new: that is for reading the closest papers."
   },
   "checklist": [
     { "id": "type", "label": "Type", "text": "Named, with its template." },

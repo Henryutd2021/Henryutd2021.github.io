@@ -60,6 +60,7 @@
   function hm(t) { return (t < 10 ? "0" : "") + t + ":00"; }
   function span(t) { return hm(t) + "–" + hm(t + 1); }
   function f2(v) { return (Math.abs(v) < 0.005 ? 0 : v).toFixed(2); }
+  function t2(v) { var r = Math.round(v * 100) / 100; return (r < 0 ? "−" : r > 0 ? "+" : "") + Math.abs(r).toFixed(2) + " t"; }
   function tco2(v) { var r = Math.round(v * 10) / 10; return (r < 0 ? "−" : r > 0 ? "+" : "") + Math.abs(r).toFixed(1) + " t"; }
   var PLANT = { spill: "spilled wind and sun", cc: "the combined-cycle plant", pk: "the peaker", short: "unserved demand" };
   // the plants that change, in words: "the peaker 10 MWh less" / "10 MWh of spilled sun and wind used"
@@ -83,7 +84,7 @@
       return "<tr><td>" + span(t) + "</td><td class=\"n\">" + d + "</td><td class=\"n\">" + (W.h[t].cc + W.h[t].pk) + "</td><td class=\"n\">" + f2(W.avg[t]) + "</td><td>" + PLANT[W.margKey[t]] + " (" + f2(W.marg[t]) + ")</td></tr>";
     }).join("");
     return "<p class=\"lx-eyebrow\">" + I.title + " (Prairie Town, " + W.dateLabel + ", illustrative)</p>" +
-      "<p class=\"lx-hint\">" + I.how[0] + "</p><ul>" + li + "</ul>" +
+      "<p class=\"lx-hint\">" + I.how[0] + "</p>" + I.terms.map(function (t) { return "<p class=\"lx-hint\">" + rich(t) + "</p>"; }).join("") + "<ul>" + li + "</ul>" +
       "<div class=\"lx-scroll-x\"><table class=\"lx-facts\"><caption class=\"lx-hint\">Each hour: demand (MWh), gas output (MWh), average factor and the plant on the margin with its factor (t CO₂ per MWh).</caption>" +
       "<thead><tr><th scope=\"col\">Hour</th><th scope=\"col\">Demand</th><th scope=\"col\">Gas</th><th scope=\"col\">Average</th><th scope=\"col\">On the margin</th></tr></thead><tbody>" + rows + "</tbody></table></div>";
   }
@@ -92,9 +93,12 @@
     if (r.same) return ["Pick two different hours."];
     var c = changes(r), sys = Math.round(r.system * 10), att = Math.round(r.attributed * 10);
     var out = "Out of " + span(r.a) + ": " + (c.out || "nothing changes") + ".", into = "Into " + span(r.b) + ": " + c.into + ".";
-    var two = sys === 0 && att !== 0 ? "<b>The average books a change the plants never make.</b>"
-      : sys === att ? "<b>Here the two views agree.</b>"
+    // compared unrounded: two changes that round alike are not called equal
+    var agree = Math.abs(r.system - r.attributed) < 1e-6;
+    var two = agree ? "<b>Here the two views agree.</b>"
+      : Math.abs(r.system) < 1e-9 ? "<b>The average books a change the plants never make.</b>"
       : "<b>The plants' change is " + (Math.abs(r.system) > Math.abs(r.attributed) ? "larger" : "smaller") + " than the average says.</b>";
+    if (!agree && sys === att) two += " Both round to " + tco2(r.system) + " here: " + t2(r.attributed) + " attributed, " + t2(r.system) + " from the plants.";
     return [out, into, two];
   }
   // the allow-listed explainer's starting state as a table (its stylized day; m = the explainer's model() result)
@@ -160,6 +164,7 @@
     H("h3", { text: I.title + " · " + W.dateLabel }, H("div", { class: "lx-stage-head" }, stage));
     H("p", { class: "lx-hint", text: I.note }, stage);
     I.how.slice(1).forEach(function (t) { H("p", { class: "lx-hint", text: t }, stage); });
+    I.terms.forEach(function (t) { H("p", { class: "lx-hint", html: LX.rich(t) }, stage); });
     var ctl = H("div", { class: "lx-ctls" }, stage);
     var pc = H("div", { class: "cf-ctl" }, ctl);
     H("p", { class: "cf-ctl-l", id: "cf6-pre-l", text: "Try a move" }, pc);

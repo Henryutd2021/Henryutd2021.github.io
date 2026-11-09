@@ -457,7 +457,8 @@ window.Quarto = {
 <ol>
 <li>Split by time: train on 6,383 hours (8 January to 30 September 2025), choose on October (744 hours), test once on November (721).</li>
 <li>On October, same hour yesterday misses by 1,126 MW on average (MAPE 3.6%); same hour last week by 2,232 MW; the latest hour held flat by 3,186 MW.</li>
-<li>Persistence error, issued every hour from the reading h hours earlier, in % of each series' 2025 maximum, at 1 and 12 hours ahead: demand 1.4 and 10.0; wind 2.8 and 17.5; solar 6.3 and 48.7. Solar is zero in 377 of 744 October hours.</li>
+<li>Persistence (the reading h hours earlier, issued every hour), October error in % of each series' 2025 maximum, 1 and 12 hours ahead: demand 1.4 and 10.0; wind 2.8 and 17.5; solar 6.3 and 48.7.</li>
+<li>Solar is zero in 377 of 744 October hours of the cleaned series, which sets night hours to zero.</li>
 <li>The best of 16 feature mixes on October: same hour yesterday + same hour last week + the latest actual + Saturday and Sunday, 1,083 MW, 3.8% better than same hour yesterday.</li>
 <li>Leaks: adding the hour before scores 670 MW on October, adding the day's actual average 822 MW; at 00:00 neither is known for every hour of the day.</li>
 <li>November, opened once: 981 MW against 1,070 MW for same hour yesterday (8.3% better).</li>
@@ -500,6 +501,7 @@ window.Quarto = {
 <div class="lx-datanote"><svg class="lx-ic" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5M12 8v.2"></path></svg><ul>
 <li><b>Data:</b> real hourly demand, wind and solar of the Southwest Power Pool (SPP) in 2025, as reported to <a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a> (accessed 2 Nov 2026).</li>
 <li><b>Cleaning:</b> done afterwards, with the whole year in hand: 699 of 2025's 8,760 demand hours were repaired from the day-ahead forecast scaled to actuals on both sides, and frozen wind and solar readings filled.</li>
+<li><b>Solar at night:</b> the cleaned series sets it to zero for hours ending 23 to 5, hours whose monthly median is zero, and hours with the sun below the horizon at SPP's approximate center.</li>
 <li><b>So:</b> a demonstration on cleaned data, not an operational backtest. Inputs are not exactly what was known at 00:00, and repaired hours are scored with the rest; the data do not mark them.</li>
 <li><b>Scale:</b> each series is stored in thousandths of its 2025 maximum; wind and solar stay so. Demand is that share of SPP's 2025 peak hour, 54,411 MW, so values are rounded to about 54 MW.</li>
 <li><b>Clock:</b> Central time with daylight saving: 9 March has 23 hours and 2 November 25. A forecast is issued at 00:00 for every hour of that day.</li>
@@ -554,7 +556,10 @@ window.Quarto = {
 <summary><span class="k">Go deeper · Modeler</span>What the lab adds, and what real forecasters use</summary>
 <div class="lx-deeper-body">
 <ul>
-<li><strong>Model ladder.</strong> Baseline, then linear regression, then gradient-boosted trees, then neural networks; each must still beat the baseline on held-out hours. The lab fits gradient boosting and a small neural network on this page’s features and split.</li>
+<li><strong>Model ladder.</strong> Baseline, then linear regression, then gradient-boosted trees, then neural networks; each must still beat the baseline on held-out hours.</li>
+<li><strong>Gradient-boosted trees.</strong> Many small if-then trees, each fitted to the misses of those before it, then added up.</li>
+<li><strong>A neural network.</strong> Weighted sums of the inputs, each passed through a simple bend, then summed again; it can learn curved links a weighted sum cannot.</li>
+<li><strong>In the lab.</strong> Gradient boosting and a small neural network on this page’s features and split.</li>
 <li><strong>Weather.</strong> Real day-ahead load forecasts use temperature forecasts; actual temperatures as inputs would be a leak, an oracle bound at best.</li>
 <li><strong>Rolling origin.</strong> One test month is a small sample: refit and test month after month, and report the spread.</li>
 <li><strong>Further reading.</strong> Hyndman and Athanasopoulos’s free textbook covers baselines, accuracy and intervals in depth.</li>
@@ -581,7 +586,7 @@ window.Quarto = {
 <div class="lx-qq" data-id="wide" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “The band that holds the most hours is the best band.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. At twice October's width the 80% band held 98.6% of November's hours, but its pinball loss was the worst of the widths tried. Aim for the stated share with the narrowest band.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. At twice October's width the 80% band held 98.6% of November's hours, but its pinball loss was the worst of the widths tried. Check coverage and quantile scores together; choose a band on validation data, then report the test.</p></details>
 </div>
 </div>
 

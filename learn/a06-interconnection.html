@@ -496,7 +496,7 @@ window.Quarto = {
 <tr class="odd">
 <td>1</td>
 <td><strong>Request.</strong> Files an <span class="lx-term" data-term="interconnection-request">interconnection request</span> in a 45-day window, with a study deposit based on its MW and <span class="lx-term" data-term="site-control">control</span> of 90% of its site.</td>
-<td><strong>Request.</strong> Asks the utility for 300 MW of service. In ERCOT's 2026 batch study, a large load posts $50,000 per MW of security.</td>
+<td><strong>Request.</strong> Asks the utility for 300 MW of service. In <span class="lx-term" data-term="ercot">ERCOT</span>'s 2026 Batch Zero study, a large load holds <span class="lx-term" data-term="financial-security">financial security</span> of $50,000 per MW.</td>
 </tr>
 <tr class="even">
 <td>2</td>
@@ -510,12 +510,12 @@ window.Quarto = {
 </tr>
 <tr class="even">
 <td>4</td>
-<td><strong>Restudy.</strong> Projects whose share is too high withdraw; the rest are restudied and their shares change.</td>
+<td><strong>Restudy.</strong> Projects whose share is too high withdraw. A withdrawal can trigger a restudy of the rest, and in this toy it always does: their shares change.</td>
 <td><strong>Contract.</strong> A service contract: a minimum bill, a term and collateral, as lesson A4 sets them.</td>
 </tr>
 <tr class="odd">
 <td>5</td>
-<td><strong>Agreement.</strong> Signs the <span class="lx-term" data-term="interconnection-agreement">interconnection agreement</span> and posts a deposit of 20% of its network upgrade costs.</td>
+<td><strong>Agreement.</strong> Signs the <span class="lx-term" data-term="interconnection-agreement">interconnection agreement</span>; its deposits must then total 20% of its network upgrade costs, earlier readiness deposits included.</td>
 <td><strong>Staged service.</strong> 200 MW fits on the two lines that exist; the last 100 MW waits for the third line.</td>
 </tr>
 <tr class="even">
@@ -577,14 +577,62 @@ window.Quarto = {
 </tr>
 </tbody>
 </table>
-</div><ul><li><b>Study 1.</b> added flow 335 MW &gt; headroom 160 MW, upgrade $120.0M needed. Withdraws: Placeholder.</li><li><b>Study 2, a restudy.</b> added flow 210 MW &gt; headroom 160 MW, upgrade $120.0M needed. Nobody withdraws.</li><li><b>In all.</b> 2 studies, 300 days; Wind, Solar, Battery connect, 450 MW, with the $120.0M upgrade.</li><li><b>Order 2023's readiness rule.</b> A request without site control cannot enter: 1 study, 150 days; Wind, Solar, Battery connect, 450 MW, with the $120.0M upgrade.</li><li><b>The data center.</b> Two 350 MW lines feed the east substation, whose own peak is 150 MW. With one line out, the other carries it all, so only 200 MW of the 300 MW campus fits before a third line.</li><li><b>Texas.</b> ERCOT's list of large loads seeking to connect totals 474.7 GW, against a record demand near 91.1 GW; at $50,000 per MW, the 300 MW campus would post $15.0M of security.</li><li><b>The money.</b> Case file CF7's toy: a 100 MW load and invented round numbers. In present value, a 36-month wait costs the developer $247.3M, other customers $20.9M and society $0.0M.</li><li><b>Staged service.</b> Half the load served at month 12: the developer's cost falls to $168.1M.</li><li><b>A faster connection.</b> 12 months sooner is worth up to $76.2M to the developer.</li></ul>
+</div><ul><li><b>Study 1.</b> added flow 335 MW &gt; headroom 160 MW, upgrade $120.0M needed. Withdraws: Placeholder.</li><li><b>Study 2, a restudy.</b> added flow 210 MW &gt; headroom 160 MW, upgrade $120.0M needed. Nobody withdraws.</li><li><b>In all.</b> 2 studies, 300 days; Wind, Solar, Battery connect, 450 MW, with the $120.0M upgrade.</li><li><b>Order 2023's readiness rule.</b> Normally, a request without site control cannot enter: 1 study, 150 days; Wind, Solar, Battery connect, 450 MW, with the $120.0M upgrade.</li><li><b>The data center.</b> Two 350 MW lines feed the east substation (own peak 150 MW). With one out, the other carries it all: only 200 MW of the 300 MW campus fits before a third line.</li><li><b>Texas.</b> ERCOT's large-load requests total 474.7 GW, against a record demand near 91.1 GW. At $50,000 per MW in its first batch study, the 300 MW campus would hold $15.0M of security in all.</li><li><b>The money.</b> Case file CF7's toy: a 100 MW load and invented round numbers. In present value, a 36-month wait costs the developer $247.3M, other customers $20.9M and society $0.0M.</li><li><b>Staged service.</b> Half the load served at month 12: the developer's cost falls to $168.1M.</li><li><b>A faster connection.</b> 12 months sooner is worth up to $76.2M to the developer.</li></ul><details class="lx-textalt"><summary>The money worked out, with the toy's inputs (case file CF7)</summary><ol><li>Monthly rate: 8% a year is 0.643% a month.</li><li>Margin lost each month: 100 MW × $45,000 = $4.50M.</li><li>Interest on idle capital each month: $500M × 0.643% = $3.22M.</li><li>36 months in today's dollars: $7.72M × 32.04 = $247.3M for the developer.</li></ol><div class="lx-scroll-x">
+<table class="lx-mini-table a6-fbt caption-top table">
+<caption>Case file CF7's inputs, invented round numbers.</caption>
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">Input</th>
+<th data-quarto-table-cell-role="th" scope="col">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>The load</td>
+<td>100 MW, such as a data center or a factory</td>
+</tr>
+<tr class="even">
+<td>Margin once connected</td>
+<td>$45,000 per MW a month (revenue minus operating costs)</td>
+</tr>
+<tr class="odd">
+<td>Capital ready and idle</td>
+<td>$500M of buildings and equipment, carried at the discount rate</td>
+</tr>
+<tr class="even">
+<td>Grid upgrades built for it</td>
+<td>$60M; while it waits, the utility's money in them still costs interest</td>
+</tr>
+<tr class="odd">
+<td>Chance it never arrives</td>
+<td>0.5% more each month of waiting, at most 50%; then the upgrades are stranded</td>
+</tr>
+<tr class="even">
+<td>Large-load tariff</td>
+<td>decides what share of those utility costs the waiting load pays; other customers pay the rest</td>
+</tr>
+<tr class="odd">
+<td>Bridge power</td>
+<td>on-site generators run half the load during the wait, at $30 per MWh above grid power</td>
+</tr>
+<tr class="even">
+<td>Its CO₂</td>
+<td>0.1 t per MWh more than grid power, had the load been connected on time; $100 per tonne</td>
+</tr>
+<tr class="odd">
+<td>Discounting</td>
+<td>8% a year, month by month</td>
+</tr>
+</tbody>
+</table>
+</div></details>
 
 <p class="lx-hint">With JavaScript on, you walk both paths step by step, run the cluster study, choose a withdrawal, test a reform, size the campus against the lines and price the wait yourself.</p>
 </div>
 </div>
 <div class="lx-datanote a6-note"><svg class="lx-ic" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5M12 8v.2"></path></svg><ul>
 <li><b>Illustrative.</b> Prairie Town's four generator requests, the line and its upgrade, each request's flow and the most it would pay; the east substation and the 300 MW data center campus.</li>
-<li><b>Restudies.</b> Each restudy takes 150 days here, as long as a cluster study.</li>
+<li><b>Restudies.</b> Each restudy takes 150 days here, as long as a cluster study. Here every withdrawal triggers one; a real provider decides whether a restudy is needed.</li>
 <li><b>The toy's clock.</b> It counts study days only; the real 45-day request and 60-day engagement windows come before the first study.</li>
 <li><b>Real rules and numbers.</b> FERC Order 2023's pro forma rules (MISO's summary, August 2023), Berkeley Lab's queue data (May 2026) and ERCOT's large-load numbers (July 2026), sourced below.</li>
 <li><b>The money.</b> Case file <a href="cf7-cost-of-waiting.html">CF7</a>'s toy, unchanged: a 100 MW load and invented round numbers. Staged service is this lesson's addition to it.</li>
@@ -687,11 +735,11 @@ window.Quarto = {
 </tr>
 <tr class="even">
 <td>Site control</td>
-<td>90% at the request, 100% by the facilities agreement stage</td>
+<td>90% at the request, 100% by the facilities agreement stage; a deposit stands in only where regulations block site control</td>
 </tr>
 <tr class="odd">
 <td>Deposits</td>
-<td>a study deposit by MW; at the agreement, 20% of the network upgrade costs</td>
+<td>a study deposit by MW, then readiness deposits that reach 20% of the network upgrade costs by the agreement</td>
 </tr>
 <tr class="even">
 <td>Withdrawal penalties</td>
@@ -699,7 +747,15 @@ window.Quarto = {
 </tr>
 <tr class="odd">
 <td>Late studies</td>
-<td>penalties can apply after a 10-business-day grace period, capped at the study deposits, with exceptions: $1,000 a business day for a cluster study, $2,000 for a restudy, $2,500 for a facilities study; paid to the delayed cluster, not recovered through rates, not before the third cluster cycle</td>
+<td>penalties can apply after a 10-business-day grace period, capped at the study deposits, with exceptions</td>
+</tr>
+<tr class="even">
+<td>Late-study rates</td>
+<td>$1,000 a business day for a cluster study, $2,000 for a restudy, $2,500 for a facilities study</td>
+</tr>
+<tr class="odd">
+<td>Who gets them</td>
+<td>the delayed cluster; not recovered through rates; not before the third cluster cycle</td>
 </tr>
 </tbody>
 </table>
@@ -721,7 +777,7 @@ window.Quarto = {
 <li><strong>Other customers:</strong> the upgrades’ carrying cost $12.4M plus expected stranded upgrades $8.6M: $20.9M.</li>
 <li><strong><span class="math inline">\(L(t)\)</span></strong> is an account’s present value when the whole load waits <span class="math inline">\(t\)</span> months.</li>
 <li><strong>Staged service.</strong> Every part of the toy grows in step with the load, its capital and its upgrades, so a share <span class="math inline">\(g\)</span> connected at month <span class="math inline">\(a\)</span> gives <span class="math inline">\(g\,L(a) + (1-g)\,L(\tau)\)</span> in each account.</li>
-<li><strong>Half at month 12:</strong> $0.5 × $88.8M + 0.5 × $247.3M = $168.1M for the developer.</li>
+<li><strong>Half at month 12:</strong> 0.5 × $88.8M + 0.5 × $247.3M = $168.1M for the developer.</li>
 <li><strong>The most worth paying</strong> for a connection 12 months sooner is the cost it avoids: $247.3M − $171.1M = $76.2M, before other risks or costs.</li>
 </ul>
 </div>
@@ -775,14 +831,14 @@ window.Quarto = {
 <details class="lx-answer"><summary>Answer</summary><p>150 days, not counting facilities and affected-system studies. Before it come a 45-day request window and a 60-day customer engagement window.</p></details>
 </div>
 <div class="lx-qq" data-id="staged" data-answer="b">
-<p class="lx-qtext">In CF7's toy, a 36-month wait costs the developer $247.3M. Half the load is served at month 12 instead. What does the developer's cost become?</p>
+<p class="lx-qtext">In CF7's toy, a 36-month wait costs the developer $247.3M; half the load is served at month 12 instead. What does the developer's cost become?</p>
 <ul class="lx-choices"><li data-value="a">$247.3M</li><li data-value="b">$168.1M</li><li data-value="c">$123.6M</li><li data-value="d">$0</li></ul>
 <details class="lx-answer"><summary>Answer</summary><p>$168.1M: half the load waits 12 months ($88.8M for the whole load) and half waits 36 ($247.3M), so half of each.</p></details>
 </div>
 </div>
 <div class="lx-card a6-practice">
 
-<p class="lx-eyebrow">Practice · about 30 minutes on your own</p><ol class="lx-fb-practice"><li><p><b>Split an upgrade by impact.</b> A $120M upgrade is needed. Four requests put 120 MW, 60 MW, 30 MW, 125 MW of flow on the line. What does the 200 MW wind farm, with 120 MW of flow, pay?</p><details class="lx-answer"><summary>Answer</summary><p>$120M × 120 ÷ 335 = $43.0M, or $215/kW for its 200 MW.</p></details></li><li><p><b>After a withdrawal.</b> The 250 MW placeholder, which puts 125 MW of flow on the line, withdraws. Recompute the wind farm's share.</p><details class="lx-answer"><summary>Answer</summary><p>$120M × 120 ÷ 210 = $68.6M, or $343/kW: up $128/kW, and 150 more days of study.</p></details></li><li><p><b>N−1 with stronger lines.</b> Two 400 MW lines feed a substation whose own peak is 150 MW. How much new load fits before an upgrade?</p><details class="lx-answer"><summary>Answer</summary><p>With one line out, the other must carry everything: 400 − 150 = 250 MW.</p></details></li><li><p><b>Security in Texas.</b> At $50,000 per MW, what security does a 120 MW load post for ERCOT's batch study?</p><details class="lx-answer"><summary>Answer</summary><p>120 × $50,000 = $6.0M.</p></details></li><li><p><b>Present value of a wait.</b> In CF7's toy, lost margin is $4.5M a month, discounted at 8% a year, month by month. What is 36 months of it worth today?</p><details class="lx-answer"><summary>Answer</summary><p>$4.5M × 32.04 = $144.2M (the annuity factor for 36 months).</p></details></li><li><p><b>What a faster queue is worth.</b> Cut the wait from 36 to 24 months. What is the most the developer should pay for that?</p><details class="lx-answer"><summary>Answer</summary><p>Its cost falls from $247.3M to $171.1M: up to $76.2M, before other risks or costs.</p></details></li><li><p><b>Read a claim critically.</b> A headline says: “Texas needs 475 GW more power.” Name three questions you would ask.</p><details class="lx-answer"><summary>Answer</summary><p>Are these requests or signed loads? How many are duplicates or placeholders? By which year, and against a peak of about 91.1 GW?</p></details></li><li><p><b>Match the reform.</b> A cluster keeps losing placeholder requests after each study. Which Order 2023 rule aims at that?</p><details class="lx-answer"><summary>Answer</summary><p>Site control and study deposits at the request (readiness), backed by withdrawal penalties.</p></details></li></ol>
+<p class="lx-eyebrow">Practice · about 30 minutes on your own</p><ol class="lx-fb-practice"><li><p><b>Split an upgrade by impact.</b></p><p>A $120M upgrade is needed, and four requests put 120 MW, 60 MW, 30 MW and 125 MW of flow on the line. What does the 200 MW wind farm, with 120 MW of flow, pay?</p><details class="lx-answer"><summary>Answer</summary><p>$120M × 120 ÷ 335 = $43.0M, or $215/kW for its 200 MW.</p></details></li><li><p><b>After a withdrawal.</b></p><p>The 250 MW placeholder, which puts 125 MW of flow on the line, withdraws. Recompute the wind farm's share.</p><details class="lx-answer"><summary>Answer</summary><p>$120M × 120 ÷ 210 = $68.6M, or $343/kW: up $128/kW, and 150 more days of study.</p></details></li><li><p><b>N−1 with stronger lines.</b></p><p>Two 400 MW lines feed a substation whose own peak is 150 MW. How much new load fits before an upgrade?</p><details class="lx-answer"><summary>Answer</summary><p>With one line out, the other must carry everything: 400 − 150 = 250 MW.</p></details></li><li><p><b>Security in Texas.</b></p><p>At $50,000 per MW, what total security does a 120 MW load hold in ERCOT's first batch study?</p><details class="lx-answer"><summary>Answer</summary><p>120 × $50,000 = $6.0M.</p></details></li><li><p><b>Present value of a wait.</b></p><p>In CF7's toy, lost margin is $4.5M a month, discounted at 8% a year, month by month. What is 36 months of it worth today?</p><details class="lx-answer"><summary>Answer</summary><p>$4.5M × 32.04 = $144.2M (the annuity factor for 36 months).</p></details></li><li><p><b>What a faster queue is worth.</b></p><p>Cut the wait from 36 to 24 months. What is the most the developer should pay for that?</p><details class="lx-answer"><summary>Answer</summary><p>Its cost falls from $247.3M to $171.1M: up to $76.2M, before other risks or costs.</p></details></li><li><p><b>Read a claim critically.</b></p><p>A headline says: “Texas needs 475 GW more power.” Name three questions you would ask.</p><details class="lx-answer"><summary>Answer</summary><p>Are these requests or signed loads, and how many are duplicates or placeholders? By which year, and against a peak of about 91.1 GW?</p></details></li><li><p><b>Match the reform.</b></p><p>A cluster keeps losing placeholder requests after each study. Which Order 2023 rule aims at that?</p><details class="lx-answer"><summary>Answer</summary><p>Site control and study deposits at the request (readiness), backed by withdrawal penalties.</p></details></li></ol>
 
 </div>
 </div>
@@ -831,7 +887,7 @@ window.Quarto = {
 </tr>
 <tr class="even">
 <td class="n">$50,000 per MW</td>
-<td>Financial security a large load posts in ERCOT's first batch study, which is to give each project MW allocations year by year for 2028–2032.</td>
+<td>Financial security per MW for a large load in ERCOT's first batch study (Batch Zero), which is to give each project MW allocations year by year for 2028–2032.</td>
 <td class="s"><a href="https://www.ercot.com/files/docs/2026/07/29/ERCOT-Senate-July-29-Panel-1-Assessing-The-Grid.pdf">ERCOT to the Texas Senate, slides 3–5</a> · 29 July 2026</td>
 </tr>
 </tbody>
@@ -859,8 +915,9 @@ window.Quarto = {
 
 <ul>
 <li>Rand, J., Cheyette, A., Talley, C., Zhang, S., Gorman, W., Wiser, R. H., Seel, J., Jeong, S. and Kahrl, F. (May 2026). Queued Up: 2026 Edition, Characteristics of Power Plants Seeking Transmission Interconnection As of the End of 2025. Berkeley Lab. <a href="https://eta-publications.lbl.gov/publications/queued-2026-edition-characteristics">Publication page</a>.</li>
+<li>FERC. Pro forma Large Generator Interconnection Procedures (LGIP), as revised by Order No. 2023 (PDF, updated 20 August 2024): site control and the deposit in its place where regulations block it, section 3.4.2; restudies after withdrawals, section 7.5; readiness deposits, sections 7.5 and 8.1; deposits at the agreement, section 11.3. <a href="https://www.ferc.gov/sites/default/files/2024-08/LGIP.pdf">Procedures</a>.</li>
 <li>MISO (8 August 2023). FERC Order No. 2023: An Initial Review (PDF). Issue date and citation, slide 3; the 45-day request window, the 60-day customer engagement window and the 150-day pro forma cluster study, slide 5; network upgrade costs by proportional impact, slide 6; site control, deposits and withdrawal penalties, slide 7; penalties for late studies, with their cap, grace period and exceptions, slide 8. <a href="https://cdn.misoenergy.org/20230808%20IPWG%20Item%2004%20Review%20of%20FERC%20Order%202023629802.pdf">Slides</a>.</li>
-<li>ERCOT (29 July 2026). ERCOT Update, Senate Committee on Business and Commerce (PDF). Batch study outputs, slide 3; milestones, slides 4–5; large-load requests, slide 6. <a href="https://www.ercot.com/files/docs/2026/07/29/ERCOT-Senate-July-29-Panel-1-Assessing-The-Grid.pdf">Slides</a>.</li>
+<li>ERCOT (29 July 2026). ERCOT Update, Senate Committee on Business and Commerce (PDF). Batch study outputs, slide 3; milestones, slides 4–5 (Batch Zero: financial security brought to $50,000 per MW, slide 5); large-load requests, slide 6. <a href="https://www.ercot.com/files/docs/2026/07/29/ERCOT-Senate-July-29-Panel-1-Assessing-The-Grid.pdf">Slides</a>.</li>
 <li>ERCOT. 2026 all-time and monthly demand records (updated 21 August 2026; values preliminary). <a href="https://www.ercot.com/static-assets/data/news/content/a-peak-demand/2026/all-time-records.htm">Records page</a>.</li>
 <li>U.S. Secretary of Energy (2025). Letter to the Federal Energy Regulatory Commission on the interconnection of large loads (PDF). 23 October 2025. <a href="https://www.energy.gov/sites/default/files/2025-10/403%20Large%20Loads%20Letter.pdf">Letter</a>.</li>
 <li>Li et al. (2026). Accepted paper on the cost of delayed energization for large loads, 2026 North American Power Symposium (NAPS), presented October 2026; DOI pending.</li>

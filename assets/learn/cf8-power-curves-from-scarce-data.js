@@ -31,6 +31,8 @@
   var M9 = (typeof window !== "undefined" && window.LX && window.LX.M9) || require("./components/gp.js");
 
   // ---------------------------------------------------------------- pure model (no DOM; exported for Node)
+  // glossary marks (double brackets: an id, a bar, the shown words) to tap-to-define spans, on text already escaped
+  function marks(t) { return String(t).replace(/\[\[([a-z0-9-]+)\|([^\]]+)\]\]/g, function (m, id, w) { return '<span class="lx-term" data-term=' + '"' + id + '">' + w + "</span>"; }); }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
   function grid(I) { var xs = [], n = Math.round((I.grid.to - I.grid.from) / I.grid.step); for (var j = 0; j <= n; j++) xs.push(Math.round((I.grid.from + j * I.grid.step) * 1000) / 1000); return xs; }
   function weibullPdf(W, v) { return W.k / W.c * Math.pow(v / W.c, W.k - 1) * Math.exp(-Math.pow(v / W.c, W.k)); }
@@ -61,7 +63,12 @@
     out.push({ label: "below " + I.grid.from + " m/s", share: weibullCdf(I.weibull, I.grid.from), power: 0, contrib: 0 });
     for (var b = 0; b < E.length - 1; b++) {
       var sw = 0, sp = 0;
-      xs.forEach(function (v, j) { if (v >= E[b] && (v < E[b + 1] || (b === E.length - 2 && v <= E[b + 1]))) { sw += w[j]; sp += w[j] * M9.maker(T, v); } });
+      xs.forEach(function (v, j) {
+        var at = function (e) { return Math.abs(v - e) < 1e-9; }, f = v > E[b] && v < E[b + 1] ? 1 : 0;
+        if (at(E[b])) f = b === 0 ? 1 : 0.5;                       // the grid's first point keeps its own (half) weight
+        if (at(E[b + 1])) f = b === E.length - 2 ? 1 : 0.5;        // the grid's last point likewise
+        if (f) { sw += f * w[j]; sp += f * w[j] * M9.maker(T, v); }
+      });
       out.push({ label: E[b] + "–" + E[b + 1] + " m/s", share: sw, power: sp / sw, contrib: sp / T.rated });
     }
     out.push({ label: "above " + I.grid.to + " m/s", share: 1 - weibullCdf(I.weibull, I.grid.to), power: null, contrib: 0 });
@@ -70,14 +77,14 @@
   // the words around the averaging table (from the data file, with the numbers filled in)
   function binsWords(I, M9D) {
     var A = all(I, M9D);
-    return { how: I.how, mix: I.mix.replace("{above}", pts(A.massAbove) + "%"), caption: I.binsCaption };
+    return { how: I.how, mix: I.mix, zero: I.zero.replace("{above}", pts(A.massAbove) + "%"), caption: I.binsCaption };
   }
   function binsHTML(I, M9D) {
     var A = all(I, M9D), B = bins(I, M9D), Wd = binsWords(I, M9D);
     var rows = B.map(function (r) {
       return "<tr><th scope=\"row\">" + esc(r.label) + "</th><td class=\"n\">" + pts(r.share) + "%</td><td class=\"n\">" + (r.power == null ? "counted as 0" : kw(r.power)) + "</td><td class=\"n\">" + pts(r.contrib) + "</td></tr>";
     }).join("");
-    return "<p class=\"lx-hint\">" + esc(Wd.how) + "</p><p class=\"lx-hint\">" + esc(Wd.mix) + "</p>" +
+    return "<p class=\"lx-hint\">" + esc(Wd.how) + "</p><p class=\"lx-hint\">" + marks(esc(Wd.mix)) + "</p><p class=\"lx-hint\">" + esc(Wd.zero) + "</p>" +
       "<div class=\"lx-scroll-x\"><table class=\"lx-mini-table cf8-bins\"><caption class=\"lx-hint\">" + esc(Wd.caption) + "</caption><thead><tr><th scope=\"col\">Wind speed</th><th scope=\"col\">Share of the year's hours</th><th scope=\"col\">Maker's curve, mean power</th><th scope=\"col\">Adds to the capacity factor, points</th></tr></thead><tbody>" +
       rows + "<tr><th scope=\"row\">All hours</th><td class=\"n\">100%</td><td></td><td class=\"n\">" + pts(A.maker) + "</td></tr></tbody></table></div>";
   }
@@ -92,13 +99,16 @@
       return e.footer ? li.replace(/<\/li>$/, "<p class=\"lx-hint lx-tl-foot\">" + esc(e.footer) + "</p></li>") : li;
     }).join("") + "</ol>";
   }
+  // the two fits, named by what they learn from (the table's columns, the chart's legend and the live lines)
+  var LAB = ["Measured records only", "Records + maker's curve"];
+  function fitName(n, k) { return n + " records" + (k ? " + the maker's curve" : " only"); }
   // the no-JS version of the idea
   function staticIdea(I, M9D) {
     var A = all(I, M9D);
     var rows = I.sweep.map(function (n) { var f = A.fits[n]; return "<tr><td>" + n + "</td><td class=\"n\">" + pts(f[0].cf) + "% ± " + pts(f[0].hi - f[0].cf) + "</td><td class=\"n\">" + pts(f[1].cf) + "% ± " + pts(f[1].hi - f[1].cf) + "</td></tr>"; }).join("");
     return "<p class=\"lx-eyebrow\">" + I.title + "</p><p>" + I.note + " The maker's curve gives a capacity factor of " + pts(A.maker) + "%; the field curve, hidden from the fits, " + pts(A.field) + "%.</p>" +
       "<p class=\"lx-hint\">" + esc(I.scope) + "</p><p class=\"lx-hint\">" + esc(I.levelNote) + "</p>" +
-      "<div class=\"lx-scroll-x\"><table class=\"lx-mini-table cf8-res\"><caption class=\"lx-hint\">" + esc(I.caption) + "</caption><thead><tr><th scope=\"col\">Records</th><th scope=\"col\">One source</th><th scope=\"col\">Two sources</th></tr></thead><tbody>" + rows + "</tbody></table></div>" +
+      "<div class=\"lx-scroll-x\"><table class=\"lx-mini-table cf8-res\"><caption class=\"lx-hint\">" + esc(I.caption) + "</caption><thead><tr><th scope=\"col\">Records</th><th scope=\"col\">" + esc(LAB[0]) + "</th><th scope=\"col\">" + esc(LAB[1]) + "</th></tr></thead><tbody>" + rows + "</tbody></table></div>" +
       "<p class=\"lx-eyebrow\">" + esc(I.binsTitle) + "</p>" + binsHTML(I, M9D);
   }
   // the explainer's text version: explainer:uq-mfgpr's model (its own synthetic turbine, 95% band of the curve) at n
@@ -115,7 +125,8 @@
     var head = ["Wind speed", "Points there", "True curve (hidden)", "Data only, 95% band", "Curve + data, 95% band"];
     return "<p class=\"lx-hint\">" + esc(X.note) + "</p><div class=\"lx-scroll-x\"><table class=\"lx-mini-table cf8-ex\"><caption class=\"lx-hint\">With " + n + " measured points</caption><thead><tr>" +
       head.map(function (h) { return "<th scope=\"col\">" + esc(h) + "</th>"; }).join("") + "</tr></thead><tbody>" +
-      explainerRows(EXM, X, n).map(function (r) { return "<tr>" + r.map(function (c) { return "<td>" + esc(c) + "</td>"; }).join("") + "</tr>"; }).join("") + "</tbody></table></div>";
+      explainerRows(EXM, X, n).map(function (r) { return "<tr>" + r.map(function (c) { return "<td>" + esc(c) + "</td>"; }).join("") + "</tr>"; }).join("") + "</tbody></table></div>" +
+      "<p class=\"lx-hint\">" + esc(X.limits) + "</p>";
   }
   // the no-JS block: the slider's start
   function explainerHTML(EXM, X) {
@@ -164,15 +175,15 @@
     H("p", { class: "lx-eyebrow", text: I.binsTitle }, how);
     H("div", { html: binsHTML(I, M9D) }, how);
     function paint() {
-      var n = I.sweep[St.i], f = A.fits[n], show = St.two ? [0, 1] : [0], col = ["var(--lx-tier-3)", "var(--lx-accent)"], lab = ["One source", "Two sources"];
+      var n = I.sweep[St.i], f = A.fits[n], show = St.two ? [0, 1] : [0], col = ["var(--lx-tier-3)", "var(--lx-accent)"], lab = LAB;
       P.render({ x: { min: 28, max: 36, ticks: [[28, "28%", "start"], [30, "30%"], [32, "32%"], [34, "34%"], [36, "36%", "end"]] }, y: { min: 0, max: 2, ticks: [] }, height: 140, heightN: 140, ml: 14,
                  bars: show.map(function (k) { return { x0: 100 * f[k].lo, x1: 100 * f[k].hi, y0: 1.35 - 0.6 * k, y1: 1.65 - 0.6 * k, color: col[k], op: 0.55, rx: 3 }; })
                    .concat([[A.maker, "var(--lx-wind)"], [A.field, "var(--lx-ink)"]].map(function (r) { return { x0: 100 * r[0] - 0.025, x1: 100 * r[0] + 0.025, y0: 0, y1: 2, color: r[1], op: 0.9 }; })),   // the two reference values as thin vertical bars
                  marks: show.map(function (k) { return { x: 100 * f[k].cf, y: 1.5 - 0.6 * k, kind: "dot", color: col[k] }; }),
                  legend: show.map(function (k) { return { label: lab[k] + ", 90% band", color: col[k] }; }).concat([{ label: "Maker's curve, " + pts(A.maker) + "%", color: "var(--lx-wind)" }, { label: "Field curve (hidden), " + pts(A.field) + "%", color: "var(--lx-ink)" }]),
                  aria: "The expected capacity factor estimated from " + n + " records with its 90% band from the fitted curve, against the maker's and the field curve's.",
-                 text: { head: ["Estimate", "Expected capacity factor", "90% band (fitted curve only)"], rows: [["Maker's curve", pts(A.maker) + "%", "–"], ["Field curve (hidden)", pts(A.field) + "%", "–"]].concat(show.map(function (k) { return [lab[k] + ", " + n + " records", pts(f[k].cf) + "%", pts(f[k].lo) + "% to " + pts(f[k].hi) + "%"]; })) } });
-      status.innerHTML = show.map(function (k) { return "<p>" + lab[k] + ", " + n + " records: <b>" + pts(f[k].cf) + "% ± " + pts(f[k].hi - f[k].cf) + " points</b>.</p>"; }).join("") +
+                 text: { head: ["Estimate", "Expected capacity factor", "90% band (fitted curve only)"], rows: [["Maker's curve", pts(A.maker) + "%", "–"], ["Field curve (hidden)", pts(A.field) + "%", "–"]].concat(show.map(function (k) { return [fitName(n, k), pts(f[k].cf) + "%", pts(f[k].lo) + "% to " + pts(f[k].hi) + "%"]; })) } });
+      status.innerHTML = show.map(function (k) { return "<p>" + fitName(n, k) + ": <b>" + pts(f[k].cf) + "% ± " + pts(f[k].hi - f[k].cf) + " points</b>.</p>"; }).join("") +
         (St.two ? "<p>The maker's curve narrows the band by " + Math.round(100 * (1 - (f[1].hi - f[1].lo) / (f[0].hi - f[0].lo))) + "% here; the field curve's " + pts(A.field) + "% lies inside both.</p>" : "<p>" + esc(I.oneNote) + "</p>");
     }
     paint();

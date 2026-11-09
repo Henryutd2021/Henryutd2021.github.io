@@ -487,8 +487,8 @@ window.Quarto = {
 <p class="lx-hint">With JavaScript on, you place stores on a duration ladder, run each through the week with a solver, and price what each MWh delivered costs.</p>
 </div>
 </div>
-<p class="lx-datanote"><svg class="lx-ic" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5M12 8v.2"></path></svg><span><b>Illustrative grid.</b> The Plains Grid (a 4,000 MW peak, as in <a href="03-balancing.html">lesson 3</a>) with 5,000 MW of wind, 2,000 MW of solar and 1,000 MW of firm gas: a mix chosen so that a calm week leaves a gap.</span></p>
-<p class="lx-datanote"><svg class="lx-ic" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5M12 8v.2"></path></svg><span><b>Real shapes.</b> Demand, wind and sun follow the Southwest Power Pool's hours of 2–8 January 2025 (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>); wind and solar scaled to EIA's monthly <span class="lx-term" data-term="capacity-factor">capacity factors</span>.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5M12 8v.2"></path></svg><span><b>Illustrative grid.</b> The Plains Grid (a 4,000 MW peak, as in <a href="03-balancing.html">lesson 3</a>) with 5,000 MW of wind, 2,000 MW of solar and 1,000 MW of firm gas: a calm week leaves a gap.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5M12 8v.2"></path></svg><span><b>Real shapes.</b> Demand, wind and sun follow the Southwest Power Pool's hours of 2–8 January 2025 (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>). Wind and solar are scaled to EIA's 2025 U.S. national monthly <span class="lx-term" data-term="capacity-factor">capacity factors</span>, not SPP's own.</span></p>
 <p class="lx-datanote"><svg class="lx-ic" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5M12 8v.2"></path></svg><span><b>Stores and costs.</b> Round trips and 2021 installed costs from DOE's <a href="https://www.energy.gov/sites/default/files/2022-09/2022%20Grid%20Energy%20Storage%20Technology%20Cost%20and%20Performance%20Assessment.pdf">2022 storage assessment</a>. The heat store's 2% a day is an illustrative assumption, borrowed from a 2020 NREL tank design target.</span></p>
 <p class="lx-hint" style="margin-top:.6rem">About 30 guided minutes in eight steps. Solver: <a href="https://ergo-code.github.io/HiGHS/">HiGHS</a> (open source), loaded on your first solve (about 3.5 MB, once).</p>
 <style>/* lesson-local */
@@ -515,11 +515,14 @@ window.Quarto = {
 <details class="lx-deeper">
 <summary><span class="k">Go deeper · Analyst</span>Why the cost per MWh delivered depends on cycles</summary>
 <div class="lx-deeper-body">
+<p><strong>The formula.</strong> Each MWh delivered carries a share of the store’s yearly capital, plus the power bought to charge it. The 1,000 turns kW into MW.</p>
+<p><span class="math display">\[\text{cost per MWh} = \frac{1{,}000 \times \text{capital recovery} \times \text{installed \$ per kW}}{\text{cycles a year} \times \text{duration in hours}} + \frac{\text{charging price}}{\text{round trip}}\]</span></p>
 <ul>
-<li><strong>The formula.</strong> Cost per MWh delivered = 1,000 × capital recovery × installed cost ($ per kW) ÷ (cycles a year × duration in hours), plus the charging price ÷ round trip. The 1,000 turns kW into MW.</li>
 <li><strong>Capital recovery</strong> is the share of the installed cost to recover each year, with interest: 4% <span class="lx-term" data-term="real-rate">real</span> (inflation taken out) over the store’s life (<a href="07-cost.html">lesson 7</a>).</li>
-<li><strong>The battery.</strong> At 250 cycles a year and $20/MWh charging, 4 hours at $1,540 per kW over 16 years: 1,000 × 0.0858 × 1,540 ÷ (250 × 4) = $132 of capital, plus $24 of charging: $156 per MWh.</li>
-<li><strong>Hydrogen.</strong> A 24-hour hydrogen store at 31% needs 24 + 24 ÷ 0.31 = 101 hours a cycle, so at most 86 cycles a year: $149 per MWh at best, $65 of it charging.</li>
+<li><strong>The battery’s inputs.</strong> 4 hours; $1,540 per kW; 16 years, so capital recovery 0.0858; 83% round trip; 250 cycles a year; $20/MWh charging.</li>
+<li><strong>The battery’s cost.</strong> 1,000 × 0.0858 × 1,540 ÷ (250 × 4) = $132 of capital, plus 20 ÷ 0.83 = $24 of charging: $156 per MWh.</li>
+<li><strong>Hydrogen’s cycles.</strong> If it charges at the same power as it discharges, a 24-hour store at 31% needs 24 + 24 ÷ 0.31 = 101 hours a cycle: at most 86 full cycles a year.</li>
+<li><strong>Hydrogen’s cost.</strong> At those 86 cycles and $20/MWh charging: $149 per MWh, $65 of it charging, with fixed upkeep left out.</li>
 <li><strong>Left out.</strong> Fixed upkeep adds under a quarter to the capital for pumped hydro and hydrogen ($28.19 and $23.90 per kW-year); the report gives no battery figure at this size.</li>
 <li><strong>Longer hydrogen stores</strong> add mostly cavern, at $5.82 per kWh in the report: energy capacity is cheap, the converters are not.</li>
 </ul>
@@ -528,7 +531,7 @@ window.Quarto = {
 <details class="lx-deeper">
 <summary><span class="k">Go deeper · Modeler</span>The week as a linear program</summary>
 <div class="lx-deeper-body">
-<p>For each hour <span class="math inline">\(t = 0 \dots 167\)</span> (one hour each, so MW over the hour is MWh), with a store of power <span class="math inline">\(P\)</span>, energy <span class="math inline">\(E\)</span>, round trip <span class="math inline">\(\eta\)</span> and standing loss <span class="math inline">\(\lambda\)</span> per hour:</p>
+<p>For each hour <span class="math inline">\(t = 0 \dots 167\)</span> (MW over one hour is MWh), with a store of power <span class="math inline">\(P\)</span>, energy <span class="math inline">\(E\)</span>, round trip <span class="math inline">\(\eta\)</span> and standing loss <span class="math inline">\(\lambda\)</span> per hour:</p>
 <p><span class="math display">\[\min \sum_t \big(V + \tau\,(168 - t)\big)\,u_t + \delta \sum_t d_t\]</span></p>
 <p><span class="math display">\[
 \begin{aligned}
@@ -614,7 +617,7 @@ e_t = (1-\lambda)\,e_{t-1} + \eta\,c_t - d_t, \quad e_{-1} &amp;= E &amp;&amp; \
 </tbody>
 </table>
 <ul>
-<li><strong>Tie rule, stated in advance.</strong> Many schedules leave the same MWh unserved. <span class="math inline">\(\tau\)</span> pushes shortfalls late and <span class="math inline">\(\delta\)</span> uses firm output before the store; neither changes the least unserved energy, the only number the page reads.</li>
+<li><strong>Tie rule, stated in advance.</strong> Many schedules leave the same MWh unserved. <span class="math inline">\(\tau\)</span> pushes shortfalls late, <span class="math inline">\(\delta\)</span> uses firm output first; neither changes the least unserved energy, the only number the page reads.</li>
 <li><strong>One of the best schedules.</strong> The dashed line in step 5 is the one this tie rule picks; others leave the same MWh unserved.</li>
 <li><strong>Next.</strong> <a href="m04-storage-multienergy.html">M4</a> adds conversion between carriers; <a href="m03-capacity-expansion.html">M3</a> links a store across representative weeks of a whole year.</li>
 </ul>
@@ -625,9 +628,9 @@ e_t = (1-\lambda)\,e_{t-1} + \eta\,c_t - d_t, \quad e_{-1} &amp;= E &amp;&amp; \
 <div class="lx-deeper-body">
 <ul>
 <li>The rest of the year: whether a store refills before the next calm spell needs the whole year in order (<a href="m03-capacity-expansion.html">M3</a>).</li>
-<li>Adequacy: many weather years and plant outages, judged by a criterion such as a loss-of-load expectation (<a href="a05-adequacy.html">A5</a>).</li>
+<li>Adequacy: many weather years and plant outages, judged by a criterion such as a <span class="lx-term" data-term="lole">loss-of-load expectation</span>, the expected days a year with a shortage (<a href="a05-adequacy.html">A5</a>).</li>
 <li>Building the stores: here each is given, at 1,000 MW; choosing sizes is capacity expansion (<a href="13-capstone.html">lesson 13</a>, M3).</li>
-<li>Wires: the Plains Grid is one node with no limits on its lines.</li>
+<li>Wires: every generator and customer is treated as connected, with no transmission limits.</li>
 <li>Wear, fixed upkeep and replacements in the costs; costs differ by site and change over time.</li>
 </ul>
 </div>
@@ -652,7 +655,7 @@ e_t = (1-\lambda)\,e_{t-1} + \eta\,c_t - d_t, \quad e_{-1} &amp;= E &amp;&amp; \
 <div class="lx-qq" data-id="cheap" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “The store with the lowest installed cost per kWh delivers the cheapest MWh.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. Hydrogen has the lowest installed cost per kWh ($126, against $263 for pumped hydro and $385 for the battery).</p><p>At 250 cycles a year pumped hydro delivers the cheapest MWh, $71; hydrogen, capped at 86 cycles, $149 (DOE's 24-hour cost case).</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. Hydrogen has the lowest installed cost per kWh ($126, against $263 for pumped hydro and $385 for the battery).</p><p>At 250 cycles a year pumped hydro delivers the cheapest MWh, $71; hydrogen, at most 86 cycles when it charges at its discharge power, $149 (DOE's 24-hour cost case, $20/MWh charging).</p></details>
 </div>
 </div>
 

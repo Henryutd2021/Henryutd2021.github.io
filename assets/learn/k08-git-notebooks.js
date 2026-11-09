@@ -393,7 +393,7 @@
     var M = D.meta || {}, F = M.files || [], a = /^(\d{4})-(\d\d)-(\d\d)$/.exec(M.accessed || "");
     var MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     return "Raw data: EIA-930 BALANCE files, SWPP, 2025, downloaded " + (a ? +a[3] + " " + MON[+a[2] - 1] + " " + a[1] : "(date)") +
-      ", SHA-256 " + F.map(function (f) { return f.sha256.slice(0, 8) + "…"; }).join(" and ");
+      "; SHA-256 checksums:" + F.map(function (f) { return "\n  " + f.name + "  " + f.sha256; }).join("");
   }
   function shareFiles(S, msg, fixed) {
     fixed = fixed || {};
@@ -574,8 +574,8 @@
   // Each fix changes the shared project's files (shareFiles): before is what the file says on your laptop, after what it
   // says once fixed. title (with glossary marks) and file show in the view; label in the no-JS table.
   var FIXES = [
-    { key: "pin", title: "Exact versions", label: "exact versions (pandas==2.2.3, an illustrative version)", file: "requirements.txt (version numbers illustrative)",
-      before: REQS_LOOSE, after: REQS, why: "Exact versions: a later pandas may change a default, and the numbers with it. These version numbers are illustrative, not a recommendation." },
+    { key: "pin", title: "Exact versions: a [[version-pin|pin]] for each [[python-package|package]]", label: "exact versions (pandas==2.2.3, an illustrative version)", file: "requirements.txt (version numbers illustrative)",
+      before: REQS_LOOSE, after: REQS, why: "Exact versions narrow the differences between installations: a later pandas may change a default, and the numbers with it. These version numbers are illustrative, not a recommendation." },
     { key: "path", title: "A path inside the project", label: "a path inside the project", file: "day.ipynb, cell 1",
       before: 'day = pd.read_csv("' + PATH_LAPTOP + '")', after: 'day = pd.read_csv("' + PATH_PROJECT + '")', why: "A path inside the project works on every computer, not only yours." },
     { key: "data", title: "The raw data's source, download date and [[checksum|checksum]]", label: "the raw data's source, download date and checksum", file: "README.md",
@@ -589,7 +589,7 @@
   function fixAfter(S, f) { return f.key === "data" ? dataLine(S.D, true) : f.after; }   // the README's line comes from the data's own metadata
 
   // ---------------------------------------------------------------- practice drill items (seeded by LX.Drill, so tests can replay them)
-  var KINDS = ["where", "next", "cost", "halve", "notebook", "repro", "order"];
+  var KINDS = ["where", "next", "cost", "notebook", "repro", "order"];
   var WHERE = ["Only in the working folder", "Staged, not yet committed", "Committed in the history", "Gone: thrown away"];
   var SEQS = [["edit"], ["edit", "add"], ["edit", "add", "commit"], ["edit", "add", "edit"], ["edit", "commit"], ["edit", "add", "commit", "edit"], ["edit", "restore"], ["edit", "add", "commit", "edit", "restore"]];
   function whereOf(r0, path, ops) {   // apply the ops; where does the latest edit of path live?
@@ -614,12 +614,20 @@
     { q: "A cell draws six random hours as a test set. What keeps the draw the same on every run?", a: "a fixed random seed", w: ["running the cell twice", "a faster computer", "restart and run all"] },
     { q: "The agency may revise its raw data. What lets a reader check they have your file?", a: "its source, download date and checksum", w: ["its file name", "its size in rows", "the date of your commit"] },
     { q: "Before you share a notebook, what shows its outputs come from the cells as written?", a: "Restart the kernel and run all cells", w: ["Save the notebook", "Run the last cell again", "Commit it"] }];
+  // a: the order that works; also: other orders of the same three commands that work too (as index lists into a), which
+  // the drill never offers as a wrong choice. Ids are unknown until git log prints them, so an order that uses an id
+  // before git log does not work.
   var ORDERS = [
-    { q: "See what you changed in params.yml since the last commit, then record it.", a: ["git diff", "git add params.yml", 'git commit -m "Raise the gas cost"'] },
-    { q: "Start a what-if on its own branch and record your edited params.yml there.", a: ["git switch -c high-gas", "git add params.yml", 'git commit -m "Raise the gas cost"'] },
-    { q: "Look at an older version of the project, then come back.", a: ["git log --oneline", "git switch --detach 1a2b3c4", "git switch main"] },
-    { q: "Rerun a shared project on a new laptop.", a: ["git clone ../prairie-day && cd prairie-day", "pip install -r requirements.txt", "jupyter nbconvert --to notebook --execute day.ipynb"] },
-    { q: "Undo a bad commit that others already have.", a: ["git log --oneline", "git diff 1a2b3c4 5d6e7f8", "git revert 5d6e7f8"] }];
+    { q: "See what you changed in params.yml since the last commit, then record it.", a: ["git diff", "git add params.yml", 'git commit -m "Raise the gas cost"'], also: [],
+      why: "git diff shows edits not yet staged, so look before git add; a commit records only what is staged." },
+    { q: "Start a what-if on its own branch and record your edited params.yml there.", a: ["git switch -c high-gas", "git add params.yml", 'git commit -m "Raise the gas cost"'], also: [[1, 0, 2]],
+      why: "The commit comes last, on the new branch. Staging before or after creating the branch both work: staged changes move with you." },
+    { q: "Look at an older version of the project, then come back to main. You do not know its id yet.", a: ["git log --oneline", "git switch --detach 1a2b3c4", "git switch main"], also: [],
+      why: "git log finds the id, --detach visits that commit, and git switch main brings you back to the branch." },
+    { q: "Rerun a shared project on a new laptop.", a: ["git clone ../prairie-day && cd prairie-day", "pip install -r requirements.txt", "jupyter nbconvert --to notebook --execute day.ipynb"], also: [],
+      why: "The clone brings requirements.txt, the install needs it, and the notebook needs the installed packages." },
+    { q: "Undo a bad commit that others already have. You do not know its id yet.", a: ["git log --oneline", "git diff 1a2b3c4 5d6e7f8", "git revert 5d6e7f8"], also: [[0, 2, 1]],
+      why: "git log finds the ids, which both other commands need. Checking the diff before the revert is the usual order; after it also works." }];
   function shuffle(a, r) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(r() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
   function drillItem(S, k, r) {
     var kind = KINDS[k % KINDS.length], pick = function (n) { return Math.floor(r() * n); };
@@ -641,11 +649,6 @@
       return { kind: kind, q: "A commit's diff shows “- gas_cost: 40” and “+ gas_cost: " + c + "” in params.yml. The model makes " + int(R.gasMWh) + " MWh of electricity from gas. What is the day's gas cost after this commit, in $?",
                answer: R.gasMWh * c, unit: "$", why: int(R.gasMWh) + " MWh × $" + c + "/MWh = " + usd(R.gasMWh * c) + " (it was " + usd(R.cost) + ")." };
     }
-    if (kind === "halve") {
-      var n = 5 + pick(60), m = maxChecks(n);
-      return { kind: kind, q: "Commit 1 of " + n + " passes the check; commit " + n + " fails it, and once the bug appears every later commit fails. Checking the middle commit each time, at most how many commits must you check to find the first bad one?",
-               answer: m, n: n, why: n - 1 + " suspects; each check halves them: 2^" + m + " = " + Math.pow(2, m) + " ≥ " + (n - 1) + (m > 0 ? " > 2^" + (m - 1) + " = " + Math.pow(2, m - 1) : "") + ", so " + m + " checks." };
-    }
     if (kind === "notebook") {
       var SC = [[0, 1, 2, "e", 3], [0, 2, 3], [1, 3], [0, "e", 1, 2, 3], [0, 1, 2, 3, "e", 1, 3], [0, 1, 2, 3, "e", 3], [0, 1, "e", 2, 3], [2, 0, 1, 3]][pick(8)];
       var nb = nbNew(), D = S.D;
@@ -661,9 +664,10 @@
       return { kind: kind, q: it.q, choices: chs, answer: chs.indexOf(it.a), why: it.why || "“" + it.a + "”." };
     }
     var o = ORDERS[pick(ORDERS.length)], right = o.a.join("  →  "), wrong = [];
-    [[1, 0, 2], [2, 1, 0], [0, 2, 1], [1, 2, 0], [2, 0, 1]].forEach(function (p) { var s = p.map(function (j) { return o.a[j]; }).join("  →  "); if (s !== right && wrong.indexOf(s) < 0) wrong.push(s); });
+    var works = function (p) { return o.also.some(function (q) { return q.join() === p.join(); }); };
+    [[1, 0, 2], [2, 1, 0], [0, 2, 1], [1, 2, 0], [2, 0, 1]].forEach(function (p) { if (works(p)) return; var s = p.map(function (j) { return o.a[j]; }).join("  →  "); if (s !== right && wrong.indexOf(s) < 0) wrong.push(s); });
     var cs = shuffle([right].concat(shuffle(wrong, r).slice(0, 2)), r);
-    return { kind: "order", q: o.q + " Which order works?", choices: cs, answer: cs.indexOf(right), why: right + "." };
+    return { kind: "order", q: o.q + " Which order works?", choices: cs, answer: cs.indexOf(right), why: right + ". " + o.why };
   }
   function drill(S, seed, n) { return DR.series(function (k, r) { return drillItem(S, k, r); }, seed, n); }
 
@@ -679,7 +683,7 @@
       ["3", "git switch -c high-gas, git add params.yml, git commit -m", "A new branch, the change staged, then recorded as a commit on high-gas only."],
       ["4", "git switch main", "params.yml says 40 again and the result is " + usd(R1.cost) + "; git switch high-gas brings back " + HIGH + "."],
       ["5", "git pull, then git switch --detach &lt;id&gt; and python check.py", "A teammate's three commits arrive; the balance check fails by " + int(Math.abs(bug.balance)) + " MWh. Halving the history (once a commit fails, every later one fails too): commit " + (B.checks[0].i + 1) + " passes, commit " + (B.checks[1].i + 1) + " fails, so commit " + (B.first + 1) + " (" + B.id + ") is the first bad one, found in " + B.checks.length + " checks."],
-      ["6", "git diff " + H[2].id + " " + H[3].id + ", git revert " + H[3].id, "The line became −(wind − solar): solar is added, not subtracted, so gas is " + int(bug.gasMWh) + " MWh instead of " + int(R1.gasMWh) + " (2 × " + int(R1.solarMWh) + " MWh too much). The revert commit brings back " + int(R1.gasMWh) + " MWh."],
+      ["6", "git switch main, git diff " + H[2].id + " " + H[3].id + ", git revert " + H[3].id, "Back on main first, so the fix lands there. The line became −(wind − solar): solar is added, not subtracted, so gas is " + int(bug.gasMWh) + " MWh instead of " + int(R1.gasMWh) + " (2 × " + int(R1.solarMWh) + " MWh too much). The revert commit brings back " + int(R1.gasMWh) + " MWh."],
       ["7", "a notebook: edit cell 2, run only cell 4", "Cell 4 still shows " + R1.cost + " (memory holds gas_cost = 40) under a cell that says " + HIGH + "; Restart and run all gives " + S.Rhigh.cost + "."],
       ["8", "five fixes", "Before sharing: " + FIXES.map(function (f) { return f.label; }).join("; ") + "."],
       ["9", "git clone, pip install -r requirements.txt, jupyter nbconvert --to notebook --execute day.ipynb", "The fresh copy has no .env and no raw data. Its notebook runs top to bottom: cell 3 gives " + int(X.mem.gas_mwh) + " MWh, cell 4 shows " + X.cells[3].out + " (dollars), and cell 6's balance assert prints “" + X.cells[5].stdout[0] + "”, as the README says."]];
@@ -691,7 +695,7 @@
     return { steps: o, history: h };
   }
   function staticDrill(S) {   // three worked items for readers without JavaScript (seed 7)
-    var it = drill(S, 7, 7).filter(function (x) { return x.kind === "cost" || x.kind === "halve" || x.kind === "notebook"; });
+    var it = drill(S, 7, 7).filter(function (x) { return x.kind === "cost" || x.kind === "next" || x.kind === "notebook"; });
     var o = '<ol class="k8-static-drill">\n';
     it.forEach(function (x) {
       var a = x.choices ? x.choices[x.answer] : (x.unit === "$" ? usd(x.answer) : String(x.answer));
@@ -801,14 +805,16 @@
 
   function view(live, data, root) {
     var D = townDay(data.town, data.town_year), S = story(D), R1 = S.R1, steps = [], finish = [], chosen = { msg: COMMIT_MSGS[0].m };
+    var lastDetached = null;   // the commit step 5 last checked out with --detach: step 6 starts there
     var H6 = S.hist, bugR = H6[3].R;
     LX.store.set("k8-story", { gas: R1.gasMWh, cost: R1.cost });
 
     // ---- step 1: the history
     steps.push({
-      text: "A [[repository|repository]] is a project folder plus its history. Each [[commit|commit]] records the staged versions of its [[tracked-file|tracked files]], with a message and a short id. Run both commands.",
+      text: "A [[repository|repository]] is a project folder plus its history; each [[commit|commit]] records the staged versions of its [[tracked-file|tracked files]], with a message and a short id. Run both commands.",
       build: function (act, api) {
-        H("p", { class: "k8-prog", html: LX.rich("The project: each hour, gas fills the [[megawatt|MW]] that demand leaves after wind, solar and a 100 MW plant that runs flat. model.py adds the day's hours into MWh of electricity from gas; check.py [[assert|asserts]] that supply equals demand.") }, act);
+        H("p", { class: "k8-prog", html: LX.rich("The project: each hour, gas fills the [[megawatt|MW]] that demand leaves after wind, solar and a 100 MW plant that runs flat.") }, act);
+        H("p", { class: "k8-prog", html: LX.rich("model.py adds the day's hours into MWh of electricity from gas; check.py [[assert|asserts]] that supply equals demand.") }, act);
         var r = stepStart(S, 0), g = GitStage(act, {}), did = {};
         g.draw(r);
         function check() { if (did.log && did.status) { api.done(); api.saw("Three commits, newest first. “Working tree clean”: your files match the last commit, which gives " + int(R1.gasMWh) + " MWh and " + usd(R1.cost) + "."); } }
@@ -890,7 +896,7 @@
 
     // ---- step 5: find the first bad commit
     steps.push({
-      text: "A teammate's three commits arrive on main (git pull), and the balance check fails. Commit 1 passed; here, once a commit fails, every later one fails too. Check commits to find the first bad one.",
+      text: "A teammate's three commits arrive on main (git pull), and the balance check fails. Commit 1 passed, and here, once a commit fails, every later one fails too: check commits to find the first bad one.",
       build: function (act, api) {
         var r = stepStart(S, 4, chosen.msg), checked = {}, n = 0;
         H("p", { class: "k8-term k8-mono", text: "$ python check.py   →   AssertionError: energy balance is off (by " + int(Math.abs(bugR.balance)) + " MWh)" }, act);
@@ -905,7 +911,7 @@
           if (h.n === 6) { mark.textContent = "fails now"; mark.className = "k8-mark bad"; }
           b.addEventListener("click", function () {
             if (!checked[h.key] && h.n > 1 && h.n < 6) n++;
-            checked[h.key] = 1; b.setAttribute("aria-pressed", "true");
+            checked[h.key] = 1; b.setAttribute("aria-pressed", "true"); lastDetached = h.id;
             mark.textContent = h.ok ? "passes" : "fails"; mark.className = "k8-mark " + (h.ok ? "good" : "bad");
             out.innerHTML = "$ git switch --detach " + h.id + " &nbsp;then&nbsp; python check.py → <b>" + (h.ok ? "balance OK" : "fails by " + int(Math.abs(h.R.balance)) + " MWh") + "</b> (gas " + int(h.R.gasMWh) + " MWh).";
             LX.store.set("k8-hunt", { checks: n });
@@ -927,41 +933,57 @@
       { t: "The data file changed", ok: false, why: "Only model.py changed in this commit." },
       { t: "The gas cost changed", ok: false, why: "params.yml is untouched; the MWh changed, not the price." }];
     steps.push({
-      text: "Read what commit 4 changed with git diff. What went wrong? Then fix it with git revert, which adds a new commit that undoes it.",
+      text: "Read what commit 4 changed with git diff: what went wrong? Then go back to main and fix it with git revert, which adds a new commit that undoes commit 4.",
       build: function (act, api) {
-        var r = stepStart(S, 4, chosen.msg), d = diffText(S.team.commits[S.ids.c3].tree, S.team.commits[S.ids.c4].tree), right = false;
+        var r0 = stepStart(S, 4, chosen.msg), dx = detach(r0, lastDetached || S.ids.c4), r = dx.err ? r0 : dx.repo;
+        var d = diffText(S.team.commits[S.ids.c3].tree, S.team.commits[S.ids.c4].tree), right = false;
         H("p", { class: "k8-mono k8-cmdline", text: "$ git diff " + S.ids.c3 + " " + S.ids.c4 }, act);
         diffView(act, d);
         textAlt(act, "Text version of the diff", diffAlt(d));
         var row = H("div", { class: "lx-qbtns k8-choices", role: "group", "aria-label": "What went wrong?" }, act);
-        var g = GitStage(act, { only: ["h"] }), bRev;
+        var prog = H("p", { class: "k8-prog", "aria-live": "polite" }, act);
+        var g = GitStage(act, { only: ["h"] }), bRev, bMain;
+        function upd() {
+          var onMain = r.head.branch === "main";
+          bMain.disabled = onMain; bRev.disabled = !(right && onMain) || revDone;
+          var left = [right ? null : "name what went wrong", onMain ? null : "git switch main (step 5 left you on a detached HEAD at " + headId(r) + ", on no branch)", revDone ? null : "git revert " + S.ids.c4].filter(Boolean);
+          prog.textContent = left.length ? "Still to do: " + left.join("; ") + "." : "All done: Next is open.";
+        }
+        var revDone = false;
         CHOICES.forEach(function (c) {
           var b = H("button", { type: "button", class: "lx-choice", text: c.t }, row);
           b.addEventListener("click", function () {
             row.querySelectorAll("button").forEach(function (x) { x.classList.remove("right", "wrong"); });
             b.classList.add(c.ok ? "right" : "wrong");
-            if (c.ok) { right = true; bRev.disabled = false; api.saw("−(wind − solar) is −wind **+ solar**: " + int(R1.solarMWh) + " MWh of solar counted twice over, " + int(Math.abs(bugR.balance)) + " MWh too much gas. Now run git revert."); }
+            if (c.ok) { right = true; upd(); api.saw("−(wind − solar) is −wind **+ solar**: " + int(R1.solarMWh) + " MWh of solar counted twice over, " + int(Math.abs(bugR.balance)) + " MWh too much gas. Now switch to main and revert."); }
             else api.saw(c.why, true);
           });
         });
         g.draw(r);
+        bMain = g.button("git switch main", function () {
+          var x = switchTo(r, "main");
+          if (x.err) { g.say("git switch main", ["error: " + x.err]); return; }
+          r = x.repo; g.say("git switch main", ["Switched to branch 'main'"]); g.draw(r); upd();
+        });
         bRev = g.button("git revert " + S.ids.c4, function () {
+          if (r.head.branch !== "main") return;   // never on a detached HEAD: the fix would land on no branch
           var x = revert(r, S.ids.c4);
           if (x.err) { g.say("git revert " + S.ids.c4, ["error: " + x.err]); return; }
-          r = x.repo; bRev.disabled = true;
+          r = x.repo; revDone = true; upd();
           g.say("git revert " + S.ids.c4, ["[main " + x.id + '] Revert "' + MSG.c4 + '"', " 1 file changed, 1 insertion(+), 1 deletion(-)"]); g.draw(r);
           api.done(); api.saw("The new commit " + x.id + " undoes commit 4: " + int(R1.gasMWh) + " MWh and a passing check. The history keeps both, so anyone can see what happened.");
         });
-        bRev.disabled = true;
-        finish[5] = function () { row.querySelector("button").click(); bRev.click(); };
+        upd();
+        finish[5] = function () { row.querySelector("button").click(); bMain.click(); bRev.click(); };
         void right;
       }
     });
 
     // ---- step 7: a notebook's hidden state
     steps.push({
-      text: "A [[notebook|notebook]] runs code in cells, one at a time; its [[notebook-kernel|kernel]] keeps the variables in memory. Run cells 1 to 4, change cell 2 to $" + HIGH + ", run only cell 4. Then restart and run all.",
+      text: "A [[notebook|notebook]] runs code in cells, one at a time, and its [[notebook-kernel|kernel]] keeps the variables in memory. See what that memory can do to an output.",
       build: function (act, api) {
+        H("p", { class: "k8-prog", html: "<b>Try.</b> Run cells 1 to 4. Change cell 2 to " + HIGH + " and run only cell 4. Then restart and run all." }, act);
         // saw: what the reader actually made cell 4 show (a stale number, or an error); the feedback is built from it
         var nb = nbNew(), saw = null, after = null, focusKey = null;
         var wrap = H("div", { class: "k8-nb" }, act), mem = H("p", { class: "k8-mem", "aria-live": "polite" }, act), prog = H("p", { class: "k8-prog" }, act);
@@ -1013,7 +1035,7 @@
     // step 9 clones and runs
     var fixedKeys = null;   // null until step 8 is built in this visit (step 9 then uses all five fixes)
     steps.push({
-      text: "The project now has a notebook, day.ipynb: step 7's cells (gas cost $40), a test draw and a balance check. It runs on your laptop. Fix, one by one, five things that would stop it on a stranger's.",
+      text: "The project now has a notebook, day.ipynb, with step 7's cells, a test draw and a balance check; it runs on your laptop. Fix, one by one, five things that would stop it on a stranger's.",
       build: function (act, api) {
         var list = H("ol", { class: "k8-fixes" }, act), prog = H("p", { class: "k8-prog", "aria-live": "polite" }, act), shown = 0;
         function show() {
@@ -1050,6 +1072,7 @@
           if (X) return X.ok ? "The notebook in the fresh copy: cell 3 gives <b>" + int(X.mem.gas_mwh) + " MWh</b> of electricity from gas, cell 4 shows <b>" + X.cells[3].out + "</b> (dollars), cell 6 prints <b>" + LX.esc(X.cells[5].stdout[0]) + "</b>." : "The notebook stopped: <b>" + LX.esc(X.error) + "</b>";
           return cloned ? "A fresh copy, nothing installed or run yet." : "Your project, committed and ready to share.";
         } });
+        H("p", { class: "k8-prog", html: "<b>pip</b> installs Python packages, ready-made code libraries, from the list in requirements.txt; a pin such as pandas==2.2.3 asks for one exact version. <b>nbconvert</b> runs a notebook without a browser." }, act);
         var CMD = ["git clone ../prairie-day fresh-copy && cd fresh-copy", "pip install -r requirements.txt", "jupyter nbconvert --to notebook --execute day.ipynb"];
         g.draw(F);
         var bs = CMD.map(function (c, i) {
@@ -1153,7 +1176,7 @@
   // item", focus goes to the new item's first button or box
   function drillView(S) {
     var host = document.getElementById("k8-drill"); if (!host) return; host.innerHTML = "";
-    LX.Drill(host, { hint: "Seven kinds of item in rotation, new details each time, about two minutes each. Fifteen items take about 30 minutes.",
+    LX.Drill(host, { hint: "Six kinds of item in rotation, new details each time, about two minutes each. Fifteen items take about 30 minutes.",
                      focus: "answer", width: "8em", choicesClass: "k8-choices", unit: function (it) { return it.unit === "$" ? "dollars" : "checks"; },
                      item: function (k, r) { return drillItem(S, k, r); } });
   }

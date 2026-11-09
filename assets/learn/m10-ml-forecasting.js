@@ -219,7 +219,8 @@
     var li = [
       "Split by time: train on " + F.P.train.length.toLocaleString("en-US") + " hours (8 January to 30 September 2025), choose on October (" + F.P.val.length + " hours), test once on November (" + F.P.test.length + ").",
       "On October, same hour yesterday misses by " + mw(b.day.val.mae) + " on average (MAPE " + pc(b.day.val.mape) + "); same hour last week by " + mw(b.week.val.mae) + "; the latest hour held flat by " + mw(b.persist.val.mae) + ".",
-      "Persistence error, issued every hour from the reading h hours earlier, in % of each series' 2025 maximum, at 1 and 12 hours ahead: demand " + F.horizon.demand[0].toFixed(1) + " and " + F.horizon.demand[3].toFixed(1) + "; wind " + F.horizon.wind[0].toFixed(1) + " and " + F.horizon.wind[3].toFixed(1) + "; solar " + F.horizon.solar[0].toFixed(1) + " and " + F.horizon.solar[3].toFixed(1) + ". Solar is zero in " + F.solarZeros + " of " + F.P.val.length + " October hours.",
+      "Persistence (the reading h hours earlier, issued every hour), October error in % of each series' 2025 maximum, 1 and 12 hours ahead: demand " + F.horizon.demand[0].toFixed(1) + " and " + F.horizon.demand[3].toFixed(1) + "; wind " + F.horizon.wind[0].toFixed(1) + " and " + F.horizon.wind[3].toFixed(1) + "; solar " + F.horizon.solar[0].toFixed(1) + " and " + F.horizon.solar[3].toFixed(1) + ".",
+      "Solar is zero in " + F.solarZeros + " of " + F.P.val.length + " October hours of the cleaned series, which sets night hours to zero.",
       "The best of 16 feature mixes on October: " + mixName(F.best.use) + ", " + mw(F.best.val) + ", " + pc(F.skillVal) + " better than same hour yesterday.",
       "Leaks: adding the hour before scores " + mw(F.leakVal.lag1) + " on October, adding the day's actual average " + mw(F.leakVal.oracle) + "; at 00:00 neither is known for every hour of the day.",
       "November, opened once: " + mw(F.best.test) + " against " + mw(b.day.test.mae) + " for same hour yesterday (" + pc(F.skillTest) + " better).",
@@ -351,12 +352,14 @@
         var seen = {}, keys = ["demand", "wind", "solar"], lab = { demand: "Demand", wind: "Wind", solar: "Solar" }, Hs = D.horizons;
         seg(rowEl(act), keys.map(function (k) { return lab[k]; }), -1, function (i) { seen[keys[i]] = 1; draw(); }, "Target");
         var P3 = LX.Plot(act, { text: "Text version of the chart" }), out = readout(act);
+        H("p", { class: "lx-hint", text: "Solar's zeros: the cleaned series sets night hours to zero (data note)." }, act);
         function draw() {
           var ks = keys.filter(function (k) { return seen[k]; });
           P3.render({ x: { min: 0, max: 24, ticks: Hs.map(function (h, j) { return [h, h + " h", j === Hs.length - 1 ? "end" : "middle"]; }) }, y: { min: 0, max: 50, step: 10, fmt: function (v) { return v + "%"; }, unit: "% of max" }, height: 210, heightN: 190,
                      lines: ks.map(function (k) { return { pts: Hs.map(function (h, j) { return [h, F.horizon[k][j]]; }), color: COL[k], dots: true }; }), legend: ks.map(function (k) { return { label: lab[k], color: COL[k] }; }),
                      aria: "October: mean absolute error of a forecast issued every hour that holds the reading h hours earlier, by hours ahead h, in % of each series' 2025 maximum.",
-                     text: { head: ["Hours ahead (issued every hour)"].concat(ks.map(function (k) { return lab[k]; })), rows: Hs.map(function (h, j) { return [String(h)].concat(ks.map(function (k) { return F.horizon[k][j].toFixed(1) + "%"; })); }) } });
+                     text: { head: ["Hours ahead (issued every hour)"].concat(ks.map(function (k) { return lab[k]; })), rows: Hs.map(function (h, j) { return [String(h)].concat(ks.map(function (k) { return F.horizon[k][j].toFixed(1) + "%"; })); }),
+                             note: "October MAE as a percentage of each series' 2025 maximum; this is not MAPE." } });
           out.innerHTML = ks.map(function (k) { return lab[k] + ": " + F.horizon[k][0].toFixed(1) + "% at 1 h, " + F.horizon[k][3].toFixed(1) + "% at 12 h, " + F.horizon[k][4].toFixed(1) + "% at 24 h"; }).join("; ") + ".";
           if (ks.length === 3) { api.done(); api.saw("Wind's error grows from " + F.horizon.wind[0].toFixed(1) + "% to " + F.horizon.wind[4].toFixed(1) + "% over a day; solar's falls back at 24 hours, when the sun returns. Solar is zero in " + F.solarZeros + " of " + P.val.length + " October hours, so MAPE cannot score it."); }
           else api.saw("Targets compared: " + ks.length + " of 3.", true);
@@ -463,7 +466,7 @@
           table(tb, ["Width", "80% band holds", "Mean width", "Pinball loss"], F.widths.filter(function (w, j) { return seen[j] || j === W.indexOf(1); }).map(function (w) { return ["× " + w.s, pc(w.b.cov[80]), mw(w.b.width), w.b.pinball.toFixed(1) + " MW"]; }));
           var w = F.widths[i];
           out.innerHTML = "× " + w.s + ": holds <b>" + pc(w.b.cov[80]) + "</b>, pinball loss <b>" + w.b.pinball.toFixed(1) + " MW</b>.";
-          if (user && Object.keys(seen).length >= 3) { api.done(); api.saw("Coverage keeps rising: " + pc(F.widths[W.length - 1].b.cov[80]) + " at × " + W[W.length - 1] + ". Pinball loss is lowest at × " + F.pbBest.s + " (" + F.pbBest.b.pinball.toFixed(1) + " MW) and rises on both sides: it wants bands narrow and honest."); }
+          if (user && Object.keys(seen).length >= 3) { api.done(); api.saw("Coverage keeps rising: " + pc(F.widths[W.length - 1].b.cov[80]) + " at × " + W[W.length - 1] + ". Pinball loss is lowest at × " + F.pbBest.s + " (" + F.pbBest.b.pinball.toFixed(1) + " MW), where the 80% band holds only " + pc(F.pbBest.b.cov[80]) + ": check coverage and pinball loss together."); }
           else if (user) api.saw("Try a few more widths, narrow and wide.", true);
         }
         draw(W.indexOf(1), false);
@@ -548,8 +551,8 @@
       columns: [{ key: "name", label: "Target", main: true }, { key: "base", label: "Hard-to-beat baseline" }, { key: "trap", label: "Trap" }, { key: "here", label: "On this page", phoneHide: true }],
       rows: [
         { key: "load", color: "var(--lx-ink)", name: "Demand", base: "same hour yesterday or last week", trap: "holidays, daylight saving, new large loads", here: "October MAE " + mw(B.day.val.mae) + " (" + pc(B.day.val.mape) + ")" },
-        { key: "wind", color: "var(--lx-wind)", name: "Wind", base: "the latest value, for the next few hours", trap: "curtailment inside the actuals, icing", here: F.horizon.wind[0].toFixed(1) + "% at 1 h, " + F.horizon.wind[4].toFixed(1) + "% at 24 h" },
-        { key: "solar", color: "var(--lx-solar)", name: "Solar", base: "same hour yesterday", trap: "zero at night breaks MAPE; snow, clipping", here: F.solarZeros + " of " + F.P.val.length + " October hours at zero" }
+        { key: "wind", color: "var(--lx-wind)", name: "Wind", base: "the latest value, for the next few hours", trap: "[[curtailment|curtailment]] inside the actuals, icing", here: F.horizon.wind[0].toFixed(1) + "% at 1 h, " + F.horizon.wind[4].toFixed(1) + "% at 24 h" },
+        { key: "solar", color: "var(--lx-solar)", name: "Solar", base: "same hour yesterday", trap: "zero at night breaks MAPE; snow; clipping (output capped by the inverters' rating)", here: F.solarZeros + " of " + F.P.val.length + " October hours at zero" }
       ],
       sorts: [{ label: "As listed", order: ["load", "wind", "solar"], note: "Score each target against its own baseline, at its own horizon." }]
     });

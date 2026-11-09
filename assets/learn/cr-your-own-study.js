@@ -86,9 +86,9 @@
         why: s.alts.length < 2 ? "Pick two alternatives to defend your method against (you have " + s.alts.length + ")." : "Your alternatives are both " + F[s.family] + ": pick one from another family." },
       { id: "fit", label: "A method family that fits the track", ok: T.fits.indexOf(s.family) >= 0,
         why: F[s.family] + " is unusual for " + (T.id === "empirical" ? "an " : "a ") + T.label.toLowerCase() + " study: change the track, or say why in the proposal." },
-      { id: "unc", label: "An uncertainty treatment that fits your method, at the rubric's Proficient level", ok: fits,
-        why: !U.ok ? U.why || "" : U.label + " suits " + (suits.length > 2 ? suits.slice(0, -1).join(", ") + " and " + suits[suits.length - 1] : suits.join(" and ")) +
-          ", not " + F[s.family] + ": pick a treatment that fits your method, or say why in the proposal." },
+      { id: "unc", label: "An uncertainty treatment at the rubric's Proficient level, usually paired with your method", ok: fits,
+        why: !U.ok ? U.why || "" : U.label + " is usually paired with " + (suits.length > 2 ? suits.slice(0, -1).join(", ") + " and " + suits[suits.length - 1] : suits.join(" and ")) +
+          ". It can still suit " + F[s.family] + ": in the proposal, say which uncertain inputs you will vary and how you will analyze their effect." },
       { id: "scale", label: "Your question card at the plan's scale", ok: !!cardScale && cardScale === s.scale,
         why: cardScale ? "Your card says " + cardScale + "; the plan says " + s.scale + ". Make them the same, or change your route."
           : "Your question card has no scale yet: set it in the card below." }
@@ -213,7 +213,8 @@
   function staticExemplars(D) {
     return D.exemplars.map(function (E, k) {
       var o = exOpts(D, k);
-      return '<div class="cr-ex-static"><p class="lx-eyebrow">' + esc(o.title) + '</p><p class="lx-hint">' + CORE.rich(exWhere(D, k)) + ". " + esc(o.task) + " " + esc(o.note) + "</p>\n" + EXS.staticHTML(o) + "</div>";
+      // where, the task and the note as three short elements (each within the text budget)
+      return '<div class="cr-ex-static"><p class="lx-eyebrow">' + esc(o.title) + '</p><p class="lx-hint">' + CORE.rich(exWhere(D, k)) + '.</p><p class="lx-hint"><b>Task:</b> ' + esc(o.task) + '</p><p class="lx-hint">' + esc(o.note) + "</p>\n" + EXS.staticHTML(o) + "</div>";
     }).join("\n");
   }
   function staticRubric(D) { return RB.staticHTML(D.rubric); }
@@ -272,8 +273,11 @@
     H("label", { for: uId, text: "Uncertainty treatment" }, uRow);
     var uSel = H("select", { id: uId }, uRow);
     D.uncertainty.forEach(function (u) { H("option", { value: u.id, text: u.label }, uSel); });
-    uSel.addEventListener("change", function () { st.unc = uSel.value; changed(); });
+    uSel.addEventListener("change", function () { st.unc = uSel.value; paintControls(); changed(); });
     var uMix = H("p", { class: "lx-hint cr-mix", "aria-live": "polite" }, mfs);
+    // the chosen family's and treatment's meaning, under the controls (native options hold plain text)
+    var fDef = H("p", { class: "lx-hint cr-def", "aria-live": "polite", id: fId + "-d" }, fRow), uDef = H("p", { class: "lx-hint cr-def", "aria-live": "polite", id: uId + "-d" }, uRow);
+    fSel.setAttribute("aria-describedby", fDef.id); uSel.setAttribute("aria-describedby", uDef.id);
     var tfs = H("fieldset", { class: "lx-sb-group" }, ctl);
     H("legend", { text: "Time and review" }, tfs);
     var hRow = H("div", { class: "cr-field" }, tfs), hId = LX.uid("cr");
@@ -298,6 +302,9 @@
     function announce(t) { say.textContent = t; }
     function paintControls() {
       cTrack.set(st.track); cScale.set(st.scale); fSel.value = st.family; uSel.value = st.unc; hIn.value = st.hours;
+      var fam = by(R3.families, st.family), U = by(D.uncertainty, st.unc);
+      fDef.innerHTML = fam ? "<b>" + LX.esc(fam.label) + "</b> answers: " + LX.rich(fam.answers) : "";
+      uDef.innerHTML = U && U.def ? LX.rich(U.def) : "";
       D.families.forEach(function (id) { aIn[id].checked = st.alts.indexOf(id) >= 0; aTx[id].textContent = id === st.family ? "Another " + F[id] + " method (name it in the proposal)" : F[id]; });
       D.reviews.forEach(function (r) { rIn[r.id].checked = r.id === st.review; });
     }

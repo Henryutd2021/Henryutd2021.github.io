@@ -3,12 +3,14 @@
    the two sourced numbers) and data/path.json (to link the lessons that are live, and name the rest as upcoming).
    Page: learn/r01-framing.qmd (studio form: Task, Exemplars, Self-check, Sources).
    Task (step cards): sort twenty questions in two rounds into researchable, too vague, already answered and not answerable
-   with the data at hand (LX.CardSort); name the type of the ten researchable ones (the course's five question types); rewrite three vague
+   with the data at hand (LX.CardSort); name the type of the sixteen that are clear enough to type (the course's five question
+   types): researchability and type are separate, so an answered or data-short question keeps its type; rewrite three vague
    questions with an audience, a metric with units and a counterfactual, then compare with an example.
    A rewrite is done when all five parts are written; its example can be opened at any time and does not complete it.
    Exemplars: a weak and a strong card for the same vague question (LX.Exemplars) and the four tests as a flowchart
    (LX.Flowchart, e-flowchart). Self-check: the reader's question card (LX.QuestionCard, started from a rewrite: each
-   rewrite keeps its own card, so switching never mixes two questions), the Framing competence of the course rubric
+   rewrite keeps its own card, so switching never mixes two questions, and a card the reader edited comes back with the
+   edits; "Refresh from the rewrite" takes the rewrite's five parts again), the Framing competence of the course rubric
    (LX.Rubric) and a reusable checklist (LX.Checklist, e-checklist); the myth-or-fact cards (e-myth) are page markup.
    Lesson links follow data/path.json through LX.lessonRef (core.js).
    Node: module.exports = the pure model below (checks, grading, the no-JS version of the task); the test is
@@ -27,10 +29,12 @@
   function plainMarks(t) { return String(t == null ? "" : t).replace(/\[\[[a-z0-9-]+\|([^\]]+)\]\]/g, "$1"); }
   function words(s) { return plainMarks(s).trim().split(/\s+/).filter(Boolean).length; }
   function round(D, n) { return D.questions.filter(function (q) { return q.round === n; }); }
-  function researchable(D) { return D.questions.filter(function (q) { return q.bin === "research"; }); }
-  // the cards of a sort: round 1 or 2 into the four bins, or "types": the researchable ones into the five types
+  // the questions clear enough to type: every one except the too-vague ones, which get a type once rewritten (a question
+  // that is already answered, or that the data at hand cannot answer, still asks for one kind of answer)
+  function typeable(D) { return D.questions.filter(function (q) { return q.bin !== "vague"; }); }
+  // the cards of a sort: round 1 or 2 into the four bins, or "types": the typeable ones into the five types
   function cards(D, which) {
-    if (which === "types") return researchable(D).map(function (q) { return { id: q.id, text: q.text, bin: q.type, why: q.typeWhy }; });
+    if (which === "types") return typeable(D).map(function (q) { return { id: q.id, text: q.text, bin: q.type, why: q.typeWhy }; });
     return round(D, which).map(function (q) { return { id: q.id, text: q.text, bin: q.bin, why: q.why }; });
   }
   // {right, placed, total} for a map {cardId: binId}
@@ -48,16 +52,17 @@
   function filled(v) { return RW_FIELDS.filter(function (k) { return v && String(v[k] || "").trim(); }).length; }
   function hasAny(c) { return Object.keys(c || {}).some(function (k) { return String(c[k] || "").trim(); }); }
   // the question card follows one source at a time: a rewrite ("rw1" ...) or the card the reader typed ("own").
-  // Switching keeps the current card under its source, then builds the new one: a rewrite's five parts from the reader's
-  // rewrite (a blank part stays blank), and the other parts only from that same rewrite's earlier card, never from
-  // another question. Returns { cards, card, from }.
-  function switchCard(cards, from, current, to, v) {
+  // Switching keeps the current card under its source, then builds the new one. A rewrite's card already started comes
+  // back whole, with the reader's edits to its question, metric or any other part; a rewrite's first card takes its five
+  // parts from the reader's rewrite (a blank part stays blank). refresh: take the rewrite's five parts again, keeping the
+  // other parts. Nothing ever comes from another question's card. Returns { cards, card, from }.
+  function switchCard(cards, from, current, to, v, refresh) {
     var out = {}, card = {};
     Object.keys(cards || {}).forEach(function (k) { out[k] = cards[k]; });
     if (hasAny(current)) out[from || "own"] = JSON.parse(JSON.stringify(current));
-    var kept = out[to] || {};
+    var kept = out[to] || {}, started = RW_FIELDS.some(function (k) { return String(kept[k] || "").trim(); });
     EXTRA.concat(RW_FIELDS).forEach(function (k) { card[k] = String(kept[k] || ""); });
-    if (to !== "own") RW_FIELDS.forEach(function (k) { card[k] = String((v && v[k]) || "").trim(); });
+    if (to !== "own" && (refresh || !started)) RW_FIELDS.forEach(function (k) { card[k] = String((v && v[k]) || "").trim(); });
     return { cards: out, card: card, from: to };
   }
   // a rewrite's feedback, in separate pieces: progress (a count), a short guidance line, and (last rewrite) what comes next
@@ -75,8 +80,9 @@
     D.questions.forEach(function (q) {
       if (ids[q.id]) out.push(q.id + ": repeated id"); ids[q.id] = true;
       if (BIN_IDS.indexOf(q.bin) < 0) out.push(q.id + ": unknown bin " + q.bin);
-      if (q.bin === "research" && TYPE_IDS.indexOf(q.type) < 0) out.push(q.id + ": researchable without a type");
-      if (q.bin !== "research" && q.type) out.push(q.id + ": a type on a question that is not researchable");
+      if (q.bin !== "vague" && TYPE_IDS.indexOf(q.type) < 0) out.push(q.id + ": a question clear enough to type, without a type");
+      if (q.bin !== "vague" && !q.typeWhy) out.push(q.id + ": a type without its reason");
+      if (q.bin === "vague" && q.type) out.push(q.id + ": a type on a question too vague to type (it gets one once rewritten)");
       if (!/\?$/.test(q.text)) out.push(q.id + ": not a question");
       if (words(q.text) > 26) out.push(q.id + ": question over 26 words");
       if (words(q.why) > 30 || (q.typeWhy && words(q.typeWhy) > 20)) out.push(q.id + ": a reason over the text budget");
@@ -89,10 +95,10 @@
     D.bins.forEach(function (b) { B[b.id] = b.label; });
     (types || []).forEach(function (t) { T[t.id] = t.label; });
     var h = ['<details class="lx-textalt"><summary>The twenty questions, sorted, with reasons</summary>',
-      '<div class="lx-scroll-x"><table class="lx-facts"><thead><tr><th scope="col">Question</th><th scope="col">Where it goes</th><th scope="col">Why</th></tr></thead><tbody>'];
+      '<div class="lx-scroll-x"><table class="lx-facts"><thead><tr><th scope="col">Question</th><th scope="col">Where it goes</th><th scope="col">Why</th><th scope="col">Its type</th></tr></thead><tbody>'];
     D.questions.forEach(function (q) {
-      h.push("<tr><td>" + esc(q.text) + "</td><td>" + esc(B[q.bin]) + (q.type ? " · " + esc((T[q.type] || q.type).toLowerCase()) : "") + "</td><td>"
-        + rich(q.why) + (q.typeWhy ? " " + rich(q.typeWhy) : "") + "</td></tr>");
+      h.push("<tr><td>" + esc(q.text) + "</td><td>" + esc(B[q.bin]) + "</td><td>" + rich(q.why) + "</td><td>"
+        + (q.typeWhy ? rich(q.typeWhy) : "Typed once rewritten") + "</td></tr>");
     });
     h.push("</tbody></table></div>");
     Object.keys(D.terms || {}).forEach(function (k) { h.push('<p class="lx-hint">Words in round ' + esc(k) + ": " + rich(D.terms[k]) + "</p>"); });
@@ -162,6 +168,7 @@
     return function (act, api) {
       var list = cards(D, which), key = "r1-sort-" + which, placed = LX.store.get(key, {}) || {};
       var bins = which === "types" ? typeBins() : D.bins;
+      if (opt.hint) H("p", { class: "lx-hint r1-terms", html: LX.rich(opt.hint) }, act);
       if (D.terms && D.terms[which]) H("p", { class: "lx-hint r1-terms", html: "Words in these questions: " + LX.rich(D.terms[which]) }, act);
       var cs = LX.CardSort(act, { bins: bins, cards: list, maxWhy: 10, checkLabel: "Check my sort", cls: "r1-sort",
         onCheck: function (g) { LX.store.set(key, placed); report(g); } });
@@ -277,25 +284,35 @@
     var qc = LX.QuestionCard(qcHost, { id: "r1-card", code: "R1", fix: fix });
     // each rewrite keeps its own card (r1-cards), so a card never mixes parts of two questions
     var cards = LX.store.get("r1-cards", {}) || {}, from = LX.store.get("r1-card-from", null);
-    function go(to, v, done) {
-      var s = switchCard(cards, from, qc.get(), to, v);
+    function go(to, v, done, refresh) {
+      var s = switchCard(cards, from, qc.get(), to, v, refresh);
       cards = s.cards; from = s.from;
       LX.store.set("r1-cards", cards); LX.store.set("r1-card-from", from);
       qc.set(s.card); paintOwn(); msg.textContent = done;
     }
+    function rwOf(id) { return (LX.store.get("r1-rewrites", {}) || {})[id] || {}; }
     D.rewrites.forEach(function (r, i) {
       var b = H("button", { class: "lx-btn ghost small", type: "button", text: "Start from rewrite " + (i + 1) }, load);
       b.addEventListener("click", function () {
         var v = (LX.store.get("r1-rewrites", {}) || {})[r.id] || {};
         if (!filled(v)) { msg.textContent = "Rewrite " + (i + 1) + " is still empty: write it in the task above first."; return; }
         var back = !!cards[r.id] && hasAny(cards[r.id]);
-        go(r.id, v, "Rewrite " + (i + 1) + " is on the card" + (back ? ", with the parts you added to it before" : ", on a fresh card")
-          + ". Your other cards are kept.");
+        go(r.id, v, back ? "Rewrite " + (i + 1) + "'s card is back, with your edits. Your other cards are kept."
+          : "Rewrite " + (i + 1) + " is on a fresh card. Your other cards are kept.");
       });
     });
     var own = H("button", { class: "lx-btn ghost small", type: "button", text: "Back to the card you typed", hidden: true }, load);
     own.addEventListener("click", function () { go("own", null, "Your own card is back."); });
-    function paintOwn() { own.hidden = !(cards.own && hasAny(cards.own) && from !== "own"); }
+    // an explicit action, never a side effect of switching: the rewrite's current five parts replace the card's
+    var fresh = H("button", { class: "lx-btn ghost small", type: "button", text: "Refresh from the rewrite", hidden: true }, load);
+    fresh.addEventListener("click", function () {
+      var k = D.rewrites.map(function (r) { return r.id; }).indexOf(from); if (k < 0) return;
+      go(from, rwOf(from), "The five parts of rewrite " + (k + 1) + " are on the card again; its other parts are kept.", true);
+    });
+    function paintOwn() {
+      own.hidden = !(cards.own && hasAny(cards.own) && from !== "own");
+      fresh.hidden = !from || from === "own" || !filled(rwOf(from));
+    }
     paintOwn();
     load.appendChild(msg);
     LX.Rubric(H("div", { class: "lx-xcard" }, host), D.rubric);
@@ -309,12 +326,12 @@
     injectCSS();
     var D = data.r01_framing, P = data.path;
     var steps = [
-      { text: "Sort ten questions into four bins. Researchable means specific, still open, and answerable with data you could get. Tap a question, then its bin.",
-        build: sortStep(D, 1, { saw: function (g) { return "You placed " + g.right + " of " + g.total + " where a researcher would. Open the reasons above: a few questions sit near a border, and the reason matters more than the bin."; } }) },
+      { text: "Sort ten questions into four bins: tap a question, then its bin.",
+        build: sortStep(D, 1, { hint: "Researchable means specific, still open, and answerable with data you could get.", saw: function (g) { return "You placed " + g.right + " of " + g.total + " where a researcher would. Open the reasons above: a few questions sit near a border, and the reason matters more than the bin."; } }) },
       { text: "Ten more. Watch for questions that name data which cannot show the answer: yearly totals for an hourly question, one year for a trend.",
-        build: sortStep(D, 2, { saw: function (g) { return "You placed " + g.right + " of " + g.total + " where a researcher would. Of the twenty, ten are researchable: next, name their types."; } }) },
-      { text: "Name the [[question-type|type]] of each researchable question. The type sets the kind of answer, and so which methods can give it.",
-        build: sortStep(D, "types", { saw: function (g) { return "You typed " + g.right + " of " + g.total + " as a researcher would; there are two of each type. Optimization is often used for prescriptive questions, alongside decision analysis and multi-criteria methods; it also supports other analyses."; } }) },
+        build: sortStep(D, 2, { saw: function (g) { return "You placed " + g.right + " of " + g.total + " where a researcher would. Next, name the types of every question that is not too vague."; } }) },
+      { text: "Name the [[question-type|type]] of each question, except the too-vague ones: they get a type once rewritten. The type sets the kind of answer, and so which methods can give it.",
+        build: sortStep(D, "types", { hint: "Optimization is often used for prescriptive questions, alongside decision analysis and multi-criteria methods; it also supports other analyses.", saw: function (g) { return "You typed " + g.right + " of " + g.total + " as a researcher would. An answered question, or one the data cannot answer, keeps its type: researchability is a separate test."; } }) },
       { text: "Now rewrite a vague question so it could be researched: an audience, a metric with units and a [[counterfactual|counterfactual]]. Then compare with an example.",
         build: rewriteStep(D, 0) },
       { text: "Next: worth what, to whom, over how long, compared with which heating? Same five parts, then compare.",

@@ -149,13 +149,13 @@
     "hoursShort": 0,
     "spilledShare": 0.07511,
     "shares": {
-     "wind": 0.661827,
-     "solar": 0.158766,
+     "wind": 0.661833,
+     "solar": 0.15876,
      "nuc": 0,
      "gas": 0.179407
     },
     "gas": 0.179407,
-    "largest": 0.661827,
+    "largest": 0.661833,
     "rm": 0.877194,
     "fair": {
      "fixed": 0.342725,
@@ -187,13 +187,13 @@
     "hoursShort": 0,
     "spilledShare": 0.07511,
     "shares": {
-     "wind": 0.661828,
-     "solar": 0.158765,
+     "wind": 0.661833,
+     "solar": 0.15876,
      "nuc": 0,
      "gas": 0.179407
     },
     "gas": 0.179407,
-    "largest": 0.661828,
+    "largest": 0.661833,
     "rm": 0.699416,
     "fair": {
      "fixed": 0.342579,
@@ -301,13 +301,13 @@
     "hoursShort": 0,
     "spilledShare": 0.013147,
     "shares": {
-     "wind": 0.354269,
-     "solar": 0.125151,
-     "nuc": 0.31956,
+     "wind": 0.35427,
+     "solar": 0.125149,
+     "nuc": 0.319561,
      "gas": 0.201019
     },
     "gas": 0.201019,
-    "largest": 0.354269,
+    "largest": 0.35427,
     "rm": 0.550454,
     "fair": {
      "fixed": 0.340494,
@@ -375,13 +375,13 @@
     "hoursShort": 0,
     "spilledShare": 0.315405,
     "shares": {
-     "wind": 0.73451,
-     "solar": 0.232341,
+     "wind": 0.734531,
+     "solar": 0.23232,
      "nuc": 0,
      "gas": 0.033149
     },
     "gas": 0.033149,
-    "largest": 0.73451,
+    "largest": 0.734531,
     "rm": 1.372838,
     "fair": {
      "fixed": 0.346038,

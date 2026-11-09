@@ -415,13 +415,13 @@ ul.task-list li input[type="checkbox"] {
 <div class="lx-case-part"><p class="lx-eyebrow">2 · The question in one sentence</p><p class="lx-case-q">Can <span class="lx-term" data-term="multi-fidelity">multi-fidelity</span> <span class="lx-term" data-term="gaussian-process">Gaussian process</span> regression, combining a theoretical power curve with limited measured data, improve probabilistic wind turbine power-curve estimation?</p><p class="lx-hint">Question type: predictive (what power, with what uncertainty?), with an evaluative part (better than records alone?).</p></div>
 <div class="lx-case-part"><p class="lx-eyebrow">3 · Scale and boundary</p><ul><li><b>Inside:</b> one wind farm's measured operating records (<span class="lx-term" data-term="scada">SCADA</span>) from the open <span class="lx-term" data-term="sdwpf">SDWPF</span> dataset, and the theoretical power curve of the turbine type; point scores for nine test turbines, probabilistic scores for one.</li><li><b>Left out:</b> other wind farms, other datasets and other theoretical curves.</li></ul></div>
 <div class="lx-case-part"><p class="lx-eyebrow">4 · Decisions, goal and rules, in words</p><ul><li><b>Decisions:</b> which few hundred measured points to train on, drawn from a <span class="lx-term" data-term="kernel-density-estimate">kernel density estimate</span> of the records, and how to link the theoretical curve to them: a linear or a nonlinear multi-fidelity model.</li><li><b>Goal:</b> a power curve given as a probability distribution, not a single line.</li><li><b>Rules:</b> every model is scored on the same turbines, with point metrics (such as <span class="lx-term" data-term="rmse">RMSE</span>) and probabilistic metrics (<span class="lx-term" data-term="pinball-loss">pinball loss</span>, <span class="lx-term" data-term="sharpness">sharpness</span>, <span class="lx-term" data-term="calibration">reliability</span>).</li></ul><p class="lx-hint">Scores: RMSE, the typical size of a miss; pinball loss, a charge for misses and for width; sharpness, how narrow a band is; reliability, whether a 90% band holds about 90% of new measurements.</p></div>
-<div class="lx-case-part wide"><p class="lx-eyebrow">5 · Data and method</p><ul><li>Linear (autoregressive) and nonlinear multi-fidelity Gaussian process regression fuse the turbine type's theoretical power curve (low fidelity) with a few hundred kernel-density-sampled SCADA points from the open SDWPF dataset (high fidelity), and are compared with single-fidelity regression on point and probabilistic metrics.</li><li>The kernel density sample keeps the shape of the scatter without manual cleaning; a compact training set matters because a Gaussian process solve grows with the cube of the training points.</li></ul></div>
+<div class="lx-case-part wide"><p class="lx-eyebrow">5 · Data and method</p><ul><li>Linear (<span class="lx-term" data-term="autoregressive-fusion">autoregressive</span>) and nonlinear multi-fidelity Gaussian process regression fuse the turbine type's theoretical power curve (low fidelity) with a few hundred kernel-density-sampled SCADA points from the open SDWPF dataset (high fidelity), and are compared with single-fidelity regression on point and probabilistic metrics.</li><li>The kernel density sample keeps the shape of the scatter without manual cleaning; a compact training set matters because a Gaussian process solve grows with the cube of the training points.</li></ul></div>
 <div class="lx-case-part wide"><p class="lx-eyebrow">6 · What came out, and where it holds</p>
 <blockquote class="lx-excerpt blockquote" data-source="excerpt:uq-mfgpr"><p>In the reported nine-turbine test, nonlinear multi-fidelity regression achieved lower RMSE for most turbines; performance depended on the evaluation metric.</p><p>The probabilistic multi-fidelity model was also able to generate confidence intervals that encompassed the measured power.</p><footer>From: <a href="https://doi.org/10.1115/detc2023-114762">Li et al., ASME IDETC 2023</a>.</footer></blockquote>
 <p class="lx-hint">Holds when: one wind farm in one open dataset, one generic theoretical curve, and about two hundred sampled measurements; probabilistic scores for one turbine. Leaves out: other wind farms and datasets.</p></div>
 <div class="lx-case-part wide"><p class="lx-eyebrow">Related project · uncertainty at plants without measurements</p>
 <details class="lx-deeper cf8-related"><summary><span class="k">Optional</span>Read its question and method</summary><div class="lx-deeper-body">
-<blockquote class="lx-excerpt blockquote" data-source="excerpt:wind-uq"><p>In a research project (2022–2023), the course author worked on this question: can uncertainty metrics of a wind power model's inputs (weather data products, forecast ensembles and turbine-level data) predict calibrated plant-level power uncertainty at wind plants that have no power measurements?</p><p>The course author developed the surrogate-modeling workflow: calibrated uncertainty targets, surrogate models and validation on held-out plants.</p><p>Inputs: uncertainty metrics of four kinds: how a series varies over time (moving windows), how data sources disagree, how widely a forecast ensemble spreads, and how values vary across a plant's turbines (a <span class="lx-term" data-term="variogram">variogram</span>).</p><p>Targets: at plants with power measurements, the scale of a predictive distribution around the point forecast, chosen to minimize pinball loss.</p><p>Surrogates: Gaussian process regression and other regressors learn a mapping from the metrics to that scale, then predict probabilistic power at plants without measurements.</p><p>Validation holds out whole plants, scored with pinball loss, <span class="lx-term" data-term="crps">CRPS</span> and reliability, with recalibration of the predictive distributions.</p><p>The project has no paper. The public framework is a fresh implementation tested on synthetic data; project data and results are not public.</p><footer>This work was developed based upon funding from the Alliance for Sustainable Energy, LLC, Managing and Operating Contractor for the National Renewable Energy Laboratory for the U.S. Department of Energy.</footer></blockquote>
+<blockquote class="lx-excerpt blockquote" data-source="excerpt:wind-uq"><p>In a research project (2022–2023), the course author worked on this question: can uncertainty metrics of a wind power model's inputs (weather data products, forecast ensembles and turbine-level data) predict calibrated plant-level power uncertainty at wind plants that have no power measurements?</p><p>The course author developed the surrogate-modeling workflow: calibrated uncertainty targets, surrogate models and validation on held-out plants.</p><p>Inputs: uncertainty metrics of four kinds: how a series varies over time (moving windows), how data sources disagree, how widely a forecast ensemble spreads, and how values vary across a plant's turbines (a <span class="lx-term" data-term="variogram">variogram</span>).</p><p>Targets: at plants with power measurements, the scale of a predictive distribution around the point forecast, chosen to minimize pinball loss.</p><p><span class="lx-term" data-term="surrogate-model">Surrogates</span>: Gaussian process regression and other regressors learn a mapping from the metrics to that scale, then predict probabilistic power at plants without measurements.</p><p>Validation holds out whole plants, scored with pinball loss, <span class="lx-term" data-term="crps">CRPS</span> and reliability, with recalibration of the predictive distributions.</p><p>The project has no paper. The public framework is a fresh implementation tested on synthetic data; project data and results are not public.</p><footer>This work was developed based upon funding from the Alliance for Sustainable Energy, LLC, Managing and Operating Contractor for the National Renewable Energy Laboratory for the U.S. Department of Energy.</footer></blockquote>
 </div></details>
 <p class="lx-hint">Question and method only: no results.</p></div>
 </div>
@@ -433,7 +433,7 @@ ul.task-list li input[type="checkbox"] {
 
 </div>
 </div>
-<p class="lx-datanote"><span>Every result about the studies is quoted from the published paper and the public framework named in the sources. The toy below uses lesson M9's illustrative turbine.</span></p>
+<p class="lx-datanote"><span>The toy below uses lesson M9's illustrative turbine.</span></p>
 </div>
 <div id="explain" class="lx-sec">
 <section id="the-idea-behind-it-then-where-the-result-holds" class="level2 lx-sec-h">
@@ -448,8 +448,8 @@ ul.task-list li input[type="checkbox"] {
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th" scope="col">Records</th>
-<th data-quarto-table-cell-role="th" scope="col">One source</th>
-<th data-quarto-table-cell-role="th" scope="col">Two sources</th>
+<th data-quarto-table-cell-role="th" scope="col">Measured records only</th>
+<th data-quarto-table-cell-role="th" scope="col">Records + maker's curve</th>
 </tr>
 </thead>
 <tbody>
@@ -480,7 +480,7 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 </tbody>
 </table>
-</div><p class="lx-eyebrow">How the capacity factor is averaged (the maker's curve)</p><p class="lx-hint">Capacity factor = the sum, over wind speeds, of share of the year's hours × power, divided by the 2,000 kW rating. Every curve on this page is averaged the same way.</p><p class="lx-hint">The wind-speed mix is an illustrative Weibull (k = 2, c = 8 m/s), the same for every curve; output below 3 m/s and above 20 m/s (0.2% of hours) counts as zero.</p><div class="lx-scroll-x">
+</div><p class="lx-eyebrow">How the capacity factor is averaged (the maker's curve)</p><p class="lx-hint">Capacity factor = the sum, over wind speeds, of share of the year's hours × power, divided by the 2,000 kW rating. Every curve on this page is averaged the same way.</p><p class="lx-hint">The wind-speed mix, the share of the year's hours at each speed, is an illustrative <span class="lx-term" data-term="weibull">Weibull distribution</span>: shape k = 2 (no unit), scale c = 8 m/s, the same for every curve.</p><p class="lx-hint">Output below 3 m/s and above 20 m/s (0.2% of hours) counts as zero.</p><div class="lx-scroll-x">
 <table class="lx-mini-table cf8-bins caption-top table">
 <caption>Rounded; the total is summed in 0.1 m/s steps before rounding</caption>
 <thead>
@@ -500,33 +500,33 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 <tr class="even">
 <th data-quarto-table-cell-role="th" scope="row">3–5 m/s</th>
-<td class="n">18.7%</td>
-<td class="n">56 kW</td>
-<td class="n">0.5</td>
+<td class="n">19.2%</td>
+<td class="n">58 kW</td>
+<td class="n">0.6</td>
 </tr>
 <tr class="odd">
 <th data-quarto-table-cell-role="th" scope="row">5–7 m/s</th>
 <td class="n">21.2%</td>
-<td class="n">253 kW</td>
-<td class="n">2.7</td>
+<td class="n">260 kW</td>
+<td class="n">2.8</td>
 </tr>
 <tr class="even">
 <th data-quarto-table-cell-role="th" scope="row">7–9 m/s</th>
-<td class="n">18.4%</td>
-<td class="n">637 kW</td>
+<td class="n">18.3%</td>
+<td class="n">649 kW</td>
 <td class="n">5.9</td>
 </tr>
 <tr class="odd">
 <th data-quarto-table-cell-role="th" scope="row">9–11 m/s</th>
-<td class="n">13.2%</td>
-<td class="n">1,268 kW</td>
+<td class="n">13.1%</td>
+<td class="n">1,288 kW</td>
 <td class="n">8.4</td>
 </tr>
 <tr class="even">
 <th data-quarto-table-cell-role="th" scope="row">11–13 m/s</th>
-<td class="n">8.1%</td>
-<td class="n">1,952 kW</td>
-<td class="n">7.9</td>
+<td class="n">8.0%</td>
+<td class="n">1,960 kW</td>
+<td class="n">7.8</td>
 </tr>
 <tr class="odd">
 <th data-quarto-table-cell-role="th" scope="row">13–15 m/s</th>
@@ -564,6 +564,7 @@ ul.task-list li input[type="checkbox"] {
 <ol class="ex-fallback lx-ex-static"><li>A Gaussian process fitted to a few measured points is uncertain wherever the points are sparse, so its band widens between them.</li><li>A multi-fidelity model also learns from the turbine's theoretical power curve, which covers every wind speed, and uses it to fill in the shape between measurements, so the band can narrow there.</li><li>In the paper's test, the result depended on the evaluation metric.</li></ol>
 </div>
 <p class="lx-hint">A separate example with synthetic numbers, from the course author's open explainer: not the study's data or results.</p>
+<p class="lx-hint">Its bands, like the toy's, describe uncertainty about the average curve. A band for one new measurement must also hold measurement and operating scatter, so it is wider.</p>
 
 <details class="lx-textalt"><summary>Text version of the explainer: its synthetic turbine at the slider's start, 5 measured points</summary><div class="cf8-ex-table"><p class="lx-hint">From the explainer's own synthetic data: estimates and 95% bands of the curve at each region's centre, in kW.</p><div class="lx-scroll-x">
 <table class="lx-mini-table cf8-ex caption-top table">
@@ -608,7 +609,7 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 </tbody>
 </table>
-</div></div></details>
+</div><p class="lx-hint">These statistical bands do not know that power has limits: they can reach below zero or above the rating, as at 0–5 m/s.</p></div></details>
 
 </div>
 <div id="cf8-explain" class="lx-xgrid">
@@ -653,21 +654,24 @@ ul.task-list li input[type="checkbox"] {
 </div>
 <div class="lx-quiz" data-quiz="cf8">
 <div class="lx-qq" data-id="score" data-answer="b">
-<p class="lx-qtext">Invented numbers, not the study's: two “90%” bands for one turbine are scored on the same 100 new measurements. Band A is 150 kW wide on average and holds 62 of them; band B is 300 kW wide and holds 89. Which is better?</p>
-<ul class="lx-choices"><li data-value="a">A: a narrower band is always better</li><li data-value="b">B: it holds about what it claims; A's narrowness is false confidence</li><li data-value="c">Neither: width cannot be compared</li><li data-value="d">A: it has the lower RMSE</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>B. A narrow band helps only if it still holds what it claims; A's “90%” band holds 62%. Width alone cannot decide, and neither can coverage alone: pinball loss weighs both, and which forecast wins can change with the score, as RMSE and pinball loss did in M9.</p></details>
+<p class="lx-qtext">Invented numbers, not the study's: two “90%” bands are checked on 100 new measurements. Band A, 150 kW wide on average, holds 62; band B, 300 kW wide, holds 89. Which better matches its claimed 90%?</p>
+<ul class="lx-choices"><li data-value="a">A: a narrower band always matches better</li><li data-value="b">B: it holds about the 90% it claims</li><li data-value="c">Neither: coverage cannot be checked on 100 measurements</li><li data-value="d">A: it has the lower RMSE</li></ul>
+<details class="lx-answer"><summary>Answer</summary><p>B. It holds 89 of 100, close to the 90 it claims; A holds only 62. Coverage alone does not rank them: pinball loss also charges for how far misses fall outside a band.</p></details>
 </div>
 </div>
 <div class="lx-card lx-case-try">
 <p class="lx-eyebrow">Try it yourself</p>
 <p class="lx-hint">Optional, about 30 minutes each; needs Python 3.10 or later (<a href="b02-python-data.html">lesson B2</a>).</p>
-<p><b>Try it yourself:</b> the framework fits the three models to an invented turbine type and wind farm in a few seconds. Change the training size and the kernel-density bandwidth, or compare linear and nonlinear fusion on a test function. Its numbers say nothing about any real turbine.</p>
+<p><b>Try it yourself:</b> the framework fits the three models to an invented turbine type and wind farm in a few seconds.</p>
+<p>Change the training size and the kernel-density bandwidth, or compare linear and nonlinear fusion on a test function.</p>
+<p>Its numbers say nothing about any real turbine.</p>
 <ul>
 <li>Run <code>python examples/sensitivity.py</code>: at 50, 100, 200 and 400 training points, which model has the lowest RMSE, and does the order hold at every size?</li>
 <li>Run <code>python examples/probabilistic.py</code> and compare the coverage at each nominal level with the level itself.</li>
 </ul>
 <p><a href="https://github.com/Henryutd2021/mfgpr-wind-power-curve">mfgpr-wind-power-curve</a>: public example repository · MIT licence · synthetic data.</p>
-<p><b>Try it yourself:</b> the framework runs end to end on invented plants in about half a minute; another example compares target choices against a negative control. Its numbers say nothing about any real plant, data product or forecast system.</p>
+<p><b>Try it yourself:</b> the framework runs end to end on invented plants in about half a minute; another example compares target choices against a <span class="lx-term" data-term="negative-control">negative control</span>.</p>
+<p>Its numbers say nothing about any real plant, data product or forecast system.</p>
 <ul>
 <li>Run <code>python examples/minimal.py</code>, then <code>python examples/validation_design.py</code>. A surrogate is useful only if it beats a constant baseline on held-out plants.</li>
 </ul>

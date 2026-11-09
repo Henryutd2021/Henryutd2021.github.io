@@ -313,6 +313,8 @@ body.lx-totop-off .to-top { opacity: 0 !important; pointer-events: none !importa
 .lx-mini-table th, .lx-mini-table td { padding: 2px 8px 2px 0; text-align: right; border-bottom: 1px solid var(--lx-line); }
 .lx-mini-table th { font-family: var(--lx-f-display); font-weight: 500; color: var(--lx-ink-3); }
 .lx-scroll-x { overflow-x: auto; max-width: 100%; }
+.lx-chart ~ .lx-textalt .lx-mini-table caption { caption-side: top; text-align: left; font-family: var(--lx-f-body); font-size: 12.5px; color: var(--lx-ink-2); padding-bottom: 2px; }
+.lx-chart ~ .lx-textalt .lx-mini-table tbody th { font-family: var(--lx-f-mono); font-weight: 400; color: var(--lx-ink); }
 
 /* missions.css — mission bars, stars and collectible notes (missions.js). */
 .lx-missions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 12px; }
@@ -1446,6 +1448,11 @@ button.lx-fline:hover { border-color: var(--lx-ink-3); }
 .lx-ck-lock { border: 1px dashed var(--lx-line-2); border-radius: var(--lx-r-lg); padding: 16px 18px; display: grid; gap: 10px; background: var(--lx-surface); }
 .lx-js .lx-ck-gated:not(.is-open) { display: none; }
 @media (max-width: 560px) { .lx-ck-card { padding: 14px; } .lx-ck-q { font-size: 17.5px; } }
+/* a neutral comparison (the estimate's range against the worked one: not a mark) and a worked solution that waits for
+   other tasks (task option solAfter) */
+.lx-ck .lx-saw.info { background: var(--lx-surface-2); border: 1px solid var(--lx-line); }
+.lx-ck .lx-saw.info .lx-ic { color: var(--lx-ink-2); }
+.lx-ck .lx-ck-solwait { margin: 0; }
 
 /* sheet.css — the working spreadsheet (sheet.js): formula bar, tools, a scrolling grid with sticky headers. */
 .lx-sheet { display: grid; gap: 8px; min-width: 0; }
@@ -1488,6 +1495,8 @@ button.lx-fline:hover { border-color: var(--lx-ink-3); }
 .lx-fp-lede { font-size: 15px; color: var(--lx-ink-2); max-width: 72ch; }
 .lx-fp-intro { font-size: 14.5px; color: var(--lx-ink-2); }
 .lx-fp-foot { font-size: 13px; color: var(--lx-ink-3); }
+ul.lx-fp-notes { margin: 0; padding-left: 1.1rem; display: grid; gap: 2px; }
+ul.lx-fp-notes li { margin: 0; } ul.lx-fp-notes b { font-weight: 600; color: var(--lx-ink-2); }
 .lx-fp-fade { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(122px, 1fr)); gap: 6px; }
 @media (max-width: 560px) {
   .lx-fp-bar .lx-seg { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); width: 100%; }
@@ -2068,6 +2077,9 @@ body.page-learn.quarto-dark { --lx-scale-0: #5CC0B1; --lx-scale-1: #5AAED2; --lx
 /* a capstone's card of excerpts before its note (C0): space between the quotes */
 .c0-yard .lx-excerpt + .lx-excerpt { margin-top: 12px; }
 .c0-tornado { min-width: 0; }
+.c0-whole { margin-top: 12px; }
+.c0-whole pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 13.5px; line-height: 1.45; margin: 8px 0 0; }
+.e0-hours table { font-size: 13px; } .e0-hours th[scope="row"] { white-space: nowrap; }
 .e0-extra { display: grid; gap: 14px; }
 @media (max-width: 560px) {
   /* 13 squares a row stay at least 24 px wide on a 375 px phone: the strip uses the card's padding */
@@ -2129,6 +2141,7 @@ body.page-learn.quarto-dark { --lx-scale-0: #5CC0B1; --lx-scale-1: #5AAED2; --lx
 .lx-sb-group > .lx-seg { justify-self: start; }
 .e1-allowl, .e1-segl { font-family: var(--lx-f-display); font-size: 13.5px; color: var(--lx-ink-2); }
 .e1-sizehint { margin: 0 !important; font-size: 13.5px; }
+.e1-allowh { flex-basis: 100%; margin: 0 !important; }   /* under the toggles: the sizes replace the reader's (SB1) */
 .e1-ro .lx-readout { flex: 1 1 140px; }
 
 /* ---------- results */
@@ -2271,6 +2284,7 @@ body.page-learn.quarto-dark { --lx-scale-0: #5CC0B1; --lx-scale-1: #5AAED2; --lx
 .e2-say.bad b { color: var(--lx-bad); }
 .e2-say.good { background: var(--lx-good-soft); border-left: 4px solid var(--lx-good); }
 .e2-notes { margin: .3rem 0 0; padding-left: 1.1rem; display: grid; gap: 2px; font-size: 13.5px; color: var(--lx-ink-2); }
+.e2-unit-notes { margin: .4rem 0 0; padding-left: 1.1rem; display: grid; gap: 2px; }   /* the plants table's formulas, one a line */
 
 /* row labels of the data tables: plain words, not the column headings' small capitals; on phones (base.css shows one
    block per row with the header hidden) each cell is labelled with its column */

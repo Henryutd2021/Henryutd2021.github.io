@@ -97,7 +97,7 @@
   "defences": [
     {
       "id": "winterize",
-      "label": "Winterize plants and wind turbines, firm up gas",
+      "label": "Winterize plants and wind turbines, secure dependable gas supply",
       "short": "Winterize",
       "cost": 25,
       "eases": {
@@ -140,7 +140,7 @@
       "short": "Demand response",
       "cost": 15,
       "add": "dr",
-      "what": "Load cut on call, at most 4 hours a day (lesson A5's program)."
+      "what": "Agreed load cuts on call, at most 4 hours a day, with no rebound later (lesson A5's program)."
     }
   ],
   "budget": 60,
@@ -166,7 +166,7 @@
         },
         {
           "n": "59.304 Hz",
-          "what": "the lowest frequency; it stayed below 59.4 Hz for 4 minutes 23 seconds on 15 February."
+          "what": "the lowest grid [[frequency|frequency]], against a normal 60 Hz; it stayed below 59.4 Hz for 4 minutes 23 seconds on 15 February."
         }
       ],
       "source": {

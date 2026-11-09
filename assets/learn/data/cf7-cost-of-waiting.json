@@ -5,7 +5,7 @@
     "title": "The question in time",
     "lede": "Two public events, then the study and its code.",
     "events": [
-      { "date": "2024-12-20", "label": "Data-center demand measured", "kind": "data",
+      { "date": "2024-12-20", "label": "Data-center electricity use estimated", "kind": "data",
         "text": "DOE releases a Berkeley Lab report: U.S. data centers used about 176 TWh in 2023, about 4.4% of U.S. electricity.",
         "source": { "label": "U.S. Department of Energy, 20 December 2024", "url": "https://www.energy.gov/articles/doe-releases-new-report-evaluating-increase-electricity-demand-data-centers", "as_of": "2026-11-03" } },
       { "date": "2025-10-23", "label": "Federal rulemaking requested", "kind": "policy",

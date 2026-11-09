@@ -443,7 +443,7 @@ window.Quarto = {
 <div class="lx-case-part"><p class="lx-eyebrow">2 · The question in one sentence</p><p class="lx-case-q">What does it cost when a large data center must wait for grid <span class="lx-term" data-term="energization">energization</span>, and how does the delay affect the developer, electricity ratepayers and society?</p><p class="lx-hint">Question type: descriptive (how much, and for whom?).</p></div>
 <div class="lx-case-part"><p class="lx-eyebrow">3 · Scale and boundary</p><ul><li><b>Inside:</b> one large load waiting for its first grid service (the study's case: a 300 <span class="lx-term" data-term="mw-it">MW-IT</span> data center), priced for three parties in <span class="lx-term" data-term="present-value">present value</span>.</li><li><b>Left out:</b> why the connection is late, whether the network can carry the load, and real project data: the parameters are illustrative.</li></ul></div>
 <div class="lx-case-part"><p class="lx-eyebrow">4 · Decisions, goal and rules, in words</p><ul><li><b>Decisions:</b> whether to pay for a mitigation option (<span class="lx-term" data-term="staged-energization">staged service</span> or <span class="lx-term" data-term="bridge-power">bridge power</span>), and who funds it.</li><li><b>Goal:</b> price the wait for each party, so an option can be judged against what it saves each one.</li><li><b>Rules:</b> the three accounts stay separate; a <span class="lx-term" data-term="net-benefit-test">net-benefit test</span> says when they may be combined.</li></ul></div>
-<div class="lx-case-part wide"><p class="lx-eyebrow">5 · Data and method</p><ul><li>A present-value framework turns the delayed computing capacity into the grid MW it needs and prices the delay in three ledgers.</li><li>Two measures compare cases: a delay cost per MW-month, and the largest payment worth making to shorten the wait.</li><li>Inputs are screened with <span class="lx-term" data-term="latin-hypercube">Latin hypercube sampling</span>.</li></ul></div>
+<div class="lx-case-part wide"><p class="lx-eyebrow">5 · Data and method</p><ul><li>A present-value framework turns the delayed computing capacity into the grid MW it needs and prices the delay in three ledgers.</li><li>Two measures compare cases: a <span class="lx-term" data-term="delay-cost-per-mw-month">delay cost per MW-month</span>, and the largest payment worth making to shorten the wait.</li><li>Inputs are screened with <span class="lx-term" data-term="latin-hypercube">Latin hypercube sampling</span>.</li></ul></div>
 <div class="lx-case-part wide"><p class="lx-eyebrow">6 · What came out, and where it holds</p>
 <blockquote class="lx-excerpt blockquote" data-source="excerpt:code"><p>A late grid connection costs the developer lost <span class="lx-term" data-term="margin">margin</span> and <span class="lx-term" data-term="carrying-cost">carrying costs</span>; ratepayers face utility carrying and <span class="lx-term" data-term="stranded-cost">stranding</span> costs; society bears <span class="lx-term" data-term="external-cost">external costs</span>.</p><p>The study keeps these present-value accounts separate.</p><p>In the study's illustrative base case, a 36-month delay for a 300 MW-IT facility cost the developer on the order of $0.7 billion in present value.</p><p>Staged energization can recover a large share of that cost.</p><p>Ratepayer exposure depends strongly on large-load <span class="lx-term" data-term="tariff">tariff</span> design.</p><footer>From: Li et al. (2026), accepted paper, 2026 North American Power Symposium (NAPS); DOI pending.</footer></blockquote>
 <blockquote class="lx-excerpt blockquote" data-source="excerpt:code"><p>The delay is treated as <span class="lx-term" data-term="exogenous">exogenous</span> and parameters are illustrative; network feasibility is not modeled, and the social perspective is illustrated with a single bridge-power example.</p><footer>From: Li et al. (2026), accepted paper, 2026 North American Power Symposium (NAPS); DOI pending.</footer></blockquote>
@@ -453,11 +453,11 @@ window.Quarto = {
 <div class="lx-fallback">
 <p class="lx-eyebrow">The question in time</p>
 
-<ol class="lx-tl-static"><li><b>20 December 2024</b> · Data-center demand measured. DOE releases a Berkeley Lab report: U.S. data centers used about 176 TWh in 2023, about 4.4% of U.S. electricity. <span class="lx-hint">Source: <a href="https://www.energy.gov/articles/doe-releases-new-report-evaluating-increase-electricity-demand-data-centers">U.S. Department of Energy, 20 December 2024</a>, as of 3 November 2026</span></li><li><b>23 October 2025</b> · Federal rulemaking requested. The Secretary of Energy asks FERC to start a rulemaking on connecting large loads to the interstate transmission system. <span class="lx-hint">Source: <a href="https://www.energy.gov/sites/default/files/2025-10/403%20Large%20Loads%20Letter.pdf">Letter of the Secretary of Energy to FERC, 23 October 2025 (PDF)</a>, as of 3 November 2026</span></li><li><b>October 2026</b> · Paper presented. The delay is priced in three separate accounts: the developer, electricity ratepayers and society. <span class="lx-hint">Source: Li et al. (2026), North American Power Symposium (NAPS 2026), accepted; DOI pending</span></li><li><b>30 October 2026</b> · Code released. <span class="lx-hint">Source: <a href="https://github.com/Henryutd2021/code-delayed-energization">code-delayed-energization on GitHub</a>, as of 3 November 2026</span></li></ol>
+<ol class="lx-tl-static"><li><b>20 December 2024</b> · Data-center electricity use estimated. DOE releases a Berkeley Lab report: U.S. data centers used about 176 TWh in 2023, about 4.4% of U.S. electricity. <span class="lx-hint">Source: <a href="https://www.energy.gov/articles/doe-releases-new-report-evaluating-increase-electricity-demand-data-centers">U.S. Department of Energy, 20 December 2024</a>, as of 3 November 2026</span></li><li><b>23 October 2025</b> · Federal rulemaking requested. The Secretary of Energy asks FERC to start a rulemaking on connecting large loads to the interstate transmission system. <span class="lx-hint">Source: <a href="https://www.energy.gov/sites/default/files/2025-10/403%20Large%20Loads%20Letter.pdf">Letter of the Secretary of Energy to FERC, 23 October 2025 (PDF)</a>, as of 3 November 2026</span></li><li><b>October 2026</b> · Paper presented. The delay is priced in three separate accounts: the developer, electricity ratepayers and society. <span class="lx-hint">Source: Li et al. (2026), North American Power Symposium (NAPS 2026), accepted; DOI pending</span></li><li><b>30 October 2026</b> · Code released. <span class="lx-hint">Source: <a href="https://github.com/Henryutd2021/code-delayed-energization">code-delayed-energization on GitHub</a>, as of 3 November 2026</span></li></ol>
 
 </div>
 </div>
-<p class="lx-datanote"><span>Every result about the study is quoted from the accepted paper named in the sources; the two public events carry their own sources. The toy below uses illustrative round numbers.</span></p>
+<p class="lx-datanote"><span>The two public events in the timeline carry their own sources. The toy below uses illustrative round numbers.</span></p>
 </div>
 <div id="explain" class="lx-sec">
 <section id="the-idea-behind-it-then-where-the-result-holds" class="level2 lx-sec-h">
@@ -508,7 +508,7 @@ window.Quarto = {
 </tr>
 </tbody>
 </table>
-<p class="lx-hint">Worked month: the lost margin is $45,000 × 100 MW = $4.5M a month. Over 24 months, discounted month by month, that is $4.5M × 22.17 = $99.8M today.</p>
+<p class="lx-hint">Worked month: the lost margin is $45,000 × 100 MW = $4.5M a month. Over 24 months, discounted month by month, that is $4.5M × 22.17 = $99.8M today.</p><p class="lx-hint">The load runs around the clock, so a month is 730 hours: bridge power for 50 MW is 50 MW × 730 h = 36,500 MWh a month, $1.1M above grid power.</p><p class="lx-hint">Per MW-month: $171.1M ÷ 100 MW ÷ 24 months = $71.3k of the developer's cost.</p><p class="lx-hint">The chance it never arrives rises by 0.5 percentage points a month: 12% after 24 months, at most 50%.</p>
 <table class="lx-facts caption-top table">
 <caption>Present values of a 100 MW load's wait, other customers paying the utility's costs, no bridge power.</caption>
 <thead>
@@ -551,7 +551,7 @@ window.Quarto = {
 </tr>
 </tbody>
 </table>
-<ul><li>At 24 months, a tariff that makes the waiting load pay all of the utility's costs moves $14.7M from other customers to the developer; the total stays $185.8M.</li><li>Bridge power for half the load saves the developer $25.6M and adds $8.1M of CO₂ damage above grid power, for society.</li></ul>
+<ul><li>At 24 months, a tariff that makes the waiting load pay all of the utility's costs moves $14.7M from other customers to the developer; the total stays $185.8M.</li><li>Bridge power for half the load saves the developer $25.6M; its CO₂ above grid power for the same energy is $8.1M of damage, for society.</li></ul>
 
 </div>
 </div>
@@ -590,7 +590,9 @@ window.Quarto = {
 </table>
 
 <p class="lx-hint">One total would hide who pays.</p>
-<p class="lx-hint">In this toy, a tariff only moves a fixed cost between accounts; it does not change the wait or what anyone does. Only a shorter wait shrinks the cost.</p>
+<p class="lx-hint">Society's account here counts only bridge power's CO₂ above grid power for the same energy; any CO₂ change from the idle months is left out.</p>
+<p class="lx-hint">In this toy, a tariff only moves a fixed cost between accounts; it does not change the wait or what anyone does.</p>
+<p class="lx-hint">A shorter wait, or bridge power for part of the load, changes the costs themselves.</p>
 </div>
 <div id="cf7-explain" class="lx-xgrid">
 <div class="lx-fallback">
@@ -623,12 +625,12 @@ window.Quarto = {
 <div class="lx-qq" data-id="tariff" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “A tariff that makes the waiting load pay the utility's costs makes the delay cheaper.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. In the toy at 24 months it moves $14.7M from other customers to the developer; the total stays $185.8M.</p><p>In this toy, the tariff only reallocates a fixed cost; it does not change the wait or what anyone does.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. In the toy at 24 months it moves $14.7M from other customers to the developer; the total stays $185.8M. In this toy, the tariff only reallocates a fixed cost; it does not change the wait or what anyone does.</p></details>
 </div>
 <div class="lx-qq" data-id="bridge" data-answer="fact">
 <p class="lx-qtext">Myth or fact? “An option can save the developer money while adding a cost that someone else bears.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Fact. In the toy at 24 months, bridge power for half the load saves the developer $25.6M and adds $8.1M of CO₂ damage above grid power. Separate accounts show both.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Fact. In the toy at 24 months, bridge power for half the load saves the developer $25.6M, while its CO₂ above grid power for the same energy is $8.1M of damage, borne by society. Separate accounts show both.</p></details>
 </div>
 </div>
 <div class="lx-card lx-case-try">

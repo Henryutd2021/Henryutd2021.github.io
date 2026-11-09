@@ -512,9 +512,10 @@ window.Quarto = {
 <summary><span class="k">Go deeper · Analyst</span>Prices, losses and the break-even spread</summary>
 <div class="lx-deeper-body">
 <ul>
-<li><strong>Break-even.</strong> A MWh stored at price <span class="math inline">\(p_\text{in}\)</span> comes back as 0.8 MWh, so it pays only if the selling price beats <span class="math inline">\(p_\text{in}/0.8\)</span>: buy at $40, sell above $50.</li>
+<li><strong>Break-even.</strong> Buying 1 MWh for charging at <span class="math inline">\(p_\text{in}\)</span> lets this battery sell 0.8 MWh later. Other costs aside, it pays only if the selling price beats <span class="math inline">\(p_\text{in}/0.8\)</span>: buy at $40, sell above $50.</li>
 <li><strong>Spilled sun.</strong> It costs $0, so storing it always passes that test.</li>
-<li><strong>One more MWh.</strong> Each hour’s <span class="lx-term" data-term="marginal-cost">price</span> is the cost of one more MWh. A 25 MW battery is more than that: at 08:00 only 3 MW of sun is spilled, so full-power charging takes 22 MW from gas at $40.</li>
+<li><strong>What the price means.</strong> Each hour’s <span class="lx-term" data-term="marginal-cost">price</span> is the cost of one more MWh without the battery.</li>
+<li><strong>Why full power can take gas.</strong> At 08:00 only 3 MW of sun is spilled, so charging at the full 25 MW takes 22 MW from gas at $40.</li>
 <li><strong>The real saving.</strong> So this lesson counts what the town actually saves. Your best full-power schedule saves $6,360; the solver saves $7,240 by charging at part power, matching each hour’s spill.</li>
 </ul>
 </div>
@@ -619,7 +620,7 @@ e_t = e_{t-1} + 0.8\,c_t - d_t, \quad e_{-1} = 0\\
 <details class="lx-answer"><summary>Answer</summary><p>Myth. The MWh say how much it holds; a separate MW rating says how fast. Prairie Town's 100 MWh battery delivers at most 25 MW, for four hours.</p></details>
 </div>
 <div class="lx-qq" data-id="make" data-answer="myth">
-<p class="lx-qtext">Myth or fact? “A battery adds energy to the grid.”</p>
+<p class="lx-qtext">Myth or fact? “Over a full charge and discharge, a battery delivers more electrical energy than it takes in.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
 <details class="lx-answer"><summary>Answer</summary><p>Myth. It moves energy in time and loses some on the way: this one returns 80% of what goes in.</p></details>
 </div>

@@ -38,7 +38,7 @@
     },
     "gas": {
       "name": "Gas plant",
-      "kind": "Natural gas combined-cycle plant",
+      "kind": "Natural gas [[combined-cycle|combined-cycle]] plant",
       "per": "per unit of electricity it makes",
       "stageNames": { "build": "Plant built", "supply": "Gas produced and piped", "run": "Gas burned, plant cooled", "end": "Taken down" },
       "carbon": {
@@ -85,7 +85,7 @@
       }
     }
   },
-  "nrelTotals": { "solar": 43, "gas": 486, "wind": 13 },
+  "nrelTotals": { "solar": 43, "gas": 486, "wind": 13, "solarWhat": "thin-film and crystalline panels", "gasWhat": "natural gas generation as a whole" },
   "harmonized": {
     "solar": { "median": 45, "lo": 39, "hi": 49, "what": "crystalline silicon panels, harmonized (Hsu et al., 2012, abstract)", "src": "hsu" },
     "gas": { "median": 450, "lo": 420, "hi": 480, "what": "combined-cycle plants, harmonized (O'Donoughue et al., 2014, abstract)", "src": "odonoughue" }
@@ -126,7 +126,7 @@
     "summer": { "median": { "hydro": 15, "gas": 45 }, "drought": { "hydro": 8, "gas": 50 } }
   },
   "consequential": [
-    { "id": "gas", "label": "Gas plants run less", "note": "Each MWh of solar replaces a MWh from gas plants that already exist: the gas burned (389 g) and its supply (71 g, treated here as all fuel supply) are avoided; their construction is done." },
+    { "id": "gas", "label": "Gas plants run less", "note": "Each MWh of solar replaces a MWh from existing gas plants: the gas burned (389 kg CO₂e) and its supply (71 kg, treated as all fuel supply) are avoided; their construction is done." },
     { "id": "spill", "label": "Nothing: its output is spilled", "note": "The grid had more clean power than it could use at those hours, so the new farm's MWh replace nothing." },
     { "id": "wind", "label": "Wind farms run less", "note": "Each MWh of solar replaces a MWh from wind farms that already exist: they are built and their upkeep goes on, so nothing they emit changes." }
   ],

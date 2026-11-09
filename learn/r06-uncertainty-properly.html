@@ -433,6 +433,32 @@ ul.task-list li input[type="checkbox"] {
 
 <p class="lx-eyebrow">The claim</p><p class="r6-claim">“Prairie Town's peak demand will reach 515 MW in 2035.”</p>
 <p class="lx-hint">In this exercise the town accepts three car-uptake storylines but no odds for them, and no one can agree on a new customer's size or arrival. With other facts, a card could move pile.</p>
+<details class="lx-textalt r6-worked"><summary>How the single number is built</summary><div class="lx-scroll-x">
+<table class="lx-facts caption-top table">
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">Demand apart from cars, 2035</th>
+<td>450 MW × 1.010<sup>10</sup> (growth 1.0% a year) × 1.00 (middle weather) = 497.1 MW</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">Cars added since 2025</th>
+<td>15,000 − 2,000 = 13,000 (central uptake; the 2,000 of 2025 are already in the 450 MW)</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">Their charging in a day</th>
+<td>13,000 × 10 kWh = 130 MWh, in the same pattern every day</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">Its busiest hour</th>
+<td>14% of a day's charging, 19:00 to 20:00: 130 MWh × 0.14 = 18.2 MWh in one hour, 18.2 MW</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">Peaks added</th>
+<td>497.1 + 18.2 = 515 MW, the study's single number</td>
+</tr>
+</tbody>
+</table>
+</div><p class="lx-hint">Middle inputs, central uptake. Adding the two peaks assumes they fall in the same hour; the model-form step tests that.</p></details>
 <details class="lx-textalt"><summary>Twelve uncertainties behind it, sorted, with reasons</summary><div class="lx-scroll-x">
 <table class="lx-facts caption-top table">
 <thead>
@@ -454,9 +480,9 @@ ul.task-list li input[type="checkbox"] {
 <td>Another number inside the model. The range here is illustrative; a real study would need driving surveys or charger meter data to set it.</td>
 </tr>
 <tr class="odd">
-<td>How hot the hottest afternoon of 2035 turns out to be</td>
+<td>How much 2035's weather raises or lowers demand (a multiplier, 0.96 to 1.04)</td>
 <td>Parameter</td>
-<td>Year-to-year weather is variability no study can know in advance. A real study takes its range from past years; the ±4% here is illustrative.</td>
+<td>Weather varies year to year; no study knows it in advance. Here it is an illustrative multiplier on background demand; demand is not computed from temperature.</td>
 </tr>
 <tr class="even">
 <td>Whether car charging adds to the town's peak hour, or mostly to later hours</td>
@@ -494,7 +520,7 @@ ul.task-list li input[type="checkbox"] {
 <td>Experts disagree on whether, when and how it changes charging: the outcomes themselves are unknown.</td>
 </tr>
 <tr class="odd">
-<td>Whether the utility funds a managed-charging programme</td>
+<td>Whether the utility funds a managed-charging programme (one that shifts car charging to quieter hours)</td>
 <td>A choice, not an uncertainty</td>
 <td>A decision the study should inform. Run the study with and without it and compare; sampling it would hide the comparison.</td>
 </tr>
@@ -514,12 +540,12 @@ ul.task-list li input[type="checkbox"] {
 </ul>
 <p class="lx-eyebrow">2 · Structural · Whether car charging adds to the town's peak hour, or mostly to later hours</p><ul>
 <li>Widen the growth range until the band covers both model forms. <b>Hard to defend.</b> It hides a question about the model inside a parameter, and the band then answers neither.</li>
-<li>Run both model forms and report the gap between them. <b>Defensible.</b> Sampling cannot reveal a structural choice; comparing forms can, and the gap tells readers how much the choice matters.</li>
+<li>Run both model forms and report the gap between them. <b>Defensible.</b> These runs vary numbers inside one model form, so the form is compared, not sampled: the gap tells readers how much the choice matters.</li>
 <li>Use whichever form gives the higher peak, to be safe. <b>Partly.</b> Sometimes wise for a planner, but say so: readers would take a cautious bound for your best estimate.</li>
 </ul>
 <p class="lx-eyebrow">3 · Scenario · How many electric cars the town has in 2035: 6,000, 15,000 or 30,000</p><ul>
 <li>Average the three and report the mean. <b>Hard to defend.</b> The average of three stories is a future nobody described, and it hides the spread between them.</li>
-<li>Call the central one the forecast, and the other two the extremes. <b>Partly.</b> Fine if you can say why the central one is more likely; otherwise readers take a storyline for a prediction.</li>
+<li>Call the central one the forecast, and the other two the extremes. <b>Partly.</b> Naming a central case is fine, but not as a forecast: the town gives no odds, and slow and fast are illustrative cases, not bounds on what could happen.</li>
 <li>Run each one and show them side by side, with no odds attached. <b>Defensible.</b> Each storyline keeps its own band, and readers can see which assumptions drive the difference.</li>
 </ul>
 <p class="lx-eyebrow">4 · Deep · Whether a large new customer, such as a factory, asks to connect, and when</p><ul>
@@ -527,7 +553,7 @@ ul.task-list li input[type="checkbox"] {
 <li>Leave it out of the numbers, and mention it in the limits. <b>Partly.</b> Better than silence, but a 60 MW what-if is wider than much of the band: show it beside the result.</li>
 <li>Show it as a separate what-if, look for a plan that holds with and without it, and name the signal that would trigger a review. <b>Defensible.</b> The approach of decision making under deep uncertainty: test plans across futures, and adapt when a signpost moves.</li>
 </ul>
-<p class="lx-eyebrow">5 · A choice, not an uncertainty · Whether the utility funds a managed-charging programme</p><ul>
+<p class="lx-eyebrow">5 · A choice, not an uncertainty · Whether the utility funds a managed-charging programme (one that shifts car charging to quieter hours)</p><ul>
 <li>Sample it: half the runs with the programme, half without. <b>Hard to defend.</b> Mixing the two options blurs the very comparison the utility needs to make.</li>
 <li>Run the study with and without the programme, and compare the two bands. <b>Defensible.</b> A choice is compared, not sampled: each option gets its own result, and the difference is what the programme is worth to the peak.</li>
 <li>Assume the programme happens, since the utility has planned it. <b>Partly.</b> A plan is not a fact. Report the other case too, so readers can see what the programme changes.</li>
@@ -590,9 +616,9 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 </tbody>
 </table>
-</div><p class="lx-hint">MW, rounded to 5; 1,000 runs, seed 6, each input drawn independently with equal odds across its range; no odds across the three uptake scenarios.</p></details>
+</div><p class="lx-hint">MW, rounded to 5; 1,000 runs, seed 6, each input drawn independently with equal odds across its range; no odds across the three uptake scenarios.</p><p class="lx-hint"><span class="lx-term" data-term="percentile">Percentiles</span> of the runs: P10, about 1 run in 10 is below it; median, half below; P90, about 9 in 10 below.</p></details>
 <details class="lx-textalt"><summary>The claim rewritten for three readers (examples)</summary><dl class="lx-ideas">
-<dt>For a paper's results section</dt><dd><ul class="r6-exl"><li><b>What varied:</b> We drew growth (0.4–1.6% a year), a car's daily energy (7–13 kWh) and the year's weather (±4%) independently, with equal odds across each range, in 1,000 runs.</li><li><b>The range:</b> Under central car uptake the 2035 peak is 480–535 MW (P10–P90 of the runs); under fast uptake, 495–550 MW.</li><li><b>Model form:</b> Demand is added hour by hour on 2025's pattern; adding the two peaks instead raises the central median by 10 MW.</li></ul></dd>
+<dt>For a paper's results section</dt><dd><ul class="r6-exl"><li><b>What varied:</b> We drew growth (0.4–1.6% a year), a car's daily energy (7–13 kWh) and a weather multiplier on background demand (0.96–1.04) independently, with equal odds across each range, in 1,000 runs.</li><li><b>The range:</b> Under central car uptake the 2035 peak is 480–535 MW (P10–P90 of the runs); under fast uptake, 495–550 MW.</li><li><b>Model form:</b> Demand is added hour by hour on 2025's pattern; adding the two peaks instead raises the central median by 10 MW.</li></ul></dd>
 <dt>For the utility's board, which decides what to plan for</dt><dd><ul class="r6-exl"><li><b>The range:</b> Under central car uptake, about 9 in 10 model runs put the 2035 peak below 535 MW; under fast uptake, below 550 MW.</li><li><b>Not decided here:</b> How much to plan for needs a reliability target and the cost of falling short; this forecast does not set them.</li><li><b>Not in the range:</b> A customer drawing a constant 60 MW would raise each figure by 60 MW.</li><li><b>The signal:</b> A connection request, or car numbers on the fast path, should trigger a new forecast.</li></ul></dd>
 <dt>For the public, in the town's newsletter</dt><dd><ul class="r6-exl"><li><b>The range:</b> If electric cars spread at a middle pace, about 8 in 10 of our model runs put the town's busiest hour in 2035 at 480 to 535 megawatts, compared with 450 in 2025.</li><li><b>What moves it:</b> Faster spread shifts that range up, and higher values are possible. How fast demand grows matters most.</li><li><b>What it leaves out:</b> A large new factory would add more.</li></ul></dd>
 </dl></details>
@@ -611,7 +637,7 @@ ul.task-list li input[type="checkbox"] {
 
 <div class="lx-ex-cols">
 <div class="lx-ex-ans weak"><p class="lx-eyebrow">Weak answer · Developing</p><p class="lx-ex-lines">Our model shows that Prairie Town's peak demand will reach 515 MW in 2035 [1]. We tested the sensitivity of the results and found them robust [2]. Electric cars add 18 MW to the peak [3]. Uncertainties remain, such as future policy [4].</p><ol class="lx-ex-static"><li value="1"><b>Falls short:</b> One number, to the megawatt, with “will”: no range and no conditions.</li><li value="2"><b>Falls short:</b> Which inputs, over what ranges? “Robust” is asserted, not shown.</li><li value="3"><b>Falls short:</b> Only if charging and the peak come in the same hour: a structural choice left unstated.</li><li value="4"><b>Falls short:</b> Not classified and not treated: which ones matter, and what was done about them?</li></ol></div>
-<div class="lx-ex-ans good"><p class="lx-eyebrow">Strong answer · Proficient</p><p class="lx-ex-lines"><b>Varied:</b> growth (0.4–1.6% a year), a car's daily energy (7–13 kWh) and the year's weather (±4%), drawn independently with equal odds across each range, in 1,000 runs (seed 6) [1].
+<div class="lx-ex-ans good"><p class="lx-eyebrow">Strong answer · Proficient</p><p class="lx-ex-lines"><b>Varied:</b> growth (0.4–1.6% a year), a car's daily energy (7–13 kWh) and a weather multiplier on background demand (0.96–1.04), drawn independently with equal odds across each range, in 1,000 runs (seed 6) [1].
 <b>Scenarios:</b> slow, central and fast car uptake, with no odds attached [2].
 <b>Model form:</b> demand added hour by hour on 2025's pattern; adding peaks instead raises the central median by 10 MW [3].
 <b>Result:</b> 480–535 MW (P10–P90) under central uptake, 495–550 MW under fast uptake [4].
@@ -695,7 +721,7 @@ ul.task-list li input[type="checkbox"] {
 <tr class="odd">
 <th data-quarto-table-cell-role="th" scope="row">Parameter</th>
 <td>A number in the model that data or judgement can bound.</td>
-<td>Growth, a car's daily energy, the year's weather.</td>
+<td>Growth, a car's daily energy, a weather multiplier on demand.</td>
 <td>With odds you can defend, sample together and rank the inputs; with bounds only, compare low and high cases.</td>
 <td>P10–P90 of the runs, or the bounded cases, with the ranges, odds and their sources.</td>
 </tr>

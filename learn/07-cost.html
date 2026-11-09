@@ -22,7 +22,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="Lesson 7 of Energy Systems, Step by Step: split a power plant’s cost into building, upkeep and fuel, see why money later is worth less, build a levelized cost of electricity (LCOE) from EIA and ATB inputs, rank what moves it with a tornado chart, and find what LCOE leaves out: when the energy arrives.">
+<meta name="description" content="Lesson 7 of Energy Systems, Step by Step: build a levelized cost of electricity (LCOE) from EIA and ATB inputs, one plant cost and one discounted dollar at a time, and find what it leaves out: when the energy arrives.">
 
 <title>What does electricity cost to make? – Honglin Li</title>
 <style>
@@ -137,7 +137,7 @@ window.Quarto = {
 <link rel="stylesheet" href="../assets/explainers.css">
 <link rel="stylesheet" href="../assets/learn/learn.css">
 <meta property="og:title" content="What does electricity cost to make? – Honglin Li">
-<meta property="og:description" content="Lesson 7 of Energy Systems, Step by Step: split a power plant’s cost into building, upkeep and fuel, see why money later is worth less, build a levelized cost of electricity (LCOE) from EIA and ATB inputs, rank what moves it with a tornado chart, and find what LCOE leaves out: when the energy arrives.">
+<meta property="og:description" content="Lesson 7 of Energy Systems, Step by Step: build a levelized cost of electricity (LCOE) from EIA and ATB inputs, one plant cost and one discounted dollar at a time, and find what it leaves out: when the energy arrives.">
 <meta property="og:image" content="https://henryutd2021.github.io/images/profile-square.jpg">
 <meta property="og:site_name" content="Honglin Li">
 <meta property="og:url" content="https://henryutd2021.github.io/learn/07-cost.html">
@@ -402,7 +402,7 @@ window.Quarto = {
 
 <div>
   <div class="description">
-    Lesson 7 of Energy Systems, Step by Step: split a power plant’s cost into building, upkeep and fuel, see why money later is worth less, build a levelized cost of electricity (LCOE) from EIA and ATB inputs, rank what moves it with a tornado chart, and find what LCOE leaves out: when the energy arrives.
+    Lesson 7 of Energy Systems, Step by Step: build a levelized cost of electricity (LCOE) from EIA and ATB inputs, one plant cost and one discounted dollar at a time, and find what it leaves out: when the energy arrives.
   </div>
 </div>
 
@@ -421,7 +421,7 @@ window.Quarto = {
 
 
 
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "name": "What does electricity cost to make? Split a plant's costs, discount the future and build a levelized cost", "description": "Lesson 7 of Energy Systems, Step by Step: split a power plant's cost into building, upkeep and fuel, see why money later is worth less, build a levelized cost of electricity (LCOE) from EIA and ATB inputs, rank what moves it with a tornado chart, and find what LCOE leaves out: when the energy arrives.", "learningResourceType": "Interactive lesson", "educationalLevel": "Intermediate", "timeRequired": "PT15M", "inLanguage": "en", "isAccessibleForFree": true, "teaches": [], "license": "https://creativecommons.org/licenses/by/4.0/", "author": {"@type": "Person", "name": "Honglin Li", "url": "https://henryutd2021.github.io/"}, "url": "https://henryutd2021.github.io/learn/07-cost.html", "isPartOf": {"@type": "Course", "name": "Energy Systems, Step by Step", "url": "https://henryutd2021.github.io/learn/"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "name": "What does electricity cost to make? Split a plant's costs, discount the future and build a levelized cost", "description": "Lesson 7 of Energy Systems, Step by Step: build a levelized cost of electricity (LCOE) from EIA and ATB inputs, one plant cost and one discounted dollar at a time, and find what it leaves out: when the energy arrives.", "learningResourceType": "Interactive lesson", "educationalLevel": "Intermediate", "timeRequired": "PT15M", "inLanguage": "en", "isAccessibleForFree": true, "teaches": [], "license": "https://creativecommons.org/licenses/by/4.0/", "author": {"@type": "Person", "name": "Honglin Li", "url": "https://henryutd2021.github.io/"}, "url": "https://henryutd2021.github.io/learn/07-cost.html", "isPartOf": {"@type": "Course", "name": "Energy Systems, Step by Step", "url": "https://henryutd2021.github.io/learn/"}}</script>
 <script type="application/json" class="lx-lesson-data">{"id":"07-cost","starter":7,"total":14,"code":null,"title":"What does electricity cost to make?","subtitle":"Split a plant's costs, discount the future and build a levelized cost","short":"What it costs","tier":"analyst","tier2":null,"tierLabel":"Analyst · L2","level":"L2","slot":2,"slot2":null,"minutes":15,"does":"Building, fuel and upkeep; a discounting slider; a levelized-cost calculator, and what it misses.","outcome":"Compute a levelized cost of electricity and say what it leaves out.","icon":"coin","form":"cards","scales":["S0"],"teaches":[],"lab":null,"href":"07-cost.html","ready":true,"after":[{"id":"05-capacity-factor","starter":5,"title":"Capacity factor: why is 1 MW not always 1 MW?","short":"Capacity factor","does":"A year of output from nuclear, wind and solar plants of equal size; double a light wind's speed and get eight times the power.","href":"05-capacity-factor.html","ready":true}],"prev":{"id":"06-three-jobs","starter":6,"title":"Cheap energy, firm capacity, flexibility: which plant does which job?","short":"Three jobs","does":"Sort technologies into the jobs they do, with key numbers for each.","href":"06-three-jobs.html","ready":true},"next":{"id":"08-merit-order","starter":8,"title":"Who runs, and what sets the price?","short":"Merit order","does":"A supply stack, a demand line and the price where they meet; add wind and watch prices fall.","href":"08-merit-order.html","ready":true}}</script>
 <div class="lx-head" data-lesson-id="07-cost" data-starter="7" data-total="14" data-tier="analyst" data-level="L2" data-minutes="15" data-form="cards" data-prev-href="06-three-jobs.html" data-next-href="08-merit-order.html">
 <div>
@@ -491,6 +491,40 @@ window.Quarto = {
 </table>
 
 </div>
+<p class="lx-eyebrow" style="margin-top:14px">What one more MWh saves on Prairie Town's summer peak-demand day, 29 July 2025 ($/MWh, averaged over each plant's output)</p>
+<div class="lx-scroll-x">
+
+<table id="cost-fallback-timing" class="lx-mini-table caption-top table">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">Solar farm size</th>
+<th data-quarto-table-cell-role="th" scope="col">Solar</th>
+<th data-quarto-table-cell-role="th" scope="col">Wind</th>
+<th data-quarto-table-cell-role="th" scope="col">Round the clock</th>
+<th data-quarto-table-cell-role="th" scope="col">Spilled</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>200 MW</td>
+<td>50.27</td>
+<td>56.35</td>
+<td>55.00</td>
+<td>0 MWh</td>
+</tr>
+<tr class="even">
+<td>400 MW</td>
+<td>9.59</td>
+<td>44.03</td>
+<td>35.00</td>
+<td>509 MWh</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+<p class="lx-hint">Each hour, one more MWh saves $0 (sun or wind spilled), $40 (the combined-cycle plant is the last one needed) or $100 (the peaker). A plant's value per MWh is that saving averaged over its output.</p>
+<p class="lx-hint">At 12:00, 425 MW of demand minus 100 MW always on, 35 MW of wind and 173 MW of sun leaves 117 MW for gas. The cheaper combined-cycle plant (up to 150 MW) covers it, so one more MWh saves $40.</p>
 <p class="lx-hint">With JavaScript on, you work through this in eight steps: predict, split the cost, discount, blend a WACC, find the price that pays back, use the calculator, read a tornado chart, and see when the energy arrives.</p>
 </div>
 </div>
@@ -504,7 +538,7 @@ window.Quarto = {
 <div id="cost-explain" class="lx-xgrid">
 <div class="lx-fallback">
 <dl class="lx-ideas">
-<dt>Four costs</dt><dd>Building the plant, fixed upkeep, fuel and upkeep per MWh; wind and solar are mostly building cost, gas plants mostly fuel.</dd>
+<dt>Four costs</dt><dd>Building the plant, fixed upkeep, fuel and upkeep per MWh. Wind and solar are mostly building cost, the combined-cycle plant mostly fuel, and a rarely used peaker mostly building.</dd>
 <dt>Discounting</dt><dd>Money later is worth less than money now, so future costs and sales are divided by (1 + r) for every year of waiting.</dd>
 <dt>WACC</dt><dd>The blended rate a project pays its lenders and owners; it is the discount rate of the plant.</dd>
 <dt>Capital recovery factor</dt><dd>The share of the building cost to repay each year so that it is paid off, with interest, over the plant's life.</dd>
@@ -528,13 +562,13 @@ Need a refresher? Toolbox <a href="k03-discounting.html">K3</a> (discounting and
 <p>The <span class="lx-term" data-term="lcoe">LCOE</span> is the steady price at which the plant’s discounted sales repay everything, so its net present value is zero.</p>
 <p>Each kW makes <span class="math inline">\(E = \mathrm{CF} \times 8{,}760 / 1{,}000\)</span> MWh a year, with the <span class="lx-term" data-term="capacity-factor">capacity factor</span> (<a href="05-capacity-factor.html">lesson 5</a>) as a fraction: 33.8% is 0.338.</p>
 <p><span class="math display">\[\mathrm{LCOE} = \frac{\mathrm{CRF}\cdot C + \mathrm{FOM}}{E} + \text{fuel} + \mathrm{VOM}\]</span></p>
-<p>Here fuel per MWh = <span class="lx-term" data-term="heat-rate">heat rate</span> (MMBtu per MWh) × gas price ($ per MMBtu).</p>
+<p>Here FOM is <span class="lx-term" data-term="fixed-om">fixed upkeep</span> ($ per kW per year) and VOM <span class="lx-term" data-term="variable-om">upkeep per MWh</span>. Fuel per MWh = <span class="lx-term" data-term="heat-rate">heat rate</span> (MMBtu per MWh) × gas price ($ per MMBtu).</p>
 <p>Check it on the wind farm:</p>
 <ul>
 <li><span class="math inline">\(\mathrm{CRF}(4\%, 30) = 0.0578301\)</span>;</li>
-<li>yearly cost: <span class="math inline">\(0.0578301 \times 1{,}712 + 34.57 = 133.58\)</span> $/kW;</li>
-<li>yearly output: <span class="math inline">\(E = 0.338 \times 8.76 = 2.961\)</span> MWh per kW;</li>
-<li>LCOE: <span class="math inline">\(133.58 / 2.961 = \$45.11\)</span> per MWh.</li>
+<li>yearly cost: <span class="math inline">\(0.0578301 \times 1{,}712 + 34.57 = 133.58\)</span> $ per kW per year;</li>
+<li>yearly output: <span class="math inline">\(E = 0.338 \times 8.76 = 2.961\)</span> MWh per kW per year;</li>
+<li>LCOE: <span class="math inline">\(133.58 / 2.961 = \$45.11\)</span> per MWh, since ($ per kW per year) ÷ (MWh per kW per year) = $ per MWh.</li>
 </ul>
 <p>The 2025 ATB writes the same equation with a fixed charge rate, <span class="math inline">\(\mathrm{FCR} = \mathrm{CRF} \times\)</span> a factor for taxes and depreciation; here that factor is 1.</p>
 <p>The WACC with taxes: loans’ share <span class="math inline">\(d\)</span> at rate <span class="math inline">\(r_d\)</span>, owners’ money at <span class="math inline">\(r_e\)</span> and tax rate <span class="math inline">\(\tau\)</span> give <span class="math inline">\(d\,r_d(1-\tau) + (1-d)\,r_e\)</span>. Step 4 left the tax out.</p>
@@ -696,10 +730,14 @@ Need a refresher? Toolbox <a href="k03-discounting.html">K3</a> (discounting and
 <td class="s"><a href="https://www.eia.gov/electricity/annual/html/epa_07_04.html">EIA, Electric Power Annual, Table 7.4</a> · final 2025 data, October 2026</td>
 </tr>
 <tr class="even">
+<td>Capacity-factor ranges: 43% for the 2023 market-average new wind turbine; 19.4-31.5% across solar resource classes</td>
+<td class="s"><a href="https://atb.nlr.gov/electricity/2025/land-based_wind">NLR, 2025 ATB, Land-Based Wind</a> and <a href="https://atb.nlr.gov/electricity/2025/utility-scale_pv">Utility-Scale PV</a> (2023 values) · September 2026</td>
+</tr>
+<tr class="odd">
 <td>Rate and 30-year life, case without tax credits</td>
 <td class="s"><a href="https://atb.nlr.gov/electricity/2025/financial_cases_&amp;_methods">NLR, 2025 ATB</a> · September 2026</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Prairie Town's summer peak-demand day, 29 July 2025</td>
 <td class="s">Southwest Power Pool shapes, <a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a> (accessed 2 November 2026); the town's plants and running costs are illustrative</td>
 </tr>
@@ -712,7 +750,7 @@ Need a refresher? Toolbox <a href="k03-discounting.html">K3</a> (discounting and
 <ul>
 <li>EIA (2026). <a href="https://www.eia.gov/outlooks/aeo/assumptions/pdf/EMM_Assumptions.pdf">Assumptions to the Annual Energy Outlook 2026: Electricity Market Module</a> (PDF). Table 3: building cost, upkeep and heat rates.</li>
 <li>EIA (2026). <a href="https://www.eia.gov/outlooks/aeo/electricity_generation/pdf/LCOE_report.pdf">Levelized Costs of New Generation Resources in the Annual Energy Outlook 2026</a> (PDF): LCOE beside a value measure (LACE).</li>
-<li>NLR (2026). 2025 Electricity Annual Technology Baseline: <a href="https://atb.nlr.gov/electricity/2025/equations_&amp;_variables">Equations and Variables</a>; <a href="https://atb.nlr.gov/electricity/2025/financial_cases_&amp;_methods">Financial Cases and Methods</a>.</li>
+<li>NLR (2026). 2025 Electricity Annual Technology Baseline: <a href="https://atb.nlr.gov/electricity/2025/equations_&amp;_variables">Equations and Variables</a>; <a href="https://atb.nlr.gov/electricity/2025/financial_cases_&amp;_methods">Financial Cases and Methods</a>; <a href="https://atb.nlr.gov/electricity/2025/land-based_wind">Land-Based Wind</a>; <a href="https://atb.nlr.gov/electricity/2025/utility-scale_pv">Utility-Scale PV</a>.</li>
 <li>EIA. Electric Power Annual: <a href="https://www.eia.gov/electricity/annual/html/epa_04_08_a.html">Table 4.08.A</a>, <a href="https://www.eia.gov/electricity/annual/html/epa_04_08_b.html">Table 4.08.B</a> (capacity factors) and <a href="https://www.eia.gov/electricity/annual/html/epa_07_04.html">Table 7.4</a> (fuel costs).</li>
 <li>Short, W., Packey, D. and Holt, T. (1995). <a href="https://docs.nlr.gov/docs/legosti/old/5173.pdf">A Manual for the Economic Evaluation of Energy Efficiency and Renewable Energy Technologies</a> (PDF). NREL/TP-462-5173.</li>
 <li>Joskow, P. (2011). <a href="https://doi.org/10.1257/aer.101.3.238">Comparing the Costs of Intermittent and Dispatchable Electricity Generating Technologies</a>. American Economic Review 101(3).</li>

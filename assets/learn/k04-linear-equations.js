@@ -59,7 +59,12 @@
 
   // ---------------------------------------------------------------- practice drill items (seeded by LX.Drill, so tests can replay them)
   var KINDS = ["gap", "solve", "flip", "test", "words"];
-  var WORDS = [["at most", "≤"], ["no more than", "≤"], ["at least", "≥"], ["no less than", "≥"], ["exactly", "="], ["must not fall below", "≥"], ["must not exceed", "≤"]];
+  // [sentence start, the words that carry the sign, the sign, the quantity the rule is about]: every sentence names the
+  // quantity it limits (a flow, an output, a need), so no template mixes what a line can carry with what must flow
+  var WORDS = [
+    ["The line's flow is", "at most", "≤", "flow"], ["The line's flow is", "no more than", "≤", "flow"], ["The line's flow must not exceed", "must not exceed", "≤", "flow"],
+    ["The town needs", "at least", "≥", "supply"], ["The plant's output is", "no less than", "≥", "output"], ["The plant's output must not fall below", "must not fall below", "≥", "output"],
+    ["The import is", "exactly", "=", "import"]];
   function drillItem(D, k, r) {
     var kind = KINDS[k % KINDS.length], pick = function (n) { return Math.floor(r() * n); };
     if (kind === "gap") {
@@ -83,8 +88,9 @@
                why: px + " + " + py + " = " + v + (pass ? " passes " : " fails ") + op + " " + c + "." };
     }
     var w = WORDS[pick(WORDS.length)], amt = 10 * (1 + pick(20));
-    return { kind: kind, q: "“The line can carry " + w[0] + " " + amt + " MW.” Which sign?", choices: ["≤", "≥", "="], answer: ["≤", "≥", "="].indexOf(w[1]),
-             why: "“" + w[0] + "” means " + w[1] + ": flow " + w[1] + " " + amt + " MW." };
+    var said = w[0] === "The line's flow must not exceed" || w[0] === "The plant's output must not fall below" ? w[0] : w[0] + " " + w[1];
+    return { kind: kind, q: "“" + said + " " + amt + " MW.” Which sign?", choices: ["≤", "≥", "="], answer: ["≤", "≥", "="].indexOf(w[2]),
+             why: "“" + w[1] + "” means " + w[2] + ": " + w[3] + " " + w[2] + " " + amt + " MW." };
   }
   function drill(D, seed, n) { return DR.series(function (k, r) { return drillItem(D, k, r); }, seed, n); }
 
@@ -193,6 +199,7 @@
     steps.push({
       text: "Rules arrive as words. Pick the sign each sentence means: ≤ (at most), ≥ (at least) or = (exactly).",
       build: function (act, api) {
+        H("p", { class: "k4-prog", html: "<b>Why “at least”.</b> Wind and solar can be turned down, so gas may make more than " + s.need + " MW: the extra replaces as much wind or sun, and supply still equals demand." }, act);
         var right = {}, list = H("div", { class: "k4-words" }, act);
         PHRASES.forEach(function (p, i) {
           var row = H("div", { class: "k4-word" }, list); H("p", { text: p[0] }, row);
@@ -209,7 +216,7 @@
     steps.push({
       text: "An [[inequality|inequality]] keeps a whole side of its line. Switch the " + s.need + " MW rule from ≥ to ≤, then move the test plan across the line.",
       build: function (act, api) {
-        var op = ">=", tried = { ">=": 1 }, moved = 0;
+        var op = ">=", tried = { ">=": 1 }, sides = {};   // sides the test plan has stood on: below and above the line x + y = need
         var top = H("div", { class: "k4-ctl" }, act);
         H("span", { class: "k4-lab", text: "x + y" }, top);
         seg(top, ["≤", "=", "≥"], 2, function (i) { op = ["<=", "=", ">="][i]; tried[op] = 1; draw(); }, "Sign of the rule");
@@ -217,16 +224,17 @@
         var pl = LX.LPPlane(act, { view: s.view, ticks: [0, 40, 80, 120, 160], xLabel: "x: combined-cycle plant, MW", yLabel: "y: peaker, MW", aria: "The rule x + y and a test plan." });
         var out = H("p", { class: "k4-test", "aria-live": "polite" }, act), prog = H("p", { class: "k4-prog" }, act);
         var p = [40, 40];
-        var sx = LX.Slider(act, { label: "Test plan x", color: "var(--lx-cc)", max: 160, step: 5, onChange: function (v) { p[0] = v; moved++; draw(); } });
-        var sy = LX.Slider(act, { label: "Test plan y", color: "var(--lx-pk)", max: 160, step: 5, onChange: function (v) { p[1] = v; moved++; draw(); } });
+        var sx = LX.Slider(act, { label: "Test plan x", color: "var(--lx-cc)", max: 160, step: 5, onChange: function (v) { p[0] = v; draw(); } });
+        var sy = LX.Slider(act, { label: "Test plan y", color: "var(--lx-pk)", max: 160, step: 5, onChange: function (v) { p[1] = v; draw(); } });
         sx.set(p[0]); sy.set(p[1]);
-        pl.onPick(function (q) { p = q; sx.set(q[0]); sy.set(q[1]); moved++; draw(); });
+        pl.onPick(function (q) { p = q; sx.set(q[0]); sy.set(q[1]); draw(); });
         function draw() {
+          var sum = p[0] + p[1]; if (sum < s.need) sides.below = 1; else if (sum > s.need) sides.above = 1;
           var r = { a: [1, 1], op: op, b: s.need }, ok = holds(r, p);
           pl.clear(); pl.region([r, { a: [1, 0], op: ">=", b: 0 }, { a: [0, 1], op: ">=", b: 0 }]); pl.rule(r, { label: fmtRule(r), cls: "on" });
           pl.point(p, { cls: ok ? "good" : "bad", label: ok ? "passes" : "fails" });
           out.innerHTML = "Test plan: x + y = " + p[0] + " + " + p[1] + " = <b>" + (p[0] + p[1]) + "</b>. Is that " + OPS[op] + " " + s.need + "? <b>" + (ok ? "Yes: it passes." : "No: it fails.") + "</b>";
-          var left = [tried["<="] ? null : "switch the sign to ≤", moved >= 1 ? null : "move the test plan"].filter(Boolean);
+          var left = [tried["<="] ? null : "switch the sign to ≤", sides.above && sides.below ? null : "move the test plan to the other side of the line (it has been only " + (sides.above ? "above" : "below") + " it)"].filter(Boolean);
           prog.textContent = left.length ? "Still to do: " + left.join("; ") + "." : "Both done: Next is open.";
           if (!left.length) { api.done(); api.saw("With ≥ the plans on the far side of the line pass; with ≤ the near side; with = only the line itself. The line always belongs to ≤ and ≥."); }
         }
@@ -242,7 +250,7 @@
       { r: { a: [1, 1], op: "<=", b: s.need }, ok: false, why: "Only the sign changed: this is the opposite rule." },
       { r: { a: [-1, -1], op: "<=", b: s.need }, ok: false, why: "The right-hand side must be multiplied by −1 too." }];
     steps.push({
-      text: "One common solver form writes every inequality one way round, as ≤ (B1 uses it). Multiplying both sides by a negative number flips the sign. Which line is the same rule as x + y ≥ " + s.need + "?",
+      text: "Some [[solver|solvers]], the programs that find a model's best plan, take every inequality as ≤. Multiplying both sides by a negative number flips the sign: which line is the same rule as x + y ≥ " + s.need + "?",
       build: function (act, api) {
         var pl = null, row = H("div", { class: "lx-choices-row k4-forms", role: "group", "aria-label": "Candidate forms" }, act), btns = [];
         FORMS.forEach(function (F, i) {
@@ -269,7 +277,7 @@
 
     // ---- step 6: several rules at once
     steps.push({
-      text: "A model's rules all hold at once. Switch on the peaker's size and the [[ramp-rate|ramp]] limit; x ≥ 0 and y ≥ 0 are always on. The plans that pass every rule form the [[feasible-region|feasible region]].",
+      text: "A model's rules all hold at once. Switch on the peaker's size and the [[ramp-rate|ramp]] limit: the plans that pass every rule form the [[feasible-region|feasible region]].",
       build: function (act, api) {
         var on = { cover: true, x0: true, y0: true };
         var chips = H("div", { class: "k4-chips", role: "group", "aria-label": "Rules" }, act);

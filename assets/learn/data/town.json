@@ -1,7 +1,7 @@
 {
   "name": "Prairie Town",
   "note": "Prairie Town is fictional. Its plants, sizes and prices are illustrative. Hourly demand, wind and solar follow the shapes of real days on the Southwest Power Pool grid (town_year.json and town_days.json, from EIA-930), scaled down to the town.",
-  "dataset": { "creator": "Honglin Li", "date": "2026-11-02", "status": "Illustrative: Prairie Town, its plants, sizes and prices are fictional.", "source": "Written by hand for lesson 0 and the lessons built on it.", "license": "CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/), Honglin Li. The EIA-930 shapes it refers to are U.S. government works in the public domain." },
+  "dataset": { "creator": "Honglin Li", "date": "2026-11-02", "status": "Illustrative: Prairie Town, its plants, sizes and prices are fictional.", "source": "Illustrative fleet assumptions shared by lesson 0 and the lessons built on it.", "license": "CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/), Honglin Li. The EIA-930 shapes it refers to are U.S. government works in the public domain." },
   "units": {
     "mw": "MW (plant size, or average output over an hour)",
     "cost": "$ per MWh (running cost: fuel and other costs that grow with output)",

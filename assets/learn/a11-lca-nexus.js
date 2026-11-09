@@ -22,7 +22,9 @@
 //           year (footprint: well pads, roads, pipelines, plant) or 1,900 (spacing: the whole gas field); over 90% is
 //           indirect (fuel supply), so Supply alone is "over" 90% of the total and On site "under" 10%.
 // The boundary is a run of stages [L, R] (indices 0..3). The total inside sums its stages; a stage "not counted" is
-// listed, never added. Consequential answer for a new solar farm against not building it (illustrative arithmetic on
+// listed, never added. Water's End of life is published inside Build (Meldrum et al. count taking down with building):
+// the two cannot be split, so a boundary with End of life but not Build has no separate number for it ("in Build", not
+// 0), and a boundary with Build but not End of life says that its Build figure includes End of life. Consequential answer for a new solar farm against not building it (illustrative arithmetic on
 // NREL's medians): its whole life (43) minus what its MWh avoid: existing gas plants' burning and gas supply, 389 + 71
 // (the 71 treated as all fuel supply); existing wind farms 0 (built already, their upkeep goes on);
 // spilled power 0.
@@ -59,12 +61,19 @@
   }
   // the total inside a boundary of stages L..R (inclusive)
   function inside(D, obj, meter, L, R, o) {
-    var parts = [], nc = [], v = 0, bounds = [], n = 0;
-    for (var i = L; i <= R; i++) { var s = stage(D, obj, meter, STAGES[i], o); parts.push(s); if (s.kind === "nc") nc.push(STAGES[i]); else if (s.kind === "bound") bounds.push(s); else { v += s.v; n++; } }
-    var res = { parts: parts, nc: nc, v: v, kind: "num", dir: null };
+    var parts = [], nc = [], sep = [], incl = [], v = 0, bounds = [], n = 0, E = D.objects[obj][meter];
+    for (var i = L; i <= R; i++) {
+      var s = stage(D, obj, meter, STAGES[i], o), w = E[STAGES[i]].with, wi = w ? STAGES.indexOf(w) : -1; parts.push(s);
+      if (s.kind === "nc") nc.push(STAGES[i]);
+      else if (s.kind === "bound") bounds.push(s);
+      else if (s.kind === "with" && (wi < L || wi > R)) sep.push(STAGES[i]);   // its number sits in a stage outside
+      else { v += s.v; n++; }
+    }
+    STAGES.forEach(function (sid, j) { var w = E[sid].with; if (w && (j < L || j > R) && STAGES.indexOf(w) >= L && STAGES.indexOf(w) <= R) incl.push(sid); });
+    var res = { parts: parts, nc: nc, sep: sep, incl: incl, v: v, kind: "num", dir: null };
     if (bounds.length === 2) { res.v = v + bounds[0].joint; n++; }          // both gas land stages inside: the whole total
     else if (bounds.length === 1) { res.v = v + bounds[0].v; res.kind = "bound"; res.dir = bounds[0].dir; n++; }
-    if (n === 0) res.kind = "nc";
+    if (n === 0) res.kind = sep.length ? "sep" : "nc";
     return res;
   }
   function full(D, obj, meter, o) { return inside(D, obj, meter, 0, 3, o); }
@@ -93,18 +102,24 @@
     var v = obj === "dc" ? "used" : "made";
     return meter === "carbon" ? "carbon in g CO₂e per kWh " + v + " (= kg per MWh)" : meter === "water" ? "water in gallons consumed per MWh " + v : "land in m² held per MWh " + v + " in a year";
   }
+  // a bound keeps two decimals (exact here: 90% and 10% of a one-decimal total), so rounding never tightens it
+  function numBound(meter, v) { return meter === "land" ? String(Math.round(v * 100) / 100) : num(meter, v); }
   function val(meter, s) {
     if (s.kind === "nc") return "not counted";
     if (s.kind === "none") return "none";
     if (s.kind === "with") return "in Build";
-    if (s.kind === "bound") return s.dir + " " + num(meter, s.v);
+    if (s.kind === "bound") return s.dir + " " + numBound(meter, s.v);
     if (s.loText && s.v <= 1) return "about " + num(meter, s.v);
     return (s.about ? "about " : "") + num(meter, s.v);
   }
   function totalText(meter, r) {
     if (r.kind === "nc") return "not counted";
-    var t = (r.kind === "bound" ? r.dir + " " : "") + num(meter, r.v) + " " + UNIT[meter];
-    return t + (r.nc.length ? " (" + r.nc.length + (r.nc.length === 1 ? " stage" : " stages") + " not counted)" : "");
+    if (r.kind === "sep") return "not separate (in Build)";
+    var t = (r.kind === "bound" ? r.dir + " " + numBound(meter, r.v) : num(meter, r.v)) + " " + UNIT[meter], x = [];
+    if (r.nc.length) x.push(r.nc.length + (r.nc.length === 1 ? " stage" : " stages") + " not counted");
+    if (r.sep && r.sep.length) x.push("End of life not separate: it is in Build, outside");
+    if (r.incl && r.incl.length) x.push("Build includes End of life");
+    return t + (x.length ? " (" + x.join("; ") + ")" : "");
   }
   // the gas plant's stages add to 460.82 g, while NREL's median of whole-life totals is 486 g: say so wherever the full sum shows
   function wholeNote(D, obj, meter, L, R) { return obj === "gas" && meter === "carbon" && L === 0 && R === 3 ? "stages added; whole-life median " + D.nrelTotals.gas : null; }
@@ -187,7 +202,7 @@
 
   var model = { STAGES: STAGES, fallbackHTML: fallbackHTML, explainHTML: explainHTML, galPerMWh: galPerMWh, haToM2: haToM2, landPv: landPv, landPvFixed: landPvFixed, landGas: landGas, dcVals: dcVals, coolingOf: coolingOf,
     stage: stage, inside: inside, full: full, avoided: avoided, consequential: consequential, consArith: consArith, unitLine: unitLine, stack: stack, campus: campus, ratio: ratio,
-    num: num, val: val, totalText: totalText, wholeNote: wholeNote, range: range, signed: signed, grp: grp, billions: billions, millions: millions, UNIT: UNIT,
+    num: num, numBound: numBound, val: val, totalText: totalText, wholeNote: wholeNote, range: range, signed: signed, grp: grp, billions: billions, millions: millions, UNIT: UNIT,
     brochureRatio: brochureRatio, fairRatio: fairRatio,
     lineSolar: lineSolar, lineGas: lineGas, stackHint: stackHint, lineCompare: lineCompare, lineWater: lineWater, lineLand: lineLand, lineDC: lineDC, lineCons: lineCons, lineDrought: lineDrought };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
@@ -234,16 +249,20 @@
       var ob = D.objects[S.obj];
       Object.keys(objB).forEach(function (k) { objB[k].setAttribute("aria-pressed", String(k === S.obj)); });
       Object.keys(metB).forEach(function (k) { metB[k].setAttribute("aria-pressed", String(k === S.meter)); });
-      head.innerHTML = ""; H("b", { text: ob.name }, head); H("span", { text: " · " + ob.kind + " · " + unitLine(S.obj, S.meter) }, head);
+      head.innerHTML = ""; H("b", { text: ob.name }, head); H("span", { html: LX.rich(" · " + ob.kind + " · " + unitLine(S.obj, S.meter)) }, head);
     }
     function paintRest() {
       var ob = D.objects[S.obj], o = { cooling: S.cooling, wide: S.wide };
       chips.innerHTML = "";
       MET.forEach(function (m) {
         var r = inside(D, S.obj, m[0], S.L, S.R, o), c = H("div", { class: "lx-readout" + (m[0] === S.meter ? " a11-on" : "") }, chips);
-        H("span", { text: D.meters.filter(function (x) { return x.id === m[0]; })[0].label + " inside" }, c); H("b", { text: totalText(m[0], r).replace(/ \(.*\)$/, "") }, c);
+        H("span", { text: D.meters.filter(function (x) { return x.id === m[0]; })[0].label + " inside" }, c); H("b", { text: r.kind === "sep" ? "not separate" : totalText(m[0], r).replace(/ \(.*\)$/, "") }, c);
         var wn = wholeNote(D, S.obj, m[0], S.L, S.R);
-        if (wn) H("small", { text: wn }, c); else if (r.nc.length && r.kind !== "nc") H("small", { text: r.nc.length + " not counted" }, c);
+        if (wn) H("small", { text: wn }, c);
+        else if (r.kind === "sep") H("small", { text: "End of life is counted in Build" }, c);
+        else if (r.sep.length) H("small", { text: "End of life missing: it is in Build, outside" + (r.nc.length ? "; " + r.nc.length + " not counted" : "") }, c);
+        else if (r.incl.length) H("small", { text: "Build includes End of life" + (r.nc.length ? "; " + r.nc.length + " not counted" : "") }, c);
+        else if (r.nc.length && r.kind !== "nc") H("small", { text: r.nc.length + " not counted" }, c);
       });
       altBody.innerHTML = "";
       var tb = H("table", { class: "lx-facts" }, altBody), hr0 = H("tr", null, H("thead", null, tb));
@@ -293,10 +312,8 @@
             options: [{ value: "bound", label: "Two boundaries: the stack for gas, cradle to grave for solar" }, { value: "zero", label: "Solar's number should be 0" }, { value: "fine", label: "Nothing: both are NREL's medians" }],
             feedback: { bound: "Right: compare on one boundary.", zero: "0 is solar on site only; on that boundary gas is " + D.objects.gas.carbon.run.v + " g, so the two must match.", fine: "Both are medians, but of different boundaries." },
             onPick: function () { pr.reveal(); tab.hidden = false; api.saw(lineCompare(D)); api.done(); } });
-          var g = D.objects.gas.carbon, rows = [["On site only", "0", grp(g.run.v)], ["Cradle to grave, NREL's median", String(D.nrelTotals.solar), String(D.nrelTotals.gas)],
-            ["Harmonized median (middle half)", D.harmonized.solar.median + " (" + D.harmonized.solar.lo + " to " + D.harmonized.solar.hi + ")", D.harmonized.gas.median + " (" + D.harmonized.gas.lo + " to " + D.harmonized.gas.hi + ")"]];
-          LX.Ledger(tab, { cls: "a11-led", caption: "g CO₂e per kWh made, on each boundary.", columns: ["Boundary", "Solar farm", "Gas plant"], rows: rows.map(function (r) { return { head: r[0], cells: [r[1], r[2]] }; }) });
-          H("p", { class: "lx-hint", html: LX.rich("Harmonized: studies re-run on common assumptions; the [[interquartile-range|middle half]] of their results in brackets (crystalline panels; combined-cycle plants).") }, tab);
+          var g = D.objects.gas.carbon, rows = [["On site only", "0", grp(g.run.v)], ["Cradle to grave", String(D.nrelTotals.solar), String(D.nrelTotals.gas)]];
+          LX.Ledger(tab, { cls: "a11-led", caption: "g CO₂e per kWh made, on each boundary: NREL's medians for " + D.nrelTotals.solarWhat + ", and for " + D.nrelTotals.gasWhat + ".", columns: ["Boundary", "Solar farm", "Gas plant"], rows: rows.map(function (r) { return { head: r[0], cells: [r[1], r[2]] }; }) });
         } },
       { text: "Switch to water: a plant [[water-withdrawal|withdraws]] water, returns part of it and [[water-consumption|consumes]] the rest, mostly by evaporation; the split depends on the cooling. Pick two ways to cool the gas plant and compare.",
         build: function (act, api) {
@@ -376,9 +393,7 @@
           LX.Toggle(H("div", { class: "lx-toggles", role: "group", "aria-label": "Water year" }, act), { label: "Drought case (EIA, May 2022)", on: S.drought,
             onChange: function (on) { S.drought = on; keep(); draw(); api.saw(lineDrought(D, on)); if (on) api.done(); } });
           draw(); if (S.drought) { api.saw(lineDrought(D, true)); api.done(); }
-          H("p", { class: "lx-hint", text: "In 2021 California's hydropower made " + D.drought.ca2021Below + "% less than its 2011–2020 average (EIA)." }, act);
-          H("p", { class: "lx-hint", html: "Plants cooled by rivers can be forced to cut output when the water runs warm or low: " + ref("A9") + " stress-tests it. EIA did not expect a significant effect in California in 2022." }, act);
-          H("p", { class: "lx-hint", text: "A data center's indirect water sits in these plants and reservoirs: LBNL names thermal plants' cooling and hydropower reservoirs' evaporation." }, act);
+          H("p", { class: "lx-hint", text: "More on drought, cooling and loads: Go deeper, below." }, act);
         } }
     ];
     var cards = LX.StepCards(live, { steps: steps });
@@ -392,7 +407,7 @@
       var row = function (k) { return function (m) { var r = full(D, k, m, o), wn = wholeNote(D, k, m, 0, 3); return totalText(m, r) + (wn ? " (" + wn + ")" : ""); }; };
       LX.CompareTable(H("div", { class: "lx-xcard" }, xhost), {
         title: "Three footprints, cradle to grave", text: true,
-        caption: "Your choices: " + cool.label.toLowerCase() + " cooling; land " + (S.wide ? "with the land between" : "as footprints") + ". Medians and 2023 averages; stages not counted are flagged.",
+        caption: "Your choices: " + cool.label.toLowerCase() + " cooling; land " + (S.wide ? "with the land between" : "as footprints") + ". Totals add stage medians (illustrative sums) or use 2023 averages; stages not counted are flagged.",
         columns: [{ key: "name", label: "Object", main: true }, { key: "c", label: "Carbon" }, { key: "w", label: "Water consumed" }, { key: "l", label: "Land" }],
         rows: [["solar", "var(--lx-solar)"], ["gas", "var(--lx-cc)"], ["dc", "var(--lx-dr)"]].map(function (x) {
           var f = row(x[0]); return { key: x[0], color: x[1], name: D.objects[x[0]].name, note: D.objects[x[0]].per, c: f("carbon"), w: f("water"), l: f("land") }; }) });
@@ -411,7 +426,7 @@
         edges: [["fu", "bound", "sets the frame for"], ["bound", "carbon", "decides"], ["bound", "water", "decides"], ["bound", "land", "decides"], ["carbon", "attr", "answers"], ["carbon", "cons", "answers"], ["drought", "water", "tightens"]],
         cols: 4, rows: 3, colsN: 3, rowsN: 4, gameLabel: "In this lesson" });
       LX.Boundary(H("div", { class: "lx-xcard" }, xhost), { title: "Where these footprints hold",
-        holds: ["each number is a published median for its technology and stage, or a 2023 U.S. average, not one real plant; solar's land between is an illustrative scaling;", "carbon in CO₂ equivalents: methane and other gases converted to CO₂'s warming effect;", "water is consumption in U.S. conditions, with making and building where the reviews count them; land is held area, not damage to it;", "the data center is the 2023 U.S. average of LBNL's report."],
+        holds: ["each stage is a published median for its technology, or a 2023 U.S. average, not one real plant; totals that add stage medians are illustrative sums; solar's land between is an illustrative scaling;", "carbon in CO₂ equivalents: methane and other gases converted to CO₂'s warming effect;", "water is consumption in U.S. conditions, with making and building where the reviews count them; land is held area, not damage to it;", "the data center is the 2023 U.S. average of LBNL's report."],
         leaves: ["one site's sun, gas field, river or grid: ranges show how far a real plant can sit from the median;", "the land of mines and factories;", "a data center's servers, buildings and site;", "air pollution and health."],
         source: "Sources: NREL (2021), Meldrum et al. (2013), Macknick et al. (2012), Bolinger and Bolinger (2022), Lovering et al. (2022), LBNL (2024), EIA and USGS; dates in Sources below." });
       H("p", { class: "lx-hint", html: "Air pollution and health, from a tonne of fuel to the people who breathe it: " + ref("F11") + "." }, xhost);

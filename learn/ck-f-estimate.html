@@ -410,14 +410,24 @@ ul.task-list li input[type="checkbox"] {
 </div>
 
 <div id="task" class="lx-sec">
+<div class="lx-card ckf-rules">
+<p class="lx-eyebrow">How it is marked, before you start</p>
+<ul class="ckf-list">
+<li><b>Proficient:</b> at least 5 of the 7 auto-marked tasks right on the first try, both points of task 1, and Proficient or better on all four estimate criteria.</li>
+<li><b>Strong:</b> at least 6 of 7, both points of task 1, and Proficient or better on all four estimate criteria, with Strong on at least two.</li>
+<li><b>Opening a solution early:</b> that task counts as not right. For task 1 that means no points; for the estimate, no self-ratings.</li>
+<li><b>Written answers</b> (tasks 1 and 9) stay as you first submit them, and that is what you rate.</li>
+</ul>
+<p class="lx-hint">The full rule and the rubric are in the <a href="#rubric">Rubric</a> section.</p>
+</div>
 <div class="lx-interactive" data-learn="ck-f-estimate" data-src="../assets/learn/data/ck-f-estimate.json">
 <div class="lx-fallback">
 
 <p class="lx-eyebrow">The nine tasks</p>
 <p class="lx-hint">Answer each task on paper first, then open its worked solution. Task 9 is the main estimate; its worked solution and the rubric are further down this page.</p>
 <ol class="ckf-static">
-<li><p><b>Why balance every moment?</b> <span class="lx-hint">Explain a mechanism · draws on T0, T3</span></p><p>In one or two sentences: why must supply equal demand at every moment on a power grid, and what tells the operator when it does not?</p><details class="lx-textalt"><summary>Worked solution, task 1</summary><p>Power is made as it is used; only the spinning machines' stored energy covers a gap, for seconds. A shortfall makes the frequency fall, a surplus makes it rise, and controls then restore the balance and 60 Hz.</p><p>A full answer makes two points:</p><ul><li>The grid stores almost no energy, so power is made as it is used; only the spinning machines' stored energy covers a gap, for seconds.</li><li>The frequency shows a gap: a shortfall makes it fall below 60 Hz and a surplus makes it rise; controls then restore the balance and bring it back to 60 Hz.</li></ul></details></li>
-<li><p><b>Phone charges in a day</b> <span class="lx-hint">Estimate with units · draws on T1</span></p><p>A U.S. home uses about 10,800 kWh of electricity a year. A phone takes about 15 Wh for a full charge (illustrative). About how many full charges equal one day of the home's use?</p><ul><li>a. 2</li><li>b. 80</li><li>c. 2,000</li><li>d. 720,000</li></ul><details class="lx-textalt"><summary>Worked solution, task 2</summary><p><b>Answer: c. 2,000.</b></p><p>One day: 10,800 kWh ÷ 365 ≈ 30 kWh = 30,000 Wh, and 30,000 Wh ÷ 15 Wh ≈ 2,000 charges. The trap is the k: kWh and Wh differ by a factor of 1,000.</p></details></li>
+<li><p><b>Why balance every moment?</b> <span class="lx-hint">Explain a mechanism · draws on T0, T3</span></p><p>In one or two sentences: why must supply equal demand at every moment on a power grid, and what tells the operator when it does not?</p><details class="lx-textalt"><summary>Worked solution, task 1</summary><p>Power is made as it is used; spinning machines' <span class="lx-term" data-term="inertia">inertia</span>, or a fast reserve such as a battery, bridges a gap only briefly. A shortfall lowers the <span class="lx-term" data-term="frequency">frequency</span>, a surplus raises it, and controls restore the balance and 60 Hz.</p><p>A full answer makes two points:</p><ul><li>The grid stores little energy, so power is made as it is used; stored energy, in spinning machines' inertia or a fast reserve such as a battery, bridges a gap only until controls act.</li><li>The frequency shows a gap: a shortfall makes it fall below 60 Hz and a surplus makes it rise; controls then restore the balance and bring it back to 60 Hz.</li></ul></details></li>
+<li><p><b>Phone charges in a day</b> <span class="lx-hint">Estimate with units · draws on T1</span></p><p>A U.S. home buys about 10,800 kWh of electricity a year. A phone takes about 15 Wh for a full charge (illustrative). About how many full charges equal one day of those purchases?</p><ul><li>a. 2</li><li>b. 80</li><li>c. 2,000</li><li>d. 720,000</li></ul><details class="lx-textalt"><summary>Worked solution, task 2</summary><p><b>Answer: c. 2,000.</b></p><p>One day: 10,800 kWh ÷ 365 ≈ 30 kWh = 30,000 Wh, and 30,000 Wh ÷ 15 Wh ≈ 2,000 charges. The trap is the k: kWh and Wh differ by a factor of 1,000.</p></details></li>
 <li><p><b>A December day's demand</b> <span class="lx-hint">Read a chart · draws on T2</span></p><p>The chart shows Prairie Town's demand on a real December weekday. When is demand highest, and how much above the day's lowest hour?</p><details class="lx-textalt"><summary>Chart data: Monday 15 December 2025, MW by hour</summary><div class="lx-scroll-x">
 <table class="lx-mini-table caption-top table">
 <thead>
@@ -660,16 +670,18 @@ ul.task-list li input[type="checkbox"] {
 </tbody>
 </table>
 </div></details><ul><li>a. too low, by at most about 2% of demand</li><li>b. too high, by at most about 2% of demand</li><li>c. too low, by up to about 20% of demand</li><li>d. exactly right</li></ul><details class="lx-textalt"><summary>Worked solution, task 5</summary><p><b>Answer: a. too low, by at most about 2% of demand.</b></p><p>Actual demand is above the forecast in 19 of 24 hours; the largest miss is 6 MW at 13:00 and 14:00, about 2% of demand. Operators hold reserves to cover misses like these.</p></details></li>
-<li><p><b>A wind farm's year</b> <span class="lx-hint">Estimate with units · draws on T5</span></p><p>A 50 MW wind farm runs at the 2025 U.S. average capacity factor for wind, 33.8%. About how much energy does it make in a year?</p><p>Answer with a number and a unit.</p><details class="lx-textalt"><summary>Worked solution, task 6</summary><p><b>Answer: about 148 GWh.</b></p><p>50 MW × 8,760 h × 0.338 ≈ 148,000 MWh, or 148 GWh. Without the capacity factor you would get 438,000 MWh: the farm at full output every hour, which no wind farm does.</p></details></li>
-<li><p><b>A windless winter evening</b> <span class="lx-hint">Explain a mechanism · draws on T6</span></p><p>A windless winter evening at 18:00, with demand near its peak. Assume every plant is available and has fuel. Which pair can Prairie Town count on?</p><ul><li>a. The solar farm and the wind farm</li><li>b. The gas peaker and the nuclear plant</li><li>c. The wind farm and the nuclear plant</li><li>d. Rooftop solar and the gas peaker</li></ul><details class="lx-textalt"><summary>Worked solution, task 7</summary><p><b>Answer: b. The gas peaker and the nuclear plant.</b></p><p>Firm capacity is output you can count on when it is needed. At a calm winter dusk, with plants available and fuelled, that is the gas peaker and the nuclear plant; wind and solar do other jobs.</p></details></li>
-<li><p><b>Spot the error in a headline</b> <span class="lx-hint">Spot an error · draws on N1</span></p><p>Made-up headline: “New 100 MW solar farm will power 100,000 homes.” At the 2025 U.S. solar capacity factor (24.0%) and 10,800 kWh per home a year, about how many homes' yearly use does it make?</p><ul><li>a. 4,000</li><li>b. 20,000</li><li>c. 100,000</li><li>d. 200,000</li></ul><details class="lx-textalt"><summary>Worked solution, task 8</summary><p><b>Answer: b. 20,000.</b></p><p>100 MW × 8,760 h × 0.240 ≈ 210,000 MWh a year, or about 19,500 homes at 10.8 MWh each. Even nameplate (maximum rated) output every hour would make only about 81,000: the headline fails the physics question.</p></details></li>
+<li><p><b>A wind farm's year</b> <span class="lx-hint">Estimate with units · draws on T5</span></p><p>A 50 MW wind farm runs at the 2025 U.S. average capacity factor for wind, 33.8%. About how much energy does it make in a year?</p><p>Answer with a number and a unit.</p><details class="lx-textalt"><summary>Worked solution, task 6</summary><p><b>Answer: about 148 GWh.</b></p><p>50 MW × 8,760 h × 0.338 ≈ 148,000 MWh, or 148 GWh. Without the <span class="lx-term" data-term="capacity-factor">capacity factor</span> you would get 438,000 MWh: the farm at full output every hour, which no wind farm does.</p></details></li>
+<li><p><b>A windless winter evening</b> <span class="lx-hint">Explain a mechanism · draws on T6</span></p><p>A windless winter evening at 18:00, with demand near its peak. Assume every plant is available and has fuel. Which pair can Prairie Town count on?</p><ul><li>a. The solar farm and the wind farm</li><li>b. The gas peaker and the nuclear plant</li><li>c. The wind farm and the nuclear plant</li><li>d. Rooftop solar and the gas peaker</li></ul><details class="lx-textalt"><summary>Worked solution, task 7</summary><p><b>Answer: b. The gas peaker and the nuclear plant.</b></p><p><span class="lx-term" data-term="firm-capacity">Firm capacity</span> is output you can count on when it is needed. At a calm winter dusk, with plants available and fuelled, that is the gas <span class="lx-term" data-term="peaker">peaker</span> and the nuclear plant; wind and solar do other jobs.</p></details></li>
+<li><p><b>Spot the error in a headline</b> <span class="lx-hint">Spot an error · draws on N1</span></p><p>Made-up headline: “New 100 MW solar farm will power 100,000 homes.” At the 2025 U.S. solar capacity factor (24.0%) and 10,800 kWh bought per home a year, about how many homes' yearly purchases does it equal?</p><ul><li>a. 4,000</li><li>b. 20,000</li><li>c. 100,000</li><li>d. 200,000</li></ul><details class="lx-textalt"><summary>Worked solution, task 8</summary><p><b>Answer: b. 20,000.</b></p><p>100 MW × 8,760 h × 0.240 ≈ 210,000 MWh a year, or about 19,500 homes' yearly purchases at 10.8 MWh each. Even nameplate (maximum rated) output every hour would equal only about 81,000: the headline fails the physics question.</p></details></li>
 <li><p><b>The school-bus estimate</b> <span class="lx-hint">Estimate (main task) · draws on T1, T5, N1</span></p><p>Prairie Town's 20 diesel school buses go electric. Estimate the electricity they will use in a year, stating your assumptions. The fields below ask for a range with units, the main uncertainty and one way to check.</p><p>On paper: a low and a high value with units, your inputs and steps, the main uncertainty and one way to check.</p></li>
 </ol>
 
 <p class="lx-hint">With JavaScript on, this page gives you nine tasks one at a time, with instant feedback and a worked solution after each first answer, and keeps your times in this browser.</p>
 </div>
 </div>
-<p class="lx-datanote"><svg class="lx-ic" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5M12 8v.2"></path></svg><span>Prairie Town is fictional; its buses and plants are illustrative. The two charts use real 2025 Southwest Power Pool shapes (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>) scaled to the town as in lesson 0. Draws on lessons <a href="00-grid-operator.html">0</a>, <a href="01-power-energy.html">1–6</a> and the news lens N1. Nothing you type leaves this browser unless you copy it; the copied summary includes what you typed in tasks 1 and 9.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5M12 8v.2"></path></svg><span>Prairie Town is fictional; its buses and plants are illustrative. Draws on lessons <a href="00-grid-operator.html">0</a>, <a href="01-power-energy.html">1–6</a> and the news lens N1.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5M12 8v.2"></path></svg><span>The two charts use real 2025 Southwest Power Pool shapes (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>) scaled to the town as in lesson 0.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5M12 8v.2"></path></svg><span>Nothing you type leaves this browser unless you copy it. The copied summary includes what you typed in tasks 1 and 9.</span></p>
 </div>
 <div id="solution" class="lx-sec">
 <section id="worked-solution-the-school-bus-estimate" class="level2 lx-sec-h">
@@ -721,11 +733,45 @@ ul.task-list li input[type="checkbox"] {
 <ul class="ckf-list">
 <li><b>Main uncertainty: energy per mile.</b> It spans nearly a factor of two, from 1.3 to 2.3 kWh per mile, with cold weather and cabin heat at the high end.</li>
 <li><b>Next: miles per bus.</b> Route B's 14,084 miles is about 1.6 times Route A's 9,000.</li>
-<li><b>Check with homes.</b> 440 MWh = 440,000 kWh; 440,000 ÷ 10,791 kWh per home ≈ 41 average U.S. homes' yearly electricity purchases.</li>
-<li><b>Check with the town.</b> Prairie Town uses about 2,470 GWh a year, so the buses add about 0.02%.</li>
-<li><b>Check with a battery.</b> 50 miles × 2.3 kWh per mile = 115 kWh per bus per day: plausible next to the battery sizes in EPA's October 2024 webinar (under 100 to over 300 kWh). A real bus needs that much usable energy, plus a reserve.</li>
+<li><b>Scale, not a check: homes.</b> 440 MWh = 440,000 kWh; 440,000 ÷ 10,791 kWh per home ≈ 41 average U.S. homes' yearly electricity purchases.</li>
+<li><b>Scale, not a check: the town.</b> Prairie Town uses about 2,470 GWh a year, so the buses add about 0.02%. A wrong estimate converts just as neatly, so neither comparison tests it.</li>
+<li><b>Plausibility: a day's energy.</b> 50 miles × 2.3 kWh per mile = 115 kWh per bus per day, within the battery sizes in EPA's October 2024 webinar (under 100 to over 300 kWh).</li>
+<li><b>Its limit.</b> A real bus needs that much usable energy, plus a reserve, so a small battery may not cover the worst day.</li>
 <li><b>Check with records.</b> The district's yearly mileage replaces Route B's national average. A comparable electric fleet's measured charging energy also checks the energy per mile, the input both routes share.</li>
 </ul>
+</div>
+<div class="lx-xcard">
+<header class="lx-x-head"><h3 class="anchored">The bus numbers and their sources</h3></header>
+<div class="lx-scroll-x">
+
+<table class="lx-facts caption-top table">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">Number</th>
+<th data-quarto-table-cell-role="th" scope="col">What it means</th>
+<th data-quarto-table-cell-role="th" scope="col">Source</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td class="n">14,084 miles</td>
+<td>Average miles a U.S. school bus travels in a year.</td>
+<td class="s"><a href="https://afdc.energy.gov/data/10309">U.S. DOE Alternative Fuels Data Center</a> · accessed 2 Nov 2026</td>
+</tr>
+<tr class="even">
+<td class="n">1.26–1.58 and 2.3 kWh/mile</td>
+<td>Energy per mile of large electric school buses as rated by makers, and a planning worst case.</td>
+<td class="s"><a href="https://www.epa.gov/system/files/documents/2024-12/csb-fleet-plan-rte-analysis-webinar-2024-10-08.pdf">EPA Clean School Bus webinar</a> (PDF), slides 21–25 · 8 Oct 2024</td>
+</tr>
+<tr class="odd">
+<td class="n">under 100 to over 300 kWh</td>
+<td>Battery sizes of electric school buses; usable energy is less, after wear and a minimum charge.</td>
+<td class="s"><a href="https://www.epa.gov/system/files/documents/2024-12/csb-fleet-plan-rte-analysis-webinar-2024-10-08.pdf">EPA Clean School Bus webinar</a> (PDF), slides 16 and 26 · 8 Oct 2024</td>
+</tr>
+</tbody>
+</table>
+
+</div>
 </div>
 <div class="lx-xcard">
 <header class="lx-x-head"><h3 class="anchored">Marking guide in one line each</h3></header>
@@ -733,7 +779,7 @@ ul.task-list li input[type="checkbox"] {
 <li><b>Units:</b> energy per year (kWh, MWh or GWh a year), never kW or MW.</li>
 <li><b>Range:</b> a low and a high from stated inputs (buses, miles, kWh per mile) that meets 230–650 MWh a year, or argues for a different one.</li>
 <li><b>Uncertainty:</b> names the input that moves the answer most, and why.</li>
-<li><b>Check:</b> one check that brings in a different input (a comparison, a record or a measured fleet), not “look it up”.</li>
+<li><b>Check:</b> one check that brings in an independent input (a record or a measured fleet), not “look it up”. A comparison with homes or the town gives scale, not a check.</li>
 </ul>
 </div>
 </div>
@@ -793,7 +839,7 @@ ul.task-list li input[type="checkbox"] {
 <th data-quarto-table-cell-role="th" scope="row">Check</th>
 <td data-l="Not yet">None.</td>
 <td data-l="Developing">“Look it up”, without saying what or where.</td>
-<td data-l="Proficient">One concrete independent check: a second route, a comparison or a record.</td>
+<td data-l="Proficient">One concrete check with an independent input: a second route, a record or a measured fleet (a comparison with homes only gives scale).</td>
 <td data-l="Strong">The check done, with whether it agrees.</td>
 </tr>
 </tbody>
@@ -805,6 +851,7 @@ ul.task-list li input[type="checkbox"] {
 <header class="lx-x-head"><h3 class="anchored">The checkpoint's level</h3></header>
 <ul class="ckf-list">
 <li><b>Proficient:</b> at least 5 of the 7 auto-marked tasks right on the first try, Proficient or better on all four estimate criteria, and both points of task 1.</li>
+<li><b>Opened early:</b> a task whose worked solution you open before answering counts as not right: no points for task 1, no self-ratings for the estimate.</li>
 <li><b>Strong:</b> at least 6 of 7, Proficient or better on all four criteria with Strong on at least two, and both points of task 1.</li>
 <li><b>Developing:</b> at least 3 of 7, and Developing or better on every estimate criterion.</li>
 <li><b>Not yet:</b> anything else. The checkpoint shows readiness for the Analyst tier; it certifies nothing.</li>
@@ -819,7 +866,7 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <div class="lx-end">
 <div class="lx-card">
-<p class="lx-eyebrow">Numbers used in the tasks</p>
+<p class="lx-eyebrow">Numbers used in tasks 1 to 8</p>
 
 <table class="lx-facts caption-top table">
 <thead>
@@ -839,21 +886,6 @@ ul.task-list li input[type="checkbox"] {
 <td class="n">33.8% and 24.0%</td>
 <td>Capacity factors of the U.S. utility-scale wind and solar fleets in 2025.</td>
 <td class="s"><a href="https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_b">EIA, Electric Power Monthly, Table 6.07.B</a> · 2025 annual values</td>
-</tr>
-<tr class="odd">
-<td class="n">14,084 miles</td>
-<td>Average miles a U.S. school bus travels in a year.</td>
-<td class="s"><a href="https://afdc.energy.gov/data/10309">U.S. DOE Alternative Fuels Data Center</a> · accessed 2 Nov 2026</td>
-</tr>
-<tr class="even">
-<td class="n">1.26–1.58 and 2.3 kWh/mile</td>
-<td>Energy per mile of large electric school buses as rated by makers, and a planning worst case.</td>
-<td class="s"><a href="https://www.epa.gov/system/files/documents/2024-12/csb-fleet-plan-rte-analysis-webinar-2024-10-08.pdf">EPA Clean School Bus webinar</a> (PDF), slides 21–25 · 8 Oct 2024</td>
-</tr>
-<tr class="odd">
-<td class="n">under 100 to over 300 kWh</td>
-<td>Battery sizes of electric school buses; usable energy is less, after wear and a minimum charge.</td>
-<td class="s"><a href="https://www.epa.gov/system/files/documents/2024-12/csb-fleet-plan-rte-analysis-webinar-2024-10-08.pdf">EPA Clean School Bus webinar</a> (PDF), slides 16 and 26 · 8 Oct 2024</td>
 </tr>
 </tbody>
 </table>

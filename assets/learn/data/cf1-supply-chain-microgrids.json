@@ -9,7 +9,7 @@
     "label": "Journal article (this case)",
     "kind": "study",
     "key": true,
-    "text": "Factories, warehouses and their on-site microgrids are sited and sized together, for a three-tier supply chain over one year; published online in February 2023, in the July 2023 issue.",
+    "text": "Factories, warehouses and their on-site microgrids are sited and sized together, for a [[supply-chain-tier|three-tier]] supply chain over one year; published online in February 2023, in the July 2023 issue.",
     "source": {
      "label": "Li et al. (2023), Applied Mathematical Modelling 119, 119–136",
      "url": "https://doi.org/10.1016/j.apm.2023.02.014"
@@ -19,7 +19,7 @@
     "date": "2023-06",
     "label": "Conference paper",
     "kind": "study",
-    "text": "A two-tier version locates warehouses and sizes their microgrids, with electric-truck routing and electricity trading.",
+    "text": "A [[supply-chain-tier|two-tier]] version locates warehouses and sizes their microgrids, with electric-truck routing and electricity trading.",
     "source": {
      "label": "Li et al. (2023), SEGRE 2023, 410–415",
      "url": "https://doi.org/10.1109/SEGRE58867.2023.00071"

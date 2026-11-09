@@ -113,7 +113,8 @@
             [LEDGER.rows[2], money(0), d.s.reserves ? money(d.reserve) : "off"], [LEDGER.rows[3], money(0), cost],
             [LEDGER.rows[4], money(d.bau), money(d.net)]];
   }
-  var LEDGER_CAPTION = "One illustrative day, in dollars: selling all the power against adding the electrolyzer and reserves. The plant's own fuel and upkeep, the same in both columns, are left out, so neither total is the plant's profit.";
+  var LEDGER_CAPTION = "One illustrative day, in dollars: selling all the power against adding the electrolyzer and reserves.";
+  var LEDGER_NOTE = "The plant's own fuel and upkeep, the same in both columns, are left out, so neither total is the plant's profit.";
   var HOURS_HEAD = ["Hour", "Grid price ($ per MWh)", "To the grid (MW)", "To the electrolyzer (MW)", "Reserve held (MW)"];
   function hourRows(d) { return d.hours.map(function (x) { return [span(x.t), per(x.p), int(x.g), int(x.h), int(x.r)]; }); }
   function facts(I, d) {
@@ -140,6 +141,7 @@
       "<p class=\"lx-hint\">" + I.note + "</p>" +
       "<ul>" + facts(I, d).map(function (t) { return "<li>" + t + "</li>"; }).join("") + "</ul>" +
       "<div class=\"lx-scroll-x\">" + table(LEDGER.cols.slice(), ledgerRows(d), LEDGER_CAPTION + " At the defaults.", "cf-two lx-ledger") + "</div>" +
+      "<p class=\"lx-hint\">" + LEDGER_NOTE + "</p>" +
       "<p>" + changeLine(d) + "</p>" +
       "<details class=\"lx-textalt\"><summary>The day hour by hour</summary><div class=\"lx-scroll-x\">" + table(HOURS_HEAD, hourRows(d)) + "</div></details>" +
       "<details class=\"lx-textalt\"><summary>The toy's assumptions</summary><ul>" + assumptions(I).map(function (t) { return "<li>" + rich(t) + "</li>"; }).join("") + "</ul></details>";
@@ -185,7 +187,7 @@
   }
   var model = { hh: hh, span: span, money: money, per: per, usd2: usd2, mw: mw, pct: pct, priceAt: priceAt, day: day, at: at, better: better,
                 changeLine: changeLine, gridRange: gridRange, hourLine: hourLine, sceneLines: sceneLines, startLine: startLine,
-                assumptions: assumptions, ledgerRows: ledgerRows, LEDGER: LEDGER, LEDGER_CAPTION: LEDGER_CAPTION, HOURS_HEAD: HOURS_HEAD,
+                assumptions: assumptions, ledgerRows: ledgerRows, LEDGER: LEDGER, LEDGER_CAPTION: LEDGER_CAPTION, LEDGER_NOTE: LEDGER_NOTE, HOURS_HEAD: HOURS_HEAD,
                 hourRows: hourRows, facts: facts, staticIdea: staticIdea, worked: worked, WORKED_HEAD: WORKED_HEAD, hourRow: hourRow,
                 staticWorked: staticWorked, staticBoundary: staticBoundary };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
@@ -258,10 +260,16 @@
     var PP = LX.Plot(H("div", null, charts), { box: true }), PO = LX.Plot(H("div", null, charts), { box: true, text: "Text version: the day hour by hour" });
     H("p", { class: "lx-hint", text: "Tap or use the arrow keys on a chart to pick an hour." }, stage);
     var chips = H("div", { class: "lx-readouts", "aria-live": "polite" }, stage), led = H("div", null, stage);
+    H("p", { class: "lx-hint", text: LEDGER_NOTE }, stage);
     var status = H("div", { class: "lx-stage-status", "aria-live": "polite", style: "display:grid;gap:4px" }, stage);
     var as = H("details", { class: "lx-textalt" }, stage); H("summary", { text: "The toy's assumptions" }, as);
     var aul = H("ul", null, as); assumptions(I).forEach(function (t) { H("li", { html: LX.rich(t) }, aul); });
-    if (P) H("p", { class: "lx-hint", html: "Where this goes next: " + LX.lessonRefHTML(P, "A1") + " turns a year of cash flows into a project's net present value; " + LX.lessonRefHTML(P, "M11") + " puts a wind-hydrogen plant's capital and lifetime cash flows inside an optimization model; " + LX.lessonRefHTML(P, "A12") + " compares the tools governments use to steer energy." }, stage);
+    if (P) {
+      H("p", { class: "lx-hint", text: "Where this goes next:" }, stage);
+      var nx = H("ul", { class: "lx-hint cf4-next" }, stage);
+      [["A1", " turns a year of cash flows into a project's net present value."], ["M11", " puts a wind-hydrogen plant's capital and lifetime cash flows inside an optimization model."],
+       ["A12", " compares the tools governments use to steer energy."]].forEach(function (n) { H("li", { html: LX.lessonRefHTML(P, n[0]) + n[1] }, nx); });
+    }
     function chip(label, value) { var c = H("div", { class: "lx-readout" }, chips); H("span", { text: label }, c); H("b", { text: value }, c); }
     function part(cls, name, val, off) { var d = H("div", { class: "cf4-part p-" + cls + (off ? " is-off" : "") }, scene); H("b", { text: name }, d); H("div", { class: "v", text: val }, d); }
     function ticks() { return [0, 6, 12, 18, 24].map(function (h) { return [h, h === 24 ? "24:00" : hh(h)]; }); }

@@ -504,11 +504,23 @@ window.Quarto = {
 <dt>Flip rule</dt><dd>Multiplying or dividing both sides by a negative number flips the sign.</dd>
 <dt>Feasible region</dt><dd>The plans that pass every rule at once.</dd>
 </dl>
+<p class="lx-eyebrow">Solve a linear inequality a·x + m ≤ n, with a not 0</p>
+<ol>
+<li>Move m across: a·x ≤ n − m.</li>
+<li>Is a negative? Then divide by a and flip the sign: x ≥ (n − m) / a. If not, divide by a: x ≤ (n − m) / a.</li>
+<li>Spot-check one value (it checks the arithmetic, not the whole solution set).</li>
+</ol>
+
+<ul>
+<li>2x + 10 ≤ 50: 2x ≤ 40, so x ≤ 20. Spot-check x = 10: 2 × 10 + 10 = 30 ≤ 50.</li>
+<li>−2x ≤ 6: Divide by −2 and flip: x ≥ −3. Spot-check x = 0: −2 × 0 = 0 ≤ 6.</li>
+</ul>
+
 </div>
 </div>
 <div class="lx-deepers">
 <details class="lx-deeper">
-<summary><span class="k">Go deeper · Analyst</span>Why a rule with two unknowns is a straight line</summary>
+<summary><span class="k">Go deeper · Analyst</span>Why a linear equation in two unknowns draws a straight line</summary>
 <div class="lx-deeper-body">
 <ul>
 <li><strong>Rearrange.</strong> <span class="math inline">\(x + y = 145\)</span> becomes <span class="math inline">\(y = 145 - x\)</span>.</li>
@@ -525,7 +537,7 @@ window.Quarto = {
 <ul>
 <li><strong>Decisions:</strong> the two outputs, <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span>.</li>
 <li><strong>Rules:</strong> each of step 6’s five inequalities becomes one row of a table, all written as ≤ (the ≥ rules flipped).</li>
-<li><strong>In one line:</strong> the rows stack into <span class="math inline">\(A x \le b\)</span>, with <span class="math inline">\(A\)</span> holding the numbers in front of <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span>, and <span class="math inline">\(b\)</span> the limits.</li>
+<li><strong>In one line:</strong> collect both outputs in a vector <span class="math inline">\(\mathbf{z} = (x, y)\)</span>, a list of numbers; the rows stack into <span class="math inline">\(A\mathbf{z} \le b\)</span>, with <span class="math inline">\(A\)</span> holding the numbers in front of <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span>, and <span class="math inline">\(b\)</span> the limits.</li>
 <li><strong>Where next:</strong> <a href="b01-algebra-to-lp.html">Bridge B1</a> builds this table from a word problem and hands it to a real solver; toolbox <a href="k06-vectors-matrices.html">K6</a> covers vectors and matrices.</li>
 </ul>
 </div>

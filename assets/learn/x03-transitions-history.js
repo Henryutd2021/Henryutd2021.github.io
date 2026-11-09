@@ -73,9 +73,9 @@
     "In 1907, 8% of U.S. homes had electric service. Guess how many years it took until 90% of homes had it, then see its [[diffusion-curve|diffusion curve]].",
     "Homes in towns and homes on farms did not move together. Switch on both curves: when did each pass half of its homes?",
     "Now heating. Switch on the homes heated mainly with coal and those heated mainly with piped gas: when did gas overtake coal?",
-    "The household series on car ownership starts only in 1948. Switch its curve on, then compare it with the cars registered decades earlier.",
+    "The household series on car ownership starts only in 1948. Switch its curve on beside electric service, then read the earlier registration counts below: they count cars, not families.",
     "Solar's share of U.S. electricity, 2015 to 2025. Switch it on, then zoom in to 0 to 10% to read it.",
-    "What sped a curve up, and what held one back? Sort each reason from this lesson into its box, then check."
+    "What sped a curve up, and what held one back? Sort each reason, from U.S. records or a study of British history, into its box, then check."
   ];
   function guessLine(D, g) {
     var N = nineTenths(D), b = N.b, ok = g === guessAnswer(D);
@@ -91,7 +91,7 @@
   var FARM_SAW = "EIA's timeline credits rural electrification, the aim of a 1936 Act: almost half of farms had power by 1942, against 11% in 1932.";
   function heatLine(D) {
     var p = passes(D, "gas", "coal");
-    return "Coal heated " + pct(at(D, "coal", 1940)) + " of homes in 1940 and " + pct(at(D, "coal", 1970)) + " in 1970; gas rose from " + pct(at(D, "gas", 1940)) + " (with bottled gas) to " + pct(at(D, "gas", 1970)) +
+    return "Coal heated " + pct(at(D, "coal", p.before)) + " of homes in " + p.before + " and piped gas " + pct(at(D, "gas", p.after)) + " in " + p.after +
       ". Gas overtook coal as the most common main heating fuel between the " + p.before + " and " + p.after + " censuses.";
   }
   var HEAT_NOTE = "Other fuels, such as heating oil, changed too; these census snapshots do not track homes switching from one fuel to another.";
@@ -100,10 +100,10 @@
     var R = D.registrations, a = first(D, "cars"), z = last(D, "cars");
     return "Families owning a car: " + pct(a[1], 0) + " in " + a[0] + ", " + pct(z[1], 0) + " in " + z[0] + ". Registered cars rose from " + fmtN(R.y1910 / 1000, 2) + " million in 1910 to " + fmtN(R.y1930 / 1000, 1) + " million in 1930.";
   }
-  var CAR_SAW = "Most of the car's early spread came before the survey began, so this curve has no start: a gap in the data, not in history.";
+  function carSaw(D) { var a = first(D, "cars"); return "The first point, " + a[0] + ", already shows " + pct(a[1], 0) + " of families owning a car, so this series misses the start of adoption: a gap in the data, not in history."; }
   function solarLine(D) {
     var a = first(D, "solar"), z = last(D, "solar");
-    return "Solar made " + pct(a[1]) + " of U.S. electricity in " + a[0] + " and " + pct(z[1]) + " in " + z[0] + ", counting rooftop panels (our arithmetic on EIA's table).";
+    return "Solar made " + pct(a[1]) + " of U.S. electricity in " + a[0] + " and " + pct(z[1]) + " in " + z[0] + ", counting small systems such as rooftop panels (our arithmetic on EIA's table).";
   }
   var SOLAR_SAW = "The chart stops at 2025: these curves show how fast past changes moved, not how fast the next one will.";
   var SORT_NOTE = "Each reason comes from this lesson's sources; open the reasons after you check.";
@@ -146,7 +146,7 @@
       "<dt>Decades, not years</dt><dd>On its <span class=\"lx-term\" data-term=\"diffusion-curve\">diffusion curve</span>, electric service went from " + pct(first(D, "elec")[1], 0) + " of U.S. homes in " + first(D, "elec")[0] + " to over 90% between " + N.b.before[0] + " and " + N.b.after[0] + ".</dd>" +
       "<dt>Not everywhere at once</dt><dd>Farms passed half about " + fmtN(H.gap) + " years after town homes; wires had to reach them first.</dd>" +
       "<dt>Gas overtook coal</dt><dd>Piped gas overtook coal as the most common main heating fuel between the 1950 and 1960 censuses. Other fuels changed too; the snapshots do not track homes switching.</dd>" +
-      "<dt>What sped it</dt><dd>Networks built, public programmes and a cheaper or better service sped curves up; refining a new source until it could compete took decades.</dd>" +
+      "<dt>What sped it</dt><dd>Networks built and public programs sped U.S. curves up; in British history, cheaper or better services drove change, and refining a new source took decades.</dd>" +
       "<dt>Say what you measure</dt><dd>A device in homes, a fuel's share of a nation and a share of electricity move at different speeds.</dd></dl>";
   }
   function checkHTML(D) {
@@ -174,7 +174,7 @@
 
   var model = { solarPts: solarPts, pts: pts, at: at, first: first, last: last, bracket: bracket, passes: passes, nineTenths: nineTenths, guessAnswer: guessAnswer, halfGap: halfGap,
     mostCommon: mostCommon, counted: counted, EXPLAIN_LEDE: EXPLAIN_LEDE,
-    STEPS: STEPS, guessLine: guessLine, GUESS_SAW: GUESS_SAW, farmLine: farmLine, FARM_SAW: FARM_SAW, heatLine: heatLine, HEAT_NOTE: HEAT_NOTE, HEAT_SAW: HEAT_SAW, carLine: carLine, CAR_SAW: CAR_SAW,
+    STEPS: STEPS, guessLine: guessLine, GUESS_SAW: GUESS_SAW, farmLine: farmLine, FARM_SAW: FARM_SAW, heatLine: heatLine, HEAT_NOTE: HEAT_NOTE, HEAT_SAW: HEAT_SAW, carLine: carLine, carSaw: carSaw,
     solarLine: solarLine, SOLAR_SAW: SOLAR_SAW, SORT_NOTE: SORT_NOTE, spec: spec, X: X, XZ: XZ,
     staticFallback: staticFallback, pointsHTML: pointsHTML, ideasHTML: ideasHTML, checkHTML: checkHTML, factsHTML: factsHTML, sourcesHTML: sourcesHTML, timelineEvents: timelineEvents, fmtN: fmtN, pct: pct };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
@@ -248,7 +248,7 @@
         } },
       { text: STEPS[3], build: function (act, api) {
           var ln = line(act), v = Viewer(act, D, { always: ["elec"], keys: ["cars"], aria: "Share of U.S. families owning a car, " + first(D, "cars")[0] + " to " + last(D, "cars")[0] + ", beside homes with electric service",
-            onChange: function (st) { if (st.on.length) { ln.innerHTML = bold(carLine(D)); api.done(); api.saw(CAR_SAW); } else ln.textContent = "Switch the car curve on."; } });
+            onChange: function (st) { if (st.on.length) { ln.innerHTML = bold(carLine(D)); api.done(); api.saw(carSaw(D)); } else ln.textContent = "Switch the car curve on."; } });
           act.appendChild(ln);
           demo[3] = function () { v.set("cars", true); };
         } },

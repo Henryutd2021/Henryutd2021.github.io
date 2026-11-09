@@ -1,8 +1,9 @@
 // f05-nuclear-basics.js — F5, "How does a nuclear reactor make electricity, and heat?" (step cards).
 //
 // Data: assets/learn/data/f05-nuclear-basics.json (the chain-reaction toy, Prairie Town's plant, the designs and heat
-// uses, every real number with its source and date), town.json (Prairie Town's 100 MW plant, illustrative),
-// cf_targets.json (the U.S. fleet's 2025 capacity factor, EIA, for the Modeler's note; read by the test, stated on the page).
+// uses, every real number with its source and date), the only file the page loads. Prairie Town's 100 MW plant
+// (illustrative) is plant.townMW there; the test checks it against town.json, which the page does not load, and reads
+// cf_targets.json (the U.S. fleet's 2025 capacity factor, EIA, stated in the Modeler's note).
 //
 // Physics and technology only (the course's nuclear scope; no research excerpt): no costs, no deployment, no siting, no data centers.
 //
@@ -82,7 +83,7 @@
   // the sentence after a change of the toy's sliders (steps 3 and 4): one sentence
   function toyText(T, rods, mod) {
     var k = kOf(T, rods, mod), s = stateOf(k, T.steadyBand), N = series(k, T.n0, T.generations), last = N[N.length - 1];
-    var head = "k = " + fmtK(k) + " (rods " + rods + "% in, moderator " + mod + "%): ";
+    var head = "[[multiplication-factor|k]] = " + fmtK(k) + " (rods " + rods + "% in, moderator " + mod + "%): ";
     if (s === "steady") return head + "**steady**, each generation as large as the last.";
     return head + "**" + (s === "growing" ? "growing" : "dying out") + "**, from " + fmtN(T.n0) + " neutrons to " + count(last) + " in " + T.generations + " generations.";
   }
@@ -221,7 +222,7 @@
   function partNote(D, F, p, type, W) {
     var pwr = type === "pwr", n = {
       containment: "**Containment**: a strong structure, often a large concrete dome, built to hold in radioactive material in an accident.",
-      core: "**Core**: " + F.assemblies_per_core.text + " [[fuel-assembly|fuel assemblies]], each of " + F.rods_per_assembly.text + " rods about 1 cm wide, filled with uranium pellets. [[fission|Fission]] heats the water around them.",
+      core: "**Core**: uranium pellets sealed in metal rods about 1 cm wide, grouped into [[fuel-assembly|fuel assemblies]]; how many depends on the design and its power. [[fission|Fission]] heats the water around them.",
       rods: "**Control rods**: pushed into the core to slow the chain reaction, pulled out to speed it up.",
       vessel: pwr ? "**Vessel**: water at about " + F.pwr_mpa.value + " MPa ([[megapascal|megapascals]]), about " + atm(F.pwr_mpa.value, F) + " times the air pressure at sea level, so it stays liquid at about " + F.pwr_c.value + " °C."
                   : "**Vessel**: water at about " + F.bwr_mpa.value + " MPa ([[megapascal|megapascals]]), about " + atm(F.bwr_mpa.value, F) + " times the air pressure at sea level. It boils right here, at about " + F.bwr_c.value + " °C.",
@@ -368,7 +369,7 @@
   // ---------------------------------------------------------------- the lesson
   function view(live, data, root) {
     var D = data.f05_nuclear_basics, F = D.facts, T = D.toy;
-    var W = plant(F, data.town.fleet.nuclear.mw);
+    var W = plant(F, D.plant.townMW);
     var log = LX.store.get("f5-log", {}) || {};
     function keep() { LX.store.set("f5-log", log); }
     var S = { rods: log.rods != null ? log.rods : T.rods.start, mod: log.mod != null ? log.mod : T.moderator.start, type: log.type || "pwr", part: log.part || "core", design: log.design || null };
@@ -389,7 +390,7 @@
       { id: "power", label: "Makes electricity", color: "var(--lx-accent)" }, { id: "waste", label: "Sheds low-temperature heat", color: "var(--lx-wind)" }];
     var cards;
     var steps = [
-      { text: "Fire a [[neutron|neutron]] at a uranium-235 nucleus and watch what comes out.",
+      { text: "Fire a [[neutron|neutron]] at the nucleus, the central core, of a [[uranium-235|uranium-235]] atom, and watch what comes out.",
         build: function (act, api) {
           FissionScene(act, { done: seen.fired, onFire: function () {
             seen.fired = log.fired = true; keep(); api.done();

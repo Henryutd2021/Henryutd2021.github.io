@@ -180,7 +180,7 @@
       "After the start, TOU homes against flat homes: " + kw(E.naive.est) + ". With home size as a control: " + kw(E.reg.size) + ". Engagement, never measured, still differs.",
       "TOU homes after against before: " + kw(E.ba.est) + ", because flat homes also changed by " + kw(F.flatChange) + " (a cooler second summer).",
       "Difference-in-differences: " + kw(E.did.est) + " (about 95% interval " + band(E.did, kw) + "), against the truth " + kw(E.att) + ". Before month 13 the change in the TOU–flat gap, against month 12, stays within " + kw(E.preMax).replace(" kW", "") + " kW of zero.",
-      "Threats move it: already cutting " + kw(T.trend.did.est) + ", early cuts " + kw(T.anticipate.did.est) + ", neighbours copy " + kw(T.spill.did.est) + ", a thermostat offer " + kw(T.bundle.did.est) + ".",
+      "Threats move it: already cutting " + kw(T.trend.did.est) + ", early cuts " + kw(T.anticipate.did.est) + ", neighbors copy " + kw(T.spill.did.est) + ", a thermostat offer " + kw(T.bundle.did.est) + ".",
       "If every home were put on the tariff by default, the average effect would be " + kw(E.ate) + ", not " + kw(E.att) + ": those who opt in respond more.",
       "Simulated regions: " + R.nOn + " of 30 adopt a policy in 2021. DiD: " + mwy(R.did.est) + " of new solar per adopting region (truth +10.0); if the policy followed a boom, " + mwy(RT.boom.did.est) + ".",
       "If projects moved across the border, DiD reads " + mwy(RT.border.did.est) + ". Adopters then gain " + Math.round(F.border.gross) + " MW a year: " + Math.round(F.border.lost) + " moved from the other regions and " + Math.round(F.border.net) + " is new."
@@ -300,7 +300,8 @@
         b.addEventListener("click", function () {
           host.innerHTML = "";
           LX.Plot(host, { text: "Text version of the chart" }).render(ladderSpec([{ label: "Naive after-period gap", short: "Naive", est: E.naive.est, lo: ci(E.naive)[0], hi: ci(E.naive)[1], ok: covers(E.naive, truth) }], truth, "The naive estimate against the truth."));
-          table(H("div", null, host), ["Before the start", "TOU homes", "Flat homes"], [["Home size, thousand sq ft", E.share.onSize.toFixed(2), E.share.offSize.toFixed(2)], ["Engagement (hidden; simulated only)", sgn(E.share.onE, 2), sgn(E.share.offE, 2)]]);
+          table(H("div", null, host), ["Before the start", "TOU homes", "Flat homes"], [["Home size, thousand sq ft", E.share.onSize.toFixed(2), E.share.offSize.toFixed(2)], ["Engagement score (simulated; never measured)", sgn(E.share.onE, 2), sgn(E.share.offE, 2)]]);
+          H("p", { class: "lx-hint", text: "Engagement is a made-up score for interest in cutting evening use: unitless, 0 on average, higher means keener. No meter records it." }, host);
           out.innerHTML = "Gap after the start: <b>" + kw(E.naive.est) + "</b>; truth " + kw(truth) + ".";
           api.done(); api.saw("The gap is " + (E.naive.est / truth).toFixed(1) + " times the truth. Homes that opted in were smaller and more engaged before any tariff: [[selection-bias|selection]], not effect.");
         });
@@ -395,7 +396,7 @@
           table(tb, ["Threat", "DiD", "Interval", "Holds the truth?"], [["None", kw(E.did.est), band(E.did, kw), covers(E.did, truth) ? "yes" : "no"]].concat(D.threats.filter(function (x) { return seen[x.key]; }).map(function (x) { var Y = F.threat[x.key].did; return [x.short, kw(Y.est), band(Y, kw), covers(Y, truth) ? "yes" : "no"]; })));
           out.innerHTML = "DiD <b>" + kw(X.did.est) + "</b> (" + band(X.did, kw) + "); truth " + kw(truth) + ".";
           var n = Object.keys(seen).length;
-          if (n >= 3) { api.done(); api.saw("None of these intervals holds the truth. Only a trend that starts before month 13 (already cutting, early cuts) shows in the months before; spillovers and a second change hide."); }
+          if (n >= 3) { api.done(); api.saw("Each threat's interval misses the truth; the no-threat one holds it. Only a trend that starts before month 13 (already cutting, early cuts) shows in the months before; spillovers and a second change hide."); }
           else api.saw("Threats tried: " + n + " of at least 3.", true);
         }
         S.draw7 = draw;
@@ -405,11 +406,11 @@
 
     // ---- 8 who is the effect for
     steps.push({
-      text: "DiD estimates the effect on the homes that opted in. If the utility put all 400 homes on the tariff by default, what would the average cut per home be?",
+      text: "DiD measures the effect on homes that opted in; here, engaged homes join more and cut more. If all 400 homes got the tariff by default, what would the average cut per home be?",
       build: function (act, api) {
         LX.Predict(act, { id: "m14-default", q: "Per home, by default:", answer: "smaller", fresh: true, title: false,
           options: [{ value: "larger", label: "Larger" }, { value: "same", label: "About the same" }, { value: "smaller", label: "Smaller" }],
-          onPick: function () { api.done(); api.saw("Smaller: " + kw(E.ate) + " per home on average, against " + kw(truth) + " for those who chose it; engaged owners respond more. A result holds for the group it was measured on."); } });
+          onPick: function () { api.done(); api.saw("Smaller: " + kw(E.ate) + " per home on average, against " + kw(truth) + " for those who chose it, since the rest are less engaged. A result holds for the group it was measured on."); } });
       }
     });
 
@@ -456,7 +457,7 @@
         function check() {
           var n = Object.keys(marks).length, right = D.classify.filter(function (c) { return marks[c.id] === c.answer; }).length;
           out.textContent = "Named " + n + " of " + D.classify.length + (n === D.classify.length ? "; " + right + " right." : ".");
-          if (right === D.classify.length) { api.done(); api.saw("Selection, confounding, spillover, anticipation: four reasons a comparison group stops being the counterfactual. Write them down before the estimate, not after."); }
+          if (right === D.classify.length) { api.done(); api.saw("Selection, confounding, spillover, anticipation: four ways a comparison group can stop showing what would have happened. Write them down before the estimate, not after."); }
           else if (n === D.classify.length) api.saw("Not all right yet. Ask: who chose, what else changed, who else was affected, and when did people react?", true);
         }
       }

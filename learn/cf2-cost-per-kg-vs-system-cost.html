@@ -411,14 +411,14 @@ ul.task-list li input[type="checkbox"] {
 
 <div id="case" class="lx-sec">
 <div class="lx-case">
-<div class="lx-case-part"><p class="lx-eyebrow">1 · The puzzle</p><p>An <span class="lx-term" data-term="electrolyzer">electrolyzer</span> next to a wind farm turns spare wind into hydrogen. A bigger one makes each kilogram cost more. Can the bigger one still be the better choice?</p></div>
+<div class="lx-case-part"><p class="lx-eyebrow">1 · The puzzle</p><p>An <span class="lx-term" data-term="electrolyzer">electrolyzer</span> next to a wind farm turns spare wind into hydrogen. When extra capacity runs fewer hours, a bigger one makes each kilogram cost more. Can the bigger one still be the better choice?</p></div>
 <div class="lx-case-part"><p class="lx-eyebrow">2 · The question in one sentence</p><p class="lx-case-q">How do electrolyzers, hydrogen storage and <span class="lx-term" data-term="fuel-cell">fuel cells</span> change the cost, <span class="lx-term" data-term="curtailment">curtailment</span> and <span class="lx-term" data-term="firm-output">firm output</span> of a grid-connected wind farm?</p><p class="lx-hint">Question type: prescriptive (what should be built, and how should it run?).</p></div>
 <div class="lx-case-part"><p class="lx-eyebrow">3 · Scale and boundary</p><ul><li><b>Inside:</b> one planned 253 MW wind farm in West Texas, with a battery and hydrogen equipment, hour by hour for a year (8,760 hours).</li><li><b>Left out:</b> the rest of the grid, which enters only through <span class="lx-term" data-term="ercot">ERCOT</span> <span class="lx-term" data-term="wholesale-price">wholesale prices</span>, and final federal hydrogen credit rules; costs date from 2020 to 2023.</li></ul></div>
-<div class="lx-case-part"><p class="lx-eyebrow">4 · Decisions, goal and rules, in words</p><ul><li><b>Decisions:</b> the sizes of the battery, electrolyzer, hydrogen tank and fuel cell, and how each runs every hour.</li><li><b>Goal:</b> the lowest life-cycle cost of the whole system, net of what it earns from electricity and hydrogen.</li><li><b>Rules:</b> deliver the largest steady output it can in every hour; no machine runs above its size.</li></ul></div>
-<div class="lx-case-part wide"><p class="lx-eyebrow">5 · Data and method</p><ul><li>A <span class="lx-term" data-term="mixed-integer-program">mixed-integer linear program</span>, an extension of NREL's REopt model, sizes and runs the equipment over a year of hours with ERCOT wholesale prices.</li><li>Sensitivity runs vary the hydrogen price, the wind profile (four regions) and projected equipment costs to 2050.</li></ul></div>
+<div class="lx-case-part"><p class="lx-eyebrow">4 · Decisions, goal and rules, in words</p><ul><li><b>Decisions:</b> the sizes of the battery, electrolyzer, hydrogen tank and fuel cell, and how each runs every hour.</li><li><b>Goal:</b> the lowest <span class="lx-term" data-term="life-cycle-cost">life-cycle cost</span> of the whole system, net of what it earns from electricity and hydrogen.</li><li><b>Rules:</b> deliver the largest steady output it can in every hour; no machine runs above its size.</li></ul></div>
+<div class="lx-case-part wide"><p class="lx-eyebrow">5 · Data and method</p><ul><li>A <span class="lx-term" data-term="mixed-integer-program">mixed-integer linear program</span>, an extension of NREL's REopt model, sizes and runs the equipment over a year of hours with ERCOT wholesale prices.</li><li><span class="lx-term" data-term="sensitivity-analysis">Sensitivity runs</span> vary the hydrogen price, the wind profile (four regions) and projected equipment costs to 2050.</li></ul></div>
 <div class="lx-case-part wide"><p class="lx-eyebrow">6 · What came out, and where it holds</p>
-<blockquote class="lx-excerpt blockquote" data-source="excerpt:wind-hydrogen"><p>As the hydrogen price rose, the optimizer built a larger electrolyzer to use more surplus wind.</p><p>The larger unit ran at lower utilization, so each kilogram carried more capital and the <span class="lx-term" data-term="lcoh">levelized cost of hydrogen</span> rose, while hydrogen revenue lowered total system cost.</p><p>Compared with wind and a battery alone, adding an electrolyzer reduced total system cost by about 7%, and using hydrogen as the storage medium for fuel cells reduced it by about 26%.</p><footer>From: Li et al. (2024), <a href="https://doi.org/10.1115/1.4063971">Journal of Mechanical Design</a>.</footer></blockquote>
-<p class="lx-hint">Battery, hydrogen and hybrid storage were compared, each set to deliver the largest stabilized output in every hour at the lowest life-cycle cost.</p>
+<blockquote class="lx-excerpt blockquote" data-source="excerpt:wind-hydrogen"><p>As the hydrogen price rose, the optimizer built a larger electrolyzer to use more surplus wind.</p><p>The larger unit ran at lower <span class="lx-term" data-term="capacity-utilization">utilization</span>, so each kilogram carried more <span class="lx-term" data-term="capital-cost">capital</span> and the <span class="lx-term" data-term="lcoh">levelized cost of hydrogen</span> rose, while hydrogen revenue lowered total system cost.</p><p>Compared with wind and a battery alone, adding an electrolyzer reduced total system cost by about 7%, and using hydrogen as the storage medium for fuel cells reduced it by about 26%.</p><footer>From: Li et al. (2024), <a href="https://doi.org/10.1115/1.4063971">Journal of Mechanical Design</a>.</footer></blockquote>
+<p class="lx-hint">Battery, hydrogen and hybrid storage were compared, each set to deliver the largest <span class="lx-term" data-term="firm-output">stabilized output</span> in every hour at the lowest life-cycle cost.</p>
 <p class="lx-hint">Hybrid hydrogen and battery storage delivered the highest stabilized output of the four configurations.</p>
 <p class="lx-hint">Holds when: one planned West Texas wind farm, ERCOT prices, costs from 2020 to 2023. Leaves out: final federal hydrogen credit rules.</p></div>
 <div class="lx-case-part"><p class="lx-eyebrow">Related study · solar and hydrogen</p>
@@ -436,7 +436,7 @@ ul.task-list li input[type="checkbox"] {
 
 </div>
 </div>
-<p class="lx-datanote"><span>Every result about the studies is quoted from the published papers named in the sources. The toy below uses illustrative round numbers.</span></p>
+<p class="lx-datanote"><span>The toy below uses illustrative round numbers.</span></p>
 </div>
 <div id="explain" class="lx-sec">
 <section id="the-idea-behind-it-then-where-the-result-holds" class="level2 lx-sec-h">
@@ -611,7 +611,7 @@ ul.task-list li input[type="checkbox"] {
 <div class="lx-qq" data-id="part-saving" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “If one part's upkeep gets 10% cheaper, the product's cost per unit falls by 10% too.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth, unless that part is the whole cost.</p><p>In the offshore study, about 10% lower turbine upkeep cut the cost per kilogram of hydrogen by about 2%: upkeep is one share of all the costs.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth, unless that part is the whole cost. In the offshore study, about 10% lower turbine upkeep cut the cost per kilogram of hydrogen by about 2%: upkeep is one share of all the costs.</p></details>
 </div>
 </div>
 <div class="lx-card lx-case-try">
