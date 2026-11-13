@@ -496,7 +496,7 @@
           ".\nResult: ",
           {
             "text": "{honest} with the battery's schedule planned the day before, {ok} with perfect foresight, an upper bound",
-            "note": "Both numbers, each labelled with what the plan knew."
+            "note": "Both numbers, each labeled with what the plan knew."
           },
           ".\nRerun: ",
           {
@@ -526,7 +526,7 @@
       {
         "label": "Information",
         "weak": "Perfect foresight, unstated",
-        "good": "Both numbers, labelled"
+        "good": "Both numbers, labeled"
       },
       {
         "label": "Rerun",

@@ -77,7 +77,7 @@
       "why": {
         "a": "Framing's Proficient level asks for a metric with units; “peak demand” names neither the hours nor whose peak.",
         "b": "Positioning is about the literature and the gap.",
-        "c": "Integrity is about licences, credit, conflicts and the people a study affects.",
+        "c": "Integrity is about licenses, credit, conflicts and the people a study affects.",
         "d": "Communication is about how results are shown; this is about what is measured."
       },
       "solution": "Framing: a metric with units. The co-op is billed for its 20 highest-load summer hours (the billing note), so the pumps' average kW in those [[coincident-peak|coincident-peak]] hours answers the board, not each pump's own peak." },

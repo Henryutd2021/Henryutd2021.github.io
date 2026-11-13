@@ -1,6 +1,6 @@
 // txh2.js — interactive explainer on the Texas hydrogen (ERCOT) project page.
 // Mechanism (the paper in Int. J. Hydrogen Energy 113:77–89, 2025, §3.3 p. 86 and Fig. 8b): when power from gas-fired
-// (CCGT) plants costs more, the model installs fuel cells and turns green hydrogen into electricity; reformer (grey)
+// (CCGT) plants costs more, the model installs fuel cells and turns green hydrogen into electricity; reformer (gray)
 // hydrogen then fills industrial demand. Gas-plant CO2 falls, reformer CO2 rises more (the hydrogen-to-power round trip
 // loses energy), so total emissions rise.
 // Toy model with stylized numbers (not the study's inputs or results), documented and tested with Node
@@ -105,7 +105,7 @@
       if (redraw) redraw();
     }
 
-    function inkOn(hex) {  // white or near-black text on a coloured fill, whichever contrasts more
+    function inkOn(hex) {  // white or near-black text on a colored fill, whichever contrasts more
       var mm = /^#?([0-9a-f]{6})$/i.exec(hex || "");
       if (!mm) return "#fff";
       var n = parseInt(mm[1], 16), ch = [n >> 16, (n >> 8) & 255, n & 255].map(function (v) { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); });
@@ -176,7 +176,7 @@
 
       // legend (HTML so it wraps on phones)
       legend.innerHTML = "";
-      [[cInd, "Reformer CO₂ (grey hydrogen for industry)"], [cPow, "Gas-fired power CO₂"], [cInk, "Net change"]].forEach(function (it) {
+      [[cInd, "Reformer CO₂ (gray hydrogen for industry)"], [cPow, "Gas-fired power CO₂"], [cInk, "Net change"]].forEach(function (it) {
         var item = h.el("span", { style: "display:inline-flex;align-items:center;gap:.35rem" }, legend);
         h.el("span", { "aria-hidden": "true", style: "display:inline-block;width:1rem;height:2px;background:" + it[0] }, item);
         h.el("span", { text: it[1] }, item);

@@ -8,7 +8,7 @@
 // the run says, the shock table, security, screening affordability and Ridge County's jobs from LX.A13, the map, the mix,
 // CO2 and imports, the full-year check from the library when the plan is a preset); the two-page policy brief
 // (LX.ReportNote); the self-check (exemplars, rubric); the sources. The first view (the plan on load, when it is in the
-// library) is drawn from the library, labelled with its date; every run the reader starts (Run, a preset) solves in the
+// library) is drawn from the library, labeled with its date; every run the reader starts (Run, a preset) solves in the
 // browser. The full-year checks stay precomputed and follow the plan's key. Every number comes from E4, the library or
 // LX.A13; _tests/learn/test_c4-prairieland-2050.js
 // checks them. Prairieland and Ridge County are fictional; their numbers are illustrative.
@@ -136,6 +136,7 @@
     { key: "notebook", label: "M13's notebook on your pathway", hint: "Paste the lines its section 8 printed for your plan (cost, CO₂, imports, what it builds) and say whether they match the page.", rows: 3, need: true, min: 8 },
     { key: "sources", label: "Sources and credit", hint: "One or two sentences: the data behind your numbers (EIA, IPCC, SPP through EIA-930; the course's teaching settings) and any conflict of interest.", rows: 2, need: true, min: 8 }];
   var TWO_PAGES = 1100;
+  var APPENDIX = "Appendix: evidence from the run";   // the run's evidence comes after the learner's two pages, under this heading
   var LINK_BASE = "c4-prairieland-2050.html#";   // this page, for the exemplar's plan link (relative, as the course's links are)
   // the two-page check counts the learner's own writing (the brief's fields); the plan, results, assumptions and limits
   // the page adds are not counted (about 1,000 words on their own)
@@ -173,7 +174,7 @@
       note: "Both briefs are illustrative; the strong one quotes the default plan's run. Other recommendations reach Proficient with equally sound reasoning." };
   }
   var page = { c4Schema: c4Schema, toE4: toE4, libEntry: libEntry, refState: refState, afford: afford, ridgeJobs: ridgeJobs, shockRows: shockRows, sensLine: sensLine, sensLines: sensLines, says: says, assumptions: assumptions, fullStatus: fullStatus, ACC: ACC, LIMITS: LIMITS,
-    FIELDS: FIELDS, TWO_PAGES: TWO_PAGES, ownWords: ownWords, RUBRIC: RUBRIC, RUBRIC_BAR: "the bar for this policy brief", exemplars: exemplars, nbLine: nbLine, LINK_BASE: LINK_BASE, missB: missB, cumOf: cumOf, overOf: overOf, kilo: kilo, fix: fix, pct: pct, bn: bn, sbn: sbn };
+    FIELDS: FIELDS, TWO_PAGES: TWO_PAGES, APPENDIX: APPENDIX, ownWords: ownWords, RUBRIC: RUBRIC, RUBRIC_BAR: "the bar for this policy brief", exemplars: exemplars, nbLine: nbLine, LINK_BASE: LINK_BASE, missB: missB, cumOf: cumOf, overOf: overOf, kilo: kilo, fix: fix, pct: pct, bn: bn, sbn: sbn };
   if (typeof module !== "undefined" && module.exports) module.exports = page;
   if (typeof window === "undefined" || !window.LX || !window.LX.E4) return;
 
@@ -269,7 +270,7 @@
     // ---- the brief
     var nh = document.getElementById("c4-note"); nh.innerHTML = "";
     var rn = LX.ReportNote(H("div", { class: "lx-xcard" }, nh), { id: "c4-note", code: "C4", title: "Your policy brief: two pages of your writing, with its evidence", lede: "Your words fill about two pages. The plan, its numbers, the shock table, the assumptions and the limits come from your run as the brief's evidence, beyond those two pages.",
-      fields: FIELDS,
+      fields: FIELDS, appendix: APPENDIX,
       checks: ["link", "run", "fields", "assumptions", "sensitivity", { id: "pages", label: "Your own writing fits on two pages (about " + kilo(TWO_PAGES) + " words); the evidence the page adds, about 1,000 words of tables and assumptions, comes on top", test: function (note, words) { return ownWords(words, LX.ReportNote.countWords) <= TWO_PAGES; } }],
       get: function () {
         if (!last) return null;
@@ -282,7 +283,7 @@
           .concat([{ label: "Who pays (screening)", value: "about $" + kilo(R.af.perHH) + " a household a year in " + R.af.year, note: "households pay " + pct(R.af.share) + " of the change against the 2025-policies pathway" },
             { label: "Ridge County jobs (screening)", value: kilo(R.jb.j.lostTotal) + " lost; " + kilo(R.jb.j.newPermGross) + " new ongoing gross, " + kilo(R.jb.j.newPermNet) + " net; " + kilo(R.jb.j.buildJobYears) + " construction job-years gross, " + kilo(R.jb.j.buildJobYearsNet) + " net", note: "new jobs: all the Ridge region's new wind and solar assumed in the county" },
             { label: "Full-year check", value: R.full ? R.full.filter(function (c) { return E4.fullVerdict(c).ok; }).length + " of " + R.full.length + " pass" : "not known for this plan", note: "demand served and CO₂ within 10% of the slices; not a test of the budget" }]);
-        return { heading: "Prairieland 2050: a pathway and its defence", made: "the Pathway Explorer's engine E4 (a linear program), on capstone C4", link: ss.url(),
+        return { heading: "Prairieland 2050: a pathway and its defense", made: "the Pathway Explorer's engine E4 (a linear program), on capstone C4", link: ss.url(),
           run: { ok: true, stale: !LX.ShareState.same(S, last.state, plan), text: "2030–2050, twelve slices a year, four shocks re-planned" + (R.lib ? " (from the library, " + LIB.date + ")" : "") },
           plan: E4.planRows(toE4(E4, P, st), P).filter(function (r) { return r[0] !== "Shock"; }).map(function (r) { return { label: r[0], value: r[1] }; }).concat([{ label: "Households pay", value: st.hs + "%" }, { label: "Jobs multiplier, displacement", value: fix(st.jm, 1) + ", " + st.jd + "%" }]),
           results: rows, assumptions: assumptions(st, R.af, R.jb, V, R.full, E4), sensitivity: sensLine(V, R.X), limits: LIMITS };

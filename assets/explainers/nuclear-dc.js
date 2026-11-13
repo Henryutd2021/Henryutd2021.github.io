@@ -5,7 +5,7 @@
 // paid on each MWh of net electricity the reactor generates. Steam extracted at the turbine crossover for an absorption
 // chiller forgoes turbine output (extraction penalty alpha, MW_e per MW_th of steam), so it gives up both the market value
 // and the credit of that output. An electric chiller uses electricity that is still generated, and still credited, so it
-// costs only the market price. A larger credit therefore raises the cost of steam-driven cooling and favours generation.
+// costs only the market price. A larger credit therefore raises the cost of steam-driven cooling and favors generation.
 //
 // Toy model, per MWh of cooling (operating cost only; the absorption chiller's own capital is not included):
 //   steam route        = (alpha / COP_abs) * (price + credit)
@@ -77,7 +77,7 @@
       swatch(legend, h.color("accent"), null, "Electric chiller: power used × price");
     }
 
-    // text label; o.halo draws a background-coloured outline under the glyphs so crossing lines do not hurt legibility
+    // text label; o.halo draws a background-colored outline under the glyphs so crossing lines do not hurt legibility
     function label(g, x, y, s, o) {
       o = o || {};
       var st = [];
@@ -142,7 +142,7 @@
         label(tags, x(0) + 6, y(m.steamSales) + 16, "Steam route", { fill: tc, weight: 600, halo: true });
       }
 
-      // break-even point, labelled where neither line passes: below-right of the crossing, or above-left near the right edge
+      // break-even point, labeled where neither line passes: below-right of the crossing, or above-left near the right edge
       h.el("circle", { cx: bx, cy: y(m.electric), r: 4.5, fill: surface, stroke: ink, "stroke-width": 1.5 }, lines);
       var beText = "break-even $" + h.fmt(m.breakEvenCredit, 0);
       if (bx <= M.l + pw - 100) label(tags, bx + 8, y(m.electric) + 16, beText, { cls: "ex-strong", halo: true });

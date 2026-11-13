@@ -256,7 +256,7 @@
             LX.CostSplit.bar(rw, [{ color: p.color, value: p.eff * 100 }, { color: "var(--lx-line-2)", value: 100 - p.eff * 100 }], 100, { height: 18 });
             H("b", { text: pct(p.eff) }, rw);
           });
-          H("p", { class: "k2-key", text: "Bright part: becomes electricity. Grey part: leaves as heat." }, box);
+          H("p", { class: "k2-key", text: "Bright part: becomes electricity. Gray part: leaves as heat." }, box);
           textAlt(box, "Text version", PLANTS.map(function (p) { return p.name + ": heat rate " + num(p.hr, 3) + " MMBtu per MWh, so " + KK + " ÷ " + num(p.hr, 3) + " = " + pct(p.eff) + " of the gas's energy becomes electricity and " + pct(1 - p.eff) + " leaves as heat."; }));
         }
         autos[2] = function () { btns[0].click(); };

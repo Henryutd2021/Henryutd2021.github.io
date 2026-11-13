@@ -536,8 +536,8 @@ window.Quarto = {
 <div id="m3-explain" class="lx-xgrid">
 <div class="lx-fallback">
 <dl class="lx-ideas">
-<dt>Capacity expansion LP</dt><dd>Decides what to build (seven sizes, paid every year) and how to run it in every modelled hour, at least yearly cost.</dd>
-<dt>Weights</dt><dd>Each modelled hour's running cost counts as many times as the hours of the year it stands for.</dd>
+<dt>Capacity expansion LP</dt><dd>Decides what to build (seven sizes, paid every year) and how to run it in every modeled hour, at least yearly cost.</dd>
+<dt>Weights</dt><dd>Each modeled hour's running cost counts as many times as the hours of the year it stands for.</dd>
 <dt>Extreme weeks</dt><dd>Peak demand, peak net load and least wind, kept as they were: they cut the full-year shortfall from 879 to 108 MWh.</dd>
 <dt>Link between weeks</dt><dd>A calendar chain of 52 battery levels; without it, each week may start full for free.</dd>
 <dt>Validation</dt><dd>Re-run the plan on every hour of 2025 and of 2024; report unserved energy, CO₂ against the cap and the estimate error.</dd>
@@ -561,7 +561,7 @@ K_i,\ g_{p,h},\ q_{p,h},\ c_{p,h},\ d_{p,h},\ S_i \ge 0, \quad s_{p,h} \text{ fr
 \end{aligned}
 \]</span></p>
 <p>Each step <span class="math inline">\(h\)</span> lasts one hour, so a power held for one step (MW) is that much energy (MWh). Sizes, outputs, charge and discharge cannot be negative; the level <span class="math inline">\(s_{p,h}\)</span> is measured from the week’s start, so it can be.</p>
-<p>The weight of a modelled hour: <span class="math inline">\(w_p = n_p \times 8{,}760 / 8{,}736\)</span>, where <span class="math inline">\(n_p\)</span> is the number of calendar weeks it stands for and the factor spreads the 24 hours of 31 December. A typical week standing for 13 weeks: <span class="math inline">\(13 \times 8{,}760 / 8{,}736 = 13.04\)</span>; an extreme week stands for itself.</p>
+<p>The weight of a modeled hour: <span class="math inline">\(w_p = n_p \times 8{,}760 / 8{,}736\)</span>, where <span class="math inline">\(n_p\)</span> is the number of calendar weeks it stands for and the factor spreads the 24 hours of 31 December. A typical week standing for 13 weeks: <span class="math inline">\(13 \times 8{,}760 / 8{,}736 = 13.04\)</span>; an extreme week stands for itself.</p>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 33%">
@@ -593,7 +593,7 @@ K_i,\ g_{p,h},\ q_{p,h},\ c_{p,h},\ d_{p,h},\ S_i \ge 0, \quad s_{p,h} \text{ fr
 </tr>
 <tr class="even">
 <td><span class="math inline">\(w_p\)</span></td>
-<td>hours of the year one modelled hour of week <span class="math inline">\(p\)</span> stands for</td>
+<td>hours of the year one modeled hour of week <span class="math inline">\(p\)</span> stands for</td>
 <td>h</td>
 </tr>
 <tr class="odd">
@@ -720,7 +720,7 @@ K_i,\ g_{p,h},\ q_{p,h},\ c_{p,h},\ d_{p,h},\ S_i \ge 0, \quad s_{p,h} \text{ fr
 <li>Transmission and regions: the town is one bus with no imports.</li>
 <li>Several years of investment, retirements and residual value: a pathway model (<a href="m13-national-pathway.html">M13</a>).</li>
 <li>Uncertainty when building: here the weather is known when the sizes are chosen (<a href="m08-stochastic-robust.html">M8</a> chooses them before it is known).</li>
-<li>Costs that change with time: every cost is constant within the year modelled.</li>
+<li>Costs that change with time: every cost is constant within the year modeled.</li>
 </ul>
 <p>Modeler's note: <a href="r05-build-validate.html">R5</a> turns these checks into a verification and validation plan, and the Modeler checkpoint <a href="ck-m-unseen-problem.html">CK-M</a> asks you to formulate, solve and verify a model you have not seen.</p>
 </div>

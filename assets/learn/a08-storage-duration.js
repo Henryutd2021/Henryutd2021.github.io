@@ -295,7 +295,7 @@
               H("b", { text: fm.usd(c.total) }, li);   // the calculated cost; only the bar stops at $600
             });
             var h = C.items.filter(function (i) { return i.id === "hydrogen"; })[0];
-            note.innerHTML = LX.rich("Coloured: building it, the yearly [[capital-recovery-factor|capital recovery]] at " + Math.round(C.rate * 100) + "% [[real-rate|real]] (inflation taken out). Grey: charging, price ÷ round trip.");
+            note.innerHTML = LX.rich("Colored: building it, the yearly [[capital-recovery-factor|capital recovery]] at " + Math.round(C.rate * 100) + "% [[real-rate|real]] (inflation taken out). Gray: charging, price ÷ round trip.");
             note2.textContent = "DOE's cost cases: the hydrogen store here holds 24 hours. Charging at its discharge power, it can cycle at most " + maxCycles(h) + " times a year. Bars stop at $600.";
           }
           LX.Slider(ctl, { label: "Full cycles a year", min: 2, max: 365, step: 1, value: cyc, fmt: function (v) { return v + " a year"; }, onChange: function (v) { cyc = v; moved.c = 1; draw(); check(); } });
@@ -346,7 +346,7 @@
     var R = D.reference;
     var rows = D.techs.map(function (t) {
       var s = store(D, t.id), r = R.stores[t.id];
-      return { key: t.id, color: t.color, name: t.short, note: s.P.toLocaleString("en-US") + " MW, " + s.hours + " h", eta: { text: fm.pct(t.eta), value: t.eta }, loss: t.lossPerDay ? fm.pct(t.lossPerDay) + " a day" : "none modelled",
+      return { key: t.id, color: t.color, name: t.short, note: s.P.toLocaleString("en-US") + " MW, " + s.hours + " h", eta: { text: fm.pct(t.eta), value: t.eta }, loss: t.lossPerDay ? fm.pct(t.lossPerDay) + " a day" : "none modeled",
                cov: { text: fm.pct(r.covered), value: r.covered } };
     });
     LX.CompareTable(H("div", { class: "lx-xcard" }, x), {

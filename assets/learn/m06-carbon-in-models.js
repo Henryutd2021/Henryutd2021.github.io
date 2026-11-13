@@ -270,7 +270,7 @@
 
     // ---------- the explain layer (precomputed reference until the reader solves)
     var xhost = document.getElementById("m06-explain");
-    // the cap card of the explain layer: the reader's solved cap, else the 70% reference example, labelled as such
+    // the cap card of the explain layer: the reader's solved cap, else the 70% reference example, labeled as such
     function capWords() {
       var R = view.cap != null && cache[JSON.stringify(capOpt(view.cap))];
       return "A rule: the year's CO₂ at most the cap. Its dual is a price per tonne: " + (R && R.ok ? f2(R.capPrice) + " at your cap of " + view.cap + "%." : f2(REF.caps[2].dual) + " at 70%, the reference example.");

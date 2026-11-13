@@ -1,5 +1,5 @@
 {
- "about": "CK-A, the Analyst checkpoint (ck-a-spreadsheet). Prairie Town High School is fictional; its load and several inputs are illustrative and labelled so in the log; the costs, prices, capacity factor and price index are dated public numbers (sources). The page's model recomputes every worked number, and the course's tests check it against this file and against the worked workbook's formulas.",
+ "about": "CK-A, the Analyst checkpoint (ck-a-spreadsheet). Prairie Town High School is fictional; its load and several inputs are illustrative and labeled so in the log; the costs, prices, capacity factor and price index are dated public numbers (sources). The page's model recomputes every worked number, and the course's tests check it against this file and against the worked workbook's formulas.",
  "version": "ck-a v1 (6 Nov 2026)",
  "built": "2026-11-06",
  "files": {

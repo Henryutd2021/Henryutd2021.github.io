@@ -209,7 +209,7 @@
     '<text x="48" y="168" class="mini">living room</text><text x="171" y="168" class="mini">kitchen</text>' +
     '<text x="148" y="236" class="mini">basement</text><text x="304" y="180" class="mini">AC</text>' +
     '<text x="300" y="138" class="mini">meters</text><text x="336" y="244" class="mini">gas pipe</text><text x="350" y="62" class="mini">power line</text>';
-  var HOME_ALT = "A two-storey Prairie Town home in cross-section: a study with a laptop, a lamp and a TV and a bathroom upstairs; a living room with a warm-air vent and a kitchen with a fridge, a gas stove and a dryer downstairs; a gas furnace and a gas water heater in the basement; an outdoor air conditioner; electricity and gas meters on the wall; a car in the driveway.";
+  var HOME_ALT = "A two-story Prairie Town home in cross-section: a study with a laptop, a lamp and a TV and a bathroom upstairs; a living room with a warm-air vent and a kitchen with a fridge, a gas stove and a dryer downstairs; a gas furnace and a gas water heater in the basement; an outdoor air conditioner; electricity and gas meters on the wall; a car in the driveway.";
 
   function HomeScene(host, o) {
     var D = o.D, S = split(D, {}), seen = {}, cur = null;

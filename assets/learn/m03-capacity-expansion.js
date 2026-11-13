@@ -237,7 +237,7 @@
     var SETROWS = ["typ4", "wk7", "typ8", "wk11", "wk15"];
     function resultsTable(host, ids) {
       host.innerHTML = "";
-      var t = table(host, ["Weeks", "~Modelled hours", "~LP columns", "Estimate", "~Full year: spending", "Full year: CO₂", "Full year: unserved"], ids.filter(function (id) { return res[id] && res[id].y25; }).map(function (id) {
+      var t = table(host, ["Weeks", "~Modeled hours", "~LP columns", "Estimate", "~Full year: spending", "Full year: CO₂", "Full year: unserved"], ids.filter(function (id) { return res[id] && res[id].y25; }).map(function (id) {
         var x = res[id], c = x.y25, set = setOf(D, id);
         return { cells: [set.label, String(x.est.hours.toLocaleString("en-US")), x.size.cols.toLocaleString("en-US"), fm.musd(x.est.cost), fm.musd(c.cost),
           { text: fm.kt(c.co2), cls: c.co2 > cap + 0.5 ? "bad" : "ok" }, { text: c.unserved < 0.5 ? "0" : fm.mwh(c.unserved) + " · " + c.hours + " h", cls: c.unserved < 0.5 ? "ok" : "bad" }] };
@@ -272,20 +272,20 @@
       { text: "The solver now chooses what to build (seven sizes, paid every year) and how to run it, but it sees only a few weeks. How do a few weeks stand for a year?",
         build: function (act, api) {
           var f, key, pr = LX.Predict(act, { id: "m3-weights", fresh: true, q: "How does the goal turn a few weeks of running costs into a year's?", answer: "weight",
-            options: [{ value: "weight", label: "Weight each modelled hour by the hours of the year it stands for" }, { value: "52", label: "Multiply every week's cost by 52" }, { value: "none", label: "Leave it: a few weeks are close enough" }],
-            feedback: { weight: "Each modelled hour counts as many hours of the year as it stands for.", "52": "A typical winter week does not stand for all 52 weeks.", none: "A year of building costs against a few weeks of fuel counts fuel for too few hours, so plants that are cheap to build would look better than they are." },
+            options: [{ value: "weight", label: "Weight each modeled hour by the hours of the year it stands for" }, { value: "52", label: "Multiply every week's cost by 52" }, { value: "none", label: "Leave it: a few weeks are close enough" }],
+            feedback: { weight: "Each modeled hour counts as many hours of the year as it stands for.", "52": "A typical winter week does not stand for all 52 weeks.", none: "A year of building costs against a few weeks of fuel counts fuel for too few hours, so plants that are cheap to build would look better than they are." },
             onPick: function () {
               pr.reveal(); f.hidden = false; key.hidden = false; api.done();
-              api.saw("Build costs count once a year. Each modelled hour's running cost counts **w** times: its [[period-weight|weight]], the hours of 2025 it stands for.");
+              api.saw("Build costs count once a year. Each modeled hour's running cost counts **w** times: its [[period-weight|weight]], the hours of 2025 it stands for.");
             } });
-          f = H("div", { class: "m3-formula", hidden: true, role: "math", "aria-label": "minimise, over the sizes K, the sum of yearly cost f times size K, plus the sum over modelled weeks p of the weight w p times the running cost of every hour of that week" }, act);
+          f = H("div", { class: "m3-formula", hidden: true, role: "math", "aria-label": "minimize, over the sizes K, the sum of yearly cost f times size K, plus the sum over modeled weeks p of the weight w p times the running cost of every hour of that week" }, act);
           f.innerHTML = "min &nbsp;Σ<sub><var>i</var></sub> <var>f</var><sub><var>i</var></sub> <var>K</var><sub><var>i</var></sub> &nbsp;+&nbsp; Σ<sub><var>p</var></sub> <span class='w'><var>w</var><sub><var>p</var></sub></span> Σ<sub><var>h</var></sub> (running cost in hour <var>h</var> of week <var>p</var>)";
           // the symbol key beside the first formula
           key = H("ul", { class: "m3-key", hidden: true, "aria-label": "The symbols in the formula" }, act);
           [["<var>K</var><sub><var>i</var></sub>", "size built of plant <var>i</var>: MW (battery energy: MWh)"],
            ["<var>f</var><sub><var>i</var></sub>", "its yearly cost: $ per MW-year (battery energy: per MWh-year)"],
            ["<var>p</var>, <var>h</var>", "a representative week, and an hour of it"],
-           ["<var>w</var><sub><var>p</var></sub>", "the week's weight: hours of the year per modelled hour"]].forEach(function (s) { H("li", { html: "<b>" + s[0] + "</b> " + s[1] }, key); });
+           ["<var>w</var><sub><var>p</var></sub>", "the week's weight: hours of the year per modeled hour"]].forEach(function (s) { H("li", { html: "<b>" + s[0] + "</b> " + s[1] }, key); });
         } },
       // 2 the weeks and their weights
       { text: "Each [[representative-period|representative week]] stands for several calendar weeks; its weight says how many. Pick two of the five ways of choosing them and compare the calendars.",
@@ -299,7 +299,7 @@
             strip.draw(RW, null); seen[id] = 1;
             var wsum = RW.reps.reduce(function (a, r) { return a + r.weight * HPW; }, 0);
             var x = RW.reps.filter(function (r) { return r.kind !== "season"; }).length;
-            var line = "**" + set.label + "**: " + RW.reps.length + " weeks, " + (RW.reps.length * HPW).toLocaleString("en-US") + " modelled hours; weights add to " + Math.round(wsum).toLocaleString("en-US") + " h. " +
+            var line = "**" + set.label + "**: " + RW.reps.length + " weeks, " + (RW.reps.length * HPW).toLocaleString("en-US") + " modeled hours; weights add to " + Math.round(wsum).toLocaleString("en-US") + " h. " +
               (x ? "Each extreme week (outlined) stands only for itself." : "No extreme week: the hardest weeks are averaged into the typical ones.");
             if (Object.keys(seen).length >= 2) { api.done(); api.saw(line + " The 24 hours of 31 December are spread over all the weights (× 8,760 ÷ 8,736)."); }
             else api.saw(line + " Now pick another.");
@@ -313,7 +313,7 @@
           var st = LX.SolverStatus(row), out = H("div", { class: "m3-row", style: "align-items:flex-start" }, act);
           function show(x) {
             out.innerHTML = ""; var k = H("div", { class: "m3-kpis" }, out);
-            kpi(k, "Estimated cost", fm.musd(x.est.cost) + " a year"); kpi(k, "CO₂", fm.kt(x.est.co2)); kpi(k, "Modelled hours", x.est.hours.toLocaleString("en-US"));
+            kpi(k, "Estimated cost", fm.musd(x.est.cost) + " a year"); kpi(k, "CO₂", fm.kt(x.est.co2)); kpi(k, "Modeled hours", x.est.hours.toLocaleString("en-US"));
             planTable(H("div", { style: "flex:1 1 260px;min-width:0" }, out), x.est.plan);
           }
           if (res.typ4 && res.typ4.est) { show(res.typ4); api.done(); }
@@ -405,7 +405,7 @@
           var rules = H("dl", { class: "m3-rules", "aria-label": "Three rules for the battery between weeks" }, act);
           [["Linked", "one calendar chain of 52 start levels: energy carried into a week was stored before."], ["Cyclic", "each representative week ends where it starts."],
            ["No link", "each week may start at any level."]].forEach(function (r) { H("dt", { text: r[0] }, rules); H("dd", { text: r[1] }, rules); });
-          // the what-if, as short labelled lines
+          // the what-if, as short labeled lines
           var info = H("ul", { class: "m3-info" }, act);
           [["What-if", "battery energy at $" + D.storage.energyCapex + " per kWh, not the sourced $" + Math.round(cfg.techs.battery.energyCapex) + " in " + cfg.priceYear + " dollars (lesson 13). An illustrative what-if, not a forecast or a sourced cost."],
            ["Why", "so the solver builds a battery large enough for the rules to differ."],
@@ -541,9 +541,9 @@
       fields: [{ key: "you", label: "In this lesson" }, { key: "code", label: "In code", code: true }],
       rows: [
         { html: "min " + sym("f", "Σ<sub><var>i</var></sub> <var>f</var><sub><var>i</var></sub>") + " " + sym("K", "<var>K</var><sub><var>i</var></sub>") + " + " + sym("w", "Σ<sub><var>p</var></sub> <var>w</var><sub><var>p</var></sub>") + " Σ<sub><var>h</var></sub> ( " + sym("r", "<var>r</var>") + " · " + sym("g", "<var>g</var><sub><var>p,h</var></sub>") + " )", tag: "goal: a year's cost",
-          say: "Minimise the yearly cost of what is built, f times K summed over the plants, plus, for every representative week p, its weight w p times the running cost r times the gas output g in each of its hours." },
-        { html: sym("a", "<var>a</var><sub><var>p,h</var></sub>") + " " + sym("K", "<var>K</var>") + " + " + sym("g", "<var>g</var><sub><var>p,h</var></sub>") + " + <var>d</var> − <var>c</var> ≥ " + sym("Dm", "<var>D</var><sub><var>p,h</var></sub>"), tag: "every modelled hour",
-          say: "In every modelled hour, wind, sun and nuclear output (availability a times size K), plus gas output g, plus battery discharge d minus charge c, covers demand D." },
+          say: "Minimize the yearly cost of what is built, f times K summed over the plants, plus, for every representative week p, its weight w p times the running cost r times the gas output g in each of its hours." },
+        { html: sym("a", "<var>a</var><sub><var>p,h</var></sub>") + " " + sym("K", "<var>K</var>") + " + " + sym("g", "<var>g</var><sub><var>p,h</var></sub>") + " + <var>d</var> − <var>c</var> ≥ " + sym("Dm", "<var>D</var><sub><var>p,h</var></sub>"), tag: "every modeled hour",
+          say: "In every modeled hour, wind, sun and nuclear output (availability a times size K), plus gas output g, plus battery discharge d minus charge c, covers demand D." },
         { html: sym("g", "<var>g</var><sub><var>p,h</var></sub>") + " ≤ " + sym("K", "<var>K</var>") + ",&nbsp; " + sym("s", "<var>s</var><sub><var>p,h</var></sub>") + " = <var>s</var><sub><var>p,h</var>−1</sub> + 0.85 <var>c</var> − <var>d</var>", tag: "sizes, battery",
           say: "Gas output stays within the size built; the battery's level s rises with 85 percent of the charge and falls with the discharge." },
         { html: sym("S", "<var>S</var><sub><var>i</var>+1</sub>") + " = <var>S</var><sub><var>i</var></sub> + " + sym("dl", "Δ<sub><var>k</var>(<var>i</var>)</sub>") + ",&nbsp; 0 ≤ <var>S</var><sub><var>i</var></sub> + ℓ<sub><var>k</var></sub>,&nbsp; <var>S</var><sub><var>i</var></sub> + <var>u</var><sub><var>k</var></sub> ≤ <var>K</var><sub>be</sub>", tag: "the link between weeks",
@@ -554,9 +554,9 @@
       symbols: {
         f: { name: "f_i", label: "f i, yearly cost of one unit built", unit: "$ per MW-year", words: "[[capital-cost|Capital cost]] spread over the plant's life ([[capital-recovery-factor|capital recovery]] at a 4% real cost of capital), plus [[fixed-om|fixed O&M]]: what one MW costs every year, used or not.", you: "Wind: $" + (C.techs.wind.fixed / 1e3).toFixed(1) + "k per MW-year; gas combined-cycle: $" + (C.techs.cc.fixed / 1e3).toFixed(1) + "k.", code: "C.techs.wind.fixed   // LX.townPlan.costs()" },
         K: { name: "K_i", label: "K i, size built", unit: "MW (battery energy: MWh)", words: "The investment decisions: one number per technology, the same in every hour of the year.", you: "The 4 + 3 plan: " + fm.mw(w7.plan.wind) + " of wind, " + fm.mw(w7.plan.cc) + " of gas combined-cycle.", code: '"K_wind", "K_cc", ... "K_be"' },
-        w: { name: "w_p", label: "w p, the weight of representative week p", unit: "h per modelled hour", words: "How many hours of the year each modelled hour stands for: the number of calendar weeks the week represents, times 8,760 ÷ 8,736.", you: "A typical week standing for 13 weeks: " + (13 * 8760 / 8736).toFixed(2) + "; an extreme week: " + (8760 / 8736).toFixed(3) + ".", code: "RW.reps[p].weight" },
+        w: { name: "w_p", label: "w p, the weight of representative week p", unit: "h per modeled hour", words: "How many hours of the year each modeled hour stands for: the number of calendar weeks the week represents, times 8,760 ÷ 8,736.", you: "A typical week standing for 13 weeks: " + (13 * 8760 / 8736).toFixed(2) + "; an extreme week: " + (8760 / 8736).toFixed(3) + ".", code: "RW.reps[p].weight" },
         r: { name: "r", label: "r, running cost", unit: "$/MWh", words: "Fuel and variable upkeep per MWh of gas output.", you: "Combined-cycle $" + C.techs.cc.run.toFixed(2) + "/MWh, peaker $" + C.techs.pk.run.toFixed(2) + "/MWh.", code: "C.techs.cc.run" },
-        g: { name: "g_p,h", label: "g, gas output in hour h of week p", unit: "MW", words: "An operating decision: one per plant and modelled hour. Each lasts an hour, so MW over the hour is MWh.", you: "4 typical weeks: 672 hours; 4 + 3: 1,176.", code: '"g" + p + "_" + h' },
+        g: { name: "g_p,h", label: "g, gas output in hour h of week p", unit: "MW", words: "An operating decision: one per plant and modeled hour. Each lasts an hour, so MW over the hour is MWh.", you: "4 typical weeks: 672 hours; 4 + 3: 1,176.", code: '"g" + p + "_" + h' },
         a: { name: "a_p,h", label: "a, output per MW built", unit: "MW per MW", words: "What one MW of wind or solar can make in that hour (from real 2025 shapes, scaled to EIA [[capacity-factor|capacity factors]]); nuclear's is a flat 0.911.", you: "Wind averages " + (S.Y.windCF * 100).toFixed(1) + "% over the year, solar " + (S.Y.solarCF * 100).toFixed(1) + "%.", code: "P.wind[h], P.solar[h]" },
         Dm: { name: "D_p,h", label: "D, demand", unit: "MW", words: "Prairie Town's demand in that hour: the real 2025 shape scaled to a 450 MW peak; a typical week is scaled to keep its season's energy.", you: "Peak " + Math.round(S.Y.peak) + " MW.", code: "P.demand[h]" },
         s: { name: "s_p,h", label: "s, battery level within week p", unit: "MWh", words: "The level relative to the week's start; the 85% round trip loses 15% on charging.", you: "4 + 3 plan: " + batText(w7.plan) + " MW / MWh of battery.", code: '"s" + p + "_" + h' },
@@ -599,7 +599,7 @@
                 { key: "u25", label: "Unserved, 2025", num: true, phone: "2025" }, { key: "u24", label: "Unserved, 2024", num: true, phone: "2024" }, { key: "co2", label: "CO₂, 2025", num: true, phoneHide: true }],
       rows: ["typ4", "wk7", "typ8", "wk11", "wk15"].map(function (id) {
         var r = R.sets[id], s = setOf(D, id);
-        return { key: id, color: s.extremes.length ? "var(--lx-bad)" : "var(--lx-hyd)", name: s.label, note: r.weeks * HPW + " modelled hours",
+        return { key: id, color: s.extremes.length ? "var(--lx-bad)" : "var(--lx-hyd)", name: s.label, note: r.weeks * HPW + " modeled hours",
                  cols: { text: r.cols.toLocaleString("en-US"), value: r.cols }, err: { text: fm.spct(r.cost / ref - 1), value: Math.abs(r.cost / ref - 1) },
                  u25: { text: fm.mwh(r.y2025.unserved), value: r.y2025.unserved }, u24: { text: fm.mwh(r.y2024.unserved), value: r.y2024.unserved }, co2: { text: fm.kt(r.y2025.co2), value: r.y2025.co2 } };
       }),

@@ -15,7 +15,7 @@
 // option, EIA's 2025 monthly values in cf_targets.json), because the SPP shapes contain the fleets' growth during 2025
 // (solar's January maximum is 0.56 of its November maximum); then the annual capacity factor is set exactly. Night-time
 // solar telemetry is zero in town_year.json itself (as its data build step writes it). Nuclear has no shape: it runs at
-// full size except for one illustrative refuelling outage sized to the same target.
+// full size except for one illustrative refueling outage sized to the same target.
 //
 // Model (closed form):
 //   capacity factor  CF = E / (P x T)      E energy made (MWh), P size (MW), T hours in the period
@@ -156,7 +156,7 @@
   var TECH = { nuclear: { label: "Nuclear", tok: "nuc", col: "var(--lx-nuc)" }, wind: { label: "Wind", tok: "wind", col: "var(--lx-wind)" },
                solar: { label: "Solar", tok: "solar", col: "var(--lx-solar)" } };
   var NOTES = {
-    nuclear: function () { return "Flat at 100 MW, except an illustrative [[refuelling-outage|refuelling outage]] of 32.5 days in spring: the gap in late March and April."; },
+    nuclear: function () { return "Flat at 100 MW, except an illustrative [[refuelling-outage|refueling outage]] of 32.5 days in spring: the gap in late March and April."; },
     wind: function (w) { return "Gusty and calm by turns: in its best hours the farm makes its full " + Math.round(w.max) + " MW, but on average a third of that."; },
     solar: function () { return "Bright in summer, faint in winter, nothing at night: the farm reaches 100 MW only near noon on the clearest days."; }
   };
@@ -437,7 +437,7 @@
     host.innerHTML = ""; host.classList.add("is-live");
     var P = D.plantMW, T = W.T;
     var c1 = H("div", { class: "lx-xcard" }, host);
-    var reasons = { nuclear: "Off for refuelling about a month in spring", wind: "Wind speed varies; below rated speed, output follows its cube", solar: "Night, clouds and short winter days" };
+    var reasons = { nuclear: "Off for refueling about a month in spring", wind: "Wind speed varies; below rated speed, output follows its cube", solar: "Night, clouds and short winter days" };
     LX.CompareTable(c1, {
       title: "Three plants, 100 MW each, one year",
       columns: [{ key: "name", label: "Plant and why it is below 100%", main: true }, { key: "e", label: "Energy in the year, MWh", phone: "MWh", num: true },

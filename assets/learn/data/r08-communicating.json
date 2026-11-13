@@ -85,24 +85,24 @@
   "briefing": {
     "facts": [
       { "k": "The 2035 peak", "v": "{c10}–{c90} MW with central car uptake (15,000 electric cars), {f10}–{f90} MW with fast uptake (30,000): [[percentile|P10–P90]], about 8 in 10 of 1,000 runs. 450 MW in 2025." },
-      { "k": "Managed charging", "v": "A programme moving most charging after 23:00. With fast uptake, the [[median|median]] falls from {f50} to {fm50} MW when demand is added hour by hour; adding the separate peaks ignores timing and misses this." },
+      { "k": "Managed charging", "v": "A program moving most charging after 23:00. With fast uptake, the [[median|median]] falls from {f50} to {fm50} MW when demand is added hour by hour; adding the separate peaks ignores timing and misses this." },
       { "k": "Inputs", "v": "Varied in the runs: growth (0.4–1.6% a year), a weather multiplier on background demand (0.96–1.04) and a car's daily energy (7–13 kWh). Fixed: 2025's hourly pattern; cars charging at home." },
-      { "k": "Not in the model", "v": "A new customer (a constant 60 MW would raise each 2035 figure by 60 MW), workplace charging, the programme's cost and sign-up. Outcomes outside the ranges remain possible." }
+      { "k": "Not in the model", "v": "A new customer (a constant 60 MW would raise each 2035 figure by 60 MW), workplace charging, the program's cost and sign-up. Outcomes outside the ranges remain possible." }
     ],
     "fields": [
       { "id": "decision", "label": "The decision", "hint": "What the council is deciding, in its own words." },
       { "id": "finding", "label": "What we found", "hint": "The result as a range, what the range means, the case it belongs to and the 2025 value for scale." },
-      { "id": "programme", "label": "What the programme changes", "hint": "Its effect on the peak, with the case and the model it holds in." },
+      { "id": "programme", "label": "What the program changes", "hint": "Its effect on the peak, with the case and the model it holds in." },
       { "id": "depends", "label": "What it depends on", "hint": "The assumptions a council member could challenge." },
       { "id": "leaves", "label": "What it leaves out", "hint": "What the study cannot say, next to what it can." },
       { "id": "change", "label": "What would change this advice", "hint": "The signal that would make the briefing out of date." }
     ],
     "example": {
-      "decision": "Whether to fund a managed-charging programme before 2030.",
+      "decision": "Whether to fund a managed-charging program before 2030.",
       "finding": "In about 8 of 10 illustrative model runs, the 2035 peak is {c10}–{c90} MW with central car uptake and {f10}–{f90} MW with fast uptake, against 450 MW in 2025.",
-      "programme": "With fast uptake the programme lowers the median by about {mHours} MW, when demand is added hour by hour.",
+      "programme": "With fast uptake the program lowers the median by about {mHours} MW, when demand is added hour by hour.",
       "depends": "Growth, the year's weather and a car's daily energy, varied within illustrative ranges; 2025's daily pattern of demand; cars charging at home.",
-      "leaves": "A large new customer (a constant 60 MW would raise each 2035 figure by 60 MW), workplace charging, and the programme's cost and sign-up; outcomes outside the ranges remain possible.",
+      "leaves": "A large new customer (a constant 60 MW would raise each 2035 figure by 60 MW), workplace charging, and the program's cost and sign-up; outcomes outside the ranges remain possible.",
       "change": "A connection request from a large customer, or car numbers on the fast path, would call for a new forecast."
     }
   },
@@ -114,22 +114,22 @@
   "exemplars": {
     "id": "r8-ex",
     "title": "Two briefings for the same council",
-    "task": "Brief the city council on the 2035 peak, ahead of its vote on a managed-charging programme.",
+    "task": "Brief the city council on the 2035 peak, ahead of its vote on a managed-charging program.",
     "lines": true,
     "answers": [
       { "key": "weak", "label": "Weak answer", "level": "Developing", "parts": [
         "Our analysis shows that ", { "text": "the town's peak will grow to {claim} MW by 2035", "note": "One number with “will”: no range, no case, no conditions." },
-        ". ", { "text": "Managed charging is the solution and should be funded", "note": "Advice past the evidence: the study measured a peak, not the programme's cost or sign-up." },
+        ". ", { "text": "Managed charging is the solution and should be funded", "note": "Advice past the evidence: the study measured a peak, not the program's cost or sign-up." },
         ". ", { "text": "See the attached figures for details", "note": "A council member cannot act on figures nobody walked them through." },
         ". ", { "text": "The model has been validated", "note": "Asserted, not shown; and checking a model does not remove the future's uncertainty." },
         "."
       ] },
       { "key": "good", "label": "Strong answer", "level": "Proficient", "parts": [
-        "Decision: ", { "text": "whether to fund a managed-charging programme before 2030", "note": "Opens with the council's decision, not the method." },
+        "Decision: ", { "text": "whether to fund a managed-charging program before 2030", "note": "Opens with the council's decision, not the method." },
         ".\nFinding: ", { "text": "in about 8 of 10 illustrative model runs, the 2035 peak is {c10}–{c90} MW with central car uptake and {f10}–{f90} MW with fast uptake, against 450 MW in 2025", "note": "Ranges with the case each belongs to, what a range means, and the 2025 value for scale." },
-        ".\nProgramme: ", { "text": "with fast uptake it lowers the median by about {mHours} MW, when demand is added hour by hour", "note": "The effect, with the case and the model condition it rests on." },
+        ".\nProgram: ", { "text": "with fast uptake it lowers the median by about {mHours} MW, when demand is added hour by hour", "note": "The effect, with the case and the model condition it rests on." },
         ".\nDepends on: ", { "text": "growth, the year's weather and a car's daily energy, varied within illustrative ranges; 2025's daily pattern; cars charging at home", "note": "The assumptions a member could challenge, with what the runs varied, in plain words." },
-        ".\nLeaves out: ", { "text": "a large new customer (a constant 60 MW would raise each figure by 60 MW), workplace charging, the programme's cost; outcomes outside the ranges remain possible", "note": "The limits beside the result, not at the end." },
+        ".\nLeaves out: ", { "text": "a large new customer (a constant 60 MW would raise each figure by 60 MW), workplace charging, the program's cost; outcomes outside the ranges remain possible", "note": "The limits beside the result, not at the end." },
         ".\nWould change it: ", { "text": "a connection request from a large customer, or car numbers on the fast path", "note": "Signposts: what would make the advice out of date." },
         "."
       ] }
@@ -149,7 +149,7 @@
   ],
   "boundary": {
     "title": "Where the managed-charging finding holds",
-    "lede": "The briefing's programme sentence, as a box a council member can read in ten seconds.",
+    "lede": "The briefing's program sentence, as a box a council member can read in ten seconds.",
     "holds": [
       "demand is added hour by hour on 2025's pattern, and every day's charging follows the same managed profile;",
       "car uptake is fast (30,000 cars in 2035); with central uptake the cut is smaller;",
@@ -158,7 +158,7 @@
     "leaves": [
       "a large new customer;",
       "workplace charging;",
-      "the programme's cost, and how many drivers sign up;",
+      "the program's cost, and how many drivers sign up;",
       "other years' patterns of demand."
     ],
     "source": "Model: R6's, 1,000 runs, seed 6. Data: SPP's 2025 hourly demand (EIA-930)."
@@ -167,21 +167,21 @@
     "id": "r8-rubric",
     "code": "R8",
     "title": "Rate your R8 practice against the rubric's Communication line",
-    "lede": "The course rubric's own words. Proficient asks for a six-page paper, which the capstone assesses; here, rate only the parts R8 practises.",
+    "lede": "The course rubric's own words. Proficient asks for a six-page paper, which the capstone assesses; here, rate only the parts R8 practices.",
     "competences": [
-      { "id": "communication", "look": "the parts R8 practises (one key figure that passes the checklist, findings with their conditions, limits beside the result, a briefing, and a public summary of at most 150 words)." }
+      { "id": "communication", "look": "the parts R8 practices (one key figure that passes the checklist, findings with their conditions, limits beside the result, a briefing, and a public summary of at most 150 words)." }
     ],
     "note": "Your rating stays in this browser and rates R8's practice only. Proficient in full also needs the capstone's six-page paper."
   },
   "checklist": [
     { "id": "one", "label": "One message", "text": "Each figure makes one point, and its title or caption says which." },
-    { "id": "axes", "label": "Honest axes", "text": "Units on every axis; bars start at zero; any zoom is labelled." },
+    { "id": "axes", "label": "Honest axes", "text": "Units on every axis; bars start at zero; any zoom is labeled." },
     { "id": "window", "label": "The whole picture", "text": "The time window and any selection said; the context shown or one click away." },
     { "id": "spread", "label": "Spread, not only averages", "text": "A band or the range beside any average, and what the band means." },
     { "id": "finding", "label": "Findings with conditions", "text": "Each finding: a number with its unit, the place, the time and the main assumption." },
     { "id": "limits", "label": "Limits beside results", "text": "What the study leaves out, next to what it found, not at the end." },
     { "id": "brief", "label": "The decision first", "text": "A briefing opens with the reader's decision and ends with what would change the advice." },
     { "id": "public", "label": "A public version", "text": "Plain words, at most 150, read back to you by someone outside the field." },
-    { "id": "colour", "label": "Not colour alone", "text": "Colour-blind-safe colours, with labels or patterns that carry the meaning too." }
+    { "id": "colour", "label": "Not color alone", "text": "Color-blind-safe colors, with labels or patterns that carry the meaning too." }
   ]
 }

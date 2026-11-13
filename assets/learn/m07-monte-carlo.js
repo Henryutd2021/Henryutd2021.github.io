@@ -13,7 +13,7 @@
 // h tau, at most 50%). Each run discounts at its own r. The developer's cost depends on m, K and r only.
 //
 // Uncertainty (data/m07-monte-carlo.json): the wait is a scenario (12, 24 or 36 months; this lesson gives it no
-// probabilities, a modelling choice); the five inputs are uniform on invented ranges around CF7's values (base = the
+// probabilities, a modeling choice); the five inputs are uniform on invented ranges around CF7's values (base = the
 // midpoint = CF7's value), drawn independently.
 //
 // Methods (every number the page states comes from these functions; _tests/learn/test_m07-monte-carlo.js checks them):
@@ -31,7 +31,7 @@
 //               run's estimate is the standard deviation (n - 1) of the 20 estimates; the page shows +/- 2 standard
 //               errors. With 20 repeats this error is itself rough (about +/- 16%).
 //   corners     every one of the 2^5 combinations of range ends; the lowest and highest result. An exact corner has
-//               zero probability under continuous inputs, so rarity is read from a stated neighbourhood: "near a corner"
+//               zero probability under continuous inputs, so rarity is read from a stated neighborhood: "near a corner"
 //               = the three inputs of the developer's cost (m, K, r) all in the outer tenth of their ranges at the same
 //               end, a chance of 0.1^3 per corner under independent uniform inputs (also per run of a Latin hypercube)
 // Probabilities are shares of runs: statements about the model under its assumed inputs, not about the world.
@@ -125,7 +125,7 @@
   // the tie rule, stated in advance: inputs are ordered by |rho|; one input ranks clearly above another when its |rho|
   // exceeds the other's by more than two standard errors of that gap (from the 20 repeats). Every pair is tested, so a rank
   // is a range: from 1 + the number of inputs clearly above it to the number of inputs not clearly below it ("1", "2–3",
-  // ...); a range wider than one place means tied. groups: neighbours in the order with the same range; first: the inputs
+  // ...); a range wider than one place means tied. groups: neighbors in the order with the same range; first: the inputs
   // that nothing ranks clearly above (several of them = tied first)
   function rankGroups(rh, reps, out, ins) {
     var ord = order(rh, ins), n = ord.length;
@@ -647,7 +647,7 @@
           var gl = D.guess.filter(function (x) { return x.value === g; })[0], right = gl && Math.abs(+g * 1e6 - sm.p90) === Math.min.apply(null, D.guess.map(function (x) { return Math.abs(+x.value * 1e6 - sm.p90); }));
           out.innerHTML = "Median <b>" + money(sm.p50) + "</b> · 80% of runs from <b>" + money(sm.p10) + "</b> to <b>" + money(sm.p90) + "</b> · runs from " + money(sm.min) + " to " + money(sm.max) + "." +
                           (gl ? (right ? " Your guess, about $" + g + "M, was the closest." : " You guessed about $" + g + "M.") : "");
-          // an exact corner has zero chance under continuous inputs: count runs in a stated neighbourhood instead (its own line)
+          // an exact corner has zero chance under continuous inputs: count runs in a stated neighborhood instead (its own line)
           outN.textContent = nearText(N) + ".";
           keep("run", true);
           api.done();

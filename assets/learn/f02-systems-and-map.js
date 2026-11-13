@@ -438,7 +438,7 @@
     if (o.static) { var ref = {}; L.links.forEach(function (l) { ref[l.id] = l.sign; }); signs(ref); }
     return { svg: svg, signs: signs, loopLabel: loopLabel, light: light };
   }
-  // a behaviour-over-time sketch: R = growth that feeds itself (or decline); B = one possible response without long delays,
+  // a behavior-over-time sketch: R = growth that feeds itself (or decline); B = one possible response without long delays,
   // settling toward a level (with long delays a balancing loop can overshoot instead); illustrative shapes
   function sketch(host, type) {
     var d = type === "R" ? "M14 70 C60 68 92 60 116 46 C134 34 146 20 154 8" : "M14 70 C34 34 58 22 92 18 C118 16 136 15 154 15";
@@ -760,7 +760,7 @@
     var host = document.getElementById("f2-explain"); if (!host) return;
     host.innerHTML = ""; host.classList.add("is-live");
     var R = D.ripple, dirs = R.dirs, nodeBy = {}; R.nodes.forEach(function (n) { nodeBy[n.id] = n; });
-    // 1 e-loop: the two kinds of loop, with their signs and typical behaviour
+    // 1 e-loop: the two kinds of loop, with their signs and typical behavior
     var c1 = H("div", { class: "lx-xcard" }, host);
     var hd = H("header", { class: "lx-x-head" }, c1); H("h3", { text: "Two kinds of feedback loop" }, hd);
     H("p", { class: "lx-lede", html: rich("Follow a loop's arrows round and count the − links: **even** makes it reinforcing (R), **odd** makes it balancing (B).") }, c1);

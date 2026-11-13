@@ -263,7 +263,7 @@
       }
       altBox.innerHTML = m.t ? "" : "<p>Nothing run yet.</p>";
       if (!m.t) { S("text", { x: ml + iw / 2, y: mt + h1 / 2 + 4, "text-anchor": "middle", class: "t1-axt" }, svg).textContent = "Switch something on and run the clock"; return; }
-      // power: one block per segment, coloured by the single appliance if only one is on
+      // power: one block per segment, colored by the single appliance if only one is on
       m.log.forEach(function (g) {
         if (g.w <= 0) return;
         var only = g.ids.indexOf(",") < 0 ? g.ids : "";

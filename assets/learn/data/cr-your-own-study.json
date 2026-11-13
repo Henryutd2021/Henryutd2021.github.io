@@ -1,7 +1,7 @@
 {
   "meta": {
     "lesson": "CR, the research capstone, 7 November 2026",
-    "note": "The hours are the course's planning ranges (20 to 40 hours for the study, CK-R's four among them), not measurements. The exemplar studies (a co-op feeder, Prairie City's weatherization programme, a co-op's community solar, the Plains Grid in a heat wave) and their numbers are fictional and illustrative: assumed, not computed, except the cost and CO₂ fragment, whose arithmetic the page shows and the test redoes. Method families: the ids of R3's data file (r03-system-and-method.json), whose labels the page reads. The page reads this file; its no-JS text is made from the same file."
+    "note": "The hours are the course's planning ranges (20 to 40 hours for the study, CK-R's four among them), not measurements. The exemplar studies (a co-op feeder, Prairie City's weatherization program, a co-op's community solar, the Plains Grid in a heat wave) and their numbers are fictional and illustrative: assumed, not computed, except the cost and CO₂ fragment, whose arithmetic the page shows and the test redoes. Method families: the ids of R3's data file (r03-system-and-method.json), whose labels the page reads. The page reads this file; its no-JS text is made from the same file."
   },
   "version": "cr v1 (7 Nov 2026)",
   "families": ["opt", "sim", "stat", "ml", "sd", "abm", "eq", "qual", "mixed"],
@@ -30,7 +30,7 @@
     { "id": "method", "label": "Method", "does": "Choose a method family, defend it, and write the one-page proposal.",
       "done": ["The method defended against two alternatives, one from another family.", "Milestone: the proposal."], "lessons": ["R3"], "route": "lab", "comps": ["method"], "milestone": "the one-page proposal" },
     { "id": "data", "label": "Data", "does": "Get, clean and document your data; for interviews, settle the ethics review with a mentor before contacting anyone.",
-      "done": ["A data note: each source with its date and licence.", "A cleaning log.",
+      "done": ["A data note: each source with its date and license.", "A cleaning log.",
     "Interviews: ethics approval or exemption before recruiting, then consent forms and a guide."], "lessons": ["R4", "B2"], "comps": ["trust", "realism"] },
     { "id": "build", "label": "Build and validate", "does": "Build the model or analysis under version control, verify it, and validate one result.",
       "done": ["It reruns from a [[clean-clone|clean clone]] (or a complete audit trail).", "A verification log.", "One validation against real data or an independent reference."], "lessons": ["R5", "CK-M", "K8"], "route": "lab", "comps": ["trust"] },
@@ -40,8 +40,8 @@
       "done": ["Every major concern answered.", "A change log.", "A clean-clone rerun within your tolerance, or the difference explained."], "lessons": ["CK-R"], "comps": ["framing", "method", "trust"], "milestone": "CK-R" },
     { "id": "communicate", "label": "Paper and poster", "does": "Write the paper and the poster, with each result's limits beside it.",
       "done": ["A six-page paper with one key figure.", "A limits paragraph and a 150-word public summary.", "A poster."], "lessons": ["R8"], "route": "cap", "comps": ["communication", "realism"], "milestone": "the paper and the poster" },
-    { "id": "integrity", "label": "Integrity and release", "does": "Check licences, credit and conflicts; make what you report and release keep your promises to the people studied.",
-      "done": ["Licences checked; credit and conflicts stated.", "The people the study is about treated fairly.", "Data and code released with documentation where allowed.", "Your rubric sheet."], "lessons": ["R9"], "comps": ["integrity"], "milestone": "the rubric sheet" }
+    { "id": "integrity", "label": "Integrity and release", "does": "Check licenses, credit and conflicts; make what you report and release keep your promises to the people studied.",
+      "done": ["Licenses checked; credit and conflicts stated.", "The people the study is about treated fairly.", "Data and code released with documentation where allowed.", "Your rubric sheet."], "lessons": ["R9"], "comps": ["integrity"], "milestone": "the rubric sheet" }
   ],
   "routes": {
     "S0": { "name": "device and plant", "lab": "M4", "cap": "C0" },
@@ -76,14 +76,14 @@
     { "key": "why", "label": "Why it matters", "hint": "Who would act on the answer, and what answer would change their decision.", "rows": 2, "need": true, "at": "top", "min": 10 },
     { "key": "known", "label": "What is known, and the gap", "hint": "The three closest studies and what none of them answers; the size of your concept matrix and the date of your search (R2).", "rows": 3, "need": true, "min": 15 },
     { "key": "method", "label": "Why this method, not the alternatives", "hint": "What your method answers that the two alternatives cannot (if one is from your method's family, name that method exactly), and one limit you will mitigate (R3).", "rows": 3, "need": true, "min": 15 },
-    { "key": "data", "label": "Data and licences", "hint": "Each source, its date and its licence; for interviews, who you will ask, how you will ask for consent, and the ethics review you need first (R4, R9).", "rows": 2, "need": true, "min": 8 },
+    { "key": "data", "label": "Data and licenses", "hint": "Each source, its date and its license; for interviews, who you will ask, how you will ask for consent, and the ethics review you need first (R4, R9).", "rows": 2, "need": true, "min": 8 },
     { "key": "check", "label": "How you will check it", "hint": "One verification check, one validation against real data or an independent reference, and the tolerance you set now (R5).", "rows": 2, "need": true, "min": 10 },
     { "key": "leaves", "label": "What the study leaves out", "hint": "The parts, people and years outside your boundary, and why that does not change the answer to your question.", "rows": 2, "need": true, "min": 8 },
     { "key": "integrity", "label": "Integrity", "hint": "Credit, conflicts, consent, and who the study affects (R9).", "rows": 2, "need": true, "min": 8 }
   ],
   "studies": {
     "feeder": "A co-op's farm [[feeder|feeder]]: how much battery, and which tariff, keep the summer evening peak under the feeder's limit at least cost (model-based, prescriptive, S1)",
-    "weather": "Prairie City's 2023 [[weatherization|weatherization]] programme: did weatherized homes use less gas than homes on its waiting list (empirical, evaluative, S3)",
+    "weather": "Prairie City's 2023 [[weatherization|weatherization]] program: did weatherized homes use less gas than homes on its waiting list (empirical, evaluative, S3)",
     "solar": "A co-op's community solar: why some farms joined and others did not, from sign-up records and 12 interviews (mixed, explanatory, S1)",
     "heat": "The Plains Grid in a five-day heat wave: how often the reserve falls short with more air conditioning (model-based, predictive, S2)"
   },
@@ -94,7 +94,7 @@
         { "key": "good", "label": "Strong", "level": "Strong", "parts": [
           "Question: Did homes weatherized in 2023 ", { "text": "cut their gas use", "note": "A metric; its units follow." }, " over the next two winters by more than ",
           { "text": "similar homes still on the waiting list?", "note": "A candidate comparison group: homes that applied too, assumed alike apart from the work. It stands in for the counterfactual." },
-          "\nType: evaluative.\nAudience: ", { "text": "the city's housing office, which sets next year's budget and would cut the programme if the saving is under 5%.", "note": "Who acts on the answer, and the answer that would change the decision." },
+          "\nType: evaluative.\nAudience: ", { "text": "the city's housing office, which sets next year's budget and would cut the program if the saving is under 5%.", "note": "Who acts on the answer, and the answer that would change the decision." },
           "\nMetric: the change in winter gas use per home, two winters before against two after, kWh, adjusted for the weather.\nScale: S3; boundary: the homes' gas, not their electricity.\n",
           { "text": "Wrong if: the waiting-list homes' use fell as much.", "note": "A falsification statement, on the same change." },
           "\n", { "text": "Selection: homes that waited may differ; I compare their use before 2023 too.", "note": "The comparison's main weakness, named, with a check." }
@@ -116,7 +116,7 @@
         { "key": "good", "label": "Strong", "level": "Strong", "parts": [
           "Method: ", { "text": "a linear program of the feeder's summer evenings: the question asks what to do, under stated rules.", "note": "The family fits the question's type (prescriptive); a [[linear-program|linear program]] is one kind of optimization." },
           "\nAgainst simulation: ", { "text": "it tests the designs it is given, but does not search for the cheapest.", "note": "One alternative, and why not." },
-          "\nAgainst agent-based modelling: ", { "text": "it would capture how members respond, but needs behaviour data the co-op does not have.", "note": "A second alternative, from another family." },
+          "\nAgainst agent-based modeling: ", { "text": "it would capture how members respond, but needs behavior data the co-op does not have.", "note": "A second alternative, from another family." },
           "\nLimit: ", { "text": "perfect foresight flatters the battery; I rerun with a day-ahead forecast.", "note": "A limit of the chosen method, stated and partly mitigated ([[perfect-foresight|perfect foresight]])." }
         ] }
       ] },
@@ -170,11 +170,11 @@
       ] },
     { "comp": "integrity", "stage": "integrity", "study": "solar", "title": "Integrity: the statement", "task": "Write the integrity statement.", "lines": true,
       "answers": [
-        { "key": "weak", "label": "Weak", "level": "Developing", "parts": ["Ethics: ", { "text": "no issues: the data are public.", "note": "The interviews and the co-op's records are not public: consent and licences unchecked." }] },
+        { "key": "weak", "label": "Weak", "level": "Developing", "parts": ["Ethics: ", { "text": "no issues: the data are public.", "note": "The interviews and the co-op's records are not public: consent and licenses unchecked." }] },
         { "key": "good", "label": "Strong", "level": "Strong", "parts": [
           "Consent: ", { "text": "the university's ethics board approved the interview protocol before recruitment began, and the 12 interviewees each signed a consent form.", "note": "[[ethics-board|Ethics review]] before anyone was contacted, then [[informed-consent|consent]]." },
-          "\nData: ", { "text": "the co-op's sign-up records under a data-sharing agreement, names removed; I release the code and a synthetic copy, not the records.", "note": "The licence checked; released where allowed ([[synthetic-sample|a synthetic copy]])." },
-          "\nCredit: ", { "text": "co-op staff in the acknowledgements; no funding and no conflicts.", "note": "Credit and conflicts stated." },
+          "\nData: ", { "text": "the co-op's sign-up records under a data-sharing agreement, names removed; I release the code and a synthetic copy, not the records.", "note": "The license checked; released where allowed ([[synthetic-sample|a synthetic copy]])." },
+          "\nCredit: ", { "text": "co-op staff in the acknowledgments; no funding and no conflicts.", "note": "Credit and conflicts stated." },
           "\nFindings: ", { "text": "the co-op saw them before publication, with no veto.", "note": "Stakeholders treated fairly, without control of the results." }
         ] }
       ] }
@@ -188,7 +188,7 @@
     { "id": "accounting", "look": "Cost and emissions on one boundary where you report them, the emissions question named, and who pays and who benefits." },
     { "id": "realism", "look": "The evidence status of your key inputs, and a list of what the study leaves out." },
     { "id": "communication", "look": "The six-page paper, its key figure, the limits paragraph and the 150-word public summary." },
-    { "id": "integrity", "look": "Your integrity statement: licences, credit, conflicts and consent; what you released." }
+    { "id": "integrity", "look": "Your integrity statement: licenses, credit, conflicts and consent; what you released." }
   ],
   "statuses": [
     { "status": "Completed Research Studio", "requires": "The core path, the checkpoints CK-F, CK-A and CK-M, and a submitted CR with a self-assessment.", "evidence": "The CR repository and report, the rubric sheet." },

@@ -19,7 +19,7 @@
 //   value          c × A(B + G)  (+ everyday savings: the battery trims the campus's monthly peak, if B ≥ minHours)
 //                  Boundary: the campus's savings. The everyday saving is a lower bill for the campus (a demand charge);
 //                  for the utility it is revenue it no longer collects, a saving for the whole system only if the smaller
-//                  peak cuts the utility's own costs (not modelled). Stacking assumes a two-hour monthly peak, time to
+//                  peak cuts the utility's own costs (not modeled). Stacking assumes a two-hour monthly peak, time to
 //                  recharge before every outage and no extra charging or wear costs, so the battery is full at each outage.
 //   net            value − annual cost
 //   the next hour  battery: saves c × (A(B + 1) − A(B)) = c × S(B), costs kWh per hour × $/kWh × (CRF + upkeep share)

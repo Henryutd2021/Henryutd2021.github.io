@@ -122,6 +122,8 @@
   var SHARE_LABEL = { 0: "Other customers", 0.5: "Half each", 1: "The waiting load" };
   var LEDGER_NOTE = "One total would hide who pays. A tariff reallocates the utility's costs; earlier service and bridge power change costs differently across the accounts.";
   // the ledger's words, defined where they first appear (step 9)
+  // society's account, in CF7's words: what it counts, and what it leaves out
+  var SOCIETY_NOTE = "Society's account here counts only bridge power's CO₂ above grid power for the same energy; any CO₂ change from the idle months is left out.";
   var LEDGER_WORDS = [
     ["[[present-value|Present value]]", "future costs stated in today's dollars"],
     ["Lost [[margin|margin]]", "revenue minus operating costs that the load cannot earn while it waits"],
@@ -170,7 +172,7 @@
     var st = withStaged && st8.stagedOn ? T.staged : null, L = staged(I, st8.tau, st8.s, st8.bridge, st), out = [];
     if (!st8.tau) return ["No wait, no delay cost in any account. Slide the wait up."];
     if (st8.s > 0) out.push("The tariff moves " + musd(st8.s * staged(I, st8.tau, 0, st8.bridge, st).ratepayers) + " from other customers to the developer; it does not shrink the cost.");
-    if (st8.bridge) out.push("Bridge power saves the developer " + musd(staged(I, st8.tau, st8.s, false, st).developer - L.developer) + " and adds " + musd(L.society) + " of CO₂ damage above grid power.");
+    if (st8.bridge) out.push("Bridge power saves the developer " + musd(staged(I, st8.tau, st8.s, false, st).developer - L.developer) + "; its CO₂ above grid power for the same energy is " + musd(L.society) + " of damage, for society.");
     if (st && st8.tau > st.at) out.push("Staged service cuts the developer's cost from " + musd(staged(I, st8.tau, st8.s, st8.bridge, null).developer) + " to " + musd(L.developer) + ".");
     if (st && st8.tau <= st.at) out.push("The whole load connects by month " + st8.tau + ", so staged service changes nothing here.");
     if (withStaged && st8.tau >= T.shorter) out.push("Full service " + T.shorter + " months sooner is worth up to " + musd(avoided(I, st8.tau, T.shorter, st8.s, st8.bridge, st).saves) + " to the developer, before other risks.");
@@ -226,6 +228,7 @@
       "<li><b>The data center.</b> Two " + N.lineMW + " MW lines feed the east substation (own peak " + N.eastMW + " MW). With one out, the other carries it all: only " + nn.maxNew + " MW of the " + N.campusMW + " MW campus fits before a third line.</li>" +
       "<li><b>Texas.</b> ERCOT's large-load requests total " + fmtN(E.requestsGW, 1) + " GW, against a record demand near " + fmtN(E.peakMW / 1000, 1) + " GW. At $" + fmtN(E.securityPerMW) + " per MW in its first batch study, the " + N.campusMW + " MW campus would hold " + musd(security(N.campusMW, E.securityPerMW)) + " of security in all.</li>" +
       "<li><b>The money.</b> Case file CF7's toy: a " + I7.loadMW + " MW load and invented round numbers. In present value, a " + T.startWait + "-month wait costs the developer " + musd(L.developer) + ", other customers " + musd(L.ratepayers) + " and society " + musd(L.society) + ".</li>" +
+      "<li><b>Society's account.</b> " + esc(SOCIETY_NOTE.replace(/^Society's account here counts/, "It counts")) + "</li>" +
       "<li><b>Staged service.</b> Half the load served at month " + T.staged.at + ": the developer's cost falls to " + musd(S.developer) + ".</li>" +
       "<li><b>A faster connection.</b> " + T.shorter + " months sooner is worth up to " + musd(av.saves) + " to the developer.</li></ul>" +
       "<details class=\"lx-textalt\"><summary>The money worked out, with the toy's inputs (case file CF7)</summary><ol>" + workedMonth(I7, T.startWait).map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("") + "</ol>" +
@@ -272,7 +275,7 @@
     }).join("\n") + "\n</ul>";
   }
 
-  var model = { moneyLines: moneyLines, n1Words: n1Words, moneyCaption: moneyCaption, workedMonth: workedMonth, musd2: musd2, LEDGER_NOTE: LEDGER_NOTE, LEDGER_WORDS: LEDGER_WORDS, staticFacts: staticFacts, staticSources: staticSources, cluster: cluster, margins: margins, n1: n1, security: security, monthly: monthly, annuity: annuity, ledgers: ledgers, staged: staged, mix: mix, avoided: avoided,
+  var model = { moneyLines: moneyLines, n1Words: n1Words, moneyCaption: moneyCaption, workedMonth: workedMonth, musd2: musd2, LEDGER_NOTE: LEDGER_NOTE, SOCIETY_NOTE: SOCIETY_NOTE, LEDGER_WORDS: LEDGER_WORDS, staticFacts: staticFacts, staticSources: staticSources, cluster: cluster, margins: margins, n1: n1, security: security, monthly: monthly, annuity: annuity, ledgers: ledgers, staged: staged, mix: mix, avoided: avoided,
                 ledgerRows: ledgerRows, forcedWords: forcedWords, roundWords: roundWords, runWords: runWords, staticSteps: staticSteps, staticPractice: staticPractice,
                 musd: musd, kusd: kusd, perkw: perkw, fmtN: fmtN, SHARE_LABEL: SHARE_LABEL, PARTS: PARTS, byId: byId };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
@@ -419,6 +422,7 @@
       var ro = H("div", { class: "lx-readouts", "aria-live": "polite" }, w);
       var led = H("div", null, w);
       var status = H("div", { class: "lx-stage-status", "aria-live": "polite", style: "display:grid;gap:4px" }, w);
+      H("p", { class: "lx-hint", text: SOCIETY_NOTE }, w);
       if (o.staged) H("p", { class: "lx-hint", text: "Staged service is this lesson's addition to the toy: that half brings half the capital and half the upgrades." }, w);
       if (!o.staged) {
         // the words of the ledger, one month worked out, then the toy's inputs (CF7's own table, unchanged)
@@ -511,7 +515,7 @@
                     { id: "pen", text: "Penalties on the transmission provider when a study runs late, after a grace period, with caps and exceptions", bin: "late", why: "After a 10-business-day grace period, $1,000 a business day for a late cluster study, capped at the study deposits." },
                     { id: "wd", text: "Withdrawal penalties that grow the later a project leaves", bin: "shift", why: "Leaving late costs the leaver, not only those who stay." },
                     { id: "ia", text: "Deposits that reach 20% of the upgrade costs by the agreement", bin: "spec", why: "Money at stake before construction filters out projects that are not ready; earlier deposits count toward the 20%." }],
-            onCheck: function (g) { api.done(); api.saw("Order 2023's pro forma rules, as MISO summarised them in August 2023; grid operators adapt them in their own rules."); } });
+            onCheck: function (g) { api.done(); api.saw("Order 2023's pro forma rules, as MISO summarized them in August 2023; grid operators adapt them in their own rules."); } });
         } },
       { text: "Turn on Order 2023's readiness rule: a request must normally control its site to enter, and the placeholder has none. What changes in the cluster?",
         build: function (act, api) {

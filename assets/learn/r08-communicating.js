@@ -372,7 +372,7 @@
       function paint() {
         D.findingsStep.fields.forEach(function (f) { checkList(lists[f.id], findingChecks(v[f.id])); });
         if (!D.findingsStep.fields.every(function (f) { return words(v[f.id]) > 0; })) return;
-        var ws = findingsState(D, v), msg = ws.done ? "Every check met in all three findings. The checks see only which parts are there; whether each would survive a sceptical reader is yours to judge."
+        var ws = findingsState(D, v), msg = ws.done ? "Every check met in all three findings. The checks see only which parts are there; whether each would survive a skeptical reader is yours to judge."
           : "Drafts entered; still open: " + ws.open.join("; ") + ".";
         if (ws.done) api.done();
         if (msg !== last) { last = msg; api.saw(msg, !ws.done); }   // spoken only when it changes, not at every key
@@ -431,7 +431,7 @@
       steps.push({ text: "Chart " + (i + 1) + " of 3, drawn from the course's own data. Say what misleads, then apply the fixes and watch it redraw.", build: chartStep(c) });
     });
     steps.push({ text: "Write one sentence for each redesigned chart: the number with its unit, where, when, and nothing it cannot carry.", build: findingsStep });
-    steps.push({ text: "Now R6's result, for the city council, which votes on a managed-charging programme that moves most charging after 23:00. Six short parts: the decision first, the signal that would change the advice last.", build: briefStep });
+    steps.push({ text: "Now R6's result, for the city council, which votes on a managed-charging program that moves most charging after 23:00. Six short parts: the decision first, the signal that would change the advice last.", build: briefStep });
     steps.push({ text: "Last, the same result for the public: one paragraph of at most 150 words, with a range and what it leaves out.", build: publicStep });
     var cards = LX.StepCards(live, { id: "r8-steps", steps: steps });
     return { cards: cards, D: D, C: C, F: F, P: P };

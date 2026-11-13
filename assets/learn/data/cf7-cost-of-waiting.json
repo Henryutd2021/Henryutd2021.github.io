@@ -56,7 +56,7 @@
       ["Margin once connected", "$45,000 per MW a month (revenue minus operating costs)"],
       ["Capital ready and idle", "$500M of buildings and equipment, carried at the discount rate"],
       ["Grid upgrades built for it", "$60M; while it waits, the utility's money in them still costs interest"],
-      ["Chance it never arrives", "0.5% more each month of waiting, at most 50%; then the upgrades are stranded"],
+      ["Chance it never arrives", "0.5 percentage points more for each month of waiting, at most 50%; then the upgrades are stranded"],
       ["Large-load tariff", "decides what share of those utility costs the waiting load pays; other customers pay the rest"],
       ["Bridge power", "on-site generators run half the load during the wait, at $30 per MWh above grid power"],
       ["Its CO₂", "0.1 t per MWh more than grid power, had the load been connected on time; $100 per tonne"],

@@ -13,8 +13,8 @@
 //           Data center: LBNL's 0.34 kg CO2e per kWh (2023) at the power plants that supply U.S. data centers.
 //   water   gallons consumed per MWh; operation (On site): Macknick et al. (2012) medians and ranges, by cooling type for
 //           gas; Build and Supply: Meldrum et al. (2013), whose plant stage includes taking down (End of life is "with
-//           Build"). Data center: LBNL 2023, direct 66 billion litres over 176 TWh, indirect 4.52 litres per kWh;
-//           litres to gallons at 3.785411784.
+//           Build"). Data center: LBNL 2023, direct 66 billion liters over 176 TWh, indirect 4.52 liters per kWh;
+//           liters to gallons at 3.785411784.
 //   land    m² held per MWh made in a year; solar: 1 acre (4,046.86 m²) / 394 MWh a year, the median energy density of
 //           single-axis tracking plants built in 2019 (LBNL), arrays only; "the land between" scales to the whole lease
 //           at one Nevada plant's ratio (1,375 / 945 acres, LBNL's example): an illustrative scaling, not a published
@@ -335,7 +335,7 @@
           H("p", { class: "lx-hint", text: "U.S. power plants withdrew " + (u.freshWithdrawal / 1000).toFixed(1) + " billion gallons of fresh water a day in " + u.year + " and consumed " + (u.consumptive / 1000).toFixed(1) + " billion, about " + Math.round(u.consumptive / u.freshWithdrawal * 100) + "% (USGS)." }, act);
           watch = null;
         } },
-      { text: "Switch to [[land-use-intensity|land]], the square metres held for each MWh made in a year: solar's lies under its arrays, most of gas's at wells, roads and pipelines. Now count the land between them too.",
+      { text: "Switch to [[land-use-intensity|land]], the square meters held for each MWh made in a year: solar's lies under its arrays, most of gas's at wells, roads and pipelines. Now count the land between them too.",
         build: function (act, api) {
           set({ obj: "solar", meter: "land", L: 0, R: 3 }); watch = null;
           var out = H("div", null, act);

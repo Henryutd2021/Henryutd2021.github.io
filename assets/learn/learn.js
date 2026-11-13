@@ -18,7 +18,7 @@
              LX.demo(root, fn, cards) a lesson's demo states ("mid", "step-N", ...) for screenshots: window.lxDemo, ?demo=
              LX.load(urls)         Promise of {basename: parsed JSON};  LX.base = URL of assets/learn/
              LX.anim({visible, step}) one shared animation loop; LX.onTheme(fn) when Quarto's day/night toggle flips
-             LX.tokens(el, names)  read colour tokens (#rrggbb) as [r, g, b]
+             LX.tokens(el, names)  read color tokens (#rrggbb) as [r, g, b]
    Links:    LX.lessonRef(P, code)  a lesson by starter number (3) or code ("R2"), from data/path.json (P, loaded with the
                                    page's data-src): { href, ready, label } ("lesson 3" or "R2"; href null when unknown)
              LX.lessonRefHTML(P, code)  a link when path.json marks the lesson ready, else its label and "(upcoming)", so a
@@ -264,7 +264,7 @@
   LX.on = function (ev, fn) { (subs[ev] = subs[ev] || []).push(fn); };
   LX.emit = function (ev, x) { (subs[ev] || []).forEach(function (f) { try { f(x); } catch (e) { console.error(e); } }); };
 
-  // ---------------------------------------------------------------- colour tokens and day/night
+  // ---------------------------------------------------------------- color tokens and day/night
   LX.isDark = function () { return document.body.classList.contains("quarto-dark"); };
   LX.onTheme = function (fn) { LX.on("theme", fn); };
   function hex(s) { var m = /^#?([0-9a-f]{6})$/i.exec((s || "").trim()); var n = m ? parseInt(m[1], 16) : 0x888888; return [n >> 16 & 255, n >> 8 & 255, n & 255]; }
@@ -461,7 +461,7 @@
    sc.highlight(["cc", "town"]) | sc.labels(on, onlyKeys) | sc.reveal(key) | sc.tappable(on, onTap(key)) | sc.met(key)
    sc.event("short text") shows a chip in the corner; sc.el is the picture, sc.box its wrapper.
    Wide scenes carry value callouts; under 560 px they switch to numbered markers with a legend strip below.
-   Sky colours follow the hour and the day/night toggle; animation stops under prefers-reduced-motion. */
+   Sky colors follow the hour and the day/night toggle; animation stops under prefers-reduced-motion. */
 (function () {
   "use strict";
   var LX = window.LX, H = LX.H, S = LX.S, clamp = LX.clamp;
@@ -819,6 +819,8 @@
              id, cls (extra class on the control)
    Decimal-safe: values snap to min + k × step and are rounded to the step's decimals, so a 0.1 or 0.05 step never shows
    floating-point noise (0.30000000000000004).
+   A start value or set() value off the grid (or outside min..max) still snaps to the nearest step, and is reported:
+   a console warning naming the slider, and o.onSnap(asked, shown) when given; the reader's own moves always land on it.
    s.set(v[, fire]) (fire: also call onChange) | s.range(lo, hi)  (values outside are clamped, and the hint nudges) |
    s.val() | s.hint(text) (fixed hint; s.hint() repaints from o.hint) | s.disable(true) | s.input | s.el
    Arrow keys move one step (native range input); the − / + buttons have spoken labels. */
@@ -844,7 +846,17 @@
     var plus = H("button", { type: "button", "aria-label": upL, text: "+" }, row);
     var hint = H("p", { class: "lx-ctl-hint" }, w);
     function snap(v) { return +((Math.round((v - min) / step) * step + min).toFixed(dec)); }
+    // a value given by the page (the start value, or set()) that is not on the grid min + k × step, or outside min..max,
+    // is shown as the nearest step: say so (console warning and o.onSnap), so a page never shows one number and uses another
+    // (a value on the grid that set() clamps into the reachable band, range(), is not reported: that is the band's job);
+    // `shown` is the value the slider then holds
+    function offGrid(v, shown, why) {
+      if (typeof v !== "number" || !isFinite(v) || Math.abs(v - clamp(snap(v), min, max)) <= 1e-9 * (1 + Math.abs(v))) return;
+      if (window.console && console.warn) console.warn("LX.Slider \"" + o.label + "\": " + why + " " + v + " is " + (v < min || v > max ? "outside " + min + " to " + max : "off its steps of " + step + " from " + min) + "; it shows " + shown + ".");
+      if (o.onSnap) o.onSnap(v, shown);
+    }
     var lo = min, hi = max, val = o.value == null ? min : clamp(snap(o.value), min, max), fixedHint = null;
+    if (o.value != null) offGrid(o.value, val, "start value");
     function pos(v) { return (13 + ((v - min) / (max - min)) * (tr.clientWidth - 26)) / Math.max(1, tr.clientWidth) * 100; }
     function paint() {
       inp.value = val; out.textContent = fmt(val);
@@ -866,7 +878,7 @@
     paint();
     return {
       el: w, input: inp,
-      set: function (v, fire) { setV(v, !!fire); },
+      set: function (v, fire) { setV(v, !!fire); offGrid(+v, val, "value"); },
       range: function (a, b) { lo = a; hi = b; setV(val, false); },
       val: function () { return val; },
       hint: function (t) { fixedHint = t; paint(); },   // hint() with no text: back to the o.hint function
@@ -875,7 +887,7 @@
   };
 })();
 
-/* daychart.js — LX.DayChart: hourly stacked bars (one colour per plant) with demand as a dashed step line.
+/* daychart.js — LX.DayChart: hourly stacked bars (one color per plant) with demand as a dashed step line.
    const c = LX.DayChart(host, { series: [{key: "nuclear", label: "Nuclear", color: "var(--lx-nuc)"}, ...],
                                  demand: [24 numbers], rows: function () { return [{nuclear: 100, ..., unserved: 0}, ...]; },
                                  yMax: 400, unit: "MW", pending: "not played yet", label: "what the chart shows" });
@@ -1084,6 +1096,9 @@
    cards.go(i) | cards.index() | cards.count   progress dots, "Step n of N", Back and Next; the last card hides Next.
    Next past the last card (a script's click on the hidden button, e.g. a demo hook run twice) and Back on the first
    card do nothing.
+   api.done() opens Next; api.undone() shuts it again (the card's action is no longer done: an answer cleared, a setting
+   moved so it no longer fits), until the next done(); a free card stays open. A card's done state is kept when the reader
+   goes Back and returns.
    api.saw(text, bad) shows what the reader saw; text takes glossary marks and **bold**.
    api.busy(on) holds Next shut while on (e.g. while a solve runs; the card is aria-busy), whatever done() said; busy(false)
    restores it. A call from a card that is no longer shown (a late solve after Back) changes nothing on screen.
@@ -1114,6 +1129,9 @@
       nx.addEventListener("click", function () { if (unlocked[i] && !busy && i < N - 1) { render(i + 1); card.scrollIntoView({ block: "nearest", behavior: LX.reduced() ? "auto" : "smooth" }); } });
       var api = {
         done: function () { unlocked[k] = true; nx.disabled = busy; },
+        // the card's action is no longer done (an answer cleared, a setting that no longer fits): Next shuts again
+        // until done() is called. A free card stays open.
+        undone: function () { if (st.free) return; unlocked[k] = false; nx.disabled = true; },
         busy: function (on) {
           busy = !!on; nx.disabled = busy || !unlocked[k];
           if (gen !== shown) return;              // a late call from a card no longer shown
@@ -1139,7 +1157,7 @@
                                      feedback: {gas: "One sentence.", wind: "One sentence."}, lockText: "Locked in.", onPick: fn });
         p.reveal("extra sentence with the reader's own numbers")   |  p.picked()
         LX.Guess(host, { id, q, ticks: ["A day", "An hour", ...], answer: 4, start: 1, onLock: function (g, out) {} })
-             a guess on an ordered scale (range input with labelled ticks); onLock adds the reveal into `out`
+             a guess on an ordered scale (range input with labeled ticks); onLock adds the reveal into `out`
    Markup (works without JS; upgraded to buttons):
         <div class="lx-predict" data-predict="id"><p class="lx-q">Question?</p>
           <ul class="lx-choices"><li data-value="a">Option A</li> ...</ul></div>
@@ -1250,11 +1268,28 @@
        <details class="lx-answer"><summary>Answer</summary><p>Myth. One or two sentences why.</p></details>
      </div> ...
    </div>
-   With JS the options become buttons; a pick shows right or not quite plus the "why" from the answer box. Answers stay in
+   With JS the options become buttons; a pick shows right or not quite plus the "why" from the answer box: all of it, its
+   later paragraphs, lists and tables included (the first paragraph's "Myth." or "Fact." is dropped). Answers stay in
    this browser (LX.progress.answer). A score line counts the right answers. */
 (function () {
   "use strict";
   var LX = window.LX, H = LX.H;
+  // the answer box's whole "why": its first paragraph (without the leading "Myth." or "Fact.") runs on after "Right." or
+  // "Not quite."; every later paragraph, list or table follows as it is, so nothing the answer says is lost with JS
+  function whyHTML(det) {
+    var parts = Array.prototype.filter.call(det.childNodes, function (n) {
+      return n.nodeType === 1 ? n.tagName !== "SUMMARY" : n.nodeType === 3 && /\S/.test(n.nodeValue);
+    });
+    if (!parts.length) return { first: "", rest: "" };
+    var head = parts[0], rest = parts.slice(1);
+    var first = head.nodeType === 3 ? LX.esc(head.nodeValue.trim()) : head.tagName === "P" ? head.innerHTML : null;
+    if (first == null) { first = ""; rest = parts; }
+    return { first: first.replace(/^\s*(Myth|Fact)\.\s*/, ""),
+      rest: rest.map(function (n) {
+        if (n.nodeType === 3) return "<p>" + LX.esc(n.nodeValue.trim()) + "</p>";
+        return n.tagName === "TABLE" ? '<div class="lx-scroll-x">' + n.outerHTML + "</div>" : n.outerHTML;   // a table scrolls on a phone
+      }).join("") };
+  }
   function setup(box) {
     var qid = box.getAttribute("data-quiz") || "quiz";
     var cards = box.querySelectorAll(".lx-qq"), score = H("p", { class: "lx-score", "aria-live": "polite" }, box);
@@ -1267,7 +1302,7 @@
       var list = q.querySelector(".lx-choices"), det = q.querySelector("details.lx-answer"), stem = q.querySelector(".lx-qtext");
       if (!list || !ans) return;
       if (stem && !stem.id) stem.id = LX.uid("qs");
-      var why = det ? (det.querySelector("p") || det).innerHTML.replace(/^\s*(Myth|Fact)\.\s*/, "") : "";
+      var why = det ? whyHTML(det) : { first: "", rest: "" };
       var group = H("div", { class: "lx-qbtns", role: "group", "aria-labelledby": stem ? stem.id : null }, null);
       var fb = H("div", { class: "lx-qfb", "aria-live": "polite" }, null);
       var btns = Array.prototype.map.call(list.querySelectorAll("li"), function (li) {
@@ -1284,7 +1319,7 @@
         q.classList.toggle("is-done", !!v); q.classList.toggle("is-right", v === ans);
         fb.innerHTML = "";
         if (v) H("div", { class: "lx-saw" + (v === ans ? "" : " no"), html: LX.icon(v === ans ? "check" : "question") + "<div><b>" +
-          (v === ans ? "Right." : "Not quite.") + "</b> " + why + "</div>" }, fb);
+          (v === ans ? "Right." : "Not quite.") + "</b> " + why.first + why.rest + "</div>" }, fb);
         tally();
       }
       list.parentNode.replaceChild(group, list);
@@ -1365,7 +1400,7 @@
   });
 })();
 
-/* conceptmap.js — LX.ConceptMap: the lesson's ideas as tappable nodes joined by labelled arrows, with a detail panel.
+/* conceptmap.js — LX.ConceptMap: the lesson's ideas as tappable nodes joined by labeled arrows, with a detail panel.
    LX.ConceptMap(host, { title: "The ideas, and how they connect", lede: "Tap an idea.",
      groups: { bal: ["Balance", "var(--lx-good)"], ... },
      nodes: [{ id: "balance", g: "bal", label: "Balance", lines: ["Two", "lines"], (on phones), text: "One or two sentences.",
@@ -1374,11 +1409,15 @@
      cols: 4, rows: 4, colsN: 3, rowsN: 5,           grid positions may be fractional (1.5 = halfway between columns)
      sel: "balance", moment: function (id) { return "Your shift: ..." | null; },
      gameLabel: "In the lesson" });                  heading of each node's `game` line (default: "In the game" on play-form pages, else "In this lesson")
-   Nodes are keyboard buttons; the panel is announced; a "Text version" lists every idea and link for screen readers.
+   An edge's words are optional: without them it reads "links to" in the text version and the panel, and draws no label.
+   Nodes are keyboard buttons; the panel is announced; a "Text version" lists every idea with what its panel says (text,
+   the game or lesson line under its heading, the later line) and every link, for screen readers and without the map.
    Under 620 px the map switches to the phone grid (atN) and hides edge labels (they stay in the panel). */
 (function () {
   "use strict";
   var LX = window.LX, H = LX.H, S = LX.S;
+  // a link's words; a link given without them reads "links to" (never "undefined") and draws no label on the map
+  function rel(e) { return e[2] != null && String(e[2]).trim() ? String(e[2]) : "links to"; }
   LX.ConceptMap = function (host, o) {
     var hd = H("header", { class: "lx-x-head" }, host);
     var tag = LX.hTag(3, hd), sub = "h" + (+tag.charAt(1) + 1);   // an h2 right under the page title; the panel's heading one below
@@ -1390,14 +1429,16 @@
     var det = H("div", { class: "lx-cdetail", "aria-live": "polite" }, wrap);
     var byId = {}; o.nodes.forEach(function (n) { byId[n.id] = n; });
     var sel = o.sel || o.nodes[0].id, mode = null, nodes = {}, edges = [], mk = LX.uid("cm");
-    // text version
+    // text version: every idea with what its panel says (its text, its game or lesson line, its "later" line) and its links
+    var gameHead = o.gameLabel || (LX.lesson && LX.lesson() && LX.lesson().form === "play" ? "In the game" : "In this lesson");
     var alt = H("details", { class: "lx-textalt" }, host); H("summary", { text: "Text version of the map" }, alt);
     var ul = H("ul", null, alt);
     o.nodes.forEach(function (n) {
       var links = o.edges.filter(function (e) { return e[0] === n.id || e[1] === n.id; }).map(function (e) {
-        return e[0] === n.id ? n.label + " " + e[2] + " " + byId[e[1]].label : byId[e[0]].label + " " + e[2] + " " + n.label;
+        return e[0] === n.id ? n.label + " " + rel(e) + " " + byId[e[1]].label : byId[e[0]].label + " " + rel(e) + " " + n.label;
       });
-      H("li", { html: "<b>" + LX.esc(n.label) + "</b>: " + LX.rich(n.text) + (links.length ? " Links: " + LX.esc(links.join("; ")) + "." : "") }, ul);
+      H("li", { html: "<b>" + LX.esc(n.label) + "</b>: " + LX.rich(n.text) + (n.game ? " <i>" + LX.esc(gameHead) + ":</i> " + LX.rich(n.game) : "") +
+        (n.later ? " " + LX.rich(n.later) : "") + (links.length ? " Links: " + LX.esc(links.join("; ")) + "." : "") }, ul);
     });
     function pos(n, m) {
       var narrow = m === "narrow", at = narrow ? (n.atN || n.at) : n.at;
@@ -1428,12 +1469,14 @@
         var a = P[e[0]], b = P[e[1]], g = S("g", { class: "cedge" }, eg);
         var p1 = edgePt(a, b, size[e[0]]), p2 = edgePt(b, a, size[e[1]]);
         S("path", { d: "M" + p1[0] + " " + p1[1] + " L" + p2[0] + " " + p2[1], "marker-end": "url(#" + mk + ")" }, g);
-        var lw = String(e[2]).length * 6.2, dy = Math.abs(p1[1] - p2[1]) < 2 ? -6 : 4, at = function (f) { return [p1[0] + (p2[0] - p1[0]) * f, p1[1] + (p2[1] - p1[1]) * f + dy]; };
+        var words = e[2] != null ? String(e[2]).trim() : "", lw = words.length * 6.2, dy = Math.abs(p1[1] - p2[1]) < 2 ? -6 : 4, at = function (f) { return [p1[0] + (p2[0] - p1[0]) * f, p1[1] + (p2[1] - p1[1]) * f + dy]; };
         var spot = [0.5, 0.4, 0.6, 0.3, 0.7].map(at).filter(function (q) { return !meets(q[0], q[1], lw); })[0] || at(0.5);
-        taken.push([spot[0], spot[1], lw]);
         var mx = spot[0], my = spot[1];
-        S("text", { x: mx, y: my, "text-anchor": "middle", class: "bg" }, g).textContent = e[2];
-        S("text", { x: mx, y: my, "text-anchor": "middle" }, g).textContent = e[2];
+        if (words) {
+          taken.push([spot[0], spot[1], lw]);
+          S("text", { x: mx, y: my, "text-anchor": "middle", class: "bg" }, g).textContent = words;
+          S("text", { x: mx, y: my, "text-anchor": "middle" }, g).textContent = words;
+        }
         edges.push({ g: g, a: e[0], b: e[1] });
       });
       o.nodes.forEach(function (n) {
@@ -1455,7 +1498,7 @@
       var n = byId[id]; det.innerHTML = "";
       H("p", { class: "lx-eyebrow", text: o.groups[n.g][0] }, det);
       H(sub, { text: n.label }, det); H("p", { html: LX.rich(n.text) }, det);
-      if (n.game) { var ig = H("div", { class: "ingame" }, det); H("b", { text: o.gameLabel || (LX.lesson() && LX.lesson().form === "play" ? "In the game" : "In this lesson") }, ig); H("span", { html: LX.rich(n.game) }, ig);
+      if (n.game) { var ig = H("div", { class: "ingame" }, det); H("b", { text: gameHead }, ig); H("span", { html: LX.rich(n.game) }, ig);
         var gm = o.moment && o.moment(id); if (gm) H("div", { class: "you", text: gm }, ig); }
       var links = o.edges.filter(function (e) { return e[0] === id || e[1] === id; });
       if (links.length) {
@@ -1464,7 +1507,7 @@
         links.forEach(function (e) {
           var other = e[0] === id ? e[1] : e[0], on = byId[other];
           var b = H("button", { class: "lx-chip", type: "button", style: "--c:" + o.groups[on.g][1] }, ch);
-          H("i", null, b); H("span", { text: on.label }, b); H("small", { text: e[2] }, b);
+          H("i", null, b); H("span", { text: on.label }, b); H("small", { text: rel(e) }, b);
           b.addEventListener("click", function () { select(other); if (nodes[other]) nodes[other].focus({ preventScroll: true }); });
         });
       }
@@ -1609,7 +1652,7 @@
 
 /* table.js — LX.CompareTable: a comparison table whose rows can be re-sorted to reveal an order (rows slide to place).
    LX.CompareTable(host, { title: "The five plants", lede: "One sentence.",
-     columns: [{key: "name", label: "Plant and who decides", main: true},          main: the name column (colour dot + small note)
+     columns: [{key: "name", label: "Plant and who decides", main: true},          main: the name column (color dot + small note)
                {key: "size", label: "Size", num: true, phoneHide: true},
                {key: "cost", label: "Running cost", num: true, bar: {max: 100}, phone: "$/MWh"}], bar: a small bar; phone: short label on phones
      rows: [{key: "nuclear", color: "var(--lx-nuc)", name: "Nuclear plant", note: "Runs flat", size: "100 MW",
@@ -1743,14 +1786,14 @@
    What is drawn: every lesson in path.json is one station.
      - The starter path (path.starter) is the named route across the tier lines, as before: large stations with icons
        and names, the route drawn thick; a lesson with tier2 bridges two lines (a capsule "to A").
-     - Each tier is one line (thinner, in the tier's colour) carrying all its lessons: its starter stops first, then
+     - Each tier is one line (thinner, in the tier's color) carrying all its lessons: its starter stops first, then
        its lessons off the starter path (path.more) in curriculum order: modules by number, then unnumbered ones,
        bridges (B), the news lens (N), side topics (X), case files (CF), sandboxes (SB), the checkpoint (CK) and
        capstones (C, CR); path.yml order breaks ties. Live stations are filled; upcoming ones hollow and quiet. Each
        station shows its code; an upcoming lesson without a code is a hollow dot. A label at the left names the tier and
        counts what is drawn on its line ("7 open · 3 coming soon"); it opens the tier's card. A bridge lesson's two
        tiers read in order, lower first ("Analyst to Modeler").
-     - Kinds by shape, not colour: lesson circle, studio hexagon, case file square, checkpoint diamond, sandbox
+     - Kinds by shape, not color: lesson circle, studio hexagon, case file square, checkpoint diamond, sandbox
        triangle, capstone star (from `form`; for an upcoming row without one, from its code: CK- checkpoint, CF case
        file, SB sandbox, C0-C4 and CR capstone, R studio). The legend shows the kinds on the map.
      - The math toolbox (path.toolbox, K1-K8) is a shelf of chips under the lines, inside the map's box.
@@ -2107,7 +2150,7 @@
 
   // ---------------------------------------------------------------- drawing
   var H = LX.H, S = LX.S, clamp = LX.clamp, uid = 0, VMAX = 560, HMIN = 720;
-  // the shape of a station of each kind, centred on x, y (s: the size; a lesson is a circle)
+  // the shape of a station of each kind, centered on x, y (s: the size; a lesson is a circle)
   function shapeD(kind, x, y, s) {
     var p = [], k;
     if (kind === "studio") { for (k = 0; k < 6; k++) p.push([x + 1.08 * s * Math.cos(Math.PI / 6 + k * Math.PI / 3), y + 1.08 * s * Math.sin(Math.PI / 6 + k * Math.PI / 3)]); }
@@ -2496,9 +2539,9 @@
            key (a newer queued solve with the same key supersedes an older queued one: slider sweeps), gap (MILP
            relative gap, default HiGHS's 1e-4)
    Duals (LP only): duals[c] = change of the optimal objective per unit increase of constraint c's binding bound
-     (dObjective/dRHS, same sign convention for min and max). For a demand balance row in a cost-minimising dispatch
+     (dObjective/dRHS, same sign convention for min and max). For a demand balance row in a cost-minimizing dispatch
      this is the marginal cost of one more MWh: a marginal value under stated assumptions (fixed capacities, a convex
-     model, the modelled market), not a market price. reducedCosts[v] = dObjective per unit increase of v's active bound.
+     model, the modeled market), not a market price. reducedCosts[v] = dObjective per unit increase of v's active bound.
    MILP: no duals and no reduced costs (null): HiGHS returns no duals for a MILP. For prices conditional on the integer
      decisions (for example a unit-commitment schedule), call
      LX.solver.fixAndReprice(model, milpResult, opts): it fixes every integer and binary variable at its MILP value,
@@ -2528,7 +2571,7 @@
   var VERSION = "1.15.4";
 
   // ---------------------------------------------------------------- the pure core (no outer references: it is also
-  // serialised with toString() into the worker, so keep everything it needs inside this function)
+  // serialized with toString() into the worker, so keep everything it needs inside this function)
   function solverCore() {
     // HiGHS model status -> ours. 11 (objective bound reached) and 12 (objective target reached) are early stops, not
     // proofs of optimality, so they get statuses of their own and ok stays false (a plan found before the stop is kept).
@@ -2547,7 +2590,7 @@
       out.forEach(function (p) { if (typeof p[1] !== "number" || !isFinite(p[1])) throw new Error(where + ": coefficient of " + p[0] + " is not a finite number"); });
       return out;
     }
-    // normalise a model into index form; throws on authoring errors (unknown or repeated names, bad numbers)
+    // normalize a model into index form; throws on authoring errors (unknown or repeated names, bad numbers)
     function normalize(model) {
       if (!model || typeof model !== "object") throw new Error("model: expected an object");
       var sense = String(model.sense || "min").toLowerCase();
@@ -2784,7 +2827,7 @@
         }, 0);
         return;
       }
-      job.watch = setTimeout(function () {   // HiGHS honours time_limit; this catches a solve that does not return at all
+      job.watch = setTimeout(function () {   // HiGHS honors time_limit; this catches a solve that does not return at all
         if (current !== job) return;
         restart(); current = null;
         finish(job, errorResult(job, "stopped by the watchdog after " + Math.round(job.opts.timeLimit * 1000 + 2000) + " ms", "time-limit"));
@@ -2840,7 +2883,7 @@
     "time-limit": "Stopped at the time limit; the plan shown, if any, may not be the best.", "iteration-limit": "Stopped at the iteration limit.",
     "objective-bound": "Stopped at the objective bound set for this run; the plan shown, if any, may not be the best.",
     "objective-target": "Stopped on reaching the objective target set for this run; the plan shown may not be the best.",
-    interrupted: "Interrupted.", cancelled: "Cancelled.", superseded: "Replaced by a newer run.", error: "The solver reported an error." };
+    interrupted: "Interrupted.", cancelled: "Canceled.", superseded: "Replaced by a newer run.", error: "The solver reported an error." };
   S.describe = function (r) {
     if (!r) return "";
     var s = SAY[r.status] || r.status;
@@ -2916,7 +2959,7 @@
 
 /* profiles.js — wind and solar output for a plant of a given size, with a realistic annual capacity factor (the
    course's data convention).
-   The wind and solar shapes in assets/learn/data/town_days.json and town_year.json are each normalised to their own 2025
+   The wind and solar shapes in assets/learn/data/town_days.json and town_year.json are each normalized to their own 2025
    maximum hour (integers in thousandths). Their mean/max (wind 0.53, solar 0.24 for SPP in 2025) is therefore NOT a
    capacity factor. To turn a shape into a plant's output, scale it so that its annual capacity factor equals a sourced
    target: assets/learn/data/cf_targets.json (EIA, Electric Power Monthly, Table 6.07.B, 2025 annual, U.S. utility scale).
@@ -2941,7 +2984,7 @@
      power  output = capacity × s ^ g. The best hour stays at capacity and weaker hours shrink (g > 1) or grow (g < 1);
             no clipping. Use it when a lesson shows peaks against capacity.
    Both keep zero hours at zero (night stays dark) and are exact to 1e-9 on the annual mean (bisection). Lesson 0 keeps its
-   single real day scaled to farm size, labelled; it does not use this helper.
+   single real day scaled to farm size, labeled; it does not use this helper.
    Node: module.exports = { cfScale, townProfile, cfOf } (tests: _tests/learn/test_profiles.js). */
 (function () {
   "use strict";
@@ -3046,7 +3089,7 @@
 
    spec = {
      x: {min, max, ticks: [[v, "label", anchor]] or function (W) -> ticks, ticksN: ticks under 480 px}
-        (anchor optional: the first tick at min starts there, the last at max ends there, others are centred)
+        (anchor optional: the first tick at min starts there, the last at max ends there, others are centered)
      y: {min, max, ticks: [[v, "label"]] or step: s with fmt(v) -> label (gridlines from min), unit: "MW" (top left),
          zero: true (the gridline at 0 drawn darker)}
      height, heightN (under 480 px; defaults 260 and 220), ml (left margin) or margin: {l, r, t, b} (default 52, 14, 18, 28)
@@ -3060,7 +3103,7 @@
                (default 2.4; 0 draws only the area), dash, anim (draw on), dots, area (fill opacity down to y = 0),
                step (each point holds for this x width: hourly prices), offset (px down, to show equal lines side by
                side), op, cap ("round" default, or "butt")}]
-     marks:   [{x, y, label, color, kind: "ring" (default: hollow, bold label beside) | "dot" (filled, label centred
+     marks:   [{x, y, label, color, kind: "ring" (default: hollow, bold label beside) | "dot" (filled, label centered
                above), above (ring), pos: "above" | "below" | "bottom" (dot), n: "1" (a numbered disc), vline: true
                (a dashed line down the chart; no dot unless dot: true)}]
      legend:  [{label, color, dash}]
@@ -3075,7 +3118,7 @@
 
    var c = LX.PlotCard(host, { text: "Text version of the chart", cls: "" });
      a card (.lx-xcard) with c.title (an eyebrow line), c.chips (value chips, aria-live), the chart c.plot (LX.Plot)
-     and its text version c.text. c.chip(label, value, tone) adds a chip; tone "good" | "bad" | "warn" colours the
+     and its text version c.text. c.chip(label, value, tone) adds a chip; tone "good" | "bad" | "warn" colors the
      value; c.clear() empties the chips. Used by lessons 3 and 4. */
 (function () {
   "use strict";
@@ -3246,7 +3289,7 @@
         wrap.setAttribute("aria-label", (pk && pk.onPick ? "Chart: the left and right arrow keys pick a column" : "Chart: the left and right arrow keys move the readout") + "; the text version lists every value.");
       } else { wrap.removeAttribute("tabindex"); wrap.removeAttribute("role"); wrap.removeAttribute("aria-label"); }
     }
-    // a mark: a hollow ring with a bold label beside it (default), a filled dot with a centred label, or a numbered disc
+    // a mark: a hollow ring with a bold label beside it (default), a filled dot with a centered label, or a numbered disc
     function mark(mk, g) {
       var m = g.m, cx = g.X(mk.x), cy = g.Y(mk.y), kind = mk.n != null ? "num" : (mk.kind || "ring");
       if (mk.vline) S("path", { d: "M" + cx + " " + m.t + "V" + (m.t + g.ih), stroke: "var(--lx-ink-3)", "stroke-dasharray": "4 3", "stroke-width": 1.5 }, svg);
@@ -3330,7 +3373,7 @@
   };
 })();
 
-/* scatter.js — LX.Scatter: a dot chart of two measures, one labelled dot per item, every dot a button, with an optional
+/* scatter.js — LX.Scatter: a dot chart of two measures, one labeled dot per item, every dot a button, with an optional
    dashed y = x line and a text version. First used by lesson 6 (06-three-jobs.js:
    capacity factor across, firm share up).
 
@@ -3351,7 +3394,7 @@
   // ---------------------------------------------------------------- pure helpers (Node tests: _tests/learn/test_components_a.js)
   // the drawing's size for a column width cw (phones: real width, so text is not scaled down)
   function size(cw) { var phone = cw < 520; return { phone: phone, W: phone ? Math.max(300, cw) : 560, H: phone ? 300 : 330 }; }
-  // where a dot's label goes: right if it fits, else left, else centred above (kept inside [left, right])
+  // where a dot's label goes: right if it fits, else left, else centered above (kept inside [left, right])
   function labelPos(px, py, text, left, right) {
     var tw = text.length * 7.4;
     if (px + 16 + tw <= right) return { x: px + 16, y: py + 5, anchor: "start" };
@@ -3437,7 +3480,7 @@
      sort: true,                                           sort rows by swing, largest first (stable; false keeps the order)
      pad: 0.28, padAbs: 1,                                 room for the end labels: the axis runs from lo − p to hi + p,
                                                            p = pad × (hi − lo) + padAbs (lo, hi: the lowest and highest result)
-     below: "var(--lx-good)", above: "var(--lx-bad)"       colours of the part of a bar below and above the base (swap them
+     below: "var(--lx-good)", above: "var(--lx-bad)"       colors of the part of a bar below and above the base (swap them
                                                            for a result where higher is better)
    });
    t.draw({ base: 37.52,                                   the result with every input at its default (the black line)
@@ -3505,7 +3548,7 @@
   LX.Tornado.layout = tornadoLayout;
 })();
 
-/* costsplit.js — LX.CostSplit: stacked bars that split a total into its parts, one row per item, with a colour key (lesson
+/* costsplit.js — LX.CostSplit: stacked bars that split a total into its parts, one row per item, with a color key (lesson
    7: a plant's cost per MWh split into building the plant, fixed upkeep, fuel and upkeep per MWh).
    var cs = LX.CostSplit(host, {
      parts: [{ key: "capital", label: "Building the plant", color: "var(--lx-tier-2)", words: "building the plant" }, ...],
@@ -3518,8 +3561,8 @@
      fmt: function (v) { return "$" + Math.round(v); },   the total at the end of each row (default: v rounded)
      min: 0.005,                    parts at or below this are left out (bar and text)
      onPick: function (key) {},     rows become toggle buttons (aria-pressed marks the last one picked); without it, plain rows
-     key: true });                  the colour key right after the rows (false: place it with cs.key(host))
-   cs.set(rows[, scale])  redraw the rows (a calculator) | cs.key(host) add the colour key (aria-hidden) | cs.el | cs.rows {key: row}
+     key: true });                  the color key right after the rows (false: place it with cs.key(host))
+   cs.set(rows[, scale])  redraw the rows (a calculator) | cs.key(host) add the color key (aria-hidden) | cs.el | cs.rows {key: row}
    Helpers for other bars and for text versions:
      LX.CostSplit.bar(host, [{ color, value }], scale, { height }) -> one stacked bar (span, aria-hidden)
      LX.CostSplit.fill(bar, [{ color, value }], scale)            repaint that bar
@@ -3611,7 +3654,7 @@
      later: true });             the legend and text version are appended after the step's other controls (next microtask);
                                  false: right under the chart
    ch.draw(blocks [{ key, mw, offer }] (cheapest first), demand MW, { xMax: 450, hideDemand: false }) -> the clearing result
-     (hideDemand: just the blocks, full colour, no price; for building a stack). Money reads "$40.00" and "−$5.00".
+     (hideDemand: just the blocks, full color, no price; for building a stack). Money reads "$40.00" and "−$5.00".
      Tick steps: { xStep: 1000, yStep: 50 } in draw's options, or xStep / yStep in the constructor's options for every
      draw: MW labels every xStep, $/MWh gridlines every yStep from the axis start (defaults: 100 or 150 MW; $20 or $40).
    ch.el (the chart box). It redraws itself on resize and on the day/night switch.
@@ -3636,7 +3679,7 @@
     return { price: price, marginal: marginal, cost: cost, plants: out, short: Math.max(0, left), spilled: spilled, total: total };
   }
   // the axes: $/MWh from yMin (below zero only for a negative offer) to yMax, gridlines every `step`; MW from 0 to xMax,
-  // labelled every `xStep`; steps.xStep and steps.yStep (positive numbers) replace the default steps
+  // labeled every `xStep`; steps.xStep and steps.yStep (positive numbers) replace the default steps
   function scaleOf(blocks, xMax, steps) {
     var offers = blocks.map(function (b) { return b.offer; });
     var yMax = Math.max(120, Math.ceil((Math.max.apply(null, offers) + 15) / 40) * 40), lowest = Math.min.apply(null, offers);
@@ -3679,7 +3722,7 @@
       for (var q = 0; q <= xMax; q += sc.xStep) S("text", { x: x(q), y: Hh - 16, "text-anchor": q === 0 ? "start" : "middle" }, svg).textContent = q;
       S("text", { x: W - m.r, y: Hh - 3, "text-anchor": "end" }, svg).textContent = "MW, cheapest first →";
       S("text", { x: 2, y: 13 }, svg).textContent = "$/MWh";
-      var cum = 0, labs = [];   // block labels: [x centre, baseline, width], so the price label can keep clear of them
+      var cum = 0, labs = [];   // block labels: [x center, baseline, width], so the price label can keep clear of them
       blocks.forEach(function (b) {
         if (b.mw <= 0) return;
         var p = res.plants[b.key], x0 = x(cum), x1 = x(cum + b.mw), xr = x(cum + p.run), top = Math.abs(b.offer) < 2 ? y(0) - 4 : Math.min(y(b.offer), y(0)), bot = Math.abs(b.offer) < 2 ? y(0) : Math.max(y(b.offer), y(0));
@@ -3720,7 +3763,7 @@
 })();
 
 /* frontier.js — LX.Frontier: cost against emissions. The frontier (the cheapest plan at each CO₂ level) as a line with the
-   region below it shaded "out of reach (approximately)", labelled plan dots that can be picked by mouse or keyboard, and an equal-score
+   region below it shaded "out of reach (approximately)", labeled plan dots that can be picked by mouse or keyboard, and an equal-score
    line for a weighted sum (cost + price × CO₂); lessons 12 and 13.
    var fc = LX.Frontier(host, {
      label: "Cost per year against CO₂ per year",   the chart's spoken name
@@ -3883,7 +3926,7 @@
      title: "Is LCOE a fair yardstick? The strongest case on each side",
      heading: "h3",            "h3" (default): the title in an explain-card header (.lx-x-head); "h4": a title inside a step card
      eyebrow: "Steelman card", a small line above the title (optional; may stand alone, without a title)
-     frame: false,             true: the card sits in its own framed box, sides on white with a coloured top edge (step cards)
+     frame: false,             true: the card sits in its own framed box, sides on white with a colored top edge (step cards)
      reveal: false,            false: every side open | "button": each side opens with a button named by its title |
                                "details": each side is a <details> whose summary is its title
      sides: [{ key: "for", title: "For: a common, checkable yardstick", points: ["One sentence.", ...] },
@@ -4055,28 +4098,33 @@
      segment(a, b, view)    the part of the line a·p = b inside the view: [[x, y], [x, y]], left (then lower) end first; or null
      verticesOf(poly)       the polygon's corners rounded to one decimal
      bigBox(view)           the view grown by 20 view-widths on every side
-     optimum(m, view)       m = {sense: "min" | "max", c: [c1, c2], rows: [rules]}: the best corner, searched inside bigBox(view),
-                            so it works for any rules a learner writes, with or without a corner (B1's builder). A best plan on
-                            the far box edge means unbounded. -> {status: "optimal", x: [x, y], ties: [[x, y], ...], value}
-                            (rounded to 1e-6) | {status: "infeasible"} | {status: "unbounded"}
+     optimum(m[, view])     m = {sense: "min" | "max", c: [c1, c2], rows: [rules]}: the best plan, decided exactly for any rules a
+                            learner writes, with or without a corner (B1's builder); no drawing box is used, so a best plan on
+                            an open edge is not called unbounded and one far outside the view is still found (the view is
+                            accepted and ignored). -> {status: "optimal", x: [x, y], ties: [the best corners], value, tied
+                            (other plans tie with x: an edge, a ray or, with no corner, a whole line)} (rounded to 1e-6) |
+                            {status: "infeasible"} | {status: "unbounded"}
+     feasible(rows)         whether any plan passes every rule, decided exactly (no box)
      halfplanes(rows)       every rule as {id, a, b} with a·p <= b
      corners(rows)          the exact corners (pairwise line crossings that pass every rule), in order around the region:
                             [{x, y, on: [ids of the rules whose line runs through it]}]
-     rays(rows)             the directions (unit vectors) along which the region goes on for ever
+     rays(rows[, c])        the directions (unit vectors) along which the region goes on for ever: the axes, both ways along
+                            each rule's line and, given the goal c in min form, straight against it (-c); enough to tell
+                            whether the goal improves for ever
      solve(m)               the exact outcome, by vertex enumeration and the region's rays: {status: "optimal" (one best
                             corner) | "tied" (a whole edge, or a ray, of equally good plans) | "infeasible" (no plan passes) |
                             "unbounded" (the goal improves for ever along a ray), corners, best (the best corners), x, y (the
                             first best corner), value (c·p there), ray (the unbounded or tied direction, else null),
                             binding: {id: true when that rule's line runs through the best corner}}. A region that is not
                             empty must have a corner (always true with x >= 0 and y >= 0); otherwise use optimum().
-     simplexWalk(m)         the simplex method, drawn: start at the worst corner, step to the better neighbouring corner along
+     simplexWalk(m)         the simplex method, drawn: start at the worst corner, step to the better neighboring corner along
                             an edge while one is better: [{x, y, value, on, along (the id of the rule whose edge was walked)}]
 
    LX.LPPlane(host, o) -> plane
      o.view                 the data box
      o.xLabel, o.yLabel     axis titles
      o.fluid                false (default): a 440 × 380 drawing that scales with its box, at most 520 px wide (B1, K4); grid
-                            lines at o.ticks (with more than six, every other x value is labelled), centred axis titles.
+                            lines at o.ticks (with more than six, every other x value is labeled), centered axis titles.
                             true: drawn at the box's own width (taller on phones), redrawn on resize, grid lines every
                             o.grid units (default 40), titles at the axis ends (lessons 10 and 11).
      o.aria                 the drawing's spoken label when there is no o.describe
@@ -4103,7 +4151,7 @@
      plane.focusDot()                focus the dot at the next render
    Keyboard: the plan dot is a focusable slider (arrow keys). Rule lines and the cost line are dragged by pointer; each lesson
    also gives a slider for the same number. Text version: o.describe (render), or the lesson's own list (primitives).
-   Colours from --lx-* tokens only, so day and night need no redraw. */
+   Colors from --lx-* tokens only, so day and night need no redraw. */
 (function () {
   "use strict";
 
@@ -4160,23 +4208,6 @@
   function bigBox(view) { var v = box(view), sx = v[1] - v[0], sy = v[3] - v[2]; return [v[0] - 20 * sx, v[1] + 20 * sx, v[2] - 20 * sy, v[3] + 20 * sy]; }
   function r6(v) { return Math.round(v * 1e6) / 1e6 + 0; }
 
-  // the best corner of max/min c·p, searched inside the big box (any rules, also without a corner)
-  function optimum(m, view) {
-    var big = bigBox(view), P = region(m.rows, big);
-    if (!P.length) return { status: "infeasible" };
-    var sg = m.sense === "max" ? -1 : 1, best = Infinity, arg = [], scale = 1;
-    P.forEach(function (p) { scale = Math.max(scale, Math.abs(m.c[0] * p[0]) + Math.abs(m.c[1] * p[1])); });
-    P.forEach(function (p) {
-      var v = sg * (m.c[0] * p[0] + m.c[1] * p[1]), e = 1e-9 * scale;
-      if (v < best - e) { best = v; arg = [p]; } else if (Math.abs(v - best) <= e) arg.push(p);
-    });
-    var span = Math.max(big[1] - big[0], big[3] - big[2]) * 1e-9;
-    var far = arg.some(function (p) { return p[0] <= big[0] + span || p[0] >= big[1] - span || p[1] <= big[2] + span || p[1] >= big[3] - span; });
-    if (far) return { status: "unbounded" };
-    var x = arg.map(function (p) { return [r6(p[0]), r6(p[1])]; });
-    return { status: "optimal", x: x[0], ties: x, value: r6(sg * best) };
-  }
-
   // ---- exact: corners, rays and the four outcomes
   var EPS = 1e-7;
   function halfplanes(rows) {
@@ -4184,6 +4215,13 @@
     rows.forEach(function (r, i) { le(r).forEach(function (h) { hs.push({ id: idOf(r, i), a: h.a, b: h.b }); }); });
     return hs;
   }
+  // the half-planes with unit normals (a rule with no decision in it keeps a = [0, 0]): the corners, rays and
+  // feasibility below then give the same answer however a rule is scaled (x >= 1 and 0.0000001x >= 0.0000001 alike)
+  function units(rows) {
+    return halfplanes(rows).map(function (h) { var n = Math.hypot(h.a[0], h.a[1]); return n > 0 ? { id: h.id, a: [h.a[0] / n + 0, h.a[1] / n + 0], b: h.b / n + 0 } : h; });
+  }
+  // a goal as a unit vector (null for a zero goal), for direction tests that do not depend on the goal's scale
+  function unit(c) { var n = Math.hypot(c[0], c[1]); return n > 0 ? [c[0] / n, c[1] / n] : null; }
   function inside(hs, v) { return hs.every(function (h) { return dot(h.a, v) <= h.b + EPS * (1 + Math.abs(h.b)); }); }
   function active(hs, v) {
     var on = [];
@@ -4191,11 +4229,12 @@
     return on;
   }
   function corners(rows) {
-    var hs = halfplanes(rows), vs = [];
+    var raw = halfplanes(rows), hs = units(rows), vs = [];   // decisions on the unit half-planes; crossings from the rules as written (no rounding noise)
     for (var i = 0; i < hs.length; i++) for (var j = i + 1; j < hs.length; j++) {
-      var a = hs[i].a, b = hs[j].a, det = a[0] * b[1] - a[1] * b[0];
-      if (Math.abs(det) < 1e-12) continue;
-      var v = [(hs[i].b * b[1] - a[1] * hs[j].b) / det, (a[0] * hs[j].b - hs[i].b * b[0]) / det];
+      var ua = hs[i].a, ub = hs[j].a;
+      if (Math.abs(ua[0] * ub[1] - ua[1] * ub[0]) < 1e-12) continue;
+      var a = raw[i].a, b = raw[j].a, det = a[0] * b[1] - a[1] * b[0];
+      var v = [(raw[i].b * b[1] - a[1] * raw[j].b) / det, (a[0] * raw[j].b - raw[i].b * b[0]) / det];
       if (!inside(hs, v)) continue;
       if (vs.some(function (u) { return Math.abs(u[0] - v[0]) < 1e-6 && Math.abs(u[1] - v[1]) < 1e-6; })) continue;
       vs.push(v);
@@ -4206,21 +4245,78 @@
     }
     return vs.map(function (v) { return { x: v[0], y: v[1], on: active(hs, v) }; });
   }
-  function rays(rows) {
-    var hs = halfplanes(rows), cand = [[1, 0], [0, 1]];
-    hs.forEach(function (h) { var n = Math.hypot(h.a[0], h.a[1]); if (n > 0) cand.push([h.a[1] / n, -h.a[0] / n], [-h.a[1] / n, h.a[0] / n]); });
-    return cand.filter(function (r) { return hs.every(function (h) { return dot(h.a, r) <= 1e-12; }); });
+  // The directions along which the region goes on for ever: the directions r with a·r <= 0 for every rule. Tried: the
+  // axes, both ways along every rule's line, and, when the goal c (in min form) is given, straight against it (-c). A
+  // region that runs on for ever in a direction that improves the goal always does so along one of these: along an
+  // edge of the region's cone of directions, or straight against the goal when that cone is a half-plane or the whole
+  // plane (minimize x with only x <= 1).
+  function rays(rows, c) {
+    var hs = units(rows), cand = [[1, 0], [0, 1], [-1, 0], [0, -1]], cu = c ? unit(c) : null;
+    hs.forEach(function (h) { if (h.a[0] || h.a[1]) cand.push([h.a[1], -h.a[0] + 0], [-h.a[1] + 0, h.a[0]]); });
+    if (cu) cand.push([-cu[0] + 0, -cu[1] + 0]);
+    var out = [];
+    cand.forEach(function (r) {
+      if (!hs.every(function (h) { return dot(h.a, r) <= 1e-12; })) return;
+      if (!out.some(function (q) { return Math.abs(q[0] - r[0]) < 1e-12 && Math.abs(q[1] - r[1]) < 1e-12; })) out.push(r);
+    });
+    return out;
+  }
+  // whether any plan passes the rules, decided exactly, with no drawing box (x >= 10000 lies far outside any drawing).
+  // Rules whose lines are not all parallel: a region that is not empty has a corner. Rules that are all parallel (or
+  // none): one number n·p must fit between their lower and upper limits. A rule with no decision in it (0 <= -1) is
+  // simply true or false.
+  function feasible(rows) {
+    var hs = [], never = false;
+    units(rows || []).forEach(function (h) { if (h.a[0] || h.a[1]) hs.push(h); else if (h.b < -1e-9) never = true; });
+    if (never) return false;
+    if (!hs.length) return true;
+    var n = hs[0].a;
+    if (hs.some(function (h) { return Math.abs(n[0] * h.a[1] - n[1] * h.a[0]) >= 1e-12; })) return corners(rows).length > 0;   // as corners() tells parallel lines
+    var lim = parallelLimits(hs, n);
+    return lim.lo <= lim.hi + EPS * (1 + Math.abs(lim.hi));
+  }
+  // unit half-planes all parallel to the unit normal n: the range [lo, hi] of n·p they allow
+  function parallelLimits(hs, n) {
+    var lo = -Infinity, hi = Infinity;
+    hs.forEach(function (h) { var k = h.a[0] * n[0] + h.a[1] * n[1]; if (k > 0) hi = Math.min(hi, h.b / k); else if (k < 0) lo = Math.max(lo, h.b / k); });
+    return { lo: lo, hi: hi };
+  }
+  // the best plan of max/min c·p for any rules, decided exactly (B1's builder: rules a learner writes, with or without a
+  // corner). Unbounded only when a direction the region runs along for ever improves the goal (rays(rows, c)), so an
+  // open region with a finite best (minimize x with x, y >= 0) is not called unbounded, and a best plan far outside the
+  // drawing is still found. The view is not needed (older callers pass one).
+  function optimum(m) {
+    var rows = m.rows || [], sg = m.sense === "max" ? -1 : 1, c = [sg * m.c[0], sg * m.c[1]], cu = unit(c);
+    if (!feasible(rows)) return { status: "infeasible" };
+    var rs = rays(rows, c);   // directions tested with the unit goal: a tiny but nonzero goal still counts
+    if (cu && rs.some(function (r) { return dot(cu, r) < -1e-9; })) return { status: "unbounded" };
+    var flat = !cu || rs.some(function (r) { return Math.abs(dot(cu, r)) <= 1e-9; }), vs = corners(rows);
+    if (vs.length) {
+      var u = cu || [0, 0], cost = function (v) { return u[0] * v.x + u[1] * v.y; }, span = 1;
+      vs.forEach(function (v) { span = Math.max(span, Math.abs(v.x), Math.abs(v.y)); });
+      var lo = Math.min.apply(null, vs.map(cost)), tol = 1e-9 * span;
+      var best = vs.filter(function (v) { return cost(v) <= lo + tol; }), x = best.map(function (v) { return [r6(v.x), r6(v.y)]; });
+      return { status: "optimal", x: x[0], ties: x, value: r6(m.c[0] * best[0].x + m.c[1] * best[0].y), tied: x.length > 1 || flat };
+    }
+    // no corner, yet bounded: the rules are all parallel to a unit normal n and the goal points along n (or is zero),
+    // so a whole line of plans ties for best; x is its plan nearest the origin
+    var hs = units(rows).filter(function (h) { return h.a[0] || h.a[1]; });
+    var n = hs.length ? hs[0].a : (cu || [1, 0]), lim = parallelLimits(hs, n);
+    var k = cu ? cu[0] * n[0] + cu[1] * n[1] : 0, t = k > 1e-9 ? lim.lo : k < -1e-9 ? lim.hi : Math.max(lim.lo, Math.min(lim.hi, 0));
+    if (!isFinite(t)) return { status: "unbounded" };   // cannot happen after the ray test; kept so no plan is ever non-finite
+    var p = [r6(t * n[0]), r6(t * n[1])];
+    return { status: "optimal", x: p, ties: [p], value: r6(sg * (c[0] * p[0] + c[1] * p[1])), tied: true };
   }
   function solve(m) {
     var sg = m.sense === "max" ? -1 : 1, c = [sg * m.c[0], sg * m.c[1]], vs = corners(m.rows);
     var res = { status: "infeasible", corners: vs, best: [], x: null, y: null, value: null, ray: null, binding: {} };
     if (!vs.length) return res;
-    var rs = rays(m.rows), down = rs.filter(function (r) { return dot(c, r) < -1e-9; });
+    var cu = unit(c) || [0, 0], rs = rays(m.rows, c), down = rs.filter(function (r) { return dot(cu, r) < -1e-9; });
     if (down.length) { res.status = "unbounded"; res.ray = down[0]; return res; }
     var cost = function (v) { return c[0] * v.x + c[1] * v.y; };
     var lo = Math.min.apply(null, vs.map(cost)), tol = 1e-7 * (1 + Math.abs(lo));
     res.best = vs.filter(function (v) { return cost(v) <= lo + tol; });
-    var flat = rs.filter(function (r) { return Math.abs(dot(c, r)) <= 1e-9; });
+    var flat = rs.filter(function (r) { return Math.abs(dot(cu, r)) <= 1e-9; });
     res.status = res.best.length > 1 || flat.length ? "tied" : "optimal";
     if (flat.length) res.ray = flat[0];
     var b = res.best[0];
@@ -4245,7 +4341,7 @@
   }
 
   var lp2 = { box: box, le: le, lhs: lhs, holds: holds, clip: clip, region: region, segment: segment, verticesOf: verticesOf, bigBox: bigBox,
-              optimum: optimum, halfplanes: halfplanes, corners: corners, rays: rays, solve: solve, simplexWalk: simplexWalk };
+              optimum: optimum, feasible: feasible, halfplanes: halfplanes, corners: corners, rays: rays, solve: solve, simplexWalk: simplexWalk };
   if (typeof module !== "undefined" && module.exports) module.exports = lp2;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -4311,7 +4407,7 @@
     }
     function path(P) { return P.length ? "M" + P.map(function (p) { return sx(p[0]).toFixed(1) + " " + sy(p[1]).toFixed(1); }).join(" L") + " Z" : ""; }
     function clear() { [gOut, gReg, gRule, gIso, gPt].forEach(function (g) { g.innerHTML = ""; }); }
-    function bg(par, at, text) {   // a label with a halo in the surface colour, so it reads over lines
+    function bg(par, at, text) {   // a label with a halo in the surface color, so it reads over lines
       var a = {}; for (var k in at) a[k] = at[k];
       a.class = at.class + " bg"; S("text", a, par).textContent = text;
       S("text", at, par).textContent = text;
@@ -4427,7 +4523,7 @@
         var label = W < 480 && stl.short ? stl.short : stl.label || "";
         if (anchor === "start" && W - m.r - lx < label.length * 7) { anchor = "end"; lx -= 12; }
         if (anchor === "end" && lx - m.l < label.length * 7) { anchor = "start"; lx = m.l + 4; }
-        // the label in its line's colour taken toward the ink (darker by day, lighter by night): 4.5:1 on the surface
+        // the label in its line's color taken toward the ink (darker by day, lighter by night): 4.5:1 on the surface
         S("text", { x: lx, y: ly, "text-anchor": anchor, class: "lbl", fill: "color-mix(in srgb, " + stl.color + " 70%, var(--lx-ink))", "paint-order": "stroke", stroke: "var(--lx-surface)", "stroke-width": 4, "stroke-linejoin": "round" }, gRule).textContent = label;
         if (o.onDrag && stl.drag) hit(r.a, r.b, id, { tabindex: "-1" }, gRule);
       });
@@ -4616,7 +4712,10 @@
      score(marks, items, binKeys)    -> {agree, differ, partly, clear, cells: {itemKey: {binKey: "agree" | "differ" | "partly"}}}
      reference(items, binKeys)       -> the marks that agree with every clear cell ("yes" on, every other value off)
    Bins and items take `id` or `key`. Keyboard: cards, bins and toggles are buttons (Tab, Enter or Space); the score and the
-   reasons are announced (aria-live). No chart, so no text version is needed. */
+   reasons are announced (aria-live). No chart, so no text version is needed.
+   Glossary marks ([[id|words]]) work in every text. Inside a button (a card, a bin, a toggle's spoken name) the words
+   show plain, and in "cards" mode the marked terms of the cards and bins are listed once under the hint as glossary
+   buttons; the row names, the reasons and the "Why" lists show the marks in place. */
 (function () {
   "use strict";
   function kid(x) { return x.id != null ? x.id : x.key; }
@@ -4645,20 +4744,33 @@
   if (typeof window === "undefined" || !window.LX) return;
 
   var LX = window.LX, H = LX.H;
+  // glossary marks ([[id|words]], LX.rich) in card and bin texts: a card or bin is a button, and a term inside a button
+  // cannot be its own button, so there the words show plain and the marked terms are listed once, as glossary buttons,
+  // under the hint ("Terms on the cards: ..."); the reasons, row names and "Why" lists show the marks in place
+  var MARK = /\[\[(?:lesson:)?[a-z0-9-]+\|([^\]]+)\]\]/g;
+  function plain(t) { return String(t == null ? "" : t).replace(MARK, "$1"); }
+  function marked(t) { return /\[\[(?:lesson:)?[a-z0-9-]+\|[^\]]+\]\]/.test(String(t == null ? "" : t)); }
+  function termsOf(texts) {
+    var seen = {}, out = [];
+    texts.forEach(function (t) { (String(t || "").match(/\[\[[a-z0-9-]+\|[^\]]+\]\]/g) || []).forEach(function (m) { var id = m.slice(2, m.indexOf("|")); if (!seen[id]) { seen[id] = 1; out.push(m); } }); });
+    return out;
+  }
 
   // ---- "cards": tap a card, then tap a bin
   function cardsMode(host, o) {
     var w = H("div", { class: "lx-cs" + (o.cls ? " " + o.cls : "") }, host), placed = {}, armed = null, checked = false;
     H("p", { class: "lx-hint", text: o.hint || "Tap a card, then tap the box it belongs in. Tap a placed card to move it." }, w);
+    var terms = termsOf(o.cards.map(function (c) { return c.text; }).concat(o.bins.map(function (b) { return b.label; }), o.bins.map(function (b) { return b.sub; })));
+    if (terms.length) H("p", { class: "lx-hint lx-cs-terms", html: "Terms on the cards: " + terms.map(LX.rich).join(" · ") }, w);
     var pool = H("div", { class: "lx-cs-pool", "data-empty": o.emptyText || "All cards placed.", role: "group", "aria-label": "Cards to sort" }, w);
     var bins = H("div", { class: "lx-cs-bins", style: "--n:" + o.bins.length }, w), binEls = {};
     o.bins.forEach(function (b) {
       var id = kid(b), el = H("div", { class: "lx-cs-bin", style: "--c:" + b.color }, bins);
-      var bt = H("button", { type: "button", class: "lx-cs-binbtn", "aria-label": "Put the chosen card in " + b.label }, el);
-      H("b", { text: b.label }, bt); if (b.sub) H("small", { text: b.sub }, bt);
+      var bt = H("button", { type: "button", class: "lx-cs-binbtn", "aria-label": "Put the chosen card in " + plain(b.label) }, el);
+      H("b", { text: plain(b.label) }, bt); if (b.sub) H("small", { text: plain(b.sub) }, bt);
       var list = H("div", { class: "lx-cs-list" }, el);
       bt.addEventListener("click", function () { if (armed) { placed[armed] = id; armed = null; checked = false; feedback.innerHTML = ""; score.textContent = ""; paint(); } });
-      binEls[id] = { el: el, list: list, label: b.label };
+      binEls[id] = { el: el, list: list, label: plain(b.label) };
     });
     var foot = H("div", { class: "lx-step-foot" }, w);
     var chk = H("button", { type: "button", class: "lx-btn small", text: o.checkLabel || "Check" }, foot);
@@ -4667,7 +4779,7 @@
     var btns = {};
     o.cards.forEach(function (c) {
       var id = kid(c), b = H("button", { type: "button", class: "lx-cs-card", "aria-pressed": "false" }, null);
-      H("span", { text: c.text }, b);
+      H("span", { text: plain(c.text) }, b);
       b.addEventListener("click", function () { armed = armed === id ? null : id; paint(); });
       btns[id] = b;
     });
@@ -4680,7 +4792,7 @@
         b.className = "lx-cs-card" + (g ? " " + g : "");
         var ic = b.querySelector(".lx-ic"); if (ic) ic.remove();
         if (g) b.insertAdjacentHTML("afterbegin", LX.icon(g === "ok" ? "check" : "cross"));
-        b.setAttribute("aria-label", c.text + (where ? ", in " + binEls[where].label : ", not placed") + (g === "ok" ? ", right" : g === "no" ? ", not right" : "") + (armed === id ? ", chosen: now tap a box" : ""));
+        b.setAttribute("aria-label", plain(c.text) + (where ? ", in " + binEls[where].label : ", not placed") + (g === "ok" ? ", right" : g === "no" ? ", not right" : "") + (armed === id ? ", chosen: now tap a box" : ""));
       });
       Object.keys(binEls).forEach(function (k) { binEls[k].el.classList.toggle("armed", !!armed); });
     }
@@ -4692,7 +4804,7 @@
       var wrong = o.cards.filter(function (c) { var id = kid(c); return placed[id] && placed[id] !== c.bin; });
       if (wrong.length) {
         var ul = H("ul", { class: "lx-cs-why" }, feedback);
-        wrong.slice(0, o.maxWhy || 3).forEach(function (c) { H("li", { html: "<b>" + LX.esc(c.text) + "</b>: " + LX.rich(c.why) }, ul); });
+        wrong.slice(0, o.maxWhy || 3).forEach(function (c) { H("li", { html: "<b>" + LX.rich(c.text) + "</b>: " + LX.rich(c.why) }, ul); });
       }
       if (o.onCheck) o.onCheck(g);
     });
@@ -4705,15 +4817,15 @@
     var items = o.items, bins = o.bins, binKeys = bins.map(kid), marks = o.marks || {}, res = null;
     var box = H("div", { class: "lx-cs-grid" + (o.cls ? " " + o.cls : ""), style: "--n:" + bins.length }, host), rows = {};
     var head = H("div", { class: "lx-cs-row head", "aria-hidden": "true" }, box); H("span", null, head);
-    bins.forEach(function (j) { H("span", { class: "jh", html: (j.icon ? LX.icon(j.icon) : "") + LX.esc(j.short || j.label) }, head); });
+    bins.forEach(function (j) { H("span", { class: "jh", html: (j.icon ? LX.icon(j.icon) : "") + LX.esc(plain(j.short || j.label)) }, head); });
     items.forEach(function (t) {
-      var k = kid(t), r = H("div", { class: "lx-cs-row", role: "group", "aria-label": t.label, style: "--c:" + (t.color || "var(--lx-ink-3)") }, box);
-      var nm = H("div", { class: "nm" }, r), nl = H("span", { class: "nl" }, nm); H("i", null, nl); H("span", { text: t.label }, nl);
+      var k = kid(t), r = H("div", { class: "lx-cs-row", role: "group", "aria-label": plain(t.label), style: "--c:" + (t.color || "var(--lx-ink-3)") }, box);
+      var nm = H("div", { class: "nm" }, r), nl = H("span", { class: "nl" }, nm); H("i", null, nl); H("span", marked(t.label) ? { html: LX.rich(t.label) } : { text: t.label }, nl);
       var wb = H("button", { type: "button", class: "lx-link lx-cs-whyb", "aria-expanded": "false", text: "Why" }, nm);
       var cells = {};
       bins.forEach(function (j) {
         var jk = kid(j), on = !!(marks[k] && marks[k][jk]);
-        var b = H("button", { type: "button", class: "tg", "aria-pressed": on ? "true" : "false", "aria-label": t.label + ": " + j.label }, r);
+        var b = H("button", { type: "button", class: "tg", "aria-pressed": on ? "true" : "false", "aria-label": plain(t.label) + ": " + plain(j.label) }, r);
         b.innerHTML = LX.icon("check");
         b.addEventListener("click", function () {
           marks[k] = marks[k] || {}; marks[k][jk] = !marks[k][jk];
@@ -4723,7 +4835,7 @@
         cells[jk] = b;
       });
       var why = H("div", { class: "lx-cs-rwhy", hidden: true }, r), ul = H("ul", null, why);
-      bins.forEach(function (j) { var jk = kid(j); H("li", { html: "<b>" + LX.esc(j.label) + ": " + LX.esc(t.ref[jk]) + ".</b> " + LX.rich((t.why || {})[jk] || "") }, ul); });
+      bins.forEach(function (j) { var jk = kid(j); H("li", { html: "<b>" + LX.rich(j.label) + ": " + LX.esc(t.ref[jk]) + ".</b> " + LX.rich((t.why || {})[jk] || "") }, ul); });
       wb.addEventListener("click", function () { why.hidden = !why.hidden; wb.setAttribute("aria-expanded", why.hidden ? "false" : "true"); LX.emit("layout"); });
       rows[k] = { cells: cells, why: why };
     });
@@ -4796,7 +4908,7 @@
                       label: "C F",                    spoken name instead of `name` (optional)
                       unit: "%",                       shown after the name: "Capacity factor (%)", in the panel and
                                                        in the text version
-                      color: "var(--lx-tier-1)",       a colour bar under the button (optional)
+                      color: "var(--lx-tier-1)",       a color bar under the button (optional)
                       words: "One or two sentences.",  what it means (alias: text)
                       you: "..." | function () {},     and any key named in `fields`: the lines under the words
                       story: "...", code: "..." } },
@@ -4815,7 +4927,7 @@
      code: "...", codeLabel: "The same equation in code (Python)",   the whole equation as code, in a collapsed box
      textLabel: "Text version" });                                    the text version's summary
    Returns { select(id), el }. Symbols are real buttons (Tab, Enter, Space) with aria-pressed and a visible focus ring;
-   the panel is a polite live region. Colours come from tokens only. LX.EquationCard.sym(id, html) writes the button
+   the panel is a polite live region. Colors come from tokens only. LX.EquationCard.sym(id, html) writes the button
    markup for html rows. */
 (function () {
   "use strict";
@@ -4908,7 +5020,7 @@
              { k: "Goal", color: "var(--lx-good)", text: "..." }, { k: "Rules", color: "var(--lx-warn)", text: "..." },
              { k: "Given", color: "var(--lx-ink-3)", text: "..." }],      k: the part's name; color: the bar on top (a token)
      symbols: "min Σ<sub>t</sub> ... <span class=\"tag\">balance</span><br>...",   optional: the same model in symbols, as html
-                                                                                     (.tag = a small grey label after a line)
+                                                                                     (.tag = a small gray label after a line)
      symbolsLabel: "Show it in symbols" });                                         the summary of the collapsed symbols box
    Four parts (or three) sit in one row on wide cards, two to a row under 860 px, and stacked under 520 px. The symbols box is a
    <details>, so it is keyboard operable and readable as text; long lines scroll inside the box, not the page.
@@ -4950,7 +5062,7 @@
      views: ["words", "symbols", "table"],       the views offered, in order; with one view there is no switch
      view: "table",                              the view shown first (default: the first)
      sel: "bal",                                 the rule highlighted in every view (null: none)
-     full: true,                                 false: rules marked extra are left out, or shown greyed with extraNote when
+     full: true,                                 false: rules marked extra are left out, or shown grayed with extraNote when
      showLater: false, extraNote: "(added later)",   showLater is true; base rules then show symBase
      hours: 24,                                  passed to rows(full, hours)
      columns: ["Rule", "In words", "In symbols", "How many", ["Its dual means", "Its dual"]],   table headings; [heading, phone label]
@@ -4960,7 +5072,7 @@
      onPick: function (id, el) {},               symbols lines become buttons (aria-pressed); called after the press
      aria: "Suspect 1: select the wrong line" }) the spoken name of the group of lines
    Returns { set({ sel, view, full }), mark(id, "right" | "wrong" | null) (no id: clear every mark), lines: { id: element }
-   (the symbols view's lines), el }. The view switch and the lines are buttons; the table becomes labelled cards on phones;
+   (the symbols view's lines), el }. The view switch and the lines are buttons; the table becomes labeled cards on phones;
    long symbols wrap inside their line. LX.Formulation.visible(rules, full, showLater) is the pure filter (Node tests). */
 (function () {
   "use strict";
@@ -5053,14 +5165,14 @@
    price; lines carry flows with arrows, limits, and a red "full" when congested; a bus can be tapped; a text version lists
    every bus and line.
    var net = LX.Network(host, {
-     buses: [{ id: "T", name: "Prairie Town", short: "Town", color: "var(--lx-demand)", at: [180, 238],   box centre, in the viewBox
-               note: "load + nuclear",                  small grey line in the box, after the plants' colour squares
+     buses: [{ id: "T", name: "Prairie Town", short: "Town", color: "var(--lx-demand)", at: [180, 238],   box center, in the viewBox
+               note: "load + nuclear",                  small gray line in the box, after the plants' color squares
                desc: "all the demand and the nuclear plant",   the bus in the text version (default: its plants' labels)
                reference: true }],                      (kept for callers; no effect on the drawing)
      lines: [{ id: "RT", from: "R", to: "T", name: "Ridge–Town",
                labelAt: [x, y, "start" | "middle" | "end"] }],   where the flow label goes (default: beside the line's middle,
-                                                                  on the side away from the network's centre)
-     plants: [{ bus: "R", color: "var(--lx-wind)", label: "Wind farm" }],   a colour square per plant in its bus's box
+                                                                  on the side away from the network's center)
+     plants: [{ bus: "R", color: "var(--lx-wind)", label: "Wind farm" }],   a color square per plant in its bus's box
      size: [360, 300],                       the viewBox, width and height
      label: "Three-bus network: ...",        the diagram's spoken name
      onPick: function (busId) {},            buses become buttons (Tab, Enter, Space; aria-pressed shows the selected bus)
@@ -5072,14 +5184,14 @@
              lim: { RT: 110 },      line limits: "110 / 110 MW"; a non-finite limit is not shown
              sel: "T",              the selected bus (thicker border)
              transfer: { RT: 60 } })  flows of a transfer instead of an hour's (shown without limits)
-   Any key left out keeps its value. Returns { set, el }. Colours are tokens (CSS variables), so day and night both work
+   Any key left out keeps its value. Returns { set, el }. Colors are tokens (CSS variables), so day and night both work
    without a redraw. Node: module.exports = { flowWidth, autoLabel, describe } (pure; tests). */
 (function () {
   "use strict";
   function money(v) { var r = Math.round(v); return (r < 0 ? "−$" : "$") + Math.abs(r).toLocaleString("en-US"); }
   function flowWidth(fl, mwPerPx) { return fl == null ? 3 : 2.5 + Math.min(9, Math.abs(fl) / (mwPerPx || 22)); }
   function byId(list, id) { for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i]; return null; }
-  // where a line's label goes: o.labelAt, else 14 units out from the line's middle, away from the buses' centre
+  // where a line's label goes: o.labelAt, else 14 units out from the line's middle, away from the buses' center
   function autoLabel(o, l) {
     if (l.labelAt) return l.labelAt;
     var a = byId(o.buses, l.from).at, b = byId(o.buses, l.to).at, mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2, cx = 0, cy = 0;
@@ -5174,11 +5286,12 @@
    ch.set({ series: [{id, label, color, v: [price per hour]}], ghost: [price per hour] or null, sel: hour });   any subset;
                  the chart keeps the rest and draws once it has series
      series      one step line per series (each price holds for its hour). Equal prices would hide each other, so with
-                 several series each line is moved 1.6 px from its neighbour (the middle one stays put)
-     ghost       an earlier run as a dashed grey step line, named ghostLabel in the legend (default "Before")
+                 several series each line is moved 1.6 px from its neighbor (the middle one stays put)
+     ghost       an earlier run as a dashed gray step line, named ghostLabel in the legend (default "Before")
      sel         the selected hour, shaded; with onPick a tap on an hour, or ← → Home End on the focused chart, picks it
    The y axis runs from $0 to a round top (at least $100, in steps of $50) with four gridlines; the time axis is marked
-   every 6 hours (every 12 under 480 px); hovering shows the hour's prices; the text version is a table of every hour.
+   every 6 hours (every 12 under 480 px); hovering shows the hour's prices (the ghost's too); the text version is a table
+   of every hour, with the ghost as its last column (textTable).
    ch.el is the chart element.
 
    var hp = LX.HourPicker(host, { start: 12, jumps: [[19, "19:00"], [12, "12:00"]], onChange: function (t) {}, label: "Hour" });
@@ -5195,9 +5308,15 @@
     if (ghost) all = all.concat(ghost);
     return Math.max(100, Math.ceil(Math.max.apply(null, all) / 50) * 50);
   }
-  // pixel offsets that keep equal step lines apart: 1.6 px per series, centred on the middle one
+  // pixel offsets that keep equal step lines apart: 1.6 px per series, centered on the middle one
   function offsets(n) { var o = []; for (var k = 0; k < n; k++) o.push(n > 1 ? (k - (n - 1) / 2) * 1.6 : 0); return o; }
-  var pure = { hh: hh, priceTop: priceTop, offsets: offsets };
+  // the text version: one row per hour, a column per series and, when there is one, a column for the dashed earlier run
+  function textTable(series, ghost, ghostLabel, unit) {
+    var u = " (" + (unit || "$/MWh") + ")";
+    return { head: ["Hour"].concat(series.map(function (s) { return s.label + u; }), ghost ? [(ghostLabel || "Before") + ", dashed" + u] : []),
+             rows: series[0].v.map(function (x, t) { return [hh(t)].concat(series.map(function (s) { return Math.round(s.v[t]); }), ghost ? [Math.round(ghost[t])] : []); }) };
+  }
+  var pure = { hh: hh, priceTop: priceTop, offsets: offsets, textTable: textTable };
   if (typeof module !== "undefined" && module.exports) module.exports = pure;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -5216,6 +5335,7 @@
       });
       if (st.ghost) legend.push({ label: o.ghostLabel || "Before", dash: true });
       var money = function (v) { var r = Math.round(v); return (r < 0 ? "−$" : "$") + Math.abs(r).toLocaleString("en-US"); };
+      var ghostLabel = o.ghostLabel || "Before";
       return {
         x: { min: 0, max: n, ticks: hours([0, 6, 12, 18, 24]), ticksN: hours([0, 12, 24]) },
         y: { min: 0, max: top, ticks: [0, 1, 2, 3, 4].map(function (k) { return [k * top / 4, "$" + k * top / 4]; }) },
@@ -5225,11 +5345,11 @@
         tip: function (x) {
           var t = Math.min(n - 1, Math.floor(x));
           return "<div><b>" + hh(t) + "–" + (t + 1 === 24 ? "24:00" : hh(t + 1)) + "</b></div>" +
-            ser.map(function (s) { return "<div><span>" + LX.esc(s.label) + "</span><b>" + money(s.v[t]) + "</b></div>"; }).join("");
+            ser.map(function (s) { return "<div><span>" + LX.esc(s.label) + "</span><b>" + money(s.v[t]) + "</b></div>"; }).join("") +
+            (st.ghost ? "<div><span>" + LX.esc(ghostLabel) + " (dashed)</span><b>" + money(st.ghost[t]) + "</b></div>" : "");
         },
         aria: o.label || "Price in each hour, dollars per MWh.",
-        text: { head: ["Hour"].concat(ser.map(function (s) { return s.label + " (" + (o.unit || "$/MWh") + ")"; })),
-                rows: ser[0].v.map(function (x, t) { return [hh(t)].concat(ser.map(function (s) { return Math.round(s.v[t]); })); }) }
+        text: textTable(ser, st.ghost, ghostLabel, o.unit)
       };
     }
     return {
@@ -5271,7 +5391,7 @@
      doneText  added to the count when every box is ticked ("9 of 9 checked. Write what you found in a data note.")
      inline    the label and its text on one line (bold label, then sep, then the text); default: stacked lines
      sep       what joins an inline label to its text (default " "; K7 uses ". ")
-     soft      soft rows without a border and accent-coloured ticks (the B3 and K7 look); default: bordered rows with
+     soft      soft rows without a border and accent-colored ticks (the B3 and K7 look); default: bordered rows with
                green ticks and a green edge when ticked
      columns   2: two columns on wide screens (≥ 861 px)
      code      notes in the monospace font (B2's pandas lines)
@@ -5344,7 +5464,7 @@
                                                                                     that sit on no rung (also a choice in each list)
      items: [{ id: "a", text: "A claim from the lesson", answer: ["operating"], note: "One or two sentences." }, ...],
      placeholder: "Where does it sit?", textLabel: "Text version of the ladder", onPlace: function (item, choice, ok) {} });
-   Each claim gets a labelled <select>. Choosing a rung highlights it (or the off box) and shows "Right." or "Not quite."
+   Each claim gets a labeled <select>. Choosing a rung highlights it (or the off box) and shows "Right." or "Not quite."
    with the claim's note; any rung in item.answer counts as right.
    Returns { el, place(itemId, rungId) } (place sets a claim's choice as if the reader had chosen it).
    Keyboard: native selects. Text version: details.lx-textalt with every rung (lowest first) and every claim with its note.
@@ -5411,7 +5531,7 @@
      onCompare: function (score) {} });
    Options:
      key          LX.store key of the reader's picks ({phraseId: tagId, _missing: tagId}); they survive a reload
-     tags         id, n (the number badge, so colour is never the only cue), label, sub (small words on the chips), color (token)
+     tags         id, n (the number badge, so color is never the only cue), label, sub (small words on the chips), color (token)
      parts        strings and phrase objects in reading order; a phrase is an inline span with button semantics, so a long
                   phrase wraps with its sentence. tag is the researcher's main tag; also lists other fair tags.
      missing      the unanswered question: a second row of chips (missingQ, default "Which question does the story leave
@@ -5584,7 +5704,7 @@
        { d: 158, label: "Factual report", value: "158 days" }, { d: 326, label: "Final report", value: "326 days" }] });
    Marks sit at their day d on one line, scaled to the last mark; labels alternate below (even) and above (odd) the line.
    anchor: "start" | "middle" | "end" (default: the first mark "start", the last "end", others "middle"); dx shifts the
-   text; warn: true draws the dot in the warning colour (a claim that came before the evidence).
+   text; warn: true draws the dot in the warning color (a claim that came before the evidence).
    textLabel: the summary of the text version (default "Text version of the timeline"); textalt: false leaves it out.
    Returns { el }. The SVG has role="img" and the label; the text version lists every mark. */
 (function () {
@@ -5736,12 +5856,13 @@
    "<key>-sol-open", and survives "Start again": LX.Checkpoint.solOpened(key) reads it (CK-M's rule compares it with the
    final task's `at`). Stored attempts need no new data version: the new fields are only added.
    Keyboard: every control is a native button, input, select or radio; the task's prompt takes focus on each new task; the
-   order task's ↑ ↓ buttons keep focus on the moved item. The results table becomes labelled lines on phones.
+   order task's ↑ ↓ buttons keep focus on the moved item. The results table becomes labeled lines on phones.
    Text version: LX.Checkpoint.lineChart adds a table of the hourly values.
    Pure (Node: module.exports): task, checkChoice, checkOrder, checkNumeric (either answer form), checkMWh, checkValue,
    checkEstimate, level(D, st, {openFirst, late, solOpen}), firstRight(record, openFirst), writtenCounts(record,
    openFirst), lateAnswer(record, solOpen), allAnswered(D, st), lastAnswerAt(D, st), lateRule({gateAll, n}), tolText(task),
-   describe, summary, fmtMs, firstWord; for the per-task options: submitted(record), waitsFor(D, st, task),
+   describe, summary, fmtMs, firstWord(D, task, record, openFirst), pointsWord(task, ticked, record, openFirst) (a written
+   task's points: "0 points" when its solution was opened first under openFirst "not-right"); for the per-task options: submitted(record), waitsFor(D, st, task),
    solWaits(D, st, task), solLeaks(D), outOfOrder(D, st), taskList(D, ids), waitText(D, task, ids), shownTitle(D, st,
    task), openProblems(D) (unknown or circular opensAfter or solAfter names; a page's test should find none).
    level and summary find the explanation and the estimate as the first "open-short" and the first "estimate" task. */
@@ -5966,9 +6087,16 @@
     var s = Math.round(ms / 1000), m = Math.floor(s / 60);
     return m ? m + " min " + (s % 60 < 10 ? "0" : "") + (s % 60) + " s" : s + " s";
   }
-  function firstWord(D, t, r) {
+  // a written task's points in the results table and the copied summary: the boxes ticked, or, when its worked solution
+  // was opened before it was submitted and openFirst is "not-right", the 0 points the level counts (with what was ticked)
+  function pointsWord(t, ticked, r, openFirst) {
+    var of = t.points ? t.points.length : 2;
+    return writtenCounts(r, openFirst) ? ticked + " of " + of + " points (self)" : "solution opened first: 0 points (" + ticked + " of " + of + " ticked)";
+  }
+  // openFirst: the runner's option, else data.rule.openFirst (as the level rule reads it)
+  function firstWord(D, t, r, openFirst) {
     if (!r || r.first == null) return r && r.skipped ? "skipped" : "not answered";
-    if (t.kind === "open-short") return (r.points || []).filter(Boolean).length + " of " + (t.points ? t.points.length : 2) + " points (self)";
+    if (t.kind === "open-short") return pointsWord(t, (r.points || []).filter(Boolean).length, r, openFirst || (D.rule && D.rule.openFirst));
     if (t.kind === "estimate") return "submitted";
     return r.first ? "right" : "not right";
   }
@@ -5987,7 +6115,7 @@
     D.tasks.forEach(function (t, i) {
       var r = st.tasks[t.id] || {};
       var hide = waitsFor(D, st, t).length > 0;   // a waiting task's title and lessons stay unsaid, as on its card
-      lines.push((i + 1) + " | " + shownTitle(D, st, t) + " | " + (hide ? "–" : t.lesson) + " | " + firstWord(D, t, r) + " | " + (r.tries || 0) + " | " + fmtMs(r.msFirst) + " | " + fmtMs(r.ms) + " | " + (r.solFirst ? "yes" : isLate(r) ? "yes (the worked solution section)" : "no"));
+      lines.push((i + 1) + " | " + shownTitle(D, st, t) + " | " + (hide ? "–" : t.lesson) + " | " + firstWord(D, t, r, o.openFirst) + " | " + (r.tries || 0) + " | " + fmtMs(r.msFirst) + " | " + fmtMs(r.ms) + " | " + (r.solFirst ? "yes" : isLate(r) ? "yes (the worked solution section)" : "no"));
     });
     var esT = ofKind(D, "estimate"), es = esT && st.tasks[esT.id];
     if (es && es.answer) {
@@ -6006,7 +6134,7 @@
 
   var pure = { task: task, checkChoice: checkChoice, checkOrder: checkOrder, checkNumeric: checkNumeric, checkMWh: checkMWh, checkValue: checkValue,
     checkEstimate: checkEstimate, level: level, firstRight: firstRight, writtenCounts: writtenCounts, lateAnswer: lateAnswer, allAnswered: allAnswered, lastAnswerAt: lastAnswerAt, lateRule: lateRule, lateText: lateText,
-    tolText: tolText, describe: describe, summary: summary, fmtMs: fmtMs, firstWord: firstWord,
+    tolText: tolText, describe: describe, summary: summary, fmtMs: fmtMs, firstWord: firstWord, pointsWord: pointsWord,
     submitted: submitted, waitsFor: waitsFor, solWaits: solWaits, solLeaks: solLeaks, outOfOrder: outOfOrder, taskList: taskList, waitText: waitText, openProblems: openProblems, shownTitle: shownTitle };
   if (typeof module !== "undefined" && module.exports) module.exports = pure;
   if (typeof window === "undefined" || !window.LX) return;
@@ -6415,7 +6543,7 @@
       D.tasks.forEach(function (t, i) {
         var r = st.tasks[t.id] || {}, tr = E("tr", null, bd);
         var td = E("td", { "data-l": "Task" }, tr); E("button", { type: "button", class: "lx-link", text: (i + 1) + ". " + shownTitle(D, st, t), onclick: function () { show(i); } }, td);
-        E("td", { "data-l": "First answer", text: firstWord(D, t, r) }, tr);
+        E("td", { "data-l": "First answer", text: firstWord(D, t, r, o.openFirst) }, tr);
         E("td", { class: "n", "data-l": "Tries", text: String(r.tries || 0) }, tr);
         E("td", { class: "n", "data-l": "Time to first answer", text: fmtMs(r.msFirst) }, tr);
         E("td", { "data-l": "Solution first", text: r.solFirst ? "yes" : o.late === "practice" && lateAnswer(r, solAt()) ? "yes (worked solution open)" : "no" }, tr);
@@ -6711,7 +6839,7 @@
 /* practice.js — LX.Practice: faded practice sets with staged hints and an automatic check (bridges B1 and B3; styles and
    the small exercise pieces in practice.css).
    LX.Practice(host, { id, title, lede, foot, blank, tracks: [{ label, intro, items: [{ key, kind, minutes, title, build }] }] })
-     foot    a closing note: a string, or short labelled notes [[label, text], ...] (one list item each)
+     foot    a closing note: a string, or short labeled notes [[label, text], ...] (one list item each)
      id      LX.store key: which exercises are done, in this browser only
      blank   the reason shown when Check is pressed with an empty answer
      tracks  sets of exercises that fade from a worked example to a blank page; kind "worked" | "partly" | "scratch";
@@ -7051,7 +7179,9 @@
                                  competences in the capstone's own words. The research studios use neither option.
    Returns { el, picks(), set(id, level), clear(), summary() }.
    The words of the levels are the course rubric's own and are not reworded per studio (a capstone may override one
-   competence's, above); "Not yet" has no anchored
+   competence's, above). A competence may carry `reads`, one line on how its words read for a kind of work they do not
+   name (Framing's: a descriptive question), under its name live and under the table in the static version. "Not yet"
+   has no anchored
    description there, so it reads "Developing is not reached yet". Each competence is a fieldset of native radio buttons
    (Tab to the group, arrow keys move, Space picks); each radio's label carries its level and the anchored description,
    so the ladder is the control. The result line (aria-live) counts competences at Proficient or above. "Copy my
@@ -7072,7 +7202,8 @@
     { id: "framing", label: "Framing", builtIn: "R1, R3, R10",
       developing: "question vague or untyped; no audience or counterfactual",
       proficient: "typed question with audience or decision-maker, metric with units, counterfactual, scale and boundary; one falsification statement",
-      strong: "also explains why the question matters to its audience and what answer would change a decision" },
+      strong: "also explains why the question matters to its audience and what answer would change a decision",
+      reads: "for a descriptive question, the counterfactual is the reference its count is compared with; the falsification statement, an expectation stated before counting or a check on the count" },
     { id: "positioning", label: "Positioning", builtIn: "R2",
       developing: "a few sources, no map",
       proficient: "concept matrix of at least 12 sources; a stated gap with evidence",
@@ -7102,8 +7233,8 @@
       proficient: "six-page paper; one key figure; a limits paragraph; a 150-word public summary",
       strong: "a briefing a decision-maker could act on without misreading" },
     { id: "integrity", label: "Integrity", builtIn: "R9",
-      developing: "licences or credit unchecked",
-      proficient: "licences checked, credit and conflicts stated, stakeholders treated fairly",
+      developing: "licenses or credit unchecked",
+      proficient: "licenses checked, credit and conflicts stated, stakeholders treated fairly",
       strong: "data and code released with documentation where allowed" }
   ];
   var NOT_YET = "Developing is not reached yet.";
@@ -7120,7 +7251,7 @@
     var lv = (c && c.levels) || {}, own = Object.keys(lv);
     own.forEach(function (k) { if (["developing", "proficient", "strong"].indexOf(k) < 0) throw new Error("LX.Rubric: no level " + JSON.stringify(k) + " to reword (developing, proficient, strong)"); });
     function w(k) { return sentence(lv[k] || base[k]); }
-    var C = { id: base.id, label: base.label, builtIn: base.builtIn, look: (c && c.look) || null,
+    var C = { id: base.id, label: base.label, builtIn: base.builtIn, look: (c && c.look) || null, reads: base.reads || null,
       text: { "not-yet": NOT_YET, developing: w("developing"), proficient: w("proficient"), strong: w("strong") } };
     if (own.length) C.own = ["developing", "proficient", "strong"].filter(function (k) { return lv[k]; });
     return C;
@@ -7162,7 +7293,9 @@
         var C = competence(c);
         return '<tr><th scope="row">' + esc(C.label) + (C.look ? '<br><span class="lx-hint">Look for: ' + esc(C.look) + "</span>" : "") + "</th>"
           + LEVELS.slice(1).map(function (L) { return '<td data-l="' + esc(L.label) + '">' + esc(C.text[L.id]) + "</td>"; }).join("") + "</tr>";
-      }).join("") + "</tbody></table></div>";
+      }).join("") + "</tbody></table></div>" + list.map(competence).filter(function (C) { return C.reads; }).map(function (C) {
+        return '<p class="lx-hint lx-rb-reads"><b>' + esc(C.label) + ",</b> " + esc(C.reads) + ".</p>";
+      }).join("");
   }
   var api = { VERSION: VERSION, LEVELS: LEVELS, COMPETENCES: COMPETENCES, competence: competence, count: count, summary: summary,
               staticHTML: staticHTML, resultText: resultText };
@@ -7183,6 +7316,7 @@
       var fs = H("fieldset", { class: "lx-rb-comp" }, box), name = LX.uid("rb");
       var lg = H("legend", null, fs); H("b", { text: C.label }, lg);
       if (C.look) H("p", { class: "lx-rb-look", html: "<b>Look for:</b> " + LX.rich(C.look) }, fs);
+      if (C.reads) H("p", { class: "lx-rb-look lx-rb-reads", html: "<b>" + LX.esc(C.label) + ",</b> " + LX.esc(C.reads) + "." }, fs);
       var row = H("div", { class: "lx-rb-levels" }, fs);
       radios[C.id] = LEVELS.map(function (L) {
         var lab = H("label", { class: "lx-rb-level " + L.id + (L.bar ? " bar" : "") }, row);
@@ -7244,7 +7378,7 @@
 /* questioncard.js — LX.QuestionCard: a structured research-question card (the course's question types and question
    studio; R1, R10, the capstone research project): the question in one sentence, its type, its audience or decision-maker, a metric with
    units, the counterfactual, scale and boundary, an "I would be wrong if" statement and the main uncertainty. Each part
-   is checked for rigour; the card copies as plain text and can travel in a link.
+   is checked for rigor; the card copies as plain text and can travel in a link.
    var qc = LX.QuestionCard(host, {
      id: "r10-card",             the draft stays in this browser under this key (optional)
      code: "R10",                in the copied text's first line
@@ -7259,13 +7393,13 @@
      share: true,                a "Share this card" button: the card travels in the link's #q-... hash (LX.Share)
      onChange: function (values, checks) {} });
    Returns { el, get(), set(values), text(), checks() }.
-   Fields: native, labelled controls with a one-line hint; the type is a set of five radio buttons (the course's question types) that shows the
+   Fields: native, labeled controls with a one-line hint; the type is a set of five radio buttons (the course's question types) that shows the
    chosen type's template and typical methods (one method family among several), the method names with their glossary
    help (TYPES[i].marked: the same list as `methods`, with glossary marks; `methods` stays plain for the copied text and
    for pages that mark it themselves). The hints of "Compared with" and "I would be wrong if" say what a descriptive
    question puts there (a reference; an expectation or a check), as it tests no causal claim. Checks: eight lines (the question
    written, with no bracketed placeholder such as "[…]" left from a draft, then the seven parts that the question
-   studio's rigour checks need), each "filled in" or "to do" in words and with an icon, never colour alone. The head counts "N of 8
+   studio's rigor checks need), each "filled in" or "to do" in words and with an icon, never color alone. The head counts "N of 8
    parts filled in": the checks see only whether a part is there, not how rigorous it is (the rubric does that); they
    never block (a learner may type any question) and never judge originality, importance or novelty.
    Node: module.exports = { TYPES, SCALES, FIELDS, CHECKS, check, text, encode, decode, clean } (pure). */
@@ -7562,7 +7696,7 @@
      note: "One sentence." });
    Returns { el, events } (events as drawn, sorted).
    An ordered list with <time datetime> dates: it reads in order as text, so it is its own text version; markers on a
-   rule, the kind in words (colour is never the only cue), sources as links. One column; on wide screens the date sits
+   rule, the kind in words (color is never the only cue), sources as links. One column; on wide screens the date sits
    left of the event.
    Node: module.exports = { parse, fmt, sortEvents, gap, validate, staticHTML, KINDS } (pure). staticHTML(events, opt)
    is the page's no-JS list (<ol class="lx-tl-static">), for a test's --write mode. */
@@ -7634,11 +7768,12 @@
       return (s.url ? '<a href="' + esc(s.url) + '">' + esc(s.label) + "</a>" : esc(s.label)) + (s.as_of ? ", as of " + esc(fmt(s.as_of)) : "");
     }).join("; ");
   }
+  // the no-JS list: each event's date, label, finding and source on lines of their own (as the live timeline sets them)
   function staticHTML(events, opt) {
     opt = opt || {};
     return '<ol class="lx-tl-static">' + sortEvents(events, opt.order).map(function (e) {
-      return "<li><b>" + esc(fmt(e.date)) + "</b> · " + esc(e.label) + "." + (e.text ? " " + rich(e.text) : "")
-        + ' <span class="lx-hint">Source: ' + srcHTML(e) + "</span></li>";
+      return "<li><b>" + esc(fmt(e.date)) + "</b><br> " + esc(e.label) + "." + (e.text ? "<br> " + rich(e.text) : "")
+        + '<br> <span class="lx-hint">Source: ' + srcHTML(e) + "</span></li>";
     }).join("") + "</ol>";
   }
   var api = { parse: parse, fmt: fmt, sortEvents: sortEvents, gap: gap, validate: validate, staticHTML: staticHTML, KINDS: KINDS };
@@ -7693,7 +7828,7 @@
      decisions   capacities: wind, solar, gas combined-cycle (cc), gas peaker (pk), nuclear (nuc) in MW; battery power
                  (bp, MW) and energy (be, MWh). Every hour: cc and peaker output, battery charge and discharge, unserved
                  demand (only when the reader's plan is fixed; the optimizer must serve all demand).
-     goal        least annual cost = annualised capital + fixed O&M (per MW or MWh built) + fuel and variable O&M (per MWh)
+     goal        least annual cost = annualized capital + fixed O&M (per MW or MWh built) + fuel and variable O&M (per MWh)
                  [+ a carbon price x CO2: lesson 12's weighted sum]. Nuclear runs flat, so its fuel is a fixed yearly cost.
      rules       every hour: wind + solar + nuclear + cc + peaker + discharge - charge + unserved >= demand (what is left
                  over is spilled); wind and solar make capacity x the hour's availability (LX.townProfile, "scale" method,
@@ -7719,7 +7854,7 @@
      "cyclic" or "free"), yearPeriods(Y), readCheck(C, Y, result, plan) (a fixed plan's full-year run: totals and MWh
      unserved in each calendar week) and errors(est, full, cap, ref) (cost gap, CO2 over the cap, estimate error).
      LX.WeekStrip (components/weekstrip.js) draws a set of weeks and readCheck's byWeek as a 52-week calendar.
-   Page kit (browser only): LX.townPlan.ui = { TECH (names and colours), fm (number formats), Num (a numeric control in
+   Page kit (browser only): LX.townPlan.ui = { TECH (names and colors), fm (number formats), Num (a numeric control in
      the slider look), TextTable (a comparison table of words; cards on phones), css (kept for callers; the styles are in
      planengine.css, bundled into learn.css) }.
    Tests: _tests/learn/test_13-capstone.js (also with --full), test_12-trade-offs.js, test_m03-capacity-expansion.js and
@@ -7804,7 +7939,7 @@
       return bestW;
     }
     // k-medoids inside a season (k = per): start from the medoid and the week farthest from it, then alternate
-    // assigning weeks to the nearest medoid and re-centring each group, until nothing changes
+    // assigning weeks to the nearest medoid and re-centering each group, until nothing changes
     function groups(members) {
       if (per === 1 || members.length <= per) return [members];
       var meds = [medoid(members)];
@@ -7840,7 +7975,7 @@
     });
     var f = HOURS / (WEEKS * HPW);   // the 24 hours of 31 December, spread over the weights
     reps.forEach(function (r) {
-      r.weight = r.n * f;            // hours of the year each modelled hour stands for
+      r.weight = r.n * f;            // hours of the year each modeled hour stands for
       r.start = weekStart(Y, r.week).toISOString().slice(0, 10);
       var A = r.week * HPW;
       r.demand = []; r.wind = []; r.solar = [];
@@ -8026,7 +8161,7 @@
   }
 
   // ---------------------------------------------------------------- helpers for the page (pure)
-  // one modelled week, hour by hour: what each source made, the battery, unserved and spilled power (MW)
+  // one modeled week, hour by hour: what each source made, the battery, unserved and spilled power (MW)
   function weekSeries(C, P, values, p, plan) {
     var v = values || {}, n = P.demand.length, o = { demand: [], nuc: [], wind: [], solar: [], dis: [], ch: [], cc: [], pk: [], unserved: [], spilled: [] };
     for (var h = 0; h < n; h++) {
@@ -8199,7 +8334,7 @@
 
 /* scalestrip.js — LX.ScaleStrip: the course's five scales (S0 device and plant ... S4 nation) side by side
    (e-scale-strip; used by F1's explain layer and R3's self-check). One card per scale, its top edge in the
-   scale's colour (--lx-scale-0 ... 4, day and night, in scalestrip.css), with the parts a lesson asks for.
+   scale's color (--lx-scale-0 ... 4, day and night, in scalestrip.css), with the parts a lesson asks for.
    var ss = LX.ScaleStrip(host, {
      title: "Five scales at a glance", lede: "One sentence.",   an h3 in .lx-x-head and a lede (both optional)
      scales: [{ id: "S0", name: "Device and plant", power: "W to MW", who: "the owner ...", decides: "what to install ...",
@@ -8217,7 +8352,7 @@
                            "upcoming" (with its note) otherwise (LX.lessonRef); an {href, label} item is always linked
      path: P,
      mark: "S1", markText: "Your brief sits here.",   one scale marked (an outlined card and a line of text)
-     color: "var(--lx-tier-4)",   one colour for every card's top edge (default: each scale's own colour)
+     color: "var(--lx-tier-4)",   one color for every card's top edge (default: each scale's own color)
      label: "Five scales" });     the list's accessible name
    Returns { el, update(patch) }: update() redraws the cards with some options changed (mark, markText, ticks, lessons).
    Layout: five columns from 861 px, one card per row below. The list is its own text version.
@@ -8227,7 +8362,7 @@
   // ---------------------------------------------------------------- pure (no DOM; exported for Node)
   var TICKS = [["who", "Who"], ["what", "What"], ["physics", "Physics"]];
   var FLOW = { down: "Passed down: prices, tariffs, limits, targets", up: "Passed up: load profiles, flexibility, forecasts, siting needs" };
-  // "S3" -> 3 (the scale's place on the ladder and its colour token)
+  // "S3" -> 3 (the scale's place on the ladder and its color token)
   function scaleIndex(id) { var m = /^S([0-4])$/.exec(String(id)); return m ? +m[1] : -1; }
   function colorOf(s, one) { var i = scaleIndex(s.id); return one || (i >= 0 ? "var(--lx-scale-" + i + ")" : "var(--lx-ink-3)"); }
   // a scale's "Go further" list split into live links and upcoming names; ref = LX.lessonRef (core.js)
@@ -8315,10 +8450,10 @@
 /* stakeholders.js — e-stakeholders (who decides, who pays, who benefits): A22's role table and R9's stakeholder map;
    F8, F9, F11 and A13 can reuse them.
 
-   LX.Stakeholders(host, o): a table of roles against questions; on phones each role becomes a card of labelled lines.
+   LX.Stakeholders(host, o): a table of roles against questions; on phones each role becomes a card of labeled lines.
      o = { title, lede ([[glossary|marks]]), cols: [{ key, label }],
            rows: [{ key, name, note, cells: { colKey: { v: "yes" | "part" | "no", t: "text with [[marks]]" } } }], note }
-     A cell with v shows a filled, half-filled or empty dot and the word Yes, Partly or No, so colour is never the only
+     A cell with v shows a filled, half-filled or empty dot and the word Yes, Partly or No, so color is never the only
      cue; t adds a short line. Returns { el, set(rowKey, colKey, text) } (set rewrites a cell's line, e.g. with the
      reader's own picks).
    LX.StakeholderMap(host, o): rings of groups around a study, each group a button that opens what the study owes it.
@@ -8330,7 +8465,7 @@
    Pure (Node: require("components/stakeholders.js"); also on LX.Stakeholders): WORD, cellText, staticHTML(o) (the role
    table as a plain table for a no-JS fallback), mapItems(o) (every group with its ring, in order), mapStaticHTML(o) (the
    map as a plain table for a no-JS fallback: group, ring, what it is owed, where it appears; staticTitle, owedHead and
-   alsoHead name its parts). Colours: --lx-* only. */
+   alsoHead name its parts). Colors: --lx-* only. */
 (function () {
   "use strict";
   var WORD = { yes: "Yes", part: "Partly", no: "No" };
@@ -8512,9 +8647,10 @@
    LX.NumAnswer (numanswer.js). Styles in drill.css.
    LX.Drill(host, { item, hint, title, seed, unit, check, empty, focus, width, widthPhone, cls, choicesClass })
      item(k, r)    the page's item maker: item k (0, 1, 2, ...) drawn with the seeded random source r (r() in [0, 1));
-                   returns { q, why, choices?, answer, unit?, tol? }: with choices, answer is the index of the right one;
-                   without, answer is a number and the reader types it; q is text and may carry [[id|words]] glossary
-                   marks (LX.rich)
+                   returns { q, why, choices?, answer, unit?, tol?, table? }: with choices, answer is the index of the
+                   right one; without, answer is a number and the reader types it; q is text and may carry [[id|words]]
+                   glossary marks (LX.rich); table: { head: [...], rows: [[...]], caption? } is a small table shown
+                   under q (cells are text; the first cell of each row is its header), so q can stay one short question
      hint          one line under the title (the kinds of item and an honest time); may carry [[id|words]] glossary marks
      title         the card's heading (default "Practice drill")
      seed          the seed (default: a new one per visit, (Date.now() % 100000) + 1); the same seed gives the same items
@@ -8547,6 +8683,15 @@
 
   // ---------------------------------------------------------------- view
   var LX = window.LX;
+  // an item's small table (it.table): head, rows (first cell a row header), optional caption
+  function tableEl(T) {
+    var H = LX.H, sx = H("div", { class: "lx-scroll-x lx-drill-t" }), tb = H("table", { class: "lx-mini-table" }, sx);
+    if (T.caption) H("caption", { class: "lx-hint", text: T.caption }, tb);
+    if (T.head) { var hr = H("tr", null, H("thead", null, tb)); T.head.forEach(function (h) { H("th", { scope: "col", text: String(h) }, hr); }); }
+    var bd = H("tbody", null, tb);
+    (T.rows || []).forEach(function (r) { var tr = H("tr", null, bd); r.forEach(function (c, i) { H(i ? "td" : "th", i ? { text: String(c) } : { scope: "row", text: String(c) }, tr); }); });
+    return sx;
+  }
   LX.Drill = function (host, o) {
     var H = LX.H, seed = o.seed != null ? o.seed : newSeed(), r = rng(seed), k = 0, right = 0, done = 0, cur = null;
     var focusMode = o.focus === undefined ? "question" : o.focus;
@@ -8561,6 +8706,7 @@
     function show(focus) {
       var it = o.item(k, r); k++; box.innerHTML = ""; cur = it;
       var qp = H("p", { class: "lx-qtext", tabindex: focusMode === "question" ? "-1" : null, html: LX.rich(it.q) }, box);
+      if (it.table) box.appendChild(tableEl(it.table));
       var fb = null, answered = false;
       function mark(ok) {
         if (answered) return; answered = true; done++; if (ok) right++;
@@ -8594,7 +8740,7 @@
   LX.Drill.newSeed = newSeed;
 })();
 
-/* weekstrip.js — LX.WeekStrip: a year's 52 calendar weeks in four rows of 13, each coloured by the representative week
+/* weekstrip.js — LX.WeekStrip: a year's 52 calendar weeks in four rows of 13, each colored by the representative week
    that stands for it, with a red dot on each week that has unserved demand in a full-year check, a key and a text
    version (a table). First used by lesson M3; M13 and C2 can reuse it. It reads the
    planning engine's objects (LX.townPlan, components/planengine.js, bundled before it):
@@ -8605,10 +8751,10 @@
                                             //   LX.townPlan.readCheck() returns it (a week is marked above 0.05 MWh)
      // -> { el, draw }
 
-   - Colours. A typical week takes its season's colour (winter, spring, summer, fall); a season's second and third
-     typical weeks are mixed toward the ink colour. Extreme weeks (peak demand, peak net load, least wind, winter
-     net-load peak) have their own colours and an outline. All colours are --lx-* tokens, so day and night both work.
-   - Letters. W, Sp, Su, F (numbered when a season has several typical weeks), P, N, C, X: the colour is never the only cue.
+   - Colors. A typical week takes its season's color (winter, spring, summer, fall); a season's second and third
+     typical weeks are mixed toward the ink color. Extreme weeks (peak demand, peak net load, least wind, winter
+     net-load peak) have their own colors and an outline. All colors are --lx-* tokens, so day and night both work.
+   - Letters. W, Sp, Su, F (numbered when a season has several typical weeks), P, N, C, X: the color is never the only cue.
    - Text. The grid is role="img" with a sentence that lists every representative week and how many weeks it stands for
      (and how many weeks are short); the key repeats the letters; "Text version" holds a table of all 52 weeks (the week's
      start date, the week standing in for it and, after a check, its unserved MWh).
@@ -8655,7 +8801,7 @@
   function mwh(v) { return Math.round(v).toLocaleString("en-US") + " MWh"; }
   function label(RW, byWeek, year) {
     var nShort = byWeek ? byWeek.filter(function (x) { return x > SHORT; }).length : 0;
-    return "The 52 weeks of " + year + " in four rows of 13, each coloured by the representative week that stands for it: " +
+    return "The 52 weeks of " + year + " in four rows of 13, each colored by the representative week that stands for it: " +
       RW.reps.map(function (r) { return name(r) + " for " + r.n + (r.n === 1 ? " week" : " weeks"); }).join(", ") + "." +
       (byWeek ? " " + (nShort ? nShort + " weeks have unserved demand in the full-year check." : "No week has unserved demand in the full-year check.") : "");
   }
@@ -9229,6 +9375,10 @@
                   or one sentence (a string)
      limits       ["It leaves out ...", ...]
      footer       optional; default: a teaching model with illustrative assumptions, not advice for a real site
+   o.appendix (and opt.appendix in the pure functions): a heading such as "Appendix: evidence from the run". The note then
+     puts all the reader's own fields first and the run's evidence (plan, results, assumptions, sensitivity, limits) after
+     it under that heading: "## " in Markdown, a ruled capitalized line in text, an h4 in the preview, and a second list
+     in outlineHTML (a capstone whose page limit counts only the reader's writing, C4)
    Pure (Node: require("components/reportnote.js"); also on LX.ReportNote): compose(note, words, fields, { format, date,
      code, title }), html(note, words, fields, opt) (the preview), sensitivityLine(s), checks(note, words, fields, list,
      opt), outlineHTML(fields, opt) (the no-JS fallback: the note's headings in order, with what goes under each),
@@ -9278,6 +9428,8 @@
     out.push({ title: title, head: head });
     function field(f) { var v = value(words, f.key); out.push({ h: f.heading || f.label, para: v || "(not written yet)", empty: !v }); }
     fields.filter(function (f) { return f.at === "top"; }).forEach(field);
+    // opt.appendix: the reader's own writing first, then the run's evidence under that heading
+    if (opt.appendix) { fields.filter(function (f) { return f.at !== "top"; }).forEach(field); out.push({ appx: opt.appendix }); }
     if (list(n.plan).length) out.push({ h: "The plan", table: { head: ["Choice", "Value"], rows: n.plan.map(function (p) { return [p.label, p.value]; }) } });
     if (list(n.results).length) out.push({ h: "Results", table: { head: ["Result", "Value"], rows: n.results.map(function (r) { return [r.label, r.value + (r.note ? " (" + r.note + ")" : "")]; }) } });
     out.push({ h: "Assumptions", list: list(n.assumptions).map(sentence), none: "(none stated)" });
@@ -9286,7 +9438,7 @@
       : s && typeof s === "object" && s.base && list(s.cases).length ? { head: [s.inputLabel || oneLine(s.input).replace(/^the /, ""), s.metric],
       rows: [[s.base.at + " (this plan)", s.base.value]].concat(s.cases.map(function (c) { return [c.at, c.value]; })) } : null;
     out.push({ h: "Sensitivity", para: sl || "(no sensitivity line yet)", empty: !sl, table: st, tableMdOnly: !multi(s) });
-    fields.filter(function (f) { return f.at !== "top"; }).forEach(field);
+    if (!opt.appendix) fields.filter(function (f) { return f.at !== "top"; }).forEach(field);
     if (list(n.limits).length) out.push({ h: "Limits of this analysis", list: list(n.limits).map(sentence) });
     out.push({ foot: n.footer || FOOTER });
     return out;
@@ -9301,6 +9453,7 @@
         return;
       }
       if (p.foot) { L.push(""); L.push(md ? "*" + p.foot + "*" : p.foot); return; }
+      if (p.appx) { L.push(""); if (!md) L.push("----"); L.push(md ? "## " + oneLine(p.appx) : oneLine(p.appx).toUpperCase()); return; }
       L.push("");
       L.push(md ? "### " + p.h : p.h.toUpperCase());
       if (p.table && (md || !p.tableMdOnly)) {
@@ -9327,6 +9480,7 @@
         return;
       }
       if (p.foot) { h.push('<p class="lx-rn-foot-line">' + esc(p.foot) + "</p>"); return; }
+      if (p.appx) { h.push('<h4 class="lx-rn-appx">' + esc(p.appx) + "</h4>"); return; }
       h.push("<h5>" + esc(p.h) + "</h5>");
       if (p.table && !p.tableMdOnly) h.push('<table class="lx-rn-table"><tbody>' + p.table.rows.map(function (r) { return '<tr><th scope="row">' + esc(r[0]) + "</th><td>" + esc(r[1]) + "</td></tr>"; }).join("") + "</tbody></table>");
       if (p.list) h.push(p.list.length ? "<ul>" + p.list.map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ul>" : '<p class="lx-rn-empty">' + esc(p.none) + "</p>");
@@ -9369,8 +9523,11 @@
     opt = opt || {}; fields = fields || [];
     var w = function (f) { return "<li><b>" + esc(f.heading || f.label) + ":</b> " + esc(f.hint || "in your words") + "</li>"; };
     var t = function (k) { var x = (opt[k] || OUTLINE[k]).split(": "); return "<li><b>" + esc(x[0]) + ":</b> " + esc(x.slice(1).join(": ")) + "</li>"; };
-    return '<ol class="lx-rn-outline">' + t("head") + fields.filter(function (f) { return f.at === "top"; }).map(w).join("") + t("plan") + t("results")
-      + t("assumptions") + t("sensitivity") + fields.filter(function (f) { return f.at !== "top"; }).map(w).join("") + t("limits") + "</ol>";
+    var top = fields.filter(function (f) { return f.at === "top"; }).map(w).join(""), rest = fields.filter(function (f) { return f.at !== "top"; }).map(w).join("");
+    if (opt.appendix) return '<ol class="lx-rn-outline">' + t("head") + top + rest + "</ol>" + '<p class="lx-rn-appx-h"><b>' + esc(opt.appendix) + ':</b> the run\'s evidence, after your writing</p><ol class="lx-rn-outline">'
+      + t("plan") + t("results") + t("assumptions") + t("sensitivity") + t("limits") + "</ol>";
+    return '<ol class="lx-rn-outline">' + t("head") + top + t("plan") + t("results")
+      + t("assumptions") + t("sensitivity") + rest + t("limits") + "</ol>";
   }
   function headText(c) { return c.pass + " of " + c.total + " parts in place" + (c.all ? ": the note is ready to copy." : ". You can copy the note at any time."); }
   var api = { compose: compose, html: html, outlineHTML: outlineHTML, sensitivityLine: sensitivityLine, checks: checks, countWords: countWords, headText: headText,
@@ -9413,7 +9570,7 @@
     var copyBox = H("div", { class: "lx-rn-copy", hidden: true }, box);
     var area = H("textarea", { readonly: true, rows: "12", "aria-label": "Your note as text" }, copyBox);
     H("p", { class: "lx-hint", text: o.privacy || "The note is built in this page from your plan. Nothing leaves the page unless you copy it; your own words stay in this browser and are not part of the plan link." }, box);
-    function opt(format) { return { format: format, code: o.code, title: o.title, date: new Date().toISOString().slice(0, 10) }; }
+    function opt(format) { return { format: format, code: o.code, title: o.title, appendix: o.appendix || null, date: new Date().toISOString().slice(0, 10) }; }
     function current() { return checks(note, words, fields, o.checks, opt("text")); }
     function paint() {
       if (!note) page.innerHTML = '<p class="lx-rn-empty">' + LX.esc(o.empty || "Run your plan first: the note fills in from its results.") + "</p>";
@@ -9473,7 +9630,7 @@
      farm   the ridge wind farm: wind (MW), the line to the grid (MW, sell only), a 4-hour battery (MWh), an electrolyzer
             (MW), a hydrogen tank (t) and a buyer who takes at most so many kg of hydrogen an hour at a set price.
    The model (an LP for LX.solver; every cost in 2025 dollars, converted in costs() with EIA's GDP price index):
-     decisions  every modelled hour: home: grid import and export, battery charge and discharge, state of charge;
+     decisions  every modeled hour: home: grid import and export, battery charge and discharge, state of charge;
                 farm: sales to the grid, battery charge and discharge, state of charge, electrolyzer power (what is left of
                 the wind is spilled: the balance row's slack),
                 hydrogen sold, hydrogen in the tank. With opts.size the sizes are decisions too (home: solar, battery;
@@ -9510,7 +9667,7 @@
                 revenue (farm), less fixed upkeep; replacements when a life ends; a straight-line residual value at the
                 end. One weather year (2025) is repeated; prices and costs stay the same in real terms.
      CO2        operating CO2 only. Home: bought power × Kansas's 2024 average factor, plus gas burned (never negative);
-                power sent back is a separate credit at the same factor, and the net of the two is labelled as a net.
+                power sent back is a separate credit at the same factor, and the net of the two is labeled as a net.
                 Farm: no operating CO2; the CO2 a gas reformer would emit for the hydrogen sold, a potential saving only
                 if that hydrogen replaces it (it leaves out the grid power the electrolyzer's MWh no longer replace).
      wear       the electrolyzer's stack wear is an illustrative throughput allowance: DOE's replacement (11% of the cost
@@ -9911,7 +10068,7 @@
       T.gasCost = T.gasKWh * perKWhGas; T.baseGasCost = T.heat / gas.afue * perKWhGas;
       T.gasCO2 = T.gasKWh / 293.071 * gas.co2PerMMBtu / 1000; T.baseGasCO2 = T.heat / gas.afue / 293.071 * gas.co2PerMMBtu / 1000;   // t
       // operating CO2: bought power and gas burned (never negative); power sent back is a separate credit at the same
-      // average factor, and co2Net (which can fall below zero) is labelled as a net balance, not as what the home emits
+      // average factor, and co2Net (which can fall below zero) is labeled as a net balance, not as what the home emits
       T.gridCO2 = T.imp * ef / 1000; T.exportCO2 = T.exp * ef / 1000; T.baseGridCO2 = T.use * ef / 1000;                         // t
       T.bill = T.buyCost - T.credit; T.cost = T.bill + T.gasCost; T.baseCost = T.baseBill + T.baseGasCost;
       T.co2 = T.gridCO2 + T.gasCO2; T.co2Net = T.co2 - T.exportCO2; T.baseCO2 = T.baseGridCO2 + T.baseGasCO2;
@@ -10318,8 +10475,8 @@
     var home = s.site === "home", sh = res.periods.filter(function (p) { return p.kind === "week"; }).map(function (p) { return p.sums.share; });
     var lo = Math.min.apply(null, sh), hi = Math.max.apply(null, sh);
     return {
-      strip: (home ? "Each square is a week: the stronger its colour, the more of the home's use came from the grid, not its own solar ("
-        : "Each square is a week: the stronger its colour, the more of the wind was spilled (") + pct(lo, home ? 0 : 1) + " to " + pct(hi, home ? 0 : 1) + "). Pick one.",
+      strip: (home ? "Each square is a week: the stronger its color, the more of the home's use came from the grid, not its own solar ("
+        : "Each square is a week: the stronger its color, the more of the wind was spilled (") + pct(lo, home ? 0 : 1) + " to " + pct(hi, home ? 0 : 1) + "). Pick one.",
       week: home ? "Hours from 00:00, Central standard time. Under the line, the home's use by source: solar first, then the battery, then the grid. Above it: charging and power sent back."
         : "Hours from 00:00, Central standard time. Under the line, where the wind went: sold, to the electrolyzer, into the battery or spilled. Above it: the battery's output.",
       sched: res.stores ? "With storage, this is one least-cost schedule: others can move charging to other hours at the same cost." : null,
@@ -11645,7 +11802,7 @@
    microgrid ledger). One row per customer, party, device or line, a
    column per amount; the row header can carry a small second line (what the row stands for); numbers in tabular
    figures; an optional total row. It is the course's two-sided table (table.cf-two, forms.css), so on a phone each row
-   becomes a card whose cells are labelled by their column (data-l).
+   becomes a card whose cells are labeled by their column (data-l).
    var tb = LX.Ledger(host, {
      caption: "Bill minus the cost of serving each customer, a month.",   optional (a hint-styled caption)
      columns: ["Customer", "Flat", "Time-of-use"],   the row-header column first, then one label per cell (also each cell's
@@ -11653,25 +11810,30 @@
      rows: [{ head: "Renter", sub: "cost $61.20", cells: ["+$4.10 above", { text: "−$2.00 below", cls: "down" }] },
             { head: "= Net", cells: ["", "+$2.10"], total: true }],   a cell is text or { text, cls, l } (l: its own phone label)
      cls: "a4-led" });                               extra classes on the table
-   Returns the table; it sits in a div.lx-scroll-x appended to host. Every text is set as text (never HTML). */
+   Returns the table; it sits in a div.lx-scroll-x appended to host. Every text is escaped (never HTML) and may carry
+   glossary marks ([[id|words]], LX.rich); a cell's phone label (data-l) shows a mark's words plain. */
 (function () {
   "use strict";
   if (typeof window === "undefined" || !window.LX) return;
   var LX = window.LX, H = LX.H;
+  var MARK = /\[\[(?:lesson:)?[a-z0-9-]+\|[^\]]+\]\]/;
+  function plain(t) { return String(t).replace(/\[\[(?:lesson:)?[a-z0-9-]+\|([^\]]+)\]\]/g, "$1"); }
+  // a text as the element's content: plain text, or through LX.rich when it carries a glossary mark
+  function put(a, t) { t = t == null ? "" : String(t); if (MARK.test(t)) a.html = LX.rich(t); else a.text = t; return a; }
   LX.Ledger = function (host, o) {
     o = o || {};
     var cols = o.columns || [];
     var tb = H("table", { class: "cf-two lx-ledger" + (o.cls ? " " + o.cls : "") }, H("div", { class: "lx-scroll-x" }, host));
-    if (o.caption) H("caption", { class: "lx-hint", text: o.caption }, tb);
-    if (cols.length) { var hr = H("tr", null, H("thead", null, tb)); cols.forEach(function (c) { H("th", { scope: "col", text: c }, hr); }); }
+    if (o.caption) H("caption", put({ class: "lx-hint" }, o.caption), tb);
+    if (cols.length) { var hr = H("tr", null, H("thead", null, tb)); cols.forEach(function (c) { H("th", put({ scope: "col" }, c), hr); }); }
     var bd = H("tbody", null, tb);
     (o.rows || []).forEach(function (r) {
-      var tr = H("tr", r.total ? { class: "tot" } : null, bd), th = H("th", { scope: "row", text: r.head }, tr);
-      if (r.sub) H("small", { text: r.sub }, th);
+      var tr = H("tr", r.total ? { class: "tot" } : null, bd), th = H("th", put({ scope: "row" }, r.head), tr);
+      if (r.sub) H("small", put({}, r.sub), th);
       (r.cells || []).forEach(function (c, i) {
-        var x = c !== null && typeof c === "object" ? c : { text: c }, a = { text: x.text == null ? "" : String(x.text) };
+        var x = c !== null && typeof c === "object" ? c : { text: c }, a = put({}, x.text);
         var l = x.l != null ? x.l : cols[i + 1];
-        if (l) a["data-l"] = l;
+        if (l) a["data-l"] = plain(l);
         if (x.cls != null) a["class"] = x.cls;
         H("td", a, tr);
       });
@@ -11835,7 +11997,7 @@
   //   colNames (headings for the key, one per column), lede (one line above). Labels sit right of their bars; the last
   //   column's labels get a reserved right margin, so no label crosses another column
   // Nodes are buttons (Tab, Enter, Space): picking one dims the other flows and says what flows in and out (aria-live).
-  // Redraws at its real width on resize and tweens between specs (not under reduced motion). Colours: tokens only.
+  // Redraws at its real width on resize and tweens between specs (not under reduced motion). Colors: tokens only.
   function defFmt(v) { return Math.round(v).toLocaleString("en-US"); }
 
   LX.Sankey = function (host, o) {
@@ -13707,7 +13869,7 @@
        state: S,                                   the page's object: S.L, S.R
        tile: function (el, i, inside) {},          fills stage i's tile (a button) on every paint; the box has set its "out"
                                                    class and aria-pressed; the page sets its content and its aria-label
-       color: function (i) { return "var(--lx-accent)"; },   optional: tile i's coloured rule (the CSS variable --c)
+       color: function (i) { return "var(--lx-accent)"; },   optional: tile i's colored rule (the CSS variable --c)
        presets: [["site", "On site only", 2, 2], ...],       optional: [key, label, L, R] buttons under the chain
        presetsLabel: "Boundary presets",           the presets' group name (default)
        handleLabels: ["Left edge of the boundary", "Right edge of the boundary"],   (default)
@@ -13960,7 +14122,7 @@
     R.nNewer = nNew;
     var subc = new Uint8Array(N);
     D.substations.forEach(function (sb) { subc[Math.floor(sb.y) * W + Math.floor(sb.x)] = 1; });
-    // distances: to the nearest home or built-up cell (a cell centre and 4 × 4 points in each cell), to roads, water
+    // distances: to the nearest home or built-up cell (a cell center and 4 × 4 points in each cell), to roads, water
     // Homes and built-up cells are looked up within 3 cells; anything farther counts as CAP km (3 km: beyond every
     // setback and every "away from homes" ramp, so the cap changes no result).
     var SUB = G.sub, CAP = 3, sp = new Float64Array(N * SUB * SUB), dHome = new Float64Array(N), dRoad = new Float64Array(N), dWater = new Float64Array(N);
@@ -14163,7 +14325,7 @@
   }
   function better(a, b) { return a.score > b.score || (a.score === b.score && (a.j < b.j || (a.j === b.j && a.i < b.i))); }
   function overlap(a, b, g) { g = g || 0; return a.i - g < b.i + b.k && b.i - g < a.i + a.k && a.j - g < b.j + b.k && b.j - g < a.j + a.k; }
-  // the cell a site connects from: its buildable cell nearest the block's centre (ties: the first in row order)
+  // the cell a site connects from: its buildable cell nearest the block's center (ties: the first in row order)
   function connCell(R, X, p) {
     var best = -1, bd = Infinity, c = (p.k - 1) / 2;
     for (var b = 0; b < p.k; b++) for (var a = 0; a < p.k; a++) {
@@ -14222,7 +14384,7 @@
     }
     return { c: c, cls: cls, base: base, mit: mit, protected: o.protected || "allow" };
   }
-  // the eight neighbours, in a fixed order (N, S, W, E, then the diagonals): the tie rule for equal paths
+  // the eight neighbors, in a fixed order (N, S, W, E, then the diagonals): the tie rule for equal paths
   var NB = [[0, -1], [0, 1], [-1, 0], [1, 0], [-1, -1], [1, -1], [-1, 1], [1, 1]];
   function Heap() { this.a = []; }
   Heap.prototype.less = function (x, y) { return x[0] < y[0] || (x[0] === y[0] && x[1] < y[1]); };
@@ -14349,7 +14511,7 @@
     return out;
   }
   function gridAt(R, n) { if (!R.gridCache) R.gridCache = gridCells(R); return R.gridCache[n]; }
-  // one row per substation: id, name, where (from the centre), spare MW, and where its lines go
+  // one row per substation: id, name, where (from the center), spare MW, and where its lines go
   function gridRows(R) {
     var D = R.D;
     return D.substations.map(function (s) {
@@ -14377,7 +14539,7 @@
     var ew = dx === 0 ? "" : Math.abs(dx) + " km " + (dx < 0 ? "W" : "E"), ns = dy === 0 ? "" : Math.abs(dy) + " km " + (dy < 0 ? "N" : "S");
     return (ew && ns ? ew + ", " + ns : ew || ns || "at the center");
   }
-  // the homes in a cell (the newer ones apart) and the distance from its centre to the nearest home or built-up land:
+  // the homes in a cell (the newer ones apart) and the distance from its center to the nearest home or built-up land:
   // the homes layer's text version, cell by cell (a home's dot is drawn on the map only)
   function homesIn(R, n) {
     var k = R.cellKm, i = n % R.W, j = (n - i) / R.W, all = 0, nw = 0;
@@ -14844,7 +15006,7 @@
      Protocol Scope 2 Guidance). Their MWh at the grid's average rate are reported apart (acc.contract) as an
      illustrative grid-average comparison: not a market-based inventory result, not a physical cut.
 
-   Prices and duals (from LPs only, never from MILPs): only from this LP, labelled "marginal values under stated assumptions": the substation duals
+   Prices and duals (from LPs only, never from MILPs): only from this LP, labeled "marginal values under stated assumptions": the substation duals
    (value of 1 MW more room, $ per MW per year), the balance duals ($/MWh in a district-hour), the CO2 cap's dual.
    Screening household outputs (kept apart from the model's costs): bills and energy burden by household group come from an accounting layer after
    the LP (E3.households), never from the LP: who adopts first (a stated rule), each adopting home's change (the
@@ -14856,7 +15018,7 @@
    Tie rule: stated costs far below any real one (e3-city-hub.json `tie`): $20 a year per MW of each
    district's busiest hour, $10 per MW of the three districts' busiest hour together, $1 per MWh out of a battery, $0.50
    per MWh out of the heat store, $0.10 x the hour's share of SPP's peak per MWh of managed charging. Left out of every
-   reported cost. The LP minimises the economic cost plus these small costs, so on a few plans it spends a few dollars a
+   reported cost. The LP minimizes the economic cost plus these small costs, so on a few plans it spends a few dollars a
    year more to keep a busiest hour that is under its limit lower: _tests/learn/test_e3-engine.js
    finds the economic optimum (ties x0) for every preset and the test's own plans and checks the gap is under $30 a year
    ($24.80 at most). It also re-solves with the tie costs x2 and x0.1 and checks every reported number on the optimal
@@ -15978,7 +16140,7 @@
       ["2025's bills keep the few EVs charged at home in 2025, as prairie-city.json counts them; use does not respond to the charge."]).forEach(function (t) { H("li", { text: t }, ul); });
     return tb;
   }
-  // short labelled lines, one idea each: [[label, text], ...] (text may carry glossary marks)
+  // short labeled lines, one idea each: [[label, text], ...] (text may carry glossary marks)
   function keys(host, items, cls) {
     var el = H("div", { class: "e3-keys" + (cls ? " " + cls : "") }, host);
     items.forEach(function (x) { H("p", { html: "<b>" + x[0] + ":</b> " + LX.rich(x[1]) }, el); });
@@ -16074,7 +16236,7 @@
    restriction, e4-pathways.json levers.shockRule "before") arrives before the shock year's plants are bought: decisions
    through the model year before it stay, and the shock year's builds are re-planned at the shock's price.
 
-   Prices and duals (from LPs only, never from MILPs): only from this LP, labelled "marginal values under stated assumptions": the budget's dual
+   Prices and duals (from LPs only, never from MILPs): only from this LP, labeled "marginal values under stated assumptions": the budget's dual
    (present value in 2025 of one more tonne; as a price in model year p's own 2025 dollars it is mu x w_p / D_p, from the
    LP's own coefficients), the import cap's duals, each region's marginal cost of electricity. Screening outputs (kept
    apart from the model's costs: affordability and Ridge County jobs) come from LX.A13 (components/whopays.js) after the LP, never from it.
@@ -16224,9 +16386,9 @@
   function withPreset(s, pr) { var o = copy(s); for (var k in pr.state) o[k] = pr.state[k]; return o; }
 
   // ---------------------------------------------------------------- the system a plan describes
-  // o: { shock (key or null), elX (demand multiplier from a year), only (period indexes modelled), fixed (decisions of
+  // o: { shock (key or null), elX (demand multiplier from a year), only (period indexes modeled), fixed (decisions of
   //      earlier periods: { n: {name: MW}, k: {unit index: [MW kept per period]}, a: {link: [MW added per period]} }),
-  //      budgetLeft (Mt the modelled periods may emit, counted with their weights) }
+  //      budgetLeft (Mt the modeled periods may emit, counted with their weights) }
   function sysOf(state, P, o) {
     o = o || {};
     var s = state, rate = s.dr / 100, Y = P.Y, np = Y.length;
@@ -16293,7 +16455,7 @@
 
   // ---------------------------------------------------------------- the LP
   // o: { tie (multiplier of the tie rule, default 1), noPenalty (hard budget and cap), objective (override: a terms map
-  //      to minimise instead of the cost, for the least-CO2 hint) }
+  //      to minimize instead of the cost, for the least-CO2 hint) }
   function build(P, S, o) {
     o = o || {};
     var cfg = P.cfg, tk = o.tie == null ? 1 : o.tie, T = P.tech, V = [], C = [], pen = cfg.penalties, tie = cfg.tie;
@@ -16530,7 +16692,7 @@
         if (typeof a === "string") row("kr_" + u.j + "_" + p, [[b, 1], [a, -1]], null, 0);
         else row("kr_" + u.j + "_" + p, [[b, 1]], null, a); }
     });
-    // the budget: sum_p w_p CO2_p (modelled periods) <= what is left for them
+    // the budget: sum_p w_p CO2_p (modeled periods) <= what is left for them
     var left = S.budgetLeft != null ? S.budgetLeft : S.budget - S.w0 * P.carbon.base2025Mt;
     var ob = v("over", 0, o.noPenalty ? 0 : Infinity, pen.budgetPerT, "penalty");
     var bt = [[ob, -1]];
@@ -16604,7 +16766,7 @@
   }
 
   // ---------------------------------------------------------------- reading a solved model
-  // raw: the decisions of every period (from this model, or fixed from earlier windows) and, for each modelled period p,
+  // raw: the decisions of every period (from this model, or fixed from earlier windows) and, for each modeled period p,
   // what ran (raw.per[p]); merge() joins the windows of a decade-by-decade run
   function read(P, S, m, r) {
     var x = r.values, val = function (n) { return x[n] || 0; }, fx = S.fixed || { n: {}, k: {}, a: {} };
@@ -16867,7 +17029,7 @@
       text: (ok ? "survives" : "does not survive (" + why.join("; ") + ")") + (priced ? (ok ? " on demand served; CO₂ not compared (the run missed a limit)" : "; CO₂ not compared") : "") };
   }
   // the four shocks (and the two A21 keeps for itself) as the engine runs them: one row each, with the model year it hits,
-  // what changes, and what the re-plan keeps (magnitudes and durations, modelled effects apart from the story)
+  // what changes, and what the re-plan keeps (magnitudes and durations, modeled effects apart from the story)
   function shockTable(P, keys) {
     var yr = P.cfg.levers.shockYear, each = P.each;
     return (keys || c4Shocks(P)).map(function (k) {
@@ -17114,7 +17276,7 @@
 
   // ---------------------------------------------------------------- near-optimal plans (M13): the optimal face widened
   // faceModel: every row of a solved model, plus "objective <= best + slack" ($M, the whole objective with its penalties and
-  // tie costs), minimising or maximising a linear expression (terms: { variable: coefficient }) over it
+  // tie costs), minimizing or maximizing a linear expression (terms: { variable: coefficient }) over it
   function faceModel(m, r, terms, sense, slack) {
     var cost = m.variables.filter(function (v) { return v.cost; }).map(function (v) { return [v.name, v.cost]; });
     var out = { sense: sense, variables: m.variables.map(function (v) { return { name: v.name, lb: v.lb, ub: v.ub, cost: 0 }; }), constraints: m.constraints.concat([{ name: "face", terms: cost, ub: r.objective + slack }]) };

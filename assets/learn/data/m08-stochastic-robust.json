@@ -4,7 +4,7 @@
   "creator": "Honglin Li",
   "date": "2026-11-05",
   "status": "Illustrative: a fictional windy zone with round numbers in 2025 dollars; the wind blocks are rounded from SPP's 2025 hourly wind shape (EIA-930).",
-  "source": "Prepared by hand for lesson M8; the reference results are solved with HiGHS.",
+  "source": "Illustrative values set for lesson M8; the reference results are solved with HiGHS.",
   "license": "CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/), Honglin Li. Values taken from the sources listed in this file keep their publishers' terms; EIA data are U.S. government works in the public domain."
  },
  "zone": {
@@ -109,7 +109,7 @@
  "electrolyzer": {
   "costPerMWYear": 80000,
   "kgPerMWh": 18,
-  "note": "Illustrative: $80,000 per MW a year, the annualized capital and fixed upkeep; 18 kg of hydrogen per MWh (about 55 kWh per kg). It runs only on surplus wind."
+  "note": "Illustrative: $80,000 per MW a year, the [[annualized-capital-cost|annualized capital]] and fixed upkeep; 18 kg of hydrogen per MWh (about 55 kWh per kg). It runs only on surplus wind."
  },
  "hydrogen": {
   "demandKgPerHour": 54000,

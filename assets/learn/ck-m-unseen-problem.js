@@ -2,7 +2,7 @@
 //
 // About 240 minutes, in three parts, on problems the course has not shown:
 //   A  formulate and implement an unseen problem from a one-paragraph brief (model variant: a water utility's pumping
-//      schedule with a tower and a demand charge, a linear program), or, in the empirical variant, analyse a supplied
+//      schedule with a tower and a demand charge, a linear program), or, in the empirical variant, analyze a supplied
 //      dataset (Prairie Town's 2025 year: what its wind and solar farms give in the hours of highest demand and net load);
 //   B  find the planted defect in a supplied model (a small capacity-expansion LP on three representative days);
 //   C  validate one result against an independent reference (model: hand-worked bounds; empirical: EIA's published 2025
@@ -202,7 +202,7 @@
   }
   function firstWord(t, r) {
     if (!r || r.first == null) return r && r.skipped ? "skipped" : r && r.answer ? "submitted" : "not answered";
-    if (t.kind === "open-short") return (r.points || []).filter(Boolean).length + " of " + t.points.length + " points (self)";
+    if (t.kind === "open-short") return CPK.pointsWord(t, (r.points || []).filter(Boolean).length, r, "not-right");   // the runner's openFirst
     return r.first ? "right" : "not right";
   }
   // the copied summary: keep its format fixed once testers use it

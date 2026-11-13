@@ -24,7 +24,7 @@
 //   present value        net ÷ (1 + r)^t;  NPV(r) = −C + net × AF(r, n),  AF(r, n) = (1 − (1 + r)^−n) ÷ r  (K3)
 //   IRR                  the r with NPV(r) = 0 (bisection between −50% and 100%). One outlay, then equal positive
 //                        years: NPV falls as r rises, so there is exactly one IRR (the test checks it on a grid)
-//   IRR bracket          the two neighbouring settings of step 4's slider (0.1-point steps) where the NPV changes sign,
+//   IRR bracket          the two neighboring settings of step 4's slider (0.1-point steps) where the NPV changes sign,
 //                        5.1% and 5.2%: the root, 5.17%, is not on the slider, so step 4 asks for the bracket
 //   simple payback       the first whole year whose running sum of cash is ≥ 0 (Short, Packey and Holt 1995, p. 56);
 //                        C ÷ net is the same in fractional years
@@ -78,7 +78,7 @@
     for (var i = 0; i < 200; i++) { var m = (lo + hi) / 2; if (npv(p, m) > 0) lo = m; else hi = m; }
     return (lo + hi) / 2;
   }
-  // the slider's two neighbouring settings around the IRR (step in % points): lo has NPV > 0, hi has NPV < 0
+  // the slider's two neighboring settings around the IRR (step in % points): lo has NPV > 0, hi has NPV < 0
   function irrBracket(p, step) {
     var i = irr(p), dec = (String(step).split(".")[1] || "").length; if (i == null) return null;
     var lo = +(Math.floor(i / step + 1e-9) * step).toFixed(dec), hi = +(lo + step).toFixed(dec);
@@ -180,7 +180,7 @@
       "A " + p.mw + " MW wind farm sells every MWh at " + usd(p.price, 0) + " for " + p.life + " years. Add its three cash flows, year by year: what it costs to build, what it sells, and its upkeep.",
       "A dollar in year " + p.life + " is worth less than a dollar now (toolbox K3). Switch on today's value: each year's net cash, divided by " + (1 + p.rate / 100).toFixed(2) + " once for every year of waiting.",
       "The rate is what the money costs: loans at " + pct(f.debtRate, 0) + ", owners asking " + pct(f.equityRate, 0) + " for their riskier share ([[nominal-rate|nominal]], illustrative), [[inflation|inflation]] " + pct(f.inflation, 1) + ". Slide the loan share and watch the [[wacc|WACC]] and the NPV.",
-      "Raise the rate from " + R + " and the NPV falls. Find the two neighbouring settings where it changes sign: the project's own return lies between them.",
+      "Raise the rate from " + R + " and the NPV falls. Find the two neighboring settings where it changes sign: the project's own return lies between them.",
       "[[payback-period|Payback]] counts the years until the cash put in comes back. Read it where each running sum crosses zero, then shorten the farm's life to " + f.lifeRange[0] + " years.",
       "Lower the sale price from " + usd(p.price, 0) + " until the NPV turns negative. Where it crosses zero is the [[break-even-price|break-even price]].",
       "Which of six inputs, swung across a plausible range with the others held, moves the NPV most? Guess, then see the [[tornado-chart|tornado chart]]."];

@@ -1,7 +1,7 @@
 {
  "meta": {
   "title": "Research studio R9: research integrity and stakeholders (the studio's own text)",
-  "note": "The six dilemmas are fictional, set around Prairie Town; their numbers are illustrative and no real person or organisation is described. Norms are named with their primary sources and sections, checked on 3 November 2026.",
+  "note": "The six dilemmas are fictional, set around Prairie Town; their numbers are illustrative and no real person or organization is described. Norms are named with their primary sources and sections, checked on 3 November 2026.",
   "as_of": "2026-11-03",
   "license": "CC BY 4.0"
  },
@@ -26,7 +26,7 @@
   },
   {
    "id": "licences",
-   "label": "Data licences",
+   "label": "Data licenses",
    "sub": "the terms that come with data",
    "color": "var(--lx-accent)"
   },
@@ -70,7 +70,7 @@
   },
   {
    "id": "c6",
-   "text": "Declare that you advise the utility whose programme you evaluate.",
+   "text": "Declare that you advise the utility whose program you evaluate.",
    "bin": "coi",
    "why": "A non-financial tie is still a conflict of interest."
   },
@@ -82,7 +82,7 @@
   },
   {
    "id": "c8",
-   "text": "Keep the attribution line and the licence when you share an edited map layer.",
+   "text": "Keep the attribution line and the license when you share an edited map layer.",
    "bin": "licences",
    "why": "Check the layer's license: keep the attribution it requires, and follow any conditions it sets for sharing modified data."
   },
@@ -373,7 +373,7 @@
   },
   {
    "id": "data",
-   "label": "Data and licences",
+   "label": "Data and licenses",
    "hint": "Each source and its terms; what is public, and the route to what is not.",
    "planned": "Each source you plan to use and its terms; which ones still need permission."
   },

@@ -19,7 +19,7 @@
 // Lesson-local component (used by this page only): ScaleZoom (the powers-of-ten zoom through five drawn scenes,
 // keyboard rail, text version). Shared components: LX.StepCards, LX.Predict, LX.CardSort ("cards" mode), LX.CompareTable,
 // LX.ScaleStrip (e-scale-strip: the five scales with the reader's sorts, signals passed down and needs passed up, and the
-// lessons per scale, linked when live by data/path.json). The five scale colours are the shared --lx-scale-0 ... 4.
+// lessons per scale, linked when live by data/path.json). The five scale colors are the shared --lx-scale-0 ... 4.
 (function () {
   "use strict";
 
@@ -67,7 +67,7 @@
 
   // ---------------------------------------------------------------- view
   var LX = window.LX, H = LX.H, LESSON = "f01-five-scales";
-  function scol(s) { return "var(--lx-scale-" + LX.ScaleStrip.scaleIndex(s.id) + ")"; }   // the scale's colour token
+  function scol(s) { return "var(--lx-scale-" + LX.ScaleStrip.scaleIndex(s.id) + ")"; }   // the scale's color token
 
   // ---- the five scenes (viewBox 400 × 230); class names style them from the page's tokens (f1z- in the page's style block)
   var SCENE = {

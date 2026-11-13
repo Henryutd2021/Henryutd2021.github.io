@@ -129,7 +129,7 @@
       if (redraw) redraw();
     }
 
-    function hatch(defs, id, col) {  // diagonal stripes for the credit, so it is not told apart by colour alone
+    function hatch(defs, id, col) {  // diagonal stripes for the credit, so it is not told apart by color alone
       var pat = h.el("pattern", { id: id, width: 6, height: 6, patternUnits: "userSpaceOnUse", patternTransform: "rotate(45)" }, defs);
       h.el("rect", { width: 6, height: 6, fill: col, "fill-opacity": 0.35 }, pat);
       h.el("rect", { width: 3, height: 6, fill: col }, pat);

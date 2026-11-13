@@ -30,9 +30,9 @@
    "ref": {"storage": "not stated", "extreme": "not stated", "full": "not stated"},
    "why": {"storage": "The abstract does not mention storage.", "extreme": "The abstract does not mention extreme days.", "full": "The abstract reports comparisons between selection methods, not with a full-year model run."}},
   {"key": "p02", "doi": "10.1016/j.renene.2017.10.017", "name": "Kotzur et al. (2017)", "method": "Several methods compared", "code": true,
-   "summary": "Compares [[time-series-aggregation|aggregation methods]] across several energy-system designs; the system matters more than the method, and typical periods as usually modelled cannot carry seasonal storage.",
+   "summary": "Compares [[time-series-aggregation|aggregation methods]] across several energy-system designs; the system matters more than the method, and typical periods as usually modeled cannot carry seasonal storage.",
    "ref": {"storage": "not stated", "extreme": "not stated", "full": "partly"},
-   "why": {"storage": "The abstract names the seasonal-storage problem but reports no link between periods. Mentioning storage is not the same as modelling it.", "extreme": "The abstract does not mention extreme periods; only a second pass can say whether the paper uses them.", "full": "It speaks of the real system cost, but the abstract does not say how that cost was found: a second pass would tell."}},
+   "why": {"storage": "The abstract names the seasonal-storage problem but reports no link between periods. Mentioning storage is not the same as modeling it.", "extreme": "The abstract does not mention extreme periods; only a second pass can say whether the paper uses them.", "full": "It speaks of the real system cost, but the abstract does not say how that cost was found: a second pass would tell."}},
   {"key": "p03", "doi": "10.1016/j.apenergy.2017.03.051", "name": "Pfenninger (2017)", "method": "Several methods compared",
    "summary": "Compares downsampling, clustering and simple rules in a Great Britain power model with 25 years of wind and solar data; the best method depends on the data and the model.",
    "ref": {"storage": "not stated", "extreme": "not stated", "full": "partly"},
@@ -76,7 +76,7 @@
  ],
  "fillers": [
   {"doi": "10.1016/j.apenergy.2022.120624", "name": "Hilbers, Brayshaw and Gandy (2023)",
-   "summary": "Picks periods after a first model run, keeps the extreme periods that drive capacity, and keeps chronology so storage can be modelled."},
+   "summary": "Picks periods after a first model run, keeps the extreme periods that drive capacity, and keeps chronology so storage can be modeled."},
   {"doi": "10.1109/powertech55446.2023.10202993", "name": "Moradi-Sepahvand and Tindemans (2023)",
    "summary": "A clustering-based aggregation that keeps extreme values and the order of days, for planning lines with short- and long-term storage on a six-bus test system."},
   {"doi": "10.1016/j.epsr.2024.110788", "name": "Moradi-Sepahvand and Tindemans (2024)",
@@ -101,7 +101,7 @@
   {"c": "Context", "q": "Which papers does it build on?", "worked": "Two from your matrix: Kotzur et al. (2018) for linked storage, and Teichgraeber, Küpper and Brandt (2021) for extreme periods taken from model results."},
   {"c": "Correctness", "q": "Which assumptions will you check in pass two?", "worked": "A test system based on the IEEE six-bus system; demand and wind only, no solar; operation with [[perfect-foresight|perfect foresight]]."},
   {"c": "Contributions", "q": "What is new?", "worked": "Periods chosen after a first model run that keep chronology for storage and keep the extreme periods that drive capacity; models, data and code released."},
-  {"c": "Clarity", "q": "Is it well written?", "worked": "Your judgement: note one thing you would ask the authors."}
+  {"c": "Clarity", "q": "Is it well written?", "worked": "Your judgment: note one thing you would ask the authors."}
  ],
  "sheet": [
   {"k": "Question", "v": "Can choosing periods after a first model run cut the error of capacity plans built from long weather series, in models with storage?"},
@@ -110,7 +110,7 @@
   {"k": "Method", "v": "Plan on representative days chosen from the input data; run operations over the full series; use those results to choose new periods, extreme and regular; plan again."},
   {"k": "Counterfactual", "v": "Three conventional schemes chosen from the input data alone and, on 3-year samples, the plan from the full series."},
   {"k": "Sensitivity and validation", "v": "30 and 120 representative days; 40 resampled series; unserved energy checked over the full series."},
-  {"k": "Not modelled", "v": "Solar; operation without [[perfect-foresight|perfect foresight]] (named by the authors as an extension)."},
+  {"k": "Not modeled", "v": "Solar; operation without [[perfect-foresight|perfect foresight]] (named by the authors as an extension)."},
   {"k": "Code and data", "v": "Public, with a Zenodo DOI."}
  ],
  "write_prompt": "Draft your gap statement: what you searched (where, when, strings), what the matrix shows, what the direct search found, what a second pass on the closest paper showed, and the question that remains.",
@@ -149,6 +149,6 @@
  "rubric": [{"id": "positioning", "look": "Your matrix has at least 12 papers and a written coding rule; the empty cell was searched directly; the closest prior work is read in a second pass."}],
  "sources": [
   {"label": "OpenAlex (open index of research works; data CC0)", "url": "https://openalex.org/", "as_of": "3 November 2026"},
-  {"label": "OpenAlex data licence", "url": "https://help.openalex.org/data/licenses/", "as_of": "2 November 2026"}
+  {"label": "OpenAlex data license", "url": "https://help.openalex.org/data/licenses/", "as_of": "2 November 2026"}
  ]
 }

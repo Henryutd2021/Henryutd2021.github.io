@@ -5,7 +5,7 @@
 // prepare() cuts the scenario's local day out of the year (index i = the hour ending at start_utc + i; local time =
 // UTC + utcOffsetHours) and scales it to the town: demand = shape x demandPeakMW, wind and solar = shape x farm size,
 // rounded to whole MW; demand is then rounded (by at most step/2) so the gas needed each hour is a multiple of the
-// controls' step, so a careful player can balance exactly. Hours where solar dips well below both neighbours (a real
+// controls' step, so a careful player can balance exactly. Hours where solar dips well below both neighbors (a real
 // passing cloud) get a cloud shade for the scene.
 //
 // Toy model (Prairie Town is fictional). One day in 24 hourly steps. The nuclear plant runs flat. The reader sets two

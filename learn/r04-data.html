@@ -22,9 +22,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="Research studio R4 of Energy Systems, Step by Step: clean a real year of hourly grid data (SPP 2025, EIA-930), log what each cleaning choice changes, check data licences and write a data note.">
+<meta name="description" content="Research studio R4 of Energy Systems, Step by Step: clean a real year of hourly grid data (SPP 2025, EIA-930), log what each cleaning choice changes, check data licenses and write a data note.">
 
-<title>Data you can defend: sources, cleaning, licences and provenance – Honglin Li</title>
+<title>Data you can defend: sources, cleaning, licenses and provenance – Honglin Li</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -108,8 +108,8 @@ ul.task-list li input[type="checkbox"] {
 <link rel="stylesheet" href="../assets/map.css">
 <link rel="stylesheet" href="../assets/explainers.css">
 <link rel="stylesheet" href="../assets/learn/learn.css">
-<meta property="og:title" content="Data you can defend: sources, cleaning, licences and provenance – Honglin Li">
-<meta property="og:description" content="Research studio R4 of Energy Systems, Step by Step: clean a real year of hourly grid data (SPP 2025, EIA-930), log what each cleaning choice changes, check data licences and write a data note.">
+<meta property="og:title" content="Data you can defend: sources, cleaning, licenses and provenance – Honglin Li">
+<meta property="og:description" content="Research studio R4 of Energy Systems, Step by Step: clean a real year of hourly grid data (SPP 2025, EIA-930), log what each cleaning choice changes, check data licenses and write a data note.">
 <meta property="og:image" content="https://henryutd2021.github.io/images/profile-square.jpg">
 <meta property="og:site_name" content="Honglin Li">
 <meta property="og:url" content="https://henryutd2021.github.io/learn/r04-data.html">
@@ -368,13 +368,13 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Data you can defend: sources, cleaning, licences and provenance</h1>
+<h1 class="title">Data you can defend: sources, cleaning, licenses and provenance</h1>
 <p class="subtitle lead">Log every cleaning choice and show what it changes</p>
 </div>
 
 <div>
   <div class="description">
-    Research studio R4 of Energy Systems, Step by Step: clean a real year of hourly grid data (SPP 2025, EIA-930), log what each cleaning choice changes, check data licences and write a data note.
+    Research studio R4 of Energy Systems, Step by Step: clean a real year of hourly grid data (SPP 2025, EIA-930), log what each cleaning choice changes, check data licenses and write a data note.
   </div>
 </div>
 
@@ -393,8 +393,8 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "name": "Data you can defend: sources, cleaning, licences and provenance Log every cleaning choice and show what it changes", "description": "Research studio R4 of Energy Systems, Step by Step: clean a real year of hourly grid data (SPP 2025, EIA-930), log what each cleaning choice changes, check data licences and write a data note.", "learningResourceType": "Research studio", "educationalLevel": "Advanced", "timeRequired": "PT150M", "inLanguage": "en", "isAccessibleForFree": true, "teaches": ["cleaning log", "time base and daylight saving", "outliers and frozen readings", "gap filling", "data licenses", "provenance"], "license": "https://creativecommons.org/licenses/by/4.0/", "author": {"@type": "Person", "name": "Honglin Li", "url": "https://henryutd2021.github.io/"}, "url": "https://henryutd2021.github.io/learn/r04-data.html", "isPartOf": {"@type": "Course", "name": "Energy Systems, Step by Step", "url": "https://henryutd2021.github.io/learn/"}}</script>
-<script type="application/json" class="lx-lesson-data">{"id":"r04-data","starter":null,"total":14,"code":"R4","title":"Data you can defend: sources, cleaning, licences and provenance","subtitle":"Log every cleaning choice and show what it changes","short":"Data you can defend","tier":"researcher","tier2":null,"tierLabel":"Researcher · L4","level":"L4","slot":4,"slot2":null,"minutes":30,"does":"Clean SPP's raw 2025 hourly file by choosing a time base, a spike rule, a frozen-reading rule and a fill method; watch four reported numbers move with each choice; sort eight data sources by license; pick coordinate systems for a spatial layer; write the data note.","outcome":"Make and log each cleaning choice on a real hourly dataset, show how much each choice moves the results, check the licenses and write a data note.","icon":"chart","form":"studio","scales":["S0","S1","S2","S3","S4"],"teaches":["cleaning log","time base and daylight saving","outliers and frozen readings","gap filling","data licenses","provenance"],"lab":null,"href":"r04-data.html","ready":true,"after":[{"id":"r03-system-and-method","code":"R3","title":"Which system, which boundary, which method?","short":"System, boundary, method","does":"Place a question on the scale ladder, draw its boundary, pick its time step and horizon, then choose a method family and defend it against two alternatives.","href":"r03-system-and-method.html","ready":true},{"id":"b02-python-data","code":"B2","title":"Python and data for energy: how do you load, plot and check a year of hourly data?","short":"Python and data","does":"In a notebook, load a year of hourly grid data, fix time zones and daylight-saving gaps, plot it, compute capacity factors and a duration curve, and write assert checks that catch bad rows.","href":"b02-python-data.html","ready":true}],"prev":null,"next":{"id":"r05-build-validate","code":"R5","title":"Can you trust your analysis? Verification, validation and reproducibility","short":"Verify, validate, rerun","does":"Find five planted bugs in a one-day battery study (a unit error, a sign flip, a free lunch, a missing rule, a leaked future), each with a named check and a real solver; match a benchmark worked by hand; validate the day-before forecast against measured data and check one input; see why a clean clone fails, rerun it for real in the notebook and write a verification log.","href":"r05-build-validate.html","ready":true},"nextNeeds":[{"id":"k08-git-notebooks","code":"K8","title":"Git and reproducible notebooks","short":"Git and notebooks","does":"In a simulated project, stage and commit changes, read a diff, go back to find the commit that broke a result, try an idea on a branch, and make a notebook rerun cleanly from top to bottom with pinned inputs.","href":"k08-git-notebooks.html","ready":true},{"id":"m01-dispatch-to-lmp","code":"M1","title":"From dispatch to locational prices: the linear program behind the market","short":"Dispatch to locational prices","does":"Build a 24-hour dispatch LP with ramps and read its balance duals as marginal values under stated assumptions; add a three-bus DC power-flow network, congest a line and watch one price split into three.","href":"m01-dispatch-to-lmp.html","ready":true}],"practice":120}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "name": "Data you can defend: sources, cleaning, licenses and provenance Log every cleaning choice and show what it changes", "description": "Research studio R4 of Energy Systems, Step by Step: clean a real year of hourly grid data (SPP 2025, EIA-930), log what each cleaning choice changes, check data licenses and write a data note.", "learningResourceType": "Research studio", "educationalLevel": "Advanced", "timeRequired": "PT150M", "inLanguage": "en", "isAccessibleForFree": true, "teaches": ["cleaning log", "time base and daylight saving", "outliers and frozen readings", "gap filling", "data licenses", "provenance"], "license": "https://creativecommons.org/licenses/by/4.0/", "author": {"@type": "Person", "name": "Honglin Li", "url": "https://henryutd2021.github.io/"}, "url": "https://henryutd2021.github.io/learn/r04-data.html", "isPartOf": {"@type": "Course", "name": "Energy Systems, Step by Step", "url": "https://henryutd2021.github.io/learn/"}}</script>
+<script type="application/json" class="lx-lesson-data">{"id":"r04-data","starter":null,"total":14,"code":"R4","title":"Data you can defend: sources, cleaning, licenses and provenance","subtitle":"Log every cleaning choice and show what it changes","short":"Data you can defend","tier":"researcher","tier2":null,"tierLabel":"Researcher · L4","level":"L4","slot":4,"slot2":null,"minutes":30,"does":"Clean SPP's raw 2025 hourly file by choosing a time base, a spike rule, a frozen-reading rule and a fill method; watch four reported numbers move with each choice; sort eight data sources by license; pick coordinate systems for a spatial layer; write the data note.","outcome":"Make and log each cleaning choice on a real hourly dataset, show how much each choice moves the results, check the licenses and write a data note.","icon":"chart","form":"studio","scales":["S0","S1","S2","S3","S4"],"teaches":["cleaning log","time base and daylight saving","outliers and frozen readings","gap filling","data licenses","provenance"],"lab":null,"href":"r04-data.html","ready":true,"after":[{"id":"r03-system-and-method","code":"R3","title":"Which system, which boundary, which method?","short":"System, boundary, method","does":"Place a question on the scale ladder, draw its boundary, pick its time step and horizon, then choose a method family and defend it against two alternatives.","href":"r03-system-and-method.html","ready":true},{"id":"b02-python-data","code":"B2","title":"Python and data for energy: how do you load, plot and check a year of hourly data?","short":"Python and data","does":"In a notebook, load a year of hourly grid data, fix time zones and daylight-saving gaps, plot it, compute capacity factors and a duration curve, and write assert checks that catch bad rows.","href":"b02-python-data.html","ready":true}],"prev":null,"next":{"id":"r05-build-validate","code":"R5","title":"Can you trust your analysis? Verification, validation and reproducibility","short":"Verify, validate, rerun","does":"Find five planted bugs in a one-day battery study (a unit error, a sign flip, a free lunch, a missing rule, a leaked future), each with a named check and a real solver; match a benchmark worked by hand; validate the day-before forecast against measured data and check one input; see why a clean clone fails, rerun it for real in the notebook and write a verification log.","href":"r05-build-validate.html","ready":true},"nextNeeds":[{"id":"k08-git-notebooks","code":"K8","title":"Git and reproducible notebooks","short":"Git and notebooks","does":"In a simulated project, stage and commit changes, read a diff, go back to find the commit that broke a result, try an idea on a branch, and make a notebook rerun cleanly from top to bottom with pinned inputs.","href":"k08-git-notebooks.html","ready":true},{"id":"m01-dispatch-to-lmp","code":"M1","title":"From dispatch to locational prices: the linear program behind the market","short":"Dispatch to locational prices","does":"Build a 24-hour dispatch LP with ramps and read its balance duals as marginal values under stated assumptions; add a three-bus DC power-flow network, congest a line and watch one price split into three.","href":"m01-dispatch-to-lmp.html","ready":true}],"practice":120}</script>
 <div class="lx-head" data-lesson-id="r04-data" data-total="14" data-tier="researcher" data-level="L4" data-minutes="30" data-form="studio" data-next-href="r05-build-validate.html">
 <div>
 <nav class="lx-crumbs" aria-label="Breadcrumb"><ol><li><a href="index.html">Learn</a></li><li aria-current="page">R4</li></ol></nav>
@@ -413,9 +413,9 @@ ul.task-list li input[type="checkbox"] {
 <div class="lx-card lx-studio-brief">
 <p class="lx-eyebrow">The task</p>
 <ol class="lx-studio-task">
-<li><b>Produce:</b> a cleaning log (rule, count, reason and effect for each step), a licence check of every source, and a data note someone else can rerun from.</li>
+<li><b>Produce:</b> a cleaning log (rule, count, reason and effect for each step), a license check of every source, and a data note someone else can rerun from.</li>
 <li><b>From:</b> SPP's hourly file for 2025 (demand, wind, solar; EIA-930 data are public domain, the course's extract is CC BY 4.0), the starter notebook and, in practice, one spatial layer.</li>
-<li><b>Done when:</b> the rubric's bar for R4's part: a complete audit trail, with licences checked and credit stated. The verification log and a validation come in <a href="r05-build-validate.html">R5</a>.</li>
+<li><b>Done when:</b> the rubric's bar for R4's part: a complete audit trail, with licenses checked and credit stated. The verification log and a validation come in <a href="r05-build-validate.html">R5</a>.</li>
 </ol>
 <p class="lx-hint">About 30 minutes guided here, then about 2 hours on your own.</p>
 </div>
@@ -544,7 +544,7 @@ ul.task-list li input[type="checkbox"] {
 </table>
 </div>
 <p>With the course's rules the counts match its data build: demand 699 hours flagged (699 in the build), wind 671 (671), solar 1,377 (1,377).</p>
-<p class="lx-eyebrow">Licences: what each source asks of you</p><div class="lx-scroll-x">
+<p class="lx-eyebrow">Licenses: what each source asks of you</p><div class="lx-scroll-x">
 <table class="lx-facts caption-top table">
 <thead>
 <tr class="header">
@@ -592,21 +592,21 @@ ul.task-list li input[type="checkbox"] {
 <tr class="even">
 <td>A co-op's meter data, shared by a co-author</td>
 <td>Check each item</td>
-<td>Governed by the data agreement, not an open licence: read it before you share anything (R9).</td>
+<td>Governed by the data agreement, not an open license: read it before you share anything (R9).</td>
 </tr>
 </tbody>
 </table>
 </div>
 <p class="lx-eyebrow">A check the rules do not pass</p><ul><li><b>Rule:</b> solar above 5% of its peak in hours starting 00:00 to 03:00 local time fails.</li><li><b>Result:</b> with the course's choices, 65 night hours fail, 49 of them written by the same-hour fill.</li><li><b>Next action:</b> the log reports it as a known limit; a night rule is the next step (B2).</li></ul>
 <p class="lx-eyebrow">A spatial layer</p><p>Your study adds wind-turbine locations from the U.S. Wind Turbine Database for Prairie Town's county (illustrative). The file stores latitude and longitude in degrees (<span class="lx-term" data-term="epsg-code">EPSG:4326</span>).</p><p>The projected options: <span class="lx-term" data-term="utm">UTM</span> zones keep distances close to true locally; <span class="lx-term" data-term="web-mercator">Web Mercator</span> is for showing web maps; <span class="lx-term" data-term="equal-area-projection">equal-area Albers</span> keeps areas true across the contiguous U.S.</p><ul>
-<li>Which coordinate system for 1 km setback buffers (the zone within 1 km of each turbine)? Right: a local projected system in metres, such as the county's <span class="lx-term" data-term="utm">UTM</span> zone, keeps distances close to true.</li>
-<li>And for the area the 1 km buffers cover, in square kilometres? Right: an equal-area system for the contiguous United States keeps areas true.</li>
+<li>Which coordinate system for 1 km setback buffers (the zone within 1 km of each turbine)? Right: a local projected system in meters, such as the county's <span class="lx-term" data-term="utm">UTM</span> zone, keeps distances close to true.</li>
+<li>And for the area the 1 km buffers cover, in square kilometers? Right: an equal-area system for the contiguous United States keeps areas true.</li>
 </ul>
 
-<p class="lx-hint">With JavaScript on, you make each choice yourself, watch the four numbers move, sort the licences and write your own data note; your drafts stay in this browser.</p>
+<p class="lx-hint">With JavaScript on, you make each choice yourself, watch the four numbers move, sort the licenses and write your own data note; your drafts stay in this browser.</p>
 </div>
 </div>
-<p class="lx-datanote"><svg class="lx-ic" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5M12 8v.2"></path></svg><span><b>Data:</b> Southwest Power Pool (balancing authority SWPP), 2025, from EIA's Form EIA-930 six-month files (public domain), downloaded on 2 November 2026.<br><b>Before this page:</b> an EIA-adjusted teaching extract: each fuel's adjusted generation columns summed and negative values set to 0; nothing else repaired.<br><b>On this page:</b> every number is computed from that extract with the rules you choose.<br><b>Illustrative:</b> the county and its turbine layer. Licence terms were checked on the dates in the sources.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5M12 8v.2"></path></svg><span><b>Data:</b> Southwest Power Pool (balancing authority SWPP), 2025, from EIA's Form EIA-930 six-month files (public domain), downloaded on 2 November 2026.<br><b>Before this page:</b> an EIA-adjusted teaching extract: each fuel's adjusted generation columns summed and negative values set to 0; nothing else repaired.<br><b>On this page:</b> every number is computed from that extract with the rules you choose.<br><b>Illustrative:</b> the county and its turbine layer. License terms were checked on the dates in the sources.</span></p>
 </div>
 <div id="exemplars" class="lx-sec">
 <section id="two-answers-to-the-same-task" class="level2 lx-sec-h">
@@ -616,11 +616,11 @@ ul.task-list li input[type="checkbox"] {
 <div class="lx-fallback">
 
 <div class="lx-ex-cols">
-<div class="lx-ex-ans weak"><p class="lx-eyebrow">Weak answer · Developing</p><p class="lx-ex-lines">Data from EIA [1]. We removed outliers [2] and filled missing values [3], and converted times to local time [4]. Annual demand was about 299 TWh [5].</p><ol class="lx-ex-static"><li value="1"><b>Falls short:</b> Which form, area, files, download date and licence? A reader cannot find the same file.</li><li value="2"><b>Falls short:</b> No rule and no count; and removing is not flagging: the hours vanish from every total.</li><li value="3"><b>Falls short:</b> EIA's adjusted file has no blanks: the gaps are the hours you flagged. Which method, and how many hours?</li><li value="4"><b>Falls short:</b> Which zone, and what happened to the 23- and 25-hour days?</li><li value="5"><b>Falls short:</b> Raw or cleaned? Here both round to 299 TWh (299.48 and 298.56), so only a log can say which.</li></ol></div>
+<div class="lx-ex-ans weak"><p class="lx-eyebrow">Weak answer · Developing</p><p class="lx-ex-lines">Data from EIA [1]. We removed outliers [2] and filled missing values [3], and converted times to local time [4]. Annual demand was about 299 TWh [5].</p><ol class="lx-ex-static"><li value="1"><b>Falls short:</b> Which form, area, files, download date and license? A reader cannot find the same file.</li><li value="2"><b>Falls short:</b> No rule and no count; and removing is not flagging: the hours vanish from every total.</li><li value="3"><b>Falls short:</b> EIA's adjusted file has no blanks: the gaps are the hours you flagged. Which method, and how many hours?</li><li value="4"><b>Falls short:</b> Which zone, and what happened to the 23- and 25-hour days?</li><li value="5"><b>Falls short:</b> Raw or cleaned? Here both round to 299 TWh (299.48 and 298.56), so only a log can say which.</li></ol></div>
 <div class="lx-ex-ans good"><p class="lx-eyebrow">Strong answer · Proficient (audit trail)</p><p class="lx-ex-lines"><b>Source:</b> EIA Form EIA-930 six-month BALANCE files, balancing authority SWPP, 2025, accessed 2 November 2026, SHA-256 fac4bb99… and 1146158b… [1].
 <b>Extraction:</b> EIA's adjusted columns; each fuel's columns summed, negative values set to 0 [2]; input file b02-python-data.json, SHA-256 54fb03b9… [3].
-<b>Licence:</b> EIA data public domain, cited with the date; the course's extract CC BY 4.0, credited [4].
-<b>Time:</b> rows kept in UTC, hour ending; results labelled in Central time with daylight saving [5].
+<b>License:</b> EIA data public domain, cited with the date; the course's extract CC BY 4.0, credited [4].
+<b>Time:</b> rows kept in UTC, hour ending; results labeled in Central time with daylight saving [5].
 <b>Spikes:</b> demand under half the median (16,541 MW): 1 hour, 21 June, 1,505 MW [6], flagged as implausible; to check against SPP's records.
 <b>Frozen:</b> runs of 3 or more identical non-zero readings: demand 698 h, wind 671 h, solar 1,377 h [7]; suspected stuck feeds, as in the course's data build.
 <b>Fill:</b> the same UTC hour on valid days within 7, 21 or 45 days, to keep the daily shape.
@@ -642,7 +642,7 @@ ul.task-list li input[type="checkbox"] {
 <tr class="odd">
 <th data-quarto-table-cell-role="th" scope="row">Provenance</th>
 <td>“EIA”</td>
-<td>Form, area, year, access date, checksums, extraction, licence</td>
+<td>Form, area, year, access date, checksums, extraction, license</td>
 </tr>
 <tr class="even">
 <th data-quarto-table-cell-role="th" scope="row">Each step</th>
@@ -668,7 +668,7 @@ ul.task-list li input[type="checkbox"] {
 <dt>Flag, then fill</dt><dd>Never delete silently: flag by a stated rule, then fill or leave out, and log which. A flag is a suspicion until other evidence confirms it.</dd>
 <dt>Check the result</dt><dd>Run a check the rules did not make, such as solar at night, and log what still fails.</dd>
 <dt>Time</dt><dd>Keep the rows as published (UTC, hour ending) and change only the labels.</dd>
-<dt>Licences</dt><dd>Public domain still asks for a citation. Share-alike terms can differ for a database you derive and for a map made from it: check which apply to your output.</dd>
+<dt>Licenses</dt><dd>Public domain still asks for a citation. Share-alike terms can differ for a database you derive and for a map made from it: check which apply to your output.</dd>
 </dl>
 </div>
 </div>
@@ -726,9 +726,9 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 <tr class="even">
 <th data-quarto-table-cell-role="th" scope="row">Integrity<br>
-<span class="lx-hint">Look for: The licence of every source is checked and stated, with the attribution lines it asks for.</span></th>
-<td data-l="Developing">Licences or credit unchecked.</td>
-<td data-l="Proficient">Licences checked, credit and conflicts stated, stakeholders treated fairly.</td>
+<span class="lx-hint">Look for: The license of every source is checked and stated, with the attribution lines it asks for.</span></th>
+<td data-l="Developing">Licenses or credit unchecked.</td>
+<td data-l="Proficient">Licenses checked, credit and conflicts stated, stakeholders treated fairly.</td>
 <td data-l="Strong">Data and code released with documentation where allowed.</td>
 </tr>
 </tbody>
@@ -812,12 +812,12 @@ ul.task-list li input[type="checkbox"] {
 <p class="lx-eyebrow">Sources and further reading</p>
 <ul>
 <li>EIA (2026). <a href="https://www.eia.gov/about/copyrights_reuse.php">Copyrights and reuse</a>: public domain, with an acknowledgment that includes the date (checked 3 November 2026).</li>
-<li>USGS, ACP and LBNL (2026). <a href="https://energy.usgs.gov/uswtdb/">U.S. Wind Turbine Database v9.1, licence and attribution</a> (checked 3 November 2026).</li>
+<li>USGS, ACP and LBNL (2026). <a href="https://energy.usgs.gov/uswtdb/">U.S. Wind Turbine Database v9.1, license and attribution</a> (checked 3 November 2026).</li>
 <li>Ember (2026). <a href="https://ember-energy.org/data/electricity-data-explorer/">Electricity Data Explorer</a>, CC BY 4.0 (checked 2 November 2026).</li>
 <li>NLR (2024). <a href="https://atb.nlr.gov/electricity/2024/data">Annual Technology Baseline 2024, data</a>; the OEDI release is CC BY 4.0 (checked 2 November 2026).</li>
 <li>IEA (2025). <a href="https://www.iea.org/data-and-statistics/data-product/world-energy-outlook-2025-free-dataset">World Energy Outlook 2025 free dataset</a>, CC BY-NC-SA 4.0 IGO (checked 2 November 2026).</li>
 <li>ENTSO-E (2019). <a href="https://www.entsoe.eu/news/2019/02/01/tsos-increase-number-of-open-data-available-through-entso-e-s-transparency-platform/">Open data on the Transparency Platform</a> (1 February 2019).</li>
-<li>OpenStreetMap Foundation. Copyright and licence (ODbL 1.0): credit OpenStreetMap and its contributors. A derived database that you share publicly stays under ODbL; a map or other produced work needs the credit line, and publishing one made from changed data can oblige you to offer those changes (openstreetmap.org/copyright and the ODbL text at opendatacommons.org, checked 3 November 2026).</li>
+<li>OpenStreetMap Foundation. Copyright and license (ODbL 1.0): credit OpenStreetMap and its contributors. A derived database that you share publicly stays under ODbL; a map or other produced work needs the credit line, and publishing one made from changed data can oblige you to offer those changes (openstreetmap.org/copyright and the ODbL text at opendatacommons.org, checked 3 November 2026).</li>
 <li>U.S. EPA (archived 19 January 2021). <a href="https://19january2021snapshot.epa.gov/waterdata/spatial-data-waters_.html">EPSG:5070, Albers equal-area for the contiguous United States</a>; USGS. <a href="https://pubs.usgs.gov/gip/70047422/report.pdf">Map projections</a>: which projections keep areas and which keep distances.</li>
 <li>Wilkinson, M. et al. (2016). <a href="https://doi.org/10.1038/sdata.2016.18">The FAIR Guiding Principles for scientific data management and stewardship</a>. Scientific Data 3, 160018.</li>
 </ul>
@@ -826,7 +826,7 @@ ul.task-list li input[type="checkbox"] {
 </div>
 
 <div class="lx-foot">
-<p class="lx-corrections">Spotted an error, or stuck? Write to <a href="mailto:hlli@ksu.edu?subject=Learn%2C%20Data%20you%20can%20defend:%20sources%2C%20cleaning%2C%20licences%20and%20provenance">hlli@ksu.edu</a>. Corrections are made in place and dated here.</p>
+<p class="lx-corrections">Spotted an error, or stuck? Write to <a href="mailto:hlli@ksu.edu?subject=Learn%2C%20Data%20you%20can%20defend:%20sources%2C%20cleaning%2C%20licenses%20and%20provenance">hlli@ksu.edu</a>. Corrections are made in place and dated here.</p>
 <p class="lx-license">Text licensed <a href="https://creativecommons.org/licenses/by/4.0/" rel="license">CC BY 4.0</a>, code <a href="https://opensource.org/license/mit">MIT</a>: teachers and students may reuse and adapt it, with credit to Honglin Li.</p>
 </div>
 
