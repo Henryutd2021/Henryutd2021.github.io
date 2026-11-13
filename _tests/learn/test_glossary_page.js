@@ -9,7 +9,7 @@ const G = JSON.parse(read("assets/learn/data/glossary.json")), q = read("learn/g
 const decode = s => s.replace(/<[^>]+>/g, "").replace(/&#x27;|&#39;/g, "'").replace(/&quot;/g, '"').replace(/&gt;/g, ">").replace(/&lt;/g, "<").replace(/&amp;/g, "&");
 const E = [...h.matchAll(/<article class="lx-glossary-entry" id="([^"]+)"[^>]*>([\s\S]*?)<\/article>/g)];
 assert.equal(E.length, 679, "all canonical entries readable without JavaScript");
-const ids = [...h.matchAll(/\bid="([^"]+)"/g)].map(m => m[1]);
+const ids = [...h.matchAll(/(?<![\w-])id="([^"]+)"/g)].map(m => m[1]).filter(id => !["quarto-text-highlighting-styles", "quarto-bootstrap"].includes(id));   // Quarto repeats its theme stylesheet ids on every page
 assert.equal(ids.length, new Set(ids).size, "all document anchors are unique");
 const sets = [...h.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map(m => JSON.parse(m[1])).filter(d => d["@type"] === "DefinedTermSet");
 assert.equal(sets.length, 1); const D = sets[0];

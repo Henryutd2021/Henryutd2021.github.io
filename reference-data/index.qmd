@@ -24,7 +24,7 @@ css: ../assets/reference-data.css
 </section>
 <section class="fx-sec" aria-labelledby="cite">
 <div class="fx-head"><h2 id="cite">How to cite</h2></div>
-<p>Cite the compilation, the original source of every numerical input (including its table or page and version), and Henry’s paper when reproducing that paper’s assumptions or model configuration. A numerical correspondence does not establish adoption of the same source.</p>
+<p>Cite the compilation, the original source of every numerical input (including its table or page and version), and the author’s paper when reproducing that paper’s assumptions or model configuration. A numerical correspondence does not establish adoption of the same source.</p>
 <p class="ref-citation">Li, H. (2026). Hydrogen techno-economic parameters and inputs: Reference data handbook. Version 0.1. https://henryutd2021.github.io/reference-data/hydrogen.html. Accessed [date], records [IDs].</p>
 <p>Use the versioned CSV and record IDs to identify the inputs used. The compilation citation credits curation and does not replace original-source citations.</p>
 </section>

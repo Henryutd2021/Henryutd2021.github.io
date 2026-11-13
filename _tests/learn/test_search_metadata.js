@@ -13,6 +13,7 @@ const ld = s => [...s.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<
 const decode = s => s.replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(+n)).replace(/&#x([a-f\d]+);/gi, (_, n) => String.fromCodePoint(parseInt(n, 16)))
   .replace(/&quot;/g, '"').replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
 const norm = s => decode(s.replace(/<[^>]*>/g, "")).replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/\s+/g, " ").trim();
+const sq = x => String(x || "").replace(/[\u2018\u2019]/g, "'").replace(/[\u201c\u201d]/g, '"');   // Quarto renders straight quotes as typographic ones
 const meta = (s, key) => { const m = s.match(new RegExp('<meta (?:name|property)="' + key + '" content="([^"]*)"')); return m && decode(m[1]); };
 assert.equal(R.version, 1);
 const names = Object.keys(R.pages);
@@ -27,9 +28,9 @@ for (const name of names) {
   assert.equal(norm(h.match(/<title>([\s\S]*?)<\/title>/)[1]), norm(entry.pagetitle + " – Honglin Li"), name + ": search title");
   assert.equal(norm(h.match(/<h1[^>]*class="title"[^>]*>([\s\S]*?)<\/h1>/)[1]), norm(fm.title), name + ": visible H1 stays original");
   if (fm.subtitle) assert.equal(norm(h.match(/<p class="subtitle[^\"]*">([\s\S]*?)<\/p>/)[1]), norm(fm.subtitle), name + ": subtitle stays original");
-  assert.equal(meta(h, "description"), entry["description-meta"], name + ": meta description");
-  assert.equal(meta(h, "og:description"), entry["description-meta"], name + ": social description");
-  if (meta(h, "twitter:description")) assert.equal(meta(h, "twitter:description"), entry["description-meta"]);
+    assert.equal(sq(meta(h, "description")), sq(entry["description-meta"]), name + ": meta description");
+  assert.equal(sq(meta(h, "og:description")), sq(entry["description-meta"]), name + ": social description");
+  if (meta(h, "twitter:description")) assert.equal(sq(meta(h, "twitter:description")), sq(entry["description-meta"]), name + ": twitter description");
   assert(!/<meta name="keywords"/.test(h), "no meta keyword lists");
   }
   assert(entry.concepts.length >= 3 && entry.concepts.length <= 6, name + ": curated concept count");
