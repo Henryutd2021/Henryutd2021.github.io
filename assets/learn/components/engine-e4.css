@@ -1,5 +1,5 @@
 /* engine-e4.css — the view pieces of engine E4 (LX.E4.ui: the bench's controls, the nation's map, the mix, CO2 and import
-   charts, tables), shared by SB4, M13 and C4. Colours from --lx-* tokens only; no overflow clipping (chart tips stay
+   charts, tables), shared by SB4, M13 and C4. Colors from --lx-* tokens only; no overflow clipping (chart tips stay
    visible; a wide table scrolls in its own .lx-scroll-x). */
 
 /* ---------- bench extras */

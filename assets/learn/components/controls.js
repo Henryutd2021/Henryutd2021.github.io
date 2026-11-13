@@ -7,6 +7,8 @@
              id, cls (extra class on the control)
    Decimal-safe: values snap to min + k × step and are rounded to the step's decimals, so a 0.1 or 0.05 step never shows
    floating-point noise (0.30000000000000004).
+   A start value or set() value off the grid (or outside min..max) still snaps to the nearest step, and is reported:
+   a console warning naming the slider, and o.onSnap(asked, shown) when given; the reader's own moves always land on it.
    s.set(v[, fire]) (fire: also call onChange) | s.range(lo, hi)  (values outside are clamped, and the hint nudges) |
    s.val() | s.hint(text) (fixed hint; s.hint() repaints from o.hint) | s.disable(true) | s.input | s.el
    Arrow keys move one step (native range input); the − / + buttons have spoken labels. */
@@ -32,7 +34,17 @@
     var plus = H("button", { type: "button", "aria-label": upL, text: "+" }, row);
     var hint = H("p", { class: "lx-ctl-hint" }, w);
     function snap(v) { return +((Math.round((v - min) / step) * step + min).toFixed(dec)); }
+    // a value given by the page (the start value, or set()) that is not on the grid min + k × step, or outside min..max,
+    // is shown as the nearest step: say so (console warning and o.onSnap), so a page never shows one number and uses another
+    // (a value on the grid that set() clamps into the reachable band, range(), is not reported: that is the band's job);
+    // `shown` is the value the slider then holds
+    function offGrid(v, shown, why) {
+      if (typeof v !== "number" || !isFinite(v) || Math.abs(v - clamp(snap(v), min, max)) <= 1e-9 * (1 + Math.abs(v))) return;
+      if (window.console && console.warn) console.warn("LX.Slider \"" + o.label + "\": " + why + " " + v + " is " + (v < min || v > max ? "outside " + min + " to " + max : "off its steps of " + step + " from " + min) + "; it shows " + shown + ".");
+      if (o.onSnap) o.onSnap(v, shown);
+    }
     var lo = min, hi = max, val = o.value == null ? min : clamp(snap(o.value), min, max), fixedHint = null;
+    if (o.value != null) offGrid(o.value, val, "start value");
     function pos(v) { return (13 + ((v - min) / (max - min)) * (tr.clientWidth - 26)) / Math.max(1, tr.clientWidth) * 100; }
     function paint() {
       inp.value = val; out.textContent = fmt(val);
@@ -54,7 +66,7 @@
     paint();
     return {
       el: w, input: inp,
-      set: function (v, fire) { setV(v, !!fire); },
+      set: function (v, fire) { setV(v, !!fire); offGrid(+v, val, "value"); },
       range: function (a, b) { lo = a; hi = b; setV(val, false); },
       val: function () { return val; },
       hint: function (t) { fixedHint = t; paint(); },   // hint() with no text: back to the o.hint function

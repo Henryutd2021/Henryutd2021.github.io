@@ -1,6 +1,6 @@
 /* exemplars.css — LX.Exemplars (exemplars.js): two answers side by side, marked phrases with number badges, the notes
    they open, and the "what made the difference" table. Weak and good are told apart by their heading and level as well
-   as the top edge's colour. */
+   as the top edge's color. */
 .lx-ex { display: grid; gap: 12px; min-width: 0; }
 .lx-ex-lede { font-size: 15.5px; color: var(--lx-ink-2); }
 .lx-ex-task { border: 1px dashed var(--lx-line-2); border-radius: 12px; padding: 10px 14px; display: grid; gap: 4px; }

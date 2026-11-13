@@ -83,6 +83,8 @@ ok(!M.defenceDone(Object.assign({}, plainDef, { why2: " " }), "opt"), "defence c
 const STEP6 = JS.slice(JS.indexOf('{ text: "Name your method and defend it'), JS.indexOf('{ text: "Your design card'));
 const CMP = STEP6.slice(STEP6.indexOf('cmp.addEventListener("click"'), STEP6.indexOf("paint();\n        } },"));
 ok((STEP6.match(/api\.done\(\)/g) || []).length === 1 && /if \(done\) api\.done\(\)/.test(STEP6) && CMP.length > 0 && !/api\.done/.test(CMP), "defence step: api.done() only when the six parts are there, never from 'Compare with an example defence'");
+ok(/if \(done\) api\.done\(\); else api\.undone\(\);/.test(STEP6) && /undone: function \(\) \{ if \(st\.free\) return; unlocked\[k\] = false; nx\.disabled = true; \}/.test(fs.readFileSync(path.join(SITE, "assets/learn/components/cards.js"), "utf8")),
+   "defence step: clearing a part after all six were there shuts Next again (the step cards' api.undone)");
 const H0 = D.briefs.find(b => b.id === "hospital");
 ok(/poor fit/.test(M.compareFeedback(D, H0, "ml")) && !/Both/.test(M.compareFeedback(D, H0, "ml")), "comparison feedback: a poorly fitting family is told so, not that both can be defended");
 ok(/Same family/.test(M.compareFeedback(D, H0, "opt")) && /helps with a part/.test(M.compareFeedback(D, H0, "stat")) && /both fit/.test(M.compareFeedback(D, H0, "sim")), "comparison feedback: same family, a family that helps with a part, and one that fits well");

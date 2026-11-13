@@ -3,9 +3,10 @@
    LX.NumAnswer (numanswer.js). Styles in drill.css.
    LX.Drill(host, { item, hint, title, seed, unit, check, empty, focus, width, widthPhone, cls, choicesClass })
      item(k, r)    the page's item maker: item k (0, 1, 2, ...) drawn with the seeded random source r (r() in [0, 1));
-                   returns { q, why, choices?, answer, unit?, tol? }: with choices, answer is the index of the right one;
-                   without, answer is a number and the reader types it; q is text and may carry [[id|words]] glossary
-                   marks (LX.rich)
+                   returns { q, why, choices?, answer, unit?, tol?, table? }: with choices, answer is the index of the
+                   right one; without, answer is a number and the reader types it; q is text and may carry [[id|words]]
+                   glossary marks (LX.rich); table: { head: [...], rows: [[...]], caption? } is a small table shown
+                   under q (cells are text; the first cell of each row is its header), so q can stay one short question
      hint          one line under the title (the kinds of item and an honest time); may carry [[id|words]] glossary marks
      title         the card's heading (default "Practice drill")
      seed          the seed (default: a new one per visit, (Date.now() % 100000) + 1); the same seed gives the same items
@@ -38,6 +39,15 @@
 
   // ---------------------------------------------------------------- view
   var LX = window.LX;
+  // an item's small table (it.table): head, rows (first cell a row header), optional caption
+  function tableEl(T) {
+    var H = LX.H, sx = H("div", { class: "lx-scroll-x lx-drill-t" }), tb = H("table", { class: "lx-mini-table" }, sx);
+    if (T.caption) H("caption", { class: "lx-hint", text: T.caption }, tb);
+    if (T.head) { var hr = H("tr", null, H("thead", null, tb)); T.head.forEach(function (h) { H("th", { scope: "col", text: String(h) }, hr); }); }
+    var bd = H("tbody", null, tb);
+    (T.rows || []).forEach(function (r) { var tr = H("tr", null, bd); r.forEach(function (c, i) { H(i ? "td" : "th", i ? { text: String(c) } : { scope: "row", text: String(c) }, tr); }); });
+    return sx;
+  }
   LX.Drill = function (host, o) {
     var H = LX.H, seed = o.seed != null ? o.seed : newSeed(), r = rng(seed), k = 0, right = 0, done = 0, cur = null;
     var focusMode = o.focus === undefined ? "question" : o.focus;
@@ -52,6 +62,7 @@
     function show(focus) {
       var it = o.item(k, r); k++; box.innerHTML = ""; cur = it;
       var qp = H("p", { class: "lx-qtext", tabindex: focusMode === "question" ? "-1" : null, html: LX.rich(it.q) }, box);
+      if (it.table) box.appendChild(tableEl(it.table));
       var fb = null, answered = false;
       function mark(ok) {
         if (answered) return; answered = true; done++; if (ok) right++;

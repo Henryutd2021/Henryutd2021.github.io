@@ -4,9 +4,9 @@
    exemplars and the checklist) and data/path.json (to link live lessons and name the rest as upcoming).
    Page: learn/r10-question-studio.qmd (studio form: Task, Exemplars, Self-check, Sources).
    Task (step cards): pick or spin scale, dimension, system element, lever, stakeholder and an optional twist (a "road
-   less travelled" toggle weights the element spin towards smaller keyword clusters, to diversify suggestions only);
+   less traveled" toggle weights the element spin towards smaller keyword clusters, to diversify suggestions only);
    choose a question type and see a draft; write the question on a card (LX.QuestionCard: its checks show which parts are
-   filled in; rigour is judged with the rubric); answer five realism checks (pass, warn or block, each with the lesson that
+   filled in; rigor is judged with the rubric); answer five realism checks (pass, warn or block, each with the lesson that
    helps, and a line for the evidence); get three search strings and run them on a dated OpenAlex snapshot
    (assets/learn/data/r10-question-studio-openalex.json, from its data build step: for each system element, the most-cited
    works whose titles or abstracts match the element's block, metadata only), searched in this page: each string's other
@@ -17,7 +17,7 @@
    Example cards: loading one starts a fresh card with that example's own picks and card fields (an element, stakeholder
    or dimension outside the pickers comes as an example "extra" with its own search terms); realism answers and papers
    start empty, and the previous work is kept, to restore with one button.
-   Rules: the studio makes no originality judgement (no combination is called new, hot or a gap; counts are
+   Rules: the studio makes no originality judgment (no combination is called new, hot or a gap; counts are
    context only); the pickers' lists contain no excluded topic, so no spin or draft can produce one, and data centers
    appear only as a load ("data-center loads" in every draft); a learner may still type any question. The audience is
    filled in only for a prescriptive draft, which names the stakeholder as the one who acts; for the other types the
@@ -172,7 +172,7 @@
   function crowdText(x) {
     return "Keyword cluster “" + x.name + "”: " + fmtInt(x.papers) + " papers, 2016–2026" + (x.rgi != null ? "; RGI " + x.rgi.toFixed(2) : "; too few papers for a growth figure") + ".";
   }
-  // spin weights for the elements: even, or with the road-less-travelled toggle sqrt(median count / count) for elements
+  // spin weights for the elements: even, or with the road-less-traveled toggle sqrt(median count / count) for elements
   // with a cluster (fewer papers, a higher weight) and 1 for elements without one; every weight stays above zero
   function weights(D, roadLess) {
     var els = D.pickers.element, w = {};
@@ -395,7 +395,7 @@
         build: function (act, api) {
           var bar = H("div", { class: "r10-bar" }, act);
           var all = H("button", { class: "lx-btn small", type: "button", text: "Spin all" }, bar);
-          LX.Toggle(H("div", { class: "lx-toggles", role: "group", "aria-label": "Spin settings" }, bar), { label: "Road less travelled", on: !!st.road,
+          LX.Toggle(H("div", { class: "lx-toggles", role: "group", "aria-label": "Spin settings" }, bar), { label: "Road less traveled", on: !!st.road,
             onChange: function (on) { st.road = on; save(); paintCtx(); } });
           var grid = H("div", { class: "r10-picks" }, act), sels = {};
           KEYS.forEach(function (k) {
@@ -432,7 +432,7 @@
               H("span", { text: "From the example: " + st.picks.extra[k].label + ", outside the " + D.pickerLabels[k].toLowerCase() + " list. Pick one to replace it." }, ctx);
             });
             crowd(D, st.picks).forEach(function (x) { H("span", { html: LX.rich(crowdText(x).replace("RGI", "[[relative-growth-index|RGI]]")) }, ctx); });
-            H("span", { class: "lx-hint", text: st.road ? "Road less travelled is on: spins favour elements with fewer papers, to vary the suggestions. It says nothing about which question is better." :
+            H("span", { class: "lx-hint", text: st.road ? "Road less traveled is on: spins favor elements with fewer papers, to vary the suggestions. It says nothing about which question is better." :
               "Counts are context only: few papers is no evidence that a question is new, important or feasible." }, ctx);
           }
           function changed() {
@@ -495,7 +495,7 @@
           var qc = LX.QuestionCard(act, { id: "r10-card", code: "R10", share: true, fix: fix, onChange: status });
           function status(v, c) {
             var q = (v || qc.get()).question, written = /\?\s*$/.test(q) && q.indexOf("[") < 0;
-            if (written) { api.done(); api.saw((c || qc.checks()).pass + " of 8 parts filled in. Rate their rigour against the rubric below, then ask whether the study could really be done."); }
+            if (written) { api.done(); api.saw((c || qc.checks()).pass + " of 8 parts filled in. Rate their rigor against the rubric below, then ask whether the study could really be done."); }
             else api.saw("Replace the brackets [ ] in the draft with your own words, and end with a question mark.", true);
           }
           status(null, null);
@@ -611,7 +611,7 @@
           crowd(D, st.picks).forEach(function (x) { H("span", { html: LX.rich(crowdText(x).replace("RGI", "[[relative-growth-index|RGI]]")) }, ctx); });
           D.crowding.caveats.forEach(function (c) { H("span", { text: c }, ctx); });
           var r2 = LX.lessonRef(P, "R2");
-          api.saw("The studio makes no originality judgement. Read the closest papers yourself; " + (r2.ready ? "R2" : "R2, upcoming,") + " shows how to map them.");
+          api.saw("The studio makes no originality judgment. Read the closest papers yourself; " + (r2.ready ? "R2" : "R2, upcoming,") + " shows how to map them.");
         } },
       { text: "Save your work. Copy the card, the checks, the search strings and your three papers into your notes, or share the card as a link from step 3.",
         free: true,

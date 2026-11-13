@@ -2,7 +2,7 @@
 // Each explainer file calls Explainer.register(slug, init). On load, every <div class="explainer" data-explainer="slug">
 // is handed to init(root, h); the container's static fallback (.ex-fallback) stays visible until init succeeds.
 // Rules: illustrative toy models only, controls act on user input (no autoplay),
-// colours from the CSS tokens in assets/base.css so both themes work, keyboard-operable labelled controls.
+// colors from the CSS tokens in assets/base.css so both themes work, keyboard-operable labeled controls.
 (function () {
   const registry = {};
   const SVGNS = "http://www.w3.org/2000/svg";
@@ -22,7 +22,7 @@
     return node;
   }
 
-  // CSS token -> colour string, e.g. color("accent"), color("t") (the page's theme colour), color("muted")
+  // CSS token -> color string, e.g. color("accent"), color("t") (the page's theme color), color("muted")
   function color(name) {
     const v = getComputedStyle(document.querySelector(".project-page .proj") || document.body).getPropertyValue("--" + name).trim();
     return v || getComputedStyle(document.body).getPropertyValue("--" + name).trim() || "#888";
@@ -50,7 +50,7 @@
     return Number(v).toLocaleString("en-US", { minimumFractionDigits: digits || 0, maximumFractionDigits: digits || 0 });
   }
 
-  // labelled range slider; returns {input, set(value)}; onInput(value) fires on every change
+  // labeled range slider; returns {input, set(value)}; onInput(value) fires on every change
   function slider(parent, o) {
     const id = "ex-s-" + (++uid);
     const wrap = el("div", { class: "ex-control" }, parent);

@@ -1,5 +1,5 @@
 /* frontier.js — LX.Frontier: cost against emissions. The frontier (the cheapest plan at each CO₂ level) as a line with the
-   region below it shaded "out of reach (approximately)", labelled plan dots that can be picked by mouse or keyboard, and an equal-score
+   region below it shaded "out of reach (approximately)", labeled plan dots that can be picked by mouse or keyboard, and an equal-score
    line for a weighted sum (cost + price × CO₂); lessons 12 and 13.
    var fc = LX.Frontier(host, {
      label: "Cost per year against CO₂ per year",   the chart's spoken name

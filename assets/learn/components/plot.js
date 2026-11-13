@@ -16,7 +16,7 @@
 
    spec = {
      x: {min, max, ticks: [[v, "label", anchor]] or function (W) -> ticks, ticksN: ticks under 480 px}
-        (anchor optional: the first tick at min starts there, the last at max ends there, others are centred)
+        (anchor optional: the first tick at min starts there, the last at max ends there, others are centered)
      y: {min, max, ticks: [[v, "label"]] or step: s with fmt(v) -> label (gridlines from min), unit: "MW" (top left),
          zero: true (the gridline at 0 drawn darker)}
      height, heightN (under 480 px; defaults 260 and 220), ml (left margin) or margin: {l, r, t, b} (default 52, 14, 18, 28)
@@ -30,7 +30,7 @@
                (default 2.4; 0 draws only the area), dash, anim (draw on), dots, area (fill opacity down to y = 0),
                step (each point holds for this x width: hourly prices), offset (px down, to show equal lines side by
                side), op, cap ("round" default, or "butt")}]
-     marks:   [{x, y, label, color, kind: "ring" (default: hollow, bold label beside) | "dot" (filled, label centred
+     marks:   [{x, y, label, color, kind: "ring" (default: hollow, bold label beside) | "dot" (filled, label centered
                above), above (ring), pos: "above" | "below" | "bottom" (dot), n: "1" (a numbered disc), vline: true
                (a dashed line down the chart; no dot unless dot: true)}]
      legend:  [{label, color, dash}]
@@ -45,7 +45,7 @@
 
    var c = LX.PlotCard(host, { text: "Text version of the chart", cls: "" });
      a card (.lx-xcard) with c.title (an eyebrow line), c.chips (value chips, aria-live), the chart c.plot (LX.Plot)
-     and its text version c.text. c.chip(label, value, tone) adds a chip; tone "good" | "bad" | "warn" colours the
+     and its text version c.text. c.chip(label, value, tone) adds a chip; tone "good" | "bad" | "warn" colors the
      value; c.clear() empties the chips. Used by lessons 3 and 4. */
 (function () {
   "use strict";
@@ -216,7 +216,7 @@
         wrap.setAttribute("aria-label", (pk && pk.onPick ? "Chart: the left and right arrow keys pick a column" : "Chart: the left and right arrow keys move the readout") + "; the text version lists every value.");
       } else { wrap.removeAttribute("tabindex"); wrap.removeAttribute("role"); wrap.removeAttribute("aria-label"); }
     }
-    // a mark: a hollow ring with a bold label beside it (default), a filled dot with a centred label, or a numbered disc
+    // a mark: a hollow ring with a bold label beside it (default), a filled dot with a centered label, or a numbered disc
     function mark(mk, g) {
       var m = g.m, cx = g.X(mk.x), cy = g.Y(mk.y), kind = mk.n != null ? "num" : (mk.kind || "ring");
       if (mk.vline) S("path", { d: "M" + cx + " " + m.t + "V" + (m.t + g.ih), stroke: "var(--lx-ink-3)", "stroke-dasharray": "4 3", "stroke-width": 1.5 }, svg);

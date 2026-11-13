@@ -136,7 +136,7 @@
       label(axis, M.l, botY0 - 8, "Load (MWh in each hour)", { cls: "ex-strong" });
       label(axis, M.l + pw, H - 4, "hour of day", { anchor: "end" });
 
-      // intensity: a step-like line through the hour centres
+      // intensity: a step-like line through the hour centers
       var pts = m.intensity.map(function (v, t) { return x(t + 0.5).toFixed(1) + "," + ye(v).toFixed(1); }).join(" ");
       h.el("polyline", { points: pts, fill: "none", stroke: ink, "stroke-width": 2, "stroke-linejoin": "round" }, svg);
 
@@ -163,11 +163,10 @@
       if (r === 0) {
         say("With no adjustment allowed, the load profile and its attributed emissions stay as they are.");
       } else {
-        var s = "Letting each hour's load move up to <strong>±" + r + "%</strong> shifts " + h.fmt(m.movedPct, 1) +
-          "% of the day's energy into cleaner hours (" + h.fmt(m.fromIntensity, 0) + " → " + h.fmt(m.toIntensity, 0) +
-          " g/kWh on average). With the same daily total, attributed emissions fall by <strong>" + h.fmt(red, 2) + "%</strong>";
-        s += state.grid === "small" ? ": with a small daily swing in intensity there is little to gain."
-          : ", a modest reduction because only a small share of the load moves.";
+        // two short sentences (the readouts carry the other numbers): what moves, then what it does to emissions
+        var s = "With each hour's load free to move up to <strong>±" + r + "%</strong>, " + h.fmt(m.movedPct, 1) +
+          "% of the day's energy moves to cleaner hours. Attributed emissions fall by <strong>" + h.fmt(red, 2) + "%</strong>";
+        s += state.grid === "small" ? ": a small daily swing leaves little to gain." : ": modest, as only a small share of the load moves.";
         say(s);
       }
       redraw();

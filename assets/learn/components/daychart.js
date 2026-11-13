@@ -1,4 +1,4 @@
-/* daychart.js — LX.DayChart: hourly stacked bars (one colour per plant) with demand as a dashed step line.
+/* daychart.js — LX.DayChart: hourly stacked bars (one color per plant) with demand as a dashed step line.
    const c = LX.DayChart(host, { series: [{key: "nuclear", label: "Nuclear", color: "var(--lx-nuc)"}, ...],
                                  demand: [24 numbers], rows: function () { return [{nuclear: 100, ..., unserved: 0}, ...]; },
                                  yMax: 400, unit: "MW", pending: "not played yet", label: "what the chart shows" });

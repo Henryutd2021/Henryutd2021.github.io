@@ -1,5 +1,5 @@
 /* engine-e2.css — the view pieces of engine E2 (LX.E2.ui: the zone map, the commitment table, the bench's small
-   controls). Colours from --lx-* tokens only; no overflow clipping (chart tips stay visible; a wide table scrolls in its
+   controls). Colors from --lx-* tokens only; no overflow clipping (chart tips stay visible; a wide table scrolls in its
    own .lx-scroll-x). */
 
 /* ---------- bench extras */
@@ -58,7 +58,7 @@
 .e2-unit-notes { margin: .4rem 0 0; padding-left: 1.1rem; display: grid; gap: 2px; }   /* the plants table's formulas, one a line */
 
 /* row labels of the data tables: plain words, not the column headings' small capitals; on phones (base.css shows one
-   block per row with the header hidden) each cell is labelled with its column */
+   block per row with the header hidden) each cell is labeled with its column */
 .lx-facts.e2-lab tbody th, .e2-units tbody th { text-transform: none; letter-spacing: 0; font-size: 14.5px; font-weight: 500; color: var(--lx-ink); }
 @media (max-width: 640px) {
   .lx-facts.e2-lab th[scope="row"], .e2-units th[scope="row"] { display: block; padding: 2px 0; border: 0; }

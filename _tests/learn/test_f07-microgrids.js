@@ -343,10 +343,13 @@ D.sort.cards.forEach(c => ok(c.why.split(" ").length <= 25 && c.text.split(" ").
     toggle("Labs").click();
     ok(!next().disabled && /You keep 650 kW, within the island's 900 kW\./.test(saw()), "shedding the labs fits: Next opens");
     toggle("Hospital").click();
-    ok(/Switch both back on\. The run keeps your last set that fits, 650 kW\./.test(saw()) && /: shed\.$/.test(diagram("Hospital")),
-      "switching the hospital off: the step says the run keeps the last set that fits (650 kW), and the diagram shows the hospital shed: " + saw());
+    ok(/Switch both back on\./.test(saw()) && !/last set/.test(saw()) && /: shed\.$/.test(diagram("Hospital")) && next().disabled,
+      "switching the hospital off: the step asks for it back, the diagram shows the hospital shed, and Next shuts again: " + saw());
+    next().click(); ok(cards.index() === 3, "Next does nothing while the set does not fit");
     toggle("Hospital").click(); toggle("Labs").click();
-    ok(/1,200 kW is more than the island's 900 kW\. Switch off another load\. The run keeps your last set that fits, 650 kW\./.test(saw()), "every load back on: over, and the step names the set the run keeps");
+    ok(/1,200 kW is more than the island's 900 kW\. Switch off another load\./.test(saw()) && next().disabled, "every load back on: over, and Next stays shut");
+    toggle("Labs").click();
+    ok(!next().disabled && /You keep 650 kW/.test(saw()), "shedding the labs again: it fits, Next opens");
     next().click();
     ok(cards.index() === 4 && /connected and supplied\.$/.test(diagram("Hospital")) && /connected and supplied\.$/.test(diagram("Dorms")) && /: shed\.$/.test(diagram("Labs")),
       "step 5 draws the set it runs (hospital, water plant and dorms), not the last toggles");
@@ -354,6 +357,16 @@ D.sort.cards.forEach(c => ok(c.why.split(" ").length <= 25 && c.text.split(" ").
     const chips = card().querySelectorAll(".lx-readout").map(txt);
     ok(chips.indexOf("Loads kept650 kW") >= 0 && chips.indexOf("Full hours before a shortfall20") >= 0, "the July run uses that set: 650 kW, 20 full hours: " + chips.join(" | "));
     ok(/^650 kW gave 20 full hours before falling short\./.test(saw()), "the run's result counts full hours: " + saw().slice(0, 60));
+    // the village (step 7): a design that serves every hour opens Next; a battery cut so it falls short shuts it again
+    cards.go(6);
+    const vs = card().querySelector(".lx-step-act").lxSliders;
+    if (vs) {
+      vs.panels.set(V.panels.max, true); vs.battery.set(V.battery.max, true);
+      ok(!next().disabled && /Every hour served/.test(saw()), "village: the largest design serves every hour and opens Next");
+      vs.battery.set(V.battery.min, true);
+      ok(next().disabled && /Short in|no battery/.test(saw()), "village: cutting the battery so it falls short shuts Next again: " + saw().slice(0, 60));
+      vs.battery.set(V.battery.max, true); ok(!next().disabled, "village: a design that serves again opens Next");
+    } else ok(false, "village: the step's sliders are reachable");
     // every supporting element of the campus steps stays within about 35 words and two sentences (the prediction's own
     // label, "You called it." or "Not quite.", not counted); the village steps' texts are checked from the data above
     [0, 1, 2, 3, 4, 5].forEach(i => { cards.go(i); card().querySelectorAll(".lx-choices-row .lx-choice").slice(0, 1).forEach(b => b.click());

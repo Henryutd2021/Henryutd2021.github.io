@@ -306,7 +306,7 @@ ok(!/\(via [a-z0-9_.-]+\.json/.test(PAGE), "no internal file names in the page's
 ok(!/\bAI\b|artificial intelligence/.test(ALL), "no 'AI'");
 ok(!/projects\/|research\.html|smr-dc/.test(ALL), "no project page and no Research page");
 const hrefs = [...OWN.matchAll(/href="([^"]+)"/g)].map(m => m[1].replace(/&amp;/g, "&")).concat([...RAW.matchAll(/"url": "([^"]+)"/g)].map(m => m[1]).filter(u => u !== "no link"));   // a source cited by name only has "no link"
-const ALLOW = /^https:\/\/([a-z0-9.-]+\.)?(eia\.gov|energy\.gov|lbl\.gov|nlr\.gov|nrel\.gov|bea\.gov|doi\.org|noaa\.gov|epa\.gov|census\.gov|dot\.gov)\//;
+const ALLOW = /^https:\/\/([a-z0-9.-]+\.)?(eia\.gov|energy\.gov|energystar\.gov|lbl\.gov|nlr\.gov|nrel\.gov|bea\.gov|doi\.org|noaa\.gov|epa\.gov|census\.gov|dot\.gov)\//;
 ok(hrefs.every(h => ALLOW.test(h) || /^[0-9a-z-]+\.html(#[a-z-]+)?$/.test(h) || /^#/.test(h)), "links on the allow-list (" + hrefs.filter(h => !(ALLOW.test(h) || /^[0-9a-z-]+\.html(#[a-z-]+)?$/.test(h) || /^#/.test(h))).join(", ") + ")");
 ok((JS.match(/fictional\((act|res)\)/g) || []).length >= 9 && /C\.about\.line/.test(JS) && /caption: C\.about\.line/.test(JS) && /note: C\.about\.line/.test(JS), "the fictional line on every interactive, read from prairie-city.json");
 ok(/Prairie City is fictional; its numbers are illustrative\./.test(PAGE), "the page's data note and fallback carry the fictional line");

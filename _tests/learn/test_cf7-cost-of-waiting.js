@@ -95,6 +95,9 @@ ok(/saves the developer \$25\.6M, while its CO₂ above grid power for the same 
 // the social entry is named against its baseline (grid power for the same energy), never as what switching bridge power on adds
 ok(!/adds \$[0-9.]+M of CO₂|and adds " \+ musd/.test(PAGE + JS) && /its CO₂ above grid power for the same energy is \$8\.1M of damage, for society/.test(T) && /Society's account here counts only bridge power's CO₂ above grid power for the same energy; any CO₂ change from the idle months is left out\./.test(PAGE) && I.assumptions.length === 9,
   "society's entry: CO2 above grid power for the same energy, idle months left out, said in the assumptions");
+{ const row = (I.assumptions || []).find(a => a[0] === "Chance it never arrives");
+  ok(row && /^0\.5 percentage points more for each month of waiting, at most 50%/.test(row[1]) && !/0\.5% more/.test(RAW + PAGE),
+     "the assumptions row says percentage points, as the code adds them (12% after 24 months), not a relative 0.5%"); }
 // a tariff only moves cost; a shorter wait or bridge power changes the costs (bridge power lowers the developer's cost)
 ok(!/Only a shorter wait shrinks the cost/.test(PAGE) && /A shorter wait, or bridge power for part of the load, changes the costs themselves\./.test(PAGE) && br.developer < base.developer, "no claim that only a shorter wait changes the cost");
 // the hours behind bridge power and the per-MW-month measure, worked; the stranding chance in percentage points

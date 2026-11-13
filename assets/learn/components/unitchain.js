@@ -15,7 +15,7 @@
        { d: 158, label: "Factual report", value: "158 days" }, { d: 326, label: "Final report", value: "326 days" }] });
    Marks sit at their day d on one line, scaled to the last mark; labels alternate below (even) and above (odd) the line.
    anchor: "start" | "middle" | "end" (default: the first mark "start", the last "end", others "middle"); dx shifts the
-   text; warn: true draws the dot in the warning colour (a claim that came before the evidence).
+   text; warn: true draws the dot in the warning color (a claim that came before the evidence).
    textLabel: the summary of the text version (default "Text version of the timeline"); textalt: false leaves it out.
    Returns { el }. The SVG has role="img" and the label; the text version lists every mark. */
 (function () {

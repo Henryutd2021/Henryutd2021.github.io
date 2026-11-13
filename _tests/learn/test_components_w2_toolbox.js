@@ -183,6 +183,15 @@ function drillEnv(opts) {
   const sc = t.d.score(); ok(sc.right === 1 && sc.done === 3, "Drill view: score()");
   t.next().click(); ok(t.q().textContent === ref[3].q, "Drill view: the items follow series(item, seed)");
 }
+{   // an item's small table: under the question, before the answer buttons, a header row and a row header per row
+  const t = drillEnv({ item: () => ({ q: "Which is bigger?", table: { head: ["Sample", "Hours"], rows: [["Sample 1", "20"], ["Sample 2", "1,000"]] }, choices: ["1", "2"], answer: 1, why: "More hours." }) });
+  const kids = t.host.querySelector(".lx-drill-q").children, tb = t.host.querySelector(".lx-drill-q table");
+  ok(kids.length === 4 && kids[0] === t.q() && kids[1].classList.contains("lx-drill-t") && kids[1].classList.contains("lx-scroll-x") && kids[2].classList.contains("lx-qbtns") && tb && tb.classList.contains("lx-mini-table"),
+     "Drill view: an item's table sits under its question, in a scroll box, before the answers");
+  ok(tb.querySelectorAll("thead th").map(x => x.textContent).join("|") === "Sample|Hours" && tb.querySelectorAll("tbody th").map(x => x.textContent + ":" + x.getAttribute("scope")).join("|") === "Sample 1:row|Sample 2:row" &&
+     tb.querySelectorAll("tbody td").map(x => x.textContent).join("|") === "20|1,000", "Drill view: the table's header row, row headers and cells");
+  const p = drillEnv(); ok(!p.host.querySelector(".lx-drill-q table"), "Drill view: no table unless the item gives one");
+}
 {
   const t = drillEnv({ empty: "Type a number first.", unit: it => it.unit === "$" ? "dollars" : "checks", width: "8em" });
   t.next().click(); t.next().click();

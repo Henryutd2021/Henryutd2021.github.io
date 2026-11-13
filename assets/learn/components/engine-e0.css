@@ -1,5 +1,5 @@
 /* engine-e0.css — the page kit of engine E0 (engine-e0.js, LX.E0.ui): the Site Bench's choice rows, presets, results
-   tiles, the 52-week strip, the week navigation and the extra cards a capstone adds (sensitivity). Colours from --lx-*
+   tiles, the 52-week strip, the week navigation and the extra cards a capstone adds (sensitivity). Colors from --lx-*
    tokens only; no overflow clipping, so chart tips stay visible. */
 .e0-choice { display: grid; gap: 6px; }
 .e0-choice-l { font-family: var(--lx-f-display); font-size: 14px; font-weight: 500; color: var(--lx-ink); }

@@ -349,6 +349,17 @@ ok(/<td>Site<\/td><td class="n">Prairie Town home<\/td><td>one of: Prairie Town 
   ok(!/<script|<img/.test(XS) && XS.indexOf("&lt;img onerror=&quot;x&quot;&gt;") > 0, "preview HTML escapes the reader's words and the page's text");
   const OL = RN.outlineHTML(FIELDS);
   ok(/^<ol class="lx-rn-outline"><li><b>Title and plan link:<\/b>/.test(OL) && OL.indexOf("<b>Recommendation:</b>") < OL.indexOf("<b>The plan:</b>") && OL.indexOf("<b>What the site cannot do alone:</b>") > OL.indexOf("<b>Sensitivity:</b>"), "outline for no-JS readers, in the note's order");
+  // the appendix option: the reader's writing first, the run's evidence after it under its own heading
+  { const AX = "Appendix: evidence from the run", o = { date: "x", code: "C4", appendix: AX };
+    const AT = RN.compose(NOTE, WORDS, FIELDS, o), AM = RN.compose(NOTE, WORDS, FIELDS, Object.assign({ format: "md" }, o)), AH = RN.html(NOTE, WORDS, FIELDS, o), AO = RN.outlineHTML(FIELDS, { appendix: AX });
+    const at = k => AT.indexOf(k);
+    ok(at("WHAT THE SITE CANNOT DO ALONE") > 0 && at("WHAT THE SITE CANNOT DO ALONE") < at("----\nAPPENDIX: EVIDENCE FROM THE RUN") && at("APPENDIX: EVIDENCE FROM THE RUN") < at("THE PLAN") && at("THE PLAN") < at("ASSUMPTIONS") && at("SENSITIVITY") < at("LIMITS OF THIS ANALYSIS"),
+       "appendix (text): every field of the reader's first, then a ruled heading, then the plan, results, assumptions, sensitivity and limits");
+    ok(/\n## Appendix: evidence from the run\n/.test(AM) && AM.indexOf("### What the site cannot do alone") < AM.indexOf("## Appendix") && AM.indexOf("## Appendix") < AM.indexOf("### The plan"), "appendix (Markdown): a level-2 heading between the writing and the evidence");
+    ok(/<h4 class="lx-rn-appx">Appendix: evidence from the run<\/h4>/.test(AH) && AH.indexOf("lx-rn-appx") < AH.indexOf("<h5>The plan</h5>"), "appendix (preview): its own heading before the evidence");
+    ok((AO.match(/<ol class="lx-rn-outline">/g) || []).length === 2 && AO.indexOf("<b>What the site cannot do alone:</b>") < AO.indexOf("Appendix: evidence from the run") && AO.indexOf("Appendix") < AO.indexOf("<b>The plan:</b>"), "appendix (outline): two lists, the writing's then the evidence's");
+    ok(RN.compose(NOTE, WORDS, FIELDS, { format: "text", date: "2026-11-03", code: "C0", appendix: null }) === T && RN.html(NOTE, WORDS, FIELDS, { date: "2026-11-03", code: "C0", appendix: "" }) === HT &&
+       RN.outlineHTML(FIELDS, {}) === OL, "no appendix option: the note, the preview and the outline exactly as before"); }
   // no claim of saving or sending: in the note, the messages and every string literal of the three components
   [T, M, W1, W2].forEach((t, i) => ok(!RN.CLAIMS.test(t), "the note claims no saving or sending (" + i + ")"));
   ["sharestate", "benchrun", "reportnote"].forEach(f => {

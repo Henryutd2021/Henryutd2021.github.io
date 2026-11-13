@@ -1,4 +1,4 @@
-/* scatter.js — LX.Scatter: a dot chart of two measures, one labelled dot per item, every dot a button, with an optional
+/* scatter.js — LX.Scatter: a dot chart of two measures, one labeled dot per item, every dot a button, with an optional
    dashed y = x line and a text version. First used by lesson 6 (06-three-jobs.js:
    capacity factor across, firm share up).
 
@@ -19,7 +19,7 @@
   // ---------------------------------------------------------------- pure helpers (Node tests: _tests/learn/test_components_a.js)
   // the drawing's size for a column width cw (phones: real width, so text is not scaled down)
   function size(cw) { var phone = cw < 520; return { phone: phone, W: phone ? Math.max(300, cw) : 560, H: phone ? 300 : 330 }; }
-  // where a dot's label goes: right if it fits, else left, else centred above (kept inside [left, right])
+  // where a dot's label goes: right if it fits, else left, else centered above (kept inside [left, right])
   function labelPos(px, py, text, left, right) {
     var tw = text.length * 7.4;
     if (px + 16 + tw <= right) return { x: px + 16, y: py + 5, anchor: "start" };

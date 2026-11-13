@@ -6,3 +6,4 @@
 .lx-drill-q { display: grid; gap: 10px; }
 .lx-drill-q .lx-qtext { overflow-wrap: anywhere; }
 .lx-drill-q .lx-qtext:focus { outline: none; }
+.lx-drill-t { justify-self: start; max-width: 100%; }

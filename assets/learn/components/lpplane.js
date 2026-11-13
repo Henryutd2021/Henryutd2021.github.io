@@ -14,28 +14,33 @@
      segment(a, b, view)    the part of the line a·p = b inside the view: [[x, y], [x, y]], left (then lower) end first; or null
      verticesOf(poly)       the polygon's corners rounded to one decimal
      bigBox(view)           the view grown by 20 view-widths on every side
-     optimum(m, view)       m = {sense: "min" | "max", c: [c1, c2], rows: [rules]}: the best corner, searched inside bigBox(view),
-                            so it works for any rules a learner writes, with or without a corner (B1's builder). A best plan on
-                            the far box edge means unbounded. -> {status: "optimal", x: [x, y], ties: [[x, y], ...], value}
-                            (rounded to 1e-6) | {status: "infeasible"} | {status: "unbounded"}
+     optimum(m[, view])     m = {sense: "min" | "max", c: [c1, c2], rows: [rules]}: the best plan, decided exactly for any rules a
+                            learner writes, with or without a corner (B1's builder); no drawing box is used, so a best plan on
+                            an open edge is not called unbounded and one far outside the view is still found (the view is
+                            accepted and ignored). -> {status: "optimal", x: [x, y], ties: [the best corners], value, tied
+                            (other plans tie with x: an edge, a ray or, with no corner, a whole line)} (rounded to 1e-6) |
+                            {status: "infeasible"} | {status: "unbounded"}
+     feasible(rows)         whether any plan passes every rule, decided exactly (no box)
      halfplanes(rows)       every rule as {id, a, b} with a·p <= b
      corners(rows)          the exact corners (pairwise line crossings that pass every rule), in order around the region:
                             [{x, y, on: [ids of the rules whose line runs through it]}]
-     rays(rows)             the directions (unit vectors) along which the region goes on for ever
+     rays(rows[, c])        the directions (unit vectors) along which the region goes on for ever: the axes, both ways along
+                            each rule's line and, given the goal c in min form, straight against it (-c); enough to tell
+                            whether the goal improves for ever
      solve(m)               the exact outcome, by vertex enumeration and the region's rays: {status: "optimal" (one best
                             corner) | "tied" (a whole edge, or a ray, of equally good plans) | "infeasible" (no plan passes) |
                             "unbounded" (the goal improves for ever along a ray), corners, best (the best corners), x, y (the
                             first best corner), value (c·p there), ray (the unbounded or tied direction, else null),
                             binding: {id: true when that rule's line runs through the best corner}}. A region that is not
                             empty must have a corner (always true with x >= 0 and y >= 0); otherwise use optimum().
-     simplexWalk(m)         the simplex method, drawn: start at the worst corner, step to the better neighbouring corner along
+     simplexWalk(m)         the simplex method, drawn: start at the worst corner, step to the better neighboring corner along
                             an edge while one is better: [{x, y, value, on, along (the id of the rule whose edge was walked)}]
 
    LX.LPPlane(host, o) -> plane
      o.view                 the data box
      o.xLabel, o.yLabel     axis titles
      o.fluid                false (default): a 440 × 380 drawing that scales with its box, at most 520 px wide (B1, K4); grid
-                            lines at o.ticks (with more than six, every other x value is labelled), centred axis titles.
+                            lines at o.ticks (with more than six, every other x value is labeled), centered axis titles.
                             true: drawn at the box's own width (taller on phones), redrawn on resize, grid lines every
                             o.grid units (default 40), titles at the axis ends (lessons 10 and 11).
      o.aria                 the drawing's spoken label when there is no o.describe
@@ -62,7 +67,7 @@
      plane.focusDot()                focus the dot at the next render
    Keyboard: the plan dot is a focusable slider (arrow keys). Rule lines and the cost line are dragged by pointer; each lesson
    also gives a slider for the same number. Text version: o.describe (render), or the lesson's own list (primitives).
-   Colours from --lx-* tokens only, so day and night need no redraw. */
+   Colors from --lx-* tokens only, so day and night need no redraw. */
 (function () {
   "use strict";
 
@@ -119,23 +124,6 @@
   function bigBox(view) { var v = box(view), sx = v[1] - v[0], sy = v[3] - v[2]; return [v[0] - 20 * sx, v[1] + 20 * sx, v[2] - 20 * sy, v[3] + 20 * sy]; }
   function r6(v) { return Math.round(v * 1e6) / 1e6 + 0; }
 
-  // the best corner of max/min c·p, searched inside the big box (any rules, also without a corner)
-  function optimum(m, view) {
-    var big = bigBox(view), P = region(m.rows, big);
-    if (!P.length) return { status: "infeasible" };
-    var sg = m.sense === "max" ? -1 : 1, best = Infinity, arg = [], scale = 1;
-    P.forEach(function (p) { scale = Math.max(scale, Math.abs(m.c[0] * p[0]) + Math.abs(m.c[1] * p[1])); });
-    P.forEach(function (p) {
-      var v = sg * (m.c[0] * p[0] + m.c[1] * p[1]), e = 1e-9 * scale;
-      if (v < best - e) { best = v; arg = [p]; } else if (Math.abs(v - best) <= e) arg.push(p);
-    });
-    var span = Math.max(big[1] - big[0], big[3] - big[2]) * 1e-9;
-    var far = arg.some(function (p) { return p[0] <= big[0] + span || p[0] >= big[1] - span || p[1] <= big[2] + span || p[1] >= big[3] - span; });
-    if (far) return { status: "unbounded" };
-    var x = arg.map(function (p) { return [r6(p[0]), r6(p[1])]; });
-    return { status: "optimal", x: x[0], ties: x, value: r6(sg * best) };
-  }
-
   // ---- exact: corners, rays and the four outcomes
   var EPS = 1e-7;
   function halfplanes(rows) {
@@ -143,6 +131,13 @@
     rows.forEach(function (r, i) { le(r).forEach(function (h) { hs.push({ id: idOf(r, i), a: h.a, b: h.b }); }); });
     return hs;
   }
+  // the half-planes with unit normals (a rule with no decision in it keeps a = [0, 0]): the corners, rays and
+  // feasibility below then give the same answer however a rule is scaled (x >= 1 and 0.0000001x >= 0.0000001 alike)
+  function units(rows) {
+    return halfplanes(rows).map(function (h) { var n = Math.hypot(h.a[0], h.a[1]); return n > 0 ? { id: h.id, a: [h.a[0] / n + 0, h.a[1] / n + 0], b: h.b / n + 0 } : h; });
+  }
+  // a goal as a unit vector (null for a zero goal), for direction tests that do not depend on the goal's scale
+  function unit(c) { var n = Math.hypot(c[0], c[1]); return n > 0 ? [c[0] / n, c[1] / n] : null; }
   function inside(hs, v) { return hs.every(function (h) { return dot(h.a, v) <= h.b + EPS * (1 + Math.abs(h.b)); }); }
   function active(hs, v) {
     var on = [];
@@ -150,11 +145,12 @@
     return on;
   }
   function corners(rows) {
-    var hs = halfplanes(rows), vs = [];
+    var raw = halfplanes(rows), hs = units(rows), vs = [];   // decisions on the unit half-planes; crossings from the rules as written (no rounding noise)
     for (var i = 0; i < hs.length; i++) for (var j = i + 1; j < hs.length; j++) {
-      var a = hs[i].a, b = hs[j].a, det = a[0] * b[1] - a[1] * b[0];
-      if (Math.abs(det) < 1e-12) continue;
-      var v = [(hs[i].b * b[1] - a[1] * hs[j].b) / det, (a[0] * hs[j].b - hs[i].b * b[0]) / det];
+      var ua = hs[i].a, ub = hs[j].a;
+      if (Math.abs(ua[0] * ub[1] - ua[1] * ub[0]) < 1e-12) continue;
+      var a = raw[i].a, b = raw[j].a, det = a[0] * b[1] - a[1] * b[0];
+      var v = [(raw[i].b * b[1] - a[1] * raw[j].b) / det, (a[0] * raw[j].b - raw[i].b * b[0]) / det];
       if (!inside(hs, v)) continue;
       if (vs.some(function (u) { return Math.abs(u[0] - v[0]) < 1e-6 && Math.abs(u[1] - v[1]) < 1e-6; })) continue;
       vs.push(v);
@@ -165,21 +161,78 @@
     }
     return vs.map(function (v) { return { x: v[0], y: v[1], on: active(hs, v) }; });
   }
-  function rays(rows) {
-    var hs = halfplanes(rows), cand = [[1, 0], [0, 1]];
-    hs.forEach(function (h) { var n = Math.hypot(h.a[0], h.a[1]); if (n > 0) cand.push([h.a[1] / n, -h.a[0] / n], [-h.a[1] / n, h.a[0] / n]); });
-    return cand.filter(function (r) { return hs.every(function (h) { return dot(h.a, r) <= 1e-12; }); });
+  // The directions along which the region goes on for ever: the directions r with a·r <= 0 for every rule. Tried: the
+  // axes, both ways along every rule's line, and, when the goal c (in min form) is given, straight against it (-c). A
+  // region that runs on for ever in a direction that improves the goal always does so along one of these: along an
+  // edge of the region's cone of directions, or straight against the goal when that cone is a half-plane or the whole
+  // plane (minimize x with only x <= 1).
+  function rays(rows, c) {
+    var hs = units(rows), cand = [[1, 0], [0, 1], [-1, 0], [0, -1]], cu = c ? unit(c) : null;
+    hs.forEach(function (h) { if (h.a[0] || h.a[1]) cand.push([h.a[1], -h.a[0] + 0], [-h.a[1] + 0, h.a[0]]); });
+    if (cu) cand.push([-cu[0] + 0, -cu[1] + 0]);
+    var out = [];
+    cand.forEach(function (r) {
+      if (!hs.every(function (h) { return dot(h.a, r) <= 1e-12; })) return;
+      if (!out.some(function (q) { return Math.abs(q[0] - r[0]) < 1e-12 && Math.abs(q[1] - r[1]) < 1e-12; })) out.push(r);
+    });
+    return out;
+  }
+  // whether any plan passes the rules, decided exactly, with no drawing box (x >= 10000 lies far outside any drawing).
+  // Rules whose lines are not all parallel: a region that is not empty has a corner. Rules that are all parallel (or
+  // none): one number n·p must fit between their lower and upper limits. A rule with no decision in it (0 <= -1) is
+  // simply true or false.
+  function feasible(rows) {
+    var hs = [], never = false;
+    units(rows || []).forEach(function (h) { if (h.a[0] || h.a[1]) hs.push(h); else if (h.b < -1e-9) never = true; });
+    if (never) return false;
+    if (!hs.length) return true;
+    var n = hs[0].a;
+    if (hs.some(function (h) { return Math.abs(n[0] * h.a[1] - n[1] * h.a[0]) >= 1e-12; })) return corners(rows).length > 0;   // as corners() tells parallel lines
+    var lim = parallelLimits(hs, n);
+    return lim.lo <= lim.hi + EPS * (1 + Math.abs(lim.hi));
+  }
+  // unit half-planes all parallel to the unit normal n: the range [lo, hi] of n·p they allow
+  function parallelLimits(hs, n) {
+    var lo = -Infinity, hi = Infinity;
+    hs.forEach(function (h) { var k = h.a[0] * n[0] + h.a[1] * n[1]; if (k > 0) hi = Math.min(hi, h.b / k); else if (k < 0) lo = Math.max(lo, h.b / k); });
+    return { lo: lo, hi: hi };
+  }
+  // the best plan of max/min c·p for any rules, decided exactly (B1's builder: rules a learner writes, with or without a
+  // corner). Unbounded only when a direction the region runs along for ever improves the goal (rays(rows, c)), so an
+  // open region with a finite best (minimize x with x, y >= 0) is not called unbounded, and a best plan far outside the
+  // drawing is still found. The view is not needed (older callers pass one).
+  function optimum(m) {
+    var rows = m.rows || [], sg = m.sense === "max" ? -1 : 1, c = [sg * m.c[0], sg * m.c[1]], cu = unit(c);
+    if (!feasible(rows)) return { status: "infeasible" };
+    var rs = rays(rows, c);   // directions tested with the unit goal: a tiny but nonzero goal still counts
+    if (cu && rs.some(function (r) { return dot(cu, r) < -1e-9; })) return { status: "unbounded" };
+    var flat = !cu || rs.some(function (r) { return Math.abs(dot(cu, r)) <= 1e-9; }), vs = corners(rows);
+    if (vs.length) {
+      var u = cu || [0, 0], cost = function (v) { return u[0] * v.x + u[1] * v.y; }, span = 1;
+      vs.forEach(function (v) { span = Math.max(span, Math.abs(v.x), Math.abs(v.y)); });
+      var lo = Math.min.apply(null, vs.map(cost)), tol = 1e-9 * span;
+      var best = vs.filter(function (v) { return cost(v) <= lo + tol; }), x = best.map(function (v) { return [r6(v.x), r6(v.y)]; });
+      return { status: "optimal", x: x[0], ties: x, value: r6(m.c[0] * best[0].x + m.c[1] * best[0].y), tied: x.length > 1 || flat };
+    }
+    // no corner, yet bounded: the rules are all parallel to a unit normal n and the goal points along n (or is zero),
+    // so a whole line of plans ties for best; x is its plan nearest the origin
+    var hs = units(rows).filter(function (h) { return h.a[0] || h.a[1]; });
+    var n = hs.length ? hs[0].a : (cu || [1, 0]), lim = parallelLimits(hs, n);
+    var k = cu ? cu[0] * n[0] + cu[1] * n[1] : 0, t = k > 1e-9 ? lim.lo : k < -1e-9 ? lim.hi : Math.max(lim.lo, Math.min(lim.hi, 0));
+    if (!isFinite(t)) return { status: "unbounded" };   // cannot happen after the ray test; kept so no plan is ever non-finite
+    var p = [r6(t * n[0]), r6(t * n[1])];
+    return { status: "optimal", x: p, ties: [p], value: r6(sg * (c[0] * p[0] + c[1] * p[1])), tied: true };
   }
   function solve(m) {
     var sg = m.sense === "max" ? -1 : 1, c = [sg * m.c[0], sg * m.c[1]], vs = corners(m.rows);
     var res = { status: "infeasible", corners: vs, best: [], x: null, y: null, value: null, ray: null, binding: {} };
     if (!vs.length) return res;
-    var rs = rays(m.rows), down = rs.filter(function (r) { return dot(c, r) < -1e-9; });
+    var cu = unit(c) || [0, 0], rs = rays(m.rows, c), down = rs.filter(function (r) { return dot(cu, r) < -1e-9; });
     if (down.length) { res.status = "unbounded"; res.ray = down[0]; return res; }
     var cost = function (v) { return c[0] * v.x + c[1] * v.y; };
     var lo = Math.min.apply(null, vs.map(cost)), tol = 1e-7 * (1 + Math.abs(lo));
     res.best = vs.filter(function (v) { return cost(v) <= lo + tol; });
-    var flat = rs.filter(function (r) { return Math.abs(dot(c, r)) <= 1e-9; });
+    var flat = rs.filter(function (r) { return Math.abs(dot(cu, r)) <= 1e-9; });
     res.status = res.best.length > 1 || flat.length ? "tied" : "optimal";
     if (flat.length) res.ray = flat[0];
     var b = res.best[0];
@@ -204,7 +257,7 @@
   }
 
   var lp2 = { box: box, le: le, lhs: lhs, holds: holds, clip: clip, region: region, segment: segment, verticesOf: verticesOf, bigBox: bigBox,
-              optimum: optimum, halfplanes: halfplanes, corners: corners, rays: rays, solve: solve, simplexWalk: simplexWalk };
+              optimum: optimum, feasible: feasible, halfplanes: halfplanes, corners: corners, rays: rays, solve: solve, simplexWalk: simplexWalk };
   if (typeof module !== "undefined" && module.exports) module.exports = lp2;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -270,7 +323,7 @@
     }
     function path(P) { return P.length ? "M" + P.map(function (p) { return sx(p[0]).toFixed(1) + " " + sy(p[1]).toFixed(1); }).join(" L") + " Z" : ""; }
     function clear() { [gOut, gReg, gRule, gIso, gPt].forEach(function (g) { g.innerHTML = ""; }); }
-    function bg(par, at, text) {   // a label with a halo in the surface colour, so it reads over lines
+    function bg(par, at, text) {   // a label with a halo in the surface color, so it reads over lines
       var a = {}; for (var k in at) a[k] = at[k];
       a.class = at.class + " bg"; S("text", a, par).textContent = text;
       S("text", at, par).textContent = text;
@@ -386,7 +439,7 @@
         var label = W < 480 && stl.short ? stl.short : stl.label || "";
         if (anchor === "start" && W - m.r - lx < label.length * 7) { anchor = "end"; lx -= 12; }
         if (anchor === "end" && lx - m.l < label.length * 7) { anchor = "start"; lx = m.l + 4; }
-        // the label in its line's colour taken toward the ink (darker by day, lighter by night): 4.5:1 on the surface
+        // the label in its line's color taken toward the ink (darker by day, lighter by night): 4.5:1 on the surface
         S("text", { x: lx, y: ly, "text-anchor": anchor, class: "lbl", fill: "color-mix(in srgb, " + stl.color + " 70%, var(--lx-ink))", "paint-order": "stroke", stroke: "var(--lx-surface)", "stroke-width": 4, "stroke-linejoin": "round" }, gRule).textContent = label;
         if (o.onDrag && stl.drag) hit(r.a, r.b, id, { tabindex: "-1" }, gRule);
       });

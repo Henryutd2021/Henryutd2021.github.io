@@ -37,6 +37,33 @@ const code = s => s.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:"'])\/\/.*$/
   const head = bundleJS.split("\n")[0];
   ok(/engine-e1, ledger, solvestep, sankey(, engine-e2)?(, adequacy, gp, plainsplan, scenario)?(, lifebox, siting, whopays)?(, engine-e3)?(, engine-e4)?\)/.test(head), "bundle order: ledger, solvestep and sankey after engines E0 and E1 (engine-e2, the next shared components, engine E3 and engine E4 may follow) (" + head.slice(-60) + ")");
 
+  // ---------------------------------------------------------------- card sort: glossary marks
+  {
+    const E = env(); load("cardsort", E);
+    const host = E.LX.H("div", null, E.body);
+    const cs = E.LX.CardSort(host, { bins: [{ id: "a", label: "[[firm-capacity|Firm]] power", color: "x" }, { id: "b", label: "Energy", color: "y" }],
+      cards: [{ id: "c1", text: "A [[peaker|peaker]] plant", bin: "a", why: "It is [[firm-capacity|firm]]." }, { id: "c2", text: "Wind & sun", bin: "b", why: "Plain." }] });
+    const cards = host.querySelectorAll("button.lx-cs-card"), terms = host.querySelector(".lx-cs-terms");
+    ok(cards[0].textContent === "A peaker plant" && !/\[\[/.test(cards[0].getAttribute("aria-label")) && host.querySelector(".lx-cs-binbtn b").textContent === "Firm power",
+       "cardsort: a card's and a bin's marks show their words plain inside the buttons");
+    ok(terms && /data-term="peaker"/.test(terms.innerHTML) && /data-term="firm-capacity"/.test(terms.innerHTML) && (terms.innerHTML.match(/data-term=/g) || []).length === 2,
+       "cardsort: the marked terms are listed once under the hint, as glossary buttons");
+    cs.place({ c1: "b", c2: "b" }); cs.check();
+    ok(/<b>A <span class="lx-term" data-term="peaker">peaker<\/span> plant<\/b>/.test(host.querySelector(".lx-cs-why li").innerHTML), "cardsort: the reasons show the card's marks in place");
+    const plainHost = E.LX.H("div", null, E.body); E.LX.CardSort(plainHost, { bins: [{ id: "a", label: "A", color: "x" }], cards: [{ id: "c", text: "No marks", bin: "a", why: "." }] });
+    ok(!plainHost.querySelector(".lx-cs-terms"), "cardsort: no marks, no terms line");
+  }
+
+  // ---------------------------------------------------------------- LX.Slider: values off its steps are reported
+  {
+    const E = env(); load("controls", E); const seen = [];
+    const sl = E.LX.Slider(E.LX.H("div", null, E.body), { label: "Test", min: 0, max: 100, step: 5, value: 12, onSnap: (a, b) => seen.push(a + "->" + b) });
+    ok(sl.val() === 10 && seen.join() === "12->10", "slider: a start value off its steps snaps and is reported (12 -> 10)");
+    sl.range(20, 40); sl.set(60); ok(sl.val() === 40 && seen.length === 1, "slider: a value on its steps clamped into the reachable band is not reported");
+    sl.set(58); ok(sl.val() === 40 && seen[1] === "58->40", "slider: an off-step value reports the value the slider holds (" + seen[1] + ")");
+    sl.set(125); ok(seen[2] === "125->40", "slider: a value outside min..max is reported");
+  }
+
   // ---------------------------------------------------------------- LX.Ledger
   {
     const E = env(); load("ledger", E);
@@ -58,6 +85,13 @@ const code = s => s.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:"'])\/\/.*$/
     ok(rows[1].querySelector("th").textContent === "<b>Mill</b>" && !rows[1].querySelector("th b") && rows[1].querySelectorAll("td")[0].getAttribute("data-l") === "Own label",
        "ledger: text stays text; a cell can carry its own label");
     ok(rows[2].getAttribute("class") === "tot" && !rows[0].getAttribute("class"), "ledger: the total row");
+    // glossary marks: a marked text goes through LX.rich (a term button in place); its phone label shows the words plain
+    const t3 = E.LX.Ledger(E.LX.H("div", null, E.body), { columns: ["Party", "[[present-value|Present value]]"], caption: "Values in [[present-value|present value]].",
+      rows: [{ head: "The [[margin|margin]] lost", cells: ["$1M & more"] }, { head: "Plain", sub: "a & b", cells: ["[[margin|Margin]] kept"] }] });
+    const r3 = t3.querySelectorAll("tbody tr"), c3 = r3[0].querySelector("td"), h3 = r3[0].querySelector("th");
+    ok(/data-term="margin"/.test(h3.innerHTML) && /data-term="present-value"/.test(t3.querySelector("caption").innerHTML) && /data-term="present-value"/.test(t3.querySelectorAll("thead th")[1].innerHTML) &&
+       c3.getAttribute("data-l") === "Present value" && c3.textContent === "$1M & more" && r3[1].querySelector("th small").textContent === "a & b" && /data-term="margin"/.test(r3[1].querySelector("td").innerHTML),
+       "ledger: glossary marks in a row head, the caption and a column; the phone label plain; unmarked text stays text");
     const t2 = E.LX.Ledger(host, { rows: [{ head: "A", cells: ["1"] }] });
     ok(!t2.querySelector("thead") && !t2.querySelector("caption") && !t2.querySelector("td").getAttribute("data-l"), "ledger: no columns, no header row or labels");
     const css = rd("components/ledger.css");

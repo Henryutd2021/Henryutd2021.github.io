@@ -28,7 +28,7 @@
 .cedge text.bg { stroke: var(--lx-surface); stroke-width: 4px; stroke-linejoin: round; }
 .cedge.on path { stroke: var(--lx-ink); stroke-width: 2; }
 .cedge.on text { fill: var(--lx-ink); }
-.cedge.dim path { opacity: .35; }   /* the label keeps its colour (ink-3, 4.5:1) */
+.cedge.dim path { opacity: .35; }   /* the label keeps its color (ink-3, 4.5:1) */
 .lx-cmap.narrow .cedge text { display: none; }
 .lx-cdetail { border: 1px solid var(--lx-line); border-radius: 12px; padding: 14px; display: grid; gap: 8px; background: var(--lx-surface-2); align-content: start; }
 .page-learn .lx-cdetail :is(h3, h4) { font-size: 18px; margin: 0; }   /* h3 under a map titled with an h2 */

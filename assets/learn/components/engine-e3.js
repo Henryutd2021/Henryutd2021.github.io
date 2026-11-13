@@ -36,7 +36,7 @@
      Protocol Scope 2 Guidance). Their MWh at the grid's average rate are reported apart (acc.contract) as an
      illustrative grid-average comparison: not a market-based inventory result, not a physical cut.
 
-   Prices and duals (from LPs only, never from MILPs): only from this LP, labelled "marginal values under stated assumptions": the substation duals
+   Prices and duals (from LPs only, never from MILPs): only from this LP, labeled "marginal values under stated assumptions": the substation duals
    (value of 1 MW more room, $ per MW per year), the balance duals ($/MWh in a district-hour), the CO2 cap's dual.
    Screening household outputs (kept apart from the model's costs): bills and energy burden by household group come from an accounting layer after
    the LP (E3.households), never from the LP: who adopts first (a stated rule), each adopting home's change (the
@@ -48,7 +48,7 @@
    Tie rule: stated costs far below any real one (e3-city-hub.json `tie`): $20 a year per MW of each
    district's busiest hour, $10 per MW of the three districts' busiest hour together, $1 per MWh out of a battery, $0.50
    per MWh out of the heat store, $0.10 x the hour's share of SPP's peak per MWh of managed charging. Left out of every
-   reported cost. The LP minimises the economic cost plus these small costs, so on a few plans it spends a few dollars a
+   reported cost. The LP minimizes the economic cost plus these small costs, so on a few plans it spends a few dollars a
    year more to keep a busiest hour that is under its limit lower: _tests/learn/test_e3-engine.js
    finds the economic optimum (ties x0) for every preset and the test's own plans and checks the gap is under $30 a year
    ($24.80 at most). It also re-solves with the tie costs x2 and x0.1 and checks every reported number on the optimal
@@ -1170,7 +1170,7 @@
       ["2025's bills keep the few EVs charged at home in 2025, as prairie-city.json counts them; use does not respond to the charge."]).forEach(function (t) { H("li", { text: t }, ul); });
     return tb;
   }
-  // short labelled lines, one idea each: [[label, text], ...] (text may carry glossary marks)
+  // short labeled lines, one idea each: [[label, text], ...] (text may carry glossary marks)
   function keys(host, items, cls) {
     var el = H("div", { class: "e3-keys" + (cls ? " " + cls : "") }, host);
     items.forEach(function (x) { H("p", { html: "<b>" + x[0] + ":</b> " + LX.rich(x[1]) }, el); });

@@ -12,7 +12,7 @@
      farm   the ridge wind farm: wind (MW), the line to the grid (MW, sell only), a 4-hour battery (MWh), an electrolyzer
             (MW), a hydrogen tank (t) and a buyer who takes at most so many kg of hydrogen an hour at a set price.
    The model (an LP for LX.solver; every cost in 2025 dollars, converted in costs() with EIA's GDP price index):
-     decisions  every modelled hour: home: grid import and export, battery charge and discharge, state of charge;
+     decisions  every modeled hour: home: grid import and export, battery charge and discharge, state of charge;
                 farm: sales to the grid, battery charge and discharge, state of charge, electrolyzer power (what is left of
                 the wind is spilled: the balance row's slack),
                 hydrogen sold, hydrogen in the tank. With opts.size the sizes are decisions too (home: solar, battery;
@@ -49,7 +49,7 @@
                 revenue (farm), less fixed upkeep; replacements when a life ends; a straight-line residual value at the
                 end. One weather year (2025) is repeated; prices and costs stay the same in real terms.
      CO2        operating CO2 only. Home: bought power × Kansas's 2024 average factor, plus gas burned (never negative);
-                power sent back is a separate credit at the same factor, and the net of the two is labelled as a net.
+                power sent back is a separate credit at the same factor, and the net of the two is labeled as a net.
                 Farm: no operating CO2; the CO2 a gas reformer would emit for the hydrogen sold, a potential saving only
                 if that hydrogen replaces it (it leaves out the grid power the electrolyzer's MWh no longer replace).
      wear       the electrolyzer's stack wear is an illustrative throughput allowance: DOE's replacement (11% of the cost
@@ -450,7 +450,7 @@
       T.gasCost = T.gasKWh * perKWhGas; T.baseGasCost = T.heat / gas.afue * perKWhGas;
       T.gasCO2 = T.gasKWh / 293.071 * gas.co2PerMMBtu / 1000; T.baseGasCO2 = T.heat / gas.afue / 293.071 * gas.co2PerMMBtu / 1000;   // t
       // operating CO2: bought power and gas burned (never negative); power sent back is a separate credit at the same
-      // average factor, and co2Net (which can fall below zero) is labelled as a net balance, not as what the home emits
+      // average factor, and co2Net (which can fall below zero) is labeled as a net balance, not as what the home emits
       T.gridCO2 = T.imp * ef / 1000; T.exportCO2 = T.exp * ef / 1000; T.baseGridCO2 = T.use * ef / 1000;                         // t
       T.bill = T.buyCost - T.credit; T.cost = T.bill + T.gasCost; T.baseCost = T.baseBill + T.baseGasCost;
       T.co2 = T.gridCO2 + T.gasCO2; T.co2Net = T.co2 - T.exportCO2; T.baseCO2 = T.baseGridCO2 + T.baseGasCO2;
@@ -857,8 +857,8 @@
     var home = s.site === "home", sh = res.periods.filter(function (p) { return p.kind === "week"; }).map(function (p) { return p.sums.share; });
     var lo = Math.min.apply(null, sh), hi = Math.max.apply(null, sh);
     return {
-      strip: (home ? "Each square is a week: the stronger its colour, the more of the home's use came from the grid, not its own solar ("
-        : "Each square is a week: the stronger its colour, the more of the wind was spilled (") + pct(lo, home ? 0 : 1) + " to " + pct(hi, home ? 0 : 1) + "). Pick one.",
+      strip: (home ? "Each square is a week: the stronger its color, the more of the home's use came from the grid, not its own solar ("
+        : "Each square is a week: the stronger its color, the more of the wind was spilled (") + pct(lo, home ? 0 : 1) + " to " + pct(hi, home ? 0 : 1) + "). Pick one.",
       week: home ? "Hours from 00:00, Central standard time. Under the line, the home's use by source: solar first, then the battery, then the grid. Above it: charging and power sent back."
         : "Hours from 00:00, Central standard time. Under the line, where the wind went: sold, to the electrolyzer, into the battery or spilled. Above it: the battery's output.",
       sched: res.stores ? "With storage, this is one least-cost schedule: others can move charging to other hours at the same cost." : null,

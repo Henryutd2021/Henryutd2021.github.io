@@ -1,4 +1,4 @@
-/* costsplit.css — LX.CostSplit (costsplit.js): rows of stacked bars, the colour key, and the bar helper. */
+/* costsplit.css — LX.CostSplit (costsplit.js): rows of stacked bars, the color key, and the bar helper. */
 .lx-split { display: grid; gap: 8px; }
 .lx-split-row { position: relative; display: grid; grid-template-columns: 8.5em minmax(0, 1fr) 5.2em; align-items: center; gap: 10px; width: 100%; padding: 8px 10px;
   border: 1px solid var(--lx-line); border-radius: 10px; background: var(--lx-surface); color: var(--lx-ink); text-align: left; font: inherit; }

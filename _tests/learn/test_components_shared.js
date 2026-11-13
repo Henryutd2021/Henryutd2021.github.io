@@ -345,6 +345,22 @@ ok(CP.checkEstimate(est, 439, 440, "MWh per year").ordered && CP.checkEstimate(e
   cards.go(0); ok(!next().disabled && busyAttr() === null, "cards: going back, a done step is open and not busy");
 })();
 
+// ---------------------------------------------------------------- step cards: api.undone
+(function () {
+  const E = env(); load("cards", E);
+  const host = E.LX.H("div", null, E.body); const api = [];
+  const cards = E.LX.StepCards(host, { steps: [{ text: "One.", build: (act, a) => { api[0] = a; } }, { text: "Two.", free: true, build: (act, a) => { api[1] = a; } }, { text: "Three." }] });
+  const card = cards.el, next = () => card.querySelector(".lx-step-foot").children[1];
+  ok(typeof api[0].undone === "function", "cards: api.undone exists");
+  api[0].done(); ok(!next().disabled, "cards: done() opens Next");
+  api[0].undone(); ok(next().disabled, "cards: undone() shuts Next again");
+  next().click(); ok(cards.index() === 0, "cards: Next does not advance after undone()");
+  cards.go(0); ok(next().disabled, "cards: the card shown again stays shut after undone()");
+  api[0].done(); api[0].busy(true); api[0].undone(); api[0].busy(false); ok(next().disabled, "cards: busy(false) after undone() leaves Next shut");
+  api[0].done(); next().click(); ok(cards.index() === 1 && !next().disabled, "cards: done() again opens Next; the free card is open");
+  api[1].undone(); ok(!next().disabled, "cards: a free card stays open after undone()");
+})();
+
 // ---------------------------------------------------------------- step cards: Next past the last card, Back before the first
 (function () {
   const E = env(); load("cards", E);

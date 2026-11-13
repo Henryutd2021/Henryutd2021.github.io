@@ -160,8 +160,9 @@
     var nA = [20, 50, 100][pick(0, 2)], nB = [500, 1000, 2000][pick(0, 2)], aFirst = r() < 0.5;
     var cA = pick(0, nA / 5), cB = nB / 100 * (4 + pick(0, 2));
     var A = { n: nA, c: cA, e: 100 * cA / nA }, B = { n: nB, c: cB, e: 100 * cB / nB }, first = aFirst ? A : B, second = aFirst ? B : A;
-    var said = function (o) { return int(o.n) + " hours, " + int(o.c) + " of them above (" + o.e + "%)"; };
-    return { kind: kind, q: "Two random samples of hours, counting demand more than 5% above the forecast: sample 1, " + said(first) + "; sample 2, " + said(second) + ". Which share is more trustworthy?",
+    var row = function (name, o) { return [name, int(o.n), int(o.c), o.e + "%"]; };
+    return { kind: kind, q: "Two random samples of hours count demand more than 5% above the forecast. Which share is more trustworthy?",
+             table: { head: ["Sample", "Hours", "Hours above", "Share above"], rows: [row("Sample 1", first), row("Sample 2", second)] },
              choices: ["Sample 1", "Sample 2", "Equally trustworthy"], answer: aFirst ? 1 : 0,
              why: "The sample of " + int(nB) + " hours: a share from more hours scatters less (its standard error shrinks with the square root of the sample size)." };
   }

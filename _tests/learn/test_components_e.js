@@ -80,6 +80,17 @@ ok(lines[4] === "# | Task | Draws on | First answer | Tries | Time to first answ
 ok(lines.indexOf("1 | " + D.tasks[0].title + " | " + D.tasks[0].lesson + " | 2 of 2 points (self) | 1 | 1 min 20 s | 1 min 30 s | no") >= 0, "checkpoint: explanation row");
 ok(/^Your explanation \(task 1\): The grid stores almost nothing\.$/m.test(sum) && /^Screen width 390 px\. Kept in this browser only; copied by you\.$/m.test(sum), "checkpoint: explanation and screen lines");
 ok(CP.firstWord(D, D.tasks[1], { first: null, skipped: true }) === "skipped" && CP.firstWord(D, D.tasks[1], {}) === "not answered" && CP.firstWord(D, es, { first: true }) === "submitted", "checkpoint: first-answer words");
+// a written task whose worked solution was opened before it was submitted: the table and the summary say 0 points, as
+// the level counts them, under openFirst "not-right" (CK-F's data rule); its ticks are still named
+{
+  const opened = state(5, P, true); opened.tasks["t0-explain"].solFirst = true;
+  const ex = D.tasks[0], r = opened.tasks["t0-explain"];
+  ok(D.rule.openFirst === "not-right" && CP.firstWord(D, ex, r) === "solution opened first: 0 points (2 of 2 ticked)" && CP.firstWord(D, ex, r, "counts") === "2 of 2 points (self)",
+     "checkpoint: a written task opened first reads 0 points (" + CP.firstWord(D, ex, r) + ")");
+  ok(CP.summary(D, opened, {}, { code: "CK-F" }).split("\n").indexOf("1 | " + ex.title + " | " + ex.lesson + " | solution opened first: 0 points (2 of 2 ticked) | 1 | 1 min 20 s | 1 min 30 s | yes") >= 0 &&
+     !CP.level(D, opened).explainOk, "checkpoint: the summary's row and the level agree: no points");
+  ok(CP.pointsWord(ex, 1, { solFirst: true }, "not-right") === "solution opened first: 0 points (1 of 2 ticked)" && CP.pointsWord(ex, 1, { solFirst: false }, "not-right") === "1 of 2 points (self)", "checkpoint: pointsWord");
+}
 // a made-up checkpoint: the explanation and estimate are found by kind, wherever they sit, and the code is the option's
 const X = { version: "ck-x v0", rule: D.rule, tasks: [
   { id: "q1", kind: "choice", title: "One", lesson: "T1", options: [["a", "A"], ["b", "B"]], answer: "a" },

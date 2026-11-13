@@ -376,7 +376,7 @@
   // a step's result that its controls have overtaken: the note (hidden until then) says so, the result is dimmed and the
   // step's conclusion is replaced, until the reader solves again (fresh() undoes it)
   function staleNote(host) { var p = H("p", { class: "m11-stale-note", role: "status", text: "Settings changed since this result: solve again to update it." }, host); p.hidden = true; return p; }
-  function stale(note, out, api, has) { if (!has) return; note.hidden = false; out.forEach(function (o) { o.classList.add("m11-stale"); }); api.saw("Settings changed: solve again to see what they do.", true); }
+  function stale(note, out, api, has) { if (!has) return; note.hidden = false; out.forEach(function (o) { o.classList.add("m11-stale"); }); api.saw("Settings changed: solve again to see what they do.", true); api.undone(); }   // Next waits for the new solve
   function fresh(note, out) { note.hidden = true; out.forEach(function (o) { o.classList.remove("m11-stale"); }); }
 
   LX.mount(SLUG, function (live, data, root) {

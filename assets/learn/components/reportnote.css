@@ -44,3 +44,5 @@
 @media (max-width: 560px) { .lx-rn-page { padding: 12px 12px; } }
 .lx-rn-outline { margin: 0; padding-left: 1.3rem; display: grid; gap: 5px; font-size: 15px; color: var(--lx-ink-2); }
 .lx-rn-outline b { color: var(--lx-ink); font-weight: 600; }
+.page-learn .lx-rn-page h4.lx-rn-appx { margin: 14px 0 0; padding-top: 10px; border-top: 1px dashed var(--lx-line-2); font-size: 15px; color: var(--lx-ink); }
+.lx-rn-appx-h { margin: 8px 0 4px; font-size: 14.5px; color: var(--lx-ink-2); }

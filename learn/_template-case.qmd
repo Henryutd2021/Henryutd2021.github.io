@@ -50,7 +50,7 @@ body-classes: "page-learn page-lesson lx-form-case"
 <div class="lx-fallback">
 <p class="lx-eyebrow">The study in time</p>
 <!-- <slug>-timeline:start (written from the data file by LX.Timeline's staticHTML in the test's --write mode; do not edit) -->
-<ol class="lx-tl-static"><li><b>Month Year</b> · One dated step. <span class="lx-hint">Source: <a href="https://doi.org/10.0000/example">Author et al. (year)</a></span></li></ol>
+<ol class="lx-tl-static"><li><b>Month Year</b><br> One dated step.<br> <span class="lx-hint">Source: <a href="https://doi.org/10.0000/example">Author et al. (year)</a></span></li></ol>
 <!-- <slug>-timeline:end -->
 </div>
 </div>

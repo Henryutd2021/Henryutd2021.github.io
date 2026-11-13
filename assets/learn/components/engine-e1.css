@@ -1,5 +1,5 @@
 /* engine-e1.css — the view pieces of engine E1 (LX.E1.Line, LX.E1.Bench, LX.E1.Results, LX.E1.HourChart): the campus
-   one-line diagram, the bench's small controls, the cost and outage tables. Colours from --lx-* tokens only; no
+   one-line diagram, the bench's small controls, the cost and outage tables. Colors from --lx-* tokens only; no
    overflow clipping (chart tips stay visible; a wide table scrolls in its own .lx-scroll-x). */
 
 /* ---------- the one-line diagram */

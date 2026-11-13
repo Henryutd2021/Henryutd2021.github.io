@@ -1,6 +1,6 @@
 /* table.js — LX.CompareTable: a comparison table whose rows can be re-sorted to reveal an order (rows slide to place).
    LX.CompareTable(host, { title: "The five plants", lede: "One sentence.",
-     columns: [{key: "name", label: "Plant and who decides", main: true},          main: the name column (colour dot + small note)
+     columns: [{key: "name", label: "Plant and who decides", main: true},          main: the name column (color dot + small note)
                {key: "size", label: "Size", num: true, phoneHide: true},
                {key: "cost", label: "Running cost", num: true, bar: {max: 100}, phone: "$/MWh"}], bar: a small bar; phone: short label on phones
      rows: [{key: "nuclear", color: "var(--lx-nuc)", name: "Nuclear plant", note: "Runs flat", size: "100 MW",

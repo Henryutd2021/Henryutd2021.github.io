@@ -4,7 +4,7 @@
                                      feedback: {gas: "One sentence.", wind: "One sentence."}, lockText: "Locked in.", onPick: fn });
         p.reveal("extra sentence with the reader's own numbers")   |  p.picked()
         LX.Guess(host, { id, q, ticks: ["A day", "An hour", ...], answer: 4, start: 1, onLock: function (g, out) {} })
-             a guess on an ordered scale (range input with labelled ticks); onLock adds the reveal into `out`
+             a guess on an ordered scale (range input with labeled ticks); onLock adds the reveal into `out`
    Markup (works without JS; upgraded to buttons):
         <div class="lx-predict" data-predict="id"><p class="lx-q">Question?</p>
           <ul class="lx-choices"><li data-value="a">Option A</li> ...</ul></div>

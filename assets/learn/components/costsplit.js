@@ -1,4 +1,4 @@
-/* costsplit.js — LX.CostSplit: stacked bars that split a total into its parts, one row per item, with a colour key (lesson
+/* costsplit.js — LX.CostSplit: stacked bars that split a total into its parts, one row per item, with a color key (lesson
    7: a plant's cost per MWh split into building the plant, fixed upkeep, fuel and upkeep per MWh).
    var cs = LX.CostSplit(host, {
      parts: [{ key: "capital", label: "Building the plant", color: "var(--lx-tier-2)", words: "building the plant" }, ...],
@@ -11,8 +11,8 @@
      fmt: function (v) { return "$" + Math.round(v); },   the total at the end of each row (default: v rounded)
      min: 0.005,                    parts at or below this are left out (bar and text)
      onPick: function (key) {},     rows become toggle buttons (aria-pressed marks the last one picked); without it, plain rows
-     key: true });                  the colour key right after the rows (false: place it with cs.key(host))
-   cs.set(rows[, scale])  redraw the rows (a calculator) | cs.key(host) add the colour key (aria-hidden) | cs.el | cs.rows {key: row}
+     key: true });                  the color key right after the rows (false: place it with cs.key(host))
+   cs.set(rows[, scale])  redraw the rows (a calculator) | cs.key(host) add the color key (aria-hidden) | cs.el | cs.rows {key: row}
    Helpers for other bars and for text versions:
      LX.CostSplit.bar(host, [{ color, value }], scale, { height }) -> one stacked bar (span, aria-hidden)
      LX.CostSplit.fill(bar, [{ color, value }], scale)            repaint that bar

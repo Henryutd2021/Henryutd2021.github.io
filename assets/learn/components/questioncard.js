@@ -1,7 +1,7 @@
 /* questioncard.js — LX.QuestionCard: a structured research-question card (the course's question types and question
    studio; R1, R10, the capstone research project): the question in one sentence, its type, its audience or decision-maker, a metric with
    units, the counterfactual, scale and boundary, an "I would be wrong if" statement and the main uncertainty. Each part
-   is checked for rigour; the card copies as plain text and can travel in a link.
+   is checked for rigor; the card copies as plain text and can travel in a link.
    var qc = LX.QuestionCard(host, {
      id: "r10-card",             the draft stays in this browser under this key (optional)
      code: "R10",                in the copied text's first line
@@ -16,13 +16,13 @@
      share: true,                a "Share this card" button: the card travels in the link's #q-... hash (LX.Share)
      onChange: function (values, checks) {} });
    Returns { el, get(), set(values), text(), checks() }.
-   Fields: native, labelled controls with a one-line hint; the type is a set of five radio buttons (the course's question types) that shows the
+   Fields: native, labeled controls with a one-line hint; the type is a set of five radio buttons (the course's question types) that shows the
    chosen type's template and typical methods (one method family among several), the method names with their glossary
    help (TYPES[i].marked: the same list as `methods`, with glossary marks; `methods` stays plain for the copied text and
    for pages that mark it themselves). The hints of "Compared with" and "I would be wrong if" say what a descriptive
    question puts there (a reference; an expectation or a check), as it tests no causal claim. Checks: eight lines (the question
    written, with no bracketed placeholder such as "[…]" left from a draft, then the seven parts that the question
-   studio's rigour checks need), each "filled in" or "to do" in words and with an icon, never colour alone. The head counts "N of 8
+   studio's rigor checks need), each "filled in" or "to do" in words and with an icon, never color alone. The head counts "N of 8
    parts filled in": the checks see only whether a part is there, not how rigorous it is (the rubric does that); they
    never block (a learner may type any question) and never judge originality, importance or novelty.
    Node: module.exports = { TYPES, SCALES, FIELDS, CHECKS, check, text, encode, decode, clean } (pure). */

@@ -2,14 +2,14 @@
    price; lines carry flows with arrows, limits, and a red "full" when congested; a bus can be tapped; a text version lists
    every bus and line.
    var net = LX.Network(host, {
-     buses: [{ id: "T", name: "Prairie Town", short: "Town", color: "var(--lx-demand)", at: [180, 238],   box centre, in the viewBox
-               note: "load + nuclear",                  small grey line in the box, after the plants' colour squares
+     buses: [{ id: "T", name: "Prairie Town", short: "Town", color: "var(--lx-demand)", at: [180, 238],   box center, in the viewBox
+               note: "load + nuclear",                  small gray line in the box, after the plants' color squares
                desc: "all the demand and the nuclear plant",   the bus in the text version (default: its plants' labels)
                reference: true }],                      (kept for callers; no effect on the drawing)
      lines: [{ id: "RT", from: "R", to: "T", name: "Ridge–Town",
                labelAt: [x, y, "start" | "middle" | "end"] }],   where the flow label goes (default: beside the line's middle,
-                                                                  on the side away from the network's centre)
-     plants: [{ bus: "R", color: "var(--lx-wind)", label: "Wind farm" }],   a colour square per plant in its bus's box
+                                                                  on the side away from the network's center)
+     plants: [{ bus: "R", color: "var(--lx-wind)", label: "Wind farm" }],   a color square per plant in its bus's box
      size: [360, 300],                       the viewBox, width and height
      label: "Three-bus network: ...",        the diagram's spoken name
      onPick: function (busId) {},            buses become buttons (Tab, Enter, Space; aria-pressed shows the selected bus)
@@ -21,14 +21,14 @@
              lim: { RT: 110 },      line limits: "110 / 110 MW"; a non-finite limit is not shown
              sel: "T",              the selected bus (thicker border)
              transfer: { RT: 60 } })  flows of a transfer instead of an hour's (shown without limits)
-   Any key left out keeps its value. Returns { set, el }. Colours are tokens (CSS variables), so day and night both work
+   Any key left out keeps its value. Returns { set, el }. Colors are tokens (CSS variables), so day and night both work
    without a redraw. Node: module.exports = { flowWidth, autoLabel, describe } (pure; tests). */
 (function () {
   "use strict";
   function money(v) { var r = Math.round(v); return (r < 0 ? "−$" : "$") + Math.abs(r).toLocaleString("en-US"); }
   function flowWidth(fl, mwPerPx) { return fl == null ? 3 : 2.5 + Math.min(9, Math.abs(fl) / (mwPerPx || 22)); }
   function byId(list, id) { for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i]; return null; }
-  // where a line's label goes: o.labelAt, else 14 units out from the line's middle, away from the buses' centre
+  // where a line's label goes: o.labelAt, else 14 units out from the line's middle, away from the buses' center
   function autoLabel(o, l) {
     if (l.labelAt) return l.labelAt;
     var a = byId(o.buses, l.from).at, b = byId(o.buses, l.to).at, mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2, cx = 0, cy = 0;

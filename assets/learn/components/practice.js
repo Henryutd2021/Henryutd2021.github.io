@@ -1,7 +1,7 @@
 /* practice.js — LX.Practice: faded practice sets with staged hints and an automatic check (bridges B1 and B3; styles and
    the small exercise pieces in practice.css).
    LX.Practice(host, { id, title, lede, foot, blank, tracks: [{ label, intro, items: [{ key, kind, minutes, title, build }] }] })
-     foot    a closing note: a string, or short labelled notes [[label, text], ...] (one list item each)
+     foot    a closing note: a string, or short labeled notes [[label, text], ...] (one list item each)
      id      LX.store key: which exercises are done, in this browser only
      blank   the reason shown when Check is pressed with an empty answer
      tracks  sets of exercises that fade from a worked example to a blank page; kind "worked" | "partly" | "scratch";

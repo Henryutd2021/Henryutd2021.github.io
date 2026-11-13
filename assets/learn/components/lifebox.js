@@ -10,7 +10,7 @@
        state: S,                                   the page's object: S.L, S.R
        tile: function (el, i, inside) {},          fills stage i's tile (a button) on every paint; the box has set its "out"
                                                    class and aria-pressed; the page sets its content and its aria-label
-       color: function (i) { return "var(--lx-accent)"; },   optional: tile i's coloured rule (the CSS variable --c)
+       color: function (i) { return "var(--lx-accent)"; },   optional: tile i's colored rule (the CSS variable --c)
        presets: [["site", "On site only", 2, 2], ...],       optional: [key, label, L, R] buttons under the chain
        presetsLabel: "Boundary presets",           the presets' group name (default)
        handleLabels: ["Left edge of the boundary", "Right edge of the boundary"],   (default)

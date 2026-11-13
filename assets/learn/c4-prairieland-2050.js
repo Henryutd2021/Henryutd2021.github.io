@@ -136,6 +136,7 @@
     { key: "notebook", label: "M13's notebook on your pathway", hint: "Paste the lines its section 8 printed for your plan (cost, CO₂, imports, what it builds) and say whether they match the page.", rows: 3, need: true, min: 8 },
     { key: "sources", label: "Sources and credit", hint: "One or two sentences: the data behind your numbers (EIA, IPCC, SPP through EIA-930; the course's teaching settings) and any conflict of interest.", rows: 2, need: true, min: 8 }];
   var TWO_PAGES = 1100;
+  var APPENDIX = "Appendix: evidence from the run";   // the run's evidence comes after the learner's two pages, under this heading
   var LINK_BASE = "c4-prairieland-2050.html#";   // this page, for the exemplar's plan link (relative, as the course's links are)
   // the two-page check counts the learner's own writing (the brief's fields); the plan, results, assumptions and limits
   // the page adds are not counted (about 1,000 words on their own)
@@ -173,7 +174,7 @@
       note: "Both briefs are illustrative; the strong one quotes the default plan's run. Other recommendations reach Proficient with equally sound reasoning." };
   }
   var page = { c4Schema: c4Schema, toE4: toE4, libEntry: libEntry, refState: refState, afford: afford, ridgeJobs: ridgeJobs, shockRows: shockRows, sensLine: sensLine, sensLines: sensLines, says: says, assumptions: assumptions, fullStatus: fullStatus, ACC: ACC, LIMITS: LIMITS,
-    FIELDS: FIELDS, TWO_PAGES: TWO_PAGES, ownWords: ownWords, RUBRIC: RUBRIC, RUBRIC_BAR: "the bar for this policy brief", exemplars: exemplars, nbLine: nbLine, LINK_BASE: LINK_BASE, missB: missB, cumOf: cumOf, overOf: overOf, kilo: kilo, fix: fix, pct: pct, bn: bn, sbn: sbn };
+    FIELDS: FIELDS, TWO_PAGES: TWO_PAGES, APPENDIX: APPENDIX, ownWords: ownWords, RUBRIC: RUBRIC, RUBRIC_BAR: "the bar for this policy brief", exemplars: exemplars, nbLine: nbLine, LINK_BASE: LINK_BASE, missB: missB, cumOf: cumOf, overOf: overOf, kilo: kilo, fix: fix, pct: pct, bn: bn, sbn: sbn };
   if (typeof module !== "undefined" && module.exports) module.exports = page;
   if (typeof window === "undefined" || !window.LX || !window.LX.E4) return;
 
@@ -269,7 +270,7 @@
     // ---- the brief
     var nh = document.getElementById("c4-note"); nh.innerHTML = "";
     var rn = LX.ReportNote(H("div", { class: "lx-xcard" }, nh), { id: "c4-note", code: "C4", title: "Your policy brief: two pages of your writing, with its evidence", lede: "Your words fill about two pages. The plan, its numbers, the shock table, the assumptions and the limits come from your run as the brief's evidence, beyond those two pages.",
-      fields: FIELDS,
+      fields: FIELDS, appendix: APPENDIX,
       checks: ["link", "run", "fields", "assumptions", "sensitivity", { id: "pages", label: "Your own writing fits on two pages (about " + kilo(TWO_PAGES) + " words); the evidence the page adds, about 1,000 words of tables and assumptions, comes on top", test: function (note, words) { return ownWords(words, LX.ReportNote.countWords) <= TWO_PAGES; } }],
       get: function () {
         if (!last) return null;

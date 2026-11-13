@@ -37,6 +37,10 @@ const pc = require(L("components/pricechart.js"));
 ok(pc.priceTop([{ v: [0, 40, 80] }]) === 100, "price top: at least $100");
 ok(pc.priceTop([{ v: [0, 40, 101] }]) === 150 && pc.priceTop([{ v: [40] }], [0, 230]) === 250, "price top: rounded up to $50, the ghost run included");
 ok(same(pc.offsets(3), [-1.6, 0, 1.6]) && same(pc.offsets(1), [0]) && same(pc.offsets(2), [-0.8, 0.8]), "price offsets: 1.6 px apart, centred on the middle line");
+{ const tt = pc.textTable([{ label: "North", v: [10, 20] }, { label: "South", v: [30.4, 40] }], [5, 25.6], "With the ramp rule");
+  ok(same(tt.head, ["Hour", "North ($/MWh)", "South ($/MWh)", "With the ramp rule, dashed ($/MWh)"]) && same(tt.rows[1], ["01:00", 20, 40, 26]),
+     "price text version: the dashed earlier run is a column of its own");
+  const t0 = pc.textTable([{ label: "Price", v: [1] }], null, null, "$/kWh"); ok(same(t0.head, ["Hour", "Price ($/kWh)"]) && t0.rows[0].length === 2, "price text version: no ghost, no extra column"); }
 ok(pc.hh(0) === "00:00" && pc.hh(19) === "19:00" && pc.hh(24) === "00:00" && pc.hh(-1) === "23:00", "price hh: hours wrap round midnight");
 
 // ---------------- scatter.js: pure helpers

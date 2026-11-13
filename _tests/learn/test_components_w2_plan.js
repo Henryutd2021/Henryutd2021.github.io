@@ -104,7 +104,7 @@ const C = TP.costs(cfg, {});
   ok(RW4.reps.every((q, k) => WS.letter(RW4, k) === { winter: "W", spring: "Sp", summer: "Su", fall: "F" }[q.season] && WS.number(RW4, k) === ""), "one typical week per season: plain letters, no numbers");
   ok(WS.dateOf(Y, 0) === "1 Jan" && WS.dateOf(Y, 13) === "2 Apr" && WS.dateOf(Y, 26) === "2 Jul" && WS.dateOf(Y, 39) === "1 Oct" && WS.yearOf(Y) === 2025, "dates: the four rows start 1 Jan, 2 Apr, 2 Jul and 1 Oct of 2025");
   const by = new Array(52).fill(0); by[3] = 12.4; by[10] = 0.05; by[51] = 0.06;
-  ok(WS.label(RW4, null, 2025) === "The 52 weeks of 2025 in four rows of 13, each coloured by the representative week that stands for it: " +
+  ok(WS.label(RW4, null, 2025) === "The 52 weeks of 2025 in four rows of 13, each colored by the representative week that stands for it: " +
      RW4.reps.map(q => WS.weekName(q) + " for " + q.n + " weeks").join(", ") + ".", "label: every representative week and the weeks it stands for");
   ok(/ 2 weeks have unserved demand in the full-year check\.$/.test(WS.label(RW4, by, 2025)) && / No week has unserved demand/.test(WS.label(RW4, new Array(52).fill(0), 2025)), "label: how many weeks are short (above 0.05 MWh)");
   const rows = WS.rows(Y, RW8, by);

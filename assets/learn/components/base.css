@@ -3,9 +3,9 @@
    Day values on body.page-learn; night values when Quarto's toggle sets body.quarto-dark.
    Type: Lexend (display), Atkinson Hyperlegible Next (text), Atkinson Hyperlegible Mono (numbers), imported here from Google
    Fonts, so only Learn pages (which link learn.css) load them.
-   Plant colours (same in every lesson): nuclear, solar, wind, gas combined-cycle (cc), gas peaker (pk), demand; and
+   Plant colors (same in every lesson): nuclear, solar, wind, gas combined-cycle (cc), gas peaker (pk), demand; and
    battery storage (bat), hydro (hyd), geothermal (geo) and demand response (dr), first used in lesson 6.
-   Tier colours: slots 1-5 (--lx-tier-1 ...); path.yml gives each tier a slot. */
+   Tier colors: slots 1-5 (--lx-tier-1 ...); path.yml gives each tier a slot. */
 @import url("https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;600&family=Atkinson+Hyperlegible+Next:ital,wght@0,400;0,600;0,700;1,400&family=Lexend:wght@400;500;600&display=swap");
 body.page-learn {
   --lx-bg: #F5F7FA; --lx-surface: #FFFFFF; --lx-surface-2: #EDF1F5; --lx-surface-3: #E3E9EF;
@@ -70,7 +70,7 @@ body.page-learn .quarto-title .subtitle { margin: .35rem 0 0; font-family: var(-
    Bootstrap's p/li/td rule and every component's or lesson's own code rule still win; code inside pre is left alone. */
 :where(.page-learn :not(pre)) > code { background-color: var(--lx-surface-2); color: var(--lx-ink); }
 .page-learn :focus-visible { outline: 3px solid var(--lx-accent); outline-offset: 2px; border-radius: 6px; }
-/* captions: Quarto's caption grey is 4.1:1 on white; one class of specificity, so a lesson's own caption colour still wins */
+/* captions: Quarto's caption gray is 4.1:1 on white; one class of specificity, so a lesson's own caption color still wins */
 .page-learn :where(caption, figcaption, .figure-caption, .table-caption, .panel-caption) { color: var(--lx-ink-3); }
 .page-learn main section[id], .page-learn main [id].lx-sec { scroll-margin-top: calc(var(--nav-h, 60px) + 12px); }
 .lx-mono, .lx-num { font-family: var(--lx-f-mono); font-variant-numeric: tabular-nums; }
@@ -155,7 +155,7 @@ details.lx-textalt > summary { cursor: pointer; font-family: var(--lx-f-display)
 details.lx-textalt ul, details.lx-textalt ol { margin: 6px 0 0; padding-left: 1.2rem; }
 details.lx-textalt li { margin: 3px 0; }
 
-/* ---------- end of lesson: next, sources, facts, corrections, licence */
+/* ---------- end of lesson: next, sources, facts, corrections, license */
 .lx-end { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; align-items: start; }
 @media (max-width: 860px) { .lx-end { grid-template-columns: minmax(0, 1fr); } }
 .lx-next { display: grid; gap: 8px; }

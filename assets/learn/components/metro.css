@@ -101,7 +101,7 @@
 .mhit { fill: transparent; cursor: pointer; }
 .mown-st text { cursor: pointer; }
 .stn .pulse { animation: none; opacity: .35; transform: scale(1.3); } .lx-door { transition: none; } }
-/* a door picks a tier: the other tiers' lines and shapes fade, their text turns to a token grey that keeps 4.5:1 */
+/* a door picks a tier: the other tiers' lines and shapes fade, their text turns to a token gray that keeps 4.5:1 */
 .seg-dim path, .seg-dim circle, .seg-dim rect, .seg-dim .icon, path.seg-dim { opacity: .25; }
 .seg-dim text, .seg-dim tspan { fill: var(--lx-ink-3); }
 /* label fonts: metro.js measures text in the same fonts and sizes (measurer) */

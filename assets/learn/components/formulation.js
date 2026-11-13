@@ -14,7 +14,7 @@
      views: ["words", "symbols", "table"],       the views offered, in order; with one view there is no switch
      view: "table",                              the view shown first (default: the first)
      sel: "bal",                                 the rule highlighted in every view (null: none)
-     full: true,                                 false: rules marked extra are left out, or shown greyed with extraNote when
+     full: true,                                 false: rules marked extra are left out, or shown grayed with extraNote when
      showLater: false, extraNote: "(added later)",   showLater is true; base rules then show symBase
      hours: 24,                                  passed to rows(full, hours)
      columns: ["Rule", "In words", "In symbols", "How many", ["Its dual means", "Its dual"]],   table headings; [heading, phone label]
@@ -24,7 +24,7 @@
      onPick: function (id, el) {},               symbols lines become buttons (aria-pressed); called after the press
      aria: "Suspect 1: select the wrong line" }) the spoken name of the group of lines
    Returns { set({ sel, view, full }), mark(id, "right" | "wrong" | null) (no id: clear every mark), lines: { id: element }
-   (the symbols view's lines), el }. The view switch and the lines are buttons; the table becomes labelled cards on phones;
+   (the symbols view's lines), el }. The view switch and the lines are buttons; the table becomes labeled cards on phones;
    long symbols wrap inside their line. LX.Formulation.visible(rules, full, showLater) is the pure filter (Node tests). */
 (function () {
   "use strict";

@@ -1,6 +1,6 @@
 /* timeline.css — LX.Timeline (timeline.js): an ordered list on a vertical rule; each event a marker, its date and kind
    (in words), its label, text and source line; the time that passed above it; key steps ringed and tagged. On wide
-   screens the date column sits left of the event. Kind colours: study tier-4, data tier-2, policy tier-3, event ink-3. */
+   screens the date column sits left of the event. Kind colors: study tier-4, data tier-2, policy tier-3, event ink-3. */
 .lx-tl { display: grid; gap: 10px; min-width: 0; }
 .lx-tl-lede { font-size: 15.5px; color: var(--lx-ink-2); }
 .lx-tl-list { position: relative; margin: 0; padding: 0 0 0 26px; list-style: none; display: grid; gap: 14px; }

@@ -1,4 +1,4 @@
-/* formulate.css — LX.FormulateBox (formulate.js): the parts of a model in words, each under a colour bar, and the
+/* formulate.css — LX.FormulateBox (formulate.js): the parts of a model in words, each under a color bar, and the
    symbols in a collapsed box. */
 .lx-form { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
 .lx-form.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }

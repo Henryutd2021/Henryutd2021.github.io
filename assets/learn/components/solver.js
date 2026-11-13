@@ -25,9 +25,9 @@
            key (a newer queued solve with the same key supersedes an older queued one: slider sweeps), gap (MILP
            relative gap, default HiGHS's 1e-4)
    Duals (LP only): duals[c] = change of the optimal objective per unit increase of constraint c's binding bound
-     (dObjective/dRHS, same sign convention for min and max). For a demand balance row in a cost-minimising dispatch
+     (dObjective/dRHS, same sign convention for min and max). For a demand balance row in a cost-minimizing dispatch
      this is the marginal cost of one more MWh: a marginal value under stated assumptions (fixed capacities, a convex
-     model, the modelled market), not a market price. reducedCosts[v] = dObjective per unit increase of v's active bound.
+     model, the modeled market), not a market price. reducedCosts[v] = dObjective per unit increase of v's active bound.
    MILP: no duals and no reduced costs (null): HiGHS returns no duals for a MILP. For prices conditional on the integer
      decisions (for example a unit-commitment schedule), call
      LX.solver.fixAndReprice(model, milpResult, opts): it fixes every integer and binary variable at its MILP value,
@@ -57,7 +57,7 @@
   var VERSION = "1.15.4";
 
   // ---------------------------------------------------------------- the pure core (no outer references: it is also
-  // serialised with toString() into the worker, so keep everything it needs inside this function)
+  // serialized with toString() into the worker, so keep everything it needs inside this function)
   function solverCore() {
     // HiGHS model status -> ours. 11 (objective bound reached) and 12 (objective target reached) are early stops, not
     // proofs of optimality, so they get statuses of their own and ok stays false (a plan found before the stop is kept).
@@ -76,7 +76,7 @@
       out.forEach(function (p) { if (typeof p[1] !== "number" || !isFinite(p[1])) throw new Error(where + ": coefficient of " + p[0] + " is not a finite number"); });
       return out;
     }
-    // normalise a model into index form; throws on authoring errors (unknown or repeated names, bad numbers)
+    // normalize a model into index form; throws on authoring errors (unknown or repeated names, bad numbers)
     function normalize(model) {
       if (!model || typeof model !== "object") throw new Error("model: expected an object");
       var sense = String(model.sense || "min").toLowerCase();
@@ -313,7 +313,7 @@
         }, 0);
         return;
       }
-      job.watch = setTimeout(function () {   // HiGHS honours time_limit; this catches a solve that does not return at all
+      job.watch = setTimeout(function () {   // HiGHS honors time_limit; this catches a solve that does not return at all
         if (current !== job) return;
         restart(); current = null;
         finish(job, errorResult(job, "stopped by the watchdog after " + Math.round(job.opts.timeLimit * 1000 + 2000) + " ms", "time-limit"));
@@ -369,7 +369,7 @@
     "time-limit": "Stopped at the time limit; the plan shown, if any, may not be the best.", "iteration-limit": "Stopped at the iteration limit.",
     "objective-bound": "Stopped at the objective bound set for this run; the plan shown, if any, may not be the best.",
     "objective-target": "Stopped on reaching the objective target set for this run; the plan shown may not be the best.",
-    interrupted: "Interrupted.", cancelled: "Cancelled.", superseded: "Replaced by a newer run.", error: "The solver reported an error." };
+    interrupted: "Interrupted.", cancelled: "Canceled.", superseded: "Replaced by a newer run.", error: "The solver reported an error." };
   S.describe = function (r) {
     if (!r) return "";
     var s = SAY[r.status] || r.status;

@@ -157,7 +157,7 @@
     var chart = h.el("div", { class: "ex-chart" }, ui.figure);
     var legend = h.el("div", { class: "ex-legend", style: "display:flex;flex-wrap:wrap;gap:.3rem 1.1rem;margin-top:.45rem;font-size:.8rem;color:var(--ink-2)" }, ui.figure);
     h.el("p", { class: "ex-hint", style: "margin:.4rem 0 0", text: "Synthetic turbine; model settings fixed in advance. " +
-      "The theoretical curve helps only as far as it resembles the turbine's real behaviour." }, ui.figure);
+      "The theoretical curve helps only as far as it resembles the turbine's real behavior." }, ui.figure);
     var read = h.readouts(ui.side, [
       { key: "sf", label: "95% band, data only (average)" },
       { key: "mf", label: "95% band, curve + data (average)" },

@@ -202,7 +202,7 @@
   }
   function firstWord(t, r) {
     if (!r || r.first == null) return r && r.skipped ? "skipped" : r && r.answer ? "submitted" : "not answered";
-    if (t.kind === "open-short") return (r.points || []).filter(Boolean).length + " of " + t.points.length + " points (self)";
+    if (t.kind === "open-short") return CPK.pointsWord(t, (r.points || []).filter(Boolean).length, r, "not-right");   // the runner's openFirst
     return r.first ? "right" : "not right";
   }
   // the copied summary: keep its format fixed once testers use it

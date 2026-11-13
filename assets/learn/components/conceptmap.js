@@ -1,4 +1,4 @@
-/* conceptmap.js — LX.ConceptMap: the lesson's ideas as tappable nodes joined by labelled arrows, with a detail panel.
+/* conceptmap.js — LX.ConceptMap: the lesson's ideas as tappable nodes joined by labeled arrows, with a detail panel.
    LX.ConceptMap(host, { title: "The ideas, and how they connect", lede: "Tap an idea.",
      groups: { bal: ["Balance", "var(--lx-good)"], ... },
      nodes: [{ id: "balance", g: "bal", label: "Balance", lines: ["Two", "lines"], (on phones), text: "One or two sentences.",
@@ -7,11 +7,15 @@
      cols: 4, rows: 4, colsN: 3, rowsN: 5,           grid positions may be fractional (1.5 = halfway between columns)
      sel: "balance", moment: function (id) { return "Your shift: ..." | null; },
      gameLabel: "In the lesson" });                  heading of each node's `game` line (default: "In the game" on play-form pages, else "In this lesson")
-   Nodes are keyboard buttons; the panel is announced; a "Text version" lists every idea and link for screen readers.
+   An edge's words are optional: without them it reads "links to" in the text version and the panel, and draws no label.
+   Nodes are keyboard buttons; the panel is announced; a "Text version" lists every idea with what its panel says (text,
+   the game or lesson line under its heading, the later line) and every link, for screen readers and without the map.
    Under 620 px the map switches to the phone grid (atN) and hides edge labels (they stay in the panel). */
 (function () {
   "use strict";
   var LX = window.LX, H = LX.H, S = LX.S;
+  // a link's words; a link given without them reads "links to" (never "undefined") and draws no label on the map
+  function rel(e) { return e[2] != null && String(e[2]).trim() ? String(e[2]) : "links to"; }
   LX.ConceptMap = function (host, o) {
     var hd = H("header", { class: "lx-x-head" }, host);
     var tag = LX.hTag(3, hd), sub = "h" + (+tag.charAt(1) + 1);   // an h2 right under the page title; the panel's heading one below
@@ -23,14 +27,16 @@
     var det = H("div", { class: "lx-cdetail", "aria-live": "polite" }, wrap);
     var byId = {}; o.nodes.forEach(function (n) { byId[n.id] = n; });
     var sel = o.sel || o.nodes[0].id, mode = null, nodes = {}, edges = [], mk = LX.uid("cm");
-    // text version
+    // text version: every idea with what its panel says (its text, its game or lesson line, its "later" line) and its links
+    var gameHead = o.gameLabel || (LX.lesson && LX.lesson() && LX.lesson().form === "play" ? "In the game" : "In this lesson");
     var alt = H("details", { class: "lx-textalt" }, host); H("summary", { text: "Text version of the map" }, alt);
     var ul = H("ul", null, alt);
     o.nodes.forEach(function (n) {
       var links = o.edges.filter(function (e) { return e[0] === n.id || e[1] === n.id; }).map(function (e) {
-        return e[0] === n.id ? n.label + " " + e[2] + " " + byId[e[1]].label : byId[e[0]].label + " " + e[2] + " " + n.label;
+        return e[0] === n.id ? n.label + " " + rel(e) + " " + byId[e[1]].label : byId[e[0]].label + " " + rel(e) + " " + n.label;
       });
-      H("li", { html: "<b>" + LX.esc(n.label) + "</b>: " + LX.rich(n.text) + (links.length ? " Links: " + LX.esc(links.join("; ")) + "." : "") }, ul);
+      H("li", { html: "<b>" + LX.esc(n.label) + "</b>: " + LX.rich(n.text) + (n.game ? " <i>" + LX.esc(gameHead) + ":</i> " + LX.rich(n.game) : "") +
+        (n.later ? " " + LX.rich(n.later) : "") + (links.length ? " Links: " + LX.esc(links.join("; ")) + "." : "") }, ul);
     });
     function pos(n, m) {
       var narrow = m === "narrow", at = narrow ? (n.atN || n.at) : n.at;
@@ -61,12 +67,14 @@
         var a = P[e[0]], b = P[e[1]], g = S("g", { class: "cedge" }, eg);
         var p1 = edgePt(a, b, size[e[0]]), p2 = edgePt(b, a, size[e[1]]);
         S("path", { d: "M" + p1[0] + " " + p1[1] + " L" + p2[0] + " " + p2[1], "marker-end": "url(#" + mk + ")" }, g);
-        var lw = String(e[2]).length * 6.2, dy = Math.abs(p1[1] - p2[1]) < 2 ? -6 : 4, at = function (f) { return [p1[0] + (p2[0] - p1[0]) * f, p1[1] + (p2[1] - p1[1]) * f + dy]; };
+        var words = e[2] != null ? String(e[2]).trim() : "", lw = words.length * 6.2, dy = Math.abs(p1[1] - p2[1]) < 2 ? -6 : 4, at = function (f) { return [p1[0] + (p2[0] - p1[0]) * f, p1[1] + (p2[1] - p1[1]) * f + dy]; };
         var spot = [0.5, 0.4, 0.6, 0.3, 0.7].map(at).filter(function (q) { return !meets(q[0], q[1], lw); })[0] || at(0.5);
-        taken.push([spot[0], spot[1], lw]);
         var mx = spot[0], my = spot[1];
-        S("text", { x: mx, y: my, "text-anchor": "middle", class: "bg" }, g).textContent = e[2];
-        S("text", { x: mx, y: my, "text-anchor": "middle" }, g).textContent = e[2];
+        if (words) {
+          taken.push([spot[0], spot[1], lw]);
+          S("text", { x: mx, y: my, "text-anchor": "middle", class: "bg" }, g).textContent = words;
+          S("text", { x: mx, y: my, "text-anchor": "middle" }, g).textContent = words;
+        }
         edges.push({ g: g, a: e[0], b: e[1] });
       });
       o.nodes.forEach(function (n) {
@@ -88,7 +96,7 @@
       var n = byId[id]; det.innerHTML = "";
       H("p", { class: "lx-eyebrow", text: o.groups[n.g][0] }, det);
       H(sub, { text: n.label }, det); H("p", { html: LX.rich(n.text) }, det);
-      if (n.game) { var ig = H("div", { class: "ingame" }, det); H("b", { text: o.gameLabel || (LX.lesson() && LX.lesson().form === "play" ? "In the game" : "In this lesson") }, ig); H("span", { html: LX.rich(n.game) }, ig);
+      if (n.game) { var ig = H("div", { class: "ingame" }, det); H("b", { text: gameHead }, ig); H("span", { html: LX.rich(n.game) }, ig);
         var gm = o.moment && o.moment(id); if (gm) H("div", { class: "you", text: gm }, ig); }
       var links = o.edges.filter(function (e) { return e[0] === id || e[1] === id; });
       if (links.length) {
@@ -97,7 +105,7 @@
         links.forEach(function (e) {
           var other = e[0] === id ? e[1] : e[0], on = byId[other];
           var b = H("button", { class: "lx-chip", type: "button", style: "--c:" + o.groups[on.g][1] }, ch);
-          H("i", null, b); H("span", { text: on.label }, b); H("small", { text: e[2] }, b);
+          H("i", null, b); H("span", { text: on.label }, b); H("small", { text: rel(e) }, b);
           b.addEventListener("click", function () { select(other); if (nodes[other]) nodes[other].focus({ preventScroll: true }); });
         });
       }

@@ -1,6 +1,6 @@
 /* profiles.js — wind and solar output for a plant of a given size, with a realistic annual capacity factor (the
    course's data convention).
-   The wind and solar shapes in assets/learn/data/town_days.json and town_year.json are each normalised to their own 2025
+   The wind and solar shapes in assets/learn/data/town_days.json and town_year.json are each normalized to their own 2025
    maximum hour (integers in thousandths). Their mean/max (wind 0.53, solar 0.24 for SPP in 2025) is therefore NOT a
    capacity factor. To turn a shape into a plant's output, scale it so that its annual capacity factor equals a sourced
    target: assets/learn/data/cf_targets.json (EIA, Electric Power Monthly, Table 6.07.B, 2025 annual, U.S. utility scale).
@@ -25,7 +25,7 @@
      power  output = capacity × s ^ g. The best hour stays at capacity and weaker hours shrink (g > 1) or grow (g < 1);
             no clipping. Use it when a lesson shows peaks against capacity.
    Both keep zero hours at zero (night stays dark) and are exact to 1e-9 on the annual mean (bisection). Lesson 0 keeps its
-   single real day scaled to farm size, labelled; it does not use this helper.
+   single real day scaled to farm size, labeled; it does not use this helper.
    Node: module.exports = { cfScale, townProfile, cfOf } (tests: _tests/learn/test_profiles.js). */
 (function () {
   "use strict";

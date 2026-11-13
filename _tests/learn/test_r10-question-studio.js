@@ -7,15 +7,15 @@
 //     no combination can meet the nuclear-plus-risk rule; every draft built from every value of every slot, and a seeded
 //     random sample of 200,000 full combinations in all five types, passes the scope scan's deny-list; data centers enter every
 //     draft as a load
-//   - no originality judgement: no data string calls anything new, hot, a gap or untouched; the crowding counts are the course
+//   - no originality judgment: no data string calls anything new, hot, a gap or untouched; the crowding counts are the course
 //     plan's table, shown as context with their caveat
 //   - search strings: at most five Boolean operators for every element, dimension, stakeholder and twist or lever; the
-//     OpenAlex link form; the road-less-travelled weights favour smaller clusters and never exclude an element
+//     OpenAlex link form; the road-less-traveled weights favor smaller clusters and never exclude an element
 //   - the card's automatic fields keep the learner's edits and follow the picks only where the automatic value changed;
 //     the audience is filled only for a prescriptive draft; realism states with the learner's evidence; the copied summary
 //   - the seven example cards are the course plan's, word for word; each loads a fresh card with its own question-matched audience,
 //     metric and units, every required part, and three search strings
-//   - the page never claims the checks establish rigour; the search links are labelled live; no production notes or guard
+//   - the page never claims the checks establish rigor; the search links are labeled live; no production notes or guard
 //     assertions in the public data file
 //   - the no-JS blocks on the page equal the generated ones (write them with --write after a data edit); text budget (step
 //     cards, feedback and every visible text element: at most 35 words and two sentences; option lists excepted)
@@ -56,7 +56,7 @@ const labels = k => D.pickers[k].map(x => x.label);
 // ---------------- the pickers, exactly as the course plan lists them (a copy; compared with the plan below when it is available)
 const REF = {
   scale: ["S0 device and plant", "S1 microgrid and community", "S2 regional grid", "S3 city and region", "S4 nation"],
-  element: ["rooftop solar", "heat pumps", "EV fleets and school buses", "irrigation pumps", "cold chains", "district heating", "industrial process heat", "data centers", "wind farms", "utility solar", "batteries", "long-duration storage", "hydrogen", "transmission lines", "distribution feeders", "gas networks", "geothermal", "hydro", "mini-grids", "water treatment and desalination", "agrivoltaics", "building retrofits", "demand-response programmes"],
+  element: ["rooftop solar", "heat pumps", "EV fleets and school buses", "irrigation pumps", "cold chains", "district heating", "industrial process heat", "data centers", "wind farms", "utility solar", "batteries", "long-duration storage", "hydrogen", "transmission lines", "distribution feeders", "gas networks", "geothermal", "hydro", "mini-grids", "water treatment and desalination", "agrivoltaics", "building retrofits", "demand-response programs"],
   lever: ["new technology", "operation", "market or tariff design", "policy", "sufficiency (using less)", "maintenance and asset life", "avoided demand", "governance and ownership"],
   stakeholder: ["low-income renters", "homeowners", "farmers", "rural co-ops", "municipal utilities", "investor-owned utilities", "grid operators", "regulators", "developers", "large energy users", "city councils", "transit agencies", "workers in fossil industries", "tribal nations", "communities near infrastructure", "future generations"],
   twist: ["a week-long cold snap", "a drought", "a heat wave", "a fuel-price spike", "a one-mineral supply disruption", "a policy reversal", "a cyber incident", "population decline", "rapid load growth", "a wildfire season", "a new tariff design", "a doubled interconnection queue"],
@@ -93,7 +93,7 @@ D.examples.forEach((e, i) => {
 ok(M.typeLabel(M.example(D, "e5")) === "predictive, with a prescriptive follow-up" && M.example(D, "e5").type === "predictive", "example 5: predictive, with a prescriptive follow-up (R3 reads its second half as conditional planning); its card stays predictive");
 ok(M.check(D).length === 0, "data checks pass: " + M.check(D).join("; "));
 const dc = M.item(D, "element", "datacenters");
-ok(dc.note === "as a load" && /load/.test(dc.phrase), "data centers: labelled and phrased as a load");
+ok(dc.note === "as a load" && /load/.test(dc.phrase), "data centers: labeled and phrased as a load");
 
 // ---------------- blocked combinations: every slot, every type, and a sample of full combinations
 const DENY = [/\bFOAK\b/i, /\bNOAK\b/i, /first[- ]of[- ]a[- ]kind/i, /nth[- ]of[- ]a[- ]kind/i, /learning[- ](curve|rate)/i, /order[- ]book/i, /anchor[- ](customer|buyer)/i,
@@ -129,17 +129,17 @@ ok(longest <= 36, "every populated draft (all " + TYPES.length + " types, every 
 ok(Object.keys(D.drafts).every(k => D.drafts[k].indexOf("{scale}") < 0) && /Scale: " \+ sc\.label \+ ", on the card's scale field/.test(JS), "the scale is shown beside the draft, as the card's field, not inside the question");
 ok(D.drafts.evaluative.indexOf("compared with […]") > 0 && D.drafts.prescriptive.indexOf("compared with […]") > 0, "evaluative and prescriptive drafts leave the counterfactual to the learner");
 
-// ---------------- no originality judgement; crowding as context
+// ---------------- no originality judgment; crowding as context
 ok(allStrings.every(s => !/\bnovel|\bhot (topic|spot|area|question)s?\b|untouched|\bgaps?\b|nobody has/i.test(s)), "no data string calls anything novel, a hot topic, untouched or a gap");
-ok(/no originality judgement/i.test(D.meta.note) && D.crowding.caveats.some(c => /^Few papers is no evidence that a question is new, important or feasible\.$/.test(c)) && D.crowding.caveats.every(c => M.rich(c) && c.split(/\s+/).length <= 15), "the crowding caveat, as short separate statements");
+ok(/no originality judgment/i.test(D.meta.note) && D.crowding.caveats.some(c => /^Few papers is no evidence that a question is new, important or feasible\.$/.test(c)) && D.crowding.caveats.every(c => M.rich(c) && c.split(/\s+/).length <= 15), "the crowding caveat, as short separate statements");
 ok(D.crowding.caveats.every(c => BLOCKS.crowding.indexOf("<li>" + c + "</li>") >= 0) && /D\.crowding\.caveats\.forEach/.test(JS), "the caveats: one element each, on the page and in the studio");
-ok(/The studio makes no originality judgement/.test(PAGE) && /no originality judgement/.test(JS), "page and studio both say they make no originality judgement");
+ok(/The studio makes no originality judgment/.test(PAGE) && /no originality judgment/.test(JS), "page and studio both say they make no originality judgment");
 const cr = M.crowd(D, base);
 ok(cr.length === 2 && M.crowdText(cr[0]) === "Keyword cluster “heat pumps”: 3,977 papers, 2016–2026; RGI 1.53." && M.crowdText(cr[1]) === "Keyword cluster “extreme weather”: 2,868 papers, 2016–2026; RGI 2.08.", "crowding lines for heat pumps and a heat wave");
 ok(M.crowdText(M.crowd(D, { element: "irrigation", twist: "queue" })[0]) === "Keyword cluster “interconnection queues”: 95 papers, 2016–2026; too few papers for a growth figure.", "crowding: no cluster for irrigation pumps; the queue cluster has no RGI");
 const w0 = M.weights(D, false), w1 = M.weights(D, true);
 ok(Object.values(w0).every(v => v === 1), "spin weights: even without the toggle");
-ok(w1.batteries < w1.heatpumps && w1.irrigation === 1 && Object.values(w1).every(v => v > 0), "road less travelled: smaller clusters weigh more, unmapped elements stay at 1, nobody is excluded");
+ok(w1.batteries < w1.heatpumps && w1.irrigation === 1 && Object.values(w1).every(v => v > 0), "road less traveled: smaller clusters weigh more, unmapped elements stay at 1, nobody is excluded");
 let s2 = 7; const r2 = () => (s2 = (s2 * 16807) % 2147483647) / 2147483647, hits = {};
 for (let i = 0; i < 23000; i++) { const id = M.spin(D.pickers.element, r2, w1); hits[id] = (hits[id] || 0) + 1; }
 ok(Object.keys(hits).length === 23 && hits.irrigation > hits.batteries, "spin: every element comes up; with the toggle, irrigation pumps more often than batteries");
@@ -209,7 +209,7 @@ ok(/if \(st\.autoKey === key\(\)\) return;/.test(JS), "the card's automatic fiel
 
 // ---------------- what the checks claim; live search links; the public data file
 ok(!/passes its eight checks|checks pass\./.test(PAGE) && /all eight parts of the card are filled in and rated against the rubric/.test(PAGE), "the task: parts filled in and rated by the learner, not 'passes its checks'");
-ok(/of 8 parts filled in\. Rate their rigour against the rubric/.test(JS) && !/of 8 checks pass/.test(JS), "the card step: parts filled in; rigour is the learner's rubric review");
+ok(/of 8 parts filled in\. Rate their rigor against the rubric/.test(JS) && !/of 8 checks pass/.test(JS), "the card step: parts filled in; rigor is the learner's rubric review");
 ok(/Optional: rerun on OpenAlex today \(new tab\)/.test(JS) && /current results/.test(D.search.live) && /differ from the snapshot/.test(D.search.live) && /asks OpenAlex nothing/.test(D.search.noreq), "search links: an optional rerun of OpenAlex's live results, which differ from the snapshot; the page asks OpenAlex nothing");
 // ---------------- the literature step runs on a dated snapshot, in the page
 ok((PAGE.match(new RegExp("snapshot retrieved " + M.snapDate(SNAP) + "|retrieved " + M.snapDate(SNAP) + "</td>", "g")) || []).length === 2, "the page's data note and sources table give the snapshot's own date (" + M.snapDate(SNAP) + ")");
@@ -240,7 +240,7 @@ ok(!("built_by" in D.meta) && !("scope" in D.meta), "the public data file carrie
 ok(/Typical methods for this type: " \+ LX\.rich\(methodsMarked/.test(JS) && ["gis", "econometrics", "mcda", "monte-carlo", "difference-in-differences"].every(id => BLOCKS.task.indexOf('data-term="' + id + '"') >= 0), "method names carry glossary marks (studio and no-JS version)");
 ["energy-burden", "customer-hours", "net-present-value", "techno-economic-analysis", "life-cycle-assessment"].forEach(id => ok(D.terms.indexOf("[[" + id + "|") >= 0, "words line: " + id));
 ok(!/Those (who decide|affected)/.test(JSON.stringify(D.exemplars)) && /no use for the answer is stated/.test(JSON.stringify(D.exemplars)), "exemplar audience: a stated use, not affected against deciding");
-ok(/Realism, data:/.test(EX.plain(D.exemplars.answers[1])) && /Realism, physics:/.test(EX.plain(D.exemplars.answers[1])) && /Closest papers:/.test(EX.plain(D.exemplars.answers[1])) && /framing and realism/.test(D.exemplars.answers[1].level), "strong exemplar: shows the realism review and the closest-paper notes, labelled for what it rates");
+ok(/Realism, data:/.test(EX.plain(D.exemplars.answers[1])) && /Realism, physics:/.test(EX.plain(D.exemplars.answers[1])) && /Closest papers:/.test(EX.plain(D.exemplars.answers[1])) && /framing and realism/.test(D.exemplars.answers[1].level), "strong exemplar: shows the realism review and the closest-paper notes, labeled for what it rates");
 ok(/Threshold: 27 °C indoors, the limit in Prairie City's 2026 rental code \(fictional\)/.test(EX.plain(D.exemplars.answers[1])) && /sensor panel \(illustrative\) covers 40 renter homes/.test(EX.plain(D.exemplars.answers[1])) && /about 3 kW of cooling per flat/.test(EX.plain(D.exemplars.answers[1])), "strong exemplar: its realism rating rests on stated evidence (a defined, fictional threshold; a named illustrative dataset; one worked physical check)");
 
 // ---------------- exemplars, rubric, page

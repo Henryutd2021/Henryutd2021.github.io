@@ -95,7 +95,7 @@
   //   colNames (headings for the key, one per column), lede (one line above). Labels sit right of their bars; the last
   //   column's labels get a reserved right margin, so no label crosses another column
   // Nodes are buttons (Tab, Enter, Space): picking one dims the other flows and says what flows in and out (aria-live).
-  // Redraws at its real width on resize and tweens between specs (not under reduced motion). Colours: tokens only.
+  // Redraws at its real width on resize and tweens between specs (not under reduced motion). Colors: tokens only.
   function defFmt(v) { return Math.round(v).toLocaleString("en-US"); }
 
   LX.Sankey = function (host, o) {

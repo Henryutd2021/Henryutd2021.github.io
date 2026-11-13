@@ -17,7 +17,7 @@
              LX.demo(root, fn, cards) a lesson's demo states ("mid", "step-N", ...) for screenshots: window.lxDemo, ?demo=
              LX.load(urls)         Promise of {basename: parsed JSON};  LX.base = URL of assets/learn/
              LX.anim({visible, step}) one shared animation loop; LX.onTheme(fn) when Quarto's day/night toggle flips
-             LX.tokens(el, names)  read colour tokens (#rrggbb) as [r, g, b]
+             LX.tokens(el, names)  read color tokens (#rrggbb) as [r, g, b]
    Links:    LX.lessonRef(P, code)  a lesson by starter number (3) or code ("R2"), from data/path.json (P, loaded with the
                                    page's data-src): { href, ready, label } ("lesson 3" or "R2"; href null when unknown)
              LX.lessonRefHTML(P, code)  a link when path.json marks the lesson ready, else its label and "(upcoming)", so a
@@ -263,7 +263,7 @@
   LX.on = function (ev, fn) { (subs[ev] = subs[ev] || []).push(fn); };
   LX.emit = function (ev, x) { (subs[ev] || []).forEach(function (f) { try { f(x); } catch (e) { console.error(e); } }); };
 
-  // ---------------------------------------------------------------- colour tokens and day/night
+  // ---------------------------------------------------------------- color tokens and day/night
   LX.isDark = function () { return document.body.classList.contains("quarto-dark"); };
   LX.onTheme = function (fn) { LX.on("theme", fn); };
   function hex(s) { var m = /^#?([0-9a-f]{6})$/i.exec((s || "").trim()); var n = m ? parseInt(m[1], 16) : 0x888888; return [n >> 16 & 255, n >> 8 & 255, n & 255]; }
