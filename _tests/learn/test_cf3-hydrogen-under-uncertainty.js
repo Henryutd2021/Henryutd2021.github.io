@@ -184,7 +184,7 @@ const NOT_RESEARCH = [
   [/^txh2-ercot-hydrogen on GitHub$/, "citation label (repository)"],
   [/^(The study in time|Where the result holds|The scale of this case|This case sits here\.)$/, "heading or course label"],
   [/^(Journal article \(this case\)|Code released)$/, "timeline step label: the kind of output"],
-  [/^txh2-ercot-hydrogen: public example repository · MIT licence · synthetic data\.$/, "repository label"],
+  [/^txh2-ercot-hydrogen: public example repository · MIT license · synthetic data\.$/, "repository label"],
   [/^Birge, J\. R\., and Louveaux, F\. \(2011\)\. Introduction to Stochastic Programming, 2nd ed\. Springer\. The toy's idea: chapter 4, The Value of Information and the Stochastic Solution\.$/, "citation (textbook), not the study"],
   [/^M8's toy: one windy zone, three build-outs with chances 25%, 50% and 25%, illustrative round numbers in 2025 dollars\.$/, "provenance label (the toy)"],
   [/^Data of case file CF3 /, "the data file's about line"],

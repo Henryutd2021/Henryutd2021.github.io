@@ -100,7 +100,7 @@ ok(/not the power in any one hour/.test(M.HOMES_NOTE), "the homes figure is labe
 
 // ---------------- requests, the wait, jobs, tax
 ok(M.ratio(D).toFixed(1) === "5.2" && D.ercot.peakMW === 91134 && D.ercot.requestsGW === 474 && D.ercot.dcShare === 0.9, "ERCOT: 474 GW / 91.134 GW = 5.2; about 90% data centers");
-ok(M.ERCOT_TICKS[3] === "5 times" && /= \*\*5\.2 times\*\*/.test(M.ercotLine(D)) && /Requests are proposals, not committed demand: projects may change or be cancelled\./.test(M.ercotLine(D)), "the ERCOT reveal: 5.2 times; requests are proposals, not committed demand");
+ok(M.ERCOT_TICKS[3] === "5 times" && /= \*\*5\.2 times\*\*/.test(M.ercotLine(D)) && /Requests are proposals, not committed demand: projects may change or be canceled\./.test(M.ercotLine(D)), "the ERCOT reveal: 5.2 times; requests are proposals, not committed demand");
 ok(!/duplicates|never be built/.test(PAGE + JS), "no claim that requests are duplicates or will never be built (the ERCOT slide does not show it)");
 for (let g = D.wait.grid.min; g <= D.wait.grid.max; g += D.wait.grid.step) {
   const i = M.idle(D, g), line = M.waitLine(D, g);

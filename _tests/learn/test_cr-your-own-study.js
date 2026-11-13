@@ -184,7 +184,7 @@ has("Every track is judged on the same nine competences.", "the same rubric for 
   ok(RN.countWords(t1) <= RN.PAGE_WORDS, "a proposal with every part written at its minimum fits one page (" + RN.countWords(t1) + " words)");
   ok(t1.includes("Question: " + card.question) && t1.includes("Scale route: S3 city and region: model lab M12, capstone C3") && t1.includes("Milestones: the one-page proposal by week 2; CK-R by week 4; the paper and the poster by week 5; the rubric sheet by week 5"), "the proposal's table: the card, the route and the milestones from the timeline");
   ok(t1.includes("Plan link: " + link) && !/word word/.test(link) && !t1.includes("Warning"), "the link carries the choices; no warning line on a proposal");
-  ok(t1.includes("Planned: scenarios for the uncertainties classified as scenario or deep") && t1.includes("Method: Optimization; alternatives: Simulation, Agent-based modelling"), "the planned treatment and the method with its alternatives");
+  ok(t1.includes("Planned: scenarios for the uncertainties classified as scenario or deep") && t1.includes("Method: Optimization; alternatives: Simulation, Agent-based modeling"), "the planned treatment and the method with its alternatives");
   ok(!RN.CLAIMS.test(t1.replace(/stored/g, "")) , "the proposal claims nothing is saved or sent");
   const nq = M.noteOf(D, Object.assign({}, d3, { alts: ["opt"] }), card, F, link); ok(!RN.checks(nq, words, D.fields, M.proposalChecks()).all, "too few alternatives fail the proposal's check too");
 }

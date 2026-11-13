@@ -308,11 +308,11 @@ function batteryNote(cfg) {
      JS.indexOf("the battery in 2024 dollars") < 0, "the boundary card: all costs in the price year, the battery converted");
   // the data file's `about`: constant costs and the reader-set nuclear capital cost are separate sentences
   const aboutS = cfg.about.split(/(?<=[.!?])\s+/);
-  ok(aboutS.indexOf("Technology costs are constant for the whole year modelled (no change over time).") >= 0 && aboutS.indexOf("The reader can change two inputs: the gas price and the nuclear capital cost.") >= 0 &&
+  ok(aboutS.indexOf("Technology costs are constant for the whole year modeled (no change over time).") >= 0 && aboutS.indexOf("The reader can change two inputs: the gas price and the nuclear capital cost.") >= 0 &&
      !aboutS.some(x => NUC.test(x) && /constant|over time/i.test(x)), "about: constant costs and the reader's nuclear capital cost in separate sentences");
   // the constant nuclear output is labelled a simplification wherever it is used
   onPage("a constant 91.1% of its size every hour", "the constant nuclear output, labelled");
-  ok(JS.indexOf("modelled as a constant ") > 0 && JS.indexOf("which cannot show reliability") > 0, "the slider hint and the boundary card call constant nuclear output a simplification");
+  ok(JS.indexOf("modeled as a constant ") > 0 && JS.indexOf("which cannot show reliability") > 0, "the slider hint and the boundary card call constant nuclear output a simplification");
   const st9 = M.stars({ unserved: 0, unservedShare: 0, co2: 99e3, cost: 1.019e8 }, target, 1e8);
   ok(st9.lights + st9.co2 + st9.cost === 9 && cfg.limits.gas.min <= 6 && cfg.limits.gas.max >= 6, "the practice task is reachable: nine stars under 100 kt within 2% of the frontier; $6/MMBtu is on the gas slider");
   onPage("earn all nine stars with a plan under 100 kt", "the practice task");

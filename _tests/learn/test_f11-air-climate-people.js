@@ -148,7 +148,7 @@ has("$c$ = 7.4% of the dose at 10 km, and 74% of the toy's exposure beyond 10 km
 has("the toy says nothing: there a tall stack's plume may not yet have reached the ground", "Go deeper: the toy starts at 10 km");
 ok(M.spreadSaw(D) === "Beyond 10 km each person's dose falls with distance, but far more people live farther out. In this toy, 74% of the exposure beyond 10 km happens more than 100 km away.", "step 5 reveal: the decreasing dose only beyond 10 km; the exposure's denominator");
 ok(/counted from 10 km out/.test(M.EXPOSURE_NOTE) && /not yet have reached the ground/.test(M.EXPOSURE_NOTE) && /EXPOSURE_NOTE \}/.test(JS), "step 5 says what exposure is and where the toy starts");
-ok(!/all the breathing|all exposure|the highest dose|Neighbours get/.test(PAGE + JS + M.staticFallback(D, PC)), "no 'all the breathing' and no highest dose claimed for the nearest people");
+ok(!/all the breathing|all exposure|the highest dose|Neighbou?rs get/.test(PAGE + JS + M.staticFallback(D, PC)), "no 'all the breathing' and no highest dose claimed for the nearest people");
 ok(/Nearby downwind communities/.test(JS) && /the peak depends on the stack, the plume and the weather/.test(JS), "explain layer: nearby communities, the peak depends on the plume");
 ok(/A spreading toy, not an air-quality model/.test(JS) && /illustrative/.test(M.staticFallback(D, PC)), "the toy is labelled a toy and illustrative");
 

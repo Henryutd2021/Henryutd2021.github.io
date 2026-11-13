@@ -174,7 +174,7 @@ if (R) {
   const RX = /\b(the study|study's|paper|article|IDETC|Li et al|course author|excerpt|research project|SDWPF|SCADA|kernel density|nine|plants? (with|without) (power )?measurements|held-out plants|multi-fidelity|surrogate)\b/i;
   const NOT = [[/^From: Li et al\., ASME IDETC 2023\.$/, "provenance"], [/^A separate example with synthetic numbers, from the course author's open explainer: not the study's data or results\.$/, "explainer label, as CF2's"],
     [/^The toy below uses lesson M9's illustrative turbine\.$/, "data note"],
-    [/^Related project · uncertainty at plants without measurements$/, "heading"], [/^Question and method only: no results\.$/, "label"], [/^(mfgpr-wind-power-curve|wind-uq-surrogate): public example repository · MIT licence · synthetic data\.$/, "repository label"],
+    [/^Related project · uncertainty at plants without measurements$/, "heading"], [/^Question and method only: no results\.$/, "label"], [/^(mfgpr-wind-power-curve|wind-uq-surrogate): public example repository · MIT license · synthetic data\.$/, "repository label"],
     [/^Question type: predictive \(what power, with what uncertainty\?\), with an evaluative part \(better than records alone\?\)\.$/, "the course's question type"],
     [/^M9 fits a Gaussian process to a few records, lets the records choose its settings and adds the maker's curve as a second source; it also shows a case where that cheap curve misleads\.$/, "navigation (Go deeper)"],
     [/^M10 scores forecasts on held-out data with MAE, coverage and pinball loss\.$/, "navigation (Go deeper; no claim about the study)"],
