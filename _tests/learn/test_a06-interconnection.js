@@ -365,5 +365,13 @@ prose.forEach(s => { const w = s.split(" ").length, n = nSent(s.replace(/^(Study
 // and every cell of the page's Markdown tables, which the elements above leave out
 PAGE.split("\n").filter(l => /^\| /.test(l) && !/^\|[-| ]+\|$/.test(l)).forEach(l => l.split(" | ").forEach(c => { const x = c.replace(/^\| |\s*\|$/g, "").replace(/\$[^$]*\\[^$]*\$/g, "x"); ok(x.split(" ").length <= 36 && nSent(x) <= 2, "table cell of " + x.split(" ").length + " words: " + x.slice(0, 60)); }));
 
+// society's account in CF7's words: bridge power's CO2 above grid power for the same energy, never "adds"; the idle
+// months left out, said beside the ledger and in the no-JS block
+{ const bl = M.moneyLines(I7, TOY, { tau: 24, s: 0, bridge: true, stagedOn: false }, false).join(" ");
+  ok(/; its CO₂ above grid power for the same energy is \$[0-9.]+M of damage, for society\./.test(bl) && !/adds \$[0-9.]+M of CO₂/.test(bl + JS) && !/and adds " \+ musd/.test(JS),
+     "bridge power's line names society's CO2 as above grid power for the same energy: " + bl);
+  ok(/any CO₂ change from the idle months is left out/.test(M.SOCIETY_NOTE) && /text: SOCIETY_NOTE/.test(JS) && PAGE.includes("<li><b>Society's account.</b> It counts only bridge power's CO₂ above grid power for the same energy; any CO₂ change from the idle months is left out.</li>"),
+     "society's account: what it counts and leaves out, live and without JavaScript"); }
+
 console.log((fails ? "FAILED " + fails + " of " : "ok: ") + checks + " checks (" + ID + ")");
 process.exit(fails ? 1 : 0);

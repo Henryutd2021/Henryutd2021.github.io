@@ -1,11 +1,11 @@
 {
  "meta": {
   "title": "Annual capacity-factor targets for Prairie Town's wind and solar plants",
-  "convention": "The wind and solar shapes in town_days.json and town_year.json are each normalised to their own 2025 maximum hour, so their mean over max (wind 0.528, solar 0.235) is not a capacity factor. Lessons scale a shape to the targets below with LX.townProfile(tech, capacityMW, {year, targets}) (assets/learn/components/profiles.js), which states its clipping rule.",
-  "built_by": "by hand from the source table below; checked 2026-11-02",
+  "convention": "The wind and solar shapes in town_days.json and town_year.json are each normalized to their own 2025 maximum hour, so their mean over max (wind 0.528, solar 0.235) is not a capacity factor. Lessons scale a shape to the targets below with LX.townProfile(tech, capacityMW, {year, targets}) (assets/learn/components/profiles.js), which states its clipping rule.",
+  "built_by": "from the source table below; checked 2026-11-02",
   "license": "EIA data are U.S. government works in the public domain; this file CC BY 4.0"
  },
- "dataset": { "creator": "Honglin Li", "date": "2026-11-02", "status": "Real: EIA's 2025 national capacity factors, as published.", "source": "Copied by hand from EIA's Electric Power Monthly, Table 6.07.B (see source).", "license": "This file: CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/), Honglin Li. The EIA values are U.S. government works in the public domain." },
+ "dataset": { "creator": "Honglin Li", "date": "2026-11-02", "status": "Real: EIA's 2025 national capacity factors, as published.", "source": "EIA's Electric Power Monthly, Table 6.07.B, values as published (see source).", "license": "This file: CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/), Honglin Li. The EIA values are U.S. government works in the public domain." },
  "targets": {
   "wind": {"cf": 0.338, "label": "Wind, U.S. utility-scale fleet", "year": 2025, "time_adjusted_capacity_MW": 155344.4},
   "solar": {"cf": 0.240, "label": "Solar photovoltaic, U.S. utility-scale fleet", "year": 2025, "time_adjusted_capacity_MW": 134526.3}

@@ -225,11 +225,11 @@
       "question": "Which productive uses make a solar mini-grid viable without lowering household access?",
       "picks": { "scale": "S1", "dimension": "TEA", "element": "minigrids", "lever": "market", "stakeholder": "farmers" },
       "card": { "audience": "the mini-grid's operator, with the farmers who would buy its power", "metric": "the mini-grid's net present value with each productive use, household supply kept as it is", "units": "$ over 20 years" } },
-    { "id": "e7", "combo": "S3 · sufficiency · building retrofits · city council", "type": "explanatory",
-      "question": "Why did some neighbourhoods' heating demand fall more than others after a retrofit programme?",
-      "picks": { "scale": "S3", "element": "retrofits", "lever": "sufficiency", "stakeholder": "councils" },
+    { "id": "e7", "combo": "S3 · avoided demand · building retrofits · city council", "type": "explanatory",
+      "question": "Why did some neighborhoods' heating demand fall more than others after a retrofit program?",
+      "picks": { "scale": "S3", "element": "retrofits", "lever": "avoided", "stakeholder": "councils" },
       "extra": { "dimension": { "label": "heating demand", "metric": "heating demand", "units": "% of pre-retrofit demand", "goal": "lower heating demand", "terms": ["\"heating demand\"", "\"energy savings\""] } },
-      "card": { "audience": "the city council, which runs the retrofit programme", "metric": "fall in heating demand per home after the retrofit", "units": "% of pre-retrofit demand" } }
+      "card": { "audience": "the city council, which runs the retrofit program", "metric": "fall in heating demand per home after the retrofit", "units": "% of pre-retrofit demand" } }
   ],
   "rubric": {
     "id": "r10-rubric",

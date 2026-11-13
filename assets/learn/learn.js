@@ -819,6 +819,8 @@
              id, cls (extra class on the control)
    Decimal-safe: values snap to min + k × step and are rounded to the step's decimals, so a 0.1 or 0.05 step never shows
    floating-point noise (0.30000000000000004).
+   A start value or set() value off the grid (or outside min..max) still snaps to the nearest step, and is reported:
+   a console warning naming the slider, and o.onSnap(asked, shown) when given; the reader's own moves always land on it.
    s.set(v[, fire]) (fire: also call onChange) | s.range(lo, hi)  (values outside are clamped, and the hint nudges) |
    s.val() | s.hint(text) (fixed hint; s.hint() repaints from o.hint) | s.disable(true) | s.input | s.el
    Arrow keys move one step (native range input); the − / + buttons have spoken labels. */
@@ -844,7 +846,15 @@
     var plus = H("button", { type: "button", "aria-label": upL, text: "+" }, row);
     var hint = H("p", { class: "lx-ctl-hint" }, w);
     function snap(v) { return +((Math.round((v - min) / step) * step + min).toFixed(dec)); }
+    // a value given by the page (the start value, or set()) that is not on the grid min + k × step, or outside min..max,
+    // is shown as the nearest step: say so (console warning and o.onSnap), so a page never shows one number and uses another
+    function offGrid(v, got, why) {
+      if (typeof v !== "number" || !isFinite(v) || Math.abs(v - got) <= 1e-9 * (1 + Math.abs(v))) return;
+      if (window.console && console.warn) console.warn("LX.Slider \"" + o.label + "\": " + why + " " + v + " is " + (v < min || v > max ? "outside " + min + " to " + max : "off its steps of " + step + " from " + min) + "; it shows " + got + ".");
+      if (o.onSnap) o.onSnap(v, got);
+    }
     var lo = min, hi = max, val = o.value == null ? min : clamp(snap(o.value), min, max), fixedHint = null;
+    if (o.value != null) offGrid(o.value, val, "start value");
     function pos(v) { return (13 + ((v - min) / (max - min)) * (tr.clientWidth - 26)) / Math.max(1, tr.clientWidth) * 100; }
     function paint() {
       inp.value = val; out.textContent = fmt(val);
@@ -866,7 +876,7 @@
     paint();
     return {
       el: w, input: inp,
-      set: function (v, fire) { setV(v, !!fire); },
+      set: function (v, fire) { var want = +v; setV(v, !!fire); offGrid(want, clamp(snap(want), min, max), "value"); },
       range: function (a, b) { lo = a; hi = b; setV(val, false); },
       val: function () { return val; },
       hint: function (t) { fixedHint = t; paint(); },   // hint() with no text: back to the o.hint function
@@ -1084,6 +1094,9 @@
    cards.go(i) | cards.index() | cards.count   progress dots, "Step n of N", Back and Next; the last card hides Next.
    Next past the last card (a script's click on the hidden button, e.g. a demo hook run twice) and Back on the first
    card do nothing.
+   api.done() opens Next; api.undone() shuts it again (the card's action is no longer done: an answer cleared, a setting
+   moved so it no longer fits), until the next done(); a free card stays open. A card's done state is kept when the reader
+   goes Back and returns.
    api.saw(text, bad) shows what the reader saw; text takes glossary marks and **bold**.
    api.busy(on) holds Next shut while on (e.g. while a solve runs; the card is aria-busy), whatever done() said; busy(false)
    restores it. A call from a card that is no longer shown (a late solve after Back) changes nothing on screen.
@@ -1114,6 +1127,9 @@
       nx.addEventListener("click", function () { if (unlocked[i] && !busy && i < N - 1) { render(i + 1); card.scrollIntoView({ block: "nearest", behavior: LX.reduced() ? "auto" : "smooth" }); } });
       var api = {
         done: function () { unlocked[k] = true; nx.disabled = busy; },
+        // the card's action is no longer done (an answer cleared, a setting that no longer fits): Next shuts again
+        // until done() is called. A free card stays open.
+        undone: function () { if (st.free) return; unlocked[k] = false; nx.disabled = true; },
         busy: function (on) {
           busy = !!on; nx.disabled = busy || !unlocked[k];
           if (gen !== shown) return;              // a late call from a card no longer shown
@@ -1250,11 +1266,28 @@
        <details class="lx-answer"><summary>Answer</summary><p>Myth. One or two sentences why.</p></details>
      </div> ...
    </div>
-   With JS the options become buttons; a pick shows right or not quite plus the "why" from the answer box. Answers stay in
+   With JS the options become buttons; a pick shows right or not quite plus the "why" from the answer box: all of it, its
+   later paragraphs, lists and tables included (the first paragraph's "Myth." or "Fact." is dropped). Answers stay in
    this browser (LX.progress.answer). A score line counts the right answers. */
 (function () {
   "use strict";
   var LX = window.LX, H = LX.H;
+  // the answer box's whole "why": its first paragraph (without the leading "Myth." or "Fact.") runs on after "Right." or
+  // "Not quite."; every later paragraph, list or table follows as it is, so nothing the answer says is lost with JS
+  function whyHTML(det) {
+    var parts = Array.prototype.filter.call(det.childNodes, function (n) {
+      return n.nodeType === 1 ? n.tagName !== "SUMMARY" : n.nodeType === 3 && /\S/.test(n.nodeValue);
+    });
+    if (!parts.length) return { first: "", rest: "" };
+    var head = parts[0], rest = parts.slice(1);
+    var first = head.nodeType === 3 ? LX.esc(head.nodeValue.trim()) : head.tagName === "P" ? head.innerHTML : null;
+    if (first == null) { first = ""; rest = parts; }
+    return { first: first.replace(/^\s*(Myth|Fact)\.\s*/, ""),
+      rest: rest.map(function (n) {
+        if (n.nodeType === 3) return "<p>" + LX.esc(n.nodeValue.trim()) + "</p>";
+        return n.tagName === "TABLE" ? '<div class="lx-scroll-x">' + n.outerHTML + "</div>" : n.outerHTML;   // a table scrolls on a phone
+      }).join("") };
+  }
   function setup(box) {
     var qid = box.getAttribute("data-quiz") || "quiz";
     var cards = box.querySelectorAll(".lx-qq"), score = H("p", { class: "lx-score", "aria-live": "polite" }, box);
@@ -1267,7 +1300,7 @@
       var list = q.querySelector(".lx-choices"), det = q.querySelector("details.lx-answer"), stem = q.querySelector(".lx-qtext");
       if (!list || !ans) return;
       if (stem && !stem.id) stem.id = LX.uid("qs");
-      var why = det ? (det.querySelector("p") || det).innerHTML.replace(/^\s*(Myth|Fact)\.\s*/, "") : "";
+      var why = det ? whyHTML(det) : "";
       var group = H("div", { class: "lx-qbtns", role: "group", "aria-labelledby": stem ? stem.id : null }, null);
       var fb = H("div", { class: "lx-qfb", "aria-live": "polite" }, null);
       var btns = Array.prototype.map.call(list.querySelectorAll("li"), function (li) {
@@ -1284,7 +1317,7 @@
         q.classList.toggle("is-done", !!v); q.classList.toggle("is-right", v === ans);
         fb.innerHTML = "";
         if (v) H("div", { class: "lx-saw" + (v === ans ? "" : " no"), html: LX.icon(v === ans ? "check" : "question") + "<div><b>" +
-          (v === ans ? "Right." : "Not quite.") + "</b> " + why + "</div>" }, fb);
+          (v === ans ? "Right." : "Not quite.") + "</b> " + why.first + why.rest + "</div>" }, fb);
         tally();
       }
       list.parentNode.replaceChild(group, list);
@@ -1374,11 +1407,15 @@
      cols: 4, rows: 4, colsN: 3, rowsN: 5,           grid positions may be fractional (1.5 = halfway between columns)
      sel: "balance", moment: function (id) { return "Your shift: ..." | null; },
      gameLabel: "In the lesson" });                  heading of each node's `game` line (default: "In the game" on play-form pages, else "In this lesson")
-   Nodes are keyboard buttons; the panel is announced; a "Text version" lists every idea and link for screen readers.
+   An edge's words are optional: without them it reads "links to" in the text version and the panel, and draws no label.
+   Nodes are keyboard buttons; the panel is announced; a "Text version" lists every idea with what its panel says (text,
+   the game or lesson line under its heading, the later line) and every link, for screen readers and without the map.
    Under 620 px the map switches to the phone grid (atN) and hides edge labels (they stay in the panel). */
 (function () {
   "use strict";
   var LX = window.LX, H = LX.H, S = LX.S;
+  // a link's words; a link given without them reads "links to" (never "undefined") and draws no label on the map
+  function rel(e) { return e[2] != null && String(e[2]).trim() ? String(e[2]) : "links to"; }
   LX.ConceptMap = function (host, o) {
     var hd = H("header", { class: "lx-x-head" }, host);
     var tag = LX.hTag(3, hd), sub = "h" + (+tag.charAt(1) + 1);   // an h2 right under the page title; the panel's heading one below
@@ -1390,14 +1427,16 @@
     var det = H("div", { class: "lx-cdetail", "aria-live": "polite" }, wrap);
     var byId = {}; o.nodes.forEach(function (n) { byId[n.id] = n; });
     var sel = o.sel || o.nodes[0].id, mode = null, nodes = {}, edges = [], mk = LX.uid("cm");
-    // text version
+    // text version: every idea with what its panel says (its text, its game or lesson line, its "later" line) and its links
+    var gameHead = o.gameLabel || (LX.lesson && LX.lesson() && LX.lesson().form === "play" ? "In the game" : "In this lesson");
     var alt = H("details", { class: "lx-textalt" }, host); H("summary", { text: "Text version of the map" }, alt);
     var ul = H("ul", null, alt);
     o.nodes.forEach(function (n) {
       var links = o.edges.filter(function (e) { return e[0] === n.id || e[1] === n.id; }).map(function (e) {
-        return e[0] === n.id ? n.label + " " + e[2] + " " + byId[e[1]].label : byId[e[0]].label + " " + e[2] + " " + n.label;
+        return e[0] === n.id ? n.label + " " + rel(e) + " " + byId[e[1]].label : byId[e[0]].label + " " + rel(e) + " " + n.label;
       });
-      H("li", { html: "<b>" + LX.esc(n.label) + "</b>: " + LX.rich(n.text) + (links.length ? " Links: " + LX.esc(links.join("; ")) + "." : "") }, ul);
+      H("li", { html: "<b>" + LX.esc(n.label) + "</b>: " + LX.rich(n.text) + (n.game ? " <i>" + LX.esc(gameHead) + ":</i> " + LX.rich(n.game) : "") +
+        (n.later ? " " + LX.rich(n.later) : "") + (links.length ? " Links: " + LX.esc(links.join("; ")) + "." : "") }, ul);
     });
     function pos(n, m) {
       var narrow = m === "narrow", at = narrow ? (n.atN || n.at) : n.at;
@@ -1428,12 +1467,14 @@
         var a = P[e[0]], b = P[e[1]], g = S("g", { class: "cedge" }, eg);
         var p1 = edgePt(a, b, size[e[0]]), p2 = edgePt(b, a, size[e[1]]);
         S("path", { d: "M" + p1[0] + " " + p1[1] + " L" + p2[0] + " " + p2[1], "marker-end": "url(#" + mk + ")" }, g);
-        var lw = String(e[2]).length * 6.2, dy = Math.abs(p1[1] - p2[1]) < 2 ? -6 : 4, at = function (f) { return [p1[0] + (p2[0] - p1[0]) * f, p1[1] + (p2[1] - p1[1]) * f + dy]; };
+        var words = e[2] != null ? String(e[2]).trim() : "", lw = words.length * 6.2, dy = Math.abs(p1[1] - p2[1]) < 2 ? -6 : 4, at = function (f) { return [p1[0] + (p2[0] - p1[0]) * f, p1[1] + (p2[1] - p1[1]) * f + dy]; };
         var spot = [0.5, 0.4, 0.6, 0.3, 0.7].map(at).filter(function (q) { return !meets(q[0], q[1], lw); })[0] || at(0.5);
-        taken.push([spot[0], spot[1], lw]);
         var mx = spot[0], my = spot[1];
-        S("text", { x: mx, y: my, "text-anchor": "middle", class: "bg" }, g).textContent = e[2];
-        S("text", { x: mx, y: my, "text-anchor": "middle" }, g).textContent = e[2];
+        if (words) {
+          taken.push([spot[0], spot[1], lw]);
+          S("text", { x: mx, y: my, "text-anchor": "middle", class: "bg" }, g).textContent = words;
+          S("text", { x: mx, y: my, "text-anchor": "middle" }, g).textContent = words;
+        }
         edges.push({ g: g, a: e[0], b: e[1] });
       });
       o.nodes.forEach(function (n) {
@@ -1455,7 +1496,7 @@
       var n = byId[id]; det.innerHTML = "";
       H("p", { class: "lx-eyebrow", text: o.groups[n.g][0] }, det);
       H(sub, { text: n.label }, det); H("p", { html: LX.rich(n.text) }, det);
-      if (n.game) { var ig = H("div", { class: "ingame" }, det); H("b", { text: o.gameLabel || (LX.lesson() && LX.lesson().form === "play" ? "In the game" : "In this lesson") }, ig); H("span", { html: LX.rich(n.game) }, ig);
+      if (n.game) { var ig = H("div", { class: "ingame" }, det); H("b", { text: gameHead }, ig); H("span", { html: LX.rich(n.game) }, ig);
         var gm = o.moment && o.moment(id); if (gm) H("div", { class: "you", text: gm }, ig); }
       var links = o.edges.filter(function (e) { return e[0] === id || e[1] === id; });
       if (links.length) {
@@ -1464,7 +1505,7 @@
         links.forEach(function (e) {
           var other = e[0] === id ? e[1] : e[0], on = byId[other];
           var b = H("button", { class: "lx-chip", type: "button", style: "--c:" + o.groups[on.g][1] }, ch);
-          H("i", null, b); H("span", { text: on.label }, b); H("small", { text: e[2] }, b);
+          H("i", null, b); H("span", { text: on.label }, b); H("small", { text: rel(e) }, b);
           b.addEventListener("click", function () { select(other); if (nodes[other]) nodes[other].focus({ preventScroll: true }); });
         });
       }
@@ -4055,14 +4096,19 @@
      segment(a, b, view)    the part of the line a·p = b inside the view: [[x, y], [x, y]], left (then lower) end first; or null
      verticesOf(poly)       the polygon's corners rounded to one decimal
      bigBox(view)           the view grown by 20 view-widths on every side
-     optimum(m, view)       m = {sense: "min" | "max", c: [c1, c2], rows: [rules]}: the best corner, searched inside bigBox(view),
-                            so it works for any rules a learner writes, with or without a corner (B1's builder). A best plan on
-                            the far box edge means unbounded. -> {status: "optimal", x: [x, y], ties: [[x, y], ...], value}
-                            (rounded to 1e-6) | {status: "infeasible"} | {status: "unbounded"}
+     optimum(m[, view])     m = {sense: "min" | "max", c: [c1, c2], rows: [rules]}: the best plan, decided exactly for any rules a
+                            learner writes, with or without a corner (B1's builder); no drawing box is used, so a best plan on
+                            an open edge is not called unbounded and one far outside the view is still found (the view is
+                            accepted and ignored). -> {status: "optimal", x: [x, y], ties: [the best corners], value, tied
+                            (other plans tie with x: an edge, a ray or, with no corner, a whole line)} (rounded to 1e-6) |
+                            {status: "infeasible"} | {status: "unbounded"}
+     feasible(rows)         whether any plan passes every rule, decided exactly (no box)
      halfplanes(rows)       every rule as {id, a, b} with a·p <= b
      corners(rows)          the exact corners (pairwise line crossings that pass every rule), in order around the region:
                             [{x, y, on: [ids of the rules whose line runs through it]}]
-     rays(rows)             the directions (unit vectors) along which the region goes on for ever
+     rays(rows[, c])        the directions (unit vectors) along which the region goes on for ever: the axes, both ways along
+                            each rule's line and, given the goal c in min form, straight against it (-c); enough to tell
+                            whether the goal improves for ever
      solve(m)               the exact outcome, by vertex enumeration and the region's rays: {status: "optimal" (one best
                             corner) | "tied" (a whole edge, or a ray, of equally good plans) | "infeasible" (no plan passes) |
                             "unbounded" (the goal improves for ever along a ray), corners, best (the best corners), x, y (the
@@ -4160,23 +4206,6 @@
   function bigBox(view) { var v = box(view), sx = v[1] - v[0], sy = v[3] - v[2]; return [v[0] - 20 * sx, v[1] + 20 * sx, v[2] - 20 * sy, v[3] + 20 * sy]; }
   function r6(v) { return Math.round(v * 1e6) / 1e6 + 0; }
 
-  // the best corner of max/min c·p, searched inside the big box (any rules, also without a corner)
-  function optimum(m, view) {
-    var big = bigBox(view), P = region(m.rows, big);
-    if (!P.length) return { status: "infeasible" };
-    var sg = m.sense === "max" ? -1 : 1, best = Infinity, arg = [], scale = 1;
-    P.forEach(function (p) { scale = Math.max(scale, Math.abs(m.c[0] * p[0]) + Math.abs(m.c[1] * p[1])); });
-    P.forEach(function (p) {
-      var v = sg * (m.c[0] * p[0] + m.c[1] * p[1]), e = 1e-9 * scale;
-      if (v < best - e) { best = v; arg = [p]; } else if (Math.abs(v - best) <= e) arg.push(p);
-    });
-    var span = Math.max(big[1] - big[0], big[3] - big[2]) * 1e-9;
-    var far = arg.some(function (p) { return p[0] <= big[0] + span || p[0] >= big[1] - span || p[1] <= big[2] + span || p[1] >= big[3] - span; });
-    if (far) return { status: "unbounded" };
-    var x = arg.map(function (p) { return [r6(p[0]), r6(p[1])]; });
-    return { status: "optimal", x: x[0], ties: x, value: r6(sg * best) };
-  }
-
   // ---- exact: corners, rays and the four outcomes
   var EPS = 1e-7;
   function halfplanes(rows) {
@@ -4206,16 +4235,71 @@
     }
     return vs.map(function (v) { return { x: v[0], y: v[1], on: active(hs, v) }; });
   }
-  function rays(rows) {
-    var hs = halfplanes(rows), cand = [[1, 0], [0, 1]];
+  // The directions along which the region goes on for ever: the directions r with a·r <= 0 for every rule. Tried: the
+  // axes, both ways along every rule's line, and, when the goal c (in min form) is given, straight against it (-c). A
+  // region that runs on for ever in a direction that improves the goal always does so along one of these: along an
+  // edge of the region's cone of directions, or straight against the goal when that cone is a half-plane or the whole
+  // plane (minimize x with only x <= 1).
+  function rays(rows, c) {
+    var hs = halfplanes(rows), cand = [[1, 0], [0, 1], [-1, 0], [0, -1]];
     hs.forEach(function (h) { var n = Math.hypot(h.a[0], h.a[1]); if (n > 0) cand.push([h.a[1] / n, -h.a[0] / n], [-h.a[1] / n, h.a[0] / n]); });
-    return cand.filter(function (r) { return hs.every(function (h) { return dot(h.a, r) <= 1e-12; }); });
+    if (c) { var nc = Math.hypot(c[0], c[1]); if (nc > 0) cand.push([-c[0] / nc + 0, -c[1] / nc + 0]); }
+    var out = [];
+    cand.forEach(function (r) {
+      if (!hs.every(function (h) { return dot(h.a, r) <= 1e-12; })) return;
+      if (!out.some(function (q) { return Math.abs(q[0] - r[0]) < 1e-12 && Math.abs(q[1] - r[1]) < 1e-12; })) out.push(r);
+    });
+    return out;
+  }
+  // whether any plan passes the rules, decided exactly, with no drawing box (x >= 10000 lies far outside any drawing).
+  // Rules whose lines are not all parallel: a region that is not empty has a corner. Rules that are all parallel (or
+  // none): one number n·p must fit between their lower and upper limits. A rule with no decision in it (0 <= -1) is
+  // simply true or false.
+  function feasible(rows) {
+    var hs = [], never = false;
+    (rows || []).forEach(function (r) { le(r).forEach(function (h) { if (h.a[0] || h.a[1]) hs.push(h); else if (h.b < -1e-9) never = true; }); });
+    if (never) return false;
+    if (!hs.length) return true;
+    var n = hs[0].a, nn = n[0] * n[0] + n[1] * n[1];
+    if (hs.some(function (h) { return Math.abs(n[0] * h.a[1] - n[1] * h.a[0]) > 1e-12 * (1 + nn); })) return corners(rows).length > 0;
+    var lim = parallelLimits(hs, n);
+    return lim.lo <= lim.hi + 1e-9 * (1 + Math.abs(lim.hi));
+  }
+  // rules all parallel to the normal n: the range [lo, hi] of n·p they allow
+  function parallelLimits(hs, n) {
+    var nn = n[0] * n[0] + n[1] * n[1], lo = -Infinity, hi = Infinity;
+    hs.forEach(function (h) { var k = (h.a[0] * n[0] + h.a[1] * n[1]) / nn; if (k > 0) hi = Math.min(hi, h.b / k); else if (k < 0) lo = Math.max(lo, h.b / k); });
+    return { lo: lo, hi: hi };
+  }
+  // the best plan of max/min c·p for any rules, decided exactly (B1's builder: rules a learner writes, with or without a
+  // corner). Unbounded only when a direction the region runs along for ever improves the goal (rays(rows, c)), so an
+  // open region with a finite best (minimize x with x, y >= 0) is not called unbounded, and a best plan far outside the
+  // drawing is still found. The view is not needed (older callers pass one).
+  function optimum(m) {
+    var rows = m.rows || [], sg = m.sense === "max" ? -1 : 1, c = [sg * m.c[0], sg * m.c[1]];
+    if (!feasible(rows)) return { status: "infeasible" };
+    var rs = rays(rows, c);
+    if (rs.some(function (r) { return dot(c, r) < -1e-9; })) return { status: "unbounded" };
+    var flat = rs.some(function (r) { return Math.abs(dot(c, r)) <= 1e-9; }), vs = corners(rows);
+    if (vs.length) {
+      var cost = function (v) { return c[0] * v.x + c[1] * v.y; };
+      var lo = Math.min.apply(null, vs.map(cost)), tol = 1e-7 * (1 + Math.abs(lo));
+      var x = vs.filter(function (v) { return cost(v) <= lo + tol; }).map(function (v) { return [r6(v.x), r6(v.y)]; });
+      return { status: "optimal", x: x[0], ties: x, value: r6(sg * lo), tied: x.length > 1 || flat };
+    }
+    // no corner, yet bounded: the rules are all parallel to a normal n and the goal points along n (or is zero), so a
+    // whole line of plans ties for best; x is its plan nearest the origin
+    var hs = halfplanes(rows).filter(function (h) { return h.a[0] || h.a[1]; });
+    var n = hs.length ? hs[0].a : (c[0] || c[1] ? c : [1, 0]), nn = n[0] * n[0] + n[1] * n[1], lim = parallelLimits(hs, n);
+    var k = (c[0] * n[0] + c[1] * n[1]) / nn, t = k > 1e-12 ? lim.lo : k < -1e-12 ? lim.hi : Math.max(lim.lo, Math.min(lim.hi, 0));
+    var p = [r6(t * n[0] / nn), r6(t * n[1] / nn)];
+    return { status: "optimal", x: p, ties: [p], value: r6(sg * (c[0] * p[0] + c[1] * p[1])), tied: true };
   }
   function solve(m) {
     var sg = m.sense === "max" ? -1 : 1, c = [sg * m.c[0], sg * m.c[1]], vs = corners(m.rows);
     var res = { status: "infeasible", corners: vs, best: [], x: null, y: null, value: null, ray: null, binding: {} };
     if (!vs.length) return res;
-    var rs = rays(m.rows), down = rs.filter(function (r) { return dot(c, r) < -1e-9; });
+    var rs = rays(m.rows, c), down = rs.filter(function (r) { return dot(c, r) < -1e-9; });
     if (down.length) { res.status = "unbounded"; res.ray = down[0]; return res; }
     var cost = function (v) { return c[0] * v.x + c[1] * v.y; };
     var lo = Math.min.apply(null, vs.map(cost)), tol = 1e-7 * (1 + Math.abs(lo));
@@ -4245,7 +4329,7 @@
   }
 
   var lp2 = { box: box, le: le, lhs: lhs, holds: holds, clip: clip, region: region, segment: segment, verticesOf: verticesOf, bigBox: bigBox,
-              optimum: optimum, halfplanes: halfplanes, corners: corners, rays: rays, solve: solve, simplexWalk: simplexWalk };
+              optimum: optimum, feasible: feasible, halfplanes: halfplanes, corners: corners, rays: rays, solve: solve, simplexWalk: simplexWalk };
   if (typeof module !== "undefined" && module.exports) module.exports = lp2;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -4616,7 +4700,10 @@
      score(marks, items, binKeys)    -> {agree, differ, partly, clear, cells: {itemKey: {binKey: "agree" | "differ" | "partly"}}}
      reference(items, binKeys)       -> the marks that agree with every clear cell ("yes" on, every other value off)
    Bins and items take `id` or `key`. Keyboard: cards, bins and toggles are buttons (Tab, Enter or Space); the score and the
-   reasons are announced (aria-live). No chart, so no text version is needed. */
+   reasons are announced (aria-live). No chart, so no text version is needed.
+   Glossary marks ([[id|words]]) work in every text. Inside a button (a card, a bin, a toggle's spoken name) the words
+   show plain, and in "cards" mode the marked terms of the cards and bins are listed once under the hint as glossary
+   buttons; the row names, the reasons and the "Why" lists show the marks in place. */
 (function () {
   "use strict";
   function kid(x) { return x.id != null ? x.id : x.key; }
@@ -4645,20 +4732,33 @@
   if (typeof window === "undefined" || !window.LX) return;
 
   var LX = window.LX, H = LX.H;
+  // glossary marks ([[id|words]], LX.rich) in card and bin texts: a card or bin is a button, and a term inside a button
+  // cannot be its own button, so there the words show plain and the marked terms are listed once, as glossary buttons,
+  // under the hint ("Terms on the cards: ..."); the reasons, row names and "Why" lists show the marks in place
+  var MARK = /\[\[(?:lesson:)?[a-z0-9-]+\|([^\]]+)\]\]/g;
+  function plain(t) { return String(t == null ? "" : t).replace(MARK, "$1"); }
+  function marked(t) { return /\[\[(?:lesson:)?[a-z0-9-]+\|[^\]]+\]\]/.test(String(t == null ? "" : t)); }
+  function termsOf(texts) {
+    var seen = {}, out = [];
+    texts.forEach(function (t) { (String(t || "").match(/\[\[[a-z0-9-]+\|[^\]]+\]\]/g) || []).forEach(function (m) { var id = m.slice(2, m.indexOf("|")); if (!seen[id]) { seen[id] = 1; out.push(m); } }); });
+    return out;
+  }
 
   // ---- "cards": tap a card, then tap a bin
   function cardsMode(host, o) {
     var w = H("div", { class: "lx-cs" + (o.cls ? " " + o.cls : "") }, host), placed = {}, armed = null, checked = false;
     H("p", { class: "lx-hint", text: o.hint || "Tap a card, then tap the box it belongs in. Tap a placed card to move it." }, w);
+    var terms = termsOf(o.cards.map(function (c) { return c.text; }).concat(o.bins.map(function (b) { return b.label; }), o.bins.map(function (b) { return b.sub; })));
+    if (terms.length) H("p", { class: "lx-hint lx-cs-terms", html: "Terms on the cards: " + terms.map(LX.rich).join(" · ") }, w);
     var pool = H("div", { class: "lx-cs-pool", "data-empty": o.emptyText || "All cards placed.", role: "group", "aria-label": "Cards to sort" }, w);
     var bins = H("div", { class: "lx-cs-bins", style: "--n:" + o.bins.length }, w), binEls = {};
     o.bins.forEach(function (b) {
       var id = kid(b), el = H("div", { class: "lx-cs-bin", style: "--c:" + b.color }, bins);
-      var bt = H("button", { type: "button", class: "lx-cs-binbtn", "aria-label": "Put the chosen card in " + b.label }, el);
-      H("b", { text: b.label }, bt); if (b.sub) H("small", { text: b.sub }, bt);
+      var bt = H("button", { type: "button", class: "lx-cs-binbtn", "aria-label": "Put the chosen card in " + plain(b.label) }, el);
+      H("b", { text: plain(b.label) }, bt); if (b.sub) H("small", { text: plain(b.sub) }, bt);
       var list = H("div", { class: "lx-cs-list" }, el);
       bt.addEventListener("click", function () { if (armed) { placed[armed] = id; armed = null; checked = false; feedback.innerHTML = ""; score.textContent = ""; paint(); } });
-      binEls[id] = { el: el, list: list, label: b.label };
+      binEls[id] = { el: el, list: list, label: plain(b.label) };
     });
     var foot = H("div", { class: "lx-step-foot" }, w);
     var chk = H("button", { type: "button", class: "lx-btn small", text: o.checkLabel || "Check" }, foot);
@@ -4667,7 +4767,7 @@
     var btns = {};
     o.cards.forEach(function (c) {
       var id = kid(c), b = H("button", { type: "button", class: "lx-cs-card", "aria-pressed": "false" }, null);
-      H("span", { text: c.text }, b);
+      H("span", { text: plain(c.text) }, b);
       b.addEventListener("click", function () { armed = armed === id ? null : id; paint(); });
       btns[id] = b;
     });
@@ -4680,7 +4780,7 @@
         b.className = "lx-cs-card" + (g ? " " + g : "");
         var ic = b.querySelector(".lx-ic"); if (ic) ic.remove();
         if (g) b.insertAdjacentHTML("afterbegin", LX.icon(g === "ok" ? "check" : "cross"));
-        b.setAttribute("aria-label", c.text + (where ? ", in " + binEls[where].label : ", not placed") + (g === "ok" ? ", right" : g === "no" ? ", not right" : "") + (armed === id ? ", chosen: now tap a box" : ""));
+        b.setAttribute("aria-label", plain(c.text) + (where ? ", in " + binEls[where].label : ", not placed") + (g === "ok" ? ", right" : g === "no" ? ", not right" : "") + (armed === id ? ", chosen: now tap a box" : ""));
       });
       Object.keys(binEls).forEach(function (k) { binEls[k].el.classList.toggle("armed", !!armed); });
     }
@@ -4692,7 +4792,7 @@
       var wrong = o.cards.filter(function (c) { var id = kid(c); return placed[id] && placed[id] !== c.bin; });
       if (wrong.length) {
         var ul = H("ul", { class: "lx-cs-why" }, feedback);
-        wrong.slice(0, o.maxWhy || 3).forEach(function (c) { H("li", { html: "<b>" + LX.esc(c.text) + "</b>: " + LX.rich(c.why) }, ul); });
+        wrong.slice(0, o.maxWhy || 3).forEach(function (c) { H("li", { html: "<b>" + LX.rich(c.text) + "</b>: " + LX.rich(c.why) }, ul); });
       }
       if (o.onCheck) o.onCheck(g);
     });
@@ -4705,15 +4805,15 @@
     var items = o.items, bins = o.bins, binKeys = bins.map(kid), marks = o.marks || {}, res = null;
     var box = H("div", { class: "lx-cs-grid" + (o.cls ? " " + o.cls : ""), style: "--n:" + bins.length }, host), rows = {};
     var head = H("div", { class: "lx-cs-row head", "aria-hidden": "true" }, box); H("span", null, head);
-    bins.forEach(function (j) { H("span", { class: "jh", html: (j.icon ? LX.icon(j.icon) : "") + LX.esc(j.short || j.label) }, head); });
+    bins.forEach(function (j) { H("span", { class: "jh", html: (j.icon ? LX.icon(j.icon) : "") + LX.esc(plain(j.short || j.label)) }, head); });
     items.forEach(function (t) {
-      var k = kid(t), r = H("div", { class: "lx-cs-row", role: "group", "aria-label": t.label, style: "--c:" + (t.color || "var(--lx-ink-3)") }, box);
-      var nm = H("div", { class: "nm" }, r), nl = H("span", { class: "nl" }, nm); H("i", null, nl); H("span", { text: t.label }, nl);
+      var k = kid(t), r = H("div", { class: "lx-cs-row", role: "group", "aria-label": plain(t.label), style: "--c:" + (t.color || "var(--lx-ink-3)") }, box);
+      var nm = H("div", { class: "nm" }, r), nl = H("span", { class: "nl" }, nm); H("i", null, nl); H("span", marked(t.label) ? { html: LX.rich(t.label) } : { text: t.label }, nl);
       var wb = H("button", { type: "button", class: "lx-link lx-cs-whyb", "aria-expanded": "false", text: "Why" }, nm);
       var cells = {};
       bins.forEach(function (j) {
         var jk = kid(j), on = !!(marks[k] && marks[k][jk]);
-        var b = H("button", { type: "button", class: "tg", "aria-pressed": on ? "true" : "false", "aria-label": t.label + ": " + j.label }, r);
+        var b = H("button", { type: "button", class: "tg", "aria-pressed": on ? "true" : "false", "aria-label": plain(t.label) + ": " + plain(j.label) }, r);
         b.innerHTML = LX.icon("check");
         b.addEventListener("click", function () {
           marks[k] = marks[k] || {}; marks[k][jk] = !marks[k][jk];
@@ -4723,7 +4823,7 @@
         cells[jk] = b;
       });
       var why = H("div", { class: "lx-cs-rwhy", hidden: true }, r), ul = H("ul", null, why);
-      bins.forEach(function (j) { var jk = kid(j); H("li", { html: "<b>" + LX.esc(j.label) + ": " + LX.esc(t.ref[jk]) + ".</b> " + LX.rich((t.why || {})[jk] || "") }, ul); });
+      bins.forEach(function (j) { var jk = kid(j); H("li", { html: "<b>" + LX.rich(j.label) + ": " + LX.esc(t.ref[jk]) + ".</b> " + LX.rich((t.why || {})[jk] || "") }, ul); });
       wb.addEventListener("click", function () { why.hidden = !why.hidden; wb.setAttribute("aria-expanded", why.hidden ? "false" : "true"); LX.emit("layout"); });
       rows[k] = { cells: cells, why: why };
     });
@@ -5178,7 +5278,8 @@
      ghost       an earlier run as a dashed grey step line, named ghostLabel in the legend (default "Before")
      sel         the selected hour, shaded; with onPick a tap on an hour, or ← → Home End on the focused chart, picks it
    The y axis runs from $0 to a round top (at least $100, in steps of $50) with four gridlines; the time axis is marked
-   every 6 hours (every 12 under 480 px); hovering shows the hour's prices; the text version is a table of every hour.
+   every 6 hours (every 12 under 480 px); hovering shows the hour's prices (the ghost's too); the text version is a table
+   of every hour, with the ghost as its last column (textTable).
    ch.el is the chart element.
 
    var hp = LX.HourPicker(host, { start: 12, jumps: [[19, "19:00"], [12, "12:00"]], onChange: function (t) {}, label: "Hour" });
@@ -5197,7 +5298,13 @@
   }
   // pixel offsets that keep equal step lines apart: 1.6 px per series, centred on the middle one
   function offsets(n) { var o = []; for (var k = 0; k < n; k++) o.push(n > 1 ? (k - (n - 1) / 2) * 1.6 : 0); return o; }
-  var pure = { hh: hh, priceTop: priceTop, offsets: offsets };
+  // the text version: one row per hour, a column per series and, when there is one, a column for the dashed earlier run
+  function textTable(series, ghost, ghostLabel, unit) {
+    var u = " (" + (unit || "$/MWh") + ")";
+    return { head: ["Hour"].concat(series.map(function (s) { return s.label + u; }), ghost ? [(ghostLabel || "Before") + ", dashed" + u] : []),
+             rows: series[0].v.map(function (x, t) { return [hh(t)].concat(series.map(function (s) { return Math.round(s.v[t]); }), ghost ? [Math.round(ghost[t])] : []); }) };
+  }
+  var pure = { hh: hh, priceTop: priceTop, offsets: offsets, textTable: textTable };
   if (typeof module !== "undefined" && module.exports) module.exports = pure;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -5216,6 +5323,7 @@
       });
       if (st.ghost) legend.push({ label: o.ghostLabel || "Before", dash: true });
       var money = function (v) { var r = Math.round(v); return (r < 0 ? "−$" : "$") + Math.abs(r).toLocaleString("en-US"); };
+      var ghostLabel = o.ghostLabel || "Before";
       return {
         x: { min: 0, max: n, ticks: hours([0, 6, 12, 18, 24]), ticksN: hours([0, 12, 24]) },
         y: { min: 0, max: top, ticks: [0, 1, 2, 3, 4].map(function (k) { return [k * top / 4, "$" + k * top / 4]; }) },
@@ -5225,11 +5333,11 @@
         tip: function (x) {
           var t = Math.min(n - 1, Math.floor(x));
           return "<div><b>" + hh(t) + "–" + (t + 1 === 24 ? "24:00" : hh(t + 1)) + "</b></div>" +
-            ser.map(function (s) { return "<div><span>" + LX.esc(s.label) + "</span><b>" + money(s.v[t]) + "</b></div>"; }).join("");
+            ser.map(function (s) { return "<div><span>" + LX.esc(s.label) + "</span><b>" + money(s.v[t]) + "</b></div>"; }).join("") +
+            (st.ghost ? "<div><span>" + LX.esc(ghostLabel) + " (dashed)</span><b>" + money(st.ghost[t]) + "</b></div>" : "");
         },
         aria: o.label || "Price in each hour, dollars per MWh.",
-        text: { head: ["Hour"].concat(ser.map(function (s) { return s.label + " (" + (o.unit || "$/MWh") + ")"; })),
-                rows: ser[0].v.map(function (x, t) { return [hh(t)].concat(ser.map(function (s) { return Math.round(s.v[t]); })); }) }
+        text: textTable(ser, st.ghost, ghostLabel, o.unit)
       };
     }
     return {
@@ -5741,7 +5849,8 @@
    Pure (Node: module.exports): task, checkChoice, checkOrder, checkNumeric (either answer form), checkMWh, checkValue,
    checkEstimate, level(D, st, {openFirst, late, solOpen}), firstRight(record, openFirst), writtenCounts(record,
    openFirst), lateAnswer(record, solOpen), allAnswered(D, st), lastAnswerAt(D, st), lateRule({gateAll, n}), tolText(task),
-   describe, summary, fmtMs, firstWord; for the per-task options: submitted(record), waitsFor(D, st, task),
+   describe, summary, fmtMs, firstWord(D, task, record, openFirst), pointsWord(task, ticked, record, openFirst) (a written
+   task's points: "0 points" when its solution was opened first under openFirst "not-right"); for the per-task options: submitted(record), waitsFor(D, st, task),
    solWaits(D, st, task), solLeaks(D), outOfOrder(D, st), taskList(D, ids), waitText(D, task, ids), shownTitle(D, st,
    task), openProblems(D) (unknown or circular opensAfter or solAfter names; a page's test should find none).
    level and summary find the explanation and the estimate as the first "open-short" and the first "estimate" task. */
@@ -5966,9 +6075,16 @@
     var s = Math.round(ms / 1000), m = Math.floor(s / 60);
     return m ? m + " min " + (s % 60 < 10 ? "0" : "") + (s % 60) + " s" : s + " s";
   }
-  function firstWord(D, t, r) {
+  // a written task's points in the results table and the copied summary: the boxes ticked, or, when its worked solution
+  // was opened before it was submitted and openFirst is "not-right", the 0 points the level counts (with what was ticked)
+  function pointsWord(t, ticked, r, openFirst) {
+    var of = t.points ? t.points.length : 2;
+    return writtenCounts(r, openFirst) ? ticked + " of " + of + " points (self)" : "solution opened first: 0 points (" + ticked + " of " + of + " ticked)";
+  }
+  // openFirst: the runner's option, else data.rule.openFirst (as the level rule reads it)
+  function firstWord(D, t, r, openFirst) {
     if (!r || r.first == null) return r && r.skipped ? "skipped" : "not answered";
-    if (t.kind === "open-short") return (r.points || []).filter(Boolean).length + " of " + (t.points ? t.points.length : 2) + " points (self)";
+    if (t.kind === "open-short") return pointsWord(t, (r.points || []).filter(Boolean).length, r, openFirst || (D.rule && D.rule.openFirst));
     if (t.kind === "estimate") return "submitted";
     return r.first ? "right" : "not right";
   }
@@ -5987,7 +6103,7 @@
     D.tasks.forEach(function (t, i) {
       var r = st.tasks[t.id] || {};
       var hide = waitsFor(D, st, t).length > 0;   // a waiting task's title and lessons stay unsaid, as on its card
-      lines.push((i + 1) + " | " + shownTitle(D, st, t) + " | " + (hide ? "–" : t.lesson) + " | " + firstWord(D, t, r) + " | " + (r.tries || 0) + " | " + fmtMs(r.msFirst) + " | " + fmtMs(r.ms) + " | " + (r.solFirst ? "yes" : isLate(r) ? "yes (the worked solution section)" : "no"));
+      lines.push((i + 1) + " | " + shownTitle(D, st, t) + " | " + (hide ? "–" : t.lesson) + " | " + firstWord(D, t, r, o.openFirst) + " | " + (r.tries || 0) + " | " + fmtMs(r.msFirst) + " | " + fmtMs(r.ms) + " | " + (r.solFirst ? "yes" : isLate(r) ? "yes (the worked solution section)" : "no"));
     });
     var esT = ofKind(D, "estimate"), es = esT && st.tasks[esT.id];
     if (es && es.answer) {
@@ -6006,7 +6122,7 @@
 
   var pure = { task: task, checkChoice: checkChoice, checkOrder: checkOrder, checkNumeric: checkNumeric, checkMWh: checkMWh, checkValue: checkValue,
     checkEstimate: checkEstimate, level: level, firstRight: firstRight, writtenCounts: writtenCounts, lateAnswer: lateAnswer, allAnswered: allAnswered, lastAnswerAt: lastAnswerAt, lateRule: lateRule, lateText: lateText,
-    tolText: tolText, describe: describe, summary: summary, fmtMs: fmtMs, firstWord: firstWord,
+    tolText: tolText, describe: describe, summary: summary, fmtMs: fmtMs, firstWord: firstWord, pointsWord: pointsWord,
     submitted: submitted, waitsFor: waitsFor, solWaits: solWaits, solLeaks: solLeaks, outOfOrder: outOfOrder, taskList: taskList, waitText: waitText, openProblems: openProblems, shownTitle: shownTitle };
   if (typeof module !== "undefined" && module.exports) module.exports = pure;
   if (typeof window === "undefined" || !window.LX) return;
@@ -6415,7 +6531,7 @@
       D.tasks.forEach(function (t, i) {
         var r = st.tasks[t.id] || {}, tr = E("tr", null, bd);
         var td = E("td", { "data-l": "Task" }, tr); E("button", { type: "button", class: "lx-link", text: (i + 1) + ". " + shownTitle(D, st, t), onclick: function () { show(i); } }, td);
-        E("td", { "data-l": "First answer", text: firstWord(D, t, r) }, tr);
+        E("td", { "data-l": "First answer", text: firstWord(D, t, r, o.openFirst) }, tr);
         E("td", { class: "n", "data-l": "Tries", text: String(r.tries || 0) }, tr);
         E("td", { class: "n", "data-l": "Time to first answer", text: fmtMs(r.msFirst) }, tr);
         E("td", { "data-l": "Solution first", text: r.solFirst ? "yes" : o.late === "practice" && lateAnswer(r, solAt()) ? "yes (worked solution open)" : "no" }, tr);
@@ -7051,7 +7167,9 @@
                                  competences in the capstone's own words. The research studios use neither option.
    Returns { el, picks(), set(id, level), clear(), summary() }.
    The words of the levels are the course rubric's own and are not reworded per studio (a capstone may override one
-   competence's, above); "Not yet" has no anchored
+   competence's, above). A competence may carry `reads`, one line on how its words read for a kind of work they do not
+   name (Framing's: a descriptive question), under its name live and under the table in the static version. "Not yet"
+   has no anchored
    description there, so it reads "Developing is not reached yet". Each competence is a fieldset of native radio buttons
    (Tab to the group, arrow keys move, Space picks); each radio's label carries its level and the anchored description,
    so the ladder is the control. The result line (aria-live) counts competences at Proficient or above. "Copy my
@@ -7072,7 +7190,8 @@
     { id: "framing", label: "Framing", builtIn: "R1, R3, R10",
       developing: "question vague or untyped; no audience or counterfactual",
       proficient: "typed question with audience or decision-maker, metric with units, counterfactual, scale and boundary; one falsification statement",
-      strong: "also explains why the question matters to its audience and what answer would change a decision" },
+      strong: "also explains why the question matters to its audience and what answer would change a decision",
+      reads: "for a descriptive question, the counterfactual is the reference its count is compared with; the falsification statement, an expectation stated before counting or a check on the count" },
     { id: "positioning", label: "Positioning", builtIn: "R2",
       developing: "a few sources, no map",
       proficient: "concept matrix of at least 12 sources; a stated gap with evidence",
@@ -7102,8 +7221,8 @@
       proficient: "six-page paper; one key figure; a limits paragraph; a 150-word public summary",
       strong: "a briefing a decision-maker could act on without misreading" },
     { id: "integrity", label: "Integrity", builtIn: "R9",
-      developing: "licences or credit unchecked",
-      proficient: "licences checked, credit and conflicts stated, stakeholders treated fairly",
+      developing: "licenses or credit unchecked",
+      proficient: "licenses checked, credit and conflicts stated, stakeholders treated fairly",
       strong: "data and code released with documentation where allowed" }
   ];
   var NOT_YET = "Developing is not reached yet.";
@@ -7120,7 +7239,7 @@
     var lv = (c && c.levels) || {}, own = Object.keys(lv);
     own.forEach(function (k) { if (["developing", "proficient", "strong"].indexOf(k) < 0) throw new Error("LX.Rubric: no level " + JSON.stringify(k) + " to reword (developing, proficient, strong)"); });
     function w(k) { return sentence(lv[k] || base[k]); }
-    var C = { id: base.id, label: base.label, builtIn: base.builtIn, look: (c && c.look) || null,
+    var C = { id: base.id, label: base.label, builtIn: base.builtIn, look: (c && c.look) || null, reads: base.reads || null,
       text: { "not-yet": NOT_YET, developing: w("developing"), proficient: w("proficient"), strong: w("strong") } };
     if (own.length) C.own = ["developing", "proficient", "strong"].filter(function (k) { return lv[k]; });
     return C;
@@ -7162,7 +7281,9 @@
         var C = competence(c);
         return '<tr><th scope="row">' + esc(C.label) + (C.look ? '<br><span class="lx-hint">Look for: ' + esc(C.look) + "</span>" : "") + "</th>"
           + LEVELS.slice(1).map(function (L) { return '<td data-l="' + esc(L.label) + '">' + esc(C.text[L.id]) + "</td>"; }).join("") + "</tr>";
-      }).join("") + "</tbody></table></div>";
+      }).join("") + "</tbody></table></div>" + list.map(competence).filter(function (C) { return C.reads; }).map(function (C) {
+        return '<p class="lx-hint lx-rb-reads"><b>' + esc(C.label) + ",</b> " + esc(C.reads) + ".</p>";
+      }).join("");
   }
   var api = { VERSION: VERSION, LEVELS: LEVELS, COMPETENCES: COMPETENCES, competence: competence, count: count, summary: summary,
               staticHTML: staticHTML, resultText: resultText };
@@ -7183,6 +7304,7 @@
       var fs = H("fieldset", { class: "lx-rb-comp" }, box), name = LX.uid("rb");
       var lg = H("legend", null, fs); H("b", { text: C.label }, lg);
       if (C.look) H("p", { class: "lx-rb-look", html: "<b>Look for:</b> " + LX.rich(C.look) }, fs);
+      if (C.reads) H("p", { class: "lx-rb-look lx-rb-reads", html: "<b>" + LX.esc(C.label) + ",</b> " + LX.esc(C.reads) + "." }, fs);
       var row = H("div", { class: "lx-rb-levels" }, fs);
       radios[C.id] = LEVELS.map(function (L) {
         var lab = H("label", { class: "lx-rb-level " + L.id + (L.bar ? " bar" : "") }, row);
@@ -7634,11 +7756,12 @@
       return (s.url ? '<a href="' + esc(s.url) + '">' + esc(s.label) + "</a>" : esc(s.label)) + (s.as_of ? ", as of " + esc(fmt(s.as_of)) : "");
     }).join("; ");
   }
+  // the no-JS list: each event's date, label, finding and source on lines of their own (as the live timeline sets them)
   function staticHTML(events, opt) {
     opt = opt || {};
     return '<ol class="lx-tl-static">' + sortEvents(events, opt.order).map(function (e) {
-      return "<li><b>" + esc(fmt(e.date)) + "</b> · " + esc(e.label) + "." + (e.text ? " " + rich(e.text) : "")
-        + ' <span class="lx-hint">Source: ' + srcHTML(e) + "</span></li>";
+      return "<li><b>" + esc(fmt(e.date)) + "</b><br> " + esc(e.label) + "." + (e.text ? "<br> " + rich(e.text) : "")
+        + '<br> <span class="lx-hint">Source: ' + srcHTML(e) + "</span></li>";
     }).join("") + "</ol>";
   }
   var api = { parse: parse, fmt: fmt, sortEvents: sortEvents, gap: gap, validate: validate, staticHTML: staticHTML, KINDS: KINDS };
@@ -8512,9 +8635,10 @@
    LX.NumAnswer (numanswer.js). Styles in drill.css.
    LX.Drill(host, { item, hint, title, seed, unit, check, empty, focus, width, widthPhone, cls, choicesClass })
      item(k, r)    the page's item maker: item k (0, 1, 2, ...) drawn with the seeded random source r (r() in [0, 1));
-                   returns { q, why, choices?, answer, unit?, tol? }: with choices, answer is the index of the right one;
-                   without, answer is a number and the reader types it; q is text and may carry [[id|words]] glossary
-                   marks (LX.rich)
+                   returns { q, why, choices?, answer, unit?, tol?, table? }: with choices, answer is the index of the
+                   right one; without, answer is a number and the reader types it; q is text and may carry [[id|words]]
+                   glossary marks (LX.rich); table: { head: [...], rows: [[...]], caption? } is a small table shown
+                   under q (cells are text; the first cell of each row is its header), so q can stay one short question
      hint          one line under the title (the kinds of item and an honest time); may carry [[id|words]] glossary marks
      title         the card's heading (default "Practice drill")
      seed          the seed (default: a new one per visit, (Date.now() % 100000) + 1); the same seed gives the same items
@@ -8547,6 +8671,15 @@
 
   // ---------------------------------------------------------------- view
   var LX = window.LX;
+  // an item's small table (it.table): head, rows (first cell a row header), optional caption
+  function tableEl(T) {
+    var H = LX.H, sx = H("div", { class: "lx-scroll-x lx-drill-t" }), tb = H("table", { class: "lx-mini-table" }, sx);
+    if (T.caption) H("caption", { class: "lx-hint", text: T.caption }, tb);
+    if (T.head) { var hr = H("tr", null, H("thead", null, tb)); T.head.forEach(function (h) { H("th", { scope: "col", text: String(h) }, hr); }); }
+    var bd = H("tbody", null, tb);
+    (T.rows || []).forEach(function (r) { var tr = H("tr", null, bd); r.forEach(function (c, i) { H(i ? "td" : "th", i ? { text: String(c) } : { scope: "row", text: String(c) }, tr); }); });
+    return sx;
+  }
   LX.Drill = function (host, o) {
     var H = LX.H, seed = o.seed != null ? o.seed : newSeed(), r = rng(seed), k = 0, right = 0, done = 0, cur = null;
     var focusMode = o.focus === undefined ? "question" : o.focus;
@@ -8561,6 +8694,7 @@
     function show(focus) {
       var it = o.item(k, r); k++; box.innerHTML = ""; cur = it;
       var qp = H("p", { class: "lx-qtext", tabindex: focusMode === "question" ? "-1" : null, html: LX.rich(it.q) }, box);
+      if (it.table) box.appendChild(tableEl(it.table));
       var fb = null, answered = false;
       function mark(ok) {
         if (answered) return; answered = true; done++; if (ok) right++;
@@ -9229,6 +9363,10 @@
                   or one sentence (a string)
      limits       ["It leaves out ...", ...]
      footer       optional; default: a teaching model with illustrative assumptions, not advice for a real site
+   o.appendix (and opt.appendix in the pure functions): a heading such as "Appendix: evidence from the run". The note then
+     puts all the reader's own fields first and the run's evidence (plan, results, assumptions, sensitivity, limits) after
+     it under that heading: "## " in Markdown, a ruled capitalized line in text, an h4 in the preview, and a second list
+     in outlineHTML (a capstone whose page limit counts only the reader's writing, C4)
    Pure (Node: require("components/reportnote.js"); also on LX.ReportNote): compose(note, words, fields, { format, date,
      code, title }), html(note, words, fields, opt) (the preview), sensitivityLine(s), checks(note, words, fields, list,
      opt), outlineHTML(fields, opt) (the no-JS fallback: the note's headings in order, with what goes under each),
@@ -9278,6 +9416,8 @@
     out.push({ title: title, head: head });
     function field(f) { var v = value(words, f.key); out.push({ h: f.heading || f.label, para: v || "(not written yet)", empty: !v }); }
     fields.filter(function (f) { return f.at === "top"; }).forEach(field);
+    // opt.appendix: the reader's own writing first, then the run's evidence under that heading
+    if (opt.appendix) { fields.filter(function (f) { return f.at !== "top"; }).forEach(field); out.push({ appx: opt.appendix }); }
     if (list(n.plan).length) out.push({ h: "The plan", table: { head: ["Choice", "Value"], rows: n.plan.map(function (p) { return [p.label, p.value]; }) } });
     if (list(n.results).length) out.push({ h: "Results", table: { head: ["Result", "Value"], rows: n.results.map(function (r) { return [r.label, r.value + (r.note ? " (" + r.note + ")" : "")]; }) } });
     out.push({ h: "Assumptions", list: list(n.assumptions).map(sentence), none: "(none stated)" });
@@ -9286,7 +9426,7 @@
       : s && typeof s === "object" && s.base && list(s.cases).length ? { head: [s.inputLabel || oneLine(s.input).replace(/^the /, ""), s.metric],
       rows: [[s.base.at + " (this plan)", s.base.value]].concat(s.cases.map(function (c) { return [c.at, c.value]; })) } : null;
     out.push({ h: "Sensitivity", para: sl || "(no sensitivity line yet)", empty: !sl, table: st, tableMdOnly: !multi(s) });
-    fields.filter(function (f) { return f.at !== "top"; }).forEach(field);
+    if (!opt.appendix) fields.filter(function (f) { return f.at !== "top"; }).forEach(field);
     if (list(n.limits).length) out.push({ h: "Limits of this analysis", list: list(n.limits).map(sentence) });
     out.push({ foot: n.footer || FOOTER });
     return out;
@@ -9301,6 +9441,7 @@
         return;
       }
       if (p.foot) { L.push(""); L.push(md ? "*" + p.foot + "*" : p.foot); return; }
+      if (p.appx) { L.push(""); if (!md) L.push("----"); L.push(md ? "## " + oneLine(p.appx) : oneLine(p.appx).toUpperCase()); return; }
       L.push("");
       L.push(md ? "### " + p.h : p.h.toUpperCase());
       if (p.table && (md || !p.tableMdOnly)) {
@@ -9327,6 +9468,7 @@
         return;
       }
       if (p.foot) { h.push('<p class="lx-rn-foot-line">' + esc(p.foot) + "</p>"); return; }
+      if (p.appx) { h.push('<h4 class="lx-rn-appx">' + esc(p.appx) + "</h4>"); return; }
       h.push("<h5>" + esc(p.h) + "</h5>");
       if (p.table && !p.tableMdOnly) h.push('<table class="lx-rn-table"><tbody>' + p.table.rows.map(function (r) { return '<tr><th scope="row">' + esc(r[0]) + "</th><td>" + esc(r[1]) + "</td></tr>"; }).join("") + "</tbody></table>");
       if (p.list) h.push(p.list.length ? "<ul>" + p.list.map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ul>" : '<p class="lx-rn-empty">' + esc(p.none) + "</p>");
@@ -9369,8 +9511,11 @@
     opt = opt || {}; fields = fields || [];
     var w = function (f) { return "<li><b>" + esc(f.heading || f.label) + ":</b> " + esc(f.hint || "in your words") + "</li>"; };
     var t = function (k) { var x = (opt[k] || OUTLINE[k]).split(": "); return "<li><b>" + esc(x[0]) + ":</b> " + esc(x.slice(1).join(": ")) + "</li>"; };
-    return '<ol class="lx-rn-outline">' + t("head") + fields.filter(function (f) { return f.at === "top"; }).map(w).join("") + t("plan") + t("results")
-      + t("assumptions") + t("sensitivity") + fields.filter(function (f) { return f.at !== "top"; }).map(w).join("") + t("limits") + "</ol>";
+    var top = fields.filter(function (f) { return f.at === "top"; }).map(w).join(""), rest = fields.filter(function (f) { return f.at !== "top"; }).map(w).join("");
+    if (opt.appendix) return '<ol class="lx-rn-outline">' + t("head") + top + rest + "</ol>" + '<p class="lx-rn-appx-h"><b>' + esc(opt.appendix) + ':</b> the run\'s evidence, after your writing</p><ol class="lx-rn-outline">'
+      + t("plan") + t("results") + t("assumptions") + t("sensitivity") + t("limits") + "</ol>";
+    return '<ol class="lx-rn-outline">' + t("head") + top + t("plan") + t("results")
+      + t("assumptions") + t("sensitivity") + rest + t("limits") + "</ol>";
   }
   function headText(c) { return c.pass + " of " + c.total + " parts in place" + (c.all ? ": the note is ready to copy." : ". You can copy the note at any time."); }
   var api = { compose: compose, html: html, outlineHTML: outlineHTML, sensitivityLine: sensitivityLine, checks: checks, countWords: countWords, headText: headText,
@@ -9413,7 +9558,7 @@
     var copyBox = H("div", { class: "lx-rn-copy", hidden: true }, box);
     var area = H("textarea", { readonly: true, rows: "12", "aria-label": "Your note as text" }, copyBox);
     H("p", { class: "lx-hint", text: o.privacy || "The note is built in this page from your plan. Nothing leaves the page unless you copy it; your own words stay in this browser and are not part of the plan link." }, box);
-    function opt(format) { return { format: format, code: o.code, title: o.title, date: new Date().toISOString().slice(0, 10) }; }
+    function opt(format) { return { format: format, code: o.code, title: o.title, appendix: o.appendix || null, date: new Date().toISOString().slice(0, 10) }; }
     function current() { return checks(note, words, fields, o.checks, opt("text")); }
     function paint() {
       if (!note) page.innerHTML = '<p class="lx-rn-empty">' + LX.esc(o.empty || "Run your plan first: the note fills in from its results.") + "</p>";
@@ -11653,25 +11798,30 @@
      rows: [{ head: "Renter", sub: "cost $61.20", cells: ["+$4.10 above", { text: "−$2.00 below", cls: "down" }] },
             { head: "= Net", cells: ["", "+$2.10"], total: true }],   a cell is text or { text, cls, l } (l: its own phone label)
      cls: "a4-led" });                               extra classes on the table
-   Returns the table; it sits in a div.lx-scroll-x appended to host. Every text is set as text (never HTML). */
+   Returns the table; it sits in a div.lx-scroll-x appended to host. Every text is escaped (never HTML) and may carry
+   glossary marks ([[id|words]], LX.rich); a cell's phone label (data-l) shows a mark's words plain. */
 (function () {
   "use strict";
   if (typeof window === "undefined" || !window.LX) return;
   var LX = window.LX, H = LX.H;
+  var MARK = /\[\[(?:lesson:)?[a-z0-9-]+\|[^\]]+\]\]/;
+  function plain(t) { return String(t).replace(/\[\[(?:lesson:)?[a-z0-9-]+\|([^\]]+)\]\]/g, "$1"); }
+  // a text as the element's content: plain text, or through LX.rich when it carries a glossary mark
+  function put(a, t) { t = t == null ? "" : String(t); if (MARK.test(t)) a.html = LX.rich(t); else a.text = t; return a; }
   LX.Ledger = function (host, o) {
     o = o || {};
     var cols = o.columns || [];
     var tb = H("table", { class: "cf-two lx-ledger" + (o.cls ? " " + o.cls : "") }, H("div", { class: "lx-scroll-x" }, host));
-    if (o.caption) H("caption", { class: "lx-hint", text: o.caption }, tb);
-    if (cols.length) { var hr = H("tr", null, H("thead", null, tb)); cols.forEach(function (c) { H("th", { scope: "col", text: c }, hr); }); }
+    if (o.caption) H("caption", put({ class: "lx-hint" }, o.caption), tb);
+    if (cols.length) { var hr = H("tr", null, H("thead", null, tb)); cols.forEach(function (c) { H("th", put({ scope: "col" }, c), hr); }); }
     var bd = H("tbody", null, tb);
     (o.rows || []).forEach(function (r) {
-      var tr = H("tr", r.total ? { class: "tot" } : null, bd), th = H("th", { scope: "row", text: r.head }, tr);
-      if (r.sub) H("small", { text: r.sub }, th);
+      var tr = H("tr", r.total ? { class: "tot" } : null, bd), th = H("th", put({ scope: "row" }, r.head), tr);
+      if (r.sub) H("small", put({}, r.sub), th);
       (r.cells || []).forEach(function (c, i) {
-        var x = c !== null && typeof c === "object" ? c : { text: c }, a = { text: x.text == null ? "" : String(x.text) };
+        var x = c !== null && typeof c === "object" ? c : { text: c }, a = put({}, x.text);
         var l = x.l != null ? x.l : cols[i + 1];
-        if (l) a["data-l"] = l;
+        if (l) a["data-l"] = plain(l);
         if (x.cls != null) a["class"] = x.cls;
         H("td", a, tr);
       });

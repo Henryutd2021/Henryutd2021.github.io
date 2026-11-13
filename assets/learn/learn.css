@@ -485,6 +485,9 @@ dl.lx-ideas dd { margin: 0; color: var(--lx-ink-2); }
 .lx-qq .lx-choices { margin: 0; padding-left: 1.2rem; }
 details.lx-answer summary { cursor: pointer; font-family: var(--lx-f-display); font-weight: 500; font-size: 14px; color: var(--lx-ink-2); }
 .lx-score { grid-column: 1 / -1; font-size: 14px; color: var(--lx-ink-3); min-height: 1.2em; }
+.lx-qfb .lx-saw > div { min-width: 0; }
+.lx-qfb .lx-saw > div > :is(p, ul, ol, table, .lx-scroll-x) { margin: 6px 0 0; }
+.lx-qfb .lx-saw > div > :is(ul, ol) { padding-left: 1.2rem; }
 
 /* deeper.css — "Go deeper" boxes: collapsed by default, so the page stays short; depth lives here, not in the main text.
    <details class="lx-deeper"><summary><span class="k">Go deeper · Analyst</span>The balance as an equation</summary>
@@ -1934,6 +1937,7 @@ body.page-learn.quarto-dark { --lx-scale-0: #5CC0B1; --lx-scale-1: #5AAED2; --lx
 .lx-drill-q { display: grid; gap: 10px; }
 .lx-drill-q .lx-qtext { overflow-wrap: anywhere; }
 .lx-drill-q .lx-qtext:focus { outline: none; }
+.lx-drill-t { justify-self: start; max-width: 100%; }
 
 /* weekstrip.css — LX.WeekStrip (weekstrip.js): 52 week cells in four rows of 13 behind a date column, extreme weeks
    outlined, a red dot on short weeks, the key, and the text version's table (M3's look: m3-strip, m3-grid, m3-cell,
@@ -2041,6 +2045,8 @@ body.page-learn.quarto-dark { --lx-scale-0: #5CC0B1; --lx-scale-1: #5AAED2; --lx
 @media (max-width: 560px) { .lx-rn-page { padding: 12px 12px; } }
 .lx-rn-outline { margin: 0; padding-left: 1.3rem; display: grid; gap: 5px; font-size: 15px; color: var(--lx-ink-2); }
 .lx-rn-outline b { color: var(--lx-ink); font-weight: 600; }
+.page-learn .lx-rn-page h4.lx-rn-appx { margin: 14px 0 0; padding-top: 10px; border-top: 1px dashed var(--lx-line-2); font-size: 15px; color: var(--lx-ink); }
+.lx-rn-appx-h { margin: 8px 0 4px; font-size: 14.5px; color: var(--lx-ink-2); }
 
 /* engine-e0.css — the page kit of engine E0 (engine-e0.js, LX.E0.ui): the Site Bench's choice rows, presets, results
    tiles, the 52-week strip, the week navigation and the extra cards a capstone adds (sensitivity). Colours from --lx-*
