@@ -163,7 +163,8 @@ const APPROVED_SNAPSHOT = {
   "E14.21": "Where the result holds: steam sent to cooling is steam the low-pressure turbine does not convert, so it costs the turbine work it gives up; one load profile; ERCOT's hourly prices for the market years 2022 to 2024; hourly average, not marginal, emission factors; the plant is one fixed unit; steam is taken at the turbine crossover, and a sweep of the penalty tests that choice. It leaves out: demand charges and ancillary-service revenues; reliability on a common basis across options; other load profiles and sites.",
   "E14.22": "Paper accepted. An hourly model prices the steam sent to cooling by the turbine work it gives up, and compares the plant, with and without steam cooling, with grid supply and an on-site gas combined cycle.",
   "E14.23": "Li et al. (2026). Accepted paper on a techno-economic analysis of reactor cogeneration for power and cooling loads. Energy Conversion and Management (2026), accepted; DOI pending.",
-  "E14.24": "Approved excerpt of: Li et al. (2026), accepted paper, Energy Conversion and Management; DOI pending."
+  "E14.24": "Approved excerpt of: Li et al. (2026), accepted paper, Energy Conversion and Management; DOI pending.",
+  "E14.25": "Every market year, the leap year 2024 included, is modeled as 8,760 hours."
 };
 const RX = /\b(stud(y|ies)|paper|Li et al|excerpt|ERCOT|optimizer|reactor|refueling|crossover|absorption|Willans|SOS2|scenario runs|wet-bulb|merchant)\b/i;
 const REG = X.register(["E14"]);   // the shared reader; its own parser reads only plain "| E14.n |" rows, so they are read here
@@ -175,7 +176,7 @@ if (REG) {
     "the approved wording's status line says E14 is approved (2026-11-07): framing C; E14.1-E14.15, E14.16b, E14.17-E14.23, E14.24 in its original wording");
   const reg = {}, e14 = PRIV.block(w5, "### E14.");
   e14.split("\n").forEach(line => { const m = line.match(/^\| (E14\.\d+)(?: \[N\]| \(optional\))? \| (.*?) \| /); if (m) reg[m[1]] = m[2].replace(/^(Timeline, [^:]+|Citations|Source): /, ""); });
-  ok(Object.keys(reg).length === 24, "the approved wording has the 24 E14 rows, the [N] and optional ones included");
+  ok(Object.keys(reg).length === 25, "the approved wording has the 25 E14 rows, the [N] and optional ones included (E14.25 approved 2026-11-13)");
   const b16 = (w5.match(/Recommended wording \(E14\.16b\): "([^"]+)"/) || [])[1];
   ok(!!b16, "E14.16b's recommended wording is in the approved wording");
   delete reg["E14.16"]; reg["E14.16b"] = b16;
@@ -205,7 +206,7 @@ segs.forEach(sg => ok(LABELS.some(re => re.test(sg)) || X.approved(RG, sg) || sg
 { // the review's other layout-only splits, at the sentences' own breaks: E14.13 at its semicolons, E14.14 at its colon,
   // E14.20 one line per sentence; joined back, each reads word for word
   const T = X.norm(X.elements(caseHTML).join(" "));
-  ["E14.10", "E14.11", "E14.12", "E14.13", "E14.14", "E14.15", "E14.16b", "E14.17", "E14.18", "E14.1", "E14.2", "E14.5", "E14.19"].forEach(k => ok(T.includes(X.norm(RG.raw[k])), k + " reads word for word on the page"));
+  ["E14.10", "E14.11", "E14.12", "E14.13", "E14.14", "E14.15", "E14.16b", "E14.17", "E14.18", "E14.1", "E14.2", "E14.5", "E14.19", "E14.25"].forEach(k => ok(T.includes(X.norm(RG.raw[k])), k + " reads word for word on the page"));
   ok(X.sentencesOf(RG.raw["E14.20"]).every(x => T.includes(x)), "E14.20 reads word for word, one line per sentence");
 }
 const tl = D.timeline.events[0];

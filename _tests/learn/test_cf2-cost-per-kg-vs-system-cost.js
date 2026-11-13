@@ -160,6 +160,7 @@ const APPROVED_SNAPSHOT = {   // the approved wording, E3-E5 with the revisions 
   "E3.14": "A higher hydrogen price makes each kilogram worth more, so the optimizer builds a larger electrolyzer to capture more surplus wind. The extra capacity runs fewer full-load hours, so the cost per kilogram, the levelized cost of hydrogen, goes up. Yet the added hydrogen revenue lowers the net cost of the whole system. The cost per kilogram and the system's cost move in opposite directions.",
   "E3.15": "Battery, hydrogen and hybrid storage were compared, each set to deliver the largest stabilized output in every hour at the lowest life-cycle cost.",
   "E3.16": "Hybrid hydrogen and battery storage delivered the highest stabilized output of the four configurations.",
+  "E3.17": "The 26% compares two configurations that deliver different stabilized outputs: 28.3 MW with the battery and 39 MW with hydrogen storage and fuel cells in its place.",
   "E4.1": "Among the cases studied, concentrated solar power with thermal storage running a high-temperature electrolyzer at variable power gave the lowest levelized cost of hydrogen; constant-power operation was the most expensive.",
   "E4.2": "Yardstick here: the cost per kilogram across designs. Holds for: one West Texas site, cost projections from NREL's Annual Technology Baseline, a conference-length study.",
   "E4.3": "Concentrated solar and photovoltaic designs for making hydrogen are compared by their cost per kilogram.",
