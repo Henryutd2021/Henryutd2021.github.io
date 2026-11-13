@@ -89,6 +89,21 @@ const view1 = [0, 160, 0, 140];
   const rmp = LP.optimum(flip("ramp", ">="), view1); ok(rmp.x[0] === 145 && rmp.x[1] === 0 && rmp.value === 5800, "optimum: ramp as ≥ gives (145, 0) at $5,800");
   const eqc = LP.optimum(flip("cover", "="), view1); ok(eqc.x[0] === 130 && eqc.x[1] === 15, "optimum: cover as = gives the same best plan");
   const mx = LP.optimum({ sense: "max", c: [-40, -100], rows: dispatch.rows }, view1); ok(mx.x[0] === 130 && mx.x[1] === 15 && mx.value === -6700, "optimum: max of the negative cost is the same plan");
+  // exact, with no drawing box: an open edge with a finite best is not unbounded; a best plan far outside the view is found
+  const xy = [{ a: [1, 0], op: ">=", b: 0 }, { a: [0, 1], op: ">=", b: 0 }];
+  const mn = LP.optimum({ sense: "min", c: [1, 0], rows: xy }, [0, 10, 0, 10]);
+  ok(mn.status === "optimal" && mn.x.join() === "0,0" && mn.value === 0 && mn.tied === true, `optimum: minimize x with x, y ≥ 0 is (0, 0), tied along the y axis, not unbounded (${JSON.stringify(mn)})`);
+  ok(LP.optimum({ sense: "min", c: [1, 0], rows: [{ a: [1, 0], op: "<=", b: 1 }] }, [0, 10, 0, 10]).status === "unbounded", "optimum: minimize x with only x ≤ 1 is unbounded (straight against the goal)");
+  ok(LP.optimum({ sense: "max", c: [1, 0], rows: [{ a: [1, 0], op: "<=", b: 1 }] }).status === "optimal" && LP.optimum({ sense: "max", c: [1, 0], rows: [{ a: [1, 0], op: "<=", b: 1 }] }).x.join() === "1,0", "optimum: maximize x with only x ≤ 1: the line x = 1 ties, (1, 0) given");
+  const far = LP.optimum({ sense: "min", c: [1, 1], rows: [{ a: [1, 0], op: ">=", b: 10000 }, { a: [0, 1], op: ">=", b: 0 }] }, [0, 10, 0, 10]);
+  ok(far.status === "optimal" && far.x.join() === "10000,0" && !far.tied, "optimum: x ≥ 10000 far outside the view: (10000, 0)");
+  ok(LP.optimum({ sense: "min", c: [0, 0], rows: [] }).status === "optimal" && LP.optimum({ sense: "min", c: [1, 0], rows: [] }).status === "unbounded", "optimum: no rules: a zero goal ties everywhere, any other goal is unbounded");
+  ok(LP.optimum({ sense: "min", c: [1, 1], rows: [{ a: [0, 0], op: "<=", b: -1 }] }).status === "infeasible", "optimum: 0 ≤ −1 is infeasible");
+  ok(LP.feasible([{ a: [1, 1], op: "<=", b: 4 }, { a: [2, 2], op: ">=", b: 6 }]) && !LP.feasible([{ a: [1, 1], op: "<=", b: 4 }, { a: [2, 2], op: ">=", b: 10 }]) && LP.feasible([]),
+     "feasible: parallel rules (3 ≤ x + y ≤ 4 passes, 5 ≤ x + y ≤ 4 does not), no rules");
+  // rays: straight against the goal is tried
+  ok(LP.rays([{ a: [1, 0], op: "<=", b: 1 }], [1, 0]).some(r => r[0] === -1 && r[1] === 0), "rays: with the goal given, −c is among the directions (half-plane region)");
+  ok(LP.rays(xy).every(r => r[0] >= 0 && r[1] >= 0), "rays: the quadrant goes on only up and to the right");
 }
 
 // ---------------- lp2.solve (lesson 10's cases): 19:00, gas needed 145 MW, CO2 cap 100 t
@@ -158,6 +173,29 @@ function hour(o) {
   }
   ok(agree === n, `solve agrees with HiGHS on ${agree} of ${n} random problems`);
   ok(both > 300 && same === both, `optimum and solve find the same unique best corner on ${same} of ${both} problems`);
+  // optimum() on free variables (no x, y >= 0; a learner's rules may have no corner at all) against HiGHS: the same
+  // status, and the same best value when there is one
+  let fAgree = 0, fN = 0, fOpen = 0;
+  for (let k = 0; k < 2000; k++) {
+    const rows = [], nr = Math.floor(rnd() * 4), par = k % 4 === 0;   // every fourth problem: rules all parallel (no corner)
+    const n0 = [Math.round(rnd() * 6 - 3), Math.round(rnd() * 6 - 3)];
+    for (let j = 0; j < nr; j++) {
+      const s = Math.round(rnd() * 4 - 2) || 1, a = par ? [s * n0[0], s * n0[1]] : [Math.round(rnd() * 10 - 5), Math.round(rnd() * 10 - 5)];
+      if (!a[0] && !a[1]) continue;
+      rows.push({ id: "r" + j, a: a, op: ["<=", ">=", "<=", "="][Math.floor(rnd() * 4)], b: Math.round(rnd() * 200 - 100) });
+    }
+    const cc = par && rnd() < 0.5 ? [Math.round(rnd() * 4 - 2) * n0[0], 0].map((v, i) => i ? v / (n0[0] || 1) * n0[1] : v) : [Math.round(rnd() * 12 - 6), Math.round(rnd() * 12 - 6)];
+    const m = { sense: rnd() < 0.3 ? "max" : "min", c: cc, rows: rows };
+    const o = LP.optimum(m), cons = rows.map(q => ({ name: q.id, terms: { x: q.a[0], y: q.a[1] }, [{ "<=": "le", ">=": "ge", "=": "eq" }[q.op]]: q.b }));
+    if (!cons.length) cons.push({ name: "none", terms: { x: 0, y: 0 }, le: 1 });
+    const b = core.solveWith(highs, { sense: m.sense, variables: [{ name: "x", cost: m.c[0], lb: -Infinity }, { name: "y", cost: m.c[1], lb: -Infinity }], constraints: cons }, {});
+    fN++; if (!LP.corners(rows).length && o.status !== "infeasible") fOpen++;
+    const ag = (o.status === "infeasible" && b.status === "infeasible") ||
+      (o.status === "unbounded" && (b.status === "unbounded" || b.status === "infeasible-or-unbounded")) ||
+      (o.status === "optimal" && b.status === "optimal" && near(o.value, b.objective, 1e-5 * (1 + Math.abs(b.objective))) && rows.every(q => LP.holds(q, o.x, 1e-4 * (1 + Math.abs(q.b)))));
+    if (ag) fAgree++; else if (fN - fAgree <= 3) console.log("  free mismatch:", JSON.stringify(m), JSON.stringify(o), b.status, b.objective);
+  }
+  ok(fAgree === fN && fOpen > 100, `optimum agrees with HiGHS on ${fAgree} of ${fN} random problems with free variables (${fOpen} feasible with no corner)`);
 
   // ---------------- CardSort: lesson 10's card sort and lesson 6's job sorter
   {

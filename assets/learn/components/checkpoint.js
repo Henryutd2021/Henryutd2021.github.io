@@ -111,7 +111,8 @@
    Pure (Node: module.exports): task, checkChoice, checkOrder, checkNumeric (either answer form), checkMWh, checkValue,
    checkEstimate, level(D, st, {openFirst, late, solOpen}), firstRight(record, openFirst), writtenCounts(record,
    openFirst), lateAnswer(record, solOpen), allAnswered(D, st), lastAnswerAt(D, st), lateRule({gateAll, n}), tolText(task),
-   describe, summary, fmtMs, firstWord; for the per-task options: submitted(record), waitsFor(D, st, task),
+   describe, summary, fmtMs, firstWord(D, task, record, openFirst), pointsWord(task, ticked, record, openFirst) (a written
+   task's points: "0 points" when its solution was opened first under openFirst "not-right"); for the per-task options: submitted(record), waitsFor(D, st, task),
    solWaits(D, st, task), solLeaks(D), outOfOrder(D, st), taskList(D, ids), waitText(D, task, ids), shownTitle(D, st,
    task), openProblems(D) (unknown or circular opensAfter or solAfter names; a page's test should find none).
    level and summary find the explanation and the estimate as the first "open-short" and the first "estimate" task. */
@@ -336,9 +337,16 @@
     var s = Math.round(ms / 1000), m = Math.floor(s / 60);
     return m ? m + " min " + (s % 60 < 10 ? "0" : "") + (s % 60) + " s" : s + " s";
   }
-  function firstWord(D, t, r) {
+  // a written task's points in the results table and the copied summary: the boxes ticked, or, when its worked solution
+  // was opened before it was submitted and openFirst is "not-right", the 0 points the level counts (with what was ticked)
+  function pointsWord(t, ticked, r, openFirst) {
+    var of = t.points ? t.points.length : 2;
+    return writtenCounts(r, openFirst) ? ticked + " of " + of + " points (self)" : "solution opened first: 0 points (" + ticked + " of " + of + " ticked)";
+  }
+  // openFirst: the runner's option, else data.rule.openFirst (as the level rule reads it)
+  function firstWord(D, t, r, openFirst) {
     if (!r || r.first == null) return r && r.skipped ? "skipped" : "not answered";
-    if (t.kind === "open-short") return (r.points || []).filter(Boolean).length + " of " + (t.points ? t.points.length : 2) + " points (self)";
+    if (t.kind === "open-short") return pointsWord(t, (r.points || []).filter(Boolean).length, r, openFirst || (D.rule && D.rule.openFirst));
     if (t.kind === "estimate") return "submitted";
     return r.first ? "right" : "not right";
   }
@@ -357,7 +365,7 @@
     D.tasks.forEach(function (t, i) {
       var r = st.tasks[t.id] || {};
       var hide = waitsFor(D, st, t).length > 0;   // a waiting task's title and lessons stay unsaid, as on its card
-      lines.push((i + 1) + " | " + shownTitle(D, st, t) + " | " + (hide ? "–" : t.lesson) + " | " + firstWord(D, t, r) + " | " + (r.tries || 0) + " | " + fmtMs(r.msFirst) + " | " + fmtMs(r.ms) + " | " + (r.solFirst ? "yes" : isLate(r) ? "yes (the worked solution section)" : "no"));
+      lines.push((i + 1) + " | " + shownTitle(D, st, t) + " | " + (hide ? "–" : t.lesson) + " | " + firstWord(D, t, r, o.openFirst) + " | " + (r.tries || 0) + " | " + fmtMs(r.msFirst) + " | " + fmtMs(r.ms) + " | " + (r.solFirst ? "yes" : isLate(r) ? "yes (the worked solution section)" : "no"));
     });
     var esT = ofKind(D, "estimate"), es = esT && st.tasks[esT.id];
     if (es && es.answer) {
@@ -376,7 +384,7 @@
 
   var pure = { task: task, checkChoice: checkChoice, checkOrder: checkOrder, checkNumeric: checkNumeric, checkMWh: checkMWh, checkValue: checkValue,
     checkEstimate: checkEstimate, level: level, firstRight: firstRight, writtenCounts: writtenCounts, lateAnswer: lateAnswer, allAnswered: allAnswered, lastAnswerAt: lastAnswerAt, lateRule: lateRule, lateText: lateText,
-    tolText: tolText, describe: describe, summary: summary, fmtMs: fmtMs, firstWord: firstWord,
+    tolText: tolText, describe: describe, summary: summary, fmtMs: fmtMs, firstWord: firstWord, pointsWord: pointsWord,
     submitted: submitted, waitsFor: waitsFor, solWaits: solWaits, solLeaks: solLeaks, outOfOrder: outOfOrder, taskList: taskList, waitText: waitText, openProblems: openProblems, shownTitle: shownTitle };
   if (typeof module !== "undefined" && module.exports) module.exports = pure;
   if (typeof window === "undefined" || !window.LX) return;
@@ -785,7 +793,7 @@
       D.tasks.forEach(function (t, i) {
         var r = st.tasks[t.id] || {}, tr = E("tr", null, bd);
         var td = E("td", { "data-l": "Task" }, tr); E("button", { type: "button", class: "lx-link", text: (i + 1) + ". " + shownTitle(D, st, t), onclick: function () { show(i); } }, td);
-        E("td", { "data-l": "First answer", text: firstWord(D, t, r) }, tr);
+        E("td", { "data-l": "First answer", text: firstWord(D, t, r, o.openFirst) }, tr);
         E("td", { class: "n", "data-l": "Tries", text: String(r.tries || 0) }, tr);
         E("td", { class: "n", "data-l": "Time to first answer", text: fmtMs(r.msFirst) }, tr);
         E("td", { "data-l": "Solution first", text: r.solFirst ? "yes" : o.late === "practice" && lateAnswer(r, solAt()) ? "yes (worked solution open)" : "no" }, tr);

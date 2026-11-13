@@ -14,14 +14,19 @@
      segment(a, b, view)    the part of the line a·p = b inside the view: [[x, y], [x, y]], left (then lower) end first; or null
      verticesOf(poly)       the polygon's corners rounded to one decimal
      bigBox(view)           the view grown by 20 view-widths on every side
-     optimum(m, view)       m = {sense: "min" | "max", c: [c1, c2], rows: [rules]}: the best corner, searched inside bigBox(view),
-                            so it works for any rules a learner writes, with or without a corner (B1's builder). A best plan on
-                            the far box edge means unbounded. -> {status: "optimal", x: [x, y], ties: [[x, y], ...], value}
-                            (rounded to 1e-6) | {status: "infeasible"} | {status: "unbounded"}
+     optimum(m[, view])     m = {sense: "min" | "max", c: [c1, c2], rows: [rules]}: the best plan, decided exactly for any rules a
+                            learner writes, with or without a corner (B1's builder); no drawing box is used, so a best plan on
+                            an open edge is not called unbounded and one far outside the view is still found (the view is
+                            accepted and ignored). -> {status: "optimal", x: [x, y], ties: [the best corners], value, tied
+                            (other plans tie with x: an edge, a ray or, with no corner, a whole line)} (rounded to 1e-6) |
+                            {status: "infeasible"} | {status: "unbounded"}
+     feasible(rows)         whether any plan passes every rule, decided exactly (no box)
      halfplanes(rows)       every rule as {id, a, b} with a·p <= b
      corners(rows)          the exact corners (pairwise line crossings that pass every rule), in order around the region:
                             [{x, y, on: [ids of the rules whose line runs through it]}]
-     rays(rows)             the directions (unit vectors) along which the region goes on for ever
+     rays(rows[, c])        the directions (unit vectors) along which the region goes on for ever: the axes, both ways along
+                            each rule's line and, given the goal c in min form, straight against it (-c); enough to tell
+                            whether the goal improves for ever
      solve(m)               the exact outcome, by vertex enumeration and the region's rays: {status: "optimal" (one best
                             corner) | "tied" (a whole edge, or a ray, of equally good plans) | "infeasible" (no plan passes) |
                             "unbounded" (the goal improves for ever along a ray), corners, best (the best corners), x, y (the
@@ -119,23 +124,6 @@
   function bigBox(view) { var v = box(view), sx = v[1] - v[0], sy = v[3] - v[2]; return [v[0] - 20 * sx, v[1] + 20 * sx, v[2] - 20 * sy, v[3] + 20 * sy]; }
   function r6(v) { return Math.round(v * 1e6) / 1e6 + 0; }
 
-  // the best corner of max/min c·p, searched inside the big box (any rules, also without a corner)
-  function optimum(m, view) {
-    var big = bigBox(view), P = region(m.rows, big);
-    if (!P.length) return { status: "infeasible" };
-    var sg = m.sense === "max" ? -1 : 1, best = Infinity, arg = [], scale = 1;
-    P.forEach(function (p) { scale = Math.max(scale, Math.abs(m.c[0] * p[0]) + Math.abs(m.c[1] * p[1])); });
-    P.forEach(function (p) {
-      var v = sg * (m.c[0] * p[0] + m.c[1] * p[1]), e = 1e-9 * scale;
-      if (v < best - e) { best = v; arg = [p]; } else if (Math.abs(v - best) <= e) arg.push(p);
-    });
-    var span = Math.max(big[1] - big[0], big[3] - big[2]) * 1e-9;
-    var far = arg.some(function (p) { return p[0] <= big[0] + span || p[0] >= big[1] - span || p[1] <= big[2] + span || p[1] >= big[3] - span; });
-    if (far) return { status: "unbounded" };
-    var x = arg.map(function (p) { return [r6(p[0]), r6(p[1])]; });
-    return { status: "optimal", x: x[0], ties: x, value: r6(sg * best) };
-  }
-
   // ---- exact: corners, rays and the four outcomes
   var EPS = 1e-7;
   function halfplanes(rows) {
@@ -165,16 +153,71 @@
     }
     return vs.map(function (v) { return { x: v[0], y: v[1], on: active(hs, v) }; });
   }
-  function rays(rows) {
-    var hs = halfplanes(rows), cand = [[1, 0], [0, 1]];
+  // The directions along which the region goes on for ever: the directions r with a·r <= 0 for every rule. Tried: the
+  // axes, both ways along every rule's line, and, when the goal c (in min form) is given, straight against it (-c). A
+  // region that runs on for ever in a direction that improves the goal always does so along one of these: along an
+  // edge of the region's cone of directions, or straight against the goal when that cone is a half-plane or the whole
+  // plane (minimize x with only x <= 1).
+  function rays(rows, c) {
+    var hs = halfplanes(rows), cand = [[1, 0], [0, 1], [-1, 0], [0, -1]];
     hs.forEach(function (h) { var n = Math.hypot(h.a[0], h.a[1]); if (n > 0) cand.push([h.a[1] / n, -h.a[0] / n], [-h.a[1] / n, h.a[0] / n]); });
-    return cand.filter(function (r) { return hs.every(function (h) { return dot(h.a, r) <= 1e-12; }); });
+    if (c) { var nc = Math.hypot(c[0], c[1]); if (nc > 0) cand.push([-c[0] / nc + 0, -c[1] / nc + 0]); }
+    var out = [];
+    cand.forEach(function (r) {
+      if (!hs.every(function (h) { return dot(h.a, r) <= 1e-12; })) return;
+      if (!out.some(function (q) { return Math.abs(q[0] - r[0]) < 1e-12 && Math.abs(q[1] - r[1]) < 1e-12; })) out.push(r);
+    });
+    return out;
+  }
+  // whether any plan passes the rules, decided exactly, with no drawing box (x >= 10000 lies far outside any drawing).
+  // Rules whose lines are not all parallel: a region that is not empty has a corner. Rules that are all parallel (or
+  // none): one number n·p must fit between their lower and upper limits. A rule with no decision in it (0 <= -1) is
+  // simply true or false.
+  function feasible(rows) {
+    var hs = [], never = false;
+    (rows || []).forEach(function (r) { le(r).forEach(function (h) { if (h.a[0] || h.a[1]) hs.push(h); else if (h.b < -1e-9) never = true; }); });
+    if (never) return false;
+    if (!hs.length) return true;
+    var n = hs[0].a, nn = n[0] * n[0] + n[1] * n[1];
+    if (hs.some(function (h) { return Math.abs(n[0] * h.a[1] - n[1] * h.a[0]) > 1e-12 * (1 + nn); })) return corners(rows).length > 0;
+    var lim = parallelLimits(hs, n);
+    return lim.lo <= lim.hi + 1e-9 * (1 + Math.abs(lim.hi));
+  }
+  // rules all parallel to the normal n: the range [lo, hi] of n·p they allow
+  function parallelLimits(hs, n) {
+    var nn = n[0] * n[0] + n[1] * n[1], lo = -Infinity, hi = Infinity;
+    hs.forEach(function (h) { var k = (h.a[0] * n[0] + h.a[1] * n[1]) / nn; if (k > 0) hi = Math.min(hi, h.b / k); else if (k < 0) lo = Math.max(lo, h.b / k); });
+    return { lo: lo, hi: hi };
+  }
+  // the best plan of max/min c·p for any rules, decided exactly (B1's builder: rules a learner writes, with or without a
+  // corner). Unbounded only when a direction the region runs along for ever improves the goal (rays(rows, c)), so an
+  // open region with a finite best (minimize x with x, y >= 0) is not called unbounded, and a best plan far outside the
+  // drawing is still found. The view is not needed (older callers pass one).
+  function optimum(m) {
+    var rows = m.rows || [], sg = m.sense === "max" ? -1 : 1, c = [sg * m.c[0], sg * m.c[1]];
+    if (!feasible(rows)) return { status: "infeasible" };
+    var rs = rays(rows, c);
+    if (rs.some(function (r) { return dot(c, r) < -1e-9; })) return { status: "unbounded" };
+    var flat = rs.some(function (r) { return Math.abs(dot(c, r)) <= 1e-9; }), vs = corners(rows);
+    if (vs.length) {
+      var cost = function (v) { return c[0] * v.x + c[1] * v.y; };
+      var lo = Math.min.apply(null, vs.map(cost)), tol = 1e-7 * (1 + Math.abs(lo));
+      var x = vs.filter(function (v) { return cost(v) <= lo + tol; }).map(function (v) { return [r6(v.x), r6(v.y)]; });
+      return { status: "optimal", x: x[0], ties: x, value: r6(sg * lo), tied: x.length > 1 || flat };
+    }
+    // no corner, yet bounded: the rules are all parallel to a normal n and the goal points along n (or is zero), so a
+    // whole line of plans ties for best; x is its plan nearest the origin
+    var hs = halfplanes(rows).filter(function (h) { return h.a[0] || h.a[1]; });
+    var n = hs.length ? hs[0].a : (c[0] || c[1] ? c : [1, 0]), nn = n[0] * n[0] + n[1] * n[1], lim = parallelLimits(hs, n);
+    var k = (c[0] * n[0] + c[1] * n[1]) / nn, t = k > 1e-12 ? lim.lo : k < -1e-12 ? lim.hi : Math.max(lim.lo, Math.min(lim.hi, 0));
+    var p = [r6(t * n[0] / nn), r6(t * n[1] / nn)];
+    return { status: "optimal", x: p, ties: [p], value: r6(sg * (c[0] * p[0] + c[1] * p[1])), tied: true };
   }
   function solve(m) {
     var sg = m.sense === "max" ? -1 : 1, c = [sg * m.c[0], sg * m.c[1]], vs = corners(m.rows);
     var res = { status: "infeasible", corners: vs, best: [], x: null, y: null, value: null, ray: null, binding: {} };
     if (!vs.length) return res;
-    var rs = rays(m.rows), down = rs.filter(function (r) { return dot(c, r) < -1e-9; });
+    var rs = rays(m.rows, c), down = rs.filter(function (r) { return dot(c, r) < -1e-9; });
     if (down.length) { res.status = "unbounded"; res.ray = down[0]; return res; }
     var cost = function (v) { return c[0] * v.x + c[1] * v.y; };
     var lo = Math.min.apply(null, vs.map(cost)), tol = 1e-7 * (1 + Math.abs(lo));
@@ -204,7 +247,7 @@
   }
 
   var lp2 = { box: box, le: le, lhs: lhs, holds: holds, clip: clip, region: region, segment: segment, verticesOf: verticesOf, bigBox: bigBox,
-              optimum: optimum, halfplanes: halfplanes, corners: corners, rays: rays, solve: solve, simplexWalk: simplexWalk };
+              optimum: optimum, feasible: feasible, halfplanes: halfplanes, corners: corners, rays: rays, solve: solve, simplexWalk: simplexWalk };
   if (typeof module !== "undefined" && module.exports) module.exports = lp2;
   if (typeof window === "undefined" || !window.LX) return;
 

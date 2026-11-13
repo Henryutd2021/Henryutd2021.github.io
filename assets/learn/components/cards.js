@@ -7,6 +7,9 @@
    cards.go(i) | cards.index() | cards.count   progress dots, "Step n of N", Back and Next; the last card hides Next.
    Next past the last card (a script's click on the hidden button, e.g. a demo hook run twice) and Back on the first
    card do nothing.
+   api.done() opens Next; api.undone() shuts it again (the card's action is no longer done: an answer cleared, a setting
+   moved so it no longer fits), until the next done(); a free card stays open. A card's done state is kept when the reader
+   goes Back and returns.
    api.saw(text, bad) shows what the reader saw; text takes glossary marks and **bold**.
    api.busy(on) holds Next shut while on (e.g. while a solve runs; the card is aria-busy), whatever done() said; busy(false)
    restores it. A call from a card that is no longer shown (a late solve after Back) changes nothing on screen.
@@ -37,6 +40,9 @@
       nx.addEventListener("click", function () { if (unlocked[i] && !busy && i < N - 1) { render(i + 1); card.scrollIntoView({ block: "nearest", behavior: LX.reduced() ? "auto" : "smooth" }); } });
       var api = {
         done: function () { unlocked[k] = true; nx.disabled = busy; },
+        // the card's action is no longer done (an answer cleared, a setting that no longer fits): Next shuts again
+        // until done() is called. A free card stays open.
+        undone: function () { if (st.free) return; unlocked[k] = false; nx.disabled = true; },
         busy: function (on) {
           busy = !!on; nx.disabled = busy || !unlocked[k];
           if (gen !== shown) return;              // a late call from a card no longer shown

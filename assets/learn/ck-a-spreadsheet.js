@@ -154,7 +154,7 @@
     lines.push("");
     lines.push("# | Part | Task | First answer | Tries | Time to first answer | Solution opened before answering");
     D.tasks.forEach(function (t, i) {
-      var r = st.tasks[t.id] || {}, w = !r || r.first == null ? (r && r.answer ? "submitted" : "not answered") : t.kind === "open-short" ? (r.points || []).filter(Boolean).length + " of " + t.points.length + " points (self)" : r.first ? "right" : "not right";
+      var r = st.tasks[t.id] || {}, w = !r || r.first == null ? (r && r.answer ? "submitted" : "not answered") : t.kind === "open-short" ? CPK.pointsWord(t, (r.points || []).filter(Boolean).length, r, "not-right") : r.first ? "right" : "not right";
       lines.push((i + 1) + " | " + t.part + " | " + t.title + " | " + w + " | " + (r.tries || 0) + " | " + CPK.fmtMs(r.msFirst) + " | " + (after(D, st, t) ? "yes (the full worked solution)" : r.solFirst ? "yes" : "no"));
     });
     D.tasks.forEach(function (t) {

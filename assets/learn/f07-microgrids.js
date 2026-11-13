@@ -504,9 +504,9 @@
             [["Loads kept", kw(k), fits ? null : "bad"], ["The island can give at night", kw(nightKW(C)), null]].forEach(function (c) {
               var d = H("div", { class: "lx-readout" + (c[2] ? " " + c[2] : "") }, sum); H("span", { text: c[0] }, d); H("b", { text: c[1] }, d);
             });
-            var stt = keepStatus(C, keep), last = saved ? " The run keeps your last set that fits, " + kw(keptKW(C, S0.keep)) + "." : "";
-            if (stt === "critical") api.saw(D.texts.keepCritical + last, true);
-            else if (stt === "over") api.saw("**" + kw(k) + "** is more than the island's " + kw(nightKW(C)) + ". Switch off another load." + last, true);
+            var stt = keepStatus(C, keep);   // a set that does not fit shuts Next until it fits again
+            if (stt === "critical") { api.saw(D.texts.keepCritical, true); api.undone(); }
+            else if (stt === "over") { api.saw("**" + kw(k) + "** is more than the island's " + kw(nightKW(C)) + ". Switch off another load.", true); api.undone(); }
             else { saved = keep; api.saw("You keep **" + kw(k) + "**, within the island's " + kw(nightKW(C)) + "."); api.done(); }
           }
           paint();
@@ -586,7 +586,7 @@
           var d = H("div", { class: "lx-readout" + (c[2] ? " " + c[2] : "") }, chips); H("span", { text: c[0] }, d); H("b", { text: c[1] }, d);
         });
         P.render(villageSpec(V, r, mill));
-        if (!r.ok) { api.saw(mb === null ? "With " + kw(S0.vkw) + " of panels no battery on the slider is enough: the day's sun is too small. Add panels." : "Short in " + r.shortHours + " hours. With " + kw(S0.vkw) + " of panels, try a larger battery.", true); return; }
+        if (!r.ok) { api.saw(mb === null ? "With " + kw(S0.vkw) + " of panels no battery on the slider is enough: the day's sun is too small. Add panels." : "Short in " + r.shortHours + " hours. With " + kw(S0.vkw) + " of panels, try a larger battery.", true); api.undone(); return; }
         var sm = smallest(V, mill), other = smallest(V, mill === "noon" ? "evening" : "noon");
         if (mill === "noon") api.saw("**Every hour served.** With " + kw(S0.vkw) + " of panels the smallest battery that works is " + kwh(mb) + "; the smallest pair on the sliders is " + kw(sm.kw) + " and " + kwh(sm.kwh) + ".");
         else api.saw("**Every hour served.** Evening milling needs at least " + kw(sm.kw) + " and " + kwh(sm.kwh) + ", against " + kw(other.kw) + " and " + kwh(other.kwh) + " at midday: the battery now runs the mill. Run big loads while the sun shines.");

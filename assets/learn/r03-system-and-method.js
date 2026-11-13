@@ -364,7 +364,7 @@
               H("li", { class: c.ok ? "ok" : "warn", html: LX.icon(c.ok ? "check" : "question") + "<span><span class=\"lx-sr\">" + (c.ok ? "Done: " : "To do: ") + "</span>" + LX.esc(c.label) + "</span>" }, cks);
             });
             var done = defenceDone(V(), m.id);
-            if (done) api.done();
+            if (done) api.done(); else api.undone();   // a part cleared after all six were there shuts Next again
             // said once per change of state, not at every keystroke
             if (done !== wasDone) {
               if (done) api.saw("All six parts are there. Read them as a reviewer would: is each reason tied to this question?");

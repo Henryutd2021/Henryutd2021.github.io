@@ -375,13 +375,16 @@ const fm = M.fm, r1 = v => Math.round(v * 10) / 10, r3 = v => Math.round(v * 100
       ok(sn() && sn().hidden && /under 0\.45 kg/.test(card().textContent) && /at most 4\.0 kg/.test(card().textContent) && /never wins/.test(card().textContent), "step 7: the cases are named by their caps, and the note says why a cap from above suffices");
       segB(/combined-cycle/).click();
       ok(!sn().hidden && card().querySelector(".m11-stale") && /Settings changed: solve again/.test(card().textContent) && !/The top tier wins/.test(card().textContent), "step 7: a new grid rate marks the table stale and replaces the conclusion");
+      ok(next().disabled, "step 7: a new grid rate after a solve shuts Next until the next solve");
       segB(/2025 average/).click(); calls = 0; btns(/Solve the tiers/)[0].click(); await flush();
       ok(sn().hidden && !card().querySelector(".m11-stale") && /The top tier wins/.test(card().textContent) && calls === 0, "step 7: solving again (from the cache) clears the stale mark");
+      ok(!next().disabled, "step 7: solving again opens Next again");
       demo.cards.go(7); failing = false; calls = 0;
       btns(/Solve this boundary/)[0].click(); await flush();
       ok(calls === 0 && !failBox() && /Now change the boundary/.test(card().textContent), "step 8: the default boundary reuses the LPs step 7 solved");
       card().querySelectorAll(".lx-seg button").filter(b => /increment/.test(b.textContent))[0].click();
       ok(!card().querySelector(".m11-stale-note").hidden && /New books, the same plant/.test(card().textContent), "step 8: a new boundary after a run says to solve again; the note calls the increment new books");
+      ok(next().disabled, "step 8: Next waits for the run of the new settings");
       btns(/Solve this boundary/)[0].click(); await flush();
       ok(calls === d.solved && !next().disabled && card().textContent.includes(fm.musd(B("increment").npv)), "step 8: a second boundary solves (" + calls + " LPs) and unlocks Next, NPV " + fm.musd(B("increment").npv));
       ok(card().querySelector(".m11-stale-note").hidden, "step 8: the new run clears the stale note");

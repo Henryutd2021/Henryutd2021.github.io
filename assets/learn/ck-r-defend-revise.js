@@ -94,7 +94,7 @@
     lines.push("");
     lines.push("# | Part | Task | First answer | Tries | Time to first answer | Solution opened before answering");
     D.tasks.forEach(function (t, i) {
-      var r = st.tasks[t.id] || {}, w = r.first == null ? (r.answer ? "submitted" : "not answered") : isOpen(t) ? points(st, t) + " of " + t.points.length + " points (self)" : r.first ? "right" : "not right";
+      var r = st.tasks[t.id] || {}, w = r.first == null ? (r.answer ? "submitted" : "not answered") : isOpen(t) ? CPK.pointsWord(t, points(st, t), r, "not-right") : r.first ? "right" : "not right";
       lines.push((i + 1) + " | " + t.part + " | " + CPK.shownTitle(D, st, t) + " | " + w + " | " + (r.tries || 0) + " | " + CPK.fmtMs(r.msFirst) + " | " + (after(D, st, t) ? "yes (the worked solution)" : r.solFirst ? "yes" : "no"));
     });
     // the reader's own texts in full, line by line (indented, so a mentor sees where each ends); nothing is cut

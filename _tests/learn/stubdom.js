@@ -5,7 +5,7 @@
 //   load("exemplars", E);                    // runs assets/learn/components/exemplars.js against the stub; returns its exports
 //   const ex = E.LX.Exemplars(E.LX.H("div", null, E.body), {...});
 //   el.click(); el.fire("keydown", { key: "Enter" }); el.querySelectorAll(".lx-ex-mark")
-// Elements keep attributes, children in order, listeners, and the reflected properties components use (hidden, disabled,
+// Elements keep attributes, children in order (appendChild, insertBefore), listeners, and the reflected properties components use (hidden, disabled,
 // open, value, checked). Selectors: tag, #id, .class, [attr], [attr="v"], :not(.class), descendant chains and comma
 // lists, matched in document order. LX holds the core helpers as core.js defines them (H, S, uid, esc, rich, store, ...;
 // rich and mulberry32 are core.js's own exports);
@@ -45,6 +45,16 @@ class El {
   get checked() { return this._checked !== undefined ? this._checked : "checked" in this.attrs; } set checked(v) { this._checked = !!v; }
   get value() { return this._value !== undefined ? this._value : (this.attrs.value || ""); } set value(v) { this._value = String(v); }
   appendChild(c) { if (c.parentNode) c.parentNode.children = c.parentNode.children.filter(x => x !== c); c.parentNode = this; this.children.push(c); this._html = null; return c; }
+  insertAdjacentHTML(pos, html) {   // a markup string as one opaque child (its class read from the markup), first or last
+    const e = new El("span"); e._html = String(html); e.attrs.class = (/class="([^"]+)"/.exec(html) || [])[1] || "";
+    if (pos === "afterbegin") { e.parentNode = this; this.children.unshift(e); this._html = null; } else this.appendChild(e);
+  }
+  insertBefore(c, ref) {
+    if (c.parentNode) c.parentNode.children = c.parentNode.children.filter(x => x !== c);
+    const i = ref ? this.children.indexOf(ref) : -1; c.parentNode = this; this._html = null;
+    if (i < 0) this.children.push(c); else this.children.splice(i, 0, c);
+    return c;
+  }
   remove() { if (this.parentNode) this.parentNode.children = this.parentNode.children.filter(x => x !== this); this.parentNode = null; }
   set textContent(v) { this.children = []; this._text = String(v); this._html = null; }
   get textContent() { return this._html != null ? this._html.replace(/<[^>]+>/g, "") : this._text + this.children.map(c => c.textContent).join(""); }

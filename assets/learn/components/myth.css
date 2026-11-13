@@ -10,3 +10,6 @@
 .lx-qq .lx-choices { margin: 0; padding-left: 1.2rem; }
 details.lx-answer summary { cursor: pointer; font-family: var(--lx-f-display); font-weight: 500; font-size: 14px; color: var(--lx-ink-2); }
 .lx-score { grid-column: 1 / -1; font-size: 14px; color: var(--lx-ink-3); min-height: 1.2em; }
+.lx-qfb .lx-saw > div { min-width: 0; }
+.lx-qfb .lx-saw > div > :is(p, ul, ol, table, .lx-scroll-x) { margin: 6px 0 0; }
+.lx-qfb .lx-saw > div > :is(ul, ol) { padding-left: 1.2rem; }
