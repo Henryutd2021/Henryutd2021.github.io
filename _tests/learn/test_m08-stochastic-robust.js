@@ -262,7 +262,7 @@ const text = s => s.replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/\\\$
   // ---------------- the excerpt: approved sentences, word for word (E10 and E11)
   const norm = s => String(s).replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/\s+/g, " ").trim();
   const SNAP = {   // the approved wording of E10 and E11
-    "E10.1": "A two-stage stochastic linear program sized electrolyzers, hydrogen tanks and fuel cells once in each of ERCOT's eight weather zones, with hydrogen pipelines between neighbouring zones, then scheduled the system hour by hour over a full year in nine scenarios: three completion rates of planned renewable capacity by three electricity-demand levels.",
+    "E10.1": "A two-stage stochastic linear program sized electrolyzers, hydrogen tanks and fuel cells once in each of ERCOT's eight weather zones, with hydrogen pipelines between neighboring zones, then scheduled the system hour by hour over a full year in nine scenarios: three completion rates of planned renewable capacity by three electricity-demand levels.",
     "E10.4": "Inputs reflect 2022–2023 conditions; post-2023 federal hydrogen credit rules are not modeled.",
     "E11.6": "Hydrogen equipment is sized once, then operated hour by hour in nine scenarios; the sizes minimize expected cost over all nine scenarios instead of fitting a single forecast.",
     "E11.7": "The completion rate of planned renewable capacity was 0% (probability 0.1), 30% (0.7) or 80% (0.2); electricity demand was ERCOT's 2030 projection (0.5), 2% lower (0.2) or 2% higher (0.3)."

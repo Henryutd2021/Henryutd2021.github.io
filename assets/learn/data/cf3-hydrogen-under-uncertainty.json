@@ -4,7 +4,7 @@
  "timeline": {
   "title": "The study in time",
   "events": [
-   {"date": "2025-03", "label": "Journal article (this case)", "kind": "study", "key": true, "text": "Electrolyzers, hydrogen tanks and fuel cells are sized for [[ercot|ERCOT]]'s eight weather zones under uncertain renewable build-out and electricity demand, with hydrogen pipelines between neighbouring zones; published online on 2 March 2025, in the March 2025 issue.", "source": {"label": "Li et al. (2025), International Journal of Hydrogen Energy 113, 77–89", "url": "https://doi.org/10.1016/j.ijhydene.2025.02.303"}},
+   {"date": "2025-03", "label": "Journal article (this case)", "kind": "study", "key": true, "text": "Electrolyzers, hydrogen tanks and fuel cells are sized for [[ercot|ERCOT]]'s eight weather zones under uncertain renewable build-out and electricity demand, with hydrogen pipelines between neighboring zones; published online on 2 March 2025, in the March 2025 issue.", "source": {"label": "Li et al. (2025), International Journal of Hydrogen Energy 113, 77–89", "url": "https://doi.org/10.1016/j.ijhydene.2025.02.303"}},
    {"date": "2026-10-30", "label": "Code released", "kind": "study", "text": "A documented, runnable implementation of the planning framework, with synthetic examples (version 1.0.2).", "source": {"label": "txh2-ercot-hydrogen on GitHub", "url": "https://github.com/Henryutd2021/txh2-ercot-hydrogen", "as_of": "2026-11-05"}}
   ]
  },
