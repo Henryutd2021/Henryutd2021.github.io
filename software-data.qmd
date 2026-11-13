@@ -37,7 +37,7 @@ Documented model frameworks for my published and accepted studies and for a fund
 ## Reference data {#reference-data}
 :::
 
-Source-based parameters and inputs for energy-system research, with technical and monetary bases, original sources, reuse terms and paper cross-references. The [hydrogen handbook](reference-data/hydrogen.qmd) includes versioned CSV downloads; see [Reference data](reference-data/index.qmd) for citation guidance and future handbooks.
+The [hydrogen](reference-data/hydrogen.qmd) and [nuclear and SMR](reference-data/nuclear.qmd) handbooks provide source-based parameters, bases and versioned CSVs, with [citation and licence guidance](reference-data/index.qmd).
 :::
 
 ::: {.fx-sec}

@@ -46,3 +46,5 @@ body.page-reference main.content { min-width: 0; }
   .page-reference .ref-nav ul { display: block; }
   .page-reference .ref-nav li + li { margin-top: .5rem; }
 }
+/* links in the handbook cards and paper boxes: the darker accent ink, 4.5:1 or better on the card background in both themes */
+.page-reference h3 a, .page-reference .ref-paper a { color: var(--accent-ink); }

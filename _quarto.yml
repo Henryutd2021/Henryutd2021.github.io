@@ -11,7 +11,9 @@ project:
     - publications.qmd
     - files/papers/*.qmd
     - software-data.qmd
-    - reference-data/*.qmd
+    - reference-data/index.qmd
+    - reference-data/hydrogen.qmd
+    - reference-data/nuclear.qmd
     # notes.qmd and notes/*.qmd are hidden until there is content
     - teaching.qmd
     - cv.qmd
