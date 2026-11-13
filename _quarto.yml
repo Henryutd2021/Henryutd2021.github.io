@@ -11,6 +11,7 @@ project:
     - publications.qmd
     - files/papers/*.qmd
     - software-data.qmd
+    - reference-data/*.qmd
     # notes.qmd and notes/*.qmd are hidden until there is content
     - teaching.qmd
     - cv.qmd
@@ -31,6 +32,8 @@ project:
   resources:
     - robots.txt
     - llms.txt
+    - reference-data/*.csv
+    - reference-data/*.json
     - google10b8e69b53ee897d.html   # Google Search Console file verification
     - images/
     - files/

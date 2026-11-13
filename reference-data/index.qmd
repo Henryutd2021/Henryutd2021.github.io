@@ -1,0 +1,42 @@
+---
+title: "Reference data"
+subtitle: "Source-based parameters and inputs"
+description: "Versioned research parameters and inputs with original sources, bases, citation guidance and source-specific reuse terms."
+title-block-banner: true
+page-layout: full
+toc: false
+body-classes: "page-inner page-folio page-reference"
+css: ../assets/reference-data.css
+---
+
+<!-- Generated from the reference data files. -->
+
+```{=html}
+<article class="reference-handbook">
+<p class="pg-lede">Reference data handbooks collect technical parameters and model inputs with their values, bases, original sources and reuse terms. They help researchers find and cite the source behind each number.</p>
+<p>This is not a harmonized forecast or a collection of study results. Historical status, targets, reference designs, model assumptions and observations retain their source-specific bases. Costs are not escalated to current dollars.</p>
+<section class="fx-sec" aria-labelledby="handbooks">
+<div class="fx-head"><h2 id="handbooks">Handbooks</h2></div>
+<div class="card ref-card theme-hydrogen"><h3><a href="hydrogen.html">Hydrogen techno-economic parameters and inputs</a></h3>
+<p>Version 0.1 · 76 quantities · 66 handbook IDs · checked 2026-11-13</p>
+<p>Electrolysis, storage and delivery, compression, fuel cells, fossil-hydrogen comparisons, policy and market inputs.</p></div>
+<p>Planned: wind, solar, nuclear/SMR, storage, markets.</p>
+</section>
+<section class="fx-sec" aria-labelledby="cite">
+<div class="fx-head"><h2 id="cite">How to cite</h2></div>
+<p>Cite the compilation, the original source of every numerical input (including its table or page and version), and Henry’s paper when reproducing that paper’s assumptions or model configuration. A numerical correspondence does not establish adoption of the same source.</p>
+<p class="ref-citation">Li, H. (2026). Hydrogen techno-economic parameters and inputs: Reference data handbook. Version 0.1. https://henryutd2021.github.io/reference-data/hydrogen.html. Accessed [date], records [IDs].</p>
+<p>Use the versioned CSV and record IDs to identify the inputs used. The compilation citation credits curation and does not replace original-source citations.</p>
+</section>
+<section class="fx-sec" aria-labelledby="licence">
+<div class="fx-head"><h2 id="licence">Licence</h2></div>
+<p>Compilation and curation: <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 (CC BY 4.0)</a>. Each value retains its source’s terms, listed in the <a href="hydrogen.html#source-register">source register</a>. This licence does not relicense the source documents.</p>
+</section>
+<section class="fx-sec" aria-labelledby="versions">
+<div class="fx-head"><h2 id="versions">Version and change log</h2></div>
+<p><strong>v0.1 — 2026-11-13</strong>: first hydrogen handbook; source-specific parameters, paper cross-references, CSV downloads and Dataset metadata.</p>
+<p>Future releases will keep versioned downloads, record changes in the change log and update the latest CSV. See the <a href="hydrogen.html#updates">source review schedule</a>.</p>
+</section>
+<p><a href="../software-data.html">Back to Software &amp; Data</a></p>
+</article>
+```
