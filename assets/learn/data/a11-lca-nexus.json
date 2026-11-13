@@ -1,5 +1,5 @@
 {
-  "about": "Data of Learn lesson A11 (a11-lca-nexus), What does 'clean' mean from cradle to grave? Life cycles, water and land. Every footprint here is a published median or range from a primary source, by life-cycle stage, with its source and the date it was read; the lesson's script turns them into the page's numbers (litres to gallons, acres to square metres) and its test recomputes every one. A data center appears only as a load: the electricity and water it uses. The gas plant's stack check reads lesson A10's EIA heat rate and CO2 coefficient (a10-emissions-questions.json); the campus is lesson F8's (f08-large-loads.json, 240 MW in every hour). Values marked about are NREL's own approximate (tilde) entries.",
+  "about": "Data of Learn lesson A11 (a11-lca-nexus), What does 'clean' mean from cradle to grave? Life cycles, water and land. Every footprint here is a published median or range from a primary source, by life-cycle stage, with its source and the date it was read; the lesson's script turns them into the page's numbers (liters to gallons, acres to square meters) and its test recomputes every one. A data center appears only as a load: the electricity and water it uses. The gas plant's stack check reads lesson A10's EIA heat rate and CO2 coefficient (a10-emissions-questions.json); the campus is lesson F8's (f08-large-loads.json, 240 MW in every hour). Values marked about are NREL's own approximate (tilde) entries.",
   "stages": [
     { "id": "build", "label": "Build", "sub": "materials, making, construction" },
     { "id": "supply", "label": "Supply", "sub": "fuel or power brought in, upkeep" },
@@ -74,7 +74,7 @@
       "water": {
         "build": { "nc": "not counted" },
         "supply": { "dc": "indirect", "src": "lbnlDC", "note": "consumed at the power plants and hydropower reservoirs that make its electricity, U.S. data centers, 2023" },
-        "run": { "dc": "direct", "src": "lbnlDC", "note": "evaporated in its own cooling, U.S. data centers, 2023: 66 billion litres over 176 TWh" },
+        "run": { "dc": "direct", "src": "lbnlDC", "note": "evaporated in its own cooling, U.S. data centers, 2023: 66 billion liters over 176 TWh" },
         "end": { "nc": "not counted" }
       },
       "land": {

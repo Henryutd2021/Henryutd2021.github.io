@@ -117,7 +117,7 @@ ok(/same UTC hour \(rows 24 apart\)/.test(D.decisions.fill.options.find(o => o.i
   ok(E("spike") === "lowest hour 24.4 GW (1.5 GW with every value kept)", "log effect, spike: " + E("spike"));
   ok(E("fill") === "demand 298.56 TWh (left out: 275.09; straight line: 297.72)", "log effect, fill: " + E("fill"));
   ok(E("frozen") === "demand 298.56 TWh, wind 110.73 TWh (299.51 and 110.46 with the rule off)", "log effect, frozen: " + E("frozen"));
-  ok(E("time") === "peak hour labelled 16:00–17:00 CDT, 29 July (21:00–22:00 UTC, 29 July in UTC)", "log effect, time: " + E("time"));
+  ok(E("time") === "peak hour labeled 16:00–17:00 CDT, 29 July (21:00–22:00 UTC, 29 July in UTC)", "log effect, time: " + E("time"));
   ok(L.find(l => l.key === "check").count === "65 hours, 49 of them filled", "the log reports the night check that fails"); }
 { const t = M.sensitivity(F, M.DEFAULT).rows; ok(M.f2(t.find(r => r.key === "frozen" && r.option === 0).rep.demandTWh) === "299.51", "the log's 'rule off' figure equals the table's frozen-off row (299.51 TWh)"); }
 // the spatial log: what the reader chose, as proposed
@@ -125,7 +125,7 @@ ok(/same UTC hour \(rows 24 apart\)/.test(D.decisions.fill.options.find(o => o.i
   ok(/proposed, not yet processed/.test(sl) && /Web Mercator \(EPSG:3857\) for the 1 km buffers/.test(sl) && /EPSG:4326 \(degrees\) for areas/.test(sl) && !/reprojected/.test(sl), "spatial log: the reader's own picks, marked proposed, never 'reprojected'");
   ok(M.spatialLine(D, { buffer: "utm" }) === "" && !/reprojected/.test(JSON.stringify(D.spatial)), "spatial log: nothing until both are chosen");
   const n2 = M.dataNote(RAWF.meta, F, base, D, {}, { buffer: "utm", area: "alb" });
-  ok(/the local UTM zone \(metres\) for the 1 km buffers/.test(n2) && M.dataNote(RAWF.meta, F, base, D, {}).indexOf("Spatial layer") < 0, "data note: the spatial line only when chosen"); }
+  ok(/the local UTM zone \(meters\) for the 1 km buffers/.test(n2) && M.dataNote(RAWF.meta, F, base, D, {}).indexOf("Spatial layer") < 0, "data note: the spatial line only when chosen"); }
 // provenance: the extraction's changes are in the note and on the page
 ok(/Extraction \(before this note's cleaning\): .*negative values set to 0/.test(M.dataNote(RAWF.meta, F, base, D, {})) && /negative values set to 0/.test(PAGE) && !/not cleaned before this page/.test(PAGE), "provenance: summed columns and clipped negatives stated");
 // flags are provisional, and the 12-hour rule's boundary (#13)
@@ -181,7 +181,7 @@ ok(/rob: \{ t: "Insensitive to this choice"/.test(JS) && !/Say it is robust/.tes
 ok(/The straight-line fill removes the within-gap fluctuations/.test(JS) && !/runs flat through/.test(JS), "the linear fill's caption matches the interpolation");
 { const r = between(PAGE, "r04-task"), blk = r ? PAGE.slice(r.from, r.to) : "";
   ok(/<li><b>Rule:<\/b>/.test(blk) && /<li><b>Result:<\/b>/.test(blk) && /<li><b>Next action:<\/b>/.test(blk), "no-JS night check in rule, result and next action");
-  (blk.slice(blk.indexOf("Licences: what each source")).match(/<(li|td|p)>[\s\S]*?<\/\1>/g) || []).map(strip0).forEach(b => ok(words0(b) <= 35, "no-JS task element at most 35 words (" + words0(b) + "): " + b.slice(0, 40))); }
+  (blk.slice(blk.indexOf("Licenses: what each source")).match(/<(li|td|p)>[\s\S]*?<\/\1>/g) || []).map(strip0).forEach(b => ok(words0(b) <= 35, "no-JS task element at most 35 words (" + words0(b) + "): " + b.slice(0, 40))); }
 
 // ---------------- exemplars
 const spec = M.exemplarsSpec(F, RAWF.meta, D);

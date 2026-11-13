@@ -156,7 +156,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 
 - **Scores.** $d$ is a distance in km and $d_0$, $d_1$ the ramp's ends; $w_k$ is a weight and $s_k$ a score from 0 to 1.
 - **Blocks.** $a_c$ is a cell's area in km² and $f_c$ its share outside setbacks, estimated from 16 points 250 m apart: a narrow setback can fall between them.
-- **Lines.** $c_u$ and $c_v$ are two neighbouring cells' costs per km; the step $\ell$ is 1 km, or $\sqrt{2}$ km on a diagonal.
+- **Lines.** $c_u$ and $c_v$ are two neighboring cells' costs per km; the step $\ell$ is 1 km, or $\sqrt{2}$ km on a diagonal.
 - **Resources** are rescaled from the region's lowest (0) to its highest (1); land price falls from 1 at $2,500 an acre to 0 at $15,000.
 - **The line's cost per km** is NREL's $1,615,100 a mile (2022 dollars) × 128.893 / 118.026 (BEA's GDP deflator, to 2025 dollars) ÷ 1.609344 km a mile.
 - **Ties.** Equal scores go to the more northern, then the more western block. Equal-cost paths can differ in their steps and length; the page draws the first found.

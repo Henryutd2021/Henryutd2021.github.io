@@ -568,7 +568,7 @@
     // the balance, symbol by symbol (LX.EquationCard, components/equation.js)
     LX.EquationCard(H("div", { class: "lx-xcard" }, x), {
       title: "The balance, symbol by symbol",
-      lede: "Tap a symbol: what it means, its units, and how a modelling language writes it.",
+      lede: "Tap a symbol: what it means, its units, and how a modeling language writes it.",
       label: "Symbols of the balance rule; select one",
       rows: [{ parts: [{ k: "sum", html: "Σ<sub>g∈G</sub>" }, { k: "p", html: "<i>p<sub>g,t</sub></i>" }, "+", { k: "u", html: "<i>u<sub>t</sub></i>" }, "=", { k: "d", html: "<i>d<sub>t</sub></i>" },
                        { k: "all", html: "∀ <i>t</i> ∈ <i>T</i>" }] }],
@@ -605,7 +605,7 @@
   // ---- exercise pieces
   function valOf(i) { var t = String(i.value).trim().replace(/[−–]/g, "-").replace(/,/g, "").replace(/^\$/, ""); return t === "" ? NaN : +t; }
   function setVal(i, v) { i.value = String(v); }
-  function field(host, label, unit, pre) {   // a labelled number box (no button: the runner's Check reads it)
+  function field(host, label, unit, pre) {   // a labeled number box (no button: the runner's Check reads it)
     var id = LX.uid("pf"), row = H("div", { class: "w1h-ans lx-fp-field" }, host);
     H("label", { for: id, text: label }, row);
     if (pre) H("span", { class: "w1h-unit", text: pre }, row);

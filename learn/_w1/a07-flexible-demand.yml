@@ -12,10 +12,10 @@ glossary:
     def: "Many small devices, such as batteries, thermostats and chargers, controlled together and offered to the grid as one resource."
   - id: aggregator
     term: Aggregator
-    def: "A company that enrols many customers' devices, offers their combined response to a grid operator or utility, and shares the payment with the owners."
+    def: "A company that enrolls many customers' devices, offers their combined response to a grid operator or utility, and shares the payment with the owners."
   - id: coordination-cost
     term: Coordination cost
-    def: "What it costs to enrol, meter, control and pay each device or customer in a program, whatever the device's size."
+    def: "What it costs to enroll, meter, control and pay each device or customer in a program, whatever the device's size."
   - id: baseline
     term: Baseline
     def: "An estimate of what a customer would have used without a demand-response event, against which the cut is measured."
@@ -23,4 +23,4 @@ glossary:
     term: Transactive energy
     def: "Buying and selling electricity among many small participants, such as homes and firms with their own generation, as well as with the grid."
 requests:
-  - "A7 reads A4's data file (a04-retail-tariffs.json) for the neighbours' trade, and keeps A4's real-time wires charge in its own data (trade.wires); its test checks the two agree. If A4's tariffs change, rerun both tests."
+  - "A7 reads A4's data file (a04-retail-tariffs.json) for the neighbors' trade, and keeps A4's real-time wires charge in its own data (trade.wires); its test checks the two agree. If A4's tariffs change, rerun both tests."

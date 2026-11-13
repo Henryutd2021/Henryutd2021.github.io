@@ -4,7 +4,7 @@
 // Data: assets/learn/data/cf8-power-curves-from-scarce-data.json: the studies' dated steps (LX.Timeline), where the
 // conference result holds (LX.Boundary) and the toy's settings and words. The research text in the data file is approved
 // excerpt wording (E12 and E13); this script adds none of its own. Each timeline
-// event of the related project (E13) carries the approved acknowledgement as its `footer`, drawn visibly under the event
+// event of the related project (E13) carries the approved acknowledgment as its `footer`, drawn visibly under the event
 // in the live timeline and in the no-JS list (LX.Timeline itself has no footer field, so this script adds it).
 //
 // The idea (illustrative; lesson M9's invented turbine and records, assets/learn/data/m09-surrogates-uq.json, not the
@@ -92,7 +92,7 @@
     var ul = function (a) { return "<ul>" + a.map(function (t) { return "<li>" + t + "</li>"; }).join("") + "</ul>"; };
     return "<p class=\"lx-eyebrow\">" + b.title + "</p><dl class=\"lx-ideas\"><dt>It holds when</dt><dd>" + ul(b.holds) + "</dd><dt>It leaves out</dt><dd>" + ul(b.leaves) + "</dd></dl><p class=\"lx-hint\">" + b.source + "</p>";
   }
-  // the no-JS timeline: LX.Timeline's own static list, with each event's footer (the E13 acknowledgement) under it
+  // the no-JS timeline: LX.Timeline's own static list, with each event's footer (the E13 acknowledgment) under it
   function staticTimeline(TL, events) {
     return "<ol class=\"lx-tl-static\">" + TL.sortEvents(events).map(function (e) {
       var li = TL.staticHTML([e]).replace(/^<ol class="lx-tl-static">/, "").replace(/<\/ol>$/, "");
@@ -113,7 +113,7 @@
   }
   // the explainer's text version: explainer:uq-mfgpr's model (its own synthetic turbine, 95% band of the curve) at n
   // measured points, by wind-speed region X.regions: measured points there, then the true curve (hidden from both
-  // models), the data-only and the curve-plus-data estimates with their band, at the region's centre
+  // models), the data-only and the curve-plus-data estimates with their band, at the region's center
   function explainerRows(EXM, X, n) {
     var cs = X.regions.map(function (r) { return (r[0] + r[1]) / 2; }), m = EXM.model({ n: n, xs: cs });
     return X.regions.map(function (r, k) {
@@ -154,7 +154,7 @@
   LX.mount("cf8", function (live, data) {
     var D = data[KEY];
     var tl = LX.Timeline(H("div", { class: "lx-card" }, live), D.timeline), lis = tl.el.querySelectorAll(".lx-tl-ev");
-    // each event's footer (the E13 acknowledgement), visible under the event, after its source line
+    // each event's footer (the E13 acknowledgment), visible under the event, after its source line
     tl.events.forEach(function (e, k) { if (e.footer && lis[k]) H("p", { class: "lx-hint lx-tl-foot", text: e.footer }, lis[k].querySelector(".lx-tl-body") || lis[k]); });
     var x = document.getElementById("cf8-explain");
     if (x) { x.innerHTML = ""; x.classList.add("is-live"); LX.Boundary(H("div", { class: "lx-xcard" }, x), D.boundary); }

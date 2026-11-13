@@ -18,7 +18,7 @@
 //   where the boundary is   "plant only": the measure is the electricity the turbine makes
 //                           "plant and load": the measure is the site's net exchange with the grid (out minus in)
 //   how steam is counted    "priced": the physical flows, so the turbine work the steam gives up is counted
-//                           "free": the turbine loss ignored, an accounting mistake shown on purpose (labelled
+//                           "free": the turbine loss ignored, an accounting mistake shown on purpose (labeled
 //                           "deliberately incomplete"): the same flow difference with the loss added back
 //   change from switching to steam cooling (MW, + = less electricity used or more sent out), from the flows:
 //                           plant only, priced     turbine(steam) - turbine(electric)   = - w C / COPa

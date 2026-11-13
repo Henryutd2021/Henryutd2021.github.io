@@ -916,11 +916,11 @@
             out.innerHTML = "$ git switch --detach " + h.id + " &nbsp;then&nbsp; python check.py → <b>" + (h.ok ? "balance OK" : "fails by " + int(Math.abs(h.R.balance)) + " MWh") + "</b> (gas " + int(h.R.gasMWh) + " MWh).";
             LX.store.set("k8-hunt", { checks: n });
             var found = checked.c3 && checked.c4;
-            prog.textContent = found ? "Checks used: " + n + "." : "Checks used: " + n + ". Find two neighbours: one that passes, the next that fails.";
+            prog.textContent = found ? "Checks used: " + n + "." : "Checks used: " + n + ". Find two neighbors: one that passes, the next that fails.";
             if (found) { api.done(); api.saw("Commit 3 passes and commit 4 fails: **commit 4 (" + S.ids.c4 + ")** broke it. Checking the middle each time needs at most " + maxChecks(6) + " checks here, and only " + maxChecks(1000) + " for 1,000 commits."); }
           });
         });
-        prog.textContent = "Checks used: 0. Find two neighbours: one that passes, the next that fails.";
+        prog.textContent = "Checks used: 0. Find two neighbors: one that passes, the next that fails.";
         finish[4] = function () { ul.querySelectorAll("button").forEach(function (b, i) { if (i === 2 || i === 3) b.click(); }); };
         void r;
       }

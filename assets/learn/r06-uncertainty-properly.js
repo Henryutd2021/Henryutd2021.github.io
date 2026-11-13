@@ -27,7 +27,7 @@
    Task (step cards): sort twelve uncertainties into the four kinds, plus a pile for the utility's own choices (LX.CardSort);
    pick a treatment for one card of each pile (verdicts, as R9's dilemmas); turn the single number into a band (i-band, on
    LX.Plot): parameters sampled, then scenarios and model form, then a deep what-if line; rewrite the claim for a paper, the
-   board and the public (form-only checks, then examples written as labelled sentences); write an uncertainty plan for the
+   board and the public (form-only checks, then examples written as labeled sentences); write an uncertainty plan for the
    reader's own study (a row counts only with an uncertainty, a pile and the reader's own treatment; the pile's suggestion
    stays a placeholder and never enters the copied plan).
    Exemplars: a weak and a strong uncertainty paragraph (LX.Exemplars), a weak and a strong plan row, the kinds compared
@@ -239,7 +239,7 @@
       { id: "plain", label: "plain words" + (jar.length ? " (try without: " + jar.join(", ") + ")" : ""), ok: !jar.length && words(t) > 0 },
       { id: "short", label: "at most 60 words (" + words(t) + ")", ok: words(t) > 0 && words(t) <= 60 }];
   }
-  // an example rewrite: its labelled sentences, filled; and the same as one text (what the checks read)
+  // an example rewrite: its labeled sentences, filled; and the same as one text (what the checks read)
   function exLines(D, id, F) { return D.rewrite.examples[id].map(function (x) { return { k: x.k, v: fill(x.v, F) }; }); }
   function exText(D, id, F) { return exLines(D, id, F).map(function (x) { return x.v; }).join(" "); }
   function exHTML(D, id, F, cls) { return '<ul class="' + (cls || "r6-exl") + '">' + exLines(D, id, F).map(function (x) { return "<li><b>" + esc(x.k) + ":</b> " + rich(x.v) + "</li>"; }).join("") + "</ul>"; }

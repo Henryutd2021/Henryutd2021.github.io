@@ -198,7 +198,7 @@ D.charts.forEach(c => {
   for (let i = 0; i < 1000; i++) { const d = { g: 0.004 + g() * 0.012, w: 0.96 + g() * 0.08, kwh: 7 + g() * 6 }; vc.push(R6.peakAt(M6, 10, d, "central", "hours", false)); }
   const sh = vc.filter(v => v > +F.c10 && v < +F.c90).length / 1000;
   ok(Math.abs(sh - 0.8) <= 0.04, "“about 8 of 10”: " + (100 * sh).toFixed(1) + "% of R6's central runs lie between " + F.c10 + " and " + F.c90 + " MW"); }
-ok(/R8 practice/.test(D.rubric.title) && /parts R8 practises/.test(D.rubric.lede + D.rubric.competences[0].look) && /six-page paper, which the capstone assesses/.test(D.rubric.lede) && /six-page paper/.test(D.rubric.note) && !D.rubric.bar && /<th scope="col">Proficient \(the bar\)<\/th>/.test(PAGE), "rubric: R8's practice rated apart from the capstone's full bar; the course's level words and 'Proficient (the bar)' kept, as every studio");
+ok(/R8 practice/.test(D.rubric.title) && /parts R8 practices/.test(D.rubric.lede + D.rubric.competences[0].look) && /six-page paper, which the capstone assesses/.test(D.rubric.lede) && /six-page paper/.test(D.rubric.note) && !D.rubric.bar && /<th scope="col">Proficient \(the bar\)<\/th>/.test(PAGE), "rubric: R8's practice rated apart from the capstone's full bar; the course's level words and 'Proficient (the bar)' kept, as every studio");
 ok(D.briefing.facts.length === 4 && R.staticTask(D, C).indexOf(R.factsHTML(D, F)) >= 0 && R.factsHTML(D, F).indexOf(F.c10 + "–" + F.c90 + " MW") >= 0 && R.factsHTML(D, F).indexOf("from " + F.f50 + " to " + F.fm50 + " MW") >= 0, "R6's result sheet: the numbers the briefing needs, also in the no-JS version");
 // ---------------- the findings sort
 ok(D.bins.map(b => b.id).join() === "holds,missing,over" && D.findings.length === 9 && D.bins.every(b => D.findings.filter(f => f.bin === b.id).length === 3), "nine findings, three per pile");
@@ -208,7 +208,7 @@ D.findings.forEach(f => ok(f.why && !/\{/.test(R.fill(f.text, F) + R.fill(f.why,
 const spec = R.exemplarsSpec(D, F);
 ok(EX.validate(spec).length === 0, "exemplars well formed: " + EX.validate(spec).join("; "));
 const good = EX.plain(spec.answers[1]);
-["Decision:", "Finding:", "Programme:", "Depends on:", "Leaves out:", "Would change it:"].forEach(k => ok(good.indexOf(k) >= 0, "strong briefing has " + k));
+["Decision:", "Finding:", "Program:", "Depends on:", "Leaves out:", "Would change it:"].forEach(k => ok(good.indexOf(k) >= 0, "strong briefing has " + k));
 ok(good.indexOf(F.c10 + "–" + F.c90 + " MW") >= 0 && good.indexOf("about " + F.mHours + " MW") >= 0, "strong briefing quotes R6's numbers");
 Object.keys(BLOCKS).forEach(k => { const r = between(PAGE, k); ok(r && PAGE.slice(r.from, r.to) === BLOCKS[k]() + "\n", k + ": the page's no-JS block equals the model's (run with --write after a data edit)"); });
 { const brief = PAGE.indexOf('<div class="lx-card lx-studio-brief">'), inter = PAGE.indexOf('<div class="lx-interactive');

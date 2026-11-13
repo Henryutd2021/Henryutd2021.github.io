@@ -218,7 +218,7 @@ const NOT_RESEARCH = [
   [/^A separate example with stylized numbers, from the course author's open explainer: not the study's data or results\.$/, "provenance label (the explainer)"],
   [/^It counts each hour at its average intensity, so it shows attributed emissions only\.$/, "describes the explainer, not the study"],
   [/^(Run examples\/strategies\.py: it compares a month, a quarter and a year as the window on four synthetic regions\.|Which kind of grid gains most from a longer window\?)$/, "repository exercise on its synthetic examples, not the study"],
-  [/^ghg-load-regulation: public example repository · MIT licence · synthetic data\.$/, "repository label"],
+  [/^ghg-load-regulation: public example repository · MIT license · synthetic data\.$/, "repository label"],
   [/^(\): change in attributed emissions|%\) and attributed emissions fall by|Change in attributed emissions \(average factor\))$/, "the toy's and the explainer's readouts (script strings), not the study"],
   [/^ghg-load-regulation on GitHub, version 1\.0\.0 \(30 October 2026\)\.$/, "citation of the repository"],
   [/^ghg-load-regulation on GitHub$/, "citation label (repository)"],

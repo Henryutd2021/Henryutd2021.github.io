@@ -63,7 +63,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 </div>
 <p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Medians and averages, not one plant.</b> Each stage is a published <span class="lx-term" data-term="median">median</span>, or a 2023 U.S. average for data centers. Totals add stage medians from different reviews: illustrative sums, not published totals.</span></p>
 <p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Carbon</b> in g <span class="lx-term" data-term="co2e">CO₂e</span> per kWh, the same number as kg per MWh: NREL's 2021 medians by life-cycle phase, for natural gas generation as a whole and for all solar panels.</span></p>
-<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Water</b> in U.S. gallons consumed per MWh (1 gallon = 3.785 litres), from two NREL-led reviews. <b>Land</b> in m² held per MWh made in a year.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Water</b> in U.S. gallons consumed per MWh (1 gallon = 3.785 liters), from two NREL-led reviews. <b>Land</b> in m² held per MWh made in a year.</span></p>
 <p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>The data center</b> is a load: Berkeley Lab's 2023 averages for U.S. data centers, per unit of electricity used. Lesson F8's campus draws 240 MW in every hour.</span></p>
 <p class="lx-hint" style="margin-top:.6rem">About 25 guided minutes in eight steps.</p>
 <style>/* lesson-local: the life-cycle box's tile content (the chain and boundary: LX.LifeBox, lifebox.css) */
@@ -216,7 +216,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <tbody>
 <tr><td class="n">43 and 486 g per kWh</td><td>Medians of published cradle-to-grave CO₂e of solar panels and of gas power.</td><td class="s"><a href="https://docs.nlr.gov/docs/fy21osti/80580.pdf">NREL, NREL/FS-6A50-80580, Table 1</a> · September 2021</td></tr>
 <tr><td class="n">255 and 205 gal per MWh</td><td>A combined-cycle plant with a cooling tower: water withdrawn and consumed (medians).</td><td class="s"><a href="https://doi.org/10.1088/1748-9326/7/4/045802">Macknick et al., 2012</a></td></tr>
-<tr><td class="n">4.52 litres per kWh</td><td>Water consumed at the power plants that supplied U.S. data centers, per kWh used, 2023.</td><td class="s"><a href="https://doi.org/10.71468/P1WC7Q">Berkeley Lab, 2024 report, page 57</a> · December 2024</td></tr>
+<tr><td class="n">4.52 liters per kWh</td><td>Water consumed at the power plants that supplied U.S. data centers, per kWh used, 2023.</td><td class="s"><a href="https://doi.org/10.71468/P1WC7Q">Berkeley Lab, 2024 report, page 57</a> · December 2024</td></tr>
 </tbody>
 </table>
 </div>

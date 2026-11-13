@@ -1,12 +1,12 @@
 # Sidecar of research studio R4: new glossary terms and requests for shared files.
 lesson: r04-data
 glossary:
-  - {id: data-licence, term: "Data licence", def: "The terms under which a dataset may be used and shared, such as public domain, CC BY or a signed data agreement."}
-  - {id: data-note, term: "Data note", def: "A short record of where a dataset came from, its licence, units and time base, and every cleaning step with its rule, count and effect."}
+  - {id: data-licence, term: "Data license", def: "The terms under which a dataset may be used and shared, such as public domain, CC BY or a signed data agreement."}
+  - {id: data-note, term: "Data note", def: "A short record of where a dataset came from, its license, units and time base, and every cleaning step with its rule, count and effect."}
   - {id: coordinate-reference-system, term: "Coordinate reference system (CRS)", def: "The rule that ties map coordinates to places on Earth; some keep areas true, others keep distances, none keeps both everywhere."}
   - {id: provenance, term: "Provenance", def: "The documented origin and history of a piece of data: source, version, access date, checksums and every change made to it."}
-  - {id: epsg-code, term: "EPSG code", def: "A catalogue number that names one coordinate system exactly, such as EPSG:4326 for latitude and longitude in degrees."}
-  - {id: utm, term: "UTM (Universal Transverse Mercator)", def: "A set of 60 north-to-south zones, each a flat map in metres that keeps distances close to true inside the zone."}
+  - {id: epsg-code, term: "EPSG code", def: "A catalog number that names one coordinate system exactly, such as EPSG:4326 for latitude and longitude in degrees."}
+  - {id: utm, term: "UTM (Universal Transverse Mercator)", def: "A set of 60 north-to-south zones, each a flat map in meters that keeps distances close to true inside the zone."}
   - {id: web-mercator, term: "Web Mercator", def: "The projection most web maps use: good for viewing, but it stretches distances and areas more the farther a place is from the equator."}
   - {id: buffer, term: "Buffer (GIS)", def: "The zone within a set distance of a map feature, such as everything within 1 km of a wind turbine."}
   - {id: equal-area-projection, term: "Equal-area projection", def: "A map projection that keeps areas true, at the cost of shapes and distances; Albers equal-area (EPSG:5070) is the usual one for the contiguous U.S."}

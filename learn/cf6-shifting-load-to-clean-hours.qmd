@@ -14,7 +14,7 @@ body-classes: "page-learn page-lesson lx-form-case"
      it. The course author's research enters only through the approved excerpt (excerpt:ghg), the allow-listed
      explainer (explainer:ghg),
      the allow-listed repository (repo:ghg-load-regulation) and a doi.org citation. No project page, no Research page.
-     The explainer takes the Learn accent as its theme colour (forms.css: .page-learn .explainer, body.page-learn --t).
+     The explainer takes the Learn accent as its theme color (forms.css: .page-learn .explainer, body.page-learn --t).
      JS: assets/learn/cf6-shifting-load-to-clean-hours.js with its data file, town.json and town_year.json.
      Tests: node _tests/learn/test_cf6-shifting-load-to-clean-hours.js [--write] (writes the four no-JS blocks between
      the cf6-* markers). -->
@@ -162,7 +162,7 @@ body-classes: "page-learn page-lesson lx-form-case"
 <li>Write the synthetic regions with <code>ghg-framework synthetic my_inputs/</code>. Then run <code>ghg-framework run my_inputs/ --region Mixed --limit 0.05</code>, and again with <code>--limit 0.08</code>. Compare <code>reduction_pct</code>.</li>
 <li>Then say why neither run can tell you which plant would change its output.</li>
 </ul>
-<p><a href="https://github.com/Henryutd2021/ghg-load-regulation">ghg-load-regulation</a>: public example repository · MIT licence · synthetic data.</p>
+<p><a href="https://github.com/Henryutd2021/ghg-load-regulation">ghg-load-regulation</a>: public example repository · MIT license · synthetic data.</p>
 </div>
 ```
 :::

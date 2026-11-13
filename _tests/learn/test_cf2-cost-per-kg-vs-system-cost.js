@@ -187,7 +187,7 @@ const NOT_RESEARCH = [
   [/^(An electrolyzer next to a wind farm turns spare wind into hydrogen\.|When extra capacity runs fewer hours, a bigger one makes each kilogram cost more\.|Can the bigger one still be the better choice\?)$/, "the puzzle: a general idea, true of the toy; no study claim"],
   [/^The toy below uses illustrative round numbers\.$/, "provenance label (the toy)"],
   [/^(Run examples\/configurations\.py\.|Its hydrogen-price cases solve one synthetic site at several prices: compare the electrolyzer size, LCOH and the objective \(net life-cycle cost\) row by row\.)$/, "repository exercise on its synthetic examples, not the study"],
-  [/^reopt-hydrogen-framework: public example repository · MIT licence · synthetic data\.$/, "repository label"],
+  [/^reopt-hydrogen-framework: public example repository · MIT license · synthetic data\.$/, "repository label"],
   [/^reopt-hydrogen-framework on GitHub, version 1\.0\.0 \(30 October 2026\)\.$/, "citation of the repository"],
   [/^Cutler, D\. et al\. \(2017\)\. REopt: A Platform for Energy System Integration and Optimization\. NREL\/TP-7A40-70022 \(the model family the study extended\)\.$/, "citation (NREL report)"],
   [/^reopt-hydrogen-framework on GitHub$/, "citation label (repository)"]

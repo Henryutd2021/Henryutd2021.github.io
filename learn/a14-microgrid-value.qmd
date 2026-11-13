@@ -126,7 +126,7 @@ $$\text{CRF} = \frac{r}{1-(1+r)^{-n}}$$
 
 ::: {#check .lx-sec}
 ::: {.lx-sec-h}
-## Check yourself, then practise
+## Check yourself, then practice
 :::
 
 ```{=html}

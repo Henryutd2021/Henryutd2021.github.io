@@ -250,7 +250,7 @@ button.f5-lad-row[aria-pressed="true"] { border-color: var(--lx-accent); box-sha
 
 Steady means exactly $k = 1$: here only with the moderator full and the rods 40% in (rods 30%, moderator 90% gives $k = 0.999$, a slow decline). Real cores are modeled with neutron transport and kinetics, a field of its own (side topic [X1](x01-under-the-hood.html)).
 
-**A plant in a system model.** Grid models such as [lesson 6](06-three-jobs.qmd), [M2](m02-unit-commitment.qmd) and [lesson 13](13-capstone.qmd) take a plant as a few numbers: its size in MW, its [heat rate]{.lx-term term="heat-rate"} or efficiency, its [capacity factor]{.lx-term term="capacity-factor"} and its [refuelling outages]{.lx-term term="refuelling-outage"}. The U.S. fleet's capacity factor was 91.1% in 2025 (EIA, Table 6.07.B; [lesson 5](05-capacity-factor.qmd)).
+**A plant in a system model.** Grid models such as [lesson 6](06-three-jobs.qmd), [M2](m02-unit-commitment.qmd) and [lesson 13](13-capstone.qmd) take a plant as a few numbers: its size in MW, its [heat rate]{.lx-term term="heat-rate"} or efficiency, its [capacity factor]{.lx-term term="capacity-factor"} and its [refueling outages]{.lx-term term="refuelling-outage"}. The U.S. fleet's capacity factor was 91.1% in 2025 (EIA, Table 6.07.B; [lesson 5](05-capacity-factor.qmd)).
 
 ```{=html}
 </div>

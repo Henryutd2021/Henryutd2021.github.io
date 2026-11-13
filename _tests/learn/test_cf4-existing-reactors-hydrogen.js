@@ -247,7 +247,7 @@ ok(/\$0 \\le h_t \\le E\$/.test(PAGE) && /\$0 \\le r_t \\le h_t\$/.test(PAGE) &&
   // loaded, in the course's own words (CF4's short name and its outcome; no nuclear term, as their own tests require)
   [["a01-project-tea", "step 1", "Year 0 counts here because the farm is not built yet. Case file \" + LX.lessonRefHTML(PJ, \"CF4\") + \" (hydrogen at existing plants) shows the other case: a plant's own capital, already spent, drops out."],
    ["m11-tea-in-models", "step 9", "Case file \" + LX.lessonRefHTML(PJ, \"CF4\") + \" (hydrogen at existing plants): what an hourly dispatch model and a lifetime cash flow each add, when the plant's own capital is already spent."],
-   ["a12-policy-instruments", "the last step", "Case file \" + LX.lessonRefHTML(PJ, \"CF4\") + \" (hydrogen at existing plants) practises reading which assumptions, a policy among them, a published result rests on."]].forEach(([id, where, line]) => {
+   ["a12-policy-instruments", "the last step", "Case file \" + LX.lessonRefHTML(PJ, \"CF4\") + \" (hydrogen at existing plants) practices reading which assumptions, a policy among them, a published result rests on."]].forEach(([id, where, line]) => {
     const js = fs.readFileSync(L(id + ".js"), "utf8"), qmd = fs.readFileSync(path.join(SITE, "learn", id + ".qmd"), "utf8");
     ok(js.includes(line) && /data-src="[^"]*\.\.\/assets\/learn\/data\/path\.json"/.test((qmd.match(/<div class="lx-interactive[^>]*data-src="[^"]*"/) || [""])[0]) && !/nuclear|reactor/i.test(line), id + " names CF4 through LX.lessonRefHTML in " + where + ", with path.json loaded");
   });
@@ -372,12 +372,12 @@ const RG = { units: Object.values(EFF).map(X.norm), raw: EFF };
   const cmds = [...((oc.match(/<ul class="cf4-cmds">[\s\S]*?<\/ul>/) || [""])[0]).matchAll(/<code>([^<]+)<\/code>/g)].map(m => m[1]);
   ok(cmds.length === 5 && cmds[0] === "python examples/minimal.py" && cmds.slice(1).every(c => /^nuclear-h2 (synthetic|run) /.test(c)) && cmds.some(c => /--price-factor 1\.15/.test(c)) && cmds.some(c => /--as-mode dispatch/.test(c)) && cmds.filter(c => /^nuclear-h2 run /.test(c)).every(c => /--out-dir /.test(c)), "part 7: only the minimal example, synthetic inputs and run (energy prices 15% higher, or ancillary services in dispatch mode)");
   ok(!/lifecycle_tea|sensitivity\.py|case_matrix|nuclear-h2 tea|tea_sweep|--reoptimize|--scale-as/.test(PAGE + JS), "part 7: no lifecycle, sensitivity, tea or case-matrix tool, no credit option");
-  ok(oc.includes('<a href="' + REPO + '">nuclear-hydrogen-integration</a>: open code · MIT licence.'), "part 7: the repository is linked as open code, with its licence, and nothing said about data in it");
+  ok(oc.includes('<a href="' + REPO + '">nuclear-hydrogen-integration</a>: open code · MIT license.'), "part 7: the repository is linked as open code, with its licence, and nothing said about data in it");
   // the open-code card: every line is E15.28, a command, or one of the course's lines about what the open code writes
   { const oc = (PAGE.match(/<p class="lx-eyebrow">With open code<\/p>([\s\S]*?)<\/div>/) || [])[1] || "";
   const OC = [/^Optional Modeler extension, about 30 minutes; needs Python 3\.10 or later on your computer \(lesson B2\)\.$/, /^Set it up first: clone the repository and install it as its README's Quick start says; run the commands in the repository's folder\.$/,
     /^Each run writes revenue_musd_per_yr\.csv and summary\.json into its --out-dir folder\.$/, /^Compare the revenue tables, and grid_output_range_mw under "flexibility" in summary\.json: the range of output to the grid, the toy's measure too\.$/,
-    /^(python examples\/minimal\.py|nuclear-h2 (synthetic|run) .*)$/, /^nuclear-hydrogen-integration: open code · MIT licence\.$/];
+    /^(python examples\/minimal\.py|nuclear-h2 (synthetic|run) .*)$/, /^nuclear-hydrogen-integration: open code · MIT license\.$/];
   const E28 = X.sentencesOf(RG.raw["E15.28"]).map(X.norm);
   const lines = X.elements(oc).map(X.norm).flatMap(s => X.sentencesOf(s)).map(X.norm).filter(Boolean);
   ok(lines.length > 6 && lines.every(s => E28.includes(s) || OC.some(re => re.test(s))), "the open-code card: E15.28, the commands, and what the open code writes, nothing else: " + lines.filter(s => !E28.includes(s) && !OC.some(re => re.test(s))).join(" | ")); }
@@ -395,7 +395,7 @@ const RG = { units: Object.values(EFF).map(X.norm), raw: EFF };
     /^Illustrative round numbers, some of them yours: a generic existing plant, not the study's inputs or results\./, /^The study in time$/, /^Two dated steps: the journal article and its open code\.$/,
     /^Earlier lessons: lesson 3 \(reserves\), lesson 7 \(what a cost counts\) and A16 \(hydrogen from electricity\)\. F5 shows how a reactor makes heat and electricity\.$/,
     /^Where this goes next: A1 \(a project's cash flows\), M11 \(techno-economic analysis inside a model\), A12 \(the tools governments use\)\.$/,
-    /^nuclear-hydrogen-integration: open code · MIT licence\.$/, /^Optional Modeler extension, about 30 minutes; needs Python 3\.10 or later on your computer \(lesson B2\)\.$/,
+    /^nuclear-hydrogen-integration: open code · MIT license\.$/, /^Optional Modeler extension, about 30 minutes; needs Python 3\.10 or later on your computer \(lesson B2\)\.$/,
     /^(python examples\/minimal\.py|nuclear-h2 (synthetic|run) [^ ]+.*)$/, /^Where the result holds$/,
     /^Go deeper · ModelerThe toy's day as a small optimization$/, /^Run a toy plant's day yourself, then where the result holds$/,
     /^turns a year of cash flows into a project's net present value\.$/];

@@ -1722,7 +1722,7 @@
    "publisher": "U.S. Energy Information Administration",
    "date": "accessed 2 Nov 2026 (via town_year.json and town_days.json)",
    "url": "https://www.eia.gov/electricity/gridmonitor/",
-   "where": "hourly demand, wind and solar shapes, each normalised to its own 2025 maximum"
+   "where": "hourly demand, wind and solar shapes, each normalized to its own 2025 maximum"
   },
   "eia-epm-cf": {
    "title": "Electric Power Monthly, Table 6.07.B (capacity factors, 2025, annual and monthly)",

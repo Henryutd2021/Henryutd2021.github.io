@@ -6,6 +6,6 @@ lesson: X3
 glossary:
   - id: diffusion-curve
     term: Diffusion curve
-    def: "How the share of homes, firms or output using a new technology grows over time, often slowly at first, then faster, then levelling off."
+    def: "How the share of homes, firms or output using a new technology grows over time, often slowly at first, then faster, then leveling off."
 requests:
   - "X3's explain layer names F10, X2 and A20 through LX.lessonRefHTML (all live; F10 is in X3's after list, and the shelf's xs- stop-box rules are in components/explain.css); no change requested."

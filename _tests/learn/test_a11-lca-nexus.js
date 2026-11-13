@@ -141,7 +141,7 @@ onPage(D.harmonized.solar.median + " g per kWh ([middle half]{.lx-term term=\"in
 onPage(D.harmonized.gas.median + " g (" + D.harmonized.gas.lo + " to " + D.harmonized.gas.hi + ")", "Go deeper: harmonized gas");
 onPage(D.nrelTotals.solar + " and " + D.nrelTotals.gas + " g per kWh", "numbers to remember: NREL");
 onPage(cool("tower").wd + " and " + cool("tower").use + " gal per MWh", "numbers to remember: tower");
-onPage(D.dcData.indirectLperKWh + " litres per kWh", "numbers to remember: LBNL");
+onPage(D.dcData.indirectLperKWh + " liters per kWh", "numbers to remember: LBNL");
 onPage(M.grp(D.eiaWater.ngccWithdrawal2021) + " gallons per MWh on average in 2021", "sources: EIA's fleet withdrawal");
 onPage(D.land.pvTracking + " MWh a year per acre for tracking plants, " + D.land.pvFixed + " for fixed tilt", "sources: LBNL densities");
 onPage("draws " + F8.campus.drawMW + " MW in every hour", "the data note: F8's campus");

@@ -178,7 +178,7 @@ const NOT_RESEARCH = [
   [/^Two public events, then the study and its code\.$/, "navigation"],
   [/^(Paper presented|Code released)$/, "timeline step label: the kind of output"],
   [/^Illustrative round numbers, not the study's inputs, equations or results\.$/, "provenance label (the toy)"],
-  [/^code-delayed-energization: public example repository · MIT licence · illustrative inputs\.$/, "repository label"],
+  [/^code-delayed-energization: public example repository · MIT license · illustrative inputs\.$/, "repository label"],
   [/^code-delayed-energization on GitHub, version 1\.0\.0 \(30 October 2026\)\.$/, "citation of the repository"],
   [/^code-delayed-energization on GitHub$/, "citation label (repository)"],
   [/^Run examples\/options\.py: compare staged service with full service, and read the net-benefit test for the bridge pathway\.$/, "repository exercise on its illustrative inputs, not the study"],

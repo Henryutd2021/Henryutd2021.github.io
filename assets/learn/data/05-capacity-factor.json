@@ -4,7 +4,7 @@
     "title": "Lesson 5 data: capacity factors, the year profiles' targets, the solar day and the illustrative turbine",
     "built": "2026-11-02",
     "license": "Numbers from EIA are U.S. government works in the public domain; this file CC BY 4.0",
-    "about": "The wind and solar shapes in town_year.json are each divided by their own 2025 maximum hour, so their mean is NOT a capacity factor (wind 0.528, solar 0.235). The lesson turns them into a plant's output with the shared helper LX.townProfile (assets/learn/components/profiles.js), method \"power\", to the annual targets in the shared cf_targets.json (EIA Table 6.07.B, 2025), with each month first brought to the 2025 U.S. monthly capacity factor (the helper's monthlyCF option; the values are in cf_targets.json, monthly). Night-time solar telemetry is already zero in town_year.json (the town data build step). Nuclear runs at full size except for one illustrative refuelling outage (nuclear). Why \"power\": the best hours reach the plant's size, so the year view shows output against nameplate."
+    "about": "The wind and solar shapes in town_year.json are each divided by their own 2025 maximum hour, so their mean is NOT a capacity factor (wind 0.528, solar 0.235). The lesson turns them into a plant's output with the shared helper LX.townProfile (assets/learn/components/profiles.js), method \"power\", to the annual targets in the shared cf_targets.json (EIA Table 6.07.B, 2025), with each month first brought to the 2025 U.S. monthly capacity factor (the helper's monthlyCF option; the values are in cf_targets.json, monthly). Night-time solar telemetry is already zero in town_year.json (the town data build step). Nuclear runs at full size except for one illustrative refueling outage (nuclear). Why \"power\": the best hours reach the plant's size, so the year view shows output against nameplate."
   },
   "sources": {
     "eia930": {
@@ -15,7 +15,7 @@
     "eia_refuel": {
       "title": "EIA, Today in Energy (14 October 2022): Daily U.S. summer nuclear capacity outages were 19% lower this summer than last summer",
       "url": "https://www.eia.gov/todayinenergy/detail.php?id=54239",
-      "as_of": "October 2022: plants typically refuel every 18 to 24 months; the average planned refuelling outage in 2022 lasted 38 days",
+      "as_of": "October 2022: plants typically refuel every 18 to 24 months; the average planned refueling outage in 2022 lasted 38 days",
       "accessed": "2026-11-02"
     },
     "eia_homes": {
@@ -65,7 +65,7 @@
     ]
   },
   "nuclear": {
-    "about": "Illustrative: the plant runs at full size all year except one spring refuelling outage of 780 hours (32.5 days, from 25 March), so that the year's capacity factor is (8760 - 780) / 8760 = 91.1%, the 2025 U.S. average. EIA: plants refuel every 18 to 24 months, mostly in spring and fall; the average planned outage in 2022 lasted 38 days.",
+    "about": "Illustrative: the plant runs at full size all year except one spring refueling outage of 780 hours (32.5 days, from 25 March), so that the year's capacity factor is (8760 - 780) / 8760 = 91.1%, the 2025 U.S. average. EIA: plants refuel every 18 to 24 months, mostly in spring and fall; the average planned outage in 2022 lasted 38 days.",
     "outageStartDay": 83,
     "outageHours": 780,
     "source": "eia_refuel"

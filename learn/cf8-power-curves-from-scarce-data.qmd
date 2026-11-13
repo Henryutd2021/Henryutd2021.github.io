@@ -10,14 +10,14 @@ body-classes: "page-learn page-lesson lx-form-case"
 ---
 
 <!-- Case file CF8 (path.yml form: case), about 10 minutes. Its excerpts are the approved sentences E12.1-E12.16
-     (E12.8 with E12.9) and E13.1-E13.12, every E13 placement with the README acknowledgement as its footer. Every
+     (E12.8 with E12.9) and E13.1-E13.12, every E13 placement with the README acknowledgment as its footer. Every
      sentence about the studies on this page and in the
      data file is one of those sentences, word for word; the test checks it. Glossary marks inside them change no word
      (as CF7's); the "Words first" and "Scores" hints are the course's own teaching notes, not about the studies. The
      course author's research enters only through approved
      excerpts (excerpt:uq-mfgpr, excerpt:wind-uq), the allow-listed explainer (explainer:uq-mfgpr), the allow-listed
      repositories (repo:mfgpr-wind-power-curve, repo:wind-uq-surrogate) and the doi.org citation. No project page, no
-     Research page, no co-author, lab, partner or data-provider name (the acknowledgement is the approved exception).
+     Research page, no co-author, lab, partner or data-provider name (the acknowledgment is the approved exception).
      JS: assets/learn/cf8-power-curves-from-scarce-data.js with its data file; the toy loads lesson M9's script and data
      (LX.M9). Tests: node _tests/learn/test_cf8-power-curves-from-scarce-data.js [--write]. -->
 
@@ -91,7 +91,7 @@ body-classes: "page-learn page-lesson lx-form-case"
 <p class="lx-hint">A separate example with synthetic numbers, from the course author's open explainer: not the study's data or results.</p>
 <p class="lx-hint">Its bands, like the toy's, describe uncertainty about the average curve. A band for one new measurement must also hold measurement and operating scatter, so it is wider.</p>
 <!-- cf8-extext:start (written from the explainer's own model by the test's --write mode; do not edit) -->
-<details class="lx-textalt"><summary>Text version of the explainer: its synthetic turbine at the slider's start, 5 measured points</summary><div class="cf8-ex-table"><p class="lx-hint">From the explainer's own synthetic data: estimates and 95% bands of the curve at each region's centre, in kW.</p><div class="lx-scroll-x"><table class="lx-mini-table cf8-ex"><caption class="lx-hint">With 5 measured points</caption><thead><tr><th scope="col">Wind speed</th><th scope="col">Points there</th><th scope="col">True curve (hidden)</th><th scope="col">Data only, 95% band</th><th scope="col">Curve + data, 95% band</th></tr></thead><tbody><tr><td>0–5 m/s</td><td>1</td><td>8 kW</td><td>93 kW ± 236</td><td>71 kW ± 136</td></tr><tr><td>5–10 m/s</td><td>2</td><td>360 kW</td><td>481 kW ± 142</td><td>417 kW ± 128</td></tr><tr><td>10–15 m/s</td><td>2</td><td>1,745 kW</td><td>1,794 kW ± 112</td><td>1,741 kW ± 93</td></tr><tr><td>15–20 m/s</td><td>0</td><td>1,877 kW</td><td>1,243 kW ± 781</td><td>1,811 kW ± 227</td></tr></tbody></table></div><p class="lx-hint">These statistical bands do not know that power has limits: they can reach below zero or above the rating, as at 0–5 m/s.</p></div></details>
+<details class="lx-textalt"><summary>Text version of the explainer: its synthetic turbine at the slider's start, 5 measured points</summary><div class="cf8-ex-table"><p class="lx-hint">From the explainer's own synthetic data: estimates and 95% bands of the curve at each region's center, in kW.</p><div class="lx-scroll-x"><table class="lx-mini-table cf8-ex"><caption class="lx-hint">With 5 measured points</caption><thead><tr><th scope="col">Wind speed</th><th scope="col">Points there</th><th scope="col">True curve (hidden)</th><th scope="col">Data only, 95% band</th><th scope="col">Curve + data, 95% band</th></tr></thead><tbody><tr><td>0–5 m/s</td><td>1</td><td>8 kW</td><td>93 kW ± 236</td><td>71 kW ± 136</td></tr><tr><td>5–10 m/s</td><td>2</td><td>360 kW</td><td>481 kW ± 142</td><td>417 kW ± 128</td></tr><tr><td>10–15 m/s</td><td>2</td><td>1,745 kW</td><td>1,794 kW ± 112</td><td>1,741 kW ± 93</td></tr><tr><td>15–20 m/s</td><td>0</td><td>1,877 kW</td><td>1,243 kW ± 781</td><td>1,811 kW ± 227</td></tr></tbody></table></div><p class="lx-hint">These statistical bands do not know that power has limits: they can reach below zero or above the rating, as at 0–5 m/s.</p></div></details>
 <!-- cf8-extext:end -->
 </div>
 <div id="cf8-explain" class="lx-xgrid">
@@ -160,13 +160,13 @@ body-classes: "page-learn page-lesson lx-form-case"
 <li>Run <code>python examples/sensitivity.py</code>: at 50, 100, 200 and 400 training points, which model has the lowest RMSE, and does the order hold at every size?</li>
 <li>Run <code>python examples/probabilistic.py</code> and compare the coverage at each nominal level with the level itself.</li>
 </ul>
-<p><a href="https://github.com/Henryutd2021/mfgpr-wind-power-curve">mfgpr-wind-power-curve</a>: public example repository · MIT licence · synthetic data.</p>
+<p><a href="https://github.com/Henryutd2021/mfgpr-wind-power-curve">mfgpr-wind-power-curve</a>: public example repository · MIT license · synthetic data.</p>
 <p><b>Try it yourself:</b> the framework runs end to end on invented plants in about half a minute; another example compares target choices against a <span class="lx-term" data-term="negative-control">negative control</span>.</p>
 <p>Its numbers say nothing about any real plant, data product or forecast system.</p>
 <ul>
 <li>Run <code>python examples/minimal.py</code>, then <code>python examples/validation_design.py</code>. A surrogate is useful only if it beats a constant baseline on held-out plants.</li>
 </ul>
-<p><a href="https://github.com/Henryutd2021/wind-uq-surrogate">wind-uq-surrogate</a>: public example repository · MIT licence · synthetic data.</p>
+<p><a href="https://github.com/Henryutd2021/wind-uq-surrogate">wind-uq-surrogate</a>: public example repository · MIT license · synthetic data.</p>
 <p class="lx-hint">This work was developed based upon funding from the Alliance for Sustainable Energy, LLC, Managing and Operating Contractor for the National Renewable Energy Laboratory for the U.S. Department of Energy.</p>
 </div>
 ```

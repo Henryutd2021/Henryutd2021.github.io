@@ -412,7 +412,7 @@
           var sQ = LX.Slider(ctl, { label: "Flow", color: "var(--lx-wind)", min: Hy.flow.min, max: Hy.flow.max, step: Hy.flow.step, value: st.Q, unit: "m³/s", fmt: function (v) { return v + " m³/s"; }, onChange: function (v) { st.Q = v; upd(); } });
           var out = H("div", { class: "f4-hyd", "aria-live": "polite" }, act);
           H("p", { class: "lx-hint", text: "Toy reservoir: no inflow, all the water usable, head and efficiency held constant. In a real one the head falls as the lake drains, and release rules can limit the flow." }, act);
-          // the formula as a labelled chain: each factor named, then watts to MW
+          // the formula as a labeled chain: each factor named, then watts to MW
           function hydroChain(st) {
             var rows = [["water density", int(Hy.rho) + " kg/m³"], ["× gravity", Hy.g + " m/s²"], ["× flow: cubic meters passing each second", st.Q + " m³/s"],
                         ["× head: the height the water falls", st.H + " m"], ["× efficiency of turbine and generator", String(Hy.eta)], ["= power in watts; ÷ 1,000,000 watts per MW", fmt1(hydroMW(st.H, st.Q, Hy)) + " MW"]];

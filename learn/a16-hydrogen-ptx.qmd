@@ -111,11 +111,11 @@ body-classes: "page-learn page-lesson lx-form-cards"
 ```{=html}
 <div class="lx-deepers">
 <details class="lx-deeper">
-<summary><span class="k">Go deeper · Analyst</span>Colours, claims and matching rules</summary>
+<summary><span class="k">Go deeper · Analyst</span>Colors, claims and matching rules</summary>
 <div class="lx-deeper-body">
 ```
 
-- **Colours are names, not measurements.** Grey (natural gas), blue (gas with capture) and green (renewable electrolysis) are common labels; the IEA says it “does not use colours” and counts low-emissions hydrogen instead.
+- **Colors are names, not measurements.** Gray (natural gas), blue (gas with capture) and green (renewable electrolysis) are common labels; the IEA says it “does not use colours” and counts low-emissions hydrogen instead.
 - **What rules measure.** DOE's clean-hydrogen target is at most 4.0 kg [CO₂e]{.lx-term term="co2e"} per kg, [well-to-gate]{.lx-term term="well-to-gate"}.
 - **DOE's example.** A [gas reformer]{.lx-term term="gas-reformer"} with about 95% carbon capture could reach about 4.0, if it uses the average U.S. grid mix and upstream methane leaks stay at or below 1%.
 - **Three tests of the power.** The U.S. clean-hydrogen credit's final rules (January 2025) ask for [deliverability]{.lx-term term="deliverability"} (the same region), incrementality (new clean power) and temporal matching.
@@ -206,7 +206,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <thead><tr><th scope="col">Number</th><th scope="col">What it means</th><th scope="col">Source</th></tr></thead>
 <tbody>
 <tr><td class="n">almost 100 Mt</td><td>Global hydrogen demand in 2024; low-emissions production was less than 1% of global production.</td><td class="s"><a href="https://www.iea.org/reports/global-hydrogen-review-2025">IEA, Global Hydrogen Review 2025, executive summary</a> · published 12 September 2025, revised October 2025; data for 2024</td></tr>
-<tr><td class="n">$5 to $7 per kg</td><td>DOE's modelled production cost of hydrogen from PEM electrolysis on renewable power, without subsidies, in 2022 dollars: upkeep and stack replacement in, compression, storage and delivery out.</td><td class="s"><a href="https://www.hydrogen.energy.gov/docs/hydrogenprogramlibraries/pdfs/24005-clean-hydrogen-production-cost-pem-electrolyzer.pdf">DOE Hydrogen Program Record 24005</a> · 20 May 2024</td></tr>
+<tr><td class="n">$5 to $7 per kg</td><td>DOE's modeled production cost of hydrogen from PEM electrolysis on renewable power, without subsidies, in 2022 dollars: upkeep and stack replacement in, compression, storage and delivery out.</td><td class="s"><a href="https://www.hydrogen.energy.gov/docs/hydrogenprogramlibraries/pdfs/24005-clean-hydrogen-production-cost-pem-electrolyzer.pdf">DOE Hydrogen Program Record 24005</a> · 20 May 2024</td></tr>
 <tr><td class="n">4.0 kg CO₂e per kg</td><td>DOE's target for clean hydrogen: well-to-gate life-cycle emissions per kg of hydrogen.</td><td class="s"><a href="https://www.hydrogen.energy.gov/docs/hydrogenprogramlibraries/pdfs/clean-hydrogen-production-standard-guidance.pdf">DOE, Clean Hydrogen Production Standard Guidance</a> · June 2023</td></tr>
 <tr><td class="n">33 kWh per kg</td><td>The energy in 1 kg of hydrogen, at its lower heating value.</td><td class="s"><a href="https://www.hydrogen.energy.gov/docs/hydrogenprogramlibraries/pdfs/hydrogen-program-plan-2024.pdf">DOE Hydrogen Program Plan, p. 24</a> · December 2024</td></tr>
 </tbody>

@@ -198,7 +198,7 @@ $$
 \eta = \frac{3{,}412\ \text{Btu per kWh}}{HR}.
 $$
 
-EIA's heat rates are net: they divide the fuel by the electricity the plant sends out. EIA typically counts fuel at its gross heat content, which includes the heat in the exhaust's water vapour (EIA glossary).
+EIA's heat rates are net: they divide the fuel by the electricity the plant sends out. EIA typically counts fuel at its gross heat content, which includes the heat in the exhaust's water vapor (EIA glossary).
 
 **Hotter heat helps.** A [heat engine]{.lx-term term="heat-engine"} can turn a larger share of its heat into work when that heat is hotter than its cooling water.
 

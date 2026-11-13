@@ -42,7 +42,7 @@ body-classes: "page-learn page-lesson lx-form-capstone"
 ```{=html}
 <div class="lx-card lx-cap-brief">
 <p class="lx-eyebrow">The brief</p>
-<p class="lx-case-q">Prairieland's energy minister wants a pathway to 2050 for its five regions, and its defence: cost, CO₂ against the budget, security, who pays and Ridge County's jobs.</p>
+<p class="lx-case-q">Prairieland's energy minister wants a pathway to 2050 for its five regions, and its defense: cost, CO₂ against the budget, security, who pays and Ridge County's jobs.</p>
 <p class="lx-hint">Also: how the pathway holds up against a gas-price spike, a drought, a mineral export restriction and a demand surprise.</p>
 <ol class="lx-studio-task">
 <li><b>Hand in:</b> a pathway link; a policy brief, two pages of your own writing with the evidence your run adds (the shock table is its sensitivity); and the lines M13's notebook prints for the same pathway.</li>
@@ -52,7 +52,7 @@ body-classes: "page-learn page-lesson lx-form-capstone"
 <p class="lx-hint">About 240 minutes: 70 to build and test pathways, 30 to read the results, 40 to run your pathway in <a href="m13-national-pathway.html">M13</a>'s notebook, 70 to write the brief, 30 to check it.</p>
 <dl class="lx-sb-facts c4-units">
 <div><dt>Units</dt><dd>Power in GW; energy in TWh and PJ (1 TWh = 3.6 PJ; 1 PJ = a million GJ); CO₂ in Mt, million tonnes; fuel prices per GJ on <span class="lx-term" data-term="net-calorific-value">net calorific values</span>.</dd></div>
-<div><dt>Terms</dt><dd><span class="lx-term" data-term="primary-energy">Primary energy</span>: fuels as found, before conversion. <span class="lx-term" data-term="lng">LNG</span>: liquefied natural gas. The LP's dual: the modelled cost change from tightening the budget by one tonne.</dd></div>
+<div><dt>Terms</dt><dd><span class="lx-term" data-term="primary-energy">Primary energy</span>: fuels as found, before conversion. <span class="lx-term" data-term="lng">LNG</span>: liquefied natural gas. The LP's dual: the modeled cost change from tightening the budget by one tonne.</dd></div>
 <div><dt>More terms</dt><dd><span class="lx-term" data-term="linear-program">LP</span>: linear program. <span class="lx-term" data-term="firm-capacity">Firm clean</span>: the generic plant that runs steadily, within its availability. <span class="lx-term" data-term="energy-burden">Energy burden</span>: home-energy spending ÷ household income.</dd></div>
 <div><dt>Cost terms</dt><dd><span class="lx-term" data-term="present-value">Present value</span>: future costs in today's dollars, discounted. <span class="lx-term" data-term="fixed-om">Fixed O&amp;M</span>: a plant's yearly upkeep. <span class="lx-term" data-term="net-demand">Net load</span>: demand less wind and solar. <span class="lx-term" data-term="round-trip-efficiency">85% round trip</span>: a battery returns 85% of what it takes in.</dd></div>
 </dl>

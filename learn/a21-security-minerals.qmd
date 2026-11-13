@@ -109,7 +109,7 @@ $$\text{import dependence} = \frac{\text{net imports}}{\text{gross available ene
 <div class="lx-deeper-body">
 ```
 
-- **An import-share cap.** Imports stay below a share of primary energy in each period; its [shadow price]{.lx-term term="shadow-price"} is how much modelled cost changes when the cap tightens slightly, not the value of security.
+- **An import-share cap.** Imports stay below a share of primary energy in each period; its [shadow price]{.lx-term term="shadow-price"} is how much modeled cost changes when the cap tightens slightly, not the value of security.
 - **Stocks as decisions.** A two-stage model chooses stock sizes before it knows which disruption comes, then runs each one.
 - **Disruption scenarios.** Shocks become scenarios with stated settings, as on this page, so a plan can be tested against them.
 - **Next.** Modeler lesson [M13](m13-national-pathway.html) adds an import-share cap to Prairieland's pathway model; capstone [C4](c4-prairieland-2050.html) tests a pathway against shocks.

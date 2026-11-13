@@ -8,7 +8,7 @@
 // Every plan is run hour by hour through all 8,760 hours of 2025 (lesson 13's fullYearModel with the plan fixed: a
 // linear program that runs the plants and the battery at least cost and leaves demand unserved only when it must). The
 // five measures come from that one run:
-//   cost      $ a year: annualised capital + fixed O&M + fuel and variable O&M (lesson 13's summarize().cost)
+//   cost      $ a year: annualized capital + fixed O&M + fuel and variable O&M (lesson 13's summarize().cost)
 //   co2       t a year: gas burned x its CO2 per MWh (operating emissions only)
 //   unserved  MWh a year of demand left unserved (plants never break down in this model)
 //   fair      % of home power bills paid by low-income homes (income under $40,000; EIA RECS 2020 shares), under a
@@ -129,11 +129,11 @@
     });
     return out;
   }
-  // a score from 0 (the centre of the radar: the scale's worst end) to 1 (the rim: its best end), on the stated fixed scale.
+  // a score from 0 (the center of the radar: the scale's worst end) to 1 (the rim: its best end), on the stated fixed scale.
   // Clipped at the ends, so two values beyond an end score the same: pick() therefore weighs only the unbeaten plans
   function score(v, sc) { var t = (sc.worst - v) / (sc.worst - sc.best); return Math.max(0, Math.min(1, t)); }
   function scores(m, defs, scales) { var o = {}; AXES.forEach(function (a) { var k = axisKey(a, defs); o[a] = score(shown(axisValue(m, a, defs), k), scales[k]); }); return o; }
-  // weighted sum of the scores (weights in any units; normalised by their total); the highest total wins, ties to the lower cost
+  // weighted sum of the scores (weights in any units; normalized by their total); the highest total wins, ties to the lower cost
   function total(m, w, defs, scales) {
     var s = scores(m, defs, scales), t = 0, W = 0;
     AXES.forEach(function (a) { t += (w[a] || 0) * s[a]; W += (w[a] || 0); });
@@ -149,7 +149,7 @@
     return { id: best.p.id, total: best.t };
   }
   // ---- "can you have them all?": the cheapest plan on lesson 13's seven weeks with limits on CO2 (t), gas (share of the
-  // electricity used) and the low-income share of home bills under a tariff; every modelled hour served (lesson 13's optimizer)
+  // electricity used) and the low-income share of home bills under a tariff; every modeled hour served (lesson 13's optimizer)
   //   gas:  sum w (g + p) <= gasMax x sum w (D - u + c - d)   (the electricity used; u = 0 for the optimizer)
   //   fair: A x F + use x V <= s x (F + V), with A the low-income share of the fixed charge, F the fixed costs and V the
   //         running costs: (A - s) F + (use - s) V <= 0. Nuclear's running cost (fuel and O&M at its constant output) is in V.
@@ -422,7 +422,7 @@
       axes.forEach(function (ax) {
         h += "<tr><th scope='row'>" + LX.esc(ax.label + " (" + ax.name() + ")") + "</th>" + series.map(function (s) { return "<td>" + LX.esc(s.values[ax.key]) + " · score " + s.s[ax.key].toFixed(2) + "</td>"; }).join("") + "</tr>";
       });
-      tvBody.innerHTML = h + "</tbody></table><p class='lx-hint'>Score: 0 at the centre (the worst end of the measure's scale), 1 at the rim (the best end).</p>";
+      tvBody.innerHTML = h + "</tbody></table><p class='lx-hint'>Score: 0 at the center (the worst end of the measure's scale), 1 at the rim (the best end).</p>";
       var you = series[0];
       var say = "Radar of five goals. " + series.map(function (s) { return s.label + ": " + axes.map(function (ax) { return ax.label + " " + s.values[ax.key]; }).join(", "); }).join(". ") + ".";
       svg.setAttribute("aria-label", say);
@@ -472,7 +472,7 @@
     var AXES_UI = M.AXES.map(function (k) { return { key: k, label: LAB[k], name: function () { return DEFN[M.axisKey(k, S_.defs)].name; } }; });
     var cv = D.cv, T = C.techs;
 
-    // the definitions as labelled fields (what is measured, the assumption, what it leaves out, how to read it); numbers come
+    // the definitions as labeled fields (what is measured, the assumption, what it leaves out, how to read it); numbers come
     // from the model and data
     var DEFN = {
       cost: { name: "Cost", unit: "$M a year", kind: "Accounts, with a stated boundary",
@@ -496,7 +496,7 @@
         measure: "The share of all home power bills paid by homes with income under $40,000.",
         assume: "They are " + F.pct(D.groups.homes, 1) + " of homes and use " + F.pct(D.groups.use, 1) + " of home electricity (U.S., 2020). The [[tariff|tariff]], such as a [[fixed-charge|fixed charge]] per home, sets their share.",
         leaves: "Incomes and other energy bills, so it is not an [[energy-burden|energy burden]].",
-        read: "Lower means less of the bill falls on low-income homes; whether that is fairer is a judgement about values." },
+        read: "Lower means less of the bill falls on low-income homes; whether that is fairer is a judgment about values." },
       gas: { name: "Gas share", unit: "% of the electricity used", kind: "A constructed measure: one choice among several", choice: true,
         measure: "The share of the electricity used that was made from gas: one view of [[energy-security|energy security]].",
         assume: "All gas is piped in from outside the town and none is stored, so a supply cut or price spike reaches every MWh from gas.",
@@ -516,7 +516,7 @@
     // the two cards' titles share a level: h3, or an h2 when the layout sits right under the page title
     var rh = H("div", { class: "a22-head" }, rc), cardTag = LX.hTag(3, rh), subTag = "h" + (+cardTag.charAt(1) + 1); var rTitle = H(cardTag, { text: "Your plan: five goals at once" }, rh);
     var status = LX.SolverStatus(rh);
-    H("p", { class: "a22-sub", text: "Each spoke is one goal, from the worst end of its scale (centre) to the best (rim); the dashed ring is halfway. Every plan runs through all 8,760 hours of 2025." }, rc);
+    H("p", { class: "a22-sub", text: "Each spoke is one goal, from the worst end of its scale (center) to the best (rim); the dashed ring is halfway. Every plan runs through all 8,760 hours of 2025." }, rc);
     var radar = Radar(rc, { axes: AXES_UI, label: "Radar of five goals" });
     var cmpLine = H("p", { class: "a22-cmp", "aria-live": "polite" }, rc);
     var tilesBox = H("div", { class: "a22-tiles", role: "group", "aria-label": "The five measures: select one for its definition" }, rc);
@@ -894,7 +894,7 @@
               if (r.status === "infeasible") {
                 free(); S_.lim.inf = att({});
                 logLine(tag() + ": no plan");
-                H("p", { class: "a22-out", html: "<b>No plan meets all three limits</b> on the seven weeks while serving every modelled hour. Something has to give: loosen a limit, or change the tariff." }, out);
+                H("p", { class: "a22-out", html: "<b>No plan meets all three limits</b> on the seven weeks while serving every modeled hour. Something has to give: loosen a limit, or change the tariff." }, out);
                 fin(); return null;
               }
               if (!r.ok) { free(); H("p", { class: "a22-sub", text: LX.solver.describe(r) }, out); return null; }
@@ -951,7 +951,7 @@
             if (!S_.lim.inf || !S_.lim.weeks) return;
             var i = S_.lim.inf, o = S_.lim.weeks, tariffFixed = o.tariff !== i.tariff && o.co2 === i.co2 && o.gas === i.gas && o.fair === i.fair;
             api.saw((tariffFixed ? "These limits clashed because of the tariff: with " + TARIFF[o.tariff].art + ", the seven weeks meet them all. That rule was chosen by people." :
-              "You found where these goals stop fitting together: tighten one, and another has to give. Choosing a point on that edge is a judgement about values.") +
+              "You found where these goals stop fitting together: tighten one, and another has to give. Choosing a point on that edge is a judgment about values.") +
               (o.pass === true ? " The full-year check confirms your plan." : " The full-year check " + (o.pass === false ? "fails" : "did not run") + ", so your plan stays a seven-week result."));
             api.done(); LX.progress.done(LESSON); LX.emit("a22-done");
           }
@@ -1043,7 +1043,7 @@
               api.check(function () { return c.v == null ? null : { ok: (c.v === "no") === !dRM.C, why: !dRM.C ? "Right: C's peakers count at the peak (" + val(BY.C.m, "rel", { rel: "rm" }) + " against " + val(BY.D.m, "rel", { rel: "rm" }) + "), so C is better on one goal." : "C stays beaten." }; });
               api.answer(function () { c.pick(dRM.C ? "yes" : "no"); });
             } }] },
-          { label: "Weights", intro: "Scores run from 0 at the centre of the radar to 1 at the rim.", items: [
+          { label: "Weights", intro: "Scores run from 0 at the center of the radar to 1 at the rim.", items: [
             { key: "eq", kind: "partly", minutes: 3, title: "Plan D's total under equal weights", build: function (area, api) {
               H("p", { html: "Plan D's scores: " + M.AXES.map(function (a) { return LAB[a] + " <b>" + sD[a].toFixed(2) + "</b>"; }).join(", ") + "." }, area);
               var inp = num(area, "Total with equal weights (0 to 1):", "");

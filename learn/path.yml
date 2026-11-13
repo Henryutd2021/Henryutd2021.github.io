@@ -1632,7 +1632,7 @@
   status: active
   minutes: 30
   practice_minutes: 120
-  title: "Data you can defend: sources, cleaning, licences and provenance"
+  title: "Data you can defend: sources, cleaning, licenses and provenance"
   subtitle: "Log every cleaning choice and show what it changes"
   short: "Data you can defend"
   outcome: "Make and log each cleaning choice on a real hourly dataset, show how much each choice moves the results, check the licenses and write a data note."
@@ -1749,9 +1749,9 @@
   title: "What could you study? The question studio"
   subtitle: "Pick or spin a scale, a system element, a lever and the people involved, then write a question and put it through the checks"
   short: "The question studio"
-  teaches: [generating research questions, question types, rigour checks, realism checks, search strings for open databases]
-  does: "Pick or spin scale, dimension, system element, stakeholder and lever (plus an optional twist); choose a question type; write the question; run rigour and realism checks and a literature-search prompt; save a question card."
-  outcome: "Generate a research question of your own and test it for rigour and realism before you take it to a mentor."
+  teaches: [generating research questions, question types, rigor checks, realism checks, search strings for open databases]
+  does: "Pick or spin scale, dimension, system element, stakeholder and lever (plus an optional twist); choose a question type; write the question; run rigor and realism checks and a literature-search prompt; save a question card."
+  outcome: "Generate a research question of your own and test it for rigor and realism before you take it to a mentor."
   after: [R1, F1]
   next: R2
   next_needs: [N1]

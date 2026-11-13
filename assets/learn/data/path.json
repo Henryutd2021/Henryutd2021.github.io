@@ -1966,7 +1966,7 @@
   {
    "tier": "researcher",
    "code": "R4",
-   "title": "Data you can defend: sources, cleaning, licences and provenance",
+   "title": "Data you can defend: sources, cleaning, licenses and provenance",
    "ready": true,
    "href": "r04-data.html",
    "scales": [

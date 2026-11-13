@@ -22,7 +22,7 @@ glossary:
     def: "The older, widely used electrolyzer type, whose cells sit in an alkaline liquid; the units in IRENA's 2020 table must stay above about 15% of their size."
   - id: lower-heating-value
     term: Lower heating value
-    def: "The heat a fuel gives when it burns, not counting the extra heat won by condensing the water vapour it makes; for hydrogen, about 33 kWh per kg."
+    def: "The heat a fuel gives when it burns, not counting the extra heat won by condensing the water vapor it makes; for hydrogen, about 33 kWh per kg."
   - id: feedstock
     term: Feedstock
     def: "A material a process consumes to make its product, as an ammonia plant consumes hydrogen."

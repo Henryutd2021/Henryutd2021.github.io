@@ -1,6 +1,6 @@
 ---
 title: "Regional profile cards"
-subtitle: "Twelve energy systems, one structure: how each is organised, who decides, what is hard, what researchers ask, and key numbers with their sources and dates"
+subtitle: "Twelve energy systems, one structure: how each is organized, who decides, what is hard, what researchers ask, and key numbers with their sources and dates"
 description: "Reference cards for Energy Systems, Step by Step: the United States, the Plains (SPP), the European Union, China, India, Japan and South Korea, the Nordic countries, the Gulf states, Sub-Saharan Africa, Latin America, small island systems and Australia, each with its system structure, institutions, main challenges, research questions and verified key numbers."
 page-layout: full
 toc: false

@@ -13,7 +13,7 @@ glossary:
     def: "The average mass of a pollutant released per unit of fuel burned or of output, such as kilograms of SO₂ per tonne of coal, taken from measurements."
   - id: fine-particles
     term: Fine particles (PM2.5)
-    def: "Airborne particles no wider than 2.5 micrometres, small enough to reach deep into the lungs; burning releases them and also forms them in the air from SO₂ and NOx."
+    def: "Airborne particles no wider than 2.5 micrometers, small enough to reach deep into the lungs; burning releases them and also forms them in the air from SO₂ and NOx."
   - id: scrubber
     term: Scrubber
     def: "Equipment that sprays a wet or dry chemical such as limestone through a plant's exhaust to capture most of its sulfur dioxide."
@@ -22,6 +22,6 @@ glossary:
     def: "An estimate of the health harm, in dollars, avoided by not emitting one more ton of a pollutant from a given kind of source, averaged over where those sources are."
   - id: net-calorific-value
     term: Net calorific value
-    def: "The heat a fuel gives when burned, not counting the heat in the water vapour it forms; it is a little lower than the gross value."
+    def: "The heat a fuel gives when burned, not counting the heat in the water vapor it forms; it is a little lower than the gross value."
 requests:
   - "A10 (a10-emissions-questions) and F4 (f04-power-plants) could link F11 for the CO₂ per tonne and per MWh of heat of coal, gas and oil, and for leaked methane."

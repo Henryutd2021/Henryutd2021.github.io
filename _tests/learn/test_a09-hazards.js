@@ -37,7 +37,7 @@ for (let m = 1; m < (1 << DEF.length); m++) {
 PORT.sort((a, b) => a.total - b.total || a.c - b.c);
 const BEST = PORT[0], WINT = PORT.filter(p => p.ds.join() === "winterize")[0], BAT = PORT.filter(p => p.ds.join() === "battery")[0];
 const reference = {
-  about: "Results of the stress tests at seed 2025: the year with each hazard, the pairs of hazards together, and the best set of defences within the budget.",
+  about: "Results of the stress tests at seed 2025: the year with each hazard, the pairs of hazards together, and the best set of defenses within the budget.",
   years: Object.fromEntries(Object.keys(SW).map(k => [k, { lole: SW[k].lole, eue: +SW[k].eue.toFixed(2), shut: +SW[k].shut.toFixed(1) }])),
   pairs: PAIRS.map(x => ({ ids: x.p, lole: x.ab.lole, eue: +x.ab.eue.toFixed(2), ratio: +x.c.ratio.toFixed(4) })),
   best: { defences: BEST.ds, cost: BEST.c, total: +BEST.total.toFixed(2), portfolios: PORT.length }
@@ -46,7 +46,7 @@ const shutCell = (a, b) => a < 0.5 && b < 0.5 ? "0" : int(a) + " → " + int(b);
 function staticTable() {
   const rows = H.hazards.map(h => `<tr><td>${h.label}</td><td>${h.when}</td><td>${d3(SW[h.id].lole)}</td><td>${int(SW[h.id].eue)}</td><td>${int(BEST.s[h.id].eue)}</td><td>${shutCell(SW[h.id].shut, BEST.s[h.id].shut)}</td></tr>`);
   return [`<table class="a9-static" aria-label="The Plains Grid in a year when each hazard strikes: LOLE, unserved energy and energy switched off directly, 500 resampled years, seed 2025">`,
-    `<thead><tr><th scope="col">Year with</th><th scope="col">When</th><th scope="col">LOLE (days a year)</th><th scope="col">Unserved energy (MWh a year)</th><th scope="col">With winterizing, hardened lines and demand response</th><th scope="col">Switched off directly (MWh a year), without → with those defences</th></tr></thead>`,
+    `<thead><tr><th scope="col">Year with</th><th scope="col">When</th><th scope="col">LOLE (days a year)</th><th scope="col">Unserved energy (MWh a year)</th><th scope="col">With winterizing, hardened lines and demand response</th><th scope="col">Switched off directly (MWh a year), without → with those defenses</th></tr></thead>`,
     `<tbody>`, `<tr><td>No hazard</td><td>–</td><td>${d3(SW.none.lole)}</td><td>${int(SW.none.eue)}</td><td>–</td><td>0</td></tr>`, ...rows, `</tbody></table>`].join("\n");
 }
 const BLOCK = /(<!-- a9-table:start[^>]*-->\n)([\s\S]*?)(<!-- a9-table:end -->)/, MBLOCK = /(<!-- a9-more:start[^>]*-->\n)([\s\S]*?)(<!-- a9-more:end -->)/;
@@ -162,7 +162,7 @@ const has = (str, msg) => ok(QMD.indexOf(str) >= 0, "page states " + (msg || JSO
   // the quick question and the drill's ratio items keep the text budget (the four values in a table or one list)
   { const qs = (QMD.match(/<p class="lx-qtext">[\s\S]*?<\/p>/g) || []).map(t => t.replace(/<[^>]+>/g, "")); ok(qs.length === 5 && qs.every(t => words(t) <= 36 && (plain(t).match(/[.?!](?=\s+[A-Z(\[]|$)/g) || []).length <= 2), "budget: the myths' and the question's stems are 36 words and two sentences or fewer"); }
   { const { series } = require(path.join(SITE, "assets/learn/components/drill.js")); const long = series(M.drillItem, 42, 200).filter(it => words(it.q) > 36); ok(long.length === 0, "budget: every drill question is 36 words or fewer (" + long.length + " longer)"); }
-  ok(/Some defences target one hazard; storage and demand response help in several, but cannot restore switched-off lines/.test(M.CLOSING) && DEF.filter(d => M.defence(H, d).add).every(d => HZ.every(h => PORT.filter(p => p.ds.join() === d)[0].s[h].eue < SW[h].eue - 1 && PORT.filter(p => p.ds.join() === d)[0].s[h].shut === SW[h].shut)), "step 6: the battery and demand response cut the shortfall in all four hazard years and leave the shutoffs as they are (the closing message)");
+  ok(/Some defenses target one hazard; storage and demand response help in several, but cannot restore switched-off lines/.test(M.CLOSING) && DEF.filter(d => M.defence(H, d).add).every(d => HZ.every(h => PORT.filter(p => p.ds.join() === d)[0].s[h].eue < SW[h].eue - 1 && PORT.filter(p => p.ds.join() === d)[0].s[h].shut === SW[h].shut)), "step 6: the battery and demand response cut the shortfall in all four hazard years and leave the shutoffs as they are (the closing message)");
   ["correlated-failure", "compound-hazard", "public-safety-power-shutoff", "winterization", "stress-test", "derate", "firm-load-shed"].forEach(id => ok(new RegExp("id: " + id + "\\n").test(SIDE) && (JS + JSON.stringify(H)).indexOf("[[" + id + "|") >= 0, "glossary: " + id + " defined in the sidecar and marked"));
   ok(!/Thermal plants|Wellheads/.test(JS) && /\[\[derate\|derates\]\]/.test(JSON.stringify(H)), "terms: no unexplained 'thermal plants' or 'wellheads'; derates and firm load shed marked");
   const elems = [].concat((QMD.match(/<li>[\s\S]*?<\/li>/g) || []).filter(t => !/data-value=/.test(t) && !/<li>(FERC|CAISO|EIA|NERC|ERCOT)/.test(t)), QMD.match(/^- \*\*[\s\S]*?$/gm) || []);
@@ -258,7 +258,7 @@ const has = (str, msg) => ok(QMD.indexOf(str) >= 0, "page states " + (msg || JSO
     btns(/^Battery · /)[0].click();
     ok(stale().hidden && /^For \$60M a year/.test(saw()), "stub: step 5: back to the choice that was run, the results are current again");
     demo.cards.go(5); btns(/Done reading/)[0].click();
-    ok(/Some defences target one hazard/.test(saw()) && /EOP-012-3/.test(card().textContent), "stub: step 6 shows the preparation timeline");
+    ok(/Some defenses target one hazard/.test(saw()) && /EOP-012-3/.test(card().textContent), "stub: step 6 shows the preparation timeline");
   } catch (e) { ok(false, "stub: the page test threw: " + (e && e.stack || e)); }
 }
 

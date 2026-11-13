@@ -819,7 +819,7 @@
   },
   "empirical": {
    "label": "Empirical variant",
-   "short": "Analyse Prairie Town's 2025 year",
+   "short": "Analyze Prairie Town's 2025 year",
    "tasksA": [
     {
      "id": "e-design",
@@ -1005,7 +1005,7 @@
       "c": "The benchmark exposes a definition, not an error, and the analysis must say which results depend on it.",
       "d": "Nothing in either source says so, and EIA's figure is the national average for 2025."
      },
-     "solution": "The dataset is normalised to its own highest hour, as its metadata say. Its mean output as a share of that hour is a different quantity from EIA's capacity factor, which divides by capacity: the comparison checks a definition, it does not validate the number."
+     "solution": "The dataset is normalized to its own highest hour, as its metadata say. Its mean output as a share of that hour is a different quantity from EIA's capacity factor, which divides by capacity: the comparison checks a definition, it does not validate the number."
     },
     {
      "id": "e-valid",
@@ -1092,7 +1092,7 @@
    "why": {
     "a": "Suspicious, but a plan without wind or solar can be right when fuel is cheap; it does not show why.",
     "b": "Prairie Town uses about 2,470 GWh a year; the model's year holds 6,757 MWh, about one day.",
-    "c": "That check passes here: each modelled hour balances.",
+    "c": "That check passes here: each modeled hour balances.",
     "d": "Low or high compared with what? It needs a reference, such as the year's demand."
    },
    "solution": "The year's total against an independent reference. 6,757 MWh is one average day of the town's 2,466 GWh in the model, or 2,469 GWh in the full 2025 data."

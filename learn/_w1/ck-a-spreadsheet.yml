@@ -13,5 +13,5 @@ glossary:
     def: "A rule of United States tax law that lets tax-exempt and governmental bodies, such as school districts, receive the value of certain clean-energy tax credits as a payment from the IRS."
 requests:
   - "path.yml: CK-A's after list is the course plan's prerequisites for the Analyst checkpoint: A1, A4, A13 and A15."
-  - "The case is the school's solar-plus-storage project only. The town heat-pump programme would need A15's numbers (not live); it can become a second variant later, as CK-M has two."
+  - "The case is the school's solar-plus-storage project only. The town heat-pump program would need A15's numbers (not live); it can become a second variant later, as CK-M has two."
   - "Downloads: assets/learn/data/ck-a-starter.xlsx and ck-a-worked.xlsx (XLSX with live formulas, written with ck-a-spreadsheet.json by the checkpoint's data build step; standard library only). assets/learn/data/ is in _quarto.yml's resources, so both are published."

@@ -22,7 +22,7 @@
 //   wires     $6 x max_t net_t                          (the local transformer and service line: the customer's own peak)
 //   meter     $10 a home, $200 a business
 // Tariffs (illustrative), each with the class's meter cost as its fixed charge F, and set so that each class pays its
-// total cost of service at the default behaviour (EV at 19:00, batch at 13:00): revenue-neutral for the class, whose
+// total cost of service at the default behavior (EV at 19:00, batch at 13:00): revenue-neutral for the class, whose
 // mix is nine renters for each solar and EV home (homes) and the factory alone (businesses). In all four, a kWh sent
 // back earns what a kWh bought costs in that hour (net metering).
 //   flat      F + p x net kWh;                   p = (class cost - F x N) / class net kWh
@@ -100,7 +100,7 @@
   var DEFAULT = { ev: "evening", batch: "day" };
   var START = { ev: "evening", batch: "day", scarce: false };   // what steps 2-4 show
   function atStart(s) { s = s || {}; return (s.ev || "evening") === "evening" && (s.batch || "day") === "day" && !s.scarce; }
-  // the four tariffs of each class, set at the default behaviour so that the class pays its cost (revenue-neutral)
+  // the four tariffs of each class, set at the default behavior so that the class pays its cost (revenue-neutral)
   function calibrate(D, W) {
     var T = {}, tou = D.tariffs.filter(function (x) { return x.key === "tou"; })[0];
     Object.keys(D.classes).forEach(function (k) {
@@ -262,7 +262,7 @@
       " while serving the renter costs " + usd(b.cost.total) + ". We assume the utility pays that gap now and recovers it from all customers later.";
   }
   // step 8: one sentence per tariff, for the homes, in the reader's state s (the same state as the ledger beside it);
-  // the scarcity week's effect on the renter is a comparison with and without it, labelled as such
+  // the scarcity week's effect on the renter is a comparison with and without it, labeled as such
   function pickLine(D, W, T, tk, s) {
     s = s || {};
     var E = evaluate(D, W, T, s), r = E.renter.gap, h = E.solarev.gap, sc = !!s.scarce, b = busiest(E.solarev.net);

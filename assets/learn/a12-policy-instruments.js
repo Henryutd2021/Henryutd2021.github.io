@@ -34,7 +34,7 @@
       moved: { tau: R.carbonPay, ptc: R.ptcPay, itc: R.itcPay, ces: R.certPay } };
   }
   function moneyOf(id, R) { return id === "tau" ? R.carbonPay : id === "ptc" ? R.ptcPay : id === "itc" ? R.itcPay : R.certPay; }
-  // the money, in words: a year, with the investment credit's cash up front and the certificates labelled illustrative
+  // the money, in words: a year, with the investment credit's cash up front and the certificates labeled illustrative
   function moneyLine(id, R) {
     var m = fmt.m(moneyOf(id, R));
     return id === "tau" ? "Gas plants pay " + m + " a year in carbon payments." : id === "ptc" ? "Taxpayers pay " + m + " a year in credits."
@@ -155,7 +155,7 @@
             },
             show: function () { st.set(""); if (g !== stepGen) return; paint(); host.innerHTML = ""; ledger(host); api.saw("**Same grid, four instruments:** compare each cut with its change in resource cost, and see who pays first. A real rule of each kind is in Sources, below."); api.done(); } });
           b.addEventListener("click", go); go();
-          if (PJ && LX.lessonRefHTML) H("p", { class: "lx-hint", html: "Case file " + LX.lessonRefHTML(PJ, "CF4") + " (hydrogen at existing plants) practises reading which assumptions, a policy among them, a published result rests on." }, act);
+          if (PJ && LX.lessonRefHTML) H("p", { class: "lx-hint", html: "Case file " + LX.lessonRefHTML(PJ, "CF4") + " (hydrogen at existing plants) practices reading which assumptions, a policy among them, a published result rests on." }, act);
         } }
     ];
     var cards = LX.StepCards(live, { steps: steps });

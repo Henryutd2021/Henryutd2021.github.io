@@ -177,7 +177,7 @@
   var VOUT = { gen: 18000, up: 345000, line: 345000, sub: 12470, feeder: 12470, service: 240, meter: 240, socket: 120 };
 
   // ---- VoltPath: the path from plant to socket (lesson-local component)
-  // glyphs drawn around (x, y) = (centre, ground); every fill and stroke from tokens (f6- classes in the page's style)
+  // glyphs drawn around (x, y) = (center, ground); every fill and stroke from tokens (f6- classes in the page's style)
   var GLYPH = {
     gen: function (x, y) { return '<rect class="bld" x="' + (x - 30) + '" y="' + (y - 46) + '" width="44" height="46" rx="2"/><path class="stack" d="M' + (x + 4) + ' ' + (y - 46) + ' V' + (y - 70) + '"/>' +
       '<circle class="genc" cx="' + (x + 22) + '" cy="' + (y - 16) + '" r="13"/><text class="gl" x="' + (x + 22) + '" y="' + (y - 12) + '">G</text>'; },
@@ -232,7 +232,7 @@
       var pts = stops.map(function (s, i) { return [L.at[i][0] + ATTACH[s.key][0], L.at[i][1] + ATTACH[s.key][1]]; });
       svg += '<rect class="sky" x="0" y="0" width="' + L.w + '" height="' + L.h + '"/>';
       (narrow ? [176, 330] : [200]).forEach(function (gy) { svg += '<rect class="ground" x="0" y="' + (gy - 24) + '" width="' + L.w + '" height="24"/>'; });
-      // wires, coloured by the voltage they carry
+      // wires, colored by the voltage they carry
       for (var i = 0; i < pts.length - 1; i++) {
         var c = SEG[i];
         var a = pts[i], b = pts[i + 1], d = narrow && i === 3 ? "M" + a[0] + " " + a[1] + " C" + (a[0] + 46) + " " + a[1] + " " + (b[0] + 46) + " " + b[1] + " " + b[0] + " " + b[1]

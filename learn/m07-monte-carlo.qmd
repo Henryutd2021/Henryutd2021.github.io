@@ -285,7 +285,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <li>Run <code>code-delay lhs my_scenario.json ranges.json --samples 500 --seed 1 --out-dir outputs/lhs</code>; open <code>rank_correlations.csv</code>.</li>
 <li>Rerun with <code>--seed 2</code>. Do any two inputs swap places? A swap warns that their order may be unstable; step 9's rule settles it from 20 seeds.</li>
 </ul>
-<p><a href="https://github.com/Henryutd2021/code-delayed-energization">code-delayed-energization</a>: public example repository · MIT licence · illustrative inputs.</p>
+<p><a href="https://github.com/Henryutd2021/code-delayed-energization">code-delayed-energization</a>: public example repository · MIT license · illustrative inputs.</p>
 </div>
 ```
 :::

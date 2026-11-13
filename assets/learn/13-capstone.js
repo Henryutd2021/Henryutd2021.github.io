@@ -10,7 +10,7 @@
 //   decisions   capacities: wind, solar, gas combined-cycle (cc), gas peaker (pk), nuclear (nuc) in MW; battery power
 //               (bp, MW) and energy (be, MWh). Every hour: cc and peaker output, battery charge and discharge, unserved
 //               demand (only when the reader's plan is fixed; the optimizer must serve all demand).
-//   goal        least annual cost = annualised capital + fixed O&M (per MW or MWh built) + fuel and variable O&M (per MWh)
+//   goal        least annual cost = annualized capital + fixed O&M (per MW or MWh built) + fuel and variable O&M (per MWh)
 //               [+ a carbon price x CO2: lesson 12's weighted sum]. Nuclear runs flat, so its fuel is a fixed yearly cost.
 //   rules       every hour: wind + solar + nuclear + cc + peaker + discharge - charge + unserved >= demand (what is left
 //               over is spilled); wind and solar make capacity x the hour's availability (LX.townProfile, "scale" method,
@@ -41,7 +41,7 @@
   var TECH = U.TECH, fm = U.fm, Num = U.Num, TextTable = U.TextTable, css = U.css;
   function copy(o) { var r = {}; for (var k in o) r[k] = o[k]; return r; }
 
-  // ---------------------------------------------------------------- one modelled week as a stacked chart
+  // ---------------------------------------------------------------- one modeled week as a stacked chart
   var STACK = [["nuc", "Nuclear", "var(--lx-nuc)"], ["wind", "Wind", "var(--lx-wind)"], ["solar", "Solar", "var(--lx-solar)"],
                ["dis", "Battery out", "var(--lx-tier-2)"], ["cc", "Gas CC", "var(--lx-cc)"], ["pk", "Peaker", "var(--lx-pk)"]];
   var MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -154,7 +154,7 @@
 
     // ---- missions, the stage, the panel
     var ms = LX.Missions(live, [
-      { id: "lights", label: "Serve demand in every modelled hour", short: "Lights on", main: true },
+      { id: "lights", label: "Serve demand in every modeled hour", short: "Lights on", main: true },
       { id: "co2", label: "Emit under " + G.co2Target + " kt (thousand tonnes) of CO₂ a year", short: "Under " + G.co2Target + " kt" },
       { id: "cost", label: "Cost within " + Math.round(G.costSlack * 100) + "% of the frontier", short: "Near the frontier" }
     ]);
@@ -202,7 +202,7 @@
       var T = S_.C.techs, t = cfg.techs;
       if (k === "wind") return fm.k(T.wind.fixed) + " per MW-year; makes " + fm.pct(Y.windCF) + " of its size on average.";
       if (k === "solar") return fm.k(T.solar.fixed) + " per MW-year; makes " + fm.pct(Y.solarCF) + " of its size on average.";
-      if (k === "nuc") return fm.k(T.nuc.fixedTotal) + " per MW-year with fuel; modelled as a constant " + fm.pct(t.nuc.avail) + " of its size every hour (a simplification).";
+      if (k === "nuc") return fm.k(T.nuc.fixedTotal) + " per MW-year with fuel; modeled as a constant " + fm.pct(t.nuc.avail) + " of its size every hour (a simplification).";
       if (k === "cc") return "A [[combined-cycle|combined-cycle]] plant (CC): " + fm.k(T.cc.fixed) + " per MW-year + $" + T.cc.run.toFixed(0) + "/MWh to run; " + T.cc.co2.toFixed(2) + " t CO₂/MWh.";
       if (k === "pk") return "A [[peaker|peaker]]: " + fm.k(T.pk.fixed) + " per MW-year + $" + T.pk.run.toFixed(0) + "/MWh to run; " + T.pk.co2.toFixed(2) + " t CO₂/MWh.";
       if (k === "bp") return fm.k(T.bp.fixed) + " per MW-year: how fast it charges or discharges.";
@@ -360,7 +360,7 @@
     }
     function missions() {
       var s = S_.sum, g = S_.exactGap != null ? S_.exactGap : gapNow(), lit = s.unserved < 0.5;
-      ms.set("lights", { frac: lit ? 1 : Math.max(0.05, 1 - s.unservedShare * 200), text: lit ? "Every modelled hour served" : fm.mwh(s.unserved) + " unserved", fail: !lit, won: lit });
+      ms.set("lights", { frac: lit ? 1 : Math.max(0.05, 1 - s.unservedShare * 200), text: lit ? "Every modeled hour served" : fm.mwh(s.unserved) + " unserved", fail: !lit, won: lit });
       ms.set("co2", { frac: s.co2 / target, text: fm.kt(s.co2), fail: s.co2 > target + 0.5, won: s.co2 <= target + 0.5 });
       ms.set("cost", { frac: g == null ? 0 : Math.max(0.03, g / G.costSlack), text: g == null ? "frontier not solved" : (S_.exactGap != null ? "+" : "about +") + fm.pct(Math.max(0, g), 1) + " vs frontier", fail: g != null && g > G.costSlack, won: lit && g != null && g <= G.costSlack });
     }
@@ -372,8 +372,8 @@
         var worst = 0, wk = 0; per.forEach(function (P, p) { var ws = model.weekSeries(S_.sumC, P, S_.raw, p, S_.sumPlan); ws.unserved.forEach(function (u) { if (u > worst) { worst = u; wk = p; } }); });
         icon = "question"; msg = "Lights out: up to " + Math.round(worst) + " MW short in the " + tabs[wk].textContent.toLowerCase() + " week. Add [[firm-capacity|firm]] plants or storage.";
       } else if (s.spilledShare > 0.1) { icon = "question"; msg = fm.pct(s.spilledShare, 0) + " of what the wind, solar and nuclear plants could make is [[curtailment|spilled]]: more than the town and the battery can use."; }
-      else if (s.co2 > target + 0.5) msg = "Every modelled hour served. Cut " + fm.kt(s.co2 - target) + " more CO₂ to reach the target.";
-      else { var g = gapNow(); msg = "Every modelled hour served, under the CO₂ target" + (g != null ? ", about " + fm.pct(Math.max(0, g), 1) + " above the frontier." : "."); }
+      else if (s.co2 > target + 0.5) msg = "Every modeled hour served. Cut " + fm.kt(s.co2 - target) + " more CO₂ to reach the target.";
+      else { var g = gapNow(); msg = "Every modeled hour served, under the CO₂ target" + (g != null ? ", about " + fm.pct(Math.max(0, g), 1) + " above the frontier." : "."); }
       var e = H("div", { class: "lx-event t13", html: LX.icon(icon) + "<div>" + LX.rich(msg) + "</div>" }, evBox);
       return e;
     }
@@ -390,7 +390,7 @@
       S_.pred = LX.Predict(q, { id: "t13-start", fresh: true, q: "Lesson 0's five plants must now serve a whole year, with a peak of " + Math.round(Y.peak) + " MW. Will every light stay on?",
         options: [{ value: "yes", label: "Yes, all year" }, { value: "no", label: "No, some hours go dark" }], answer: "no",
         feedback: { yes: "Not quite.", no: "Right." }, lockText: "Locked in.",
-        onPick: function () { S_.picked = true; setTimeout(function () { if (!S_.done && S_.tourWait) tour.start(0); }, 900); var go = function () { var s = S_.sum; S_.pred.reveal(s.unserved >= 0.5 ? "Run on the seven weeks, the year leaves " + fm.mwh(s.unserved) + " unserved. Gas and nuclear give at most " + Math.round(S_.plan.cc + S_.plan.pk + S_.plan.nuc * cfg.techs.nuc.avail) + " MW; in some hours wind and sun cannot cover the rest." : "Every modelled hour is served."); };
+        onPick: function () { S_.picked = true; setTimeout(function () { if (!S_.done && S_.tourWait) tour.start(0); }, 900); var go = function () { var s = S_.sum; S_.pred.reveal(s.unserved >= 0.5 ? "Run on the seven weeks, the year leaves " + fm.mwh(s.unserved) + " unserved. Gas and nuclear give at most " + Math.round(S_.plan.cc + S_.plan.pk + S_.plan.nuc * cfg.techs.nuc.avail) + " MW; in some hours wind and sun cannot cover the rest." : "Every modeled hour is served."); };
           if (S_.sum) go(); else LX.on("t13-run", function once() { if (S_.pred) { go(); S_.pred = null; } }); } });
     }
 
@@ -418,10 +418,10 @@
       LX.store.set("t13-score", { stars: st, frontier: fCost, cost: s.cost, co2: s.co2, unserved: s.unserved });
       panel.hidden = true; links.hidden = true; deb.hidden = false; deb.innerHTML = "";
       var hd = H("div", { class: "lx-deb-head" }, deb);
-      var hTitle = H("h3", { text: s.unserved < 0.5 ? "Your plan serves every modelled hour." : "Your plan leaves " + fm.mwh(s.unserved) + " unserved in the modelled year." }, hd);
+      var hTitle = H("h3", { text: s.unserved < 0.5 ? "Your plan serves every modeled hour." : "Your plan leaves " + fm.mwh(s.unserved) + " unserved in the modeled year." }, hd);
       H("a", { class: "lx-btn small", href: "#explain", html: "See it as diagrams" + LX.icon("arrow") }, hd);
       H("p", { class: "lx13-sub", text: "Scored on the seven weeks. The full-year check below can change the verdict." }, deb);
-      LX.Stars(deb, [{ label: "Lights on", n: st.lights, value: s.unserved < 0.5 ? "every modelled hour" : fm.mwh(s.unserved) + " short" },
+      LX.Stars(deb, [{ label: "Lights on", n: st.lights, value: s.unserved < 0.5 ? "every modeled hour" : fm.mwh(s.unserved) + " short" },
                      { label: "CO₂", n: st.co2, value: fm.kt(s.co2) }, { label: "Cost", n: st.cost, value: st.gap == null ? fm.musd(s.cost) : "+" + fm.pct(Math.max(0, st.gap), 1) }]);
       if (fCost) H("p", { class: "lx-hint", text: "The cheapest plan with your CO₂ (" + fm.kt(s.co2) + ") costs " + fm.musd(fCost) + " a year; yours costs " + fm.musd(s.cost) + "." }, deb);
       // check on all 8,760 hours
@@ -464,7 +464,7 @@
         { icon: "cloud", title: "Spilled energy", text: "Output beyond what the town and the battery can take is thrown away.", moment: "Your highest spill: " + fm.pct(S_.spill, 0) + ".", got: S_.spill >= 0.05, lock: "Build enough wind or sun to spill 5% to collect this." },
         { icon: "battery", title: "Storage", text: "A battery moves energy to the hours that need it and loses 15% on the way.", moment: "", got: S_.bat, lock: "Run a plan with a battery to collect this." },
         { icon: "target", title: "Shadow price of the cap", text: "What one more tonne of allowed CO₂ would save the cheapest plan.", moment: S_.asked && model.capReading(S_.asked.cap, S_.asked.sum).kind === "binds" ? "$" + Math.round(S_.asked.sum.capDual) + " per tonne at " + Math.round(S_.asked.cap / 1e3) + " kt." : "", got: !!S_.asked, lock: "Ask the optimizer to collect this." },
-        { icon: "frontier", title: "The frontier", text: "No plan is both cheaper and cleaner than a plan on the frontier.", moment: g != null ? "Your plan: " + fm.pct(Math.max(0, g), 1) + " above it." : "", got: g != null && g <= G.costSlack && s.unserved < 0.5, lock: "Get within " + Math.round(G.costSlack * 100) + "% of the frontier with every modelled hour served." }
+        { icon: "frontier", title: "The frontier", text: "No plan is both cheaper and cleaner than a plan on the frontier.", moment: g != null ? "Your plan: " + fm.pct(Math.max(0, g), 1) + " above it." : "", got: g != null && g <= G.costSlack && s.unserved < 0.5, lock: "Get within " + Math.round(G.costSlack * 100) + "% of the frontier with every modeled hour served." }
       ];
       H("h4", { class: "lx-deb-notes", text: "Notes collected: " + NOTES.filter(function (n) { return n.got; }).length + " of " + NOTES.length }, deb);
       LX.Notes(deb, NOTES.map(function (n) { n.link = { href: "#explain", text: "On the concept map" }; return n; }));
@@ -517,7 +517,7 @@
     var later = "Next: M3 (capacity expansion) writes this model in code, on representative weeks checked against the full year.";
     var NODES = [
       { id: "build", g: "dec", label: "What to build", lines: ["What to", "build"], at: [3, 1], atN: [2, 1], text: "Seven numbers: MW of five plants, and the battery's MW and MWh. Each costs money every year, used or not.", game: "Your sliders.", later: later },
-      { id: "run", g: "ops", label: "Hourly operation", lines: ["Hourly", "operation"], at: [1, 1], atN: [1, 1], text: "Given what is built, the solver runs the plants and the battery at least cost, every modelled hour.", game: "The week chart." },
+      { id: "run", g: "ops", label: "Hourly operation", lines: ["Hourly", "operation"], at: [1, 1], atN: [1, 1], text: "Given what is built, the solver runs the plants and the battery at least cost, every modeled hour.", game: "The week chart." },
       { id: "weeks", g: "time", label: "Seven weeks", lines: ["Seven", "weeks"], at: [0, 0], atN: [0, 0], text: "Four typical weeks (one per season) and three extreme ones stand for the 52 weeks of 2025.", game: "The week tabs." },
       { id: "rules", g: "dec", label: "Rules", at: [2, 0], atN: [0, 1], text: "Supply covers demand each hour; no plant above its size; the battery's charge stays within its MWh.", game: "Unserved energy appears when a rule cannot be met." },
       { id: "store", g: "time", label: "Storage link", lines: ["Storage", "link"], at: [1, 0], atN: [1, 0], text: "The battery's charge carries from each calendar week to the next, so energy can move across weeks.", game: "Charging, below zero on the chart." },

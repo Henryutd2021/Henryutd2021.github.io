@@ -7,7 +7,7 @@
 // The day is lesson 0's (3 September 2025), cut and rounded exactly as grid-operator.js prepare() does. The lesson's
 // two-variable linear program is one hour of it, 19:00, when gas must supply the gap left by nuclear, wind and sun:
 //   decisions  x = combined-cycle output (MW), y = peaker output (MW), for one hour
-//   goal       minimise cx*x + cy*y  (gas running cost in $, one hour: MW x 1 h x $/MWh; the fixed-output plant's
+//   goal       minimize cx*x + cy*y  (gas running cost in $, one hour: MW x 1 h x $/MWh; the fixed-output plant's
 //              100 MW x $10/MWh = $1,000 is a constant that never moves the best plan, so the chart leaves it out)
 //   rules      demand   x + y >= D        (gas covers the gap; any extra would be spilled)
 //              cc size  x <= 150,  peaker size  y <= 100

@@ -112,7 +112,7 @@
   var ERCOT_TICKS = ["Half", "Equal", "2 times", "5 times", "10 times"];
   function ercotLine(D) {
     var E = D.ercot;
-    return fmtN(E.requestsGW) + " GW ÷ " + fmtN(E.peakMW / 1000, 1) + " GW = **" + fmtN(ratio(D), 1) + " times** the record, and about " + pct(E.dcShare) + " are data centers. Requests are proposals, not committed demand: projects may change or be cancelled.";
+    return fmtN(E.requestsGW) + " GW ÷ " + fmtN(E.peakMW / 1000, 1) + " GW = **" + fmtN(ratio(D), 1) + " times** the record, and about " + pct(E.dcShare) + " are data centers. Requests are proposals, not committed demand: projects may change or be canceled.";
   }
   function waitLine(D, grid) {
     var b = D.wait.buildMonths, i = idle(D, grid);
@@ -129,7 +129,7 @@
   var TAX_NOTE = "Illustrative: real values, rates and any tax breaks differ by place. $M means millions of dollars.";
   function coolLine(c) { return c.name + ": " + c.water + "; " + c.power + "."; }
   var PAY = {
-    options: [{ value: "company", label: "The company that cancelled" }, { value: "others", label: "The utility's other customers" }, { value: "nobody", label: "Nobody" }],
+    options: [{ value: "company", label: "The company that canceled" }, { value: "others", label: "The utility's other customers" }, { value: "nobody", label: "Nobody" }],
     answer: "others",
     feedback: {
       company: "Only if its contract says so: with no special terms, the cost can land on the utility's other customers.",

@@ -96,7 +96,7 @@ body-classes: "page-learn page-lesson lx-form-play"
 <div class="lx-deeper-body">
 ```
 
-The model decides what to build ($K_i$) and how to run it every modelled hour $t$, at least yearly cost:
+The model decides what to build ($K_i$) and how to run it every modeled hour $t$, at least yearly cost:
 
 $$\min \; \sum_i f_i K_i + \sum_t w_t \big(r_\mathrm{cc}\, g_t + r_\mathrm{pk}\, q_t + V u_t\big)$$
 
@@ -121,7 +121,7 @@ $$
 | $V$ | \$10,000 per unserved MWh: a weight that steers a fixed plan to keep the lights on, never counted in its cost | \$/MWh |
 | $a^w_t, a^s_t$ | wind and solar output per MW built | MW per MW |
 | $D_t$ | demand | MW |
-| $w_t$ | hours of the year that modelled hour $t$ stands for | h |
+| $w_t$ | hours of the year that modeled hour $t$ stands for | h |
 | $0.911$ | nuclear output per MW built, the same every hour: a simplification | MW per MW |
 
 - **Yearly cost** of a plant: [overnight capital cost]{.lx-term term="capital-cost"} × [capital recovery factor]{.lx-term term="capital-recovery-factor"} + [fixed O&M]{.lx-term term="fixed-om"} (operation and maintenance). At a 4% real (after-inflation) [cost of capital]{.lx-term term="wacc"} over 30 years, the factor is 0.05783.
@@ -226,7 +226,7 @@ Planners respond with more or longer periods, extreme weeks and adequacy tests o
 <tr><td class="n">$8,255/kW</td><td>EIA's overnight cost for a large light-water nuclear plant: the lesson's default, which you can change.</td><td class="s"><a href="https://www.eia.gov/outlooks/aeo/assumptions/pdf/EMM_Assumptions.pdf">EIA, AEO2026 assumptions, Table 3</a> (PDF) · 2025 dollars, April 2026</td></tr>
 <tr><td class="n">$247/kWh + $382/kW</td><td>A lithium-ion battery's energy and power costs in 2025 dollars (NREL's $241 and $372 in 2024 dollars, converted); a 4-hour battery: $343/kWh.</td><td class="s"><a href="https://docs.nlr.gov/docs/fy25osti/93281.pdf">NREL, battery cost projections, 2025 update</a> (PDF) · 2024 costs, June 2025; <a href="https://apps.bea.gov/iTable/?reqid=19&amp;step=3&amp;isuri=1&amp;1921=survey&amp;1903=13&amp;1904=2022&amp;1905=2026&amp;1906=a&amp;1911=0">BEA, NIPA Table 1.1.9</a> · revised 29 Oct 2026</td></tr>
 <tr><td class="n">$3.85/MMBtu</td><td>Average cost of natural gas to U.S. power plants in 2025. MMBtu: a million Btu of fuel energy.</td><td class="s"><a href="https://www.eia.gov/electricity/annual/html/epa_07_04.html">EIA, Electric Power Annual, Table 7.4</a> · 2025 data</td></tr>
-<tr><td class="n">91.1%</td><td>Capacity factor of the U.S. nuclear fleet in 2025. For simplicity, the lesson's plant makes a constant 91.1% of its size every hour; real output varies, with <span class="lx-term" data-term="refuelling-outage">refuelling outages</span>, so this cannot show reliability.</td><td class="s"><a href="https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_b">EIA, Electric Power Monthly, Table 6.07.B</a> · 2025 data</td></tr>
+<tr><td class="n">91.1%</td><td>Capacity factor of the U.S. nuclear fleet in 2025. For simplicity, the lesson's plant makes a constant 91.1% of its size every hour; real output varies, with <span class="lx-term" data-term="refuelling-outage">refueling outages</span>, so this cannot show reliability.</td><td class="s"><a href="https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_b">EIA, Electric Power Monthly, Table 6.07.B</a> · 2025 data</td></tr>
 </tbody>
 </table>
 </div>

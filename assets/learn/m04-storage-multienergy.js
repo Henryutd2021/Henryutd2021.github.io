@@ -1,4 +1,4 @@
-// m04-storage-multienergy.js — Modeler lesson M4, "Storage and coupled carriers: modelling power, hydrogen and heat
+// m04-storage-multienergy.js — Modeler lesson M4, "Storage and coupled carriers: modeling power, hydrogen and heat
 // together" (model-lab: step cards with solver runs).
 //
 // Data: assets/learn/data/m04-storage-multienergy.json (the plant, its devices, the customers, two weeks, the four

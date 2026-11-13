@@ -110,7 +110,7 @@
     h.push("</details>");
     return h.join("\n");
   }
-  // one example rewrite as a labelled table: one part per row
+  // one example rewrite as a labeled table: one part per row
   function rewriteTable(r, T) {
     var e = r.example;
     return '<table class="lx-facts r1-rw"><caption>“' + esc(r.vague) + "”, rewritten</caption><tbody>"
@@ -343,7 +343,7 @@
     exemplars(D, P);
     selfcheck(D, P);
     root.lxLesson = { data: D, model: model };
-    // demo states (core.js LX.demo): "mid" = round 1 sorted (eight right, two in a neighbouring bin) and checked;
+    // demo states (core.js LX.demo): "mid" = round 1 sorted (eight right, two in a neighboring bin) and checked;
     // "step-1" to "step-3": that sort done the same way; "step-4" to "step-6": the rewrite written (the example's words, as
     // plain text) and the example opened
     function clickText(re) { setTimeout(function () { [].forEach.call(live.querySelectorAll("button"), function (b) { if (re.test(b.textContent)) b.click(); }); }, 60); }

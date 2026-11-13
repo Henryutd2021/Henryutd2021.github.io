@@ -155,7 +155,7 @@
           "Recommendation: connect ", { text: "the full " + kilo(st.conn) + " MW this year with " + st.pk + " new 50 MW peakers at Prairie Town and " + kilo(st.up) + " MW more on Town–Metro", note: "Sizes with units and places: a plan the planners can check and cost." }, ".\n",
           "Adequacy: ", { text: lt(A.plan.lole) + " loss-of-load days a year (90% interval " + lt(A.plan.ci[0]) + " to " + lt(A.plan.ci[1]) + (A.plan.lole <= 0.1 && A.plan.ci[1] > 0.1 ? ": the point estimate meets the 0.1 criterion, the interval crosses it" : "") + "), against " + lt(A.today.lole) + " for today's grid and " + A.bare.lole.toFixed(1) + " if the load connects with nothing built", note: "The criterion's measure, its Monte Carlo interval with the warning it carries, and two baselines." }, ".\n",
           "Sensitivity (its chart goes with the note): ", { text: "with these builds held fixed, " + sw.map(function (x) { return lt(x.lole) + " days at " + kilo(x.mw) + " MW"; }).join(", ") + " connected", note: "One input moved, the plan held fixed: where the margin runs out." }, ".\n",
-          "Hard weeks: ", { text: kilo(W.shed) + " MWh unserved in the 14 days; Town's price peaks at " + price(W.maxT) + "/MWh, conditional on the commitment", note: "The extreme periods kept, and the prices labelled for what they are." }, ".\n",
+          "Hard weeks: ", { text: kilo(W.shed) + " MWh unserved in the 14 days; Town's price peaks at " + price(W.maxT) + "/MWh, conditional on the commitment", note: "The extreme periods kept, and the prices labeled for what they are." }, ".\n",
           "Who pays: ", { text: "on the 26-day estimate, the large load " + mil(L.ll.total) + " a year, half the new costs directly, and other customers " + mil(L.delta) + " a year more than today (" + mil(L.lo) + " to " + mil(L.hi) + " across the cost ranges); every day of 2025 gives " + mil(ref.full.ll) + " and " + mil(ref.full.delta), note: "Both parties on one boundary, a year, 2025 dollars, with the range the costs allow and the estimate checked against a full year." }, ".\n",
           "Emissions: ", { text: kilo(ref.co2 / 1000) + " kt of CO₂ a year from the fuel burned", note: "Operating CO₂ on its own line, not mixed into the money." }, ".\n",
           "Limits: ", { text: "two weather years, a transport model without power-flow physics, illustrative plants and costs; one study year, so it does not test a load that arrives late or never", note: "What the study leaves out, so the planners do not over-read it." }, "."] }],
@@ -358,7 +358,7 @@
         chartFor = stAt; rn.refresh();
       } }, dl);
     }
-    // the sensitivity chart as a standalone SVG: the page's colours and fonts written onto each element, a background and
+    // the sensitivity chart as a standalone SVG: the page's colors and fonts written onto each element, a background and
     // a title line; returns an object URL (or a data URL)
     function chartSVG(host, title) {
       var svg = host.querySelector("svg[role=img]"); if (!svg) return null;

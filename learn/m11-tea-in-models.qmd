@@ -279,7 +279,7 @@ $$
 <li>Run <code>examples/configurations.py</code>: wind, battery, electrolyzer, tank and fuel cell sized and run hour by hour on a synthetic site, with life-cycle costs as present values.</li>
 <li>Read “Production incentives” in <code>docs/formulation.md</code>: how does it handle an incentive that lasts fewer years than the analysis period? Compare it with this lesson's two periods.</li>
 </ul>
-<p><a href="https://github.com/Henryutd2021/reopt-hydrogen-framework">reopt-hydrogen-framework</a>: public example repository · MIT licence · synthetic data.</p>
+<p><a href="https://github.com/Henryutd2021/reopt-hydrogen-framework">reopt-hydrogen-framework</a>: public example repository · MIT license · synthetic data.</p>
 </div>
 </div>
 <div class="lx-card lx-sources">

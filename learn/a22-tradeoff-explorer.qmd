@@ -95,8 +95,8 @@ body-classes: "page-learn page-lesson lx-form-play"
 <summary><span class="k">Go deeper · Analyst</span>Reading a radar honestly</summary>
 <div class="lx-deeper-body">
 <ul>
-<li><b>Scales are choices.</b> Rim (best) and centre (worst): cost $100M and $250M a year; CO₂ 0 and 850 kt; unserved energy 0 and 2,000 MWh; low-income share 20% and 35%; gas share 0% and 100%.</li>
-<li><b>Equal weights carry a price.</b> One spoke of cost ($150M) counts as much as one spoke of CO₂ (850 kt): about $176 a tonne, set by the scales, not by anyone's judgement of harm (<a href="12-trade-offs.html">lesson 12</a>: weights carry units).</li>
+<li><b>Scales are choices.</b> Rim (best) and center (worst): cost $100M and $250M a year; CO₂ 0 and 850 kt; unserved energy 0 and 2,000 MWh; low-income share 20% and 35%; gas share 0% and 100%.</li>
+<li><b>Equal weights carry a price.</b> One spoke of cost ($150M) counts as much as one spoke of CO₂ (850 kt): about $176 a tonne, set by the scales, not by anyone's judgment of harm (<a href="12-trade-offs.html">lesson 12</a>: weights carry units).</li>
 <li><b>Squeezed spokes.</b> Under a fixed charge per home, every plan's low-income share lies between 31.3% and 34.6%, so Fair scores span only 0.03 to 0.25: a weight on Fair barely moves a pick.</li>
 <li><b>Shape, not area.</b> Reordering the spokes changes a polygon's area; compare plans spoke by spoke.</li>
 <li><b>Ties as shown.</b> Verdicts treat values that round to the same shown number as equal. Under the income-graduated charge, C's share (21.61%) and D's (21.63%) both show 21.6%, so D beats C; at full precision, C is unbeaten.</li>
@@ -175,7 +175,7 @@ Mavrotas (2009) shows how to sweep the limits. Next: [M6](m06-carbon-in-models.q
 
 <div class="lx-quiz" data-quiz="a22">
 <div class="lx-qq" data-id="cd" data-answer="a">
-<p class="lx-qtext">Plans C and D differ only by 80 MW of gas peakers, which never ran in 2025. Which measure can tell them apart in C's favour?</p>
+<p class="lx-qtext">Plans C and D differ only by 80 MW of gas peakers, which never ran in 2025. Which measure can tell them apart in C's favor?</p>
 <ul class="lx-choices"><li data-value="a">A reserve margin</li><li data-value="b">Unserved energy</li><li data-value="c">CO₂ a year</li><li data-value="d">The gas share</li></ul>
 <details class="lx-answer"><summary>Answer</summary><p>A <span class="lx-term" data-term="reserve-margin">reserve margin</span>: it counts capacity at the peak, 88% for C against 70% for D. The other three see the same year for both.</p></details>
 </div>

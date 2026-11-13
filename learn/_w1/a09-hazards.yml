@@ -16,7 +16,7 @@ glossary:
     def: "Protecting power plants and fuel supply against freezing, with insulation, electric heaters on exposed pipes (heat tracing), enclosures and cold-weather procedures."
   - id: stress-test
     term: Stress test
-    def: "Running a system model through a severe event on purpose, to see what breaks and what a defence would change."
+    def: "Running a system model through a severe event on purpose, to see what breaks and what a defense would change."
   - id: derate
     term: Derate
     def: "A cut in the most a power plant can produce while it keeps running, for example when its cooling water is too warm or its equipment freezes."

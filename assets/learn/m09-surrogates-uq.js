@@ -117,7 +117,7 @@
     return t;
   }
   // ---- the fit chart (i-fitter, lesson-local, on LX.Plot): records as dots, the maker's curve dashed, each fit's mean
-  // and its 90% band as columns 0.25 m/s wide (the band at each column's centre); o = {fits: [{F, color, label}],
+  // and its 90% band as columns 0.25 m/s wide (the band at each column's center); o = {fits: [{F, color, label}],
   // recs: [{r, color, label, faint}], maker, field (mode or null), aria}
   function fitSpec(T, o) {
     var bars = [], lines = [], legend = [], X0 = T.range[0], X1 = T.range[1], step = 0.25, dark = LX.isDark && LX.isDark();
@@ -134,7 +134,7 @@
     (o.recs || []).forEach(function (s) { lines.push({ pts: s.r.map(function (p) { return [p[0], p[1]]; }), color: s.color, width: 0.01, op: 0, dots: true }); legend.push({ label: s.label, color: s.color }); });
     curves.forEach(function (c) { lines.push({ pts: c.c.map(function (p) { return [p.v, p.m]; }), color: c.f.color, width: 2.6 }); legend.push({ label: c.f.label + ", with its 90% band", color: c.f.color }); });
     // the text version, one row per 1 m/s bin of wind speed: each set of records as its count and mean power in the bin
-    // (and, beside the maker's curve, their mean gap below it), then every curve and band at the bin's centre
+    // (and, beside the maker's curve, their mean gap below it), then every curve and band at the bin's center
     var rows = binText(T, o);
     return {
       x: { min: X0, max: X1, ticks: [[3, "3"], [6, "6"], [9, "9"], [12, "12"], [15, "15"], [18, "18"], [20, "20 m/s", "end"]], ticksN: [[3, "3"], [8, "8"], [13, "13"], [20, "20 m/s", "end"]] },

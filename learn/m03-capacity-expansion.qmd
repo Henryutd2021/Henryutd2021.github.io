@@ -96,8 +96,8 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div id="m3-explain" class="lx-xgrid">
 <div class="lx-fallback">
 <dl class="lx-ideas">
-<dt>Capacity expansion LP</dt><dd>Decides what to build (seven sizes, paid every year) and how to run it in every modelled hour, at least yearly cost.</dd>
-<dt>Weights</dt><dd>Each modelled hour's running cost counts as many times as the hours of the year it stands for.</dd>
+<dt>Capacity expansion LP</dt><dd>Decides what to build (seven sizes, paid every year) and how to run it in every modeled hour, at least yearly cost.</dd>
+<dt>Weights</dt><dd>Each modeled hour's running cost counts as many times as the hours of the year it stands for.</dd>
 <dt>Extreme weeks</dt><dd>Peak demand, peak net load and least wind, kept as they were: they cut the full-year shortfall from 879 to 108 MWh.</dd>
 <dt>Link between weeks</dt><dd>A calendar chain of 52 battery levels; without it, each week may start full for free.</dd>
 <dt>Validation</dt><dd>Re-run the plan on every hour of 2025 and of 2024; report unserved energy, CO₂ against the cap and the estimate error.</dd>
@@ -130,14 +130,14 @@ $$
 
 Each step $h$ lasts one hour, so a power held for one step (MW) is that much energy (MWh). Sizes, outputs, charge and discharge cannot be negative; the level $s_{p,h}$ is measured from the week's start, so it can be.
 
-The weight of a modelled hour: $w_p = n_p \times 8{,}760 / 8{,}736$, where $n_p$ is the number of calendar weeks it stands for and the factor spreads the 24 hours of 31 December. A typical week standing for 13 weeks: $13 \times 8{,}760 / 8{,}736 = 13.04$; an extreme week stands for itself.
+The weight of a modeled hour: $w_p = n_p \times 8{,}760 / 8{,}736$, where $n_p$ is the number of calendar weeks it stands for and the factor spreads the 24 hours of 31 December. A typical week standing for 13 weeks: $13 \times 8{,}760 / 8{,}736 = 13.04$; an extreme week stands for itself.
 
 | Symbol | Meaning | Unit |
 |---|---|---|
 | $K_i$ | size built; battery power $K_\mathrm{bp}$ | MW |
 | $K_\mathrm{be}$ | battery energy | MWh |
 | $f_i$ | yearly cost of one unit built: [capital recovery]{.lx-term term="capital-recovery-factor"} at 4% real plus [fixed O&M]{.lx-term term="fixed-om"}; for a plant with constant output, also its fuel and variable O&M | \$ per MW-year (per MWh-year) |
-| $w_p$ | hours of the year one modelled hour of week $p$ stands for | h |
+| $w_p$ | hours of the year one modeled hour of week $p$ stands for | h |
 | $g, q$ | gas combined-cycle and peaker output | MW |
 | $r_\mathrm{cc}, r_\mathrm{pk}$ | running cost of gas | \$/MWh |
 | $c, d$ | battery charge and discharge | MW |
@@ -198,7 +198,7 @@ Cyclic storage replaces the chain $S_{i+1} = S_i + s_{k(i),168}$ with $s_{p,168}
 <li>Transmission and regions: the town is one bus with no imports.</li>
 <li>Several years of investment, retirements and residual value: a pathway model (<a href="m13-national-pathway.html">M13</a>).</li>
 <li>Uncertainty when building: here the weather is known when the sizes are chosen (<a href="m08-stochastic-robust.html">M8</a> chooses them before it is known).</li>
-<li>Costs that change with time: every cost is constant within the year modelled.</li>
+<li>Costs that change with time: every cost is constant within the year modeled.</li>
 </ul>
 <p>Modeler's note: <a href="r05-build-validate.html">R5</a> turns these checks into a verification and validation plan, and the Modeler checkpoint <a href="ck-m-unseen-problem.html">CK-M</a> asks you to formulate, solve and verify a model you have not seen.</p>
 </div>

@@ -8,7 +8,7 @@
 lesson: R10
 glossary:
   - {id: search-string, term: "Search string", def: "The words and operators (AND, OR, quotation marks) typed into a literature database to find papers."}
-  - {id: gis, term: "GIS (geographic information system)", def: "Software and methods for mapping and analysing data tied to places, such as land use, lines and population."}
+  - {id: gis, term: "GIS (geographic information system)", def: "Software and methods for mapping and analyzing data tied to places, such as land use, lines and population."}
   - {id: econometrics, term: "Econometrics", def: "Statistics applied to economic data, often to estimate whether a change caused an effect."}
   - {id: mcda, term: "MCDA (multi-criteria decision analysis)", def: "Scoring options against several goals at once, such as cost, emissions and fairness, with weights that the people deciding set."}
   - {id: decision-analysis, term: "Decision analysis", def: "A structured way to choose among options under uncertainty, weighing each possible outcome by how likely and how valuable it is."}

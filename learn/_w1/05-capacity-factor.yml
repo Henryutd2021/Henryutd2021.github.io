@@ -23,6 +23,6 @@ glossary:
     term: Power coefficient (Cp)
     def: "The share of the wind's power that a turbine turns into electricity; no rotor can capture more than 16/27, about 59% (the Betz limit)."
   - id: refuelling-outage
-    term: Refuelling outage
+    term: Refueling outage
     def: "The planned weeks when a reactor is shut down to replace part of its fuel and carry out maintenance."
 requests: []

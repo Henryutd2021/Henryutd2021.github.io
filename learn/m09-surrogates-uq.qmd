@@ -13,7 +13,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
      explain layer: assets/learn/m09-surrogates-uq.js with assets/learn/data/m09-surrogates-uq.json (an illustrative,
      seeded toy turbine; the records, the stored fits and the reference block are written by the test's --write).
      The course author's research enters only through approved excerpts (excerpt:uq-mfgpr: E1, E12.5, E12.6, E12.15;
-     excerpt:wind-uq: E13.1-E13.9 with the README acknowledgement as the footer), the allow-listed repositories
+     excerpt:wind-uq: E13.1-E13.9 with the README acknowledgment as the footer), the allow-listed repositories
      (repo:mfgpr-wind-power-curve, repo:wind-uq-surrogate) and the doi.org citation. Lab:
      learn/notebooks/m09-surrogates-uq.ipynb (written by its notebook build step; asserts the reference block). Tests:
      node _tests/learn/test_m09-surrogates-uq.js [--write]. -->
@@ -221,12 +221,12 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <li>Clone and install it (its README's quick start), then run <code>python examples/sensitivity.py</code>: compare the three models' RMSE at 50, 100, 200 and 400 training points.</li>
 <li>Run <code>python examples/probabilistic.py</code> and read the coverage at each nominal level, as in step 5.</li>
 </ul>
-<p><a href="https://github.com/Henryutd2021/mfgpr-wind-power-curve">mfgpr-wind-power-curve</a>: public example repository · MIT licence · synthetic data.</p>
+<p><a href="https://github.com/Henryutd2021/mfgpr-wind-power-curve">mfgpr-wind-power-curve</a>: public example repository · MIT license · synthetic data.</p>
 <p><b>Try it yourself:</b> the framework runs end to end on invented plants in about half a minute; another example compares target choices against a negative control. Its numbers say nothing about any real plant, data product or forecast system.</p>
 <ul>
 <li>Run <code>python examples/minimal.py</code>: in its printed scores, does each model beat the constant baseline?</li>
 </ul>
-<p><a href="https://github.com/Henryutd2021/wind-uq-surrogate">wind-uq-surrogate</a>: public example repository · MIT licence · synthetic data.</p>
+<p><a href="https://github.com/Henryutd2021/wind-uq-surrogate">wind-uq-surrogate</a>: public example repository · MIT license · synthetic data.</p>
 <p class="lx-hint">This work was developed based upon funding from the Alliance for Sustainable Energy, LLC, Managing and Operating Contractor for the National Renewable Energy Laboratory for the U.S. Department of Energy.</p>
 </div>
 ```

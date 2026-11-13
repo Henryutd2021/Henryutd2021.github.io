@@ -19,6 +19,6 @@ glossary:
     def: "A linear way to combine two sources: the accurate curve is modeled as a scaled copy of the rough curve plus a learned correction."
   - id: negative-control
     term: Negative control
-    def: "A test run in which the method should find nothing, for example inputs with no real signal, to show that a result is not an artefact of the method."
+    def: "A test run in which the method should find nothing, for example inputs with no real signal, to show that a result is not an artifact of the method."
 requests:
   - "Shared fix (assets/explainers/uq-mfgpr.js, a site explainer): its SVG title gives only the average band widths. A text version that follows the slider (by wind-speed region: measured points, both estimates and their bands) would serve the project page too; CF8 carries a static text version at 5, 10 and 25 points meanwhile."

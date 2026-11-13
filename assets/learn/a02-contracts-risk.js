@@ -9,7 +9,7 @@
 //                                             and the sources for the contract types
 // One price year: every dollar is a real 2025 dollar. A "price year" is one simulated year of market conditions.
 // Every contract is settled in cash (a financial PPA): the buyer buys its power at the hub, and the contract pays the
-// difference between the contract price (the strike) and a floating price. No hour-by-hour delivery is modelled.
+// difference between the contract price (the strike) and a floating price. No hour-by-hour delivery is modeled.
 //
 // Model (simulation; yearly totals, no solver):
 //   each price year draws five independent drivers from the seeded generator (LX.Drill.rng, a linear congruential
@@ -324,7 +324,7 @@
         height: 170, heightN: 150, ml: 40, bars: bars, spans: spans,
         marks: [{ x: st.p50 / 1e6, y: yMax, vline: true, label: "" }],
         legend: [{ label: "Price years per $0.25M", color: o.color }, { label: "Shaded: P10 to P90", color: o.color }, { label: "Dashed: median", color: "var(--lx-ink-3)", dash: "3 3" }]
-          .concat(ghost ? [{ label: ghostLabel || "Grey: P10 to P90, no contract", color: COL.band }] : []),
+          .concat(ghost ? [{ label: ghostLabel || "Gray: P10 to P90, no contract", color: COL.band }] : []),
         aria: o.title + ": 200 simulated price years, P10 " + musd(st.p10) + ", median " + musd(st.p50) + ", P90 " + musd(st.p90) + ", mean " + musd(st.mean, 2) + ".",
         text: { head: ["$M a year", "Price years"], rows: B.filter(function (b) { return b.n; }).map(function (b) { return [b.x0.toFixed(2) + " to " + b.x1.toFixed(2), String(b.n)]; }),
                 note: "P10 " + musd(st.p10) + ", median " + musd(st.p50) + ", P90 " + musd(st.p90) + ", mean " + musd(st.mean, 2) + " (200 price years)." } });
@@ -368,7 +368,7 @@
       function draw() {
         var c = ST.contract, bat = typeof battery === "function" ? battery() : battery, off = offset ? offset() : 0;
         var r = sm.at(c, bat, off), g = bat === "none" ? sm.solar.merchant : sm.plant.merchant[bat === "toll" ? "merchant" : bat], ax = sm.ax[bat === "none" ? "solar" : "plant"];
-        var gl = bat === "none" ? null : "Grey: P10 to P90, no contract and the battery run by its owner";
+        var gl = bat === "none" ? null : "Gray: P10 to P90, no contract and the battery run by its owner";
         hs.draw(r.R, r.sR, ax.R, c === "merchant" && bat !== "toll" ? null : g.sR, gl); hb.draw(r.Y, r.sY, ax.Y, c === "merchant" && bat !== "toll" ? null : g.sY, gl);
       }
       redraws.push(draw); draw();

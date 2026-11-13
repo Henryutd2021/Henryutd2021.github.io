@@ -418,7 +418,7 @@
             LX.Ledger(box, { caption: "Who pays and who gains, a year, with your inputs. Screening estimate. The jobs count the supplying mines closing; the budget row holds their taxes fixed, with the case where they end beside it.", columns: ["Who", "Pays or gains", "Kind"],
               rows: [{ head: "Prairie City, poorest group", sub: SH[0] + " of area median income", cells: ["pays " + money(a.rows[0].charge) + " a household (" + pts(a.rows[0].delta) + ")", "a share of a real cost"] },
                      { head: "Prairie City, top group", sub: SH[SH.length - 1] + " of area median income", cells: ["pays " + money(a.rows[a.rows.length - 1].charge) + " a household (" + pts(a.rows[a.rows.length - 1].delta) + ")", "a share of a real cost"] },
-                     { head: "Ridge County's workers", sub: "the plant and its supplying mines close", cells: [sgn(j.netPerm) + " permanent jobs, net", "employment, in jobs; earnings and labour costs not valued here"] },
+                     { head: "Ridge County's workers", sub: "the plant and its supplying mines close", cells: [sgn(j.netPerm) + " permanent jobs, net", "employment, in jobs; earnings and labor costs not valued here"] },
                      { head: "Construction workers", sub: "for " + D.jobs.buildYears + " years", cells: [fmtN(Math.round(j.buildJobYears)) + " job-years gross, " + fmtN(Math.round(j.buildJobYearsNet)) + " net", "temporary"] },
                      { head: "Ridge County's budget", sub: "plant tax only; the mines' held fixed", cells: [signed0(t.changeM, 1) + " a year; " + signed0(t.ifMinesCloseM, 1) + " if the mines' taxes end too", "a transfer"] }], cls: "a13-led" });
           }

@@ -149,7 +149,7 @@ body-classes: "page-learn page-lesson lx-form-case"
 <li>Double <code>delay_months</code> in <code>my_scenario.json</code> and run <code>code-delay run my_scenario.json --out-dir outputs/run</code>. Does the developer's cost per MW-month stay level?</li>
 <li>Run <code>examples/options.py</code>: compare staged service with full service, and read the net-benefit test for the bridge pathway.</li>
 </ul>
-<p><a href="https://github.com/Henryutd2021/code-delayed-energization">code-delayed-energization</a>: public example repository · MIT licence · illustrative inputs.</p>
+<p><a href="https://github.com/Henryutd2021/code-delayed-energization">code-delayed-energization</a>: public example repository · MIT license · illustrative inputs.</p>
 </div>
 ```
 :::

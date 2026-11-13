@@ -458,7 +458,7 @@ function researchWording(entry) {
     [/^The whole case, with its accounts and a toy of its own: CF7, the cost of waiting\.$/, "navigation to the case file"],
     [/^This page's toy borrows CF7's load\.$/, "provenance of the toy"],
     [/^Illustrative round numbers, not the study's inputs, equations or results\.$/, "provenance label (the toy), as in CF7"],
-    [/^code-delayed-energization: public example repository · MIT licence · illustrative inputs\.$/, "repository label, as in CF7"],
+    [/^code-delayed-energization: public example repository · MIT license · illustrative inputs\.$/, "repository label, as in CF7"],
     [/^code-delayed-energization on GitHub, version 1\.0\.2 \(2 November 2026\)\.$/, "citation of the repository"],
     [/^Try it yourself with open code$/, "heading"],
     [/^Model: this page's toy, built on case file CF7's illustrative load; seed 7, 1,000 runs per scenario, 20 repeats\.$/, "provenance of the toy"]
