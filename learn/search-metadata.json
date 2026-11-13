@@ -1,0 +1,1154 @@
+{
+  "version": 1,
+  "pages": {
+    "00-grid-operator.qmd": {
+      "pagetitle": "Grid Balancing and Dispatch · 0",
+      "description-meta": "Balance a fictional town's grid using real SPP hourly profiles. Try dispatch, ramp limits and curtailment in an interactive game.",
+      "concepts": [
+        "balancing",
+        "dispatch",
+        "ramp-rate",
+        "curtailment"
+      ]
+    },
+    "01-power-energy.qmd": {
+      "pagetitle": "Power vs Energy: kW and kWh · 1",
+      "description-meta": "Switch appliances on a virtual board, calculate kWh from kW and time, and check energy estimates from a home to the United States.",
+      "concepts": [
+        "power",
+        "energy",
+        "kilowatt",
+        "kilowatt-hour"
+      ]
+    },
+    "02-demand.qmd": {
+      "pagetitle": "Electricity Demand and the Duck Curve · 2",
+      "description-meta": "Explore real hourly demand scaled to a town, compare seasons, build a load-duration curve and see how solar changes net demand.",
+      "concepts": [
+        "demand",
+        "load-duration-curve",
+        "duck-curve",
+        "net-demand"
+      ]
+    },
+    "03-balancing.qmd": {
+      "pagetitle": "Grid Frequency, Inertia and Reserves · 3",
+      "description-meta": "Trip a plant in a grid simulation, test frequency responses and reserves, then examine the February 2021 Texas outage timeline.",
+      "concepts": [
+        "frequency",
+        "inertia",
+        "primary-response",
+        "reserves"
+      ]
+    },
+    "04-forecasts.qmd": {
+      "pagetitle": "Energy Forecast Errors and Intervals · 4",
+      "description-meta": "Score a real grid demand forecast against a baseline, compare MAE and MAPE, and test prediction bands and reserve costs.",
+      "concepts": [
+        "forecast-error",
+        "mae",
+        "mape",
+        "prediction-interval"
+      ]
+    },
+    "05-capacity-factor.qmd": {
+      "pagetitle": "Capacity Factor: MW to Annual MWh · 5",
+      "description-meta": "Compare nuclear, wind and solar output, calculate capacity factors from hourly data and explore a wind turbine's power curve.",
+      "concepts": [
+        "capacity-factor",
+        "capacity",
+        "power-curve",
+        "cube-law"
+      ]
+    },
+    "06-three-jobs.qmd": {
+      "pagetitle": "Firm Capacity, Energy and Flexibility · 6",
+      "description-meta": "Compare nine power technologies in interactive cards and sort their roles: supplying energy, dependable capacity and flexibility.",
+      "concepts": [
+        "firm-capacity",
+        "firm-share",
+        "flexibility",
+        "capacity-factor"
+      ]
+    },
+    "07-cost.qmd": {
+      "pagetitle": "LCOE Calculation and Its Limits · 7",
+      "description-meta": "Build an LCOE calculation with EIA and ATB inputs, vary financing and fuel costs, and see why energy timing matters.",
+      "concepts": [
+        "lcoe",
+        "capital-recovery-factor",
+        "heat-rate",
+        "discount-rate"
+      ]
+    },
+    "08-merit-order.qmd": {
+      "pagetitle": "Merit Order and Electricity Prices · 8",
+      "description-meta": "Build a power supply stack, clear demand and add wind in a fictional market to explore the merit order effect and negative prices.",
+      "concepts": [
+        "merit-order",
+        "supply-stack",
+        "clearing-price",
+        "negative-price"
+      ]
+    },
+    "09-storage.qmd": {
+      "pagetitle": "Battery Scheduling and Arbitrage · 9",
+      "description-meta": "Schedule a battery on a real solar profile scaled to a town; compare manual and optimal dispatch with power, energy and loss limits.",
+      "concepts": [
+        "energy-storage",
+        "state-of-charge",
+        "round-trip-efficiency",
+        "marginal-cost"
+      ]
+    },
+    "10-write-it-down.qmd": {
+      "pagetitle": "Linear Programming for Energy Dispatch · 10",
+      "description-meta": "Turn a dispatch problem into variables, an objective and constraints, then solve a two-plant linear program on a graph.",
+      "concepts": [
+        "linear-program",
+        "decision-variable",
+        "objective",
+        "constraint"
+      ]
+    },
+    "11-solver.qmd": {
+      "pagetitle": "HiGHS Solver and Shadow Prices · 11",
+      "description-meta": "Solve a grid dispatch model with HiGHS in your browser, check planted errors and interpret shadow prices and integer-model limits.",
+      "concepts": [
+        "solver",
+        "shadow-price",
+        "verification",
+        "mixed-integer-program"
+      ]
+    },
+    "12-trade-offs.qmd": {
+      "pagetitle": "Energy Cost and Emissions Trade-offs · 12",
+      "description-meta": "Compare fictional power plans, remove dominated options and use a solver to trace a cost-emissions frontier under carbon caps.",
+      "concepts": [
+        "pareto-frontier",
+        "dominated-plan",
+        "carbon-price",
+        "emissions-cap"
+      ]
+    },
+    "13-capstone.qmd": {
+      "pagetitle": "Power Capacity Expansion Planning · 13",
+      "description-meta": "Plan a fictional town's generation and storage with 2025 hourly profiles; compare costs and emissions using a linear program.",
+      "concepts": [
+        "capacity-expansion",
+        "representative-period",
+        "emissions-cap",
+        "linear-program"
+      ]
+    },
+    "a01-project-tea.qmd": {
+      "pagetitle": "Energy Project NPV, IRR and Payback · A1",
+      "description-meta": "Build a wind farm's cash flows in an interactive model; compare NPV, IRR, payback and sensitivity to financing and energy prices.",
+      "concepts": [
+        "net-present-value",
+        "internal-rate-of-return",
+        "payback-period",
+        "wacc"
+      ]
+    },
+    "a02-contracts-risk.qmd": {
+      "pagetitle": "Power Purchase Agreements and Risk · A2",
+      "description-meta": "Compare fixed, hub-settled and shaped contracts and a battery toll across 200 simulated price years to see who carries each risk.",
+      "concepts": [
+        "power-purchase-agreement",
+        "basis-risk",
+        "tolling-agreement",
+        "capture-ratio"
+      ]
+    },
+    "a03-market-design.qmd": {
+      "pagetitle": "Energy-Only vs Capacity Markets · A3",
+      "description-meta": "Clear hourly prices in an illustrative power market; compare scarcity pricing, solar capture prices and capacity payments.",
+      "concepts": [
+        "energy-only-market",
+        "capacity-market",
+        "capture-price",
+        "missing-money"
+      ]
+    },
+    "a04-retail-tariffs.qmd": {
+      "pagetitle": "Electricity Tariffs and Cost Allocation · A4",
+      "description-meta": "Bill three fictional customers under flat, time-of-use, demand-charge and real-time tariffs; test a large load's minimum bill.",
+      "concepts": [
+        "tariff",
+        "time-of-use-tariff",
+        "demand-charge",
+        "cost-of-service"
+      ]
+    },
+    "a05-adequacy.qmd": {
+      "pagetitle": "Resource Adequacy and Capacity Credit · A5",
+      "description-meta": "Simulate 500 resampled weather years and plant outages to estimate loss-of-load risk and compare capacity accreditation.",
+      "concepts": [
+        "resource-adequacy",
+        "lole",
+        "capacity-accreditation",
+        "forced-outage-rate"
+      ]
+    },
+    "a06-interconnection.qmd": {
+      "pagetitle": "Grid Interconnection Queues Explained · A6",
+      "description-meta": "Follow a wind farm and data center through illustrative grid-connection studies, withdrawals, upgrade costs and delay accounts.",
+      "concepts": [
+        "interconnection-queue",
+        "cluster-study",
+        "network-upgrade",
+        "n-minus-one"
+      ]
+    },
+    "a07-flexible-demand.qmd": {
+      "pagetitle": "Demand Response and Virtual Power Plants · A7",
+      "description-meta": "Shift a town's demand, pool small devices and test local trading in an interactive model with feeder limits and owner payments.",
+      "concepts": [
+        "demand-response",
+        "virtual-power-plant",
+        "aggregator",
+        "transactive-energy"
+      ]
+    },
+    "a08-storage-duration.qmd": {
+      "pagetitle": "Long-Duration Energy Storage Economics · A8",
+      "description-meta": "Compare batteries, pumped hydro, heat and hydrogen in a modeled winter week; calculate delivered-energy costs and cycling effects.",
+      "concepts": [
+        "long-duration-storage",
+        "battery-duration",
+        "standing-loss",
+        "full-cycle"
+      ]
+    },
+    "a09-hazards.qmd": {
+      "pagetitle": "Extreme Weather and Grid Resilience · A9",
+      "description-meta": "Stress a fictional grid with heat, drought, cold and wildfire; choose defenses and study Winter Storm Uri using FERC-NERC evidence.",
+      "concepts": [
+        "compound-hazard",
+        "correlated-failure",
+        "stress-test",
+        "winterization"
+      ]
+    },
+    "a10-emissions-questions.qmd": {
+      "pagetitle": "Average vs Marginal Emission Factors · A10",
+      "description-meta": "Model a data center or electrolyzer load and compare inventory, marginal, long-run and procurement answers to emissions questions.",
+      "concepts": [
+        "average-emission-factor",
+        "marginal-emission-factor",
+        "scope-2",
+        "consequential-analysis"
+      ]
+    },
+    "a11-lca-nexus.qmd": {
+      "pagetitle": "Energy Life Cycles, Water and Land · A11",
+      "description-meta": "Move life-cycle boundaries around power and data-center systems; compare published carbon, water and land ranges on common units.",
+      "concepts": [
+        "life-cycle-assessment",
+        "functional-unit",
+        "water-withdrawal",
+        "water-consumption"
+      ]
+    },
+    "a12-policy-instruments.qmd": {
+      "pagetitle": "Carbon Prices, Credits and Standards · A12",
+      "description-meta": "Re-plan a fictional grid under taxes, credits and clean-energy standards; compare emissions, resource costs and monetary transfers.",
+      "concepts": [
+        "carbon-price",
+        "production-credit",
+        "investment-credit",
+        "clean-energy-standard"
+      ]
+    },
+    "a13-fairness-jobs.qmd": {
+      "pagetitle": "Energy Burden, Cost Allocation and Jobs · A13",
+      "description-meta": "Allocate a fictional city's costs across households and compare energy burdens, job-years and tax-base screening estimates.",
+      "concepts": [
+        "energy-burden",
+        "transfer-payment",
+        "job-year",
+        "tax-base"
+      ]
+    },
+    "a14-microgrid-value.qmd": {
+      "pagetitle": "Microgrid Economics and Resilience Value · A14",
+      "description-meta": "Price outages for a household, dairy and hospital; use an interactive campus model to compare backup size, savings and ownership.",
+      "concepts": [
+        "microgrid",
+        "value-of-lost-load",
+        "mini-grid",
+        "productive-use"
+      ]
+    },
+    "a15-efficiency-electrification.qmd": {
+      "pagetitle": "Efficiency and Electrification Demand · A15",
+      "description-meta": "Build a fictional city's energy-savings curve, electrify heat and cars, and test cold-day peaks against substation limits.",
+      "concepts": [
+        "cost-of-saved-energy",
+        "electrification",
+        "coincident-peak",
+        "design-day"
+      ]
+    },
+    "a16-hydrogen-ptx.qmd": {
+      "pagetitle": "Electrolyzer Utilization and LCOH · A16",
+      "description-meta": "Size an electrolyzer using real 2025 wind profiles; compare hydrogen cost, utilization, storage needs and electricity matching.",
+      "concepts": [
+        "electrolyzer",
+        "lcoh",
+        "full-load-hours",
+        "hourly-matching"
+      ]
+    },
+    "a17-physical-feasibility.qmd": {
+      "pagetitle": "Grid Voltage, Ramps and Hosting Capacity · A17",
+      "description-meta": "Test an hourly energy plan against interactive checks of reactive power, feeder voltage, rooftop solar, ramping and frequency.",
+      "concepts": [
+        "reactive-power",
+        "hosting-capacity",
+        "ramp-rate",
+        "ac-power-flow"
+      ]
+    },
+    "a18-city-plan.qmd": {
+      "pagetitle": "City Energy Plans and Abatement Costs · A18",
+      "description-meta": "Build a fictional city's emissions inventory and abatement curve; test measures against budgets, winter peaks and interactions.",
+      "concepts": [
+        "gpc",
+        "marginal-abatement-cost-curve",
+        "abatement-cost",
+        "scope-1"
+      ]
+    },
+    "a19-gis-siting.qmd": {
+      "pagetitle": "GIS Energy Siting and Least-Cost Paths · A19",
+      "description-meta": "Screen fictional map layers for wind, solar and data-center sites; vary weights and route a line, with an optional NumPy notebook.",
+      "concepts": [
+        "gis",
+        "weighted-overlay",
+        "exclusion-layer",
+        "least-cost-path"
+      ]
+    },
+    "a20-national-scenarios.qmd": {
+      "pagetitle": "Comparing National Energy Scenarios · A20",
+      "description-meta": "Compare four fictional national scenarios on common data; trace gaps to assumptions and distinguish exploratory from target paths.",
+      "concepts": [
+        "exploratory-scenario",
+        "target-seeking-scenario",
+        "implied-carbon-price",
+        "scenario"
+      ]
+    },
+    "a21-security-minerals.qmd": {
+      "pagetitle": "Energy Security and Critical Minerals · A21",
+      "description-meta": "Calculate a fictional nation's import dependence and supplier concentration; test fuel, shipping, mineral and factory shocks.",
+      "concepts": [
+        "energy-security",
+        "import-dependence",
+        "hhi",
+        "refining"
+      ]
+    },
+    "a22-tradeoff-explorer.qmd": {
+      "pagetitle": "Energy Planning Across Five Goals · A22",
+      "description-meta": "Use an interactive power-plan comparison to weigh cost, CO₂, reliability, fairness and security; test priorities and definitions.",
+      "concepts": [
+        "multi-objective",
+        "pareto-frontier",
+        "energy-burden",
+        "energy-security"
+      ]
+    },
+    "b01-algebra-to-lp.qmd": {
+      "pagetitle": "Energy Linear Programming from Algebra · B1",
+      "description-meta": "Translate energy word problems into equations and constraints, explore feasible regions and solve the same model in matrix form.",
+      "concepts": [
+        "linear-program",
+        "constraint",
+        "feasible-region",
+        "matrix"
+      ]
+    },
+    "b02-python-data.qmd": {
+      "pagetitle": "Python for Hourly Energy Data · B2",
+      "description-meta": "Clean real SPP hourly data, fix time zones, detect bad readings and calculate capacity factors with a reproducible pandas notebook.",
+      "concepts": [
+        "dataframe",
+        "utc",
+        "daylight-saving-time",
+        "capacity-factor"
+      ]
+    },
+    "b03-read-check-formulation.qmd": {
+      "pagetitle": "Reading and Checking Energy Models · B3",
+      "description-meta": "Read a dispatch formulation line by line, find five planted bugs with a solver, and check energy balances and dual signs.",
+      "concepts": [
+        "verification",
+        "validation",
+        "shadow-price",
+        "linear-program"
+      ]
+    },
+    "c0-behind-one-meter.qmd": {
+      "pagetitle": "Behind-the-Meter Energy Planning · C0",
+      "description-meta": "Size equipment for a fictional home or wind farm using 2025 hourly profiles; defend NPV, emissions and sensitivity in a short note.",
+      "concepts": [
+        "net-present-value",
+        "heat-pump",
+        "electrolyzer",
+        "sensitivity-analysis"
+      ]
+    },
+    "c1-keep-the-campus-running.qmd": {
+      "pagetitle": "Microgrid Planning for a Winter Outage · C1",
+      "description-meta": "Size a fictional campus microgrid for a three-day winter outage; test feeder limits and ownership costs, then defend the plan.",
+      "concepts": [
+        "microgrid",
+        "critical-load",
+        "islanding",
+        "cost-of-capital"
+      ]
+    },
+    "c2-plains-grid-hard-year.qmd": {
+      "pagetitle": "Grid Planning for a Large Data Center · C2",
+      "description-meta": "Connect a data center to a fictional grid using the Grid Room; compare build plans, adequacy, conditional prices and who pays.",
+      "concepts": [
+        "resource-adequacy",
+        "unit-commitment",
+        "conditional-price",
+        "large-load"
+      ]
+    },
+    "c3-prairie-city-2040.qmd": {
+      "pagetitle": "City Energy Planning Capstone · C3",
+      "description-meta": "Plan a fictional city's 2040 energy system with the City Planner; test budgets, solar siting, grid peaks and household costs.",
+      "concepts": [
+        "energy-hub",
+        "energy-burden",
+        "weighted-overlay",
+        "linearized-feeder-limit"
+      ]
+    },
+    "c4-prairieland-2050.qmd": {
+      "pagetitle": "National Energy Pathway Capstone · C4",
+      "description-meta": "Use the Pathway Explorer to defend a fictional 2050 energy plan; test carbon budgets, security shocks and affordability screens.",
+      "concepts": [
+        "carbon-budget",
+        "energy-security",
+        "energy-burden",
+        "stress-test"
+      ]
+    },
+    "cf1-supply-chain-microgrids.qmd": {
+      "pagetitle": "Factory Siting with Microgrids · CF1",
+      "description-meta": "Explore factory siting, logistics and electricity trading with an illustrative supply-chain and microgrid model.",
+      "concepts": [
+        "supply-chain-tier",
+        "logistics-cost",
+        "transactive-energy",
+        "microgrid"
+      ]
+    },
+    "cf2-cost-per-kg-vs-system-cost.qmd": {
+      "pagetitle": "Hydrogen LCOH vs System Cost · CF2",
+      "description-meta": "Compare hydrogen cost per kilogram and whole-system cost using an illustrative wind-hydrogen model.",
+      "concepts": [
+        "lcoh",
+        "life-cycle-cost",
+        "electrolyzer",
+        "capacity-utilization"
+      ]
+    },
+    "cf3-hydrogen-under-uncertainty.qmd": {
+      "pagetitle": "Hydrogen Planning Under Uncertainty · CF3",
+      "description-meta": "Compare forecast-based and scenario-weighted hydrogen plans under uncertain wind build-out in an illustrative model.",
+      "concepts": [
+        "two-stage-stochastic-program",
+        "here-and-now",
+        "recourse",
+        "future-scenario"
+      ]
+    },
+    "cf4-existing-reactors-hydrogen.qmd": {
+      "pagetitle": "Nuclear Hydrogen and Grid Services · CF4",
+      "description-meta": "Explore hydrogen production, dispatch and reserve headroom in an illustrative model of an existing reactor.",
+      "concepts": [
+        "high-temperature-electrolyzer",
+        "ancillary-services",
+        "reserve-headroom",
+        "sunk-cost"
+      ]
+    },
+    "cf5-drawing-the-boundary.qmd": {
+      "pagetitle": "Cogeneration Boundaries and Steam Value · CF5",
+      "description-meta": "Explore cogeneration boundaries and diverted steam in an illustrative turbine and absorption-chiller model.",
+      "concepts": [
+        "cogeneration",
+        "willans-line",
+        "absorption-chiller",
+        "system-boundary"
+      ]
+    },
+    "cf6-shifting-load-to-clean-hours.qmd": {
+      "pagetitle": "Load Shifting and Emission Factors · CF6",
+      "description-meta": "Explore load shifting with an illustrative dispatch model; distinguish average, marginal and attributed emissions.",
+      "concepts": [
+        "average-emission-factor",
+        "marginal-emission-factor",
+        "attributed-emissions",
+        "consequential-analysis"
+      ]
+    },
+    "cf7-cost-of-waiting.qmd": {
+      "pagetitle": "Grid Connection Delay Costs · CF7",
+      "description-meta": "Explore grid-connection delays in an illustrative calculator with separate developer, ratepayer and social accounts.",
+      "concepts": [
+        "energization",
+        "carrying-cost",
+        "delay-cost-per-mw-month",
+        "ratepayer"
+      ]
+    },
+    "cf8-power-curves-from-scarce-data.qmd": {
+      "pagetitle": "Wind Power Curves with Sparse Data · CF8",
+      "description-meta": "Fit an illustrative Gaussian process to sparse wind data; compare prediction bands with and without a theoretical power curve.",
+      "concepts": [
+        "power-curve",
+        "multi-fidelity",
+        "gaussian-process",
+        "calibration"
+      ]
+    },
+    "ck-a-spreadsheet.qmd": {
+      "pagetitle": "Solar and Battery Spreadsheet Audit · CK-A",
+      "description-meta": "Build a school solar-battery spreadsheet from dated EIA and NLR inputs; defend NPV, cost allocation and sensitivity with a workbook.",
+      "concepts": [
+        "net-present-value",
+        "sensitivity-analysis",
+        "demand-charge",
+        "transfer-payment"
+      ]
+    },
+    "ck-f-estimate.qmd": {
+      "pagetitle": "Energy Estimation Practice · CK-F",
+      "description-meta": "Check your energy reasoning with nine unfamiliar tasks, unit checks and a worked rubric, including an estimate with uncertainty.",
+      "concepts": [
+        "fermi-estimate",
+        "capacity-factor",
+        "firm-capacity",
+        "frequency"
+      ]
+    },
+    "ck-m-unseen-problem.qmd": {
+      "pagetitle": "Energy Model Validation Practice · CK-M",
+      "description-meta": "Formulate a pumping LP or analyze real grid data, debug a capacity model and validate a result against worked checks and benchmarks.",
+      "concepts": [
+        "linear-program",
+        "capacity-expansion",
+        "verification",
+        "validation"
+      ]
+    },
+    "ck-r-defend-revise.qmd": {
+      "pagetitle": "Energy Research Peer Review Practice · CK-R",
+      "description-meta": "Review a fictional energy proposal, defend and revise your own study, and check reproducibility against annotated examples.",
+      "concepts": [
+        "audit-trail",
+        "clean-clone",
+        "selection-bias",
+        "parallel-trends"
+      ]
+    },
+    "cr-your-own-study.qmd": {
+      "pagetitle": "Energy Research Project from Start · CR",
+      "description-meta": "Plan and carry out an energy research exercise with question cards, milestones, a proposal and a research rubric.",
+      "concepts": [
+        "question-type",
+        "method-family",
+        "triangulation",
+        "verification"
+      ]
+    },
+    "f01-five-scales.qmd": {
+      "pagetitle": "Energy Systems Across Five Scales · F1",
+      "description-meta": "Zoom from a home to a fictional nation in an interactive scale map; identify decisions, physical limits and links between scales.",
+      "concepts": [
+        "system-scale",
+        "microgrid",
+        "feeder",
+        "synchronous-grid"
+      ]
+    },
+    "f02-systems-and-map.qmd": {
+      "pagetitle": "Energy Stocks, Flows and Feedback · F2",
+      "description-meta": "Run reservoir, battery and carbon-budget simulations; trace feedback loops and the rebound effect on a whole-system map.",
+      "concepts": [
+        "stock",
+        "flow",
+        "feedback-loop",
+        "rebound-effect"
+      ]
+    },
+    "f03-energy-services.qmd": {
+      "pagetitle": "Energy Services and Heat Pump Efficiency · F3",
+      "description-meta": "Trace a fictional home's energy from purchases to useful services; compare devices and explore heat-pump COP on a cold day.",
+      "concepts": [
+        "energy-service",
+        "energy-carrier",
+        "useful-energy",
+        "coefficient-of-performance"
+      ]
+    },
+    "f04-power-plants.qmd": {
+      "pagetitle": "How Power Plants Convert Energy · F4",
+      "description-meta": "Explore six plant types with energy-flow diagrams, heat-rate calculations and real regional solar profiles scaled to one farm.",
+      "concepts": [
+        "heat-engine",
+        "heat-rate",
+        "gas-turbine",
+        "steam-turbine"
+      ]
+    },
+    "f05-nuclear-basics.qmd": {
+      "pagetitle": "Nuclear Fission, Reactors and Heat · F5",
+      "description-meta": "Control a simulated chain reaction, follow heat to steam in U.S. reactor types, and compare reactor designs by size and temperature.",
+      "concepts": [
+        "fission",
+        "chain-reaction",
+        "control-rod",
+        "outlet-temperature"
+      ]
+    },
+    "f06-grid-and-outages.qmd": {
+      "pagetitle": "Power Grids, Outages, SAIDI and SAIFI · F6",
+      "description-meta": "Follow electricity from plant to socket, repair a fictional storm-damaged network and calculate outage duration and frequency.",
+      "concepts": [
+        "transmission",
+        "distribution",
+        "saidi",
+        "saifi"
+      ]
+    },
+    "f07-microgrids.qmd": {
+      "pagetitle": "Microgrids, Islanding and Backup Power · F7",
+      "description-meta": "Run a fictional campus through a storm, prioritize critical loads and size solar and batteries for an off-grid village.",
+      "concepts": [
+        "microgrid",
+        "islanding",
+        "critical-load",
+        "grid-forming"
+      ]
+    },
+    "f08-large-loads.qmd": {
+      "pagetitle": "Data Centers as Electricity Loads · F8",
+      "description-meta": "Add a 300 MW data center to a fictional town with real hourly shapes; compare annual energy, connection requests and who pays.",
+      "concepts": [
+        "data-center",
+        "large-load",
+        "power-usage-effectiveness",
+        "load-factor"
+      ]
+    },
+    "f09-city-energy.qmd": {
+      "pagetitle": "City Energy Flows and Decision-Makers · F9",
+      "description-meta": "Trace energy through a fictional U.S. city with a flow diagram, then sort the roles of utilities, regulators and local government.",
+      "concepts": [
+        "final-energy",
+        "useful-energy",
+        "public-utility-commission",
+        "building-code"
+      ]
+    },
+    "f10-nations-differ.qmd": {
+      "pagetitle": "Comparing National Energy Systems · F10",
+      "description-meta": "Compare national energy Sankeys from official statistics; switch accounting conventions and examine import dependence.",
+      "concepts": [
+        "sankey-diagram",
+        "primary-energy",
+        "physical-energy-content",
+        "import-dependence"
+      ]
+    },
+    "f11-air-climate-people.qmd": {
+      "pagetitle": "Energy, Air Pollution and Health · F11",
+      "description-meta": "Calculate fuel emissions and methane leakage, explore pollution controls and EPA health estimates, then compare household burdens.",
+      "concepts": [
+        "emission-factor",
+        "methane-leak",
+        "global-warming-potential",
+        "fine-particles"
+      ]
+    },
+    "index.qmd": {
+      "pagetitle": "Energy Systems: Free Interactive Course",
+      "description-meta": "Learn energy systems, power markets, costs and optimization through browser models, real grid data and research practice.",
+      "concepts": [
+        "system-scale",
+        "techno-economic-analysis",
+        "optimization",
+        "energy"
+      ]
+    },
+    "k01-units.qmd": {
+      "pagetitle": "Energy Units and Orders of Magnitude · K1",
+      "description-meta": "Convert kW, MW and GW, sum hourly power into MWh and use scientific notation and bounds to check real energy quantities.",
+      "concepts": [
+        "order-of-magnitude",
+        "scientific-notation",
+        "megawatt",
+        "megawatt-hour"
+      ]
+    },
+    "k02-rates-efficiencies.qmd": {
+      "pagetitle": "Energy Rates, Heat Rate and Efficiency · K2",
+      "description-meta": "Use worked energy examples to convert heat rate to efficiency, chain fuel costs and emissions, and calculate storage losses.",
+      "concepts": [
+        "efficiency",
+        "heat-rate",
+        "round-trip-efficiency",
+        "capacity-factor"
+      ]
+    },
+    "k03-discounting.qmd": {
+      "pagetitle": "Discounting and Capital Recovery · K3",
+      "description-meta": "Practice compound growth, present value, annuities and capital recovery with interactive calculations for energy investments.",
+      "concepts": [
+        "present-value",
+        "annuity-factor",
+        "capital-recovery-factor",
+        "discount-rate"
+      ]
+    },
+    "k04-linear-equations.qmd": {
+      "pagetitle": "Linear Equations for Energy Balances · K4",
+      "description-meta": "Solve balances and inequalities using a real grid evening scaled to a fictional town; find plans satisfying several rules.",
+      "concepts": [
+        "inequality",
+        "constraint",
+        "feasible-region",
+        "power"
+      ]
+    },
+    "k05-probability-statistics.qmd": {
+      "pagetitle": "Energy Probability and Statistics · K5",
+      "description-meta": "Analyze 2,716 SPP forecast errors from 2025; explore histograms, spread, percentiles, sampling and combined outage probabilities.",
+      "concepts": [
+        "histogram",
+        "percentile",
+        "standard-deviation",
+        "expected-value"
+      ]
+    },
+    "k06-vectors-matrices.qmd": {
+      "pagetitle": "Vectors and Matrices for Energy Models · K6",
+      "description-meta": "Build vectors, dot products and a matrix of dispatch rules; connect matrix notation to the grid problem used in earlier lessons.",
+      "concepts": [
+        "vector",
+        "matrix",
+        "dot-product",
+        "linear-program"
+      ]
+    },
+    "k07-spreadsheets.qmd": {
+      "pagetitle": "Energy Spreadsheet Formulas and Checks · K7",
+      "description-meta": "Build a real grid day scaled to a fictional town in a spreadsheet; practice formulas, fill-down, absolute references and checks.",
+      "concepts": [
+        "absolute-reference",
+        "megawatt",
+        "megawatt-hour",
+        "ramp-rate"
+      ]
+    },
+    "k08-git-notebooks.qmd": {
+      "pagetitle": "Git and Reproducible Energy Notebooks · K8",
+      "description-meta": "Practice Git in a simulated energy project, trace a broken result, remove notebook hidden state and rerun a clean clone.",
+      "concepts": [
+        "version-control",
+        "commit",
+        "hidden-state",
+        "clean-clone"
+      ]
+    },
+    "m01-dispatch-to-lmp.qmd": {
+      "pagetitle": "Dispatch and Locational Marginal Prices · M1",
+      "description-meta": "Solve a dispatch LP and a three-bus network in your browser; read balance duals as prices and reproduce the model in Python.",
+      "concepts": [
+        "dispatch",
+        "locational-marginal-price",
+        "dc-power-flow",
+        "congestion"
+      ]
+    },
+    "m02-unit-commitment.qmd": {
+      "pagetitle": "Unit Commitment: A Worked MILP Example · M2",
+      "description-meta": "Switch gas plants on and off in a browser model; explore branch and bound, conditional electricity prices and uplift payments.",
+      "concepts": [
+        "unit-commitment",
+        "mixed-integer-program",
+        "branch-and-bound",
+        "uplift"
+      ]
+    },
+    "m03-capacity-expansion.qmd": {
+      "pagetitle": "Capacity Expansion: Representative Weeks · M3",
+      "description-meta": "Choose representative weeks for a planning LP, link storage across periods, and validate against full 2024 and 2025 hourly data.",
+      "concepts": [
+        "capacity-expansion",
+        "representative-period",
+        "period-weight",
+        "storage-link"
+      ]
+    },
+    "m04-storage-multienergy.qmd": {
+      "pagetitle": "Modeling Power, Hydrogen and Heat · M4",
+      "description-meta": "Build a coupled-carrier LP with batteries, electrolysis and heat storage; compare seasons and marginal values, with a Python notebook.",
+      "concepts": [
+        "sector-coupling",
+        "state-of-charge",
+        "electrolyzer",
+        "value-of-coupling"
+      ]
+    },
+    "m05-microgrid-size-and-run.qmd": {
+      "pagetitle": "Microgrid Sizing with an Outage MILP · M5",
+      "description-meta": "Size a fictional campus microgrid with a mixed-integer model, test outage scenarios and compare forecast-based rolling operation.",
+      "concepts": [
+        "microgrid",
+        "mixed-integer-program",
+        "rolling-horizon",
+        "service-level"
+      ]
+    },
+    "m06-carbon-in-models.qmd": {
+      "pagetitle": "Carbon Caps and Prices in Energy Models · M6",
+      "description-meta": "Solve a planning LP with carbon caps, read the cap's dual and compare annual versus hourly electricity-matching rules.",
+      "concepts": [
+        "emissions-cap",
+        "carbon-price",
+        "shadow-price",
+        "hourly-matching"
+      ]
+    },
+    "m07-monte-carlo.qmd": {
+      "pagetitle": "Monte Carlo Energy Sensitivity Analysis · M7",
+      "description-meta": "Sample uncertain delay-cost inputs with a Latin hypercube; compare percentiles, Monte Carlo error and rank sensitivity in Python.",
+      "concepts": [
+        "monte-carlo",
+        "latin-hypercube",
+        "monte-carlo-error",
+        "rank-correlation"
+      ]
+    },
+    "m08-stochastic-robust.qmd": {
+      "pagetitle": "Stochastic vs Robust Energy Planning · M8",
+      "description-meta": "Size an electrolyzer under uncertain wind build-out; solve stochastic, worst-case and regret models and calculate VSS and EVPI.",
+      "concepts": [
+        "two-stage-stochastic-program",
+        "robust-optimization",
+        "value-of-stochastic-solution",
+        "evpi"
+      ]
+    },
+    "m09-surrogates-uq.qmd": {
+      "pagetitle": "Gaussian Processes for Wind Power · M9",
+      "description-meta": "Fit a Gaussian process to illustrative turbine data, test prediction-band calibration and add a second fidelity with a Python notebook.",
+      "concepts": [
+        "gaussian-process",
+        "multi-fidelity",
+        "calibration",
+        "surrogate-model"
+      ]
+    },
+    "m10-ml-forecasting.qmd": {
+      "pagetitle": "Energy Forecasting with Machine Learning · M10",
+      "description-meta": "Forecast real SPP demand with time-ordered splits, baselines and regression; detect leakage and score bands in a Python notebook.",
+      "concepts": [
+        "forecast-baseline",
+        "data-leakage",
+        "linear-regression",
+        "pinball-loss"
+      ]
+    },
+    "m11-tea-in-models.qmd": {
+      "pagetitle": "Techno-Economic Optimization and LCOH · M11",
+      "description-meta": "Link a wind-hydrogen LP to lifetime cash flows; test capital recovery, dated tax-credit rules and system boundaries in Python.",
+      "concepts": [
+        "techno-economic-analysis",
+        "lcoh",
+        "capital-recovery-factor",
+        "net-present-value"
+      ]
+    },
+    "m12-city-model.qmd": {
+      "pagetitle": "City Energy Hub Optimization · M12",
+      "description-meta": "Model a fictional city's heat, transport and power in an LP; inspect substation and carbon-cap duals and household cost screens.",
+      "concepts": [
+        "energy-hub",
+        "linearized-feeder-limit",
+        "shadow-price",
+        "energy-burden"
+      ]
+    },
+    "m13-national-pathway.qmd": {
+      "pagetitle": "National Energy Pathway Optimization · M13",
+      "description-meta": "Build a five-region planning LP with plant vintages, transmission and carbon budgets; compare foresight and validate time slices.",
+      "concepts": [
+        "capacity-expansion",
+        "vintage",
+        "carbon-budget",
+        "time-slice"
+      ]
+    },
+    "m14-did-it-work.qmd": {
+      "pagetitle": "Energy Policy Difference-in-Differences · M14",
+      "description-meta": "Estimate a tariff's effect on simulated homes and regions; compare regression and difference-in-differences against known effects.",
+      "concepts": [
+        "difference-in-differences",
+        "parallel-trends",
+        "selection-bias",
+        "confidence-interval"
+      ]
+    },
+    "n01-news-lens.qmd": {
+      "pagetitle": "How to Read Energy News Critically · N1",
+      "description-meta": "Audit three real energy stories with seven questions, unit checks and an evidence ladder; write a concise, qualified interpretation.",
+      "concepts": [
+        "evidence-ladder",
+        "system-boundary",
+        "counterfactual",
+        "projection"
+      ]
+    },
+    "r01-framing.qmd": {
+      "pagetitle": "Framing Energy Research Questions · R1",
+      "description-meta": "Sort and rewrite energy questions with a browser question card; specify audience, metric, counterfactual and a testable claim.",
+      "concepts": [
+        "question-type",
+        "counterfactual",
+        "falsification-statement",
+        "system-boundary"
+      ]
+    },
+    "r02-literature.qmd": {
+      "pagetitle": "Energy Literature Search and Gap Analysis · R2",
+      "description-meta": "Search a dated OpenAlex snapshot, build a concept matrix, follow citations and test a research gap against the closest paper.",
+      "concepts": [
+        "search-string",
+        "snowballing",
+        "concept-matrix",
+        "research-gap"
+      ]
+    },
+    "r03-system-and-method.qmd": {
+      "pagetitle": "Energy Research Boundaries and Methods · R3",
+      "description-meta": "Use research question cards to choose a system boundary, time resolution and method, then defend the choice against alternatives.",
+      "concepts": [
+        "system-boundary",
+        "time-step",
+        "horizon",
+        "method-family"
+      ]
+    },
+    "r04-data.qmd": {
+      "pagetitle": "Energy Data Cleaning and Provenance · R4",
+      "description-meta": "Clean real SPP 2025 EIA-930 data, log the effects of cleaning choices, check licenses and write a reproducible data note.",
+      "concepts": [
+        "provenance",
+        "data-licence",
+        "data-note",
+        "utc"
+      ]
+    },
+    "r05-build-validate.qmd": {
+      "pagetitle": "Energy Model Verification and Validation · R5",
+      "description-meta": "Audit a browser battery model with five planted bugs, compare hand checks and measured forecasts, and document reproducibility.",
+      "concepts": [
+        "verification",
+        "validation",
+        "benchmark",
+        "audit-trail"
+      ]
+    },
+    "r06-uncertainty-properly.qmd": {
+      "pagetitle": "Uncertainty in Energy Research · R6",
+      "description-meta": "Sort uncertainty types with interactive cards, choose treatments, turn forecasts into bands and practice reporting ranges.",
+      "concepts": [
+        "structural-uncertainty",
+        "deep-uncertainty",
+        "scenario",
+        "percentile"
+      ]
+    },
+    "r07-cost-carbon-properly.qmd": {
+      "pagetitle": "Auditing Energy Cost and Carbon Claims · R7",
+      "description-meta": "Repair a fictional electric-bus study's boundaries, baseline, grid costs and double-counted credits in an interactive audit.",
+      "concepts": [
+        "system-boundary",
+        "counterfactual",
+        "attributed-emissions",
+        "consequential-analysis"
+      ]
+    },
+    "r08-communicating.qmd": {
+      "pagetitle": "Communicating Energy Results and Limits · R8",
+      "description-meta": "Use interactive chart examples to spot truncated axes and selective time windows, then report results with their limits.",
+      "concepts": [
+        "boundary-condition",
+        "truncated-axis",
+        "percentile",
+        "capacity-factor"
+      ]
+    },
+    "r09-integrity-stakeholders.qmd": {
+      "pagetitle": "Energy Research Integrity and Consent · R9",
+      "description-meta": "Work through six fictional research dilemmas, map stakeholders and draft an integrity statement using named norms and sources.",
+      "concepts": [
+        "informed-consent",
+        "credit-roles",
+        "conflict-of-interest",
+        "stakeholder"
+      ]
+    },
+    "r10-question-studio.qmd": {
+      "pagetitle": "Energy Research Question Builder · R10",
+      "description-meta": "Build an energy-study question with interactive cards, test its feasibility and generate search strings for an open database.",
+      "concepts": [
+        "question-type",
+        "search-string",
+        "method-family",
+        "counterfactual"
+      ]
+    },
+    "regions.qmd": {
+      "pagetitle": "Regional Energy Systems: 12 Profiles",
+      "description-meta": "Compare 12 regional energy systems through sourced, dated profiles of institutions, challenges, research questions and key numbers.",
+      "concepts": [
+        "rto",
+        "market-coupling",
+        "resource-adequacy",
+        "vertically-integrated-utility"
+      ]
+    },
+    "sb0-site-bench.qmd": {
+      "pagetitle": "Behind-the-Meter Energy Simulator · SB0",
+      "description-meta": "Size equipment for a fictional home or wind farm; an hourly LP using 2025 profiles reports bills, emissions and project cash flows.",
+      "concepts": [
+        "linear-program",
+        "net-present-value",
+        "state-of-charge",
+        "electrolyzer"
+      ]
+    },
+    "sb1-microgrid-workbench.qmd": {
+      "pagetitle": "Microgrid Sizing and Outage Simulator · SB1",
+      "description-meta": "Set a fictional campus's equipment, tariffs, load priorities and feeder limits; solve outage operation or sizing with a browser MILP.",
+      "concepts": [
+        "microgrid",
+        "islanding",
+        "critical-load",
+        "mixed-integer-program"
+      ]
+    },
+    "sb2-grid-room.qmd": {
+      "pagetitle": "Unit Commitment and Grid Prices Lab · SB2",
+      "description-meta": "Run unit commitment on a fictional three-zone grid, calculate conditional prices and test congestion, reserves and a large load.",
+      "concepts": [
+        "unit-commitment",
+        "conditional-price",
+        "transport-model",
+        "uplift"
+      ]
+    },
+    "sb3-city-planner.qmd": {
+      "pagetitle": "City Energy Planning Simulator · SB3",
+      "description-meta": "Plan a fictional city's heat, cars, solar and storage with an energy-hub LP; test substation limits and household cost screens.",
+      "concepts": [
+        "energy-hub",
+        "linearized-feeder-limit",
+        "managed-charging",
+        "energy-burden"
+      ]
+    },
+    "sb4-pathway-explorer.qmd": {
+      "pagetitle": "National Energy Pathway Simulator · SB4",
+      "description-meta": "Plan a fictional nation's five regions to 2050; test carbon budgets, imports, shocks and foresight with an interactive LP.",
+      "concepts": [
+        "carbon-budget",
+        "time-slice",
+        "vintage",
+        "import-dependence"
+      ]
+    },
+    "x01-under-the-hood.qmd": {
+      "pagetitle": "Engineering Inputs to Energy Models · X1",
+      "description-meta": "Explore eight device types and trace model inputs such as efficiency, ramp limits and failure rates to their engineering sources.",
+      "concepts": [
+        "efficiency",
+        "ramp-rate",
+        "forced-outage-rate",
+        "power-coefficient"
+      ]
+    },
+    "x02-fossil-transition.qmd": {
+      "pagetitle": "Fossil Fuels, Carbon Capture and Removal · X2",
+      "description-meta": "Examine dated gas, coal and oil evidence; compare retirement plans, network costs and carbon removal methods without forecasting.",
+      "concepts": [
+        "carbon-capture",
+        "carbon-removal",
+        "lng",
+        "lock-in"
+      ]
+    },
+    "x03-transitions-history.qmd": {
+      "pagetitle": "Energy Transition History and Adoption · X3",
+      "description-meta": "Read a century of U.S. energy adoption curves from dated sources and compare transition speeds using consistent measures.",
+      "concepts": [
+        "diffusion-curve",
+        "electrification",
+        "photovoltaic"
+      ]
+    },
+    "x04-rules-law.qmd": {
+      "pagetitle": "Energy Regulation and Utility Rate Cases · X4",
+      "description-meta": "Sequence FERC Order 2222 and a Kansas rate case, map regulatory jurisdictions and identify opportunities for public participation.",
+      "concepts": [
+        "ferc",
+        "rate-case",
+        "revenue-requirement",
+        "intervenor"
+      ]
+    },
+    "x05-project-finance.qmd": {
+      "pagetitle": "Energy Project Finance and Debt Coverage · X5",
+      "description-meta": "Use an interactive wind-battery finance model to build a capital stack, size debt from cash coverage and compare contracts.",
+      "concepts": [
+        "capital-stack",
+        "debt-service-coverage-ratio",
+        "tax-equity",
+        "power-purchase-agreement"
+      ]
+    },
+    "x06-social-methods.qmd": {
+      "pagetitle": "Social Research Methods for Energy · X6",
+      "description-meta": "Use interactive cases to compare surveys, interviews and other social methods; examine selection bias, consent and inference.",
+      "concepts": [
+        "choice-experiment",
+        "ethnography",
+        "participatory-mapping",
+        "informed-consent"
+      ]
+    },
+    "glossary.qmd": {
+      "pagetitle": "Energy Systems Glossary",
+      "description-meta": "Find energy, economics, modeling and research terms with plain-English definitions and links to the lessons that teach them.",
+      "concepts": [
+        "energy",
+        "power",
+        "optimization",
+        "techno-economic-analysis"
+      ]
+    }
+  }
+}

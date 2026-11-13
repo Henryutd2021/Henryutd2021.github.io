@@ -339,7 +339,7 @@ const bad = [];
 const signalled = (where, list) => list.forEach(s => { if (RX.test(s)) { const o = offending(s); if (o) bad.push(where + ": " + o); } });
 signalled("page", elements(OWN.replace(/<style>[\s\S]*?<\/style>/g, " ").replace(/^---[\s\S]*?\n---\n/, " ")));
 const FM = (PAGE.match(/^---\n([\s\S]*?)\n---/) || [])[1] || "";
-signalled("front matter", [...FM.matchAll(/^(title|subtitle|description): "(.*)"$/gm)].map(m => m[2]));
+signalled("front matter", [...FM.matchAll(/^(title|subtitle|description|pagetitle|description-meta): "(.*)"$/gm)].map(m => m[2]));
 const PATHYML = fs.readFileSync(path.join(SITE, "learn/path.yml"), "utf8"), entry = (PATHYML.split(/\n- kind: /).find(e => new RegExp("\\n  id: " + ID + "\\n").test(e)) || "");
 ok(entry.length > 0 && /\n  status: active\n/.test(entry) && /\n  after: \[F8, 8\]\n/.test(entry) && /\n  minutes: 25\n/.test(entry) && /\n  practice_minutes: 30/.test(entry), "path.yml: the full entry, active, after F8 and lesson 8, 25 + 30 minutes");
 signalled("path.yml", [...entry.matchAll(/^  (title|subtitle|short|does|outcome): "(.*)"$/gm)].map(m => m[2]));

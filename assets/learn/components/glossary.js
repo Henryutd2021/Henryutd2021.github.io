@@ -33,6 +33,8 @@
     var onIt = here && L != null && (String(here.starter) === String(L) || here.code === L || here.id === L);
     if (L != null && !onIt) H("a", { href: LX.base + "../../learn/" + (g.href || (num ? "index.html#lesson-" + L : "index.html")),
       text: "Taught in " + (num ? "lesson " + L : L) }, pop);
+    if (g.href && /\.html$/.test(g.href) && L != null) H("a", { href: LX.base + "../../learn/glossary.html#" + (g.alias || btn.getAttribute("data-term")),
+      text: "More about this term" }, pop);
     pop.hidden = false; openBtn = btn;
     btn.setAttribute("aria-expanded", "true"); btn.setAttribute("aria-describedby", "lx-pop");
     var r = btn.getBoundingClientRect(), pw = Math.min(300, window.innerWidth - 24);

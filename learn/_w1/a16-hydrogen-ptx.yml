@@ -13,13 +13,13 @@ glossary:
     def: "A rule for which purchased electricity a buyer may count as clean, for example by region, by hour and by how new the plant is; it sets a claim, not the emissions the purchase causes."
   - id: full-load-hours
     term: Full-load hours
-    def: "A year's output divided by a machine's size: the hours it would need at full size to make the same amount; divided by 8,760, it is the average utilization."
+    def: "Output over a period divided by rated capacity, giving the equivalent hours at full output; dividing by the hours in that period gives average utilization."
   - id: pem-electrolyzer
     term: PEM electrolyzer
-    def: "An electrolyzer named for the thin polymer membrane in its cells (proton exchange membrane); it follows changing power well and can run down to about 5% of its size."
+    def: "An electrolyzer that uses a proton exchange membrane to carry ions between its electrodes, with operating limits that depend on the equipment design."
   - id: alkaline-electrolyzer
     term: Alkaline electrolyzer
-    def: "The older, widely used electrolyzer type, whose cells sit in an alkaline liquid; the units in IRENA's 2020 table must stay above about 15% of their size."
+    def: "An electrolyzer that uses an alkaline liquid electrolyte to carry ions between its electrodes, with operating limits that depend on the equipment design."
   - id: lower-heating-value
     term: Lower heating value
     def: "The heat a fuel gives when it burns, not counting the extra heat won by condensing the water vapor it makes; for hydrogen, about 33 kWh per kg."

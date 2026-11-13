@@ -263,7 +263,7 @@ const SRC_LI = [...SRC.matchAll(/<li>[\s\S]*?<\/li>/g)].map(m => m[0]);
 strict("page, sources", SRC_LI.filter(li => !TITLED.test(li)).map(norm));
 signalled("page", elements(REST.replace(/^---[\s\S]*?\n---\n/, " ")));
 const FM = (PAGE.match(/^---\n([\s\S]*?)\n---/) || [])[1] || "";
-signalled("front matter", [...FM.matchAll(/^(title|subtitle|description): "(.*)"$/gm)].map(m => m[2]));
+signalled("front matter", [...FM.matchAll(/^(title|subtitle|description|pagetitle|description-meta): "(.*)"$/gm)].map(m => m[2]));
 const PATHYML = fs.readFileSync(path.join(SITE, "learn/path.yml"), "utf8"), entry = (PATHYML.split(/\n- kind: /).find(e => new RegExp("\\n  id: " + ID + "\\n").test(e)) || "");
 ok(entry.length > 0, "path.yml has the entry");
 signalled("path.yml", [...entry.matchAll(/^  (title|subtitle|short|does|outcome): "(.*)"$/gm)].map(m => m[2]));

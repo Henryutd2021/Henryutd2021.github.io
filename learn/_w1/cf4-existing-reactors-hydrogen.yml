@@ -33,7 +33,7 @@ glossary:
     def: "The largest size a model is allowed to choose for a piece of equipment."
   - id: baseload
     term: Baseload operation
-    def: "Running a plant at steady full output around the clock, whatever the hour's price."
+    def: "Operating a plant at a relatively steady output to supply the portion of demand that persists through the day."
   - id: capacity-payment
     term: Capacity payment
     def: "Money a plant earns for being available to run when needed, as in a capacity market, apart from the energy it sells."

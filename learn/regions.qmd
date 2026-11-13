@@ -7,6 +7,10 @@ toc: false
 title-block-banner: false
 css: ../assets/learn/learn.css
 body-classes: "page-learn page-lesson page-learn-ref"
+pagetitle: "Regional Energy Systems: 12 Profiles"
+description-meta: "Compare 12 regional energy systems through sourced, dated profiles of institutions, challenges, research questions and key numbers."
+open-graph: {"description": "Compare 12 regional energy systems through sourced, dated profiles of institutions, challenges, research questions and key numbers."}
+twitter-card: {"description": "Compare 12 regional energy systems through sourced, dated profiles of institutions, challenges, research questions and key numbers."}
 ---
 
 <!-- The twelve regional profile cards, a reference page of Learn outside path.yml: no tier, code or time row, so it

@@ -23,7 +23,8 @@ fs.readdirSync(LEARN).filter(f => f.endsWith(".qmd")).forEach(f => {
   const q = fs.readFileSync(path.join(LEARN, f), "utf8");
   for (const m of q.matchAll(/href="\.\.\/assets\/learn\/data\/([a-z0-9_-]+)\.json"/g)) (offered[m[1]] = offered[m[1]] || []).push(f);
 });
-const names = Object.keys(offered).sort(), covered = names.filter(n => !NOT_COVERED.test(n));
+// This one reference export has its own versioned contract in test_glossary_export.js.
+const names = Object.keys(offered).sort(), covered = names.filter(n => n !== "glossary-export" && !NOT_COVERED.test(n));
 ok(covered.length >= 27, "the offered files are found (" + covered.length + " covered, " + (names.length - covered.length) + " not covered)");
 
 const MAINT = [

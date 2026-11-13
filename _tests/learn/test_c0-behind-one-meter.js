@@ -192,7 +192,7 @@ const QPATH = path.join(SITE, "learn/c0-behind-one-meter.qmd");
   const bad = elems.filter(t => RX.test(t) && !approved(t) && !LISTED.some(x => x.test(t)) && !t.split(/(?<=[.?!])\s+/).every(x => approved(x) || LISTED.some(y => y.test(x))));
   ok(bad.length === 0, "research wording: approved or listed:\n  " + bad.join("\n  "));
   const FM = (Q.match(/^---\n([\s\S]*?)\n---/) || [])[1] || "";
-  ok(![...FM.matchAll(/^(title|subtitle|description): "(.*)"$/gm)].some(x => RX.test(x[2])), "front matter: names no study");
+  ok(![...FM.matchAll(/^(title|subtitle|description|pagetitle|description-meta): "(.*)"$/gm)].some(x => RX.test(x[2])), "front matter: names no study");
   ok(!RX.test(JSON.stringify(C).replace(/"about": "[^"]*"/, "")) , "the data file names no study");
   if (RP) {
     const bib = fs.readFileSync(PRIV.path("publications"), "utf8"), titles = [...bib.matchAll(/^\s*title\s*=\s*\{(.*)\},?\s*$/gm)].map(x => x[1].replace(/[{}]/g, "").toLowerCase());

@@ -22,7 +22,7 @@ glossary:
     def: "A line-by-line list of what changed between two versions of a file, with removed lines marked minus and added lines plus."
   - id: merge
     term: Merge
-    def: "Joining two lines of commits into one, keeping the changes made on both."
+    def: "Combining two lines of commits, with conflicting changes requiring resolution before the merge is complete."
   - id: clone
     term: Clone
     def: "A complete new copy of a repository, with its files and its whole history."

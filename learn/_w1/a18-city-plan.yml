@@ -25,7 +25,7 @@ glossary:
     def: "Air sealing, insulation and similar work on a building's shell that cuts the heat it loses, so it needs less heating."
   - id: condensing-furnace
     term: Condensing furnace
-    def: "A gas furnace that also recovers the heat in its exhaust's water vapor, so 90% or more of the gas's energy becomes heat, against about 80% for a non-condensing one."
+    def: "A furnace that recovers additional heat by condensing water vapor in its exhaust, with efficiency depending on its design and operating conditions."
   - id: gdp-deflator
     term: GDP deflator
     def: "A price index for everything an economy produces; multiplying by the ratio of two years' values turns one year's dollars into another's, such as 2022 dollars into 2025 dollars."

@@ -191,6 +191,7 @@ if (R) {
   X.elements((OWN.match(/<div class="lx-card lx-case-try">[\s\S]*?\n<\/div>/) || [""])[0]).forEach(sg => { const o = X.offending(R, NOT, sg); if (o) bad.push("try it: " + o); });
   let REST = OWN.replace(/<!-- cf8-[a-z]+:start[\s\S]*?<!-- cf8-[a-z]+:end -->/g, " ").replace(/<!--[\s\S]*?-->/g, " ");
   X.elements(REST).forEach(sg => { const o = X.offending(R, NOT, sg); if (o && RX.test(o)) bad.push("page: " + o); });
+  X.frontmatter(PAGE).forEach(sg => { const o = X.offending(R, NOT, sg); if (o && RX.test(o)) bad.push("front matter: " + o); });
   const strings = (o, k) => typeof o === "string" ? [[k, o]] : o && typeof o === "object" ? Object.keys(o).flatMap(j => strings(o[j], j)) : [];
   strings(D).filter(x => !["about", "built", "label", "title", "note", "url", "as_of", "date", "kind"].includes(x[0])).forEach(x => { const o = X.offending(R, NOT, x[1]); if (o && RX.test(o)) bad.push("data: " + o); });
   (JS.replace(/\/\/[^\n]*/g, " ").match(/"(?:[^"\\\n]|\\.)*"/g) || []).forEach(l => { const s = l.slice(1, -1); if (RX.test(s)) { const o = X.offending(R, NOT, s); if (o) bad.push("script: " + o); } });

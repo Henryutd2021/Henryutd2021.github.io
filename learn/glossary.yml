@@ -143,7 +143,7 @@
   lesson: 10
 - id: solver
   term: Solver
-  short: "Software that finds the best solution of an optimization problem, or shows that none exists."
+  short: "Software that searches for an optimization solution and reports whether it is optimal, infeasible or unbounded, or stops at a time or other limit with or without a feasible solution."
   lesson: 11
 - id: shadow-price
   term: Shadow price

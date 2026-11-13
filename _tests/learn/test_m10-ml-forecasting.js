@@ -282,6 +282,7 @@ function researchWording(entry, OWN) {
   const src = (REST.match(/<div class="lx-card lx-sources">[\s\S]*?<\/div>/) || [""])[0];
   strict("sources", [...src.matchAll(/<li>[\s\S]*?<\/li>/g)].map(m => X.norm(m[0])).filter(s => /Li et al/.test(s)));
   signalled("page", X.elements(REST));
+  signalled("front matter", X.frontmatter(PAGE));
   const strings = (o, k) => typeof o === "string" ? [[k, o]] : o && typeof o === "object" ? Object.keys(o).flatMap(j => strings(o[j], j)) : [];
   signalled("data", strings(D).filter(x => x[0] !== "about").map(x => x[1]));
   const literals = JS.replace(/\/\/[^\n]*/g, " ").match(/"(?:[^"\\\n]|\\.)*"/g) || [];

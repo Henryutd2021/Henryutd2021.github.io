@@ -161,6 +161,8 @@ const APPROVED_SNAPSHOT = {   // the approved wording, E8 (E8.11-E8.12 not used)
 // names a study, its author, its site or its method: such an element is research text unless approved or listed below
 const RX = /\b(stud(y|y's|ies|ies')|paper|article|journal|Li et al|course author|excerpt|research|published|supply chains?|factor(y|ies)|warehouses?|facilit(y|ies)|transactive|California|Arizona|Nevada|chance constraint|service level|stylized|synthetic|mixed-integer|SEGRE|Applied Mathematical Modelling|three-tier|two-tier|logistics)\b/i;
 const NOT_RESEARCH = [
+  [/^Factory Siting with Microgrids · CF1$/, "generic teaching title, no study finding"],
+  [/^Explore factory siting, logistics and electricity trading with an illustrative supply-chain and microgrid model\.$/, "generic teaching description, no study finding"],
   [/^\d · [A-Z][a-z ,]+$/, "part label"],
   [/^Question type: prescriptive \(where should it build, and what should each site install\?\)\.$/, "course label (the course's question types)"],
   [/^From: Li et al\. \(2023\), Applied Mathematical Modelling\.$/, "provenance label"],
@@ -250,7 +252,7 @@ const SRC_LI = [...SRC.matchAll(/<li>[\s\S]*?<\/li>/g)].map(m => m[0]);
 strict("page, sources", SRC_LI.filter(li => !TITLED.test(li)).map(norm));
 signalled("page", elements(REST.replace(/^---[\s\S]*?\n---\n/, " ")));
 const FM = (PAGE.match(/^---\n([\s\S]*?)\n---/) || [])[1] || "";
-signalled("front matter", [...FM.matchAll(/^(title|subtitle|description): "(.*)"$/gm)].map(m => m[2]));
+signalled("front matter", [...FM.matchAll(/^(title|subtitle|description|pagetitle|description-meta): "(.*)"$/gm)].map(m => m[2]));
 const PATHYML = fs.readFileSync(path.join(SITE, "learn/path.yml"), "utf8"), entry = (PATHYML.split(/\n- kind: /).find(e => new RegExp("\\n  id: " + ID + "\\n").test(e)) || "");
 ok(entry.length > 0, "path.yml has the entry");
 signalled("path.yml", [...entry.matchAll(/^  (title|subtitle|short|does|outcome): "(.*)"$/gm)].map(m => m[2]));

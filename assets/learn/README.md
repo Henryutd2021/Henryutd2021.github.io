@@ -7,6 +7,16 @@ Every Learn page is built from these parts and nothing else. Pages load two file
 
 Both are **generated**: the course build step joins `components/*.js` and `components/*.css`. Edit the components, never the bundle.
 
+## Search metadata and glossary
+
+`learn/search-metadata.json` is the version 1 search registry: `pages` maps each public QMD filename to `pagetitle`, `description-meta` and three to six distinct canonical glossary IDs in `concepts`. Add a registry row when adding a page. The course build writes the two front-matter fields, matching Open Graph and Twitter descriptions, and connected JSON-LD. Quarto reads social descriptions separately, so those overrides are generated too. Keep `title`, `subtitle` and `description` unchanged when editing search copy; case-file search copy describes the teaching topic and method, or quotes approved wording verbatim.
+
+The build checks page coverage, unique titles, valid public concept IDs and generated output drift. Drafts get their existing generated blocks without a public search-registry row; add that row when publishing them. Resource IDs end in `#learningresource`, the index defines `learn/#course`, and resource `about` references resolve to `learn/glossary.html#<id>`. Keywords are the names of those same concepts, inside JSON-LD only. These entities describe the course; they do not promise search ranking or rich results.
+
+`learn/glossary.qmd` is a generated reference page outside the curriculum map. Its static entries, DefinedTermSet and `data/glossary-export.json` all use the merged glossary's terms with a live teaching destination. Held/upcoming terms remain in the popover map until their lesson becomes public. Aliases retain their fragment anchors without adding duplicate definitions. The filter searches existing HTML; without JavaScript every definition and teaching link is available. Add an optional `source` (HTTPS URL) and `source-title` to a glossary entry when its definition needs a direct citation; these appear in the page, structured data and export.
+
+The download contract is separate from lesson datasets: `format: "learn-glossary"`, `version: 1`, `title`, `url`, `creator`, `language`, `license`, and a `terms` array. Each canonical term has `id`, `term`, `definition`, `url`, `aliases` (ID strings), `lesson` (`code`, absolute `url`) and `sources` (objects with `title` and `url`, or an empty array when the teaching lesson supplies context). `glossary.json` remains the popover ID map; neither file has a dataset envelope. The `test_glossary_*` and `test_search_*` tests cover these contracts. The metadata and static-page tests also accept `--source-only` for a source audit when rendered HTML is unavailable; the default tests require a rendered site.
+
 ## Start a new lesson
 
 1. Add the lesson to `learn/path.yml`: `id`, `starter`, `tier`, `form: cards` (or `play` for lessons 0 and 13), `icon`, `title`, `subtitle`, `short`, `minutes`, `does`, `outcome`, `after`. The lesson goes live (linked, with its generated header, next box and footer) when you set `status: active`; its page is then `learn/<id>.qmd` (or the file named by `path:`). Until then keep `status: upcoming`, or leave the status out: it shows as coming soon.

@@ -515,7 +515,7 @@ function researchWording(entry) {
   ok(lis.some(s => s === APPROVED_SNAPSHOT["E7.14"]), "the citation is E7.14, word for word");
   signalled("page", elements(REST.replace(/^---[\s\S]*?\n---\n/, " ")));
   const FM = (PAGE.match(/^---\n([\s\S]*?)\n---/) || [])[1] || "";
-  signalled("front matter", [...FM.matchAll(/^(title|subtitle|description): "(.*)"$/gm)].map(m => m[2]));
+  signalled("front matter", [...FM.matchAll(/^(title|subtitle|description|pagetitle|description-meta): "(.*)"$/gm)].map(m => m[2]));
   signalled("path.yml", [...entry.matchAll(/^  (title|subtitle|short|does|outcome|lab): "(.*)"$/gm)].map(m => m[2]));
   const strings = (o, k) => typeof o === "string" ? [[k, o]] : o && typeof o === "object" ? Object.keys(o).flatMap(j => strings(o[j], j)) : [];
   signalled("data", strings(D).filter(x => ["about"].indexOf(x[0]) < 0).map(x => x[1]));

@@ -56,6 +56,11 @@ function elements(html) {
     .map(norm).filter(s => s && !/^(:::|\{=html\})/.test(s) && /[A-Za-z]/.test(s));
 }
 const sentencesOf = s => norm(s).split(/(?<=[.?!])\s+(?=[A-Z“"])/);
+// Both visible and search-only front matter are subject to the same research-wording rules.
+function frontmatter(page) {
+  const fm = (page.match(/^---\n([\s\S]*?)\n---/) || [])[1] || "";
+  return [...fm.matchAll(/^(?:title|subtitle|description|pagetitle|description-meta): (".*")$/gm)].map(m => JSON.parse(m[1]));
+}
 // the first sentence of seg that is neither approved nor a listed label; null when all are
 function offending(R, notResearch, seg) {
   const listed = x => notResearch.some(r => r[0].test(norm(x)));
@@ -63,4 +68,4 @@ function offending(R, notResearch, seg) {
   // a "Label: sentence" row, as the approved wording has some (Inputs:, Targets:, Try it yourself:) is checked whole above
   return sentencesOf(seg).find(x => !approved(R, x) && !listed(x)) || null;
 }
-module.exports = { ACK, norm, register, approved, elements, offending, sentencesOf };
+module.exports = { ACK, norm, register, approved, elements, offending, sentencesOf, frontmatter };
