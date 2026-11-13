@@ -85,8 +85,8 @@ body-classes: "page-learn page-lesson lx-form-case"
 <table class="cf-two">
 <thead><tr><th scope="col">Cost</th><th scope="col">What sets it</th><th scope="col">Which site it favors in the toy</th></tr></thead>
 <tbody>
-<tr><th scope="row">Site, building and shipping</th><td data-l="What sets it">land prices and the distance to the stores</td><td data-l="Which site it favours">the near site</td></tr>
-<tr><th scope="row">Energy, net of sales</th><td data-l="What sets it">the site's wind and sun, the grid's buying price, and what spare energy earns</td><td data-l="Which site it favours">the windy site, once each site can build wind and solar; selling spare energy can make this saving outweigh its higher site and shipping costs</td></tr>
+<tr><th scope="row">Site, building and shipping</th><td data-l="What sets it">land prices and the distance to the stores</td><td data-l="Which site it favors">the near site</td></tr>
+<tr><th scope="row">Energy, net of sales</th><td data-l="What sets it">the site's wind and sun, the grid's buying price, and what spare energy earns</td><td data-l="Which site it favors">the windy site, once each site can build wind and solar; selling spare energy can make this saving outweigh its higher site and shipping costs</td></tr>
 </tbody>
 </table>
 <p class="lx-hint">Every hour counts on its own: energy made when the factory needs none is worth only what the grid pays for it.</p>
