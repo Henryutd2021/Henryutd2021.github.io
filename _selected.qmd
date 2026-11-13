@@ -3,7 +3,7 @@
 <li class="pub" data-type="journal" data-year="2026">
 <div class="pub-badge"><span class="abbr pt-journal">Nat. Commun.</span></div>
 <div class="pub-main">
-<div class="pub-title">Rethinking the economics and flexibility of U.S. nuclear power through hydrogen integration and policy support</div>
+<div class="pub-title"><a href="files/papers/Li2026.html">Rethinking the economics and flexibility of U.S. nuclear power through hydrogen integration and policy support</a></div>
 <div class="pub-authors"><span class="me">H. Li</span>, J. Huang, B. Poudel, M. Sun, T. Westover, D. Wendt, J. Zhang</div>
 <div class="pub-venue"><em>Nature Communications</em>, vol. 17, article 7090, 2026.</div>
 <div class="pub-links">
@@ -32,7 +32,7 @@
 <li class="pub" data-type="journal" data-year="2026">
 <div class="pub-badge"><span class="abbr pt-journal">Energy Convers. Manag.</span></div>
 <div class="pub-main">
-<div class="pub-title">Techno-Economic Boundary Analysis of Small Modular Reactor Cogeneration for Hyperscale Data Center IT and Cooling Loads</div>
+<div class="pub-title"><a href="files/papers/li2026smrcogeneration.html">Techno-Economic Boundary Analysis of Small Modular Reactor Cogeneration for Hyperscale Data Center IT and Cooling Loads</a></div>
 <div class="pub-authors"><span class="me">H. Li</span>, B. She, J. Zhang</div>
 <div class="pub-venue"><em>Energy Conversion and Management</em>, 2026. <span class="pub-tag tag-ok">Accepted</span></div>
 <div class="pub-links">
@@ -59,7 +59,7 @@
 <li class="pub" data-type="journal" data-year="2026">
 <div class="pub-badge"><span class="abbr pt-journal">Cell Rep. Sustain.</span></div>
 <div class="pub-main">
-<div class="pub-title">The role of small modular reactors in powering data centers for a sustainable digital economy</div>
+<div class="pub-title"><a href="files/papers/jacob2026role.html">The role of small modular reactors in powering data centers for a sustainable digital economy</a></div>
 <div class="pub-authors">R. A. Jacob*, <span class="me">H. Li</span>*, A. M. Rad, B. Poudel, Y. Li, M. Sun, T. R. McJunkin, J. Zhang</div>
 <div class="pub-venue"><em>Cell Reports Sustainability</em>, vol. 3, article 100820, 2026. <span class="pub-tag tag-note">Co-first authors</span></div>
 <div class="pub-links">
@@ -87,7 +87,7 @@
 <li class="pub" data-type="journal" data-year="2025">
 <div class="pub-badge"><span class="abbr pt-journal">Cell Rep. Sustain.</span></div>
 <div class="pub-main">
-<div class="pub-title">Real-time greenhouse gas emission intensity informed demand-side load regulation for power grid decarbonization</div>
+<div class="pub-title"><a href="files/papers/li2025ghg.html">Real-time greenhouse gas emission intensity informed demand-side load regulation for power grid decarbonization</a></div>
 <div class="pub-authors"><span class="me">H. Li</span>, G. Shen, S. Senemmar, A. Mehmani, J. Zhang</div>
 <div class="pub-venue"><em>Cell Reports Sustainability</em>, vol. 2, article 100367, 2025.</div>
 <div class="pub-links">
@@ -117,7 +117,7 @@
 <li class="pub" data-type="journal" data-year="2025">
 <div class="pub-badge"><span class="abbr pt-journal">Int. J. Hydrogen Energy</span></div>
 <div class="pub-main">
-<div class="pub-title">Hydrogen’s role in expanding renewable energy and reducing carbon emissions in Texas</div>
+<div class="pub-title"><a href="files/papers/li2025hydrogen.html">Hydrogen’s role in expanding renewable energy and reducing carbon emissions in Texas</a></div>
 <div class="pub-authors"><span class="me">H. Li</span>, J. Zhang</div>
 <div class="pub-venue"><em>International Journal of Hydrogen Energy</em>, vol. 113, pp. 77–89, 2025.</div>
 <div class="pub-links">

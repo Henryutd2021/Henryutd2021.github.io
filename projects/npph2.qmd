@@ -91,7 +91,7 @@ toc: false
 <li class="pub" data-type="journal" data-year="2026">
 <div class="pub-badge"><span class="abbr pt-journal">Nat. Commun.</span></div>
 <div class="pub-main">
-<div class="pub-title">Rethinking the economics and flexibility of U.S. nuclear power through hydrogen integration and policy support</div>
+<div class="pub-title"><a href="../files/papers/Li2026.html">Rethinking the economics and flexibility of U.S. nuclear power through hydrogen integration and policy support</a></div>
 <div class="pub-authors"><span class="me">H. Li</span>, J. Huang, B. Poudel, M. Sun, T. Westover, D. Wendt, J. Zhang</div>
 <div class="pub-venue"><em>Nature Communications</em>, vol. 17, article 7090, 2026.</div>
 <div class="pub-links">

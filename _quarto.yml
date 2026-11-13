@@ -9,6 +9,7 @@ project:
     - projects.qmd
     - projects/*.qmd
     - publications.qmd
+    - files/papers/*.qmd
     - software-data.qmd
     # notes.qmd and notes/*.qmd are hidden until there is content
     - teaching.qmd
@@ -29,6 +30,7 @@ project:
     - 404.qmd
   resources:
     - robots.txt
+    - llms.txt
     - google10b8e69b53ee897d.html   # Google Search Console file verification
     - images/
     - files/

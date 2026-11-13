@@ -1,0 +1,58 @@
+# Honglin Li
+
+> I am an energy systems researcher and a Postdoctoral Fellow in the Department of Electrical and Computer Engineering at Kansas State University. I build optimization and techno-economic models that show which low-carbon technology mixes deliver reliable, affordable energy, and who pays for them. My doctoral research asked when flexibility, from hydrogen or from demand, adds value to a low-carbon energy system, at the scale of a plant, a state and the U.S. nuclear fleet. My current research asks how large new electricity loads such as AI data centers can be supplied with firm, low-carbon power, including small modular reactors.
+
+## Key pages
+
+- [Home](https://henryutd2021.github.io/): Biography and research interests.
+- [Research](https://henryutd2021.github.io/research.html): Research questions and methods.
+- [Projects](https://henryutd2021.github.io/projects.html): Public project pages.
+- [Publications](https://henryutd2021.github.io/publications.html): Publication list and citations.
+- [Software & Data](https://henryutd2021.github.io/software-data.html): Open model frameworks and published datasets.
+- [CV](https://henryutd2021.github.io/cv.html): Education, experience and publications.
+- [Teaching](https://henryutd2021.github.io/teaching.html): Teaching experience and courses.
+- [BibTeX](https://henryutd2021.github.io/files/publications.bib): Download all publication citations.
+
+## Papers
+
+- [Rethinking the economics and flexibility of U.S. nuclear power through hydrogen integration and policy support](https://henryutd2021.github.io/files/papers/Li2026.html): Nature Communications, vol. 17, article 7090, 2026. DOI: 10.1038/s41467-026-73630-y.
+- [The role of small modular reactors in powering data centers for a sustainable digital economy](https://henryutd2021.github.io/files/papers/jacob2026role.html): Cell Reports Sustainability, vol. 3, article 100820, 2026. Co-first authors. DOI: 10.1016/j.crsus.2026.100820.
+- [Quantifying the Cost of Delayed Energization (CoDE) for AI Data Centers](https://henryutd2021.github.io/files/papers/li2026code.html): 2026 North American Power Symposium (NAPS), 2026. Accepted.
+- [Inertia-Aware Planning of Grid-Forming Energy Storage and Firm Capacity under Thermal Retirement](https://henryutd2021.github.io/files/papers/she2026inertia.html): 2026 North American Power Symposium (NAPS), 2026. Accepted.
+- [Techno-Economic Boundary Analysis of Small Modular Reactor Cogeneration for Hyperscale Data Center IT and Cooling Loads](https://henryutd2021.github.io/files/papers/li2026smrcogeneration.html): Energy Conversion and Management, 2026. Accepted.
+- [Real-time greenhouse gas emission intensity informed demand-side load regulation for power grid decarbonization](https://henryutd2021.github.io/files/papers/li2025ghg.html): Cell Reports Sustainability, vol. 2, article 100367, 2025. DOI: 10.1016/j.crsus.2025.100367.
+- [Hydrogen’s role in expanding renewable energy and reducing carbon emissions in Texas](https://henryutd2021.github.io/files/papers/li2025hydrogen.html): International Journal of Hydrogen Energy, vol. 113, pp. 77–89, 2025. DOI: 10.1016/j.ijhydene.2025.02.303.
+- [Techno-Economic Analysis of Hydrogen-Integrated Sustainable Energy Systems](https://henryutd2021.github.io/files/papers/li2025dissertation.html): Ph.D. dissertation, The University of Texas at Dallas, 2025.
+- [Techno-economic analysis incorporating intelligent operation and maintenance management: a case study of an integrated offshore wind and hydrogen energy system](https://henryutd2021.github.io/files/papers/li2024techno.html): Journal of Physics: Conference Series, vol. 2767, article 062016, 2024. DOI: 10.1088/1742-6596/2767/6/062016.
+- [Towards sustainable integration: techno-economic analysis and future perspectives of Co-located wind and hydrogen energy systems](https://henryutd2021.github.io/files/papers/li2024towards.html): Journal of Mechanical Design, vol. 146, article 020903, 2024. Featured Article. DOI: 10.1115/1.4063971.
+- [Demand-side Management Under Real-time Greenhouse Gas Emission Factor for Electricity](https://henryutd2021.github.io/files/papers/shen2024demand.html): 2024 ACEEE Summer Study on Energy Efficiency in Buildings, 2024.
+- [A Multi-Fidelity Gaussian Process Regression Method for Probabilistic Wind Farm Power Curve Estimation](https://henryutd2021.github.io/files/papers/li2023multi.html): Proceedings of the ASME 2023 IDETC-CIE, Paper No. IDETC2023-114762, article V03AT03A034, 2023. DOI: 10.1115/detc2023-114762.
+- [Facility and microgrid location-allocation for integrated supply chain and transactive energy operations](https://henryutd2021.github.io/files/papers/li2023facility.html): Applied Mathematical Modelling, vol. 119, pp. 119–136, 2023. DOI: 10.1016/j.apm.2023.02.014.
+- [Locating and Allocating Warehouse Facilities and Prosumer Microgrid in Transactive Energy Paradigm](https://henryutd2021.github.io/files/papers/li2023locating.html): 2023 International Conference on Smart Electrical Grid and Renewable Energy (SEGRE), pp. 410–415, 2023. DOI: 10.1109/segre58867.2023.00071.
+- [Techno-economic analysis for co-located solar and hydrogen plants](https://henryutd2021.github.io/files/papers/li2023techno.html): 2023 19th International Conference on the European Energy Market (EEM), pp. 1–6, 2023. DOI: 10.1109/eem58374.2023.10161786.
+- [Supply chain design for transactive energy operations in the nexus of manufacturing, microgrid and climate](https://henryutd2021.github.io/files/papers/jin2021supply.html): Journal of the Operational Research Society, vol. 73, pp. 2395–2411, 2022. DOI: 10.1080/01605682.2022.2035273.
+- [Integrating offshore wind farms with unmanned hydrogen and battery ships](https://henryutd2021.github.io/files/papers/badakhshan2022integrating.html): 2022 IEEE Kansas Power and Energy Conference (KPEC), pp. 1–6, 2022. DOI: 10.1109/kpec54747.2022.9814722.
+- [Optimal planning of co-located wind energy and hydrogen plants: a techno-economic analysis](https://henryutd2021.github.io/files/papers/li2022optimal.html): Journal of Physics: Conference Series, vol. 2265, article 042063, 2022. DOI: 10.1088/1742-6596/2265/4/042063.
+- [System availability considering redundancy, maintenance and spare parts with dual repair processes](https://henryutd2021.github.io/files/papers/jin2021system.html): Proceedings of the IISE Annual Conference and Expo 2021, pp. 590–595, 2021.
+- [Planning Virtual Power Plants for Smart Factories and Industry 4.0 with Renewable and Thermal Cogeneration](https://henryutd2021.github.io/files/papers/li2021thesis.html): M.S. thesis, Texas State University, 2021.
+
+## Frameworks
+
+- [Nuclear–hydrogen integration framework](https://github.com/Henryutd2021/nuclear-hydrogen-integration): Python model framework; MIT code license.
+- [SMR cogeneration framework](https://github.com/Henryutd2021/smr-datacenter-cogeneration): Python model framework; MIT code license.
+- [CoDE framework](https://github.com/Henryutd2021/code-delayed-energization): Python model framework; MIT code license.
+- [TXH2 framework](https://github.com/Henryutd2021/txh2-ercot-hydrogen): Python model framework; MIT code license.
+- [REopt hydrogen framework](https://github.com/Henryutd2021/reopt-hydrogen-framework): Python model framework; MIT code license.
+- [GHG load-regulation framework](https://github.com/Henryutd2021/ghg-load-regulation): Python model framework; MIT code license.
+- [Supply chains with on-site microgrids](https://github.com/Henryutd2021/supply-chain-microgrid-models): Python model framework; MIT code license.
+- [Wind UQ surrogate framework](https://github.com/Henryutd2021/wind-uq-surrogate): Python model framework; MIT code license.
+- [MF-GPR framework](https://github.com/Henryutd2021/mfgpr-wind-power-curve): Python model framework; MIT code license.
+
+## Datasets
+
+- [Zenodo — 10.5281/zenodo.14658398](https://doi.org/10.5281/zenodo.14658398): Raw data, code, and results covered in the Cell Reports Sustainability article.
+- [Mendeley Data — 10.17632/jfcc62strg.1](https://doi.org/10.17632/jfcc62strg.1): Raw data related to fuel mix for each region obtained from EIA
+
+## Learn
+
+- [Learn course index](https://henryutd2021.github.io/learn/): Interactive energy-systems lessons.

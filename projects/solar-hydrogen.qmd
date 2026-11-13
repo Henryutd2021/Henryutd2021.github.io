@@ -77,7 +77,7 @@ toc: false
 <li class="pub" data-type="conference" data-year="2023">
 <div class="pub-badge"><span class="abbr pt-conference">EEM 2023</span></div>
 <div class="pub-main">
-<div class="pub-title">Techno-economic analysis for co-located solar and hydrogen plants</div>
+<div class="pub-title"><a href="../files/papers/li2023techno.html">Techno-economic analysis for co-located solar and hydrogen plants</a></div>
 <div class="pub-authors"><span class="me">H. Li</span>, J. Kiviluoma, J. Zhang</div>
 <div class="pub-venue"><em>2023 19th International Conference on the European Energy Market (EEM)</em>, pp. 1–6, 2023.</div>
 <div class="pub-links">

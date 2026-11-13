@@ -85,7 +85,7 @@ toc: false
 <li class="pub" data-type="journal" data-year="2025">
 <div class="pub-badge"><span class="abbr pt-journal">Cell Rep. Sustain.</span></div>
 <div class="pub-main">
-<div class="pub-title">Real-time greenhouse gas emission intensity informed demand-side load regulation for power grid decarbonization</div>
+<div class="pub-title"><a href="../files/papers/li2025ghg.html">Real-time greenhouse gas emission intensity informed demand-side load regulation for power grid decarbonization</a></div>
 <div class="pub-authors"><span class="me">H. Li</span>, G. Shen, S. Senemmar, A. Mehmani, J. Zhang</div>
 <div class="pub-venue"><em>Cell Reports Sustainability</em>, vol. 2, article 100367, 2025.</div>
 <div class="pub-links">
@@ -129,6 +129,11 @@ toc: false
 <a class="btn-outline" href="../files/papers/li2025ghg.pdf" title="Published version, open access (CC BY-NC 4.0)"><i class="bi bi-file-earmark-pdf" aria-hidden="true"></i>Paper (PDF)</a>
 <a class="btn-outline" href="https://github.com/Henryutd2021/ghg-load-regulation"><i class="bi bi-github" aria-hidden="true"></i>Model framework (GitHub)</a>
 </div>
+</section>
+<section class="aside-card" aria-labelledby="h-datasets">
+<h2 id="h-datasets"><i class="bi bi-database" aria-hidden="true"></i>Published datasets</h2>
+<div class="dataset-record"><p><a href="https://doi.org/10.5281/zenodo.14658398">Zenodo — Real-time Greenhouse Gas Emission Intensity Informed Demand-Side Load Regulation for Power Grid Decarbonization</a></p><p>Raw data, code, and results covered in the Cell Reports Sustainability article.</p><p class="dataset-doi">DOI: 10.5281/zenodo.14658398</p></div>
+<div class="dataset-record"><p><a href="https://doi.org/10.17632/jfcc62strg.1">Mendeley Data — Real-time Greenhouse Gas Emission Intensity Informed Demand-Side Load Regulation for Power Grid Decarbonization</a></p><p>Raw data related to fuel mix for each region obtained from EIA</p><p class="dataset-doi">DOI: 10.17632/jfcc62strg.1</p></div>
 </section>
 <section class="aside-card" aria-labelledby="h-repro">
 <h2 id="h-repro"><i class="bi bi-arrow-repeat" aria-hidden="true"></i>Reproducibility</h2>

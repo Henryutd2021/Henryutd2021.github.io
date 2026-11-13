@@ -77,7 +77,7 @@ toc: false
 <li class="pub" data-type="conference" data-year="2023">
 <div class="pub-badge"><span class="abbr pt-conference">IDETC 2023</span></div>
 <div class="pub-main">
-<div class="pub-title">A Multi-Fidelity Gaussian Process Regression Method for Probabilistic Wind Farm Power Curve Estimation</div>
+<div class="pub-title"><a href="../files/papers/li2023multi.html">A Multi-Fidelity Gaussian Process Regression Method for Probabilistic Wind Farm Power Curve Estimation</a></div>
 <div class="pub-authors"><span class="me">H. Li</span>, C. Feng, J. Zhang</div>
 <div class="pub-venue"><em>Proceedings of the ASME 2023 IDETC-CIE, Paper No. IDETC2023-114762</em>, article V03AT03A034, 2023.</div>
 <div class="pub-links">

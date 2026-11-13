@@ -1,5 +1,6 @@
 /_site/
 /.quarto/
+/.aivis-checks/
 .DS_Store
 
 **/*.quarto_ipynb
