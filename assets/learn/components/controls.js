@@ -36,10 +36,12 @@
     function snap(v) { return +((Math.round((v - min) / step) * step + min).toFixed(dec)); }
     // a value given by the page (the start value, or set()) that is not on the grid min + k × step, or outside min..max,
     // is shown as the nearest step: say so (console warning and o.onSnap), so a page never shows one number and uses another
-    function offGrid(v, got, why) {
-      if (typeof v !== "number" || !isFinite(v) || Math.abs(v - got) <= 1e-9 * (1 + Math.abs(v))) return;
-      if (window.console && console.warn) console.warn("LX.Slider \"" + o.label + "\": " + why + " " + v + " is " + (v < min || v > max ? "outside " + min + " to " + max : "off its steps of " + step + " from " + min) + "; it shows " + got + ".");
-      if (o.onSnap) o.onSnap(v, got);
+    // (a value on the grid that set() clamps into the reachable band, range(), is not reported: that is the band's job);
+    // `shown` is the value the slider then holds
+    function offGrid(v, shown, why) {
+      if (typeof v !== "number" || !isFinite(v) || Math.abs(v - clamp(snap(v), min, max)) <= 1e-9 * (1 + Math.abs(v))) return;
+      if (window.console && console.warn) console.warn("LX.Slider \"" + o.label + "\": " + why + " " + v + " is " + (v < min || v > max ? "outside " + min + " to " + max : "off its steps of " + step + " from " + min) + "; it shows " + shown + ".");
+      if (o.onSnap) o.onSnap(v, shown);
     }
     var lo = min, hi = max, val = o.value == null ? min : clamp(snap(o.value), min, max), fixedHint = null;
     if (o.value != null) offGrid(o.value, val, "start value");
@@ -64,7 +66,7 @@
     paint();
     return {
       el: w, input: inp,
-      set: function (v, fire) { var want = +v; setV(v, !!fire); offGrid(want, clamp(snap(want), min, max), "value"); },
+      set: function (v, fire) { setV(v, !!fire); offGrid(+v, val, "value"); },
       range: function (a, b) { lo = a; hi = b; setV(val, false); },
       val: function () { return val; },
       hint: function (t) { fixedHint = t; paint(); },   // hint() with no text: back to the o.hint function

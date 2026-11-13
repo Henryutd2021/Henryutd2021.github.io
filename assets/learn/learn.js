@@ -848,10 +848,12 @@
     function snap(v) { return +((Math.round((v - min) / step) * step + min).toFixed(dec)); }
     // a value given by the page (the start value, or set()) that is not on the grid min + k × step, or outside min..max,
     // is shown as the nearest step: say so (console warning and o.onSnap), so a page never shows one number and uses another
-    function offGrid(v, got, why) {
-      if (typeof v !== "number" || !isFinite(v) || Math.abs(v - got) <= 1e-9 * (1 + Math.abs(v))) return;
-      if (window.console && console.warn) console.warn("LX.Slider \"" + o.label + "\": " + why + " " + v + " is " + (v < min || v > max ? "outside " + min + " to " + max : "off its steps of " + step + " from " + min) + "; it shows " + got + ".");
-      if (o.onSnap) o.onSnap(v, got);
+    // (a value on the grid that set() clamps into the reachable band, range(), is not reported: that is the band's job);
+    // `shown` is the value the slider then holds
+    function offGrid(v, shown, why) {
+      if (typeof v !== "number" || !isFinite(v) || Math.abs(v - clamp(snap(v), min, max)) <= 1e-9 * (1 + Math.abs(v))) return;
+      if (window.console && console.warn) console.warn("LX.Slider \"" + o.label + "\": " + why + " " + v + " is " + (v < min || v > max ? "outside " + min + " to " + max : "off its steps of " + step + " from " + min) + "; it shows " + shown + ".");
+      if (o.onSnap) o.onSnap(v, shown);
     }
     var lo = min, hi = max, val = o.value == null ? min : clamp(snap(o.value), min, max), fixedHint = null;
     if (o.value != null) offGrid(o.value, val, "start value");
@@ -876,7 +878,7 @@
     paint();
     return {
       el: w, input: inp,
-      set: function (v, fire) { var want = +v; setV(v, !!fire); offGrid(want, clamp(snap(want), min, max), "value"); },
+      set: function (v, fire) { setV(v, !!fire); offGrid(+v, val, "value"); },
       range: function (a, b) { lo = a; hi = b; setV(val, false); },
       val: function () { return val; },
       hint: function (t) { fixedHint = t; paint(); },   // hint() with no text: back to the o.hint function
@@ -1300,7 +1302,7 @@
       var list = q.querySelector(".lx-choices"), det = q.querySelector("details.lx-answer"), stem = q.querySelector(".lx-qtext");
       if (!list || !ans) return;
       if (stem && !stem.id) stem.id = LX.uid("qs");
-      var why = det ? whyHTML(det) : "";
+      var why = det ? whyHTML(det) : { first: "", rest: "" };
       var group = H("div", { class: "lx-qbtns", role: "group", "aria-labelledby": stem ? stem.id : null }, null);
       var fb = H("div", { class: "lx-qfb", "aria-live": "polite" }, null);
       var btns = Array.prototype.map.call(list.querySelectorAll("li"), function (li) {
@@ -4213,6 +4215,13 @@
     rows.forEach(function (r, i) { le(r).forEach(function (h) { hs.push({ id: idOf(r, i), a: h.a, b: h.b }); }); });
     return hs;
   }
+  // the half-planes with unit normals (a rule with no decision in it keeps a = [0, 0]): the corners, rays and
+  // feasibility below then give the same answer however a rule is scaled (x >= 1 and 0.0000001x >= 0.0000001 alike)
+  function units(rows) {
+    return halfplanes(rows).map(function (h) { var n = Math.hypot(h.a[0], h.a[1]); return n > 0 ? { id: h.id, a: [h.a[0] / n + 0, h.a[1] / n + 0], b: h.b / n + 0 } : h; });
+  }
+  // a goal as a unit vector (null for a zero goal), for direction tests that do not depend on the goal's scale
+  function unit(c) { var n = Math.hypot(c[0], c[1]); return n > 0 ? [c[0] / n, c[1] / n] : null; }
   function inside(hs, v) { return hs.every(function (h) { return dot(h.a, v) <= h.b + EPS * (1 + Math.abs(h.b)); }); }
   function active(hs, v) {
     var on = [];
@@ -4220,11 +4229,12 @@
     return on;
   }
   function corners(rows) {
-    var hs = halfplanes(rows), vs = [];
+    var raw = halfplanes(rows), hs = units(rows), vs = [];   // decisions on the unit half-planes; crossings from the rules as written (no rounding noise)
     for (var i = 0; i < hs.length; i++) for (var j = i + 1; j < hs.length; j++) {
-      var a = hs[i].a, b = hs[j].a, det = a[0] * b[1] - a[1] * b[0];
-      if (Math.abs(det) < 1e-12) continue;
-      var v = [(hs[i].b * b[1] - a[1] * hs[j].b) / det, (a[0] * hs[j].b - hs[i].b * b[0]) / det];
+      var ua = hs[i].a, ub = hs[j].a;
+      if (Math.abs(ua[0] * ub[1] - ua[1] * ub[0]) < 1e-12) continue;
+      var a = raw[i].a, b = raw[j].a, det = a[0] * b[1] - a[1] * b[0];
+      var v = [(raw[i].b * b[1] - a[1] * raw[j].b) / det, (a[0] * raw[j].b - raw[i].b * b[0]) / det];
       if (!inside(hs, v)) continue;
       if (vs.some(function (u) { return Math.abs(u[0] - v[0]) < 1e-6 && Math.abs(u[1] - v[1]) < 1e-6; })) continue;
       vs.push(v);
@@ -4241,9 +4251,9 @@
   // edge of the region's cone of directions, or straight against the goal when that cone is a half-plane or the whole
   // plane (minimize x with only x <= 1).
   function rays(rows, c) {
-    var hs = halfplanes(rows), cand = [[1, 0], [0, 1], [-1, 0], [0, -1]];
-    hs.forEach(function (h) { var n = Math.hypot(h.a[0], h.a[1]); if (n > 0) cand.push([h.a[1] / n, -h.a[0] / n], [-h.a[1] / n, h.a[0] / n]); });
-    if (c) { var nc = Math.hypot(c[0], c[1]); if (nc > 0) cand.push([-c[0] / nc + 0, -c[1] / nc + 0]); }
+    var hs = units(rows), cand = [[1, 0], [0, 1], [-1, 0], [0, -1]], cu = c ? unit(c) : null;
+    hs.forEach(function (h) { if (h.a[0] || h.a[1]) cand.push([h.a[1], -h.a[0] + 0], [-h.a[1] + 0, h.a[0]]); });
+    if (cu) cand.push([-cu[0] + 0, -cu[1] + 0]);
     var out = [];
     cand.forEach(function (r) {
       if (!hs.every(function (h) { return dot(h.a, r) <= 1e-12; })) return;
@@ -4257,18 +4267,18 @@
   // simply true or false.
   function feasible(rows) {
     var hs = [], never = false;
-    (rows || []).forEach(function (r) { le(r).forEach(function (h) { if (h.a[0] || h.a[1]) hs.push(h); else if (h.b < -1e-9) never = true; }); });
+    units(rows || []).forEach(function (h) { if (h.a[0] || h.a[1]) hs.push(h); else if (h.b < -1e-9) never = true; });
     if (never) return false;
     if (!hs.length) return true;
-    var n = hs[0].a, nn = n[0] * n[0] + n[1] * n[1];
-    if (hs.some(function (h) { return Math.abs(n[0] * h.a[1] - n[1] * h.a[0]) > 1e-12 * (1 + nn); })) return corners(rows).length > 0;
+    var n = hs[0].a;
+    if (hs.some(function (h) { return Math.abs(n[0] * h.a[1] - n[1] * h.a[0]) >= 1e-12; })) return corners(rows).length > 0;   // as corners() tells parallel lines
     var lim = parallelLimits(hs, n);
-    return lim.lo <= lim.hi + 1e-9 * (1 + Math.abs(lim.hi));
+    return lim.lo <= lim.hi + EPS * (1 + Math.abs(lim.hi));
   }
-  // rules all parallel to the normal n: the range [lo, hi] of n·p they allow
+  // unit half-planes all parallel to the unit normal n: the range [lo, hi] of n·p they allow
   function parallelLimits(hs, n) {
-    var nn = n[0] * n[0] + n[1] * n[1], lo = -Infinity, hi = Infinity;
-    hs.forEach(function (h) { var k = (h.a[0] * n[0] + h.a[1] * n[1]) / nn; if (k > 0) hi = Math.min(hi, h.b / k); else if (k < 0) lo = Math.max(lo, h.b / k); });
+    var lo = -Infinity, hi = Infinity;
+    hs.forEach(function (h) { var k = h.a[0] * n[0] + h.a[1] * n[1]; if (k > 0) hi = Math.min(hi, h.b / k); else if (k < 0) lo = Math.max(lo, h.b / k); });
     return { lo: lo, hi: hi };
   }
   // the best plan of max/min c·p for any rules, decided exactly (B1's builder: rules a learner writes, with or without a
@@ -4276,35 +4286,37 @@
   // open region with a finite best (minimize x with x, y >= 0) is not called unbounded, and a best plan far outside the
   // drawing is still found. The view is not needed (older callers pass one).
   function optimum(m) {
-    var rows = m.rows || [], sg = m.sense === "max" ? -1 : 1, c = [sg * m.c[0], sg * m.c[1]];
+    var rows = m.rows || [], sg = m.sense === "max" ? -1 : 1, c = [sg * m.c[0], sg * m.c[1]], cu = unit(c);
     if (!feasible(rows)) return { status: "infeasible" };
-    var rs = rays(rows, c);
-    if (rs.some(function (r) { return dot(c, r) < -1e-9; })) return { status: "unbounded" };
-    var flat = rs.some(function (r) { return Math.abs(dot(c, r)) <= 1e-9; }), vs = corners(rows);
+    var rs = rays(rows, c);   // directions tested with the unit goal: a tiny but nonzero goal still counts
+    if (cu && rs.some(function (r) { return dot(cu, r) < -1e-9; })) return { status: "unbounded" };
+    var flat = !cu || rs.some(function (r) { return Math.abs(dot(cu, r)) <= 1e-9; }), vs = corners(rows);
     if (vs.length) {
-      var cost = function (v) { return c[0] * v.x + c[1] * v.y; };
-      var lo = Math.min.apply(null, vs.map(cost)), tol = 1e-7 * (1 + Math.abs(lo));
-      var x = vs.filter(function (v) { return cost(v) <= lo + tol; }).map(function (v) { return [r6(v.x), r6(v.y)]; });
-      return { status: "optimal", x: x[0], ties: x, value: r6(sg * lo), tied: x.length > 1 || flat };
+      var u = cu || [0, 0], cost = function (v) { return u[0] * v.x + u[1] * v.y; }, span = 1;
+      vs.forEach(function (v) { span = Math.max(span, Math.abs(v.x), Math.abs(v.y)); });
+      var lo = Math.min.apply(null, vs.map(cost)), tol = 1e-9 * span;
+      var best = vs.filter(function (v) { return cost(v) <= lo + tol; }), x = best.map(function (v) { return [r6(v.x), r6(v.y)]; });
+      return { status: "optimal", x: x[0], ties: x, value: r6(m.c[0] * best[0].x + m.c[1] * best[0].y), tied: x.length > 1 || flat };
     }
-    // no corner, yet bounded: the rules are all parallel to a normal n and the goal points along n (or is zero), so a
-    // whole line of plans ties for best; x is its plan nearest the origin
-    var hs = halfplanes(rows).filter(function (h) { return h.a[0] || h.a[1]; });
-    var n = hs.length ? hs[0].a : (c[0] || c[1] ? c : [1, 0]), nn = n[0] * n[0] + n[1] * n[1], lim = parallelLimits(hs, n);
-    var k = (c[0] * n[0] + c[1] * n[1]) / nn, t = k > 1e-12 ? lim.lo : k < -1e-12 ? lim.hi : Math.max(lim.lo, Math.min(lim.hi, 0));
-    var p = [r6(t * n[0] / nn), r6(t * n[1] / nn)];
+    // no corner, yet bounded: the rules are all parallel to a unit normal n and the goal points along n (or is zero),
+    // so a whole line of plans ties for best; x is its plan nearest the origin
+    var hs = units(rows).filter(function (h) { return h.a[0] || h.a[1]; });
+    var n = hs.length ? hs[0].a : (cu || [1, 0]), lim = parallelLimits(hs, n);
+    var k = cu ? cu[0] * n[0] + cu[1] * n[1] : 0, t = k > 1e-9 ? lim.lo : k < -1e-9 ? lim.hi : Math.max(lim.lo, Math.min(lim.hi, 0));
+    if (!isFinite(t)) return { status: "unbounded" };   // cannot happen after the ray test; kept so no plan is ever non-finite
+    var p = [r6(t * n[0]), r6(t * n[1])];
     return { status: "optimal", x: p, ties: [p], value: r6(sg * (c[0] * p[0] + c[1] * p[1])), tied: true };
   }
   function solve(m) {
     var sg = m.sense === "max" ? -1 : 1, c = [sg * m.c[0], sg * m.c[1]], vs = corners(m.rows);
     var res = { status: "infeasible", corners: vs, best: [], x: null, y: null, value: null, ray: null, binding: {} };
     if (!vs.length) return res;
-    var rs = rays(m.rows, c), down = rs.filter(function (r) { return dot(c, r) < -1e-9; });
+    var cu = unit(c) || [0, 0], rs = rays(m.rows, c), down = rs.filter(function (r) { return dot(cu, r) < -1e-9; });
     if (down.length) { res.status = "unbounded"; res.ray = down[0]; return res; }
     var cost = function (v) { return c[0] * v.x + c[1] * v.y; };
     var lo = Math.min.apply(null, vs.map(cost)), tol = 1e-7 * (1 + Math.abs(lo));
     res.best = vs.filter(function (v) { return cost(v) <= lo + tol; });
-    var flat = rs.filter(function (r) { return Math.abs(dot(c, r)) <= 1e-9; });
+    var flat = rs.filter(function (r) { return Math.abs(dot(cu, r)) <= 1e-9; });
     res.status = res.best.length > 1 || flat.length ? "tied" : "optimal";
     if (flat.length) res.ray = flat[0];
     var b = res.best[0];

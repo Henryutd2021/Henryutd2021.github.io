@@ -101,6 +101,13 @@ const view1 = [0, 160, 0, 140];
   ok(LP.optimum({ sense: "min", c: [1, 1], rows: [{ a: [0, 0], op: "<=", b: -1 }] }).status === "infeasible", "optimum: 0 ≤ −1 is infeasible");
   ok(LP.feasible([{ a: [1, 1], op: "<=", b: 4 }, { a: [2, 2], op: ">=", b: 6 }]) && !LP.feasible([{ a: [1, 1], op: "<=", b: 4 }, { a: [2, 2], op: ">=", b: 10 }]) && LP.feasible([]),
      "feasible: parallel rules (3 ≤ x + y ≤ 4 passes, 5 ≤ x + y ≤ 4 does not), no rules");
+  // the same answer however the rules or the goal are scaled
+  const box4 = k => [{ a: [k, 0], op: ">=", b: k }, { a: [0, k], op: ">=", b: 2 * k }, { a: [1, 0], op: "<=", b: 10 }, { a: [0, 1], op: "<=", b: 10 }];
+  ok([1, 1e-7, 1e7].every(k => { const o = LP.optimum({ sense: "min", c: [1, 1], rows: box4(k) }), s = LP.solve({ sense: "min", c: [1, 1], rows: box4(k) });
+       return o.status === "optimal" && o.x.join() === "1,2" && o.value === 3 && s.status === "optimal" && near(s.x, 1) && near(s.y, 2); }) &&
+     LP.optimum({ sense: "min", c: [1, 1], rows: box4(1e-7).slice(0, 2) }).x.join() === "1,2", "optimum and solve: rules scaled by 1e-7 or 1e7 give the same best plan (1, 2)");
+  ok(LP.optimum({ sense: "min", c: [1e-10, 0], rows: [] }).status === "unbounded" && LP.optimum({ sense: "min", c: [1e-10, 1e-10], rows: xy }).x.join() === "0,0" &&
+     LP.solve({ sense: "min", c: [-1e-10, 0], rows: xy }).status === "unbounded", "optimum and solve: a tiny nonzero goal is a goal (unbounded, or its best corner), never a non-finite plan");
   // rays: straight against the goal is tried
   ok(LP.rays([{ a: [1, 0], op: "<=", b: 1 }], [1, 0]).some(r => r[0] === -1 && r[1] === 0), "rays: with the goal given, −c is among the directions (half-plane region)");
   ok(LP.rays(xy).every(r => r[0] >= 0 && r[1] >= 0), "rays: the quadrant goes on only up and to the right");
@@ -175,7 +182,7 @@ function hour(o) {
   ok(both > 300 && same === both, `optimum and solve find the same unique best corner on ${same} of ${both} problems`);
   // optimum() on free variables (no x, y >= 0; a learner's rules may have no corner at all) against HiGHS: the same
   // status, and the same best value when there is one
-  let fAgree = 0, fN = 0, fOpen = 0;
+  let fAgree = 0, fN = 0, fOpen = 0, fLine = 0;
   for (let k = 0; k < 2000; k++) {
     const rows = [], nr = Math.floor(rnd() * 4), par = k % 4 === 0;   // every fourth problem: rules all parallel (no corner)
     const n0 = [Math.round(rnd() * 6 - 3), Math.round(rnd() * 6 - 3)];
@@ -184,18 +191,18 @@ function hour(o) {
       if (!a[0] && !a[1]) continue;
       rows.push({ id: "r" + j, a: a, op: ["<=", ">=", "<=", "="][Math.floor(rnd() * 4)], b: Math.round(rnd() * 200 - 100) });
     }
-    const cc = par && rnd() < 0.5 ? [Math.round(rnd() * 4 - 2) * n0[0], 0].map((v, i) => i ? v / (n0[0] || 1) * n0[1] : v) : [Math.round(rnd() * 12 - 6), Math.round(rnd() * 12 - 6)];
+    const sc = Math.round(rnd() * 4 - 2), cc = par && rnd() < 0.5 ? [sc * n0[0], sc * n0[1]] : [Math.round(rnd() * 12 - 6), Math.round(rnd() * 12 - 6)];   // half the parallel problems: a goal along the rules' normal
     const m = { sense: rnd() < 0.3 ? "max" : "min", c: cc, rows: rows };
     const o = LP.optimum(m), cons = rows.map(q => ({ name: q.id, terms: { x: q.a[0], y: q.a[1] }, [{ "<=": "le", ">=": "ge", "=": "eq" }[q.op]]: q.b }));
     if (!cons.length) cons.push({ name: "none", terms: { x: 0, y: 0 }, le: 1 });
     const b = core.solveWith(highs, { sense: m.sense, variables: [{ name: "x", cost: m.c[0], lb: -Infinity }, { name: "y", cost: m.c[1], lb: -Infinity }], constraints: cons }, {});
-    fN++; if (!LP.corners(rows).length && o.status !== "infeasible") fOpen++;
+    fN++; if (!LP.corners(rows).length && o.status !== "infeasible") fOpen++; if (!LP.corners(rows).length && rows.length && o.status === "optimal") fLine++;
     const ag = (o.status === "infeasible" && b.status === "infeasible") ||
       (o.status === "unbounded" && (b.status === "unbounded" || b.status === "infeasible-or-unbounded")) ||
       (o.status === "optimal" && b.status === "optimal" && near(o.value, b.objective, 1e-5 * (1 + Math.abs(b.objective))) && rows.every(q => LP.holds(q, o.x, 1e-4 * (1 + Math.abs(q.b)))));
     if (ag) fAgree++; else if (fN - fAgree <= 3) console.log("  free mismatch:", JSON.stringify(m), JSON.stringify(o), b.status, b.objective);
   }
-  ok(fAgree === fN && fOpen > 100, `optimum agrees with HiGHS on ${fAgree} of ${fN} random problems with free variables (${fOpen} feasible with no corner)`);
+  ok(fAgree === fN && fOpen > 100 && fLine > 30, `optimum agrees with HiGHS on ${fAgree} of ${fN} random problems with free variables (${fOpen} feasible with no corner, ${fLine} of them with a finite best along a line)`);
 
   // ---------------- CardSort: lesson 10's card sort and lesson 6's job sorter
   {

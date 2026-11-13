@@ -54,6 +54,16 @@ const code = s => s.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:"'])\/\/.*$/
     ok(!plainHost.querySelector(".lx-cs-terms"), "cardsort: no marks, no terms line");
   }
 
+  // ---------------------------------------------------------------- LX.Slider: values off its steps are reported
+  {
+    const E = env(); load("controls", E); const seen = [];
+    const sl = E.LX.Slider(E.LX.H("div", null, E.body), { label: "Test", min: 0, max: 100, step: 5, value: 12, onSnap: (a, b) => seen.push(a + "->" + b) });
+    ok(sl.val() === 10 && seen.join() === "12->10", "slider: a start value off its steps snaps and is reported (12 -> 10)");
+    sl.range(20, 40); sl.set(60); ok(sl.val() === 40 && seen.length === 1, "slider: a value on its steps clamped into the reachable band is not reported");
+    sl.set(58); ok(sl.val() === 40 && seen[1] === "58->40", "slider: an off-step value reports the value the slider holds (" + seen[1] + ")");
+    sl.set(125); ok(seen[2] === "125->40", "slider: a value outside min..max is reported");
+  }
+
   // ---------------------------------------------------------------- LX.Ledger
   {
     const E = env(); load("ledger", E);

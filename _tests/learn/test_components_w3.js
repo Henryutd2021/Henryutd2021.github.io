@@ -358,7 +358,8 @@ ok(/<td>Site<\/td><td class="n">Prairie Town home<\/td><td>one of: Prairie Town 
     ok(/\n## Appendix: evidence from the run\n/.test(AM) && AM.indexOf("### What the site cannot do alone") < AM.indexOf("## Appendix") && AM.indexOf("## Appendix") < AM.indexOf("### The plan"), "appendix (Markdown): a level-2 heading between the writing and the evidence");
     ok(/<h4 class="lx-rn-appx">Appendix: evidence from the run<\/h4>/.test(AH) && AH.indexOf("lx-rn-appx") < AH.indexOf("<h5>The plan</h5>"), "appendix (preview): its own heading before the evidence");
     ok((AO.match(/<ol class="lx-rn-outline">/g) || []).length === 2 && AO.indexOf("<b>What the site cannot do alone:</b>") < AO.indexOf("Appendix: evidence from the run") && AO.indexOf("Appendix") < AO.indexOf("<b>The plan:</b>"), "appendix (outline): two lists, the writing's then the evidence's");
-    ok(RN.compose(NOTE, WORDS, FIELDS, { date: "x" }) === T.replace(/2026-11-03/g, "x").replace(/^C0 · /, "") || !/APPENDIX/.test(RN.compose(NOTE, WORDS, FIELDS, { date: "x" })), "no appendix option: the note as before"); }
+    ok(RN.compose(NOTE, WORDS, FIELDS, { format: "text", date: "2026-11-03", code: "C0", appendix: null }) === T && RN.html(NOTE, WORDS, FIELDS, { date: "2026-11-03", code: "C0", appendix: "" }) === HT &&
+       RN.outlineHTML(FIELDS, {}) === OL, "no appendix option: the note, the preview and the outline exactly as before"); }
   // no claim of saving or sending: in the note, the messages and every string literal of the three components
   [T, M, W1, W2].forEach((t, i) => ok(!RN.CLAIMS.test(t), "the note claims no saving or sending (" + i + ")"));
   ["sharestate", "benchrun", "reportnote"].forEach(f => {

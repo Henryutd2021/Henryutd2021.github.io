@@ -40,7 +40,7 @@
       var list = q.querySelector(".lx-choices"), det = q.querySelector("details.lx-answer"), stem = q.querySelector(".lx-qtext");
       if (!list || !ans) return;
       if (stem && !stem.id) stem.id = LX.uid("qs");
-      var why = det ? whyHTML(det) : "";
+      var why = det ? whyHTML(det) : { first: "", rest: "" };
       var group = H("div", { class: "lx-qbtns", role: "group", "aria-labelledby": stem ? stem.id : null }, null);
       var fb = H("div", { class: "lx-qfb", "aria-live": "polite" }, null);
       var btns = Array.prototype.map.call(list.querySelectorAll("li"), function (li) {
