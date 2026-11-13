@@ -7,7 +7,9 @@ glossary:
     def: "Energy a store loses while it waits, used or not, such as heat leaking from a hot tank; it grows with time, unlike the loss of each charge and discharge."
   - id: long-duration-storage
     term: Long-duration storage
-    def: "Storage that can give its full power for about 10 hours or more; DOE splits it into inter-day (10 to 36 hours) and multi-day or week-long (36 to 160 hours) stores."
+    def: "Storage for extended discharge, including the Department of Energy's 2023 inter-day (10–36 hours) and multi-day or week-long (36–160 hours) categories, though definitions vary."
+    source-title: "Department of Energy, Long Duration Energy Storage Opportunities (July 27, 2023), slide 13"
+    source: "https://www.energy.gov/sites/default/files/2023-08/Pathways%20to%20Commercial%20Liftoff%20Long%20Duration%20Energy%20Storage%20Opportunities.pdf#page=13"
   - id: full-cycle
     term: Full cycle
     def: "Charging a store's usable energy once and discharging it once; two half charges and discharges count as one full cycle."

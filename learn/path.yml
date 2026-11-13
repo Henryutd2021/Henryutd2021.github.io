@@ -132,6 +132,7 @@
   scales: [S2]
 - kind: lesson
   id: 01-power-energy
+  teaches: ["Calculate energy from power and elapsed time", "Convert between common power and energy units", "Check an energy estimate using scale and bounds"]
   starter: 1
   form: cards
   icon: bolt
@@ -148,6 +149,7 @@
   scales: [S0]
 - kind: lesson
   id: 02-demand
+  teaches: ["Read daily and seasonal demand profiles", "Construct a load-duration curve by sorting hourly demand", "Explain how solar output changes net demand"]
   starter: 2
   form: cards
   icon: curve
@@ -232,6 +234,7 @@
   scales: [S2]
 - kind: lesson
   id: 07-cost
+  teaches: ["Calculate a levelized cost of electricity from capital and operating costs", "Compare how discount rates and fuel prices affect LCOE", "Explain why LCOE omits the timing and system value of electricity"]
   starter: 7
   form: cards
   icon: coin
@@ -248,6 +251,7 @@
   scales: [S0]
 - kind: lesson
   id: 08-merit-order
+  teaches: ["Find a clearing price from a supply stack and demand", "Explain how wind output and fuel prices change the merit order", "Distinguish scarcity prices from negative-price hours"]
   starter: 8
   form: cards
   icon: stairs
@@ -312,6 +316,7 @@
   scales: [S2]
 - kind: lesson
   id: 12-trade-offs
+  teaches: ["Identify dominated power plans", "Trace a cost-emissions frontier with a carbon cap", "Explain how a carbon price selects among competing plans"]
   starter: 12
   form: cards
   icon: frontier
@@ -328,6 +333,7 @@
   scales: [S2]
 - kind: lesson
   id: 13-capstone
+  teaches: ["Compare generation and storage plans in an illustrative capacity-expansion model", "Check hourly operation against a carbon cap", "Explain cost and emissions trade-offs and model limits"]
   starter: 13
   form: play
   icon: blueprint
@@ -368,6 +374,7 @@
   scales: [S0, S1, S2, S3, S4]
 - kind: lesson
   id: ck-f-estimate
+  teaches: ["Estimate an unfamiliar energy quantity with consistent units", "State a plausible range and its main uncertainty", "Check an estimate against an independent reference"]
   code: CK-F
   tier: foundations
   form: checkpoint
@@ -1165,6 +1172,7 @@
 # CK-A, the Analyst checkpoint. Prerequisites A1, A4, A13, A15.
 - kind: lesson
   id: ck-a-spreadsheet
+  teaches: ["Build an auditable solar-and-battery spreadsheet", "Distinguish costs and transfers within a stated boundary", "Test sensitivity and record assumptions and sources"]
   code: CK-A
   tier: analyst
   form: checkpoint
@@ -1555,6 +1563,7 @@
 # ---------- the Modeler checkpoint
 - kind: lesson
   id: ck-m-unseen-problem
+  teaches: ["Formulate an unfamiliar energy problem or analyze a supplied grid dataset", "Find a defect in a supplied capacity model", "Validate a result against an independent check"]
   code: CK-M
   tier: modeler
   form: checkpoint
@@ -1780,6 +1789,7 @@
 # the reader's own tools; its minutes are the page (the plan and the proposal), practice_minutes the study itself.
 - kind: lesson
   id: ck-r-defend-revise
+  teaches: ["Review an energy research proposal for inference and method limits", "Respond to a review and document revisions", "Check reproducibility by rerunning a result from a clean clone"]
   code: CK-R
   tier: researcher
   form: checkpoint

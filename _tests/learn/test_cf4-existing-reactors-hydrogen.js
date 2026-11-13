@@ -450,10 +450,10 @@ if (RP) {
 ok(RISK, "the scope scan's DENY_RISK read from its word lists");
 const SIDE = fs.readFileSync(path.join(SITE, "learn/_w1", ID + ".yml"), "utf8");
 const strings = o => typeof o === "string" ? [o] : Array.isArray(o) ? o.flatMap(strings) : o && typeof o === "object" ? Object.values(o).flatMap(strings) : [];
-const fm = (PAGE.match(/^---\n([\s\S]*?)\n---/) || ["", ""])[1].split("\n").map(l => (l.match(/^(?:title|subtitle|description): "(.*)"$/) || [])[1]).filter(Boolean);
+const fm = (PAGE.match(/^---\n([\s\S]*?)\n---/) || ["", ""])[1].split("\n").map(l => (l.match(/^(?:title|subtitle|description|pagetitle|description-meta): "(.*)"$/) || [])[1]).filter(Boolean);
 const ABBR = /(?:\b(?:U\.S|U\.K|e\.g|i\.e|et al|vs)|\b[A-Z])\.$/;
 const split = t => { const out = []; X.norm(t).split(/(?<=[.!?])\s+(?=[A-Z0-9"“(‘'])/).forEach(s => { if (out.length && ABBR.test(out[out.length - 1])) out[out.length - 1] += " " + s; else if (s) out.push(s); }); return out; };
-const GEN = [...PAGE.matchAll(/<script type="application\/(?:ld\+)?json"[^>]*>([\s\S]*?)<\/script>/g)].flatMap(m => { try { return strings(JSON.parse(m[1])); } catch (e) { return [m[1]]; } });
+const GEN = [...PAGE.matchAll(/<script type="application\/(?:ld\+)?json"[^>]*>([\s\S]*?)<\/script>/g)].flatMap(m => { try { return strings(JSON.parse(m[1])); } catch (e) { return [m[1]]; } }).filter(s => !/^https?:\/\/\S+$/.test(s)); // entity URLs are checked as links, not research prose
 ok(GEN.length > 10 && GEN.includes(TITLE), "the build's JSON-LD and lesson data on the page are read value by value (" + GEN.length + " strings)");
 const UNITS = X.elements(PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1:end -->/g, "").replace(/<!--[\s\S]*?-->/g, "").replace(/^---[\s\S]*?\n---\n/, "")).concat(GEN, fm, strings(D), JSSTR, [...SIDE.matchAll(/^    (?:term|def): "?(.*?)"?$/gm)].map(m => m[1]), [row]);
 const SENT = UNITS.flatMap(split);
@@ -469,7 +469,9 @@ ok(NUC.test("The study treats an existing reactor's capital as already spent (a 
 if (RG) {
   const NK = ["E15.1", "E15.2", "E15.3", "E15.4", "E15.5", "E15.11", "E15.12", "E15.13", "E15.19", "E15.26", "E15.29"], NROWS = NK.map(k => X.norm(RG.raw[k]));
   ok(Object.keys(RG.raw).filter(k => NUC.test(RG.raw[k])).join() === NK.join(), "the nuclear-term rows of the approved set are E15.1–E15.5, E15.11–E15.13, E15.19, E15.26 and E15.29 (E15.16 as revised names the plant): " + Object.keys(RG.raw).filter(k => NUC.test(RG.raw[k])).join(", "));
-  const OTHER = [TITLE, "F5 shows how a reactor makes heat and electricity."];
+  const OTHER = [TITLE, "F5 shows how a reactor makes heat and electricity.",
+    "Nuclear Hydrogen and Grid Services · CF4",
+    "Explore hydrogen production, dispatch and reserve headroom in an illustrative model of an existing reactor."]; // generic teaching metadata, no paper outcomes
   // names, not prose: the repository, its command and the lesson's own id; the path.yml row is checked field by field below
   const NAMES = /nuclear-hydrogen-integration|nuclear-h2|cf4[-_]existing[-_]reactors[-_]hydrogen(\.html|\.js|\.json)?/g;
   const withN = UNITS.filter(u => u !== row).flatMap(split).map(s => s.replace(NAMES, "")).filter(s => NUC.test(s) && !/^https?:/.test(s));

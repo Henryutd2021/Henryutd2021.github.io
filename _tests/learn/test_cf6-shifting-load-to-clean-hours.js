@@ -205,6 +205,7 @@ const APPROVED_SNAPSHOT = {   // the approved wording, E6 with the revisions aft
 // names the study, its author, its data or its method: such an element is research text unless approved or listed below
 const RX = /\b(stud(y|y's|ies)|paper|article|journal|Li et al|course author|excerpt|research|published|U\.S\. (grid )?regions|EIA's hourly|2023|load-regulation|regulating load|perfect foresight|binary variable|attributed emissions|strateg(y|ies))\b/i;
 const NOT_RESEARCH = [
+  [/^Explore load shifting with an illustrative dispatch model; distinguish average, marginal and attributed emissions\.$/, "generic teaching description, no study finding"],
   [/^\d · [A-Z][a-z ,]+$/, "part label"],
   [/^Question type: descriptive \(how much\?\), with a prescriptive part \(which strategy suits which grid\?\)\.$/, "course label (the course's question types)"],
   [/^(Grid electricity is cleaner in some hours than in others\.|If some electricity use moves into the cleaner hours, without using less in total, how much CO₂ does that save\?)$/, "the puzzle: a general idea; no study claim"],
@@ -290,7 +291,7 @@ const SRC_LI = [...SRC.matchAll(/<li>[\s\S]*?<\/li>/g)].map(m => m[0]);
 strict("page, sources", SRC_LI.filter(li => !TITLED.test(li)).map(norm));
 signalled("page", elements(REST.replace(/^---[\s\S]*?\n---\n/, " ")));
 const FM = (PAGE.match(/^---\n([\s\S]*?)\n---/) || [])[1] || "";
-signalled("front matter", [...FM.matchAll(/^(title|subtitle|description): "(.*)"$/gm)].map(m => m[2]));
+signalled("front matter", [...FM.matchAll(/^(title|subtitle|description|pagetitle|description-meta): "(.*)"$/gm)].map(m => m[2]));
 const PATHYML = fs.readFileSync(path.join(SITE, "learn/path.yml"), "utf8"), entry = (PATHYML.split(/\n- kind: /).find(e => new RegExp("\\n  id: " + ID + "\\n").test(e)) || "");
 ok(entry.length > 0, "path.yml has the entry");
 signalled("path.yml", [...entry.matchAll(/^  (title|subtitle|short|does|outcome): "(.*)"$/gm)].map(m => m[2]));

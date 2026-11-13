@@ -218,13 +218,17 @@ ok(X.approved(RG, cite) && X.norm(cite) === X.norm(RG.raw["E14.23"]), "the citat
 const desc = (PAGE.match(/^description: "Case file CF5 of Energy Systems, Step by Step\. ([^"]+)"/m) || [])[1] || "";
 ok(desc && X.norm(desc) === X.norm(RG.raw["E14.3"]), "the description's sentence is E14.3");
 // every other element that names the study or its method is approved, or one of these labels (the course's own words)
-const OTHER = [/^The toy below is the course's own, with illustrative numbers you set; it holds none of the study's inputs or results\.$/,
+const OTHER = [/^Cogeneration Boundaries and Steam Value · CF5$/, // generic teaching metadata, no paper outcomes
+  /^Explore cogeneration boundaries and diverted steam in an illustrative turbine and absorption-chiller model\.$/,
+  /^Where should a cogeneration study's boundary be drawn\?$/, // unchanged visible title
+  /^Follow one study's boundary through six parts, then move the line yourself around a toy steam plant and its load$/, // unchanged subtitle
+  /^The toy below is the course's own, with illustrative numbers you set; it holds none of the study's inputs or results\.$/,
   /^Illustrative round numbers you set: a generic steam plant and one load that needs power and cooling, not the study's inputs or results\.$/,
   /^Earlier lessons: /, /^A model that runs every hour/, /^One dated step: the accepted paper\.$/, /^(The study in time|Absorption chiller: MW of cooling per MW of steam heat)$/,
   /^ audits a study's boundary, baseline and counterfactual; $/];
 const own = sg => X.norm(sg) === X.norm(SHOWN24) || OTHER.some(re => re.test(sg)) || /toy|steam plant|Myth|Fact|absorption chiller|turbine/i.test(sg) && !/\b(study|paper|Li et al|ERCOT|reactor|refueling|Willans|SOS2|scenario runs)\b/i.test(sg);
 const rest = OWN.replace(caseHTML, "").replace(/<blockquote[\s\S]*?<\/blockquote>/g, "");
-X.elements(rest).map(X.norm).map(s => s.replace(/^2026 (· )?/, "").replace(/ Source: Li et al\. \(2026\), accepted paper, Energy Conversion and Management; DOI pending$/, "")).filter(s => RX.test(s))
+X.elements(rest).concat(X.frontmatter(PAGE).map(s => s.replace(/^Case file CF5 of Energy Systems, Step by Step\. /, ""))).map(X.norm).map(s => s.replace(/^2026 (· )?/, "").replace(/ Source: Li et al\. \(2026\), accepted paper, Energy Conversion and Management; DOI pending$/, "")).filter(s => RX.test(s))
   .forEach(sg => ok(X.approved(RG, sg) || /^Li et al\. \(2026\)\./.test(sg) && X.approved(RG, sg) || own(sg), "outside the case: approved wording or the course's own: " + sg.slice(0, 70)));
 const strings = (o, k) => typeof o === "string" ? [[k, o]] : o && typeof o === "object" ? Object.keys(o).flatMap(j => strings(o[j], j)) : [];
 const DATA = strings(D).filter(x => !["about", "built", "date", "id", "kind", "hour", "key", "color", "unit"].includes(x[0])).map(x => x[1]);

@@ -18,7 +18,7 @@ glossary:
     def: "A project folder together with its full history of commits, as kept by a version-control tool such as Git."
   - id: version-control
     term: Version control
-    def: "Keeping every saved state of a project's files, with who changed what and why, so any earlier state can be compared or brought back."
+    def: "Keeping selected recorded versions of a project's files, with who changed what and why, so any recorded version can be compared or brought back."
   - id: checksum
     term: Checksum
     def: "A short fingerprint computed from a file's bytes, such as SHA-256, that changes if even one byte of the file changes."
