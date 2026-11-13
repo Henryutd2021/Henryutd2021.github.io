@@ -126,8 +126,8 @@ ok(keys.length === 2 && keys.every(k => k === "excerpt:code"), "the only excerpt
 // the page's own links (the generated header, next box and footer are the course build step's and checked by the scope scan)
 const OWN = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?<!-- learn:\1:end -->/g, "");
 const hrefs = [...OWN.matchAll(/href="([^"]+)"/g)].map(m => m[1]);
-ok(hrefs.every(h => h === "https://github.com/Henryutd2021/code-delayed-energization" || /^https:\/\/www\.energy\.gov\//.test(h) || /^[0-9a-z-]+\.html$/.test(h) || /^#/.test(h)),
-  "links: energy.gov, the allow-listed repository and learn pages only");
+ok(hrefs.every(h => h === "../files/papers/li2026code.html" || h === "https://github.com/Henryutd2021/code-delayed-energization" || /^https:\/\/www\.energy\.gov\//.test(h) || /^[0-9a-z-]+\.html$/.test(h) || /^#/.test(h)),
+  "links: the paper page, energy.gov, the allow-listed repository and learn pages only");
 ok(!/projects\/|research\.html/.test(PAGE), "no project page and no Research page");
 ok(TL.validate(D.timeline.events).length === 0, "every timeline event has a valid date and a source");
 
@@ -165,6 +165,7 @@ const APPROVED_SNAPSHOT = {   // the approved wording, E7 with the revisions aft
 // names the study, its author, its case or its method: such an element is research text unless approved or listed below
 const RX = /\b(stud(y|y's|ies)|paper|article|NAPS|Li et al|course author|excerpt|research|published|accepted|300 MW-IT|36-month|0\.7 billion|ledgers?|Latin hypercube|framework|exogenous|net-benefit test|staged (service|energization))\b/i;
 const NOT_RESEARCH = [
+  [/^Paper page and citation$/, "navigation label"],
   [/^\d · [A-Z][a-z ,]+$/, "part label"],
   [/^Question type: descriptive \(how much, and for whom\?\)\.$/, "course label (the course's question types)"],
   [/^(A large new load, such as a data center or a factory, is ready to run, but its grid service will not start for months\.|What does the wait cost, and who pays\?)$/, "the puzzle: a general idea; no study claim"],

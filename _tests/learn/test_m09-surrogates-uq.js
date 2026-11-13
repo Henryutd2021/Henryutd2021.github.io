@@ -281,9 +281,9 @@ function finish() {
   ok(!/nuclear|reactor|\bSMR\b|small modular|fission|uranium/i.test(ALL), "no nuclear term on the page, in the data, the script, the sidecar or the notebook");
   ok(!/\bAI\b|artificial intelligence/.test(ALL), "no 'AI' anywhere");
   ok(!/\bFOAK\b|\bNOAK\b|first[- ]of[- ]a[- ]kind|learning[- ](curve|rate)|order[- ]book|anchor[- ](customer|buyer)|subsidy[- ]free|smr-dc|projects\/|research\.(html|qmd)/i.test(ALL), "no deny-listed term");
-  const OKH = h => /^https:\/\/doi\.org\/10\./.test(h) || h === "https://gaussianprocess.org/gpml/" || /^https:\/\/github\.com\/Henryutd2021\/(mfgpr-wind-power-curve|wind-uq-surrogate)$/.test(h) || /^(\.\.\/assets\/learn\/data\/[a-z0-9-]+\.json|notebooks\/[a-z0-9-]+\.ipynb|[0-9a-z-]+\.html(#[a-z0-9-]+)?)$/.test(h);
+  const OKH = h => h === "../files/papers/li2023multi.html" || /^https:\/\/doi\.org\/10\./.test(h) || h === "https://gaussianprocess.org/gpml/" || /^https:\/\/github\.com\/Henryutd2021\/(mfgpr-wind-power-curve|wind-uq-surrogate)$/.test(h) || /^(\.\.\/assets\/learn\/data\/[a-z0-9-]+\.json|notebooks\/[a-z0-9-]+\.ipynb|[0-9a-z-]+\.html(#[a-z0-9-]+)?)$/.test(h);
   const hrefs = [...OWN.matchAll(/href="([^"]+)"/g)].map(m => m[1]).concat([...NB.matchAll(/https?:\/\/[^\s"'<>)\]]+/g)].map(m => m[0]), [...PAGE.matchAll(/\]\(([^)]+)\)/g)].map(m => m[1]));
-  ok(hrefs.length > 5 && hrefs.every(OKH), "links: learn pages, downloads, doi.org, gaussianprocess.org and the two repositories only: " + hrefs.filter(h => !OKH(h)).join(" "));
+  ok(hrefs.length > 5 && hrefs.every(OKH), "links: the paper page, learn pages, downloads, doi.org, gaussianprocess.org and the two repositories only: " + hrefs.filter(h => !OKH(h)).join(" "));
   const keys = [...PAGE.matchAll(/data-source="([^"]+)"/g)].map(m => m[1]);
   ok(keys.length === 3 && keys.filter(k => k === "excerpt:uq-mfgpr").length === 2 && keys.filter(k => k === "excerpt:wind-uq").length === 1, "excerpt keys: uq-mfgpr twice, wind-uq once");
   ok(!/Feng|Zhang|Sun, M|Chartan|Hodge/.test(ALL), "no collaborator names from the repositories' READMEs");
@@ -309,6 +309,7 @@ function researchWording(entry) {
   ok(R.ack, "the acknowledgement sentence is in the approved wording");
   const RX = /\b(the study|study's|paper|article|IDETC|Li et al|course author|excerpt|research project|SDWPF|SCADA|kernel density|nine test turbines|DOE|funding|plants? (with|without) (power )?measurements|held-out plants)\b/i;
   const NOT_RESEARCH = [
+    [/^Paper page and citation$/, "navigation label"],
     [/^Where this came up in research$/, "heading"],
     [/^From: Li et al\., ASME IDETC 2023\.$/, "provenance label (E12.16's short citation, as E1's)"],
     [/^This page's turbine is a toy: invented round numbers, not the studies' data, equations or results\.$/, "provenance of the toy"],

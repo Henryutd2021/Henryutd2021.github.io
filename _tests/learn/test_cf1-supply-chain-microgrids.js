@@ -161,6 +161,7 @@ const APPROVED_SNAPSHOT = {   // the approved wording, E8 (E8.11-E8.12 not used)
 // names a study, its author, its site or its method: such an element is research text unless approved or listed below
 const RX = /\b(stud(y|y's|ies|ies')|paper|article|journal|Li et al|course author|excerpt|research|published|supply chains?|factor(y|ies)|warehouses?|facilit(y|ies)|transactive|California|Arizona|Nevada|chance constraint|service level|stylized|synthetic|mixed-integer|SEGRE|Applied Mathematical Modelling|three-tier|two-tier|logistics)\b/i;
 const NOT_RESEARCH = [
+  [/^Paper page and citation$/, "navigation label"],
   [/^Factory Siting with Microgrids · CF1$/, "generic teaching title, no study finding"],
   [/^Explore factory siting, logistics and electricity trading with an illustrative supply-chain and microgrid model\.$/, "generic teaching description, no study finding"],
   [/^\d · [A-Z][a-z ,]+$/, "part label"],
@@ -288,8 +289,8 @@ if (RP) {
 // ---------------- links and sources
 const OWN2 = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?<!-- learn:\1:end -->/g, "");
 const hrefs2 = [...OWN2.matchAll(/href="([^"]+)"/g)].map(m => m[1]).concat([...OWN2.matchAll(/\]\(([^)]+)\)/g)].map(m => m[1]));
-ok(hrefs2.every(h => /^https:\/\/doi\.org\/10\./.test(h) || h === "https://github.com/Henryutd2021/supply-chain-microgrid-models" || h === "https://www.eia.gov/electricity/gridmonitor/" || /^[0-9a-z-]+\.html$/.test(h) || /^\.\.\/assets\//.test(h) || /^#/.test(h)),
-  "links: doi.org, the allow-listed repository, EIA and learn pages only: " + hrefs2.filter(h => !/^(https:\/\/doi\.org|\.\.\/|#|[0-9a-z-]+\.html$)/.test(h)).join(", "));
+ok(hrefs2.every(h => h === "../files/papers/li2023facility.html" || /^https:\/\/doi\.org\/10\./.test(h) || h === "https://github.com/Henryutd2021/supply-chain-microgrid-models" || h === "https://www.eia.gov/electricity/gridmonitor/" || /^[0-9a-z-]+\.html$/.test(h) || /^\.\.\/assets\//.test(h) || /^#/.test(h)),
+  "links: the paper page, doi.org, the allow-listed repository, EIA and learn pages only: " + hrefs2.filter(h => !/^(https:\/\/doi\.org|\.\.\/|#|[0-9a-z-]+\.html$)/.test(h)).join(", "));
 ok(!/projects\/|research\.html/.test(PAGE + RAW), "no project page and no Research page");
 ok(TL.validate(D.timeline.events).length === 0 && D.timeline.events.every(e => e.source && e.source.label), "every timeline event has a valid date and a source");
 ok(D.timeline.events.filter(e => /doi\.org/.test((e.source || {}).url || "")).every(e => hrefs2.indexOf(e.source.url) >= 0), "every study in the timeline is in the sources list");

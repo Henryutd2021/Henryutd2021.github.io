@@ -165,8 +165,8 @@ ok(keys.length === 1 && keys[0] === "excerpt:ghg", "the only excerpt key is exce
 // the page's own links (the generated header, next box and footer are the course build step's and checked by the scope scan)
 const OWN = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?<!-- learn:\1:end -->/g, "");
 const hrefs = [...OWN.matchAll(/href="([^"]+)"/g)].map(m => m[1]);
-ok(hrefs.every(h => /^https:\/\/doi\.org\/10\./.test(h) || h === "https://github.com/Henryutd2021/ghg-load-regulation" || h === "https://www.eia.gov/electricity/gridmonitor/" || /^[0-9a-z-]+\.html$/.test(h) || /^#/.test(h)),
-  "links: doi.org, EIA, the allow-listed repository and learn pages only");
+ok(hrefs.every(h => h === "../files/papers/li2025ghg.html" || /^https:\/\/doi\.org\/10\./.test(h) || h === "https://github.com/Henryutd2021/ghg-load-regulation" || h === "https://www.eia.gov/electricity/gridmonitor/" || /^[0-9a-z-]+\.html$/.test(h) || /^#/.test(h)),
+  "links: the paper page, doi.org, EIA, the allow-listed repository and learn pages only");
 ok(!/projects\/|research\.html/.test(PAGE), "no project page and no Research page");
 ok(!/\bnuclear\b/i.test(T), "the page text never names the town's flat plant's technology (it needs no mention here)");
 ok(TL.validate(D.timeline.events).length === 0, "every timeline event has a valid date and a source");
@@ -205,6 +205,7 @@ const APPROVED_SNAPSHOT = {   // the approved wording, E6 with the revisions aft
 // names the study, its author, its data or its method: such an element is research text unless approved or listed below
 const RX = /\b(stud(y|y's|ies)|paper|article|journal|Li et al|course author|excerpt|research|published|U\.S\. (grid )?regions|EIA's hourly|2023|load-regulation|regulating load|perfect foresight|binary variable|attributed emissions|strateg(y|ies))\b/i;
 const NOT_RESEARCH = [
+  [/^Paper page and citation$/, "navigation label"],
   [/^Explore load shifting with an illustrative dispatch model; distinguish average, marginal and attributed emissions\.$/, "generic teaching description, no study finding"],
   [/^\d · [A-Z][a-z ,]+$/, "part label"],
   [/^Question type: descriptive \(how much\?\), with a prescriptive part \(which strategy suits which grid\?\)\.$/, "course label (the course's question types)"],

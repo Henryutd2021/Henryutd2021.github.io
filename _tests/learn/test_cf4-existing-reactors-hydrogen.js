@@ -333,7 +333,7 @@ const RG = { units: Object.values(EFF).map(X.norm), raw: EFF };
   ok(Object.keys(joined).join() === "E15.2,E15.5,E15.6,E15.7,E15.8,E15.9,E15.10,E15.24", "the structured rows: E15.2 in part 1, E15.5–E15.7 in part 3, E15.8–E15.10 in part 4, E15.24 under the excerpt");
   Object.keys(joined).forEach(k => ok(X.norm(joined[k].join(" ")) === X.norm(RG.raw[k]), k + " split into list items keeps every word in order"));
   // every text element of the case is E15 wording or one of these labels
-  const LABELS = [/^\d · (The puzzle|The question in one sentence|Scale and boundary|Decisions, goal and rules, in words|Data and method|What came out, and where it holds)$/,
+  const LABELS = [/^Paper page and citation$/, /^\d · (The puzzle|The question in one sentence|Scale and boundary|Decisions, goal and rules, in words|Data and method|What came out, and where it holds)$/,
     /^So can an existing plant earn more by making hydrogen as well as power\?$/, /^Question type: prescriptive \(what should be added, and how should it run\?\)\.$/,
     /^Detail(What the equipment can do, and the two cases|From one year to a lifetime|Sensitivity runs)$/, /^(The pressure|The option|The open question)$/];
   const segs = X.elements(caseHTML.replace(SPLIT, "")).map(X.norm).filter(Boolean);
@@ -489,8 +489,8 @@ const ALL45 = ALL.replace(/<[^>]+>/g, "").replace(/without capacity payments or 
 ok(!/\b45[UVY]\b|\b48E\b|MACRS|greenfield|new[- ]plant|new[- ]build|Cases? [34]\b|subsidy|profitab|without (policy|subsid|credit)|PJM|Data Miner|market data/i.test(ALL45), "no other credit name, no new-plant case, no 'without policy support' or 'profitable', no PJM or market-data wording (credit and nuclear scope)");
 ok(!/data[- ]?cent|hyperscale|\bcampus\b|colocat|small modular|\bSMR\b|\bAI\b|artificial intelligence/i.test(ALL), "no data-center or small-modular wording, no AI wording");
 const hrefs = [...PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1:end -->/g, "").matchAll(/(?:href|src)="([^"]+)"/g)].map(m => m[1]).concat([...PAGE.matchAll(/\]\(([^)]+)\)/g)].map(m => m[1]), strings(D).filter(s => /^https?:/.test(s)));
-const HOK = h => h === DOI || h === REPO || h === REPO + "#quick-start" || /^[0-9a-z-]+\.html$/.test(h) || /^\.\.\/assets\/learn\//.test(h);
-ok(hrefs.every(HOK), "links: the paper's DOI, the allow-listed repository (and its README's Quick start), learn pages and the lesson's own assets only: " + hrefs.filter(h => !HOK(h)).join(", "));
+const HOK = h => h === "../files/papers/Li2026.html" || h === DOI || h === REPO || h === REPO + "#quick-start" || /^[0-9a-z-]+\.html$/.test(h) || /^\.\.\/assets\/learn\//.test(h);
+ok(hrefs.every(HOK), "links: the paper page, the paper's DOI, the allow-listed repository (and its README's Quick start), learn pages and the lesson's own assets only: " + hrefs.filter(h => !HOK(h)).join(", "));
 { const oc2 = (PAGE.match(/<p class="lx-eyebrow">With open code<\/p>([\s\S]*?)<\/div>/) || [])[1] || "";
   ok(oc2.includes('<a href="' + REPO + '#quick-start">Quick start</a>') && oc2.indexOf("Set it up first") < oc2.indexOf("<code>") && /Each run writes revenue_musd_per_yr\.csv and summary\.json into its --out-dir folder\. Compare the revenue tables, and grid_output_range_mw under "flexibility" in summary\.json/.test(X.norm(oc2)), "part 7: how to set up first (the README's Quick start), and which outputs to compare"); }
 ok(!/projects\/|research\.(html|qmd)|npph2|arxiv|explainers\//i.test((PAGE.replace(/<!--[\s\S]*?-->/g, "") + JS + JSON.stringify(D)).replace(/data-source="excerpt:npph2-existing"/, "")), "no project page, no Research page, no explainer, no preprint");

@@ -177,7 +177,7 @@ const exSteps = [...PAGE.matchAll(/<ol class="ex-fallback[^"]*">([\s\S]*?)<\/ol>
 ok(exSteps.length === 4 && exSteps.every(approved), "the explainer's no-JS steps are E3.14, sentence by sentence");
 // any element that names a study, a paper, its author or method must be approved, or one of these labels
 const RX = /\b(stud(y|ies)|paper|Li et al|course author|excerpt|ERCOT|West Texas|optimizer|stochastic|weather zones?)\b/i;
-const LABELS = [/^From: Li et al\. \(20\d\d\), (International Journal of Hydrogen Energy|EEM 2023)\.$/, /^A separate example with stylized numbers, from the course author's open explainer: not the study's data or results\.$/,
+const LABELS = [/^Paper page and citation$/, /^From: Li et al\. \(20\d\d\), (International Journal of Hydrogen Energy|EEM 2023)\.$/, /^A separate example with stylized numbers, from the course author's open explainer: not the study's data or results\.$/,
   /^Li et al\. \(20\d\d\)\. .+\.$/, /^Case file CF2: when the cost per kilogram and the cost of the system disagree\.$/, /^Case file CF2 tells a published study's version\.$/];
 const OWN = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1:end -->/g, "").replace(/<!--[\s\S]*?-->/g, "").replace(/^---[\s\S]*?\n---\n/, "");
 const elems = OWN.replace(/^- (.*)$/gm, "<li>$1</li>").split(/<\/?(?:p|li|ul|ol|dl|dt|dd|div|blockquote|footer|table|thead|tbody|tr|td|th|summary|details|h[1-6]|header|script)\b[^>]*>/i).map(norm).filter(s => /[A-Za-z]/.test(s));
@@ -194,7 +194,7 @@ ok(!NUC.test(OWN + JS + JSON.stringify(D)), "no nuclear term and no nuclear-to-h
 ok(!/\bAI\b|data cent/i.test(PAGE + JS), "no AI wording, no data centers");
 const hrefs = [...OWN.matchAll(/href="([^"]+)"/g)].map(m => m[1]);
 const ALLOW = /^(https:\/\/(doi\.org|www\.eia\.gov|www\.energy\.gov|www\.hydrogen\.energy\.gov|afdc\.energy\.gov|www\.iea\.org|www\.irena\.org|ergo-code\.github\.io)\/|[0-9a-z-]+\.html|\.\.\/assets\/|#)/;
-ok(hrefs.every(h => ALLOW.test(h)), "links only to allowed domains and learn pages: " + hrefs.filter(h => !ALLOW.test(h)).join(", "));
+ok(hrefs.every(h => h === "../files/papers/li2023techno.html" || h === "../reference-data/hydrogen.html" || ALLOW.test(h)), "links only to the listed paper/handbook pages, allowed domains and learn pages: " + hrefs.filter(h => !(h === "../files/papers/li2023techno.html" || h === "../reference-data/hydrogen.html" || ALLOW.test(h))).join(", "));
 const stepTexts = (JS.match(/\{ text: "([^"]+)"/g) || []).map(s => s.slice(9, -1));
 ok(stepTexts.length === 7 && stepTexts.every(t => t.split(/\s+/).length <= 40), "seven step texts of 40 words at most");
 // review 11: every element of the page's own text stays within budget; the data note is three entries (farm, costs, boundary)

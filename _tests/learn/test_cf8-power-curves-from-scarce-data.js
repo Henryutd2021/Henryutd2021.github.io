@@ -172,7 +172,7 @@ if (R) {
   ok(X.norm((PAGE.match(/<ol class="ex-fallback lx-ex-static">([\s\S]*?)<\/ol>/) || [])[1].replace(/<\/li>/g, " ")) === X.norm(R.raw["E12.11"]), "the explainer's no-JS text: E12.11");
   // every other sentence that could be about the studies
   const RX = /\b(the study|study's|paper|article|IDETC|Li et al|course author|excerpt|research project|SDWPF|SCADA|kernel density|nine|plants? (with|without) (power )?measurements|held-out plants|multi-fidelity|surrogate)\b/i;
-  const NOT = [[/^From: Li et al\., ASME IDETC 2023\.$/, "provenance"], [/^A separate example with synthetic numbers, from the course author's open explainer: not the study's data or results\.$/, "explainer label, as CF2's"],
+  const NOT = [[/^Paper page and citation$/, "navigation label"], [/^From: Li et al\., ASME IDETC 2023\.$/, "provenance"], [/^A separate example with synthetic numbers, from the course author's open explainer: not the study's data or results\.$/, "explainer label, as CF2's"],
     [/^The toy below uses lesson M9's illustrative turbine\.$/, "data note"],
     [/^Related project · uncertainty at plants without measurements$/, "heading"], [/^Question and method only: no results\.$/, "label"], [/^(mfgpr-wind-power-curve|wind-uq-surrogate): public example repository · MIT license · synthetic data\.$/, "repository label"],
     [/^Question type: predictive \(what power, with what uncertainty\?\), with an evaluative part \(better than records alone\?\)\.$/, "the course's question type"],
@@ -207,8 +207,8 @@ ok(!/\bAI\b|artificial intelligence/.test(ALL), "no 'AI'");
 ok(!/Feng|Zhang|Sun, M|Chartan|Hodge|NREL\b/.test(ALL), "no co-author name and no lab acronym (the acknowledgement names the laboratory in full, as approved)");
 ok(!/\bFOAK\b|\bNOAK\b|learning[- ](curve|rate)|projects\/|research\.(html|qmd)/i.test(ALL), "no deny-listed term, no project or Research page");
 const hrefs = [...OWN.matchAll(/\s(?:href|src)="([^"]+)"/g)].map(m => m[1]).concat(D.timeline.events.map(e => e.source.url));
-const OKH = h => /^https:\/\/doi\.org\/10\./.test(h) || /^https:\/\/github\.com\/Henryutd2021\/(mfgpr-wind-power-curve|wind-uq-surrogate)$/.test(h) || /^(\.\.\/assets\/(learn|explainers)\/[a-z0-9/-]+\.(js|json)|[0-9a-z-]+\.html)$/.test(h);
-ok(hrefs.every(OKH), "links: doi.org, the two repositories, learn pages and the page's scripts only: " + hrefs.filter(h => !OKH(h)).join(" "));
+const OKH = h => h === "../files/papers/li2023multi.html" || /^https:\/\/doi\.org\/10\./.test(h) || /^https:\/\/github\.com\/Henryutd2021\/(mfgpr-wind-power-curve|wind-uq-surrogate)$/.test(h) || /^(\.\.\/assets\/(learn|explainers)\/[a-z0-9/-]+\.(js|json)|[0-9a-z-]+\.html)$/.test(h);
+ok(hrefs.every(OKH), "links: the paper page, doi.org, the two repositories, learn pages and the page's scripts only: " + hrefs.filter(h => !OKH(h)).join(" "));
 ok(/<script src="\.\.\/assets\/learn\/learn\.js" defer><\/script>\n<script src="\.\.\/assets\/learn\/cf8-power-curves-from-scarce-data\.js" defer><\/script>/.test(PAGE) && !/<script src="[^"]*m09-surrogates-uq\.js"/.test(PAGE), "LX.M9 comes with the bundle (components/gp.js); the page loads no other lesson's script");
 const PY = fs.readFileSync(path.join(SITE, "learn/path.yml"), "utf8"), entry = PY.split(/\n- kind: /).find(x => new RegExp("\\n  id: " + ID + "\\n").test(x)) || "";
 ok(/\n  form: case\n/.test(entry) && /\n  tier: analyst\n/.test(entry) && /\n  minutes: 10\n/.test(entry) && /after: \[5\]/.test(entry) && /\n  status: upcoming\n/.test(entry) === /_drafts/.test(QPATH), "path.yml: a case, Analyst tier, 10 minutes, after lesson 5; upcoming while a draft");

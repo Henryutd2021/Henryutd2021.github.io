@@ -247,7 +247,7 @@ const KEYS = ["nuclear", "wind", "solar"];
   const own = QMD.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1:end -->/g, "");
   const ALLOW = /^(https:\/\/(www\.|docs\.)?(eia\.gov|energy\.gov|ferc\.gov|nerc\.com|nrel\.gov|nlr\.gov|doi\.org)\/|https:\/\/github\.com\/Henryutd2021\/mfgpr-wind-power-curve|#|\.\.\/assets\/|[0-9a-z-]+\.(qmd|html)(#[a-z0-9-]*)?$)/;
   let nl = 0;
-  for (const h of own.matchAll(/href="([^"]+)"|\]\(([^)]+)\)/g)) { const u = h[1] || h[2]; nl++; ok(ALLOW.test(u), `link on the allow-list: ${u}`); }
+  for (const h of own.matchAll(/href="([^"]+)"|\]\(([^)]+)\)/g)) { const u = h[1] || h[2]; nl++; ok(u === "../files/papers/li2023multi.html" || ALLOW.test(u), `link on the allow-list: ${u}`); }
   ok(nl >= 10 && !/creativecommons|opensource/.test(own), `${nl} lesson links checked; no licence domains in the lesson's own content`);
 }
 

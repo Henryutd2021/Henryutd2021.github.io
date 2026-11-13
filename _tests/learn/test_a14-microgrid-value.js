@@ -165,7 +165,7 @@ ok(D.texts.ownersNote.split(" ").length <= 40 && D.texts.tableCaption.split(" ")
 const OWN = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?<!-- learn:\1:end -->/g, "");
 const hrefs = [...OWN.matchAll(/href="([^"]+)"/g)].map(m => m[1]).concat([...OWN.matchAll(/\]\(([^)]+)\)/g)].map(m => m[1]));
 const OKH = /^(https:\/\/doi\.org\/10\.|https:\/\/www\.eia\.gov\/|https:\/\/www\.energy\.gov\/|https:\/\/www\.ferc\.gov\/|https:\/\/eta-publications\.lbl\.gov\/|[0-9a-z-]+\.html$|\.\.\/assets\/|#)/;
-ok(hrefs.length > 0 && hrefs.every(h => OKH.test(h)), "links: doi.org, EIA, DOE, FERC, Berkeley Lab and learn pages only: " + hrefs.filter(h => !OKH.test(h)).join(", "));
+ok(hrefs.length > 0 && hrefs.every(h => h === "../files/papers/li2023facility.html" || OKH.test(h)), "links: the paper page, doi.org, EIA, DOE, FERC, Berkeley Lab and learn pages only: " + hrefs.filter(h => !(h === "../files/papers/li2023facility.html" || OKH.test(h))).join(", "));
 ok(!/projects\/|research\.html/.test(PAGE + JSON.stringify(D)), "no project page and no Research page");
 // CF1's link follows its status in path.yml: linked once live, named only while it is a draft
 const PY = fs.readFileSync(path.join(SITE, "learn/path.yml"), "utf8"), cf1 = (PY.split(/\n- kind: /).find(e => /\n  id: cf1-supply-chain-microgrids\n/.test(e)) || "");
@@ -186,6 +186,7 @@ const APPROVED_SNAPSHOT = {   // the approved wording's E8.4, E8.6 and E8.7 (app
 };
 const RX = /\b(course author|research|stud(y|ies)|paper|article|Li et al|excerpt|internship|confidential|supply chains?|factor(y|ies)|warehouses?|transactive|Applied Mathematical Modelling|SEGRE|California|Arizona|Nevada|synthetic|techno-economic|facilit(y|ies))\b/i;
 const NOT_RESEARCH = [
+  [/^Paper page and citation$/, "navigation label"],
   [/^From: Li et al\. \(2023\), Applied Mathematical Modelling\.$/, "provenance label"],
   [/^In the real world$/, "heading"],
   [/^The full case: case file CF1( \(upcoming\))?\.$/, "pointer to the case file"],

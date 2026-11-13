@@ -62,7 +62,8 @@ twitter-card: {"description": "Compare forecast-based and scenario-weighted hydr
 <blockquote class="lx-excerpt" data-source="excerpt:txh2"><p>When gas-fired backup power became much more expensive, the model built fuel cells and turned stored green hydrogen back into electricity.</p><p>Industry then drew more hydrogen from gas reformers, and the round trip from power to hydrogen and back lost energy, so total emissions rose although gas-plant emissions fell.</p><p>Electrolyzers and hydrogen tanks, combined with hydrogen transport between zones, could meet most of the hydrogen demand in certain zones.</p><p>Across ERCOT, renewable (green) hydrogen covered only a few percent of industrial hydrogen demand; reformer hydrogen remained the main supply.</p><footer>From: Li et al. (2025), <a href="https://doi.org/10.1016/j.ijhydene.2025.02.303">International Journal of Hydrogen Energy</a>.</footer></blockquote>
 <p class="lx-hint">Inputs reflect 2022–2023 conditions; post-2023 federal hydrogen credit rules are not modeled.</p>
 <p class="lx-hint">Holds when: ERCOT's eight weather zones, inputs from 2022–2023, and hydrogen demand held fixed; the emissions result comes from runs in which power from gas-fired plants became more expensive.</p>
-<p class="lx-hint">Leaves out: post-2023 federal hydrogen credit rules; truck and rail transport.</p></div>
+<p class="lx-hint">Leaves out: post-2023 federal hydrogen credit rules; truck and rail transport.</p>
+<p class="lx-hint"><a href="../files/papers/li2025hydrogen.html">Paper page and citation</a></p></div>
 </div>
 <div class="lx-interactive" data-learn="cf3" data-src="../assets/learn/data/cf3-hydrogen-under-uncertainty.json ../assets/learn/data/f01-five-scales.json">
 <div class="lx-fallback">

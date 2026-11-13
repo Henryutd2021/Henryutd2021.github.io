@@ -132,7 +132,7 @@ const keys = [...PAGE.matchAll(/data-source="([^"]+)"/g)].map(m => m[1]);
 ok(keys.length === 1 && keys[0] === "excerpt:txh2", "one excerpt, from excerpt:txh2");
 const OWN = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?<!-- learn:\1:end -->/g, "");
 const hrefs = [...OWN.matchAll(/href="([^"]+)"/g)].map(m => m[1]);
-ok(hrefs.every(h => /^https:\/\/doi\.org\/10\./.test(h) || h === "https://github.com/Henryutd2021/txh2-ercot-hydrogen" || h === D8.blocks.source.url || h === I.cfSource.url || /^[0-9a-z-]+\.html$/.test(h) || /^\.\.\/assets\//.test(h) || /^#/.test(h)), "links: doi.org, the allow-listed repository and learn pages only");
+ok(hrefs.every(h => h === "../files/papers/li2025hydrogen.html" || /^https:\/\/doi\.org\/10\./.test(h) || h === "https://github.com/Henryutd2021/txh2-ercot-hydrogen" || h === D8.blocks.source.url || h === I.cfSource.url || /^[0-9a-z-]+\.html$/.test(h) || /^\.\.\/assets\//.test(h) || /^#/.test(h)), "links: the paper page, doi.org, the allow-listed repository and learn pages only");
 ok(!/projects\/|research\.html/.test(PAGE + JS) && /assets\/explainers\/txh2\.js/.test(PAGE) && !/explainers\/(?!common|txh2)/.test(PAGE), "no project page and no Research page; only the allow-listed txh2 explainer");
 ok(TL.validate(D.timeline.events).length === 0 && D.timeline.events.every(e => e.source && e.source.label), "every timeline event has a valid date and a source");
 ok(!/\bSMR\b|nuclear|reactor|small modular|131 tons|1,300 tons|92\.4%|310 kilotons|Zhang/i.test(PAGE + JS + JSON.stringify(D)), "no reformer abbreviation, no nuclear term, none of the abstract's withdrawn numbers, no co-author");
@@ -174,6 +174,7 @@ const APPROVED_SNAPSHOT = {   // the approved wording, E10 and E11
 // names a study, its author, its region or its method: such an element is research text unless approved or listed below
 const RX = /\b(stud(y|y's|ies)|paper|article|journal|Li et al|course author|excerpt|research|published|ERCOT|Texas|Gulf Coast|weather zones?|nine scenarios|completion rates?|scenarios|framework)\b/i;
 const NOT_RESEARCH = [
+  [/^Paper page and citation$/, "navigation label"],
   [/^\d · [A-Z][a-z ,]+$/, "part label"],
   [/^Question type: prescriptive \(what should be built, where, and how should it run\?\)\.$/, "course label (the course's question types)"],
   [/^From: Li et al\. \(2025\), International Journal of Hydrogen Energy\.$/, "provenance label"],

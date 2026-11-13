@@ -122,8 +122,8 @@ ok(keys.length === 3 && keys.every(k => allowed.indexOf(k) >= 0), "excerpts use 
 // the page's own links (the generated header, next box and footer are the course build step's and checked by the scope scan)
 const OWN = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?<!-- learn:\1:end -->/g, "");
 const hrefs = [...OWN.matchAll(/href="([^"]+)"/g)].map(m => m[1]);
-ok(hrefs.every(h => /^https:\/\/doi\.org\/10\./.test(h) || h === "https://github.com/Henryutd2021/reopt-hydrogen-framework" || /^[0-9a-z-]+\.html$/.test(h) || /^\.\.\/assets\//.test(h) || /^#/.test(h)),
-  "links: doi.org, the allow-listed repository and learn pages only");
+ok(hrefs.every(h => h === "../files/papers/li2024towards.html" || /^https:\/\/doi\.org\/10\./.test(h) || h === "https://github.com/Henryutd2021/reopt-hydrogen-framework" || /^[0-9a-z-]+\.html$/.test(h) || /^\.\.\/assets\//.test(h) || /^#/.test(h)),
+  "links: the paper page, doi.org, the allow-listed repository and learn pages only");
 ok(!/projects\/|research\.html/.test(PAGE), "no project page and no Research page");
 ok(TL.validate(D.timeline.events).length === 0 && D.timeline.events.every(e => e.source && e.source.label), "every timeline event has a valid date and a source");
 ok(D.timeline.events.filter(e => /doi\.org/.test((e.source || {}).url || "")).every(e => hrefs.indexOf(e.source.url) >= 0), "every study in the timeline is in the sources list");
@@ -173,6 +173,7 @@ const APPROVED_SNAPSHOT = {   // the approved wording, E3-E5 with the revisions 
 // names a study, its author, its site or its method: such an element is research text unless approved or listed below
 const RX = /\b(stud(y|y's|ies|ies')|paper|article|journal|Li et al|course author|excerpt|research|published|REopt|ERCOT|West Texas|253 MW|Gulf of Mexico|offshore|optimizer|configurations?|four regions|2050|8,760|stabilized|utilization)\b/i;
 const NOT_RESEARCH = [
+  [/^Paper page and citation$/, "navigation label"],
   [/^\d · [A-Z][a-z ,]+$/, "part label"],
   [/^Related study · (solar and hydrogen|maintenance offshore)$/, "part label"],
   [/^Question type: prescriptive \(what should be built, and how should it run\?\)\.$/, "course label (the course's question types)"],

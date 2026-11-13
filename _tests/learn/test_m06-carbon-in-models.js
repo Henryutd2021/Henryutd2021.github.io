@@ -267,8 +267,8 @@ ${buyRow("New wind, sun and batteries, matched hour by hour", Hr, "0 t", YR.hour
   ok(PAGE.includes(`<p class="lx-hint">${SNAP["E10.4"]}</p>`), "E10.4 under the txh2 excerpt");
   const OWN = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1:end -->/g, "").replace(/<!--[\s\S]*?-->/g, "").replace(/^---[\s\S]*?\n---\n/, "");
   const RX = /\b(stud(y|ies)|paper|Li et al|course author|excerpt|ERCOT|Texas|weather zones?|load regulation)\b/i;
-  const LABELS = [/^From: Li et al\. \(2025\), (Cell Reports Sustainability|International Journal of Hydrogen Energy)\.$/, /^Li et al\. \(2025\)\. .+\.$/,
-    /^Case file CF6: how much shifting load to cleaner hours can cut emissions, and when\.$/];
+  const LABELS = [/^Paper page and citation$/, /^From: Li et al\. \(2025\), (Cell Reports Sustainability|International Journal of Hydrogen Energy)\.$/, /^Li et al\. \(2025\)\. .+\.$/,
+    /^(Paper page and citation · )?Case file CF6: how much shifting load to cleaner hours can cut emissions, and when\.$/];
   const elems = OWN.replace(/^- (.*)$/gm, "<li>$1</li>").split(/<\/?(?:p|li|ul|ol|dl|dt|dd|div|blockquote|footer|table|thead|tbody|tr|td|th|summary|details|h[1-6]|header|script)\b[^>]*>/i).map(norm).filter(s => /[A-Za-z]/.test(s));
   const strs = (JS.replace(/\/\/[^\n]*/g, " ").match(/"(?:[^"\\\n]|\\.)*"/g) || []).map(s => s.slice(1, -1));
   const fine = x => approved(x) || !RX.test(x) || LABELS.some(r => r.test(norm(x)));
@@ -281,7 +281,7 @@ ${buyRow("New wind, sun and batteries, matched hour by hour", Hr, "0 t", YR.hour
   { const dc = (OWN + JS).match(/[^.;:!?"]*data cent[^.;:!?"]*/gi) || []; ok(dc.every(s => /load|buy|claim|purchas|300 MW|plants emit|without the|with the|for it|serves|cost|matching/i.test(s)), "data centers appear only as a load: " + dc.filter(s => !/load|buy|claim|purchas|300 MW|plants emit|without the|with the|for it|serves|cost|matching/i.test(s)).join(" | ")); }
   const hrefs = [...OWN.matchAll(/href="([^"]+)"/g)].map(m => m[1].replace(/&amp;/g, "&"));
   const ALLOW = /^(https:\/\/(doi\.org|www\.eia\.gov|docs\.nlr\.gov|atb\.nlr\.gov|ergo-code\.github\.io|ghgprotocol\.org|github\.com\/Henryutd2021\/ghg-load-regulation)(\/|$)|notebooks\/m06-carbon-in-models\.ipynb$|[0-9a-z-]+\.html|\.\.\/assets\/|#)/;
-  ok(hrefs.every(h => ALLOW.test(h)), "links only to allowed domains and learn pages: " + hrefs.filter(h => !ALLOW.test(h)).join(", "));
+  ok(hrefs.every(h => h === "../files/papers/li2025ghg.html" || ALLOW.test(h)), "links only to the listed paper/handbook pages, allowed domains and learn pages: " + hrefs.filter(h => !(h === "../files/papers/li2025ghg.html" || ALLOW.test(h))).join(", "));
   const stepTexts = [...JS.matchAll(/\{ text: "([^\n]+)",\n\s+build:/g)].map(m => m[1].replace(/\[\[[^|]+\|([^\]]+)\]\]/g, "$1"));
   const sentences = t => t.replace(/\*\*/g, "").split(/(?<=[.?!])\s+(?=[A-Z0-9“"$])/).filter(x => /[A-Za-z]/.test(x)).length;
   ok(stepTexts.length === 7 && stepTexts.every(t => t.split(/\s+/).length <= 40 && sentences(t) <= 2), "seven step texts of 40 words and two sentences at most: " + stepTexts.map(t => t.split(/\s+/).length + "/" + sentences(t)).join(","));
