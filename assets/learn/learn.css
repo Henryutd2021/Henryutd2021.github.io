@@ -4,9 +4,9 @@
    Day values on body.page-learn; night values when Quarto's toggle sets body.quarto-dark.
    Type: Lexend (display), Atkinson Hyperlegible Next (text), Atkinson Hyperlegible Mono (numbers), imported here from Google
    Fonts, so only Learn pages (which link learn.css) load them.
-   Plant colours (same in every lesson): nuclear, solar, wind, gas combined-cycle (cc), gas peaker (pk), demand; and
+   Plant colors (same in every lesson): nuclear, solar, wind, gas combined-cycle (cc), gas peaker (pk), demand; and
    battery storage (bat), hydro (hyd), geothermal (geo) and demand response (dr), first used in lesson 6.
-   Tier colours: slots 1-5 (--lx-tier-1 ...); path.yml gives each tier a slot. */
+   Tier colors: slots 1-5 (--lx-tier-1 ...); path.yml gives each tier a slot. */
 @import url("https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;600&family=Atkinson+Hyperlegible+Next:ital,wght@0,400;0,600;0,700;1,400&family=Lexend:wght@400;500;600&display=swap");
 body.page-learn {
   --lx-bg: #F5F7FA; --lx-surface: #FFFFFF; --lx-surface-2: #EDF1F5; --lx-surface-3: #E3E9EF;
@@ -71,7 +71,7 @@ body.page-learn .quarto-title .subtitle { margin: .35rem 0 0; font-family: var(-
    Bootstrap's p/li/td rule and every component's or lesson's own code rule still win; code inside pre is left alone. */
 :where(.page-learn :not(pre)) > code { background-color: var(--lx-surface-2); color: var(--lx-ink); }
 .page-learn :focus-visible { outline: 3px solid var(--lx-accent); outline-offset: 2px; border-radius: 6px; }
-/* captions: Quarto's caption grey is 4.1:1 on white; one class of specificity, so a lesson's own caption colour still wins */
+/* captions: Quarto's caption gray is 4.1:1 on white; one class of specificity, so a lesson's own caption color still wins */
 .page-learn :where(caption, figcaption, .figure-caption, .table-caption, .panel-caption) { color: var(--lx-ink-3); }
 .page-learn main section[id], .page-learn main [id].lx-sec { scroll-margin-top: calc(var(--nav-h, 60px) + 12px); }
 .lx-mono, .lx-num { font-family: var(--lx-f-mono); font-variant-numeric: tabular-nums; }
@@ -156,7 +156,7 @@ details.lx-textalt > summary { cursor: pointer; font-family: var(--lx-f-display)
 details.lx-textalt ul, details.lx-textalt ol { margin: 6px 0 0; padding-left: 1.2rem; }
 details.lx-textalt li { margin: 3px 0; }
 
-/* ---------- end of lesson: next, sources, facts, corrections, licence */
+/* ---------- end of lesson: next, sources, facts, corrections, license */
 .lx-end { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; align-items: start; }
 @media (max-width: 860px) { .lx-end { grid-template-columns: minmax(0, 1fr); } }
 .lx-next { display: grid; gap: 8px; }
@@ -553,7 +553,7 @@ details.lx-deeper .k { font-size: 11.5px; letter-spacing: .07em; text-transform:
 .cedge text.bg { stroke: var(--lx-surface); stroke-width: 4px; stroke-linejoin: round; }
 .cedge.on path { stroke: var(--lx-ink); stroke-width: 2; }
 .cedge.on text { fill: var(--lx-ink); }
-.cedge.dim path { opacity: .35; }   /* the label keeps its colour (ink-3, 4.5:1) */
+.cedge.dim path { opacity: .35; }   /* the label keeps its color (ink-3, 4.5:1) */
 .lx-cmap.narrow .cedge text { display: none; }
 .lx-cdetail { border: 1px solid var(--lx-line); border-radius: 12px; padding: 14px; display: grid; gap: 8px; background: var(--lx-surface-2); align-content: start; }
 .page-learn .lx-cdetail :is(h3, h4) { font-size: 18px; margin: 0; }   /* h3 under a map titled with an h2 */
@@ -775,7 +775,7 @@ details.lx-deeper .k { font-size: 11.5px; letter-spacing: .07em; text-transform:
 .mhit { fill: transparent; cursor: pointer; }
 .mown-st text { cursor: pointer; }
 .stn .pulse { animation: none; opacity: .35; transform: scale(1.3); } .lx-door { transition: none; } }
-/* a door picks a tier: the other tiers' lines and shapes fade, their text turns to a token grey that keeps 4.5:1 */
+/* a door picks a tier: the other tiers' lines and shapes fade, their text turns to a token gray that keeps 4.5:1 */
 .seg-dim path, .seg-dim circle, .seg-dim rect, .seg-dim .icon, path.seg-dim { opacity: .25; }
 .seg-dim text, .seg-dim tspan { fill: var(--lx-ink-3); }
 /* label fonts: metro.js measures text in the same fonts and sizes (measurer) */
@@ -853,7 +853,7 @@ details.lx-listview > summary { cursor: pointer; min-height: 48px; display: flex
 .lx-list-tiers li.is-done::after { content: " ✓"; color: var(--lx-good); font-weight: 700; }
 
 /* solver.css — the live solver status line (LX.SolverStatus in solver.js): loading, solving, then the outcome in plain
-   words with the time the page waited. Colour follows the outcome; the text alone carries the meaning. */
+   words with the time the page waited. Color follows the outcome; the text alone carries the meaning. */
 .lx-solver-status { display: inline-flex; align-items: center; gap: 8px; min-height: 28px; margin: 6px 0 0; padding: 2px 12px; border-radius: 999px;
   font-size: 14px; line-height: 1.35; color: var(--lx-ink-2); background: var(--lx-surface-2); }
 .lx-solver-status:empty { display: none; }
@@ -957,7 +957,7 @@ details.lx-listview > summary { cursor: pointer; min-height: 48px; display: flex
 .lx-torn-bar .mid { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--lx-ink); }
 @media (max-width: 560px) { .lx-torn-row { grid-template-columns: minmax(0, 1fr); } }
 
-/* costsplit.css — LX.CostSplit (costsplit.js): rows of stacked bars, the colour key, and the bar helper. */
+/* costsplit.css — LX.CostSplit (costsplit.js): rows of stacked bars, the color key, and the bar helper. */
 .lx-split { display: grid; gap: 8px; }
 .lx-split-row { position: relative; display: grid; grid-template-columns: 8.5em minmax(0, 1fr) 5.2em; align-items: center; gap: 10px; width: 100%; padding: 8px 10px;
   border: 1px solid var(--lx-line); border-radius: 10px; background: var(--lx-surface); color: var(--lx-ink); text-align: left; font: inherit; }
@@ -1216,7 +1216,7 @@ button.lx-split-row { cursor: pointer; }
   .lx-eq.dense .lx-eq-row { font-size: 15px; }
 }
 
-/* formulate.css — LX.FormulateBox (formulate.js): the parts of a model in words, each under a colour bar, and the
+/* formulate.css — LX.FormulateBox (formulate.js): the parts of a model in words, each under a color bar, and the
    symbols in a collapsed box. */
 .lx-form { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
 .lx-form.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -1231,8 +1231,8 @@ details.lx-form-symbols { margin: 0; }
 @media (max-width: 860px) { .lx-form, .lx-form.three { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 520px) { .lx-form, .lx-form.three { grid-template-columns: minmax(0, 1fr); } }
 
-/* formulation.css — LX.Formulation (formulation.js): a model's rules in words, in symbols (labelled lines, optionally
-   pickable and marked right or wrong) and as a table that turns into labelled cards on phones. */
+/* formulation.css — LX.Formulation (formulation.js): a model's rules in words, in symbols (labeled lines, optionally
+   pickable and marked right or wrong) and as a table that turns into labeled cards on phones. */
 .lx-fviews { display: grid; gap: 10px; }
 .lx-fviews > .lx-seg { justify-self: start; }
 .lx-ftag { font-size: 12.5px; color: var(--lx-ink-3); }
@@ -1335,7 +1335,7 @@ button.lx-fline:hover { border-color: var(--lx-ink-3); }
 @media (max-width: 760px) { .lx-ladder { grid-template-columns: minmax(0, 1fr); } }
 
 /* tagger.css — the phrase tagger (tagger.js): the text card, tappable phrases, tag chips, the comparison list.
-   Tag colours come from the data (--c); the number badge repeats the question, so colour is never the only cue. */
+   Tag colors come from the data (--c); the number badge repeats the question, so color is never the only cue. */
 .lx-tagger { display: grid; gap: 12px; }
 .lx-tag-n { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 10px; background: color-mix(in srgb, var(--c) 86%, var(--lx-ink));   /* the number at 4.5:1, day and night */
   color: var(--lx-btn-ink); font-family: var(--lx-f-mono); font-size: 12px; font-weight: 600; }
@@ -1547,10 +1547,10 @@ ul.lx-fp-notes li { margin: 0; } ul.lx-fp-notes b { font-weight: 600; color: var
    card above the interactive (div.lx-card.lx-studio-brief, seen with and without JavaScript) and its task list; the
    case file's numbered parts, its question line and the approved-excerpt quote (blockquote.lx-excerpt with
    data-source="excerpt:<key>", checked by the scope scan); the static lists of the no-JS fallbacks (timeline, exemplar
-   notes, rubric table); the case file's Try-it box, its toys' controls and comparison table (.cf-*), and the theme colour
-   of an allow-listed explainer on a Learn page. Sandbox and capstone: the sandbox's brief (its facts as labelled cells) and bench frame
+   notes, rubric table); the case file's Try-it box, its toys' controls and comparison table (.cf-*), and the theme color
+   of an allow-listed explainer on a Learn page. Sandbox and capstone: the sandbox's brief (its facts as labeled cells) and bench frame
    (controls beside the run box from 960 px), the results' readouts and chart cards, the capstone's brief, and the
-   static tables of their no-JS fallbacks. Colours from --lx-* tokens only. */
+   static tables of their no-JS fallbacks. Colors from --lx-* tokens only. */
 .lx-studio-brief { margin-bottom: 14px; display: grid; gap: 8px; }
 .lx-studio-task { margin: 0; padding-left: 1.3rem; display: grid; gap: 6px; font-size: 16px; color: var(--lx-ink-2); }
 .lx-studio-task b { color: var(--lx-ink); font-family: var(--lx-f-display); font-weight: 500; }
@@ -1575,9 +1575,9 @@ ul.lx-fp-notes li { margin: 0; } ul.lx-fp-notes b { font-weight: 600; color: var
 /* the Try-it box wraps: a long command or file path breaks on a 375 px phone, and its text takes the list's size */
 .lx-case-try code { white-space: normal; overflow-wrap: anywhere; }
 .lx-case-try p:not(.lx-eyebrow) { font-size: 15.5px; color: var(--lx-ink-2); overflow-wrap: anywhere; }
-/* case-file toys (CF2, CF6, CF7): a labelled control (.cf-ctl, its label .cf-ctl-l), a row of buttons (.cf-row), a pair
+/* case-file toys (CF2, CF6, CF7): a labeled control (.cf-ctl, its label .cf-ctl-l), a row of buttons (.cf-row), a pair
    of selects (.cf-selects of .cf-sel) and a two-sided comparison table (table.cf-two: th per row, td with data-l) that
-   becomes labelled lines on phones */
+   becomes labeled lines on phones */
 .cf-ctl { display: grid; gap: 6px; align-content: start; min-width: 0; }
 .cf-ctl .lx-seg, .cf-ctl .lx-toggle { justify-self: start; }
 .cf-ctl-l { font-family: var(--lx-f-display); font-weight: 500; font-size: 14px; color: var(--lx-ink-2); }
@@ -1593,7 +1593,7 @@ ul.lx-fp-notes li { margin: 0; } ul.lx-fp-notes b { font-weight: 600; color: var
 .cf-two tbody th { font-family: var(--lx-f-display); font-weight: 500; color: var(--lx-ink); }
 .cf-two td { color: var(--lx-ink-2); }
 /* an allow-listed explainer on a Learn page (assets/explainers/, a case file's Explain section): the explainers read the
-   theme colour --t from the body (common.js color("t")) and the helpers --t-ink, --t-soft, --t-line from their card, which
+   theme color --t from the body (common.js color("t")) and the helpers --t-ink, --t-soft, --t-line from their card, which
    the site defines only on project pages (.theme-*, pubs.css); on Learn pages they take the Learn accent, day and night */
 body.page-learn { --t: var(--lx-accent); }
 .page-learn .explainer { --t-ink: var(--lx-accent); --t-soft: var(--lx-accent-soft); --t-line: color-mix(in srgb, var(--lx-accent) 30%, var(--lx-line)); margin: 0; }
@@ -1614,7 +1614,7 @@ body.page-learn { --t: var(--lx-accent); }
 }
 
 /* ---------- sandbox and capstone pages */
-/* the brief: a card above the bench (seen with and without JavaScript); its facts as labelled cells, two columns
+/* the brief: a card above the bench (seen with and without JavaScript); its facts as labeled cells, two columns
    from 641 px; a capstone's brief reuses the studio's task list (.lx-studio-task) */
 .lx-sb-brief, .lx-cap-brief { margin-bottom: 14px; display: grid; gap: 10px; }
 .lx-sb-facts { margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 20px; }
@@ -1655,7 +1655,7 @@ body.page-learn { --t: var(--lx-accent); }
 
 /* exemplars.css — LX.Exemplars (exemplars.js): two answers side by side, marked phrases with number badges, the notes
    they open, and the "what made the difference" table. Weak and good are told apart by their heading and level as well
-   as the top edge's colour. */
+   as the top edge's color. */
 .lx-ex { display: grid; gap: 12px; min-width: 0; }
 .lx-ex-lede { font-size: 15.5px; color: var(--lx-ink-2); }
 .lx-ex-task { border: 1px dashed var(--lx-line-2); border-radius: 12px; padding: 10px 14px; display: grid; gap: 4px; }
@@ -1772,7 +1772,7 @@ body.page-learn { --t: var(--lx-accent); }
 
 /* timeline.css — LX.Timeline (timeline.js): an ordered list on a vertical rule; each event a marker, its date and kind
    (in words), its label, text and source line; the time that passed above it; key steps ringed and tagged. On wide
-   screens the date column sits left of the event. Kind colours: study tier-4, data tier-2, policy tier-3, event ink-3. */
+   screens the date column sits left of the event. Kind colors: study tier-4, data tier-2, policy tier-3, event ink-3. */
 .lx-tl { display: grid; gap: 10px; min-width: 0; }
 .lx-tl-lede { font-size: 15.5px; color: var(--lx-ink-2); }
 .lx-tl-list { position: relative; margin: 0; padding: 0 0 0 26px; list-style: none; display: grid; gap: 14px; }
@@ -1806,7 +1806,7 @@ body.page-learn { --t: var(--lx-accent); }
 
 /* planengine.css — the page kit of the planning engine (planengine.js, LX.townPlan.ui) shared by lessons 12 and 13:
    the stage and cards, the plan and comparison tables (TextTable: cards on phones), the scenario box, the week tabs, the
-   hourly table and the verdict list. The lx13- prefix stays because both lessons use these classes. Colours from --lx-* tokens only. */
+   hourly table and the verdict list. The lx13- prefix stays because both lessons use these classes. Colors from --lx-* tokens only. */
 .lx13-stage{display:grid;gap:14px;min-width:0}
 .lx13-card{background:var(--lx-surface);border:1px solid var(--lx-line);border-radius:var(--lx-r-lg);padding:14px 16px;display:grid;gap:10px;min-width:0}
 .page-learn .lx13-card :is(h2,h3){font-size:17px}
@@ -1855,8 +1855,8 @@ body.page-learn { --t: var(--lx-accent); }
 
 /* scalestrip.css — LX.ScaleStrip (scalestrip.js): the five scales side by side, and the scale palette.
    The palette (--lx-scale-0 ... --lx-scale-4, S0 device and plant to S4 nation; day, then night) is the only place these
-   colours are defined: F1's zoom, card sorts and comparison table, and any later scale route, use the same tokens.
-   Everything else takes colours from the --lx-* tokens. */
+   colors are defined: F1's zoom, card sorts and comparison table, and any later scale route, use the same tokens.
+   Everything else takes colors from the --lx-* tokens. */
 body.page-learn { --lx-scale-0: #2F8F80; --lx-scale-1: #2A7FA0; --lx-scale-2: #2E66B5; --lx-scale-3: #5150B0; --lx-scale-4: #6A3F9E; }
 body.page-learn.quarto-dark { --lx-scale-0: #5CC0B1; --lx-scale-1: #5AAED2; --lx-scale-2: #7CA6EE; --lx-scale-3: #9A9BEA; --lx-scale-4: #B496E6; }
 .lx-ss { display: grid; gap: 10px; min-width: 0; }
@@ -1868,7 +1868,7 @@ body.page-learn.quarto-dark { --lx-scale-0: #5CC0B1; --lx-scale-1: #5AAED2; --lx
   align-content: start; background: var(--lx-surface); font-size: 13.5px; color: var(--lx-ink-2); min-width: 0; }
 .lx-ss-strip li.is-marked { background: var(--lx-accent-soft); border-color: var(--lx-accent); }
 .lx-ss-top { display: flex; justify-content: space-between; gap: 6px; align-items: baseline; }
-.lx-ss-code { font-family: var(--lx-f-mono); font-size: 12.5px; font-weight: 600; color: color-mix(in srgb, var(--c) 70%, var(--lx-ink)); }   /* the scale's colour toward the ink: 4.5:1 day and night */
+.lx-ss-code { font-family: var(--lx-f-mono); font-size: 12.5px; font-weight: 600; color: color-mix(in srgb, var(--c) 70%, var(--lx-ink)); }   /* the scale's color toward the ink: 4.5:1 day and night */
 .lx-ss-pw { font-family: var(--lx-f-mono); font-size: 12px; color: var(--lx-ink-3); }
 .lx-ss-strip .lx-ss-name { font-family: var(--lx-f-display); font-weight: 600; font-size: 15px; color: var(--lx-ink); }
 .lx-ss-who, .lx-ss-line { font-size: 13.5px; color: var(--lx-ink-2); }
@@ -1882,8 +1882,8 @@ body.page-learn.quarto-dark { --lx-scale-0: #5CC0B1; --lx-scale-1: #5AAED2; --lx
 @media (max-width: 860px) { .lx-ss-strip { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 560px) { .lx-ss-flow { flex-direction: column; } }
 
-/* stakeholders.css — LX.Stakeholders (the role table: cards of labelled lines on phones) and LX.StakeholderMap (rings of
-   groups as buttons), used by A22 and R9. Colours from --lx-* tokens only, day and night. */
+/* stakeholders.css — LX.Stakeholders (the role table: cards of labeled lines on phones) and LX.StakeholderMap (rings of
+   groups as buttons), used by A22 and R9. Colors from --lx-* tokens only, day and night. */
 .lx-stake { width: 100%; border-collapse: collapse; font-size: 14px; }
 .lx-stake th, .lx-stake td { padding: 7px 8px; border-bottom: 1px solid var(--lx-line); text-align: left; vertical-align: top; font-weight: 400; }
 .lx-stake thead th { font-family: var(--lx-f-display); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--lx-ink-3); }
@@ -1941,11 +1941,11 @@ body.page-learn.quarto-dark { --lx-scale-0: #5CC0B1; --lx-scale-1: #5AAED2; --lx
 
 /* weekstrip.css — LX.WeekStrip (weekstrip.js): 52 week cells in four rows of 13 behind a date column, extreme weeks
    outlined, a red dot on short weeks, the key, and the text version's table (M3's look: m3-strip, m3-grid, m3-cell,
-   m3-keys and the m3-tbl rules its table uses). Colours from --lx-* tokens only; cell colours come in as --c. */
+   m3-keys and the m3-tbl rules its table uses). Colors from --lx-* tokens only; cell colors come in as --c. */
 .lx-wks{display:grid;gap:6px;min-width:0}
 .lx-wks-grid{display:grid;grid-template-columns:4.6em repeat(13,minmax(0,1fr));gap:3px;align-items:center}
 .lx-wks-grid span.rl{font-size:12px;color:var(--lx-ink-3);font-family:var(--lx-f-mono)}
-/* cells and keys take their colour a little toward the ink (darker by day, lighter by night), so the letter in the page colour reads at 4.5:1 */
+/* cells and keys take their color a little toward the ink (darker by day, lighter by night), so the letter in the page color reads at 4.5:1 */
 .lx-wks-cell{position:relative;height:26px;border-radius:5px;background:color-mix(in srgb,var(--c) 86%,var(--lx-ink));color:var(--lx-bg);font:600 11px/26px var(--lx-f-mono);text-align:center;overflow:hidden}
 .lx-wks-cell.x{outline:2px solid var(--lx-ink);outline-offset:-2px}
 .lx-wks-cell.short::after{content:'';position:absolute;right:2px;top:2px;width:8px;height:8px;border-radius:50%;background:var(--lx-bad);box-shadow:0 0 0 1.5px var(--lx-surface)}
@@ -1966,8 +1966,8 @@ body.page-learn.quarto-dark { --lx-scale-0: #5CC0B1; --lx-scale-1: #5AAED2; --lx
 }
 
 /* sharestate.css — LX.ShareState (sharestate.js): the plan-link box: the status line that announces an opened, updated or
-   refused link (empty and hidden otherwise; a refused link in the warning colours), the copy button row and LX.Share's
-   link field below it. Colours from --lx-* tokens only. */
+   refused link (empty and hidden otherwise; a refused link in the warning colors), the copy button row and LX.Share's
+   link field below it. Colors from --lx-* tokens only. */
 .lx-ss { display: grid; gap: 8px; min-width: 0; }
 .lx-ss-msg { margin: 0; padding: 8px 12px; border-radius: 10px; border-left: 4px solid var(--lx-accent); background: var(--lx-accent-soft);
   font-size: 14.5px; line-height: 1.4; color: var(--lx-ink); overflow-wrap: anywhere; }
@@ -1977,11 +1977,11 @@ body.page-learn.quarto-dark { --lx-scale-0: #5CC0B1; --lx-scale-1: #5AAED2; --lx
 .lx-ss-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .lx-ss-row:empty { display: none; }
 
-/* benchrun.css — LX.BenchRun (benchrun.js): the Run and Try again buttons, the status line (its left rule coloured by
+/* benchrun.css — LX.BenchRun (benchrun.js): the Run and Try again buttons, the status line (its left rule colored by
    the run's kind: done, a refused or failed run, a stop) and the "results are for an earlier plan" line above the
    results, whose charts dim while they are stale or a run is on. Only graphics dim (an SVG's shapes, canvas); text,
    chart labels included, keeps its 4.5:1 contrast, and the stale line says in words why the charts
-   are faded. Colours from --lx-* tokens
+   are faded. Colors from --lx-* tokens
    only; the words carry the meaning too. */
 .lx-br { display: grid; gap: 8px; min-width: 0; }
 .lx-br-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
@@ -2049,7 +2049,7 @@ body.page-learn.quarto-dark { --lx-scale-0: #5CC0B1; --lx-scale-1: #5AAED2; --lx
 .lx-rn-appx-h { margin: 8px 0 4px; font-size: 14.5px; color: var(--lx-ink-2); }
 
 /* engine-e0.css — the page kit of engine E0 (engine-e0.js, LX.E0.ui): the Site Bench's choice rows, presets, results
-   tiles, the 52-week strip, the week navigation and the extra cards a capstone adds (sensitivity). Colours from --lx-*
+   tiles, the 52-week strip, the week navigation and the extra cards a capstone adds (sensitivity). Colors from --lx-*
    tokens only; no overflow clipping, so chart tips stay visible. */
 .e0-choice { display: grid; gap: 6px; }
 .e0-choice-l { font-family: var(--lx-f-display); font-size: 14px; font-weight: 500; color: var(--lx-ink); }
@@ -2095,7 +2095,7 @@ body.page-learn.quarto-dark { --lx-scale-0: #5CC0B1; --lx-scale-1: #5AAED2; --lx
 }
 
 /* engine-e1.css — the view pieces of engine E1 (LX.E1.Line, LX.E1.Bench, LX.E1.Results, LX.E1.HourChart): the campus
-   one-line diagram, the bench's small controls, the cost and outage tables. Colours from --lx-* tokens only; no
+   one-line diagram, the bench's small controls, the cost and outage tables. Colors from --lx-* tokens only; no
    overflow clipping (chart tips stay visible; a wide table scrolls in its own .lx-scroll-x). */
 
 /* ---------- the one-line diagram */
@@ -2234,7 +2234,7 @@ body.page-learn.quarto-dark { --lx-scale-0: #5CC0B1; --lx-scale-1: #5AAED2; --lx
 @media (prefers-reduced-motion: reduce) { .lx-sk .band { transition: none; } }
 
 /* engine-e2.css — the view pieces of engine E2 (LX.E2.ui: the zone map, the commitment table, the bench's small
-   controls). Colours from --lx-* tokens only; no overflow clipping (chart tips stay visible; a wide table scrolls in its
+   controls). Colors from --lx-* tokens only; no overflow clipping (chart tips stay visible; a wide table scrolls in its
    own .lx-scroll-x). */
 
 /* ---------- bench extras */
@@ -2293,7 +2293,7 @@ body.page-learn.quarto-dark { --lx-scale-0: #5CC0B1; --lx-scale-1: #5AAED2; --lx
 .e2-unit-notes { margin: .4rem 0 0; padding-left: 1.1rem; display: grid; gap: 2px; }   /* the plants table's formulas, one a line */
 
 /* row labels of the data tables: plain words, not the column headings' small capitals; on phones (base.css shows one
-   block per row with the header hidden) each cell is labelled with its column */
+   block per row with the header hidden) each cell is labeled with its column */
 .lx-facts.e2-lab tbody th, .e2-units tbody th { text-transform: none; letter-spacing: 0; font-size: 14.5px; font-weight: 500; color: var(--lx-ink); }
 @media (max-width: 640px) {
   .lx-facts.e2-lab th[scope="row"], .e2-units th[scope="row"] { display: block; padding: 2px 0; border: 0; }
@@ -2414,7 +2414,7 @@ body.page-learn.quarto-dark { --lx-scale-0: #5CC0B1; --lx-scale-1: #5AAED2; --lx
 .a19-gtbl td.a19-gnw { white-space: nowrap; }
 
 /* engine-e3.css — the view pieces of engine E3 (LX.E3.ui: the bench's controls, a district's day, the cost and household
-   tables, the hub diagram), shared by SB3, M12 and C3. Colours from --lx-* tokens only; no overflow clipping (chart tips
+   tables, the hub diagram), shared by SB3, M12 and C3. Colors from --lx-* tokens only; no overflow clipping (chart tips
    stay visible; a wide table scrolls in its own .lx-scroll-x). */
 
 /* ---------- bench extras */
@@ -2482,7 +2482,7 @@ body.page-learn.quarto-dark { --lx-scale-0: #5CC0B1; --lx-scale-1: #5AAED2; --lx
 .e3-fold .e3-notes { margin-top: 4px; }
 
 /* engine-e4.css — the view pieces of engine E4 (LX.E4.ui: the bench's controls, the nation's map, the mix, CO2 and import
-   charts, tables), shared by SB4, M13 and C4. Colours from --lx-* tokens only; no overflow clipping (chart tips stay
+   charts, tables), shared by SB4, M13 and C4. Colors from --lx-* tokens only; no overflow clipping (chart tips stay
    visible; a wide table scrolls in its own .lx-scroll-x). */
 
 /* ---------- bench extras */

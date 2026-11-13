@@ -10,7 +10,7 @@
      onCompare: function (score) {} });
    Options:
      key          LX.store key of the reader's picks ({phraseId: tagId, _missing: tagId}); they survive a reload
-     tags         id, n (the number badge, so colour is never the only cue), label, sub (small words on the chips), color (token)
+     tags         id, n (the number badge, so color is never the only cue), label, sub (small words on the chips), color (token)
      parts        strings and phrase objects in reading order; a phrase is an inline span with button semantics, so a long
                   phrase wraps with its sentence. tag is the researcher's main tag; also lists other fair tags.
      missing      the unanswered question: a second row of chips (missingQ, default "Which question does the story leave

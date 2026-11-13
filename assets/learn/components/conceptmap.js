@@ -1,4 +1,4 @@
-/* conceptmap.js — LX.ConceptMap: the lesson's ideas as tappable nodes joined by labelled arrows, with a detail panel.
+/* conceptmap.js — LX.ConceptMap: the lesson's ideas as tappable nodes joined by labeled arrows, with a detail panel.
    LX.ConceptMap(host, { title: "The ideas, and how they connect", lede: "Tap an idea.",
      groups: { bal: ["Balance", "var(--lx-good)"], ... },
      nodes: [{ id: "balance", g: "bal", label: "Balance", lines: ["Two", "lines"], (on phones), text: "One or two sentences.",

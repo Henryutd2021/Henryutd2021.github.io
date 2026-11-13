@@ -106,7 +106,7 @@
    "<key>-sol-open", and survives "Start again": LX.Checkpoint.solOpened(key) reads it (CK-M's rule compares it with the
    final task's `at`). Stored attempts need no new data version: the new fields are only added.
    Keyboard: every control is a native button, input, select or radio; the task's prompt takes focus on each new task; the
-   order task's ↑ ↓ buttons keep focus on the moved item. The results table becomes labelled lines on phones.
+   order task's ↑ ↓ buttons keep focus on the moved item. The results table becomes labeled lines on phones.
    Text version: LX.Checkpoint.lineChart adds a table of the hourly values.
    Pure (Node: module.exports): task, checkChoice, checkOrder, checkNumeric (either answer form), checkMWh, checkValue,
    checkEstimate, level(D, st, {openFirst, late, solOpen}), firstRight(record, openFirst), writtenCounts(record,

@@ -1,6 +1,6 @@
 /* scalestrip.js — LX.ScaleStrip: the course's five scales (S0 device and plant ... S4 nation) side by side
    (e-scale-strip; used by F1's explain layer and R3's self-check). One card per scale, its top edge in the
-   scale's colour (--lx-scale-0 ... 4, day and night, in scalestrip.css), with the parts a lesson asks for.
+   scale's color (--lx-scale-0 ... 4, day and night, in scalestrip.css), with the parts a lesson asks for.
    var ss = LX.ScaleStrip(host, {
      title: "Five scales at a glance", lede: "One sentence.",   an h3 in .lx-x-head and a lede (both optional)
      scales: [{ id: "S0", name: "Device and plant", power: "W to MW", who: "the owner ...", decides: "what to install ...",
@@ -18,7 +18,7 @@
                            "upcoming" (with its note) otherwise (LX.lessonRef); an {href, label} item is always linked
      path: P,
      mark: "S1", markText: "Your brief sits here.",   one scale marked (an outlined card and a line of text)
-     color: "var(--lx-tier-4)",   one colour for every card's top edge (default: each scale's own colour)
+     color: "var(--lx-tier-4)",   one color for every card's top edge (default: each scale's own color)
      label: "Five scales" });     the list's accessible name
    Returns { el, update(patch) }: update() redraws the cards with some options changed (mark, markText, ticks, lessons).
    Layout: five columns from 861 px, one card per row below. The list is its own text version.
@@ -28,7 +28,7 @@
   // ---------------------------------------------------------------- pure (no DOM; exported for Node)
   var TICKS = [["who", "Who"], ["what", "What"], ["physics", "Physics"]];
   var FLOW = { down: "Passed down: prices, tariffs, limits, targets", up: "Passed up: load profiles, flexibility, forecasts, siting needs" };
-  // "S3" -> 3 (the scale's place on the ladder and its colour token)
+  // "S3" -> 3 (the scale's place on the ladder and its color token)
   function scaleIndex(id) { var m = /^S([0-4])$/.exec(String(id)); return m ? +m[1] : -1; }
   function colorOf(s, one) { var i = scaleIndex(s.id); return one || (i >= 0 ? "var(--lx-scale-" + i + ")" : "var(--lx-ink-3)"); }
   // a scale's "Go further" list split into live links and upcoming names; ref = LX.lessonRef (core.js)

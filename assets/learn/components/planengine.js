@@ -9,7 +9,7 @@
      decisions   capacities: wind, solar, gas combined-cycle (cc), gas peaker (pk), nuclear (nuc) in MW; battery power
                  (bp, MW) and energy (be, MWh). Every hour: cc and peaker output, battery charge and discharge, unserved
                  demand (only when the reader's plan is fixed; the optimizer must serve all demand).
-     goal        least annual cost = annualised capital + fixed O&M (per MW or MWh built) + fuel and variable O&M (per MWh)
+     goal        least annual cost = annualized capital + fixed O&M (per MW or MWh built) + fuel and variable O&M (per MWh)
                  [+ a carbon price x CO2: lesson 12's weighted sum]. Nuclear runs flat, so its fuel is a fixed yearly cost.
      rules       every hour: wind + solar + nuclear + cc + peaker + discharge - charge + unserved >= demand (what is left
                  over is spilled); wind and solar make capacity x the hour's availability (LX.townProfile, "scale" method,
@@ -35,7 +35,7 @@
      "cyclic" or "free"), yearPeriods(Y), readCheck(C, Y, result, plan) (a fixed plan's full-year run: totals and MWh
      unserved in each calendar week) and errors(est, full, cap, ref) (cost gap, CO2 over the cap, estimate error).
      LX.WeekStrip (components/weekstrip.js) draws a set of weeks and readCheck's byWeek as a 52-week calendar.
-   Page kit (browser only): LX.townPlan.ui = { TECH (names and colours), fm (number formats), Num (a numeric control in
+   Page kit (browser only): LX.townPlan.ui = { TECH (names and colors), fm (number formats), Num (a numeric control in
      the slider look), TextTable (a comparison table of words; cards on phones), css (kept for callers; the styles are in
      planengine.css, bundled into learn.css) }.
    Tests: _tests/learn/test_13-capstone.js (also with --full), test_12-trade-offs.js, test_m03-capacity-expansion.js and
@@ -120,7 +120,7 @@
       return bestW;
     }
     // k-medoids inside a season (k = per): start from the medoid and the week farthest from it, then alternate
-    // assigning weeks to the nearest medoid and re-centring each group, until nothing changes
+    // assigning weeks to the nearest medoid and re-centering each group, until nothing changes
     function groups(members) {
       if (per === 1 || members.length <= per) return [members];
       var meds = [medoid(members)];
@@ -156,7 +156,7 @@
     });
     var f = HOURS / (WEEKS * HPW);   // the 24 hours of 31 December, spread over the weights
     reps.forEach(function (r) {
-      r.weight = r.n * f;            // hours of the year each modelled hour stands for
+      r.weight = r.n * f;            // hours of the year each modeled hour stands for
       r.start = weekStart(Y, r.week).toISOString().slice(0, 10);
       var A = r.week * HPW;
       r.demand = []; r.wind = []; r.solar = [];
@@ -342,7 +342,7 @@
   }
 
   // ---------------------------------------------------------------- helpers for the page (pure)
-  // one modelled week, hour by hour: what each source made, the battery, unserved and spilled power (MW)
+  // one modeled week, hour by hour: what each source made, the battery, unserved and spilled power (MW)
   function weekSeries(C, P, values, p, plan) {
     var v = values || {}, n = P.demand.length, o = { demand: [], nuc: [], wind: [], solar: [], dis: [], ch: [], cc: [], pk: [], unserved: [], spilled: [] };
     for (var h = 0; h < n; h++) {

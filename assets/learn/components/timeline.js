@@ -16,7 +16,7 @@
      note: "One sentence." });
    Returns { el, events } (events as drawn, sorted).
    An ordered list with <time datetime> dates: it reads in order as text, so it is its own text version; markers on a
-   rule, the kind in words (colour is never the only cue), sources as links. One column; on wide screens the date sits
+   rule, the kind in words (color is never the only cue), sources as links. One column; on wide screens the date sits
    left of the event.
    Node: module.exports = { parse, fmt, sortEvents, gap, validate, staticHTML, KINDS } (pure). staticHTML(events, opt)
    is the page's no-JS list (<ol class="lx-tl-static">), for a test's --write mode. */

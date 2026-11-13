@@ -15,7 +15,7 @@
      doneText  added to the count when every box is ticked ("9 of 9 checked. Write what you found in a data note.")
      inline    the label and its text on one line (bold label, then sep, then the text); default: stacked lines
      sep       what joins an inline label to its text (default " "; K7 uses ". ")
-     soft      soft rows without a border and accent-coloured ticks (the B3 and K7 look); default: bordered rows with
+     soft      soft rows without a border and accent-colored ticks (the B3 and K7 look); default: bordered rows with
                green ticks and a green edge when ticked
      columns   2: two columns on wide screens (≥ 861 px)
      code      notes in the monospace font (B2's pandas lines)

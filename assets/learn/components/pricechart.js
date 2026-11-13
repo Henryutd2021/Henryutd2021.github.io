@@ -7,8 +7,8 @@
    ch.set({ series: [{id, label, color, v: [price per hour]}], ghost: [price per hour] or null, sel: hour });   any subset;
                  the chart keeps the rest and draws once it has series
      series      one step line per series (each price holds for its hour). Equal prices would hide each other, so with
-                 several series each line is moved 1.6 px from its neighbour (the middle one stays put)
-     ghost       an earlier run as a dashed grey step line, named ghostLabel in the legend (default "Before")
+                 several series each line is moved 1.6 px from its neighbor (the middle one stays put)
+     ghost       an earlier run as a dashed gray step line, named ghostLabel in the legend (default "Before")
      sel         the selected hour, shaded; with onPick a tap on an hour, or ← → Home End on the focused chart, picks it
    The y axis runs from $0 to a round top (at least $100, in steps of $50) with four gridlines; the time axis is marked
    every 6 hours (every 12 under 480 px); hovering shows the hour's prices (the ghost's too); the text version is a table
@@ -29,7 +29,7 @@
     if (ghost) all = all.concat(ghost);
     return Math.max(100, Math.ceil(Math.max.apply(null, all) / 50) * 50);
   }
-  // pixel offsets that keep equal step lines apart: 1.6 px per series, centred on the middle one
+  // pixel offsets that keep equal step lines apart: 1.6 px per series, centered on the middle one
   function offsets(n) { var o = []; for (var k = 0; k < n; k++) o.push(n > 1 ? (k - (n - 1) / 2) * 1.6 : 0); return o; }
   // the text version: one row per hour, a column per series and, when there is one, a column for the dashed earlier run
   function textTable(series, ghost, ghostLabel, unit) {

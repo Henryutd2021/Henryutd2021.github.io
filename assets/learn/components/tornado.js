@@ -7,7 +7,7 @@
      sort: true,                                           sort rows by swing, largest first (stable; false keeps the order)
      pad: 0.28, padAbs: 1,                                 room for the end labels: the axis runs from lo − p to hi + p,
                                                            p = pad × (hi − lo) + padAbs (lo, hi: the lowest and highest result)
-     below: "var(--lx-good)", above: "var(--lx-bad)"       colours of the part of a bar below and above the base (swap them
+     below: "var(--lx-good)", above: "var(--lx-bad)"       colors of the part of a bar below and above the base (swap them
                                                            for a result where higher is better)
    });
    t.draw({ base: 37.52,                                   the result with every input at its default (the black line)

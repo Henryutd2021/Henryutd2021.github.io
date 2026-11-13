@@ -136,7 +136,7 @@
       label(axis, M.l, botY0 - 8, "Load (MWh in each hour)", { cls: "ex-strong" });
       label(axis, M.l + pw, H - 4, "hour of day", { anchor: "end" });
 
-      // intensity: a step-like line through the hour centres
+      // intensity: a step-like line through the hour centers
       var pts = m.intensity.map(function (v, t) { return x(t + 0.5).toFixed(1) + "," + ye(v).toFixed(1); }).join(" ");
       h.el("polyline", { points: pts, fill: "none", stroke: ink, "stroke-width": 2, "stroke-linejoin": "round" }, svg);
 

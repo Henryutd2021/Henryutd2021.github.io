@@ -21,7 +21,7 @@
                       label: "C F",                    spoken name instead of `name` (optional)
                       unit: "%",                       shown after the name: "Capacity factor (%)", in the panel and
                                                        in the text version
-                      color: "var(--lx-tier-1)",       a colour bar under the button (optional)
+                      color: "var(--lx-tier-1)",       a color bar under the button (optional)
                       words: "One or two sentences.",  what it means (alias: text)
                       you: "..." | function () {},     and any key named in `fields`: the lines under the words
                       story: "...", code: "..." } },
@@ -40,7 +40,7 @@
      code: "...", codeLabel: "The same equation in code (Python)",   the whole equation as code, in a collapsed box
      textLabel: "Text version" });                                    the text version's summary
    Returns { select(id), el }. Symbols are real buttons (Tab, Enter, Space) with aria-pressed and a visible focus ring;
-   the panel is a polite live region. Colours come from tokens only. LX.EquationCard.sym(id, html) writes the button
+   the panel is a polite live region. Colors come from tokens only. LX.EquationCard.sym(id, html) writes the button
    markup for html rows. */
 (function () {
   "use strict";

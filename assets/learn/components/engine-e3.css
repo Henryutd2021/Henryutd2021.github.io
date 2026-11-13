@@ -1,5 +1,5 @@
 /* engine-e3.css — the view pieces of engine E3 (LX.E3.ui: the bench's controls, a district's day, the cost and household
-   tables, the hub diagram), shared by SB3, M12 and C3. Colours from --lx-* tokens only; no overflow clipping (chart tips
+   tables, the hub diagram), shared by SB3, M12 and C3. Colors from --lx-* tokens only; no overflow clipping (chart tips
    stay visible; a wide table scrolls in its own .lx-scroll-x). */
 
 /* ---------- bench extras */

@@ -1579,7 +1579,7 @@
  },
  "gis": {
   "term": "GIS (geographic information system)",
-  "short": "Software and methods for mapping and analysing data tied to places, such as land use, lines and population.",
+  "short": "Software and methods for mapping and analyzing data tied to places, such as land use, lines and population.",
   "lesson": "R10",
   "href": "r10-question-studio.html"
  },

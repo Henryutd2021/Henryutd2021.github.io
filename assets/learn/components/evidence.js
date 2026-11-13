@@ -6,7 +6,7 @@
                                                                                     that sit on no rung (also a choice in each list)
      items: [{ id: "a", text: "A claim from the lesson", answer: ["operating"], note: "One or two sentences." }, ...],
      placeholder: "Where does it sit?", textLabel: "Text version of the ladder", onPlace: function (item, choice, ok) {} });
-   Each claim gets a labelled <select>. Choosing a rung highlights it (or the off box) and shows "Right." or "Not quite."
+   Each claim gets a labeled <select>. Choosing a rung highlights it (or the off box) and shows "Right." or "Not quite."
    with the claim's note; any rung in item.answer counts as right.
    Returns { el, place(itemId, rungId) } (place sets a claim's choice as if the reader had chosen it).
    Keyboard: native selects. Text version: details.lx-textalt with every rung (lowest first) and every claim with its note.

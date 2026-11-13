@@ -1,7 +1,7 @@
 /* scalestrip.css — LX.ScaleStrip (scalestrip.js): the five scales side by side, and the scale palette.
    The palette (--lx-scale-0 ... --lx-scale-4, S0 device and plant to S4 nation; day, then night) is the only place these
-   colours are defined: F1's zoom, card sorts and comparison table, and any later scale route, use the same tokens.
-   Everything else takes colours from the --lx-* tokens. */
+   colors are defined: F1's zoom, card sorts and comparison table, and any later scale route, use the same tokens.
+   Everything else takes colors from the --lx-* tokens. */
 body.page-learn { --lx-scale-0: #2F8F80; --lx-scale-1: #2A7FA0; --lx-scale-2: #2E66B5; --lx-scale-3: #5150B0; --lx-scale-4: #6A3F9E; }
 body.page-learn.quarto-dark { --lx-scale-0: #5CC0B1; --lx-scale-1: #5AAED2; --lx-scale-2: #7CA6EE; --lx-scale-3: #9A9BEA; --lx-scale-4: #B496E6; }
 .lx-ss { display: grid; gap: 10px; min-width: 0; }
@@ -13,7 +13,7 @@ body.page-learn.quarto-dark { --lx-scale-0: #5CC0B1; --lx-scale-1: #5AAED2; --lx
   align-content: start; background: var(--lx-surface); font-size: 13.5px; color: var(--lx-ink-2); min-width: 0; }
 .lx-ss-strip li.is-marked { background: var(--lx-accent-soft); border-color: var(--lx-accent); }
 .lx-ss-top { display: flex; justify-content: space-between; gap: 6px; align-items: baseline; }
-.lx-ss-code { font-family: var(--lx-f-mono); font-size: 12.5px; font-weight: 600; color: color-mix(in srgb, var(--c) 70%, var(--lx-ink)); }   /* the scale's colour toward the ink: 4.5:1 day and night */
+.lx-ss-code { font-family: var(--lx-f-mono); font-size: 12.5px; font-weight: 600; color: color-mix(in srgb, var(--c) 70%, var(--lx-ink)); }   /* the scale's color toward the ink: 4.5:1 day and night */
 .lx-ss-pw { font-family: var(--lx-f-mono); font-size: 12px; color: var(--lx-ink-3); }
 .lx-ss-strip .lx-ss-name { font-family: var(--lx-f-display); font-weight: 600; font-size: 15px; color: var(--lx-ink); }
 .lx-ss-who, .lx-ss-line { font-size: 13.5px; color: var(--lx-ink-2); }

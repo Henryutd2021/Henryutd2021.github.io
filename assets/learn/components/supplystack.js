@@ -11,7 +11,7 @@
      later: true });             the legend and text version are appended after the step's other controls (next microtask);
                                  false: right under the chart
    ch.draw(blocks [{ key, mw, offer }] (cheapest first), demand MW, { xMax: 450, hideDemand: false }) -> the clearing result
-     (hideDemand: just the blocks, full colour, no price; for building a stack). Money reads "$40.00" and "−$5.00".
+     (hideDemand: just the blocks, full color, no price; for building a stack). Money reads "$40.00" and "−$5.00".
      Tick steps: { xStep: 1000, yStep: 50 } in draw's options, or xStep / yStep in the constructor's options for every
      draw: MW labels every xStep, $/MWh gridlines every yStep from the axis start (defaults: 100 or 150 MW; $20 or $40).
    ch.el (the chart box). It redraws itself on resize and on the day/night switch.
@@ -36,7 +36,7 @@
     return { price: price, marginal: marginal, cost: cost, plants: out, short: Math.max(0, left), spilled: spilled, total: total };
   }
   // the axes: $/MWh from yMin (below zero only for a negative offer) to yMax, gridlines every `step`; MW from 0 to xMax,
-  // labelled every `xStep`; steps.xStep and steps.yStep (positive numbers) replace the default steps
+  // labeled every `xStep`; steps.xStep and steps.yStep (positive numbers) replace the default steps
   function scaleOf(blocks, xMax, steps) {
     var offers = blocks.map(function (b) { return b.offer; });
     var yMax = Math.max(120, Math.ceil((Math.max.apply(null, offers) + 15) / 40) * 40), lowest = Math.min.apply(null, offers);
@@ -79,7 +79,7 @@
       for (var q = 0; q <= xMax; q += sc.xStep) S("text", { x: x(q), y: Hh - 16, "text-anchor": q === 0 ? "start" : "middle" }, svg).textContent = q;
       S("text", { x: W - m.r, y: Hh - 3, "text-anchor": "end" }, svg).textContent = "MW, cheapest first →";
       S("text", { x: 2, y: 13 }, svg).textContent = "$/MWh";
-      var cum = 0, labs = [];   // block labels: [x centre, baseline, width], so the price label can keep clear of them
+      var cum = 0, labs = [];   // block labels: [x center, baseline, width], so the price label can keep clear of them
       blocks.forEach(function (b) {
         if (b.mw <= 0) return;
         var p = res.plants[b.key], x0 = x(cum), x1 = x(cum + b.mw), xr = x(cum + p.run), top = Math.abs(b.offer) < 2 ? y(0) - 4 : Math.min(y(b.offer), y(0)), bot = Math.abs(b.offer) < 2 ? y(0) : Math.max(y(b.offer), y(0));

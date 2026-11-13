@@ -1,5 +1,5 @@
 /* solver.css — the live solver status line (LX.SolverStatus in solver.js): loading, solving, then the outcome in plain
-   words with the time the page waited. Colour follows the outcome; the text alone carries the meaning. */
+   words with the time the page waited. Color follows the outcome; the text alone carries the meaning. */
 .lx-solver-status { display: inline-flex; align-items: center; gap: 8px; min-height: 28px; margin: 6px 0 0; padding: 2px 12px; border-radius: 999px;
   font-size: 14px; line-height: 1.35; color: var(--lx-ink-2); background: var(--lx-surface-2); }
 .lx-solver-status:empty { display: none; }

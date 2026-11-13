@@ -2,7 +2,7 @@
    microgrid ledger). One row per customer, party, device or line, a
    column per amount; the row header can carry a small second line (what the row stands for); numbers in tabular
    figures; an optional total row. It is the course's two-sided table (table.cf-two, forms.css), so on a phone each row
-   becomes a card whose cells are labelled by their column (data-l).
+   becomes a card whose cells are labeled by their column (data-l).
    var tb = LX.Ledger(host, {
      caption: "Bill minus the cost of serving each customer, a month.",   optional (a hint-styled caption)
      columns: ["Customer", "Flat", "Time-of-use"],   the row-header column first, then one label per cell (also each cell's

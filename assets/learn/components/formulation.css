@@ -1,5 +1,5 @@
-/* formulation.css — LX.Formulation (formulation.js): a model's rules in words, in symbols (labelled lines, optionally
-   pickable and marked right or wrong) and as a table that turns into labelled cards on phones. */
+/* formulation.css — LX.Formulation (formulation.js): a model's rules in words, in symbols (labeled lines, optionally
+   pickable and marked right or wrong) and as a table that turns into labeled cards on phones. */
 .lx-fviews { display: grid; gap: 10px; }
 .lx-fviews > .lx-seg { justify-self: start; }
 .lx-ftag { font-size: 12.5px; color: var(--lx-ink-3); }

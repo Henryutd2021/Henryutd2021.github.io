@@ -8,14 +8,14 @@
    What is drawn: every lesson in path.json is one station.
      - The starter path (path.starter) is the named route across the tier lines, as before: large stations with icons
        and names, the route drawn thick; a lesson with tier2 bridges two lines (a capsule "to A").
-     - Each tier is one line (thinner, in the tier's colour) carrying all its lessons: its starter stops first, then
+     - Each tier is one line (thinner, in the tier's color) carrying all its lessons: its starter stops first, then
        its lessons off the starter path (path.more) in curriculum order: modules by number, then unnumbered ones,
        bridges (B), the news lens (N), side topics (X), case files (CF), sandboxes (SB), the checkpoint (CK) and
        capstones (C, CR); path.yml order breaks ties. Live stations are filled; upcoming ones hollow and quiet. Each
        station shows its code; an upcoming lesson without a code is a hollow dot. A label at the left names the tier and
        counts what is drawn on its line ("7 open · 3 coming soon"); it opens the tier's card. A bridge lesson's two
        tiers read in order, lower first ("Analyst to Modeler").
-     - Kinds by shape, not colour: lesson circle, studio hexagon, case file square, checkpoint diamond, sandbox
+     - Kinds by shape, not color: lesson circle, studio hexagon, case file square, checkpoint diamond, sandbox
        triangle, capstone star (from `form`; for an upcoming row without one, from its code: CK- checkpoint, CF case
        file, SB sandbox, C0-C4 and CR capstone, R studio). The legend shows the kinds on the map.
      - The math toolbox (path.toolbox, K1-K8) is a shelf of chips under the lines, inside the map's box.
@@ -372,7 +372,7 @@
 
   // ---------------------------------------------------------------- drawing
   var H = LX.H, S = LX.S, clamp = LX.clamp, uid = 0, VMAX = 560, HMIN = 720;
-  // the shape of a station of each kind, centred on x, y (s: the size; a lesson is a circle)
+  // the shape of a station of each kind, centered on x, y (s: the size; a lesson is a circle)
   function shapeD(kind, x, y, s) {
     var p = [], k;
     if (kind === "studio") { for (k = 0; k < 6; k++) p.push([x + 1.08 * s * Math.cos(Math.PI / 6 + k * Math.PI / 3), y + 1.08 * s * Math.sin(Math.PI / 6 + k * Math.PI / 3)]); }

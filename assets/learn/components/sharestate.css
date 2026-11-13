@@ -1,6 +1,6 @@
 /* sharestate.css — LX.ShareState (sharestate.js): the plan-link box: the status line that announces an opened, updated or
-   refused link (empty and hidden otherwise; a refused link in the warning colours), the copy button row and LX.Share's
-   link field below it. Colours from --lx-* tokens only. */
+   refused link (empty and hidden otherwise; a refused link in the warning colors), the copy button row and LX.Share's
+   link field below it. Colors from --lx-* tokens only. */
 .lx-ss { display: grid; gap: 8px; min-width: 0; }
 .lx-ss-msg { margin: 0; padding: 8px 12px; border-radius: 10px; border-left: 4px solid var(--lx-accent); background: var(--lx-accent-soft);
   font-size: 14.5px; line-height: 1.4; color: var(--lx-ink); overflow-wrap: anywhere; }

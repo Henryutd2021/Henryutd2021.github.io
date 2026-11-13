@@ -3,7 +3,7 @@
      title: "Is LCOE a fair yardstick? The strongest case on each side",
      heading: "h3",            "h3" (default): the title in an explain-card header (.lx-x-head); "h4": a title inside a step card
      eyebrow: "Steelman card", a small line above the title (optional; may stand alone, without a title)
-     frame: false,             true: the card sits in its own framed box, sides on white with a coloured top edge (step cards)
+     frame: false,             true: the card sits in its own framed box, sides on white with a colored top edge (step cards)
      reveal: false,            false: every side open | "button": each side opens with a button named by its title |
                                "details": each side is a <details> whose summary is its title
      sides: [{ key: "for", title: "For: a common, checkable yardstick", points: ["One sentence.", ...] },

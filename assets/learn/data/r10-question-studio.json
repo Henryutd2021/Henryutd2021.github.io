@@ -3,7 +3,7 @@
     "title": "R10 research studio: the question studio. Pickers, draft templates, checks, search terms, crowding counts and example cards",
     "version": "r10-v1",
     "as_of": "2026-11-03",
-    "note": "Draft questions, example cards and exemplars are illustrative. The studio makes no originality judgement: the counts are context only.",
+    "note": "Draft questions, example cards and exemplars are illustrative. The studio makes no originality judgment: the counts are context only.",
     "license": "CC BY 4.0"
   },
   "dataset": { "creator": "Honglin Li", "date": "2026-11-03", "status": "Illustrative: the draft questions, example cards and exemplars are invented for teaching; the crowding counts are dated OpenAlex search counts, for context only.", "source": "Illustrative teaching examples for research studio R10; the crowding counts come from dated OpenAlex keyword searches (crowding.source), and the literature step searches a dated OpenAlex snapshot (r10-question-studio-openalex.json).", "license": "This file: CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/), Honglin Li. OpenAlex data are CC0." },
@@ -50,7 +50,7 @@
       { "id": "water", "label": "water treatment and desalination", "phrase": "water treatment and desalination plants", "terms": ["desalination", "\"water treatment\""], "cluster": "C27" },
       { "id": "agrivoltaics", "label": "agrivoltaics", "def": "solar panels built over working farmland", "phrase": "agrivoltaics", "terms": ["agrivoltaic", "agrivoltaics"] },
       { "id": "retrofits", "label": "building retrofits", "phrase": "building retrofits", "terms": ["\"building retrofit\"", "\"energy retrofit\""] },
-      { "id": "dr", "label": "demand-response programmes", "phrase": "demand-response programmes", "terms": ["\"demand response\""], "cluster": "C04" }
+      { "id": "dr", "label": "demand-response programs", "phrase": "demand-response programs", "terms": ["\"demand response\""], "cluster": "C04" }
     ],
     "lever": [
       { "id": "tech", "label": "new technology", "phrase": "new technology", "terms": ["innovation", "technology"] },
@@ -109,8 +109,8 @@
     { "id": "data", "label": "Data exist",
       "q": "Can you name a dataset that measures your metric, at your scale and time step?",
       "answers": ["Yes", "Not sure", "No"],
-      "evidence": "The dataset, its licence and its date",
-      "pass": "Name it below, with its licence and date.",
+      "evidence": "The dataset, its license and its date",
+      "pass": "Name it below, with its license and date.",
       "warn": "Look before you commit: find one dataset and open it.",
       "block": "As written, the question cannot be answered: change the metric or the scale, or plan to collect data.",
       "fix": ["B2", "R4"] },
@@ -149,7 +149,7 @@
   ],
   "clusters": [
     { "id": "C32", "name": "interconnection queues", "papers": 95, "rgi": null, "query": "\"interconnection queue\" OR \"grid connection queue\" OR \"transmission permitting\"" },
-    { "id": "C33", "name": "open-source modelling", "papers": 401, "rgi": 1.45, "query": "(\"open-source\" OR \"open source\") AND (\"energy system model\" OR \"energy modelling\" OR \"power system model\")" },
+    { "id": "C33", "name": "open-source modeling", "papers": 401, "rgi": 1.45, "query": "(\"open-source\" OR \"open source\") AND (\"energy system model\" OR \"energy modelling\" OR \"power system model\")" },
     { "id": "C29", "name": "resource adequacy", "papers": 2027, "rgi": 0.90, "query": "\"resource adequacy\" OR \"capacity adequacy\" OR \"generation adequacy\" OR \"loss of load\" OR \"capacity credit\"" },
     { "id": "C23", "name": "carbon accounting", "papers": 2244, "rgi": 1.79, "query": "(\"carbon accounting\" OR \"GHG accounting\" OR \"marginal emission\" OR \"carbon intensity\") AND (electricity OR grid)" },
     { "id": "C31", "name": "extreme weather", "papers": 2868, "rgi": 2.08, "query": "(\"extreme weather\" OR \"heat wave\" OR heatwave) AND (\"power system\" OR electricity OR grid)" },
@@ -199,10 +199,10 @@
   },
   "examples": [
     { "id": "e1", "combo": "S1 · society · community solar · low-income renters", "type": "evaluative",
-      "question": "Did a rural co-op's community-solar programme lower renters' energy burden more than bill credits of the same cost would have?",
+      "question": "Did a rural co-op's community-solar program lower renters' energy burden more than bill credits of the same cost would have?",
       "picks": { "scale": "S1", "dimension": "SOC", "lever": "policy", "stakeholder": "renters" },
       "extra": { "element": { "label": "community solar", "phrase": "community solar", "terms": ["\"community solar\"", "\"shared solar\""] } },
-      "card": { "audience": "the co-op's board, deciding whether to keep the programme", "metric": "energy burden: yearly energy bills as a share of income", "units": "% of household income" } },
+      "card": { "audience": "the co-op's board, deciding whether to keep the program", "metric": "energy burden: yearly energy bills as a share of income", "units": "% of household income" } },
     { "id": "e2", "combo": "S0 · operations · irrigation pumps · farmers", "type": "prescriptive",
       "question": "How much irrigation pumping on a Plains farm could move to windy night hours without lowering yield, and what is that worth under the co-op's tariff?",
       "picks": { "scale": "S0", "dimension": "OPS", "element": "irrigation", "lever": "operation", "stakeholder": "farmers" },
@@ -313,7 +313,7 @@
     { "id": "scale", "label": "Scale and boundary", "text": "Including what is left out." },
     { "id": "wrong", "label": "I would be wrong if…", "text": "A result that would count against you." },
     { "id": "unc", "label": "Main uncertainty", "text": "The input that could change the answer most." },
-    { "id": "data", "label": "Data", "text": "One dataset named, with its licence and date." },
+    { "id": "data", "label": "Data", "text": "One dataset named, with its license and date." },
     { "id": "rules", "label": "Rules", "text": "Who pays, who permits, which jurisdiction, as of when." },
     { "id": "time", "label": "Time", "text": "A first version fits the time you have." },
     { "id": "people", "label": "People", "text": "Consent and fair treatment planned, if people are involved." },

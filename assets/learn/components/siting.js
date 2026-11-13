@@ -145,7 +145,7 @@
     R.nNewer = nNew;
     var subc = new Uint8Array(N);
     D.substations.forEach(function (sb) { subc[Math.floor(sb.y) * W + Math.floor(sb.x)] = 1; });
-    // distances: to the nearest home or built-up cell (a cell centre and 4 × 4 points in each cell), to roads, water
+    // distances: to the nearest home or built-up cell (a cell center and 4 × 4 points in each cell), to roads, water
     // Homes and built-up cells are looked up within 3 cells; anything farther counts as CAP km (3 km: beyond every
     // setback and every "away from homes" ramp, so the cap changes no result).
     var SUB = G.sub, CAP = 3, sp = new Float64Array(N * SUB * SUB), dHome = new Float64Array(N), dRoad = new Float64Array(N), dWater = new Float64Array(N);
@@ -348,7 +348,7 @@
   }
   function better(a, b) { return a.score > b.score || (a.score === b.score && (a.j < b.j || (a.j === b.j && a.i < b.i))); }
   function overlap(a, b, g) { g = g || 0; return a.i - g < b.i + b.k && b.i - g < a.i + a.k && a.j - g < b.j + b.k && b.j - g < a.j + a.k; }
-  // the cell a site connects from: its buildable cell nearest the block's centre (ties: the first in row order)
+  // the cell a site connects from: its buildable cell nearest the block's center (ties: the first in row order)
   function connCell(R, X, p) {
     var best = -1, bd = Infinity, c = (p.k - 1) / 2;
     for (var b = 0; b < p.k; b++) for (var a = 0; a < p.k; a++) {
@@ -407,7 +407,7 @@
     }
     return { c: c, cls: cls, base: base, mit: mit, protected: o.protected || "allow" };
   }
-  // the eight neighbours, in a fixed order (N, S, W, E, then the diagonals): the tie rule for equal paths
+  // the eight neighbors, in a fixed order (N, S, W, E, then the diagonals): the tie rule for equal paths
   var NB = [[0, -1], [0, 1], [-1, 0], [1, 0], [-1, -1], [1, -1], [-1, 1], [1, 1]];
   function Heap() { this.a = []; }
   Heap.prototype.less = function (x, y) { return x[0] < y[0] || (x[0] === y[0] && x[1] < y[1]); };
@@ -534,7 +534,7 @@
     return out;
   }
   function gridAt(R, n) { if (!R.gridCache) R.gridCache = gridCells(R); return R.gridCache[n]; }
-  // one row per substation: id, name, where (from the centre), spare MW, and where its lines go
+  // one row per substation: id, name, where (from the center), spare MW, and where its lines go
   function gridRows(R) {
     var D = R.D;
     return D.substations.map(function (s) {
@@ -562,7 +562,7 @@
     var ew = dx === 0 ? "" : Math.abs(dx) + " km " + (dx < 0 ? "W" : "E"), ns = dy === 0 ? "" : Math.abs(dy) + " km " + (dy < 0 ? "N" : "S");
     return (ew && ns ? ew + ", " + ns : ew || ns || "at the center");
   }
-  // the homes in a cell (the newer ones apart) and the distance from its centre to the nearest home or built-up land:
+  // the homes in a cell (the newer ones apart) and the distance from its center to the nearest home or built-up land:
   // the homes layer's text version, cell by cell (a home's dot is drawn on the map only)
   function homesIn(R, n) {
     var k = R.cellKm, i = n % R.W, j = (n - i) / R.W, all = 0, nw = 0;

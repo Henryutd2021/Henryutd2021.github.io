@@ -1,10 +1,10 @@
 /* weekstrip.css — LX.WeekStrip (weekstrip.js): 52 week cells in four rows of 13 behind a date column, extreme weeks
    outlined, a red dot on short weeks, the key, and the text version's table (M3's look: m3-strip, m3-grid, m3-cell,
-   m3-keys and the m3-tbl rules its table uses). Colours from --lx-* tokens only; cell colours come in as --c. */
+   m3-keys and the m3-tbl rules its table uses). Colors from --lx-* tokens only; cell colors come in as --c. */
 .lx-wks{display:grid;gap:6px;min-width:0}
 .lx-wks-grid{display:grid;grid-template-columns:4.6em repeat(13,minmax(0,1fr));gap:3px;align-items:center}
 .lx-wks-grid span.rl{font-size:12px;color:var(--lx-ink-3);font-family:var(--lx-f-mono)}
-/* cells and keys take their colour a little toward the ink (darker by day, lighter by night), so the letter in the page colour reads at 4.5:1 */
+/* cells and keys take their color a little toward the ink (darker by day, lighter by night), so the letter in the page color reads at 4.5:1 */
 .lx-wks-cell{position:relative;height:26px;border-radius:5px;background:color-mix(in srgb,var(--c) 86%,var(--lx-ink));color:var(--lx-bg);font:600 11px/26px var(--lx-f-mono);text-align:center;overflow:hidden}
 .lx-wks-cell.x{outline:2px solid var(--lx-ink);outline-offset:-2px}
 .lx-wks-cell.short::after{content:'';position:absolute;right:2px;top:2px;width:8px;height:8px;border-radius:50%;background:var(--lx-bad);box-shadow:0 0 0 1.5px var(--lx-surface)}

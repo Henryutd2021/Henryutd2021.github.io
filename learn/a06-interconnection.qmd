@@ -160,7 +160,7 @@ $$\text{share}_i = U \, \frac{m_i d_i}{\sum_j m_j d_j}$$
 <div class="lx-deeper-body">
 ```
 
-FERC issued Order 2023 on 28 July 2023 (184 FERC ¶ 61,054). Its pro forma rules, as MISO summarised them:
+FERC issued Order 2023 on 28 July 2023 (184 FERC ¶ 61,054). Its pro forma rules, as MISO summarized them:
 
 | Reform | Pro forma detail |
 |---|---|
@@ -202,7 +202,7 @@ CF7's toy discounts month by month, in three steps:
 <summary><span class="k">Go deeper</span>What this lesson leaves out</summary>
 <div class="lx-deeper-body">
 <ul>
-<li>Affected-system studies, when a project also loads a neighbouring grid, and facilities studies of the equipment at the connection.</li>
+<li>Affected-system studies, when a project also loads a neighboring grid, and facilities studies of the equipment at the connection.</li>
 <li>Many operating conditions: the toy tests one, every project at full output; real studies test peak and light load, and faults.</li>
 <li>Voltage, short-circuit and stability limits, which can bind before a line's thermal limit.</li>
 <li>Permits, land, supply chains and construction crews, which set much of the time after the agreement.</li>

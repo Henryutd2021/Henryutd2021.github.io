@@ -1,6 +1,6 @@
 /* planengine.css — the page kit of the planning engine (planengine.js, LX.townPlan.ui) shared by lessons 12 and 13:
    the stage and cards, the plan and comparison tables (TextTable: cards on phones), the scenario box, the week tabs, the
-   hourly table and the verdict list. The lx13- prefix stays because both lessons use these classes. Colours from --lx-* tokens only. */
+   hourly table and the verdict list. The lx13- prefix stays because both lessons use these classes. Colors from --lx-* tokens only. */
 .lx13-stage{display:grid;gap:14px;min-width:0}
 .lx13-card{background:var(--lx-surface);border:1px solid var(--lx-line);border-radius:var(--lx-r-lg);padding:14px 16px;display:grid;gap:10px;min-width:0}
 .page-learn .lx13-card :is(h2,h3){font-size:17px}

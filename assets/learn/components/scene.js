@@ -4,7 +4,7 @@
    sc.highlight(["cc", "town"]) | sc.labels(on, onlyKeys) | sc.reveal(key) | sc.tappable(on, onTap(key)) | sc.met(key)
    sc.event("short text") shows a chip in the corner; sc.el is the picture, sc.box its wrapper.
    Wide scenes carry value callouts; under 560 px they switch to numbered markers with a legend strip below.
-   Sky colours follow the hour and the day/night toggle; animation stops under prefers-reduced-motion. */
+   Sky colors follow the hour and the day/night toggle; animation stops under prefers-reduced-motion. */
 (function () {
   "use strict";
   var LX = window.LX, H = LX.H, S = LX.S, clamp = LX.clamp;

@@ -18,7 +18,7 @@
              LX.demo(root, fn, cards) a lesson's demo states ("mid", "step-N", ...) for screenshots: window.lxDemo, ?demo=
              LX.load(urls)         Promise of {basename: parsed JSON};  LX.base = URL of assets/learn/
              LX.anim({visible, step}) one shared animation loop; LX.onTheme(fn) when Quarto's day/night toggle flips
-             LX.tokens(el, names)  read colour tokens (#rrggbb) as [r, g, b]
+             LX.tokens(el, names)  read color tokens (#rrggbb) as [r, g, b]
    Links:    LX.lessonRef(P, code)  a lesson by starter number (3) or code ("R2"), from data/path.json (P, loaded with the
                                    page's data-src): { href, ready, label } ("lesson 3" or "R2"; href null when unknown)
              LX.lessonRefHTML(P, code)  a link when path.json marks the lesson ready, else its label and "(upcoming)", so a
@@ -264,7 +264,7 @@
   LX.on = function (ev, fn) { (subs[ev] = subs[ev] || []).push(fn); };
   LX.emit = function (ev, x) { (subs[ev] || []).forEach(function (f) { try { f(x); } catch (e) { console.error(e); } }); };
 
-  // ---------------------------------------------------------------- colour tokens and day/night
+  // ---------------------------------------------------------------- color tokens and day/night
   LX.isDark = function () { return document.body.classList.contains("quarto-dark"); };
   LX.onTheme = function (fn) { LX.on("theme", fn); };
   function hex(s) { var m = /^#?([0-9a-f]{6})$/i.exec((s || "").trim()); var n = m ? parseInt(m[1], 16) : 0x888888; return [n >> 16 & 255, n >> 8 & 255, n & 255]; }
@@ -461,7 +461,7 @@
    sc.highlight(["cc", "town"]) | sc.labels(on, onlyKeys) | sc.reveal(key) | sc.tappable(on, onTap(key)) | sc.met(key)
    sc.event("short text") shows a chip in the corner; sc.el is the picture, sc.box its wrapper.
    Wide scenes carry value callouts; under 560 px they switch to numbered markers with a legend strip below.
-   Sky colours follow the hour and the day/night toggle; animation stops under prefers-reduced-motion. */
+   Sky colors follow the hour and the day/night toggle; animation stops under prefers-reduced-motion. */
 (function () {
   "use strict";
   var LX = window.LX, H = LX.H, S = LX.S, clamp = LX.clamp;
@@ -887,7 +887,7 @@
   };
 })();
 
-/* daychart.js — LX.DayChart: hourly stacked bars (one colour per plant) with demand as a dashed step line.
+/* daychart.js — LX.DayChart: hourly stacked bars (one color per plant) with demand as a dashed step line.
    const c = LX.DayChart(host, { series: [{key: "nuclear", label: "Nuclear", color: "var(--lx-nuc)"}, ...],
                                  demand: [24 numbers], rows: function () { return [{nuclear: 100, ..., unserved: 0}, ...]; },
                                  yMax: 400, unit: "MW", pending: "not played yet", label: "what the chart shows" });
@@ -1157,7 +1157,7 @@
                                      feedback: {gas: "One sentence.", wind: "One sentence."}, lockText: "Locked in.", onPick: fn });
         p.reveal("extra sentence with the reader's own numbers")   |  p.picked()
         LX.Guess(host, { id, q, ticks: ["A day", "An hour", ...], answer: 4, start: 1, onLock: function (g, out) {} })
-             a guess on an ordered scale (range input with labelled ticks); onLock adds the reveal into `out`
+             a guess on an ordered scale (range input with labeled ticks); onLock adds the reveal into `out`
    Markup (works without JS; upgraded to buttons):
         <div class="lx-predict" data-predict="id"><p class="lx-q">Question?</p>
           <ul class="lx-choices"><li data-value="a">Option A</li> ...</ul></div>
@@ -1400,7 +1400,7 @@
   });
 })();
 
-/* conceptmap.js — LX.ConceptMap: the lesson's ideas as tappable nodes joined by labelled arrows, with a detail panel.
+/* conceptmap.js — LX.ConceptMap: the lesson's ideas as tappable nodes joined by labeled arrows, with a detail panel.
    LX.ConceptMap(host, { title: "The ideas, and how they connect", lede: "Tap an idea.",
      groups: { bal: ["Balance", "var(--lx-good)"], ... },
      nodes: [{ id: "balance", g: "bal", label: "Balance", lines: ["Two", "lines"], (on phones), text: "One or two sentences.",
@@ -1652,7 +1652,7 @@
 
 /* table.js — LX.CompareTable: a comparison table whose rows can be re-sorted to reveal an order (rows slide to place).
    LX.CompareTable(host, { title: "The five plants", lede: "One sentence.",
-     columns: [{key: "name", label: "Plant and who decides", main: true},          main: the name column (colour dot + small note)
+     columns: [{key: "name", label: "Plant and who decides", main: true},          main: the name column (color dot + small note)
                {key: "size", label: "Size", num: true, phoneHide: true},
                {key: "cost", label: "Running cost", num: true, bar: {max: 100}, phone: "$/MWh"}], bar: a small bar; phone: short label on phones
      rows: [{key: "nuclear", color: "var(--lx-nuc)", name: "Nuclear plant", note: "Runs flat", size: "100 MW",
@@ -1786,14 +1786,14 @@
    What is drawn: every lesson in path.json is one station.
      - The starter path (path.starter) is the named route across the tier lines, as before: large stations with icons
        and names, the route drawn thick; a lesson with tier2 bridges two lines (a capsule "to A").
-     - Each tier is one line (thinner, in the tier's colour) carrying all its lessons: its starter stops first, then
+     - Each tier is one line (thinner, in the tier's color) carrying all its lessons: its starter stops first, then
        its lessons off the starter path (path.more) in curriculum order: modules by number, then unnumbered ones,
        bridges (B), the news lens (N), side topics (X), case files (CF), sandboxes (SB), the checkpoint (CK) and
        capstones (C, CR); path.yml order breaks ties. Live stations are filled; upcoming ones hollow and quiet. Each
        station shows its code; an upcoming lesson without a code is a hollow dot. A label at the left names the tier and
        counts what is drawn on its line ("7 open · 3 coming soon"); it opens the tier's card. A bridge lesson's two
        tiers read in order, lower first ("Analyst to Modeler").
-     - Kinds by shape, not colour: lesson circle, studio hexagon, case file square, checkpoint diamond, sandbox
+     - Kinds by shape, not color: lesson circle, studio hexagon, case file square, checkpoint diamond, sandbox
        triangle, capstone star (from `form`; for an upcoming row without one, from its code: CK- checkpoint, CF case
        file, SB sandbox, C0-C4 and CR capstone, R studio). The legend shows the kinds on the map.
      - The math toolbox (path.toolbox, K1-K8) is a shelf of chips under the lines, inside the map's box.
@@ -2150,7 +2150,7 @@
 
   // ---------------------------------------------------------------- drawing
   var H = LX.H, S = LX.S, clamp = LX.clamp, uid = 0, VMAX = 560, HMIN = 720;
-  // the shape of a station of each kind, centred on x, y (s: the size; a lesson is a circle)
+  // the shape of a station of each kind, centered on x, y (s: the size; a lesson is a circle)
   function shapeD(kind, x, y, s) {
     var p = [], k;
     if (kind === "studio") { for (k = 0; k < 6; k++) p.push([x + 1.08 * s * Math.cos(Math.PI / 6 + k * Math.PI / 3), y + 1.08 * s * Math.sin(Math.PI / 6 + k * Math.PI / 3)]); }
@@ -2539,9 +2539,9 @@
            key (a newer queued solve with the same key supersedes an older queued one: slider sweeps), gap (MILP
            relative gap, default HiGHS's 1e-4)
    Duals (LP only): duals[c] = change of the optimal objective per unit increase of constraint c's binding bound
-     (dObjective/dRHS, same sign convention for min and max). For a demand balance row in a cost-minimising dispatch
+     (dObjective/dRHS, same sign convention for min and max). For a demand balance row in a cost-minimizing dispatch
      this is the marginal cost of one more MWh: a marginal value under stated assumptions (fixed capacities, a convex
-     model, the modelled market), not a market price. reducedCosts[v] = dObjective per unit increase of v's active bound.
+     model, the modeled market), not a market price. reducedCosts[v] = dObjective per unit increase of v's active bound.
    MILP: no duals and no reduced costs (null): HiGHS returns no duals for a MILP. For prices conditional on the integer
      decisions (for example a unit-commitment schedule), call
      LX.solver.fixAndReprice(model, milpResult, opts): it fixes every integer and binary variable at its MILP value,
@@ -2571,7 +2571,7 @@
   var VERSION = "1.15.4";
 
   // ---------------------------------------------------------------- the pure core (no outer references: it is also
-  // serialised with toString() into the worker, so keep everything it needs inside this function)
+  // serialized with toString() into the worker, so keep everything it needs inside this function)
   function solverCore() {
     // HiGHS model status -> ours. 11 (objective bound reached) and 12 (objective target reached) are early stops, not
     // proofs of optimality, so they get statuses of their own and ok stays false (a plan found before the stop is kept).
@@ -2590,7 +2590,7 @@
       out.forEach(function (p) { if (typeof p[1] !== "number" || !isFinite(p[1])) throw new Error(where + ": coefficient of " + p[0] + " is not a finite number"); });
       return out;
     }
-    // normalise a model into index form; throws on authoring errors (unknown or repeated names, bad numbers)
+    // normalize a model into index form; throws on authoring errors (unknown or repeated names, bad numbers)
     function normalize(model) {
       if (!model || typeof model !== "object") throw new Error("model: expected an object");
       var sense = String(model.sense || "min").toLowerCase();
@@ -2827,7 +2827,7 @@
         }, 0);
         return;
       }
-      job.watch = setTimeout(function () {   // HiGHS honours time_limit; this catches a solve that does not return at all
+      job.watch = setTimeout(function () {   // HiGHS honors time_limit; this catches a solve that does not return at all
         if (current !== job) return;
         restart(); current = null;
         finish(job, errorResult(job, "stopped by the watchdog after " + Math.round(job.opts.timeLimit * 1000 + 2000) + " ms", "time-limit"));
@@ -2883,7 +2883,7 @@
     "time-limit": "Stopped at the time limit; the plan shown, if any, may not be the best.", "iteration-limit": "Stopped at the iteration limit.",
     "objective-bound": "Stopped at the objective bound set for this run; the plan shown, if any, may not be the best.",
     "objective-target": "Stopped on reaching the objective target set for this run; the plan shown may not be the best.",
-    interrupted: "Interrupted.", cancelled: "Cancelled.", superseded: "Replaced by a newer run.", error: "The solver reported an error." };
+    interrupted: "Interrupted.", cancelled: "Canceled.", superseded: "Replaced by a newer run.", error: "The solver reported an error." };
   S.describe = function (r) {
     if (!r) return "";
     var s = SAY[r.status] || r.status;
@@ -2959,7 +2959,7 @@
 
 /* profiles.js — wind and solar output for a plant of a given size, with a realistic annual capacity factor (the
    course's data convention).
-   The wind and solar shapes in assets/learn/data/town_days.json and town_year.json are each normalised to their own 2025
+   The wind and solar shapes in assets/learn/data/town_days.json and town_year.json are each normalized to their own 2025
    maximum hour (integers in thousandths). Their mean/max (wind 0.53, solar 0.24 for SPP in 2025) is therefore NOT a
    capacity factor. To turn a shape into a plant's output, scale it so that its annual capacity factor equals a sourced
    target: assets/learn/data/cf_targets.json (EIA, Electric Power Monthly, Table 6.07.B, 2025 annual, U.S. utility scale).
@@ -2984,7 +2984,7 @@
      power  output = capacity × s ^ g. The best hour stays at capacity and weaker hours shrink (g > 1) or grow (g < 1);
             no clipping. Use it when a lesson shows peaks against capacity.
    Both keep zero hours at zero (night stays dark) and are exact to 1e-9 on the annual mean (bisection). Lesson 0 keeps its
-   single real day scaled to farm size, labelled; it does not use this helper.
+   single real day scaled to farm size, labeled; it does not use this helper.
    Node: module.exports = { cfScale, townProfile, cfOf } (tests: _tests/learn/test_profiles.js). */
 (function () {
   "use strict";
@@ -3089,7 +3089,7 @@
 
    spec = {
      x: {min, max, ticks: [[v, "label", anchor]] or function (W) -> ticks, ticksN: ticks under 480 px}
-        (anchor optional: the first tick at min starts there, the last at max ends there, others are centred)
+        (anchor optional: the first tick at min starts there, the last at max ends there, others are centered)
      y: {min, max, ticks: [[v, "label"]] or step: s with fmt(v) -> label (gridlines from min), unit: "MW" (top left),
          zero: true (the gridline at 0 drawn darker)}
      height, heightN (under 480 px; defaults 260 and 220), ml (left margin) or margin: {l, r, t, b} (default 52, 14, 18, 28)
@@ -3103,7 +3103,7 @@
                (default 2.4; 0 draws only the area), dash, anim (draw on), dots, area (fill opacity down to y = 0),
                step (each point holds for this x width: hourly prices), offset (px down, to show equal lines side by
                side), op, cap ("round" default, or "butt")}]
-     marks:   [{x, y, label, color, kind: "ring" (default: hollow, bold label beside) | "dot" (filled, label centred
+     marks:   [{x, y, label, color, kind: "ring" (default: hollow, bold label beside) | "dot" (filled, label centered
                above), above (ring), pos: "above" | "below" | "bottom" (dot), n: "1" (a numbered disc), vline: true
                (a dashed line down the chart; no dot unless dot: true)}]
      legend:  [{label, color, dash}]
@@ -3118,7 +3118,7 @@
 
    var c = LX.PlotCard(host, { text: "Text version of the chart", cls: "" });
      a card (.lx-xcard) with c.title (an eyebrow line), c.chips (value chips, aria-live), the chart c.plot (LX.Plot)
-     and its text version c.text. c.chip(label, value, tone) adds a chip; tone "good" | "bad" | "warn" colours the
+     and its text version c.text. c.chip(label, value, tone) adds a chip; tone "good" | "bad" | "warn" colors the
      value; c.clear() empties the chips. Used by lessons 3 and 4. */
 (function () {
   "use strict";
@@ -3289,7 +3289,7 @@
         wrap.setAttribute("aria-label", (pk && pk.onPick ? "Chart: the left and right arrow keys pick a column" : "Chart: the left and right arrow keys move the readout") + "; the text version lists every value.");
       } else { wrap.removeAttribute("tabindex"); wrap.removeAttribute("role"); wrap.removeAttribute("aria-label"); }
     }
-    // a mark: a hollow ring with a bold label beside it (default), a filled dot with a centred label, or a numbered disc
+    // a mark: a hollow ring with a bold label beside it (default), a filled dot with a centered label, or a numbered disc
     function mark(mk, g) {
       var m = g.m, cx = g.X(mk.x), cy = g.Y(mk.y), kind = mk.n != null ? "num" : (mk.kind || "ring");
       if (mk.vline) S("path", { d: "M" + cx + " " + m.t + "V" + (m.t + g.ih), stroke: "var(--lx-ink-3)", "stroke-dasharray": "4 3", "stroke-width": 1.5 }, svg);
@@ -3373,7 +3373,7 @@
   };
 })();
 
-/* scatter.js — LX.Scatter: a dot chart of two measures, one labelled dot per item, every dot a button, with an optional
+/* scatter.js — LX.Scatter: a dot chart of two measures, one labeled dot per item, every dot a button, with an optional
    dashed y = x line and a text version. First used by lesson 6 (06-three-jobs.js:
    capacity factor across, firm share up).
 
@@ -3394,7 +3394,7 @@
   // ---------------------------------------------------------------- pure helpers (Node tests: _tests/learn/test_components_a.js)
   // the drawing's size for a column width cw (phones: real width, so text is not scaled down)
   function size(cw) { var phone = cw < 520; return { phone: phone, W: phone ? Math.max(300, cw) : 560, H: phone ? 300 : 330 }; }
-  // where a dot's label goes: right if it fits, else left, else centred above (kept inside [left, right])
+  // where a dot's label goes: right if it fits, else left, else centered above (kept inside [left, right])
   function labelPos(px, py, text, left, right) {
     var tw = text.length * 7.4;
     if (px + 16 + tw <= right) return { x: px + 16, y: py + 5, anchor: "start" };
@@ -3480,7 +3480,7 @@
      sort: true,                                           sort rows by swing, largest first (stable; false keeps the order)
      pad: 0.28, padAbs: 1,                                 room for the end labels: the axis runs from lo − p to hi + p,
                                                            p = pad × (hi − lo) + padAbs (lo, hi: the lowest and highest result)
-     below: "var(--lx-good)", above: "var(--lx-bad)"       colours of the part of a bar below and above the base (swap them
+     below: "var(--lx-good)", above: "var(--lx-bad)"       colors of the part of a bar below and above the base (swap them
                                                            for a result where higher is better)
    });
    t.draw({ base: 37.52,                                   the result with every input at its default (the black line)
@@ -3548,7 +3548,7 @@
   LX.Tornado.layout = tornadoLayout;
 })();
 
-/* costsplit.js — LX.CostSplit: stacked bars that split a total into its parts, one row per item, with a colour key (lesson
+/* costsplit.js — LX.CostSplit: stacked bars that split a total into its parts, one row per item, with a color key (lesson
    7: a plant's cost per MWh split into building the plant, fixed upkeep, fuel and upkeep per MWh).
    var cs = LX.CostSplit(host, {
      parts: [{ key: "capital", label: "Building the plant", color: "var(--lx-tier-2)", words: "building the plant" }, ...],
@@ -3561,8 +3561,8 @@
      fmt: function (v) { return "$" + Math.round(v); },   the total at the end of each row (default: v rounded)
      min: 0.005,                    parts at or below this are left out (bar and text)
      onPick: function (key) {},     rows become toggle buttons (aria-pressed marks the last one picked); without it, plain rows
-     key: true });                  the colour key right after the rows (false: place it with cs.key(host))
-   cs.set(rows[, scale])  redraw the rows (a calculator) | cs.key(host) add the colour key (aria-hidden) | cs.el | cs.rows {key: row}
+     key: true });                  the color key right after the rows (false: place it with cs.key(host))
+   cs.set(rows[, scale])  redraw the rows (a calculator) | cs.key(host) add the color key (aria-hidden) | cs.el | cs.rows {key: row}
    Helpers for other bars and for text versions:
      LX.CostSplit.bar(host, [{ color, value }], scale, { height }) -> one stacked bar (span, aria-hidden)
      LX.CostSplit.fill(bar, [{ color, value }], scale)            repaint that bar
@@ -3654,7 +3654,7 @@
      later: true });             the legend and text version are appended after the step's other controls (next microtask);
                                  false: right under the chart
    ch.draw(blocks [{ key, mw, offer }] (cheapest first), demand MW, { xMax: 450, hideDemand: false }) -> the clearing result
-     (hideDemand: just the blocks, full colour, no price; for building a stack). Money reads "$40.00" and "−$5.00".
+     (hideDemand: just the blocks, full color, no price; for building a stack). Money reads "$40.00" and "−$5.00".
      Tick steps: { xStep: 1000, yStep: 50 } in draw's options, or xStep / yStep in the constructor's options for every
      draw: MW labels every xStep, $/MWh gridlines every yStep from the axis start (defaults: 100 or 150 MW; $20 or $40).
    ch.el (the chart box). It redraws itself on resize and on the day/night switch.
@@ -3679,7 +3679,7 @@
     return { price: price, marginal: marginal, cost: cost, plants: out, short: Math.max(0, left), spilled: spilled, total: total };
   }
   // the axes: $/MWh from yMin (below zero only for a negative offer) to yMax, gridlines every `step`; MW from 0 to xMax,
-  // labelled every `xStep`; steps.xStep and steps.yStep (positive numbers) replace the default steps
+  // labeled every `xStep`; steps.xStep and steps.yStep (positive numbers) replace the default steps
   function scaleOf(blocks, xMax, steps) {
     var offers = blocks.map(function (b) { return b.offer; });
     var yMax = Math.max(120, Math.ceil((Math.max.apply(null, offers) + 15) / 40) * 40), lowest = Math.min.apply(null, offers);
@@ -3722,7 +3722,7 @@
       for (var q = 0; q <= xMax; q += sc.xStep) S("text", { x: x(q), y: Hh - 16, "text-anchor": q === 0 ? "start" : "middle" }, svg).textContent = q;
       S("text", { x: W - m.r, y: Hh - 3, "text-anchor": "end" }, svg).textContent = "MW, cheapest first →";
       S("text", { x: 2, y: 13 }, svg).textContent = "$/MWh";
-      var cum = 0, labs = [];   // block labels: [x centre, baseline, width], so the price label can keep clear of them
+      var cum = 0, labs = [];   // block labels: [x center, baseline, width], so the price label can keep clear of them
       blocks.forEach(function (b) {
         if (b.mw <= 0) return;
         var p = res.plants[b.key], x0 = x(cum), x1 = x(cum + b.mw), xr = x(cum + p.run), top = Math.abs(b.offer) < 2 ? y(0) - 4 : Math.min(y(b.offer), y(0)), bot = Math.abs(b.offer) < 2 ? y(0) : Math.max(y(b.offer), y(0));
@@ -3763,7 +3763,7 @@
 })();
 
 /* frontier.js — LX.Frontier: cost against emissions. The frontier (the cheapest plan at each CO₂ level) as a line with the
-   region below it shaded "out of reach (approximately)", labelled plan dots that can be picked by mouse or keyboard, and an equal-score
+   region below it shaded "out of reach (approximately)", labeled plan dots that can be picked by mouse or keyboard, and an equal-score
    line for a weighted sum (cost + price × CO₂); lessons 12 and 13.
    var fc = LX.Frontier(host, {
      label: "Cost per year against CO₂ per year",   the chart's spoken name
@@ -3926,7 +3926,7 @@
      title: "Is LCOE a fair yardstick? The strongest case on each side",
      heading: "h3",            "h3" (default): the title in an explain-card header (.lx-x-head); "h4": a title inside a step card
      eyebrow: "Steelman card", a small line above the title (optional; may stand alone, without a title)
-     frame: false,             true: the card sits in its own framed box, sides on white with a coloured top edge (step cards)
+     frame: false,             true: the card sits in its own framed box, sides on white with a colored top edge (step cards)
      reveal: false,            false: every side open | "button": each side opens with a button named by its title |
                                "details": each side is a <details> whose summary is its title
      sides: [{ key: "for", title: "For: a common, checkable yardstick", points: ["One sentence.", ...] },
@@ -4117,14 +4117,14 @@
                             first best corner), value (c·p there), ray (the unbounded or tied direction, else null),
                             binding: {id: true when that rule's line runs through the best corner}}. A region that is not
                             empty must have a corner (always true with x >= 0 and y >= 0); otherwise use optimum().
-     simplexWalk(m)         the simplex method, drawn: start at the worst corner, step to the better neighbouring corner along
+     simplexWalk(m)         the simplex method, drawn: start at the worst corner, step to the better neighboring corner along
                             an edge while one is better: [{x, y, value, on, along (the id of the rule whose edge was walked)}]
 
    LX.LPPlane(host, o) -> plane
      o.view                 the data box
      o.xLabel, o.yLabel     axis titles
      o.fluid                false (default): a 440 × 380 drawing that scales with its box, at most 520 px wide (B1, K4); grid
-                            lines at o.ticks (with more than six, every other x value is labelled), centred axis titles.
+                            lines at o.ticks (with more than six, every other x value is labeled), centered axis titles.
                             true: drawn at the box's own width (taller on phones), redrawn on resize, grid lines every
                             o.grid units (default 40), titles at the axis ends (lessons 10 and 11).
      o.aria                 the drawing's spoken label when there is no o.describe
@@ -4151,7 +4151,7 @@
      plane.focusDot()                focus the dot at the next render
    Keyboard: the plan dot is a focusable slider (arrow keys). Rule lines and the cost line are dragged by pointer; each lesson
    also gives a slider for the same number. Text version: o.describe (render), or the lesson's own list (primitives).
-   Colours from --lx-* tokens only, so day and night need no redraw. */
+   Colors from --lx-* tokens only, so day and night need no redraw. */
 (function () {
   "use strict";
 
@@ -4407,7 +4407,7 @@
     }
     function path(P) { return P.length ? "M" + P.map(function (p) { return sx(p[0]).toFixed(1) + " " + sy(p[1]).toFixed(1); }).join(" L") + " Z" : ""; }
     function clear() { [gOut, gReg, gRule, gIso, gPt].forEach(function (g) { g.innerHTML = ""; }); }
-    function bg(par, at, text) {   // a label with a halo in the surface colour, so it reads over lines
+    function bg(par, at, text) {   // a label with a halo in the surface color, so it reads over lines
       var a = {}; for (var k in at) a[k] = at[k];
       a.class = at.class + " bg"; S("text", a, par).textContent = text;
       S("text", at, par).textContent = text;
@@ -4523,7 +4523,7 @@
         var label = W < 480 && stl.short ? stl.short : stl.label || "";
         if (anchor === "start" && W - m.r - lx < label.length * 7) { anchor = "end"; lx -= 12; }
         if (anchor === "end" && lx - m.l < label.length * 7) { anchor = "start"; lx = m.l + 4; }
-        // the label in its line's colour taken toward the ink (darker by day, lighter by night): 4.5:1 on the surface
+        // the label in its line's color taken toward the ink (darker by day, lighter by night): 4.5:1 on the surface
         S("text", { x: lx, y: ly, "text-anchor": anchor, class: "lbl", fill: "color-mix(in srgb, " + stl.color + " 70%, var(--lx-ink))", "paint-order": "stroke", stroke: "var(--lx-surface)", "stroke-width": 4, "stroke-linejoin": "round" }, gRule).textContent = label;
         if (o.onDrag && stl.drag) hit(r.a, r.b, id, { tabindex: "-1" }, gRule);
       });
@@ -4908,7 +4908,7 @@
                       label: "C F",                    spoken name instead of `name` (optional)
                       unit: "%",                       shown after the name: "Capacity factor (%)", in the panel and
                                                        in the text version
-                      color: "var(--lx-tier-1)",       a colour bar under the button (optional)
+                      color: "var(--lx-tier-1)",       a color bar under the button (optional)
                       words: "One or two sentences.",  what it means (alias: text)
                       you: "..." | function () {},     and any key named in `fields`: the lines under the words
                       story: "...", code: "..." } },
@@ -4927,7 +4927,7 @@
      code: "...", codeLabel: "The same equation in code (Python)",   the whole equation as code, in a collapsed box
      textLabel: "Text version" });                                    the text version's summary
    Returns { select(id), el }. Symbols are real buttons (Tab, Enter, Space) with aria-pressed and a visible focus ring;
-   the panel is a polite live region. Colours come from tokens only. LX.EquationCard.sym(id, html) writes the button
+   the panel is a polite live region. Colors come from tokens only. LX.EquationCard.sym(id, html) writes the button
    markup for html rows. */
 (function () {
   "use strict";
@@ -5020,7 +5020,7 @@
              { k: "Goal", color: "var(--lx-good)", text: "..." }, { k: "Rules", color: "var(--lx-warn)", text: "..." },
              { k: "Given", color: "var(--lx-ink-3)", text: "..." }],      k: the part's name; color: the bar on top (a token)
      symbols: "min Σ<sub>t</sub> ... <span class=\"tag\">balance</span><br>...",   optional: the same model in symbols, as html
-                                                                                     (.tag = a small grey label after a line)
+                                                                                     (.tag = a small gray label after a line)
      symbolsLabel: "Show it in symbols" });                                         the summary of the collapsed symbols box
    Four parts (or three) sit in one row on wide cards, two to a row under 860 px, and stacked under 520 px. The symbols box is a
    <details>, so it is keyboard operable and readable as text; long lines scroll inside the box, not the page.
@@ -5062,7 +5062,7 @@
      views: ["words", "symbols", "table"],       the views offered, in order; with one view there is no switch
      view: "table",                              the view shown first (default: the first)
      sel: "bal",                                 the rule highlighted in every view (null: none)
-     full: true,                                 false: rules marked extra are left out, or shown greyed with extraNote when
+     full: true,                                 false: rules marked extra are left out, or shown grayed with extraNote when
      showLater: false, extraNote: "(added later)",   showLater is true; base rules then show symBase
      hours: 24,                                  passed to rows(full, hours)
      columns: ["Rule", "In words", "In symbols", "How many", ["Its dual means", "Its dual"]],   table headings; [heading, phone label]
@@ -5072,7 +5072,7 @@
      onPick: function (id, el) {},               symbols lines become buttons (aria-pressed); called after the press
      aria: "Suspect 1: select the wrong line" }) the spoken name of the group of lines
    Returns { set({ sel, view, full }), mark(id, "right" | "wrong" | null) (no id: clear every mark), lines: { id: element }
-   (the symbols view's lines), el }. The view switch and the lines are buttons; the table becomes labelled cards on phones;
+   (the symbols view's lines), el }. The view switch and the lines are buttons; the table becomes labeled cards on phones;
    long symbols wrap inside their line. LX.Formulation.visible(rules, full, showLater) is the pure filter (Node tests). */
 (function () {
   "use strict";
@@ -5165,14 +5165,14 @@
    price; lines carry flows with arrows, limits, and a red "full" when congested; a bus can be tapped; a text version lists
    every bus and line.
    var net = LX.Network(host, {
-     buses: [{ id: "T", name: "Prairie Town", short: "Town", color: "var(--lx-demand)", at: [180, 238],   box centre, in the viewBox
-               note: "load + nuclear",                  small grey line in the box, after the plants' colour squares
+     buses: [{ id: "T", name: "Prairie Town", short: "Town", color: "var(--lx-demand)", at: [180, 238],   box center, in the viewBox
+               note: "load + nuclear",                  small gray line in the box, after the plants' color squares
                desc: "all the demand and the nuclear plant",   the bus in the text version (default: its plants' labels)
                reference: true }],                      (kept for callers; no effect on the drawing)
      lines: [{ id: "RT", from: "R", to: "T", name: "Ridge–Town",
                labelAt: [x, y, "start" | "middle" | "end"] }],   where the flow label goes (default: beside the line's middle,
-                                                                  on the side away from the network's centre)
-     plants: [{ bus: "R", color: "var(--lx-wind)", label: "Wind farm" }],   a colour square per plant in its bus's box
+                                                                  on the side away from the network's center)
+     plants: [{ bus: "R", color: "var(--lx-wind)", label: "Wind farm" }],   a color square per plant in its bus's box
      size: [360, 300],                       the viewBox, width and height
      label: "Three-bus network: ...",        the diagram's spoken name
      onPick: function (busId) {},            buses become buttons (Tab, Enter, Space; aria-pressed shows the selected bus)
@@ -5184,14 +5184,14 @@
              lim: { RT: 110 },      line limits: "110 / 110 MW"; a non-finite limit is not shown
              sel: "T",              the selected bus (thicker border)
              transfer: { RT: 60 } })  flows of a transfer instead of an hour's (shown without limits)
-   Any key left out keeps its value. Returns { set, el }. Colours are tokens (CSS variables), so day and night both work
+   Any key left out keeps its value. Returns { set, el }. Colors are tokens (CSS variables), so day and night both work
    without a redraw. Node: module.exports = { flowWidth, autoLabel, describe } (pure; tests). */
 (function () {
   "use strict";
   function money(v) { var r = Math.round(v); return (r < 0 ? "−$" : "$") + Math.abs(r).toLocaleString("en-US"); }
   function flowWidth(fl, mwPerPx) { return fl == null ? 3 : 2.5 + Math.min(9, Math.abs(fl) / (mwPerPx || 22)); }
   function byId(list, id) { for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i]; return null; }
-  // where a line's label goes: o.labelAt, else 14 units out from the line's middle, away from the buses' centre
+  // where a line's label goes: o.labelAt, else 14 units out from the line's middle, away from the buses' center
   function autoLabel(o, l) {
     if (l.labelAt) return l.labelAt;
     var a = byId(o.buses, l.from).at, b = byId(o.buses, l.to).at, mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2, cx = 0, cy = 0;
@@ -5286,8 +5286,8 @@
    ch.set({ series: [{id, label, color, v: [price per hour]}], ghost: [price per hour] or null, sel: hour });   any subset;
                  the chart keeps the rest and draws once it has series
      series      one step line per series (each price holds for its hour). Equal prices would hide each other, so with
-                 several series each line is moved 1.6 px from its neighbour (the middle one stays put)
-     ghost       an earlier run as a dashed grey step line, named ghostLabel in the legend (default "Before")
+                 several series each line is moved 1.6 px from its neighbor (the middle one stays put)
+     ghost       an earlier run as a dashed gray step line, named ghostLabel in the legend (default "Before")
      sel         the selected hour, shaded; with onPick a tap on an hour, or ← → Home End on the focused chart, picks it
    The y axis runs from $0 to a round top (at least $100, in steps of $50) with four gridlines; the time axis is marked
    every 6 hours (every 12 under 480 px); hovering shows the hour's prices (the ghost's too); the text version is a table
@@ -5308,7 +5308,7 @@
     if (ghost) all = all.concat(ghost);
     return Math.max(100, Math.ceil(Math.max.apply(null, all) / 50) * 50);
   }
-  // pixel offsets that keep equal step lines apart: 1.6 px per series, centred on the middle one
+  // pixel offsets that keep equal step lines apart: 1.6 px per series, centered on the middle one
   function offsets(n) { var o = []; for (var k = 0; k < n; k++) o.push(n > 1 ? (k - (n - 1) / 2) * 1.6 : 0); return o; }
   // the text version: one row per hour, a column per series and, when there is one, a column for the dashed earlier run
   function textTable(series, ghost, ghostLabel, unit) {
@@ -5391,7 +5391,7 @@
      doneText  added to the count when every box is ticked ("9 of 9 checked. Write what you found in a data note.")
      inline    the label and its text on one line (bold label, then sep, then the text); default: stacked lines
      sep       what joins an inline label to its text (default " "; K7 uses ". ")
-     soft      soft rows without a border and accent-coloured ticks (the B3 and K7 look); default: bordered rows with
+     soft      soft rows without a border and accent-colored ticks (the B3 and K7 look); default: bordered rows with
                green ticks and a green edge when ticked
      columns   2: two columns on wide screens (≥ 861 px)
      code      notes in the monospace font (B2's pandas lines)
@@ -5464,7 +5464,7 @@
                                                                                     that sit on no rung (also a choice in each list)
      items: [{ id: "a", text: "A claim from the lesson", answer: ["operating"], note: "One or two sentences." }, ...],
      placeholder: "Where does it sit?", textLabel: "Text version of the ladder", onPlace: function (item, choice, ok) {} });
-   Each claim gets a labelled <select>. Choosing a rung highlights it (or the off box) and shows "Right." or "Not quite."
+   Each claim gets a labeled <select>. Choosing a rung highlights it (or the off box) and shows "Right." or "Not quite."
    with the claim's note; any rung in item.answer counts as right.
    Returns { el, place(itemId, rungId) } (place sets a claim's choice as if the reader had chosen it).
    Keyboard: native selects. Text version: details.lx-textalt with every rung (lowest first) and every claim with its note.
@@ -5531,7 +5531,7 @@
      onCompare: function (score) {} });
    Options:
      key          LX.store key of the reader's picks ({phraseId: tagId, _missing: tagId}); they survive a reload
-     tags         id, n (the number badge, so colour is never the only cue), label, sub (small words on the chips), color (token)
+     tags         id, n (the number badge, so color is never the only cue), label, sub (small words on the chips), color (token)
      parts        strings and phrase objects in reading order; a phrase is an inline span with button semantics, so a long
                   phrase wraps with its sentence. tag is the researcher's main tag; also lists other fair tags.
      missing      the unanswered question: a second row of chips (missingQ, default "Which question does the story leave
@@ -5704,7 +5704,7 @@
        { d: 158, label: "Factual report", value: "158 days" }, { d: 326, label: "Final report", value: "326 days" }] });
    Marks sit at their day d on one line, scaled to the last mark; labels alternate below (even) and above (odd) the line.
    anchor: "start" | "middle" | "end" (default: the first mark "start", the last "end", others "middle"); dx shifts the
-   text; warn: true draws the dot in the warning colour (a claim that came before the evidence).
+   text; warn: true draws the dot in the warning color (a claim that came before the evidence).
    textLabel: the summary of the text version (default "Text version of the timeline"); textalt: false leaves it out.
    Returns { el }. The SVG has role="img" and the label; the text version lists every mark. */
 (function () {
@@ -5856,7 +5856,7 @@
    "<key>-sol-open", and survives "Start again": LX.Checkpoint.solOpened(key) reads it (CK-M's rule compares it with the
    final task's `at`). Stored attempts need no new data version: the new fields are only added.
    Keyboard: every control is a native button, input, select or radio; the task's prompt takes focus on each new task; the
-   order task's ↑ ↓ buttons keep focus on the moved item. The results table becomes labelled lines on phones.
+   order task's ↑ ↓ buttons keep focus on the moved item. The results table becomes labeled lines on phones.
    Text version: LX.Checkpoint.lineChart adds a table of the hourly values.
    Pure (Node: module.exports): task, checkChoice, checkOrder, checkNumeric (either answer form), checkMWh, checkValue,
    checkEstimate, level(D, st, {openFirst, late, solOpen}), firstRight(record, openFirst), writtenCounts(record,
@@ -6839,7 +6839,7 @@
 /* practice.js — LX.Practice: faded practice sets with staged hints and an automatic check (bridges B1 and B3; styles and
    the small exercise pieces in practice.css).
    LX.Practice(host, { id, title, lede, foot, blank, tracks: [{ label, intro, items: [{ key, kind, minutes, title, build }] }] })
-     foot    a closing note: a string, or short labelled notes [[label, text], ...] (one list item each)
+     foot    a closing note: a string, or short labeled notes [[label, text], ...] (one list item each)
      id      LX.store key: which exercises are done, in this browser only
      blank   the reason shown when Check is pressed with an empty answer
      tracks  sets of exercises that fade from a worked example to a blank page; kind "worked" | "partly" | "scratch";
@@ -7378,7 +7378,7 @@
 /* questioncard.js — LX.QuestionCard: a structured research-question card (the course's question types and question
    studio; R1, R10, the capstone research project): the question in one sentence, its type, its audience or decision-maker, a metric with
    units, the counterfactual, scale and boundary, an "I would be wrong if" statement and the main uncertainty. Each part
-   is checked for rigour; the card copies as plain text and can travel in a link.
+   is checked for rigor; the card copies as plain text and can travel in a link.
    var qc = LX.QuestionCard(host, {
      id: "r10-card",             the draft stays in this browser under this key (optional)
      code: "R10",                in the copied text's first line
@@ -7393,13 +7393,13 @@
      share: true,                a "Share this card" button: the card travels in the link's #q-... hash (LX.Share)
      onChange: function (values, checks) {} });
    Returns { el, get(), set(values), text(), checks() }.
-   Fields: native, labelled controls with a one-line hint; the type is a set of five radio buttons (the course's question types) that shows the
+   Fields: native, labeled controls with a one-line hint; the type is a set of five radio buttons (the course's question types) that shows the
    chosen type's template and typical methods (one method family among several), the method names with their glossary
    help (TYPES[i].marked: the same list as `methods`, with glossary marks; `methods` stays plain for the copied text and
    for pages that mark it themselves). The hints of "Compared with" and "I would be wrong if" say what a descriptive
    question puts there (a reference; an expectation or a check), as it tests no causal claim. Checks: eight lines (the question
    written, with no bracketed placeholder such as "[…]" left from a draft, then the seven parts that the question
-   studio's rigour checks need), each "filled in" or "to do" in words and with an icon, never colour alone. The head counts "N of 8
+   studio's rigor checks need), each "filled in" or "to do" in words and with an icon, never color alone. The head counts "N of 8
    parts filled in": the checks see only whether a part is there, not how rigorous it is (the rubric does that); they
    never block (a learner may type any question) and never judge originality, importance or novelty.
    Node: module.exports = { TYPES, SCALES, FIELDS, CHECKS, check, text, encode, decode, clean } (pure). */
@@ -7696,7 +7696,7 @@
      note: "One sentence." });
    Returns { el, events } (events as drawn, sorted).
    An ordered list with <time datetime> dates: it reads in order as text, so it is its own text version; markers on a
-   rule, the kind in words (colour is never the only cue), sources as links. One column; on wide screens the date sits
+   rule, the kind in words (color is never the only cue), sources as links. One column; on wide screens the date sits
    left of the event.
    Node: module.exports = { parse, fmt, sortEvents, gap, validate, staticHTML, KINDS } (pure). staticHTML(events, opt)
    is the page's no-JS list (<ol class="lx-tl-static">), for a test's --write mode. */
@@ -7828,7 +7828,7 @@
      decisions   capacities: wind, solar, gas combined-cycle (cc), gas peaker (pk), nuclear (nuc) in MW; battery power
                  (bp, MW) and energy (be, MWh). Every hour: cc and peaker output, battery charge and discharge, unserved
                  demand (only when the reader's plan is fixed; the optimizer must serve all demand).
-     goal        least annual cost = annualised capital + fixed O&M (per MW or MWh built) + fuel and variable O&M (per MWh)
+     goal        least annual cost = annualized capital + fixed O&M (per MW or MWh built) + fuel and variable O&M (per MWh)
                  [+ a carbon price x CO2: lesson 12's weighted sum]. Nuclear runs flat, so its fuel is a fixed yearly cost.
      rules       every hour: wind + solar + nuclear + cc + peaker + discharge - charge + unserved >= demand (what is left
                  over is spilled); wind and solar make capacity x the hour's availability (LX.townProfile, "scale" method,
@@ -7854,7 +7854,7 @@
      "cyclic" or "free"), yearPeriods(Y), readCheck(C, Y, result, plan) (a fixed plan's full-year run: totals and MWh
      unserved in each calendar week) and errors(est, full, cap, ref) (cost gap, CO2 over the cap, estimate error).
      LX.WeekStrip (components/weekstrip.js) draws a set of weeks and readCheck's byWeek as a 52-week calendar.
-   Page kit (browser only): LX.townPlan.ui = { TECH (names and colours), fm (number formats), Num (a numeric control in
+   Page kit (browser only): LX.townPlan.ui = { TECH (names and colors), fm (number formats), Num (a numeric control in
      the slider look), TextTable (a comparison table of words; cards on phones), css (kept for callers; the styles are in
      planengine.css, bundled into learn.css) }.
    Tests: _tests/learn/test_13-capstone.js (also with --full), test_12-trade-offs.js, test_m03-capacity-expansion.js and
@@ -7939,7 +7939,7 @@
       return bestW;
     }
     // k-medoids inside a season (k = per): start from the medoid and the week farthest from it, then alternate
-    // assigning weeks to the nearest medoid and re-centring each group, until nothing changes
+    // assigning weeks to the nearest medoid and re-centering each group, until nothing changes
     function groups(members) {
       if (per === 1 || members.length <= per) return [members];
       var meds = [medoid(members)];
@@ -7975,7 +7975,7 @@
     });
     var f = HOURS / (WEEKS * HPW);   // the 24 hours of 31 December, spread over the weights
     reps.forEach(function (r) {
-      r.weight = r.n * f;            // hours of the year each modelled hour stands for
+      r.weight = r.n * f;            // hours of the year each modeled hour stands for
       r.start = weekStart(Y, r.week).toISOString().slice(0, 10);
       var A = r.week * HPW;
       r.demand = []; r.wind = []; r.solar = [];
@@ -8161,7 +8161,7 @@
   }
 
   // ---------------------------------------------------------------- helpers for the page (pure)
-  // one modelled week, hour by hour: what each source made, the battery, unserved and spilled power (MW)
+  // one modeled week, hour by hour: what each source made, the battery, unserved and spilled power (MW)
   function weekSeries(C, P, values, p, plan) {
     var v = values || {}, n = P.demand.length, o = { demand: [], nuc: [], wind: [], solar: [], dis: [], ch: [], cc: [], pk: [], unserved: [], spilled: [] };
     for (var h = 0; h < n; h++) {
@@ -8334,7 +8334,7 @@
 
 /* scalestrip.js — LX.ScaleStrip: the course's five scales (S0 device and plant ... S4 nation) side by side
    (e-scale-strip; used by F1's explain layer and R3's self-check). One card per scale, its top edge in the
-   scale's colour (--lx-scale-0 ... 4, day and night, in scalestrip.css), with the parts a lesson asks for.
+   scale's color (--lx-scale-0 ... 4, day and night, in scalestrip.css), with the parts a lesson asks for.
    var ss = LX.ScaleStrip(host, {
      title: "Five scales at a glance", lede: "One sentence.",   an h3 in .lx-x-head and a lede (both optional)
      scales: [{ id: "S0", name: "Device and plant", power: "W to MW", who: "the owner ...", decides: "what to install ...",
@@ -8352,7 +8352,7 @@
                            "upcoming" (with its note) otherwise (LX.lessonRef); an {href, label} item is always linked
      path: P,
      mark: "S1", markText: "Your brief sits here.",   one scale marked (an outlined card and a line of text)
-     color: "var(--lx-tier-4)",   one colour for every card's top edge (default: each scale's own colour)
+     color: "var(--lx-tier-4)",   one color for every card's top edge (default: each scale's own color)
      label: "Five scales" });     the list's accessible name
    Returns { el, update(patch) }: update() redraws the cards with some options changed (mark, markText, ticks, lessons).
    Layout: five columns from 861 px, one card per row below. The list is its own text version.
@@ -8362,7 +8362,7 @@
   // ---------------------------------------------------------------- pure (no DOM; exported for Node)
   var TICKS = [["who", "Who"], ["what", "What"], ["physics", "Physics"]];
   var FLOW = { down: "Passed down: prices, tariffs, limits, targets", up: "Passed up: load profiles, flexibility, forecasts, siting needs" };
-  // "S3" -> 3 (the scale's place on the ladder and its colour token)
+  // "S3" -> 3 (the scale's place on the ladder and its color token)
   function scaleIndex(id) { var m = /^S([0-4])$/.exec(String(id)); return m ? +m[1] : -1; }
   function colorOf(s, one) { var i = scaleIndex(s.id); return one || (i >= 0 ? "var(--lx-scale-" + i + ")" : "var(--lx-ink-3)"); }
   // a scale's "Go further" list split into live links and upcoming names; ref = LX.lessonRef (core.js)
@@ -8450,10 +8450,10 @@
 /* stakeholders.js — e-stakeholders (who decides, who pays, who benefits): A22's role table and R9's stakeholder map;
    F8, F9, F11 and A13 can reuse them.
 
-   LX.Stakeholders(host, o): a table of roles against questions; on phones each role becomes a card of labelled lines.
+   LX.Stakeholders(host, o): a table of roles against questions; on phones each role becomes a card of labeled lines.
      o = { title, lede ([[glossary|marks]]), cols: [{ key, label }],
            rows: [{ key, name, note, cells: { colKey: { v: "yes" | "part" | "no", t: "text with [[marks]]" } } }], note }
-     A cell with v shows a filled, half-filled or empty dot and the word Yes, Partly or No, so colour is never the only
+     A cell with v shows a filled, half-filled or empty dot and the word Yes, Partly or No, so color is never the only
      cue; t adds a short line. Returns { el, set(rowKey, colKey, text) } (set rewrites a cell's line, e.g. with the
      reader's own picks).
    LX.StakeholderMap(host, o): rings of groups around a study, each group a button that opens what the study owes it.
@@ -8465,7 +8465,7 @@
    Pure (Node: require("components/stakeholders.js"); also on LX.Stakeholders): WORD, cellText, staticHTML(o) (the role
    table as a plain table for a no-JS fallback), mapItems(o) (every group with its ring, in order), mapStaticHTML(o) (the
    map as a plain table for a no-JS fallback: group, ring, what it is owed, where it appears; staticTitle, owedHead and
-   alsoHead name its parts). Colours: --lx-* only. */
+   alsoHead name its parts). Colors: --lx-* only. */
 (function () {
   "use strict";
   var WORD = { yes: "Yes", part: "Partly", no: "No" };
@@ -8740,7 +8740,7 @@
   LX.Drill.newSeed = newSeed;
 })();
 
-/* weekstrip.js — LX.WeekStrip: a year's 52 calendar weeks in four rows of 13, each coloured by the representative week
+/* weekstrip.js — LX.WeekStrip: a year's 52 calendar weeks in four rows of 13, each colored by the representative week
    that stands for it, with a red dot on each week that has unserved demand in a full-year check, a key and a text
    version (a table). First used by lesson M3; M13 and C2 can reuse it. It reads the
    planning engine's objects (LX.townPlan, components/planengine.js, bundled before it):
@@ -8751,10 +8751,10 @@
                                             //   LX.townPlan.readCheck() returns it (a week is marked above 0.05 MWh)
      // -> { el, draw }
 
-   - Colours. A typical week takes its season's colour (winter, spring, summer, fall); a season's second and third
-     typical weeks are mixed toward the ink colour. Extreme weeks (peak demand, peak net load, least wind, winter
-     net-load peak) have their own colours and an outline. All colours are --lx-* tokens, so day and night both work.
-   - Letters. W, Sp, Su, F (numbered when a season has several typical weeks), P, N, C, X: the colour is never the only cue.
+   - Colors. A typical week takes its season's color (winter, spring, summer, fall); a season's second and third
+     typical weeks are mixed toward the ink color. Extreme weeks (peak demand, peak net load, least wind, winter
+     net-load peak) have their own colors and an outline. All colors are --lx-* tokens, so day and night both work.
+   - Letters. W, Sp, Su, F (numbered when a season has several typical weeks), P, N, C, X: the color is never the only cue.
    - Text. The grid is role="img" with a sentence that lists every representative week and how many weeks it stands for
      (and how many weeks are short); the key repeats the letters; "Text version" holds a table of all 52 weeks (the week's
      start date, the week standing in for it and, after a check, its unserved MWh).
@@ -8801,7 +8801,7 @@
   function mwh(v) { return Math.round(v).toLocaleString("en-US") + " MWh"; }
   function label(RW, byWeek, year) {
     var nShort = byWeek ? byWeek.filter(function (x) { return x > SHORT; }).length : 0;
-    return "The 52 weeks of " + year + " in four rows of 13, each coloured by the representative week that stands for it: " +
+    return "The 52 weeks of " + year + " in four rows of 13, each colored by the representative week that stands for it: " +
       RW.reps.map(function (r) { return name(r) + " for " + r.n + (r.n === 1 ? " week" : " weeks"); }).join(", ") + "." +
       (byWeek ? " " + (nShort ? nShort + " weeks have unserved demand in the full-year check." : "No week has unserved demand in the full-year check.") : "");
   }
@@ -9630,7 +9630,7 @@
      farm   the ridge wind farm: wind (MW), the line to the grid (MW, sell only), a 4-hour battery (MWh), an electrolyzer
             (MW), a hydrogen tank (t) and a buyer who takes at most so many kg of hydrogen an hour at a set price.
    The model (an LP for LX.solver; every cost in 2025 dollars, converted in costs() with EIA's GDP price index):
-     decisions  every modelled hour: home: grid import and export, battery charge and discharge, state of charge;
+     decisions  every modeled hour: home: grid import and export, battery charge and discharge, state of charge;
                 farm: sales to the grid, battery charge and discharge, state of charge, electrolyzer power (what is left of
                 the wind is spilled: the balance row's slack),
                 hydrogen sold, hydrogen in the tank. With opts.size the sizes are decisions too (home: solar, battery;
@@ -9667,7 +9667,7 @@
                 revenue (farm), less fixed upkeep; replacements when a life ends; a straight-line residual value at the
                 end. One weather year (2025) is repeated; prices and costs stay the same in real terms.
      CO2        operating CO2 only. Home: bought power × Kansas's 2024 average factor, plus gas burned (never negative);
-                power sent back is a separate credit at the same factor, and the net of the two is labelled as a net.
+                power sent back is a separate credit at the same factor, and the net of the two is labeled as a net.
                 Farm: no operating CO2; the CO2 a gas reformer would emit for the hydrogen sold, a potential saving only
                 if that hydrogen replaces it (it leaves out the grid power the electrolyzer's MWh no longer replace).
      wear       the electrolyzer's stack wear is an illustrative throughput allowance: DOE's replacement (11% of the cost
@@ -10068,7 +10068,7 @@
       T.gasCost = T.gasKWh * perKWhGas; T.baseGasCost = T.heat / gas.afue * perKWhGas;
       T.gasCO2 = T.gasKWh / 293.071 * gas.co2PerMMBtu / 1000; T.baseGasCO2 = T.heat / gas.afue / 293.071 * gas.co2PerMMBtu / 1000;   // t
       // operating CO2: bought power and gas burned (never negative); power sent back is a separate credit at the same
-      // average factor, and co2Net (which can fall below zero) is labelled as a net balance, not as what the home emits
+      // average factor, and co2Net (which can fall below zero) is labeled as a net balance, not as what the home emits
       T.gridCO2 = T.imp * ef / 1000; T.exportCO2 = T.exp * ef / 1000; T.baseGridCO2 = T.use * ef / 1000;                         // t
       T.bill = T.buyCost - T.credit; T.cost = T.bill + T.gasCost; T.baseCost = T.baseBill + T.baseGasCost;
       T.co2 = T.gridCO2 + T.gasCO2; T.co2Net = T.co2 - T.exportCO2; T.baseCO2 = T.baseGridCO2 + T.baseGasCO2;
@@ -10475,8 +10475,8 @@
     var home = s.site === "home", sh = res.periods.filter(function (p) { return p.kind === "week"; }).map(function (p) { return p.sums.share; });
     var lo = Math.min.apply(null, sh), hi = Math.max.apply(null, sh);
     return {
-      strip: (home ? "Each square is a week: the stronger its colour, the more of the home's use came from the grid, not its own solar ("
-        : "Each square is a week: the stronger its colour, the more of the wind was spilled (") + pct(lo, home ? 0 : 1) + " to " + pct(hi, home ? 0 : 1) + "). Pick one.",
+      strip: (home ? "Each square is a week: the stronger its color, the more of the home's use came from the grid, not its own solar ("
+        : "Each square is a week: the stronger its color, the more of the wind was spilled (") + pct(lo, home ? 0 : 1) + " to " + pct(hi, home ? 0 : 1) + "). Pick one.",
       week: home ? "Hours from 00:00, Central standard time. Under the line, the home's use by source: solar first, then the battery, then the grid. Above it: charging and power sent back."
         : "Hours from 00:00, Central standard time. Under the line, where the wind went: sold, to the electrolyzer, into the battery or spilled. Above it: the battery's output.",
       sched: res.stores ? "With storage, this is one least-cost schedule: others can move charging to other hours at the same cost." : null,
@@ -11802,7 +11802,7 @@
    microgrid ledger). One row per customer, party, device or line, a
    column per amount; the row header can carry a small second line (what the row stands for); numbers in tabular
    figures; an optional total row. It is the course's two-sided table (table.cf-two, forms.css), so on a phone each row
-   becomes a card whose cells are labelled by their column (data-l).
+   becomes a card whose cells are labeled by their column (data-l).
    var tb = LX.Ledger(host, {
      caption: "Bill minus the cost of serving each customer, a month.",   optional (a hint-styled caption)
      columns: ["Customer", "Flat", "Time-of-use"],   the row-header column first, then one label per cell (also each cell's
@@ -11997,7 +11997,7 @@
   //   colNames (headings for the key, one per column), lede (one line above). Labels sit right of their bars; the last
   //   column's labels get a reserved right margin, so no label crosses another column
   // Nodes are buttons (Tab, Enter, Space): picking one dims the other flows and says what flows in and out (aria-live).
-  // Redraws at its real width on resize and tweens between specs (not under reduced motion). Colours: tokens only.
+  // Redraws at its real width on resize and tweens between specs (not under reduced motion). Colors: tokens only.
   function defFmt(v) { return Math.round(v).toLocaleString("en-US"); }
 
   LX.Sankey = function (host, o) {
@@ -13869,7 +13869,7 @@
        state: S,                                   the page's object: S.L, S.R
        tile: function (el, i, inside) {},          fills stage i's tile (a button) on every paint; the box has set its "out"
                                                    class and aria-pressed; the page sets its content and its aria-label
-       color: function (i) { return "var(--lx-accent)"; },   optional: tile i's coloured rule (the CSS variable --c)
+       color: function (i) { return "var(--lx-accent)"; },   optional: tile i's colored rule (the CSS variable --c)
        presets: [["site", "On site only", 2, 2], ...],       optional: [key, label, L, R] buttons under the chain
        presetsLabel: "Boundary presets",           the presets' group name (default)
        handleLabels: ["Left edge of the boundary", "Right edge of the boundary"],   (default)
@@ -14122,7 +14122,7 @@
     R.nNewer = nNew;
     var subc = new Uint8Array(N);
     D.substations.forEach(function (sb) { subc[Math.floor(sb.y) * W + Math.floor(sb.x)] = 1; });
-    // distances: to the nearest home or built-up cell (a cell centre and 4 × 4 points in each cell), to roads, water
+    // distances: to the nearest home or built-up cell (a cell center and 4 × 4 points in each cell), to roads, water
     // Homes and built-up cells are looked up within 3 cells; anything farther counts as CAP km (3 km: beyond every
     // setback and every "away from homes" ramp, so the cap changes no result).
     var SUB = G.sub, CAP = 3, sp = new Float64Array(N * SUB * SUB), dHome = new Float64Array(N), dRoad = new Float64Array(N), dWater = new Float64Array(N);
@@ -14325,7 +14325,7 @@
   }
   function better(a, b) { return a.score > b.score || (a.score === b.score && (a.j < b.j || (a.j === b.j && a.i < b.i))); }
   function overlap(a, b, g) { g = g || 0; return a.i - g < b.i + b.k && b.i - g < a.i + a.k && a.j - g < b.j + b.k && b.j - g < a.j + a.k; }
-  // the cell a site connects from: its buildable cell nearest the block's centre (ties: the first in row order)
+  // the cell a site connects from: its buildable cell nearest the block's center (ties: the first in row order)
   function connCell(R, X, p) {
     var best = -1, bd = Infinity, c = (p.k - 1) / 2;
     for (var b = 0; b < p.k; b++) for (var a = 0; a < p.k; a++) {
@@ -14384,7 +14384,7 @@
     }
     return { c: c, cls: cls, base: base, mit: mit, protected: o.protected || "allow" };
   }
-  // the eight neighbours, in a fixed order (N, S, W, E, then the diagonals): the tie rule for equal paths
+  // the eight neighbors, in a fixed order (N, S, W, E, then the diagonals): the tie rule for equal paths
   var NB = [[0, -1], [0, 1], [-1, 0], [1, 0], [-1, -1], [1, -1], [-1, 1], [1, 1]];
   function Heap() { this.a = []; }
   Heap.prototype.less = function (x, y) { return x[0] < y[0] || (x[0] === y[0] && x[1] < y[1]); };
@@ -14511,7 +14511,7 @@
     return out;
   }
   function gridAt(R, n) { if (!R.gridCache) R.gridCache = gridCells(R); return R.gridCache[n]; }
-  // one row per substation: id, name, where (from the centre), spare MW, and where its lines go
+  // one row per substation: id, name, where (from the center), spare MW, and where its lines go
   function gridRows(R) {
     var D = R.D;
     return D.substations.map(function (s) {
@@ -14539,7 +14539,7 @@
     var ew = dx === 0 ? "" : Math.abs(dx) + " km " + (dx < 0 ? "W" : "E"), ns = dy === 0 ? "" : Math.abs(dy) + " km " + (dy < 0 ? "N" : "S");
     return (ew && ns ? ew + ", " + ns : ew || ns || "at the center");
   }
-  // the homes in a cell (the newer ones apart) and the distance from its centre to the nearest home or built-up land:
+  // the homes in a cell (the newer ones apart) and the distance from its center to the nearest home or built-up land:
   // the homes layer's text version, cell by cell (a home's dot is drawn on the map only)
   function homesIn(R, n) {
     var k = R.cellKm, i = n % R.W, j = (n - i) / R.W, all = 0, nw = 0;
@@ -15006,7 +15006,7 @@
      Protocol Scope 2 Guidance). Their MWh at the grid's average rate are reported apart (acc.contract) as an
      illustrative grid-average comparison: not a market-based inventory result, not a physical cut.
 
-   Prices and duals (from LPs only, never from MILPs): only from this LP, labelled "marginal values under stated assumptions": the substation duals
+   Prices and duals (from LPs only, never from MILPs): only from this LP, labeled "marginal values under stated assumptions": the substation duals
    (value of 1 MW more room, $ per MW per year), the balance duals ($/MWh in a district-hour), the CO2 cap's dual.
    Screening household outputs (kept apart from the model's costs): bills and energy burden by household group come from an accounting layer after
    the LP (E3.households), never from the LP: who adopts first (a stated rule), each adopting home's change (the
@@ -15018,7 +15018,7 @@
    Tie rule: stated costs far below any real one (e3-city-hub.json `tie`): $20 a year per MW of each
    district's busiest hour, $10 per MW of the three districts' busiest hour together, $1 per MWh out of a battery, $0.50
    per MWh out of the heat store, $0.10 x the hour's share of SPP's peak per MWh of managed charging. Left out of every
-   reported cost. The LP minimises the economic cost plus these small costs, so on a few plans it spends a few dollars a
+   reported cost. The LP minimizes the economic cost plus these small costs, so on a few plans it spends a few dollars a
    year more to keep a busiest hour that is under its limit lower: _tests/learn/test_e3-engine.js
    finds the economic optimum (ties x0) for every preset and the test's own plans and checks the gap is under $30 a year
    ($24.80 at most). It also re-solves with the tie costs x2 and x0.1 and checks every reported number on the optimal
@@ -16140,7 +16140,7 @@
       ["2025's bills keep the few EVs charged at home in 2025, as prairie-city.json counts them; use does not respond to the charge."]).forEach(function (t) { H("li", { text: t }, ul); });
     return tb;
   }
-  // short labelled lines, one idea each: [[label, text], ...] (text may carry glossary marks)
+  // short labeled lines, one idea each: [[label, text], ...] (text may carry glossary marks)
   function keys(host, items, cls) {
     var el = H("div", { class: "e3-keys" + (cls ? " " + cls : "") }, host);
     items.forEach(function (x) { H("p", { html: "<b>" + x[0] + ":</b> " + LX.rich(x[1]) }, el); });
@@ -16236,7 +16236,7 @@
    restriction, e4-pathways.json levers.shockRule "before") arrives before the shock year's plants are bought: decisions
    through the model year before it stay, and the shock year's builds are re-planned at the shock's price.
 
-   Prices and duals (from LPs only, never from MILPs): only from this LP, labelled "marginal values under stated assumptions": the budget's dual
+   Prices and duals (from LPs only, never from MILPs): only from this LP, labeled "marginal values under stated assumptions": the budget's dual
    (present value in 2025 of one more tonne; as a price in model year p's own 2025 dollars it is mu x w_p / D_p, from the
    LP's own coefficients), the import cap's duals, each region's marginal cost of electricity. Screening outputs (kept
    apart from the model's costs: affordability and Ridge County jobs) come from LX.A13 (components/whopays.js) after the LP, never from it.
@@ -16386,9 +16386,9 @@
   function withPreset(s, pr) { var o = copy(s); for (var k in pr.state) o[k] = pr.state[k]; return o; }
 
   // ---------------------------------------------------------------- the system a plan describes
-  // o: { shock (key or null), elX (demand multiplier from a year), only (period indexes modelled), fixed (decisions of
+  // o: { shock (key or null), elX (demand multiplier from a year), only (period indexes modeled), fixed (decisions of
   //      earlier periods: { n: {name: MW}, k: {unit index: [MW kept per period]}, a: {link: [MW added per period]} }),
-  //      budgetLeft (Mt the modelled periods may emit, counted with their weights) }
+  //      budgetLeft (Mt the modeled periods may emit, counted with their weights) }
   function sysOf(state, P, o) {
     o = o || {};
     var s = state, rate = s.dr / 100, Y = P.Y, np = Y.length;
@@ -16455,7 +16455,7 @@
 
   // ---------------------------------------------------------------- the LP
   // o: { tie (multiplier of the tie rule, default 1), noPenalty (hard budget and cap), objective (override: a terms map
-  //      to minimise instead of the cost, for the least-CO2 hint) }
+  //      to minimize instead of the cost, for the least-CO2 hint) }
   function build(P, S, o) {
     o = o || {};
     var cfg = P.cfg, tk = o.tie == null ? 1 : o.tie, T = P.tech, V = [], C = [], pen = cfg.penalties, tie = cfg.tie;
@@ -16692,7 +16692,7 @@
         if (typeof a === "string") row("kr_" + u.j + "_" + p, [[b, 1], [a, -1]], null, 0);
         else row("kr_" + u.j + "_" + p, [[b, 1]], null, a); }
     });
-    // the budget: sum_p w_p CO2_p (modelled periods) <= what is left for them
+    // the budget: sum_p w_p CO2_p (modeled periods) <= what is left for them
     var left = S.budgetLeft != null ? S.budgetLeft : S.budget - S.w0 * P.carbon.base2025Mt;
     var ob = v("over", 0, o.noPenalty ? 0 : Infinity, pen.budgetPerT, "penalty");
     var bt = [[ob, -1]];
@@ -16766,7 +16766,7 @@
   }
 
   // ---------------------------------------------------------------- reading a solved model
-  // raw: the decisions of every period (from this model, or fixed from earlier windows) and, for each modelled period p,
+  // raw: the decisions of every period (from this model, or fixed from earlier windows) and, for each modeled period p,
   // what ran (raw.per[p]); merge() joins the windows of a decade-by-decade run
   function read(P, S, m, r) {
     var x = r.values, val = function (n) { return x[n] || 0; }, fx = S.fixed || { n: {}, k: {}, a: {} };
@@ -17029,7 +17029,7 @@
       text: (ok ? "survives" : "does not survive (" + why.join("; ") + ")") + (priced ? (ok ? " on demand served; CO₂ not compared (the run missed a limit)" : "; CO₂ not compared") : "") };
   }
   // the four shocks (and the two A21 keeps for itself) as the engine runs them: one row each, with the model year it hits,
-  // what changes, and what the re-plan keeps (magnitudes and durations, modelled effects apart from the story)
+  // what changes, and what the re-plan keeps (magnitudes and durations, modeled effects apart from the story)
   function shockTable(P, keys) {
     var yr = P.cfg.levers.shockYear, each = P.each;
     return (keys || c4Shocks(P)).map(function (k) {
@@ -17276,7 +17276,7 @@
 
   // ---------------------------------------------------------------- near-optimal plans (M13): the optimal face widened
   // faceModel: every row of a solved model, plus "objective <= best + slack" ($M, the whole objective with its penalties and
-  // tie costs), minimising or maximising a linear expression (terms: { variable: coefficient }) over it
+  // tie costs), minimizing or maximizing a linear expression (terms: { variable: coefficient }) over it
   function faceModel(m, r, terms, sense, slack) {
     var cost = m.variables.filter(function (v) { return v.cost; }).map(function (v) { return [v.name, v.cost]; });
     var out = { sense: sense, variables: m.variables.map(function (v) { return { name: v.name, lb: v.lb, ub: v.ub, cost: 0 }; }), constraints: m.constraints.concat([{ name: "face", terms: cost, ub: r.objective + slack }]) };

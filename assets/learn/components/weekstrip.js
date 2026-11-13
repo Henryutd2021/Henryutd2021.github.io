@@ -1,4 +1,4 @@
-/* weekstrip.js — LX.WeekStrip: a year's 52 calendar weeks in four rows of 13, each coloured by the representative week
+/* weekstrip.js — LX.WeekStrip: a year's 52 calendar weeks in four rows of 13, each colored by the representative week
    that stands for it, with a red dot on each week that has unserved demand in a full-year check, a key and a text
    version (a table). First used by lesson M3; M13 and C2 can reuse it. It reads the
    planning engine's objects (LX.townPlan, components/planengine.js, bundled before it):
@@ -9,10 +9,10 @@
                                             //   LX.townPlan.readCheck() returns it (a week is marked above 0.05 MWh)
      // -> { el, draw }
 
-   - Colours. A typical week takes its season's colour (winter, spring, summer, fall); a season's second and third
-     typical weeks are mixed toward the ink colour. Extreme weeks (peak demand, peak net load, least wind, winter
-     net-load peak) have their own colours and an outline. All colours are --lx-* tokens, so day and night both work.
-   - Letters. W, Sp, Su, F (numbered when a season has several typical weeks), P, N, C, X: the colour is never the only cue.
+   - Colors. A typical week takes its season's color (winter, spring, summer, fall); a season's second and third
+     typical weeks are mixed toward the ink color. Extreme weeks (peak demand, peak net load, least wind, winter
+     net-load peak) have their own colors and an outline. All colors are --lx-* tokens, so day and night both work.
+   - Letters. W, Sp, Su, F (numbered when a season has several typical weeks), P, N, C, X: the color is never the only cue.
    - Text. The grid is role="img" with a sentence that lists every representative week and how many weeks it stands for
      (and how many weeks are short); the key repeats the letters; "Text version" holds a table of all 52 weeks (the week's
      start date, the week standing in for it and, after a check, its unserved MWh).
@@ -59,7 +59,7 @@
   function mwh(v) { return Math.round(v).toLocaleString("en-US") + " MWh"; }
   function label(RW, byWeek, year) {
     var nShort = byWeek ? byWeek.filter(function (x) { return x > SHORT; }).length : 0;
-    return "The 52 weeks of " + year + " in four rows of 13, each coloured by the representative week that stands for it: " +
+    return "The 52 weeks of " + year + " in four rows of 13, each colored by the representative week that stands for it: " +
       RW.reps.map(function (r) { return name(r) + " for " + r.n + (r.n === 1 ? " week" : " weeks"); }).join(", ") + "." +
       (byWeek ? " " + (nShort ? nShort + " weeks have unserved demand in the full-year check." : "No week has unserved demand in the full-year check.") : "");
   }

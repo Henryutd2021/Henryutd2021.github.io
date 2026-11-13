@@ -1,10 +1,10 @@
 /* stakeholders.js — e-stakeholders (who decides, who pays, who benefits): A22's role table and R9's stakeholder map;
    F8, F9, F11 and A13 can reuse them.
 
-   LX.Stakeholders(host, o): a table of roles against questions; on phones each role becomes a card of labelled lines.
+   LX.Stakeholders(host, o): a table of roles against questions; on phones each role becomes a card of labeled lines.
      o = { title, lede ([[glossary|marks]]), cols: [{ key, label }],
            rows: [{ key, name, note, cells: { colKey: { v: "yes" | "part" | "no", t: "text with [[marks]]" } } }], note }
-     A cell with v shows a filled, half-filled or empty dot and the word Yes, Partly or No, so colour is never the only
+     A cell with v shows a filled, half-filled or empty dot and the word Yes, Partly or No, so color is never the only
      cue; t adds a short line. Returns { el, set(rowKey, colKey, text) } (set rewrites a cell's line, e.g. with the
      reader's own picks).
    LX.StakeholderMap(host, o): rings of groups around a study, each group a button that opens what the study owes it.
@@ -16,7 +16,7 @@
    Pure (Node: require("components/stakeholders.js"); also on LX.Stakeholders): WORD, cellText, staticHTML(o) (the role
    table as a plain table for a no-JS fallback), mapItems(o) (every group with its ring, in order), mapStaticHTML(o) (the
    map as a plain table for a no-JS fallback: group, ring, what it is owed, where it appears; staticTitle, owedHead and
-   alsoHead name its parts). Colours: --lx-* only. */
+   alsoHead name its parts). Colors: --lx-* only. */
 (function () {
   "use strict";
   var WORD = { yes: "Yes", part: "Partly", no: "No" };

@@ -515,7 +515,7 @@
                     { id: "pen", text: "Penalties on the transmission provider when a study runs late, after a grace period, with caps and exceptions", bin: "late", why: "After a 10-business-day grace period, $1,000 a business day for a late cluster study, capped at the study deposits." },
                     { id: "wd", text: "Withdrawal penalties that grow the later a project leaves", bin: "shift", why: "Leaving late costs the leaver, not only those who stay." },
                     { id: "ia", text: "Deposits that reach 20% of the upgrade costs by the agreement", bin: "spec", why: "Money at stake before construction filters out projects that are not ready; earlier deposits count toward the 20%." }],
-            onCheck: function (g) { api.done(); api.saw("Order 2023's pro forma rules, as MISO summarised them in August 2023; grid operators adapt them in their own rules."); } });
+            onCheck: function (g) { api.done(); api.saw("Order 2023's pro forma rules, as MISO summarized them in August 2023; grid operators adapt them in their own rules."); } });
         } },
       { text: "Turn on Order 2023's readiness rule: a request must normally control its site to enter, and the placeholder has none. What changes in the cluster?",
         build: function (act, api) {

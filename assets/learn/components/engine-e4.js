@@ -60,7 +60,7 @@
    restriction, e4-pathways.json levers.shockRule "before") arrives before the shock year's plants are bought: decisions
    through the model year before it stay, and the shock year's builds are re-planned at the shock's price.
 
-   Prices and duals (from LPs only, never from MILPs): only from this LP, labelled "marginal values under stated assumptions": the budget's dual
+   Prices and duals (from LPs only, never from MILPs): only from this LP, labeled "marginal values under stated assumptions": the budget's dual
    (present value in 2025 of one more tonne; as a price in model year p's own 2025 dollars it is mu x w_p / D_p, from the
    LP's own coefficients), the import cap's duals, each region's marginal cost of electricity. Screening outputs (kept
    apart from the model's costs: affordability and Ridge County jobs) come from LX.A13 (components/whopays.js) after the LP, never from it.
@@ -210,9 +210,9 @@
   function withPreset(s, pr) { var o = copy(s); for (var k in pr.state) o[k] = pr.state[k]; return o; }
 
   // ---------------------------------------------------------------- the system a plan describes
-  // o: { shock (key or null), elX (demand multiplier from a year), only (period indexes modelled), fixed (decisions of
+  // o: { shock (key or null), elX (demand multiplier from a year), only (period indexes modeled), fixed (decisions of
   //      earlier periods: { n: {name: MW}, k: {unit index: [MW kept per period]}, a: {link: [MW added per period]} }),
-  //      budgetLeft (Mt the modelled periods may emit, counted with their weights) }
+  //      budgetLeft (Mt the modeled periods may emit, counted with their weights) }
   function sysOf(state, P, o) {
     o = o || {};
     var s = state, rate = s.dr / 100, Y = P.Y, np = Y.length;
@@ -279,7 +279,7 @@
 
   // ---------------------------------------------------------------- the LP
   // o: { tie (multiplier of the tie rule, default 1), noPenalty (hard budget and cap), objective (override: a terms map
-  //      to minimise instead of the cost, for the least-CO2 hint) }
+  //      to minimize instead of the cost, for the least-CO2 hint) }
   function build(P, S, o) {
     o = o || {};
     var cfg = P.cfg, tk = o.tie == null ? 1 : o.tie, T = P.tech, V = [], C = [], pen = cfg.penalties, tie = cfg.tie;
@@ -516,7 +516,7 @@
         if (typeof a === "string") row("kr_" + u.j + "_" + p, [[b, 1], [a, -1]], null, 0);
         else row("kr_" + u.j + "_" + p, [[b, 1]], null, a); }
     });
-    // the budget: sum_p w_p CO2_p (modelled periods) <= what is left for them
+    // the budget: sum_p w_p CO2_p (modeled periods) <= what is left for them
     var left = S.budgetLeft != null ? S.budgetLeft : S.budget - S.w0 * P.carbon.base2025Mt;
     var ob = v("over", 0, o.noPenalty ? 0 : Infinity, pen.budgetPerT, "penalty");
     var bt = [[ob, -1]];
@@ -590,7 +590,7 @@
   }
 
   // ---------------------------------------------------------------- reading a solved model
-  // raw: the decisions of every period (from this model, or fixed from earlier windows) and, for each modelled period p,
+  // raw: the decisions of every period (from this model, or fixed from earlier windows) and, for each modeled period p,
   // what ran (raw.per[p]); merge() joins the windows of a decade-by-decade run
   function read(P, S, m, r) {
     var x = r.values, val = function (n) { return x[n] || 0; }, fx = S.fixed || { n: {}, k: {}, a: {} };
@@ -853,7 +853,7 @@
       text: (ok ? "survives" : "does not survive (" + why.join("; ") + ")") + (priced ? (ok ? " on demand served; CO₂ not compared (the run missed a limit)" : "; CO₂ not compared") : "") };
   }
   // the four shocks (and the two A21 keeps for itself) as the engine runs them: one row each, with the model year it hits,
-  // what changes, and what the re-plan keeps (magnitudes and durations, modelled effects apart from the story)
+  // what changes, and what the re-plan keeps (magnitudes and durations, modeled effects apart from the story)
   function shockTable(P, keys) {
     var yr = P.cfg.levers.shockYear, each = P.each;
     return (keys || c4Shocks(P)).map(function (k) {
@@ -1100,7 +1100,7 @@
 
   // ---------------------------------------------------------------- near-optimal plans (M13): the optimal face widened
   // faceModel: every row of a solved model, plus "objective <= best + slack" ($M, the whole objective with its penalties and
-  // tie costs), minimising or maximising a linear expression (terms: { variable: coefficient }) over it
+  // tie costs), minimizing or maximizing a linear expression (terms: { variable: coefficient }) over it
   function faceModel(m, r, terms, sense, slack) {
     var cost = m.variables.filter(function (v) { return v.cost; }).map(function (v) { return [v.name, v.cost]; });
     var out = { sense: sense, variables: m.variables.map(function (v) { return { name: v.name, lb: v.lb, ub: v.ub, cost: 0 }; }), constraints: m.constraints.concat([{ name: "face", terms: cost, ub: r.objective + slack }]) };

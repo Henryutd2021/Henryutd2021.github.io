@@ -33,14 +33,14 @@
                             first best corner), value (c·p there), ray (the unbounded or tied direction, else null),
                             binding: {id: true when that rule's line runs through the best corner}}. A region that is not
                             empty must have a corner (always true with x >= 0 and y >= 0); otherwise use optimum().
-     simplexWalk(m)         the simplex method, drawn: start at the worst corner, step to the better neighbouring corner along
+     simplexWalk(m)         the simplex method, drawn: start at the worst corner, step to the better neighboring corner along
                             an edge while one is better: [{x, y, value, on, along (the id of the rule whose edge was walked)}]
 
    LX.LPPlane(host, o) -> plane
      o.view                 the data box
      o.xLabel, o.yLabel     axis titles
      o.fluid                false (default): a 440 × 380 drawing that scales with its box, at most 520 px wide (B1, K4); grid
-                            lines at o.ticks (with more than six, every other x value is labelled), centred axis titles.
+                            lines at o.ticks (with more than six, every other x value is labeled), centered axis titles.
                             true: drawn at the box's own width (taller on phones), redrawn on resize, grid lines every
                             o.grid units (default 40), titles at the axis ends (lessons 10 and 11).
      o.aria                 the drawing's spoken label when there is no o.describe
@@ -67,7 +67,7 @@
      plane.focusDot()                focus the dot at the next render
    Keyboard: the plan dot is a focusable slider (arrow keys). Rule lines and the cost line are dragged by pointer; each lesson
    also gives a slider for the same number. Text version: o.describe (render), or the lesson's own list (primitives).
-   Colours from --lx-* tokens only, so day and night need no redraw. */
+   Colors from --lx-* tokens only, so day and night need no redraw. */
 (function () {
   "use strict";
 
@@ -323,7 +323,7 @@
     }
     function path(P) { return P.length ? "M" + P.map(function (p) { return sx(p[0]).toFixed(1) + " " + sy(p[1]).toFixed(1); }).join(" L") + " Z" : ""; }
     function clear() { [gOut, gReg, gRule, gIso, gPt].forEach(function (g) { g.innerHTML = ""; }); }
-    function bg(par, at, text) {   // a label with a halo in the surface colour, so it reads over lines
+    function bg(par, at, text) {   // a label with a halo in the surface color, so it reads over lines
       var a = {}; for (var k in at) a[k] = at[k];
       a.class = at.class + " bg"; S("text", a, par).textContent = text;
       S("text", at, par).textContent = text;
@@ -439,7 +439,7 @@
         var label = W < 480 && stl.short ? stl.short : stl.label || "";
         if (anchor === "start" && W - m.r - lx < label.length * 7) { anchor = "end"; lx -= 12; }
         if (anchor === "end" && lx - m.l < label.length * 7) { anchor = "start"; lx = m.l + 4; }
-        // the label in its line's colour taken toward the ink (darker by day, lighter by night): 4.5:1 on the surface
+        // the label in its line's color taken toward the ink (darker by day, lighter by night): 4.5:1 on the surface
         S("text", { x: lx, y: ly, "text-anchor": anchor, class: "lbl", fill: "color-mix(in srgb, " + stl.color + " 70%, var(--lx-ink))", "paint-order": "stroke", stroke: "var(--lx-surface)", "stroke-width": 4, "stroke-linejoin": "round" }, gRule).textContent = label;
         if (o.onDrag && stl.drag) hit(r.a, r.b, id, { tabindex: "-1" }, gRule);
       });
