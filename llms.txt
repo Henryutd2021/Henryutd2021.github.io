@@ -53,6 +53,11 @@
 - [Zenodo — 10.5281/zenodo.14658398](https://doi.org/10.5281/zenodo.14658398): Raw data, code, and results covered in the Cell Reports Sustainability article.
 - [Mendeley Data — 10.17632/jfcc62strg.1](https://doi.org/10.17632/jfcc62strg.1): Raw data related to fuel mix for each region obtained from EIA
 
+## Reference data
+
+- [Hydrogen reference data handbook](https://henryutd2021.github.io/reference-data/hydrogen.html): Versioned techno-economic parameters and inputs, original sources, bases, licences and CSV downloads. Cite the compilation and each original source.
+
 ## Learn
 
 - [Learn course index](https://henryutd2021.github.io/learn/): Interactive energy-systems lessons.
+- [Learn glossary](https://henryutd2021.github.io/learn/glossary.html): Energy-systems terms, one-sentence definitions, and the lesson that teaches each.
