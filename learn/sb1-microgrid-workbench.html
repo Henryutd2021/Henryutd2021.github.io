@@ -22,9 +22,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="Sandbox SB1 of Energy Systems, Step by Step: set Prairie Campus’s load priorities, equipment, feeder limits, tariff and owner; a small mixed-integer program runs hypothetical outages hour by hour or sizes the plan.">
+<meta name="description" content="Set a fictional campus’s equipment, tariffs, load priorities and feeder limits; solve outage operation or sizing with a browser MILP.">
 
-<title>Microgrid Workbench – Honglin Li</title>
+<title>Microgrid Sizing and Outage Simulator · SB1 – Honglin Li</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -108,11 +108,15 @@ ul.task-list li input[type="checkbox"] {
 <link rel="stylesheet" href="../assets/map.css">
 <link rel="stylesheet" href="../assets/explainers.css">
 <link rel="stylesheet" href="../assets/learn/learn.css">
-<meta property="og:title" content="Microgrid Workbench – Honglin Li">
-<meta property="og:description" content="Sandbox SB1 of Energy Systems, Step by Step: set Prairie Campus’s load priorities, equipment, feeder limits, tariff and owner; a small mixed-integer program runs hypothetical outages hour by hour or sizes the plan.">
+<meta property="og:title" content="Microgrid Sizing and Outage Simulator · SB1">
+<meta property="og:description" content="Set a fictional campus’s equipment, tariffs, load priorities and feeder limits; solve outage operation or sizing with a browser MILP.">
 <meta property="og:image" content="https://henryutd2021.github.io/images/profile-square.jpg">
 <meta property="og:site_name" content="Honglin Li">
 <meta property="og:url" content="https://henryutd2021.github.io/learn/sb1-microgrid-workbench.html">
+<meta name="twitter:title" content="Microgrid Sizing and Outage Simulator · SB1">
+<meta name="twitter:description" content="Set a fictional campus’s equipment, tariffs, load priorities and feeder limits; solve outage operation or sizing with a browser MILP.">
+<meta name="twitter:image" content="https://henryutd2021.github.io/images/profile-square.jpg">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="canonical" href="https://henryutd2021.github.io/learn/sb1-microgrid-workbench.html">
 </head>
 
@@ -393,7 +397,7 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "name": "Microgrid Workbench Keep a fictional campus running on its own power: set what must stay on, size solar, a battery and diesel, and test hypothetical outages on 2025 solar profiles within the feeder's limits", "description": "Sandbox SB1 of Energy Systems, Step by Step: set Prairie Campus's load priorities, equipment, feeder limits, tariff and owner; a small mixed-integer program runs hypothetical outages hour by hour or sizes the plan.", "learningResourceType": "Simulation", "educationalLevel": "Intermediate", "timeRequired": "PT30M", "inLanguage": "en", "isAccessibleForFree": true, "teaches": ["one-line diagram", "islanding", "load priorities in an outage", "outage scenarios", "host-feeder limits", "ownership and cost of capital"], "license": "https://creativecommons.org/licenses/by/4.0/", "author": {"@type": "Person", "name": "Honglin Li", "url": "https://henryutd2021.github.io/"}, "url": "https://henryutd2021.github.io/learn/sb1-microgrid-workbench.html", "isPartOf": {"@type": "Course", "name": "Energy Systems, Step by Step", "url": "https://henryutd2021.github.io/learn/"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "@id": "https://henryutd2021.github.io/learn/sb1-microgrid-workbench.html#learningresource", "name": "Microgrid Workbench Keep a fictional campus running on its own power: set what must stay on, size solar, a battery and diesel, and test hypothetical outages on 2025 solar profiles within the feeder's limits", "description": "Sandbox SB1 of Energy Systems, Step by Step: set Prairie Campus's load priorities, equipment, feeder limits, tariff and owner; a small mixed-integer program runs hypothetical outages hour by hour or sizes the plan.", "learningResourceType": "Simulation", "educationalLevel": "Intermediate", "timeRequired": "PT30M", "inLanguage": "en", "isAccessibleForFree": true, "teaches": ["one-line diagram", "islanding", "load priorities in an outage", "outage scenarios", "host-feeder limits", "ownership and cost of capital"], "license": "https://creativecommons.org/licenses/by/4.0/", "author": {"@type": "Person", "name": "Honglin Li", "url": "https://henryutd2021.github.io/"}, "url": "https://henryutd2021.github.io/learn/sb1-microgrid-workbench.html", "isPartOf": {"@id": "https://henryutd2021.github.io/learn/#course"}, "about": [{"@type": "DefinedTerm", "@id": "https://henryutd2021.github.io/learn/glossary.html#microgrid"}, {"@type": "DefinedTerm", "@id": "https://henryutd2021.github.io/learn/glossary.html#islanding"}, {"@type": "DefinedTerm", "@id": "https://henryutd2021.github.io/learn/glossary.html#critical-load"}, {"@type": "DefinedTerm", "@id": "https://henryutd2021.github.io/learn/glossary.html#mixed-integer-program"}], "keywords": ["Microgrid", "Islanding", "Critical load", "Mixed-integer program"]}</script>
 <script type="application/json" class="lx-lesson-data">{"id":"sb1-microgrid-workbench","starter":null,"total":14,"code":"SB1","title":"Microgrid Workbench","subtitle":"Keep a fictional campus running on its own power: set what must stay on, size solar, a battery and diesel, and test hypothetical outages on 2025 solar profiles within the feeder's limits","short":"Microgrid Workbench","tier":"analyst","tier2":"modeler","tierLabel":"Analyst to Modeler · L2–L3","level":"L2","slot":2,"slot2":3,"minutes":30,"does":"One-line diagram, islanding, outage scenarios, load priorities, host-feeder limits and ownership models, on engine E1: a small mixed-integer program.","outcome":"Build a campus microgrid plan, run it through outage scenarios within the host feeder's limits, and read its cost, unserved load and emissions per scenario.","icon":"battery","form":"sandbox","scales":["S1"],"teaches":["one-line diagram","islanding","load priorities in an outage","outage scenarios","host-feeder limits","ownership and cost of capital"],"lab":null,"href":"sb1-microgrid-workbench.html","ready":true,"after":[{"id":"09-storage","starter":9,"title":"How does storage move energy through time?","short":"Storage","does":"A battery with power and energy ratings and losses: charge cheap, sell dear, then compare with the best schedule.","href":"09-storage.html","ready":true}],"prev":null,"next":null}</script>
 <div class="lx-head" data-lesson-id="sb1-microgrid-workbench" data-total="14" data-tier="analyst" data-tier2="modeler" data-level="L2" data-minutes="30" data-form="sandbox">
 <div>

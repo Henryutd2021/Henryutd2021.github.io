@@ -1,0 +1,48 @@
+/* Reference handbooks share the site's page frame, cards and theme tokens. */
+body.page-reference main.content { min-width: 0; }
+.page-reference .reference-handbook { min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
+.page-reference .pg-lede { max-width: 78ch; font-size: 1.1rem; line-height: 1.7; }
+.page-reference .ref-actions, .page-reference .ref-meta { display: flex; flex-wrap: wrap; gap: .6rem; }
+.page-reference .ref-card { padding: 1.4rem; margin-bottom: 1rem; }
+.page-reference .ref-card h3 { margin-bottom: .65rem; }
+.page-reference .ref-card p:last-child { margin-bottom: 0; }
+.page-reference .ref-nav ul { display: flex; flex-wrap: wrap; gap: .55rem 1.4rem; padding: 1rem 1.3rem; list-style: none;
+  border: 1px solid var(--line); border-radius: var(--r); background: var(--bg-2); }
+.page-reference .ref-table-scroll { width: 100%; max-width: 100%; min-width: 0; overflow-x: auto; overscroll-behavior-x: contain;
+  border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); }
+.page-reference table { width: 100%; margin: 0; color: var(--ink-2); border-collapse: collapse; line-height: 1.5; }
+.page-reference .ref-table { min-width: 1080px; table-layout: fixed; font-size: .88rem; }
+.page-reference .ref-table th:nth-child(1) { width: 10%; }
+.page-reference .ref-table th:nth-child(2) { width: 16%; }
+.page-reference .ref-table th:nth-child(3) { width: 9%; }
+.page-reference .ref-table th:nth-child(4) { width: 11%; }
+.page-reference .ref-table th:nth-child(5) { width: 23%; }
+.page-reference .ref-table th:nth-child(6) { width: 12%; }
+.page-reference .ref-table th:nth-child(7) { width: 19%; }
+.page-reference th, .page-reference td { padding: .85rem .7rem; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+.page-reference thead { background: var(--bg-2); color: var(--ink); }
+.page-reference tbody tr:last-child > * { border-bottom: 0; }
+.page-reference .ref-value { color: var(--ink); font-weight: 650; font-variant-numeric: tabular-nums; }
+.page-reference caption { caption-side: top; padding: .75rem; color: var(--ink-2); font-size: .9rem; }
+.page-reference small { display: block; color: var(--muted); margin-top: .25rem; }
+.page-reference details { margin-top: .6rem; }
+.page-reference summary { color: var(--accent-ink); cursor: pointer; font-size: .85rem; }
+.page-reference details p { margin-block: .65rem; }
+.page-reference details dl { margin: .7rem 0; }
+.page-reference details dt { font-weight: 600; color: var(--ink); }
+.page-reference details dd { margin: 0 0 .45rem; }
+.page-reference .ref-paper + .ref-paper { margin-top: .9rem; }
+.page-reference .ref-comparison { min-width: 700px; table-layout: fixed; font-size: .94rem; }
+.page-reference .ref-comparison th:first-child { width: 23%; }
+.page-reference .ref-risks dt { color: var(--ink); margin-top: 1.1rem; font-weight: 650; }
+.page-reference .ref-risks dd { margin: .25rem 0 0; max-width: 85ch; }
+.page-reference .ref-source { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--line); }
+.page-reference .ref-source h3 { margin-bottom: .65rem; }
+.page-reference .ref-source p { margin: .55rem 0; }
+.page-reference .ref-citation { padding: 1.1rem; background: var(--bg-2); border-left: 3px solid var(--accent); }
+.page-reference [id] { scroll-margin-top: calc(var(--nav-h) + 1.5rem); }
+@media (max-width: 600px) {
+  .page-reference .fx-sec { margin-top: 2.5rem; }
+  .page-reference .ref-nav ul { display: block; }
+  .page-reference .ref-nav li + li { margin-top: .5rem; }
+}

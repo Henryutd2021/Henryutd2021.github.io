@@ -1,49 +1,5 @@
 [
   {
-    "listing": "/field-notes/briefings.html",
-    "items": [
-      "/field-notes/briefings/2026-11-03.html"
-    ]
-  },
-  {
-    "listing": "/projects.html",
-    "items": [
-      "/projects/nuclear-dc.html",
-      "/projects/smr-dc.html",
-      "/projects/smr-dc-national.html",
-      "/projects/data-center-delay-economics.html",
-      "/projects/wind-hydrogen.html",
-      "/projects/solar-hydrogen.html",
-      "/projects/offshore-wind-hydrogen-om.html",
-      "/projects/txh2.html",
-      "/projects/npph2.html",
-      "/projects/ghg.html",
-      "/projects/facility-microgrid-location.html",
-      "/projects/uq-mfgpr.html",
-      "/projects/national-wind-uq.html",
-      "/projects/fm-global-internship.html"
-    ]
-  },
-  {
-    "listing": "/index.html",
-    "items": [
-      "/field-notes/briefings/2026-11-03.html"
-    ]
-  },
-  {
-    "listing": "/field-notes.html",
-    "items": [
-      "/field-notes/briefings/2026-11-03.html",
-      "/field-notes/perspectives/2026-11-three-jobs.html"
-    ]
-  },
-  {
-    "listing": "/field-notes/perspectives.html",
-    "items": [
-      "/field-notes/perspectives/2026-11-three-jobs.html"
-    ]
-  },
-  {
     "listing": "/learn/index.html",
     "items": [
       "/learn/00-grid-operator.html",
@@ -68,6 +24,50 @@
       "/learn/k05-probability-statistics.html",
       "/learn/k06-vectors-matrices.html",
       "/learn/k08-git-notebooks.html"
+    ]
+  },
+  {
+    "listing": "/field-notes/perspectives.html",
+    "items": [
+      "/field-notes/perspectives/2026-11-three-jobs.html"
+    ]
+  },
+  {
+    "listing": "/field-notes.html",
+    "items": [
+      "/field-notes/briefings/2026-11-03.html",
+      "/field-notes/perspectives/2026-11-three-jobs.html"
+    ]
+  },
+  {
+    "listing": "/index.html",
+    "items": [
+      "/field-notes/briefings/2026-11-03.html"
+    ]
+  },
+  {
+    "listing": "/projects.html",
+    "items": [
+      "/projects/nuclear-dc.html",
+      "/projects/smr-dc.html",
+      "/projects/smr-dc-national.html",
+      "/projects/data-center-delay-economics.html",
+      "/projects/wind-hydrogen.html",
+      "/projects/solar-hydrogen.html",
+      "/projects/offshore-wind-hydrogen-om.html",
+      "/projects/txh2.html",
+      "/projects/npph2.html",
+      "/projects/ghg.html",
+      "/projects/facility-microgrid-location.html",
+      "/projects/uq-mfgpr.html",
+      "/projects/national-wind-uq.html",
+      "/projects/fm-global-internship.html"
+    ]
+  },
+  {
+    "listing": "/field-notes/briefings.html",
+    "items": [
+      "/field-notes/briefings/2026-11-03.html"
     ]
   }
 ]

@@ -22,9 +22,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="Lesson 9 of Energy Systems, Step by Step: give Prairie Town a battery with power and energy ratings and losses, schedule it by hand on a real sunny day, then compare your schedule with the best one a solver finds.">
+<meta name="description" content="Schedule a battery on a real solar profile scaled to a town; compare manual and optimal dispatch with power, energy and loss limits.">
 
-<title>How does storage move energy through time? – Honglin Li</title>
+<title>Battery Scheduling and Arbitrage · 9 – Honglin Li</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -136,11 +136,15 @@ window.Quarto = {
 <link rel="stylesheet" href="../assets/map.css">
 <link rel="stylesheet" href="../assets/explainers.css">
 <link rel="stylesheet" href="../assets/learn/learn.css">
-<meta property="og:title" content="How does storage move energy through time? – Honglin Li">
-<meta property="og:description" content="Lesson 9 of Energy Systems, Step by Step: give Prairie Town a battery with power and energy ratings and losses, schedule it by hand on a real sunny day, then compare your schedule with the best one a solver finds.">
+<meta property="og:title" content="Battery Scheduling and Arbitrage · 9">
+<meta property="og:description" content="Schedule a battery on a real solar profile scaled to a town; compare manual and optimal dispatch with power, energy and loss limits.">
 <meta property="og:image" content="https://henryutd2021.github.io/images/profile-square.jpg">
 <meta property="og:site_name" content="Honglin Li">
 <meta property="og:url" content="https://henryutd2021.github.io/learn/09-storage.html">
+<meta name="twitter:title" content="Battery Scheduling and Arbitrage · 9">
+<meta name="twitter:description" content="Schedule a battery on a real solar profile scaled to a town; compare manual and optimal dispatch with power, energy and loss limits.">
+<meta name="twitter:image" content="https://henryutd2021.github.io/images/profile-square.jpg">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="canonical" href="https://henryutd2021.github.io/learn/09-storage.html">
 </head>
 
@@ -421,7 +425,7 @@ window.Quarto = {
 
 
 
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "name": "How does storage move energy through time? Charge with midday sun, discharge at sunset", "description": "Lesson 9 of Energy Systems, Step by Step: give Prairie Town a battery with power and energy ratings and losses, schedule it by hand on a real sunny day, then compare your schedule with the best one a solver finds.", "learningResourceType": "Interactive lesson", "educationalLevel": "Intermediate", "timeRequired": "PT15M", "inLanguage": "en", "isAccessibleForFree": true, "teaches": ["energy storage", "round-trip efficiency", "state of charge", "valuing storage", "linear programming"], "license": "https://creativecommons.org/licenses/by/4.0/", "author": {"@type": "Person", "name": "Honglin Li", "url": "https://henryutd2021.github.io/"}, "url": "https://henryutd2021.github.io/learn/09-storage.html", "isPartOf": {"@type": "Course", "name": "Energy Systems, Step by Step", "url": "https://henryutd2021.github.io/learn/"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "@id": "https://henryutd2021.github.io/learn/09-storage.html#learningresource", "name": "How does storage move energy through time? Charge with midday sun, discharge at sunset", "description": "Lesson 9 of Energy Systems, Step by Step: give Prairie Town a battery with power and energy ratings and losses, schedule it by hand on a real sunny day, then compare your schedule with the best one a solver finds.", "learningResourceType": "Interactive lesson", "educationalLevel": "Intermediate", "timeRequired": "PT15M", "inLanguage": "en", "isAccessibleForFree": true, "teaches": ["energy storage", "round-trip efficiency", "state of charge", "valuing storage", "linear programming"], "license": "https://creativecommons.org/licenses/by/4.0/", "author": {"@type": "Person", "name": "Honglin Li", "url": "https://henryutd2021.github.io/"}, "url": "https://henryutd2021.github.io/learn/09-storage.html", "isPartOf": {"@id": "https://henryutd2021.github.io/learn/#course"}, "about": [{"@type": "DefinedTerm", "@id": "https://henryutd2021.github.io/learn/glossary.html#energy-storage"}, {"@type": "DefinedTerm", "@id": "https://henryutd2021.github.io/learn/glossary.html#state-of-charge"}, {"@type": "DefinedTerm", "@id": "https://henryutd2021.github.io/learn/glossary.html#round-trip-efficiency"}, {"@type": "DefinedTerm", "@id": "https://henryutd2021.github.io/learn/glossary.html#marginal-cost"}], "keywords": ["Energy storage", "State of charge", "Round-trip efficiency", "Marginal cost"]}</script>
 <script type="application/json" class="lx-lesson-data">{"id":"09-storage","starter":9,"total":14,"code":null,"title":"How does storage move energy through time?","subtitle":"Charge with midday sun, discharge at sunset","short":"Storage","tier":"analyst","tier2":null,"tierLabel":"Analyst · L2","level":"L2","slot":2,"slot2":null,"minutes":15,"does":"A battery with power and energy ratings and losses: charge cheap, sell dear, then compare with the best schedule.","outcome":"Size and value simple storage.","icon":"battery","form":"cards","scales":["S0","S2"],"teaches":["energy storage","round-trip efficiency","state of charge","valuing storage","linear programming"],"lab":null,"href":"09-storage.html","ready":true,"after":[{"id":"02-demand","starter":2,"title":"Why does electricity demand rise and fall?","short":"The shape of demand","does":"Daily, weekly and seasonal demand curves, and a solar slider that digs the “duck curve”.","href":"02-demand.html","ready":true},{"id":"08-merit-order","starter":8,"title":"Who runs, and what sets the price?","short":"Merit order","does":"A supply stack, a demand line and the price where they meet; add wind and watch prices fall.","href":"08-merit-order.html","ready":true}],"prev":{"id":"08-merit-order","starter":8,"title":"Who runs, and what sets the price?","short":"Merit order","does":"A supply stack, a demand line and the price where they meet; add wind and watch prices fall.","href":"08-merit-order.html","ready":true},"next":{"id":"10-write-it-down","starter":10,"title":"Write it down: what are the decisions, the goal and the rules?","short":"Write it down","does":"Sort Prairie Town's choices into decisions, goal and rules, then find the best plan for two plants on a graph.","href":"10-write-it-down.html","ready":true}}</script>
 <div class="lx-head" data-lesson-id="09-storage" data-starter="9" data-total="14" data-tier="analyst" data-level="L2" data-minutes="15" data-form="cards" data-prev-href="08-merit-order.html" data-next-href="10-write-it-down.html">
 <div>

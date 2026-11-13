@@ -22,9 +22,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="Lesson 11 of Energy Systems, Step by Step: solve Prairie Town’s day as a linear program with the HiGHS solver in the browser, try to beat it, check its answer, catch a planted error, read the shadow price of the demand rule, and see why a mixed-integer solve returns no such prices.">
+<meta name="description" content="Solve a grid dispatch model with HiGHS in your browser, check planted errors and interpret shadow prices and integer-model limits.">
 
-<title>Ask the solver, then check its answer – Honglin Li</title>
+<title>HiGHS Solver and Shadow Prices · 11 – Honglin Li</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -108,11 +108,15 @@ ul.task-list li input[type="checkbox"] {
 <link rel="stylesheet" href="../assets/map.css">
 <link rel="stylesheet" href="../assets/explainers.css">
 <link rel="stylesheet" href="../assets/learn/learn.css">
-<meta property="og:title" content="Ask the solver, then check its answer – Honglin Li">
-<meta property="og:description" content="Lesson 11 of Energy Systems, Step by Step: solve Prairie Town’s day as a linear program with the HiGHS solver in the browser, try to beat it, check its answer, catch a planted error, read the shadow price of the demand rule, and see why a mixed-integer solve returns no such prices.">
+<meta property="og:title" content="HiGHS Solver and Shadow Prices · 11">
+<meta property="og:description" content="Solve a grid dispatch model with HiGHS in your browser, check planted errors and interpret shadow prices and integer-model limits.">
 <meta property="og:image" content="https://henryutd2021.github.io/images/profile-square.jpg">
 <meta property="og:site_name" content="Honglin Li">
 <meta property="og:url" content="https://henryutd2021.github.io/learn/11-solver.html">
+<meta name="twitter:title" content="HiGHS Solver and Shadow Prices · 11">
+<meta name="twitter:description" content="Solve a grid dispatch model with HiGHS in your browser, check planted errors and interpret shadow prices and integer-model limits.">
+<meta name="twitter:image" content="https://henryutd2021.github.io/images/profile-square.jpg">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="canonical" href="https://henryutd2021.github.io/learn/11-solver.html">
 </head>
 
@@ -393,7 +397,7 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "name": "Ask the solver, then check its answer HiGHS in your browser: solve, check, and read prices", "description": "Lesson 11 of Energy Systems, Step by Step: solve Prairie Town's day as a linear program with the HiGHS solver in the browser, try to beat it, check its answer, catch a planted error, read the shadow price of the demand rule, and see why a mixed-integer solve returns no such prices.", "learningResourceType": "Interactive lesson", "educationalLevel": "Advanced", "timeRequired": "PT15M", "inLanguage": "en", "isAccessibleForFree": true, "teaches": ["solvers", "model checking", "shadow prices", "sensitivity analysis", "mixed-integer programming"], "license": "https://creativecommons.org/licenses/by/4.0/", "author": {"@type": "Person", "name": "Honglin Li", "url": "https://henryutd2021.github.io/"}, "url": "https://henryutd2021.github.io/learn/11-solver.html", "isPartOf": {"@type": "Course", "name": "Energy Systems, Step by Step", "url": "https://henryutd2021.github.io/learn/"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "@id": "https://henryutd2021.github.io/learn/11-solver.html#learningresource", "name": "Ask the solver, then check its answer HiGHS in your browser: solve, check, and read prices", "description": "Lesson 11 of Energy Systems, Step by Step: solve Prairie Town's day as a linear program with the HiGHS solver in the browser, try to beat it, check its answer, catch a planted error, read the shadow price of the demand rule, and see why a mixed-integer solve returns no such prices.", "learningResourceType": "Interactive lesson", "educationalLevel": "Advanced", "timeRequired": "PT15M", "inLanguage": "en", "isAccessibleForFree": true, "teaches": ["solvers", "model checking", "shadow prices", "sensitivity analysis", "mixed-integer programming"], "license": "https://creativecommons.org/licenses/by/4.0/", "author": {"@type": "Person", "name": "Honglin Li", "url": "https://henryutd2021.github.io/"}, "url": "https://henryutd2021.github.io/learn/11-solver.html", "isPartOf": {"@id": "https://henryutd2021.github.io/learn/#course"}, "about": [{"@type": "DefinedTerm", "@id": "https://henryutd2021.github.io/learn/glossary.html#solver"}, {"@type": "DefinedTerm", "@id": "https://henryutd2021.github.io/learn/glossary.html#shadow-price"}, {"@type": "DefinedTerm", "@id": "https://henryutd2021.github.io/learn/glossary.html#verification"}, {"@type": "DefinedTerm", "@id": "https://henryutd2021.github.io/learn/glossary.html#mixed-integer-program"}], "keywords": ["Solver", "Shadow price", "Verification", "Mixed-integer program"]}</script>
 <script type="application/json" class="lx-lesson-data">{"id":"11-solver","starter":11,"total":14,"code":null,"title":"Ask the solver, then check its answer","subtitle":"HiGHS in your browser: solve, check, and read prices","short":"Ask the solver","tier":"modeler","tier2":null,"tierLabel":"Modeler · L3","level":"L3","slot":3,"slot2":null,"minutes":15,"does":"A real solver in your browser: try to beat it, check its answer, and read prices from it.","outcome":"Solve, interpret and check a linear program.","icon":"target","form":"cards","scales":["S2"],"teaches":["solvers","model checking","shadow prices","sensitivity analysis","mixed-integer programming"],"lab":null,"href":"11-solver.html","ready":true,"after":[{"id":"10-write-it-down","starter":10,"title":"Write it down: what are the decisions, the goal and the rules?","short":"Write it down","does":"Sort Prairie Town's choices into decisions, goal and rules, then find the best plan for two plants on a graph.","href":"10-write-it-down.html","ready":true}],"prev":{"id":"10-write-it-down","starter":10,"title":"Write it down: what are the decisions, the goal and the rules?","short":"Write it down","does":"Sort Prairie Town's choices into decisions, goal and rules, then find the best plan for two plants on a graph.","href":"10-write-it-down.html","ready":true},"next":{"id":"12-trade-offs","starter":12,"title":"Cheap or clean? How do you weigh cost against emissions?","short":"Cheap or clean?","does":"Spot the plans nobody should pick, slide a carbon price, and trace the frontier between cost and CO₂.","href":"12-trade-offs.html","ready":true}}</script>
 <div class="lx-head" data-lesson-id="11-solver" data-starter="11" data-total="14" data-tier="modeler" data-level="L3" data-minutes="15" data-form="cards" data-prev-href="10-write-it-down.html" data-next-href="12-trade-offs.html">
 <div>

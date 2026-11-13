@@ -165,7 +165,11 @@
    "scales": [
     "S0"
    ],
-   "teaches": [],
+   "teaches": [
+    "Calculate energy from power and elapsed time",
+    "Convert between common power and energy units",
+    "Check an energy estimate using scale and bounds"
+   ],
    "lab": null,
    "href": "01-power-energy.html",
    "ready": true,
@@ -212,7 +216,11 @@
     "S2",
     "S0"
    ],
-   "teaches": [],
+   "teaches": [
+    "Read daily and seasonal demand profiles",
+    "Construct a load-duration curve by sorting hourly demand",
+    "Explain how solar output changes net demand"
+   ],
    "lab": null,
    "href": "02-demand.html",
    "ready": true,
@@ -532,7 +540,11 @@
    "scales": [
     "S0"
    ],
-   "teaches": [],
+   "teaches": [
+    "Calculate a levelized cost of electricity from capital and operating costs",
+    "Compare how discount rates and fuel prices affect LCOE",
+    "Explain why LCOE omits the timing and system value of electricity"
+   ],
    "lab": null,
    "href": "07-cost.html",
    "ready": true,
@@ -588,7 +600,11 @@
    "scales": [
     "S2"
    ],
-   "teaches": [],
+   "teaches": [
+    "Find a clearing price from a supply stack and demand",
+    "Explain how wind output and fuel prices change the merit order",
+    "Distinguish scarcity prices from negative-price hours"
+   ],
    "lab": null,
    "href": "08-merit-order.html",
    "ready": true,
@@ -859,7 +875,11 @@
    "scales": [
     "S2"
    ],
-   "teaches": [],
+   "teaches": [
+    "Identify dominated power plans",
+    "Trace a cost-emissions frontier with a carbon cap",
+    "Explain how a carbon price selects among competing plans"
+   ],
    "lab": null,
    "href": "12-trade-offs.html",
    "ready": true,
@@ -915,7 +935,11 @@
    "scales": [
     "S2"
    ],
-   "teaches": [],
+   "teaches": [
+    "Compare generation and storage plans in an illustrative capacity-expansion model",
+    "Check hourly operation against a carbon cap",
+    "Explain cost and emissions trade-offs and model limits"
+   ],
    "lab": null,
    "href": "13-capstone.html",
    "ready": true,

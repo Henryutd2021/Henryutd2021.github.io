@@ -55,7 +55,7 @@
  },
  "alkaline-electrolyzer": {
   "term": "Alkaline electrolyzer",
-  "short": "The older, widely used electrolyzer type, whose cells sit in an alkaline liquid; the units in IRENA's 2020 table must stay above about 15% of their size.",
+  "short": "An electrolyzer that uses an alkaline liquid electrolyte to carry ions between its electrodes, with operating limits that depend on the equipment design.",
   "lesson": "A16",
   "href": "a16-hydrogen-ptx.html"
  },
@@ -187,7 +187,7 @@
  },
  "baseload": {
   "term": "Baseload operation",
-  "short": "Running a plant at steady full output around the clock, whatever the hour's price.",
+  "short": "Operating a plant at a relatively steady output to supply the portion of demand that persists through the day.",
   "lesson": "CF4",
   "href": "cf4-existing-reactors-hydrogen.html"
  },
@@ -601,7 +601,7 @@
  },
  "condensing-furnace": {
   "term": "Condensing furnace",
-  "short": "A gas furnace that also recovers the heat in its exhaust's water vapor, so 90% or more of the gas's energy becomes heat, against about 80% for a non-condensing one.",
+  "short": "A furnace that recovers additional heat by condensing water vapor in its exhaust, with efficiency depending on its design and operating conditions.",
   "lesson": "A18",
   "href": "a18-city-plan.html"
  },
@@ -1513,7 +1513,7 @@
  },
  "full-load-hours": {
   "term": "Full-load hours",
-  "short": "A year's output divided by a machine's size: the hours it would need at full size to make the same amount; divided by 8,760, it is the average utilization.",
+  "short": "Output over a period divided by rated capacity, giving the equivalent hours at full output; dividing by the hours in that period gives average utilization.",
   "lesson": "A16",
   "href": "a16-hydrogen-ptx.html"
  },
@@ -2089,8 +2089,14 @@
  },
  "long-duration-storage": {
   "term": "Long-duration storage",
-  "short": "Storage that can give its full power for about 10 hours or more; DOE splits it into inter-day (10 to 36 hours) and multi-day or week-long (36 to 160 hours) stores.",
+  "short": "Storage for extended discharge, including the Department of Energy's 2023 inter-day (10–36 hours) and multi-day or week-long (36–160 hours) categories, though definitions vary.",
   "lesson": "A8",
+  "sources": [
+   {
+    "title": "Department of Energy, Long Duration Energy Storage Opportunities (July 27, 2023), slide 13",
+    "url": "https://www.energy.gov/sites/default/files/2023-08/Pathways%20to%20Commercial%20Liftoff%20Long%20Duration%20Energy%20Storage%20Opportunities.pdf#page=13"
+   }
+  ],
   "href": "a08-storage-duration.html"
  },
  "lole": {
@@ -2263,7 +2269,7 @@
  },
  "merge": {
   "term": "Merge",
-  "short": "Joining two lines of commits into one, keeping the changes made on both.",
+  "short": "Combining two lines of commits, with conflicting changes requiring resolution before the merge is complete.",
   "lesson": "K8",
   "href": "k08-git-notebooks.html"
  },
@@ -2653,7 +2659,7 @@
  },
  "pem-electrolyzer": {
   "term": "PEM electrolyzer",
-  "short": "An electrolyzer named for the thin polymer membrane in its cells (proton exchange membrane); it follows changing power well and can run down to about 5% of its size.",
+  "short": "An electrolyzer that uses a proton exchange membrane to carry ions between its electrodes, with operating limits that depend on the equipment design.",
   "lesson": "A16",
   "href": "a16-hydrogen-ptx.html"
  },
@@ -3217,7 +3223,7 @@
  },
  "scarcity-price": {
   "term": "Scarcity price",
-  "short": "A very high wholesale price in hours when available supply barely covers demand.",
+  "short": "A wholesale electricity price that rises when supply or operating reserves are scarce, reflecting the value of meeting demand or maintaining reserves.",
   "lesson": "F2",
   "href": "f02-systems-and-map.html"
  },
@@ -3379,7 +3385,7 @@
  },
  "solver": {
   "term": "Solver",
-  "short": "Software that finds the best solution of an optimization problem, or shows that none exists.",
+  "short": "Software that searches for an optimization solution and reports whether it is optimal, infeasible or unbounded, or stops at a time or other limit with or without a feasible solution.",
   "lesson": 11,
   "href": "11-solver.html"
  },

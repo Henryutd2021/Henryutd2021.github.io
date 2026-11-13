@@ -1,0 +1,496 @@
+{
+  "handbook_version": "0.1",
+  "last_checked": "2026-11-13",
+  "title": "Hydrogen techno-economic parameters and inputs",
+  "description": "Source-specific hydrogen techno-economic parameters and inputs, preserving printed values, technical and monetary bases, source terms and paper cross-references. Includes historical status, design coefficients, targets, policy inputs, an observed retail price and a clearly labeled paper model assumption.",
+  "temporal_coverage": "2007/2031",
+  "temporal_coverage_note": "2007 cost bases through the 2031 Hydrogen Shot goal, including historical status and 2026 policy and market inputs. Ultimate technology targets are undated.",
+  "spatial_coverage": "United States",
+  "spatial_coverage_note": "U.S. focus, with a global IRENA technology synthesis explicitly labeled.",
+  "compilation_licence": "https://creativecommons.org/licenses/by/4.0/",
+  "compilation_rights_note": "Compilation and curation: CC BY 4.0. Each value retains the original source’s terms, listed in the source register; this compilation licence does not relicense source documents.",
+  "sources": [
+    {
+      "source_id": "S1",
+      "title": "Technical Targets for Proton Exchange Membrane Electrolysis",
+      "url": "https://www.energy.gov/cmei/fuels/technical-targets-proton-exchange-membrane-electrolysis",
+      "doi": "",
+      "authors": [
+        "U.S. Department of Energy"
+      ],
+      "publisher": "U.S. Department of Energy",
+      "date": "2026-05-29",
+      "year": "2026",
+      "version": "Webpage updated 29 May 2026; 2022 status, 2026 and ultimate targets",
+      "reuse_code": "G",
+      "licence": "U.S. government information (qualified)",
+      "licence_url": "https://www.energy.gov/web-policies",
+      "rights_note": "Government-authored material is public domain in the United States; third-party exceptions remain. DOE requests acknowledgement."
+    },
+    {
+      "source_id": "S2",
+      "title": "Technical Targets for Liquid Alkaline Electrolysis",
+      "url": "https://www.energy.gov/cmei/fuels/technical-targets-liquid-alkaline-electrolysis",
+      "doi": "",
+      "authors": [
+        "U.S. Department of Energy"
+      ],
+      "publisher": "U.S. Department of Energy",
+      "date": "2026-05-29",
+      "year": "2026",
+      "version": "Webpage updated 29 May 2026; 2022 status, 2026 and ultimate targets",
+      "reuse_code": "G",
+      "licence": "U.S. government information (qualified)",
+      "licence_url": "https://www.energy.gov/web-policies",
+      "rights_note": "Government-authored material is public domain in the United States; third-party exceptions remain. DOE requests acknowledgement."
+    },
+    {
+      "source_id": "S3",
+      "title": "Technical Targets for High Temperature Electrolysis",
+      "url": "https://www.energy.gov/cmei/fuels/technical-targets-high-temperature-electrolysis",
+      "doi": "",
+      "authors": [
+        "U.S. Department of Energy"
+      ],
+      "publisher": "U.S. Department of Energy",
+      "date": "2026-05-29",
+      "year": "2026",
+      "version": "Webpage updated 29 May 2026; 2022 status, 2026 and ultimate targets",
+      "reuse_code": "G",
+      "licence": "U.S. government information (qualified)",
+      "licence_url": "https://www.energy.gov/web-policies",
+      "rights_note": "Government-authored material is public domain in the United States; third-party exceptions remain. DOE requests acknowledgement."
+    },
+    {
+      "source_id": "S4",
+      "title": "Hydrogen Shot: Water Electrolysis Technology Assessment",
+      "url": "https://www.energy.gov/sites/default/files/2024-12/hydrogen-shot-water-electrolysis-technology-assessment.pdf",
+      "doi": "",
+      "authors": [
+        "McKenzie Hubert",
+        "Anne Marie Esposito",
+        "David Peterson",
+        "Eric Miller",
+        "Joseph Stanford"
+      ],
+      "publisher": "U.S. Department of Energy, Hydrogen and Fuel Cell Technologies Office",
+      "date": "2024-12",
+      "year": "2024",
+      "version": "December 2024",
+      "reuse_code": "G",
+      "licence": "U.S. government information (qualified)",
+      "licence_url": "https://www.energy.gov/web-policies",
+      "rights_note": "Government-authored material is public domain in the United States; third-party exceptions remain. DOE requests acknowledgement."
+    },
+    {
+      "source_id": "S5",
+      "title": "Green Hydrogen Cost Reduction: Scaling up Electrolysers to Meet the 1.5°C Climate Goal",
+      "url": "https://www.irena.org/-/media/Files/IRENA/Agency/Publication/2020/Dec/IRENA_Green_hydrogen_cost_2020.pdf?rev=95b8c10569874148a44e1d17b301d263",
+      "doi": "",
+      "authors": [
+        "Emanuele Taibi",
+        "Herib Blanco",
+        "Raul Miranda",
+        "Marcelo Carmo"
+      ],
+      "publisher": "International Renewable Energy Agency, Abu Dhabi",
+      "date": "2020",
+      "year": "2020",
+      "version": "2020; ISBN 978-92-9260-295-6",
+      "reuse_code": "A",
+      "licence": "IRENA attribution-based reuse permission",
+      "licence_url": "https://www.irena.org/-/media/Files/IRENA/Agency/Publication/2020/Dec/IRENA_Green_hydrogen_cost_2020.pdf?rev=95b8c10569874148a44e1d17b301d263#page=2",
+      "rights_note": "Copyright IRENA 2020. Reuse permitted with acknowledgement of IRENA as source and copyright holder; third-party material may have separate terms (p. 2)."
+    },
+    {
+      "source_id": "S6",
+      "title": "High-Temperature Steam Electrolysis Process Performance and Cost Estimates",
+      "url": "https://inldigitallibrary.inl.gov/sites/sti/sti/Sort_60759.pdf",
+      "doi": "10.2172/1867883",
+      "authors": [
+        "Daniel S. Wendt",
+        "L. Todd Knighton",
+        "Richard D. Boardman"
+      ],
+      "publisher": "Idaho National Laboratory",
+      "date": "2022-03",
+      "year": "2022",
+      "version": "INL/RPT-22-66117 Rev. 0",
+      "reuse_code": "C",
+      "licence": "Source-specific rights; no blanket open licence",
+      "licence_url": "",
+      "rights_note": "Publicly accessible contractor/mixed-authorship report; no blanket open licence established. Facts are transcribed with attribution; protected tables and figures are not reproduced."
+    },
+    {
+      "source_id": "S7",
+      "title": "Multi-Year Research, Development, and Demonstration Plan, Section 3.2: Hydrogen Delivery",
+      "url": "https://www.energy.gov/sites/prod/files/2015/05/f22/fcto_myrdd_delivery_0.pdf",
+      "doi": "",
+      "authors": [
+        "U.S. Department of Energy"
+      ],
+      "publisher": "U.S. Department of Energy",
+      "date": "2015",
+      "year": "2015",
+      "version": "2015 chapter; FY2015 status",
+      "reuse_code": "G",
+      "licence": "U.S. government information (qualified)",
+      "licence_url": "https://www.energy.gov/web-policies",
+      "rights_note": "Government-authored material is public domain in the United States; third-party exceptions remain. DOE requests acknowledgement."
+    },
+    {
+      "source_id": "S8",
+      "title": "Multi-Year Research, Development, and Demonstration Plan, Section 3.4: Fuel Cells",
+      "url": "https://www.energy.gov/sites/prod/files/2016/06/f32/fcto_myrdd_fuel_cells_0.pdf",
+      "doi": "",
+      "authors": [
+        "U.S. Department of Energy"
+      ],
+      "publisher": "U.S. Department of Energy",
+      "date": "2016",
+      "year": "2016",
+      "version": "2016 chapter; 2015 status",
+      "reuse_code": "G",
+      "licence": "U.S. government information (qualified)",
+      "licence_url": "https://www.energy.gov/web-policies",
+      "rights_note": "Government-authored material is public domain in the United States; third-party exceptions remain. DOE requests acknowledgement."
+    },
+    {
+      "source_id": "S9",
+      "title": "Comparison of Commercial, State-of-the-Art, Fossil-Based Hydrogen Production Technologies",
+      "url": "https://www.netl.doe.gov/projects/files/ComparisonofCommercialStateofArtFossilBasedHydrogenProductionTechnologies_041222.pdf",
+      "doi": "10.2172/1862910",
+      "authors": [
+        "Eric Lewis",
+        "Shannon McNaul",
+        "Matthew Jamieson",
+        "Megan S. Henriksen",
+        "H. Scott Matthews",
+        "John White",
+        "Liam Walsh",
+        "Jadon Grove",
+        "Travis Shultz",
+        "Timothy J. Skone",
+        "Robert Stevens"
+      ],
+      "publisher": "National Energy Technology Laboratory",
+      "date": "2022-04-12",
+      "year": "2022",
+      "version": "DOE/NETL-2022/3241",
+      "reuse_code": "C",
+      "licence": "Source-specific rights; no blanket open licence",
+      "licence_url": "",
+      "rights_note": "Publicly accessible contractor/mixed-authorship report; no blanket open licence established. Facts are transcribed with attribution; protected tables and figures are not reproduced."
+    },
+    {
+      "source_id": "S10",
+      "title": "26 USC §45V—Credit for production of clean hydrogen",
+      "url": "https://uscode.house.gov/us/usc/t26/s45V/",
+      "doi": "",
+      "authors": [
+        "U.S. Congress"
+      ],
+      "publisher": "Office of the Law Revision Counsel, U.S. House of Representatives",
+      "date": "2026-11-03",
+      "year": "2026",
+      "version": "Enacted 2022; amended 2025; consulted text includes laws through 3 November 2026",
+      "reuse_code": "G",
+      "licence": "U.S. government information (qualified)",
+      "licence_url": "",
+      "rights_note": "U.S. federal statutory text; public domain in the United States."
+    },
+    {
+      "source_id": "S11",
+      "title": "Credit for Production of Clean Hydrogen and Energy Credit",
+      "url": "https://www.govinfo.gov/content/pkg/FR-2025-01-10/html/2024-31513.htm",
+      "doi": "",
+      "authors": [
+        "U.S. Department of the Treasury",
+        "Internal Revenue Service"
+      ],
+      "publisher": "Federal Register",
+      "date": "2025-01-10",
+      "year": "2025",
+      "version": "T.D. 10023; 90 FR 2224–2329",
+      "reuse_code": "G",
+      "licence": "U.S. government information (qualified)",
+      "licence_url": "",
+      "rights_note": "U.S. federal regulations; public domain in the United States."
+    },
+    {
+      "source_id": "S12",
+      "title": "Notice 2026-41",
+      "url": "https://www.irs.gov/irb/2026-29_irb",
+      "doi": "",
+      "authors": [
+        "Internal Revenue Service"
+      ],
+      "publisher": "Internal Revenue Service",
+      "date": "2026-07-13",
+      "year": "2026",
+      "version": "Notice 2026-41, Section 3.02; Internal Revenue Bulletin 2026-29",
+      "reuse_code": "G",
+      "licence": "U.S. government information (qualified)",
+      "licence_url": "",
+      "rights_note": "U.S. federal tax notice; public domain in the United States."
+    },
+    {
+      "source_id": "S13",
+      "title": "DOE Releases First in Series of Reports Highlighting Pathways Toward Clean Hydrogen EarthShot",
+      "url": "https://www.energy.gov/articles/doe-releases-first-series-reports-highlighting-pathways-toward-clean-hydrogen-earthshot",
+      "doi": "",
+      "authors": [
+        "U.S. Department of Energy"
+      ],
+      "publisher": "U.S. Department of Energy",
+      "date": "2023-12-05",
+      "year": "2023",
+      "version": "5 December 2023 target statement",
+      "reuse_code": "G",
+      "licence": "U.S. government information (qualified)",
+      "licence_url": "https://www.energy.gov/web-policies",
+      "rights_note": "Government-authored material is public domain in the United States; third-party exceptions remain. DOE requests acknowledgement."
+    },
+    {
+      "source_id": "S14",
+      "title": "Alternative Fuel Price Report, July 2026",
+      "url": "https://afdc.energy.gov/files/u/publication/alternative-fuel-price-report-july-2026",
+      "doi": "",
+      "authors": [
+        "U.S. Department of Energy, Clean Cities and Communities"
+      ],
+      "publisher": "U.S. Department of Energy",
+      "date": "2026-07",
+      "year": "2026",
+      "version": "July 2026 report; collection 1–31 July 2026",
+      "reuse_code": "G",
+      "licence": "U.S. government information (qualified)",
+      "licence_url": "https://www.energy.gov/web-policies",
+      "rights_note": "Government-authored material is public domain in the United States; third-party exceptions remain. DOE requests acknowledgement."
+    },
+    {
+      "source_id": "S15",
+      "authors": [
+        "Honglin Li",
+        "Jianqiao Huang",
+        "Bikash Poudel",
+        "Mucun Sun",
+        "Tyler Westover",
+        "Daniel Wendt",
+        "Jie Zhang"
+      ],
+      "title": "Rethinking the economics and flexibility of U.S. nuclear power through hydrogen integration and policy support",
+      "publisher": "Nature Communications",
+      "date": "2026",
+      "year": "2026",
+      "version": "Volume 17, article 7090; published version",
+      "url": "https://henryutd2021.github.io/files/papers/Li2026.pdf",
+      "doi": "10.1038/s41467-026-73630-y",
+      "reuse_code": "ND",
+      "licence": "CC BY-NC-ND 4.0",
+      "licence_url": "https://creativecommons.org/licenses/by-nc-nd/4.0/",
+      "rights_note": "CC BY-NC-ND 4.0 applies to the published article. Source rights are separate from the compilation licence."
+    }
+  ],
+  "papers": {
+    "li2024towards": {
+      "title": "Towards Sustainable Integration: Techno-Economic Analysis and Future Perspectives of Co-Located Wind and Hydrogen Energy Systems",
+      "authors": [
+        "Honglin Li",
+        "Jie Zhang"
+      ],
+      "year": "2024",
+      "venue": "Journal of Mechanical Design",
+      "doi": "10.1115/1.4063971",
+      "short_title": "Wind–hydrogen (2024)",
+      "manuscript_locator": "Table 1, PDF p. 13",
+      "published_locator": "Table 1, PDF p. 8",
+      "manuscript_rights": "Posted manuscript: ©2023 ASME; no CC licence identified.",
+      "published_rights": "Published version: ASME copyright; no CC licence identified.",
+      "published_url": "https://personal.utdallas.edu/~jiezhang/Journals/Zhang_2024_JMD_TEA.pdf",
+      "key": "li2024towards",
+      "page_url": "https://henryutd2021.github.io/files/papers/li2024towards.html",
+      "posted_pdf_url": "https://henryutd2021.github.io/files/papers/li2024towards.pdf"
+    },
+    "li2023techno": {
+      "title": "Techno-Economic Analysis for Co-located Solar and Hydrogen Plants",
+      "authors": [
+        "Honglin Li",
+        "Juha Kiviluoma",
+        "Jie Zhang"
+      ],
+      "year": "2023",
+      "venue": "19th International Conference on the European Energy Market (EEM)",
+      "doi": "10.1109/EEM58374.2023.10161786",
+      "short_title": "Solar–hydrogen (2023)",
+      "manuscript_locator": "Posted version, Table I, PDF p. 4",
+      "published_locator": "Table I, PDF p. 4",
+      "manuscript_rights": "Posted version: ©2023 IEEE; personal-use notice, not an open licence.",
+      "published_rights": "©2023 IEEE.",
+      "published_url": "https://doi.org/10.1109/EEM58374.2023.10161786",
+      "key": "li2023techno",
+      "page_url": "https://henryutd2021.github.io/files/papers/li2023techno.html",
+      "posted_pdf_url": "https://henryutd2021.github.io/files/papers/li2023techno.pdf"
+    },
+    "li2025hydrogen": {
+      "title": "Hydrogen’s Role in Expanding Renewable Energy and Reducing Carbon Emissions in Texas",
+      "authors": [
+        "Honglin Li",
+        "Jie Zhang"
+      ],
+      "year": "2025",
+      "venue": "International Journal of Hydrogen Energy 113, 77–89",
+      "doi": "10.1016/j.ijhydene.2025.02.303",
+      "short_title": "Texas hydrogen (2025)",
+      "manuscript_locator": "Table 3, PDF p. 5 / printed p. 4",
+      "published_locator": "Table 3, PDF p. 4 / printed p. 80",
+      "manuscript_rights": "Accepted manuscript: CC BY-NC-ND 4.0.",
+      "published_rights": "Published version: all rights reserved; publisher notice.",
+      "published_url": "https://personal.utdallas.edu/~jiezhang/Journals/Zhang_2025_HE_H2_Texas.pdf",
+      "key": "li2025hydrogen",
+      "page_url": "https://henryutd2021.github.io/files/papers/li2025hydrogen.html",
+      "posted_pdf_url": "https://henryutd2021.github.io/files/papers/li2025hydrogen.pdf"
+    },
+    "Li2026": {
+      "title": "Rethinking the economics and flexibility of U.S. nuclear power through hydrogen integration and policy support",
+      "authors": [
+        "Honglin Li",
+        "Jianqiao Huang",
+        "Bikash Poudel",
+        "Mucun Sun",
+        "Tyler Westover",
+        "Daniel Wendt",
+        "Jie Zhang"
+      ],
+      "year": "2026",
+      "venue": "Nature Communications 17, 7090",
+      "doi": "10.1038/s41467-026-73630-y",
+      "short_title": "Nuclear–hydrogen (2026)",
+      "manuscript_locator": "",
+      "published_locator": "Policy model, p. 11; Methods, p. 12",
+      "manuscript_rights": "",
+      "published_rights": "Published version: CC BY-NC-ND 4.0 (p. 15).",
+      "published_url": "https://henryutd2021.github.io/files/papers/Li2026.pdf",
+      "key": "Li2026",
+      "page_url": "https://henryutd2021.github.io/files/papers/Li2026.html",
+      "posted_pdf_url": "https://henryutd2021.github.io/files/papers/Li2026.pdf"
+    }
+  },
+  "disagreements": [
+    {
+      "issue": "PEM stack lifetime",
+      "values": "40,000 h (S1); 50,000–80,000 h (S5, Table 6, p. 65).",
+      "source_ids": [
+        "S1",
+        "S5"
+      ],
+      "interpretation": "The 40,000–80,000 h envelope is not a confidence interval: endpoint definitions, technologies and duty cycles are not harmonized."
+    },
+    {
+      "issue": "Alkaline degradation",
+      "values": "3.2 mV/kh (S2); 4.8 mV/kh (S4, Table A-2, p. 52).",
+      "source_ids": [
+        "S2",
+        "S4"
+      ],
+      "interpretation": "The public documents disagree. Keep the document-specific values; do not average them or silently repair either source."
+    },
+    {
+      "issue": "Backup fuel-cell equipment cost",
+      "values": "3,000 $/kW in the 2016 DOE PDF (S8); 6,100 $/kW in the later DOE webpage, both labeled 2015 status.",
+      "source_ids": [
+        "S8"
+      ],
+      "document_url": "https://www.energy.gov/cmei/fuels/doe-technical-targets-fuel-cell-backup-power-systems",
+      "interpretation": "A source-version difference, not a validated market-price range. Preserve the version; cost years remain NR."
+    }
+  ],
+  "gaps": [
+    {
+      "title": "ATR without CCS",
+      "text": "The cited NETL report has no such case. Subtracting capture equipment from ATR+CCS does not supply a complete unabated design."
+    },
+    {
+      "title": "Unit-level CCS removal assumptions",
+      "text": "NETL’s overall capture objective does not supply a universal solvent-removal input."
+    },
+    {
+      "title": "Before-capture intensity of capture-equipped plants",
+      "text": "The unabated SMR coefficient H52 should not be transferred to SMR+CCS or ATR+CCS; their fuel and process balances differ."
+    },
+    {
+      "title": "Current PEM/alkaline variable O&M",
+      "text": "A comparable public benchmark excluding electricity, water and stack replacement is not established here. H27 is a model factor."
+    },
+    {
+      "title": "Current MW-scale, continuous-duty pure-hydrogen fuel cells",
+      "text": "Installed CAPEX, variable O&M and lifetime require suitable public sources. Backup-system values and natural-gas CHP efficiencies are unsuitable substitutes."
+    },
+    {
+      "title": "Current storage and pipeline procurement costs",
+      "text": "Historical DOE component benchmarks need newer public estimates with installation and location stated."
+    },
+    {
+      "title": "Hydrogen-only U.S. wholesale prices",
+      "text": "H65 is a small retail sample. The BLS/FRED argon-and-hydrogen series is a combined index, not a hydrogen-only price per kilogram.",
+      "url": "https://fred.stlouisfed.org/series/WPU06790309"
+    },
+    {
+      "title": "Additional California retail coverage",
+      "text": "The CEC/CARB assessment is a further public reference; its numerical observations are not included in this edition.",
+      "url": "https://www.energy.ca.gov/publications/2026/joint-agency-staff-report-assembly-bill-126-2025-annual-assessment-hydrogen"
+    }
+  ],
+  "other_references": [
+    {
+      "name": "IEA — Global Hydrogen Review 2026",
+      "url": "https://www.iea.org/reports/global-hydrogen-review-2026",
+      "description": "Production, infrastructure and policy."
+    },
+    {
+      "name": "BloombergNEF — Hydrogen Market Outlook",
+      "url": "https://about.bnef.com/insights/clean-energy/1h-2024-hydrogen-market-outlook-targets-meet-reality/",
+      "description": "Equipment deployment, markets and policy."
+    },
+    {
+      "name": "Lazard — LCOE+ hydrogen analysis",
+      "url": "https://www.lazard.com/media/gjyffoqd/lazards-lcoeplus-june-2024.pdf",
+      "description": "Cost comparisons and assumptions."
+    },
+    {
+      "name": "S&P Global Platts — Hydrogen Price Assessments",
+      "url": "https://www.spglobal.com/energy/en/pricing-benchmarks/assessments/energy-transition/hydrogen-price-explained",
+      "description": "Regional pricing methodology."
+    }
+  ],
+  "update_cadence": [
+    {
+      "family": "45V statute and regulations",
+      "cadence": "Monthly and after legislation, final rules or material guidance; recheck before each analysis."
+    },
+    {
+      "family": "45V monetary amounts",
+      "cadence": "Annually when the IRS inflation notice appears; retain production-year applicability."
+    },
+    {
+      "family": "Electrolyzer and fuel-cell costs and targets",
+      "cadence": "Six-month source check; annual handbook release; preserve historical editions."
+    },
+    {
+      "family": "Efficiency, lifetime, degradation and turndown",
+      "cadence": "Annual review and whenever design or duty cycle changes."
+    },
+    {
+      "family": "Storage, pipelines and compression",
+      "cadence": "Annual source review; update project-specific estimates before investment modeling."
+    },
+    {
+      "family": "Retail prices",
+      "cadence": "Each quarterly DOE report; preserve sample, period and units."
+    },
+    {
+      "family": "Paper model assumptions",
+      "cadence": "Retain the cited publication version."
+    }
+  ]
+}

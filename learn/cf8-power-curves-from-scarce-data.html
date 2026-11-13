@@ -22,9 +22,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="Case file CF8 of Energy Systems, Step by Step: why a measured power curve is a band, and how a turbine’s theoretical curve can narrow it when records are few.">
+<meta name="description" content="Fit an illustrative Gaussian process to sparse wind data; compare prediction bands with and without a theoretical power curve.">
 
-<title>Learning a wind turbine’s power curve from scarce data – Honglin Li</title>
+<title>Wind Power Curves with Sparse Data · CF8 – Honglin Li</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -108,11 +108,15 @@ ul.task-list li input[type="checkbox"] {
 <link rel="stylesheet" href="../assets/map.css">
 <link rel="stylesheet" href="../assets/explainers.css">
 <link rel="stylesheet" href="../assets/learn/learn.css">
-<meta property="og:title" content="Learning a wind turbine’s power curve from scarce data – Honglin Li">
-<meta property="og:description" content="Case file CF8 of Energy Systems, Step by Step: why a measured power curve is a band, and how a turbine’s theoretical curve can narrow it when records are few.">
+<meta property="og:title" content="Wind Power Curves with Sparse Data · CF8">
+<meta property="og:description" content="Fit an illustrative Gaussian process to sparse wind data; compare prediction bands with and without a theoretical power curve.">
 <meta property="og:image" content="https://henryutd2021.github.io/images/profile-square.jpg">
 <meta property="og:site_name" content="Honglin Li">
 <meta property="og:url" content="https://henryutd2021.github.io/learn/cf8-power-curves-from-scarce-data.html">
+<meta name="twitter:title" content="Wind Power Curves with Sparse Data · CF8">
+<meta name="twitter:description" content="Fit an illustrative Gaussian process to sparse wind data; compare prediction bands with and without a theoretical power curve.">
+<meta name="twitter:image" content="https://henryutd2021.github.io/images/profile-square.jpg">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="canonical" href="https://henryutd2021.github.io/learn/cf8-power-curves-from-scarce-data.html">
 </head>
 
@@ -393,7 +397,7 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "name": "Learning a wind turbine's power curve from scarce data Why a measured power curve is a band, and how a turbine's theoretical curve can narrow it when records are few", "description": "Case file CF8 of Energy Systems, Step by Step: why a measured power curve is a band, and how a turbine's theoretical curve can narrow it when records are few.", "learningResourceType": "Case study", "educationalLevel": "Intermediate", "timeRequired": "PT10M", "inLanguage": "en", "isAccessibleForFree": true, "teaches": ["probabilistic power curves", "multi-fidelity data", "from a power-curve band to a capacity-factor band"], "license": "https://creativecommons.org/licenses/by/4.0/", "author": {"@type": "Person", "name": "Honglin Li", "url": "https://henryutd2021.github.io/"}, "url": "https://henryutd2021.github.io/learn/cf8-power-curves-from-scarce-data.html", "isPartOf": {"@type": "Course", "name": "Energy Systems, Step by Step", "url": "https://henryutd2021.github.io/learn/"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "@id": "https://henryutd2021.github.io/learn/cf8-power-curves-from-scarce-data.html#learningresource", "name": "Learning a wind turbine's power curve from scarce data Why a measured power curve is a band, and how a turbine's theoretical curve can narrow it when records are few", "description": "Case file CF8 of Energy Systems, Step by Step: why a measured power curve is a band, and how a turbine's theoretical curve can narrow it when records are few.", "learningResourceType": "Case study", "educationalLevel": "Intermediate", "timeRequired": "PT10M", "inLanguage": "en", "isAccessibleForFree": true, "teaches": ["probabilistic power curves", "multi-fidelity data", "from a power-curve band to a capacity-factor band"], "license": "https://creativecommons.org/licenses/by/4.0/", "author": {"@type": "Person", "name": "Honglin Li", "url": "https://henryutd2021.github.io/"}, "url": "https://henryutd2021.github.io/learn/cf8-power-curves-from-scarce-data.html", "isPartOf": {"@id": "https://henryutd2021.github.io/learn/#course"}, "about": [{"@type": "DefinedTerm", "@id": "https://henryutd2021.github.io/learn/glossary.html#power-curve"}, {"@type": "DefinedTerm", "@id": "https://henryutd2021.github.io/learn/glossary.html#multi-fidelity"}, {"@type": "DefinedTerm", "@id": "https://henryutd2021.github.io/learn/glossary.html#gaussian-process"}, {"@type": "DefinedTerm", "@id": "https://henryutd2021.github.io/learn/glossary.html#calibration"}], "keywords": ["Power curve", "Multi-fidelity data", "Gaussian process", "Calibration (of a band)"]}</script>
 <script type="application/json" class="lx-lesson-data">{"id":"cf8-power-curves-from-scarce-data","starter":null,"total":14,"code":"CF8","title":"Learning a wind turbine's power curve from scarce data","subtitle":"Why a measured power curve is a band, and how a turbine's theoretical curve can narrow it when records are few","short":"Power curves from scarce data","tier":"analyst","tier2":null,"tierLabel":"Analyst · L2","level":"L2","slot":2,"slot2":null,"minutes":10,"does":"A case file in seven parts and a timeline; then turn a power-curve band into a capacity-factor band, and see how the number of records and the theoretical curve change it.","outcome":"Say why a measured power curve is a band, what a theoretical curve adds when records are few, and why the verdict depends on the score.","icon":"turbine","form":"case","scales":["S0"],"teaches":["probabilistic power curves","multi-fidelity data","from a power-curve band to a capacity-factor band"],"lab":null,"href":"cf8-power-curves-from-scarce-data.html","ready":true,"after":[{"id":"05-capacity-factor","starter":5,"title":"Capacity factor: why is 1 MW not always 1 MW?","short":"Capacity factor","does":"A year of output from nuclear, wind and solar plants of equal size; double a light wind's speed and get eight times the power.","href":"05-capacity-factor.html","ready":true}],"prev":null,"next":null}</script>
 <div class="lx-head" data-lesson-id="cf8-power-curves-from-scarce-data" data-total="14" data-tier="analyst" data-level="L2" data-minutes="10" data-form="case">
 <div>
