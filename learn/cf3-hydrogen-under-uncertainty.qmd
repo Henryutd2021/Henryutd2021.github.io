@@ -146,7 +146,7 @@ body-classes: "page-learn page-lesson lx-form-case"
 <p>Try it yourself: the framework solves a small invented region (four zones, three days) in a few seconds.</p>
 <p>Halve the capital cost of the hydrogen equipment, or allow ±5% load flexibility, and compare the sizes and the emissions.</p>
 <p>Its numbers say nothing about ERCOT or Texas.</p>
-<p><a href="https://github.com/Henryutd2021/txh2-ercot-hydrogen">txh2-ercot-hydrogen</a>: public example repository · MIT licence · synthetic data.</p>
+<p><a href="https://github.com/Henryutd2021/txh2-ercot-hydrogen">txh2-ercot-hydrogen</a>: public example repository · MIT license · synthetic data.</p>
 </div>
 ```
 :::

@@ -257,7 +257,7 @@ $$
 <li>Plan for one future: give <code>build_instance</code> the tree <code>ScenarioTree((Level("M", 1.0, 1.0),), (Level("M", 0.3, 1.0),))</code>. Which sizes change against the nine-branch plan?</li>
 <li>Its objective is what that plan expects in its one future, as in step 4, not its cost across the nine branches.</li>
 </ul>
-<p><a href="https://github.com/Henryutd2021/txh2-ercot-hydrogen">txh2-ercot-hydrogen</a>: public example repository · MIT licence · synthetic data.</p>
+<p><a href="https://github.com/Henryutd2021/txh2-ercot-hydrogen">txh2-ercot-hydrogen</a>: public example repository · MIT license · synthetic data.</p>
 </div>
 ```
 :::

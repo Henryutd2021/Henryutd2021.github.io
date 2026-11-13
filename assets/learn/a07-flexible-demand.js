@@ -2,7 +2,7 @@
 // charging, virtual power plants and local trading" (step cards, Analyst tier).
 //
 // Data: assets/learn/data/a07-flexible-demand.json (the shift, the devices, Feeder 7, the trade, the numbers to remember),
-// a04-retail-tariffs.json (A4's customers and tariff rules, for the neighbours' trade), town.json (Prairie Town's fleet;
+// a04-retail-tariffs.json (A4's customers and tariff rules, for the neighbors' trade), town.json (Prairie Town's fleet;
 // illustrative) and town_year.json (every hour of 2025 on the Southwest Power Pool grid, from EIA-930, as shapes).
 //
 // The day (real shapes, illustrative town): 9 June 2025, cut and scaled exactly as lesson 9, CF6 and A4 do (demand =
@@ -34,7 +34,7 @@
 //   Earnings follow the reader's restart setting (all at once, or staggered), as the explain layer does.
 // 3 Feeder 7: 1,000 homes, rated 3.0 MW, its load = the town's shape scaled to a 3.0 MW peak; its 300 thermostats and
 //   120 chargers follow the same event and return rule. The limit binds when everything comes back at once.
-// 4 The neighbours' trade: A4's solar and EV home (net billing: a kWh sent back earns the hour's running cost, $0 at
+// 4 The neighbors' trade: A4's solar and EV home (net billing: a kWh sent back earns the hour's running cost, $0 at
 //   midday) sells to the renter next door on A4's real-time tariff (the hour's price + A4's plant-and-wire charge per
 //   kWh, w). The
 //   traded kWh are the hours' min(export, the renter's use). The kWh flow the same way with or without the trade, so the
@@ -176,7 +176,7 @@
     for (var k = 0; k < 8; k++) { var t = (after + k) % HOURS; if (load[t] > m) { m = load[t]; at = t; } }
     return { base: base, load: load, peakAfter: m, at: at, over: m - F.limitMW, limit: F.limitMW };
   }
-  // 4 the neighbours' trade, from A4's data: kWh a month, and each party's gain ($ a month) at local price pl ($/kWh)
+  // 4 the neighbors' trade, from A4's data: kWh a month, and each party's gain ($ a month) at local price pl ($/kWh)
   function tradeKWh(A4, W) {
     var home = A4.customers.filter(function (c) { return c.key === "solarev"; })[0], renter = A4.customers.filter(function (c) { return c.key === "renter"; })[0], k = 0;
     for (var t = 0; t < HOURS; t++) { var ex = home.solarKW * W.solarShape[t] - home.kw[t]; if (ex > 0) k += Math.min(ex, renter.kw[t]); }
@@ -258,7 +258,7 @@
   }
   function vppLine(W, D, kinds, stagger) {
     var r = vpp(W, D, kinds, stagger), n = D.vpp.devices.filter(function (x) { return kinds[x.key]; }).length;
-    if (!n) return "Enrol at least two kinds of device.";
+    if (!n) return "Enroll at least two kinds of device.";
     return mw(r.mw) + " for three hours: the peaker runs " + mwh(-r.peakerMWh) + " less, but " + mwh(r.backMWh) + " of use comes back after 23:00. The town saves " + usd(-r.cost) + " that day.";
   }
   // what an owner earns (or loses) a year, in words
@@ -313,8 +313,8 @@
       ["Where coordination bites.", "At what coordination cost per device does a thermostat's owner earn nothing?",
        "At " + usd(E.thermostat.value * (1 - D.vpp.aggregatorShare)) + " a year: 80% of its " + usd(E.thermostat.value) + " value. A dairy earns " + usd(E.dairy.owner) + " at $" + D.vpp.coordinationStart + "."],
       ["The feeder.", D.feeder.name + " is rated " + mw(D.feeder.limitMW) + "; released at once, its load reaches " + mw2(f0.peakAfter) + " at " + hm(f0.at) + ". Name two fixes.",
-       "Stagger the restart over several hours, or enrol fewer chargers on this feeder; a feeder-aware aggregator plans with the limit."],
-      ["The neighbours' trade.", "At 5¢ a kWh, " + Math.round(tr.kwh) + " kWh a month change hands. Who gains and who pays?",
+       "Stagger the restart over several hours, or enroll fewer chargers on this feeder; a feeder-aware aggregator plans with the limit."],
+      ["The neighbors' trade.", "At 5¢ a kWh, " + Math.round(tr.kwh) + " kWh a month change hands. Who gains and who pays?",
        "The seller " + usd(tr.seller) + ", the buyer " + usd(tr.buyer) + "; other customers pay the " + usd(-tr.others) + " of plant-and-wire charge the trade skips. The kWh and the plants do not change."]
     ];
     return "<p class=\"lx-eyebrow\">Practice · about 30 minutes on your own</p><ol class=\"lx-fb-practice\">" + items.map(function (it) {
@@ -487,7 +487,7 @@
           if (S.loss || S.user) { api.done(); api.saw(costsLine(W, D, S)); }
           void tg; void sl;
         } },
-      { text: "Now pool small devices into a [[virtual-power-plant|virtual power plant]]: an [[aggregator|aggregator]] enrols them and cuts their use from 20:00 to 23:00, the peaker's hours. Enrol each kind and watch the gas plants.",
+      { text: "Now pool small devices into a [[virtual-power-plant|virtual power plant]]: an [[aggregator|aggregator]] enrolls them and cuts their use from 20:00 to 23:00, the peaker's hours. Enroll each kind and watch the gas plants.",
         build: function (act, api) {
           part = "vpp"; showStage(true); paint();
           var box = H("div", { class: "lx-toggles", role: "group", "aria-label": "Devices in the pool" }, act);
@@ -521,7 +521,7 @@
             S.stagger = k === "stagger"; keep(); paint(); api.saw(feederLine(W, D, S.stagger)); if (S.stagger) api.done(); });
           if (S.stagger) { api.done(); api.saw(feederLine(W, D, true)); }
         } },
-      { text: "Neighbours can trade too: under [[net-billing|net billing]] the solar home's midday kWh earn $0, the hour's running cost, while the renter next door pays " + cents(wires) + " a kWh for plants and wires. Set a local price.",
+      { text: "Neighbors can trade too: under [[net-billing|net billing]] the solar home's midday kWh earn $0, the hour's running cost, while the renter next door pays " + cents(wires) + " a kWh for plants and wires. Set a local price.",
         build: function (act, api) {
           part = "trade"; showStage(false);
           var host = H("div", null, act);
@@ -576,9 +576,9 @@
       H("h3", { text: "Ledger: who earns, who pays" }, H("header", { class: "lx-x-head" }, lc));
       earnTable(lc); tradeTable(lc);
       LX.Flowchart(H("div", { class: "lx-xcard" }, xhost), {
-        title: "One event, from enrolment to payment",
+        title: "One event, from enrollment to payment",
         lede: "An aggregator turns many small answers into one resource the grid operator can count on.",
-        nodes: { enrol: { t: "Enrol devices", s: "owners sign up", k: "end" }, fc: { t: "Forecast the kW", tN: ["Forecast", "the kW"], s: "who is home, who is plugged in" },
+        nodes: { enrol: { t: "Enroll devices", s: "owners sign up", k: "end" }, fc: { t: "Forecast the kW", tN: ["Forecast", "the kW"], s: "who is home, who is plugged in" },
                  bid: { t: "Offer as one resource", tN: ["Offer as one", "resource"], s: "above the market's minimum size" }, call: { t: "Called?", k: "q" },
                  act: { t: "Devices answer", tN: ["Devices", "answer"], s: "some owners opt out" }, wait: { t: "Stand by", s: "no payment for energy" },
                  meas: { t: "Measure against a baseline", tN: ["Measure against", "a baseline"], s: "what they would have used" }, pay: { t: "Pay the owners", s: "minus coordination", k: "end" } },

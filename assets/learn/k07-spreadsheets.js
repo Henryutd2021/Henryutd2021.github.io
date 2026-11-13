@@ -68,7 +68,7 @@
       { cell: "E36", label: "Highest solar, MW", ask: "The day's highest solar output, in MW.", answer: Math.max.apply(null, D.solar), hint: "=MAX(D5:D28)" },
       { cell: "E37", label: "Gas cost at the E32 cost", ask: "The day's gas cost at the alternative gas cost in E32, $55 per MWh, without changing E2.", answer: (D.alt || ALT) * sum(D.need), hint: "=E30*E32" }];
   }
-  // the practice sheet: the finished sheet, the alternative gas cost as a labelled input (E32), the five task rows
+  // the practice sheet: the finished sheet, the alternative gas cost as a labeled input (E32), the five task rows
   var ALT = 55;
   function practiceSheet(D) {
     var S = filled(D), T = tasks(D); S.rows = 37;

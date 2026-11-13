@@ -83,7 +83,7 @@ body-classes: "page-learn page-lesson lx-form-case"
 <div class="lx-xcard">
 <header class="lx-x-head"><h3>Two costs pull apart</h3></header>
 <table class="cf-two">
-<thead><tr><th scope="col">Cost</th><th scope="col">What sets it</th><th scope="col">Which site it favours in the toy</th></tr></thead>
+<thead><tr><th scope="col">Cost</th><th scope="col">What sets it</th><th scope="col">Which site it favors in the toy</th></tr></thead>
 <tbody>
 <tr><th scope="row">Site, building and shipping</th><td data-l="What sets it">land prices and the distance to the stores</td><td data-l="Which site it favours">the near site</td></tr>
 <tr><th scope="row">Energy, net of sales</th><td data-l="What sets it">the site's wind and sun, the grid's buying price, and what spare energy earns</td><td data-l="Which site it favours">the windy site, once each site can build wind and solar; selling spare energy can make this saving outweigh its higher site and shipping costs</td></tr>
@@ -146,7 +146,7 @@ body-classes: "page-learn page-lesson lx-form-case"
 <li>First install the repository (linked below) as its README's Quick start shows. Then run <code>python examples/sensitivity.py</code>. It solves a synthetic supply chain in several cases: compare the benchmark row with "grid supply only". Do the open factories or warehouses change?</li>
 <li>Predict first, then read the "purchase price +25%" row: does on-site wind and solar photovoltaic (PV) capacity grow or shrink?</li>
 </ul>
-<p><a href="https://github.com/Henryutd2021/supply-chain-microgrid-models">supply-chain-microgrid-models</a>: public example repository · MIT licence · synthetic data.</p>
+<p><a href="https://github.com/Henryutd2021/supply-chain-microgrid-models">supply-chain-microgrid-models</a>: public example repository · MIT license · synthetic data.</p>
 </div>
 ```
 :::

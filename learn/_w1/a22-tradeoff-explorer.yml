@@ -24,5 +24,5 @@ glossary:
     term: Tariff
     def: "The rule for calculating electricity bills: fixed charges, prices per kWh, or both."
 requests:
-  - "A22 uses the shared planning engine (components/planengine.js, LX.townPlan: prepareYear, selectWeeks, costs, fullYearModel, weekModel, periodsOf, summarize, ceilPlan, KEYS, and ui.TECH for slider labels and colours); no 13-capstone.js tag."
+  - "A22 uses the shared planning engine (components/planengine.js, LX.townPlan: prepareYear, selectWeeks, costs, fullYearModel, weekModel, periodsOf, summarize, ceilPlan, KEYS, and ui.TECH for slider labels and colors); no 13-capstone.js tag."
   - "Promote: i-radar (Radar and Radar.glyph in assets/learn/a22-tradeoff-explorer.js: five-score radar with up to three series, tweened, a text-version table, small glyphs for cards) and e-stakeholders (Stakeholders: who decides, pays, benefits, as a table that becomes cards on phones)."

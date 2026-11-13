@@ -216,7 +216,7 @@ body-classes: "page-learn page-lesson lx-form-sandbox"
 <p class="lx-eyebrow">Built on</p>
 <ul class="sb1-links">
 <li><a href="f07-microgrids.html">F7</a> (the campus and its island) and <a href="a14-microgrid-value.html">A14</a> (what a microgrid is worth); <a href="09-storage.html">lesson 9</a> (storage) and <a href="03-balancing.html">lesson 3</a> (outages and balance); <a href="m02-unit-commitment.html">M2</a> for whole numbers in a model.</li>
-<li>Formalised in <a href="m05-microgrid-size-and-run.html">M5</a>; applied in the capstone <a href="c1-keep-the-campus-running.html">C1</a>.</li>
+<li>Formalized in <a href="m05-microgrid-size-and-run.html">M5</a>; applied in the capstone <a href="c1-keep-the-campus-running.html">C1</a>.</li>
 <li>Open tools for larger microgrid models: <a href="https://docs.pypsa.org/">PyPSA</a>, <a href="https://www.pyomo.org/">Pyomo</a> and <a href="https://jump.dev/">JuMP</a>.</li>
 </ul>
 </div>

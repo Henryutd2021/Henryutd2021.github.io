@@ -1,5 +1,5 @@
 {
- "about": "Lesson A7 (a07-flexible-demand). Prairie Town is fictional: the flexible share, the losses, the users' cost, the devices, their counts and ratings, the values, the coordination cost, Feeder 7 and the neighbours are illustrative. The day is 9 June 2025 on real Southwest Power Pool shapes (EIA-930 in town_year.json), cut and scaled as lesson 9, CF6 and A4 do; each hour is dispatched cheapest first (the town's 100 MW always-on plant, wind and sun, the combined-cycle plant at $40/MWh and 0.37 t CO2/MWh, the peaker at $100/MWh and 0.55 t CO2/MWh; CO2 at the plant only). The real-world box quotes two cited papers word for word.",
+ "about": "Lesson A7 (a07-flexible-demand). Prairie Town is fictional: the flexible share, the losses, the users' cost, the devices, their counts and ratings, the values, the coordination cost, Feeder 7 and the neighbors are illustrative. The day is 9 June 2025 on real Southwest Power Pool shapes (EIA-930 in town_year.json), cut and scaled as lesson 9, CF6 and A4 do; each hour is dispatched cheapest first (the town's 100 MW always-on plant, wind and sun, the combined-cycle plant at $40/MWh and 0.37 t CO2/MWh, the peaker at $100/MWh and 0.55 t CO2/MWh; CO2 at the plant only). The real-world box quotes two cited papers word for word.",
  "built": "2026-11-03",
  "day": {
   "date": "2025-06-09",
@@ -116,7 +116,7 @@
    0.5
   ],
   "start": 5,
-  "note": "Illustrative: under net billing the solar home's midday kWh earn the hour's running cost, $0 on 9 June; its neighbour, the renter, is on A4's real-time tariff, so in those hours it pays the hour's price, $0, plus A4's plant-and-wire charge, 9.5¢ per kWh (not A4's 14.7¢ flat price). The trade skips that charge unless it pays it.",
+  "note": "Illustrative: under net billing the solar home's midday kWh earn the hour's running cost, $0 on 9 June; its neighbor, the renter, is on A4's real-time tariff, so in those hours it pays the hour's price, $0, plus A4's plant-and-wire charge, 9.5¢ per kWh (not A4's 14.7¢ flat price). The trade skips that charge unless it pays it.",
   "wires": 0.095185
  },
  "facts": [

@@ -13,7 +13,7 @@ glossary:
     def: "Water taken and not returned, mostly lost to evaporation, so it is no longer available downstream."
   - id: land-use-intensity
     term: Land-use intensity
-    def: "The land a plant holds for each unit of energy it makes in a year, here square metres per MWh a year."
+    def: "The land a plant holds for each unit of energy it makes in a year, here square meters per MWh a year."
   - id: attributional-analysis
     term: Attributional analysis
     def: "An analysis that gives a product its share of today's burdens from average data, so the shares of all products add up."

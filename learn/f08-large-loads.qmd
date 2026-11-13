@@ -174,7 +174,7 @@ $$\text{LF} = \frac{\bar d + c}{d_{\max} + c} = \frac{281.9 + 240}{450 + 240} = 
 <div class="lx-qq" data-id="requests" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “Requests to connect show how much new demand will arrive.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. ERCOT's requests were about 474 GW in June 2026, 5.2 times its record peak, but requests are proposals, not committed demand: projects may change or be cancelled.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. ERCOT's requests were about 474 GW in June 2026, 5.2 times its record peak, but requests are proposals, not committed demand: projects may change or be canceled.</p></details>
 </div>
 <div class="lx-qq" data-id="jobs" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “1,000 people building a campus for two years means 1,000 permanent jobs.”</p>

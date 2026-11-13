@@ -1,5 +1,5 @@
 {
- "about": "Case file CF8's data: the studies' dated steps (LX.Timeline; an E13 event's footer is the approved acknowledgement, drawn under it by the page's script), where the result holds (LX.Boundary) and the toy's settings. Research text here is approved excerpt wording (E12 and E13); the toy reuses lesson M9's illustrative turbine and records (m09-surrogates-uq.json).",
+ "about": "Case file CF8's data: the studies' dated steps (LX.Timeline; an E13 event's footer is the approved acknowledgment, drawn under it by the page's script), where the result holds (LX.Boundary) and the toy's settings. Research text here is approved excerpt wording (E12 and E13); the toy reuses lesson M9's illustrative turbine and records (m09-surrogates-uq.json).",
  "built": "2026-11-05",
  "timeline": {
   "title": "The studies in time",
@@ -112,7 +112,7 @@
  "explainer": {
   "summary": "Text version of the explainer: its synthetic turbine at the slider's start, 5 measured points",
   "liveSummary": "Text version of the explainer: its synthetic turbine at the slider's setting",
-  "note": "From the explainer's own synthetic data: estimates and 95% bands of the curve at each region's centre, in kW.",
+  "note": "From the explainer's own synthetic data: estimates and 95% bands of the curve at each region's center, in kW.",
   "limits": "These statistical bands do not know that power has limits: they can reach below zero or above the rating, as at 0–5 m/s.",
   "start": 5,
   "regions": [

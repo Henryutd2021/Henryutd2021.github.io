@@ -9,4 +9,4 @@ glossary:
   - {id: horizon, term: "Horizon", def: "The span of time a study covers, from a day of operation to decades of planning."}
   - {id: monte-carlo, term: "Monte Carlo simulation", def: "A method that runs a calculation many times on randomly drawn inputs and reads the spread of the results."}
   - {id: expected-unserved-energy, term: "Expected unserved energy", def: "Demand left unmet, averaged over many simulated years, in MWh a year: an amount of energy, unlike a load's size in MW."}
-  - {id: difference-in-differences, term: "Difference-in-differences", def: "A comparison of how much an outcome changed in a group that got a programme against how much it changed in a similar group that did not."}
+  - {id: difference-in-differences, term: "Difference-in-differences", def: "A comparison of how much an outcome changed in a group that got a program against how much it changed in a similar group that did not."}

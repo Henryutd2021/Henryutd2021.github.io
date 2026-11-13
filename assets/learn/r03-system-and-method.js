@@ -5,13 +5,13 @@
    Task (step cards): choose a brief; place it on the scale ladder; draw its boundary (LX.CardSort into inside, given and
    left out, then LX.Boundary of the reader's own sort: i-boundary); pick a time step and a horizon; choose one of nine
    method families (method-neutral: optimization is one family among several, and several can fit one question); name the
-   method and defend it against two alternatives, one from another family, in labelled parts (the step is done when the six
+   method and defend it against two alternatives, one from another family, in labeled parts (the step is done when the six
    required parts are there;
-   opening the example defence completes nothing); then a design card to copy, built from the same parts.
-   Exemplars: a weak and a strong method defence (LX.Exemplars), the steps as a flowchart (LX.Flowchart, e-flowchart) and
+   opening the example defense completes nothing); then a design card to copy, built from the same parts.
+   Exemplars: a weak and a strong method defense (LX.Exemplars), the steps as a flowchart (LX.Flowchart, e-flowchart) and
    the nine families compared (LX.CompareTable, e-table). Self-check: the five scales with typical time steps and horizons
    and the reader's brief marked (LX.ScaleStrip, e-scale-strip) and the course rubric's Framing and Method fit (LX.Rubric).
-   Node: module.exports = the pure model (checks, fit lookups, the defence checks, the comparison feedback, the design card
+   Node: module.exports = the pure model (checks, fit lookups, the defense checks, the comparison feedback, the design card
    as fields and as text, the no-JS version of the task); the test is _tests/learn/test_r03-system-and-method.js (it writes
    the no-JS blocks with --write). */
 (function () {
@@ -25,7 +25,7 @@
   function rich(t) { return esc(t).replace(/\[\[([a-z0-9-]+)\|([^\]]+)\]\]/g, function (m, id, w) { return '<span class="lx-term" data-term=' + '"' + id + '">' + w + "</span>"; }); }
   function words(s) { return plainMarks(s).trim().split(/\s+/).filter(Boolean).length; }
   function str(v) { return String(v == null ? "" : v).trim(); }
-  // the parts of a method defence, in order: the reader's form, the example defences and the design card share them
+  // the parts of a method defense, in order: the reader's form, the example defenses and the design card share them
   var DEF = [
     { k: "choice", ex: "choice", label: "Your method, named, and how it answers this question" },
     { k: "same", ex: "same", label: "Alternative 1: a simpler or different version in the same family" },
@@ -35,14 +35,14 @@
     { k: "limit", ex: "limit", label: "The method's main limit" },
     { k: "reduce", ex: "check", label: "How you reduce it or check it (optional: it moves you towards Strong)" }
   ];
-  // an example defence in the reader's shape (for the checks and the tests)
+  // an example defense in the reader's shape (for the checks and the tests)
   function asReader(d) { var v = {}; DEF.forEach(function (f) { v[f.k] = d[f.ex]; }); return v; }
   function brief(D, id) { return D.briefs.filter(function (b) { return b.id === id; })[0] || null; }
   function family(D, id) { return D.families.filter(function (f) { return f.id === id; })[0] || null; }
   function option(list, id) { return (list || []).filter(function (o) { return o.id === id; })[0] || null; }
   function fit(B, famId) { var f = B.fits[famId]; return f ? { fit: f[0], why: f[1] } : null; }
   // data checks: every brief has a right scale, eight boundary cards in the three bins, one "good" time step and
-  // horizon, a fit for every family with at least two that fit well or help, and a defence against another family
+  // horizon, a fit for every family with at least two that fit well or help, and a defense against another family
   function check(D) {
     var out = [], fams = D.families.map(function (f) { return f.id; });
     D.briefs.forEach(function (B) {
@@ -57,13 +57,13 @@
       fams.forEach(function (f) { if (!B.fits[f] || FIT_IDS.indexOf(B.fits[f][0]) < 0) out.push(n + "no fit for " + f); });
       if (fams.filter(function (f) { return B.fits[f] && B.fits[f][0] !== "poor"; }).length < 2) out.push(n + "fewer than two families fit");
       var d = B.defence;
-      if (!d || fams.indexOf(d.method) < 0 || fams.indexOf(d.other) < 0 || d.other === d.method) out.push(n + "the defence needs a method and another family");
-      if (d && B.fits[d.method][0] !== "good") out.push(n + "the example defence is for a family that does not fit well");
-      if (d) ["same", "choice", "resolution", "alt1", "alt2", "limit", "check"].forEach(function (k) { if (!str(d[k])) out.push(n + "the example defence has no " + k); });
+      if (!d || fams.indexOf(d.method) < 0 || fams.indexOf(d.other) < 0 || d.other === d.method) out.push(n + "the defense needs a method and another family");
+      if (d && B.fits[d.method][0] !== "good") out.push(n + "the example defense is for a family that does not fit well");
+      if (d) ["same", "choice", "resolution", "alt1", "alt2", "limit", "check"].forEach(function (k) { if (!str(d[k])) out.push(n + "the example defense has no " + k); });
     });
     return out;
   }
-  // the defence's structure (never its quality, and never particular wording): each required part is there. The six
+  // the defense's structure (never its quality, and never particular wording): each required part is there. The six
   // required parts are done when each is written (the method itself first, so "why yours?" has a referent); "reduce" is
   // optional.
   function defenceChecks(v, method) {
@@ -78,7 +78,7 @@
     ];
   }
   function defenceDone(v, method) { return defenceChecks(v, method).every(function (c) { return c.ok; }); }
-  // what "Compare with an example defence" says: it respects the fit of the reader's own family
+  // what "Compare with an example defense" says: it respects the fit of the reader's own family
   function compareFeedback(D, B, method) {
     var d = B.defence, dm = family(D, d.method), mine = B.fits[method] ? B.fits[method][0] : null;
     if (method === d.method) return "Same family as yours: compare the reasons, not the words.";
@@ -107,7 +107,7 @@
     var f = designFields(D, st);
     return f.length ? ["Learn · R3 design card"].concat(f.map(function (x) { return x[0] + ": " + x[1]; })).join("\n") : "";
   }
-  // an example defence as [label, value] fields (glossary marks kept), for the page and the no-JS version
+  // an example defense as [label, value] fields (glossary marks kept), for the page and the no-JS version
   function defenceFields(D, d) {
     var m = family(D, d.method), o = family(D, d.other);
     return [["Family", m.label], ["Method", d.choice], ["Time step and horizon", d.resolution], ["Alternative 1", d.same], ["Why not alternative 1", d.alt1],
@@ -131,7 +131,7 @@
         var fs = D.families.filter(function (f) { return B.fits[f.id][0] === k; }).map(function (f) { return esc(f.label); });
         if (fs.length) h.push("<li><strong>" + esc(L[k]) + ":</strong> " + fs.join(", ") + ".</li>");
       });
-      h.push("<li><strong>A researcher's defence (" + esc(m.label) + "):</strong><ul>" + defenceFields(D, d).map(function (x) { return "<li><b>" + rich(x[0]) + ":</b> " + rich(x[1]) + "</li>"; }).join("") + "</ul></li></ul></details>");
+      h.push("<li><strong>A researcher's defense (" + esc(m.label) + "):</strong><ul>" + defenceFields(D, d).map(function (x) { return "<li><b>" + rich(x[0]) + ":</b> " + rich(x[1]) + "</li>"; }).join("") + "</ul></li></ul></details>");
     });
     return h.join("\n");
   }
@@ -353,10 +353,10 @@
             ctl[f.k] = el;
           });
           var row = H("div", { class: "r3-row" }, act);
-          var cmp = H("button", { class: "lx-btn ghost small", type: "button", text: "Compare with an example defence", "aria-expanded": "false" }, row);
+          var cmp = H("button", { class: "lx-btn ghost small", type: "button", text: "Compare with an example defense", "aria-expanded": "false" }, row);
           var cm = H("span", { class: "lx-hint", "aria-live": "polite" }, row);
           var cks = H("ul", { class: "r3-cks", "aria-live": "polite" }, act);
-          H("p", { class: "lx-hint", text: "These checks look for the parts of a defence, not for its quality." }, act);
+          H("p", { class: "lx-hint", text: "These checks look for the parts of a defense, not for its quality." }, act);
           var ex = H("dl", { class: "r3-card", hidden: true }, act), wasDone = null;
           function paint() {
             cks.innerHTML = "";
@@ -377,7 +377,7 @@
             var d = b.defence;
             ex.hidden = !ex.hidden; ex.innerHTML = "";
             cmp.setAttribute("aria-expanded", ex.hidden ? "false" : "true");
-            cmp.textContent = ex.hidden ? "Compare with an example defence" : "Hide the example defence";
+            cmp.textContent = ex.hidden ? "Compare with an example defense" : "Hide the example defense";
             if (!ex.hidden) defenceFields(D, d).forEach(function (p) { H("dt", { html: LX.rich(p[0]) }, ex); H("dd", { html: LX.rich(p[1]) }, ex); });
             cm.textContent = ex.hidden ? "" : compareFeedback(D, b, m.id);
             LX.emit("layout");
@@ -421,7 +421,7 @@
           q1: { t: "Answers this type?", tN: ["Answers", "this type?"], k: "q" },
           alt: { t: "Try another family", s: "or change the question", sN: "or the question", k: "end" },
           q2: { t: "Beats two alternatives?", tN: ["Beats two", "alternatives?"], k: "q" },
-          done: { t: "Write the defence", s: "and the method's limit", sN: "and its limit", k: "end" }
+          done: { t: "Write the defense", s: "and the method's limit", sN: "and its limit", k: "end" }
         },
         cols: 3, at: { start: [0, 0], sc: [1, 0], bd: [2, 0], rh: [2, 1], mf: [1, 1], q1: [1, 2.1], q2: [1, 3.3], alt: [2, 3.3], done: [1, 4.5] },
         colsN: 2, atN: { start: [0, 0], sc: [0, 1], bd: [0, 2], rh: [0, 3], mf: [0, 4], q1: [0, 5], q2: [0, 6.2], alt: [1, 6.2], done: [0, 7.4] },
@@ -471,7 +471,7 @@
       if (n >= 5) v.method = "opt";
       if (n >= 6) { var r = asReader(b.defence); Object.keys(r).forEach(function (k) { v[k] = k === "other" ? r[k] : plainMarks(r[k]); }); v.reduce = ""; }
       save(); cardsUI.go(n - 1);
-      if (n === 6) setTimeout(function () { [].forEach.call(live.querySelectorAll("button"), function (x) { if (/^Compare with an example defence$/.test(x.textContent)) x.click(); }); }, 60);
+      if (n === 6) setTimeout(function () { [].forEach.call(live.querySelectorAll("button"), function (x) { if (/^Compare with an example defense$/.test(x.textContent)) x.click(); }); }, 60);
       return { view: "hospital brief, step " + n };
     }, cardsUI);
   });

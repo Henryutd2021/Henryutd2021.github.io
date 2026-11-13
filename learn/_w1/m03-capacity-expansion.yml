@@ -4,7 +4,7 @@ lesson: M3
 glossary:
   - id: period-weight
     term: Period weight
-    def: "How many hours of the year one modelled hour of a representative period stands for; a model multiplies that hour's running cost and emissions by it."
+    def: "How many hours of the year one modeled hour of a representative period stands for; a model multiplies that hour's running cost and emissions by it."
   - id: resource-adequacy
     term: Resource adequacy
     def: "Whether a power system has enough supply to meet demand in nearly every hour, judged with many weather years and plant outages against a criterion such as a loss-of-load expectation."

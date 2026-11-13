@@ -41,7 +41,7 @@
   "solar": {
    "cf": 0.176,
    "method": "scale",
-   "note": "Rooftop panels follow SPP's 2025 hourly solar pattern, reshaped month by month to EIA's 2025 monthly capacity factors and scaled to a 17.6% yearly capacity factor, EIA's figure for a typical home system: a modelled profile, not a measured home's output.",
+   "note": "Rooftop panels follow SPP's 2025 hourly solar pattern, reshaped month by month to EIA's 2025 monthly capacity factors and scaled to a 17.6% yearly capacity factor, EIA's figure for a typical home system: a modeled profile, not a measured home's output.",
    "src": [
     "eia-dg-2024",
     "eia-epm-cf"
@@ -65,7 +65,7 @@
   },
   "grid": {
    "lbPerMWh": 680,
-   "note": "One yearly average for every hour: Kansas power plants emitted 680 lb of CO2 per MWh generated in 2024 (operating emissions; location-based). The bench counts the electricity bought at this factor, plus gas burned, as the home's CO2; power sent back is shown separately as a credit at the same factor, and the net of the two is labelled as a net (it can fall below zero, an accounting balance, not CO2 taken out of the air). An hourly or marginal factor would differ (case file CF6).",
+   "note": "One yearly average for every hour: Kansas power plants emitted 680 lb of CO2 per MWh generated in 2024 (operating emissions; location-based). The bench counts the electricity bought at this factor, plus gas burned, as the home's CO2; power sent back is shown separately as a credit at the same factor, and the net of the two is labeled as a net (it can fall below zero, an accounting balance, not CO2 taken out of the air). An hourly or marginal factor would differ (case file CF6).",
    "src": [
     "eia-ks-profile"
    ]
@@ -137,7 +137,7 @@
    "life": 30,
    "cf": 0.338,
    "method": "power",
-   "note": "Onshore wind: $1,712 per kW to build and $34.57 per kW a year to keep up (2025 dollars); 30 years. Output follows SPP's 2025 hourly wind pattern, reshaped month by month (a power of the shape) to EIA's 2025 monthly capacity factors and a 33.8% year (the U.S. fleet in 2025); the best hours reach the farm's full size: a modelled profile, not a measured farm's output.",
+   "note": "Onshore wind: $1,712 per kW to build and $34.57 per kW a year to keep up (2025 dollars); 30 years. Output follows SPP's 2025 hourly wind pattern, reshaped month by month (a power of the shape) to EIA's 2025 monthly capacity factors and a 33.8% year (the U.S. fleet in 2025); the best hours reach the farm's full size: a modeled profile, not a measured farm's output.",
    "src": [
     "eia-aeo2026-emm",
     "eia-epm-cf",

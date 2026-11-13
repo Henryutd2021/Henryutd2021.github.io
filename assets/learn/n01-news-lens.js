@@ -42,7 +42,7 @@
   function minutesOfUse(gwh, nationalTWh, hours) { return gwh / averageGW(nationalTWh, hours) * 60; }
   function days(a, b) { return Math.round((Date.parse(b + "T00:00:00Z") - Date.parse(a + "T00:00:00Z")) / 86400000); }
   function ladderOK(item, choice) { return shared("EvidenceLadder", "evidence.js").check(item, choice); }
-  // a three-sentence take as its three labelled parts (claim; what would change my mind; confidence). Sentences end at
+  // a three-sentence take as its three labeled parts (claim; what would change my mind; confidence). Sentences end at
   // ". " before a capital letter, so "U.S. data" is not a break.
   function takeParts(take) {
     var s = take.split(/(?<=[.!?])\s+(?=[A-Z])/);
@@ -99,8 +99,8 @@
   function injectCSS() {
     if (document.getElementById("n1-css")) return;
     var css = [
-      // the seven lens cards; tag colours come from the lens data (--c), and the number badge (LX.PhraseTagger.badge)
-      // repeats the question, so colour is never the only cue
+      // the seven lens cards; tag colors come from the lens data (--c), and the number badge (LX.PhraseTagger.badge)
+      // repeats the question, so color is never the only cue
       ".n1-lens{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}",
       ".n1-q{display:grid;gap:4px;align-content:start;text-align:left;min-height:84px;padding:10px 12px;border-radius:12px;border:1px solid var(--lx-line-2);border-top:4px solid var(--c);background:var(--lx-surface);color:var(--lx-ink);cursor:pointer;font:inherit}",
       ".n1-q b{font-family:var(--lx-f-display);font-weight:500;font-size:15px;display:flex;gap:6px;align-items:baseline;hyphens:auto}",

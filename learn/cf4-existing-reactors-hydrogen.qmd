@@ -15,7 +15,7 @@ body-classes: "page-learn page-lesson lx-form-case"
      boundary card's source line
      are E15.30. Depth D2 (working knowledge: read a study's question, boundary and conditions; reason with the toy's
      numbers), closed-form toy of the course's own (a generic existing plant, electricity only, learner-set prices, one
-     fixed assumed hydrogen price). Text structure: part 1 in three labelled groups, part 4's decisions, goal and rules as
+     fixed assumed hydrogen price). Text structure: part 1 in three labeled groups, part 4's decisions, goal and rules as
      three boxes; a sentence split into list items keeps every word in order (the elements with data-e15 join back to
      their E15 row; the test checks it). Script and toy: assets/learn/cf4-existing-reactors-hydrogen.js with
      assets/learn/data/cf4-existing-reactors-hydrogen.json. Tests: node _tests/learn/test_cf4-existing-reactors-hydrogen.js
@@ -174,7 +174,7 @@ $$\max \; \sum_t \left( p_t\,g_t + v\,h_t + q\,r_t \right) \Delta t \; - \; c\,E
 <p class="lx-hint">Set it up first: clone the repository and install it as its README's <a href="https://github.com/Henryutd2021/nuclear-hydrogen-integration#quick-start">Quick start</a> says; run the commands in the repository's folder.</p>
 <ul class="cf4-cmds"><li><code>python examples/minimal.py</code></li><li><code>nuclear-h2 synthetic my_inputs/ --storage</code></li><li><code>nuclear-h2 run my_inputs/ --out-dir outputs/base</code></li><li><code>nuclear-h2 run my_inputs/ --price-factor 1.15 --out-dir outputs/price_up</code></li><li><code>nuclear-h2 run my_inputs/ --as-mode dispatch --out-dir outputs/dispatch</code></li></ul>
 <p class="lx-hint">Each run writes <code>revenue_musd_per_yr.csv</code> and <code>summary.json</code> into its <code>--out-dir</code> folder. Compare the revenue tables, and <code>grid_output_range_mw</code> under "flexibility" in <code>summary.json</code>: the range of output to the grid, the toy's measure too.</p>
-<p><a href="https://github.com/Henryutd2021/nuclear-hydrogen-integration">nuclear-hydrogen-integration</a>: open code · MIT licence.</p>
+<p><a href="https://github.com/Henryutd2021/nuclear-hydrogen-integration">nuclear-hydrogen-integration</a>: open code · MIT license.</p>
 </div>
 ```
 :::

@@ -1,5 +1,5 @@
 {
-  "about": "Lesson F9's own inputs: how the Sankey's sectors group, the colours of its nodes, who typically decides what in U.S. energy (each claim with a dated primary source), and the numbers to remember. Prairie City's flows are read from prairie-city.json (flows, balance, supply), never copied here.",
+  "about": "Lesson F9's own inputs: how the Sankey's sectors group, the colors of its nodes, who typically decides what in U.S. energy (each claim with a dated primary source), and the numbers to remember. Prairie City's flows are read from prairie-city.json (flows, balance, supply), never copied here.",
   "groups": [
     {
       "key": "buildings",

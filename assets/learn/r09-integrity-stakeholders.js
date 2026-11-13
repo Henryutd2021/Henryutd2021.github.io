@@ -4,7 +4,7 @@
 // Data: assets/learn/data/r09-integrity-stakeholders.json — the five norms and ten practices for the sort, six fictional
 // dilemmas set around Prairie Town (each with three options, a verdict, the norm and its primary source and section),
 // the stakeholder rings, the integrity-statement fields, the exemplars, a Steelman card, the rubric line and the sources.
-// No real person or organisation appears; numbers in the cases are illustrative.
+// No real person or organization appears; numbers in the cases are illustrative.
 //
 // What the reader does (step cards): sort ten practices by the norm they serve (LX.CardSort); work through six dilemmas
 // (a funder wants a headline, a convenient scenario, a co-author's data, a community meeting, a survey without consent,
@@ -151,7 +151,7 @@
     var D = data.r09_integrity_stakeholders, picks = LX.store.get("r9-picks", {}) || {};
     function sortStep(act, api) {
       LX.CardSort(act, { bins: D.norms, cards: D.practices, checkLabel: "Check my sort",
-        onCheck: function (g) { api.done(); api.saw("**" + g.right + " of " + g.total + "** placed as the course would. Some practices serve two norms (citing a dataset is credit and a licence term); the reasons say which comes first.", g.right < g.total - 3); } });
+        onCheck: function (g) { api.done(); api.saw("**" + g.right + " of " + g.total + "** placed as the course would. Some practices serve two norms (citing a dataset is credit and a license term); the reasons say which comes first.", g.right < g.total - 3); } });
     }
     function dilemmaStep(d, i) {
       return function (act, api) {
@@ -211,7 +211,7 @@
     LX.Flowchart(H("div", { class: "lx-xcard" }, x), FLOW);
     var sm = H("div", { class: "lx-xcard" }, x), hd = H("header", { class: "lx-x-head" }, sm);
     H("h3", { text: "Who your study owes what" }, hd);
-    H("p", { class: "lx-lede", html: LX.rich("Three rings of [[stakeholder|stakeholders]] around a Prairie Town study. The fairness questions are who pays and who benefits, who decides, and whose concerns are recognised.") }, sm);
+    H("p", { class: "lx-lede", html: LX.rich("Three rings of [[stakeholder|stakeholders]] around a Prairie Town study. The fairness questions are who pays and who benefits, who decides, and whose concerns are recognized.") }, sm);
     LX.StakeholderMap(sm, { rings: mapRings(D) });
     LX.Steelman(H("div", { class: "lx-xcard" }, x), D.steelman);
   }
@@ -222,7 +222,7 @@
     LX.Checklist(H("div", { class: "lx-xcard" }, x), { id: "r9-checklist", title: "An integrity check for your own study", columns: 2,
       lede: "Tick each line before you submit anything with your name on it.", doneText: "Put the answers in your integrity statement.",
       items: [
-        { id: "licences", label: "Licences", text: "The terms of every data source checked, with the attribution each asks for; data agreements obeyed." },
+        { id: "licences", label: "Licenses", text: "The terms of every data source checked, with the attribution each asks for; data agreements obeyed." },
         { id: "credit", label: "Credit", text: "Authorship agreed early; contributor roles written down." },
         { id: "coi", label: "Funding and ties", text: "Funders and your own ties declared, with what the funder could see or change." },
         { id: "ethics", label: "Ethics review", text: "Any work with people has its required ethics determination before it starts; its consent or waiver conditions followed." },

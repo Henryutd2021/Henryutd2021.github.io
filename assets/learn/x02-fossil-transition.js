@@ -7,7 +7,7 @@
 //
 // No model beyond arithmetic:
 //   vals          every number the page prints, from the data: shares of EIA's 2025 generation, the retirement
-//                 balance (planned = retired + delayed + cancelled), CO2 per kWh generated, capture capacity against
+//                 balance (planned = retired + delayed + canceled), CO2 per kWh generated, capture capacity against
 //                 energy CO2 (spelled out: million and billion tonnes)
 //   fill          text in the data carries {tokens}; fill() writes vals into them, so no number is typed twice
 //   gas network   (illustrative) cost per remaining customer = F × (1 − a·s) / (1 − s): F the network cost per customer
@@ -153,7 +153,7 @@
       q("capture", "myth", "Capturing CO₂ at a coal plant removes CO₂ from the air.", "Myth. Stored durably, the captured share of the plant's own CO₂ stays out of the air; IPCC: capture applied to fossil fuel use is not removal, since it takes no CO₂ out of the air.") +
       q("trees", "myth", "Carbon stored in new forests stays there for good.", "Myth. IPCC puts trees and soils at decades to centuries, and wildfire, disease or pests can reverse it.") +
       q("lng", "fact", "LNG is natural gas cooled until it is a liquid about 600 times smaller.", "Fact. EIA: it is cooled to −260 °F, and the liquid is 600 times smaller than the gas.") +
-      q("plans", "myth", "When owners plan to retire a coal plant, it closes that year.", "Myth. In 2025 owners planned " + V.planned + " and " + V.retired + " retired; " + V.delayed + " was delayed and " + V.cancelled + " cancelled (EIA).") +
+      q("plans", "myth", "When owners plan to retire a coal plant, it closes that year.", "Myth. In 2025 owners planned " + V.planned + " and " + V.retired + " retired; " + V.delayed + " was delayed and " + V.cancelled + " canceled (EIA).") +
       "</div><div class=\"lx-quiz\" data-quiz=\"x02\">" +
       qq("co2", "b", "EIA: in 2023 burning coal for power emitted " + V.co2coal + " pounds of CO₂ per kWh of electricity generated and burning gas " + V.co2gas + ". About what share of coal's is gas's?", [["a", "About 20%"], ["b", "About 40%"], ["c", "About 60%"]],
         "About 40%: " + V.co2gas + " ÷ " + V.co2coal + " = " + fmtN(D.co2kwh.gas / D.co2kwh.coal, 3) + ", or " + V.gasVsCoal + ". Burning only: leaks before burning are not counted.") +
@@ -193,7 +193,7 @@
   // ---------------------------------------------------------------- view
   var LX = window.LX, H = LX.H;
   function bold(t) { return LX.rich(t).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>"); }
-  // two labelled bars on one scale (lesson-local): rows [{label, value, text, color}]
+  // two labeled bars on one scale (lesson-local): rows [{label, value, text, color}]
   function Bars(host, max) {
     var w = H("div", { class: "x2-bars" }, host);
     return { set: function (rows) {

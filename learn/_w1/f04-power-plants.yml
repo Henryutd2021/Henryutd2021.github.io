@@ -25,7 +25,7 @@ glossary:
     def: "The part of a steam plant that cools the used steam back into water, so it can be pumped back to the boiler; most of the plant's waste heat leaves here."
   - id: hydraulic-head
     term: Head (hydropower)
-    def: "The height the water falls through a hydro plant, from the reservoir's surface down to where it leaves the turbine, in metres."
+    def: "The height the water falls through a hydro plant, from the reservoir's surface down to where it leaves the turbine, in meters."
   - id: reservoir
     term: Reservoir
     def: "The lake a dam holds back; its water is energy stored for later, up to what it holds."

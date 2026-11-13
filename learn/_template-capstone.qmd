@@ -162,7 +162,7 @@ The Modeler lesson whose notebook this version adds (a link once it is live, els
 <div class="lx-deeper-body">
 ```
 
-One or two sentences on how the same plan, note and self-check grow into the research project (CR), with a link to the studio that formalises it.
+One or two sentences on how the same plan, note and self-check grow into the research project (CR), with a link to the studio that formalizes it.
 
 ```{=html}
 </div>

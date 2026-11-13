@@ -147,7 +147,7 @@
           });
         } },
       // 2 the model, written down and counted
-      { text: "Write the sizing down: what it decides, what it minimises, and the rules every hour of the year and of the storm must meet.",
+      { text: "Write the sizing down: what it decides, what it minimizes, and the rules every hour of the year and of the storm must meet.",
         build: function (act, api) {
           var m = H("div", { class: "m5-model" }, act);
           m.innerHTML = '<div><p class="lx-eyebrow">Decisions</p><p><var>S</var> kW of solar, <var>B</var> kWh of battery (4 hours: <var>B</var>/4 kW), <var>N</var> generator sets of 200 kW, a <b>whole number</b>; every hour: import, export, charge, discharge, generator output.</p></div>' +

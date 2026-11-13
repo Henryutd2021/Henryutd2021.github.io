@@ -50,7 +50,7 @@
    "best": 0.25,
    "worst": 1
   },
-  "note": "Fixed scales chosen for this lesson: the rim of the radar is the 'best' end, the centre the 'worst'; values beyond an end are drawn at that end. Scores (0 at the centre, 1 at the rim) feed the weighted sums. A value beyond an end scores the same as that end, so the weighted sums weigh only the plans that are unbeaten as shown."
+  "note": "Fixed scales chosen for this lesson: the rim of the radar is the 'best' end, the center the 'worst'; values beyond an end are drawn at that end. Scores (0 at the center, 1 at the rim) feed the weighted sums. A value beyond an end scores the same as that end, so the weighted sums weigh only the plans that are unbeaten as shown."
  },
  "start": "A",
  "plans": [

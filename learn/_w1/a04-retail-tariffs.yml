@@ -32,4 +32,4 @@ glossary:
     term: Customer class
     def: "A group of customers, such as homes or businesses, that a utility bills under the same tariffs."
 requests:
-  - "Ledger table: a04-retail-tariffs.js builds the e-ledger as a table.cf-two (rows: parties, columns: options, cells: signed $ with 'above'/'below' words, no colour tones); A7 builds the same for owners and neighbours. A shared LX.Ledger (i-ledger/e-ledger) serves both, with a staticHTML for the no-JS block."
+  - "Ledger table: a04-retail-tariffs.js builds the e-ledger as a table.cf-two (rows: parties, columns: options, cells: signed $ with 'above'/'below' words, no color tones); A7 builds the same for owners and neighbors. A shared LX.Ledger (i-ledger/e-ledger) serves both, with a staticHTML for the no-JS block."

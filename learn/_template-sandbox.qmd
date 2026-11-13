@@ -45,7 +45,7 @@ body-classes: "page-learn page-lesson lx-form-sandbox"
      parts), focus survives a re-render, results are announced (BenchRun's status line), and a busy run holds Next.
      The plan link (LX.ShareState): numbers and choices only, no free text and no personal data; the schema's version
      goes up whenever a field, a range, a step or a meaning changes, with an `old` entry so earlier links still open.
-     Prices in one dollar year, labelled; data scaled or invented is "illustrative" or "based on ...", never "real".
+     Prices in one dollar year, labeled; data scaled or invented is "illustrative" or "based on ...", never "real".
      Scope (the course's scope rules): Prairie Town, Prairie Campus and their sites are fictional; data centers appear
      only as loads; no links to project pages or the Research page; the course author's research only through approved
      excerpts, allow-listed repositories and citations (the sourcing rule).
@@ -141,7 +141,7 @@ body-classes: "page-learn page-lesson lx-form-sandbox"
 <div class="lx-deeper-body">
 ```
 
-The Modeler lesson that formalises the engine (a link once it is live, else "upcoming"), and one sentence on what its notebook adds.
+The Modeler lesson that formalizes the engine (a link once it is live, else "upcoming"), and one sentence on what its notebook adds.
 
 ```{=html}
 </div>

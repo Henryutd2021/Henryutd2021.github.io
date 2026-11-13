@@ -164,7 +164,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 
 - **Mean.** $\bar e = \frac{1}{n}\sum_{i=1}^{n} e_i$, where $e_i$ is hour $i$'s error in % and $n = 2716$ hours.
 - **Standard deviation.** $s = \sqrt{\frac{1}{n}\sum_{i=1}^{n} (e_i - \bar e)^2}$, in percentage points. Dividing by $n - 1$, as many tools do, gives 2.4533 points against 2.4528: with this many hours the choice hardly matters.
-- **Percentile.** Sort the errors and write the share as a fraction $p$ ($p = 0.9$ for the 90th percentile). The percentile sits at position $(n - 1)\,p$ counting from 0, between two neighbours when that is not a whole number.
+- **Percentile.** Sort the errors and write the share as a fraction $p$ ($p = 0.9$ for the 90th percentile). The percentile sits at position $(n - 1)\,p$ counting from 0, between two neighbors when that is not a whole number.
 - **How sure a share is.** All 2,716 hours have the share $p = 134/2716$, 4.9%, above +5%. Across repeated random samples of $m$ hours, the sample share scatters around $p$ by about $\sqrt{p\,(1 - p)/m}$, its [standard error]{.lx-term term="standard-error"}; times 100, it is in percentage points.
 - **The scatter by sample size.** 6.8 points for $m$ = 10 hours, 2.2 for 100 and 0.7 for 1,000.
 - **Two standard errors.** For large samples, about 95% of estimates land within two standard errors. A sample of 100 hours with 9% above: 4.9% + 2 × 2.2 ≈ 9.3%, so 9% is within two standard errors.

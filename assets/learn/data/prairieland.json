@@ -2,7 +2,7 @@
  "about": {
   "line": "Prairieland is fictional; its numbers are illustrative.",
   "what": "Shared data of Prairieland, Learn's national scale (S4): five regions, the 2025 energy balance, the supply fleet with vintages, transmission, imports and minerals, the battery factory, fixed cost ranges, the carbon budget, time slices for engine E4, shocks and demand scenarios. Read by F10, A20, A21, M13, SB4 (engine E4) and C4; pages read these numbers and never retype them.",
-  "fictional": "Prairieland is fictional. Its card (people, primary energy and shares, imports, Ridge County) is the course's own; costs come from EIA's 2026 assumptions; hourly shapes from SPP's 2025 grid; CO2 factors from the IPCC. Everything else is set for teaching and labelled so in the builder.",
+  "fictional": "Prairieland is fictional. Its card (people, primary energy and shares, imports, Ridge County) is the course's own; costs come from EIA's 2026 assumptions; hourly shapes from SPP's 2025 grid; CO2 factors from the IPCC. Everything else is set for teaching and labeled so in the builder.",
   "dollarYear": 2025,
   "built": "2026-11-07",
   "builtBy": "Built for the course from the Prairieland card and the public sources listed in `sources`.",
@@ -79,7 +79,7 @@
    "short": "Highlands",
    "people": 1600000,
    "peopleShare": 0.08,
-   "story": "Rivers and reservoirs: most of the nation's hydro, an aluminium smelter, few people.",
+   "story": "Rivers and reservoirs: most of the nation's hydro, an aluminum smelter, few people.",
    "climate": {
     "kind": "cold, snowy winters; mild summers",
     "hdd": 4200,
@@ -1873,7 +1873,7 @@
    "set": "teaching: generic limits, the same rule in every region and period; no technology has its own timeline"
   },
   "rule": "Every cost is a fixed range the learner sets, the same in every period; no cost changes with how much is built. Defaults are EIA's Table 3 values (2025 dollars); each range lies inside its source's range (`source`).",
-  "note": "Capital in 2025 dollars per kW (battery: per kW of a 4-hour battery), fixed O&M per kW-year, variable O&M per MWh. Annualised at the discount rate (periods.discount) over each life."
+  "note": "Capital in 2025 dollars per kW (battery: per kW of a 4-hour battery), fixed O&M per kW-year, variable O&M per MWh. Annualized at the discount rate (periods.discount) over each life."
  },
  "carbon": {
   "base2025Mt": 214.9,
@@ -2662,7 +2662,7 @@
    "publisher": "U.S. Energy Information Administration",
    "date": "8 Apr 2026; read 2 Nov 2026",
    "url": "https://www.eia.gov/outlooks/aeo/",
-   "where": "modelled U.S. electricity use grows 0.9% to 1.6% a year to 2050 across the cases"
+   "where": "modeled U.S. electricity use grows 0.9% to 1.6% a year to 2050 across the cases"
   },
   "doe-fotw1360": {
    "title": "A Typical EV is 87%–91% Efficient Compared to 30% for a Conventional Gasoline Vehicle",
@@ -2697,7 +2697,7 @@
    "publisher": "U.S. Energy Information Administration",
    "date": "accessed 2 and 3 Nov 2026 (via town_year.json and m03-capacity-expansion-2024.json)",
    "url": "https://www.eia.gov/electricity/gridmonitor/",
-   "where": "hourly demand, wind and solar shapes, each normalised to its own maximum: the weather years of the time slices and of the full-year check"
+   "where": "hourly demand, wind and solar shapes, each normalized to its own maximum: the weather years of the time slices and of the full-year check"
   },
   "noaa-normals": {
    "title": "U.S. Climate Normals 1991-2020, Wichita Eisenhower National Airport",

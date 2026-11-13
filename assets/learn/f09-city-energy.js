@@ -2,7 +2,7 @@
 // model). The data-center campus appears only as a load.
 //
 // Data: data/prairie-city.json (Prairie City's 2025 flows in GWh: flows, balance, supply; read, never retyped),
-// data/f09-city-energy.json (how sectors group, colours, who typically decides what, each with a dated primary source,
+// data/f09-city-energy.json (how sectors group, colors, who typically decides what, each with a dated primary source,
 // the numbers to remember) and data/path.json (lesson links that appear once a lesson is live).
 //
 // No model beyond arithmetic on the flows:
@@ -30,7 +30,7 @@
   function into(C, id) { return sum(C.flows.links.filter(function (l) { return l.to === id; }).map(function (l) { return l.value; })); }
   function outOf(C, id) { return sum(C.flows.links.filter(function (l) { return l.from === id; }).map(function (l) { return l.value; })); }
   function colorOf(F, n) { return F.colors[n.id] || (n.kind === "sector" ? F.colors.sector : "var(--lx-ink-3)"); }
-  // the detailed spec (the file's own nodes), coloured
+  // the detailed spec (the file's own nodes), colored
   function detailed(C, F) {
     return { nodes: C.flows.nodes.map(function (n) { return { id: n.id, label: n.short, short: n.short, note: n.label, col: n.col, kind: n.kind === "loss" ? "loss" : n.kind, color: colorOf(F, n) }; }),
              links: C.flows.links.map(function (l) { return { from: l.from, to: l.to, value: l.value }; }) };
@@ -81,7 +81,7 @@
     spec.links.forEach(function (l) { l.color = lit[l.from] || lit[l.to] ? a.color : "var(--lx-line-2)"; });
     return { spec: spec, actor: a, lit: Object.keys(lit) };
   }
-  // the lens in words (the colours' text equivalent): the lit parts, in the Sankey's column order
+  // the lens in words (the colors' text equivalent): the lit parts, in the Sankey's column order
   function litParts(C, F, key) {
     var L = lens(C, F, key), on = {}; L.lit.forEach(function (id) { on[id] = true; });
     return L.spec.nodes.filter(function (n) { return on[n.id]; }).sort(function (a, b) { return a.col - b.col; }).map(function (n) { return n.short; });

@@ -49,7 +49,7 @@
  },
  "aggregator": {
   "term": "Aggregator",
-  "short": "A company that enrols many customers' devices, offers their combined response to a grid operator or utility, and shares the payment with the owners.",
+  "short": "A company that enrolls many customers' devices, offers their combined response to a grid operator or utility, and shares the payment with the owners.",
   "lesson": "A7",
   "href": "a07-flexible-demand.html"
  },
@@ -685,7 +685,7 @@
  },
  "coordination-cost": {
   "term": "Coordination cost",
-  "short": "What it costs to enrol, meter, control and pay each device or customer in a program, whatever the device's size.",
+  "short": "What it costs to enroll, meter, control and pay each device or customer in a program, whatever the device's size.",
   "lesson": "A7",
   "href": "a07-flexible-demand.html"
  },
@@ -840,14 +840,14 @@
   "href": "m10-ml-forecasting.html"
  },
  "data-licence": {
-  "term": "Data licence",
+  "term": "Data license",
   "short": "The terms under which a dataset may be used and shared, such as public domain, CC BY or a signed data agreement.",
   "lesson": "R4",
   "href": "r04-data.html"
  },
  "data-note": {
   "term": "Data note",
-  "short": "A short record of where a dataset came from, its licence, units and time base, and every cleaning step with its rule, count and effect.",
+  "short": "A short record of where a dataset came from, its license, units and time base, and every cleaning step with its rule, count and effect.",
   "lesson": "R4",
   "href": "r04-data.html"
  },
@@ -973,13 +973,13 @@
  },
  "difference-in-differences": {
   "term": "Difference-in-differences",
-  "short": "A comparison of how much an outcome changed in a group that got a programme against how much it changed in a similar group that did not.",
+  "short": "A comparison of how much an outcome changed in a group that got a program against how much it changed in a similar group that did not.",
   "lesson": "R3",
   "href": "r03-system-and-method.html"
  },
  "diffusion-curve": {
   "term": "Diffusion curve",
-  "short": "How the share of homes, firms or output using a new technology grows over time, often slowly at first, then faster, then levelling off.",
+  "short": "How the share of homes, firms or output using a new technology grows over time, often slowly at first, then faster, then leveling off.",
   "lesson": "X3",
   "href": "x03-transitions-history.html"
  },
@@ -1201,7 +1201,7 @@
  },
  "epsg-code": {
   "term": "EPSG code",
-  "short": "A catalogue number that names one coordinate system exactly, such as EPSG:4326 for latitude and longitude in degrees.",
+  "short": "A catalog number that names one coordinate system exactly, such as EPSG:4326 for latitude and longitude in degrees.",
   "lesson": "R4",
   "href": "r04-data.html"
  },
@@ -1399,7 +1399,7 @@
  },
  "fine-particles": {
   "term": "Fine particles (PM2.5)",
-  "short": "Airborne particles no wider than 2.5 micrometres, small enough to reach deep into the lungs; burning releases them and also forms them in the air from SO₂ and NOx.",
+  "short": "Airborne particles no wider than 2.5 micrometers, small enough to reach deep into the lungs; burning releases them and also forms them in the air from SO₂ and NOx.",
   "lesson": "F11",
   "href": "f11-air-climate-people.html"
  },
@@ -1579,7 +1579,7 @@
  },
  "gis": {
   "term": "GIS (geographic information system)",
-  "short": "Software and methods for mapping and analysing data tied to places, such as land use, lines and population.",
+  "short": "Software and methods for mapping and analyzing data tied to places, such as land use, lines and population.",
   "lesson": "R10",
   "href": "r10-question-studio.html"
  },
@@ -1657,7 +1657,7 @@
  },
  "hydraulic-head": {
   "term": "Head (hydropower)",
-  "short": "The height the water falls through a hydro plant, from the reservoir's surface down to where it leaves the turbine, in metres.",
+  "short": "The height the water falls through a hydro plant, from the reservoir's surface down to where it leaves the turbine, in meters.",
   "lesson": "F4",
   "href": "f04-power-plants.html"
  },
@@ -1939,7 +1939,7 @@
  },
  "land-use-intensity": {
   "term": "Land-use intensity",
-  "short": "The land a plant holds for each unit of energy it makes in a year, here square metres per MWh a year.",
+  "short": "The land a plant holds for each unit of energy it makes in a year, here square meters per MWh a year.",
   "lesson": "A11",
   "href": "a11-lca-nexus.html"
  },
@@ -2113,7 +2113,7 @@
  },
  "lower-heating-value": {
   "term": "Lower heating value",
-  "short": "The heat a fuel gives when it burns, not counting the extra heat won by condensing the water vapour it makes; for hydrogen, about 33 kWh per kg.",
+  "short": "The heat a fuel gives when it burns, not counting the extra heat won by condensing the water vapor it makes; for hydrogen, about 33 kWh per kg.",
   "lesson": "A16",
   "href": "a16-hydrogen-ptx.html"
  },
@@ -2425,7 +2425,7 @@
  },
  "negative-control": {
   "term": "Negative control",
-  "short": "A test run in which the method should find nothing, for example inputs with no real signal, to show that a result is not an artefact of the method.",
+  "short": "A test run in which the method should find nothing, for example inputs with no real signal, to show that a result is not an artifact of the method.",
   "lesson": "CF8",
   "href": "cf8-power-curves-from-scarce-data.html"
  },
@@ -2443,7 +2443,7 @@
  },
  "net-calorific-value": {
   "term": "Net calorific value",
-  "short": "The heat a fuel gives when burned, not counting the heat in the water vapour it forms; it is a little lower than the gross value.",
+  "short": "The heat a fuel gives when burned, not counting the heat in the water vapor it forms; it is a little lower than the gross value.",
   "lesson": "F11",
   "href": "f11-air-climate-people.html"
  },
@@ -2689,7 +2689,7 @@
  },
  "period-weight": {
   "term": "Period weight",
-  "short": "How many hours of the year one modelled hour of a representative period stands for; a model multiplies that hour's running cost and emissions by it.",
+  "short": "How many hours of the year one modeled hour of a representative period stands for; a model multiplies that hour's running cost and emissions by it.",
   "lesson": "M3",
   "href": "m03-capacity-expansion.html"
  },
@@ -3024,7 +3024,7 @@
   "href": "a21-security-minerals.html"
  },
  "refuelling-outage": {
-  "term": "Refuelling outage",
+  "term": "Refueling outage",
   "short": "The planned weeks when a reactor is shut down to replace part of its fuel and carry out maintenance.",
   "lesson": 5,
   "href": "05-capacity-factor.html"
@@ -3397,7 +3397,7 @@
  },
  "special-ordered-set": {
   "term": "Special ordered set (SOS2)",
-  "short": "A rule in a mixed-integer program that lets at most two neighbouring points of a curve be used, so the model can follow a curved line by joining straight pieces.",
+  "short": "A rule in a mixed-integer program that lets at most two neighboring points of a curve be used, so the model can follow a curved line by joining straight pieces.",
   "lesson": "CF5",
   "href": "cf5-drawing-the-boundary.html"
  },
@@ -3511,7 +3511,7 @@
  },
  "stress-test": {
   "term": "Stress test",
-  "short": "Running a system model through a severe event on purpose, to see what breaks and what a defence would change.",
+  "short": "Running a system model through a severe event on purpose, to see what breaks and what a defense would change.",
   "lesson": "A9",
   "href": "a09-hazards.html"
  },
@@ -3873,7 +3873,7 @@
  },
  "utm": {
   "term": "UTM (Universal Transverse Mercator)",
-  "short": "A set of 60 north-to-south zones, each a flat map in metres that keeps distances close to true inside the zone.",
+  "short": "A set of 60 north-to-south zones, each a flat map in meters that keeps distances close to true inside the zone.",
   "lesson": "R4",
   "href": "r04-data.html"
  },

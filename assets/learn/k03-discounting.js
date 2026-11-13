@@ -1,6 +1,6 @@
 // k03-discounting.js — Toolbox K3, "Exponentials and discounting" (step cards).
 //
-// Just-in-time math for lesson 7 (discounting, the capital recovery factor, LCOE) and for the yearly ("annualised") plant
+// Just-in-time math for lesson 7 (discounting, the capital recovery factor, LCOE) and for the yearly ("annualized") plant
 // costs of lessons 12 and 13. Six step cards, an explain layer and a practice drill.
 //
 // Data (read through data-src, so the numbers stay in step with the lessons that use them):
@@ -323,7 +323,7 @@
           if (close(v, s.payment, 0.5)) {
             LX.store.set("k3-own", { rate: s.plantRate * 100, life: s.life });
             api.done(); api.saw(T.payOk);
-            if (!totals) {   // the totals, as labelled readouts of their own
+            if (!totals) {   // the totals, as labeled readouts of their own
               totals = readouts(act, [["all", "All " + s.life + " payments"], ["wait", "Paid for the wait (the return to lenders and owners)"]], "k3-ro");
               totals.all.textContent = T.payTotal; totals.wait.textContent = T.payWait;
             }

@@ -21,7 +21,7 @@ glossary:
     def: "The lowest temperature evaporating water can reach in the air at hand, which combines heat and humidity; when it is high, chillers and cooling towers reject heat less well and deliver less, which is called derating."
   - id: special-ordered-set
     term: Special ordered set (SOS2)
-    def: "A rule in a mixed-integer program that lets at most two neighbouring points of a curve be used, so the model can follow a curved line by joining straight pieces."
+    def: "A rule in a mixed-integer program that lets at most two neighboring points of a curve be used, so the model can follow a curved line by joining straight pieces."
   - id: willans-line
     term: Willans line
     def: "A straight-line rule for a turbine's steam use against its output; here it gives the electricity lost for each unit of steam taken out of the turbine."

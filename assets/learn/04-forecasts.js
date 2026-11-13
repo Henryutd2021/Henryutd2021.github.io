@@ -12,7 +12,7 @@
 // demand every month (04-forecasts.json monthly_forecast_ratio). The cause is unverified (possibly a reporting or definition
 // mismatch between the two series); leaving those months out is an editorial choice pending validation.
 //
-// Model (statistical, no solver). Hours are labelled by their start (index t covers t:00 to t+1:00), as in lesson 0.
+// Model (statistical, no solver). Hours are labeled by their start (index t covers t:00 to t+1:00), as in lesson 0.
 //   MAE  = mean |A - P| (MW);  MAPE = mean |A - P| / A over hours with A > 0 (night hours of solar are skipped)
 //   bias = mean (A - P);  skill against a baseline B = 1 - MAE(P) / MAE(B)
 //   band = forecast x (1 + q_lo) to forecast x (1 + q_hi), with q the January-April quantiles of e = (A - F) / F
@@ -346,7 +346,7 @@
     var row = H("div", { class: "lx-row2" }, host), c2 = H("div", { class: "lx-xcard" }, row), c3 = H("div", { class: "lx-xcard" }, row);
     var typ = DAYS.typical, PM = Q.persistence_mae_mw;
     LX.CompareTable(c2, {
-      title: "Four ways to score a forecast", text: true,   // "Misleads when" is words: on phones each score is a card of labelled lines
+      title: "Four ways to score a forecast", text: true,   // "Misleads when" is words: on phones each score is a card of labeled lines
       columns: [{ key: "name", label: "Score", main: true }, { key: "spp", label: "SPP, Jan–Apr 2025", num: true }, { key: "trap", label: "Misleads when" }],
       rows: [
         { key: "mae", color: "var(--lx-accent)", name: "MAE", note: "average miss, in GW", spp: { text: gw2(Q.mae_mw) }, trap: "comparing grids of different sizes" },

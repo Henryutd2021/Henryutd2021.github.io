@@ -3,7 +3,7 @@
   "built": "2026-11-06",
   "plan": {
     "costM": { "min": 0, "max": 60, "step": 2, "start": 24 },
-    "what": "the yearly cost of a Prairie City plan that its households pay through their electricity bills (illustrative; an annual amount in 2025 dollars, such as the yearly charge that recovers new wires and programmes)",
+    "what": "the yearly cost of a Prairie City plan that its households pay through their electricity bills (illustrative; an annual amount in 2025 dollars, such as the yearly charge that recovers new wires and programs)",
     "set": "teaching"
   },
   "designs": [

@@ -136,7 +136,7 @@ $$s = \min\left(1,\ \max\left(0,\ \tfrac{1}{2} + \frac{C_{\text{gas}} - C_{\text
 <div class="lx-deeper-body">
 ```
 
-- **A target is chosen.** A target-seeking scenario needs a target first; a national carbon budget is one, and choosing it is a value judgement, not a model output.
+- **A target is chosen.** A target-seeking scenario needs a target first; a national carbon budget is one, and choosing it is a value judgment, not a model output.
 - **Sharing a global budget.** Common rules give each country a share by population, by today's emissions, by capability to pay or by historical responsibility; each rule gives a very different national budget.
 - **Prairieland's reference budgets.** Step 7 lists three, arithmetic on 2025's emissions (no change, or a straight line to zero by 2050 or 2040), not a fair share under any rule.
 - **Report the rule.** A study that cites a national budget should say which sharing rule, which global budget and which start year it used.

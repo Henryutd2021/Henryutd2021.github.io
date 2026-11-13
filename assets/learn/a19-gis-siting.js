@@ -227,7 +227,7 @@
     host.innerHTML = "";
     pairs.forEach(function (p) { var d = H("div", { class: "lx-readout" }, host); H("span", { class: "k", text: p[0] }, d); H("b", { text: p[1] }, d); });
   }
-  // the top-sites table: the map's text version (cf-two: labelled lines on phones); a row's button highlights its site
+  // the top-sites table: the map's text version (cf-two: labeled lines on phones); a row's button highlights its site
   function SitesTable(host, onSel) {
     var box = H("div", { class: "a19-sites-box" }, host), cap = H("p", { class: "a19-tcap" }, box);
     var tbl = H("table", { class: "a19-tbl" }, H("div", { class: "lx-scroll-x" }, box)), note = H("p", { class: "a19-tnote" }, box), sel = null, btns = {};

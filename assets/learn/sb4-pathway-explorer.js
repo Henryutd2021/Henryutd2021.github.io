@@ -6,7 +6,7 @@
 // costs and fuels; Run the pathway; readouts; the plan link), the results (what the run says, the map of the five regions,
 // the mix by model year, CO2 and imports, the LP's marginal values, Ridge County, the shock against the plan, the
 // full-year check from the library), then how the engine works (LX.Boundary) and the sources. The first view (the plan
-// on load, when it is in the library) is drawn from the library, labelled "precomputed with this engine on <date>"; every
+// on load, when it is in the library) is drawn from the library, labeled "precomputed with this engine on <date>"; every
 // run the reader starts (Run, a preset) solves in the browser. The full-year checks stay precomputed: they follow the
 // plan's key, live or not (about a minute of solving each). Every number the page states comes from E4 or the library and
 // is checked by _tests/learn/test_sb4-pathway-explorer.js (with the engine's test_e4-engine.js).
@@ -112,7 +112,7 @@
       if (g.shocks) o.extra = function (fs) { var d = H("details", { class: "e4-fold" }, fs); H("summary", { text: "What each shock changes, in numbers" }, d);
         U.table(d, ["Shock", "When, in the model", "What changes", "What the re-plan keeps"], E4.shockTable(P), "sb4-shocks e4-wrap");
         H("p", { class: "lx-hint", text: "A model year stands for five years: the gas-price spike, the drought and the mineral restriction each last one period here, longer than their stories (the restriction's two years); the demand surprise lasts from 2031 to 2050." }, d);
-        H("p", { class: "lx-hint", text: "The story's other effects (the factory's stocks and recycling) are lesson A21's, not modelled here." }, d); };
+        H("p", { class: "lx-hint", text: "The story's other effects (the factory's stocks and recycling) are lesson A21's, not modeled here." }, d); };
       return o;
     });
     var C = U.controls(ctr, S, plan, groups, change, hints);

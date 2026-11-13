@@ -43,7 +43,7 @@ body-classes: "page-learn page-lesson lx-form-sandbox"
 <p class="lx-eyebrow">The brief</p>
 <dl class="lx-sb-facts">
 <div><dt>The site</dt><dd><b>A Prairie Town home</b> or <b>the ridge wind farm</b>, behind one meter, through every hour of 2025.</dd></div>
-<div><dt>Its hours</dt><dd>The hourly patterns of the Southwest Power Pool (SPP) grid in 2025, reshaped to EIA's monthly <span class="lx-term" data-term="capacity-factor">capacity factors</span>: modelled sites, not measured ones.</dd></div>
+<div><dt>Its hours</dt><dd>The hourly patterns of the Southwest Power Pool (SPP) grid in 2025, reshaped to EIA's monthly <span class="lx-term" data-term="capacity-factor">capacity factors</span>: modeled sites, not measured ones.</dd></div>
 <div><dt>You decide</dt><dd>Home: solar (kW), a battery (kWh), a <span class="lx-term" data-term="heat-pump">heat pump</span>, the <span class="lx-term" data-term="tariff">tariff</span>. Farm: wind, a battery, an <span class="lx-term" data-term="electrolyzer">electrolyzer</span>, a hydrogen tank.</dd></div>
 <div><dt>The engine works out</dt><dd>The cheapest way to run all 8,760 hours, a <span class="lx-term" data-term="linear-program">linear program</span>; then the bills, the CO₂ and the <span class="lx-term" data-term="net-present-value">NPV</span>.</dd></div>
 <div><dt>It leaves out</dt><dd>Outages, taxes and incentives, storage from one week to the next, and costs that change over time.</dd></div>
@@ -114,7 +114,7 @@ body-classes: "page-learn page-lesson lx-form-sandbox"
 - The battery's [state of charge]{.lx-term term="state-of-charge"} is one more variable per hour: this hour's level = last hour's + 0.85 × charge − discharge. Each week starts and ends half full, so the weeks join.
 - "Size it for me" makes the sizes decisions too, each charged its yearly cost through the [capital recovery factor]{.lx-term term="capital-recovery-factor"}. It runs on a few [representative weeks]{.lx-term term="representative-period"}, as [lesson 13](13-capstone.html) and [M3](m03-capacity-expansion.html) do.
 - Its rounded sizes are a suggestion, not the best on the year: the explain layer runs three cases on the year, with one step either side.
-- Storage and coupled carriers, modelling power, hydrogen and heat together ([M4](m04-storage-multienergy.html), in the Modeler tier), writes this model in Python.
+- Storage and coupled carriers, modeling power, hydrogen and heat together ([M4](m04-storage-multienergy.html), in the Modeler tier), writes this model in Python.
 
 ```{=html}
 </div>

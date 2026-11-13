@@ -96,7 +96,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-deeper-body">
 ```
 
-- **A real cost** uses something up: wires, equipment, labour, fuel. **A [transfer]{.lx-term term="transfer"}** moves money between people: taxes, rebates, a charge moved from one group to another.
+- **A real cost** uses something up: wires, equipment, labor, fuel. **A [transfer]{.lx-term term="transfer"}** moves money between people: taxes, rebates, a charge moved from one group to another.
 - **Count each once.** Add real costs to judge a plan and read transfers to see who gains and who loses; adding a transfer to a cost counts it twice.
 - **Real designs.** California's regulator adopted a fixed charge in three income tiers for its large utilities ([income-based charge]{.lx-term term="income-based-charge"}; CPUC Decision 24-05-028, May 2024).
 
@@ -142,7 +142,7 @@ $$c_g = \frac{C\,e_g}{\sum_h n_h e_h} \ \text{(per kWh)}, \qquad c_g = \frac{C}{
 <li>How households and firms respond to prices, and how people move, retrain or start firms.</li>
 <li>What the plan delivers to each group: cleaner air, lower bills from efficiency, reliability.</li>
 <li>Who gets a say in the decision, as well as who pays.</li>
-<li>Field surveys, interviews and causal studies of labour markets: the social-science methods behind real estimates.</li>
+<li>Field surveys, interviews and causal studies of labor markets: the social-science methods behind real estimates.</li>
 </ul>
 </div>
 </details>

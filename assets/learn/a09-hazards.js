@@ -3,16 +3,16 @@
 //
 // Data (read through data-src): lesson A5's files (town_year.json, m03-capacity-expansion-2024.json, cf_targets.json,
 // a05-adequacy.json: the Plains Grid, its units, the 500 resampled years) and assets/learn/data/a09-hazards.json (four
-// hazards, three pairs, five defences with illustrative yearly costs, a budget, real events and preparation steps with
+// hazards, three pairs, five defenses with illustrative yearly costs, a budget, real events and preparation steps with
 // their primary sources, and a reference block written by the test).
 // The simulator is lesson A5's, shared (assets/learn/components/adequacy.js, in the learn.js
 // bundle; LX.A5 on the page, require in Node): the same weather years, outages and seed, with the hazards as multipliers over the calendar hours of every
 // simulated year (A5's o.mod), so a result reads "in a year when the hazard strikes".
-//   mods(H, ids, defs)  multiplier arrays for the hazards ids, eased by the defences defs: in each window of a hazard, every
-//       unit type's availability, wind and demand are multiplied as the data say; a defence that eases hazard h keeps a
+//   mods(H, ids, defs)  multiplier arrays for the hazards ids, eased by the defenses defs: in each window of a hazard, every
+//       unit type's availability, wind and demand are multiplied as the data say; a defense that eases hazard h keeps a
 //       share k of each supply loss (1 - k (1 - m)), and of the share of customers switched off; demand is never eased.
 //       Overlapping hazards multiply. tally: the share of demand switched off directly, hour by hour (the shutoffs).
-//   run(A5, D5, SRC, H, ids, defs, seed)  the simulated years with the hazards and defences: LOLE, LOLH and EUE (A5's
+//   run(A5, D5, SRC, H, ids, defs, seed)  the simulated years with the hazards and defenses: LOLE, LOLH and EUE (A5's
 //       evaluate, with a battery or demand response added when chosen) and the customer energy cut directly by
 //       shutoffs (MWh a year). Switched-off demand leaves the supply balance (A5's o.tally): LOLE and EUE are shortfalls
 //       for the customers still connected, and the switched-off energy is counted on its own.
@@ -29,7 +29,7 @@
   function ones() { var a = new Float64Array(T); a.fill(1); return a; }
   function hazard(H, id) { return H.hazards.filter(function (h) { return h.id === id; })[0]; }
   function defence(H, id) { return H.defences.filter(function (d) { return d.id === id; })[0]; }
-  // the share of each loss that remains for hazard id under the defences defs
+  // the share of each loss that remains for hazard id under the defenses defs
   function keep(H, id, defs) { var k = 1; (defs || []).forEach(function (x) { var d = defence(H, x); if (d && d.eases && d.eases[id] != null) k *= d.eases[id]; }); return k; }
   function mods(H, ids, defs) {
     var o = { demand: ones(), wind: ones(), avail: { coal: ones(), cc: ones(), ct: ones() } }, tally = new Float64Array(T), any = false;
@@ -53,14 +53,14 @@
     (defs || []).forEach(function (x) { var d = defence(H, x); if (d && d.add) add = A5.plus(add, A5.block(D5, d.add)); });
     return add;
   }
-  // the defences chosen, in words, with their yearly cost
+  // the defenses chosen, in words, with their yearly cost
   function packageText(H, defs) { var n = (defs || []).map(function (x) { return defence(H, x).short; }); return (n.length > 1 ? n.slice(0, -1).join(", ") + " and " + n[n.length - 1] : n[0] || "none") + ", " + money(cost(H, defs)) + " a year"; }
   function cost(H, defs) { return (defs || []).reduce(function (s, x) { var d = defence(H, x); return s + (d ? d.cost : 0); }, 0); }
   function run(D5, SRC, H, ids, defs, seed) {
     var m = mods(H, ids, defs), S = A5.simulate(D5, SRC, seed == null ? H.seed : seed, { mod: m.mod, tally: m.tally }), e = A5.evaluate(S, addsOf(D5, H, defs));
     return { ids: (ids || []).slice(), defs: (defs || []).slice(), lole: e.lole, lolh: e.lolh, eue: e.eue, days: e.days, shut: S.tally, cost: cost(H, defs) };
   }
-  // all four hazards one by one, and the base, with defences defs
+  // all four hazards one by one, and the base, with defenses defs
   function sweep(D5, SRC, H, defs, seed) {
     var out = { none: run(D5, SRC, H, [], defs, seed) };
     H.hazards.forEach(function (hz) { out[hz.id] = run(D5, SRC, H, [hz.id], defs, seed); });
@@ -89,7 +89,7 @@
     if (c.ratio < 0.95) return both + " add " + int(c.both) + " MWh a year, less than the " + int(c.sum) + " MWh the two add alone: they hit different hours or the same scarce ones.";
     return both + " add " + int(c.both) + " MWh a year, about the " + int(c.sum) + " MWh the two add alone.";
   }
-  var CLOSING = "Planners now test grids against correlated hazards, require cold-weather plans and harden lines. **Some defences target one hazard; storage and demand response help in several, but cannot restore switched-off lines.**";
+  var CLOSING = "Planners now test grids against correlated hazards, require cold-weather plans and harden lines. **Some defenses target one hazard; storage and demand response help in several, but cannot restore switched-off lines.**";
   // step 3, for the hazards the reader tried (in the data's order): each year's unserved energy against none, and the
   // energy that shutoffs switch off directly when the wildfire year is among them
   function triedText(H, base, runs, ids) {
@@ -103,9 +103,9 @@
     H.hazards.forEach(function (hz) { var cut = before[hz.id].eue - after[hz.id].eue; if (!best || cut > best.cut) best = { id: hz.id, cut: cut }; });
     var c = cost(H, defs), hz = hazard(H, best.id);
     return "For " + money(c) + " a year: in the " + hz.label.toLowerCase() + " year, unserved energy falls from " + int(before[best.id].eue) + " to " + int(after[best.id].eue) + " MWh, the largest cut. " +
-      (after[best.id].eue > 0.5 ? "**Some risk remains: defences narrow it, they do not remove it.**" : "**No shortfall is left in that year, at this price.**");
+      (after[best.id].eue > 0.5 ? "**Some risk remains: defenses narrow it, they do not remove it.**" : "**No shortfall is left in that year, at this price.**");
   }
-  // the no-JS version of what the cards show besides the results: each hazard, each defence and the preparation steps,
+  // the no-JS version of what the cards show besides the results: each hazard, each defense and the preparation steps,
   // from the same data (written into the page by the test's --write)
   var MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   function dateWords(d) { var p = d.split("-"); return (p[2] ? +p[2] + " " : "") + (p[1] ? MONTH_NAMES[+p[1] - 1] + " " : "") + p[0]; }
@@ -115,7 +115,7 @@
     var df = H.defences.map(function (d) { return "<tr><td>" + escH(d.label) + "</td><td>" + money(d.cost) + "</td><td>" + escH(d.what) + "</td></tr>"; }).join("\n");
     var pr = H.prepare.map(function (e) { return "<li><b>" + dateWords(e.date) + ", " + escH(e.label) + ":</b> " + escH(e.text) + " (<a href=\"" + escH(e.source.url) + "\">" + escH(e.source.label) + "</a>)</li>"; }).join("\n");
     return '<table class="a9-static a9-words" aria-label="The four hazards as this lesson models them (illustrative)">\n<thead><tr><th scope="col">Hazard</th><th scope="col">When</th><th scope="col">What it does here</th></tr></thead>\n<tbody>\n' + hz + "\n</tbody></table>\n" +
-      '<table class="a9-static a9-words" aria-label="The five defences, with illustrative yearly costs in millions of 2025 dollars">\n<thead><tr><th scope="col">Defence</th><th scope="col">Yearly cost</th><th scope="col">What it does here</th></tr></thead>\n<tbody>\n' + df + "\n</tbody></table>\n" +
+      '<table class="a9-static a9-words" aria-label="The five defenses, with illustrative yearly costs in millions of 2025 dollars">\n<thead><tr><th scope="col">Defense</th><th scope="col">Yearly cost</th><th scope="col">What it does here</th></tr></thead>\n<tbody>\n' + df + "\n</tbody></table>\n" +
       '<p class="lx-hint">How planners prepared after Uri and Elliott:</p>\n<ol class="a9-prep">\n' + pr + "\n</ol>";
   }
   // practice drill items (two kinds, seeded; the test recomputes every answer)
@@ -123,7 +123,7 @@
     if (k % 2 === 0) {
       var before = 200 * (5 + Math.floor(r() * 30)), after = Math.round(before * (0.1 + 0.6 * r()) / 10) * 10, c = 5 * (2 + Math.floor(r() * 12));
       var v = Math.round((before - after) / c * 10) / 10;
-      return { kind: "perM", q: "A defence costing $" + c + "M a year cuts a hazard year's unserved energy from " + int(before) + " to " + int(after) + " MWh. How many MWh does it avoid per $1M a year?", answer: v, tol: 0.06, unit: "MWh",
+      return { kind: "perM", q: "A defense costing $" + c + "M a year cuts a hazard year's unserved energy from " + int(before) + " to " + int(after) + " MWh. How many MWh does it avoid per $1M a year?", answer: v, tol: 0.06, unit: "MWh",
                why: "(" + int(before) + " − " + int(after) + ") ÷ " + c + " = " + v.toFixed(1) + " MWh per $1M a year." };
     }
     var base = 50 + 10 * Math.floor(r() * 10), a = base + 50 * (1 + Math.floor(r() * 8)), b = base + 50 * (1 + Math.floor(r() * 8)), ab = a + b - base + 50 * Math.floor(r() * 12);
@@ -254,10 +254,10 @@
             });
           });
         } },
-      // 5 defences under a budget
-      { text: function () { return "Choose defences within " + money(H.budget) + " a year, such as [[winterization|winterizing]] plants, then run the four hazard years again. Costs are illustrative."; },
+      // 5 defenses under a budget
+      { text: function () { return "Choose defenses within " + money(H.budget) + " a year, such as [[winterization|winterizing]] plants, then run the four hazard years again. Costs are illustrative."; },
         build: function (act, api) {
-          var chosen = {}, row = H_("div", { class: "a9-row", role: "group", "aria-label": "Defences" }, act), bud = H_("p", { class: "a9-budget", "aria-live": "polite" }, act);
+          var chosen = {}, row = H_("div", { class: "a9-row", role: "group", "aria-label": "Defenses" }, act), bud = H_("p", { class: "a9-budget", "aria-live": "polite" }, act);
           var list = H_("ul", { class: "a9-facts" }, act);
           H.defences.forEach(function (d) { var li = H_("li", null, list); H_("b", { text: money(d.cost) }, li); li.appendChild(document.createTextNode(d.label + ": " + d.what)); });
           var go = H_("button", { type: "button", class: "lx-btn small", html: LX.icon("play") + "Run the hazard years" }, H_("div", { class: "a9-row" }, act));
@@ -278,7 +278,7 @@
                 H.hazards.forEach(function (hz) { before[hz.id] = get([hz.id]); after[hz.id] = get([hz.id], ds); });
                 busy.textContent = ""; out.innerHTML = "";
                 H_("p", { class: "a9-note", text: "Results for: " + packageText(H, ds) + "." }, out);
-                table(out, ["Year with", "Unserved before (MWh/yr)", "With your defences (MWh/yr)", "Switched off directly, before → with (MWh/yr)"], H.hazards.map(function (hz) { return [chip(hz), int(before[hz.id].eue), int(after[hz.id].eue), int(before[hz.id].shut) + " → " + int(after[hz.id].shut)]; }), "Unserved energy and energy switched off directly in each hazard year, before and with your defences");
+                table(out, ["Year with", "Unserved before (MWh/yr)", "With your defenses (MWh/yr)", "Switched off directly, before → with (MWh/yr)"], H.hazards.map(function (hz) { return [chip(hz), int(before[hz.id].eue), int(after[hz.id].eue), int(before[hz.id].shut) + " → " + int(after[hz.id].shut)]; }), "Unserved energy and energy switched off directly in each hazard year, before and with your defenses");
                 ran = { ds: ds, text: defenceText(H, before, after, ds) }; fresh();
                 api.done(); remember("defs", ds);
               } catch (e) { busy.textContent = "The run stopped. Try again."; }
@@ -326,7 +326,7 @@
     });
     LX.CompareTable(H_("div", { class: "lx-xcard" }, x), {
       title: "Four hazards, four ways in", text: true,
-      columns: [{ key: "name", label: "Hazard", main: true }, { key: "hits", label: "What it hits here" }, { key: "ev", label: "Real case" }, { key: "def", label: "Defence that eases it" }, { key: "eue", label: "Unserved, MWh/yr", num: true }],
+      columns: [{ key: "name", label: "Hazard", main: true }, { key: "hits", label: "What it hits here" }, { key: "ev", label: "Real case" }, { key: "def", label: "Defense that eases it" }, { key: "eue", label: "Unserved, MWh/yr", num: true }],
       rows: rows, sorts: [{ label: "As listed", order: rows.map(function (r) { return r.key; }), note: "Unserved energy for connected customers in a year when the hazard strikes, seed 2025; " + (Y.none ? int(Y.none.eue) : "–") + " MWh a year with none." },
                           { label: "By unserved energy", order: rows.slice().sort(function (a, b) { return b.eue.value - a.eue.value; }).map(function (r) { return r.key; }), ranked: true, note: "The cold snap hits demand, plants and fuel at once. A battery and demand response ease every hazard's shortfall, not its shutoffs." }]
     });
@@ -346,18 +346,18 @@
       edges: [["cold", "demand", "raises"], ["cold", "equip", "freezes"], ["cold", "fuel", "cuts"], ["demand", "deficit", "more to serve"], ["equip", "deficit", "less supply"], ["fuel", "deficit", "less supply"], ["deficit", "shed", "forces"]]
     });
     LX.Flowchart(H_("div", { class: "lx-xcard" }, x), {
-      title: "Planning for hazards, move by move", lede: "Trace how a planner turns a hazard into a defence.",
+      title: "Planning for hazards, move by move", lede: "Trace how a planner turns a hazard into a defense.",
       nodes: {
         h: { t: "Name the hazard", tN: ["Name the", "hazard"], s: "what it hits", sN: "what it hits" },
         s: { t: "Stress-test the grid", tN: ["Stress-test", "the grid"], s: "correlated outages", sN: "correlated" },
         q: { t: "Risk acceptable?", tN: ["Risk", "acceptable?"], k: "q" },
-        d: { t: "Choose defences, re-test", tN: ["Choose defences,", "re-test"], s: "cost against MWh avoided", sN: "cost vs MWh" },
+        d: { t: "Choose defenses, re-test", tN: ["Choose defenses,", "re-test"], s: "cost against MWh avoided", sN: "cost vs MWh" },
         r: { t: "Rules, drills, reports", tN: ["Rules, drills,", "reports"], k: "end" }
       },
       cols: 2, at: { h: [0, 0], s: [0, 1], q: [0, 2], d: [1, 2], r: [0, 3] }, colsN: 2, atN: { h: [0, 0], s: [0, 1], q: [0, 2], d: [1, 2], r: [0, 3] },
       edges: [["h", "s"], ["s", "q"], ["q", "d", "no"], ["d", "s"], ["q", "r", "yes"]],
       traces: [{ label: "A cold snap", path: ["h", "s", "q", "d", "s", "q", "r"], text: "Winterizing cuts the units' losses; since October 2025 the standard EOP-012-3 requires cold-weather plans for generators." },
-               { label: "Wildfire shutoffs", path: ["h", "s", "q", "d"], text: "Customers on switched-off lines lose far more energy than the supply shortfall adds: the defence is on the wires." }], sel: 0
+               { label: "Wildfire shutoffs", path: ["h", "s", "q", "d"], text: "Customers on switched-off lines lose far more energy than the supply shortfall adds: the defense is on the wires." }], sel: 0
     });
   }
 })();

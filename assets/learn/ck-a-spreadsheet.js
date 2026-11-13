@@ -269,7 +269,7 @@
     { id: "accounting", look: "One boundary for every cost and saving, in 2025 dollars; the school's result kept apart from the other customers' and the resource view; transfers kept apart from real costs." },
     { id: "uncertainty", look: "Low and high values for the inputs that matter, the main result as a range, the input that moves it most named." },
     { id: "trust", look: "Every number traces to a formula or to a log row with a source and a date; a second calculation (a year-by-year cash flow) checks the first." },
-    { id: "realism", look: "Illustrative inputs labelled as such; what the spreadsheet leaves out listed (credits, resilience, solar wear, tariff changes)." }
+    { id: "realism", look: "Illustrative inputs labeled as such; what the spreadsheet leaves out listed (credits, resilience, solar wear, tariff changes)." }
   ];
   var api = { derive: derive, model: model, vals: vals, sensitivity: sensitivity, facts: facts, level: level, describe: describe, summary: summary, runnerData: runnerData,
     staticBrief: staticBrief, staticTasks: staticTasks, staticSolution: staticSolution, tornadoRows: tornadoRows, usd: usd, usdK: usdK, pct: pct, showVal: showVal, showRange: showRange, after: after, RUBRIC: RUBRIC, KEY: KEY, CODE: CODE,

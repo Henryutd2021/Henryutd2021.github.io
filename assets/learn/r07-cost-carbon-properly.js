@@ -53,7 +53,7 @@
       perTonne: saving < 0 && co2.cut > 0 ? -saving / co2.cut : null, society: society, societyPerTonne: society > 0 && co2.cut > 0 ? society / co2.cut : null };
   }
   // the conclusion as the fixes that are on (Fx; all four if left out) are added in the page's order: one bar per cost fix
-  // that is on, then the result now (the boundary moves CO2 only); a grid fix with one of its two costs is labelled by it
+  // that is on, then the result now (the boundary moves CO2 only); a grid fix with one of its two costs is labeled by it
   function gridOn(Fx) { return !!(Fx.grid || Fx.depot || Fx.demand); }
   function waterfall(D, gid, Fx) {
     Fx = Fx || all(true);

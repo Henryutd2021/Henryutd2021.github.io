@@ -70,7 +70,7 @@
   "flow": { "min": 20, "max": 300, "step": 10, "start": 100 },
   "goalMW": 100,
   "volumeM3": 20000000,
-  "about": "Illustrative plant. Power P = rho x g x Q x H x eta (W), in MW / 1e6. Toy reservoir: 20 million cubic metres, all of it usable, no water flowing in, and the head and efficiency held constant as it drains; at a flow Q it runs for volume / (Q x 3600) hours and gives P x hours MWh. In a real reservoir the head falls as the water level drops, and release rules can limit the flow."
+  "about": "Illustrative plant. Power P = rho x g x Q x H x eta (W), in MW / 1e6. Toy reservoir: 20 million cubic meters, all of it usable, no water flowing in, and the head and efficiency held constant as it drains; at a flow Q it runs for volume / (Q x 3600) hours and gives P x hours MWh. In a real reservoir the head falls as the water level drops, and release rules can limit the flow."
  },
  "ramp": {
   "date": "2025-09-03",

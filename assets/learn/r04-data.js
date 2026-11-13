@@ -1,9 +1,9 @@
-// r04-data.js — Research studio R4, "Data you can defend: sources, cleaning, licences and provenance".
+// r04-data.js — Research studio R4, "Data you can defend: sources, cleaning, licenses and provenance".
 //
 // Data (real, Southwest Power Pool 2025, from EIA Form EIA-930; the same raw extract as lesson B2):
 //   assets/learn/data/b02-python-data.json  demand, wind and solar in MW from EIA's adjusted columns, before any cleaning;
 //                                           index i = the hour ENDING at start_utc + i hours, in UTC (EIA-930 convention)
-//   assets/learn/data/r04-data.json         the studio's text: the decisions and their options, the licence cards, the
+//   assets/learn/data/r04-data.json         the studio's text: the decisions and their options, the license cards, the
 //                                           spatial-layer question, the exemplars, the rubric lines, sources with dates
 //
 // B2 finds the problems (a one-hour spike, frozen telemetry, 23- and 25-hour days). R4 is about defending what you do
@@ -19,7 +19,7 @@
 // to 07:00 UTC on the first Sunday in November; standard time, UTC-6, otherwise). The Node test checks it against B2's
 // model and the ICU time-zone database.
 //
-// Shared components: LX.StepCards, LX.CardSort (the licence sort), LX.Plot (the frozen week), LX.Flowchart,
+// Shared components: LX.StepCards, LX.CardSort (the license sort), LX.Plot (the frozen week), LX.Flowchart,
 // LX.CompareTable, LX.Checklist, LX.Exemplars, LX.Rubric. Lesson-local: the decision buttons, the four-number readout,
 // the sensitivity table and the data-note form; CSS injected once with --lx-* tokens only.
 //
@@ -206,7 +206,7 @@
     var key = JSON.stringify(ch); if (effMemo[key]) return effMemo[key];
     var rep = report(F, clean(F, ch)), alt = function (k, v) { var c = Object.assign({}, ch); c[k] = v; return report(F, clean(F, c)); }, e = {};
     var u = alt("time", "utc");
-    e.time = ch.time === "utc" ? "peak hour " + rep.peakAt : "peak hour labelled " + rep.peakAt + " (" + u.peakAt + " in UTC)";
+    e.time = ch.time === "utc" ? "peak hour " + rep.peakAt : "peak hour labeled " + rep.peakAt + " (" + u.peakAt + " in UTC)";
     if (ch.time === "force") e.time += "; wind " + f2(rep.windTWh) + " TWh (" + f2(u.windTWh) + " with the rows kept)";
     var k = alt("spike", "keep");
     e.spike = ch.spike === "keep" ? "none (no rule): lowest hour " + f1(rep.minGW) + " GW" : "lowest hour " + f1(rep.minGW) + " GW (" + f1(k.minGW) + " GW with every value kept)";
@@ -281,7 +281,7 @@
     out.push("Accessed: " + meta.accessed);
     out.push("Extraction (before this note's cleaning): " + meta.not_cleaned + (meta.built_by ? " (" + meta.built_by + ")" : ""));
     if (D.input) { out.push("Input file: " + D.input.name + ", SHA-256 " + D.input.sha256); out.push("Cleaning code: " + D.input.code + ", or this page with the choices below"); }
-    out.push("Licence: " + (n.licence || meta.license));
+    out.push("License: " + (n.licence || meta.license));
     out.push("Units: " + meta.units);
     out.push("Time: " + meta.time);
     out.push("Cleaning log:");
@@ -332,7 +332,7 @@
   function exemplarParts(F, meta, D) {
     var base = clean(F, DEFAULT), rb = report(F, base), raw = report(F, clean(F, RAW)), drop = report(F, clean(F, Object.assign({}, DEFAULT, { fill: "drop" })));
     var c = base.count, sp = F.cols.demand.indexOf(Math.min.apply(null, F.cols.demand)), when = clock(F, sp, "local");
-    var weak = ["Data from ", { text: "EIA", note: "Which form, area, files, download date and licence? A reader cannot find the same file." }, ". We ",
+    var weak = ["Data from ", { text: "EIA", note: "Which form, area, files, download date and license? A reader cannot find the same file." }, ". We ",
       { text: "removed outliers", note: "No rule and no count; and removing is not flagging: the hours vanish from every total." }, " and ",
       { text: "filled missing values", note: "EIA's adjusted file has no blanks: the gaps are the hours you flagged. Which method, and how many hours?" }, ", and ",
       { text: "converted times to local time", note: "Which zone, and what happened to the 23- and 25-hour days?" }, ". Annual demand was ",
@@ -342,8 +342,8 @@
       { text: "EIA Form EIA-930 six-month BALANCE files, balancing authority SWPP, 2025, accessed " + dateText(meta.accessed) + ", SHA-256 " + meta.files.map(function (x) { return x.sha256.slice(0, 8); }).join("… and ") + "…", note: "Date and checksums let anyone confirm they downloaded the same EIA files." },
       ".\nExtraction: ", { text: "EIA's adjusted columns; each fuel's columns summed, negative values set to 0", note: "Even an extract changes values: the clipping belongs in the audit trail." },
       "; input file b02-python-data.json, SHA-256 ", { text: (D && D.input ? D.input.sha256.slice(0, 8) : "") + "…", note: "The extract itself, by its own checksum: the exact file this note's cleaning starts from." },
-      ".\nLicence: ", { text: "EIA data public domain, cited with the date; the course's extract CC BY 4.0, credited", note: "Two layers of terms: the government data, and the course's extract of it." },
-      ".\nTime: ", { text: "rows kept in UTC, hour ending; results labelled in Central time with daylight saving", note: "No hour is lost or doubled, and every clock time on the page is named." },
+      ".\nLicense: ", { text: "EIA data public domain, cited with the date; the course's extract CC BY 4.0, credited", note: "Two layers of terms: the government data, and the course's extract of it." },
+      ".\nTime: ", { text: "rows kept in UTC, hour ending; results labeled in Central time with daylight saving", note: "No hour is lost or doubled, and every clock time on the page is named." },
       ".\nSpikes: ", { text: "demand under half the median (" + f0(spikeLimit(F.cols.demand, "half")) + " MW): " + c.demand.spike + " hour, " + when.d + " " + MONTHS[when.m - 1] + ", " + f0(F.cols.demand[sp]) + " MW", note: "Rule, threshold, count and the value itself." },
       ", flagged as implausible; to check against SPP's records.\nFrozen: ",
       { text: "runs of 3 or more identical non-zero readings: demand " + f0(c.demand.frozen) + " h, wind " + f0(c.wind.frozen) + " h, solar " + f0(c.solar.frozen) + " h", note: "Counts per column, so the reader sees what each rule flagged." },
@@ -359,14 +359,14 @@
     var P = exemplarParts(F, meta, D);
     return { title: "Two data notes for the same file", task: "Write the data note for your cleaned SPP 2025 file.", id: "r4-ex",
       answers: [{ key: "weak", label: "Weak answer", level: "Developing", parts: P.weak }, { key: "good", label: "Strong answer", level: "Proficient (audit trail)", parts: P.good }], lines: true,
-      diff: [{ label: "Provenance", weak: "“EIA”", good: "Form, area, year, access date, checksums, extraction, licence" },
+      diff: [{ label: "Provenance", weak: "“EIA”", good: "Form, area, year, access date, checksums, extraction, license" },
              { label: "Each step", weak: "A verb", good: "Rule, threshold, count, and a flag called provisional" },
              { label: "Effect", weak: "One rounded number", good: "Raw against cleaned, and the rejected alternative" },
              { label: "Limits and rerun", weak: "None", good: "A failed check reported; a notebook that rebuilds the numbers" }],
       note: "Both notes are illustrative; every number in them is computed on this page from the raw file." };
   }
   // the no-JS version of the task (what to produce is the page's task card, above the interactive): the four numbers raw
-  // and with the course's choices, the one-choice-at-a-time table, the licence sort and the coordinate systems, as HTML
+  // and with the course's choices, the one-choice-at-a-time table, the license sort and the coordinate systems, as HTML
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
   // glossary marks (double brackets around a slug, a bar and the words): as term spans for the no-JS blocks, or as words
   function rich(s) { return esc(s).replace(/\[\[([a-z0-9-]+)\|([^\]]+)\]\]/g, function (m, id, w) { return "<span class=\"lx-term\" data-" + "term=\"" + id + "\">" + w + "</span>"; }); }
@@ -388,7 +388,7 @@
     var c = clean(F, DEFAULT).count;
     h.push("<p>With the course's rules the counts match its data build: demand " + f0(c.demand.frozen + c.demand.spike) + " hours flagged (" + f0(build.demand_hours_flagged_as_implausible) +
       " in the build), wind " + f0(c.wind.frozen) + " (" + f0(build.frozen_hours_filled.wind) + "), solar " + f0(c.solar.frozen) + " (" + f0(build.frozen_hours_filled.solar) + ").</p>");
-    h.push('<p class="lx-eyebrow">Licences: what each source asks of you</p><div class="lx-scroll-x"><table class="lx-facts"><thead><tr><th scope="col">Source</th><th scope="col">Kind of terms</th><th scope="col">What they ask</th></tr></thead><tbody>');
+    h.push('<p class="lx-eyebrow">Licenses: what each source asks of you</p><div class="lx-scroll-x"><table class="lx-facts"><thead><tr><th scope="col">Source</th><th scope="col">Kind of terms</th><th scope="col">What they ask</th></tr></thead><tbody>');
     D.licences.cards.forEach(function (k) { var b = D.licences.bins.filter(function (x) { return x.id === k.bin; })[0]; h.push("<tr><td>" + esc(k.text) + "</td><td>" + esc(b.label) + "</td><td>" + rich(k.why) + "</td></tr>"); });
     h.push("</tbody></table></div>");
     var nt = nightSolar(F, clean(F, DEFAULT));
@@ -578,7 +578,7 @@
         " The peak's clock label " + (rw.peakMoved ? "changed too: a relabelling, not a change in demand." : "did not change.") +
         (pick ? (pick === rw.most ? " Your prediction was right." : " You predicted the " + name(pick) + ".") : ""));
     }
-    // ---- step 7: licences
+    // ---- step 7: licenses
     function licenceStep(act, api) {
       var L = D.licences;
       LX.CardSort(act, { bins: L.bins, cards: L.cards, checkLabel: "Check my sort",
@@ -643,7 +643,7 @@
       { text: "A stuck feed repeats its last reading ([[frozen-telemetry|frozen telemetry]]); a long repeat is a suspect, not proof. Choose how long a run must be before you flag it.", build: decision("frozen", frozenExtra) },
       { text: "Flagged hours are now gaps. Choose how to fill them, and watch the December freeze and the year's totals.", build: decision("fill", fillExtra) },
       { text: "Now vary one choice at a time from yours. Which choices move which numbers? This table is what defends your choices.", build: sensStep },
-      { text: "Data come with a [[data-licence|licence]]. Sort eight sources by what their terms ask of you.", build: licenceStep },
+      { text: "Data come with a [[data-licence|license]]. Sort eight sources by what their terms ask of you.", build: licenceStep },
       { text: "A spatial layer needs its own decisions. Pick a [[coordinate-reference-system|coordinate system]] for each job: 1 km [[buffer|buffers]], then an area. Your log records them as proposed.", build: spatialStep },
       { text: "Write the [[data-note|data note]]: your log writes itself, with each step's effect; add a reason for each choice, the known limits and how to rerun.", build: noteStep }
     ];
@@ -659,7 +659,7 @@
       title: "Defending one cleaning step", lede: "The same route for every suspect value. Trace three real cases from SPP's 2025 file.",
       nodes: {
         s: { t: "A suspect value", k: "end" },
-        q1: { t: "Plausible next to its neighbours?", tN: ["Plausible next", "to neighbours?"], k: "q" },
+        q1: { t: "Plausible next to its neighbors?", tN: ["Plausible next", "to neighbors?"], k: "q" },
         q2: { t: "A real event?", tN: ["A real", "event?"], k: "q" },
         keep: { t: "Keep it, say why", tN: ["Keep it,", "say why"] },
         flag: { t: "Flag by a stated rule", tN: ["Flag by a", "stated rule"], s: "count the hours", sN: "count them" },
@@ -698,7 +698,7 @@
         { id: "source", label: "Source", text: "Agency, form or product, area, years and the address." },
         { id: "files", label: "Files and checksums", text: "File names and SHA-256, so the same bytes can be found." },
         { id: "date", label: "Access date", text: "When you downloaded it: data are revised." },
-        { id: "licence", label: "Licence", text: "The terms, and the attribution line they ask for." },
+        { id: "licence", label: "License", text: "The terms, and the attribution line they ask for." },
         { id: "units", label: "Units", text: "[[power|MW]] or [[energy|MWh]], per what period." },
         { id: "time", label: "Time base", text: "Zone, hour start or end, daylight saving." },
         { id: "steps", label: "Each step", text: "Rule, threshold, count and reason." },

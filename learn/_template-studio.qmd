@@ -89,7 +89,7 @@ body-classes: "page-learn page-lesson lx-form-studio"
 <div class="lx-deeper-body">
 ```
 
-One or two sentences on how the same skill is used in the capstone research project (CR), with a link to the lesson that formalises it.
+One or two sentences on how the same skill is used in the capstone research project (CR), with a link to the lesson that formalizes it.
 
 ```{=html}
 </div>

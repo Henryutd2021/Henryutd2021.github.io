@@ -446,7 +446,7 @@
     LX.on("l3-change", function () { mineTrace(); fc.update(traces); });   // the selected trace shows its new path and text
     var L = D.layers;
     LX.CompareTable(c3, {
-      title: "Four layers of defense", text: true,   // a column of words: on phones each layer is a card of labelled lines
+      title: "Four layers of defense", text: true,   // a column of words: on phones each layer is a card of labeled lines
       columns: [{ key: "name", label: "Layer", main: true }, { key: "time", label: "Typical time scale" }, { key: "from", label: "Where the power comes from" }],
       rows: L.rows.map(function (r) { return { key: r.key, color: { inertia: "var(--lx-ink-3)", primary: "var(--lx-accent)", secondary: "var(--lx-good)", tertiary: "var(--lx-tier-3)" }[r.key], name: r.name, note: r.who, time: r.time, from: r.from }; }),
       sorts: [{ label: "Fastest first", order: ["inertia", "primary", "secondary", "tertiary"], note: "Typical time scales from NERC's control continuum (" + L.asOf + "). The layers overlap: governors start while machines still give up stored energy." }]

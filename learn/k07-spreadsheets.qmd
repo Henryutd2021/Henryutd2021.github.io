@@ -161,7 +161,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-deeper-body">
 ```
 
-A preview: [bridge B2](b02-python-data.html) loads and runs code like this. A spreadsheet column with one formula filled down is what a data table calls a vectorised operation: one line acts on every row at once. Here pandas, a Python tool for tables, holds the day in a table named `df`, and the two inputs are single numbers:
+A preview: [bridge B2](b02-python-data.html) loads and runs code like this. A spreadsheet column with one formula filled down is what a data table calls a vectorized operation: one line acts on every row at once. Here pandas, a Python tool for tables, holds the day in a table named `df`, and the two inputs are single numbers:
 
 ```python
 nuclear = 100                                              # E1: MW, runs flat

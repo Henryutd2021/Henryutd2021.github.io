@@ -14,7 +14,7 @@
 //   pollutants    kg per metric tonne from AP-42's factors for large boilers (lb per short ton x 0.5 = kg per tonne for
 //                 coal; per million scf at 42,000 lb per million scf for gas; per 1,000 gal at 845 kg/m3 for oil); the
 //                 illustrative coal has 2% sulfur and 10% ash, the oil 0.2% sulfur; PM2.5 = filterable PM2.5 +
-//                 condensable PM (all below 1 micrometre). Controls: coal a wet limestone scrubber (90% of SO2, and
+//                 condensable PM (all below 1 micrometer). Controls: coal a wet limestone scrubber (90% of SO2, and
 //                 AP-42's condensable factor with FGD), low-NOx burners and an ESP; gas low-NOx burners; oil low-NOx
 //                 burners with flue gas recirculation. CO2 is not changed by any of them.
 //   where it goes the spreading toy (illustrative, not a dispersion model): a year of winds from every direction, a mixed
@@ -457,7 +457,7 @@
     var cards = LX.StepCards(live, { id: "f11-steps", steps: steps });
 
     // ---------------------------------------------------------------- the explain layer
-    // the reader's own experiment (redrawn after each change, keep()), then fixed reference cards, labelled as such
+    // the reader's own experiment (redrawn after each change, keep()), then fixed reference cards, labeled as such
     var xhost = document.getElementById("f11-explain"), mineHost = null;
     function paintMine() {
       if (!mineHost) return;

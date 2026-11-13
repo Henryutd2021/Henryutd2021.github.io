@@ -14,7 +14,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
      City's household groups, read and never retyped) and path.json. Tests: node _tests/learn/test_f11-air-climate-people.js
      [--write] (every number on this page is checked against the model; --write rewrites the no-JS block between the
      f11-fallback markers). Health effects come from primary sources (EPA's benefit-per-ton estimates, WHO, IPCC values),
-     labelled as estimates; the spreading toy is labelled illustrative. Text budget: one or two sentences per element;
+     labeled as estimates; the spreading toy is labeled illustrative. Text budget: one or two sentences per element;
      depth in the Go deeper boxes. The learn:meta, learn:next and learn:footer blocks are written by
      the course build step. Lesson-local styles (prefix f11-) are in the style block below. -->
 
@@ -96,7 +96,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-deeper-body">
 ```
 
-- **Net heat.** The IPCC counts the [net calorific value]{.lx-term term="net-calorific-value"}: the heat a fuel gives, leaving out the heat in the water vapour it forms.
+- **Net heat.** The IPCC counts the [net calorific value]{.lx-term term="net-calorific-value"}: the heat a fuel gives, leaving out the heat in the water vapor it forms.
 - **Gross heat** is about 5% higher than net for coal and oil, and about 10% higher for most natural gas.
 - **Gross-heat sources.** EPA's AP-42 and EIA count gross heat, so their CO₂ per unit of heat is a little lower than the IPCC's for the same fuel.
 - **Coal types vary much more per tonne than per unit of heat.** Sub-bituminous coal holds 18.9 GJ a tonne: 1.82 t of CO₂ a tonne, yet 346 kg per MWh of heat, close to bituminous coal's 341.

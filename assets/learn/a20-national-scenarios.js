@@ -258,7 +258,7 @@
   var PREDICT = {
     q: "These four scenarios for Prairieland end up far apart. Why?",
     answer: "both",
-    options: [{ value: "error", label: "Some of the modellers made mistakes" }, { value: "assume", label: "They assume different futures" },
+    options: [{ value: "error", label: "Some of the modelers made mistakes" }, { value: "assume", label: "They assume different futures" },
               { value: "ask", label: "They answer different questions" }, { value: "both", label: "Both: different questions and different assumptions" }],
     feedback: {
       error: "Nothing here is a mistake: the four use one accounting and one data set. They ask different questions and assume different futures.",
@@ -678,7 +678,7 @@
                  { label: "Current → Budget", path: ["q", "lev", "bd", "one", "ord", "rep"], text: readSaw(P) }], sel: 0 });
       LX.Boundary(H("div", { class: "lx-xcard" }, xhost), { title: "Where these scenarios hold",
         holds: ["Prairieland, a fictional nation, in 2025 dollars, with its own data;", "existing plants run as in 2025 until they retire, unless a carbon price closes them;", "new power shared by full costs per MWh, with fixed costs the same in every year;", "domestic oil and gas meeting demand up to their 2025 output, imports beyond it, no exports."],
-        leaves: ["Balance over [[time-slice|time slices]], storage, transmission between regions and hourly checks of selected years: the pathway model of [[lesson:m13-national-pathway|M13]] adds them;", "adequacy judged over many weather years and plant outages: lesson [[lesson:a05-adequacy|A5]];", "end-use equipment costs, behaviour and prices that respond to demand;", "methane and other gases, and removals;", "probabilities: this lesson assigns none, so it cannot say which scenario is more likely."],
+        leaves: ["Balance over [[time-slice|time slices]], storage, transmission between regions and hourly checks of selected years: the pathway model of [[lesson:m13-national-pathway|M13]] adds them;", "adequacy judged over many weather years and plant outages: lesson [[lesson:a05-adequacy|A5]];", "end-use equipment costs, behavior and prices that respond to demand;", "methane and other gases, and removals;", "probabilities: this lesson assigns none, so it cannot say which scenario is more likely."],
         source: "Accounting: this page's screening model. Data: Prairieland (course data); costs from EIA's AEO2026 assumptions." });
     }
     paintExplain();

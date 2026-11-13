@@ -111,7 +111,7 @@ body-classes: "page-learn page-lesson lx-form-capstone"
 <div class="lx-deeper-body">
 ```
 
-- Storage and coupled carriers, modelling power, hydrogen and heat together ([M4](m04-storage-multienergy.html), in the Modeler tier), writes a plant [linear program]{.lx-term term="linear-program"} like the bench's in Python.
+- Storage and coupled carriers, modeling power, hydrogen and heat together ([M4](m04-storage-multienergy.html), in the Modeler tier), writes a plant [linear program]{.lx-term term="linear-program"} like the bench's in Python.
 - It is another plant: two weeks, power bought and sold, a fixed hydrogen demand and a heat store; it has no NPV.
 - Hand in, with the note: the notebook's weekly saving from adding the electrolyzer and tank (its section 3), winter and summer.
 - Then two sentences: how its model differs from the bench's, and which difference could change your recommendation.

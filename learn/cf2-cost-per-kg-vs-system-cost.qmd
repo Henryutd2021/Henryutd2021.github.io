@@ -160,7 +160,7 @@ body-classes: "page-learn page-lesson lx-form-case"
 <li>Run <code>examples/configurations.py</code>. Its hydrogen-price cases solve one synthetic site at several prices: compare the electrolyzer size, LCOH and the objective (net life-cycle cost) row by row.</li>
 <li>Predict first, then halve the electrolyzer's capital cost (<code>parameter_factors</code>): does the best size grow, and which way does LCOH move?</li>
 </ul>
-<p><a href="https://github.com/Henryutd2021/reopt-hydrogen-framework">reopt-hydrogen-framework</a>: public example repository · MIT licence · synthetic data.</p>
+<p><a href="https://github.com/Henryutd2021/reopt-hydrogen-framework">reopt-hydrogen-framework</a>: public example repository · MIT license · synthetic data.</p>
 </div>
 ```
 :::

@@ -285,7 +285,7 @@ $$
 <li>Write the synthetic regions with <code>ghg-framework synthetic my_inputs/</code>, then run <code>ghg-framework run my_inputs/ --region Mixed --limit 0.08 --lam 5 --out-dir outputs/mixed</code>.</li>
 <li>Its goal counts each hour at its average intensity. Write down what you would change to count the change at the plants instead, as question 2 of A10 does.</li>
 </ul>
-<p><a href="https://github.com/Henryutd2021/ghg-load-regulation">ghg-load-regulation</a>: public example repository · MIT licence · synthetic data.</p>
+<p><a href="https://github.com/Henryutd2021/ghg-load-regulation">ghg-load-regulation</a>: public example repository · MIT license · synthetic data.</p>
 </div>
 </div>
 <div class="lx-card lx-sources">
