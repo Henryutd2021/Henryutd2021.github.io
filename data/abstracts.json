@@ -1,0 +1,198 @@
+{
+  "jin2021supply": {
+    "text": "Manufacturing and supply chain sectors are undergoing a paradigm change driven by the growing use of distributed renewable energy. Under demand and generation uncertainty, this paper aims to allocate wind turbine, solar photovoltaics and energy storage units in a three-tier supply chain network to achieve sustainable operations with minimum cost. We propose a mixed-integer stochastic programming model that involves the production-inventory and microgrid capacity decisions along with the hourly energy transactions to meet the electrical loads of factories, warehouse, and retail stores. Our study advances existing supply chain design methods by explicitly incorporating transactive energy, materials, information and cash flows into a holistic optimization framework. The performance and scalability of the model is tested in two network instances with various facility locations, machine capacity, and climate conditions. Results show that onsite renewable generation enables large industrial consumers to achieve environmental sustainability as well as to create new revenue stream through the participation in transactive energy market. The study also indicates that feed-in tariff, time-of-use rate, two-way energy trading can lower the utility cost and accelerate the adoption of variable generation technology.",
+    "source": "https://henryutd2021.github.io/files/papers/jin2021supply.pdf",
+    "source_type": "posted-pdf",
+    "source_locator": "PDF page 1",
+    "sha256": "dafb7e0f9757530b000199e9e00082629d2d7ab6c1f80d0f336a070707c15e40",
+    "transcription": "Author abstract; line wrapping, PDF ligatures, and typesetting normalized. No wording edited.",
+    "verified": "2026-11-13",
+    "title": "Supply chain design for transactive energy operations in the nexus of manufacturing, microgrid and climate"
+  },
+  "jin2021system": {
+    "text": null,
+    "source": null,
+    "omission_reason": "No complete author abstract found on a reliable open publisher or arXiv page; proceedings table of contents only.",
+    "attempted_sources": [
+      "https://www.proceedings.com/content/061/061116webtoc.pdf"
+    ],
+    "verified": "2026-11-13",
+    "title": "System availability considering redundancy, maintenance and spare parts with dual repair processes"
+  },
+  "li2021thesis": {
+    "text": "Wind- and solar-based microgrid generation is a promising solution to reverse the climate change and achieve manufacturing sustainability. Virtual power plants (VPP) formed by a group of coordinated microgrid systems have the potential to accelerate the integration of variable renewable resources. We propose a facility-microgrid, location-allocation model to realize renewable and thermal cogeneration in smart factories and Industry 4.0. Under demand and supply uncertainty, the model jointly locates the factories and warehouse, assigns the transportation routes, and sizes wind turbines, photovoltaics, and energy storage for cost minimization. The model also performs operational planning for production, inventory, energy transactions, vehicle charging, and electricity and thermal cogeneration using combined heat and power. The proposed VPP planning model is demonstrated on multi-echelon supply chain networks using 11-year period, 2.3 million data. Several managerial insights are obtained. First, the experimental results show that the site with abundant renewables is opt for being the factory location despite of higher transportation and production cost. Second, the sizing of renewable microgrid is significantly influenced by time-of-use tariff or peaking price. Third, combined heat and power is proven to be a viable approach to streamline variable generation. Fourth, different decision-making criteria, such as value-at-risk and Minimax, may have huge impacts on the risk-averse planning. Future work can be focused on incorporating edge computing and vehicle-to-grid operations into the integration of renewable energy in smart factories.",
+    "source": "https://henryutd2021.github.io/files/papers/li2021thesis.pdf",
+    "source_type": "posted-pdf",
+    "source_locator": "PDF page 17 (xvii)",
+    "sha256": "db2d85a850ea4e0a3c51abea5b97308d1426c53e7459e62d1537ab08c10d3350",
+    "transcription": "Author abstract; line wrapping, PDF ligatures, and typesetting normalized. No wording edited.",
+    "verified": "2026-11-13",
+    "title": "Planning Virtual Power Plants for Smart Factories and Industry 4.0 with Renewable and Thermal Cogeneration"
+  },
+  "badakhshan2022integrating": {
+    "text": "The transition to low-carbon electrical grids has enabled a rapid growth in offshore wind energy. In the meantime, producing green hydrogen from offshore wind farms has also gained wide attention in recent years. Among many challenges, energy transferring from offshore wind farms (especially for those in deep water) to the shoreline infrastructure has been explored in various ways. In this paper, unmanned surface hydrogen ships are explored as mobile energy resources to replace hydrogen pipelines to transfer hydrogen generated from offshore wind farms in deep water, in conjunction with unmanned battery ships for electricity transmission. The hydrogen/battery ships could charge from offshore wind farms and discharge their energy when plugged-in to the terrestrial grid or onshore hydrogen infrastructure. The schedules of the ships are optimized based on the offshore wind farm generation, weather conditions, and ship sailing timing. Results showed that by combining the hydrogen ship, battery ship, and onsite hydrogen storage tanks, more than 99% of the offshore wind farm generation could be successfully transmitted to the shore side infrastructure.",
+    "source": "https://henryutd2021.github.io/files/papers/badakhshan2022integrating.pdf",
+    "source_type": "posted-pdf",
+    "source_locator": "PDF page 1",
+    "sha256": "84301a4d2424f2c2e502ab2920ec1223ecf7bfebd60c95f4c6b3a81caf4e5ca7",
+    "transcription": "Author abstract; line wrapping, PDF ligatures, and typesetting normalized. No wording edited.",
+    "verified": "2026-11-13",
+    "title": "Integrating offshore wind farms with unmanned hydrogen and battery ships"
+  },
+  "li2022optimal": {
+    "text": "Green hydrogen produced using renewable electricity could play an important role in a clean energy future. This paper seeks to analyze the techno-economic performance of integrated wind and hydrogen systems under different conditions. A co-located wind and hydrogen hybrid system is optimized to reduce the total system cost. We have adopted and improved a state-of-the-art techno-economic tool REopt, developed by the National Renewable Energy Laboratory (NREL), for optimal planning of the integrate energy system (IES). In addition to wind and electrolyzer components, we have also considered battery energy storage, hydrogen tank, and hydrogen fuel cell in the IES. The results show that (i) adding electrolyzers to the grid-connected wind energy system could reduce the total system cost by approximately 8.9%, and (ii) adding electrolyzers, hydrogen tank, and hydrogen fuel cells could reduce the total system cost by approximately 30%.",
+    "source": "https://henryutd2021.github.io/files/papers/li2022optimal.pdf",
+    "source_type": "posted-pdf",
+    "source_locator": "PDF page 1",
+    "sha256": "83c10200eb454a00dfab2ee497f30d756b8eecd328cfd6080d6be391c7dd6e1c",
+    "transcription": "Author abstract; line wrapping, PDF ligatures, and typesetting normalized. No wording edited.",
+    "verified": "2026-11-13",
+    "title": "Optimal planning of co-located wind energy and hydrogen plants: a techno-economic analysis"
+  },
+  "li2023multi": {
+    "text": "Accurate estimation of the power curve for wind turbines or wind farms is crucial to ensure their efficient operation and management. However, conventional methods for power curve estimation rely either on expensive and infrequent measurements or on low-quality numerical simulations. Moreover, the majority of previous studies on power curve estimation for wind turbines or wind farms focused on deterministic estimation, which provides a point estimate of the relationship between wind speed and power generation. Nevertheless, the deterministic approach fails to consider the inherent uncertainty associated with wind energy production resulting from varying turbine characteristics. This can lead to inaccurate power generation estimation and suboptimal decisions regarding energy management. In this paper, a kernel density estimation (KDE) based Multi-Fidelity Gaussian Process Regression (MFGPR) model is proposed to fuse theoretical power curve data and the ground true measurements to create a mapping of wind speed and wind power. By conducting a case study on an actual wind farm in China, the efficacy of the proposed MFGPR model was demonstrated in characterizing the variability of wind power. The probabilistic MFGPR model was also able to generate confidence intervals that encompassed the measured power, thereby improving the accuracy and confidence in wind power estimation or wind resource assessment. Overall, the proposed MFGPR model offers a reliable approach to integrate high-fidelity ground measurements and theoretical power curve data, resulting in precise wind resource assessment and power estimation.",
+    "source": "https://henryutd2021.github.io/files/papers/li2023multi.pdf",
+    "source_type": "posted-pdf",
+    "source_locator": "PDF page 1",
+    "sha256": "da6bd3d302d89e84148b4a1545eefbb7208e03241a34621051e7c3e618025493",
+    "transcription": "Author abstract; line wrapping, PDF ligatures, and typesetting normalized. No wording edited.",
+    "verified": "2026-11-13",
+    "title": "A Multi-Fidelity Gaussian Process Regression Method for Probabilistic Wind Farm Power Curve Estimation"
+  },
+  "li2023facility": {
+    "text": "Supply chain network design usually focuses on the uncertainties in materials, capacity, yield, and demand. However, the challenges of prosumer energy integration are not adequately addressed. This paper proposes an integrated facility and microgrid location-allocation model for achieving low-carbon supply chain operations at the nexus of manufacturing, renewables, and climate. The model strategically locates the site for establishing factories, warehouses, and microgrids subject to product demand and energy supply uncertainty. The model further allocates production, inventory, transportation, generation, and energy transactions to lower the net supply chain cost. The study represents a first-of-its-kind in jointly siting and sizing industrial facilities and prosumer microgrids under a unified optimization framework. The proposed model is implemented in a three-tier production supply chain network over a one-year period, covering the US pacific region with broad climate conditions. Numerical experiments show that transactive energy, time-of-use tariff, and climate conditions play a critical role in locating factories, warehouses, wind turbines, solar photovoltaics, and energy storage systems. Since transactive energy market brings new revenue stream, locations with stronger renewables become competitive to establish facilities despite of higher fixed and logistics cost. Contrary to the intuition, energy storage systems, which balance the intermittent power and uncertain load, have limited benefits to the cost saving.",
+    "source": "https://www.sciencedirect.com/science/article/abs/pii/S0307904X23000756",
+    "source_type": "publisher-landing-page",
+    "source_locator": "Publisher abstract",
+    "verified": "2026-11-13",
+    "title": "Facility and microgrid location-allocation for integrated supply chain and transactive energy operations",
+    "retrieval_note": "Abstract, complete publisher text returned by web search; direct page retrieval returned HTTP 403."
+  },
+  "li2023locating": {
+    "text": null,
+    "source": null,
+    "omission_reason": "No complete author abstract retrieved from the publisher; DOI retrieval unavailable.",
+    "attempted_sources": [
+      "https://doi.org/10.1109/SEGRE58867.2023.00071"
+    ],
+    "verified": "2026-11-13",
+    "title": "Locating and Allocating Warehouse Facilities and Prosumer Microgrid in Transactive Energy Paradigm"
+  },
+  "li2023techno": {
+    "text": "Power-to-X technologies with flexible electricity consumption has the potential improve the utilization of variable power generation. Both concentrated solar power (CSP) and photovoltaic (PV) plants can be used to produce green hydrogen, utilizing high temperature electrolyzers (HTE) or low temperature electrolyzers (LTE), respectively. There have been limited studies examining the feasibility of co-locating solar and hydrogen plants from a techno-economic standpoint. This paper presents a detailed analysis and optimization to compare the economic feasibility of an integrated CSP and HTE system versus an integrated PV and LTE system. It is assumed that the steam generated by the CSP is solely directed towards HTE, while the electricity produced by the PV system is either supplied to the grid or directed towards the LTE system. The Renewable Energy Integration & Optimization (REopt) and System Advisor Model (SAM) frameworks developed by the National Renewable Energy Laboratory (NREL) are adopted and modified to perform the analysis. The results of the case study indicate that the integrated CSP and HTE system is more economically feasible compared to the integrated PV and LTE system, mainly due to the lower cost of thermal energy storage.",
+    "source": "https://henryutd2021.github.io/files/papers/li2023techno.pdf",
+    "source_type": "posted-pdf",
+    "source_locator": "PDF page 1",
+    "sha256": "2fc7417362308fc8b1c1ad8ef28bf5f3dff4844285bf4cb1a5676728a4509086",
+    "transcription": "Author abstract; line wrapping, PDF ligatures, and typesetting normalized. No wording edited.",
+    "verified": "2026-11-13",
+    "title": "Techno-economic analysis for co-located solar and hydrogen plants"
+  },
+  "li2024techno": {
+    "text": "In this study, a comprehensive examination of wind-hydrogen energy systems is conducted through detailed techno-economic analysis and sensitivity analysis. The primary emphasis is on optimizing operation and maintenance (O&M) strategies and understanding the impacts of market dynamics. Utilizing Monte Carlo simulations, we first identify the optimal intelligent O&M plan, leading to significant reductions in annual O&M costs ($39.9/MW) and downtime (6.59 days per turbine) compared to conventional methods. The incorporation of prognostics and health management (PHM) further demonstrate a notable impact, leading to a 9.9% reduction in O&M costs and a 10.7% decrease in downtime. In the broader context, these outcomes translate into reductions in the O&M expenditures, total lifecycle costs of the system, Levelized Cost of Hydrogen (LCOH) and Levelized Cost of Energy (LCOE) by 3.9%, 0.75%, 2.4%, and 1.8%, respectively, highlighting the economic benefits of intelligent O&M strategies. The extensive sensitivity analysis, encompassing 54 scenarios, delves into the effects of maintenance strategies, hydrogen prices, wind energy share, and subsidies, revealing nuanced insights into cost savings and operational efficiencies. Notably, intelligent maintenance and favorable hydrogen subsidies effectively reduce LCOH, while the interplay between wind energy share and hydrogen pricing influences system profitability and efficiency, underscoring the complex dynamics at play in optimizing renewable energy systems.",
+    "source": "https://henryutd2021.github.io/files/papers/li2024techno.pdf",
+    "source_type": "posted-pdf",
+    "source_locator": "PDF page 1",
+    "sha256": "f960cd39d661a5f05076936c68af74dfafc76fb3f4925822e005c4fd414c60b0",
+    "transcription": "Author abstract; line wrapping, PDF ligatures, and typesetting normalized. No wording edited.",
+    "verified": "2026-11-13",
+    "title": "Techno-economic analysis incorporating intelligent operation and maintenance management: a case study of an integrated offshore wind and hydrogen energy system"
+  },
+  "li2024towards": {
+    "text": "This paper presents a comprehensive study that focuses on the techno-economic analysis of co-located wind and hydrogen energy integration within an Integrated Energy System (IES). The research investigates four distinct cases, each exploring various configurations of wind farms, electrolyzers, batteries, hydrogen storage tanks, and fuel cells. To obtain optimal results, the study employs a sophisticated mathematical optimization model formulated as a mixed-integer linear program. This model helps determine the most suitable component sizes and hourly energy scheduling patterns. The research utilizes historical meteorological data and wholesale market prices from diverse regions as inputs, enhancing the study’s applicability and relevance across different geographical locations. Moreover, sensitivity analyses are conducted to assess the impact of hydrogen prices, regional wind profiles, and potential future fluctuations in component prices. These analyses provide valuable insights into the robustness and flexibility of the proposed IES configurations under varying market conditions and uncertainties. The findings reveal cost-effective system configurations, strategic component selections, and implications of future energy scenarios. Specifically comparing to configurations that only have wind and battery combinations, we find that incorporating an electrolyzer results in a 7% reduction in the total cost of the IES, and utilizing hydrogen as the storage medium for fuel cells leads to a 26% cost reduction. Additionally, the IES with hybrid hydrogen and battery energy storage achieves even higher and stable power output. This research facilitates decision-making, risk mitigation, and optimized investment strategies, fostering sustainable planning for a resilient and environmentally friendly energy future.",
+    "source": "https://henryutd2021.github.io/files/papers/li2024towards.pdf",
+    "source_type": "posted-pdf",
+    "source_locator": "PDF page 1",
+    "sha256": "ff5d1cf2f46b46a257e748b3ac526d06b3f9a6ed9f0ca72a60a810f03cf5dcea",
+    "transcription": "Author abstract; line wrapping, PDF ligatures, and typesetting normalized. No wording edited.",
+    "verified": "2026-11-13",
+    "title": "Towards sustainable integration: techno-economic analysis and future perspectives of Co-located wind and hydrogen energy systems"
+  },
+  "shen2024demand": {
+    "text": "Electric power generation contributes to the second largest share of greenhouse gas (GHG) emissions in the US. The direct and indirect carbon emissions created from generating electricity vary from resources of generation, and power plant efficiency. Approximately 60% of the electricity comes from burning fossil fuels, mostly coal and natural gas, emitting more than 1500 million metric Tons of CO₂ per year. Depending on regions and time of day, the cleanness of electricity significantly varies as more and more intermittent renewable energy resources, such as solar and wind, being added into the grid. With the growing awareness and regulations on GHG emissions, the need for accurate carbon measurement and technologies that reduces GHG for both the supply and demand side is ever-increasing. To optimally control demand-side users such as buildings, balance supply and demand, and incorporate energy storage technologies to reduce overall GHG emissions, the real-time emission factor and its predictions play critical roles. Here, we use the open-source real-time electricity GHG Emission Factor that covers all states in the US and four sample buildings’ demand data from Nantum OS across different regions to propose an optimization framework for potential emission reduction through load shifting. This study highlights the importance to raise awareness, monitor, and account for real-time GHG emissions. Furthermore, it proves the viability to control buildings with electric energy storage system to reduce carbon emissions for demand-side users.",
+    "source": "https://henryutd2021.github.io/files/papers/shen2024demand.pdf",
+    "source_type": "posted-pdf",
+    "source_locator": "PDF page 1",
+    "sha256": "2e85cdced33bafb17e876d6677f90ccb200f7ae237226d420c9736fd2a2c1b82",
+    "transcription": "Author abstract; line wrapping, PDF ligatures, and typesetting normalized. No wording edited.",
+    "verified": "2026-11-13",
+    "title": "Demand-side Management Under Real-time Greenhouse Gas Emission Factor for Electricity"
+  },
+  "li2025ghg": {
+    "text": "The US targets net-zero-carbon electricity by 2035, emphasizing the need for both supply- and demand-side strategies in the power sector. Our study focuses on demand-side carbon reduction via load regulation, using real-time greenhouse gas emission data to optimize electricity use without reducing overall consumption. Our multi-scenario analysis indicates significant potential for carbon footprint reduction by adapting strategies to specific grid characteristics. For example, California could have 32.58% more emission reduction with annual instead of quarterly optimization. In grids with diverse generation resources, expanding adjustment ranges from ±5% to ±8% can boost carbon reductions from 1.19% to 1.64%. Our results also reveal low greenhouse gas intensity fluctuation areas as more cost sensitive in electricity consumption than high greenhouse gas intensity fluctuation areas, providing essential insights for policymakers.",
+    "source": "https://henryutd2021.github.io/files/papers/li2025ghg.pdf",
+    "source_type": "posted-pdf",
+    "source_locator": "PDF page 1",
+    "sha256": "92eabd02c5b6056fa9a69c30490fd89aa002ad3d2121e71dac22bc384ed84423",
+    "transcription": "Author abstract; line wrapping, PDF ligatures, and typesetting normalized. No wording edited.",
+    "verified": "2026-11-13",
+    "title": "Real-time greenhouse gas emission intensity informed demand-side load regulation for power grid decarbonization"
+  },
+  "li2025hydrogen": {
+    "text": "Texas, with its substantial wind and solar capacities, plays a pivotal role in the U.S. strategy to achieve net-zero emissions by 2050. Despite its leadership in wind energy generation and a growing solar sector, the integration of large-scale renewable energy in Texas faces significant challenges, primarily due to the intermittent nature of renewables and uncertainties surrounding future capacity expansion and demand growth. This study explores the potential of hydrogen as a solution to these challenges through a stochastic optimization model that accounts for the unpredictability of renewable energy installation timelines and fluctuations in electricity demand. The model designs a hydrogen network to mitigate geographical mismatches between energy supply and demand, providing a critical balancing mechanism. Our findings indicate that hydrogen can significantly enhance renewable energy penetration while reducing carbon emissions. Strategic placement of electrolyzers and hydrogen tanks, combined with inter-regional hydrogen transport, could satisfy up to 92.4% of hydrogen demand in certain regions. Additionally, annual hydrogen production across Electric Reliability Council of Texas (ERCOT) is projected to reach 131 tons, which corresponds to a carbon emissions reduction of 1,300 tons. Sensitivity analyses further reveal that higher electricity prices for combined cycle gas-turbine plants negatively impact the system’s overall energy efficiency, leading to an increase in carbon emissions. For instance, when electricity prices rise to $250 MWh⁻¹, annual system-wide carbon emissions increase by 310 kilotons compared to the benchmark scenario. This study highlights the critical role hydrogen can play in supporting Texas’s renewable energy ambitions and underscores the necessity for policy backing, investment, and advancements in both hydrogen and carbon capture technologies to fully realize its potential.",
+    "source": "https://henryutd2021.github.io/files/papers/li2025hydrogen.pdf",
+    "source_type": "posted-pdf",
+    "source_locator": "PDF page 2",
+    "sha256": "9cdab27e7f4e3e8e6b2eb9db1e3e2d35cffda40af7b0c432cf4bded7f3bffe80",
+    "transcription": "Author abstract; line wrapping, PDF ligatures, and typesetting normalized. No wording edited.",
+    "verified": "2026-11-13",
+    "title": "Hydrogen’s role in expanding renewable energy and reducing carbon emissions in Texas"
+  },
+  "li2025dissertation": {
+    "text": "The global energy transition is driven by the urgent need to achieve deep decarbonization while maintaining system reliability and economic viability. Yet, the variability of renewable resources and the limited flexibility of conventional baseload power remain key barriers to large-scale integration. Hydrogen has emerged as a versatile solution, capable of providing long-duration storage, enabling sector coupling, and enhancing the operational flexibility of energy systems. This dissertation develops three distinct techno-economic analysis (TEA) frameworks that integrate optimization modeling with lifecycle financial evaluation to systematically assess hydrogen’s role in advancing sustainable energy systems. The study explores three interconnected applications. It first examines the integration of hydrogen storage with renewable generation, showing how co-location strategies reduce curtailment and improve cost-effectiveness under diverse market and resource conditions. It then broadens the scope to the grid level, using the Texas power system as a case study to evaluate how hydrogen can mitigate uncertainty in renewable deployment and demand growth, while inter-regional hydrogen networks alleviate geographic mismatches and contribute to significant carbon reductions. Building on these insights, the framework is applied to nuclear power systems, where hydrogen production enhances operational flexibility, supports participation in ancillary service markets, and creates new revenue streams—outcomes that are further reinforced under favorable policy incentives. These analyses illustrate hydrogen’s capacity to serve as a unifying energy carrier across renewable and nuclear contexts. The findings emphasize that the effectiveness of hydrogen-enabled systems depends not only on technological performance but also on evolving cost trajectories, market mechanisms, and policy frameworks. By establishing a coherent analytical foundation and offering actionable insights, this dissertation provides guidance for policymakers, industry leaders, and researchers in designing resilient, economically viable, and carbon-neutral energy pathways where hydrogen plays a central role.",
+    "source": "https://henryutd2021.github.io/files/papers/li2025dissertation.pdf",
+    "source_type": "posted-pdf",
+    "source_locator": "PDF pages 6–7 (vi–vii)",
+    "sha256": "3f284ced73324036c179c10c4b5478885f11f4bd6b72051c9c8c6679ea69887e",
+    "transcription": "Author abstract; line wrapping, PDF ligatures, and typesetting normalized. No wording edited.",
+    "verified": "2026-11-13",
+    "title": "Techno-Economic Analysis of Hydrogen-Integrated Sustainable Energy Systems"
+  },
+  "Li2026": {
+    "text": "Nuclear power supplies reliable low-carbon electricity and high-temperature heat, but existing plants face growing pressure to operate more flexibly in markets with rising renewable penetration. Coupling nuclear reactors with hydrogen production through high-temperature electrolysis may improve flexibility and create additional value, yet its economic potential remains uncertain. Here we show that integrating nuclear generation with hydrogen production and ancillary service participation can substantially improve the economics and operational flexibility of nuclear energy systems. Using an hourly optimization model linked to lifecycle techno-economic analysis, we find that retrofitting existing reactors with high-temperature electrolysis increases average net present value from about -$1.06 billion to about $240 million without policy support, while expanding flexible output by more than 115 MW for most reactors. Policy incentives, cost reductions, and optimized market participation further strengthen the value of nuclear-hydrogen systems for reducing costs and supporting grid reliability.",
+    "source": "https://henryutd2021.github.io/files/papers/Li2026.pdf",
+    "source_type": "posted-pdf",
+    "source_locator": "PDF page 1",
+    "sha256": "02e20435a1078c9bfffa331800347f1f47f6bceb169678059c5cfadc7cfb743c",
+    "transcription": "Author abstract; line wrapping, PDF ligatures, and typesetting normalized. No wording edited.",
+    "verified": "2026-11-13",
+    "title": "Rethinking the economics and flexibility of U.S. nuclear power through hydrogen integration and policy support"
+  },
+  "jacob2026role": {
+    "text": "This paper presents a critical perspective on the potential of small modular reactors (SMRs) to address the rapidly increasing energy demands of the digital economy, particularly those driven by advancements in artificial intelligence (AI). Drawing on expertise in techno-economic analysis and the modeling and control of advanced nuclear reactors and integrated energy systems, we explore the prospects for deploying SMR technology to power energy-intensive data centers. We examine practical implementation pathways and identify the key technical, regulatory, and operational challenges that must be addressed for effective integration. The SMR-data center discussion is grounded on SMR designs, deployment configurations, grid integration strategies, and interactions with data center cooling systems. This perspective aims to assess the potential of SMR-powered data centers as a scalable and forward-looking solution to escalating electricity demands, emphasizing their role in enhancing energy resilience and sustainability.",
+    "source": "https://henryutd2021.github.io/files/papers/jacob2026role.pdf",
+    "source_type": "posted-pdf",
+    "source_locator": "PDF page 1",
+    "sha256": "10739b3baf078e021cc21835053b54506de043b99935a27f771c4ffa2ff94aae",
+    "transcription": "Author abstract; line wrapping, PDF ligatures, and typesetting normalized. No wording edited.",
+    "verified": "2026-11-13",
+    "title": "The role of small modular reactors in powering data centers for a sustainable digital economy"
+  },
+  "li2026code": {
+    "text": "Grid interconnection has become a binding constraint on artificial intelligence (AI) data center development, yet existing planning frameworks do not price service that arrives later than planned. This paper develops the Cost of Delayed Energization (CoDE), a present-value framework that maps delayed information technology (IT) capacity to grid MW and MVA requirements and prices the delay separately for developers, ratepayers, and society. Two decision metrics, delay cost intensity and the break-even acceleration payment, make results comparable across project sizes, delays, and mitigation options. For a 300 MW-IT project delayed 36 months, private CoDE is 714 million USD, or 66.1 thousand USD per MW-IT-month, and committed-capital carrying cost keeps it above 1.0 billion USD at 60 months even as realization probability decays. A one-year natural-gas bridge over the same delay avoids 257 million USD of private cost while adding 25–68 million USD of expected climate damage, and the delay itself adds 25 million USD of ratepayer exposure. Because these third-party effects are smaller than the private values they are set against by factors of about four to thirty, the operative planning question is who should fund acceleration and how pathway externalities are compensated.",
+    "source": "https://henryutd2021.github.io/files/papers/li2026code.pdf",
+    "source_type": "posted-pdf",
+    "source_locator": "PDF page 1",
+    "sha256": "cfb89e5850583870ab7b7f496ed6cb23bc3407be78b0c85b032be9fdb92339cc",
+    "transcription": "Author abstract; line wrapping, PDF ligatures, and typesetting normalized. No wording edited.",
+    "verified": "2026-11-13",
+    "title": "Quantifying the Cost of Delayed Energization (CoDE) for AI Data Centers"
+  },
+  "she2026inertia": {
+    "text": null,
+    "source": null,
+    "omission_reason": "Accepted conference paper; no posted PDF or reliable open publisher/arXiv abstract found by exact-title search.",
+    "attempted_sources": [],
+    "verified": "2026-11-13",
+    "title": "Inertia-Aware Planning of Grid-Forming Energy Storage and Firm Capacity under Thermal Retirement"
+  },
+  "li2026smrcogeneration": {
+    "text": "Hyperscale data centers are adding firm, high-utilization demand faster than grids can serve it, renewing interest in colocating them with small modular reactors. Such a plant could earn revenue in two ways, selling low-carbon power and diverting steam to absorption chillers that serve a cooling load accounting for 20-40% of facility electricity use, but neither revenue stream has been priced across the conditions that must coincide. Here we co-optimize reactor dispatch, steam extraction, absorption cooling and grid exchange hourly for a 200 MWₑ data center in the Electric Reliability Council of Texas (ERCOT) region, across 109 runs spanning capital, market, policy, financing and cooling efficiency. At 2023 mid-range reactor capital, the nuclear configurations cost 49-62% more than grid supply even with the Section 45Y production tax credit. The viable region opens near $5,000 kWₑ⁻¹, and nth-of-a-kind capital makes them 77-89% cheaper in 2023, though between parity and 34% more expensive in the low-price 2024 market. A carbon price of $53-64 tCO₂⁻¹ closes the mid-range gap under hourly export crediting. Absorption cooling is dispatched in response to hourly electricity prices and supplies 38% of annual cooling, at an added cost of $9.2 million yr⁻¹ relative to the reactor-only plant; that gap closes at an installed absorption cost of $60 kWc⁻¹ at baseline efficiency and $570 kWc⁻¹ on a legacy-efficiency campus, against surveyed commercial prices of $450-1,200 kWc⁻¹. Together these results delineate the capital, market and policy conditions under which colocated reactor cogeneration is competitive with grid procurement, and the range over which each condition moves the outcome.",
+    "source": "https://arxiv.org/abs/2608.10999v1",
+    "source_type": "arxiv",
+    "source_locator": "Abstract, version 1 (11 August 2026)",
+    "transcription": "Author abstract; mathematical subscripts and superscripts transcribed as Unicode where available (cooling subscript c is formatted in HTML), line wrapping normalized. No wording edited.",
+    "verified": "2026-11-13",
+    "title": "Techno-Economic Boundary Analysis of Small Modular Reactor Cogeneration for Hyperscale Data Center IT and Cooling Loads"
+  }
+}

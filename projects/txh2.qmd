@@ -90,7 +90,7 @@ toc: false
 <li class="pub" data-type="journal" data-year="2025">
 <div class="pub-badge"><span class="abbr pt-journal">Int. J. Hydrogen Energy</span></div>
 <div class="pub-main">
-<div class="pub-title">Hydrogen’s role in expanding renewable energy and reducing carbon emissions in Texas</div>
+<div class="pub-title"><a href="../files/papers/li2025hydrogen.html">Hydrogen’s role in expanding renewable energy and reducing carbon emissions in Texas</a></div>
 <div class="pub-authors"><span class="me">H. Li</span>, J. Zhang</div>
 <div class="pub-venue"><em>International Journal of Hydrogen Energy</em>, vol. 113, pp. 77–89, 2025.</div>
 <div class="pub-links">

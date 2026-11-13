@@ -1,0 +1,65 @@
+{
+  "https://github.com/Henryutd2021/nuclear-hydrogen-integration": {
+    "license": "https://opensource.org/license/mit/",
+    "programmingLanguage": "Python",
+    "source": "https://github.com/Henryutd2021/nuclear-hydrogen-integration/blob/main/pyproject.toml",
+    "source_sha": "535d37afe80d7b086a73d6ee5445fd9b6c59a91d",
+    "verified": "2026-11-13"
+  },
+  "https://github.com/Henryutd2021/smr-datacenter-cogeneration": {
+    "license": "https://opensource.org/license/mit/",
+    "programmingLanguage": "Python",
+    "source": "https://github.com/Henryutd2021/smr-datacenter-cogeneration/blob/main/pyproject.toml",
+    "source_sha": "0bc3b5426a5ac74bd9fd17f2cd4c241c2bfdef96",
+    "verified": "2026-11-13"
+  },
+  "https://github.com/Henryutd2021/code-delayed-energization": {
+    "license": "https://opensource.org/license/mit/",
+    "programmingLanguage": "Python",
+    "source": "https://github.com/Henryutd2021/code-delayed-energization/blob/main/pyproject.toml",
+    "source_sha": "46ce09534de4ce22e1c6d988cda39054fc655205",
+    "verified": "2026-11-13"
+  },
+  "https://github.com/Henryutd2021/txh2-ercot-hydrogen": {
+    "license": "https://opensource.org/license/mit/",
+    "programmingLanguage": "Python",
+    "source": "https://github.com/Henryutd2021/txh2-ercot-hydrogen/blob/main/pyproject.toml",
+    "source_sha": "98c134775ac1fc2b9d1945b63dff642e60661b46",
+    "verified": "2026-11-13"
+  },
+  "https://github.com/Henryutd2021/reopt-hydrogen-framework": {
+    "license": "https://opensource.org/license/mit/",
+    "programmingLanguage": "Python",
+    "source": "https://github.com/Henryutd2021/reopt-hydrogen-framework/blob/main/pyproject.toml",
+    "source_sha": "9a4a94730af6766cb19f37922b24c2f517c4d316",
+    "verified": "2026-11-13"
+  },
+  "https://github.com/Henryutd2021/ghg-load-regulation": {
+    "license": "https://opensource.org/license/mit/",
+    "programmingLanguage": "Python",
+    "source": "https://github.com/Henryutd2021/ghg-load-regulation/blob/main/pyproject.toml",
+    "source_sha": "f179efb831eec7e54fcda635980af0b90a863a95",
+    "verified": "2026-11-13"
+  },
+  "https://github.com/Henryutd2021/supply-chain-microgrid-models": {
+    "license": "https://opensource.org/license/mit/",
+    "programmingLanguage": "Python",
+    "source": "https://github.com/Henryutd2021/supply-chain-microgrid-models/blob/main/pyproject.toml",
+    "source_sha": "bf43def753b57befc6357ae9c3cb41f9d9371482",
+    "verified": "2026-11-13"
+  },
+  "https://github.com/Henryutd2021/wind-uq-surrogate": {
+    "license": "https://opensource.org/license/mit/",
+    "programmingLanguage": "Python",
+    "source": "https://github.com/Henryutd2021/wind-uq-surrogate/blob/main/pyproject.toml",
+    "source_sha": "b28585b572cb0be31385157c11c008adaaed8914",
+    "verified": "2026-11-13"
+  },
+  "https://github.com/Henryutd2021/mfgpr-wind-power-curve": {
+    "license": "https://opensource.org/license/mit/",
+    "programmingLanguage": "Python",
+    "source": "https://github.com/Henryutd2021/mfgpr-wind-power-curve/blob/main/pyproject.toml",
+    "source_sha": "0467d197be3bee78b58941e4a5597e86f8482e75",
+    "verified": "2026-11-13"
+  }
+}
