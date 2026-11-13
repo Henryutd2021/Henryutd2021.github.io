@@ -103,7 +103,7 @@ const QPATH = path.join(X.SITE, "learn/c4-prairieland-2050.qmd");
     // for a brief written without JavaScript: what each shock changes, and the default pathway's assumptions (as the live note has them)
     E4.tableHTML(["Shock", "When, in the model", "What changes", "What the re-plan keeps"], E4.shockTable(P), "c4-shockwhat e4-wrap") +
     '<p class="lx-eyebrow">The default pathway\'s assumptions, for the brief</p><ul class="c4-assume">' + PG.assumptions(def, af, jb, e0.view, e0.full, E4).map(x => "<li>" + E4.esc(x) + "</li>").join("") + "</ul>";
-  const BLOCKS = { "c4-plan": () => SS.staticHTML(S, def), "c4-results": fbRes, "c4-note": () => RN.outlineHTML(PG.FIELDS), "c4-exemplars": () => EX.staticHTML(exd), "c4-rubric": () => RB.staticHTML(PG.RUBRIC, { bar: PG.RUBRIC_BAR }), "c4-inputs": () => E4.inputsHTML(P) };
+  const BLOCKS = { "c4-plan": () => SS.staticHTML(S, def), "c4-results": fbRes, "c4-note": () => RN.outlineHTML(PG.FIELDS, { appendix: PG.APPENDIX }), "c4-exemplars": () => EX.staticHTML(exd), "c4-rubric": () => RB.staticHTML(PG.RUBRIC, { bar: PG.RUBRIC_BAR }), "c4-inputs": () => E4.inputsHTML(P) };
   if (process.argv.includes("--write")) { const b = {}; Object.keys(BLOCKS).forEach(k => { b[k] = BLOCKS[k](); }); X.writeBlocks(QPATH, b); console.log("wrote the c4 blocks"); }
   const PAGE = fs.readFileSync(QPATH, "utf8"), T = X.norm(PAGE), JS = fs.readFileSync(L("c4-prairieland-2050.js"), "utf8");
   Object.keys(BLOCKS).forEach(k => { const r = X.between(PAGE, k); ok(r && r.text === BLOCKS[k]() + "\n", k + " block is up to date (run with --write)"); });
@@ -151,6 +151,9 @@ const QPATH = path.join(X.SITE, "learn/c4-prairieland-2050.qmd");
   ok(PG.ownWords(w1, RN.countWords) === RN.countWords(exText) && PG.ownWords(w1, RN.countWords) <= PG.TWO_PAGES && PG.ownWords(big, RN.countWords) > PG.TWO_PAGES && /PG\.ownWords|ownWords\(words, LX\.ReportNote\.countWords\) <= TWO_PAGES/.test(CJS) && /the evidence the page adds, about 1,000 words of tables and assumptions, comes on top/.test(CJS) && addWords >= 800 && addWords <= 1250,
     "the two-page check counts the learner's own words (the strong exemplar's " + RN.countWords(exText) + " pass; six fields of 200 words fail), not the tables the page adds");
   ok(/the demand surprise lasts from 2031 to 2050/.test(CJS) && !/each shock lasts five years/.test(CJS), "shock durations: three last one period, the demand surprise 2031-2050");
+  { const nt = RN.compose({ heading: "x", plan: [{ label: "p", value: "1" }], results: [{ label: "r", value: "2" }], assumptions: ["a"], limits: ["l"] }, w1, PG.FIELDS, { date: "x", appendix: PG.APPENDIX });
+    ok(PG.APPENDIX === "Appendix: evidence from the run" && /fields: FIELDS, appendix: APPENDIX,/.test(CJS) && nt.indexOf("APPENDIX: EVIDENCE FROM THE RUN") > nt.indexOf(PG.FIELDS[PG.FIELDS.length - 1].label.toUpperCase()) && nt.indexOf("APPENDIX: EVIDENCE FROM THE RUN") < nt.indexOf("THE PLAN"),
+       "the brief: the learner's two pages first, the run's evidence after them under its appendix heading (the live note and the outline)"); }
   ok(CT.indexOf("What the re-plan keeps") >= 0 && CT.indexOf("The default pathway's assumptions, for the brief") >= 0, "the no-JS fallback carries the shock table and the default assumptions");
 
   // ---------------- the page frame

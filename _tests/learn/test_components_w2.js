@@ -260,7 +260,7 @@ function timeline() {
   const vb = TL.validate([{ date: "May 2023", label: "x", source: { label: "s" } }, { date: "2023", source: { label: "s", url: "ftp://x" } }, { date: "2023", label: "y" }, { date: "2023", label: "z", kind: "rumour", source: { label: "s", as_of: "soon" } }]);
   ok(vb.some(p => /date "May 2023"/.test(p)) && vb.some(p => /no label/.test(p)) && vb.some(p => /not http/.test(p)) && vb.some(p => /no source/.test(p)) && vb.some(p => /unknown kind rumour/.test(p)) && vb.some(p => /as_of "soon"/.test(p)), "timeline: validate() names each problem");
   const st = TL.staticHTML(evs);
-  ok(st.indexOf('<ol class="lx-tl-static"><li><b>2023</b> · Data year. Hourly <span class="lx-term" data-term="load">load</span> from <b>EIA-930</b>. <span class="lx-hint">Source: <a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>, as of 1 November 2025; Utility report</span></li>') === 0, "timeline: staticHTML, in date order, with sources");
+  ok(st.indexOf('<ol class="lx-tl-static"><li><b>2023</b><br> Data year.<br> Hourly <span class="lx-term" data-term="load">load</span> from <b>EIA-930</b>.<br> <span class="lx-hint">Source: <a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>, as of 1 November 2025; Utility report</span></li>') === 0, "timeline: staticHTML, in date order, date, label, finding and source on lines of their own");
   const E = env(); load("timeline", E);
   const host = E.LX.H("div", null, E.body), tl = E.LX.Timeline(host, { title: "The study in time", events: evs, note: "Dates as published." });
   const lis = host.querySelectorAll("li.lx-tl-ev");

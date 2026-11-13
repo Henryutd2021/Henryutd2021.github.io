@@ -20,7 +20,9 @@
                                  competences in the capstone's own words. The research studios use neither option.
    Returns { el, picks(), set(id, level), clear(), summary() }.
    The words of the levels are the course rubric's own and are not reworded per studio (a capstone may override one
-   competence's, above); "Not yet" has no anchored
+   competence's, above). A competence may carry `reads`, one line on how its words read for a kind of work they do not
+   name (Framing's: a descriptive question), under its name live and under the table in the static version. "Not yet"
+   has no anchored
    description there, so it reads "Developing is not reached yet". Each competence is a fieldset of native radio buttons
    (Tab to the group, arrow keys move, Space picks); each radio's label carries its level and the anchored description,
    so the ladder is the control. The result line (aria-live) counts competences at Proficient or above. "Copy my
@@ -41,7 +43,8 @@
     { id: "framing", label: "Framing", builtIn: "R1, R3, R10",
       developing: "question vague or untyped; no audience or counterfactual",
       proficient: "typed question with audience or decision-maker, metric with units, counterfactual, scale and boundary; one falsification statement",
-      strong: "also explains why the question matters to its audience and what answer would change a decision" },
+      strong: "also explains why the question matters to its audience and what answer would change a decision",
+      reads: "for a descriptive question, the counterfactual is the reference its count is compared with; the falsification statement, an expectation stated before counting or a check on the count" },
     { id: "positioning", label: "Positioning", builtIn: "R2",
       developing: "a few sources, no map",
       proficient: "concept matrix of at least 12 sources; a stated gap with evidence",
@@ -71,8 +74,8 @@
       proficient: "six-page paper; one key figure; a limits paragraph; a 150-word public summary",
       strong: "a briefing a decision-maker could act on without misreading" },
     { id: "integrity", label: "Integrity", builtIn: "R9",
-      developing: "licences or credit unchecked",
-      proficient: "licences checked, credit and conflicts stated, stakeholders treated fairly",
+      developing: "licenses or credit unchecked",
+      proficient: "licenses checked, credit and conflicts stated, stakeholders treated fairly",
       strong: "data and code released with documentation where allowed" }
   ];
   var NOT_YET = "Developing is not reached yet.";
@@ -89,7 +92,7 @@
     var lv = (c && c.levels) || {}, own = Object.keys(lv);
     own.forEach(function (k) { if (["developing", "proficient", "strong"].indexOf(k) < 0) throw new Error("LX.Rubric: no level " + JSON.stringify(k) + " to reword (developing, proficient, strong)"); });
     function w(k) { return sentence(lv[k] || base[k]); }
-    var C = { id: base.id, label: base.label, builtIn: base.builtIn, look: (c && c.look) || null,
+    var C = { id: base.id, label: base.label, builtIn: base.builtIn, look: (c && c.look) || null, reads: base.reads || null,
       text: { "not-yet": NOT_YET, developing: w("developing"), proficient: w("proficient"), strong: w("strong") } };
     if (own.length) C.own = ["developing", "proficient", "strong"].filter(function (k) { return lv[k]; });
     return C;
@@ -131,7 +134,9 @@
         var C = competence(c);
         return '<tr><th scope="row">' + esc(C.label) + (C.look ? '<br><span class="lx-hint">Look for: ' + esc(C.look) + "</span>" : "") + "</th>"
           + LEVELS.slice(1).map(function (L) { return '<td data-l="' + esc(L.label) + '">' + esc(C.text[L.id]) + "</td>"; }).join("") + "</tr>";
-      }).join("") + "</tbody></table></div>";
+      }).join("") + "</tbody></table></div>" + list.map(competence).filter(function (C) { return C.reads; }).map(function (C) {
+        return '<p class="lx-hint lx-rb-reads"><b>' + esc(C.label) + ",</b> " + esc(C.reads) + ".</p>";
+      }).join("");
   }
   var api = { VERSION: VERSION, LEVELS: LEVELS, COMPETENCES: COMPETENCES, competence: competence, count: count, summary: summary,
               staticHTML: staticHTML, resultText: resultText };
@@ -152,6 +157,7 @@
       var fs = H("fieldset", { class: "lx-rb-comp" }, box), name = LX.uid("rb");
       var lg = H("legend", null, fs); H("b", { text: C.label }, lg);
       if (C.look) H("p", { class: "lx-rb-look", html: "<b>Look for:</b> " + LX.rich(C.look) }, fs);
+      if (C.reads) H("p", { class: "lx-rb-look lx-rb-reads", html: "<b>" + LX.esc(C.label) + ",</b> " + LX.esc(C.reads) + "." }, fs);
       var row = H("div", { class: "lx-rb-levels" }, fs);
       radios[C.id] = LEVELS.map(function (L) {
         var lab = H("label", { class: "lx-rb-level " + L.id + (L.bar ? " bar" : "") }, row);

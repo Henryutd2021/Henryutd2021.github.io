@@ -56,7 +56,7 @@ body-classes: "page-learn page-lesson lx-form-case"
 <div class="lx-fallback">
 <p class="lx-eyebrow">The study in time</p>
 <!-- cf6-timeline:start (written from the data file by LX.Timeline's staticHTML in the test's --write mode; do not edit) -->
-<ol class="lx-tl-static"><li><b>May 2025</b> · Journal article (this case). Load re-timed by hourly average emission intensity in U.S. grid regions, with windows of a month, a quarter or a year. <span class="lx-hint">Source: <a href="https://doi.org/10.1016/j.crsus.2025.100367">Li et al. (2025), Cell Reports Sustainability 2, 100367</a></span></li><li><b>30 October 2026</b> · Code released. <span class="lx-hint">Source: <a href="https://github.com/Henryutd2021/ghg-load-regulation">ghg-load-regulation on GitHub</a>, as of 3 November 2026</span></li></ol>
+<ol class="lx-tl-static"><li><b>May 2025</b><br> Journal article (this case).<br> Load re-timed by hourly average emission intensity in U.S. grid regions, with windows of a month, a quarter or a year.<br> <span class="lx-hint">Source: <a href="https://doi.org/10.1016/j.crsus.2025.100367">Li et al. (2025), Cell Reports Sustainability 2, 100367</a></span></li><li><b>30 October 2026</b><br> Code released.<br> <span class="lx-hint">Source: <a href="https://github.com/Henryutd2021/ghg-load-regulation">ghg-load-regulation on GitHub</a>, as of 3 November 2026</span></li></ol>
 <!-- cf6-timeline:end -->
 </div>
 </div>

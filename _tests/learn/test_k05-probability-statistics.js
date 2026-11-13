@@ -240,11 +240,12 @@ function sgn2(v) { return K.sgn(v, 2); }
       ok(v[1] + v[3] + v[5] === 100 && v[1] > 0 && v[3] > 0 && v[5] > 0 && near(it.answer, (v[0] * v[1] + v[2] * v[3] + v[4] * v[5]) / 100, 1e-9) && it.why.indexOf(String(it.answer) + " MW") >= 0, `drill ${seed}/${i}: ev ${it.q} -> ${it.answer}`);
     }
     if (it.kind === "sample") {
-      const m = /sample 1, ([\d,]+) hours, ([\d,]+) of them above \(([\d.]+)%\); sample 2, ([\d,]+) hours, ([\d,]+) of them above \(([\d.]+)%\)\. Which share is more trustworthy\?$/.exec(it.q);
-      ok(m && it.q.split(/(?<=[.?!])\s+(?=[A-Z])/).length <= 2 && it.q.split(/\s+/).length <= 36, `drill ${seed}/${i}: the sample question is two sentences, at most 36 words`);
-      const v = m ? m.slice(1).map(t => +t.replace(/,/g, "")) : [];
+      // the two samples in a small table under a one-line question (the drill's item table)
+      const T = it.table, m = T && T.head.join("|") === "Sample|Hours|Hours above|Share above" && T.rows.length === 2 && T.rows[0][0] === "Sample 1" && T.rows[1][0] === "Sample 2";
+      ok(m && it.q === "Two random samples of hours count demand more than 5% above the forecast. Which share is more trustworthy?", `drill ${seed}/${i}: the sample question is two short sentences, the samples in a table`);
+      const v = m ? [].concat(...T.rows.map(r => [+String(r[1]).replace(/,/g, ""), +String(r[2]).replace(/,/g, ""), parseFloat(r[3])])) : [];
       ok(m && it.answer === (v[0] > v[3] ? 0 : 1), `drill ${seed}/${i}: the bigger sample`);
-      ok(m && [0, 3].every(j => Number.isInteger(v[j + 1]) && v[j + 1] >= 0 && v[j + 1] <= v[j] && near(100 * v[j + 1] / v[j], v[j + 2], 1e-9)), `drill ${seed}/${i}: each share is a whole number of hours out of its sample: ${it.q}`);
+      ok(m && [0, 3].every(j => Number.isInteger(v[j + 1]) && v[j + 1] >= 0 && v[j + 1] <= v[j] && near(100 * v[j + 1] / v[j], v[j + 2], 1e-9)), `drill ${seed}/${i}: each share is a whole number of hours out of its sample: ${JSON.stringify(T && T.rows)}`);
     }
     ok(it.choices || (typeof it.answer === "number" && isFinite(it.answer) && it.tol > 0), `drill ${seed}/${i}: a numeric answer with a tolerance`);
   }));

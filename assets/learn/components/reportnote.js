@@ -30,6 +30,10 @@
                   or one sentence (a string)
      limits       ["It leaves out ...", ...]
      footer       optional; default: a teaching model with illustrative assumptions, not advice for a real site
+   o.appendix (and opt.appendix in the pure functions): a heading such as "Appendix: evidence from the run". The note then
+     puts all the reader's own fields first and the run's evidence (plan, results, assumptions, sensitivity, limits) after
+     it under that heading: "## " in Markdown, a ruled capitalized line in text, an h4 in the preview, and a second list
+     in outlineHTML (a capstone whose page limit counts only the reader's writing, C4)
    Pure (Node: require("components/reportnote.js"); also on LX.ReportNote): compose(note, words, fields, { format, date,
      code, title }), html(note, words, fields, opt) (the preview), sensitivityLine(s), checks(note, words, fields, list,
      opt), outlineHTML(fields, opt) (the no-JS fallback: the note's headings in order, with what goes under each),
@@ -79,6 +83,8 @@
     out.push({ title: title, head: head });
     function field(f) { var v = value(words, f.key); out.push({ h: f.heading || f.label, para: v || "(not written yet)", empty: !v }); }
     fields.filter(function (f) { return f.at === "top"; }).forEach(field);
+    // opt.appendix: the reader's own writing first, then the run's evidence under that heading
+    if (opt.appendix) { fields.filter(function (f) { return f.at !== "top"; }).forEach(field); out.push({ appx: opt.appendix }); }
     if (list(n.plan).length) out.push({ h: "The plan", table: { head: ["Choice", "Value"], rows: n.plan.map(function (p) { return [p.label, p.value]; }) } });
     if (list(n.results).length) out.push({ h: "Results", table: { head: ["Result", "Value"], rows: n.results.map(function (r) { return [r.label, r.value + (r.note ? " (" + r.note + ")" : "")]; }) } });
     out.push({ h: "Assumptions", list: list(n.assumptions).map(sentence), none: "(none stated)" });
@@ -87,7 +93,7 @@
       : s && typeof s === "object" && s.base && list(s.cases).length ? { head: [s.inputLabel || oneLine(s.input).replace(/^the /, ""), s.metric],
       rows: [[s.base.at + " (this plan)", s.base.value]].concat(s.cases.map(function (c) { return [c.at, c.value]; })) } : null;
     out.push({ h: "Sensitivity", para: sl || "(no sensitivity line yet)", empty: !sl, table: st, tableMdOnly: !multi(s) });
-    fields.filter(function (f) { return f.at !== "top"; }).forEach(field);
+    if (!opt.appendix) fields.filter(function (f) { return f.at !== "top"; }).forEach(field);
     if (list(n.limits).length) out.push({ h: "Limits of this analysis", list: list(n.limits).map(sentence) });
     out.push({ foot: n.footer || FOOTER });
     return out;
@@ -102,6 +108,7 @@
         return;
       }
       if (p.foot) { L.push(""); L.push(md ? "*" + p.foot + "*" : p.foot); return; }
+      if (p.appx) { L.push(""); if (!md) L.push("----"); L.push(md ? "## " + oneLine(p.appx) : oneLine(p.appx).toUpperCase()); return; }
       L.push("");
       L.push(md ? "### " + p.h : p.h.toUpperCase());
       if (p.table && (md || !p.tableMdOnly)) {
@@ -128,6 +135,7 @@
         return;
       }
       if (p.foot) { h.push('<p class="lx-rn-foot-line">' + esc(p.foot) + "</p>"); return; }
+      if (p.appx) { h.push('<h4 class="lx-rn-appx">' + esc(p.appx) + "</h4>"); return; }
       h.push("<h5>" + esc(p.h) + "</h5>");
       if (p.table && !p.tableMdOnly) h.push('<table class="lx-rn-table"><tbody>' + p.table.rows.map(function (r) { return '<tr><th scope="row">' + esc(r[0]) + "</th><td>" + esc(r[1]) + "</td></tr>"; }).join("") + "</tbody></table>");
       if (p.list) h.push(p.list.length ? "<ul>" + p.list.map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ul>" : '<p class="lx-rn-empty">' + esc(p.none) + "</p>");
@@ -170,8 +178,11 @@
     opt = opt || {}; fields = fields || [];
     var w = function (f) { return "<li><b>" + esc(f.heading || f.label) + ":</b> " + esc(f.hint || "in your words") + "</li>"; };
     var t = function (k) { var x = (opt[k] || OUTLINE[k]).split(": "); return "<li><b>" + esc(x[0]) + ":</b> " + esc(x.slice(1).join(": ")) + "</li>"; };
-    return '<ol class="lx-rn-outline">' + t("head") + fields.filter(function (f) { return f.at === "top"; }).map(w).join("") + t("plan") + t("results")
-      + t("assumptions") + t("sensitivity") + fields.filter(function (f) { return f.at !== "top"; }).map(w).join("") + t("limits") + "</ol>";
+    var top = fields.filter(function (f) { return f.at === "top"; }).map(w).join(""), rest = fields.filter(function (f) { return f.at !== "top"; }).map(w).join("");
+    if (opt.appendix) return '<ol class="lx-rn-outline">' + t("head") + top + rest + "</ol>" + '<p class="lx-rn-appx-h"><b>' + esc(opt.appendix) + ':</b> the run\'s evidence, after your writing</p><ol class="lx-rn-outline">'
+      + t("plan") + t("results") + t("assumptions") + t("sensitivity") + t("limits") + "</ol>";
+    return '<ol class="lx-rn-outline">' + t("head") + top + t("plan") + t("results")
+      + t("assumptions") + t("sensitivity") + rest + t("limits") + "</ol>";
   }
   function headText(c) { return c.pass + " of " + c.total + " parts in place" + (c.all ? ": the note is ready to copy." : ". You can copy the note at any time."); }
   var api = { compose: compose, html: html, outlineHTML: outlineHTML, sensitivityLine: sensitivityLine, checks: checks, countWords: countWords, headText: headText,
@@ -214,7 +225,7 @@
     var copyBox = H("div", { class: "lx-rn-copy", hidden: true }, box);
     var area = H("textarea", { readonly: true, rows: "12", "aria-label": "Your note as text" }, copyBox);
     H("p", { class: "lx-hint", text: o.privacy || "The note is built in this page from your plan. Nothing leaves the page unless you copy it; your own words stay in this browser and are not part of the plan link." }, box);
-    function opt(format) { return { format: format, code: o.code, title: o.title, date: new Date().toISOString().slice(0, 10) }; }
+    function opt(format) { return { format: format, code: o.code, title: o.title, appendix: o.appendix || null, date: new Date().toISOString().slice(0, 10) }; }
     function current() { return checks(note, words, fields, o.checks, opt("text")); }
     function paint() {
       if (!note) page.innerHTML = '<p class="lx-rn-empty">' + LX.esc(o.empty || "Run your plan first: the note fills in from its results.") + "</p>";

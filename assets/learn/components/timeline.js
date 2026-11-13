@@ -88,11 +88,12 @@
       return (s.url ? '<a href="' + esc(s.url) + '">' + esc(s.label) + "</a>" : esc(s.label)) + (s.as_of ? ", as of " + esc(fmt(s.as_of)) : "");
     }).join("; ");
   }
+  // the no-JS list: each event's date, label, finding and source on lines of their own (as the live timeline sets them)
   function staticHTML(events, opt) {
     opt = opt || {};
     return '<ol class="lx-tl-static">' + sortEvents(events, opt.order).map(function (e) {
-      return "<li><b>" + esc(fmt(e.date)) + "</b> · " + esc(e.label) + "." + (e.text ? " " + rich(e.text) : "")
-        + ' <span class="lx-hint">Source: ' + srcHTML(e) + "</span></li>";
+      return "<li><b>" + esc(fmt(e.date)) + "</b><br> " + esc(e.label) + "." + (e.text ? "<br> " + rich(e.text) : "")
+        + '<br> <span class="lx-hint">Source: ' + srcHTML(e) + "</span></li>";
     }).join("") + "</ol>";
   }
   var api = { parse: parse, fmt: fmt, sortEvents: sortEvents, gap: gap, validate: validate, staticHTML: staticHTML, KINDS: KINDS };

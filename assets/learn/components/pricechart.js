@@ -11,7 +11,8 @@
      ghost       an earlier run as a dashed grey step line, named ghostLabel in the legend (default "Before")
      sel         the selected hour, shaded; with onPick a tap on an hour, or ← → Home End on the focused chart, picks it
    The y axis runs from $0 to a round top (at least $100, in steps of $50) with four gridlines; the time axis is marked
-   every 6 hours (every 12 under 480 px); hovering shows the hour's prices; the text version is a table of every hour.
+   every 6 hours (every 12 under 480 px); hovering shows the hour's prices (the ghost's too); the text version is a table
+   of every hour, with the ghost as its last column (textTable).
    ch.el is the chart element.
 
    var hp = LX.HourPicker(host, { start: 12, jumps: [[19, "19:00"], [12, "12:00"]], onChange: function (t) {}, label: "Hour" });
@@ -30,7 +31,13 @@
   }
   // pixel offsets that keep equal step lines apart: 1.6 px per series, centred on the middle one
   function offsets(n) { var o = []; for (var k = 0; k < n; k++) o.push(n > 1 ? (k - (n - 1) / 2) * 1.6 : 0); return o; }
-  var pure = { hh: hh, priceTop: priceTop, offsets: offsets };
+  // the text version: one row per hour, a column per series and, when there is one, a column for the dashed earlier run
+  function textTable(series, ghost, ghostLabel, unit) {
+    var u = " (" + (unit || "$/MWh") + ")";
+    return { head: ["Hour"].concat(series.map(function (s) { return s.label + u; }), ghost ? [(ghostLabel || "Before") + ", dashed" + u] : []),
+             rows: series[0].v.map(function (x, t) { return [hh(t)].concat(series.map(function (s) { return Math.round(s.v[t]); }), ghost ? [Math.round(ghost[t])] : []); }) };
+  }
+  var pure = { hh: hh, priceTop: priceTop, offsets: offsets, textTable: textTable };
   if (typeof module !== "undefined" && module.exports) module.exports = pure;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -49,6 +56,7 @@
       });
       if (st.ghost) legend.push({ label: o.ghostLabel || "Before", dash: true });
       var money = function (v) { var r = Math.round(v); return (r < 0 ? "−$" : "$") + Math.abs(r).toLocaleString("en-US"); };
+      var ghostLabel = o.ghostLabel || "Before";
       return {
         x: { min: 0, max: n, ticks: hours([0, 6, 12, 18, 24]), ticksN: hours([0, 12, 24]) },
         y: { min: 0, max: top, ticks: [0, 1, 2, 3, 4].map(function (k) { return [k * top / 4, "$" + k * top / 4]; }) },
@@ -58,11 +66,11 @@
         tip: function (x) {
           var t = Math.min(n - 1, Math.floor(x));
           return "<div><b>" + hh(t) + "–" + (t + 1 === 24 ? "24:00" : hh(t + 1)) + "</b></div>" +
-            ser.map(function (s) { return "<div><span>" + LX.esc(s.label) + "</span><b>" + money(s.v[t]) + "</b></div>"; }).join("");
+            ser.map(function (s) { return "<div><span>" + LX.esc(s.label) + "</span><b>" + money(s.v[t]) + "</b></div>"; }).join("") +
+            (st.ghost ? "<div><span>" + LX.esc(ghostLabel) + " (dashed)</span><b>" + money(st.ghost[t]) + "</b></div>" : "");
         },
         aria: o.label || "Price in each hour, dollars per MWh.",
-        text: { head: ["Hour"].concat(ser.map(function (s) { return s.label + " (" + (o.unit || "$/MWh") + ")"; })),
-                rows: ser[0].v.map(function (x, t) { return [hh(t)].concat(ser.map(function (s) { return Math.round(s.v[t]); })); }) }
+        text: textTable(ser, st.ghost, ghostLabel, o.unit)
       };
     }
     return {

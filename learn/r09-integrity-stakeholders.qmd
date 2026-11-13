@@ -167,7 +167,7 @@ body-classes: "page-learn page-lesson lx-form-studio"
 <div id="r09-rubric" class="lx-xgrid">
 <div class="lx-fallback">
 <!-- r09-rubric:start (written by LX.Rubric's staticHTML, from the course rubric, in the test's --write mode; do not edit) -->
-<div class="lx-scroll-x"><table class="lx-facts lx-rb-static"><thead><tr><th scope="col">Competence</th><th scope="col">Developing</th><th scope="col">Proficient (the bar)</th><th scope="col">Strong</th></tr></thead><tbody><tr><th scope="row">Integrity<br><span class="lx-hint">Look for: Your statement covers funding and conflicts, contributor roles, the terms of every data source, ethics review and consent, and how the people affected were heard.</span></th><td data-l="Developing">Licences or credit unchecked.</td><td data-l="Proficient">Licences checked, credit and conflicts stated, stakeholders treated fairly.</td><td data-l="Strong">Data and code released with documentation where allowed.</td></tr></tbody></table></div>
+<div class="lx-scroll-x"><table class="lx-facts lx-rb-static"><thead><tr><th scope="col">Competence</th><th scope="col">Developing</th><th scope="col">Proficient (the bar)</th><th scope="col">Strong</th></tr></thead><tbody><tr><th scope="row">Integrity<br><span class="lx-hint">Look for: Your statement covers funding and conflicts, contributor roles, the terms of every data source, ethics review and consent, and how the people affected were heard.</span></th><td data-l="Developing">Licenses or credit unchecked.</td><td data-l="Proficient">Licenses checked, credit and conflicts stated, stakeholders treated fairly.</td><td data-l="Strong">Data and code released with documentation where allowed.</td></tr></tbody></table></div>
 <!-- r09-rubric:end -->
 </div>
 </div>
