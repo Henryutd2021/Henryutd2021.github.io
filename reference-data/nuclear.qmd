@@ -480,19 +480,19 @@ css: ../assets/reference-data.css
   ],
   "citation": [
     {
-      "@type": "ScholarlyArticle",
+      "@type": "CreativeWork",
       "name": "Rethinking the economics and flexibility of U.S. nuclear power through hydrogen integration and policy support",
       "url": "https://henryutd2021.github.io/files/papers/Li2026.html",
       "sameAs": "https://doi.org/10.1038/s41467-026-73630-y"
     },
     {
-      "@type": "ScholarlyArticle",
+      "@type": "CreativeWork",
       "name": "The role of small modular reactors in powering data centers for a sustainable digital economy",
       "url": "https://henryutd2021.github.io/files/papers/jacob2026role.html",
       "sameAs": "https://doi.org/10.1016/j.crsus.2026.100820"
     },
     {
-      "@type": "ScholarlyArticle",
+      "@type": "CreativeWork",
       "name": "Techno-Economic Boundary Analysis of Small Modular Reactor Cogeneration for Hyperscale Data Center IT and Cooling Loads",
       "url": "https://henryutd2021.github.io/files/papers/li2026smrcogeneration.html",
       "sameAs": "https://doi.org/10.48550/arXiv.2608.10999"
