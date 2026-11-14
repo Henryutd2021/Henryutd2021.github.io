@@ -40,12 +40,6 @@
     ]
   },
   {
-    "listing": "/index.html",
-    "items": [
-      "/field-notes/briefings/2026-11-03.html"
-    ]
-  },
-  {
     "listing": "/projects.html",
     "items": [
       "/projects/nuclear-dc.html",
@@ -62,6 +56,12 @@
       "/projects/uq-mfgpr.html",
       "/projects/national-wind-uq.html",
       "/projects/fm-global-internship.html"
+    ]
+  },
+  {
+    "listing": "/index.html",
+    "items": [
+      "/field-notes/briefings/2026-11-03.html"
     ]
   },
   {

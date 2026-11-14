@@ -1,0 +1,1141 @@
+{
+  "slug": "nuclear",
+  "handbook_version": "0.1",
+  "last_checked": "2026-11-13",
+  "title": "Nuclear and SMR techno-economic parameters and inputs",
+  "description": "Source-specific nuclear power and small modular reactor techno-economic parameters and inputs, preserving printed values, technical and monetary bases, source terms and paper cross-references. Includes reference-plant estimates, fleet observations, design descriptions, policy parameters and regulatory charges.",
+  "temporal_coverage": "1986/..",
+  "temporal_coverage_note": "January 1986 decommissioning-assurance cost bases, 2020–2025 fleet observations, 2026 policy and regulatory records, 2030-onward reference scenarios and construction-start phaseout cases through 2036 onward.",
+  "spatial_coverage": "United States",
+  "spatial_coverage_note": "United States focus; Canadian-filed vendor material is supplementary design context.",
+  "coverage_intro": "United States focus; Canadian-filed vendor material is labeled as supplementary design context.",
+  "compilation_licence": "https://creativecommons.org/licenses/by/4.0/",
+  "compilation_rights_note": "Compilation and curation: CC BY 4.0. Each value retains the original source’s terms, listed in the source register; this compilation licence does not relicense source documents.",
+  "reading_conventions": "Values retain their source-specific bases; costs have not been escalated or converted. NR means not reported or not established, never zero. FOAK means first-of-a-kind; BOAK means between first- and nth-of-a-kind; NOAK means nth-of-a-kind. Blank numeric fields are missing values. Suffixes separate scenarios or years while retaining the common N-number. Verification of a printed value does not establish realized cost, performance or eligibility.",
+  "paper_crosswalk_note": "The paper column labels input use, citation provenance, numerical correspondence and contextual discussion separately. Input use identifies a stated model assumption; it does not establish the original source. Context is not a numerical input. Only examined public versions are linked, with version-specific locators. All expanded basis and locator text is present in the page and downloads.",
+  "verification_note": "The nuclear CSV separately records transcription verification, underlying evidence, source conflicts and numerical-field interpretation. Source editions, revisions, release dates, publishers, retrieval dates and document SHA-256 values travel with each row. Semicolon-separated source IDs resolve to the accompanying JSON register; expanded bibliographic fields retain each source’s full text. NR denotes an unreported date or revision; it is not a date inferred from access. Document checksums identify source bytes, not independently validated engineering performance.",
+  "reuse_code_note": "Reuse codes: G — government-authored material, subject to third-party exceptions; A — explicit attribution-based permission, retaining restrictions; C — conditional handling for contractor, mixed or vendor material, not a licence; ND — CC BY-NC-ND 4.0 on the identified article version.",
+  "papers": {
+    "Li2026": {
+      "title": "Rethinking the economics and flexibility of U.S. nuclear power through hydrogen integration and policy support",
+      "authors": [
+        "Honglin Li",
+        "Jianqiao Huang",
+        "Bikash Poudel",
+        "Mucun Sun",
+        "Tyler Westover",
+        "Daniel Wendt",
+        "Jie Zhang"
+      ],
+      "year": "2026",
+      "venue": "Nature Communications 17, 7090",
+      "doi": "10.1038/s41467-026-73630-y",
+      "short_title": "Nuclear–hydrogen (2026)",
+      "manuscript_locator": "",
+      "published_locator": "Policy period, p.11; Case 3 technical-life assumption, p.12",
+      "manuscript_rights": "",
+      "published_rights": "Published version: CC BY-NC-ND 4.0 (p. 15).",
+      "published_url": "https://henryutd2021.github.io/files/papers/Li2026.pdf",
+      "key": "Li2026",
+      "page_url": "https://henryutd2021.github.io/files/papers/Li2026.html",
+      "posted_pdf_url": "https://henryutd2021.github.io/files/papers/Li2026.pdf"
+    },
+    "jacob2026role": {
+      "key": "jacob2026role",
+      "title": "The role of small modular reactors in powering data centers for a sustainable digital economy",
+      "authors": [
+        "Roshni Anna Jacob",
+        "Honglin Li",
+        "Ali Mahboub Rad",
+        "Bikash Poudel",
+        "Yaoyu Li",
+        "Mucun Sun",
+        "Timothy R. McJunkin",
+        "Jie Zhang"
+      ],
+      "year": "2026",
+      "venue": "Cell Reports Sustainability 3, 100820",
+      "doi": "10.1016/j.crsus.2026.100820",
+      "short_title": "SMRs and data centers (2026)",
+      "manuscript_locator": "",
+      "manuscript_rights": "",
+      "published_locator": "Technology descriptions, pp.2–3; regulatory context, p.13 and ref.97",
+      "published_rights": "Published version: CC BY-NC 4.0; noncommercial restriction applies.",
+      "published_url": "https://henryutd2021.github.io/files/papers/jacob2026role.pdf",
+      "posted_pdf_url": "https://henryutd2021.github.io/files/papers/jacob2026role.pdf",
+      "page_url": "https://henryutd2021.github.io/files/papers/jacob2026role.html"
+    },
+    "li2026smrcogeneration": {
+      "key": "li2026smrcogeneration",
+      "title": "Techno-Economic Boundary Analysis of Small Modular Reactor Cogeneration for Hyperscale Data Center IT and Cooling Loads",
+      "authors": [
+        "Honglin Li",
+        "Buxin She",
+        "Jie Zhang"
+      ],
+      "year": "2026",
+      "venue": "arXiv:2608.10999v1, 11 August 2026",
+      "doi": "10.48550/arXiv.2608.10999",
+      "short_title": "SMR cogeneration (2026)",
+      "manuscript_locator": "",
+      "manuscript_rights": "",
+      "version_label": "Public preprint",
+      "published_locator": "Public arXiv v1, Eq. (12), PDF p.8; Table S7, PDF p.32",
+      "published_rights": "Public arXiv v1: arXiv nonexclusive distribution licence, not a general reuse licence.",
+      "published_url": "https://arxiv.org/pdf/2608.10999v1",
+      "posted_pdf_url": "https://arxiv.org/pdf/2608.10999v1",
+      "page_url": "https://henryutd2021.github.io/files/papers/li2026smrcogeneration.html"
+    }
+  },
+  "sources": [
+    {
+      "source_id": "S1",
+      "title": "Capital Cost and Performance Characteristics for Utility-Scale Electric Power Generating Technologies",
+      "url": "https://www.eia.gov/analysis/studies/powerplants/capitalcost/pdf/capital_cost_AEO2025.pdf",
+      "doi": "",
+      "authors": [
+        "U.S. Energy Information Administration",
+        "Sargent & Lundy"
+      ],
+      "publisher": "U.S. Energy Information Administration",
+      "date": "2024-01",
+      "year": "2024",
+      "version": "January 2024 publication; underlying Sargent & Lundy report Final Rev. A, 6 December 2023",
+      "reuse_code": "C",
+      "licence": "No blanket open reuse licence established for this document",
+      "licence_url": "https://www.eia.gov/about/copyrights_reuse.php",
+      "rights_note": "C is a handling category, not a licence. Source-specific contractor, mixed or vendor rights apply. Cite the factual parameter and document; no source tables or figures are reproduced. Sargent & Lundy estimates are not the underlying proprietary industry dataset.",
+      "edition": "AEO2025 supporting capital-cost report",
+      "revision": "Final Rev. A, 2023-12-06",
+      "release_date": "2024-01",
+      "snapshot_date": "2026-11-13",
+      "document_sha256": "ad9127130fece93d3c2d9e203fc0176fcfc5e4d4dccc61d6576107f2d2df96ec",
+      "checksum_scope": "Retrieved PDF bytes"
+    },
+    {
+      "source_id": "S2",
+      "title": "Meta-Analysis of Advanced Nuclear Reactor Cost Estimations",
+      "url": "https://gain.inl.gov/content/uploads/4/2024/11/INL-RPT-24-77048-Meta-Analysis-of-Adv-Nuclear-Reactor-Cost-Estimations.pdf",
+      "doi": "",
+      "authors": [
+        "Abdalla Abou-Jaoude",
+        "Levi M. Larsen",
+        "Nahuel Guaita",
+        "Ishita Trivedi",
+        "Frederick Joseck",
+        "Christopher Lohse",
+        "Edward Hoffman",
+        "Nicolas Stauff",
+        "Koroush Shirvan",
+        "Adam Stein"
+      ],
+      "publisher": "Idaho National Laboratory",
+      "date": "2024-04",
+      "year": "2024",
+      "version": "INL/RPT-24-77048, Rev. 0, April 2024",
+      "reuse_code": "C",
+      "licence": "No blanket open reuse licence established for this document",
+      "licence_url": "",
+      "rights_note": "C is a handling category, not a licence. Source-specific contractor, mixed or vendor rights apply. Cite the factual parameter and document; no source tables or figures are reproduced.",
+      "edition": "INL/RPT-24-77048",
+      "revision": "Rev. 0",
+      "release_date": "2024-04",
+      "snapshot_date": "2026-11-13",
+      "document_sha256": "a2c3468d71aba44bf9375f953c364db37fbf221d452e693cd2e1f4a118b24aaf",
+      "checksum_scope": "Retrieved PDF bytes"
+    },
+    {
+      "source_id": "S3",
+      "title": "2024 Annual Technology Baseline: Nuclear",
+      "url": "https://atb.nlr.gov/electricity/2024/nuclear",
+      "doi": "",
+      "authors": [
+        "National Renewable Energy Laboratory"
+      ],
+      "publisher": "National Renewable Energy Laboratory",
+      "date": "2024",
+      "year": "2024",
+      "version": "2024 ATB nuclear narrative; now hosted on the NLR domain; not the downloadable ATB dataset",
+      "reuse_code": "C",
+      "licence": "No blanket open reuse licence established for this document",
+      "licence_url": "",
+      "rights_note": "C is a handling category, not a licence. Source-specific contractor, mixed or vendor rights apply. Cite the factual parameter and document; no source tables or figures are reproduced. CC BY 4.0 metadata for the downloadable ATB dataset does not establish a licence for this narrative chapter.",
+      "edition": "2024 ATB narrative chapter",
+      "revision": "Historical 2024 edition",
+      "release_date": "2024",
+      "snapshot_date": "2026-11-13",
+      "document_sha256": "ca25ad841329725ecc182d1872d2f4f7820a230b36c1c57a11ba6113fefe3431",
+      "checksum_scope": "Retrieved HTML bytes; page navigation may change"
+    },
+    {
+      "source_id": "S4",
+      "title": "Pathways to Commercial Liftoff: Advanced Nuclear",
+      "url": "https://yardsale.energy/wp-content/uploads/2025/05/DOE-Liftoff-Advanced-Nuclear-2023.pdf",
+      "doi": "",
+      "authors": [
+        "Julie Kozeracki",
+        "Chris Vlahoplus",
+        "Katheryn Scott",
+        "Melissa Bates",
+        "Billy Valderrama",
+        "Erica Bickford",
+        "Tim Stuhldreher",
+        "Andrew Foss",
+        "Tom Fanning"
+      ],
+      "publisher": "U.S. Department of Energy",
+      "date": "2023-03",
+      "year": "2023",
+      "version": "March 2023 complete DOE report, retrieved from a mirror",
+      "reuse_code": "C",
+      "licence": "No blanket open reuse licence established for this document",
+      "licence_url": "",
+      "rights_note": "C is a handling category, not a licence. Source-specific contractor, mixed or vendor rights apply. Cite the factual parameter and document; no source tables or figures are reproduced.",
+      "edition": "March 2023 report",
+      "revision": "Original edition",
+      "release_date": "2023-03",
+      "snapshot_date": "2026-11-13",
+      "document_sha256": "3119ddb987c9494ed76bd6a80244bf573d2cc6b8168dc93ac4ae7ebffd4f1241",
+      "checksum_scope": "Retrieved PDF bytes"
+    },
+    {
+      "source_id": "S5",
+      "title": "Pathways to Commercial Liftoff: Advanced Nuclear",
+      "url": "https://gain.inl.gov/content/uploads/4/2024/11/DOE-Advanced-Nuclear-Liftoff-Report.pdf",
+      "doi": "",
+      "authors": [
+        "U.S. Department of Energy"
+      ],
+      "publisher": "U.S. Department of Energy",
+      "date": "2024-09",
+      "year": "2024",
+      "version": "September 2024 update; GAIN-hosted copy",
+      "reuse_code": "C",
+      "licence": "No blanket open reuse licence established for this document",
+      "licence_url": "",
+      "rights_note": "C is a handling category, not a licence. Source-specific contractor, mixed or vendor rights apply. Cite the factual parameter and document; no source tables or figures are reproduced.",
+      "edition": "September 2024 report",
+      "revision": "September 2024 update",
+      "release_date": "2024-09",
+      "snapshot_date": "2026-11-13",
+      "document_sha256": "e10272f7162a28ac607d35500c7793317b7981386c502c314e9a56c7f22f570c",
+      "checksum_scope": "Retrieved PDF bytes"
+    },
+    {
+      "source_id": "S6",
+      "title": "Electric Power Monthly, Table 6.07.B: Capacity Factors for Utility Scale Generators Primarily Using Non-Fossil Fuels",
+      "url": "https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_b",
+      "doi": "",
+      "authors": [
+        "U.S. Energy Information Administration"
+      ],
+      "publisher": "U.S. Energy Information Administration",
+      "date": "2026-10-23",
+      "year": "2026",
+      "version": "23 October 2026 release; annual nuclear values 2020–2025; final status retained",
+      "reuse_code": "G",
+      "licence": "U.S. government information (qualified)",
+      "licence_url": "https://www.eia.gov/about/copyrights_reuse.php",
+      "rights_note": "Government-authored factual, statistical or legal material; third-party exceptions remain. Cite the original source.",
+      "edition": "October 2026 release; data through August 2026",
+      "revision": "Annual values as printed in this release",
+      "release_date": "2026-10-23",
+      "snapshot_date": "2026-11-13",
+      "document_sha256": "c05663a696708cfcc3d25c817fadf3972ea35874a0c0ddc039ed7785f4cbdb7d",
+      "checksum_scope": "Retrieved HTML bytes; page navigation may change"
+    },
+    {
+      "source_id": "S7",
+      "title": "2025 Uranium Marketing Annual Report, Table 1: Uranium purchased by owners and operators of U.S. civilian nuclear power reactors",
+      "url": "https://www.eia.gov/uranium/marketing/table1.php",
+      "doi": "",
+      "authors": [
+        "U.S. Energy Information Administration"
+      ],
+      "publisher": "U.S. Energy Information Administration",
+      "date": "2026-08-13",
+      "year": "2026",
+      "version": "2025 Uranium Marketing Annual Report, reissued 13 August 2026; Table 1, 2025 column",
+      "reuse_code": "G",
+      "licence": "U.S. government information (qualified)",
+      "licence_url": "https://www.eia.gov/about/copyrights_reuse.php",
+      "rights_note": "Government-authored factual, statistical or legal material; third-party exceptions remain. Cite the original source.",
+      "edition": "2025 report",
+      "revision": "Reissued 13 August 2026",
+      "release_date": "2026-08-13",
+      "snapshot_date": "2026-11-13",
+      "document_sha256": "db0c2796a39979cdb88d36ec51b0339f451798d53df51a3f98a6dd9f38952c08",
+      "checksum_scope": "Retrieved HTML bytes; page navigation may change"
+    },
+    {
+      "source_id": "S8",
+      "title": "2025 Uranium Marketing Annual Report, Table 16: Purchases of enrichment services by owners and operators of U.S. civilian nuclear power reactors",
+      "url": "https://www.eia.gov/uranium/marketing/table16.php",
+      "doi": "",
+      "authors": [
+        "U.S. Energy Information Administration"
+      ],
+      "publisher": "U.S. Energy Information Administration",
+      "date": "2026-08-13",
+      "year": "2026",
+      "version": "2025 Uranium Marketing Annual Report, reissued 13 August 2026; Table 16, 2025 column",
+      "reuse_code": "G",
+      "licence": "U.S. government information (qualified)",
+      "licence_url": "https://www.eia.gov/about/copyrights_reuse.php",
+      "rights_note": "Government-authored factual, statistical or legal material; third-party exceptions remain. Cite the original source.",
+      "edition": "2025 report",
+      "revision": "Reissued 13 August 2026",
+      "release_date": "2026-08-13",
+      "snapshot_date": "2026-11-13",
+      "document_sha256": "2ec7fb60c78ff8cfd97d0425bebcd4686eb7067ff715cb11d06ae6aa4375343a",
+      "checksum_scope": "Retrieved HTML bytes; page navigation may change"
+    },
+    {
+      "source_id": "S9",
+      "title": "U.S. summer nuclear outages rose in 2023, returning to 2021 levels",
+      "url": "https://www.eia.gov/todayinenergy/detail.php?id=60682",
+      "doi": "",
+      "authors": [
+        "Slade Johnson",
+        "Tyler Hodge"
+      ],
+      "publisher": "U.S. Energy Information Administration",
+      "date": "2023-10-17",
+      "year": "2023",
+      "version": "17 October 2023 article; outage statistic as of 3 October 2023",
+      "reuse_code": "G",
+      "licence": "U.S. government information (qualified)",
+      "licence_url": "https://www.eia.gov/about/copyrights_reuse.php",
+      "rights_note": "Government-authored factual, statistical or legal material; third-party exceptions remain. Cite the original source.",
+      "edition": "Today in Energy, 17 October 2023",
+      "revision": "Dated article",
+      "release_date": "2023-10-17",
+      "snapshot_date": "2026-11-13",
+      "document_sha256": "1367f143f44a54a9120307da75bc6fdc691e48d48fc125dadae61c39da86c9aa",
+      "checksum_scope": "Retrieved HTML bytes; page navigation may change"
+    },
+    {
+      "source_id": "S11",
+      "title": "42 U.S.C. §2133: Commercial licenses",
+      "url": "https://uscode.house.gov/us/usc/t42/s2133/",
+      "doi": "",
+      "authors": [
+        "United States Congress"
+      ],
+      "publisher": "Office of the Law Revision Counsel, U.S. House of Representatives",
+      "date": "2026-11-13 (text examined)",
+      "year": "2026",
+      "version": "42 U.S.C. §2133(c), accessed 13 November 2026",
+      "reuse_code": "G",
+      "licence": "U.S. government information (qualified)",
+      "licence_url": "",
+      "rights_note": "Government-authored factual, statistical or legal material; third-party exceptions remain. Cite the original source.",
+      "edition": "U.S. Code text examined 13 November 2026",
+      "revision": "Current text at access",
+      "release_date": "NR",
+      "snapshot_date": "2026-11-13",
+      "document_sha256": "f18508ad2f50ed1d9aecf171663d47aec3816469a141260eec03147414c371b2",
+      "checksum_scope": "Retrieved HTML bytes; page navigation may change"
+    },
+    {
+      "source_id": "S12",
+      "title": "10 CFR §54.31: Issuance of a renewed license",
+      "url": "https://www.govinfo.gov/content/pkg/CFR-2026-title10-vol2/pdf/CFR-2026-title10-vol2-sec54-33.pdf",
+      "doi": "",
+      "authors": [
+        "U.S. Nuclear Regulatory Commission"
+      ],
+      "publisher": "U.S. Government Publishing Office",
+      "date": "2026-01-01 edition (publication date NR)",
+      "year": "2026",
+      "version": "Official CFR p.173 contains §54.31(b)–(d); distributed in the §54.33 PDF",
+      "reuse_code": "G",
+      "licence": "U.S. government information (qualified)",
+      "licence_url": "",
+      "rights_note": "Government-authored factual, statistical or legal material; third-party exceptions remain. Cite the original source.",
+      "edition": "2026 annual CFR edition, Title 10, Volume 2",
+      "revision": "1 January 2026 edition",
+      "release_date": "NR",
+      "snapshot_date": "2026-11-13",
+      "document_sha256": "88b42e28bf94ca9c90dfb6340d63c0be42e8a671e5f7fddd3f1e585e2a868a60",
+      "checksum_scope": "Retrieved PDF bytes"
+    },
+    {
+      "source_id": "S13",
+      "title": "10 CFR §50.75: Reporting and recordkeeping for decommissioning planning",
+      "url": "https://www.govinfo.gov/content/pkg/CFR-2025-title10-vol1/pdf/CFR-2025-title10-vol1-sec50-75.pdf",
+      "doi": "",
+      "authors": [
+        "U.S. Nuclear Regulatory Commission"
+      ],
+      "publisher": "U.S. Government Publishing Office",
+      "date": "2025-01-01 edition (publication date NR)",
+      "year": "2025",
+      "version": "1 January 2025 CFR edition, §50.75(c)",
+      "reuse_code": "G",
+      "licence": "U.S. government information (qualified)",
+      "licence_url": "",
+      "rights_note": "Government-authored factual, statistical or legal material; third-party exceptions remain. Cite the original source.",
+      "edition": "2025 annual CFR edition, Title 10, Volume 1",
+      "revision": "1 January 2025 edition",
+      "release_date": "NR",
+      "snapshot_date": "2026-11-13",
+      "document_sha256": "2c3ac4605c54c9199d3b79e10232e5d6494dbd38d23dc9349bef30a6d91908d1",
+      "checksum_scope": "Retrieved PDF bytes"
+    },
+    {
+      "source_id": "S14",
+      "title": "Heat Storage Options for Sodium, Salt and Helium Cooled Reactors to Enable Variable Electricity to the Grid and Heat to Industry with Base-Load Reactor Operations",
+      "url": "https://inldigitallibrary.inl.gov/content/uploads/50/2026/04/Sort_17329.pdf",
+      "doi": "",
+      "authors": [
+        "Charles Forsberg",
+        "Piyush Sabharwall"
+      ],
+      "publisher": "Idaho National Laboratory / Massachusetts Institute of Technology",
+      "date": "2018-09",
+      "year": "2018",
+      "version": "September 2018, INL/EXT-18-51329 and MIT ANP-TR-181",
+      "reuse_code": "C",
+      "licence": "No blanket open reuse licence established for this document",
+      "licence_url": "",
+      "rights_note": "C is a handling category, not a licence. Source-specific contractor, mixed or vendor rights apply. Cite the factual parameter and document; no source tables or figures are reproduced.",
+      "edition": "INL/EXT-18-51329; MIT ANP-TR-181",
+      "revision": "NR",
+      "release_date": "2018-09",
+      "snapshot_date": "2026-11-13",
+      "document_sha256": "0f75b498805cfe7f14a4c3033e8316aa109f6574ad9f608c5394b4abadb31d5e",
+      "checksum_scope": "Retrieved PDF bytes"
+    },
+    {
+      "source_id": "S15",
+      "title": "Reference Piping and Instrumentation Diagrams for Heat Transport Systems for Methanol Plants",
+      "url": "https://inldigitallibrary.inl.gov/content/uploads/50/2026/04/Sort_106989.pdf",
+      "doi": "",
+      "authors": [
+        "Byung-Hee Choi",
+        "Nipun Popli",
+        "Sarah Creasman",
+        "Ramon Yoshiura",
+        "JunSoo Yoo",
+        "Daniel Mikkelson"
+      ],
+      "publisher": "Idaho National Laboratory",
+      "date": "2024-05",
+      "year": "2024",
+      "version": "INL/RPT-24-77932, Rev. 0, May 2024",
+      "reuse_code": "C",
+      "licence": "No blanket open reuse licence established for this document",
+      "licence_url": "",
+      "rights_note": "C is a handling category, not a licence. Source-specific contractor, mixed or vendor rights apply. Cite the factual parameter and document; no source tables or figures are reproduced.",
+      "edition": "INL/RPT-24-77932",
+      "revision": "Rev. 0",
+      "release_date": "2024-05",
+      "snapshot_date": "2026-11-13",
+      "document_sha256": "b4dfac2e90e6d5063542a805cd81cc1242051e8e2c852ba0a1e69e5f3a084a67",
+      "checksum_scope": "Retrieved PDF bytes"
+    },
+    {
+      "source_id": "S17",
+      "title": "26 U.S.C. §45U: Zero-emission nuclear power production credit",
+      "url": "https://uscode.house.gov/us/usc/t26/s45U/",
+      "doi": "",
+      "authors": [
+        "United States Congress"
+      ],
+      "publisher": "Office of the Law Revision Counsel, U.S. House of Representatives",
+      "date": "2026-11-13 (text examined)",
+      "year": "2026",
+      "version": "§45U including Public Law 119-21 amendments of 4 July 2025; text accessed 13 November 2026",
+      "reuse_code": "G",
+      "licence": "U.S. government information (qualified)",
+      "licence_url": "",
+      "rights_note": "Government-authored factual, statistical or legal material; third-party exceptions remain. Cite the original source.",
+      "edition": "U.S. Code text examined 13 November 2026",
+      "revision": "Includes 2025 amendments",
+      "release_date": "NR",
+      "snapshot_date": "2026-11-13",
+      "document_sha256": "8b2a06a3962df178c9275eb80514f250e0f1fee35c6ad70e52a35a55150c5a22",
+      "checksum_scope": "Retrieved HTML bytes; page navigation may change"
+    },
+    {
+      "source_id": "S18",
+      "title": "Notice 2026-41: Zero-Emission Nuclear Power Production Credit",
+      "url": "https://www.irs.gov/irb/2026-29_irb",
+      "doi": "",
+      "authors": [
+        "Internal Revenue Service"
+      ],
+      "publisher": "Internal Revenue Service",
+      "date": "2026-07-13",
+      "year": "2026",
+      "version": "Notice 2026-41, §3.01; IRB 2026-29, 13 July 2026",
+      "reuse_code": "G",
+      "licence": "U.S. government information (qualified)",
+      "licence_url": "",
+      "rights_note": "Government-authored factual, statistical or legal material; third-party exceptions remain. Cite the original source.",
+      "edition": "Internal Revenue Bulletin 2026-29",
+      "revision": "Notice 2026-41",
+      "release_date": "2026-07-13",
+      "snapshot_date": "2026-11-13",
+      "document_sha256": "766c1fbf4d8bcfb8a9f4274b992ffbface8cdccb0939f3e445baf9fb9c391d06",
+      "checksum_scope": "Retrieved HTML bytes; page navigation may change"
+    },
+    {
+      "source_id": "S19",
+      "title": "26 U.S.C. §45Y: Clean electricity production credit",
+      "url": "https://uscode.house.gov/us/usc/t26/s45Y/",
+      "doi": "",
+      "authors": [
+        "United States Congress"
+      ],
+      "publisher": "Office of the Law Revision Counsel, U.S. House of Representatives",
+      "date": "2026-11-13 (text examined)",
+      "year": "2026",
+      "version": "§45Y including 2025 amendments; text accessed 13 November 2026",
+      "reuse_code": "G",
+      "licence": "U.S. government information (qualified)",
+      "licence_url": "",
+      "rights_note": "Government-authored factual, statistical or legal material; third-party exceptions remain. Cite the original source.",
+      "edition": "U.S. Code text examined 13 November 2026",
+      "revision": "Includes 2025 amendments",
+      "release_date": "NR",
+      "snapshot_date": "2026-11-13",
+      "document_sha256": "dcff3cde80663fe40f617e9686d37f2b34bdcffc2e4b2c3a9b3f989381553c1e",
+      "checksum_scope": "Retrieved HTML bytes; page navigation may change"
+    },
+    {
+      "source_id": "S20",
+      "title": "Notice 2026-47: Clean Electricity Production Credit Inflation Adjustment Factor and Applicable Amounts",
+      "url": "https://www.irs.gov/irb/2026-41_irb",
+      "doi": "",
+      "authors": [
+        "Internal Revenue Service"
+      ],
+      "publisher": "Internal Revenue Service",
+      "date": "2026-10-05",
+      "year": "2026",
+      "version": "Notice 2026-47, §4; IRB 2026-41, 5 October 2026",
+      "reuse_code": "G",
+      "licence": "U.S. government information (qualified)",
+      "licence_url": "",
+      "rights_note": "Government-authored factual, statistical or legal material; third-party exceptions remain. Cite the original source.",
+      "edition": "Internal Revenue Bulletin 2026-41",
+      "revision": "Notice 2026-47",
+      "release_date": "2026-10-05",
+      "snapshot_date": "2026-11-13",
+      "document_sha256": "3003ecd81e0a99e44d71b38b1644ad2d670ead6a49d7fc5890fb9fbf69b34f12",
+      "checksum_scope": "Retrieved HTML bytes; page navigation may change"
+    },
+    {
+      "source_id": "S21",
+      "title": "26 U.S.C. §48E: Clean electricity investment credit",
+      "url": "https://uscode.house.gov/us/usc/t26/s48E/",
+      "doi": "",
+      "authors": [
+        "United States Congress"
+      ],
+      "publisher": "Office of the Law Revision Counsel, U.S. House of Representatives",
+      "date": "2026-11-13 (text examined)",
+      "year": "2026",
+      "version": "§48E including 2025 amendments; text accessed 13 November 2026",
+      "reuse_code": "G",
+      "licence": "U.S. government information (qualified)",
+      "licence_url": "",
+      "rights_note": "Government-authored factual, statistical or legal material; third-party exceptions remain. Cite the original source.",
+      "edition": "U.S. Code text examined 13 November 2026",
+      "revision": "Includes 2025 amendments",
+      "release_date": "NR",
+      "snapshot_date": "2026-11-13",
+      "document_sha256": "c3556accaaaf476de2238992c308de166b97c5d532e0c0ee7c2a54dce80221be",
+      "checksum_scope": "Retrieved HTML bytes; page navigation may change"
+    },
+    {
+      "source_id": "S22",
+      "title": "26 U.S.C. §45: Electricity produced from certain renewable resources, etc.",
+      "url": "https://uscode.house.gov/us/usc/t26/s45/",
+      "doi": "",
+      "authors": [
+        "United States Congress"
+      ],
+      "publisher": "Office of the Law Revision Counsel, U.S. House of Representatives",
+      "date": "2026-11-13 (text examined)",
+      "year": "2026",
+      "version": "§45(b)(11), energy-community definitions; text accessed 13 November 2026",
+      "reuse_code": "G",
+      "licence": "U.S. government information (qualified)",
+      "licence_url": "",
+      "rights_note": "Government-authored factual, statistical or legal material; third-party exceptions remain. Cite the original source.",
+      "edition": "U.S. Code text examined 13 November 2026",
+      "revision": "Includes 2025 amendments",
+      "release_date": "NR",
+      "snapshot_date": "2026-11-13",
+      "document_sha256": "4dd4c41125f8343bab96544280ad9f99a53a5296c5d9f81b1a4c9f7cf3cebbcb",
+      "checksum_scope": "Retrieved HTML bytes; page navigation may change"
+    },
+    {
+      "source_id": "S23",
+      "title": "26 U.S.C. §48: Energy credit",
+      "url": "https://uscode.house.gov/us/usc/t26/s48/",
+      "doi": "",
+      "authors": [
+        "United States Congress"
+      ],
+      "publisher": "Office of the Law Revision Counsel, U.S. House of Representatives",
+      "date": "2026-11-13 (text examined)",
+      "year": "2026",
+      "version": "§48(a)(12), domestic-content provisions incorporated by §48E; text accessed 13 November 2026",
+      "reuse_code": "G",
+      "licence": "U.S. government information (qualified)",
+      "licence_url": "",
+      "rights_note": "Government-authored factual, statistical or legal material; third-party exceptions remain. Cite the original source.",
+      "edition": "U.S. Code text examined 13 November 2026",
+      "revision": "Includes 2025 amendments",
+      "release_date": "NR",
+      "snapshot_date": "2026-11-13",
+      "document_sha256": "37c76266a957f023ad761fa79ad60ca4d56c9c7771c5e92f8dfb152e82982a99",
+      "checksum_scope": "Retrieved HTML bytes; page navigation may change"
+    },
+    {
+      "source_id": "S24",
+      "title": "42 U.S.C. §16512: Terms and conditions",
+      "url": "https://uscode.house.gov/us/usc/t42/s16512/",
+      "doi": "",
+      "authors": [
+        "United States Congress"
+      ],
+      "publisher": "Office of the Law Revision Counsel, U.S. House of Representatives",
+      "date": "2026-11-13 (text examined)",
+      "year": "2026",
+      "version": "§16512(c), loan-guarantee share; text accessed 13 November 2026",
+      "reuse_code": "G",
+      "licence": "U.S. government information (qualified)",
+      "licence_url": "",
+      "rights_note": "Government-authored factual, statistical or legal material; third-party exceptions remain. Cite the original source.",
+      "edition": "U.S. Code text examined 13 November 2026",
+      "revision": "Current text at access",
+      "release_date": "NR",
+      "snapshot_date": "2026-11-13",
+      "document_sha256": "62c99e6bf91a30c7ea0fc695cd66d43771b7d5f511ed42e1d907d31b124532d7",
+      "checksum_scope": "Retrieved HTML bytes; page navigation may change"
+    },
+    {
+      "source_id": "S25",
+      "title": "Risk-Informed, Technology-Inclusive Regulatory Framework for Advanced Reactors",
+      "url": "https://www.govinfo.gov/content/pkg/FR-2026-03-30/html/2026-06048.htm",
+      "doi": "",
+      "authors": [
+        "U.S. Nuclear Regulatory Commission"
+      ],
+      "publisher": "Federal Register",
+      "date": "2026-03-30",
+      "year": "2026",
+      "version": "Final rule published 30 March 2026; effective 29 April 2026",
+      "reuse_code": "G",
+      "licence": "U.S. government information (qualified)",
+      "licence_url": "",
+      "rights_note": "Government-authored factual, statistical or legal material; third-party exceptions remain. Cite the original source.",
+      "edition": "91 FR 15696",
+      "revision": "Final rule",
+      "release_date": "2026-03-30",
+      "snapshot_date": "2026-11-13",
+      "document_sha256": "540a30545617b61518cef5c5b7abed5f4a9638a569fc2c6cb0a33ac4f0d9d977",
+      "checksum_scope": "Retrieved HTML bytes; page navigation may change"
+    },
+    {
+      "source_id": "S26",
+      "title": "Streamlining Contested Adjudications in Licensing Proceedings",
+      "url": "https://www.govinfo.gov/content/pkg/FR-2026-11-03/html/2026-22443.htm",
+      "doi": "",
+      "authors": [
+        "U.S. Nuclear Regulatory Commission"
+      ],
+      "publisher": "Federal Register",
+      "date": "2026-11-03",
+      "year": "2026",
+      "version": "Final rule published 3 November 2026; effective 3 December 2026 (not yet effective at the handbook check date)",
+      "reuse_code": "G",
+      "licence": "U.S. government information (qualified)",
+      "licence_url": "",
+      "rights_note": "Government-authored factual, statistical or legal material; third-party exceptions remain. Cite the original source.",
+      "edition": "91 FR 69446",
+      "revision": "Final rule",
+      "release_date": "2026-11-03",
+      "snapshot_date": "2026-11-13",
+      "document_sha256": "344aea4e04f549a9749a20311613017133681a28a9e06858448c796e7e741efa",
+      "checksum_scope": "Retrieved HTML bytes; page navigation may change"
+    },
+    {
+      "source_id": "S27",
+      "title": "Fee Schedules; Fee Recovery for Fiscal Year 2026",
+      "url": "https://www.govinfo.gov/content/pkg/FR-2026-06-16/html/2026-12067.htm",
+      "doi": "",
+      "authors": [
+        "U.S. Nuclear Regulatory Commission"
+      ],
+      "publisher": "Federal Register",
+      "date": "2026-06-16",
+      "year": "2026",
+      "version": "Published 16 June 2026; effective 17 August 2026; hourly rates implemented in the first full pay period afterward",
+      "reuse_code": "G",
+      "licence": "U.S. government information (qualified)",
+      "licence_url": "",
+      "rights_note": "Government-authored factual, statistical or legal material; third-party exceptions remain. Cite the original source.",
+      "edition": "91 FR 36470",
+      "revision": "FY2026 final fee rule",
+      "release_date": "2026-06-16",
+      "snapshot_date": "2026-11-13",
+      "document_sha256": "4378126711fda8d8685a690a042e722cf2856bce3b7d9c8a7e7779160ee9f49c",
+      "checksum_scope": "Retrieved HTML bytes; page navigation may change"
+    },
+    {
+      "source_id": "S28",
+      "title": "Standard Design Approval for the NuScale US460 Power Plant Design",
+      "url": "https://content.govdelivery.com/attachments/USNRC/2025/05/29/file_attachments/3275315/Standard%20Design%20Approval%20SDA%20for%20the%20NuScale%20US460%20Power%20Plant%20Design.pdf",
+      "doi": "",
+      "authors": [
+        "U.S. Nuclear Regulatory Commission"
+      ],
+      "publisher": "U.S. Nuclear Regulatory Commission",
+      "date": "2025-05-29",
+      "year": "2025",
+      "version": "29 May 2025 standard design approval; enclosure finding (2)",
+      "reuse_code": "G",
+      "licence": "U.S. government information (qualified)",
+      "licence_url": "",
+      "rights_note": "Government-authored factual, statistical or legal material; third-party exceptions remain. Cite the original source.",
+      "edition": "Docket 52-050",
+      "revision": "2025 standard design approval",
+      "release_date": "2025-05-29",
+      "snapshot_date": "2026-11-13",
+      "document_sha256": "e3ce629588100d68ef5a48f36268c296c1f81a5c0e9f4613b07f681f3f4bfe91",
+      "checksum_scope": "Retrieved PDF bytes"
+    },
+    {
+      "source_id": "S29",
+      "title": "BWRX-300 design presentation sheet: Nuclear Heat and Power for Industrial Applications Workshop",
+      "url": "https://arpa-e.energy.gov/sites/default/files/migrated/ARPA-E%20-%20NHES%20-%20Day%201%20-%20Quanta%20Panel%20-%20Hunt%20-%20GE-%20H.pdf",
+      "doi": "",
+      "authors": [
+        "GE Hitachi Nuclear Energy"
+      ],
+      "publisher": "DOE ARPA-E workshop hosting vendor-authored material",
+      "date": "2023",
+      "year": "2023",
+      "version": "2023 GE Hitachi workshop sheet; vendor design claims; one-page document",
+      "reuse_code": "C",
+      "licence": "No blanket open reuse licence established for this document",
+      "licence_url": "",
+      "rights_note": "C is a handling category, not a licence. Source-specific contractor, mixed or vendor rights apply. Cite the factual parameter and document; no source tables or figures are reproduced. Government hosting or filing is not government authorship or endorsement.",
+      "edition": "2023 DOE ARPA-E workshop sheet",
+      "revision": "2023 sheet",
+      "release_date": "2023",
+      "snapshot_date": "2026-11-13",
+      "document_sha256": "8a9dbb1302094cd3d1d46d9f202e3b2eb9b4ffd130ddfed4cfa49503c99c245b",
+      "checksum_scope": "Retrieved PDF bytes"
+    },
+    {
+      "source_id": "S30",
+      "title": "PJM Interconnection, L.L.C., 189 FERC ¶61,078",
+      "url": "https://www.ferc.gov/sites/default/files/2024-11/20241101-3061_ER24-2172-000.pdf",
+      "doi": "",
+      "authors": [
+        "Federal Energy Regulatory Commission"
+      ],
+      "publisher": "Federal Energy Regulatory Commission",
+      "date": "2024-11-01",
+      "year": "2024",
+      "version": "1 November 2024 order rejecting the amended interconnection service agreement; historical arrangement and proposal",
+      "reuse_code": "G",
+      "licence": "U.S. government information (qualified)",
+      "licence_url": "",
+      "rights_note": "Government-authored factual, statistical or legal material; third-party exceptions remain. Cite the original source.",
+      "edition": "Docket ER24-2172-000/-001",
+      "revision": "Order of 1 November 2024",
+      "release_date": "2024-11-01",
+      "snapshot_date": "2026-11-13",
+      "document_sha256": "69b04b60cfc5f0150af8cb2f96eabca1c6af9ff74f8bbdbd41a2929b0bf69934",
+      "checksum_scope": "Retrieved PDF bytes"
+    },
+    {
+      "source_id": "S33",
+      "title": "BWRX-300 General Description",
+      "url": "https://api.cnsc-ccsn.gc.ca/dms/digital-medias/CMD-24-H3-Ref-R1-9-GEH-005N9751-BWRX-300-General-Description-Rev-F.pdf/object",
+      "doi": "",
+      "authors": [
+        "GE Hitachi Nuclear Energy"
+      ],
+      "publisher": "GE Hitachi Nuclear Energy; filed with the Canadian Nuclear Safety Commission",
+      "date": "2023-12",
+      "year": "2023",
+      "version": "005N9751 Rev. F, December 2023; CNSC filing copy",
+      "reuse_code": "C",
+      "licence": "No blanket open reuse licence established for this document",
+      "licence_url": "",
+      "rights_note": "C is a handling category, not a licence. Source-specific contractor, mixed or vendor rights apply. Cite the factual parameter and document; no source tables or figures are reproduced. Government hosting or filing is not government authorship or endorsement.",
+      "edition": "005N9751",
+      "revision": "Rev. F",
+      "release_date": "2023-12",
+      "snapshot_date": "2026-11-13",
+      "document_sha256": "dd6b9dd0da5a6977dd27fc352bf774b70c9f43fe0f1cb4c04fcd8e8b434cc11f",
+      "checksum_scope": "Retrieved PDF bytes"
+    },
+    {
+      "source_id": "S34",
+      "title": "Executive Order 14300: Ordering the Reform of the Nuclear Regulatory Commission",
+      "url": "https://www.govinfo.gov/content/pkg/FR-2025-05-29/html/2025-09798.htm",
+      "doi": "",
+      "authors": [
+        "President of the United States"
+      ],
+      "publisher": "Federal Register",
+      "date": "2025-05-29",
+      "year": "2025",
+      "version": "EO 14300, signed 23 May 2025; published 29 May 2025; §5(a), p.22588",
+      "reuse_code": "G",
+      "licence": "U.S. government information (qualified)",
+      "licence_url": "",
+      "rights_note": "Government-authored factual, statistical or legal material; third-party exceptions remain. Cite the original source.",
+      "edition": "90 FR 22587–22590",
+      "revision": "Executive Order of 23 May 2025",
+      "release_date": "2025-05-29",
+      "snapshot_date": "2026-11-13",
+      "document_sha256": "f5a4edb0f203e4204e3fdc080932f7be67ce8d3071f2cdb42ad90d9d5c45a26c",
+      "checksum_scope": "Retrieved HTML bytes; page navigation may change"
+    },
+    {
+      "source_id": "S35",
+      "title": "Meta-Analysis of Advanced Nuclear Reactor Cost Estimations",
+      "url": "https://inldigitallibrary.inl.gov/content/uploads/50/2026/04/Sort_107010.pdf",
+      "doi": "",
+      "authors": [
+        "Abdalla Abou-Jaoude",
+        "Levi M. Larsen",
+        "Nahuel Guaita",
+        "Ishita Trivedi",
+        "Frederick Joseck",
+        "Christopher Lohse",
+        "Edward Hoffman",
+        "Nicolas Stauff",
+        "Koroush Shirvan",
+        "Adam Stein"
+      ],
+      "publisher": "Idaho National Laboratory",
+      "date": "2024-07",
+      "year": "2024",
+      "version": "July 2024 document; cover says Revision 2, internal title page says Revision 1; Table A-1 and Table 31 still differ",
+      "reuse_code": "C",
+      "licence": "No blanket open reuse licence established for this document",
+      "licence_url": "",
+      "rights_note": "C is a handling category, not a licence. Source-specific contractor, mixed or vendor rights apply. Cite the factual parameter and document; no source tables or figures are reproduced.",
+      "edition": "INL/RPT-24-77048, July 2024 document",
+      "revision": "Cover: Revision 2; internal title page: Revision 1",
+      "release_date": "2024-07",
+      "snapshot_date": "2026-11-13",
+      "document_sha256": "c2b7b12624fb500f28fb5beae9f8e081ba8f1e92a91aa75ea2fe5c515eb05866",
+      "checksum_scope": "Retrieved PDF bytes"
+    }
+  ],
+  "definition_risks": [
+    [
+      "Overnight versus total capital",
+      "Record IDC/AFUDC, escalation during construction, owner’s costs, contingency, initial fuel and interconnection separately. A table labelled “Total Capital Cost” may still be an overnight total."
+    ],
+    [
+      "FOAK versus BOAK versus NOAK",
+      "Preserve the source’s term. Distinguish first design, first country deployment, first site unit and repeat factory production."
+    ],
+    [
+      "$/kWe versus $/kWth",
+      "Never substitute one for the other without an explicit efficiency and boundary."
+    ],
+    [
+      "Net versus gross output",
+      "Record auxiliary demand and whether the denominator is generator output, plant export or delivered customer power."
+    ],
+    [
+      "Capacity factor versus availability",
+      "Fleet CF includes generation behavior; availability describes whether equipment can operate. Neither alone establishes data-center service reliability."
+    ],
+    [
+      "Ramp rate versus operating envelope",
+      "Identify rated-power denominator, electric versus thermal power, permitted range, time resolution and fuel-cycle conditions."
+    ],
+    [
+      "Design life versus licence term",
+      "Keep technical life, amortization life, analysis horizon and regulatory permission in separate fields."
+    ],
+    [
+      "Fuel price versus fuel cost",
+      "Uranium and SWU purchase prices do not determine $/MWh without enrichment, tails, fabrication, burnup, efficiency and inventory assumptions."
+    ],
+    [
+      "Production versus investment credit",
+      "§45Y applies to qualifying production; §48E applies to qualified investment. Percentage bonuses and percentage-point adders differ."
+    ],
+    [
+      "Reactor temperature versus usable heat",
+      "Include steam pressure, phase, extraction location, return conditions and temperature losses."
+    ],
+    [
+      "Footprint versus site",
+      "Separate building envelope, protected area, owner-controlled area, construction laydown, cooling systems and EPZ."
+    ],
+    [
+      "Vendor claim versus reviewed value",
+      "Government hosting does not make vendor content a government endorsement. Design approval does not establish commercial performance."
+    ],
+    [
+      "Decommissioning assurance versus expenditure",
+      "A regulatory minimum funding formula is not a complete project cost estimate."
+    ],
+    [
+      "Historical order versus current entitlement",
+      "A dated FERC order cannot establish today’s contractual limit without checking subsequent proceedings."
+    ],
+    [
+      "Verification and source conflicts",
+      "Transcription verification confirms what a document prints. The separate underlying-evidence and conflict fields describe the limits of that evidence. Neither a model input nor a vendor design claim is independently demonstrated operating performance."
+    ],
+    [
+      "Policy scope and payment",
+      "Qualifying capacity additions at older facilities can fall within §45Y/§48E. Domestic-content requirements can affect elective payment as well as bonus eligibility; statutory exceptions and waivers must be checked."
+    ],
+    [
+      "Source versions",
+      "Edition, revision, release date, retrieval date and document SHA-256 are separate fields. A checksum identifies retrieved bytes, not accuracy; live HTML navigation can change without changing a cited table."
+    ]
+  ],
+  "disagreements": [
+    {
+      "issue": "Large-reactor overnight capital",
+      "values": "7,861 $/kW net (N01); 5,750 $/kWe (N07).",
+      "source_ids": [
+        "S1",
+        "S2"
+      ],
+      "interpretation": "Different 2023/2022 dollar bases, plant scales, cost accounts and maturity definitions. Retain the source-specific estimates without averaging."
+    },
+    {
+      "issue": "SMR overnight capital",
+      "values": "8,936 $/kW net (N03); 8,000 $/kWe in Table A-1 (N08).",
+      "source_ids": [
+        "S1",
+        "S2"
+      ],
+      "interpretation": "EIA specifies a six-module NOAK plant; INL describes a generalized 300-MWe BOAK category. These are different plant and maturity assumptions."
+    },
+    {
+      "issue": "INL Moderate SMR capital conflict",
+      "values": "Table A-1: 8,000 $/kWe; Table 31: 7,750 $/kWe.",
+      "source_ids": [
+        "S2",
+        "S35"
+      ],
+      "interpretation": "Unresolved internal conflict. N08 preserves the Rev. 0 Table A-1 value with a conflict flag; no canonical replacement is established. The July 2024 document also prints both values; its cover says Revision 2 and its internal title page says Revision 1."
+    },
+    {
+      "issue": "Liftoff report editions",
+      "values": "March 2023: FOAK 9,000 and NOAK 3,600 $/kW; September 2024: early-of-a-kind 7,000–20,000 $/kW.",
+      "source_ids": [
+        "S4",
+        "S5"
+      ],
+      "interpretation": "Different scenario constructions and editions; the later range is not a revision of the earlier NOAK input."
+    },
+    {
+      "issue": "ATB and INL inputs",
+      "values": "INL candidate ATB recommendations; ATB 2024 narrative assumptions.",
+      "source_ids": [
+        "S2",
+        "S3"
+      ],
+      "interpretation": "A recommendation in an INL report does not show that an ATB workbook release adopted it unchanged."
+    },
+    {
+      "issue": "Construction clocks",
+      "values": "EIA: 52/42 months (large LWR/SMR); ATB Moderate: 82/55 months.",
+      "source_ids": [
+        "S1",
+        "S3"
+      ],
+      "interpretation": "Reference plants and scenarios differ. EIA reports development time separately: construction time is not total project lead time."
+    },
+    {
+      "issue": "INL Moderate large-reactor fuel cost",
+      "values": "Table A-1: 10.3 $/MWh; fuel discussion: 10.2 $/MWh.",
+      "source_ids": [
+        "S2"
+      ],
+      "interpretation": "Unresolved internal difference. N18 contains the Advanced and Conservative scenarios; no Moderate midpoint is supplied."
+    },
+    {
+      "issue": "INL future-cost endpoints",
+      "values": "Advanced-scenario large-reactor/SMR assignments in Table A-1 and Table 54 differ.",
+      "source_ids": [
+        "S2"
+      ],
+      "interpretation": "Disputed future-cost endpoints are outside this edition; reconciliation requires a revised document or erratum."
+    },
+    {
+      "issue": "Heat delivery boundaries",
+      "values": "Representative reactor outlets, coolant core exits and reference-model steam headers.",
+      "source_ids": [
+        "S3",
+        "S14",
+        "S15"
+      ],
+      "interpretation": "Different fluids and locations; reactor outlet temperature does not establish delivered process-steam temperature."
+    },
+    {
+      "issue": "Xe-100 reference-model steam header",
+      "values": "Table 9: 565.5°C and 161.4 bar; prose: 565°C and 160 bar.",
+      "source_ids": [
+        "S15"
+      ],
+      "interpretation": "Table/prose discrepancy; explanation not given. N44 retains Table 9 and marks the conflict. Pressure reference (gauge/absolute) remains NR."
+    },
+    {
+      "issue": "BWRX-300 output convention",
+      "values": "Workshop sheet: 300 MWe net; Rev. F includes both gross and net descriptions.",
+      "source_ids": [
+        "S29",
+        "S33"
+      ],
+      "interpretation": "Keep the exact document label and version. No parasitic-load adjustment is inferred from the product name."
+    },
+    {
+      "issue": "Tax-credit vintages",
+      "values": "2026 indexed amounts and statutory nominal amounts have different roles.",
+      "source_ids": [
+        "S17",
+        "S18",
+        "S19",
+        "S20",
+        "S21"
+      ],
+      "interpretation": "Annual indexing and statutory amendments remain dated. Apply the amount and eligibility conditions for the relevant year together."
+    }
+  ],
+  "gaps": [
+    {
+      "title": "ATB nuclear cost workbook",
+      "text": "The narrative chapter is included; a cell-level cost export is still needed before adding ATB capital-cost records.",
+      "url": "https://atb.nlr.gov/electricity/2024/nuclear"
+    },
+    {
+      "title": "INL revision reconciliation",
+      "text": "Internal capital, fuel and future-cost differences require comparison with subsequent revisions or errata.",
+      "url": "https://gain.inl.gov/content/uploads/4/2024/11/INL-RPT-24-77048-Meta-Analysis-of-Adv-Nuclear-Reactor-Cost-Estimations.pdf"
+    },
+    {
+      "title": "Plant-specific flexibility",
+      "text": "Public design- and fuel-cycle-specific operating constraints are needed for load following and ramp rates. Historical summaries do not establish licensed plant limits.",
+      "url": "https://europeanutilityrequirements.eu/fr/eur-document-full-text"
+    },
+    {
+      "title": "Licensing milestones",
+      "text": "Licensing pathway and milestone definitions require separate evidence; executive deadlines do not establish observed approval duration.",
+      "url": "https://www.govinfo.gov/content/pkg/FR-2025-05-29/html/2025-09798.htm"
+    },
+    {
+      "title": "All-in U.S. SMR capital cost",
+      "text": "A consistently scoped commercial benchmark remains unavailable here. Financing, owner costs and shared-site allocation need explicit treatment.",
+      "url": "https://www.eia.gov/analysis/studies/powerplants/capitalcost/pdf/capital_cost_AEO2025.pdf"
+    },
+    {
+      "title": "Advanced-reactor operating costs",
+      "text": "Technology-specific staffing, fuel cycles and maintenance need stronger public evidence; generic SMR estimates are not interchangeable across HTGR, SFR and MSR designs.",
+      "url": "https://gain.inl.gov/content/uploads/4/2024/11/INL-RPT-24-77048-Meta-Analysis-of-Adv-Nuclear-Reactor-Cost-Estimations.pdf"
+    },
+    {
+      "title": "Delivered process heat",
+      "text": "Pressure reference, return temperature, enthalpy states, delivery distance and extraction penalties remain necessary for a project heat balance.",
+      "url": "https://inldigitallibrary.inl.gov/content/uploads/50/2026/04/Sort_106989.pdf"
+    },
+    {
+      "title": "Current complete-site footprints",
+      "text": "Historical protected-area claims do not establish current application-specific total land, cooling or construction needs.",
+      "url": "https://api.cnsc-ccsn.gc.ca/dms/digital-medias/CMD-24-H3-Ref-R1-9-GEH-005N9751-BWRX-300-General-Description-Rev-F.pdf/object"
+    },
+    {
+      "title": "Decommissioning estimates",
+      "text": "Site-specific expenditure estimates and advanced-reactor end-state assumptions are needed in addition to statutory financial assurance.",
+      "url": "https://www.govinfo.gov/content/pkg/CFR-2025-title10-vol1/pdf/CFR-2025-title10-vol1-sec50-75.pdf"
+    },
+    {
+      "title": "Current co-location arrangements",
+      "text": "Later FERC orders, tariffs and agreements must be checked for a contemporary project; the November 2024 order is historical.",
+      "url": "https://www.ferc.gov/sites/default/files/2024-11/20241101-3061_ER24-2172-000.pdf"
+    }
+  ],
+  "other_references": [
+    {
+      "name": "Lazard — Levelized Cost of Energy+",
+      "url": "https://www.lazard.com/research-insights/financial-advisory/levelized-cost-of-energyplus-lcoeplus/",
+      "description": "Commercial cost comparisons and assumptions; source-specific reuse conditions."
+    },
+    {
+      "name": "BloombergNEF",
+      "url": "https://about.bnef.com/",
+      "description": "Subscription energy research."
+    },
+    {
+      "name": "S&P Global",
+      "url": "https://www.spglobal.com/",
+      "description": "Commercial energy research and data."
+    },
+    {
+      "name": "NEI — Nuclear Costs in Context",
+      "url": "https://www.nei.org/resources/reports-briefs/nuclear-costs-in-context",
+      "description": "Industry cost dataset; no extraction through an intermediary."
+    },
+    {
+      "name": "IEA — Projected Costs of Generating Electricity 2020",
+      "url": "https://www.iea.org/reports/projected-costs-of-generating-electricity-2020",
+      "description": "Comparative generation costs; no blanket redistribution permission assumed."
+    }
+  ],
+  "update_cadence": [
+    {
+      "family": "EIA fleet capacity factors",
+      "cadence": "Check monthly; append annual values when available and retain release vintage and preliminary/final status."
+    },
+    {
+      "family": "Uranium and enrichment prices",
+      "cadence": "Annual release and revisions; retain the reissue date."
+    },
+    {
+      "family": "EIA capital costs, AEO and ATB",
+      "cadence": "Each release; retain historical editions and their cost bases."
+    },
+    {
+      "family": "INL and DOE reports",
+      "cadence": "Each revision, erratum or replacement; reconcile conflicts explicitly."
+    },
+    {
+      "family": "Tax-credit amounts and eligibility",
+      "cadence": "Annual IRS indexing and immediate review after legislation or substantive Treasury/IRS guidance."
+    },
+    {
+      "family": "NRC licensing status and review schedules",
+      "cadence": "Quarterly and at rulemaking or licensing milestones; distinguish publication and effective dates."
+    },
+    {
+      "family": "NRC hourly fees",
+      "cadence": "Each annual final fee rule, including the actual implementation date."
+    },
+    {
+      "family": "Vendor design records",
+      "cadence": "Each filing or design revision; retain superseded versions."
+    },
+    {
+      "family": "FERC arrangements",
+      "cadence": "Each relevant order, tariff amendment or agreement."
+    },
+    {
+      "family": "Paper cross-references",
+      "cadence": "Corrections or a new public version; preserve the examined version and its locators."
+    }
+  ]
+}
