@@ -234,7 +234,7 @@
             st.set(""); box.innerHTML = ""; draw();
             table(box, ["Plan", "Chance", "Annual cost"], [["Stochastic program, expected", "", fm.m(St.sp.exp)]].concat(S.map(function (s) { return ["Wait and see: " + s.short.toLowerCase(), fm.pct(s.p), fm.m(St.ws[s.id].cost)]; })), "Numbers for the expected value of perfect information");
             var ans = Math.round((St.sp.exp - wsExp()) / 1e4) / 100, tries = 0;
-            var na = LX.NumAnswer(box, { label: "EVPI, in $M a year", unit: "$M", accept: ["M", "million"], width: "7em", onCheck: function (v) {
+            var na = LX.NumAnswer(box, { label: "EVPI, in $M a year", unit: "$M", accept: ["M", "million"], width: "7em", onChange: function () { api.clearSaw(); api.undone(); }, onCheck: function (v) {
               if (v == null) return; tries++;
               var good = LX.NumAnswer.close(v, ans, 0.05);
               na.msg.textContent = good ? "Right." : tries < 2 ? "Not yet: weight each wait-and-see cost by its chance, add them, and subtract from the stochastic plan's cost." : "The answer is below.";

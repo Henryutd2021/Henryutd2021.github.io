@@ -235,8 +235,9 @@
           fb.textContent = right ? plain(s.peak) + " MW = " + plain(vals[i]) + " " + PREFIX[i].p + "W." : (i === 1 ? "kW is the smaller unit, so the number grows: × 1,000." : "GW is the bigger unit, so the number shrinks: ÷ 1,000.");
           if (got[1] && got[3]) { api.done(); api.saw("A step down the ladder multiplies by 1,000; a step up divides. " + s.peak + " MW = " + num(s.peakKW) + " kW = " + plain(s.peakGW) + " GW: the same power, three ways."); }
         }
-        var a = numBox(act, { label: s.peak + " MW in kW:", unit: "kW", onCheck: function (v, inp) { check(1, v, inp); } });
-        var b = numBox(act, { label: s.peak + " MW in GW:", unit: "GW", onCheck: function (v, inp) { check(3, v, inp); } });
+        function edited(i) { got[i] = false; cells[i].textContent = "?"; fb.textContent = ""; api.clearSaw(); api.undone(); }
+        var a = numBox(act, { label: s.peak + " MW in kW:", unit: "kW", onChange: function () { edited(1); }, onCheck: function (v, inp) { check(1, v, inp); } });
+        var b = numBox(act, { label: s.peak + " MW in GW:", unit: "GW", onChange: function () { edited(3); }, onCheck: function (v, inp) { check(3, v, inp); } });
         fb = H("p", { class: "k1-test", "aria-live": "polite" }, act);
         autos[0] = function () { a.input.value = String(s.peakKW); a.go(); b.input.value = String(s.peakGW); b.go(); };
       }
@@ -259,7 +260,7 @@
         }
         draw();
         var tries = 0;
-        var n = numBox(act, { label: "Day's energy in GWh:", unit: "GWh", onCheck: function (v) {
+        var n = numBox(act, { label: "Day's energy in GWh:", unit: "GWh", onChange: function () { api.clearSaw(); api.undone(); }, onCheck: function (v) {
           tries++;
           if (close(v, s.dayGWh, 0.006)) { LX.store.set("k1-day", { gwh: s.dayGWh }); api.done(); api.saw(num(s.dayMWh) + " MWh ÷ 1,000 = " + plain(s.dayGWh) + " GWh. One hour at 1 MW is 1 MWh, so a day of hourly MW adds straight up to MWh."); }
           else api.saw(tries < 2 ? "Not yet. Add all 24 hours (slide to the end), then step up one rung: ÷ 1,000." : num(s.dayMWh) + " MWh ÷ 1,000 = " + plain(s.dayGWh) + " GWh (" + sig(s.dayGWh, 3) + " is fine).", true);
@@ -303,7 +304,7 @@
         var row = H("div", { class: "k1-row" }, list);
         H("p", { html: "<b>" + plain(s.dayWh) + " Wh ≈ " + sig(mant(s.dayWh), 3) + " × 10ⁿ Wh</b> <span>the town's day: n = ?</span>" }, row);
         var tries = 0;
-        var n = numBox(act, { label: "Exponent n for the day in Wh:", onCheck: function (v) {
+        var n = numBox(act, { label: "Exponent n for the day in Wh:", onChange: function () { api.clearSaw(); api.undone(); }, onCheck: function (v) {
           tries++;
           if (v === s.byId.town.exp) { api.done(); api.saw(plain(s.dayWh) + " Wh " + eqSci(s.dayWh) + " Wh: the point moves " + s.byId.town.exp + " places. The leading number is rounded to 3 figures, so the sign is ≈."); }
           else api.saw(tries < 2 ? "Not yet. Count the digits after the first one, 6: each is one place." : "n = " + s.byId.town.exp + ": " + plain(s.dayWh) + " has " + s.byId.town.exp + " digits after its first.", true);
@@ -341,7 +342,7 @@
         }
         pair();
         var tries = 0, PU = pairText(s, "phone", "us");
-        var n = numBox(act, { label: "Powers of ten, phone to U.S. year:", onCheck: function (v) {
+        var n = numBox(act, { label: "Powers of ten, phone to U.S. year:", onChange: function () { api.clearSaw(); api.undone(); }, onCheck: function (v) {
           tries++;
           if (v === s.span) { api.done(); api.saw("10" + sup(s.byId.us.exp) + " ÷ 10" + sup(s.byId.phone.exp) + " = 10" + sup(s.span) + ": the U.S. year is about " + sci(s.spanRatio, 2) + " phone charges. " + nearestWhy(PU)); }
           else api.saw(tries < 2 ? "Not yet. Subtract the exponents: " + s.byId.phone.sci + " and " + s.byId.us.sci + "." : s.byId.us.exp + " − " + s.byId.phone.exp + " = " + s.span + ".", true);

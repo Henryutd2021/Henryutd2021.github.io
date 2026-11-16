@@ -352,7 +352,8 @@
         var want = Math.round(E.did.est * 100) / 100;
         H("p", { class: "lx-hint", text: "TOU change " + kw(E.cells.onPost - E.cells.onPre) + "; flat change " + kw(F.flatChange) + "." }, act);
         var host = H("div", null, act);
-        LX.NumAnswer(act, { label: "TOU change − flat change", unit: "kW", width: "7em", onCheck: function (v) {
+        LX.NumAnswer(act, { label: "TOU change − flat change", unit: "kW", width: "7em", onChange: function () { host.innerHTML = ""; api.clearSaw(); api.undone(); }, onCheck: function (v) {
+          if (v == null) { api.saw("Type a number first.", true); return; }
           if (Math.abs(v - want) > 0.011) { api.saw("Not quite: " + kw(E.cells.onPost - E.cells.onPre) + " − (" + kw(F.flatChange) + ") = ?", true); return; }
           host.innerHTML = "";
           LX.Plot(host, { text: "Text version of the chart" }).render(ladderSpec([

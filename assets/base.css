@@ -100,6 +100,11 @@ a.card:hover, a.glow-card:hover, .card.is-link:hover { box-shadow: var(--shadow-
 div.quarto-post .body h2.listing-title, #quarto-margin-sidebar h2.quarto-listing-category-title {
   color: var(--ink); padding-bottom: 0; border-bottom: 0; }
 
+/* Category labels keep readable contrast in both themes, including Quarto's title badges. */
+.quarto-title .quarto-categories .quarto-category { opacity: 1; color: var(--muted); }
+div.quarto-post .listing-categories .listing-category,
+.quarto-grid-item .listing-categories .listing-category { color: var(--muted); border-color: var(--muted); }
+
 /* ---------- footer ---------- */
 .nav-footer { border-top: 1px solid var(--line); background: var(--bg-2) !important; font-size: .86rem; color: var(--muted); }
 .nav-footer a { color: var(--ink-2); }

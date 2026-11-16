@@ -160,6 +160,7 @@ body.page-folio main .chip { font-size: .78rem; padding: .16rem .6rem; color: va
   color: var(--t-ink); background: color-mix(in srgb, var(--t) 9%, var(--surface)); border: 1px solid color-mix(in srgb, var(--t) 30%, transparent); }
 .page-software .repo h3 { margin-top: 1.05rem; font-size: 1.25rem; font-weight: 700; }
 .page-software .repo p { margin: 0 0 .9rem; font-size: .96rem; line-height: 1.65; color: var(--ink-2); }
+.page-software .repo a { overflow-wrap: anywhere; }
 .page-software .repo-slug { display: inline-block; margin-top: .15rem; font-family: var(--font-mono); font-size: .8rem; color: var(--muted); }
 .page-software .repo h3 + p { margin-bottom: .75rem; }
 .page-software .repo-papers { margin-bottom: .95rem; }

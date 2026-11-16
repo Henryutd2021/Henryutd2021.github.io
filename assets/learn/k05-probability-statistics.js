@@ -417,7 +417,7 @@
       text: "Illustrative: gas plants A (" + PL.cc + " [[megawatt|MW]]) and B (" + PL.pk + " MW) are each out of service in " + share(PL.p, 0) + " of hours. If outages are [[independent-events|independent]], the chance both are out is the product of the two chances.",
       build: function (act, api) {
         var tbl = H("div", { class: "k5-cases" }, act), tries = 0, caveat = null;
-        numBox(act, { label: "Both out:", unit: "% of hours", onCheck: function (v) {
+        numBox(act, { label: "Both out:", unit: "% of hours", onChange: function () { tbl.innerHTML = ""; api.clearSaw(); api.undone(); }, onCheck: function (v) {
           tries++;
           if (v != null && Math.abs(v - 100 * PL.both) < 0.0051) {
             miniTable(tbl, ["Case", "MW out", "Hours in 10,000"], caseRows(false));
@@ -434,7 +434,9 @@
       build: function (act, api) {
         var tbl = H("div", { class: "k5-cases" }, act), tries = 0;
         miniTable(tbl, ["Case", "MW out", "Hours in 10,000"], caseRows(false));
-        numBox(act, { label: "Average MW out:", unit: "MW", onCheck: function (v) {
+        numBox(act, { label: "Average MW out:", unit: "MW", onChange: function () {
+          miniTable(tbl, ["Case", "MW out", "Hours in 10,000"], caseRows(false)); api.clearSaw(); api.undone();
+        }, onCheck: function (v) {
           tries++;
           if (v != null && Math.abs(v - PL.ev) < 0.051) {
             miniTable(tbl, ["Case", "MW out", "Hours in 10,000", "MW × chance"], caseRows(true));
@@ -526,7 +528,7 @@
     T.forEach(function (t) {
       var li = H("li", null, ol); H("p", { text: t.text }, li);
       var fb = H("div", { "aria-live": "polite" }, li);
-      var ni = numBox(li, { label: "Answer", unit: t.unit, onCheck: function (v) {
+      var ni = numBox(li, { label: "Answer", unit: t.unit, onChange: function () { fb.innerHTML = ""; }, onCheck: function (v) {
         if (v == null) return;
         var ok = Math.abs(v - t.answer) <= t.tol + 1e-9;
         if (ok) { doneK[t.key] = 1; li.classList.add("done"); score.textContent = Object.keys(doneK).length + " of " + T.length + " done"; }

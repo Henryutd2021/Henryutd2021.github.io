@@ -622,10 +622,12 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 <tr class="even">
 <th data-quarto-table-cell-role="th" scope="row">6. Uncertainty and accounting</th>
-<td data-l="Do, then check">Classify the uncertainties, treat each one, and put cost and carbon on one boundary.
+<td data-l="Do, then check">Classify and address uncertainty in your findings; use consistent boundaries where you report cost and emissions.
 <ul>
-<li>Uncertainties classified.</li>
-<li>Scenarios or a global sensitivity analysis; results as ranges.</li>
+<li>Uncertainties classified, with a justified treatment for each.</li>
+<li>Quantitative findings: scenario results or uncertainty ranges, with their construction explained.</li>
+<li>Qualitative findings: triangulation, conflicting evidence and limits of interpretation documented.</li>
+<li>Mixed studies: uncertainty addressed in both parts.</li>
 <li>Cost and emissions on one boundary where you report both.</li>
 </ul></td>
 <td data-l="Studios"><a href="r06-uncertainty-properly.html">R6</a>, <a href="r07-cost-carbon-properly.html">R7</a>, <a href="m07-monte-carlo.html">M7</a>, <a href="m08-stochastic-robust.html">M8</a></td>
@@ -633,11 +635,11 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 <tr class="odd">
 <th data-quarto-table-cell-role="th" scope="row">7. Mock review and rerun</th>
-<td data-l="Do, then check">Get a written mock review of your question and method, answer it, revise, and rerun your main result.
+<td data-l="Do, then check">Get a written mock review, answer it, revise, and rerun results or retrace qualitative findings.
 <ul>
 <li>Every major concern answered.</li>
 <li>A change log.</li>
-<li>A clean-clone rerun within your tolerance, or the difference explained.</li>
+<li>A clean-clone rerun or checked audit trail; differences explained.</li>
 </ul></td>
 <td data-l="Studios"><a href="ck-r-defend-revise.html">CK-R</a></td>
 <td class="n" data-l="Hours">4 · 4 · 4</td>
@@ -700,11 +702,13 @@ ul.task-list li input[type="checkbox"] {
 .cr-legend { margin: 0; padding-left: 1.4rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2px 18px; font-size: 13.5px; color: var(--lx-ink-2); }
 .cr-pick { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
 .cr-pick .lx-choice span { display: grid; gap: 2px; text-align: left; } .cr-pick .lx-choice small { color: var(--lx-ink-3); font-size: 13px; }
-.cr-field { display: grid; gap: 4px; } .cr-field label { font-family: var(--lx-f-display); font-weight: 500; font-size: 14px; }
-.cr-field select, .cr-field input { max-width: 100%; }
+.cr-field { display: grid; grid-template-columns: minmax(0, 1fr); min-width: 0; gap: 4px; } .cr-field label { font-family: var(--lx-f-display); font-weight: 500; font-size: 14px; }
+.cr-field select, .cr-field input { min-width: 0; max-width: 100%; }
+.cr-field select { width: 100%; }
 .cr-alts { margin: 0; padding: 0; border: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 4px 12px; font-size: 14.5px; min-width: 0; }
 .cr-alts legend { float: none; padding: 0; margin-bottom: 4px; font-family: var(--lx-f-display); font-weight: 500; font-size: 14px; }
-.cr-alts label { display: flex; gap: 6px; align-items: flex-start; }
+.cr-alts label { display: flex; gap: 6px; align-items: flex-start; min-width: 0; }
+.cr-alts label span { min-width: 0; overflow-wrap: anywhere; }
 .cr-checks .lx-rn-list li, .cr-route p { font-size: 14.5px; }
 .cr-why { display: block; color: var(--lx-ink-2); font-size: 13.5px; }
 .cr-route p, .cr-checks p { margin: 0 0 4px; }
@@ -744,7 +748,7 @@ ul.task-list li input[type="checkbox"] {
 <div id="cr-note" class="cr-note">
 <div class="lx-fallback">
 
-<ol class="lx-rn-outline"><li><b>Title and plan link:</b> the plan's link from the planner above, and the date</li><li><b>Why it matters:</b> Who would act on the answer, and what answer would change their decision.</li><li><b>The plan:</b> your question card's eight parts; the track, the scale route, the method and its alternatives, the mock review, the time and the milestones</li><li><b>Assumptions:</b> the hours a week the weeks rest on</li><li><b>Sensitivity:</b> the uncertainty treatment you plan</li><li><b>What is known, and the gap:</b> The three closest studies and what none of them answers; the size of your concept matrix and the date of your search (R2).</li><li><b>Why this method, not the alternatives:</b> What your method answers that the two alternatives cannot (if one is from your method's family, name that method exactly), and one limit you will mitigate (R3).</li><li><b>Data and licenses:</b> Each source, its date and its license; for interviews, who you will ask, how you will ask for consent, and the ethics review you need first (R4, R9).</li><li><b>How you will check it:</b> One verification check, one validation against real data or an independent reference, and the tolerance you set now (R5).</li><li><b>What the study leaves out:</b> The parts, people and years outside your boundary, and why that does not change the answer to your question.</li><li><b>Integrity:</b> Credit, conflicts, consent, and who the study affects (R9).</li></ol>
+<ol class="lx-rn-outline"><li><b>Title and plan link:</b> the plan's link from the planner above, and the date</li><li><b>Why it matters:</b> Who would act on the answer, and what answer would change their decision.</li><li><b>The plan:</b> your question card's eight parts; the track, the scale route, the method and its alternatives, the mock review, the time and the milestones</li><li><b>Assumptions:</b> the hours a week the weeks rest on</li><li><b>Sensitivity:</b> the uncertainty treatment you plan</li><li><b>What is known, and the gap:</b> The three closest studies and what none of them answers; the size of your concept matrix and the date of your search (R2).</li><li><b>Why this method, not the alternatives:</b> What your method answers that the two alternatives cannot (if one is from your method's family, name that method exactly), and one limit you will mitigate (R3).</li><li><b>Data and licenses:</b> Each source, its date and its license; for interviews, who you will ask, how you will ask for consent, and the ethics review you need first (R4, R9).</li><li><b>How you will check it:</b> Name one verification check and independent validation evidence; set a numerical tolerance or explain how qualitative findings will be traced to their sources (R5).</li><li><b>What the study leaves out:</b> The parts, people and years outside your boundary, and why that does not change the answer to your question.</li><li><b>Integrity:</b> Credit, conflicts, consent, and who the study affects (R9).</li></ol>
 
 <p class="lx-hint">With JavaScript on, your question card and your plan fill in the proposal's table, and the checks say which parts are in place. Without it, write the proposal under these headings, on one page.</p>
 </div>
@@ -888,14 +892,14 @@ Selection: homes that waited may differ; I compare their use before 2023 too. [5
 </tr>
 <tr class="even">
 <th data-quarto-table-cell-role="th" scope="row">Trustworthy analysis<br>
-<span class="lx-hint">Look for: A clean-clone rerun (CK-R), a verification log and one validation, named in the paper.</span></th>
+<span class="lx-hint">Look for: A clean-clone rerun or checked audit trail, a verification log and independent validation evidence.</span></th>
 <td data-l="Developing">Results cannot be rerun.</td>
 <td data-l="Proficient">Reruns from a clean clone (or a complete audit trail); verification log; one validation against real data or an independent reference.</td>
 <td data-l="Strong">Independent reproduction by someone else; validation on data not used to build the analysis.</td>
 </tr>
 <tr class="odd">
 <th data-quarto-table-cell-role="th" scope="row">Uncertainty<br>
-<span class="lx-hint">Look for: The main result as a range, with how the range was made.</span></th>
+<span class="lx-hint">Look for: The main uncertainties, the evidence used to assess them, and how they affect your conclusions.</span></th>
 <td data-l="Developing">Single numbers.</td>
 <td data-l="Proficient">Uncertainties classified; scenario or global sensitivity analysis; results as ranges.</td>
 <td data-l="Strong">Decision-relevant uncertainty identified and its value discussed.</td>
@@ -930,7 +934,7 @@ Selection: homes that waited may differ; I compare their use before 2023 too. [5
 </tr>
 </tbody>
 </table>
-</div><p class="lx-hint lx-rb-reads"><b>Framing,</b> for a descriptive question, the counterfactual is the reference its count is compared with; the falsification statement, an expectation stated before counting or a check on the count.</p>
+</div><p class="lx-hint lx-rb-reads"><b>Framing,</b> for a descriptive question, the counterfactual is the reference its count is compared with; the falsification statement, an expectation stated before counting or a check on the count.</p><p class="lx-hint lx-rb-reads"><b>Uncertainty,</b> for CR, quantitative findings need scenario results or justified uncertainty ranges, including intervals with robustness checks; qualitative findings need triangulation, conflicting evidence and limits of interpretation. A numerical range is not required for qualitative findings. Mixed studies address both parts.</p>
 
 </div>
 </div>

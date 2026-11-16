@@ -496,7 +496,7 @@
           var seg = H("div", { class: "lx-seg", role: "group", "aria-labelledby": "a6-f-l" }, cc);
           var opts = [null].concat(C.forceable), btns = opts.map(function (id) {
             var bt = H("button", { type: "button", text: id ? PJ[id].short : "Nobody" }, seg);
-            bt.addEventListener("click", function () { S.forced = id; keep(); paint(); if (id) { var run = board.paint(); api.done(); api.saw(forcedWords(C, run, id)); } });
+            bt.addEventListener("click", function () { S.forced = id; keep(); paint(); api.clearSaw(); if (id) { var run = board.paint(); api.done(); api.saw(forcedWords(C, run, id)); } });
             return bt;
           });
           var board = ClusterBoard(act, { progressive: false });
@@ -521,7 +521,7 @@
         build: function (act, api) {
           S.forced = null;
           var tg = LX.Toggle(H("div", { class: "lx-toggles", role: "group", "aria-label": "Rules" }, act), { label: "Readiness rule: site control at the request", on: S.ready,
-            onChange: function (on) { S.ready = on; keep(); var run = board.paint(); if (on) { api.done(); var off = cluster(C); api.saw("Same three projects connect, at the same shares, after **" + fmtN(run.days) + " days** of study instead of " + fmtN(off.days) + ": no placeholder to withdraw."); } } });
+            onChange: function (on) { S.ready = on; keep(); var run = board.paint(); api.clearSaw(); if (on) { api.done(); var off = cluster(C); api.saw("Same three projects connect, at the same shares, after **" + fmtN(run.days) + " days** of study instead of " + fmtN(off.days) + ": no placeholder to withdraw."); } } });
           var board = ClusterBoard(act, { progressive: false });
           if (S.ready) api.done();
           hooks.ready = function () { if (!S.ready) tg.el.click(); };
@@ -546,7 +546,7 @@
       { text: "Large loads have their own process: in Texas, a large load in ERCOT's first batch study holds $50,000 of [[financial-security|security]] per MW. What total security would the 300 MW campus hold?",
         build: function (act, api) {
           var want = security(N.campusMW, E.securityPerMW) / 1e6;
-          var na = LX.NumAnswer(act, { label: "Security for 300 MW", unit: "$ million", accept: ["million", "M", "$M"], onCheck: function (v, input) {
+          var na = LX.NumAnswer(act, { label: "Security for 300 MW", unit: "$ million", accept: ["million", "M", "$M"], onChange: function () { api.clearSaw(); api.undone(); }, onCheck: function (v, input) {
             if (v == null) return;
             var ok = Math.abs(v - want) < 1e-9; input.classList.toggle("right", ok); input.classList.toggle("wrong", !ok);
             if (ok) { api.done(); api.saw("**$" + want + " million.** ERCOT's list of large loads seeking to connect totals " + fmtN(E.requestsGW, 1) + " GW, about " + fmtN(E.requestsGW / (E.peakMW / 1000), 1) + " times its record demand; " + fmtN(E.noStudyGW, 1) + " GW had no studies submitted, " + fmtN(E.energizedGW, 1) + " GW were energized."); }

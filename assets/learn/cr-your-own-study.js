@@ -86,9 +86,9 @@
         why: s.alts.length < 2 ? "Pick two alternatives to defend your method against (you have " + s.alts.length + ")." : "Your alternatives are both " + F[s.family] + ": pick one from another family." },
       { id: "fit", label: "A method family that fits the track", ok: T.fits.indexOf(s.family) >= 0,
         why: F[s.family] + " is unusual for " + (T.id === "empirical" ? "an " : "a ") + T.label.toLowerCase() + " study: change the track, or say why in the proposal." },
-      { id: "unc", label: "An uncertainty treatment at the rubric's Proficient level, usually paired with your method", ok: fits,
+      { id: "unc", label: "An uncertainty treatment usually paired with your method, to justify in the proposal", ok: fits,
         why: !U.ok ? U.why || "" : U.label + " is usually paired with " + (suits.length > 2 ? suits.slice(0, -1).join(", ") + " and " + suits[suits.length - 1] : suits.join(" and ")) +
-          ". It can still suit " + F[s.family] + ": in the proposal, say which uncertain inputs you will vary and how you will analyze their effect." },
+          ". It can still suit " + F[s.family] + ": in the proposal, explain which uncertainty it addresses, how you will apply it, and what evidence it will produce." },
       { id: "scale", label: "Your question card at the plan's scale", ok: !!cardScale && cardScale === s.scale,
         why: cardScale ? "Your card says " + cardScale + "; the plan says " + s.scale + ". Make them the same, or change your route."
           : "Your question card has no scale yet: set it in the card below." }

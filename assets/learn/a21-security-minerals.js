@@ -489,7 +489,7 @@
           LX.Ledger(H("div", null, act), { caption: "What you need, 2025. " + LINE, columns: ["", "PJ a year", "Through the strait"],
             rows: straitInputs(PL).map(function (r) { return { head: r[0], cells: [r[1], r[2]] }; }), cls: "a21-led" });
           var ans = straitAnswer(PL), out;
-          var na = LX.NumAnswer(act, { label: "Share of primary energy through the strait", unit: "%", onCheck: function (v) {
+          var na = LX.NumAnswer(act, { label: "Share of primary energy through the strait", unit: "%", onChange: function () { out.innerHTML = ""; api.clearSaw(); api.undone(); }, onCheck: function (v) {
             if (v == null) return;
             var good = Math.abs(v - ans) <= 0.6;
             out.innerHTML = bold((good ? "Right. " : "Not quite: " + fmtN(v, 1) + "%. ") + straitSaw(PL)); api.done(); api.saw("A route is a supply of its own: diversifying sellers does not help if they all ship through one strait.");
@@ -600,7 +600,7 @@
         } },
       { text: "Last, sort the levers: which ones help against which shock? Tick each cell where the lever helps, then check against the stress tests.",
         build: function (act, api) {
-          var cs = LX.CardSort(act, { mode: "toggles", bins: D.sort.bins, items: D.sort.items, checkLabel: "Check my sort", onCheck: function (res) {
+          var cs = LX.CardSort(act, { mode: "toggles", bins: D.sort.bins, items: D.sort.items, checkLabel: "Check my sort", onChange: function () { api.clearSaw(); }, onCheck: function (res) {
             api.done(); api.saw(res.agree + " of " + res.clear + " clear cells agree. Stocks bridge time, more suppliers spread a supplier risk, a second site spreads a site risk; using less helps against prices and routes.");
           } });
           demo[9] = function () { cs.check(); };

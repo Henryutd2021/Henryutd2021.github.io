@@ -392,7 +392,7 @@
       matrixIntro(D).forEach(function (t) { H("p", { class: "lx-hint", html: LX.rich(t) }, act); });
       var cs = LX.CardSort(act, { mode: "toggles", bins: D.bins, checkLabel: "Check my coding", cls: "r2-matrix",
         items: D.matrix.map(function (p) { return { key: p.key, label: p.name + (p.code ? " · to code" : ""), color: p.code ? "var(--lx-accent)" : "var(--lx-ink-3)", ref: p.ref, why: p.why }; }),
-        marks: marks, onChange: function (m) { LX.store.set("r2-marks", m); state.marks = m; },
+        marks: marks, onChange: function (m) { LX.store.set("r2-marks", m); state.marks = m; api.clearSaw(); },
         onCheck: function (res) {
           var mine = D.matrix.filter(function (p) { return p.code; }), agree = 0, total = 0;
           mine.forEach(function (p) { KEYS.forEach(function (k) { if (p.ref[k] !== "partly") { total++; if (res.cells[p.key][k] === "agree") agree++; } }); });

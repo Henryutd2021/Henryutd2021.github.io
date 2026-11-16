@@ -75,6 +75,10 @@
       while (legend.firstChild) legend.removeChild(legend.firstChild);
       swatch(legend, h.color("t"), null, "Steam route: lost turbine output × (price + credit)");
       swatch(legend, h.color("accent"), null, "Electric chiller: power used × price");
+      var bracket = h.el("span", { style: "display:inline-flex;align-items:center;gap:.4rem" }, legend);
+      var mark = h.el("svg", { width: 22, height: 10, "aria-hidden": "true" }, bracket);
+      h.el("path", { d: "M4 1 H18 M11 1 V9 M4 9 H18", fill: "none", stroke: h.color("t"), "stroke-width": 2 }, mark);
+      h.el("span", { text: "Bracket: forgone production credit" }, bracket);
     }
 
     // text label; o.halo draws a background-colored outline under the glyphs so crossing lines do not hurt legibility
@@ -91,7 +95,7 @@
     function draw(w) {
       var m = model(state);
       var H = Math.max(240, Math.min(320, Math.round(w * 0.58)));
-      var M = { l: 48, r: 12, t: 24, b: 42 };
+      var M = { l: 48, r: 12, t: 46, b: 42 };
       var pw = w - M.l - M.r, ph = H - M.t - M.b;
       var Y_MAX = yMax(state.price);
       var x = h.scale(0, X_MAX, M.l, M.l + pw), y = h.scale(0, Y_MAX, M.t + ph, M.t);
@@ -122,7 +126,7 @@
         label(axis, x(v), M.t + ph + 16, "$" + v, { anchor: "middle" });
       });
       h.el("line", { x1: M.l, x2: M.l + pw, y1: M.t + ph, y2: M.t + ph }, axis);
-      label(axis, M.l + pw / 2, H - 6, "Production credit ($ per MWh of electricity)", { anchor: "middle" });
+      label(axis, M.l + pw / 2, H - 6, w < 300 ? "Credit ($/MWh electricity)" : "Production credit ($ per MWh of electricity)", { anchor: "middle" });
       var yl = label(axis, 0, 0, "Cost per MWh of cooling", { anchor: "middle" });
       yl.setAttribute("transform", "translate(12," + (M.t + ph / 2) + ") rotate(-90)");
 
@@ -142,11 +146,13 @@
         label(tags, x(0) + 6, y(m.steamSales) + 16, "Steam route", { fill: tc, weight: 600, halo: true });
       }
 
-      // break-even point, labeled where neither line passes: below-right of the crossing, or above-left near the right edge
+      // A separate heading row keeps break-even clear of both route labels and the changing forgone-credit bracket.
+      // The leader crosses above the region captions, then follows their boundary down to the intersection.
       h.el("circle", { cx: bx, cy: y(m.electric), r: 4.5, fill: surface, stroke: ink, "stroke-width": 1.5 }, lines);
-      var beText = "break-even $" + h.fmt(m.breakEvenCredit, 0);
-      if (bx <= M.l + pw - 100) label(tags, bx + 8, y(m.electric) + 16, beText, { cls: "ex-strong", halo: true });
-      else label(tags, bx - 8, y(m.electric) - 9, beText, { anchor: "end", cls: "ex-strong", halo: true });
+      var beText = "break-even $" + h.fmt(m.breakEvenCredit, 0), beX = M.l + pw / 2;
+      h.el("path", { d: "M" + beX + " 20 V22 H" + bx + " V" + (y(m.electric) - 5), fill: "none", stroke: ink,
+        "stroke-opacity": 0.45, "stroke-dasharray": "3 3" }, lines);
+      label(tags, beX, 16, beText, { anchor: "middle", cls: "ex-strong", halo: true });
 
       // current setting: marker, both costs, and the part of the steam cost that is forgone credit
       var cx = x(state.credit), cur = h.el("g", {}, svg);
@@ -160,7 +166,7 @@
         h.el("line", { x1: bxk, x2: bxk, y1: y0, y2: y1, stroke: tc, "stroke-width": 3, "stroke-opacity": 0.55 }, cur);
         h.el("line", { x1: bxk - 3, x2: bxk + 3, y1: y0, y2: y0, stroke: tc, "stroke-width": 1.5 }, cur);
         h.el("line", { x1: bxk - 3, x2: bxk + 3, y1: y1, y2: y1, stroke: tc, "stroke-width": 1.5 }, cur);
-        if (y0 - y1 > 16) label(tags, bxk + side * 6, (y0 + y1) / 2 + 4, "forgone credit", { anchor: side > 0 ? "start" : "end", fill: tc, halo: true });
+        // The bracket is named in the legend, so its label cannot collide with a route as the sliders move.
       }
       h.el("circle", { cx: cx, cy: y(m.steam), r: 5, fill: tc, stroke: surface, "stroke-width": 1.5 }, cur);
       h.el("circle", { cx: cx, cy: y(m.electric), r: 5, fill: ac, stroke: surface, "stroke-width": 1.5 }, cur);

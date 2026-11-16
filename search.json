@@ -70,8 +70,8 @@
     "text": "The bench"
   },
   {
-    "objectID": "learn/sb4-pathway-explorer.html#results",
-    "href": "learn/sb4-pathway-explorer.html#results",
+    "objectID": "learn/sb4-pathway-explorer.html#results-heading",
+    "href": "learn/sb4-pathway-explorer.html#results-heading",
     "title": "Pathway Explorer",
     "section": "Results",
     "text": "Results"
@@ -98,8 +98,8 @@
     "text": "The bench"
   },
   {
-    "objectID": "learn/sb2-grid-room.html#results",
-    "href": "learn/sb2-grid-room.html#results",
+    "objectID": "learn/sb2-grid-room.html#results-heading",
+    "href": "learn/sb2-grid-room.html#results-heading",
     "title": "Grid Room",
     "section": "Results",
     "text": "Results"
@@ -126,8 +126,8 @@
     "text": "The bench"
   },
   {
-    "objectID": "learn/sb0-site-bench.html#results",
-    "href": "learn/sb0-site-bench.html#results",
+    "objectID": "learn/sb0-site-bench.html#results-heading",
+    "href": "learn/sb0-site-bench.html#results-heading",
     "title": "Site Bench",
     "section": "Results",
     "text": "Results"
@@ -637,8 +637,8 @@
     "text": "Worked solution"
   },
   {
-    "objectID": "learn/ck-r-defend-revise.html#rubric",
-    "href": "learn/ck-r-defend-revise.html#rubric",
+    "objectID": "learn/ck-r-defend-revise.html#rubric-heading",
+    "href": "learn/ck-r-defend-revise.html#rubric-heading",
     "title": "Researcher checkpoint: defend your question and method, then revise",
     "section": "Rubric",
     "text": "Rubric"
@@ -658,8 +658,8 @@
     "text": "Worked solution: the school-bus estimate"
   },
   {
-    "objectID": "learn/ck-f-estimate.html#rubric",
-    "href": "learn/ck-f-estimate.html#rubric",
+    "objectID": "learn/ck-f-estimate.html#rubric-heading",
+    "href": "learn/ck-f-estimate.html#rubric-heading",
     "title": "Foundations checkpoint: estimate an unfamiliar situation",
     "section": "Rubric",
     "text": "Rubric"
@@ -1768,7 +1768,7 @@
     "href": "field-notes/data-tools.html#at-a-glance",
     "title": "Data & Tools for Energy-Systems Modeling",
     "section": "Terms at a glance",
-    "text": "Terms at a glance\n\n\n\n\n\n\n\n\nSource\nPublisher\nCan you redistribute what you download?\n\n\n\n\nERCOT disclosures and prices\nERCOT\nYes, if files are unmodified and notices kept; charts and analyses built from the raw data are allowed\n\n\nPJM Data Miner\nPJM Interconnection\nNo, not without PJM authorization (membership or a PJM redistribution license); non-members may use the data internally\n\n\nEIA-930, EIA-860/860M/861/923\nU.S. Energy Information Administration\nYes; public domain, with credit to EIA\n\n\nIEA Energy and AI\nInternational Energy Agency\nReport text and figures: yes, under CC BY 4.0. Data explorer and datasets: not CC BY; check IEA’s separate terms\n\n\nSDWPF\nDataset authors, via figshare\nYes, under CC BY 4.0\n\n\nQueued Up\nBerkeley Lab with GridTracker\nYes, under CC BY 4.0, crediting both\n\n\nReEDS\nNLR\nCode: yes, BSD-3-Clause. Running it needs a commercial GAMS license; inputs come from many sources\n\n\nNRC and DOE resources\nNRC; DOE\nNRC-authored material: yes, it is not subject to copyright. Third-party documents may be protected\n\n\nAnnual Technology Baseline\nNLR\nYes, under CC BY 4.0\n\n\nCambium\nNLR\nWorkbooks: copies allowed if the license notice travels with them, with credit. Full datasets: link to the viewer\n\n\nREopt\nNLR\nREopt.jl code: Apache-2.0. API and web tool: free, with a key for the API\n\n\nSAM and PySAM\nNLR\nFree; open-source code under BSD-3-Clause\n\n\nHiGHS and linopy\nHiGHS project; linopy maintainers\nYes; both MIT"
+    "text": "Terms at a glance\n\n\n\n\n\n\n\n\n\nSource\nPublisher\nCan you redistribute what you download?\n\n\n\n\nERCOT disclosures and prices\nERCOT\nYes, if files are unmodified and notices kept; charts and analyses built from the raw data are allowed\n\n\nPJM Data Miner\nPJM Interconnection\nNo, not without PJM authorization (membership or a PJM redistribution license); non-members may use the data internally\n\n\nEIA-930, EIA-860/860M/861/923\nU.S. Energy Information Administration\nYes; public domain, with credit to EIA\n\n\nIEA Energy and AI\nInternational Energy Agency\nReport text and figures: yes, under CC BY 4.0. Data explorer and datasets: not CC BY; check IEA’s separate terms\n\n\nSDWPF\nDataset authors, via figshare\nYes, under CC BY 4.0\n\n\nQueued Up\nBerkeley Lab with GridTracker\nYes, under CC BY 4.0, crediting both\n\n\nReEDS\nNLR\nCode: yes, BSD-3-Clause. Running it needs a commercial GAMS license; inputs come from many sources\n\n\nNRC and DOE resources\nNRC; DOE\nNRC-authored material: yes, it is not subject to copyright. Third-party documents may be protected\n\n\nAnnual Technology Baseline\nNLR\nYes, under CC BY 4.0\n\n\nCambium\nNLR\nWorkbooks: copies allowed if the license notice travels with them, with credit. Full datasets: link to the viewer\n\n\nREopt\nNLR\nREopt.jl code: Apache-2.0. API and web tool: free, with a key for the API\n\n\nSAM and PySAM\nNLR\nFree; open-source code under BSD-3-Clause\n\n\nHiGHS and linopy\nHiGHS project; linopy maintainers\nYes; both MIT"
   },
   {
     "objectID": "field-notes/data-tools.html#grid-markets",
@@ -2422,8 +2422,8 @@
     "text": "Worked solution"
   },
   {
-    "objectID": "learn/ck-a-spreadsheet.html#rubric",
-    "href": "learn/ck-a-spreadsheet.html#rubric",
+    "objectID": "learn/ck-a-spreadsheet.html#rubric-heading",
+    "href": "learn/ck-a-spreadsheet.html#rubric-heading",
     "title": "Analyst checkpoint: an auditable spreadsheet for a new case",
     "section": "Rubric",
     "text": "Rubric"
@@ -2443,8 +2443,8 @@
     "text": "Worked solutions"
   },
   {
-    "objectID": "learn/ck-m-unseen-problem.html#rubric",
-    "href": "learn/ck-m-unseen-problem.html#rubric",
+    "objectID": "learn/ck-m-unseen-problem.html#rubric-heading",
+    "href": "learn/ck-m-unseen-problem.html#rubric-heading",
     "title": "Modeler checkpoint: formulate an unseen problem, find a defect, validate a result",
     "section": "Rubric",
     "text": "Rubric"
@@ -2961,8 +2961,8 @@
     "text": "The bench"
   },
   {
-    "objectID": "learn/sb1-microgrid-workbench.html#results",
-    "href": "learn/sb1-microgrid-workbench.html#results",
+    "objectID": "learn/sb1-microgrid-workbench.html#results-heading",
+    "href": "learn/sb1-microgrid-workbench.html#results-heading",
     "title": "Microgrid Workbench",
     "section": "Results",
     "text": "Results"
@@ -2989,8 +2989,8 @@
     "text": "The bench"
   },
   {
-    "objectID": "learn/sb3-city-planner.html#results",
-    "href": "learn/sb3-city-planner.html#results",
+    "objectID": "learn/sb3-city-planner.html#results-heading",
+    "href": "learn/sb3-city-planner.html#results-heading",
     "title": "City Planner",
     "section": "Results",
     "text": "Results"

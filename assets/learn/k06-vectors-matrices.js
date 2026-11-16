@@ -282,7 +282,7 @@
       build: function (act, api) {
         H("p", { class: "lx-hint", text: T.hour }, act);
         H("p", { class: "k6-eq", html: "c · x = " + M.c[0] + " × " + s.plan[0] + " + " + M.c[1] + " × " + s.plan[1] + " = ?" }, act);
-        var tries = 0, n = LX.NumAnswer(act, { label: "c · x, in dollars:", unit: "$", onCheck: function (v) {
+        var tries = 0, n = LX.NumAnswer(act, { label: "c · x, in dollars:", unit: "$", onChange: function () { api.clearSaw(); api.undone(); }, onCheck: function (v) {
           tries++;
           if (close(v, s.cost, 0.5)) { api.done(); api.saw(T.cost); } else api.saw(tries < 2 ? T.costHint : T.cost, true);
         } });
@@ -316,7 +316,7 @@
       build: function (act, api) {
         var mx = matrix(act, M, {}), tries = 0, done = false;
         function draw() { mx.draw({ ax: s.Ax.map(function (v, i) { return i === 3 && !done ? null : v; }), b: true }); }
-        var n = LX.NumAnswer(act, { label: "CO₂ row of A x, in t:", unit: "t", onCheck: function (v) {
+        var n = LX.NumAnswer(act, { label: "CO₂ row of A x, in t:", unit: "t", onChange: function () { done = false; draw(); api.clearSaw(); api.undone(); }, onCheck: function (v) {
           tries++;
           if (close(v, s.co2, 0.005)) { done = true; draw(); api.done(); api.saw(T.co2); } else api.saw(tries < 2 ? T.co2Hint : T.co2, true);
         } });
