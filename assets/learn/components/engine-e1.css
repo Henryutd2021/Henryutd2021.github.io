@@ -85,6 +85,7 @@
 /* ---------- phones: base.css turns .lx-facts into one block per row with the header hidden; label each cell, and keep
    the cost table a table (three short columns fit) */
 @media (max-width: 640px) {
+  .lx-facts.e1-outs td.n { white-space: normal; }
   .lx-facts.e1-lab th[scope="row"] { display: block; padding: 2px 0; border: 0; text-transform: none; letter-spacing: 0; font-size: 14.5px; color: var(--lx-ink); }
   .lx-facts.e1-lab td[data-l]::before { content: attr(data-l) ": "; font-family: var(--lx-f-display); font-weight: 400; font-size: 12.5px; color: var(--lx-ink-3); white-space: normal; }
   .lx-facts.e1-cost { display: table; } .e1-cost tbody { display: table-row-group; } .e1-cost tfoot { display: table-footer-group; }

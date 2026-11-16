@@ -20,6 +20,8 @@ This guide is for researchers, students and analysts who build models of U.S. po
 
 ## Terms at a glance {#at-a-glance}
 
+::: {.table-responsive role="region" aria-label="Data sources and redistribution terms" tabindex="0"}
+
 | Source | Publisher | Can you redistribute what you download? |
 |---|---|---|
 | ERCOT disclosures and prices | ERCOT | Yes, if files are unmodified and notices kept; charts and analyses built from the raw data are allowed |
@@ -35,6 +37,8 @@ This guide is for researchers, students and analysts who build models of U.S. po
 | REopt | NLR | REopt.jl code: Apache-2.0. API and web tool: free, with a key for the API |
 | SAM and PySAM | NLR | Free; open-source code under BSD-3-Clause |
 | HiGHS and linopy | HiGHS project; linopy maintainers | Yes; both MIT |
+
+:::
 
 ## Grid operations & markets {#grid-markets}
 

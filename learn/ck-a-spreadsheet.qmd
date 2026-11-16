@@ -230,7 +230,7 @@ twitter-card: {"description": "Build a school solar-battery spreadsheet from dat
 
 ::: {#rubric .lx-sec}
 ::: {.lx-sec-h}
-## Rubric
+## Rubric {#rubric-heading}
 :::
 
 ```{=html}

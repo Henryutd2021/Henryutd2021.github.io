@@ -240,6 +240,7 @@
   }
   LX.store = { get: function (k, d) { var v = kv("kv")(k); return v === undefined ? d : v; }, set: function (k, v) { kv("kv")(k, v); },
     persistent: function () { return MEM == null; },
+    resetMark: function () { return read().reset || null; },
     clearAll: function () {   // every guess, answer, draft, checkpoint attempt and tick of the course, in this browser
       EPOCH = new Date().toISOString();
       var txt = JSON.stringify({ reset: EPOCH });   // no reader data: only the time of the reset (see read and write)

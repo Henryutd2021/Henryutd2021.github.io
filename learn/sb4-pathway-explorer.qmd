@@ -101,7 +101,7 @@ twitter-card: {"description": "Plan a fictional nation's five regions to 2050; t
 
 ::: {#results .lx-sec}
 ::: {.lx-sec-h}
-## Results
+## Results {#results-heading}
 :::
 
 ```{=html}

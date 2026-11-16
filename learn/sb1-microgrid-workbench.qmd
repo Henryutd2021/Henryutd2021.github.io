@@ -96,7 +96,7 @@ twitter-card: {"description": "Set a fictional campus's equipment, tariffs, load
 
 ::: {#results .lx-sec}
 ::: {.lx-sec-h}
-## Results
+## Results {#results-heading}
 :::
 
 ```{=html}

@@ -109,7 +109,7 @@
       ctl = typeof AbortController !== "undefined" ? new AbortController() : null;
       attempt = isRetry && lastTried === k ? attempt + 1 : 1;
       lastTried = k; planKey = k;
-      setBusy(true, JSON.parse(k)); say("busy", "Running…");
+      setBusy(true, JSON.parse(k)); paintStale(false); say("busy", "Running…");
       var p, step = function (s, n) { if (my === token && prog) prog.step(s, n); };
       try { p = Promise.resolve(o.solve(JSON.parse(k), { signal: ctl ? ctl.signal : null, attempt: attempt, step: step })); }
       catch (e) { p = Promise.resolve({ status: "error", ok: false, error: e && e.message }); }
@@ -132,7 +132,7 @@
       });
     }
     btn.addEventListener("click", function () { if (!busyNow && o.state) run(o.state(), false); });
-    again.addEventListener("click", function () { if (!busyNow && lastTried !== null) run(JSON.parse(lastTried), true); });
+    again.addEventListener("click", function () { if (!busyNow && lastTried !== null) run(o.state ? o.state() : JSON.parse(lastTried), true); });
     return {
       el: box, button: btn, again: again, status: status,
       run: function (state) { return run(state, false); },

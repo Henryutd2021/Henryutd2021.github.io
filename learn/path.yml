@@ -426,6 +426,7 @@
   does: "In a notebook, load a year of hourly grid data, fix time zones and daylight-saving gaps, plot it, compute capacity factors and a duration curve, and write assert checks that catch bad rows."
   after: [5, K7]
   next: B3
+  next_needs: [B1]
   scales: [S0, S2]
 - kind: lesson
   id: b03-read-check-formulation

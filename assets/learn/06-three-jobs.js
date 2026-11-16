@@ -207,7 +207,7 @@
       { text: "Now sort. Mark the jobs each technology does well; some do more than one. Then check your sort against the evidence.",
         build: function (act, api) {
           LX.CardSort(act, { mode: "toggles", cls: "lx6-sorter", items: sortItems(TECH), bins: D.jobs, marks: marks, checked: checked, checkLabel: "Check my sort",
-            onChange: function (m) { marks = m; keep("marks", m); },
+            onChange: function (m) { marks = m; keep("marks", m); api.clearSaw(); },
             onCheck: function (res) {
               checked = true; keep("score", { agree: res.agree, clear: res.clear, partly: res.partly });
               api.done();

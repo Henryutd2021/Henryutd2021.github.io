@@ -246,7 +246,7 @@ $$0 \le q_t \le \bar Q\,\Delta t, \qquad P_t = k\,q_t / \Delta t \le P, \qquad s
 
 ::: {#rubric .lx-sec}
 ::: {.lx-sec-h}
-## Rubric
+## Rubric {#rubric-heading}
 :::
 
 ```{=html}

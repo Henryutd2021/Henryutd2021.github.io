@@ -92,7 +92,7 @@
     var lv = (c && c.levels) || {}, own = Object.keys(lv);
     own.forEach(function (k) { if (["developing", "proficient", "strong"].indexOf(k) < 0) throw new Error("LX.Rubric: no level " + JSON.stringify(k) + " to reword (developing, proficient, strong)"); });
     function w(k) { return sentence(lv[k] || base[k]); }
-    var C = { id: base.id, label: base.label, builtIn: base.builtIn, look: (c && c.look) || null, reads: base.reads || null,
+    var C = { id: base.id, label: base.label, builtIn: base.builtIn, look: (c && c.look) || null, reads: (c && c.reads) || base.reads || null,
       text: { "not-yet": NOT_YET, developing: w("developing"), proficient: w("proficient"), strong: w("strong") } };
     if (own.length) C.own = ["developing", "proficient", "strong"].filter(function (k) { return lv[k]; });
     return C;
@@ -120,6 +120,7 @@
     list.forEach(function (c) {
       var C = competence(c), p = picks && picks[C.id];
       lines.push(C.label + ": " + (rank(p) < 0 ? "not rated" : levelLabel(p) + " — " + C.text[p]));
+      if (C.reads) lines.push("Interpretation: " + sentence(C.reads));
     });
     lines.push(resultText(count(list, picks), opt.bar));
     if (opt.date) lines.push("Rated on " + opt.date);

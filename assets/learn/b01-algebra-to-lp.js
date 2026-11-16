@@ -359,8 +359,9 @@
   function parseNum(s) {
     s = String(s == null ? "" : s).trim().replace(/[−–]/g, "-").replace(/,/g, "").replace(/\s+/g, "");
     if (s === "" || s === "+") return 0; if (s === "-") return -1;
-    var m = /^([+-]?\d*\.?\d+)\/(\d*\.?\d+)$/.exec(s); if (m) return parseFloat(m[1]) / parseFloat(m[2]);
-    return /^[+-]?(\d+\.?\d*|\.\d+)$/.test(s) ? parseFloat(s) : NaN;
+    var m = /^([+-]?\d*\.?\d+)\/(\d*\.?\d+)$/.exec(s);
+    var v = m ? +m[1] / +m[2] : /^[+-]?(\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?$/i.test(s) ? +s : NaN;
+    return isFinite(v) ? v : NaN;
   }
 
   function seg(host, labels, sel, onPick, aria) {
@@ -412,15 +413,25 @@
     var hint = H("button", { type: "button", class: "lx-btn ghost small", text: "Hint 1 of 3" }, acts);
     var show = H("button", { type: "button", class: "lx-btn ghost small", text: "Show the answer", hidden: true }, acts);
     function inp(val, label, onIn, cls) {
-      var i = H("input", { type: "text", inputmode: "decimal", autocomplete: "off", class: "b1-in " + (cls || ""), "aria-label": label, placeholder: "0", value: isFinite(val) ? num(val).replace("−", "-") : "" }, null);
-      i.addEventListener("input", function () { onIn(parseNum(i.value)); i.classList.toggle("bad", isNaN(parseNum(i.value))); draw(); });
+      var i = H("input", { type: "text", inputmode: "decimal", autocomplete: "off", class: "b1-in " + (cls || ""), "aria-label": label, placeholder: "0", value: typeof val === "string" ? val : isFinite(val) ? String(val) : "" }, null);
+      if (i.value.trim() !== "" && !isFinite(parseNum(i.value))) { i.classList.add("bad"); i.setAttribute("aria-invalid", "true"); }
+      i.addEventListener("input", function () {
+        var v = parseNum(i.value), bad = !isFinite(v);
+        onIn(bad ? i.value : v); i.classList.toggle("bad", bad);
+        if (bad) i.setAttribute("aria-invalid", "true"); else i.removeAttribute("aria-invalid");
+        edited(); draw();
+      });
       return i;
+    }
+    function edited() {
+      solved = false; box.classList.remove("is-solved"); out.innerHTML = "";
+      if (o.onEdit) o.onEdit();
     }
     function renderGoal() {
       goal.innerHTML = "";
       H("span", { class: "b1-k", text: "Goal" }, goal);
       if (o.mode === "one") { H("span", { class: "b1-fixed", text: fmtGoal({ sense: st.sense, c: st.c, vars: st.vars }) + " (" + st.goalUnit + ")" }, goal); return; }
-      var sg = seg(goal, ["min", "max"], mine.sense === "min" ? 0 : mine.sense === "max" ? 1 : -1, function (i) { mine.sense = i ? "max" : "min"; draw(); }, "Minimize or maximize");
+      var sg = seg(goal, ["min", "max"], mine.sense === "min" ? 0 : mine.sense === "max" ? 1 : -1, function (i) { mine.sense = i ? "max" : "min"; edited(); draw(); }, "Minimize or maximize");
       sg.el.classList.add("b1-sense");
       var w = H("span", { class: "b1-lin" }, goal);
       w.appendChild(inp(mine.c[0], "Goal coefficient of " + sy[0], function (v) { mine.c[0] = v; })); H("span", { class: "b1-sym", text: sy[0] + " +" }, w);
@@ -434,18 +445,18 @@
         var w = H("span", { class: "b1-lin" }, row);
         w.appendChild(inp(r.a[0], "Rule " + (i + 1) + ": coefficient of " + sy[0], function (v) { r.a[0] = v; })); H("span", { class: "b1-sym", text: sy[0] + " +" }, w);
         w.appendChild(inp(r.a[1], "Rule " + (i + 1) + ": coefficient of " + sy[1], function (v) { r.a[1] = v; })); H("span", { class: "b1-sym", text: sy[1] }, w);
-        var sg = seg(row, ["≤", "=", "≥"], OPLIST.indexOf(r.op), function (k) { r.op = OPLIST[k]; draw(); }, "Sign of rule " + (i + 1));
+        var sg = seg(row, ["≤", "=", "≥"], OPLIST.indexOf(r.op), function (k) { r.op = OPLIST[k]; edited(); draw(); }, "Sign of rule " + (i + 1));
         sg.el.classList.add("b1-op");
         row.appendChild(inp(r.b, "Rule " + (i + 1) + ": right-hand side", function (v) { r.b = v; }, "rhs"));
         if (o.mode === "all") { var del = H("button", { type: "button", class: "b1-del", "aria-label": "Remove rule " + (i + 1), html: LX.icon("cross") }, row);
-          del.addEventListener("click", function () { mine.rows.splice(i, 1); renderRows(); draw(); }); }
+          del.addEventListener("click", function () { mine.rows.splice(i, 1); renderRows(); edited(); draw(); }); }
       });
     }
     if (o.mode === "all") {
       var add = H("button", { type: "button", class: "lx-btn ghost small", text: "Add a rule" }, tools);
-      add.addEventListener("click", function () { mine.rows.push({ a: [NaN, NaN], op: "<=", b: NaN }); renderRows(); draw(); var ins = list.querySelectorAll("input"); if (ins.length) ins[ins.length - 3].focus(); });
+      add.addEventListener("click", function () { mine.rows.push({ a: [NaN, NaN], op: "<=", b: NaN }); renderRows(); edited(); draw(); var ins = list.querySelectorAll("input"); if (ins.length) ins[ins.length - 3].focus(); });
       var nn = H("button", { type: "button", class: "lx-btn ghost small", text: "Add " + sy[0] + " ≥ 0 and " + sy[1] + " ≥ 0" }, tools);
-      nn.addEventListener("click", function () { mine.rows.push({ a: [1, 0], op: ">=", b: 0 }, { a: [0, 1], op: ">=", b: 0 }); renderRows(); draw(); });
+      nn.addEventListener("click", function () { mine.rows.push({ a: [1, 0], op: ">=", b: 0 }, { a: [0, 1], op: ">=", b: 0 }); renderRows(); edited(); draw(); });
     }
     function clean() { return { sense: mine.sense, c: mine.c.map(function (x) { return isFinite(x) ? x : 0; }),
       rows: mine.rows.filter(function (r) { return isFinite(r.b) && (isFinite(r.a[0]) || isFinite(r.a[1])); }).map(function (r) { return { a: [isFinite(r.a[0]) ? r.a[0] : 0, isFinite(r.a[1]) ? r.a[1] : 0], op: r.op, b: r.b }; }) }; }
@@ -484,6 +495,12 @@
       msgs.slice(0, 4).forEach(function (t) { H("li", { text: t }, ul); });
     }
     check.addEventListener("click", function () {
+      var bad = Array.prototype.filter.call(box.querySelectorAll("input"), function (i) { return i.value.trim() !== "" && !isFinite(parseNum(i.value)); });
+      if (bad.length) {
+        edited(); bad.forEach(function (i) { i.classList.add("bad"); i.setAttribute("aria-invalid", "true"); });
+        H("div", { class: "lx-saw no", text: "A number could not be read. Use a finite number or a fraction such as 1/3; correct the marked boxes before checking the model." }, out);
+        bad[0].focus(); return;
+      }
       var m = clean();   // a rule with no decision in it stays: 0 ≤ −1 makes the model infeasible, 0 ≤ 1 changes nothing
       if (!m.sense) { out.innerHTML = ""; H("div", { class: "lx-saw no", html: LX.icon("question") + "<div><b>Not yet.</b> Choose min or max for the goal first.</div>" }, out); return; }
       report(compare(st, m, st.view), m);
@@ -725,7 +742,7 @@
       text: "A new story, mostly written for you: one rule is missing. Find the sentence the model ignores and write that rule.",
       build: function (act, api) {
         storyBox(act, planning);
-        Builder(act, { story: planning, mode: "one", onSolved: function () {
+        Builder(act, { story: planning, mode: "one", onEdit: function () { api.clearSaw(); api.undone(); }, onSolved: function () {
           api.done(); api.saw("Right: S + W ≤ 115. The cheapest mix is " + bestP.x[0] + " MW of solar and " + bestP.x[1] + " MW of wind, $" + (bestP.value / 1000).toFixed(1) + " million a year. Solar is cheaper per GWh; wind gets more out of each MW of connection.");
         } });
       }
@@ -736,7 +753,7 @@
       text: "Your turn, from scratch: the battery story. Choose the goal, write the rules, and check. Hints come in three steps if you need them.",
       build: function (act, api) {
         storyBox(act, battery);
-        Builder(act, { story: battery, mode: "all", onSolved: function (m) {
+        Builder(act, { story: battery, mode: "all", onEdit: function () { api.clearSaw(); api.undone(); }, onSolved: function (m) {
           diyModel = m; api.done(); api.saw("The best plan buys " + bestB.x[0] + " MWh and sells " + bestB.x[1] + " MWh: " + money(bestB.value) + ". The losses rule d ≤ 0.9c has a zero on the right once written as −0.9c + d ≤ 0.");
         } });
       }

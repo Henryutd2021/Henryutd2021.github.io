@@ -11,6 +11,7 @@
    moved so it no longer fits), until the next done(); a free card stays open. A card's done state is kept when the reader
    goes Back and returns.
    api.saw(text, bad) shows what the reader saw; text takes glossary marks and **bold**.
+   api.clearSaw() removes that feedback when an answer is edited, without changing historical course progress.
    api.busy(on) holds Next shut while on (e.g. while a solve runs; the card is aria-busy), whatever done() said; busy(false)
    restores it. A call from a card that is no longer shown (a late solve after Back) changes nothing on screen.
    Text budget: card text is one or two sentences; anything longer goes in a Go deeper box inside `act`. */
@@ -49,6 +50,7 @@
           if (busy) card.setAttribute("aria-busy", "true"); else card.removeAttribute("aria-busy");
         },
         saw: function (t, bad) { sawBox.innerHTML = ""; H("div", { class: "lx-saw" + (bad ? " no" : ""), html: LX.icon(bad ? "question" : "check") + "<div>" + LX.rich(t).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>") + "</div>" }, sawBox); },
+        clearSaw: function () { sawBox.innerHTML = ""; },
         card: card, index: i
       };
       var txt = typeof st.text === "function" ? st.text(act, api) : st.text;

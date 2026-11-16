@@ -22,8 +22,9 @@
    headers, so it reads as its own text version.
    Engine (Node: module.exports; in the page LX.Sheet.engine): tokenize, parse, value(sheet, name), changed(sheet) (after
    any edit: clears the cache), shift(raw, rows, cols) (fill-down and fill-right), refsIn(raw), colName, colNum, isErr,
-   show(value, prefix). Functions: SUM, AVERAGE, MIN, MAX, COUNT, ABS, ROUND. Errors: #DIV/0!, #VALUE!, #NAME?, #REF!,
-   #CYCLE! (a formula that depends on itself). As in Excel, −2^2 = 4 and 2^3^2 = 64; blanks count as 0. */
+   show(value, prefix). Functions: SUM, AVERAGE, MIN, MAX, COUNT, ABS, ROUND. Errors: #DIV/0!, #VALUE!, #NUM!, #NAME?, #REF!,
+   #CYCLE! (a formula that depends on itself). As in Excel, −2^2 = 4 and 2^3^2 = 64; arithmetic blanks count as 0,
+   while aggregate functions ignore blank and text references, whether passed individually or as a range. */
 (function () {
   "use strict";
   // ---------------------------------------------------------------- formula engine (pure)
@@ -51,7 +52,19 @@
     MAX: function (a) { return a.length ? Math.max.apply(null, a) : 0; },
     COUNT: function (a) { return a.length; },
     ABS: function (a) { return a.length === 1 ? Math.abs(a[0]) : E("#VALUE!"); },
-    ROUND: function (a) { if (a.length < 1 || a.length > 2) return E("#VALUE!"); var k = Math.pow(10, a[1] || 0); return Math.round(a[0] * k) / k; }
+    ROUND: function (a) {
+      if (a.length < 1 || a.length > 2) return E("#VALUE!");
+      if (!isFinite(a[0]) || (a.length > 1 && !isFinite(a[1]))) return E("#NUM!");
+      var d = Math.trunc(a[1] || 0), n = Math.abs(a[0]);
+      if (!n || d < -308) return 0;
+      if (d > 324) return a[0];
+      // Shift the decimal exponent as text: multiplying 1.005 by 100 can land below the half-way point.
+      function shift(v, by) { var p = String(v).split("e"); return +(p[0] + "e" + ((+p[1] || 0) + by)); }
+      var scaled = shift(n, d);
+      if (!isFinite(scaled)) return a[0];
+      var v = shift(Math.round(scaled), -d);
+      return !isFinite(v) ? E("#NUM!") : v === 0 ? 0 : (a[0] < 0 ? -v : v);
+    }
   };
   // parse to a small tree: {n: number} | {r: "A1"} | {rg: ["A1", "B2"]} | {f: name, a: [...]} | {op, x, y} | {neg: x}
   function parse(src) {
@@ -98,6 +111,7 @@
     if (stack[name]) return E("#CYCLE!");
     stack[name] = true;
     var tree = parse(raw.slice(1)), v = tree ? ev(tree) : E("#NAME?");
+    if (typeof v === "number" && !isFinite(v)) v = E("#NUM!");
     delete stack[name];
     return (memo[name] = v);
     function cell(ref) { var p = plain(ref); return p ? value(sheet, p, memo, stack) : E("#REF!"); }
@@ -109,12 +123,14 @@
       if (n.neg) { var a = ev(n.neg); return isErr(a) ? a : -a; }
       if (n.f) {
         if (!FUN[n.f]) return E("#NAME?");
-        var vals = [];
+        var vals = [], aggregate = /^(SUM|AVERAGE|MIN|MAX|COUNT)$/.test(n.f);
         for (var k = 0; k < n.a.length; k++) {
           var arg = n.a[k];
           if (arg.rg) {
             var cs = rangeCells(arg.rg[0], arg.rg[1]); if (!cs) return E("#REF!");
             for (var j = 0; j < cs.length; j++) { var cv = value(sheet, cs[j], memo, stack); if (isErr(cv)) return cv; if (typeof cv === "number") vals.push(cv); }
+          } else if (aggregate && arg.r) {
+            var rv = cell(arg.r); if (isErr(rv)) return rv; if (typeof rv === "number") vals.push(rv);
           } else { var av = ev(arg); if (isErr(av)) return av; vals.push(av); }
         }
         return FUN[n.f](vals);
@@ -130,7 +146,9 @@
   // fill-down (and fill-right): shift every reference without a $ on that axis
   function shift(raw, dr, dc) {
     if (!raw || String(raw).charAt(0) !== "=") return raw;
-    return String(raw).replace(/(\$?)([A-Za-z]{1,2})(\$?)(\d+)(?![A-Za-z(])/g, function (all, c$, c, r$, r, off, s) {
+    // Consume number literals first: the E3 in 1E3 is an exponent, not a cell reference.
+    return String(raw).replace(/(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?|(\$?)([A-Za-z]{1,2})(\$?)(\d+)(?![A-Za-z(])/g, function (all, c$, c, r$, r, off, s) {
+      if (!c) return all;
       var before = s.charAt(off - 1); if (/[A-Za-z]/.test(before)) return all;   // part of a function name
       var col = c$ ? c.toUpperCase() : colName(colNum(c.toUpperCase()) + (dc || 0)), row = r$ ? +r : +r + dr;
       return row < 1 || colNum(col) < 1 ? "#REF!" : c$ + col + r$ + row;

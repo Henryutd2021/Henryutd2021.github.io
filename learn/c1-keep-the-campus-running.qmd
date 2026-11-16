@@ -219,7 +219,7 @@ Then test your plan on outages you did not design it for, as the Workbench's ten
 <tr><td>The storm</td><td class="n">72 hours</td><td class="s">From 00:00 on 20 January 2025, the grid assumed down; solar: a teaching profile from SPP's observed hourly solar (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a> · accessed 2 Nov 2026), scaled to monthly capacity factors</td></tr>
 <tr><td>Must stay on (to start)</td><td class="n">650 kW</td><td class="s">Hospital 300, water and heating plant 100, dorms 250 kW: F7's campus (illustrative)</td></tr>
 <tr><td>Tariff level</td><td class="n">13.37¢/kWh</td><td class="s"><a href="https://www.eia.gov/electricity/annual/html/epa_02_04.html">EIA, Electric Power Annual, Table 2.4</a>, U.S. commercial average, 2025 · accessed 3 Nov 2026</td></tr>
-<tr><td>CO₂ from diesel · from the grid</td><td class="n">10.19 kg/gal · 0.367 kg/kWh</td><td class="s"><a href="https://www.eia.gov/environment/emissions/co2_vol_mass.php">EIA coefficients</a> · <a href="https://www.eia.gov/tools/faqs/faq.php?id=74&amp;t=11">EIA FAQ</a> (2023 U.S. average)</td></tr>
+<tr><td>CO₂ from diesel · from the grid</td><td class="n" style="white-space:normal">10.19 kg/gal · 0.367 kg/kWh</td><td class="s"><a href="https://www.eia.gov/environment/emissions/co2_vol_mass.php">EIA coefficients</a> · <a href="https://www.eia.gov/tools/faqs/faq.php?id=74&amp;t=11">EIA FAQ</a> (2023 U.S. average)</td></tr>
 <tr><td>Owners' real <span class="lx-term" data-term="cost-of-capital">cost of capital</span></td><td class="n">6% · 4% · 5%</td><td class="s">Illustrative: utility, co-op, community</td></tr>
 </tbody>
 </table></div>

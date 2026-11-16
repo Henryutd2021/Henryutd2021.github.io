@@ -156,7 +156,7 @@ twitter-card: {"description": "Check your energy reasoning with nine unfamiliar 
 
 ::: {#rubric .lx-sec}
 ::: {.lx-sec-h}
-## Rubric
+## Rubric {#rubric-heading}
 :::
 
 ```{=html}

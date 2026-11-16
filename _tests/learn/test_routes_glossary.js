@@ -50,6 +50,7 @@ def variant(code, value):
     bc = {l["code"]: l for l in L + T if l.get("code")}
     st = sorted([l for l in L if l.get("starter") is not None], key=lambda l: l["starter"])
     return B.route_problems(L, T, st, bc)
+out["b2_unnamed"] = variant("B2", None)
 out["m3_unnamed"] = variant("M3", None)
 out["r5_partial"] = variant("R5", ["M7"])
 out["m3_padded"] = variant("M3", ["R5", "R1"])
@@ -57,6 +58,7 @@ print(json.dumps(out))
 `;
   const R = JSON.parse(execFileSync("python3", ["-c", py], { encoding: "utf8" }));
   ok(R.real.length === 0, "the course as it is: no route skips a prerequisite unnamed: " + R.real.join("; "));
+  ok(R.b2_unnamed.some(p => /^B2 -> B3: the route has not met B1; next_needs lists nothing/.test(p)), "rule: the K7 tool route into B2 cannot silently skip B1 before B3");
   ok(R.m3_unnamed.length === 1 && /^M3 -> CK-M: the route has not met R5; next_needs lists nothing/.test(R.m3_unnamed[0]), "rule: M3 without next_needs fails, naming R5: " + R.m3_unnamed[0]);
   ok(R.r5_partial.length === 1 && /^R5 -> R6: the route has not met M7, M8; next_needs lists M7/.test(R.r5_partial[0]), "rule: R5 naming only M7 fails: " + R.r5_partial[0]);
   ok(R.m3_padded.length === 1 && /next_needs lists R5, R1/.test(R.m3_padded[0]), "rule: a hand-off naming a met prerequisite fails too (stale): " + R.m3_padded[0]);

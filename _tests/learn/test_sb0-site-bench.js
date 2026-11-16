@@ -334,7 +334,9 @@ const QPATH = path.join(SITE, "learn/sb0-site-bench.qmd");
     ok(SS.validate(E0.schema, pl).length === 0 && SS.decode(E0.schema, SS.encode(E0.schema, pl)).status === "ok", "view: the plan stays valid and its link round-trips after the stopped sizing");
     B.sizer.again.click(); await settle();
     pl = B.plan();
-    ok(/plan on the controls changed/.test(sizerSays()) && pl.site === "farm" && pl.fb === 0 && pl.el === 0, "view: Try again on the home's sizing, with the farm on the controls, stops at once and writes nothing");
+    const retryWant = await run(Object.assign({}, pl, { fb: 0, el: 0, tank: 0 }), { size: true });
+    ok(/^Suggested/.test(sizerSays()) && pl.site === "farm" && ["fb", "el", "tank"].every(k => pl[k] === retryWant.results.snapped[k]),
+      "view: Try again sizes the farm now on the controls, with the farm's own result fields");
     sizeBtn.click(); await settle();
     pl = B.plan();
     const want = await run(Object.assign({}, pl, { fb: 0, el: 0, tank: 0 }), { size: true });

@@ -32,7 +32,9 @@
     var band = H("div", { class: "lx-ctl-band" }, tr), fill = H("div", { class: "lx-ctl-fill" }, tr);
     var inp = H("input", { type: "range", id: id, min: min, max: max, step: step, value: min }, tr);
     var plus = H("button", { type: "button", "aria-label": upL, text: "+" }, row);
-    var hint = H("p", { class: "lx-ctl-hint" }, w);
+    var hint = H("p", { id: id + "-hint", class: "lx-ctl-hint" }, w);
+    var limit = H("p", { id: id + "-limit", class: "lx-ctl-hint", "aria-live": "polite", hidden: true }, w);
+    inp.setAttribute("aria-describedby", id + "-hint " + id + "-limit");
     function snap(v) { return +((Math.round((v - min) / step) * step + min).toFixed(dec)); }
     // a value given by the page (the start value, or set()) that is not on the grid min + k × step, or outside min..max,
     // is shown as the nearest step: say so (console warning and o.onSnap), so a page never shows one number and uses another
@@ -55,6 +57,8 @@
     }
     function setV(v, user) {
       var want = snap(v), c = clamp(want, lo, hi);
+      limit.hidden = !user || c === want;
+      limit.textContent = limit.hidden ? "" : "Only " + fmt(lo) + " to " + fmt(hi) + " is reachable now; showing " + fmt(c) + ".";
       if (user && c !== want) { hint.classList.remove("bump"); void hint.offsetWidth; hint.classList.add("bump"); }
       var changed = c !== val; val = c; paint();
       if (user && changed && o.onChange) o.onChange(val);

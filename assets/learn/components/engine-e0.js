@@ -1129,9 +1129,8 @@
     var sizer = null;
     if (sizeBox) {
       var sizeHint = H("p", { class: "lx-hint" }, sizeBox);
-      // sizes belong to the plan they were found for: a change to the plan while sizing runs stops it (changed()), "Try
-      // again" on a plan that is no longer on the controls stops at once, and the sizes are written onto the submitted
-      // plan's own site only if that plan is still the one on the controls
+      // Sizes belong to the plan they were found for: a change while sizing runs stops it (changed()). Try again
+      // sizes the current controls; a result is written onto its own site only while its submitted plan is still current.
       sizer = LX.BenchRun(sizeBox, { label: "Size it for me", state: function () { return plan; },
         solve: function (st, ctx) {
           if (!LX.ShareState.same(S, st, plan)) return Promise.resolve({ status: "cancelled", ok: false, results: null });
@@ -1143,7 +1142,7 @@
         },
         busy: o.api && o.api.busy,
         words: { ok: SIZED,
-          cancelled: "Sizing stopped: the plan on the controls changed. Press Size it for me to size the plan you see." } });
+          cancelled: "Sizing stopped: the plan on the controls changed. Choose Size it for me or Try again to size the plan you see." } });
     }
     function changed() { if (sizer && sizer.running()) sizer.cancel(); ss.set(plan); run.changed(plan); if (o.onChange) o.onChange(plan); }
     refill();

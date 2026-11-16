@@ -241,6 +241,7 @@
   }
   LX.store = { get: function (k, d) { var v = kv("kv")(k); return v === undefined ? d : v; }, set: function (k, v) { kv("kv")(k, v); },
     persistent: function () { return MEM == null; },
+    resetMark: function () { return read().reset || null; },
     clearAll: function () {   // every guess, answer, draft, checkpoint attempt and tick of the course, in this browser
       EPOCH = new Date().toISOString();
       var txt = JSON.stringify({ reset: EPOCH });   // no reader data: only the time of the reset (see read and write)
@@ -844,7 +845,9 @@
     var band = H("div", { class: "lx-ctl-band" }, tr), fill = H("div", { class: "lx-ctl-fill" }, tr);
     var inp = H("input", { type: "range", id: id, min: min, max: max, step: step, value: min }, tr);
     var plus = H("button", { type: "button", "aria-label": upL, text: "+" }, row);
-    var hint = H("p", { class: "lx-ctl-hint" }, w);
+    var hint = H("p", { id: id + "-hint", class: "lx-ctl-hint" }, w);
+    var limit = H("p", { id: id + "-limit", class: "lx-ctl-hint", "aria-live": "polite", hidden: true }, w);
+    inp.setAttribute("aria-describedby", id + "-hint " + id + "-limit");
     function snap(v) { return +((Math.round((v - min) / step) * step + min).toFixed(dec)); }
     // a value given by the page (the start value, or set()) that is not on the grid min + k × step, or outside min..max,
     // is shown as the nearest step: say so (console warning and o.onSnap), so a page never shows one number and uses another
@@ -867,6 +870,8 @@
     }
     function setV(v, user) {
       var want = snap(v), c = clamp(want, lo, hi);
+      limit.hidden = !user || c === want;
+      limit.textContent = limit.hidden ? "" : "Only " + fmt(lo) + " to " + fmt(hi) + " is reachable now; showing " + fmt(c) + ".";
       if (user && c !== want) { hint.classList.remove("bump"); void hint.offsetWidth; hint.classList.add("bump"); }
       var changed = c !== val; val = c; paint();
       if (user && changed && o.onChange) o.onChange(val);
@@ -1100,6 +1105,7 @@
    moved so it no longer fits), until the next done(); a free card stays open. A card's done state is kept when the reader
    goes Back and returns.
    api.saw(text, bad) shows what the reader saw; text takes glossary marks and **bold**.
+   api.clearSaw() removes that feedback when an answer is edited, without changing historical course progress.
    api.busy(on) holds Next shut while on (e.g. while a solve runs; the card is aria-busy), whatever done() said; busy(false)
    restores it. A call from a card that is no longer shown (a late solve after Back) changes nothing on screen.
    Text budget: card text is one or two sentences; anything longer goes in a Go deeper box inside `act`. */
@@ -1138,6 +1144,7 @@
           if (busy) card.setAttribute("aria-busy", "true"); else card.removeAttribute("aria-busy");
         },
         saw: function (t, bad) { sawBox.innerHTML = ""; H("div", { class: "lx-saw" + (bad ? " no" : ""), html: LX.icon(bad ? "question" : "check") + "<div>" + LX.rich(t).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>") + "</div>" }, sawBox); },
+        clearSaw: function () { sawBox.innerHTML = ""; },
         card: card, index: i
       };
       var txt = typeof st.text === "function" ? st.text(act, api) : st.text;
@@ -2474,7 +2481,9 @@
           p.lines.forEach(function (ln, j) { S("text", { x: p.x, y: y0 + 15 + j * 14, "text-anchor": "middle", class: "mlabel" + (s === "up" ? " up" : ""), "aria-hidden": "true" }, g).textContent = ln; });
         } else {
           p.lines.forEach(function (ln, j) { S("text", { x: p.textX, y: p.ty + j * 15, class: "mlabel" + (s === "up" ? " up" : ""), "aria-hidden": "true" }, g).textContent = ln; });
-          S("text", { x: p.textX, y: p.subY, class: "mlabel sub", "aria-hidden": "true" }, g).textContent = l.minutes + " min · " + (s === "open" ? "open now" : s === "done" ? "done" : "coming soon");
+          var sub = l.minutes + " min · " + (s === "open" ? "open now" : s === "done" ? "done" : "coming soon"), room = L.W - p.textX - 6;
+          if (meas(sub, "sub") > room) sub = l.minutes + " min · " + (s === "open" ? "open" : s === "done" ? "done" : "soon");
+          S("text", { x: p.textX, y: p.subY, class: "mlabel sub", "aria-hidden": "true" }, g).textContent = shorten(sub, room, meas, "sub");
           var hit = S("rect", { x: p.textX - 6, y: p.top + 4, width: L.W - p.textX + 6, height: p.h - 8, class: "mhit", "aria-hidden": "true" }, g);
           hit.addEventListener("click", function () { open(p.key); });
         }
@@ -6595,6 +6604,7 @@
       E("p", { class: "lx-eyebrow", text: "Your results (this browser only)" }, c);
       E("p", { class: "lx-ck-level", tabindex: "-1", text: "Level: " + L.level }, c).focus({ preventScroll: true });
       E("p", { class: "lx-ck-describe", text: describeOf(D, L) }, c);
+      E("p", { class: "lx-hint", text: "This level describes this attempt. A Completed tick records that you reached the bar before; changing a self-rating or starting again keeps that history." }, c);
       var sc = E("div", { class: "lx-scroll-x" }, c), tb = E("table", { class: "lx-ck-res" }, sc), hr = E("tr", null, E("thead", null, tb));
       ["Task", "First answer", "Tries", "Time to first answer", "Solution first"].forEach(function (h) { E("th", { scope: "col", text: h }, hr); });
       var bd = E("tbody", null, tb);
@@ -6679,8 +6689,9 @@
    headers, so it reads as its own text version.
    Engine (Node: module.exports; in the page LX.Sheet.engine): tokenize, parse, value(sheet, name), changed(sheet) (after
    any edit: clears the cache), shift(raw, rows, cols) (fill-down and fill-right), refsIn(raw), colName, colNum, isErr,
-   show(value, prefix). Functions: SUM, AVERAGE, MIN, MAX, COUNT, ABS, ROUND. Errors: #DIV/0!, #VALUE!, #NAME?, #REF!,
-   #CYCLE! (a formula that depends on itself). As in Excel, −2^2 = 4 and 2^3^2 = 64; blanks count as 0. */
+   show(value, prefix). Functions: SUM, AVERAGE, MIN, MAX, COUNT, ABS, ROUND. Errors: #DIV/0!, #VALUE!, #NUM!, #NAME?, #REF!,
+   #CYCLE! (a formula that depends on itself). As in Excel, −2^2 = 4 and 2^3^2 = 64; arithmetic blanks count as 0,
+   while aggregate functions ignore blank and text references, whether passed individually or as a range. */
 (function () {
   "use strict";
   // ---------------------------------------------------------------- formula engine (pure)
@@ -6708,7 +6719,19 @@
     MAX: function (a) { return a.length ? Math.max.apply(null, a) : 0; },
     COUNT: function (a) { return a.length; },
     ABS: function (a) { return a.length === 1 ? Math.abs(a[0]) : E("#VALUE!"); },
-    ROUND: function (a) { if (a.length < 1 || a.length > 2) return E("#VALUE!"); var k = Math.pow(10, a[1] || 0); return Math.round(a[0] * k) / k; }
+    ROUND: function (a) {
+      if (a.length < 1 || a.length > 2) return E("#VALUE!");
+      if (!isFinite(a[0]) || (a.length > 1 && !isFinite(a[1]))) return E("#NUM!");
+      var d = Math.trunc(a[1] || 0), n = Math.abs(a[0]);
+      if (!n || d < -308) return 0;
+      if (d > 324) return a[0];
+      // Shift the decimal exponent as text: multiplying 1.005 by 100 can land below the half-way point.
+      function shift(v, by) { var p = String(v).split("e"); return +(p[0] + "e" + ((+p[1] || 0) + by)); }
+      var scaled = shift(n, d);
+      if (!isFinite(scaled)) return a[0];
+      var v = shift(Math.round(scaled), -d);
+      return !isFinite(v) ? E("#NUM!") : v === 0 ? 0 : (a[0] < 0 ? -v : v);
+    }
   };
   // parse to a small tree: {n: number} | {r: "A1"} | {rg: ["A1", "B2"]} | {f: name, a: [...]} | {op, x, y} | {neg: x}
   function parse(src) {
@@ -6755,6 +6778,7 @@
     if (stack[name]) return E("#CYCLE!");
     stack[name] = true;
     var tree = parse(raw.slice(1)), v = tree ? ev(tree) : E("#NAME?");
+    if (typeof v === "number" && !isFinite(v)) v = E("#NUM!");
     delete stack[name];
     return (memo[name] = v);
     function cell(ref) { var p = plain(ref); return p ? value(sheet, p, memo, stack) : E("#REF!"); }
@@ -6766,12 +6790,14 @@
       if (n.neg) { var a = ev(n.neg); return isErr(a) ? a : -a; }
       if (n.f) {
         if (!FUN[n.f]) return E("#NAME?");
-        var vals = [];
+        var vals = [], aggregate = /^(SUM|AVERAGE|MIN|MAX|COUNT)$/.test(n.f);
         for (var k = 0; k < n.a.length; k++) {
           var arg = n.a[k];
           if (arg.rg) {
             var cs = rangeCells(arg.rg[0], arg.rg[1]); if (!cs) return E("#REF!");
             for (var j = 0; j < cs.length; j++) { var cv = value(sheet, cs[j], memo, stack); if (isErr(cv)) return cv; if (typeof cv === "number") vals.push(cv); }
+          } else if (aggregate && arg.r) {
+            var rv = cell(arg.r); if (isErr(rv)) return rv; if (typeof rv === "number") vals.push(rv);
           } else { var av = ev(arg); if (isErr(av)) return av; vals.push(av); }
         }
         return FUN[n.f](vals);
@@ -6787,7 +6813,9 @@
   // fill-down (and fill-right): shift every reference without a $ on that axis
   function shift(raw, dr, dc) {
     if (!raw || String(raw).charAt(0) !== "=") return raw;
-    return String(raw).replace(/(\$?)([A-Za-z]{1,2})(\$?)(\d+)(?![A-Za-z(])/g, function (all, c$, c, r$, r, off, s) {
+    // Consume number literals first: the E3 in 1E3 is an exponent, not a cell reference.
+    return String(raw).replace(/(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?|(\$?)([A-Za-z]{1,2})(\$?)(\d+)(?![A-Za-z(])/g, function (all, c$, c, r$, r, off, s) {
+      if (!c) return all;
       var before = s.charAt(off - 1); if (/[A-Za-z]/.test(before)) return all;   // part of a function name
       var col = c$ ? c.toUpperCase() : colName(colNum(c.toUpperCase()) + (dc || 0)), row = r$ ? +r : +r + dr;
       return row < 1 || colNum(col) < 1 ? "#REF!" : c$ + col + r$ + row;
@@ -7309,7 +7337,7 @@
     var lv = (c && c.levels) || {}, own = Object.keys(lv);
     own.forEach(function (k) { if (["developing", "proficient", "strong"].indexOf(k) < 0) throw new Error("LX.Rubric: no level " + JSON.stringify(k) + " to reword (developing, proficient, strong)"); });
     function w(k) { return sentence(lv[k] || base[k]); }
-    var C = { id: base.id, label: base.label, builtIn: base.builtIn, look: (c && c.look) || null, reads: base.reads || null,
+    var C = { id: base.id, label: base.label, builtIn: base.builtIn, look: (c && c.look) || null, reads: (c && c.reads) || base.reads || null,
       text: { "not-yet": NOT_YET, developing: w("developing"), proficient: w("proficient"), strong: w("strong") } };
     if (own.length) C.own = ["developing", "proficient", "strong"].filter(function (k) { return lv[k]; });
     return C;
@@ -7337,6 +7365,7 @@
     list.forEach(function (c) {
       var C = competence(c), p = picks && picks[C.id];
       lines.push(C.label + ": " + (rank(p) < 0 ? "not rated" : levelLabel(p) + " — " + C.text[p]));
+      if (C.reads) lines.push("Interpretation: " + sentence(C.reads));
     });
     lines.push(resultText(count(list, picks), opt.bar));
     if (opt.date) lines.push("Rated on " + opt.date);
@@ -8604,7 +8633,7 @@
 /* numanswer.js — LX.NumAnswer: a number box with its label, its unit and a Check button, plus the lenient number parser and
    the tolerance check behind it (used by the toolbox lessons K1 to K5 and K8, and LX.Drill builds its numeric items
    with it). Styles in numanswer.css.
-   LX.NumAnswer(host, { label, unit, accept, button, width, widthPhone, onCheck })
+   LX.NumAnswer(host, { label, unit, accept, button, width, widthPhone, onCheck, onChange })
      label       the visible label, tied to the box (for/id)
      unit        a short unit after the box ("MW", "dollars", "% of hours"); none when empty. The box's description
                  (aria-describedby), and the one unit a reader may type after the number ("450,000 kW" in a kW box)
@@ -8612,6 +8641,7 @@
      button      the button's text (default "Check")
      width       the box's width as a CSS length (default 7.5em); widthPhone the width at 560 px and below (default: width)
      onCheck     function (v, input): v is the parsed number, or null when the box is empty; Check and Enter run it
+     onChange    optional function (input): clear the lesson's previous feedback when the answer is edited
    Returns { row, input, button, msg, go } (go() runs the check, e.g. for a page's "finish for me" shortcut).
    Text that is not just a number (another unit, such as "450,000 MW" in a kW box, or other words) is refused: the box
    says "Type just the number: the box is in kW." in its own live note (msg, tied to the box), sets aria-invalid, and does
@@ -8619,11 +8649,12 @@
    The box is a text input with inputmode="decimal", so phones show a number pad and "1,230", "$3.85" or "−3" are accepted.
    Pure (no DOM; Node: require("assets/learn/components/numanswer.js"); page: LX.NumAnswer.parse, .read, .close):
      parse(text, unit)    "450,000", "0.45", "$78,600", "33.8%", "6.96e9", "6.96 × 10^9", "6.96x10^9", "6.96 × 10⁹", "10⁹",
-                          "−3" -> a number; null when the text is not a number. Thousands commas, spaces, $ and % are
-                          dropped, − and – read as minus signs, superscript digits as an exponent. After the number only
-                          the unit (a string or a list; case and spaces ignored, "/" for "per") may follow; any other
+                          "−3" -> a number; null when the text is not a number. Thousands commas and spaces are dropped;
+                          − and – read as minus signs, superscript digits as an exponent.
+                          Currency and percent signs require a matching unit; SI prefixes are case-sensitive. After the number only
+                          the unit (a string or a list; spaces ignored, "/" for "per") may follow; any other
                           leftover text gives null.
-     read(text, unit)     { value, why }: why is null (a number), "empty" (nothing but spaces, $ or %) or "text" (not just a
+     read(text, unit)     { value, why }: why is null (a number), "empty" (blank, or just $ in a currency box) or "text" (not just a
                           number: another unit, words, or no number at all)
      close(v, ans, tol)   v is a number within tol of ans (plus 1e-9 for rounding); without tol, v must equal ans exactly
    Classes: .lx-na (the row), .lx-na-num (the box; .right and .wrong mark a checked answer), .lx-na-unit, .lx-na-msg. */
@@ -8632,15 +8663,22 @@
 
   // ---------------------------------------------------------------- pure (no DOM; exported for Node)
   var SUP = { "⁰": "0", "¹": "1", "²": "2", "³": "3", "⁴": "4", "⁵": "5", "⁶": "6", "⁷": "7", "⁸": "8", "⁹": "9", "⁻": "-", "⁺": "+" };
-  // the text with commas, spaces, $ and % dropped, minus signs and superscript exponents ("10⁹" -> "10^9") read
+  // Commas and spaces are formatting; currency and percent signs still carry a dimension.
   function squeeze(text) {
-    return String(text == null ? "" : text).replace(/[−–]/g, "-").replace(/[,\s$%]/g, "")
+    return String(text == null ? "" : text).replace(/[−–]/g, "-").replace(/[,\s]/g, "")
       .replace(/[⁻⁺]?[⁰¹²³⁴⁵⁶⁷⁸⁹]+/g, function (x) { return "^" + x.replace(/./g, function (c) { return SUP[c]; }); }).replace(/\^\^/g, "^");
   }
-  function unitKey(u) { return squeeze(u).toLowerCase().replace(/per/g, "/"); }
+  function unitKey(u) {
+    var k = squeeze(u).replace(/\$/g, "").replace(/per/gi, "/").replace(/[A-Za-z]{4,}/g, function (w) { return w.toLowerCase(); });
+    return k === "kw" ? "kW" : k;   // a common spelling; never fold MW into mW
+  }
   var NUM = /^([-+]?(?:\d+\.?\d*|\.\d+)(?:e[-+]?\d+)?)(?:[x×*·]10\^([-+]?\d+))?(.*)$/i;
   function read(text, unit) {
-    var t = squeeze(text);
+    var t = squeeze(text), units = [].concat(unit == null ? [] : unit);
+    var money = units.some(function (u) { return /\$|\bdollars?\b/i.test(u); });
+    var percent = units.some(function (u) { return /%|\bpercent\b/i.test(u); });
+    if ((t.indexOf("$") >= 0 && !money) || (t.indexOf("%") >= 0 && !percent) || (t.match(/\$/g) || []).length > 1) return { value: null, why: "text" };
+    if (money) t = t.replace(/^([+-]?)\$/, "$1");
     if (t === "") return { value: null, why: "empty" };
     var m = /^10\^([-+]?\d+)(.*)$/.exec(t), v, rest;   // a bare power of ten, "10^9" or "10⁹"
     if (m) { v = Math.pow(10, +m[1]); rest = m[2]; }
@@ -8649,8 +8687,9 @@
       if (!m) return { value: null, why: "text" };
       v = m[2] != null ? +m[1] * Math.pow(10, +m[2]) : +m[1]; rest = m[3];
     }
+    if ((rest === "%" && percent) || (rest === "$" && money)) rest = "";
     if (rest) {
-      var ok = [].concat(unit == null ? [] : unit).some(function (u) { var k = unitKey(u); return k !== "" && k === unitKey(rest); });
+      var ok = units.some(function (u) { var k = unitKey(u); return k !== "" && k === unitKey(rest); });
       if (!ok) return { value: null, why: "text" };
     }
     return isFinite(v) ? { value: v, why: null } : { value: null, why: "text" };
@@ -8681,7 +8720,14 @@
     var units = (o.unit ? [o.unit] : []).concat(o.accept || []);
     function describe(refused) { inp.setAttribute("aria-describedby", [uid, refused ? mid : null].filter(Boolean).join(" ")); if (!uid && !refused) inp.removeAttribute("aria-describedby"); }
     describe(false);
+    var seen = inp.value;
+    function invalidate() {
+      seen = inp.value; inp.classList.remove("right", "wrong"); inp.removeAttribute("aria-invalid");
+      msg.textContent = ""; msg.hidden = true; describe(false);
+      if (o.onChange) o.onChange(inp);
+    }
     function go() {
+      if (seen !== inp.value) invalidate();
       var r = read(inp.value, units);
       if (r.why === "text") {
         msg.textContent = "Type just the number" + (o.unit ? ": the box is in " + o.unit + "." : ".");
@@ -8689,8 +8735,11 @@
         return;
       }
       msg.textContent = ""; msg.hidden = true; inp.removeAttribute("aria-invalid"); describe(false);
+      if (r.why === "empty") invalidate();
       if (o.onCheck) o.onCheck(r.value, inp);
+      msg.hidden = !msg.textContent; describe(!msg.hidden);
     }
+    inp.addEventListener("input", invalidate);
     btn.addEventListener("click", go);
     inp.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); go(); } });
     return { row: row, input: inp, button: btn, msg: msg, go: go };
@@ -8768,6 +8817,8 @@
       var fb = null, answered = false;
       function mark(ok) {
         if (answered) return; answered = true; done++; if (ok) right++;
+        // Feedback and score belong to the first answer; keep it visible until Next item draws fresh controls.
+        Array.prototype.forEach.call(box.querySelectorAll("input, button"), function (el) { el.disabled = true; });
         score.textContent = right + " of " + done + " right";
         fb.innerHTML = ""; H("div", { class: "lx-saw" + (ok ? "" : " no"), html: LX.icon(ok ? "check" : "question") + "<div><b>" + (ok ? "Right." : "Not quite.") + "</b> " + LX.esc(it.why) + "</div>" }, fb);
       }
@@ -8778,7 +8829,9 @@
           b.addEventListener("click", function () { if (!answered) { b.classList.add(i === it.answer ? "right" : "wrong"); mark(i === it.answer); } });
         });
       } else {
-        LX.NumAnswer(box, { label: "Answer", unit: unitOf(it), width: o.width, widthPhone: o.widthPhone, onCheck: function (v) {
+        LX.NumAnswer(box, { label: "Answer", unit: unitOf(it), width: o.width, widthPhone: o.widthPhone,
+          onChange: function () { if (!answered) fb.textContent = ""; }, onCheck: function (v) {
+          if (answered) return;
           if (v == null && o.empty !== false) { if (o.empty) fb.textContent = o.empty; return; }
           mark(check(v, it));
         } });
@@ -9192,11 +9245,34 @@
     var box = H("div", { class: "lx-ss" }, host);
     var status = H("p", { class: "lx-ss-msg", role: "status", "aria-live": "polite" }, box);
     var row = o.button ? null : H("div", { class: "lx-ss-row" }, box);
-    var r0 = decode(S, hashNow()), cur = clone(r0.state), written = null, timer = null, said = 0, showing = false;
+    // A section anchor replaces the plan fragment. Keep that entry's plan in browser history, never in a query.
+    // Capture the reset mark now: an old tab must not attach a new mark to data cleared in another tab.
+    var store = LX.store, epoch = store && store.resetMark ? store.resetMark() : null;
+    function canCache() { return sync && store && store.resetMark && store.persistent() && store.resetMark() === epoch; }
+    function cached() {
+      if (!canCache()) return null;
+      var x = hist(), c = x && x.state && x.state.lxPlan;
+      if (!c || c.path !== baseUrl() || c.schema !== S.key || c.epoch !== epoch) return null;
+      var r = decode(S, c.token);
+      if (r.status !== "ok" && r.status !== "migrated") return null;
+      r.history = true; return r;
+    }
+    var r0 = decode(S, hashNow()), saved = r0.status === "none" ? cached() : null;
+    if (saved) r0 = saved;
+    var cur = clone(r0.state), written = null, timer = null, said = 0, showing = false;
+    function cache() {
+      if (!canCache()) return;
+      try {
+        var x = hist(); if (!x || !x.replaceState) return;
+        var s = Object.assign({}, x.state || {});
+        s.lxPlan = { path: baseUrl(), schema: S.key, token: encode(S, cur), epoch: epoch };
+        x.replaceState(s, "", location.href);
+      } catch (e) { /* history unavailable: the explicit plan link still works */ }
+    }
     function put(h) {   // the address, without a new history entry; h null takes the hash out
       try { var x = hist(); if (x && x.replaceState) x.replaceState(x.state, "", h ? baseUrl() + "#" + h : baseUrl()); } catch (e) { /* not allowed here */ }
     }
-    function write() { written = encode(S, cur); put(written); }
+    function write() { written = encode(S, cur); put(written); cache(); }
     function later() { if (timer) clearTimeout(timer); timer = setTimeout(function () { timer = null; write(); }, 250); }
     function announce(text, kind) {   // filled a moment later, so a region present at load is still read out
       var my = ++said;
@@ -9205,26 +9281,40 @@
       status.textContent = "";
       if (text) setTimeout(function () { if (my === said) { status.textContent = text; LX.emit("layout"); } }, 120);
     }
-    if (r0.status === "ok" || r0.status === "migrated") write();   // the link as this version writes it
-    else if (r0.status !== "none") put(null);                     // a refused link leaves the address
-    if (r0.status !== "none") announce(message(S, r0), r0.status === "ok" ? "ok" : (r0.status === "migrated" ? "note" : "warn"));
+    if (r0.history) { written = encode(S, cur); cache(); }
+    else if (r0.status === "ok" || r0.status === "migrated") write();   // the link as this version writes it
+    else if (r0.status !== "none") { put(null); cache(); }                     // a refused link leaves the address
+    if (r0.status !== "none") announce(r0.history ? "Restored this tab’s plan. Use Copy plan link to share it." : message(S, r0), r0.status === "ok" ? "ok" : (r0.status === "migrated" ? "note" : "warn"));
     var share = LX.Share ? LX.Share(box, { button: o.button || row, buttonText: o.buttonText || "Copy plan link", id: o.id,
-      note: o.note || "Anyone who opens this link sees this plan and can run it themselves. It holds only the plan's numbers and choices.",
-      replace: sync, hash: function () { written = encode(S, cur); return written; } }) : null;
-    if (window.addEventListener) window.addEventListener("hashchange", function () {
-      var h = hashNow().replace(/^#/, "");
-      if (!h || h === written) return;
-      var r = decode(S, h);
-      if (r.status === "none") return;
+      note: o.note || "Anyone who opens this link sees this plan and can run it themselves. It holds only the plan's numbers and choices. Use this button to share a plan after visiting a section link.",
+      replace: sync, hash: function () { written = encode(S, cur); cache(); return written; } }) : null;
+    function navigate() {
+      var r = decode(S, hashNow());
+      if (timer) { clearTimeout(timer); timer = null; }
+      if (r.status === "none") {
+        var kept = cached();
+        if (kept && !same(S, cur, kept.state)) {
+          cur = clone(kept.state); written = encode(S, cur);
+          if (o.onLoad) o.onLoad(clone(cur), kept);
+        }
+        cache(); return;   // native section navigation may send popstate(null) before hashchange
+      }
       if (r.status === "ok" || r.status === "migrated") {
+        var changed = !same(S, cur, r.state);
         cur = clone(r.state); write();
-        announce(message(S, r), r.status === "ok" ? "ok" : "note");
-        if (o.onLoad) o.onLoad(clone(cur), r);
+        if (changed) {
+          announce(message(S, r), r.status === "ok" ? "ok" : "note");
+          if (o.onLoad) o.onLoad(clone(cur), r);
+        }
       } else {
-        put(written || null);   // the damaged hash leaves the address; the reader's plan stays
+        if (sync) write(); else put(written || null);   // preserve edits even when the previous write was pending
         announce(message(S, r, { keep: true }), "warn");
       }
-    });
+    }
+    if (window.addEventListener) {
+      window.addEventListener("hashchange", navigate);
+      if (sync) window.addEventListener("popstate", navigate);
+    }
     return {
       el: box, status: status, share: share, schema: S, state: clone(cur), result: r0,
       get: function () { return clone(cur); },
@@ -9234,10 +9324,10 @@
         var changed = encode(S, state) !== encode(S, cur);
         cur = clone(state);
         if (changed && showing) announce("", null);   // a link notice goes once the reader changes the plan
-        if (sync && !(opt && opt.write === false)) later();
+        if (sync && !(opt && opt.write === false)) { cache(); later(); }
         return [];
       },
-      reset: function () { cur = defaults(S); if (sync) later(); announce("", null); return clone(cur); },
+      reset: function () { cur = defaults(S); if (sync) { cache(); later(); } announce("", null); return clone(cur); },
       hash: function () { return encode(S, cur); },
       url: function () { return baseUrl() + "#" + encode(S, cur); },
       copy: function () { return share ? share.share() : (LX.copyText ? LX.copyText(baseUrl() + "#" + encode(S, cur), {}) : Promise.resolve(false)); },
@@ -9358,7 +9448,7 @@
       ctl = typeof AbortController !== "undefined" ? new AbortController() : null;
       attempt = isRetry && lastTried === k ? attempt + 1 : 1;
       lastTried = k; planKey = k;
-      setBusy(true, JSON.parse(k)); say("busy", "Running…");
+      setBusy(true, JSON.parse(k)); paintStale(false); say("busy", "Running…");
       var p, step = function (s, n) { if (my === token && prog) prog.step(s, n); };
       try { p = Promise.resolve(o.solve(JSON.parse(k), { signal: ctl ? ctl.signal : null, attempt: attempt, step: step })); }
       catch (e) { p = Promise.resolve({ status: "error", ok: false, error: e && e.message }); }
@@ -9381,7 +9471,7 @@
       });
     }
     btn.addEventListener("click", function () { if (!busyNow && o.state) run(o.state(), false); });
-    again.addEventListener("click", function () { if (!busyNow && lastTried !== null) run(JSON.parse(lastTried), true); });
+    again.addEventListener("click", function () { if (!busyNow && lastTried !== null) run(o.state ? o.state() : JSON.parse(lastTried), true); });
     return {
       el: box, button: btn, again: again, status: status,
       run: function (state) { return run(state, false); },
@@ -10805,9 +10895,8 @@
     var sizer = null;
     if (sizeBox) {
       var sizeHint = H("p", { class: "lx-hint" }, sizeBox);
-      // sizes belong to the plan they were found for: a change to the plan while sizing runs stops it (changed()), "Try
-      // again" on a plan that is no longer on the controls stops at once, and the sizes are written onto the submitted
-      // plan's own site only if that plan is still the one on the controls
+      // Sizes belong to the plan they were found for: a change while sizing runs stops it (changed()). Try again
+      // sizes the current controls; a result is written onto its own site only while its submitted plan is still current.
       sizer = LX.BenchRun(sizeBox, { label: "Size it for me", state: function () { return plan; },
         solve: function (st, ctx) {
           if (!LX.ShareState.same(S, st, plan)) return Promise.resolve({ status: "cancelled", ok: false, results: null });
@@ -10819,7 +10908,7 @@
         },
         busy: o.api && o.api.busy,
         words: { ok: SIZED,
-          cancelled: "Sizing stopped: the plan on the controls changed. Press Size it for me to size the plan you see." } });
+          cancelled: "Sizing stopped: the plan on the controls changed. Choose Size it for me or Try again to size the plan you see." } });
     }
     function changed() { if (sizer && sizer.running()) sizer.cancel(); ss.set(plan); run.changed(plan); if (o.onChange) o.onChange(plan); }
     refill();

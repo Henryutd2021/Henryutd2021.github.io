@@ -290,7 +290,15 @@
     var inp = H("input", { id: id, type: "text", inputmode: "numeric", autocomplete: "off", class: "w1h-num" }, row);
     if (o.unit) H("span", { class: "w1h-unit", text: o.unit }, row);
     var btn = H("button", { type: "button", class: "lx-btn small", text: o.button || "Check" }, row);
-    function go() { var v = parseFloat(String(inp.value).replace(/[−–]/g, "-").replace(/,/g, "")); o.onCheck(isNaN(v) ? null : v, inp); }
+    var seen = inp.value;
+    function changed() { seen = inp.value; inp.removeAttribute("aria-invalid"); if (o.onChange) o.onChange(); }
+    function go() {
+      if (seen !== inp.value) changed();
+      var r = LX.NumAnswer.read(inp.value, o.unit);
+      if (r.why === "text") inp.setAttribute("aria-invalid", "true"); else inp.removeAttribute("aria-invalid");
+      o.onCheck(r.value, inp);
+    }
+    inp.addEventListener("input", changed);
     btn.addEventListener("click", go);
     inp.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); go(); } });
     return { input: inp, button: btn };
@@ -430,8 +438,9 @@
       build: function (act, api) {
         readLines(act, J, {}); inputKey(act, inst);
         var got = {}, out = H("div", { "aria-live": "polite" }, act);
-        numInput(act, { label: "Balance (1):", unit: "rows", onCheck: function (v) { if (v === N.balance) { got.b = 1; fin(); } else saw(out, false, "∀ t ∈ T: one balance row per hour. How many hours are in T?"); } });
-        numInput(act, { label: "Sizes (2):", unit: "rows", onCheck: function (v) { if (v === N.size) { got.s = 1; fin(); } else saw(out, false, "∀ g ∈ G, t ∈ T: one row per plant and hour."); } });
+        function changed(k) { got[k] = false; out.innerHTML = ""; api.clearSaw(); api.undone(); }
+        numInput(act, { label: "Balance (1):", unit: "rows", onChange: function () { changed("b"); }, onCheck: function (v) { got.b = v === N.balance; if (got.b) fin(); else { api.undone(); saw(out, false, "Enter one number: ∀ t ∈ T means one balance row per hour. How many hours are in T?"); } } });
+        numInput(act, { label: "Sizes (2):", unit: "rows", onChange: function () { changed("s"); }, onCheck: function (v) { got.s = v === N.size; if (got.s) fin(); else { api.undone(); saw(out, false, "Enter one number: ∀ g ∈ G, t ∈ T means one row per plant and hour."); } } });
         function fin() {
           saw(out, true, (got.b ? "Balance: " + N.balance + " rows. " : "") + (got.s ? "Sizes: " + N.size + " rows." : ""));
           if (got.b && got.s) { api.done(); api.saw("The seven lines stand for " + N.rows + " rows and " + N.variables + " variables. A full year of hours would make the same lines stand for many thousands: the indices do the copying."); }

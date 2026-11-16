@@ -93,7 +93,7 @@ twitter-card: {"description": "Plan a fictional city's heat, cars, solar and sto
 
 ::: {#results .lx-sec}
 ::: {.lx-sec-h}
-## Results
+## Results {#results-heading}
 :::
 
 ```{=html}

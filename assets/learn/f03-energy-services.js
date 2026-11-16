@@ -395,7 +395,7 @@
         } },
       { text: D.apply.q,
         build: function (act, api) {
-          var na = LX.NumAnswer(act, { label: "Electricity used", unit: D.apply.unit, onCheck: function (v, input) {
+          var na = LX.NumAnswer(act, { label: "Electricity used", unit: D.apply.unit, onChange: function () { fb.innerHTML = ""; api.undone(); }, onCheck: function (v, input) {
             if (v == null) { fb.textContent = "Type a number first."; return; }
             var okv = Math.abs(v - D.apply.answer) <= D.apply.tol;
             input.classList.toggle("right", okv); input.classList.toggle("wrong", !okv);

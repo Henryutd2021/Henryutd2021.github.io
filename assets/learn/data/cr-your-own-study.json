@@ -34,10 +34,10 @@
     "Interviews: ethics approval or exemption before recruiting, then consent forms and a guide."], "lessons": ["R4", "B2"], "comps": ["trust", "realism"] },
     { "id": "build", "label": "Build and validate", "does": "Build the model or analysis under version control, verify it, and validate one result.",
       "done": ["It reruns from a [[clean-clone|clean clone]] (or a complete audit trail).", "A verification log.", "One validation against real data or an independent reference."], "lessons": ["R5", "CK-M", "K8"], "route": "lab", "comps": ["trust"] },
-    { "id": "uncertainty", "label": "Uncertainty and accounting", "does": "Classify the uncertainties, treat each one, and put cost and carbon on one boundary.",
-      "done": ["Uncertainties classified.", "Scenarios or a global sensitivity analysis; results as ranges.", "Cost and emissions on one boundary where you report both."], "lessons": ["R6", "R7", "M7", "M8"], "comps": ["uncertainty", "accounting"] },
-    { "id": "review", "label": "Mock review and rerun", "does": "Get a written mock review of your question and method, answer it, revise, and rerun your main result.",
-      "done": ["Every major concern answered.", "A change log.", "A clean-clone rerun within your tolerance, or the difference explained."], "lessons": ["CK-R"], "comps": ["framing", "method", "trust"], "milestone": "CK-R" },
+    { "id": "uncertainty", "label": "Uncertainty and accounting", "does": "Classify and address uncertainty in your findings; use consistent boundaries where you report cost and emissions.",
+      "done": ["Uncertainties classified, with a justified treatment for each.", "Quantitative findings: scenario results or uncertainty ranges, with their construction explained.", "Qualitative findings: triangulation, conflicting evidence and limits of interpretation documented.", "Mixed studies: uncertainty addressed in both parts.", "Cost and emissions on one boundary where you report both."], "lessons": ["R6", "R7", "M7", "M8"], "comps": ["uncertainty", "accounting"] },
+    { "id": "review", "label": "Mock review and rerun", "does": "Get a written mock review, answer it, revise, and rerun results or retrace qualitative findings.",
+      "done": ["Every major concern answered.", "A change log.", "A clean-clone rerun or checked audit trail; differences explained."], "lessons": ["CK-R"], "comps": ["framing", "method", "trust"], "milestone": "CK-R" },
     { "id": "communicate", "label": "Paper and poster", "does": "Write the paper and the poster, with each result's limits beside it.",
       "done": ["A six-page paper with one key figure.", "A limits paragraph and a 150-word public summary.", "A poster."], "lessons": ["R8"], "route": "cap", "comps": ["communication", "realism"], "milestone": "the paper and the poster" },
     { "id": "integrity", "label": "Integrity and release", "does": "Check licenses, credit and conflicts; make what you report and release keep your promises to the people studied.",
@@ -65,7 +65,7 @@
     { "id": "tri", "label": "Triangulation", "def": "[[triangulation|Triangulation]]: each finding checked against a second source or a second method.", "line": "Triangulation: each qualitative finding checked against a second source or method.", "ok": true,
       "fits": ["qual", "mixed"] },
     { "id": "oat", "label": "One input at a time", "def": "One input swung at a time, the others held at their base values.", "line": "One input swung at a time, the others at their base values.", "ok": false,
-      "why": "Swings one at a time miss interactions; the rubric's Proficient level asks for scenarios or a global sensitivity analysis." }
+      "why": "One-at-a-time swings can miss interactions. For this capstone, add a justified treatment of the main uncertainties that fits your method." }
   ],
   "reviews": [
     { "id": "mentor", "label": "A mentor", "line": "A mentor reviews the proposal, the validation evidence and the final study." },
@@ -77,7 +77,7 @@
     { "key": "known", "label": "What is known, and the gap", "hint": "The three closest studies and what none of them answers; the size of your concept matrix and the date of your search (R2).", "rows": 3, "need": true, "min": 15 },
     { "key": "method", "label": "Why this method, not the alternatives", "hint": "What your method answers that the two alternatives cannot (if one is from your method's family, name that method exactly), and one limit you will mitigate (R3).", "rows": 3, "need": true, "min": 15 },
     { "key": "data", "label": "Data and licenses", "hint": "Each source, its date and its license; for interviews, who you will ask, how you will ask for consent, and the ethics review you need first (R4, R9).", "rows": 2, "need": true, "min": 8 },
-    { "key": "check", "label": "How you will check it", "hint": "One verification check, one validation against real data or an independent reference, and the tolerance you set now (R5).", "rows": 2, "need": true, "min": 10 },
+    { "key": "check", "label": "How you will check it", "hint": "Name one verification check and independent validation evidence; set a numerical tolerance or explain how qualitative findings will be traced to their sources (R5).", "rows": 2, "need": true, "min": 10 },
     { "key": "leaves", "label": "What the study leaves out", "hint": "The parts, people and years outside your boundary, and why that does not change the answer to your question.", "rows": 2, "need": true, "min": 8 },
     { "key": "integrity", "label": "Integrity", "hint": "Credit, conflicts, consent, and who the study affects (R9).", "rows": 2, "need": true, "min": 8 }
   ],
@@ -183,8 +183,8 @@
     { "id": "framing", "look": "Your proposal's question card passes its eight checks and says what answer would change your audience's decision." },
     { "id": "positioning", "look": "Your concept matrix of 12 sources or more, and a dated search behind the gap." },
     { "id": "method", "look": "Your method defended against the two alternatives in your plan, and one limit you mitigated." },
-    { "id": "trust", "look": "A clean-clone rerun (CK-R), a verification log and one validation, named in the paper." },
-    { "id": "uncertainty", "look": "The main result as a range, with how the range was made." },
+    { "id": "trust", "look": "A clean-clone rerun or checked audit trail, a verification log and independent validation evidence." },
+    { "id": "uncertainty", "look": "The main uncertainties, the evidence used to assess them, and how they affect your conclusions.", "reads": "for CR, quantitative findings need scenario results or justified uncertainty ranges, including intervals with robustness checks; qualitative findings need triangulation, conflicting evidence and limits of interpretation. A numerical range is not required for qualitative findings. Mixed studies address both parts" },
     { "id": "accounting", "look": "Cost and emissions on one boundary where you report them, the emissions question named, and who pays and who benefits." },
     { "id": "realism", "look": "The evidence status of your key inputs, and a list of what the study leaves out." },
     { "id": "communication", "look": "The six-page paper, its key figure, the limits paragraph and the 150-word public summary." },

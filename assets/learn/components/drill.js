@@ -66,6 +66,8 @@
       var fb = null, answered = false;
       function mark(ok) {
         if (answered) return; answered = true; done++; if (ok) right++;
+        // Feedback and score belong to the first answer; keep it visible until Next item draws fresh controls.
+        Array.prototype.forEach.call(box.querySelectorAll("input, button"), function (el) { el.disabled = true; });
         score.textContent = right + " of " + done + " right";
         fb.innerHTML = ""; H("div", { class: "lx-saw" + (ok ? "" : " no"), html: LX.icon(ok ? "check" : "question") + "<div><b>" + (ok ? "Right." : "Not quite.") + "</b> " + LX.esc(it.why) + "</div>" }, fb);
       }
@@ -76,7 +78,9 @@
           b.addEventListener("click", function () { if (!answered) { b.classList.add(i === it.answer ? "right" : "wrong"); mark(i === it.answer); } });
         });
       } else {
-        LX.NumAnswer(box, { label: "Answer", unit: unitOf(it), width: o.width, widthPhone: o.widthPhone, onCheck: function (v) {
+        LX.NumAnswer(box, { label: "Answer", unit: unitOf(it), width: o.width, widthPhone: o.widthPhone,
+          onChange: function () { if (!answered) fb.textContent = ""; }, onCheck: function (v) {
+          if (answered) return;
           if (v == null && o.empty !== false) { if (o.empty) fb.textContent = o.empty; return; }
           mark(check(v, it));
         } });

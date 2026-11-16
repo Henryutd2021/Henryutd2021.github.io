@@ -366,7 +366,7 @@
         build: function (act, api) {
           var coal = plantByKey(D, "coal"), ans = share(coal, btu);
           H("p", { class: "lx-hint", text: "1 kWh of electricity = " + int(btu) + " Btu (British thermal units, a unit of heat energy)." }, act);
-          var na = LX.NumAnswer(act, { label: "Share of the fuel's energy that becomes electricity", unit: "%", width: "6em", onCheck: function (v) {
+          var na = LX.NumAnswer(act, { label: "Share of the fuel's energy that becomes electricity", unit: "%", width: "6em", onChange: function () { api.clearSaw(); api.undone(); }, onCheck: function (v) {
             if (v === null) { api.saw("Type a percentage first, such as 30.", true); return; }
             var okv = Math.abs(v - ans) <= 0.6;
             api.saw(okv ? "**" + fmt1(ans) + "%**: 3,412 ÷ " + int(coal.heatRate) + " = " + (ans / 100).toFixed(3) + ". The other " + fmt1(lost(coal, btu)) + "% leaves as waste heat, mostly through the condenser."

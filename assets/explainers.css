@@ -12,7 +12,7 @@
 .ex-side { grid-area: side; display: flex; flex-direction: column; gap: .8rem; }
 
 /* controls */
-.ex-control { display: flex; flex-direction: column; gap: .3rem; min-width: 13rem; flex: 1 1 13rem; margin: 0; padding: 0; border: 0; }
+.ex-control { display: flex; flex-direction: column; gap: .3rem; min-width: min(13rem, 100%); flex: 1 1 13rem; margin: 0; padding: 0; border: 0; }
 .ex-label { font-size: .84rem; font-weight: 600; color: var(--ink-2); margin: 0; padding: 0; }
 .ex-value { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--t-ink, var(--accent)); margin-left: .15rem; }
 .ex-hint { font-size: .76rem; color: var(--ink-2); }
@@ -66,11 +66,12 @@ body.quarto-dark .ex-seg-opt input:checked + span { background: var(--t, var(--a
 .ex-note .bi { margin-right: .35rem; }
 
 @media (max-width: 767.98px) {
-  .ex-live { grid-template-columns: 1fr; grid-template-areas: "title" "controls" "figure" "side"; }
+  .ex-live { grid-template-columns: minmax(0, 1fr); grid-template-areas: "title" "controls" "figure" "side"; }
   .ex-readouts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 /* phones: narrower side padding keeps more segment labels on one line; a label that still wraps stays compact */
 @media (max-width: 480px) { .ex-seg-opt span { padding: .32rem .3rem; line-height: 1.25; } }
+@media (max-width: 360px) { .ex-readouts { grid-template-columns: minmax(0, 1fr); } }
 @media (prefers-reduced-motion: reduce) { .ex-svg .ex-trans { transition: none; } }
 
 /* numbers behind a chart, as a table (keyboard and screen-reader access) */

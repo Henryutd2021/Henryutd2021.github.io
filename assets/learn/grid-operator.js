@@ -145,7 +145,13 @@
     }
     return plan;
   }
-  var model = { HOURS: HOURS, prepare: prepare, facts: facts, ccRange: ccRange, settle: settle, totals: totals, simulate: simulate,
+  function morningAdvice(x) {
+    if (x.unserved > 0) return "Your current setting is short " + Math.round(x.unserved) + " MW. Raise gas within the reachable range; the peaker can cover any remaining gap.";
+    if (x.over > 0) return "Your current setting makes " + Math.round(x.over) + " MW too much. Lower gas within the reachable range.";
+    if (x.curtailed > 0) return "Demand is met, but " + Math.round(x.curtailed) + " MW of wind and solar is being curtailed. Lower gas where its ramp limit allows.";
+    return "Your current setting already meets demand. Hold it here, or compare gas plants while keeping supply balanced.";
+  }
+  var model = { morningAdvice: morningAdvice, HOURS: HOURS, prepare: prepare, facts: facts, ccRange: ccRange, settle: settle, totals: totals, simulate: simulate,
                 greedyStep: greedyStep, finishPlan: finishPlan, expertPlan: expertPlan, expert: expert, trace: trace, stars: stars, targets: targets, encodePlan: encodePlan, decodePlan: decodePlan };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
@@ -230,7 +236,7 @@
     var chart = LX.DayChart(ops, { series: SERIES, demand: W.demand, rows: function () { return S_.rows; }, yMax: 400, label: "Hourly output by plant in MW for the hours played, with demand in MW for the whole day." });
     ops.addEventListener("toggle", function () { if (ops.open) chart.render(); });
 
-    var S_ = null;
+    var S_ = null, morning = null;
     function reset() {
       S_ = { t: 0, prev: g.startCC, rows: [], plan: [], done: false, cost: 0, co2: 0, short: 0, pause: false, rampHit: [], pkHours: 0, minF: 60, maxF: 60,
              gasAt: null, hookDone: false, hookSkipped: false, predPick: null, predDone: false };
@@ -244,6 +250,7 @@
     function refresh() {
       if (!S_ || S_.done) return;
       var x = preview();
+      if (morning) morning.reveal(morningAdvice(x));
       scene.set(sceneState(x, S_.t)); meters.set(x); nowTable(x);
       clock.innerHTML = F.hh(S_.t) + "<small>Hour " + (S_.t + 1) + " of 24</small>";
       var im = x.imbalance;
@@ -277,7 +284,7 @@
     }
     function pause(on) { S_.pause = on; refresh(); }
     function fireEvents() {
-      evBox.innerHTML = ""; scene.event("");
+      morning = null; evBox.innerHTML = ""; scene.event("");
       var t = S_.t;
       if (t === cloudH) {
         var e = H("div", { class: "lx-event" }, evBox);
@@ -291,9 +298,9 @@
         var pr = LX.Predict(c, { id: "g0-morning", q: "Demand climbs from " + W.demand[t - 1] + " to " + W.demand[t] + " MW this hour. Where must the extra power come from?",
           options: MORNING.options, answer: "plants", feedback: MORNING.feedback, fresh: true,
           onPick: function () {
-            pr.reveal("Now raise your gas to match."); S_.hookDone = true; skip.hidden = true;
+            morning = pr; pr.reveal(morningAdvice(preview())); S_.hookDone = true; skip.hidden = true;
             var go = H("button", { class: "lx-btn small", type: "button", html: "Back to my shift" + LX.icon("arrow") }, c);
-            go.addEventListener("click", function () { evBox.innerHTML = ""; pause(false); next.focus(); });
+            go.addEventListener("click", function () { morning = null; evBox.innerHTML = ""; pause(false); next.focus(); });
             pause(true);
           } });
         var skip = H("button", { class: "lx-link", type: "button", text: "Skip this question", onclick: function () { S_.hookSkipped = S_.hookDone = true; evBox.innerHTML = ""; pause(false); } }, c);

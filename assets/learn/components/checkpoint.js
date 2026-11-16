@@ -787,6 +787,7 @@
       E("p", { class: "lx-eyebrow", text: "Your results (this browser only)" }, c);
       E("p", { class: "lx-ck-level", tabindex: "-1", text: "Level: " + L.level }, c).focus({ preventScroll: true });
       E("p", { class: "lx-ck-describe", text: describeOf(D, L) }, c);
+      E("p", { class: "lx-hint", text: "This level describes this attempt. A Completed tick records that you reached the bar before; changing a self-rating or starting again keeps that history." }, c);
       var sc = E("div", { class: "lx-scroll-x" }, c), tb = E("table", { class: "lx-ck-res" }, sc), hr = E("tr", null, E("thead", null, tb));
       ["Task", "First answer", "Tries", "Time to first answer", "Solution first"].forEach(function (h) { E("th", { scope: "col", text: h }, hr); });
       var bd = E("tbody", null, tb);

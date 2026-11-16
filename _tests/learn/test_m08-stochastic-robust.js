@@ -343,7 +343,14 @@ const text = s => s.replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/\\\$
       demo.cards.go(6); await flush(); await flush();
       const box = card().querySelector("input");
       ok(box && card().textContent.includes(fm.m(R.sp.exp)), "step 7: the stochastic program solved on arrival; the box is there");
-      if (box) { box.value = "10"; btns(/Check/)[0].click(); ok(next().disabled, "step 7: a wrong EVPI does not unlock Next"); box.value = (R.evpi / 1e6).toFixed(2); btns(/Check/)[0].click(); ok(!next().disabled && card().textContent.includes("EVPI = " + fm.m(R.sp.exp)), "step 7: the right EVPI unlocks Next"); saw(7); }
+      if (box) {
+        box.value = "10"; btns(/Check/)[0].click(); ok(next().disabled, "step 7: a wrong EVPI does not unlock Next");
+        ok(!card().querySelector(".lx-na-msg").hidden, "step 7: the wrong-answer feedback is visible");
+        box.value = (R.evpi / 1e6).toFixed(2); btns(/Check/)[0].click(); ok(!next().disabled && card().textContent.includes("EVPI = " + fm.m(R.sp.exp)), "step 7: the right EVPI unlocks Next"); saw(7);
+        ok(!card().querySelector(".lx-na-msg").hidden, "step 7: the correct-answer feedback is visible");
+        box.value = ""; box.fire("input");
+        ok(next().disabled && !card().querySelector(".lx-saw") && card().querySelector(".lx-na-msg").hidden, "step 7: editing clears both the local and step feedback");
+      }
       // step 8: the worst-case plan; the cost comparison is a figure, apart from the reason
       demo.cards.go(7); btns(/Solve the worst-case plan/)[0].click(); await flush(); await flush();
       ok(!next().disabled && card().textContent.includes(fm.m(R.rob.exp - R.sp.exp)) && /Expected, above the stochastic plan/.test(card().textContent), "step 8: the worst-case plan, and what it costs above the stochastic plan in expectation"); saw(8);

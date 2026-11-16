@@ -175,7 +175,9 @@
       build: function (act, api) {
         var uc = LX.UnitChain(act, { label: "Average power bought from the grid", steps: [{ v: num(s.homeKWh) + " kWh", u: "in a year" }, { op: "÷ " + num(s.hours) + " h =" }, { v: "? kW", u: "average power bought", out: true }] });
         var tries = 0;
-        var n = LX.NumAnswer(act, { label: "Average power bought:", unit: "W", onCheck: function (v) {
+        var n = LX.NumAnswer(act, { label: "Average power bought:", unit: "W", onChange: function () {
+          uc.set([{ v: num(s.homeKWh) + " kWh", u: "in a year" }, { op: "÷ " + num(s.hours) + " h =" }, { v: "? kW", u: "average power bought", out: true }]); api.clearSaw(); api.undone();
+        }, onCheck: function (v) {
           tries++;
           if (close(v, s.homeW, 1)) {
             uc.set([{ v: num(s.homeKWh) + " kWh", u: "in a year" }, { op: "÷ " + num(s.hours) + " h =" }, { v: num(s.homeKW, 3) + " kW", u: "= " + num(s.homeW) + " W", out: true }]);
@@ -269,7 +271,9 @@
       build: function (act, api) {
         var uc = LX.UnitChain(act, { label: "Battery round trip", steps: [{ v: "? MWh", u: "charged" }, { op: "× " + num(s.rte, 2) + " =" }, { v: num(s.target) + " MWh", u: "back", out: true }] });
         var tries = 0;
-        var n = LX.NumAnswer(act, { label: "Charge:", unit: "MWh", onCheck: function (v) {
+        var n = LX.NumAnswer(act, { label: "Charge:", unit: "MWh", onChange: function () {
+          uc.set([{ v: "? MWh", u: "charged" }, { op: "× " + num(s.rte, 2) + " =" }, { v: num(s.target) + " MWh", u: "back", out: true }]); api.clearSaw(); api.undone();
+        }, onCheck: function (v) {
           tries++;
           if (close(v, s.need, 0.06)) {
             uc.set([{ v: num(s.need, 1) + " MWh", u: "charged" }, { op: "× " + num(s.rte, 2) + " =" }, { v: num(s.target) + " MWh", u: "back", out: true }]);
@@ -293,7 +297,9 @@
         H("p", { class: "k2-key", text: num(s.windMW) + " MW × " + num(s.hours) + " h = " + num(s.windMax) + " MWh: the farm at full output every hour of the year." }, act);
         var gwh = H("p", { class: "k2-key", "aria-live": "polite" }, act);   // the GWh conversion, a caption of its own once the answer is in
         var tries = 0;
-        var n = LX.NumAnswer(act, { label: "A year's energy:", unit: "MWh", onCheck: function (v) {
+        var n = LX.NumAnswer(act, { label: "A year's energy:", unit: "MWh", onChange: function () {
+          LX.CostSplit.fill(bar, [], 100); made.textContent = "?"; gwh.textContent = ""; api.clearSaw(); api.undone();
+        }, onCheck: function (v) {
           tries++;
           if (close(v, s.windE, 1000)) {
             LX.CostSplit.fill(bar, [{ color: "var(--lx-wind)", value: s.windCF * 100 }], 100); made.textContent = num(s.windE);

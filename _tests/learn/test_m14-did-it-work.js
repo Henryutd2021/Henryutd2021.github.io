@@ -210,6 +210,11 @@ ok((TX.match(/[Ss]imulated/g) || []).length >= 6, "the page says 'simulated' thr
     inp.value = "−0.30"; go.click(); }
   sawIs(5, "DiD: −0.30 kW, about 95% interval −0.33 to −0.27 kW, around the truth −0.29 kW. It removes fixed differences between homes and changes common to both groups.");
   { const sp = plotSpecs[plotSpecs.length - 1]; ok(sp.text.rows.length === 4 && sp.marks.length === 4 && sp.refs[0].y === truth, "step 5: the estimate ladder has four estimates and the truth"); }
+  { const inp = card().querySelector("input"), go = card().querySelector(".lx-na button");
+    inp.value = ""; inp.fire("input");
+    ok(next().disabled && saw() === "" && !card().querySelector(".stub-plot"), "step 5: editing clears the prior result and closes Next");
+    go.click(); ok(next().disabled && !card().querySelector(".stub-plot"), "step 5: an empty answer is not a numerical zero and cannot pass");
+    inp.value = "−0.30"; go.click(); ok(!next().disabled, "step 5: the correct answer can be checked again"); }
   cards.go(5); card().querySelectorAll(".lx-seg button")[1].click();
   ok(next().disabled && /Look again/.test(saw()), "step 6: 'not parallel' is not accepted");
   ok(/Each dot is that month's TOU–flat gap minus the month-12 gap: the change in the gap\. Zero means the gap stayed the same\./.test(text(card().innerHTML)), "step 6: what each dot is, said before the chart");

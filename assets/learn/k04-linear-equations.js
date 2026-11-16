@@ -157,7 +157,7 @@
       build: function (act, api) {
         H("p", { class: "k4-eq", html: s.nuclear + " + " + s.wind + " + " + s.solar + " + <i>g</i> = " + s.demand }, act);
         var tries = 0;
-        LX.NumAnswer(act, { label: "g =", unit: "MW", onCheck: function (v) {
+        LX.NumAnswer(act, { label: "g =", unit: "MW", onChange: function () { api.clearSaw(); api.undone(); }, onCheck: function (v) {
           tries++;
           if (v === s.need) { api.done(); api.saw("g = " + s.demand + " − " + s.nuclear + " − " + s.wind + " − " + s.solar + " = " + s.need + " MW. Do the same to both sides and the balance holds."); }
           else api.saw(tries < 2 ? "Not yet. Take the known parts away from both sides." : "Subtract each known part from " + s.demand + ": " + s.demand + " − " + s.nuclear + " − " + s.wind + " − " + s.solar + ".", true);

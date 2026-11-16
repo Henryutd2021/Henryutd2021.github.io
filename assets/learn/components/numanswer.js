@@ -1,7 +1,7 @@
 /* numanswer.js — LX.NumAnswer: a number box with its label, its unit and a Check button, plus the lenient number parser and
    the tolerance check behind it (used by the toolbox lessons K1 to K5 and K8, and LX.Drill builds its numeric items
    with it). Styles in numanswer.css.
-   LX.NumAnswer(host, { label, unit, accept, button, width, widthPhone, onCheck })
+   LX.NumAnswer(host, { label, unit, accept, button, width, widthPhone, onCheck, onChange })
      label       the visible label, tied to the box (for/id)
      unit        a short unit after the box ("MW", "dollars", "% of hours"); none when empty. The box's description
                  (aria-describedby), and the one unit a reader may type after the number ("450,000 kW" in a kW box)
@@ -9,6 +9,7 @@
      button      the button's text (default "Check")
      width       the box's width as a CSS length (default 7.5em); widthPhone the width at 560 px and below (default: width)
      onCheck     function (v, input): v is the parsed number, or null when the box is empty; Check and Enter run it
+     onChange    optional function (input): clear the lesson's previous feedback when the answer is edited
    Returns { row, input, button, msg, go } (go() runs the check, e.g. for a page's "finish for me" shortcut).
    Text that is not just a number (another unit, such as "450,000 MW" in a kW box, or other words) is refused: the box
    says "Type just the number: the box is in kW." in its own live note (msg, tied to the box), sets aria-invalid, and does
@@ -16,11 +17,12 @@
    The box is a text input with inputmode="decimal", so phones show a number pad and "1,230", "$3.85" or "−3" are accepted.
    Pure (no DOM; Node: require("assets/learn/components/numanswer.js"); page: LX.NumAnswer.parse, .read, .close):
      parse(text, unit)    "450,000", "0.45", "$78,600", "33.8%", "6.96e9", "6.96 × 10^9", "6.96x10^9", "6.96 × 10⁹", "10⁹",
-                          "−3" -> a number; null when the text is not a number. Thousands commas, spaces, $ and % are
-                          dropped, − and – read as minus signs, superscript digits as an exponent. After the number only
-                          the unit (a string or a list; case and spaces ignored, "/" for "per") may follow; any other
+                          "−3" -> a number; null when the text is not a number. Thousands commas and spaces are dropped;
+                          − and – read as minus signs, superscript digits as an exponent.
+                          Currency and percent signs require a matching unit; SI prefixes are case-sensitive. After the number only
+                          the unit (a string or a list; spaces ignored, "/" for "per") may follow; any other
                           leftover text gives null.
-     read(text, unit)     { value, why }: why is null (a number), "empty" (nothing but spaces, $ or %) or "text" (not just a
+     read(text, unit)     { value, why }: why is null (a number), "empty" (blank, or just $ in a currency box) or "text" (not just a
                           number: another unit, words, or no number at all)
      close(v, ans, tol)   v is a number within tol of ans (plus 1e-9 for rounding); without tol, v must equal ans exactly
    Classes: .lx-na (the row), .lx-na-num (the box; .right and .wrong mark a checked answer), .lx-na-unit, .lx-na-msg. */
@@ -29,15 +31,22 @@
 
   // ---------------------------------------------------------------- pure (no DOM; exported for Node)
   var SUP = { "⁰": "0", "¹": "1", "²": "2", "³": "3", "⁴": "4", "⁵": "5", "⁶": "6", "⁷": "7", "⁸": "8", "⁹": "9", "⁻": "-", "⁺": "+" };
-  // the text with commas, spaces, $ and % dropped, minus signs and superscript exponents ("10⁹" -> "10^9") read
+  // Commas and spaces are formatting; currency and percent signs still carry a dimension.
   function squeeze(text) {
-    return String(text == null ? "" : text).replace(/[−–]/g, "-").replace(/[,\s$%]/g, "")
+    return String(text == null ? "" : text).replace(/[−–]/g, "-").replace(/[,\s]/g, "")
       .replace(/[⁻⁺]?[⁰¹²³⁴⁵⁶⁷⁸⁹]+/g, function (x) { return "^" + x.replace(/./g, function (c) { return SUP[c]; }); }).replace(/\^\^/g, "^");
   }
-  function unitKey(u) { return squeeze(u).toLowerCase().replace(/per/g, "/"); }
+  function unitKey(u) {
+    var k = squeeze(u).replace(/\$/g, "").replace(/per/gi, "/").replace(/[A-Za-z]{4,}/g, function (w) { return w.toLowerCase(); });
+    return k === "kw" ? "kW" : k;   // a common spelling; never fold MW into mW
+  }
   var NUM = /^([-+]?(?:\d+\.?\d*|\.\d+)(?:e[-+]?\d+)?)(?:[x×*·]10\^([-+]?\d+))?(.*)$/i;
   function read(text, unit) {
-    var t = squeeze(text);
+    var t = squeeze(text), units = [].concat(unit == null ? [] : unit);
+    var money = units.some(function (u) { return /\$|\bdollars?\b/i.test(u); });
+    var percent = units.some(function (u) { return /%|\bpercent\b/i.test(u); });
+    if ((t.indexOf("$") >= 0 && !money) || (t.indexOf("%") >= 0 && !percent) || (t.match(/\$/g) || []).length > 1) return { value: null, why: "text" };
+    if (money) t = t.replace(/^([+-]?)\$/, "$1");
     if (t === "") return { value: null, why: "empty" };
     var m = /^10\^([-+]?\d+)(.*)$/.exec(t), v, rest;   // a bare power of ten, "10^9" or "10⁹"
     if (m) { v = Math.pow(10, +m[1]); rest = m[2]; }
@@ -46,8 +55,9 @@
       if (!m) return { value: null, why: "text" };
       v = m[2] != null ? +m[1] * Math.pow(10, +m[2]) : +m[1]; rest = m[3];
     }
+    if ((rest === "%" && percent) || (rest === "$" && money)) rest = "";
     if (rest) {
-      var ok = [].concat(unit == null ? [] : unit).some(function (u) { var k = unitKey(u); return k !== "" && k === unitKey(rest); });
+      var ok = units.some(function (u) { var k = unitKey(u); return k !== "" && k === unitKey(rest); });
       if (!ok) return { value: null, why: "text" };
     }
     return isFinite(v) ? { value: v, why: null } : { value: null, why: "text" };
@@ -78,7 +88,14 @@
     var units = (o.unit ? [o.unit] : []).concat(o.accept || []);
     function describe(refused) { inp.setAttribute("aria-describedby", [uid, refused ? mid : null].filter(Boolean).join(" ")); if (!uid && !refused) inp.removeAttribute("aria-describedby"); }
     describe(false);
+    var seen = inp.value;
+    function invalidate() {
+      seen = inp.value; inp.classList.remove("right", "wrong"); inp.removeAttribute("aria-invalid");
+      msg.textContent = ""; msg.hidden = true; describe(false);
+      if (o.onChange) o.onChange(inp);
+    }
     function go() {
+      if (seen !== inp.value) invalidate();
       var r = read(inp.value, units);
       if (r.why === "text") {
         msg.textContent = "Type just the number" + (o.unit ? ": the box is in " + o.unit + "." : ".");
@@ -86,8 +103,11 @@
         return;
       }
       msg.textContent = ""; msg.hidden = true; inp.removeAttribute("aria-invalid"); describe(false);
+      if (r.why === "empty") invalidate();
       if (o.onCheck) o.onCheck(r.value, inp);
+      msg.hidden = !msg.textContent; describe(!msg.hidden);
     }
+    inp.addEventListener("input", invalidate);
     btn.addEventListener("click", go);
     inp.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); go(); } });
     return { row: row, input: inp, button: btn, msg: msg, go: go };

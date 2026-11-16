@@ -638,7 +638,9 @@
           p.lines.forEach(function (ln, j) { S("text", { x: p.x, y: y0 + 15 + j * 14, "text-anchor": "middle", class: "mlabel" + (s === "up" ? " up" : ""), "aria-hidden": "true" }, g).textContent = ln; });
         } else {
           p.lines.forEach(function (ln, j) { S("text", { x: p.textX, y: p.ty + j * 15, class: "mlabel" + (s === "up" ? " up" : ""), "aria-hidden": "true" }, g).textContent = ln; });
-          S("text", { x: p.textX, y: p.subY, class: "mlabel sub", "aria-hidden": "true" }, g).textContent = l.minutes + " min · " + (s === "open" ? "open now" : s === "done" ? "done" : "coming soon");
+          var sub = l.minutes + " min · " + (s === "open" ? "open now" : s === "done" ? "done" : "coming soon"), room = L.W - p.textX - 6;
+          if (meas(sub, "sub") > room) sub = l.minutes + " min · " + (s === "open" ? "open" : s === "done" ? "done" : "soon");
+          S("text", { x: p.textX, y: p.subY, class: "mlabel sub", "aria-hidden": "true" }, g).textContent = shorten(sub, room, meas, "sub");
           var hit = S("rect", { x: p.textX - 6, y: p.top + 4, width: L.W - p.textX + 6, height: p.h - 8, class: "mhit", "aria-hidden": "true" }, g);
           hit.addEventListener("click", function () { open(p.key); });
         }

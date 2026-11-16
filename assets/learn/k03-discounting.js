@@ -245,7 +245,7 @@
       build: function (act, api) {
         H("p", { class: "k3-eq", html: T.pvEq }, act);
         var tries = 0, want = s.pv7[1];
-        var n = LX.NumAnswer(act, { label: "Worth today, in dollars:", unit: "$", onCheck: function (v) {
+        var n = LX.NumAnswer(act, { label: "Worth today, in dollars:", unit: "$", onChange: function () { api.clearSaw(); api.undone(); }, onCheck: function (v) {
           tries++;
           if (close(v, +want.toFixed(2), 0.015)) { api.done(); api.saw(T.pvOk); }
           else api.saw(tries < 2 ? T.pvHint : T.pvShow, true);
@@ -318,7 +318,7 @@
       build: function (act, api) {
         H("p", { class: "k3-eq", html: T.payEq }, act);
         var tries = 0, totals = null;
-        var n = LX.NumAnswer(act, { label: "Yearly payment, $ per kW:", unit: "$ per kW", onCheck: function (v) {
+        var n = LX.NumAnswer(act, { label: "Yearly payment, $ per kW:", unit: "$ per kW", onChange: function () { api.clearSaw(); api.undone(); }, onCheck: function (v) {
           tries++;
           if (close(v, s.payment, 0.5)) {
             LX.store.set("k3-own", { rate: s.plantRate * 100, life: s.life });

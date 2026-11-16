@@ -75,7 +75,7 @@ const num = K.num;
   ok(K.expOf(1000) === 3 && K.expOf(19) === 1 && K.expOf(0.019) === -2 && K.expOf(1e15) === 15 && K.expOf(4.2e15) === 15, "scientific: exact powers of ten and the anchors");
   ok(K.sci(19) === "1.9 × 10¹" && K.sci(6957e6) === "6.96 × 10⁹" && K.sci(4.2e15) === "4.2 × 10¹⁵" && K.sci(298.6e12) === "2.99 × 10¹⁴" && K.sup(-12) === "⁻¹²", "scientific: formatting");
   ok(K.powersApart(19, 4.2e15) === 14 && K.powersApart(4.2e15, 19) === 14 && K.powersApart(10791e3, 6957e6) === 3 && K.powersApart(5, 5) === 0, "ratio: powers apart, either order");
-  ok(K.parseNum("450,000") === 450000 && K.parseNum("0.45") === 0.45 && K.parseNum("6.96e9") === 6.96e9 && near(K.parseNum("6.96 × 10^9"), 6.96e9, 1) && near(K.parseNum("6.96x10^9"), 6.96e9, 1) && K.parseNum("−3") === -3 && K.parseNum("$78,600") === 78600 && K.parseNum("abc") === null, "parse: commas, decimals, e-notation, × 10^n, minus sign, dollars");
+  ok(K.parseNum("450,000") === 450000 && K.parseNum("0.45") === 0.45 && K.parseNum("6.96e9") === 6.96e9 && near(K.parseNum("6.96 × 10^9"), 6.96e9, 1) && near(K.parseNum("6.96x10^9"), 6.96e9, 1) && K.parseNum("−3") === -3 && K.parseNum("$78,600", "$") === 78600 && K.parseNum("$78,600") === null && K.parseNum("abc") === null, "parse: number formats, minus signs and currency only in a currency box");
   ok(K.close(0.45, 0.45) && !K.close(0.46, 0.45) && K.close(6.96, 6.957, 0.006) && !K.close(6.95, 6.957, 0.006) && !K.close(7, 6.957, 0.006) && !K.close(null, 1), "close: tolerances of the inputs");
   ok(K.plain(450e6) === "450,000,000" && K.plain(0.00045) === "0.00045" && K.plain(6.957) === "6.957" && K.plain(0.045) === "0.045", "plain: number formats");
 }

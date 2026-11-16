@@ -46,16 +46,18 @@ const P = NA.parse, near = (a, b, t) => a != null && Math.abs(a - b) <= (t === u
 ok(P("450,000") === 450000 && P("0.45") === 0.45 && P(".5") === 0.5 && P("5.") === 5 && P("6.96e9") === 6.96e9 && P("1e3") === 1000, "parse: commas, decimals, e-notation");
 ok(near(P("6.96 × 10^9"), 6.96e9, 1) && near(P("6.96x10^9"), 6.96e9, 1) && near(P("6.96*10^9"), 6.96e9, 1) && near(P("2 × 10^-3"), 0.002, 1e-15), "parse: a × 10^n written three ways, negative exponents");
 ok(P("−3") === -3 && P("–2.5") === -2.5 && P("-0.25") === -0.25, "parse: minus, en dash and hyphen");
-ok(P("$78,600") === 78600 && P("$3.85") === 3.85 && P("33.8%") === 33.8 && P(" 145 ") === 145 && P("1 230") === 1230, "parse: dollars, percent and spaces dropped");
+ok(P("$78,600", "dollars") === 78600 && P("$3.85", "$") === 3.85 && P("33.8%", "%") === 33.8 && P(" 145 ") === 145 && P("1 230") === 1230, "parse: dollars and percent require the matching unit; number formatting is accepted");
+ok(P("$78,600") === null && P("33.8%") === null && P("450,000%", "kW") === null && P("145 mW", "MW") === null,
+  "parse: unitless answers and power answers do not silently discard another dimension; SI prefix case matters");
 // superscript exponents, no left-over text, and only the box's own unit after the number
 ok(near(P("6.96 × 10⁹"), 6.96e9, 1) && near(P("6.96×10⁹"), 6.96e9, 1) && near(P("2 × 10⁻³"), 0.002, 1e-15) && P("10⁹") === 1e9 && P("10^9") === 1e9 && near(P("1.9 × 10¹"), 19, 1e-12) && near(P("4.2 × 10¹⁵"), 4.2e15, 1),
   "parse: superscript exponents as the page prints them (6.96 × 10⁹ is 6.96e9, not 6.96), and a bare power of ten");
 ok(P("145 MW") === null && P("12.5kg") === null && P("3 apples") === null && P("1.2.3") === null && P("6.96 × 10") === null && P("abc") === null, "parse: left-over text is refused (null), not cut off as parseFloat would");
 ok(P("450,000 MW", "kW") === null && P("450,000 kW", "kW") === 450000 && P("450,000 kw", "kW") === 450000 && P("450,000", "kW") === 450000, "parse: in a kW box, 450,000 MW is refused; 450,000 kW and 450,000 are read");
 ok(P("145 MW", ["MW", "megawatts"]) === 145 && P("145 megawatts", ["MW", "megawatts"]) === 145 && P("$120 per kW", "$ per kW") === 120 && P("120 $/kW", "$ per kW") === 120 && P("85%", "% (back ÷ in)") === 85,
-  "parse: the unit may be a list; case, spaces and $ and % are ignored, and / reads as per");
+  "parse: accepted unit aliases, currency and percent formats, and / for per");
 ok(P("") === null && P("$") === null && P(null) === null && P(undefined) === null && P("-") === null && P("1e400") === null, "parse: no number gives null");
-ok(NA.read("").why === "empty" && NA.read(" $ ").why === "empty" && NA.read("450,000 MW", "kW").why === "text" && NA.read("abc").why === "text" && NA.read("6.96 × 10⁹").why === null && NA.read("6.96 × 10⁹").value === 6.96e9,
+ok(NA.read("").why === "empty" && NA.read(" $ ", "$").why === "empty" && NA.read(" $ ").why === "text" && NA.read("450,000 MW", "kW").why === "text" && NA.read("abc").why === "text" && NA.read("6.96 × 10⁹").why === null && NA.read("6.96 × 10⁹").value === 6.96e9,
   "read: why a text gives no number (empty, or text that is not just a number)");
 ok(NA.close(145, 145) && !NA.close(145.0001, 145) && !NA.close(null, 0) && !NA.close(NaN, NaN), "close: exact without a tolerance; null and NaN never");
 ok(NA.close(6.963, 6.957, 0.006) && !NA.close(6.95, 6.957, 0.006) && NA.close(1.5, 1, 0.5) && !NA.close(1.6, 1, 0.5), "close: within the tolerance (ends included)");

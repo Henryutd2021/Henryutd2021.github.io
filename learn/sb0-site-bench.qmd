@@ -77,7 +77,7 @@ twitter-card: {"description": "Size equipment for a fictional home or wind farm;
 
 ::: {#results .lx-sec}
 ::: {.lx-sec-h}
-## Results
+## Results {#results-heading}
 :::
 
 ```{=html}
