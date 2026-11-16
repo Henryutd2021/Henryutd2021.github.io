@@ -19,9 +19,10 @@
      parse(text, unit)    "450,000", "0.45", "$78,600", "33.8%", "6.96e9", "6.96 × 10^9", "6.96x10^9", "6.96 × 10⁹", "10⁹",
                           "−3" -> a number; null when the text is not a number. Thousands commas and spaces are dropped;
                           − and – read as minus signs, superscript digits as an exponent.
-                          Currency and percent signs require a matching unit; SI prefixes are case-sensitive. After the number only
-                          the unit (a string or a list; spaces ignored, "/" for "per") may follow; any other
-                          leftover text gives null.
+                          Currency and percent signs require a matching unit. After the number only the unit (a string
+                          or a list; spaces ignored, "/" for "per") may follow; any other leftover text gives null.
+                          Case is ignored ("mwh", "KW", "hz") except where it turns one SI prefix into another: m and M
+                          (milli, mega), p and P (pico, peta), so "145 mW" is refused in an MW box.
      read(text, unit)     { value, why }: why is null (a number), "empty" (blank, or just $ in a currency box) or "text" (not just a
                           number: another unit, words, or no number at all)
      close(v, ans, tol)   v is a number within tol of ans (plus 1e-9 for rounding); without tol, v must equal ans exactly
@@ -37,8 +38,18 @@
       .replace(/[⁻⁺]?[⁰¹²³⁴⁵⁶⁷⁸⁹]+/g, function (x) { return "^" + x.replace(/./g, function (c) { return SUP[c]; }); }).replace(/\^\^/g, "^");
   }
   function unitKey(u) {
-    var k = squeeze(u).replace(/\$/g, "").replace(/per/gi, "/").replace(/[A-Za-z]{4,}/g, function (w) { return w.toLowerCase(); });
-    return k === "kw" ? "kW" : k;   // a common spelling; never fold MW into mW
+    return squeeze(u).replace(/\$/g, "").replace(/per/gi, "/").replace(/[A-Za-z]{4,}/g, function (w) { return w.toLowerCase(); });
+  }
+  // two unit keys name the same unit: equal, or equal but for case, unless the case of a prefix letter differs (an m or
+  // p that starts a symbol and is followed by a letter: mW is not MW, pJ is not PJ; "cap" or "m/s" have no prefix)
+  function sameUnit(a, b) {
+    if (a === b) return true;
+    if (a.length !== b.length || a.toLowerCase() !== b.toLowerCase()) return false;
+    for (var i = 0; i < a.length; i++) {
+      if (a.charAt(i) === b.charAt(i) || !/[mp]/i.test(a.charAt(i))) continue;
+      if (!/[A-Za-z]/.test(a.charAt(i - 1)) && /[A-Za-z]/.test(a.charAt(i + 1))) return false;
+    }
+    return true;
   }
   var NUM = /^([-+]?(?:\d+\.?\d*|\.\d+)(?:e[-+]?\d+)?)(?:[x×*·]10\^([-+]?\d+))?(.*)$/i;
   function read(text, unit) {
@@ -57,7 +68,7 @@
     }
     if ((rest === "%" && percent) || (rest === "$" && money)) rest = "";
     if (rest) {
-      var ok = units.some(function (u) { var k = unitKey(u); return k !== "" && k === unitKey(rest); });
+      var ok = units.some(function (u) { var k = unitKey(u); return k !== "" && sameUnit(k, unitKey(rest)); });
       if (!ok) return { value: null, why: "text" };
     }
     return isFinite(v) ? { value: v, why: null } : { value: null, why: "text" };

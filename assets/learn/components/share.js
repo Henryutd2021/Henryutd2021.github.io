@@ -46,7 +46,7 @@
     function url() { return shareUrl(location.href, o.hash()); }
     function share() {
       var h = cleanHash(o.hash()), u = shareUrl(location.href, h);
-      if (o.replace !== false) { try { history.replaceState(null, "", "#" + h); } catch (e) { /* not allowed here */ } }
+      if (o.replace !== false) { try { history.replaceState(history.state, "", "#" + h); } catch (e) { /* not allowed here */ } }
       box.hidden = false; box.innerHTML = "";
       if (o.note) H("label", { class: "lx-share-note", for: id, html: LX.rich(o.note) }, box);
       var inp = H("input", { id: id, type: "text", readonly: true, value: u, "aria-label": o.note ? null : "Link to share" }, box);

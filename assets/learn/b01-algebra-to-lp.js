@@ -458,8 +458,10 @@
       var nn = H("button", { type: "button", class: "lx-btn ghost small", text: "Add " + sy[0] + " ≥ 0 and " + sy[1] + " ≥ 0" }, tools);
       nn.addEventListener("click", function () { mine.rows.push({ a: [1, 0], op: ">=", b: 0 }, { a: [0, 1], op: ">=", b: 0 }); renderRows(); edited(); draw(); });
     }
-    function clean() { return { sense: mine.sense, c: mine.c.map(function (x) { return isFinite(x) ? x : 0; }),
-      rows: mine.rows.filter(function (r) { return isFinite(r.b) && (isFinite(r.a[0]) || isFinite(r.a[1])); }).map(function (r) { return { a: [isFinite(r.a[0]) ? r.a[0] : 0, isFinite(r.a[1]) ? r.a[1] : 0], op: r.op, b: r.b }; }) }; }
+    // a box that cannot be read keeps its text (a string, never a number: global isFinite would read "0x10" as 16)
+    function fin(x) { return typeof x === "number" && isFinite(x); }
+    function clean() { return { sense: mine.sense, c: mine.c.map(function (x) { return fin(x) ? x : 0; }),
+      rows: mine.rows.filter(function (r) { return fin(r.b) && (fin(r.a[0]) || fin(r.a[1])); }).map(function (r) { return { a: [fin(r.a[0]) ? r.a[0] : 0, fin(r.a[1]) ? r.a[1] : 0], op: r.op, b: r.b }; }) }; }
     function draw() {
       var m = clean(); pl.clear();
       var usable = m.rows.filter(function (r) { return r.a[0] || r.a[1]; });   // rules with no decision draw no line but still count

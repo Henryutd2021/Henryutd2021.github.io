@@ -4129,7 +4129,7 @@
     function url() { return shareUrl(location.href, o.hash()); }
     function share() {
       var h = cleanHash(o.hash()), u = shareUrl(location.href, h);
-      if (o.replace !== false) { try { history.replaceState(null, "", "#" + h); } catch (e) { /* not allowed here */ } }
+      if (o.replace !== false) { try { history.replaceState(history.state, "", "#" + h); } catch (e) { /* not allowed here */ } }
       box.hidden = false; box.innerHTML = "";
       if (o.note) H("label", { class: "lx-share-note", for: id, html: LX.rich(o.note) }, box);
       var inp = H("input", { id: id, type: "text", readonly: true, value: u, "aria-label": o.note ? null : "Link to share" }, box);
@@ -8651,9 +8651,10 @@
      parse(text, unit)    "450,000", "0.45", "$78,600", "33.8%", "6.96e9", "6.96 × 10^9", "6.96x10^9", "6.96 × 10⁹", "10⁹",
                           "−3" -> a number; null when the text is not a number. Thousands commas and spaces are dropped;
                           − and – read as minus signs, superscript digits as an exponent.
-                          Currency and percent signs require a matching unit; SI prefixes are case-sensitive. After the number only
-                          the unit (a string or a list; spaces ignored, "/" for "per") may follow; any other
-                          leftover text gives null.
+                          Currency and percent signs require a matching unit. After the number only the unit (a string
+                          or a list; spaces ignored, "/" for "per") may follow; any other leftover text gives null.
+                          Case is ignored ("mwh", "KW", "hz") except where it turns one SI prefix into another: m and M
+                          (milli, mega), p and P (pico, peta), so "145 mW" is refused in an MW box.
      read(text, unit)     { value, why }: why is null (a number), "empty" (blank, or just $ in a currency box) or "text" (not just a
                           number: another unit, words, or no number at all)
      close(v, ans, tol)   v is a number within tol of ans (plus 1e-9 for rounding); without tol, v must equal ans exactly
@@ -8669,8 +8670,18 @@
       .replace(/[⁻⁺]?[⁰¹²³⁴⁵⁶⁷⁸⁹]+/g, function (x) { return "^" + x.replace(/./g, function (c) { return SUP[c]; }); }).replace(/\^\^/g, "^");
   }
   function unitKey(u) {
-    var k = squeeze(u).replace(/\$/g, "").replace(/per/gi, "/").replace(/[A-Za-z]{4,}/g, function (w) { return w.toLowerCase(); });
-    return k === "kw" ? "kW" : k;   // a common spelling; never fold MW into mW
+    return squeeze(u).replace(/\$/g, "").replace(/per/gi, "/").replace(/[A-Za-z]{4,}/g, function (w) { return w.toLowerCase(); });
+  }
+  // two unit keys name the same unit: equal, or equal but for case, unless the case of a prefix letter differs (an m or
+  // p that starts a symbol and is followed by a letter: mW is not MW, pJ is not PJ; "cap" or "m/s" have no prefix)
+  function sameUnit(a, b) {
+    if (a === b) return true;
+    if (a.length !== b.length || a.toLowerCase() !== b.toLowerCase()) return false;
+    for (var i = 0; i < a.length; i++) {
+      if (a.charAt(i) === b.charAt(i) || !/[mp]/i.test(a.charAt(i))) continue;
+      if (!/[A-Za-z]/.test(a.charAt(i - 1)) && /[A-Za-z]/.test(a.charAt(i + 1))) return false;
+    }
+    return true;
   }
   var NUM = /^([-+]?(?:\d+\.?\d*|\.\d+)(?:e[-+]?\d+)?)(?:[x×*·]10\^([-+]?\d+))?(.*)$/i;
   function read(text, unit) {
@@ -8689,7 +8700,7 @@
     }
     if ((rest === "%" && percent) || (rest === "$" && money)) rest = "";
     if (rest) {
-      var ok = units.some(function (u) { var k = unitKey(u); return k !== "" && k === unitKey(rest); });
+      var ok = units.some(function (u) { var k = unitKey(u); return k !== "" && sameUnit(k, unitKey(rest)); });
       if (!ok) return { value: null, why: "text" };
     }
     return isFinite(v) ? { value: v, why: null } : { value: null, why: "text" };
@@ -9260,19 +9271,24 @@
     var r0 = decode(S, hashNow()), saved = r0.status === "none" ? cached() : null;
     if (saved) r0 = saved;
     var cur = clone(r0.state), written = null, timer = null, said = 0, showing = false;
+    // The entry's history state with this tab's plan (when it may be kept), other owners' keys left as they are.
+    function entry(x) {
+      if (!canCache()) return x.state;
+      var s = Object.assign({}, x.state || {});
+      s.lxPlan = { path: baseUrl(), schema: S.key, token: encode(S, cur), epoch: epoch };
+      return s;
+    }
+    // One replaceState per write: browsers throttle the History API (Chrome drops calls, Safari throws after 100
+    // in 30 s), so the plan is never written on every slider step, only by the debounced write and on navigation.
     function cache() {
       if (!canCache()) return;
-      try {
-        var x = hist(); if (!x || !x.replaceState) return;
-        var s = Object.assign({}, x.state || {});
-        s.lxPlan = { path: baseUrl(), schema: S.key, token: encode(S, cur), epoch: epoch };
-        x.replaceState(s, "", location.href);
-      } catch (e) { /* history unavailable: the explicit plan link still works */ }
+      try { var x = hist(); if (x && x.replaceState) x.replaceState(entry(x), "", location.href); }
+      catch (e) { /* history unavailable: the explicit plan link still works */ }
     }
-    function put(h) {   // the address, without a new history entry; h null takes the hash out
-      try { var x = hist(); if (x && x.replaceState) x.replaceState(x.state, "", h ? baseUrl() + "#" + h : baseUrl()); } catch (e) { /* not allowed here */ }
+    function put(h) {   // the address and the entry's plan, without a new history entry; h null takes the hash out
+      try { var x = hist(); if (x && x.replaceState) x.replaceState(entry(x), "", h ? baseUrl() + "#" + h : baseUrl()); } catch (e) { /* not allowed here */ }
     }
-    function write() { written = encode(S, cur); put(written); cache(); }
+    function write() { written = encode(S, cur); put(written); }
     function later() { if (timer) clearTimeout(timer); timer = setTimeout(function () { timer = null; write(); }, 250); }
     function announce(text, kind) {   // filled a moment later, so a region present at load is still read out
       var my = ++said;
@@ -9283,11 +9299,11 @@
     }
     if (r0.history) { written = encode(S, cur); cache(); }
     else if (r0.status === "ok" || r0.status === "migrated") write();   // the link as this version writes it
-    else if (r0.status !== "none") { put(null); cache(); }                     // a refused link leaves the address
+    else if (r0.status !== "none") put(null);                     // a refused link leaves the address
     if (r0.status !== "none") announce(r0.history ? "Restored this tab’s plan. Use Copy plan link to share it." : message(S, r0), r0.status === "ok" ? "ok" : (r0.status === "migrated" ? "note" : "warn"));
     var share = LX.Share ? LX.Share(box, { button: o.button || row, buttonText: o.buttonText || "Copy plan link", id: o.id,
       note: o.note || "Anyone who opens this link sees this plan and can run it themselves. It holds only the plan's numbers and choices. Use this button to share a plan after visiting a section link.",
-      replace: sync, hash: function () { written = encode(S, cur); cache(); return written; } }) : null;
+      replace: sync, hash: function () { written = encode(S, cur); return written; } }) : null;
     function navigate() {
       var r = decode(S, hashNow());
       if (timer) { clearTimeout(timer); timer = null; }
@@ -9324,10 +9340,10 @@
         var changed = encode(S, state) !== encode(S, cur);
         cur = clone(state);
         if (changed && showing) announce("", null);   // a link notice goes once the reader changes the plan
-        if (sync && !(opt && opt.write === false)) { cache(); later(); }
+        if (sync && !(opt && opt.write === false)) later();
         return [];
       },
-      reset: function () { cur = defaults(S); if (sync) { cache(); later(); } announce("", null); return clone(cur); },
+      reset: function () { cur = defaults(S); if (sync) later(); announce("", null); return clone(cur); },
       hash: function () { return encode(S, cur); },
       url: function () { return baseUrl() + "#" + encode(S, cur); },
       copy: function () { return share ? share.share() : (LX.copyText ? LX.copyText(baseUrl() + "#" + encode(S, cur), {}) : Promise.resolve(false)); },

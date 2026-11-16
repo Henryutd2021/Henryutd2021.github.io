@@ -12,8 +12,8 @@ function page(options = {}) {
   const epoch = options.epoch || { value: null };
   E.LX.store.resetMark = () => epoch.value; E.LX.store.persistent = () => !options.blocked;
   E.window.addEventListener = (name, fn) => (events[name] = events[name] || []).push(fn);
-  E.window.history = { state: options.state || null, replaceState(state, title, url) {
-    this.state = state; E.location.href = String(url); E.location.hash = new URL(url).hash;
+  E.window.history = { state: options.state || null, calls: 0, replaceState(state, title, url) {
+    this.calls++; this.state = state; E.location.href = String(url); E.location.hash = new URL(url).hash;
   } };
   vm.runInNewContext(fs.readFileSync(path.resolve(__dirname, "../../assets/learn/components/sharestate.js"), "utf8"), {
     window: E.window, document: E.document, location: E.location, console,
@@ -59,6 +59,15 @@ function page(options = {}) {
     const P = page(); P.ss.set({ size: 35 }); P.navigate("#results"); P.flush();
     assert.strictEqual(P.ss.get().size, 35); assert.strictEqual(P.E.location.hash, "#results");
     assert.strictEqual(page({ hash: "#results", state: P.E.window.history.state }).ss.get().size, 35);
+  });
+  await test("a run of plan changes writes the history once, after the pause (browsers throttle the History API)", () => {
+    const P = page(), h = P.E.window.history, start = h.calls;
+    for (let i = 0; i < 300; i++) P.ss.set({ size: i % 100 });
+    assert.strictEqual(h.calls - start, 0);
+    P.flush();
+    assert.strictEqual(h.calls - start, 1);
+    assert.ok(P.E.location.hash.endsWith("s99") && h.state.lxPlan.token.endsWith("s99"));
+    P.ss.reset(); assert.strictEqual(h.calls - start, 1); P.flush(); assert.strictEqual(h.calls - start, 2);
   });
   await test("Back and Forward restore their own entries once each", () => {
     const P = page(); P.ss.set({ size: 20 }); P.flush(); P.navigate("#results"); const a = P.E.window.history.state;

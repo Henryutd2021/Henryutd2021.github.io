@@ -294,19 +294,24 @@
     var r0 = decode(S, hashNow()), saved = r0.status === "none" ? cached() : null;
     if (saved) r0 = saved;
     var cur = clone(r0.state), written = null, timer = null, said = 0, showing = false;
+    // The entry's history state with this tab's plan (when it may be kept), other owners' keys left as they are.
+    function entry(x) {
+      if (!canCache()) return x.state;
+      var s = Object.assign({}, x.state || {});
+      s.lxPlan = { path: baseUrl(), schema: S.key, token: encode(S, cur), epoch: epoch };
+      return s;
+    }
+    // One replaceState per write: browsers throttle the History API (Chrome drops calls, Safari throws after 100
+    // in 30 s), so the plan is never written on every slider step, only by the debounced write and on navigation.
     function cache() {
       if (!canCache()) return;
-      try {
-        var x = hist(); if (!x || !x.replaceState) return;
-        var s = Object.assign({}, x.state || {});
-        s.lxPlan = { path: baseUrl(), schema: S.key, token: encode(S, cur), epoch: epoch };
-        x.replaceState(s, "", location.href);
-      } catch (e) { /* history unavailable: the explicit plan link still works */ }
+      try { var x = hist(); if (x && x.replaceState) x.replaceState(entry(x), "", location.href); }
+      catch (e) { /* history unavailable: the explicit plan link still works */ }
     }
-    function put(h) {   // the address, without a new history entry; h null takes the hash out
-      try { var x = hist(); if (x && x.replaceState) x.replaceState(x.state, "", h ? baseUrl() + "#" + h : baseUrl()); } catch (e) { /* not allowed here */ }
+    function put(h) {   // the address and the entry's plan, without a new history entry; h null takes the hash out
+      try { var x = hist(); if (x && x.replaceState) x.replaceState(entry(x), "", h ? baseUrl() + "#" + h : baseUrl()); } catch (e) { /* not allowed here */ }
     }
-    function write() { written = encode(S, cur); put(written); cache(); }
+    function write() { written = encode(S, cur); put(written); }
     function later() { if (timer) clearTimeout(timer); timer = setTimeout(function () { timer = null; write(); }, 250); }
     function announce(text, kind) {   // filled a moment later, so a region present at load is still read out
       var my = ++said;
@@ -317,11 +322,11 @@
     }
     if (r0.history) { written = encode(S, cur); cache(); }
     else if (r0.status === "ok" || r0.status === "migrated") write();   // the link as this version writes it
-    else if (r0.status !== "none") { put(null); cache(); }                     // a refused link leaves the address
+    else if (r0.status !== "none") put(null);                     // a refused link leaves the address
     if (r0.status !== "none") announce(r0.history ? "Restored this tab’s plan. Use Copy plan link to share it." : message(S, r0), r0.status === "ok" ? "ok" : (r0.status === "migrated" ? "note" : "warn"));
     var share = LX.Share ? LX.Share(box, { button: o.button || row, buttonText: o.buttonText || "Copy plan link", id: o.id,
       note: o.note || "Anyone who opens this link sees this plan and can run it themselves. It holds only the plan's numbers and choices. Use this button to share a plan after visiting a section link.",
-      replace: sync, hash: function () { written = encode(S, cur); cache(); return written; } }) : null;
+      replace: sync, hash: function () { written = encode(S, cur); return written; } }) : null;
     function navigate() {
       var r = decode(S, hashNow());
       if (timer) { clearTimeout(timer); timer = null; }
@@ -358,10 +363,10 @@
         var changed = encode(S, state) !== encode(S, cur);
         cur = clone(state);
         if (changed && showing) announce("", null);   // a link notice goes once the reader changes the plan
-        if (sync && !(opt && opt.write === false)) { cache(); later(); }
+        if (sync && !(opt && opt.write === false)) later();
         return [];
       },
-      reset: function () { cur = defaults(S); if (sync) { cache(); later(); } announce("", null); return clone(cur); },
+      reset: function () { cur = defaults(S); if (sync) later(); announce("", null); return clone(cur); },
       hash: function () { return encode(S, cur); },
       url: function () { return baseUrl() + "#" + encode(S, cur); },
       copy: function () { return share ? share.share() : (LX.copyText ? LX.copyText(baseUrl() + "#" + encode(S, cur), {}) : Promise.resolve(false)); },

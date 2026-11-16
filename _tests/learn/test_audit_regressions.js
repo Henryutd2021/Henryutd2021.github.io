@@ -57,6 +57,12 @@ test("numeric answers retain legitimate monetary, percentage and exponent format
    ["85%", "% (back ÷ in)", 85], ["0.25%", "% of hours", 0.25], ["6.96 × 10⁹", "kWh", 6.96e9],
    ["450,000 kw", "kW", 450000]].forEach(([s, u, want]) => assert.strictEqual(NA.parse(s, u), want, s));
 });
+test("a unit typed in another case is read unless the case turns one SI prefix into another", () => {
+  [["12.5 KW", "kW"], ["12.5 hz", "Hz"], ["12.5 MWH", "MWh"], ["12.5 gwh", "GWh"], ["12.5 KG PER MMBTU", "kg per MMBtu"],
+   ["12.5 cop", "COP"], ["12.5 M/S", "m/s"], ["12.5 ej", "EJ"]].forEach(([s, u]) => assert.strictEqual(NA.parse(s, u), 12.5, s + " in " + u));
+  [["12.5 mwh", "MWh"], ["12.5 mw", "MW"], ["12.5 pj", "PJ"], ["12.5 mt", "Mt"], ["12.5 $/mwh", "$/MWh"], ["12.5 Mw", "mW"]]
+    .forEach(([s, u]) => assert.strictEqual(NA.parse(s, u), null, s + " in " + u));
+});
 test("editing a numeric answer invalidates visible feedback without grading the edit", () => {
   const E = env(); load("numanswer", E);
   let graded = 0, changed = 0;
