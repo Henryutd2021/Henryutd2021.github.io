@@ -132,11 +132,12 @@ toc: false
 <a class="btn-solid" href="https://doi.org/10.1016/j.enconman.2026.122376"><i class="bi bi-journal-text" aria-hidden="true"></i>Paper (DOI)</a>
 <a class="btn-outline" href="https://arxiv.org/abs/2608.10999"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>Preprint (arXiv)</a>
 <a class="btn-outline" href="https://github.com/Henryutd2021/smr-datacenter-cogeneration"><i class="bi bi-github" aria-hidden="true"></i>Model framework (GitHub)</a>
+<a class="btn-outline" href="https://github.com/Henryutd2021/Nuclear-DC-public"><i class="bi bi-github" aria-hidden="true"></i>Study code and data (GitHub)</a>
 </div>
 </section>
 <section class="aside-card" aria-labelledby="h-repro">
 <h2 id="h-repro"><i class="bi bi-arrow-repeat" aria-hidden="true"></i>Reproducibility</h2>
-<p>Model framework with documentation, examples and tests on GitHub.</p>
+<p>Model framework with documentation, examples and tests on GitHub; the study&#x27;s code, input data and results are in a separate public repository, named in the paper&#x27;s data statement.</p>
 <p class="updated"><i class="bi bi-clock-history" aria-hidden="true"></i>Last updated 2026-11</p>
 </section>
 </div>
