@@ -145,10 +145,10 @@ const APPROVED_SNAPSHOT = {
   "E14.3": "Where should an hourly cogeneration study draw its boundary: which plant streams, which loads and which alternatives must it include to price the steam sent to cooling?",
   "E14.4": "Inside: one plant with high- and low-pressure turbines, one large load that needs power and cooling, an absorption chiller and an electric chiller, and power bought from and sold to the grid, every hour of a year (8,760 hours).",
   "E14.5": "The plant produces much more power than the load uses, so it is partly a merchant generator that sells power to the grid.",
-  "E14.6": "Left out: demand charges and ancillary-service revenues; reliability compared on a common basis across options; marginal emission factors, because emissions are counted at hourly averages; other load profiles and sites; the choice of plant size, because the plant is one fixed unit.",
+  "E14.6": "Left out: demand charges and ancillary-service revenues; reliability compared on a common basis across options; marginal emission factors, because emissions are counted at hourly averages; broader validation across load profiles and sites; the choice of plant size, because the plant is one fixed unit.",
   "E14.7": "Decisions: in every hour, the reactor's output, the steam extracted at the turbine crossover, how the absorption and electric chillers share the cooling, and the power bought from or sold to the grid.",
   "E14.8": "Goal: the lowest annualized cost of meeting the load's power and cooling, counting what the power sold to the grid earns.",
-  "E14.9": "Rules: the load's power and cooling are met in every hour; every unit of steam sent to the chiller lowers turbine output; the absorption chiller has no steam during refueling.",
+  "E14.9": "Rules: the load's power and cooling are met in every hour; every unit of steam sent to the chiller lowers turbine output; the absorption chiller has no steam during the plant's scheduled outage.",
   "E14.10": "The value of steam cooling depends on hourly physics: wet-bulb derating, crystallization risk, part-load chiller efficiency and the turbine work lost to extraction.",
   "E14.11": "A mixed-integer linear program co-optimizes, for every hour of a year, reactor output, steam extraction at the turbine crossover, absorption and electric cooling, and grid exchange.",
   "E14.12": "The plant, with and without steam cooling, is compared with grid supply and an on-site gas combined cycle, all evaluated on the same hourly basis.",
@@ -158,12 +158,12 @@ const APPROVED_SNAPSHOT = {
   "E14.16b": "Scenario runs vary the market year (2022 to 2024), the carbon price, the cost of capital, cooling efficiency, battery storage and the size of the load.",
   "E14.17": "The load's size is swept with the plant fixed, and the grid connection is enlarged only for loads above the baseline size.",
   "E14.18": "Margins measured against grid cost are distorted across market years, because the grid cost itself falls in low-price years, so cross-year results are also reported in absolute annualized cost.",
-  "E14.19": "Pricing diverted steam matters: treating it as a free by-product can by itself decide the sign of a cogeneration result.",
-  "E14.20": "Holds when: steam sent to cooling would otherwise turn the low-pressure turbine; the study used one load profile, ERCOT's hourly prices for 2022 to 2024, and one fixed plant. Leaves out: demand charges, ancillary-service revenues, and reliability on a common basis across options.",
-  "E14.21": "Where the result holds: steam sent to cooling is steam the low-pressure turbine does not convert, so it costs the turbine work it gives up; one load profile; ERCOT's hourly prices for the market years 2022 to 2024; hourly average, not marginal, emission factors; the plant is one fixed unit; steam is taken at the turbine crossover, and a sweep of the penalty tests that choice. It leaves out: demand charges and ancillary-service revenues; reliability on a common basis across options; other load profiles and sites.",
-  "E14.22": "Paper accepted. An hourly model prices the steam sent to cooling by the turbine work it gives up, and compares the plant, with and without steam cooling, with grid supply and an on-site gas combined cycle.",
-  "E14.23": "Li et al. (2026). Accepted paper on a techno-economic analysis of reactor cogeneration for power and cooling loads. Energy Conversion and Management (2026), accepted; DOI pending.",
-  "E14.24": "Approved excerpt of: Li et al. (2026), accepted paper, Energy Conversion and Management; DOI pending.",
+  "E14.19": "Pricing diverted steam matters: treating it as a free by-product would substantially overstate the value of absorption cooling.",
+  "E14.20": "Holds when: steam sent to cooling would otherwise turn the low-pressure turbine; the main scenarios used one load profile (with an equal-energy constant-load check), ERCOT's hourly prices for 2022 to 2024, and one fixed plant. Leaves out: demand charges, ancillary-service revenues, and reliability on a common basis across options.",
+  "E14.21": "Where the result holds: steam sent to cooling is steam the low-pressure turbine does not convert, so it costs the turbine work it gives up; one load profile in the main scenarios, with an equal-energy constant-load check; ERCOT's hourly prices for the market years 2022 to 2024; hourly average, not marginal, emission factors; the plant is one fixed unit; steam is taken at the turbine crossover, and a sweep of the penalty tests that choice. It leaves out: demand charges and ancillary-service revenues; reliability on a common basis across options; broader validation across load profiles and sites.",
+  "E14.22": "Paper published. An hourly model prices the steam sent to cooling by the turbine work it gives up, and compares the plant, with and without steam cooling, with grid supply and an on-site gas combined cycle.",
+  "E14.23": "Li et al. (2027). Paper on a techno-economic analysis of reactor cogeneration for power and cooling loads. Energy Conversion and Management 372, 122376. DOI: 10.1016/j.enconman.2026.122376.",
+  "E14.24": "Approved excerpt of: Li et al. (2027), Energy Conversion and Management 372, 122376; DOI: 10.1016/j.enconman.2026.122376.",
   "E14.25": "Every market year, the leap year 2024 included, is modeled as 8,760 hours."
 };
 const RX = /\b(stud(y|ies)|paper|Li et al|excerpt|ERCOT|optimizer|reactor|refueling|crossover|absorption|Willans|SOS2|scenario runs|wet-bulb|merchant)\b/i;
@@ -214,7 +214,7 @@ ok(D.timeline.events.length === 1 && tl.date === "2026" && X.approved(RG, tl.lab
 [].concat(D.boundary.holds, D.boundary.leaves).forEach(t => ok(X.approved(RG, t), "boundary item is a clause of E14.21: " + t.slice(0, 50)));
 ok(X.approved(RG, "Where the result holds: " + D.boundary.holds.join(" ").replace(/;$/, "") + " It leaves out: " + D.boundary.leaves.join(" ")), "the boundary card is E14.21, whole, in order");
 ok(/^Approved excerpt of: /.test(RG.raw["E14.24"]) && D.boundary.source === SHOWN24, "the boundary card's source line is E14.24, as approved, with the label 'From: ': " + D.boundary.source);
-const cite = (OWN.match(/<li>(Li et al\. \(2026\)\.[\s\S]*?)<\/li>/) || [])[1] || "";
+const cite = (OWN.match(/<li>(Li et al\. \(2027\)\.[\s\S]*?)<\/li>/) || [])[1] || "";
 ok(X.approved(RG, cite) && X.norm(cite) === X.norm(RG.raw["E14.23"]), "the citation is E14.23, word for word");
 const desc = (PAGE.match(/^description: "Case file CF5 of Energy Systems, Step by Step\. ([^"]+)"/m) || [])[1] || "";
 ok(desc && X.norm(desc) === X.norm(RG.raw["E14.3"]), "the description's sentence is E14.3");
@@ -225,12 +225,12 @@ const OTHER = [/^Cogeneration Boundaries and Steam Value · CF5$/, // generic te
   /^Follow one study's boundary through six parts, then move the line yourself around a toy steam plant and its load$/, // unchanged subtitle
   /^The toy below is the course's own, with illustrative numbers you set; it holds none of the study's inputs or results\.$/,
   /^Illustrative round numbers you set: a generic steam plant and one load that needs power and cooling, not the study's inputs or results\.$/,
-  /^Earlier lessons: /, /^A model that runs every hour/, /^One dated step: the accepted paper\.$/, /^(The study in time|Absorption chiller: MW of cooling per MW of steam heat)$/,
+  /^Earlier lessons: /, /^A model that runs every hour/, /^One dated step: the published paper\.$/, /^(The study in time|Absorption chiller: MW of cooling per MW of steam heat)$/,
   /^ audits a study's boundary, baseline and counterfactual; $/];
 const own = sg => X.norm(sg) === X.norm(SHOWN24) || OTHER.some(re => re.test(sg)) || /toy|steam plant|Myth|Fact|absorption chiller|turbine/i.test(sg) && !/\b(study|paper|Li et al|ERCOT|reactor|refueling|Willans|SOS2|scenario runs)\b/i.test(sg);
 const rest = OWN.replace(caseHTML, "").replace(/<blockquote[\s\S]*?<\/blockquote>/g, "");
-X.elements(rest).concat(X.frontmatter(PAGE).map(s => s.replace(/^Case file CF5 of Energy Systems, Step by Step\. /, ""))).map(X.norm).map(s => s.replace(/^2026 (· )?/, "").replace(/ Source: Li et al\. \(2026\), accepted paper, Energy Conversion and Management; DOI pending$/, "")).filter(s => RX.test(s))
-  .forEach(sg => ok(X.approved(RG, sg) || /^Li et al\. \(2026\)\./.test(sg) && X.approved(RG, sg) || own(sg), "outside the case: approved wording or the course's own: " + sg.slice(0, 70)));
+X.elements(rest).concat(X.frontmatter(PAGE).map(s => s.replace(/^Case file CF5 of Energy Systems, Step by Step\. /, ""))).map(X.norm).map(s => s.replace(/^2026 (· )?/, "").replace(/ Source: Li et al\. \(2027\), Energy Conversion and Management 372, 122376; DOI: 10\.1016\/j\.enconman\.2026\.122376$/, "")).filter(s => RX.test(s))
+  .forEach(sg => ok(X.approved(RG, sg) || /^Li et al\. \(2027\)\./.test(sg) && X.approved(RG, sg) || own(sg), "outside the case: approved wording or the course's own: " + sg.slice(0, 70)));
 const strings = (o, k) => typeof o === "string" ? [[k, o]] : o && typeof o === "object" ? Object.keys(o).flatMap(j => strings(o[j], j)) : [];
 const DATA = strings(D).filter(x => !["about", "built", "date", "id", "kind", "hour", "key", "color", "unit"].includes(x[0])).map(x => x[1]);
 const LIT = (JS.replace(/\/\/[^\n]*/g, " ").match(/"(?:[^"\\\n]|\\.)*"/g) || []).map(l => l.slice(1, -1));
@@ -240,8 +240,9 @@ LIT.filter(s => RX.test(s)).forEach(s => ok(X.approved(RG, s) || own(s), "script
 const q = [...PAGE.matchAll(/<blockquote class="lx-excerpt" data-source="([^"]+)"><p>([\s\S]*?)<\/p><footer>([\s\S]*?)<\/footer><\/blockquote>/g)];
 ok(q.length === 1 && q[0][1] === "excerpt:cogen-boundary-methods" && X.norm(q[0][2]) === X.norm(RG.raw["E14.19"]), "part 6: E14.19 is the only excerpt");
 ok(q.length === 1 && q[0][3] === SHOWN24, "part 6: the excerpt's footer is E14.24, as approved, with the label 'From: ': " + (q[0] ? q[0][3] : "none"));
-{ const f7 = (fs.readFileSync(path.join(SITE, "learn/cf7-cost-of-waiting.qmd"), "utf8").match(/<footer>(From: [^<]*)<\/footer>/) || [])[1] || "", form = /^From: Li et al\. \(2026\), accepted paper, [^;]+; DOI pending\.$/;
-  ok(form.test(f7) && q[0] && form.test(q[0][3]), "the footer has CF7's form, 'From: Li et al. (2026), accepted paper, <venue>; DOI pending.' (CF7: " + f7 + ")"); }
+{ // published 2026-11-17: the footer is the published citation (CF7's footer keeps its own accepted-paper form until its DOI exists)
+  const form = /^From: Li et al\. \(2027\), Energy Conversion and Management 372, 122376; DOI: 10\.1016\/j\.enconman\.2026\.122376\.$/;
+  ok(q[0] && form.test(q[0][3]), "the footer is the published citation, 'From: Li et al. (2027), Energy Conversion and Management 372, 122376; DOI: ...': " + (q[0] ? q[0][3] : "none")); }
 { const notes = (PAGE.match(/<\/blockquote>\n((?:<p class="lx-hint">[\s\S]*?<\/p>)+)<\/div>/) || [])[1] || "";
   ok(notes && X.elements(notes).map(X.norm).join("|") === X.sentencesOf(RG.raw["E14.20"]).map(X.norm).join("|"), "part 6: E14.20 is the note under the excerpt, one line per sentence (glossary marks aside)"); }
 // the draft period is over: its source line is gone, "approved" is said nowhere a reader sees, no draft or pending wording is left
@@ -251,7 +252,7 @@ const said = VIS.filter(s => /approv/i.test(s));
 ok(said.length === 0, "'approved' is not said where a reader sees it (" + said.length + "): " + said.join(" | ").slice(0, 160));
 ok(VIS.filter(s => X.norm(s) === X.norm(SHOWN24)).length === 3, "E14.24 as shown ('From: ...') is the footer, the boundary card's source line and its no-JS text");
 ok(!VIS.some(s => /\bdrafts?\b|\bdrafted\b/i.test(s)), "no draft wording on the page, in the data or in the script's strings");
-ok(VIS.filter(s => /pending/i.test(s)).every(s => !/pending/i.test(X.norm(s).replace(/DOI pending/g, ""))), "'pending' only in 'DOI pending' (E14.23, E14.24 and the timeline's source)");
+ok(!VIS.some(s => /pending/i.test(X.norm(s))), "no 'pending' wording: the paper is published, and E14.23, E14.24 and the timeline's source carry its DOI");
 ok(!/quoted from the excerpts/.test(PAGE), "no blanket claim that every sentence is quoted");
 // the placements, in the approved wording's order (--places prints them with file:line)
 { const lines = PAGE.split("\n"), rel = path.relative(SITE, QPATH), where = [];

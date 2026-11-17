@@ -3,16 +3,16 @@
  "built": "2026-11-06",
  "timeline": {
   "title": "The study in time",
-  "lede": "One dated step: the accepted paper.",
+  "lede": "One dated step: the published paper.",
   "events": [
    {
     "date": "2026",
-    "label": "Paper accepted",
+    "label": "Paper published",
     "kind": "study",
     "key": true,
     "text": "An hourly model prices the steam sent to cooling by the turbine work it gives up, and compares the plant, with and without steam cooling, with grid supply and an on-site gas combined cycle.",
     "source": {
-     "label": "Li et al. (2026), accepted paper, Energy Conversion and Management; DOI pending"
+     "label": "Li et al. (2027), Energy Conversion and Management 372, 122376; DOI: 10.1016/j.enconman.2026.122376"
     }
    }
   ]
@@ -21,7 +21,7 @@
   "title": "Where the result holds",
   "holds": [
    "steam sent to cooling is steam the low-pressure turbine does not convert, so it costs the turbine work it gives up;",
-   "one load profile;",
+   "one load profile in the main scenarios, with an equal-energy constant-load check;",
    "ERCOT's hourly prices for the market years 2022 to 2024;",
    "hourly average, not marginal, emission factors;",
    "the plant is one fixed unit;",
@@ -30,9 +30,9 @@
   "leaves": [
    "demand charges and ancillary-service revenues;",
    "reliability on a common basis across options;",
-   "other load profiles and sites."
+   "broader validation across load profiles and sites."
   ],
-  "source": "From: Li et al. (2026), accepted paper, Energy Conversion and Management; DOI pending."
+  "source": "From: Li et al. (2027), Energy Conversion and Management 372, 122376; DOI: 10.1016/j.enconman.2026.122376."
  },
  "idea": {
   "title": "One hour at a steam plant beside a large load",
