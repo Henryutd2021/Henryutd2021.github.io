@@ -29,13 +29,14 @@
 </div>
 </div>
 </li>
-<li class="pub" data-type="journal" data-year="2026">
+<li class="pub" data-type="journal" data-year="2027">
 <div class="pub-badge"><span class="abbr pt-journal">Energy Convers. Manag.</span></div>
 <div class="pub-main">
-<div class="pub-title"><a href="files/papers/li2026smrcogeneration.html">Techno-Economic Boundary Analysis of Small Modular Reactor Cogeneration for Hyperscale Data Center IT and Cooling Loads</a></div>
+<div class="pub-title"><a href="files/papers/li2026smrcogeneration.html">Techno-economic boundary analysis of small modular reactor cogeneration for hyperscale data center IT and cooling loads</a></div>
 <div class="pub-authors"><span class="me">H. Li</span>, B. She, J. Zhang</div>
-<div class="pub-venue"><em>Energy Conversion and Management</em>, 2026. <span class="pub-tag tag-ok">Accepted</span></div>
+<div class="pub-venue"><em>Energy Conversion and Management</em>, vol. 372, article 122376, 2027.</div>
 <div class="pub-links">
+<a class="btn-xs" href="https://doi.org/10.1016/j.enconman.2026.122376">DOI</a>
 <a class="btn-xs" href="https://arxiv.org/abs/2608.10999">arXiv</a>
 <a class="btn-xs" href="https://github.com/Henryutd2021/smr-datacenter-cogeneration">Code</a>
 <a class="btn-xs" href="projects/nuclear-dc.html">Project</a>
@@ -45,13 +46,16 @@
 <button type="button" class="bib-copy"><i class="bi bi-clipboard" aria-hidden="true"></i><span>Copy</span></button>
 <pre><code>@article{li2026smrcogeneration,
   author        = {Li, Honglin and She, Buxin and Zhang, Jie},
-  title         = {{Techno-Economic Boundary Analysis of Small Modular Reactor Cogeneration for Hyperscale Data Center IT and Cooling Loads}},
+  title         = {Techno-economic boundary analysis of small modular reactor cogeneration for hyperscale data center {IT} and cooling loads},
   journal       = {Energy Conversion and Management},
-  year          = {2026},
+  volume        = {372},
+  pages         = {122376},
+  year          = {2027},
+  publisher     = {Elsevier},
+  doi           = {10.1016/j.enconman.2026.122376},
   eprint        = {2608.10999},
   archivePrefix = {arXiv},
-  primaryClass  = {eess.SY},
-  note          = {Accepted}
+  primaryClass  = {eess.SY}
 }</code></pre>
 </div>
 </div>

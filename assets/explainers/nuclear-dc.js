@@ -1,6 +1,6 @@
 // explainers/nuclear-dc.js — interactive explainer for the nuclear-dc project page.
 //
-// Mechanism (Energy Conversion and Management, 2026, accepted; text as in arXiv:2608.10999, Secs. 2.2.1, 2.2.6, 3.2,
+// Mechanism (Energy Conversion and Management 372 (2027) 122376, doi:10.1016/j.enconman.2026.122376, Secs. 2.2.1, 2.2.6, 3.2,
 // Discussion and Conclusion): the Section 45Y production credit is
 // paid on each MWh of net electricity the reactor generates. Steam extracted at the turbine crossover for an absorption
 // chiller forgoes turbine output (extraction penalty alpha, MW_e per MW_th of steam), so it gives up both the market value

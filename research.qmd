@@ -12,7 +12,7 @@ body-classes: "page-inner page-folio page-research"
      The story of the research, not the project details: the path, then one question at three scales (Ph.D.), the
      turning point, firm low-carbon supply for AI data centers (current), supporting capabilities, methods, outlook.
      Follows the past-research part of the author's research statement; findings stay within the audited project-page
-     text and the accepted boundary paper (arXiv preprint). Upcoming work: broad question and status only. No
+     text and the published boundary paper (Energy Conversion and Management 372, 2027). Upcoming work: broad question and status only. No
      collaborator names.
      Anchors linked from the home page: path, flexibility, data-centers, sei, supporting, methods. -->
 
@@ -133,7 +133,7 @@ body-classes: "page-inner page-folio page-research"
     <li class="step">
       <span class="step-scale">One campus</span>
       <h3>Where SMR cogeneration becomes competitive</h3>
-      <p>For a hyperscale campus in Texas, I co-optimized reactor output, turbine steam extraction for absorption cooling and grid exchange, hour by hour. Capital cost and policy set the competitiveness boundary far more than operating choices do, and an output-based credit discourages using steam for cooling. <span class="status">Accepted in <em>Energy Conversion and Management</em>.</span></p>
+      <p>For a hyperscale campus in Texas, I co-optimized reactor output, turbine steam extraction for absorption cooling and grid exchange, hour by hour. Reactor capital and market conditions set the competitiveness boundary far more than operating choices do, and an output-based credit discourages using steam for cooling. <span class="status">Published in <em>Energy Conversion and Management</em> (2027).</span></p>
       <p class="step-links"><a href="projects/nuclear-dc.html">SMR cogeneration</a></p>
     </li>
     <li class="step">

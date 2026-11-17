@@ -153,11 +153,11 @@ A small modular reactor that supplies a data center with power and, through turb
 ::: {.repo-papers}
 [Accompanies]{.label}
 
-- [Energy Conversion and Management (2026, accepted)](projects/nuclear-dc.qmd)
+- [Energy Conversion and Management (2027)](projects/nuclear-dc.qmd)
 :::
 
 <!-- generated framework citations -->
-Study citations: [Techno-Economic Boundary Analysis of Small Modular Reactor Cogeneration for Hyperscale Data Center IT and Cooling Loads](https://henryutd2021.github.io/files/papers/li2026smrcogeneration.html)
+Study citations: [10.1016/j.enconman.2026.122376](https://doi.org/10.1016/j.enconman.2026.122376)
 <!-- end framework citations -->
 
 ::: {.repo-tools}

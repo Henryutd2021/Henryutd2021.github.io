@@ -15,16 +15,16 @@
    "home": true,
    "papers": [
     {
+     "title": "Techno-economic boundary analysis of small modular reactor cogeneration for hyperscale data center IT and cooling loads",
+     "year": 2027,
+     "doi": "10.1016/j.enconman.2026.122376",
+     "status": "published"
+    },
+    {
      "title": "Rethinking the economics and flexibility of U.S. nuclear power through hydrogen integration and policy support",
      "year": 2026,
      "doi": "10.1038/s41467-026-73630-y",
      "status": "published"
-    },
-    {
-     "title": "Techno-Economic Boundary Analysis of Small Modular Reactor Cogeneration for Hyperscale Data Center IT and Cooling Loads",
-     "year": 2026,
-     "doi": null,
-     "status": "accepted"
     },
     {
      "title": "The role of small modular reactors in powering data centers for a sustainable digital economy",
@@ -153,6 +153,12 @@
    "home": true,
    "papers": [
     {
+     "title": "Techno-economic boundary analysis of small modular reactor cogeneration for hyperscale data center IT and cooling loads",
+     "year": 2027,
+     "doi": "10.1016/j.enconman.2026.122376",
+     "status": "published"
+    },
+    {
      "title": "Inertia-Aware Planning of Grid-Forming Energy Storage and Firm Capacity under Thermal Retirement",
      "year": 2026,
      "doi": null,
@@ -160,12 +166,6 @@
     },
     {
      "title": "Quantifying the Cost of Delayed Energization (CoDE) for AI Data Centers",
-     "year": 2026,
-     "doi": null,
-     "status": "accepted"
-    },
-    {
-     "title": "Techno-Economic Boundary Analysis of Small Modular Reactor Cogeneration for Hyperscale Data Center IT and Cooling Loads",
      "year": 2026,
      "doi": null,
      "status": "accepted"

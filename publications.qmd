@@ -14,27 +14,28 @@ body-classes: "page-inner page-publications"
 <div class="pg">
 <div class="pub-head">
 <div class="pub-head-text">
-<p class="pg-lede">Newest first: 8 journal articles (1 accepted), 10 conference papers and 2 theses. My name is shown in <span class="me">bold</span>; * marks equal contribution. The list is also on <a href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en">Google Scholar</a>. PDF links give the open-access published version or, where the publisher allows it, the accepted manuscript with the publisher&#8217;s notice.</p>
+<p class="pg-lede">Newest first: 8 journal articles, 10 conference papers and 2 theses. My name is shown in <span class="me">bold</span>; * marks equal contribution. The list is also on <a href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en">Google Scholar</a>. PDF links give the open-access published version or, where the publisher allows it, the accepted manuscript with the publisher&#8217;s notice.</p>
 <p><a href="files/publications.bib" download>Download all publications (BibTeX)</a></p>
 <p class="pub-cites"><i class="bi bi-quote" aria-hidden="true"></i><span><strong>121 citations</strong> · h-index 7 · i10-index 6 (<a href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en">Google Scholar</a>, as of October 30, 2026). Per-paper counts are from the same profile; papers it does not list use OpenAlex.</span></p>
 </div>
 <figure class="pub-chart" data-type="all">
 <figcaption><span>Publications per year</span><span class="pub-chart-total">20 in total</span></figcaption>
-<svg class="pub-chart-svg" viewBox="0 0 300 132" role="img" focusable="false" aria-label="Bar chart of publications per year, 2021 to 2026. 2021: 2; 2022: 3; 2023: 4; 2024: 3; 2025: 3; 2026: 5. The table that follows gives the counts by type.">
+<svg class="pub-chart-svg" viewBox="0 0 300 132" role="img" focusable="false" aria-label="Bar chart of publications per year, 2021 to 2027. 2021: 2; 2022: 3; 2023: 4; 2024: 3; 2025: 3; 2026: 4; 2027: 1. The table that follows gives the counts by type.">
 <line class="axis" x1="0" x2="300" y1="108.5" y2="108.5"/>
-<g class="yr"><title>2021: 1 conference paper, 1 thesis</title><rect class="seg pt-conference" x="10.5" y="91.5" width="29.0" height="16.5" rx="2"/><rect class="seg pt-thesis" x="10.5" y="72.0" width="29.0" height="18.0" rx="2"/><text class="n" x="25.0" y="67.0" text-anchor="middle">2</text><text class="yl" x="25.0" y="126" text-anchor="middle">2021</text></g>
-<g class="yr"><title>2022: 1 journal article, 2 conference papers</title><rect class="seg pt-journal" x="60.5" y="91.5" width="29.0" height="16.5" rx="2"/><rect class="seg pt-conference" x="60.5" y="54.0" width="29.0" height="36.0" rx="2"/><text class="n" x="75.0" y="49.0" text-anchor="middle">3</text><text class="yl" x="75.0" y="126" text-anchor="middle">2022</text></g>
-<g class="yr"><title>2023: 1 journal article, 3 conference papers</title><rect class="seg pt-journal" x="110.5" y="91.5" width="29.0" height="16.5" rx="2"/><rect class="seg pt-conference" x="110.5" y="36.0" width="29.0" height="54.0" rx="2"/><text class="n" x="125.0" y="31.0" text-anchor="middle">4</text><text class="yl" x="125.0" y="126" text-anchor="middle">2023</text></g>
-<g class="yr"><title>2024: 1 journal article, 2 conference papers</title><rect class="seg pt-journal" x="160.5" y="91.5" width="29.0" height="16.5" rx="2"/><rect class="seg pt-conference" x="160.5" y="54.0" width="29.0" height="36.0" rx="2"/><text class="n" x="175.0" y="49.0" text-anchor="middle">3</text><text class="yl" x="175.0" y="126" text-anchor="middle">2024</text></g>
-<g class="yr"><title>2025: 2 journal articles, 1 thesis</title><rect class="seg pt-journal" x="210.5" y="73.5" width="29.0" height="34.5" rx="2"/><rect class="seg pt-thesis" x="210.5" y="54.0" width="29.0" height="18.0" rx="2"/><text class="n" x="225.0" y="49.0" text-anchor="middle">3</text><text class="yl" x="225.0" y="126" text-anchor="middle">2025</text></g>
-<g class="yr"><title>2026: 3 journal articles, 2 conference papers</title><rect class="seg pt-journal" x="260.5" y="55.5" width="29.0" height="52.5" rx="2"/><rect class="seg pt-conference" x="260.5" y="18.0" width="29.0" height="36.0" rx="2"/><text class="n" x="275.0" y="13.0" text-anchor="middle">5</text><text class="yl" x="275.0" y="126" text-anchor="middle">2026</text></g>
+<g class="yr"><title>2021: 1 conference paper, 1 thesis</title><rect class="seg pt-conference" x="9.0" y="87.0" width="24.9" height="21.0" rx="2"/><rect class="seg pt-thesis" x="9.0" y="63.0" width="24.9" height="22.5" rx="2"/><text class="n" x="21.4" y="58.0" text-anchor="middle">2</text><text class="yl" x="21.4" y="126" text-anchor="middle">2021</text></g>
+<g class="yr"><title>2022: 1 journal article, 2 conference papers</title><rect class="seg pt-journal" x="51.9" y="87.0" width="24.9" height="21.0" rx="2"/><rect class="seg pt-conference" x="51.9" y="40.5" width="24.9" height="45.0" rx="2"/><text class="n" x="64.3" y="35.5" text-anchor="middle">3</text><text class="yl" x="64.3" y="126" text-anchor="middle">2022</text></g>
+<g class="yr"><title>2023: 1 journal article, 3 conference papers</title><rect class="seg pt-journal" x="94.7" y="87.0" width="24.9" height="21.0" rx="2"/><rect class="seg pt-conference" x="94.7" y="18.0" width="24.9" height="67.5" rx="2"/><text class="n" x="107.1" y="13.0" text-anchor="middle">4</text><text class="yl" x="107.1" y="126" text-anchor="middle">2023</text></g>
+<g class="yr"><title>2024: 1 journal article, 2 conference papers</title><rect class="seg pt-journal" x="137.6" y="87.0" width="24.9" height="21.0" rx="2"/><rect class="seg pt-conference" x="137.6" y="40.5" width="24.9" height="45.0" rx="2"/><text class="n" x="150.0" y="35.5" text-anchor="middle">3</text><text class="yl" x="150.0" y="126" text-anchor="middle">2024</text></g>
+<g class="yr"><title>2025: 2 journal articles, 1 thesis</title><rect class="seg pt-journal" x="180.4" y="64.5" width="24.9" height="43.5" rx="2"/><rect class="seg pt-thesis" x="180.4" y="40.5" width="24.9" height="22.5" rx="2"/><text class="n" x="192.9" y="35.5" text-anchor="middle">3</text><text class="yl" x="192.9" y="126" text-anchor="middle">2025</text></g>
+<g class="yr"><title>2026: 2 journal articles, 2 conference papers</title><rect class="seg pt-journal" x="223.3" y="64.5" width="24.9" height="43.5" rx="2"/><rect class="seg pt-conference" x="223.3" y="18.0" width="24.9" height="45.0" rx="2"/><text class="n" x="235.7" y="13.0" text-anchor="middle">4</text><text class="yl" x="235.7" y="126" text-anchor="middle">2026</text></g>
+<g class="yr"><title>2027: 1 journal article</title><rect class="seg pt-journal" x="266.1" y="85.5" width="24.9" height="22.5" rx="2"/><text class="n" x="278.6" y="80.5" text-anchor="middle">1</text><text class="yl" x="278.6" y="126" text-anchor="middle">2027</text></g>
 </svg>
 <ul class="pub-chart-key" aria-hidden="true">
 <li><span class="dot pt-journal"></span>Journal</li>
 <li><span class="dot pt-conference"></span>Conference</li>
 <li><span class="dot pt-thesis"></span>Thesis</li>
 </ul>
-<div class="visually-hidden"><table data-quarto-disable-processing="true"><caption>Publications per year by type</caption><thead><tr><th scope="col">Year</th><th scope="col">Journal</th><th scope="col">Conference</th><th scope="col">Thesis</th><th scope="col">Total</th></tr></thead><tbody><tr><th scope="row">2026</th><td>3</td><td>2</td><td>0</td><td>5</td></tr><tr><th scope="row">2025</th><td>2</td><td>0</td><td>1</td><td>3</td></tr><tr><th scope="row">2024</th><td>1</td><td>2</td><td>0</td><td>3</td></tr><tr><th scope="row">2023</th><td>1</td><td>3</td><td>0</td><td>4</td></tr><tr><th scope="row">2022</th><td>1</td><td>2</td><td>0</td><td>3</td></tr><tr><th scope="row">2021</th><td>0</td><td>1</td><td>1</td><td>2</td></tr></tbody></table></div>
+<div class="visually-hidden"><table data-quarto-disable-processing="true"><caption>Publications per year by type</caption><thead><tr><th scope="col">Year</th><th scope="col">Journal</th><th scope="col">Conference</th><th scope="col">Thesis</th><th scope="col">Total</th></tr></thead><tbody><tr><th scope="row">2027</th><td>1</td><td>0</td><td>0</td><td>1</td></tr><tr><th scope="row">2026</th><td>2</td><td>2</td><td>0</td><td>4</td></tr><tr><th scope="row">2025</th><td>2</td><td>0</td><td>1</td><td>3</td></tr><tr><th scope="row">2024</th><td>1</td><td>2</td><td>0</td><td>3</td></tr><tr><th scope="row">2023</th><td>1</td><td>3</td><td>0</td><td>4</td></tr><tr><th scope="row">2022</th><td>1</td><td>2</td><td>0</td><td>3</td></tr><tr><th scope="row">2021</th><td>0</td><td>1</td><td>1</td><td>2</td></tr></tbody></table></div>
 </figure>
 </div>
 <div class="filter-bar pub-filter" hidden>
@@ -48,6 +49,42 @@ body-classes: "page-inner page-publications"
 </div>
 <p class="filter-status" role="status" aria-live="polite"></p>
 <div class="pub-years">
+<section class="pub-year" data-year="2027" aria-labelledby="y2027">
+<h2 class="year-h" id="y2027">2027</h2>
+<ol class="pubs">
+<li class="pub" data-type="journal" data-year="2027">
+<div class="pub-badge"><span class="abbr pt-journal">Energy Convers. Manag.</span></div>
+<div class="pub-main">
+<div class="pub-title"><a href="files/papers/li2026smrcogeneration.html">Techno-economic boundary analysis of small modular reactor cogeneration for hyperscale data center IT and cooling loads</a></div>
+<div class="pub-authors"><span class="me">H. Li</span>, B. She, J. Zhang</div>
+<div class="pub-venue"><em>Energy Conversion and Management</em>, vol. 372, article 122376, 2027.</div>
+<div class="pub-links">
+<a class="btn-xs" href="https://doi.org/10.1016/j.enconman.2026.122376">DOI</a>
+<a class="btn-xs" href="https://arxiv.org/abs/2608.10999">arXiv</a>
+<a class="btn-xs" href="https://github.com/Henryutd2021/smr-datacenter-cogeneration">Code</a>
+<a class="btn-xs" href="projects/nuclear-dc.html">Project</a>
+<button type="button" class="btn-xs bib-toggle" aria-expanded="false" aria-controls="bib-li2026smrcogeneration">Bib</button>
+</div>
+<div class="pub-bib" id="bib-li2026smrcogeneration" hidden>
+<button type="button" class="bib-copy"><i class="bi bi-clipboard" aria-hidden="true"></i><span>Copy</span></button>
+<pre><code>@article{li2026smrcogeneration,
+  author        = {Li, Honglin and She, Buxin and Zhang, Jie},
+  title         = {Techno-economic boundary analysis of small modular reactor cogeneration for hyperscale data center {IT} and cooling loads},
+  journal       = {Energy Conversion and Management},
+  volume        = {372},
+  pages         = {122376},
+  year          = {2027},
+  publisher     = {Elsevier},
+  doi           = {10.1016/j.enconman.2026.122376},
+  eprint        = {2608.10999},
+  archivePrefix = {arXiv},
+  primaryClass  = {eess.SY}
+}</code></pre>
+</div>
+</div>
+</li>
+</ol>
+</section>
 <section class="pub-year" data-year="2026" aria-labelledby="y2026">
 <h2 class="year-h" id="y2026">2026</h2>
 <ol class="pubs">
@@ -104,33 +141,6 @@ body-classes: "page-inner page-publications"
   publisher = {Elsevier},
   note      = {Co-first authors},
   doi       = {10.1016/j.crsus.2026.100820}
-}</code></pre>
-</div>
-</div>
-</li>
-<li class="pub" data-type="journal" data-year="2026">
-<div class="pub-badge"><span class="abbr pt-journal">Energy Convers. Manag.</span></div>
-<div class="pub-main">
-<div class="pub-title"><a href="files/papers/li2026smrcogeneration.html">Techno-Economic Boundary Analysis of Small Modular Reactor Cogeneration for Hyperscale Data Center IT and Cooling Loads</a></div>
-<div class="pub-authors"><span class="me">H. Li</span>, B. She, J. Zhang</div>
-<div class="pub-venue"><em>Energy Conversion and Management</em>, 2026. <span class="pub-tag tag-ok">Accepted</span></div>
-<div class="pub-links">
-<a class="btn-xs" href="https://arxiv.org/abs/2608.10999">arXiv</a>
-<a class="btn-xs" href="https://github.com/Henryutd2021/smr-datacenter-cogeneration">Code</a>
-<a class="btn-xs" href="projects/nuclear-dc.html">Project</a>
-<button type="button" class="btn-xs bib-toggle" aria-expanded="false" aria-controls="bib-li2026smrcogeneration">Bib</button>
-</div>
-<div class="pub-bib" id="bib-li2026smrcogeneration" hidden>
-<button type="button" class="bib-copy"><i class="bi bi-clipboard" aria-hidden="true"></i><span>Copy</span></button>
-<pre><code>@article{li2026smrcogeneration,
-  author        = {Li, Honglin and She, Buxin and Zhang, Jie},
-  title         = {{Techno-Economic Boundary Analysis of Small Modular Reactor Cogeneration for Hyperscale Data Center IT and Cooling Loads}},
-  journal       = {Energy Conversion and Management},
-  year          = {2026},
-  eprint        = {2608.10999},
-  archivePrefix = {arXiv},
-  primaryClass  = {eess.SY},
-  note          = {Accepted}
 }</code></pre>
 </div>
 </div>

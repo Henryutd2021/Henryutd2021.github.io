@@ -54,7 +54,7 @@ include-in-header:
         cycle cost and carbon footprint analysis, simulation and reliability modeling. Applications span wind, solar and
         hydrogen systems, regional hydrogen networks, nuclear–hydrogen integration, small modular reactors for data centers,
         grid integration of data centers, and energy storage. My first-author papers appear in <em>Nature Communications</em>,
-        <em>Cell Reports Sustainability</em> and the <em>International Journal of Hydrogen Energy</em>, with one accepted in <em>Energy Conversion and Management</em>.</p>
+        <em>Cell Reports Sustainability</em>, the <em>International Journal of Hydrogen Energy</em> and <em>Energy Conversion and Management</em>.</p>
     </div>
 
     <div class="about-cols">
@@ -185,7 +185,7 @@ include-in-header:
   <div class="section-title"><h2 id="h-news">News</h2></div>
   <table class="news-table" data-quarto-disable-processing="true">
     <tbody>
-      <tr><th scope="row">Nov 2026</th><td>Paper on small modular reactor cogeneration for hyperscale data-center IT and cooling loads accepted in <em>Energy Conversion and Management</em>.</td></tr>
+      <tr><th scope="row">Nov 2026</th><td>Paper on small modular reactor cogeneration for hyperscale data-center IT and cooling loads published in <a href="https://doi.org/10.1016/j.enconman.2026.122376"><em>Energy Conversion and Management</em></a>.</td></tr>
       <tr><th scope="row">Fall 2026</th><td>Teaching <strong>ECE 685 Power Systems Design</strong> at Kansas State University.</td></tr>
       <tr><th scope="row">Aug 2026</th><td>Preprint on small modular reactor cogeneration for hyperscale data-center IT and cooling loads posted on <a href="https://arxiv.org/abs/2608.10999">arXiv</a>.</td></tr>
       <tr><th scope="row">2026</th><td>Two papers accepted at the IEEE North American Power Symposium (NAPS 2026), including the cost of delayed energization for AI data centers.</td></tr>

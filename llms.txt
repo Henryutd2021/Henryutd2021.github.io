@@ -15,11 +15,11 @@
 
 ## Papers
 
+- [Techno-economic boundary analysis of small modular reactor cogeneration for hyperscale data center IT and cooling loads](https://henryutd2021.github.io/files/papers/li2026smrcogeneration.html): Energy Conversion and Management, vol. 372, article 122376, 2027. DOI: 10.1016/j.enconman.2026.122376.
 - [Rethinking the economics and flexibility of U.S. nuclear power through hydrogen integration and policy support](https://henryutd2021.github.io/files/papers/Li2026.html): Nature Communications, vol. 17, article 7090, 2026. DOI: 10.1038/s41467-026-73630-y.
 - [The role of small modular reactors in powering data centers for a sustainable digital economy](https://henryutd2021.github.io/files/papers/jacob2026role.html): Cell Reports Sustainability, vol. 3, article 100820, 2026. Co-first authors. DOI: 10.1016/j.crsus.2026.100820.
 - [Quantifying the Cost of Delayed Energization (CoDE) for AI Data Centers](https://henryutd2021.github.io/files/papers/li2026code.html): 2026 North American Power Symposium (NAPS), 2026. Accepted.
 - [Inertia-Aware Planning of Grid-Forming Energy Storage and Firm Capacity under Thermal Retirement](https://henryutd2021.github.io/files/papers/she2026inertia.html): 2026 North American Power Symposium (NAPS), 2026. Accepted.
-- [Techno-Economic Boundary Analysis of Small Modular Reactor Cogeneration for Hyperscale Data Center IT and Cooling Loads](https://henryutd2021.github.io/files/papers/li2026smrcogeneration.html): Energy Conversion and Management, 2026. Accepted.
 - [Real-time greenhouse gas emission intensity informed demand-side load regulation for power grid decarbonization](https://henryutd2021.github.io/files/papers/li2025ghg.html): Cell Reports Sustainability, vol. 2, article 100367, 2025. DOI: 10.1016/j.crsus.2025.100367.
 - [Hydrogen’s role in expanding renewable energy and reducing carbon emissions in Texas](https://henryutd2021.github.io/files/papers/li2025hydrogen.html): International Journal of Hydrogen Energy, vol. 113, pp. 77–89, 2025. DOI: 10.1016/j.ijhydene.2025.02.303.
 - [Techno-Economic Analysis of Hydrogen-Integrated Sustainable Energy Systems](https://henryutd2021.github.io/files/papers/li2025dissertation.html): Ph.D. dissertation, The University of Texas at Dallas, 2025.
