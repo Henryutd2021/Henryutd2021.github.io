@@ -146,7 +146,7 @@ body-classes: "page-inner page-folio page-research"
 
   <div class="sei" id="sei">
     <div class="sei-head">
-      <span class="label">Seed grant · Co-PI · funded (2027)</span>
+      <span class="label">Funded seed grant · Co-PI</span>
       <h3>Secure power for Kansas data centers</h3>
       <p class="sei-src">Kansas State University Secure Energy Initiative, seed funding for January–December 2027</p>
     </div>
