@@ -164,9 +164,9 @@ include-in-header:
     </li>
     <li class="ability">
       <span class="ab-icon" aria-hidden="true"><i class="bi bi-people"></i></span>
-      <h3>Proposals and teamwork</h3>
-      <p>Co-PI on an interdisciplinary seed proposal on secure power for Kansas data centers; helped prepare a funded NSF supplement for national-laboratory research.</p>
-      <p class="ab-links"><a href="research.html#sei">Proposal</a><a href="cv.html#grant-writing-experience">Grants on the CV</a></p>
+      <h3>Grants and teamwork</h3>
+      <p>Co-PI on an interdisciplinary seed grant on secure power for Kansas data centers, funded for 2027; helped prepare the funded NSF supplement that supported my national-laboratory research.</p>
+      <p class="ab-links"><a href="research.html#sei">Seed grant</a><a href="cv.html#grant-writing-experience">Grants on the CV</a></p>
     </li>
   </ul>
 </section>

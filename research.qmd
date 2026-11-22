@@ -146,11 +146,11 @@ body-classes: "page-inner page-folio page-research"
 
   <div class="sei" id="sei">
     <div class="sei-head">
-      <span class="label">Proposal · Co-PI · under review (2026)</span>
+      <span class="label">Seed grant · Co-PI · funded (2027)</span>
       <h3>Secure power for Kansas data centers</h3>
-      <p class="sei-src">Kansas State University Secure Energy Initiative, seed funding</p>
+      <p class="sei-src">Kansas State University Secure Energy Initiative, seed funding for January–December 2027</p>
     </div>
-    <p>Kansas is seeing data-center proposals of several hundred megawatts. The proposal asks how small modular reactors, their recoverable heat, data-center cooling and grid connections can be planned together, so that computing and cooling continue through disruptions at a cost the region can bear, with community priorities in siting and design.</p>
+    <p>Kansas is seeing data-center proposals of several hundred megawatts. The project asks how small modular reactors, their recoverable heat, data-center cooling and grid connections can be planned together, so that computing and cooling continue through disruptions at a cost the region can bear, with community priorities in siting and design.</p>
     <ol class="sei-modules" aria-label="Four research modules">
       <li><strong>Community and policy</strong> preferences and local conditions</li>
       <li><strong>Physical models</strong> of reactor heat, cooling and data-center operation</li>

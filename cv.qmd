@@ -247,7 +247,7 @@ body-classes: "page-inner page-folio page-cv"
 :::
 
 ::: {.cv-list}
-- [2026]{.cv-date} [**K-State Secure Energy Initiative (SEI) Seed Grant Proposal: Secure Power for Kansas Data Centers: Socio-Techno-Economic Pathways for SMR Deployment and Grid Integration**]{.cv-lt} [Co-PI; under review.]{.cv-ld}
+- [2027]{.cv-date} [**K-State Secure Energy Initiative (SEI) Seed Grant (funded): Secure Power for Kansas Data Centers: Socio-Techno-Economic Pathways for SMR Deployment and Grid Integration**]{.cv-lt} [Co-PI (**\$100,000**; PI Prof. Buxin She; January–December 2027); lead the techno-economic analysis of the integrated SMR–data center system.]{.cv-ld}
 - [2024]{.cv-date} [**NSF INTERN supplement (funded)**]{.cv-lt} [Helped prepare a funded NSF INTERN supplement (**\$55,000**; PI Prof. Jie Zhang) that supported my nuclear–hydrogen research at Idaho National Laboratory.]{.cv-ld}
 :::
 :::
