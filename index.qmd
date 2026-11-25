@@ -187,6 +187,7 @@ include-in-header:
     <tbody>
       <tr><th scope="row">Nov 2026</th><td>Our <a href="research.html#sei">project on secure power for Kansas data centers</a> was funded by the Kansas State University Secure Energy Initiative as a seed grant for 2027; I am co-PI.</td></tr>
       <tr><th scope="row">Nov 2026</th><td>Paper on small modular reactor cogeneration for hyperscale data-center IT and cooling loads published in <a href="https://doi.org/10.1016/j.enconman.2026.122376"><em>Energy Conversion and Management</em></a>.</td></tr>
+      <tr><th scope="row">Nov 2026</th><td>Accepted a postdoctoral offer from Princeton University (Department of Civil and Environmental Engineering).</td></tr>
       <tr><th scope="row">Fall 2026</th><td>Teaching <strong>ECE 685 Power Systems Design</strong> at Kansas State University.</td></tr>
       <tr><th scope="row">Aug 2026</th><td>Preprint on small modular reactor cogeneration for hyperscale data-center IT and cooling loads posted on <a href="https://arxiv.org/abs/2608.10999">arXiv</a>.</td></tr>
       <tr><th scope="row">2026</th><td>Two papers accepted at the IEEE North American Power Symposium (NAPS 2026), including the cost of delayed energization for AI data centers.</td></tr>
